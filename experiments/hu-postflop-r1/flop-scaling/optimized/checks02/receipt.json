@@ -1,0 +1,91 @@
+{
+  "schema": "r1.flop-optimized-local-checks/v1",
+  "created_utc": "2026-09-27T01:02:46.557000+00:00",
+  "source_before": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\build.py": {
+      "bytes": 8939,
+      "sha256": "6fb0c169706e75a0724e2fb221d37219f792db7bbb368d57da4d9054eff82ad4"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\run.py": {
+      "bytes": 5333,
+      "sha256": "d7f7b09564b326a774645cba1f51c47c830beda2d7f662077c00c2f83c26bbb9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\README.jp.md": {
+      "bytes": 5604,
+      "sha256": "08bf11534bfeabee3daaba58303c55bcc94d3984e64c9159230317166a7c407c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4322,
+      "sha256": "fc4883fb3798833da1ac73ee28312fae6b691517dadc541bed845030d2a8df47"
+    },
+    "experiments\\README.md": {
+      "bytes": 17699,
+      "sha256": "783637b8226ee7ce4823e415c884157126809973c6b604c568317b40dd12221f"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "00-stdout.log",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "00-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "01-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "01-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\build.py": {
+      "bytes": 8939,
+      "sha256": "6fb0c169706e75a0724e2fb221d37219f792db7bbb368d57da4d9054eff82ad4"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\run.py": {
+      "bytes": 5333,
+      "sha256": "d7f7b09564b326a774645cba1f51c47c830beda2d7f662077c00c2f83c26bbb9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\README.jp.md": {
+      "bytes": 5604,
+      "sha256": "08bf11534bfeabee3daaba58303c55bcc94d3984e64c9159230317166a7c407c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4322,
+      "sha256": "fc4883fb3798833da1ac73ee28312fae6b691517dadc541bed845030d2a8df47"
+    },
+    "experiments\\README.md": {
+      "bytes": 17699,
+      "sha256": "783637b8226ee7ce4823e415c884157126809973c6b604c568317b40dd12221f"
+    }
+  },
+  "source_unchanged": true,
+  "production_pin_count": 207,
+  "production_mismatches": [],
+  "clippy_workspace_tests": "not_rerun_researchonly_productionunchanged_competinglocalwork"
+}

@@ -1,0 +1,1 @@
+{"schema":"r1.flop-native-solve/v1","status":"completed","case":"expanded","threads":2,"iterations":2,"state_file":"state.bin","state_bytes":283677926,"quality_file":"quality.json","build_seconds":0.4183548,"cfr_seconds":1.7117404999999999,"state_write_seconds":0.6823294,"quality_seconds":3.2818221,"cfv_capture":false,"performance_claim":false}

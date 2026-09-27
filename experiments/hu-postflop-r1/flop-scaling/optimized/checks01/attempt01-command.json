@@ -1,0 +1,79 @@
+{
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\optimized\\verify.py"
+  ],
+  "started_utc": "2026-09-27T01:03:22.333490+00:00",
+  "ended_utc": "2026-09-27T01:03:25.655896+00:00",
+  "elapsed_seconds": 3.320293900091201,
+  "exit_code": 0,
+  "source_before": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\verify.py": {
+      "bytes": 24976,
+      "sha256": "d34aef4678a9fe8f121f471fcceb577101226249407992c13111e06773e22ecd"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\build.py": {
+      "bytes": 8939,
+      "sha256": "6fb0c169706e75a0724e2fb221d37219f792db7bbb368d57da4d9054eff82ad4"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\run.py": {
+      "bytes": 5333,
+      "sha256": "d7f7b09564b326a774645cba1f51c47c830beda2d7f662077c00c2f83c26bbb9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\manifest.json": {
+      "bytes": 19493,
+      "sha256": "63925b265d5e9d12e3934d5629f0b0adc21fae949b01af4057aa7404dbc8f03f"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\proof01\\manifest.json": {
+      "bytes": 13158,
+      "sha256": "55ad681a062455c2b2a6501920336ec11c215ab9b76890fc77f2a04b67e2aa11"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "tools\\run_supervised.py": {
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    }
+  },
+  "source_after": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\verify.py": {
+      "bytes": 24976,
+      "sha256": "d34aef4678a9fe8f121f471fcceb577101226249407992c13111e06773e22ecd"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\build.py": {
+      "bytes": 8939,
+      "sha256": "6fb0c169706e75a0724e2fb221d37219f792db7bbb368d57da4d9054eff82ad4"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\run.py": {
+      "bytes": 5333,
+      "sha256": "d7f7b09564b326a774645cba1f51c47c830beda2d7f662077c00c2f83c26bbb9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\optimized\\proof01\\manifest.json": {
+      "bytes": 19493,
+      "sha256": "63925b265d5e9d12e3934d5629f0b0adc21fae949b01af4057aa7404dbc8f03f"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\proof01\\manifest.json": {
+      "bytes": 13158,
+      "sha256": "55ad681a062455c2b2a6501920336ec11c215ab9b76890fc77f2a04b67e2aa11"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "tools\\run_supervised.py": {
+      "bytes": 39015,
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+    }
+  },
+  "stdout": {
+    "bytes": 5084,
+    "sha256": "a9b3aa17a48417d50df465c4503902e98b87c4942d4665d9686171a94c5d4e5b"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

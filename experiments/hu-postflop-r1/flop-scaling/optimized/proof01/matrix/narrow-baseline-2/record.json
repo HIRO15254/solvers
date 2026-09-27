@@ -1,0 +1,194 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T00:56:22.637828+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\flop-solve-opt-probe.exe",
+    "narrow",
+    "2",
+    "2",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2\\output"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 60.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 469762048,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": 1610612736,
+    "disk_reserve_bytes": 1073741824
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2\\record.stdout.log",
+      "sha256": "d93860ef7195b44a4862f8c420c874a5a5c05e43b470f7e337c11f778e30605d",
+      "bytes": 773
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2\\record.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2\\record.samples.jsonl",
+      "sha256": "9a5b87f736b0b5792df93708cbbe364525fb60a8420e468286d60e39fd1e7810",
+      "bytes": 8992
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\flop-solve-opt-probe.exe",
+      "sha256": "dad0a1a618b1fe9a7ddf15e7ec6b803482e7d5ede83426e81edb09b7763a4f6e",
+      "bytes": 983552
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\narrow.toml",
+      "sha256": "c059797a7276fa708c0c04dc31e967b0f074b63353171055f8edbb83ca20355c",
+      "bytes": 753
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs",
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9",
+      "bytes": 11148
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-base-build01\\receipt.json",
+      "sha256": "3635c26f4f64ee3b0714e5a713f70a9e009eb4aaff998318dae721e8d0e3aa5f",
+      "bytes": 27775
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\flop-solve-opt-probe.exe",
+      "sha256": "dad0a1a618b1fe9a7ddf15e7ec6b803482e7d5ede83426e81edb09b7763a4f6e",
+      "bytes": 983552
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\narrow.toml",
+      "sha256": "c059797a7276fa708c0c04dc31e967b0f074b63353171055f8edbb83ca20355c",
+      "bytes": 753
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs",
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9",
+      "bytes": 11148
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-base-build01\\receipt.json",
+      "sha256": "3635c26f4f64ee3b0714e5a713f70a9e009eb4aaff998318dae721e8d0e3aa5f",
+      "bytes": 27775
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 25,
+    "max_sample_gap_seconds": 0.10531729995273054,
+    "sampled_peak_tree_resident_bytes": 131543040,
+    "root_os_peak_resident_bytes": 120664064,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 127209472,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 5108989952,
+    "commit_available_bytes": 2461609984
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\flop-solve-opt-probe.exe",
+    "narrow",
+    "2",
+    "2",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2\\output"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-matrix01\\narrow-baseline-2",
+  "disk_free_before_bytes": 42811486208,
+  "started_at": "2026-09-27T00:56:22.766012+00:00",
+  "pid": 86476,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 120664064,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 127209472,
+    "elapsed_seconds": 2.441972500178963,
+    "at": "2026-09-27T00:56:25.208162+00:00",
+    "host_available_memory_bytes": 5164699648,
+    "disk_free_bytes": 42729840640
+  },
+  "elapsed_seconds": 2.442343900213018,
+  "ended_at": "2026-09-27T00:56:25.208762+00:00",
+  "supervisor_exit_code": 0
+}

@@ -12,6 +12,7 @@ Flopの十分に大きい仕事量で、利用可能な物理coreに近い倍率
 | [flat chance出力候補](flat-chance/README.jp.md) | 子ごとの出力所有Vecを親の再利用bufferへ変更。子の演算・元順fold・chance制御は維持。研究copyでのみ検査 |
 | [native構築の後続確認](native-preflight/README.jp.md) | 2入力とも実際の木・rank tableを構築し、全street bet/raise・support・storage件数が一致。CFR/収束・速度比較は未実施 |
 | [narrowの短いnative solve](native-solve/report.jp.md) | baseline／flat各1／2 workers、2反復の全F32状態・公開EV／BR／seat別gainが完全一致。未収束の正しさ検査で、速度は未認定 |
+| [最適化buildの2入力照合](optimized/README.jp.md) | runtime依存も新規release buildし、narrow／expanded各4条件の全状態・公開品質が完全一致。1 workerは非並列chance対照、2 workersは候補経路を通る。性能は未認定 |
 
 [最終照合記録](review.json)で301件のsource/raw pin照合とproduction207ファイルの不変を確認した。
 通常fmtと文書検査も成功。競合するローカル計算と資源余力のためfull clippy/workspace testsは

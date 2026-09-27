@@ -1,0 +1,70 @@
+{
+  "scope": "Full-street Flop two-iteration F32/DCFR release correctness, no convergence or timing acceptance",
+  "conditions": [
+    [
+      "narrow",
+      "baseline",
+      1
+    ],
+    [
+      "narrow",
+      "baseline",
+      2
+    ],
+    [
+      "narrow",
+      "flat",
+      1
+    ],
+    [
+      "narrow",
+      "flat",
+      2
+    ],
+    [
+      "expanded",
+      "baseline",
+      1
+    ],
+    [
+      "expanded",
+      "baseline",
+      2
+    ],
+    [
+      "expanded",
+      "flat",
+      1
+    ],
+    [
+      "expanded",
+      "flat",
+      2
+    ]
+  ],
+  "exact_iterations": 2,
+  "wall_seconds_each": 60,
+  "job_commit_bytes": 536870912,
+  "rss_trigger_bytes": 469762048,
+  "stop_on_failure_or_mismatch": true,
+  "build_receipts": {
+    "baseline": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-base-build01\\receipt.json",
+      "bytes": 27775,
+      "sha256": "3635c26f4f64ee3b0714e5a713f70a9e009eb4aaff998318dae721e8d0e3aa5f"
+    },
+    "flat": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-opt-flat-build01\\receipt.json",
+      "bytes": 27771,
+      "sha256": "0d500bdf93e3bd4dc5ae85ea10e9d6d82110104c2f2fac9fe1ac72b78d95a3c5"
+    }
+  },
+  "adapter": {
+    "bytes": 11148,
+    "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+  },
+  "runner": {
+    "bytes": 5333,
+    "sha256": "d7f7b09564b326a774645cba1f51c47c830beda2d7f662077c00c2f83c26bbb9"
+  }
+}

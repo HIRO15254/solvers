@@ -1,0 +1,35 @@
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.46
+   Compiling quickdiv v0.1.1
+   Compiling fastrand v2.4.1
+   Compiling aya_base v0.1.0
+   Compiling miniphf v0.1.0
+   Compiling syn v2.0.118
+   Compiling crossbeam-utils v0.8.21
+   Compiling aya_codegen v0.1.0
+   Compiling serde_core v1.0.228
+   Compiling zerocopy v0.8.52
+   Compiling aya_poker v0.1.0
+   Compiling cfg-if v1.0.4
+   Compiling thiserror v2.0.18
+   Compiling serde v1.0.228
+   Compiling getrandom v0.2.17
+   Compiling crossbeam-epoch v0.9.18
+   Compiling serde_derive v1.0.228
+   Compiling thiserror-impl v2.0.18
+   Compiling rayon-core v1.13.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling crossbeam-deque v0.8.6
+   Compiling rand_core v0.6.4
+   Compiling rand_chacha v0.3.1
+   Compiling cards v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\crates\cards)
+   Compiling either v1.16.0
+   Compiling rayon v1.12.0
+   Compiling rand v0.8.6
+   Compiling engine v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\crates\engine)
+   Compiling game v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\crates\game)
+   Compiling hand-index v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\crates\hand-index)
+   Compiling holdem v0.1.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\crates\holdem)
+   Compiling flop-solve-opt-probe v0.0.0 (C:\Users\PC_User\.codex\worktrees\ce71\solvers\.cache\flop-opt-base01\probe)
+    Finished `release` profile [optimized] target(s) in 1m 27s

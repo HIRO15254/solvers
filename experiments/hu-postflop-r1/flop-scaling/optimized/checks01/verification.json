@@ -1,0 +1,201 @@
+{
+  "schema": "r1.flop-optimized-portable-verification/v1",
+  "status": "verified",
+  "proof_manifest": {
+    "bytes": 19493,
+    "sha256": "63925b265d5e9d12e3934d5629f0b0adc21fae949b01af4057aa7404dbc8f03f"
+  },
+  "payload_files": 105,
+  "successful_runs": [
+    "narrow-baseline-1",
+    "narrow-baseline-2",
+    "narrow-flat-1",
+    "narrow-flat-2",
+    "expanded-baseline-1",
+    "expanded-baseline-2",
+    "expanded-flat-1",
+    "expanded-flat-2"
+  ],
+  "cases": {
+    "narrow": {
+      "state": {
+        "bytes": 81414344,
+        "sha256": "35981691a7736e2df5a89734b1102ee8ffc1bacaab7719476b0152e459eb2700"
+      },
+      "header": [
+        2,
+        2,
+        367662,
+        147104,
+        34,
+        30,
+        10176768,
+        10176768
+      ],
+      "quality": {
+        "bytes": 667,
+        "sha256": "083989ea08a64f13508c259b87c3797245b4b037ed73bfffd3bc3e8564347fb0"
+      },
+      "ev": [
+        -14.63106391292879,
+        14.63104995201374
+      ],
+      "br": [
+        316.8959826239224,
+        157.72235278864017
+      ],
+      "public_gains": [
+        331.5270465368512,
+        143.09128887571137
+      ],
+      "nash_conv_chips": 474.61833541256254,
+      "usual_exploitability_chips": 237.30916770628127
+    },
+    "expanded": {
+      "state": {
+        "bytes": 283677926,
+        "sha256": "87d31b1da7e9b766cc09b02a51da74169167d705b104e9a60a1e4eeeb20f9cdd"
+      },
+      "header": [
+        2,
+        2,
+        367662,
+        147104,
+        63,
+        160,
+        35459676,
+        35459676
+      ],
+      "quality": {
+        "bytes": 672,
+        "sha256": "7c62ebfc3d6eb027d8374cda83e399d6c8caae3c2996c0b7c03ee52edb7910ea"
+      },
+      "ev": [
+        -14.415155969378592,
+        14.415154362821031
+      ],
+      "br": [
+        311.3756253367457,
+        148.71117363589934
+      ],
+      "public_gains": [
+        325.7907813061243,
+        134.29601766652075
+      ],
+      "nash_conv_chips": 460.08679897264506,
+      "usual_exploitability_chips": 230.04339948632253
+    }
+  },
+  "builds": {
+    "baseline": {
+      "runtime_packages": [
+        "aya_base",
+        "aya_poker",
+        "cards",
+        "cfg-if",
+        "crossbeam-deque",
+        "crossbeam-epoch",
+        "crossbeam-utils",
+        "either",
+        "engine",
+        "fastrand",
+        "flop-solve-opt-probe",
+        "game",
+        "getrandom",
+        "hand-index",
+        "holdem",
+        "ppv-lite86",
+        "quickdiv",
+        "rand",
+        "rand_chacha",
+        "rand_core",
+        "rayon",
+        "rayon-core",
+        "serde",
+        "serde_core",
+        "thiserror",
+        "zerocopy"
+      ],
+      "host_packages": [
+        "aya_base",
+        "aya_codegen",
+        "aya_poker",
+        "crossbeam-utils",
+        "fastrand",
+        "miniphf",
+        "proc-macro2",
+        "quickdiv",
+        "quote",
+        "rayon-core",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "unicode-ident",
+        "zerocopy"
+      ],
+      "artifacts": 46
+    },
+    "flat": {
+      "runtime_packages": [
+        "aya_base",
+        "aya_poker",
+        "cards",
+        "cfg-if",
+        "crossbeam-deque",
+        "crossbeam-epoch",
+        "crossbeam-utils",
+        "either",
+        "engine",
+        "fastrand",
+        "flop-solve-opt-probe",
+        "game",
+        "getrandom",
+        "hand-index",
+        "holdem",
+        "ppv-lite86",
+        "quickdiv",
+        "rand",
+        "rand_chacha",
+        "rand_core",
+        "rayon",
+        "rayon-core",
+        "serde",
+        "serde_core",
+        "thiserror",
+        "zerocopy"
+      ],
+      "host_packages": [
+        "aya_base",
+        "aya_codegen",
+        "aya_poker",
+        "crossbeam-utils",
+        "fastrand",
+        "miniphf",
+        "proc-macro2",
+        "quickdiv",
+        "quote",
+        "rayon-core",
+        "serde",
+        "serde_core",
+        "serde_derive",
+        "syn",
+        "thiserror",
+        "thiserror-impl",
+        "unicode-ident",
+        "zerocopy"
+      ],
+      "artifacts": 46
+    }
+  },
+  "limitations": [
+    "Two iterations, workers 1/2 only; no convergence, performance, full-workspace or 32-worker acceptance",
+    "One canonical state per case; eight original state hashes and byte equality are captured records, not eight retained streams",
+    "Source archives and final executables retained; registry source, intermediate libraries, compiler DLL/sysroot/linker not retained or recompiled by this checker",
+    "Cargo artifact profiles confirm opt3 runtime and opt0 host build tools; thin LTO/target-cpu are retained declarations, not independent disassembly proof",
+    "Pinned repository checkout required; original host cache/target/run paths never opened",
+    "No CFV, checkpoint, SOL wire or external solver certification"
+  ]
+}
