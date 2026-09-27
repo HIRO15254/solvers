@@ -1,0 +1,62 @@
+Diff in \\?\C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\alloc-probe\probe.rs:119:
+     pub(crate) fn emit(phase: &str, counts: [u64; 12]) {
+         println!(
+             "{{\"event\":\"allocation_counts\",\"schema\":\"r1-phase-allocation/v1\",\"phase\":\"{phase}\",\"alloc_calls\":{},\"alloc_requested_bytes\":{},\"alloc_failed_calls\":{},\"alloc_zeroed_calls\":{},\"alloc_zeroed_requested_bytes\":{},\"alloc_zeroed_failed_calls\":{},\"realloc_calls\":{},\"realloc_requested_new_bytes\":{},\"realloc_old_layout_bytes\":{},\"realloc_failed_calls\":{},\"dealloc_calls\":{},\"dealloc_layout_bytes\":{}}}",
+-            counts[0], counts[1], counts[2], counts[3], counts[4], counts[5],
+-            counts[6], counts[7], counts[8], counts[9], counts[10], counts[11]
++            counts[0],
++            counts[1],
++            counts[2],
++            counts[3],
++            counts[4],
++            counts[5],
++            counts[6],
++            counts[7],
++            counts[8],
++            counts[9],
++            counts[10],
++            counts[11]
+         );
+     }
+ }
+Diff in \\?\C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\alloc-probe\selftest.rs:114:
+     pub(crate) fn emit(phase: &str, counts: [u64; 12]) {
+         println!(
+             "{{\"event\":\"allocation_counts\",\"schema\":\"r1-phase-allocation/v1\",\"phase\":\"{phase}\",\"alloc_calls\":{},\"alloc_requested_bytes\":{},\"alloc_failed_calls\":{},\"alloc_zeroed_calls\":{},\"alloc_zeroed_requested_bytes\":{},\"alloc_zeroed_failed_calls\":{},\"realloc_calls\":{},\"realloc_requested_new_bytes\":{},\"realloc_old_layout_bytes\":{},\"realloc_failed_calls\":{},\"dealloc_calls\":{},\"dealloc_layout_bytes\":{}}}",
+-            counts[0], counts[1], counts[2], counts[3], counts[4], counts[5],
+-            counts[6], counts[7], counts[8], counts[9], counts[10], counts[11]
++            counts[0],
++            counts[1],
++            counts[2],
++            counts[3],
++            counts[4],
++            counts[5],
++            counts[6],
++            counts[7],
++            counts[8],
++            counts[9],
++            counts[10],
++            counts[11]
+         );
+     }
+ }
+Diff in \\?\C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\alloc-probe\selftest.rs:123:
+ // Compile this generated standalone source without the solver crate graph.
+ // It exercises explicit allocator calls, not optimizer-elidable Box values.
+ fn main() {
+-    use std::alloc::{GlobalAlloc, Layout};
+     use allocation_probe::ALLOCATOR;
++    use std::alloc::{GlobalAlloc, Layout};
+ 
+     let l32 = Layout::from_size_align(32, 8).unwrap();
+     let l64 = Layout::from_size_align(64, 8).unwrap();
+Diff in \\?\C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\alloc-probe\selftest.rs:165:
+     assert!(allocation_probe::stop().is_none());
+     allocation_probe::start();
+     assert_eq!(allocation_probe::stop().unwrap(), [0; 12]);
+-    println!("{{\"selftest\":\"passed\",\"null_failure_injection\":false,\"concurrency_stress\":false}}");
++    println!(
++        "{{\"selftest\":\"passed\",\"null_failure_injection\":false,\"concurrency_stress\":false}}"
++    );
+ }
+ 

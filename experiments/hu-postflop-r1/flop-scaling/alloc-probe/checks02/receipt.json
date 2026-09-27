@@ -1,0 +1,71 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\verify.py"
+  ],
+  "elapsed_seconds": 0.8254088000394404,
+  "exit_code": 0,
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/proof01/manifest.json": {
+      "bytes": 25500,
+      "sha256": "a37f86dc0cdccbdbe823735a11e909cbe47a623749259acfae3fcb89b86c7036"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/provenance.json": {
+      "bytes": 1381,
+      "sha256": "1333526cc86087e0cf96fd04f2f1329375860e550079226aeabb4644f2dcf36a"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/retain.py": {
+      "bytes": 4032,
+      "sha256": "77635aabb84910176f5f052d4be16560680822c938f61039f33950c256b01350"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/run.py": {
+      "bytes": 12338,
+      "sha256": "0d62bc2861b33627b5d42b5a591278d20dcf608a1c1cccaa3149f147a8e48d23"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/verify.py": {
+      "bytes": 11847,
+      "sha256": "4307cd398c79080ffd94491f0c2850ca77315f6cabf00a2f0611ef49d152d33b"
+    }
+  },
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/proof01/manifest.json": {
+      "bytes": 25500,
+      "sha256": "a37f86dc0cdccbdbe823735a11e909cbe47a623749259acfae3fcb89b86c7036"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/provenance.json": {
+      "bytes": 1381,
+      "sha256": "1333526cc86087e0cf96fd04f2f1329375860e550079226aeabb4644f2dcf36a"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/retain.py": {
+      "bytes": 4032,
+      "sha256": "77635aabb84910176f5f052d4be16560680822c938f61039f33950c256b01350"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/run.py": {
+      "bytes": 12338,
+      "sha256": "0d62bc2861b33627b5d42b5a591278d20dcf608a1c1cccaa3149f147a8e48d23"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/alloc-probe/verify.py": {
+      "bytes": 11847,
+      "sha256": "4307cd398c79080ffd94491f0c2850ca77315f6cabf00a2f0611ef49d152d33b"
+    }
+  },
+  "source_unchanged": true,
+  "started_utc": "2026-09-27T01:10:16.062112+00:00",
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stdout": {
+    "bytes": 3427,
+    "sha256": "79299fb17da1e8d6e746c90f96f4e2e6cae230eb0e4569412c71f5483c9bea79"
+  }
+}

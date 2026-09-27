@@ -1,0 +1,47 @@
+// Compile this generated standalone source without the solver crate graph.
+// It exercises explicit allocator calls, not optimizer-elidable Box values.
+fn main() {
+    use std::alloc::{GlobalAlloc, Layout};
+    use allocation_probe::ALLOCATOR;
+
+    let l32 = Layout::from_size_align(32, 8).unwrap();
+    let l64 = Layout::from_size_align(64, 8).unwrap();
+    let l128 = Layout::from_size_align(128, 8).unwrap();
+    assert!(allocation_probe::stop().is_none());
+    unsafe {
+        let ignored = ALLOCATOR.alloc(l32);
+        assert!(!ignored.is_null());
+        ALLOCATOR.dealloc(ignored, l32);
+    }
+
+    allocation_probe::start();
+    let preserved;
+    let zeroed;
+    unsafe {
+        let old = ALLOCATOR.alloc(l64);
+        if old.is_null() {
+            std::process::abort();
+        }
+        old.write_volatile(91);
+        let grown = ALLOCATOR.realloc(old, l64, 128);
+        if grown.is_null() {
+            std::process::abort();
+        }
+        preserved = grown.read_volatile() == 91;
+        ALLOCATOR.dealloc(grown, l128);
+        let zero = ALLOCATOR.alloc_zeroed(l32);
+        if zero.is_null() {
+            std::process::abort();
+        }
+        zeroed = (0..32).all(|i| zero.add(i).read_volatile() == 0);
+        ALLOCATOR.dealloc(zero, l32);
+    }
+    let first = allocation_probe::stop().unwrap();
+    assert!(preserved && zeroed);
+    assert_eq!(first, [1, 64, 0, 1, 32, 0, 1, 128, 64, 0, 2, 160]);
+    allocation_probe::emit("selftest", first);
+    assert!(allocation_probe::stop().is_none());
+    allocation_probe::start();
+    assert_eq!(allocation_probe::stop().unwrap(), [0; 12]);
+    println!("{{\"selftest\":\"passed\",\"null_failure_injection\":false,\"concurrency_stress\":false}}");
+}

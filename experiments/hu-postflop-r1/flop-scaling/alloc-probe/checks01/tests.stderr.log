@@ -1,0 +1,14 @@
+test_already_instrumented_rejected (__main__.TransformTests.test_already_instrumented_rejected) ... ok
+test_appended_base_rejected (__main__.TransformTests.test_appended_base_rejected) ... ok
+test_bool_only_gate_negative_control_detects_race (__main__.TransformTests.test_bool_only_gate_negative_control_detects_race) ... ok
+test_changed_base_rejected (__main__.TransformTests.test_changed_base_rejected) ... ok
+test_epoch_model_rejects_stale_entry_after_restart (__main__.TransformTests.test_epoch_model_rejects_stale_entry_after_restart) ... ok
+test_event_io_outside_gate (__main__.TransformTests.test_event_io_outside_gate) ... ok
+test_exact_generated_files_and_manifest (__main__.TransformTests.test_exact_generated_files_and_manifest) ... ok
+test_only_declared_two_transformations (__main__.TransformTests.test_only_declared_two_transformations) ... ok
+test_selftest_uses_identical_allocator (__main__.TransformTests.test_selftest_uses_identical_allocator) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.008s
+
+OK

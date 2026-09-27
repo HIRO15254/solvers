@@ -1,0 +1,121 @@
+// Research-only phase-window allocation counters. No solver semantics live here.
+mod allocation_probe {
+    use std::alloc::{GlobalAlloc, Layout, System};
+    use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+
+    // The event driver is single-threaded. An odd epoch admits operations; an
+    // even epoch excludes them. Epoch equality prevents a delayed old entrant
+    // from being admitted after a stop/reset/start cycle.
+    static EPOCH: AtomicU64 = AtomicU64::new(0);
+    static INFLIGHT: AtomicUsize = AtomicUsize::new(0);
+    static COUNTERS: [AtomicU64; 12] = [const { AtomicU64::new(0) }; 12];
+
+    pub(crate) struct CountingSystem;
+
+    #[global_allocator]
+    pub(crate) static ALLOCATOR: CountingSystem = CountingSystem;
+
+    fn enter() -> bool {
+        let epoch = EPOCH.load(Ordering::SeqCst);
+        if epoch & 1 == 0 {
+            return false;
+        }
+        INFLIGHT.fetch_add(1, Ordering::SeqCst);
+        if EPOCH.load(Ordering::SeqCst) != epoch {
+            INFLIGHT.fetch_sub(1, Ordering::SeqCst);
+            return false;
+        }
+        true
+    }
+
+    fn add(index: usize, value: u64) {
+        COUNTERS[index].fetch_add(value, Ordering::Relaxed);
+    }
+
+    fn leave() {
+        INFLIGHT.fetch_sub(1, Ordering::SeqCst);
+    }
+
+    // Each admitted operation stays inflight through System and all updates.
+    // Allocator methods never format, allocate recursively, lock, or panic.
+    unsafe impl GlobalAlloc for CountingSystem {
+        unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+            let counted = enter();
+            let result = unsafe { System.alloc(layout) };
+            if counted {
+                add(0, 1);
+                add(1, layout.size() as u64);
+                add(2, result.is_null() as u64);
+                leave();
+            }
+            result
+        }
+
+        unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
+            let counted = enter();
+            let result = unsafe { System.alloc_zeroed(layout) };
+            if counted {
+                add(3, 1);
+                add(4, layout.size() as u64);
+                add(5, result.is_null() as u64);
+                leave();
+            }
+            result
+        }
+
+        unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, size: usize) -> *mut u8 {
+            let counted = enter();
+            let result = unsafe { System.realloc(ptr, layout, size) };
+            if counted {
+                add(6, 1);
+                add(7, size as u64);
+                add(8, layout.size() as u64);
+                add(9, result.is_null() as u64);
+                leave();
+            }
+            result
+        }
+
+        unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+            let counted = enter();
+            unsafe { System.dealloc(ptr, layout) };
+            if counted {
+                add(10, 1);
+                add(11, layout.size() as u64);
+                leave();
+            }
+        }
+    }
+
+    pub(crate) fn start() {
+        let epoch = EPOCH.load(Ordering::SeqCst);
+        assert_eq!(epoch & 1, 0, "allocation phase already active");
+        // stop() drained every admitted operation before returning. A delayed
+        // rejected entrant can still modify INFLIGHT but cannot update counters.
+        // Do not assert INFLIGHT == 0 here: that would reject such a valid race.
+        for counter in &COUNTERS {
+            counter.store(0, Ordering::Relaxed);
+        }
+        EPOCH.store(epoch.checked_add(1).unwrap(), Ordering::SeqCst);
+    }
+
+    pub(crate) fn stop() -> Option<[u64; 12]> {
+        let epoch = EPOCH.load(Ordering::SeqCst);
+        if epoch & 1 == 0 {
+            return None;
+        }
+        EPOCH.store(epoch.checked_add(1).unwrap(), Ordering::SeqCst);
+        while INFLIGHT.load(Ordering::SeqCst) != 0 {
+            std::hint::spin_loop();
+        }
+        Some(std::array::from_fn(|i| COUNTERS[i].load(Ordering::Relaxed)))
+    }
+
+    pub(crate) fn emit(phase: &str, counts: [u64; 12]) {
+        println!(
+            "{{\"event\":\"allocation_counts\",\"schema\":\"r1-phase-allocation/v1\",\"phase\":\"{phase}\",\"alloc_calls\":{},\"alloc_requested_bytes\":{},\"alloc_failed_calls\":{},\"alloc_zeroed_calls\":{},\"alloc_zeroed_requested_bytes\":{},\"alloc_zeroed_failed_calls\":{},\"realloc_calls\":{},\"realloc_requested_new_bytes\":{},\"realloc_old_layout_bytes\":{},\"realloc_failed_calls\":{},\"dealloc_calls\":{},\"dealloc_layout_bytes\":{}}}",
+            counts[0], counts[1], counts[2], counts[3], counts[4], counts[5],
+            counts[6], counts[7], counts[8], counts[9], counts[10], counts[11]
+        );
+    }
+}

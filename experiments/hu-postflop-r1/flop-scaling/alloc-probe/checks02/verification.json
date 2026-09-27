@@ -1,0 +1,109 @@
+{
+  "payload_files": 65,
+  "quality": {
+    "bytes": 667,
+    "sha256": "083989ea08a64f13508c259b87c3797245b4b037ed73bfffd3bc3e8564347fb0"
+  },
+  "scope": "retained byte/provenance consistency and observed allocation counts; not a hermetic rebuild or performance result",
+  "shared_state": {
+    "bytes": 81414344,
+    "sha256": "35981691a7736e2df5a89734b1102ee8ffc1bacaab7719476b0152e459eb2700"
+  },
+  "solves": 4,
+  "stages": 8,
+  "status": "verified",
+  "summaries": [
+    {
+      "cfr": {
+        "alloc_calls": 49,
+        "alloc_requested_bytes": 8328,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 8,
+        "realloc_calls": 36,
+        "realloc_requested_new_bytes": 15792,
+        "requested_total_bytes": 24120
+      },
+      "name": "04-baseline-1",
+      "quality_7_walks": {
+        "alloc_calls": 173,
+        "alloc_requested_bytes": 30416,
+        "alloc_zeroed_calls": 220656,
+        "alloc_zeroed_requested_bytes": 62332704,
+        "dealloc_calls": 220829,
+        "realloc_calls": 149,
+        "realloc_requested_new_bytes": 58080,
+        "requested_total_bytes": 62421200
+      }
+    },
+    {
+      "cfr": {
+        "alloc_calls": 49,
+        "alloc_requested_bytes": 8328,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 8,
+        "realloc_calls": 36,
+        "realloc_requested_new_bytes": 15792,
+        "requested_total_bytes": 24120
+      },
+      "name": "05-flat-1",
+      "quality_7_walks": {
+        "alloc_calls": 173,
+        "alloc_requested_bytes": 30416,
+        "alloc_zeroed_calls": 220656,
+        "alloc_zeroed_requested_bytes": 62332704,
+        "dealloc_calls": 220829,
+        "realloc_calls": 149,
+        "realloc_requested_new_bytes": 58080,
+        "requested_total_bytes": 62421200
+      }
+    },
+    {
+      "cfr": {
+        "alloc_calls": 413240,
+        "alloc_requested_bytes": 76481832,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 413224,
+        "realloc_calls": 296791,
+        "realloc_requested_new_bytes": 102544416,
+        "requested_total_bytes": 179026248
+      },
+      "name": "06-baseline-2",
+      "quality_7_walks": {
+        "alloc_calls": 555316,
+        "alloc_requested_bytes": 101258236,
+        "alloc_zeroed_calls": 220656,
+        "alloc_zeroed_requested_bytes": 62332704,
+        "dealloc_calls": 775972,
+        "realloc_calls": 332726,
+        "realloc_requested_new_bytes": 123764072,
+        "requested_total_bytes": 287355012
+      }
+    },
+    {
+      "cfr": {
+        "alloc_calls": 223499,
+        "alloc_requested_bytes": 55064328,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 223482,
+        "realloc_calls": 29901,
+        "realloc_requested_new_bytes": 9964584,
+        "requested_total_bytes": 65028912
+      },
+      "name": "07-flat-2",
+      "quality_7_walks": {
+        "alloc_calls": 214461,
+        "alloc_requested_bytes": 48938372,
+        "alloc_zeroed_calls": 220656,
+        "alloc_zeroed_requested_bytes": 62332704,
+        "dealloc_calls": 435117,
+        "realloc_calls": 34511,
+        "realloc_requested_new_bytes": 10243008,
+        "requested_total_bytes": 121514084
+      }
+    }
+  ]
+}

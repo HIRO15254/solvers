@@ -1,0 +1,39 @@
+{
+  "counter_limit": "u64 modulo arithmetic; finite bounded probe must remain below 2^64 operations and bytes per phase",
+  "edits": [
+    "insert allocator module before first std import",
+    "replace event function only"
+  ],
+  "generated": {
+    "probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "selftest.rs": {
+      "bytes": 6383,
+      "sha256": "2ebe488b7f53d560f0ae563c3dfe85c35942a61615f0c8b5ee604cd7e8bd9d09"
+    }
+  },
+  "inputs": {
+    "../native-solve/solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "allocator.rs.in": {
+      "bytes": 4656,
+      "sha256": "e6a3fbfeed5cdf14ebbeab5e73fb00b7609203150b02954dbbd45c575fb34792"
+    },
+    "prepare.py": {
+      "bytes": 3999,
+      "sha256": "70b5114f12dfb0b598ba68d06857c724ea873179ffb5d206ee4929e568f71b52"
+    },
+    "selftest-body.rs.in": {
+      "bytes": 1726,
+      "sha256": "c143a4a22a07f3950eec446bf13f8406adf22c193e272c1fb8f8d2c812a108a9"
+    }
+  },
+  "metrics": "process allocator operations admitted during each phase; requested bytes are not live memory or RSS",
+  "native_execution_claim": null,
+  "schema": "r1-allocation-probe-transform/v1",
+  "unchanged_contract": "same fixture, arguments, CFR, public quality APIs and full state writer"
+}

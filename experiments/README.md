@@ -37,6 +37,7 @@
 | R1の全street Flopのnative構築 | [2入力の件数照合](hu-postflop-r1/flop-scaling/native-preflight/README.jp.md) | 現行5crateをコンパイルし、両tree・rank tableを構築。support・storage・全street bet/raise数が静的値と一致。512MiB Job設定・校正と先行起動失敗を保持。solver実行・速度比較とは区別 |
 | R1の全street Flopの短いnative solve | [narrowの4条件照合](hu-postflop-r1/flop-scaling/native-solve/report.jp.md) | baseline／flat各1／2 workers・2反復で全F32状態約81MBと公開EV／BR／seat別gainが完全一致。raw・binary・共通stateを保持。未収束、32 workers・性能・採用は未認定 |
 | R1の全street Flopの最適化build | [2入力・8条件の照合](hu-postflop-r1/flop-scaling/optimized/README.jp.md) | runtime依存を含む新規release buildで全状態約81MB／284MBと公開品質が各入力内で完全一致。narrowは前回debugとも一致。収束・32 workers性能は未認定 |
+| R1のFlop並列時のallocation診断 | [System allocatorのphase別記録](hu-postflop-r1/flop-scaling/alloc-probe/README.md) | narrow・2 workersのCFRで確保／再確保710,031→253,400回、要求総bytes179,026,248→65,028,912。1 worker対照countsと全状態・品質が一致。時間・RSS削減とは区別 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

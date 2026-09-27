@@ -1,0 +1,101 @@
+{
+  "created_utc": "2026-09-27T01:12:18.328695+00:00",
+  "source_before": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\selftest.rs": {
+      "bytes": 6383,
+      "sha256": "2ebe488b7f53d560f0ae563c3dfe85c35942a61615f0c8b5ee604cd7e8bd9d09"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\verify.py": {
+      "bytes": 11847,
+      "sha256": "4307cd398c79080ffd94491f0c2850ca77315f6cabf00a2f0611ef49d152d33b"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\README.md": {
+      "bytes": 6396,
+      "sha256": "0e07af2d3fd060ed825a4840f1ac698fe1ab3848ec5999fdeffb8edc64a771f9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4613,
+      "sha256": "0af47e49fb23c77d96aba218f2b3aa69117a49339420a66bd4df4d9576b080a8"
+    },
+    "experiments\\README.md": {
+      "bytes": 18025,
+      "sha256": "aa821f0f7e2106b07d8015e00d6678e2fffd7a4346e6e2b9f62763219c113c08"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\probe.rs",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\selftest.rs"
+      ],
+      "exit_code": 1,
+      "stdout": {
+        "path": "00-stdout.log",
+        "bytes": 3283,
+        "sha256": "81772c4641a0422c6ea564e941022eff4719582997c02827f77f967d9487c02d"
+      },
+      "stderr": {
+        "path": "00-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "01-stdout.log",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "01-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\probe.rs": {
+      "bytes": 16030,
+      "sha256": "d5c5c1f281fd06862c64d151e9886c8ef06ec9302df86e38ddff16e51cec10cb"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\selftest.rs": {
+      "bytes": 6383,
+      "sha256": "2ebe488b7f53d560f0ae563c3dfe85c35942a61615f0c8b5ee604cd7e8bd9d09"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\verify.py": {
+      "bytes": 11847,
+      "sha256": "4307cd398c79080ffd94491f0c2850ca77315f6cabf00a2f0611ef49d152d33b"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\alloc-probe\\README.md": {
+      "bytes": 6396,
+      "sha256": "0e07af2d3fd060ed825a4840f1ac698fe1ab3848ec5999fdeffb8edc64a771f9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4613,
+      "sha256": "0af47e49fb23c77d96aba218f2b3aa69117a49339420a66bd4df4d9576b080a8"
+    },
+    "experiments\\README.md": {
+      "bytes": 18025,
+      "sha256": "aa821f0f7e2106b07d8015e00d6678e2fffd7a4346e6e2b9f62763219c113c08"
+    }
+  },
+  "source_unchanged": true,
+  "production_pin_count": 207,
+  "production_mismatches": [],
+  "workspace_fmt": "passed prior optimized/checks02; production stillsame207pins",
+  "clippy_workspace_tests": "not_rerun_researchonly_productionunchanged_competinglocalwork"
+}

@@ -1,0 +1,2 @@
+{"event":"allocation_counts","schema":"r1-phase-allocation/v1","phase":"selftest","alloc_calls":1,"alloc_requested_bytes":64,"alloc_failed_calls":0,"alloc_zeroed_calls":1,"alloc_zeroed_requested_bytes":32,"alloc_zeroed_failed_calls":0,"realloc_calls":1,"realloc_requested_new_bytes":128,"realloc_old_layout_bytes":64,"realloc_failed_calls":0,"dealloc_calls":2,"dealloc_layout_bytes":160}
+{"selftest":"passed","null_failure_injection":false,"concurrency_stress":false}
