@@ -1,0 +1,33 @@
+{
+  "command": [
+    "C:/Python313/python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "--record",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-base01\\record.json",
+    "--timeout-seconds",
+    "60",
+    "--grace-seconds",
+    "0.2",
+    "--poll-seconds",
+    "0.1",
+    "--memory-limit-bytes",
+    "469762048",
+    "--min-free-memory-bytes",
+    "1610612736",
+    "--disk-reserve-bytes",
+    "1073741824",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs",
+    "--identity-file",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\narrow.toml",
+    "--",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-base01\\flop_solve_probe.exe",
+    "narrow",
+    "1",
+    "2",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-base01\\output"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 34.582046600058675
+}

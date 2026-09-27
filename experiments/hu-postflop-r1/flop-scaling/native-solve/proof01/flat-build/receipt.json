@@ -1,0 +1,353 @@
+{
+  "scope": "flat research engine plus current game/holdem, reuse baseline current cards/hand-index and cached externals; default debug no features",
+  "source_pins": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\lib.rs": {
+      "bytes": 1376,
+      "sha256": "4d3f7a3b7551fbf1547dd45e0fb5170ebfdd45fd83a7ebefe132562d5cf885d8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\mccfr.rs": {
+      "bytes": 21267,
+      "sha256": "1cb21e70898bf0fcc98e039202470e59da5b3c4a5c9776c8965eac5d832cac68"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\reach.rs": {
+      "bytes": 18760,
+      "sha256": "e4184dffabadaccb16d2672e6e3d24bba20fceec1013480d28d700b703210c3b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\schedule.rs": {
+      "bytes": 6330,
+      "sha256": "c4dd446587d52c710d3a61a78ddd3d4a52550d331b9a24e1a68156ac84e4b6a9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\solver.rs": {
+      "bytes": 58650,
+      "sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\tree.rs": {
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\lib.rs": {
+      "bytes": 651,
+      "sha256": "3667e422f0ccb31b507574c43c86f87b5930b8a345f19896aa55230e4c83e0be"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\payoff.rs": {
+      "bytes": 11716,
+      "sha256": "bd9ecc083fbc575e888ad2d1173b3ad5ce78f0fb263778f8bd75a27242d772f9"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\toy.rs": {
+      "bytes": 14756,
+      "sha256": "da123312ed67171641eab5b2675a43397a5e0d5c4f44c995342978839a4b6af8"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\aggregate.rs": {
+      "bytes": 2037,
+      "sha256": "45f3488891a5b9cc555e2bf6785509f051516d1907586b33f4d1987270a45aa6"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\compatibility.rs": {
+      "bytes": 3715,
+      "sha256": "330cf4368b3bcc324712f39d2fac62895bbcde764d10fae22c7c0708bedf5069"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\equity.rs": {
+      "bytes": 4194,
+      "sha256": "b3e8576a6215202f76a2dbfba19de21379da573d0d2918ba782ed3da88756eef"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\hands.rs": {
+      "bytes": 4706,
+      "sha256": "eaf9c95079482fa0b6839b78eafd995c76405fad7ba8d97f9ef5fab89036366a"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\kernel.rs": {
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\kernel_tests.rs": {
+      "bytes": 14982,
+      "sha256": "047f9f30af76b141ed1c6f2e0655af0638ddcb0c23d723702899608df65cb348"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs": {
+      "bytes": 1714,
+      "sha256": "7566e1e68dd1bfaef8fff34283e32b09bb85462671d8a3913a50ead59b2dee2f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass.rs": {
+      "bytes": 10960,
+      "sha256": "6937d14f2424501109c182bcb433125206e39cbd24e6bcb8b5c3b5be1f627639"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\mass_tests.rs": {
+      "bytes": 27700,
+      "sha256": "e888687425723d0e552d200865f1aea3dec42b06f75b20a29ac8d94d9c33584b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\postflop.rs": {
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\river.rs": {
+      "bytes": 3799,
+      "sha256": "aa49eff9d5d1191175152c7efe8de8bd8f427456aac8dd5c4d0897fea3a1075b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\viewer.rs": {
+      "bytes": 19700,
+      "sha256": "c582d0a58698c5c03780a3d72693db11f129f04e57d693574d268bf0b036f16d"
+    }
+  },
+  "dependency_pins": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib": {
+      "bytes": 1794538,
+      "sha256": "bf710bfa3240cd514544d968268e5023e8240bb5c95c835511b20a767627f228"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libhand_index.rlib": {
+      "bytes": 1118002,
+      "sha256": "3e53708e19914b07cb0b4c8945e232437171201836e339646b6d94ae320bcdde"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib": {
+      "bytes": 4379000,
+      "sha256": "5d4be3ebee0c0a4937e915abcf2133406f391d62738553f2fb5291fc4d29c705"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib": {
+      "bytes": 1435340,
+      "sha256": "cf9ff5e9eca82f0bd412a7f6a56a9fd22bc143c7c74d8e5ff235ee7f05c9062f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib": {
+      "bytes": 651774,
+      "sha256": "a5c589eb80da6beca423dcaa896811d334f968a5277b44842d398ae00831dc67"
+    }
+  },
+  "candidate_sha256": "4a58bfa9bfa384e98e5a92f477f6322d39baff975a3810ceef8533f5b6fabafa",
+  "commands": [
+    {
+      "name": "engine",
+      "command": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-flat-build01\\00-engine.json",
+        "--timeout-seconds",
+        "45",
+        "--grace-seconds",
+        "0.2",
+        "--poll-seconds",
+        "0.1",
+        "--memory-limit-bytes",
+        "469762048",
+        "--min-free-memory-bytes",
+        "1610612736",
+        "--identity-file",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\lib.rs",
+        "--",
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01",
+        "--crate-name",
+        "engine",
+        "--crate-type",
+        "rlib",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+        "--extern",
+        "rand=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand-b00db5fdaa26e274.rlib",
+        "--extern",
+        "rand_chacha=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librand_chacha-3e21c25d4f672f67.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\.cache\\r1-flop-native-flat01\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libengine.rlib"
+      ],
+      "exit_code": 0,
+      "artifact": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libengine.rlib",
+        "bytes": 1281898,
+        "sha256": "557f429e5db70eade85cb164e8ebc03443e7480bff57f862246dbdb16ac2227d"
+      }
+    },
+    {
+      "name": "game",
+      "command": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-flat-build01\\01-game.json",
+        "--timeout-seconds",
+        "45",
+        "--grace-seconds",
+        "0.2",
+        "--poll-seconds",
+        "0.1",
+        "--memory-limit-bytes",
+        "469762048",
+        "--min-free-memory-bytes",
+        "1610612736",
+        "--identity-file",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\lib.rs",
+        "--",
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01",
+        "--crate-name",
+        "game",
+        "--crate-type",
+        "rlib",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libengine.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\game\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libgame.rlib"
+      ],
+      "exit_code": 0,
+      "artifact": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libgame.rlib",
+        "bytes": 1116840,
+        "sha256": "943910b7bc035e75e64359501cf8f5673ce35defd49cf7ed7811d856926226e5"
+      }
+    },
+    {
+      "name": "holdem",
+      "command": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-flat-build01\\02-holdem.json",
+        "--timeout-seconds",
+        "45",
+        "--grace-seconds",
+        "0.2",
+        "--poll-seconds",
+        "0.1",
+        "--memory-limit-bytes",
+        "469762048",
+        "--min-free-memory-bytes",
+        "1610612736",
+        "--identity-file",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs",
+        "--",
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01",
+        "--crate-name",
+        "holdem",
+        "--crate-type",
+        "rlib",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libengine.rlib",
+        "--extern",
+        "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libgame.rlib",
+        "--extern",
+        "hand_index=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libhand_index.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libholdem.rlib"
+      ],
+      "exit_code": 0,
+      "artifact": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libholdem.rlib",
+        "bytes": 3549040,
+        "sha256": "146797988292bb9ca539826a97c7f064a3332513ca1847e84f690d097cd1938a"
+      }
+    },
+    {
+      "name": "probe",
+      "command": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-flat-build01\\03-probe.json",
+        "--timeout-seconds",
+        "45",
+        "--grace-seconds",
+        "0.2",
+        "--poll-seconds",
+        "0.1",
+        "--memory-limit-bytes",
+        "469762048",
+        "--min-free-memory-bytes",
+        "1610612736",
+        "--identity-file",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs",
+        "--",
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "codegen-units=1",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01",
+        "--crate-name",
+        "flop_solve_probe",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libengine.rlib",
+        "--extern",
+        "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libgame.rlib",
+        "--extern",
+        "holdem=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\libholdem.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps\\librayon-170433e97196c6df.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\flop_solve_probe.exe"
+      ],
+      "exit_code": 0,
+      "artifact": {
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-solve-flat01\\flop_solve_probe.exe",
+        "bytes": 1883648,
+        "sha256": "2143e48bed1d54ae26209727d0c780e18a52b3817bc839934ef2afd3a5dfe7be"
+      }
+    }
+  ],
+  "source_unchanged": true,
+  "dependency_unchanged": true,
+  "all_passed": true
+}

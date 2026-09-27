@@ -1,0 +1,23 @@
+{
+  "scope": "Narrow full-street Flop 2 iterations. Exact F32 state and public EV/BR/seat gain bytes only; no convergence or performance acceptance",
+  "reference": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-solve-base01\\output",
+  "conditions": [
+    {
+      "arm": "baseline",
+      "threads": 2
+    },
+    {
+      "arm": "flat",
+      "threads": 1
+    },
+    {
+      "arm": "flat",
+      "threads": 2
+    }
+  ],
+  "iterations": 2,
+  "per_process_timeout_seconds": 60,
+  "hard_job_commit_bytes": 536870912,
+  "stop_on_failure_or_mismatch": true,
+  "cfv_or_public_file_format_validation": false
+}

@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-09-27T00:46:10.023709+00:00",
+  "change": "Clarify directly pinned dependencies versus unpinned transitive cache after independent review",
+  "sources": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\README.md": {
+      "bytes": 4082,
+      "sha256": "e2ee26f8e17d28d17c3e99c1b9c76939ada819a7abad22a77cf8339ed095f00a"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\report.jp.md": {
+      "bytes": 5616,
+      "sha256": "d2d409ca2c46a2b74bbcbacab7c335b69fabfdef73e33600b24682030172cc49"
+    }
+  },
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "exit_code": 0,
+  "stdout": "Documentation check passed: 49 Markdown files.\r\n",
+  "stderr": ""
+}

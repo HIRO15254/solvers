@@ -1,0 +1,119 @@
+{
+  "schema": "r1.flop-native-solve-local-checks/v1",
+  "created_utc": "2026-09-27T00:43:35.778561+00:00",
+  "source_before": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\verify.py": {
+      "bytes": 18419,
+      "sha256": "54da2272a409f885d412a2017adb744f849ac0f009ca5b0bf96d08811ad80c0b"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\report.jp.md": {
+      "bytes": 5556,
+      "sha256": "6e3094c8edec89fe93bbf6aa262bbff6c8576fb7ed81d097c144934b0d7231bd"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\README.md": {
+      "bytes": 3955,
+      "sha256": "41ce26c6e6bef8453cdf1d0b2f3439782d013133ac9c2164a43a1964c8d293be"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4056,
+      "sha256": "934e75a4c3fe9e3dd2b6f3ca0b015b96457c39cf09deb4da09112fdd792d1b5c"
+    },
+    "experiments\\README.md": {
+      "bytes": 17384,
+      "sha256": "88aa86d6ab408367ee437796607aee07071af51634500e1eae79c5fa06a43b52"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "00-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "00-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "01-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "01-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "02-stdout.log",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "02-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\solve.rs": {
+      "bytes": 11148,
+      "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\verify.py": {
+      "bytes": 18419,
+      "sha256": "54da2272a409f885d412a2017adb744f849ac0f009ca5b0bf96d08811ad80c0b"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\report.jp.md": {
+      "bytes": 5556,
+      "sha256": "6e3094c8edec89fe93bbf6aa262bbff6c8576fb7ed81d097c144934b0d7231bd"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\native-solve\\README.md": {
+      "bytes": 3955,
+      "sha256": "41ce26c6e6bef8453cdf1d0b2f3439782d013133ac9c2164a43a1964c8d293be"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\README.jp.md": {
+      "bytes": 4056,
+      "sha256": "934e75a4c3fe9e3dd2b6f3ca0b015b96457c39cf09deb4da09112fdd792d1b5c"
+    },
+    "experiments\\README.md": {
+      "bytes": 17384,
+      "sha256": "88aa86d6ab408367ee437796607aee07071af51634500e1eae79c5fa06a43b52"
+    }
+  },
+  "source_unchanged": true,
+  "production_pin_count": 207,
+  "production_mismatches": [],
+  "full_workspace_clippy_test": "not_rerun_research_only_unchanged_production_competing_local_work"
+}

@@ -1,0 +1,61 @@
+{
+  "schema": "r1.flop-native-portable-verification/v1",
+  "status": "verified",
+  "proof_manifest": {
+    "bytes": 13158,
+    "sha256": "55ad681a062455c2b2a6501920336ec11c215ab9b76890fc77f2a04b67e2aa11"
+  },
+  "preflight_manifest": {
+    "bytes": 13426,
+    "sha256": "af24b699bd7da223c810206a80b4a3253f761256deadadec79fb25aa58d26176"
+  },
+  "payload_files": 75,
+  "candidate_archive_files": 8,
+  "unchanged_engine_files": 7,
+  "successful_runs": [
+    "baseline-1",
+    "baseline-2",
+    "flat-1",
+    "flat-2"
+  ],
+  "state": {
+    "bytes": 81414344,
+    "sha256": "35981691a7736e2df5a89734b1102ee8ffc1bacaab7719476b0152e459eb2700"
+  },
+  "state_header": [
+    2,
+    2,
+    367662,
+    147104,
+    34,
+    30,
+    10176768,
+    10176768
+  ],
+  "quality": {
+    "bytes": 667,
+    "sha256": "083989ea08a64f13508c259b87c3797245b4b037ed73bfffd3bc3e8564347fb0"
+  },
+  "nash_conv_chips": 474.61833541256254,
+  "usual_exploitability_chips": 237.30916770628127,
+  "fresh_baseline_libraries": [
+    "cards",
+    "engine",
+    "game",
+    "hand_index",
+    "holdem"
+  ],
+  "candidate_rebuilt": [
+    "engine",
+    "game",
+    "holdem",
+    "probe"
+  ],
+  "scope": "Narrow F32/DCFR two iterations; full state and public scalar quality identity only",
+  "limitations": [
+    "One deduplicated state stream retained; four original hashes/equality are capture records, not four independent retained streams",
+    "Library/compiler/cached transitive dependency bytes are not retained here; library lineage is cross-checked from source and build receipts, not reproduced compilation",
+    "Requires pinned repository source checkout; no original cache/target or absolute-path files are opened",
+    "No convergence, performance, full-workspace, CFV, checkpoint or SOL wire acceptance"
+  ]
+}

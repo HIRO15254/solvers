@@ -7,10 +7,11 @@ Flopの十分に大きい仕事量で、利用可能な物理coreに近い倍率
 
 | 資料 | 保持する内容 |
 |---|---|
-| [2つの固定入力](fixtures/README.md) | 開始support34/30と63/160、全streetにbet/raiseのある同じ約36.8万public nodes。12静的tests。native tree/peak/品質は未測定 |
+| [2つの固定入力](fixtures/README.md) | 開始support34/30と63/160、全streetにbet/raiseのある同じ約36.8万public nodes。12静的tests。native検査は後続証拠に分離 |
 | [現行sourceの監査](source-audit/README.jp.md) | nested chance、action siblingの逐次処理、scratch寿命、親fold。遅延寄与率は未測定 |
 | [flat chance出力候補](flat-chance/README.jp.md) | 子ごとの出力所有Vecを親の再利用bufferへ変更。子の演算・元順fold・chance制御は維持。研究copyでのみ検査 |
 | [native構築の後続確認](native-preflight/README.jp.md) | 2入力とも実際の木・rank tableを構築し、全street bet/raise・support・storage件数が一致。CFR/収束・速度比較は未実施 |
+| [narrowの短いnative solve](native-solve/report.jp.md) | baseline／flat各1／2 workers、2反復の全F32状態・公開EV／BR／seat別gainが完全一致。未収束の正しさ検査で、速度は未認定 |
 
 [最終照合記録](review.json)で301件のsource/raw pin照合とproduction207ファイルの不変を確認した。
 通常fmtと文書検査も成功。競合するローカル計算と資源余力のためfull clippy/workspace testsは
