@@ -61,3 +61,8 @@ experiments/hu-postflop-r1/cloud/usage-audit-vm17/inputs/preflight-vm17/*.html -
 # VM18 retained official HTML excerpts are byte-pinned inputs.
 experiments/hu-postflop-r1/cloud/preflight-vm18/*.html -whitespace
 experiments/hu-postflop-r1/flop-scaling/chance-grain/adapter/adapter.patch -whitespace
+experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/inputs/**/*.html -whitespace
+experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/adapter.patch -whitespace
+# Preserve these already pinned generated source bytes in the prelaunch evidence.
+experiments/hu-postflop-r1/cloud/vm19/cost-proposal.py whitespace=cr-at-eol,-blank-at-eol
+experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/markers.rs.inc whitespace=cr-at-eol,-blank-at-eof

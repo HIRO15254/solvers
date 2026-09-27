@@ -1,0 +1,89 @@
+{
+  "vms": [
+    {
+      "vm": 16,
+      "arithmetic": {
+        "whole_minutes": 26,
+        "overlapping_large_minutes": 13,
+        "disk_minutes": 26,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.02903828200000000000000000000",
+          "overlapping_e2_highcpu_32": "0.1714968320000000000000000000",
+          "whole_lifetime_ipv4": "0.001083333333333333333333333333",
+          "disk_40gib_lifecycle": "0.002374666666666666666666666666",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.353993114000000000000000000",
+        "held_before_usd": "1.9",
+        "proposed_hold_usd": "1.4",
+        "restore_usd": "0.5",
+        "margin_above_model_usd": "0.046006886000000000000000000"
+      }
+    },
+    {
+      "vm": 17,
+      "arithmetic": {
+        "whole_minutes": 39,
+        "overlapping_large_minutes": 21,
+        "disk_minutes": 40,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.0435574230",
+          "overlapping_e2_highcpu_32": "0.2770333440",
+          "whole_lifetime_ipv4": "0.001625",
+          "disk_40gib_lifecycle": "0.003653333333333333333333333334",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.475869100333333333333333333",
+        "held_before_usd": "1.8",
+        "proposed_hold_usd": "1.5",
+        "restore_usd": "0.3",
+        "margin_above_model_usd": "0.024130899666666666666666667"
+      }
+    },
+    {
+      "vm": 18,
+      "arithmetic": {
+        "whole_minutes": 34,
+        "overlapping_large_minutes": 13,
+        "disk_minutes": 34,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.03797313800000000000000000000",
+          "overlapping_e2_highcpu_32": "0.1714968320000000000000000000",
+          "whole_lifetime_ipv4": "0.001416666666666666666666666667",
+          "disk_40gib_lifecycle": "0.003105333333333333333333333334",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.363991970000000000000000000",
+        "held_before_usd": "1.5",
+        "proposed_hold_usd": "1.4",
+        "restore_usd": "0.1",
+        "margin_above_model_usd": "0.036008030000000000000000000"
+      }
+    }
+  ],
+  "proposal": {
+    "held_before_usd": "39",
+    "restore_usd": "0.9",
+    "held_after_usd": "38.1",
+    "available_after_usd": "1.9",
+    "applied": false
+  }
+}

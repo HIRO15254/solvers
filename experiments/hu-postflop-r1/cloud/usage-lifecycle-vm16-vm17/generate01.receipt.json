@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-lifecycle-vm16-vm17\\analyze.py"
+  ],
+  "exit_code": 1,
+  "wall_seconds": 1.792988199973479
+}

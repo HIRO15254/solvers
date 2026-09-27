@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-16",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:hKvDp1TECIghTNxDlT3G0MUe4/989bYtay4xAGyW7Sw",
+    "--command=bash -n /opt/r1/flop-cpu-occupancy-package/experiments/hu-postflop-r1/cloud/vm16/recover.sh && sudo bash /opt/r1/flop-cpu-occupancy-package/experiments/hu-postflop-r1/cloud/vm16/fetch-dependencies.sh"
+  ],
+  "started_utc": "2026-09-27T05:01:47.572574+00:00",
+  "timeout_seconds": 120,
+  "stdout": {
+    "bytes": 304,
+    "sha256": "e520cb23003ec6f39c108c5fbbd3f863d99fe1ec0c58c43b7fffb0e9744140fe"
+  },
+  "stderr": {
+    "bytes": 4002,
+    "sha256": "53c61210ef5af9befbe877a802bf20987ad3c3f0ee1ea13bff0b21d8764084e9"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T05:01:55.000905+00:00"
+}

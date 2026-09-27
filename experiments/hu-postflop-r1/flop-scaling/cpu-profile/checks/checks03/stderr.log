@@ -1,0 +1,18 @@
+test_capture_identity_rejects_mismatch_without_read (__main__.Controls.test_capture_identity_rejects_mismatch_without_read) ... ok
+test_clip_pid_half_open_and_unknown_preserved (__main__.Controls.test_clip_pid_half_open_and_unknown_preserved) ... ok
+test_compressed_script_original_hash_and_receipt (__main__.Controls.test_compressed_script_original_hash_and_receipt) ... ok
+test_deadlines_and_no_extension (__main__.Controls.test_deadlines_and_no_extension) ... ok
+test_fixed_schedule (__main__.Controls.test_fixed_schedule) ... ok
+test_perf_command_no_pmu_or_fallback (__main__.Controls.test_perf_command_no_pmu_or_fallback) ... ok
+test_perf_header_only_callchain_layout (__main__.Controls.test_perf_header_only_callchain_layout) ... ok
+test_phase_contract_and_invalid_intervals (__main__.Controls.test_phase_contract_and_invalid_intervals) ... ok
+test_pinned_base_and_adapter_controls (__main__.Controls.test_pinned_base_and_adapter_controls) ... ok
+test_record_census_and_attributes (__main__.Controls.test_record_census_and_attributes) ... ok
+test_source_binding_new_example_only (__main__.Controls.test_source_binding_new_example_only) ... ok
+test_source_order_is_path_components (__main__.Controls.test_source_order_is_path_components) ... ok
+test_unknown_parser_missing_tail_and_empty_fail (__main__.Controls.test_unknown_parser_missing_tail_and_empty_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.006s
+
+OK

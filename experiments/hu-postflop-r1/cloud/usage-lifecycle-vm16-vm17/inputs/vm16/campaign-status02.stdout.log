@@ -1,0 +1,10 @@
+MainPID=1907
+Result=success
+ActiveState=active
+==> /opt/r1/flop-cpu-occupancy-wrapper01/execute.stdout.log <==
+{"stage": "narrow-r1-32-full", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 32, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.215188485, "cfr_seconds": 0.737840719, "state_write_seconds": 0.453689915, "quality_seconds": 0.110829508, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r1-16-full", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.225395595, "cfr_seconds": 0.689817878, "state_write_seconds": 0.45169775, "quality_seconds": 0.105994925, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r2-16-full", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 16, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.220243417, "cfr_seconds": 0.680684487, "state_write_seconds": 0.451478868, "quality_seconds": 0.105863178, "cfv_capture": false, "performance_claim": false}}
+{"stage": "narrow-r2-32-full", "status": "completed", "case": "narrow", "result": {"schema": "r1.flop-native-solve/v1", "status": "completed", "case": "narrow", "threads": 32, "iterations": 16, "state_file": "state.bin", "state_bytes": 81414344, "quality_file": "quality.json", "build_seconds": 0.219695217, "cfr_seconds": 0.745282627, "state_write_seconds": 0.45281849, "quality_seconds": 0.10776255, "cfv_capture": false, "performance_claim": false}}
+
+==> /opt/r1/flop-cpu-occupancy-wrapper01/execute.stderr.log <==

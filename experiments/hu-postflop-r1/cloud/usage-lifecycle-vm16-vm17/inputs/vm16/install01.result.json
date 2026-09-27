@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-16",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:hKvDp1TECIghTNxDlT3G0MUe4/989bYtay4xAGyW7Sw",
+    "--command=sudo mkdir -p /opt/r1 && sudo python3 -B /tmp/install.py --archive /tmp/deployment01.tar.gz --sha256 07f40865d62a827ac7de582e735e6f0d53dd27666307f4b9d80287fd6d18a42a --destination /opt/r1/flop-cpu-occupancy-package && bash -n /opt/r1/flop-cpu-occupancy-package/experiments/hu-postflop-r1/cloud/vm16/run.sh /opt/r1/flop-cpu-occupancy-package/experiments/hu-postflop-r1/cloud/vm16/recover.sh && if test -f /opt/r1/bootstrap-complete; then cat /opt/r1/bootstrap-complete; else systemctl is-active google-startup-scripts.service; fi"
+  ],
+  "started_utc": "2026-09-27T05:00:54.747073+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 389,
+    "sha256": "a81f9cd751fc03f022fa57465d46781de436947c947e3bec6f233ee2603156b7"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T05:00:59.505161+00:00"
+}

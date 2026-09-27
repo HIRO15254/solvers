@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "instances",
+    "get-serial-port-output",
+    "solvers-r1-20260927-16",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--port=1",
+    "--start=0"
+  ],
+  "started_utc": "2026-09-27T04:59:35.921255+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 239659,
+    "sha256": "09b463fa8df9382baa0c2cb01fb0078c3f786d97b7f55baee20abb93a165131a"
+  },
+  "stderr": {
+    "bytes": 119,
+    "sha256": "3f00d74d31139dfdc151c6838a348c13b15ac652736bfee3332e6ce5dc337878"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T04:59:38.828346+00:00"
+}

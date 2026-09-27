@@ -1,0 +1,10 @@
+{
+  "id": "2052432309614088030",
+  "name": "solvers-r1-20260927-17",
+  "sizeGb": "40",
+  "status": "READY",
+  "type": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/diskTypes/pd-balanced",
+  "users": [
+    "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-17"
+  ]
+}

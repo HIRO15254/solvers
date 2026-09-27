@@ -1,0 +1,969 @@
+{
+  "schema": "r1.vm18-usage-acquisition/v1",
+  "started_at": "2026-09-27T07:49:05.746098Z",
+  "project": "solvers-abstraction-20260723",
+  "instance_id": "3769585733775752220",
+  "instance_name": "solvers-r1-20260927-18",
+  "interval_start": "2026-09-27T07:15:00Z",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 80712,
+      "sha256": "e3902d82766c3ec5d83b8833b67cb52fbab8fc653174a5ab4150d5009b7240f7"
+    },
+    "create-result-r1-20260927-18.json": {
+      "path": "inputs/create-result-r1-20260927-18.json",
+      "bytes": 30180,
+      "sha256": "2704e0bdad66e9fa9d99a7fbb33312cbe68dccb7813683d297368d3bf960e9cc"
+    },
+    "launch-r1-20260927-18.json": {
+      "path": "inputs/launch-r1-20260927-18.json",
+      "bytes": 1184,
+      "sha256": "f5e72dca44e103ddf1c910a7286cda64e105be870b3d5255eab06b2391f297a8"
+    },
+    "preflight-vm18/cost-proposal.json": {
+      "path": "inputs/preflight-vm18/cost-proposal.json",
+      "bytes": 5224,
+      "sha256": "ac3f0b6a16187f9f97317df23881f8abb9926e79b575cdc9095e9a1a354c5745"
+    },
+    "preflight-vm18/pricing-sources.json": {
+      "path": "inputs/preflight-vm18/pricing-sources.json",
+      "bytes": 5660,
+      "sha256": "7fa8bfbc95c945ee569aa5e3a9eb61ca68e98fd428b6691f9ea476ddf2b6754c"
+    },
+    "preflight-vm18/spot-pricing-source.json": {
+      "path": "inputs/preflight-vm18/spot-pricing-source.json",
+      "bytes": 2253,
+      "sha256": "b1face2c013339d2fb757e4d3a1218e5d0f0d40673d7b7055829a8b048705873"
+    },
+    "vm18/absence-addresses01.result.json": {
+      "path": "inputs/vm18/absence-addresses01.result.json",
+      "bytes": 658,
+      "sha256": "38660a1585d454a55f30e8b173439c80e3d854d603cb1e6a18a02aa745f2f3a4"
+    },
+    "vm18/absence-addresses01.stderr.log": {
+      "path": "inputs/vm18/absence-addresses01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm18/absence-addresses01.stdout.log": {
+      "path": "inputs/vm18/absence-addresses01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm18/absence-disks01.result.json": {
+      "path": "inputs/vm18/absence-disks01.result.json",
+      "bytes": 666,
+      "sha256": "2fbe6c2938b8adba0c7b9de23fbb2e516dbe85bb2cae4df33755c17031d4cfb2"
+    },
+    "vm18/absence-disks01.stderr.log": {
+      "path": "inputs/vm18/absence-disks01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm18/absence-disks01.stdout.log": {
+      "path": "inputs/vm18/absence-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm18/absence-instances01.result.json": {
+      "path": "inputs/vm18/absence-instances01.result.json",
+      "bytes": 670,
+      "sha256": "ee07eb2b2fed1bb0f8b3dafc0f4009b634ea0f1987aa074811553fd2671a49a8"
+    },
+    "vm18/absence-instances01.stderr.log": {
+      "path": "inputs/vm18/absence-instances01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm18/absence-instances01.stdout.log": {
+      "path": "inputs/vm18/absence-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm18/analysis-download01.result.json": {
+      "path": "inputs/vm18/analysis-download01.result.json",
+      "bytes": 731,
+      "sha256": "234be5bc1884d7f7d03a754bec1d34e165c0056d133059373046295c613c3e0a"
+    },
+    "vm18/analysis-download01.stderr.log": {
+      "path": "inputs/vm18/analysis-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/analysis-download01.stdout.log": {
+      "path": "inputs/vm18/analysis-download01.stdout.log",
+      "bytes": 285,
+      "sha256": "8dadfad2ad336f762e5c1adde424cf1e9120ee5867e5133c1add7d339c5bbb59"
+    },
+    "vm18/analyze01.result.json": {
+      "path": "inputs/vm18/analyze01.result.json",
+      "bytes": 775,
+      "sha256": "3a4aaedd01c3b85a7c3efe7b7b937a1b89b26aa169f108a108e5b359fe1199fa"
+    },
+    "vm18/analyze01.stderr.log": {
+      "path": "inputs/vm18/analyze01.stderr.log",
+      "bytes": 583,
+      "sha256": "36ae68ec7b7adc641deec57bdd57b20fe196d12cc94ecc5bb371badb94d693f4"
+    },
+    "vm18/analyze01.stdout.log": {
+      "path": "inputs/vm18/analyze01.stdout.log",
+      "bytes": 1052,
+      "sha256": "4bb6d3b518b89aa8d4c6066dff01aa9579fc76aaa23dfbc30d6dabf0b223b3bb"
+    },
+    "vm18/bootstrap-recovery01.result.json": {
+      "path": "inputs/vm18/bootstrap-recovery01.result.json",
+      "bytes": 782,
+      "sha256": "23ed9ff095febd4271860abbb561c5c590e997f23f89be2047008aef0a1fd506"
+    },
+    "vm18/bootstrap-recovery01.stderr.log": {
+      "path": "inputs/vm18/bootstrap-recovery01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/bootstrap-recovery01.stdout.log": {
+      "path": "inputs/vm18/bootstrap-recovery01.stdout.log",
+      "bytes": 103,
+      "sha256": "07b971c2a8c8ae7975371da5f027c4457f63bc86972829b9a4dd5238771deada"
+    },
+    "vm18/bootstrap32-01.result.json": {
+      "path": "inputs/vm18/bootstrap32-01.result.json",
+      "bytes": 783,
+      "sha256": "8d05b588c0ccad8a456360879cfa0bacb1bf0188dcbe34b5f6236b13a5c1655a"
+    },
+    "vm18/bootstrap32-01.stderr.log": {
+      "path": "inputs/vm18/bootstrap32-01.stderr.log",
+      "bytes": 580,
+      "sha256": "2f8ca2917d6572bf269e6420f48a6c19be8ed6377d329f51ac68347635e93304"
+    },
+    "vm18/bootstrap32-01.stdout.log": {
+      "path": "inputs/vm18/bootstrap32-01.stdout.log",
+      "bytes": 78,
+      "sha256": "f605fb59bb57ef962d483cd03b304b9d53066586540dd560ce65c3d720c1cff3"
+    },
+    "vm18/bootstrap32-02.result.json": {
+      "path": "inputs/vm18/bootstrap32-02.result.json",
+      "bytes": 782,
+      "sha256": "79bc718b590373a27a4d20ffa2e66dbb3d7aec12d99acdd50a61cd7630909536"
+    },
+    "vm18/bootstrap32-02.stderr.log": {
+      "path": "inputs/vm18/bootstrap32-02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/bootstrap32-02.stdout.log": {
+      "path": "inputs/vm18/bootstrap32-02.stdout.log",
+      "bytes": 103,
+      "sha256": "b1ebecc46bac6be11188e72836d9f6267d9c7b0a80f5adb0ee26ba9c520ee46c"
+    },
+    "vm18/build-start01.result.json": {
+      "path": "inputs/vm18/build-start01.result.json",
+      "bytes": 858,
+      "sha256": "f54df02477654669abd91ab4f2ca295e671706ca4466ee63bb5ca14c125982c0"
+    },
+    "vm18/build-start01.stderr.log": {
+      "path": "inputs/vm18/build-start01.stderr.log",
+      "bytes": 97,
+      "sha256": "0379c8a781b73f9723cb4062a2b8fba95e5a2476b842f7ea23b7085376abb28f"
+    },
+    "vm18/build-start01.stdout.log": {
+      "path": "inputs/vm18/build-start01.stdout.log",
+      "bytes": 1395,
+      "sha256": "5b3bf7303f9c58aeadacbc27534277d8235d7608a700231d589d67cc80bf583c"
+    },
+    "vm18/build-status01.result.json": {
+      "path": "inputs/vm18/build-status01.result.json",
+      "bytes": 700,
+      "sha256": "e305082161d5fb9f223efd463fc07af8945f7518875e97409eb87e2ab7134ddb"
+    },
+    "vm18/build-status01.stderr.log": {
+      "path": "inputs/vm18/build-status01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/build-status01.stdout.log": {
+      "path": "inputs/vm18/build-status01.stdout.log",
+      "bytes": 1181,
+      "sha256": "d400f822635c95a51775575d0e83fae47a5d86b8d4d2bbf7a0ca342bb3a5c6a2"
+    },
+    "vm18/build-status02.result.json": {
+      "path": "inputs/vm18/build-status02.result.json",
+      "bytes": 700,
+      "sha256": "27c9b2dd22ac9d65fb710d85318d96bfaa543ec19ab3e12018422dc512ecb325"
+    },
+    "vm18/build-status02.stderr.log": {
+      "path": "inputs/vm18/build-status02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/build-status02.stdout.log": {
+      "path": "inputs/vm18/build-status02.stdout.log",
+      "bytes": 1275,
+      "sha256": "d9f9c5d53a3ccd335a75176f0b15430100ed1de93ec85ff36ac1b4e1ea6487a1"
+    },
+    "vm18/build-status03.result.json": {
+      "path": "inputs/vm18/build-status03.result.json",
+      "bytes": 703,
+      "sha256": "c13f54622afa0b5014c3c4d714372b31073f2fe345b1538f9397c5fcf6c4abce"
+    },
+    "vm18/build-status03.stderr.log": {
+      "path": "inputs/vm18/build-status03.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/build-status03.stdout.log": {
+      "path": "inputs/vm18/build-status03.stdout.log",
+      "bytes": 1252,
+      "sha256": "14b1ad3d3fe81b8b9e331d82438d608ce75aadc70ab124f225981cf98d9794a3"
+    },
+    "vm18/create.receipt.json": {
+      "path": "inputs/vm18/create.receipt.json",
+      "bytes": 1255,
+      "sha256": "20606b38c6ef7acf899bd78eb6af961550509b5f997083440fd4167a499cd77c"
+    },
+    "vm18/delete-operation01.result.json": {
+      "path": "inputs/vm18/delete-operation01.result.json",
+      "bytes": 698,
+      "sha256": "c41a72d26145e8672d19a199ed057697137577f52a57f45beb12218dabde4d1f"
+    },
+    "vm18/delete-operation01.stderr.log": {
+      "path": "inputs/vm18/delete-operation01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/delete-operation01.stdout.log": {
+      "path": "inputs/vm18/delete-operation01.stdout.log",
+      "bytes": 905,
+      "sha256": "fcc632479f540864d5af2c20515d077c41ab832117fa53d38a1917019f58e4a7"
+    },
+    "vm18/delete01.result.json": {
+      "path": "inputs/vm18/delete01.result.json",
+      "bytes": 667,
+      "sha256": "3c144a647e907ad81b441815a251bb04bf54ed41130eb324357f9d27bde15dc3"
+    },
+    "vm18/delete01.stderr.log": {
+      "path": "inputs/vm18/delete01.stderr.log",
+      "bytes": 141,
+      "sha256": "ae76c0df65851edc403319a7fdbd0cb25817e365519193908937f5d49aa89b43"
+    },
+    "vm18/delete01.stdout.log": {
+      "path": "inputs/vm18/delete01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/disk-before-delete01.result.json": {
+      "path": "inputs/vm18/disk-before-delete01.result.json",
+      "bytes": 687,
+      "sha256": "e8358853386cd554e28cadfcded5f4a922cba234fba03570fb7527e468951aa5"
+    },
+    "vm18/disk-before-delete01.stderr.log": {
+      "path": "inputs/vm18/disk-before-delete01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/disk-before-delete01.stdout.log": {
+      "path": "inputs/vm18/disk-before-delete01.stdout.log",
+      "bytes": 1821,
+      "sha256": "adeff41bce184ec3fd636aaf1e6c6a12afad60dd63b5dd34679ba00d1f9cd308"
+    },
+    "vm18/identity-before-delete01.result.json": {
+      "path": "inputs/vm18/identity-before-delete01.result.json",
+      "bytes": 732,
+      "sha256": "e4839abd85db03525090521348d0090539a3ce7643fb42e5899bb34544f7817c"
+    },
+    "vm18/identity-before-delete01.stderr.log": {
+      "path": "inputs/vm18/identity-before-delete01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/identity-before-delete01.stdout.log": {
+      "path": "inputs/vm18/identity-before-delete01.stdout.log",
+      "bytes": 30066,
+      "sha256": "c95d16a99ab5cb76db6e1e8079f08b97b85936a415add1574d525ba5ae9c9616"
+    },
+    "vm18/install-state01.result.json": {
+      "path": "inputs/vm18/install-state01.result.json",
+      "bytes": 738,
+      "sha256": "e85d3e159641c2c03ebdf4e6e849dcea4e59ecdc95273b5e8f331e9cebcaa8bb"
+    },
+    "vm18/install-state01.stderr.log": {
+      "path": "inputs/vm18/install-state01.stderr.log",
+      "bytes": 716,
+      "sha256": "06298e4b43a5d7537bd97c492c2d2659169e802721c1eef05460991d0bbf771c"
+    },
+    "vm18/install-state01.stdout.log": {
+      "path": "inputs/vm18/install-state01.stdout.log",
+      "bytes": 66,
+      "sha256": "04d14f3a9fb2375c186db39c39198881cdeebbae7e357d26ed425c7804b7b8f3"
+    },
+    "vm18/install01.result.json": {
+      "path": "inputs/vm18/install01.result.json",
+      "bytes": 852,
+      "sha256": "b49bc2bbd0ded100069a301318559a97a9ed74f0518976fa9db88b83fac80c82"
+    },
+    "vm18/install01.stderr.log": {
+      "path": "inputs/vm18/install01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/install01.stdout.log": {
+      "path": "inputs/vm18/install01.stdout.log",
+      "bytes": 362,
+      "sha256": "945147e57b8a8c799fba4806c137babe01eb62bade0855cf8b8f0bf9bfbf23c2"
+    },
+    "vm18/measure-start01.result.json": {
+      "path": "inputs/vm18/measure-start01.result.json",
+      "bytes": 820,
+      "sha256": "d6c51d44870ec51788a0824d46f8d3ef37f21c5fb60c993f8acb108289db4c9c"
+    },
+    "vm18/measure-start01.stderr.log": {
+      "path": "inputs/vm18/measure-start01.stderr.log",
+      "bytes": 100,
+      "sha256": "01ad6c3efa54de4d539ddc9a6eed49c6aa5ef6415515d7d3c56c88feaded250b"
+    },
+    "vm18/measure-start01.stdout.log": {
+      "path": "inputs/vm18/measure-start01.stdout.log",
+      "bytes": 1531,
+      "sha256": "6cd4c7e40e3a89d7af88f2d905288a03777ddca70b70516d0d8d433d5aa7fcf3"
+    },
+    "vm18/measure-status01.result.json": {
+      "path": "inputs/vm18/measure-status01.result.json",
+      "bytes": 703,
+      "sha256": "045bf1ac590c41b16972eec65712672fe5ac099e522b7e882a0d48078d3fb0c3"
+    },
+    "vm18/measure-status01.stderr.log": {
+      "path": "inputs/vm18/measure-status01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/measure-status01.stdout.log": {
+      "path": "inputs/vm18/measure-status01.stdout.log",
+      "bytes": 2463,
+      "sha256": "62a7f4e5e2cb971c40e09ed198d2398aa1857e40632ab21fe661c821accea641"
+    },
+    "vm18/measure-status02.result.json": {
+      "path": "inputs/vm18/measure-status02.result.json",
+      "bytes": 703,
+      "sha256": "3c02b6132a405e3a488c9a2ae3c8e3429a202b2ee6ea1dbe81e40945f245e89e"
+    },
+    "vm18/measure-status02.stderr.log": {
+      "path": "inputs/vm18/measure-status02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/measure-status02.stdout.log": {
+      "path": "inputs/vm18/measure-status02.stdout.log",
+      "bytes": 2410,
+      "sha256": "ba43d13ce8e89b39137be68c59d58f4bdcf4fce12f28b525c048e2eeadb2e44f"
+    },
+    "vm18/measure-status03.result.json": {
+      "path": "inputs/vm18/measure-status03.result.json",
+      "bytes": 703,
+      "sha256": "843676a9bfb1680ce7cdf223072efaad2de785109e2e3471bba9c76b97499900"
+    },
+    "vm18/measure-status03.stderr.log": {
+      "path": "inputs/vm18/measure-status03.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/measure-status03.stdout.log": {
+      "path": "inputs/vm18/measure-status03.stdout.log",
+      "bytes": 2465,
+      "sha256": "5ab470572cebaa8d6706655be0b18bc6d0c2b988f5327530f1824ef54a014d67"
+    },
+    "vm18/measure-status04.result.json": {
+      "path": "inputs/vm18/measure-status04.result.json",
+      "bytes": 703,
+      "sha256": "551cec69bb64218de86256dc9b5b10b5b1636ef814a2b44174cb2f861ed42e1f"
+    },
+    "vm18/measure-status04.stderr.log": {
+      "path": "inputs/vm18/measure-status04.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/measure-status04.stdout.log": {
+      "path": "inputs/vm18/measure-status04.stdout.log",
+      "bytes": 2576,
+      "sha256": "775c0188c076c380d2fb6b3182a4ba57ff20353f300e19c22c8ab8140b2b97a1"
+    },
+    "vm18/preflight-disks01.result.json": {
+      "path": "inputs/vm18/preflight-disks01.result.json",
+      "bytes": 655,
+      "sha256": "407bab8e4b950b91a3257609b7aceee04afe453b9f153e7d8302e109877c68a8"
+    },
+    "vm18/preflight-disks01.stderr.log": {
+      "path": "inputs/vm18/preflight-disks01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm18/preflight-disks01.stdout.log": {
+      "path": "inputs/vm18/preflight-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm18/preflight-instances01.result.json": {
+      "path": "inputs/vm18/preflight-instances01.result.json",
+      "bytes": 659,
+      "sha256": "ace01517f186d296ef3fea86017b62ca9616a989f6c1e4cd87ecae45eed11635"
+    },
+    "vm18/preflight-instances01.stderr.log": {
+      "path": "inputs/vm18/preflight-instances01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm18/preflight-instances01.stdout.log": {
+      "path": "inputs/vm18/preflight-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm18/preflight-region01.result.json": {
+      "path": "inputs/vm18/preflight-region01.result.json",
+      "bytes": 650,
+      "sha256": "979b5126da29d31072779f38624eca89c33faae6077d67dec3ecee431d638971"
+    },
+    "vm18/preflight-region01.stderr.log": {
+      "path": "inputs/vm18/preflight-region01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/preflight-region01.stdout.log": {
+      "path": "inputs/vm18/preflight-region01.stdout.log",
+      "bytes": 12068,
+      "sha256": "b8794f4470295c72590ce4e5295d0da15a98a540e8b104d4c13423b34c322e8e"
+    },
+    "vm18/proof-download01.result.json": {
+      "path": "inputs/vm18/proof-download01.result.json",
+      "bytes": 735,
+      "sha256": "f01005f029442d19690dfb87fe0439aba56763a1cd7f04d717397d00383eef68"
+    },
+    "vm18/proof-download01.stderr.log": {
+      "path": "inputs/vm18/proof-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/proof-download01.stdout.log": {
+      "path": "inputs/vm18/proof-download01.stdout.log",
+      "bytes": 13542,
+      "sha256": "b57bd535f4b77afc15dd4a4d3cb97740384b8334f53208c45a8035dfcae84def"
+    },
+    "vm18/reconciliation.json": {
+      "path": "inputs/vm18/reconciliation.json",
+      "bytes": 1615,
+      "sha256": "89228dba05cc4b1f603a453e9090245282bb224f16a17f335d9f52ebd6e595ea"
+    },
+    "vm18/recover01.result.json": {
+      "path": "inputs/vm18/recover01.result.json",
+      "bytes": 757,
+      "sha256": "eb47200d7156e9f8c370e4b3cf05004566b2a53388f0d5489f7421b08bd5f5bb"
+    },
+    "vm18/recover01.stderr.log": {
+      "path": "inputs/vm18/recover01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/recover01.stdout.log": {
+      "path": "inputs/vm18/recover01.stdout.log",
+      "bytes": 254,
+      "sha256": "4d7f7ac879f17628a4ba82a392373c8acae98df97dc71884a799728f31661dd7"
+    },
+    "vm18/recovery-receipt-download01.result.json": {
+      "path": "inputs/vm18/recovery-receipt-download01.result.json",
+      "bytes": 733,
+      "sha256": "50c1ad0e7163207fe4c6154958b322238a39eb56914f0dee1ef50388859abca0"
+    },
+    "vm18/recovery-receipt-download01.stderr.log": {
+      "path": "inputs/vm18/recovery-receipt-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/recovery-receipt-download01.stdout.log": {
+      "path": "inputs/vm18/recovery-receipt-download01.stdout.log",
+      "bytes": 71,
+      "sha256": "e05687178f62e147fffe0ac65eb46f8a9a49c582b8d96fc6e1a6ab5b138c28c4"
+    },
+    "vm18/recovery-state01.result.json": {
+      "path": "inputs/vm18/recovery-state01.result.json",
+      "bytes": 748,
+      "sha256": "3863b6a134fb229b53b5b8385742d3827231466bf9fb2d4d7357f0826110d132"
+    },
+    "vm18/recovery-state01.stderr.log": {
+      "path": "inputs/vm18/recovery-state01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/recovery-state01.stdout.log": {
+      "path": "inputs/vm18/recovery-state01.stdout.log",
+      "bytes": 545,
+      "sha256": "212d76a23f638daf3e1b3c9f9a0d6f5cc798d34e0a9667dbbdfd0f8fc62d2533"
+    },
+    "vm18/reservation-check.json": {
+      "path": "inputs/vm18/reservation-check.json",
+      "bytes": 704,
+      "sha256": "6d6eb2bb8b0406159ee262be9c09e21344f20276990e7143e165948ab16295f9"
+    },
+    "vm18/reservation.json": {
+      "path": "inputs/vm18/reservation.json",
+      "bytes": 1641,
+      "sha256": "8ce04f2cf9ef886f2b9d10ebe29848b2325dc2329d2e2fe776d5773c545413ca"
+    },
+    "vm18/resize-recovery01.result.json": {
+      "path": "inputs/vm18/resize-recovery01.result.json",
+      "bytes": 713,
+      "sha256": "7d933cde2913c2270e4d8586323697e713a50e4d7f07a434afe0a4a5561db0aa"
+    },
+    "vm18/resize-recovery01.stderr.log": {
+      "path": "inputs/vm18/resize-recovery01.stderr.log",
+      "bytes": 141,
+      "sha256": "93452c5c3aab263bed96c8ed19c96f24468754a45b0a2dd7c3a1f41905c11f4a"
+    },
+    "vm18/resize-recovery01.stdout.log": {
+      "path": "inputs/vm18/resize-recovery01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/resize01.result.json": {
+      "path": "inputs/vm18/resize01.result.json",
+      "bytes": 713,
+      "sha256": "0b7336ffd5d2e68e49859efb6ece6aab686442a683189fca9f19d4e637fdd856"
+    },
+    "vm18/resize01.stderr.log": {
+      "path": "inputs/vm18/resize01.stderr.log",
+      "bytes": 141,
+      "sha256": "93452c5c3aab263bed96c8ed19c96f24468754a45b0a2dd7c3a1f41905c11f4a"
+    },
+    "vm18/resize01.stdout.log": {
+      "path": "inputs/vm18/resize01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/serial01.result.json": {
+      "path": "inputs/vm18/serial01.result.json",
+      "bytes": 703,
+      "sha256": "85315c0319847364f578143c42b1c14ec46c25133cd64659d6995ab805c62d34"
+    },
+    "vm18/serial01.stderr.log": {
+      "path": "inputs/vm18/serial01.stderr.log",
+      "bytes": 118,
+      "sha256": "cb039819dfcd7d07bb8b1f716ca6d85026305e3ce097d71d2a25c9c4eaa2301c"
+    },
+    "vm18/serial01.stdout.log": {
+      "path": "inputs/vm18/serial01.stdout.log",
+      "bytes": 86285,
+      "sha256": "5e5919ec0110be5f3e2234a389fbc2ae39567ce17cabd539dd1f917863ff9be3"
+    },
+    "vm18/sidecars-download01.result.json": {
+      "path": "inputs/vm18/sidecars-download01.result.json",
+      "bytes": 735,
+      "sha256": "6bf84baf1ce883e8e64a3d0ff44ce0704ae979b61cc22412411762456a0e55c0"
+    },
+    "vm18/sidecars-download01.stderr.log": {
+      "path": "inputs/vm18/sidecars-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/sidecars-download01.stdout.log": {
+      "path": "inputs/vm18/sidecars-download01.stdout.log",
+      "bytes": 214,
+      "sha256": "68fd2ba34cf48a67b865174f118bd2aa4d6cd7a66c7111b55adfc2b975d7fed9"
+    },
+    "vm18/split-upload01.result.json": {
+      "path": "inputs/vm18/split-upload01.result.json",
+      "bytes": 727,
+      "sha256": "374b590f66366503b2fd382cd158ddcd7839382a8d3c0bebf6b25df1933d5255"
+    },
+    "vm18/split-upload01.stderr.log": {
+      "path": "inputs/vm18/split-upload01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/split-upload01.stdout.log": {
+      "path": "inputs/vm18/split-upload01.stdout.log",
+      "bytes": 71,
+      "sha256": "3eb299f3386f188f602731ed081df2a9ab82bf94b47e9e0b5784cd908275fdb1"
+    },
+    "vm18/split01.result.json": {
+      "path": "inputs/vm18/split01.result.json",
+      "bytes": 698,
+      "sha256": "f0e62447a584d5c7060bb0dcabf1ce00522c03d6142021b1b7d0115b8d0978c7"
+    },
+    "vm18/split01.stderr.log": {
+      "path": "inputs/vm18/split01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/split01.stdout.log": {
+      "path": "inputs/vm18/split01.stdout.log",
+      "bytes": 597,
+      "sha256": "83d44fe93eaee729040303071e89566ade14df940cb8b93b8dc0a365e6ad6f05"
+    },
+    "vm18/start-recovery01.result.json": {
+      "path": "inputs/vm18/start-recovery01.result.json",
+      "bytes": 665,
+      "sha256": "eaf6699cc82b1177d63dc1917d6eaf12a364165ae85e421cafc87e54b0e525f7"
+    },
+    "vm18/start-recovery01.stderr.log": {
+      "path": "inputs/vm18/start-recovery01.stderr.log",
+      "bytes": 320,
+      "sha256": "8bdb8186487fc36cd6fea350ed13acb4a892240248de0a2cde2f756d2fa8dfbb"
+    },
+    "vm18/start-recovery01.stdout.log": {
+      "path": "inputs/vm18/start-recovery01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/start32-01.result.json": {
+      "path": "inputs/vm18/start32-01.result.json",
+      "bytes": 665,
+      "sha256": "1f55554e5d0a98223cc211c40da33b132d1769e43e8cbf78571e51979c4d53ca"
+    },
+    "vm18/start32-01.stderr.log": {
+      "path": "inputs/vm18/start32-01.stderr.log",
+      "bytes": 387,
+      "sha256": "cd85d35c990c3a513f808e56fd37baba40f935bdfb9912b76bc9a3a1317f1213"
+    },
+    "vm18/start32-01.stdout.log": {
+      "path": "inputs/vm18/start32-01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/state32-01.result.json": {
+      "path": "inputs/vm18/state32-01.result.json",
+      "bytes": 748,
+      "sha256": "0cad01e057bc350dc2193253376345db2a2452f7fa8a7d0bbb2867c2d2b7d582"
+    },
+    "vm18/state32-01.stderr.log": {
+      "path": "inputs/vm18/state32-01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/state32-01.stdout.log": {
+      "path": "inputs/vm18/state32-01.stdout.log",
+      "bytes": 545,
+      "sha256": "c6af1cc26a9884dff32fa9acb77380ba7d81e832aaa8bebfa8bc441648636660"
+    },
+    "vm18/status-persist01.result.json": {
+      "path": "inputs/vm18/status-persist01.result.json",
+      "bytes": 712,
+      "sha256": "a158d29fd9349903269e9d189193ab12d0474630c4fe68f9015445dd87b10cca"
+    },
+    "vm18/status-persist01.stderr.log": {
+      "path": "inputs/vm18/status-persist01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/status-persist01.stdout.log": {
+      "path": "inputs/vm18/status-persist01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/status-upload01.result.json": {
+      "path": "inputs/vm18/status-upload01.result.json",
+      "bytes": 720,
+      "sha256": "13a99f27f85867d2e61c85221655a5efc666030d01a4a5afeb1c96d82f863d96"
+    },
+    "vm18/status-upload01.stderr.log": {
+      "path": "inputs/vm18/status-upload01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/status-upload01.stdout.log": {
+      "path": "inputs/vm18/status-upload01.stdout.log",
+      "bytes": 71,
+      "sha256": "16dfe460f030f9f1e5f91e82d8933445b0275d9de9fe4ab393a689fc74b06144"
+    },
+    "vm18/stop-recovery01.result.json": {
+      "path": "inputs/vm18/stop-recovery01.result.json",
+      "bytes": 665,
+      "sha256": "8c9998150e2791d06943243214deb7366a63ecde4857ffce3841ab9baa6049ba"
+    },
+    "vm18/stop-recovery01.stderr.log": {
+      "path": "inputs/vm18/stop-recovery01.stderr.log",
+      "bytes": 458,
+      "sha256": "47726be1a9383972d4d3d0208210634be009de382b59451b01922e4813ad7c0a"
+    },
+    "vm18/stop-recovery01.stdout.log": {
+      "path": "inputs/vm18/stop-recovery01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/stop-resize01.result.json": {
+      "path": "inputs/vm18/stop-resize01.result.json",
+      "bytes": 665,
+      "sha256": "4f03bf3dbf03ff19f4a292a6b1c17fc3e57ba2b874cdf56c41e3da8b1120ca0e"
+    },
+    "vm18/stop-resize01.stderr.log": {
+      "path": "inputs/vm18/stop-resize01.stderr.log",
+      "bytes": 470,
+      "sha256": "6a98d3d45172c3ff0897a56269437b726cbadd1694bb309f97bf959079f8ae56"
+    },
+    "vm18/stop-resize01.stdout.log": {
+      "path": "inputs/vm18/stop-resize01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/upload01.result.json": {
+      "path": "inputs/vm18/upload01.result.json",
+      "bytes": 774,
+      "sha256": "6e4245727f0349ee6d3b2efbaf7b93c3c958d9cd5924533d2f708888a92cda0a"
+    },
+    "vm18/upload01.stderr.log": {
+      "path": "inputs/vm18/upload01.stderr.log",
+      "bytes": 182,
+      "sha256": "e9a7f39f0e4b152a47dc8001cb7b1eeb6cc586a8b50b4aef432675fc44390253"
+    },
+    "vm18/upload01.stdout.log": {
+      "path": "inputs/vm18/upload01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/upload02.result.json": {
+      "path": "inputs/vm18/upload02.result.json",
+      "bytes": 774,
+      "sha256": "fbd9836a83ddef4812fee3a020ff71efd54988f7fd9a94c774fca5c108217ce1"
+    },
+    "vm18/upload02.stderr.log": {
+      "path": "inputs/vm18/upload02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm18/upload02.stdout.log": {
+      "path": "inputs/vm18/upload02.stdout.log",
+      "bytes": 286,
+      "sha256": "f317e6f530a23183e5c34c4f008d3aa7ca0a21c48c290c6af3386d25ed019e04"
+    },
+    "preflight-vm18/pricing-compute-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-standard-2-row.html",
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "preflight-vm18/pricing-compute-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-standard-2-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm18/pricing-compute-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-compute-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm18/pricing-compute-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm18/pricing-compute-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-compute-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-n2-highcpu-32-row.html",
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "preflight-vm18/pricing-compute-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-n2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "preflight-vm18/pricing-compute-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm18/pricing-compute-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-disk-balanced-row.html": {
+      "path": "inputs/preflight-vm18/pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm18/pricing-disk-balanced-header.html": {
+      "path": "inputs/preflight-vm18/pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm18/pricing-disk-balanced-region.html": {
+      "path": "inputs/preflight-vm18/pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-network-spot-ipv4-row.html": {
+      "path": "inputs/preflight-vm18/pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm18/pricing-network-spot-ipv4-header.html": {
+      "path": "inputs/preflight-vm18/pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm18/pricing-network-spot-ipv4-region.html": {
+      "path": "inputs/preflight-vm18/pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-network-asia-egress-row.html": {
+      "path": "inputs/preflight-vm18/pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm18/pricing-network-asia-egress-header.html": {
+      "path": "inputs/preflight-vm18/pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm18/pricing-network-asia-egress-region.html": {
+      "path": "inputs/preflight-vm18/pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-spot-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-standard-2-row.html",
+      "bytes": 376,
+      "sha256": "a8eb421dcf94e184a8abff0e34d53e25d543d78f6e57dc9e38794b6b49c00d6c"
+    },
+    "preflight-vm18/pricing-spot-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-standard-2-header.html",
+      "bytes": 613,
+      "sha256": "ba42cc29e1dbbbcf4289de82a6dcce26512185bbbd82d85d4376510a58932a9c"
+    },
+    "preflight-vm18/pricing-spot-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-spot-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "9de71a06d059c30b308d4a4208cb5d0b227292f8516e62a6825af9228c789645"
+    },
+    "preflight-vm18/pricing-spot-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "ea2cfaff837888ca38d51f5b98ab19c79b025e9f96cb7e6a1cdd861721e397b6"
+    },
+    "preflight-vm18/pricing-spot-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm18/pricing-spot-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-n2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "7d7ebe7f800772814df8c7fc8befba16b8d77a398eaad4d3640cc836acbd8add"
+    },
+    "preflight-vm18/pricing-spot-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-n2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "0433094e7dfc90576d2e1d7b9f6037eeb443e1e0299b105580d77a929f964e4c"
+    },
+    "preflight-vm18/pricing-spot-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm18/pricing-spot-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    }
+  },
+  "requests": [
+    {
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "label": "sent",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%223769585733775752220%22&interval.startTime=2026-09-27T07%3A15%3A00Z&interval.endTime=2026-09-27T07%3A49%3A05.746098Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T07:49:07.529800Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T07:49:08.035184Z",
+      "response": {
+        "path": "vm18-sent-00.json",
+        "bytes": 6859,
+        "sha256": "d62e15eeb02728f4972b823a1d11e63e6c0aa97b74d2ca234738763800910a6a"
+      },
+      "point_count": 28
+    },
+    {
+      "metric": "compute.googleapis.com/instance/uptime",
+      "label": "uptime",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%223769585733775752220%22&interval.startTime=2026-09-27T07%3A15%3A00Z&interval.endTime=2026-09-27T07%3A49%3A05.746098Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T07:49:08.035908Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T07:49:08.482636Z",
+      "response": {
+        "path": "vm18-uptime-00.json",
+        "bytes": 6978,
+        "sha256": "78c305d62be16357c7ccab381e629ab1d7772b8b9c3f66c5c761d20ef94ac0b4"
+      },
+      "point_count": 28
+    }
+  ],
+  "source": {
+    "bytes": 14000,
+    "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+  },
+  "status": "completed",
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "credential_material_retained": false,
+  "billed_usd": null,
+  "usage_coverage": "unknown; raw acquisition success does not establish complete usage",
+  "maximum_monitoring_gets": 2,
+  "interval_end": "2026-09-27T07:49:05.746098Z",
+  "captured_sdk_commands": [
+    "vm18/absence-addresses01.result.json",
+    "vm18/absence-disks01.result.json",
+    "vm18/absence-instances01.result.json",
+    "vm18/analysis-download01.result.json",
+    "vm18/analyze01.result.json",
+    "vm18/bootstrap-recovery01.result.json",
+    "vm18/bootstrap32-01.result.json",
+    "vm18/bootstrap32-02.result.json",
+    "vm18/build-start01.result.json",
+    "vm18/build-status01.result.json",
+    "vm18/build-status02.result.json",
+    "vm18/build-status03.result.json",
+    "vm18/delete-operation01.result.json",
+    "vm18/delete01.result.json",
+    "vm18/disk-before-delete01.result.json",
+    "vm18/identity-before-delete01.result.json",
+    "vm18/install-state01.result.json",
+    "vm18/install01.result.json",
+    "vm18/measure-start01.result.json",
+    "vm18/measure-status01.result.json",
+    "vm18/measure-status02.result.json",
+    "vm18/measure-status03.result.json",
+    "vm18/measure-status04.result.json",
+    "vm18/preflight-disks01.result.json",
+    "vm18/preflight-instances01.result.json",
+    "vm18/preflight-region01.result.json",
+    "vm18/proof-download01.result.json",
+    "vm18/recover01.result.json",
+    "vm18/recovery-receipt-download01.result.json",
+    "vm18/recovery-state01.result.json",
+    "vm18/resize-recovery01.result.json",
+    "vm18/resize01.result.json",
+    "vm18/serial01.result.json",
+    "vm18/sidecars-download01.result.json",
+    "vm18/split-upload01.result.json",
+    "vm18/split01.result.json",
+    "vm18/start-recovery01.result.json",
+    "vm18/start32-01.result.json",
+    "vm18/state32-01.result.json",
+    "vm18/status-persist01.result.json",
+    "vm18/status-upload01.result.json",
+    "vm18/stop-recovery01.result.json",
+    "vm18/stop-resize01.result.json",
+    "vm18/upload01.result.json",
+    "vm18/upload02.result.json"
+  ],
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-27T07:49:08.483553Z"
+}

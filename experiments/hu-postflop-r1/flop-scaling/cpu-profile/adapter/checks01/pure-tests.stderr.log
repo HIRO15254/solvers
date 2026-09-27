@@ -1,0 +1,10 @@
+test_cfr_marker_bounds_only_original_pool_work (test_prepare.AdapterSourceTests.test_cfr_marker_bounds_only_original_pool_work) ... ok
+test_clock_integer_safety_and_finite_scope (test_prepare.AdapterSourceTests.test_clock_integer_safety_and_finite_scope) ... ok
+test_fixture_state_and_output_json_templates_unchanged (test_prepare.AdapterSourceTests.test_fixture_state_and_output_json_templates_unchanged) ... ok
+test_missing_or_ambiguous_anchor_fails_closed (test_prepare.AdapterSourceTests.test_missing_or_ambiguous_anchor_fails_closed) ... ok
+test_pin_forward_and_exact_inverse (test_prepare.AdapterSourceTests.test_pin_forward_and_exact_inverse) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.005s
+
+OK

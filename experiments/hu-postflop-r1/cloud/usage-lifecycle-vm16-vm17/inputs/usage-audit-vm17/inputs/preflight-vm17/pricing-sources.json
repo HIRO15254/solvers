@@ -1,0 +1,136 @@
+{
+  "scope": "Three unauthenticated official public GETs; no resources, tokens, or account changes",
+  "extractor": {
+    "path": "preflight-vm14/collect-pricing.py",
+    "bytes": 2925,
+    "sha256": "bd5b772cecbf129ee7fa7e1c40fdfc7aa862fd423c94820575493692d7b24c1d"
+  },
+  "attempts": [
+    {
+      "status": "acquired",
+      "started_at_utc": "2026-09-27T05:46:09.370845+00:00",
+      "source": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "final_url": "https://cloud.google.com/products/compute/pricing/general-purpose",
+      "retrieved_at_utc": "2026-09-27T05:46:20.683730+00:00",
+      "response_bytes": 35801308,
+      "response_sha256": "3dd05de9e2ce42159b32cad95696516dd93fe026e5743a189cbefa3d4d6874be",
+      "retained": [
+        {
+          "path": "pricing-compute-e2-standard-2-row.html",
+          "bytes": 738,
+          "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+        },
+        {
+          "path": "pricing-compute-e2-standard-2-header.html",
+          "bytes": 6156,
+          "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+        },
+        {
+          "path": "pricing-compute-e2-standard-2-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        },
+        {
+          "path": "pricing-compute-e2-highcpu-32-row.html",
+          "bytes": 738,
+          "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+        },
+        {
+          "path": "pricing-compute-e2-highcpu-32-header.html",
+          "bytes": 6156,
+          "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+        },
+        {
+          "path": "pricing-compute-e2-highcpu-32-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        },
+        {
+          "path": "pricing-compute-n2-highcpu-32-row.html",
+          "bytes": 730,
+          "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+        },
+        {
+          "path": "pricing-compute-n2-highcpu-32-header.html",
+          "bytes": 6156,
+          "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+        },
+        {
+          "path": "pricing-compute-n2-highcpu-32-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        }
+      ],
+      "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+    },
+    {
+      "status": "acquired",
+      "started_at_utc": "2026-09-27T05:46:09.371418+00:00",
+      "source": "https://cloud.google.com/compute/disks-image-pricing",
+      "final_url": "https://cloud.google.com/compute/disks-image-pricing",
+      "retrieved_at_utc": "2026-09-27T05:46:11.426447+00:00",
+      "response_bytes": 3902503,
+      "response_sha256": "774216e387f61ed6c58829a9ceaa0ecb3b4f150d226be9f2fc39fe1e6271566f",
+      "retained": [
+        {
+          "path": "pricing-disk-balanced-row.html",
+          "bytes": 243,
+          "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+        },
+        {
+          "path": "pricing-disk-balanced-header.html",
+          "bytes": 316,
+          "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+        },
+        {
+          "path": "pricing-disk-balanced-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        }
+      ],
+      "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+    },
+    {
+      "status": "acquired",
+      "started_at_utc": "2026-09-27T05:46:09.371927+00:00",
+      "source": "https://cloud.google.com/vpc/network-pricing",
+      "final_url": "https://cloud.google.com/vpc/network-pricing",
+      "retrieved_at_utc": "2026-09-27T05:46:10.247689+00:00",
+      "response_bytes": 3808725,
+      "response_sha256": "e51c95005a443f418d1d52f400ab8321af266fb3a5f4e08e03fc42f6dcbf3dde",
+      "retained": [
+        {
+          "path": "pricing-network-spot-ipv4-row.html",
+          "bytes": 288,
+          "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+        },
+        {
+          "path": "pricing-network-spot-ipv4-header.html",
+          "bytes": 315,
+          "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+        },
+        {
+          "path": "pricing-network-spot-ipv4-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        },
+        {
+          "path": "pricing-network-asia-egress-row.html",
+          "bytes": 791,
+          "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+        },
+        {
+          "path": "pricing-network-asia-egress-header.html",
+          "bytes": 316,
+          "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+        },
+        {
+          "path": "pricing-network-asia-egress-region.html",
+          "bytes": 304,
+          "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+        }
+      ],
+      "extraction": "Exact first matching HTML row, prior table header and prior Iowa label. Full response is not retained."
+    }
+  ]
+}

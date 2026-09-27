@@ -1,0 +1,14 @@
+{
+  "id": "2775050120395558750",
+  "machineType": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/machineTypes/e2-standard-2",
+  "name": "solvers-r1-20260927-17",
+  "scheduling": {
+    "automaticRestart": false,
+    "instanceTerminationAction": "STOP",
+    "onHostMaintenance": "TERMINATE",
+    "preemptible": true,
+    "provisioningModel": "SPOT",
+    "terminationTime": "2026-09-27T06:38:26Z"
+  },
+  "status": "RUNNING"
+}

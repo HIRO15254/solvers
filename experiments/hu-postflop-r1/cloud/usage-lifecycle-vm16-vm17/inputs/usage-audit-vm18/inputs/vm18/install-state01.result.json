@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-18",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=ls -l /tmp/deployment01.tar.gz /tmp/install.py /opt/r1/bootstrap-complete",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:18:53.180114+00:00",
+  "timeout_seconds": 30,
+  "stdout": {
+    "bytes": 66,
+    "sha256": "04d14f3a9fb2375c186db39c39198881cdeebbae7e357d26ed425c7804b7b8f3"
+  },
+  "stderr": {
+    "bytes": 716,
+    "sha256": "06298e4b43a5d7537bd97c492c2d2659169e802721c1eef05460991d0bbf771c"
+  },
+  "exit_code": 2,
+  "ended_utc": "2026-09-27T07:18:58.984544+00:00"
+}

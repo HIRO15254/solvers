@@ -1,0 +1,139 @@
+{
+  "schema": "r1.cpu-profile-adapter-source-checks/v1",
+  "status": "passed",
+  "commands": [
+    {
+      "name": "pure-tests",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\adapter",
+        "-p",
+        "test_prepare.py",
+        "-v"
+      ],
+      "started_at": "2026-09-27T08:11:13.584510+00:00",
+      "ended_at": "2026-09-27T08:11:13.717781+00:00",
+      "elapsed_seconds": 0.1332680000923574,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 765,
+        "sha256": "e196b42cad96e6d9bb3ff186eca13c15a8a17abf4d18aaad0c8dd347b485c234"
+      }
+    },
+    {
+      "name": "inverse",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\adapter\\prepare.py",
+        "--check"
+      ],
+      "started_at": "2026-09-27T08:11:13.725327+00:00",
+      "ended_at": "2026-09-27T08:11:13.831171+00:00",
+      "elapsed_seconds": 0.1058410000987351,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 178,
+        "sha256": "dae44dc2429cd5212cdb4c8b4a710304e272b46214817d1cd6bb17744602289c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "rustfmt",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\adapter\\solve.rs"
+      ],
+      "started_at": "2026-09-27T08:11:13.840134+00:00",
+      "ended_at": "2026-09-27T08:11:13.938407+00:00",
+      "elapsed_seconds": 0.0982759001199156,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "rustfmt-version",
+      "argv": [
+        "rustfmt",
+        "--version"
+      ],
+      "started_at": "2026-09-27T08:11:13.938695+00:00",
+      "ended_at": "2026-09-27T08:11:14.019937+00:00",
+      "elapsed_seconds": 0.08124929992482066,
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 45,
+        "sha256": "1a5aa61117be56013e4e2a9cf9c7b006c49487c1dcea31eaf3c7c39719ccf1cc"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "controls": {
+    "adapter.patch": {
+      "bytes": 11851,
+      "sha256": "f656d4be862bb88e88d649dacb54c945371b9c8254c438cd14f82df670ceb25b"
+    },
+    "markers.rs.inc": {
+      "bytes": 2384,
+      "sha256": "91c08a0d4f67fef951fe80ed55ece660f569030c1f8d7a36ef465c1e8d168345"
+    },
+    "prepare.py": {
+      "bytes": 7220,
+      "sha256": "1b2141a8179b175f157d0358202c90732f274d71f6b35a3fc09de2eff24c4772"
+    },
+    "provenance.json": {
+      "bytes": 956,
+      "sha256": "270123b30d753ff1c145d329dc47359f4fc29db3c5884ca5e20d6261c0db224b"
+    },
+    "README.jp.md": {
+      "bytes": 5017,
+      "sha256": "43ad166f6829c655bcdfb8d42619b965cda8cba207a58c3d0f0745732cb5e42b"
+    },
+    "solve.rs": {
+      "bytes": 19309,
+      "sha256": "b1ffa4f46a79a6c167f3118cd32602fa19d8222c302f3c48c682705ad0e14301"
+    },
+    "test_prepare.py": {
+      "bytes": 4188,
+      "sha256": "1c82501f99b4f11236b9d28c2f0581ebeebe3bccc046d640fa397bb01881431b"
+    }
+  },
+  "baseline_before": {
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "baseline_after": {
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "baseline_unchanged": true,
+  "native_compilation": false,
+  "solver_execution": false,
+  "perf_execution": false,
+  "cloud_calls": false,
+  "test_scope": "five pure source tests, exact inverse/template/anchor checks and rustfmt parse/format only"
+}

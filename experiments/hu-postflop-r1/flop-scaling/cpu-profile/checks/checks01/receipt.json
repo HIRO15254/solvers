@@ -1,0 +1,63 @@
+{
+  "schema": "r1.cpu-profile-python-check/v1",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\test_run.py"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 0.43411490018479526,
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 32613,
+      "sha256": "d38b483c8ce63852141371034c86ced413a8b6f39ea493871c3ed86c34275e75"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24182,
+      "sha256": "d6892b6a0e95da8b2f5f3dabbf8d5a21031f7945920518f0e853eac59d39f7a9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 7868,
+      "sha256": "6df8e6611abb5cc048e599198b1571d4bea257c53b24925a59407172f123bbf1"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7262,
+      "sha256": "889333f35d09e7b7d9f0d1d070db6956521a60a128b7346b38d9eab1792b29fe"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2230,
+      "sha256": "713fbb2ae778478a4a0bb5fce90fe193f1ca24c54c75e8ac3d20f37b00c272f4"
+    }
+  },
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 32613,
+      "sha256": "d38b483c8ce63852141371034c86ced413a8b6f39ea493871c3ed86c34275e75"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24182,
+      "sha256": "d6892b6a0e95da8b2f5f3dabbf8d5a21031f7945920518f0e853eac59d39f7a9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 7868,
+      "sha256": "6df8e6611abb5cc048e599198b1571d4bea257c53b24925a59407172f123bbf1"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7262,
+      "sha256": "889333f35d09e7b7d9f0d1d070db6956521a60a128b7346b38d9eab1792b29fe"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2230,
+      "sha256": "713fbb2ae778478a4a0bb5fce90fe193f1ca24c54c75e8ac3d20f37b00c272f4"
+    }
+  },
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 2773,
+    "sha256": "257541694d68cf7d2f12845c9be31c3e107b9bfd3702ffac3ccea25b4dc9a641"
+  },
+  "note": "Initial synthetic fixture used host Path for a Linux command expectation; raw failure retained. No native/perf/cloud operation."
+}

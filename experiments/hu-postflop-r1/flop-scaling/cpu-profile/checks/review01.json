@@ -1,0 +1,93 @@
+{
+  "schema": "r1.cpu-profile-independent-review/v1",
+  "created_at": "2026-09-27T08:33:18.757919+00:00",
+  "reviewer": "profile_raw_storage",
+  "status": "passed_source_review",
+  "scope": [
+    "Linux perf text grammar and clock/frequency attribute interpretation",
+    "Fixed source, adapter, binary and same-measurement-boot binding",
+    "CFR-only PID and half-open monotonic-nanosecond clipping",
+    "Full state/quality evidence, exact commands, finite resource/deadline conditions",
+    "Pinned helper reuse, fail-closed reader and diagnostic-only conclusions"
+  ],
+  "pins": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 33317,
+      "sha256": "e8c428023386f76cf3c719c467b980e7c4e36e72f408692d85fc90fe4eb1fa66"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24584,
+      "sha256": "5f7a03b4fc5bff751aa9843456a531d1c46ac0303e15ae4c55820562770d2c61"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7361,
+      "sha256": "24a7f1c1fa4dc01db44b1dd6c238145cd2c09e58ed8e06cb9565cd819b4084db"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 9878,
+      "sha256": "eca774d4bfc221fe59e8258a69c60451bae76436c7647cd2b43cf2afbf3fcac9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/solve.rs": {
+      "bytes": 19309,
+      "sha256": "b1ffa4f46a79a6c167f3118cd32602fa19d8222c302f3c48c682705ad0e14301"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/prepare.py": {
+      "bytes": 7220,
+      "sha256": "1b2141a8179b175f157d0358202c90732f274d71f6b35a3fc09de2eff24c4772"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/provenance.json": {
+      "bytes": 956,
+      "sha256": "270123b30d753ff1c145d329dc47359f4fc29db3c5884ca5e20d6261c0db224b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/markers.rs.inc": {
+      "bytes": 2384,
+      "sha256": "91c08a0d4f67fef951fe80ed55ece660f569030c1f8d7a36ef465c1e8d168345"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/chance-grain/run.py": {
+      "bytes": 39199,
+      "sha256": "143a89ace93b169787b34f0c26f4683b1fde643d9fbe5553e6120cd92f8e2b79"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/chance-grain/analyze.py": {
+      "bytes": 29755,
+      "sha256": "866dfdc35ff9e2e5f6f0ed2b681e657dd7aa80b29e12da43731801c8bc0b1fcf"
+    }
+  },
+  "resolved_findings": [
+    {
+      "finding": "Frame-pointer callchains can have a header-only first line, with IP/symbol/DSO on following lines.",
+      "resolution": "Parser accepts that layout and retains inline fallback; empty callchain rejected; representative synthetic regression added.",
+      "primary_source": "https://github.com/torvalds/linux/blob/v6.8/tools/perf/builtin-script.c#L2086-L2095"
+    },
+    {
+      "finding": "Verbose event attributes print a sample_period/sample_freq union label.",
+      "resolution": "Parser accepts the union value97 while independently requiring freq1/use_clockid1/clockid1 and CALLCHAIN.",
+      "primary_source": "https://github.com/torvalds/linux/blob/v6.8/tools/perf/util/perf_event_attr_fprintf.c#L247-L264"
+    },
+    {
+      "finding": "Bare PERF_RECORD tokens need not be record headers.",
+      "resolution": "Census matches the source offset and bracketed-size record marker, and requires SAMPLE count equality with parsed script samples. No record-summary footer was found in the reviewed builtin-script source.",
+      "primary_source": "https://github.com/torvalds/linux/blob/v6.8/tools/perf/util/session.c#L1244-L1261"
+    }
+  ],
+  "unresolved_blockers": [],
+  "verification": {
+    "command": [
+      "C:/Python313/python.exe",
+      "-B",
+      "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py"
+    ],
+    "exit_code": 0,
+    "tests_passed": 13,
+    "test_body_seconds": 0.006,
+    "observed_exec_wall_seconds": 0.5759514,
+    "kind": "small Python synthetic tests and source AST only",
+    "note": "Replayed final frozen test bytes after the owner added one compressed-text hash/receipt test; the earlier 12-test run was superseded for this final pinned review."
+  },
+  "limitations": [
+    "No Linux perf, native compile, solver, GCP operation or large retained-state read was executed in this review.",
+    "Linux v6.8 source inspection does not establish the installed perf version or permissions; fixed real preflight on both boots must pass before proceeding.",
+    "No profile or performance result exists in this review; no production adoption, SMT causal conclusion, physical-memory claim or external-quality certification is implied.",
+    "Whole-proof recovery remains necessary on failure or interruption; an incomplete run is not a validated profiling result."
+  ],
+  "ownership": "Only this new review JSON was written; runner, analyzer, protocol, adapter and existing evidence were not edited by this review."
+}

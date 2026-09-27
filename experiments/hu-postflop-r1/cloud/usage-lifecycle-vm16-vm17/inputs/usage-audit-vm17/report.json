@@ -1,0 +1,144 @@
+{
+  "schema": "r1.vm17-conservative-usage-proposal/v1",
+  "instance_id": "2775050120395558750",
+  "acquisition": {
+    "bytes": 16327,
+    "sha256": "189d8fa74ec20ced574d29b44b7973a0902019e81941c55aad6676d368b1cdf1"
+  },
+  "analysis_source": {
+    "bytes": 17242,
+    "sha256": "0504f0fcd28eeda8938f30a1b2562216451ca19c907bb5706a4d1c00aa3d90fd"
+  },
+  "acquired_at": [
+    "2026-09-27T06:40:52.396396Z",
+    "2026-09-27T06:40:54.531630Z"
+  ],
+  "lifecycle": {
+    "launch_attempt": "2026-09-27T06:03:26.7694177+00:00",
+    "created": "2026-09-26T23:03:29.904-07:00",
+    "original_stop_deadline": "2026-09-27T06:38:26Z",
+    "delete_done": "2026-09-26T23:39:13.383-07:00",
+    "absence_verified": "2026-09-27T06:39:59.735307+00:00",
+    "launch_to_absence_seconds": "2192.96589",
+    "billing_rounding_slack_seconds": "120",
+    "priced_seconds_before_rounding": "2312.96589",
+    "rounded_lifetime_minutes": 39,
+    "stopped_intervals_subtracted": false,
+    "window_capped_to_original_stop": false
+  },
+  "recovery_exception": {
+    "source": {
+      "bytes": 1125,
+      "sha256": "df8a7df2189bb3ffb2710be155004232716e7898a84af1b936e4274deb287a79"
+    },
+    "original_maximum_starts": 3,
+    "allowed_additional_starts": 1,
+    "allowed_total_starts": 4,
+    "additional_start_exit_code": 0,
+    "additional_start_ended_utc": "2026-09-27T06:33:55.008216+00:00",
+    "stop_extended": false,
+    "reservation_changed": false,
+    "prior_boot_lower_seconds": {
+      "bootstrap": "181.554832",
+      "measurement": "950.832349",
+      "initial_recovery": "389.754"
+    },
+    "scope": "One extra2CPU recovery-only start; full lifetime plus120s,512MiB transfer allowance and1USD reserve unchanged"
+  },
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 32,
+      "observed_sum": "99729092",
+      "first_start": "2026-09-27T06:03:00.001Z",
+      "last_end": "2026-09-27T06:38:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T06:07:00Z",
+          "to": "2026-09-27T06:08:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T06:31:00Z",
+          "to": "2026-09-27T06:33:00.001Z",
+          "seconds": "120.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "0",
+      "last_to_delete_seconds": "73.383"
+    },
+    "uptime": {
+      "available": true,
+      "points": 32,
+      "observed_sum": "1720.7524129999999476",
+      "first_start": "2026-09-27T06:03:00.001Z",
+      "last_end": "2026-09-27T06:38:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T06:07:00Z",
+          "to": "2026-09-27T06:08:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T06:31:00Z",
+          "to": "2026-09-27T06:33:00.001Z",
+          "seconds": "120.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "0",
+      "last_to_delete_seconds": "73.383"
+    }
+  },
+  "network_allowance_gib": "0.5",
+  "disk_allowance_hours": "24",
+  "rates_usd": {
+    "compute_hour": "1.15",
+    "ipv4_hour": "0.0025",
+    "disk_gib_hour": "0.000137",
+    "sent_gib": "0.3"
+  },
+  "cost_scenario_usd": {
+    "whole_lifetime_highest_compute": "0.7475",
+    "whole_lifetime_ipv4": "0.001625",
+    "40gib_disk_at_least_24h": "0.131520",
+    "network_allowance": "0.15",
+    "original_uncertainty_reserve": "1"
+  },
+  "modeled_total_usd": "2.030645",
+  "held_before_usd": "2",
+  "unrounded_headroom_usd": "-0.030645",
+  "half_dollar_rounded_hold_usd": "2.5",
+  "optional_tenth_dollar_rounding": {
+    "available": false,
+    "hold_usd": "2.1",
+    "restore_usd": null,
+    "margin_above_modeled_total_usd": "0.069355",
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false,
+    "scope": "Unapplied finer rounding for review; not an invoice claim or automatic budget release"
+  },
+  "proposal": {
+    "available": false,
+    "hold_usd": null,
+    "restore_usd": null,
+    "margin_above_modeled_total_usd": null,
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "limits": [
+    "Monitoring observations are not invoice data; missing intervals/edge traffic remain unknown",
+    "All sent traffic is priced as charged egress, rounded to half GiB with original0.5GiB minimum; this allowance is not missing-data imputation",
+    "Full launch-attempt-to-absence duration plus original120s billing slack, including stopped/small-VM intervals, uses rounded highest undiscounted1.15USD/hour",
+    "Original40GiB disk24h, IPv4 and1USD uncertainty reserve remain; no Spot/free-tier/credit reductions assumed",
+    "A rounded usage-based reservation proposal, not a rigorous maximum bill or an applied budget change"
+  ]
+}

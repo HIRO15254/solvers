@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm17/audit-partial.py",
+    "solvers-r1-20260927-17:/tmp/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8"
+  ],
+  "started_utc": "2026-09-27T06:26:35.495968+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 140,
+    "sha256": "3859c39fc60ca6460e083078bc1e4cc779f1f9065a4dfd965be31274904cd832"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T06:26:42.533807+00:00"
+}

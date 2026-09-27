@@ -1,0 +1,78 @@
+{
+  "at_utc": "2026-09-27T08:21:49.334181+00:00",
+  "authorized_limit_usd": 40,
+  "held_before_usd": 39,
+  "held_after_usd": 38.1,
+  "restored_usd": 0.9,
+  "available_after_usd": 1.9,
+  "changes": [
+    {
+      "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+      "at": "2026-09-27T08:21:49.334181+00:00",
+      "id": "r1-20260927-16",
+      "old_reserved_usd": 1.9,
+      "new_reserved_usd": 1.4,
+      "restored_to_available_budget_usd": 0.5,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+      "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+    },
+    {
+      "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+      "at": "2026-09-27T08:21:49.334181+00:00",
+      "id": "r1-20260927-17",
+      "old_reserved_usd": 1.8,
+      "new_reserved_usd": 1.5,
+      "restored_to_available_budget_usd": 0.3,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+      "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+    },
+    {
+      "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+      "at": "2026-09-27T08:21:49.334181+00:00",
+      "id": "r1-20260927-18",
+      "old_reserved_usd": 1.5,
+      "new_reserved_usd": 1.4,
+      "restored_to_available_budget_usd": 0.1,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+      "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+    }
+  ],
+  "report": {
+    "bytes": 30939,
+    "sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2"
+  },
+  "analyzer": {
+    "bytes": 22825,
+    "sha256": "ecfe33c0c05bd04c216dfe43d01efb70b6eefb6112aaf5cde39b8d9c0df4018b"
+  },
+  "budget_before": {
+    "bytes": 83152,
+    "sha256": "dd3d8ae625fd9785f42ee9b2ec96bc54f79dbc143ec96e12bce61c1caea6c535"
+  },
+  "application_source": {
+    "bytes": 5884,
+    "sha256": "f792769a2291d0f2f5e66b277c232cb4019874f2d92d20d306c41dd2ce1fcc45"
+  },
+  "independent_review": {
+    "agent": "profile_raw_storage",
+    "result": "No blocking findings",
+    "checks": "576 input pins; IDs; deletion and absence; lifecycle bounds; prices; transfers; independent Decimal arithmetic"
+  },
+  "billed_usd": null,
+  "final_invoice": false,
+  "cloud_mutations": false,
+  "archive_access": false,
+  "budget_after": {
+    "bytes": 88994,
+    "sha256": "12b4838c861e185eb2f5bef8ae27bf5f58592b9f8c3fa183fc3c83b2ac28d4f0"
+  }
+}

@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 296, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 285, in main
+    report = build_report()
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 254, in build_report
+    reports = [audit(vm, rows[vm]) for vm in (16, 17)]
+               ~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 196, in audit
+    first = raw("recover01.stdout.log")
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 90, in raw
+    return read(path(suffix))
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\inputs\usage-audit-vm18\analyze.py", line 33, in read
+    return json.loads(path.read_bytes(), parse_float=D, parse_constant=invalid, object_pairs_hook=unique)
+                      ~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-lifecycle-vm16-vm17\\inputs\\vm17\\recover01.stdout.log'

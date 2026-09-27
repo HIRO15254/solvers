@@ -1,0 +1,11 @@
+
+Recommendation: To check for possible causes of SSH connectivity issues and get
+recommendations, rerun the ssh command with the --troubleshoot option.
+
+gcloud compute ssh solvers-r1-20260927-17 --project=solvers-abstraction-20260723 --zone=us-central1-b --troubleshoot
+
+Or, to investigate an IAP tunneling issue:
+
+gcloud compute ssh solvers-r1-20260927-17 --project=solvers-abstraction-20260723 --zone=us-central1-b --troubleshoot --tunnel-through-iap
+
+ERROR: (gcloud.compute.ssh) [C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin\sdk\plink.exe] exited with return code [1].

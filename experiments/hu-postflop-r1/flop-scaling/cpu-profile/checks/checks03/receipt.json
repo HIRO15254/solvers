@@ -1,0 +1,90 @@
+{
+  "schema": "r1.cpu-profile-python-check/v1",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.46648639999330044,
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 33317,
+      "sha256": "e8c428023386f76cf3c719c467b980e7c4e36e72f408692d85fc90fe4eb1fa66"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24584,
+      "sha256": "5f7a03b4fc5bff751aa9843456a531d1c46ac0303e15ae4c55820562770d2c61"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 9878,
+      "sha256": "eca774d4bfc221fe59e8258a69c60451bae76436c7647cd2b43cf2afbf3fcac9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7361,
+      "sha256": "24a7f1c1fa4dc01db44b1dd6c238145cd2c09e58ed8e06cb9565cd819b4084db"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2319,
+      "sha256": "044bdf60805569c5b822b3818debf9a1c49c886775d8a242d67fa2bd653fb839"
+    }
+  },
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 33317,
+      "sha256": "e8c428023386f76cf3c719c467b980e7c4e36e72f408692d85fc90fe4eb1fa66"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24584,
+      "sha256": "5f7a03b4fc5bff751aa9843456a531d1c46ac0303e15ae4c55820562770d2c61"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 9878,
+      "sha256": "eca774d4bfc221fe59e8258a69c60451bae76436c7647cd2b43cf2afbf3fcac9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7361,
+      "sha256": "24a7f1c1fa4dc01db44b1dd6c238145cd2c09e58ed8e06cb9565cd819b4084db"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2319,
+      "sha256": "044bdf60805569c5b822b3818debf9a1c49c886775d8a242d67fa2bd653fb839"
+    }
+  },
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 1490,
+    "sha256": "4f8bda9002942d2c4b1ef2bf37cb6214c511843f741a15cfdfec9e2ca36cef60"
+  },
+  "ast": [
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py",
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py",
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py"
+  ],
+  "relative_links": [
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md",
+      "target": "proposal.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md",
+      "target": "adapter/README.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "protocol.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "proposal.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "adapter/README.jp.md"
+    }
+  ],
+  "scope": "Synthetic Python only; Linux perf availability unexecuted. Includes Linux header-only frames/attr union/dump record marker, 64MiB transient gz retention logic. Previous receipts immutable."
+}

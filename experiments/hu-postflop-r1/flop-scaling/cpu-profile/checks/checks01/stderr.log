@@ -1,0 +1,57 @@
+test_capture_identity_rejects_mismatch_without_read (__main__.Controls.test_capture_identity_rejects_mismatch_without_read) ... ok
+test_clip_pid_half_open_and_unknown_preserved (__main__.Controls.test_clip_pid_half_open_and_unknown_preserved) ... ok
+test_deadlines_and_no_extension (__main__.Controls.test_deadlines_and_no_extension) ... ok
+test_fixed_schedule (__main__.Controls.test_fixed_schedule) ... ok
+test_perf_command_no_pmu_or_fallback (__main__.Controls.test_perf_command_no_pmu_or_fallback) ... FAIL
+test_phase_contract_and_invalid_intervals (__main__.Controls.test_phase_contract_and_invalid_intervals) ... ok
+test_pinned_base_and_adapter_controls (__main__.Controls.test_pinned_base_and_adapter_controls) ... ok
+test_record_census_and_attributes (__main__.Controls.test_record_census_and_attributes) ... ok
+test_source_binding_new_example_only (__main__.Controls.test_source_binding_new_example_only) ... ok
+test_source_order_is_path_components (__main__.Controls.test_source_order_is_path_components) ... ok
+test_unknown_parser_missing_tail_and_empty_fail (__main__.Controls.test_unknown_parser_missing_tail_and_empty_fail) ... ok
+
+======================================================================
+FAIL: test_perf_command_no_pmu_or_fallback (__main__.Controls.test_perf_command_no_pmu_or_fallback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\cpu-profile\test_run.py", line 118, in test_perf_command_no_pmu_or_fallback
+    self.assertEqual(command, ["/perf","record","-e","cpu-clock","-F","97","--strict-freq","--clockid","mono","--call-graph","fp,32","--no-buildid-cache","--max-size","16M","-o","/data","--","/probe","narrow","16","64","/out"])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['/pe[150 chars], '-o', '\\data', '--', '/probe', 'narrow', '16', '64', '/out'] != ['/pe[150 chars], '-o', '/data', '--', '/probe', 'narrow', '16', '64', '/out']
+
+First differing element 15:
+'\\data'
+'/data'
+
+  ['/perf',
+   'record',
+   '-e',
+   'cpu-clock',
+   '-F',
+   '97',
+   '--strict-freq',
+   '--clockid',
+   'mono',
+   '--call-graph',
+   'fp,32',
+   '--no-buildid-cache',
+   '--max-size',
+   '16M',
+   '-o',
+-  '\\data',
+?   ^^
+
++  '/data',
+?   ^
+
+   '--',
+   '/probe',
+   'narrow',
+   '16',
+   '64',
+   '/out']
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.006s
+
+FAILED (failures=1)

@@ -1,0 +1,132 @@
+{
+  "schema": "r1.vm16-conservative-usage-proposal/v1",
+  "instance_id": "1127898822003203169",
+  "acquisition": {
+    "bytes": 13754,
+    "sha256": "08d6e7e35000781ab384a1e40b585810ab9e89e732ae99389c0d173efc2c21f8"
+  },
+  "analysis_source": {
+    "bytes": 12989,
+    "sha256": "8c1b794c90233b89e70b8989c860c189c6be4bcc464dc621524a35d5afc6bf6e"
+  },
+  "acquired_at": [
+    "2026-09-27T05:24:18.670987Z",
+    "2026-09-27T05:24:20.660047Z"
+  ],
+  "lifecycle": {
+    "launch_attempt": "2026-09-27T04:58:50.8833182+00:00",
+    "created": "2026-09-26T21:58:54.810-07:00",
+    "delete_done": "2026-09-26T22:21:46.211-07:00",
+    "absence_verified": "2026-09-27T05:22:19.881926+00:00",
+    "launch_to_absence_seconds": "1408.998608",
+    "billing_rounding_slack_seconds": "120",
+    "priced_seconds_before_rounding": "1528.998608",
+    "rounded_lifetime_minutes": 26,
+    "stopped_intervals_subtracted": false
+  },
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 20,
+      "observed_sum": "121242568",
+      "first_start": "2026-09-27T04:59:00.001Z",
+      "last_end": "2026-09-27T05:21:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T05:03:00Z",
+          "to": "2026-09-27T05:04:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T05:11:00Z",
+          "to": "2026-09-27T05:12:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "5.191",
+      "last_to_delete_seconds": "46.211"
+    },
+    "uptime": {
+      "available": true,
+      "points": 20,
+      "observed_sum": "1077.68152999999998872",
+      "first_start": "2026-09-27T04:59:00.001Z",
+      "last_end": "2026-09-27T05:21:00Z",
+      "internal_gaps_over_1ms": [
+        {
+          "from": "2026-09-27T05:03:00Z",
+          "to": "2026-09-27T05:04:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T05:11:00Z",
+          "to": "2026-09-27T05:12:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "created_to_first_seconds": "5.191",
+      "last_to_delete_seconds": "46.211"
+    }
+  },
+  "network_allowance_gib": "0.5",
+  "disk_allowance_hours": "24",
+  "rates_usd": {
+    "compute_hour": "1.15",
+    "ipv4_hour": "0.0025",
+    "disk_gib_hour": "0.000137",
+    "sent_gib": "0.3"
+  },
+  "cost_scenario_usd": {
+    "whole_lifetime_highest_compute": "0.4983333333333333333333333333",
+    "whole_lifetime_ipv4": "0.001083333333333333333333333333",
+    "40gib_disk_at_least_24h": "0.131520",
+    "network_allowance": "0.15",
+    "original_uncertainty_reserve": "1"
+  },
+  "modeled_total_usd": "1.780936666666666666666666667",
+  "held_before_usd": "2",
+  "unrounded_headroom_usd": "0.219063333333333333333333333",
+  "half_dollar_rounded_hold_usd": "2",
+  "optional_tenth_dollar_rounding": {
+    "available": true,
+    "hold_usd": "1.8",
+    "restore_usd": "0.2",
+    "margin_above_modeled_total_usd": "0.019063333333333333333333333",
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false,
+    "scope": "Optional finer rounding requested by root after acquisition; not the historical half-dollar policy or an invoice claim"
+  },
+  "root_requested_conservative_option": {
+    "hold_usd": "1.90",
+    "restore_usd": "0.10",
+    "above_modeled_total": true,
+    "margin_above_modeled_total_usd": "0.119063333333333333333333333",
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false,
+    "scope": "Root requested an extra0.10USD above the optional1.80USD ceil; ledger action is separate"
+  },
+  "proposal": {
+    "available": false,
+    "hold_usd": null,
+    "restore_usd": null,
+    "margin_above_modeled_total_usd": null,
+    "original_uncertainty_reserve_preserved_usd": "1",
+    "applied": false
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "limits": [
+    "Monitoring observations are not invoice data; missing intervals/edge traffic remain unknown",
+    "All sent traffic is priced as charged egress, rounded to half GiB with original0.5GiB minimum; this allowance is not missing-data imputation",
+    "Full launch-attempt-to-absence duration plus original120s billing slack, including stopped/small-VM intervals, uses rounded highest undiscounted1.15USD/hour",
+    "Original40GiB disk24h, IPv4 and1USD uncertainty reserve remain; no Spot/free-tier/credit reductions assumed",
+    "A rounded usage-based reservation proposal, not a rigorous maximum bill or an applied budget change"
+  ]
+}

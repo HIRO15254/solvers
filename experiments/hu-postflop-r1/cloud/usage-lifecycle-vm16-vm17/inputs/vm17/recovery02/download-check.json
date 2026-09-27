@@ -1,0 +1,26 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "at_utc": "2026-09-27T06:37:56.603885+00:00",
+  "bytes": 127202699,
+  "sha256": "7cf50f9623cc33a80a81c73699d1dab7ae7957ab4af5b7cad028bde29e20ec5f",
+  "parts": [
+    {
+      "path": "flop-fused-update-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "7dbd01c4d40ed6d35fddb99ca875f93a79e735b68ed95e5f144b3218ea1bb661"
+    },
+    {
+      "path": "flop-fused-update-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "a7254ca20670ef3541d7d8901d3d2bf8345642f840ac03ecddae8ee1f8c39c14"
+    },
+    {
+      "path": "flop-fused-update-proof01.part02",
+      "bytes": 26539403,
+      "sha256": "81e8148300b24897c6a5089daf6f3ee944e72c8612a5e681b0a8a72b1118fdf6"
+    }
+  ],
+  "elapsed_seconds": 0.5528160000685602,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity; solver correctness is established separately by cloud readers"
+}

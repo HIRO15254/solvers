@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-17",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Q37lbkYqSPT7f81C/tVWZAaDWLfU/+AKb+SnYqj5eR8",
+    "--command=test \"$(sha256sum /tmp/install.py | cut -d \" \" -f1)\" = d30dfa642b344b29f3294a979e34417ced43b38d47e74df7dbc9bedd47bc36b7 && sudo python3 -B /tmp/install.py --archive /tmp/deployment01.tar.gz --sha256 c33651e8d7034ce10c185e57df7df5d38204c1a069e15693b95d433e90551a8c --destination /opt/r1/flop-fused-update-package && for f in bootstrap.sh fetch-dependencies.sh run.sh recover.sh; do bash -n /opt/r1/flop-fused-update-package/experiments/hu-postflop-r1/cloud/vm17/$f || exit; done && if test -f /opt/r1/bootstrap-complete; then cat /opt/r1/bootstrap-complete; else systemctl is-active google-startup-scripts.service; fi"
+  ],
+  "started_utc": "2026-09-27T06:05:11.217693+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 94,
+    "sha256": "d0c2bc7665368541e5c9e7ad25b953e7e0f0f048809918d51a3c3e7295e17378"
+  },
+  "exit_code": 255,
+  "ended_utc": "2026-09-27T06:05:11.272786+00:00"
+}

@@ -1,0 +1,258 @@
+--- cpu-occupancy/adapter/solve.rs
++++ cpu-profile/adapter/solve.rs
+@@ -1,5 +1,5 @@
+ //! Research-only fixed-fixture correctness probe, not a CLI config parser.
+-//! Usage: solve.exe narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY
++//! Usage: flop_cpu_profile_probe narrow|expanded 1|16|32 64 NEW_OUTPUT_DIRECTORY
+ //! Arguments after the case are worker count and exact iteration count.
+ //! External supervision supplies wall-time, memory and disk bounds.
+ 
+@@ -48,11 +48,19 @@
+ 
+ fn process_cpu_ns() -> u64 {
+     const CLOCK_PROCESS_CPUTIME_ID: std::ffi::c_int = 2;
+-    let mut value = ProcessCpuTimespec { tv_sec: 0, tv_nsec: 0 };
++    let mut value = ProcessCpuTimespec {
++        tv_sec: 0,
++        tv_nsec: 0,
++    };
+     // SAFETY: the guarded LP64 ABI matches clockid_t and struct timespec;
+     // value is a live, aligned, exclusively borrowed writable stack object.
+     let result = unsafe { clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mut value) };
+-    assert_eq!(result, 0, "clock_gettime failed: {}", std::io::Error::last_os_error());
++    assert_eq!(
++        result,
++        0,
++        "clock_gettime failed: {}",
++        std::io::Error::last_os_error()
++    );
+     assert!(value.tv_sec >= 0 && (0..1_000_000_000).contains(&value.tv_nsec));
+     (value.tv_sec as u64)
+         .checked_mul(1_000_000_000)
+@@ -69,12 +77,20 @@
+ 
+ fn allowed_cpu_list() -> std::io::Result<String> {
+     let status = std::fs::read_to_string("/proc/self/status")?;
+-    let mut fields = status.lines().filter_map(|line| line.strip_prefix("Cpus_allowed_list:"));
++    let mut fields = status
++        .lines()
++        .filter_map(|line| line.strip_prefix("Cpus_allowed_list:"));
+     let value = fields.next().unwrap_or("").trim();
+-    if value.is_empty() || fields.next().is_some()
+-        || !value.bytes().all(|b| b.is_ascii_digit() || b == b',' || b == b'-')
++    if value.is_empty()
++        || fields.next().is_some()
++        || !value
++            .bytes()
++            .all(|b| b.is_ascii_digit() || b == b',' || b == b'-')
+     {
+-        return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid Cpus_allowed_list"));
++        return Err(std::io::Error::new(
++            std::io::ErrorKind::InvalidData,
++            "invalid Cpus_allowed_list",
++        ));
+     }
+     Ok(value.to_owned())
+ }
+@@ -93,6 +109,75 @@
+     file.write_all(value.as_bytes())?;
+     file.write_all(b"\n")?;
+     file.sync_all()
++}
++
++// CLOCK_MONOTONIC matches perf record --clockid mono; never use stdout arrival.
++fn monotonic_ns() -> u64 {
++    const CLOCK_MONOTONIC: std::ffi::c_int = 1;
++    let mut value = ProcessCpuTimespec {
++        tv_sec: 0,
++        tv_nsec: 0,
++    };
++    // SAFETY: the existing Linux GNU LP64 guard and layout assertions apply;
++    // value is a live, aligned, exclusively borrowed writable stack object.
++    let result = unsafe { clock_gettime(CLOCK_MONOTONIC, &mut value) };
++    assert_eq!(
++        result,
++        0,
++        "monotonic clock_gettime failed: {}",
++        std::io::Error::last_os_error()
++    );
++    assert!(value.tv_sec >= 0 && (0..1_000_000_000).contains(&value.tv_nsec));
++    (value.tv_sec as u64)
++        .checked_mul(1_000_000_000)
++        .and_then(|n| n.checked_add(value.tv_nsec as u64))
++        .expect("monotonic nanoseconds overflow")
++}
++
++fn write_phases(
++    path: &Path,
++    case: &str,
++    threads: usize,
++    iterations: u64,
++    bounds: [[u64; 2]; 8],
++) -> std::io::Result<()> {
++    // Order: CFR, state write, whole quality, EV0, EV1, BR0, BR1, gains.
++    // The quality container overlaps its five explicitly ordered subintervals.
++    for [start, end] in bounds {
++        assert!(start < end, "empty or backwards phase interval");
++    }
++    assert!(bounds[0][1] <= bounds[1][0]);
++    assert!(bounds[1][1] <= bounds[2][0]);
++    assert!(bounds[2][0] <= bounds[3][0]);
++    for pair in bounds[3..].windows(2) {
++        assert!(pair[0][1] <= pair[1][0]);
++    }
++    assert!(bounds[7][1] <= bounds[2][1]);
++    let names = [
++        "cfr",
++        "state_write",
++        "quality",
++        "ev_p0",
++        "ev_p1",
++        "br_p0",
++        "br_p1",
++        "exploitability",
++    ];
++    let phases = names
++        .into_iter()
++        .zip(bounds)
++        .map(|(name, [start_ns, end_ns])| {
++            format!("\"{name}\":{{\"start_ns\":{start_ns},\"end_ns\":{end_ns}}}")
++        })
++        .collect::<Vec<_>>()
++        .join(",");
++    let pid = std::process::id();
++    write_json(
++        path,
++        &format!(
++            "{{\"schema\":\"r1.flop-cpu-profile-phases/v1\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"pid\":{pid},\"clock\":\"CLOCK_MONOTONIC\",\"clock_id\":1,\"unit\":\"nanoseconds\",\"interval\":\"[start_ns,end_ns)\",\"status\":\"completed\",\"phases\":{{{phases}}},\"performance_claim\":false}}"
++        ),
++    )
+ }
+ 
+ fn fixture(case: &str) -> (PostflopConfig, [usize; 2], usize, f64) {
+@@ -211,13 +296,13 @@
+     assert_eq!(
+         args.len(),
+         4,
+-        "usage: solve narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY"
++        "usage: flop_cpu_profile_probe narrow|expanded 1|16|32 64 NEW_OUTPUT_DIRECTORY"
+     );
+     let case = args[0].as_str();
+     let threads: usize = args[1].parse()?;
+     let iterations: u64 = args[2].parse()?;
+-    assert!([1, 2, 4, 8, 16, 32].contains(&threads), "workers");
+-    assert!((1..=128).contains(&iterations), "iteration limit is 128");
++    assert!([1, 16, 32].contains(&threads), "workers");
++    assert_eq!(iterations, 64, "the predeclared profile uses exactly N64");
+     let (config, support, elements, normalizer) = fixture(case);
+     let out = Path::new(&args[3]);
+     // Parent must exist; existing output directories are rejected, not reused.
+@@ -286,28 +371,35 @@
+     event("cfr", "started");
+     let cfr_cpu_started = process_cpu_ns();
+     let started = Instant::now();
++    let cfr_start_ns = monotonic_ns();
+     pool.install(|| {
+         assert_eq!(rayon::current_num_threads(), threads);
+         solver.run(iterations);
+     });
++    let cfr_end_ns = monotonic_ns();
+     let cfr_seconds = started.elapsed().as_secs_f64();
+     let cfr_cpu_seconds = process_cpu_elapsed(cfr_cpu_started);
+     assert_eq!(solver.iteration(), iterations);
+     event("cfr", "completed");
+     event("state_write", "started");
+     let started = Instant::now();
++    let state_start_ns = monotonic_ns();
+     let state_bytes = write_state(&out.join("state.bin"), &solver, iterations)?;
++    let state_end_ns = monotonic_ns();
+     let state_write_seconds = started.elapsed().as_secs_f64();
+     event("state_write", "completed");
+ 
+     // Public API calls, including their precise zero-sum exploitability policy.
+     // No second metric definition or per-node/root CFV capture is introduced.
++    let quality_start_ns = monotonic_ns();
+     let quality_cpu_started = process_cpu_ns();
+     let started = Instant::now();
+     let mut ev_cpu_seconds = [0.0_f64; 2];
+     let mut br_cpu_seconds = [0.0_f64; 2];
+     let mut ev_wall_seconds = [0.0_f64; 2];
+     let mut br_wall_seconds = [0.0_f64; 2];
++    let mut ev_ns = [[0_u64; 2]; 2];
++    let mut br_ns = [[0_u64; 2]; 2];
+     let mut ev = [0.0_f64; 2];
+     let mut br = [0.0_f64; 2];
+     for p in Player::BOTH {
+@@ -315,7 +407,9 @@
+         event(phase, "started");
+         let phase_cpu_started = process_cpu_ns();
+         let phase_wall_started = Instant::now();
++        ev_ns[p.index()][0] = monotonic_ns();
+         ev[p.index()] = pool.install(|| solver.expected_value(p));
++        ev_ns[p.index()][1] = monotonic_ns();
+         ev_wall_seconds[p.index()] = phase_wall_started.elapsed().as_secs_f64();
+         ev_cpu_seconds[p.index()] = process_cpu_elapsed(phase_cpu_started);
+         assert!(ev[p.index()].is_finite());
+@@ -326,7 +420,9 @@
+         event(phase, "started");
+         let phase_cpu_started = process_cpu_ns();
+         let phase_wall_started = Instant::now();
++        br_ns[p.index()][0] = monotonic_ns();
+         br[p.index()] = pool.install(|| solver.best_response_value(p));
++        br_ns[p.index()][1] = monotonic_ns();
+         br_wall_seconds[p.index()] = phase_wall_started.elapsed().as_secs_f64();
+         br_cpu_seconds[p.index()] = process_cpu_elapsed(phase_cpu_started);
+         assert!(br[p.index()].is_finite());
+@@ -335,13 +431,16 @@
+     event("exploitability", "started");
+     let exploitability_cpu_started = process_cpu_ns();
+     let exploitability_wall_started = Instant::now();
++    let gains_start_ns = monotonic_ns();
+     let gains = pool.install(|| solver.exploitability()).0;
++    let gains_end_ns = monotonic_ns();
+     let exploitability_wall_seconds = exploitability_wall_started.elapsed().as_secs_f64();
+     let exploitability_cpu_seconds = process_cpu_elapsed(exploitability_cpu_started);
+     assert!(gains.iter().all(|v| v.is_finite()));
+     event("exploitability", "completed");
+     let quality_seconds = started.elapsed().as_secs_f64();
+     let quality_cpu_seconds = process_cpu_elapsed(quality_cpu_started);
++    let quality_end_ns = monotonic_ns();
+     assert_eq!(solver.iteration(), iterations);
+     let quality = format!(
+         "{{\"schema\":\"r1.flop-native-quality/v1\",\"case\":\"{case}\",\"iterations\":{iterations},\"root_support\":{support:?},\"normalizer_bits\":\"{:016x}\",\"ev\":{ev:?},\"ev_bits\":[\"{:016x}\",\"{:016x}\"],\"br\":{br:?},\"br_bits\":[\"{:016x}\",\"{:016x}\"],\"exploitability\":{gains:?},\"exploitability_bits\":[\"{:016x}\",\"{:016x}\"],\"metric_source\":\"public expected_value and best_response_value for both seats, then public exploitability\",\"ev_basis\":\"solver internal chip utility; no starting-share reporting offset\",\"quality_target\":null,\"cfv_capture\":false}}",
+@@ -360,13 +459,34 @@
+             "{{\"schema\":\"r1.flop-native-solve/v1\",\"status\":\"completed\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"state_file\":\"state.bin\",\"state_bytes\":{state_bytes},\"quality_file\":\"quality.json\",\"build_seconds\":{build_seconds},\"cfr_seconds\":{cfr_seconds},\"state_write_seconds\":{state_write_seconds},\"quality_seconds\":{quality_seconds},\"cfv_capture\":false,\"performance_claim\":false}}"
+         ),
+     )?;
+-    assert_eq!(cpu_allowed_list, allowed_cpu_list()?, "CPU affinity changed");
++    assert_eq!(
++        cpu_allowed_list,
++        allowed_cpu_list()?,
++        "CPU affinity changed"
++    );
+     write_json(
+         &out.join("cpu.json"),
+         &format!(
+             "{{\"schema\":\"r1.flop-cpu-occupancy/v1\",\"case\":\"{case}\",\"threads\":{threads},\"iterations\":{iterations},\"clock\":\"CLOCK_PROCESS_CPUTIME_ID\",\"clock_id\":2,\"scope\":\"all threads in this process\",\"cpu_allowed_list\":\"{cpu_allowed_list}\",\"cfr_cpu_seconds\":{cfr_cpu_seconds},\"quality_cpu_seconds\":{quality_cpu_seconds},\"ev_cpu_seconds\":{ev_cpu_seconds:?},\"br_cpu_seconds\":{br_cpu_seconds:?},\"exploitability_cpu_seconds\":{exploitability_cpu_seconds},\"cfr_wall_seconds\":{cfr_seconds},\"quality_wall_seconds\":{quality_seconds},\"ev_wall_seconds\":{ev_wall_seconds:?},\"br_wall_seconds\":{br_wall_seconds:?},\"exploitability_wall_seconds\":{exploitability_wall_seconds},\"performance_claim\":false}}"
+         ),
+     )?;
++    // Serialize only after all computational intervals; no marker I/O inside CFR.
++    write_phases(
++        &out.join("phases.json"),
++        case,
++        threads,
++        iterations,
++        [
++            [cfr_start_ns, cfr_end_ns],
++            [state_start_ns, state_end_ns],
++            [quality_start_ns, quality_end_ns],
++            ev_ns[0],
++            ev_ns[1],
++            br_ns[0],
++            br_ns[1],
++            [gains_start_ns, gains_end_ns],
++        ],
++    )?;
+     event("probe", "completed");
+     Ok(())
+ }

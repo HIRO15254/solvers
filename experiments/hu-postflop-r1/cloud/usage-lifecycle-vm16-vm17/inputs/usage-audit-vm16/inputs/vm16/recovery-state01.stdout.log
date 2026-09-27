@@ -1,0 +1,6 @@
+2
+34908f1f-b1b2-4b67-b728-9bdd02222853
+2026-09-27T05:13:11+00:00
+MainPID=0
+ActiveState=inactive
+{"status": "original_bytes_verified", "archive": "/tmp/flop-cpu-occupancy-proof01.tar.gz", "bytes": 115423261, "sha256": "6183eeb0734b0135c75dd925231b74d81716cc8e785e850aada496c8c83d45f1", "files": 780, "proof_present": true, "cloud_mutations": false}

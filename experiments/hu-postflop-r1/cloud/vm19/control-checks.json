@@ -1,0 +1,131 @@
+{
+  "at_utc": "2026-09-27T08:24:32.681888+00:00",
+  "python_ast": [
+    {
+      "path": "analyze-on-cloud.py",
+      "bytes": 3028,
+      "sha256": "95cfd414332da3a257d53b45b568ae0f28ca5113c97f2bca951b1768d46d6700"
+    },
+    {
+      "path": "apply-usage-return.py",
+      "bytes": 5884,
+      "sha256": "f792769a2291d0f2f5e66b277c232cb4019874f2d92d20d306c41dd2ce1fcc45"
+    },
+    {
+      "path": "capture-command.py",
+      "bytes": 2171,
+      "sha256": "434aebf724186af9abe463a3ac46a7c50bb9b2c5e7152a2241cf3e59a16af81d"
+    },
+    {
+      "path": "check-controls.py",
+      "bytes": 1721,
+      "sha256": "56e696e23aca831da0f1b6e082a4e7907e5f72faa31035f4b6045f76fa4790fd"
+    },
+    {
+      "path": "check-download.py",
+      "bytes": 3101,
+      "sha256": "63eeebd9ceeee29346843de452134b7fc80912161fa9d6083995cab99b1319e5"
+    },
+    {
+      "path": "cost-proposal.py",
+      "bytes": 6647,
+      "sha256": "abd25cc5b2b327438241092c6517a5d6f7b8b922aa6d80c78a29f4030de701f9"
+    },
+    {
+      "path": "install.py",
+      "bytes": 3820,
+      "sha256": "d95ecdd73707a07de1f79cb85c354c6602497b7084b29b998579a66b04c488c2"
+    },
+    {
+      "path": "launch.py",
+      "bytes": 4921,
+      "sha256": "d75c05edfa9a5a2e475ab839ad55a41267561c97cac73264705e877984415c13"
+    },
+    {
+      "path": "pack.py",
+      "bytes": 5022,
+      "sha256": "775c5807dcf98870ce4aee04fd169de70db3459839b1c245ce9d585840ff1955"
+    },
+    {
+      "path": "prepare-budget-controls.py",
+      "bytes": 3471,
+      "sha256": "02cb9272d160b8b1e0424426e90c7d965dbcd8b42397d83af329e6e177f24ec5"
+    },
+    {
+      "path": "prepare-controls.py",
+      "bytes": 3788,
+      "sha256": "f1963ca223aaf5f2356ba417fa49ab4b92a91ad6669a3774d269710cc5c761c2"
+    },
+    {
+      "path": "reserve.py",
+      "bytes": 5177,
+      "sha256": "d92e52a09e6a559913948b8c840c3aa440b361095fdb18dc89dfa54c5b4dc178"
+    },
+    {
+      "path": "split-on-cloud.py",
+      "bytes": 2363,
+      "sha256": "aa6155c7f76a743f76b94c6ef8cbc7a7ff94028e7acff79e3b4a783f4e92c98f"
+    },
+    {
+      "path": "start.py",
+      "bytes": 8527,
+      "sha256": "69ede5e951f22bbd83b9c356ff4567e680e0ec3032cb899ddcfc4ea98d11c1bd"
+    },
+    {
+      "path": "status.py",
+      "bytes": 2487,
+      "sha256": "6372187bf8f1be239721023a7564c171d7f75e17b8a5c0b6239357d19b8b9f45"
+    }
+  ],
+  "shell_syntax": [
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/cloud/vm19/bootstrap.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "source": {
+        "path": "bootstrap.sh",
+        "bytes": 812,
+        "sha256": "0e8bd5044c3eb19c35163c76d86b70bfb9dee9ee4ee19c1ef400fd84a1266dcc"
+      }
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/cloud/vm19/recover.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "source": {
+        "path": "recover.sh",
+        "bytes": 7239,
+        "sha256": "1391a12588bb55ae282a922359b71e42fa3f85073170b047be3d3a2d2fd98198"
+      }
+    },
+    {
+      "argv": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/PC_User/.codex/worktrees/ce71/solvers/experiments/hu-postflop-r1/cloud/vm19/run.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "source": {
+        "path": "run.sh",
+        "bytes": 3076,
+        "sha256": "0ae228f3f39592bd8c72a72160d3416819c3149726bfa026ed0b52e6727a26f0"
+      }
+    }
+  ],
+  "elapsed_seconds": 0.17748909979127347,
+  "native_build_or_solver": false,
+  "cloud_api": false,
+  "archive_read": false
+}

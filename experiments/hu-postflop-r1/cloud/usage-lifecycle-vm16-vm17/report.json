@@ -1,0 +1,911 @@
+{
+  "schema": "r1.vm16-vm17-plus-vm18-e2-lifecycle-proposal/v1",
+  "source": {
+    "bytes": 22825,
+    "sha256": "ecfe33c0c05bd04c216dfe43d01efb70b6eefb6112aaf5cde39b8d9c0df4018b"
+  },
+  "budget_before": {
+    "bytes": 83152,
+    "sha256": "dd3d8ae625fd9785f42ee9b2ec96bc54f79dbc143ec96e12bce61c1caea6c535"
+  },
+  "input_manifests": [
+    {
+      "bytes": 92368,
+      "sha256": "3823f40ab288fc82f9efa7a196f26655a8c5c053438ec820a42d3ce47c55624d"
+    },
+    {
+      "bytes": 47550,
+      "sha256": "56e1b0ee61d23a4f07767e36fe9a61eecd3bbaa4161f9898a5f506a7f36cd25a"
+    }
+  ],
+  "input_files": 576,
+  "input_bytes": 1727087,
+  "vms": [
+    {
+      "vm": 16,
+      "instance_id": "1127898822003203169",
+      "original_report": {
+        "bytes": 4722,
+        "sha256": "635a20f6e74f268926810ee0fc12cbc8ca953b2a59d12e4702d1ac508d0865a1"
+      },
+      "lifecycle": {
+        "launch": "2026-09-27T04:58:50.8833182+00:00",
+        "delete_done": "2026-09-26T22:21:46.211-07:00",
+        "absence": "2026-09-27T05:22:19.881926+00:00",
+        "whole_seconds": "1408.998608",
+        "large_start": "2026-09-27T05:02:07.510172+00:00",
+        "large_end": "2026-09-27T05:12:19.031415+00:00",
+        "large_seconds": "611.521243",
+        "disk_id": "4260965739450932321",
+        "disk_start_bound": "2026-09-26T21:58:54.817-07:00",
+        "disk_start_basis": "recorded creationTimestamp",
+        "disk_creation_recorded": "2026-09-26T21:58:54.817-07:00",
+        "disk_seconds_bound": "1405.064926",
+        "original_stop": "2026-09-27T05:33:50Z"
+      },
+      "metrics": {
+        "sent": {
+          "available": true,
+          "points": 20,
+          "observed_sum": "121242568",
+          "first_start": "2026-09-27T04:59:00.001Z",
+          "last_end": "2026-09-27T05:21:00Z",
+          "internal_gaps": [
+            {
+              "from": "2026-09-27T05:00:00Z",
+              "to": "2026-09-27T05:00:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:01:00Z",
+              "to": "2026-09-27T05:01:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:02:00Z",
+              "to": "2026-09-27T05:02:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:03:00Z",
+              "to": "2026-09-27T05:04:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:05:00Z",
+              "to": "2026-09-27T05:05:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:06:00Z",
+              "to": "2026-09-27T05:06:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:07:00Z",
+              "to": "2026-09-27T05:07:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:08:00Z",
+              "to": "2026-09-27T05:08:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:09:00Z",
+              "to": "2026-09-27T05:09:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:10:00Z",
+              "to": "2026-09-27T05:10:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:11:00Z",
+              "to": "2026-09-27T05:12:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:13:00Z",
+              "to": "2026-09-27T05:13:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:14:00Z",
+              "to": "2026-09-27T05:14:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:15:00Z",
+              "to": "2026-09-27T05:15:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:16:00Z",
+              "to": "2026-09-27T05:16:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:17:00Z",
+              "to": "2026-09-27T05:17:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:18:00Z",
+              "to": "2026-09-27T05:18:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:19:00Z",
+              "to": "2026-09-27T05:19:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:20:00Z",
+              "to": "2026-09-27T05:20:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "available": true,
+          "points": 20,
+          "observed_sum": "1077.68152999999998872",
+          "first_start": "2026-09-27T04:59:00.001Z",
+          "last_end": "2026-09-27T05:21:00Z",
+          "internal_gaps": [
+            {
+              "from": "2026-09-27T05:00:00Z",
+              "to": "2026-09-27T05:00:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:01:00Z",
+              "to": "2026-09-27T05:01:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:02:00Z",
+              "to": "2026-09-27T05:02:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:03:00Z",
+              "to": "2026-09-27T05:04:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:05:00Z",
+              "to": "2026-09-27T05:05:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:06:00Z",
+              "to": "2026-09-27T05:06:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:07:00Z",
+              "to": "2026-09-27T05:07:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:08:00Z",
+              "to": "2026-09-27T05:08:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:09:00Z",
+              "to": "2026-09-27T05:09:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:10:00Z",
+              "to": "2026-09-27T05:10:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:11:00Z",
+              "to": "2026-09-27T05:12:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:13:00Z",
+              "to": "2026-09-27T05:13:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:14:00Z",
+              "to": "2026-09-27T05:14:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:15:00Z",
+              "to": "2026-09-27T05:15:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:16:00Z",
+              "to": "2026-09-27T05:16:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:17:00Z",
+              "to": "2026-09-27T05:17:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:18:00Z",
+              "to": "2026-09-27T05:18:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:19:00Z",
+              "to": "2026-09-27T05:19:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T05:20:00Z",
+              "to": "2026-09-27T05:20:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null
+        }
+      },
+      "downloads": [
+        {
+          "receipt": "analysis-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 77824
+        },
+        {
+          "receipt": "proof-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 115427328
+        },
+        {
+          "receipt": "sidecars-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 329728
+        }
+      ],
+      "traffic_payload_allowance_bytes": 115834880,
+      "failure_transfer_policy": "No failed download recorded; successful payload rounding and full0.5GiB allowance retained",
+      "arithmetic": {
+        "whole_minutes": 26,
+        "overlapping_large_minutes": 13,
+        "disk_minutes": 26,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.02903828200000000000000000000",
+          "overlapping_e2_highcpu_32": "0.1714968320000000000000000000",
+          "whole_lifetime_ipv4": "0.001083333333333333333333333333",
+          "disk_40gib_lifecycle": "0.002374666666666666666666666666",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.353993114000000000000000000",
+        "held_before_usd": "1.9",
+        "proposed_hold_usd": "1.4",
+        "restore_usd": "0.5",
+        "margin_above_model_usd": "0.046006886000000000000000000"
+      },
+      "actual_billed_usd": null,
+      "unobserved_egress_bytes": null
+    },
+    {
+      "vm": 17,
+      "instance_id": "2775050120395558750",
+      "original_report": {
+        "bytes": 4985,
+        "sha256": "6081ad544311746f5637aff717435b84612225c2ed29166ed3db57061f1f89ec"
+      },
+      "lifecycle": {
+        "launch": "2026-09-27T06:03:26.7694177+00:00",
+        "delete_done": "2026-09-26T23:39:13.383-07:00",
+        "absence": "2026-09-27T06:39:59.735307+00:00",
+        "whole_seconds": "2192.96589",
+        "large_start": "2026-09-27T06:06:31.458832+00:00",
+        "large_end": "2026-09-27T06:24:56.413189+00:00",
+        "large_seconds": "1104.954357",
+        "disk_id": "2052432309614088030",
+        "disk_start_bound": "2026-09-27T06:02:59.618400+00:00",
+        "disk_start_basis": "upper envelope from prelaunch empty-disk query start; creationTimestamp unknown",
+        "disk_creation_recorded": null,
+        "disk_seconds_bound": "2220.116907",
+        "original_stop": "2026-09-27T06:38:26Z"
+      },
+      "metrics": {
+        "sent": {
+          "available": true,
+          "points": 32,
+          "observed_sum": "99729092",
+          "first_start": "2026-09-27T06:03:00.001Z",
+          "last_end": "2026-09-27T06:38:00Z",
+          "internal_gaps": [
+            {
+              "from": "2026-09-27T06:04:00Z",
+              "to": "2026-09-27T06:04:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:05:00Z",
+              "to": "2026-09-27T06:05:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:06:00Z",
+              "to": "2026-09-27T06:06:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:07:00Z",
+              "to": "2026-09-27T06:08:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:09:00Z",
+              "to": "2026-09-27T06:09:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:10:00Z",
+              "to": "2026-09-27T06:10:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:11:00Z",
+              "to": "2026-09-27T06:11:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:12:00Z",
+              "to": "2026-09-27T06:12:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:13:00Z",
+              "to": "2026-09-27T06:13:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:14:00Z",
+              "to": "2026-09-27T06:14:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:15:00Z",
+              "to": "2026-09-27T06:15:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:16:00Z",
+              "to": "2026-09-27T06:16:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:17:00Z",
+              "to": "2026-09-27T06:17:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:18:00Z",
+              "to": "2026-09-27T06:18:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:19:00Z",
+              "to": "2026-09-27T06:19:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:20:00Z",
+              "to": "2026-09-27T06:20:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:21:00Z",
+              "to": "2026-09-27T06:21:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:22:00Z",
+              "to": "2026-09-27T06:22:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:23:00Z",
+              "to": "2026-09-27T06:23:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:24:00Z",
+              "to": "2026-09-27T06:24:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:25:00Z",
+              "to": "2026-09-27T06:25:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:26:00Z",
+              "to": "2026-09-27T06:26:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:27:00Z",
+              "to": "2026-09-27T06:27:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:28:00Z",
+              "to": "2026-09-27T06:28:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:29:00Z",
+              "to": "2026-09-27T06:29:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:30:00Z",
+              "to": "2026-09-27T06:30:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:31:00Z",
+              "to": "2026-09-27T06:33:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:34:00Z",
+              "to": "2026-09-27T06:34:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:35:00Z",
+              "to": "2026-09-27T06:35:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:36:00Z",
+              "to": "2026-09-27T06:36:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:37:00Z",
+              "to": "2026-09-27T06:37:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null
+        },
+        "uptime": {
+          "available": true,
+          "points": 32,
+          "observed_sum": "1720.7524129999999476",
+          "first_start": "2026-09-27T06:03:00.001Z",
+          "last_end": "2026-09-27T06:38:00Z",
+          "internal_gaps": [
+            {
+              "from": "2026-09-27T06:04:00Z",
+              "to": "2026-09-27T06:04:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:05:00Z",
+              "to": "2026-09-27T06:05:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:06:00Z",
+              "to": "2026-09-27T06:06:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:07:00Z",
+              "to": "2026-09-27T06:08:00.001Z",
+              "seconds": "60.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:09:00Z",
+              "to": "2026-09-27T06:09:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:10:00Z",
+              "to": "2026-09-27T06:10:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:11:00Z",
+              "to": "2026-09-27T06:11:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:12:00Z",
+              "to": "2026-09-27T06:12:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:13:00Z",
+              "to": "2026-09-27T06:13:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:14:00Z",
+              "to": "2026-09-27T06:14:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:15:00Z",
+              "to": "2026-09-27T06:15:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:16:00Z",
+              "to": "2026-09-27T06:16:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:17:00Z",
+              "to": "2026-09-27T06:17:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:18:00Z",
+              "to": "2026-09-27T06:18:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:19:00Z",
+              "to": "2026-09-27T06:19:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:20:00Z",
+              "to": "2026-09-27T06:20:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:21:00Z",
+              "to": "2026-09-27T06:21:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:22:00Z",
+              "to": "2026-09-27T06:22:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:23:00Z",
+              "to": "2026-09-27T06:23:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:24:00Z",
+              "to": "2026-09-27T06:24:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:25:00Z",
+              "to": "2026-09-27T06:25:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:26:00Z",
+              "to": "2026-09-27T06:26:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:27:00Z",
+              "to": "2026-09-27T06:27:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:28:00Z",
+              "to": "2026-09-27T06:28:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:29:00Z",
+              "to": "2026-09-27T06:29:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:30:00Z",
+              "to": "2026-09-27T06:30:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:31:00Z",
+              "to": "2026-09-27T06:33:00.001Z",
+              "seconds": "120.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:34:00Z",
+              "to": "2026-09-27T06:34:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:35:00Z",
+              "to": "2026-09-27T06:35:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:36:00Z",
+              "to": "2026-09-27T06:36:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            },
+            {
+              "from": "2026-09-27T06:37:00Z",
+              "to": "2026-09-27T06:37:00.001Z",
+              "seconds": "0.001",
+              "missing_usage": null
+            }
+          ],
+          "unobserved_usage": null
+        }
+      },
+      "downloads": [
+        {
+          "receipt": "analysis-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 4096
+        },
+        {
+          "receipt": "partial-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 34816
+        },
+        {
+          "receipt": "proof-download01.result.json",
+          "exit_code": 1,
+          "completed_payload_allowance_bytes": 76872704
+        },
+        {
+          "receipt": "proof-download02.result.json",
+          "exit_code": 1,
+          "completed_payload_allowance_bytes": 0
+        },
+        {
+          "receipt": "proof-download03.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 127206400
+        },
+        {
+          "receipt": "recovery-receipt-download01.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 1024
+        },
+        {
+          "receipt": "recovery-receipt-download02.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 1024
+        },
+        {
+          "receipt": "sidecars-download01.result.json",
+          "exit_code": 1,
+          "completed_payload_allowance_bytes": 0
+        },
+        {
+          "receipt": "sidecars-download02.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 505856
+        },
+        {
+          "receipt": "sidecars-download03.result.json",
+          "exit_code": 0,
+          "completed_payload_allowance_bytes": 505856
+        }
+      ],
+      "traffic_payload_allowance_bytes": 306841147,
+      "failure_transfer_policy": "Interrupted first archive charged in full; failed part00 retry charged as full50,331,648B; rejected sidecars add1MiB; all later successful downloads added. No missing traffic filled with zero.",
+      "arithmetic": {
+        "whole_minutes": 39,
+        "overlapping_large_minutes": 21,
+        "disk_minutes": 40,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.0435574230",
+          "overlapping_e2_highcpu_32": "0.2770333440",
+          "whole_lifetime_ipv4": "0.001625",
+          "disk_40gib_lifecycle": "0.003653333333333333333333333334",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.475869100333333333333333333",
+        "held_before_usd": "1.8",
+        "proposed_hold_usd": "1.5",
+        "restore_usd": "0.3",
+        "margin_above_model_usd": "0.024130899666666666666666667"
+      },
+      "actual_billed_usd": null,
+      "unobserved_egress_bytes": null
+    },
+    {
+      "vm": 18,
+      "instance_id": "3769585733775752220",
+      "original_report": {
+        "bytes": 14303,
+        "sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8"
+      },
+      "change_scope": "Ordinary E2 compute rates only; frozen original report/reader and all lifecycle windows/reserves unchanged",
+      "lifecycle": {
+        "launch_attempt": "2026-09-27T07:17:04.240092+00:00",
+        "created": "2026-09-27T00:17:07.959-07:00",
+        "original_stop": "2026-09-27T08:17:04Z",
+        "delete_done": "2026-09-27T00:47:47.558-07:00",
+        "absence_verified": "2026-09-27T07:48:52.424052+00:00",
+        "whole_seconds": "1908.18396",
+        "large_window_start": "2026-09-27T07:25:35.002654+00:00",
+        "large_window_end": "2026-09-27T07:35:53.258461+00:00",
+        "large_window_seconds": "618.255807",
+        "disk_id": "9212560962946956316",
+        "disk_created": "2026-09-27T00:17:07.969-07:00",
+        "disk_seconds_to_absence": "1904.455052",
+        "slack_seconds_added_to_each_window": 120,
+        "boot_lower_seconds": [
+          "507.043654",
+          "425.274545",
+          "637.334358"
+        ],
+        "stopped_intervals_subtracted": false,
+        "small_base_subtracted_from_large_window": false
+      },
+      "arithmetic": {
+        "whole_minutes": 34,
+        "overlapping_large_minutes": 13,
+        "disk_minutes": 34,
+        "ordinary_rates_usd_hour": {
+          "e2-standard-2": "0.06701142",
+          "e2-highcpu-32": "0.79152384"
+        },
+        "network_allowance_gib": "0.5",
+        "components_usd": {
+          "whole_lifetime_e2_standard_2": "0.03797313800000000000000000000",
+          "overlapping_e2_highcpu_32": "0.1714968320000000000000000000",
+          "whole_lifetime_ipv4": "0.001416666666666666666666666667",
+          "disk_40gib_lifecycle": "0.003105333333333333333333333334",
+          "network_allowance": "0.150",
+          "original_uncertainty_reserve": "1"
+        },
+        "total_usd": "1.363991970000000000000000000",
+        "held_before_usd": "1.5",
+        "proposed_hold_usd": "1.4",
+        "restore_usd": "0.1",
+        "margin_above_model_usd": "0.036008030000000000000000000"
+      },
+      "actual_billed_usd": null,
+      "unobserved_egress_bytes": null
+    }
+  ],
+  "proposal": {
+    "held_before_usd": "39",
+    "restore_usd": "0.9",
+    "held_after_usd": "38.1",
+    "available_after_usd": "1.9",
+    "applied": false
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "limits": [
+    "Every whole, overlapping large, and disk window adds120s before minute ceiling; stopped periods and overlapping small base remain charged.",
+    "Recorded E2-only commands and same-ID configuration readbacks justify ordinary E2 rates, not Spot discounts. SDK evidence is not exhaustive Cloud Audit Logs.",
+    "All original1USD per-VM uncertainty and0.5GiB network allowances remain. Missing metric intervals/edges are unknown and not subtracted.",
+    "VM17 disk creation timestamp is absent; earlier confirmed empty-disk inventory bounds its lifetime conservatively. No creation timestamp is fabricated.",
+    "Existing snapshots/reports and large archives remain untouched. A usage-based reservation proposal, not invoice data or a guaranteed maximum bill."
+  ]
+}

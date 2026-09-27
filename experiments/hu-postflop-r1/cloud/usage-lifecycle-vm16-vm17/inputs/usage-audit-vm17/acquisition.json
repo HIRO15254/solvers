@@ -1,0 +1,359 @@
+{
+  "schema": "r1.vm17-usage-acquisition/v1",
+  "started_at": "2026-09-27T06:40:52.396396Z",
+  "project": "solvers-abstraction-20260723",
+  "instance_id": "2775050120395558750",
+  "instance_name": "solvers-r1-20260927-17",
+  "interval_start": "2026-09-27T06:00:00Z",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 71854,
+      "sha256": "b48ea868f20123b9ff58912493c449f1830b5147656b0c5b624348fc09f10619"
+    },
+    "vm17/reservation.json": {
+      "path": "inputs/vm17/reservation.json",
+      "bytes": 1769,
+      "sha256": "f762fdf14cc9a33c583d6405905a890285189d20c8a69e5a2afd106666347373"
+    },
+    "launch-r1-20260927-17.json": {
+      "path": "inputs/launch-r1-20260927-17.json",
+      "bytes": 1097,
+      "sha256": "06726d972cf5461e91cfc87ea80a6f2ddcce817a9180b08df9854d977ae38bb8"
+    },
+    "create-result-r1-20260927-17.json": {
+      "path": "inputs/create-result-r1-20260927-17.json",
+      "bytes": 30180,
+      "sha256": "401884e1d737f22e9692df4924cc761c1ffa61e23aff996169d6c3a00da15601"
+    },
+    "vm17/stop-resize01.result.json": {
+      "path": "inputs/vm17/stop-resize01.result.json",
+      "bytes": 665,
+      "sha256": "45838d468797113ee8b2c597b08f386326a01b8689c515583ceddcb5a087dbc9"
+    },
+    "vm17/resize01.result.json": {
+      "path": "inputs/vm17/resize01.result.json",
+      "bytes": 713,
+      "sha256": "940f99d204749ff54da08ccb892cf91c3d796a0a84825122c9b255e91b7f595c"
+    },
+    "vm17/start32-01.result.json": {
+      "path": "inputs/vm17/start32-01.result.json",
+      "bytes": 665,
+      "sha256": "eb04eafa4327395ee8c13e7edbd28cb09c2e9893ad968c0103bd7495e0fecd4c"
+    },
+    "vm17/stop-recovery01.result.json": {
+      "path": "inputs/vm17/stop-recovery01.result.json",
+      "bytes": 665,
+      "sha256": "698076ac601727c59c74e4bdaffbf2af1dfd6642d7f3c281234cd3dd95a3cd16"
+    },
+    "vm17/resize-recovery01.result.json": {
+      "path": "inputs/vm17/resize-recovery01.result.json",
+      "bytes": 713,
+      "sha256": "ffcdfd382ec2a7fe3ed4fbac668e082e3003d261a09e8cc2b14e13864ef23373"
+    },
+    "vm17/start-recovery01.result.json": {
+      "path": "inputs/vm17/start-recovery01.result.json",
+      "bytes": 665,
+      "sha256": "440088f10cb6e1f7cab1d65fd80a40e0cfc50c13eb7adcbff0ebe8c2e19ac4b7"
+    },
+    "vm17/recovery-state01.stdout.log": {
+      "path": "inputs/vm17/recovery-state01.stdout.log",
+      "bytes": 348,
+      "sha256": "1203bde385121717553c192722d2d9bce98fe868311704faff8a729077759d6f"
+    },
+    "vm17/delete-operation01.stdout.log": {
+      "path": "inputs/vm17/delete-operation01.stdout.log",
+      "bytes": 905,
+      "sha256": "476c6d3da938d26c79bdf4e33bd1bc87d4441687d982ecc98b5568a97c26b0fe"
+    },
+    "vm17/delete-operation01.result.json": {
+      "path": "inputs/vm17/delete-operation01.result.json",
+      "bytes": 682,
+      "sha256": "f95db35e5f31dd6764cc6725b65a4154eaf66918d6d663224271f7e3cdf263bf"
+    },
+    "vm17/reconciliation.json": {
+      "path": "inputs/vm17/reconciliation.json",
+      "bytes": 1715,
+      "sha256": "6afafeea421f3b141fef5b6d0054722c68d02b77d2ca0fdb59273c1fb8f0b07b"
+    },
+    "preflight-vm17/cost-proposal.json": {
+      "path": "inputs/preflight-vm17/cost-proposal.json",
+      "bytes": 5272,
+      "sha256": "1d2ae7878257c67e102ac36661d2f5b0910bd282fd67e63925c62cd4832df02c"
+    },
+    "preflight-vm17/pricing-sources.json": {
+      "path": "inputs/preflight-vm17/pricing-sources.json",
+      "bytes": 5660,
+      "sha256": "7ece61edfbc3806941f1d4c4f551554ec408e641097056cc596f471260d3543e"
+    },
+    "preflight-vm17/spot-pricing-source.json": {
+      "path": "inputs/preflight-vm17/spot-pricing-source.json",
+      "bytes": 2253,
+      "sha256": "41cbe9f2853a54a1451393bb50f7b38c0893790632c4ecdbe8f054f3cd9ca2e0"
+    },
+    "vm17/absence-instances01.result.json": {
+      "path": "inputs/vm17/absence-instances01.result.json",
+      "bytes": 654,
+      "sha256": "3d3de24a4abf5d3f16c5ef9ed2fb64664a9a278de2a95153d747b5d10d8f84eb"
+    },
+    "vm17/absence-instances01.stdout.log": {
+      "path": "inputs/vm17/absence-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm17/absence-disks01.result.json": {
+      "path": "inputs/vm17/absence-disks01.result.json",
+      "bytes": 650,
+      "sha256": "47d4d8104f960e650c22a024287a334cb6b79d9a71b3aa9eb4e5ccc09ef1331c"
+    },
+    "vm17/absence-disks01.stdout.log": {
+      "path": "inputs/vm17/absence-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm17/absence-addresses01.result.json": {
+      "path": "inputs/vm17/absence-addresses01.result.json",
+      "bytes": 642,
+      "sha256": "2798ce1f61522f7e2c9b3bd6cc8281734bea474ed0fbf19271661cc3da34533c"
+    },
+    "vm17/absence-addresses01.stdout.log": {
+      "path": "inputs/vm17/absence-addresses01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm17/recovery-exception01.json": {
+      "path": "inputs/vm17/recovery-exception01.json",
+      "bytes": 1125,
+      "sha256": "df8a7df2189bb3ffb2710be155004232716e7898a84af1b936e4274deb287a79"
+    },
+    "vm17/transfer-interruption-check.json": {
+      "path": "inputs/vm17/transfer-interruption-check.json",
+      "bytes": 805,
+      "sha256": "9b296150db8a251ed060dc9bb0212c111fa0609f029146835c618c9a18d75b64"
+    },
+    "vm17/transfer-state01.stdout.log": {
+      "path": "inputs/vm17/transfer-state01.stdout.log",
+      "bytes": 424,
+      "sha256": "e9b012f5b2c334083a64194f3c831d74c97e0af017714b4dd86169860ba13101"
+    },
+    "vm17/transfer-state01.result.json": {
+      "path": "inputs/vm17/transfer-state01.result.json",
+      "bytes": 733,
+      "sha256": "571e53db275e1a0472d90408cf29187dd70726b7623d7aa87e4ea56f8d2f7bc6"
+    },
+    "vm17/start-recovery02.stdout.log": {
+      "path": "inputs/vm17/start-recovery02.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm17/start-recovery02.result.json": {
+      "path": "inputs/vm17/start-recovery02.result.json",
+      "bytes": 665,
+      "sha256": "e4002aeb753c16335a83c3a55995aa440b3802e6d7da80b9e7234ce537cffc9d"
+    },
+    "vm17/recovery-state02.stdout.log": {
+      "path": "inputs/vm17/recovery-state02.stdout.log",
+      "bytes": 252,
+      "sha256": "f0c1439d3fc19b7cca816e26b327b171538c1ca7cb879c2386457f0d323f1a8e"
+    },
+    "vm17/recovery-state02.result.json": {
+      "path": "inputs/vm17/recovery-state02.result.json",
+      "bytes": 1359,
+      "sha256": "6186ac16b466e352dcd707906a8172e3273dc74c04fcd93ad8622a1aa551f657"
+    },
+    "vm17/recovery02/flop-fused-update-recovery01.json": {
+      "path": "inputs/vm17/recovery02/flop-fused-update-recovery01.json",
+      "bytes": 252,
+      "sha256": "f0c1439d3fc19b7cca816e26b327b171538c1ca7cb879c2386457f0d323f1a8e"
+    },
+    "vm17/recovery02/manifest-comparison.json": {
+      "path": "inputs/vm17/recovery02/manifest-comparison.json",
+      "bytes": 372,
+      "sha256": "407b05387d079b529bbc64c10d92908ec53acff2cb6ab8163937c308f54be976"
+    },
+    "preflight-vm17/pricing-compute-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-standard-2-row.html",
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "preflight-vm17/pricing-compute-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-standard-2-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm17/pricing-compute-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-compute-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm17/pricing-compute-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm17/pricing-compute-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-compute-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-n2-highcpu-32-row.html",
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "preflight-vm17/pricing-compute-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-n2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "preflight-vm17/pricing-compute-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm17/pricing-compute-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-disk-balanced-row.html": {
+      "path": "inputs/preflight-vm17/pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm17/pricing-disk-balanced-header.html": {
+      "path": "inputs/preflight-vm17/pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm17/pricing-disk-balanced-region.html": {
+      "path": "inputs/preflight-vm17/pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-network-spot-ipv4-row.html": {
+      "path": "inputs/preflight-vm17/pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm17/pricing-network-spot-ipv4-header.html": {
+      "path": "inputs/preflight-vm17/pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm17/pricing-network-spot-ipv4-region.html": {
+      "path": "inputs/preflight-vm17/pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-network-asia-egress-row.html": {
+      "path": "inputs/preflight-vm17/pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm17/pricing-network-asia-egress-header.html": {
+      "path": "inputs/preflight-vm17/pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm17/pricing-network-asia-egress-region.html": {
+      "path": "inputs/preflight-vm17/pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-spot-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-standard-2-row.html",
+      "bytes": 376,
+      "sha256": "a8eb421dcf94e184a8abff0e34d53e25d543d78f6e57dc9e38794b6b49c00d6c"
+    },
+    "preflight-vm17/pricing-spot-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-standard-2-header.html",
+      "bytes": 613,
+      "sha256": "ba42cc29e1dbbbcf4289de82a6dcce26512185bbbd82d85d4376510a58932a9c"
+    },
+    "preflight-vm17/pricing-spot-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-spot-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "9de71a06d059c30b308d4a4208cb5d0b227292f8516e62a6825af9228c789645"
+    },
+    "preflight-vm17/pricing-spot-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "ea2cfaff837888ca38d51f5b98ab19c79b025e9f96cb7e6a1cdd861721e397b6"
+    },
+    "preflight-vm17/pricing-spot-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm17/pricing-spot-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-n2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "7d7ebe7f800772814df8c7fc8befba16b8d77a398eaad4d3640cc836acbd8add"
+    },
+    "preflight-vm17/pricing-spot-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-n2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "0433094e7dfc90576d2e1d7b9f6037eeb443e1e0299b105580d77a929f964e4c"
+    },
+    "preflight-vm17/pricing-spot-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm17/pricing-spot-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    }
+  },
+  "requests": [
+    {
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "label": "sent",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%222775050120395558750%22&interval.startTime=2026-09-27T06%3A00%3A00Z&interval.endTime=2026-09-27T06%3A40%3A52.396396Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T06:40:53.745484Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T06:40:54.250953Z",
+      "response": {
+        "path": "vm17-sent-00.json",
+        "bytes": 7746,
+        "sha256": "52d20257b7785c6eec204fde0c988bed4735b5c62717add810c0fa13d7767551"
+      },
+      "point_count": 32
+    },
+    {
+      "metric": "compute.googleapis.com/instance/uptime",
+      "label": "uptime",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%222775050120395558750%22&interval.startTime=2026-09-27T06%3A00%3A00Z&interval.endTime=2026-09-27T06%3A40%3A52.396396Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T06:40:54.251826Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T06:40:54.530860Z",
+      "response": {
+        "path": "vm17-uptime-00.json",
+        "bytes": 7866,
+        "sha256": "0900e0abd5bd79fd30059b76bb762a3499ff3e7343dba8d9d6a916fe9b560edd"
+      },
+      "point_count": 32
+    }
+  ],
+  "source": {
+    "bytes": 12547,
+    "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+  },
+  "status": "completed",
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "credential_material_retained": false,
+  "interval_end": "2026-09-27T06:40:52.396396Z",
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-27T06:40:54.531630Z"
+}

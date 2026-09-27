@@ -1,0 +1,11 @@
+test_observed_or_known_excess_expands_network (__main__.LifecycleTests.test_observed_or_known_excess_expands_network) ... ok
+test_scope_mutations_fail (__main__.LifecycleTests.test_scope_mutations_fail) ... ok
+test_unknown_traffic_keeps_original_allowance_and_uncertainty (__main__.LifecycleTests.test_unknown_traffic_keeps_original_allowance_and_uncertainty) ... ok
+test_vm16_arithmetic (__main__.LifecycleTests.test_vm16_arithmetic) ... ok
+test_vm17_prelaunch_disk_upper_envelope (__main__.LifecycleTests.test_vm17_prelaunch_disk_upper_envelope) ... ok
+test_vm18_only_rates_change (__main__.LifecycleTests.test_vm18_only_rates_change) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

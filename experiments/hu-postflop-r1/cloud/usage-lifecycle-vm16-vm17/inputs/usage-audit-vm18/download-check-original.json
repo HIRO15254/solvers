@@ -1,0 +1,26 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "at_utc": "2026-09-27T07:46:37.038709+00:00",
+  "bytes": 124577587,
+  "sha256": "433beedb71aef16f9880490dab4322909197a877d42efe82fb8689d3e8e5cfcc",
+  "parts": [
+    {
+      "path": "flop-chance-grain-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "4659c187d3d7ad2e1c69aa5665027e97d83d3d02c92d7ab04d9b7a3006e40149"
+    },
+    {
+      "path": "flop-chance-grain-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "860a4052db44f25c7624ec3712ff7e753b4f7607413df53060089f076fa2efd9"
+    },
+    {
+      "path": "flop-chance-grain-proof01.part02",
+      "bytes": 23914291,
+      "sha256": "96e567b821d29a2e33ac7016c29d66a5f94f78922f0f415879a6b844431b7aad"
+    }
+  ],
+  "elapsed_seconds": 0.5531943999230862,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity; solver correctness is established separately by cloud readers"
+}

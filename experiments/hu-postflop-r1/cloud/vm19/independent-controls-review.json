@@ -1,0 +1,109 @@
+{
+  "schema": "r1.vm19-independent-controls-review/v1",
+  "recorded_at_utc": "2026-09-27T08:23:15.707547+00:00",
+  "status": "passed_source_review",
+  "reviewer": "profile_raw_storage",
+  "inputs": {
+    "launch.py": {
+      "bytes": 4921,
+      "sha256": "d75c05edfa9a5a2e475ab839ad55a41267561c97cac73264705e877984415c13"
+    },
+    "reserve.py": {
+      "bytes": 5177,
+      "sha256": "d92e52a09e6a559913948b8c840c3aa440b361095fdb18dc89dfa54c5b4dc178"
+    },
+    "cost-proposal.py": {
+      "bytes": 6647,
+      "sha256": "abd25cc5b2b327438241092c6517a5d6f7b8b922aa6d80c78a29f4030de701f9"
+    },
+    "cost-proposal.json": {
+      "bytes": 5185,
+      "sha256": "17bb2148f6a974fc320b2e65caa23cba6edafbb506f8926d8e817b0cc79e1cdf"
+    },
+    "prepare-budget-controls.py": {
+      "bytes": 3471,
+      "sha256": "02cb9272d160b8b1e0424426e90c7d965dbcd8b42397d83af329e6e177f24ec5"
+    },
+    "prepare-controls.py": {
+      "bytes": 3788,
+      "sha256": "f1963ca223aaf5f2356ba417fa49ab4b92a91ad6669a3774d269710cc5c761c2"
+    },
+    "start.py": {
+      "bytes": 8527,
+      "sha256": "69ede5e951f22bbd83b9c356ff4567e680e0ec3032cb899ddcfc4ea98d11c1bd"
+    },
+    "run.sh": {
+      "bytes": 3076,
+      "sha256": "0ae228f3f39592bd8c72a72160d3416819c3149726bfa026ed0b52e6727a26f0"
+    },
+    "bootstrap.sh": {
+      "bytes": 812,
+      "sha256": "0e8bd5044c3eb19c35163c76d86b70bfb9dee9ee4ee19c1ef400fd84a1266dcc"
+    },
+    "pack.py": {
+      "bytes": 5022,
+      "sha256": "775c5807dcf98870ce4aee04fd169de70db3459839b1c245ce9d585840ff1955"
+    },
+    "install.py": {
+      "bytes": 3820,
+      "sha256": "d95ecdd73707a07de1f79cb85c354c6602497b7084b29b998579a66b04c488c2"
+    },
+    "recover.sh": {
+      "bytes": 7239,
+      "sha256": "1391a12588bb55ae282a922359b71e42fa3f85073170b047be3d3a2d2fd98198"
+    },
+    "analyze-on-cloud.py": {
+      "bytes": 3028,
+      "sha256": "95cfd414332da3a257d53b45b568ae0f28ca5113c97f2bca951b1768d46d6700"
+    },
+    "README.md": {
+      "bytes": 1518,
+      "sha256": "a9b364aa45c1a60aa856b90278d2840c73598fa1fa9f74dae8f47d1952160279"
+    },
+    "usage-applied.json": {
+      "bytes": 3340,
+      "sha256": "0e653e2ccf5d72811e87736e13fc5bb06672ed124fb3c0fc6e175d2015dd13ab"
+    }
+  },
+  "budget_after_return": {
+    "bytes": 88994,
+    "sha256": "12b4838c861e185eb2f5bef8ae27bf5f58592b9f8c3fa183fc3c83b2ac28d4f0"
+  },
+  "blocking_findings": [],
+  "resolved_findings": [
+    "Actual bootstrap.sh bytes are bound through pack receipt -> source-manifest.json -> manifest entry before create.",
+    "Exclusive launch-intent file is flushed and fsynced before the gcloud create call."
+  ],
+  "checks": [
+    "Static Python AST for reviewed Python controls; no control main() executed.",
+    "Fixed E2-standard-2 build/recovery and E2-highcpu-32 measurement; one named Spot VM,20GiB autoDelete balanced boot disk, no restart/fallback.",
+    "Creation-request STOP2700s; build deadline STOP-1500s; measurement900s and recovery>=900s therefore dispatch by launch+15min.",
+    "At most3 starts is the fixed reservation/operating envelope; no automatic recovery start or retry is implemented here.",
+    "Post-return budget snapshot SHA agrees with usage-applied.json; held38.10 plus proposed1.85 is39.95 under40.",
+    "Independent rational arithmetic total368877/200000=1.844385; margin within1.85 is1123/200000=.005615;1USD uncertainty remains.",
+    "All27 already-acquired official pricing excerpts verified against retained receipts; no new pricing request.",
+    "Reservation checks applied-ledger binding, fresh empty resource inventory and price replay before immutable reservation receipts and budget replacement.",
+    "Exclusive immutable launch attempt,180s bounded create client call, ambiguous timeout preserves evidence and does not retry.",
+    "Bootstrap installs current-kernel perf on small VM; wrapper passes actual perf path and portable v3/frame-pointer/line-table flags to runner.",
+    "Build/measure service paths and CLI agree with new runner contract; startup verify-only has no launch requirement.",
+    "Recovery checks both units and cgroup descendants quiescent; archive contents reread and hashed before archive+manifest fsync and checksum publication."
+  ],
+  "arithmetic": {
+    "model_usd": "1.844385",
+    "reservation_usd": "1.85",
+    "held_before_usd": "38.10",
+    "held_if_reserved_usd": "39.95",
+    "available_if_reserved_usd": "0.05",
+    "pricing_excerpts": 27
+  },
+  "limitations": [
+    "Source-level controls review only. New runner/analyzer is still under independent preparation and is outside this frozen review.",
+    "No VM, quota, startup, compiler, perf, solver or live failure behavior was exercised.",
+    "Budget reservation and launch were not executed by this reviewer. Three-start,24h disk cleanup and512MiB total egress envelopes also require root operation records.",
+    "Quoted prices are captured official evidence; billed amount remains unknown and the model is not a guaranteed invoice ceiling."
+  ],
+  "native_execution": false,
+  "api_calls": false,
+  "budget_mutation": false,
+  "control_execution": false
+}

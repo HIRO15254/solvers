@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 295, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 284, in main
+    report = build_report()
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 253, in build_report
+    reports = [audit(vm, rows[vm]) for vm in (16, 17)]
+               ~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\cloud\usage-lifecycle-vm16-vm17\analyze.py", line 126, in audit
+    require(value["id"] == IDS[vm] and value["name"] == name and value["status"] == "RUNNING"
+                                       ~~~~~^^^^^^^^
+KeyError: 'name'

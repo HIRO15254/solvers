@@ -1,0 +1,299 @@
+{
+  "schema": "r1.vm16-usage-acquisition/v1",
+  "started_at": "2026-09-27T05:24:18.670987Z",
+  "project": "solvers-abstraction-20260723",
+  "instance_id": "1127898822003203169",
+  "instance_name": "solvers-r1-20260927-16",
+  "interval_start": "2026-09-27T04:55:00Z",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 66453,
+      "sha256": "4be76f7c737229ad9fffead98aedca64eb15638de37a7c1a9988c111e1bb839b"
+    },
+    "vm16/reservation.json": {
+      "path": "inputs/vm16/reservation.json",
+      "bytes": 1770,
+      "sha256": "6d5d57616559aa6b76c7a292fe5bfe74df81e2111fb242aedf4b4f754bc77f53"
+    },
+    "launch-r1-20260927-16.json": {
+      "path": "inputs/launch-r1-20260927-16.json",
+      "bytes": 1097,
+      "sha256": "b8c589831b4124cbbe20e62b0a5b3969511405e8da7e59f2f0a5325bf0593fa1"
+    },
+    "create-result-r1-20260927-16.json": {
+      "path": "inputs/create-result-r1-20260927-16.json",
+      "bytes": 30180,
+      "sha256": "5cae254158c11ce2869f4be4d2ff244134f99a2505ef6de1e4e1334e102c37da"
+    },
+    "vm16/resize01.result.json": {
+      "path": "inputs/vm16/resize01.result.json",
+      "bytes": 739,
+      "sha256": "c119b77b5ca335cb4edf071e7dca00a63b80d34e76312f0825b7a694b9f5c1f6"
+    },
+    "vm16/start32-01.result.json": {
+      "path": "inputs/vm16/start32-01.result.json",
+      "bytes": 691,
+      "sha256": "3eb52f0e36ce94271fe1b368ff7d884150aa14005f29e9ccc7d1758b836e6c54"
+    },
+    "vm16/stop-recovery01.result.json": {
+      "path": "inputs/vm16/stop-recovery01.result.json",
+      "bytes": 687,
+      "sha256": "d3c8032360759f2605967af69a8d70841ddf58642c5cbc54e1ec8bd2d49854a9"
+    },
+    "vm16/resize-recovery01.result.json": {
+      "path": "inputs/vm16/resize-recovery01.result.json",
+      "bytes": 739,
+      "sha256": "b240d6789aabc7a2aeb27a1ebdfccd4f396223293488f73b74e2519f803f4dc7"
+    },
+    "vm16/start-recovery01.result.json": {
+      "path": "inputs/vm16/start-recovery01.result.json",
+      "bytes": 691,
+      "sha256": "520bd991a16a5c9d1daefcd4256ebf900da0ddeebf95f32eb13f882ef8fd9196"
+    },
+    "vm16/recovery-state01.stdout.log": {
+      "path": "inputs/vm16/recovery-state01.stdout.log",
+      "bytes": 348,
+      "sha256": "c3d2b47c3f1ee757a405ce2223d0178e0fe83a572506f795bace7bcc69e06a7e"
+    },
+    "vm16/delete-operation01.stdout.log": {
+      "path": "inputs/vm16/delete-operation01.stdout.log",
+      "bytes": 905,
+      "sha256": "275458a1aba4db39d5cec590e67f49b510608b380e54e0def14ab0ce05c8a253"
+    },
+    "vm16/reconciliation.json": {
+      "path": "inputs/vm16/reconciliation.json",
+      "bytes": 1403,
+      "sha256": "f7eba140ee08897c96e5c206ebb8b77e4d2941633d9c899306f6f4e3d04fadb3"
+    },
+    "preflight-vm16/cost-proposal.json": {
+      "path": "inputs/preflight-vm16/cost-proposal.json",
+      "bytes": 5189,
+      "sha256": "b7f72ff941fa2f92187a718c388e22735b466a8d6e872f300abf9a10137b95fe"
+    },
+    "preflight-vm16/pricing-sources.json": {
+      "path": "inputs/preflight-vm16/pricing-sources.json",
+      "bytes": 5660,
+      "sha256": "b8c3ec816fa0e3e6ee8008b7326d7df3d1dbd47b6d20677bc29dcfd302519da9"
+    },
+    "preflight-vm16/spot-pricing-source.json": {
+      "path": "inputs/preflight-vm16/spot-pricing-source.json",
+      "bytes": 2253,
+      "sha256": "7b82510d254c6ba7a17a6978f3f5fc3b20735cd20dac6bb14d0d4ebd42949cc5"
+    },
+    "vm16/absence-instances01.result.json": {
+      "path": "inputs/vm16/absence-instances01.result.json",
+      "bytes": 654,
+      "sha256": "75b60f00c14a2cdd012f5b1add15be88ce27331bca0ba00f3cfc4ad3aa8c6a56"
+    },
+    "vm16/absence-instances01.stdout.log": {
+      "path": "inputs/vm16/absence-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm16/absence-disks01.result.json": {
+      "path": "inputs/vm16/absence-disks01.result.json",
+      "bytes": 650,
+      "sha256": "f5debda8ce2be2b8ef4694d35567c821ee3ca562794325696d51c581d52a2b33"
+    },
+    "vm16/absence-disks01.stdout.log": {
+      "path": "inputs/vm16/absence-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm16/absence-addresses01.result.json": {
+      "path": "inputs/vm16/absence-addresses01.result.json",
+      "bytes": 642,
+      "sha256": "e91ecbbf894c89a7c9f943b213661cb0ce7a882ac87ac1809e8451e80f6c3f02"
+    },
+    "vm16/absence-addresses01.stdout.log": {
+      "path": "inputs/vm16/absence-addresses01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-standard-2-row.html",
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-standard-2-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm16/pricing-compute-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm16/pricing-compute-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-n2-highcpu-32-row.html",
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-n2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "preflight-vm16/pricing-compute-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm16/pricing-compute-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-disk-balanced-row.html": {
+      "path": "inputs/preflight-vm16/pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm16/pricing-disk-balanced-header.html": {
+      "path": "inputs/preflight-vm16/pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm16/pricing-disk-balanced-region.html": {
+      "path": "inputs/preflight-vm16/pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-row.html": {
+      "path": "inputs/preflight-vm16/pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-header.html": {
+      "path": "inputs/preflight-vm16/pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm16/pricing-network-spot-ipv4-region.html": {
+      "path": "inputs/preflight-vm16/pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-network-asia-egress-row.html": {
+      "path": "inputs/preflight-vm16/pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm16/pricing-network-asia-egress-header.html": {
+      "path": "inputs/preflight-vm16/pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm16/pricing-network-asia-egress-region.html": {
+      "path": "inputs/preflight-vm16/pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-spot-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-standard-2-row.html",
+      "bytes": 376,
+      "sha256": "a8eb421dcf94e184a8abff0e34d53e25d543d78f6e57dc9e38794b6b49c00d6c"
+    },
+    "preflight-vm16/pricing-spot-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-standard-2-header.html",
+      "bytes": 613,
+      "sha256": "ba42cc29e1dbbbcf4289de82a6dcce26512185bbbd82d85d4376510a58932a9c"
+    },
+    "preflight-vm16/pricing-spot-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-spot-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "9de71a06d059c30b308d4a4208cb5d0b227292f8516e62a6825af9228c789645"
+    },
+    "preflight-vm16/pricing-spot-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "ea2cfaff837888ca38d51f5b98ab19c79b025e9f96cb7e6a1cdd861721e397b6"
+    },
+    "preflight-vm16/pricing-spot-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm16/pricing-spot-n2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-n2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "7d7ebe7f800772814df8c7fc8befba16b8d77a398eaad4d3640cc836acbd8add"
+    },
+    "preflight-vm16/pricing-spot-n2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-n2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "0433094e7dfc90576d2e1d7b9f6037eeb443e1e0299b105580d77a929f964e4c"
+    },
+    "preflight-vm16/pricing-spot-n2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm16/pricing-spot-n2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    }
+  },
+  "requests": [
+    {
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "label": "sent",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%221127898822003203169%22&interval.startTime=2026-09-27T04%3A55%3A00Z&interval.endTime=2026-09-27T05%3A24%3A18.670987Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T05:24:19.924640Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T05:24:20.271002Z",
+      "response": {
+        "path": "vm16-sent-00.json",
+        "bytes": 5061,
+        "sha256": "7208cb0e983b177e764097fc8c1dbdc2bd8e057bdabc31810be588949e4f24e8"
+      },
+      "point_count": 20
+    },
+    {
+      "metric": "compute.googleapis.com/instance/uptime",
+      "label": "uptime",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%221127898822003203169%22&interval.startTime=2026-09-27T04%3A55%3A00Z&interval.endTime=2026-09-27T05%3A24%3A18.670987Z&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-27T05:24:20.271969Z",
+      "http_status": 200,
+      "completed_at": "2026-09-27T05:24:20.659071Z",
+      "response": {
+        "path": "vm16-uptime-00.json",
+        "bytes": 5149,
+        "sha256": "4a834ff73f1615d0602e170e6ed1be52e48b8e33e37c964a5abaf91febd388e9"
+      },
+      "point_count": 20
+    }
+  ],
+  "source": {
+    "bytes": 7447,
+    "sha256": "0429d4f951fc24fcb3f36e4335e034f4b0b353c825a2c71568905e14f0cff9df"
+  },
+  "status": "completed",
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "credential_material_retained": false,
+  "interval_end": "2026-09-27T05:24:18.670987Z",
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-27T05:24:20.660047Z"
+}

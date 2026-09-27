@@ -1,0 +1,20 @@
+{
+  "flop-fused-update-proof01.part00": {
+    "bytes": 33259520,
+    "sha256": "acc9599e0a7094eb861ba48315ec4a79b2e9363281dd95aca4b4be84f419ed29",
+    "expected_sha256": "2e556c81949abe791043121811d788df1ed15644e4210e89fdc0f3103a83fead",
+    "matches": false
+  },
+  "flop-fused-update-proof01.part01": {
+    "bytes": 50331648,
+    "sha256": "b9ef033d38c6a62380b8731fcd4218972b273f0813e2c818fc9e5c8386fced83",
+    "expected_sha256": "b9ef033d38c6a62380b8731fcd4218972b273f0813e2c818fc9e5c8386fced83",
+    "matches": true
+  },
+  "flop-fused-update-proof01.part02": {
+    "bytes": 26538555,
+    "sha256": "0b2c7e62b749d0efb75bb70efab83b674563bc8958f9da0a59a5ae3b493a745f",
+    "expected_sha256": "0b2c7e62b749d0efb75bb70efab83b674563bc8958f9da0a59a5ae3b493a745f",
+    "matches": true
+  }
+}

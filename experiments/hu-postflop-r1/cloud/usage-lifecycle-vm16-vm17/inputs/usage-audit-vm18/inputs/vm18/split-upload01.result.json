@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm18/split-on-cloud.py",
+    "solvers-r1-20260927-18:/tmp/vm18-split.py",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:39:11.649465+00:00",
+  "timeout_seconds": 30,
+  "stdout": {
+    "bytes": 71,
+    "sha256": "3eb299f3386f188f602731ed081df2a9ab82bf94b47e9e0b5784cd908275fdb1"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T07:39:17.822120+00:00"
+}

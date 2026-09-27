@@ -1,0 +1,18 @@
+{
+  "schema": "r1-vm17-recovery-exception/v1",
+  "recorded_at": "2026-09-27T06:33:39.456007+00:00",
+  "reason": "Spot VM stopped during verified-archive transfer; part00 incomplete, part01/02 verified; preserve irreplaceable evidence",
+  "instance_id": "2775050120395558750",
+  "original_maximum_starts": 3,
+  "allowed_additional_recovery_starts": 1,
+  "machine_type": "e2-standard-2",
+  "original_stop_utc": "2026-09-27T06:38:26Z",
+  "stop_extension": false,
+  "build_or_solve_allowed": false,
+  "reservation_change_usd": 0,
+  "reserved_usd": 2,
+  "egress_limit_bytes": 536870912,
+  "download_scope": "Only missing part00; bounded48MiB retransmission to fresh local filename. Existing verified parts are not retransmitted.",
+  "cost_basis": "Original full35min request-to-STOP envelope at1.15USD/hour plus120sec already covers all machine states. Prior boots exceed one minute. Additional2CPU start stays within original window; same40GiB disk,512MiB egress and1USD uncertainty reserve unchanged.",
+  "cleanup": "Delete same instance and sole autoDelete disk after verifieddownload, before original STOP."
+}

@@ -1169,7 +1169,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-16",
-      "reserved_usd": 1.9,
+      "reserved_usd": 1.4,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_seconds": 2100,
@@ -1250,6 +1250,19 @@
           "evidence_sha256": "635a20f6e74f268926810ee0fc12cbc8ca953b2a59d12e4702d1ac508d0865a1",
           "billed_usd": null,
           "final_invoice": false
+        },
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-16",
+          "old_reserved_usd": 1.9,
+          "new_reserved_usd": 1.4,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
         }
       ],
       "measurement_deadline_utc": "2026-09-27T05:18:50Z"
@@ -1259,7 +1272,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-17",
-      "reserved_usd": 1.8,
+      "reserved_usd": 1.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_seconds": 2100,
@@ -1301,6 +1314,19 @@
           "billed_usd": null,
           "final_invoice": false,
           "basis": "Whole lifetime small-VM price plus a wider overlapping high-CPU interval; original one-dollar uncertainty, disk24h and512MiB egress retained"
+        },
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-17",
+          "old_reserved_usd": 1.8,
+          "new_reserved_usd": 1.5,
+          "restored_to_available_budget_usd": 0.3,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
         }
       ]
     },
@@ -1309,7 +1335,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-18",
-      "reserved_usd": 1.5,
+      "reserved_usd": 1.4,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_seconds": 3600,
@@ -1350,8 +1376,55 @@
           "billed_usd": null,
           "final_invoice": false,
           "note": "User-authorized reuse of unused reservation; original $1 uncertainty and 512MiB allowance retained. Missing Monitoring traffic remains unknown."
+        },
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-18",
+          "old_reserved_usd": 1.5,
+          "new_reserved_usd": 1.4,
+          "restored_to_available_budget_usd": 0.1,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
         }
       ]
+    },
+    {
+      "id": "r1-20260927-19",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260927-19",
+      "reserved_usd": 1.85,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_seconds": 2700,
+      "maximum_starts": 3,
+      "billing_rounding_slack_seconds": 120,
+      "machine_type": "e2-standard-2",
+      "measurement_machine_type": "e2-highcpu-32",
+      "capacity_or_quota_fallback": null,
+      "provisioning_model": "SPOT",
+      "disk_type": "pd-balanced",
+      "disk_gib": 20,
+      "maximum_download_gib": 0.5,
+      "maximum_archive_bytes": 268435456,
+      "conservative_compute_usd_hour": 0.8,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "auto_restart": false,
+      "reserved_at_utc": "2026-09-27T08:27:54.006100+00:00",
+      "pricing_checked_utc": "2026-09-27",
+      "pricing_evidence": "experiments/hu-postflop-r1/cloud/vm19/cost-proposal.json",
+      "preflight_evidence": "experiments/hu-postflop-r1/cloud/vm19/",
+      "purpose": "Baseline CPU profile:2CPU portable build/core tests,32CPU boot for10 N64 solves,2CPU recovery",
+      "note": "E2 only.45min original STOP;20min build upper bound but measurement dispatch by launch+15min, then15min measurement and15min recovery.47min at0.80USD/h plus20GiB24h disk,512MiB egress and original1USD uncertainty =1.844385USD. No local native work; billed unknown."
     }
   ],
   "usage_reconciliations": [
@@ -1652,6 +1725,80 @@
       "cloud_mutations": false,
       "archive_access": false,
       "independent_cost_arithmetic_usd": "1.483022000000000000000000000"
+    },
+    {
+      "at_utc": "2026-09-27T08:21:49.334181+00:00",
+      "authorized_limit_usd": 40,
+      "held_before_usd": 39,
+      "held_after_usd": 38.1,
+      "restored_usd": 0.9,
+      "available_after_usd": 1.9,
+      "changes": [
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-16",
+          "old_reserved_usd": 1.9,
+          "new_reserved_usd": 1.4,
+          "restored_to_available_budget_usd": 0.5,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+        },
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-17",
+          "old_reserved_usd": 1.8,
+          "new_reserved_usd": 1.5,
+          "restored_to_available_budget_usd": 0.3,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+        },
+        {
+          "event": "usage_based_e2_lifecycle_reservation_reconciliation",
+          "at": "2026-09-27T08:21:49.334181+00:00",
+          "id": "r1-20260927-18",
+          "old_reserved_usd": 1.5,
+          "new_reserved_usd": 1.4,
+          "restored_to_available_budget_usd": 0.1,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-lifecycle-vm16-vm17/report.json",
+          "evidence_sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2",
+          "billed_usd": null,
+          "final_invoice": false,
+          "note": "User-authorized unused reservation reuse; actual E2 regular prices, overlapping conservative lifecycle windows, original1USD uncertainty and512MiB allowance retained. Missing usage remains unknown."
+        }
+      ],
+      "report": {
+        "bytes": 30939,
+        "sha256": "5e2c6be9727a5360eaaa84838b05ba5a957888b82f15ecf2f2b54c315e4a81f2"
+      },
+      "analyzer": {
+        "bytes": 22825,
+        "sha256": "ecfe33c0c05bd04c216dfe43d01efb70b6eefb6112aaf5cde39b8d9c0df4018b"
+      },
+      "budget_before": {
+        "bytes": 83152,
+        "sha256": "dd3d8ae625fd9785f42ee9b2ec96bc54f79dbc143ec96e12bce61c1caea6c535"
+      },
+      "application_source": {
+        "bytes": 5884,
+        "sha256": "f792769a2291d0f2f5e66b277c232cb4019874f2d92d20d306c41dd2ce1fcc45"
+      },
+      "independent_review": {
+        "agent": "profile_raw_storage",
+        "result": "No blocking findings",
+        "checks": "576 input pins; IDs; deletion and absence; lifecycle bounds; prices; transfers; independent Decimal arithmetic"
+      },
+      "billed_usd": null,
+      "final_invoice": false,
+      "cloud_mutations": false,
+      "archive_access": false
     }
   ]
 }

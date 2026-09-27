@@ -1,0 +1,25 @@
+{
+  "at_utc": "2026-09-27T07:15:22.282519+00:00",
+  "held_before_usd": 37.5,
+  "held_after_usd": 40,
+  "available_usd": 0,
+  "authorized_limit_usd": 40,
+  "estimate_usd": {
+    "fraction": "741731/300000",
+    "decimal_usd": "2.472436666666666666666666666666666666667"
+  },
+  "budget_before": {
+    "bytes": 78934,
+    "sha256": "b6d8afaea8912b9aef44d64c458ff1d496e9e161813609b3bc4ca8efad329f15"
+  },
+  "budget_after": {
+    "bytes": 80712,
+    "sha256": "e3902d82766c3ec5d83b8833b67cb52fbab8fc653174a5ab4150d5009b7240f7"
+  },
+  "price_proposal": {
+    "bytes": 5224,
+    "sha256": "ac3f0b6a16187f9f97317df23881f8abb9926e79b575cdc9095e9a1a354c5745"
+  },
+  "cloud_launched": false,
+  "billed_usd": null
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "r1.cpu-profile-adapter-source/v1",
+  "original_path": "experiments/hu-postflop-r1/flop-scaling/cpu-occupancy/adapter/solve.rs",
+  "original": {
+    "bytes": 15687,
+    "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+  },
+  "generated": {
+    "bytes": 19309,
+    "sha256": "b1ffa4f46a79a6c167f3118cd32602fa19d8222c302f3c48c682705ad0e14301"
+  },
+  "generator": {
+    "bytes": 7220,
+    "sha256": "1b2141a8179b175f157d0358202c90732f274d71f6b35a3fc09de2eff24c4772"
+  },
+  "marker_helper": {
+    "bytes": 2384,
+    "sha256": "91c08a0d4f67fef951fe80ed55ece660f569030c1f8d7a36ef465c1e8d168345"
+  },
+  "patch": {
+    "bytes": 11851,
+    "sha256": "f656d4be862bb88e88d649dacb54c945371b9c8254c438cd14f82df670ceb25b"
+  },
+  "inverse_exact": true,
+  "production_source_modified": false,
+  "native_execution": false,
+  "fixed_iterations": 64,
+  "workers": [
+    1,
+    16,
+    32
+  ],
+  "example": "flop_cpu_profile_probe"
+}

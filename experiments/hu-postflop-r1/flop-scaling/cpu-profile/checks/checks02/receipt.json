@@ -1,0 +1,90 @@
+{
+  "schema": "r1.cpu-profile-python-check/v1",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\cpu-profile\\test_run.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.5144889999646693,
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 32654,
+      "sha256": "c6a2573db1e0562bd805ff6efbc99157e018830ba028a8ad63ff54bf7bcf325b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24182,
+      "sha256": "d6892b6a0e95da8b2f5f3dabbf8d5a21031f7945920518f0e853eac59d39f7a9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 8346,
+      "sha256": "98aa167124bf0f45c633628a4d0c71d967d446ea20b52dbf8957dc3a79b825a7"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7287,
+      "sha256": "a52df4fb14f04f5392c9b1dee0bc8d3b2a62d0023817af25d85d83f017c829cb"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2319,
+      "sha256": "044bdf60805569c5b822b3818debf9a1c49c886775d8a242d67fa2bd653fb839"
+    }
+  },
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py": {
+      "bytes": 32654,
+      "sha256": "c6a2573db1e0562bd805ff6efbc99157e018830ba028a8ad63ff54bf7bcf325b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py": {
+      "bytes": 24182,
+      "sha256": "d6892b6a0e95da8b2f5f3dabbf8d5a21031f7945920518f0e853eac59d39f7a9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py": {
+      "bytes": 8346,
+      "sha256": "98aa167124bf0f45c633628a4d0c71d967d446ea20b52dbf8957dc3a79b825a7"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md": {
+      "bytes": 7287,
+      "sha256": "a52df4fb14f04f5392c9b1dee0bc8d3b2a62d0023817af25d85d83f017c829cb"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md": {
+      "bytes": 2319,
+      "sha256": "044bdf60805569c5b822b3818debf9a1c49c886775d8a242d67fa2bd653fb839"
+    }
+  },
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 1364,
+    "sha256": "019d66b7e473f47e74a2275f614f4a3df9f627463b1a43465d5e6808a094c7fb"
+  },
+  "ast": [
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/run.py",
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/analyze.py",
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/test_run.py"
+  ],
+  "relative_links": [
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md",
+      "target": "proposal.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/protocol.jp.md",
+      "target": "adapter/README.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "protocol.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "proposal.jp.md"
+    },
+    {
+      "source": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/README.md",
+      "target": "adapter/README.jp.md"
+    }
+  ],
+  "scope": "Synthetic Python control/parser checks only. No native/perf/cloud operation. Prior failed host-path test receipt checks01 retained."
+}

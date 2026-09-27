@@ -1,0 +1,12 @@
+MainPID=1790
+Result=success
+ActiveState=active
+==> /opt/r1/flop-fused-update-wrapper01/prepare.stdout.log <==
+{"status": "prepared", "solves": 54, "matrix_rows": 48}
+
+==> /opt/r1/flop-fused-update-wrapper01/prepare.stderr.log <==
+
+==> /opt/r1/flop-fused-update-wrapper01/execute.stdout.log <==
+{"stage": "toolchain", "status": "completed", "case": null, "result": null}
+
+==> /opt/r1/flop-fused-update-wrapper01/execute.stderr.log <==
