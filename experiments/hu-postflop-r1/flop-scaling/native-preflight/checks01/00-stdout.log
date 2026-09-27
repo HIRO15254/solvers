@@ -1,0 +1,25 @@
+{
+  "verified": true,
+  "retained_files": 78,
+  "native_solve_executed": false,
+  "cases": [
+    {
+      "case": "narrow",
+      "nodes": 367662,
+      "root_support": [
+        34,
+        30
+      ],
+      "root_os_peak_resident_bytes": 110583808
+    },
+    {
+      "case": "expanded",
+      "nodes": 367662,
+      "root_support": [
+        63,
+        160
+      ],
+      "root_os_peak_resident_bytes": 113090560
+    }
+  ]
+}

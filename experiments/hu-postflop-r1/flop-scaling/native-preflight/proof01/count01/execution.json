@@ -1,0 +1,60 @@
+[
+  {
+    "case": "narrow",
+    "command": [
+      "C:/Python313/python.exe",
+      "-B",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "--record",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-count01\\narrow.json",
+      "--timeout-seconds",
+      "45",
+      "--grace-seconds",
+      "0.2",
+      "--poll-seconds",
+      "0.1",
+      "--memory-limit-bytes",
+      "469762048",
+      "--min-free-memory-bytes",
+      "1610612736",
+      "--identity-file",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\estimate.rs",
+      "--identity-file",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\narrow.toml",
+      "--",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+      "narrow"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 1.0026871000882238
+  },
+  {
+    "case": "expanded",
+    "command": [
+      "C:/Python313/python.exe",
+      "-B",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "--record",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-count01\\expanded.json",
+      "--timeout-seconds",
+      "45",
+      "--grace-seconds",
+      "0.2",
+      "--poll-seconds",
+      "0.1",
+      "--memory-limit-bytes",
+      "469762048",
+      "--min-free-memory-bytes",
+      "1610612736",
+      "--identity-file",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\estimate.rs",
+      "--identity-file",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\expanded.toml",
+      "--",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+      "expanded"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.9097162000834942
+  }
+]

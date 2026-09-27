@@ -1,0 +1,204 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T00:17:41.067659+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "-C",
+    "debuginfo=0",
+    "-C",
+    "codegen-units=1",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+    "--crate-name",
+    "holdem",
+    "--crate-type",
+    "rlib",
+    "--extern",
+    "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+    "--extern",
+    "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libengine.rlib",
+    "--extern",
+    "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libgame.rlib",
+    "--extern",
+    "hand_index=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libhand_index.rlib",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs",
+    "-o",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libholdem.rlib"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 45.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 469762048,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": 1610612736,
+    "disk_reserve_bytes": null
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-build02\\04-holdem.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-build02\\04-holdem.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-build02\\04-holdem.samples.jsonl",
+      "sha256": "1c9761a2df481802ab2dca9aa32e9306cf36d6d94a34ca35989d546e17ee4fb7",
+      "bytes": 6104
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 17,
+    "max_sample_gap_seconds": 0.10262960009276867,
+    "sampled_peak_tree_resident_bytes": 134950912,
+    "root_os_peak_resident_bytes": 128335872,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 202547200,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 4843499520,
+    "commit_available_bytes": 2181304320
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "-C",
+    "debuginfo=0",
+    "-C",
+    "codegen-units=1",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-local-tests\\debug\\deps",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02",
+    "--crate-name",
+    "holdem",
+    "--crate-type",
+    "rlib",
+    "--extern",
+    "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libcards.rlib",
+    "--extern",
+    "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libengine.rlib",
+    "--extern",
+    "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libgame.rlib",
+    "--extern",
+    "hand_index=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libhand_index.rlib",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\crates\\holdem\\src\\lib.rs",
+    "-o",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\libholdem.rlib"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-build02",
+  "disk_free_before_bytes": 44375699456,
+  "started_at": "2026-09-27T00:17:41.169198+00:00",
+  "pid": 77796,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 128335872,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 202547200,
+    "elapsed_seconds": 1.6262290999293327,
+    "at": "2026-09-27T00:17:42.795550+00:00",
+    "host_available_memory_bytes": 4852899840,
+    "disk_free_bytes": 44371951616
+  },
+  "elapsed_seconds": 1.626555799972266,
+  "ended_at": "2026-09-27T00:17:42.796048+00:00",
+  "supervisor_exit_code": 0
+}

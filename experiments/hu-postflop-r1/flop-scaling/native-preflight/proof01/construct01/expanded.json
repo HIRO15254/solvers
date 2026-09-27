@@ -1,0 +1,180 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T00:18:57.796377+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+    "expanded",
+    "--build"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 60.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 469762048,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": 1610612736,
+    "disk_reserve_bytes": null
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-construct01\\expanded.stdout.log",
+      "sha256": "772647646573ac2e6cf2026eec5905ae5698feb06123257b78b9315a0f6e47e1",
+      "bytes": 2286
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-construct01\\expanded.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-construct01\\expanded.samples.jsonl",
+      "sha256": "113f02737be87c6b9d4741e8c9a9b33dc56dfe42001af16613f7703029b68c9e",
+      "bytes": 8222
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+      "sha256": "b033f3f39ffd23801d52b91d7df42bd72f5fc46813b690f48b28f461d45286d9",
+      "bytes": 1279488
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\estimate.rs",
+      "sha256": "80ef2355d1dc8a744e770541bee13ffcd1b4e849615cb0e5b5ba93ef21aa321d",
+      "bytes": 9271
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\expanded.toml",
+      "sha256": "8a5f811a4b19e1e79d3dca5e817e56f626b06b5d5b2cdc9e03623be5b7aafbae",
+      "bytes": 798
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+      "sha256": "b033f3f39ffd23801d52b91d7df42bd72f5fc46813b690f48b28f461d45286d9",
+      "bytes": 1279488
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\estimate.rs",
+      "sha256": "80ef2355d1dc8a744e770541bee13ffcd1b4e849615cb0e5b5ba93ef21aa321d",
+      "bytes": 9271
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\fixtures\\expanded.toml",
+      "sha256": "8a5f811a4b19e1e79d3dca5e817e56f626b06b5d5b2cdc9e03623be5b7aafbae",
+      "bytes": 798
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 23,
+    "max_sample_gap_seconds": 0.10165990004315972,
+    "sampled_peak_tree_resident_bytes": 112898048,
+    "root_os_peak_resident_bytes": 113090560,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 129712128,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 4748955648,
+    "commit_available_bytes": 2064404480
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\r1-native-flop-02\\flop_native_probe.exe",
+    "expanded",
+    "--build"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-construct01",
+  "disk_free_before_bytes": 44360036352,
+  "started_at": "2026-09-27T00:18:57.912136+00:00",
+  "pid": 80672,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 113090560,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 129712128,
+    "elapsed_seconds": 2.227370999986306,
+    "at": "2026-09-27T00:19:00.139634+00:00",
+    "host_available_memory_bytes": 4773576704,
+    "disk_free_bytes": 44359897088
+  },
+  "elapsed_seconds": 2.22774889995344,
+  "ended_at": "2026-09-27T00:19:00.140169+00:00",
+  "supervisor_exit_code": 0
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "below-cap",
+    "exit_code": 0,
+    "wall_seconds": 0.5659708001185209
+  },
+  {
+    "name": "above-cap",
+    "exit_code": 0,
+    "wall_seconds": 0.4320778001565486
+  },
+  {
+    "name": "aggregate-child-cap",
+    "exit_code": 0,
+    "wall_seconds": 0.5350338998250663
+  }
+]

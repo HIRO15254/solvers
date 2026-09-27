@@ -1,0 +1,96 @@
+{
+  "schema": "r1.native-preflight-calibration-plan/v1",
+  "execution": "not_run",
+  "job_commit_bytes": 536870912,
+  "minimum_available_commit_bytes": 1610612736,
+  "checks": [
+    "Fresh resource probe; calibration commands run serially, without this task's compiler/solver runs",
+    "Each record: completed, cleanup_complete=true, unchanged identities",
+    "Queried job limit 536870912, flags 8704, root priority 16384, verified_before_resume=true",
+    "Below-cap allocation succeeds; above-cap returns NULL and nonzero Windows error",
+    "While parent holds 300MiB commit, child 256MiB request returns NULL/nonzero error; both requests individually fit the Job cap",
+    "Job commit counter and sampled working-set counter remain distinct",
+    "Aggregate test supports child containment; allocation error alone does not prove its unique cause",
+    "Not a timeout, CPU isolation, or performance calibration"
+  ],
+  "commands": [
+    {
+      "name": "below-cap",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\below-cap\\record.json",
+        "--timeout-seconds",
+        "10",
+        "--grace-seconds",
+        "0.2",
+        "--kill-wait-seconds",
+        "2",
+        "--poll-seconds",
+        "0.05",
+        "--",
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-c",
+        "import ctypes, json\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\nk.VirtualAlloc.restype = ctypes.c_void_p\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\nk.VirtualFree.restype = ctypes.c_int\namount = 1048576\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\nerror = ctypes.get_last_error() if not p else 0\nprint(json.dumps({\"requested_commit_bytes\": amount, \"allocation_succeeded\": bool(p), \"winerror\": error}), flush=True)\nreleased = not p or bool(k.VirtualFree(p, 0, 0x8000))\nexpected = bool(p) if True else not p and error != 0\nraise SystemExit(0 if expected and released else 3)\n"
+      ],
+      "expected_supervisor_exit": 0,
+      "expected_allocation_success": true
+    },
+    {
+      "name": "above-cap",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\above-cap\\record.json",
+        "--timeout-seconds",
+        "10",
+        "--grace-seconds",
+        "0.2",
+        "--kill-wait-seconds",
+        "2",
+        "--poll-seconds",
+        "0.05",
+        "--",
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-c",
+        "import ctypes, json\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\nk.VirtualAlloc.restype = ctypes.c_void_p\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\nk.VirtualFree.restype = ctypes.c_int\namount = 536936448\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\nerror = ctypes.get_last_error() if not p else 0\nprint(json.dumps({\"requested_commit_bytes\": amount, \"allocation_succeeded\": bool(p), \"winerror\": error}), flush=True)\nreleased = not p or bool(k.VirtualFree(p, 0, 0x8000))\nexpected = bool(p) if False else not p and error != 0\nraise SystemExit(0 if expected and released else 3)\n"
+      ],
+      "expected_supervisor_exit": 0,
+      "expected_allocation_success": false
+    },
+    {
+      "name": "aggregate-child-cap",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+        "--record",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\aggregate-child-cap\\record.json",
+        "--timeout-seconds",
+        "10",
+        "--grace-seconds",
+        "0.2",
+        "--kill-wait-seconds",
+        "2",
+        "--poll-seconds",
+        "0.05",
+        "--",
+        "C:\\Python313\\python.exe",
+        "-B",
+        "-c",
+        "import ctypes, json\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\nk.VirtualAlloc.restype = ctypes.c_void_p\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\nk.VirtualFree.restype = ctypes.c_int\nimport subprocess, sys\namount = 314572800\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\nprint(json.dumps({\"parent_requested_commit_bytes\": amount, \"parent_allocation_succeeded\": bool(p)}), flush=True)\nif not p:\n    raise SystemExit(4)\ntry:\n    result = subprocess.run([sys.executable, \"-B\", \"-c\", 'import ctypes, json\\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\\nk.VirtualAlloc.restype = ctypes.c_void_p\\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\\nk.VirtualFree.restype = ctypes.c_int\\namount = 268435456\\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\\nerror = ctypes.get_last_error() if not p else 0\\nprint(json.dumps({\"requested_commit_bytes\": amount, \"allocation_succeeded\": bool(p), \"winerror\": error}), flush=True)\\nreleased = not p or bool(k.VirtualFree(p, 0, 0x8000))\\nexpected = bool(p) if False else not p and error != 0\\nraise SystemExit(0 if expected and released else 3)\\n'],\n        capture_output=True, text=True, timeout=5, creationflags=0x08000000)\n    print(json.dumps({\"child_exit\": result.returncode, \"child_stdout\": result.stdout, \"child_stderr\": result.stderr}), flush=True)\nfinally:\n    released = bool(k.VirtualFree(p, 0, 0x8000))\nraise SystemExit(0 if result.returncode == 0 and released else 5)\n"
+      ],
+      "expected_supervisor_exit": 0,
+      "expected_allocation_success": {
+        "parent_300_mib": true,
+        "child_256_mib": false
+      }
+    }
+  ]
+}

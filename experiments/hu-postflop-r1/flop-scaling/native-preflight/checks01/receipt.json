@@ -1,0 +1,119 @@
+{
+  "schema": "solvers.r1.flop-native-local-checks/v1",
+  "created_at": "2026-09-27T00:25:03.891026+00:00",
+  "source_before": {
+    "verify.py": {
+      "bytes": 6336,
+      "sha256": "26f7e75b533fd6d2e6fe582c8d72d3b4eb05da58861035c251f1e911c22a5c90"
+    },
+    "estimate.rs": {
+      "bytes": 9271,
+      "sha256": "80ef2355d1dc8a744e770541bee13ffcd1b4e849615cb0e5b5ba93ef21aa321d"
+    },
+    "run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "build_probe.py": {
+      "bytes": 5360,
+      "sha256": "6f9a892a9b0c613c5b5fa232d6542a953e26fde5e11b966645cdb05829a232bf"
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\verify.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "00-stdout.log",
+        "bytes": 452,
+        "sha256": "4198a8863ee0446a940eab2bd5502ae10f73188d86a64cd66484142b77508a97"
+      },
+      "stderr": {
+        "path": "00-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\estimate.rs"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "01-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "01-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "02-stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "02-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "path": "03-stdout.log",
+        "bytes": 48,
+        "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+      },
+      "stderr": {
+        "path": "03-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "verify.py": {
+      "bytes": 6336,
+      "sha256": "26f7e75b533fd6d2e6fe582c8d72d3b4eb05da58861035c251f1e911c22a5c90"
+    },
+    "estimate.rs": {
+      "bytes": 9271,
+      "sha256": "80ef2355d1dc8a744e770541bee13ffcd1b4e849615cb0e5b5ba93ef21aa321d"
+    },
+    "run_bounded.py": {
+      "bytes": 11663,
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+    },
+    "build_probe.py": {
+      "bytes": 5360,
+      "sha256": "6f9a892a9b0c613c5b5fa232d6542a953e26fde5e11b966645cdb05829a232bf"
+    }
+  },
+  "source_unchanged": true,
+  "production_unchanged_pin_count": 207
+}

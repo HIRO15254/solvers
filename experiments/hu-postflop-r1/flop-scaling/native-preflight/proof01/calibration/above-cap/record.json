@@ -1,0 +1,152 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T00:16:05.197663+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-c",
+    "import ctypes, json\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\nk.VirtualAlloc.restype = ctypes.c_void_p\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\nk.VirtualFree.restype = ctypes.c_int\namount = 536936448\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\nerror = ctypes.get_last_error() if not p else 0\nprint(json.dumps({\"requested_commit_bytes\": amount, \"allocation_succeeded\": bool(p), \"winerror\": error}), flush=True)\nreleased = not p or bool(k.VirtualFree(p, 0, 0x8000))\nexpected = bool(p) if False else not p and error != 0\nraise SystemExit(0 if expected and released else 3)\n"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 10.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 2.0,
+    "poll_seconds": 0.05,
+    "memory_limit_bytes": null,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": null,
+    "disk_reserve_bytes": null
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\above-cap\\record.stdout.log",
+      "sha256": "7f94c4dd16714d7780e1039d646471c8de0c653eb0ef8470baffe8c89ff09a9d",
+      "bytes": 88
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\above-cap\\record.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\above-cap\\record.samples.jsonl",
+      "sha256": "563d3e7e6483da1f392d79cc06edf71cf2b971ffaa7af42e9bb38cd01a319f0a",
+      "bytes": 1409
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 4,
+    "max_sample_gap_seconds": 0.05108270002529025,
+    "sampled_peak_tree_resident_bytes": 26869760,
+    "root_os_peak_resident_bytes": 16158720,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 547602432,
+    "max_observed_processes": 2
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 4904636416,
+    "commit_available_bytes": 2236706816
+  },
+  "resolved_argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "-c",
+    "import ctypes, json\nk = ctypes.WinDLL(\"kernel32\", use_last_error=True)\nk.VirtualAlloc.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong]\nk.VirtualAlloc.restype = ctypes.c_void_p\nk.VirtualFree.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong]\nk.VirtualFree.restype = ctypes.c_int\namount = 536936448\np = k.VirtualAlloc(None, amount, 0x3000, 0x04)\nerror = ctypes.get_last_error() if not p else 0\nprint(json.dumps({\"requested_commit_bytes\": amount, \"allocation_succeeded\": bool(p), \"winerror\": error}), flush=True)\nreleased = not p or bool(k.VirtualFree(p, 0, 0x8000))\nexpected = bool(p) if False else not p and error != 0\nraise SystemExit(0 if expected and released else 3)\n"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-native-calibration\\above-cap",
+  "disk_free_before_bytes": 44392419328,
+  "started_at": "2026-09-27T00:16:05.301300+00:00",
+  "pid": 59656,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 16158720,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 547602432,
+    "elapsed_seconds": 0.16630650009028614,
+    "at": "2026-09-27T00:16:05.467730+00:00",
+    "host_available_memory_bytes": 4905787392,
+    "disk_free_bytes": 44392382464
+  },
+  "elapsed_seconds": 0.16664299997501075,
+  "ended_at": "2026-09-27T00:16:05.468420+00:00",
+  "supervisor_exit_code": 0
+}

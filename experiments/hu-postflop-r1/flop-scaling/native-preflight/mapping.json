@@ -1,0 +1,26 @@
+{
+  "schema": "r1.flop-native-preflight-mapping/v1",
+  "adapter": "estimate.rs",
+  "fixtures": {
+    "narrow": {"path": "../fixtures/narrow.toml", "bytes": 753, "sha256": "c059797a7276fa708c0c04dc31e967b0f074b63353171055f8edbb83ca20355c"},
+    "expanded": {"path": "../fixtures/expanded.toml", "bytes": 798, "sha256": "8a5f811a4b19e1e79d3dca5e817e56f626b06b5d5b2cdc9e03623be5b7aafbae"}
+  },
+  "input_binding": "Fixed typed constants, independently mapped to these pinned fixtures. The adapter does not read TOML; the external receipt must verify fixture, source, adapter, dependency and executable pins.",
+  "typed_mapping": {
+    "board": "native Card::from_str for Qs Jh 2h",
+    "ranges": "native Range::from_str, then PostflopHands::from_ranges; all retained weights are one",
+    "units": "10 chips per bb; pot=200, effective_stack=900, min_bet=10",
+    "tree": "Exact script body is compiled by Script<PostflopVar>::compile with empty overrides and POSTFLOP. Each street uses StreetTree::from_script(cap=2, include_allin=false, allin_threshold=None).",
+    "iso_merging": false,
+    "track_node_info": true,
+    "preflop_aggressor": "Some(Player::P0)",
+    "payoff_build_only": "PayoffPipeline { rake: &NoRake, utility: &ChipEv }",
+    "run_fields": "No solver is instantiated. DCFR, F32, iterations=100, time=30s, check_every=10, threads=1, chance_depth=2 and min_children=12 are not exercised."
+  },
+  "default_count": "memory_usage visits the native betting/chance recursion and retains distinct completed-board keys. It does not create TempNodes, masks, rank entries or solver arenas. Counts are not OS peak-memory bounds.",
+  "optional_build": "Explicit --build only. Constructs tree, masks, rank tables and CLI-style node metadata using the same config. No solver storage, CFR or EV/BR. Emits a second JSON line. Count output is flushed first, so a bounded build failure retains its count result.",
+  "comparison": "Checks native root combo IDs/support and compatible pair mass. Count fields match static-check.json; build fields match count and static per-street bet/raise availability. Actual rank-table count is not exposed publicly and is not asserted from the built evaluator.",
+  "cli_boundary": "Native typed API/script/range parsing validation only; not a test of TOML parsing, public-schema normalization, CLI errors or run settings.",
+  "commands": ["estimate.exe narrow", "estimate.exe expanded", "estimate.exe narrow --build", "estimate.exe expanded --build"],
+  "external_limits": "Caller must supervise one process at a time. Count first; optional build has a separately authorized bounded execution (requested 60 seconds, 512 MiB hard job cap). A successful estimate does not authorize an unbounded build or solve."
+}
