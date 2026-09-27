@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:hKvDp1TECIghTNxDlT3G0MUe4/989bYtay4xAGyW7Sw",
+    "experiments/hu-postflop-r1/cloud/vm16/deployment01.tar.gz",
+    "experiments/hu-postflop-r1/cloud/vm16/install.py",
+    "solvers-r1-20260927-16:/tmp/"
+  ],
+  "started_utc": "2026-09-27T05:00:10.004893+00:00",
+  "timeout_seconds": 90
+}

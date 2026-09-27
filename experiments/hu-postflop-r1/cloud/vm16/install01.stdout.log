@@ -1,0 +1,2 @@
+{"archive_sha256": "07f40865d62a827ac7de582e735e6f0d53dd27666307f4b9d80287fd6d18a42a", "manifest": {"bytes": 71794, "sha256": "a895d2ce4985bc8d7ade14359742345a9a370854fe1000ee7344b9fd3a453841"}, "source_revision": "700c2db69ec5f844e54dc0847792a2cf42015921", "source_files": 208, "destination": "/opt/r1/flop-cpu-occupancy-package", "builds_or_solves_started": 0}
+2026-09-27T05:00:16+00:00

@@ -1,0 +1,16 @@
+{
+  "status": "package_unpacked_and_all_current_inputs_match",
+  "source_files": 208,
+  "members": 242,
+  "archive": {
+    "path": "deployment01.tar.gz",
+    "bytes": 1326556,
+    "sha256": "07f40865d62a827ac7de582e735e6f0d53dd27666307f4b9d80287fd6d18a42a"
+  },
+  "manifest": {
+    "bytes": 71794,
+    "sha256": "a895d2ce4985bc8d7ade14359742345a9a370854fe1000ee7344b9fd3a453841"
+  },
+  "elapsed_seconds": 0.14902750006876886,
+  "native_or_cloud_execution": false
+}

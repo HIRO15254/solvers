@@ -1,0 +1,12 @@
+MainPID=1907
+Result=success
+ActiveState=active
+==> /opt/r1/flop-cpu-occupancy-wrapper01/prepare.stdout.log <==
+{"status": "prepared", "solves": 28, "diagnostic_rows": 24}
+
+==> /opt/r1/flop-cpu-occupancy-wrapper01/prepare.stderr.log <==
+
+==> /opt/r1/flop-cpu-occupancy-wrapper01/execute.stdout.log <==
+{"stage": "toolchain", "status": "completed", "case": null, "result": null}
+
+==> /opt/r1/flop-cpu-occupancy-wrapper01/execute.stderr.log <==

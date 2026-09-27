@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "instances",
+    "get-serial-port-output",
+    "solvers-r1-20260927-16",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--port=1",
+    "--start=0"
+  ],
+  "started_utc": "2026-09-27T04:59:35.921255+00:00",
+  "timeout_seconds": 60
+}
