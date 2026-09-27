@@ -1,0 +1,77 @@
+{
+  "allocation_summaries": [
+    {
+      "case": "narrow",
+      "quality_7_walks": {
+        "alloc_calls": 175,
+        "alloc_requested_bytes": 31168,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 175,
+        "realloc_calls": 156,
+        "realloc_requested_new_bytes": 61280,
+        "requested_total_bytes": 92448
+      },
+      "workers": 1
+    },
+    {
+      "case": "narrow",
+      "quality_7_walks": {
+        "alloc_calls": 558214,
+        "alloc_requested_bytes": 102139404,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 558214,
+        "realloc_calls": 334384,
+        "realloc_requested_new_bytes": 124841712,
+        "requested_total_bytes": 226981116
+      },
+      "workers": 2
+    },
+    {
+      "case": "expanded",
+      "quality_7_walks": {
+        "alloc_calls": 175,
+        "alloc_requested_bytes": 106044,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 175,
+        "realloc_calls": 168,
+        "realloc_requested_new_bytes": 225760,
+        "requested_total_bytes": 331804
+      },
+      "workers": 1
+    },
+    {
+      "case": "expanded",
+      "quality_7_walks": {
+        "alloc_calls": 553843,
+        "alloc_requested_bytes": 296019996,
+        "alloc_zeroed_calls": 0,
+        "alloc_zeroed_requested_bytes": 0,
+        "dealloc_calls": 553843,
+        "realloc_calls": 446000,
+        "realloc_requested_new_bytes": 632343780,
+        "requested_total_bytes": 928363776
+      },
+      "workers": 2
+    }
+  ],
+  "builds": 5,
+  "canonical_states": {
+    "expanded": {
+      "bytes": 283677926,
+      "sha256": "87d31b1da7e9b766cc09b02a51da74169167d705b104e9a60a1e4eeeb20f9cdd"
+    },
+    "narrow": {
+      "bytes": 81414344,
+      "sha256": "35981691a7736e2df5a89734b1102ee8ffc1bacaab7719476b0152e459eb2700"
+    }
+  },
+  "payload_files": 109,
+  "scope": "retained source/command/byte consistency; not performance, convergence or hermetic rebuild evidence",
+  "solves": 8,
+  "source_files": 50,
+  "states_deduplicated": 8,
+  "status": "verified"
+}

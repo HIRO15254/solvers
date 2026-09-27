@@ -1,0 +1,144 @@
+{
+  "status": "pass",
+  "source_files": 206,
+  "payload_files": 73,
+  "runs": [
+    {
+      "stage": "calibrate",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-calibrate01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 0,
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 0.2147245998494327,
+      "job_peak_commit_bytes": 1085452288,
+      "sampled_peak_resident_bytes": 2146304
+    },
+    {
+      "stage": "fmt",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-fmt01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 0,
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 2.834290800150484,
+      "job_peak_commit_bytes": 46276608,
+      "sampled_peak_resident_bytes": 96215040
+    },
+    {
+      "stage": "edge-tests",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-edge01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 1,
+      "test_totals": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 5.233273199992254,
+      "job_peak_commit_bytes": 251363328,
+      "sampled_peak_resident_bytes": 252088320
+    },
+    {
+      "stage": "clippy",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-clippy01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 0,
+      "test_totals": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 48.299191899830475,
+      "job_peak_commit_bytes": 463245312,
+      "sampled_peak_resident_bytes": 450756608
+    },
+    {
+      "stage": "tests",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-workspace01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 57,
+      "test_totals": {
+        "passed": 956,
+        "failed": 0,
+        "ignored": 30,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 684.9522044998594,
+      "job_peak_commit_bytes": 836898816,
+      "sampled_peak_resident_bytes": 745201664
+    },
+    {
+      "stage": "release-values",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-values01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 2,
+      "test_totals": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 223.92588719981723,
+      "job_peak_commit_bytes": 517218304,
+      "sampled_peak_resident_bytes": 466022400
+    },
+    {
+      "stage": "release-oracle",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-oracle01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 1,
+      "test_totals": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 0
+      },
+      "elapsed_seconds": 30.942251400090754,
+      "job_peak_commit_bytes": 257298432,
+      "sampled_peak_resident_bytes": 243662848
+    },
+    {
+      "stage": "release-postflop",
+      "original_dir": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-postflop01",
+      "status": "pass",
+      "errors": [],
+      "test_summaries": 1,
+      "test_totals": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 33
+      },
+      "elapsed_seconds": 32.55021220003255,
+      "job_peak_commit_bytes": 292868096,
+      "sampled_peak_resident_bytes": 254377984
+    }
+  ],
+  "scope": "Retained command, source, raw test outcomes and containment evidence; no isolated performance claim"
+}

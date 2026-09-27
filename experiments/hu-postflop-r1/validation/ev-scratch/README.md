@@ -62,3 +62,7 @@ python -B experiments/hu-postflop-r1/validation/ev-scratch/verify.py experiments
 
 補助検査は[checks02](checks02/README.md)に別保持した。Python 39 testsと文書49ファイルの検査が成功。
 Python初回の開始前資源拒否も残し、Rust検証8stageの成功と混同しない。
+
+`f59518a`へ証拠を保存後、[照合済みの重複raw 12 directory](cleanup.json)を削除した。
+252ファイル・1,464,492,802 bytesで、実行sourceはarchive、8個の全stateは既存canonicalに保持する。
+[削除後の再検査](checks03/receipt.json)も両verifierで成功した。これは証拠の再照合で、solver再実行ではない。

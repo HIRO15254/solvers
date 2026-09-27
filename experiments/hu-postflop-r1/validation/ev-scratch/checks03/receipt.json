@@ -1,0 +1,45 @@
+{
+  "scope": "Independent retained-proof checks after raw deletion; no solver rerun",
+  "cleanup_sha256": "799d00c8b29d6c1a256e286d67c5556c341f54758fe760c3dde758247fa9c64a",
+  "commands": [
+    {
+      "name": "native",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments/hu-postflop-r1/flop-scaling/ev-scratch/verify.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.5872176999691874
+    },
+    {
+      "name": "workspace",
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments/hu-postflop-r1/validation/ev-scratch/verify.py",
+        "experiments/hu-postflop-r1/validation/ev-scratch/proof01"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.4800074999220669
+    }
+  ],
+  "outputs": {
+    "native.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native.stdout.log": {
+      "bytes": 2220,
+      "sha256": "2fc6aac7d7b259202ddf73d5fc26a928952f0713406be60257d41d8e87f0779a"
+    },
+    "workspace.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspace.stdout.log": {
+      "bytes": 4310,
+      "sha256": "eaf6f5d1e7f376f94d1ae679e10449a17bacdd982169d8735eb6a725fb1fecfc"
+    }
+  }
+}

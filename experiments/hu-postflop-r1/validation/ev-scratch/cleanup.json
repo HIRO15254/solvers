@@ -1,0 +1,70 @@
+{
+  "status": "deleted_verified_duplicates",
+  "retention_commit": "f59518a14cb518f699f4a2b67093c5a9db6ef5db",
+  "directories": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-ev-scratch01",
+      "files": 165,
+      "bytes": 1461731547
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-calibrate01",
+      "files": 9,
+      "bytes": 92641
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-fmt01",
+      "files": 9,
+      "bytes": 95895
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-edge01",
+      "files": 9,
+      "bytes": 100992
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-clippy01",
+      "files": 9,
+      "bytes": 184671
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-workspace01",
+      "files": 9,
+      "bytes": 1429711
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-values01",
+      "files": 9,
+      "bytes": 498796
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-oracle01",
+      "files": 9,
+      "bytes": 149607
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-release-postflop01",
+      "files": 9,
+      "bytes": 152606
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-tools01",
+      "files": 3,
+      "bytes": 7667
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-tools02",
+      "files": 6,
+      "bytes": 39217
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\ev-scratch-docs01",
+      "files": 6,
+      "bytes": 9452
+    }
+  ],
+  "total_files": 252,
+  "total_bytes": 1464492802,
+  "basis": "Every raw file matches Git-backed identical payload, retained source archive, or existing canonical state; reproducible build targets kept.",
+  "deleted_at_utc": "2026-09-27T01:59:40.3769151Z"
+}

@@ -53,6 +53,9 @@ zeroed allocationを避けられた範囲の証拠として扱う。
 保持時にも各原streamのSHAを再計算して、既存の2canonicalへdeduplicateした。
 元scratchの削除はこの保持処理では行わない。
 
+後続の[照合付き整理](../../validation/ev-scratch/cleanup.json)で元runとsource copyを削除した。
+原内容はこのproof、source archive、既存canonicalから確認でき、[削除後の検査](../../validation/ev-scratch/checks03/receipt.json)も成功した。
+
 [verify.py](verify.py) は保存codeを実行せず、全payload hash、source exact set・唯一の
 runtime差分、crate依存の結合、binary展開bytes、13recordのcommand/identity/cleanup、
 canonical stream、quality bytes、phase順とcountを検査する。
