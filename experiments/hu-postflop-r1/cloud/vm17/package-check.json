@@ -1,0 +1,17 @@
+{
+  "schema": "r1-vm17-package-check/v1",
+  "members": 266,
+  "source_files": 208,
+  "archive": {
+    "path": "deployment01.tar.gz",
+    "bytes": 1433750,
+    "sha256": "c33651e8d7034ce10c185e57df7df5d38204c1a069e15693b95d433e90551a8c"
+  },
+  "manifest": {
+    "bytes": 76942,
+    "sha256": "6083ea503d82dfc551244610a8713ef2bff74d3084fd52f39ae28fbb6c37da23"
+  },
+  "native_execution": false,
+  "in_memory_only": true,
+  "wall_seconds": 0.0738234999589622
+}
