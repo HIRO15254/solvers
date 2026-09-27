@@ -1,0 +1,68 @@
+{
+  "schema": "r1.vm16-usage-checks/v1",
+  "started_at": "2026-09-27T05:27:07.371698+00:00",
+  "network_operations": false,
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "commands": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm16\\analyze.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.11791740008629858,
+      "stdout": {
+        "bytes": 1781,
+        "sha256": "f599056082c9e2c8f27d66a76ec13277188c608d3ef14b08f7b0e1cae01666de"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm16\\test_analyze.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.1408894001506269,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 107,
+        "sha256": "351f929ed84aacafade91b6fd67dc7be9217ffaea2ca9d1c9d59bd385ba30fb6"
+      }
+    }
+  ],
+  "sources": {
+    "collect.py": {
+      "bytes": 7447,
+      "sha256": "0429d4f951fc24fcb3f36e4335e034f4b0b353c825a2c71568905e14f0cff9df"
+    },
+    "analyze.py": {
+      "bytes": 12989,
+      "sha256": "8c1b794c90233b89e70b8989c860c189c6be4bcc464dc621524a35d5afc6bf6e"
+    },
+    "test_analyze.py": {
+      "bytes": 3797,
+      "sha256": "c6dd61d8581c5895d653cd600af7ea1bbee4da8ddbe9f0dbe6ed634e8f9737a2"
+    },
+    "report.json": {
+      "bytes": 4722,
+      "sha256": "635a20f6e74f268926810ee0fc12cbc8ca953b2a59d12e4702d1ac508d0865a1"
+    },
+    "acquisition.json": {
+      "bytes": 13754,
+      "sha256": "08d6e7e35000781ab384a1e40b585810ab9e89e732ae99389c0d173efc2c21f8"
+    }
+  },
+  "status": "passed",
+  "ended_at": "2026-09-27T05:27:07.651235+00:00"
+}

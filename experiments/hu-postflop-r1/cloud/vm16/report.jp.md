@@ -64,3 +64,5 @@ plan SHA256は`0b9ad8e992055d6bb313a556e085fd33c0fd59d7e591360e18d936f05d184b6f`
 このディレクトリの `flop-cpu-occupancy-proof01.part00`、`part01`、`part02`を順番に連結すると元のtar.gzになる。[ファイルmanifest](flop-cpu-occupancy-proof01.tar.gz.manifest.json)と[各片のhash](flop-cpu-occupancy-proof01.parts.sha256)を併せて保持する。source・binary・plan・全stage記録・canonical state・service記録とtrusted readerの結果を含む。保存された研究コードを自動実行せず、再検査にはGit上の固定readerを用いる。
 
 2026-09-27 **05:21:46.211 UTC**にVMと唯一の40 GiB boot diskを削除した。[05:22:19 UTCの照合](reconciliation.json)で削除operationのDONEとinstance・disk・予約IPの残存なしを確認した。元の05:33:50 UTC停止期限は延長していない。削除時点では2 USDの予約を維持し、実請求額は未確定。使用量取得後の再評価は[費用台帳](../budget.json)で管理する。
+
+その後、[取得済み使用量](../usage-audit-vm16/README.jp.md)と削除記録を照合し、通常料金で26分、disk24時間、転送0.5 GiB、元の1 USD予備費を含む1.78094 USDと試算した。1.90 USDを保持し、[0.10 USDだけ再利用枠へ戻した](usage-applied.json)。Spot割引・credit・未取得区間の使用ゼロを仮定しておらず、確定請求は未取得である。

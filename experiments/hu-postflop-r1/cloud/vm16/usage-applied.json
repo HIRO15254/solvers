@@ -1,0 +1,22 @@
+{
+  "at": "2026-09-27T05:27:56.544417+00:00",
+  "change": {
+    "id": "r1-20260927-16",
+    "event": "usage_based_partial_reservation_reconciliation",
+    "at": "2026-09-27T05:27:56.544417+00:00",
+    "old_reserved_usd": 2,
+    "new_reserved_usd": 1.9,
+    "restored_to_available_budget_usd": 0.1,
+    "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm16/report.json",
+    "evidence_sha256": "635a20f6e74f268926810ee0fc12cbc8ca953b2a59d12e4702d1ac508d0865a1",
+    "billed_usd": null,
+    "final_invoice": false
+  },
+  "held_before_usd": 40,
+  "held_after_usd": 39.9,
+  "unreserved_usd": 0.1,
+  "authorized_limit_usd": 40,
+  "invoice_confirmed": false,
+  "ledger_before_sha256": "4be76f7c737229ad9fffead98aedca64eb15638de37a7c1a9988c111e1bb839b",
+  "ledger_after_sha256": "0edcf9c5767d3c7a338b3feca29e8ca2c1e7f6e277337a9c9127f39f26e5c336"
+}

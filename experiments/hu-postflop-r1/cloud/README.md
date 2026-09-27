@@ -288,3 +288,5 @@ CSVのdownload観測はtimeoutし、精密な全明細は取得できていな�
 課金設定変更・追加起動は行わず、確認用タブは閉じた。
 
 [VM16診断結果](vm16/report.jp.md)は全28 solvesの同一state/quality照合を完了した。32 workersでCFRのCPU時間がほぼ倍になってもwall時間は短くならず、単独原因は未確定。115,423,261 bytesの原本を3片で回収し、05:21:46 UTCにVMと唯一の40 GiB diskを削除、残存なしを照合した。削除時点は2 USDを留保し、削除だけでは予算を解放しない。
+
+[VM16の使用量照合](usage-audit-vm16/README.jp.md)後、保守的試算1.78094 USDに対して1.90 USDを留保し、[0.10 USDを復元](vm16/usage-applied.json)した。保持39.90 USD・未予約0.10 USD。使用量に基づく復元累計は8.10 USDで、確定請求や追加許可ではない。
