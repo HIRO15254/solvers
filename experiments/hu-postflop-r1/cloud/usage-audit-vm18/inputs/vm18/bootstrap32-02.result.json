@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-18",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo systemctl show google-startup-scripts.service -p ActiveState -p Result -p ExecMainStatus -p ExecMainExitTimestamp",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:28:50.720430+00:00",
+  "timeout_seconds": 30,
+  "stdout": {
+    "bytes": 103,
+    "sha256": "b1ebecc46bac6be11188e72836d9f6267d9c7b0a80f5adb0ee26ba9c520ee46c"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T07:28:55.926379+00:00"
+}

@@ -1,0 +1,58 @@
+{
+  "at_utc": "2026-09-27T08:00:52.532681+00:00",
+  "explicit_documents": [
+    "experiments/README.md",
+    "experiments/hu-postflop-r1/cloud/README.md",
+    "experiments/hu-postflop-r1/cloud/vm18/report.jp.md",
+    "experiments/hu-postflop-r1/cloud/vm18/README.md",
+    "experiments/hu-postflop-r1/cloud/usage-audit-vm18/README.jp.md"
+  ],
+  "local_links_checked": 176,
+  "application_ast": "passed",
+  "doc_check_argv": [
+    "C:/Python313/python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "doc_check_exit": 0,
+  "doc_check_stdout": "Documentation check passed: 50 Markdown files.\r\n",
+  "doc_check_seconds": 0.18406579992733896,
+  "native_build_or_solve": false,
+  "archive_reads": false,
+  "pins": {
+    "experiments/README.md": {
+      "bytes": 22682,
+      "sha256": "922e4c0e04fe42a0eeff7173d50d2e19e0dbf8046c98a1c9f91f9ab863770de4"
+    },
+    "experiments/hu-postflop-r1/cloud/README.md": {
+      "bytes": 26995,
+      "sha256": "be8b618e09b4c2d0756ae736f444740ecf1c4ede918f81d9d4c6eef9dea19871"
+    },
+    "experiments/hu-postflop-r1/cloud/vm18/report.jp.md": {
+      "bytes": 4949,
+      "sha256": "91339c6e79426170a79da5c5d004ac8f4bf34447c673c370f0c3e90ebf92f6b5"
+    },
+    "experiments/hu-postflop-r1/cloud/vm18/README.md": {
+      "bytes": 1978,
+      "sha256": "06c9ab1201da1ec399e50c2f61334deeb2f3e5f6017bc4141e543b57338d6716"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-audit-vm18/README.jp.md": {
+      "bytes": 6813,
+      "sha256": "8aa9c0f598203fffdf239c490225be39d7a926077d4c30af161dba1b50e9dfab"
+    },
+    "experiments/hu-postflop-r1/cloud/vm18/apply-reservation-return.py": {
+      "bytes": 5039,
+      "sha256": "78500a4ddaffb4aa66a9e8ea3a9803800484b2da4f311d0197d3ac9ead44624c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm18/reservation-return-applied.json": {
+      "bytes": 1654,
+      "sha256": "bbc627c9b3eab6f2efcee9e4a9e5af6e172d24b64db564355a089a85bbd0c5e5"
+    },
+    "experiments/hu-postflop-r1/cloud/budget.json": {
+      "bytes": 83152,
+      "sha256": "dd3d8ae625fd9785f42ee9b2ec96bc54f79dbc143ec96e12bce61c1caea6c535"
+    }
+  }
+}

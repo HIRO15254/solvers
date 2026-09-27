@@ -1,0 +1,13 @@
+The host key is not cached for this server:
+  104.155.177.142 (port 22)
+You have no guarantee that the server is the computer you
+think it is.
+The server's ssh-ed25519 key fingerprint is:
+  ssh-ed25519 255 SHA256:bJ+xK4bJaqCWxxST3okY0AJC++aCOl7t8baPwvfA/nI
+If you trust this host, enter "y" to add the key to Plink's
+cache and carry on connecting.
+If you want to carry on connecting just once, without adding
+the key to the cache, enter "n".
+If you do not trust this host, press Return to abandon the
+connection.
+Store key in cache? (y/n, Return cancels connection, i for more info) 

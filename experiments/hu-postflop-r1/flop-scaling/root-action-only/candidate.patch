@@ -1,0 +1,197 @@
+--- a/crates/engine/src/solver.rs
++++ b/crates/engine/src/solver.rs
+@@ -98,6 +98,42 @@
+ }
+ 
+ impl ActionPlan {
++    /// Research-only CFR entry plan. Mixed trees may fork at the root action
++    /// only; chance-free trees retain the accepted action plan unchanged.
++    /// This does not consume or disable the independent chance-depth budget.
++    fn for_cfr(tree: &PublicTree) -> Option<Self> {
++        if !tree.subtree_has_chance[0] {
++            return Self::new(tree);
++        }
++        let workers = rayon::current_num_threads();
++        if workers == 1
++            || tree.node(0).kind != NodeKind::Action
++            || subtree_elements(tree, 0) < 2 * ACTION_PAR_MIN_GRAIN
++        {
++            return None;
++        }
++        let grain = subtree_elements(tree, 0)
++            .div_ceil(workers.saturating_mul(ACTION_PAR_TASKS_PER_WORKER))
++            .clamp(ACTION_PAR_MIN_GRAIN, ACTION_PAR_MAX_GRAIN);
++        if tree
++            .children(0)
++            .filter(|&child| subtree_elements(tree, child) >= grain)
++            .take(2)
++            .count()
++            != 2
++        {
++            return None;
++        }
++        // All non-root flags stay false, including action descendants before
++        // the first chance. Existing chance recursion already clears the plan.
++        let mut nodes = vec![ActionSplit::default(); tree.nodes.len()];
++        nodes[0] = ActionSplit {
++            here: true,
++            below: true,
++        };
++        Some(Self { nodes })
++    }
++
+     fn new(tree: &PublicTree) -> Option<Self> {
+         let workers = rayon::current_num_threads();
+         if workers == 1
+@@ -255,7 +291,7 @@
+     /// One alternating iteration: a regret/strategy update pass for each
+     /// player in turn.
+     pub fn step(&mut self) {
+-        let action_plan = ActionPlan::new(&self.game.tree);
++        let action_plan = ActionPlan::for_cfr(&self.game.tree);
+         self.step_with_plan(action_plan.as_ref());
+     }
+ 
+@@ -297,7 +333,7 @@
+         // Construct inside the caller's current pool, not in Solver::new:
+         // callers may build a solver outside the pool that later runs it.
+         // Reuse the immutable plan across both player passes and iterations.
+-        let action_plan = ActionPlan::new(&self.game.tree);
++        let action_plan = ActionPlan::for_cfr(&self.game.tree);
+         for _ in 0..iterations {
+             self.step_with_plan(action_plan.as_ref());
+         }
+@@ -1440,3 +1476,133 @@
+             .install(|| assert!(ActionPlan::new(&tree).is_none()));
+     }
+ }
++
++#[cfg(test)]
++mod root_action_only_tests {
++    use super::*;
++    use crate::tree::{ReachMap, TempNode, TreeSpec};
++
++    fn action(player: Player, count: usize) -> TempNode {
++        TempNode::Action {
++            player,
++            children: (0..count)
++                .map(|_| TempNode::Terminal { id: 0, tag: 0 })
++                .collect(),
++            tag: 0,
++        }
++    }
++
++    fn chance(child: TempNode) -> TempNode {
++        TempNode::Chance {
++            deals: vec![(
++                1.0,
++                PerPlayer::new(ReachMap::Identity, ReachMap::Identity),
++                child,
++            )],
++            tag: 0,
++        }
++    }
++
++    fn tree(root: TempNode) -> PublicTree {
++        PublicTree::compile(TreeSpec {
++            root,
++            masks: Vec::new(),
++            transitions: Vec::new(),
++            root_dims: PerPlayer::new(4_095, 2_048),
++        })
++    }
++
++    fn mixed_root(second_large: bool) -> PublicTree {
++        tree(TempNode::Action {
++            player: Player::P0,
++            children: vec![
++                chance(action(Player::P1, 2)), // exactly 4,096 elements
++                chance(if second_large {
++                    action(Player::P1, 2)
++                } else {
++                    action(Player::P0, 1) // exactly 4,095 elements
++                }),
++            ],
++            tag: 0,
++        })
++    }
++
++    #[test]
++    fn cfr_mixed_root_requires_two_large_children_and_only_marks_root() {
++        for workers in [2, 4, 16, 32] {
++            rayon::ThreadPoolBuilder::new()
++                .num_threads(workers)
++                .build()
++                .unwrap()
++                .install(|| {
++                    assert!(ActionPlan::for_cfr(&mixed_root(false)).is_none());
++                    let tree = mixed_root(true);
++                    // Existing quality/default plan remains disabled.
++                    assert!(ActionPlan::new(&tree).is_none());
++                    let plan = ActionPlan::for_cfr(&tree).unwrap();
++                    assert!(plan.nodes[0].here && plan.nodes[0].below);
++                    assert!(plan.nodes[1..].iter().all(|p| !p.here && !p.below));
++                });
++        }
++    }
++
++    #[test]
++    fn cfr_mixed_root_does_not_search_below_a_single_heavy_child() {
++        let tree = tree(TempNode::Action {
++            player: Player::P0,
++            children: vec![TempNode::Terminal { id: 0, tag: 0 }, {
++                TempNode::Action {
++                    player: Player::P1,
++                    children: vec![chance(action(Player::P1, 2)), chance(action(Player::P1, 2))],
++                    tag: 0,
++                }
++            }],
++            tag: 0,
++        });
++        rayon::ThreadPoolBuilder::new()
++            .num_threads(4)
++            .build()
++            .unwrap()
++            .install(|| assert!(ActionPlan::for_cfr(&tree).is_none()));
++    }
++
++    #[test]
++    fn cfr_serial_and_chance_root_remain_without_action_plan() {
++        rayon::ThreadPoolBuilder::new()
++            .num_threads(1)
++            .build()
++            .unwrap()
++            .install(|| assert!(ActionPlan::for_cfr(&mixed_root(true)).is_none()));
++        let chance_root = tree(chance(TempNode::Action {
++            player: Player::P0,
++            children: vec![action(Player::P1, 2), action(Player::P1, 2)],
++            tag: 0,
++        }));
++        rayon::ThreadPoolBuilder::new()
++            .num_threads(4)
++            .build()
++            .unwrap()
++            .install(|| assert!(ActionPlan::for_cfr(&chance_root).is_none()));
++    }
++
++    #[test]
++    fn cfr_chance_free_plan_is_identical_to_existing_plan() {
++        let tree = tree(TempNode::Action {
++            player: Player::P0,
++            children: vec![action(Player::P1, 2), action(Player::P1, 2)],
++            tag: 0,
++        });
++        rayon::ThreadPoolBuilder::new()
++            .num_threads(4)
++            .build()
++            .unwrap()
++            .install(|| {
++                let original = ActionPlan::new(&tree).unwrap();
++                let cfr = ActionPlan::for_cfr(&tree).unwrap();
++                assert_eq!(original.nodes.len(), cfr.nodes.len());
++                for (a, b) in original.nodes.iter().zip(&cfr.nodes) {
++                    assert_eq!((a.here, a.below), (b.here, b.below));
++                }
++            });
++    }
++}

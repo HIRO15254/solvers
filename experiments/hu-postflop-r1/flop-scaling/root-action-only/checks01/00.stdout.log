@@ -1,0 +1,1 @@
+{"status": "passed", "candidate": {"bytes": 62079, "sha256": "2b641b2ec597207ca9815572945f9f6285de91ab94cdbbddd6e00b9b3fdbbeb7"}, "checks": {"inverse_exact": true, "cfr_and_value_traversals_unchanged": true, "quality_plan_factory_unchanged": true, "native_test_execution": false}}

@@ -1,0 +1,458 @@
+{
+  "schema": "r1.vm18-conservative-usage-proposal/v1",
+  "analysis_source": {
+    "bytes": 20759,
+    "sha256": "7187f3fa19b73b3dcbd2945ea565b78aacb5479599874cbb3390273778b9cc2b"
+  },
+  "acquisition": {
+    "bytes": 41295,
+    "sha256": "d63792777cf26e5e267ee09de408299745ef4c0d14ac780c3bfc07383eb4409b"
+  },
+  "collector": {
+    "bytes": 14000,
+    "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+  },
+  "additional_download_receipt": {
+    "bytes": 941,
+    "sha256": "2478ed980f338e5ceb86f603ea3e2d46d4d83868bbc3c086ad908c04b824d0aa"
+  },
+  "validated_input_files": 172,
+  "validated_input_bytes": 362278,
+  "validated_sdk_commands": 45,
+  "instance_id": "3769585733775752220",
+  "lifecycle": {
+    "launch_attempt": "2026-09-27T07:17:04.240092+00:00",
+    "created": "2026-09-27T00:17:07.959-07:00",
+    "original_stop": "2026-09-27T08:17:04Z",
+    "delete_done": "2026-09-27T00:47:47.558-07:00",
+    "absence_verified": "2026-09-27T07:48:52.424052+00:00",
+    "whole_seconds": "1908.18396",
+    "large_window_start": "2026-09-27T07:25:35.002654+00:00",
+    "large_window_end": "2026-09-27T07:35:53.258461+00:00",
+    "large_window_seconds": "618.255807",
+    "disk_id": "9212560962946956316",
+    "disk_created": "2026-09-27T00:17:07.969-07:00",
+    "disk_seconds_to_absence": "1904.455052",
+    "slack_seconds_added_to_each_window": 120,
+    "boot_lower_seconds": [
+      "507.043654",
+      "425.274545",
+      "637.334358"
+    ],
+    "stopped_intervals_subtracted": false,
+    "small_base_subtracted_from_large_window": false
+  },
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 28,
+      "observed_sum": "131083237",
+      "first_start": "2026-09-27T07:17:00.001Z",
+      "last_end": "2026-09-27T07:47:00Z",
+      "internal_gaps": [
+        {
+          "from": "2026-09-27T07:18:00Z",
+          "to": "2026-09-27T07:18:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:19:00Z",
+          "to": "2026-09-27T07:19:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:20:00Z",
+          "to": "2026-09-27T07:20:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:21:00Z",
+          "to": "2026-09-27T07:21:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:22:00Z",
+          "to": "2026-09-27T07:22:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:23:00Z",
+          "to": "2026-09-27T07:23:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:24:00Z",
+          "to": "2026-09-27T07:24:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:25:00Z",
+          "to": "2026-09-27T07:25:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:26:00Z",
+          "to": "2026-09-27T07:27:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:28:00Z",
+          "to": "2026-09-27T07:28:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:29:00Z",
+          "to": "2026-09-27T07:29:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:30:00Z",
+          "to": "2026-09-27T07:30:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:31:00Z",
+          "to": "2026-09-27T07:31:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:32:00Z",
+          "to": "2026-09-27T07:32:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:33:00Z",
+          "to": "2026-09-27T07:33:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:34:00Z",
+          "to": "2026-09-27T07:34:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:35:00Z",
+          "to": "2026-09-27T07:36:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:37:00Z",
+          "to": "2026-09-27T07:37:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:38:00Z",
+          "to": "2026-09-27T07:38:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:39:00Z",
+          "to": "2026-09-27T07:39:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:40:00Z",
+          "to": "2026-09-27T07:40:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:41:00Z",
+          "to": "2026-09-27T07:41:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:42:00Z",
+          "to": "2026-09-27T07:42:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:43:00Z",
+          "to": "2026-09-27T07:43:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:44:00Z",
+          "to": "2026-09-27T07:44:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:45:00Z",
+          "to": "2026-09-27T07:45:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:46:00Z",
+          "to": "2026-09-27T07:46:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "launch_to_first_observation_seconds": "0",
+      "last_observation_to_absence_seconds": "112.424052"
+    },
+    "uptime": {
+      "available": true,
+      "points": 28,
+      "observed_sum": "1532.222950000000083",
+      "first_start": "2026-09-27T07:17:00.001Z",
+      "last_end": "2026-09-27T07:47:00Z",
+      "internal_gaps": [
+        {
+          "from": "2026-09-27T07:18:00Z",
+          "to": "2026-09-27T07:18:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:19:00Z",
+          "to": "2026-09-27T07:19:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:20:00Z",
+          "to": "2026-09-27T07:20:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:21:00Z",
+          "to": "2026-09-27T07:21:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:22:00Z",
+          "to": "2026-09-27T07:22:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:23:00Z",
+          "to": "2026-09-27T07:23:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:24:00Z",
+          "to": "2026-09-27T07:24:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:25:00Z",
+          "to": "2026-09-27T07:25:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:26:00Z",
+          "to": "2026-09-27T07:27:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:28:00Z",
+          "to": "2026-09-27T07:28:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:29:00Z",
+          "to": "2026-09-27T07:29:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:30:00Z",
+          "to": "2026-09-27T07:30:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:31:00Z",
+          "to": "2026-09-27T07:31:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:32:00Z",
+          "to": "2026-09-27T07:32:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:33:00Z",
+          "to": "2026-09-27T07:33:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:34:00Z",
+          "to": "2026-09-27T07:34:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:35:00Z",
+          "to": "2026-09-27T07:36:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:37:00Z",
+          "to": "2026-09-27T07:37:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:38:00Z",
+          "to": "2026-09-27T07:38:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:39:00Z",
+          "to": "2026-09-27T07:39:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:40:00Z",
+          "to": "2026-09-27T07:40:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:41:00Z",
+          "to": "2026-09-27T07:41:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:42:00Z",
+          "to": "2026-09-27T07:42:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:43:00Z",
+          "to": "2026-09-27T07:43:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:44:00Z",
+          "to": "2026-09-27T07:44:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:45:00Z",
+          "to": "2026-09-27T07:45:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:46:00Z",
+          "to": "2026-09-27T07:46:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "launch_to_first_observation_seconds": "0",
+      "last_observation_to_absence_seconds": "112.424052"
+    }
+  },
+  "downloads": [
+    {
+      "receipt": "vm18/analysis-download01.result.json",
+      "completed_files": 3,
+      "display_rounded_payload_allowance_bytes": 161792
+    },
+    {
+      "receipt": "vm18/proof-download01.result.json",
+      "completed_files": 4,
+      "display_rounded_payload_allowance_bytes": 124580864
+    },
+    {
+      "receipt": "vm18/recovery-receipt-download01.result.json",
+      "completed_files": 1,
+      "display_rounded_payload_allowance_bytes": 1024
+    },
+    {
+      "receipt": "vm18/sidecars-download01.result.json",
+      "completed_files": 2,
+      "display_rounded_payload_allowance_bytes": 390144
+    }
+  ],
+  "verified_archive_bytes": 124577587,
+  "known_payload_allowance_bytes": 125133824,
+  "unobserved_egress_bytes": null,
+  "arithmetic": {
+    "whole_minutes": 34,
+    "overlapping_large_minutes": 13,
+    "disk_minutes": 34,
+    "network_allowance_gib": "0.5",
+    "components_usd": {
+      "whole_lifetime_small_compute": "0.07933333333333333333333333334",
+      "overlapping_large_window_compute": "0.2491666666666666666666666667",
+      "whole_lifetime_ipv4": "0.001416666666666666666666666667",
+      "same_disk_lifetime_40gib": "0.003105333333333333333333333334",
+      "network_allowance": "0.150",
+      "original_uncertainty_reserve": "1"
+    },
+    "total_usd": "1.483022000000000000000000000",
+    "rounded_hold_usd": "1.5",
+    "restore_usd": "1.0",
+    "margin_above_model_usd": "0.016978000000000000000000000",
+    "flat_highest_compute_alternative_usd": "1.806188666666666666666666667"
+  },
+  "proposal": {
+    "available": true,
+    "held_before_usd": "2.5",
+    "hold_usd": "1.5",
+    "restore_usd": "1.0",
+    "original_uncertainty_reserve_usd": "1",
+    "applied": false
+  },
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling_usd": null,
+  "budget_changed": false,
+  "limits": [
+    "All missing Monitoring intervals and edge usage remain unknown, never zero; no observed-uptime subtraction is used.",
+    "Whole launch-to-absence small-VM base plus overlapping pre-resize-to-post-downsize 32-vCPU window; each adds120s and rounds upward to minutes.",
+    "Same named disk is linked by source URI at create/predelete, numeric ID at predelete/reconciliation, autoDelete and deletion/absence evidence; its own creation-to-absence lifetime adds120s then rounds upward.",
+    "All four recorded download attempts succeeded; rounded progress payload estimates and archive receipt are checked, not rehashed archive bytes. At least512MiB remains for all network traffic.",
+    "SDK receipts/readbacks establish the recorded configuration sequence, not an exhaustive Cloud Audit Logs inventory. All original1USD uncertainty remains.",
+    "Usage-based conservative reservation estimate, not an invoice or guaranteed ceiling. No Spot discounts, credits or free tier reductions."
+  ]
+}

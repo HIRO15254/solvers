@@ -1,0 +1,181 @@
+{
+  "schema": "r1.flop-cpu-profile-design-review/v1",
+  "reviewed_at_utc": "2026-09-27T08:01:27.651676+00:00",
+  "scope": "Read-only code and compact-result review, prospective diagnostic design; not an executable launch protocol.",
+  "execution_authorization": false,
+  "reservation_created": false,
+  "production_changes": false,
+  "native_execution": false,
+  "cloud_resource_or_monitoring_api_calls": false,
+  "primary_documentation_web_reads": true,
+  "archive_read_or_decompression": false,
+  "method": "Source inspection and small Python integer arithmetic/class expansion only. Official perf/rustc documentation was read separately; no code was copied from those projects.",
+  "proposal": {
+    "path": "experiments/hu-postflop-r1/flop-scaling/cpu-profile/proposal.jp.md",
+    "bytes": 10403,
+    "sha256": "efa6ab53d40a5ed8ce6683ec52f51931fff92d52086e2e47ef4c9fb30845c952"
+  },
+  "source_and_evidence": [
+    {
+      "path": "crates/engine/src/solver.rs",
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    {
+      "path": "crates/engine/src/storage.rs",
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    },
+    {
+      "path": "crates/engine/src/scratch.rs",
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    {
+      "path": "crates/engine/src/tree.rs",
+      "bytes": 16936,
+      "sha256": "2e6c1a3560bd12a7b2a04573e28505ae00fdaaf8fcb797cb3b0bb964a98879b2"
+    },
+    {
+      "path": "crates/holdem/src/kernel.rs",
+      "bytes": 18270,
+      "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076"
+    },
+    {
+      "path": "crates/holdem/src/postflop.rs",
+      "bytes": 73444,
+      "sha256": "70ecaa0bbc39ca1fff1d3c7c29a1e499dea87e5b8e58d2486b3e0ebc157f891f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm16/report.jp.md",
+      "bytes": 8654,
+      "sha256": "c965caa26d16799c7a799ec887b9c4dc3133cd5272e11e8eb171e04cbbb87908"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/flop-chance-grain-analysis01.json",
+      "bytes": 158458,
+      "sha256": "9f0659a3cd503de19f72c2350c8c95c4a9de4ef5efeb302bbcf65c1209d9b4b6"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm17/report.jp.md",
+      "bytes": 11045,
+      "sha256": "0b0ff234e77a8264fff233da7b33d109f78652431c8f339e431c32e5f8858265"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/fused-update/candidate/storage.rs",
+      "bytes": 48942,
+      "sha256": "149288f814df08406fb9215270cf3894e1e97a1dda06e5238432d3c13881484c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/fused-update/timing/protocol.jp.md",
+      "bytes": 6428,
+      "sha256": "b2d8738890a157c8700697f1f6392590a46798b797e515857ab7aa73ff383bdf"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/chance-grain/adapter/solve.rs",
+      "bytes": 17517,
+      "sha256": "69d09d308e2d5d12160235dc9fc3fe981acc8f2103809a1fcccaaeed8b97c195"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/cpu-occupancy/adapter/solve.rs",
+      "bytes": 15687,
+      "sha256": "a6746b4316216231f3a4bf02120968d7b78ddb876d6d04cd611bf1efed7ba2a5"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/fixtures/prepare.py",
+      "bytes": 13013,
+      "sha256": "4e360f5f4e88a78eee91dd74492a5c9cdce9d9f44d7c8d65dfc0d8fb978d6fae"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/fixtures/static-check.json",
+      "bytes": 11602,
+      "sha256": "06b7f3d437ada5e565ae9815000a9631098431b5305f2cdb36cea0224997568a"
+    },
+    {
+      "path": "examples/postflop_srp20.toml",
+      "bytes": 614,
+      "sha256": "cf9b03f59921dbe1c0be16b9210c5f2d31df58dec659bf4d38a409ade3ebc98c"
+    }
+  ],
+  "checks": {
+    "relative_link_occurrences_resolve": 16,
+    "rank_precompute_and_compact_terminal_path_confirmed": true,
+    "chance_tree_action_plan_exclusion_confirmed": true,
+    "disjoint_storage_no_global_cfr_lock_confirmed": true,
+    "false_sharing_or_bandwidth_root_cause_established": false,
+    "existing_adapter_lacks_absolute_monotonic_phase_timestamps": true
+  },
+  "structural_arithmetic": {
+    "chance_depth1_nodes": 5,
+    "chance_depth2_nodes_cumulative": 1034,
+    "chance_depth1_child_edges": 245,
+    "chance_depth2_child_edges_cumulative": 49637,
+    "second_layer_child_edges": 49392,
+    "scope": "One structural traversal, not Rayon job counts or elapsed work. Full-tree storage divided by disjoint second-layer subtrees is an upper-side mean work proxy.",
+    "narrow_elements_per_buffer": 10176768,
+    "expanded_elements_per_buffer": 35459676,
+    "narrow_upper_mean_elements_per_second_layer_child": 206.0408163265306,
+    "expanded_upper_mean_elements_per_second_layer_child": 717.9234693877551,
+    "narrow_two_buffer_bytes_written_N16": 1302626304,
+    "expanded_two_buffer_bytes_written_N16": 4538838528,
+    "write_scope": "Logical storage writes only, excluding reads/scratch/terminal work; not DRAM traffic."
+  },
+  "prospective_wider_range": {
+    "source": "examples/postflop_srp20.toml:7-8",
+    "retained_board": "Qs Jh 2h",
+    "source_class_combos": [
+      330,
+      454
+    ],
+    "positive_root_combos": [
+      287,
+      403
+    ],
+    "same_tree_action_edges_per_seat": 159012,
+    "F32_two_array_payload_bytes": 877746240,
+    "not_os_peak_or_native_validation": true,
+    "external_reference_equivalence": false
+  },
+  "diagnostic_proposal": {
+    "source": "current baseline only",
+    "build_logical_cpus": 2,
+    "target_cpu": "x86-64-v3",
+    "frame_pointers": true,
+    "debug_info": "line-tables-only",
+    "measurement_same_boot_logical_cpus": 32,
+    "iterations": 64,
+    "cases": [
+      "narrow",
+      "expanded"
+    ],
+    "workers": [
+      16,
+      32
+    ],
+    "rounds": 2,
+    "profile_runs": 8,
+    "separate_one_worker_canonical_runs": 2,
+    "event_proposal": "cpu-clock",
+    "frequency_hz": 97,
+    "call_graph_proposal": "fp,32",
+    "clock": "CLOCK_MONOTONIC",
+    "perf_data_cap_proposal_bytes_each": 16777216,
+    "unavailable_preflight": "Stop without automatic alternative or experiment start",
+    "performance_acceptance": null
+  },
+  "candidate_ordering": "Profile first; substantial update/intermediate-buffer CPU motivates completing fused-update comparison; serial-root work plus waiting motivates root-action; widespread scheduler overhead motivates coarser jobs rather than additional forks.",
+  "prior_fused_result": "VM17 44/54 solves verified but full performance screen not_evaluable; no adoption or performance inference from the prefix.",
+  "VM18_screen": "rejected",
+  "limits": [
+    "CPU samples do not measure off-CPU waiting or establish bandwidth/false-sharing causes.",
+    "Unknown/truncated/LOST/throttled samples must remain visible; inline and libc frames may be incomplete.",
+    "Same-state N64 is not convergence to a quality target or external acceptance.",
+    "Guest 32 logical CPUs do not imply 32 dedicated physical cores or twofold speedup from 16.",
+    "Actual perf version/options/permissions, total deadlines, recovery and evidence-size bounds still require a separate fixed execution protocol."
+  ],
+  "primary_references": [
+    "https://raw.githubusercontent.com/torvalds/linux/master/tools/perf/Documentation/perf-record.txt",
+    "https://raw.githubusercontent.com/torvalds/linux/v6.12/tools/perf/Documentation/perf-report.txt",
+    "https://doc.rust-lang.org/rustc/codegen-options/index.html"
+  ]
+}

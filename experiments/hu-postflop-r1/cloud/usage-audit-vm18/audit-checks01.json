@@ -1,0 +1,166 @@
+{
+  "schema": "r1.vm18-usage-audit-checks/v1",
+  "at_utc": "2026-09-27T07:57:56.961011+00:00",
+  "source_before": [
+    {
+      "path": "analyze.py",
+      "bytes": 20759,
+      "sha256": "7187f3fa19b73b3dcbd2945ea565b78aacb5479599874cbb3390273778b9cc2b"
+    },
+    {
+      "path": "test_analyze.py",
+      "bytes": 4154,
+      "sha256": "04fb6930496ebca57a76349bdde77a388ec930001430e5e5dd0141db762995aa"
+    },
+    {
+      "path": "collect.py",
+      "bytes": 14000,
+      "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+    },
+    {
+      "path": "test_collect.py",
+      "bytes": 5408,
+      "sha256": "281b51a94f22971ecaf86d548009685113b5ac9c6e043aac41efdb6b3d5c723f"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 6487,
+      "sha256": "a81c4c5491253e2eb758ae0ac6c4d3aad9ce6c69b4c7be420224637bcbafde6f"
+    },
+    {
+      "path": "report.json",
+      "bytes": 14303,
+      "sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8"
+    },
+    {
+      "path": "acquisition.json",
+      "bytes": 41295,
+      "sha256": "d63792777cf26e5e267ee09de408299745ef4c0d14ac780c3bfc07383eb4409b"
+    },
+    {
+      "path": "download-check-original.json",
+      "bytes": 941,
+      "sha256": "2478ed980f338e5ceb86f603ea3e2d46d4d83868bbc3c086ad908c04b824d0aa"
+    }
+  ],
+  "source_after": [
+    {
+      "path": "analyze.py",
+      "bytes": 20759,
+      "sha256": "7187f3fa19b73b3dcbd2945ea565b78aacb5479599874cbb3390273778b9cc2b"
+    },
+    {
+      "path": "test_analyze.py",
+      "bytes": 4154,
+      "sha256": "04fb6930496ebca57a76349bdde77a388ec930001430e5e5dd0141db762995aa"
+    },
+    {
+      "path": "collect.py",
+      "bytes": 14000,
+      "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+    },
+    {
+      "path": "test_collect.py",
+      "bytes": 5408,
+      "sha256": "281b51a94f22971ecaf86d548009685113b5ac9c6e043aac41efdb6b3d5c723f"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 6487,
+      "sha256": "a81c4c5491253e2eb758ae0ac6c4d3aad9ce6c69b4c7be420224637bcbafde6f"
+    },
+    {
+      "path": "report.json",
+      "bytes": 14303,
+      "sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8"
+    },
+    {
+      "path": "acquisition.json",
+      "bytes": 41295,
+      "sha256": "d63792777cf26e5e267ee09de408299745ef4c0d14ac780c3bfc07383eb4409b"
+    },
+    {
+      "path": "download-check-original.json",
+      "bytes": 941,
+      "sha256": "2478ed980f338e5ceb86f603ea3e2d46d4d83868bbc3c086ad908c04b824d0aa"
+    }
+  ],
+  "unchanged": true,
+  "ast_files": 4,
+  "readme_links_verified": true,
+  "pure_tests": {
+    "argv": [
+      "C:/Python313/python.exe",
+      "-B",
+      "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm18\\test_analyze.py"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.24092720006592572
+  },
+  "initial_test_failure": "Expected-value literal corrected from1.483022667 to1.483022000; arithmetic implementation unchanged; initial failure retained",
+  "generation": {
+    "argv": [
+      "C:/Python313/python.exe",
+      "-B",
+      "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm18\\analyze.py"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.518398700049147
+  },
+  "replay": {
+    "argv": [
+      "C:/Python313/python.exe",
+      "-B",
+      "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm18\\analyze.py",
+      "--check"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.3572247000411153
+  },
+  "logs": [
+    {
+      "path": "audit-replay01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "audit-replay01.stdout.log",
+      "bytes": 11247,
+      "sha256": "db7aae39b51e89dcf023226f2086bd88c0705caa1c2e69b0e8296f3986d19222"
+    },
+    {
+      "path": "audit-tests01.stderr.log",
+      "bytes": 1858,
+      "sha256": "e2aef42d01d492c0d441e2a76717fbfb3836bd29758cc8a561e5d16ae7977209"
+    },
+    {
+      "path": "audit-tests01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "audit-tests02.stderr.log",
+      "bytes": 1099,
+      "sha256": "d71893f6a955a597011d5fe8856c50ff09a2b5a98ca039a8353c625264345752"
+    },
+    {
+      "path": "audit-tests02.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "generate01.stdout.log",
+      "bytes": 11247,
+      "sha256": "db7aae39b51e89dcf023226f2086bd88c0705caa1c2e69b0e8296f3986d19222"
+    },
+    {
+      "path": "generate01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cloud_calls": 0,
+  "ledger_mutations": false,
+  "native_execution": false,
+  "archive_bytes_read": 0
+}

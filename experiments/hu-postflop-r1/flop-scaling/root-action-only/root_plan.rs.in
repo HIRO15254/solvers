@@ -1,0 +1,36 @@
+    /// Research-only CFR entry plan. Mixed trees may fork at the root action
+    /// only; chance-free trees retain the accepted action plan unchanged.
+    /// This does not consume or disable the independent chance-depth budget.
+    fn for_cfr(tree: &PublicTree) -> Option<Self> {
+        if !tree.subtree_has_chance[0] {
+            return Self::new(tree);
+        }
+        let workers = rayon::current_num_threads();
+        if workers == 1
+            || tree.node(0).kind != NodeKind::Action
+            || subtree_elements(tree, 0) < 2 * ACTION_PAR_MIN_GRAIN
+        {
+            return None;
+        }
+        let grain = subtree_elements(tree, 0)
+            .div_ceil(workers.saturating_mul(ACTION_PAR_TASKS_PER_WORKER))
+            .clamp(ACTION_PAR_MIN_GRAIN, ACTION_PAR_MAX_GRAIN);
+        if tree
+            .children(0)
+            .filter(|&child| subtree_elements(tree, child) >= grain)
+            .take(2)
+            .count()
+            != 2
+        {
+            return None;
+        }
+        // All non-root flags stay false, including action descendants before
+        // the first chance. Existing chance recursion already clears the plan.
+        let mut nodes = vec![ActionSplit::default(); tree.nodes.len()];
+        nodes[0] = ActionSplit {
+            here: true,
+            below: true,
+        };
+        Some(Self { nodes })
+    }
+

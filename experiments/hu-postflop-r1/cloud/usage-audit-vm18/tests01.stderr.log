@@ -1,0 +1,12 @@
+test_actual_launch_and_original_uncertainty (__main__.CollectorTests.test_actual_launch_and_original_uncertainty) ... ok
+test_missing_absence_and_changed_stop_rejected (__main__.CollectorTests.test_missing_absence_and_changed_stop_rejected) ... ok
+test_nonterminal_error_and_wrong_identity_rejected (__main__.CollectorTests.test_nonterminal_error_and_wrong_identity_rejected) ... ok
+test_two_metrics_and_timezone_required (__main__.CollectorTests.test_two_metrics_and_timezone_required) ... ok
+test_valid_same_id_terminal_cleanup (__main__.CollectorTests.test_valid_same_id_terminal_cleanup) ... ok
+test_wrong_delete_query_rejected (__main__.CollectorTests.test_wrong_delete_query_rejected) ... ok
+test_wrong_inventory_query_or_content_rejected (__main__.CollectorTests.test_wrong_inventory_query_or_content_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.010s
+
+OK

@@ -1,0 +1,55 @@
+{
+  "schema": "r1.root-action-only-test-overlay/v1",
+  "scope": "Apply only to a fresh research source copy; no production/oracle source modification or execution by this manifest",
+  "production_solver": {
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  },
+  "files": {
+    "crates/engine/src/solver.rs": {
+      "source": "solver.rs",
+      "bytes": 62079,
+      "sha256": "2b641b2ec597207ca9815572945f9f6285de91ab94cdbbddd6e00b9b3fdbbeb7"
+    },
+    "crates/engine/tests/root_action_paths.rs": {
+      "source": "root_action_paths.rs",
+      "bytes": 13955,
+      "sha256": "a99ee836de6c9d390a34af4ad7c6287585b5b482c5abef35126dad369470dada"
+    },
+    "crates/holdem/tests/root_action_oracle.rs": {
+      "source": "root_action_oracle.rs",
+      "bytes": 6040,
+      "sha256": "01f477438f5214431b7089bef2ac310acc6fc579892b3af7fb12b4e5e2cb10c6"
+    }
+  },
+  "expected_test_names": {
+    "engine_lib": [
+      "root_action_only_tests::cfr_mixed_root_requires_two_large_children_and_only_marks_root",
+      "root_action_only_tests::cfr_mixed_root_does_not_search_below_a_single_heavy_child",
+      "root_action_only_tests::cfr_serial_and_chance_root_remain_without_action_plan",
+      "root_action_only_tests::cfr_chance_free_plan_is_identical_to_existing_plan"
+    ],
+    "engine_paths": [
+      "root_action_paths_f32_state_values_cfv_and_steps",
+      "root_action_paths_i16_state_values_cfv_and_steps",
+      "root_action_path_is_actually_parallel_with_chance_disabled"
+    ],
+    "holdem_oracle_filter": [
+      "root_action_profile_f32_matches_independent_scalar_ev_br",
+      "root_action_profile_i16_matches_independent_scalar_ev_br"
+    ]
+  },
+  "fixture": {
+    "nodes": 487,
+    "storage_refs": 195,
+    "storage_elements": 8706,
+    "root_child_elements": [
+      4352,
+      4352
+    ],
+    "rendezvous_timeout_seconds": 2,
+    "oracle_abs_tolerance": 0.0001
+  },
+  "compiled": false,
+  "executed": false
+}

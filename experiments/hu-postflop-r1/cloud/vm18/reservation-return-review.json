@@ -1,0 +1,30 @@
+{
+  "at_utc": "2026-09-27T08:04:06.508769+00:00",
+  "result": "passed",
+  "reviewer": "independent ev_validation_evidence agent",
+  "checked": [
+    "Only VM18 reserved_usd changed from2.5 to1.5, plus one row event and one audit event; every other ledger value matches previous version",
+    "held39USD/available1USD; original1USD uncertainty and512MiB allowance retained",
+    "billed_usd=null/reservation_released=false and all application pins agree"
+  ],
+  "reexecution": false,
+  "cloud_calls": false,
+  "pins": {
+    "apply-reservation-return.py": {
+      "bytes": 5039,
+      "sha256": "78500a4ddaffb4aa66a9e8ea3a9803800484b2da4f311d0197d3ac9ead44624c"
+    },
+    "budget-before-reservation-return.json": {
+      "bytes": 80712,
+      "sha256": "e3902d82766c3ec5d83b8833b67cb52fbab8fc653174a5ab4150d5009b7240f7"
+    },
+    "reservation-return-applied.json": {
+      "bytes": 1654,
+      "sha256": "bbc627c9b3eab6f2efcee9e4a9e5af6e172d24b64db564355a089a85bbd0c5e5"
+    }
+  },
+  "ledger": {
+    "bytes": 83152,
+    "sha256": "dd3d8ae625fd9785f42ee9b2ec96bc54f79dbc143ec96e12bce61c1caea6c535"
+  }
+}

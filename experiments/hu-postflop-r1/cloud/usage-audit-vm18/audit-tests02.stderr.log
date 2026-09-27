@@ -1,0 +1,13 @@
+test_actual_window_arithmetic_preserves_reserves (__main__.UsageTests.test_actual_window_arithmetic_preserves_reserves) ... ok
+test_empty_metric_is_unknown_not_zero (__main__.UsageTests.test_empty_metric_is_unknown_not_zero) ... ok
+test_internal_gap_remains_unknown (__main__.UsageTests.test_internal_gap_remains_unknown) ... ok
+test_invalid_duplicate_overlapping_metric_rejected (__main__.UsageTests.test_invalid_duplicate_overlapping_metric_rejected) ... ok
+test_network_known_or_observed_excess_expands_allowance (__main__.UsageTests.test_network_known_or_observed_excess_expands_allowance) ... ok
+test_no_restoration_when_model_exceeds_reservation (__main__.UsageTests.test_no_restoration_when_model_exceeds_reservation) ... ok
+test_resize_scope_and_readback_mutations_rejected (__main__.UsageTests.test_resize_scope_and_readback_mutations_rejected) ... ok
+test_rounding_includes_120_seconds_and_full_disk (__main__.UsageTests.test_rounding_includes_120_seconds_and_full_disk) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+OK

@@ -1,0 +1,63 @@
+{
+  "schema": "r1.vm18-usage-preparation-checks/v1",
+  "at_utc": "2026-09-27T07:36:00.217034+00:00",
+  "command": [
+    "C:/Python313/python.exe",
+    "-B",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-audit-vm18\\test_collect.py"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.194080000044778,
+  "python_ast_files": 2,
+  "source_before": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/collect.py",
+      "bytes": 14000,
+      "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/test_collect.py",
+      "bytes": 5408,
+      "sha256": "281b51a94f22971ecaf86d548009685113b5ac9c6e043aac41efdb6b3d5c723f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/README.jp.md",
+      "bytes": 3055,
+      "sha256": "33579e996b7acf51ee7f007d630613a180ca7cf2123c72eb5eccc33e9d92ba7f"
+    }
+  ],
+  "source_after": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/collect.py",
+      "bytes": 14000,
+      "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/test_collect.py",
+      "bytes": 5408,
+      "sha256": "281b51a94f22971ecaf86d548009685113b5ac9c6e043aac41efdb6b3d5c723f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/README.jp.md",
+      "bytes": 3055,
+      "sha256": "33579e996b7acf51ee7f007d630613a180ca7cf2123c72eb5eccc33e9d92ba7f"
+    }
+  ],
+  "unchanged": true,
+  "logs": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/tests01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/tests01.stderr.log",
+      "bytes": 935,
+      "sha256": "8bc2b1247dc85362e9a79ec9e08a6bc3d18b896a7c35e4aef35e9c4d820f56ea"
+    }
+  ],
+  "external_calls": 0,
+  "collector_main_executed": false,
+  "budget_mutations": false,
+  "native_execution": false
+}

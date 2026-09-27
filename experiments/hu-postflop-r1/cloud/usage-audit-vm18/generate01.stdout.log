@@ -1,0 +1,379 @@
+{
+  "arithmetic": {
+    "whole_minutes": 34,
+    "overlapping_large_minutes": 13,
+    "disk_minutes": 34,
+    "network_allowance_gib": "0.5",
+    "components_usd": {
+      "whole_lifetime_small_compute": "0.07933333333333333333333333334",
+      "overlapping_large_window_compute": "0.2491666666666666666666666667",
+      "whole_lifetime_ipv4": "0.001416666666666666666666666667",
+      "same_disk_lifetime_40gib": "0.003105333333333333333333333334",
+      "network_allowance": "0.150",
+      "original_uncertainty_reserve": "1"
+    },
+    "total_usd": "1.483022000000000000000000000",
+    "rounded_hold_usd": "1.5",
+    "restore_usd": "1.0",
+    "margin_above_model_usd": "0.016978000000000000000000000",
+    "flat_highest_compute_alternative_usd": "1.806188666666666666666666667"
+  },
+  "proposal": {
+    "available": true,
+    "held_before_usd": "2.5",
+    "hold_usd": "1.5",
+    "restore_usd": "1.0",
+    "original_uncertainty_reserve_usd": "1",
+    "applied": false
+  },
+  "metrics": {
+    "sent": {
+      "available": true,
+      "points": 28,
+      "observed_sum": "131083237",
+      "first_start": "2026-09-27T07:17:00.001Z",
+      "last_end": "2026-09-27T07:47:00Z",
+      "internal_gaps": [
+        {
+          "from": "2026-09-27T07:18:00Z",
+          "to": "2026-09-27T07:18:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:19:00Z",
+          "to": "2026-09-27T07:19:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:20:00Z",
+          "to": "2026-09-27T07:20:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:21:00Z",
+          "to": "2026-09-27T07:21:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:22:00Z",
+          "to": "2026-09-27T07:22:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:23:00Z",
+          "to": "2026-09-27T07:23:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:24:00Z",
+          "to": "2026-09-27T07:24:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:25:00Z",
+          "to": "2026-09-27T07:25:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:26:00Z",
+          "to": "2026-09-27T07:27:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:28:00Z",
+          "to": "2026-09-27T07:28:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:29:00Z",
+          "to": "2026-09-27T07:29:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:30:00Z",
+          "to": "2026-09-27T07:30:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:31:00Z",
+          "to": "2026-09-27T07:31:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:32:00Z",
+          "to": "2026-09-27T07:32:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:33:00Z",
+          "to": "2026-09-27T07:33:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:34:00Z",
+          "to": "2026-09-27T07:34:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:35:00Z",
+          "to": "2026-09-27T07:36:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:37:00Z",
+          "to": "2026-09-27T07:37:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:38:00Z",
+          "to": "2026-09-27T07:38:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:39:00Z",
+          "to": "2026-09-27T07:39:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:40:00Z",
+          "to": "2026-09-27T07:40:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:41:00Z",
+          "to": "2026-09-27T07:41:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:42:00Z",
+          "to": "2026-09-27T07:42:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:43:00Z",
+          "to": "2026-09-27T07:43:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:44:00Z",
+          "to": "2026-09-27T07:44:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:45:00Z",
+          "to": "2026-09-27T07:45:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:46:00Z",
+          "to": "2026-09-27T07:46:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "launch_to_first_observation_seconds": "0",
+      "last_observation_to_absence_seconds": "112.424052"
+    },
+    "uptime": {
+      "available": true,
+      "points": 28,
+      "observed_sum": "1532.222950000000083",
+      "first_start": "2026-09-27T07:17:00.001Z",
+      "last_end": "2026-09-27T07:47:00Z",
+      "internal_gaps": [
+        {
+          "from": "2026-09-27T07:18:00Z",
+          "to": "2026-09-27T07:18:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:19:00Z",
+          "to": "2026-09-27T07:19:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:20:00Z",
+          "to": "2026-09-27T07:20:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:21:00Z",
+          "to": "2026-09-27T07:21:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:22:00Z",
+          "to": "2026-09-27T07:22:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:23:00Z",
+          "to": "2026-09-27T07:23:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:24:00Z",
+          "to": "2026-09-27T07:24:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:25:00Z",
+          "to": "2026-09-27T07:25:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:26:00Z",
+          "to": "2026-09-27T07:27:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:28:00Z",
+          "to": "2026-09-27T07:28:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:29:00Z",
+          "to": "2026-09-27T07:29:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:30:00Z",
+          "to": "2026-09-27T07:30:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:31:00Z",
+          "to": "2026-09-27T07:31:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:32:00Z",
+          "to": "2026-09-27T07:32:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:33:00Z",
+          "to": "2026-09-27T07:33:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:34:00Z",
+          "to": "2026-09-27T07:34:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:35:00Z",
+          "to": "2026-09-27T07:36:00.001Z",
+          "seconds": "60.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:37:00Z",
+          "to": "2026-09-27T07:37:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:38:00Z",
+          "to": "2026-09-27T07:38:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:39:00Z",
+          "to": "2026-09-27T07:39:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:40:00Z",
+          "to": "2026-09-27T07:40:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:41:00Z",
+          "to": "2026-09-27T07:41:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:42:00Z",
+          "to": "2026-09-27T07:42:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:43:00Z",
+          "to": "2026-09-27T07:43:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:44:00Z",
+          "to": "2026-09-27T07:44:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:45:00Z",
+          "to": "2026-09-27T07:45:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        },
+        {
+          "from": "2026-09-27T07:46:00Z",
+          "to": "2026-09-27T07:46:00.001Z",
+          "seconds": "0.001",
+          "missing_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "launch_to_first_observation_seconds": "0",
+      "last_observation_to_absence_seconds": "112.424052"
+    }
+  }
+}

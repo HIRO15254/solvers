@@ -1,0 +1,24 @@
+{
+  "at_utc": "2026-09-27T08:04:06.525048+00:00",
+  "local_links_checked": 116,
+  "pins": {
+    "experiments/README.md": {
+      "bytes": 23443,
+      "sha256": "86086d9e606cdec9164954f8ff41f796b84db7f58e55b9046dc916cd3a6c02b8"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/root-action-only/protocol.jp.md": {
+      "bytes": 9835,
+      "sha256": "ce192a6b3365a466e02b0e96b3189f18c6c25df1525fa9a1b4c49b7af55a6c4d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/cpu-profile/proposal.jp.md": {
+      "bytes": 10403,
+      "sha256": "efa6ab53d40a5ed8ce6683ec52f51931fff92d52086e2e47ef4c9fb30845c952"
+    }
+  },
+  "research_native_tests": "not_compiled_or_executed",
+  "local_archive_reads": false,
+  "production_solver": {
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  }
+}

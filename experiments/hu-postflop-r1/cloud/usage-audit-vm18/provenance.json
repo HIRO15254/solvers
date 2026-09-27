@@ -1,0 +1,55 @@
+{
+  "schema": "r1.vm18-usage-collector-preparation/v1",
+  "source": {
+    "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm17/collect.py",
+    "bytes": 12547,
+    "sha256": "f51750c2961b0c4a45c64f52f5f826a80792f80bae7f6c06ab25c62c0b52c473"
+  },
+  "prepared_files": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/collect.py",
+      "bytes": 14000,
+      "sha256": "fbb063bce32a7d8b2a2499f3286dcf3f145c0c52f399659856ba230b17c2e907"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/test_collect.py",
+      "bytes": 5408,
+      "sha256": "281b51a94f22971ecaf86d548009685113b5ac9c6e043aac41efdb6b3d5c723f"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/README.jp.md",
+      "bytes": 3055,
+      "sha256": "33579e996b7acf51ee7f007d630613a180ca7cf2123c72eb5eccc33e9d92ba7f"
+    }
+  ],
+  "bound_inputs": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/preflight-vm18/cost-proposal.json",
+      "bytes": 5224,
+      "sha256": "ac3f0b6a16187f9f97317df23881f8abb9926e79b575cdc9095e9a1a354c5745"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/launch-r1-20260927-18.json",
+      "bytes": 1184,
+      "sha256": "f5e72dca44e103ddf1c910a7286cda64e105be870b3d5255eab06b2391f297a8"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/reservation.json",
+      "bytes": 1641,
+      "sha256": "8ce04f2cf9ef886f2b9d10ebe29848b2325dc2329d2e2fe776d5773c545413ca"
+    }
+  ],
+  "changes": [
+    "VM18 fixed project/name/numeric ID/request/STOP/pricing proposal",
+    "Removed VM17 fourth-start exception; no VM18 exception inferred",
+    "Verify original reservation including $1 uncertainty, same-ID delete query and post-delete inventory scope/timestamps",
+    "Retain all bounded captured SDK command outputs including failed transfer/recovery attempts",
+    "No analyzer, budget write, metric aggregate or incomplete-coverage zero fill"
+  ],
+  "checks": {
+    "path": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/checks01.json",
+    "bytes": 2227,
+    "sha256": "4de11ca1496703a9a9398951cd154c2bacb2c11a683d390a8758383a2af9db95"
+  },
+  "collector_main_executed": false
+}

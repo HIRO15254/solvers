@@ -1,0 +1,43 @@
+{
+  "build": {
+    "service_exit": 0,
+    "service": "MainPID=3141\nResult=success\nActiveState=active",
+    "status": "running",
+    "stages": [
+      {
+        "name": "toolchain",
+        "status": "completed",
+        "started_at": "2026-09-27T07:20:21.443927+00:00",
+        "ended_at": "2026-09-27T07:20:21.649559+00:00"
+      },
+      {
+        "name": "build-baseline",
+        "status": "completed",
+        "started_at": "2026-09-27T07:20:21.960030+00:00",
+        "ended_at": "2026-09-27T07:21:25.578165+00:00"
+      },
+      {
+        "name": "tests-baseline",
+        "status": "running",
+        "started_at": "2026-09-27T07:21:25.924491+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 2,
+      "running": 1,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0
+    },
+    "error": null,
+    "stage_stderr_tail": "   Compiling holdem v0.1.0 (/opt/r1/flop-chance-grain-package/source-baseline/crates/holdem)\n"
+  },
+  "measure": {
+    "service_exit": 0,
+    "service": "MainPID=0\nResult=success\nActiveState=inactive"
+  },
+  "source_archive": {
+    "bytes": 967265,
+    "sha256": "83fc42a73c202a7754889fd6bcefe984ffd575d0883545dc13a9068be0f3691c"
+  }
+}

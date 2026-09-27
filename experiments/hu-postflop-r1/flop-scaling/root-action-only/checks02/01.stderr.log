@@ -1,0 +1,9 @@
+test_changed_baseline_and_ambiguous_anchors_rejected (test_prepare.SourceScope.test_changed_baseline_and_ambiguous_anchors_rejected) ... ok
+test_exact_application_and_inverse (test_prepare.SourceScope.test_exact_application_and_inverse) ... ok
+test_only_two_cfr_entries_and_existing_quality_guard (test_prepare.SourceScope.test_only_two_cfr_entries_and_existing_quality_guard) ... ok
+test_quality_or_arithmetic_mutation_rejected (test_prepare.SourceScope.test_quality_or_arithmetic_mutation_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+OK

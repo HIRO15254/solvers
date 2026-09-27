@@ -1,0 +1,91 @@
+{
+  "schema": "r1.root-action-only-check/v1",
+  "created_at": "2026-09-27T07:53:17.814950+00:00",
+  "commands": [
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "experiments\\hu-postflop-r1\\flop-scaling\\root-action-only\\prepare.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3170805999543518,
+      "stdout": {
+        "bytes": 282,
+        "sha256": "a4388d04eb62ec4e4e2b4d9d95252dcb617c72887ea48752efeb3ed5bab2a5f3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:/Python313/python.exe",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "experiments\\hu-postflop-r1\\flop-scaling\\root-action-only",
+        "-p",
+        "test_prepare.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.15826639998704195,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 615,
+        "sha256": "b489ae985ced3aa8c2633709b9e12972b35ce903798b619fc7f8cd1bc3f2154b"
+      }
+    }
+  ],
+  "pure_tests": 4,
+  "ast_files": 2,
+  "compiler_or_solver_execution": false,
+  "rust_unit_tests_executed": false,
+  "cloud_actions": false,
+  "controls": {
+    "candidate.patch": {
+      "bytes": 6972,
+      "sha256": "3df82a0d2c8889d85ab846c576e0097e9a5cb8a3af58536c18ae7c2962b457f3"
+    },
+    "plan_tests.rs.in": {
+      "bytes": 4280,
+      "sha256": "d895f8ca26a21561d22e45174b94f2871a6e93664805e584ba1cac965551f024"
+    },
+    "prepare.py": {
+      "bytes": 4432,
+      "sha256": "1ab69da8c6ae313105324c9d0b661cef1a7f47ab2bc45c6da37f64cf75ff5c02"
+    },
+    "protocol.jp.md": {
+      "bytes": 6568,
+      "sha256": "84b5222e9177be217df570b86c661c8101355b81a7b665401af4ffd1182621c9"
+    },
+    "provenance.json": {
+      "bytes": 1260,
+      "sha256": "cefe4e42c6f29c1fc0d55a0c315e9255fab4a1331be8297ed3bd96de80f85ad7"
+    },
+    "root_plan.rs.in": {
+      "bytes": 1370,
+      "sha256": "3db9af1d1118a458dbe6f8e58dc413d62e4980fd76d2a6ff66aba08116033d3a"
+    },
+    "solver.rs": {
+      "bytes": 62079,
+      "sha256": "2b641b2ec597207ca9815572945f9f6285de91ab94cdbbddd6e00b9b3fdbbeb7"
+    },
+    "test_prepare.py": {
+      "bytes": 2509,
+      "sha256": "18e890f86113d13d03e156e2a8c4d7a7746311a63da8128b9a353284f9f0cca0"
+    }
+  },
+  "production_solver": {
+    "bytes": 56421,
+    "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+  }
+}

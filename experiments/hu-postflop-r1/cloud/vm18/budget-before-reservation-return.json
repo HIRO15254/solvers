@@ -1309,7 +1309,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260927-18",
-      "reserved_usd": 1.5,
+      "reserved_usd": 2.5,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_seconds": 3600,
@@ -1336,22 +1336,7 @@
       "pricing_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm18/cost-proposal.json",
       "purpose": "Portable2CPU build/core tests followed by32CPU fixed38-solve chance-depth1 versus2 comparison",
       "preflight_evidence": "experiments/hu-postflop-r1/cloud/vm18/",
-      "note": "Single instance, launch+20min build deadline,20min measurement,15min recovery before fixed60min STOP. All38 solves share32CPU boot and binary; no local native work. Full62min highest regular rate plus40GiB24h disk,.5GiB egress,$1 uncertainty models2.472436667. Estimate only; billed unknown.",
-      "events": [
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:59:19.532704+00:00",
-          "id": "r1-20260927-18",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 1.5,
-          "restored_to_available_budget_usd": 1,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/report.json",
-          "evidence_sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "User-authorized reuse of unused reservation; original $1 uncertainty and 512MiB allowance retained. Missing Monitoring traffic remains unknown."
-        }
-      ]
+      "note": "Single instance, launch+20min build deadline,20min measurement,15min recovery before fixed60min STOP. All38 solves share32CPU boot and binary; no local native work. Full62min highest regular rate plus40GiB24h disk,.5GiB egress,$1 uncertainty models2.472436667. Estimate only; billed unknown."
     }
   ],
   "usage_reconciliations": [
@@ -1608,50 +1593,6 @@
       "billed_usd": null,
       "final_invoice": false,
       "cloud_mutations": false
-    },
-    {
-      "at_utc": "2026-09-27T07:59:19.532704+00:00",
-      "authorized_limit_usd": 40,
-      "held_before_usd": 40,
-      "held_after_usd": 39,
-      "restored_usd": 1,
-      "available_after_usd": 1,
-      "changes": [
-        {
-          "event": "usage_based_lifecycle_reservation_reconciliation",
-          "at": "2026-09-27T07:59:19.532704+00:00",
-          "id": "r1-20260927-18",
-          "old_reserved_usd": 2.5,
-          "new_reserved_usd": 1.5,
-          "restored_to_available_budget_usd": 1,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm18/report.json",
-          "evidence_sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "User-authorized reuse of unused reservation; original $1 uncertainty and 512MiB allowance retained. Missing Monitoring traffic remains unknown."
-        }
-      ],
-      "report": {
-        "bytes": 14303,
-        "sha256": "b68dbe4dbc225e7dede745b370c92b49ebe0a3b455e32130a893f4621f16b9b8"
-      },
-      "analyzer": {
-        "bytes": 20759,
-        "sha256": "7187f3fa19b73b3dcbd2945ea565b78aacb5479599874cbb3390273778b9cc2b"
-      },
-      "application_source": {
-        "bytes": 5039,
-        "sha256": "78500a4ddaffb4aa66a9e8ea3a9803800484b2da4f311d0197d3ac9ead44624c"
-      },
-      "budget_before": {
-        "bytes": 80712,
-        "sha256": "e3902d82766c3ec5d83b8833b67cb52fbab8fc653174a5ab4150d5009b7240f7"
-      },
-      "billed_usd": null,
-      "final_invoice": false,
-      "cloud_mutations": false,
-      "archive_access": false,
-      "independent_cost_arithmetic_usd": "1.483022000000000000000000000"
     }
   ]
 }
