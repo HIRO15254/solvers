@@ -1,0 +1,302 @@
+{
+  "schema": "solvers.r1.local-scaling-preflight/v1",
+  "observer_pid": 64524,
+  "logical_cpu_count": 16,
+  "observer_source_sha256": "e389c342f109b2f259e1dc2d249a8cb859c1c86a63fc79a337ab416ad985d337",
+  "memory_helper_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+  "points": [
+    {
+      "at": "2026-09-27T02:05:48.880937+00:00",
+      "monotonic_seconds": 1309083.1430901,
+      "idle_ticks": 160181043906250,
+      "kernel_ticks": 174572068437500,
+      "user_ticks": 34467977343750,
+      "memory": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5821382656,
+        "commit_available_bytes": 3984928768
+      },
+      "process_coverage": {
+        "enumerated": 456,
+        "readable": 313,
+        "inaccessible_or_exited": 143
+      },
+      "watched_processes": [],
+      "query_seconds": 0.02086529997177422
+    },
+    {
+      "at": "2026-09-27T02:05:53.902446+00:00",
+      "monotonic_seconds": 1309088.1646004,
+      "idle_ticks": 160181709687500,
+      "kernel_ticks": 174572782187500,
+      "user_ticks": 34468066093750,
+      "memory": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5822115840,
+        "commit_available_bytes": 3984097280
+      },
+      "process_coverage": {
+        "enumerated": 458,
+        "readable": 315,
+        "inaccessible_or_exited": 143
+      },
+      "watched_processes": [],
+      "query_seconds": 0.016615699976682663
+    },
+    {
+      "at": "2026-09-27T02:05:58.919945+00:00",
+      "monotonic_seconds": 1309093.1820999,
+      "idle_ticks": 160182448437500,
+      "kernel_ticks": 174573558750000,
+      "user_ticks": 34468092031250,
+      "memory": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5824917504,
+        "commit_available_bytes": 4018073600
+      },
+      "process_coverage": {
+        "enumerated": 457,
+        "readable": 314,
+        "inaccessible_or_exited": 143
+      },
+      "watched_processes": [],
+      "query_seconds": 0.020024799974635243
+    },
+    {
+      "at": "2026-09-27T02:06:03.940877+00:00",
+      "monotonic_seconds": 1309098.203039,
+      "idle_ticks": 160183153750000,
+      "kernel_ticks": 174574308750000,
+      "user_ticks": 34468144531250,
+      "memory": {
+        "total_bytes": 34275098624,
+        "available_bytes": 5772656640,
+        "commit_available_bytes": 3943505920
+      },
+      "process_coverage": {
+        "enumerated": 458,
+        "readable": 315,
+        "inaccessible_or_exited": 143
+      },
+      "watched_processes": [],
+      "query_seconds": 0.016500799916684628
+    }
+  ],
+  "intervals": [
+    {
+      "elapsed_seconds": 5.021510299993679,
+      "total_cpu_ticks": 802500000,
+      "busy_cpu_ticks": 136718750,
+      "total_busy_percent": 17.036604361370717,
+      "average_busy_logical_cores": 2.7226619449565224,
+      "top_readable_processes": [
+        {
+          "pid": 25080,
+          "name": "Elgato.WaveLink.exe",
+          "cpu_seconds": 1.3125,
+          "average_logical_cores": 0.26137554671582613
+        },
+        {
+          "pid": 64100,
+          "name": "codex.exe",
+          "cpu_seconds": 0.578125,
+          "average_logical_cores": 0.11512970510101866
+        },
+        {
+          "pid": 10484,
+          "name": "audiodg.exe",
+          "cpu_seconds": 0.453125,
+          "average_logical_cores": 0.09023679588998759
+        },
+        {
+          "pid": 67736,
+          "name": "claude.exe",
+          "cpu_seconds": 0.34375,
+          "average_logical_cores": 0.06845550033033541
+        },
+        {
+          "pid": 30960,
+          "name": "msedgewebview2.exe",
+          "cpu_seconds": 0.265625,
+          "average_logical_cores": 0.052897432073441004
+        },
+        {
+          "pid": 85148,
+          "name": "ChatGPT.exe",
+          "cpu_seconds": 0.09375,
+          "average_logical_cores": 0.018669681908273297
+        },
+        {
+          "pid": 17100,
+          "name": "Taskmgr.exe",
+          "cpu_seconds": 0.078125,
+          "average_logical_cores": 0.015558068256894413
+        },
+        {
+          "pid": 21176,
+          "name": "OverwolfHelper.exe",
+          "cpu_seconds": 0.0625,
+          "average_logical_cores": 0.012446454605515531
+        },
+        {
+          "pid": 17428,
+          "name": "steamwebhelper.exe",
+          "cpu_seconds": 0.0625,
+          "average_logical_cores": 0.012446454605515531
+        },
+        {
+          "pid": 9864,
+          "name": "OverwolfHelper64.exe",
+          "cpu_seconds": 0.046875,
+          "average_logical_cores": 0.009334840954136649
+        }
+      ],
+      "new_or_reused_pids": 2,
+      "departed_pids": 0
+    },
+    {
+      "elapsed_seconds": 5.017499499954283,
+      "total_cpu_ticks": 802500000,
+      "busy_cpu_ticks": 63750000,
+      "total_busy_percent": 7.94392523364486,
+      "average_busy_logical_cores": 1.2705531908987904,
+      "top_readable_processes": [
+        {
+          "pid": 25080,
+          "name": "Elgato.WaveLink.exe",
+          "cpu_seconds": 1.3125,
+          "average_logical_cores": 0.2615844804791627
+        },
+        {
+          "pid": 67736,
+          "name": "claude.exe",
+          "cpu_seconds": 0.5,
+          "average_logical_cores": 0.09965123065872866
+        },
+        {
+          "pid": 10484,
+          "name": "audiodg.exe",
+          "cpu_seconds": 0.453125,
+          "average_logical_cores": 0.09030892778447284
+        },
+        {
+          "pid": 30960,
+          "name": "msedgewebview2.exe",
+          "cpu_seconds": 0.203125,
+          "average_logical_cores": 0.04048331245510852
+        },
+        {
+          "pid": 64100,
+          "name": "codex.exe",
+          "cpu_seconds": 0.171875,
+          "average_logical_cores": 0.034255110538937976
+        },
+        {
+          "pid": 1652,
+          "name": "python.exe",
+          "cpu_seconds": 0.078125,
+          "average_logical_cores": 0.015570504790426353
+        },
+        {
+          "pid": 21176,
+          "name": "OverwolfHelper.exe",
+          "cpu_seconds": 0.0625,
+          "average_logical_cores": 0.012456403832341083
+        },
+        {
+          "pid": 68632,
+          "name": "claude.exe",
+          "cpu_seconds": 0.046875,
+          "average_logical_cores": 0.009342302874255812
+        },
+        {
+          "pid": 9864,
+          "name": "OverwolfHelper64.exe",
+          "cpu_seconds": 0.046875,
+          "average_logical_cores": 0.009342302874255812
+        },
+        {
+          "pid": 27720,
+          "name": "claude.exe.old.1790328125826",
+          "cpu_seconds": 0.046875,
+          "average_logical_cores": 0.009342302874255812
+        }
+      ],
+      "new_or_reused_pids": 3,
+      "departed_pids": 4
+    },
+    {
+      "elapsed_seconds": 5.0209391000680625,
+      "total_cpu_ticks": 802500000,
+      "busy_cpu_ticks": 97187500,
+      "total_busy_percent": 12.110591900311526,
+      "average_busy_logical_cores": 1.9356438718542224,
+      "top_readable_processes": [
+        {
+          "pid": 25080,
+          "name": "Elgato.WaveLink.exe",
+          "cpu_seconds": 1.28125,
+          "average_logical_cores": 0.2551813464502351
+        },
+        {
+          "pid": 10484,
+          "name": "audiodg.exe",
+          "cpu_seconds": 0.46875,
+          "average_logical_cores": 0.0933590291891104
+        },
+        {
+          "pid": 30960,
+          "name": "msedgewebview2.exe",
+          "cpu_seconds": 0.203125,
+          "average_logical_cores": 0.040455579315281175
+        },
+        {
+          "pid": 67736,
+          "name": "claude.exe",
+          "cpu_seconds": 0.140625,
+          "average_logical_cores": 0.028007708756733123
+        },
+        {
+          "pid": 15096,
+          "name": "msedgewebview2.exe",
+          "cpu_seconds": 0.109375,
+          "average_logical_cores": 0.021783773477459096
+        },
+        {
+          "pid": 6716,
+          "name": "mep.exe",
+          "cpu_seconds": 0.09375,
+          "average_logical_cores": 0.018671805837822082
+        },
+        {
+          "pid": 27720,
+          "name": "claude.exe.old.1790328125826",
+          "cpu_seconds": 0.09375,
+          "average_logical_cores": 0.018671805837822082
+        },
+        {
+          "pid": 45088,
+          "name": "rustrover64.exe",
+          "cpu_seconds": 0.09375,
+          "average_logical_cores": 0.018671805837822082
+        },
+        {
+          "pid": 21176,
+          "name": "OverwolfHelper.exe",
+          "cpu_seconds": 0.0625,
+          "average_logical_cores": 0.012447870558548055
+        },
+        {
+          "pid": 39024,
+          "name": "Notion.exe",
+          "cpu_seconds": 0.0625,
+          "average_logical_cores": 0.012447870558548055
+        }
+      ],
+      "new_or_reused_pids": 3,
+      "departed_pids": 2
+    }
+  ],
+  "scope": "Short whole-host observation including this observer; no isolation or benchmark",
+  "limits": "Process list can miss short-lived or inaccessible processes; total CPU counters cover their CPU time."
+}

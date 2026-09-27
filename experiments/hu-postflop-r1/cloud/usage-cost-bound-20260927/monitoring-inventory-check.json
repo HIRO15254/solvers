@@ -1,0 +1,59 @@
+{
+  "schema": "r1.usage-inventory-check/v1",
+  "started_at": "2026-09-27T02:29:04.714438Z",
+  "requests": [
+    {
+      "resource": "instances",
+      "url": "https://compute.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/aggregated/instances?maxResults=500&fields=items%2F%2A%2Finstances%28id%2Cname%29%2Citems%2F%2A%2Fwarning%2Cwarning%2Cunreachables%2CnextPageToken&filter=name+eq+solvers-r1-.%2A",
+      "method": "GET",
+      "requested_at": "2026-09-27T02:29:06.642184Z",
+      "http_status": 200,
+      "response": {
+        "path": "inventory-instances.json",
+        "bytes": 39626,
+        "sha256": "f46555d059e3209a229e3f844362208754deced7d2cf058d19f6495af13a7d47"
+      },
+      "completed_at": "2026-09-27T02:29:07.269260Z",
+      "returned_count": 0,
+      "no_unreachable_scopes": true
+    },
+    {
+      "resource": "disks",
+      "url": "https://compute.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/aggregated/disks?maxResults=500&fields=items%2F%2A%2Fdisks%28id%2Cname%29%2Citems%2F%2A%2Fwarning%2Cwarning%2Cunreachables%2CnextPageToken&filter=name+eq+solvers-r1-.%2A",
+      "method": "GET",
+      "requested_at": "2026-09-27T02:29:07.269775Z",
+      "http_status": 200,
+      "response": {
+        "path": "inventory-disks.json",
+        "bytes": 52529,
+        "sha256": "4a68a598589f239e9666d17c3e08bfa6f620fa6282e9839fbf1d4cb86b343fae"
+      },
+      "completed_at": "2026-09-27T02:29:07.732363Z",
+      "returned_count": 0,
+      "no_unreachable_scopes": true
+    },
+    {
+      "resource": "addresses",
+      "url": "https://compute.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/aggregated/addresses?maxResults=500&fields=items%2F%2A%2Faddresses%28id%2Cname%29%2Citems%2F%2A%2Fwarning%2Cwarning%2Cunreachables%2CnextPageToken",
+      "method": "GET",
+      "requested_at": "2026-09-27T02:29:07.736255Z",
+      "http_status": 200,
+      "response": {
+        "path": "inventory-addresses.json",
+        "bytes": 13178,
+        "sha256": "cfb80c1b81bf2342ccf5e5a6fe04b6a94700af684cec29156ba3ba2fb3a2b21b"
+      },
+      "completed_at": "2026-09-27T02:29:08.189833Z",
+      "returned_count": 0,
+      "no_unreachable_scopes": true
+    }
+  ],
+  "source": {
+    "bytes": 3470,
+    "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+  },
+  "cloud_mutations": false,
+  "authentication_exit_code": 0,
+  "status": "completed",
+  "ended_at": "2026-09-27T02:29:08.190046Z"
+}

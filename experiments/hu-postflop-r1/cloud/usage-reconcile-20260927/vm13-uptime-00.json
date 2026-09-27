@@ -1,0 +1,286 @@
+{
+  "timeSeries": [
+    {
+      "metric": {
+        "labels": {
+          "instance_name": "solvers-r1-20260926-13"
+        },
+        "type": "compute.googleapis.com/instance/uptime"
+      },
+      "resource": {
+        "type": "gce_instance",
+        "labels": {
+          "instance_id": "6526324704760165755",
+          "zone": "us-central1-b",
+          "project_id": "solvers-abstraction-20260723"
+        }
+      },
+      "metricKind": "DELTA",
+      "valueType": "DOUBLE",
+      "points": [
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:15:00.001Z",
+            "endTime": "2026-09-26T23:16:00Z"
+          },
+          "value": {
+            "doubleValue": 37.107150999999931
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:14:00.001Z",
+            "endTime": "2026-09-26T23:15:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:13:00.001Z",
+            "endTime": "2026-09-26T23:14:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:12:00.001Z",
+            "endTime": "2026-09-26T23:13:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:11:00.001Z",
+            "endTime": "2026-09-26T23:12:00Z"
+          },
+          "value": {
+            "doubleValue": 60.000000000000227
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:10:00.001Z",
+            "endTime": "2026-09-26T23:11:00Z"
+          },
+          "value": {
+            "doubleValue": 59.999999999999773
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:09:00.001Z",
+            "endTime": "2026-09-26T23:10:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:08:00.001Z",
+            "endTime": "2026-09-26T23:09:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:07:00.001Z",
+            "endTime": "2026-09-26T23:08:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:06:00.001Z",
+            "endTime": "2026-09-26T23:07:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:05:00.001Z",
+            "endTime": "2026-09-26T23:06:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:04:00.001Z",
+            "endTime": "2026-09-26T23:05:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:03:00.001Z",
+            "endTime": "2026-09-26T23:04:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:02:00.001Z",
+            "endTime": "2026-09-26T23:03:00Z"
+          },
+          "value": {
+            "doubleValue": 60.000000000000114
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:01:00.001Z",
+            "endTime": "2026-09-26T23:02:00Z"
+          },
+          "value": {
+            "doubleValue": 59.999999999999886
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T23:00:00.001Z",
+            "endTime": "2026-09-26T23:01:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:59:00.001Z",
+            "endTime": "2026-09-26T23:00:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:58:00.001Z",
+            "endTime": "2026-09-26T22:59:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:57:00.001Z",
+            "endTime": "2026-09-26T22:58:00Z"
+          },
+          "value": {
+            "doubleValue": 60.000000000000114
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:56:00.001Z",
+            "endTime": "2026-09-26T22:57:00Z"
+          },
+          "value": {
+            "doubleValue": 59.999999999999886
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:55:00.001Z",
+            "endTime": "2026-09-26T22:56:00Z"
+          },
+          "value": {
+            "doubleValue": 60.000000000000057
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:54:00.001Z",
+            "endTime": "2026-09-26T22:55:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:53:00.001Z",
+            "endTime": "2026-09-26T22:54:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:52:00.001Z",
+            "endTime": "2026-09-26T22:53:00Z"
+          },
+          "value": {
+            "doubleValue": 59.999999999999972
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:51:00.001Z",
+            "endTime": "2026-09-26T22:52:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:50:00.001Z",
+            "endTime": "2026-09-26T22:51:00Z"
+          },
+          "value": {
+            "doubleValue": 60.000000000000014
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:49:00.001Z",
+            "endTime": "2026-09-26T22:50:00Z"
+          },
+          "value": {
+            "doubleValue": 60
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:48:00.001Z",
+            "endTime": "2026-09-26T22:49:00Z"
+          },
+          "value": {
+            "doubleValue": 59.999999999999993
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T22:47:00.001Z",
+            "endTime": "2026-09-26T22:48:00Z"
+          },
+          "value": {
+            "doubleValue": 6.282991
+          }
+        }
+      ]
+    }
+  ],
+  "unit": "s{uptime}"
+}

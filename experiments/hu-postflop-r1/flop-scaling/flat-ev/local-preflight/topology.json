@@ -1,0 +1,22 @@
+{
+  "method": "Get-CimInstance Win32_Processor / Win32_OperatingSystem; selected fields only",
+  "initial_sandbox_query": "Access denied; no topology result",
+  "read_only_escalated_retry_exit_code": 0,
+  "processors": [
+    {
+      "DeviceID": "CPU0",
+      "Name": "Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz",
+      "NumberOfCores": 8,
+      "NumberOfLogicalProcessors": 16,
+      "SocketDesignation": "LGA1200"
+    }
+  ],
+  "os": {
+    "Caption": "Microsoft Windows 11 Home",
+    "Version": "10.0.26200",
+    "BuildNumber": "26200",
+    "LastBootUpTime": "2026-09-12T07:27:46.114136+09:00"
+  },
+  "processorCount": 16,
+  "scope": "Selected CIM output transcribed from this task's successful read-only query; no process command lines collected."
+}

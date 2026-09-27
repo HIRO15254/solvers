@@ -1,0 +1,86 @@
+{
+  "schema": "r1.usage-cost-source-check/v1",
+  "monitoring_checks_match_all_payload_pins": true,
+  "monitoring_analysis_exit": 0,
+  "monitoring_source_before_equals_after": true,
+  "http_200_requests": 22,
+  "independently_recomputed_metric_rows": [
+    {
+      "vm": "08",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "117027329",
+      "points": 156
+    },
+    {
+      "vm": "08",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "9117.658603000000027",
+      "points": 156
+    },
+    {
+      "vm": "09",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "14447201",
+      "points": 53
+    },
+    {
+      "vm": "09",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "3064.273573999999967",
+      "points": 53
+    },
+    {
+      "vm": "10",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "39790497",
+      "points": 109
+    },
+    {
+      "vm": "10",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "6498.670255000000002",
+      "points": 109
+    },
+    {
+      "vm": "11",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "70360127",
+      "points": 82
+    },
+    {
+      "vm": "11",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "4874.655501999999614",
+      "points": 82
+    },
+    {
+      "vm": "12",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "6951318",
+      "points": 12
+    },
+    {
+      "vm": "12",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "645.210811000000014",
+      "points": 12
+    },
+    {
+      "vm": "13",
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "sum_observed": "29321558",
+      "points": 29
+    },
+    {
+      "vm": "13",
+      "metric": "compute.googleapis.com/instance/uptime",
+      "sum_observed": "1663.390141999999964",
+      "points": 29
+    }
+  ],
+  "empty_resource_inventory_requests": 3,
+  "fresh_pricing_extract_pins_match": true,
+  "local_native_execution": false,
+  "cloud_mutations": false,
+  "budget_mutations": false
+}

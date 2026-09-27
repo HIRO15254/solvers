@@ -1,0 +1,145 @@
+{
+  "status": "passed",
+  "source_before": {
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs.json": {
+      "bytes": 1315,
+      "sha256": "5b90c9fe104f02c66cc1cad3f59c26d78ccaab5242ccecb6ae111e08f9a52596"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    "runs/flop-flat-ev01/plan.json": {
+      "bytes": 58995,
+      "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837"
+    },
+    "runs/flop-flat-ev01/build.json": {
+      "bytes": 16572,
+      "sha256": "3aca90eec943788caff56f898c6a589266cbc98ae016b35e167bcd5f9797a888"
+    },
+    "target/flop-flat-ev01/libengine.rlib": {
+      "bytes": 879906,
+      "sha256": "0337143a8cd1103fedad49989d663e57af721ec7b247471852f067db9e797904"
+    }
+  },
+  "commands": [
+    {
+      "phase": "prepare",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py",
+        "prepare"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.3959598001092672,
+      "stdout": {
+        "path": "prepare.stdout.log",
+        "bytes": 162,
+        "sha256": "f286ae676137b3d1bb397e38a83d5592af7052f1c9e02c2de5d483ec51fd05d7"
+      },
+      "stderr": {
+        "path": "prepare.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "phase": "build",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py",
+        "build"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 77.8137971998658,
+      "stdout": {
+        "path": "build.stdout.log",
+        "bytes": 56,
+        "sha256": "454431515611f3eca518ac27888d2b7f6844460d5dab8dae0b14d3af992f3c93"
+      },
+      "stderr": {
+        "path": "build.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "phase": "run",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py",
+        "run"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 12.790968299843371,
+      "stdout": {
+        "path": "run.stdout.log",
+        "bytes": 54,
+        "sha256": "7d1fa7248a747d3468b1d50450215dab708f1c3bbe55b2ba33df3eb7ea37afa5"
+      },
+      "stderr": {
+        "path": "run.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "source_after": {
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs.json": {
+      "bytes": 1315,
+      "sha256": "5b90c9fe104f02c66cc1cad3f59c26d78ccaab5242ccecb6ae111e08f9a52596"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    "runs/flop-flat-ev01/plan.json": {
+      "bytes": 58995,
+      "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837"
+    },
+    "runs/flop-flat-ev01/build.json": {
+      "bytes": 16572,
+      "sha256": "3aca90eec943788caff56f898c6a589266cbc98ae016b35e167bcd5f9797a888"
+    },
+    "target/flop-flat-ev01/libengine.rlib": {
+      "bytes": 879906,
+      "sha256": "0337143a8cd1103fedad49989d663e57af721ec7b247471852f067db9e797904"
+    }
+  },
+  "source_unchanged": true
+}

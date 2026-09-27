@@ -1,0 +1,959 @@
+{
+  "schema": "r1.usage-cost-bound-inputs/v1",
+  "captured_utc": "2026-09-27T02:26:34.520609+00:00",
+  "source_pins": {
+    "experiments/hu-postflop-r1/cloud/budget.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-08.json": {
+      "bytes": 1091,
+      "sha256": "97b31879278097341f61fccb7510a498c0ccd2c0f455b30b0a7f71de1a68ae05"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-08.json": {
+      "bytes": 30180,
+      "sha256": "cac3015bd5d0915c9908992123086395809e9d95a01e89139b015557c4fa67d4"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json": {
+      "bytes": 1250,
+      "sha256": "79d4301afe012980b037c0cecb6e059793bea0d58cf2f5729bc9893552777147"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-machine-type.json": {
+      "bytes": 33010,
+      "sha256": "dbef81a0a25bd5a0a2398ca80f5eace79853c4f4cfc33c652aa5d4ef759eb41e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-start.json": {
+      "bytes": 33129,
+      "sha256": "5a18fb345ec5c197dfd3ade319ab718a07dcb4c4c08fe06c238c7fac6390689c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-restart-description.json": {
+      "bytes": 1509,
+      "sha256": "0d7272d3c5ab0e601e60f4ec1874265fe88bfc14b46f91e6a73c322a40e0dcbd"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/start-resized.json": {
+      "bytes": 33120,
+      "sha256": "de72ff8449bbea4e288d6e082d0fecbd78dd31a7f9dd39b2f97e28780ae76a0f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm08/predelete.json": {
+      "bytes": 914,
+      "sha256": "fc5918fdcb62974a9f9010551bbf2783ce476db3e583f3138872a8b9de4a4bcb"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-09.json": {
+      "bytes": 1091,
+      "sha256": "22b7f38d5e62c03d09015a032e9e2f242946cbb50be14d311839dbe92ef76302"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-09.json": {
+      "bytes": 30180,
+      "sha256": "800f0df37cf231d3da0a0f7579cfdb0f118d460631e85cd1ab4850632fdad9f7"
+    },
+    "experiments/hu-postflop-r1/cloud/../showdown-kernel/cleanup.json": {
+      "bytes": 269,
+      "sha256": "6eb1ada64302146fc129bb71348e0188aee08de41985cc7ac6dc8a42eb574bb3"
+    },
+    "experiments/hu-postflop-r1/cloud/../showdown-kernel/vm09-final-disk.json": {
+      "bytes": 1820,
+      "sha256": "b9afc6585b9f981645284add61b6faeaea1baf6ef80a2dfd28d302c4efa79b0a"
+    },
+    "experiments/hu-postflop-r1/cloud/../showdown-kernel/instances-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/../showdown-kernel/disks-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/../showdown-kernel/addresses-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-10.json": {
+      "bytes": 1091,
+      "sha256": "de1d0268e5effa16d0b17aa31073a2b84453f4a0116fcdacc52fc03616378377"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-10.json": {
+      "bytes": 30180,
+      "sha256": "969cc76aef66b2aab8d9928927c1cdb0cdbf4af885c7707cc13cbda3aa8aafb8"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/reconciliation.json": {
+      "bytes": 3877,
+      "sha256": "f4eefc7ea203045805a3f2b251901ef8e99e3ef77d095ab1a3c95423d714531c"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/disk-before.json": {
+      "bytes": 448,
+      "sha256": "9bbe9d0bcc3fd9d342c8782e55aa9a63123388fb5e7c9d5d3c693d8ff4ae76ea"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-11.json": {
+      "bytes": 1091,
+      "sha256": "e34a44b36064ec6fdd555d2e9cb8e9db1f446863486bfc572960bc3b73f51957"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-11.json": {
+      "bytes": 30179,
+      "sha256": "18c8744425db625ed8eaa5801fa444d514d4da8ce676ffee7a797a16b36af854"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/reconciliation.json": {
+      "bytes": 19627,
+      "sha256": "ee5e2396a0c1d1251d2d8970bf0cf03bdac76f81eaf987e24131fc176e54468f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "94b39e5f8bfd05c41df35d67f5d3f4888f54ca99335353d11248246cd1c7b24e"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-12.json": {
+      "bytes": 1091,
+      "sha256": "1bfd207fd566c0c6ff0dbf8bd9d0f87ff15b600e937bd211f16f14d23e1b6cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-12.json": {
+      "bytes": 30180,
+      "sha256": "f074bdcc6a0d34e4c3fa5646fa7fd3128462acf005e220fbbf6d79a7501f3b82"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/reconciliation.json": {
+      "bytes": 14461,
+      "sha256": "f81c73c2353000355a419de2917222f664475b483512293643a977b7c5f8d28f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "77ef32e8661ded1463f012221f42a413524d787353eb84e0e59a251ec0acb14f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm12/start32-01.stdout.log": {
+      "bytes": 33130,
+      "sha256": "2428f101f2e8bfa4d11f3d47d6c48117a26b3e33621c74434d67b11af4b98ba0"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-13.json": {
+      "bytes": 1091,
+      "sha256": "4d7ad1b7ffb119b03222600f31585189c63d68ea4ada410865e414b5bcbad54b"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-13.json": {
+      "bytes": 30180,
+      "sha256": "35dec09e11c32d8ef60e81543df0267b1bf81a66cca2df0026158c8c89f50bc9"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/reconciliation.json": {
+      "bytes": 16396,
+      "sha256": "590535ddc8d45ca090ef832016f7a2274bd232d0f09acd1e3252c616461f09bc"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "447c4cf58b6b14ed4ccf50a3826410a8e94be40ae762e4ba950d86128fb23ae4"
+    },
+    "experiments/hu-postflop-r1/cloud/billing-observation-20260927-0220.json": {
+      "bytes": 4487,
+      "sha256": "1ce771d54086dbc59a7314a2992a463507d07694c8853229cb6cf061faf27b85"
+    },
+    "experiments/hu-postflop-r1/cloud/cost-audit-20260925/audit.json": {
+      "bytes": 15512,
+      "sha256": "90b6b49e3e22fa74dd5c114fa085d6c539289a76dc2f2c68f7e4e3130ce0b2da"
+    },
+    "experiments/hu-postflop-r1/cloud/transfers.json": {
+      "bytes": 27655,
+      "sha256": "7681c48a4501203b73a84aa79068d9ee0a33a8d9f255f9b210cf6a5ce45e07eb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/checks.json": {
+      "bytes": 6148,
+      "sha256": "e21d5c036098564bbc21e0c4de919311c35540d06e8c41c69aaabd670380099b"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    }
+  },
+  "vms": [
+    {
+      "vm": "08",
+      "instance_id": "1635613034982056517",
+      "request_start": "2026-09-26T01:15:19.0365885+00:00",
+      "instance_creation": "2026-09-25T18:15:22.791-07:00",
+      "absence_verified": "2026-09-26T04:01:25.6238650Z",
+      "disk_creation_observed": null,
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-08",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-08",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 6,
+          "machine_type": "e2-standard-2",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "pricing_checked_utc": "2026-09-26",
+          "conservative_compute_usd_hour": 0.14,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "purpose": "Linux validation and release writer comparison, followed by exact root-support validation on a resized 4-vCPU Spot VM. Formal scaling is separately reserved through 32 vCPU.",
+          "note": "Original launch was e2-standard-2, then resized to e2-standard-4 after retaining codec evidence. $3 reserved conservatively for the entire original six-hour window at 4-vCPU on-demand rate rounded to $0.14/h. This is not actual Spot billing. With the separate prospective 32-vCPU reservation, aggregate held $26/$40, $14 unreserved. No automatic restart or deadline extension; explicit VM/disk cleanup after recovery.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "events": [
+            {
+              "at": "2026-09-26T11:06:33.653402+09:00",
+              "event": "reserve_additional_1_usd_for_planned_resize",
+              "from_machine": "e2-standard-2",
+              "to_machine": "e2-standard-4",
+              "absolute_stop_deadline_utc": "2026-09-26T07:15:19Z",
+              "published_on_demand_usd_hour": 0.13402284,
+              "conservative_total_entire_6_02h_at_4vcpu_usd": 2.28937,
+              "note": "Reserve $3 covers all 6.02 hours at rounded-up $0.14/h plus IPv4, 40 GiB disk for24h, <=1GiB egress at $0.30/GiB and $1 other margin. Existing reservation extended by $1, no new deadline."
+            },
+            {
+              "at": "2026-09-26T13:00:40.671+09:00",
+              "event": "explicit_delete_and_absence_verification",
+              "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
+              "instance_id": "1635613034982056517",
+              "reconciled_at_utc": "2026-09-26T04:01:25.623865Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
+              "reservation_released": false,
+              "billed_usd": null
+            }
+          ],
+          "disposition": "Completed evidence recovered and verified, including source04 full compact/scaling results and source06 full validation plus48 paired action measurements. Deleted2026-09-26T04:00:40.671Z; no VM/disk/reserved address remains at04:01:25Z. Billing unavailable; full reservation held. Combined held26 of authorized40USD."
+        },
+        {
+          "id": "r1-20260926-08-scale32",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-08",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 1.5,
+          "machine_type": "e2-highcpu-32",
+          "fallback_machine_type": "n2-highcpu-32",
+          "conservative_compute_usd_hour": 1.15,
+          "pricing_checked_utc": "2026-09-26",
+          "published_e2_on_demand_usd_hour": 0.79152384,
+          "published_n2_on_demand_usd_hour": 1.147136,
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose"
+          ],
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "purpose": "Short 32-vCPU Spot phase on the existing VM, after small-VM correctness validation. Fresh native release build and same-boot 1/2/4/8/16/32-worker measurements.",
+          "note": "Reserve before resize. Try lower-cost E2 first; N2 fallback only if E2 capacity/quota prevents launch. Extra $3 covers 1.5h at rounded-up N2 on-demand $1.15/h plus $1 margin (2.725 USD); actual Spot billing is not asserted. Existing VM08 reservation separately covers disk, IPv4, cumulative <=1GiB download and 4-vCPU window. Set an absolute cloud STOP deadline no later than resize time+90min and original 07:15:19Z; no automatic restart or deadline extension. Aggregate held $26/$40, $14 unreserved. This reservation is not a launch record.",
+          "events": [
+            {
+              "at": "2026-09-26T03:05:16Z",
+              "event": "resized_vm_running_verified",
+              "machine_type": "e2-highcpu-32",
+              "instance_id": "1635613034982056517",
+              "boot_id": "28fa23ab-d76f-4282-87bb-64ab5c67c76b",
+              "logical_cpus": 32,
+              "physical_cores": 16,
+              "threads_per_core": 2,
+              "cpu_model": "Intel Xeon CPU @ 2.20GHz family6 model79",
+              "absolute_stop_deadline_utc": "2026-09-26T04:30:56Z",
+              "measurement_deadline_utc": "2026-09-26T04:15:56Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-description.json"
+            },
+            {
+              "at": "2026-09-26T03:31:56.257Z",
+              "event": "unexpected_spot_stop_after_baseline_recovery",
+              "status": "TERMINATED",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-spot-stop.json",
+              "baseline": "source04 scaling32 completed 03:24:54Z; all1060 original paths recovered with0missing unique payloads before stop",
+              "restart": "Same instance and existing reservation, unchanged absolute STOP04:30:56Z. Old/new action comparison not started; fresh builds required on new CPU/boot. No sample retry or crossboot timing merge."
+            },
+            {
+              "at": "2026-09-26T03:35:16Z",
+              "event": "same_reservation_manual_restart_ready",
+              "boot_id": "80fe06e6-3580-42ac-9af7-02c050425389",
+              "cpu_model": "AMD EPYC 7B12",
+              "logical_cpus": 32,
+              "physical_cores": 16,
+              "absolute_stop_deadline_utc": "2026-09-26T04:30:56Z",
+              "measurement_deadline_utc": "2026-09-26T04:15:56Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm08/scale32-restart-description.json",
+              "note": "Old/new fresh build same newboot; previous completed Intelbaseline retained separately. Fullvalidation bound04:25Z, no deadline/budget extension."
+            },
+            {
+              "at": "2026-09-26T13:00:40.671+09:00",
+              "event": "explicit_delete_and_absence_verification",
+              "operation_id": "operation-1790395190812-65c5add5b1f30-1405c0d3-0848aa19",
+              "instance_id": "1635613034982056517",
+              "reconciled_at_utc": "2026-09-26T04:01:25.623865Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json",
+              "reservation_released": false,
+              "billed_usd": null
+            }
+          ],
+          "disposition": "Completed evidence recovered and verified, including source04 full compact/scaling results and source06 full validation plus48 paired action measurements. Deleted2026-09-26T04:00:40.671Z; no VM/disk/reserved address remains at04:01:25Z. Billing unavailable; full reservation held. Combined held26 of authorized40USD."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-2",
+          "basis": "initial launch argv"
+        },
+        {
+          "machine": "e2-standard-4",
+          "running_since": "2026-09-25T19:11:30.371-07:00",
+          "previous_stop": "2026-09-25T19:07:33.110-07:00"
+        },
+        {
+          "machine": "e2-highcpu-32",
+          "conservative_rate_switch_at": "2026-09-25T20:02:06.483-07:00",
+          "running_since": "2026-09-25T20:04:21.128-07:00"
+        },
+        {
+          "machine": "e2-highcpu-32",
+          "restart_since": "2026-09-25T20:34:20.976-07:00",
+          "previous_stop": "2026-09-25T20:31:56.257-07:00"
+        }
+      ]
+    },
+    {
+      "vm": "09",
+      "instance_id": "5775064646140191983",
+      "request_start": "2026-09-26T14:43:07.2577428+00:00",
+      "instance_creation": "2026-09-26T07:43:12.277-07:00",
+      "absence_verified": "2026-09-26T15:38:37.2805183+00:00",
+      "disk_creation_observed": "2026-09-26T07:43:12.285-07:00",
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-09",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-09",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 4,
+          "machine_type": "e2-standard-4",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "pricing_checked_utc": "2026-09-26",
+          "conservative_compute_usd_hour": 0.14,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "purpose": "Prepared showdown/fold card and seat-local indices; old/new fresh release builds and full workspace validation on a small Spot VM.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "note": "4.02h compute/IP at rounded on-demand price + 40GiB disk up to 24h + 1GiB egress + $1 margin = $2.00437 < $3. No asserted Spot invoice. Full held reservation grows $26 to $29/$40. Absolute STOP deadline fixed at launch, no automatic restart or extension. Explicit VM and disk deletion after evidence recovery.",
+          "events": [
+            {
+              "at": "2026-09-26T14:43:19.656Z",
+              "event": "initial_running",
+              "instance_id": "5775064646140191983",
+              "boot_id": "02dcc8e8-f1c9-4ec6-a657-f0f9b12c0f0f",
+              "absolute_stop_deadline_utc": "2026-09-26T18:43:07Z"
+            },
+            {
+              "at": "2026-09-26T15:01:42.258Z",
+              "event": "compute.instances.preempted",
+              "last_stop": "2026-09-26T15:01:55.386Z",
+              "new_validation": "Process records completed before stop, but recovered raw validation evidence failed three hashes; old build interrupted; no performance samples started. Fresh same-boot validation subsequently supersedes it.",
+              "evidence": "../showdown-kernel/vm09-operations-1510.json"
+            },
+            {
+              "at": "2026-09-26T15:04:51.102Z",
+              "event": "manual_restart_same_reservation_and_deadline",
+              "boot_id": "ac2eeb5d-385c-4ea1-95b6-1b545ce65a85",
+              "absolute_stop_deadline_utc": "2026-09-26T18:43:07Z",
+              "fresh_targets": "new full validation and old release build in kernel-new-r2 and kernel-old-r2; source archives unchanged"
+            },
+            {
+              "at": "2026-09-26T15:38:37.2805183+00:00",
+              "event": "explicit_delete_and_absence_verification",
+              "instance_id": "5775064646140191983",
+              "disk_id": "2452169262360061167",
+              "evidence": "../showdown-kernel/cleanup.json",
+              "instances": [],
+              "disks": [],
+              "reserved_addresses": [],
+              "reservation_released": false,
+              "billed_usd": null
+            }
+          ],
+          "disposition": "VM09 and its 40GiB disk explicitly deleted after the 8,089,211-byte proof was downloaded and independently verified. Project instance, disk and reserved-address lists empty at 2026-09-26T15:38:37.2805183Z. Final same-boot validation: 933 workspace tests plus four selected release tests, 32 old/new sample output identities. First boot raw-evidence failure and first preparation CPU-quota failure retained separately. Invoice unknown; full $3 reservation held, cumulative $29/$40."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-4",
+          "stop": "2026-09-26T15:01:55.386Z",
+          "restart": "2026-09-26T15:04:51.102Z",
+          "basis": "budget events; charged throughout"
+        }
+      ]
+    },
+    {
+      "vm": "10",
+      "instance_id": "9019841781761201633",
+      "request_start": "2026-09-26T15:55:53.8409999+00:00",
+      "instance_creation": "2026-09-26T08:55:58.763-07:00",
+      "absence_verified": "2026-09-26T17:51:09.145691+00:00",
+      "disk_creation_observed": "2026-09-26T08:55:58.773-07:00",
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-10",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-10",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 4,
+          "machine_type": "e2-standard-4",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "pricing_checked_utc": "2026-09-26",
+          "conservative_compute_usd_hour": 0.14,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "purpose": "Exact card-removal mass correction: complete validation, fixed-quality performance comparison and separate fallback diagnostics on a small Spot VM.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "note": "On-demand compute 0.13402284/h rechecked from official page with Invoke-WebRequest because web renderer exceeded4MiB; round to0.14. Disk0.000136986/GiB/h and SpotIPv4 0.0025/h rechecked official pages. 4.02h compute/IP +40GiB disk up to24h +1GiB transfer0.30 +1margin =2.00437 <3. New held total32/40. Absolute4h STOPdeadline, noauto restart/extension, explicitVM/diskdelete afterproofrecovery.",
+          "events": [
+            {
+              "at": "2026-09-26T08:55:58.763-07:00",
+              "event": "initial_running",
+              "instance_id": "9019841781761201633",
+              "boot_id": "fa0a2c40-b141-458b-8d58-98807d55dc06",
+              "absolute_stop_deadline_utc": "2026-09-26T19:55:53Z"
+            },
+            {
+              "at": "2026-09-26T17:45:17.305000+00:00",
+              "event": "explicit_delete_and_absence_verification",
+              "operation_id": "operation-1790444665453-65c6662463c62-d110ba8d-296ba226",
+              "instance_id": "9019841781761201633",
+              "disk_id": "2211921492040111585",
+              "reconciled_at_utc": "2026-09-26T17:51:09.145691+00:00",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm10/reconciliation.json",
+              "instances": [],
+              "disks": [],
+              "reserved_addresses": [],
+              "reservation_released": false,
+              "billed_usd": null
+            }
+          ],
+          "reserved_at_utc": "2026-09-26T15:55:50.829245+00:00",
+          "disposition": "Candidate04 full validation (958 workspace tests, 31 ignored, four selected release tests), 32 paired performance/quality runs and four additional ignored release tests passed; immutable source and raw evidence recovered and independently verified. Earlier candidate failures and diagnostic retained. VM and its auto-delete 40GiB boot disk explicitly deleted at 2026-09-26T17:45:17.305000+00:00; exact-name VM/disk and former reserved-address queries empty at 2026-09-26T17:51:09.145691+00:00. Billing unavailable; full $3 reservation remains held, cumulative $32/$40."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-4",
+          "basis": "initial launch and pre-delete identity"
+        }
+      ]
+    },
+    {
+      "vm": "11",
+      "instance_id": "570856080701499920",
+      "request_start": "2026-09-26T18:54:51.7007926+00:00",
+      "instance_creation": "2026-09-26T11:54:55.988-07:00",
+      "absence_verified": "2026-09-26T20:17:20.111820+00:00",
+      "disk_creation_observed": null,
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-11",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-11",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 3,
+          "machine_type": "e2-standard-4",
+          "vcpus": 4,
+          "memory_gib": 16,
+          "provisioning_model": "SPOT",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "conservative_compute_usd_hour": 0.14,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "auto_restart": false,
+          "absolute_deadline_utc": "2026-09-26T21:54:51Z",
+          "reserved_at_utc": "2026-09-26T18:53:41.416277+00:00",
+          "pricing_checked_utc": "2026-09-26",
+          "purpose": "Final cumulative SOL3/CKPT1 versus SOL4/CKPT2 fixed-quality whole CLI, saved-profile and codec comparison.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "events": [
+            {
+              "at": "2026-09-26T11:54:55.988-07:00",
+              "at_utc": "2026-09-26T18:54:55.988000+00:00",
+              "event": "instance_created_running",
+              "instance_id": "570856080701499920",
+              "create_response_status": "RUNNING",
+              "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+              "boot_disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-11",
+              "boot_disk_gib": 40,
+              "boot_disk_auto_delete": true,
+              "evidence": "experiments/hu-postflop-r1/cloud/vm11/launch-evidence.json",
+              "billed_usd": null,
+              "reservation_released": false
+            },
+            {
+              "at": "2026-09-26T19:00:01+00:00",
+              "event": "bootstrap_complete_observed",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm11/runtime-start-evidence.json"
+            },
+            {
+              "at": "2026-09-26T19:02:00+00:00",
+              "event": "measurement_service_started",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "service_unit": "solvers-r1-vm11-final.service",
+              "invocation_id": "d96d3cd3d12a4f8f918f4ff67b8cb43b",
+              "measurement_deadline_utc": "2026-09-26T21:34:51Z",
+              "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm11/runtime-start-evidence.json",
+              "experiment_complete": false
+            },
+            {
+              "at": "2026-09-26T19:14:50.344466+00:00",
+              "at_basis": "Failure was already recorded by deployment02 metadata creation; exact failure time was not retained.",
+              "event": "campaign01_terminal_failure_observed",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "campaign": "final-proof01",
+              "error": "ValueError('host/boot changed')",
+              "old_cli_process_ended_at_utc": "2026-09-26T19:06:24.535384+00:00",
+              "old_cli_child_exit_code": 0,
+              "old_cli_supervisor_exit_code": 0,
+              "old_cli_process_seconds": 258.55871665300003,
+              "measurement_processes_passed": 0,
+              "measurement_stages_skipped": 156,
+              "evidence": "experiments/hu-postflop-r1/final-pipeline/proof01/retention-verification.json",
+              "root_cause": null,
+              "reservation_delta_usd": 0
+            },
+            {
+              "at": "2026-09-26T19:14:50+00:00",
+              "at_precision": "seconds, from systemd ExecMainStartTimestamp",
+              "event": "explicit_deployment02_service_started_same_vm_reservation_deadline",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "service_unit": "solvers-r1-vm11-final02.service",
+              "invocation_id": "cc3c39ef4f414211a6f694fd1a37fe86",
+              "measurement_deadline_utc": "2026-09-26T21:34:51Z",
+              "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+              "cpu_weight": 100,
+              "memory_max_bytes": 12884901888,
+              "memory_swap_max_bytes": 0,
+              "fresh_targets": true,
+              "fresh_proof_directory": true,
+              "previous_campaign_resumed": false,
+              "reservation_delta_usd": 0,
+              "evidence": "experiments/hu-postflop-r1/cloud/vm11/capture-final02.json",
+              "deployment_metadata_sha256": "53732572b9e73a280d14e578df883e03d0393c51e7c730cb803f1fea6b34140b",
+              "experiment_complete": false
+            },
+            {
+              "at": "2026-09-26T19:36:51Z",
+              "event": "final_pipeline02_completed_then_locally_verified",
+              "campaign": "final-proof02",
+              "service_unit": "solvers-r1-vm11-final02.service",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "build_processes_passed": 9,
+              "measurement_processes_passed": 156,
+              "screens": {
+                "time": true,
+                "io": true,
+                "memory": null
+              },
+              "archive_bytes": 32221395,
+              "archive_sha256": "27f772cdf4e9c8293f470d0e8b09df2a03f8b8e3fa873444bc1ee4d817005b84",
+              "local_verification_ended_utc": "2026-09-26T19:41:57.378791+00:00",
+              "evidence": "experiments/hu-postflop-r1/final-pipeline/proof02/report-command.json",
+              "reservation_delta_usd": 0,
+              "reservation_released": false,
+              "billed_usd": null
+            },
+            {
+              "at": "2026-09-26T20:03:30.869057+00:00",
+              "event": "focused_memory03_started_same_vm_reservation",
+              "instance_id": "570856080701499920",
+              "boot_id": "7d1d9913-8d5d-420b-934e-2129e2ce25e6",
+              "service_unit": "solvers-r1-vm11-memory03.service",
+              "invocation_id": "8efbb887487042be8fb7a1a2e51146a0",
+              "measurement_deadline_utc": "2026-09-26T21:20:00Z",
+              "absolute_stop_deadline_utc": "2026-09-26T21:54:51Z",
+              "reservation_delta_usd": 0,
+              "held_total_usd": 35,
+              "proof02_memory_screen_revised": false,
+              "evidence": "experiments/hu-postflop-r1/cloud/vm11/memory03-start.stdout.log"
+            },
+            {
+              "at": "2026-09-26T20:10:33Z",
+              "event": "focused_memory03_completed_recovered_locally_verified",
+              "processes_passed": 99,
+              "archive_bytes": 21516217,
+              "archive_sha256": "fc4cbedaa99d1f1c9a3764420ba25e40d8a0509e3cf62ab080b64c49177c8449",
+              "screens": {
+                "river": false,
+                "turn": true,
+                "flop": true
+              },
+              "native_counter_ratio_max_new_over_min_old": {
+                "river": 0.9579992363497518,
+                "turn": 0.34134238704622616,
+                "flop": 0.05362213323625774
+              },
+              "proof02_memory_screen_revised": false,
+              "local_verification_ended_utc": "2026-09-26T20:16:10.861485+00:00",
+              "evidence": "experiments/hu-postflop-r1/focused-memory/proof03/verification-command.json",
+              "reservation_delta_usd": 0
+            },
+            {
+              "at": "2026-09-26T20:17:09.165Z",
+              "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+              "instance_id": "570856080701499920",
+              "disk_id": "1158215583101463056",
+              "operation_id": "4744298419522475772",
+              "absence_verified_utc": "2026-09-26T20:17:20.111820+00:00",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/reconciliation.json",
+              "billed_usd": null,
+              "reservation_released": false
+            }
+          ],
+          "note": "3.02h at rounded on-demand compute/IP +40GiB disk up to24h +1GiB transfer +$1 margin =1.86187<3. Protocol frozen before candidate execution. Absolute3h STOP, no automatic restart/extension. Reserve20min for recovery, then explicit VM/disk deletion. Actual billing unknown; held35/40.",
+          "disposition": "VM11 and its sole 40GiB autoDelete disk explicitly deleted after all three attempts were recovered and verified. Delete DONE20:17:09.165Z, named-resource absence20:17:20.111820Z. Proof01 retains premeasurement host-identity failure; proof02 passed time/eligibleIO with memory null; focused memory03 passed Turn/Flop RSS screens but River missed10% criterion. Original STOP21:54:51Z not extended. Invoice unknown; full $3 reservation held, cumulative $35/$40."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-4",
+          "basis": "initial launch and pre-delete identity"
+        }
+      ]
+    },
+    {
+      "vm": "12",
+      "instance_id": "4952839753420870319",
+      "request_start": "2026-09-26T20:34:03.5069532+00:00",
+      "instance_creation": "2026-09-26T13:34:08.489-07:00",
+      "absence_verified": "2026-09-26T20:47:41.047498+00:00",
+      "disk_creation_observed": null,
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-12",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-12",
+          "reserved_usd": 3,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 1,
+          "machine_type": "e2-standard-4",
+          "planned_measurement_machine_type": "e2-highcpu-32",
+          "capacity_or_quota_fallback_machine_type": "n2-highcpu-32",
+          "provisioning_model": "SPOT",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "conservative_compute_usd_hour": 1.15,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "auto_restart": false,
+          "reserved_at_utc": "2026-09-26T20:33:05.007360+00:00",
+          "pricing_checked_utc": "2026-09-26",
+          "purpose": "Current production 11e4062 one-boot compact F32 River/Turn/Flop endpoint scaling at 1/16/32 workers; original exact-mass04 validation reused with raw verification.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "preflight_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm12/",
+          "note": "Single instance: bootstrap/fetch only on 4 CPUs, stop and resize to32, fresh native build after resize. No overlapping VMs. Original absolute STOP within1h, no extension; measurement deadline15min earlier. Conservative entire1.02h at rounded N2 highcpu32 on-demand1.15/h,40GiB disk24h,IPv4,1GiB egress and1USD margin=2.60707<3. Spot actual billing unknown; held38/40,2unreserved. E2 capacity/quota availability unproven; N2 fallback only same instance/deadline after explicit unsuccessful E2 attempt.",
+          "events": [
+            {
+              "event": "instance_created_running",
+              "at": "2026-09-26T13:34:08.489-07:00",
+              "instance_id": "4952839753420870319",
+              "absolute_stop_deadline_utc": "2026-09-26T21:34:03Z",
+              "boot_disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-12",
+              "boot_disk_auto_delete": true,
+              "evidence": "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-12.json"
+            },
+            {
+              "event": "resized_e2_highcpu_32_and_campaign_started",
+              "at": "2026-09-26T20:40:32.446385+00:00",
+              "instance_id": "4952839753420870319",
+              "boot_id": "735f9ef6-e1d7-414e-a760-3963d9f0b68c",
+              "service_unit": "solvers-r1-vm12-current32.service",
+              "invocation_id": "a0ce434421b74cf98ad907b8a012f2bf",
+              "measurement_deadline_utc": "2026-09-26T21:19:03Z",
+              "absolute_stop_deadline_utc": "2026-09-26T21:34:03Z",
+              "evidence": "experiments/hu-postflop-r1/cloud/vm12/campaign-start01.stdout.log",
+              "reservation_delta_usd": 0
+            },
+            {
+              "event": "current32_completed_recovered_and_verified",
+              "at": "2026-09-26T20:45:03Z",
+              "build_stages_passed": 2,
+              "samples_passed": 36,
+              "warmups_passed": 9,
+              "archive_bytes": 5262188,
+              "archive_sha256": "d2809e7a66faf627704c690722d3f8011f45af5af44173a8695d55cea90c1798",
+              "local_verification_ended_utc": "2026-09-26T20:46:29.960458+00:00",
+              "evidence": "experiments/hu-postflop-r1/current-scaling32/proof01/report.jp.md",
+              "reservation_delta_usd": 0
+            },
+            {
+              "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+              "at": "2026-09-26T13:47:28.759-07:00",
+              "instance_id": "4952839753420870319",
+              "disk_id": "5551647169025774255",
+              "operation_id": "8412797885897609665",
+              "absence_verified_utc": "2026-09-26T20:47:41.047498+00:00",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/reconciliation.json",
+              "billed_usd": null,
+              "reservation_released": false
+            }
+          ],
+          "absolute_deadline_utc": "2026-09-26T21:34:03Z",
+          "measurement_deadline_utc": "2026-09-26T21:19:03Z",
+          "disposition": "All36 current-source F32 endpoint runs plus2 fresh build stages passed; all raw bytes recovered and trusted locally verified. Same VM resized4->32; full worker/quality/state agreement. 16workers fastest among1/16/32 for all3 cases;32 slower16. VM and sole40GiB autoDelete disk explicitly deleted and named resources verified absent. Original STOP not extended. Invoice unknown; full3USD held, cumulative38/40,2unreserved."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-4",
+          "basis": "initial launch"
+        },
+        {
+          "machine": "e2-highcpu-32",
+          "running_since": "2026-09-26T13:39:31.130-07:00",
+          "previous_stop": "2026-09-26T13:38:41.634-07:00",
+          "cost_model": "charge whole lifetime at reserved1.15USD/h"
+        }
+      ]
+    },
+    {
+      "vm": "13",
+      "instance_id": "6526324704760165755",
+      "request_start": "2026-09-26T22:47:45.4539527+00:00",
+      "instance_creation": "2026-09-26T15:47:48.384-07:00",
+      "absence_verified": "2026-09-26T23:16:40.762086+00:00",
+      "disk_creation_observed": null,
+      "disk_lifetime_upper_bound_basis": "new auto-delete40GiB boot disk created during launch, absent at final reconciliation; use24h in cost calculation",
+      "reservations": [
+        {
+          "id": "r1-20260926-13",
+          "project": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance": "solvers-r1-20260926-13",
+          "reserved_usd": 2,
+          "billed_usd": null,
+          "reservation_released": false,
+          "maximum_runtime_hours": 1,
+          "machine_type": "e2-standard-4",
+          "provisioning_model": "SPOT",
+          "disk_type": "pd-balanced",
+          "disk_gib": 40,
+          "maximum_download_gib": 1,
+          "conservative_compute_usd_hour": 0.14,
+          "disk_usd_gib_hour": 0.000137,
+          "ipv4_usd_hour": 0.0025,
+          "reserved_egress_usd_gib": 0.3,
+          "tax_price_delay_and_other_reserve_usd": 1,
+          "instance_termination_action": "STOP",
+          "explicit_disk_cleanup_hours": 24,
+          "auto_restart": false,
+          "reserved_at_utc": "2026-09-26T22:47:22.220525+00:00",
+          "pricing_checked_utc": "2026-09-26",
+          "purpose": "Current 11e4062 fixed 4-arm phase attribution, two fresh builds, 48 solve + 96 codec + 144 quality stages; four-CPU finite single-boot campaign.",
+          "pricing_sources": [
+            "https://cloud.google.com/products/compute/pricing/general-purpose",
+            "https://cloud.google.com/compute/disks-image-pricing",
+            "https://cloud.google.com/vpc/network-pricing"
+          ],
+          "preflight_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm13/",
+          "note": "One instance, no resize or auto restart, work ends15min before absolute STOP<=1h. Conservative1.02h compute/IP,40GiB disk24h,<=1GiB egress and1USD margin=1.57687<2. Prior invoices unknown and fully held; cumulative40/40,0unreserved. No further reservation until actual billing reconciliation or explicit new authorization.",
+          "absolute_deadline_utc": "2026-09-26T23:47:45Z",
+          "measurement_deadline_utc": "2026-09-26T23:32:45+00:00",
+          "events": [
+            {
+              "event": "instance_created_running",
+              "at": "2026-09-26T15:47:48.384-07:00",
+              "instance_id": "6526324704760165755",
+              "absolute_stop_deadline_utc": "2026-09-26T23:47:45Z",
+              "boot_disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260926-13",
+              "boot_disk_auto_delete": true,
+              "evidence": "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-13.json"
+            },
+            {
+              "event": "finite_campaign_dispatched",
+              "at": "2026-09-26T22:51:52.646763+00:00",
+              "instance_id": "6526324704760165755",
+              "boot_id": "d65ffd75-d2ca-4e08-8452-4c12027b4a2a",
+              "unit": "solvers-r1-vm13-current-phases",
+              "measurement_deadline_utc": "2026-09-26T23:32:45+00:00",
+              "runtime_max_seconds": 2432,
+              "evidence": "experiments/hu-postflop-r1/cloud/vm13/campaign-start01.stdout.log",
+              "reservation_delta_usd": 0
+            },
+            {
+              "event": "phase_failed_raw_recovered_and_verified",
+              "at": "2026-09-26T23:01:22Z",
+              "passed": 44,
+              "failed": 1,
+              "skipped": 252,
+              "failure": "Flop memory warmup: VmHWM declined36KiB within one reset interval. Fixed campaign terminated; no retry or performance acceptance.",
+              "archive_bytes": 17708089,
+              "archive_sha256": "c94c351505c70aecc7c3b4f9f0a60c37173ed074c728ce1acbb54f65683d100a",
+              "local_verification_ended_utc": "2026-09-26T23:04:56.525372+00:00",
+              "evidence": "experiments/hu-postflop-r1/current-phases/proof01/README.jp.md",
+              "reservation_delta_usd": 0
+            },
+            {
+              "event": "separate_native_river_diagnostics_completed_recovered_verified",
+              "at": "2026-09-26T23:11:04Z",
+              "cases": [
+                "HU-R0-006",
+                "HU-R0-022"
+              ],
+              "passed": 8,
+              "archive_bytes": 7682236,
+              "archive_sha256": "06ddb7169418cb680cf22bc72eeb0f57cba617772ef9beb8039a5c3994ef45eb",
+              "local_verification_ended_utc": "2026-09-26T23:13:31.940971+00:00",
+              "evidence": "experiments/hu-postflop-r1/reference/native-river-vm13/proof01/",
+              "reservation_delta_usd": 0,
+              "note": "Same VM/boot/plain binaries; separate finite240s unit after phase quiescence. No deadline extension, no external quality certification."
+            },
+            {
+              "event": "instance_and_auto_delete_disk_deleted_absence_verified",
+              "at": "2026-09-26T16:16:28.277-07:00",
+              "instance_id": "6526324704760165755",
+              "disk_id": "2641872341416932731",
+              "absence_verified_utc": "2026-09-26T23:16:40.762086+00:00",
+              "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/reconciliation.json",
+              "billed_usd": null,
+              "reservation_released": false
+            }
+          ],
+          "disposition": "Fixed phase campaign failed on reset-window VmHWM decline after44 passed stages; all raw retained and trusted checked. Separate native006/022 diagnostics8 stages passed and exact menus verified. Both evidence archives recovered and verified. Original VM and sole autoDelete40GiB disk deleted; named instance/disk/address absence verified. No retry, resize, restart or deadline extension. Invoice unknown; full2USD held, cumulative40/40,0unreserved."
+        }
+      ],
+      "machine_transitions": [
+        {
+          "machine": "e2-standard-4",
+          "basis": "initial launch and pre-delete identity"
+        }
+      ]
+    }
+  ],
+  "billing_snapshot": "billing-observation.json",
+  "budget_snapshot": "budget-before.json",
+  "earlier_vm02_05_06_07": {
+    "source": "experiments/hu-postflop-r1/cloud/cost-audit-20260925/audit.json",
+    "compute_disk_ip_usd": "1.504463555555555555555555556",
+    "observed_network_bytes": 149960905,
+    "missing_network_bytes": null,
+    "prior_unproven_total_with_original_reserves_usd": "16.40446355555555555555555556",
+    "release_proposed_here_usd": "0"
+  },
+  "pricing_scope": "Existing reservation rates; checked against fresh official pricing extracts captured 2026-09-27, without treating on-demand ceilings as actual Spot billing",
+  "network_allowance_scope": "Retain 1GiB per physical VM08-13 at0.30USD/GiB despite fresh total observed sent bytes277898030; missing intervals/boundaries remain unknown, so allowance is not an enforced or formally proved cap",
+  "proposal": {
+    "original_group_reservation_usd": "20",
+    "retained_group_reservation_usd": "15",
+    "release_usd": "5",
+    "budget_write_performed": false,
+    "requires_invoice_finality": false,
+    "interpretation": "usage-based conservative estimate with contingency, not a guaranteed invoice ceiling",
+    "per_reservation_holds_usd": {
+      "r1-20260926-08": "3.00",
+      "r1-20260926-08-scale32": "3.00",
+      "r1-20260926-09": "1.60",
+      "r1-20260926-10": "1.80",
+      "r1-20260926-11": "1.80",
+      "r1-20260926-12": "1.80",
+      "r1-20260926-13": "2.00"
+    }
+  },
+  "monitoring_snapshot": "monitoring-usage.json",
+  "fresh_pricing_source": "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-sources.json",
+  "fresh_pricing_comparisons": [
+    {
+      "item": "e2-standard-4/hour",
+      "published_usd": ".13402284",
+      "reserved_usd": ".14"
+    },
+    {
+      "item": "e2-highcpu-32/hour",
+      "published_usd": ".79152384",
+      "reserved_usd": "1.15"
+    },
+    {
+      "item": "n2-highcpu-32/hour",
+      "published_usd": "1.147136",
+      "reserved_usd": "1.15"
+    },
+    {
+      "item": "pd-balanced/GiB-hour",
+      "published_usd": ".000136986",
+      "reserved_usd": ".000137"
+    },
+    {
+      "item": "Spot IPv4/hour",
+      "published_usd": ".0025",
+      "reserved_usd": ".0025"
+    },
+    {
+      "item": "egress to Japan/GiB",
+      "published_usd": ".12",
+      "reserved_usd": ".30"
+    }
+  ]
+}

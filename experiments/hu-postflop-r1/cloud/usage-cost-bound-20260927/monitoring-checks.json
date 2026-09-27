@@ -1,0 +1,178 @@
+{
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\analyze.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.11117730010300875,
+  "source_before": {
+    "collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "analyze.py": {
+      "bytes": 5920,
+      "sha256": "966664e4976fa6b12c6dcee0b9961bf9c0c77cd85280c25c20c341d3f962b794"
+    },
+    "check-inventory.py": {
+      "bytes": 3470,
+      "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+    }
+  },
+  "source_after": {
+    "collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "analyze.py": {
+      "bytes": 5920,
+      "sha256": "966664e4976fa6b12c6dcee0b9961bf9c0c77cd85280c25c20c341d3f962b794"
+    },
+    "check-inventory.py": {
+      "bytes": 3470,
+      "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+    }
+  },
+  "acquisition_source_pin_matches": true,
+  "inventory_payload_hashes_match": true,
+  "native_build_or_solve_run": false,
+  "payloads": {
+    "acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "analysis.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "analysis.stdout.log": {
+      "bytes": 2138,
+      "sha256": "151ea545bd184f278374a2fd9fe25c0568b13d65aa787464780608290d9f83b8"
+    },
+    "analyze.py": {
+      "bytes": 5920,
+      "sha256": "966664e4976fa6b12c6dcee0b9961bf9c0c77cd85280c25c20c341d3f962b794"
+    },
+    "billing-account.json": {
+      "bytes": 167,
+      "sha256": "1fa9f818ecd3af1c19e4ede94e6e0e07d82a4e095765bf4a6cddd0ac04b2692b"
+    },
+    "check-inventory.py": {
+      "bytes": 3470,
+      "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+    },
+    "collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "inventory-addresses.json": {
+      "bytes": 13178,
+      "sha256": "cfb80c1b81bf2342ccf5e5a6fe04b6a94700af684cec29156ba3ba2fb3a2b21b"
+    },
+    "inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "inventory-disks.json": {
+      "bytes": 52529,
+      "sha256": "4a68a598589f239e9666d17c3e08bfa6f620fa6282e9839fbf1d4cb86b343fae"
+    },
+    "inventory-instances.json": {
+      "bytes": 39626,
+      "sha256": "f46555d059e3209a229e3f844362208754deced7d2cf058d19f6495af13a7d47"
+    },
+    "machine-e2-highcpu-32.json": {
+      "bytes": 216,
+      "sha256": "4e97563250ea39009d4dc324e1fb7e4c3843eed15294f307cbc2c31f4d85ef47"
+    },
+    "machine-e2-standard-2.json": {
+      "bytes": 214,
+      "sha256": "4949df77a56e4b7bed32da5860867e9e3d1cbc97e2db2f72c67ca237204cbe52"
+    },
+    "machine-e2-standard-4.json": {
+      "bytes": 215,
+      "sha256": "77c7d098b7c48c72d4d9c2e5a0d96b56a426422fada1a5821a79aada4d56e6d7"
+    },
+    "machine-n2-highcpu-32.json": {
+      "bytes": 216,
+      "sha256": "bbcf69ff90e20a1da9941ee87c7260e793ddd1f2d70a46040dbcb610224c0b3f"
+    },
+    "project-billing.json": {
+      "bytes": 203,
+      "sha256": "1b7ecd19bcf6e2fa81aec5795a5d06eee98cd435c785bafe83060e8a0afa438c"
+    },
+    "README.md": {
+      "bytes": 3143,
+      "sha256": "f0bea488d8a5f8e95c01c9aa75123fb55d7e6f9ca192f2eef6c9cda20cb1c382"
+    },
+    "region-us-central1.json": {
+      "bytes": 10786,
+      "sha256": "9d2e5c34488eae430bd98a5b6c6d2dfea64db33e86b4f2c94872e30d41d40264"
+    },
+    "resources-addresses-00.json": {
+      "bytes": 1458,
+      "sha256": "943c06e6647806c1b0287a3383865303a751c1dd2bf6b1b0798e5f9c672e4fb0"
+    },
+    "resources-disks-00.json": {
+      "bytes": 5798,
+      "sha256": "38a199b2f8e7fb87cbdce4151b21bb6068e8c4ba7fc64d5e2b86bbd5edf15c7d"
+    },
+    "resources-instances-00.json": {
+      "bytes": 3,
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+    },
+    "usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "vm08-sent-00.json": {
+      "bytes": 35421,
+      "sha256": "12e449bb515104378a32cbd52b691a3350944a22b46f2733ea95a868a160f1b5"
+    },
+    "vm08-uptime-00.json": {
+      "bytes": 35337,
+      "sha256": "f10c804e54daf19c6977579c13888bf49518096f7e005764ae19329571b0e9e9"
+    },
+    "vm09-sent-00.json": {
+      "bytes": 12413,
+      "sha256": "74cf7f3f15f2bce8fca8c6159b4e54fd8515f65149d36fda4b622d355f4aa0a5"
+    },
+    "vm09-uptime-00.json": {
+      "bytes": 12671,
+      "sha256": "677639b9ba7ef33a153a638047fc0f8ff0d393e1b7f17744590ac44713999d85"
+    },
+    "vm10-sent-00.json": {
+      "bytes": 24863,
+      "sha256": "bc2871b5a818adbe83d8a43767215efd4f65273b310332f4e09580566ca7a6b8"
+    },
+    "vm10-uptime-00.json": {
+      "bytes": 25055,
+      "sha256": "421d89a628a9e09c5618a56771fcead4d68b4042a21b483940646c04e573370f"
+    },
+    "vm11-sent-00.json": {
+      "bytes": 18828,
+      "sha256": "48a190d9c52ac22438f0672d25b0f1569acc13ff242a977efab46653998e4f6a"
+    },
+    "vm11-uptime-00.json": {
+      "bytes": 18616,
+      "sha256": "ecc07085bf6fe2d726a815aaf1519ce86a7ae450b5eff2a6caacf305ffa47a89"
+    },
+    "vm12-sent-00.json": {
+      "bytes": 3276,
+      "sha256": "d2f1a192c667ef0e91ad7219cf0af6e5167f63a3e7a9504bbc588f41fbf38fec"
+    },
+    "vm12-uptime-00.json": {
+      "bytes": 3224,
+      "sha256": "40277d9799487ad6b11fb0b8b3e9f869fe0f6df140039e06493092f55d84a7c2"
+    },
+    "vm13-sent-00.json": {
+      "bytes": 7068,
+      "sha256": "9d26a23e4eb0311eda970cef727e275c662f5ba752dc9b8b4fe5656ae90e8a0f"
+    },
+    "vm13-uptime-00.json": {
+      "bytes": 7102,
+      "sha256": "01908ccd406557483f4f550f449be0b70a2ab3528693b7c0caafdb6603b49d63"
+    }
+  }
+}

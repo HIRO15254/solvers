@@ -1,0 +1,9 @@
+2026-09-27T02:46:45+00:00
+Sep 27 02:46:35 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script:
+Sep 27 02:46:35 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: No VM guests are running outdated hypervisor (qemu) binaries on this host.
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: downloading installer
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: profile set to minimal
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: default host tuple is x86_64-unknown-linux-gnu
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: syncing channel updates for 1.97.0-x86_64-unknown-linux-gnu
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: latest update on 2026-07-09 for version 1.97.0 (2d8144b78 2026-07-07)
+Sep 27 02:46:37 solvers-r1-20260927-14 google_metadata_script_runner[1157]: startup-script: info: downloading 5 components

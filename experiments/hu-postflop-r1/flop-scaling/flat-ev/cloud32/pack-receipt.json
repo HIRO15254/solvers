@@ -1,0 +1,18 @@
+{
+  "archive": {
+    "path": "deployment01.tar.gz",
+    "bytes": 1314063,
+    "sha256": "59d070e22a9f10eddaec883c6841f4548db334ed367155049925ca741e0ee683"
+  },
+  "manifest": {
+    "bytes": 69316,
+    "sha256": "377d343542235c5ec33c2d3e52887d3a1c99e04ae353ca16dba9ae6291fe621e"
+  },
+  "packer": {
+    "bytes": 3995,
+    "sha256": "df3e95c3e5190ca36303f784fcbaada66c34c072aa7949dc226225d5685ad245"
+  },
+  "source_files": 208,
+  "members": 228,
+  "scope": "Package only; no compiler, solve, cloud launch or transfer performed"
+}

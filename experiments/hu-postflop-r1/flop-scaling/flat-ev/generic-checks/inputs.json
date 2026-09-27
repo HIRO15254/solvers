@@ -1,0 +1,36 @@
+{
+  "schema": "r1-flat-ev-generic-inputs/v1",
+  "originals": {
+    "crates/engine/tests/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "crates/engine/tests/value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/flat-chance/zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    }
+  },
+  "snapshots": {
+    "inputs/parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "inputs/value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "inputs/zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    "inputs/parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    }
+  },
+  "generation": "parallel.rs bytes + one LF byte + zero_chance_tests.rs.in bytes; no test logic edits"
+}

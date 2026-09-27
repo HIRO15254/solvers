@@ -39,6 +39,8 @@
 | R1の全street Flopの最適化build | [2入力・8条件の照合](hu-postflop-r1/flop-scaling/optimized/README.jp.md) | runtime依存を含む新規release buildで全状態約81MB／284MBと公開品質が各入力内で完全一致。narrowは前回debugとも一致。収束・32 workers性能は未認定 |
 | R1のFlop並列時のallocation診断 | [System allocatorのphase別記録](hu-postflop-r1/flop-scaling/alloc-probe/README.md) | narrow・2 workersのCFRで確保／再確保710,031→253,400回、要求総bytes179,026,248→65,028,912。1 worker対照countsと全状態・品質が一致。時間・RSS削減とは区別 |
 | R1のEV作業配列再利用 | [Flopでの一致と確保回数](hu-postflop-r1/flop-scaling/ev-scratch/README.jp.md)、[通常・release回帰検証](hu-postflop-r1/validation/ev-scratch/README.md) | 両EV経路でtask内Scratchを再利用。2入力・通常／計測版・1／2 workersの全8条件で全状態・品質が基準と一致し、品質走査のzeroed allocationが0回。時間・RSS・32 workersのスケール認定とは区別 |
+| R1のflat chanceとEV再利用の組合せ | [候補とnative検査](hu-postflop-r1/flop-scaling/flat-ev/README.jp.md) | 8実行の全state・公開品質一致、汎用境界8 tests成功。2 workersの確保要求量を削減。時間・RSS・本体採用は別判断。ローカルtimingは利用者指示で実行前に取り下げ |
+| R1のGCP使用量による予約再計算 | [使用量](hu-postflop-r1/cloud/usage-reconcile-20260927/README.md)、[計算と適用](hu-postflop-r1/cloud/usage-cost-bound-20260927/applied.json) | 利用者の追加許可により、VM08〜13の稼働/削除・Monitoring・料金を照合し5 USDを再利用枠へ復帰。控除後の表示0を実費0とせず、欠測と余裕を保持 |
 | R1の受入証拠の範囲 | [事前条件の監査](hu-postflop-r1/acceptance/audit.jp.md)、[将来の外部比較器](hu-postflop-r1/acceptance/external-contract.md) | 既存の事前条件と測定後索引を区別。将来の閾値発行・校正・欠測の検査であり、総合受入の認定ではない |
 | R1の実入力への境界適用 | [抽象化の適用確認](hu-postflop-r1/reference/abstraction-applicability.md) | 017/019のhand identity・joint重み・完全記憶の検査と、未実装・未評価の範囲 |
 | R1の工程別診断 | [source03 phase比較](hu-postflop-r1/phases/vm06-report.md) | 別instrumented buildのon/off較正、重複しない工程時間、元の性能実測との区別 |

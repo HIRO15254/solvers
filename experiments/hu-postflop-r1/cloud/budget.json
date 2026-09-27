@@ -19,9 +19,67 @@
       "additional_usd": 10,
       "cumulative_usd": 40,
       "scope": "Include 32-vCPU scaling measurements; use large VM only for finite measurement after small-VM validation."
+    },
+    {
+      "date": "2026-09-27",
+      "additional_usd": 0,
+      "cumulative_usd": 40,
+      "preference": "Minimize local compute. Reuse reservation differences when acquired GCP usage indicates costs are within estimates; retain uncertainty allowance."
     }
   ],
   "reservations": [
+    {
+      "id": "r1-20260927-14",
+      "project": "solvers-abstraction-20260723",
+      "zone": "us-central1-b",
+      "instance": "solvers-r1-20260927-14",
+      "reserved_usd": 3,
+      "billed_usd": null,
+      "reservation_released": false,
+      "maximum_runtime_hours": 1.25,
+      "machine_type": "e2-standard-2",
+      "measurement_machine_type": "e2-highcpu-32",
+      "capacity_or_quota_fallback": "n2-highcpu-32 on the same stopped instance only after explicit E2 failure; original deadline unchanged",
+      "provisioning_model": "SPOT",
+      "disk_type": "pd-balanced",
+      "disk_gib": 40,
+      "maximum_download_gib": 1,
+      "conservative_compute_usd_hour": 1.15,
+      "disk_usd_gib_hour": 0.000137,
+      "ipv4_usd_hour": 0.0025,
+      "reserved_egress_usd_gib": 0.3,
+      "tax_price_delay_and_other_reserve_usd": 1,
+      "instance_termination_action": "STOP",
+      "explicit_disk_cleanup_hours": 24,
+      "auto_restart": false,
+      "reserved_at_utc": "2026-09-27T02:43:48.010165+00:00",
+      "pricing_checked_utc": "2026-09-27",
+      "purpose": "Full-street Flop EV versus flat-EV at 1/2/4/8/16/32 workers, same fixed-iteration profile",
+      "preflight_evidence": "experiments/hu-postflop-r1/cloud/preflight-vm14/",
+      "note": "Usage-based reconciliation restored5USD with uncertainty reserve kept. One small2-vCPU Spot VM for dependencies, then same stopped VM resized32 for fresh native builds and96 comparison stages. Absolute75min STOP never extended; experiment<=40min ending>=15min before STOP. Conservative envelope2.895195USD<3USD. Cumulative held38USD;2USD unreserved; actual invoice unknown.",
+      "absolute_deadline_utc": "2026-09-27T03:58:56Z",
+      "events": [
+        {
+          "event": "instance_created_running",
+          "at": "2026-09-26T19:44:01.040-07:00",
+          "instance_id": "5878531675315846175",
+          "absolute_stop_deadline_utc": "2026-09-27T03:58:56Z",
+          "boot_disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260927-14",
+          "boot_disk_auto_delete": true,
+          "evidence": "experiments/hu-postflop-r1/cloud/create-result-r1-20260927-14.json"
+        },
+        {
+          "event": "source_verified_dependencies_fetched_on_two_vcpu",
+          "at": "2026-09-27T02:48:35.769804+00:00",
+          "archive_sha256": "59d070e22a9f10eddaec883c6841f4548db334ed367155049925ca741e0ee683",
+          "builds_or_solves_started": 0,
+          "evidence": [
+            "vm14/install02.stdout.log",
+            "vm14/fetch01.result.json"
+          ]
+        }
+      ]
+    },
     {
       "id": "r1-20260926-13",
       "project": "solvers-abstraction-20260723",
@@ -123,7 +181,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-12",
-      "reserved_usd": 3,
+      "reserved_usd": 1.8,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 1,
@@ -196,18 +254,29 @@
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/reconciliation.json",
           "billed_usd": null,
           "reservation_released": false
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
       ],
       "absolute_deadline_utc": "2026-09-26T21:34:03Z",
       "measurement_deadline_utc": "2026-09-26T21:19:03Z",
-      "disposition": "All36 current-source F32 endpoint runs plus2 fresh build stages passed; all raw bytes recovered and trusted locally verified. Same VM resized4->32; full worker/quality/state agreement. 16workers fastest among1/16/32 for all3 cases;32 slower16. VM and sole40GiB autoDelete disk explicitly deleted and named resources verified absent. Original STOP not extended. Invoice unknown; full3USD held, cumulative38/40,2unreserved."
+      "disposition": "All36 current-source F32 endpoint runs plus2 fresh build stages passed; all raw bytes recovered and trusted locally verified. Same VM resized4->32; full worker/quality/state agreement. 16workers fastest among1/16/32 for all3 cases;32 slower16. VM and sole40GiB autoDelete disk explicitly deleted and named resources verified absent. Original STOP not extended. Invoice unknown; full3USD held, cumulative38/40,2unreserved.",
+      "original_reserved_usd": 3.0
     },
     {
       "id": "r1-20260926-11",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-11",
-      "reserved_usd": 3,
+      "reserved_usd": 1.8,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 3,
@@ -375,17 +444,28 @@
           "evidence": "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/reconciliation.json",
           "billed_usd": null,
           "reservation_released": false
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
       ],
       "note": "3.02h at rounded on-demand compute/IP +40GiB disk up to24h +1GiB transfer +$1 margin =1.86187<3. Protocol frozen before candidate execution. Absolute3h STOP, no automatic restart/extension. Reserve20min for recovery, then explicit VM/disk deletion. Actual billing unknown; held35/40.",
-      "disposition": "VM11 and its sole 40GiB autoDelete disk explicitly deleted after all three attempts were recovered and verified. Delete DONE20:17:09.165Z, named-resource absence20:17:20.111820Z. Proof01 retains premeasurement host-identity failure; proof02 passed time/eligibleIO with memory null; focused memory03 passed Turn/Flop RSS screens but River missed10% criterion. Original STOP21:54:51Z not extended. Invoice unknown; full $3 reservation held, cumulative $35/$40."
+      "disposition": "VM11 and its sole 40GiB autoDelete disk explicitly deleted after all three attempts were recovered and verified. Delete DONE20:17:09.165Z, named-resource absence20:17:20.111820Z. Proof01 retains premeasurement host-identity failure; proof02 passed time/eligibleIO with memory null; focused memory03 passed Turn/Flop RSS screens but River missed10% criterion. Original STOP21:54:51Z not extended. Invoice unknown; full $3 reservation held, cumulative $35/$40.",
+      "original_reserved_usd": 3.0
     },
     {
       "id": "r1-20260926-10",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-10",
-      "reserved_usd": 3,
+      "reserved_usd": 1.8,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 4,
@@ -429,17 +509,28 @@
           "reserved_addresses": [],
           "reservation_released": false,
           "billed_usd": null
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
       ],
       "reserved_at_utc": "2026-09-26T15:55:50.829245+00:00",
-      "disposition": "Candidate04 full validation (958 workspace tests, 31 ignored, four selected release tests), 32 paired performance/quality runs and four additional ignored release tests passed; immutable source and raw evidence recovered and independently verified. Earlier candidate failures and diagnostic retained. VM and its auto-delete 40GiB boot disk explicitly deleted at 2026-09-26T17:45:17.305000+00:00; exact-name VM/disk and former reserved-address queries empty at 2026-09-26T17:51:09.145691+00:00. Billing unavailable; full $3 reservation remains held, cumulative $32/$40."
+      "disposition": "Candidate04 full validation (958 workspace tests, 31 ignored, four selected release tests), 32 paired performance/quality runs and four additional ignored release tests passed; immutable source and raw evidence recovered and independently verified. Earlier candidate failures and diagnostic retained. VM and its auto-delete 40GiB boot disk explicitly deleted at 2026-09-26T17:45:17.305000+00:00; exact-name VM/disk and former reserved-address queries empty at 2026-09-26T17:51:09.145691+00:00. Billing unavailable; full $3 reservation remains held, cumulative $32/$40.",
+      "original_reserved_usd": 3.0
     },
     {
       "id": "r1-20260926-09",
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260926-09",
-      "reserved_usd": 3,
+      "reserved_usd": 1.6,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_hours": 4,
@@ -495,9 +586,20 @@
           "reserved_addresses": [],
           "reservation_released": false,
           "billed_usd": null
+        },
+        {
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.6,
+          "restored_to_available_budget_usd": 1.4,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
       ],
-      "disposition": "VM09 and its 40GiB disk explicitly deleted after the 8,089,211-byte proof was downloaded and independently verified. Project instance, disk and reserved-address lists empty at 2026-09-26T15:38:37.2805183Z. Final same-boot validation: 933 workspace tests plus four selected release tests, 32 old/new sample output identities. First boot raw-evidence failure and first preparation CPU-quota failure retained separately. Invoice unknown; full $3 reservation held, cumulative $29/$40."
+      "disposition": "VM09 and its 40GiB disk explicitly deleted after the 8,089,211-byte proof was downloaded and independently verified. Project instance, disk and reserved-address lists empty at 2026-09-26T15:38:37.2805183Z. Final same-boot validation: 933 workspace tests plus four selected release tests, 32 old/new sample output identities. First boot raw-evidence failure and first preparation CPU-quota failure retained separately. Invoice unknown; full $3 reservation held, cumulative $29/$40.",
+      "original_reserved_usd": 3.0
     },
     {
       "id": "r1-20260926-08-scale32",
@@ -821,6 +923,87 @@
           "deadline_utc": "2026-09-25T20:09:11Z",
           "reservation_released": false,
           "billed_usd": null
+        }
+      ]
+    }
+  ],
+  "usage_reconciliations": [
+    {
+      "at": "2026-09-27T02:34:55.059119+00:00",
+      "authority": "User's 2026-09-27 explicit usage-based budget-reuse instruction",
+      "held_before_usd": 40,
+      "held_after_usd": 35,
+      "restored_usd": 5,
+      "available_after_usd": 5,
+      "actual_billed_usd": null,
+      "guaranteed_cost_ceiling": false,
+      "basis": "Observed usage plus complete resource lifetime envelopes, undiscounted rounded compute rates, 24h disks, original network and other reserves; credits not counted. Monitoring gaps are unknown, covered by retained allowances rather than filled as zero.",
+      "evidence": [
+        {
+          "path": "usage-cost-bound-20260927/report.json",
+          "bytes": 10059,
+          "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+        },
+        {
+          "path": "usage-reconcile-20260927/usage.json",
+          "bytes": 21273,
+          "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+        },
+        {
+          "path": "usage-reconcile-20260927/inventory-check.json",
+          "bytes": 2470,
+          "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+        },
+        {
+          "path": "preflight-vm14/pricing-sources.json",
+          "bytes": 4730,
+          "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+        }
+      ],
+      "changes": [
+        {
+          "id": "r1-20260926-12",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260926-11",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260926-10",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.8,
+          "restored_to_available_budget_usd": 1.2,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
+        },
+        {
+          "id": "r1-20260926-09",
+          "event": "usage_based_partial_reservation_reconciliation",
+          "at": "2026-09-27T02:34:55.059119+00:00",
+          "old_reserved_usd": 3.0,
+          "new_reserved_usd": 1.6,
+          "restored_to_available_budget_usd": 1.4,
+          "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+          "billed_usd": null,
+          "final_invoice": false
         }
       ]
     }

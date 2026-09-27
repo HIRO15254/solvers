@@ -1,0 +1,218 @@
+{
+  "inputs": {
+    "combined": {
+      "bytes": 41185,
+      "path": "runs\\flop-flat-ev01\\execution.json",
+      "sha256": "5dfae0bf5d11ec031338e9e7e17801e866419760362cd222abaf686a2bdee957"
+    },
+    "ev_baseline": {
+      "bytes": 41364,
+      "path": "experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\proof01\\execution.json",
+      "sha256": "b468082bcf53f9a7b4b0e32ed30ba473c90dba0599c84bb57be83074f06859a6"
+    }
+  },
+  "rows": [
+    {
+      "case": "narrow",
+      "cfr": {
+        "combined_flat_ev": {
+          "alloc_calls": 49,
+          "alloc_requested_bytes": 8328,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 8,
+          "realloc_calls": 36,
+          "realloc_requested_new_bytes": 15792,
+          "requested_total_bytes": 24120
+        },
+        "ev_baseline": {
+          "alloc_calls": 49,
+          "alloc_requested_bytes": 8328,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 8,
+          "realloc_calls": 36,
+          "realloc_requested_new_bytes": 15792,
+          "requested_total_bytes": 24120
+        },
+        "observed_requested_byte_ratio": 1.0
+      },
+      "quality_7_walks": {
+        "combined_flat_ev": {
+          "alloc_calls": 175,
+          "alloc_requested_bytes": 31168,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 175,
+          "realloc_calls": 156,
+          "realloc_requested_new_bytes": 61280,
+          "requested_total_bytes": 92448
+        },
+        "ev_baseline": {
+          "alloc_calls": 175,
+          "alloc_requested_bytes": 31168,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 175,
+          "realloc_calls": 156,
+          "realloc_requested_new_bytes": 61280,
+          "requested_total_bytes": 92448
+        },
+        "observed_requested_byte_ratio": 1.0
+      },
+      "workers": 1
+    },
+    {
+      "case": "narrow",
+      "cfr": {
+        "combined_flat_ev": {
+          "alloc_calls": 224709,
+          "alloc_requested_bytes": 55292200,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 224692,
+          "realloc_calls": 30277,
+          "realloc_requested_new_bytes": 10101384,
+          "requested_total_bytes": 65393584
+        },
+        "ev_baseline": {
+          "alloc_calls": 408484,
+          "alloc_requested_bytes": 75661664,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 408468,
+          "realloc_calls": 295524,
+          "realloc_requested_new_bytes": 102203656,
+          "requested_total_bytes": 177865320
+        },
+        "observed_requested_byte_ratio": 0.3676578660752979
+      },
+      "quality_7_walks": {
+        "combined_flat_ev": {
+          "alloc_calls": 216509,
+          "alloc_requested_bytes": 49293612,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 216509,
+          "realloc_calls": 39470,
+          "realloc_requested_new_bytes": 12703680,
+          "requested_total_bytes": 61997292
+        },
+        "ev_baseline": {
+          "alloc_calls": 558214,
+          "alloc_requested_bytes": 102139404,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 558214,
+          "realloc_calls": 334384,
+          "realloc_requested_new_bytes": 124841712,
+          "requested_total_bytes": 226981116
+        },
+        "observed_requested_byte_ratio": 0.2731385460277673
+      },
+      "workers": 2
+    },
+    {
+      "case": "expanded",
+      "cfr": {
+        "combined_flat_ev": {
+          "alloc_calls": 49,
+          "alloc_requested_bytes": 24120,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 8,
+          "realloc_calls": 53,
+          "realloc_requested_new_bytes": 75112,
+          "requested_total_bytes": 99232
+        },
+        "ev_baseline": {
+          "alloc_calls": 52,
+          "alloc_requested_bytes": 29136,
+          "alloc_zeroed_calls": 1,
+          "alloc_zeroed_requested_bytes": 1520,
+          "dealloc_calls": 9,
+          "realloc_calls": 53,
+          "realloc_requested_new_bytes": 75112,
+          "requested_total_bytes": 105768
+        },
+        "observed_requested_byte_ratio": 0.9382043718326905
+      },
+      "quality_7_walks": {
+        "combined_flat_ev": {
+          "alloc_calls": 175,
+          "alloc_requested_bytes": 106044,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 175,
+          "realloc_calls": 168,
+          "realloc_requested_new_bytes": 225760,
+          "requested_total_bytes": 331804
+        },
+        "ev_baseline": {
+          "alloc_calls": 175,
+          "alloc_requested_bytes": 106044,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 175,
+          "realloc_calls": 168,
+          "realloc_requested_new_bytes": 225760,
+          "requested_total_bytes": 331804
+        },
+        "observed_requested_byte_ratio": 1.0
+      },
+      "workers": 1
+    },
+    {
+      "case": "expanded",
+      "cfr": {
+        "combined_flat_ev": {
+          "alloc_calls": 215277,
+          "alloc_requested_bytes": 127251604,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 215260,
+          "realloc_calls": 28535,
+          "realloc_requested_new_bytes": 22739776,
+          "requested_total_bytes": 149991380
+        },
+        "ev_baseline": {
+          "alloc_calls": 406832,
+          "alloc_requested_bytes": 203855508,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 406816,
+          "realloc_calls": 342189,
+          "realloc_requested_new_bytes": 437741728,
+          "requested_total_bytes": 641597236
+        },
+        "observed_requested_byte_ratio": 0.23377809564005042
+      },
+      "quality_7_walks": {
+        "combined_flat_ev": {
+          "alloc_calls": 215060,
+          "alloc_requested_bytes": 131132080,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 215060,
+          "realloc_calls": 37582,
+          "realloc_requested_new_bytes": 32265120,
+          "requested_total_bytes": 163397200
+        },
+        "ev_baseline": {
+          "alloc_calls": 553843,
+          "alloc_requested_bytes": 296019996,
+          "alloc_zeroed_calls": 0,
+          "alloc_zeroed_requested_bytes": 0,
+          "dealloc_calls": 553843,
+          "realloc_calls": 446000,
+          "realloc_requested_new_bytes": 632343780,
+          "requested_total_bytes": 928363776
+        },
+        "observed_requested_byte_ratio": 0.1760055747802034
+      },
+      "workers": 2
+    }
+  ],
+  "schema": "r1-flat-ev-observed-alloc-comparison/v1",
+  "scope": "Separate observed runs, requested sizes include full realloc new requests; scheduling can vary counters. No timing, RSS or convergence claim."
+}

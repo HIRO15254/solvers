@@ -1,0 +1,1007 @@
+{
+  "timeSeries": [
+    {
+      "metric": {
+        "labels": {
+          "instance_name": "solvers-r1-20260926-10",
+          "loadbalanced": "false"
+        },
+        "type": "compute.googleapis.com/instance/network/sent_bytes_count"
+      },
+      "resource": {
+        "type": "gce_instance",
+        "labels": {
+          "project_id": "solvers-abstraction-20260723",
+          "zone": "us-central1-b",
+          "instance_id": "9019841781761201633"
+        }
+      },
+      "metricKind": "DELTA",
+      "valueType": "INT64",
+      "points": [
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:44:00.001Z",
+            "endTime": "2026-09-26T17:45:00Z"
+          },
+          "value": {
+            "int64Value": "105323"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:43:00.001Z",
+            "endTime": "2026-09-26T17:44:00Z"
+          },
+          "value": {
+            "int64Value": "214017"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:42:00.001Z",
+            "endTime": "2026-09-26T17:43:00Z"
+          },
+          "value": {
+            "int64Value": "454157"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:41:00.001Z",
+            "endTime": "2026-09-26T17:42:00Z"
+          },
+          "value": {
+            "int64Value": "3410009"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:40:00.001Z",
+            "endTime": "2026-09-26T17:41:00Z"
+          },
+          "value": {
+            "int64Value": "1006977"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:39:00.001Z",
+            "endTime": "2026-09-26T17:40:00Z"
+          },
+          "value": {
+            "int64Value": "7575830"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:38:00.001Z",
+            "endTime": "2026-09-26T17:39:00Z"
+          },
+          "value": {
+            "int64Value": "6128"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:37:00.001Z",
+            "endTime": "2026-09-26T17:38:00Z"
+          },
+          "value": {
+            "int64Value": "672"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:36:00.001Z",
+            "endTime": "2026-09-26T17:37:00Z"
+          },
+          "value": {
+            "int64Value": "5863"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:35:00.001Z",
+            "endTime": "2026-09-26T17:36:00Z"
+          },
+          "value": {
+            "int64Value": "6483"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:34:00.001Z",
+            "endTime": "2026-09-26T17:35:00Z"
+          },
+          "value": {
+            "int64Value": "6360"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:33:00.001Z",
+            "endTime": "2026-09-26T17:34:00Z"
+          },
+          "value": {
+            "int64Value": "7396"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:32:00.001Z",
+            "endTime": "2026-09-26T17:33:00Z"
+          },
+          "value": {
+            "int64Value": "718"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:31:00.001Z",
+            "endTime": "2026-09-26T17:32:00Z"
+          },
+          "value": {
+            "int64Value": "5534"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:30:00.001Z",
+            "endTime": "2026-09-26T17:31:00Z"
+          },
+          "value": {
+            "int64Value": "1309"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:29:00.001Z",
+            "endTime": "2026-09-26T17:30:00Z"
+          },
+          "value": {
+            "int64Value": "6073"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:28:00.001Z",
+            "endTime": "2026-09-26T17:29:00Z"
+          },
+          "value": {
+            "int64Value": "5864"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:27:00.001Z",
+            "endTime": "2026-09-26T17:28:00Z"
+          },
+          "value": {
+            "int64Value": "35"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:26:00.001Z",
+            "endTime": "2026-09-26T17:27:00Z"
+          },
+          "value": {
+            "int64Value": "779"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:25:00.001Z",
+            "endTime": "2026-09-26T17:26:00Z"
+          },
+          "value": {
+            "int64Value": "5916"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:24:00.001Z",
+            "endTime": "2026-09-26T17:25:00Z"
+          },
+          "value": {
+            "int64Value": "728"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:23:00.001Z",
+            "endTime": "2026-09-26T17:24:00Z"
+          },
+          "value": {
+            "int64Value": "7059"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:22:00.001Z",
+            "endTime": "2026-09-26T17:23:00Z"
+          },
+          "value": {
+            "int64Value": "11634"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:21:00.001Z",
+            "endTime": "2026-09-26T17:22:00Z"
+          },
+          "value": {
+            "int64Value": "5"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:20:00.001Z",
+            "endTime": "2026-09-26T17:21:00Z"
+          },
+          "value": {
+            "int64Value": "1477"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:19:00.001Z",
+            "endTime": "2026-09-26T17:20:00Z"
+          },
+          "value": {
+            "int64Value": "16635"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:18:00.001Z",
+            "endTime": "2026-09-26T17:19:00Z"
+          },
+          "value": {
+            "int64Value": "43183"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:17:00.001Z",
+            "endTime": "2026-09-26T17:18:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:16:00.001Z",
+            "endTime": "2026-09-26T17:17:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:15:00.001Z",
+            "endTime": "2026-09-26T17:16:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:14:00.001Z",
+            "endTime": "2026-09-26T17:15:00Z"
+          },
+          "value": {
+            "int64Value": "18"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:13:00.001Z",
+            "endTime": "2026-09-26T17:14:00Z"
+          },
+          "value": {
+            "int64Value": "763869"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:12:00.001Z",
+            "endTime": "2026-09-26T17:13:00Z"
+          },
+          "value": {
+            "int64Value": "5799640"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:11:00.001Z",
+            "endTime": "2026-09-26T17:12:00Z"
+          },
+          "value": {
+            "int64Value": "35"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:10:00.001Z",
+            "endTime": "2026-09-26T17:11:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:09:00.001Z",
+            "endTime": "2026-09-26T17:10:00Z"
+          },
+          "value": {
+            "int64Value": "996171"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:08:00.001Z",
+            "endTime": "2026-09-26T17:09:00Z"
+          },
+          "value": {
+            "int64Value": "7565627"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:07:00.001Z",
+            "endTime": "2026-09-26T17:08:00Z"
+          },
+          "value": {
+            "int64Value": "6580"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:06:00.001Z",
+            "endTime": "2026-09-26T17:07:00Z"
+          },
+          "value": {
+            "int64Value": "681"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:05:00.001Z",
+            "endTime": "2026-09-26T17:06:00Z"
+          },
+          "value": {
+            "int64Value": "5933"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:04:00.001Z",
+            "endTime": "2026-09-26T17:05:00Z"
+          },
+          "value": {
+            "int64Value": "6506"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:03:00.001Z",
+            "endTime": "2026-09-26T17:04:00Z"
+          },
+          "value": {
+            "int64Value": "6414"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:02:00.001Z",
+            "endTime": "2026-09-26T17:03:00Z"
+          },
+          "value": {
+            "int64Value": "5730"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:01:00.001Z",
+            "endTime": "2026-09-26T17:02:00Z"
+          },
+          "value": {
+            "int64Value": "106"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T17:00:00.001Z",
+            "endTime": "2026-09-26T17:01:00Z"
+          },
+          "value": {
+            "int64Value": "894"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:59:00.001Z",
+            "endTime": "2026-09-26T17:00:00Z"
+          },
+          "value": {
+            "int64Value": "6919"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:58:00.001Z",
+            "endTime": "2026-09-26T16:59:00Z"
+          },
+          "value": {
+            "int64Value": "6057"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:57:00.001Z",
+            "endTime": "2026-09-26T16:58:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:56:00.001Z",
+            "endTime": "2026-09-26T16:57:00Z"
+          },
+          "value": {
+            "int64Value": "867"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:55:00.001Z",
+            "endTime": "2026-09-26T16:56:00Z"
+          },
+          "value": {
+            "int64Value": "7434"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:54:00.001Z",
+            "endTime": "2026-09-26T16:55:00Z"
+          },
+          "value": {
+            "int64Value": "6489"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:53:00.001Z",
+            "endTime": "2026-09-26T16:54:00Z"
+          },
+          "value": {
+            "int64Value": "843"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:52:00.001Z",
+            "endTime": "2026-09-26T16:53:00Z"
+          },
+          "value": {
+            "int64Value": "8070"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:51:00.001Z",
+            "endTime": "2026-09-26T16:52:00Z"
+          },
+          "value": {
+            "int64Value": "12652"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:50:00.001Z",
+            "endTime": "2026-09-26T16:51:00Z"
+          },
+          "value": {
+            "int64Value": "176911"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:49:00.001Z",
+            "endTime": "2026-09-26T16:50:00Z"
+          },
+          "value": {
+            "int64Value": "1343487"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:48:00.001Z",
+            "endTime": "2026-09-26T16:49:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:47:00.001Z",
+            "endTime": "2026-09-26T16:48:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:46:00.001Z",
+            "endTime": "2026-09-26T16:47:00Z"
+          },
+          "value": {
+            "int64Value": "5297"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:45:00.001Z",
+            "endTime": "2026-09-26T16:46:00Z"
+          },
+          "value": {
+            "int64Value": "42276"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:44:00.001Z",
+            "endTime": "2026-09-26T16:45:00Z"
+          },
+          "value": {
+            "int64Value": "15561"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:43:00.001Z",
+            "endTime": "2026-09-26T16:44:00Z"
+          },
+          "value": {
+            "int64Value": "1679"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:42:00.001Z",
+            "endTime": "2026-09-26T16:43:00Z"
+          },
+          "value": {
+            "int64Value": "13154"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:41:00.001Z",
+            "endTime": "2026-09-26T16:42:00Z"
+          },
+          "value": {
+            "int64Value": "12108"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:40:00.001Z",
+            "endTime": "2026-09-26T16:41:00Z"
+          },
+          "value": {
+            "int64Value": "53192"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:39:00.001Z",
+            "endTime": "2026-09-26T16:40:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:38:00.001Z",
+            "endTime": "2026-09-26T16:39:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:37:00.001Z",
+            "endTime": "2026-09-26T16:38:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:36:00.001Z",
+            "endTime": "2026-09-26T16:37:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:35:00.001Z",
+            "endTime": "2026-09-26T16:36:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:34:00.001Z",
+            "endTime": "2026-09-26T16:35:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:33:00.001Z",
+            "endTime": "2026-09-26T16:34:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:32:00.001Z",
+            "endTime": "2026-09-26T16:33:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:31:00.001Z",
+            "endTime": "2026-09-26T16:32:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:30:00.001Z",
+            "endTime": "2026-09-26T16:31:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:29:00.001Z",
+            "endTime": "2026-09-26T16:30:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:28:00.001Z",
+            "endTime": "2026-09-26T16:29:00Z"
+          },
+          "value": {
+            "int64Value": "5"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:27:00.001Z",
+            "endTime": "2026-09-26T16:28:00Z"
+          },
+          "value": {
+            "int64Value": "35"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:26:00.001Z",
+            "endTime": "2026-09-26T16:27:00Z"
+          },
+          "value": {
+            "int64Value": "1036129"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:25:00.001Z",
+            "endTime": "2026-09-26T16:26:00Z"
+          },
+          "value": {
+            "int64Value": "7868192"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:24:00.001Z",
+            "endTime": "2026-09-26T16:25:00Z"
+          },
+          "value": {
+            "int64Value": "778"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:23:00.001Z",
+            "endTime": "2026-09-26T16:24:00Z"
+          },
+          "value": {
+            "int64Value": "7322"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:22:00.001Z",
+            "endTime": "2026-09-26T16:23:00Z"
+          },
+          "value": {
+            "int64Value": "10733"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:21:00.001Z",
+            "endTime": "2026-09-26T16:22:00Z"
+          },
+          "value": {
+            "int64Value": "738"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:20:00.001Z",
+            "endTime": "2026-09-26T16:21:00Z"
+          },
+          "value": {
+            "int64Value": "6394"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:19:00.001Z",
+            "endTime": "2026-09-26T16:20:00Z"
+          },
+          "value": {
+            "int64Value": "6969"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:18:00.001Z",
+            "endTime": "2026-09-26T16:19:00Z"
+          },
+          "value": {
+            "int64Value": "7936"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:17:00.001Z",
+            "endTime": "2026-09-26T16:18:00Z"
+          },
+          "value": {
+            "int64Value": "4893"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:16:00.001Z",
+            "endTime": "2026-09-26T16:17:00Z"
+          },
+          "value": {
+            "int64Value": "7022"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:15:00.001Z",
+            "endTime": "2026-09-26T16:16:00Z"
+          },
+          "value": {
+            "int64Value": "6762"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:14:00.001Z",
+            "endTime": "2026-09-26T16:15:00Z"
+          },
+          "value": {
+            "int64Value": "6319"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:13:00.001Z",
+            "endTime": "2026-09-26T16:14:00Z"
+          },
+          "value": {
+            "int64Value": "851"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:12:00.001Z",
+            "endTime": "2026-09-26T16:13:00Z"
+          },
+          "value": {
+            "int64Value": "7313"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:11:00.001Z",
+            "endTime": "2026-09-26T16:12:00Z"
+          },
+          "value": {
+            "int64Value": "6474"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:10:00.001Z",
+            "endTime": "2026-09-26T16:11:00Z"
+          },
+          "value": {
+            "int64Value": "0"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:09:00.001Z",
+            "endTime": "2026-09-26T16:10:00Z"
+          },
+          "value": {
+            "int64Value": "10"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:08:00.001Z",
+            "endTime": "2026-09-26T16:09:00Z"
+          },
+          "value": {
+            "int64Value": "374"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:07:00.001Z",
+            "endTime": "2026-09-26T16:08:00Z"
+          },
+          "value": {
+            "int64Value": "3074"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:06:00.001Z",
+            "endTime": "2026-09-26T16:07:00Z"
+          },
+          "value": {
+            "int64Value": "6185"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:05:00.001Z",
+            "endTime": "2026-09-26T16:06:00Z"
+          },
+          "value": {
+            "int64Value": "1732"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:04:00.001Z",
+            "endTime": "2026-09-26T16:05:00Z"
+          },
+          "value": {
+            "int64Value": "20453"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:03:00.001Z",
+            "endTime": "2026-09-26T16:04:00Z"
+          },
+          "value": {
+            "int64Value": "109354"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:02:00.001Z",
+            "endTime": "2026-09-26T16:03:00Z"
+          },
+          "value": {
+            "int64Value": "17497"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:01:00.001Z",
+            "endTime": "2026-09-26T16:02:00Z"
+          },
+          "value": {
+            "int64Value": "92140"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T16:00:00.001Z",
+            "endTime": "2026-09-26T16:01:00Z"
+          },
+          "value": {
+            "int64Value": "1239"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T15:59:00.001Z",
+            "endTime": "2026-09-26T16:00:00Z"
+          },
+          "value": {
+            "int64Value": "47551"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T15:58:00.001Z",
+            "endTime": "2026-09-26T15:59:00Z"
+          },
+          "value": {
+            "int64Value": "354007"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T15:57:00.001Z",
+            "endTime": "2026-09-26T15:58:00Z"
+          },
+          "value": {
+            "int64Value": "281405"
+          }
+        },
+        {
+          "interval": {
+            "startTime": "2026-09-26T15:56:00.001Z",
+            "endTime": "2026-09-26T15:57:00Z"
+          },
+          "value": {
+            "int64Value": "93247"
+          }
+        }
+      ]
+    }
+  ],
+  "unit": "By"
+}

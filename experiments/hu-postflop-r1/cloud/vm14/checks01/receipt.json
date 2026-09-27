@@ -1,0 +1,101 @@
+{
+  "schema": "r1.vm14-deployment-checks/v1",
+  "at": "2026-09-27T02:42:14.330683+00:00",
+  "elapsed_seconds": 0.006737299961969256,
+  "source_before": {
+    "start.py": {
+      "bytes": 6218,
+      "sha256": "b95c713442c96c3e9b6ad7a22eb80bf7d190d625405276dc785a01dbb38edcda"
+    },
+    "run.sh": {
+      "bytes": 2581,
+      "sha256": "1020d8690ab5cf6ad34ca123b8316e196a23b0603a64d6db9d336095b97338d1"
+    },
+    "recover.sh": {
+      "bytes": 5798,
+      "sha256": "9eced454d556555945c0ce4ec811fed410f68be67e1a3fc80e0b77083a2e6893"
+    },
+    "capture-command.py": {
+      "bytes": 2171,
+      "sha256": "a6e7bdd649d7936944a8f59ffb914241603104ab7603fc3a21eb9f3c656a3ab0"
+    },
+    "fetch-dependencies.sh": {
+      "bytes": 885,
+      "sha256": "f32f3333d509aeaf94087383529ead17903d29e7219f4f845dd84cfc7dee05f7"
+    },
+    "README.md": {
+      "bytes": 2914,
+      "sha256": "8b83ae16f875dd2481c41c5000b16b9ffbbeabe96fcf13b387a9f83b98e070e0"
+    }
+  },
+  "source_after": {
+    "start.py": {
+      "bytes": 6218,
+      "sha256": "b95c713442c96c3e9b6ad7a22eb80bf7d190d625405276dc785a01dbb38edcda"
+    },
+    "run.sh": {
+      "bytes": 2581,
+      "sha256": "1020d8690ab5cf6ad34ca123b8316e196a23b0603a64d6db9d336095b97338d1"
+    },
+    "recover.sh": {
+      "bytes": 5798,
+      "sha256": "9eced454d556555945c0ce4ec811fed410f68be67e1a3fc80e0b77083a2e6893"
+    },
+    "capture-command.py": {
+      "bytes": 2171,
+      "sha256": "a6e7bdd649d7936944a8f59ffb914241603104ab7603fc3a21eb9f3c656a3ab0"
+    },
+    "fetch-dependencies.sh": {
+      "bytes": 885,
+      "sha256": "f32f3333d509aeaf94087383529ead17903d29e7219f4f845dd84cfc7dee05f7"
+    },
+    "README.md": {
+      "bytes": 2914,
+      "sha256": "8b83ae16f875dd2481c41c5000b16b9ffbbeabe96fcf13b387a9f83b98e070e0"
+    }
+  },
+  "results": [
+    {
+      "file": "start.py",
+      "python_parse": "passed"
+    },
+    {
+      "file": "capture-command.py",
+      "python_parse": "passed"
+    },
+    {
+      "file": "run.sh",
+      "embedded_python_parsed": 2
+    },
+    {
+      "file": "recover.sh",
+      "embedded_python_parsed": 1
+    },
+    {
+      "file": "fetch-dependencies.sh",
+      "embedded_python_parsed": 0
+    }
+  ],
+  "bash_syntax_check": {
+    "status": "environment_failure_before_parse",
+    "argv": [
+      "C:/Program Files/Git/bin/bash.exe",
+      "-n",
+      "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm14\\run.sh"
+    ],
+    "exit_code": 1,
+    "reason": "Windows MSYS CreateFileMapping error5",
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 2529,
+      "sha256": "1b6c7705bdbd849e8d17120c0bbcdb813d554a6f77803917ae48722b5651592f"
+    },
+    "required_followup": "bash -n on three shell scripts on small Linux VM before dispatch"
+  },
+  "native_build_or_solve": false,
+  "cloud_commands": false,
+  "linux_service_execution": false
+}

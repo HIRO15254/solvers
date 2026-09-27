@@ -1,0 +1,10 @@
+{
+  "id": "337032",
+  "name": "e2-highcpu-32",
+  "guestCpus": 32,
+  "memoryMb": 32768,
+  "maximumPersistentDisks": 128,
+  "maximumPersistentDisksSizeGb": "524288",
+  "zone": "us-central1-b",
+  "isSharedCpu": false
+}

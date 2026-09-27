@@ -1,0 +1,117 @@
+{
+  "status": "passed",
+  "source_unchanged": true,
+  "native_plan": {
+    "bytes": 58995,
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\plan.json",
+    "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837"
+  },
+  "native_build": {
+    "bytes": 16572,
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build.json",
+    "sha256": "3aca90eec943788caff56f898c6a589266cbc98ae016b35e167bcd5f9797a888"
+  },
+  "native_engine": {
+    "bytes": 879906,
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+    "sha256": "0337143a8cd1103fedad49989d663e57af721ec7b247471852f067db9e797904"
+  },
+  "source_archive": {
+    "bytes": 164280,
+    "sha256": "7fd88736bb911d9e9b01ed89e1e564d2377e009110f96607e6fefe753f181388"
+  },
+  "candidate_solver": {
+    "bytes": 58955,
+    "sha256": "ec9e5e6b5230684fce6f2315370ceda0e05fb4346eb7e4ff44ea05e6028aabcd"
+  },
+  "test_inputs": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    }
+  },
+  "stages": [
+    {
+      "stage": "build-00-parallel",
+      "elapsed_seconds": 50.28330540005118,
+      "sample_count": 495,
+      "sampled_peak_resident_bytes": 355962880,
+      "job_peak_commit_bytes": 313851904,
+      "tests_passed": [],
+      "artifact": {
+        "bytes": 1698816,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\parallel.exe",
+        "sha256": "034216a836810d5e6427b15d6921a56cb542f1e41983bd524a868f064a5d73b9"
+      },
+      "record": {
+        "bytes": 9942,
+        "sha256": "d73babcda6479e9795d278859935f9d2629b482eff4a1895f2cd51019c3f7f18"
+      }
+    },
+    {
+      "stage": "build-01-values",
+      "elapsed_seconds": 16.213452499825507,
+      "sample_count": 130,
+      "sampled_peak_resident_bytes": 255819776,
+      "job_peak_commit_bytes": 219987968,
+      "tests_passed": [],
+      "artifact": {
+        "bytes": 1273856,
+        "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\values.exe",
+        "sha256": "e70bc741fb5435d146725ca63a7e6fc64d022950ea285f149754653712ff8367"
+      },
+      "record": {
+        "bytes": 9922,
+        "sha256": "79fce1b8e8458335bfb0de7b73667cf2dadae35be2dedf9cd5bac46cafb70ec2"
+      }
+    },
+    {
+      "stage": "run-00-parallel",
+      "elapsed_seconds": 1.0173253999091685,
+      "sample_count": 9,
+      "sampled_peak_resident_bytes": 21110784,
+      "job_peak_commit_bytes": 8359936,
+      "tests_passed": [
+        "mapped_chance_and_action_siblings_preserve_f32_state",
+        "mapped_chance_and_action_siblings_preserve_i16_state",
+        "parallel_chance_fanout_is_bitwise_deterministic",
+        "selected_value_recording_preserves_ancestor_values_and_storage",
+        "zero_mapped_chance_preserves_f32_state_and_all_values",
+        "zero_mapped_chance_preserves_i16_state_and_all_values"
+      ],
+      "artifact": null,
+      "record": {
+        "bytes": 8097,
+        "sha256": "42b2a4afe8459476a554eabbd39db9eb53006e667a8b0deedfc2638f830c48ba"
+      }
+    },
+    {
+      "stage": "run-01-values",
+      "elapsed_seconds": 0.23543130001053214,
+      "sample_count": 2,
+      "sampled_peak_resident_bytes": 2056192,
+      "job_peak_commit_bytes": 3018752,
+      "tests_passed": [
+        "untrained_empty_and_variable_value_spaces_f32",
+        "untrained_empty_and_variable_value_spaces_i16"
+      ],
+      "artifact": null,
+      "record": {
+        "bytes": 7555,
+        "sha256": "c376ae0938719c743be52e110711d21ac0b801b80bc9496eb0a755964dc37d17"
+      }
+    }
+  ]
+}

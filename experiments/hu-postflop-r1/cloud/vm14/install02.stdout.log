@@ -1,0 +1,4 @@
+/tmp/install.py: OK
+{"archive_sha256": "59d070e22a9f10eddaec883c6841f4548db334ed367155049925ca741e0ee683", "manifest": {"bytes": 69316, "sha256": "377d343542235c5ec33c2d3e52887d3a1c99e04ae353ca16dba9ae6291fe621e"}, "source_revision": "0d54a9e64cf0a1eb57533938a2907c5dc80c2812", "source_files": 208, "destination": "/opt/r1/flop-flat-cloud32-package", "builds_or_solves_started": 0}
+{"manifest": {"bytes": 69316, "sha256": "377d343542235c5ec33c2d3e52887d3a1c99e04ae353ca16dba9ae6291fe621e"}, "installation": {"bytes": 388, "sha256": "918c391ec8f9de1e879ccc56524d3aa613a34c7637158d07541a94c7089abf14"}, "source_revision": "0d54a9e64cf0a1eb57533938a2907c5dc80c2812", "package_files": 227}
+2026-09-27T02:46:47+00:00

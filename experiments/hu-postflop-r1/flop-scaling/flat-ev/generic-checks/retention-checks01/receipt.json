@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "script_before": {
+    "bytes": 13942,
+    "sha256": "6e503f9f95391d1be71289f5ae4d4550548a4a978dea2cab0281ba2233a86d2d"
+  },
+  "commands": [
+    {
+      "phase": "retain",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\evidence.py",
+        "retain",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\proof01"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.579187500057742,
+      "stdout": {
+        "bytes": 2126,
+        "sha256": "649bcf8a8516b53391e450d2c6c9ffbe0ada27259fdb82564cf2b177fc5ed02b"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "phase": "verify",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\evidence.py",
+        "verify",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\proof01"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.16030810005031526,
+      "stdout": {
+        "bytes": 2126,
+        "sha256": "649bcf8a8516b53391e450d2c6c9ffbe0ada27259fdb82564cf2b177fc5ed02b"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "script_after": {
+    "bytes": 13942,
+    "sha256": "6e503f9f95391d1be71289f5ae4d4550548a4a978dea2cab0281ba2233a86d2d"
+  },
+  "script_unchanged": true
+}

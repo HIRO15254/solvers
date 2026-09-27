@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=sudo systemd-run --unit=solvers-r1-vm14-fetch --wait --pipe --property=RuntimeMaxSec=180 --property=MemoryMax=1G --property=MemorySwapMax=0 --property=KillMode=control-group /bin/bash /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/fetch-dependencies.sh"
+  ],
+  "started_utc": "2026-09-27T02:47:47.781618+00:00",
+  "timeout_seconds": 240,
+  "stdout": {
+    "bytes": 304,
+    "sha256": "b3120b949406234315e6d0a574ceaaeb48ee3e9b66a5a3a5aea9ec60137fa5d3"
+  },
+  "stderr": {
+    "bytes": 4221,
+    "sha256": "c92fe6c62afd0adce702f803c6d92cd7695269760563a6775547cdbd3dbfb9f7"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T02:47:55.061044+00:00"
+}

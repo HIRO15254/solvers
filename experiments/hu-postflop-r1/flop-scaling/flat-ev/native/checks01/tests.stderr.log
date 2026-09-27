@@ -1,0 +1,10 @@
+test_missing_metadata_token_rejected (__main__.WrapperTests.test_missing_metadata_token_rejected) ... ok
+test_new_graph_uses_fresh_affected_rlibs (__main__.WrapperTests.test_new_graph_uses_fresh_affected_rlibs) ... ok
+test_old_dependency_and_bounds_unmodified (__main__.WrapperTests.test_old_dependency_and_bounds_unmodified) ... ok
+test_only_five_identity_tokens_change (__main__.WrapperTests.test_only_five_identity_tokens_change) ... ok
+test_shared_pin_and_globals_preserved (__main__.WrapperTests.test_shared_pin_and_globals_preserved) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.025s
+
+OK

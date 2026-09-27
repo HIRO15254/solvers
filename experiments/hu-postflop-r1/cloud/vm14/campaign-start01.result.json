@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=sudo python3 -B /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/start.py --deadline-utc 2026-09-27T03:30:00Z --stop-deadline-utc 2026-09-27T03:58:56Z"
+  ],
+  "started_utc": "2026-09-27T02:51:18.773134+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 1468,
+    "sha256": "b212ea5b6da806ed2db5bcb8e62977b2f9cab55e68b2481ceee9cdcbfc91c5ce"
+  },
+  "stderr": {
+    "bytes": 97,
+    "sha256": "b7de82e7ff12258d0c7da872d3300e77c861eef59c4430dd26c29a50d0fc39fe"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T02:51:26.259071+00:00"
+}

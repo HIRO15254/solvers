@@ -1,0 +1,89 @@
+{
+  "at": "2026-09-27T02:34:55.059119+00:00",
+  "authority": "User's 2026-09-27 explicit usage-based budget-reuse instruction",
+  "held_before_usd": 40,
+  "held_after_usd": 35,
+  "restored_usd": 5,
+  "available_after_usd": 5,
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling": false,
+  "basis": "Observed usage plus complete resource lifetime envelopes, undiscounted rounded compute rates, 24h disks, original network and other reserves; credits not counted. Monitoring gaps are unknown, covered by retained allowances rather than filled as zero.",
+  "evidence": [
+    {
+      "path": "usage-cost-bound-20260927/report.json",
+      "bytes": 10059,
+      "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+    },
+    {
+      "path": "usage-reconcile-20260927/usage.json",
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    {
+      "path": "usage-reconcile-20260927/inventory-check.json",
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    {
+      "path": "preflight-vm14/pricing-sources.json",
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    }
+  ],
+  "changes": [
+    {
+      "id": "r1-20260926-12",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T02:34:55.059119+00:00",
+      "old_reserved_usd": 3.0,
+      "new_reserved_usd": 1.8,
+      "restored_to_available_budget_usd": 1.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260926-11",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T02:34:55.059119+00:00",
+      "old_reserved_usd": 3.0,
+      "new_reserved_usd": 1.8,
+      "restored_to_available_budget_usd": 1.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260926-10",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T02:34:55.059119+00:00",
+      "old_reserved_usd": 3.0,
+      "new_reserved_usd": 1.8,
+      "restored_to_available_budget_usd": 1.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    },
+    {
+      "id": "r1-20260926-09",
+      "event": "usage_based_partial_reservation_reconciliation",
+      "at": "2026-09-27T02:34:55.059119+00:00",
+      "old_reserved_usd": 3.0,
+      "new_reserved_usd": 1.6,
+      "restored_to_available_budget_usd": 1.4,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/report.json",
+      "billed_usd": null,
+      "final_invoice": false
+    }
+  ],
+  "ledger_before": {
+    "path": "budget.json",
+    "bytes": 45258,
+    "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+  },
+  "ledger_after": {
+    "path": "budget.json",
+    "bytes": 49822,
+    "sha256": "e7998aba73a70da0402bbdf6b8e54e74610d3efe015f057c4bfa073fb6a9f56f"
+  }
+}

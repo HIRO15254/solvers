@@ -1,0 +1,124 @@
+{
+  "argv": [
+    "C:/Python313/python.exe",
+    "-B",
+    "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/calculate.py",
+    "--check"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "started_at": "2026-09-27T02:34:59.140149+00:00",
+  "ended_at": "2026-09-27T02:34:59.242605+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 0.09893199987709522,
+  "source_before": {
+    "calculate.py": {
+      "bytes": 7917,
+      "sha256": "605fd6d7193a1649ee74c3c90f35bd7774983356aaa4a96672484fea40f0aeb9"
+    },
+    "inputs.json": {
+      "bytes": 51238,
+      "sha256": "2cc0abe300982afaf6272e58fb769b6e98c465ee8bf60653767f52ae1af59153"
+    },
+    "report.json": {
+      "bytes": 10059,
+      "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+    },
+    "README.jp.md": {
+      "bytes": 4880,
+      "sha256": "c3c026155d4b704ea19364b51b01814e68523c6c668273493816ea29c0f0f034"
+    },
+    "source-check.json": {
+      "bytes": 2408,
+      "sha256": "986b8149d95f25795f13874242a5beb49648da05c5195027d4bc113bd443b29e"
+    },
+    "budget-before.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "billing-observation.json": {
+      "bytes": 4487,
+      "sha256": "1ce771d54086dbc59a7314a2992a463507d07694c8853229cb6cf061faf27b85"
+    },
+    "monitoring-usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "monitoring-acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "monitoring-checks.json": {
+      "bytes": 6148,
+      "sha256": "e21d5c036098564bbc21e0c4de919311c35540d06e8c41c69aaabd670380099b"
+    },
+    "monitoring-inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    }
+  },
+  "source_after": {
+    "calculate.py": {
+      "bytes": 7917,
+      "sha256": "605fd6d7193a1649ee74c3c90f35bd7774983356aaa4a96672484fea40f0aeb9"
+    },
+    "inputs.json": {
+      "bytes": 51238,
+      "sha256": "2cc0abe300982afaf6272e58fb769b6e98c465ee8bf60653767f52ae1af59153"
+    },
+    "report.json": {
+      "bytes": 10059,
+      "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+    },
+    "README.jp.md": {
+      "bytes": 4880,
+      "sha256": "c3c026155d4b704ea19364b51b01814e68523c6c668273493816ea29c0f0f034"
+    },
+    "source-check.json": {
+      "bytes": 2408,
+      "sha256": "986b8149d95f25795f13874242a5beb49648da05c5195027d4bc113bd443b29e"
+    },
+    "budget-before.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "billing-observation.json": {
+      "bytes": 4487,
+      "sha256": "1ce771d54086dbc59a7314a2992a463507d07694c8853229cb6cf061faf27b85"
+    },
+    "monitoring-usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "monitoring-acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "monitoring-checks.json": {
+      "bytes": 6148,
+      "sha256": "e21d5c036098564bbc21e0c4de919311c35540d06e8c41c69aaabd670380099b"
+    },
+    "monitoring-inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    }
+  },
+  "stdout": {
+    "bytes": 264,
+    "sha256": "889aa09bcd04171ed1555ed3639e948f0d2ecc9b1bd06ffb58dce040ea3c77e1"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "native_build_or_solve": false,
+  "cloud_mutations": false,
+  "budget_mutations_by_audit": false
+}

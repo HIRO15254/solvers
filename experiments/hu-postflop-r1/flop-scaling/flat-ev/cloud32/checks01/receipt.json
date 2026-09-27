@@ -1,0 +1,40 @@
+{
+  "at_utc": "2026-09-27T02:53:21.905121+00:00",
+  "exit_code": 0,
+  "elapsed_seconds": 0.32598480000160635,
+  "scope": "Pure synthetic tests only; no real proof gzip read, native build or solve",
+  "sources": {
+    "analyze.py": {
+      "bytes": 31087,
+      "sha256": "6293275ea6b04530f2d1674cb1d50c1522834b0e56d60952510866d3a2458862"
+    },
+    "install.py": {
+      "bytes": 4088,
+      "sha256": "78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c"
+    },
+    "pack.py": {
+      "bytes": 3995,
+      "sha256": "df3e95c3e5190ca36303f784fcbaada66c34c072aa7949dc226225d5685ad245"
+    },
+    "prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "runner.py": {
+      "bytes": 28935,
+      "sha256": "ec9812da13884ea255699bd9c1af04ba82a77d00701d4edd01121604ca73cafe"
+    },
+    "test_analyze.py": {
+      "bytes": 6012,
+      "sha256": "7910d136a13d58e88d9572f8dadb4a5313822d75ee440718170220556fe68f09"
+    },
+    "test_install.py": {
+      "bytes": 4424,
+      "sha256": "65573601c3ecf504b8c1c270e3e5ef52add039c58f87250c98ab0c1c5fef5df5"
+    },
+    "test_runner.py": {
+      "bytes": 5377,
+      "sha256": "88a3b5075aaef45f172194d713becad1c3622a0813b34e7ff28267ec6a21ce56"
+    }
+  }
+}

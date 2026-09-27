@@ -1,0 +1,26 @@
+--- native-solve/solve.rs
++++ cloud32/solve.rs
+@@ -1,5 +1,5 @@
+ //! Research-only fixed-fixture correctness probe, not a CLI config parser.
+-//! Usage: solve.exe narrow|expanded 1|2 1|2 NEW_OUTPUT_DIRECTORY
++//! Usage: solve.exe narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY
+ //! Arguments after the case are worker count and exact iteration count.
+ //! External supervision supplies wall-time, memory and disk bounds.
+ 
+@@ -150,13 +150,13 @@
+     assert_eq!(
+         args.len(),
+         4,
+-        "usage: solve narrow|expanded 1|2 1|2 NEW_OUTPUT_DIRECTORY"
++        "usage: solve narrow|expanded 1|2|4|8|16|32 1..128 NEW_OUTPUT_DIRECTORY"
+     );
+     let case = args[0].as_str();
+     let threads: usize = args[1].parse()?;
+     let iterations: u64 = args[2].parse()?;
+-    assert!((1..=2).contains(&threads), "worker limit is 2");
+-    assert!((1..=2).contains(&iterations), "iteration limit is 2");
++    assert!([1, 2, 4, 8, 16, 32].contains(&threads), "workers");
++    assert!((1..=128).contains(&iterations), "iteration limit is 128");
+     let (config, support, elements, normalizer) = fixture(case);
+     let out = Path::new(&args[3]);
+     // Parent must exist; existing output directories are rejected, not reused.

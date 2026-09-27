@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=printf \"%s\\n\" \"78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c  /tmp/install.py\" | sha256sum -c - && sudo python3 -B /tmp/install.py --archive /tmp/deployment01.tar.gz --sha256 59d070e22a9f10eddaec883c6841f4548db334ed367155049925ca741e0ee683 --destination /opt/r1/flop-flat-cloud32-package && bash -n /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/run.sh && bash -n /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/recover.sh && bash -n /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/fetch-dependencies.sh && sudo python3 -B /opt/r1/flop-flat-cloud32-package/experiments/hu-postflop-r1/cloud/vm14/start.py --verify-only && test -f /opt/r1/bootstrap-complete && cat /opt/r1/bootstrap-complete"
+  ],
+  "started_utc": "2026-09-27T02:46:08.288457+00:00",
+  "timeout_seconds": 120
+}

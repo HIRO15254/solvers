@@ -1,0 +1,190 @@
+{
+  "scope": "Python syntax, exact fixture generation and pure command graph only; no prepare/build/run invoked",
+  "status": "passed",
+  "native_processes_launched": 0,
+  "source_before": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs.json": {
+      "bytes": 1315,
+      "sha256": "5b90c9fe104f02c66cc1cad3f59c26d78ccaab5242ccecb6ae111e08f9a52596"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\README.jp.md": {
+      "bytes": 1997,
+      "sha256": "f75f2eae1df8dd44e5f78a630fa24b22c1b0a228465f6b692f12bf5853019567"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    }
+  },
+  "source_after": {
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel.rs": {
+      "bytes": 23642,
+      "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel_zero.rs": {
+      "bytes": 29472,
+      "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\value_scratch.rs": {
+      "bytes": 9171,
+      "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\zero_chance_tests.rs.in": {
+      "bytes": 5829,
+      "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs.json": {
+      "bytes": 1315,
+      "sha256": "5b90c9fe104f02c66cc1cad3f59c26d78ccaab5242ccecb6ae111e08f9a52596"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\README.jp.md": {
+      "bytes": 1997,
+      "sha256": "f75f2eae1df8dd44e5f78a630fa24b22c1b0a228465f6b692f12bf5853019567"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    }
+  },
+  "source_unchanged": true,
+  "fixtures": 4,
+  "originals": 3,
+  "expected_tests": [
+    6,
+    2
+  ],
+  "native_plan_pin_for_read_only_graph_check": {
+    "bytes": 58995,
+    "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837"
+  },
+  "commands_preview": [
+    {
+      "name": "parallel",
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--test",
+        "--crate-name",
+        "flat_ev_generic_parallel",
+        "-C",
+        "metadata=r1_flat_ev_generic_parallel",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel_zero.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\parallel.exe"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\parallel.exe",
+      "run_argv": [
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\parallel.exe",
+        "--test-threads=1",
+        "parallel_chance_fanout_is_bitwise_deterministic",
+        "selected_value_recording_preserves_ancestor_values_and_storage",
+        "mapped_chance_and_action_siblings_preserve_f32_state",
+        "mapped_chance_and_action_siblings_preserve_i16_state",
+        "zero_mapped_chance_preserves_f32_state_and_all_values",
+        "zero_mapped_chance_preserves_i16_state_and_all_values"
+      ],
+      "expected_tests": [
+        "parallel_chance_fanout_is_bitwise_deterministic",
+        "selected_value_recording_preserves_ancestor_values_and_storage",
+        "mapped_chance_and_action_siblings_preserve_f32_state",
+        "mapped_chance_and_action_siblings_preserve_i16_state",
+        "zero_mapped_chance_preserves_f32_state_and_all_values",
+        "zero_mapped_chance_preserves_i16_state_and_all_values"
+      ]
+    },
+    {
+      "name": "values",
+      "argv": [
+        "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+        "--edition=2024",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "lto=thin",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "debug-assertions=no",
+        "-C",
+        "overflow-checks=no",
+        "-C",
+        "embed-bitcode=yes",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01",
+        "-L",
+        "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+        "--test",
+        "--crate-name",
+        "flat_ev_generic_values",
+        "-C",
+        "metadata=r1_flat_ev_generic_values",
+        "--extern",
+        "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+        "--extern",
+        "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+        "--extern",
+        "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\value_scratch.rs",
+        "-o",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\values.exe"
+      ],
+      "artifact": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\values.exe",
+      "run_argv": [
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\values.exe",
+        "--test-threads=1",
+        "untrained_empty_and_variable_value_spaces_f32",
+        "untrained_empty_and_variable_value_spaces_i16"
+      ],
+      "expected_tests": [
+        "untrained_empty_and_variable_value_spaces_f32",
+        "untrained_empty_and_variable_value_spaces_i16"
+      ]
+    }
+  ]
+}

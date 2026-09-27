@@ -1,0 +1,166 @@
+// Research-only fragment: append to the unchanged engine/tests/parallel.rs.
+// Reuses its evaluator, game builder and full-state/value observation helpers.
+
+#[derive(Clone, Copy, Debug)]
+enum ZeroChanceShape {
+    Mixed,
+    EmptyP0,
+    EmptyP1,
+    EmptyBoth,
+}
+
+fn zero_chance_dims(shape: ZeroChanceShape, deal: usize) -> PerPlayer<usize> {
+    let (p0, p1) = match shape {
+        // Leading, interior and trailing empty rows, plus unequal nonempty
+        // rows. The two seats' empty rows do not always coincide.
+        ZeroChanceShape::Mixed => {
+            [(0, 2), (2, 0), (1, 3), (0, 0), (4, 1), (2, 3), (3, 1), (0, 0)]
+                [deal % 8]
+        }
+        ZeroChanceShape::EmptyP0 => (0, 1 + deal % 3),
+        ZeroChanceShape::EmptyP1 => (1 + deal % 4, 0),
+        ZeroChanceShape::EmptyBoth => (0, 0),
+    };
+    PerPlayer::new(p0, p1)
+}
+
+fn zero_mapped_chance(
+    shape: ZeroChanceShape,
+    with_actions: bool,
+    root_dims: PerPlayer<usize>,
+    terminals: &mut Vec<PerPlayer<usize>>,
+    transitions: &mut Vec<SparseTransition>,
+) -> TempNode {
+    let deals = (0..16)
+        .map(|deal| {
+            let dims = zero_chance_dims(shape, deal);
+            let mut maps = PerPlayer::new(ReachMap::Identity, ReachMap::Identity);
+            for player in Player::BOTH {
+                let id = transitions.len() as u32;
+                let entries = if dims[player] == 0 {
+                    // A map into the empty state space has no valid output
+                    // index; it removes all incoming mass on this branch.
+                    Vec::new()
+                } else {
+                    (0..root_dims[player])
+                        .flat_map(|i| {
+                            [
+                                (i as u32, (i % dims[player]) as u32, 0.5),
+                                (i as u32, ((i + 1) % dims[player]) as u32, 0.5),
+                            ]
+                        })
+                        .collect()
+                };
+                transitions.push(SparseTransition {
+                    in_dim: root_dims[player] as u32,
+                    out_dim: dims[player] as u32,
+                    entries,
+                });
+                maps[player] = ReachMap::Transition(id);
+            }
+            // Both seats own action refs even when their hand dimension is
+            // zero. This also exercises the I16 empty-block scale slots.
+            let child = branching_actions(
+                if with_actions { 2 } else { 0 },
+                Player::P1,
+                dims,
+                terminals,
+            );
+            (1.0 / 16.0, maps, child)
+        })
+        .collect();
+    TempNode::Chance { deals, tag: 0 }
+}
+
+fn zero_mapped_chance_game(shape: ZeroChanceShape) -> CompiledGame<DimensionEvaluator> {
+    // Only mapped dimensions can be zero. Root ranges and the normalizer
+    // stay strictly positive; empty roots are not needed for this regression.
+    let root_dims = PerPlayer::new(3, 2);
+    let mut terminals = Vec::new();
+    let mut transitions = Vec::new();
+    let direct = zero_mapped_chance(shape, true, root_dims, &mut terminals, &mut transitions);
+    let terminal = dimension_terminal(root_dims, &mut terminals);
+    let nested = TempNode::Chance {
+        // A below-threshold outer chance still consumes one depth level.
+        // The inner 16-way chance must fork at depth 2 but not depth 1.
+        deals: (0..2)
+            .map(|_| {
+                (
+                    0.5,
+                    PerPlayer::new(ReachMap::Identity, ReachMap::Identity),
+                    zero_mapped_chance(
+                        shape,
+                        false,
+                        root_dims,
+                        &mut terminals,
+                        &mut transitions,
+                    ),
+                )
+            })
+            .collect(),
+        tag: 0,
+    };
+    let root = TempNode::Action {
+        player: Player::P0,
+        children: vec![direct, terminal, nested],
+        tag: 0,
+    };
+    let game = dimension_game(root, root_dims, terminals, transitions);
+    assert_eq!(game.tree.nodes.len(), 246);
+    assert!(game.normalizer.is_finite() && game.normalizer > 0.0);
+    assert!(game.tree.transitions.iter().any(|t| t.out_dim == 0));
+    assert!(
+        game.tree
+            .transitions
+            .iter()
+            .filter(|t| t.out_dim == 0)
+            .all(|t| t.entries.is_empty())
+    );
+    game
+}
+
+fn compare_zero_chance_pools<S: Storage>() {
+    for shape in [
+        ZeroChanceShape::Mixed,
+        ZeroChanceShape::EmptyP0,
+        ZeroChanceShape::EmptyP1,
+        ZeroChanceShape::EmptyBoth,
+    ] {
+        // Use a truly serial traversal, not merely a one-worker Rayon fork,
+        // as the arithmetic and stored-state reference.
+        let baseline = observe::<S>(
+            || zero_mapped_chance_game(shape),
+            1,
+            ParConfig {
+                chance_depth: 0,
+                min_children: 12,
+            },
+        );
+        for threads in [1, 2, 4, 8, 16, 32] {
+            for chance_depth in [0, 1, 2] {
+                let actual = observe::<S>(
+                    || zero_mapped_chance_game(shape),
+                    threads,
+                    ParConfig {
+                        chance_depth,
+                        min_children: 12,
+                    },
+                );
+                assert_eq!(
+                    actual, baseline,
+                    "shape={shape:?}, threads={threads}, depth={chance_depth}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn zero_mapped_chance_preserves_f32_state_and_all_values() {
+    compare_zero_chance_pools::<F32Storage>();
+}
+
+#[test]
+fn zero_mapped_chance_preserves_i16_state_and_all_values() {
+    compare_zero_chance_pools::<I16Storage>();
+}

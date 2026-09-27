@@ -1,0 +1,49 @@
+{
+  "scope": "small retention and Python syntax compilation only; full retained verifier not run",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\retain.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 1.0143033999484032,
+  "source_before": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\run.py": {
+      "bytes": 7166,
+      "sha256": "f777056c8ca7d95795db2d5f19885ff4906ed09f8e87bfe776f0498576e5dd93"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\retain.py": {
+      "bytes": 5873,
+      "sha256": "81115ae49f99bf096a8fe1fea14ca8f345f3d3692bed2c0b42a978ca543aae2c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\verify.py": {
+      "bytes": 6193,
+      "sha256": "9387d4deb251359fbd7522f55f38cedffc361f289a2692b7b5ec6f778a99d0e9"
+    }
+  },
+  "source_after": {
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\run.py": {
+      "bytes": 7166,
+      "sha256": "f777056c8ca7d95795db2d5f19885ff4906ed09f8e87bfe776f0498576e5dd93"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\retain.py": {
+      "bytes": 5873,
+      "sha256": "81115ae49f99bf096a8fe1fea14ca8f345f3d3692bed2c0b42a978ca543aae2c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\verify.py": {
+      "bytes": 6193,
+      "sha256": "9387d4deb251359fbd7522f55f38cedffc361f289a2692b7b5ec6f778a99d0e9"
+    }
+  },
+  "unchanged": true,
+  "logs": {
+    "retention.stdout.log": {
+      "bytes": 202,
+      "sha256": "44a62ec8db5813297e7ab290653886c3a78ad3e82ccf8c8b0d15964537c49a1d"
+    },
+    "retention.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

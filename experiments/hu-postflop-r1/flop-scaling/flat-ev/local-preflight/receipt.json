@@ -1,0 +1,51 @@
+{
+  "schema": "solvers.r1.local-scaling-preflight-receipt/v1",
+  "recorded_at": "2026-09-27T02:09:19.800406+00:00",
+  "sample_command": [
+    "C:\\Python313\\python.exe",
+    "-B",
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/sample.py"
+  ],
+  "observed_command_exit_code": 0,
+  "measurement_start": "2026-09-27T02:05:48.880937+00:00",
+  "measurement_end": "2026-09-27T02:06:03.940877+00:00",
+  "files": [
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/sample.py",
+      "bytes": 6497,
+      "sha256": "e389c342f109b2f259e1dc2d249a8cb859c1c86a63fc79a337ab416ad985d337"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/samples.json",
+      "bytes": 8946,
+      "sha256": "309ba6ff13b8b6adef60dc42c3275d4b5ca104495362ef391e8a9805549a94c9"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/topology.json",
+      "bytes": 751,
+      "sha256": "e8a9ddcf370c494de9c1a5b2be786b56b9f0c820f7c35553fb1ef13965f446ec"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/README.jp.md",
+      "bytes": 4773,
+      "sha256": "a1fd58e7113fa9bb85ef9cf2b4d78e7ca286aec3e286a80bda82d87c74c66b52"
+    }
+  ],
+  "baseline": {
+    "path": "target/flop-ev-scratch01/ordinary.exe",
+    "bytes": 986112,
+    "sha256": "e33d8d6a19178352dfcbb1e7fe55cbfb6b1316c22d974b4d5415d243f07f9b39"
+  },
+  "baseline_matches_retained_manifest": true,
+  "baseline_manifest": {
+    "path": "experiments/hu-postflop-r1/flop-scaling/ev-scratch/proof01/manifest.json",
+    "bytes": 38306,
+    "sha256": "90f84cbd11de19d10c6de8b2abea444f412ae9d05e8dd4f6b1fb078dc806dea2"
+  },
+  "adapter": {
+    "path": "experiments/hu-postflop-r1/flop-scaling/native-solve/solve.rs",
+    "bytes": 11148,
+    "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+  },
+  "scope": "Resource observation only; no compilation, solver run, cloud action, process termination or installation."
+}

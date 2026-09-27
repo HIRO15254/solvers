@@ -1,0 +1,605 @@
+{
+  "schema": "r1-flat-ev-generic-proof/v1",
+  "files": {
+    "binaries/engine.rlib": {
+      "path": "binaries/engine.rlib.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+      "original": {
+        "bytes": 879906,
+        "sha256": "0337143a8cd1103fedad49989d663e57af721ec7b247471852f067db9e797904"
+      },
+      "compressed": {
+        "bytes": 400210,
+        "sha256": "4770d87611edeabd6d751462edb52ca6e4f8d15d03ed025e632301e42963327e"
+      }
+    },
+    "binaries/parallel.exe": {
+      "path": "binaries/parallel.exe.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\parallel.exe",
+      "original": {
+        "bytes": 1698816,
+        "sha256": "034216a836810d5e6427b15d6921a56cb542f1e41983bd524a868f064a5d73b9"
+      },
+      "compressed": {
+        "bytes": 599333,
+        "sha256": "3b7ef7d2d2a214dc1788dbf7372496d70d5fc4821defa3235279542631edfa9c"
+      }
+    },
+    "binaries/values.exe": {
+      "path": "binaries/values.exe.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev-tests01\\values.exe",
+      "original": {
+        "bytes": 1273856,
+        "sha256": "e70bc741fb5435d146725ca63a7e6fc64d022950ea285f149754653712ff8367"
+      },
+      "compressed": {
+        "bytes": 477742,
+        "sha256": "c3fc426c12b14f7fd97609d604517c4c86c0baf919b61ab68ab7cef7d801dc15"
+      }
+    },
+    "generic/build-00-parallel/record.json": {
+      "path": "generic/build-00-parallel/record.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\record.json",
+      "original": {
+        "bytes": 9942,
+        "sha256": "d73babcda6479e9795d278859935f9d2629b482eff4a1895f2cd51019c3f7f18"
+      },
+      "compressed": {
+        "bytes": 2657,
+        "sha256": "06652297fdc0880ab3c94f12a2a40e27118a785ebc0e176a82f50448c1a0d3d1"
+      }
+    },
+    "generic/build-00-parallel/record.samples.jsonl": {
+      "path": "generic/build-00-parallel/record.samples.jsonl.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\record.samples.jsonl",
+      "original": {
+        "bytes": 178958,
+        "sha256": "60e228ac81c7958da28017c3c6bfc562cb28c3f26c861364add149c43289e880"
+      },
+      "compressed": {
+        "bytes": 19158,
+        "sha256": "262677e12e4ef936feb1f87051fa60a33e7b7f2d224365509a8c59ce321a0135"
+      }
+    },
+    "generic/build-00-parallel/record.stderr.log": {
+      "path": "generic/build-00-parallel/record.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\record.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-00-parallel/record.stdout.log": {
+      "path": "generic/build-00-parallel/record.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\record.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-00-parallel/wrapper.stderr.log": {
+      "path": "generic/build-00-parallel/wrapper.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\wrapper.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-00-parallel/wrapper.stdout.log": {
+      "path": "generic/build-00-parallel/wrapper.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-00-parallel\\wrapper.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-01-values/record.json": {
+      "path": "generic/build-01-values/record.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\record.json",
+      "original": {
+        "bytes": 9922,
+        "sha256": "79fce1b8e8458335bfb0de7b73667cf2dadae35be2dedf9cd5bac46cafb70ec2"
+      },
+      "compressed": {
+        "bytes": 2633,
+        "sha256": "8efdbaf7019118b0917b1a76402bf1cd828d33655fd473e9e7c9050a31b727fa"
+      }
+    },
+    "generic/build-01-values/record.samples.jsonl": {
+      "path": "generic/build-01-values/record.samples.jsonl.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\record.samples.jsonl",
+      "original": {
+        "bytes": 47041,
+        "sha256": "125211f519ba0d49d4fe20e81ebdff8ee12d2fa7c4ef2a6e97283f80f12880c9"
+      },
+      "compressed": {
+        "bytes": 5490,
+        "sha256": "2f94560c9e86751ab4536646c038a36eff9c22b8926ac0017e8f27a99179c245"
+      }
+    },
+    "generic/build-01-values/record.stderr.log": {
+      "path": "generic/build-01-values/record.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\record.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-01-values/record.stdout.log": {
+      "path": "generic/build-01-values/record.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\record.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-01-values/wrapper.stderr.log": {
+      "path": "generic/build-01-values/wrapper.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\wrapper.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build-01-values/wrapper.stdout.log": {
+      "path": "generic/build-01-values/wrapper.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build-01-values\\wrapper.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/build.json": {
+      "path": "generic/build.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\build.json",
+      "original": {
+        "bytes": 6713,
+        "sha256": "0a8aad39f7b64728f3ee4333a46c8930fd305771b8b7a4bab708ccbb733284c8"
+      },
+      "compressed": {
+        "bytes": 1356,
+        "sha256": "a940866190d781d585cf2f654d0090196661b8f14a6e8391b4423ee993e2a868"
+      }
+    },
+    "generic/execution.json": {
+      "path": "generic/execution.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\execution.json",
+      "original": {
+        "bytes": 4411,
+        "sha256": "719c8e84d7366338e81de564981ad14863f238f60c7b93d490a23a19d47eebd2"
+      },
+      "compressed": {
+        "bytes": 1012,
+        "sha256": "738da003468b506efb86a6f77823a0082511a25e678ed8ecb397cde5051da0f4"
+      }
+    },
+    "generic/plan.json": {
+      "path": "generic/plan.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\plan.json",
+      "original": {
+        "bytes": 56795,
+        "sha256": "6a1412940874321f3b8d693cd88ac90b0804e9353e9dace2096fcac70b777c4a"
+      },
+      "compressed": {
+        "bytes": 14699,
+        "sha256": "3852b284344b32f9990f372205d19e0e14b9edd866c2e31607a90dcd0e1eb8af"
+      }
+    },
+    "generic/run-00-parallel/record.json": {
+      "path": "generic/run-00-parallel/record.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\record.json",
+      "original": {
+        "bytes": 8097,
+        "sha256": "42b2a4afe8459476a554eabbd39db9eb53006e667a8b0deedfc2638f830c48ba"
+      },
+      "compressed": {
+        "bytes": 2446,
+        "sha256": "5835f6a1d2ffa749ea78bde7a3c371d628f256233b320bd591ec71b58b5f248d"
+      }
+    },
+    "generic/run-00-parallel/record.samples.jsonl": {
+      "path": "generic/run-00-parallel/record.samples.jsonl.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\record.samples.jsonl",
+      "original": {
+        "bytes": 3190,
+        "sha256": "b2319dfcf1706f53c09d5e658afd221afa213546b85f91b4f2f80b08e6960c8c"
+      },
+      "compressed": {
+        "bytes": 680,
+        "sha256": "38efdb6059b4820993fcb2ed069d0c5e202e868d1acb8464dc0895e66f851224"
+      }
+    },
+    "generic/run-00-parallel/record.stderr.log": {
+      "path": "generic/run-00-parallel/record.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\record.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/run-00-parallel/record.stdout.log": {
+      "path": "generic/run-00-parallel/record.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\record.stdout.log",
+      "original": {
+        "bytes": 510,
+        "sha256": "806833a6c2d8160a83b108dcc6ca80fd65e3233a0246c55f5d1c23be2a74b311"
+      },
+      "compressed": {
+        "bytes": 250,
+        "sha256": "8d7343832bdef003bf925917966e0e6d724ebeddd1f01490314d5cb2a84bbe2c"
+      }
+    },
+    "generic/run-00-parallel/wrapper.stderr.log": {
+      "path": "generic/run-00-parallel/wrapper.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\wrapper.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/run-00-parallel/wrapper.stdout.log": {
+      "path": "generic/run-00-parallel/wrapper.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-00-parallel\\wrapper.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/run-01-values/record.json": {
+      "path": "generic/run-01-values/record.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\record.json",
+      "original": {
+        "bytes": 7555,
+        "sha256": "c376ae0938719c743be52e110711d21ac0b801b80bc9496eb0a755964dc37d17"
+      },
+      "compressed": {
+        "bytes": 2318,
+        "sha256": "f52cc81343fd11c408036397ea1986e81e5af66afe2e47e69c26aefabea555b3"
+      }
+    },
+    "generic/run-01-values/record.samples.jsonl": {
+      "path": "generic/run-01-values/record.samples.jsonl.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\record.samples.jsonl",
+      "original": {
+        "bytes": 686,
+        "sha256": "04eebe1a181c50d23623fa491efe76961894a9c72821787705ad201bb74dc580"
+      },
+      "compressed": {
+        "bytes": 311,
+        "sha256": "1eab1339a42e5da5cbde459415961d5f8e2264d3932753c25d358dcb71cef5e6"
+      }
+    },
+    "generic/run-01-values/record.stderr.log": {
+      "path": "generic/run-01-values/record.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\record.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/run-01-values/record.stdout.log": {
+      "path": "generic/run-01-values/record.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\record.stdout.log",
+      "original": {
+        "bytes": 229,
+        "sha256": "0ccd5abef15a51e21e276f538557e049ced80eb92c7d6d61b27704bc60fb8eb7"
+      },
+      "compressed": {
+        "bytes": 151,
+        "sha256": "355600774de1d73218c3632ad39dc8eacb4de98f78279f8e95ca15be87dc58b9"
+      }
+    },
+    "generic/run-01-values/wrapper.stderr.log": {
+      "path": "generic/run-01-values/wrapper.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\wrapper.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/run-01-values/wrapper.stdout.log": {
+      "path": "generic/run-01-values/wrapper.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\run-01-values\\wrapper.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "generic/source.tar.gz": {
+      "path": "generic/source.tar.gz.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev-tests01\\source.tar.gz",
+      "original": {
+        "bytes": 164280,
+        "sha256": "7fd88736bb911d9e9b01ed89e1e564d2377e009110f96607e6fefe753f181388"
+      },
+      "compressed": {
+        "bytes": 164266,
+        "sha256": "1b976230f35d651ecb4508b0dda1bc8daa851f028794de2a214bf2edaef49a23"
+      }
+    },
+    "native/build-00-engine/record.json": {
+      "path": "native/build-00-engine/record.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\record.json",
+      "original": {
+        "bytes": 10193,
+        "sha256": "8f138c25176390b5a324bd4c32d812ec3450243408699892e6d3413a7e0c40b1"
+      },
+      "compressed": {
+        "bytes": 2664,
+        "sha256": "dcec611b3d5ba584cd6e658414df9aae5b3954ccd0bba1222255126610579f6a"
+      }
+    },
+    "native/build-00-engine/record.samples.jsonl": {
+      "path": "native/build-00-engine/record.samples.jsonl.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\record.samples.jsonl",
+      "original": {
+        "bytes": 3933,
+        "sha256": "6489db81c7c14634425d5b600b2cab2ef93157bc83ecebfedb1841bc86c962b3"
+      },
+      "compressed": {
+        "bytes": 748,
+        "sha256": "de7aed7dab5ade0074075029d4ce4620c5325a29f85e6868aae074aea8e54929"
+      }
+    },
+    "native/build-00-engine/record.stderr.log": {
+      "path": "native/build-00-engine/record.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\record.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "native/build-00-engine/record.stdout.log": {
+      "path": "native/build-00-engine/record.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\record.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "native/build-00-engine/wrapper.stderr.log": {
+      "path": "native/build-00-engine/wrapper.stderr.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\wrapper.stderr.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "native/build-00-engine/wrapper.stdout.log": {
+      "path": "native/build-00-engine/wrapper.stdout.log.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-00-engine\\wrapper.stdout.log",
+      "original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "compressed": {
+        "bytes": 20,
+        "sha256": "458c5a203299dd326aa747fee1bbc7709bfbd560507d1603459d9f7d9eb6be76"
+      }
+    },
+    "native/build.json": {
+      "path": "native/build.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build.json",
+      "original": {
+        "bytes": 16572,
+        "sha256": "3aca90eec943788caff56f898c6a589266cbc98ae016b35e167bcd5f9797a888"
+      },
+      "compressed": {
+        "bytes": 2044,
+        "sha256": "7007d24498d306b4458cda828843630be399e0cb79b794ce0693c5a501c60d3b"
+      }
+    },
+    "native/plan.json": {
+      "path": "native/plan.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\plan.json",
+      "original": {
+        "bytes": 58995,
+        "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837"
+      },
+      "compressed": {
+        "bytes": 12733,
+        "sha256": "808766fc934732fb18e2ca6b7be3f10d0f281e51e3c6fd19b4488b70ca48f11d"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/ev-scratch/run.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py",
+      "original": {
+        "bytes": 16343,
+        "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d"
+      },
+      "compressed": {
+        "bytes": 6113,
+        "sha256": "50a6b3fe4bcfbe0a4246dfb4687c314b78f3edd01a91fb3fa4a55b481d0943ff"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/evidence.py": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/evidence.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\evidence.py",
+      "original": {
+        "bytes": 13942,
+        "sha256": "6e503f9f95391d1be71289f5ae4d4550548a4a978dea2cab0281ba2233a86d2d"
+      },
+      "compressed": {
+        "bytes": 5290,
+        "sha256": "e6d2d84778598bb2b2c2d9922f4691c2042cc6d389095ec5048708d2ee62d342"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs.json": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs.json.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs.json",
+      "original": {
+        "bytes": 1315,
+        "sha256": "5b90c9fe104f02c66cc1cad3f59c26d78ccaab5242ccecb6ae111e08f9a52596"
+      },
+      "compressed": {
+        "bytes": 491,
+        "sha256": "ff7747a18310ed8046a5da07acddc66a0f5aba131f8b212c5d68b2986bf557c9"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel.rs": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel.rs.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel.rs",
+      "original": {
+        "bytes": 23642,
+        "sha256": "d918561390ec3a00d6522049af014faab57803384ec24b77fbf68df97e14884d"
+      },
+      "compressed": {
+        "bytes": 7535,
+        "sha256": "80a759e703f3aacaeab23abcb2f1165c053236f64bacc70199c44dfc8599eee0"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel_zero.rs": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/parallel_zero.rs.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\parallel_zero.rs",
+      "original": {
+        "bytes": 29472,
+        "sha256": "01c4b0dd7ffad12dace4888c41b36945323c08735a3522fca4f4106c239345c1"
+      },
+      "compressed": {
+        "bytes": 9042,
+        "sha256": "ee79725651091aa8efbb85e383392f29c961b5abc0f310d281ada61b720ad19b"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/value_scratch.rs": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/value_scratch.rs.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\value_scratch.rs",
+      "original": {
+        "bytes": 9171,
+        "sha256": "2fe1d1e276aaf9f6c2f5aa124dfa02e4e63c168c3afe6b94bca28a1f1402659b"
+      },
+      "compressed": {
+        "bytes": 3064,
+        "sha256": "688ee2e5a151b68b1ad6970ce56e3c0304f143471b60337be3ab93759b874179"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/zero_chance_tests.rs.in": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/inputs/zero_chance_tests.rs.in.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\inputs\\zero_chance_tests.rs.in",
+      "original": {
+        "bytes": 5829,
+        "sha256": "26bd9edf188f159eaf526307ed3c877ce815082e190f9ade6df4988d51dc3834"
+      },
+      "compressed": {
+        "bytes": 2118,
+        "sha256": "7a8ecebd576df8b65e0667426f9b477bc52664ce6f2ba16caca1a9d62df4dd35"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/run.py": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/run.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py",
+      "original": {
+        "bytes": 10136,
+        "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+      },
+      "compressed": {
+        "bytes": 3759,
+        "sha256": "6523245146e17e2443836de15c4406bcae4f874b3682fcd464538c24cc41355d"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/native/run.py": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/flat-ev/native/run.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\run.py",
+      "original": {
+        "bytes": 7166,
+        "sha256": "f777056c8ca7d95795db2d5f19885ff4906ed09f8e87bfe776f0498576e5dd93"
+      },
+      "compressed": {
+        "bytes": 2897,
+        "sha256": "df3a0fc891a107c3f91d7da1d2232766fe7ab85aaefce3bd94de36d1c1a4a15b"
+      }
+    },
+    "sources/experiments/hu-postflop-r1/flop-scaling/native-preflight/run_bounded.py": {
+      "path": "sources/experiments/hu-postflop-r1/flop-scaling/native-preflight/run_bounded.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "original": {
+        "bytes": 11663,
+        "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8"
+      },
+      "compressed": {
+        "bytes": 4259,
+        "sha256": "819cf0fc1d7c0898663ba8a5ca65517a468933606e4c7bfc3af87b247ffb1fcd"
+      }
+    },
+    "sources/tools/run_supervised.py": {
+      "path": "sources/tools/run_supervised.py.gz",
+      "original_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "original": {
+        "bytes": 39015,
+        "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8"
+      },
+      "compressed": {
+        "bytes": 12364,
+        "sha256": "3e71fbeaa2ee0702d25c42c38aa10b4d81343848f30eb1b7d80cbb756a05fc7f"
+      }
+    }
+  }
+}

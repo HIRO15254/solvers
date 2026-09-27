@@ -1,0 +1,23 @@
+{
+  "source": {
+    "bytes": 11148,
+    "sha256": "547ed17705b7784ac656fb8032d859261b9a4639fa49dc0ba4b105cdfe2addd9"
+  },
+  "preparer": {
+    "bytes": 2951,
+    "sha256": "b74612f429672d59b9a7abab8ea2824bff83c18fd2c65c7bc7f4eb6fd7c44d2f"
+  },
+  "generated": {
+    "solve.rs": {
+      "bytes": 11171,
+      "sha256": "cd4113f3305ba742ac6beb5b251b9ad05e78b78e42b83624e172c7504d271322"
+    },
+    "adapter.patch": {
+      "bytes": 1230,
+      "sha256": "919a3f5c197e2e0b0583e0277bdef73c5113fbb6cf9bf6d2ea179ff55dbd35bf"
+    }
+  },
+  "formatter": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+  "outside_bounds_and_usage_byte_identical": true,
+  "scope": "same fixed-iteration adapter; extended bounds only; no solver or performance execution"
+}

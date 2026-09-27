@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/deployment01.tar.gz",
+    "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/install.py",
+    "solvers-r1-20260927-14:/tmp/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--scp-flag=-batch",
+    "--scp-flag=-hostkey",
+    "--scp-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI"
+  ],
+  "started_utc": "2026-09-27T02:45:37.258521+00:00",
+  "timeout_seconds": 180
+}

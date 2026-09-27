@@ -1,0 +1,20 @@
+MainPID=1880
+Result=success
+MemoryPeak=795779072
+CPUUsageNSec=77777627000
+ActiveState=active
+SubState=running
+==> /opt/r1/flop-flat-cloud32-wrapper01/build.stdout.log <==
+{"stage": "toolchain", "status": "completed", "case": null, "arm": null, "workers": null, "iterations": null, "result": null}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/preflight.stdout.log <==
+{"manifest": {"bytes": 69316, "sha256": "377d343542235c5ec33c2d3e52887d3a1c99e04ae353ca16dba9ae6291fe621e"}, "installation": {"bytes": 388, "sha256": "918c391ec8f9de1e879ccc56524d3aa613a34c7637158d07541a94c7089abf14"}, "source_revision": "0d54a9e64cf0a1eb57533938a2907c5dc80c2812", "package_files": 227}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/prepare.stdout.log <==
+{"status": "prepared", "sources": {"baseline": 209, "flat": 209}, "matrix_processes": 96}
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/build.stderr.log <==
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/preflight.stderr.log <==
+
+==> /opt/r1/flop-flat-cloud32-wrapper01/prepare.stderr.log <==

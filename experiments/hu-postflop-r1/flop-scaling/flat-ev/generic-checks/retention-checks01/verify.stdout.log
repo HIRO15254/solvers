@@ -1,0 +1,62 @@
+{
+  "status": "passed",
+  "payload_files": 50,
+  "tests_passed": [
+    "mapped_chance_and_action_siblings_preserve_f32_state",
+    "mapped_chance_and_action_siblings_preserve_i16_state",
+    "parallel_chance_fanout_is_bitwise_deterministic",
+    "selected_value_recording_preserves_ancestor_values_and_storage",
+    "zero_mapped_chance_preserves_f32_state_and_all_values",
+    "zero_mapped_chance_preserves_i16_state_and_all_values",
+    "untrained_empty_and_variable_value_spaces_f32",
+    "untrained_empty_and_variable_value_spaces_i16"
+  ],
+  "candidate_source": {
+    "bytes": 58955,
+    "sha256": "ec9e5e6b5230684fce6f2315370ceda0e05fb4346eb7e4ff44ea05e6028aabcd"
+  },
+  "native_engine": {
+    "bytes": 879906,
+    "sha256": "0337143a8cd1103fedad49989d663e57af721ec7b247471852f067db9e797904"
+  },
+  "archived_source_files": 50,
+  "fixture_files": 4,
+  "stages": [
+    {
+      "name": "native/build-00-engine",
+      "elapsed_seconds": 1.0150048998184502,
+      "sample_count": 11,
+      "job_peak_commit_bytes": 189231104,
+      "sampled_peak_resident_bytes": 119504896
+    },
+    {
+      "name": "generic/build-00-parallel",
+      "elapsed_seconds": 50.28330540005118,
+      "sample_count": 495,
+      "job_peak_commit_bytes": 313851904,
+      "sampled_peak_resident_bytes": 355962880
+    },
+    {
+      "name": "generic/run-00-parallel",
+      "elapsed_seconds": 1.0173253999091685,
+      "sample_count": 9,
+      "job_peak_commit_bytes": 8359936,
+      "sampled_peak_resident_bytes": 21110784
+    },
+    {
+      "name": "generic/build-01-values",
+      "elapsed_seconds": 16.213452499825507,
+      "sample_count": 130,
+      "job_peak_commit_bytes": 219987968,
+      "sampled_peak_resident_bytes": 255819776
+    },
+    {
+      "name": "generic/run-01-values",
+      "elapsed_seconds": 0.23543130001053214,
+      "sample_count": 2,
+      "job_peak_commit_bytes": 3018752,
+      "sampled_peak_resident_bytes": 2056192
+    }
+  ],
+  "scope": "Eight generic tests and reused engine build; compiler/dependency installation pins retained, no performance claim"
+}

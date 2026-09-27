@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-14",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--ssh-flag=-batch",
+    "--ssh-flag=-hostkey",
+    "--ssh-flag=SHA256:Lcj/zOzHlkM1lSwfGsxJMh4gSF+TpYUx/LCVTD5E/LI",
+    "--command=date -u --iso-8601=seconds; test -f /opt/r1/bootstrap-complete && cat /opt/r1/bootstrap-complete; test ! -e /opt/r1/flop-flat-cloud32-package; sudo journalctl -u google-startup-scripts.service -n 8 --no-pager"
+  ],
+  "started_utc": "2026-09-27T02:46:40.670809+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 1120,
+    "sha256": "dda2badad7c8a53b061252e0ebe9f686960e833acd6216028327200b652a5561"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T02:46:46.874730+00:00"
+}

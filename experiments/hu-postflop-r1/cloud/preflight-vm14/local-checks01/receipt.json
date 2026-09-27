@@ -1,0 +1,979 @@
+{
+  "schema": "r1.vm14-local-light-checks/v1",
+  "started_at": "2026-09-27T02:46:49.948549+00:00",
+  "ended_at": "2026-09-27T02:46:50.952514+00:00",
+  "source_before": {
+    "AGENTS.md": {
+      "bytes": 4224,
+      "sha256": "2c0c4f4d549cb86ebe6a0d416dafe21653f77b8eb871e3abe215ee73653e6787"
+    },
+    "CLAUDE.md": {
+      "bytes": 748,
+      "sha256": "c5c635e23166828ffbd622e909177266a143d40339e8a048dde6ecc70aa7dff7"
+    },
+    "crates\\cli\\examples\\hu_saved_profile_audit.md": {
+      "bytes": 5415,
+      "sha256": "79ea214f2d7d249caf2c3d4212751dc9ea19c677da184cb1a9cfaaae3dde7c68"
+    },
+    "crates\\cli\\examples\\mw_average_sampling_research.md": {
+      "bytes": 9733,
+      "sha256": "0ab6f8523127fb481d111574ab6203c70b4978b6781217f9f77b27b6f3f0fc88"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_audit.md": {
+      "bytes": 30537,
+      "sha256": "8db6b46e8f822ea1507fa4e6f9413201c6a04ddf040045811a733c9f8ff22d5f"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_export_bench.md": {
+      "bytes": 2360,
+      "sha256": "acaaa10b23e49f65aba1af934b328ce18974e1e7f61e425df5c0883c08171a4c"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_load_bench.md": {
+      "bytes": 1460,
+      "sha256": "06f58fc64a97c6386557d97b13d43490dffe9921291de995393d652204a2c667"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_write_bench.md": {
+      "bytes": 2091,
+      "sha256": "332ff71abdbcc31ae358aab79257b2210b223e4173296063ed5f8fee2d8eba86"
+    },
+    "crates\\cli\\examples\\mw_strategy_drift_bench.md": {
+      "bytes": 2083,
+      "sha256": "cc2db6951581b9c6f1c8766aa2dbbc4362008712ae45c6661dcf8948c9e600a7"
+    },
+    "crates\\cli\\examples\\mw_tree_census.md": {
+      "bytes": 1807,
+      "sha256": "bcdb1dccc269efa33cb95b510fcff142f2a8b9b646f1501073c07b043e3856df"
+    },
+    "crates\\cli\\examples\\mw_tree_initialization_bench.md": {
+      "bytes": 5976,
+      "sha256": "42c492559989a6458a1d27a540a8e598462b64fa24ad018f83479166232690b6"
+    },
+    "docs\\app-architecture.md": {
+      "bytes": 17157,
+      "sha256": "759ec95a14e95bf11345bad576f2829eccd290d5854a59f2f4a2df906f5fc01c"
+    },
+    "docs\\architecture.md": {
+      "bytes": 35162,
+      "sha256": "c4cf15e7186f82a1b0d39e2695caba27470fbe159f6d3f9c42c10df7e78cfb6d"
+    },
+    "docs\\cli-reference.jp.md": {
+      "bytes": 38192,
+      "sha256": "15328ea28027f863103124c8b6eb2b08aab1908088905e56b479c222b93be9b4"
+    },
+    "docs\\decisions\\2026-09-25-development-workflow.jp.md": {
+      "bytes": 4538,
+      "sha256": "e2f5b82d2181b77f39c8f0cd7647f7070aec3f7a5a0d3db1322d56227feba8ea"
+    },
+    "docs\\development.md": {
+      "bytes": 9331,
+      "sha256": "57ee4413cb2ab0ff641f7ba9a46c67f1ffc462b5e3734183d1b1bbf3443fa83b"
+    },
+    "docs\\multiway-preflop-cli-spec.jp.md": {
+      "bytes": 826,
+      "sha256": "2a91ad90809321c37808dd2338f1559d9b7ddaa3dbe317b45a478aa0f29a771b"
+    },
+    "docs\\multiway-preflop-v1.jp.md": {
+      "bytes": 43602,
+      "sha256": "1b2aa9cd55b5487a2f31bee570e2306abeb9b2ff89e3faa367a3661919d39db1"
+    },
+    "docs\\multiway-preflop-v1.md": {
+      "bytes": 27510,
+      "sha256": "2c24b9287197df95939c2e77143702d9bdadf683773921ea9cde9ea811aed8e7"
+    },
+    "docs\\plans\\hu-postflop-r0\\asset-map.md": {
+      "bytes": 30897,
+      "sha256": "96fe974ddabaf5af615d39e79eb20c4a3bea0fc478df3234b40240a02f615da2"
+    },
+    "docs\\plans\\hu-postflop-r0\\coverage.md": {
+      "bytes": 8864,
+      "sha256": "de35865bd8f63e44eaf485ed7f614eba92d3376be37960d6476dda8b84097784"
+    },
+    "docs\\plans\\hu-postflop-r0\\handoff.md": {
+      "bytes": 6136,
+      "sha256": "eca6812364ee5e32a4c94195f4f2f3148a7c84dc53b1b3776507d9deb84a0c1a"
+    },
+    "docs\\plans\\hu-postflop-r0\\local-run-plan.md": {
+      "bytes": 10823,
+      "sha256": "9ee1d1b819d772b77f8635ea8aa3ca5d1bf0b7c1de9cad850d8f43cbfc9a0a6c"
+    },
+    "docs\\plans\\hu-postflop-r0\\measurement-protocol.md": {
+      "bytes": 17568,
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    "docs\\plans\\hu-postflop-r0\\provenance.md": {
+      "bytes": 8831,
+      "sha256": "07e54d96eaebe8d6296126797713281ed3d96bf85b45bbadbe06aed85e981761"
+    },
+    "docs\\plans\\r0-execution-plan.jp.md": {
+      "bytes": 21676,
+      "sha256": "c3da5c01cca9d422d4e3a204bdf83e7b79075fff0ad3b75fdeaad323f24b5644"
+    },
+    "docs\\plans\\r1-abstraction-contract.jp.md": {
+      "bytes": 17780,
+      "sha256": "e3c5a0a0104883c5b3e93c6a18c70dd89198a7eedaddce37a6a6caea32534a1f"
+    },
+    "docs\\plans\\r1-common-game-boundary.jp.md": {
+      "bytes": 21766,
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    "docs\\plans\\r1-execution-plan.jp.md": {
+      "bytes": 11612,
+      "sha256": "0f5ec1db0eca4f1aed05c343bda353b84c433469b20f69a68eda5c11a9d8dd4a"
+    },
+    "docs\\plans\\r1-oracle-fixtures.jp.md": {
+      "bytes": 6011,
+      "sha256": "db296f6a796c10938726479b1db4c85b857ca8e14082fef9da34c43953903241"
+    },
+    "docs\\plans\\r1-supervisor.jp.md": {
+      "bytes": 8574,
+      "sha256": "e9dd523bb07410ef654083aaa46caf8a73cbf14740819b5288a36d158124f4e0"
+    },
+    "docs\\plans\\solver-implementation-plan.jp.md": {
+      "bytes": 43729,
+      "sha256": "59b82cc19404e279686a5fca887ca1f8e46828a87a3f70d357d1dd965079965f"
+    },
+    "docs\\plans\\task-template.md": {
+      "bytes": 913,
+      "sha256": "59e7d1000c0c101d6d84463ed22966d81c6e4503adb0e6f91c396430286af6ad"
+    },
+    "docs\\product-roadmap.jp.md": {
+      "bytes": 44223,
+      "sha256": "e7a8610a41d41af51a38ee2360118d6d7c3ab530a88ec04ef1c6e6d121a8a761"
+    },
+    "docs\\README.md": {
+      "bytes": 3455,
+      "sha256": "dd18819050861d95db13ac67b737127f96ac9a7b0d040ea601b0d0d6d24eabdf"
+    },
+    "docs\\research\\2026-09-27-postflop-exact-weight-proposal.jp.md": {
+      "bytes": 8319,
+      "sha256": "a8f1e71e94b0a677c58766d9cab8f87c04955cfccc2c815eee8a98a48965e2a2"
+    },
+    "docs\\research\\2026-09-27-r1-final-pipeline-proposal.jp.md": {
+      "bytes": 20448,
+      "sha256": "7f8256a3797ba33cf8a2f179f8c45417bac6fc0edd68681163d2b8e897971eef"
+    },
+    "docs\\research\\ai-development-structure-audit-2026-09-25.jp.md": {
+      "bytes": 26565,
+      "sha256": "56755904d995ed4840d609cdc81f51cef2e2326d86687635cd6da321ef7716d8"
+    },
+    "docs\\research\\README.md": {
+      "bytes": 1537,
+      "sha256": "037b4044b012c4971ef61e1a2085851a3b14dc02abadd58201f14f85dc3237e0"
+    },
+    "docs\\research\\solver-cloud-cost-estimate-2026-09-20.jp.md": {
+      "bytes": 8625,
+      "sha256": "1843584620bb7237a69adac49adf448366b9d8fdefbb50121364e79f4ba1b363"
+    },
+    "docs\\research\\solver-roadmap-survey-2026-09-20.jp.md": {
+      "bytes": 20364,
+      "sha256": "618119a2b1edcfe7af363d460f990cd6fa92fd79e29567fe8783169446d0084f"
+    },
+    "docs\\solver-config-v1.jp.md": {
+      "bytes": 60496,
+      "sha256": "31c14cc25ed37bde41c9a4cf24de5184506f591309e8fe0fc441b1c024282265"
+    },
+    "docs\\status.jp.md": {
+      "bytes": 6546,
+      "sha256": "1939f6e770f1ff77cfcd2ecc2e9dd24c43174485a9d56d6a688f2b1a5eeeb619"
+    },
+    "docs\\user-guide.jp.md": {
+      "bytes": 40320,
+      "sha256": "f4147af553d188b606deb30cc68fcb81d78dcaf388f96b61aa7c74d6e6f498f5"
+    },
+    "docs\\validation.jp.md": {
+      "bytes": 12343,
+      "sha256": "4a254c92a8701d59ef01f654320de21a74d3ef8e85d03480c8a61a293740520a"
+    },
+    "examples\\bench_multiway\\README.md": {
+      "bytes": 1094,
+      "sha256": "75d9c86bdbbdb5aaa0b1f742c14d715f343fb7cf7faa90a1ece32b90af07a08c"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\budget.json": {
+      "bytes": 52460,
+      "sha256": "1df2e2366b5e0e925c4dce07369e18d07e47c00e0040babb2e720d3826dd3398"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\collect-pricing.py": {
+      "bytes": 2925,
+      "sha256": "bd5b772cecbf129ee7fa7e1c40fdfc7aa862fd423c94820575493692d7b24c1d"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\local-checks01\\check.py": {
+      "bytes": 10032,
+      "sha256": "b0b9c1d7f0efc3b0c7c8cc14bc115aca87152cd543aec34c25ec796dceca8b28"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\reservation.json": {
+      "bytes": 1558,
+      "sha256": "7a959a5098f19ff72a9fad93bbaeb1429bb00fc462e1bd37e6fdbb1a9d8941cf"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\README.md": {
+      "bytes": 22439,
+      "sha256": "23012040740180a1e098f2c729e723c7153208b720cf00fd7f15be82d3695d04"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\applied.json": {
+      "bytes": 3334,
+      "sha256": "0619f95b83dbf3218623a8560230318affba542d41f36c0228062394f8d1046b"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\apply-reconciliation.py": {
+      "bytes": 4807,
+      "sha256": "2bf8305f28805303dca154a398a59f74b441b005ce67384eec09f488ae30ad1c"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\budget-before.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\calculate.py": {
+      "bytes": 7917,
+      "sha256": "605fd6d7193a1649ee74c3c90f35bd7774983356aaa4a96672484fea40f0aeb9"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\inputs.json": {
+      "bytes": 51238,
+      "sha256": "2cc0abe300982afaf6272e58fb769b6e98c465ee8bf60653767f52ae1af59153"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\monitoring-usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\README.jp.md": {
+      "bytes": 4880,
+      "sha256": "c3c026155d4b704ea19364b51b01814e68523c6c668273493816ea29c0f0f034"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\report.json": {
+      "bytes": 10059,
+      "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\analyze.py": {
+      "bytes": 5920,
+      "sha256": "966664e4976fa6b12c6dcee0b9961bf9c0c77cd85280c25c20c341d3f962b794"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\check-inventory.py": {
+      "bytes": 3470,
+      "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\README.md": {
+      "bytes": 3143,
+      "sha256": "f0bea488d8a5f8e95c01c9aa75123fb55d7e6f9ca192f2eef6c9cda20cb1c382"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\capture-command.py": {
+      "bytes": 2171,
+      "sha256": "a6e7bdd649d7936944a8f59ffb914241603104ab7603fc3a21eb9f3c656a3ab0"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\fetch-dependencies.sh": {
+      "bytes": 885,
+      "sha256": "f32f3333d509aeaf94087383529ead17903d29e7219f4f845dd84cfc7dee05f7"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\README.md": {
+      "bytes": 2914,
+      "sha256": "8b83ae16f875dd2481c41c5000b16b9ffbbeabe96fcf13b387a9f83b98e070e0"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\recover.sh": {
+      "bytes": 5798,
+      "sha256": "9eced454d556555945c0ce4ec811fed410f68be67e1a3fc80e0b77083a2e6893"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\run.sh": {
+      "bytes": 2581,
+      "sha256": "1020d8690ab5cf6ad34ca123b8316e196a23b0603a64d6db9d336095b97338d1"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\start.py": {
+      "bytes": 6218,
+      "sha256": "b95c713442c96c3e9b6ad7a22eb80bf7d190d625405276dc785a01dbb38edcda"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\install.py": {
+      "bytes": 4088,
+      "sha256": "78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\pack.py": {
+      "bytes": 3995,
+      "sha256": "df3e95c3e5190ca36303f784fcbaada66c34c072aa7949dc226225d5685ad245"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\protocol.md": {
+      "bytes": 4162,
+      "sha256": "dd0d154832eb3119f90465c6e0099f63fe8c8fb962d54bd8cfa4bf08a1c03de9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\README.jp.md": {
+      "bytes": 1420,
+      "sha256": "cf950a13f1f56ec8f193b867dfdcc73ff96b1eecdff5df32cd37e2cb5591436c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\runner.py": {
+      "bytes": 28935,
+      "sha256": "ec9812da13884ea255699bd9c1af04ba82a77d00701d4edd01121604ca73cafe"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\test_install.py": {
+      "bytes": 4424,
+      "sha256": "65573601c3ecf504b8c1c270e3e5ef52add039c58f87250c98ab0c1c5fef5df5"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\test_runner.py": {
+      "bytes": 5377,
+      "sha256": "88a3b5075aaef45f172194d713becad1c3622a0813b34e7ff28267ec6a21ce56"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\evidence.py": {
+      "bytes": 13942,
+      "sha256": "6e503f9f95391d1be71289f5ae4d4550548a4a978dea2cab0281ba2233a86d2d"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\README.jp.md": {
+      "bytes": 1997,
+      "sha256": "f75f2eae1df8dd44e5f78a630fa24b22c1b0a228465f6b692f12bf5853019567"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\local-preflight\\README.jp.md": {
+      "bytes": 4773,
+      "sha256": "a1fd58e7113fa9bb85ef9cf2b4d78e7ca286aec3e286a80bda82d87c74c66b52"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\local-preflight\\sample.py": {
+      "bytes": 6497,
+      "sha256": "e389c342f109b2f259e1dc2d249a8cb859c1c86a63fc79a337ab416ad985d337"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\README.jp.md": {
+      "bytes": 4183,
+      "sha256": "51a5db30248a63de4a93cf8e2be1f4b39d0a1419b9f18547a3131487030cf161"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\retain.py": {
+      "bytes": 5873,
+      "sha256": "81115ae49f99bf096a8fe1fea14ca8f345f3d3692bed2c0b42a978ca543aae2c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\run.py": {
+      "bytes": 7166,
+      "sha256": "f777056c8ca7d95795db2d5f19885ff4906ed09f8e87bfe776f0498576e5dd93"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\test_run.py": {
+      "bytes": 2833,
+      "sha256": "a75d4b8559a5809c9d5688b320d5d6ce8c2d8a7d6d1f3259b3b693811722cda1"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\verify.py": {
+      "bytes": 6193,
+      "sha256": "9387d4deb251359fbd7522f55f38cedffc361f289a2692b7b5ec6f778a99d0e9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\README.jp.md": {
+      "bytes": 2980,
+      "sha256": "f9c37359a73b00090e7ffbebc41f9c1ac85bc8bf20b444be43cecdc10d456d9d"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\analyze.py": {
+      "bytes": 6998,
+      "sha256": "ca80bd0c955d93258add8f66bf979bce343e68227f548fcd5540e386b0f908ae"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\prepare.py": {
+      "bytes": 2951,
+      "sha256": "b74612f429672d59b9a7abab8ea2824bff83c18fd2c65c7bc7f4eb6fd7c44d2f"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\protocol.md": {
+      "bytes": 3444,
+      "sha256": "4e5b2bff8eb4fef3f23309c1df5fc1de6fb3cd47cdfe2ff531bfc10e38c2a142"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\README.jp.md": {
+      "bytes": 1720,
+      "sha256": "ee4a3b57719f488b36e5f87ffd9949dbfb96995898580aadcbb3f0dbb03f7173"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\run.py": {
+      "bytes": 24781,
+      "sha256": "c4f3fbd1375f465333e2327465a098b96fb35922e8dbdcce48a3e181290b7892"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\test_run.py": {
+      "bytes": 3593,
+      "sha256": "45fd1120347f390013b02a42eaf743ecebf2386e2097c02074569d34828f26bd"
+    },
+    "experiments\\README.md": {
+      "bytes": 19209,
+      "sha256": "f6de2fc5c53d598f1f9169bef8517a409036bd4c1bc7669b743415683422a271"
+    },
+    "LICENSE-POLICY.md": {
+      "bytes": 1898,
+      "sha256": "0178ebad00f178ebccecb89b2e9c891fbd59dafb54a9c598911e82dc63426833"
+    },
+    "README.md": {
+      "bytes": 8176,
+      "sha256": "42765d75fd40616e36023f1f151714961e5799f92404c0cf7a18f71f3ead7634"
+    },
+    "tools\\check_docs.py": {
+      "bytes": 5418,
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    "tools\\README.md": {
+      "bytes": 2171,
+      "sha256": "479e25496f3cf7c63968b16db1c501d93c73041caf4e0d5dffae890e44bb7bc5"
+    }
+  },
+  "source_after": {
+    "AGENTS.md": {
+      "bytes": 4224,
+      "sha256": "2c0c4f4d549cb86ebe6a0d416dafe21653f77b8eb871e3abe215ee73653e6787"
+    },
+    "CLAUDE.md": {
+      "bytes": 748,
+      "sha256": "c5c635e23166828ffbd622e909177266a143d40339e8a048dde6ecc70aa7dff7"
+    },
+    "crates\\cli\\examples\\hu_saved_profile_audit.md": {
+      "bytes": 5415,
+      "sha256": "79ea214f2d7d249caf2c3d4212751dc9ea19c677da184cb1a9cfaaae3dde7c68"
+    },
+    "crates\\cli\\examples\\mw_average_sampling_research.md": {
+      "bytes": 9733,
+      "sha256": "0ab6f8523127fb481d111574ab6203c70b4978b6781217f9f77b27b6f3f0fc88"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_audit.md": {
+      "bytes": 30537,
+      "sha256": "8db6b46e8f822ea1507fa4e6f9413201c6a04ddf040045811a733c9f8ff22d5f"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_export_bench.md": {
+      "bytes": 2360,
+      "sha256": "acaaa10b23e49f65aba1af934b328ce18974e1e7f61e425df5c0883c08171a4c"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_load_bench.md": {
+      "bytes": 1460,
+      "sha256": "06f58fc64a97c6386557d97b13d43490dffe9921291de995393d652204a2c667"
+    },
+    "crates\\cli\\examples\\mw_checkpoint_write_bench.md": {
+      "bytes": 2091,
+      "sha256": "332ff71abdbcc31ae358aab79257b2210b223e4173296063ed5f8fee2d8eba86"
+    },
+    "crates\\cli\\examples\\mw_strategy_drift_bench.md": {
+      "bytes": 2083,
+      "sha256": "cc2db6951581b9c6f1c8766aa2dbbc4362008712ae45c6661dcf8948c9e600a7"
+    },
+    "crates\\cli\\examples\\mw_tree_census.md": {
+      "bytes": 1807,
+      "sha256": "bcdb1dccc269efa33cb95b510fcff142f2a8b9b646f1501073c07b043e3856df"
+    },
+    "crates\\cli\\examples\\mw_tree_initialization_bench.md": {
+      "bytes": 5976,
+      "sha256": "42c492559989a6458a1d27a540a8e598462b64fa24ad018f83479166232690b6"
+    },
+    "docs\\app-architecture.md": {
+      "bytes": 17157,
+      "sha256": "759ec95a14e95bf11345bad576f2829eccd290d5854a59f2f4a2df906f5fc01c"
+    },
+    "docs\\architecture.md": {
+      "bytes": 35162,
+      "sha256": "c4cf15e7186f82a1b0d39e2695caba27470fbe159f6d3f9c42c10df7e78cfb6d"
+    },
+    "docs\\cli-reference.jp.md": {
+      "bytes": 38192,
+      "sha256": "15328ea28027f863103124c8b6eb2b08aab1908088905e56b479c222b93be9b4"
+    },
+    "docs\\decisions\\2026-09-25-development-workflow.jp.md": {
+      "bytes": 4538,
+      "sha256": "e2f5b82d2181b77f39c8f0cd7647f7070aec3f7a5a0d3db1322d56227feba8ea"
+    },
+    "docs\\development.md": {
+      "bytes": 9331,
+      "sha256": "57ee4413cb2ab0ff641f7ba9a46c67f1ffc462b5e3734183d1b1bbf3443fa83b"
+    },
+    "docs\\multiway-preflop-cli-spec.jp.md": {
+      "bytes": 826,
+      "sha256": "2a91ad90809321c37808dd2338f1559d9b7ddaa3dbe317b45a478aa0f29a771b"
+    },
+    "docs\\multiway-preflop-v1.jp.md": {
+      "bytes": 43602,
+      "sha256": "1b2aa9cd55b5487a2f31bee570e2306abeb9b2ff89e3faa367a3661919d39db1"
+    },
+    "docs\\multiway-preflop-v1.md": {
+      "bytes": 27510,
+      "sha256": "2c24b9287197df95939c2e77143702d9bdadf683773921ea9cde9ea811aed8e7"
+    },
+    "docs\\plans\\hu-postflop-r0\\asset-map.md": {
+      "bytes": 30897,
+      "sha256": "96fe974ddabaf5af615d39e79eb20c4a3bea0fc478df3234b40240a02f615da2"
+    },
+    "docs\\plans\\hu-postflop-r0\\coverage.md": {
+      "bytes": 8864,
+      "sha256": "de35865bd8f63e44eaf485ed7f614eba92d3376be37960d6476dda8b84097784"
+    },
+    "docs\\plans\\hu-postflop-r0\\handoff.md": {
+      "bytes": 6136,
+      "sha256": "eca6812364ee5e32a4c94195f4f2f3148a7c84dc53b1b3776507d9deb84a0c1a"
+    },
+    "docs\\plans\\hu-postflop-r0\\local-run-plan.md": {
+      "bytes": 10823,
+      "sha256": "9ee1d1b819d772b77f8635ea8aa3ca5d1bf0b7c1de9cad850d8f43cbfc9a0a6c"
+    },
+    "docs\\plans\\hu-postflop-r0\\measurement-protocol.md": {
+      "bytes": 17568,
+      "sha256": "c611f96600dcba452b361d40a485cd14c3a57ddba21dde9711bc289eb6ade892"
+    },
+    "docs\\plans\\hu-postflop-r0\\provenance.md": {
+      "bytes": 8831,
+      "sha256": "07e54d96eaebe8d6296126797713281ed3d96bf85b45bbadbe06aed85e981761"
+    },
+    "docs\\plans\\r0-execution-plan.jp.md": {
+      "bytes": 21676,
+      "sha256": "c3da5c01cca9d422d4e3a204bdf83e7b79075fff0ad3b75fdeaad323f24b5644"
+    },
+    "docs\\plans\\r1-abstraction-contract.jp.md": {
+      "bytes": 17780,
+      "sha256": "e3c5a0a0104883c5b3e93c6a18c70dd89198a7eedaddce37a6a6caea32534a1f"
+    },
+    "docs\\plans\\r1-common-game-boundary.jp.md": {
+      "bytes": 21766,
+      "sha256": "77f212d98f8762ee98e7bf66f222fd20d8b9e30bb9abe8db6f106bc5a3cd8f8d"
+    },
+    "docs\\plans\\r1-execution-plan.jp.md": {
+      "bytes": 11612,
+      "sha256": "0f5ec1db0eca4f1aed05c343bda353b84c433469b20f69a68eda5c11a9d8dd4a"
+    },
+    "docs\\plans\\r1-oracle-fixtures.jp.md": {
+      "bytes": 6011,
+      "sha256": "db296f6a796c10938726479b1db4c85b857ca8e14082fef9da34c43953903241"
+    },
+    "docs\\plans\\r1-supervisor.jp.md": {
+      "bytes": 8574,
+      "sha256": "e9dd523bb07410ef654083aaa46caf8a73cbf14740819b5288a36d158124f4e0"
+    },
+    "docs\\plans\\solver-implementation-plan.jp.md": {
+      "bytes": 43729,
+      "sha256": "59b82cc19404e279686a5fca887ca1f8e46828a87a3f70d357d1dd965079965f"
+    },
+    "docs\\plans\\task-template.md": {
+      "bytes": 913,
+      "sha256": "59e7d1000c0c101d6d84463ed22966d81c6e4503adb0e6f91c396430286af6ad"
+    },
+    "docs\\product-roadmap.jp.md": {
+      "bytes": 44223,
+      "sha256": "e7a8610a41d41af51a38ee2360118d6d7c3ab530a88ec04ef1c6e6d121a8a761"
+    },
+    "docs\\README.md": {
+      "bytes": 3455,
+      "sha256": "dd18819050861d95db13ac67b737127f96ac9a7b0d040ea601b0d0d6d24eabdf"
+    },
+    "docs\\research\\2026-09-27-postflop-exact-weight-proposal.jp.md": {
+      "bytes": 8319,
+      "sha256": "a8f1e71e94b0a677c58766d9cab8f87c04955cfccc2c815eee8a98a48965e2a2"
+    },
+    "docs\\research\\2026-09-27-r1-final-pipeline-proposal.jp.md": {
+      "bytes": 20448,
+      "sha256": "7f8256a3797ba33cf8a2f179f8c45417bac6fc0edd68681163d2b8e897971eef"
+    },
+    "docs\\research\\ai-development-structure-audit-2026-09-25.jp.md": {
+      "bytes": 26565,
+      "sha256": "56755904d995ed4840d609cdc81f51cef2e2326d86687635cd6da321ef7716d8"
+    },
+    "docs\\research\\README.md": {
+      "bytes": 1537,
+      "sha256": "037b4044b012c4971ef61e1a2085851a3b14dc02abadd58201f14f85dc3237e0"
+    },
+    "docs\\research\\solver-cloud-cost-estimate-2026-09-20.jp.md": {
+      "bytes": 8625,
+      "sha256": "1843584620bb7237a69adac49adf448366b9d8fdefbb50121364e79f4ba1b363"
+    },
+    "docs\\research\\solver-roadmap-survey-2026-09-20.jp.md": {
+      "bytes": 20364,
+      "sha256": "618119a2b1edcfe7af363d460f990cd6fa92fd79e29567fe8783169446d0084f"
+    },
+    "docs\\solver-config-v1.jp.md": {
+      "bytes": 60496,
+      "sha256": "31c14cc25ed37bde41c9a4cf24de5184506f591309e8fe0fc441b1c024282265"
+    },
+    "docs\\status.jp.md": {
+      "bytes": 6546,
+      "sha256": "1939f6e770f1ff77cfcd2ecc2e9dd24c43174485a9d56d6a688f2b1a5eeeb619"
+    },
+    "docs\\user-guide.jp.md": {
+      "bytes": 40320,
+      "sha256": "f4147af553d188b606deb30cc68fcb81d78dcaf388f96b61aa7c74d6e6f498f5"
+    },
+    "docs\\validation.jp.md": {
+      "bytes": 12343,
+      "sha256": "4a254c92a8701d59ef01f654320de21a74d3ef8e85d03480c8a61a293740520a"
+    },
+    "examples\\bench_multiway\\README.md": {
+      "bytes": 1094,
+      "sha256": "75d9c86bdbbdb5aaa0b1f742c14d715f343fb7cf7faa90a1ece32b90af07a08c"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\budget.json": {
+      "bytes": 52460,
+      "sha256": "1df2e2366b5e0e925c4dce07369e18d07e47c00e0040babb2e720d3826dd3398"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\collect-pricing.py": {
+      "bytes": 2925,
+      "sha256": "bd5b772cecbf129ee7fa7e1c40fdfc7aa862fd423c94820575493692d7b24c1d"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\local-checks01\\check.py": {
+      "bytes": 10032,
+      "sha256": "b0b9c1d7f0efc3b0c7c8cc14bc115aca87152cd543aec34c25ec796dceca8b28"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\preflight-vm14\\reservation.json": {
+      "bytes": 1558,
+      "sha256": "7a959a5098f19ff72a9fad93bbaeb1429bb00fc462e1bd37e6fdbb1a9d8941cf"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\README.md": {
+      "bytes": 22439,
+      "sha256": "23012040740180a1e098f2c729e723c7153208b720cf00fd7f15be82d3695d04"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\applied.json": {
+      "bytes": 3334,
+      "sha256": "0619f95b83dbf3218623a8560230318affba542d41f36c0228062394f8d1046b"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\apply-reconciliation.py": {
+      "bytes": 4807,
+      "sha256": "2bf8305f28805303dca154a398a59f74b441b005ce67384eec09f488ae30ad1c"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\budget-before.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\calculate.py": {
+      "bytes": 7917,
+      "sha256": "605fd6d7193a1649ee74c3c90f35bd7774983356aaa4a96672484fea40f0aeb9"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\inputs.json": {
+      "bytes": 51238,
+      "sha256": "2cc0abe300982afaf6272e58fb769b6e98c465ee8bf60653767f52ae1af59153"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\monitoring-usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\README.jp.md": {
+      "bytes": 4880,
+      "sha256": "c3c026155d4b704ea19364b51b01814e68523c6c668273493816ea29c0f0f034"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\report.json": {
+      "bytes": 10059,
+      "sha256": "17596df15556fd5fdd364a61c0bd8069ce51f3191ad4faa84111f913a40a6515"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\analyze.py": {
+      "bytes": 5920,
+      "sha256": "966664e4976fa6b12c6dcee0b9961bf9c0c77cd85280c25c20c341d3f962b794"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\check-inventory.py": {
+      "bytes": 3470,
+      "sha256": "6a1fdcff32dd576ae501239a2b7695239cf0554c4c8886dbebbef462c2a58b00"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\README.md": {
+      "bytes": 3143,
+      "sha256": "f0bea488d8a5f8e95c01c9aa75123fb55d7e6f9ca192f2eef6c9cda20cb1c382"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\usage-reconcile-20260927\\usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\capture-command.py": {
+      "bytes": 2171,
+      "sha256": "a6e7bdd649d7936944a8f59ffb914241603104ab7603fc3a21eb9f3c656a3ab0"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\fetch-dependencies.sh": {
+      "bytes": 885,
+      "sha256": "f32f3333d509aeaf94087383529ead17903d29e7219f4f845dd84cfc7dee05f7"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\README.md": {
+      "bytes": 2914,
+      "sha256": "8b83ae16f875dd2481c41c5000b16b9ffbbeabe96fcf13b387a9f83b98e070e0"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\recover.sh": {
+      "bytes": 5798,
+      "sha256": "9eced454d556555945c0ce4ec811fed410f68be67e1a3fc80e0b77083a2e6893"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\run.sh": {
+      "bytes": 2581,
+      "sha256": "1020d8690ab5cf6ad34ca123b8316e196a23b0603a64d6db9d336095b97338d1"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm14\\start.py": {
+      "bytes": 6218,
+      "sha256": "b95c713442c96c3e9b6ad7a22eb80bf7d190d625405276dc785a01dbb38edcda"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\install.py": {
+      "bytes": 4088,
+      "sha256": "78b215676b59a39af7f50ed08b5437ccc847d1657a8b15237a3b0397b9f37d8c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\pack.py": {
+      "bytes": 3995,
+      "sha256": "df3e95c3e5190ca36303f784fcbaada66c34c072aa7949dc226225d5685ad245"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\prepare.py": {
+      "bytes": 2959,
+      "sha256": "2cf605efbb26368e718d3cc6027dbcffc5d96c58a232cb7436f375173832e3ac"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\protocol.md": {
+      "bytes": 4162,
+      "sha256": "dd0d154832eb3119f90465c6e0099f63fe8c8fb962d54bd8cfa4bf08a1c03de9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\README.jp.md": {
+      "bytes": 1420,
+      "sha256": "cf950a13f1f56ec8f193b867dfdcc73ff96b1eecdff5df32cd37e2cb5591436c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\runner.py": {
+      "bytes": 28935,
+      "sha256": "ec9812da13884ea255699bd9c1af04ba82a77d00701d4edd01121604ca73cafe"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\test_install.py": {
+      "bytes": 4424,
+      "sha256": "65573601c3ecf504b8c1c270e3e5ef52add039c58f87250c98ab0c1c5fef5df5"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\cloud32\\test_runner.py": {
+      "bytes": 5377,
+      "sha256": "88a3b5075aaef45f172194d713becad1c3622a0813b34e7ff28267ec6a21ce56"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\evidence.py": {
+      "bytes": 13942,
+      "sha256": "6e503f9f95391d1be71289f5ae4d4550548a4a978dea2cab0281ba2233a86d2d"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\README.jp.md": {
+      "bytes": 1997,
+      "sha256": "f75f2eae1df8dd44e5f78a630fa24b22c1b0a228465f6b692f12bf5853019567"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\generic-checks\\run.py": {
+      "bytes": 10136,
+      "sha256": "d31ba98cf693ebfb9aad6262fd1cf37eeb571d4750a997370e8da3705b627a40"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\local-preflight\\README.jp.md": {
+      "bytes": 4773,
+      "sha256": "a1fd58e7113fa9bb85ef9cf2b4d78e7ca286aec3e286a80bda82d87c74c66b52"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\local-preflight\\sample.py": {
+      "bytes": 6497,
+      "sha256": "e389c342f109b2f259e1dc2d249a8cb859c1c86a63fc79a337ab416ad985d337"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\README.jp.md": {
+      "bytes": 4183,
+      "sha256": "51a5db30248a63de4a93cf8e2be1f4b39d0a1419b9f18547a3131487030cf161"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\retain.py": {
+      "bytes": 5873,
+      "sha256": "81115ae49f99bf096a8fe1fea14ca8f345f3d3692bed2c0b42a978ca543aae2c"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\run.py": {
+      "bytes": 7166,
+      "sha256": "f777056c8ca7d95795db2d5f19885ff4906ed09f8e87bfe776f0498576e5dd93"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\test_run.py": {
+      "bytes": 2833,
+      "sha256": "a75d4b8559a5809c9d5688b320d5d6ce8c2d8a7d6d1f3259b3b693811722cda1"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\native\\verify.py": {
+      "bytes": 6193,
+      "sha256": "9387d4deb251359fbd7522f55f38cedffc361f289a2692b7b5ec6f778a99d0e9"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\README.jp.md": {
+      "bytes": 2980,
+      "sha256": "f9c37359a73b00090e7ffbebc41f9c1ac85bc8bf20b444be43cecdc10d456d9d"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\analyze.py": {
+      "bytes": 6998,
+      "sha256": "ca80bd0c955d93258add8f66bf979bce343e68227f548fcd5540e386b0f908ae"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\prepare.py": {
+      "bytes": 2951,
+      "sha256": "b74612f429672d59b9a7abab8ea2824bff83c18fd2c65c7bc7f4eb6fd7c44d2f"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\protocol.md": {
+      "bytes": 3444,
+      "sha256": "4e5b2bff8eb4fef3f23309c1df5fc1de6fb3cd47cdfe2ff531bfc10e38c2a142"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\README.jp.md": {
+      "bytes": 1720,
+      "sha256": "ee4a3b57719f488b36e5f87ffd9949dbfb96995898580aadcbb3f0dbb03f7173"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\run.py": {
+      "bytes": 24781,
+      "sha256": "c4f3fbd1375f465333e2327465a098b96fb35922e8dbdcce48a3e181290b7892"
+    },
+    "experiments\\hu-postflop-r1\\flop-scaling\\flat-ev\\timing\\test_run.py": {
+      "bytes": 3593,
+      "sha256": "45fd1120347f390013b02a42eaf743ecebf2386e2097c02074569d34828f26bd"
+    },
+    "experiments\\README.md": {
+      "bytes": 19209,
+      "sha256": "f6de2fc5c53d598f1f9169bef8517a409036bd4c1bc7669b743415683422a271"
+    },
+    "LICENSE-POLICY.md": {
+      "bytes": 1898,
+      "sha256": "0178ebad00f178ebccecb89b2e9c891fbd59dafb54a9c598911e82dc63426833"
+    },
+    "README.md": {
+      "bytes": 8176,
+      "sha256": "42765d75fd40616e36023f1f151714961e5799f92404c0cf7a18f71f3ead7634"
+    },
+    "tools\\check_docs.py": {
+      "bytes": 5418,
+      "sha256": "9af1a436520b57adea611e214d4d7801c8d4ca5d78f591e72b995cd876905a9c"
+    },
+    "tools\\README.md": {
+      "bytes": 2171,
+      "sha256": "479e25496f3cf7c63968b16db1c501d93c73041caf4e0d5dffae890e44bb7bc5"
+    }
+  },
+  "source_unchanged": true,
+  "results": [
+    {
+      "name": "uncommitted_python_ast",
+      "status": "passed",
+      "detail": {
+        "python_files": [
+          "experiments/hu-postflop-r1/cloud/preflight-vm14/collect-pricing.py",
+          "experiments/hu-postflop-r1/cloud/preflight-vm14/local-checks01/check.py",
+          "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/apply-reconciliation.py",
+          "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/calculate.py",
+          "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/analyze.py",
+          "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/check-inventory.py",
+          "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/collect.py",
+          "experiments/hu-postflop-r1/cloud/vm14/capture-command.py",
+          "experiments/hu-postflop-r1/cloud/vm14/start.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/install.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/pack.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/prepare.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/runner.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_install.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/test_runner.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/evidence.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/run.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/sample.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/native/retain.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/native/run.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/native/test_run.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/native/verify.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/analyze.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/prepare.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/run.py",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/test_run.py"
+        ],
+        "python_count": 26,
+        "embedded_python": [
+          {
+            "file": "experiments/hu-postflop-r1/cloud/vm14/recover.sh",
+            "snippet": 0
+          },
+          {
+            "file": "experiments/hu-postflop-r1/cloud/vm14/run.sh",
+            "snippet": 0
+          },
+          {
+            "file": "experiments/hu-postflop-r1/cloud/vm14/run.sh",
+            "snippet": 1
+          }
+        ],
+        "shell_syntax_executed": false
+      },
+      "elapsed_seconds": 0.05826279986649752
+    },
+    {
+      "name": "existing_docs_validator",
+      "status": "passed",
+      "detail": {
+        "argv": [
+          "C:\\Python313\\python.exe",
+          "-B",
+          "tools/check_docs.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.1927353001665324,
+        "stdout": {
+          "bytes": 48,
+          "sha256": "78525ba6a5f5b6be950c80a401fdf487286a0b6c1ce0004597612ea7fe650692"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_seconds": 0.1927603001240641
+    },
+    {
+      "name": "changed_markdown_local_links",
+      "status": "passed",
+      "detail": {
+        "markdown_files": [
+          "docs/plans/r1-execution-plan.jp.md",
+          "experiments/README.md",
+          "experiments/hu-postflop-r1/cloud/README.md",
+          "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/README.jp.md",
+          "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/README.md",
+          "experiments/hu-postflop-r1/cloud/vm14/README.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/cloud32/protocol.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/generic-checks/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/local-preflight/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/native/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/README.jp.md",
+          "experiments/hu-postflop-r1/flop-scaling/flat-ev/timing/protocol.md"
+        ],
+        "count": 14,
+        "local_link_destinations": 164,
+        "anchors_or_remote_links_checked": false
+      },
+      "elapsed_seconds": 0.015903200022876263
+    },
+    {
+      "name": "budget38_and_unreserved2",
+      "status": "passed",
+      "detail": {
+        "authorized_usd": "40",
+        "held_usd": "38.0",
+        "unreserved_usd": "2.0",
+        "vm08_13_usd": "15.0",
+        "vm14_usd": "3",
+        "earlier_usd": "20"
+      },
+      "elapsed_seconds": 0.0008799999486654997
+    },
+    {
+      "name": "restored_report_and_ledger_hashes",
+      "status": "passed",
+      "detail": {
+        "four_evidence_pins_match": true,
+        "reconstructed_after_ledger_pin_matches": true,
+        "current_pre_vm14_reservations_match": true,
+        "restored_usd": "5",
+        "final_invoice_claim": null,
+        "guaranteed_ceiling": false
+      },
+      "elapsed_seconds": 0.0021772999316453934
+    },
+    {
+      "name": "cost_report_recompute",
+      "status": "passed",
+      "detail": {
+        "argv": [
+          "C:\\Python313\\python.exe",
+          "-B",
+          "experiments\\hu-postflop-r1\\cloud\\usage-cost-bound-20260927\\calculate.py",
+          "--check"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.10452119982801378,
+        "stdout": {
+          "bytes": 264,
+          "sha256": "889aa09bcd04171ed1555ed3639e948f0d2ecc9b1bd06ffb58dce040ea3c77e1"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_seconds": 0.10463110008276999
+    }
+  ],
+  "status": "passed",
+  "errors": [],
+  "heavy_native_hashes_compression_builds_solves_or_cloud_calls": false
+}

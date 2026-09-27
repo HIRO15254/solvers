@@ -1,0 +1,232 @@
+{
+  "schema": "r1.usage-cost-bound-report/v1",
+  "cost_basis": "Existing reservation rates; checked against fresh official pricing extracts captured 2026-09-27, without treating on-demand ceilings as actual Spot billing",
+  "rows": [
+    {
+      "vm": "08",
+      "instance_id": "1635613034982056517",
+      "request_start": "2026-09-26T01:15:19.0365885+00:00",
+      "absence_verified": "2026-09-26T04:01:25.6238650Z",
+      "ceil_lifetime_seconds": 9967,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T01:15:19.0365885+00:00",
+          "end": "2026-09-25T20:02:06.483-07:00",
+          "ceil_seconds": 6408,
+          "usd_hour": "0.14"
+        },
+        {
+          "start": "2026-09-25T20:02:06.483-07:00",
+          "end": "2026-09-26T04:01:25.6238650Z",
+          "ceil_seconds": 3560,
+          "usd_hour": "1.15"
+        }
+      ],
+      "compute_usd": "1.386422222222222222222222222",
+      "ipv4_usd": "0.006921527777777777777777777778",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "2",
+      "original_reservations_usd": "6",
+      "estimated_hold_usd": "3.824863750000000000000000000",
+      "estimated_hold_rounded_up_usd": "3.83",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "1.15",
+      "full_rate_sensitivity_hold_usd": "5.622344305555555555555555556",
+      "full_rate_sensitivity_rounded_up_usd": "5.63",
+      "proposed_hold_usd": "6.00",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.37"
+    },
+    {
+      "vm": "09",
+      "instance_id": "5775064646140191983",
+      "request_start": "2026-09-26T14:43:07.2577428+00:00",
+      "absence_verified": "2026-09-26T15:38:37.2805183+00:00",
+      "ceil_lifetime_seconds": 3331,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T14:43:07.2577428+00:00",
+          "end": "2026-09-26T15:38:37.2805183+00:00",
+          "ceil_seconds": 3331,
+          "usd_hour": "0.14"
+        }
+      ],
+      "compute_usd": "0.1295388888888888888888888889",
+      "ipv4_usd": "0.002313194444444444444444444444",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "1",
+      "original_reservations_usd": "3",
+      "estimated_hold_usd": "1.563372083333333333333333333",
+      "estimated_hold_rounded_up_usd": "1.57",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "0.14",
+      "full_rate_sensitivity_hold_usd": "1.563372083333333333333333333",
+      "full_rate_sensitivity_rounded_up_usd": "1.57",
+      "proposed_hold_usd": "1.60",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.03"
+    },
+    {
+      "vm": "10",
+      "instance_id": "9019841781761201633",
+      "request_start": "2026-09-26T15:55:53.8409999+00:00",
+      "absence_verified": "2026-09-26T17:51:09.145691+00:00",
+      "ceil_lifetime_seconds": 6916,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T15:55:53.8409999+00:00",
+          "end": "2026-09-26T17:51:09.145691+00:00",
+          "ceil_seconds": 6916,
+          "usd_hour": "0.14"
+        }
+      ],
+      "compute_usd": "0.2689555555555555555555555555",
+      "ipv4_usd": "0.004802777777777777777777777778",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "1",
+      "original_reservations_usd": "3",
+      "estimated_hold_usd": "1.705278333333333333333333333",
+      "estimated_hold_rounded_up_usd": "1.71",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "0.14",
+      "full_rate_sensitivity_hold_usd": "1.705278333333333333333333333",
+      "full_rate_sensitivity_rounded_up_usd": "1.71",
+      "proposed_hold_usd": "1.80",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.09"
+    },
+    {
+      "vm": "11",
+      "instance_id": "570856080701499920",
+      "request_start": "2026-09-26T18:54:51.7007926+00:00",
+      "absence_verified": "2026-09-26T20:17:20.111820+00:00",
+      "ceil_lifetime_seconds": 4949,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T18:54:51.7007926+00:00",
+          "end": "2026-09-26T20:17:20.111820+00:00",
+          "ceil_seconds": 4949,
+          "usd_hour": "0.14"
+        }
+      ],
+      "compute_usd": "0.1924611111111111111111111111",
+      "ipv4_usd": "0.003436805555555555555555555555",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "1",
+      "original_reservations_usd": "3",
+      "estimated_hold_usd": "1.627417916666666666666666667",
+      "estimated_hold_rounded_up_usd": "1.63",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "0.14",
+      "full_rate_sensitivity_hold_usd": "1.627417916666666666666666667",
+      "full_rate_sensitivity_rounded_up_usd": "1.63",
+      "proposed_hold_usd": "1.80",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.17"
+    },
+    {
+      "vm": "12",
+      "instance_id": "4952839753420870319",
+      "request_start": "2026-09-26T20:34:03.5069532+00:00",
+      "absence_verified": "2026-09-26T20:47:41.047498+00:00",
+      "ceil_lifetime_seconds": 818,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T20:34:03.5069532+00:00",
+          "end": "2026-09-26T20:47:41.047498+00:00",
+          "ceil_seconds": 818,
+          "usd_hour": "1.15"
+        }
+      ],
+      "compute_usd": "0.2613055555555555555555555555",
+      "ipv4_usd": "0.0005680555555555555555555555555",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "1",
+      "original_reservations_usd": "3",
+      "estimated_hold_usd": "1.693393611111111111111111111",
+      "estimated_hold_rounded_up_usd": "1.70",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "1.15",
+      "full_rate_sensitivity_hold_usd": "1.693393611111111111111111111",
+      "full_rate_sensitivity_rounded_up_usd": "1.70",
+      "proposed_hold_usd": "1.80",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.10"
+    },
+    {
+      "vm": "13",
+      "instance_id": "6526324704760165755",
+      "request_start": "2026-09-26T22:47:45.4539527+00:00",
+      "absence_verified": "2026-09-26T23:16:40.762086+00:00",
+      "ceil_lifetime_seconds": 1736,
+      "compute_intervals": [
+        {
+          "start": "2026-09-26T22:47:45.4539527+00:00",
+          "end": "2026-09-26T23:16:40.762086+00:00",
+          "ceil_seconds": 1736,
+          "usd_hour": "0.14"
+        }
+      ],
+      "compute_usd": "0.06751111111111111111111111111",
+      "ipv4_usd": "0.001205555555555555555555555556",
+      "disk_gib": 40,
+      "disk_hours_charged_in_estimate": 24,
+      "disk_usd": "0.131520",
+      "network_allowance_gib_unproven_cap": 1,
+      "network_allowance_usd": "0.3",
+      "original_other_reserves_usd": "1",
+      "original_reservations_usd": "2",
+      "estimated_hold_usd": "1.500236666666666666666666667",
+      "estimated_hold_rounded_up_usd": "1.51",
+      "full_lifetime_at_highest_reserved_compute_rate_usd_hour": "0.14",
+      "full_rate_sensitivity_hold_usd": "1.500236666666666666666666667",
+      "full_rate_sensitivity_rounded_up_usd": "1.51",
+      "proposed_hold_usd": "2.00",
+      "proposed_extra_over_full_rate_sensitivity_usd": "0.49"
+    }
+  ],
+  "original_group_reservations_usd": "20",
+  "group_estimate_unrounded_usd": "11.91456236111111111111111111",
+  "group_estimate_sum_of_rounded_holds_usd": "11.95",
+  "group_full_rate_sensitivity_sum_of_rounded_holds_usd": "13.75",
+  "proposed_group_hold_usd": "15",
+  "proposed_recovery_usd": "5",
+  "extra_contingency_over_rounded_estimate_usd": "3.05",
+  "extra_contingency_over_full_rate_sensitivity_usd": "1.25",
+  "original_other_reserves_retained_usd": "7",
+  "network_allowances_retained_usd": "1.8",
+  "network_allowances_retained_gib": 6,
+  "fresh_observed_sent_bytes": "277898030",
+  "fresh_observed_sent_gib": "0.2588127087801694869995117188",
+  "fresh_observed_uptime_seconds": "25863.858886999999588",
+  "per_reservation_proposed_holds_usd": {
+    "r1-20260926-08": "3.00",
+    "r1-20260926-08-scale32": "3.00",
+    "r1-20260926-09": "1.60",
+    "r1-20260926-10": "1.80",
+    "r1-20260926-11": "1.80",
+    "r1-20260926-12": "1.80",
+    "r1-20260926-13": "2.00"
+  },
+  "fresh_pricing_comparisons_within_reserved_rates": true,
+  "earlier_group_reservations_unchanged_usd": "20",
+  "proposed_total_held_usd": "35",
+  "authorized_limit_usd": "40",
+  "proposed_remaining_budget_usd": "5",
+  "actual_billed_usd": null,
+  "guaranteed_cost_ceiling": false,
+  "budget_changed": false,
+  "network_status": "Fresh Monitoring observes277898030 sent bytes. Internal gaps for08/09/12 and all start/end boundaries have unknown usage; original1GiB per VM allowance and other contingencies remain. This is a plausible conservative estimate, not a formal network or invoice bound.",
+  "billing_status": "14-row partial JPY usage observation is retained; credits and rounded zero are not substituted for incurred cost. Final invoice is not required for the user-authorized estimate-based reconciliation.",
+  "proposal_status": "Fresh usage and pricing assessed; proposed5USD recovery with15USD retained for08-13. Budget application is separate and this calculator never changes it."
+}

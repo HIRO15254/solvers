@@ -2,7 +2,17 @@
 
 初期20 USDと2026-09-26の2回の追加各10 USD許可により、累計上限は40 USD。
 節約を優先し、検証・buildは小型Spot VM、32 vCPU機は検証後の短時間計測に使う。
-[台帳](budget.json)は請求額と予約額を区別する。未精算の既存20 USD、
+[台帳](budget.json)は請求額と予約額を区別する。
+
+2026-09-27に利用者が、取得したGCP使用量から費用が想定内と確認できた分の予約再利用を許可した。
+ローカルの重い計算を抑え、[新しい使用量・資源照合](usage-reconcile-20260927/README.md)と
+[費用計算](usage-cost-bound-20260927/README.jp.md)に基づき、まず5 USDを再利用枠へ戻した。
+[適用記録](usage-cost-bound-20260927/applied.json)では保留予約40→35 USD、利用可能0→5 USD。
+VM08〜13の全稼働期間を高い通常単価で見積もる場合も、転送・税等の従来余裕を含む
+13.75 USDに対して15 USDを保持した。過去4VMの20 USD予約は変更していない。
+Monitoringの欠測を0と扱わず、実請求USDも未確定のまま残す。以降の予約額は台帳を参照する。
+
+以下はVM08実施時点の費用履歴である。未精算の既存20 USD、
 VM08の小型機枠3 USD、32 vCPU枠3 USDを保持し、合計26/40 USD、未予約枠14 USD。
 これは請求額ではない。32 vCPU枠は通常料金を上限側の見積りに使い、最大90分と予備を含めた。
 VM08は2 vCPU / 8 GiBでのcodec比較後、同じinstanceを4 vCPU / 16 GiBへ変更した。
@@ -31,7 +41,8 @@ VM08とboot diskは2026-09-26 04:00:40.671 UTCに削除し、04:01:25 UTCの
 [Spot IPv4](https://cloud.google.com/vpc/pricing-announce-external-ips)0.0025 USD/h。
 Spotの変動額そのものは未取得なので、CPU/RAMは通常料金を切り上げた0.37 USD/hで予約する。
 ダウンロードは最大2 GiB、転送予備0.30 USD/GiB、削除遅延・税・料金差等の予備を含め5 USD。
-請求未反映の予約を解放して次のVMを増設しない。
+当時は請求未反映の予約を解放しない方針だった。9月27日以降は上記の利用者許可により、
+使用量に基づく部分再計算と確定請求での精算を区別する。
 
 [launch.ps1](launch.ps1)は起動前に予約総額を検査し、一意の試行記録を書いてから作成する。
 [絶対終了時刻](https://docs.cloud.google.com/compute/docs/instances/limit-vm-runtime)にDELETE、

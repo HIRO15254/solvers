@@ -1,0 +1,248 @@
+{
+  "schema": "solvers.supervised-run/v1",
+  "state": "completed",
+  "created_at": "2026-09-27T02:07:47.678867+00:00",
+  "argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "lto=thin",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "target-cpu=native",
+    "-C",
+    "debuginfo=0",
+    "-C",
+    "debug-assertions=no",
+    "-C",
+    "overflow-checks=no",
+    "-C",
+    "embed-bitcode=yes",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+    "--crate-name",
+    "flat_ev01_ordinary",
+    "--extern",
+    "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+    "--extern",
+    "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+    "--extern",
+    "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libgame.rlib",
+    "--extern",
+    "holdem=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libholdem.rlib",
+    "--extern",
+    "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\source\\adapters\\solve.rs",
+    "-o",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\ordinary.exe"
+  ],
+  "cwd": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers",
+  "shell": false,
+  "limits": {
+    "timeout_seconds": 60.0,
+    "grace_seconds": 0.2,
+    "kill_wait_seconds": 5.0,
+    "poll_seconds": 0.1,
+    "memory_limit_bytes": 469762048,
+    "hard_job_commit_limit_bytes": 536870912,
+    "minimum_available_commit_before_launch_bytes": 1610612736,
+    "root_priority_class": 16384,
+    "min_free_memory_bytes": 1610612736,
+    "disk_reserve_bytes": 1073741824
+  },
+  "runtime": {
+    "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "logical_cpus": 16
+  },
+  "outputs": {
+    "stdout": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-03-ordinary\\record.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stderr": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-03-ordinary\\record.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "samples": {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-03-ordinary\\record.samples.jsonl",
+      "sha256": "3113e72187ec33fc37c3078d72fd7d2b761e882409b2744bd37e193fd4fbf487",
+      "bytes": 22441
+    }
+  },
+  "identity_before": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\plan.json",
+      "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837",
+      "bytes": 58995
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py",
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d",
+      "bytes": 16343
+    }
+  ],
+  "identity_after": [
+    {
+      "path": "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+      "sha256": "6d1c5543ed3a45cfbc1c1332d42d6550d883c14d3c2e323427e631c331cebeeb",
+      "bytes": 110592
+    },
+    {
+      "path": "C:\\Python313\\python.exe",
+      "sha256": "d932e5e2f324d57f392e8fd063dcf6d0185be8a664c57c6d24e7762ed02c28ca",
+      "bytes": 105816
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+      "sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+      "bytes": 39015
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+      "sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+      "bytes": 11663
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\plan.json",
+      "sha256": "b93f1611c88c683a46aea2d5ad403607b36f5e3a7fc457fb3493322bb32cd837",
+      "bytes": 58995
+    },
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\ev-scratch\\run.py",
+      "sha256": "14f6fd5e95777aa1c7758b7ae99045b2f33452e5381b62a3a43efd6368b3da5d",
+      "bytes": 16343
+    }
+  ],
+  "identity_unchanged": true,
+  "research_wrapper": {
+    "wrapper_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\native-preflight\\run_bounded.py",
+    "wrapper_sha256": "224e91f60ae572f3221196b2d8c76dfadfd4db412cdb67f767b89ad8cd7cb9b8",
+    "base_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\tools\\run_supervised.py",
+    "base_sha256": "5bd46e106bbc48e971c43c1ea080ed16e22356e83747ec6fb57157013fd029b8",
+    "transformed_source_sha256": "5d0c10873f7b0af1c235d738739fa398e8093e01324a25489eb9970b713ae679"
+  },
+  "bounded_job_settings": {
+    "limit_flags": 8704,
+    "job_memory_limit_bytes": 536870912,
+    "root_priority_class": 16384,
+    "verified_before_resume": true
+  },
+  "stop_reason": "completed",
+  "stop_requested_at": null,
+  "events": [],
+  "errors": [],
+  "child_exit_code": 0,
+  "cleanup_complete": true,
+  "forced": false,
+  "measurement": {
+    "interval": "before_process_creation_to_root_reaped_and_containment_empty",
+    "sample_count": 62,
+    "max_sample_gap_seconds": 0.10098290001042187,
+    "sampled_peak_tree_resident_bytes": 217726976,
+    "root_os_peak_resident_bytes": 206909440,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 219348992,
+    "max_observed_processes": 4
+  },
+  "containment": {
+    "kind": "windows_job_kill_on_close_suspended_assignment",
+    "limitations": [
+      "Optional RAM trigger is sampled working set; separate fixed Job limit caps committed memory",
+      "summed working sets can double-count shared pages",
+      "Job membership can include the hidden console host",
+      "CTRL_BREAK covers the dedicated console; detached descendants require Job termination",
+      "job peak committed bytes are not resident working set bytes"
+    ]
+  },
+  "host_before": {
+    "total_bytes": 34275098624,
+    "available_bytes": 5972979712,
+    "commit_available_bytes": 4213813248
+  },
+  "resolved_argv": [
+    "C:\\Users\\PC_User\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc\\bin\\rustc.exe",
+    "--edition=2024",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "lto=thin",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "target-cpu=native",
+    "-C",
+    "debuginfo=0",
+    "-C",
+    "debug-assertions=no",
+    "-C",
+    "overflow-checks=no",
+    "-C",
+    "embed-bitcode=yes",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01",
+    "-L",
+    "dependency=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps",
+    "--crate-name",
+    "flat_ev01_ordinary",
+    "--extern",
+    "cards=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\libcards-8df8c3ebbaa652da.rlib",
+    "--extern",
+    "engine=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libengine.rlib",
+    "--extern",
+    "game=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libgame.rlib",
+    "--extern",
+    "holdem=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\libholdem.rlib",
+    "--extern",
+    "rayon=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-opt-base01\\release\\deps\\librayon-7de89c85d6326c49.rlib",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\source\\adapters\\solve.rs",
+    "-o",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\target\\flop-flat-ev01\\ordinary.exe"
+  ],
+  "disk_path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\runs\\flop-flat-ev01\\build-03-ordinary",
+  "disk_free_before_bytes": 40167043072,
+  "started_at": "2026-09-27T02:07:47.756233+00:00",
+  "pid": 19252,
+  "last_sample": {
+    "pids": [],
+    "tree_resident_bytes": 0,
+    "root_os_peak_resident_bytes": 206909440,
+    "root_os_peak_source": "GetProcessMemoryInfo.PeakWorkingSetSize",
+    "job_os_peak_commit_bytes": 219348992,
+    "elapsed_seconds": 6.149071599822491,
+    "at": "2026-09-27T02:07:53.905407+00:00",
+    "host_available_memory_bytes": 6005026816,
+    "disk_free_bytes": 40164360192
+  },
+  "elapsed_seconds": 6.149298199918121,
+  "ended_at": "2026-09-27T02:07:53.905774+00:00",
+  "supervisor_exit_code": 0
+}
