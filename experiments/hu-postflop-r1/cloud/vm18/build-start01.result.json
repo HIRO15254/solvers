@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-18",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo python3 -B /opt/r1/flop-chance-grain-package/experiments/hu-postflop-r1/cloud/vm18/start.py --phase build --deadline-utc 2026-09-27T07:37:04+00:00 --stop-deadline-utc 2026-09-27T08:17:04Z",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:20:13.657180+00:00",
+  "timeout_seconds": 30,
+  "stdout": {
+    "bytes": 1395,
+    "sha256": "5b3bf7303f9c58aeadacbc27534277d8235d7608a700231d589d67cc80bf583c"
+  },
+  "stderr": {
+    "bytes": 97,
+    "sha256": "0379c8a781b73f9723cb4062a2b8fba95e5a2476b842f7ea23b7085376abb28f"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T07:20:19.589871+00:00"
+}

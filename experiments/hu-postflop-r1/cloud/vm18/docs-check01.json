@@ -1,0 +1,38 @@
+{
+  "at_utc": "2026-09-27T07:51:38.573556+00:00",
+  "argv": [
+    "C:/Python313/python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.2150902000721544,
+  "local_native_build_or_solve": false,
+  "archive_decompressed": false,
+  "source": {
+    "report.jp.md": {
+      "bytes": 4949,
+      "sha256": "91339c6e79426170a79da5c5d004ac8f4bf34447c673c370f0c3e90ebf92f6b5"
+    },
+    "README.md": {
+      "bytes": 1978,
+      "sha256": "06c9ab1201da1ec399e50c2f61334deeb2f3e5f6017bc4141e543b57338d6716"
+    },
+    "independent-review01.json": {
+      "bytes": 7792,
+      "sha256": "e94a776d527232346c9028726c1f2c9de7b3d3a83b8ca594c4833c12f47023ff"
+    }
+  },
+  "stdout": {
+    "path": "docs-check01.stdout.log",
+    "bytes": 48,
+    "sha256": "4c017748d2c77b7c0f92b108f9c3aef9b48475827ec7c7af0facbad1bb7f3fb0"
+  },
+  "stderr": {
+    "path": "docs-check01.stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

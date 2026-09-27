@@ -1,5 +1,10 @@
 # VM18 portable build and Flop chance-depth comparison
 
+[Completed comparison and retained evidence](report.jp.md): all38 solves and
+full payload/quality checks passed, but the predeclared performance screen
+rejected depth1. No production/default change. The VM and disk were deleted
+after verified recovery; usage estimates remain separate from actual invoices.
+
 One finite Spot VM, with a fixed 60-minute STOP measured from creation request.
 Build and core tests use two logical CPUs and a fresh target with explicit
 `RUSTFLAGS=-C target-cpu=x86-64-v3`; the build deadline is launch +20 minutes.

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "experiments/hu-postflop-r1/cloud/vm18/status.py",
+    "solvers-r1-20260927-18:/tmp/vm18-status.py",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:21:31.475741+00:00",
+  "timeout_seconds": 30
+}

@@ -1,0 +1,182 @@
+{
+  "schema": "r1.vm18-independent-compact-review/v1",
+  "reviewed_at_utc": "2026-09-27T07:48:43.761532+00:00",
+  "review_result": "no_blocking_arithmetic_or_claim_error_found",
+  "method": "Independent Python standard-library arithmetic over the small downloaded report and deployment/reader receipts; no retained code was executed.",
+  "evidence": [
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/flop-chance-grain-analysis01.json",
+      "bytes": 158458,
+      "sha256": "9f0659a3cd503de19f72c2350c8c95c4a9de4ef5efeb302bbcf65c1209d9b4b6"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/flop-chance-grain-analysis01.receipt.json",
+      "bytes": 1218,
+      "sha256": "1e0e7c95fc61eaa20c24f5afe2ccbdfe44e1b2012accf5d88b77020437d80dfe"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/flop-chance-grain-analysis01.stdout.log",
+      "bytes": 57,
+      "sha256": "5696ca5a8d5509a48c5018bf5e770434b84133168ff23fdb0e6fd0f26365ba96"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/flop-chance-grain-analysis01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/build-start01.stdout.log",
+      "bytes": 1395,
+      "sha256": "5b3bf7303f9c58aeadacbc27534277d8235d7608a700231d589d67cc80bf583c"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/measure-start01.stdout.log",
+      "bytes": 1531,
+      "sha256": "6cd4c7e40e3a89d7af88f2d905288a03777ddca70b70516d0d8d433d5aa7fcf3"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/measure-status04.stdout.log",
+      "bytes": 2576,
+      "sha256": "775c0188c076c380d2fb6b3182a4ba57ff20353f300e19c22c8ab8140b2b97a1"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/cloud/vm18/analyze01.stdout.log",
+      "bytes": 1052,
+      "sha256": "4bb6d3b518b89aa8d4c6066dff01aa9579fc76aaa23dfbc30d6dabf0b223b3bb"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/chance-grain/analyze.py",
+      "bytes": 29755,
+      "sha256": "866dfdc35ff9e2e5f6f0ed2b681e657dd7aa80b29e12da43731801c8bc0b1fcf"
+    },
+    {
+      "path": "experiments/hu-postflop-r1/flop-scaling/chance-grain/protocol.jp.md",
+      "bytes": 8983,
+      "sha256": "f4204ca484ff007aa90ade3ac84189b067a4c8c4d67f1d4b2126ce7bfdaafae9"
+    }
+  ],
+  "evidence_unchanged_during_review": true,
+  "checks": {
+    "report_and_stdout_stderr_match_reader_receipt": true,
+    "trusted_reader_source_matches_receipt_pin": true,
+    "metric_statistic_groups_recomputed": 264,
+    "three_samples_per_group": true,
+    "cpu_over_wall_and_division_by_32_recomputed": true,
+    "cfr_plus_quality_sums_recomputed": true,
+    "four_depth_comparisons_recomputed": true,
+    "all_predeclared_guards_recomputed": true,
+    "build_measure_same_instance_distinct_expected_boots": true,
+    "start_records_match_host_fields_and_same_package_tool_pins": true,
+    "build_and_measure_terminal_wrapper_exit_zero": true,
+    "measure_completed_38_no_failed_or_skipped": true
+  },
+  "counts": {
+    "build_commands": 1,
+    "canonical": 2,
+    "core_test_commands": 1,
+    "measured": 24,
+    "smoke": 4,
+    "warmup": 8
+  },
+  "comparisons": [
+    {
+      "case": "narrow",
+      "depth1_over_depth2_cfr_median": 0.9864038343822549,
+      "depth1_over_depth2_quality_median": 1.001560844164849,
+      "depth1_over_depth2_rss_maximum": 0.9925721656362585,
+      "workers": 16
+    },
+    {
+      "case": "narrow",
+      "depth1_over_depth2_cfr_median": 1.005444328991692,
+      "depth1_over_depth2_quality_median": 1.0002085924467832,
+      "depth1_over_depth2_rss_maximum": 0.9938321265754894,
+      "workers": 32
+    },
+    {
+      "case": "expanded",
+      "depth1_over_depth2_cfr_median": 1.0706575676785601,
+      "depth1_over_depth2_quality_median": 0.9990228498673734,
+      "depth1_over_depth2_rss_maximum": 0.9927486260004598,
+      "workers": 16
+    },
+    {
+      "case": "expanded",
+      "depth1_over_depth2_cfr_median": 1.0100162740488101,
+      "depth1_over_depth2_quality_median": 1.003176936053652,
+      "depth1_over_depth2_rss_maximum": 0.9888236211467485,
+      "workers": 32
+    }
+  ],
+  "scaling_16_to_32": [
+    {
+      "case": "narrow",
+      "depth": 2,
+      "cfr_wall_32_over_16": 1.044372260000142,
+      "cfr_wall_change_percent": 4.437226000014194,
+      "cfr_speedup_16_to_32": 0.9575129848813335,
+      "quality_speedup_16_to_32": 0.9781859299625633
+    },
+    {
+      "case": "narrow",
+      "depth": 1,
+      "cfr_wall_32_over_16": 1.0645317156851775,
+      "cfr_wall_change_percent": 6.453171568517746,
+      "cfr_speedup_16_to_32": 0.9393801849824247,
+      "quality_speedup_16_to_32": 0.9795084077080741
+    },
+    {
+      "case": "expanded",
+      "depth": 2,
+      "cfr_wall_32_over_16": 1.0527890316217972,
+      "cfr_wall_change_percent": 5.278903162179716,
+      "cfr_speedup_16_to_32": 0.9498579202136282,
+      "quality_speedup_16_to_32": 1.0344461748897094
+    },
+    {
+      "case": "expanded",
+      "depth": 1,
+      "cfr_wall_32_over_16": 0.9931597993405711,
+      "cfr_wall_change_percent": -0.6840200659428919,
+      "cfr_speedup_16_to_32": 1.0068873112503856,
+      "quality_speedup_16_to_32": 1.030162604951925
+    }
+  ],
+  "predeclared_guards": {
+    "both_inputs_16worker_cfr_ratio_at_most_1_03": false,
+    "both_inputs_32worker_cfr_ratio_at_most_0_95": false,
+    "all_quality_median_ratios_at_most_1_05": true,
+    "all_root_rss_maximum_ratios_at_most_1_10": true,
+    "all_cfr_quality_three_sample_max_over_min_at_most_1_15": true
+  },
+  "conclusion": {
+    "status": "completed",
+    "performance_screen": "rejected",
+    "production_adoption": false,
+    "reason": "Expanded 16-worker CFR ratio exceeds 1.03; both 32-worker CFR ratios exceed 0.95. Quality, RSS and variability guards pass."
+  },
+  "host_boundary": {
+    "instance_id": "3769585733775752220",
+    "build_boot_id": "1a4ee524-82f9-467f-b7e3-9622e794dd83",
+    "build_logical_cpus": 2,
+    "build_cpu_models": [
+      "AMD EPYC 7B12"
+    ],
+    "measurement_boot_id": "406ea346-93eb-4241-a8ea-a8ba96a683d0",
+    "measurement_logical_cpus": 32,
+    "measurement_guest_physical_cores": 16,
+    "measurement_cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ]
+  },
+  "limits": [
+    "State/canonical/quality-byte equality and complete raw membership are verified claims of the pinned successful strict reader; this compact review did not independently re-open those raw artifacts.",
+    "Downloaded compressed archive parts were neither read nor decompressed. No native build, solver, benchmark or cloud/API operation was performed.",
+    "N16 F32/DCFR equality is not convergence to a quality target, external-reference equivalence, full-workspace validation or overall R1 acceptance.",
+    "All measurement conditions use the same portable x86-64-v3 binary and measurement boot according to the strict reader. The different build boot/CPU model is intentional; earlier native-build absolute timings must not be merged.",
+    "CPU/wall includes spinning and scheduling and cannot isolate a cause. Guest 16-core/32-logical topology does not establish dedicated physical resources or SMT as the sole explanation.",
+    "The quality total is a separately timed interval around seven walks and includes inter-walk overhead; it is not asserted to equal the sum of separately timed individual walks. Quality uses depth2 in both CFR conditions.",
+    "RSS is the reported whole-process Linux high-water counter, not phase memory or aggregate descendant memory. Structural frontier counts are not task counts.",
+    "Cloud archive download integrity and deletion/absence are outside this review; no cleanup completion or actual billing claim is made."
+  ]
+}

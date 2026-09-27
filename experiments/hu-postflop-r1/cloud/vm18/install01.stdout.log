@@ -1,0 +1,1 @@
+{"archive_sha256": "4cd591ea18270f6d01e95a6689098d9edf67f9ebd4d6ef370b7476fe966f1286", "manifest": {"bytes": 71618, "sha256": "1f15f22a4e0fd62b296dec46c286e545b7f8036fc907fdba02caeb5f565b0e8b"}, "source_revision": "88fb39b586074d6988fe825ffbc97912013eb8f3", "source_files": 208, "destination": "/opt/r1/flop-chance-grain-package", "builds_or_solves_started": 0}

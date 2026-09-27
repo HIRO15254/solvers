@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-18",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo systemctl show google-startup-scripts.service -p ActiveState -p Result -p ExecMainStatus -p ExecMainExitTimestamp",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:38:07.797921+00:00",
+  "timeout_seconds": 30
+}

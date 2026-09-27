@@ -1,0 +1,10 @@
+{
+  "at_utc": "2026-09-27T07:31:34.053854+00:00",
+  "review": "Independent review found arithmetic/missing/zero/rounding handling sound;19 pure tests replayed by reviewer. Own-zero reference-measure extension must not claim the R0 unreachable exclusion rule.",
+  "resolution": "README now explicitly separates additional off-policy arithmetic from R0 hand/action acceptance. No normative rule, runtime code, defaults, or threshold changed.",
+  "runtime_sha256": "b9c6ebec7fca43936961ee488b9fa52a276934348f6b8eb68a175c9123a14054",
+  "readme_sha256": "2137bb5c295df52143b05d02d51ba3ab1c3237a02c019f29c9679dbac3b9cc8a",
+  "original_checks": "checks-final.json",
+  "external_acceptance": null,
+  "native_execution": false
+}

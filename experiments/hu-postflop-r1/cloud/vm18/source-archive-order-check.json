@@ -1,0 +1,16 @@
+{
+  "scope": "Small deployment source archive ordering diagnosis only; no solver state/native work",
+  "elapsed_seconds": 0.47148089995607734,
+  "frozen_preview": {
+    "bytes": 967129,
+    "sha256": "54fedb52b9d50e6da0985b060d8ae5c6ee1c0f5c5ac8283e9a9fef33f88545ce"
+  },
+  "linux_path_component_order": {
+    "bytes": 967265,
+    "sha256": "83fc42a73c202a7754889fd6bcefe984ffd575d0883545dc13a9068be0f3691c"
+  },
+  "matches_cloud_source_archive": true,
+  "reason": "Prepack uses flat string lexical order; Linux Path inventory sorts path components. Source member bytes agree, compressed container differs. Both below1MiB; cloud reader checks exact member content.",
+  "native_or_solver_execution": false,
+  "protocol_changed": false
+}

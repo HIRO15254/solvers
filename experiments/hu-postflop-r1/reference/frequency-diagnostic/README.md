@@ -35,6 +35,8 @@ w_ref(h) = reference.actor(h) × reference.compatible_opponent(h) × chance_weig
 
 own node mass は own の二つの reach と共通 chance factor の積を別集計し、主診断の重みへ代入しない。own reach が未知でも共通参照測度と両 policy が明示されていれば頻度診断は可能で、own mass だけ null となる。own reach=0 で明示された条件付き policy は、参照測度上の off-policy 診断として扱い、その旨を hand に残す。保存形式が未到達 hand の0を単に欠損の代わりに書いた場合、その値を policy として入力してはならない。
 
+この own-zero 比較は研究用の追加算術診断である。R0測定仕様の「未到達hand/actionは `not_applicable`」という除外規則へ準拠した受入validatorとは扱わず、本出力をそのままR0のhand/action受入値へ代入しない。参照測度が正でもown側で未到達なら比較を除外するR0経路の実装・仕様照合は別途必要であり、同規則をEV限定と解釈して適用範囲を変更したことにはしない。
+
 `policy[combo] = {action_id: probability}`。missing hand/action/null は欠測で、明示的な数値0とは異なる。complete row は各値が0–1で総和が**厳密に1**でなければ拒否する。表示丸めで0.999や1.001になった行を勝手に正規化しない。この初版はそのような rounded row の区間制約復元を扱わない。十進文字列または `{numerator: "...", denominator: "..."}` の厳密有理数を使えるので、実際の u16 decoded policy 等は証拠にある正しい分母を明示できる。action product / Whole range の単純比による補完は行わない。
 
 数値は JSON number ではなく十進文字列または有理数。指数・桁数・入力サイズに有限上限を置くが、正の reach を0へ切り捨てる閾値は置かない。FileRef は `{path, bytes, sha256}`、`--evidence-root` 内の相対 path の実 bytes を再検算する。入力 JSON と各証拠 file は2MiB以下。この hash 照合は入力証拠との対応を確認するもので、外部 solution の版や規則の一致を新たに保証しない。

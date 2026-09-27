@@ -1,0 +1,6272 @@
+{
+  "adoption_pending": "Screen only; full workspace fmt/clippy/tests, broader applicability and code review are required before changing production defaults",
+  "build_host": {
+    "affinity": [
+      0,
+      1
+    ],
+    "boot_id": "1a4ee524-82f9-467f-b7e3-9622e794dd83",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm18-build2.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "6442450944",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "AMD EPYC 7B12"
+    ],
+    "instance_id": "3769585733775752220",
+    "logical_cpus": 2,
+    "machine": "x86_64",
+    "one_per_core": [],
+    "physical_cores": 1,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 1,
+        "socket": "0"
+      }
+    ],
+    "v3": {
+      "argv": [
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "--help"
+      ],
+      "loader": {
+        "bytes": 236616,
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "per_cpu_flags": {
+        "0": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "1": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ]
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Usage: /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]\nYou have invoked 'ld.so', the program interpreter for dynamically-linked\nELF programs.  Usually, the program interpreter is invoked automatically\nwhen a dynamically-linked executable is started.\n\nYou may invoke the program interpreter program directly from the command\nline to load and run an ELF executable file; this is like executing that\nfile itself, but always uses the program interpreter you invoked,\ninstead of the program interpreter specified in the executable file you\nrun.  Invoking the program interpreter directly provides access to\nadditional diagnostics, and changing the dynamic linker behavior without\nsetting environment variables (which would be inherited by subprocesses).\n\n  --list                list all dependencies and how they are resolved\n  --verify              verify that given object really is a dynamically linked\n                        object we can handle\n  --inhibit-cache       Do not use /etc/ld.so.cache\n  --library-path PATH   use given PATH instead of content of the environment\n                        variable LD_LIBRARY_PATH\n  --glibc-hwcaps-prepend LIST\n                        search glibc-hwcaps subdirectories in LIST\n  --glibc-hwcaps-mask LIST\n                        only search built-in subdirectories if in LIST\n  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names\n                        in LIST\n  --audit LIST          use objects named in LIST as auditors\n  --preload LIST        preload objects named in LIST\n  --argv0 STRING        set argv[0] to STRING before running\n  --list-tunables       list all tunables with minimum and maximum values\n  --list-diagnostics    list diagnostics information\n  --help                display this help and exit\n  --version             output version information and exit\n\nThis program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2\n\nShared library search path:\n  (libraries located via /etc/ld.so.cache)\n  /lib/x86_64-linux-gnu (system search path)\n  /usr/lib/x86_64-linux-gnu (system search path)\n  /lib (system search path)\n  /usr/lib (system search path)\n\nSubdirectories of glibc-hwcaps directories, in priority order:\n  x86-64-v4\n  x86-64-v3 (supported, searched)\n  x86-64-v2 (supported, searched)\n"
+    }
+  },
+  "build_plan": {
+    "bytes": 56678,
+    "sha256": "0202d235a94cf5e4176e3dea47cba4a66250d5560c8df161915788d4db67975f"
+  },
+  "comparisons": [
+    {
+      "case": "narrow",
+      "depth1_over_depth2_cfr_median": 0.9864038343822549,
+      "depth1_over_depth2_quality_median": 1.001560844164849,
+      "depth1_over_depth2_rss_maximum": 0.9925721656362585,
+      "workers": 16
+    },
+    {
+      "case": "narrow",
+      "depth1_over_depth2_cfr_median": 1.005444328991692,
+      "depth1_over_depth2_quality_median": 1.0002085924467832,
+      "depth1_over_depth2_rss_maximum": 0.9938321265754894,
+      "workers": 32
+    },
+    {
+      "case": "expanded",
+      "depth1_over_depth2_cfr_median": 1.0706575676785601,
+      "depth1_over_depth2_quality_median": 0.9990228498673734,
+      "depth1_over_depth2_rss_maximum": 0.9927486260004598,
+      "workers": 16
+    },
+    {
+      "case": "expanded",
+      "depth1_over_depth2_cfr_median": 1.0100162740488101,
+      "depth1_over_depth2_quality_median": 1.003176936053652,
+      "depth1_over_depth2_rss_maximum": 0.9888236211467485,
+      "workers": 32
+    }
+  ],
+  "counts": {
+    "build_commands": 1,
+    "canonical": 2,
+    "core_test_commands": 1,
+    "measured": 24,
+    "smoke": 4,
+    "warmup": 8
+  },
+  "execution": {
+    "bytes": 5339214,
+    "sha256": "3eb5ed260b3e7f7527d19c74257e8af949ba8868f54b567448322001029cea7c"
+  },
+  "frontier_observations": {
+    "expanded": {
+      "case": "expanded",
+      "counts_scope": "one structural root traversal; not tasks, iterations or seat passes",
+      "eligible_chance_nodes_by_depth": [
+        5,
+        1034
+      ],
+      "eligible_child_edges_by_depth": [
+        245,
+        49637
+      ],
+      "min_children": 12,
+      "quality_depth": 2,
+      "schema": "r1.flop-chance-grain-observation/v1"
+    },
+    "narrow": {
+      "case": "narrow",
+      "counts_scope": "one structural root traversal; not tasks, iterations or seat passes",
+      "eligible_chance_nodes_by_depth": [
+        5,
+        1034
+      ],
+      "eligible_child_edges_by_depth": [
+        245,
+        49637
+      ],
+      "min_children": 12,
+      "quality_depth": 2,
+      "schema": "r1.flop-chance-grain-observation/v1"
+    }
+  },
+  "groups": [
+    {
+      "case": "narrow",
+      "depth": 2,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0017298307558558,
+          "maximum": 15.884364965643876,
+          "median": 15.875756933305931,
+          "minimum": 15.856935151525159,
+          "samples": [
+            15.875756933305931,
+            15.856935151525159,
+            15.884364965643876
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0017298307558558,
+          "maximum": 0.4963864051763711,
+          "median": 0.49611740416581035,
+          "minimum": 0.4955292234851612,
+          "samples": [
+            0.49611740416581035,
+            0.4955292234851612,
+            0.4963864051763711
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0501208510578448,
+          "maximum": 0.323742864,
+          "median": 0.310182884,
+          "minimum": 0.308291054,
+          "samples": [
+            0.308291054,
+            0.310182884,
+            0.323742864
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0495517710685467,
+          "maximum": 0.020381228,
+          "median": 0.019561339,
+          "minimum": 0.019418983,
+          "samples": [
+            0.019418983,
+            0.019561339,
+            0.020381228
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0006250781795698,
+          "maximum": 15.918290970859275,
+          "median": 15.913757744578577,
+          "minimum": 15.908347010270129,
+          "samples": [
+            15.918290970859275,
+            15.913757744578577,
+            15.908347010270129
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0006250781795698,
+          "maximum": 0.49744659283935233,
+          "median": 0.49730492951808053,
+          "minimum": 0.4971358440709415,
+          "samples": [
+            0.49744659283935233,
+            0.49730492951808053,
+            0.4971358440709415
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.00811500551786,
+          "maximum": 0.303637946,
+          "median": 0.30278767300000003,
+          "minimum": 0.301193757,
+          "samples": [
+            0.303637946,
+            0.301193757,
+            0.30278767300000003
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0078279135526895,
+          "maximum": 0.019074783,
+          "median": 0.019033258,
+          "minimum": 0.018926627,
+          "samples": [
+            0.019074783,
+            0.018926627,
+            0.019033258
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0007065617715158,
+          "maximum": 15.962226772506714,
+          "median": 15.958934901204206,
+          "minimum": 15.95095643646959,
+          "samples": [
+            15.95095643646959,
+            15.958934901204206,
+            15.962226772506714
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0007065617715158,
+          "maximum": 0.4988195866408348,
+          "median": 0.4987167156626314,
+          "minimum": 0.4984673886396747,
+          "samples": [
+            0.4984673886396747,
+            0.4987167156626314,
+            0.4988195866408348
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0083104900039936,
+          "maximum": 13.066449709,
+          "median": 12.989969067,
+          "minimum": 12.958756096,
+          "samples": [
+            13.066449709,
+            12.958756096,
+            12.989969067
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0074751695227033,
+          "maximum": 0.960662058,
+          "median": 0.955677181,
+          "minimum": 0.953534228,
+          "samples": [
+            0.960662058,
+            0.953534228,
+            0.955677181
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0088148340361576,
+          "maximum": 0.819164027,
+          "median": 0.813794294,
+          "minimum": 0.812006326,
+          "samples": [
+            0.819164027,
+            0.812006326,
+            0.813794294
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0063904293855899,
+          "maximum": 0.298488731,
+          "median": 0.298219252,
+          "minimum": 0.296593372,
+          "samples": [
+            0.298488731,
+            0.298219252,
+            0.296593372
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0070696173424758,
+          "maximum": 15.852355537658926,
+          "median": 15.824729966760676,
+          "minimum": 15.741072180780517,
+          "samples": [
+            15.852355537658926,
+            15.824729966760676,
+            15.741072180780517
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0070696173424758,
+          "maximum": 0.49538611055184145,
+          "median": 0.49452281146127114,
+          "minimum": 0.49190850564939115,
+          "samples": [
+            0.49538611055184145,
+            0.49452281146127114,
+            0.49190850564939115
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0113549354636802,
+          "maximum": 0.343916251,
+          "median": 0.34360929300000004,
+          "minimum": 0.340054949,
+          "samples": [
+            0.343916251,
+            0.34360929300000004,
+            0.340054949
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0051104853965898,
+          "maximum": 0.021713438,
+          "median": 0.021694962,
+          "minimum": 0.021603036,
+          "samples": [
+            0.021694962,
+            0.021713438,
+            0.021603036
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0013547120960462,
+          "maximum": 15.902111755882734,
+          "median": 15.8908415967416,
+          "minimum": 15.88059811752048,
+          "samples": [
+            15.8908415967416,
+            15.88059811752048,
+            15.902111755882734
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0013547120960462,
+          "maximum": 0.49694099237133543,
+          "median": 0.496588799898175,
+          "minimum": 0.496268691172515,
+          "samples": [
+            0.496588799898175,
+            0.496268691172515,
+            0.49694099237133543
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0082721914657689,
+          "maximum": 0.33363200800000004,
+          "median": 0.332595696,
+          "minimum": 0.330894783,
+          "samples": [
+            0.332595696,
+            0.33363200800000004,
+            0.330894783
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0096381099996545,
+          "maximum": 0.021008781,
+          "median": 0.020930024,
+          "minimum": 0.020808229,
+          "samples": [
+            0.020930024,
+            0.021008781,
+            0.020808229
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0004540864273677,
+          "maximum": 15.957746717587359,
+          "median": 15.95108380648803,
+          "minimum": 15.950503810297427,
+          "samples": [
+            15.95108380648803,
+            15.950503810297427,
+            15.957746717587359
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0004540864273677,
+          "maximum": 0.49867958492460496,
+          "median": 0.49847136895275096,
+          "minimum": 0.4984532440717946,
+          "samples": [
+            0.49847136895275096,
+            0.4984532440717946,
+            0.49867958492460496
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0053811750178243,
+          "maximum": 0.9607975820000001,
+          "median": 0.959312331,
+          "minimum": 0.955655035,
+          "samples": [
+            0.9607975820000001,
+            0.959312331,
+            0.955655035
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0058011317725721,
+          "maximum": 0.060234,
+          "median": 0.060143074,
+          "minimum": 0.05988659,
+          "samples": [
+            0.060234,
+            0.060143074,
+            0.05988659
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0009637899767587,
+          "maximum": 15.896972460344697,
+          "median": 15.884744041496496,
+          "minimum": 15.881665869964994,
+          "samples": [
+            15.896972460344697,
+            15.884744041496496,
+            15.881665869964994
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0009637899767587,
+          "maximum": 0.4967803893857718,
+          "median": 0.4963982512967655,
+          "minimum": 0.49630205843640607,
+          "samples": [
+            0.4967803893857718,
+            0.4963982512967655,
+            0.49630205843640607
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0023139656477973,
+          "maximum": 2.2533366040000002,
+          "median": 2.249390302,
+          "minimum": 2.248134498,
+          "samples": [
+            2.249390302,
+            2.248134498,
+            2.2533366040000002
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0027198682361878,
+          "maximum": 0.141882887,
+          "median": 0.141527902,
+          "minimum": 0.141498031,
+          "samples": [
+            0.141498031,
+            0.141527902,
+            0.141882887
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.005455927731318,
+          "maximum": 184180736,
+          "median": 184180736,
+          "minimum": 183181312,
+          "samples": [
+            183181312,
+            184180736,
+            184180736
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0035462565485755,
+          "maximum": 0.458588027,
+          "median": 0.457695273,
+          "minimum": 0.456967503,
+          "samples": [
+            0.457695273,
+            0.458588027,
+            0.456967503
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.002814078475124,
+          "maximum": 1.9209747099999959,
+          "median": 1.920694348000012,
+          "minimum": 1.9155841060000114,
+          "samples": [
+            1.9155841060000114,
+            1.920694348000012,
+            1.9209747099999959
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "narrow-r1-w16-d2",
+        "narrow-r2-w16-d2",
+        "narrow-r3-w16-d2"
+      ],
+      "workers": 16
+    },
+    {
+      "case": "narrow",
+      "depth": 2,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0015870260649438,
+          "maximum": 31.791349852262485,
+          "median": 31.75976711947623,
+          "minimum": 31.74097609587158,
+          "samples": [
+            31.74097609587158,
+            31.791349852262485,
+            31.75976711947623
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0015870260649438,
+          "maximum": 0.9934796828832027,
+          "median": 0.9924927224836322,
+          "minimum": 0.9919055029959869,
+          "samples": [
+            0.9919055029959869,
+            0.9934796828832027,
+            0.9924927224836322
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.018184714783166,
+          "maximum": 0.6545757720000001,
+          "median": 0.644931299,
+          "minimum": 0.64288509,
+          "samples": [
+            0.6545757720000001,
+            0.64288509,
+            0.644931299
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0198006004644542,
+          "maximum": 0.020622421,
+          "median": 0.02030655,
+          "minimum": 0.020222013,
+          "samples": [
+            0.020622421,
+            0.020222013,
+            0.02030655
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0007178750472625,
+          "maximum": 31.777232609850365,
+          "median": 31.759557841844753,
+          "minimum": 31.75443689196575,
+          "samples": [
+            31.759557841844753,
+            31.75443689196575,
+            31.777232609850365
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0007178750472625,
+          "maximum": 0.9930385190578239,
+          "median": 0.9924861825576485,
+          "minimum": 0.9923261528739297,
+          "samples": [
+            0.9924861825576485,
+            0.9923261528739297,
+            0.9930385190578239
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0240929302611295,
+          "maximum": 0.6301284610000001,
+          "median": 0.6244905040000001,
+          "minimum": 0.615303985,
+          "samples": [
+            0.6301284610000001,
+            0.6244905040000001,
+            0.615303985
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0246628564877065,
+          "maximum": 0.019840593,
+          "median": 0.019666244,
+          "minimum": 0.019363045,
+          "samples": [
+            0.019840593,
+            0.019666244,
+            0.019363045
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0062124170904647,
+          "maximum": 31.54167992566248,
+          "median": 31.35897556746807,
+          "minimum": 31.346939661972677,
+          "samples": [
+            31.54167992566248,
+            31.35897556746807,
+            31.346939661972677
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0062124170904647,
+          "maximum": 0.9856774976769525,
+          "median": 0.9799679864833772,
+          "minimum": 0.9795918644366461,
+          "samples": [
+            0.9856774976769525,
+            0.9799679864833772,
+            0.9795918644366461
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0371028097530248,
+          "maximum": 27.269539557,
+          "median": 26.641895237,
+          "minimum": 26.29395977,
+          "samples": [
+            26.29395977,
+            27.269539557,
+            26.641895237
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0352275288156054,
+          "maximum": 1.014276856,
+          "median": 0.992912285,
+          "minimum": 0.979762253,
+          "samples": [
+            0.979762253,
+            1.014276856,
+            0.992912285
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0431452011197286,
+          "maximum": 0.869592806,
+          "median": 0.849904186,
+          "minimum": 0.833625851,
+          "samples": [
+            0.833625851,
+            0.869592806,
+            0.849904186
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.021168651480842,
+          "maximum": 0.301758978,
+          "median": 0.296653044,
+          "minimum": 0.295503566,
+          "samples": [
+            0.295503566,
+            0.296653044,
+            0.301758978
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0199978602758446,
+          "maximum": 31.240099624764003,
+          "median": 31.238357864288666,
+          "minimum": 30.62761290137956,
+          "samples": [
+            30.62761290137956,
+            31.238357864288666,
+            31.240099624764003
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0199978602758446,
+          "maximum": 0.9762531132738751,
+          "median": 0.9761986832590208,
+          "minimum": 0.9571129031681113,
+          "samples": [
+            0.9571129031681113,
+            0.9761986832590208,
+            0.9762531132738751
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0613361150450578,
+          "maximum": 0.7112975960000001,
+          "median": 0.6892498650000001,
+          "minimum": 0.6701907020000001,
+          "samples": [
+            0.6892498650000001,
+            0.7112975960000001,
+            0.6701907020000001
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0613952920768424,
+          "maximum": 0.022770006,
+          "median": 0.022504198,
+          "minimum": 0.021452899,
+          "samples": [
+            0.022504198,
+            0.022770006,
+            0.021452899
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0340342935818565,
+          "maximum": 31.811543597251667,
+          "median": 31.797892300541445,
+          "minimum": 30.76449571808461,
+          "samples": [
+            30.76449571808461,
+            31.797892300541445,
+            31.811543597251667
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0340342935818565,
+          "maximum": 0.9941107374141146,
+          "median": 0.9936841343919202,
+          "minimum": 0.9613904911901441,
+          "samples": [
+            0.9613904911901441,
+            0.9936841343919202,
+            0.9941107374141146
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0331411475685857,
+          "maximum": 0.6718543610000001,
+          "median": 0.662971968,
+          "minimum": 0.650302587,
+          "samples": [
+            0.650302587,
+            0.662971968,
+            0.6718543610000001
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0138386633346694,
+          "maximum": 0.021138087,
+          "median": 0.021119829,
+          "minimum": 0.020849557,
+          "samples": [
+            0.021138087,
+            0.020849557,
+            0.021119829
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0128502819060001,
+          "maximum": 31.588082276280577,
+          "median": 31.301326564581746,
+          "minimum": 31.18731646777799,
+          "samples": [
+            31.588082276280577,
+            31.18731646777799,
+            31.301326564581746
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0128502819060001,
+          "maximum": 0.987127571133768,
+          "median": 0.9781664551431796,
+          "minimum": 0.9746036396180622,
+          "samples": [
+            0.987127571133768,
+            0.9746036396180622,
+            0.9781664551431796
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0297828719637243,
+          "maximum": 1.952695518,
+          "median": 1.901964857,
+          "minimum": 1.8962206220000002,
+          "samples": [
+            1.952695518,
+            1.901964857,
+            1.8962206220000002
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0204345323664528,
+          "maximum": 0.061817476,
+          "median": 0.060985204,
+          "minimum": 0.060579561,
+          "samples": [
+            0.061817476,
+            0.060985204,
+            0.060579561
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0044164973049807,
+          "maximum": 31.486869551353173,
+          "median": 31.435345851875173,
+          "minimum": 31.348419341814644,
+          "samples": [
+            31.348419341814644,
+            31.435345851875173,
+            31.486869551353173
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0044164973049807,
+          "maximum": 0.9839646734797867,
+          "median": 0.9823545578710992,
+          "minimum": 0.9796381044317076,
+          "samples": [
+            0.9796381044317076,
+            0.9823545578710992,
+            0.9839646734797867
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0173817421122842,
+          "maximum": 4.581145211,
+          "median": 4.548193151,
+          "minimum": 4.502877358,
+          "samples": [
+            4.581145211,
+            4.548193151,
+            4.502877358
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0218750058344597,
+          "maximum": 0.146136402,
+          "median": 0.14468405,
+          "minimum": 0.143008099,
+          "samples": [
+            0.146136402,
+            0.14468405,
+            0.143008099
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.002396899711028,
+          "maximum": 183287808,
+          "median": 183078912,
+          "minimum": 182849536,
+          "samples": [
+            183078912,
+            183287808,
+            182849536
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0040334702284428,
+          "maximum": 0.459184599,
+          "median": 0.458769812,
+          "minimum": 0.457339932,
+          "samples": [
+            0.457339932,
+            0.458769812,
+            0.459184599
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0059188965695482,
+          "maximum": 1.9347746059999906,
+          "median": 1.9265621389999978,
+          "minimum": 1.923390258000012,
+          "samples": [
+            1.923390258000012,
+            1.9347746059999906,
+            1.9265621389999978
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.48124955015537957,
+          "speedup": 0.9624991003107591
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.47875649244066676,
+          "speedup": 0.9575129848813335
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.48909296498128163,
+          "speedup": 0.9781859299625633
+        }
+      },
+      "stages": [
+        "narrow-r1-w32-d2",
+        "narrow-r2-w32-d2",
+        "narrow-r3-w32-d2"
+      ],
+      "workers": 32
+    },
+    {
+      "case": "narrow",
+      "depth": 1,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.001341533899957,
+          "maximum": 15.898681826113737,
+          "median": 15.877820766552555,
+          "minimum": 15.877381780213023,
+          "samples": [
+            15.877381780213023,
+            15.877820766552555,
+            15.898681826113737
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.001341533899957,
+          "maximum": 0.4968338070660543,
+          "median": 0.49618189895476733,
+          "minimum": 0.49616818063165696,
+          "samples": [
+            0.49616818063165696,
+            0.49618189895476733,
+            0.4968338070660543
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.11077256492183,
+          "maximum": 0.35321576200000004,
+          "median": 0.32516717,
+          "minimum": 0.317991075,
+          "samples": [
+            0.317991075,
+            0.35321576200000004,
+            0.32516717
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.1107418545372314,
+          "maximum": 0.022245859,
+          "median": 0.020452461,
+          "minimum": 0.020027929,
+          "samples": [
+            0.020027929,
+            0.022245859,
+            0.020452461
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0019452181407753,
+          "maximum": 15.93512859789994,
+          "median": 15.912110257568912,
+          "minimum": 15.904191476126217,
+          "samples": [
+            15.904191476126217,
+            15.93512859789994,
+            15.912110257568912
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0019452181407753,
+          "maximum": 0.4979727686843731,
+          "median": 0.4972534455490285,
+          "minimum": 0.49700598362894427,
+          "samples": [
+            0.49700598362894427,
+            0.4979727686843731,
+            0.4972534455490285
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0599600538566596,
+          "maximum": 0.322487165,
+          "median": 0.308103679,
+          "minimum": 0.30424464,
+          "samples": [
+            0.308103679,
+            0.322487165,
+            0.30424464
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0584289384278087,
+          "maximum": 0.0202375,
+          "median": 0.019372483,
+          "minimum": 0.01912032,
+          "samples": [
+            0.019372483,
+            0.0202375,
+            0.01912032
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.003658393701916,
+          "maximum": 13.062846889668794,
+          "median": 13.047379025515117,
+          "minimum": 13.015232046720099,
+          "samples": [
+            13.047379025515117,
+            13.062846889668794,
+            13.015232046720099
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.003658393701916,
+          "maximum": 0.4082139653021498,
+          "median": 0.4077305945473474,
+          "minimum": 0.4067260014600031,
+          "samples": [
+            0.4077305945473474,
+            0.4082139653021498,
+            0.4067260014600031
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0029432056354106,
+          "maximum": 10.478464547000002,
+          "median": 10.467324958,
+          "minimum": 10.447714774000001,
+          "samples": [
+            10.478464547000002,
+            10.467324958,
+            10.447714774000001
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0073043729118996,
+          "maximum": 0.950212422,
+          "median": 0.944857577,
+          "minimum": 0.943322046,
+          "samples": [
+            0.944857577,
+            0.950212422,
+            0.943322046
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0022510017106057,
+          "maximum": 0.803108772,
+          "median": 0.802729812,
+          "minimum": 0.801305033,
+          "samples": [
+            0.803108772,
+            0.801305033,
+            0.802729812
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0224815318331368,
+          "maximum": 0.302524848,
+          "median": 0.299458749,
+          "minimum": 0.295873166,
+          "samples": [
+            0.295873166,
+            0.299458749,
+            0.302524848
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0031761122501859,
+          "maximum": 15.855128612252056,
+          "median": 15.83592027662519,
+          "minimum": 15.804930379261151,
+          "samples": [
+            15.855128612252056,
+            15.804930379261151,
+            15.83592027662519
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0031761122501859,
+          "maximum": 0.49547276913287674,
+          "median": 0.4948725086445372,
+          "minimum": 0.49390407435191097,
+          "samples": [
+            0.49547276913287674,
+            0.49390407435191097,
+            0.4948725086445372
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.094715366741935,
+          "maximum": 0.36330976800000003,
+          "median": 0.34695322900000003,
+          "minimum": 0.33187601,
+          "samples": [
+            0.34695322900000003,
+            0.36330976800000003,
+            0.33187601
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.096861856226171,
+          "maximum": 0.022987116,
+          "median": 0.021882713,
+          "minimum": 0.020957166,
+          "samples": [
+            0.021882713,
+            0.022987116,
+            0.020957166
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0052463500045288,
+          "maximum": 15.917888569880574,
+          "median": 15.906369187576002,
+          "minimum": 15.834813595502098,
+          "samples": [
+            15.834813595502098,
+            15.906369187576002,
+            15.917888569880574
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0052463500045288,
+          "maximum": 0.49743401780876795,
+          "median": 0.4970740371117501,
+          "minimum": 0.49483792485944056,
+          "samples": [
+            0.49483792485944056,
+            0.4970740371117501,
+            0.49743401780876795
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0661502640348297,
+          "maximum": 0.34972303200000004,
+          "median": 0.333516961,
+          "minimum": 0.328024148,
+          "samples": [
+            0.333516961,
+            0.34972303200000004,
+            0.328024148
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0669223693682788,
+          "maximum": 0.021986352,
+          "median": 0.02106226,
+          "minimum": 0.020607265,
+          "samples": [
+            0.02106226,
+            0.021986352,
+            0.020607265
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0015351218013961,
+          "maximum": 15.961476592186042,
+          "median": 15.951034077238674,
+          "minimum": 15.937011338631013,
+          "samples": [
+            15.951034077238674,
+            15.937011338631013,
+            15.961476592186042
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0015351218013961,
+          "maximum": 0.4987961435058138,
+          "median": 0.49846981491370856,
+          "minimum": 0.49803160433221916,
+          "samples": [
+            0.49846981491370856,
+            0.49803160433221916,
+            0.4987961435058138
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0339714128995905,
+          "maximum": 0.9771424860000001,
+          "median": 0.9463352930000001,
+          "minimum": 0.9450382030000001,
+          "samples": [
+            0.9450382030000001,
+            0.9771424860000001,
+            0.9463352930000001
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0348811889261493,
+          "maximum": 0.061312781,
+          "median": 0.059288706,
+          "minimum": 0.059246203,
+          "samples": [
+            0.059246203,
+            0.061312781,
+            0.059288706
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0010591327830494,
+          "maximum": 15.902638946614932,
+          "median": 15.889622891715602,
+          "minimum": 15.885813760475795,
+          "samples": [
+            15.885813760475795,
+            15.889622891715602,
+            15.902638946614932
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0010591327830494,
+          "maximum": 0.4969574670817166,
+          "median": 0.49655071536611256,
+          "minimum": 0.4964316800148686,
+          "samples": [
+            0.4964316800148686,
+            0.49655071536611256,
+            0.4969574670817166
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0582768795791335,
+          "maximum": 2.366082257,
+          "median": 2.2517951170000003,
+          "minimum": 2.235787536,
+          "samples": [
+            2.2517951170000003,
+            2.366082257,
+            2.235787536
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0591437717676497,
+          "maximum": 0.148907389,
+          "median": 0.141748805,
+          "minimum": 0.140592234,
+          "samples": [
+            0.141748805,
+            0.148907389,
+            0.140592234
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0048404890019587,
+          "maximum": 182812672,
+          "median": 182550528,
+          "minimum": 181932032,
+          "samples": [
+            181932032,
+            182550528,
+            182812672
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.019473533714346,
+          "maximum": 0.465718168,
+          "median": 0.457094888,
+          "minimum": 0.456822225,
+          "samples": [
+            0.456822225,
+            0.465718168,
+            0.457094888
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0065020573934027,
+          "maximum": 1.9276410810000186,
+          "median": 1.9221899689999873,
+          "minimum": 1.9151884160000066,
+          "samples": [
+            1.9151884160000066,
+            1.9276410810000186,
+            1.9221899689999873
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "narrow-r1-w16-d1",
+        "narrow-r2-w16-d1",
+        "narrow-r3-w16-d1"
+      ],
+      "workers": 16
+    },
+    {
+      "case": "narrow",
+      "depth": 1,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0015752207673319,
+          "maximum": 31.804424323465934,
+          "median": 31.772129288957693,
+          "minimum": 31.754404126631417,
+          "samples": [
+            31.772129288957693,
+            31.754404126631417,
+            31.804424323465934
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0015752207673319,
+          "maximum": 0.9938882601083104,
+          "median": 0.9928790402799279,
+          "minimum": 0.9923251289572318,
+          "samples": [
+            0.9928790402799279,
+            0.9923251289572318,
+            0.9938882601083104
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0362860710665558,
+          "maximum": 0.674309249,
+          "median": 0.654983462,
+          "minimum": 0.650697976,
+          "samples": [
+            0.654983462,
+            0.674309249,
+            0.650697976
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0379184504065964,
+          "maximum": 0.021235141,
+          "median": 0.020615032,
+          "minimum": 0.020459354,
+          "samples": [
+            0.020615032,
+            0.021235141,
+            0.020459354
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0014764129390605,
+          "maximum": 31.810400829696988,
+          "median": 31.78032051218064,
+          "minimum": 31.76350478024952,
+          "samples": [
+            31.76350478024952,
+            31.78032051218064,
+            31.810400829696988
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0014764129390605,
+          "maximum": 0.9940750259280309,
+          "median": 0.993135016005645,
+          "minimum": 0.9926095243827975,
+          "samples": [
+            0.9926095243827975,
+            0.993135016005645,
+            0.9940750259280309
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0309620999181097,
+          "maximum": 0.63348937,
+          "median": 0.617791894,
+          "minimum": 0.614464266,
+          "samples": [
+            0.63348937,
+            0.614464266,
+            0.617791894
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0315078955544323,
+          "maximum": 0.019943938,
+          "median": 0.019421066,
+          "minimum": 0.019334741,
+          "samples": [
+            0.019943938,
+            0.019334741,
+            0.019421066
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0049522533341868,
+          "maximum": 24.04667740030281,
+          "median": 23.979528562019347,
+          "minimum": 23.928178996088413,
+          "samples": [
+            24.04667740030281,
+            23.979528562019347,
+            23.928178996088413
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0049522533341868,
+          "maximum": 0.7514586687594628,
+          "median": 0.7493602675631046,
+          "minimum": 0.7477555936277629,
+          "samples": [
+            0.7514586687594628,
+            0.7493602675631046,
+            0.7477555936277629
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.045547411507681,
+          "maximum": 21.085249508,
+          "median": 20.447378957,
+          "minimum": 20.166708153000002,
+          "samples": [
+            21.085249508,
+            20.166708153000002,
+            20.447378957
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0370841288914099,
+          "maximum": 1.022265324,
+          "median": 0.998938071,
+          "minimum": 0.9857110870000001,
+          "samples": [
+            1.022265324,
+            0.9857110870000001,
+            0.998938071
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.04262778594427,
+          "maximum": 0.876846691,
+          "median": 0.854531344,
+          "minimum": 0.840996857,
+          "samples": [
+            0.876846691,
+            0.840996857,
+            0.854531344
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0095747331771951,
+          "maximum": 0.298484791,
+          "median": 0.296643473,
+          "minimum": 0.295653983,
+          "samples": [
+            0.296643473,
+            0.298484791,
+            0.295653983
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.028421918490894,
+          "maximum": 31.449810902754436,
+          "median": 30.66653356393521,
+          "minimum": 30.580650156604868,
+          "samples": [
+            31.449810902754436,
+            30.66653356393521,
+            30.580650156604868
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.028421918490894,
+          "maximum": 0.9828065907110761,
+          "median": 0.9583291738729753,
+          "minimum": 0.9556453173939021,
+          "samples": [
+            0.9828065907110761,
+            0.9583291738729753,
+            0.9556453173939021
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0345496546870925,
+          "maximum": 0.69687557,
+          "median": 0.6815777230000001,
+          "minimum": 0.673602825,
+          "samples": [
+            0.6815777230000001,
+            0.69687557,
+            0.673602825
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0485597998294383,
+          "maximum": 0.022724302,
+          "median": 0.022027093,
+          "minimum": 0.021671918,
+          "samples": [
+            0.021671918,
+            0.022724302,
+            0.022027093
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0214481929761001,
+          "maximum": 31.79584265863782,
+          "median": 31.790431748371674,
+          "minimum": 31.128199038658224,
+          "samples": [
+            31.79584265863782,
+            31.790431748371674,
+            31.128199038658224
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0214481929761001,
+          "maximum": 0.9936200830824319,
+          "median": 0.9934509921366148,
+          "minimum": 0.9727562199580695,
+          "samples": [
+            0.9936200830824319,
+            0.9934509921366148,
+            0.9727562199580695
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.049717131576731,
+          "maximum": 0.6734872660000001,
+          "median": 0.6430748150000001,
+          "minimum": 0.6415892870000001,
+          "samples": [
+            0.6734872660000001,
+            0.6430748150000001,
+            0.6415892870000001
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0471140192099637,
+          "maximum": 0.021181614,
+          "median": 0.020611192,
+          "minimum": 0.020228565,
+          "samples": [
+            0.021181614,
+            0.020228565,
+            0.020611192
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0120276366823078,
+          "maximum": 31.207551326997056,
+          "median": 31.032594756007075,
+          "minimum": 30.836659193718862,
+          "samples": [
+            31.032594756007075,
+            31.207551326997056,
+            30.836659193718862
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0120276366823078,
+          "maximum": 0.975235978968658,
+          "median": 0.9697685861252211,
+          "minimum": 0.9636455998037144,
+          "samples": [
+            0.9697685861252211,
+            0.975235978968658,
+            0.9636455998037144
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.007699822050022,
+          "maximum": 1.9177116070000002,
+          "median": 1.9037765670000002,
+          "minimum": 1.903058396,
+          "samples": [
+            1.9177116070000002,
+            1.9037765670000002,
+            1.903058396
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.012998782123351,
+          "maximum": 0.061796689,
+          "median": 0.061714156,
+          "minimum": 0.061003715,
+          "samples": [
+            0.061796689,
+            0.061003715,
+            0.061714156
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0097410155323272,
+          "maximum": 31.401484395744532,
+          "median": 31.34817727323706,
+          "minimum": 31.09855290882675,
+          "samples": [
+            31.401484395744532,
+            31.34817727323706,
+            31.09855290882675
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0097410155323272,
+          "maximum": 0.9812963873670166,
+          "median": 0.9796305397886581,
+          "minimum": 0.971829778400836,
+          "samples": [
+            0.9812963873670166,
+            0.9796305397886581,
+            0.971829778400836
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.016816606907397,
+          "maximum": 4.5663609350000005,
+          "median": 4.536527336000001,
+          "minimum": 4.490840240000001,
+          "samples": [
+            4.5663609350000005,
+            4.536527336000001,
+            4.490840240000001
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0070073328370637,
+          "maximum": 0.145418633,
+          "median": 0.14471423,
+          "minimum": 0.144406727,
+          "samples": [
+            0.145418633,
+            0.14471423,
+            0.144406727
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0035428184587611,
+          "maximum": 182157312,
+          "median": 181768192,
+          "minimum": 181514240,
+          "samples": [
+            181514240,
+            182157312,
+            181768192
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0040655160745893,
+          "maximum": 0.459363282,
+          "median": 0.457751462,
+          "minimum": 0.457503295,
+          "samples": [
+            0.459363282,
+            0.457503295,
+            0.457751462
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0080634519619451,
+          "maximum": 1.9266973320000034,
+          "median": 1.9189649309999766,
+          "minimum": 1.9112857709999957,
+          "samples": [
+            1.9266973320000034,
+            1.9112857709999957,
+            1.9189649309999766
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.4729310076520249,
+          "speedup": 0.9458620153040498
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.4696900924912124,
+          "speedup": 0.9393801849824248
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.48975420385403706,
+          "speedup": 0.9795084077080741
+        }
+      },
+      "stages": [
+        "narrow-r1-w32-d1",
+        "narrow-r2-w32-d1",
+        "narrow-r3-w32-d1"
+      ],
+      "workers": 32
+    },
+    {
+      "case": "expanded",
+      "depth": 2,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.00401516919392,
+          "maximum": 15.94028793935077,
+          "median": 15.916836413985184,
+          "minimum": 15.876540941257423,
+          "samples": [
+            15.94028793935077,
+            15.876540941257423,
+            15.916836413985184
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.00401516919392,
+          "maximum": 0.49813399810471154,
+          "median": 0.497401137937037,
+          "minimum": 0.49614190441429445,
+          "samples": [
+            0.49813399810471154,
+            0.49614190441429445,
+            0.497401137937037
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.023433862968452,
+          "maximum": 0.873840622,
+          "median": 0.870579533,
+          "minimum": 0.853832039,
+          "samples": [
+            0.853832039,
+            0.873840622,
+            0.870579533
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0275431230870575,
+          "maximum": 0.055039736,
+          "median": 0.054695513,
+          "minimum": 0.053564405,
+          "samples": [
+            0.053564405,
+            0.055039736,
+            0.054695513
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0009572169465597,
+          "maximum": 15.938906468547755,
+          "median": 15.93240650553793,
+          "minimum": 15.923664067451067,
+          "samples": [
+            15.923664067451067,
+            15.93240650553793,
+            15.938906468547755
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0009572169465597,
+          "maximum": 0.49809082714211733,
+          "median": 0.4978877032980603,
+          "minimum": 0.49761450210784586,
+          "samples": [
+            0.49761450210784586,
+            0.4978877032980603,
+            0.49809082714211733
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0187810234536907,
+          "maximum": 0.811915766,
+          "median": 0.797971399,
+          "minimum": 0.796948262,
+          "samples": [
+            0.797971399,
+            0.796948262,
+            0.811915766
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.018365559633721,
+          "maximum": 0.050939239,
+          "median": 0.050112298,
+          "minimum": 0.050020583,
+          "samples": [
+            0.050112298,
+            0.050020583,
+            0.050939239
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0011098138478458,
+          "maximum": 15.944080020731235,
+          "median": 15.930891824495877,
+          "minimum": 15.926404676275109,
+          "samples": [
+            15.926404676275109,
+            15.930891824495877,
+            15.944080020731235
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0011098138478458,
+          "maximum": 0.4982525006478511,
+          "median": 0.49784036951549615,
+          "minimum": 0.49770014613359714,
+          "samples": [
+            0.49770014613359714,
+            0.49784036951549615,
+            0.4982525006478511
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0203450021877898,
+          "maximum": 33.691434526,
+          "median": 33.215809886,
+          "minimum": 33.019649681000004,
+          "samples": [
+            33.691434526,
+            33.215809886,
+            33.019649681000004
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0173821698033458,
+          "maximum": 2.49218351,
+          "median": 2.4599914930000004,
+          "minimum": 2.449604076,
+          "samples": [
+            2.49218351,
+            2.4599914930000004,
+            2.449604076
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.021477395200798,
+          "maximum": 2.115445087,
+          "median": 2.08499375,
+          "minimum": 2.070966129,
+          "samples": [
+            2.115445087,
+            2.08499375,
+            2.070966129
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0175017758623828,
+          "maximum": 0.313385898,
+          "median": 0.312408567,
+          "minimum": 0.307995431,
+          "samples": [
+            0.307995431,
+            0.312408567,
+            0.313385898
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0027751891131362,
+          "maximum": 15.910582814379811,
+          "median": 15.907987515632415,
+          "minimum": 15.866550137176091,
+          "samples": [
+            15.910582814379811,
+            15.907987515632415,
+            15.866550137176091
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0027751891131362,
+          "maximum": 0.4972057129493691,
+          "median": 0.497124609863513,
+          "minimum": 0.49582969178675285,
+          "samples": [
+            0.4972057129493691,
+            0.497124609863513,
+            0.49582969178675285
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0217941754670634,
+          "maximum": 0.904631959,
+          "median": 0.902188867,
+          "minimum": 0.8853367740000001,
+          "samples": [
+            0.902188867,
+            0.8853367740000001,
+            0.904631959
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0244627122054997,
+          "maximum": 0.057015038,
+          "median": 0.056703697,
+          "minimum": 0.0556536,
+          "samples": [
+            0.056703697,
+            0.0556536,
+            0.057015038
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0018690911619963,
+          "maximum": 15.934861228661712,
+          "median": 15.931094671673984,
+          "minimum": 15.905133084982197,
+          "samples": [
+            15.905133084982197,
+            15.931094671673984,
+            15.934861228661712
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0018690911619963,
+          "maximum": 0.4979644133956785,
+          "median": 0.497846708489812,
+          "minimum": 0.49703540890569364,
+          "samples": [
+            0.49703540890569364,
+            0.497846708489812,
+            0.4979644133956785
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0334189886826621,
+          "maximum": 0.889426413,
+          "median": 0.8893000480000001,
+          "minimum": 0.860663896,
+          "samples": [
+            0.8893000480000001,
+            0.860663896,
+            0.889426413
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0349587526157051,
+          "maximum": 0.05591277,
+          "median": 0.055816389,
+          "minimum": 0.054024153,
+          "samples": [
+            0.05591277,
+            0.054024153,
+            0.055816389
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0004975298029073,
+          "maximum": 15.969202024986048,
+          "median": 15.964069642919286,
+          "minimum": 15.96126082203511,
+          "samples": [
+            15.96126082203511,
+            15.964069642919286,
+            15.969202024986048
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0004975298029073,
+          "maximum": 0.499037563280814,
+          "median": 0.4988771763412277,
+          "minimum": 0.4987894006885972,
+          "samples": [
+            0.4987894006885972,
+            0.4988771763412277,
+            0.499037563280814
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0013971559589072,
+          "maximum": 2.5581701690000003,
+          "median": 2.5557110730000003,
+          "minimum": 2.554600993,
+          "samples": [
+            2.5581701690000003,
+            2.5557110730000003,
+            2.554600993
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0018953808885434,
+          "maximum": 0.16027369,
+          "median": 0.160091451,
+          "minimum": 0.159970485,
+          "samples": [
+            0.16027369,
+            0.160091451,
+            0.159970485
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0002068788181488,
+          "maximum": 15.93047150648608,
+          "median": 15.929047159132207,
+          "minimum": 15.927176511033029,
+          "samples": [
+            15.93047150648608,
+            15.927176511033029,
+            15.929047159132207
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0002068788181488,
+          "maximum": 0.49782723457769,
+          "median": 0.49778272372288146,
+          "minimum": 0.49772426596978214,
+          "samples": [
+            0.49782723457769,
+            0.49772426596978214,
+            0.49778272372288146
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.009825859287451,
+          "maximum": 6.031341714000001,
+          "median": 6.001620713,
+          "minimum": 5.972655244,
+          "samples": [
+            6.001620713,
+            5.972655244,
+            6.031341714000001
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0097072690914835,
+          "maximum": 0.378637947,
+          "median": 0.376738423,
+          "minimum": 0.374997743,
+          "samples": [
+            0.376738423,
+            0.374997743,
+            0.378637947
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0001358511071865,
+          "maximum": 392011776,
+          "median": 391983104,
+          "minimum": 391958528,
+          "samples": [
+            391958528,
+            391983104,
+            392011776
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0174470278899828,
+          "maximum": 1.953049109,
+          "median": 1.9271534099999998,
+          "minimum": 1.919558518,
+          "samples": [
+            1.953049109,
+            1.919558518,
+            1.9271534099999998
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0083628937090894,
+          "maximum": 4.9237362960000155,
+          "median": 4.911095262999993,
+          "minimum": 4.882901113000003,
+          "samples": [
+            4.9237362960000155,
+            4.911095262999993,
+            4.882901113000003
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "expanded-r1-w16-d2",
+        "expanded-r2-w16-d2",
+        "expanded-r3-w16-d2"
+      ],
+      "workers": 16
+    },
+    {
+      "case": "expanded",
+      "depth": 2,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0152932098212277,
+          "maximum": 31.89403269763883,
+          "median": 31.890139539307278,
+          "minimum": 31.41361765164835,
+          "samples": [
+            31.41361765164835,
+            31.890139539307278,
+            31.89403269763883
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0152932098212277,
+          "maximum": 0.9966885218012135,
+          "median": 0.9965668606033524,
+          "minimum": 0.981675551614011,
+          "samples": [
+            0.981675551614011,
+            0.9965668606033524,
+            0.9966885218012135
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0130762989175646,
+          "maximum": 1.6309485410000002,
+          "median": 1.6304529,
+          "minimum": 1.6098970460000002,
+          "samples": [
+            1.6098970460000002,
+            1.6309485410000002,
+            1.6304529
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0024929510782266,
+          "maximum": 0.051248381,
+          "median": 0.051142722,
+          "minimum": 0.051120939,
+          "samples": [
+            0.051248381,
+            0.051142722,
+            0.051120939
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.027817031164471,
+          "maximum": 31.77196669965496,
+          "median": 31.717963894951538,
+          "minimum": 30.912084287666193,
+          "samples": [
+            31.717963894951538,
+            30.912084287666193,
+            31.77196669965496
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.027817031164471,
+          "maximum": 0.9928739593642175,
+          "median": 0.9911863717172356,
+          "minimum": 0.9660026339895685,
+          "samples": [
+            0.9911863717172356,
+            0.9660026339895685,
+            0.9928739593642175
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0307911935650078,
+          "maximum": 1.6013585170000002,
+          "median": 1.559016124,
+          "minimum": 1.553523669,
+          "samples": [
+            1.553523669,
+            1.6013585170000002,
+            1.559016124
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0576639723311683,
+          "maximum": 0.051803641,
+          "median": 0.049068921,
+          "minimum": 0.0489793,
+          "samples": [
+            0.0489793,
+            0.051803641,
+            0.049068921
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.003740933710981,
+          "maximum": 31.098248654871533,
+          "median": 31.02908188561411,
+          "minimum": 30.982345753198125,
+          "samples": [
+            30.982345753198125,
+            31.098248654871533,
+            31.02908188561411
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.003740933710981,
+          "maximum": 0.9718202704647354,
+          "median": 0.969658808925441,
+          "minimum": 0.9681983047874414,
+          "samples": [
+            0.9681983047874414,
+            0.9718202704647354,
+            0.969658808925441
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.039755431746993,
+          "maximum": 69.660839165,
+          "median": 68.262476631,
+          "minimum": 66.997331332,
+          "samples": [
+            66.997331332,
+            68.262476631,
+            69.660839165
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0315095189866534,
+          "maximum": 2.606241948,
+          "median": 2.5615941949999996,
+          "minimum": 2.526629081,
+          "samples": [
+            2.526629081,
+            2.5615941949999996,
+            2.606241948
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0381893477836481,
+          "maximum": 2.245017736,
+          "median": 2.195058551,
+          "minimum": 2.162435726,
+          "samples": [
+            2.162435726,
+            2.195058551,
+            2.245017736
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0224950927361134,
+          "maximum": 0.318258706,
+          "median": 0.315183952,
+          "minimum": 0.311256952,
+          "samples": [
+            0.315183952,
+            0.311256952,
+            0.318258706
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.004930035121619,
+          "maximum": 31.791199134399434,
+          "median": 31.66306141879279,
+          "minimum": 31.635236308318703,
+          "samples": [
+            31.635236308318703,
+            31.66306141879279,
+            31.791199134399434
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.004930035121619,
+          "maximum": 0.9934749729499823,
+          "median": 0.9894706693372747,
+          "minimum": 0.9886011346349595,
+          "samples": [
+            0.9886011346349595,
+            0.9894706693372747,
+            0.9934749729499823
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0227360276775446,
+          "maximum": 1.6956853630000002,
+          "median": 1.679522828,
+          "minimum": 1.657989273,
+          "samples": [
+            1.6956853630000002,
+            1.679522828,
+            1.657989273
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.02777815221414,
+          "maximum": 0.05360116,
+          "median": 0.053043602,
+          "minimum": 0.052152461,
+          "samples": [
+            0.05360116,
+            0.053043602,
+            0.052152461
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0069272241532499,
+          "maximum": 31.326449352105005,
+          "median": 31.204124863915027,
+          "minimum": 31.110936918453262,
+          "samples": [
+            31.204124863915027,
+            31.110936918453262,
+            31.326449352105005
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0069272241532499,
+          "maximum": 0.9789515422532814,
+          "median": 0.9751289019973446,
+          "minimum": 0.9722167787016645,
+          "samples": [
+            0.9751289019973446,
+            0.9722167787016645,
+            0.9789515422532814
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.007057435333332,
+          "maximum": 1.7497792900000002,
+          "median": 1.741992202,
+          "minimum": 1.737516877,
+          "samples": [
+            1.7497792900000002,
+            1.741992202,
+            1.737516877
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0110052398589289,
+          "maximum": 0.056075256,
+          "median": 0.05599292,
+          "minimum": 0.055464852,
+          "samples": [
+            0.056075256,
+            0.05599292,
+            0.055464852
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0141516362794802,
+          "maximum": 31.584530616613364,
+          "median": 31.23449690362218,
+          "minimum": 31.143794958004964,
+          "samples": [
+            31.143794958004964,
+            31.584530616613364,
+            31.23449690362218
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0141516362794802,
+          "maximum": 0.9870165817691676,
+          "median": 0.9760780282381931,
+          "minimum": 0.9732435924376551,
+          "samples": [
+            0.9732435924376551,
+            0.9870165817691676,
+            0.9760780282381931
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0185236639161572,
+          "maximum": 4.874584067000001,
+          "median": 4.79909181,
+          "minimum": 4.785931088,
+          "samples": [
+            4.79909181,
+            4.874584067000001,
+            4.785931088
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0072359349903257,
+          "maximum": 0.154334542,
+          "median": 0.154094638,
+          "minimum": 0.15322581,
+          "samples": [
+            0.154094638,
+            0.154334542,
+            0.15322581
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0049031354669915,
+          "maximum": 31.486112979602822,
+          "median": 31.46067976952332,
+          "minimum": 31.332485558392467,
+          "samples": [
+            31.332485558392467,
+            31.46067976952332,
+            31.486112979602822
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0049031354669915,
+          "maximum": 0.9839410306125882,
+          "median": 0.9831462427976038,
+          "minimum": 0.9791401736997646,
+          "samples": [
+            0.9791401736997646,
+            0.9831462427976038,
+            0.9839410306125882
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.013884338722548,
+          "maximum": 11.531460520000001,
+          "median": 11.411083036,
+          "minimum": 11.373546350000002,
+          "samples": [
+            11.411083036,
+            11.531460520000001,
+            11.373546350000002
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.014703975601724,
+          "maximum": 0.366535644,
+          "median": 0.364193355,
+          "minimum": 0.361224212,
+          "samples": [
+            0.364193355,
+            0.366535644,
+            0.361224212
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0021567442538915,
+          "maximum": 393973760,
+          "median": 393895936,
+          "minimum": 393125888,
+          "samples": [
+            393895936,
+            393125888,
+            393973760
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0010950937085752,
+          "maximum": 1.915571866,
+          "median": 1.915247959,
+          "minimum": 1.91347643,
+          "samples": [
+            1.91347643,
+            1.915571866,
+            1.915247959
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0173242940570015,
+          "maximum": 5.013240521,
+          "median": 4.951299688000006,
+          "minimum": 4.927868675000013,
+          "samples": [
+            4.927868675000013,
+            4.951299688000006,
+            5.013240521
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.48016807225002334,
+          "speedup": 0.9603361445000467
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.4749289601068141,
+          "speedup": 0.9498579202136282
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5172230874448547,
+          "speedup": 1.0344461748897094
+        }
+      },
+      "stages": [
+        "expanded-r1-w32-d2",
+        "expanded-r2-w32-d2",
+        "expanded-r3-w32-d2"
+      ],
+      "workers": 32
+    },
+    {
+      "case": "expanded",
+      "depth": 1,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0017787482661393,
+          "maximum": 15.952822395587573,
+          "median": 15.9431091707658,
+          "minimum": 15.924496724649462,
+          "samples": [
+            15.952822395587573,
+            15.9431091707658,
+            15.924496724649462
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0017787482661393,
+          "maximum": 0.49852569986211165,
+          "median": 0.49822216158643123,
+          "minimum": 0.4976405226452957,
+          "samples": [
+            0.49852569986211165,
+            0.49822216158643123,
+            0.4976405226452957
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0050438607594592,
+          "maximum": 0.8692416780000001,
+          "median": 0.8655362560000001,
+          "minimum": 0.864879347,
+          "samples": [
+            0.8692416780000001,
+            0.864879347,
+            0.8655362560000001
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.004431917823393,
+          "maximum": 0.054488269,
+          "median": 0.054352503,
+          "minimum": 0.054247847,
+          "samples": [
+            0.054488269,
+            0.054247847,
+            0.054352503
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.002267165355123,
+          "maximum": 15.951226189913859,
+          "median": 15.939863428672084,
+          "minimum": 15.915143926980813,
+          "samples": [
+            15.939863428672084,
+            15.951226189913859,
+            15.915143926980813
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.002267165355123,
+          "maximum": 0.4984758184348081,
+          "median": 0.4981207321460026,
+          "minimum": 0.4973482477181504,
+          "samples": [
+            0.4981207321460026,
+            0.4984758184348081,
+            0.4973482477181504
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.039416500110088,
+          "maximum": 0.8248608540000001,
+          "median": 0.7977860840000001,
+          "minimum": 0.793580681,
+          "samples": [
+            0.7977860840000001,
+            0.793580681,
+            0.8248608540000001
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0417730291886806,
+          "maximum": 0.051828677,
+          "median": 0.050049744,
+          "minimum": 0.04975045,
+          "samples": [
+            0.050049744,
+            0.04975045,
+            0.051828677
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0010826647527447,
+          "maximum": 12.86678891992339,
+          "median": 12.864825158357615,
+          "minimum": 12.852873566741197,
+          "samples": [
+            12.86678891992339,
+            12.864825158357615,
+            12.852873566741197
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0010826647527447,
+          "maximum": 0.40208715374760595,
+          "median": 0.40202578619867546,
+          "minimum": 0.4016522989606624,
+          "samples": [
+            0.40208715374760595,
+            0.40202578619867546,
+            0.4016522989606624
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.002820469747032,
+          "maximum": 28.718333644,
+          "median": 28.718124672000002,
+          "minimum": 28.637562266000003,
+          "samples": [
+            28.637562266000003,
+            28.718333644,
+            28.718124672000002
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.003595614980497,
+          "maximum": 2.611422449,
+          "median": 2.606533107,
+          "minimum": 2.60206642,
+          "samples": [
+            2.60206642,
+            2.606533107,
+            2.611422449
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0038988830931277,
+          "maximum": 2.234373856,
+          "median": 2.232314337,
+          "minimum": 2.225696127,
+          "samples": [
+            2.225696127,
+            2.232314337,
+            2.234373856
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0117704665496725,
+          "maximum": 0.313182724,
+          "median": 0.310645466,
+          "minimum": 0.309539302,
+          "samples": [
+            0.310645466,
+            0.309539302,
+            0.313182724
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0015559663102924,
+          "maximum": 15.931496344346652,
+          "median": 15.927780952225085,
+          "minimum": 15.90674598348996,
+          "samples": [
+            15.927780952225085,
+            15.931496344346652,
+            15.90674598348996
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0015559663102924,
+          "maximum": 0.49785926076083287,
+          "median": 0.4977431547570339,
+          "minimum": 0.49708581198406127,
+          "samples": [
+            0.4977431547570339,
+            0.49785926076083287,
+            0.49708581198406127
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0240472035092731,
+          "maximum": 0.899947696,
+          "median": 0.8840966750000001,
+          "minimum": 0.878814661,
+          "samples": [
+            0.878814661,
+            0.8840966750000001,
+            0.899947696
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0254013963109605,
+          "maximum": 0.05657648,
+          "median": 0.055493637,
+          "minimum": 0.055174959,
+          "samples": [
+            0.055174959,
+            0.055493637,
+            0.05657648
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0037974729740389,
+          "maximum": 15.959764840545859,
+          "median": 15.943437215054958,
+          "minimum": 15.899387346792636,
+          "samples": [
+            15.899387346792636,
+            15.943437215054958,
+            15.959764840545859
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0037974729740389,
+          "maximum": 0.4987426512670581,
+          "median": 0.49823241297046744,
+          "minimum": 0.4968558545872699,
+          "samples": [
+            0.4968558545872699,
+            0.49823241297046744,
+            0.4987426512670581
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0035353930086706,
+          "maximum": 0.8871646240000001,
+          "median": 0.885439167,
+          "minimum": 0.8840391980000001,
+          "samples": [
+            0.8840391980000001,
+            0.8871646240000001,
+            0.885439167
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0029747945284688,
+          "maximum": 0.055644502,
+          "median": 0.055602092,
+          "minimum": 0.055479462,
+          "samples": [
+            0.055602092,
+            0.055644502,
+            0.055479462
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0014894099760014,
+          "maximum": 15.96810662006539,
+          "median": 15.966353769749679,
+          "minimum": 15.944358932809914,
+          "samples": [
+            15.944358932809914,
+            15.966353769749679,
+            15.96810662006539
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0014894099760014,
+          "maximum": 0.49900333187704343,
+          "median": 0.49894855530467747,
+          "minimum": 0.4982612166503098,
+          "samples": [
+            0.4982612166503098,
+            0.49894855530467747,
+            0.49900333187704343
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0126922621678627,
+          "maximum": 2.565304443,
+          "median": 2.537338342,
+          "minimum": 2.533153001,
+          "samples": [
+            2.565304443,
+            2.537338342,
+            2.533153001
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.014200576125755,
+          "maximum": 0.160891037,
+          "median": 0.158917833,
+          "minimum": 0.158638282,
+          "samples": [
+            0.160891037,
+            0.158917833,
+            0.158638282
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0010295450203412,
+          "maximum": 15.945793937594313,
+          "median": 15.937203171051218,
+          "minimum": 15.929393909417819,
+          "samples": [
+            15.929393909417819,
+            15.945793937594313,
+            15.937203171051218
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0010295450203412,
+          "maximum": 0.4983060605498223,
+          "median": 0.49803759909535056,
+          "minimum": 0.49779355966930683,
+          "samples": [
+            0.49779355966930683,
+            0.4983060605498223,
+            0.49803759909535056
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0070191262145682,
+          "maximum": 6.009100032,
+          "median": 5.995350653,
+          "minimum": 5.967215394,
+          "samples": [
+            5.995350653,
+            5.967215394,
+            6.009100032
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0075619483223677,
+          "maximum": 0.377048593,
+          "median": 0.376370293,
+          "minimum": 0.37421877,
+          "samples": [
+            0.376370293,
+            0.37421877,
+            0.377048593
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0022468591440838,
+          "maximum": 389169152,
+          "median": 388952064,
+          "minimum": 388296704,
+          "samples": [
+            388952064,
+            389169152,
+            388296704
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0085248351497869,
+          "maximum": 1.9258625569999999,
+          "median": 1.9212748880000001,
+          "minimum": 1.909583671,
+          "samples": [
+            1.9258625569999999,
+            1.909583671,
+            1.9212748880000001
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.00796851205178,
+          "maximum": 5.011355459000015,
+          "median": 4.991525093000007,
+          "minimum": 4.971738103999996,
+          "samples": [
+            5.011355459000015,
+            4.991525093000007,
+            4.971738103999996
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "expanded-r1-w16-d1",
+        "expanded-r2-w16-d1",
+        "expanded-r3-w16-d1"
+      ],
+      "workers": 16
+    },
+    {
+      "case": "expanded",
+      "depth": 1,
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0238038524275355,
+          "maximum": 31.741174323895994,
+          "median": 31.589810633337937,
+          "minimum": 31.003179220936392,
+          "samples": [
+            31.589810633337937,
+            31.741174323895994,
+            31.003179220936392
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0238038524275355,
+          "maximum": 0.9919116976217498,
+          "median": 0.9871815822918105,
+          "minimum": 0.9688493506542623,
+          "samples": [
+            0.9871815822918105,
+            0.9919116976217498,
+            0.9688493506542623
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0121978823082145,
+          "maximum": 1.6556408660000002,
+          "median": 1.643668673,
+          "minimum": 1.6356889250000002,
+          "samples": [
+            1.6556408660000002,
+            1.6356889250000002,
+            1.643668673
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0287985042949745,
+          "maximum": 0.053016133,
+          "median": 0.052410598,
+          "minimum": 0.051532086,
+          "samples": [
+            0.052410598,
+            0.051532086,
+            0.053016133
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0286957057793107,
+          "maximum": 31.866638818530955,
+          "median": 31.646929873028522,
+          "minimum": 30.97771152295196,
+          "samples": [
+            31.646929873028522,
+            31.866638818530955,
+            30.97771152295196
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0286957057793107,
+          "maximum": 0.9958324630790923,
+          "median": 0.9889665585321413,
+          "minimum": 0.9680534850922488,
+          "samples": [
+            0.9889665585321413,
+            0.9958324630790923,
+            0.9680534850922488
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0185832053650499,
+          "maximum": 1.5949261970000002,
+          "median": 1.575114917,
+          "minimum": 1.565828092,
+          "samples": [
+            1.575114917,
+            1.5949261970000002,
+            1.565828092
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0155798825560625,
+          "maximum": 0.050546926,
+          "median": 0.050050029,
+          "minimum": 0.049771492,
+          "samples": [
+            0.049771492,
+            0.050050029,
+            0.050546926
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.001485058928382,
+          "maximum": 23.17797613404087,
+          "median": 23.17360851120256,
+          "minimum": 23.143606514551475,
+          "samples": [
+            23.143606514551475,
+            23.17797613404087,
+            23.17360851120256
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.001485058928382,
+          "maximum": 0.7243117541887771,
+          "median": 0.72417526597508,
+          "minimum": 0.7232377035797336,
+          "samples": [
+            0.7232377035797336,
+            0.7243117541887771,
+            0.72417526597508
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0060277849605412,
+          "maximum": 51.534495854000006,
+          "median": 51.386612830000004,
+          "minimum": 51.225718240000006,
+          "samples": [
+            51.225718240000006,
+            51.386612830000004,
+            51.534495854000006
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0046345340132905,
+          "maximum": 2.5891946160000003,
+          "median": 2.585936767,
+          "minimum": 2.5772502619999997,
+          "samples": [
+            2.5772502619999997,
+            2.585936767,
+            2.5891946160000003
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0047253187425291,
+          "maximum": 2.223844242,
+          "median": 2.217044859,
+          "minimum": 2.213385291,
+          "samples": [
+            2.213385291,
+            2.217044859,
+            2.223844242
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0057963976386224,
+          "maximum": 0.311831888,
+          "median": 0.311022737,
+          "minimum": 0.310034803,
+          "samples": [
+            0.310034803,
+            0.311831888,
+            0.311022737
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.013924158884309,
+          "maximum": 31.63775488171597,
+          "median": 31.237086294672167,
+          "minimum": 31.203275515724155,
+          "samples": [
+            31.203275515724155,
+            31.63775488171597,
+            31.237086294672167
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.013924158884309,
+          "maximum": 0.9886798400536241,
+          "median": 0.9761589467085052,
+          "minimum": 0.9751023598663798,
+          "samples": [
+            0.9751023598663798,
+            0.9886798400536241,
+            0.9761589467085052
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0162276635887453,
+          "maximum": 1.7260818740000001,
+          "median": 1.7050797290000002,
+          "minimum": 1.698518881,
+          "samples": [
+            1.698518881,
+            1.7260818740000001,
+            1.7050797290000002
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0027761145503324,
+          "maximum": 0.054585108,
+          "median": 0.05455766,
+          "minimum": 0.054433993,
+          "samples": [
+            0.054433993,
+            0.05455766,
+            0.054585108
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0219383549866945,
+          "maximum": 31.842654148517887,
+          "median": 31.606941998321926,
+          "minimum": 31.15907529366825,
+          "samples": [
+            31.606941998321926,
+            31.15907529366825,
+            31.842654148517887
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0219383549866945,
+          "maximum": 0.995082942141184,
+          "median": 0.9877169374475602,
+          "minimum": 0.9737211029271328,
+          "samples": [
+            0.9877169374475602,
+            0.9737211029271328,
+            0.995082942141184
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0077847644808888,
+          "maximum": 1.7280331750000002,
+          "median": 1.716727606,
+          "minimum": 1.7146847580000002,
+          "samples": [
+            1.7146847580000002,
+            1.716727606,
+            1.7280331750000002
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0155820641442848,
+          "maximum": 0.055095589,
+          "median": 0.054267875,
+          "minimum": 0.054250258,
+          "samples": [
+            0.054250258,
+            0.055095589,
+            0.054267875
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0185122252127203,
+          "maximum": 31.766571516220004,
+          "median": 31.622832777835455,
+          "minimum": 31.189190202980065,
+          "samples": [
+            31.766571516220004,
+            31.189190202980065,
+            31.622832777835455
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0185122252127203,
+          "maximum": 0.9927053598818751,
+          "median": 0.988213524307358,
+          "minimum": 0.974662193843127,
+          "samples": [
+            0.9927053598818751,
+            0.974662193843127,
+            0.988213524307358
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0167194182139092,
+          "maximum": 4.910745670000001,
+          "median": 4.8540918500000005,
+          "minimum": 4.82999103,
+          "samples": [
+            4.8540918500000005,
+            4.910745670000001,
+            4.82999103
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0308554962444838,
+          "maximum": 0.157450246,
+          "median": 0.152805028,
+          "minimum": 0.152737456,
+          "samples": [
+            0.152805028,
+            0.157450246,
+            0.152737456
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0063066762812918,
+          "maximum": 31.606324665970664,
+          "median": 31.410078770283032,
+          "minimum": 31.40824304452471,
+          "samples": [
+            31.606324665970664,
+            31.410078770283032,
+            31.40824304452471
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0063066762812918,
+          "maximum": 0.9876976458115833,
+          "median": 0.9815649615713448,
+          "minimum": 0.9815075951413972,
+          "samples": [
+            0.9876976458115833,
+            0.9815649615713448,
+            0.9815075951413972
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0097525416010316,
+          "maximum": 11.586923888000001,
+          "median": 11.500434408,
+          "minimum": 11.475013343,
+          "samples": [
+            11.500434408,
+            11.586923888000001,
+            11.475013343
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0138153914244195,
+          "maximum": 0.368891908,
+          "median": 0.365350374,
+          "minimum": 0.363864971,
+          "samples": [
+            0.363864971,
+            0.368891908,
+            0.365350374
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0025297775903868,
+          "maximum": 389570560,
+          "median": 389324800,
+          "minimum": 388587520,
+          "samples": [
+            389324800,
+            389570560,
+            388587520
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0012772510231773,
+          "maximum": 1.914192848,
+          "median": 1.912395251,
+          "minimum": 1.911751062,
+          "samples": [
+            1.912395251,
+            1.914192848,
+            1.911751062
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0084196161999677,
+          "maximum": 5.031554225999969,
+          "median": 5.011783502000014,
+          "minimum": 4.989544179000006,
+          "samples": [
+            5.031554225999969,
+            4.989544179000006,
+            5.011783502000014
+          ]
+        }
+      },
+      "same_depth_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.5039823750261099,
+          "speedup": 1.0079647500522197
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.5034436556251928,
+          "speedup": 1.0068873112503856
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5150813024759625,
+          "speedup": 1.030162604951925
+        }
+      },
+      "stages": [
+        "expanded-r1-w32-d1",
+        "expanded-r2-w32-d1",
+        "expanded-r3-w32-d1"
+      ],
+      "workers": 32
+    }
+  ],
+  "limits": [
+    "Two fixed synthetic Flop inputs, F32/DCFR16 iterations and CFV capture disabled; not an external quality certification",
+    "Same portable x86-64-v3 binary in all measurement conditions; no absolute comparison to earlier native builds",
+    "CFR depth changes only; quality is reset to depth2 before all seven quality traversals",
+    "Structural frontier counts are not Rayon tasks, iterations, seat passes or measured scheduler overhead",
+    "Process CPU includes spinning, allocation and scheduling; CPU/wall does not identify a cause",
+    "Guest16core/32logical topology does not prove dedicated physical cores or 32physical-core scaling",
+    "Root wait4 ru_maxrss is whole-process Linux high-water RSS, not phase or aggregate child memory",
+    "Warmup/smoke/canonical excluded; no adaptive iterations, retries or mixed measurement boots",
+    "Build and measurement boots intentionally differ on one instance; all measured rows share one boot",
+    "Predeclared screen alone does not authorize a production/default change"
+  ],
+  "measurement_host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "boot_id": "406ea346-93eb-4241-a8ea-a8ba96a683d0",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm18-measure32.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "12884901888",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "Intel(R) Xeon(R) CPU @ 2.20GHz"
+    ],
+    "instance_id": "3769585733775752220",
+    "logical_cpus": 32,
+    "machine": "x86_64",
+    "one_per_core": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "physical_cores": 16,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 1,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 2,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 3,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 4,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 5,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 6,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 7,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 8,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 9,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 10,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 11,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 12,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 13,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 14,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 15,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 16,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 17,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 18,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 19,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 20,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 21,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 22,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 23,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 24,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 25,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 26,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 27,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 28,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 29,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 30,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 31,
+        "socket": "0"
+      }
+    ],
+    "v3": {
+      "argv": [
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "--help"
+      ],
+      "loader": {
+        "bytes": 236616,
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "per_cpu_flags": {
+        "0": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "1": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "10": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "11": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "12": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "13": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "14": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "15": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "16": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "17": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "18": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "19": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "2": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "20": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "21": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "22": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "23": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "24": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "25": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "26": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "27": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "28": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "29": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "3": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "30": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "31": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "4": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "5": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "6": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "7": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "8": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "9": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "arch_capabilities",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "cmov",
+          "constant_tsc",
+          "cpuid",
+          "cx16",
+          "cx8",
+          "de",
+          "erms",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "hle",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "invpcid",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "md_clear",
+          "mmx",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "pae",
+          "pat",
+          "pcid",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "pti",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "rtm",
+          "sep",
+          "smap",
+          "smep",
+          "ss",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "vme",
+          "x2apic",
+          "xsave",
+          "xsaveopt",
+          "xtopology"
+        ]
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Usage: /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]\nYou have invoked 'ld.so', the program interpreter for dynamically-linked\nELF programs.  Usually, the program interpreter is invoked automatically\nwhen a dynamically-linked executable is started.\n\nYou may invoke the program interpreter program directly from the command\nline to load and run an ELF executable file; this is like executing that\nfile itself, but always uses the program interpreter you invoked,\ninstead of the program interpreter specified in the executable file you\nrun.  Invoking the program interpreter directly provides access to\nadditional diagnostics, and changing the dynamic linker behavior without\nsetting environment variables (which would be inherited by subprocesses).\n\n  --list                list all dependencies and how they are resolved\n  --verify              verify that given object really is a dynamically linked\n                        object we can handle\n  --inhibit-cache       Do not use /etc/ld.so.cache\n  --library-path PATH   use given PATH instead of content of the environment\n                        variable LD_LIBRARY_PATH\n  --glibc-hwcaps-prepend LIST\n                        search glibc-hwcaps subdirectories in LIST\n  --glibc-hwcaps-mask LIST\n                        only search built-in subdirectories if in LIST\n  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names\n                        in LIST\n  --audit LIST          use objects named in LIST as auditors\n  --preload LIST        preload objects named in LIST\n  --argv0 STRING        set argv[0] to STRING before running\n  --list-tunables       list all tunables with minimum and maximum values\n  --list-diagnostics    list diagnostics information\n  --help                display this help and exit\n  --version             output version information and exit\n\nThis program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2\n\nShared library search path:\n  (libraries located via /etc/ld.so.cache)\n  /lib/x86_64-linux-gnu (system search path)\n  /usr/lib/x86_64-linux-gnu (system search path)\n  /lib (system search path)\n  /usr/lib (system search path)\n\nSubdirectories of glibc-hwcaps directories, in priority order:\n  x86-64-v4\n  x86-64-v3 (supported, searched)\n  x86-64-v2 (supported, searched)\n"
+    }
+  },
+  "measurement_plan": {
+    "bytes": 104966,
+    "sha256": "0de5c727454dfedfbc28a57da111e262790c22b3239acf8bdae39d653aa4dcdb"
+  },
+  "payload_integrity": "verified",
+  "performance_screen": "rejected",
+  "predeclared_guards": {
+    "all_cfr_quality_three_sample_max_over_min_at_most_1_15": true,
+    "all_quality_median_ratios_at_most_1_05": true,
+    "all_root_rss_maximum_ratios_at_most_1_10": true,
+    "both_inputs_16worker_cfr_ratio_at_most_1_03": false,
+    "both_inputs_32worker_cfr_ratio_at_most_0_95": false
+  },
+  "production_adoption": false,
+  "schema": "r1.chance-grain-report/v1",
+  "status": "completed"
+}

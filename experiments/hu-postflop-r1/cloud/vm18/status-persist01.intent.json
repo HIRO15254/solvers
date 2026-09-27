@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-18",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo cp /tmp/vm18-status.py /opt/r1/vm18-status.py",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-27T07:23:47.576132+00:00",
+  "timeout_seconds": 30
+}
