@@ -69,3 +69,6 @@ experiments/hu-postflop-r1/cloud/preflight-vm20/*.html -whitespace
 experiments/hu-postflop-r1/cloud/preflight-vm20/cost-proposal.py whitespace=cr-at-eol,-blank-at-eol
 experiments/hu-postflop-r1/cloud/usage-audit-vm19/inputs/preflight-vm18/*.html -whitespace
 experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/markers.rs.inc whitespace=cr-at-eol,-blank-at-eof
+experiments/hu-postflop-r1/cloud/usage-audit-vm20/inputs/preflight-vm20/*.html -whitespace
+experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/candidate.patch -whitespace
+experiments/hu-postflop-r1/cloud/usage-audit-vm20/analyze.py whitespace=cr-at-eol,-blank-at-eof

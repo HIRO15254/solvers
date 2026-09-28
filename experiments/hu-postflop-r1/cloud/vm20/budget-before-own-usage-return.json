@@ -1599,7 +1599,7 @@
       "project": "solvers-abstraction-20260723",
       "zone": "us-central1-b",
       "instance": "solvers-r1-20260928-20",
-      "reserved_usd": 1.35,
+      "reserved_usd": 1.85,
       "billed_usd": null,
       "reservation_released": false,
       "maximum_runtime_seconds": 2700,
@@ -1627,22 +1627,7 @@
       "preflight_evidence": "experiments/hu-postflop-r1/cloud/vm20/",
       "deployment_template": "experiments/hu-postflop-r1/cloud/vm19/pack-receipt.json",
       "purpose": "Baseline CPU profile:2CPU portable build/core tests,32CPU boot for10 N64 solves,2CPU recovery",
-      "note": "E2 only.45min original STOP;20min build upper bound but measurement dispatch by launch+15min, then15min measurement and15min recovery.47min at0.80USD/h plus20GiB24h disk,512MiB egress and original1USD uncertainty =1.844385USD. No local native work; billed unknown.",
-      "events": [
-        {
-          "event": "usage_based_reservation_reconciliation",
-          "at": "2026-09-28T05:14:58.342246+00:00",
-          "id": "r1-20260928-20",
-          "old_reserved_usd": 1.85,
-          "new_reserved_usd": 1.35,
-          "restored_to_available_budget_usd": 0.5,
-          "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm20/report02.json",
-          "evidence_sha256": "01f63fea326fb7c66ba64814b994e41f6ce0e2f1965d72a6e416cf89804d47fd",
-          "billed_usd": null,
-          "final_invoice": false,
-          "note": "Original 1USD and 512MiB allowances retained; whole lifecycle plus overlapping highCPU window, each with120s padding. Missing Monitoring usage remains unknown. Explicit0.05USD upper rounding."
-        }
-      ]
+      "note": "E2 only.45min original STOP;20min build upper bound but measurement dispatch by launch+15min, then15min measurement and15min recovery.47min at0.80USD/h plus20GiB24h disk,512MiB egress and original1USD uncertainty =1.844385USD. No local native work; billed unknown."
     }
   ],
   "usage_reconciliations": [
@@ -2169,57 +2154,6 @@
       "application_source": {
         "bytes": 5749,
         "sha256": "f2c015e97107d6fe48488699c3dc9a62cb4fcf214350c9bbad031abc11d0c25c"
-      },
-      "billed_usd": null,
-      "final_invoice": false,
-      "cloud_mutations": false,
-      "archive_access": false
-    },
-    {
-      "at_utc": "2026-09-28T05:14:58.342246+00:00",
-      "authorized_limit_usd": 40,
-      "held_before_usd": 39.15,
-      "held_after_usd": 38.65,
-      "restored_usd": 0.5,
-      "available_after_usd": 1.35,
-      "change": {
-        "event": "usage_based_reservation_reconciliation",
-        "at": "2026-09-28T05:14:58.342246+00:00",
-        "id": "r1-20260928-20",
-        "old_reserved_usd": 1.85,
-        "new_reserved_usd": 1.35,
-        "restored_to_available_budget_usd": 0.5,
-        "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm20/report02.json",
-        "evidence_sha256": "01f63fea326fb7c66ba64814b994e41f6ce0e2f1965d72a6e416cf89804d47fd",
-        "billed_usd": null,
-        "final_invoice": false,
-        "note": "Original 1USD and 512MiB allowances retained; whole lifecycle plus overlapping highCPU window, each with120s padding. Missing Monitoring usage remains unknown. Explicit0.05USD upper rounding."
-      },
-      "budget_before": {
-        "bytes": 108521,
-        "sha256": "4d1f06be12404791c6791881ed2311db6a29c8b7d948f63767f7a5147aa0f055"
-      },
-      "evidence": {
-        "usage-audit-vm20/report02.json": {
-          "bytes": 21687,
-          "sha256": "01f63fea326fb7c66ba64814b994e41f6ce0e2f1965d72a6e416cf89804d47fd"
-        },
-        "usage-audit-vm20/analyze02.py": {
-          "bytes": 3103,
-          "sha256": "b7cc4dfdf3519b4edb512f68f9c4a2f1aadd213d5398f8433532b06a018dd488"
-        },
-        "usage-audit-vm20/analyze.py": {
-          "bytes": 16390,
-          "sha256": "cfff88d4810ff2732c4112307e5bc2729eb00f4b577350c5aabf3f1a8c708f5e"
-        },
-        "usage-audit-vm20/report.json": {
-          "bytes": 19595,
-          "sha256": "53a4b5efc92ec9d0030d61b204a53cc4e7170556e08575a5599e84696e1046e1"
-        }
-      },
-      "application_source": {
-        "bytes": 4737,
-        "sha256": "d9ac1ee320a433a804cfa3b849494094cda67cd145952f78c945f21182b4498d"
       },
       "billed_usd": null,
       "final_invoice": false,

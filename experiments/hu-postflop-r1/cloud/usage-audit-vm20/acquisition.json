@@ -1,0 +1,895 @@
+{
+  "schema": "r1.vm20-usage-acquisition/v1",
+  "started_at": "2026-09-28T05:03:53.280359+00:00",
+  "project": "solvers-abstraction-20260723",
+  "instance_id": "2562385330130146252",
+  "instance_name": "solvers-r1-20260928-20",
+  "inputs": {
+    "budget.json": {
+      "path": "inputs/budget.json",
+      "bytes": 108521,
+      "sha256": "4d1f06be12404791c6791881ed2311db6a29c8b7d948f63767f7a5147aa0f055"
+    },
+    "create-result-r1-20260928-20.json": {
+      "path": "inputs/create-result-r1-20260928-20.json",
+      "bytes": 30180,
+      "sha256": "deb00a6adec077727d194d9fc9f0d9d7edb49715a6d923128f1d698499a41552"
+    },
+    "launch-r1-20260928-20.json": {
+      "path": "inputs/launch-r1-20260928-20.json",
+      "bytes": 1247,
+      "sha256": "4f6a5070228f1827276c02c8e4af2afecec0c8b0839b4908a1bcb25b4f318db1"
+    },
+    "preflight-vm20/cost-proposal.json": {
+      "path": "inputs/preflight-vm20/cost-proposal.json",
+      "bytes": 5233,
+      "sha256": "be1f19118ebb73de7b6892752e7b8a30eae463ad81830d1b9d57f38751107c8e"
+    },
+    "preflight-vm20/pricing-compute-e2-highcpu-32-header.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "preflight-vm20/pricing-compute-e2-highcpu-32-region.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm20/pricing-compute-e2-highcpu-32-row.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "preflight-vm20/pricing-compute-e2-standard-2-header.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-standard-2-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "preflight-vm20/pricing-compute-e2-standard-2-region.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm20/pricing-compute-e2-standard-2-row.html": {
+      "path": "inputs/preflight-vm20/pricing-compute-e2-standard-2-row.html",
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "preflight-vm20/pricing-disk-balanced-header.html": {
+      "path": "inputs/preflight-vm20/pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "preflight-vm20/pricing-disk-balanced-region.html": {
+      "path": "inputs/preflight-vm20/pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm20/pricing-disk-balanced-row.html": {
+      "path": "inputs/preflight-vm20/pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "preflight-vm20/pricing-network-asia-egress-header.html": {
+      "path": "inputs/preflight-vm20/pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "preflight-vm20/pricing-network-asia-egress-region.html": {
+      "path": "inputs/preflight-vm20/pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm20/pricing-network-asia-egress-row.html": {
+      "path": "inputs/preflight-vm20/pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "preflight-vm20/pricing-network-spot-ipv4-header.html": {
+      "path": "inputs/preflight-vm20/pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "preflight-vm20/pricing-network-spot-ipv4-region.html": {
+      "path": "inputs/preflight-vm20/pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "preflight-vm20/pricing-network-spot-ipv4-row.html": {
+      "path": "inputs/preflight-vm20/pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "preflight-vm20/pricing-sources.json": {
+      "path": "inputs/preflight-vm20/pricing-sources.json",
+      "bytes": 5062,
+      "sha256": "4e5e67f12d3601d72b397921bb9b4b6e29eb5deb9d7edc744c2e8ae6d2741741"
+    },
+    "vm20/absence-addresses01.result.json": {
+      "path": "inputs/vm20/absence-addresses01.result.json",
+      "bytes": 659,
+      "sha256": "a8a65a9fae81f21e8d1751d4e9bc3f1508c79d6170ba481dea6979002b67582a"
+    },
+    "vm20/absence-addresses01.stderr.log": {
+      "path": "inputs/vm20/absence-addresses01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/absence-addresses01.stdout.log": {
+      "path": "inputs/vm20/absence-addresses01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/absence-disks01.result.json": {
+      "path": "inputs/vm20/absence-disks01.result.json",
+      "bytes": 655,
+      "sha256": "f84b16a28a7c029804f9fd609a9ce30e766bd2172638d36a8d36b4bbad72bdbe"
+    },
+    "vm20/absence-disks01.stderr.log": {
+      "path": "inputs/vm20/absence-disks01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/absence-disks01.stdout.log": {
+      "path": "inputs/vm20/absence-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/absence-instances01.result.json": {
+      "path": "inputs/vm20/absence-instances01.result.json",
+      "bytes": 659,
+      "sha256": "c9270eaf838791b5d8eae4e6627967593b295037a2569a0313524fb569d1e710"
+    },
+    "vm20/absence-instances01.stderr.log": {
+      "path": "inputs/vm20/absence-instances01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/absence-instances01.stdout.log": {
+      "path": "inputs/vm20/absence-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/archive-recovery01.result.json": {
+      "path": "inputs/vm20/archive-recovery01.result.json",
+      "bytes": 735,
+      "sha256": "74337ee24804f698902fe88a85e1b9a7fcdc388dfc5ae65aa90d635470cc8d5c"
+    },
+    "vm20/archive-recovery01.stderr.log": {
+      "path": "inputs/vm20/archive-recovery01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/archive-recovery01.stdout.log": {
+      "path": "inputs/vm20/archive-recovery01.stdout.log",
+      "bytes": 253,
+      "sha256": "1a23fdfa53571b5d332cf8121760898a7126432c00bf18f6b5d18ac4ad46c1bc"
+    },
+    "vm20/bootstrap-state01.result.json": {
+      "path": "inputs/vm20/bootstrap-state01.result.json",
+      "bytes": 750,
+      "sha256": "575311a9fe6dd474bfe583208f0d83471e3b23737e1e08293248edf672add03e"
+    },
+    "vm20/bootstrap-state01.stderr.log": {
+      "path": "inputs/vm20/bootstrap-state01.stderr.log",
+      "bytes": 599,
+      "sha256": "731a48943912cf588fda8b6166962f9ca30c6e89b38606f26fd77e82dcc05d69"
+    },
+    "vm20/bootstrap-state01.stdout.log": {
+      "path": "inputs/vm20/bootstrap-state01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/bootstrap-state02.result.json": {
+      "path": "inputs/vm20/bootstrap-state02.result.json",
+      "bytes": 817,
+      "sha256": "07d77026f41872a92cd649d7a8d0356be94633032e1005f1f27ad9e3a550502b"
+    },
+    "vm20/bootstrap-state02.stderr.log": {
+      "path": "inputs/vm20/bootstrap-state02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/bootstrap-state02.stdout.log": {
+      "path": "inputs/vm20/bootstrap-state02.stdout.log",
+      "bytes": 592,
+      "sha256": "cbb667f3797f55922de4110101565b66509358dc3dbc0ddec1396bf206d5727a"
+    },
+    "vm20/build-start01.result.json": {
+      "path": "inputs/vm20/build-start01.result.json",
+      "bytes": 920,
+      "sha256": "d2e0e5c6efe91dc76f2605bd8ac0c9f1c7e1960f4403141364a523814ab5527f"
+    },
+    "vm20/build-start01.stderr.log": {
+      "path": "inputs/vm20/build-start01.stderr.log",
+      "bytes": 97,
+      "sha256": "d82940c19f8d95cf3a32fa352902c20383e8fc62e40b585e78905b99593c21f5"
+    },
+    "vm20/build-start01.stdout.log": {
+      "path": "inputs/vm20/build-start01.stdout.log",
+      "bytes": 1546,
+      "sha256": "15bd111703ed363cd02149b9e102d72e895bdae6aeb1e0e90af59f76d7437193"
+    },
+    "vm20/build-status01.result.json": {
+      "path": "inputs/vm20/build-status01.result.json",
+      "bytes": 703,
+      "sha256": "4926bf60249c62c7c2d36b4a9dbae0b9c64a434aa39e7c3749a543b82a46480f"
+    },
+    "vm20/build-status01.stderr.log": {
+      "path": "inputs/vm20/build-status01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/build-status01.stdout.log": {
+      "path": "inputs/vm20/build-status01.stdout.log",
+      "bytes": 1381,
+      "sha256": "181650ac19e001c99f7c1064b45687c5202b5fa8768ccb8f71df1668866d898d"
+    },
+    "vm20/build-status02.result.json": {
+      "path": "inputs/vm20/build-status02.result.json",
+      "bytes": 703,
+      "sha256": "ee9c4f46af0354932ab22dcf6013550b1c1c5355d03373376ae7d833c50378ea"
+    },
+    "vm20/build-status02.stderr.log": {
+      "path": "inputs/vm20/build-status02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/build-status02.stdout.log": {
+      "path": "inputs/vm20/build-status02.stdout.log",
+      "bytes": 1474,
+      "sha256": "7b032e097a1936ed5ba865d8c99e450866674180ea105e2acd96ece1d026e937"
+    },
+    "vm20/build-status03.result.json": {
+      "path": "inputs/vm20/build-status03.result.json",
+      "bytes": 703,
+      "sha256": "bdc80e2670792159e4ee262bb78160520a1e07030a38bd4e02a184b09598ca58"
+    },
+    "vm20/build-status03.stderr.log": {
+      "path": "inputs/vm20/build-status03.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/build-status03.stdout.log": {
+      "path": "inputs/vm20/build-status03.stdout.log",
+      "bytes": 1453,
+      "sha256": "6fa786604ddf165b9a2eb7cf29269030fc23ba449f6e2497d26d86a5a82f7c56"
+    },
+    "vm20/cleanup-operations01.result.json": {
+      "path": "inputs/vm20/cleanup-operations01.result.json",
+      "bytes": 674,
+      "sha256": "c4f2762ac404f1b3cf455310c71e913b8dc30e1cd6e2b423e0fc4214c887284f"
+    },
+    "vm20/cleanup-operations01.stderr.log": {
+      "path": "inputs/vm20/cleanup-operations01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/cleanup-operations01.stdout.log": {
+      "path": "inputs/vm20/cleanup-operations01.stdout.log",
+      "bytes": 7806,
+      "sha256": "da3c4856946b12d6c61a95719454065999a3e61c6ed08db96395ca6db6274bf9"
+    },
+    "vm20/delete01.result.json": {
+      "path": "inputs/vm20/delete01.result.json",
+      "bytes": 716,
+      "sha256": "38b42dabe520226c2ec819bb30d1d21a760c08fb5b075c7a20b047d179a9d0a5"
+    },
+    "vm20/delete01.stderr.log": {
+      "path": "inputs/vm20/delete01.stderr.log",
+      "bytes": 141,
+      "sha256": "06ab783494d863a599b3a00837677710d5104defc5ecade064aa60c79c4ea934"
+    },
+    "vm20/delete01.stdout.log": {
+      "path": "inputs/vm20/delete01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/disk-before-delete01.result.json": {
+      "path": "inputs/vm20/disk-before-delete01.result.json",
+      "bytes": 687,
+      "sha256": "ecf7239db5e9ab035fca22e6b1975d69e643490bcadabf75d6ab9afc096fa94f"
+    },
+    "vm20/disk-before-delete01.stderr.log": {
+      "path": "inputs/vm20/disk-before-delete01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/disk-before-delete01.stdout.log": {
+      "path": "inputs/vm20/disk-before-delete01.stdout.log",
+      "bytes": 1821,
+      "sha256": "4f8ce53b04e6940235d15690957315ec721ef58139f2f397483e451ed960d2b4"
+    },
+    "vm20/download-check.json": {
+      "path": "inputs/vm20/download-check.json",
+      "bytes": 1113,
+      "sha256": "391b176211499a1f89c460fedcdd7b8dc6250474c90178baa78a76eb8a24300a"
+    },
+    "vm20/install01.result.json": {
+      "path": "inputs/vm20/install01.result.json",
+      "bytes": 859,
+      "sha256": "e00afabbfe9d418175b1a74afda869c9e1b5e6404350dd1b3da5df8edd7c7c5d"
+    },
+    "vm20/install01.stderr.log": {
+      "path": "inputs/vm20/install01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/install01.stdout.log": {
+      "path": "inputs/vm20/install01.stdout.log",
+      "bytes": 361,
+      "sha256": "93c06fe559a8ba61399a2b4c081f6b8405f9ebdbbed43acdf58b720db9471a3b"
+    },
+    "vm20/measure-start01.result.json": {
+      "path": "inputs/vm20/measure-start01.result.json",
+      "bytes": 882,
+      "sha256": "8cbf5ddff951fc4431e7407102cb65018d04b62a27d9072d836587d6b9a75673"
+    },
+    "vm20/measure-start01.stderr.log": {
+      "path": "inputs/vm20/measure-start01.stderr.log",
+      "bytes": 681,
+      "sha256": "22c6d347c4eacb6db6b5b765cd76c5d2f0391a5ac7364ac72fde8202bdc32fe5"
+    },
+    "vm20/measure-start01.stdout.log": {
+      "path": "inputs/vm20/measure-start01.stdout.log",
+      "bytes": 1680,
+      "sha256": "1a56f7a83674f247dd0a45b12c68d684309f4258a90c620d0504ff85a3d044cb"
+    },
+    "vm20/measure-status01.result.json": {
+      "path": "inputs/vm20/measure-status01.result.json",
+      "bytes": 701,
+      "sha256": "c126ec5ebc4489c16a9a08d82272a1507babd9a95b4f3be7250e59f029a6d632"
+    },
+    "vm20/measure-status01.stderr.log": {
+      "path": "inputs/vm20/measure-status01.stderr.log",
+      "bytes": 79,
+      "sha256": "3fbb250f417ef98d69e394c346391f373aba7214897f75f419a29885958c87e3"
+    },
+    "vm20/measure-status01.stdout.log": {
+      "path": "inputs/vm20/measure-status01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/measure-status02.result.json": {
+      "path": "inputs/vm20/measure-status02.result.json",
+      "bytes": 703,
+      "sha256": "c1a5525f0015221eb360048420ec0b186e239a56e371652725a35140c1770526"
+    },
+    "vm20/measure-status02.stderr.log": {
+      "path": "inputs/vm20/measure-status02.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/measure-status02.stdout.log": {
+      "path": "inputs/vm20/measure-status02.stdout.log",
+      "bytes": 2269,
+      "sha256": "733fb1ee07eedbd44f4dcc9974af13a67d3b3a9aa230ebd4f49a9d26b5dce0fc"
+    },
+    "vm20/measure-status03.result.json": {
+      "path": "inputs/vm20/measure-status03.result.json",
+      "bytes": 703,
+      "sha256": "b509e1e1c894bc6072f54d7500db32e12f079d39bc91ff339a520542e517d515"
+    },
+    "vm20/measure-status03.stderr.log": {
+      "path": "inputs/vm20/measure-status03.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/measure-status03.stdout.log": {
+      "path": "inputs/vm20/measure-status03.stdout.log",
+      "bytes": 2421,
+      "sha256": "fc70c8069a7d1f44e715a71e8aead965b9955bbcef79d4e40a9090669950b475"
+    },
+    "vm20/partial-metadata-upload01.result.json": {
+      "path": "inputs/vm20/partial-metadata-upload01.result.json",
+      "bytes": 781,
+      "sha256": "dd70dccf171d0f1f8eee92859c8fc2ff9010d880cccdc9e92018ded032d8f385"
+    },
+    "vm20/partial-metadata-upload01.stderr.log": {
+      "path": "inputs/vm20/partial-metadata-upload01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/partial-metadata-upload01.stdout.log": {
+      "path": "inputs/vm20/partial-metadata-upload01.stdout.log",
+      "bytes": 142,
+      "sha256": "7e174d1408ba49659c334ffed8e4ea2d11818c4bd5c21d38849b9fb65857ff79"
+    },
+    "vm20/partial-metadata01.result.json": {
+      "path": "inputs/vm20/partial-metadata01.result.json",
+      "bytes": 743,
+      "sha256": "dae58f14afdf90f298385c8e9b98d1282945f469ec9fc9910de27a30c9eb944b"
+    },
+    "vm20/partial-metadata01.stderr.log": {
+      "path": "inputs/vm20/partial-metadata01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/partial-metadata01.stdout.log": {
+      "path": "inputs/vm20/partial-metadata01.stdout.log",
+      "bytes": 156633,
+      "sha256": "37ce59b6c491e1c00a438a0271f79ada6c1c216baa2a0b89aef7cafff72eb70f"
+    },
+    "vm20/posthoc-quiescence01.result.json": {
+      "path": "inputs/vm20/posthoc-quiescence01.result.json",
+      "bytes": 764,
+      "sha256": "ecb01326b5b17c2c75e97fc9358c70bfc0bd8686558b2dbccc429c11a33913f3"
+    },
+    "vm20/posthoc-quiescence01.stderr.log": {
+      "path": "inputs/vm20/posthoc-quiescence01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/posthoc-quiescence01.stdout.log": {
+      "path": "inputs/vm20/posthoc-quiescence01.stdout.log",
+      "bytes": 45,
+      "sha256": "7d62454091f4230a47dffb72f488a95473b9655e689d06b3048537e852757304"
+    },
+    "vm20/posthoc-report-download01.result.json": {
+      "path": "inputs/vm20/posthoc-report-download01.result.json",
+      "bytes": 758,
+      "sha256": "ed971e2894971fc011c97db612bf2273b9378b29fefe98f61a4a59fec18d5bd4"
+    },
+    "vm20/posthoc-report-download01.stderr.log": {
+      "path": "inputs/vm20/posthoc-report-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/posthoc-report-download01.stdout.log": {
+      "path": "inputs/vm20/posthoc-report-download01.stdout.log",
+      "bytes": 142,
+      "sha256": "f94bac92c0c35f4d6bcec2f89f80308b224103e2fbf199459302eb5c6d9fc6cc"
+    },
+    "vm20/posthoc-upload01.result.json": {
+      "path": "inputs/vm20/posthoc-upload01.result.json",
+      "bytes": 728,
+      "sha256": "b0ed9cef6791e560ebfe9db701df2680d80ab56c74b9fee6f1199c33ec9a1cff"
+    },
+    "vm20/posthoc-upload01.stderr.log": {
+      "path": "inputs/vm20/posthoc-upload01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/posthoc-upload01.stdout.log": {
+      "path": "inputs/vm20/posthoc-upload01.stdout.log",
+      "bytes": 141,
+      "sha256": "4bf798b14defb24084dd464d7b8363d446cc1fa7668d2120205852a90511ca79"
+    },
+    "vm20/posthoc01.result.json": {
+      "path": "inputs/vm20/posthoc01.result.json",
+      "bytes": 981,
+      "sha256": "2472ce10de855a998ad56079e6610c082b79ae8110abc7121e31b6e9b2504cea"
+    },
+    "vm20/posthoc01.stderr.log": {
+      "path": "inputs/vm20/posthoc01.stderr.log",
+      "bytes": 270,
+      "sha256": "bb6e8e3849bb42370770b5e4840a260a8f3ca4486908b9820c01a9dec2eaeb4c"
+    },
+    "vm20/posthoc01.stdout.log": {
+      "path": "inputs/vm20/posthoc01.stdout.log",
+      "bytes": 177,
+      "sha256": "200041ea5fb585d7506d4c4cfe62b25887c9230ef03c95445387d135c655aa57"
+    },
+    "vm20/preflight-addresses01.result.json": {
+      "path": "inputs/vm20/preflight-addresses01.result.json",
+      "bytes": 659,
+      "sha256": "62966516d86b109927ef020532ce2ca3098b07df33cfaa7989b71d29005b55d7"
+    },
+    "vm20/preflight-addresses01.stderr.log": {
+      "path": "inputs/vm20/preflight-addresses01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-addresses01.stdout.log": {
+      "path": "inputs/vm20/preflight-addresses01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-disks01.result.json": {
+      "path": "inputs/vm20/preflight-disks01.result.json",
+      "bytes": 655,
+      "sha256": "22465f8958967ce5e44271e4ca39ef514ae0ea53a7c17df604b74cc5e2142bef"
+    },
+    "vm20/preflight-disks01.stderr.log": {
+      "path": "inputs/vm20/preflight-disks01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-disks01.stdout.log": {
+      "path": "inputs/vm20/preflight-disks01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-instances01.result.json": {
+      "path": "inputs/vm20/preflight-instances01.result.json",
+      "bytes": 659,
+      "sha256": "b823d0f77aed28e482fd0d10533b8b7c8f0e9b0adbb40c4678498d0d5456b56c"
+    },
+    "vm20/preflight-instances01.stderr.log": {
+      "path": "inputs/vm20/preflight-instances01.stderr.log",
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-instances01.stdout.log": {
+      "path": "inputs/vm20/preflight-instances01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-quota01.result.json": {
+      "path": "inputs/vm20/preflight-quota01.result.json",
+      "bytes": 658,
+      "sha256": "95ee3b4063fe31a2c345700de640df7536f9e175d033af9176146df47a6203b8"
+    },
+    "vm20/preflight-quota01.stderr.log": {
+      "path": "inputs/vm20/preflight-quota01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/preflight-quota01.stdout.log": {
+      "path": "inputs/vm20/preflight-quota01.stdout.log",
+      "bytes": 11313,
+      "sha256": "b1bf827a1fe22cdaceda6a07540e16a0861fa8698bcc7abcef150ce74c93add2"
+    },
+    "vm20/proof-download01.result.json": {
+      "path": "inputs/vm20/proof-download01.result.json",
+      "bytes": 732,
+      "sha256": "8dd8ac48a75940308c0a00b782e1701e9a074512fb9877b823bcef7bc05b118e"
+    },
+    "vm20/proof-download01.stderr.log": {
+      "path": "inputs/vm20/proof-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/proof-download01.stdout.log": {
+      "path": "inputs/vm20/proof-download01.stdout.log",
+      "bytes": 3454,
+      "sha256": "97f1e5339c65f2789cff0512ba49861f0dbb69d78b3624b19f195e02588c025e"
+    },
+    "vm20/recovery-control-upload01.result.json": {
+      "path": "inputs/vm20/recovery-control-upload01.result.json",
+      "bytes": 734,
+      "sha256": "356158c4115ba99d397a5ba3cb7bd880c5061f8092888429d3214bbc970348e5"
+    },
+    "vm20/recovery-control-upload01.stderr.log": {
+      "path": "inputs/vm20/recovery-control-upload01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/recovery-control-upload01.stdout.log": {
+      "path": "inputs/vm20/recovery-control-upload01.stdout.log",
+      "bytes": 140,
+      "sha256": "96487d210c41ea5fd288c3df4b8d713b994b55d833d19c607534e7af02625dd1"
+    },
+    "vm20/recovery-receipt-download01.result.json": {
+      "path": "inputs/vm20/recovery-receipt-download01.result.json",
+      "bytes": 732,
+      "sha256": "5f5cfcddc0b8c968f3886a4add7a6b4b3118497e689b7490a5c99492d7e5f3ab"
+    },
+    "vm20/recovery-receipt-download01.stderr.log": {
+      "path": "inputs/vm20/recovery-receipt-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/recovery-receipt-download01.stdout.log": {
+      "path": "inputs/vm20/recovery-receipt-download01.stdout.log",
+      "bytes": 71,
+      "sha256": "75aa59c4803a97fed51afbf6a5044d70a9e1308fd984a91563ade34f3d43fe64"
+    },
+    "vm20/recovery-syntax01.result.json": {
+      "path": "inputs/vm20/recovery-syntax01.result.json",
+      "bytes": 701,
+      "sha256": "5b230380d9a57b31309243673e17d632da5348c6c1b50fa80bb8025d9ff42415"
+    },
+    "vm20/recovery-syntax01.stderr.log": {
+      "path": "inputs/vm20/recovery-syntax01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/recovery-syntax01.stdout.log": {
+      "path": "inputs/vm20/recovery-syntax01.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/reservation.json": {
+      "path": "inputs/vm20/reservation.json",
+      "bytes": 1597,
+      "sha256": "e6921665326262d62e827e418756d84a762e81f8733649e8256877cb73a44364"
+    },
+    "vm20/resize2-01.result.json": {
+      "path": "inputs/vm20/resize2-01.result.json",
+      "bytes": 739,
+      "sha256": "a725dbef01818b92cc9940dd09ed4b43aa319e3173e1dfc2c634ad1d94e68876"
+    },
+    "vm20/resize2-01.stderr.log": {
+      "path": "inputs/vm20/resize2-01.stderr.log",
+      "bytes": 141,
+      "sha256": "7e590ac24b1c0d85d232a3f4db97edb95d58bebfdc80c4aa2278d05bb6e37445"
+    },
+    "vm20/resize2-01.stdout.log": {
+      "path": "inputs/vm20/resize2-01.stdout.log",
+      "bytes": 33271,
+      "sha256": "9d88f3b990dcfb05ef0e39c2f3a6d58fcfcc1ad8c46e68eda1bff80e2792f754"
+    },
+    "vm20/resize32-01.result.json": {
+      "path": "inputs/vm20/resize32-01.result.json",
+      "bytes": 739,
+      "sha256": "12d7a2010850fffd9924ee229965dc57aa7e81595923ab66c828d9e1cc6cd133"
+    },
+    "vm20/resize32-01.stderr.log": {
+      "path": "inputs/vm20/resize32-01.stderr.log",
+      "bytes": 141,
+      "sha256": "7e590ac24b1c0d85d232a3f4db97edb95d58bebfdc80c4aa2278d05bb6e37445"
+    },
+    "vm20/resize32-01.stdout.log": {
+      "path": "inputs/vm20/resize32-01.stdout.log",
+      "bytes": 33271,
+      "sha256": "496fbfe87d463ce714284ee04b0649276b37f7da51419ab735b5106cfed7ca60"
+    },
+    "vm20/sidecars-download01.result.json": {
+      "path": "inputs/vm20/sidecars-download01.result.json",
+      "bytes": 734,
+      "sha256": "66d561479a6e0fdad7aec043f95a60b9eaa32d79f69de678bd231455ef94dc7b"
+    },
+    "vm20/sidecars-download01.stderr.log": {
+      "path": "inputs/vm20/sidecars-download01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/sidecars-download01.stdout.log": {
+      "path": "inputs/vm20/sidecars-download01.stdout.log",
+      "bytes": 214,
+      "sha256": "32b19d57200af769f2e4e71f3da4861dc59ab382ab38a813a456da52cc153696"
+    },
+    "vm20/split01.result.json": {
+      "path": "inputs/vm20/split01.result.json",
+      "bytes": 738,
+      "sha256": "d77561b4b1c06ef1d52bd09d429b87aadc543c0ed943465bbb03aca8e730b69b"
+    },
+    "vm20/split01.stderr.log": {
+      "path": "inputs/vm20/split01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/split01.stdout.log": {
+      "path": "inputs/vm20/split01.stdout.log",
+      "bytes": 744,
+      "sha256": "29ecdb759e96579f233fec674c462d7f2150d8a54cc192908e16cc627054d4d7"
+    },
+    "vm20/start2-recovery01.result.json": {
+      "path": "inputs/vm20/start2-recovery01.result.json",
+      "bytes": 691,
+      "sha256": "97c3f7a921307e8fe072d7e11107eb85c88fcfa2938734ffe4d4b025eae038e8"
+    },
+    "vm20/start2-recovery01.stderr.log": {
+      "path": "inputs/vm20/start2-recovery01.stderr.log",
+      "bytes": 316,
+      "sha256": "9f253787495ba61aed33729476809f9df6c73559caf9f7d7aed24e22db3b100b"
+    },
+    "vm20/start2-recovery01.stdout.log": {
+      "path": "inputs/vm20/start2-recovery01.stdout.log",
+      "bytes": 33384,
+      "sha256": "e1494482ac249acd0534d7f6d22b3a72983460927342bb534ed164150dae6b9f"
+    },
+    "vm20/start32-01.result.json": {
+      "path": "inputs/vm20/start32-01.result.json",
+      "bytes": 691,
+      "sha256": "9ad45a6105acdef3441cc09de800c5c52885c5ed74f734d935758cf41e16684c"
+    },
+    "vm20/start32-01.stderr.log": {
+      "path": "inputs/vm20/start32-01.stderr.log",
+      "bytes": 338,
+      "sha256": "ab3e972ff441fd99c8b44c63056f1073817ea21d482f0bfdbbd165c8b3018521"
+    },
+    "vm20/start32-01.stdout.log": {
+      "path": "inputs/vm20/start32-01.stdout.log",
+      "bytes": 33384,
+      "sha256": "deaf90af104d9e74239ec8841829a1e5245bb56f5f9560b2babd48c72d26b811"
+    },
+    "vm20/state2-01.result.json": {
+      "path": "inputs/vm20/state2-01.result.json",
+      "bytes": 692,
+      "sha256": "4e2aeed771dae9219479fa016f810910a0af8f6bc4e88186b52c190ce856ab8d"
+    },
+    "vm20/state2-01.stderr.log": {
+      "path": "inputs/vm20/state2-01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/state2-01.stdout.log": {
+      "path": "inputs/vm20/state2-01.stdout.log",
+      "bytes": 33045,
+      "sha256": "73624d20d8ba7b99f5a98a411a7fc70f95790c345160d881865c6e879af9f0fd"
+    },
+    "vm20/state2-recovery01.result.json": {
+      "path": "inputs/vm20/state2-recovery01.result.json",
+      "bytes": 692,
+      "sha256": "a960c0b8919ee1d3062dee5236226eb20c5d8de7194795d23a5f1b78aa338cef"
+    },
+    "vm20/state2-recovery01.stderr.log": {
+      "path": "inputs/vm20/state2-recovery01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/state2-recovery01.stdout.log": {
+      "path": "inputs/vm20/state2-recovery01.stdout.log",
+      "bytes": 33102,
+      "sha256": "bb852077be30c48e1db1b153861f2a754e32d4e6513027a887c3905fc93e4109"
+    },
+    "vm20/state32-01.result.json": {
+      "path": "inputs/vm20/state32-01.result.json",
+      "bytes": 692,
+      "sha256": "276aa510302a1493d71865740760761029f11b47091bddbdc2327543a4f49f10"
+    },
+    "vm20/state32-01.stderr.log": {
+      "path": "inputs/vm20/state32-01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/state32-01.stdout.log": {
+      "path": "inputs/vm20/state32-01.stdout.log",
+      "bytes": 33102,
+      "sha256": "b30537e4a3d52c10c299a03958772d29565b71613a215594bdf131fa08b19963"
+    },
+    "vm20/stop2-01.result.json": {
+      "path": "inputs/vm20/stop2-01.result.json",
+      "bytes": 686,
+      "sha256": "aaa1d72dd8a5832c27319e9b20c86e3962fe83c84ebf0c046345b6932bf714a2"
+    },
+    "vm20/stop2-01.stderr.log": {
+      "path": "inputs/vm20/stop2-01.stderr.log",
+      "bytes": 463,
+      "sha256": "fdab70a7d2fe44755e64b33cdeb332b49512c40974ad7c228abc094452c9ed2f"
+    },
+    "vm20/stop2-01.stdout.log": {
+      "path": "inputs/vm20/stop2-01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/stop32-01.result.json": {
+      "path": "inputs/vm20/stop32-01.result.json",
+      "bytes": 686,
+      "sha256": "a305714dabf6ae79286f5c2d3aa7241d5ed975c1896f97a8c0798291a5adcc4c"
+    },
+    "vm20/stop32-01.stderr.log": {
+      "path": "inputs/vm20/stop32-01.stderr.log",
+      "bytes": 481,
+      "sha256": "b3f0028f24ab4463d857608d5609659bc65d15a17d22d017fcc0e8b9a0b74985"
+    },
+    "vm20/stop32-01.stdout.log": {
+      "path": "inputs/vm20/stop32-01.stdout.log",
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/upload-status32-01.result.json": {
+      "path": "inputs/vm20/upload-status32-01.result.json",
+      "bytes": 715,
+      "sha256": "b16a8b8119ec96fe031ee36cc2ed135cc1249ae3e7d7fdf578bcb2da32b769e5"
+    },
+    "vm20/upload-status32-01.stderr.log": {
+      "path": "inputs/vm20/upload-status32-01.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm20/upload-status32-01.stdout.log": {
+      "path": "inputs/vm20/upload-status32-01.stdout.log",
+      "bytes": 71,
+      "sha256": "16dfe460f030f9f1e5f91e82d8933445b0275d9de9fe4ab393a689fc74b06144"
+    },
+    "vm20/upload01.result.json": {
+      "path": "inputs/vm20/upload01.result.json",
+      "bytes": 896,
+      "sha256": "99b042747a955a9249b510c25b95117d1bcffd611dc6aaa8169a0c0a29473b9f"
+    },
+    "vm20/upload01.stderr.log": {
+      "path": "inputs/vm20/upload01.stderr.log",
+      "bytes": 783,
+      "sha256": "2af9ed78b3f297d3406728bd33504203daf5c15e50603505f5c34bc23e10918f"
+    },
+    "vm20/upload01.stdout.log": {
+      "path": "inputs/vm20/upload01.stdout.log",
+      "bytes": 428,
+      "sha256": "e5d3a19d5e34706b8d29449821f9bdba7597ec2fc575f9bc1815eb34ca40b74f"
+    }
+  },
+  "requests": [
+    {
+      "metric": "compute.googleapis.com/instance/network/sent_bytes_count",
+      "label": "sent",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fnetwork%2Fsent_bytes_count%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%222562385330130146252%22&interval.startTime=2026-09-28T04%3A29%3A20.103183%2B00%3A00&interval.endTime=2026-09-28T05%3A02%3A08.001102%2B00%3A00&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-28T05:03:54.668284+00:00",
+      "http_status": 200,
+      "completed_at": "2026-09-28T05:03:55.143978+00:00",
+      "response": {
+        "path": "vm20-sent-00.json",
+        "bytes": 7517,
+        "sha256": "4e7dc5834fce9c085cf3dbac23ad1764e7255f9bb7ea373665f9f6855447057d"
+      },
+      "point_count": 31
+    },
+    {
+      "metric": "compute.googleapis.com/instance/uptime",
+      "label": "uptime",
+      "page": 0,
+      "method": "GET",
+      "url": "https://monitoring.googleapis.com/v3/projects/solvers-abstraction-20260723/timeSeries?filter=metric.type+%3D+%22compute.googleapis.com%2Finstance%2Fuptime%22+AND+resource.type+%3D+%22gce_instance%22+AND+resource.labels.project_id+%3D+%22solvers-abstraction-20260723%22+AND+resource.labels.instance_id+%3D+%222562385330130146252%22&interval.startTime=2026-09-28T04%3A29%3A20.103183%2B00%3A00&interval.endTime=2026-09-28T05%3A02%3A08.001102%2B00%3A00&view=FULL&pageSize=1000",
+      "requested_at": "2026-09-28T05:03:55.144970+00:00",
+      "http_status": 200,
+      "completed_at": "2026-09-28T05:03:55.569916+00:00",
+      "response": {
+        "path": "vm20-uptime-00.json",
+        "bytes": 7552,
+        "sha256": "738a55e56d2b6922bc087fbedb039fbb9f2c51a2b6a2cbc899c38873d6f23686"
+      },
+      "point_count": 31
+    }
+  ],
+  "source": {
+    "bytes": 13054,
+    "sha256": "e014d02efaa40af98a2e1e65de501536ad87b07ed720d449bf4281572b4400ba"
+  },
+  "status": "completed",
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "credential_material_retained": false,
+  "billed_usd": null,
+  "maximum_monitoring_gets": 2,
+  "maximum_response_bytes_per_get": 2097152,
+  "usage_coverage": "Unknown; missing points are not zero usage",
+  "captured_sdk_commands": [
+    "vm20/absence-addresses01.result.json",
+    "vm20/absence-disks01.result.json",
+    "vm20/absence-instances01.result.json",
+    "vm20/archive-recovery01.result.json",
+    "vm20/bootstrap-state01.result.json",
+    "vm20/bootstrap-state02.result.json",
+    "vm20/build-start01.result.json",
+    "vm20/build-status01.result.json",
+    "vm20/build-status02.result.json",
+    "vm20/build-status03.result.json",
+    "vm20/cleanup-operations01.result.json",
+    "vm20/delete01.result.json",
+    "vm20/disk-before-delete01.result.json",
+    "vm20/install01.result.json",
+    "vm20/measure-start01.result.json",
+    "vm20/measure-status01.result.json",
+    "vm20/measure-status02.result.json",
+    "vm20/measure-status03.result.json",
+    "vm20/partial-metadata-upload01.result.json",
+    "vm20/partial-metadata01.result.json",
+    "vm20/posthoc-quiescence01.result.json",
+    "vm20/posthoc-report-download01.result.json",
+    "vm20/posthoc-upload01.result.json",
+    "vm20/posthoc01.result.json",
+    "vm20/preflight-addresses01.result.json",
+    "vm20/preflight-disks01.result.json",
+    "vm20/preflight-instances01.result.json",
+    "vm20/preflight-quota01.result.json",
+    "vm20/proof-download01.result.json",
+    "vm20/recovery-control-upload01.result.json",
+    "vm20/recovery-receipt-download01.result.json",
+    "vm20/recovery-syntax01.result.json",
+    "vm20/resize2-01.result.json",
+    "vm20/resize32-01.result.json",
+    "vm20/sidecars-download01.result.json",
+    "vm20/split01.result.json",
+    "vm20/start2-recovery01.result.json",
+    "vm20/start32-01.result.json",
+    "vm20/state2-01.result.json",
+    "vm20/state2-recovery01.result.json",
+    "vm20/state32-01.result.json",
+    "vm20/stop2-01.result.json",
+    "vm20/stop32-01.result.json",
+    "vm20/upload-status32-01.result.json",
+    "vm20/upload01.result.json"
+  ],
+  "interval_start": "2026-09-28T04:29:20.103183+00:00",
+  "interval_end": "2026-09-28T05:02:08.001102+00:00",
+  "authentication": {
+    "method": "existing gcloud auth print-access-token",
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "ended_at": "2026-09-28T05:03:55.571509+00:00"
+}

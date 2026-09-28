@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-20",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo timeout --kill-after=5s 60s python3 -B /tmp/split-on-cloud.py"
+  ],
+  "started_utc": "2026-09-28T04:58:06.492940+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 744,
+    "sha256": "29ecdb759e96579f233fec674c462d7f2150d8a54cc192908e16cc627054d4d7"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T04:58:12.969361+00:00"
+}

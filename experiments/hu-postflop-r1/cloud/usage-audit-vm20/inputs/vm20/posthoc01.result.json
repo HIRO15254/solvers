@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-20",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo systemd-run --unit=solvers-r1-vm20-posthoc --wait --pipe --collect --property=RuntimeMaxSec=120 --property=MemoryMax=2G --property=MemorySwapMax=0 --property=CPUWeight=100 --property=KillMode=control-group --property=TimeoutStopSec=5 --property=SendSIGKILL=yes /usr/bin/python3 -B /tmp/posthoc-leaf.py"
+  ],
+  "started_utc": "2026-09-28T04:55:31.065421+00:00",
+  "timeout_seconds": 160,
+  "stdout": {
+    "bytes": 177,
+    "sha256": "200041ea5fb585d7506d4c4cfe62b25887c9230ef03c95445387d135c655aa57"
+  },
+  "stderr": {
+    "bytes": 270,
+    "sha256": "bb6e8e3849bb42370770b5e4840a260a8f3ca4486908b9820c01a9dec2eaeb4c"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T04:55:41.526780+00:00"
+}

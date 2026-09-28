@@ -1,0 +1,111 @@
+{
+  "schema": "r1.vm20-usage-checks/v1",
+  "status": "passed",
+  "checks": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm20\\analyze.py",
+        "--check"
+      ],
+      "started_utc": "2026-09-28T05:13:02.919299+00:00",
+      "ended_utc": "2026-09-28T05:13:03.216820+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "analyze.check.stdout.log",
+        "bytes": 1036,
+        "sha256": "9c3ca3de4bced8f7fd447c20b4b7216645e9a9444f86396c4f95124dce2316c7"
+      },
+      "stderr": {
+        "path": "analyze.check.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm20\\analyze02.py",
+        "--check"
+      ],
+      "started_utc": "2026-09-28T05:13:03.217622+00:00",
+      "ended_utc": "2026-09-28T05:13:03.521426+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "analyze02.check.stdout.log",
+        "bytes": 1234,
+        "sha256": "ec43084f5b622389a6c4b8d5398ee7b818e7d2a9c8bff1c37fed5d33c3c95b18"
+      },
+      "stderr": {
+        "path": "analyze02.check.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "experiments\\hu-postflop-r1\\cloud\\usage-audit-vm20\\test_analysis.py"
+      ],
+      "started_utc": "2026-09-28T05:13:03.522444+00:00",
+      "ended_utc": "2026-09-28T05:13:04.060768+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "test_analysis.check.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "test_analysis.check.stderr.log",
+        "bytes": 108,
+        "sha256": "ce2338e0115d153dba06a08c31485e619c9aa86961c576f8a5c6d3d67f870a2a"
+      }
+    }
+  ],
+  "pins": {
+    "analyze.py": {
+      "bytes": 16390,
+      "sha256": "cfff88d4810ff2732c4112307e5bc2729eb00f4b577350c5aabf3f1a8c708f5e"
+    },
+    "analyze02.py": {
+      "bytes": 3103,
+      "sha256": "b7cc4dfdf3519b4edb512f68f9c4a2f1aadd213d5398f8433532b06a018dd488"
+    },
+    "collect.py": {
+      "bytes": 13054,
+      "sha256": "e014d02efaa40af98a2e1e65de501536ad87b07ed720d449bf4281572b4400ba"
+    },
+    "test_analysis.py": {
+      "bytes": 3534,
+      "sha256": "39854bab4b3412d5e0cf9fb7de14b490d7b322e1717887a86f7a5d1ccdbe8ede"
+    },
+    "acquisition.json": {
+      "bytes": 38098,
+      "sha256": "2a03d7be28d9c68990c3e329f29f7c729e06d99c333809b8690c5bb0aad3f9ab"
+    },
+    "report.json": {
+      "bytes": 19595,
+      "sha256": "53a4b5efc92ec9d0030d61b204a53cc4e7170556e08575a5599e84696e1046e1"
+    },
+    "report02.json": {
+      "bytes": 21687,
+      "sha256": "01f63fea326fb7c66ba64814b994e41f6ce0e2f1965d72a6e416cf89804d47fd"
+    },
+    "README.jp.md": {
+      "bytes": 4189,
+      "sha256": "d58d42c548e907fa930ef46ec693e86a5c905055fb22b35b9dd6833675e6ced6"
+    }
+  },
+  "native_compute": false,
+  "network_or_sdk": false,
+  "ledger_or_resource_mutations": false
+}

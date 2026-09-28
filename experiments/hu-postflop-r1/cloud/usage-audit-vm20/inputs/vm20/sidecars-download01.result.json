@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260928-20:/opt/r1/flop-cpu-profile-proof01.tar.gz.*",
+    "experiments/hu-postflop-r1/cloud/vm20/",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-28T04:58:35.623039+00:00",
+  "timeout_seconds": 90,
+  "stdout": {
+    "bytes": 214,
+    "sha256": "32b19d57200af769f2e4e71f3da4861dc59ab382ab38a813a456da52cc153696"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T04:58:43.607768+00:00"
+}

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-20",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo python3 -B /opt/r1/flop-cpu-profile-package/experiments/hu-postflop-r1/cloud/vm19/start.py --phase measure --stop-deadline-utc 2026-09-28T05:14:20Z --launch-attempted-at 2026-09-28T04:29:20.103183+00:00"
+  ],
+  "started_utc": "2026-09-28T04:40:48.943551+00:00",
+  "timeout_seconds": 45,
+  "stdout": {
+    "bytes": 1680,
+    "sha256": "1a56f7a83674f247dd0a45b12c68d684309f4258a90c620d0504ff85a3d044cb"
+  },
+  "stderr": {
+    "bytes": 681,
+    "sha256": "22c6d347c4eacb6db6b5b765cd76c5d2f0391a5ac7364ac72fde8202bdc32fe5"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T04:40:55.765853+00:00"
+}

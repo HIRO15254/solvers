@@ -1,0 +1,653 @@
+{
+  "schema": "r1.vm20-usage-proposal/v1",
+  "status": "proposal_only_no_ledger_change",
+  "instance_id": "2562385330130146252",
+  "instance_name": "solvers-r1-20260928-20",
+  "project": "solvers-abstraction-20260723",
+  "source": {
+    "bytes": 3103,
+    "sha256": "b7cc4dfdf3519b4edb512f68f9c4a2f1aadd213d5398f8433532b06a018dd488"
+  },
+  "acquisition": {
+    "bytes": 38098,
+    "sha256": "2a03d7be28d9c68990c3e329f29f7c729e06d99c333809b8690c5bb0aad3f9ab"
+  },
+  "inputs": {
+    "count": 157,
+    "bytes": 637788,
+    "sdk_receipts": 45
+  },
+  "lifecycle": {
+    "launch": "2026-09-28T04:29:20.103183+00:00",
+    "original_stop_deadline": "2026-09-28T05:14:20Z",
+    "high_cpu_start_before_stop": "2026-09-28T04:38:08.674629+00:00",
+    "high_cpu_end_after_resize_down": "2026-09-28T04:45:32.898930+00:00",
+    "delete_operation_done": "2026-09-27T22:01:08.496-07:00",
+    "absence_observed": "2026-09-28T05:02:08.001102+00:00",
+    "disk_created": "2026-09-27T21:29:24.114-07:00",
+    "disk_absence_observed": "2026-09-28T05:02:05.469068+00:00",
+    "whole_lifecycle_seconds": "1967.897919",
+    "overlapping_highcpu_seconds": "444.224301",
+    "disk_lifecycle_seconds": "1961.355068",
+    "actual_machine_sequence": [
+      "e2-standard-2",
+      "e2-highcpu-32",
+      "e2-standard-2"
+    ],
+    "instance_id_unchanged": true,
+    "disk_id": "5203462124618404812",
+    "three_inventory_absence_confirmed": true,
+    "stop_deadline_extended": false,
+    "preemption_or_overnight_disk_gap": false
+  },
+  "monitoring": {
+    "sent": {
+      "available": true,
+      "points": 31,
+      "observed_sum": "179843801",
+      "first_start": "2026-09-28T04:29:00.001Z",
+      "last_end": "2026-09-28T05:01:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-28T04:30:00Z",
+          "end": "2026-09-28T04:30:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:31:00Z",
+          "end": "2026-09-28T04:31:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:32:00Z",
+          "end": "2026-09-28T04:32:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:33:00Z",
+          "end": "2026-09-28T04:33:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:34:00Z",
+          "end": "2026-09-28T04:34:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:35:00Z",
+          "end": "2026-09-28T04:35:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:36:00Z",
+          "end": "2026-09-28T04:36:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:37:00Z",
+          "end": "2026-09-28T04:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:38:00Z",
+          "end": "2026-09-28T04:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:39:00Z",
+          "end": "2026-09-28T04:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:40:00Z",
+          "end": "2026-09-28T04:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:41:00Z",
+          "end": "2026-09-28T04:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:42:00Z",
+          "end": "2026-09-28T04:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:43:00Z",
+          "end": "2026-09-28T04:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:44:00Z",
+          "end": "2026-09-28T04:45:00.001Z",
+          "seconds": "60.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:46:00Z",
+          "end": "2026-09-28T04:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:47:00Z",
+          "end": "2026-09-28T04:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:48:00Z",
+          "end": "2026-09-28T04:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:49:00Z",
+          "end": "2026-09-28T04:49:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:50:00Z",
+          "end": "2026-09-28T04:50:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:51:00Z",
+          "end": "2026-09-28T04:51:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:52:00Z",
+          "end": "2026-09-28T04:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:53:00Z",
+          "end": "2026-09-28T04:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:54:00Z",
+          "end": "2026-09-28T04:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:55:00Z",
+          "end": "2026-09-28T04:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:56:00Z",
+          "end": "2026-09-28T04:56:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:57:00Z",
+          "end": "2026-09-28T04:57:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:58:00Z",
+          "end": "2026-09-28T04:58:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:59:00Z",
+          "end": "2026-09-28T04:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:00:00Z",
+          "end": "2026-09-28T05:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    },
+    "uptime": {
+      "available": true,
+      "points": 31,
+      "observed_sum": "1629.719073999999928",
+      "first_start": "2026-09-28T04:29:00.001Z",
+      "last_end": "2026-09-28T05:01:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-28T04:30:00Z",
+          "end": "2026-09-28T04:30:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:31:00Z",
+          "end": "2026-09-28T04:31:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:32:00Z",
+          "end": "2026-09-28T04:32:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:33:00Z",
+          "end": "2026-09-28T04:33:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:34:00Z",
+          "end": "2026-09-28T04:34:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:35:00Z",
+          "end": "2026-09-28T04:35:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:36:00Z",
+          "end": "2026-09-28T04:36:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:37:00Z",
+          "end": "2026-09-28T04:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:38:00Z",
+          "end": "2026-09-28T04:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:39:00Z",
+          "end": "2026-09-28T04:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:40:00Z",
+          "end": "2026-09-28T04:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:41:00Z",
+          "end": "2026-09-28T04:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:42:00Z",
+          "end": "2026-09-28T04:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:43:00Z",
+          "end": "2026-09-28T04:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:44:00Z",
+          "end": "2026-09-28T04:45:00.001Z",
+          "seconds": "60.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:46:00Z",
+          "end": "2026-09-28T04:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:47:00Z",
+          "end": "2026-09-28T04:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:48:00Z",
+          "end": "2026-09-28T04:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:49:00Z",
+          "end": "2026-09-28T04:49:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:50:00Z",
+          "end": "2026-09-28T04:50:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:51:00Z",
+          "end": "2026-09-28T04:51:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:52:00Z",
+          "end": "2026-09-28T04:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:53:00Z",
+          "end": "2026-09-28T04:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:54:00Z",
+          "end": "2026-09-28T04:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:55:00Z",
+          "end": "2026-09-28T04:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:56:00Z",
+          "end": "2026-09-28T04:56:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:57:00Z",
+          "end": "2026-09-28T04:57:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:58:00Z",
+          "end": "2026-09-28T04:58:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:59:00Z",
+          "end": "2026-09-28T04:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:00:00Z",
+          "end": "2026-09-28T05:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    }
+  },
+  "known_verified_archive_transfer_bytes": 172135766,
+  "captured_scp_attempts": [
+    {
+      "path": "vm20/partial-metadata-upload01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "experiments/hu-postflop-r1/cloud/vm20/partial-metadata.py",
+        "experiments/hu-postflop-r1/cloud/vm20/split-on-cloud.py",
+        "solvers-r1-20260928-20:/tmp/",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/posthoc-report-download01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "solvers-r1-20260928-20:/opt/r1/flop-cpu-profile-posthoc01/report.json",
+        "experiments/hu-postflop-r1/cloud/vm20/posthoc-report.json",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/posthoc-upload01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "experiments/hu-postflop-r1/cloud/vm20/posthoc-leaf.py",
+        "solvers-r1-20260928-20:/tmp/posthoc-leaf.py",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/proof-download01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "solvers-r1-20260928-20:/opt/r1/flop-cpu-profile-proof01.part*",
+        "experiments/hu-postflop-r1/cloud/vm20/",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/recovery-control-upload01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "experiments/hu-postflop-r1/cloud/vm20/recover-posthoc.sh",
+        "solvers-r1-20260928-20:/tmp/recover-posthoc.sh",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/recovery-receipt-download01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "solvers-r1-20260928-20:/opt/r1/flop-cpu-profile-recovery01.json",
+        "experiments/hu-postflop-r1/cloud/vm20/",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/sidecars-download01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "solvers-r1-20260928-20:/opt/r1/flop-cpu-profile-proof01.tar.gz.*",
+        "experiments/hu-postflop-r1/cloud/vm20/",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/upload-status32-01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "experiments/hu-postflop-r1/cloud/vm19/status.py",
+        "solvers-r1-20260928-20:/tmp/status.py",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    },
+    {
+      "path": "vm20/upload01.result.json",
+      "exit_code": 0,
+      "argv": [
+        "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+        "compute",
+        "scp",
+        "experiments/hu-postflop-r1/cloud/vm19/deployment01.tar.gz",
+        "experiments/hu-postflop-r1/cloud/vm19/install.py",
+        "experiments/hu-postflop-r1/cloud/vm19/status.py",
+        "experiments/hu-postflop-r1/cloud/vm20/split-on-cloud.py",
+        "solvers-r1-20260928-20:/tmp/",
+        "--project=solvers-abstraction-20260723",
+        "--zone=us-central1-b",
+        "--quiet"
+      ]
+    }
+  ],
+  "price_basis": {
+    "regular_e2_standard_2_usd_hour": "0.06701142",
+    "regular_e2_highcpu_32_usd_hour": "0.79152384",
+    "capture_date_utc": "2026-09-28",
+    "disk_ceiling_usd_gib_hour": ".000137",
+    "spot_ipv4_usd_hour": ".0025",
+    "egress_allowance_usd_gib": ".30",
+    "discounts_or_credits_assumed": false
+  },
+  "cost": {
+    "whole_lifecycle_minutes": 35,
+    "overlapping_highcpu_minutes": 10,
+    "disk_minutes": 35,
+    "rounding": "Add120 seconds to whole lifecycle, overlapping highCPU window, and full disk window; ceil each to minute. No stopped-time subtraction.",
+    "network_allowance_gib": "0.5",
+    "components_usd": {
+      "e2_standard_2_whole_lifecycle_regular_price": "0.03908999500000000000000000000",
+      "overlapping_e2_highcpu32_regular_price": "0.1319206400000000000000000000",
+      "ipv4_entire_rounded_lifecycle": "0.001458333333333333333333333333",
+      "same_20gib_disk_entire_lifecycle": "0.001598333333333333333333333334",
+      "total_egress_allowance": "0.150",
+      "original_uncertainty_reserve": "1"
+    },
+    "model_usd": "1.324067301666666666666666667",
+    "proposed_hold_usd": "1.35",
+    "previous_hold_usd": "1.85",
+    "proposed_restore_usd": "0.50",
+    "rounding_margin_usd": "0.025932698333333333333333333",
+    "reservation_rounding_step_usd": ".05",
+    "reservation_rounding_direction": "ceiling",
+    "reservation_rounding_basis": "Explicit finer bookkeeping granularity requested and agreed by root after acquisition; not an established global policy and not a reduction in modeled expense or buffers."
+  },
+  "budget_snapshot": {
+    "authorized_usd": "40",
+    "held_usd": "39.15",
+    "available_usd": "0.85",
+    "billed_usd": null,
+    "ledger_pin": {
+      "path": "inputs/budget.json",
+      "bytes": 108521,
+      "sha256": "4d1f06be12404791c6791881ed2311db6a29c8b7d948f63767f7a5147aa0f055"
+    },
+    "proposed_new_available_usd": "1.35"
+  },
+  "limitations": [
+    "Observed Monitoring DELTA is not invoice or complete billing export; actual billed amount unknown.",
+    "Monitoring gaps and edges remain unknown, not zero usage; acquisition immediately after cleanup may have reporting delay.",
+    "All observed sent bytes count against egress allowance; archive is known payload, not total connection/sidecar traffic.",
+    "Entire lifecycle is charged at ordinary2CPU price including stopped intervals, plus overlapping32CPU regular-price window.",
+    "Original1USD uncertainty and at least512MiB total outbound allowance retained.",
+    "No performance/profile completeness, candidate adoption or R1 acceptance follows from this usage audit."
+  ],
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "local_archive_decompression": false,
+  "original_proposal": {
+    "source": {
+      "bytes": 16390,
+      "sha256": "cfff88d4810ff2732c4112307e5bc2729eb00f4b577350c5aabf3f1a8c708f5e"
+    },
+    "report": {
+      "bytes": 19595,
+      "sha256": "53a4b5efc92ec9d0030d61b204a53cc4e7170556e08575a5599e84696e1046e1"
+    },
+    "cost": {
+      "whole_lifecycle_minutes": 35,
+      "overlapping_highcpu_minutes": 10,
+      "disk_minutes": 35,
+      "rounding": "Add120 seconds to whole lifecycle, overlapping highCPU window, and full disk window; ceil each to minute. No stopped-time subtraction.",
+      "network_allowance_gib": "0.5",
+      "components_usd": {
+        "e2_standard_2_whole_lifecycle_regular_price": "0.03908999500000000000000000000",
+        "overlapping_e2_highcpu32_regular_price": "0.1319206400000000000000000000",
+        "ipv4_entire_rounded_lifecycle": "0.001458333333333333333333333333",
+        "same_20gib_disk_entire_lifecycle": "0.001598333333333333333333333334",
+        "total_egress_allowance": "0.150",
+        "original_uncertainty_reserve": "1"
+      },
+      "model_usd": "1.324067301666666666666666667",
+      "proposed_hold_usd": "1.4",
+      "previous_hold_usd": "1.85",
+      "proposed_restore_usd": "0.45",
+      "rounding_margin_usd": "0.075932698333333333333333333"
+    }
+  },
+  "rounding_review": {
+    "original_tenth_dollar_proposal_preserved": true,
+    "model_and_components_unchanged": true,
+    "original_uncertainty_usd": "1",
+    "original_network_floor_gib": ".5",
+    "extra_seconds_per_lifecycle_window_unchanged": 120,
+    "finding": "VM19 explicitly used a tenth-dollar ceiling; 1.264 to 1.30 is also compatible with a five-cent ceiling but does not establish that policy. Earlier audits documented optional finer rounding. No fixed universal rounding minimum was found."
+  }
+}
