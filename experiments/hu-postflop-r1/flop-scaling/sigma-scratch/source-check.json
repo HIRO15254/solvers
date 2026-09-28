@@ -1,0 +1,150 @@
+{
+  "schema": "r1.sigma-scratch-source-check/v1",
+  "checks": [
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "prepare.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.095502,
+      "stdout": "{\"mode\":\"check\",\"candidate\":{\"crates/engine/src/scratch.rs\":{\"bytes\":6340,\"sha256\":\"e6739662c97b464cdf4cd9c756d23e5ffe330a94d47cc42104dcc34509bbd8ad\"},\"crates/engine/src/solver.rs\":{\"bytes\":56449,\"sha256\":\"9278b051f696eb1511f8b41509d0072733395f814016865acc7717d14953ff3a\"}},\"compiled\":false,\"performance_measured\":false}\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_prepare.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.113562,
+      "stdout": "",
+      "stderr": "test_accumulator_or_old_take_change_is_rejected (test_prepare.SourceChecks.test_accumulator_or_old_take_change_is_rejected) ... ok\r\ntest_average_strategy_callers_stay_zero_initialized (test_prepare.SourceChecks.test_average_strategy_callers_stay_zero_initialized) ... ok\r\ntest_changed_source_or_storage_contract_is_rejected (test_prepare.SourceChecks.test_changed_source_or_storage_contract_is_rejected) ... ok\r\ntest_frozen_outputs_reproduce (test_prepare.SourceChecks.test_frozen_outputs_reproduce) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 4 tests in 0.011s\r\n\r\nOK\r\n"
+    },
+    {
+      "kind": "formatter_only",
+      "file": "crates/engine/src/scratch.rs",
+      "version": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+      "matches": true,
+      "elapsed_seconds": 0.067948
+    },
+    {
+      "kind": "formatter_only",
+      "file": "crates/engine/src/solver.rs",
+      "version": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+      "matches": true,
+      "elapsed_seconds": 0.091275
+    },
+    {
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "prepare.py",
+        "--apply-to",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sigma-scratch\\_application-check",
+        "--receipt",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sigma-scratch\\_application-check\\application.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.135784,
+      "stdout": "{\"mode\":\"apply\",\"candidate\":{\"crates/engine/src/scratch.rs\":{\"bytes\":6340,\"sha256\":\"e6739662c97b464cdf4cd9c756d23e5ffe330a94d47cc42104dcc34509bbd8ad\"},\"crates/engine/src/solver.rs\":{\"bytes\":56449,\"sha256\":\"9278b051f696eb1511f8b41509d0072733395f814016865acc7717d14953ff3a\"}},\"compiled\":false,\"performance_measured\":false}\r\n",
+      "stderr": ""
+    }
+  ],
+  "application": {
+    "schema": "r1.sigma-scratch-application/v1",
+    "source_copy": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sigma-scratch\\_application-check",
+    "before": {
+      "crates/engine/src/scratch.rs": {
+        "bytes": 1117,
+        "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+      },
+      "crates/engine/src/solver.rs": {
+        "bytes": 56421,
+        "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+      },
+      "crates/engine/src/storage.rs": {
+        "bytes": 44287,
+        "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+      }
+    },
+    "after": {
+      "crates/engine/src/scratch.rs": {
+        "bytes": 6340,
+        "sha256": "e6739662c97b464cdf4cd9c756d23e5ffe330a94d47cc42104dcc34509bbd8ad"
+      },
+      "crates/engine/src/solver.rs": {
+        "bytes": 56449,
+        "sha256": "9278b051f696eb1511f8b41509d0072733395f814016865acc7717d14953ff3a"
+      },
+      "crates/engine/src/storage.rs": {
+        "bytes": 44287,
+        "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+      }
+    },
+    "patch": {
+      "bytes": 6423,
+      "sha256": "0142113c4e26ce4ee907a06fdd2219ffb45bb00e7c1239cfa3174788c4668ccf"
+    },
+    "compiled": false
+  },
+  "production_sources_unchanged": true,
+  "temporary_fixture_removed": true,
+  "candidate": {
+    "crates/engine/src/scratch.rs": {
+      "bytes": 6340,
+      "sha256": "e6739662c97b464cdf4cd9c756d23e5ffe330a94d47cc42104dcc34509bbd8ad"
+    },
+    "crates/engine/src/solver.rs": {
+      "bytes": 56449,
+      "sha256": "9278b051f696eb1511f8b41509d0072733395f814016865acc7717d14953ff3a"
+    }
+  },
+  "artifacts": {
+    "prepare.py": {
+      "bytes": 7619,
+      "sha256": "6e07c806d27a84dd7f8fb892acb801624f511441b4d7ab586c73ff334c109ba2"
+    },
+    "tests.rs.in": {
+      "bytes": 4805,
+      "sha256": "9574e4fd4c50d8b29b7833834d0bbb77a28607b370783e4cf55f160258c5a8fb"
+    },
+    "test_prepare.py": {
+      "bytes": 2048,
+      "sha256": "dcaf7fd342fe1fcc849cb3193a8b860171043ff2b35e26a98bfd3e73a605d131"
+    },
+    "candidate.patch": {
+      "bytes": 6423,
+      "sha256": "0142113c4e26ce4ee907a06fdd2219ffb45bb00e7c1239cfa3174788c4668ccf"
+    },
+    "provenance.json": {
+      "bytes": 1661,
+      "sha256": "1b782b6b13ccc440f710d7fb71ffce3aa2f7abda2be0e3ade5d22c3c99d79295"
+    },
+    "README.jp.md": {
+      "bytes": 4061,
+      "sha256": "b4cf9989499af0e3abec0da24c05f96e741e62ec2607c571bf98f0e0508a6510"
+    }
+  },
+  "initial_check_invocation_error": {
+    "command": "python -m unittest -v test_prepare.py from repository root",
+    "error": "ModuleNotFoundError: test_prepare",
+    "resolution": "Repeated from the candidate directory; 4 source-only tests passed."
+  },
+  "rust_compiled": false,
+  "rust_tests_executed": false,
+  "performance_measured": false,
+  "elapsed_seconds": 0.580629
+}

@@ -67,7 +67,7 @@ chance lowering、hidden action一般、実Hi/Lo ranker、任意ゲームのlega
 | Lossless/lossy/保存量子化を区別 | G0/GA、action/private/chance map、recall、lift/off-tree方針、評価domainを契約で特定。単にbucket数やroot EVが一致しても同型としない |
 | 粗密private写像の細分化と復元 | `nested_river_buckets_lift_a_coarse_policy_but_are_not_lossless`。固定Riverの2/4 EHS2 bucket、1081 live comboでparent関係、固定相手`AcAd`の990 worldでlift前後EV一致。同じbucketの勝ち/負け混在も要求 |
 | 粗密bet写像・完全profileの復元 | `coarse_bet_profile_lifts_completely_and_expanded_br_uses_the_fine_domain`。pot10/stack30の固定Riverで21→49情報集合。追加action確率0、新規28情報集合の一様補完、元profile復元、両compiled treeと独立scalar EV/BRを照合 |
-| Domain/contentの識別 | `canonical_table_content_depends_on_coverage_not_only_bucket_counts`。suit全置換でtable bytes一致、別board coverageで不一致。既存postcard bytesをversion独立semantic IDと呼ばない |
+| Domain/contentの識別 | `canonical_table_content_depends_on_coverage_not_only_bucket_counts`。全カードへ固定したsuit巡回置換 `(suit + 1) % 4` を施す1例でtable bytes一致、別board coverageで不一致。全24置換やversion独立semantic IDの証明ではない |
 | 完全記憶・joint mass | T1-03のStud/Draw tests。Draw mapの行和4/3を個別に1へ正規化せず、joint blocker後の3候補を評価 |
 | NLHE suit quotient | 通常の`asymmetric_ranges_suppress_iso_merging`と、下記の2つのignored iso testで限定domainを照合 |
 
@@ -76,6 +76,15 @@ EHS2 testsは[semantic_mapping.rs](../../../crates/abstraction/tests/semantic_ma
 固定bet対照は[oracle_river.rs](../../../crates/holdem/tests/oracle_river.rs)のtest専用adapterであり、
 任意の保存profileを移植する公開APIではない。共通semantic ID codec/保存、一般的なaction transport、任意bucket migration、
 current-card近似Draw solver、未知domainの自動認定は未実装。GA内の残差を元ゲームG0のExploitabilityと呼ばない。
+
+現行の `oracle_river.rs` はcompact local-hand IDへのadapter変更を含むため、旧bet-refinement
+snapshotと同じsource bytesとして扱わない。SHA-256
+`96ed38393bdcdb0cdc7685ec5325a67645d8b01196df3b779e03352b09909267` は
+[VM19 deploymentのsource manifest](../cloud/vm19/source-manifest.json)と一致する。
+そのsourceから新規buildした[VM21の成功記録](../cloud/vm21/build-proof01.stdout.log)では、
+baseline/candidateのengine・holdem・cfr-refに対する `cargo test --release --tests` が完了している。
+[全原本の回収と検証範囲](../cloud/vm21/report.jp.md)へ結び付け、旧snapshotを現行版の直接証拠として代用しない。
+このcore testの実行を全workspace検証や外部参照の品質認定とは扱わない。
 
 ## 変更した評価・保存処理への接続
 

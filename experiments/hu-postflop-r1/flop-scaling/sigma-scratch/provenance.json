@@ -1,0 +1,55 @@
+{
+  "schema": "r1.sigma-scratch-proposal/v1",
+  "source_revision": "a0baa8bb56d1a11b4f619913518f55c548f6f80a",
+  "source": {
+    "crates/engine/src/scratch.rs": {
+      "bytes": 1117,
+      "sha256": "d5a5a5379b365896d94554c6b5e16ec1808e51dd605c6c0ae6dfd024fe6c5d49"
+    },
+    "crates/engine/src/solver.rs": {
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    "crates/engine/src/storage.rs": {
+      "bytes": 44287,
+      "sha256": "1929ce7947c6b60d9aea8d75540065c8c9a0596a3f59d82bbf8f4b6f687fd1a5"
+    }
+  },
+  "candidate": {
+    "crates/engine/src/scratch.rs": {
+      "bytes": 6340,
+      "sha256": "e6739662c97b464cdf4cd9c756d23e5ffe330a94d47cc42104dcc34509bbd8ad"
+    },
+    "crates/engine/src/solver.rs": {
+      "bytes": 56449,
+      "sha256": "9278b051f696eb1511f8b41509d0072733395f814016865acc7717d14953ff3a"
+    }
+  },
+  "patch": {
+    "bytes": 6423,
+    "sha256": "0142113c4e26ce4ee907a06fdd2219ffb45bb00e7c1239cfa3174788c4668ccf"
+  },
+  "controls": {
+    "prepare.py": {
+      "bytes": 7619,
+      "sha256": "6e07c806d27a84dd7f8fb892acb801624f511441b4d7ab586c73ff334c109ba2"
+    },
+    "tests.rs.in": {
+      "bytes": 4805,
+      "sha256": "9574e4fd4c50d8b29b7833834d0bbb77a28607b370783e4cf55f160258c5a8fb"
+    }
+  },
+  "scope": {
+    "new_method": "Scratch::take_for_overwrite",
+    "cfr_sigma_sites": 2,
+    "all_other_production_bytes_unchanged": true,
+    "storage_unchanged": true,
+    "oracle_unchanged": true,
+    "rust_tests": 5,
+    "rust_tests_executed": false
+  },
+  "production_adopted": false,
+  "compiled": false,
+  "performance": null,
+  "full_state_quality": null
+}
