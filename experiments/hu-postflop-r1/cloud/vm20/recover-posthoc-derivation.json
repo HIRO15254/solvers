@@ -1,0 +1,12 @@
+{
+  "source": "../vm19/recover.sh",
+  "before": {
+    "bytes": 7239,
+    "sha256": "1391a12588bb55ae282a922359b71e42fa3f85073170b047be3d3a2d2fd98198"
+  },
+  "after": {
+    "bytes": 7319,
+    "sha256": "937285900acd4bad3b496ea8109e1d66d525f2d5ae2261b00d10cf4216c047e8"
+  },
+  "change": "Retain separate posthoc directory under recovery/posthoc if present; original failed proof unchanged; no retry/native solve; all archive limits and verification unchanged."
+}

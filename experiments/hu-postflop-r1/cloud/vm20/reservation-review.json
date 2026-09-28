@@ -1,0 +1,145 @@
+{
+  "schema": "r1.vm20-reservation-review/v1",
+  "at_utc": "2026-09-28T04:28:48.435672+00:00",
+  "status": "no_blocking_findings",
+  "reviewer": "budget_reuse_audit",
+  "scope": "Read-only source/data review of the reservation and prior usage application; reserve.py was not executed. Only this review artifact is written.",
+  "held_before_usd": "37.30",
+  "new_reservation_usd": "1.85",
+  "held_after_usd": "39.15",
+  "unreserved_after_usd": "0.85",
+  "authorized_usd": "40",
+  "cost_estimate_usd": "1.844385",
+  "usage_return_verified_usd": "2.65",
+  "checks": [
+    "Usage application exactly changes nine reviewed holds and appends corresponding events; all other reservation fields and unrelated rows unchanged.",
+    "Current ledger hash equals usage-applied budget_after; historical before hash and evidence hashes match.",
+    "reserve.py fails on changed ledger, non37.30 total, non40 authorization, duplicateVM20, price/source replay mismatch, stale/nonempty or wrongly scoped inventory.",
+    "Immutable receipts use exclusive writes and fsync; final budget uses atomic os.replace and byte readback; no cloud call in reservation.",
+    "E2-only2/32CPU,45minute original STOP,3starts,20GiB24h disk,512MiB all-egress,256MiB archive and original1USD uncertainty remain.",
+    "Fresh exact price model replay succeeds; decimal budget arithmetic yields39.15 held and0.85 free.",
+    "All three fresh named resource inventories empty with successful scoped commands; quota receipt successful and payload/stream hashes match."
+  ],
+  "regional_quota": {
+    "CPUS": {
+      "limit": 200.0,
+      "usage": 0.0
+    },
+    "E2_CPUS": {
+      "limit": 24.0,
+      "usage": 0.0
+    },
+    "PREEMPTIBLE_CPUS": {
+      "limit": 0.0,
+      "usage": 0.0
+    }
+  },
+  "quota_interpretation": "Consistent with retained vm19/quota-review.md: documented E2 pool is CPUS; E2_CPUS24 alone does not prove32CPU blocked; PREEMPTIBLE0 alone does not prove project request history or effective pool. Actual32CPU zonal availability is not guaranteed. No fallback/quota-change/deadline extension authorized by this review.",
+  "limitations": [
+    "The cost proposal budget observation predates the separately applied usage return; reserve.py correctly binds the current ledger via usage-applied instead.",
+    "Source review confirms guards for this frozen state; this is not execution proof of reservation, launch controls, or successful32CPU capacity.",
+    "Partial receipt files after a local write failure require reconciliation before any retry; no retry or mutation was performed here.",
+    "Final invoices and a formal guaranteed bill ceiling remain unknown."
+  ],
+  "inputs": {
+    "budget.json": {
+      "bytes": 106783,
+      "sha256": "590f4806730b7942b539fa62b0faea9c004461a14fd5135d469c20db311478c3"
+    },
+    "vm20/usage-applied.json": {
+      "bytes": 7183,
+      "sha256": "d66013c3da31d31efecc05364d7d291d94066e1b2986d7afcea9b9c2c64b2871"
+    },
+    "vm20/budget-before-usage-return.json": {
+      "bytes": 92775,
+      "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+    },
+    "usage-followup-20260928/report.json": {
+      "bytes": 86786,
+      "sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d"
+    },
+    "usage-followup-20260928/validate.py": {
+      "bytes": 17614,
+      "sha256": "b69bd2c983d805b5dcf4e4b0aca0e73cfb214ffba6939e1737a126f45244e0b6"
+    },
+    "usage-audit-vm19/report.json": {
+      "bytes": 20592,
+      "sha256": "803d7263f80f6c60d3132f7c4216577e382ac0de718a54cafc23ca7dc7790358"
+    },
+    "usage-audit-vm19/analyze.py": {
+      "bytes": 15651,
+      "sha256": "a6c2963f58aa5d2bb4930590a70075552ef1392ab3bf11b1b7792896ec8a870d"
+    },
+    "vm20/apply-usage-return.py": {
+      "bytes": 5749,
+      "sha256": "f2c015e97107d6fe48488699c3dc9a62cb4fcf214350c9bbad031abc11d0c25c"
+    },
+    "vm20/reserve.py": {
+      "bytes": 5328,
+      "sha256": "ceebd92f7a5243ca76a10058e5b784272f26e7bf7f12520f3d4268d2103d383f"
+    },
+    "preflight-vm20/cost-proposal.json": {
+      "bytes": 5233,
+      "sha256": "be1f19118ebb73de7b6892752e7b8a30eae463ad81830d1b9d57f38751107c8e"
+    },
+    "preflight-vm20/cost-proposal.py": {
+      "bytes": 6587,
+      "sha256": "2a48c4f1ae37dfb81a5100e3c84005e25454719f36352e3655315079e412f12c"
+    },
+    "vm20/preflight-instances01.result.json": {
+      "bytes": 659,
+      "sha256": "b823d0f77aed28e482fd0d10533b8b7c8f0e9b0adbb40c4678498d0d5456b56c"
+    },
+    "vm20/preflight-instances01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-instances01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-disks01.result.json": {
+      "bytes": 655,
+      "sha256": "22465f8958967ce5e44271e4ca39ef514ae0ea53a7c17df604b74cc5e2142bef"
+    },
+    "vm20/preflight-disks01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-disks01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-addresses01.result.json": {
+      "bytes": 659,
+      "sha256": "62966516d86b109927ef020532ce2ca3098b07df33cfaa7989b71d29005b55d7"
+    },
+    "vm20/preflight-addresses01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "vm20/preflight-addresses01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "vm20/preflight-quota01.result.json": {
+      "bytes": 658,
+      "sha256": "95ee3b4063fe31a2c345700de640df7536f9e175d033af9176146df47a6203b8"
+    },
+    "vm20/preflight-quota01.stdout.log": {
+      "bytes": 11313,
+      "sha256": "b1bf827a1fe22cdaceda6a07540e16a0861fa8698bcc7abcef150ce74c93add2"
+    },
+    "vm20/preflight-quota01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "vm19/quota-review.md": {
+      "bytes": 3967,
+      "sha256": "b4265025da47e682fb72f5ee8cba12404a1cd9aff0625925da316e1fa96ade9f"
+    }
+  },
+  "reserve_executed": false,
+  "cloud_calls": 0,
+  "ledger_mutated": false
+}

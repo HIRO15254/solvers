@@ -1,0 +1,38 @@
+{
+  "schema": "r1.vm20-summary-check/v1",
+  "derivation": "VM19 to VM20 display and summary-schema label only; all validation/reader pins unchanged",
+  "parent": {
+    "bytes": 19334,
+    "sha256": "ade308151f0062cdad93678d1138def66291f376c7b3f8564fddbf351ede84c5"
+  },
+  "summary": {
+    "bytes": 19334,
+    "sha256": "2f0ba9a074cedbbedd3530996443bcf24021e4eb522b38418eaa579cbf2d26b4"
+  },
+  "guard": {
+    "bytes": 6035,
+    "sha256": "caebe96e76a7143e098f0178b34738064136f374222b806b40807c6a3ea3ba4f"
+  },
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\vm20\\summarize-profile.py",
+    "--self-test"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.10278930002823472,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 597,
+    "sha256": "66ff38648a7334ee640cc91a1227fd86ff099a28da4049524d7ee73fcd1930f6"
+  },
+  "guard_syntax_parsed": true,
+  "guard_execution": "not run; awaits real state32 and completed trusted reader report",
+  "new_api_calls": 0,
+  "native_or_archive_access": false
+}

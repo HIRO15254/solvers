@@ -1,0 +1,7 @@
+Running as unit: solvers-r1-vm20-posthoc.service; invocation ID: cf6dcd4379ee4d06b5b173be11e1af60
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 5.245s
+CPU time consumed: 3.582s
+Memory peak: 3.3M
+Memory swap peak: 0B

@@ -1,0 +1,87 @@
+{
+  "schema": "r1.vm20-posthoc-control-review/v1",
+  "recorded_at_utc": "2026-09-28T04:56:25.706171+00:00",
+  "reviewer": "/root/vm19_recovery_audit",
+  "status": "passed_static_review",
+  "scope": "Read-only audit of source and compact existing metadata; no new API, native execution, or archive read/decompression by reviewer. Runtime result is separate.",
+  "files": {
+    "posthoc-leaf.py": {
+      "bytes": 18949,
+      "sha256": "b3d128bd15ae6c0ca9bac70d2cdde9e92bfde68de75afdcb96e6959e840fed9e"
+    },
+    "recover-posthoc.sh": {
+      "bytes": 7319,
+      "sha256": "937285900acd4bad3b496ea8109e1d66d525f2d5ae2261b00d10cf4216c047e8"
+    },
+    "recover-posthoc-derivation.json": {
+      "bytes": 473,
+      "sha256": "c6a69380b1f9155a012f1eefa81036298c1a0a0dcf71a85a816c6dbede54a40b"
+    },
+    "recovery-syntax01.result.json": {
+      "bytes": 701,
+      "sha256": "5b230380d9a57b31309243673e17d632da5348c6c1b50fa80bb8025d9ff42415"
+    },
+    "recovery-syntax01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-syntax01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "partial-metadata01.result.json": {
+      "bytes": 743,
+      "sha256": "dae58f14afdf90f298385c8e9b98d1282945f469ec9fc9910de27a30c9eb944b"
+    },
+    "partial-metadata01.stdout.log": {
+      "bytes": 156633,
+      "sha256": "37ce59b6c491e1c00a438a0271f79ada6c1c216baa2a0b89aef7cafff72eb70f"
+    }
+  },
+  "recovery_delta": "Only an optional /opt/r1/flop-cpu-profile-posthoc01 input mapped to recovery/posthoc was added to the fixed VM19 archive script; normalized remainder byte-identical.",
+  "checks": {
+    "embedded_recovery_python_ast": true,
+    "posthoc_python_ast": true,
+    "cloud_bash_syntax_receipt_verified": true,
+    "original_script_dump_and_proof_not_overwritten_or_removed": true,
+    "exclusive_new_posthoc_directory": true,
+    "fixed_reader_and_runner_pins": true,
+    "fixed_vm20_instance_id": "2562385330130146252",
+    "original_failed_status_preserved": true,
+    "solver_or_perf_record_rerun": false,
+    "failed_child_supervisor_checked_without_completed_row_synthesis": true,
+    "canonical_state_fullstream_and_quality_bytes_checked": true,
+    "new_perf_commands_only": [
+      "script help",
+      "script leaf without demangling/inline/callchain rendering",
+      "script raw dump with same rendering flags",
+      "evlist -v"
+    ],
+    "original_inventory_and_perf_rehashed_after_decode": true,
+    "mismatch_forces_failed_report": true,
+    "unknown_leaf_retained_and_cfr_monotonic_clip": true,
+    "sample_census_loss_throttle_validation": true,
+    "cfr_clip_bracket_required": true,
+    "helper_per_command_timeout_seconds": 20,
+    "helper_work_alarm_seconds": 110,
+    "helper_rlimit_as_bytes": 2147483648,
+    "helper_hard_per_file_bytes": 16777216,
+    "successful_command_combined_output_limit_bytes": 16777216,
+    "failed_command_two_output_file_bound_bytes": 33554432,
+    "archive_plus_sidecars_limit_bytes": 268435456,
+    "archive_every_member_readback_and_hash_verified_on_cloud": true
+  },
+  "required_outer_conditions": [
+    "Run posthoc under root-confirmed120s/2GiB systemd unit with KillMode=control-group; final inventory/hash/publication occurs after work alarm cancellation.",
+    "Wait for helper and descendants to terminate before archiving; original recovery unit checks cover build/measurement only.",
+    "Keep original STOP and finite resource/transfer budget; no new record, solver, retry, or output-cap escalation.",
+    "If archive cap or readback fails, preserve originals and partial archive; do not label it complete or overwrite it."
+  ],
+  "not_claimed": [
+    "Actual posthoc success before execution",
+    "Full8-profile campaign completion or16-to32scaling",
+    "Convergence or external exploitability acceptance",
+    "Production optimization adoption",
+    "Guaranteed compressed archive fits256MiB"
+  ]
+}

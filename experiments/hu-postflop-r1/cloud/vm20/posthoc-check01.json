@@ -1,0 +1,26 @@
+{
+  "schema": "r1.vm20-posthoc-source-check/v1",
+  "source": {
+    "bytes": 18949,
+    "sha256": "b3d128bd15ae6c0ca9bac70d2cdde9e92bfde68de75afdcb96e6959e840fed9e"
+  },
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "experiments\\hu-postflop-r1\\cloud\\vm20\\posthoc-leaf.py",
+    "--self-test"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.13070760015398264,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 421,
+    "sha256": "39d3c8a7a9e8f9a48feca030aa774e2a40a16025e7533742aa5b9babc944a2ec"
+  },
+  "local_native_or_archive_or_cloud_calls": false
+}

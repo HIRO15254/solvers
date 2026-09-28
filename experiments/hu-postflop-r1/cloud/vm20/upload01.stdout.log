@@ -1,0 +1,4 @@
+deployment01.tar.gz       | 4 kB |   4.0 kB/s | ETA: 00:05:34 |   0%deployment01.tar.gz       | 120 kB | 120.0 kB/s | ETA: 00:00:10 |   8%deployment01.tar.gz       | 1340 kB | 1340.9 kB/s | ETA: 00:00:00 | 100%
+install.py                | 3 kB |   3.7 kB/s | ETA: 00:00:00 | 100%
+status.py                 | 2 kB |   2.4 kB/s | ETA: 00:00:00 | 100%
+split-on-cloud.py         | 2 kB |   2.3 kB/s | ETA: 00:00:00 | 100%

@@ -1,0 +1,8 @@
+test_leaf_period_unknown_and_cfr_clip (__main__.self_test.<locals>.Tests.test_leaf_period_unknown_and_cfr_clip) ... ok
+test_reject_chain_or_lost_line (__main__.self_test.<locals>.Tests.test_reject_chain_or_lost_line) ... ok
+test_reject_unbracketed (__main__.self_test.<locals>.Tests.test_reject_unbracketed) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

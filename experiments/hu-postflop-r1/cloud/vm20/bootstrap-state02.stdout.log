@@ -1,0 +1,6 @@
+2026-09-28T04:30:54+00:00
+Sep 28 04:30:55 solvers-r1-20260928-20 google_metadata_script_runner[1151]: startup-script exit status 0
+Sep 28 04:30:55 solvers-r1-20260928-20 google_metadata_script_runner[1151]: Finished running startup scripts.
+Sep 28 04:30:54 solvers-r1-20260928-20 systemd[1]: google-startup-scripts.service: Deactivated successfully.
+Sep 28 04:30:54 solvers-r1-20260928-20 systemd[1]: Finished google-startup-scripts.service - Google Compute Engine Startup Scripts.
+Sep 28 04:30:54 solvers-r1-20260928-20 systemd[1]: google-startup-scripts.service: Consumed 40.063s CPU time.

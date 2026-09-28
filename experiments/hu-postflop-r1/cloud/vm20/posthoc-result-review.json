@@ -1,0 +1,558 @@
+{
+  "schema": "r1.vm20-posthoc-result-review/v1",
+  "recorded_at_utc": "2026-09-28T05:06:08.754610+00:00",
+  "reviewer": "/root/vm19_recovery_audit",
+  "status": "single_existing_profile_metadata_arithmetic_transfer_and_cleanup_verified",
+  "scope": "Independent compact report/source/SDK receipt review. Raw perf decoding and full state streams validated on GCP; no API/native/archive work by this reviewer.",
+  "inputs": {
+    "posthoc01.stdout.log": {
+      "bytes": 177,
+      "sha256": "200041ea5fb585d7506d4c4cfe62b25887c9230ef03c95445387d135c655aa57"
+    },
+    "posthoc01.stderr.log": {
+      "bytes": 270,
+      "sha256": "bb6e8e3849bb42370770b5e4840a260a8f3ca4486908b9820c01a9dec2eaeb4c"
+    },
+    "posthoc01.result.json": {
+      "bytes": 981,
+      "sha256": "2472ce10de855a998ad56079e6610c082b79ae8110abc7121e31b6e9b2504cea"
+    },
+    "posthoc-quiescence01.stdout.log": {
+      "bytes": 45,
+      "sha256": "7d62454091f4230a47dffb72f488a95473b9655e689d06b3048537e852757304"
+    },
+    "posthoc-quiescence01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "posthoc-quiescence01.result.json": {
+      "bytes": 764,
+      "sha256": "ecb01326b5b17c2c75e97fc9358c70bfc0bd8686558b2dbccc429c11a33913f3"
+    },
+    "posthoc-report-download01.stdout.log": {
+      "bytes": 142,
+      "sha256": "f94bac92c0c35f4d6bcec2f89f80308b224103e2fbf199459302eb5c6d9fc6cc"
+    },
+    "posthoc-report-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "posthoc-report-download01.result.json": {
+      "bytes": 758,
+      "sha256": "ed971e2894971fc011c97db612bf2273b9378b29fefe98f61a4a59fec18d5bd4"
+    },
+    "partial-metadata01.stdout.log": {
+      "bytes": 156633,
+      "sha256": "37ce59b6c491e1c00a438a0271f79ada6c1c216baa2a0b89aef7cafff72eb70f"
+    },
+    "partial-metadata01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "partial-metadata01.result.json": {
+      "bytes": 743,
+      "sha256": "dae58f14afdf90f298385c8e9b98d1282945f469ec9fc9910de27a30c9eb944b"
+    },
+    "measure-status03.stdout.log": {
+      "bytes": 2421,
+      "sha256": "fc70c8069a7d1f44e715a71e8aead965b9955bbcef79d4e40a9090669950b475"
+    },
+    "measure-status03.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "measure-status03.result.json": {
+      "bytes": 703,
+      "sha256": "b509e1e1c894bc6072f54d7500db32e12f079d39bc91ff339a520542e517d515"
+    },
+    "archive-recovery01.stdout.log": {
+      "bytes": 253,
+      "sha256": "1a23fdfa53571b5d332cf8121760898a7126432c00bf18f6b5d18ac4ad46c1bc"
+    },
+    "archive-recovery01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "archive-recovery01.result.json": {
+      "bytes": 735,
+      "sha256": "74337ee24804f698902fe88a85e1b9a7fcdc388dfc5ae65aa90d635470cc8d5c"
+    },
+    "posthoc-report.json": {
+      "bytes": 43797,
+      "sha256": "f966862cf89a2c736816bb9611132d5d6204066402bc7f42e39132cda93d800e"
+    },
+    "posthoc-leaf.py": {
+      "bytes": 18949,
+      "sha256": "b3d128bd15ae6c0ca9bac70d2cdde9e92bfde68de75afdcb96e6959e840fed9e"
+    },
+    "posthoc-check01.json": {
+      "bytes": 706,
+      "sha256": "89d3837d28625c9cf7476f690dc59de1834c71576ef88f95af38f11bcfc8f99f"
+    },
+    "posthoc-control-review.json": {
+      "bytes": 4116,
+      "sha256": "96c30af880ec2e2fbe2f39384689819c5698d5ec46473c03b8dcf20d94b520f0"
+    },
+    "proof-download01.stdout.log": {
+      "bytes": 3454,
+      "sha256": "97f1e5339c65f2789cff0512ba49861f0dbb69d78b3624b19f195e02588c025e"
+    },
+    "proof-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "proof-download01.result.json": {
+      "bytes": 732,
+      "sha256": "8dd8ac48a75940308c0a00b782e1701e9a074512fb9877b823bcef7bc05b118e"
+    },
+    "recovery-receipt-download01.stdout.log": {
+      "bytes": 71,
+      "sha256": "75aa59c4803a97fed51afbf6a5044d70a9e1308fd984a91563ade34f3d43fe64"
+    },
+    "recovery-receipt-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-receipt-download01.result.json": {
+      "bytes": 732,
+      "sha256": "5f5cfcddc0b8c968f3886a4add7a6b4b3118497e689b7490a5c99492d7e5f3ab"
+    },
+    "sidecars-download01.stdout.log": {
+      "bytes": 214,
+      "sha256": "32b19d57200af769f2e4e71f3da4861dc59ab382ab38a813a456da52cc153696"
+    },
+    "sidecars-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sidecars-download01.result.json": {
+      "bytes": 734,
+      "sha256": "66d561479a6e0fdad7aec043f95a60b9eaa32d79f69de678bd231455ef94dc7b"
+    },
+    "split01.stdout.log": {
+      "bytes": 744,
+      "sha256": "29ecdb759e96579f233fec674c462d7f2150d8a54cc192908e16cc627054d4d7"
+    },
+    "split01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "split01.result.json": {
+      "bytes": 738,
+      "sha256": "d77561b4b1c06ef1d52bd09d429b87aadc543c0ed943465bbb03aca8e730b69b"
+    },
+    "delete01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "delete01.stderr.log": {
+      "bytes": 141,
+      "sha256": "06ab783494d863a599b3a00837677710d5104defc5ecade064aa60c79c4ea934"
+    },
+    "delete01.result.json": {
+      "bytes": 716,
+      "sha256": "38b42dabe520226c2ec819bb30d1d21a760c08fb5b075c7a20b047d179a9d0a5"
+    },
+    "disk-before-delete01.stdout.log": {
+      "bytes": 1821,
+      "sha256": "4f8ce53b04e6940235d15690957315ec721ef58139f2f397483e451ed960d2b4"
+    },
+    "disk-before-delete01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "disk-before-delete01.result.json": {
+      "bytes": 687,
+      "sha256": "ecf7239db5e9ab035fca22e6b1975d69e643490bcadabf75d6ab9afc096fa94f"
+    },
+    "cleanup-operations01.stdout.log": {
+      "bytes": 7806,
+      "sha256": "da3c4856946b12d6c61a95719454065999a3e61c6ed08db96395ca6db6274bf9"
+    },
+    "cleanup-operations01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cleanup-operations01.result.json": {
+      "bytes": 674,
+      "sha256": "c4f2762ac404f1b3cf455310c71e913b8dc30e1cd6e2b423e0fc4214c887284f"
+    },
+    "absence-instances01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-instances01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-instances01.result.json": {
+      "bytes": 659,
+      "sha256": "c9270eaf838791b5d8eae4e6627967593b295037a2569a0313524fb569d1e710"
+    },
+    "absence-disks01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-disks01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-disks01.result.json": {
+      "bytes": 655,
+      "sha256": "f84b16a28a7c029804f9fd609a9ce30e766bd2172638d36a8d36b4bbad72bdbe"
+    },
+    "absence-addresses01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-addresses01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-addresses01.result.json": {
+      "bytes": 659,
+      "sha256": "a8a65a9fae81f21e8d1751d4e9bc3f1508c79d6170ba481dea6979002b67582a"
+    },
+    "download-check.json": {
+      "bytes": 1113,
+      "sha256": "391b176211499a1f89c460fedcdd7b8dc6250474c90178baa78a76eb8a24300a"
+    },
+    "flop-cpu-profile-recovery01.json": {
+      "bytes": 253,
+      "sha256": "1a23fdfa53571b5d332cf8121760898a7126432c00bf18f6b5d18ac4ad46c1bc"
+    },
+    "flop-cpu-profile-proof01.tar.gz.manifest.json": {
+      "bytes": 273694,
+      "sha256": "b04abcaf21bdd334d1c9571ccd26b504b67b83c8940d2d2705af224984af30d8"
+    },
+    "flop-cpu-profile-proof01.tar.gz.sha256": {
+      "bytes": 98,
+      "sha256": "e2512433603f80de466d43ea124fdaa3f79ff9982656588f5ed5b73827b1a911"
+    },
+    "flop-cpu-profile-proof01.parts.sha256": {
+      "bytes": 424,
+      "sha256": "6841c9754523a18f41412325a89b1b51269101572ea0327ec08a5295ceb86741"
+    },
+    "create.receipt.json": {
+      "bytes": 1318,
+      "sha256": "a589ee50c47aac3904ca0a1ed8bfa8f6944e7adfdc50248e101036adad932204"
+    },
+    "reservation.json": {
+      "bytes": 1597,
+      "sha256": "e6921665326262d62e827e418756d84a762e81f8733649e8256877cb73a44364"
+    },
+    "state2-01.stdout.log": {
+      "bytes": 33045,
+      "sha256": "73624d20d8ba7b99f5a98a411a7fc70f95790c345160d881865c6e879af9f0fd"
+    },
+    "state32-01.stdout.log": {
+      "bytes": 33102,
+      "sha256": "b30537e4a3d52c10c299a03958772d29565b71613a215594bdf131fa08b19963"
+    },
+    "state2-recovery01.stdout.log": {
+      "bytes": 33102,
+      "sha256": "bb852077be30c48e1db1b153861f2a754e32d4e6513027a887c3905fc93e4109"
+    }
+  },
+  "campaign": {
+    "status": "failed",
+    "completed_stages": 3,
+    "completed_stage_kinds": [
+      "measurement perf preflight",
+      "narrow canonical",
+      "expanded canonical"
+    ],
+    "failed_profile": "narrow-r0-w16",
+    "failed_profile_child_completed": true,
+    "skipped_stages": 7,
+    "retained_manifest_present": false,
+    "performance_comparison": "not_evaluated",
+    "production_adoption": false
+  },
+  "posthoc": {
+    "status": "single_existing_profile_posthoc_validated",
+    "condition": {
+      "case": "narrow",
+      "workers": 16,
+      "round": 0,
+      "iterations": 64
+    },
+    "perf_input": {
+      "bytes": 1167196,
+      "sha256": "c2d8d4739d7c50bde2fc591b98cd82d24f0b1ab75db43308b817e26daddbef7e"
+    },
+    "binary": {
+      "bytes": 1388792,
+      "path": "/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe",
+      "sha256": "5e0e61d88bd40cac51979c4ace1fe20aacd2cef6cc233cd2a6c0a80cf5c94200"
+    },
+    "full_state": {
+      "bytes": 81414344,
+      "sha256": "8adfe1abed9baeb61828a035e557c4011ad33fadaf264b7746018172d59095d1"
+    },
+    "full_quality": {
+      "bytes": 670,
+      "sha256": "7af8b32289142b35c2d22087ceb22d998f55e7c4420418c74cc6b4d0142922f9"
+    },
+    "canonical_solves_verified": 2,
+    "original_inventory_files": 137,
+    "original_inventory_bytes": 301460126,
+    "original_inventory_verified_unchanged_on_cloud": true,
+    "new_solver_or_perf_record_runs": 0,
+    "systemd_runtime_seconds": 5.245,
+    "ended_and_quiescent": true
+  },
+  "arithmetic": {
+    "denominator": "All3687CFR-window physical-leaf samples includingunknowns; not all3892samples or known-only subtotal",
+    "cfr_samples": 3687,
+    "all_samples": 3892,
+    "outside_cfr_or_pid_filter": 205,
+    "cfr_period_sum": 38010307986,
+    "period_units_per_sample": 10309278,
+    "leaf_symbol_count": 61,
+    "sample_share_equals_period_share": true,
+    "unknown_samples": 717,
+    "unknown_fraction": "239/1229",
+    "exclusive_disjoint_groups": [
+      {
+        "label": "unknown libc leaf",
+        "exact_leaf_symbols": [
+          "[unknown] (/usr/lib/x86_64-linux-gnu/libc.so.6)"
+        ],
+        "samples": 717,
+        "period_sum": 7391752326,
+        "sample_share_fraction": "239/1229",
+        "sample_percent": 19.446704637917005,
+        "period_share_fraction": "239/1229"
+      },
+      {
+        "label": "PostflopEvaluator / TerminalEvaluator::eval",
+        "exact_leaf_symbols": [
+          "_RNvXs7_NtCs55Pa3lyLok9_6holdem8postflopNtB5_17PostflopEvaluatorNtNtCsdIIk8PxyAKR_6engine6solver17TerminalEvaluator4eval (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)"
+        ],
+        "samples": 583,
+        "period_sum": 6010309074,
+        "sample_share_fraction": "583/3687",
+        "sample_percent": 15.812313534038514,
+        "period_share_fraction": "583/3687"
+      },
+      {
+        "label": "holdem::kernel::compact_compat_sums",
+        "exact_leaf_symbols": [
+          "_RNvNtCs55Pa3lyLok9_6holdem6kernel19compact_compat_sums (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)"
+        ],
+        "samples": 558,
+        "period_sum": 5752577124,
+        "sample_share_fraction": "186/1229",
+        "sample_percent": 15.134255492270139,
+        "period_share_fraction": "186/1229"
+      },
+      {
+        "label": "engine::solver::cfr_pass",
+        "exact_leaf_symbols": [
+          "_RINvNtCsdIIk8PxyAKR_6engine6solver8cfr_passNtNtCs55Pa3lyLok9_6holdem8postflop17PostflopEvaluatorNtNtB4_7storage7F32ViewECs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)"
+        ],
+        "samples": 492,
+        "period_sum": 5072164776,
+        "sample_share_fraction": "164/1229",
+        "sample_percent": 13.344182262001627,
+        "period_share_fraction": "164/1229"
+      },
+      {
+        "label": "engine::storage::normalize_columns",
+        "exact_leaf_symbols": [
+          "_RNvNtCsdIIk8PxyAKR_6engine7storage17normalize_columns.llvm.10837699797065374691 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)"
+        ],
+        "samples": 259,
+        "period_sum": 2670103002,
+        "sample_share_fraction": "259/3687",
+        "sample_percent": 7.024681312720369,
+        "period_share_fraction": "259/3687"
+      },
+      {
+        "label": "crossbeam_epoch::with_handle specialization in rayon_core",
+        "exact_leaf_symbols": [
+          "_RINvNtCsdqcvwL2XED4_15crossbeam_epoch7default11with_handleNCNvB2_3pin0NtNtB4_5guard5GuardECsl5jAlkQcOtZ_10rayon_core (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)"
+        ],
+        "samples": 179,
+        "period_sum": 1845360762,
+        "sample_share_fraction": "179/3687",
+        "sample_percent": 4.8548955790615675,
+        "period_share_fraction": "179/3687"
+      },
+      {
+        "label": "kernel::__pv_queued_spin_lock_slowpath",
+        "exact_leaf_symbols": [
+          "__pv_queued_spin_lock_slowpath ([kernel.kallsyms])"
+        ],
+        "samples": 155,
+        "period_sum": 1597938090,
+        "sample_share_fraction": "155/3687",
+        "sample_percent": 4.203959858963927,
+        "period_share_fraction": "155/3687"
+      },
+      {
+        "label": "all other physical symbols; mixed work, not an overhead category",
+        "exact_leaf_symbols": [
+          "_RINvNtCsdqcvwL2XED4_15crossbeam_epoch7default11with_handleNCNvB2_3pin0NtNtB4_5guard5GuardECs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RINvNvMs2_NtCs40k4W9msRzi_5alloc7raw_vecINtB8_11RawVecInnerpE7reserve21do_reserve_and_handleNtNtBa_5alloc6GlobalECs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RINvNvMs2_NtCs40k4W9msRzi_5alloc7raw_vecINtB8_11RawVecInnerpE7reserve21do_reserve_and_handleNtNtBa_5alloc6GlobalECsdIIk8PxyAKR_6engine.llvm.10837699797065374691 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RINvNvNtNtCs8mwzgb7nc6f_5rayon4iter8plumbing24bridge_producer_consumer6helperINtNtB6_9enumerate17EnumerateProducerINtNtB6_3zip11ZipProducerINtNtB8_3vec13DrainProducermEIB2e_NtNtCsdIIk8PxyAKR_6engine7storage7F32ViewEEEINtNtB6_8map_with15MapInitConsumerINtNtNtB6_7collect8consumer15CollectConsumerINtNtCs40k4W9msRzi_5alloc3vec3VecfEENvMNtB2P_7scratchNtB5m_7Scratch3newNCINvNtB2P_6solver8cfr_passNtNtCs55Pa3lyLok9_6holdem8postflop17PostflopEvaluatorB2L_Es_0EECs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNCINvNtCsl5jAlkQcOtZ_10rayon_core4join12join_contextNCINvNvNtNtCs8mwzgb7nc6f_5rayon4iter8plumbing24bridge_producer_consumer6helperINtNtBY_9enumerate17EnumerateProducerINtNtBY_3zip11ZipProducerINtNtB10_3vec13DrainProducermEIB36_NtNtCsdIIk8PxyAKR_6engine7storage7F32ViewEEEINtNtBY_8map_with15MapInitConsumerINtNtNtBY_7collect8consumer15CollectConsumerINtNtCs40k4W9msRzi_5alloc3vec3VecfEENvMNtB3I_7scratchNtB6f_7Scratch3newNCINvNtB3I_6solver8cfr_passNtNtCs55Pa3lyLok9_6holdem8postflop17PostflopEvaluatorB3E_Es_0EE0NCBR_s_0INtB4X_13CollectResultB5C_EB8m_E0Cs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMNtCsl5jAlkQcOtZ_10rayon_core5sleepNtB2_5Sleep20wake_specific_thread.llvm.11887556918420257650 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMNtNtNtNtCsgczF5crJ4sT_3std3sys4sync5mutex5futexNtB2_5Mutex14lock_contended (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs1_NtCsdIIk8PxyAKR_6engine6solverINtB5_11ActionViewsNtNtB7_7storage7F32ViewE9split_forCs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs3_NtCs40k4W9msRzi_5alloc7raw_vecINtB5_6RawVecNtNtCsdIIk8PxyAKR_6engine7storage11StorageSpanE8grow_oneBQ_ (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs4_NtCs40k4W9msRzi_5alloc7raw_vecNtB5_11RawVecInner11finish_growCsdIIk8PxyAKR_6engine.llvm.10837699797065374691 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs5_NtCsdqcvwL2XED4_15crossbeam_epoch8internalNtB5_6Global11try_advance.llvm.17812587297356209916 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs8_NtCs38JfbbatTF6_15crossbeam_deque5dequeINtB5_7StealerNtNtCsl5jAlkQcOtZ_10rayon_core3job6JobRefE5stealB10_ (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs8_NtCsl5jAlkQcOtZ_10rayon_core8registryNtB5_12WorkerThread14take_local_job (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs8_NtCsl5jAlkQcOtZ_10rayon_core8registryNtB5_12WorkerThread14take_local_job.llvm.11887556918420257650 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs8_NtCsl5jAlkQcOtZ_10rayon_core8registryNtB5_12WorkerThread15wait_until_cold (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs8_NtCsl5jAlkQcOtZ_10rayon_core8registryNtB5_12WorkerThread9find_work.llvm.11887556918420257650 (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs_NtCsdIIk8PxyAKR_6engine4treeNtB4_10PublicTree10mapped_dim (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs_NtCsdIIk8PxyAKR_6engine4treeNtB4_10PublicTree14map_reach_into (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvMs_NtCsdIIk8PxyAKR_6engine4treeNtB4_10PublicTree17accumulate_values (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvXs2_NtCsl5jAlkQcOtZ_10rayon_core3jobINtB5_8StackJobNtNtB7_5latch9SpinLatchNCINvNvNtB7_4join12join_context6call_bINtNtNtNtCs8mwzgb7nc6f_5rayon4iter7collect8consumer13CollectResultINtNtCs40k4W9msRzi_5alloc3vec3VecfEENCINvNvNtB1W_8plumbing24bridge_producer_consumer6helperINtNtB1W_9enumerate17EnumerateProducerINtNtB1W_3zip11ZipProducerINtNtB1Y_3vec13DrainProducermEIB5p_NtNtCsdIIk8PxyAKR_6engine7storage7F32ViewEEEINtNtB1W_8map_with15MapInitConsumerINtB1S_15CollectConsumerB2T_ENvMNtB61_7scratchNtB7K_7Scratch3newNCINvNtB61_6solver8cfr_passNtNtCs55Pa3lyLok9_6holdem8postflop17PostflopEvaluatorB5X_Es_0EEs_0E0B1P_ENtB5_3Job7executeCs1AXPtoW92OM_22flop_cpu_profile_probe (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "_RNvXs6_NtCsdIIk8PxyAKR_6engine7storageNtB5_7F32ViewNtB5_11StorageView5split (/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe)",
+          "__futex_hash ([kernel.kallsyms])",
+          "__futex_wait ([kernel.kallsyms])",
+          "__lll_lock_wait_private (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "__lll_lock_wake_private (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "__raw_callee_save___pv_queued_spin_unlock ([kernel.kallsyms])",
+          "__sched_yield (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "__schedule ([kernel.kallsyms])",
+          "__x2apic_send_IPI_mask ([kernel.kallsyms])",
+          "__x64_sys_sched_yield ([kernel.kallsyms])",
+          "_raw_spin_lock ([kernel.kallsyms])",
+          "_raw_spin_unlock ([kernel.kallsyms])",
+          "_raw_spin_unlock_irqrestore ([kernel.kallsyms])",
+          "cfree (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "do_anonymous_page ([kernel.kallsyms])",
+          "do_futex ([kernel.kallsyms])",
+          "do_sched_yield ([kernel.kallsyms])",
+          "do_syscall_64 ([kernel.kallsyms])",
+          "do_user_addr_fault ([kernel.kallsyms])",
+          "futex_hash ([kernel.kallsyms])",
+          "futex_wait_setup ([kernel.kallsyms])",
+          "futex_wake_mark ([kernel.kallsyms])",
+          "malloc (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "mas_preallocate ([kernel.kallsyms])",
+          "native_write_msr ([kernel.kallsyms])",
+          "plist_add ([kernel.kallsyms])",
+          "plist_del ([kernel.kallsyms])",
+          "pv_native_safe_halt ([kernel.kallsyms])",
+          "realloc (/usr/lib/x86_64-linux-gnu/libc.so.6)",
+          "sched_balance_domains ([kernel.kallsyms])",
+          "schedule ([kernel.kallsyms])",
+          "smp_call_function_many_cond ([kernel.kallsyms])",
+          "uncharge_folio ([kernel.kallsyms])",
+          "x64_sys_call ([kernel.kallsyms])"
+        ],
+        "samples": 744,
+        "period_sum": 7670102832,
+        "sample_share_fraction": "248/1229",
+        "sample_percent": 20.179007323026852,
+        "period_share_fraction": "248/1229"
+      }
+    ]
+  },
+  "single_run_timing": {
+    "cfr_wall_seconds": 2.4318987610000002,
+    "cfr_cpu_seconds": 38.218711726,
+    "cpu_to_wall_ratio": 15.715585014848402,
+    "ratio_is_not_speedup": true
+  },
+  "failure_evidence": {
+    "script_stdout_bytes": 63286615,
+    "dump_stdout_bytes": 71438336,
+    "decoder_cap_bytes": 67108864,
+    "dump_exceeded_cap": true,
+    "proof_bytes": 301460126,
+    "proof_exceeded240mib": true,
+    "original_plain_outputs_retained": true
+  },
+  "limits": [
+    "Onlynarrow16workersN64round0; no32worker/expandedprofile/scalingcomparison.",
+    "Physical-symbol sample shares are not elapsed-time shares or removable overhead.",
+    "Rayon generic producer/join/job symbols can include inlinedsolverwork; none aggregated as all-Rayon overhead.",
+    "Unknownlibc717samples unclassified; not attributed to allocator/memcpy/memset/locks.",
+    "Kernelspin/scheduler leaves do not aloneidentify the causing applicationoperation.",
+    "No off-CPU/bandwidth/cache/callchain-completeness/convergence inference.",
+    "Same-input fullstate/quality identity is not externalquality or exploitability-target acceptance.",
+    "Cloud absence covers the recorded project/name-prefix queries at their timestamps, not unrelated resources or billing accounts."
+  ],
+  "archive": {
+    "bytes": 172135766,
+    "sha256": "7831f67fb0cf528aeae045ee185162414fdfe4e334f5be0bfabd1dbeee4f5f0c",
+    "payload_files": 645,
+    "embedded_manifest_files": 1,
+    "regular_members_total": 646,
+    "payload_bytes": 322416622,
+    "original_inventory_entries_matched": 137,
+    "posthoc_report_and_source_members_matched": true,
+    "retained_manifest_present": false,
+    "compressed_cap_bytes": 268435456,
+    "parts": [
+      {
+        "path": "flop-cpu-profile-proof01.part00",
+        "bytes": 50331648,
+        "sha256": "f4f5e36ed389d705cf4bb1620864ae371b8826a8688415cea4efbc0d6c0f5ec5"
+      },
+      {
+        "path": "flop-cpu-profile-proof01.part01",
+        "bytes": 50331648,
+        "sha256": "bd61ae9c49ee84dcb2006cb890c4c520abc3d55a3fb4c5a81b023525aaa8d816"
+      },
+      {
+        "path": "flop-cpu-profile-proof01.part02",
+        "bytes": 50331648,
+        "sha256": "8e93cc5351ae1525ce2b5ffaca6382012833a877a2cfa15e2214e8e3ec235757"
+      },
+      {
+        "path": "flop-cpu-profile-proof01.part03",
+        "bytes": 21140822,
+        "sha256": "5a325dbc4f3851c99e0390651b9a2e7e5e737eb948c1f076cc0162534d5aa303"
+      }
+    ],
+    "availability": "Four local parts exist at the paths above; source bytes and member inventory were verified on GCP and the concatenated transferred stream was hashed by root. This reviewer read only compact receipts/manifests and checked part sizes; no local archive decompression. The four parts are included for Git retention in the same change set; retain them with the compact manifest/hash receipts.",
+    "local_archive_decompression": false,
+    "download_check_seconds": 0.6407699999399483
+  },
+  "cleanup": {
+    "instance": "solvers-r1-20260928-20",
+    "instance_id": "2562385330130146252",
+    "boot_disk_id": "5203462124618404812",
+    "same_instance_machine_types": [
+      "e2-standard-2",
+      "e2-highcpu-32",
+      "e2-standard-2"
+    ],
+    "original_stop_utc": "2026-09-28T05:14:20+00:00",
+    "original_stop_unchanged": true,
+    "delete_done_utc": "2026-09-27T22:01:08.496000-07:00",
+    "delete_operation_id": "4620273976060693135",
+    "deletion_before_stop_seconds": 791.504,
+    "boot_disk_delete_requested": true,
+    "absence": {
+      "instances": {
+        "count": 0,
+        "checked_at_utc": "2026-09-28T05:02:06.787154+00:00",
+        "filter": "name~solvers-r1-"
+      },
+      "disks": {
+        "count": 0,
+        "checked_at_utc": "2026-09-28T05:02:05.469068+00:00",
+        "filter": "name~solvers-r1-"
+      },
+      "addresses": {
+        "count": 0,
+        "checked_at_utc": "2026-09-28T05:02:08.001102+00:00",
+        "filter": "name~solvers-r1-"
+      }
+    },
+    "disk_created_utc": "2026-09-27T21:29:24.114000-07:00",
+    "disk_retention_upper_bound_seconds": 1961.355068,
+    "cost_scope": "Usage/lifecycle evidence only; no invoice, exact charge, or automatic reservation release is asserted."
+  }
+}
