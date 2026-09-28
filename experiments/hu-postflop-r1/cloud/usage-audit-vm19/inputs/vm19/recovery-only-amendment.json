@@ -1,0 +1,53 @@
+{
+  "schema": "r1.vm19.recovery-only-amendment/v1",
+  "prepared_at_utc": "2026-09-28T04:04:34.390465+00:00",
+  "reason": "Original experiment window expired during interruption; preserve existing evidence only",
+  "instance_id": "6599180552829758403",
+  "machine_type": "e2-standard-2",
+  "maximum_recovery_starts": 1,
+  "recovery_stop_utc": "2026-09-28T04:14:34+00:00",
+  "maximum_recovery_runtime_seconds": 600,
+  "original_experiment_stop_utc": "2026-09-27T09:19:48Z",
+  "original_experiment_expired": true,
+  "build_or_solve_permitted": false,
+  "resize_permitted": false,
+  "disk_cleanup_deadline_utc": "2026-09-28T08:34:52.576000+00:00",
+  "reserved_usd_unchanged": 1.85,
+  "held_total_usd_unchanged": 39.95,
+  "actual_billed_usd": null,
+  "cost_components_exact_usd": {
+    "prior_any_authorized_e2": "43/75",
+    "recovery_12min_small_ceiling": "7/250",
+    "ipv4_55min": "11/4800",
+    "disk_20gib_24h": "411/6250",
+    "egress_512mib": "3/20",
+    "original_uncertainty": "1"
+  },
+  "cost_total_exact_usd": "363877/200000",
+  "cost_total_usd": 1.819385,
+  "current_state": {
+    "bytes": 33079,
+    "sha256": "fa9a850046ba9118d67ac8655ff6714ac5bf9458157aa42ad96a39cc1cd070b0"
+  },
+  "original_launch": {
+    "bytes": 1184,
+    "sha256": "415b77745da2310a04f705c92c704f10420b86a183b8e2dcede6a4c7022b7858"
+  },
+  "recovery_bootstrap": {
+    "bytes": 258,
+    "sha256": "d7be7cd1c8fb203a61b8bdb65dabbcf3df64501d4925ab7b02fe719bdb5ebde3"
+  },
+  "source": {
+    "bytes": 5196,
+    "sha256": "616d8213e35f8e4f6119cc94a9b587a391248ee5fb8b2730dea1296c1115e381"
+  },
+  "budget_before": {
+    "bytes": 90634,
+    "sha256": "6e29506c473dd8438f5aa5d7748a280c6f06a4bc689d5c5572768431c26b5e7d"
+  },
+  "cloud_started": false,
+  "budget_after": {
+    "bytes": 92775,
+    "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+  }
+}

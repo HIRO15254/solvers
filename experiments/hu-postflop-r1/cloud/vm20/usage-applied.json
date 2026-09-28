@@ -1,0 +1,161 @@
+{
+  "at_utc": "2026-09-28T04:25:14.763878+00:00",
+  "authorized_limit_usd": 40,
+  "held_before_usd": 39.95,
+  "held_after_usd": 37.3,
+  "restored_usd": 2.65,
+  "available_after_usd": 2.7,
+  "changes": [
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260927-15",
+      "old_reserved_usd": 2.0,
+      "new_reserved_usd": 1.7,
+      "restored_to_available_budget_usd": 0.3,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260927-14",
+      "old_reserved_usd": 1.9,
+      "new_reserved_usd": 1.7,
+      "restored_to_available_budget_usd": 0.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-13",
+      "old_reserved_usd": 1.6,
+      "new_reserved_usd": 1.4,
+      "restored_to_available_budget_usd": 0.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-12",
+      "old_reserved_usd": 1.8,
+      "new_reserved_usd": 1.7,
+      "restored_to_available_budget_usd": 0.1,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-11",
+      "old_reserved_usd": 1.8,
+      "new_reserved_usd": 1.6,
+      "restored_to_available_budget_usd": 0.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-10",
+      "old_reserved_usd": 1.8,
+      "new_reserved_usd": 1.6,
+      "restored_to_available_budget_usd": 0.2,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-09",
+      "old_reserved_usd": 1.6,
+      "new_reserved_usd": 1.5,
+      "restored_to_available_budget_usd": 0.1,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260926-08",
+      "old_reserved_usd": 3.0,
+      "new_reserved_usd": 2.2,
+      "restored_to_available_budget_usd": 0.8,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-followup-20260928/report.json",
+      "evidence_sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    },
+    {
+      "event": "usage_based_reservation_reconciliation",
+      "at": "2026-09-28T04:25:14.763878+00:00",
+      "id": "r1-20260927-19",
+      "old_reserved_usd": 1.85,
+      "new_reserved_usd": 1.3,
+      "restored_to_available_budget_usd": 0.55,
+      "evidence": "experiments/hu-postflop-r1/cloud/usage-audit-vm19/report.json",
+      "evidence_sha256": "803d7263f80f6c60d3132f7c4216577e382ac0de718a54cafc23ca7dc7790358",
+      "billed_usd": null,
+      "final_invoice": false,
+      "note": "Original uncertainty and transfer allowances retained. Missing Monitoring intervals remain unknown. VM19 overnight disk lifetime included."
+    }
+  ],
+  "budget_before": {
+    "bytes": 92775,
+    "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+  },
+  "evidence": {
+    "usage-followup-20260928/report.json": {
+      "bytes": 86786,
+      "sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d"
+    },
+    "usage-followup-20260928/validate.py": {
+      "bytes": 17614,
+      "sha256": "b69bd2c983d805b5dcf4e4b0aca0e73cfb214ffba6939e1737a126f45244e0b6"
+    },
+    "usage-audit-vm19/report.json": {
+      "bytes": 20592,
+      "sha256": "803d7263f80f6c60d3132f7c4216577e382ac0de718a54cafc23ca7dc7790358"
+    },
+    "usage-audit-vm19/analyze.py": {
+      "bytes": 15651,
+      "sha256": "a6c2963f58aa5d2bb4930590a70075552ef1392ab3bf11b1b7792896ec8a870d"
+    }
+  },
+  "application_source": {
+    "bytes": 5749,
+    "sha256": "f2c015e97107d6fe48488699c3dc9a62cb4fcf214350c9bbad031abc11d0c25c"
+  },
+  "billed_usd": null,
+  "final_invoice": false,
+  "cloud_mutations": false,
+  "archive_access": false,
+  "budget_after": {
+    "bytes": 106783,
+    "sha256": "590f4806730b7942b539fa62b0faea9c004461a14fd5135d469c20db311478c3"
+  }
+}

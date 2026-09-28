@@ -1,0 +1,1865 @@
+{
+  "schema": "r1.usage-followup-proposal/v1",
+  "source": {
+    "bytes": 17614,
+    "sha256": "b69bd2c983d805b5dcf4e4b0aca0e73cfb214ffba6939e1737a126f45244e0b6"
+  },
+  "ledger_observation": {
+    "bytes": 92775,
+    "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+  },
+  "rows": [
+    {
+      "vm": "08",
+      "instance_id": "1635613034982056517",
+      "launch_attempt": "2026-09-26T01:15:19.0365885+00:00",
+      "absence_verified": "2026-09-26T04:01:25.6238650Z",
+      "whole_minutes": 169,
+      "overlapping_high_minutes": 63,
+      "disk_minutes": 1440,
+      "disk_basis": "Full original24h disk allowance retained; earlier reconciliation lacks separate raw disk-ID record.",
+      "machine_scope": "Retained validator checks 2 -> 4 -> E2 highcpu32 and same E2 restart; predelete also E2 highcpu32. Whole life charged at4-vCPU rate plus overlapping32-vCPU window from plan before resize through absence. Both original1USD buffers retained.",
+      "monitoring": {
+        "available": true,
+        "points": 156,
+        "observed_sum": "117027329",
+        "first_start": "2026-09-26T01:15:00.001Z",
+        "last_end": "2026-09-26T04:01:00Z",
+        "internal_gaps_over_1ms": [
+          {
+            "from": "2026-09-26T02:06:00Z",
+            "to": "2026-09-26T02:11:00.001Z",
+            "seconds": "300.001",
+            "missing_usage": null
+          },
+          {
+            "from": "2026-09-26T03:02:00Z",
+            "to": "2026-09-26T03:04:00.001Z",
+            "seconds": "120.001",
+            "missing_usage": null
+          },
+          {
+            "from": "2026-09-26T03:31:00Z",
+            "to": "2026-09-26T03:34:00.001Z",
+            "seconds": "180.001",
+            "missing_usage": null
+          }
+        ],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.3943333333333333333333333334",
+        "overlapping_highcpu32_compute": "0.8311000320",
+        "whole_lifetime_ipv4": "0.007041666666666666666666666668",
+        "disk": "0.131520",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "2"
+      },
+      "modeled_total_usd": "3.663995032000000000000000000",
+      "held_before_usd": "4.50",
+      "proposed_hold_usd": "3.70",
+      "restore_usd": "0.80",
+      "margin_above_model_usd": "0.036004968000000000000000000",
+      "reservation_allocation_usd": {
+        "r1-20260926-08": "2.20",
+        "r1-20260926-08-scale32": "1.50"
+      }
+    },
+    {
+      "vm": "09",
+      "instance_id": "5775064646140191983",
+      "launch_attempt": "2026-09-26T14:43:07.2577428+00:00",
+      "absence_verified": "2026-09-26T15:38:37.2805183+00:00",
+      "whole_minutes": 58,
+      "overlapping_high_minutes": 0,
+      "disk_minutes": 58,
+      "disk_basis": "New 40GiB auto-delete boot disk requested in instance create; same disk name/URI and numeric ID at predelete, raw empty named disk inventory after same-ID delete. Launch-to-absence plus120s then whole-minute ceiling; no guessed creation timestamp.",
+      "machine_scope": "4-vCPU rounded regular rate over the entire lifecycle, including stopped intervals.",
+      "monitoring": {
+        "available": true,
+        "points": 53,
+        "observed_sum": "14447201",
+        "first_start": "2026-09-26T14:43:00.001Z",
+        "last_end": "2026-09-26T15:39:00Z",
+        "internal_gaps_over_1ms": [
+          {
+            "from": "2026-09-26T15:01:00Z",
+            "to": "2026-09-26T15:04:00.001Z",
+            "seconds": "180.001",
+            "missing_usage": null
+          }
+        ],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.1353333333333333333333333333",
+        "overlapping_highcpu32_compute": "0E-8",
+        "whole_lifetime_ipv4": "0.002416666666666666666666666667",
+        "disk": "0.005297333333333333333333333334",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.443047333333333333333333333",
+      "held_before_usd": "1.60",
+      "proposed_hold_usd": "1.50",
+      "restore_usd": "0.10",
+      "margin_above_model_usd": "0.056952666666666666666666667",
+      "reservation_allocation_usd": {
+        "r1-20260926-09": "1.50"
+      }
+    },
+    {
+      "vm": "10",
+      "instance_id": "9019841781761201633",
+      "launch_attempt": "2026-09-26T15:55:53.8409999+00:00",
+      "absence_verified": "2026-09-26T17:51:09.145691+00:00",
+      "whole_minutes": 118,
+      "overlapping_high_minutes": 0,
+      "disk_minutes": 118,
+      "disk_basis": "New 40GiB auto-delete boot disk requested in instance create; same disk name/URI and numeric ID at predelete, raw empty named disk inventory after same-ID delete. Launch-to-absence plus120s then whole-minute ceiling; no guessed creation timestamp.",
+      "machine_scope": "4-vCPU rounded regular rate over the entire lifecycle, including stopped intervals.",
+      "monitoring": {
+        "available": true,
+        "points": 109,
+        "observed_sum": "39790497",
+        "first_start": "2026-09-26T15:56:00.001Z",
+        "last_end": "2026-09-26T17:45:00Z",
+        "internal_gaps_over_1ms": [],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.2753333333333333333333333334",
+        "overlapping_highcpu32_compute": "0E-8",
+        "whole_lifetime_ipv4": "0.004916666666666666666666666668",
+        "disk": "0.01077733333333333333333333334",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.591027333333333333333333333",
+      "held_before_usd": "1.80",
+      "proposed_hold_usd": "1.60",
+      "restore_usd": "0.20",
+      "margin_above_model_usd": "0.008972666666666666666666667",
+      "reservation_allocation_usd": {
+        "r1-20260926-10": "1.60"
+      }
+    },
+    {
+      "vm": "11",
+      "instance_id": "570856080701499920",
+      "launch_attempt": "2026-09-26T18:54:51.7007926+00:00",
+      "absence_verified": "2026-09-26T20:17:20.111820+00:00",
+      "whole_minutes": 85,
+      "overlapping_high_minutes": 0,
+      "disk_minutes": 85,
+      "disk_basis": "New 40GiB auto-delete boot disk requested in instance create; same disk name/URI and numeric ID at predelete, raw empty named disk inventory after same-ID delete. Launch-to-absence plus120s then whole-minute ceiling; no guessed creation timestamp.",
+      "machine_scope": "4-vCPU rounded regular rate over the entire lifecycle, including stopped intervals.",
+      "monitoring": {
+        "available": true,
+        "points": 82,
+        "observed_sum": "70360127",
+        "first_start": "2026-09-26T18:55:00.001Z",
+        "last_end": "2026-09-26T20:17:00Z",
+        "internal_gaps_over_1ms": [],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.1983333333333333333333333334",
+        "overlapping_highcpu32_compute": "0E-8",
+        "whole_lifetime_ipv4": "0.003541666666666666666666666668",
+        "disk": "0.007763333333333333333333333335",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.509638333333333333333333333",
+      "held_before_usd": "1.80",
+      "proposed_hold_usd": "1.60",
+      "restore_usd": "0.20",
+      "margin_above_model_usd": "0.090361666666666666666666667",
+      "reservation_allocation_usd": {
+        "r1-20260926-11": "1.60"
+      }
+    },
+    {
+      "vm": "12",
+      "instance_id": "4952839753420870319",
+      "launch_attempt": "2026-09-26T20:34:03.5069532+00:00",
+      "absence_verified": "2026-09-26T20:47:41.047498+00:00",
+      "whole_minutes": 16,
+      "overlapping_high_minutes": 0,
+      "disk_minutes": 16,
+      "disk_basis": "New 40GiB auto-delete boot disk requested in instance create; same disk name/URI and numeric ID at predelete, raw empty named disk inventory after same-ID delete. Launch-to-absence plus120s then whole-minute ceiling; no guessed creation timestamp.",
+      "machine_scope": "Whole lifecycle retains original higher N2 fallback ceiling1.15/h, including initial4CPU phase and stopped intervals. Running record shows E2 highcpu32; predelete query omitted machineType so no actual-machine price reduction is used.",
+      "monitoring": {
+        "available": true,
+        "points": 12,
+        "observed_sum": "6951318",
+        "first_start": "2026-09-26T20:34:00.001Z",
+        "last_end": "2026-09-26T20:47:00Z",
+        "internal_gaps_over_1ms": [
+          {
+            "from": "2026-09-26T20:38:00Z",
+            "to": "2026-09-26T20:39:00.001Z",
+            "seconds": "60.001",
+            "missing_usage": null
+          }
+        ],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.3066666666666666666666666667",
+        "overlapping_highcpu32_compute": "0E-8",
+        "whole_lifetime_ipv4": "0.0006666666666666666666666666668",
+        "disk": "0.001461333333333333333333333334",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.608794666666666666666666667",
+      "held_before_usd": "1.80",
+      "proposed_hold_usd": "1.70",
+      "restore_usd": "0.10",
+      "margin_above_model_usd": "0.091205333333333333333333333",
+      "reservation_allocation_usd": {
+        "r1-20260926-12": "1.70"
+      }
+    },
+    {
+      "vm": "13",
+      "instance_id": "6526324704760165755",
+      "launch_attempt": "2026-09-26T22:47:45.4539527+00:00",
+      "absence_verified": "2026-09-26T23:16:40.762086+00:00",
+      "whole_minutes": 31,
+      "overlapping_high_minutes": 0,
+      "disk_minutes": 31,
+      "disk_basis": "New 40GiB auto-delete boot disk requested in instance create; same disk name/URI and numeric ID at predelete, raw empty named disk inventory after same-ID delete. Launch-to-absence plus120s then whole-minute ceiling; no guessed creation timestamp.",
+      "machine_scope": "4-vCPU rounded regular rate over the entire lifecycle, including stopped intervals.",
+      "monitoring": {
+        "available": true,
+        "points": 29,
+        "observed_sum": "29321558",
+        "first_start": "2026-09-26T22:47:00.001Z",
+        "last_end": "2026-09-26T23:16:00Z",
+        "internal_gaps_over_1ms": [],
+        "unobserved_usage": null
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.07233333333333333333333333334",
+        "overlapping_highcpu32_compute": "0E-8",
+        "whole_lifetime_ipv4": "0.001291666666666666666666666667",
+        "disk": "0.002831333333333333333333333334",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.376456333333333333333333333",
+      "held_before_usd": "1.60",
+      "proposed_hold_usd": "1.40",
+      "restore_usd": "0.20",
+      "margin_above_model_usd": "0.023543666666666666666666667",
+      "reservation_allocation_usd": {
+        "r1-20260926-13": "1.40"
+      }
+    },
+    {
+      "vm": "14",
+      "instance_id": "5878531675315846175",
+      "launch_attempt": "2026-09-27T02:43:56.2823865+00:00",
+      "absence_verified": "2026-09-27T03:29:01.189918+00:00",
+      "whole_minutes": 48,
+      "overlapping_high_minutes": 21,
+      "disk_minutes": 48,
+      "disk_basis": "Creation attached URI + predelete disk numeric ID/URI and sole instance user + same-ID successful delete and raw empty inventory; unchanged prior launch-to-absence bound",
+      "machine_scope": "Prior validator checks successful same-ID E2-only 2 -> 32 -> 2 lifecycle; small rate covers entire life and high window overlaps.",
+      "monitoring": {
+        "observed_sent_bytes": 126925818,
+        "points": 36,
+        "internal_gaps": [
+          {
+            "seconds": "60.001",
+            "unknown_bytes": null
+          },
+          {
+            "seconds": "240.001",
+            "unknown_bytes": null
+          }
+        ],
+        "unobserved_edge_and_gap_bytes": null,
+        "known_verified_compressed_download_bytes": 120465345,
+        "allowance_gib": 1,
+        "accounting_scope": "Verified compressed archive plus every captured SCP attempt; Monitoring includes traffic beyond archive; sidecars/SSH/retries not exact total",
+        "captured_scp_attempts": [
+          {
+            "path": "vm14/analysis-download01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/analysis-download02.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/analysis-helper-upload01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/analysis-helper-upload02.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/analyzer-upload01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/checker-history01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/checkers-upload01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/checkers-upload02.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/original-supervisor01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/recovery-download01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/recovery-helper-upload01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/recovery-manifest01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm14/recovery-metadata01.result.json",
+            "exit_code": 1
+          },
+          {
+            "path": "vm14/upload01.result.json",
+            "exit_code": 0
+          }
+        ],
+        "unobserved_bytes_not_assumed_zero": true,
+        "formal_traffic_bound": false
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.053609136",
+        "overlapping_highcpu32_compute": "0.2770333440",
+        "whole_lifetime_ipv4": "0.00200",
+        "disk": "0.0043840",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.6370264800",
+      "held_before_usd": "1.90",
+      "proposed_hold_usd": "1.70",
+      "restore_usd": "0.20",
+      "margin_above_model_usd": "0.0629735200",
+      "reservation_allocation_usd": {
+        "r1-20260927-14": "1.70"
+      }
+    },
+    {
+      "vm": "15",
+      "instance_id": "5437217996035927118",
+      "launch_attempt": "2026-09-27T03:50:53.9385733+00:00",
+      "absence_verified": "2026-09-27T04:30:14.609367+00:00",
+      "whole_minutes": 42,
+      "overlapping_high_minutes": 26,
+      "disk_minutes": 42,
+      "disk_basis": "Creation attached URI + predelete disk numeric ID/URI and sole instance user + same-ID successful delete and raw empty inventory; unchanged prior launch-to-absence bound",
+      "machine_scope": "Prior validator checks successful same-ID E2-only 2 -> 32 -> 2 lifecycle; small rate covers entire life and high window overlaps.",
+      "monitoring": {
+        "observed_sent_bytes": 133433063,
+        "points": 36,
+        "internal_gaps": [
+          {
+            "seconds": "60.001",
+            "unknown_bytes": null
+          },
+          {
+            "seconds": "60.001",
+            "unknown_bytes": null
+          }
+        ],
+        "unobserved_edge_and_gap_bytes": null,
+        "known_verified_compressed_download_bytes": 127275647,
+        "allowance_gib": 1,
+        "accounting_scope": "Verified compressed archive plus every captured SCP attempt; Monitoring includes traffic beyond archive; sidecars/SSH/retries not exact total",
+        "captured_scp_attempts": [
+          {
+            "path": "vm15/analysis-download01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm15/analysis-upload01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm15/download-manifest01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm15/download-parts01.result.json",
+            "exit_code": 0
+          },
+          {
+            "path": "vm15/upload01.result.json",
+            "exit_code": 0
+          }
+        ],
+        "unobserved_bytes_not_assumed_zero": true,
+        "formal_traffic_bound": false
+      },
+      "network_missing_usage_unknown": true,
+      "network_formal_cap_proven": false,
+      "network_allowance_gib": 1,
+      "costs_usd": {
+        "whole_lifetime_compute": "0.046907994",
+        "overlapping_highcpu32_compute": "0.3429936640000000000000000000",
+        "whole_lifetime_ipv4": "0.00175",
+        "disk": "0.0038360",
+        "unchanged_one_gib_network_allowance": "0.30",
+        "unchanged_original_uncertainty": "1"
+      },
+      "modeled_total_usd": "1.695487658000000000000000000",
+      "held_before_usd": "2.00",
+      "proposed_hold_usd": "1.70",
+      "restore_usd": "0.30",
+      "margin_above_model_usd": "0.004512342000000000000000000",
+      "reservation_allocation_usd": {
+        "r1-20260927-15": "1.70"
+      }
+    }
+  ],
+  "input_pins": {
+    "experiments/hu-postflop-r1/cloud/billing-observation-20260927-0220.json": {
+      "bytes": 4487,
+      "sha256": "1ce771d54086dbc59a7314a2992a463507d07694c8853229cb6cf061faf27b85"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/addresses-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/disks-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/instances-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/operations.json": {
+      "bytes": 485,
+      "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/reconciliation.json": {
+      "bytes": 343,
+      "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm06/verified-target.json": {
+      "bytes": 676,
+      "sha256": "b4e19104c9c6897f490fef056b157e6fec015e7cf53e147e351076e2e0c94db1"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/addresses-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/disks-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/instances-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/operations.json": {
+      "bytes": 904,
+      "sha256": "9dac1c27c6c0072b2e8c1fefefae7ab8758e1d004c15670a15eb4c4a8813354a"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/reconciliation.json": {
+      "bytes": 544,
+      "sha256": "4a69df1dcee04cd3e9e5df26880aa6158e561593cf937dba10a693cee43342d3"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm07/verified-target.json": {
+      "bytes": 767,
+      "sha256": "c3fc20bcb602292e05fbad90af386dc6d1cb96099cf868b4a0cc507191ad24a2"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm08/predelete.json": {
+      "bytes": 914,
+      "sha256": "fc5918fdcb62974a9f9010551bbf2783ce476db3e583f3138872a8b9de4a4bcb"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm08/reconciliation.json": {
+      "bytes": 1250,
+      "sha256": "79d4301afe012980b037c0cecb6e059793bea0d58cf2f5729bc9893552777147"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/addresses-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/delete-operations-after.json": {
+      "bytes": 905,
+      "sha256": "68a16e08621a34bc0635e9495606b2ff129040475c2f0fdb5247e9cd0b49f15d"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/disk-before.json": {
+      "bytes": 448,
+      "sha256": "9bbe9d0bcc3fd9d342c8782e55aa9a63123388fb5e7c9d5d3c693d8ff4ae76ea"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/disks-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/instances-after.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm10/reconciliation.json": {
+      "bytes": 3877,
+      "sha256": "f4eefc7ea203045805a3f2b251901ef8e99e3ef77d095ab1a3c95423d714531c"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/addresses-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "94b39e5f8bfd05c41df35d67f5d3f4888f54ca99335353d11248246cd1c7b24e"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/disks-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/instances-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm11/run01/reconciliation.json": {
+      "bytes": 19627,
+      "sha256": "ee5e2396a0c1d1251d2d8970bf0cf03bdac76f81eaf987e24131fc176e54468f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/addresses-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "77ef32e8661ded1463f012221f42a413524d787353eb84e0e59a251ec0acb14f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/disks-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/instance-before.stdout.log": {
+      "bytes": 30708,
+      "sha256": "ffa2f385551b1c91af3701cb2739f70748397ca6798068b011086de690c8bb38"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/instances-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm12/run01/reconciliation.json": {
+      "bytes": 14461,
+      "sha256": "f81c73c2353000355a419de2917222f664475b483512293643a977b7c5f8d28f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/addresses-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/disk-before.stdout.log": {
+      "bytes": 524,
+      "sha256": "447c4cf58b6b14ed4ccf50a3826410a8e94be40ae762e4ba950d86128fb23ae4"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/disks-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/instance-before.stdout.log": {
+      "bytes": 30708,
+      "sha256": "d8583a334d4defe9332ccc17cc8c2f0d0ebc8b0b09c7bb785ad1eb08f9696127"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/instances-after.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/cleanup-vm13/run01/reconciliation.json": {
+      "bytes": 16396,
+      "sha256": "590535ddc8d45ca090ef832016f7a2274bd232d0f09acd1e3252c616461f09bc"
+    },
+    "experiments/hu-postflop-r1/cloud/cost-audit-20260925/audit.json": {
+      "bytes": 15512,
+      "sha256": "90b6b49e3e22fa74dd5c114fa085d6c539289a76dc2f2c68f7e4e3130ce0b2da"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-06.json": {
+      "bytes": 735,
+      "sha256": "eaa050d79f4f3d696f11cbf4dd279a4e31d43adc6042dd3eebaa33b50003b253"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-07.json": {
+      "bytes": 30180,
+      "sha256": "611ca7b526eb5e10acf268acd7ba45aa2a95615fac67f579069a1b0518c41ab4"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-08.json": {
+      "bytes": 30180,
+      "sha256": "cac3015bd5d0915c9908992123086395809e9d95a01e89139b015557c4fa67d4"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-09.json": {
+      "bytes": 30180,
+      "sha256": "800f0df37cf231d3da0a0f7579cfdb0f118d460631e85cd1ab4850632fdad9f7"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-10.json": {
+      "bytes": 30180,
+      "sha256": "969cc76aef66b2aab8d9928927c1cdb0cdbf4af885c7707cc13cbda3aa8aafb8"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-11.json": {
+      "bytes": 30179,
+      "sha256": "18c8744425db625ed8eaa5801fa444d514d4da8ce676ffee7a797a16b36af854"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-12.json": {
+      "bytes": 30180,
+      "sha256": "f074bdcc6a0d34e4c3fa5646fa7fd3128462acf005e220fbbf6d79a7501f3b82"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260926-13.json": {
+      "bytes": 30180,
+      "sha256": "35dec09e11c32d8ef60e81543df0267b1bf81a66cca2df0026158c8c89f50bc9"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260927-14.json": {
+      "bytes": 30180,
+      "sha256": "914ce5b044f20c7f82468a23a7e3a68a6a6ce8d3d37a31435b377404d9a59b50"
+    },
+    "experiments/hu-postflop-r1/cloud/create-result-r1-20260927-15.json": {
+      "bytes": 30180,
+      "sha256": "cbff352aeb529bfbd6dc86c197c81585c94566dcb13b5830a9a474d5abc350a9"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260925-06.json": {
+      "bytes": 1091,
+      "sha256": "a6560bf77fd21d4089f3b7d2fcd64fb3469a4de66c90b49e44a2fa3b41877f64"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260925-07.json": {
+      "bytes": 1091,
+      "sha256": "32bc441fbe6a45bb53d12b455a79ab36fcbf72b63b3db47ea4bb524fe5fecaad"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-08.json": {
+      "bytes": 1091,
+      "sha256": "97b31879278097341f61fccb7510a498c0ccd2c0f455b30b0a7f71de1a68ae05"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-09.json": {
+      "bytes": 1091,
+      "sha256": "22b7f38d5e62c03d09015a032e9e2f242946cbb50be14d311839dbe92ef76302"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-10.json": {
+      "bytes": 1091,
+      "sha256": "de1d0268e5effa16d0b17aa31073a2b84453f4a0116fcdacc52fc03616378377"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-11.json": {
+      "bytes": 1091,
+      "sha256": "e34a44b36064ec6fdd555d2e9cb8e9db1f446863486bfc572960bc3b73f51957"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-12.json": {
+      "bytes": 1091,
+      "sha256": "1bfd207fd566c0c6ff0dbf8bd9d0f87ff15b600e937bd211f16f14d23e1b6cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260926-13.json": {
+      "bytes": 1091,
+      "sha256": "4d7ad1b7ffb119b03222600f31585189c63d68ea4ada410865e414b5bcbad54b"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260927-14.json": {
+      "bytes": 1091,
+      "sha256": "74a66c24c52304dd9614b681d54309e173c212493af3780458e73905d708cd6c"
+    },
+    "experiments/hu-postflop-r1/cloud/launch-r1-20260927-15.json": {
+      "bytes": 1091,
+      "sha256": "c8e10e7249ee619e5b78374feed8cf58ad5be71e39d9d05d57cf786a79f74943"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-highcpu-32-row.html": {
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-standard-4-header.html": {
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-standard-4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-e2-standard-4-row.html": {
+      "bytes": 739,
+      "sha256": "27d15a273c29ecc264b02b1eef346ded94c18b661df4022ab45088bf3b94f22c"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-n2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-n2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-compute-n2-highcpu-32-row.html": {
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-disk-balanced-header.html": {
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-disk-balanced-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-disk-balanced-row.html": {
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-asia-egress-header.html": {
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-asia-egress-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-asia-egress-row.html": {
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-spot-ipv4-header.html": {
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-spot-ipv4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-network-spot-ipv4-row.html": {
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm14/pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-highcpu-32-row.html": {
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-standard-2-header.html": {
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-standard-2-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-e2-standard-2-row.html": {
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-n2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-n2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-compute-n2-highcpu-32-row.html": {
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-disk-balanced-header.html": {
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-disk-balanced-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-disk-balanced-row.html": {
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-asia-egress-header.html": {
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-asia-egress-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-asia-egress-row.html": {
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-spot-ipv4-header.html": {
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-spot-ipv4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-network-spot-ipv4-row.html": {
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm16/pricing-sources.json": {
+      "bytes": 5660,
+      "sha256": "b8c3ec816fa0e3e6ee8008b7326d7df3d1dbd47b6d20677bc29dcfd302519da9"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-highcpu-32-row.html": {
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-standard-2-header.html": {
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-standard-2-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-e2-standard-2-row.html": {
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-n2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-n2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-compute-n2-highcpu-32-row.html": {
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-disk-balanced-header.html": {
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-disk-balanced-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-disk-balanced-row.html": {
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-asia-egress-header.html": {
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-asia-egress-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-asia-egress-row.html": {
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-spot-ipv4-header.html": {
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-spot-ipv4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-network-spot-ipv4-row.html": {
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "experiments/hu-postflop-r1/cloud/preflight-vm18/pricing-sources.json": {
+      "bytes": 5660,
+      "sha256": "7fa8bfbc95c945ee569aa5e3a9eb61ca68e98fd428b6691f9ea476ddf2b6754c"
+    },
+    "experiments/hu-postflop-r1/cloud/transfers.json": {
+      "bytes": 27655,
+      "sha256": "7681c48a4501203b73a84aa79068d9ee0a33a8d9f255f9b210cf6a5ce45e07eb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/budget-before.json": {
+      "bytes": 45258,
+      "sha256": "b90d468d5611c906c1fff1cd6292e1fcc3dd9cee212552d6cb73b90790ac2523"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-cost-bound-20260927/inputs.json": {
+      "bytes": 51238,
+      "sha256": "2cc0abe300982afaf6272e58fb769b6e98c465ee8bf60653767f52ae1af59153"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/acquisition.json": {
+      "bytes": 12210,
+      "sha256": "8695f84f478da1f655eaebb9d2061a289875d2b3afd78b76419caac3c8717272"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/analyze.py": {
+      "bytes": 10505,
+      "sha256": "51dfed0bec65f3a9090ae08f406b24072d05f92738fac93b268e3d2d07eba254"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/collect.py": {
+      "bytes": 6906,
+      "sha256": "a5c17833f9fdd36b82fa0ba90e66b04a400beda6b69291cd83d4d051ec344294"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/budget.json": {
+      "bytes": 53479,
+      "sha256": "879d774903285cc61f6d71591e4fa7ba9559063190d22eaa8bb5d66621e75701"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/cleanup-vm06/operations.json": {
+      "bytes": 485,
+      "sha256": "4ade5a438f501da78d2cad3715c46a98d9315cd4c66894cf77d0c1297a5250e0"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/cleanup-vm06/reconciliation.json": {
+      "bytes": 343,
+      "sha256": "5307789b96ce0a32b00830e7732cef7dc80a83ddd3eac2c8134a41d77b4ecb0f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/cleanup-vm07/operations.json": {
+      "bytes": 904,
+      "sha256": "9dac1c27c6c0072b2e8c1fefefae7ab8758e1d004c15670a15eb4c4a8813354a"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/cleanup-vm07/reconciliation.json": {
+      "bytes": 544,
+      "sha256": "4a69df1dcee04cd3e9e5df26880aa6158e561593cf937dba10a693cee43342d3"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/create-result-r1-20260925-02.json": {
+      "bytes": 634,
+      "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/create-result-r1-20260925-05.json": {
+      "bytes": 737,
+      "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/create-result-r1-20260925-06.json": {
+      "bytes": 735,
+      "sha256": "eaa050d79f4f3d696f11cbf4dd279a4e31d43adc6042dd3eebaa33b50003b253"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/create-result-r1-20260925-07.json": {
+      "bytes": 30180,
+      "sha256": "611ca7b526eb5e10acf268acd7ba45aa2a95615fac67f579069a1b0518c41ab4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/launch-r1-20260925-02.json": {
+      "bytes": 1093,
+      "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/launch-r1-20260925-05.json": {
+      "bytes": 1093,
+      "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/launch-r1-20260925-06.json": {
+      "bytes": 1091,
+      "sha256": "a6560bf77fd21d4089f3b7d2fcd64fb3469a4de66c90b49e44a2fa3b41877f64"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/launch-r1-20260925-07.json": {
+      "bytes": 1091,
+      "sha256": "32bc441fbe6a45bb53d12b455a79ab36fcbf72b63b3db47ea4bb524fe5fecaad"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/preempted-02.json": {
+      "bytes": 610,
+      "sha256": "245b31bcdb390ad0166293b61bbb6e52b8417cd3d49c27ee178a9440523f250f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/inputs/preempted-05.json": {
+      "bytes": 7246,
+      "sha256": "e2f74e8534a423baf02d7053c337de9c6e2cc784917287c80339ff87c1af9eef"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/report.json": {
+      "bytes": 11030,
+      "sha256": "36b445c0bf1f331ca2e9294951a0acd17fe03b9e8f75aa1bdbaeb5fa360036c2"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm02-sent-00.json": {
+      "bytes": 9305,
+      "sha256": "13e0a42f770dc5267131c14402bbea5d6485ca0dbd6d668984825c421285dd78"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm02-uptime-00.json": {
+      "bytes": 9506,
+      "sha256": "e14728e6f2ee812776415eebed2d441a7b6699a7eba9646c354d72bedb97e43d"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm05-sent-00.json": {
+      "bytes": 13540,
+      "sha256": "68e95a9e3cd70cf21a8aecf702c6c87964b37903e5de283820a7665a1e97a1ee"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm05-uptime-00.json": {
+      "bytes": 13563,
+      "sha256": "55fae0502cc1074b7baa035f8797f3242eb9706cc8bc4960ea23c223044b92fa"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm06-sent-00.json": {
+      "bytes": 20231,
+      "sha256": "e1e9c6c453e2d3ceea86318f6c868e51e3a0ec0a51c673cc677da3f5159b345c"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm06-uptime-00.json": {
+      "bytes": 20277,
+      "sha256": "1597eddc777198b856ee8440ec5e2e7a121511cb82a17aa70c8b8c9ed8f19b33"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm07-sent-00.json": {
+      "bytes": 9757,
+      "sha256": "39f2ebb7c47f0a4599498d1b30816bf72faa6ab7a5152512bd8b2fc8d3ba1cae"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-early-20260927/vm07-uptime-00.json": {
+      "bytes": 9869,
+      "sha256": "5cbdcadf92fe1728637a92fa913ec89eb4c03672731c44b7d5fcd1886fad0a13"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/analyze.py": {
+      "bytes": 19691,
+      "sha256": "e606ca5db2298a289912744ebef0ef323d33d9bf2fafca728b6cf83ab1ca3ab3"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/budget-before.json": {
+      "bytes": 72594,
+      "sha256": "8e28e34709452c791980f268ea44edd5f2bd2a14a1cc21eccdeb365d16549901"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-lifecycle-20260927/report02.json": {
+      "bytes": 55094,
+      "sha256": "814cc041fd1947eecfa53c2caf90d33632d8e280b26e66caa5a5ee573a487714"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/acquisition.json": {
+      "bytes": 20743,
+      "sha256": "a40d807434a7ac23105ee056f762d265d1536229599495d474fabec8cab11613"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/checks.json": {
+      "bytes": 6148,
+      "sha256": "e21d5c036098564bbc21e0c4de919311c35540d06e8c41c69aaabd670380099b"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/collect.py": {
+      "bytes": 8486,
+      "sha256": "048bf3945a49e1060d76115edd3cd1d5b4c747880d0e105c44e76058082bf125"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/inventory-check.json": {
+      "bytes": 2470,
+      "sha256": "386cf95de2b7137568649341cbdd42ebdb7966f997f00285d78c19e88570a112"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/usage.json": {
+      "bytes": 21273,
+      "sha256": "6819a17bc59c6fc1408b8ad68449b7dc37ae7109b157c52338b05ede4b005bb4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm08-sent-00.json": {
+      "bytes": 35421,
+      "sha256": "12e449bb515104378a32cbd52b691a3350944a22b46f2733ea95a868a160f1b5"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm08-uptime-00.json": {
+      "bytes": 35337,
+      "sha256": "f10c804e54daf19c6977579c13888bf49518096f7e005764ae19329571b0e9e9"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm09-sent-00.json": {
+      "bytes": 12413,
+      "sha256": "74cf7f3f15f2bce8fca8c6159b4e54fd8515f65149d36fda4b622d355f4aa0a5"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm10-sent-00.json": {
+      "bytes": 24863,
+      "sha256": "bc2871b5a818adbe83d8a43767215efd4f65273b310332f4e09580566ca7a6b8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm11-sent-00.json": {
+      "bytes": 18828,
+      "sha256": "48a190d9c52ac22438f0672d25b0f1569acc13ff242a977efab46653998e4f6a"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm12-sent-00.json": {
+      "bytes": 3276,
+      "sha256": "d2f1a192c667ef0e91ad7219cf0af6e5167f63a3e7a9504bbc588f41fbf38fec"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm13-sent-00.json": {
+      "bytes": 7068,
+      "sha256": "9d26a23e4eb0311eda970cef727e275c662f5ba752dc9b8b4fe5656ae90e8a0f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-reconcile-20260927/vm13-uptime-00.json": {
+      "bytes": 7102,
+      "sha256": "01908ccd406557483f4f550f449be0b70a2ab3528693b7c0caafdb6603b49d63"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/budget-before.json": {
+      "bytes": 66997,
+      "sha256": "0edcf9c5767d3c7a338b3feca29e8ca2c1e7f6e277337a9c9127f39f26e5c336"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/calculate.py": {
+      "bytes": 13320,
+      "sha256": "8835f1c31a002683dcbf04746ceebbce25743a69fd8375405504b36219070855"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/inputs.json": {
+      "bytes": 6947,
+      "sha256": "f5a28d0dde3aea47826469ee20f67ab2b7ef63b4fd17afaeef1a3f6623d4bb20"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm08-vm13-20260927/report.json": {
+      "bytes": 8526,
+      "sha256": "0fa5232f4b49fa2d0e1c638819cf043a15c430a710dd343d55142f03b0660382"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/acquisition.json": {
+      "bytes": 5297,
+      "sha256": "62b0abc2b67d76436376cf498bb016beab8402139efa59771ba0ed4be4cc05e4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/analyze.py": {
+      "bytes": 9659,
+      "sha256": "e6d7a13f10daa92c015e90bffad80ecb67be34f77bc6aadb0b8b73ce5da3dce7"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/collect.py": {
+      "bytes": 6572,
+      "sha256": "65abfafeb177e713a658c9f4a8d8c5fc659c5faaf27096b2388cae9a6dc671e3"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/budget.json": {
+      "bytes": 60746,
+      "sha256": "7bbc83114a2046978634cec69eeb7370324a3d5c580f9f70ac831d1a27e7c07b"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/create-result-r1-20260927-14.json": {
+      "bytes": 30180,
+      "sha256": "914ce5b044f20c7f82468a23a7e3a68a6a6ce8d3d37a31435b377404d9a59b50"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/launch-r1-20260927-14.json": {
+      "bytes": 1091,
+      "sha256": "74a66c24c52304dd9614b681d54309e173c212493af3780458e73905d708cd6c"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/preflight-vm14/draft.json": {
+      "bytes": 2008,
+      "sha256": "287913ebb23cf81b9d561a2124d80822107188206fcea405757f66445cf7c1cb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/preflight-vm14/pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/cleanup-operation01.stdout.log": {
+      "bytes": 905,
+      "sha256": "087b18278fa6edcf4c21fceeb2e907f832560132ddf0bbb2ac66b81b073db9a1"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/preemption01.stdout.log": {
+      "bytes": 969,
+      "sha256": "503db721090237d6664a429335ed541031c140d01045642de1627e667cab9430"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/reconciliation.json": {
+      "bytes": 1376,
+      "sha256": "d67e979f25caca2f48d5ade094f2160d4fe99f2d3e567ee149cca87b2e8da3b2"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/recovery-state01.stdout.log": {
+      "bytes": 1808,
+      "sha256": "d15600ba05c52d2f73b6a74e94d90b90a360631a5477087c0aacce3416340a11"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/resize-recovery01.result.json": {
+      "bytes": 776,
+      "sha256": "a41d8dfb0f0a897125096b433f07ab14e7aca2d4e59be646e0581aad41de9d00"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/resize01.result.json": {
+      "bytes": 739,
+      "sha256": "72937cf90cacbbb8d0960bf3cf1f5864f703a45882b4f7d00901a83b8c01eb0c"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/start-recovery01.result.json": {
+      "bytes": 729,
+      "sha256": "ba2b7b7db0aabcfe5bc3cd32693fd742091ba9c937b95587f08c365eb1521f3e"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/inputs/vm14/start32-01.result.json": {
+      "bytes": 729,
+      "sha256": "12859b87f173863c0b1130d0ff9543b004a2fb20fe297c0883fc36455fab2437"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/report.json": {
+      "bytes": 3673,
+      "sha256": "478ec20619bc52da09f0f691d9304aeae6e41b77d1c2da9539d6aea815e429cc"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/vm14-sent-00.json": {
+      "bytes": 8633,
+      "sha256": "ede7ee9e6a5d710f7672ae1c3162b44aab446ce04f6200959575ac99010fcd70"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm14-20260927/vm14-uptime-00.json": {
+      "bytes": 8713,
+      "sha256": "9fafaae1b009fe7b6a95d461c15b385794647ca0aecf40b043b572f0eb9f1aaa"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/acquisition.json": {
+      "bytes": 10009,
+      "sha256": "dbb837bc134c83bc57714d11301cb36ea02d85de41cff87314a743774f1a5965"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/analyze.py": {
+      "bytes": 10928,
+      "sha256": "48ac85a744744a7a2da3228120438026e9ab1e363374b007fe34512aee52fd8d"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/collect.py": {
+      "bytes": 7129,
+      "sha256": "56ccc31f6c3bf32478d7caef31682a04c19e32da07791d9f089e23ab552f4d6d"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/budget.json": {
+      "bytes": 61293,
+      "sha256": "3c1cf597028fdf47658c53e5ec2e04a4f3c6c4d2f044c9be68ef7d634bd37ebb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/create-result-r1-20260927-15.json": {
+      "bytes": 30180,
+      "sha256": "cbff352aeb529bfbd6dc86c197c81585c94566dcb13b5830a9a474d5abc350a9"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/launch-r1-20260927-15.json": {
+      "bytes": 1091,
+      "sha256": "c8e10e7249ee619e5b78374feed8cf58ad5be71e39d9d05d57cf786a79f74943"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/draft.json": {
+      "bytes": 2008,
+      "sha256": "287913ebb23cf81b9d561a2124d80822107188206fcea405757f66445cf7c1cb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-highcpu-32-row.html": {
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-standard-4-header.html": {
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-standard-4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-e2-standard-4-row.html": {
+      "bytes": 739,
+      "sha256": "27d15a273c29ecc264b02b1eef346ded94c18b661df4022ab45088bf3b94f22c"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-n2-highcpu-32-header.html": {
+      "bytes": 6156,
+      "sha256": "2fbd3aadfb24a3f16c23f4bdf60e9be00930e55b51b2efec38eda192a4836451"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-n2-highcpu-32-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-compute-n2-highcpu-32-row.html": {
+      "bytes": 730,
+      "sha256": "ee6561764f0a056da53bd80cec2e63fb31d5a7f4fe3c56120e0969bd6b67a5f9"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-disk-balanced-header.html": {
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-disk-balanced-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-disk-balanced-row.html": {
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-asia-egress-header.html": {
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-asia-egress-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-asia-egress-row.html": {
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-spot-ipv4-header.html": {
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-spot-ipv4-region.html": {
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-network-spot-ipv4-row.html": {
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/preflight-vm14/pricing-sources.json": {
+      "bytes": 4730,
+      "sha256": "9c7b5c6521022dcac2baea9e1dca91ce91ed6b5028f4f7077cd524ddf632164f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/cleanup-operation01.stdout.log": {
+      "bytes": 904,
+      "sha256": "6e81c7b9b4e7828678ae1649adf9cad8af01a1b2d3d8f329a86269df23e8228f"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/reconciliation.json": {
+      "bytes": 1387,
+      "sha256": "41c1800c04a6ddbacbcc1fb7946bb263f574f44d496aab15a32bc179bc47cab7"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/recovery-state01.stdout.log": {
+      "bytes": 466,
+      "sha256": "1b24f75aa28e9beb22729c56daa37ca31e893edbc9f9513a52e915c2f0cb9150"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/reservation.json": {
+      "bytes": 1731,
+      "sha256": "b3e9ef76faff5e284d5a3f8125c4431f67e8b066f9ac10eb5c8c036b68c8632b"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/resize-recovery01.result.json": {
+      "bytes": 739,
+      "sha256": "759499ab7eec2ed911731288cf10ea28775cfec9a5df1b2df7f71c818713dbad"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/resize01.result.json": {
+      "bytes": 739,
+      "sha256": "d4ed25e38c96495d6c6ec809a04867c4874086338dbca438840435ed1b515b54"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/start-recovery01.result.json": {
+      "bytes": 692,
+      "sha256": "65a0e3a0162aac92420a4a86ee25d953d05f12a1741631b160c3772693590033"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/start32-01.result.json": {
+      "bytes": 692,
+      "sha256": "354df748d57a69781bf9f1d455c3a0b847df3f0fffa024d54dd82ecf0d4c49e2"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/inputs/vm15/stop-for-recovery01.result.json": {
+      "bytes": 687,
+      "sha256": "24495d4d7274eb8921e41caae372f15ff2d418900f6a89847375581c9ac481bb"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/report.json": {
+      "bytes": 3713,
+      "sha256": "970a3ea2cfffb0dad3354f3f7e9e255f9dd340e9732e5d2f8ea647b2bf4157de"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/vm15-sent-00.json": {
+      "bytes": 8633,
+      "sha256": "03f25ce4695a02c9ad06c7e7dc6a97cd76d63eb452d86f3f992d0dda488fc22a"
+    },
+    "experiments/hu-postflop-r1/cloud/usage-vm15-20260927/vm15-uptime-00.json": {
+      "bytes": 8665,
+      "sha256": "91204967fa13b795881c9507fe606d44bd78a33387a3259864a4d15f0ac98360"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-machine-type.json": {
+      "bytes": 33010,
+      "sha256": "dbef81a0a25bd5a0a2398ca80f5eace79853c4f4cfc33c652aa5d4ef759eb41e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-plan.json": {
+      "bytes": 580,
+      "sha256": "1138b0c15b4f57c8186423784729397c7bde86238680f65f75ab8b503c5fd0ff"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-restart-description.json": {
+      "bytes": 1509,
+      "sha256": "0d7272d3c5ab0e601e60f4ec1874265fe88bfc14b46f91e6a73c322a40e0dcbd"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-scheduling.json": {
+      "bytes": 33010,
+      "sha256": "cd76b71673540d0e04adb1b0e34f3e0b2b2c220a41fd565207e9366219bce5b8"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-spot-stop.json": {
+      "bytes": 1491,
+      "sha256": "647df90d4b562c2fdde37f23b735fdeb9b0858012e7065e5ec684336a02a7558"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/scale32-start.json": {
+      "bytes": 33129,
+      "sha256": "5a18fb345ec5c197dfd3ade319ab718a07dcb4c4c08fe06c238c7fac6390689c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm08/start-resized.json": {
+      "bytes": 33120,
+      "sha256": "de72ff8449bbea4e288d6e082d0fecbd78dd31a7f9dd39b2f97e28780ae76a0f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm12/start32-01.stdout.log": {
+      "bytes": 33130,
+      "sha256": "2428f101f2e8bfa4d11f3d47d6c48117a26b3e33621c74434d67b11af4b98ba0"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download01.result.json": {
+      "bytes": 857,
+      "sha256": "545604b58d8b6125d8ab29f456cb0f7b7a3482b6743b135a7ea6e6a81f2cdc7a"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download01.stdout.log": {
+      "bytes": 142,
+      "sha256": "21306bfe2ca6b239dd25e28c98621ae4de05eba485265ca7d964e8874326191a"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download02.result.json": {
+      "bytes": 857,
+      "sha256": "d64acb1343253ffa0882d2b43dbf8937221e857a5d4187468b9f442e62559c29"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download02.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-download02.stdout.log": {
+      "bytes": 213,
+      "sha256": "052a304a3ea6f9aebd16175f0dae1c5df453f9520ce05674a0ec4d8a457b5ae7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload01.result.json": {
+      "bytes": 843,
+      "sha256": "3818bcb2cbb6ae07f90dffc88952efb3e47826681843bfcbefda9b3cc241b259"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload01.stdout.log": {
+      "bytes": 71,
+      "sha256": "0a17e95c2f9762718db5eefe2eb262f837572f96ab49e5170c43ff882e1277bf"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload02.result.json": {
+      "bytes": 845,
+      "sha256": "3688c7701924195c8a13558fe9c273c8cf7aab7b38daf883c91a27ddb2e80a56"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload02.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analysis-helper-upload02.stdout.log": {
+      "bytes": 71,
+      "sha256": "a7493bb3fdd395919fc93c7331c125523ca5f1c95ad1d043b0e6611c22c5b5dc"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analyzer-upload01.result.json": {
+      "bytes": 873,
+      "sha256": "e628770fbd8c67ba84bcb105d48de5275670ec44d050f978ad76b8501da0d893"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analyzer-upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/analyzer-upload01.stdout.log": {
+      "bytes": 141,
+      "sha256": "b2e556505bb406894c99d289c0ce4e0df7b399febb9eef4161585299a66aed7c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checker-history01.result.json": {
+      "bytes": 961,
+      "sha256": "ea4b1e3c683a36e40780ade38d59e18b19c3a659ffa3a39df3d022bb30a4857d"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checker-history01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checker-history01.stdout.log": {
+      "bytes": 72,
+      "sha256": "59ca99920ec1e62fe984dddde3cffc5e1c780e57ddee0a7381d42b6d29112496"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload01.result.json": {
+      "bytes": 925,
+      "sha256": "3a1b1c61227caf53a30eade5fd1a8d75e474f2b528e9c3a116dd4d84f3cd4ab2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload01.stdout.log": {
+      "bytes": 282,
+      "sha256": "fc011323f1932c74230767a4d07107b47cff292c60999fce24a8aee1e0c2e914"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload02.result.json": {
+      "bytes": 925,
+      "sha256": "4770edff27ad8afaeb1bde501eafef7bdf29689f639d6f3f827b889da152172e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload02.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/checkers-upload02.stdout.log": {
+      "bytes": 282,
+      "sha256": "fc011323f1932c74230767a4d07107b47cff292c60999fce24a8aee1e0c2e914"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-addresses-after01.result.json": {
+      "bytes": 608,
+      "sha256": "57f3d4a17af461d8002559214533b0b681ae59a72449b259e64047f08567da31"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-addresses-after01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-addresses-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disk-before01.result.json": {
+      "bytes": 711,
+      "sha256": "8d1813b77a6981f6d6a0d7e8e613652a523438331242fc78659d35bde59df260"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disk-before01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disk-before01.stdout.log": {
+      "bytes": 634,
+      "sha256": "07d67a75dab74c8325e33f429558e193072eda681dd77bbf1b085e0a5f2cfd36"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disks-after01.result.json": {
+      "bytes": 650,
+      "sha256": "e1d32b79e0b5a76c8840ab69635baac615178f220e36cd261c28d719577ffbf8"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disks-after01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-disks-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-instances-after01.result.json": {
+      "bytes": 654,
+      "sha256": "11b6679602c3bfb56a2e6f366eb7b0f0852abd5a917c216cbfb4d4904efadcac"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-instances-after01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-instances-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-operation01.result.json": {
+      "bytes": 682,
+      "sha256": "35dc384867c07d146eb2a92c5c8af6ca17dbf99b17117c9dc3925ccc86960f98"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-operation01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/cleanup-operation01.stdout.log": {
+      "bytes": 905,
+      "sha256": "087b18278fa6edcf4c21fceeb2e907f832560132ddf0bbb2ac66b81b073db9a1"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/download-check.json": {
+      "bytes": 911,
+      "sha256": "938c5c0d19fe0668d98ce2349e2f05904192bf23f47493595893dce7527f2239"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/original-supervisor01.result.json": {
+      "bytes": 909,
+      "sha256": "1d3676a5f64364b141fdfc087233845bda6c653df4a7fb01886450d23b8f4926"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/original-supervisor01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/original-supervisor01.stdout.log": {
+      "bytes": 71,
+      "sha256": "cb709d0c439ba7d093ee09757243a4ee6de5fa4d2cfaad158c5be218630a681e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/reconciliation.json": {
+      "bytes": 1376,
+      "sha256": "d67e979f25caca2f48d5ade094f2160d4fe99f2d3e567ee149cca87b2e8da3b2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-download01.result.json": {
+      "bytes": 855,
+      "sha256": "57fcb05cd84082ead2184bb108c0a3e8aa9c2607aeef59621f0c30ef00314625"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-download01.stdout.log": {
+      "bytes": 3826,
+      "sha256": "c7973e17905e1274ea4ca4019b046ba9af7999d60cb604279aecf9c7c5425167"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-helper-upload01.result.json": {
+      "bytes": 844,
+      "sha256": "1ec73f5d71f206af8a6c4c5bbd1b8c922c0f801986e6e978847173399db67cfb"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-helper-upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-helper-upload01.stdout.log": {
+      "bytes": 140,
+      "sha256": "666ae65ebf09e948add28a73e831360832231bd08f25e98aea2736337b705f07"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-manifest01.result.json": {
+      "bytes": 856,
+      "sha256": "e6b651c358257eeae750e7d736608dff4cbe1d2711e84b32e1835d4f25d886ef"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-manifest01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-manifest01.stdout.log": {
+      "bytes": 285,
+      "sha256": "a73718b47012c5d979f46162f777a7f6f673b1c02e2fea61c6e777a3b0c1291d"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-metadata01.result.json": {
+      "bytes": 1014,
+      "sha256": "a55f93c058000c8e5f9d49f5bbbd2ff9e935117baa9d464c223fd476b351b877"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-metadata01.stderr.log": {
+      "bytes": 353,
+      "sha256": "8d9e7670d099729e67ba79575734ac914344ac8777b02d1d585c0a882368523a"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/recovery-metadata01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize-recovery01.result.json": {
+      "bytes": 776,
+      "sha256": "a41d8dfb0f0a897125096b433f07ab14e7aca2d4e59be646e0581aad41de9d00"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize-recovery01.stderr.log": {
+      "bytes": 141,
+      "sha256": "bb8f16dfaa98fa14b91947d6812e54dc006430e694c4e5fedd487637b15eca11"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize-recovery01.stdout.log": {
+      "bytes": 524,
+      "sha256": "ce9d42847c9ffd4a999d99289d4a24cd84f091b60a5abb5d7d795d0e10abefbd"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize01.result.json": {
+      "bytes": 739,
+      "sha256": "72937cf90cacbbb8d0960bf3cf1f5864f703a45882b4f7d00901a83b8c01eb0c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize01.stderr.log": {
+      "bytes": 141,
+      "sha256": "bb8f16dfaa98fa14b91947d6812e54dc006430e694c4e5fedd487637b15eca11"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/resize01.stdout.log": {
+      "bytes": 33011,
+      "sha256": "3ece444936700806b4e9b9a8f5da3025054339e2a7c2b6be754c0082ef1027e0"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/stop-for-resize01.result.json": {
+      "bytes": 687,
+      "sha256": "847856ffcf8251d6db1e2d6c61ccd2b3e071d342b066b45df26d78ef91205b79"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/stop-for-resize01.stderr.log": {
+      "bytes": 467,
+      "sha256": "693f1fe16b1885dbf2eb7f8fd430622d53107594f504eb7b7639f06080facf08"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/stop-for-resize01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/upload01.result.json": {
+      "bytes": 935,
+      "sha256": "c956c466518459e7e146e176c7ff3791192a0dc687cb7936370a8e68c7798b21"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm14/upload01.stdout.log": {
+      "bytes": 357,
+      "sha256": "3a6f079e4f4ae25e50953d9b3bff2f624f7cecbfe4fec9f0b1f65deb53aa9deb"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-download01.result.json": {
+      "bytes": 870,
+      "sha256": "8af8b89a3c4a6402d0164cfb0a85641ad23ca823d35f7d71bc959f3b197d9792"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-download01.stdout.log": {
+      "bytes": 568,
+      "sha256": "6c32c9418e9a454fb6a869a709668eebaf8522eca061e07906e158624e533965"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-upload01.result.json": {
+      "bytes": 928,
+      "sha256": "76e8ec05f466ded291c52fb1be92c8bfdf8835ddc0ea5438c0fba7b4244baaaf"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/analysis-upload01.stdout.log": {
+      "bytes": 212,
+      "sha256": "5bf1e69eab062915df551210a403b616017610025e7a5998aaf2d9e28a9fccfb"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-addresses-after01.result.json": {
+      "bytes": 642,
+      "sha256": "9111cc76bb32673db151aadaed61e81f6e3ab1198999a9d5cb0541d40972d33f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-addresses-after01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-addresses-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disk-before01.result.json": {
+      "bytes": 718,
+      "sha256": "a02f37ca0d65afb28523d4c78d2bb76ffe46bc8e391a4576fed7360b079bff7c"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disk-before01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disk-before01.stdout.log": {
+      "bytes": 656,
+      "sha256": "7dd4cd95717446ae86e9863d8d5bedb62252f626f3aaa6b34218ced7ab4503cf"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disks-after01.result.json": {
+      "bytes": 650,
+      "sha256": "939c6c8848de6c3e780f3d723185747b5d1072ac3db957a42ee2655caab0adda"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disks-after01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-disks-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-instances-after01.result.json": {
+      "bytes": 654,
+      "sha256": "9ea272f5b4219b01ea963425a706f179419bae1e7b4fd46549e6413e89fbc7d5"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-instances-after01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-instances-after01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-operation01.result.json": {
+      "bytes": 682,
+      "sha256": "8a2f5edeaf92d6d07862c8b171f3c9bce30b85db78af02dcec863b7508566762"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-operation01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/cleanup-operation01.stdout.log": {
+      "bytes": 904,
+      "sha256": "6e81c7b9b4e7828678ae1649adf9cad8af01a1b2d3d8f329a86269df23e8228f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-check.json": {
+      "bytes": 947,
+      "sha256": "4b9678349bd61bb6bd75cf0445bbeb3c55f655c8ef34b203e3ecff54140267e6"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-manifest01.result.json": {
+      "bytes": 858,
+      "sha256": "d935ba3e8f163143c1ae03580a491bbd4220766aee32f2a0ac2969f01d583c10"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-manifest01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-manifest01.stdout.log": {
+      "bytes": 214,
+      "sha256": "259aa5aef39135af455af3657f7e006a4a0daae13f6235ad2ddf418f16701c12"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-parts01.result.json": {
+      "bytes": 857,
+      "sha256": "b2d9319244fefb2c7978954ce181879598811295bfe284b2fdd5c30345aad5ac"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-parts01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/download-parts01.stdout.log": {
+      "bytes": 7043,
+      "sha256": "a4e38f815927a378d57cdda95a582cb78ccc7cb1701153aa54077a30a045e2ed"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/reconciliation.json": {
+      "bytes": 1387,
+      "sha256": "41c1800c04a6ddbacbcc1fb7946bb263f574f44d496aab15a32bc179bc47cab7"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize-recovery01.result.json": {
+      "bytes": 739,
+      "sha256": "759499ab7eec2ed911731288cf10ea28775cfec9a5df1b2df7f71c818713dbad"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize-recovery01.stderr.log": {
+      "bytes": 141,
+      "sha256": "fd48218285c2eb13709394424521bce8352fa2fca1097efef50db51ea3875a74"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize-recovery01.stdout.log": {
+      "bytes": 33011,
+      "sha256": "be971cc2e8018fd18deab72cb1609579a226884b1e8424d4323c17d2e7283116"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize01.result.json": {
+      "bytes": 739,
+      "sha256": "d4ed25e38c96495d6c6ec809a04867c4874086338dbca438840435ed1b515b54"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize01.stderr.log": {
+      "bytes": 141,
+      "sha256": "fd48218285c2eb13709394424521bce8352fa2fca1097efef50db51ea3875a74"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/resize01.stdout.log": {
+      "bytes": 33011,
+      "sha256": "d53e4ec9f461a4a255cd82e72c09e63185b45a5f878a9293fcd8026ca7fd5433"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/stop-for-resize01.result.json": {
+      "bytes": 687,
+      "sha256": "bec3f7f5d574878d115cfe168cd0b94abca3aa870e5fb34ce8a40c387ed3ab52"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/stop-for-resize01.stderr.log": {
+      "bytes": 467,
+      "sha256": "1521bcb1e6d1681651837a9f177cda0d42e9bc3f84d35d6c5d1e64e34b01ba02"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/stop-for-resize01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/upload01.result.json": {
+      "bytes": 949,
+      "sha256": "c4d170ec28bb5f081602e752a6571e111e3c9d7d214e8957c60e9898bfc40334"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/upload01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiments/hu-postflop-r1/cloud/vm15/upload01.stdout.log": {
+      "bytes": 355,
+      "sha256": "f572c8f273b82434789b8e5d919ea731dc9eee04f94a29f2f79f7aa3c45b54be"
+    },
+    "experiments/hu-postflop-r1/showdown-kernel/addresses-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/showdown-kernel/cleanup.json": {
+      "bytes": 269,
+      "sha256": "6eb1ada64302146fc129bb71348e0188aee08de41985cc7ac6dc8a42eb574bb3"
+    },
+    "experiments/hu-postflop-r1/showdown-kernel/disks-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/showdown-kernel/instances-after-delete.json": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "experiments/hu-postflop-r1/showdown-kernel/vm09-final-disk.json": {
+      "bytes": 1820,
+      "sha256": "b9afc6585b9f981645284add61b6faeaea1baf6ef80a2dfd28d302c4efa79b0a"
+    }
+  },
+  "summary": {
+    "authorized_usd": "40",
+    "held_before_usd": "39.95",
+    "restore_usd": "2.10",
+    "proposed_held_after_usd": "37.85",
+    "proposed_available_usd": "2.15"
+  },
+  "new_api_calls": 0,
+  "native_execution": false,
+  "archive_access": false,
+  "budget_changed": false,
+  "billed_usd": null,
+  "guaranteed_invoice_ceiling": false,
+  "limits": [
+    "Previously acquired usage and lifecycle only; no new tariff or usage acquisition is claimed.",
+    "Use regular E2 prices from official captured rows, no Spot discount or credits.",
+    "All original uncertainty and1GiB network allowances retained. Gaps and edges remain unknown, not zero.",
+    "Every lifetime includes stopped time and120s extra, rounded up to whole minutes; high windows overlap small-CPU coverage.",
+    "VM08 retains full24h disk; VM09-13 use new-boot-disk request through verified absence, not an invented creation timestamp.",
+    "VM02/05 untouched: historical raw disk-absence evidence is weaker.",
+    "Proposal only. Root must independently review and apply before funds become available."
+  ]
+}

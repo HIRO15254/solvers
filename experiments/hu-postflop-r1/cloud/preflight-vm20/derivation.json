@@ -1,0 +1,30 @@
+{
+  "schema": "r1.vm20-price-derivation/v1",
+  "changes": "Remove N2 rows; use local fresh sources and VM20 schema. Unchanged finite25s GET extraction. Derived code subject to later checks.",
+  "files": [
+    {
+      "source": "preflight-vm18/collect-pricing.py",
+      "source_bytes": 2077,
+      "source_sha256": "de5f3e9b68ca40a1d8e9e30b278d85d3f3c2052e1bbdc4bd3f81f8569aae4465",
+      "target": "collect-pricing.py",
+      "initial_bytes": 2030,
+      "initial_sha256": "633763ea02203d67b7b088de64476935e4649c9b3acff644ba1b04411afb8a6b"
+    },
+    {
+      "source": "preflight-vm18/collect-spot.py",
+      "source_bytes": 1054,
+      "source_sha256": "080a200a84c54150552e4e20bf56920f9c9cc17175fa4ac9f00a14166daf307a",
+      "target": "collect-spot.py",
+      "initial_bytes": 1003,
+      "initial_sha256": "5d13daaad637eda264623ab98f1b4931bcbb2ef133f56b9b5c80847f343da433"
+    },
+    {
+      "source": "vm19/cost-proposal.py",
+      "source_bytes": 6647,
+      "source_sha256": "abd25cc5b2b327438241092c6517a5d6f7b8b922aa6d80c78a29f4030de701f9",
+      "target": "cost-proposal.py",
+      "initial_bytes": 6587,
+      "initial_sha256": "2a48c4f1ae37dfb81a5100e3c84005e25454719f36352e3655315079e412f12c"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"status": "durable_transport_parts_verified", "archive_sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e", "parts": [{"path": "/opt/r1/flop-cpu-profile-proof01.part00", "bytes": 4668141, "sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e"}]}

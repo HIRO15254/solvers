@@ -1,0 +1,7 @@
+{
+  "status": "matched",
+  "instance_id": "6599180552829758403",
+  "termination_time": "2026-09-28T04:14:34Z",
+  "bootstrap_sha256": "d7be7cd1c8fb203a61b8bdb65dabbcf3df64501d4925ab7b02fe719bdb5ebde3",
+  "note": "JSON parsed without PowerShell automatic date conversion"
+}

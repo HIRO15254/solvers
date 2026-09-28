@@ -1,0 +1,405 @@
+{
+  "schema": "r1.vm19-cleanup-review/v1",
+  "recorded_at_utc": "2026-09-28T04:15:03.100444+00:00",
+  "reviewer": "/root/vm19_recovery_audit",
+  "status": "build_only_evidence_recovered_and_resources_absent",
+  "scope": "Independent offline metadata review; original build proof validated on GCP by fixed reader. No cloud API, native execution, or archive decompression in this review.",
+  "inputs": {
+    "resume-state01.stdout.log": {
+      "bytes": 33079,
+      "sha256": "fa9a850046ba9118d67ac8655ff6714ac5bf9458157aa42ad96a39cc1cd070b0"
+    },
+    "resume-state01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "resume-state01.result.json": {
+      "bytes": 692,
+      "sha256": "75105611363af4878e696cacd52bd905a0862c660e89fa722cdd713261fd7c21"
+    },
+    "disk-state01.stdout.log": {
+      "bytes": 1820,
+      "sha256": "e5d802124f1690875b83f1140088c74f6b1b77d49cfabab70d95f4ad6407a406"
+    },
+    "disk-state01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "disk-state01.result.json": {
+      "bytes": 687,
+      "sha256": "28bff4810d4484e33c5189c333f473b41ad8da2a7ad5f3618a79dcd6a0dbd651"
+    },
+    "recovery-bootstrap01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-bootstrap01.stderr.log": {
+      "bytes": 141,
+      "sha256": "a85a872e4e8a06a695f5562c2f6d44048a4309904e76c4880b4b0645a3ffd56d"
+    },
+    "recovery-bootstrap01.result.json": {
+      "bytes": 781,
+      "sha256": "a87e9dd477e95a03818d18ba4f1b5277bbd049f7198e9417912659df18e47db7"
+    },
+    "recovery-schedule01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-schedule01.stderr.log": {
+      "bytes": 141,
+      "sha256": "a85a872e4e8a06a695f5562c2f6d44048a4309904e76c4880b4b0645a3ffd56d"
+    },
+    "recovery-schedule01.result.json": {
+      "bytes": 797,
+      "sha256": "16f779432113f1e2bb7d25ca566c30aae3375375cee6421d1683e4c210f2bf64"
+    },
+    "recovery-start01.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-start01.stderr.log": {
+      "bytes": 378,
+      "sha256": "e61fda686699504210d3ea240700a614d4472e2780130a3c2c0fb67fb1c0eb78"
+    },
+    "recovery-start01.result.json": {
+      "bytes": 665,
+      "sha256": "4bdeb1558742804d9e603f0eb54f499657cde14671cbe5dcc33a845165909243"
+    },
+    "recovery-state02.stdout.log": {
+      "bytes": 32532,
+      "sha256": "092710eaac127a478db274b85077b3dab2afa429532fa9dcbcaef6ac334a163c"
+    },
+    "recovery-state02.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-state02.result.json": {
+      "bytes": 692,
+      "sha256": "c34ee125b9cb4136c58a8dcdf4d7171acc319d2859fc64d3778d605d57e5d263"
+    },
+    "recovery-status01.stdout.log": {
+      "bytes": 1453,
+      "sha256": "d61e023b6a98da73eeb3ef15263916f32af6ebdb44543704ff9e5b633f5ae5ca"
+    },
+    "recovery-status01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-status01.result.json": {
+      "bytes": 703,
+      "sha256": "58c40484c5dcdfed246e1c03e6117196433cc1561ea2769156cb8aee43711137"
+    },
+    "build-audit01.stdout.log": {
+      "bytes": 26833,
+      "sha256": "4da157b657e23ad2c60dcd27d897805039c2292b955de9baf800f74524a91b29"
+    },
+    "build-audit01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build-audit01.result.json": {
+      "bytes": 794,
+      "sha256": "0e6117fbab42c00b548fbb68f58082061a12f52e31236f32cf0ce86253e7888e"
+    },
+    "archive-recovery01.stdout.log": {
+      "bytes": 251,
+      "sha256": "2daf95332732e4bd8d307c0e64a7139237b173f3d702498c876f4e6f734b668d"
+    },
+    "archive-recovery01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "archive-recovery01.result.json": {
+      "bytes": 793,
+      "sha256": "f7f051e686530e148cc54042cc246f4ce4e4039b5f32fd0d9813b22adcb3f150"
+    },
+    "proof-download01.stdout.log": {
+      "bytes": 360,
+      "sha256": "e2a50d430168ef745ead942ede45452a606dd64d36e509ec019a0bdc1220a8b7"
+    },
+    "proof-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "proof-download01.result.json": {
+      "bytes": 731,
+      "sha256": "59f73fb135def70383650c3f28913938815c45e7b245c9b7b82b806f7232e1b1"
+    },
+    "sidecars-download01.stdout.log": {
+      "bytes": 284,
+      "sha256": "f5e7b692ddc57d29fd1a1312281b5fb5521eaa880b48afdea6939acbe347b9e7"
+    },
+    "sidecars-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sidecars-download01.result.json": {
+      "bytes": 734,
+      "sha256": "20dc5e962abc5f2e6294015f5c0f752ad7bbac1ccb7c4bafa861731e82b98e90"
+    },
+    "recovery-receipt-download01.stdout.log": {
+      "bytes": 71,
+      "sha256": "75aa59c4803a97fed51afbf6a5044d70a9e1308fd984a91563ade34f3d43fe64"
+    },
+    "recovery-receipt-download01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "recovery-receipt-download01.result.json": {
+      "bytes": 732,
+      "sha256": "f8fb6b10f6f34a36fbe14d18fb9e66b601d7d2baab71ead5e663f7d0372e1bfb"
+    },
+    "delete01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "delete01.stderr.log": {
+      "bytes": 141,
+      "sha256": "1f48904c689a6a2179c1991a06ad633fd02080acece46b551b14c25ea4c473a8"
+    },
+    "delete01.result.json": {
+      "bytes": 716,
+      "sha256": "cbdccb68e0d9450f9c9281baac94e2bc8c5b144d90240934d0ebb2dff8dae7bf"
+    },
+    "cleanup-operations01.stdout.log": {
+      "bytes": 7047,
+      "sha256": "955e203bee673d41dcfad105e6ea501c44d86dc7e49e987bd718b98093eb1875"
+    },
+    "cleanup-operations01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "cleanup-operations01.result.json": {
+      "bytes": 674,
+      "sha256": "9fad77973e4b216a69fff18a975293a3a3b0df39cc0b40221397338a776009a2"
+    },
+    "absence-instances01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-instances01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-instances01.result.json": {
+      "bytes": 659,
+      "sha256": "f80e75a2e96c44ee54fba2f6f8c40fc3dc9303e6dd7c36faccb59c9dbaa5cace"
+    },
+    "absence-disks01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-disks01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-disks01.result.json": {
+      "bytes": 655,
+      "sha256": "422360e0078faeb087f3b18bf2cc3dcff1b07edf3680361fa47ca894fcbbc4e0"
+    },
+    "absence-addresses01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "absence-addresses01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "absence-addresses01.result.json": {
+      "bytes": 659,
+      "sha256": "1404e3572b9b37462d8b3c0cf8fb5592fc5425736448ef5bf61812a5f12aacc1"
+    },
+    "recovery-only-amendment.json": {
+      "bytes": 1848,
+      "sha256": "7ae104fa0245acecad63a305caf5ec4ad9f106df159f43d3972c9bb6e8da0b4e"
+    },
+    "recovery-only-bootstrap.sh": {
+      "bytes": 258,
+      "sha256": "d7be7cd1c8fb203a61b8bdb65dabbcf3df64501d4925ab7b02fe719bdb5ebde3"
+    },
+    "recovery-configuration-check.json": {
+      "bytes": 277,
+      "sha256": "7ec6427a5915901c1314ca00be9d694b25f883e9c26605db013ccd45a2346851"
+    },
+    "download-check.json": {
+      "bytes": 587,
+      "sha256": "4383d84972381f2209a9e8e57a417c9d89fe02164614e0efba29fef42ccfc904"
+    },
+    "flop-cpu-profile-recovery01.json": {
+      "bytes": 251,
+      "sha256": "2daf95332732e4bd8d307c0e64a7139237b173f3d702498c876f4e6f734b668d"
+    },
+    "flop-cpu-profile-proof01.tar.gz.manifest.json": {
+      "bytes": 236997,
+      "sha256": "22c727c5907b14e331664f2ace4be37f64dc429637727f1df7fb4cac45ee3fae"
+    },
+    "source-manifest.json": {
+      "bytes": 75417,
+      "sha256": "c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a"
+    },
+    "pack-receipt.json": {
+      "bytes": 677,
+      "sha256": "5a1eee017529435054a61025cc61a01f1f570e385f4eebe2928ef829565aab7b"
+    },
+    "verify-build-only.py": {
+      "bytes": 6817,
+      "sha256": "b501269ed7733ffd8fc00bc9c2bc2ebec258243eab5ab9011faa9a6ea3d0348f"
+    }
+  },
+  "identity": {
+    "project": "solvers-abstraction-20260723",
+    "zone": "us-central1-b",
+    "instance": "solvers-r1-20260927-19",
+    "instance_id": "6599180552829758403",
+    "disk_id": "9014745296258034627",
+    "source_revision": "6a5545efb0bee4a4940d260b9b97a8cf841edec1"
+  },
+  "build": {
+    "status": "build_only_verified",
+    "same_boot_id": "da8e1f93-d598-4c0a-9e3b-3baa0518583b",
+    "logical_cpus": 2,
+    "guest_physical_core_count": 1,
+    "host_note": "Guest topology is not a dedicated physical-core guarantee",
+    "stage_process_seconds": {
+      "perf-preflight-build": 4.420759064000009,
+      "toolchain": 0.11823590399998807,
+      "build-baseline": 92.78524657599999,
+      "tests-baseline": 230.873970987
+    },
+    "wrapper_finished_at_utc": "2026-09-27T08:42:54.256932+00:00",
+    "core_test_totals": {
+      "passed": 131,
+      "failed": 0,
+      "ignored": 13,
+      "measured": 0,
+      "filtered_out": 0
+    },
+    "required_named_regressions": [
+      "mapped_chance_and_action_siblings_preserve_f32_state",
+      "mapped_chance_and_action_siblings_preserve_i16_state",
+      "untrained_empty_and_variable_value_spaces_f32",
+      "untrained_empty_and_variable_value_spaces_i16",
+      "parallel_chance_fanout_is_bitwise_deterministic",
+      "selected_value_recording_preserves_ancestor_values_and_storage"
+    ],
+    "source_archive": {
+      "bytes": 967619,
+      "sha256": "42d70a15c6457a6c38831b8fa159437f6fd5b9587931d49c8ad6e8d325dd6c5d"
+    },
+    "baseline_binary": {
+      "bytes": 1388792,
+      "path": "/opt/r1/flop-cpu-profile-work01/baseline-target/release/examples/flop_cpu_profile_probe",
+      "sha256": "5e0e61d88bd40cac51979c4ace1fe20aacd2cef6cc233cd2a6c0a80cf5c94200"
+    },
+    "retained_binary_gzip": {
+      "bytes": 701302,
+      "sha256": "9b262a6b0d1c9a68e1dfd9e5f5b5953d88d9339f3209ce712ae596db36ce78da"
+    },
+    "source_manifest": {
+      "bytes": 75417,
+      "sha256": "c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a"
+    },
+    "production_solver_source_pin": {
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    "reader_pins": {
+      "analyze.py": {
+        "bytes": 24584,
+        "sha256": "5f7a03b4fc5bff751aa9843456a531d1c46ac0303e15ae4c55820562770d2c61"
+      },
+      "run.py": {
+        "bytes": 33317,
+        "sha256": "e8c428023386f76cf3c719c467b980e7c4e36e72f408692d85fc90fe4eb1fa66"
+      }
+    },
+    "verifier": {
+      "bytes": 6817,
+      "sha256": "b501269ed7733ffd8fc00bc9c2bc2ebec258243eab5ab9011faa9a6ea3d0348f"
+    },
+    "measurement_present": false,
+    "completed_profile_or_canonical_solves": 0
+  },
+  "lifecycle": {
+    "original_start_utc": "2026-09-27T08:34:59.581000+00:00",
+    "observed_original_stop_utc": "2026-09-27T09:15:25.078000+00:00",
+    "original_planned_stop_utc": "2026-09-27T09:19:48Z",
+    "stop_cause_claim": null,
+    "recovery_prepared_utc": "2026-09-28T04:04:34.390465+00:00",
+    "recovery_start_utc": "2026-09-28T04:05:41.027000+00:00",
+    "recovery_stop_deadline_utc": "2026-09-28T04:14:34+00:00",
+    "recovery_compute_or_resize_permitted": false,
+    "delete_operation": {
+      "name": "operation-1790568661161-65c8340fe9801-09aa79a1-a8b5b134",
+      "targetId": "6599180552829758403",
+      "status": "DONE",
+      "startTime": "2026-09-27T21:11:01.371-07:00",
+      "endTime": "2026-09-27T21:11:52.051-07:00"
+    },
+    "delete_before_recovery_stop": true,
+    "observed_named_resources_after_delete": {
+      "instances": 0,
+      "disks": 0,
+      "addresses": 0
+    },
+    "absence_filter": "name~solvers-r1-",
+    "disk_creation_to_confirmed_absence_seconds": 70657.603303,
+    "disk_deleted_within_24_hours": true
+  },
+  "retention": {
+    "archive": {
+      "status": "original_bytes_verified",
+      "archive": "/opt/r1/flop-cpu-profile-proof01.tar.gz",
+      "bytes": 4668141,
+      "sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e",
+      "files": 551,
+      "proof_present": true,
+      "cloud_mutations": false
+    },
+    "payload_files": 551,
+    "embedded_manifest_files": 1,
+    "total_regular_archive_members": 552,
+    "local_archive_parts": [
+      {
+        "path": "flop-cpu-profile-proof01.part00",
+        "bytes": 4668141,
+        "sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e",
+        "location": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm19\\flop-cpu-profile-proof01.part00"
+      }
+    ],
+    "availability": "Local compressed part present with recorded successful download/hash check; not rehashed or decompressed by this metadata review. Git availability depends on subsequent commit.",
+    "transfer_check": {
+      "bytes": 587,
+      "sha256": "4383d84972381f2209a9e8e57a417c9d89fe02164614e0efba29fef42ccfc904"
+    },
+    "cloud_reader_report_member": {
+      "member": "recovery/metadata/flop-cpu-profile-analysis01.json",
+      "original": "/opt/r1/flop-cpu-profile-metadata01/flop-cpu-profile-analysis01.json",
+      "bytes": 40737,
+      "sha256": "6c3c9b0173702fcaf47542387b5208b3c2d89c53f564baa2938458ace4918564",
+      "signature": [
+        2049,
+        275568,
+        40737,
+        1790568579842212614,
+        1790568579842212614
+      ]
+    }
+  },
+  "cost": {
+    "amendment_reserved_usd": 1.85,
+    "amendment_held_total_usd": 39.95,
+    "amendment_conservative_model_usd": 1.819385,
+    "bill_usd": null,
+    "reservation_released_by_review": false,
+    "note": "Reserved model, not an invoice. No zero assumption for missing usage. Root owns subsequent reconciliation."
+  },
+  "claims": {
+    "build_and_preflight_verified": true,
+    "full_workspace_verification": false,
+    "flop_scaling_verified": false,
+    "equal_exploitability_verified": false,
+    "cpu_bottleneck_identified": false,
+    "production_adoption": false
+  }
+}

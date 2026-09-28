@@ -1,0 +1,52 @@
+{
+  "capture-command.py": {
+    "source": "../vm19/capture-command.py",
+    "before": {
+      "bytes": 2171,
+      "sha256": "434aebf724186af9abe463a3ac46a7c50bb9b2c5e7152a2241cf3e59a16af81d"
+    },
+    "after": {
+      "bytes": 2171,
+      "sha256": "de148dc8c97b56f82b5ad183621020c2c8bb5494eb0ef3581dc65ee7a7a6205b"
+    }
+  },
+  "launch.py": {
+    "source": "../vm19/launch.py",
+    "before": {
+      "bytes": 4921,
+      "sha256": "d75c05edfa9a5a2e475ab839ad55a41267561c97cac73264705e877984415c13"
+    },
+    "after": {
+      "bytes": 5030,
+      "sha256": "df06563773fc4ee8fc2ad3fe51d74bebbe1302bd0fa521f1d02e5f75398bf8c2"
+    }
+  },
+  "check-download.py": {
+    "source": "../vm19/check-download.py",
+    "before": {
+      "bytes": 3101,
+      "sha256": "63eeebd9ceeee29346843de452134b7fc80912161fa9d6083995cab99b1319e5"
+    },
+    "after": {
+      "bytes": 3101,
+      "sha256": "63eeebd9ceeee29346843de452134b7fc80912161fa9d6083995cab99b1319e5"
+    }
+  },
+  "split-on-cloud.py": {
+    "source": "../vm19/split-on-cloud.py",
+    "before": {
+      "bytes": 2363,
+      "sha256": "aa6155c7f76a743f76b94c6ef8cbc7a7ff94028e7acff79e3b4a783f4e92c98f"
+    },
+    "after": {
+      "bytes": 2363,
+      "sha256": "aa6155c7f76a743f76b94c6ef8cbc7a7ff94028e7acff79e3b4a783f4e92c98f"
+    }
+  },
+  "deployment": {
+    "path": "../vm19/deployment01.tar.gz",
+    "bytes": 1373074,
+    "sha256": "ad156105b5323c91c4c9e715525e9efdf75ec07acb193db3eb3106581fec466f"
+  },
+  "scope": "New cloud resource and deadlines. Frozen VM19 internal path/unit/schema labels are reused verbatim; old VM19 runtime proof is not an input."
+}

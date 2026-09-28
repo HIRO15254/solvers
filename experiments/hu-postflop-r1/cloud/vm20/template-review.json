@@ -1,0 +1,161 @@
+{
+  "schema": "r1.vm20-template-review/v1",
+  "recorded_at_utc": "2026-09-28T04:27:12.027188+00:00",
+  "reviewer": "/root/vm19_recovery_audit",
+  "status": "passed_static_template_and_local_control_review",
+  "scope": "Fresh VM20 build/test using unchanged VM19 deployment template; no historical VM19 runtime proof transplant. No cloud call, native execution, archive read/decompression, or budget mutation in review.",
+  "local_files": {
+    "prepare-controls.py": {
+      "bytes": 1980,
+      "sha256": "87da7317813269c134e26e97051963fde07165d85d09dc392feda694795fdb29"
+    },
+    "launch.py": {
+      "bytes": 5630,
+      "sha256": "45f6290a6ac755c51befd72a64ded4faff866fef4ef6b9564346612955a5a251"
+    },
+    "capture-command.py": {
+      "bytes": 2171,
+      "sha256": "de148dc8c97b56f82b5ad183621020c2c8bb5494eb0ef3581dc65ee7a7a6205b"
+    },
+    "check-download.py": {
+      "bytes": 3101,
+      "sha256": "63eeebd9ceeee29346843de452134b7fc80912161fa9d6083995cab99b1319e5"
+    },
+    "split-on-cloud.py": {
+      "bytes": 2363,
+      "sha256": "aa6155c7f76a743f76b94c6ef8cbc7a7ff94028e7acff79e3b4a783f4e92c98f"
+    },
+    "README.md": {
+      "bytes": 1287,
+      "sha256": "bf05a4a7c6ea94aeb4e742e6f1ab3eddd3d11415a6b518351bfe28002aca3c96"
+    },
+    "control-derivation.json": {
+      "bytes": 1664,
+      "sha256": "e4137fe368a04cb16dd0994d6eaac0017d9a0840e0f507896cb08a385c0d1d18"
+    },
+    "measurement-reuse-design.md": {
+      "bytes": 2172,
+      "sha256": "3fac0a7e79d2fee7ea2d15e7ce645e37d6440cc84d347cc3e5c7f50d0ed262f2"
+    }
+  },
+  "template": {
+    "archive": {
+      "path": "deployment01.tar.gz",
+      "bytes": 1373074,
+      "sha256": "ad156105b5323c91c4c9e715525e9efdf75ec07acb193db3eb3106581fec466f"
+    },
+    "manifest": {
+      "bytes": 75417,
+      "sha256": "c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a"
+    },
+    "pack_receipt": {
+      "bytes": 677,
+      "sha256": "5a1eee017529435054a61025cc61a01f1f570e385f4eebe2928ef829565aab7b"
+    },
+    "source_revision": "6a5545efb0bee4a4940d260b9b97a8cf841edec1",
+    "production_solver": {
+      "bytes": 56421,
+      "sha256": "69063b31c3433b2eb4798b2f41015311200301a7ba1887b05bbefdb936d4e81a"
+    },
+    "cloud_controls": {
+      "experiments/hu-postflop-r1/cloud/vm19/README.md": {
+        "bytes": 1518,
+        "sha256": "a9b364aa45c1a60aa856b90278d2840c73598fa1fa9f74dae8f47d1952160279"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/analyze-on-cloud.py": {
+        "bytes": 3028,
+        "sha256": "95cfd414332da3a257d53b45b568ae0f28ca5113c97f2bca951b1768d46d6700"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/bootstrap.sh": {
+        "bytes": 812,
+        "sha256": "0e8bd5044c3eb19c35163c76d86b70bfb9dee9ee4ee19c1ef400fd84a1266dcc"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/capture-command.py": {
+        "bytes": 2171,
+        "sha256": "434aebf724186af9abe463a3ac46a7c50bb9b2c5e7152a2241cf3e59a16af81d"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/control-derivation.json": {
+        "bytes": 3327,
+        "sha256": "e1045b9265558b0f991ae831417fd2df4789aa0083a34161d94fa80c03fd395c"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/install.py": {
+        "bytes": 3820,
+        "sha256": "d95ecdd73707a07de1f79cb85c354c6602497b7084b29b998579a66b04c488c2"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/pack.py": {
+        "bytes": 5022,
+        "sha256": "775c5807dcf98870ce4aee04fd169de70db3459839b1c245ce9d585840ff1955"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/prepare-controls.py": {
+        "bytes": 3788,
+        "sha256": "f1963ca223aaf5f2356ba417fa49ab4b92a91ad6669a3774d269710cc5c761c2"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/recover.sh": {
+        "bytes": 7239,
+        "sha256": "1391a12588bb55ae282a922359b71e42fa3f85073170b047be3d3a2d2fd98198"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/run.sh": {
+        "bytes": 3076,
+        "sha256": "0ae228f3f39592bd8c72a72160d3416819c3149726bfa026ed0b52e6727a26f0"
+      },
+      "experiments/hu-postflop-r1/cloud/vm19/start.py": {
+        "bytes": 8527,
+        "sha256": "69ede5e951f22bbd83b9c356ff4567e680e0ec3032cb899ddcfc4ea98d11c1bd"
+      }
+    },
+    "archive_hash_recomputed_here": false,
+    "launch_rehashes_archive_before_creation": true
+  },
+  "derivation": {
+    "initial_receipt": {
+      "bytes": 1664,
+      "sha256": "e4137fe368a04cb16dd0994d6eaac0017d9a0840e0f507896cb08a385c0d1d18"
+    },
+    "initial_launch": {
+      "bytes": 5030,
+      "sha256": "df06563773fc4ee8fc2ad3fe51d74bebbe1302bd0fa521f1d02e5f75398bf8c2"
+    },
+    "final_launch": {
+      "bytes": 5630,
+      "sha256": "45f6290a6ac755c51befd72a64ded4faff866fef4ef6b9564346612955a5a251"
+    },
+    "initial_launch_reproduced_exactly": true,
+    "final_delta": "--- initial-derived-launch\n+++ hardened-launch\n@@ -1,32 +1,38 @@\n-\"\"\"One explicit creation attempt with fixed STOP and a captured timeout; no retry.\"\"\"\r\n-import datetime as dt\r\n-from decimal import Decimal as D\r\n-import json\r\n-import hashlib\r\n-import os\r\n-from pathlib import Path\r\n-import subprocess\r\n-\r\n-HERE = Path(__file__).resolve().parent\r\n-CLOUD = HERE.parent\r\n+\"\"\"One explicit creation attempt with fixed STOP and a captured timeout; no retry.\"\"\"\n+import datetime as dt\n+from decimal import Decimal as D\n+import json\n+import hashlib\n+import os\n+from pathlib import Path\n+import subprocess\n+\n+HERE = Path(__file__).resolve().parent\n+CLOUD = HERE.parent\n TEMPLATE = HERE.parent / 'vm19'\n-GCLOUD = 'C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd'\r\n-\r\n-\r\n-def main():\r\n-    ledger = json.loads((CLOUD / 'budget.json').read_bytes())\r\n-    total = sum(D(str(r['reserved_usd'])) if not r['reservation_released'] else D(str(r['billed_usd'])) for r in ledger['reservations'])\r\n-    row, = [r for r in ledger['reservations'] if r['id'] == 'r1-20260928-20']\r\n-    if total > 40 or ledger['authorized_limit'] != 40 or row['reservation_released'] or row['reserved_usd'] != 1.85 or row['maximum_runtime_seconds'] != 2700:\r\n-        raise ValueError('Resource authorization differs')\r\n-    check = json.loads((HERE / 'reservation-check.json').read_bytes())\r\n-    raw = (CLOUD / 'budget.json').read_bytes()\r\n-    if check['budget_after'] != {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}:\r\n-        raise ValueError('Reserved ledger changed before launch')\r\n-    if row['maximum_starts'] != 3 or row['disk_gib'] != 20 or row['capacity_or_quota_fallback'] is not None:\r\n-        raise ValueError('Finite E2-only envelope differs')\r\n-    pack = json.loads((TEMPLATE / 'pack-receipt.json').read_bytes())\r\n-    raw = (TEMPLATE / pack['archive']['path']).read_bytes()\r\n+GCLOUD = 'C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd'\n+\n+\n+def main():\n+    ledger = json.loads((CLOUD / 'budget.json').read_bytes())\n+    total = sum(D(str(r['reserved_usd'])) if not r['reservation_released'] else D(str(r['billed_usd'])) for r in ledger['reservations'])\n+    row, = [r for r in ledger['reservations'] if r['id'] == 'r1-20260928-20']\n+    if (row['instance'], row['project'], row['zone']) != ('solvers-r1-20260928-20', 'solvers-abstraction-20260723', 'us-central1-b'):\n+        raise ValueError('New resource identity differs')\n+    if total > 40 or ledger['authorized_limit'] != 40 or row['reservation_released'] or row['reserved_usd'] != 1.85 or row['maximum_runtime_seconds'] != 2700:\n+        raise ValueError('Resource authorization differs')\n+    check = json.loads((HERE / 'reservation-check.json').read_bytes())\n+    raw = (CLOUD / 'budget.json').read_bytes()\n+    if check['budget_after'] != {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}:\n+        raise ValueError('Reserved ledger changed before launch')\n+    if row['maximum_starts'] != 3 or row['disk_gib'] != 20 or row['capacity_or_quota_fallback'] is not None:\n+        raise ValueError('Finite E2-only envelope differs')\n+    pack = json.loads((TEMPLATE / 'pack-receipt.json').read_bytes())\n+    if pack['archive'] != {'path': 'deployment01.tar.gz', 'bytes': 1373074, 'sha256': 'ad156105b5323c91c4c9e715525e9efdf75ec07acb193db3eb3106581fec466f'}:\n+        raise ValueError('Fixed deployment template differs')\n+    if pack['manifest'] != {'bytes': 75417, 'sha256': 'c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a'}:\n+        raise ValueError('Fixed deployment manifest differs')\n+    raw = (TEMPLATE / pack['archive']['path']).read_bytes()\n     if {k: pack['archive'][k] for k in ('bytes', 'sha256')} != {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}:\n         raise ValueError('Frozen deployment changed')\n     raw = (TEMPLATE / 'source-manifest.json').read_bytes()\n@@ -36,44 +42,44 @@\n     raw = (TEMPLATE / 'bootstrap.sh').read_bytes()\n     if manifest['files']['experiments/hu-postflop-r1/cloud/vm19/bootstrap.sh'] != {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}:\n         raise ValueError('Actual launch bootstrap differs from frozen package')\n-    started = dt.datetime.now(dt.timezone.utc)\r\n-    if (started - dt.datetime.fromisoformat(check['at_utc'])).total_seconds() > 1800:\r\n-        raise ValueError('Reservation/preflight older than30min')\r\n-    stop = (started + dt.timedelta(seconds=2700)).strftime('%Y-%m-%dT%H:%M:%SZ')\r\n-    argv = ['compute', 'instances', 'create', row['instance'], '--project=' + row['project'], '--zone=' + row['zone'],\r\n-            '--machine-type=e2-standard-2', '--provisioning-model=SPOT', '--instance-termination-action=STOP',\r\n-            '--termination-time=' + stop, '--no-restart-on-failure', '--maintenance-policy=TERMINATE',\r\n-            '--image-family=ubuntu-2404-lts-amd64', '--image-project=ubuntu-os-cloud', '--boot-disk-type=pd-balanced',\r\n-            '--boot-disk-size=20GB', '--boot-disk-auto-delete', '--no-service-account', '--no-scopes',\r\n-            '--labels=campaign=hu-postflop-r1,reservation=' + row['id'],\r\n-            '--metadata-from-file=startup-script=' + str(TEMPLATE / 'bootstrap.sh'),\r\n-            '--format=json(id,name,status,creationTimestamp,scheduling,disks)', '--quiet']\r\n-    record = {'template': '../vm19', 'fresh_instance_and_build': True, 'reservation_id': row['id'], 'attempted_at': started.isoformat(), 'termination_time': stop,\r\n-              'build_deadline_utc': (dt.datetime.fromisoformat(stop.replace('Z', '+00:00')) - dt.timedelta(seconds=1500)).isoformat(),\r\n-              'argv': argv, 'client_timeout_seconds': 180}\r\n-    with (CLOUD / ('launch-' + row['id'] + '.json')).open('x') as stream:\r\n+    started = dt.datetime.now(dt.timezone.utc)\n+    if (started - dt.datetime.fromisoformat(check['at_utc'])).total_seconds() > 1800:\n+        raise ValueError('Reservation/preflight older than30min')\n+    stop = (started + dt.timedelta(seconds=2700)).strftime('%Y-%m-%dT%H:%M:%SZ')\n+    argv = ['compute', 'instances', 'create', row['instance'], '--project=' + row['project'], '--zone=' + row['zone'],\n+            '--machine-type=e2-standard-2', '--provisioning-model=SPOT', '--instance-termination-action=STOP',\n+            '--termination-time=' + stop, '--no-restart-on-failure', '--maintenance-policy=TERMINATE',\n+            '--image-family=ubuntu-2404-lts-amd64', '--image-project=ubuntu-os-cloud', '--boot-disk-type=pd-balanced',\n+            '--boot-disk-size=20GB', '--boot-disk-auto-delete', '--no-service-account', '--no-scopes',\n+            '--labels=campaign=hu-postflop-r1,reservation=' + row['id'],\n+            '--metadata-from-file=startup-script=' + str(TEMPLATE / 'bootstrap.sh'),\n+            '--format=json(id,name,status,creationTimestamp,scheduling,disks)', '--quiet']\n+    record = {'template': '../vm19', 'fresh_instance_and_build': True, 'reservation_id': row['id'], 'attempted_at': started.isoformat(), 'termination_time': stop,\n+              'build_deadline_utc': (dt.datetime.fromisoformat(stop.replace('Z', '+00:00')) - dt.timedelta(seconds=1500)).isoformat(),\n+              'argv': argv, 'client_timeout_seconds': 180}\n+    with (CLOUD / ('launch-' + row['id'] + '.json')).open('x') as stream:\n         json.dump(record, stream, indent=2)\n         stream.write('\\n')\n         stream.flush()\n         os.fsync(stream.fileno())\n-    env = dict(os.environ, CLOUDSDK_PYTHON='C:/Python313/python.exe', CLOUDSDK_ENCODING='utf-8', PYTHONIOENCODING='utf-8')\r\n-    try:\r\n-        result = subprocess.run([GCLOUD, *argv], env=env, capture_output=True, timeout=180)\r\n-        code, stdout, stderr = result.returncode, result.stdout, result.stderr\r\n-    except subprocess.TimeoutExpired as error:\r\n-        code, stdout, stderr = None, error.stdout or b'', error.stderr or b''\r\n-        record['error'] = 'Client timeout; inspect named resource before any next mutation'\r\n-    with (CLOUD / ('create-result-' + row['id'] + '.json')).open('xb') as stream:\r\n-        stream.write(stdout)\r\n-    with (HERE / 'create.stderr.log').open('xb') as stream:\r\n-        stream.write(stderr)\r\n-    record.update(exit_code=code, ended_utc=dt.datetime.now(dt.timezone.utc).isoformat())\r\n-    with (HERE / 'create.receipt.json').open('x') as stream:\r\n-        json.dump(record, stream, indent=2)\r\n-        stream.write('\\n')\r\n-    print(json.dumps({'exit_code': code, 'stop_deadline_utc': stop, 'build_deadline_utc': record['build_deadline_utc']}))\r\n-    raise SystemExit(0 if code == 0 else 1)\r\n-\r\n-\r\n-if __name__ == '__main__':\r\n-    main()\r\n+    env = dict(os.environ, CLOUDSDK_PYTHON='C:/Python313/python.exe', CLOUDSDK_ENCODING='utf-8', PYTHONIOENCODING='utf-8')\n+    try:\n+        result = subprocess.run([GCLOUD, *argv], env=env, capture_output=True, timeout=180)\n+        code, stdout, stderr = result.returncode, result.stdout, result.stderr\n+    except subprocess.TimeoutExpired as error:\n+        code, stdout, stderr = None, error.stdout or b'', error.stderr or b''\n+        record['error'] = 'Client timeout; inspect named resource before any next mutation'\n+    with (CLOUD / ('create-result-' + row['id'] + '.json')).open('xb') as stream:\n+        stream.write(stdout)\n+    with (HERE / 'create.stderr.log').open('xb') as stream:\n+        stream.write(stderr)\n+    record.update(exit_code=code, ended_utc=dt.datetime.now(dt.timezone.utc).isoformat())\n+    with (HERE / 'create.receipt.json').open('x') as stream:\n+        json.dump(record, stream, indent=2)\n+        stream.write('\\n')\n+    print(json.dumps({'exit_code': code, 'stop_deadline_utc': stop, 'build_deadline_utc': record['build_deadline_utc']}))\n+    raise SystemExit(0 if code == 0 else 1)\n+\n+\n+if __name__ == '__main__':\n+    main()\n",
+    "only_additional_logic": "Three explicit guards fix new resource identity, immutable deployment tuple and immutable manifest tuple. Original derivation receipt preserved."
+  },
+  "checks": {
+    "python_ast_files": 5,
+    "isolated_guard_expression_cases": [
+      "New resource identity differs: accepted exact input",
+      "Fixed deployment template differs: accepted exact input",
+      "Fixed deployment manifest differs: accepted exact input",
+      "reject changed resource instance",
+      "reject changed resource project",
+      "reject changed resource zone",
+      "reject changed archive path",
+      "reject changed archive bytes",
+      "reject changed archive sha256",
+      "reject changed manifest bytes",
+      "reject changed manifest sha256"
+    ],
+    "packaged_cloud_file_pins_checked": 11,
+    "fixed_old_instance_id_or_date_in_runtime_controls": false,
+    "fresh_source_work_proof_required": true,
+    "same_new_instance_across_build_measurement": true,
+    "different_boot_required": true,
+    "e2_only_2_then_32": true,
+    "fixed45min_stop_from_new_launch": true,
+    "measurement_dispatch_within15min": true,
+    "measurement15min_recovery_margin15min": true,
+    "old_runtime_proof_input": false,
+    "local_receipts_vm20_only": true
+  },
+  "limits": [
+    "This is not launch authorization or a budget/price/live-resource audit; reserve.py is outside this review.",
+    "Old vm19 internal unit/schema/path labels identify the reusable template, not the new cloud numeric instance ID.",
+    "Fresh ISA/tool/source/control/perf preflight remains mandatory on new boots; stages may fail or reach overall deadline.",
+    "status.py, split-on-cloud.py and check-download.py are not in the deployment archive; use separately pinned sidecars.",
+    "No new native tests were run; frozen shell scripts unchanged, so no redundant bash/native checks were run.",
+    "Future source/contract changes invalidate frozen-template suitability and require a new package."
+  ]
+}

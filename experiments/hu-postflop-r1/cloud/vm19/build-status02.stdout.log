@@ -1,0 +1,43 @@
+{
+  "build": {
+    "service_exit": 0,
+    "service": "MainPID=3123\nResult=success\nActiveState=active",
+    "status": "running",
+    "stages": [
+      {
+        "name": "perf-preflight-build",
+        "status": "completed",
+        "started_at": "2026-09-27T08:37:20.350496+00:00",
+        "ended_at": "2026-09-27T08:37:25.047939+00:00"
+      },
+      {
+        "name": "toolchain",
+        "status": "completed",
+        "started_at": "2026-09-27T08:37:26.106679+00:00",
+        "ended_at": "2026-09-27T08:37:26.355720+00:00"
+      },
+      {
+        "name": "build-baseline",
+        "status": "running",
+        "started_at": "2026-09-27T08:37:27.486484+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 2,
+      "running": 1,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 1
+    },
+    "error": null,
+    "stage_stderr_tail": "   Compiling zerocopy-derive v0.8.52\n   Compiling serde_derive v1.0.228\n   Compiling aya_codegen v0.1.0\n   Compiling crossbeam-epoch v0.9.18\n   Compiling aya_poker v0.1.0\n   Compiling thiserror v2.0.18\n   Compiling either v1.16.0\n   Compiling rayon-core v1.13.0\n   Compiling crossbeam-deque v0.8.6\n   Compiling getrandom v0.2.17\n   Compiling thiserror-impl v2.0.18\n   Compiling rand_core v0.6.4\n   Compiling ppv-lite86 v0.2.21\n   Compiling autocfg v1.5.1\n   Compiling zmij v1.0.21\n   Compiling num-traits v0.2.19\n   Compiling rand_chacha v0.3.1\n   Compiling rayon v1.12.0\n   Compiling serde_json v1.0.150\n   Compiling rand v0.8.6\n   Compiling cards v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/cards)\n   Compiling half v2.7.1\n   Compiling anstyle v1.0.14\n   Compiling itoa v1.0.18\n   Compiling ciborium-io v0.2.2\n   Compiling memchr v2.8.2\n   Compiling clap_lex v1.1.0\n   Compiling regex-syntax v0.8.11\n   Compiling plotters-backend v0.3.7\n   Compiling plotters-svg v0.3.7\n   Compiling regex-automata v0.4.14\n   Compiling clap_builder v4.6.0\n   Compiling ciborium-ll v0.2.2\n   Compiling engine v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/engine)\n   Compiling itertools v0.10.5\n   Compiling same-file v1.0.6\n   Compiling cast v0.3.0\n   Compiling walkdir v2.5.0\n   Compiling plotters v0.3.7\n   Compiling criterion-plot v0.5.0\n   Compiling game v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/game)\n   Compiling ciborium v0.2.2\n   Compiling clap v4.6.1\n   Compiling regex v1.12.4\n   Compiling tinytemplate v1.2.1\n   Compiling hand-index v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/hand-index)\n   Compiling is-terminal v0.4.17\n   Compiling oorandom v11.1.5\n   Compiling anes v0.1.6\n   Compiling once_cell v1.21.4\n   Compiling holdem v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/holdem)\n   Compiling criterion v0.5.1\n   Compiling cfr-ref v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/cfr-ref)\n"
+  },
+  "measure": {
+    "service_exit": 0,
+    "service": "MainPID=0\nResult=success\nActiveState=inactive"
+  },
+  "source_archive": {
+    "bytes": 967619,
+    "sha256": "42d70a15c6457a6c38831b8fa159437f6fd5b9587931d49c8ad6e8d325dd6c5d"
+  }
+}

@@ -1,0 +1,18 @@
+test_extra_resize_rejected (test_analyze.AuditTests.test_extra_resize_rejected) ... ok
+test_immutable_report_replays (test_analyze.AuditTests.test_immutable_report_replays) ... ok
+test_large_egress_increases_allowance (test_analyze.AuditTests.test_large_egress_increases_allowance) ... ok
+test_missing_metric_page_rejected (test_analyze.AuditTests.test_missing_metric_page_rejected) ... ok
+test_negative_metric_rejected (test_analyze.AuditTests.test_negative_metric_rejected) ... ok
+test_present_disk_rejected (test_analyze.AuditTests.test_present_disk_rejected) ... ok
+test_repeated_metric_interval_rejected (test_analyze.AuditTests.test_repeated_metric_interval_rejected) ... ok
+test_separate_windows_disk_full_lifecycle (test_analyze.AuditTests.test_separate_windows_disk_full_lifecycle) ... ok
+test_unamended_recovery_deadline_rejected (test_analyze.AuditTests.test_unamended_recovery_deadline_rejected) ... ok
+test_unknown_observation_is_not_zero (test_analyze.AuditTests.test_unknown_observation_is_not_zero) ... ok
+test_wrong_instance_rejected (test_analyze.AuditTests.test_wrong_instance_rejected) ... ok
+test_wrong_metric_unit_rejected (test_analyze.AuditTests.test_wrong_metric_unit_rejected) ... ok
+test_wrong_metric_zone_rejected (test_analyze.AuditTests.test_wrong_metric_zone_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.177s
+
+OK

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-19",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo python3 -B /tmp/vm19-status.py"
+  ],
+  "started_utc": "2026-09-27T08:41:49.349726+00:00",
+  "timeout_seconds": 45,
+  "stdout": {
+    "bytes": 1474,
+    "sha256": "d929d496483d50a4da9edc1d0d1fc35305c4ddc89a765111deba6cc69928d637"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T08:41:55.268115+00:00"
+}

@@ -1,0 +1,49 @@
+{
+  "build": {
+    "service_exit": 0,
+    "service": "MainPID=3123\nResult=success\nActiveState=active",
+    "status": "running",
+    "stages": [
+      {
+        "name": "perf-preflight-build",
+        "status": "completed",
+        "started_at": "2026-09-27T08:37:20.350496+00:00",
+        "ended_at": "2026-09-27T08:37:25.047939+00:00"
+      },
+      {
+        "name": "toolchain",
+        "status": "completed",
+        "started_at": "2026-09-27T08:37:26.106679+00:00",
+        "ended_at": "2026-09-27T08:37:26.355720+00:00"
+      },
+      {
+        "name": "build-baseline",
+        "status": "completed",
+        "started_at": "2026-09-27T08:37:27.486484+00:00",
+        "ended_at": "2026-09-27T08:39:00.662373+00:00"
+      },
+      {
+        "name": "tests-baseline",
+        "status": "running",
+        "started_at": "2026-09-27T08:39:01.794383+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 3,
+      "running": 1,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0
+    },
+    "error": null,
+    "stage_stderr_tail": "   Compiling holdem v0.1.0 (/opt/r1/flop-cpu-profile-package/source-baseline/crates/holdem)\n"
+  },
+  "measure": {
+    "service_exit": 0,
+    "service": "MainPID=0\nResult=success\nActiveState=inactive"
+  },
+  "source_archive": {
+    "bytes": 967619,
+    "sha256": "42d70a15c6457a6c38831b8fa159437f6fd5b9587931d49c8ad6e8d325dd6c5d"
+  }
+}

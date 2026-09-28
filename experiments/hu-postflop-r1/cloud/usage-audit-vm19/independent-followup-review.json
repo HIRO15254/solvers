@@ -1,0 +1,76 @@
+{
+  "schema": "r1.usage-followup-independent-review/v1",
+  "status": "passed_with_disclosed_evidence_limits",
+  "reviewer_scope": "Independent source review, previous full validator replay exit0, and separate arithmetic/official-price provenance checks",
+  "review_source": {
+    "bytes": 5381,
+    "sha256": "11af454a12845ed818284579bd1242135a97bb7f2a6ee1cbfb8ab8bcae44f240"
+  },
+  "proposal": {
+    "bytes": 86786,
+    "sha256": "83cd8ceb6897a4dc53e9eb8865435a69e036013a174ddc2ba30d81ca3024e72d"
+  },
+  "validator": {
+    "bytes": 17614,
+    "sha256": "b69bd2c983d805b5dcf4e4b0aca0e73cfb214ffba6939e1737a126f45244e0b6"
+  },
+  "budget_snapshot": {
+    "bytes": 92775,
+    "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+  },
+  "rechecked_input_pins": 345,
+  "rows": [
+    {
+      "vm": "08",
+      "restore_usd": "0.80",
+      "model_usd": "3.663995032000000000000000000"
+    },
+    {
+      "vm": "09",
+      "restore_usd": "0.10",
+      "model_usd": "1.443047333333333333333333333"
+    },
+    {
+      "vm": "10",
+      "restore_usd": "0.20",
+      "model_usd": "1.591027333333333333333333333"
+    },
+    {
+      "vm": "11",
+      "restore_usd": "0.20",
+      "model_usd": "1.509638333333333333333333333"
+    },
+    {
+      "vm": "12",
+      "restore_usd": "0.10",
+      "model_usd": "1.608794666666666666666666667"
+    },
+    {
+      "vm": "13",
+      "restore_usd": "0.20",
+      "model_usd": "1.376456333333333333333333333"
+    },
+    {
+      "vm": "14",
+      "restore_usd": "0.20",
+      "model_usd": "1.6370264800"
+    },
+    {
+      "vm": "15",
+      "restore_usd": "0.30",
+      "model_usd": "1.695487658000000000000000000"
+    }
+  ],
+  "restore_usd": "2.10",
+  "full_validator_replay": {
+    "argv": "python -B usage-followup-20260928/validate.py --budget usage-audit-vm19/inputs/budget.json --check",
+    "exit_code": 0
+  },
+  "limits": [
+    "VM09 raw named inventories establish absence, but no matching delete-operation record is claimed; README already discloses this.",
+    "VM10/11/13 retain their existing 4-vCPU price envelope; no lower actual-machine rate is introduced.",
+    "All original uncertainty and one-GiB network buffers remain. Missing Monitoring observations are unknown.",
+    "Formal billing export remains absent; cost proposal is not invoice or guaranteed upper bill.",
+    "No ledger/resource change, new API call, native command or archive access in this review."
+  ]
+}

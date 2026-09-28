@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-19",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo timeout --kill-after=5s 120s bash /opt/r1/flop-cpu-profile-package/experiments/hu-postflop-r1/cloud/vm19/recover.sh"
+  ],
+  "started_utc": "2026-09-28T04:09:35.213369+00:00",
+  "timeout_seconds": 135,
+  "stdout": {
+    "bytes": 251,
+    "sha256": "2daf95332732e4bd8d307c0e64a7139237b173f3d702498c876f4e6f734b668d"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T04:09:42.219590+00:00"
+}

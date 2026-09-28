@@ -1,0 +1,16 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "at_utc": "2026-09-28T04:10:40.763202+00:00",
+  "bytes": 4668141,
+  "sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e",
+  "parts": [
+    {
+      "path": "flop-cpu-profile-proof01.part00",
+      "bytes": 4668141,
+      "sha256": "69908a4ada42fe4cc9b361cb80cde4ce592db72f5202de66f88eb1aff20a0b2e"
+    }
+  ],
+  "elapsed_seconds": 0.019810300087556243,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity; solver correctness is established separately by cloud readers"
+}

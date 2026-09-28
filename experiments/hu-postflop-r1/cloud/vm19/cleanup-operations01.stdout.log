@@ -1,0 +1,132 @@
+[
+  {
+    "endTime": "2026-09-27T01:34:59.622-07:00",
+    "id": "5134860974231481283",
+    "insertTime": "2026-09-27T01:34:52.627-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790498092045-65c72d2bf5615-349637be-ad101518",
+    "operationType": "insert",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790498092045-65c72d2bf5615-349637be-ad101518",
+    "startTime": "2026-09-27T01:34:52.650-07:00",
+    "status": "DONE",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "hi089697@gmail.com",
+    "warnings": [
+      {
+        "code": "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
+        "data": [
+          {
+            "key": "disk_size_gb",
+            "value": "20"
+          },
+          {
+            "key": "image_size_gb",
+            "value": "10"
+          }
+        ],
+        "message": "Disk size: '20 GB' is larger than image size: '10 GB'. You might need to resize the root repartition manually if the operating system does not support automatic resizing. See https://cloud.google.com/compute/docs/disks/add-persistent-disk#resize_pd for details."
+      }
+    ],
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T21:04:45.451-07:00",
+    "id": "9177281087965256114",
+    "insertTime": "2026-09-27T21:04:45.242-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790568285068-65c832a93dc4f-2f3cc2ae-e84e2db5",
+    "operationType": "setMetadata",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790568285068-65c832a93dc4f-2f3cc2ae-e84e2db5",
+    "startTime": "2026-09-27T21:04:45.251-07:00",
+    "status": "DONE",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T21:05:09.791-07:00",
+    "id": "6506069488668268954",
+    "insertTime": "2026-09-27T21:05:09.594-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790568309240-65c832c04b137-584dea87-9469f8d5",
+    "operationType": "setScheduling",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790568309240-65c832c04b137-584dea87-9469f8d5",
+    "startTime": "2026-09-27T21:05:09.616-07:00",
+    "status": "DONE",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T21:05:41.081-07:00",
+    "id": "359230642456910191",
+    "insertTime": "2026-09-27T21:05:20.639-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790568320330-65c832cade949-d9103747-c6b84f86",
+    "operationType": "start",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790568320330-65c832cade949-d9103747-c6b84f86",
+    "startTime": "2026-09-27T21:05:20.661-07:00",
+    "status": "DONE",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T21:11:52.051-07:00",
+    "id": "8062724932780709434",
+    "insertTime": "2026-09-27T21:11:01.344-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790568661161-65c8340fe9801-09aa79a1-a8b5b134",
+    "operationType": "delete",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790568661161-65c8340fe9801-09aa79a1-a8b5b134",
+    "startTime": "2026-09-27T21:11:01.371-07:00",
+    "status": "DONE",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "hi089697@gmail.com",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T02:19:49.489-07:00",
+    "id": "5536395512524398938",
+    "insertTime": "2026-09-27T02:19:49.253-07:00",
+    "kind": "compute#operation",
+    "name": "systemevent-1790498094092-65c72d2de9232-5408febb-8d7141aa",
+    "operationType": "compute.instances.deferredStop",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/systemevent-1790498094092-65c72d2de9232-5408febb-8d7141aa",
+    "startTime": "2026-09-27T02:19:49.268-07:00",
+    "status": "DONE",
+    "statusMessage": "Instance stopped by Compute Engine.",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "system",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-27T02:15:09.966-07:00",
+    "id": "2662065817353805937",
+    "insertTime": "2026-09-27T02:15:09.966-07:00",
+    "kind": "compute#operation",
+    "name": "systemevent-1790500509966-65c7362dde1ce-ac7dcc27-09e3e0ec",
+    "operationType": "compute.instances.preempted",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/systemevent-1790500509966-65c7362dde1ce-ac7dcc27-09e3e0ec",
+    "startTime": "2026-09-27T02:15:09.966-07:00",
+    "status": "DONE",
+    "statusMessage": "Instance was preempted.",
+    "targetId": "6599180552829758403",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260927-19",
+    "user": "system",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  }
+]

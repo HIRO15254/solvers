@@ -1,0 +1,176 @@
+{
+  "schema": "r1.vm20.cost-proposal/v1",
+  "recorded_at_utc": "2026-09-28T04:24:09.153907+00:00",
+  "scope": "Fresh official public pricing acquisition; conditional estimate only, no reservation or resource mutation",
+  "calculator": {
+    "path": "cost-proposal.py",
+    "bytes": 6587,
+    "sha256": "2a48c4f1ae37dfb81a5100e3c84005e25454719f36352e3655315079e412f12c"
+  },
+  "arithmetic": {
+    "prices_usd": {
+      "compute-e2-standard-2": "0.06701142",
+      "compute-e2-highcpu-32": "0.79152384",
+      "spot-e2-standard-2": "0.040212",
+      "spot-e2-highcpu-32": "0.475008",
+      "disk-balanced": "0.000136986",
+      "network-spot-ipv4": "0.0025",
+      "network-asia-egress-paid-first-tier": "0.12"
+    },
+    "verified_excerpts": 21,
+    "excerpt_bytes": 20165,
+    "source_receipts": [
+      {
+        "path": "pricing-sources.json",
+        "bytes": 5062,
+        "sha256": "4e5e67f12d3601d72b397921bb9b4b6e29eb5deb9d7edc744c2e8ae6d2741741"
+      },
+      {
+        "path": "spot-pricing-source.json",
+        "bytes": 1725,
+        "sha256": "361ddc5ca1f40f6fc5d7177e590fc39ec3d7e498daa191eb96d96477313b9d7e"
+      }
+    ],
+    "price_exposure_hours": "47/60",
+    "components_usd": {
+      "compute": {
+        "fraction": "47/75",
+        "decimal_usd": "0.6266666666666666666666666666666666666667"
+      },
+      "spot_ipv4": {
+        "fraction": "47/24000",
+        "decimal_usd": "0.001958333333333333333333333333333333333333"
+      },
+      "disk_20gib_24hours": {
+        "fraction": "411/6250",
+        "decimal_usd": "0.06576"
+      },
+      "egress_512mib": {
+        "fraction": "3/20",
+        "decimal_usd": "0.15"
+      },
+      "tax_price_delay_and_other_uncertainty": {
+        "fraction": "1/1",
+        "decimal_usd": "1"
+      }
+    },
+    "total_usd": {
+      "fraction": "368877/200000",
+      "decimal_usd": "1.844385"
+    },
+    "headroom_within_1_85usd": {
+      "fraction": "1123/200000",
+      "decimal_usd": "0.005615"
+    },
+    "below_1_85usd": true
+  },
+  "budget_snapshot": {
+    "file": {
+      "path": "budget.json",
+      "bytes": 92775,
+      "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+    },
+    "authorized_usd": "40",
+    "held_usd": "39.95",
+    "available_usd": "0.05",
+    "reservations": [
+      {
+        "id": "r1-20260927-15",
+        "held_usd": "2.0"
+      },
+      {
+        "id": "r1-20260927-14",
+        "held_usd": "1.9"
+      },
+      {
+        "id": "r1-20260926-13",
+        "held_usd": "1.6"
+      },
+      {
+        "id": "r1-20260926-12",
+        "held_usd": "1.8"
+      },
+      {
+        "id": "r1-20260926-11",
+        "held_usd": "1.8"
+      },
+      {
+        "id": "r1-20260926-10",
+        "held_usd": "1.8"
+      },
+      {
+        "id": "r1-20260926-09",
+        "held_usd": "1.6"
+      },
+      {
+        "id": "r1-20260926-08-scale32",
+        "held_usd": "1.5"
+      },
+      {
+        "id": "r1-20260926-08",
+        "held_usd": "3"
+      },
+      {
+        "id": "r1-20260925-07",
+        "held_usd": "3.6"
+      },
+      {
+        "id": "r1-20260925-02",
+        "held_usd": "4.5"
+      },
+      {
+        "id": "r1-20260925-05",
+        "held_usd": "4.5"
+      },
+      {
+        "id": "r1-20260925-06",
+        "held_usd": "4.2"
+      },
+      {
+        "id": "r1-20260927-16",
+        "held_usd": "1.4"
+      },
+      {
+        "id": "r1-20260927-17",
+        "held_usd": "1.5"
+      },
+      {
+        "id": "r1-20260927-18",
+        "held_usd": "1.4"
+      },
+      {
+        "id": "r1-20260927-19",
+        "held_usd": "1.85"
+      }
+    ],
+    "billed_usd": null
+  },
+  "bounds": {
+    "deadline_origin": "launch request",
+    "cloud_stop_after_creation_request_seconds": 2700,
+    "price_slack_seconds_not_runtime_extension": 120,
+    "build_deadline_after_launch_seconds": 1200,
+    "maximum_measurement_seconds": 900,
+    "recovery_margin_seconds": 900,
+    "minimum_remaining_before_measure_dispatch_seconds": 1800,
+    "work_deadline": "dispatch + 900s, no later than original_STOP - 900s",
+    "disk_gib": 20,
+    "disk_delete_within_hours": 24,
+    "egress_budget_bytes": 536870912,
+    "archive_cap_bytes": 268435456
+  },
+  "conditions": [
+    "One SPOT Linux VM in us-central1; e2-standard-2 portable build/core tests/recovery and e2-highcpu-32 for measurement only; no fallback",
+    "At most three starts; no automatic retry, additional VM, or deadline extension",
+    "120 seconds prices minimum-uptime/deletion uncertainty and grants no extra execution time",
+    "Original STOP enforced independently; stopped boot disk remains charged until deleted",
+    "512 MiB covers all external egress, not only the capped archive; exclude free credits from the calculation",
+    "No premium OS, NAT, load balancer, extra disk, snapshot, or unassigned static address",
+    "The fixed one-dollar uncertainty reserve remains; this estimate is not a guaranteed invoice ceiling"
+  ],
+  "not_checked_here": [
+    "Live project quota and resource inventory",
+    "Cloud enforcement code",
+    "Actual bill or future tariff"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260927-19",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command",
+    "sudo python3 -B /tmp/install.py --archive /tmp/deployment01.tar.gz --sha256 ad156105b5323c91c4c9e715525e9efdf75ec07acb193db3eb3106581fec466f --destination /opt/r1/flop-cpu-profile-package"
+  ],
+  "started_utc": "2026-09-27T08:36:12.980564+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 361,
+    "sha256": "93c06fe559a8ba61399a2b4c081f6b8405f9ebdbbed43acdf58b720db9471a3b"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-27T08:36:18.837202+00:00"
+}

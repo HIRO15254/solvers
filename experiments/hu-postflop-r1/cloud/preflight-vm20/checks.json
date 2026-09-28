@@ -1,0 +1,165 @@
+{
+  "schema": "r1.vm20-price-checks/v1",
+  "status": "verified",
+  "source": {
+    "path": "check-pricing.py",
+    "bytes": 4363,
+    "sha256": "47072a9bec25f35a06e5fcdf28edc4e5c1851693472b9604b49d4078dfca7a59"
+  },
+  "public_gets": 4,
+  "retained_excerpts": 21,
+  "retained_excerpt_bytes": 20165,
+  "independent_total_usd": "1.844385",
+  "reservation_required_usd": "1.85",
+  "budget_mutated": false,
+  "cloud_resources_mutated": false,
+  "credentials_used": false,
+  "native_execution": false,
+  "inputs": [
+    {
+      "path": "check-pricing.py",
+      "bytes": 4363,
+      "sha256": "47072a9bec25f35a06e5fcdf28edc4e5c1851693472b9604b49d4078dfca7a59"
+    },
+    {
+      "path": "collect-pricing.py",
+      "bytes": 2030,
+      "sha256": "633763ea02203d67b7b088de64476935e4649c9b3acff644ba1b04411afb8a6b"
+    },
+    {
+      "path": "collect-spot.py",
+      "bytes": 1003,
+      "sha256": "5d13daaad637eda264623ab98f1b4931bcbb2ef133f56b9b5c80847f343da433"
+    },
+    {
+      "path": "cost-proposal.json",
+      "bytes": 5233,
+      "sha256": "be1f19118ebb73de7b6892752e7b8a30eae463ad81830d1b9d57f38751107c8e"
+    },
+    {
+      "path": "cost-proposal.py",
+      "bytes": 6587,
+      "sha256": "2a48c4f1ae37dfb81a5100e3c84005e25454719f36352e3655315079e412f12c"
+    },
+    {
+      "path": "derivation.json",
+      "bytes": 1249,
+      "sha256": "a8d39d7a0c08e60b816e5567ef8522f0d2c8c362020e66f38c087833664f3c58"
+    },
+    {
+      "path": "pricing-compute-e2-highcpu-32-header.html",
+      "bytes": 6156,
+      "sha256": "95fda29617708aa733c70efe4c4a596a0c6c6fd4412caa2bb6c2e7a4e8d989ba"
+    },
+    {
+      "path": "pricing-compute-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-compute-e2-highcpu-32-row.html",
+      "bytes": 738,
+      "sha256": "d3c12a45c633d8bf5aaa107f6f202511767227fafedbb87932f4963ada3045da"
+    },
+    {
+      "path": "pricing-compute-e2-standard-2-header.html",
+      "bytes": 6156,
+      "sha256": "0eaf29d999d51db71eba961ac83ed0759f97e85be48a16011ccef9c5b6505aa4"
+    },
+    {
+      "path": "pricing-compute-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-compute-e2-standard-2-row.html",
+      "bytes": 738,
+      "sha256": "4825b9030a6dbb4d3f9c4827a2184c60066b22eb7a1e35775e8dcfaada00fc13"
+    },
+    {
+      "path": "pricing-disk-balanced-header.html",
+      "bytes": 316,
+      "sha256": "6d20d457c99d6bdf26cff89c6462a3eccb864216f96720ddac3312547cb64565"
+    },
+    {
+      "path": "pricing-disk-balanced-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-disk-balanced-row.html",
+      "bytes": 243,
+      "sha256": "2e10a2e464884d98e9c4ca6af644341647b7bc4f3356ee0053167fca14ef0319"
+    },
+    {
+      "path": "pricing-network-asia-egress-header.html",
+      "bytes": 316,
+      "sha256": "654fa3b64513f4092f73efbf07280024104f26e28e2a01ed800794e177b97c35"
+    },
+    {
+      "path": "pricing-network-asia-egress-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-network-asia-egress-row.html",
+      "bytes": 791,
+      "sha256": "7682738cbbb76f8367ad699c94767ae312761d1401b69c034cf6e31a1d419cd4"
+    },
+    {
+      "path": "pricing-network-spot-ipv4-header.html",
+      "bytes": 315,
+      "sha256": "93345396f548060461bc900f409d21bf02ea0c2123b5849d1269035dea74151e"
+    },
+    {
+      "path": "pricing-network-spot-ipv4-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-network-spot-ipv4-row.html",
+      "bytes": 288,
+      "sha256": "2d4be4d8fbcb1102c509855997a66ba5eff2757985e3ba982670b5bc376631a7"
+    },
+    {
+      "path": "pricing-sources.json",
+      "bytes": 5062,
+      "sha256": "4e5e67f12d3601d72b397921bb9b4b6e29eb5deb9d7edc744c2e8ae6d2741741"
+    },
+    {
+      "path": "pricing-spot-e2-highcpu-32-header.html",
+      "bytes": 613,
+      "sha256": "ea2cfaff837888ca38d51f5b98ab19c79b025e9f96cb7e6a1cdd861721e397b6"
+    },
+    {
+      "path": "pricing-spot-e2-highcpu-32-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-spot-e2-highcpu-32-row.html",
+      "bytes": 378,
+      "sha256": "9de71a06d059c30b308d4a4208cb5d0b227292f8516e62a6825af9228c789645"
+    },
+    {
+      "path": "pricing-spot-e2-standard-2-header.html",
+      "bytes": 613,
+      "sha256": "ba42cc29e1dbbbcf4289de82a6dcce26512185bbbd82d85d4376510a58932a9c"
+    },
+    {
+      "path": "pricing-spot-e2-standard-2-region.html",
+      "bytes": 304,
+      "sha256": "e745ff1a6ccfc92d2a42b925121ce03d2b31a9fc09fb62aba407f02b559b82f8"
+    },
+    {
+      "path": "pricing-spot-e2-standard-2-row.html",
+      "bytes": 376,
+      "sha256": "a8eb421dcf94e184a8abff0e34d53e25d543d78f6e57dc9e38794b6b49c00d6c"
+    },
+    {
+      "path": "spot-pricing-source.json",
+      "bytes": 1725,
+      "sha256": "361ddc5ca1f40f6fc5d7177e590fc39ec3d7e498daa191eb96d96477313b9d7e"
+    }
+  ]
+}

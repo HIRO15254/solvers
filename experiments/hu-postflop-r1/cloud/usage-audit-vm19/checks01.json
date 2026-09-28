@@ -1,0 +1,99 @@
+{
+  "schema": "r1.vm19-usage-checks/v1",
+  "at_utc": "2026-09-28T04:23:00.804915+00:00",
+  "commands": [
+    {
+      "label": "tests",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-audit-vm19",
+        "-p",
+        "test_analyze.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.328276599990204,
+      "stdout": {
+        "path": "tests01.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "tests01.stderr.log",
+        "bytes": 1424,
+        "sha256": "aae99bd54c7b638bdef7e671b297415f6dd91f70e463ba1e492d598ff56caef6"
+      }
+    },
+    {
+      "label": "generate",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-audit-vm19\\analyze.py",
+        "--report",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-audit-vm19\\report.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.2782512998674065,
+      "stdout": {
+        "path": "generate01.stdout.log",
+        "bytes": 1027,
+        "sha256": "3789ef201469f4f4cfe5e01d7c76acbdffe9e4ea612e171c642c59c2ebb24fc7"
+      },
+      "stderr": {
+        "path": "generate01.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "native_or_cloud_work": false,
+  "local_archive_decompression": false,
+  "status": "passed",
+  "files": [
+    {
+      "path": "collect.py",
+      "bytes": 12833,
+      "sha256": "804c007cea27d9046afd64e4807de5b4b42b4296366ca3c1c0b0962ff03b6462"
+    },
+    {
+      "path": "analyze.py",
+      "bytes": 15651,
+      "sha256": "a6c2963f58aa5d2bb4930590a70075552ef1392ab3bf11b1b7792896ec8a870d"
+    },
+    {
+      "path": "test_analyze.py",
+      "bytes": 4306,
+      "sha256": "6380c7968f9257be54fa83bc05dd5e819def83595ba882d5579d8c5693f6f2f3"
+    },
+    {
+      "path": "check.py",
+      "bytes": 2445,
+      "sha256": "4c162f07900389fa2a3b6f230633cd7dcfcee0009fad2a3584e6ada6d81b61b6"
+    },
+    {
+      "path": "acquisition.json",
+      "bytes": 31971,
+      "sha256": "b8d16f64c095bad1fd12676e62cdf78d4f27894edfa73e21b16159151dd8f490"
+    },
+    {
+      "path": "report.json",
+      "bytes": 20592,
+      "sha256": "803d7263f80f6c60d3132f7c4216577e382ac0de718a54cafc23ca7dc7790358"
+    },
+    {
+      "path": "README.jp.md",
+      "bytes": 3680,
+      "sha256": "e8f00f55620574c78166f0a228e495d7eb19f5ea2f7a16460fdfeae47a2fe208"
+    }
+  ]
+}

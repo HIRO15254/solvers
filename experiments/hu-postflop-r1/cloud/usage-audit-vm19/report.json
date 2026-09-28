@@ -1,0 +1,667 @@
+{
+  "schema": "r1.vm19-usage-proposal/v1",
+  "status": "proposal_only_no_ledger_change",
+  "instance_id": "6599180552829758403",
+  "instance_name": "solvers-r1-20260927-19",
+  "project": "solvers-abstraction-20260723",
+  "source": {
+    "bytes": 15651,
+    "sha256": "a6c2963f58aa5d2bb4930590a70075552ef1392ab3bf11b1b7792896ec8a870d"
+  },
+  "acquisition": {
+    "bytes": 31971,
+    "sha256": "b8d16f64c095bad1fd12676e62cdf78d4f27894edfa73e21b16159151dd8f490"
+  },
+  "inputs": {
+    "count": 129,
+    "bytes": 351130,
+    "sdk_receipts": 34
+  },
+  "lifecycle": {
+    "original_launch": "2026-09-27T08:34:48.992911Z",
+    "original_stop_deadline": "2026-09-27T09:19:48Z",
+    "actual_original_last_stop": "2026-09-27T02:15:25.078-07:00",
+    "preemption_recorded": true,
+    "recovery_amendment_separate_from_experiment": true,
+    "recovery_request": "2026-09-28T04:05:18.452864+00:00",
+    "recovery_stop_deadline": "2026-09-28T04:14:34Z",
+    "delete_operation_done": "2026-09-27T21:11:52.051-07:00",
+    "disk_absence_observed": "2026-09-28T04:12:30.179303+00:00",
+    "original_runtime_window_seconds": "2436.085089",
+    "recovery_window_seconds": "393.598136",
+    "disk_full_window_seconds": "70657.603303",
+    "actual_machine": "e2-standard-2 only",
+    "measurement_32cpu_run": false,
+    "three_inventory_absence_confirmed": true
+  },
+  "monitoring": {
+    "sent": {
+      "available": true,
+      "points": 47,
+      "observed_sum": "6050550",
+      "first_start": "2026-09-27T08:34:00.001Z",
+      "last_end": "2026-09-28T04:12:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-27T08:35:00Z",
+          "end": "2026-09-27T08:35:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:36:00Z",
+          "end": "2026-09-27T08:36:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:37:00Z",
+          "end": "2026-09-27T08:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:38:00Z",
+          "end": "2026-09-27T08:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:39:00Z",
+          "end": "2026-09-27T08:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:40:00Z",
+          "end": "2026-09-27T08:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:41:00Z",
+          "end": "2026-09-27T08:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:42:00Z",
+          "end": "2026-09-27T08:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:43:00Z",
+          "end": "2026-09-27T08:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:44:00Z",
+          "end": "2026-09-27T08:44:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:45:00Z",
+          "end": "2026-09-27T08:45:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:46:00Z",
+          "end": "2026-09-27T08:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:47:00Z",
+          "end": "2026-09-27T08:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:48:00Z",
+          "end": "2026-09-27T08:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:49:00Z",
+          "end": "2026-09-27T08:49:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:50:00Z",
+          "end": "2026-09-27T08:50:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:51:00Z",
+          "end": "2026-09-27T08:51:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:52:00Z",
+          "end": "2026-09-27T08:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:53:00Z",
+          "end": "2026-09-27T08:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:54:00Z",
+          "end": "2026-09-27T08:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:55:00Z",
+          "end": "2026-09-27T08:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:56:00Z",
+          "end": "2026-09-27T08:56:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:57:00Z",
+          "end": "2026-09-27T08:57:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:58:00Z",
+          "end": "2026-09-27T08:58:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:59:00Z",
+          "end": "2026-09-27T08:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:00:00Z",
+          "end": "2026-09-27T09:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:01:00Z",
+          "end": "2026-09-27T09:01:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:02:00Z",
+          "end": "2026-09-27T09:02:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:03:00Z",
+          "end": "2026-09-27T09:03:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:04:00Z",
+          "end": "2026-09-27T09:04:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:05:00Z",
+          "end": "2026-09-27T09:05:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:06:00Z",
+          "end": "2026-09-27T09:06:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:07:00Z",
+          "end": "2026-09-27T09:07:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:08:00Z",
+          "end": "2026-09-27T09:08:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:09:00Z",
+          "end": "2026-09-27T09:09:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:10:00Z",
+          "end": "2026-09-27T09:10:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:11:00Z",
+          "end": "2026-09-27T09:11:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:12:00Z",
+          "end": "2026-09-27T09:12:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:13:00Z",
+          "end": "2026-09-27T09:13:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:14:00Z",
+          "end": "2026-09-28T04:05:00.001Z",
+          "seconds": "67860.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:06:00Z",
+          "end": "2026-09-28T04:06:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:07:00Z",
+          "end": "2026-09-28T04:07:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:08:00Z",
+          "end": "2026-09-28T04:08:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:09:00Z",
+          "end": "2026-09-28T04:09:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:10:00Z",
+          "end": "2026-09-28T04:10:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:11:00Z",
+          "end": "2026-09-28T04:11:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    },
+    "uptime": {
+      "available": true,
+      "points": 47,
+      "observed_sum": "2661.8649180000001544",
+      "first_start": "2026-09-27T08:34:00.001Z",
+      "last_end": "2026-09-28T04:12:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-27T08:35:00Z",
+          "end": "2026-09-27T08:35:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:36:00Z",
+          "end": "2026-09-27T08:36:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:37:00Z",
+          "end": "2026-09-27T08:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:38:00Z",
+          "end": "2026-09-27T08:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:39:00Z",
+          "end": "2026-09-27T08:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:40:00Z",
+          "end": "2026-09-27T08:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:41:00Z",
+          "end": "2026-09-27T08:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:42:00Z",
+          "end": "2026-09-27T08:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:43:00Z",
+          "end": "2026-09-27T08:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:44:00Z",
+          "end": "2026-09-27T08:44:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:45:00Z",
+          "end": "2026-09-27T08:45:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:46:00Z",
+          "end": "2026-09-27T08:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:47:00Z",
+          "end": "2026-09-27T08:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:48:00Z",
+          "end": "2026-09-27T08:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:49:00Z",
+          "end": "2026-09-27T08:49:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:50:00Z",
+          "end": "2026-09-27T08:50:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:51:00Z",
+          "end": "2026-09-27T08:51:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:52:00Z",
+          "end": "2026-09-27T08:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:53:00Z",
+          "end": "2026-09-27T08:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:54:00Z",
+          "end": "2026-09-27T08:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:55:00Z",
+          "end": "2026-09-27T08:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:56:00Z",
+          "end": "2026-09-27T08:56:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:57:00Z",
+          "end": "2026-09-27T08:57:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:58:00Z",
+          "end": "2026-09-27T08:58:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T08:59:00Z",
+          "end": "2026-09-27T08:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:00:00Z",
+          "end": "2026-09-27T09:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:01:00Z",
+          "end": "2026-09-27T09:01:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:02:00Z",
+          "end": "2026-09-27T09:02:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:03:00Z",
+          "end": "2026-09-27T09:03:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:04:00Z",
+          "end": "2026-09-27T09:04:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:05:00Z",
+          "end": "2026-09-27T09:05:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:06:00Z",
+          "end": "2026-09-27T09:06:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:07:00Z",
+          "end": "2026-09-27T09:07:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:08:00Z",
+          "end": "2026-09-27T09:08:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:09:00Z",
+          "end": "2026-09-27T09:09:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:10:00Z",
+          "end": "2026-09-27T09:10:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:11:00Z",
+          "end": "2026-09-27T09:11:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:12:00Z",
+          "end": "2026-09-27T09:12:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:13:00Z",
+          "end": "2026-09-27T09:13:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-27T09:14:00Z",
+          "end": "2026-09-28T04:05:00.001Z",
+          "seconds": "67860.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:06:00Z",
+          "end": "2026-09-28T04:06:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:07:00Z",
+          "end": "2026-09-28T04:07:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:08:00Z",
+          "end": "2026-09-28T04:08:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:09:00Z",
+          "end": "2026-09-28T04:09:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:10:00Z",
+          "end": "2026-09-28T04:10:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T04:11:00Z",
+          "end": "2026-09-28T04:11:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    }
+  },
+  "known_verified_archive_transfer_bytes": 4668141,
+  "price_basis": {
+    "regular_e2_standard_2_usd_hour": "0.06701142",
+    "capture_date_utc": "2026-09-27",
+    "disk_ceiling_usd_gib_hour": ".000137",
+    "spot_ipv4_usd_hour": ".0025",
+    "egress_allowance_usd_gib": ".30",
+    "discounts_or_credits_assumed": false
+  },
+  "cost": {
+    "original_window_minutes": 43,
+    "recovery_window_minutes": 9,
+    "total_compute_minutes": 52,
+    "disk_minutes": 1180,
+    "rounding": "Add 120 seconds to each of the two runtime windows and the full disk window; ceil each to minute",
+    "network_allowance_gib": "0.5",
+    "components_usd": {
+      "e2_standard_2_compute_regular_price": "0.05807656400000000000000000000",
+      "ipv4_during_both_rounded_runtime_windows": "0.002166666666666666666666666667",
+      "same_20gib_disk_entire_lifecycle": "0.05388666666666666666666666668",
+      "total_egress_allowance": "0.150",
+      "original_uncertainty_reserve": "1"
+    },
+    "model_usd": "1.264129897333333333333333333",
+    "proposed_hold_usd": "1.3",
+    "previous_hold_usd": "1.85",
+    "proposed_restore_usd": "0.55",
+    "rounding_margin_usd": "0.035870102666666666666666667",
+    "small_compute_014_ceiling_alternative_usd": "1.327386666666666666666666666"
+  },
+  "budget_snapshot": {
+    "authorized_usd": "40",
+    "held_usd": "39.95",
+    "available_usd": "0.05",
+    "billed_usd": null,
+    "ledger_pin": {
+      "path": "inputs/budget.json",
+      "bytes": 92775,
+      "sha256": "ad2613a9d22c6ebe4284068ece3186e8e05e9a098eb9d8e6e907cef40f8e903f"
+    },
+    "proposed_new_available_usd": "0.60"
+  },
+  "limitations": [
+    "Not invoice or complete billing export; actual billed amount unknown.",
+    "Monitoring missing intervals and edge coverage are unknown, not zero usage.",
+    "Compute price uses the captured ordinary E2 rate rather than assuming the Spot discount.",
+    "The stopped disk remained billable across the overnight gap and is priced for the entire lifecycle.",
+    "Recovery has its own explicit ten-minute amendment; it is not represented as part of the expired experiment window.",
+    "Original $1 uncertainty and at least 512 MiB total outbound allowance are retained.",
+    "No full build, solver performance, profile completeness or R1 acceptance claim follows from this usage report."
+  ],
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "local_archive_decompression": false
+}
