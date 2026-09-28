@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "scp",
+    "solvers-r1-20260928-21:/opt/r1/sparse-rank-analysis01.json",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm21\\downloads\\proof01",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-28T06:01:40.646762+00:00",
+  "timeout_seconds": 180,
+  "stdout": {
+    "bytes": 143,
+    "sha256": "02f7e0458b1f5552a7057160a38eccaa61733c8dfc3c480b439827ea93e4f56c"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T06:01:47.540846+00:00"
+}

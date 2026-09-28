@@ -1,0 +1,60 @@
+{
+  "architecture": "X86_64",
+  "creationTimestamp": "2026-09-27T22:35:54.661-07:00",
+  "enableConfidentialCompute": false,
+  "guestOsFeatures": [
+    {
+      "type": "VIRTIO_SCSI_MULTIQUEUE"
+    },
+    {
+      "type": "SEV_CAPABLE"
+    },
+    {
+      "type": "SEV_SNP_CAPABLE"
+    },
+    {
+      "type": "SEV_LIVE_MIGRATABLE"
+    },
+    {
+      "type": "SEV_LIVE_MIGRATABLE_V2"
+    },
+    {
+      "type": "SNP_SVSM_CAPABLE"
+    },
+    {
+      "type": "IDPF"
+    },
+    {
+      "type": "TDX_CAPABLE"
+    },
+    {
+      "type": "UEFI_COMPATIBLE"
+    },
+    {
+      "type": "GVNIC"
+    }
+  ],
+  "id": "5498906379380081237",
+  "kind": "compute#disk",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "lastAttachTimestamp": "2026-09-27T22:35:55.207-07:00",
+  "licenseCodes": [
+    "3242930272766215801"
+  ],
+  "licenses": [
+    "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-2404-lts"
+  ],
+  "name": "solvers-r1-20260928-21",
+  "physicalBlockSizeBytes": "4096",
+  "satisfiesPzi": false,
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260928-21",
+  "sizeGb": "20",
+  "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-2404-noble-amd64-v20260918",
+  "sourceImageId": "763874002631433611",
+  "status": "READY",
+  "type": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/diskTypes/pd-balanced",
+  "users": [
+    "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260928-21"
+  ],
+  "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+}

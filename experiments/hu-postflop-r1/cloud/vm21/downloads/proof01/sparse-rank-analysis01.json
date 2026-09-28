@@ -1,0 +1,6590 @@
+{
+  "build_host": {
+    "affinity": [
+      0,
+      1
+    ],
+    "boot_id": "e472e3a4-51c6-407f-bd56-1f0dc06204fe",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm21-build2.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "6442450944",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "AMD EPYC 7B12"
+    ],
+    "instance_id": "715936786015339093",
+    "logical_cpus": 2,
+    "machine": "x86_64",
+    "one_per_core": [],
+    "physical_cores": 1,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 1,
+        "socket": "0"
+      }
+    ],
+    "v3": {
+      "argv": [
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "--help"
+      ],
+      "loader": {
+        "bytes": 236616,
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "per_cpu_flags": {
+        "0": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "1": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ]
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Usage: /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]\nYou have invoked 'ld.so', the program interpreter for dynamically-linked\nELF programs.  Usually, the program interpreter is invoked automatically\nwhen a dynamically-linked executable is started.\n\nYou may invoke the program interpreter program directly from the command\nline to load and run an ELF executable file; this is like executing that\nfile itself, but always uses the program interpreter you invoked,\ninstead of the program interpreter specified in the executable file you\nrun.  Invoking the program interpreter directly provides access to\nadditional diagnostics, and changing the dynamic linker behavior without\nsetting environment variables (which would be inherited by subprocesses).\n\n  --list                list all dependencies and how they are resolved\n  --verify              verify that given object really is a dynamically linked\n                        object we can handle\n  --inhibit-cache       Do not use /etc/ld.so.cache\n  --library-path PATH   use given PATH instead of content of the environment\n                        variable LD_LIBRARY_PATH\n  --glibc-hwcaps-prepend LIST\n                        search glibc-hwcaps subdirectories in LIST\n  --glibc-hwcaps-mask LIST\n                        only search built-in subdirectories if in LIST\n  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names\n                        in LIST\n  --audit LIST          use objects named in LIST as auditors\n  --preload LIST        preload objects named in LIST\n  --argv0 STRING        set argv[0] to STRING before running\n  --list-tunables       list all tunables with minimum and maximum values\n  --list-diagnostics    list diagnostics information\n  --help                display this help and exit\n  --version             output version information and exit\n\nThis program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2\n\nShared library search path:\n  (libraries located via /etc/ld.so.cache)\n  /lib/x86_64-linux-gnu (system search path)\n  /usr/lib/x86_64-linux-gnu (system search path)\n  /lib (system search path)\n  /usr/lib (system search path)\n\nSubdirectories of glibc-hwcaps directories, in priority order:\n  x86-64-v4\n  x86-64-v3 (supported, searched)\n  x86-64-v2 (supported, searched)\n"
+    }
+  },
+  "build_plan": {
+    "bytes": 96218,
+    "sha256": "5913d3d3cf534fa0519c16b033172ea07f5d38e424b3032f1b5cdcc70523f158"
+  },
+  "comparisons": [
+    {
+      "candidate_over_baseline_cfr_median": 0.9054863822014432,
+      "candidate_over_baseline_quality_median": 0.8629653734548626,
+      "candidate_over_baseline_rss_maximum": 0.9989757292362503,
+      "case": "narrow",
+      "workers": 16
+    },
+    {
+      "candidate_over_baseline_cfr_median": 0.9497139824020727,
+      "candidate_over_baseline_quality_median": 0.8652614532496602,
+      "candidate_over_baseline_rss_maximum": 0.9933191752942218,
+      "case": "narrow",
+      "workers": 32
+    },
+    {
+      "candidate_over_baseline_cfr_median": 0.852584132622279,
+      "candidate_over_baseline_quality_median": 0.7890992180716179,
+      "candidate_over_baseline_rss_maximum": 1.0006074252500392,
+      "case": "expanded",
+      "workers": 16
+    },
+    {
+      "candidate_over_baseline_cfr_median": 0.8529820019718515,
+      "candidate_over_baseline_quality_median": 0.8177576042930286,
+      "candidate_over_baseline_rss_maximum": 0.9976116799235738,
+      "case": "expanded",
+      "workers": 32
+    }
+  ],
+  "counts": {
+    "build_commands": 2,
+    "canonical": 2,
+    "core_test_commands": 2,
+    "measured": 24,
+    "smoke": 4,
+    "warmup": 8
+  },
+  "exact_state_and_quality_across_arms_workers": true,
+  "execution": {
+    "bytes": 5983380,
+    "sha256": "e0b9da1dc18b7b3be975c64f025a58c39ae1b210cc2c2e34b3c09c0ff65954d2"
+  },
+  "frontier_observations": {
+    "expanded": {
+      "case": "expanded",
+      "cfr_depth": 2,
+      "counts_scope": "one structural root traversal; not tasks, iterations or seat passes",
+      "eligible_chance_nodes_by_depth": [
+        5,
+        1034
+      ],
+      "eligible_child_edges_by_depth": [
+        245,
+        49637
+      ],
+      "min_children": 12,
+      "quality_depth": 2,
+      "schema": "r1.flop-chance-grain-observation/v1"
+    },
+    "narrow": {
+      "case": "narrow",
+      "cfr_depth": 2,
+      "counts_scope": "one structural root traversal; not tasks, iterations or seat passes",
+      "eligible_chance_nodes_by_depth": [
+        5,
+        1034
+      ],
+      "eligible_child_edges_by_depth": [
+        245,
+        49637
+      ],
+      "min_children": 12,
+      "quality_depth": 2,
+      "schema": "r1.flop-chance-grain-observation/v1"
+    }
+  },
+  "groups": [
+    {
+      "arm": "baseline",
+      "case": "narrow",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0040025148937133,
+          "maximum": 15.52919038415962,
+          "median": 15.496564567763919,
+          "minimum": 15.467282356163805,
+          "samples": [
+            15.496564567763919,
+            15.52919038415962,
+            15.467282356163805
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0040025148937133,
+          "maximum": 0.4852871995049881,
+          "median": 0.48426764274262246,
+          "minimum": 0.4833525736301189,
+          "samples": [
+            0.48426764274262246,
+            0.4852871995049881,
+            0.4833525736301189
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.099405711928257,
+          "maximum": 0.257032081,
+          "median": 0.24389922100000003,
+          "minimum": 0.233791837,
+          "samples": [
+            0.24389922100000003,
+            0.233791837,
+            0.257032081
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.1038060996644834,
+          "maximum": 0.016617792,
+          "median": 0.015738922,
+          "minimum": 0.015054992,
+          "samples": [
+            0.015738922,
+            0.015054992,
+            0.016617792
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0041850950171278,
+          "maximum": 15.855573924032283,
+          "median": 15.852108328188358,
+          "minimum": 15.789493393906472,
+          "samples": [
+            15.855573924032283,
+            15.789493393906472,
+            15.852108328188358
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0041850950171278,
+          "maximum": 0.49548668512600885,
+          "median": 0.4953783852558862,
+          "minimum": 0.49342166855957725,
+          "samples": [
+            0.49548668512600885,
+            0.49342166855957725,
+            0.4953783852558862
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0791926590215777,
+          "maximum": 0.233753376,
+          "median": 0.22180270400000002,
+          "minimum": 0.216600228,
+          "samples": [
+            0.22180270400000002,
+            0.233753376,
+            0.216600228
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0834723135827689,
+          "maximum": 0.014804362,
+          "median": 0.013988942,
+          "minimum": 0.013663812,
+          "samples": [
+            0.013988942,
+            0.014804362,
+            0.013663812
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.002606171525777,
+          "maximum": 15.785076265591192,
+          "median": 15.761937164812881,
+          "minimum": 15.74404458489348,
+          "samples": [
+            15.761937164812881,
+            15.74404458489348,
+            15.785076265591192
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.002606171525777,
+          "maximum": 0.49328363329972474,
+          "median": 0.49256053640040254,
+          "minimum": 0.49200139327792125,
+          "samples": [
+            0.49256053640040254,
+            0.49200139327792125,
+            0.49328363329972474
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0361581072714985,
+          "maximum": 10.846923658000001,
+          "median": 10.568421773,
+          "minimum": 10.468405914,
+          "samples": [
+            10.568421773,
+            10.846923658000001,
+            10.468405914
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0335921636885084,
+          "maximum": 0.7969249669999999,
+          "median": 0.779297965,
+          "minimum": 0.771024583,
+          "samples": [
+            0.779297965,
+            0.7969249669999999,
+            0.771024583
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0388585130268724,
+          "maximum": 0.688954074,
+          "median": 0.670502722,
+          "minimum": 0.66318374,
+          "samples": [
+            0.670502722,
+            0.688954074,
+            0.66318374
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.01905452128018,
+          "maximum": 0.213622886,
+          "median": 0.213485486,
+          "minimum": 0.209628515,
+          "samples": [
+            0.213485486,
+            0.213622886,
+            0.209628515
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0043805052245396,
+          "maximum": 15.505574369089443,
+          "median": 15.470680711965537,
+          "minimum": 15.437948355661296,
+          "samples": [
+            15.437948355661296,
+            15.505574369089443,
+            15.470680711965537
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0043805052245396,
+          "maximum": 0.4845491990340451,
+          "median": 0.48345877224892303,
+          "minimum": 0.4824358861144155,
+          "samples": [
+            0.4824358861144155,
+            0.4845491990340451,
+            0.48345877224892303
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0702510405782601,
+          "maximum": 0.27054796000000003,
+          "median": 0.258559128,
+          "minimum": 0.252789252,
+          "samples": [
+            0.258559128,
+            0.27054796000000003,
+            0.252789252
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0678425536717133,
+          "maximum": 0.017448432,
+          "median": 0.016748283,
+          "minimum": 0.016339892,
+          "samples": [
+            0.016748283,
+            0.017448432,
+            0.016339892
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0082294092632653,
+          "maximum": 15.550898078588988,
+          "median": 15.532157362500346,
+          "minimum": 15.423967933996648,
+          "samples": [
+            15.550898078588988,
+            15.532157362500346,
+            15.423967933996648
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0082294092632653,
+          "maximum": 0.48596556495590587,
+          "median": 0.4853799175781358,
+          "minimum": 0.48199899793739526,
+          "samples": [
+            0.48596556495590587,
+            0.4853799175781358,
+            0.48199899793739526
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0363555038315257,
+          "maximum": 0.24395601600000003,
+          "median": 0.23935286700000002,
+          "minimum": 0.23539800300000002,
+          "samples": [
+            0.23539800300000002,
+            0.24395601600000003,
+            0.23935286700000002
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0376059446950143,
+          "maximum": 0.015706512,
+          "median": 0.015518242,
+          "minimum": 0.015137261,
+          "samples": [
+            0.015137261,
+            0.015706512,
+            0.015518242
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0087441478774224,
+          "maximum": 15.792746149605602,
+          "median": 15.72699849578018,
+          "minimum": 15.655849090015895,
+          "samples": [
+            15.655849090015895,
+            15.72699849578018,
+            15.792746149605602
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0087441478774224,
+          "maximum": 0.49352331717517506,
+          "median": 0.4914687029931306,
+          "minimum": 0.4892452840629967,
+          "samples": [
+            0.4892452840629967,
+            0.4914687029931306,
+            0.49352331717517506
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0450195099341117,
+          "maximum": 0.7359169010000001,
+          "median": 0.719117737,
+          "minimum": 0.704213552,
+          "samples": [
+            0.7359169010000001,
+            0.704213552,
+            0.719117737
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0497686945178664,
+          "maximum": 0.047005876,
+          "median": 0.045534686,
+          "minimum": 0.044777365,
+          "samples": [
+            0.047005876,
+            0.044777365,
+            0.045534686
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0024891552337436,
+          "maximum": 15.625319286497048,
+          "median": 15.61930650142905,
+          "minimum": 15.58652201365091,
+          "samples": [
+            15.58652201365091,
+            15.61930650142905,
+            15.625319286497048
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0024891552337436,
+          "maximum": 0.48829122770303274,
+          "median": 0.4881033281696578,
+          "minimum": 0.48707881292659094,
+          "samples": [
+            0.48707881292659094,
+            0.4881033281696578,
+            0.48829122770303274
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0063451299385366,
+          "maximum": 1.69573945,
+          "median": 1.6864304710000002,
+          "minimum": 1.6850476040000002,
+          "samples": [
+            1.69573945,
+            1.6864304710000002,
+            1.6850476040000002
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0088500791856754,
+          "maximum": 0.108795243,
+          "median": 0.107970893,
+          "minimum": 0.107840843,
+          "samples": [
+            0.108795243,
+            0.107970893,
+            0.107840843
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0052827147781707,
+          "maximum": 183951360,
+          "median": 183304192,
+          "minimum": 182984704,
+          "samples": [
+            182984704,
+            183951360,
+            183304192
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0020916834692386,
+          "maximum": 0.467005627,
+          "median": 0.466589177,
+          "minimum": 0.466030838,
+          "samples": [
+            0.466589177,
+            0.467005627,
+            0.466030838
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0037823188716857,
+          "maximum": 1.6343234499999966,
+          "median": 1.6319232409999955,
+          "minimum": 1.6281652099999917,
+          "samples": [
+            1.6281652099999917,
+            1.6343234499999966,
+            1.6319232409999955
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "narrow-r1-w16-baseline",
+        "narrow-r2-w16-baseline",
+        "narrow-r3-w16-baseline"
+      ],
+      "workers": 16
+    },
+    {
+      "arm": "baseline",
+      "case": "narrow",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0366583111543137,
+          "maximum": 30.541794193265233,
+          "median": 30.39368168416476,
+          "minimum": 29.461775268320668,
+          "samples": [
+            30.541794193265233,
+            29.461775268320668,
+            30.39368168416476
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0366583111543137,
+          "maximum": 0.9544310685395385,
+          "median": 0.9498025526301488,
+          "minimum": 0.9206804771350209,
+          "samples": [
+            0.9544310685395385,
+            0.9206804771350209,
+            0.9498025526301488
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.2713608855609548,
+          "maximum": 0.533567864,
+          "median": 0.46638259600000004,
+          "minimum": 0.41968246000000003,
+          "samples": [
+            0.41968246000000003,
+            0.533567864,
+            0.46638259600000004
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.317966828493272,
+          "maximum": 0.018110513,
+          "median": 0.015344722,
+          "minimum": 0.013741251,
+          "samples": [
+            0.013741251,
+            0.018110513,
+            0.015344722
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0157964309525596,
+          "maximum": 30.61749372730662,
+          "median": 30.612545411667092,
+          "minimum": 30.14136769371711,
+          "samples": [
+            30.61749372730662,
+            30.14136769371711,
+            30.612545411667092
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0157964309525596,
+          "maximum": 0.9567966789783319,
+          "median": 0.9566420441145966,
+          "minimum": 0.9419177404286597,
+          "samples": [
+            0.9567966789783319,
+            0.9419177404286597,
+            0.9566420441145966
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.1630533404301742,
+          "maximum": 0.45936475200000004,
+          "median": 0.45276726100000003,
+          "minimum": 0.39496447500000004,
+          "samples": [
+            0.39496447500000004,
+            0.45936475200000004,
+            0.45276726100000003
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.181425432216423,
+          "maximum": 0.015240342,
+          "median": 0.014790252,
+          "minimum": 0.012899961,
+          "samples": [
+            0.012899961,
+            0.015240342,
+            0.014790252
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.000560820477115,
+          "maximum": 30.737354509018083,
+          "median": 30.72556801021478,
+          "minimum": 30.720126033279065,
+          "samples": [
+            30.720126033279065,
+            30.737354509018083,
+            30.72556801021478
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.000560820477115,
+          "maximum": 0.9605423284068151,
+          "median": 0.9601740003192119,
+          "minimum": 0.9600039385399708,
+          "samples": [
+            0.9600039385399708,
+            0.9605423284068151,
+            0.9601740003192119
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0620297792795361,
+          "maximum": 22.770341676,
+          "median": 21.919265246000002,
+          "minimum": 21.44039849,
+          "samples": [
+            21.44039849,
+            22.770341676,
+            21.919265246000002
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0642117491950067,
+          "maximum": 0.851584484,
+          "median": 0.81774479,
+          "minimum": 0.800202107,
+          "samples": [
+            0.800202107,
+            0.851584484,
+            0.81774479
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0614345050739742,
+          "maximum": 0.740803561,
+          "median": 0.713388447,
+          "minimum": 0.697926775,
+          "samples": [
+            0.697926775,
+            0.740803561,
+            0.713388447
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0176815060178186,
+          "maximum": 0.215895347,
+          "median": 0.214959606,
+          "minimum": 0.212144316,
+          "samples": [
+            0.215895347,
+            0.212144316,
+            0.214959606
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0600857023457233,
+          "maximum": 31.00133705316544,
+          "median": 29.545198379762223,
+          "minimum": 29.24417996070194,
+          "samples": [
+            29.545198379762223,
+            29.24417996070194,
+            31.00133705316544
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0600857023457233,
+          "maximum": 0.96879178291142,
+          "median": 0.9232874493675695,
+          "minimum": 0.9138806237719356,
+          "samples": [
+            0.9232874493675695,
+            0.9138806237719356,
+            0.96879178291142
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.241278895542749,
+          "maximum": 0.5780235020000001,
+          "median": 0.48202032100000003,
+          "minimum": 0.46566771100000004,
+          "samples": [
+            0.5780235020000001,
+            0.46566771100000004,
+            0.48202032100000003
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.2582694831330252,
+          "maximum": 0.019564042,
+          "median": 0.015923432,
+          "minimum": 0.015548372,
+          "samples": [
+            0.019564042,
+            0.015923432,
+            0.015548372
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0352260504589963,
+          "maximum": 30.605536677879744,
+          "median": 30.584627489521953,
+          "minimum": 29.5641098524423,
+          "samples": [
+            30.605536677879744,
+            29.5641098524423,
+            30.584627489521953
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0352260504589963,
+          "maximum": 0.956423021183742,
+          "median": 0.955769609047561,
+          "minimum": 0.9238784328888219,
+          "samples": [
+            0.956423021183742,
+            0.9238784328888219,
+            0.955769609047561
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.190740177722452,
+          "maximum": 0.5135972360000001,
+          "median": 0.47127491600000004,
+          "minimum": 0.431326032,
+          "samples": [
+            0.431326032,
+            0.5135972360000001,
+            0.47127491600000004
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.2326852513064575,
+          "maximum": 0.017372322,
+          "median": 0.015408882,
+          "minimum": 0.014093072,
+          "samples": [
+            0.014093072,
+            0.017372322,
+            0.015408882
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0185167756618436,
+          "maximum": 31.249861181148486,
+          "median": 30.919953407251487,
+          "minimum": 30.68173438855926,
+          "samples": [
+            30.68173438855926,
+            31.249861181148486,
+            30.919953407251487
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0185167756618436,
+          "maximum": 0.9765581619108902,
+          "median": 0.966248543976609,
+          "minimum": 0.9588041996424769,
+          "samples": [
+            0.9588041996424769,
+            0.9765581619108902,
+            0.966248543976609
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0681307051373632,
+          "maximum": 1.369922227,
+          "median": 1.3314903390000001,
+          "minimum": 1.282541753,
+          "samples": [
+            1.282541753,
+            1.369922227,
+            1.3314903390000001
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0487119413848434,
+          "maximum": 0.043837706,
+          "median": 0.043062495,
+          "minimum": 0.041801475,
+          "samples": [
+            0.041801475,
+            0.043837706,
+            0.043062495
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0178700180346425,
+          "maximum": 30.7194145831653,
+          "median": 30.394487656124163,
+          "minimum": 30.180095728214866,
+          "samples": [
+            30.394487656124163,
+            30.180095728214866,
+            30.7194145831653
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0178700180346425,
+          "maximum": 0.9599817057239156,
+          "median": 0.9498277392538801,
+          "minimum": 0.9431279915067146,
+          "samples": [
+            0.9498277392538801,
+            0.9431279915067146,
+            0.9599817057239156
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0755234086064953,
+          "maximum": 3.343378861,
+          "median": 3.205765765,
+          "minimum": 3.1086063160000004,
+          "samples": [
+            3.1086063160000004,
+            3.343378861,
+            3.205765765
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0831636606175965,
+          "maximum": 0.110780923,
+          "median": 0.104356343,
+          "minimum": 0.102275332,
+          "samples": [
+            0.102275332,
+            0.110780923,
+            0.104356343
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.009761654790359,
+          "maximum": 185155584,
+          "median": 184020992,
+          "minimum": 183365632,
+          "samples": [
+            183365632,
+            185155584,
+            184020992
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0035918314936574,
+          "maximum": 0.467354016,
+          "median": 0.465755956,
+          "minimum": 0.465681367,
+          "samples": [
+            0.465681367,
+            0.467354016,
+            0.465755956
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0695221792980285,
+          "maximum": 1.7488480140000036,
+          "median": 1.6368869300000028,
+          "minimum": 1.635167598999999,
+          "samples": [
+            1.635167598999999,
+            1.7488480140000036,
+            1.6368869300000028
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.4764921614480723,
+          "speedup": 0.9529843228961447
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.469942234710734,
+          "speedup": 0.939884469421468
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5173183052227117,
+          "speedup": 1.0346366104454234
+        }
+      },
+      "stages": [
+        "narrow-r1-w32-baseline",
+        "narrow-r2-w32-baseline",
+        "narrow-r3-w32-baseline"
+      ],
+      "workers": 32
+    },
+    {
+      "arm": "candidate",
+      "case": "narrow",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0080245206464775,
+          "maximum": 15.4915435638152,
+          "median": 15.42534021214717,
+          "minimum": 15.368220957442576,
+          "samples": [
+            15.4915435638152,
+            15.42534021214717,
+            15.368220957442576
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0080245206464775,
+          "maximum": 0.484110736369225,
+          "median": 0.48204188162959904,
+          "minimum": 0.4802569049200805,
+          "samples": [
+            0.484110736369225,
+            0.48204188162959904,
+            0.4802569049200805
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.1626426116960222,
+          "maximum": 0.23204058100000002,
+          "median": 0.211228682,
+          "minimum": 0.199580317,
+          "samples": [
+            0.23204058100000002,
+            0.199580317,
+            0.211228682
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.1576740404642867,
+          "maximum": 0.014978532,
+          "median": 0.013744511,
+          "minimum": 0.012938471,
+          "samples": [
+            0.014978532,
+            0.012938471,
+            0.013744511
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.007262898625665,
+          "maximum": 15.781665238081764,
+          "median": 15.72687030281661,
+          "minimum": 15.667871078756763,
+          "samples": [
+            15.72687030281661,
+            15.781665238081764,
+            15.667871078756763
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.007262898625665,
+          "maximum": 0.49317703869005514,
+          "median": 0.4914646969630191,
+          "minimum": 0.48962097121114884,
+          "samples": [
+            0.4914646969630191,
+            0.49317703869005514,
+            0.48962097121114884
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0955781931224136,
+          "maximum": 0.20093717200000002,
+          "median": 0.18629028,
+          "minimum": 0.18340742200000001,
+          "samples": [
+            0.18340742200000001,
+            0.18629028,
+            0.20093717200000002
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0997037225556212,
+          "maximum": 0.012824791,
+          "median": 0.011804222,
+          "minimum": 0.011662042,
+          "samples": [
+            0.011662042,
+            0.011804222,
+            0.012824791
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0036032118805969,
+          "maximum": 15.795159466848133,
+          "median": 15.77433041791021,
+          "minimum": 15.738450495042212,
+          "samples": [
+            15.738450495042212,
+            15.77433041791021,
+            15.795159466848133
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0036032118805969,
+          "maximum": 0.49359873333900417,
+          "median": 0.4929478255596941,
+          "minimum": 0.4918265779700691,
+          "samples": [
+            0.4918265779700691,
+            0.4929478255596941,
+            0.49359873333900417
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0207592540968426,
+          "maximum": 9.590597716000001,
+          "median": 9.577086326,
+          "minimum": 9.395553043000001,
+          "samples": [
+            9.590597716000001,
+            9.577086326,
+            9.395553043000001
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0183123638281257,
+          "maximum": 0.702548836,
+          "median": 0.696332795,
+          "minimum": 0.689914864,
+          "samples": [
+            0.702548836,
+            0.696332795,
+            0.689914864
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0244372659684335,
+          "maximum": 0.609373694,
+          "median": 0.607131084,
+          "minimum": 0.594837492,
+          "samples": [
+            0.609373694,
+            0.607131084,
+            0.594837492
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0044794236245225,
+          "maximum": 0.214762237,
+          "median": 0.214183386,
+          "minimum": 0.213804516,
+          "samples": [
+            0.214762237,
+            0.213804516,
+            0.214183386
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0178322659474863,
+          "maximum": 15.444229526872403,
+          "median": 15.319536328708418,
+          "minimum": 15.173648982817006,
+          "samples": [
+            15.173648982817006,
+            15.444229526872403,
+            15.319536328708418
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0178322659474863,
+          "maximum": 0.4826321727147626,
+          "median": 0.47873551027213807,
+          "minimum": 0.47417653071303145,
+          "samples": [
+            0.47417653071303145,
+            0.4826321727147626,
+            0.47873551027213807
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.1102368085905798,
+          "maximum": 0.23335618500000002,
+          "median": 0.22128766900000002,
+          "minimum": 0.210185956,
+          "samples": [
+            0.23335618500000002,
+            0.210185956,
+            0.22128766900000002
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1300348466260555,
+          "maximum": 0.015379042,
+          "median": 0.014444802,
+          "minimum": 0.013609352,
+          "samples": [
+            0.015379042,
+            0.013609352,
+            0.014444802
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.009066731706913,
+          "maximum": 15.797512350741489,
+          "median": 15.765098454144345,
+          "minimum": 15.655567520315328,
+          "samples": [
+            15.765098454144345,
+            15.797512350741489,
+            15.655567520315328
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.009066731706913,
+          "maximum": 0.4936722609606715,
+          "median": 0.4926593266920108,
+          "minimum": 0.489236485009854,
+          "samples": [
+            0.4926593266920108,
+            0.4936722609606715,
+            0.489236485009854
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.1208436204857042,
+          "maximum": 0.21985257500000002,
+          "median": 0.20096972300000002,
+          "minimum": 0.19614919600000003,
+          "samples": [
+            0.20096972300000002,
+            0.19614919600000003,
+            0.21985257500000002
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.1310060088780531,
+          "maximum": 0.014043092,
+          "median": 0.012747762,
+          "minimum": 0.012416461,
+          "samples": [
+            0.012747762,
+            0.012416461,
+            0.014043092
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0069604488499166,
+          "maximum": 15.683357784589473,
+          "median": 15.605804890336254,
+          "minimum": 15.574949147706809,
+          "samples": [
+            15.574949147706809,
+            15.605804890336254,
+            15.683357784589473
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0069604488499166,
+          "maximum": 0.49010493076842104,
+          "median": 0.4876814028230079,
+          "minimum": 0.4867171608658378,
+          "samples": [
+            0.4867171608658378,
+            0.4876814028230079,
+            0.49010493076842104
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0493747713394377,
+          "maximum": 0.625003686,
+          "median": 0.596927265,
+          "minimum": 0.5955962570000001,
+          "samples": [
+            0.5955962570000001,
+            0.596927265,
+            0.625003686
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.042121140445947,
+          "maximum": 0.039851395,
+          "median": 0.038250335,
+          "minimum": 0.038240655,
+          "samples": [
+            0.038240655,
+            0.038250335,
+            0.039851395
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0039174240776052,
+          "maximum": 15.574838648554623,
+          "median": 15.550145664522574,
+          "minimum": 15.514063482725897,
+          "samples": [
+            15.514063482725897,
+            15.574838648554623,
+            15.550145664522574
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0039174240776052,
+          "maximum": 0.48671370776733197,
+          "median": 0.48594205201633045,
+          "minimum": 0.4848144838351843,
+          "samples": [
+            0.4848144838351843,
+            0.48671370776733197,
+            0.48594205201633045
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0641795027791272,
+          "maximum": 1.478466984,
+          "median": 1.445525068,
+          "minimum": 1.3893022560000001,
+          "samples": [
+            1.445525068,
+            1.3893022560000001,
+            1.478466984
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.065869375532494,
+          "maximum": 0.095077372,
+          "median": 0.093175142,
+          "minimum": 0.089201711,
+          "samples": [
+            0.093175142,
+            0.089201711,
+            0.095077372
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0025922946276928,
+          "maximum": 183762944,
+          "median": 183447552,
+          "minimum": 183287808,
+          "samples": [
+            183447552,
+            183287808,
+            183762944
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0014417587090174,
+          "maximum": 0.465913666,
+          "median": 0.465874987,
+          "minimum": 0.465242898,
+          "samples": [
+            0.465242898,
+            0.465874987,
+            0.465913666
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.002735093021236,
+          "maximum": 1.5215501750000016,
+          "median": 1.5178529760000004,
+          "minimum": 1.5173999450000082,
+          "samples": [
+            1.5178529760000004,
+            1.5215501750000016,
+            1.5173999450000082
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "narrow-r1-w16-candidate",
+        "narrow-r2-w16-candidate",
+        "narrow-r3-w16-candidate"
+      ],
+      "workers": 16
+    },
+    {
+      "arm": "candidate",
+      "case": "narrow",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0513051820732224,
+          "maximum": 30.935442677717035,
+          "median": 30.879069439697243,
+          "minimum": 29.425749254570317,
+          "samples": [
+            30.879069439697243,
+            30.935442677717035,
+            29.425749254570317
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0513051820732224,
+          "maximum": 0.9667325836786573,
+          "median": 0.9649709199905389,
+          "minimum": 0.9195546642053224,
+          "samples": [
+            0.9649709199905389,
+            0.9667325836786573,
+            0.9195546642053224
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.1487404150807414,
+          "maximum": 0.45313217400000005,
+          "median": 0.43120647300000003,
+          "minimum": 0.394460026,
+          "samples": [
+            0.43120647300000003,
+            0.394460026,
+            0.45313217400000005
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.207676751231328,
+          "maximum": 0.015399172,
+          "median": 0.013964361,
+          "minimum": 0.012751071,
+          "samples": [
+            0.013964361,
+            0.012751071,
+            0.015399172
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.1017635521308682,
+          "maximum": 31.789210791563438,
+          "median": 31.510997957641564,
+          "minimum": 28.85302452607136,
+          "samples": [
+            31.789210791563438,
+            31.510997957641564,
+            28.85302452607136
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.1017635521308682,
+          "maximum": 0.9934128372363574,
+          "median": 0.9847186861762989,
+          "minimum": 0.90165701643973,
+          "samples": [
+            0.9934128372363574,
+            0.9847186861762989,
+            0.90165701643973
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.3406954608366846,
+          "maximum": 0.43433992800000004,
+          "median": 0.35813169300000003,
+          "minimum": 0.323966136,
+          "samples": [
+            0.323966136,
+            0.35813169300000003,
+            0.43433992800000004
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.4771293932571568,
+          "maximum": 0.015053532,
+          "median": 0.011365292,
+          "minimum": 0.010191072,
+          "samples": [
+            0.010191072,
+            0.011365292,
+            0.015053532
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0404365315396749,
+          "maximum": 30.869642611819007,
+          "median": 30.75981323353258,
+          "minimum": 29.669894968160158,
+          "samples": [
+            30.75981323353258,
+            29.669894968160158,
+            30.869642611819007
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0404365315396749,
+          "maximum": 0.964676331619344,
+          "median": 0.9612441635478931,
+          "minimum": 0.9271842177550049,
+          "samples": [
+            0.9612441635478931,
+            0.9271842177550049,
+            0.964676331619344
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.019643495767883,
+          "maximum": 20.840234340000002,
+          "median": 20.480789785000002,
+          "minimum": 20.438745921000002,
+          "samples": [
+            20.840234340000002,
+            20.480789785000002,
+            20.438745921000002
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0187353114816102,
+          "maximum": 0.7805841050000001,
+          "median": 0.768802013,
+          "minimum": 0.766228574,
+          "samples": [
+            0.766228574,
+            0.7805841050000001,
+            0.768802013
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0425767789013165,
+          "maximum": 0.690288584,
+          "median": 0.677514983,
+          "minimum": 0.66209856,
+          "samples": [
+            0.677514983,
+            0.690288584,
+            0.66209856
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0029800907161683,
+          "maximum": 0.215051906,
+          "median": 0.214814486,
+          "minimum": 0.214412936,
+          "samples": [
+            0.214412936,
+            0.215051906,
+            0.214814486
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.044033072022137,
+          "maximum": 30.790536374121665,
+          "median": 30.01335155639581,
+          "minimum": 29.49191668275888,
+          "samples": [
+            30.01335155639581,
+            30.790536374121665,
+            29.49191668275888
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.044033072022137,
+          "maximum": 0.962204261691302,
+          "median": 0.9379172361373691,
+          "minimum": 0.921622396336215,
+          "samples": [
+            0.9379172361373691,
+            0.962204261691302,
+            0.921622396336215
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.170394114305019,
+          "maximum": 0.49085349300000003,
+          "median": 0.44560717000000005,
+          "minimum": 0.419391628,
+          "samples": [
+            0.419391628,
+            0.44560717000000005,
+            0.49085349300000003
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1910873881150195,
+          "maximum": 0.016643662,
+          "median": 0.014472212,
+          "minimum": 0.013973502,
+          "samples": [
+            0.013973502,
+            0.014472212,
+            0.016643662
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0390012417537196,
+          "maximum": 31.01069812780585,
+          "median": 30.573647989473507,
+          "minimum": 29.846642026590082,
+          "samples": [
+            30.573647989473507,
+            31.01069812780585,
+            29.846642026590082
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0390012417537196,
+          "maximum": 0.9690843164939328,
+          "median": 0.9554264996710471,
+          "minimum": 0.9327075633309401,
+          "samples": [
+            0.9554264996710471,
+            0.9690843164939328,
+            0.9327075633309401
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.1974037178332202,
+          "maximum": 0.43976015500000004,
+          "median": 0.39142639700000004,
+          "minimum": 0.36726139100000005,
+          "samples": [
+            0.36726139100000005,
+            0.39142639700000004,
+            0.43976015500000004
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.2265701360208339,
+          "maximum": 0.014733991,
+          "median": 0.012622302,
+          "minimum": 0.012012351,
+          "samples": [
+            0.012012351,
+            0.012622302,
+            0.014733991
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0529543272490154,
+          "maximum": 31.156350673498103,
+          "median": 30.689785177136283,
+          "minimum": 29.589460689048362,
+          "samples": [
+            31.156350673498103,
+            30.689785177136283,
+            29.589460689048362
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0529543272490154,
+          "maximum": 0.9736359585468157,
+          "median": 0.9590557867855088,
+          "minimum": 0.9246706465327613,
+          "samples": [
+            0.9736359585468157,
+            0.9590557867855088,
+            0.9246706465327613
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.1074207273622605,
+          "maximum": 1.321954872,
+          "median": 1.194473543,
+          "minimum": 1.1937241550000002,
+          "samples": [
+            1.194473543,
+            1.1937241550000002,
+            1.321954872
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.1653318828680983,
+          "maximum": 0.044676545,
+          "median": 0.038896465,
+          "minimum": 0.038338044,
+          "samples": [
+            0.038338044,
+            0.038896465,
+            0.044676545
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.049079878564012,
+          "maximum": 30.891912818634527,
+          "median": 30.871545821193056,
+          "minimum": 29.446673651695228,
+          "samples": [
+            30.891912818634527,
+            30.871545821193056,
+            29.446673651695228
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.049079878564012,
+          "maximum": 0.965372275582329,
+          "median": 0.964735806912283,
+          "minimum": 0.9202085516154759,
+          "samples": [
+            0.965372275582329,
+            0.964735806912283,
+            0.9202085516154759
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.1465150426846658,
+          "maximum": 3.142061758,
+          "median": 2.787562314,
+          "minimum": 2.7405325190000003,
+          "samples": [
+            2.7405325190000003,
+            2.787562314,
+            3.142061758
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.2027858617514424,
+          "maximum": 0.106703453,
+          "median": 0.090295521,
+          "minimum": 0.088713591,
+          "samples": [
+            0.088713591,
+            0.090295521,
+            0.106703453
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0018518931703073,
+          "maximum": 183918592,
+          "median": 183734272,
+          "minimum": 183578624,
+          "samples": [
+            183734272,
+            183918592,
+            183578624
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0094324239157086,
+          "maximum": 0.468821548,
+          "median": 0.464804967,
+          "minimum": 0.464440746,
+          "samples": [
+            0.464440746,
+            0.464804967,
+            0.468821548
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0071851729281482,
+          "maximum": 1.6517778520000093,
+          "median": 1.6423064210000007,
+          "minimum": 1.6399942099999976,
+          "samples": [
+            1.6399942099999976,
+            1.6517778520000093,
+            1.6423064210000007
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.45286873813115264,
+          "speedup": 0.9057374762623053
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.4480573118188886,
+          "speedup": 0.8961146236377772
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5159455362132525,
+          "speedup": 1.031891072426505
+        }
+      },
+      "stages": [
+        "narrow-r1-w32-candidate",
+        "narrow-r2-w32-candidate",
+        "narrow-r3-w32-candidate"
+      ],
+      "workers": 32
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0070738319063475,
+          "maximum": 15.843878744539884,
+          "median": 15.755846610631565,
+          "minimum": 15.732589054119401,
+          "samples": [
+            15.732589054119401,
+            15.843878744539884,
+            15.755846610631565
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0070738319063475,
+          "maximum": 0.4951212107668714,
+          "median": 0.4923702065822364,
+          "minimum": 0.4916434079412313,
+          "samples": [
+            0.4916434079412313,
+            0.4951212107668714,
+            0.4923702065822364
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0829392707501093,
+          "maximum": 0.6075320660000001,
+          "median": 0.563127638,
+          "minimum": 0.561002895,
+          "samples": [
+            0.6075320660000001,
+            0.563127638,
+            0.561002895
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0864848471752688,
+          "maximum": 0.038616153,
+          "median": 0.035606014,
+          "minimum": 0.035542284,
+          "samples": [
+            0.038616153,
+            0.035542284,
+            0.035606014
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0019865987408798,
+          "maximum": 15.776212327027517,
+          "median": 15.754887426661906,
+          "minimum": 15.7449334620366,
+          "samples": [
+            15.7449334620366,
+            15.776212327027517,
+            15.754887426661906
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0019865987408798,
+          "maximum": 0.4930066352196099,
+          "median": 0.49234023208318456,
+          "minimum": 0.49202917068864377,
+          "samples": [
+            0.49202917068864377,
+            0.4930066352196099,
+            0.49234023208318456
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0333004755480932,
+          "maximum": 0.5442541780000001,
+          "median": 0.539334902,
+          "minimum": 0.5267143400000001,
+          "samples": [
+            0.539334902,
+            0.5442541780000001,
+            0.5267143400000001
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.0319037505781172,
+          "maximum": 0.034498406,
+          "median": 0.034254505,
+          "minimum": 0.033431806,
+          "samples": [
+            0.034254505,
+            0.034498406,
+            0.033431806
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0001579276181245,
+          "maximum": 15.755897055879117,
+          "median": 15.754953196027078,
+          "minimum": 15.753409157493534,
+          "samples": [
+            15.753409157493534,
+            15.755897055879117,
+            15.754953196027078
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0001579276181245,
+          "maximum": 0.4923717829962224,
+          "median": 0.4923422873758462,
+          "minimum": 0.49229403617167294,
+          "samples": [
+            0.49229403617167294,
+            0.4923717829962224,
+            0.4923422873758462
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0152183601614997,
+          "maximum": 24.503830489000002,
+          "median": 24.408726541,
+          "minimum": 24.136512351,
+          "samples": [
+            24.136512351,
+            24.408726541,
+            24.503830489000002
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.007101348610544,
+          "maximum": 1.810761162,
+          "median": 1.799986177,
+          "minimum": 1.7979929869999998,
+          "samples": [
+            1.799986177,
+            1.7979929869999998,
+            1.810761162
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0151188653392336,
+          "maximum": 1.5553096339999999,
+          "median": 1.5491803769999999,
+          "minimum": 1.532145335,
+          "samples": [
+            1.532145335,
+            1.5491803769999999,
+            1.5553096339999999
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0125918387095982,
+          "maximum": 0.224094221,
+          "median": 0.223839461,
+          "minimum": 0.221307552,
+          "samples": [
+            0.221307552,
+            0.224094221,
+            0.223839461
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0418006166987523,
+          "maximum": 15.573153642607723,
+          "median": 15.567382150953712,
+          "minimum": 14.948305263972468,
+          "samples": [
+            14.948305263972468,
+            15.573153642607723,
+            15.567382150953712
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0418006166987523,
+          "maximum": 0.48666105133149135,
+          "median": 0.4864806922173035,
+          "minimum": 0.46713453949913963,
+          "samples": [
+            0.46713453949913963,
+            0.48666105133149135,
+            0.4864806922173035
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.115704658337211,
+          "maximum": 0.6799583450000001,
+          "median": 0.630601975,
+          "minimum": 0.6094429560000001,
+          "samples": [
+            0.6799583450000001,
+            0.6094429560000001,
+            0.630601975
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1623418011093773,
+          "maximum": 0.04548732,
+          "median": 0.040507901,
+          "minimum": 0.039134203,
+          "samples": [
+            0.04548732,
+            0.039134203,
+            0.040507901
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.018900101623545,
+          "maximum": 15.727792643896711,
+          "median": 15.714786327964152,
+          "minimum": 15.436049735234679,
+          "samples": [
+            15.436049735234679,
+            15.727792643896711,
+            15.714786327964152
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.018900101623545,
+          "maximum": 0.4914935201217722,
+          "median": 0.49108707274887975,
+          "minimum": 0.4823765542260837,
+          "samples": [
+            0.4823765542260837,
+            0.4914935201217722,
+            0.49108707274887975
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.1338940503725603,
+          "maximum": 0.650698974,
+          "median": 0.58665378,
+          "minimum": 0.573862235,
+          "samples": [
+            0.650698974,
+            0.573862235,
+            0.58665378
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.1553247631549348,
+          "maximum": 0.042154501,
+          "median": 0.037331324,
+          "minimum": 0.036487144,
+          "samples": [
+            0.042154501,
+            0.036487144,
+            0.037331324
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0079976124842494,
+          "maximum": 15.869934067841523,
+          "median": 15.803808489160918,
+          "minimum": 15.74401950092863,
+          "samples": [
+            15.803808489160918,
+            15.869934067841523,
+            15.74401950092863
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0079976124842494,
+          "maximum": 0.4959354396200476,
+          "median": 0.4938690152862787,
+          "minimum": 0.4920006094040197,
+          "samples": [
+            0.4938690152862787,
+            0.4959354396200476,
+            0.4920006094040197
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0451972734422197,
+          "maximum": 1.706706078,
+          "median": 1.6934693150000002,
+          "minimum": 1.632903301,
+          "samples": [
+            1.6934693150000002,
+            1.632903301,
+            1.706706078
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0535563562048045,
+          "maximum": 0.108403453,
+          "median": 0.107155773,
+          "minimum": 0.102892885,
+          "samples": [
+            0.107155773,
+            0.102892885,
+            0.108403453
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0126488456348501,
+          "maximum": 15.770242143274011,
+          "median": 15.704904802918229,
+          "minimum": 15.573258401719032,
+          "samples": [
+            15.573258401719032,
+            15.770242143274011,
+            15.704904802918229
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0126488456348501,
+          "maximum": 0.49282006697731284,
+          "median": 0.49077827509119465,
+          "minimum": 0.48666432505371976,
+          "samples": [
+            0.48666432505371976,
+            0.49282006697731284,
+            0.49077827509119465
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.063030053045746,
+          "maximum": 4.171154643,
+          "median": 4.011841929,
+          "minimum": 3.9238351080000005,
+          "samples": [
+            4.171154643,
+            3.9238351080000005,
+            4.011841929
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.076476156091928,
+          "maximum": 0.267840842,
+          "median": 0.255451528,
+          "minimum": 0.24881261,
+          "samples": [
+            0.267840842,
+            0.24881261,
+            0.255451528
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0013738280512616,
+          "maximum": 391106560,
+          "median": 390864896,
+          "minimum": 390569984,
+          "samples": [
+            390864896,
+            390569984,
+            391106560
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.000627778991338,
+          "maximum": 1.9483582529999999,
+          "median": 1.947264092,
+          "minimum": 1.947135882,
+          "samples": [
+            1.947264092,
+            1.947135882,
+            1.9483582529999999
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0010442570360447,
+          "maximum": 4.172981962999984,
+          "median": 4.1727260050000154,
+          "minimum": 4.168628843000022,
+          "samples": [
+            4.1727260050000154,
+            4.168628843000022,
+            4.172981962999984
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "expanded-r1-w16-baseline",
+        "expanded-r2-w16-baseline",
+        "expanded-r3-w16-baseline"
+      ],
+      "workers": 16
+    },
+    {
+      "arm": "baseline",
+      "case": "expanded",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0460092338947982,
+          "maximum": 31.027257638507876,
+          "median": 31.021674846983554,
+          "minimum": 29.66250835375362,
+          "samples": [
+            29.66250835375362,
+            31.027257638507876,
+            31.021674846983554
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0460092338947982,
+          "maximum": 0.9696018012033711,
+          "median": 0.9694273389682361,
+          "minimum": 0.9269533860548006,
+          "samples": [
+            0.9269533860548006,
+            0.9696018012033711,
+            0.9694273389682361
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.1054332416160857,
+          "maximum": 1.07136513,
+          "median": 1.012548335,
+          "minimum": 0.969181213,
+          "samples": [
+            1.07136513,
+            1.012548335,
+            0.969181213
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.1560853241907882,
+          "maximum": 0.036118494,
+          "median": 0.032634155,
+          "minimum": 0.031242066,
+          "samples": [
+            0.036118494,
+            0.032634155,
+            0.031242066
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.021988494316022,
+          "maximum": 31.257357083881498,
+          "median": 31.0155714292642,
+          "minimum": 30.584842449523716,
+          "samples": [
+            30.584842449523716,
+            31.257357083881498,
+            31.0155714292642
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.021988494316022,
+          "maximum": 0.9767924088712968,
+          "median": 0.9692366071645062,
+          "minimum": 0.9557763265476161,
+          "samples": [
+            0.9557763265476161,
+            0.9767924088712968,
+            0.9692366071645062
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.061341079725001,
+          "maximum": 0.9978469270000001,
+          "median": 0.9804804990000001,
+          "minimum": 0.940175544,
+          "samples": [
+            0.9804804990000001,
+            0.9978469270000001,
+            0.940175544
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.057556428645819,
+          "maximum": 0.032057726,
+          "median": 0.031923586,
+          "minimum": 0.030313017,
+          "samples": [
+            0.032057726,
+            0.031923586,
+            0.030313017
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.0033129173060678,
+          "maximum": 30.373454337561263,
+          "median": 30.333561189382745,
+          "minimum": 30.27316185573999,
+          "samples": [
+            30.333561189382745,
+            30.373454337561263,
+            30.27316185573999
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0033129173060678,
+          "maximum": 0.9491704480487895,
+          "median": 0.9479237871682108,
+          "minimum": 0.9460363079918747,
+          "samples": [
+            0.9479237871682108,
+            0.9491704480487895,
+            0.9460363079918747
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0513546385824344,
+          "maximum": 50.829610502,
+          "median": 50.74349886700001,
+          "minimum": 48.346779133000005,
+          "samples": [
+            50.74349886700001,
+            50.829610502,
+            48.346779133000005
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0471205401606158,
+          "maximum": 1.9075836210000001,
+          "median": 1.903171421,
+          "minimum": 1.8217421470000001,
+          "samples": [
+            1.9075836210000001,
+            1.903171421,
+            1.8217421470000001
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0478830885635961,
+          "maximum": 1.673487972,
+          "median": 1.672850034,
+          "minimum": 1.597017826,
+          "samples": [
+            1.672850034,
+            1.673487972,
+            1.597017826
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0266562584181724,
+          "maximum": 0.229344219,
+          "median": 0.224325861,
+          "minimum": 0.223389491,
+          "samples": [
+            0.229344219,
+            0.224325861,
+            0.223389491
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0144856337703303,
+          "maximum": 31.156806137347207,
+          "median": 31.155469823228163,
+          "minimum": 30.71192444741983,
+          "samples": [
+            31.155469823228163,
+            30.71192444741983,
+            31.156806137347207
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0144856337703303,
+          "maximum": 0.9736501917921002,
+          "median": 0.9736084319758801,
+          "minimum": 0.9597476389818697,
+          "samples": [
+            0.9736084319758801,
+            0.9597476389818697,
+            0.9736501917921002
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.083525432024195,
+          "maximum": 1.071562815,
+          "median": 1.052803902,
+          "minimum": 0.988959542,
+          "samples": [
+            0.988959542,
+            1.071562815,
+            1.052803902
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0991738390710364,
+          "maximum": 0.034890774,
+          "median": 0.033790495,
+          "minimum": 0.031742726,
+          "samples": [
+            0.031742726,
+            0.034890774,
+            0.033790495
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0364637476529839,
+          "maximum": 31.074951800387026,
+          "median": 30.836681353991096,
+          "minimum": 29.981706423166827,
+          "samples": [
+            30.836681353991096,
+            29.981706423166827,
+            31.074951800387026
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0364637476529839,
+          "maximum": 0.9710922437620946,
+          "median": 0.9636462923122218,
+          "minimum": 0.9369283257239633,
+          "samples": [
+            0.9636462923122218,
+            0.9369283257239633,
+            0.9710922437620946
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0267043368784607,
+          "maximum": 1.113912978,
+          "median": 1.088679706,
+          "minimum": 1.084940365,
+          "samples": [
+            1.113912978,
+            1.084940365,
+            1.088679706
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0329037553382079,
+          "maximum": 0.036186745,
+          "median": 0.036122985,
+          "minimum": 0.035033995,
+          "samples": [
+            0.036122985,
+            0.036186745,
+            0.035033995
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0267803879891937,
+          "maximum": 31.23493647527136,
+          "median": 31.035491802023685,
+          "minimum": 30.420269846057963,
+          "samples": [
+            30.420269846057963,
+            31.035491802023685,
+            31.23493647527136
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0267803879891937,
+          "maximum": 0.97609176485223,
+          "median": 0.9698591188132402,
+          "minimum": 0.9506334326893113,
+          "samples": [
+            0.9506334326893113,
+            0.9698591188132402,
+            0.97609176485223
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0285415799225825,
+          "maximum": 2.9959279860000003,
+          "median": 2.940561182,
+          "minimum": 2.9127922920000002,
+          "samples": [
+            2.9959279860000003,
+            2.9127922920000002,
+            2.940561182
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0493428866103351,
+          "maximum": 0.098484596,
+          "median": 0.094143338,
+          "minimum": 0.093853589,
+          "samples": [
+            0.098484596,
+            0.093853589,
+            0.094143338
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0212687700821776,
+          "maximum": 31.115038202740863,
+          "median": 30.828838698777986,
+          "minimum": 30.467041697786524,
+          "samples": [
+            30.467041697786524,
+            30.828838698777986,
+            31.115038202740863
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0212687700821776,
+          "maximum": 0.972344943835652,
+          "median": 0.9634012093368121,
+          "minimum": 0.9520950530558289,
+          "samples": [
+            0.9520950530558289,
+            0.9634012093368121,
+            0.972344943835652
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.022786782186791,
+          "maximum": 7.1516379830000005,
+          "median": 7.080874001000001,
+          "minimum": 6.9923058330000005,
+          "samples": [
+            7.1516379830000005,
+            7.080874001000001,
+            6.9923058330000005
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0445401991002121,
+          "maximum": 0.234733587,
+          "median": 0.229683449,
+          "minimum": 0.224724321,
+          "samples": [
+            0.234733587,
+            0.229683449,
+            0.224724321
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0020811221410584,
+          "maximum": 394452992,
+          "median": 394326016,
+          "minimum": 393633792,
+          "samples": [
+            393633792,
+            394452992,
+            394326016
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0228039424310733,
+          "maximum": 1.993375417,
+          "median": 1.949756481,
+          "minimum": 1.948932082,
+          "samples": [
+            1.993375417,
+            1.949756481,
+            1.948932082
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0314401975617709,
+          "maximum": 4.3076878429999965,
+          "median": 4.304664293999991,
+          "minimum": 4.176381581000015,
+          "samples": [
+            4.304664293999991,
+            4.3076878429999965,
+            4.176381581000015
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.47289123752557655,
+          "speedup": 0.9457824750511531
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.46303623920660414,
+          "speedup": 0.9260724784132083
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5560947667587488,
+          "speedup": 1.1121895335174976
+        }
+      },
+      "stages": [
+        "expanded-r1-w32-baseline",
+        "expanded-r2-w32-baseline",
+        "expanded-r3-w32-baseline"
+      ],
+      "workers": 32
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0037299008653968,
+          "maximum": 15.783591584559298,
+          "median": 15.756636614408322,
+          "minimum": 15.724939120525338,
+          "samples": [
+            15.756636614408322,
+            15.783591584559298,
+            15.724939120525338
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0037299008653968,
+          "maximum": 0.49323723701747807,
+          "median": 0.49239489420026006,
+          "minimum": 0.4914043475164168,
+          "samples": [
+            0.49239489420026006,
+            0.49323723701747807,
+            0.4914043475164168
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0302462119527775,
+          "maximum": 0.469055149,
+          "median": 0.46275707800000004,
+          "minimum": 0.45528451700000006,
+          "samples": [
+            0.45528451700000006,
+            0.469055149,
+            0.46275707800000004
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0284867736308616,
+          "maximum": 0.029717897,
+          "median": 0.029428227,
+          "minimum": 0.028894778,
+          "samples": [
+            0.028894778,
+            0.029717897,
+            0.029428227
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0114342039488153,
+          "maximum": 15.790498470589533,
+          "median": 15.743065350935119,
+          "minimum": 15.611987817833999,
+          "samples": [
+            15.611987817833999,
+            15.743065350935119,
+            15.790498470589533
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0114342039488153,
+          "maximum": 0.4934530772059229,
+          "median": 0.49197079221672246,
+          "minimum": 0.48787461930731246,
+          "samples": [
+            0.48787461930731246,
+            0.49197079221672246,
+            0.4934530772059229
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.1161501609150448,
+          "maximum": 0.443083017,
+          "median": 0.41713760800000005,
+          "minimum": 0.39697437900000004,
+          "samples": [
+            0.41713760800000005,
+            0.443083017,
+            0.39697437900000004
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.1195130691514532,
+          "maximum": 0.028144647,
+          "median": 0.026719058,
+          "minimum": 0.025140079,
+          "samples": [
+            0.026719058,
+            0.028144647,
+            0.025140079
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.003427041891276,
+          "maximum": 15.764517874083854,
+          "median": 15.753273918357017,
+          "minimum": 15.710676726800811,
+          "samples": [
+            15.710676726800811,
+            15.753273918357017,
+            15.764517874083854
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.003427041891276,
+          "maximum": 0.49264118356512043,
+          "median": 0.4922898099486568,
+          "minimum": 0.49095864771252534,
+          "samples": [
+            0.49095864771252534,
+            0.4922898099486568,
+            0.49264118356512043
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.0204518204464674,
+          "maximum": 20.868945542000002,
+          "median": 20.807028289,
+          "minimum": 20.450691668,
+          "samples": [
+            20.868945542000002,
+            20.807028289,
+            20.450691668
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0209384504316794,
+          "maximum": 1.529905476,
+          "median": 1.525741268,
+          "minimum": 1.498528609,
+          "samples": [
+            1.529905476,
+            1.525741268,
+            1.498528609
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0239489515831663,
+          "maximum": 1.328328875,
+          "median": 1.320806608,
+          "minimum": 1.2972608380000001,
+          "samples": [
+            1.328328875,
+            1.320806608,
+            1.2972608380000001
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0298800704769306,
+          "maximum": 0.230068978,
+          "median": 0.22563395,
+          "minimum": 0.223393951,
+          "samples": [
+            0.223393951,
+            0.230068978,
+            0.22563395
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0084445237624926,
+          "maximum": 15.683564838335014,
+          "median": 15.677283891360709,
+          "minimum": 15.552233631870845,
+          "samples": [
+            15.552233631870845,
+            15.677283891360709,
+            15.683564838335014
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0084445237624926,
+          "maximum": 0.4901114011979692,
+          "median": 0.48991512160502215,
+          "minimum": 0.4860073009959639,
+          "samples": [
+            0.4860073009959639,
+            0.48991512160502215,
+            0.4901114011979692
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.041914115912329,
+          "maximum": 0.491961878,
+          "median": 0.478897393,
+          "minimum": 0.47217123800000005,
+          "samples": [
+            0.491961878,
+            0.478897393,
+            0.47217123800000005
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.0507125844226273,
+          "maximum": 0.031632876,
+          "median": 0.030547217,
+          "minimum": 0.030106117,
+          "samples": [
+            0.031632876,
+            0.030547217,
+            0.030106117
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0113450246524731,
+          "maximum": 15.7150965541874,
+          "median": 15.643494260978182,
+          "minimum": 15.53880838993355,
+          "samples": [
+            15.643494260978182,
+            15.7150965541874,
+            15.53880838993355
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0113450246524731,
+          "maximum": 0.4910967673183563,
+          "median": 0.4888591956555682,
+          "minimum": 0.48558776218542343,
+          "samples": [
+            0.4888591956555682,
+            0.4910967673183563,
+            0.48558776218542343
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.0496797628019061,
+          "maximum": 0.507127203,
+          "median": 0.48903591700000004,
+          "minimum": 0.483125636,
+          "samples": [
+            0.483125636,
+            0.507127203,
+            0.48903591700000004
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.0448971336979251,
+          "maximum": 0.032270066,
+          "median": 0.031471906,
+          "minimum": 0.030883486,
+          "samples": [
+            0.030883486,
+            0.032270066,
+            0.031471906
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.0038910344394945,
+          "maximum": 15.84128230173457,
+          "median": 15.81606301753276,
+          "minimum": 15.779882236501177,
+          "samples": [
+            15.81606301753276,
+            15.84128230173457,
+            15.779882236501177
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0038910344394945,
+          "maximum": 0.4950400719292053,
+          "median": 0.4942519692978988,
+          "minimum": 0.49312131989066177,
+          "samples": [
+            0.4942519692978988,
+            0.4950400719292053,
+            0.49312131989066177
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.017851695196331,
+          "maximum": 1.3404944,
+          "median": 1.331620614,
+          "minimum": 1.3169840030000002,
+          "samples": [
+            1.3169840030000002,
+            1.331620614,
+            1.3404944
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0201854685892235,
+          "maximum": 0.084949582,
+          "median": 0.084060153,
+          "minimum": 0.083268763,
+          "samples": [
+            0.083268763,
+            0.084060153,
+            0.084949582
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.0039124499546186,
+          "maximum": 15.760956809355726,
+          "median": 15.708393337351561,
+          "minimum": 15.699533171511312,
+          "samples": [
+            15.699533171511312,
+            15.760956809355726,
+            15.708393337351561
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0039124499546186,
+          "maximum": 0.49252990029236643,
+          "median": 0.4908872917922363,
+          "minimum": 0.4906104116097285,
+          "samples": [
+            0.4906104116097285,
+            0.49252990029236643,
+            0.4908872917922363
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0216261249411367,
+          "maximum": 3.2299663250000004,
+          "median": 3.1646585340000004,
+          "minimum": 3.161593313,
+          "samples": [
+            3.1646585340000004,
+            3.2299663250000004,
+            3.161593313
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.0182189576690843,
+          "maximum": 0.20493466,
+          "median": 0.201576601,
+          "minimum": 0.201267771,
+          "samples": [
+            0.201576601,
+            0.20493466,
+            0.201267771
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0011421505962235,
+          "maximum": 391344128,
+          "median": 391057408,
+          "minimum": 390897664,
+          "samples": [
+            390897664,
+            391057408,
+            391344128
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.0023884057366947,
+          "maximum": 1.95241869,
+          "median": 1.949043801,
+          "minimum": 1.947766633,
+          "samples": [
+            1.95241869,
+            1.949043801,
+            1.947766633
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0276684655122326,
+          "maximum": 3.928841704000007,
+          "median": 3.9284502799999927,
+          "minimum": 3.823063406000017,
+          "samples": [
+            3.928841704000007,
+            3.9284502799999927,
+            3.823063406000017
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 1.0,
+          "speedup": 1.0
+        }
+      },
+      "stages": [
+        "expanded-r1-w16-candidate",
+        "expanded-r2-w16-candidate",
+        "expanded-r3-w16-candidate"
+      ],
+      "workers": 16
+    },
+    {
+      "arm": "candidate",
+      "case": "expanded",
+      "iterations": 16,
+      "metrics": {
+        "br_p0_cpu_over_wall": {
+          "max_over_min": 1.0057496804766863,
+          "maximum": 31.651882124853504,
+          "median": 31.572917957430896,
+          "minimum": 31.47093430827812,
+          "samples": [
+            31.47093430827812,
+            31.572917957430896,
+            31.651882124853504
+          ]
+        },
+        "br_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0057496804766863,
+          "maximum": 0.989121316401672,
+          "median": 0.9866536861697155,
+          "minimum": 0.9834666971336913,
+          "samples": [
+            0.9834666971336913,
+            0.9866536861697155,
+            0.989121316401672
+          ]
+        },
+        "br_p0_cpu_seconds": {
+          "max_over_min": 1.0662258979474861,
+          "maximum": 0.858485326,
+          "median": 0.809571837,
+          "minimum": 0.805162703,
+          "samples": [
+            0.858485326,
+            0.805162703,
+            0.809571837
+          ]
+        },
+        "br_p0_wall_seconds": {
+          "max_over_min": 1.0696810736606925,
+          "maximum": 0.027278673,
+          "median": 0.025577368,
+          "minimum": 0.025501688,
+          "samples": [
+            0.027278673,
+            0.025501688,
+            0.025577368
+          ]
+        },
+        "br_p1_cpu_over_wall": {
+          "max_over_min": 1.0447663578605306,
+          "maximum": 31.373523339623382,
+          "median": 31.0208254345491,
+          "minimum": 30.029224336692838,
+          "samples": [
+            31.0208254345491,
+            31.373523339623382,
+            30.029224336692838
+          ]
+        },
+        "br_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0447663578605306,
+          "maximum": 0.9804226043632307,
+          "median": 0.9694007948296594,
+          "minimum": 0.9384132605216512,
+          "samples": [
+            0.9694007948296594,
+            0.9804226043632307,
+            0.9384132605216512
+          ]
+        },
+        "br_p1_cpu_seconds": {
+          "max_over_min": 1.0957299028912386,
+          "maximum": 0.84821307,
+          "median": 0.79966377,
+          "minimum": 0.7741078050000001,
+          "samples": [
+            0.84821307,
+            0.7741078050000001,
+            0.79966377
+          ]
+        },
+        "br_p1_wall_seconds": {
+          "max_over_min": 1.1081880382201126,
+          "maximum": 0.027343343,
+          "median": 0.026629518,
+          "minimum": 0.02467392,
+          "samples": [
+            0.027343343,
+            0.02467392,
+            0.026629518
+          ]
+        },
+        "cfr_cpu_over_wall": {
+          "max_over_min": 1.029323232356161,
+          "maximum": 30.61019150413214,
+          "median": 30.463163764545758,
+          "minimum": 29.738172171694032,
+          "samples": [
+            30.61019150413214,
+            30.463163764545758,
+            29.738172171694032
+          ]
+        },
+        "cfr_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.029323232356161,
+          "maximum": 0.9565684845041293,
+          "median": 0.9519738676420549,
+          "minimum": 0.9293178803654385,
+          "samples": [
+            0.9565684845041293,
+            0.9519738676420549,
+            0.9293178803654385
+          ]
+        },
+        "cfr_cpu_seconds": {
+          "max_over_min": 1.040695476599439,
+          "maximum": 44.333256776000006,
+          "median": 43.468222587,
+          "minimum": 42.599643962,
+          "samples": [
+            42.599643962,
+            43.468222587,
+            44.333256776000006
+          ]
+        },
+        "cfr_plus_quality_wall_seconds": {
+          "max_over_min": 1.0550748181411405,
+          "maximum": 1.6786115899999998,
+          "median": 1.6117722689999998,
+          "minimum": 1.590988204,
+          "samples": [
+            1.590988204,
+            1.6117722689999998,
+            1.6786115899999998
+          ]
+        },
+        "cfr_wall_seconds": {
+          "max_over_min": 1.0712120318717702,
+          "maximum": 1.4907862029999999,
+          "median": 1.4269109709999999,
+          "minimum": 1.39168172,
+          "samples": [
+            1.39168172,
+            1.4269109709999999,
+            1.4907862029999999
+          ]
+        },
+        "construction_wall_seconds": {
+          "max_over_min": 1.0272995909502334,
+          "maximum": 0.224753338,
+          "median": 0.223344631,
+          "minimum": 0.218780714,
+          "samples": [
+            0.224753338,
+            0.218780714,
+            0.223344631
+          ]
+        },
+        "ev_p0_cpu_over_wall": {
+          "max_over_min": 1.0470683213051832,
+          "maximum": 31.145282807967146,
+          "median": 30.565071417000997,
+          "minimum": 29.745225000355447,
+          "samples": [
+            29.745225000355447,
+            31.145282807967146,
+            30.565071417000997
+          ]
+        },
+        "ev_p0_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0470683213051832,
+          "maximum": 0.9732900877489733,
+          "median": 0.9551584817812812,
+          "minimum": 0.9295382812611077,
+          "samples": [
+            0.9295382812611077,
+            0.9732900877489733,
+            0.9551584817812812
+          ]
+        },
+        "ev_p0_cpu_seconds": {
+          "max_over_min": 1.0848154704160682,
+          "maximum": 0.9288982830000001,
+          "median": 0.882999508,
+          "minimum": 0.856273079,
+          "samples": [
+            0.9288982830000001,
+            0.882999508,
+            0.856273079
+          ]
+        },
+        "ev_p0_wall_seconds": {
+          "max_over_min": 1.1147154653272393,
+          "maximum": 0.031228484,
+          "median": 0.028350987,
+          "minimum": 0.028014758,
+          "samples": [
+            0.031228484,
+            0.028350987,
+            0.028014758
+          ]
+        },
+        "ev_p1_cpu_over_wall": {
+          "max_over_min": 1.0807610639188325,
+          "maximum": 31.54993381121498,
+          "median": 31.087370169680586,
+          "minimum": 29.19233016853432,
+          "samples": [
+            29.19233016853432,
+            31.087370169680586,
+            31.54993381121498
+          ]
+        },
+        "ev_p1_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.0807610639188325,
+          "maximum": 0.9859354316004681,
+          "median": 0.9714803178025183,
+          "minimum": 0.9122603177666975,
+          "samples": [
+            0.9122603177666975,
+            0.9714803178025183,
+            0.9859354316004681
+          ]
+        },
+        "ev_p1_cpu_seconds": {
+          "max_over_min": 1.1548146655845926,
+          "maximum": 1.0006825430000001,
+          "median": 0.8742358530000001,
+          "minimum": 0.8665308580000001,
+          "samples": [
+            1.0006825430000001,
+            0.8742358530000001,
+            0.8665308580000001
+          ]
+        },
+        "ev_p1_wall_seconds": {
+          "max_over_min": 1.2480787266062752,
+          "maximum": 0.034278954,
+          "median": 0.028121898,
+          "minimum": 0.027465378,
+          "samples": [
+            0.034278954,
+            0.028121898,
+            0.027465378
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall": {
+          "max_over_min": 1.009423642587828,
+          "maximum": 31.000577120802294,
+          "median": 30.998467899022643,
+          "minimum": 30.711166068319024,
+          "samples": [
+            30.998467899022643,
+            31.000577120802294,
+            30.711166068319024
+          ]
+        },
+        "exploitability_3_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.009423642587828,
+          "maximum": 0.9687680350250717,
+          "median": 0.9687021218444576,
+          "minimum": 0.9597239396349695,
+          "samples": [
+            0.9687021218444576,
+            0.9687680350250717,
+            0.9597239396349695
+          ]
+        },
+        "exploitability_3_walks_cpu_seconds": {
+          "max_over_min": 1.0152583137505071,
+          "maximum": 2.4550808660000003,
+          "median": 2.44853547,
+          "minimum": 2.418183464,
+          "samples": [
+            2.44853547,
+            2.418183464,
+            2.4550808660000003
+          ]
+        },
+        "exploitability_3_walks_wall_seconds": {
+          "max_over_min": 1.0248257452336127,
+          "maximum": 0.079940985,
+          "median": 0.078988919,
+          "minimum": 0.078004466,
+          "samples": [
+            0.078988919,
+            0.078004466,
+            0.079940985
+          ]
+        },
+        "quality_7_walks_cpu_over_wall": {
+          "max_over_min": 1.01970718113292,
+          "maximum": 31.14804860885484,
+          "median": 30.82503375861539,
+          "minimum": 30.54607164210473,
+          "samples": [
+            30.54607164210473,
+            31.14804860885484,
+            30.82503375861539
+          ]
+        },
+        "quality_7_walks_cpu_over_wall_per_allowed_logical": {
+          "max_over_min": 1.01970718113292,
+          "maximum": 0.9733765190267137,
+          "median": 0.963282304956731,
+          "minimum": 0.9545647388157729,
+          "samples": [
+            0.9545647388157729,
+            0.9733765190267137,
+            0.963282304956731
+          ]
+        },
+        "quality_7_walks_cpu_seconds": {
+          "max_over_min": 1.0573041865980544,
+          "maximum": 6.088030139000001,
+          "median": 5.789723895000001,
+          "minimum": 5.7580686960000005,
+          "samples": [
+            6.088030139000001,
+            5.7580686960000005,
+            5.789723895000001
+          ]
+        },
+        "quality_7_walks_wall_seconds": {
+          "max_over_min": 1.078140671715937,
+          "maximum": 0.199306484,
+          "median": 0.187825387,
+          "minimum": 0.184861298,
+          "samples": [
+            0.199306484,
+            0.184861298,
+            0.187825387
+          ]
+        },
+        "root_os_peak_resident_bytes": {
+          "max_over_min": 1.0007708493926957,
+          "maximum": 393510912,
+          "median": 393224192,
+          "minimum": 393207808,
+          "samples": [
+            393510912,
+            393207808,
+            393224192
+          ]
+        },
+        "state_write_wall_seconds": {
+          "max_over_min": 1.001435460019619,
+          "maximum": 1.949977861,
+          "median": 1.949757953,
+          "minimum": 1.9471827579999998,
+          "samples": [
+            1.9471827579999998,
+            1.949757953,
+            1.949977861
+          ]
+        },
+        "whole_process_seconds": {
+          "max_over_min": 1.0360475900893589,
+          "maximum": 4.081222353000015,
+          "median": 3.9413464049999902,
+          "minimum": 3.9392228620000083,
+          "samples": [
+            3.9392228620000083,
+            3.9413464049999902,
+            4.081222353000015
+          ]
+        }
+      },
+      "same_arm_16worker_relative": {
+        "cfr_plus_quality_wall_seconds": {
+          "relative_efficiency": 0.4733116760181708,
+          "speedup": 0.9466233520363416
+        },
+        "cfr_wall_seconds": {
+          "relative_efficiency": 0.4628202581813355,
+          "speedup": 0.925640516362671
+        },
+        "quality_7_walks_wall_seconds": {
+          "relative_efficiency": 0.5366063773902938,
+          "speedup": 1.0732127547805876
+        }
+      },
+      "stages": [
+        "expanded-r1-w32-candidate",
+        "expanded-r2-w32-candidate",
+        "expanded-r3-w32-candidate"
+      ],
+      "workers": 32
+    }
+  ],
+  "limitations": [
+    "Fixed two synthetic Flop inputs; F32/DCFR16 and CFV capture disabled.",
+    "Same compiler, portable x86-64-v3 flags and depth2; separately built source-bound binaries.",
+    "16 guest physical cores and 32 logical CPUs do not prove dedicated or 32 physical cores.",
+    "CPU includes spin/allocation/scheduling; whole-process RSS is not per-phase memory.",
+    "Three samples, possibly subsecond CFR intervals; no adaptive retries or mixed boots.",
+    "A performance screen is not adoption, broader correctness, or target-exploitability certification."
+  ],
+  "measurement_host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "boot_id": "bdd9bbdc-ba0f-465d-9046-b33efdb34ff5",
+    "cgroup": {
+      "cpu_limits": {
+        "/sys/fs/cgroup/system.slice": "max 100000",
+        "/sys/fs/cgroup/system.slice/solvers-r1-vm21-measure32.service": "max 100000"
+      },
+      "cpu_weight": "100",
+      "memory_max": "12884901888",
+      "swap_max": "0"
+    },
+    "cpu_models": [
+      "AMD EPYC 7B12"
+    ],
+    "instance_id": "715936786015339093",
+    "logical_cpus": 32,
+    "machine": "x86_64",
+    "one_per_core": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "physical_cores": 16,
+    "topology": [
+      {
+        "core": "0",
+        "cpu": 0,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 1,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 2,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 3,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 4,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 5,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 6,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 7,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 8,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 9,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 10,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 11,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 12,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 13,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 14,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 15,
+        "socket": "0"
+      },
+      {
+        "core": "0",
+        "cpu": 16,
+        "socket": "0"
+      },
+      {
+        "core": "1",
+        "cpu": 17,
+        "socket": "0"
+      },
+      {
+        "core": "2",
+        "cpu": 18,
+        "socket": "0"
+      },
+      {
+        "core": "3",
+        "cpu": 19,
+        "socket": "0"
+      },
+      {
+        "core": "4",
+        "cpu": 20,
+        "socket": "0"
+      },
+      {
+        "core": "5",
+        "cpu": 21,
+        "socket": "0"
+      },
+      {
+        "core": "6",
+        "cpu": 22,
+        "socket": "0"
+      },
+      {
+        "core": "7",
+        "cpu": 23,
+        "socket": "0"
+      },
+      {
+        "core": "8",
+        "cpu": 24,
+        "socket": "0"
+      },
+      {
+        "core": "9",
+        "cpu": 25,
+        "socket": "0"
+      },
+      {
+        "core": "10",
+        "cpu": 26,
+        "socket": "0"
+      },
+      {
+        "core": "11",
+        "cpu": 27,
+        "socket": "0"
+      },
+      {
+        "core": "12",
+        "cpu": 28,
+        "socket": "0"
+      },
+      {
+        "core": "13",
+        "cpu": 29,
+        "socket": "0"
+      },
+      {
+        "core": "14",
+        "cpu": 30,
+        "socket": "0"
+      },
+      {
+        "core": "15",
+        "cpu": 31,
+        "socket": "0"
+      }
+    ],
+    "v3": {
+      "argv": [
+        "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "--help"
+      ],
+      "loader": {
+        "bytes": 236616,
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da"
+      },
+      "per_cpu_flags": {
+        "0": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "1": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "10": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "11": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "12": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "13": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "14": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "15": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "16": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "17": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "18": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "19": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "2": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "20": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "21": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "22": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "23": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "24": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "25": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "26": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "27": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "28": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "29": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "3": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "30": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "31": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "4": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "5": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "6": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "7": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "8": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ],
+        "9": [
+          "3dnowprefetch",
+          "abm",
+          "adx",
+          "aes",
+          "apic",
+          "arat",
+          "avx",
+          "avx2",
+          "bmi1",
+          "bmi2",
+          "clflush",
+          "clflushopt",
+          "clwb",
+          "clzero",
+          "cmov",
+          "cmp_legacy",
+          "constant_tsc",
+          "cpuid",
+          "cr8_legacy",
+          "cx16",
+          "cx8",
+          "de",
+          "extd_apicid",
+          "f16c",
+          "fma",
+          "fpu",
+          "fsgsbase",
+          "fxsr",
+          "fxsr_opt",
+          "ht",
+          "hypervisor",
+          "ibpb",
+          "ibrs",
+          "lahf_lm",
+          "lm",
+          "mca",
+          "mce",
+          "misalignsse",
+          "mmx",
+          "mmxext",
+          "movbe",
+          "msr",
+          "mtrr",
+          "nonstop_tsc",
+          "nopl",
+          "nx",
+          "osvw",
+          "pae",
+          "pat",
+          "pclmulqdq",
+          "pdpe1gb",
+          "pge",
+          "pni",
+          "popcnt",
+          "pse",
+          "pse36",
+          "rdpid",
+          "rdrand",
+          "rdseed",
+          "rdtscp",
+          "rep_good",
+          "sep",
+          "sha_ni",
+          "smap",
+          "smep",
+          "ssbd",
+          "sse",
+          "sse2",
+          "sse4_1",
+          "sse4_2",
+          "sse4a",
+          "ssse3",
+          "stibp",
+          "syscall",
+          "topoext",
+          "tsc",
+          "tsc_adjust",
+          "tsc_known_freq",
+          "umip",
+          "vme",
+          "vmmcall",
+          "x2apic",
+          "xgetbv1",
+          "xsave",
+          "xsavec",
+          "xsaveerptr",
+          "xsaveopt",
+          "xtopology"
+        ]
+      },
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "Usage: /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 [OPTION]... EXECUTABLE-FILE [ARGS-FOR-PROGRAM...]\nYou have invoked 'ld.so', the program interpreter for dynamically-linked\nELF programs.  Usually, the program interpreter is invoked automatically\nwhen a dynamically-linked executable is started.\n\nYou may invoke the program interpreter program directly from the command\nline to load and run an ELF executable file; this is like executing that\nfile itself, but always uses the program interpreter you invoked,\ninstead of the program interpreter specified in the executable file you\nrun.  Invoking the program interpreter directly provides access to\nadditional diagnostics, and changing the dynamic linker behavior without\nsetting environment variables (which would be inherited by subprocesses).\n\n  --list                list all dependencies and how they are resolved\n  --verify              verify that given object really is a dynamically linked\n                        object we can handle\n  --inhibit-cache       Do not use /etc/ld.so.cache\n  --library-path PATH   use given PATH instead of content of the environment\n                        variable LD_LIBRARY_PATH\n  --glibc-hwcaps-prepend LIST\n                        search glibc-hwcaps subdirectories in LIST\n  --glibc-hwcaps-mask LIST\n                        only search built-in subdirectories if in LIST\n  --inhibit-rpath LIST  ignore RUNPATH and RPATH information in object names\n                        in LIST\n  --audit LIST          use objects named in LIST as auditors\n  --preload LIST        preload objects named in LIST\n  --argv0 STRING        set argv[0] to STRING before running\n  --list-tunables       list all tunables with minimum and maximum values\n  --list-diagnostics    list diagnostics information\n  --help                display this help and exit\n  --version             output version information and exit\n\nThis program interpreter self-identifies as: /lib64/ld-linux-x86-64.so.2\n\nShared library search path:\n  (libraries located via /etc/ld.so.cache)\n  /lib/x86_64-linux-gnu (system search path)\n  /usr/lib/x86_64-linux-gnu (system search path)\n  /lib (system search path)\n  /usr/lib (system search path)\n\nSubdirectories of glibc-hwcaps directories, in priority order:\n  x86-64-v4\n  x86-64-v3 (supported, searched)\n  x86-64-v2 (supported, searched)\n"
+    }
+  },
+  "measurement_plan": {
+    "bytes": 151840,
+    "sha256": "576e5bf642c332599411005428212635488a9812738d74734814cbd47c1b8fa8"
+  },
+  "payload_integrity": "verified",
+  "performance_screen": "rejected",
+  "predeclared_guards": {
+    "all_cfr_quality_three_sample_max_over_min_at_most_1_15": false,
+    "all_quality_median_ratios_at_most_1_05": true,
+    "all_root_rss_maximum_ratios_at_most_1_10": true,
+    "both_inputs_16worker_cfr_ratio_at_most_1_03": true,
+    "both_inputs_32worker_cfr_ratio_at_most_0_95": true
+  },
+  "production_adoption": false,
+  "schema": "r1.sparse-rank-groups-report/v1",
+  "status": "completed"
+}

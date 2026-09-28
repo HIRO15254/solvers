@@ -1,0 +1,10 @@
+{
+  "schema": "r1.vm21-large-phase/v1",
+  "instance_id": "715936786015339093",
+  "armed_at_utc": "2026-09-28T05:50:57.358983+00:00",
+  "phase_stop_utc": "2026-09-28T05:58:57+00:00",
+  "original_stop_utc": "2026-09-28T06:20:51+00:00",
+  "maximum_large_phase_seconds": 480,
+  "max_measurement_window_seconds": 360,
+  "note": "STOP is fixed before start request; setup latency consumes this window."
+}

@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-21",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo systemd-run --unit=solvers-r1-vm21-recover2 --wait --pipe --collect --property=RuntimeMaxSec=150 --property=MemoryMax=2G --property=MemorySwapMax=0 --property=KillMode=control-group /bin/bash /opt/r1/sparse-rank-package/experiments/hu-postflop-r1/cloud/vm21/recover.sh",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-28T05:59:17.783307+00:00",
+  "timeout_seconds": 180,
+  "stdout": {
+    "bytes": 249,
+    "sha256": "90e61da2bbab7d587116d5579d9dc6346412e05e9f0862fdd9270191a9b3edfd"
+  },
+  "stderr": {
+    "bytes": 222,
+    "sha256": "bdd12974456748f09aaac7ef318af444dc53d9f734e22c2123511384cb6b8ff4"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T05:59:28.681058+00:00"
+}

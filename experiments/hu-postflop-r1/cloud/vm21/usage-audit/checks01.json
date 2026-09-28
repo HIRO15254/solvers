@@ -1,0 +1,57 @@
+{
+  "schema": "r1.vm21-usage-checks/v1",
+  "at_utc": "2026-09-28T06:10:00.722227+00:00",
+  "status": "passed",
+  "checks": [
+    "two source ASTs parsed",
+    "complete frozen acquisition/lifecycle/transfer/metric/budget replay",
+    "stored report byte-for-byte replay",
+    "all nondisk cost components equal original model",
+    "four arithmetic envelope rejection checks"
+  ],
+  "negative_cases": [
+    "nonpositive_disk",
+    "disk_beyond_original",
+    "observed_egress_beyond_original",
+    "started_payload_beyond_original"
+  ],
+  "files": {
+    "collect.py": {
+      "bytes": 16369,
+      "sha256": "e5d143a12feaf57daaefb122cb15c74251dd65564438caea2e9a8a5196780bae"
+    },
+    "analyze.py": {
+      "bytes": 18254,
+      "sha256": "f60b8b6e07db948c88fae26c2df5857c79220712cac26cc71b21210bc104eae3"
+    },
+    "acquisition.json": {
+      "bytes": 260200,
+      "sha256": "dba8951a42eb7e748c278667d0bdd3316feb2501a459742e6274e22752047918"
+    },
+    "report.json": {
+      "bytes": 15220,
+      "sha256": "2d6370ff4e19f731d555b59a4df133a750e2891d6ffb931b086f715a4612cd5b"
+    },
+    "checks01.stdout.log": {
+      "bytes": 1066,
+      "sha256": "9faab9c8873fcd97888b8a4657645683a2a1a7696a42045430fd5351f3fe663c"
+    },
+    "checks01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "budget_snapshot": {
+    "bytes": 112890,
+    "sha256": "11bf3967e2196d23486d76796569f1ccd8c998f49d1d237121b78b406374adb1"
+  },
+  "authorized_usd": "40",
+  "held_before_usd": "40",
+  "proposed_hold_usd": "1.30",
+  "proposed_restore_usd": "0.05",
+  "billing_amount_known": false,
+  "cloud_requests_during_validation": 0,
+  "budget_mutations": false,
+  "local_native_or_archive_work": false,
+  "note": "Earlier preparation harness relative/absolute-path mismatch was corrected before pure lifecycle validation; it made no acquisition or file copies."
+}

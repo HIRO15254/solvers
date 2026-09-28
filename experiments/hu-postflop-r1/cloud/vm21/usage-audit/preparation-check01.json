@@ -1,0 +1,27 @@
+{
+  "schema": "r1.vm21-usage-preparation-check/v1",
+  "checked_at": "2026-09-28T05:58:06.047784+00:00",
+  "status": "passed",
+  "checks": [
+    "AST parsed",
+    "import does not acquire or create input copies",
+    "offset timestamp normalizes correctly",
+    "naive timestamp rejected",
+    "numeric instance binding and two metrics fixed"
+  ],
+  "cloud_requests": 0,
+  "credential_requests": 0,
+  "native_or_archive_work": false,
+  "budget_changes": false,
+  "acquisition_requires_root_cleanup_notice": true,
+  "files": {
+    "collect.py": {
+      "bytes": 15536,
+      "sha256": "8da152c1df283752097822a179d147d4f6f0c859743d919e1aae0fb5e3f0605b"
+    },
+    "README.jp.md": {
+      "bytes": 2536,
+      "sha256": "bca146952477773d5d04e9c4fa44ff2db86aa7a7c9e7fae56b99dc57277e0405"
+    }
+  }
+}

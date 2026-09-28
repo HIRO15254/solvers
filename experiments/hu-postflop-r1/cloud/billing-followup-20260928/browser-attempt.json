@@ -1,0 +1,28 @@
+{
+  "schema": "r1.billing-ui-attempt/v1",
+  "recorded_at_utc": "2026-09-28T05:42:25.926237+00:00",
+  "source": "Direct CUA tool outcomes, manually transcribed; no authenticated page was available.",
+  "calls": [
+    {
+      "method": "cua.createBrowserTab",
+      "browser": "iab",
+      "visible": false,
+      "url": "https://console.cloud.google.com/billing/015A1D-8A8F19-EC7035/reports;timeRange=CUSTOM_RANGE;from=2026-09-25;to=2026-09-27;grouping=GROUP_BY_SKU;projects=1010616757715?authuser=1",
+      "result": "Browser is not available: iab"
+    },
+    {
+      "method": "cua.listBrowsers",
+      "result": []
+    }
+  ],
+  "status": "browser_connection_unavailable",
+  "created_tabs": 0,
+  "login_attempted": false,
+  "report_page_read": false,
+  "cost_observed": null,
+  "billing_permission_conclusion": null,
+  "reservation_return_usd": 0,
+  "exports": false,
+  "external_changes": false,
+  "next_access": "When a browser connection is available, open the exact existing-account/project Reports URL above and inspect actual historical cost before credits; keep forecast/partial periods separate."
+}

@@ -1,0 +1,362 @@
+{
+  "schema": "r1.vm21-transfer-intent/v1",
+  "resource": "solvers-r1-20260928-21",
+  "at_utc": "2026-09-28T06:00:11.105970+00:00",
+  "label": "proof01-00",
+  "transport": {
+    "bytes": 2272,
+    "sha256": "1e15f5717be3a66e5ff9813278dc9e95d003c3116b2af65528361ced5ab8c3a4"
+  },
+  "split_receipt": {
+    "bytes": 764,
+    "sha256": "54c38e73e18f9f685a5a711d9df4fe1a162272dea115f05862b1c8a088623259"
+  },
+  "files": [
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "a019452f5ea6c9a6d7a38ebb44bf3a8f4e0e6486985b8657d9b5e92ad9a25a0e"
+    }
+  ],
+  "destination": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm21\\downloads\\proof01",
+  "charged_payload_bytes": 50331648,
+  "prior_payload_bytes": 0,
+  "cumulative_payload_bytes": 50331648,
+  "total_reserved_outbound_bytes": 117440512,
+  "sdk_timeout_seconds": 180,
+  "original_stop_utc": "2026-09-28T06:20:51+00:00",
+  "control_evidence": {
+    "observed_output_bytes": 485639,
+    "output_payload_sublimit_bytes": 8388608,
+    "reserved_control_protocol_bytes": 67108864,
+    "files": [
+      {
+        "path": "analyze01.stderr.log",
+        "bytes": 1007
+      },
+      {
+        "path": "analyze01.stdout.log",
+        "bytes": 57
+      },
+      {
+        "path": "arm32-schedule01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "arm32-schedule01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "arm32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "arm32-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "bootstrap-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "bootstrap-state01.stdout.log",
+        "bytes": 26
+      },
+      {
+        "path": "build-proof01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-proof01.stdout.log",
+        "bytes": 104606
+      },
+      {
+        "path": "build-start01.stderr.log",
+        "bytes": 97
+      },
+      {
+        "path": "build-start01.stdout.log",
+        "bytes": 1853
+      },
+      {
+        "path": "build-status01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status01.stdout.log",
+        "bytes": 2060
+      },
+      {
+        "path": "build-status02.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status02.stdout.log",
+        "bytes": 1174
+      },
+      {
+        "path": "build-status03.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status03.stdout.log",
+        "bytes": 1655
+      },
+      {
+        "path": "build-status04.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status04.stdout.log",
+        "bytes": 1745
+      },
+      {
+        "path": "build-status05.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status05.stdout.log",
+        "bytes": 1644
+      },
+      {
+        "path": "create.stderr.log",
+        "bytes": 453
+      },
+      {
+        "path": "install-base01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "install-base01.stdout.log",
+        "bytes": 356
+      },
+      {
+        "path": "install-overlay01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "install-overlay01.stdout.log",
+        "bytes": 553
+      },
+      {
+        "path": "measure-start01.stderr.log",
+        "bytes": 885
+      },
+      {
+        "path": "measure-start01.stdout.log",
+        "bytes": 2096
+      },
+      {
+        "path": "measure-status01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status01.stdout.log",
+        "bytes": 2821
+      },
+      {
+        "path": "measure-status02.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status02.stdout.log",
+        "bytes": 2826
+      },
+      {
+        "path": "measure-status03.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status03.stdout.log",
+        "bytes": 2834
+      },
+      {
+        "path": "measure-status04.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status04.stdout.log",
+        "bytes": 3001
+      },
+      {
+        "path": "preflight-addresses01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-addresses01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-disks01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-disks01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-instances01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-instances01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-quota01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "preflight-quota01.stdout.log",
+        "bytes": 11313
+      },
+      {
+        "path": "recover01.stderr.log",
+        "bytes": 222
+      },
+      {
+        "path": "recover01.stdout.log",
+        "bytes": 249
+      },
+      {
+        "path": "remote-preflight01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "remote-preflight01.stdout.log",
+        "bytes": 537
+      },
+      {
+        "path": "resize2-recovery01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "resize2-recovery01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "resize32-01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "resize32-01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "restore2-schedule01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "restore2-schedule01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "restore2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "restore2-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "split01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "split01.stdout.log",
+        "bytes": 2272
+      },
+      {
+        "path": "start2-recovery01.stderr.log",
+        "bytes": 325
+      },
+      {
+        "path": "start2-recovery01.stdout.log",
+        "bytes": 33383
+      },
+      {
+        "path": "start2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "start2-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "start32-01.stderr.log",
+        "bytes": 347
+      },
+      {
+        "path": "start32-01.stdout.log",
+        "bytes": 33383
+      },
+      {
+        "path": "start32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "start32-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "state2-01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "state2-01.stdout.log",
+        "bytes": 544
+      },
+      {
+        "path": "stop2-before32-01.stderr.log",
+        "bytes": 456
+      },
+      {
+        "path": "stop2-before32-01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "stop32-aftermeasure01.stderr.log",
+        "bytes": 465
+      },
+      {
+        "path": "stop32-aftermeasure01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "stopped2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "stopped2-state01.stdout.log",
+        "bytes": 489
+      },
+      {
+        "path": "stopped32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "stopped32-state01.stdout.log",
+        "bytes": 489
+      },
+      {
+        "path": "upload-base01.stderr.log",
+        "bytes": 581
+      },
+      {
+        "path": "upload-base01.stdout.log",
+        "bytes": 286
+      },
+      {
+        "path": "upload-overlay01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "upload-overlay01.stdout.log",
+        "bytes": 2673
+      }
+    ],
+    "meaning": "Captured application output only; does not measure wire/retransmission/billed bytes"
+  },
+  "prior_intents": [],
+  "failure_policy": "This file remains fully charged on failure/uncertainty; unstarted suffix files are not charged; no automatic retry"
+}

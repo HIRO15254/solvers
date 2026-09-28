@@ -1,0 +1,55 @@
+{
+  "at_utc": "2026-09-28T06:11:04.884411+00:00",
+  "authorized_limit_usd": 40,
+  "held_before_usd": 40,
+  "held_after_usd": 39.95,
+  "restored_usd": 0.05,
+  "available_after_usd": 0.05,
+  "change": {
+    "event": "usage_based_reservation_reconciliation",
+    "at": "2026-09-28T06:11:04.884411+00:00",
+    "id": "r1-20260928-21",
+    "old_reserved_usd": 1.35,
+    "new_reserved_usd": 1.3,
+    "restored_to_available_budget_usd": 0.05,
+    "evidence": "experiments/hu-postflop-r1/cloud/vm21/usage-audit/report.json",
+    "evidence_sha256": "2d6370ff4e19f731d555b59a4df133a750e2891d6ffb931b086f715a4612cd5b",
+    "billed_usd": null,
+    "final_invoice": false,
+    "note": "Only disk24h replaced by confirmed lifetime plus120s/upward-minute rounding; original47min smallCPU, overlapping10min highCPU, IPv4,320MiB and1USD retained. Missing usage remains unknown."
+  },
+  "budget_before": {
+    "bytes": 112890,
+    "sha256": "11bf3967e2196d23486d76796569f1ccd8c998f49d1d237121b78b406374adb1"
+  },
+  "evidence": {
+    "vm21/usage-audit/report.json": {
+      "bytes": 15220,
+      "sha256": "2d6370ff4e19f731d555b59a4df133a750e2891d6ffb931b086f715a4612cd5b"
+    },
+    "vm21/usage-audit/analyze.py": {
+      "bytes": 18254,
+      "sha256": "f60b8b6e07db948c88fae26c2df5857c79220712cac26cc71b21210bc104eae3"
+    },
+    "vm21/usage-audit/collect.py": {
+      "bytes": 16369,
+      "sha256": "e5d143a12feaf57daaefb122cb15c74251dd65564438caea2e9a8a5196780bae"
+    },
+    "vm21/usage-audit/acquisition.json": {
+      "bytes": 260200,
+      "sha256": "dba8951a42eb7e748c278667d0bdd3316feb2501a459742e6274e22752047918"
+    }
+  },
+  "application_source": {
+    "bytes": 5222,
+    "sha256": "8a90dc63e3f55c80d2648073887922e3bd4e515e3dc45b41cafd314fc242142e"
+  },
+  "billed_usd": null,
+  "final_invoice": false,
+  "cloud_mutations": false,
+  "archive_access": false,
+  "budget_after": {
+    "bytes": 115720,
+    "sha256": "5f57f5a932540fc8d7c88b25787d1c2e98903c729bd1eda184857415f905a825"
+  }
+}

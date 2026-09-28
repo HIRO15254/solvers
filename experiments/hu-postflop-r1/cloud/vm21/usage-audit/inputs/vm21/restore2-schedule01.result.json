@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "instances",
+    "set-scheduling",
+    "solvers-r1-20260928-21",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--format=json",
+    "--termination-time=2026-09-28T06:20:51Z",
+    "--instance-termination-action=STOP",
+    "--no-restart-on-failure"
+  ],
+  "started_utc": "2026-09-28T05:57:28.005156+00:00",
+  "timeout_seconds": 60,
+  "stdout": {
+    "bytes": 33270,
+    "sha256": "7459ca25c0e140a40d9dc3f7515e9a41a2b7fd66ccd3f2b385af0e1750a6f156"
+  },
+  "stderr": {
+    "bytes": 141,
+    "sha256": "cc313eb53dabb3aa52d6bafdc2753acff654e56a126a8367597c57f7891846f6"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T05:57:33.466165+00:00"
+}

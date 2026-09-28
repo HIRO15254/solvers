@@ -1,0 +1,55 @@
+{
+  "schema": "r1.billing-metadata-followup/v1",
+  "project": "solvers-abstraction-20260723",
+  "started_at": "2026-09-28T05:39:29.182198+00:00",
+  "source": {
+    "bytes": 3729,
+    "sha256": "7d6a30d434b1b00c2f8160287979b76d33a78dc62d8cb75cd699f9235b08fc2b"
+  },
+  "requests": [
+    {
+      "name": "project-billing",
+      "method": "GET",
+      "url": "https://cloudbilling.googleapis.com/v1/projects/solvers-abstraction-20260723/billingInfo",
+      "requested_at": "2026-09-28T05:39:30.302324+00:00",
+      "http_status": 200,
+      "ended_at": "2026-09-28T05:39:31.485779+00:00",
+      "response": {
+        "path": "project-billing.json",
+        "bytes": 203,
+        "sha256": "1b7ecd19bcf6e2fa81aec5795a5d06eee98cd435c785bafe83060e8a0afa438c"
+      },
+      "next_page_present": false,
+      "unreachable": []
+    },
+    {
+      "name": "datasets",
+      "method": "GET",
+      "url": "https://bigquery.googleapis.com/bigquery/v2/projects/solvers-abstraction-20260723/datasets?all=true&maxResults=50",
+      "requested_at": "2026-09-28T05:39:31.486353+00:00",
+      "http_status": 200,
+      "ended_at": "2026-09-28T05:39:31.840749+00:00",
+      "response": {
+        "path": "datasets.json",
+        "bytes": 75,
+        "sha256": "9cb070e75f4dc30792aed516410a21ac82ec9bec6b577932fbcc15c5638cb34a"
+      },
+      "next_page_present": false,
+      "unreachable": []
+    }
+  ],
+  "maximum_gets": 2,
+  "maximum_response_bytes": 262144,
+  "credential_material_retained": false,
+  "query_jobs": false,
+  "resource_mutations": false,
+  "ledger_mutations": false,
+  "vm_access": false,
+  "billed_amount": null,
+  "authentication": {
+    "returncode": 0,
+    "stderr_bytes": 0
+  },
+  "status": "responses_captured",
+  "ended_at": "2026-09-28T05:39:31.844560+00:00"
+}

@@ -72,3 +72,5 @@ experiments/hu-postflop-r1/flop-scaling/cpu-profile/adapter/markers.rs.inc white
 experiments/hu-postflop-r1/cloud/usage-audit-vm20/inputs/preflight-vm20/*.html -whitespace
 experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/candidate.patch -whitespace
 experiments/hu-postflop-r1/cloud/usage-audit-vm20/analyze.py whitespace=cr-at-eol,-blank-at-eof
+# VM21 usage audit retains the original byte-pinned pricing HTML.
+experiments/hu-postflop-r1/cloud/vm21/usage-audit/inputs/**/*.html -whitespace

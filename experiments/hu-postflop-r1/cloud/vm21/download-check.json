@@ -1,0 +1,27 @@
+{
+  "status": "downloaded_archive_stream_hash_verified",
+  "at_utc": "2026-09-28T06:02:05.004793+00:00",
+  "bytes": 126540793,
+  "sha256": "a50c560a69556a29793e982929bfb28c5a1c1d4d248819915171bccfb7edfbf8",
+  "parts": [
+    {
+      "path": "sparse-rank-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "a019452f5ea6c9a6d7a38ebb44bf3a8f4e0e6486985b8657d9b5e92ad9a25a0e"
+    },
+    {
+      "path": "sparse-rank-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "a516a356aa47c1aed71a8ae9ea6d7432fc897fc665cea78bd85a9f0544a60367"
+    },
+    {
+      "path": "sparse-rank-proof01.part02",
+      "bytes": 25877497,
+      "sha256": "11f079a5dd271cdec3357644a01fe5488aadc0e229a9c3f658fb0b95217c7043"
+    }
+  ],
+  "directory": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm21\\downloads\\proof01",
+  "elapsed_seconds": 0.4757569001521915,
+  "local_archive_decompression": false,
+  "scope": "Transfer integrity; solver correctness is established separately by cloud readers"
+}

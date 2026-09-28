@@ -1,0 +1,5 @@
+Starting instance(s) solvers-r1-20260928-21...
+.......................................................................done.
+Updated [https://compute.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260928-21].
+Instance internal IP is 10.128.0.22
+Instance external IP is 34.30.163.212

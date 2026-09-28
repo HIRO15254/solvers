@@ -1,0 +1,23 @@
+00-kernel.rs              | 4 kB |   4.0 kB/s | ETA: 00:00:05 |  15%00-kernel.rs              | 26 kB |  26.4 kB/s | ETA: 00:00:00 | 100%
+01-candidate.patch        | 4 kB |   4.0 kB/s | ETA: 00:00:01 |  40%01-candidate.patch        | 9 kB |   9.8 kB/s | ETA: 00:00:00 | 100%
+02-provenance.json        | 1 kB |   1.2 kB/s | ETA: 00:00:00 | 100%
+03-prepare.py             | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  51%03-prepare.py             | 7 kB |   7.8 kB/s | ETA: 00:00:00 | 100%
+04-tests.rs.in            | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  76%04-tests.rs.in            | 5 kB |   5.2 kB/s | ETA: 00:00:00 | 100%
+05-README.jp.md           | 3 kB |   3.8 kB/s | ETA: 00:00:00 | 100%
+06-run.py                 | 4 kB |   4.0 kB/s | ETA: 00:00:04 |  17%06-run.py                 | 22 kB |  22.4 kB/s | ETA: 00:00:00 | 100%
+07-analyze.py             | 4 kB |   4.0 kB/s | ETA: 00:00:04 |  17%07-analyze.py             | 22 kB |  22.8 kB/s | ETA: 00:00:00 | 100%
+08-protocol.jp.md         | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  63%08-protocol.jp.md         | 6 kB |   6.3 kB/s | ETA: 00:00:00 | 100%
+09-install-overlay.py     | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  79%09-install-overlay.py     | 5 kB |   5.0 kB/s | ETA: 00:00:00 | 100%
+10-prepare-overlay.py     | 2 kB |   2.5 kB/s | ETA: 00:00:00 | 100%
+11-protocol.jp.md         | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  59%11-protocol.jp.md         | 6 kB |   6.7 kB/s | ETA: 00:00:00 | 100%
+12-start.py               | 4 kB |   4.0 kB/s | ETA: 00:00:01 |  39%12-start.py               | 10 kB |  10.1 kB/s | ETA: 00:00:00 | 100%
+13-run.sh                 | 2 kB |   2.9 kB/s | ETA: 00:00:00 | 100%
+14-status.py              | 2 kB |   2.4 kB/s | ETA: 00:00:00 | 100%
+15-prepare-dispatch.py    | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  71%15-prepare-dispatch.py    | 5 kB |   5.6 kB/s | ETA: 00:00:00 | 100%
+16-dispatch-derivation.js | 1 kB |   1.0 kB/s | ETA: 00:00:00 | 100%
+17-solve.rs               | 4 kB |   4.0 kB/s | ETA: 00:00:03 |  23%17-solve.rs               | 17 kB |  17.1 kB/s | ETA: 00:00:00 | 100%
+18-prepare.py             | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  62%18-prepare.py             | 6 kB |   6.4 kB/s | ETA: 00:00:00 | 100%
+19-provenance.json        | 0 kB |   0.3 kB/s | ETA: 00:00:00 | 100%
+20-recover.sh             | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  52%20-recover.sh             | 7 kB |   7.6 kB/s | ETA: 00:00:00 | 100%
+21-split-on-cloud.py      | 3 kB |   4.0 kB/s | ETA: 00:00:00 | 100%
+overlay-manifest.json     | 4 kB |   4.0 kB/s | ETA: 00:00:00 |  64%overlay-manifest.json     | 6 kB |   6.2 kB/s | ETA: 00:00:00 | 100%

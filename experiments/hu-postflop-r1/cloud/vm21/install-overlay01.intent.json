@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-21",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--quiet",
+    "--command=sudo python3 -B /tmp/r1-vm21-overlay/09-install-overlay.py --package /opt/r1/sparse-rank-package --incoming /tmp/r1-vm21-overlay --manifest-sha256 fc3fc5c18c6e2aa2fcb9ab7c0d2ddccbcb1899cc452dc8a3543963fb4773711d"
+  ],
+  "started_utc": "2026-09-28T05:38:47.435094+00:00",
+  "timeout_seconds": 45
+}

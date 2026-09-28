@@ -1,0 +1,37 @@
+{
+  "build": {
+    "service_exit": 0,
+    "service": "MainPID=3322\nResult=success\nActiveState=active",
+    "status": "running",
+    "stages": [
+      {
+        "name": "toolchain",
+        "status": "completed",
+        "started_at": "2026-09-28T05:39:35.632075+00:00",
+        "ended_at": "2026-09-28T05:39:35.817649+00:00"
+      },
+      {
+        "name": "build-baseline",
+        "status": "running",
+        "started_at": "2026-09-28T05:39:36.204434+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 1,
+      "running": 1,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 3
+    },
+    "error": null,
+    "stage_stderr_tail": "   Compiling proc-macro2 v1.0.106\n   Compiling unicode-ident v1.0.24\n   Compiling quote v1.0.46\n   Compiling zerocopy v0.8.52\n   Compiling serde_core v1.0.228\n   Compiling cfg-if v1.0.4\n   Compiling libc v0.2.186\n   Compiling syn v2.0.118\n   Compiling serde v1.0.228\n   Compiling fastrand v2.4.1\n   Compiling quickdiv v0.1.1\n   Compiling crossbeam-utils v0.8.21\n   Compiling miniphf v0.1.0\n   Compiling aya_base v0.1.0\n   Compiling zerocopy-derive v0.8.52\n   Compiling serde_derive v1.0.228\n   Compiling aya_codegen v0.1.0\n   Compiling crossbeam-epoch v0.9.18\n   Compiling aya_poker v0.1.0\n   Compiling rayon-core v1.13.0\n   Compiling thiserror v2.0.18\n   Compiling either v1.16.0\n   Compiling crossbeam-deque v0.8.6\n   Compiling getrandom v0.2.17\n   Compiling thiserror-impl v2.0.18\n   Compiling rand_core v0.6.4\n   Compiling ppv-lite86 v0.2.21\n   Compiling zmij v1.0.21\n   Compiling autocfg v1.5.1\n   Compiling num-traits v0.2.19\n   Compiling rand_chacha v0.3.1\n   Compiling rayon v1.12.0\n   Compiling cards v0.1.0 (/opt/r1/sparse-rank-work01/source-baseline/crates/cards)\n   Compiling serde_json v1.0.150\n   Compiling rand v0.8.6\n"
+  },
+  "measure": {
+    "service_exit": 0,
+    "service": "MainPID=0\nResult=success\nActiveState=inactive"
+  },
+  "source_archive": {
+    "bytes": 967265,
+    "sha256": "83fc42a73c202a7754889fd6bcefe984ffd575d0883545dc13a9068be0f3691c"
+  }
+}

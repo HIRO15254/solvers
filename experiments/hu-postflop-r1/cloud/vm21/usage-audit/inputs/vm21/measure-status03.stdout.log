@@ -1,0 +1,101 @@
+{
+  "build": {
+    "service_exit": 0,
+    "service": "MainPID=0\nResult=success\nActiveState=inactive",
+    "status": "completed",
+    "stages": [
+      {
+        "name": "toolchain",
+        "status": "completed",
+        "started_at": "2026-09-28T05:39:35.632075+00:00",
+        "ended_at": "2026-09-28T05:39:35.817649+00:00"
+      },
+      {
+        "name": "build-baseline",
+        "status": "completed",
+        "started_at": "2026-09-28T05:39:36.204434+00:00",
+        "ended_at": "2026-09-28T05:40:45.944719+00:00"
+      },
+      {
+        "name": "tests-baseline",
+        "status": "completed",
+        "started_at": "2026-09-28T05:40:46.422001+00:00",
+        "ended_at": "2026-09-28T05:43:29.345787+00:00"
+      },
+      {
+        "name": "build-candidate",
+        "status": "completed",
+        "started_at": "2026-09-28T05:43:29.766776+00:00",
+        "ended_at": "2026-09-28T05:44:37.069647+00:00"
+      },
+      {
+        "name": "tests-candidate",
+        "status": "completed",
+        "started_at": "2026-09-28T05:44:37.548990+00:00",
+        "ended_at": "2026-09-28T05:47:21.520921+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 5,
+      "running": 0,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 0
+    },
+    "error": null,
+    "wrapper_finish": {
+      "exit_code": 0,
+      "last_phase": "build",
+      "ended_at": "2026-09-28T05:47:22.029791+00:00"
+    }
+  },
+  "measure": {
+    "service_exit": 0,
+    "service": "MainPID=1533\nResult=success\nActiveState=active",
+    "status": "running",
+    "stages": [
+      {
+        "name": "expanded-r2-w16-baseline",
+        "status": "completed",
+        "started_at": "2026-09-28T05:54:18.859258+00:00",
+        "ended_at": "2026-09-28T05:54:23.176211+00:00"
+      },
+      {
+        "name": "expanded-r2-w16-candidate",
+        "status": "completed",
+        "started_at": "2026-09-28T05:54:24.450716+00:00",
+        "ended_at": "2026-09-28T05:54:28.529319+00:00"
+      },
+      {
+        "name": "expanded-r2-w32-baseline",
+        "status": "completed",
+        "started_at": "2026-09-28T05:54:29.806525+00:00",
+        "ended_at": "2026-09-28T05:54:34.275239+00:00"
+      },
+      {
+        "name": "expanded-r2-w32-candidate",
+        "status": "completed",
+        "started_at": "2026-09-28T05:54:35.555750+00:00",
+        "ended_at": "2026-09-28T05:54:39.662160+00:00"
+      },
+      {
+        "name": "expanded-r3-w32-candidate",
+        "status": "running",
+        "started_at": "2026-09-28T05:54:40.952881+00:00"
+      }
+    ],
+    "counts": {
+      "completed": 34,
+      "running": 1,
+      "failed": 0,
+      "skipped": 0,
+      "pending": 3
+    },
+    "error": null,
+    "stage_stderr_tail": ""
+  },
+  "source_archive": {
+    "bytes": 967265,
+    "sha256": "83fc42a73c202a7754889fd6bcefe984ffd575d0883545dc13a9068be0f3691c"
+  }
+}

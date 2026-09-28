@@ -1,0 +1,20 @@
+{
+  "schema": "r1.vm21-transfer-result/v1",
+  "label": "proof01-05",
+  "intent": {
+    "bytes": 10395,
+    "sha256": "bcc00da8222ae92a36d56d5abfadd641898910093e1ea7787b519cd7e7f256d5"
+  },
+  "charged_payload_bytes": 303,
+  "charged_payload_refund_bytes": 0,
+  "exit_code": 0,
+  "status": "intended_file_verified",
+  "verified_files": [
+    {
+      "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm21\\downloads\\proof01\\sparse-rank-proof01.parts.sha256",
+      "bytes": 303,
+      "sha256": "8445242d6ecfaeba297e63f7f996b0619d7d72dc34310dd112576f3f8599c5e9"
+    }
+  ],
+  "ended_utc": "2026-09-28T06:01:33.929117+00:00"
+}

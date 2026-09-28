@@ -1,0 +1,78 @@
+{
+  "schema": "r1.billing-metadata-followup-report/v1",
+  "at_utc": "2026-09-28T05:41:21.051067+00:00",
+  "conclusion": "No actual settled cost acquired. No accessible BigQuery billing export dataset was listed in the authorized project. No reservation return proposed from this observation.",
+  "project": "solvers-abstraction-20260723",
+  "billing_account_id": "015A1D-8A8F19-EC7035",
+  "account_display_name_from_prior_ui": "趣味",
+  "billing_enabled": true,
+  "acquisition": {
+    "bytes": 1770,
+    "sha256": "383f66aae599f671a982d43bc8a33106d5873447474dbe3541ab43fd1b671355"
+  },
+  "responses": {
+    "project-billing": {
+      "path": "project-billing.json",
+      "bytes": 203,
+      "sha256": "1b7ecd19bcf6e2fa81aec5795a5d06eee98cd435c785bafe83060e8a0afa438c"
+    },
+    "datasets": {
+      "path": "datasets.json",
+      "bytes": 75,
+      "sha256": "9cb070e75f4dc30792aed516410a21ac82ec9bec6b577932fbcc15c5638cb34a"
+    }
+  },
+  "access_scope": "Two official authenticated metadata GETs in the authorized project; existing auth token held in memory only.",
+  "datasets": {
+    "accessible_dataset_count": 0,
+    "hidden_included": true,
+    "pagination_complete": true,
+    "unreachable_locations": [],
+    "limitation": "datasets.list filters by caller permissions. This does not establish that exports are absent from another project or invisible datasets."
+  },
+  "prior_observation": {
+    "path": "../billing-observation-20260927-0220.json",
+    "pin": {
+      "bytes": 4487,
+      "sha256": "1ce771d54086dbc59a7314a2992a463507d07694c8853229cb6cf061faf27b85"
+    },
+    "limitation": "Prior Reports showed September25 actuals and forecast through September27; credited/rounded JPY zero was not complete R1 cost or an invoice."
+  },
+  "next_concrete_read_only_access": [
+    {
+      "name": "Billing Reports for the existing account",
+      "url": "https://console.cloud.google.com/billing/015A1D-8A8F19-EC7035/reports;timeRange=CUSTOM_RANGE;from=2026-09-25;to=2026-09-27;grouping=GROUP_BY_SKU;projects=1010616757715?authuser=1",
+      "action": "Confirm project solvers-abstraction-20260723 /1010616757715, actual usage dates, currency, cost before credits and unrounded subtotal. Download filtered CSV if available; retain receipt and distinguish actual rows from forecasts.",
+      "access_state": "URL structure taken from previously observed authenticated page; not reopened this time."
+    },
+    {
+      "name": "Existing Billing export settings",
+      "url": "https://console.cloud.google.com/billing/export",
+      "action": "Choose billing account 趣味 /015A1D-8A8F19-EC7035 and inspect existing BigQuery export destination project/dataset. Do not enable, edit, save or create any export.",
+      "access_state": "Exact entrypoint from official setup documentation; authenticated settings not read this time."
+    }
+  ],
+  "official_sources": [
+    {
+      "url": "https://docs.cloud.google.com/bigquery/docs/reference/rest/v2/datasets/list",
+      "finding": "GET lists accessible datasets only; all=true includes hidden datasets."
+    },
+    {
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/reports",
+      "finding": "CSV can expose unrounded subtotal; reported cost detail can lag more than24hours and forecasts are separate from actuals."
+    },
+    {
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/export-data-bigquery-setup",
+      "finding": "Existing export destination can be a separate project. Billing export console entrypoint is /billing/export."
+    }
+  ],
+  "actual_r1_billed_usd": null,
+  "settlement_verified": false,
+  "proposed_reservation_return_usd": 0,
+  "query_jobs": false,
+  "export_or_dataset_changes": false,
+  "resource_mutations": false,
+  "ledger_mutations": false,
+  "vm_ssh": false,
+  "local_native_compute": false
+}

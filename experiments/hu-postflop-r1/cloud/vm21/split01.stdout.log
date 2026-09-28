@@ -1,0 +1,68 @@
+{
+  "schema": "r1.vm21-transport/v1",
+  "status": "durable_transport_parts_verified",
+  "archive_sha256": "a50c560a69556a29793e982929bfb28c5a1c1d4d248819915171bccfb7edfbf8",
+  "archive_bytes": 126540793,
+  "payload_bytes": 127124619,
+  "parts": [
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "a019452f5ea6c9a6d7a38ebb44bf3a8f4e0e6486985b8657d9b5e92ad9a25a0e"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "a516a356aa47c1aed71a8ae9ea6d7432fc897fc665cea78bd85a9f0544a60367"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part02",
+      "bytes": 25877497,
+      "sha256": "11f079a5dd271cdec3357644a01fe5488aadc0e229a9c3f658fb0b95217c7043"
+    }
+  ],
+  "files": [
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "a019452f5ea6c9a6d7a38ebb44bf3a8f4e0e6486985b8657d9b5e92ad9a25a0e"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "a516a356aa47c1aed71a8ae9ea6d7432fc897fc665cea78bd85a9f0544a60367"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part02",
+      "bytes": 25877497,
+      "sha256": "11f079a5dd271cdec3357644a01fe5488aadc0e229a9c3f658fb0b95217c7043"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.tar.gz.manifest.json",
+      "bytes": 417362,
+      "sha256": "bee68cbad7758bc8a15976c7df027639552a7bb4d6b4fd9cad97f3435e0de49d"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.tar.gz.sha256",
+      "bytes": 93,
+      "sha256": "c2b45057697a52af79f7b303096e4bc7923a3589e154719a47caa26b00dfbcf2"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.parts.sha256",
+      "bytes": 303,
+      "sha256": "8445242d6ecfaeba297e63f7f996b0619d7d72dc34310dd112576f3f8599c5e9"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-recovery01.json",
+      "bytes": 249,
+      "sha256": "90e61da2bbab7d587116d5579d9dc6346412e05e9f0862fdd9270191a9b3edfd"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-analysis01.json",
+      "bytes": 165819,
+      "sha256": "17dd8082bf12d30cfb61156b1893a33a7199de37d860dddb5e9c2d3d158633a7"
+    }
+  ],
+  "control_protocol_reserved_bytes": 67108864,
+  "total_egress_envelope_bytes": 335544320
+}

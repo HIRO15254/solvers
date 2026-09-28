@@ -1,0 +1,383 @@
+{
+  "schema": "r1.vm21-transfer-request/v1",
+  "resource": "solvers-r1-20260928-21",
+  "label": "proof01",
+  "files": [
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part00",
+      "bytes": 50331648,
+      "sha256": "a019452f5ea6c9a6d7a38ebb44bf3a8f4e0e6486985b8657d9b5e92ad9a25a0e"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part01",
+      "bytes": 50331648,
+      "sha256": "a516a356aa47c1aed71a8ae9ea6d7432fc897fc665cea78bd85a9f0544a60367"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.part02",
+      "bytes": 25877497,
+      "sha256": "11f079a5dd271cdec3357644a01fe5488aadc0e229a9c3f658fb0b95217c7043"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.tar.gz.manifest.json",
+      "bytes": 417362,
+      "sha256": "bee68cbad7758bc8a15976c7df027639552a7bb4d6b4fd9cad97f3435e0de49d"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.tar.gz.sha256",
+      "bytes": 93,
+      "sha256": "c2b45057697a52af79f7b303096e4bc7923a3589e154719a47caa26b00dfbcf2"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-proof01.parts.sha256",
+      "bytes": 303,
+      "sha256": "8445242d6ecfaeba297e63f7f996b0619d7d72dc34310dd112576f3f8599c5e9"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-recovery01.json",
+      "bytes": 249,
+      "sha256": "90e61da2bbab7d587116d5579d9dc6346412e05e9f0862fdd9270191a9b3edfd"
+    },
+    {
+      "path": "/opt/r1/sparse-rank-analysis01.json",
+      "bytes": 165819,
+      "sha256": "17dd8082bf12d30cfb61156b1893a33a7199de37d860dddb5e9c2d3d158633a7"
+    }
+  ],
+  "destination": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm21\\downloads\\proof01",
+  "intended_payload_bytes": 127124619,
+  "prior_payload_bytes": 0,
+  "control_evidence": {
+    "observed_output_bytes": 485639,
+    "output_payload_sublimit_bytes": 8388608,
+    "reserved_control_protocol_bytes": 67108864,
+    "files": [
+      {
+        "path": "analyze01.stderr.log",
+        "bytes": 1007
+      },
+      {
+        "path": "analyze01.stdout.log",
+        "bytes": 57
+      },
+      {
+        "path": "arm32-schedule01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "arm32-schedule01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "arm32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "arm32-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "bootstrap-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "bootstrap-state01.stdout.log",
+        "bytes": 26
+      },
+      {
+        "path": "build-proof01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-proof01.stdout.log",
+        "bytes": 104606
+      },
+      {
+        "path": "build-start01.stderr.log",
+        "bytes": 97
+      },
+      {
+        "path": "build-start01.stdout.log",
+        "bytes": 1853
+      },
+      {
+        "path": "build-status01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status01.stdout.log",
+        "bytes": 2060
+      },
+      {
+        "path": "build-status02.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status02.stdout.log",
+        "bytes": 1174
+      },
+      {
+        "path": "build-status03.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status03.stdout.log",
+        "bytes": 1655
+      },
+      {
+        "path": "build-status04.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status04.stdout.log",
+        "bytes": 1745
+      },
+      {
+        "path": "build-status05.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "build-status05.stdout.log",
+        "bytes": 1644
+      },
+      {
+        "path": "create.stderr.log",
+        "bytes": 453
+      },
+      {
+        "path": "install-base01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "install-base01.stdout.log",
+        "bytes": 356
+      },
+      {
+        "path": "install-overlay01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "install-overlay01.stdout.log",
+        "bytes": 553
+      },
+      {
+        "path": "measure-start01.stderr.log",
+        "bytes": 885
+      },
+      {
+        "path": "measure-start01.stdout.log",
+        "bytes": 2096
+      },
+      {
+        "path": "measure-status01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status01.stdout.log",
+        "bytes": 2821
+      },
+      {
+        "path": "measure-status02.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status02.stdout.log",
+        "bytes": 2826
+      },
+      {
+        "path": "measure-status03.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status03.stdout.log",
+        "bytes": 2834
+      },
+      {
+        "path": "measure-status04.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "measure-status04.stdout.log",
+        "bytes": 3001
+      },
+      {
+        "path": "preflight-addresses01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-addresses01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-disks01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-disks01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-instances01.stderr.log",
+        "bytes": 76
+      },
+      {
+        "path": "preflight-instances01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "preflight-quota01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "preflight-quota01.stdout.log",
+        "bytes": 11313
+      },
+      {
+        "path": "recover01.stderr.log",
+        "bytes": 222
+      },
+      {
+        "path": "recover01.stdout.log",
+        "bytes": 249
+      },
+      {
+        "path": "remote-preflight01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "remote-preflight01.stdout.log",
+        "bytes": 537
+      },
+      {
+        "path": "resize2-recovery01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "resize2-recovery01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "resize32-01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "resize32-01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "restore2-schedule01.stderr.log",
+        "bytes": 141
+      },
+      {
+        "path": "restore2-schedule01.stdout.log",
+        "bytes": 33270
+      },
+      {
+        "path": "restore2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "restore2-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "split01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "split01.stdout.log",
+        "bytes": 2272
+      },
+      {
+        "path": "start2-recovery01.stderr.log",
+        "bytes": 325
+      },
+      {
+        "path": "start2-recovery01.stdout.log",
+        "bytes": 33383
+      },
+      {
+        "path": "start2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "start2-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "start32-01.stderr.log",
+        "bytes": 347
+      },
+      {
+        "path": "start32-01.stdout.log",
+        "bytes": 33383
+      },
+      {
+        "path": "start32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "start32-state01.stdout.log",
+        "bytes": 32996
+      },
+      {
+        "path": "state2-01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "state2-01.stdout.log",
+        "bytes": 544
+      },
+      {
+        "path": "stop2-before32-01.stderr.log",
+        "bytes": 456
+      },
+      {
+        "path": "stop2-before32-01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "stop32-aftermeasure01.stderr.log",
+        "bytes": 465
+      },
+      {
+        "path": "stop32-aftermeasure01.stdout.log",
+        "bytes": 4
+      },
+      {
+        "path": "stopped2-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "stopped2-state01.stdout.log",
+        "bytes": 489
+      },
+      {
+        "path": "stopped32-state01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "stopped32-state01.stdout.log",
+        "bytes": 489
+      },
+      {
+        "path": "upload-base01.stderr.log",
+        "bytes": 581
+      },
+      {
+        "path": "upload-base01.stdout.log",
+        "bytes": 286
+      },
+      {
+        "path": "upload-overlay01.stderr.log",
+        "bytes": 0
+      },
+      {
+        "path": "upload-overlay01.stdout.log",
+        "bytes": 2673
+      }
+    ],
+    "meaning": "Captured application output only; does not measure wire/retransmission/billed bytes"
+  },
+  "note": "This request is not a byte charge. Each file is charged in its own intent immediately before its single-source SCP."
+}

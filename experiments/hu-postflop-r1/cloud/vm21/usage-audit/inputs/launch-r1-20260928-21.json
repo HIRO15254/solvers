@@ -1,0 +1,37 @@
+{
+  "reservation_id": "r1-20260928-21",
+  "fresh_instance_and_build": true,
+  "attempted_at": "2026-09-28T05:35:51.441617+00:00",
+  "termination_time": "2026-09-28T06:20:51+00:00",
+  "build_deadline_utc": "2026-09-28T05:55:51+00:00",
+  "argv": [
+    "compute",
+    "instances",
+    "create",
+    "solvers-r1-20260928-21",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--machine-type=e2-standard-2",
+    "--provisioning-model=SPOT",
+    "--instance-termination-action=STOP",
+    "--termination-time=2026-09-28T06:20:51Z",
+    "--no-restart-on-failure",
+    "--maintenance-policy=TERMINATE",
+    "--image-family=ubuntu-2404-lts-amd64",
+    "--image-project=ubuntu-os-cloud",
+    "--boot-disk-type=pd-balanced",
+    "--boot-disk-size=20GB",
+    "--boot-disk-auto-delete",
+    "--no-service-account",
+    "--no-scopes",
+    "--labels=campaign=hu-postflop-r1,reservation=r1-20260928-21",
+    "--metadata-from-file=startup-script=C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm19\\bootstrap.sh",
+    "--format=json(id,name,status,creationTimestamp,scheduling,disks)",
+    "--quiet"
+  ],
+  "client_timeout_seconds": 180,
+  "launch_approval": {
+    "bytes": 3106,
+    "sha256": "0635145f578a36e35ef1771a21016d0758810999e51ed2ed383c5edf610dcf81"
+  }
+}

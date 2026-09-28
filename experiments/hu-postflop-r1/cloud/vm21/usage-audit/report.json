@@ -1,0 +1,462 @@
+{
+  "schema": "r1.vm21-usage-proposal/v1",
+  "status": "proposal_only_no_ledger_change",
+  "instance_id": "715936786015339093",
+  "instance_name": "solvers-r1-20260928-21",
+  "project": "solvers-abstraction-20260723",
+  "source": {
+    "bytes": 18254,
+    "sha256": "f60b8b6e07db948c88fae26c2df5857c79220712cac26cc71b21210bc104eae3"
+  },
+  "collector": {
+    "bytes": 16369,
+    "sha256": "e5d143a12feaf57daaefb122cb15c74251dd65564438caea2e9a8a5196780bae"
+  },
+  "acquisition": {
+    "bytes": 260200,
+    "sha256": "dba8951a42eb7e748c278667d0bdd3316feb2501a459742e6274e22752047918"
+  },
+  "helper_reuse": {
+    "path": "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\usage-audit-vm20\\analyze.py",
+    "sha256": "cfff88d4810ff2732c4112307e5bc2729eb00f4b577350c5aabf3f1a8c708f5e",
+    "prior_collector_sha256": "e014d02efaa40af98a2e1e65de501536ad87b07ed720d449bf4281572b4400ba",
+    "scope": "Strict JSON/pin/time helpers and verify_metrics only; VM21 identity binding replaces VM20 identity; no prior cost/report routine called."
+  },
+  "input_count": 205,
+  "input_bytes": 809783,
+  "lifecycle": {
+    "launch": "2026-09-28T05:35:51.441617+00:00",
+    "original_stop": "2026-09-28T06:20:51Z",
+    "phase32": {
+      "schema": "r1.vm21-large-phase/v1",
+      "instance_id": "715936786015339093",
+      "armed_at_utc": "2026-09-28T05:50:57.358983+00:00",
+      "phase_stop_utc": "2026-09-28T05:58:57+00:00",
+      "original_stop_utc": "2026-09-28T06:20:51+00:00",
+      "maximum_large_phase_seconds": 480,
+      "max_measurement_window_seconds": 360,
+      "note": "STOP is fixed before start request; setup latency consumes this window."
+    },
+    "operation_types": [
+      "insert",
+      "stop",
+      "setMachineType",
+      "setScheduling",
+      "start",
+      "stop",
+      "setMachineType",
+      "setScheduling",
+      "start",
+      "delete"
+    ],
+    "high_start_operation_start": "2026-09-27T22:51:20.761-07:00",
+    "high_stop_operation_done": "2026-09-27T22:56:38.588-07:00",
+    "observed_high_operation_window_seconds": "317.827",
+    "delete_done": "2026-09-27T23:03:21.409-07:00",
+    "latest_absence": "2026-09-28T06:03:52.070393+00:00",
+    "disk_id": "5498906379380081237",
+    "disk_created": "2026-09-27T22:35:54.661-07:00",
+    "disk_absence": "2026-09-28T06:03:50.271970+00:00",
+    "absence_receipts": {
+      "instances": {
+        "receipt": "vm21/absence-instances01.result.json",
+        "ended_utc": "2026-09-28T06:03:52.070393+00:00"
+      },
+      "disks": {
+        "receipt": "vm21/absence-disks01.result.json",
+        "ended_utc": "2026-09-28T06:03:50.271970+00:00"
+      },
+      "addresses": {
+        "receipt": "vm21/absence-addresses01.result.json",
+        "ended_utc": "2026-09-28T06:03:50.739892+00:00"
+      }
+    },
+    "large_running_evidence": [
+      "vm21/start32-01.result.json"
+    ]
+  },
+  "monitoring": {
+    "sent": {
+      "available": true,
+      "points": 23,
+      "observed_sum": "134338923",
+      "first_start": "2026-09-28T05:36:00.001Z",
+      "last_end": "2026-09-28T06:03:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-28T05:37:00Z",
+          "end": "2026-09-28T05:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:38:00Z",
+          "end": "2026-09-28T05:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:39:00Z",
+          "end": "2026-09-28T05:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:40:00Z",
+          "end": "2026-09-28T05:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:41:00Z",
+          "end": "2026-09-28T05:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:42:00Z",
+          "end": "2026-09-28T05:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:43:00Z",
+          "end": "2026-09-28T05:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:44:00Z",
+          "end": "2026-09-28T05:44:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:45:00Z",
+          "end": "2026-09-28T05:45:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:46:00Z",
+          "end": "2026-09-28T05:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:47:00Z",
+          "end": "2026-09-28T05:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:48:00Z",
+          "end": "2026-09-28T05:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:49:00Z",
+          "end": "2026-09-28T05:51:00.001Z",
+          "seconds": "120.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:52:00Z",
+          "end": "2026-09-28T05:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:53:00Z",
+          "end": "2026-09-28T05:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:54:00Z",
+          "end": "2026-09-28T05:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:55:00Z",
+          "end": "2026-09-28T05:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:56:00Z",
+          "end": "2026-09-28T05:58:00.001Z",
+          "seconds": "120.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:59:00Z",
+          "end": "2026-09-28T05:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:00:00Z",
+          "end": "2026-09-28T06:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:01:00Z",
+          "end": "2026-09-28T06:01:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:02:00Z",
+          "end": "2026-09-28T06:02:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    },
+    "uptime": {
+      "available": true,
+      "points": 23,
+      "observed_sum": "1274.900536000000002",
+      "first_start": "2026-09-28T05:36:00.001Z",
+      "last_end": "2026-09-28T06:03:00Z",
+      "internal_gaps": [
+        {
+          "start": "2026-09-28T05:37:00Z",
+          "end": "2026-09-28T05:37:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:38:00Z",
+          "end": "2026-09-28T05:38:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:39:00Z",
+          "end": "2026-09-28T05:39:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:40:00Z",
+          "end": "2026-09-28T05:40:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:41:00Z",
+          "end": "2026-09-28T05:41:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:42:00Z",
+          "end": "2026-09-28T05:42:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:43:00Z",
+          "end": "2026-09-28T05:43:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:44:00Z",
+          "end": "2026-09-28T05:44:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:45:00Z",
+          "end": "2026-09-28T05:45:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:46:00Z",
+          "end": "2026-09-28T05:46:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:47:00Z",
+          "end": "2026-09-28T05:47:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:48:00Z",
+          "end": "2026-09-28T05:48:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:49:00Z",
+          "end": "2026-09-28T05:51:00.001Z",
+          "seconds": "120.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:52:00Z",
+          "end": "2026-09-28T05:52:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:53:00Z",
+          "end": "2026-09-28T05:53:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:54:00Z",
+          "end": "2026-09-28T05:54:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:55:00Z",
+          "end": "2026-09-28T05:55:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:56:00Z",
+          "end": "2026-09-28T05:58:00.001Z",
+          "seconds": "120.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T05:59:00Z",
+          "end": "2026-09-28T05:59:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:00:00Z",
+          "end": "2026-09-28T06:00:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:01:00Z",
+          "end": "2026-09-28T06:01:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        },
+        {
+          "start": "2026-09-28T06:02:00Z",
+          "end": "2026-09-28T06:02:00.001Z",
+          "seconds": "0.001",
+          "unobserved_usage": null
+        }
+      ],
+      "unobserved_usage": null,
+      "interval_semantics": "Full raw DELTA points; one edge minute may overlap outside query; missing usage remains unknown"
+    }
+  },
+  "transfer": {
+    "intents": [
+      {
+        "intent": "vm21/transfer-proof01-00.intent.json",
+        "payload_bytes": 50331648,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-01.intent.json",
+        "payload_bytes": 50331648,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-02.intent.json",
+        "payload_bytes": 25877497,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-03.intent.json",
+        "payload_bytes": 417362,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-04.intent.json",
+        "payload_bytes": 93,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-05.intent.json",
+        "payload_bytes": 303,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-06.intent.json",
+        "payload_bytes": 249,
+        "status": "intended_file_verified"
+      },
+      {
+        "intent": "vm21/transfer-proof01-07.intent.json",
+        "payload_bytes": 165819,
+        "status": "intended_file_verified"
+      }
+    ],
+    "started_payload_bytes_including_uncertain": 127124619,
+    "uncertain_or_failed_intents": 0,
+    "control_protocol_reserved_bytes": 67108864,
+    "total_started_payload_plus_control_reserve": 194233483,
+    "verified_archive_bytes": 126540793,
+    "verified_archive_sha256": "a50c560a69556a29793e982929bfb28c5a1c1d4d248819915171bccfb7edfbf8",
+    "observed_control_output_bytes_after_transfer": 491710,
+    "local_archive_read_or_decompression_by_this_validator": false,
+    "wire_or_billable_bytes": null
+  },
+  "cost": {
+    "disk_seconds": "1675.61097",
+    "disk_minutes_after_120s_slack_and_ceiling": 30,
+    "components_usd": {
+      "full_original_small_cpu_47_minutes": "0.05249227900000000000000000000",
+      "overlapping_full_original_large_cpu_10_minutes": "0.1333333333333333333333333334",
+      "full_original_ipv4_47_minutes": "0.001958333333333333333333333333",
+      "same_disk_creation_to_absence_plus_slack": "0.0013700",
+      "original_egress_320_mib": "0.09375",
+      "original_uncertainty": "1"
+    },
+    "model_usd": "1.282903945666666666666666667",
+    "previous_hold_usd": "1.35",
+    "proposed_hold_usd": "1.30",
+    "proposed_restore_usd": "0.05",
+    "rounding_margin_usd": "0.017096054333333333333333333",
+    "rounding": "Ceil to next 0.05 USD; unchanged VM19/20 upper-rounding rule.",
+    "only_reduced_component": "20 GiB disk: original24h replaced by creation through confirmed absence plus120s, rounded upward to minute.",
+    "billed_usd": null
+  },
+  "budget_snapshot": {
+    "ledger": {
+      "path": "inputs/budget.json",
+      "bytes": 112890,
+      "sha256": "11bf3967e2196d23486d76796569f1ccd8c998f49d1d237121b78b406374adb1"
+    },
+    "authorized_usd": "40",
+    "held_usd": "40.00",
+    "available_usd": "0",
+    "proposed_new_held_usd": "39.95",
+    "proposed_new_available_usd": "0.05",
+    "billed_usd": null
+  },
+  "limitations": [
+    "Monitoring DELTA points are acquired usage observations, not invoice or complete billing export; actual billed amount remains unknown.",
+    "Gaps and query-edge usage remain unknown, not zero; preserved CPU/network/uncertainty bounds do not assume complete metrics.",
+    "Only confirmed disk lifecycle replaces its original24h reserve. Full47min smallCPU, overlapping10min highCPU at .80/h and IPv4 remain.",
+    "Original320MiB outbound allowance, .30 USD/GiB rate and1 USD uncertainty remain; transfer receipts are payload, not wire metering.",
+    "Usage accounting implies no performance acceptance or candidate adoption."
+  ],
+  "cloud_mutations": false,
+  "budget_mutations": false,
+  "local_native_or_archive_work": false
+}

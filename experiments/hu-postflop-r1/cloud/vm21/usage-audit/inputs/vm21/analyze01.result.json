@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "C:/Program Files (x86)/Google/Cloud SDK/google-cloud-sdk/bin/gcloud.cmd",
+    "compute",
+    "ssh",
+    "solvers-r1-20260928-21",
+    "--project=solvers-abstraction-20260723",
+    "--zone=us-central1-b",
+    "--command=sudo systemd-run --unit=solvers-r1-vm21-analyze2 --wait --pipe --collect --property=RuntimeMaxSec=120 --property=MemoryMax=2G --property=MemorySwapMax=0 --property=KillMode=control-group /usr/bin/python3 -B /opt/r1/sparse-rank-package/experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/analyze.py --out /opt/r1/sparse-rank-proof01 --report /opt/r1/sparse-rank-analysis01.json",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-28T05:58:41.262517+00:00",
+  "timeout_seconds": 160,
+  "stdout": {
+    "bytes": 57,
+    "sha256": "5696ca5a8d5509a48c5018bf5e770434b84133168ff23fdb0e6fd0f26365ba96"
+  },
+  "stderr": {
+    "bytes": 1007,
+    "sha256": "6d5a072df5fadc08263bc6eecccb99491b728f7d43fadc07eaf021e79657eccf"
+  },
+  "exit_code": 0,
+  "ended_utc": "2026-09-28T05:58:50.721259+00:00"
+}

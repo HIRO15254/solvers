@@ -1,0 +1,33 @@
+{
+  "schema": "r1.vm21-usage-preparation-check/v1",
+  "checked_at": "2026-09-28T06:04:20.692619+00:00",
+  "status": "passed",
+  "checks": [
+    "AST parsed",
+    "import did not acquire",
+    "all current SDK stdout/stderr pins replayed",
+    "exact-scope successful start32 response is singleton RUNNING on expected numeric ID and highcpu32",
+    "Spot STOP and phase deadline unchanged",
+    "highCPU RUNNING observation falls inside fixed phase"
+  ],
+  "sdk_receipts_checked": 54,
+  "cloud_requests": 0,
+  "credential_requests": 0,
+  "native_or_archive_work": false,
+  "budget_changes": false,
+  "acquisition_requires_root_cleanup_notice": true,
+  "files": {
+    "collect.py": {
+      "bytes": 16369,
+      "sha256": "e5d143a12feaf57daaefb122cb15c74251dd65564438caea2e9a8a5196780bae"
+    },
+    "README.jp.md": {
+      "bytes": 3018,
+      "sha256": "35bbaafd23a5968c08f98fe7c227b251595c2f2b3f1fc4f35776d84c4f0f404a"
+    },
+    "model-review.jp.md": {
+      "bytes": 2346,
+      "sha256": "7add37d9cc99b4954bbba2636902ec50c03e98cb96b99424382239883385a314"
+    }
+  }
+}
