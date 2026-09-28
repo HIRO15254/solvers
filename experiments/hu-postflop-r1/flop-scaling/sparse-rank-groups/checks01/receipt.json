@@ -1,0 +1,69 @@
+{
+  "schema": "r1.sparse-rank-groups-source-check/v1",
+  "status": "failed",
+  "commands": [
+    {
+      "name": "source-tests",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups",
+        "-p",
+        "test_prepare.py",
+        "-v"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 0.2286509999539703,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 5185,
+        "sha256": "bae04156f848fc9a72e9f1fa6e39b68dc42c095369380760defac22d38a93e8d"
+      }
+    }
+  ],
+  "files": {
+    "prepare.py": {
+      "bytes": 7967,
+      "sha256": "b8d5f5e2e1eb9f7624e1491842c5f1c368e3ef44c5799b1c832890302481f7c9"
+    },
+    "tests.rs.in": {
+      "bytes": 5345,
+      "sha256": "98067a7bd77a4546b4e4176a410e602ebea91ff3385da96d73d35cbd8f29897c"
+    },
+    "kernel.rs": {
+      "bytes": 26998,
+      "sha256": "90d08f5b41a30fffffb90c8ebf76196bf84fa286b7e01aca584d538ef9851ba7"
+    },
+    "candidate.patch": {
+      "bytes": 10023,
+      "sha256": "3c42836e6850bb9129a52f15a0dcea9c235cf805685139dcbba08776ad7edb63"
+    },
+    "provenance.json": {
+      "bytes": 1208,
+      "sha256": "98afe25d53f698d16e7f8b9b034b8cab5525e2302cec346611a02719d2fd9fd2"
+    },
+    "test_prepare.py": {
+      "bytes": 2928,
+      "sha256": "370f8663da8268bf2309abce45698b4d56a7a285bdba2c047314d9cbe3b77810"
+    },
+    "check.py": {
+      "bytes": 2252,
+      "sha256": "572dc255fecbc80f961208572baae84717e6196d0e2ba5ca9a0705aa65330dea"
+    },
+    "README.jp.md": {
+      "bytes": 3933,
+      "sha256": "277ab6280a61e02424902beb8aa31cc1a859a80f833ed021c5e8bd5e3943cae8"
+    }
+  },
+  "rust_tests_compiled_or_executed": false,
+  "cargo_or_solver_or_archive_work": false
+}

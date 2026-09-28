@@ -1,0 +1,63 @@
+{
+  "schema": "r1.vm21-control-static-check/v1",
+  "at_utc": "2026-09-28T05:16:54.652061+00:00",
+  "status": "pure_checks_passed_not_launched",
+  "tests_run": 5,
+  "tests_failed": 0,
+  "tests_errors": 0,
+  "files": {
+    "budget-proposal.json": {
+      "bytes": 2086,
+      "sha256": "a4299fcd70fa3d0193b69cc3cbb473620b5bbf3cdfcfd8287dfde7a3e874dd8e"
+    },
+    "capture-command.py": {
+      "bytes": 2171,
+      "sha256": "ac72bce0c8ef2c1dc7d2b447d6b48524fe4c5fc4eca135448a2c9976b5f1356e"
+    },
+    "controls-selftest01.log": {
+      "bytes": 688,
+      "sha256": "3a435b562951914072130da34e7ec8deef8b8ad18b7809d980dcd7319177900d"
+    },
+    "install-overlay.py": {
+      "bytes": 5145,
+      "sha256": "8b47ba4c58e353c024ff585a34377973d74772a89a88332c2b31f37860519480"
+    },
+    "launch.py": {
+      "bytes": 4601,
+      "sha256": "5d54be2f629a46904b9d0558a6c8c91822ab61953cd2e26504e28c79379f9376"
+    },
+    "phase.py": {
+      "bytes": 5220,
+      "sha256": "3764b2727671edac2ffd54bdb43e9d442370a37babd0fe3b62f1361f0942a842"
+    },
+    "protocol.jp.md": {
+      "bytes": 6846,
+      "sha256": "08a85c86ead7a7d573c5e166e752fb4209c5b915f70b06a2df71b682bcf3e9a1"
+    },
+    "reserve.py": {
+      "bytes": 4754,
+      "sha256": "1d6ad7801016d4f6292df5f75cdd9c8a89bd735fdd63b80f427bd0c059756f57"
+    },
+    "test_controls.py": {
+      "bytes": 3155,
+      "sha256": "22a53a8dadfe3bc513cb20525d6f6898f5a1d8b905fd5bb3dd3ff7dfd2e6d89a"
+    }
+  },
+  "sdk_source_read_only": {
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\lib\\surface\\compute\\instances\\set_scheduling.py": {
+      "bytes": 14255,
+      "sha256": "58fb002774e0ce29c2304634662c387dc9dd575bf2266fe160e24591a3cdb42f"
+    },
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\lib\\googlecloudsdk\\command_lib\\compute\\instances\\flags.py": {
+      "bytes": 170980,
+      "sha256": "55a715507ac336f6fc3687c654c4c6c09d5d9a93ad6abee6d1ab2e6aa3d2c861"
+    }
+  },
+  "limits": [
+    "No cloud API or SDK command execution",
+    "No native build or archive access",
+    "No ledger mutation",
+    "Package and overlay pins, current price verification, resource preflight and root reservation still required",
+    "Transfer cap enforcement belongs to recovery/download controls"
+  ]
+}

@@ -1,0 +1,10 @@
+test_budget_exact_rational_and_smaller_available_bound (vm21_test.ResourceGuards.test_budget_exact_rational_and_smaller_available_bound) ... ok
+test_changed_schedule_rejected (vm21_test.ResourceGuards.test_changed_schedule_rejected) ... ok
+test_non_utc_and_naive_times_rejected (vm21_test.ResourceGuards.test_non_utc_and_naive_times_rejected) ... ok
+test_stopped_same_small_instance_allowed (vm21_test.ResourceGuards.test_stopped_same_small_instance_allowed) ... ok
+test_wrong_identity_type_or_running_rejected (vm21_test.ResourceGuards.test_wrong_identity_type_or_running_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK

@@ -1,0 +1,40 @@
+{
+  "schema": "r1.sparse-rank-groups-proposal/v1",
+  "source_path": "crates/holdem/src/kernel.rs",
+  "source": {
+    "bytes": 18270,
+    "sha256": "d59724dd4d9a1c797bebf83422c06b75c90020796bfbf8f492417910770bb076"
+  },
+  "candidate": {
+    "bytes": 26998,
+    "sha256": "90d08f5b41a30fffffb90c8ebf76196bf84fa286b7e01aca584d538ef9851ba7"
+  },
+  "patch": {
+    "bytes": 10023,
+    "sha256": "3c42836e6850bb9129a52f15a0dcea9c235cf805685139dcbba08776ad7edb63"
+  },
+  "controls": {
+    "prepare.py": {
+      "bytes": 7967,
+      "sha256": "b8d5f5e2e1eb9f7624e1491842c5f1c368e3ef44c5799b1c832890302481f7c9"
+    },
+    "tests.rs.in": {
+      "bytes": 5345,
+      "sha256": "98067a7bd77a4546b4e4176a410e602ebea91ff3385da96d73d35cbd8f29897c"
+    }
+  },
+  "formatter": "rustfmt 1.9.0-stable (2d8144b788 2026-07-07)",
+  "scope": {
+    "production_prefix_and_suffix_exact": true,
+    "initial_all_sums_unchanged": true,
+    "fold_and_integer_fallback_unchanged": true,
+    "only_f64_compact_group_scratch_changed": true,
+    "oracle_unchanged": true,
+    "new_rust_tests": 4,
+    "rust_tests_executed": false
+  },
+  "production_adopted": false,
+  "compiled": false,
+  "performance": null,
+  "full_state_quality": null
+}

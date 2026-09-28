@@ -1,0 +1,84 @@
+test_fold_or_integer_change_rejected (test_prepare.SourceChecks.test_fold_or_integer_change_rejected) ... ok
+test_modified_baseline_rejected (test_prepare.SourceChecks.test_modified_baseline_rejected) ... ok
+test_production_root_application_rejected (test_prepare.SourceChecks.test_production_root_application_rejected) ... ok
+test_separate_copy_application_and_nonfresh_rejection (test_prepare.SourceChecks.test_separate_copy_application_and_nonfresh_rejection) ... ERROR
+
+======================================================================
+ERROR: test_separate_copy_application_and_nonfresh_rejection (test_prepare.SourceChecks.test_separate_copy_application_and_nonfresh_rejection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\source-check-nt3runk0\\crates\\holdem\\src'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] 指定されたパスが見つかりません。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\source-check-nt3runk0\\crates\\holdem'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\sparse-rank-groups\test_prepare.py", line 38, in test_separate_copy_application_and_nonfresh_rejection
+    target.parent.mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 726, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 722, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\source-check-nt3runk0\\crates'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen os>", line 369, in walk
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\source-check-nt3runk0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\PC_User\.codex\worktrees\ce71\solvers\experiments\hu-postflop-r1\flop-scaling\sparse-rank-groups\test_prepare.py", line 34, in test_separate_copy_application_and_nonfresh_rejection
+    with tempfile.TemporaryDirectory(prefix='source-check-', dir=HERE) as directory:
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 951, in __exit__
+    self.cleanup()
+    ~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\tempfile.py", line 955, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 935, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\shutil.py", line 790, in rmtree
+    return _rmtree_unsafe(path, onexc)
+  File "C:\Python313\Lib\shutil.py", line 613, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 372, in walk
+  File "C:\Python313\Lib\shutil.py", line 611, in onerror
+    onexc(os.scandir, err.filename, err)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 907, in onexc
+    _resetperms(path)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 287, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\tempfile.py", line 276, in _dont_follow_symlinks
+    func(path, *args, follow_symlinks=False)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] アクセスが拒否されました。: 'C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\source-check-nt3runk0'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.118s
+
+FAILED (errors=1)

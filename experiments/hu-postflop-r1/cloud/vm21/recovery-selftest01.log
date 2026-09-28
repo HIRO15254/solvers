@@ -1,0 +1,11 @@
+test_duplicate_and_escaping_members_rejected (vm21_transfer_test.TransferBounds.test_duplicate_and_escaping_members_rejected) ... ok
+test_empty_analysis_log_allowed_but_unknown_output_rejected (vm21_transfer_test.TransferBounds.test_empty_analysis_log_allowed_but_unknown_output_rejected) ... ok
+test_exact_small_inventory_allowed (vm21_transfer_test.TransferBounds.test_exact_small_inventory_allowed) ... ok
+test_failed_and_uncertain_intents_both_remain_charged (vm21_transfer_test.TransferBounds.test_failed_and_uncertain_intents_both_remain_charged) ... ok
+test_part_size_hash_and_total_changes_rejected (vm21_transfer_test.TransferBounds.test_part_size_hash_and_total_changes_rejected) ... ok
+test_zero_byte_sidecar_stream_and_intent_roundtrip (vm21_transfer_test.TransferBounds.test_zero_byte_sidecar_stream_and_intent_roundtrip) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.003s
+
+OK

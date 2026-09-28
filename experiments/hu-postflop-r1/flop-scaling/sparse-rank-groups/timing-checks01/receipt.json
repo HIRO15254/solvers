@@ -1,0 +1,49 @@
+{
+  "schema": "r1.sparse-rank-groups-runner-check/v1",
+  "status": "passed",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups",
+    "-p",
+    "test_run.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.24591180006973445,
+  "files": {
+    "run.py": {
+      "bytes": 22967,
+      "sha256": "e0c7725683a4747ae5c52e8a6cb2fecb2e7c6fc4833075293cc88b4e5d0964bb"
+    },
+    "protocol.jp.md": {
+      "bytes": 6480,
+      "sha256": "8220c3cfb8a24e20fa21a2ce34ecb4f46c563e7bddf4a70fb0f69d5cd0d537e8"
+    },
+    "test_run.py": {
+      "bytes": 6159,
+      "sha256": "ca15c12b5873e978bf7b89a47141b0b4a577f96b511b3aec196a98574cc192f8"
+    },
+    "check_timing.py": {
+      "bytes": 1830,
+      "sha256": "65d54f3009f1a24cd01e97d3e18bd6b265edcbd52be1e7ee6f7ed46ac97cd5fd"
+    }
+  },
+  "local_native_execution": false,
+  "external_api": false,
+  "archive_access": false,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "bytes": 887,
+    "sha256": "1690dc4c4427b97141adfe61017f2dba0dccd87cbd16c90f7309142002ad5906"
+  }
+}

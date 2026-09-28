@@ -1,0 +1,53 @@
+{
+  "schema": "r1.vm21-budget-proposal/v1",
+  "reservation": {
+    "id": "r1-20260928-21",
+    "project": "solvers-abstraction-20260723",
+    "zone": "us-central1-b",
+    "instance": "solvers-r1-20260928-21",
+    "reserved_usd": 1.35,
+    "billed_usd": null,
+    "reservation_released": false,
+    "maximum_runtime_seconds": 2700,
+    "maximum_starts": 3,
+    "maximum_large_phase_seconds": 480,
+    "billing_rounding_slack_seconds": 120,
+    "machine_type": "e2-standard-2",
+    "measurement_machine_type": "e2-highcpu-32",
+    "provisioning_model": "SPOT",
+    "capacity_or_quota_fallback": null,
+    "disk_type": "pd-balanced",
+    "disk_gib": 20,
+    "explicit_disk_cleanup_hours": 24,
+    "maximum_download_gib": 0.3125,
+    "maximum_archive_bytes": 268435456,
+    "small_compute_usd_hour": 0.06701142,
+    "large_compute_usd_hour": 0.8,
+    "disk_usd_gib_hour": 0.000137,
+    "ipv4_usd_hour": 0.0025,
+    "reserved_egress_usd_gib": 0.3,
+    "tax_price_delay_and_other_reserve_usd": 1,
+    "instance_termination_action": "STOP",
+    "auto_restart": false,
+    "purpose": "Sparse rank groups: fresh paired build/tests on 2 CPUs, bounded 16/32-worker measurement on one 32-CPU boot, 2-CPU recovery"
+  },
+  "arithmetic": {
+    "terms_usd": {
+      "small_compute": "0.05249227900000000000000000000",
+      "large_compute": "0.1333333333333333333333333334",
+      "disk_20_gib_24_hours": "0.065760",
+      "egress_320_mib": "0.093750",
+      "ipv4": "0.001958333333333333333333333333",
+      "uncertainty": "1"
+    },
+    "total_usd": "1.347293945666666666666666667",
+    "reserve_usd": "1.35",
+    "headroom_usd": "0.002706054333333333333333333",
+    "small_and_large_compute_overlap_intentionally": true,
+    "observed_usage_or_bill": false
+  },
+  "pricing_verification_required": true,
+  "ledger_written": false,
+  "cloud_mutations": false,
+  "note": "Root must verify current pricing/available funds and apply the reservation before launch. 47 small-CPU minutes plus 10 large-CPU minutes includes overlapping conservative charges; the large phase itself is at most 480 seconds."
+}

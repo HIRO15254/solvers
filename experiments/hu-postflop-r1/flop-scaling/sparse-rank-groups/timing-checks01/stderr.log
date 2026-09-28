@@ -1,0 +1,11 @@
+test_existing_absolute_stop_and_short_measurement_bounds (test_run.Contracts.test_existing_absolute_stop_and_short_measurement_bounds) ... ok
+test_fixed_38_schedule_has_adjacent_paired_arms (test_run.Contracts.test_fixed_38_schedule_has_adjacent_paired_arms) ... ok
+test_only_candidate_kernel_may_differ (test_run.Contracts.test_only_candidate_kernel_may_differ) ... ok
+test_retained_vm19_manifest_and_explicit_adapter_overlay (test_run.Contracts.test_retained_vm19_manifest_and_explicit_adapter_overlay) ... ok
+test_stage_timeout_hook_keeps_frozen_supervision (test_run.Contracts.test_stage_timeout_hook_keeps_frozen_supervision) ... ok
+test_two_fresh_targets_and_required_kernel_oracle_tests (test_run.Contracts.test_two_fresh_targets_and_required_kernel_oracle_tests) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.009s
+
+OK

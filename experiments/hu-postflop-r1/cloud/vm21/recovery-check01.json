@@ -1,0 +1,58 @@
+{
+  "schema": "r1.vm21-recovery-static-check/v1",
+  "at_utc": "2026-09-28T05:32:20.864166+00:00",
+  "status": "pure_checks_passed_no_remote_execution",
+  "tests_run": 6,
+  "tests_failed": 0,
+  "tests_errors": 0,
+  "files": {
+    "recover.sh": {
+      "bytes": 7806,
+      "sha256": "9ddca64ba4919a4819df3fcaf95c9ef2d72c79123caa884ab25a23c567abca26"
+    },
+    "split-on-cloud.py": {
+      "bytes": 4056,
+      "sha256": "7426d60d7f3f02f8c110fcb4260a4c27ebe289993fbc649ac7da28304594b687"
+    },
+    "download.py": {
+      "bytes": 12620,
+      "sha256": "a4f2d878f46529fda90217a52fdd683f9fa5b83e9628ab9bc651172946b546f4"
+    },
+    "check-download.py": {
+      "bytes": 3387,
+      "sha256": "bb4c2f50413083368f1e723b9e681124a0a8aafd53f7368fe6530b361e92147e"
+    },
+    "test_download.py": {
+      "bytes": 4471,
+      "sha256": "de10b60145f8e44545ce8f0c943d732c52c750a1cbf791c24a4f7ccc1383b479"
+    },
+    "recovery-protocol.jp.md": {
+      "bytes": 4310,
+      "sha256": "6805ea8a81544ee5a195042a5138e645b65fd70fe943623d09569efcb6c64ffe"
+    },
+    "recovery-derivation.json": {
+      "bytes": 1744,
+      "sha256": "7b3c8dcae7df90cc4ef9e5ae1240b720ce4440e334d2ed838c3ea6c9718223d6"
+    },
+    "recovery-selftest01.log": {
+      "bytes": 951,
+      "sha256": "a2069d0c45beacfc20d5f29b5db84848c6fcd8d2e99698091a60ff8cd8e53534"
+    }
+  },
+  "embedded_recovery_python_ast": "passed",
+  "python_ast": "passed",
+  "shell_syntax": "Requires GCP bash -n before recovery execution; no local bash execution",
+  "operations": {
+    "cloud_api": false,
+    "native_solver": false,
+    "archive_creation_or_read": false,
+    "ledger_mutation": false
+  },
+  "limits": [
+    "64MiB control/protocol allowance is a conservative reservation model, not observed wire/billed bytes",
+    "Root must use wrapper for all downloads and bound each remaining control response",
+    "One exact remote file per SCP; zero-sidecar JSON/stream/intent checks passed in memory",
+    "Failed/uncertain started files retain their full precharge; unstarted suffix files do not consume charge",
+    "Initial filesystem mock failed on Windows TemporaryDirectory ACL before writing fixture; replaced with in-memory checks; no real download claimed"
+  ]
+}

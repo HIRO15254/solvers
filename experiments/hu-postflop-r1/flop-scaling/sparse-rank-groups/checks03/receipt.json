@@ -1,0 +1,112 @@
+{
+  "schema": "r1.sparse-rank-groups-source-check/v1",
+  "status": "passed",
+  "commands": [
+    {
+      "name": "source-tests",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups",
+        "-p",
+        "test_prepare.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.4138946000020951,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 577,
+        "sha256": "57c8e62321da986c9db6970251b564e16f5496c3193668328891a09243a1ea21"
+      }
+    },
+    {
+      "name": "replay",
+      "argv": [
+        "C:\\Python313\\python.exe",
+        "-X",
+        "utf8",
+        "-B",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\prepare.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.21423439984209836,
+      "stdout": {
+        "bytes": 414,
+        "sha256": "1aa160211e179dabf403e850da76e3c72147fea5a83df2b5a4516bcb8f5de518"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "rustfmt",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--check",
+        "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\kernel.rs"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.07275799987837672,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "files": {
+    "prepare.py": {
+      "bytes": 7967,
+      "sha256": "b8d5f5e2e1eb9f7624e1491842c5f1c368e3ef44c5799b1c832890302481f7c9"
+    },
+    "tests.rs.in": {
+      "bytes": 5345,
+      "sha256": "98067a7bd77a4546b4e4176a410e602ebea91ff3385da96d73d35cbd8f29897c"
+    },
+    "kernel.rs": {
+      "bytes": 26998,
+      "sha256": "90d08f5b41a30fffffb90c8ebf76196bf84fa286b7e01aca584d538ef9851ba7"
+    },
+    "candidate.patch": {
+      "bytes": 10023,
+      "sha256": "3c42836e6850bb9129a52f15a0dcea9c235cf805685139dcbba08776ad7edb63"
+    },
+    "provenance.json": {
+      "bytes": 1208,
+      "sha256": "98afe25d53f698d16e7f8b9b034b8cab5525e2302cec346611a02719d2fd9fd2"
+    },
+    "test_prepare.py": {
+      "bytes": 3040,
+      "sha256": "ca7d14946d12b549bd08769b49aa7218adca8fa92f1e13605e86e709efc1f8c8"
+    },
+    "check.py": {
+      "bytes": 2252,
+      "sha256": "ad34d7865aa9b2831f3c94f4dcf20b3f91accf5aa1443e2c8ebb650226979602"
+    },
+    "README.jp.md": {
+      "bytes": 3933,
+      "sha256": "277ab6280a61e02424902beb8aa31cc1a859a80f833ed021c5e8bd5e3943cae8"
+    }
+  },
+  "rust_tests_compiled_or_executed": false,
+  "cargo_or_solver_or_archive_work": false
+}

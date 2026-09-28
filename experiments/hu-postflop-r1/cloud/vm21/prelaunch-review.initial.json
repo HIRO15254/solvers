@@ -1,0 +1,171 @@
+{
+  "schema": "r1.vm21-prelaunch-static-review/v1",
+  "reviewed_at_utc": "2026-09-28T05:27:45.865512+00:00",
+  "reviewer": "budget_reuse_audit",
+  "status": "no_static_blocker_in_reviewed_sources",
+  "resource": "solvers-r1-20260928-21",
+  "files": {
+    "experiments/hu-postflop-r1/cloud/vm21/reserve.py": {
+      "bytes": 4754,
+      "sha256": "1d6ad7801016d4f6292df5f75cdd9c8a89bd735fdd63b80f427bd0c059756f57"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/apply-reservation.py": {
+      "bytes": 4828,
+      "sha256": "df6df693264fa7c9939167f8339926f39e5c44dff4d8093e5d53b0d1aa2ecebb"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/launch.py": {
+      "bytes": 4601,
+      "sha256": "5d54be2f629a46904b9d0558a6c8c91822ab61953cd2e26504e28c79379f9376"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/phase.py": {
+      "bytes": 5220,
+      "sha256": "3764b2727671edac2ffd54bdb43e9d442370a37babd0fe3b62f1361f0942a842"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/capture-command.py": {
+      "bytes": 2171,
+      "sha256": "ac72bce0c8ef2c1dc7d2b447d6b48524fe4c5fc4eca135448a2c9976b5f1356e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/install-overlay.py": {
+      "bytes": 5145,
+      "sha256": "8b47ba4c58e353c024ff585a34377973d74772a89a88332c2b31f37860519480"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/prepare-overlay.py": {
+      "bytes": 2577,
+      "sha256": "d10e8585360562b2e18e771784743498b603d4dedab7b9e959409e3219f9da4d"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/prepare-dispatch.py": {
+      "bytes": 5736,
+      "sha256": "0cc6ef02aadea36fd751e0cbc4f34ec71060d6106fcaa553b560c04fa60a5276"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/dispatch-derivation.json": {
+      "bytes": 1026,
+      "sha256": "380c85fa69ba046a31e9cd967b0a6d929dae6935ba06d49129addbf95c67e7cc"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/start.py": {
+      "bytes": 10314,
+      "sha256": "fdf275d450b11274b4967df6e4611f08d944c3dd32851a57cc7940d77a57b76f"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/run.sh": {
+      "bytes": 3003,
+      "sha256": "d5170d28be5b8d671dcd7c3f54f5828b7bd944ad61b6b49ddd8a340679d4dd98"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/status.py": {
+      "bytes": 2477,
+      "sha256": "a2d86bfe588291b8f2eb7558c7f73509ee1b08506e8c83322d394c283b7c8841"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/recover.sh": {
+      "bytes": 7806,
+      "sha256": "9ddca64ba4919a4819df3fcaf95c9ef2d72c79123caa884ab25a23c567abca26"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/split-on-cloud.py": {
+      "bytes": 4056,
+      "sha256": "7426d60d7f3f02f8c110fcb4260a4c27ebe289993fbc649ac7da28304594b687"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/download.py": {
+      "bytes": 11198,
+      "sha256": "20a5179e0a0f8ff4646261cdf4f64a694761c0101482fdc62a0b494f95cfa0e3"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/check-download.py": {
+      "bytes": 3387,
+      "sha256": "bb4c2f50413083368f1e723b9e681124a0a8aafd53f7368fe6530b361e92147e"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/protocol.jp.md": {
+      "bytes": 6846,
+      "sha256": "08a85c86ead7a7d573c5e166e752fb4209c5b915f70b06a2df71b682bcf3e9a1"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/run.py": {
+      "bytes": 22967,
+      "sha256": "e0c7725683a4747ae5c52e8a6cb2fecb2e7c6fc4833075293cc88b4e5d0964bb"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/analyze.py": {
+      "bytes": 23344,
+      "sha256": "a7e362c4c682c97a587bce1a0ebdcb3e7007cd0204a2a84ca0b2b0369265764e"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/protocol.jp.md": {
+      "bytes": 6480,
+      "sha256": "8220c3cfb8a24e20fa21a2ce34ecb4f46c563e7bddf4a70fb0f69d5cd0d537e8"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/prepare.py": {
+      "bytes": 7967,
+      "sha256": "b8d5f5e2e1eb9f7624e1491842c5f1c368e3ef44c5799b1c832890302481f7c9"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/provenance.json": {
+      "bytes": 1208,
+      "sha256": "98afe25d53f698d16e7f8b9b034b8cab5525e2302cec346611a02719d2fd9fd2"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/kernel.rs": {
+      "bytes": 26998,
+      "sha256": "90d08f5b41a30fffffb90c8ebf76196bf84fa286b7e01aca584d538ef9851ba7"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/candidate.patch": {
+      "bytes": 10023,
+      "sha256": "3c42836e6850bb9129a52f15a0dcea9c235cf805685139dcbba08776ad7edb63"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/tests.rs.in": {
+      "bytes": 5345,
+      "sha256": "98067a7bd77a4546b4e4176a410e602ebea91ff3385da96d73d35cbd8f29897c"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/chance-grain/adapter/solve.rs": {
+      "bytes": 17517,
+      "sha256": "69d09d308e2d5d12160235dc9fc3fe981acc8f2103809a1fcccaaeed8b97c195"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/chance-grain/adapter/prepare.py": {
+      "bytes": 6531,
+      "sha256": "533da61ec77e542e38638c6c9193013208bc6f2a038ba9ac6e2bc37d07e55466"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/chance-grain/adapter/provenance.json": {
+      "bytes": 357,
+      "sha256": "1177f622056f0909fae5b55125e2a97e65a588df42739e97b0430ab3baabc4f2"
+    },
+    "experiments/hu-postflop-r1/cloud/vm19/source-manifest.json": {
+      "bytes": 75417,
+      "sha256": "c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a"
+    },
+    "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/analysis-checks01.json": {
+      "bytes": 1321,
+      "sha256": "8725fe2a95a560d12010cf9b28c886f2d70e2fa51f9d1afe0e36b0c57a5ff8dc"
+    },
+    "experiments/hu-postflop-r1/cloud/vm21/control-check01.json": {
+      "bytes": 2276,
+      "sha256": "445c51d2ad5e226eadccebb93506cc781858e779a3649ee659d9b139254b9691"
+    }
+  },
+  "findings": [],
+  "checks": [
+    "Original GCP STOP is launch request +45 minutes rounded down; E2 Spot only,20GiB disk,at most three named starts; no type or price fallback.",
+    "Large phase requires observed TERMINATED e2-highcpu-32 before fixing an absolute STOP <=480 seconds from arm; unique intent/plan gates precede its sole start.",
+    "Original STOP can only be restored after observed TERMINATED e2-standard-2; a32CPU deadline extension is rejected.",
+    "Dispatch/runner agree: build STOP-1500 seconds, measure min(now+360,largeSTOP-20); >260seconds at dispatcher, >240seconds in runner; finite process/systemd limits.",
+    "Exact frozen VM19 manifest/archive/revision and disjoint overlay bind pristine source; two fresh source/target copies differ only in candidate kernel plus identical adapter.",
+    "Five build/test stages and two source-bound binaries precede 38 fixed solves; independent reader checks same measurement boot, exact full state and quality bytes, canonical streams, and declared performance guards.",
+    "Incomplete/mismatching proof is not_evaluable; performance screen never constitutes production adoption.",
+    "Recovery requires build,measurement,and analysis units quiescent; original proof remains untouched; compressed original streams verified before durable checksum publication.",
+    "Archive plus primary sidecars <=255MiB; complete file payload <=256MiB; fixed64MiB control/protocol reserve. Immutable transfer intents charge every planned file before SCP, including failed/uncertain attempts; no automatic retry.",
+    "Transfer checks enforce exact names/paths/part sizes/hashes, exclusive local lock, captured control output sublimit8MiB,and SCP timeout bounded by original STOP with60seconds cleanup margin.",
+    "Root reservation application independently checks held38.65 plus1.35 <=40, exact model1.347293945666666666666666667, current reviewed sources, and fresh empty inventories before atomic ledger replacement."
+  ],
+  "verification_scope": {
+    "source_review_only": true,
+    "analyzer_pure_tests": {
+      "count": 4,
+      "passed": true,
+      "seconds": 0.003,
+      "receipt": "experiments/hu-postflop-r1/flop-scaling/sparse-rank-groups/analysis-checks01.json"
+    },
+    "native_build_or_solver_executed_by_reviewer": false,
+    "cloud_api_or_resource_mutation_by_reviewer": false,
+    "ledger_mutation_by_reviewer": false,
+    "archive_expansion_or_state_streaming_by_reviewer": false
+  },
+  "pending_before_launch": [
+    "Create final overlay manifest; recheck every current source pin in this review and confirm complete runner/control membership including the three chance-grain adapter files.",
+    "Freeze local launch approval including recovery/download controls and recheck the overlay payload against manifest.",
+    "Obtain fresh scoped resource inventory and quota; reserve and launch only after those checks."
+  ],
+  "limitations": [
+    "No VM21 build,solve,test,capacity,actual transfer,performance,or billing result is asserted.",
+    "The320MiB amount is a reservation model with64MiB control/protocol headroom,not measured billable wire bytes. All file downloads must use the wrapper and remaining status outputs must stay bounded.",
+    "The analysis test receipt retains the protocol pin at its test time; the protocol pin in this review is the subsequently reviewed final wording.",
+    "This review does not authorize unpinned changes; root must repeat pin comparisons after final freeze."
+  ]
+}

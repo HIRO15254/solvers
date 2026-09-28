@@ -1,0 +1,36 @@
+{
+  "source": {
+    "start.py": {
+      "bytes": 8527,
+      "sha256": "69ede5e951f22bbd83b9c356ff4567e680e0ec3032cb899ddcfc4ea98d11c1bd"
+    },
+    "run.sh": {
+      "bytes": 3076,
+      "sha256": "0ae228f3f39592bd8c72a72160d3416819c3149726bfa026ed0b52e6727a26f0"
+    },
+    "status.py": {
+      "bytes": 2487,
+      "sha256": "6372187bf8f1be239721023a7564c171d7f75e17b8a5c0b6239357d19b8b9f45"
+    }
+  },
+  "outputs": {
+    "start.py": {
+      "bytes": 10314,
+      "sha256": "fdf275d450b11274b4967df6e4611f08d944c3dd32851a57cc7940d77a57b76f"
+    },
+    "run.sh": {
+      "bytes": 3003,
+      "sha256": "d5170d28be5b8d671dcd7c3f54f5828b7bd944ad61b6b49ddd8a340679d4dd98"
+    },
+    "status.py": {
+      "bytes": 2477,
+      "sha256": "a2d86bfe588291b8f2eb7558c7f73509ee1b08506e8c83322d394c283b7c8841"
+    }
+  },
+  "deriver": {
+    "bytes": 5736,
+    "sha256": "0cc6ef02aadea36fd751e0cbc4f34ec71060d6106fcaa553b560c04fa60a5276"
+  },
+  "cloud_execution": false,
+  "native_execution": false
+}

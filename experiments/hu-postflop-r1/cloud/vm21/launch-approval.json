@@ -1,0 +1,87 @@
+{
+  "schema": "r1.vm21-launch-approval/v1",
+  "resource": "solvers-r1-20260928-21",
+  "package_review_passed": true,
+  "at_utc": "2026-09-28T05:35:03.941606+00:00",
+  "files": {
+    "../vm19/deployment01.tar.gz": {
+      "bytes": 1373074,
+      "sha256": "ad156105b5323c91c4c9e715525e9efdf75ec07acb193db3eb3106581fec466f"
+    },
+    "../vm19/source-manifest.json": {
+      "bytes": 75417,
+      "sha256": "c376fe25a9ba2fbf2d61f5fca71bf366223fb374b7a1ef6a20cbe2b11403d04a"
+    },
+    "../vm19/bootstrap.sh": {
+      "bytes": 812,
+      "sha256": "0e8bd5044c3eb19c35163c76d86b70bfb9dee9ee4ee19c1ef400fd84a1266dcc"
+    },
+    "overlay-manifest.json": {
+      "bytes": 6303,
+      "sha256": "fc3fc5c18c6e2aa2fcb9ab7c0d2ddccbcb1899cc452dc8a3543963fb4773711d"
+    },
+    "install-overlay.py": {
+      "bytes": 5145,
+      "sha256": "8b47ba4c58e353c024ff585a34377973d74772a89a88332c2b31f37860519480"
+    },
+    "launch.py": {
+      "bytes": 4601,
+      "sha256": "5d54be2f629a46904b9d0558a6c8c91822ab61953cd2e26504e28c79379f9376"
+    },
+    "reserve.py": {
+      "bytes": 4754,
+      "sha256": "1d6ad7801016d4f6292df5f75cdd9c8a89bd735fdd63b80f427bd0c059756f57"
+    },
+    "phase.py": {
+      "bytes": 5220,
+      "sha256": "3764b2727671edac2ffd54bdb43e9d442370a37babd0fe3b62f1361f0942a842"
+    },
+    "capture-command.py": {
+      "bytes": 2171,
+      "sha256": "ac72bce0c8ef2c1dc7d2b447d6b48524fe4c5fc4eca135448a2c9976b5f1356e"
+    },
+    "download.py": {
+      "bytes": 12620,
+      "sha256": "a4f2d878f46529fda90217a52fdd683f9fa5b83e9628ab9bc651172946b546f4"
+    },
+    "check-download.py": {
+      "bytes": 3387,
+      "sha256": "bb4c2f50413083368f1e723b9e681124a0a8aafd53f7368fe6530b361e92147e"
+    },
+    "recover.sh": {
+      "bytes": 7806,
+      "sha256": "9ddca64ba4919a4819df3fcaf95c9ef2d72c79123caa884ab25a23c567abca26"
+    },
+    "split-on-cloud.py": {
+      "bytes": 4056,
+      "sha256": "7426d60d7f3f02f8c110fcb4260a4c27ebe289993fbc649ac7da28304594b687"
+    },
+    "start.py": {
+      "bytes": 10314,
+      "sha256": "fdf275d450b11274b4967df6e4611f08d944c3dd32851a57cc7940d77a57b76f"
+    },
+    "run.sh": {
+      "bytes": 3003,
+      "sha256": "d5170d28be5b8d671dcd7c3f54f5828b7bd944ad61b6b49ddd8a340679d4dd98"
+    },
+    "status.py": {
+      "bytes": 2477,
+      "sha256": "a2d86bfe588291b8f2eb7558c7f73509ee1b08506e8c83322d394c283b7c8841"
+    },
+    "apply-reservation.py": {
+      "bytes": 4828,
+      "sha256": "df6df693264fa7c9939167f8339926f39e5c44dff4d8093e5d53b0d1aa2ecebb"
+    },
+    "prepare-overlay.py": {
+      "bytes": 2577,
+      "sha256": "d10e8585360562b2e18e771784743498b603d4dedab7b9e959409e3219f9da4d"
+    },
+    "prelaunch-review.json": {
+      "bytes": 11617,
+      "sha256": "bdb6f609db5aa54702afa1a7ee6e05e92c1e37db449b43e020f550cb52ab3985"
+    }
+  },
+  "overlay_files_verified": 22,
+  "independent_review_file_count": 36,
+  "scope": "Static source/control freeze only. Cloud build/native correctness/performance remain unverified. Reservation and resource creation follow separately."
+}

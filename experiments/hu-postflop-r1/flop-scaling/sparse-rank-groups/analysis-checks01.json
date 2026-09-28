@@ -1,0 +1,43 @@
+{
+  "schema": "r1.sparse-rank-analysis-checks/v1",
+  "started_utc": "2026-09-28T05:23:47.155756+00:00",
+  "ended_utc": "2026-09-28T05:23:47.449510+00:00",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "experiments\\hu-postflop-r1\\flop-scaling\\sparse-rank-groups\\test_analyze.py"
+  ],
+  "exit_code": 0,
+  "ast_valid": true,
+  "native_or_archive_or_api_execution": false,
+  "pins": {
+    "analyze.py": {
+      "bytes": 23344,
+      "sha256": "a7e362c4c682c97a587bce1a0ebdcb3e7007cd0204a2a84ca0b2b0369265764e"
+    },
+    "test_analyze.py": {
+      "bytes": 2918,
+      "sha256": "25f2e669464ef13ec3fb292063913a316b2103ab71beae4b05f5f97f38a3432f"
+    },
+    "run.py": {
+      "bytes": 22967,
+      "sha256": "e0c7725683a4747ae5c52e8a6cb2fecb2e7c6fc4833075293cc88b4e5d0964bb"
+    },
+    "protocol.jp.md": {
+      "bytes": 6453,
+      "sha256": "29648e6253e5f045beee286726d4984eaccffa32f613083d5e9af8234a0ee921"
+    }
+  },
+  "stdout": {
+    "path": "analysis-checks01.stdout.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "analysis-checks01.stderr.log",
+    "bytes": 107,
+    "sha256": "638d287c0b0a39696192d173099f90dfd19c0b1b2df974802576f431e7c9eb0b"
+  }
+}

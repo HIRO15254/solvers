@@ -1,0 +1,256 @@
+--- a/crates/holdem/src/kernel.rs
++++ b/crates/holdem/src/kernel.rs
+@@ -96,6 +96,7 @@
+     let (all_total, all_card) = compact_compat_sums(sorted, opponent, opp_reach);
+     let mut below_total = 0.0;
+     let mut below_card = [0.0; 52];
++    let mut group_card = [0.0; 52];
+     let mut group_start = 0;
+     while group_start < sorted.len() {
+         let rank = sorted[group_start].rank;
+@@ -104,7 +105,17 @@
+             group_end += 1;
+         }
+         let group = &sorted[group_start..group_end];
+-        let (group_total, group_card) = compact_compat_sums(group, opponent, opp_reach);
++        // Keep one scratch array for the sweep. The preceding group cleared
++        // every card it touched after all tie values had consumed its sums.
++        let mut group_total = 0.0;
++        for &entry in group {
++            let r = entry.reach(opponent, opp_reach);
++            if r != 0.0 {
++                group_total += r;
++                group_card[entry.cards[0] as usize] += r;
++                group_card[entry.cards[1] as usize] += r;
++            }
++        }
+         for &entry in group {
+             let Some(index) = entry.index(player) else {
+                 continue;
+@@ -125,6 +136,10 @@
+             if r != 0.0 {
+                 below_card[entry.cards[0] as usize] += r;
+                 below_card[entry.cards[1] as usize] += r;
++                // These sums are dead after tie evaluation. Repeated cards
++                // may be cleared more than once; untouched cards stay zero.
++                group_card[entry.cards[0] as usize] = 0.0;
++                group_card[entry.cards[1] as usize] = 0.0;
+             }
+         }
+         group_start = group_end;
+@@ -511,3 +526,215 @@
+ #[cfg(test)]
+ #[path = "kernel_tests.rs"]
+ mod tests;
++
++#[cfg(test)]
++mod sparse_rank_group_tests {
++    use super::{ABSENT, RankEntry, analyze_mass, showdown_kernel_compact};
++    use cards::{HandRank, Player};
++
++    // Frozen pre-candidate F64 accumulation order. This is an operation-order
++    // reference for this research patch, not the independent poker oracle.
++    fn reference_sums(
++        sorted: &[RankEntry],
++        opponent: Player,
++        opp_reach: &[f32],
++    ) -> (f64, [f64; 52]) {
++        let mut total = 0.0;
++        let mut per_card = [0.0; 52];
++        for &entry in sorted {
++            let r = entry.reach(opponent, opp_reach);
++            if r != 0.0 {
++                total += r;
++                per_card[entry.cards[0] as usize] += r;
++                per_card[entry.cards[1] as usize] += r;
++            }
++        }
++        (total, per_card)
++    }
++
++    fn reference_compact(
++        sorted: &[RankEntry],
++        utilities: [f64; 3],
++        player: Player,
++        opp_reach: &[f32],
++        out: &mut [f32],
++    ) {
++        let opponent = player.opponent();
++        assert!(analyze_mass(opp_reach).is_f64_exact());
++        let (all_total, all_card) = reference_sums(sorted, opponent, opp_reach);
++        let mut below_total = 0.0;
++        let mut below_card = [0.0; 52];
++        let mut group_start = 0;
++        while group_start < sorted.len() {
++            let rank = sorted[group_start].rank;
++            let mut group_end = group_start;
++            while group_end < sorted.len() && sorted[group_end].rank == rank {
++                group_end += 1;
++            }
++            let group = &sorted[group_start..group_end];
++            let (group_total, group_card) = reference_sums(group, opponent, opp_reach);
++            for &entry in group {
++                let Some(index) = entry.index(player) else {
++                    continue;
++                };
++                let [a, b] = entry.cards.map(usize::from);
++                let own_reach = entry.reach(opponent, opp_reach);
++                let win = below_total - below_card[a] - below_card[b];
++                let tie = group_total - group_card[a] - group_card[b] + own_reach;
++                let compat = all_total - all_card[a] - all_card[b] + own_reach;
++                let lose = compat - win - tie;
++                out[index] = (utilities[0] * win + utilities[1] * tie + utilities[2] * lose) as f32;
++            }
++            below_total += group_total;
++            // Keep combo-wise additions, rather than adding the aggregated group
++            // card sums, to preserve the historical floating-point order.
++            for &entry in group {
++                let r = entry.reach(opponent, opp_reach);
++                if r != 0.0 {
++                    below_card[entry.cards[0] as usize] += r;
++                    below_card[entry.cards[1] as usize] += r;
++                }
++            }
++            group_start = group_end;
++        }
++    }
++
++    fn table(rows: &[(u16, [u8; 2], [bool; 2])]) -> (Vec<RankEntry>, [usize; 2]) {
++        let mut dimensions = [0; 2];
++        let mut entries = Vec::new();
++        for &(rank, cards, present) in rows {
++            assert_ne!(cards[0], cards[1]);
++            assert!(present.into_iter().any(|value| value));
++            let indices = std::array::from_fn(|seat| {
++                if present[seat] {
++                    let local = dimensions[seat] as u16;
++                    dimensions[seat] += 1;
++                    local
++                } else {
++                    ABSENT
++                }
++            });
++            entries.push(RankEntry {
++                rank: HandRank(rank),
++                cards,
++                indices,
++            });
++        }
++        assert!(entries.windows(2).all(|pair| pair[0].rank <= pair[1].rank));
++        (entries, dimensions)
++    }
++
++    fn compare(sorted: &[RankEntry], dimensions: [usize; 2], reaches: [Vec<f32>; 2]) {
++        for player in Player::BOTH {
++            let reach = &reaches[player.opponent().index()];
++            assert_eq!(reach.len(), dimensions[player.opponent().index()]);
++            assert!(
++                analyze_mass(reach).is_f64_exact(),
++                "fixture escaped F64 branch"
++            );
++            for utilities in [
++                [100.0, 0.0, -100.0],
++                [93.0, -7.0, -107.0],
++                [0.1, -3.25, 2.5],
++            ] {
++                // Unrepresented output slots must retain their payload as well.
++                let sentinel = f32::from_bits(0x7fc0_0123);
++                let mut expected = vec![sentinel; dimensions[player.index()] + 2];
++                let mut actual = expected.clone();
++                reference_compact(sorted, utilities, player, reach, &mut expected);
++                showdown_kernel_compact(sorted, utilities, player, reach, &mut actual);
++                let expected: Vec<_> = expected.iter().map(|value| value.to_bits()).collect();
++                let actual: Vec<_> = actual.iter().map(|value| value.to_bits()).collect();
++                assert_eq!(
++                    actual, expected,
++                    "player={player:?}, utilities={utilities:?}"
++                );
++            }
++        }
++    }
++
++    fn repeated_cards() -> (Vec<RankEntry>, [usize; 2]) {
++        table(&[
++            (10, [0, 1], [true, true]),
++            (10, [2, 3], [false, true]),
++            (10, [4, 5], [true, false]),
++            (10, [6, 7], [false, true]),
++            (20, [0, 2], [true, true]),
++            (20, [1, 3], [true, true]),
++            (30, [0, 4], [true, true]),
++            (30, [2, 5], [false, true]),
++            (30, [8, 9], [true, false]),
++            (40, [1, 8], [true, true]),
++            (40, [4, 9], [false, true]),
++            (50, [0, 10], [true, false]),
++            (60, [1, 11], [false, true]),
++            (70, [0, 12], [true, true]),
++        ])
++    }
++
++    #[test]
++    fn sparse_rank_groups_repeated_cards_and_asymmetric_support_match_old_bits() {
++        let (sorted, dimensions) = repeated_cards();
++        assert_ne!(dimensions[0], dimensions[1]);
++        let reaches = dimensions.map(|n| (0..n).map(|i| ((i % 7) + 1) as f32 * 0.125).collect());
++        compare(&sorted, dimensions, reaches);
++    }
++
++    #[test]
++    fn sparse_rank_groups_zero_missing_and_tied_mass_match_old_bits() {
++        let (sorted, dimensions) = repeated_cards();
++        for active in [None, Some(0), Some(1), Some(4), Some(7)] {
++            let reaches = dimensions.map(|n| {
++                (0..n)
++                    .map(|i| {
++                        if active == Some(i) {
++                            0.375
++                        } else if i % 2 == 0 {
++                            0.0
++                        } else {
++                            -0.0
++                        }
++                    })
++                    .collect()
++            });
++            compare(&sorted, dimensions, reaches);
++        }
++    }
++
++    #[test]
++    fn sparse_rank_groups_dense_ties_fractional_and_subnormal_mass_match_old_bits() {
++        let mut rows = Vec::new();
++        for a in 0..16 {
++            for b in (a + 1)..16 {
++                let i = rows.len();
++                rows.push((
++                    (i / 12) as u16,
++                    [a, b],
++                    [i % 5 != 0 || i % 3 == 0, i % 3 != 0],
++                ));
++            }
++        }
++        let (sorted, dimensions) = table(&rows);
++        for subnormal in [false, true] {
++            let reaches = dimensions.map(|n| {
++                (0..n)
++                    .map(|i| {
++                        if i % 4 == 0 {
++                            0.0
++                        } else if subnormal {
++                            f32::from_bits((i % 15 + 1) as u32)
++                        } else {
++                            f32::from_bits(0x3e00_0000 + ((i * 2971) % 0x1f_ffff) as u32)
++                        }
++                    })
++                    .collect()
++            });
++            compare(&sorted, dimensions, reaches);
++        }
++    }
++
++    #[test]
++    fn sparse_rank_groups_empty_table_keeps_outputs() {
++        compare(&[], [0, 0], [vec![], vec![]]);
++    }
++}

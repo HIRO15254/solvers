@@ -1,0 +1,42 @@
+{
+  "schema": "r1.vm21-recovery-derivation/v1",
+  "parents": {
+    "experiments\\hu-postflop-r1\\cloud\\vm20\\recover-posthoc.sh": {
+      "bytes": 7319,
+      "sha256": "937285900acd4bad3b496ea8109e1d66d525f2d5ae2261b00d10cf4216c047e8"
+    },
+    "experiments\\hu-postflop-r1\\cloud\\vm20\\split-on-cloud.py": {
+      "bytes": 2363,
+      "sha256": "aa6155c7f76a743f76b94c6ef8cbc7a7ff94028e7acff79e3b4a783f4e92c98f"
+    },
+    "C:\\Users\\PC_User\\.codex\\worktrees\\ce71\\solvers\\experiments\\hu-postflop-r1\\cloud\\vm20\\check-download.py": {
+      "bytes": 3101,
+      "sha256": "63eeebd9ceeee29346843de452134b7fc80912161fa9d6083995cab99b1319e5"
+    }
+  },
+  "outputs": {
+    "recover.sh": {
+      "bytes": 7806,
+      "sha256": "9ddca64ba4919a4819df3fcaf95c9ef2d72c79123caa884ab25a23c567abca26"
+    },
+    "split-on-cloud.py": {
+      "bytes": 4056,
+      "sha256": "7426d60d7f3f02f8c110fcb4260a4c27ebe289993fbc649ac7da28304594b687"
+    },
+    "check-download.py": {
+      "bytes": 3387,
+      "sha256": "bb4c2f50413083368f1e723b9e681124a0a8aafd53f7368fe6530b361e92147e"
+    }
+  },
+  "changes": [
+    "Fixed VM21 sparse-rank paths/units/schema",
+    "Removed posthoc optional root; all original proof roots retained",
+    "Archive plus manifest/checksum at most255MiB",
+    "Explicit part/sidecar inventory totals at most256MiB;64MiB reserved for control/protocol",
+    "No source/package/native/archive execution during derivation",
+    "Analyzer unit quiescence required; journal/service evidence retained",
+    "Known optional analysis outputs included; zero-byte sidecars permitted",
+    "Local compressed-only reader accepts an explicit transfer directory"
+  ],
+  "cloud_mutations": false
+}

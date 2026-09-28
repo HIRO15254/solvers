@@ -1,0 +1,9 @@
+test_fold_or_integer_change_rejected (test_prepare.SourceChecks.test_fold_or_integer_change_rejected) ... ok
+test_modified_baseline_rejected (test_prepare.SourceChecks.test_modified_baseline_rejected) ... ok
+test_production_root_application_rejected (test_prepare.SourceChecks.test_production_root_application_rejected) ... ok
+test_separate_copy_application_and_nonfresh_rejection (test_prepare.SourceChecks.test_separate_copy_application_and_nonfresh_rejection) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.300s
+
+OK
