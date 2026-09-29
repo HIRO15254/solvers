@@ -1,0 +1,102 @@
+{
+  "schema": "r1.early-delete-followup-observation/v1",
+  "at_utc": "2026-09-28T06:30:45.300900+00:00",
+  "status": "raw_operations_acquired_no_cost_proposal",
+  "sdk_list_commands": 2,
+  "maximum_items_per_command": 100,
+  "rows": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "operation_type": "compute.instances.preempted",
+      "operation_status": "DONE",
+      "operation_error": null,
+      "preemption_done": "2026-09-25T09:02:58.126-07:00",
+      "separate_delete_operation_retained": false,
+      "creation_termination_action": "DELETE",
+      "single_disk_auto_delete": true,
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-02",
+      "disk_gib": 100,
+      "refs": [
+        {
+          "path": "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-02.json",
+          "bytes": 634,
+          "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/launch-r1-20260925-02.json",
+          "bytes": 1093,
+          "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.result.json",
+          "bytes": 872,
+          "sha256": "71ab6b42b7c6029b60ad2ee98968c1042919fda5fd9a4d55c2516083569ee5c6"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.stdout.log",
+          "bytes": 2462,
+          "sha256": "7b33a8a2c59b6116365685497ed9477b8926d9dc97d48088928a5025127ac47c"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "operation_type": "compute.instances.preempted",
+      "operation_status": "DONE",
+      "operation_error": null,
+      "preemption_done": "2026-09-25T10:05:35.687-07:00",
+      "separate_delete_operation_retained": false,
+      "creation_termination_action": "DELETE",
+      "single_disk_auto_delete": true,
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-05",
+      "disk_gib": 100,
+      "refs": [
+        {
+          "path": "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-05.json",
+          "bytes": 737,
+          "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/launch-r1-20260925-05.json",
+          "bytes": 1093,
+          "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.result.json",
+          "bytes": 872,
+          "sha256": "4eea43304743ef412787338941f628343488b8f329105a9c4a767e5bb8126878"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.stdout.log",
+          "bytes": 2462,
+          "sha256": "8d1d4edfce5c4de58c1f5fcbfe88c803d3e1cb9706bbb153114395a498476947"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "official_semantics": {
+    "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+    "summary": "DELETE termination action deletes a Spot VM during preemption; disks marked auto-delete are deleted with the VM. A completed preemption event is not labeled as a separate delete operation."
+  },
+  "absence_queries_so_far": 0,
+  "budget_mutations": false,
+  "proposed_return_usd": null,
+  "billed_usd": null,
+  "limits": [
+    "Not an invoice; no Spot discount or credits assumed.",
+    "No historical raw absence timestamp fabricated.",
+    "Original uncertainty/rates/network remain unchanged pending a separately reviewed proposal."
+  ]
+}

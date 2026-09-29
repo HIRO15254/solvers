@@ -1,0 +1,51 @@
+{
+  "schema": "r1.early-delete-followup-checks/v1",
+  "at_utc": "2026-09-28T06:37:26.578538+00:00",
+  "status": "passed",
+  "checks": [
+    "two source ASTs",
+    "all5SDK query receipts/output identities",
+    "both numeric VM IDs and complete resource URI/DELETE/autoDelete bindings",
+    "current budget and prior applied adjustment match, no double return",
+    "only disk component substitution",
+    "stored proposal exact replay"
+  ],
+  "files": {
+    "capture.py": {
+      "bytes": 2512,
+      "sha256": "33704bc44ff0828d145647aa6b736cc611a1aef29c02ed4026e2d92385968c3e"
+    },
+    "recalculate.py": {
+      "bytes": 10048,
+      "sha256": "472c27d979acc0db571ab2026994bbde4739306281cc15d95444838553d1b570"
+    },
+    "observation01.json": {
+      "bytes": 4450,
+      "sha256": "e6729c1d6bcb7cdc67438ba5e3d3811393de99fc05d2d6b440aa648752ef31a0"
+    },
+    "observation02.json": {
+      "bytes": 6611,
+      "sha256": "92a314c06b8e3b50d77f2deb57618b6ce64c857dc28bb8979c9e48af61c84bc3"
+    },
+    "proposal01.json": {
+      "bytes": 8825,
+      "sha256": "2fd924709ddbe192f680c10f05fe16845c35f50b8492b38c8883448c7e630bf6"
+    },
+    "README.jp.md": {
+      "bytes": 3416,
+      "sha256": "7f4dc9ecac6f9bba2473bebf87810dbb1d5ac01f6e3f782c3724b249d2b71f8c"
+    },
+    "checks01.stdout.log": {
+      "bytes": 197,
+      "sha256": "59e86cfe4c92aad29dd359b7a0e9100935501a0d35eec8a6f7a03fc859a55143"
+    },
+    "checks01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "budget_sha256": "5f57f5a932540fc8d7c88b25787d1c2e98903c729bd1eda184857415f905a825",
+  "cloud_queries_during_checks": 0,
+  "budget_mutations": false,
+  "native_or_archive_work": false
+}

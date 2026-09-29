@@ -1,0 +1,45 @@
+{
+  "schema": "r1.early-delete-followup-checks/v2",
+  "at_utc": "2026-09-28T06:38:48.279611+00:00",
+  "status": "passed",
+  "checks": [
+    "updated source AST",
+    "full proposal replay against exact current ledger",
+    "default and explicit pinned budget path produce identical bytes",
+    "logical budget.json input key retained",
+    "different-budget snapshot rejected",
+    "stored proposal exact CLI replay"
+  ],
+  "files": {
+    "recalculate.py": {
+      "bytes": 10545,
+      "sha256": "d5c7fbe52792c0117c9cc1cae404827df0354ce531de8e5aa0f82d41419ffd57"
+    },
+    "proposal01.json": {
+      "bytes": 8825,
+      "sha256": "377082a2b33e265a20e8227fab06ed48bf8b517a4cce026e97323059f8cf79ca"
+    },
+    "README.jp.md": {
+      "bytes": 4141,
+      "sha256": "d894df60ba21076471a80e21b1fd6fd37b710274675c77b47f20a3176aadc0d5"
+    },
+    "observation02.json": {
+      "bytes": 6611,
+      "sha256": "92a314c06b8e3b50d77f2deb57618b6ce64c857dc28bb8979c9e48af61c84bc3"
+    },
+    "checks02.stdout.log": {
+      "bytes": 197,
+      "sha256": "59e86cfe4c92aad29dd359b7a0e9100935501a0d35eec8a6f7a03fc859a55143"
+    },
+    "checks02.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "budget_sha256": "5f57f5a932540fc8d7c88b25787d1c2e98903c729bd1eda184857415f905a825",
+  "root_snapshot_exists_at_check": false,
+  "prior_acquisition_checks": "checks01.json",
+  "cloud_queries_during_checks": 0,
+  "budget_mutations": false,
+  "native_or_archive_work": false
+}

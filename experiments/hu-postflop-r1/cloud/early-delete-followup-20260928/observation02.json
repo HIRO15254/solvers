@@ -1,0 +1,165 @@
+{
+  "schema": "r1.early-delete-followup-observation/v2",
+  "at_utc": "2026-09-28T06:37:26.483775+00:00",
+  "status": "original_identity_preemption_and_current_absence_verified",
+  "sdk_list_commands": 5,
+  "maximum_items_per_command": 100,
+  "rows": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "operation_type": "compute.instances.preempted",
+      "operation_status": "DONE",
+      "operation_error": null,
+      "preemption_done": "2026-09-25T09:02:58.126-07:00",
+      "separate_delete_operation_retained": false,
+      "creation_termination_action": "DELETE",
+      "single_disk_auto_delete": true,
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-02",
+      "disk_gib": 100,
+      "refs": [
+        {
+          "path": "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-02.json",
+          "bytes": 634,
+          "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/launch-r1-20260925-02.json",
+          "bytes": 1093,
+          "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.result.json",
+          "bytes": 872,
+          "sha256": "71ab6b42b7c6029b60ad2ee98968c1042919fda5fd9a4d55c2516083569ee5c6"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.stdout.log",
+          "bytes": 2462,
+          "sha256": "7b33a8a2c59b6116365685497ed9477b8926d9dc97d48088928a5025127ac47c"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm02-01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "operation_type": "compute.instances.preempted",
+      "operation_status": "DONE",
+      "operation_error": null,
+      "preemption_done": "2026-09-25T10:05:35.687-07:00",
+      "separate_delete_operation_retained": false,
+      "creation_termination_action": "DELETE",
+      "single_disk_auto_delete": true,
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-05",
+      "disk_gib": 100,
+      "refs": [
+        {
+          "path": "experiments/hu-postflop-r1/cloud/create-result-r1-20260925-05.json",
+          "bytes": 737,
+          "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/launch-r1-20260925-05.json",
+          "bytes": 1093,
+          "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.result.json",
+          "bytes": 872,
+          "sha256": "4eea43304743ef412787338941f628343488b8f329105a9c4a767e5bb8126878"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.stdout.log",
+          "bytes": 2462,
+          "sha256": "8d1d4edfce5c4de58c1f5fcbfe88c803d3e1cb9706bbb153114395a498476947"
+        },
+        {
+          "path": "experiments/hu-postflop-r1/cloud/early-delete-followup-20260928/vm05-01.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  ],
+  "official_semantics": {
+    "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+    "summary": "DELETE termination action deletes a Spot VM during preemption; disks marked auto-delete are deleted with the VM. A completed preemption event is not labeled as a separate delete operation."
+  },
+  "absence_queries_so_far": 3,
+  "budget_mutations": false,
+  "proposed_return_usd": null,
+  "billed_usd": null,
+  "limits": [
+    "Current absence is observed September28 and is not historical September25 absence.",
+    "No separate operationType=delete or independent disk-delete response is retained.",
+    "The separate proposal preserves all original uncertainty, CPU, IPv4 and network terms; actual bill unknown."
+  ],
+  "previous_observation": {
+    "bytes": 4450,
+    "sha256": "e6729c1d6bcb7cdc67438ba5e3d3811393de99fc05d2d6b440aa648752ef31a0"
+  },
+  "current_absence": {
+    "instances": {
+      "started_utc": "2026-09-28T06:32:40.035625+00:00",
+      "ended_utc": "2026-09-28T06:32:41.927773+00:00",
+      "items": 0,
+      "refs": {
+        "result.json": {
+          "bytes": 862,
+          "sha256": "77f9d19d00c6e5566cc7960db682d2d484b2dab867a6365b438b5f8096abff43"
+        },
+        "stdout.log": {
+          "bytes": 4,
+          "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+        },
+        "stderr.log": {
+          "bytes": 76,
+          "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+        }
+      }
+    },
+    "disks": {
+      "started_utc": "2026-09-28T06:32:48.336861+00:00",
+      "ended_utc": "2026-09-28T06:32:50.253199+00:00",
+      "items": 0,
+      "refs": {
+        "result.json": {
+          "bytes": 854,
+          "sha256": "f5a9889767ef920f3ea3a2f28dc81d404d6ae8b752b639db4217cd4f19c7c8dd"
+        },
+        "stdout.log": {
+          "bytes": 4,
+          "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+        },
+        "stderr.log": {
+          "bytes": 76,
+          "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+        }
+      }
+    },
+    "addresses": {
+      "started_utc": "2026-09-28T06:32:55.961949+00:00",
+      "ended_utc": "2026-09-28T06:32:58.765302+00:00",
+      "items": 0,
+      "refs": {
+        "result.json": {
+          "bytes": 862,
+          "sha256": "68d50b271c4db81e1ed3bad820c312a9b584b7ba45f53e03fe219b8cf2fb3b8f"
+        },
+        "stdout.log": {
+          "bytes": 4,
+          "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+        },
+        "stderr.log": {
+          "bytes": 76,
+          "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+        }
+      }
+    }
+  }
+}

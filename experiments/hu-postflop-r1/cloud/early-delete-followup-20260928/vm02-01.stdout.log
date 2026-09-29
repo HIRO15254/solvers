@@ -1,0 +1,51 @@
+[
+  {
+    "endTime": "2026-09-25T08:22:19.056-07:00",
+    "id": "5789751243859242875",
+    "insertTime": "2026-09-25T08:21:57.449-07:00",
+    "kind": "compute#operation",
+    "name": "operation-1790349714483-65c5046c1699b-fcaedd6c-c2afdc94",
+    "operationType": "insert",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/operation-1790349714483-65c5046c1699b-fcaedd6c-c2afdc94",
+    "startTime": "2026-09-25T08:21:57.690-07:00",
+    "status": "DONE",
+    "targetId": "7774326211091312507",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260925-02",
+    "user": "hi089697@gmail.com",
+    "warnings": [
+      {
+        "code": "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
+        "data": [
+          {
+            "key": "disk_size_gb",
+            "value": "100"
+          },
+          {
+            "key": "image_size_gb",
+            "value": "10"
+          }
+        ],
+        "message": "Disk size: '100 GB' is larger than image size: '10 GB'. You might need to resize the root repartition manually if the operating system does not support automatic resizing. See https://cloud.google.com/compute/docs/disks/add-persistent-disk#resize_pd for details."
+      }
+    ],
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  },
+  {
+    "endTime": "2026-09-25T09:02:58.126-07:00",
+    "id": "7207833755759355335",
+    "insertTime": "2026-09-25T09:02:48.551-07:00",
+    "kind": "compute#operation",
+    "name": "systemevent-1790352163234-65c50d8b66320-08c2d75f-8536c888",
+    "operationType": "compute.instances.preempted",
+    "progress": 100,
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/operations/systemevent-1790352163234-65c50d8b66320-08c2d75f-8536c888",
+    "startTime": "2026-09-25T09:02:48.562-07:00",
+    "status": "DONE",
+    "statusMessage": "Instance was preempted.",
+    "targetId": "7774326211091312507",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/instances/solvers-r1-20260925-02",
+    "user": "system",
+    "zone": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b"
+  }
+]

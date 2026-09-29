@@ -1,0 +1,202 @@
+{
+  "schema": "r1.early-delete-disk-only-proposal/v1",
+  "status": "proposal_only_no_ledger_change",
+  "rows": [
+    {
+      "vm": "02",
+      "instance_id": "7774326211091312507",
+      "reservation_id": "r1-20260925-02",
+      "basis": "Preemption DONE under original DELETE policy and single autoDelete disk; not a distinct delete operation.",
+      "launch_attempt": "2026-09-25T15:21:50.6576085+00:00",
+      "preemption_done": "2026-09-25T09:02:58.126-07:00",
+      "old_report_preemption_time_unchanged": "2026-09-25T16:02:58.126Z",
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-02",
+      "disk_numeric_id": null,
+      "disk_lifecycle_seconds_for_model": "2467.468392",
+      "disk_slack_seconds": 120,
+      "disk_minutes_after_upper_rounding": 44,
+      "old_costs_usd_unchanged_except_disk": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.370870155169444435131944444",
+        "whole_lifetime_plus_full_allowances": "4.384169444444444444444444444",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "3.2"
+      },
+      "old_total_usd": "4.384169444444444444444444444",
+      "unchanged_nondisk_cost_usd": "4.055369444444444444444444444",
+      "old_disk_usd": "0.328800",
+      "new_disk_usd": "0.01004666666666666666666666667",
+      "new_model_usd": "4.065416111111111111111111111",
+      "current_hold_usd": "4.50",
+      "proposed_hold_usd": "4.10",
+      "proposed_return_usd": "0.40",
+      "margin_above_model_usd": "0.034583888888888888888888889"
+    },
+    {
+      "vm": "05",
+      "instance_id": "1627891813360280286",
+      "reservation_id": "r1-20260925-05",
+      "basis": "Preemption DONE under original DELETE policy and single autoDelete disk; not a distinct delete operation.",
+      "launch_attempt": "2026-09-25T16:07:09.8570374+00:00",
+      "preemption_done": "2026-09-25T10:05:35.687-07:00",
+      "old_report_preemption_time_unchanged": "2026-09-25T17:05:35.714153Z",
+      "disk_source": "https://www.googleapis.com/compute/v1/projects/solvers-abstraction-20260723/zones/us-central1-b/disks/solvers-r1-20260925-05",
+      "disk_numeric_id": null,
+      "disk_lifecycle_seconds_for_model": "3505.829963",
+      "disk_slack_seconds": 120,
+      "disk_minutes_after_upper_rounding": 61,
+      "old_costs_usd_unchanged_except_disk": {
+        "observed_uptime_plus_full_allowances_not_a_cost_bound": "4.484603216449999993274305556",
+        "whole_lifetime_plus_full_allowances": "4.491573611111111111111111111",
+        "undiscounted_compute_hourly": "0.37",
+        "spot_ipv4_hourly": "0.0025",
+        "disk_100gib_24hours": "0.328800",
+        "egress_2gib_at_0_30": "0.6",
+        "original_other_reserve": "3.2"
+      },
+      "old_total_usd": "4.491573611111111111111111111",
+      "unchanged_nondisk_cost_usd": "4.162773611111111111111111111",
+      "old_disk_usd": "0.328800",
+      "new_disk_usd": "0.01392833333333333333333333334",
+      "new_model_usd": "4.176701944444444444444444444",
+      "current_hold_usd": "4.50",
+      "proposed_hold_usd": "4.20",
+      "proposed_return_usd": "0.30",
+      "margin_above_model_usd": "0.023298055555555555555555556"
+    }
+  ],
+  "current_absence": {
+    "instances": {
+      "at_utc": "2026-09-28T06:32:41.927773+00:00",
+      "receipt": "instances-01.result.json",
+      "empty": true
+    },
+    "disks": {
+      "at_utc": "2026-09-28T06:32:50.253199+00:00",
+      "receipt": "disks-01.result.json",
+      "empty": true
+    },
+    "addresses": {
+      "at_utc": "2026-09-28T06:32:58.765302+00:00",
+      "receipt": "addresses-01.result.json",
+      "empty": true
+    }
+  },
+  "source": {
+    "bytes": 10545,
+    "sha256": "d5c7fbe52792c0117c9cc1cae404827df0354ce531de8e5aa0f82d41419ffd57"
+  },
+  "inputs": {
+    "budget.json": {
+      "bytes": 115720,
+      "sha256": "5f57f5a932540fc8d7c88b25787d1c2e98903c729bd1eda184857415f905a825"
+    },
+    "usage-early-20260927/report.json": {
+      "bytes": 11030,
+      "sha256": "36b445c0bf1f331ca2e9294951a0acd17fe03b9e8f75aa1bdbaeb5fa360036c2"
+    },
+    "usage-early-20260927/applied.json": {
+      "bytes": 1978,
+      "sha256": "cc6a857b56175ed82dd9d1555c485107e93377509594286d83807c5b213415f8"
+    },
+    "early-delete-followup-20260928/instances-01.result.json": {
+      "bytes": 862,
+      "sha256": "77f9d19d00c6e5566cc7960db682d2d484b2dab867a6365b438b5f8096abff43"
+    },
+    "early-delete-followup-20260928/instances-01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "early-delete-followup-20260928/instances-01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "early-delete-followup-20260928/disks-01.result.json": {
+      "bytes": 854,
+      "sha256": "f5a9889767ef920f3ea3a2f28dc81d404d6ae8b752b639db4217cd4f19c7c8dd"
+    },
+    "early-delete-followup-20260928/disks-01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "early-delete-followup-20260928/disks-01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "early-delete-followup-20260928/addresses-01.result.json": {
+      "bytes": 862,
+      "sha256": "68d50b271c4db81e1ed3bad820c312a9b584b7ba45f53e03fe219b8cf2fb3b8f"
+    },
+    "early-delete-followup-20260928/addresses-01.stdout.log": {
+      "bytes": 4,
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    "early-delete-followup-20260928/addresses-01.stderr.log": {
+      "bytes": 76,
+      "sha256": "fef1649259e099f4f3e50fbf31d9dbbaccc38eecf1c04c4461b4c8208b6bbee2"
+    },
+    "launch-r1-20260925-02.json": {
+      "bytes": 1093,
+      "sha256": "3620de30de7232e4eeb03825db887e080755056d71fd7f91a09f01ea65af8f57"
+    },
+    "create-result-r1-20260925-02.json": {
+      "bytes": 634,
+      "sha256": "5fa2c0941bb4541815577e09821dfe97abd6da1550485c1ceb762191ac8e4698"
+    },
+    "early-delete-followup-20260928/vm02-01.result.json": {
+      "bytes": 872,
+      "sha256": "71ab6b42b7c6029b60ad2ee98968c1042919fda5fd9a4d55c2516083569ee5c6"
+    },
+    "early-delete-followup-20260928/vm02-01.stdout.log": {
+      "bytes": 2462,
+      "sha256": "7b33a8a2c59b6116365685497ed9477b8926d9dc97d48088928a5025127ac47c"
+    },
+    "early-delete-followup-20260928/vm02-01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "launch-r1-20260925-05.json": {
+      "bytes": 1093,
+      "sha256": "34e72d10559a1a6dcf5165541b5b4423176e38bcf34794a1ae87269d9d4d61ce"
+    },
+    "create-result-r1-20260925-05.json": {
+      "bytes": 737,
+      "sha256": "60ef8479412072ef14d29dd27d5c9244876051ef2f4651ce82976444b7035603"
+    },
+    "early-delete-followup-20260928/vm05-01.result.json": {
+      "bytes": 872,
+      "sha256": "4eea43304743ef412787338941f628343488b8f329105a9c4a767e5bb8126878"
+    },
+    "early-delete-followup-20260928/vm05-01.stdout.log": {
+      "bytes": 2462,
+      "sha256": "8d1d4edfce5c4de58c1f5fcbfe88c803d3e1cb9706bbb153114395a498476947"
+    },
+    "early-delete-followup-20260928/vm05-01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "summary": {
+    "authorized_usd": "40",
+    "held_before_usd": "39.95",
+    "return_usd": "0.70",
+    "proposed_held_usd": "39.25",
+    "proposed_available_usd": "0.75"
+  },
+  "rounding": "Disk duration includes120s margin, ceiling to whole minute; hold ceiling to0.05USD.",
+  "official_semantics": "https://docs.cloud.google.com/compute/docs/instances/spot",
+  "limitations": [
+    "No independent disk numeric ID, disk-delete operation, or historical raw disk-absence receipt is retained.",
+    "Preemption DONE plus DELETE/autoDelete configuration and current absence support this model; endTime is not independently measured disk billing end.",
+    "Current absence is a September28 observation and must not be relabeled as a September25 observation.",
+    "Original CPU, IPv4,2GiB network and3.2USD other reserve per VM remain completely unchanged; no Spot discount or credits.",
+    "Old VM05 summary time differs from fresh operation endTime by27.153ms; neither original record is overwritten; minute ceiling is unchanged.",
+    "Actual invoice and complete historical charge timing remain unknown."
+  ],
+  "billed_usd": null,
+  "budget_mutations": false,
+  "cloud_queries_during_calculation": 0,
+  "local_native_or_archive_work": false
+}

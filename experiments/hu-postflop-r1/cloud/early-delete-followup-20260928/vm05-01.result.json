@@ -1,0 +1,31 @@
+{
+  "schema": "r1.early-delete-sdk-capture/v1",
+  "kind": "vm05",
+  "project": "solvers-abstraction-20260723",
+  "argv": [
+    "C:\\Python313\\python.exe",
+    "C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\lib\\gcloud.py",
+    "compute",
+    "operations",
+    "list",
+    "--filter=targetId=1627891813360280286",
+    "--project=solvers-abstraction-20260723",
+    "--limit=100",
+    "--format=json",
+    "--quiet"
+  ],
+  "started_utc": "2026-09-28T06:28:06.604359+00:00",
+  "timeout_seconds": 60,
+  "maximum_returned_items": 100,
+  "read_only": true,
+  "exit_code": 0,
+  "stdout": {
+    "bytes": 2462,
+    "sha256": "8d1d4edfce5c4de58c1f5fcbfe88c803d3e1cb9706bbb153114395a498476947"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ended_utc": "2026-09-28T06:28:08.595417+00:00"
+}
