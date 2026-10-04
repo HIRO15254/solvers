@@ -8,8 +8,8 @@ Web GUI は §8 の設計案であり、現行の実行体に含めない。
 [文書索引](README.md)に示す規範仕様、solver core は [architecture.md](architecture.md) を参照する。
 
 作業状態は Linear で管理し、管理先と運用は [status.jp.md](status.jp.md) を参照する。
-プロダクトの優先順位・受入条件は [product-roadmap.jp.md](product-roadmap.jp.md)、
-設計と依存関係は [実装計画](plans/solver-implementation-plan.jp.md)に置く。
+製品の範囲・受入条件は [products.jp.md](products.jp.md)、
+目標構成と移行手順は [再構築計画](plans/two-product-restructure.jp.md)に置く。
 本書に完了 Phase や次の作業の一覧を複製しない。
 
 ## 1. 利用モデル
@@ -287,6 +287,6 @@ Multiway production は current-street recall / dense arena を使い、full-rec
 ## 10. 変更時の参照先
 
 - 公開 contract / default: family の規範仕様と [CLI reference](cli-reference.jp.md)。
-- 設計の依存関係: [実装計画](plans/solver-implementation-plan.jp.md)。
+- 目標構成と移行手順: [再構築計画](plans/two-product-restructure.jp.md)。
 - 作業状態の管理先: [status.jp.md](status.jp.md) 経由の Linear。
-- 検証手順と受入証拠: [development.md](development.md)、[validation.jp.md](validation.jp.md)。
+- 検証手順と受入証拠: [development.md](development.md)、[products.jp.md](products.jp.md) の品質節。

@@ -9,22 +9,30 @@ For three or more players, results are regret-minimized approximations rather th
 
 ## Status
 
-Active development. The [product roadmap](docs/product-roadmap.jp.md) defines
-priorities and acceptance criteria. Task state is managed in Linear; see
-[status and task management](docs/status.jp.md) for the project and workflow.
+Being rebuilt as two products that share one input format: the
+**NLH HU Postflop Solver** (exact vector CFR for spots where two players see
+the flop) and the **NLH Multiway Preflop Solver** (sampled MCCFR for 2–9 seat
+preflop). The [product definition](docs/products.jp.md) states their scope and
+quality, and the [restructure plan](docs/plans/two-product-restructure.jp.md)
+the target architecture and migration steps. The commands below describe the
+current code, which still reads the v1 config families until the new input
+format replaces them. The pre-restructure state is the git tag
+`archive/pre-two-products-2026-10-04`. Task state is managed in Linear; see
+[status and task management](docs/status.jp.md).
 
 ## Documentation
 
 - [docs/README.md](docs/README.md) — documentation map and source-of-truth hierarchy
 - [AGENTS.md](AGENTS.md) — shared entrypoint for AI development
-- [docs/product-roadmap.jp.md](docs/product-roadmap.jp.md) — product priorities and acceptance criteria
+- [docs/products.jp.md](docs/products.jp.md) — the two products: scope, quality, stages
+- [docs/plans/two-product-restructure.jp.md](docs/plans/two-product-restructure.jp.md) — target architecture and migration plan
+- [docs/plans/nlh-input-v1.jp.md](docs/plans/nlh-input-v1.jp.md) — draft of the shared input format
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
 - [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop, HU Preflop, and toy config contracts
 - [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
 - [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
 - [docs/app-architecture.md](docs/app-architecture.md) — current CLI/daemon boundaries and proposed Web GUI
 - [docs/development.md](docs/development.md) — setup, tests, benchmarks, and change workflow
-- [docs/validation.jp.md](docs/validation.jp.md) — correctness and HU acceptance evidence
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout

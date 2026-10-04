@@ -3,9 +3,10 @@
 本書は現在の workspace、計算時の表現、維持する不変条件を記す。
 公開入力・既定値・保存契約の正本は [文書索引](README.md) に示す規範仕様であり、
 本書はその代替ではない。作業状態の管理先は [status.jp.md](status.jp.md) から辿る Linear、
-優先順位と受入条件は [product-roadmap.jp.md](product-roadmap.jp.md)、
-検証手順は [development.md](development.md) と [validation.jp.md](validation.jp.md) を参照する。
-将来の接続点は §11 に分け、未実装 API を現行構成へ含めない。
+製品の範囲と受入条件は [products.jp.md](products.jp.md)、
+検証手順は [development.md](development.md) を参照する。
+2製品への再構築後の目標構成は [再構築計画](plans/two-product-restructure.jp.md) にあり、
+本書は移行の各段階で現行コードに合わせて更新する（§11）。未実装 API を現行構成へ含めない。
 
 ## 0. 維持する設計原則
 
@@ -198,7 +199,8 @@ joint belief の検証を伴う別境界とする。NN、別方式の abstractio
 - 保存／再開、量子化、保存時の EV と query の一致、および未保存領域の区別。
 
 実行コマンドと重い ignored test の扱いは [development.md](development.md)、
-HU の参照比較・測定・受入は [validation.jp.md](validation.jp.md) に置く。
+HU の品質目標は [products.jp.md](products.jp.md)、参照比較の候補は
+[HU Postflop参照候補](plans/hu-postflop-validation/README.md) に置く。
 過去の比較値や実行時間を、このアーキテクチャの達成済み品質や普遍的な性能保証にはしない。
 
 ## 8. config・保存・query の境界
@@ -370,17 +372,19 @@ f64集計は既存方式と同じである。sparse側は従来mapを使い、tr
 ## 11. 将来の接続点
 
 以下は設計検証が必要な境界であり、実装済みの機能表ではない。
-作業状態は Linear へ集約し、管理先は [status.jp.md](status.jp.md) を参照する。設計の詳細は、
-[実装計画](plans/solver-implementation-plan.jp.md)、[R0 作業票](plans/r0-execution-plan.jp.md)から追う。
+作業状態は Linear へ集約し、管理先は [status.jp.md](status.jp.md) を参照する。
+目標の crate 構成・依存方向・移行手順は [再構築計画](plans/two-product-restructure.jp.md)、
+共通 Input は [`solvers.nlh/v1` 草案](plans/nlh-input-v1.jp.md) から追う。
+[製品定義](products.jp.md) が範囲外とした機能（他 variant、NN/ML 近似、Nodelock・profile、
+Multiway postflop、PKO）の接続点はここに置かない。
 
 | 接続点 | 設計で確認すること |
 |---|---|
-| 共通ゲーム記述 | 配札・観測・交換・情報集合・行動・精算を小さい Stud/Draw 等で検証する。既存 HU hot path には compiled tree と専用 kernel を維持 |
-| NN leaf / 学習 / 局所探索 | 3係数の `PostflopModel` を前提にせず、range 条件付き value、教師の品質・単位・抽象化・horizon、batch 推論の境界を設計 |
-| ICM / Nodelock / profile | legal action、戦略制約、主観評価、客観 EV を分離し、適用 horizon と教師の条件を保存 |
-| subgame re-solve / action translation | 履歴・到達 range・境界値・安全性を検証し、HU の保証を Multiway へ流用しない |
-| GPU CFR | CPU vector の同条件測定を比較基準にする。NN 学習・推論の GPU 利用とは別の採否判断 |
-| viewer / 言語 adapter | 実際に必要な query と保存契約を先に固定し、Web / PyO3 / WASM の独立した依存が生じてから追加 |
+| 共通 Input / Spot IR | table・economics・range・tree 文法を一度だけ解釈し、HU と Multiway が同じ中間表現を消費する。NLH のルールは一箇所に置き、既存 HU builder との差は照合 test で確かめる |
+| derive（Multiway 解 → HU 入力） | Preflop line と board から pot・stack・aggressor・到達 range を導出し、保存する解の identity と結び付ける |
+| ICM | legal action と精算を分離し、HU の general-sum では seat ごとの g_i を NashConv と並べて示す |
+| GPU CFR | CPU vector の同条件測定を比較基準にする |
+| viewer | 実際に必要な query と保存契約を先に固定し、Web GUI は daemon の client として追加する |
 
 学習コード・model registry・dataset pipeline は着手時に solver runtime と依存・成果物を分ける。
 空の将来 crate を先に作らず、教師生成と推論の実際の共有 API が決まってから配置する。

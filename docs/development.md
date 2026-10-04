@@ -1,7 +1,7 @@
 # 開発・検証ガイド
 
-作業の選択・担当・状態は[Linear管理先](status.jp.md)、目標と受入条件は[ロードマップ](product-roadmap.jp.md)、
-実施手順は[作業票](plans/r0-execution-plan.jp.md)を参照する。この文書は環境・変更・検証・引継ぎを扱う。
+作業の選択・担当・状態は[Linear管理先](status.jp.md)、製品の目的と受入条件は[製品定義](products.jp.md)、
+移行の手順と完了条件は[再構築計画](plans/two-product-restructure.jp.md)を参照する。この文書は環境・変更・検証・引継ぎを扱う。
 
 ## 環境準備
 
@@ -50,7 +50,7 @@ cargo test --workspace
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
 | 研究feature | 明示したfeatureのcompileと該当する小規模test。production品質認定とは区別 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
-| 品質・性能の主張 | [品質検証ガイド](validation.jp.md)、対応する固定条件と基準測定 |
+| 品質・性能の主張 | [製品定義](products.jp.md)の品質節、対応する固定条件と基準測定 |
 
 文書だけの編集で重いsolverを回す必要はない。逆に、文章の修正に見えてdefaultや公開契約を変える場合は契約変更として扱う。
 `check_docs.py`はファイル参照と入口を調べる軽量検査で、見出しアンカー・外部URL・本文の意味を保証しない。
@@ -81,7 +81,7 @@ Windowsで並列compileがメモリ割当やページングファイル不足（
 - `runs/`: 新規solver・benchmark実行のignored作業領域。保存対象は選定してexperimentsへ。
 - `.cache/`: 再生成可能なmachine-local cacheやtest用の一時データ。固有の証拠・source snapshotを置かない。
 - `docs/plans/`: 受け入れた作業の手順・成果物・完了条件。状態はLinear。
-- `docs/research/`: 日付付きの調査・未採用案・費用概算。
+- `docs/research/`: 日付付きの調査・未採用案・費用概算（現在は空。旧調査はtagに残る）。
 - `experiments/<campaign>/<experiment>/`: 採否・品質認定に必要なmanifest、config、集計、検証器、報告。
 - 共通Python testは`tools/tests/`、実験だけの検証は当該実験の近くに置く。
 
@@ -131,8 +131,8 @@ Measure-Command { & ./target/release/solvers.exe solve examples/river_small.toml
 ```
 
 Windowsのpeak working setは別途プロセス計測で取得し、取得方法とサンプリング間隔を記録する。未計測のRSSを静的storage見積もりで代用しない。
-Linux RSSとWindows working setも定義を明記して扱う。初期化・CFR・BR・保存を比較する場合は[検証ガイド](validation.jp.md)の区間に分ける。
-旧M3/M5の所要時間・容量目標は過去条件の記録であり、現在のR1/R2受入条件ではない。
+Linux RSSとWindows working setも定義を明記して扱う。初期化・CFR・BR・保存を比較する場合は区間を分けて記録する。
+過去の所要時間・容量目標は当時の条件の記録であり、現在の受入条件ではない。
 
 ## 性能判断で残す理由
 

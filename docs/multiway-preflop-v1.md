@@ -248,7 +248,8 @@ chunkからstateへ直接復元します。展開payload全体のbufferと同サ
 solver stateとも扱いません。checkpointからの監査は別の経路です。
 修正にはwriter、metadata、reader、評価、出力テストを同期し、一般postflop treeで
 Preflop-onlyの範囲と拒否境界を検証する必要があります。
-修正の優先順位は[現行ロードマップ](product-roadmap.jp.md)に従います。
+この不一致は[製品定義](products.jp.md)のP2既知課題に含め、
+修正の段階は[再構築計画](plans/two-product-restructure.jp.md)に従います。
 
 CLIの `evaluate` は `.mwsol` に保存されたaverage policy blockを再評価します。
 現在のwriterは正の平均質量を持つPostflop blockも保存し得ますが、未訪問・平均質量0の

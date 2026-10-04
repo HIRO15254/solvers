@@ -1,13 +1,13 @@
 # 実験・検証証拠
 
-現在の作業とLinearへの入口は[開発状態](../docs/status.jp.md)、成果物・完了条件は
-[R0実行計画](../docs/plans/r0-execution-plan.jp.md)を参照する。ここは実験の証拠を探す索引であり、作業状態の正本ではない。
+現在の作業とLinearへの入口は[開発状態](../docs/status.jp.md)、製品の品質目標は
+[製品定義](../docs/products.jp.md)を参照する。ここは実験の証拠を探す索引であり、作業状態の正本ではない。
+R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し、git tag
+`archive/pre-two-products-2026-10-04`に残した。
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
-| 現行計画の参照候補 | [HU Postflop参照調査](hu-postflop-reference/README.md) | R0で棚卸しする2ケースと取得条件。現行受入セットへの採用は別判断 |
-| 現行sourceの限定検証 | [SOL-2 HU資産棚卸し](hu-postflop-r0/asset-inventory-2026-09-25/README.md) | 通常39 testsの成功・9 ignoredの区別、外部tree source保存差分の小ケース再現。品質・性能認定とは分離 |
-| R0準備時の環境観測 | [HU Postflop readiness](hu-postflop-r0/readiness/README.md) | SOL-3のsource候補、toolchain、CPU/RAM/disk。測定runの成功証拠ではない |
+| 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 

@@ -26,7 +26,3 @@ experiments/multiway-2026-09/scripts/summarize_raised_opponent.py -text
 experiments/multiway-2026-09/scripts/summarize_whole_preflop_deviation.py -text
 experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json -text
 experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json -text
-# New SOL-2 evidence uses canonical LF bytes for portable SHA-256 verification.
-experiments/hu-postflop-r0/asset-inventory-2026-09-25/* text eol=lf
-# Cargo emits a final blank line; preserve it in the retained test output.
-experiments/hu-postflop-r0/asset-inventory-2026-09-25/*.log whitespace=-blank-at-eof

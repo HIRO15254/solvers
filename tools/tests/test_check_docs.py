@@ -76,20 +76,29 @@ class DocumentationTests(unittest.TestCase):
         ]))
         self.assertEqual(docs.check(self.root), [])
 
-    def test_moved_plan_paths_are_rejected_in_current_prose(self):
-        self.write("docs/development.md", "Use `docs/research/r0-execution-plan.jp.md`.")
+    def test_retired_plan_paths_are_rejected_in_current_prose(self):
+        self.write("docs/development.md", "Use `docs/plans/r0-execution-plan.jp.md`.")
         errors = docs.check(self.root)
         self.assertEqual(len(errors), 1)
-        self.assertIn("use docs/plans/r0-execution-plan.jp.md", errors[0])
+        self.assertIn("use docs/plans/two-product-restructure.jp.md", errors[0])
+
+    def test_retired_validation_guide_is_rejected_in_current_prose(self):
+        self.write("docs/architecture.md", "See `docs/validation.jp.md`.")
+        errors = docs.check(self.root)
+        self.assertEqual(len(errors), 1)
+        self.assertIn("use docs/products.jp.md", errors[0])
 
     def test_historical_prose_is_allowed_but_its_broken_links_are_not(self):
-        self.write("docs/research/old-survey.md", "\n".join([
-            "Previously `docs/research/r0-execution-plan.jp.md`.",
-            "[missing](missing.md)",
-        ]))
-        self.assertEqual(docs.check(self.root), [
-            "docs/research/old-survey.md:2: missing local link target: missing.md"
-        ])
+        for name in ("docs/research/old-survey.md", "docs/decisions/old-decision.md"):
+            with self.subTest(name=name):
+                self.write(name, "\n".join([
+                    "Previously `docs/plans/r0-execution-plan.jp.md`.",
+                    "[missing](missing.md)",
+                ]))
+                self.assertEqual(docs.check(self.root), [
+                    f"{name}:2: missing local link target: missing.md"
+                ])
+                (self.root / name).unlink()
 
     def test_links_into_experiments_are_checked_without_scanning_history(self):
         self.write("experiments/old/README.md", "[obsolete](missing.md)")

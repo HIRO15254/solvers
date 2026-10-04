@@ -4,8 +4,8 @@
 
 # 手順書: GTO Wizardとの出力精度クロスチェック(postflop / Mode A)
 
-> 2026-07の手順記録。現行の参照セットと受入条件は
-> [R0実行計画](../../docs/plans/r0-execution-plan.jp.md)で選び直す。
+> 2026-07の手順記録。現行の参照候補は[HU Postflop参照候補](../../docs/plans/hu-postflop-validation/README.md)、
+> 受入条件は[製品定義](../../docs/products.jp.md)で選び直す。
 
 ## 0. この文書の目的と使い方
 

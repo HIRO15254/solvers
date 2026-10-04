@@ -1,6 +1,6 @@
 # 2026年9月 Multiway実験（休止）
 
-この索引は、当時のMultiway Preflop研究の実行条件と結果を探すためのもの。現在の作業は[開発状態・Linearへの入口](../../docs/status.jp.md)、成果物・完了条件は[R0実行計画](../../docs/plans/r0-execution-plan.jp.md)、契約は[規範仕様](../../docs/multiway-preflop-v1.jp.md)を参照する。
+この索引は、当時のMultiway Preflop研究の実行条件と結果を探すためのもの。現在の作業は[開発状態・Linearへの入口](../../docs/status.jp.md)、製品の目標と移行手順は[製品定義](../../docs/products.jp.md)と[再構築計画](../../docs/plans/two-product-restructure.jp.md)、契約は[規範仕様](../../docs/multiway-preflop-v1.jp.md)を参照する。
 
 現行文書から最初に読むのは[品質判断](quality-decision.md)だけでよい。保存・初期化・メモリ・失敗時の状態について改善を実測したが、Preflop Tree全体の戦略品質は未認定。主要2実験の設定・source識別子・過去検証記録は[保持証拠](quality-evidence/README.md)へ取り出し、集約結果のhashと符号集計を再検査できるようにした。solver実行全体の再現状態は **historical-only** である。
 

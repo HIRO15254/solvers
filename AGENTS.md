@@ -11,15 +11,24 @@ Linear project and task mapping. Linear is the sole authority for task status,
 assignees, blockers, and next actions; do not maintain a Markdown status mirror.
 Specifications, acceptance criteria, and validation evidence stay in Git.
 
+The repository is being rebuilt as two products that share one input format:
+the NLH HU Postflop Solver (P1) and the NLH Multiway Preflop Solver (P2).
+`docs/products.jp.md` defines them; `docs/plans/two-product-restructure.jp.md`
+defines the target architecture and the ordered migration steps M0-M8 on
+branch `restructure/two-products`. The pre-restructure state is the tag
+`archive/pre-two-products-2026-10-04`. Do not reintroduce features the product
+definition excludes (Nodelock, opponent profiles, ML approximation, other
+variants, multiway postflop, PKO) without a new user decision.
+
 Read the relevant route rather than every long document for every change:
 
 | Change | Read next |
 |---|---|
-| Choose work / acceptance | `docs/product-roadmap.jp.md`, the applicable `docs/plans/` ticket |
-| Solver / game semantics | `docs/architecture.md`, affected crate and oracle tests |
-| Config / CLI / artifacts | Family specification below, implementation map, CLI reference and fixtures |
+| Choose work / acceptance | `docs/products.jp.md`, `docs/plans/two-product-restructure.jp.md` |
+| Solver / game semantics | `docs/architecture.md` (current code), target layout in the restructure plan, affected crate and oracle tests |
+| Config / CLI / artifacts | Family specification below, CLI reference and fixtures; target format `docs/plans/nlh-input-v1.jp.md` |
 | Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
-| Quality / measurement | `docs/validation.jp.md`, experiment manifest and validator |
+| Quality / measurement | Quality sections of `docs/products.jp.md`, `docs/plans/hu-postflop-validation/` |
 | Development / handoff | `docs/development.md` |
 | External references | `LICENSE-POLICY.md` |
 
@@ -40,6 +49,12 @@ The normative specifications are:
 second specification. `docs/multiway-preflop-v1.md` is the implementation
 contract map, `docs/cli-reference.jp.md` covers both binaries' complete CLI,
 and `docs/user-guide.jp.md` is the operational guide.
+
+These families remain normative for the code that implements them until
+restructure step M7 replaces them with `solvers.nlh/v1`. The draft
+`docs/plans/nlh-input-v1.jp.md` is not a contract yet: do not expose its keys
+in parsers, help, or templates ahead of the step that implements them, and
+promote it to `docs/` together with that implementation.
 
 Any contract or default change MUST update every affected artifact in the same
 change set: the normative specification, implementation guide, CLI reference

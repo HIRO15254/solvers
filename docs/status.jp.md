@@ -6,41 +6,32 @@
 - Workspace: `sapphire2`
 - Team: `Solvers`（Issue prefix: `SOL`、既存チーム）
 - Team ID: `3b3cbc79-927d-4c0f-81cf-e4235278c45f`
-- R0 Project: [R0: 対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16)
 - 導入日: 2026-09-25
 - 仕様・設計・受入条件・検証証拠の入口: [文書索引](README.md)
 
-## 既存Projectの対応
+## Projectの対応
 
-R0〜R7のProjectは既存のものを使う。同名Projectや既存作業のIssueを重複作成しない。
+2026-10-04の再構築決定（[製品定義](products.jp.md)）により、既存のR0〜R7 Projectは旧ロードマップに
+対応するものとなった。新しい2製品向けのProject構成は[再構築計画](plans/two-product-restructure.jp.md)
+第6節の再編案として利用者の承認を待っている。承認後にLinearを再編し、この節を新しい対応へ置き換える。
+承認前に同名Projectや再構築の作業Issueを作らない。
 
-| 段階 | Linear Project |
-|---|---|
-| R0 | [対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16) |
-| R1 | [HU検証と汎用ゲーム境界](https://linear.app/sapphire2/project/r1-hu検証と汎用ゲーム境界-078f73df767b) |
-| R2 | [HU Postflopの厳密CFRを実用化](https://linear.app/sapphire2/project/r2-hu-postflopの厳密cfrを実用化-961ce1daf638) |
-| R3 | [HU教師生成・学習・局所探索](https://linear.app/sapphire2/project/r3-hu教師生成学習局所探索-711bb60a2110) |
-| R4 | [ICM・Nodelock・相手profile](https://linear.app/sapphire2/project/r4-icmnodelock相手profile-7f415feb41fc) |
-| R5 | [共通基盤でvariantとPreflopを広げる](https://linear.app/sapphire2/project/r5-共通基盤でvariantとpreflopを広げる-68bdce1dd133) |
-| R6 | [Multiway Postflop（低優先）](https://linear.app/sapphire2/project/r6-multiway-postflop低優先-b0a9c0be563c) |
-| R7 | [特殊大会と追加の精密化](https://linear.app/sapphire2/project/r7-特殊大会と追加の精密化-b0b0f17e2066) |
+| 旧段階 | Linear Project | 現在の扱い |
+|---|---|---|
+| R0 | [対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16) | 全Issue完了。旧手順書はtagに残る |
+| R1 | [HU検証と汎用ゲーム境界](https://linear.app/sapphire2/project/r1-hu検証と汎用ゲーム境界-078f73df767b) | HU関連のIssueはP1へ移す案（再構築計画第6節） |
+| R2〜R7 | 既存Project | 旧ロードマップとしてarchiveする案 |
 
 ## 作業IDの対応
 
 | リポジトリの作業ID | Linear | 手順・完了条件 |
 |---|---|---|
-| DEV-01 | [SOL-7](https://linear.app/sapphire2/issue/SOL-7/dev-01-開発文書と証拠管理を整理する) | 文書導線、Linearへの状態一本化、選定証拠の保全、補助検査を確認。[移行記録](decisions/2026-09-25-development-workflow.jp.md) |
-| R0-01 | [SOL-1](https://linear.app/sapphire2/issue/SOL-1/r0-01-hu参照候補と日常拡張セットを選定する) | [R0作業票](plans/r0-execution-plan.jp.md) §3 |
-| R0-02 | [SOL-2](https://linear.app/sapphire2/issue/SOL-2/r0-02-現行実装検証資産契約の差分を棚卸しする) | 同 §4 |
-| R0-03 | [SOL-3](https://linear.app/sapphire2/issue/SOL-3/r0-03-sourcebinaryマシンの記録方式を整える) | 同 §5 |
-| R0-04 | [SOL-4](https://linear.app/sapphire2/issue/SOL-4/r0-04-huの測定仕様と暫定判定を固定する) | 同 §6 |
-| R0-05 | [SOL-5](https://linear.app/sapphire2/issue/SOL-5/r0-05-初回ローカル実行の資源枠を決める) | 同 §7 |
-| R0-06 | [SOL-6](https://linear.app/sapphire2/issue/SOL-6/r0-06-r0完了を確認しr1へ引き渡す) | 同 §8 |
+| DEV-01 | [SOL-7](https://linear.app/sapphire2/issue/SOL-7/dev-01-開発文書と証拠管理を整理する) | 文書導線、Linearへの状態一本化。[移行記録](decisions/2026-09-25-development-workflow.jp.md) |
+| R0-01〜R0-06 | SOL-1〜SOL-6 | 完了済み。手順書はtag `archive/pre-two-products-2026-10-04`。SOL-1の参照候補は[HU Postflop参照候補](plans/hu-postflop-validation/README.md)へ移した |
+| M0〜M8 | 未起票（再編の承認後） | [再構築計画](plans/two-product-restructure.jp.md)第4節 |
 
-設計・受入上の必須前提はGitの作業票で定義する。Linearのblocked-byは実行時の待ち関係を表す。
-必須前提が変わった場合は作業票を更新し、その影響をLinearの待ち関係へ反映する。
-後続のR1〜R7も上の既存Projectを使う。[全体実行計画](plans/solver-implementation-plan.jp.md)のIDで
-既存Issueを確認し、未起票で着手に必要な単位だけ追加する。
+設計・受入上の必須前提はGitの計画で定義する。Linearのblocked-byは実行時の待ち関係を表す。
+必須前提が変わった場合は計画を更新し、その影響をLinearの待ち関係へ反映する。
 
 ## 運用
 
@@ -57,7 +48,7 @@ workspace URLとteam IDが上記に一致することを確認する。対象が
 既存のBacklog・Todo・In Progress・In Review・Done・Canceled・Duplicateを使う。
 実装・文書等が揃って検証・レビュー待ちならIn Reviewとし、必要な確認を記録する。
 作業継続中はIn Progress、保留はブロッカーと再開条件を記録する。
-Issueの状態を示すためだけに、このファイルやロードマップの日付を更新しない。
+Issueの状態を示すためだけに、このファイルや計画の日付を更新しない。
 
 Linearへ接続できない場合は、既知の受入条件で独立作業を進められるが、状態を推測して確定しない。
 接続障害と未反映の更新を引継ぎに明記し、復旧後にLinearへ反映する。一時記録を第二の状態台帳に育てない。

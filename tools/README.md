@@ -22,7 +22,8 @@ The documentation checker scans root Markdown files and Markdown under `docs/`,
 `tools/`, `examples/`, and `crates/`. It skips fenced and inline code links,
 remote URLs, and heading anchors. Historical `experiments/` documents are not
 scanned, but links into them from current documentation must resolve. Research
-surveys may mention old plan paths as historical text; their actual links must
+surveys under `docs/research/` and decision records under `docs/decisions/` may
+mention retired document paths as historical text; their actual links must
 still resolve. This is a file-link check, not a complete Markdown parser or a
 remote-link/anchor validator. It does not duplicate task state from Linear.
 
@@ -39,5 +40,6 @@ The old Multiway benchmark and cloud runners are retained with the
 [`multiway-2026-09` experiment](../experiments/multiway-2026-09/README.md)
 or in Git history. They are not current development commands.
 
-Current development priorities are in the
-[product roadmap](../docs/product-roadmap.jp.md).
+The products and their quality goals are defined in
+[docs/products.jp.md](../docs/products.jp.md); the migration steps are in the
+[restructure plan](../docs/plans/two-product-restructure.jp.md).
