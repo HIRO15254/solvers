@@ -1065,7 +1065,7 @@ mod estimate_tests {
 #[cfg(test)]
 mod deviator_visit_counter_tests {
     use super::*;
-    use cards::Range;
+    use nlh::Range;
 
     /// One own decision immediately before terminal values 4 and 2.
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]

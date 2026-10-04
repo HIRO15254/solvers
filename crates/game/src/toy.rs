@@ -5,8 +5,8 @@
 //! values, exploitability decay) exercises the same `TempNode` compilation,
 //! payoff baking, chance masks, and solver walks as real poker games.
 
-use cards::{Chips, PerPlayer, Player, Street};
 use engine::{CompiledGame, PublicTree, ReachMap, TempNode, TerminalEvaluator, TreeSpec};
+use nlh::{Chips, PerPlayer, Player, Street};
 
 use crate::payoff::{BakedPayoffs, Outcome, PayoffPipeline, TerminalDescriptor, TerminalKind};
 

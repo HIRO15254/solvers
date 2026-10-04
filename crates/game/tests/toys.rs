@@ -2,9 +2,9 @@
 //! exercise the full production path: spec -> TempNode -> PublicTree ->
 //! payoff baking -> vector CFR -> best-response exploitability.
 
-use cards::Player;
 use engine::{CfrPlus, Dcfr, DiscountSchedule, F32Storage, Solver, Vanilla};
 use game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake, ToyGame};
+use nlh::Player;
 
 fn solve(
     game: ToyGame,

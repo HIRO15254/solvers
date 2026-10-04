@@ -7,12 +7,12 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use cards::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
 use engine::{
     CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
 };
 use game::PayoffPipeline;
 use holdem::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
+use nlh::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
 use crate::postflop_setup;
@@ -579,7 +579,7 @@ impl<'a> Repl<'a> {
             println!("error: combos only works at an action node");
             return;
         }
-        let class_range = match arg.parse::<cards::Range>() {
+        let class_range = match arg.parse::<nlh::Range>() {
             Ok(r) => r,
             Err(e) => {
                 println!("error: parsing {arg:?}: {e}");

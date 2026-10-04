@@ -7,11 +7,11 @@
 
 use std::collections::HashMap;
 
-use cards::{Card, CardSet, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 use cfr_ref::{RefGame, best_response_value, expected_value};
 use engine::{Dcfr, F32Storage, NodeKind, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use nlh::{Card, CardSet, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 const BOARD: &str = "Ks Qs 7h 2d";
 const P0_RANGE: &str = "AhAd,QhQd,7c7d";
@@ -261,8 +261,8 @@ fn engine_game() -> holdem::PostflopGame {
         &PostflopConfig {
             board: board_cards().to_vec(),
             ranges: PerPlayer::new(P0_RANGE.parse().unwrap(), P1_RANGE.parse().unwrap()),
-            pot: cards::Chips(POT),
-            effective_stack: cards::Chips(STACK),
+            pot: nlh::Chips(POT),
+            effective_stack: nlh::Chips(STACK),
             streets: PerStreet {
                 flop: StreetTree::pot_fractions(&[], &[], 0),
                 turn: StreetTree::pot_fractions(&[1.0], &[1.0], 1),

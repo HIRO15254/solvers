@@ -2,8 +2,8 @@
 //! mapping goldens, class-level weight/average summaries, and showdown
 //! equity goldens at the river, turn, and flop.
 
-use cards::{Card, NUM_COMBOS, PerPlayer, Player, Range, combo_index};
 use holdem::{class_average, class_of_combo, class_weights, range_equity};
+use nlh::{Card, NUM_COMBOS, PerPlayer, Player, Range, combo_index};
 
 fn parse_board(s: &str) -> Vec<Card> {
     s.split_whitespace().map(|c| c.parse().unwrap()).collect()
@@ -15,7 +15,7 @@ fn combo(a: &str, b: &str) -> usize {
 
 #[test]
 fn class_mapping_goldens() {
-    // Cell indices anchored by `cards::range`'s own `class_index_layout`
+    // Cell indices anchored by `nlh::range`'s own `class_index_layout`
     // golden test: AA is the top-left diagonal cell (0), AKs the cell just
     // right of it (1), AKo its mirror below the diagonal (13).
     assert_eq!(

@@ -10,11 +10,11 @@
 
 use std::time::Duration;
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use engine::TerminalEvaluator;
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{RiverConfig, RiverGame, build_river_game};
+use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {

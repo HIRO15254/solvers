@@ -25,7 +25,7 @@ mod ehs;
 pub use buckets::{BucketCacheError, CACHE_FORMAT_VERSION, Ehs2Abstraction, Ehs2Params};
 pub use ehs::{ehs2, hand_strength};
 
-use cards::{Card, Street};
+use nlh::{Card, Street};
 
 /// Build-time mapping from a concrete (board, hole-combo) situation to its
 /// abstract bucket.
@@ -37,7 +37,7 @@ pub trait CardAbstraction: Send + Sync {
     /// and must not be queried).
     fn num_buckets(&self, street: Street) -> u32;
 
-    /// Bucket of `combo` (a `cards::combo_index`) on `board` (3, 4, or 5
+    /// Bucket of `combo` (a `nlh::combo_index`) on `board` (3, 4, or 5
     /// cards — the length selects the street). Panics if the combo shares a
     /// card with the board or the street was not built.
     fn bucket(&self, board: &[Card], combo: usize) -> u32;

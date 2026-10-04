@@ -1,6 +1,6 @@
 //! Multiway's tree-rule condition dialect and evaluator.
 //!
-//! This is a thin adapter over `cards::script`'s generic condition grammar
+//! This is a thin adapter over `nlh::script`'s generic condition grammar
 //! (`Vars`, `Condition<V>`, `Dialect<V>`, `VarSource<V>`) -- the same front
 //! end postflop's `.tree` scripts use -- providing the fifteen variables
 //! multiway's `when` strings and `.mwtree` scripts read. `TreeRule::compiled`
@@ -10,7 +10,7 @@
 //! rule up front), and cached from then on -- `matches` below never
 //! reparses a string per decision node the way the old flat scanner did.
 //!
-//! Reusing `cards::script` also retires three bugs the old hand-rolled
+//! Reusing `nlh::script` also retires three bugs the old hand-rolled
 //! byte-position parser carried: it stripped comments with
 //! `line.split('#')`, so a `#` inside a string literal truncated the line;
 //! it cast `bytes[index] as char`, so a non-ASCII byte got mangled into
@@ -20,8 +20,8 @@
 
 use std::collections::BTreeMap;
 
-use cards::SizeUnit;
-use cards::script::{
+use nlh::SizeUnit;
+use nlh::script::{
     ActionKind, Condition, Dialect, Script, ScriptError, Value, VarKind, VarSource, Vars,
 };
 
@@ -30,7 +30,7 @@ use crate::config::{RuleStreet, TreeRule};
 use crate::types::SeatId;
 
 /// One named variable multiway's tree-rule conditions can read -- the same
-/// fifteen the old `context_value` resolved, ported onto `cards::script`'s
+/// fifteen the old `context_value` resolved, ported onto `nlh::script`'s
 /// generic condition grammar.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum MultiwayVar {
@@ -115,10 +115,10 @@ const ALL_MULTIWAY_VARS: &[MultiwayVar] = &[
 pub(crate) static MULTIWAY: Dialect<MultiwayVar> = Dialect {
     vars: ALL_MULTIWAY_VARS,
     streets: &[
-        ("preflop", cards::Street::Preflop),
-        ("flop", cards::Street::Flop),
-        ("turn", cards::Street::Turn),
-        ("river", cards::Street::River),
+        ("preflop", nlh::Street::Preflop),
+        ("flop", nlh::Street::Flop),
+        ("turn", nlh::Street::Turn),
+        ("river", nlh::Street::River),
     ],
     actions: &[
         ActionKind::Fold,
@@ -178,7 +178,7 @@ pub(crate) fn compile(source: &str) -> Result<Condition<MultiwayVar>, ScriptErro
 
 /// Compiles a whole `.mwtree` script against [`MULTIWAY`], applying
 /// `overrides` to any `param` it declares, and lowers the result straight to
-/// [`TreeRule`]s -- the same `cards::script` front end (tokenizing,
+/// [`TreeRule`]s -- the same `nlh::script` front end (tokenizing,
 /// substitution, nesting, `if`/`else`, `param`/`define`) postflop's `.tree`
 /// scripts compile through, so this is the whole answer to "put multiway's
 /// tree script on the same front end as postflop's". This is the only
@@ -189,7 +189,7 @@ pub(crate) fn compile(source: &str) -> Result<Condition<MultiwayVar>, ScriptErro
 /// Every rule gets `priority` 100 (ties with every other script rule, so
 /// `Vec<TreeRule>`'s sort-by-`(priority, source_order)` is a no-op and
 /// source order -- the flattened script's own order -- decides, matching
-/// `cards::script::Rule<V>`'s own "no priority field, source order is the
+/// `nlh::script::Rule<V>`'s own "no priority field, source order is the
 /// whole model") and `source_order` set to its position in the flattened
 /// list, matching what the old flat scanner already did (it hardcoded the
 /// same 100 for the same reason).
@@ -216,16 +216,16 @@ pub fn compile_script(
         .collect())
 }
 
-/// `cards::Street` has no `Postflop` catch-all (only the typed `[[..rules]]`
+/// `nlh::Street` has no `Postflop` catch-all (only the typed `[[..rules]]`
 /// TOML surface's [`RuleStreet`] does, and `.mwtree` scripts dropped that
 /// keyword -- see the module docs on `MULTIWAY`), so every variant maps
 /// straight across.
-fn to_rule_street(street: cards::Street) -> RuleStreet {
+fn to_rule_street(street: nlh::Street) -> RuleStreet {
     match street {
-        cards::Street::Preflop => RuleStreet::Preflop,
-        cards::Street::Flop => RuleStreet::Flop,
-        cards::Street::Turn => RuleStreet::Turn,
-        cards::Street::River => RuleStreet::River,
+        nlh::Street::Preflop => RuleStreet::Preflop,
+        nlh::Street::Flop => RuleStreet::Flop,
+        nlh::Street::Turn => RuleStreet::Turn,
+        nlh::Street::River => RuleStreet::River,
     }
 }
 

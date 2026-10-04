@@ -135,7 +135,7 @@ struct ResourcePreflightAbstraction {
 impl MultiwayAbstraction for ResourcePreflightAbstraction {
     fn num_buckets(&self, street: Street, active_opponents: u8) -> u32 {
         if street == Street::Preflop {
-            return cards::NUM_CLASSES as u32;
+            return nlh::NUM_CLASSES as u32;
         }
         let profile = self.config.buckets_for(active_opponents);
         match street {
@@ -960,11 +960,7 @@ fn build_ehs2_table_abstraction(
     }
     let cached = cache.is_some_and(Path::is_file);
     let start = Instant::now();
-    let streets = [
-        cards::Street::Flop,
-        cards::Street::Turn,
-        cards::Street::River,
-    ];
+    let streets = [nlh::Street::Flop, nlh::Street::Turn, nlh::Street::River];
     let table = Ehs2Abstraction::load_or_build(params, &streets, cache);
     eprintln!(
         "ehs2 tables: {} in {:.2}s",

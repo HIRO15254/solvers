@@ -12,7 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 abstraction = { workspace = true }
-cards = { workspace = true }
+nlh = { workspace = true }
 engine = { workspace = true, features = ["serde"] }
 formats = { workspace = true }
 game = { workspace = true }

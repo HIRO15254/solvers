@@ -11,7 +11,7 @@
 //! whole run is reproducible from `(seed, iteration count)` alone, and a
 //! snapshot mid-run can resume bit-for-bit (see [`McSolverState`]).
 
-use cards::{PerPlayer, Player};
+use nlh::{PerPlayer, Player};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use cards::{PerPlayer, Player};
+use nlh::{PerPlayer, Player};
 use rayon::prelude::*;
 
 use crate::schedule::{DiscountSchedule, Discounts};

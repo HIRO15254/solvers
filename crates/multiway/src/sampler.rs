@@ -8,8 +8,8 @@
 //! deck and shared by every branch of an external-sampling traversal.
 
 #[cfg(test)]
-use cards::ALL_CARDS;
-use cards::{Card, CardSet, NUM_COMBOS, Range, combo_cards, combo_index};
+use nlh::ALL_CARDS;
+use nlh::{Card, CardSet, NUM_COMBOS, Range, combo_cards, combo_index};
 use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -340,7 +340,7 @@ impl DealSampler {
     }
 
     fn sample_uniform_world<R: Rng + ?Sized>(&self, rng: &mut R) -> SampledWorld {
-        let mut deck: [Card; cards::NUM_CARDS] =
+        let mut deck: [Card; nlh::NUM_CARDS] =
             std::array::from_fn(|index| Card::from_index(index as u8));
         deck.shuffle(rng);
         let mut offset = 0;
@@ -452,7 +452,7 @@ fn is_uniform_full_range(range: &Range) -> bool {
 }
 
 fn draw_runout<R: Rng + ?Sized>(dead: CardSet, rng: &mut R) -> [Card; 5] {
-    let mut deck: [Card; cards::NUM_CARDS] =
+    let mut deck: [Card; nlh::NUM_CARDS] =
         std::array::from_fn(|index| Card::from_index(index as u8));
     let mut live_len = 0;
     for source in 0..deck.len() {

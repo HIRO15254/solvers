@@ -2,10 +2,10 @@
 //! O(n^2) reference, and a full solve against the closed-form solution of
 //! the clairvoyance (polarized-vs-bluffcatcher) game.
 
-use cards::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 use engine::{Dcfr, F32Storage, Solver, TerminalEvaluator};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{RiverConfig, RiverGame, build_river_game};
+use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -47,7 +47,7 @@ fn naive_showdown(board_cards: [Card; 5], p: Player, opp_reach: &[f32]) -> Vec<f
         let (c1, c2) = combo_cards(combo);
         rank_of(board_cards.iter().copied().chain([c1, c2]))
     };
-    let ranks: std::collections::HashMap<usize, cards::HandRank> =
+    let ranks: std::collections::HashMap<usize, nlh::HandRank> =
         live.iter().map(|&c| (c, rank(c))).collect();
     // Check-check terminal of a pot-2 game: win +1, tie 0, lose -1 for
     // either player by symmetry.

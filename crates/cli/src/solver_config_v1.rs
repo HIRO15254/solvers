@@ -20,8 +20,8 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::script::{ActionKind, Effect, ParamKind, ParamSchema, PostflopVar, Rule, Script};
-use cards::{SizeSpec, SizeUnit, Street};
+use nlh::script::{ActionKind, Effect, ParamKind, ParamSchema, PostflopVar, Rule, Script};
+use nlh::{SizeSpec, SizeUnit, Street};
 use serde::{Deserialize, Serialize};
 
 use crate::config::{
@@ -485,15 +485,15 @@ fn validate_rule_sizes(rules: &[Rule<PostflopVar>]) -> Result<()> {
         let label = format!(
             "a {} rule on {}",
             match rule.action {
-                Some(cards::script::ActionKind::Bet) => "bet",
-                Some(cards::script::ActionKind::Raise) => "raise",
+                Some(nlh::script::ActionKind::Bet) => "bet",
+                Some(nlh::script::ActionKind::Raise) => "raise",
                 None => "checkdown",
-                // `POSTFLOP`'s dialect (`cards::script::cond::POSTFLOP`)
+                // `POSTFLOP`'s dialect (`nlh::script::cond::POSTFLOP`)
                 // lists only `bet`/`raise` as accepted action words, so a
                 // compiled postflop rule never carries any other action.
-                Some(cards::script::ActionKind::Fold)
-                | Some(cards::script::ActionKind::Check)
-                | Some(cards::script::ActionKind::Call) => {
+                Some(nlh::script::ActionKind::Fold)
+                | Some(nlh::script::ActionKind::Check)
+                | Some(nlh::script::ActionKind::Call) => {
                     unreachable!("postflop's dialect only accepts bet/raise actions")
                 }
             },
@@ -838,7 +838,7 @@ struct ParamDiagnostic {
     /// The *effective* default -- the script's own `param` value, overridden
     /// by `[game.tree.params]` where present (`ParamSchema::default` is
     /// already resolved that way; see `resolve_declarations` in
-    /// `cards::script::parse`). A JSON number/bool for `number`/`bool`
+    /// `nlh::script::parse`). A JSON number/bool for `number`/`bool`
     /// params, so a numeric default round-trips as JSON's own number type
     /// instead of a quoted string.
     default: serde_json::Value,
@@ -893,7 +893,7 @@ fn render_param(param: &ParamSchema) -> ParamDiagnostic {
 /// integer so a config that wrote a bare integer (`cb = 40`) round-trips as
 /// JSON's own integer type rather than picking up a synthetic `.0`.
 /// `ParamKind::Number` is only ever inferred when `default` already parses
-/// as `f64` (`infer_param_kind` in `cards::script::parse`), so the `f64`
+/// as `f64` (`infer_param_kind` in `nlh::script::parse`), so the `f64`
 /// fallback parse never actually fails; `unwrap_or` covers it rather than
 /// panicking on a diagnostic path.
 fn param_number_value(default: &str) -> serde_json::Value {
@@ -909,7 +909,7 @@ fn param_number_value(default: &str) -> serde_json::Value {
 fn render_rule(rule: &Rule<PostflopVar>) -> RuleDiagnostic {
     RuleDiagnostic {
         street: street_name(rule.street),
-        // `Condition<V>`'s own `Display` impl (`cards::script::cond`) is the
+        // `Condition<V>`'s own `Display` impl (`nlh::script::cond`) is the
         // one condition-to-text renderer; multiway's `.mwtree` frontend
         // reuses the exact same impl for its own dialect.
         condition: rule.condition.to_string(),
@@ -966,7 +966,7 @@ fn effect_name(effect: Effect) -> &'static str {
 }
 
 // A rule's `Condition<PostflopVar>` renders back to source-like text via its
-// own `Display` impl in `cards::script::cond` -- see `render_rule` above.
+// own `Display` impl in `nlh::script::cond` -- see `render_rule` above.
 // That impl is shared with multiway's `.mwtree` frontend, which has no other
 // source text for a rule whose condition is a nested `when`/`if`
 // composition.

@@ -13,6 +13,8 @@ mod set;
 mod sizing;
 mod types;
 
+pub mod iso;
+
 /// Tree-script front end: `.tree` source in, compiled rules out. Kept a
 /// module rather than re-exported flat, because `Rule`, `Effect`, `Var` and
 /// `Literal` are generic enough names to want the `script::` qualifier at

@@ -2,7 +2,7 @@
 //! path (display/reporting): built for correctness and reuse of the terminal
 //! kernels in [`crate::kernel`], not for the solve loop.
 
-use cards::{Card, CardSet, HandRank, NUM_COMBOS, PerPlayer, Player, combo_cards, rank_of};
+use nlh::{Card, CardSet, HandRank, NUM_COMBOS, PerPlayer, Player, combo_cards, rank_of};
 
 use crate::kernel;
 
@@ -29,7 +29,7 @@ fn rank_table(board5: &[Card; 5]) -> Vec<(HandRank, u32)> {
 /// returned runout is equally likely.
 fn runouts(board: &[Card]) -> Vec<Vec<Card>> {
     let board_set: CardSet = board.iter().copied().collect();
-    let remaining: Vec<Card> = cards::ALL_CARDS
+    let remaining: Vec<Card> = nlh::ALL_CARDS
         .into_iter()
         .filter(|c| !board_set.contains(*c))
         .collect();

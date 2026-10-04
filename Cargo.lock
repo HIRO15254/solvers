@@ -6,8 +6,7 @@ version = 4
 name = "abstraction"
 version = "0.1.0"
 dependencies = [
- "cards",
- "hand-index",
+ "nlh",
  "postcard",
  "rayon",
  "serde",
@@ -187,16 +186,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
-name = "cards"
-version = "0.1.0"
-dependencies = [
- "aya_poker",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "cast"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -304,7 +293,6 @@ dependencies = [
  "abstraction",
  "anyhow",
  "blake3",
- "cards",
  "clap",
  "engine",
  "formats",
@@ -312,6 +300,7 @@ dependencies = [
  "holdem",
  "libc",
  "multiway",
+ "nlh",
  "rand",
  "rand_chacha",
  "rayon",
@@ -464,8 +453,8 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 name = "engine"
 version = "0.1.0"
 dependencies = [
- "cards",
  "criterion",
+ "nlh",
  "rand",
  "rand_chacha",
  "rayon",
@@ -543,9 +532,9 @@ dependencies = [
 name = "game"
 version = "0.1.0"
 dependencies = [
- "cards",
  "cfr-ref",
  "engine",
+ "nlh",
 ]
 
 [[package]]
@@ -594,13 +583,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hand-index"
-version = "0.1.0"
-dependencies = [
- "cards",
-]
-
-[[package]]
 name = "hash32"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -645,12 +627,11 @@ checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
 name = "holdem"
 version = "0.1.0"
 dependencies = [
- "cards",
  "cfr-ref",
  "criterion",
  "engine",
  "game",
- "hand-index",
+ "nlh",
  "rayon",
 ]
 
@@ -771,8 +752,8 @@ version = "0.1.0"
 dependencies = [
  "abstraction",
  "blake3",
- "cards",
  "libc",
+ "nlh",
  "postcard",
  "rand",
  "rand_chacha",
@@ -784,6 +765,16 @@ dependencies = [
  "thiserror",
  "toml",
  "zstd",
+]
+
+[[package]]
+name = "nlh"
+version = "0.1.0"
+dependencies = [
+ "aya_poker",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

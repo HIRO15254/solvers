@@ -11,12 +11,12 @@
 
 use std::time::Duration;
 
-use cards::{PerPlayer, Player};
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use engine::{
     Discounts, F32Storage, I16Storage, PublicTree, ReachMap, SparseTransition, Storage, StorageOps,
     StorageRef, TempNode, TreeSpec,
 };
+use nlh::{PerPlayer, Player};
 
 /// A typical postflop action node: bet/call/fold-shaped (3 actions) over
 /// every hold'em combo (1,326 hands).

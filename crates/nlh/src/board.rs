@@ -159,9 +159,8 @@ mod tests {
     }
 
     /// All 24 permutations of the four suits, generated inline rather than
-    /// via `hand-index`'s permutation machinery: `cards` cannot depend on
-    /// `hand-index`, and a test should not be validated by the same code it
-    /// validates.
+    /// via `nlh::iso`'s permutation machinery, so the test is independent
+    /// of the implementation it validates.
     fn all_suit_permutations() -> Vec<[u8; 4]> {
         let mut perms = Vec::with_capacity(24);
         let suits = [0u8, 1, 2, 3];

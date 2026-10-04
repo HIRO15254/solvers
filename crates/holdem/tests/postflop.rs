@@ -5,14 +5,14 @@
 
 use std::time::Instant;
 
-use cards::script::{ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, Rule};
-use cards::{
-    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
-    combo_cards, rank_of,
-};
 use engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game, memory_usage};
+use nlh::script::{ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, Rule};
+use nlh::{
+    ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
+    combo_cards, rank_of,
+};
 use rayon::prelude::*;
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -1136,7 +1136,7 @@ fn member_branch_matches_suit_permuted_rep_branch() {
     };
     // Turn checks through; compare the 8c and 8d river branches under the
     // clubs<->diamonds swap ([1, 0, 2, 3] in suit order c, d, h, s).
-    let perm: hand_index::SuitPerm = [1, 0, 2, 3];
+    let perm: nlh::iso::SuitPerm = [1, 0, 2, 3];
     let node_c = find("xx[8c]");
     let node_d = find("xx[8d]");
     let sig_c = solver.average_strategy_at(node_c);
@@ -1148,7 +1148,7 @@ fn member_branch_matches_suit_permuted_rep_branch() {
                 continue;
             }
             let x = sig_c[a * NUM_COMBOS + combo];
-            let y = sig_d[a * NUM_COMBOS + hand_index::permute_combo(&perm, combo)];
+            let y = sig_d[a * NUM_COMBOS + nlh::iso::permute_combo(&perm, combo)];
             assert!(
                 (x - y).abs() < 1e-3,
                 "branches not suit-symmetric: action {a} combo {combo}: {x} vs {y}"
@@ -2013,7 +2013,7 @@ fn node_info_records_the_pot_contribution_at_each_node() {
         .expect("root node info");
     assert_eq!(root.contrib[Player::P0], Chips(10));
     assert_eq!(root.contrib[Player::P1], Chips(10));
-    assert_eq!(root.street, cards::Street::River);
+    assert_eq!(root.street, nlh::Street::River);
 
     // After OOP bets 10 (50% of a 20 pot) the pot at that node is 30.
     let faced = game

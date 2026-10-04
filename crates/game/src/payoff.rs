@@ -1,4 +1,4 @@
-use cards::{Chips, PerPlayer, Player, Street};
+use nlh::{Chips, PerPlayer, Player, Street};
 
 /// Everything a rake or utility model may depend on at a terminal. Emitted
 /// by variant rules at tree-build time; never seen by the engine.

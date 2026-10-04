@@ -11,7 +11,7 @@
 //! board, not one per hero) and does not call these functions in its hot
 //! loop.
 
-use cards::{Card, CardSet, NUM_COMBOS, combo_cards, rank_of};
+use nlh::{Card, CardSet, NUM_COMBOS, combo_cards, rank_of};
 
 /// Hero's hand strength on a complete 5-card board against a uniform
 /// random opponent: `(wins + ties / 2) / opponents`, where opponents are
@@ -73,7 +73,7 @@ pub fn ehs2(board: &[Card], hole: (Card, Card)) -> (f64, f64) {
             let mut sum_hs = 0.0;
             let mut sum_hs2 = 0.0;
             let mut n = 0u32;
-            for river in cards::ALL_CARDS {
+            for river in nlh::ALL_CARDS {
                 if dead.contains(river) {
                     continue;
                 }
@@ -87,7 +87,7 @@ pub fn ehs2(board: &[Card], hole: (Card, Card)) -> (f64, f64) {
             (sum_hs / n as f64, sum_hs2 / n as f64)
         }
         3 => {
-            let remaining: Vec<Card> = cards::ALL_CARDS
+            let remaining: Vec<Card> = nlh::ALL_CARDS
                 .into_iter()
                 .filter(|&c| !dead.contains(c))
                 .collect();
@@ -171,7 +171,7 @@ mod tests {
         let mut sum_hs = 0.0;
         let mut sum_hs2 = 0.0;
         let mut n = 0u32;
-        for river in cards::ALL_CARDS {
+        for river in nlh::ALL_CARDS {
             if dead.contains(river) {
                 continue;
             }

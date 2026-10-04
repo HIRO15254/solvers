@@ -40,8 +40,8 @@
 
 use std::fmt;
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
 use engine::{NodeId, NodeKind, PublicTree};
+use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
 
 use crate::postflop::{PerStreet, PostflopConfig, StreetTree};
 

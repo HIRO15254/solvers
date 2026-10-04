@@ -1,7 +1,7 @@
 //! Suit-isomorphism canonicalization for boards and chance deals.
 //!
 //! Two boards are strategically identical if one maps onto the other by a
-//! permutation of the four suits. This crate provides:
+//! permutation of the four suits. This module provides:
 //!
 //! - [`canonicalize_board`]: the canonical representative of a board,
 //! - [`canonical_flops`]: the 1,755 canonical flops with multiplicities,
@@ -16,7 +16,7 @@
 //! abstraction cache keys) is planned for a later milestone; this module
 //! only handles boards, which is all the exact postflop solver needs.
 
-use cards::{Card, Suit};
+use crate::{Card, Suit};
 
 /// A permutation of the four suits; `perm[s]` is the image of suit `s`.
 pub type SuitPerm = [Suit; 4];
@@ -133,8 +133,8 @@ pub fn permute_card(perm: &SuitPerm, card: Card) -> Card {
 
 /// Applies a suit permutation to a two-card combo index.
 pub fn permute_combo(perm: &SuitPerm, combo: usize) -> usize {
-    let (a, b) = cards::combo_cards(combo);
-    cards::combo_index(apply_perm(perm, a), apply_perm(perm, b))
+    let (a, b) = crate::combo_cards(combo);
+    crate::combo_index(apply_perm(perm, a), apply_perm(perm, b))
 }
 
 /// For each member of a deal group, one permutation from `stab` mapping the
@@ -161,7 +161,7 @@ pub fn deal_groups_with(board: &Board, dead: &[Card], allowed: &[SuitPerm]) -> V
     let used: Vec<Card> = board.cards().chain(dead.iter().copied()).collect();
     let mut groups: Vec<DealGroup> = Vec::new();
     let mut assigned = [false; 52];
-    for card in cards::ALL_CARDS {
+    for card in crate::ALL_CARDS {
         if assigned[card.index()] || used.contains(&card) {
             continue;
         }

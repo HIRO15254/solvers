@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 12 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 11 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -51,8 +51,7 @@ crates/
 ├── cli/          # solvers: 公開schema/normalizer、session、run lifecycle、artifact query
 ├── protocol/     # daemon の versioned request/response 型
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
-├── cards/        # card/range/evaluator、HU基本型、bet size、tree-script front end
-├── hand-index/   # suit-isomorphism の canonicalization / index
+├── nlh/          # card/range/evaluator、HU基本型、bet size、tree-script front end、suit同型
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── engine/       # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── game/         # payoff pipeline、production tree を使う Kuhn/Leduc
@@ -66,19 +65,19 @@ crates/
 外部ライブラリと dev-dependency は省略する。
 
 ```text
-cards, cfr-ref                       → workspace内の通常依存なし
-hand-index, engine                  → cards
-game                                → cards, engine
-holdem                              → cards, hand-index, engine, game
-abstraction                         → cards, hand-index
-multiway                            → cards, abstraction
+nlh, cfr-ref                        → workspace内の通常依存なし
+engine                              → nlh
+game                                → nlh, engine
+holdem                              → nlh, engine, game
+abstraction                         → nlh
+multiway                            → nlh, abstraction
 formats                             → engine
 protocol                            → formats
 daemon                              → formats, protocol
-cli                                 → cards, abstraction, engine, game, holdem, multiway, formats
+cli                                 → nlh, abstraction, engine, game, holdem, multiway, formats
 ```
 
-`engine` は `cards::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
+`engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
 ルールには依存しない。`formats` は HU checkpoint の `engine::SolverState` を保存するため
 engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
 `crates/multiway/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は

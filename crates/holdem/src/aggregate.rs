@@ -1,12 +1,12 @@
 //! Range-level aggregation: mapping combos to their 13x13 preflop class
-//! (see [`cards::class_index`]) and summarizing per-combo values (weights,
+//! (see [`nlh::class_index`]) and summarizing per-combo values (weights,
 //! weight-averaged values) by class. Used for reporting/display, not by any
 //! solve path.
 
-use cards::{NUM_CLASSES, NUM_COMBOS, class_index, combo_cards};
+use nlh::{NUM_CLASSES, NUM_COMBOS, class_index, combo_cards};
 
 /// The 13x13 class index of a combo: same rank pair, suited-ness, as
-/// [`cards::class_index`]. `combo_cards` always returns the higher-rank card
+/// [`nlh::class_index`]. `combo_cards` always returns the higher-rank card
 /// first (see its doc comment), so `hi.rank() >= lo.rank()` holds here.
 pub fn class_of_combo(combo: usize) -> usize {
     let (hi, lo) = combo_cards(combo);
@@ -14,7 +14,7 @@ pub fn class_of_combo(combo: usize) -> usize {
 }
 
 /// Sum of combo weights per class. `weights` must have length
-/// [`cards::NUM_COMBOS`].
+/// [`nlh::NUM_COMBOS`].
 pub fn class_weights(weights: &[f32]) -> [f64; NUM_CLASSES] {
     assert_eq!(weights.len(), NUM_COMBOS, "weights must cover every combo");
     let mut out = [0.0f64; NUM_CLASSES];
@@ -26,7 +26,7 @@ pub fn class_weights(weights: &[f32]) -> [f64; NUM_CLASSES] {
 
 /// Weight-averaged per-class value: `sum(w * v) / sum(w)` per class, `0.0`
 /// where the class has zero total weight. `weights` and `per_combo` must
-/// both have length [`cards::NUM_COMBOS`].
+/// both have length [`nlh::NUM_COMBOS`].
 pub fn class_average(weights: &[f32], per_combo: &[f32]) -> [f64; NUM_CLASSES] {
     assert_eq!(weights.len(), NUM_COMBOS, "weights must cover every combo");
     assert_eq!(

@@ -3,9 +3,9 @@ use std::collections::BTreeMap;
 use std::str::FromStr;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::Street;
-use cards::script::{POSTFLOP, PostflopVar, Script};
 use holdem::{PerStreet, StreetTree};
+use nlh::Street;
+use nlh::script::{POSTFLOP, PostflopVar, Script};
 use serde::{Deserialize, Serialize};
 
 /// Parses either the legacy shared solver schema or the dedicated Multiway
@@ -219,7 +219,7 @@ pub enum GameSection {
         /// any -- exists only to define the tree script's `cbet`/`donk`
         /// variables on the starting street. Kept as the raw declared
         /// string (`"oop"` / `"ip"` / `"none"`); `postflop_setup` resolves
-        /// it to `Option<cards::Player>` at solve time, the same way
+        /// it to `Option<nlh::Player>` at solve time, the same way
         /// `board`/`oop_range`/`ip_range` stay strings here and are parsed
         /// downstream.
         #[serde(default = "default_preflop_aggressor")]
@@ -383,7 +383,7 @@ impl TreeSection {
 }
 
 /// Converts `[game.tree.params]`'s TOML values into the single-token strings
-/// `cards::script::Script::compile`'s `overrides` expect -- the same
+/// `nlh::script::Script::compile`'s `overrides` expect -- the same
 /// scalar-only conversion Multiway Preflop's `.mwtree` `params` table uses
 /// (`crate::multiway_v1::lower_tree_script` reuses this directly).
 pub(crate) fn param_overrides(

@@ -9,7 +9,7 @@
 //! `holdem::viewer`) that needs a trunk subtree's entry reach to seed a
 //! fresh subgame.
 
-use cards::{PerPlayer, Player};
+use nlh::{PerPlayer, Player};
 
 use crate::storage::StorageRef;
 use crate::tree::{NodeId, NodeKind, PublicTree, ReachMap};

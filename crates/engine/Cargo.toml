@@ -7,7 +7,7 @@ repository.workspace = true
 description = "Hot core: public game tree, regret/strategy storage, discount schedules, vector-form CFR, accelerated best response"
 
 [dependencies]
-cards = { workspace = true }
+nlh = { workspace = true }
 rayon = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }

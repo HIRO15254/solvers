@@ -9,11 +9,11 @@
 
 use std::time::Duration;
 
-use cards::{Card, Chips, PerPlayer, Range};
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use engine::{Dcfr, F32Storage, ParConfig, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline};
 use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use nlh::{Card, Chips, PerPlayer, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {

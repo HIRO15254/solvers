@@ -112,9 +112,9 @@ fn parse_history(
     Ok(current)
 }
 
-fn parse_runtime_range(raw: &str) -> Result<cards::Range> {
+fn parse_runtime_range(raw: &str) -> Result<nlh::Range> {
     if raw.trim().is_empty() {
-        Ok(cards::Range::full())
+        Ok(nlh::Range::full())
     } else {
         Ok(raw.parse()?)
     }
@@ -149,7 +149,7 @@ fn strategy_matrix(
         .iter()
         .map(|entry| (entry.key, entry.weight))
         .collect();
-    let cells = (0..cards::NUM_CLASSES)
+    let cells = (0..nlh::NUM_CLASSES)
         .map(|bucket| {
             let block = strategies.iter().find(|block| {
                 block.key.history == history
@@ -194,15 +194,15 @@ fn range_matrix(
         .iter()
         .map(|seat| {
             let parsed = parse_runtime_range(&seat.range)?;
-            let mut classes = vec![Some(0.0_f64); cards::NUM_CLASSES];
-            for combo in 0..cards::NUM_COMBOS {
-                let (first, second) = cards::combo_cards(combo);
+            let mut classes = vec![Some(0.0_f64); nlh::NUM_CLASSES];
+            for combo in 0..nlh::NUM_COMBOS {
+                let (first, second) = nlh::combo_cards(combo);
                 let (hi, lo) = if first.rank() >= second.rank() {
                     (first, second)
                 } else {
                     (second, first)
                 };
-                let class = cards::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit());
+                let class = nlh::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit());
                 *classes[class].as_mut().expect("initialized") += f64::from(parsed.weight(combo));
             }
             Ok::<_, anyhow::Error>(classes)
@@ -1012,13 +1012,13 @@ fn evaluate_value(
 }
 
 fn combo_class(combo: usize) -> usize {
-    let (first, second) = cards::combo_cards(combo);
+    let (first, second) = nlh::combo_cards(combo);
     let (hi, lo) = if first.rank() >= second.rank() {
         (first, second)
     } else {
         (second, first)
     };
-    cards::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit())
+    nlh::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit())
 }
 
 fn explicit_range(weights: &[f32]) -> Result<String> {
@@ -1031,7 +1031,7 @@ fn explicit_range(weights: &[f32]) -> Result<String> {
         .enumerate()
         .filter(|(_, weight)| **weight > 0.0)
         .map(|(combo, weight)| {
-            let (first, second) = cards::combo_cards(combo);
+            let (first, second) = nlh::combo_cards(combo);
             format!("{first}{second}:{}", weight / maximum)
         })
         .collect::<Vec<_>>()
@@ -1068,7 +1068,7 @@ fn node_conditioned_evaluation(
         if state.street != 0 {
             bail!("node-conditioned EV currently requires a preflop node");
         }
-        let mut class_probability = vec![None; cards::NUM_CLASSES];
+        let mut class_probability = vec![None; nlh::NUM_CLASSES];
         for block in blocks
             .iter()
             .filter(|block| block.key.history == current && block.key.actor == step.actor)

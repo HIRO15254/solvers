@@ -6,8 +6,7 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-cards.workspace = true
-hand-index.workspace = true
+nlh.workspace = true
 rayon.workspace = true
 serde.workspace = true
 postcard.workspace = true

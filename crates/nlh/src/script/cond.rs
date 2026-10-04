@@ -11,9 +11,9 @@
 //! and `multiway`'s own variable enum are both just implementations of
 //! [`Vars`], read through [`VarSource<V>`] -- postflop's [`RuleContext`]
 //! implements `VarSource<PostflopVar>` right here, since board/card concepts
-//! belong in `cards`; `multiway` implements `VarSource<MultiwayVar>` for its
+//! belong in `nlh`; `multiway` implements `VarSource<MultiwayVar>` for its
 //! own betting-state types, in its own crate, with no orphan-rule problem
-//! (multiway already depends on `cards`).
+//! (multiway already depends on `nlh`).
 
 use std::fmt;
 
@@ -209,7 +209,7 @@ impl ActionKind {
 }
 
 /// Which names and street vocabulary one config family's tree script
-/// exposes. `cards` has no notion of a family (that lives in `holdem` /
+/// exposes. `nlh` has no notion of a family (that lives in `holdem` /
 /// `multiway`), so a family builds its own `Dialect<V>` naming the `V`
 /// values, action words, and street keywords it wants; [`POSTFLOP`] is the
 /// one the postflop family uses today.

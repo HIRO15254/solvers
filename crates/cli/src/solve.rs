@@ -2,13 +2,13 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, anyhow};
-use cards::{PerPlayer, Player};
 use engine::{
     DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, SolverState, Storage,
     TerminalEvaluator,
 };
 use game::PayoffPipeline;
 use holdem::build_postflop_game;
+use nlh::{PerPlayer, Player};
 
 use crate::config::{GameSection, RunSection, SolveConfig, StorageKind, TreeSection};
 use crate::postflop_setup;

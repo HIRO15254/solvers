@@ -1,6 +1,6 @@
 //! Exact chip settlement, including refunds, side pots, rake, and odd chips.
 
-use cards::{Card, CardSet, rank_of};
+use nlh::{Card, CardSet, rank_of};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 

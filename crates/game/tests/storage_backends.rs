@@ -5,9 +5,9 @@
 //! solves) rather than duplicating game setup, since these tests exercise
 //! `engine::Storage` backends, not game-layer logic.
 
-use cards::Player;
 use engine::{Dcfr, F32Storage, I16Storage, Solver, StateMismatch, Storage};
 use game::{ChipEv, NoRake, PayoffPipeline};
+use nlh::Player;
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {

@@ -2,7 +2,7 @@ use super::eval::*;
 use super::support::*;
 use super::workers::*;
 use super::*;
-use cards::Range;
+use nlh::Range;
 use rand::RngCore;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -2421,10 +2421,10 @@ fn vector_traverser_hand_updates_exceed_one_and_matches_scalar_metrics_shape() {
 fn vector_conditional_weights_match_the_scalar_chance_expectation() {
     use std::collections::BTreeMap;
 
-    let combo_a = cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
-    let combo_b = cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
-    let blocked = cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap());
-    let opponent = cards::combo_index("Qs".parse().unwrap(), "Jc".parse().unwrap());
+    let combo_a = nlh::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
+    let combo_b = nlh::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
+    let blocked = nlh::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap());
+    let opponent = nlh::combo_index("Qs".parse().unwrap(), "Jc".parse().unwrap());
     let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
     let world = SampledWorld::new(vec![combo_a, opponent], board).unwrap();
 
@@ -2688,9 +2688,9 @@ fn independent_average_pass_tracks_temporal_own_strategy_and_samples_zero_oppone
     let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
     let world = SampledWorld::new(
         vec![
-            cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap()),
-            cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap()),
-            cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap()),
+            nlh::combo_index("As".parse().unwrap(), "Ah".parse().unwrap()),
+            nlh::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap()),
+            nlh::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap()),
         ],
         board,
     )
@@ -4568,7 +4568,7 @@ fn zero_target_exploration_touches_dense_column_without_regret_support() {
     }
 
     let combos = [("As", "Ah"), ("Ks", "Kh")]
-        .map(|(first, second)| cards::combo_index(first.parse().unwrap(), second.parse().unwrap()));
+        .map(|(first, second)| nlh::combo_index(first.parse().unwrap(), second.parse().unwrap()));
     let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
     let world = SampledWorld::new(combos.to_vec(), board).unwrap();
     let ranges = combos

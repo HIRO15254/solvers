@@ -7,10 +7,10 @@
 //! rake in aggregate, and rake must visibly shift both bettor and defender
 //! strategies at a hand-verifiable spot.
 
-use cards::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 use engine::{Dcfr, F32Storage, ParConfig, Solver};
 use game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake};
 use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {

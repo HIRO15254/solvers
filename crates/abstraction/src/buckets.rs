@@ -1,13 +1,13 @@
 //! E[HS²] percentile bucketing with per-street canonical-board tables and a
 //! postcard disk cache.
 //!
-//! Internal representation avoids `hand_index::Board`/`cards::Card` in the
+//! Internal representation avoids `nlh::iso::Board`/`nlh::Card` in the
 //! serialized form (neither implements `serde`): canonical boards are keyed
 //! by raw card-index arrays (`[u8; 3]` flop, `[u8; 4]` turn), each mapping
-//! to a `Vec<u16>` indexed by `cards::combo_index` (dead combos, i.e.
+//! to a `Vec<u16>` indexed by `nlh::combo_index` (dead combos, i.e.
 //! sharing a card with the board, are `u16::MAX`).
 //!
-//! Flop and turn use `hand_index::canonicalize_board`'s street-structured
+//! Flop and turn use `nlh::iso::canonicalize_board`'s street-structured
 //! quotient (1,755 flops, 63,193 turns). The river uses the coarser
 //! *unordered 5-card-set* quotient (134,459 boards, keyed by the sorted
 //! min-over-24-suit-perms card indices): river E[HS²] is a function of the
@@ -21,14 +21,14 @@ use std::collections::BTreeMap;
 use std::io::Write;
 use std::path::Path;
 
-use cards::{ALL_CARDS, Card, CardSet, HandRank, NUM_COMBOS, combo_cards, rank_of};
-use hand_index::{
+use nlh::iso::{
     Board, SuitPerm, all_suit_perms, canonical_flops, canonicalize_board, permute_card,
     permute_combo,
 };
+use nlh::{ALL_CARDS, Card, CardSet, HandRank, NUM_COMBOS, combo_cards, rank_of};
 use rayon::prelude::*;
 
-use cards::Street;
+use nlh::Street;
 
 use crate::CardAbstraction;
 
@@ -245,7 +245,7 @@ impl Sweep {
     /// Ranks every combo disjoint from the complete 5-card `board`, then
     /// sweeps sorted-by-rank to fill `hs_out[combo]` for each live combo
     /// with its hand strength against the uniform live-opponent pool
-    /// (exactly `cards::rank_of`-comparisons, no sampling). Ties within a
+    /// (exactly `nlh::rank_of`-comparisons, no sampling). Ties within a
     /// group are resolved in O(1) per combo via a per-card tally of the
     /// group's own cards (mirrors the `lower`/`lower_card` inclusion-
     /// exclusion trick, applied to the group instead of everything below
@@ -823,8 +823,8 @@ impl CardAbstraction for Ehs2Abstraction {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cards::combo_index;
-    use hand_index::{all_suit_perms, permute_card};
+    use nlh::combo_index;
+    use nlh::iso::{all_suit_perms, permute_card};
 
     fn parse(s: &str) -> Vec<Card> {
         s.split_whitespace().map(|c| c.parse().unwrap()).collect()
@@ -832,7 +832,7 @@ mod tests {
 
     #[test]
     fn canonical_turn_count_pin() {
-        // NOTE: 63,193, not 16,432. `hand_index::canonical_unordered_board_count(4)`
+        // NOTE: 63,193, not 16,432. `nlh::iso::canonical_unordered_board_count(4)`
         // (16,432) quotients raw *unordered 4-card sets* (raw space C(52,4)=270,725)
         // by suit permutation, treating all four cards as interchangeable. This
         // crate's `canonicalize_board` preserves the flop/turn *role* distinction
@@ -857,7 +857,7 @@ mod tests {
     #[ignore = "expensive (2.6M sets x 24 perms); CI runs it in release with --include-ignored"]
     fn canonical_river_sets_count_pin() {
         // The unordered 5-set quotient the river street is keyed by; count
-        // matches hand_index::canonical_unordered_board_count(5).
+        // matches nlh::iso::canonical_unordered_board_count(5).
         let sets = canonical_river_sets();
         assert_eq!(sets.len(), 134_459);
         let total: u64 = sets.iter().map(|&(_, w)| w as u64).sum();

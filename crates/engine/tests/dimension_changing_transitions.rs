@@ -10,11 +10,11 @@
 //! `Deal::weight`'s doc comment: "suit-isomorphism classes fold their class
 //! size in here").
 
-use cards::{PerPlayer, Player};
 use engine::{
     CompiledGame, Dcfr, F32Storage, McCfg, McSolver, PublicTree, ReachMap, Solver,
     SparseTransition, TempNode, TerminalEvaluator, TreeSpec,
 };
+use nlh::{PerPlayer, Player};
 
 /// Payoff to P0 (row = hero's class, col = opponent's class) at each of the
 /// 4 terminals, indexed `[terminal][class(hero)][class(opp)]`. Values are

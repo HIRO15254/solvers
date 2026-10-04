@@ -17,7 +17,6 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::{Card, PerPlayer, Player, Street};
 use engine::{
     Dcfr, F32Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array, reach_at,
 };
@@ -30,6 +29,7 @@ use holdem::{
     PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
     river_entry_state, river_resolve_config,
 };
+use nlh::{Card, PerPlayer, Player, Street};
 
 use crate::config::GameSection;
 use crate::postflop_setup;
@@ -113,13 +113,13 @@ fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
         if reach == 0.0 {
             continue;
         }
-        let (hi, lo) = cards::combo_cards(combo);
+        let (hi, lo) = nlh::combo_cards(combo);
         per_card[hi.index()] += reach as f64;
         per_card[lo.index()] += reach as f64;
     }
     (0..opp_reach.len())
         .map(|combo| {
-            let (hi, lo) = cards::combo_cards(combo);
+            let (hi, lo) = nlh::combo_cards(combo);
             let compatible =
                 total - per_card[hi.index()] - per_card[lo.index()] + opp_reach[combo] as f64;
             compatible.max(0.0) as f32

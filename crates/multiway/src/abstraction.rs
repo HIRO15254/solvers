@@ -6,7 +6,7 @@
 //! example, heads-up river strength from strength against five ranges.
 
 use abstraction::{CACHE_FORMAT_VERSION, CardAbstraction, Ehs2Abstraction, Ehs2Params};
-use cards::{Card, NUM_CLASSES, NUM_COMBOS, class_index, combo_cards, rank_of};
+use nlh::{Card, NUM_CLASSES, NUM_COMBOS, class_index, combo_cards, rank_of};
 
 use crate::types::Street;
 
@@ -423,12 +423,12 @@ fn street_index(street: Street) -> u8 {
     }
 }
 
-fn to_cards_street(street: Street) -> cards::Street {
+fn to_cards_street(street: Street) -> nlh::Street {
     match street {
-        Street::Preflop => cards::Street::Preflop,
-        Street::Flop => cards::Street::Flop,
-        Street::Turn => cards::Street::Turn,
-        Street::River => cards::Street::River,
+        Street::Preflop => nlh::Street::Preflop,
+        Street::Flop => nlh::Street::Flop,
+        Street::Turn => nlh::Street::Turn,
+        Street::River => nlh::Street::River,
     }
 }
 
@@ -441,7 +441,7 @@ pub enum AbstractionError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cards::combo_index;
+    use nlh::combo_index;
 
     fn card(text: &str) -> Card {
         text.parse().unwrap()

@@ -9,8 +9,8 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::OnceLock;
 
-use cards::Range;
-use cards::script::Condition;
+use nlh::Range;
+use nlh::script::Condition;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -43,7 +43,7 @@ pub struct SeatConfig {
     pub name: Option<String>,
     pub stack_bb: f64,
     /// Empty means the full 1,326-combo range.  Non-empty strings use the
-    /// shared `cards::Range` grammar.
+    /// shared `nlh::Range` grammar.
     #[serde(default = "default_range")]
     pub range: String,
     /// Optional complete betting profile for this seat. Omission uses the
@@ -174,7 +174,7 @@ impl TreeRule {
     /// Builds a `TreeRule` with an empty compiled-condition cache. The one
     /// constructor every caller outside this module uses (the field is
     /// private so a struct literal can't skip it), matching the way
-    /// `cards::script::Rule<V>` has no cache at all -- its condition is
+    /// `nlh::script::Rule<V>` has no cache at all -- its condition is
     /// already a compiled `Condition<V>`.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
@@ -200,7 +200,7 @@ impl TreeRule {
 
     /// Builds a `TreeRule` from an already-compiled `.mwtree` script rule
     /// (`crate::tree_rules::compile_script`): `condition`'s *text* is
-    /// `compiled`'s own [`std::fmt::Display`] rendering (`cards::script`'s
+    /// `compiled`'s own [`std::fmt::Display`] rendering (`nlh::script`'s
     /// condition-to-text renderer, shared with postflop's `tree`
     /// diagnostic) -- nesting composes several `when`/`if` conditions into
     /// one that never existed as one literal source string, so this is the
@@ -254,7 +254,7 @@ impl TreeRule {
     /// validating path: `MultiwayConfig::validate` calls it on every rule so
     /// a bad condition is rejected before a `ValidatedMultiwayConfig` (and
     /// therefore a `BettingState`) can exist.
-    fn compile_condition(&self) -> Result<(), cards::script::ScriptError> {
+    fn compile_condition(&self) -> Result<(), nlh::script::ScriptError> {
         if self.compiled_condition.get().is_some() {
             return Ok(());
         }
@@ -323,12 +323,12 @@ impl RuleStreet {
 
 /// The same five effects a postflop `.tree` script's `add`/`remove`/
 /// `replace`/`force`/`checkdown` statements name -- one enum, shared via
-/// `cards::script`, rather than a second copy of the same five spellings.
-pub type RuleEffect = cards::script::Effect;
+/// `nlh::script`, rather than a second copy of the same five spellings.
+pub type RuleEffect = nlh::script::Effect;
 
 /// The same five actions a postflop `.tree` script's `bet`/`raise` (and,
 /// here, `fold`/`check`/`call`) statements name -- see [`RuleEffect`].
-pub type RuleAction = cards::script::ActionKind;
+pub type RuleAction = nlh::script::ActionKind;
 
 fn default_true() -> bool {
     true
@@ -425,9 +425,9 @@ fn default_postflop_betting() -> StreetBettingConfig {
 }
 
 /// Bet/raise size grammar, shared with every other config family that
-/// lowers a bet or raise tree. Defined in `cards::sizing`; re-exported here
+/// lowers a bet or raise tree. Defined in `nlh::sizing`; re-exported here
 /// so `multiway::config::SizeSpec` keeps working for every existing user.
-pub use cards::SizeSpec;
+pub use nlh::SizeSpec;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1116,7 +1116,7 @@ fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
         // off the street being resolved.
         SizeSpec::GeometricAllInRemaining => Ok(()),
         // `to-chips` is the postflop family's absolute chip literal; the
-        // `SizeSpec` enum is shared with `cards::sizing` (see the type
+        // `SizeSpec` enum is shared with `nlh::sizing` (see the type
         // there), but multiway seats are configured in bb, so a config that
         // spells `kind = "to-chips"` for a multiway size is rejected here
         // rather than silently accepted.
@@ -1415,7 +1415,7 @@ stack_bb = 12
         assert!(matches!(config.validate(), Err(ConfigError::Button { .. })));
 
         config.button = SeatId(0);
-        // `cards::Range::from_str` now rejects any spec that selects zero
+        // `nlh::Range::from_str` now rejects any spec that selects zero
         // combos (including a range whose only entry has weight 0), so this
         // now fails inside `Range::from_str` itself and surfaces as
         // `ConfigError::Range` rather than reaching the

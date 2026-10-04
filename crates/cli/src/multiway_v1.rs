@@ -9,7 +9,6 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::SizeUnit;
 use multiway::config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
     BlindConfig, ForcedBetConfig, MultiwayConfig, RakeAllocation as RuntimeRakeAllocation,
@@ -17,6 +16,7 @@ use multiway::config::{
     SeatConfig, SizeSpec, StackRatio, TreeRule as RuntimeTreeRule,
 };
 use multiway::types::{MAX_SEATS, MIN_SEATS, SeatId};
+use nlh::SizeUnit;
 use serde::{Deserialize, Serialize};
 
 use crate::config::{
@@ -651,7 +651,7 @@ fn default_rule_priority() -> i32 {
 }
 
 /// Parses a Multiway Preflop bet-size literal (bb-denominated). Delegates to
-/// the shared grammar in `cards::sizing`; the error is re-wrapped as
+/// the shared grammar in `nlh::sizing`; the error is re-wrapped as
 /// `anyhow::Error` but keeps the same message text this crate has always
 /// produced.
 fn parse_size_literal(source: &str) -> Result<SizeSpec> {
@@ -687,7 +687,7 @@ fn lower_tree_rules(rules: &[TreeRule]) -> Result<Vec<RuntimeTreeRule>> {
     Ok(lowered)
 }
 /// Compiles a `.mwtree` script against `multiway::tree_rules::MULTIWAY` --
-/// the same `cards::script` front end (tokenizing, substitution, nesting,
+/// the same `nlh::script` front end (tokenizing, substitution, nesting,
 /// `if`/`else`, `param`/`define`) postflop's `.tree` scripts compile
 /// through -- and lowers the result straight to [`RuntimeTreeRule`]s. This
 /// is the entire multiway-specific frontend now: it owns nothing but the
@@ -2419,7 +2419,7 @@ flop when players >= 4 {
     }
 
     /// End-to-end proof that multiway's `.mwtree` frontend is the same
-    /// `cards::script` grammar postflop's `.tree` scripts use: nesting,
+    /// `nlh::script` grammar postflop's `.tree` scripts use: nesting,
     /// `if`/`else if`/`else`, a multi-street list (`flop, turn`), and
     /// `param` all compile through `source =`, and the normalized effective
     /// config inlines the script body (not a lowered `[[game.tree.rules]]`

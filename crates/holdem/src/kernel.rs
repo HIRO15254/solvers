@@ -15,7 +15,7 @@
 //! correct, because every "dead" combo the superset drags in contributes
 //! zero.
 
-use cards::{HandRank, combo_cards};
+use nlh::{HandRank, combo_cards};
 
 /// Sum of `opp_reach` over combos disjoint from hand `h`, via
 /// inclusion-exclusion on h's two cards.

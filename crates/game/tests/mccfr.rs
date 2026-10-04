@@ -4,9 +4,9 @@
 //! traversal) as a fast smoke test, Leduc (one chance node — the board
 //! card) as the real chance-sampling exit test.
 
-use cards::Player;
 use engine::{F32Storage, McCfg, McSolver, Solver, StorageState, Vanilla, linear_cfr};
 use game::{ChipEv, NoRake, PayoffPipeline};
+use nlh::Player;
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {

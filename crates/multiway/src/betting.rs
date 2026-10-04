@@ -774,7 +774,7 @@ fn action_sort_key(action: &Action) -> (u8, u64) {
     }
 }
 
-/// Delegates to `cards::geometric_allin_target`, the unit-free formula
+/// Delegates to `nlh::geometric_allin_target`, the unit-free formula
 /// shared with every other engine that resolves a `GeometricAllIn` size.
 /// Betting streets left to play from `street`, inclusive — what a bare `e`
 /// geometric size divides the remaining stack across.
@@ -793,7 +793,7 @@ fn geometric_allin_target(
     maximum: MwChips,
     streets: u8,
 ) -> MwChips {
-    MwChips(cards::geometric_allin_target(
+    MwChips(nlh::geometric_allin_target(
         called_to.raw(),
         pot_after_call.raw(),
         maximum.raw(),

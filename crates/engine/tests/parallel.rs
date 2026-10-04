@@ -4,11 +4,11 @@
 //! root, one that forces the fully sequential walk — and checked bit-for-bit
 //! equal.
 
-use cards::{PerPlayer, Player};
 use engine::{
     CompiledGame, Dcfr, F32Storage, ParConfig, PublicTree, ReachMap, Solver, TempNode,
     TerminalEvaluator, TreeSpec,
 };
+use nlh::{PerPlayer, Player};
 
 /// Per-player private-state dimension: a small synthetic "hand space".
 const DIM: usize = 8;

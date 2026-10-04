@@ -906,7 +906,7 @@ solvers resume runs/my-run
 | size literal 文法 | 共通(PioSOLVER 準拠) | 共通 |
 | rake / ICM モデル | 共通実装を流用 | 同じ実装 |
 | tree frontend | `script`(`.tree`)+ `standard` は空 | `script`(`.mwtree`)+ `standard` の rule 配列 |
-| script の正規化 | 本文をインライン化 | 本文をインライン化(共通の `cards::script` フロントエンド) |
+| script の正規化 | 本文をインライン化 | 本文をインライン化(共通の `nlh::script` フロントエンド) |
 | 停止判定 | `iterations` / `max_time` / `target_nash_conv` | sweep 予算 + trained deviator 評価 |
 | artifact の値 | 戦略 + per-hand 値(`i16`) | 戦略のみ(`u16` / `f32`) |
 
@@ -918,8 +918,8 @@ TOML surface、型、既定値、条件付き validation、単位のいずれか
 1. この規範仕様(入力・出力・制約)と、CLI を変えるなら
    [cli-reference.jp.md](cli-reference.jp.md)
 2. `crates/cli/src/solver_config_v1.rs` の parser と test
-3. tree script の文法・条件変数・盤面述語を変えるなら `crates/cards/src/script/`
-   (parser と平坦化)、`crates/cards/src/board.rs`(盤面述語)、
+3. tree script の文法・条件変数・盤面述語を変えるなら `crates/nlh/src/script/`
+   (parser と平坦化)、`crates/nlh/src/board.rs`(盤面述語)、
    `crates/holdem/src/postflop.rs`(rule 適用)
 4. `examples/` の該当 config と `examples/trees/` の script、
    `crates/cli/src/config_new.rs` の template

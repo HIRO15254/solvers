@@ -18,22 +18,22 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::{Index, IndexMut};
 
-use cards::script::{
-    ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, PreviousAggressor, Rule,
-    RuleContext,
-};
-use cards::{
-    ALL_CARDS, BoardFacts, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range,
-    SizeSpec, Street, combo_cards, combo_index, geometric_allin_target, rank_of,
-};
 use engine::{
     CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
     TreeSpec,
 };
 use game::{BakedPayoffs, PayoffPipeline, TerminalDescriptor, TerminalKind};
-use hand_index::{
+use nlh::iso::{
     Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with, orbit_perms, permute_combo,
     stabilizer,
+};
+use nlh::script::{
+    ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, PreviousAggressor, Rule,
+    RuleContext,
+};
+use nlh::{
+    ALL_CARDS, BoardFacts, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range,
+    SizeSpec, Street, combo_cards, combo_index, geometric_allin_target, rank_of,
 };
 
 use crate::kernel;
@@ -79,7 +79,7 @@ impl<T> IndexMut<Street> for PerStreet<T> {
 /// add/remove). `rules` used to come only from the five fixed-menu fields
 /// (`oop_bet`/`ip_bet`/`oop_raise`/`ip_raise`/`oop_donk`) a pre-script
 /// grammar had; [`StreetTree::from_script`] is what a compiled tree script
-/// (`cards::script::Script`) builds this from now, and
+/// (`nlh::script::Script`) builds this from now, and
 /// [`StreetTree::pot_fractions`] is the short constructor test/bench
 /// fixtures use for the common single-level pot-fraction case.
 #[derive(Clone, Debug)]
@@ -110,7 +110,7 @@ impl Default for StreetTree {
 }
 
 /// AND-combines two conditions without ever nesting `Const(true)`, matching
-/// `cards::script::cond`'s own simplification convention -- not load-bearing
+/// `nlh::script::cond`'s own simplification convention -- not load-bearing
 /// here (the translated rules never actually combine two `Const`s), just
 /// keeping every hand-built `Condition` in the same normal form the script
 /// compiler would produce.
@@ -229,7 +229,7 @@ impl StreetTree {
     }
 
     /// Collects one street's rules out of a compiled tree script's flat rule
-    /// list (`cards::script::Script::rules`), preserving source order --
+    /// list (`nlh::script::Script::rules`), preserving source order --
     /// source order is the script's entire priority model (see
     /// `docs/solver-config-v1.jp.md`'s script の構造 chapter), so this
     /// must not reorder or resort what it filters. `rules` is the *whole*
@@ -1613,7 +1613,7 @@ mod tests {
     /// be equally wrong.
     ///
     /// `BoardFacts::new` is proved suit-permutation invariant in
-    /// `cards::board`, and the classes here come from permutations that fix
+    /// `nlh::board`, and the classes here come from permutations that fix
     /// both the board and the ranges — so this holds by construction. It is
     /// pinned end to end anyway, through this crate's own private
     /// `chance_groups`, because it is the one property whose violation is

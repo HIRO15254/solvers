@@ -14,10 +14,10 @@
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use cards::{PerPlayer, Player, Street, combo_cards};
 use engine::{NodeId, NodeKind};
 use formats::{StreetsStored, dequantize_probs};
 use holdem::PostflopNodeInfo;
+use nlh::{PerPlayer, Player, Street, combo_cards};
 use serde::Serialize;
 
 use crate::multiway_artifact::{ExportFormat, ExportView};
@@ -185,7 +185,7 @@ fn summary(loaded: &LoadedSol) -> Summary {
         board: loaded
             .board
             .iter()
-            .map(cards::Card::to_string)
+            .map(nlh::Card::to_string)
             .collect::<Vec<_>>()
             .join(" "),
         pot: loaded.config.pot.0,

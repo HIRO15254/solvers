@@ -3,7 +3,7 @@
 
 use std::sync::{Arc, Mutex};
 
-use cards::{combo_cards, rank_of};
+use nlh::{combo_cards, rank_of};
 use rustc_hash::FxHashMap;
 
 use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
@@ -778,7 +778,7 @@ mod tests {
     use crate::config::{AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, SeatConfig};
     use crate::solver::ExternalSamplingGame;
     use crate::types::SeatId;
-    use cards::combo_index;
+    use nlh::combo_index;
 
     fn config() -> MultiwayConfig {
         MultiwayConfig {
@@ -1007,7 +1007,7 @@ mod tests {
         .unwrap();
         let state = manual_three_way_allin();
 
-        let card = |text: &str| text.parse::<cards::Card>().unwrap();
+        let card = |text: &str| text.parse::<nlh::Card>().unwrap();
         let board = [card("2c"), card("7d"), card("9h"), card("Jc"), card("4s")];
         let seat1 = combo_index(card("Ah"), card("Kd"));
         let seat2 = combo_index(card("3h"), card("3d"));
@@ -1072,7 +1072,7 @@ mod tests {
         state.seats[SeatId(0)].status = SeatStatus::Folded;
         state.seats[SeatId(2)].status = SeatStatus::Folded;
 
-        let card = |text: &str| text.parse::<cards::Card>().unwrap();
+        let card = |text: &str| text.parse::<nlh::Card>().unwrap();
         let board = [card("2c"), card("7d"), card("9h"), card("Jc"), card("4s")];
         let seat1 = combo_index(card("Ah"), card("Kd"));
         let seat2 = combo_index(card("3h"), card("3d"));
@@ -1201,7 +1201,7 @@ mod tests {
     #[test]
     fn vector_terminal_utilities_fast_path_matches_reference_randomized() {
         use crate::config::FieldPlayerConfig;
-        use cards::ALL_CARDS;
+        use nlh::ALL_CARDS;
         use rand::seq::SliceRandom;
         use rand::{Rng, SeedableRng};
         use rand_chacha::ChaCha20Rng;
@@ -1233,9 +1233,9 @@ mod tests {
             let button = rng.gen_range(0..num_seats) as u8;
             let state = manual_n_way(&stacks, &statuses, button);
 
-            let mut deck: Vec<cards::Card> = ALL_CARDS.into_iter().collect();
+            let mut deck: Vec<nlh::Card> = ALL_CARDS.into_iter().collect();
             deck.shuffle(&mut rng);
-            let board: [cards::Card; 5] = deck[0..5].try_into().unwrap();
+            let board: [nlh::Card; 5] = deck[0..5].try_into().unwrap();
             let mut offset = 5;
             let mut hole_combos = Vec::with_capacity(num_seats);
             for _ in 0..num_seats {

@@ -1,10 +1,10 @@
 [package]
-name = "cards"
+name = "nlh"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Card, chip, and range primitives shared by all solver crates"
+description = "NLH primitives: cards, combos, ranges, hand evaluation, board predicates, suit isomorphism, tree-script and size grammar"
 
 [dependencies]
 aya_poker = { workspace = true }

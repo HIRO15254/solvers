@@ -4,7 +4,7 @@
 //! gracefully, never panic or emit out-of-range buckets.
 
 use abstraction::{CardAbstraction, Ehs2Abstraction, Ehs2Params};
-use cards::{Card, NUM_COMBOS, Street, combo_cards};
+use nlh::{Card, NUM_COMBOS, Street, combo_cards};
 
 fn boards() -> Vec<Vec<Card>> {
     let parse =
@@ -35,7 +35,7 @@ fn extreme_small_bucket_counts_degrade_gracefully() {
             };
             let k = abs.num_buckets(street);
             assert!(k >= 1);
-            let dead: cards::CardSet = board.iter().copied().collect();
+            let dead: nlh::CardSet = board.iter().copied().collect();
             for combo in 0..NUM_COMBOS {
                 let (a, b) = combo_cards(combo);
                 if dead.contains(a) || dead.contains(b) {
@@ -66,7 +66,7 @@ fn k1_river_is_a_single_information_free_bucket() {
         .split_whitespace()
         .map(|c| c.parse().unwrap())
         .collect();
-    let dead: cards::CardSet = river.iter().copied().collect();
+    let dead: nlh::CardSet = river.iter().copied().collect();
     for combo in 0..NUM_COMBOS {
         let (a, b) = combo_cards(combo);
         if dead.contains(a) || dead.contains(b) {

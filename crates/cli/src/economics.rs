@@ -11,11 +11,11 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 
 use anyhow::{Result, anyhow};
-use cards::{Chips, PerPlayer, Player};
 use game::{
     ChipEv, GgPreflopRake, Icm, NoRake, PercentCapRake, RakeModel, TerminalDescriptor,
     TerminalKind, UtilityModel,
 };
+use nlh::{Chips, PerPlayer, Player};
 
 use crate::config::{RakeSection, UtilitySection};
 
@@ -313,13 +313,13 @@ impl UtilityModel for TournamentIcm {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cards::Chips;
     use game::{ChipEv, Icm, PayoffPipeline};
+    use nlh::Chips;
 
     fn showdown_terminal(pot: u32, contrib: (u32, u32)) -> TerminalDescriptor {
         TerminalDescriptor {
             kind: TerminalKind::Showdown,
-            street: cards::Street::River,
+            street: nlh::Street::River,
             pot: Chips(pot),
             contrib: PerPlayer::new(Chips(contrib.0), Chips(contrib.1)),
             stacks_before: PerPlayer::new(Chips(100), Chips(100)),
@@ -329,7 +329,7 @@ mod tests {
     fn fold_terminal(pot: u32, contrib: (u32, u32), folder: Player) -> TerminalDescriptor {
         TerminalDescriptor {
             kind: TerminalKind::Fold { folder },
-            street: cards::Street::Flop,
+            street: nlh::Street::Flop,
             pot: Chips(pot),
             contrib: PerPlayer::new(Chips(contrib.0), Chips(contrib.1)),
             stacks_before: PerPlayer::new(Chips(100), Chips(100)),

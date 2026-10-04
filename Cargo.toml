@@ -1,8 +1,7 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/cards",
-    "crates/hand-index",
+    "crates/nlh",
     "crates/cfr-ref",
     "crates/engine",
     "crates/game",
@@ -22,8 +21,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/hiro15254/solvers"
 
 [workspace.dependencies]
-cards = { path = "crates/cards" }
-hand-index = { path = "crates/hand-index" }
+nlh = { path = "crates/nlh" }
 cfr-ref = { path = "crates/cfr-ref" }
 engine = { path = "crates/engine" }
 game = { path = "crates/game" }

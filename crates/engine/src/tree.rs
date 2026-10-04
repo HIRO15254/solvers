@@ -1,4 +1,4 @@
-use cards::{PerPlayer, Player};
+use nlh::{PerPlayer, Player};
 
 use crate::storage::{StorageRef, StorageSpan};
 

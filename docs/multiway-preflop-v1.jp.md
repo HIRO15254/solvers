@@ -302,7 +302,7 @@ enabled = true
 
 `.mwtree`の文法(トークン化、`param`/`define`、街ブロックの入れ子、`if`/`else if`/
 `else`、条件式、size literal、error)はpostflopの`.tree`スクリプトと同じ
-`cards::script`フロントエンドを共有する。共通部分の規範は
+`nlh::script`フロントエンドを共有する。共通部分の規範は
 [solver-config-v1.jp.md](solver-config-v1.jp.md)の`[game.tree]`章にあり、ここには
 multiway固有の差分だけを記す:
 

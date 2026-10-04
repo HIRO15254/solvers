@@ -6,10 +6,10 @@
 //! sampled multiway engine.
 
 use anyhow::{Result, anyhow};
-use cards::{Card, Chips, PerPlayer, Player, Range, Street};
 use engine::{CfrPlus, Dcfr, DiscountSchedule, HsDcfr, Vanilla, linear_cfr};
 use game::UtilityModel;
 use holdem::{MemoryEstimate, PerStreet, PostflopConfig, RuleHits, StreetTree};
+use nlh::{Card, Chips, PerPlayer, Player, Range, Street};
 
 use crate::config::AlgorithmSection;
 use crate::solver_config_v1::render_rule_line;
@@ -69,7 +69,7 @@ pub fn validate_board_ranges(board: &[Card], oop: &Range, ip: &Range) -> Result<
             .iter()
             .enumerate()
             .filter_map(|(index, &weight)| {
-                let (a, b) = cards::combo_cards(index);
+                let (a, b) = nlh::combo_cards(index);
                 (weight > 0.0 && !board.contains(&a) && !board.contains(&b)).then_some((a, b))
             })
             .collect::<Vec<_>>()

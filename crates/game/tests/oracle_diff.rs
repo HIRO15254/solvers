@@ -6,11 +6,11 @@
 
 use std::collections::HashMap;
 
-use cards::Player;
 use cfr_ref::games::{Kuhn, Leduc};
 use cfr_ref::{RefGame, best_response_value, expected_value};
 use engine::{Dcfr, F32Storage, NodeKind, Solver};
 use game::{ChipEv, NoRake, PayoffPipeline, ToyGame};
+use nlh::Player;
 
 /// Exports the engine's average strategy as an oracle profile keyed by
 /// `"{card}|{history}"`.

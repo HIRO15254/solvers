@@ -5,9 +5,9 @@
 //! token / node lookup behaves exactly as it did when this module owned the
 //! whole builder.
 
-use cards::{Card, Chips, PerPlayer, Range};
 use engine::{CompiledGame, NodeId};
 use game::PayoffPipeline;
+use nlh::{Card, Chips, PerPlayer, Range};
 
 use crate::postflop::{
     PerStreet, PostflopConfig, PostflopEvaluator, PostflopGame, StreetTree, build_postflop_game,
@@ -63,8 +63,8 @@ pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> R
     // the opening bet menu and every raise level's menu, the classic
     // shared-size behaviour this shim has always had.
     let river_tree = StreetTree::pot_fractions(
-        &config.bet_fractions[cards::Player::P0],
-        &config.bet_fractions[cards::Player::P1],
+        &config.bet_fractions[nlh::Player::P0],
+        &config.bet_fractions[nlh::Player::P1],
         config.max_raises,
     );
     let postflop_config = PostflopConfig {
