@@ -1,15 +1,12 @@
-//! The `solvers.toy/v1`, `solvers.postflop/v1`, and `solvers.preflop-hu/v1`
-//! contracts.
+//! The `solvers.postflop/v1` contract (`docs/solver-config-v1.jp.md`).
 //!
-//! These three families share every section except `[game]`, so they share
-//! one document (`docs/solver-config-v1.jp.md`) and one module. What makes
-//! them contracts rather than version markers is what this module adds over
-//! plain deserialization:
+//! What makes it a contract rather than a version marker is what this module
+//! adds over plain deserialization:
 //!
-//! * **A key belongs to exactly one family.** They used to share one struct,
-//!   so a postflop config could set `stop_dev_gain` or `sweeps` -- multiway
-//!   knobs -- and have them silently ignored. Each family now names the keys
-//!   it honours and rejects the rest.
+//! * **A key belongs to exactly one family.** Families used to share one
+//!   struct, so a postflop config could set `stop_dev_gain` or `sweeps` --
+//!   multiway knobs -- and have them silently ignored. Each family now names
+//!   the keys it honours and rejects the rest.
 //! * **Defaults are explicit in the effective config.** Every optional key
 //!   with a default is declared with that default, so normalizing is a
 //!   round-trip and the result says what the run will actually do.
@@ -28,16 +25,14 @@ use cards::{SizeSpec, SizeUnit, Street};
 use serde::{Deserialize, Serialize};
 
 use crate::config::{
-    AlgorithmSection, GameSection, OutsidePlayerSection, PostflopSection, RakeSection, RunSection,
-    SolveConfig, StorageKind, TreeSection, UtilitySection,
+    AlgorithmSection, GameSection, OutsidePlayerSection, RakeSection, RunSection, SolveConfig,
+    StorageKind, TreeSection, UtilitySection,
 };
 
-pub const SCHEMA_TOY: &str = "solvers.toy/v1";
 pub const SCHEMA_POSTFLOP: &str = "solvers.postflop/v1";
-pub const SCHEMA_PREFLOP_HU: &str = "solvers.preflop-hu/v1";
 
 /// Every schema this module owns.
-pub const SCHEMAS: [&str; 3] = [SCHEMA_TOY, SCHEMA_POSTFLOP, SCHEMA_PREFLOP_HU];
+pub const SCHEMAS: [&str; 1] = [SCHEMA_POSTFLOP];
 
 pub fn owns(schema: &str) -> bool {
     SCHEMAS.contains(&schema)
@@ -45,15 +40,15 @@ pub fn owns(schema: &str) -> bool {
 
 // --- run sections -----------------------------------------------------------
 
-/// Run controls every family here honours.
+/// Run controls for the exact heads-up vector engine.
 ///
 /// Multiway's sampling knobs (`sweeps`, `evaluation_*`, `stop_*`,
 /// `sweep_batch`, `max_memory_bytes`, `checkpoint_every`) are absent on
-/// purpose: these games are solved by the exact vector engine, which does
-/// none of those things, and accepting them would mean accepting a lie.
+/// purpose: this game is solved by the exact vector engine, which does none
+/// of those things, and accepting them would mean accepting a lie.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct RunToy {
+pub struct RunHeadsUp {
     /// Total iteration budget. A safety budget, not a convergence
     /// criterion: reaching it says nothing about how solved the game is.
     #[serde(default = "default_iterations")]
@@ -75,27 +70,8 @@ pub struct RunToy {
     pub target_nash_conv: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub threads: Option<usize>,
-}
-
-/// [`RunToy`] plus the tree-parallelism knobs, which only mean something
-/// for a game with chance nodes.
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct RunHeadsUp {
-    #[serde(default = "default_iterations")]
-    pub iterations: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_time: Option<String>,
-    #[serde(default = "default_check_every")]
-    pub check_every: u64,
-    #[serde(default)]
-    pub storage: StorageKind,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub seed: Option<u64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub target_nash_conv: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub threads: Option<usize>,
+    /// Tree-parallelism knobs, which mean something for a game with chance
+    /// nodes.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub par_chance_depth: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -112,23 +88,6 @@ fn default_check_every() -> u64 {
 /// to be a real backstop.
 fn default_iterations() -> u64 {
     1_000_000
-}
-
-impl RunToy {
-    fn lower(self) -> Result<RunSection> {
-        RunHeadsUp {
-            iterations: self.iterations,
-            max_time: self.max_time,
-            check_every: self.check_every,
-            storage: self.storage,
-            seed: self.seed,
-            target_nash_conv: self.target_nash_conv,
-            threads: self.threads,
-            par_chance_depth: None,
-            par_min_children: None,
-        }
-        .lower()
-    }
 }
 
 /// Parses a `run.max_time` duration into seconds. Same grammar as Multiway
@@ -191,17 +150,7 @@ impl RunHeadsUp {
     }
 }
 
-// --- families ---------------------------------------------------------------
-
-/// `solvers.toy/v1` covers two games, so this family keeps a `kind`. The
-/// other two do not: their schema already names the game, and carrying it
-/// twice would be two things to keep in agreement.
-#[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(deny_unknown_fields, tag = "kind", rename_all = "kebab-case")]
-pub enum ToyGame {
-    Kuhn,
-    Leduc,
-}
+// --- family -----------------------------------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -238,54 +187,11 @@ fn default_preflop_aggressor() -> String {
     "none".to_string()
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct PreflopHuGame {
-    pub effective_stack_bb: f64,
-    #[serde(default = "default_sb_bb")]
-    pub sb_bb: f64,
-    #[serde(default = "default_open_sizes_bb")]
-    pub open_sizes_bb: Vec<f64>,
-    #[serde(default = "default_raise_factors")]
-    pub raise_factors: Vec<Vec<f64>>,
-    #[serde(default = "default_preflop_max_raises")]
-    pub max_raises: u32,
-    #[serde(default = "default_true")]
-    pub include_allin: bool,
-    #[serde(default = "default_true")]
-    pub allow_limp: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sb_range: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub bb_range: Option<String>,
-    /// Per-player equity realization applied at the postflop boundary.
-    #[serde(default = "default_equity_realization")]
-    pub equity_realization: [f64; 2],
-    /// Postflop model. Absent means the equity-showdown model.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub postflop: Option<PostflopSection>,
-}
-
 fn default_true() -> bool {
     true
 }
 fn default_min_bet() -> u32 {
     1
-}
-fn default_sb_bb() -> f64 {
-    0.5
-}
-fn default_open_sizes_bb() -> Vec<f64> {
-    vec![2.5]
-}
-fn default_raise_factors() -> Vec<Vec<f64>> {
-    vec![vec![3.0]]
-}
-fn default_preflop_max_raises() -> u32 {
-    4
-}
-fn default_equity_realization() -> [f64; 2] {
-    [1.0, 1.0]
 }
 
 /// `[utility]` for `solvers.postflop/v1`.
@@ -349,37 +255,7 @@ impl PostflopUtility {
     }
 }
 
-/// One config file, in whichever family it declared.
-///
-/// The three are separate types rather than one with an optional `[game]`,
-/// so the compiler enforces that each family's run section travels with its
-/// own game section.
-// Parsed once per config file and destructured away immediately; the size
-// difference between the three families never sits on a hot path, so boxing
-// a variant to appease the lint would just add an allocation.
-#[allow(clippy::large_enum_variant)]
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-enum Family {
-    Toy(ToyConfig),
-    Postflop(PostflopConfig),
-    PreflopHu(PreflopHuConfig),
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-struct ToyConfig {
-    schema: String,
-    game: ToyGame,
-    #[serde(default)]
-    rake: RakeSection,
-    #[serde(default)]
-    utility: UtilitySection,
-    #[serde(default)]
-    algorithm: AlgorithmSection,
-    run: RunToy,
-}
-
+/// One `solvers.postflop/v1` config file.
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct PostflopConfig {
@@ -394,28 +270,14 @@ struct PostflopConfig {
     run: RunHeadsUp,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-struct PreflopHuConfig {
-    schema: String,
-    game: PreflopHuGame,
-    #[serde(default)]
-    rake: RakeSection,
-    #[serde(default)]
-    utility: UtilitySection,
-    #[serde(default)]
-    algorithm: AlgorithmSection,
-    run: RunHeadsUp,
-}
-
 /// Reads the `schema` key without committing to a family.
 fn declared_schema(raw: &str) -> Result<String> {
     let document: toml::Value = toml::from_str(raw).context("parsing TOML document")?;
     if let Some(schema) = document.get("schema").and_then(toml::Value::as_str) {
         return Ok(schema.to_string());
     }
-    // A lowered multiway config has no schema either, and saying "declare
-    // one of these three" would send its author to the wrong place.
+    // A lowered multiway config has no schema either, and telling its author
+    // to declare a postflop schema would send them to the wrong place.
     let kind = document
         .get("game")
         .and_then(toml::Value::as_table)
@@ -440,44 +302,39 @@ fn declared_schema(raw: &str) -> Result<String> {
 /// known not to use `source`); a `[game.tree] source` config parsed that
 /// way fails explicitly rather than silently resolving against the current
 /// directory.
-fn parse_family_at(raw: &str, base_dir: Option<&Path>) -> Result<Family> {
+fn parse_family_at(raw: &str, base_dir: Option<&Path>) -> Result<PostflopConfig> {
     let schema = declared_schema(raw)?;
-    // Parsing per declared family, rather than by trying each in turn,
+    // Parsing per declared schema, rather than by trying each shape in turn,
     // means an error names the keys *that* family accepts instead of
-    // reporting that the file matched none of three shapes.
-    let mut family = match schema.as_str() {
-        SCHEMA_TOY => Family::Toy(toml::from_str(raw).map_err(key_error)?),
+    // reporting that the file matched none of the shapes.
+    let mut config = match schema.as_str() {
         SCHEMA_POSTFLOP => {
             reject_retired_postflop_keys(raw)?;
-            Family::Postflop(toml::from_str(raw).map_err(key_error)?)
+            toml::from_str::<PostflopConfig>(raw).map_err(key_error)?
         }
-        SCHEMA_PREFLOP_HU => Family::PreflopHu(toml::from_str(raw).map_err(key_error)?),
         other => bail!(
             "SLV001: unsupported schema {other:?}; this parser handles {}",
             SCHEMAS.join(", ")
         ),
     };
-    if let Family::Postflop(config) = &mut family {
-        // Checked on what the author actually wrote, before `source` (if
-        // any) is resolved into `script` below -- resolving first would
-        // make a legitimate `source`-only config look like it named
-        // neither.
-        check_tree_shape(&config.game.tree)?;
-        if config.game.tree.source.is_some() {
-            let base_dir = base_dir.ok_or_else(|| {
-                anyhow!(
-                    "SLV004: [game.tree] source requires a config file path for relative \
-                     resolution; run this through a command that knows the file's location"
-                )
-            })?;
-            config.game.tree.resolve_source_at(base_dir)?;
-        }
+    // Checked on what the author actually wrote, before `source` (if any)
+    // is resolved into `script` below -- resolving first would make a
+    // legitimate `source`-only config look like it named neither.
+    check_tree_shape(&config.game.tree)?;
+    if config.game.tree.source.is_some() {
+        let base_dir = base_dir.ok_or_else(|| {
+            anyhow!(
+                "SLV004: [game.tree] source requires a config file path for relative \
+                 resolution; run this through a command that knows the file's location"
+            )
+        })?;
+        config.game.tree.resolve_source_at(base_dir)?;
     }
-    validate_semantics(&family)?;
-    Ok(family)
+    validate_semantics(&config)?;
+    Ok(config)
 }
 
-fn parse_family(raw: &str) -> Result<Family> {
+fn parse_family(raw: &str) -> Result<PostflopConfig> {
     parse_family_at(raw, None)
 }
 
@@ -594,7 +451,7 @@ fn reject_retired_postflop_keys(raw: &str) -> Result<()> {
 
 /// Turns serde's unknown-field message into something that says why.
 ///
-/// The common case is a key that belongs to Multiway Preflop, since these
+/// The common case is a key that belongs to Multiway Preflop, since the
 /// families used to share one struct that accepted every key and ignored the
 /// ones it did not use.
 fn key_error(error: toml::de::Error) -> anyhow::Error {
@@ -677,8 +534,8 @@ fn check_size(label: &str, size: SizeSpec) -> Result<()> {
     Ok(())
 }
 
-/// Postflop is the one heads-up family that accepts the multiway economics
-/// models, so it is also the one that has to check their numbers.
+/// Postflop accepts the multiway economics models, so it has to check their
+/// numbers.
 fn validate_postflop_economics(rake: &RakeSection, utility: &PostflopUtility) -> Result<()> {
     match rake {
         RakeSection::None => {}
@@ -755,226 +612,124 @@ fn positive(value: f64) -> bool {
 
 /// Checks the things a type cannot: values in range, and sections whose
 /// variant does not apply to this family.
-fn validate_semantics(family: &Family) -> Result<()> {
+fn validate_semantics(config: &PostflopConfig) -> Result<()> {
     // Normalization/validate and solve must check the same run controls.
-    match family {
-        Family::Toy(config) => {
-            config.run.clone().lower()?;
-        }
-        Family::Postflop(config) => {
-            config.run.clone().lower()?;
-        }
-        Family::PreflopHu(config) => {
-            config.run.clone().lower()?;
-        }
-    }
-    let algorithm = match family {
-        Family::Toy(config) => &config.algorithm,
-        Family::Postflop(config) => &config.algorithm,
-        Family::PreflopHu(config) => &config.algorithm,
-    };
-    if matches!(algorithm, AlgorithmSection::ExternalSamplingMccfr { .. }) {
+    config.run.clone().lower()?;
+    if matches!(
+        config.algorithm,
+        AlgorithmSection::ExternalSamplingMccfr { .. }
+    ) {
         bail!(
             "SLV003: schedule = \"external-sampling-mccfr\" is the multiway sampler; \
              these families are solved by the exact vector engine"
         );
     }
-    // Only postflop grew the multiway economics models. Toy games have no
-    // chip amounts to rake or to price with ICM, and the heads-up preflop
-    // family still owns the equity-showdown model it was written for.
-    let shared_economics = match family {
-        Family::Toy(config) => Some(("toy", &config.rake, &config.utility)),
-        Family::PreflopHu(config) => Some(("preflop-hu", &config.rake, &config.utility)),
-        Family::Postflop(_) => None,
-    };
-    if let Some((label, rake, utility)) = shared_economics {
-        if matches!(rake, RakeSection::Generic { .. }) {
-            bail!(
-                "SLV003: kind = \"generic\" rake belongs to schema = \
-                 \"solvers.postflop/v1\" and Multiway Preflop, not to {label}"
-            );
-        }
-        if matches!(utility, UtilitySection::TournamentIcm { .. }) {
-            bail!(
-                "SLV003: kind = \"tournament-icm\" belongs to schema = \
-                 \"solvers.postflop/v1\" and Multiway Preflop, not to {label}; \
-                 use kind = \"icm\" with two payouts"
-            );
-        }
-        if label == "toy" && !matches!(rake, RakeSection::None) {
-            bail!(
-                "SLV003: a toy game has no chip amounts to rake; \
-                 remove [rake] or set kind = \"none\""
-            );
-        }
-    }
 
-    match family {
-        Family::Toy(_) => {}
-        Family::Postflop(config) => {
-            let game = &config.game;
-            // Parsed with the same functions the solve path uses, so
-            // `validate` cannot accept a board or range that `solve` then
-            // rejects.
-            let board = crate::postflop_setup::parse_board(&game.board)
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            if !(3..=5).contains(&board.len()) {
-                bail!(
-                    "SLV004: board has {} cards; a postflop board is 3, 4, or 5",
-                    board.len()
-                );
-            }
-            // The builder asserts distinct board cards. Checking it here is
-            // what keeps the promise that `validate` never accepts a config
-            // `solve` then rejects.
-            let distinct: BTreeSet<_> = board.iter().copied().collect();
-            if distinct.len() != board.len() {
-                bail!("SLV004: board {:?} repeats a card", game.board);
-            }
-            let oop = crate::postflop_setup::parse_range("oop_range", &game.oop_range)
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            let ip = crate::postflop_setup::parse_range("ip_range", &game.ip_range)
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            crate::postflop_setup::validate_board_ranges(&board, &oop, &ip)
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            if game.pot == 0 {
-                bail!("SLV004: pot must be positive");
-            }
-            if game.effective_stack == 0 {
-                bail!("SLV004: effective_stack must be positive");
-            }
-            if game.min_bet == 0 {
-                bail!("SLV004: min_bet must be positive");
-            }
-            crate::postflop_setup::parse_preflop_aggressor(&game.preflop_aggressor)
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            if !matches!(game.tree.kind.as_str(), "none" | "script") {
-                bail!(
-                    "SLV004: unknown [game.tree] kind {:?}; the postflop family has \"none\" or \
-                     \"script\"",
-                    game.tree.kind
-                );
-            }
-            if let Some(threshold) = game.tree.allin_threshold
-                && !(threshold.is_finite() && threshold > 0.0 && threshold <= 1.0)
-            {
-                bail!("SLV004: [game.tree] allin_threshold must be finite and within (0, 1]");
-            }
-            // Compiling here, through the same code the tree builder uses,
-            // is what stops a broken script from surviving normalization
-            // and only failing once `solve` builds the tree.
-            let script = game
-                .tree
-                .compiled_script()
-                .map_err(|error| anyhow!("SLV004: {error}"))?;
-            if let Some(script) = &script {
-                for key in game.tree.params.keys() {
-                    if !script.params.iter().any(|param| &param.name == key) {
-                        bail!("SLV004: [game.tree.params] {key:?} does not name a declared param");
-                    }
-                }
-            }
-            let rules: &[Rule<PostflopVar>] = script.as_ref().map_or(&[], |script| &script.rules);
-            let start = match board.len() {
-                3 => Street::Flop,
-                4 => Street::Turn,
-                _ => Street::River,
-            };
-            for rule in rules {
-                // A rule on a street this board already passed cannot be
-                // reached, and silently dropping it would let a config
-                // describe a tree it does not get. Say so instead.
-                if rule.street < start {
-                    bail!(
-                        "SLV004: a tree-script rule targets {}, but a {}-card board starts on \
-                         the {}; remove the rule or shorten the board",
-                        street_name(rule.street),
-                        board.len(),
-                        street_name(start)
-                    );
-                }
-            }
-            validate_rule_sizes(rules)?;
-            validate_postflop_economics(&config.rake, &config.utility)?;
-        }
-        Family::PreflopHu(config) => {
-            let game = &config.game;
-            // `is_finite` first, so NaN and infinity are rejected rather
-            // than slipping through a bare comparison.
-            if !positive(game.effective_stack_bb) {
-                bail!("SLV004: effective_stack_bb must be a positive, finite number");
-            }
-            if !positive(game.sb_bb) || game.sb_bb >= 1.0 {
-                bail!("SLV004: sb_bb must be greater than 0 and less than the big blind");
-            }
-            for realization in game.equity_realization {
-                if !positive(realization) {
-                    bail!("SLV004: equity_realization entries must be positive, finite numbers");
-                }
-            }
-            for (label, range) in [("sb_range", &game.sb_range), ("bb_range", &game.bb_range)] {
-                if let Some(range) = range {
-                    crate::postflop_setup::parse_range(label, range)
-                        .map_err(|error| anyhow!("SLV004: {error}"))?;
-                }
+    let game = &config.game;
+    // Parsed with the same functions the solve path uses, so
+    // `validate` cannot accept a board or range that `solve` then
+    // rejects.
+    let board = crate::postflop_setup::parse_board(&game.board)
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    if !(3..=5).contains(&board.len()) {
+        bail!(
+            "SLV004: board has {} cards; a postflop board is 3, 4, or 5",
+            board.len()
+        );
+    }
+    // The builder asserts distinct board cards. Checking it here is
+    // what keeps the promise that `validate` never accepts a config
+    // `solve` then rejects.
+    let distinct: BTreeSet<_> = board.iter().copied().collect();
+    if distinct.len() != board.len() {
+        bail!("SLV004: board {:?} repeats a card", game.board);
+    }
+    let oop = crate::postflop_setup::parse_range("oop_range", &game.oop_range)
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    let ip = crate::postflop_setup::parse_range("ip_range", &game.ip_range)
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    crate::postflop_setup::validate_board_ranges(&board, &oop, &ip)
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    if game.pot == 0 {
+        bail!("SLV004: pot must be positive");
+    }
+    if game.effective_stack == 0 {
+        bail!("SLV004: effective_stack must be positive");
+    }
+    if game.min_bet == 0 {
+        bail!("SLV004: min_bet must be positive");
+    }
+    crate::postflop_setup::parse_preflop_aggressor(&game.preflop_aggressor)
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    if !matches!(game.tree.kind.as_str(), "none" | "script") {
+        bail!(
+            "SLV004: unknown [game.tree] kind {:?}; the postflop family has \"none\" or \
+             \"script\"",
+            game.tree.kind
+        );
+    }
+    if let Some(threshold) = game.tree.allin_threshold
+        && !(threshold.is_finite() && threshold > 0.0 && threshold <= 1.0)
+    {
+        bail!("SLV004: [game.tree] allin_threshold must be finite and within (0, 1]");
+    }
+    // Compiling here, through the same code the tree builder uses,
+    // is what stops a broken script from surviving normalization
+    // and only failing once `solve` builds the tree.
+    let script = game
+        .tree
+        .compiled_script()
+        .map_err(|error| anyhow!("SLV004: {error}"))?;
+    if let Some(script) = &script {
+        for key in game.tree.params.keys() {
+            if !script.params.iter().any(|param| &param.name == key) {
+                bail!("SLV004: [game.tree.params] {key:?} does not name a declared param");
             }
         }
     }
+    let rules: &[Rule<PostflopVar>] = script.as_ref().map_or(&[], |script| &script.rules);
+    let start = match board.len() {
+        3 => Street::Flop,
+        4 => Street::Turn,
+        _ => Street::River,
+    };
+    for rule in rules {
+        // A rule on a street this board already passed cannot be
+        // reached, and silently dropping it would let a config
+        // describe a tree it does not get. Say so instead.
+        if rule.street < start {
+            bail!(
+                "SLV004: a tree-script rule targets {}, but a {}-card board starts on \
+                 the {}; remove the rule or shorten the board",
+                street_name(rule.street),
+                board.len(),
+                street_name(start)
+            );
+        }
+    }
+    validate_rule_sizes(rules)?;
+    validate_postflop_economics(&config.rake, &config.utility)?;
     Ok(())
 }
 
-fn lower_family(family: Family) -> Result<SolveConfig> {
-    Ok(match family {
-        Family::Toy(config) => SolveConfig {
-            schema: Some(config.schema),
-            game: match config.game {
-                ToyGame::Kuhn => GameSection::Kuhn,
-                ToyGame::Leduc => GameSection::Leduc,
-            },
-            rake: config.rake,
-            utility: config.utility,
-            algorithm: config.algorithm,
-            run: config.run.lower()?,
+fn lower_family(config: PostflopConfig) -> Result<SolveConfig> {
+    Ok(SolveConfig {
+        schema: Some(config.schema),
+        game: GameSection::Postflop {
+            board: config.game.board,
+            oop_range: config.game.oop_range,
+            ip_range: config.game.ip_range,
+            pot: config.game.pot,
+            effective_stack: config.game.effective_stack,
+            min_bet: config.game.min_bet,
+            iso_merging: config.game.iso_merging,
+            preflop_aggressor: config.game.preflop_aggressor,
+            tree: config.game.tree,
         },
-        Family::Postflop(config) => SolveConfig {
-            schema: Some(config.schema),
-            game: GameSection::Postflop {
-                board: config.game.board,
-                oop_range: config.game.oop_range,
-                ip_range: config.game.ip_range,
-                pot: config.game.pot,
-                effective_stack: config.game.effective_stack,
-                min_bet: config.game.min_bet,
-                iso_merging: config.game.iso_merging,
-                preflop_aggressor: config.game.preflop_aggressor,
-                tree: config.game.tree,
-            },
-            rake: config.rake,
-            utility: config.utility.lower(),
-            algorithm: config.algorithm,
-            run: config.run.lower()?,
-        },
-        Family::PreflopHu(config) => SolveConfig {
-            schema: Some(config.schema),
-            game: GameSection::Preflop {
-                effective_stack_bb: config.game.effective_stack_bb,
-                sb_bb: config.game.sb_bb,
-                open_sizes_bb: config.game.open_sizes_bb,
-                raise_factors: config.game.raise_factors,
-                max_raises: config.game.max_raises,
-                include_allin: config.game.include_allin,
-                allow_limp: config.game.allow_limp,
-                sb_range: config.game.sb_range,
-                bb_range: config.game.bb_range,
-                equity_realization: config.game.equity_realization,
-                equity_cache: None,
-                postflop: config.game.postflop,
-            },
-            rake: config.rake,
-            utility: config.utility,
-            algorithm: config.algorithm,
-            run: config.run.lower()?,
-        },
+        rake: config.rake,
+        utility: config.utility.lower(),
+        algorithm: config.algorithm,
+        run: config.run.lower()?,
     })
 }
 
@@ -999,30 +754,30 @@ fn base_directory(config_path: &Path) -> &Path {
 /// serialize and is idempotent by construction: normalizing an effective
 /// config returns the same bytes.
 pub fn normalized_toml(raw: &str) -> Result<String> {
-    let family = parse_family(raw)?;
-    let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
+    let config = parse_family(raw)?;
+    let text = toml::to_string_pretty(&config).context("serializing the effective config")?;
     crate::config::literalize_tree_script("SLV004", &text)
 }
 
 /// [`normalized_toml`], resolving a postflop `[game.tree] source` relative
 /// to `config_path`'s directory.
 pub fn normalized_toml_at(raw: &str, config_path: &Path) -> Result<String> {
-    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
-    let text = toml::to_string_pretty(&family).context("serializing the effective config")?;
+    let config = parse_family_at(raw, Some(base_directory(config_path)))?;
+    let text = toml::to_string_pretty(&config).context("serializing the effective config")?;
     crate::config::literalize_tree_script("SLV004", &text)
 }
 
 /// The same, as JSON, for `validate --format json --show-effective`.
 pub fn normalized_json(raw: &str) -> Result<serde_json::Value> {
-    let family = parse_family(raw)?;
-    serde_json::to_value(&family).context("serializing the effective config")
+    let config = parse_family(raw)?;
+    serde_json::to_value(&config).context("serializing the effective config")
 }
 
 /// [`normalized_json`], resolving a postflop `[game.tree] source` relative
 /// to `config_path`'s directory.
 pub fn normalized_json_at(raw: &str, config_path: &Path) -> Result<serde_json::Value> {
-    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
-    serde_json::to_value(&family).context("serializing the effective config")
+    let config = parse_family_at(raw, Some(base_directory(config_path)))?;
+    serde_json::to_value(&config).context("serializing the effective config")
 }
 
 /// The schema a config declares, once it is known to parse.
@@ -1038,29 +793,20 @@ pub fn declared_at(raw: &str, config_path: &Path) -> Result<String> {
     declared_schema(raw)
 }
 
-fn game_kind_of(family: &Family) -> &'static str {
-    match family {
-        Family::Toy(config) => match config.game {
-            ToyGame::Kuhn => "kuhn",
-            ToyGame::Leduc => "leduc",
-        },
-        Family::Postflop(_) => "postflop",
-        Family::PreflopHu(_) => "preflop",
-    }
-}
+/// The `game.kind` the run manifest records for this family.
+const GAME_KIND: &str = "postflop";
 
 /// The `game.kind` a config declares, for the run manifest.
 pub fn game_kind(raw: &str) -> Result<&'static str> {
-    Ok(game_kind_of(&parse_family(raw)?))
+    parse_family(raw)?;
+    Ok(GAME_KIND)
 }
 
 /// [`game_kind`], resolving a postflop `[game.tree] source` relative to
 /// `config_path`'s directory.
 pub fn game_kind_at(raw: &str, config_path: &Path) -> Result<&'static str> {
-    Ok(game_kind_of(&parse_family_at(
-        raw,
-        Some(base_directory(config_path)),
-    )?))
+    parse_family_at(raw, Some(base_directory(config_path)))?;
+    Ok(GAME_KIND)
 }
 
 // --- tree diagnostic (`validate` only) --------------------------------------
@@ -1072,14 +818,10 @@ pub fn game_kind_at(raw: &str, config_path: &Path) -> Result<&'static str> {
 // verbatim (`literalize_tree_script`) rather than this expanded form.
 
 /// The `tree` diagnostic `validate --format json` reports: a postflop
-/// config's compiled `param` schema and lowered `rule` list. `None` for the
-/// toy and preflop-hu families (no `[game.tree]` at all) and for a postflop
+/// config's compiled `param` schema and lowered `rule` list. `None` for a
 /// config with `kind = "none"` (no script compiled, so nothing to report).
 pub fn tree_diagnostic_at(raw: &str, config_path: &Path) -> Result<Option<serde_json::Value>> {
-    let family = parse_family_at(raw, Some(base_directory(config_path)))?;
-    let Family::Postflop(config) = &family else {
-        return Ok(None);
-    };
+    let config = parse_family_at(raw, Some(base_directory(config_path)))?;
     let Some(script) = config.game.tree.compiled_script()? else {
         return Ok(None);
     };
@@ -1253,9 +995,6 @@ river { replace bet [50] }
 iterations = 100
 "#;
 
-    const TOY: &str =
-        "schema = \"solvers.toy/v1\"\n\n[game]\nkind = \"kuhn\"\n\n[run]\niterations = 10\n";
-
     /// The defect this contract exists to fix: a multiway sampling knob in a
     /// postflop config used to be accepted and ignored.
     #[test]
@@ -1267,18 +1006,18 @@ iterations = 100
         assert!(error.contains("multiway-preflop"), "{error}");
 
         for key in ["sweeps = 5", "evaluation_samples = 8", "sweep_batch = 2"] {
-            let mixed = TOY.replace("iterations = 10", &format!("iterations = 10\n{key}"));
+            let mixed = POSTFLOP.replace("iterations = 100", &format!("iterations = 100\n{key}"));
             assert!(parse_and_lower(&mixed).is_err(), "{key} was accepted");
         }
     }
 
     #[test]
     fn a_missing_or_unknown_schema_says_which_ones_exist() {
-        let error = parse_and_lower("[game]\nkind = \"kuhn\"\n")
+        let error = parse_and_lower("[game]\nboard = \"2c 7d 9h\"\n")
             .unwrap_err()
             .to_string();
         assert!(error.contains("SLV001"), "{error}");
-        assert!(error.contains("solvers.toy/v1"), "{error}");
+        assert!(error.contains("solvers.postflop/v1"), "{error}");
 
         let error = parse_and_lower("schema = \"nope/v1\"\n")
             .unwrap_err()
@@ -1286,14 +1025,31 @@ iterations = 100
         assert!(error.contains("SLV001"), "{error}");
     }
 
-    /// A family's own game section must match its schema.
+    /// The toy and heads-up preflop families were removed. Their schemas are
+    /// refused outright -- by this parser's own `SLV001`, and by the shared
+    /// router with the same "unsupported config schema" error any unknown
+    /// schema gets -- never accepted and reinterpreted as something else.
     #[test]
-    fn a_game_section_from_another_family_is_rejected() {
-        let wrong = POSTFLOP.replace(
-            "schema = \"solvers.postflop/v1\"",
-            "schema = \"solvers.toy/v1\"",
-        );
-        assert!(parse_and_lower(&wrong).is_err());
+    fn the_removed_family_schemas_are_refused() {
+        for removed in ["solvers.toy/v1", "solvers.preflop-hu/v1"] {
+            assert!(!owns(removed), "{removed} must not be owned");
+            let wrong = POSTFLOP.replace(
+                "schema = \"solvers.postflop/v1\"",
+                &format!("schema = \"{removed}\""),
+            );
+            let error = parse_and_lower(&wrong).unwrap_err().to_string();
+            assert!(error.contains("SLV001"), "{removed}: {error}");
+            assert!(error.contains(removed), "{removed}: {error}");
+
+            let error = crate::config::parse_solve_config(&wrong)
+                .unwrap_err()
+                .to_string();
+            assert!(
+                error.contains("unsupported config schema") && error.contains(removed),
+                "{removed}: {error}"
+            );
+            assert!(error.contains(SCHEMA_POSTFLOP), "{removed}: {error}");
+        }
     }
 
     /// Normalizing must be idempotent, or an effective config could not be
@@ -1317,7 +1073,7 @@ iterations = 100
 
     #[test]
     fn the_multiway_sampler_is_refused() {
-        let sampled = TOY.replace(
+        let sampled = POSTFLOP.replace(
             "[run]",
             "[algorithm]\nschedule = \"external-sampling-mccfr\"\n\n[run]",
         );
@@ -1354,10 +1110,12 @@ iterations = 100
     /// the same thing whichever parser reads it.
     #[test]
     fn contract_defaults_match_the_internal_shape() {
-        let minimal = "schema = \"solvers.preflop-hu/v1\"\n\n\
-             [game]\neffective_stack_bb = 100.0\n\n[run]\niterations = 10\n";
-        let internal = "[game]\nkind = \"preflop\"\neffective_stack_bb = 100.0\n\n\
-             [run]\niterations = 10\n";
+        let minimal = "schema = \"solvers.postflop/v1\"\n\n\
+             [game]\nboard = \"2c 7d 9h Js Qs\"\noop_range = \"22+\"\nip_range = \"22+\"\n\
+             pot = 20\neffective_stack = 80\n\n[game.tree]\n\n[run]\niterations = 10\n";
+        let internal = "[game]\nkind = \"postflop\"\nboard = \"2c 7d 9h Js Qs\"\n\
+             oop_range = \"22+\"\nip_range = \"22+\"\npot = 20\neffective_stack = 80\n\n\
+             [game.tree]\n\n[run]\niterations = 10\n";
 
         let from_contract = parse_and_lower(minimal).unwrap();
         let from_internal: SolveConfig = toml::from_str(internal).unwrap();
@@ -1375,7 +1133,7 @@ iterations = 100
     /// safety budget rather than "do no work".
     #[test]
     fn an_omitted_budget_is_the_safety_budget_and_never_zero() {
-        let without = TOY.replace("iterations = 10", "");
+        let without = POSTFLOP.replace("iterations = 100", "");
         let config = parse_and_lower(&without).expect("iterations is optional");
         assert_eq!(config.run.iterations, default_iterations());
         assert!(config.run.iterations > 0, "an omitted budget must solve");
@@ -1534,9 +1292,9 @@ iterations = 100
     }
 
     /// The two economics models postflop borrowed from Multiway Preflop are
-    /// accepted here and refused by the families that cannot use them.
+    /// accepted here.
     #[test]
-    fn the_multiway_economics_models_are_postflop_only() {
+    fn the_multiway_economics_models_are_accepted() {
         let raked = POSTFLOP.replace(
             "[run]",
             "[rake]\nkind = \"generic\"\nrate = 0.05\ncap = 4.0\n\n[run]",
@@ -1554,18 +1312,10 @@ iterations = 100
             panic!("expected tournament ICM");
         };
         assert_eq!(outside_field.len(), 1);
-
-        let borrowed = TOY.replace(
-            "[run]",
-            "[utility]\nkind = \"tournament-icm\"\npayouts = [1.0, 0.0]\n\n[run]",
-        );
-        let error = parse_and_lower(&borrowed).unwrap_err().to_string();
-        assert!(error.contains("SLV003"), "{error}");
     }
 
     #[test]
     fn the_declared_kind_is_reported_for_the_manifest() {
-        assert_eq!(game_kind(TOY).unwrap(), "kuhn");
         assert_eq!(game_kind(POSTFLOP).unwrap(), "postflop");
     }
 }

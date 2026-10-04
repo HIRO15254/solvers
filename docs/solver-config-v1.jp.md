@@ -1,28 +1,29 @@
-<!-- `solvers.toy/v1` / `solvers.postflop/v1` / `solvers.preflop-hu/v1` の規範仕様。
+<!-- `solvers.postflop/v1` の規範仕様。
      Multiway Preflopは別契約(multiway-preflop-v1.jp.md)。実装は
      crates/cli/src/solver_config_v1.rs。
-     postflopについては入力・出力・制約の完全リファレンス。CLIはcli-reference.jp.md。
+     入力・出力・制約の完全リファレンス。CLIはcli-reference.jp.md。
      crates/cli/src/config_new.rs の the_postflop_reference_covers_the_whole_surface
      が網羅性を機械的に検査する。 -->
 
-# Solver Config v1: toy / postflop / preflop-hu
+# Solver Config v1: postflop
 
-正確な heads-up vector engine が解く 3 family の規範仕様である。Multiway Preflop
-(`solvers.multiway-preflop/v1`)は sampling engine の別契約で、
+正確な heads-up vector engine が解く `solvers.postflop/v1` の規範仕様である。
+Multiway Preflop(`solvers.multiway-preflop/v1`)は sampling engine の別契約で、
 [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md)を参照。
 
-`solvers.postflop/v1` については、この文書が **入力(TOML)・出力(artifact)・
-サポート範囲** を覆う完全リファレンスである。CLI は
-[cli-reference.jp.md](cli-reference.jp.md) が全 family 分を覆う。他の 2 family は
-`[game]` 章とそれらが共有する節までをここで規定する。
+この文書が **入力(TOML)・出力(artifact)・サポート範囲** を覆う完全リファレンスである。
+CLI は [cli-reference.jp.md](cli-reference.jp.md) が両 family 分を覆う。
+
+`solvers.toy/v1` と `solvers.preflop-hu/v1` は製品範囲外として削除した。この schema を
+宣言した config は、他の未知 schema と同じく `unsupported config schema` エラー
+(exit code 2)で拒否され、run directory も作られない。
 
 ## 契約の境界
 
 - 全 config は先頭で `schema` を宣言する。schema が family を決めるので、
-  `[game]` に `kind` は書かない。例外は `solvers.toy/v1` のみで、これは 2 つの
-  game を含むため `kind = "kuhn" | "leduc"` を持つ。
+  `[game]` に `kind` は書かない。
 - **key は 1 つの family にだけ属する。** 他 family の key はエラーであり、
-  無視ではない。以前は 3 family が 1 つの struct を共有しており、postflop config に
+  無視ではない。以前は複数の family が 1 つの struct を共有しており、postflop config に
   `stop_dev_gain` や `sweeps`(multiway の sampling 制御)を書いても黙って捨てられていた。
 - **effective config は既定値をすべて明示する。** 既定は field 宣言に置いてあるので
   正規化は parse + serialize であり、冪等である(effective config を正規化すると
@@ -48,7 +49,7 @@ lowered 形状(`[game] kind = "preflop-multiway"`)を手書きした config は 
 ```toml
 schema = "solvers.postflop/v1"   # 必須
 
-[game]      # 必須。family ごと。下記参照
+[game]      # 必須。下記参照
 [game.tree] # postflop のみ。任意
 [rake]      # 任意、既定 kind = "none"
 [utility]   # 任意、既定 kind = "chip-ev"
@@ -59,13 +60,6 @@ schema = "solvers.postflop/v1"   # 必須
 `[run]` の key はすべて省略できるようになったが、table 自体は必須のままである。
 どれだけ回すつもりなのかを config が一言も述べない状態を作らないためで、
 budget を既定に任せる場合も `[run]` と書いて意図を示す。
-
-## `[game]` — `solvers.toy/v1`
-
-```toml
-[game]
-kind = "kuhn"   # 必須。"kuhn" | "leduc"
-```
 
 ## `[game]` — `solvers.postflop/v1`
 
@@ -357,8 +351,8 @@ SPR 閾値か)で決まり、宣言すると `validate` が実際に強制する
 `tree` は診断であって config の一部ではない。`--write-effective` や `run.toml`、
 normalize の結果には決して現れない — script 本文と `[game.tree.params]` をそのまま
 持ち歩く理由(「正規化 — script は展開せずインライン化する」)がここでも変わらない
-ためである。`kind = "none"` の postflop config、および toy / preflop-hu / multiway
-の 3 契約では `tree` key 自体が無い(空 object ではない)。
+ためである。`kind = "none"` の postflop config、および multiway の契約では
+`tree` key 自体が無い(空 object ではない)。
 
 ### 条件式
 
@@ -543,40 +537,7 @@ script は正規化時に parse して条件をコンパイルする。壊れた
 config を素通りして solve 時に落ちることはない。script 由来の error は script 本文の
 行番号を持つ。
 
-## `[game]` — `solvers.preflop-hu/v1`
-
-```toml
-[game]
-effective_stack_bb = 100.0    # 必須、正
-sb_bb = 0.5                   # 既定 0.5。0 < sb_bb < 1
-open_sizes_bb = [2.5]         # 既定 [2.5]
-raise_factors = [[3.0]]       # 既定 [[3.0]]。raise level ごとの倍率
-max_raises = 4                # 既定 4
-include_allin = true          # 既定 true
-allow_limp = true             # 既定 true
-sb_range = "..."              # 任意。省略時は全 range
-bb_range = "..."              # 任意
-equity_realization = [1.0, 1.0]  # 既定 [1.0, 1.0]、各要素は正
-
-[game.postflop]               # 任意。省略時は equity-showdown model
-model = "bucketed"
-flop_buckets = 40
-turn_buckets = 15
-river_buckets = 6
-bets_flop = [0.5]
-bets_turn = [0.75]
-bets_river = [0.75, 1.0]
-max_raises = 3
-include_allin = false
-```
-
 ## `[rake]`
-
-`[rake]` と `[utility]` の適用範囲は family ごとに違う。`solvers.toy/v1` は
-chip 量を持たない抽象 game なので `kind = "none"` / `kind = "chip-ev"` だけを
-受け付け、それ以外は `SLV003` である。`solvers.preflop-hu/v1` は従来どおり
-`percent-cap` / `gg-preflop` と `chip-ev` / `icm` である。以下は
-`solvers.postflop/v1` の surface を述べる。
 
 `kind = "generic"` を postflop で受け付ける。条件式・rounding は
 Multiway Preflop の `[economics.rake]` と同じ実装を共有し、cap と rounding 単位
@@ -624,9 +585,6 @@ Multiway Preflop の ICM 実装をそのまま使う。table 内 2 人 + outside
 `outside_field` の単位は `effective_stack` と同じ chip 単位である
 (Multiway Preflop の `outside_field_bb` は BB 単位で、family ごとに単位が違う)。
 
-`kind = "tournament-icm"` は `solvers.postflop/v1` 専用である。toy と preflop-hu で
-指定すると `SLV003` になる。
-
 ## `[run]`
 
 ```toml
@@ -638,8 +596,8 @@ storage = "f32"        # 既定 f32。"f32" | "i16"
 seed = 7               # 任意。exact HU では記録用。乱数列や戦略を変えない
 target_nash_conv = 0.001   # 任意。下回ったら早期終了
 threads = 8            # 任意
-par_chance_depth = 2   # postflop / preflop-hu のみ。任意
-par_min_children = 12  # postflop / preflop-hu のみ。任意
+par_chance_depth = 2   # postflop のみ。任意
+par_min_children = 12  # postflop のみ。任意
 ```
 
 `iterations` は必須ではなくなった。省略時は 1,000,000 iteration を安全予算として
@@ -663,7 +621,7 @@ HU の `solve` / `resume` / live `inspect` / `report` は `storage`、`threads`�
 multiway の sampling 制御(`sweeps`、`evaluation_samples`、`evaluation_cadence`、
 `sweep_batch`、`stop_dev_gain`、`stop_confirmations`、`stop_eval_period_secs`、
 `stop_br_traversals`、`max_memory_bytes`、`checkpoint_every`)は `SLV002` で拒否する。
-これらの family は正確な vector engine が解くので、どれも意味を持たない。
+この family は正確な vector engine が解くので、どれも意味を持たない。
 
 ## node 履歴の文法
 
@@ -706,7 +664,7 @@ bet と raise を同じ `r` で表すのは、両者が「到達額を宣言す�
 
 `[algorithm]` は Multiway と同じ section 型を共有するが、
 `schedule = "external-sampling-mccfr"` は `SLV003` で拒否する。これは multiway の
-sampler であり、これらの family は正確な vector engine が解くからである。
+sampler であり、この family は正確な vector engine が解くからである。
 
 ## cache path を書かない
 
@@ -718,7 +676,7 @@ OS の user cache directory で決まる。
 ## 出力契約 — postflop
 
 `solve --out <dir>` が作る directory が run の唯一の永続状態である。全 family で
-共通の 5 ファイルに加え、heads-up engine は自分の 3 ファイルを書く。
+共通の 5 ファイルに加え、heads-up engine は自分の 2 ファイルを書く。
 
 | file | 書き込み規則 | 内容 |
 |---|---|---|
@@ -732,10 +690,9 @@ OS の user cache directory で決まる。
 
 Multiway は `checkpoint.mwckpt` / `solution.mwsol` を書く。
 
-postflop は `strategy.json` を書かない。戦略も per-hand 値も `solution.sol` にあり、
-`export` がそれを読むので、同じものの部分的な JSON を別に持つ理由が無いからである。
-`strategy.json` と `solve --history` は、artifact を持たない family
-(`solvers.toy/v1` と `solvers.preflop-hu/v1`)にだけ残っている。
+戦略も per-hand 値も `solution.sol` にあり、`export` がそれを読む。同じものの部分的な
+JSON を別に持つ理由が無いので、第二の JSON 出力も、そのノードを選ぶ `solve --history` も
+持たない。
 
 ### `manifest.json`
 
@@ -880,7 +837,7 @@ resume で生成し直す。
 `resume` は同じ iteration の checkpoint / `.sol` / `run.json` を出力する。
 既存の `.sol` があれば `full` / `no-rivers` を継承し、
 `.sol` がない場合は `full` とする。`--out` による fork でも成果物を全て作り、
-時間予算を維持するため progress をコピーする。postflop に `--history` は使えない。
+時間予算を維持するため progress をコピーする。
 
 ## CLIとの対応
 
@@ -911,7 +868,7 @@ solvers resume runs/my-run
   tree を組むときに印字する。
 - `export` と `compare` は `.sol` と `.mwsol` の両方を扱う。`evaluate` は
   `.mwsol` 専用である(下記「サポート範囲と制約」)。
-- postflop は `strategy.json` を書かず、`solve --history` を受け付けない。
+- `solve` / `resume` に `--history` は無い(渡すと未知の flag として error)。
   ノードを読むのは `export --node` である。
 
 ## サポート範囲と制約
@@ -930,7 +887,7 @@ solvers resume runs/my-run
 | **`allin_threshold` は street ごとに変えられない** | `[game.tree]` 直下の 1 つだけ | size 解決時の規則であって action list の編集ではないので、rule では表現できない。street ごとに変えたい場合は script で明示 size を書く |
 | **`[run]` table は必須** | 中の key は全て省略できるが table は書く | 予算について config が一言も述べない状態を作らないため |
 | **`--threads` / `--memory` / `--max-time` は使えない** | 渡すと error | Multiway 専用 override。heads-up は `[run] threads` / `[run] max_time` を config に書く |
-| **`solve --history` は使えない** | 渡すと error | `strategy.json` を書かないため。ノードは `export --node` で読む |
+| **`solve --history` は使えない** | 渡すと error(未知の flag) | 第二の JSON 出力を持たないため。ノードは `export --node` で読む |
 | **`evaluate` は非対応** | `.mwsol` 専用 | sampling 解に trained deviation をぶつけて再評価するもので、exact engine に対応する概念が無い。相当するのは exploitability で、`summary` view と `.sol` の meta にある |
 | **`report` は root node 限定** | 列は全ボードの root action label の**和集合**。ボードごとに集合が変わっても列は揃う(無い action は空セル) | 任意 node のレポートは `export` が出す。root だけなら 1 回の解でボード横断の比較ができる |
 | **`no-rivers` は river の値を持たない** | river ノードを指す `export` は明示エラー | 既定の `full` なら全ノードが揃う。`no-rivers` は巨大ツリー向けの容量オプトイン |
@@ -969,6 +926,6 @@ TOML surface、型、既定値、条件付き validation、単位のいずれか
 5. `docs/user-guide.jp.md` の利用者向け説明
 6. CLI help 文字列
 
-出力契約(`strategy.json`、`report` の CSV、`.sol`、run directory)を変える場合は
+出力契約(`report` の CSV、`.sol`、run directory)を変える場合は
 `crates/formats` と `crates/cli/src/{solve,sol,report}.rs` も同じ change set に含める。
 AI はこれらが一致しない状態で postflop の仕様変更を完了扱いにしてはならない。

@@ -13,7 +13,7 @@
 
 入力は「テーブルのルール一式」を書いた TOML 設定である。先頭でschemaを宣言する。
 Multiway Preflopは`solvers.multiway-preflop/v1`(仕様は`multiway-preflop-v1.jp.md`)、
-postflop / preflop-hu / toyは`solver-config-v1.jp.md`が規範である。どのfamilyも
+postflopは`solvers.postflop/v1`(仕様は`solver-config-v1.jp.md`)が規範である。どのfamilyも
 `solvers validate`が既定値を展開したeffective configを返す:
 
 - 席ごとのスタック(bb)と参加レンジ(省略時は全 1,326 コンボ)
@@ -251,7 +251,7 @@ Heads-upもcooperative cancelで停止する。
 cargo run -p cli --release -- resume runs/my-run
 ```
 
-これはMultiway Preflopに限らない。Postflop、HU Preflop、toy gameも同じ
+これはMultiway Preflopに限らない。Postflopも同じ
 `solve --out` / `status` / `watch` / `resume` で扱う。engineごとに違うのは
 run directory内の2ファイル(`checkpoint.mwckpt`/`solution.mwsol`と
 `checkpoint.ckpt`/`solution.sol`)だけである。
@@ -428,8 +428,8 @@ EV は **subgame 開始基準** で、「この spot から自分が持ち帰る
 解いた結果は `solution.sol` 一つに入る。戦略とハンドごとの EV が両方入っているので、
 `export` がそこから機械可読な view を出す(`summary` / `tree` / `actions` /
 `strategy` / `ev` / `range`)。`--node all` で全ノードを一度に吐ける。
-2 つの解を突き合わせるなら `compare` を使う。postflop は `strategy.json` を
-書かず、`solve --history` も受け付けない。
+2 つの解を突き合わせるなら `compare` を使う。`solve` / `resume` に `--history` は
+無く、ノードを読むのは `export --node` である。
 
 `inspect --node` と `export --node` が受け取る betting-line 文字列の token は
 `x`(check)、`f`(fold)、`c`(call)、`r{到達額}`(bet / raise)、`[Th]`(配牌)である。
@@ -450,7 +450,7 @@ EV は **subgame 開始基準** で、「この spot から自分が持ち帰る
 ## 13. 関連ドキュメント
 
 - `docs/multiway-preflop-v1.jp.md` — Multiway Preflop v1の規範仕様と全TOML項目
-- `docs/solver-config-v1.jp.md` — postflop / preflop-hu / toyの規範仕様と全TOML項目
+- `docs/solver-config-v1.jp.md` — postflopの規範仕様と全TOML項目
 - `docs/cli-reference.jp.md` — 全コマンド・全flag・exit code・daemonのHTTP API
 - `docs/architecture.md` — workspace、solver、CLIの内部設計
 - `docs/app-architecture.md` — CLI / job daemon / Web GUIの目標設計

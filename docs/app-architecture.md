@@ -82,14 +82,14 @@ TypeScript の wire 型生成は §8.4 の設計条件であり、現行の実�
 
 ### R6. production config は schema 必須、solve の出力は run directory
 
-公開 family は `solvers.multiway-preflop/v1`、`solvers.postflop/v1`、
-`solvers.preflop-hu/v1`、`solvers.toy/v1`。family は schema が決め、toy の game 選択を除き
-利用者が内部の `game.kind` を指定する方式ではない。
+公開 family は `solvers.multiway-preflop/v1` と `solvers.postflop/v1`。family は schema が決め、
+利用者が内部の `game.kind` を指定する方式ではない。削除した family(`solvers.toy/v1`、
+`solvers.preflop-hu/v1`)の schema は、ほかの未対応 schema と同じ unsupported schema エラーで拒否する。
 
 `solve --out` と `resume` が run directory の lifecycle を共有する。
 `--sol-streets` は保存範囲の選択であり、独立した出力先ではない。
-`--history` / `strategy.json` は toy と HU preflop の表面で、postflop は戦略と値を
-`solution.sol` に保存して `export` で読む。詳細・override の可否は CLI reference と規範仕様へ置く。
+postflop は戦略と値を `solution.sol` に保存して `export` で読み、第二の JSON 出力や `--history` は持たない。
+詳細・override の可否は CLI reference と規範仕様へ置く。
 
 lowered config は内部 IR として残るが、schema なしの手書き lowered TOML を公開 family として
 受理しない。既存構造体を使うことと、retired input を再び受け付けることを区別する。
@@ -110,7 +110,7 @@ production の公開 schema は規範仕様で定義する。研究用 example �
 ### R9. キャッシュは machine スコープ、config は run スコープ
 
 cache root の解決順は `--cache-dir`、`SOLVERS_CACHE_DIR`、OS の user cache directory。
-[cli/src/cache.rs](../crates/cli/src/cache.rs) が EHS²、preflop equity、blueprint の場所を決める。
+[cli/src/cache.rs](../crates/cli/src/cache.rs) が EHS² の場所を決める。
 cache は再生成可能な計算資産であり、run directory ごとに複製しない。
 
 EHS² の名前は format version と bucket 数を含み、異なる設定を併存させる。
@@ -157,7 +157,6 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 ├── solution.mwsol       # Multiway の閲覧用 artifact
 ├── checkpoint.ckpt      # HU系の再開用 state (Multiwayとは別形式)
 ├── solution.sol         # HU postflop の戦略・値
-├── strategy.json        # toy / HU preflop の指定履歴の平均戦略
 └── stdout.log           # daemon が起動した child の stdout/stderr
 ```
 

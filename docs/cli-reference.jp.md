@@ -7,26 +7,28 @@
 `solvers`(ソルバー本体)と `solversd`(job daemon)の全コマンド・全 flag を列挙する。
 config に何を書けるかは family ごとの規範仕様を参照する。
 
-- [solver-config-v1.jp.md](solver-config-v1.jp.md) — `solvers.postflop/v1` /
-  `solvers.preflop-hu/v1` / `solvers.toy/v1`
+- [solver-config-v1.jp.md](solver-config-v1.jp.md) — `solvers.postflop/v1`
 - [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) — `solvers.multiway-preflop/v1`
 
 ## family サポート表
 
-| コマンド | postflop | preflop-hu | toy | multiway-preflop |
-|---|:--:|:--:|:--:|:--:|
-| `config new` | ○ | — | — | ○ |
-| `validate` | ○ | ○ | ○ | ○ |
-| `solve` | ○ | ○ | ○ | ○ |
-| `resume` | ○ | ○ | ○ | ○ |
-| `status` / `watch` / `runs ls` | ○ | ○ | ○ | ○ |
-| `inspect` | ○ | — | — | ○ |
-| `report` | ○ | — | — | — |
-| `export` / `compare` | ○ | — | — | ○ |
-| `evaluate` | — | — | — | ○ |
+| コマンド | postflop | multiway-preflop |
+|---|:--:|:--:|
+| `config new` | ○ | ○ |
+| `validate` | ○ | ○ |
+| `solve` | ○ | ○ |
+| `resume` | ○ | ○ |
+| `status` / `watch` / `runs ls` | ○ | ○ |
+| `inspect` | ○ | ○ |
+| `report` | ○ | — |
+| `export` / `compare` | ○ | ○ |
+| `evaluate` | — | ○ |
 
 `inspect` は postflop config・postflop の `.sol`・multiway の `.mwsol` を開く。
-preflop-hu と toy を渡すと error になる。
+
+`solvers.preflop-hu/v1` と `solvers.toy/v1` は製品範囲外として削除した family である。
+その schema を宣言した config は、他の未知 schema と同じく
+`unsupported config schema`(exit code 2)で拒否され、run directory は作られない。
 
 ## 共通
 
@@ -120,7 +122,7 @@ error になる。exact engine の tree サイズ見積りは `solve` が tree �
 
 ### `--format json` の body
 
-toy / postflop / preflop-hu の 3 契約:
+postflop 契約:
 
 ```json
 {
@@ -147,8 +149,8 @@ toy / postflop / preflop-hu の 3 契約:
 `param` 宣言の変数スキーマ(`[game.tree.params]` の上書きを反映した実効値付き)、
 `rules` はビルダーが適用する順序そのままの平坦化された rule 列で、`condition` は
 ソース風テキストへ、`sizes` は size literal へ戻して書く。`effectiveConfig` や
-`run.toml` には決して現れない。`kind = "none"` の postflop config、および toy /
-preflop-hu では `tree` key 自体が無い。
+`run.toml` には決して現れない。`kind = "none"` の postflop config では
+`tree` key 自体が無い。
 
 Multiway Preflop(v1)は `seatCount` / `chipUnitBb` を別途持ち、`tree` は無い
 (`docs/multiway-preflop-v1.jp.md` を見よ)。standard ruleまたは`.mwtree` scriptの
@@ -159,14 +161,13 @@ aggressorのposition名(`UTG`/`HJ`/`CO`/`BTN`/`SB`/`BB`等)を文字列比較で
 ## `solvers solve`
 
 ```sh
-solvers solve <CONFIG> --out DIR [--history LINE]... [--sol-streets MODE]
+solvers solve <CONFIG> --out DIR [--sol-streets MODE]
                                  [--threads N] [--memory SIZE] [--max-time DUR]
 ```
 
 | flag | 既定 | family | 意味 |
 |---|---|---|---|
 | `--out DIR` | 必須 | 全 | run directory。全 artifact がここに落ちる |
-| `--history LINE` | `""`(root のみ) | toy / preflop-hu | `strategy.json` に載せる betting line。繰り返し可。**postflop に渡すと error**で、`export --node` を案内する |
 | `--sol-streets` | `full` | postflop | `full` \| `no-rivers`。`.sol` に戦略と値の block を保存する street |
 | `--threads N` | — | **multiway のみ** | worker thread 数の上書き |
 | `--memory SIZE` | — | **multiway のみ** | policy arena 予算の上書き(`auto` は 6GiB) |
@@ -175,9 +176,9 @@ solvers solve <CONFIG> --out DIR [--history LINE]... [--sol-streets MODE]
 `--threads` / `--memory` / `--max-time` を heads-up config に渡すと error になる。
 heads-up は `[run] threads` と `[run] max_time` を config に書く。
 
-`--history` は artifact を持たない family(toy と preflop-hu)専用である。multiway
-と postflop はどちらも戦略を solution artifact で公開するので、渡すと error になる。
-postflop のノードを読むのは `export --node` である。
+戦略は solution artifact(`.sol` / `.mwsol`)で公開し、postflop のノードを読むのは
+`export --node` である。`--history` は削除した(`solve` / `resume` に渡すと未知の flag として
+error になる)。
 
 `--sol-streets full`(既定)は全 action node の戦略と per-hand 値を保存する。
 `no-rivers` は river の action node を落として artifact を大幅に小さくするが、
@@ -207,7 +208,7 @@ sweep するため、盤面ごとではなく sweep 全体を通じて一度も�
 ## `solvers resume`
 
 ```sh
-solvers resume <RUN> [--out DIR] [--history LINE]...
+solvers resume <RUN> [--out DIR]
                      [--threads N] [--memory SIZE] [--max-time DUR]
                      [--max-sweeps N] [--stop-target X]
                      [--evaluation-samples N] [--evaluation-cadence N]
@@ -221,7 +222,6 @@ solvers resume <RUN> [--out DIR] [--history LINE]...
 | flag | 意味 |
 |---|---|
 | `--out DIR` | 元の run を汚さず、新しい空 directory へ fork する |
-| `--history LINE` | toy / preflop-hu の `strategy.json` に載せる line。postflop では error |
 | `--threads` / `--memory` / `--max-time` | この resume 区間の上書き |
 | `--max-sweeps` / `--stop-target` / `--evaluation-samples` / `--evaluation-cadence` / `--checkpoint-interval` | multiway の停止・評価・checkpoint 設定の上書き |
 
@@ -409,8 +409,7 @@ deviationの2候補を比較するCIは候補選択を考慮した近似区間�
 
 `solve` / `resume` / live `inspect` / `report` は TOML の storage と並列設定を適用する。
 `report` は各 board ごとに `max_time` を判定する。`resume` は保存済み progress の
-経過時間を引き継ぎ、`solution.sol` と `run.json` も更新する。fork も同様で、
-postflop の `--history` は solve / resume とも拒否する。
+経過時間を引き継ぎ、`solution.sol` と `run.json` も更新する。fork も同様である。
 
 `inspect` の `eq` は現在の board と両者の到達レンジを使う。`range` は root range、
 `ev` は run 全体の root summary である。ハンド別 EV は `export ... ev --node ...` を使う。

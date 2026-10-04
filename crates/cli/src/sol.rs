@@ -376,9 +376,6 @@ pub(crate) fn load_sol(
         .context(".sol artifact's embedded config failed to parse")?;
     match &config.game {
         GameSection::Postflop { .. } => {}
-        GameSection::Preflop { .. } => {
-            bail!(".sol artifacts are not supported for preflop configs yet (kind = \"preflop\")");
-        }
         _ => bail!(".sol artifact's embedded config is not kind = \"postflop\""),
     }
     let GameSection::Postflop {

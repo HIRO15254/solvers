@@ -1,5 +1,5 @@
 //! Later streets may be abstracted arbitrarily coarsely: for a
-//! preflop-focused blueprint the river's fidelity barely feeds back into
+//! preflop-focused solver the river's fidelity barely feeds back into
 //! preflop strategy, so extreme bucket counts (down to k = 1) must degrade
 //! gracefully, never panic or emit out-of-range buckets.
 

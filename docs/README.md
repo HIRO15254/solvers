@@ -27,7 +27,7 @@
 | 対象 | 規範 |
 |---|---|
 | `solvers.multiway-preflop/v1` | [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) |
-| `solvers.postflop/v1`、`solvers.preflop-hu/v1`、`solvers.toy/v1` | [solver-config-v1.jp.md](solver-config-v1.jp.md) |
+| `solvers.postflop/v1` | [solver-config-v1.jp.md](solver-config-v1.jp.md) |
 | `solvers` / `solversd`のコマンド・flag・exit code・HTTP API | [cli-reference.jp.md](cli-reference.jp.md) |
 
 [Multiway実装対応表](multiway-preflop-v1.md)は規範から実装・testへの補助資料。

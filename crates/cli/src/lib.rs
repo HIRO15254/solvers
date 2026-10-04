@@ -6,10 +6,11 @@
 //! `clap`/stdout. `main.rs` is a thin binary shim that just calls
 //! [`main_impl`].
 //!
-//! M1 scope: solve toy games from a TOML config, report convergence, and
-//! export the average strategy as JSON. The config schema is the seed of
-//! the future `formats::SolveConfig` (M3), which will add board/range/tree
-//! sections for hold'em and blake3 config hashing.
+//! Two config families are supported: `solvers.postflop/v1` (exact heads-up
+//! postflop, lowered by `solver_config_v1` into [`config::SolveConfig`]) and
+//! `solvers.multiway-preflop/v1` (`multiway_v1`).
+//! [`config::parse_solve_config`] routes a file to its family by its `schema`
+//! key; any other schema is an "unsupported config schema" error.
 //!
 //! `solve --checkpoint`/`--metrics` autosave progress (via the `formats`
 //! crate's `.ckpt`/JSONL formats), and `resume` continues a checkpointed run
@@ -125,7 +126,6 @@ pub mod multiway_solve;
 pub mod multiway_v1;
 mod postflop_artifact;
 pub mod postflop_setup;
-pub mod preflop_setup;
 pub mod report;
 pub mod resume;
 pub mod run_dir;
@@ -218,12 +218,6 @@ enum Command {
         /// Override the v1 cumulative solve-time limit.
         #[arg(long)]
         max_time: Option<String>,
-        /// Betting-line history to export into `strategy.json` (toy and
-        /// heads-up preflop only; repeatable). Defaults to the root node.
-        /// Postflop publishes through `solution.sol`: read a node with
-        /// `export --node` instead.
-        #[arg(long = "history", default_value = "")]
-        history: Vec<String>,
         /// Which streets get stored strategy and value blocks in the `.sol`
         /// export. `full` (default) stores every action node. `no-rivers`
         /// omits river action nodes for a much smaller artifact -- the
@@ -265,11 +259,6 @@ enum Command {
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
-        /// Betting-line history to export into `strategy.json` (toy and
-        /// heads-up preflop only; repeatable). Postflop publishes through
-        /// `solution.sol`; read a node with `export --node` instead.
-        #[arg(long = "history", default_value = "")]
-        history: Vec<String>,
     },
     /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
     Inspect {
@@ -439,7 +428,6 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
-            history,
             sol_streets,
         } => solve::run(
             &config,
@@ -447,7 +435,6 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory.as_deref(),
             max_time.as_deref(),
-            &history,
             sol_streets,
         ),
         Command::Resume {
@@ -456,7 +443,6 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
-            history,
             max_sweeps,
             stop_target,
             evaluation_samples,
@@ -473,7 +459,6 @@ pub fn main_impl() -> Result<()> {
             evaluation_samples,
             evaluation_cadence,
             checkpoint_interval.as_deref(),
-            &history,
         ),
         Command::Inspect {
             config,

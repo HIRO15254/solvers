@@ -139,10 +139,7 @@ fn river_set_key(board: &Board) -> Vec<u8> {
 /// what summing over every raw flop in its orbit would give, since suit
 /// permutations act bijectively on "cards not on the flop" and
 /// canonicalization is invariant under them.
-///
-/// `pub(crate)`: the `blueprint` module enumerates the same 63,193 canonical
-/// turn boards to build `T2`.
-pub(crate) fn canonical_turns() -> Vec<(Board, u32)> {
+fn canonical_turns() -> Vec<(Board, u32)> {
     let flops = canonical_flops();
     let mut counts: BTreeMap<Board, u32> = BTreeMap::new();
     for (flop_board, weight) in &flops {
@@ -169,7 +166,7 @@ pub(crate) fn canonical_turns() -> Vec<(Board, u32)> {
 /// When multiple permutations achieve the minimum (the set has a nontrivial
 /// stabilizer) any of them is correct: bucket rows on the canonical board
 /// are stabilizer-invariant, since E[HS²] scores are suit-symmetric.
-pub(crate) fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
+fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
     let mut best = [u8::MAX; 5];
     let mut best_perm: SuitPerm = [0, 1, 2, 3];
     for perm in all_suit_perms() {
@@ -189,9 +186,8 @@ pub(crate) fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
 /// All 134,459 canonical unordered 5-card sets with raw multiplicities
 /// (summing to `C(52, 5) = 2,598,960`), each as its sorted representative.
 /// Expensive (2.6M sets x 24 perms) — only the full-street build path calls
-/// it. `pub(crate)`: the `blueprint` module enumerates the same sets for
-/// its bucket-vs-bucket river equity.
-pub(crate) fn canonical_river_sets() -> Vec<([Card; 5], u32)> {
+/// it.
+fn canonical_river_sets() -> Vec<([Card; 5], u32)> {
     let all: Vec<Card> = ALL_CARDS.into_iter().collect();
     let mut counts: BTreeMap<[u8; 5], u32> = BTreeMap::new();
     for i in 0..52 {
@@ -528,7 +524,7 @@ fn build_table(
 }
 
 /// A canonical board with its raw enumeration multiplicity.
-pub(crate) type WeightedBoards = Vec<(Board, u32)>;
+type WeightedBoards = Vec<(Board, u32)>;
 
 /// Canonicalizes a list of literal boards (3, 4, or 5 cards each) into
 /// deduplicated per-street `(Board, weight)` lists, weight being how many
@@ -537,12 +533,9 @@ pub(crate) type WeightedBoards = Vec<(Board, u32)>;
 /// street's table keys; the returned river `Board`s are the sorted
 /// representatives (arbitrary 3/2 role split — irrelevant for scoring).
 ///
-/// Factored out of [`Ehs2Abstraction::build_for_boards`] (which just builds
-/// tables from the result) so the `blueprint` module's tests can construct
-/// a small artifact set over exactly the same board subset a small test
-/// abstraction was built for — `build_for_boards` doesn't otherwise expose
-/// which canonical boards it ended up covering.
-pub(crate) fn canonicalize_board_subset(
+/// Factored out of [`Ehs2Abstraction::build_for_boards`], which just builds
+/// tables from the result.
+fn canonicalize_board_subset(
     boards: &[Vec<Card>],
 ) -> (WeightedBoards, WeightedBoards, WeightedBoards) {
     let mut flop_boards: BTreeMap<Board, u32> = BTreeMap::new();
@@ -759,55 +752,6 @@ impl Ehs2Abstraction {
         }
         table
     }
-
-    /// Combo-bucket row for a board already known to be canonical for its
-    /// street (e.g. a member of `canonical_flops()`/[`canonical_turns`], or
-    /// the output of `canonicalize_board`).
-    ///
-    /// This is the batched counterpart of the public per-query `bucket()`:
-    /// no canonicalization happens here, so callers doing millions of
-    /// lookups over the same small set of boards (`blueprint`'s T1/T2/T3/
-    /// river-equity builders) canonicalize once per board and then read the
-    /// whole row via combo-index slicing, instead of paying `bucket()`'s
-    /// per-call canonicalization cost per combo.
-    pub(crate) fn flop_row(&self, canon_flop: &Board) -> &[u16] {
-        let table = self
-            .flop
-            .as_ref()
-            .unwrap_or_else(|| panic!("Ehs2Abstraction::flop_row: flop street not built"));
-        table.boards.get(&flop_key(canon_flop)).unwrap_or_else(|| {
-            panic!("Ehs2Abstraction::flop_row: canonical board {canon_flop:?} not present")
-        })
-    }
-
-    /// Turn counterpart of [`Ehs2Abstraction::flop_row`].
-    pub(crate) fn turn_row(&self, canon_turn: &Board) -> &[u16] {
-        let table = self
-            .turn
-            .as_ref()
-            .unwrap_or_else(|| panic!("Ehs2Abstraction::turn_row: turn street not built"));
-        table.boards.get(&turn_key(canon_turn)).unwrap_or_else(|| {
-            panic!("Ehs2Abstraction::turn_row: canonical board {canon_turn:?} not present")
-        })
-    }
-
-    /// River bucket row for an *arbitrary* (not necessarily canonical)
-    /// unordered 5-card set, plus the suit permutation mapping the caller's
-    /// combo indices into the row's canonical frame
-    /// (`row[permute_combo(&perm, combo)]`). One min-over-24-perms
-    /// canonicalization per call — cheaper than street-structured
-    /// `canonicalize_board`, and the only canonicalization the batched
-    /// river consumers pay per board.
-    pub(crate) fn river_row_for_set(&self, five: [Card; 5]) -> (&[u16], SuitPerm) {
-        let (key, perm) = canonical_river_set(five);
-        let table = self.river.as_ref().unwrap_or_else(|| {
-            panic!("Ehs2Abstraction::river_row_for_set: river street not built")
-        });
-        let row = table.boards.get(key.as_slice()).unwrap_or_else(|| {
-            panic!("Ehs2Abstraction::river_row_for_set: board {five:?} not present")
-        });
-        (row, perm)
-    }
 }
 
 /// Canonicalizes a query board (3/4/5 cards; for 3/4 the first three are
@@ -913,8 +857,7 @@ mod tests {
     #[ignore = "expensive (2.6M sets x 24 perms); CI runs it in release with --include-ignored"]
     fn canonical_river_sets_count_pin() {
         // The unordered 5-set quotient the river street is keyed by; count
-        // matches hand_index::canonical_unordered_board_count(5) and
-        // preflop's independent enumeration.
+        // matches hand_index::canonical_unordered_board_count(5).
         let sets = canonical_river_sets();
         assert_eq!(sets.len(), 134_459);
         let total: u64 = sets.iter().map(|&(_, w)| w as u64).sum();

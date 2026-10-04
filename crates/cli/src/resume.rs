@@ -25,7 +25,6 @@ pub fn run(
     evaluation_samples: Option<u64>,
     evaluation_cadence: Option<u64>,
     checkpoint_interval: Option<&str>,
-    histories: &[String],
 ) -> Result<()> {
     let checkpoint = resolve_checkpoint(run_directory)?;
     if checkpoint
@@ -58,20 +57,15 @@ pub fn run(
             "these resume overrides apply to Multiway Preflop v1 runs only"
         ));
     }
-    resume_heads_up(run_directory, &checkpoint, out, histories)
+    resume_heads_up(run_directory, &checkpoint, out)
 }
 
-/// Continues a heads-up, postflop, or toy run from its run directory.
+/// Continues a heads-up postflop run from its run directory.
 ///
 /// The directory is self-describing: `run.toml` is the config the run used,
 /// and its blake3 hash is what the checkpoint was stamped with, so the two
 /// are verified against each other exactly as before.
-fn resume_heads_up(
-    run_directory: &Path,
-    checkpoint_path: &Path,
-    out: Option<&Path>,
-    histories: &[String],
-) -> Result<()> {
+fn resume_heads_up(run_directory: &Path, checkpoint_path: &Path, out: Option<&Path>) -> Result<()> {
     let config_file = run_directory.join(formats::RUN_CONFIG_FILE);
     let raw_bytes = std::fs::read(&config_file)
         .with_context(|| format!("reading {}", config_file.display()))?;
@@ -80,11 +74,6 @@ fn resume_heads_up(
         crate::config::parse_solve_config(raw).context("parsing the run config")?;
     let config_hash = formats::config_hash(&raw_bytes);
     let is_postflop = matches!(config.game, GameSection::Postflop { .. });
-    if is_postflop && histories.iter().any(|history| !history.is_empty()) {
-        return Err(anyhow!(
-            "postflop publishes through solution.sol; use export --node instead of --history"
-        ));
-    }
     let previous_sol = run_directory.join(formats::RUN_HU_SOLUTION_FILE);
     let sol_mode = if is_postflop && previous_sol.exists() {
         match formats::read_sol(&previous_sol)?.mode {
@@ -156,7 +145,6 @@ fn resume_heads_up(
         }
         .into(),
     });
-    let output = (!is_postflop).then_some(paths.strategy.as_path());
     // A storage-backend mismatch (e.g. the config now says `storage =
     // "i16"` but the checkpoint holds f32 state) surfaces naturally as a
     // `StateMismatch` from `Solver::restore_state` inside `run_with_storage_sol`
@@ -164,8 +152,6 @@ fn resume_heads_up(
     let outcome = match config.run.storage {
         StorageKind::F32 => run_with_storage_sol::<F32Storage>(
             config,
-            output,
-            histories,
             Some(&paths.progress),
             checkpoint_sink,
             Some(checkpoint.state),
@@ -175,8 +161,6 @@ fn resume_heads_up(
         ),
         StorageKind::I16 => run_with_storage_sol::<I16Storage>(
             config,
-            output,
-            histories,
             Some(&paths.progress),
             checkpoint_sink,
             Some(checkpoint.state),

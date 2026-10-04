@@ -277,7 +277,6 @@ mod tests {
             "--show-effective",
             "--write-effective",
             "--resources",
-            "--history",
             "--sol-streets",
             "--threads",
             "--memory",
@@ -437,7 +436,7 @@ mod tests {
             "run.json",
             "checkpoint.ckpt",
             "solution.sol",
-            // the export views that replaced `strategy.json`
+            // the export views
             "summary",
             "tree",
             "actions",

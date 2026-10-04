@@ -173,9 +173,9 @@ pub fn run(
     Ok(())
 }
 
-/// `validate` for the toy, postflop, and heads-up preflop contracts.
+/// `validate` for the postflop contract.
 ///
-/// Their effective config is the parsed form serialized back, so the same
+/// Its effective config is the parsed form serialized back, so the same
 /// call both checks the file and produces the self-contained form a daemon
 /// wants (R10).
 fn validate_solver_config(
@@ -219,9 +219,8 @@ fn validate_solver_config(
         effective_config: Option<serde_json::Value>,
         /// The compiled tree script's `param` schema and lowered rule list --
         /// a read-only diagnostic that never feeds `effective_config` (see
-        /// `solver_config_v1::tree_diagnostic_at`). Absent for the toy and
-        /// preflop-hu families, and for a postflop config with `kind =
-        /// "none"`.
+        /// `solver_config_v1::tree_diagnostic_at`). Absent for a config with
+        /// `kind = "none"`.
         #[serde(skip_serializing_if = "Option::is_none")]
         tree: Option<serde_json::Value>,
     }

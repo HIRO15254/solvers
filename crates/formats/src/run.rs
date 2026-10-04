@@ -37,8 +37,6 @@ pub const RUN_CHECKPOINT_FILE: &str = "checkpoint.mwckpt";
 pub const RUN_SOLUTION_FILE: &str = "solution.mwsol";
 pub const RUN_HU_CHECKPOINT_FILE: &str = "checkpoint.ckpt";
 pub const RUN_HU_SOLUTION_FILE: &str = "solution.sol";
-/// Average strategy for the requested betting lines (heads-up path).
-pub const RUN_STRATEGY_FILE: &str = "strategy.json";
 
 /// Where a run is in its lifecycle.
 ///

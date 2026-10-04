@@ -9,8 +9,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use formats::{
     RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_HU_CHECKPOINT_FILE, RUN_HU_SOLUTION_FILE,
-    RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RUN_STRATEGY_FILE,
-    RunEventLevel, RunEventLog, RunEventPayload, RunManifest, RunState,
+    RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RunEventLevel,
+    RunEventLog, RunEventPayload, RunManifest, RunState,
 };
 
 use crate::multiway_solve::MultiwayRunObservation;
@@ -26,11 +26,6 @@ pub struct RunPaths {
     pub progress: PathBuf,
     pub checkpoint: PathBuf,
     pub solution: PathBuf,
-    /// Average strategy for the requested betting lines. Toy games and the
-    /// heads-up preflop family only: postflop publishes through
-    /// `solution.sol` and multiway through `solution.mwsol`, both of which
-    /// `export` reads.
-    pub strategy: PathBuf,
 }
 
 impl RunPaths {
@@ -42,7 +37,6 @@ impl RunPaths {
             progress: directory.join(RUN_PROGRESS_FILE),
             checkpoint: directory.join(RUN_CHECKPOINT_FILE),
             solution: directory.join(RUN_SOLUTION_FILE),
-            strategy: directory.join(RUN_STRATEGY_FILE),
         }
     }
 
@@ -54,7 +48,6 @@ impl RunPaths {
             progress: directory.join(RUN_PROGRESS_FILE),
             checkpoint: directory.join(RUN_HU_CHECKPOINT_FILE),
             solution: directory.join(RUN_HU_SOLUTION_FILE),
-            strategy: directory.join(RUN_STRATEGY_FILE),
         }
     }
 }
@@ -324,10 +317,10 @@ mod tests {
         create_or_adopt(&run).expect("a queued directory must be adoptable");
         let recorder = RunRecorder::start(
             &run,
-            "kuhn",
-            Some("solvers.toy/v1".into()),
+            "postflop",
+            Some("solvers.postflop/v1".into()),
             [1; 32],
-            "schema = \"solvers.toy/v1\"\n",
+            "schema = \"solvers.postflop/v1\"\n",
             vec!["solve".into()],
         )
         .unwrap();
@@ -335,7 +328,7 @@ mod tests {
 
         let manifest = RunManifest::read(&run).unwrap();
         assert_eq!(manifest.state, RunState::Completed);
-        assert_eq!(manifest.game_kind, "kuhn");
+        assert_eq!(manifest.game_kind, "postflop");
         assert_eq!(
             manifest.created_unix_ms, 1_700_000_000_000,
             "the queued moment must survive adoption"
@@ -349,7 +342,7 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let run = directory.path().join("done");
         std::fs::create_dir(&run).unwrap();
-        let mut manifest = RunManifest::new("done", "kuhn", None, "aa", vec!["solve".into()]);
+        let mut manifest = RunManifest::new("done", "postflop", None, "aa", vec!["solve".into()]);
         manifest.finish(RunState::Completed, None);
         manifest.write_atomic(&run).unwrap();
         assert!(create_or_adopt(&run).is_err());

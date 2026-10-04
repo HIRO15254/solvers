@@ -77,29 +77,6 @@ pub fn ehs2_table(params: Ehs2Params) -> Result<Option<PathBuf>> {
     )
 }
 
-/// Cache file for the exact heads-up preflop equity table.
-///
-/// The table has no parameters -- it is the same 169x169 exact equity for
-/// every run -- so one file per format version serves everything.
-pub fn preflop_equity() -> Result<Option<PathBuf>> {
-    named("preflop", &format!("equity-v{CACHE_FORMAT_VERSION}.bin"))
-}
-
-/// Cache file for a bucketed-blueprint artifact set.
-///
-/// Keyed by the abstraction it was built over: blueprint artifacts are
-/// derived from those buckets, so a different table means different
-/// artifacts.
-pub fn blueprint(params: Ehs2Params) -> Result<Option<PathBuf>> {
-    named(
-        "blueprint",
-        &format!(
-            "v{}-f{}-t{}-r{}.bin",
-            CACHE_FORMAT_VERSION, params.flop_buckets, params.turn_buckets, params.river_buckets
-        ),
-    )
-}
-
 fn named(directory: &str, file: &str) -> Result<Option<PathBuf>> {
     let Some(root) = root() else {
         return Ok(None);

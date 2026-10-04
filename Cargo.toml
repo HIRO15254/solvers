@@ -8,7 +8,6 @@ members = [
     "crates/game",
     "crates/holdem",
     "crates/abstraction",
-    "crates/preflop",
     "crates/multiway",
     "crates/formats",
     "crates/protocol",
@@ -30,7 +29,6 @@ engine = { path = "crates/engine" }
 game = { path = "crates/game" }
 holdem = { path = "crates/holdem" }
 abstraction = { path = "crates/abstraction" }
-preflop = { path = "crates/preflop" }
 multiway = { path = "crates/multiway", default-features = false }
 formats = { path = "crates/formats" }
 protocol = { path = "crates/protocol" }

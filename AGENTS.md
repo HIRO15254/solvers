@@ -43,7 +43,6 @@ The normative specifications are:
 |---|---|
 | `solvers.multiway-preflop/v1` | `docs/multiway-preflop-v1.jp.md` |
 | `solvers.postflop/v1` | `docs/solver-config-v1.jp.md` |
-| `solvers.preflop-hu/v1`, `solvers.toy/v1` | `docs/solver-config-v1.jp.md` |
 
 `docs/multiway-preflop-cli-spec.jp.md` is a compatibility entrypoint, not a
 second specification. `docs/multiway-preflop-v1.md` is the implementation

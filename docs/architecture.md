@@ -32,7 +32,7 @@
 | HU CFR、BR、storage、reach | `crates/engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
 | HU postflop の木と terminal kernel | `crates/holdem` | rules/metadata と engine の汎用木を分ける |
 | rake / utility | `crates/game/src/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
-| HU preflop / bucketed blueprint | `crates/preflop`、`crates/abstraction` | 169-class trunk、継続モデル、lossy bucket の意味を区別する |
+| Multiway の card abstraction | `crates/abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
 | 多人数の state / sampling / evaluation | `crates/multiway` | production、read-only 診断、feature-gated 研究経路を区別する |
 | 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
 | 保存 / run metadata / wire types | `crates/formats`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 13 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 12 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -57,8 +57,7 @@ crates/
 ├── engine/       # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── game/         # payoff pipeline、production tree を使う Kuhn/Leduc
 ├── holdem/       # Flop/Turn/River開始の HU postflop、kernel、viewer helper
-├── abstraction/  # EHS² percentile bucket、blueprint transition/equity、cache
-├── preflop/      # HU 169-class trunk と bucketed blueprint
+├── abstraction/  # EHS² percentile bucket と cache
 ├── multiway/     # 2–9 seat NLHE、dense arena、sampled solver、checkpoint
 └── formats/      # HU checkpoint、solution、metrics、run-directory DTO/codec
 ```
@@ -72,13 +71,11 @@ hand-index, engine                  → cards
 game                                → cards, engine
 holdem                              → cards, hand-index, engine, game
 abstraction                         → cards, hand-index
-preflop                             → cards, hand-index, abstraction, engine, game
 multiway                            → cards, abstraction
 formats                             → engine
 protocol                            → formats
 daemon                              → formats, protocol
-cli                                 → cards, abstraction, engine, game, holdem,
-                                      preflop, multiway, formats
+cli                                 → cards, abstraction, engine, game, holdem, multiway, formats
 ```
 
 `engine` は `cards::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
@@ -169,25 +166,16 @@ FGS、bounty、profile をこの pipeline だけで実装できるとは仮定�
   Flop tree は 2 層の chance とサイズ・raise cap の組合せで大きくなるため、事前見積りを行う。
   ある 3-bet pot の測定値を SRP や別の action tree の資源保証へ流用しない。
 
-## 6. Mode B: preflop + abstraction crate
+## 6. abstraction crate(Multiway の bucket)
 
-[preflop](../crates/preflop/src/lib.rs) の trunk は 169 hand class の reach を使う。
-同一 class 内で combo weight が一様な条件では lossless であり、reach は class ごとの確率密度ではなく
-combo weight の合計である。compatible combo pair の比率を terminal 評価と root normalizer に反映する。
+[abstraction](../crates/abstraction/src/lib.rs) は Multiway が使う build 時の card abstraction である。
+`Ehs2Abstraction` は street ごとに (canonical board, combo) を E[HS²] の percentile bucket へ写し、
+`CardAbstraction` は具体的な board/combo と bucket の対応を提供する。写像の計算は build 時だけで行い、
+Preflop は 169 hand class で lossless に扱うため、bucket 化するのは postflop だけである。
+HU postflop(§5)は card abstraction を使わない。
 
-現在の [PostflopModel](../crates/preflop/src/model.rs) は
-`continuation_coef(ctx, player) -> TermCoef { a, b, c }` を返し、class pair の utility を
-`a + b * e_win + c * e_tie` と表す。`EquityShowdown` は realization factor を使う実装である。
-これは range 条件付き value ベクトルを返す API ではなく、NN や solved flop subset をそのまま接続できない。
-
-別の [bucketed.rs](../crates/preflop/src/bucketed.rs) は `BlueprintGame` を組み立てる。
-[abstraction](../crates/abstraction/src/lib.rs) の `Ehs2Abstraction`、bucket 間の transition / equity
-artifact を利用し、engine 側は bucket を私的状態の次元として扱う。`CardAbstraction` は
-具体的な board/combo と bucket の対応を build 時に提供する。
-
-多人数の range 相関や bunching は HU class trunk の単純な延長とは扱わず、共有 world と
-joint belief の検証を伴う別境界とする。NN、別方式の abstraction、追加 variant の採否は §11 と
-ロードマップに従う。
+多人数の range 相関や bunching は共有 world と joint belief の検証を伴う別境界とする。
+NN、別方式の abstraction、追加 variant の採否は §11 とロードマップに従う。
 
 ## 7. 正当性検証
 

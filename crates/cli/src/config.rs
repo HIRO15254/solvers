@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 use std::collections::BTreeMap;
-use std::path::PathBuf;
 use std::str::FromStr;
 
 use anyhow::{Context, Result, anyhow, bail};
@@ -15,8 +14,10 @@ use serde::{Deserialize, Serialize};
 /// Parses a config in whichever family it declares.
 ///
 /// Every family is a versioned contract with its own parser: Multiway
-/// Preflop in `multiway_v1`, the rest in `solver_config_v1`. This function
-/// is only the routing, so no caller has to know which module owns a file.
+/// Preflop in `multiway_v1`, heads-up postflop in `solver_config_v1`. This
+/// function is only the routing, so no caller has to know which module owns a
+/// file. A schema neither parser owns is the "unsupported config schema"
+/// error, which is also what a removed family now gets.
 pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
     if crate::multiway_v1::has_v1_schema(raw)? {
         return crate::multiway_v1::parse_and_lower(raw);
@@ -173,9 +174,10 @@ pub(crate) fn solution_artifact_compatible_config(
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SolveConfig {
-    /// The config family this file belongs to; see [`SCHEMA_TOY`] and its
-    /// siblings. Absent on a config lowered from another schema, whose
-    /// declaration lives in the source file rather than the lowered form.
+    /// The config family this file belongs to; see
+    /// `solver_config_v1::SCHEMA_POSTFLOP` and `multiway_v1::SCHEMA`. Absent
+    /// on a config lowered from another schema, whose declaration lives in
+    /// the source file rather than the lowered form.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schema: Option<String>,
     pub game: GameSection,
@@ -195,8 +197,6 @@ pub struct SolveConfig {
 // boxing `tree` to appease the lint would just add indirection for nothing.
 #[allow(clippy::large_enum_variant)]
 pub enum GameSection {
-    Kuhn,
-    Leduc,
     Postflop {
         /// Whitespace-separated cards, e.g. "Ks 7h 2d" (flop), "...  Js"
         /// (turn), or "... Tc" (river). Board length picks the starting
@@ -227,104 +227,7 @@ pub enum GameSection {
         #[serde(default)]
         tree: TreeSection,
     },
-    Preflop {
-        /// Per-player starting stack, in big blinds.
-        effective_stack_bb: f64,
-        /// Small blind size, in big blinds (SB = `Player::P0`).
-        #[serde(default = "default_sb_bb")]
-        sb_bb: f64,
-        /// SB's (or BB's iso-raise) first-raise raise-to sizes, in big
-        /// blinds.
-        #[serde(default = "default_open_sizes_bb")]
-        open_sizes_bb: Vec<f64>,
-        /// Reraise-to factors per raise level (see `preflop::PreflopConfig`
-        /// docs); an empty outer list means sized reraises are never offered
-        /// (all-in only).
-        #[serde(default = "default_raise_factors")]
-        raise_factors: Vec<Vec<f64>>,
-        #[serde(default = "default_preflop_max_raises")]
-        max_raises: u32,
-        #[serde(default = "default_true")]
-        include_allin: bool,
-        #[serde(default = "default_true")]
-        allow_limp: bool,
-        /// SB's range spec (e.g. "22+,A2s+"); `None` is the full range.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        sb_range: Option<String>,
-        /// BB's range spec; `None` is the full range.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        bb_range: Option<String>,
-        /// Per-player equity-realization factors for non-all-in
-        /// continuations (see `preflop::EquityShowdown`).
-        #[serde(default = "default_equity_realization")]
-        equity_realization: [f64; 2],
-        /// Disk cache path for the exact 169x169 equity table; `None`
-        /// recomputes it in memory every run.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        equity_cache: Option<PathBuf>,
-        /// Optional bucketed blueprint postflop model. Absence of the whole
-        /// section keeps today's behavior: the 169-class trunk's
-        /// continuations resolve via `preflop::EquityShowdown`, with no
-        /// postflop betting tree at all.
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        postflop: Option<PostflopSection>,
-    },
     PreflopMultiway(multiway::MultiwayConfig),
-}
-
-/// `[game.postflop]`: extends the preflop trunk with a bucketed blueprint
-/// postflop model (`abstraction::Ehs2Abstraction` + `BlueprintArtifacts`,
-/// wired through `preflop::build_blueprint_game`).
-///
-/// Bucket-count defaults (50/20/8) are deliberately coarser on later
-/// streets: the deliverable of this model is preflop ranges, so turn/river
-/// fidelity is traded for tree storage and artifact build time.
-#[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(deny_unknown_fields, rename_all = "kebab-case")]
-pub struct PostflopSection {
-    /// Postflop model kind. Validated at solve time (not parse time) so the
-    /// error message can name the one supported value; only `"bucketed"` is
-    /// implemented.
-    pub model: String,
-    #[serde(default = "default_flop_buckets")]
-    pub flop_buckets: u32,
-    #[serde(default = "default_turn_buckets")]
-    pub turn_buckets: u32,
-    #[serde(default = "default_river_buckets")]
-    pub river_buckets: u32,
-    /// Pot-fraction bet/raise sizes on the flop, same for both players.
-    #[serde(default)]
-    pub bets_flop: Vec<f64>,
-    /// Pot-fraction bet/raise sizes on the turn, same for both players.
-    #[serde(default)]
-    pub bets_turn: Vec<f64>,
-    /// Pot-fraction bet/raise sizes on the river, same for both players.
-    #[serde(default)]
-    pub bets_river: Vec<f64>,
-    #[serde(default = "default_postflop_max_raises")]
-    pub max_raises: u32,
-    #[serde(default = "default_true")]
-    pub include_allin: bool,
-    /// Disk cache path for the EHS² bucket abstraction.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub abstraction_cache: Option<PathBuf>,
-    /// Disk cache path for the derived blueprint artifacts (T1/T2/T3
-    /// transitions plus river bucket-vs-bucket equity).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub artifacts_cache: Option<PathBuf>,
-}
-
-fn default_flop_buckets() -> u32 {
-    50
-}
-fn default_turn_buckets() -> u32 {
-    20
-}
-fn default_river_buckets() -> u32 {
-    8
-}
-fn default_postflop_max_raises() -> u32 {
-    2
 }
 
 /// `[game.tree]`: the postflop betting grammar. Every node's menu comes from
@@ -699,22 +602,6 @@ fn is_false(value: &bool) -> bool {
     !*value
 }
 
-fn default_sb_bb() -> f64 {
-    0.5
-}
-fn default_open_sizes_bb() -> Vec<f64> {
-    vec![2.5]
-}
-fn default_raise_factors() -> Vec<Vec<f64>> {
-    vec![vec![3.0]]
-}
-fn default_preflop_max_raises() -> u32 {
-    4
-}
-fn default_equity_realization() -> [f64; 2] {
-    [1.0, 1.0]
-}
-
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct RunSection {
@@ -847,16 +734,15 @@ pub enum StorageKind {
 /// Shared by both families: postflop and Multiway Preflop write their
 /// script to the same `[game.tree] script` key and want the same literal
 /// form, so `code` is the only thing that differs (`SLV004` / `MWP004`).
-/// A no-op (including for the toy and preflop-hu families, and for a
-/// multiway config still on `kind = "standard"`) when the parsed document
-/// has no `[game.tree] script` string to rewrite.
+/// A no-op (including for a multiway config still on `kind = "standard"`)
+/// when the parsed document has no `[game.tree] script` string to rewrite.
 pub(crate) fn literalize_tree_script(code: &str, effective_toml: &str) -> Result<String> {
     let mut document = toml_edit::DocumentMut::from_str(effective_toml)
         .context("re-parsing the effective config as a TOML document")?;
     // Checked read-only first: `Item::get_mut` auto-vivifies a missing key
     // as `Item::None` (the machinery that lets `doc["a"]["b"] = v` create
     // tables on the fly), so chaining `get_mut` alone would "find" a
-    // `[game.tree] script` on every config, toy and preflop-hu included.
+    // `[game.tree] script` on every config, scriptless ones included.
     // `Item::get` has no such side effect.
     let has_script = document
         .get("game")
@@ -954,250 +840,6 @@ mod tests {
             panic!("expected schedule = \"external-sampling-mccfr\"");
         };
         assert!(traverser_vector);
-    }
-
-    #[test]
-    fn preflop_config_minimal_applies_defaults() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-
-[run]
-iterations = 10
-"#;
-        let config: SolveConfig = toml::from_str(raw).expect("parse minimal preflop config");
-        match config.game {
-            GameSection::Preflop {
-                effective_stack_bb,
-                sb_bb,
-                open_sizes_bb,
-                raise_factors,
-                max_raises,
-                include_allin,
-                allow_limp,
-                sb_range,
-                bb_range,
-                equity_realization,
-                equity_cache,
-                postflop,
-            } => {
-                assert_eq!(effective_stack_bb, 100.0);
-                assert_eq!(sb_bb, 0.5);
-                assert_eq!(open_sizes_bb, vec![2.5]);
-                assert_eq!(raise_factors, vec![vec![3.0]]);
-                assert_eq!(max_raises, 4);
-                assert!(include_allin);
-                assert!(allow_limp);
-                assert_eq!(sb_range, None);
-                assert_eq!(bb_range, None);
-                assert_eq!(equity_realization, [1.0, 1.0]);
-                assert_eq!(equity_cache, None);
-                assert!(postflop.is_none());
-            }
-            other => panic!("expected GameSection::Preflop, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn preflop_config_fully_specified_overrides_every_default() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 10.0
-sb_bb = 0.5
-open_sizes_bb = []
-raise_factors = []
-max_raises = 1
-include_allin = true
-allow_limp = false
-sb_range = "22+,A2s+"
-bb_range = "QQ+"
-equity_realization = [0.9, 1.1]
-equity_cache = ".cache/preflop_equity.bin"
-
-[run]
-iterations = 10
-"#;
-        let config: SolveConfig =
-            toml::from_str(raw).expect("parse fully-specified preflop config");
-        match config.game {
-            GameSection::Preflop {
-                effective_stack_bb,
-                sb_bb,
-                open_sizes_bb,
-                raise_factors,
-                max_raises,
-                include_allin,
-                allow_limp,
-                sb_range,
-                bb_range,
-                equity_realization,
-                equity_cache,
-                postflop,
-            } => {
-                assert_eq!(effective_stack_bb, 10.0);
-                assert_eq!(sb_bb, 0.5);
-                assert_eq!(open_sizes_bb, Vec::<f64>::new());
-                assert_eq!(raise_factors, Vec::<Vec<f64>>::new());
-                assert_eq!(max_raises, 1);
-                assert!(include_allin);
-                assert!(!allow_limp);
-                assert_eq!(sb_range.as_deref(), Some("22+,A2s+"));
-                assert_eq!(bb_range.as_deref(), Some("QQ+"));
-                assert_eq!(equity_realization, [0.9, 1.1]);
-                assert_eq!(
-                    equity_cache,
-                    Some(PathBuf::from(".cache/preflop_equity.bin"))
-                );
-                assert!(postflop.is_none());
-            }
-            other => panic!("expected GameSection::Preflop, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn preflop_config_rejects_unknown_field() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-typo_field = 1
-
-[run]
-iterations = 10
-"#;
-        let result: Result<SolveConfig, _> = toml::from_str(raw);
-        assert!(
-            result.is_err(),
-            "an unknown field in a preflop config must fail to parse"
-        );
-    }
-
-    // --- [game.postflop] (bucketed blueprint model) -------------------------
-
-    #[test]
-    fn postflop_section_absent_by_default() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-
-[run]
-iterations = 10
-"#;
-        let config: SolveConfig =
-            toml::from_str(raw).expect("parse preflop config without [game.postflop]");
-        match config.game {
-            GameSection::Preflop { postflop, .. } => {
-                assert!(postflop.is_none());
-            }
-            other => panic!("expected GameSection::Preflop, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn postflop_section_parses_fully_specified() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-
-[game.postflop]
-model = "bucketed"
-flop-buckets = 40
-turn-buckets = 15
-river-buckets = 6
-bets-flop = [0.5]
-bets-turn = [0.75]
-bets-river = [0.75, 1.0]
-max-raises = 3
-include-allin = false
-abstraction-cache = ".cache/ehs2.bin"
-artifacts-cache = ".cache/blueprint.bin"
-
-[run]
-iterations = 10
-"#;
-        let config: SolveConfig =
-            toml::from_str(raw).expect("parse fully-specified [game.postflop]");
-        match config.game {
-            GameSection::Preflop { postflop, .. } => {
-                let section = postflop.expect("postflop section must be present");
-                assert_eq!(section.model, "bucketed");
-                assert_eq!(section.flop_buckets, 40);
-                assert_eq!(section.turn_buckets, 15);
-                assert_eq!(section.river_buckets, 6);
-                assert_eq!(section.bets_flop, vec![0.5]);
-                assert_eq!(section.bets_turn, vec![0.75]);
-                assert_eq!(section.bets_river, vec![0.75, 1.0]);
-                assert_eq!(section.max_raises, 3);
-                assert!(!section.include_allin);
-                assert_eq!(
-                    section.abstraction_cache,
-                    Some(PathBuf::from(".cache/ehs2.bin"))
-                );
-                assert_eq!(
-                    section.artifacts_cache,
-                    Some(PathBuf::from(".cache/blueprint.bin"))
-                );
-            }
-            other => panic!("expected GameSection::Preflop, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn postflop_section_defaults() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-
-[game.postflop]
-model = "bucketed"
-
-[run]
-iterations = 10
-"#;
-        let config: SolveConfig = toml::from_str(raw).expect("parse minimal [game.postflop]");
-        match config.game {
-            GameSection::Preflop { postflop, .. } => {
-                let section = postflop.expect("postflop section must be present");
-                assert_eq!(section.model, "bucketed");
-                assert_eq!(section.flop_buckets, 50);
-                assert_eq!(section.turn_buckets, 20);
-                assert_eq!(section.river_buckets, 8);
-                assert!(section.bets_flop.is_empty());
-                assert!(section.bets_turn.is_empty());
-                assert!(section.bets_river.is_empty());
-                assert_eq!(section.max_raises, 2);
-                assert!(section.include_allin);
-                assert_eq!(section.abstraction_cache, None);
-                assert_eq!(section.artifacts_cache, None);
-            }
-            other => panic!("expected GameSection::Preflop, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn postflop_section_rejects_unknown_field() {
-        let raw = r#"
-[game]
-kind = "preflop"
-effective_stack_bb = 100.0
-
-[game.postflop]
-model = "bucketed"
-typo_field = 1
-
-[run]
-iterations = 10
-"#;
-        let result: Result<SolveConfig, _> = toml::from_str(raw);
-        assert!(
-            result.is_err(),
-            "an unknown field in [game.postflop] must fail to parse"
-        );
     }
 
     fn parse_tree(toml: &str) -> TreeSection {

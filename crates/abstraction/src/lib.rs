@@ -1,9 +1,9 @@
 //! Card abstraction: build-time bucketing of (board, hole-combo) situations.
 //!
-//! Buckets compress the postflop private-state space so a Mode B blueprint
-//! game stays tabular (`docs/architecture.md` §6). Everything in this crate
-//! runs at tree-build time only — the engine's hot loop sees buckets purely
-//! as reach-vector dimensions.
+//! Buckets compress the postflop private-state space so the Multiway preflop
+//! solver's game stays tabular. Everything in this crate runs at tree-build
+//! time only — the engine's hot loop sees buckets purely as reach-vector
+//! dimensions.
 //!
 //! This slice ships the E[HS²] percentile baseline
 //! ([`Ehs2Abstraction`]): per street, every live (canonical board, combo)
@@ -19,11 +19,9 @@
 //! does the Waugh perfect-hash index for compact cache keys — until then,
 //! canonical boards (suit-isomorphism representatives) key everything.
 
-mod blueprint;
 mod buckets;
 mod ehs;
 
-pub use blueprint::{BlueprintArtifacts, BlueprintCacheError, BucketEquity, TransitionTable};
 pub use buckets::{BucketCacheError, CACHE_FORMAT_VERSION, Ehs2Abstraction, Ehs2Params};
 pub use ehs::{ehs2, hand_strength};
 

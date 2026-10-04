@@ -387,7 +387,6 @@ const ARTIFACTS: &[&str] = &[
     formats::RUN_RESULT_FILE,
     formats::RUN_PROGRESS_FILE,
     formats::RUN_EVENTS_FILE,
-    formats::RUN_STRATEGY_FILE,
     formats::RUN_SOLUTION_FILE,
     formats::RUN_HU_SOLUTION_FILE,
     formats::RUN_CHECKPOINT_FILE,

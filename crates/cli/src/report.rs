@@ -69,11 +69,6 @@ fn run_config<S: Storage>(
                     tree,
                 )
             }
-            GameSection::Preflop { .. } => {
-                return Err(anyhow!(
-                    "report does not support preflop configs yet (kind = \"preflop\")"
-                ));
-            }
             _ => {
                 return Err(anyhow!(
                     "report only supports schema = \"solvers.postflop/v1\" configs"

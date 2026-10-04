@@ -202,7 +202,7 @@ mod tests {
         let (_guard, root) = root();
         let directory = root.directory("run-c").unwrap();
         std::fs::create_dir_all(&directory).unwrap();
-        let mut manifest = RunManifest::new("run-c", "kuhn", None, "aa", vec!["solve".into()]);
+        let mut manifest = RunManifest::new("run-c", "postflop", None, "aa", vec!["solve".into()]);
         manifest.pid = 0;
         manifest.write_atomic(&directory).unwrap();
         std::fs::write(directory.join(formats::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();

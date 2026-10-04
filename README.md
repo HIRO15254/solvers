@@ -16,7 +16,9 @@ preflop). The [product definition](docs/products.jp.md) states their scope and
 quality, and the [restructure plan](docs/plans/two-product-restructure.jp.md)
 the target architecture and migration steps. The commands below describe the
 current code, which still reads the v1 config families until the new input
-format replaces them. The pre-restructure state is the git tag
+format replaces them. The out-of-scope `solvers.toy/v1` and
+`solvers.preflop-hu/v1` families are gone: their configs fail as an
+unsupported schema. The pre-restructure state is the git tag
 `archive/pre-two-products-2026-10-04`. Task state is managed in Linear; see
 [status and task management](docs/status.jp.md).
 
@@ -28,7 +30,7 @@ format replaces them. The pre-restructure state is the git tag
 - [docs/plans/two-product-restructure.jp.md](docs/plans/two-product-restructure.jp.md) — target architecture and migration plan
 - [docs/plans/nlh-input-v1.jp.md](docs/plans/nlh-input-v1.jp.md) — draft of the shared input format
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
-- [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop, HU Preflop, and toy config contracts
+- [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop config contract
 - [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
 - [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
 - [docs/app-architecture.md](docs/app-architecture.md) — current CLI/daemon boundaries and proposed Web GUI
@@ -37,7 +39,7 @@ format replaces them. The pre-restructure state is the git tag
 
 ## Workspace layout
 
-The project has 13 Rust workspace crates. The `solvers` CLI selects the
+The project has 12 Rust workspace crates. The `solvers` CLI selects the
 config family through its `schema`, runs the solver, and writes a run directory.
 `solversd` manages CLI child processes locally or remotely. The exact HU
 postflop path can start on the flop, turn, or river; the sampled Multiway
@@ -56,8 +58,7 @@ crates/
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── engine      # hot core: public tree, storage, discount schedules, vector CFR, best response
 ├── game        # terminal payoff pipeline (rake/ICM), compiled-tree toy games
-├── abstraction # heads-up blueprint abstraction
-├── preflop     # exact/bucketed heads-up preflop path
+├── abstraction # EHS² percentile bucket abstraction for the multiway solver
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
 ├── formats     # run/metrics/solutions + HU checkpoint; depends on engine snapshots
 └── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
@@ -71,13 +72,12 @@ Examples are runnable inputs; regression fixtures are retained with their tests.
 
 ## Quick start
 
-Every config declares the family it belongs to: `solvers.toy/v1`,
-`solvers.postflop/v1`, `solvers.preflop-hu/v1`, or `solvers.multiway-preflop/v1`.
-Every solve writes one run directory.
+Every config declares the family it belongs to: `solvers.postflop/v1` or
+`solvers.multiway-preflop/v1`. Every solve writes one run directory.
 
 ```sh
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
-cargo run -p cli --release -- solve examples/kuhn.toml --out runs/kuhn
+cargo run -p cli --release -- solve examples/river_small.toml --out runs/river-small
 
 # --- Preflop ---------------------------------------------------------------
 # Multiway Preflop v1: validate, then write one self-contained run directory.

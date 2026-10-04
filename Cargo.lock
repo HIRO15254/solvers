@@ -312,7 +312,6 @@ dependencies = [
  "holdem",
  "libc",
  "multiway",
- "preflop",
  "rand",
  "rand_chacha",
  "rayon",
@@ -874,24 +873,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
-]
-
-[[package]]
-name = "preflop"
-version = "0.1.0"
-dependencies = [
- "abstraction",
- "cards",
- "engine",
- "game",
- "hand-index",
- "postcard",
- "rand",
- "rand_chacha",
- "rayon",
- "rustc-hash",
- "serde",
- "thiserror",
 ]
 
 [[package]]

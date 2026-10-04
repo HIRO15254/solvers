@@ -45,11 +45,6 @@ fn run_config<S: Storage>(
 ) -> Result<()> {
     match &config.game {
         GameSection::Postflop { .. } => {}
-        GameSection::Preflop { .. } => {
-            return Err(anyhow!(
-                "inspect does not support preflop configs yet (kind = \"preflop\")"
-            ));
-        }
         _ => {
             return Err(anyhow!("inspect only supports kind = \"postflop\" configs"));
         }

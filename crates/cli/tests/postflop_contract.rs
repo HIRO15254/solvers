@@ -181,7 +181,6 @@ fn resume_republishes_solution_and_summary_in_place_and_on_fork() {
         assert_eq!(artifact.meta.iterations, 10);
         assert_eq!(result["iterations"], 10);
         assert!((result["nashConv"].as_f64().unwrap() - artifact.meta.nash_conv).abs() < 1e-10);
-        assert!(!path.join("strategy.json").exists());
     }
 }
 
