@@ -27,11 +27,11 @@ crateは`crates/`直下に平置きし、名前の接頭辞で所有者を示す
 | crate | 責務 | 主な由来 |
 |---|---|---|
 | `nlh` | card、combo、range、役判定、盤面述語、suit同型、chip単位（0.001 BB）、position、2〜9人のNLHベッティング規則（forced bet、min-raise、all-in、side pot）、size literalの解決 | `cards`、`hand-index`、`multiway::{betting, settlement, types}` |
-| `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/Monte Carlo）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部、`cli::economics`、`game::payoff`のrake/utility |
+| `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/Monte Carlo）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部（M3）。`cli::economics`はM4、`game::payoff`のrake・ICMはM5で載せ替える |
 | `spot` | 共通Input: TOML schema、parse/正規化、tree script（条件式・param/define）、line文法と再生、製品の決定、検証、Spot IR | `cards::script`、`cards::sizing`の文法部、旧`cli`のconfig層（置換） |
 | `runfiles` | run directory契約（`run.toml`、manifest、events、progress、run.json）、config hash | `formats::{run, metrics, hash}` |
-| `hu-engine` | HU vector CFR/BR、storage、discount schedule、chance-sampled driver、engine試験用toy game | `engine`、`game::toy` |
-| `hu-postflop` | P1: NLH HU postflop木・showdown kernel・payoff焼込み・`.sol`・checkpoint・照会 | `holdem`、`game::payoff`のHU部、`formats::{sol, checkpoint}`、`cli`のpostflop計算部 |
+| `hu-engine` | HU vector CFR/BR、storage、discount schedule、chance-sampled driver | `engine` |
+| `hu-postflop` | P1: NLH HU postflop木・showdown kernel・payoff焼込み・`.sol`・checkpoint・照会。payoff pipelineを通す試験用toy game（Kuhn・Leduc） | `holdem`、`game::{payoff, toy}`、`formats::{sol, checkpoint}`、`cli`のpostflop計算部 |
 | `cfr-ref` | 凍結した独立oracle（test専用、変更しない） | `cfr-ref` |
 | `mw-preflop` | P2: External-Sampling MCCFR、public tree/arena、EHS²抽象化、checkpoint、`.mwsol`、停止評価 | `multiway`（研究経路を除く）、`abstraction::{buckets, ehs}`、`formats::mwsol`、`cli`のmultiway計算部 |
 | `protocol` | daemonのwire型 | `protocol`（`formats`依存を`runfiles`へ） |
@@ -45,8 +45,8 @@ nlh, runfiles, cfr-ref    → workspace内の依存なし
 economics                 → nlh
 spot                      → nlh, economics
 hu-engine                 → nlh
-hu-postflop               → nlh, economics, spot, hu-engine
-mw-preflop                → nlh, economics, spot
+hu-postflop               → nlh, economics, spot, hu-engine, runfiles
+mw-preflop                → nlh, economics, spot, runfiles
 protocol                  → runfiles
 daemon                    → runfiles, protocol
 cli                       → spot, hu-postflop, mw-preflop, runfiles
@@ -73,8 +73,8 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
 |---|---|---|
 | `cards`、`hand-index` | 移植 | `nlh`。script/sizingの文法部は`spot`へ |
 | `engine` | 移植 | `hu-engine` |
-| `game::toy` | 移植 | `hu-engine`の試験用（公開schemaから外す） |
-| `game::payoff` | 分割移植 | rake/utilityは`economics`、HUのpayoff焼込みは`hu-postflop` |
+| `game::toy` | 移植 | `hu-postflop`の試験用（公開schemaから外す）。toy gameはpayoff pipelineを通して作るため`payoff`と同じcrateに置く |
+| `game::payoff` | 移植 | `hu-postflop`。HUのrake・ICMはM5でP1を共通Inputへ接続するときに`economics`へ載せ替え、旧実装と数値照合する |
 | `holdem` | 移植 | `hu-postflop` |
 | `cfr-ref` | 維持 | 凍結oracle。変更・最適化しない |
 | `multiway`の本番経路 | 移植 | `mw-preflop`。betting/settlement/typesは`nlh`、icm/rake_conditionは`economics` |
@@ -102,7 +102,7 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
 | **M0 保全** | 旧状態のtag、作業branch | tagがmainの`457f034`を指す。remoteへのpushは利用者の承認後 |
 | **M1 設計文書** | 製品定義、本計画、Input草案。旧ロードマップ・計画・調査文書を削除し、入口文書を更新 | 文書のリンク検査（`tools/check_docs.py`）が通る。旧R0〜R7計画への導線が残らない |
 | **M2 対象外の削除** | 第3節の「削除」を実施。対応する規範・CLI reference・user guide・例・試験を同じ変更で更新 | 必須検証が通る。HU oracle差分試験とMultiwayの固定seed試験・GTO Wizard参照試験の結果が変わらない。研究featureと`research-*`のcfgが残らない |
-| **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`+`game::toy`→`hu-engine`、`holdem`+`game::payoff`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、rake・ICM・utilityを`economics`へ集める | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に依存方向が第2節と一致する（`spot`はM4で加える） |
+| **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`→`hu-engine`、`holdem`+`game`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、`multiway::{icm, rake_condition}`とconfigのrake部を`economics`へ移す | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に依存方向が第2節と一致する（`spot`はM4で加える） |
 | **M4 共通Input** | tree script（`nlh::script`）を`spot`へ移し、`spot`に`solvers.nlh/v1`のparse・正規化・line再生・製品の決定・検証・Spot IRを実装 | 草案の全key・error・正規化の冪等性・line再生（暗黙fold、min-raise、all-in、side pot、ante）の試験。CLIへはまだ接続しない |
 | **M5 P1接続** | `hu-postflop`がSpot IRから木を組む（BB単位、tableから導出したpot/stack、手に残らない人を含むICM、lineから導出した条件変数、非対称stack）。CLIのsolve/resume/export/compare/report/inspectをP1で新Inputへ | 旧P1の代表config（`examples/postflop_*`、`river_small`、`turn_small`、`3betpot_fast`）を新Inputへ書き換え、戦略・EV・Exploitabilityが旧実装と数値許容内で一致。oracle差分試験が通る |
 | **M6 P2接続** | `mw-preflop`がSpot IRからtableと木を組む。CLIのsolve/resume/status/export/evaluateをP2で新Inputへ | 旧P2の例（`examples/preflop_multiway_v1_*`、`bench_multiway/*`）を新Inputへ書き換え、固定seedのsolve結果が旧実装と一致。GTO Wizard参照試験が通る |
