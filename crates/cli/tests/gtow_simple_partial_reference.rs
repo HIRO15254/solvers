@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use cli::config::GameSection;
-use multiway::{Action, BettingConfig, BettingState, SeatId};
+use mw_preflop::{Action, BettingConfig, BettingState, SeatId};
 
 #[derive(Debug, PartialEq, Eq)]
 enum MenuAction {
@@ -16,7 +16,7 @@ fn fixture_path() -> PathBuf {
         .join("examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml")
 }
 
-fn fixture() -> (multiway::config::ValidatedMultiwayConfig, BettingState) {
+fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
     let path = fixture_path();
     let raw = std::fs::read_to_string(&path).expect("reading Simple reference fixture");
     cli::multiway_v1::validate_production_contract_at(&raw, &path)

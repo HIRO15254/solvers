@@ -7,8 +7,8 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
 use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
-use multiway::solver::StrategyDriftTracker;
-use multiway::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
+use mw_preflop::solver::StrategyDriftTracker;
+use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
 use crate::config::{GameSection, SolveConfig, StorageKind, UtilitySection};
@@ -92,7 +92,7 @@ struct ResultV2 {
     traversals_per_second: f64,
     total_deal_attempts: u64,
     mean_deal_attempts: f64,
-    /// See `multiway::solver::SolverState::hand_updates`. Compare against a
+    /// See `mw_preflop::solver::SolverState::hand_updates`. Compare against a
     /// range-based solver's "hands/s".
     hand_updates: u64,
     hand_updates_per_second: f64,
@@ -468,7 +468,7 @@ fn run_inner(
             .max(1);
         let chunk_end = current
             .checked_add(chunk)
-            .ok_or(multiway::solver::SolverError::CounterOverflow)?;
+            .ok_or(mw_preflop::solver::SolverError::CounterOverflow)?;
         let mut deferred_live_observation = false;
         let operational_stop = Cell::new(None);
         match mw_session.solver.run_sweeps_with_threads_until_observed(
@@ -1021,7 +1021,7 @@ fn final_checkpoint_path<'a>(
         .then(|| Cow::Owned(implicit_resource_checkpoint_path(output)))
 }
 
-fn write_checkpoint<A: multiway::MultiwayAbstraction>(
+fn write_checkpoint<A: mw_preflop::MultiwayAbstraction>(
     solver: &MultiwaySolver<HoldemGame<A>>,
     path: &Path,
     raw_config: &str,
@@ -1031,7 +1031,7 @@ fn write_checkpoint<A: multiway::MultiwayAbstraction>(
     cumulative_before: u64,
 ) -> Result<()> {
     let current = solver.completed_sweeps();
-    let runtime = multiway::checkpoint::CheckpointRuntimeState {
+    let runtime = mw_preflop::checkpoint::CheckpointRuntimeState {
         confirmations_met: stop_state.confirmations_met,
         next_evaluation_sweep: current
             .saturating_add(session::distance_to_boundary(current, evaluation_cadence)),
@@ -1040,8 +1040,10 @@ fn write_checkpoint<A: multiway::MultiwayAbstraction>(
         cumulative_solve_millis: cumulative_before
             .saturating_add(started.elapsed().as_millis().min(u128::from(u64::MAX)) as u64),
     };
-    multiway::checkpoint::MultiwayCheckpoint::write_solver_atomic(solver, path, raw_config, runtime)
-        .with_context(|| format!("writing {}", path.display()))
+    mw_preflop::checkpoint::MultiwayCheckpoint::write_solver_atomic(
+        solver, path, raw_config, runtime,
+    )
+    .with_context(|| format!("writing {}", path.display()))
 }
 
 fn mean(values: &[f64]) -> f64 {
@@ -1053,7 +1055,7 @@ fn mean(values: &[f64]) -> f64 {
 }
 
 fn checkpoint_progress_row(
-    metrics: &multiway::SolverMetrics,
+    metrics: &mw_preflop::SolverMetrics,
     elapsed_secs: f64,
 ) -> MultiwayMetricsRow {
     let mut row = session::metrics_row(
@@ -1081,7 +1083,7 @@ fn publish_observation(
 }
 
 fn publish_live_observation(
-    solver: &MultiwaySolver<HoldemGame<multiway::MultiwayAbstractionBackend>>,
+    solver: &MultiwaySolver<HoldemGame<mw_preflop::MultiwayAbstractionBackend>>,
     cumulative_before: u64,
     started: &Instant,
     observer: &mut Option<&mut dyn FnMut(MultiwayRunObservation)>,
@@ -1137,7 +1139,7 @@ mod tests {
 
     #[test]
     fn checkpoint_progress_uses_current_counters_without_quality_estimates() {
-        let metrics = multiway::SolverMetrics {
+        let metrics = mw_preflop::SolverMetrics {
             sweeps: 12,
             traversals: 72,
             infosets: 34,

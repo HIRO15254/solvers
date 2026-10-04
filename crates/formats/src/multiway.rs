@@ -77,7 +77,7 @@ pub struct MultiwayMetricsRow {
     pub infosets: u64,
     pub memory_bytes: u64,
     pub traversals_per_second: f64,
-    /// See `multiway::solver::SolverState::hand_updates`. Rows written before
+    /// See `mw_preflop::solver::SolverState::hand_updates`. Rows written before
     /// this field existed decode as `0`.
     #[serde(default)]
     pub hand_updates: u64,

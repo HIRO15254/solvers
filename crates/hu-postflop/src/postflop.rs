@@ -582,7 +582,7 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
 }
 
 /// `(amount * fraction).round()`, clamped into `Chips`' `u32` range. Matches
-/// `multiway::betting::scale`'s rounding convention (same size-literal
+/// `mw_preflop::betting::scale`'s rounding convention (same size-literal
 /// grammar, chip unit instead of bb).
 fn scale(amount: Chips, fraction: f64) -> Chips {
     let scaled = (amount.as_f64() * fraction).round();
@@ -596,7 +596,7 @@ fn scale(amount: Chips, fraction: f64) -> Chips {
 /// all-in past `allin_threshold`, sorted, deduped, and filtered down to
 /// targets that actually raise the bet faced — the resolution order fixed by
 /// `docs/solver-config-v1.jp.md`'s `[game.tree]` size-literal table
-/// (identical to `multiway::betting::BettingState::legal_actions`'s size
+/// (identical to `mw_preflop::betting::BettingState::legal_actions`'s size
 /// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
 /// as *additional* contribution over the actor's current street wager — the
 /// shape both `Builder::betting` and the counting mirror `Counting::betting`
@@ -632,7 +632,7 @@ fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec])
     let pot_after_call = pot_now + to_call;
     let called_to = actor_wager + to_call;
 
-    // `multiway::betting::BettingState::minimum_full_target`, with
+    // `mw_preflop::betting::BettingState::minimum_full_target`, with
     // `min_bet` playing the big blind's role: the first bet of a street must
     // reach `min_bet`, and every later raise must reach the previous full
     // raise's own increment on top of the bet it faces.

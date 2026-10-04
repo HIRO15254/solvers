@@ -2,11 +2,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use multiway::solver::{
+use mw_preflop::solver::{
     HistoryEntry, HistoryKey, InfoKey, PolicyColumn, PolicyEntry, ProfileVariant,
     SOLVER_STATE_VERSION, SolverState,
 };
-use multiway::{ExternalSamplingGame, HoldemGame, MultiwayAbstractionBackend};
+use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwayAbstractionBackend};
 use rand::{SeedableRng, rngs::StdRng};
 use serde::Serialize;
 
@@ -25,10 +25,10 @@ fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession>
     };
     let retired = !matches!(
         game.abstraction.kind,
-        multiway::config::AbstractionKind::Ehs2Table
+        mw_preflop::config::AbstractionKind::Ehs2Table
     ) || !matches!(
         game.abstraction.recall,
-        multiway::config::RecallMode::Street
+        mw_preflop::config::RecallMode::Street
     );
     if retired {
         bail!(
@@ -576,7 +576,7 @@ fn comparison_mapping(config_toml: &str) -> Result<(usize, &'static str)> {
     Ok((game.seats.len(), unit))
 }
 
-fn comparison_recall(config_toml: &str) -> Result<multiway::RecallMode> {
+fn comparison_recall(config_toml: &str) -> Result<mw_preflop::RecallMode> {
     let config = parse_solution_config(config_toml)?;
     let crate::config::GameSection::PreflopMultiway(game) = config.game else {
         bail!("compare requires Multiway Preflop solutions");
@@ -624,8 +624,8 @@ impl ComparisonBasis {
     fn for_artifacts(
         left_fingerprint: [u8; 32],
         right_fingerprint: [u8; 32],
-        left_recall: multiway::RecallMode,
-        right_recall: multiway::RecallMode,
+        left_recall: mw_preflop::RecallMode,
+        right_recall: mw_preflop::RecallMode,
     ) -> Self {
         // Recall is checked independently for compatibility with artifacts
         // written before recall entered the abstraction fingerprint. Two
@@ -666,7 +666,7 @@ fn replay_public_state(
     game: &HoldemGame<MultiwayAbstractionBackend>,
     metadata: &formats::MultiwaySolutionMetadata,
     history: [u8; 16],
-) -> Result<multiway::BettingState> {
+) -> Result<mw_preflop::BettingState> {
     let mut state = game.root_state();
     let path = metadata.resolve_history(history).ok_or_else(|| {
         anyhow!(
@@ -964,7 +964,7 @@ fn evaluate_prepared(
             .collect(),
     };
     let (game, sampler, config) = mw_session.solver.into_components();
-    let restored = multiway::MultiwaySolver::from_state_with_config_preallocated_with_threads(
+    let restored = mw_preflop::MultiwaySolver::from_state_with_config_preallocated_with_threads(
         game,
         sampler,
         state,
@@ -1190,7 +1190,7 @@ mod tests {
         ComparisonBasis, build_solution_session, comparison_recall, parse_solution_config,
     };
     use crate::session;
-    use multiway::MultiwayAbstraction;
+    use mw_preflop::MultiwayAbstraction;
 
     #[test]
     fn solution_reads_normalize_only_historical_full_recall_pruning() {
@@ -1263,15 +1263,15 @@ mod tests {
         assert_ne!(current_street, bucket_history);
         assert_eq!(
             comparison_recall(&bucket_history).unwrap(),
-            multiway::RecallMode::Full
+            mw_preflop::RecallMode::Full
         );
         assert_eq!(
             comparison_recall(&current_street).unwrap(),
-            multiway::RecallMode::Street
+            mw_preflop::RecallMode::Street
         );
         assert_eq!(
             comparison_recall(crate::test_fixtures::V1_RETIRED_ROLLOUT).unwrap(),
-            multiway::RecallMode::Street,
+            mw_preflop::RecallMode::Street,
             "the v1 default must lower to current-street recall"
         );
 
@@ -1283,9 +1283,9 @@ mod tests {
             session::build_multiway_session(&current_street, None).expect("current-street session");
         let current_street_fingerprint = current_street.solver.abstraction_fingerprint();
         let backend_fingerprint = current_street.solver.game().abstraction().fingerprint();
-        let bucket_history_fingerprint = multiway::abstraction_fingerprint_with_recall(
+        let bucket_history_fingerprint = mw_preflop::abstraction_fingerprint_with_recall(
             backend_fingerprint,
-            multiway::RecallMode::Full,
+            mw_preflop::RecallMode::Full,
         );
         assert_ne!(
             bucket_history_fingerprint, current_street_fingerprint,
@@ -1295,8 +1295,8 @@ mod tests {
             ComparisonBasis::for_artifacts(
                 bucket_history_fingerprint,
                 bucket_history_fingerprint,
-                multiway::RecallMode::Full,
-                multiway::RecallMode::Full,
+                mw_preflop::RecallMode::Full,
+                mw_preflop::RecallMode::Full,
             ),
             ComparisonBasis::BucketInfoset
         );
@@ -1304,8 +1304,8 @@ mod tests {
             ComparisonBasis::for_artifacts(
                 bucket_history_fingerprint,
                 current_street_fingerprint,
-                multiway::RecallMode::Full,
-                multiway::RecallMode::Street,
+                mw_preflop::RecallMode::Full,
+                mw_preflop::RecallMode::Street,
             ),
             ComparisonBasis::SharedRealCardSample
         );
@@ -1313,8 +1313,8 @@ mod tests {
             ComparisonBasis::for_artifacts(
                 bucket_history_fingerprint,
                 bucket_history_fingerprint,
-                multiway::RecallMode::Full,
-                multiway::RecallMode::Street,
+                mw_preflop::RecallMode::Full,
+                mw_preflop::RecallMode::Street,
             ),
             ComparisonBasis::SharedRealCardSample,
             "legacy artifacts may share the backend fingerprint across recall modes"

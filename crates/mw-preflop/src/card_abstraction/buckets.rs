@@ -30,7 +30,7 @@ use rayon::prelude::*;
 
 use nlh::Street;
 
-use crate::CardAbstraction;
+use super::CardAbstraction;
 
 /// Bucket counts per postflop street.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -61,7 +61,7 @@ const CACHE_MAGIC: &[u8; 8] = b"SLVRBKTS";
 /// version-1 caches would silently miss every river lookup.
 const CACHE_VERSION: u16 = 2;
 /// Public alias for [`CACHE_VERSION`] so downstream content fingerprints
-/// (e.g. `multiway`'s ehs2-table abstraction backend) can fold in the
+/// (e.g. `mw-preflop`'s ehs2-table abstraction backend) can fold in the
 /// table format/scoring-semantics version and change whenever it bumps,
 /// without duplicating the constant.
 pub const CACHE_FORMAT_VERSION: u16 = CACHE_VERSION;

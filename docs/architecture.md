@@ -32,8 +32,8 @@
 | HU CFR、BR、storage、reach | `crates/hu-engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
 | HU postflop の木と terminal kernel | `crates/hu-postflop` | rules/metadata と engine の汎用木を分ける |
 | rake / utility | `crates/hu-postflop/src/game/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
-| Multiway の card abstraction | `crates/abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
-| 多人数の state / sampling / evaluation | `crates/multiway` | production、read-only 診断、feature-gated 研究経路を区別する |
+| Multiway の card abstraction | `crates/mw-preflop/src/card_abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
+| 多人数の state / sampling / evaluation | `crates/mw-preflop` | production、read-only 診断、feature-gated 研究経路を区別する |
 | 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
 | 保存 / run metadata / wire types | `crates/formats`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
 | job / HTTP / remote | `crates/daemon` | solver は CLI 子プロセスへ委譲し、永続状態は run directory から読む |
@@ -55,8 +55,7 @@ crates/
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc
-├── abstraction/  # EHS² percentile bucket と cache
-├── multiway/     # 2–9 seat NLHE、dense arena、sampled solver、checkpoint
+├── mw-preflop/   # 2–9 seat NLHE、dense arena、sampled solver、checkpoint、EHS² bucket と cache
 └── formats/      # HU checkpoint、solution、metrics、run-directory DTO/codec
 ```
 
@@ -67,18 +66,17 @@ crates/
 nlh, cfr-ref                        → workspace内の通常依存なし
 hu-engine                           → nlh
 hu-postflop                         → nlh, hu-engine
-abstraction                         → nlh
-multiway                            → nlh, abstraction
+mw-preflop                          → nlh
 formats                             → hu-engine
 protocol                            → formats
 daemon                              → formats, protocol
-cli                                 → nlh, abstraction, hu-engine, hu-postflop, multiway, formats
+cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, formats
 ```
 
 `hu-engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
 ルールには依存しない。`formats` は HU checkpoint の `hu_engine::SolverState` を保存するため
 hu-engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
-`crates/multiway/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は
+`crates/mw-preflop/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
@@ -163,9 +161,9 @@ FGS、bounty、profile をこの pipeline だけで実装できるとは仮定�
   Flop tree は 2 層の chance とサイズ・raise cap の組合せで大きくなるため、事前見積りを行う。
   ある 3-bet pot の測定値を SRP や別の action tree の資源保証へ流用しない。
 
-## 6. abstraction crate(Multiway の bucket)
+## 6. mw-preflop::card_abstraction module(Multiway の bucket)
 
-[abstraction](../crates/abstraction/src/lib.rs) は Multiway が使う build 時の card abstraction である。
+[mw_preflop::card_abstraction](../crates/mw-preflop/src/card_abstraction/mod.rs) は Multiway が使う build 時の card abstraction である。
 `Ehs2Abstraction` は street ごとに (canonical board, combo) を E[HS²] の percentile bucket へ写し、
 `CardAbstraction` は具体的な board/combo と bucket の対応を提供する。写像の計算は build 時だけで行い、
 Preflop は 169 hand class で lossless に扱うため、bucket 化するのは postflop だけである。
@@ -198,7 +196,7 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 |---|---|---|
 | HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
 | HU solution `.sol` | `formats::sol` + CLI artifact query | 平均戦略(u16)と per-hand 値(i16/scale)、config、metadata。`Full` / `NoRivers` |
-| Multiway checkpoint `.mwckpt` | `multiway::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
+| Multiway checkpoint `.mwckpt` | `mw_preflop::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
 | Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
 | run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |
 

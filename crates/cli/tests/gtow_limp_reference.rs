@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use cli::config::GameSection;
-use multiway::{Action, BettingState, SeatId};
+use mw_preflop::{Action, BettingState, SeatId};
 
 fn fixture_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -9,7 +9,7 @@ fn fixture_path() -> PathBuf {
         .join("examples/bench_multiway/6max_100bb_nl50_partial_reference_limp.toml")
 }
 
-fn fixture() -> (multiway::config::ValidatedMultiwayConfig, BettingState) {
+fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
     let path = fixture_path();
     let raw = std::fs::read_to_string(&path).expect("reading limp fixture");
     let lowered = cli::multiway_v1::parse_and_lower_at(&raw, &path).expect("lowering limp fixture");
@@ -23,25 +23,25 @@ fn fixture() -> (multiway::config::ValidatedMultiwayConfig, BettingState) {
     (validated, state)
 }
 
-fn apply(state: &mut BettingState, config: &multiway::BettingConfig, action: Action) {
+fn apply(state: &mut BettingState, config: &mw_preflop::BettingConfig, action: Action) {
     state.apply(action, config).expect("fixture action applies");
 }
 
-fn raise(state: &BettingState, config: &multiway::BettingConfig, bb: f64) -> Action {
+fn raise(state: &BettingState, config: &mw_preflop::BettingConfig, bb: f64) -> Action {
     let target = (bb * 1000.0).round() as u64;
     state.legal_actions(config).unwrap().into_iter().find(|action| {
         matches!(action, Action::RaiseTo { to, all_in: false, .. } if to.raw() == target)
     }).unwrap_or_else(|| panic!("raise to {bb}bb missing"))
 }
 
-fn has_raise(state: &BettingState, config: &multiway::BettingConfig, bb: f64) -> bool {
+fn has_raise(state: &BettingState, config: &mw_preflop::BettingConfig, bb: f64) -> bool {
     let target = (bb * 1000.0).round() as u64;
     state.legal_actions(config).unwrap().iter().any(
         |action| matches!(action, Action::RaiseTo { to, all_in: false, .. } if to.raw() == target),
     )
 }
 
-fn has_jam(state: &BettingState, config: &multiway::BettingConfig) -> bool {
+fn has_jam(state: &BettingState, config: &mw_preflop::BettingConfig) -> bool {
     state
         .legal_actions(config)
         .unwrap()
@@ -49,7 +49,7 @@ fn has_jam(state: &BettingState, config: &multiway::BettingConfig) -> bool {
         .any(|action| matches!(action, Action::RaiseTo { all_in: true, .. }))
 }
 
-fn has_fold(state: &BettingState, config: &multiway::BettingConfig) -> bool {
+fn has_fold(state: &BettingState, config: &mw_preflop::BettingConfig) -> bool {
     state
         .legal_actions(config)
         .unwrap()
@@ -57,7 +57,7 @@ fn has_fold(state: &BettingState, config: &multiway::BettingConfig) -> bool {
         .any(|action| matches!(action, Action::Fold))
 }
 
-fn has_check(state: &BettingState, config: &multiway::BettingConfig) -> bool {
+fn has_check(state: &BettingState, config: &mw_preflop::BettingConfig) -> bool {
     state
         .legal_actions(config)
         .unwrap()
@@ -65,7 +65,7 @@ fn has_check(state: &BettingState, config: &multiway::BettingConfig) -> bool {
         .any(|action| matches!(action, Action::Check))
 }
 
-fn assert_bb_limp_menu(state: &BettingState, config: &multiway::BettingConfig) {
+fn assert_bb_limp_menu(state: &BettingState, config: &mw_preflop::BettingConfig) {
     assert_eq!(state.legal_actions(config).unwrap().len(), 4);
     assert!(has_check(state, config));
     assert!(has_raise(state, config, 3.0));
@@ -74,7 +74,7 @@ fn assert_bb_limp_menu(state: &BettingState, config: &multiway::BettingConfig) {
     assert!(!has_raise(state, config, 4.0));
 }
 
-fn assert_sb_iso_menu(state: &BettingState, config: &multiway::BettingConfig, target: f64) {
+fn assert_sb_iso_menu(state: &BettingState, config: &mw_preflop::BettingConfig, target: f64) {
     assert_eq!(state.legal_actions(config).unwrap().len(), 4);
     assert!(has_fold(state, config));
     assert!(
@@ -91,7 +91,7 @@ fn assert_sb_iso_menu(state: &BettingState, config: &multiway::BettingConfig, ta
     assert!(!has_raise(state, config, 12.5));
 }
 
-fn fold(state: &BettingState, config: &multiway::BettingConfig) -> Action {
+fn fold(state: &BettingState, config: &mw_preflop::BettingConfig) -> Action {
     state
         .legal_actions(config)
         .unwrap()

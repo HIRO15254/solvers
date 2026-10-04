@@ -56,8 +56,7 @@ crates/
 ├── nlh         # card/chip/street types, ranges, evaluator, tree-script front end, suit isomorphism
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
-├── abstraction # EHS² percentile bucket abstraction for the multiway solver
-├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
+├── mw-preflop  # generative 2–9 seat NLHE + external-sampling MCCFR + EHS² buckets
 ├── formats     # run/metrics/solutions + HU checkpoint; depends on hu-engine snapshots
 └── hu-postflop # exact multi-street postflop, payoff pipeline, toy games, aggregation/equity helpers
 ```

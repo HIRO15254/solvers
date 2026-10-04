@@ -15,7 +15,7 @@
 //! normative grammar this module implements: script の構造,
 //! 文 — action list の書き換え, param と define, 条件式, 盤面述語,
 //! size literal, error. The grammar is the same one
-//! `crates/multiway/src/tree_rules.rs` evaluates today, ported to a
+//! `crates/mw-preflop/src/tree_rules.rs` evaluates today, ported to a
 //! compile-once/evaluate-many shape: multiway re-parses its condition
 //! string at every node, which is fine for a small preflop tree but not for
 //! a postflop tree with hundreds of thousands of decision nodes, so here

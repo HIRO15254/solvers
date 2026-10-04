@@ -90,12 +90,12 @@ pub struct GenericRake {
     pub rate: f64,
     /// Cap in chips; `None` is uncapped.
     pub cap: Option<f64>,
-    pub when: multiway::CompiledRakeCondition,
+    pub when: mw_preflop::CompiledRakeCondition,
     /// No effect on a heads-up subgame: there is exactly one pot and never
     /// a side pot to allocate rake across. Kept so a `Generic` rake config
     /// is portable verbatim between the multiway and heads-up families.
-    pub allocation: multiway::RakeAllocation,
-    pub rounding: multiway::RakeRounding,
+    pub allocation: mw_preflop::RakeAllocation,
+    pub rounding: mw_preflop::RakeRounding,
     /// Chip granularity the rake is rounded to. Positive and finite.
     pub rounding_unit: f64,
 }
@@ -108,8 +108,8 @@ impl GenericRake {
         rate: f64,
         cap: Option<f64>,
         when_source: &str,
-        allocation: multiway::RakeAllocation,
-        rounding: multiway::RakeRounding,
+        allocation: mw_preflop::RakeAllocation,
+        rounding: mw_preflop::RakeRounding,
         rounding_unit: f64,
     ) -> Result<GenericRake, String> {
         if !(0.0..=1.0).contains(&rate) {
@@ -129,7 +129,7 @@ impl GenericRake {
                 "generic rake rounding unit must be positive and finite, got {rounding_unit}"
             ));
         }
-        let when = multiway::rake_condition::compile(when_source)?;
+        let when = mw_preflop::rake_condition::compile(when_source)?;
         Ok(GenericRake {
             rate,
             cap,
@@ -147,7 +147,7 @@ impl RakeModel for GenericRake {
         // preflop street belongs to a different engine entirely), and both
         // seats are always dealt in and see the flop, so the multiway
         // condition context collapses to these four constants.
-        let context = multiway::RakeConditionContext {
+        let context = mw_preflop::RakeConditionContext {
             flop_dealt: true,
             showdown: matches!(t.kind, TerminalKind::Showdown),
             players_dealt: 2,
@@ -156,19 +156,19 @@ impl RakeModel for GenericRake {
         if !self.when.matches(context) {
             return 0.0;
         }
-        // Match `multiway::settlement::percentage_with_rounding`: round the
+        // Match `mw_preflop::settlement::percentage_with_rounding`: round the
         // exact percentage to the configured unit first, then cap. Multiway
         // applies the cap to the already-rounded value
-        // (`crates/multiway/src/settlement.rs` `apply_rake`'s
+        // (`crates/mw-preflop/src/settlement.rs` `apply_rake`'s
         // `CompiledRake::Generic` arm), so this mirrors that order.
         let exact = t.pot.as_f64() * self.rate;
         let scaled = exact / self.rounding_unit;
         let rounded = match self.rounding {
-            multiway::RakeRounding::Down => scaled.floor(),
+            mw_preflop::RakeRounding::Down => scaled.floor(),
             // f64::round rounds half-way cases away from zero, exactly the
             // semantics `percentage_with_rounding` relies on for `Nearest`.
-            multiway::RakeRounding::Nearest => scaled.round(),
-            multiway::RakeRounding::Up => scaled.ceil(),
+            mw_preflop::RakeRounding::Nearest => scaled.round(),
+            mw_preflop::RakeRounding::Up => scaled.ceil(),
         } * self.rounding_unit;
         match self.cap {
             Some(cap) => rounded.min(cap),
@@ -186,7 +186,7 @@ impl RakeModel for GenericRake {
 /// plus a fixed outside field.
 pub struct TournamentIcm {
     /// Padded to exactly `2 + outside_field.len()` entries (unpaid places
-    /// trail as `0.0`), matching what `multiway::estimate_icm` requires.
+    /// trail as `0.0`), matching what `mw_preflop::estimate_icm` requires.
     payouts: Vec<f64>,
     outside_field: Vec<f64>,
     samples: u64,
@@ -199,7 +199,7 @@ pub struct TournamentIcm {
 
 impl TournamentIcm {
     /// Validates the payout structure and outside field up front so
-    /// `utility` never needs to fail. `multiway::estimate_icm` re-validates
+    /// `utility` never needs to fail. `mw_preflop::estimate_icm` re-validates
     /// its own inputs on every call (cheap relative to the Monte Carlo
     /// work), so this is a fast, friendlier-message pre-check, not the only
     /// line of defense.
@@ -237,7 +237,7 @@ impl TournamentIcm {
                 ));
             }
         }
-        if field_size > multiway::icm::EXACT_ICM_MAX_PLAYERS && samples < 2 {
+        if field_size > mw_preflop::icm::EXACT_ICM_MAX_PLAYERS && samples < 2 {
             return Err(format!(
                 "tournament ICM with {field_size} players requires at least 2 Monte Carlo samples, got {samples}"
             ));
@@ -260,8 +260,10 @@ impl TournamentIcm {
         // ICM depends only on stack proportions, so treating one chip as
         // one BB-unit is a faithful, lossless-to-0.001 mapping; only the
         // proportions among all field stacks matter, not their scale.
-        let chips_p0 = multiway::MwChips::try_from_bb(stack_p0).unwrap_or(multiway::MwChips::ZERO);
-        let chips_p1 = multiway::MwChips::try_from_bb(stack_p1).unwrap_or(multiway::MwChips::ZERO);
+        let chips_p0 =
+            mw_preflop::MwChips::try_from_bb(stack_p0).unwrap_or(mw_preflop::MwChips::ZERO);
+        let chips_p1 =
+            mw_preflop::MwChips::try_from_bb(stack_p1).unwrap_or(mw_preflop::MwChips::ZERO);
         let key = (chips_p0.raw(), chips_p1.raw());
         if let Some(&cached) = self.memo.lock().unwrap().get(&key) {
             return cached;
@@ -270,9 +272,11 @@ impl TournamentIcm {
         stacks.push(chips_p0);
         stacks.push(chips_p1);
         for &stack in &self.outside_field {
-            stacks.push(multiway::MwChips::try_from_bb(stack).unwrap_or(multiway::MwChips::ZERO));
+            stacks
+                .push(mw_preflop::MwChips::try_from_bb(stack).unwrap_or(mw_preflop::MwChips::ZERO));
         }
-        let result = match multiway::estimate_icm(&stacks, &self.payouts, self.samples, self.seed) {
+        let result = match mw_preflop::estimate_icm(&stacks, &self.payouts, self.samples, self.seed)
+        {
             Ok(estimate) => (estimate.values[0], estimate.values[1]),
             // A stack vector that makes it past `new`'s validation but
             // still upsets `estimate_icm` (e.g. every stack rounding down
@@ -344,8 +348,8 @@ mod tests {
             0.05,
             None,
             "flop_dealt",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -358,8 +362,8 @@ mod tests {
             0.1,
             None,
             "showdown",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -377,8 +381,8 @@ mod tests {
             0.5,
             Some(3.0),
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -394,8 +398,8 @@ mod tests {
             0.13,
             None,
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -403,8 +407,8 @@ mod tests {
             0.13,
             None,
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Nearest,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Nearest,
             1.0,
         )
         .unwrap();
@@ -412,8 +416,8 @@ mod tests {
             0.13,
             None,
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Up,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Up,
             1.0,
         )
         .unwrap();
@@ -428,8 +432,8 @@ mod tests {
             0.5,
             None,
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Nearest,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Nearest,
             1.0,
         )
         .unwrap();
@@ -442,8 +446,8 @@ mod tests {
             0.0,
             None,
             "true",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -456,8 +460,8 @@ mod tests {
             0.1,
             None,
             "players_dealt > 20",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -472,8 +476,8 @@ mod tests {
                 0.1,
                 None,
                 "cards_seen > 3",
-                multiway::RakeAllocation::MainFirst,
-                multiway::RakeRounding::Down,
+                mw_preflop::RakeAllocation::MainFirst,
+                mw_preflop::RakeRounding::Down,
                 1.0,
             )
             .is_err()
@@ -486,8 +490,8 @@ mod tests {
             0.05,
             None,
             "showdown",
-            multiway::RakeAllocation::MainFirst,
-            multiway::RakeRounding::Down,
+            mw_preflop::RakeAllocation::MainFirst,
+            mw_preflop::RakeRounding::Down,
             1.0,
         )
         .unwrap();
@@ -545,17 +549,17 @@ mod tests {
     fn prize_pool_is_conserved_with_an_outside_field() {
         // `utility` only reports the two table seats, so exercise the same
         // stack vector `icm_pair` builds directly through
-        // `multiway::estimate_icm` and check the *full* field's ICM values
+        // `mw_preflop::estimate_icm` and check the *full* field's ICM values
         // (table seats plus outside field) sum to the total prize pool.
         let payouts = vec![100.0, 60.0, 30.0, 0.0];
         for (s0, s1) in [(10.0, 40.0), (100.0, 100.0), (300.0, 5.0)] {
             let stacks = [
-                multiway::MwChips::try_from_bb(s0).unwrap(),
-                multiway::MwChips::try_from_bb(s1).unwrap(),
-                multiway::MwChips::try_from_bb(200.0).unwrap(),
-                multiway::MwChips::try_from_bb(150.0).unwrap(),
+                mw_preflop::MwChips::try_from_bb(s0).unwrap(),
+                mw_preflop::MwChips::try_from_bb(s1).unwrap(),
+                mw_preflop::MwChips::try_from_bb(200.0).unwrap(),
+                mw_preflop::MwChips::try_from_bb(150.0).unwrap(),
             ];
-            let estimate = multiway::estimate_icm(&stacks, &payouts, 1, 0).unwrap();
+            let estimate = mw_preflop::estimate_icm(&stacks, &payouts, 1, 0).unwrap();
             let total: f64 = estimate.values.iter().sum();
             assert!(
                 (total - 190.0).abs() < 1e-9,

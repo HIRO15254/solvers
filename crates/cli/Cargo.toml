@@ -11,12 +11,11 @@ name = "solvers"
 path = "src/main.rs"
 
 [dependencies]
-abstraction = { workspace = true }
 nlh = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 formats = { workspace = true }
 hu-postflop = { workspace = true }
-multiway = { workspace = true, default-features = false }
+mw-preflop = { workspace = true }
 anyhow = { workspace = true }
 blake3 = { workspace = true }
 clap = { workspace = true }

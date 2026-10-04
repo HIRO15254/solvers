@@ -1,7 +1,7 @@
 //! Card abstraction: build-time bucketing of (board, hole-combo) situations.
 //!
 //! Buckets compress the postflop private-state space so the Multiway preflop
-//! solver's game stays tabular. Everything in this crate runs at tree-build
+//! solver's game stays tabular. Everything in this module runs at tree-build
 //! time only — the engine's hot loop sees buckets purely as reach-vector
 //! dimensions.
 //!

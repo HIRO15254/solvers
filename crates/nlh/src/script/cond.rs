@@ -183,7 +183,7 @@ const ALL_POSTFLOP_VARS: &[PostflopVar] = &[
 /// wager kind, so `Fold`/`Check`/`Call` simply never match there even if a
 /// caller constructed one directly). `Serialize`/`Deserialize` are here so a
 /// family whose typed rule surface names an action directly in TOML (as
-/// `multiway::config::RuleAction`, a type alias for this enum) needs no
+/// `mw_preflop::config::RuleAction`, a type alias for this enum) needs no
 /// second copy of the same five spellings.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]

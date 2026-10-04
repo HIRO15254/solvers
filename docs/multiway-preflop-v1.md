@@ -16,19 +16,19 @@
 | canonical spec見出し | 実装上の契約／確認先 |
 |---|---|
 | `契約の境界` | `solvers.multiway-preflop/v1`、2--9 seats、EHS²/current-street、linear average profile、multiwayはNash/GTO保証なし。`crates/cli/src/multiway_v1.rs` のproduction gateと `crates/cli/src/multiway_solve.rs` の入口を確認する。 |
-| `計算と停止判定` | External-Sampling MCCFR、range-vectorの条件付きrange-weight正規化、stop CIとtrained deviator。`crates/multiway/src/solver/mod.rs`、`solver/workers.rs`、`solver/eval.rs`、`crates/cli/src/session.rs`、`multiway_solve.rs`。 |
+| `計算と停止判定` | External-Sampling MCCFR、range-vectorの条件付きrange-weight正規化、stop CIとtrained deviator。`crates/mw-preflop/src/solver/mod.rs`、`solver/workers.rs`、`solver/eval.rs`、`crates/cli/src/session.rs`、`multiway_solve.rs`。 |
 | `共通規則` | strict schema、seat ID、BB/.001 BB、relative path、effective config。typed parse/lowerは `crates/cli/src/multiway_v1.rs`、共通CLIは `crates/cli/src/config.rs`。 |
 | `全体構造` | top-level `schema`/`game` と `[economics]`、`[solver]`、`[run]`、`[output]` の対応は `multiway_v1.rs` の `V1Config` と `crates/cli/src/config_new.rs` の template。 |
 | ``[game]`` | `V1Config.game` の seat/button/blind/ante normalization、runtimeの `MultiwayConfig`。例は `examples/preflop_multiway_v1_default.toml` と `examples/preflop_multiway_v1_full_surface.toml`。 |
-| ``[game.defaults]`` | stack/range defaultと1,326 comboへの展開は `multiway_v1.rs`、`multiway/src/config.rs` の `SeatConfig`。 |
+| ``[game.defaults]`` | stack/range defaultと1,326 comboへの展開は `multiway_v1.rs`、`mw-preflop/src/config.rs` の `SeatConfig`。 |
 | ``[[game.players]]`` | seatごとの stack/range/blind/ante overrideと重複・範囲検証は `multiway_v1.rs`。 |
-| ``[game.tree]`` | standard/script frontend、typed ruleとsize lowerは `multiway_v1.rs`、`multiway/src/tree_rules.rs`、`tree.rs`。 |
-| `Standard frontend` | 標準 betting profile、max aggressive actions、reraise jam、rule priorityの runtimeは `multiway/src/config.rs`、`betting.rs`、`tree.rs`。 |
+| ``[game.tree]`` | standard/script frontend、typed ruleとsize lowerは `multiway_v1.rs`、`mw-preflop/src/tree_rules.rs`、`tree.rs`。 |
+| `Standard frontend` | 標準 betting profile、max aggressive actions、reraise jam、rule priorityの runtimeは `mw-preflop/src/config.rs`、`betting.rs`、`tree.rs`。 |
 | `Script frontend` | `.mwtree` の相対path、script compile、canonical fingerprintは `multiway_v1.rs`、`tree_rules.rs`、`config.rs`。 |
-| ``[game.abstraction]`` | EHS² percentile、bucket幅、Solve前の全assignment/cache buildは `multiway_v1.rs`、`multiway/src/abstraction.rs`、`holdem.rs`。 |
+| ``[game.abstraction]`` | EHS² percentile、bucket幅、Solve前の全assignment/cache buildは `multiway_v1.rs`、`mw-preflop/src/abstraction.rs`、`holdem.rs`。 |
 | ``[game.information]`` | current-street固定。`multiway_v1.rs` の lowerがfull/bucket-historyをMWP002で拒否し、`solver/mod.rs` の構築・復元もFullを明示拒否する。toy testもdense arenaのみ。Fullのenum・fingerprintと保存形式は旧artifactのidentityのために保持。 |
 | `Production removal and migration errors` | retired rollout/training/opponent bucketなどを黙って変換しない gateは `multiway_v1.rs`。拒否テストは `crates/cli/tests/common/mod.rs` と `cli_integration.rs`。 |
-| ``[economics]`` | cash/chipEV、rake、tournament-ICMの surface/lowerは `economics.rs` と `multiway/src/icm.rs`/`settlement.rs`。 |
+| ``[economics]`` | cash/chipEV、rake、tournament-ICMの surface/lowerは `economics.rs` と `mw-preflop/src/icm.rs`/`settlement.rs`。 |
 | `Cash / chipEV` | rake適用順、uncalled refund、utility unitは `economics.rs` と `settlement.rs`、受入テストは `crates/cli/tests/multiway_acceptance.rs`。 |
 | `Tournament ICM` | exact small-field ICM、large-field sampling、payout/field validationは `economics.rs` と `icm.rs`。 |
 | ``[solver]`` | `kind`、seed、exploration、batch、discount、pruningの strict enumと互換性は `multiway_v1.rs`、`solver/mod.rs`、`checkpoint.rs`。 |
@@ -59,10 +59,10 @@ range-vectorのcombo bucket cacheをstreetだけでなく
 `(street, bucket_active_opponents)`で識別します。同じstreetでもcounterfactual branchに
 よってbucket計算に使う相手人数が異なり、抽象化bucketも異なるためです。
 Holdemの現在streetの人数記録は行動ごとに更新され、street開始時に固定されません。
-`crates/multiway/src/solver/mod.rs` の `SOLVER_STATE_VERSION = 4` にこの境界を刻み、
+`crates/mw-preflop/src/solver/mod.rs` の `SOLVER_STATE_VERSION = 4` にこの境界を刻み、
 version 3以前のcheckpointを新しい更新則へ混ぜてresumeしないよう、loaderはstate
 version mismatchを拒否します。
-この変更に伴うテストは `crates/multiway/src/solver/tests.rs` と checkpoint tests
+この変更に伴うテストは `crates/mw-preflop/src/solver/tests.rs` と checkpoint tests
 に置き、config/game/abstraction fingerprintとは別に solver-state compatibility
 を確認します。
 
@@ -87,7 +87,7 @@ readerはmetadataを保持してstrategyを最大4096件ずつpage読み出し�
 10,000,000件上限だった古いreaderは、それを超えるv4 artifactを読めません。
 wire version、checkpoint、solver state、algorithm fingerprintは変わりません。
 
-checkpoint containerは現在 `crates/multiway/src/checkpoint.rs` の
+checkpoint containerは現在 `crates/mw-preflop/src/checkpoint.rs` の
 `CHECKPOINT_VERSION = 7` です。state version 4とcontainer version 7を同一視せず、
 どちらを変更したかをmetadataとmigration testに記録します。
 
@@ -179,8 +179,8 @@ GTO Wizardの完全解、学習時の完全profile、またはcheckpoint監査�
 
 入力の公開契約は `crates/cli/src/multiway_v1.rs` がparse/normalizeし、
 `crates/cli/src/config.rs` がschema dispatchします。ゲームの型・tree・cards・
-settlementは `crates/multiway/src/{config,tree,tree_rules,holdem,settlement}.rs`、
-solver stateとworkerは `crates/multiway/src/solver/`、CLI lifecycleは
+settlementは `crates/mw-preflop/src/{config,tree,tree_rules,holdem,settlement}.rs`、
+solver stateとworkerは `crates/mw-preflop/src/solver/`、CLI lifecycleは
 `crates/cli/src/{session,multiway_solve,run_dir}.rs` が担当します。
 
 回帰面は、library unit tests（`config.rs`、`solver/tests.rs`、`checkpoint.rs`）、

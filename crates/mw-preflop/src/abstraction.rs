@@ -5,7 +5,7 @@
 //! count is part of every query so an abstraction can distinguish, for
 //! example, heads-up river strength from strength against five ranges.
 
-use abstraction::{CACHE_FORMAT_VERSION, CardAbstraction, Ehs2Abstraction, Ehs2Params};
+use crate::card_abstraction::{CACHE_FORMAT_VERSION, CardAbstraction, Ehs2Abstraction, Ehs2Params};
 use nlh::{Card, NUM_CLASSES, NUM_COMBOS, class_index, combo_cards, rank_of};
 
 use crate::types::Street;

@@ -12,8 +12,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use abstraction::{CACHE_FORMAT_VERSION, Ehs2Params};
 use anyhow::{Context, Result};
+use mw_preflop::card_abstraction::{CACHE_FORMAT_VERSION, Ehs2Params};
 
 /// Set once from `--cache-dir`, before anything resolves a cache path.
 static OVERRIDE: OnceLock<PathBuf> = OnceLock::new();

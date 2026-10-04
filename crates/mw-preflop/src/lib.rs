@@ -8,6 +8,7 @@
 
 pub mod abstraction;
 pub mod betting;
+pub mod card_abstraction;
 pub mod checkpoint;
 pub mod config;
 pub mod holdem;

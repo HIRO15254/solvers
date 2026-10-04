@@ -227,7 +227,7 @@ pub enum GameSection {
         #[serde(default)]
         tree: TreeSection,
     },
-    PreflopMultiway(multiway::MultiwayConfig),
+    PreflopMultiway(mw_preflop::MultiwayConfig),
 }
 
 /// `[game.tree]`: the postflop betting grammar. Every node's menu comes from
@@ -446,9 +446,9 @@ pub enum RakeSection {
         #[serde(default = "default_rake_when")]
         when: String,
         #[serde(default)]
-        allocation: multiway::RakeAllocation,
+        allocation: mw_preflop::RakeAllocation,
         #[serde(default)]
-        rounding: multiway::RakeRounding,
+        rounding: mw_preflop::RakeRounding,
         #[serde(default = "default_rounding_unit")]
         rounding_unit: f64,
     },
@@ -515,7 +515,7 @@ pub enum AlgorithmSection {
         #[serde(default = "default_discount_until")]
         discount_until: u64,
         /// Enables "vector-traverser" external sampling (see
-        /// `multiway::solver::SolverConfig::traverser_vector`): one
+        /// `mw_preflop::solver::SolverConfig::traverser_vector`): one
         /// traversal updates every feasible hole combo of the sampled
         /// traverser seat at once, instead of only the one combo the deal
         /// sampler dealt it. Street recall uses the dense vector worker;
@@ -525,7 +525,7 @@ pub enum AlgorithmSection {
         #[serde(default, skip_serializing_if = "is_false")]
         traverser_vector: bool,
         /// Enables Pluribus-style regret-based pruning (see
-        /// `multiway::solver::SolverConfig::prune`): in vector-traverser
+        /// `mw_preflop::solver::SolverConfig::prune`): in vector-traverser
         /// mode with current-street recall, zero-probability actions whose
         /// regret sits far below `prune_threshold` are skipped (with
         /// probability `prune_skip_probability`) rather than descended into.
@@ -543,7 +543,7 @@ pub enum AlgorithmSection {
         prune_threshold: Option<f64>,
         /// Probability that a prunable action is actually skipped on a
         /// given traversal (see
-        /// `multiway::solver::SolverConfig::prune_skip_probability`). Omitted
+        /// `mw_preflop::solver::SolverConfig::prune_skip_probability`). Omitted
         /// from serialized output at its default (the GUI never exposes this
         /// knob, so its exported configs always hit this default).
         #[serde(
@@ -584,7 +584,7 @@ fn default_icm_samples() -> u64 {
     100_000
 }
 fn default_prune_skip_probability() -> f64 {
-    multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
+    mw_preflop::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
 }
 fn is_default_prune_skip_probability(value: &f64) -> bool {
     *value == default_prune_skip_probability()
@@ -656,7 +656,7 @@ pub struct RunSection {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evaluation_cadence: Option<u64>,
     /// Complete sweeps run per parallel drive iteration against the same
-    /// strategy snapshot (see `multiway::solver::SolverConfig::sweep_batch`).
+    /// strategy snapshot (see `mw_preflop::solver::SolverConfig::sweep_batch`).
     /// `None` (the default) is `1`, bit-identical to a solver built before
     /// this knob existed. Values above `1` trade slightly staler
     /// within-batch updates for restored parallel efficiency on tables whose

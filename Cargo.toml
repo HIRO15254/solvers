@@ -5,8 +5,7 @@ members = [
     "crates/cfr-ref",
     "crates/hu-engine",
     "crates/hu-postflop",
-    "crates/abstraction",
-    "crates/multiway",
+    "crates/mw-preflop",
     "crates/formats",
     "crates/protocol",
     "crates/daemon",
@@ -24,8 +23,7 @@ nlh = { path = "crates/nlh" }
 cfr-ref = { path = "crates/cfr-ref" }
 hu-engine = { path = "crates/hu-engine" }
 hu-postflop = { path = "crates/hu-postflop" }
-abstraction = { path = "crates/abstraction" }
-multiway = { path = "crates/multiway", default-features = false }
+mw-preflop = { path = "crates/mw-preflop" }
 formats = { path = "crates/formats" }
 protocol = { path = "crates/protocol" }
 daemon = { path = "crates/daemon" }

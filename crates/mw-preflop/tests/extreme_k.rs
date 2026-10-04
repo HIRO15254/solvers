@@ -3,7 +3,7 @@
 //! preflop strategy, so extreme bucket counts (down to k = 1) must degrade
 //! gracefully, never panic or emit out-of-range buckets.
 
-use abstraction::{CardAbstraction, Ehs2Abstraction, Ehs2Params};
+use mw_preflop::card_abstraction::{CardAbstraction, Ehs2Abstraction, Ehs2Params};
 use nlh::{Card, NUM_COMBOS, Street, combo_cards};
 
 fn boards() -> Vec<Vec<Card>> {

@@ -2,7 +2,7 @@
 //!
 //! One pass over `char`s (not bytes), tracking 1-based line numbers. Working
 //! in `char`s rather than bytes fixes two bugs the older multiway condition
-//! parser (`crates/multiway/src/tree_rules.rs`) has: it strips comments with
+//! parser (`crates/mw-preflop/src/tree_rules.rs`) has: it strips comments with
 //! `line.split('#')`, so a `#` inside a string literal truncates the line,
 //! and it casts `bytes[index] as char`, so a non-ASCII byte gets mangled
 //! into latin-1 instead of producing an error. Iterating `char`s and lexing

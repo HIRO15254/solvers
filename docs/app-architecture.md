@@ -114,7 +114,7 @@ cache root の解決順は `--cache-dir`、`SOLVERS_CACHE_DIR`、OS の user cac
 cache は再生成可能な計算資産であり、run directory ごとに複製しない。
 
 EHS² の名前は format version と bucket 数を含み、異なる設定を併存させる。
-[Ehs2Abstraction::save](../crates/abstraction/src/buckets.rs) は writer ごとに一意の
+[Ehs2Abstraction::save](../crates/mw-preflop/src/card_abstraction/buckets.rs) は writer ごとに一意の
 pid/nonce を含む一時ファイルを書いて rename する。同じ内容を並列に構築することの抑止と、
 ファイルを壊さず保存することは別問題であり、前者の lock/coalescing は実装済みとは扱わない。
 

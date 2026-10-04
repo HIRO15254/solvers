@@ -1,5 +1,5 @@
 [package]
-name = "multiway"
+name = "mw-preflop"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,7 +7,6 @@ repository.workspace = true
 description = "Sampled 2-9 player NLHE solving with side pots and tournament utility"
 
 [dependencies]
-abstraction = { workspace = true }
 nlh = { workspace = true }
 blake3 = { workspace = true }
 postcard = { workspace = true }

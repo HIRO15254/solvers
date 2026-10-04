@@ -13,7 +13,7 @@ use crate::{SizeSpec, Street};
 
 /// How a rule changes the action list already built for a node.
 /// `Serialize`/`Deserialize` are here for the same reason as on
-/// [`ActionKind`]: `multiway::config::RuleEffect` is a type alias for this
+/// [`ActionKind`]: `mw_preflop::config::RuleEffect` is a type alias for this
 /// enum, so its typed `[[..rules]]` TOML surface needs no second copy of the
 /// same five spellings.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

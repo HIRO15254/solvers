@@ -426,7 +426,7 @@ fn default_postflop_betting() -> StreetBettingConfig {
 
 /// Bet/raise size grammar, shared with every other config family that
 /// lowers a bet or raise tree. Defined in `nlh::sizing`; re-exported here
-/// so `multiway::config::SizeSpec` keeps working for every existing user.
+/// so `mw_preflop::config::SizeSpec` keeps working for every existing user.
 pub use nlh::SizeSpec;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

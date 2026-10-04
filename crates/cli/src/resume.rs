@@ -218,8 +218,9 @@ fn run_self_contained_multiway(
     evaluation_cadence: Option<u64>,
     checkpoint_interval: Option<&str>,
 ) -> Result<()> {
-    let mut checkpoint = multiway::checkpoint::MultiwayCheckpoint::load_unchecked(checkpoint_path)
-        .with_context(|| format!("reading {}", checkpoint_path.display()))?;
+    let mut checkpoint =
+        mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(checkpoint_path)
+            .with_context(|| format!("reading {}", checkpoint_path.display()))?;
     let raw = checkpoint.config_toml.take().ok_or_else(|| {
         anyhow!("checkpoint is not self-contained: it carries no config to resume from")
     })?;

@@ -9,13 +9,13 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use multiway::config::{
+use mw_preflop::config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, AnteConfig, BettingConfig,
     BlindConfig, ForcedBetConfig, MultiwayConfig, RakeAllocation as RuntimeRakeAllocation,
     RakeRounding as RuntimeRakeRounding, RecallMode, RuleAction, RuleEffect, RuleStreet,
     SeatConfig, SizeSpec, StackRatio, TreeRule as RuntimeTreeRule,
 };
-use multiway::types::{MAX_SEATS, MIN_SEATS, SeatId};
+use mw_preflop::types::{MAX_SEATS, MIN_SEATS, SeatId};
 use nlh::SizeUnit;
 use serde::{Deserialize, Serialize};
 
@@ -686,7 +686,7 @@ fn lower_tree_rules(rules: &[TreeRule]) -> Result<Vec<RuntimeTreeRule>> {
     lowered.sort_by_key(|rule| (rule.priority, rule.source_order));
     Ok(lowered)
 }
-/// Compiles a `.mwtree` script against `multiway::tree_rules::MULTIWAY` --
+/// Compiles a `.mwtree` script against `mw_preflop::tree_rules::MULTIWAY` --
 /// the same `nlh::script` front end (tokenizing, substitution, nesting,
 /// `if`/`else`, `param`/`define`) postflop's `.tree` scripts compile
 /// through -- and lowers the result straight to [`RuntimeTreeRule`]s. This
@@ -699,7 +699,7 @@ fn lower_tree_script(
     params: &BTreeMap<String, toml::Value>,
 ) -> Result<Vec<RuntimeTreeRule>> {
     let overrides = crate::config::param_overrides(params)?;
-    Ok(multiway::tree_rules::compile_script(source, &overrides)?)
+    Ok(mw_preflop::tree_rules::compile_script(source, &overrides)?)
 }
 
 impl Default for Tree {
@@ -1456,7 +1456,7 @@ impl V1Config {
                 traverser_vector: vector,
                 prune,
                 prune_threshold: None,
-                prune_skip_probability: multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
+                prune_skip_probability: mw_preflop::solver::DEFAULT_PRUNE_SKIP_PROBABILITY,
             },
             run: RunSection {
                 max_time_secs: None,
@@ -1609,13 +1609,13 @@ fn lower_economics(
             seed,
         } => {
             let field = seats.len() + outside_field_bb.len();
-            if field > multiway::icm::ICM_MAX_PLAYERS {
+            if field > mw_preflop::icm::ICM_MAX_PLAYERS {
                 bail!(
                     "ICM field exceeds {} players",
-                    multiway::icm::ICM_MAX_PLAYERS
+                    mw_preflop::icm::ICM_MAX_PLAYERS
                 );
             }
-            if field <= multiway::icm::EXACT_ICM_MAX_PLAYERS
+            if field <= mw_preflop::icm::EXACT_ICM_MAX_PLAYERS
                 && (samples.is_some() || seed.is_some())
             {
                 bail!("samples and seed are meaningless for exact ICM fields of 15 or fewer");
@@ -1777,9 +1777,9 @@ fn default_target() -> Target {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use multiway::abstraction::FeatureHashAbstraction;
-    use multiway::holdem::HoldemGame;
-    use multiway::solver::ExternalSamplingGame;
+    use mw_preflop::abstraction::FeatureHashAbstraction;
+    use mw_preflop::holdem::HoldemGame;
+    use mw_preflop::solver::ExternalSamplingGame;
 
     const MINIMAL: &str = r#"
 schema = "solvers.multiway-preflop/v1"
@@ -2217,7 +2217,7 @@ ante_bb = 0.125
             panic!()
         };
         let validated = game.validated().unwrap();
-        let state = multiway::BettingState::new(&validated).unwrap();
+        let state = mw_preflop::BettingState::new(&validated).unwrap();
         assert_eq!(state.to_act, Some(SeatId::new_unchecked(4)));
         assert_eq!(state.big_blind.raw(), 2_000);
         assert_eq!(state.current_wager(SeatId::new_unchecked(1)).raw(), 0);
@@ -2259,20 +2259,20 @@ ante_bb = 0.125
             panic!()
         };
         let validated = game.validated().unwrap();
-        let state = multiway::BettingState::new(&validated).unwrap();
+        let state = mw_preflop::BettingState::new(&validated).unwrap();
         let actions = state.legal_actions(&validated.betting).unwrap();
         assert!(actions.iter().any(|action| matches!(
             action,
-            multiway::Action::RaiseTo { to, .. } if to.raw() == 2_200
+            mw_preflop::Action::RaiseTo { to, .. } if to.raw() == 2_200
         )));
         assert!(!actions.iter().any(|action| matches!(
             action,
-            multiway::Action::RaiseTo { to, .. } if to.raw() == 2_500
+            mw_preflop::Action::RaiseTo { to, .. } if to.raw() == 2_500
         )));
         assert!(
             actions
                 .iter()
-                .any(|action| matches!(action, multiway::Action::RaiseTo { all_in: true, .. }))
+                .any(|action| matches!(action, mw_preflop::Action::RaiseTo { all_in: true, .. }))
         );
     }
 

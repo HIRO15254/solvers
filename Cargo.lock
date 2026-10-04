@@ -3,17 +3,6 @@
 version = 4
 
 [[package]]
-name = "abstraction"
-version = "0.1.0"
-dependencies = [
- "nlh",
- "postcard",
- "rayon",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -290,7 +279,6 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 name = "cli"
 version = "0.1.0"
 dependencies = [
- "abstraction",
  "anyhow",
  "blake3",
  "clap",
@@ -298,7 +286,7 @@ dependencies = [
  "hu-engine",
  "hu-postflop",
  "libc",
- "multiway",
+ "mw-preflop",
  "nlh",
  "rand",
  "rand_chacha",
@@ -736,10 +724,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiway"
+name = "mw-preflop"
 version = "0.1.0"
 dependencies = [
- "abstraction",
  "blake3",
  "libc",
  "nlh",

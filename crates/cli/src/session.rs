@@ -13,26 +13,26 @@
 use std::path::Path;
 use std::time::Instant;
 
-use abstraction::{Ehs2Abstraction, Ehs2Params};
 use anyhow::{Context, Result, anyhow};
 use formats::{
     Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayHistoryNode, MultiwayMetricsRow,
     MultiwayPublicAction, MultiwayPublicState, MultiwaySeatMetrics, MultiwaySeatResult,
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
-use multiway::abstraction::{
+use mw_preflop::abstraction::{
     BucketContext, BucketId, MultiwayAbstraction, MultiwayAbstractionBackend,
     TableAbstractionAdapter, ehs2_table_fingerprint,
 };
 #[cfg(test)]
-use multiway::abstraction::{FeatureHashAbstraction, FeatureHashParams};
-use multiway::checkpoint::MultiwayCheckpoint;
-use multiway::config::{
+use mw_preflop::abstraction::{FeatureHashAbstraction, FeatureHashParams};
+use mw_preflop::card_abstraction::{Ehs2Abstraction, Ehs2Params};
+use mw_preflop::checkpoint::MultiwayCheckpoint;
+use mw_preflop::config::{
     AbstractionConfig, AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
     UtilityConfig as MultiwayUtility,
 };
-use multiway::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
-use multiway::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
+use mw_preflop::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
+use mw_preflop::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
 use rayon::prelude::*;
 
 use crate::config::{
@@ -93,8 +93,8 @@ pub struct MultiwaySession {
     pub config_hash: [u8; 32],
     /// The multiway game config (seats, blinds, betting), kept around for
     /// display purposes (seat names/positions, button seat).
-    pub game_config: multiway::MultiwayConfig,
-    pub checkpoint_runtime: Option<multiway::checkpoint::CheckpointRuntimeState>,
+    pub game_config: mw_preflop::MultiwayConfig,
+    pub checkpoint_runtime: Option<mw_preflop::checkpoint::CheckpointRuntimeState>,
 }
 
 /// Resource facts derived from the production public tree and configured
@@ -206,7 +206,7 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
                 .iter()
                 .rposition(|payout| *payout != 0.0)
                 .map_or(0, |place| place + 1);
-            if field_players <= multiway::icm::EXACT_ICM_MAX_PLAYERS {
+            if field_players <= mw_preflop::icm::EXACT_ICM_MAX_PLAYERS {
                 Some(MultiwayIcmPreflight {
                     field_players: field_players as u64,
                     paid_places: paid_places as u64,
@@ -217,7 +217,7 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
                     prepared_limit_bytes: None,
                 })
             } else {
-                let prepared_bytes = multiway::icm::prepared_race_memory_bytes(
+                let prepared_bytes = mw_preflop::icm::prepared_race_memory_bytes(
                     game_config.seats.len(),
                     outside_field.len(),
                     paid_places,
@@ -231,7 +231,7 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
                     samples: Some(*samples),
                     seed: Some(*seed),
                     prepared_bytes: Some(prepared_bytes as u64),
-                    prepared_limit_bytes: Some(multiway::icm::MAX_PREPARED_RACE_BYTES as u64),
+                    prepared_limit_bytes: Some(mw_preflop::icm::MAX_PREPARED_RACE_BYTES as u64),
                 })
             }
         }
@@ -255,9 +255,9 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
         .max_memory_bytes
         .filter(|bytes| *bytes != u64::MAX)
         .unwrap_or(crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES);
-    let arena = match multiway::tree::preflight_arena(&game, memory_limit) {
+    let arena = match mw_preflop::tree::preflight_arena(&game, memory_limit) {
         Ok(arena) => arena,
-        Err(multiway::tree::TreeError::MemoryLimit {
+        Err(mw_preflop::tree::TreeError::MemoryLimit {
             node_count,
             total_columns,
             needed,
@@ -520,8 +520,8 @@ fn build_multiway_session_internal(
     let mut checkpoint_runtime = None;
     let solver = if let Some(path) = resume_checkpoint {
         let expected_configuration =
-            multiway::solver::configuration_fingerprint_for_setup(&game, &sampler, solver_config);
-        let expected_abstraction = multiway::abstraction_fingerprint_with_recall(
+            mw_preflop::solver::configuration_fingerprint_for_setup(&game, &sampler, solver_config);
+        let expected_abstraction = mw_preflop::abstraction_fingerprint_with_recall(
             game.abstraction_fingerprint(),
             game.recall_mode(),
         );
@@ -623,7 +623,7 @@ fn resolve_policy_memory_limit(
     Ok(resolved)
 }
 
-fn validate_production_abstraction(game: &multiway::MultiwayConfig) -> Result<()> {
+fn validate_production_abstraction(game: &mw_preflop::MultiwayConfig) -> Result<()> {
     if !matches!(game.abstraction.kind, AbstractionKind::Ehs2Table) {
         return Err(anyhow!(
             "MWP001: rollout-kmeans was removed from production because its assignment cache \
@@ -666,7 +666,7 @@ pub(crate) const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
 /// zero and can delay or reverse pruning eligibility.
 fn derive_prune_threshold(
     utility: &MultiwayUtility,
-    game_config: &multiway::MultiwayConfig,
+    game_config: &mw_preflop::MultiwayConfig,
 ) -> f64 {
     let total = match utility {
         MultiwayUtility::ChipEv => game_config
@@ -725,8 +725,8 @@ pub fn train_deviators_parallel(
     threads: usize,
     traversals: u64,
     seed: u64,
-    variant: multiway::ProfileVariant,
-) -> Result<Vec<multiway::DeviatorPolicy>> {
+    variant: mw_preflop::ProfileVariant,
+) -> Result<Vec<mw_preflop::DeviatorPolicy>> {
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(threads)
         .build()
@@ -816,7 +816,7 @@ pub fn run_stop_rule_check(
                 threads,
                 stop_rule.br_traversals,
                 training_seed,
-                multiway::ProfileVariant::default(),
+                mw_preflop::ProfileVariant::default(),
             )
             .context("training best-response deviators for the convergence stop rule")?,
         )
@@ -828,7 +828,7 @@ pub fn run_stop_rule_check(
             state.samples,
             held_out_seed,
             deviators.as_deref(),
-            multiway::ProfileVariant::default(),
+            mw_preflop::ProfileVariant::default(),
         )
         .context("evaluating multiway profile for the convergence stop rule")?;
 
@@ -879,7 +879,7 @@ pub fn run_stop_rule_check(
 /// ready-to-use game plus its deal sampler, without touching
 /// `[algorithm]`/`[run]` or constructing a solver.
 fn build_multiway_game_from_config(
-    game_config: &multiway::MultiwayConfig,
+    game_config: &mw_preflop::MultiwayConfig,
     utility: &MultiwayUtility,
     rake: &MultiwayRake,
     abstraction_policy: AbstractionPolicy,
@@ -932,7 +932,7 @@ fn build_multiway_game_from_config(
 /// separate assignment cache to persist after a solve: the table is fully
 /// determined by `params` at build time.
 fn build_ehs2_table_abstraction(
-    game_config: &multiway::MultiwayConfig,
+    game_config: &mw_preflop::MultiwayConfig,
 ) -> Result<(TableAbstractionAdapter<Ehs2Abstraction>, AbstractionReady)> {
     let params = Ehs2Params {
         flop_buckets: u32::from(game_config.abstraction.flop_buckets),
@@ -1019,7 +1019,7 @@ pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
             no_flop_no_drop,
         } => MultiwayRake::PercentCap {
             rate,
-            cap_bb: cap / multiway::types::CHIPS_PER_BB as f64,
+            cap_bb: cap / mw_preflop::types::CHIPS_PER_BB as f64,
             no_flop_no_drop,
         },
         RakeSection::Generic {
@@ -1044,7 +1044,7 @@ pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
             exempt_pot,
         } => MultiwayRake::GgPreflop {
             rate,
-            cap_bb: cap / multiway::types::CHIPS_PER_BB as f64,
+            cap_bb: cap / mw_preflop::types::CHIPS_PER_BB as f64,
             exempt_pot_bb: exempt_pot as f64 / 1_000.0,
         },
     }
@@ -1060,7 +1060,7 @@ pub fn distance_to_boundary(current: u64, cadence: u64) -> u64 {
 /// Assembles one `MultiwayMetricsRow` from solver metrics, drift, elapsed
 /// time, and an optional held-out profile evaluation.
 pub fn metrics_row(
-    metrics: &multiway::SolverMetrics,
+    metrics: &mw_preflop::SolverMetrics,
     drift: Vec<f64>,
     elapsed_secs: f64,
     evaluation: Option<&ProfileEvaluation>,
@@ -1107,7 +1107,7 @@ pub fn metrics_row(
     }
 }
 
-fn profile_estimate(value: &multiway::solver::ProfileEstimate) -> Estimate {
+fn profile_estimate(value: &mw_preflop::solver::ProfileEstimate) -> Estimate {
     Estimate {
         mean: value.mean,
         stderr: value.stderr,
@@ -1115,8 +1115,8 @@ fn profile_estimate(value: &multiway::solver::ProfileEstimate) -> Estimate {
     }
 }
 
-fn policy_coverage(value: &multiway::CandidatePolicyCoverage) -> formats::MultiwayPolicyCoverage {
-    let by_street = |counts: multiway::StreetVisitCounts| formats::MultiwayStreetVisitCounts {
+fn policy_coverage(value: &mw_preflop::CandidatePolicyCoverage) -> formats::MultiwayPolicyCoverage {
+    let by_street = |counts: mw_preflop::StreetVisitCounts| formats::MultiwayStreetVisitCounts {
         preflop: counts.preflop,
         flop: counts.flop,
         turn: counts.turn,
@@ -1138,15 +1138,15 @@ fn policy_coverage(value: &multiway::CandidatePolicyCoverage) -> formats::Multiw
     }
 }
 
-fn public_action(action: &multiway::Action) -> MultiwayPublicAction {
+fn public_action(action: &mw_preflop::Action) -> MultiwayPublicAction {
     match action {
-        multiway::Action::Fold => MultiwayPublicAction::Fold,
-        multiway::Action::Check => MultiwayPublicAction::Check,
-        multiway::Action::Call { amount, all_in } => MultiwayPublicAction::Call {
+        mw_preflop::Action::Fold => MultiwayPublicAction::Fold,
+        mw_preflop::Action::Check => MultiwayPublicAction::Check,
+        mw_preflop::Action::Call { amount, all_in } => MultiwayPublicAction::Call {
             amount_millibb: amount.raw(),
             all_in: *all_in,
         },
-        multiway::Action::BetTo {
+        mw_preflop::Action::BetTo {
             to,
             all_in,
             full_raise,
@@ -1155,7 +1155,7 @@ fn public_action(action: &multiway::Action) -> MultiwayPublicAction {
             all_in: *all_in,
             full_raise: *full_raise,
         },
-        multiway::Action::RaiseTo {
+        mw_preflop::Action::RaiseTo {
             to,
             all_in,
             full_raise,
@@ -1170,8 +1170,8 @@ fn public_action(action: &multiway::Action) -> MultiwayPublicAction {
 fn make_public_tree(
     game: &HoldemGame<MultiwayAbstractionBackend>,
 ) -> (Vec<MultiwayHistoryNode>, Vec<MultiwayPublicState>) {
-    let root = multiway::solver::ExternalSamplingGame::root_state(game);
-    let mut pending = vec![(multiway::solver::HistoryKey::ROOT, root)];
+    let root = mw_preflop::solver::ExternalSamplingGame::root_state(game);
+    let mut pending = vec![(mw_preflop::solver::HistoryKey::ROOT, root)];
     let mut histories = Vec::new();
     let mut public_states = Vec::new();
 
@@ -1202,7 +1202,7 @@ fn make_public_tree(
                 action_index: action_index as u32,
                 action: public_action(action).label(),
             });
-            let next = multiway::solver::ExternalSamplingGame::next_state_with(
+            let next = mw_preflop::solver::ExternalSamplingGame::next_state_with(
                 game,
                 &state,
                 &actions,
@@ -1226,7 +1226,7 @@ pub(crate) fn multiway_algorithm_fingerprint(
     let material = serde_json::to_vec(algorithm)?;
     let mut hasher = blake3::Hasher::new();
     hasher.update(b"solvers.multiway.algorithm.v1");
-    hasher.update(&multiway::solver::SOLVER_STATE_VERSION.to_le_bytes());
+    hasher.update(&mw_preflop::solver::SOLVER_STATE_VERSION.to_le_bytes());
     hasher.update(&material);
     Ok(*hasher.finalize().as_bytes())
 }
@@ -1240,7 +1240,7 @@ pub fn make_solution(
     abstraction_fingerprint: [u8; 32],
     configuration_fingerprint: [u8; 32],
     game: &HoldemGame<MultiwayAbstractionBackend>,
-    state: &multiway::solver::SolverState,
+    state: &mw_preflop::solver::SolverState,
     row: &MultiwayMetricsRow,
 ) -> MultiwaySolution {
     let effective = crate::config::parse_internal_config(config_toml)
@@ -1318,7 +1318,7 @@ pub fn make_solution(
 mod tests {
     use super::*;
     use crate::config::RakeSection;
-    use multiway::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
+    use mw_preflop::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
 
     #[test]
     fn algorithm_identity_distinguishes_corrected_updates_from_legacy_artifacts() {

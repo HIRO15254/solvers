@@ -1,6 +1,6 @@
 # Solvers 利用ガイド
 
-`solvers` のマルチウェイプリフロップソルバー(`crates/multiway` + CLI)が
+`solvers` のマルチウェイプリフロップソルバー(`crates/mw-preflop` + CLI)が
 「何を入力に、どういう計算をして、何を出すのか」を、実装の技術詳細より一段上の
 視点で説明し、CLIの実行手順をまとめる。Production契約と全TOML項目は
 `docs/multiway-preflop-v1.jp.md`、内部設計は`docs/architecture.md`を参照。

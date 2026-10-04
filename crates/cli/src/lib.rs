@@ -80,7 +80,7 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         cause.is::<formats::MwSolError>()
             || cause.is::<formats::SolError>()
             || cause.is::<formats::CheckpointError>()
-            || cause.is::<multiway::checkpoint::CheckpointError>()
+            || cause.is::<mw_preflop::checkpoint::CheckpointError>()
     }) {
         return 3;
     }
