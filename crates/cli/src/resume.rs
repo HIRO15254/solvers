@@ -66,19 +66,19 @@ pub fn run(
 /// and its blake3 hash is what the checkpoint was stamped with, so the two
 /// are verified against each other exactly as before.
 fn resume_heads_up(run_directory: &Path, checkpoint_path: &Path, out: Option<&Path>) -> Result<()> {
-    let config_file = run_directory.join(formats::RUN_CONFIG_FILE);
+    let config_file = run_directory.join(runfiles::RUN_CONFIG_FILE);
     let raw_bytes = std::fs::read(&config_file)
         .with_context(|| format!("reading {}", config_file.display()))?;
     let raw = std::str::from_utf8(&raw_bytes).context("run config is not valid UTF-8")?;
     let config: SolveConfig =
         crate::config::parse_solve_config(raw).context("parsing the run config")?;
-    let config_hash = formats::config_hash(&raw_bytes);
+    let config_hash = runfiles::config_hash(&raw_bytes);
     let is_postflop = matches!(config.game, GameSection::Postflop { .. });
-    let previous_sol = run_directory.join(formats::RUN_HU_SOLUTION_FILE);
+    let previous_sol = run_directory.join(runfiles::RUN_HU_SOLUTION_FILE);
     let sol_mode = if is_postflop && previous_sol.exists() {
-        match formats::read_sol(&previous_sol)?.mode {
-            formats::StreetsStored::Full => SolStreets::Full,
-            formats::StreetsStored::NoRivers => SolStreets::NoRivers,
+        match hu_postflop::sol::read_sol(&previous_sol)?.mode {
+            hu_postflop::sol::StreetsStored::Full => SolStreets::Full,
+            hu_postflop::sol::StreetsStored::NoRivers => SolStreets::NoRivers,
         }
     } else {
         SolStreets::Full
@@ -92,7 +92,7 @@ fn resume_heads_up(run_directory: &Path, checkpoint_path: &Path, out: Option<&Pa
         ));
     }
 
-    let checkpoint = formats::read_checkpoint(checkpoint_path)
+    let checkpoint = hu_postflop::checkpoint::read_checkpoint(checkpoint_path)
         .with_context(|| format!("reading checkpoint {}", checkpoint_path.display()))?;
     if checkpoint.config_hash != config_hash {
         return Err(anyhow!(
@@ -100,8 +100,8 @@ fn resume_heads_up(run_directory: &Path, checkpoint_path: &Path, out: Option<&Pa
              (the checkpoint was produced from a different config; refusing to resume)",
             checkpoint_path.display(),
             config_file.display(),
-            formats::config_hash_hex(&checkpoint.config_hash),
-            formats::config_hash_hex(&config_hash),
+            runfiles::config_hash_hex(&checkpoint.config_hash),
+            runfiles::config_hash_hex(&config_hash),
         ));
     }
     println!(
@@ -114,11 +114,11 @@ fn resume_heads_up(run_directory: &Path, checkpoint_path: &Path, out: Option<&Pa
     let directory = match out {
         Some(fork) => {
             crate::run_dir::create_or_adopt(fork)?;
-            std::fs::write(fork.join(formats::RUN_CONFIG_FILE), raw)?;
-            std::fs::copy(checkpoint_path, fork.join(formats::RUN_HU_CHECKPOINT_FILE))?;
-            let progress = run_directory.join(formats::RUN_PROGRESS_FILE);
+            std::fs::write(fork.join(runfiles::RUN_CONFIG_FILE), raw)?;
+            std::fs::copy(checkpoint_path, fork.join(runfiles::RUN_HU_CHECKPOINT_FILE))?;
+            let progress = run_directory.join(runfiles::RUN_PROGRESS_FILE);
             if progress.exists() {
-                std::fs::copy(progress, fork.join(formats::RUN_PROGRESS_FILE))?;
+                std::fs::copy(progress, fork.join(runfiles::RUN_PROGRESS_FILE))?;
             }
             fork
         }
@@ -191,8 +191,8 @@ fn resolve_checkpoint(path: &Path) -> Result<std::path::PathBuf> {
     // Which checkpoint a run left behind identifies its engine, so the
     // caller routes on the extension rather than re-parsing the config.
     for name in [
-        formats::RUN_CHECKPOINT_FILE,
-        formats::RUN_HU_CHECKPOINT_FILE,
+        runfiles::RUN_CHECKPOINT_FILE,
+        runfiles::RUN_HU_CHECKPOINT_FILE,
     ] {
         let checkpoint = path.join(name);
         if checkpoint.is_file() {
@@ -286,7 +286,7 @@ fn run_self_contained_multiway(
         checkpoint_path
     };
     let paths = crate::run_dir::RunPaths::multiway(directory);
-    let config_hash = formats::config_hash(raw.as_bytes());
+    let config_hash = runfiles::config_hash(raw.as_bytes());
     let mut recorder = crate::run_dir::RunRecorder::reopen(
         directory,
         "preflop-multiway",
@@ -342,7 +342,11 @@ mod tests {
     #[test]
     fn a_heads_up_run_directory_resolves_to_its_ckpt() {
         let directory = tempfile::tempdir().unwrap();
-        std::fs::write(directory.path().join(formats::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(
+            directory.path().join(runfiles::RUN_HU_CHECKPOINT_FILE),
+            b"x",
+        )
+        .unwrap();
         let resolved = resolve_checkpoint(directory.path()).unwrap();
         assert_eq!(resolved.extension().unwrap(), "ckpt");
     }

@@ -17,14 +17,14 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow, bail};
-use formats::{
-    SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
-    dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
-};
 use hu_engine::{
     Dcfr, F32Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array, reach_at,
 };
 use hu_postflop::game::{PayoffPipeline, RakeModel, UtilityModel};
+use hu_postflop::sol::{
+    SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
+    dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
+};
 use hu_postflop::{
     PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
     river_entry_state, river_resolve_config,
@@ -36,8 +36,8 @@ use crate::postflop_setup;
 use crate::solve::RunSummary;
 
 /// `--sol-streets`: which streets get stored strategy blocks in a `.sol`
-/// export. Mirrors `formats::StreetsStored` one-to-one; kept as a separate
-/// type (rather than teaching `formats` about `clap`) so the codec crate
+/// export. Mirrors `hu_postflop::sol::StreetsStored` one-to-one; kept as a separate
+/// type (rather than teaching `hu_postflop::sol` about `clap`) so the codec crate
 /// stays free of CLI-parsing dependencies.
 #[derive(clap::ValueEnum, Clone, Copy, Debug, PartialEq, Eq)]
 #[value(rename_all = "kebab-case")]
@@ -354,14 +354,14 @@ pub(crate) struct LoadedSol {
     pub river_target: Option<f64>,
 }
 
-/// Reads, verifies, and rebuilds a `.sol` artifact: `formats::read_sol`
+/// Reads, verifies, and rebuilds a `.sol` artifact: `hu_postflop::sol::read_sol`
 /// (which itself verifies the header hash against the embedded config text)
 /// -> parse that text as a `SolveConfig` (must be `kind = "postflop"`) ->
 /// rebuild the exact same tree `solve --sol` built -> verify the stored
 /// block set matches the mode-implied set of action-node `sref`s exactly.
 /// That last check is the artifact's only defense against a hand-edited or
 /// bit-rotted `.sol` file whose header hash still happens to match (e.g. a
-/// `formats` version bump that changed `aux` assignment): without it, a
+/// `hu_postflop::sol` version bump that changed `aux` assignment): without it, a
 /// mismatched node id would silently serve the wrong node's strategy.
 pub(crate) fn load_sol(
     path: &Path,

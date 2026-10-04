@@ -3,8 +3,8 @@
 //! Usage:
 //!
 //! ```text
-//! cargo run --release -p formats --example mwsol_rewrite_bench -- <input.mwsol> <output.mwsol> [f32|u16]
-//! cargo run --release -p formats --example mwsol_rewrite_bench -- --compare-profiles <left.mwsol> <right.mwsol>
+//! cargo run --release -p mw-preflop --example mwsol_rewrite_bench -- <input.mwsol> <output.mwsol> [f32|u16]
+//! cargo run --release -p mw-preflop --example mwsol_rewrite_bench -- --compare-profiles <left.mwsol> <right.mwsol>
 //! ```
 //!
 //! The input is decoded before the write timer starts.  The output is then
@@ -19,7 +19,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::Instant;
 
-use formats::{
+use mw_preflop::mwsol::{
     MWSOL_MAX_PAGE_LIMIT, MultiwaySolution, MwSolError, MwSolReader, MwsolStorage, write_mwsol_with,
 };
 

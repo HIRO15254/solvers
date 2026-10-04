@@ -35,7 +35,7 @@
 | Multiway の card abstraction | `crates/mw-preflop/src/card_abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
 | 多人数の state / sampling / evaluation | `crates/mw-preflop` | production、read-only 診断、feature-gated 研究経路を区別する |
 | 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
-| 保存 / run metadata / wire types | `crates/formats`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
+| 保存 / run metadata / wire types | `crates/runfiles`、`crates/hu-postflop`、`crates/mw-preflop`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
 | job / HTTP / remote | `crates/daemon` | solver は CLI 子プロセスへ委譲し、永続状態は run directory から読む |
 
 crate 境界は独立した計算経路と依存方向を表す。大きなファイルは schema、lowering、
@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 10 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 9 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -54,29 +54,28 @@ crates/
 ├── nlh/          # card/range/evaluator、HU基本型、bet size、tree-script front end、suit同型
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
-├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc
-├── mw-preflop/   # 2–9 seat NLHE、dense arena、sampled solver、checkpoint、EHS² bucket と cache
-└── formats/      # HU checkpoint、solution、metrics、run-directory DTO/codec
+├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc、.sol、checkpoint
+├── mw-preflop/   # 2–9 seat NLHE、dense arena、sampled solver、checkpoint、.mwsol、metrics、EHS² bucket と cache
+└── runfiles/     # metrics、run-directory DTO/codec、config hash
 ```
 
 現在の workspace 内の通常依存は次のとおり。矢印は「左が右へ依存」を意味し、
 外部ライブラリと dev-dependency は省略する。
 
 ```text
-nlh, cfr-ref                        → workspace内の通常依存なし
+nlh, runfiles, cfr-ref               → workspace内の通常依存なし
 hu-engine                           → nlh
-hu-postflop                         → nlh, hu-engine
-mw-preflop                          → nlh
-formats                             → hu-engine
-protocol                            → formats
-daemon                              → formats, protocol
-cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, formats
+hu-postflop                         → nlh, hu-engine, runfiles
+mw-preflop                          → nlh, runfiles
+protocol                            → runfiles
+daemon                              → runfiles, protocol
+cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, runfiles
 ```
 
 `hu-engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
-ルールには依存しない。`formats` は HU checkpoint の `hu_engine::SolverState` を保存するため
-hu-engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
-`crates/mw-preflop/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は
+ルールには依存しない。HU checkpoint と `.sol` は `hu-postflop` が所有し、
+`runfiles` は solver crate に依存しない。Multiway checkpoint と `.mwsol` は
+`crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
@@ -194,11 +193,11 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 
 | 用途 | 現在の所有箇所 | 意味 |
 |---|---|---|
-| HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
-| HU solution `.sol` | `formats::sol` + CLI artifact query | 平均戦略(u16)と per-hand 値(i16/scale)、config、metadata。`Full` / `NoRivers` |
+| HU checkpoint `.ckpt` | `hu_postflop::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
+| HU solution `.sol` | `hu_postflop::sol` + CLI artifact query | 平均戦略(u16)と per-hand 値(i16/scale)、config、metadata。`Full` / `NoRivers` |
 | Multiway checkpoint `.mwckpt` | `mw_preflop::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
-| Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
-| run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |
+| Multiway solution `.mwsol` | `mw_preflop::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
+| run / progress / event | `runfiles::run`、`runfiles::metrics`、`mw_preflop::metrics` | lifecycle、定期測定、離散事象を別データとして保持 |
 
 `.sol` は戦略だけのファイルではない。保存対象 node の値も持ち、`NoRivers` の再 solve で
 元の per-hand 値を上書き解釈しない。`export` / `compare` / `report` と対話 `inspect` が現在の
@@ -215,7 +214,7 @@ crates/daemon      solversd: queue、認証/TLS、監視、artifact 配信
     ↓ child process + run directory
 crates/cli         solvers: config、solve/resume、artifact driver
     ↓ Rust API
-solver / formats   domain は HTTP、job、画面状態を持たない
+solver / runfiles  domain は HTTP、job、画面状態を持たない
 ```
 
 `solversd` は実装済みであり、自身では solve しない。永続 job 状態を run directory へ置くことで、

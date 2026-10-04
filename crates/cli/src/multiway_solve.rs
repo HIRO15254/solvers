@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
-use formats::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
+use mw_preflop::metrics::{MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwayMetricsWriter};
 use mw_preflop::solver::StrategyDriftTracker;
 use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
@@ -96,7 +96,7 @@ struct ResultV2 {
     /// range-based solver's "hands/s".
     hand_updates: u64,
     hand_updates_per_second: f64,
-    seats: Vec<formats::MultiwaySeatMetrics>,
+    seats: Vec<mw_preflop::metrics::MultiwaySeatMetrics>,
     strategy_blocks: usize,
     config_hash: String,
     effective_config: serde_json::Value,
@@ -795,16 +795,20 @@ fn run_inner(
         // state and `.mwckpt` checkpoints stay f32 regardless.
         let artifact_storage = if is_v1 {
             match crate::multiway_v1::probability_encoding(raw_config)? {
-                crate::multiway_v1::ProbabilityEncoding::U16 => formats::MwsolStorage::U16,
-                crate::multiway_v1::ProbabilityEncoding::F32 => formats::MwsolStorage::F32,
+                crate::multiway_v1::ProbabilityEncoding::U16 => {
+                    mw_preflop::mwsol::MwsolStorage::U16
+                }
+                crate::multiway_v1::ProbabilityEncoding::F32 => {
+                    mw_preflop::mwsol::MwsolStorage::F32
+                }
             }
         } else {
             match mw_session.storage {
-                StorageKind::F32 => formats::MwsolStorage::F32,
-                StorageKind::I16 => formats::MwsolStorage::I16,
+                StorageKind::F32 => mw_preflop::mwsol::MwsolStorage::F32,
+                StorageKind::I16 => mw_preflop::mwsol::MwsolStorage::I16,
             }
         };
-        formats::write_mwsol_with(path, &solution, artifact_storage)
+        mw_preflop::mwsol::write_mwsol_with(path, &solution, artifact_storage)
             .with_context(|| format!("writing {}", path.display()))?;
     }
     let elapsed = started.elapsed().as_secs_f64();
@@ -818,14 +822,14 @@ fn run_inner(
         UtilitySection::ChipEv => "bb",
         UtilitySection::TournamentIcm { .. } | UtilitySection::Icm { .. } => "prize",
     };
-    let game_fingerprint = formats::config_hash_hex(&mw_session.solver.game().game_fingerprint());
-    let algorithm_fingerprint = formats::config_hash_hex(&session::multiway_algorithm_fingerprint(
-        &effective.algorithm,
-    )?);
+    let game_fingerprint = runfiles::config_hash_hex(&mw_session.solver.game().game_fingerprint());
+    let algorithm_fingerprint = runfiles::config_hash_hex(
+        &session::multiway_algorithm_fingerprint(&effective.algorithm)?,
+    );
     let abstraction_fingerprint =
-        formats::config_hash_hex(&mw_session.solver.abstraction_fingerprint());
+        runfiles::config_hash_hex(&mw_session.solver.abstraction_fingerprint());
     let configuration_fingerprint =
-        formats::config_hash_hex(&mw_session.solver.configuration_fingerprint());
+        runfiles::config_hash_hex(&mw_session.solver.configuration_fingerprint());
     let finished_unix_ms = unix_ms()?;
 
     let result = ResultV2 {
@@ -866,7 +870,7 @@ fn run_inner(
         },
         seats: last_row.seats,
         strategy_blocks,
-        config_hash: formats::config_hash_hex(&mw_session.config_hash),
+        config_hash: runfiles::config_hash_hex(&mw_session.config_hash),
         effective_config,
         game_fingerprint,
         abstraction_fingerprint,
@@ -1200,7 +1204,7 @@ mod tests {
     }
 
     fn run_to_json(raw: &str, config: SolveConfig) -> serde_json::Value {
-        let config_hash = formats::config_hash(raw.as_bytes());
+        let config_hash = runfiles::config_hash(raw.as_bytes());
         let dir = tempfile::tempdir().unwrap();
         let output = dir.path().join("result.json");
         run(
@@ -1223,7 +1227,7 @@ mod tests {
         raw: &str,
         config: SolveConfig,
     ) -> (serde_json::Value, Vec<(String, u64)>) {
-        let config_hash = formats::config_hash(raw.as_bytes());
+        let config_hash = runfiles::config_hash(raw.as_bytes());
         let dir = tempfile::tempdir().unwrap();
         let output = dir.path().join("result.json");
         let mut observations = Vec::new();

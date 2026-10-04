@@ -48,3 +48,6 @@ pub use solver::{
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};
+
+pub mod metrics;
+pub mod mwsol;

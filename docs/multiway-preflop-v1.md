@@ -33,10 +33,10 @@
 | `Tournament ICM` | exact small-field ICM、large-field sampling、payout/field validationは `economics.rs` と `icm.rs`。 |
 | ``[solver]`` | `kind`、seed、exploration、batch、discount、pruningの strict enumと互換性は `multiway_v1.rs`、`solver/mod.rs`、`checkpoint.rs`。 |
 | ``[run]`` | sweep/time ceiling、threads/memory、stop cadence、checkpoint intervalとpreflightは `multiway_v1.rs`、`multiway_solve.rs`、`run_dir.rs`。 |
-| ``[output]`` | `probability_encoding` と `.mwsol` exportは `multiway_artifact.rs`、`crates/formats`、`multiway_solve.rs`。 |
+| ``[output]`` | `probability_encoding` と `.mwsol` exportは `multiway_artifact.rs`、`crates/mw-preflop/src/mwsol.rs`、`multiway_solve.rs`。 |
 | `完全な設定例` | canonical full surfaceの回帰fixtureは `examples/preflop_multiway_v1_full_surface.toml`。小さいvalidate fixtureは `preflop_multiway_v1_3max_smoke.toml` と `examples/bench_multiway/3max_2bb.toml`。 |
 | `CLIとの対応` | clap surface/helpは `crates/cli/src/lib.rs`、template/help consistencyは `config_new.rs`、integrationは `crates/cli/tests/`。 |
-| `run directory契約` | `run.toml`、`manifest.json`、`progress.jsonl`、`events.jsonl`、`run.json`、`checkpoint.mwckpt`、`solution.mwsol` は `crates/cli/src/run_dir.rs`、`multiway_solve.rs`、`crates/formats/src/run.rs`。 |
+| `run directory契約` | `run.toml`、`manifest.json`、`progress.jsonl`、`events.jsonl`、`run.json`、`checkpoint.mwckpt`、`solution.mwsol` は `crates/cli/src/run_dir.rs`、`multiway_solve.rs`、`crates/runfiles/src/run.rs`。 |
 | `同期規則` | 仕様変更は本map、canonical spec、user guide、typed parser/runtime、CLI help、tests、examples、fingerprint、checkpoint/solution metadataを同じchange setで更新する。 |
 
 ## Correction boundaries that must remain explicit
@@ -146,7 +146,7 @@ seat/street別に数えます。平均質量が正のaverage、current明示指�
 regret fallback、未保存columnのuniform fallbackを区別します。旧
 `stored_strategy_visits`は最初の3つの合計として保持し、平均学習coverageに読み替えません。
 sample-id順にcounterをmergeするのでthread数は集計を変えません。CLIの
-`session::metrics_row`はこれをformatsの`candidatePolicyCoverage`へ変換し、
+`session::metrics_row`はこれを`mw_preflop::metrics`の`candidatePolicyCoverage`へ変換し、
 progress/run summaryへ保存します。旧JSONはdefault/Noneで読み込めますが、過去に
 測定していない内訳を0件の実測として扱いません。
 
@@ -189,7 +189,7 @@ CLI integration/acceptance（`crates/cli/tests/cli_integration.rs`、
 です。旧Python benchmark runnerの検証は実験アーカイブに移しました。canonical examplesは `examples/preflop_multiway_v1_*.toml`、benchmark例は
 `examples/bench_multiway/` に置きます。
 
-成果物の読み手は `crates/formats/src/run.rs` の event schemaを使い、artifactの
+成果物の読み手は `crates/runfiles/src/run.rs` の event schemaを使い、artifactの
 inspect/export/evaluateは `crates/cli/src/multiway_artifact.rs` を使います。
 `run.json` の `elapsedSecs` はsession/abstraction初期化を除き、学習・run内評価・
 最終checkpoint/snapshot/solution出力を含む経過時間で、benchmarkの壁時計とは別です。`events.jsonl` のEHS² noticeはbuild/loadの離散

@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use anyhow::{Context, Result};
 use clap::ValueEnum;
-use formats::{
+use runfiles::{
     RunEvent, RunEventLog, RunManifest, RunState, is_run_directory, last_progress_row, read_events,
 };
 use serde::Serialize;
@@ -62,8 +62,8 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
         .unwrap_or(0);
     // Either engine's checkpoint makes a stopped run resumable; which one
     // is present also says which engine produced the run.
-    let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file()
-        || directory.join(formats::RUN_HU_CHECKPOINT_FILE).is_file();
+    let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
+        || directory.join(runfiles::RUN_HU_CHECKPOINT_FILE).is_file();
 
     Ok(RunStatus {
         run_id: manifest.run_id.clone(),
@@ -140,7 +140,7 @@ pub fn watch(
         anyhow::bail!(
             "{} is not a run directory (no {})",
             directory.display(),
-            formats::RUN_MANIFEST_FILE
+            runfiles::RUN_MANIFEST_FILE
         );
     }
     let events_path = RunEventLog::path_in(directory);
@@ -251,7 +251,7 @@ pub fn list(root: &Path, format: ReportFormat) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use formats::{RunEventPayload, RunState};
+    use runfiles::{RunEventPayload, RunState};
 
     fn finished_run(directory: &Path, state: RunState, checkpoint: bool) {
         std::fs::create_dir_all(directory).unwrap();
@@ -268,10 +268,10 @@ mod tests {
         events.state(RunState::Running).unwrap();
         events.state(state).unwrap();
         if checkpoint {
-            std::fs::write(directory.join(formats::RUN_CHECKPOINT_FILE), b"x").unwrap();
+            std::fs::write(directory.join(runfiles::RUN_CHECKPOINT_FILE), b"x").unwrap();
         }
         std::fs::write(
-            directory.join(formats::RUN_PROGRESS_FILE),
+            directory.join(runfiles::RUN_PROGRESS_FILE),
             "{\"sweeps\":42,\"elapsedSecs\":1.5}\n",
         )
         .unwrap();
@@ -318,7 +318,7 @@ mod tests {
         );
         manifest.pid = 0;
         manifest.write_atomic(&run).unwrap();
-        std::fs::write(run.join(formats::RUN_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(run.join(runfiles::RUN_CHECKPOINT_FILE), b"x").unwrap();
 
         let status = read_status(&run).unwrap();
         assert_eq!(status.state, "interrupted");

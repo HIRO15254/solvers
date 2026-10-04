@@ -12,8 +12,8 @@
 //! [`config::parse_solve_config`] routes a file to its family by its `schema`
 //! key; any other schema is an "unsupported config schema" error.
 //!
-//! `solve --checkpoint`/`--metrics` autosave progress (via the `formats`
-//! crate's `.ckpt`/JSONL formats), and `resume` continues a checkpointed run
+//! `solve --checkpoint`/`--metrics` autosave progress (via `hu_postflop::checkpoint`
+//! and `runfiles` JSONL metrics), and `resume` continues a checkpointed run
 //! to its configured iteration total bit-for-bit identically to an
 //! uninterrupted solve.
 
@@ -77,9 +77,9 @@ pub fn install_signal_handler() -> anyhow::Result<()> {
 
 pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     if error.chain().any(|cause| {
-        cause.is::<formats::MwSolError>()
-            || cause.is::<formats::SolError>()
-            || cause.is::<formats::CheckpointError>()
+        cause.is::<mw_preflop::mwsol::MwSolError>()
+            || cause.is::<hu_postflop::sol::SolError>()
+            || cause.is::<hu_postflop::checkpoint::CheckpointError>()
             || cause.is::<mw_preflop::checkpoint::CheckpointError>()
     }) {
         return 3;

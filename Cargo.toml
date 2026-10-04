@@ -6,7 +6,7 @@ members = [
     "crates/hu-engine",
     "crates/hu-postflop",
     "crates/mw-preflop",
-    "crates/formats",
+    "crates/runfiles",
     "crates/protocol",
     "crates/daemon",
     "crates/cli",
@@ -24,7 +24,7 @@ cfr-ref = { path = "crates/cfr-ref" }
 hu-engine = { path = "crates/hu-engine" }
 hu-postflop = { path = "crates/hu-postflop" }
 mw-preflop = { path = "crates/mw-preflop" }
-formats = { path = "crates/formats" }
+runfiles = { path = "crates/runfiles" }
 protocol = { path = "crates/protocol" }
 daemon = { path = "crates/daemon" }
 

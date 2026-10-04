@@ -1,20 +1,15 @@
 [package]
-name = "formats"
+name = "runfiles"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Checkpoint (.ckpt) and metrics (JSONL) file formats for solver runs, plus config-file hashing"
+description = "Run-directory contracts, progress metrics, and config-file hashing"
 
 [dependencies]
-
-hu-engine = { workspace = true, features = ["serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
-thiserror = { workspace = true }
 blake3 = { workspace = true }
-postcard = { workspace = true }
-zstd = { workspace = true }
 tempfile = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]

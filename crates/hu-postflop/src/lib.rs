@@ -34,3 +34,6 @@ pub use river::{RiverConfig, RiverGame, RiverNodeInfo, build_river_game};
 pub use viewer::{
     ReplayError, RiverEntryState, node_streets, river_entry_state, river_resolve_config,
 };
+
+pub mod checkpoint;
+pub mod sol;

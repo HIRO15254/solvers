@@ -927,5 +927,5 @@ TOML surface、型、既定値、条件付き validation、単位のいずれか
 6. CLI help 文字列
 
 出力契約(`report` の CSV、`.sol`、run directory)を変える場合は
-`crates/formats` と `crates/cli/src/{solve,sol,report}.rs` も同じ change set に含める。
+`crates/hu-postflop/src/{sol,checkpoint}.rs`、`crates/runfiles` と `crates/cli/src/{solve,sol,report}.rs` も同じ change set に含める。
 AI はこれらが一致しない状態で postflop の仕様変更を完了扱いにしてはならない。

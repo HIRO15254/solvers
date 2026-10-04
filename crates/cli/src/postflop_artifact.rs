@@ -7,16 +7,16 @@
 //! line rather than a seat-indexed public history.
 //!
 //! Everything here reads the artifact. Strategies and per-hand values are
-//! both stored (see `formats::ValueBlock`), so no view has to re-solve —
+//! both stored (see `hu_postflop::sol::ValueBlock`), so no view has to re-solve —
 //! except a river node in a `no-rivers` artifact, which carries neither and
 //! is reported as such rather than silently recomputed.
 
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use formats::{StreetsStored, dequantize_probs};
 use hu_engine::{NodeId, NodeKind};
 use hu_postflop::PostflopNodeInfo;
+use hu_postflop::sol::{StreetsStored, dequantize_probs};
 use nlh::{PerPlayer, Player, Street, combo_cards};
 use serde::Serialize;
 

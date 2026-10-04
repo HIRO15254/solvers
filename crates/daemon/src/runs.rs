@@ -9,8 +9,8 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use formats::{RunManifest, RunState, is_run_directory, last_progress_row};
 use protocol::RunSummary;
+use runfiles::{RunManifest, RunState, is_run_directory, last_progress_row};
 
 /// The directory holding every run this daemon knows about.
 pub struct RunsRoot {
@@ -78,11 +78,11 @@ impl RunsRoot {
         let observed = manifest.observed_state();
         let progress_row = last_progress_row(directory)
             .with_context(|| format!("reading progress in {}", directory.display()))?;
-        let events_offset = std::fs::metadata(formats::RunEventLog::path_in(directory))
+        let events_offset = std::fs::metadata(runfiles::RunEventLog::path_in(directory))
             .map(|metadata| metadata.len())
             .unwrap_or(0);
-        let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file()
-            || directory.join(formats::RUN_HU_CHECKPOINT_FILE).is_file();
+        let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
+            || directory.join(runfiles::RUN_HU_CHECKPOINT_FILE).is_file();
 
         Ok(RunSummary {
             run_id: manifest.run_id,
@@ -164,7 +164,7 @@ mod tests {
         }
         manifest.write_atomic(&directory).unwrap();
         std::fs::write(
-            directory.join(formats::RUN_PROGRESS_FILE),
+            directory.join(runfiles::RUN_PROGRESS_FILE),
             "{\"sweeps\":7,\"elapsedSecs\":0.5}\n",
         )
         .unwrap();
@@ -205,7 +205,7 @@ mod tests {
         let mut manifest = RunManifest::new("run-c", "postflop", None, "aa", vec!["solve".into()]);
         manifest.pid = 0;
         manifest.write_atomic(&directory).unwrap();
-        std::fs::write(directory.join(formats::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(directory.join(runfiles::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
 
         let summary = root.summary("run-c").unwrap();
         assert_eq!(summary.state, RunState::Interrupted);

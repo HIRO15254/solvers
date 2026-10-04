@@ -17,7 +17,8 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{Estimate, MULTIWAY_SCHEMA_VERSION, config_hash, config_hash_hex};
+use crate::metrics::{Estimate, MULTIWAY_SCHEMA_VERSION};
+use runfiles::{config_hash, config_hash_hex};
 
 pub const MWSOL_HEADER_LEN: usize = 8 + 2 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 32 + 32;
 pub const MWSOL_FORMAT_VERSION: u16 = 4;

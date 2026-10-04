@@ -7,12 +7,12 @@
 use std::path::Path;
 use std::process::Command;
 
-use formats::{RunEventLog, RunManifest, RunState, read_events};
 use protocol::{
     ArtifactEntry, ArtifactListResponse, CreateRunRequest, CreateRunResponse, ErrorCode,
     ErrorResponse, EventPage, PROTOCOL_VERSION, RunListResponse, RunSummary, ServerInfo,
     SolutionView, ValidateRequest, ValidateResponse,
 };
+use runfiles::{RunEventLog, RunManifest, RunState, read_events};
 
 use crate::jobs::{CancelOutcome, JobCommand, JobRunner};
 use crate::runs::RunsRoot;
@@ -121,11 +121,11 @@ impl Api {
 
         let directory = self
             .runs
-            .allocate(request.run_id.as_deref(), formats::unix_millis())
+            .allocate(request.run_id.as_deref(), runfiles::unix_millis())
             .map_err(|error| ErrorResponse::new(ErrorCode::Conflict, error.to_string()))?;
         std::fs::create_dir_all(&directory).map_err(internal)?;
         std::fs::write(
-            directory.join(formats::RUN_CONFIG_FILE),
+            directory.join(runfiles::RUN_CONFIG_FILE),
             &effective.effective_config_toml,
         )
         .map_err(internal)?;
@@ -281,13 +281,13 @@ impl Api {
         csv: bool,
     ) -> ApiResult<(Vec<u8>, &'static str)> {
         let directory = self.run_directory(run_id)?;
-        let solution = directory.join(formats::RUN_SOLUTION_FILE);
+        let solution = directory.join(runfiles::RUN_SOLUTION_FILE);
         if !solution.is_file() {
             return Err(ErrorResponse::new(
                 ErrorCode::Unavailable,
                 format!(
                     "run {run_id:?} has no {}; only a finished multiway run has one",
-                    formats::RUN_SOLUTION_FILE
+                    runfiles::RUN_SOLUTION_FILE
                 ),
             ));
         }
@@ -316,7 +316,7 @@ impl Api {
             .runs
             .directory(run_id)
             .map_err(|error| ErrorResponse::new(ErrorCode::NotFound, error.to_string()))?;
-        if !formats::is_run_directory(&directory) {
+        if !runfiles::is_run_directory(&directory) {
             return Err(ErrorResponse::new(
                 ErrorCode::NotFound,
                 format!("no run {run_id:?}"),
@@ -382,15 +382,15 @@ pub struct Recovered {
 /// Every name comes from the run-directory contract; nothing else in the
 /// directory is reachable.
 const ARTIFACTS: &[&str] = &[
-    formats::RUN_MANIFEST_FILE,
-    formats::RUN_CONFIG_FILE,
-    formats::RUN_RESULT_FILE,
-    formats::RUN_PROGRESS_FILE,
-    formats::RUN_EVENTS_FILE,
-    formats::RUN_SOLUTION_FILE,
-    formats::RUN_HU_SOLUTION_FILE,
-    formats::RUN_CHECKPOINT_FILE,
-    formats::RUN_HU_CHECKPOINT_FILE,
+    runfiles::RUN_MANIFEST_FILE,
+    runfiles::RUN_CONFIG_FILE,
+    runfiles::RUN_RESULT_FILE,
+    runfiles::RUN_PROGRESS_FILE,
+    runfiles::RUN_EVENTS_FILE,
+    runfiles::RUN_SOLUTION_FILE,
+    runfiles::RUN_HU_SOLUTION_FILE,
+    runfiles::RUN_CHECKPOINT_FILE,
+    runfiles::RUN_HU_CHECKPOINT_FILE,
     "stdout.log",
 ];
 

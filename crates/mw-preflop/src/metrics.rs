@@ -1,6 +1,6 @@
 //! Versioned progress and result summaries for sampled multiway solves.
 //!
-//! The heads-up [`crate::MetricsRow`] contract remains frozen.  Multiway
+//! The heads-up [`runfiles::MetricsRow`] contract remains frozen.  Multiway
 //! games are sampled, general-sum profiles, so their diagnostics are arrays
 //! and intentionally avoid the `exploitability` / `nash_conv` vocabulary.
 

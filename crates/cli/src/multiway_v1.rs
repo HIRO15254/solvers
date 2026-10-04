@@ -1942,8 +1942,8 @@ kind = "ehs2-percentile"
         let explicit_effective = normalized_toml(&explicit_defaults).unwrap();
         assert_eq!(omitted_effective, explicit_effective);
         assert_eq!(
-            formats::config_hash(omitted_effective.as_bytes()),
-            formats::config_hash(explicit_effective.as_bytes())
+            runfiles::config_hash(omitted_effective.as_bytes()),
+            runfiles::config_hash(explicit_effective.as_bytes())
         );
         assert_eq!(
             omitted_effective,
@@ -1962,8 +1962,8 @@ kind = "ehs2-percentile"
         assert_eq!(game.abstraction.kmeans_iterations, 40);
         let tuned_effective = normalized_toml(&tuned).unwrap();
         assert_ne!(
-            formats::config_hash(tuned_effective.as_bytes()),
-            formats::config_hash(omitted_effective.as_bytes())
+            runfiles::config_hash(tuned_effective.as_bytes()),
+            runfiles::config_hash(omitted_effective.as_bytes())
         );
         assert_eq!(tuned_effective, normalized_toml(&tuned_effective).unwrap());
     }
@@ -2039,8 +2039,8 @@ kind = "ehs2-percentile"
         let second = normalized_toml(&first).unwrap();
         assert_eq!(first, second);
         assert_eq!(
-            formats::config_hash(first.as_bytes()),
-            formats::config_hash(second.as_bytes())
+            runfiles::config_hash(first.as_bytes()),
+            runfiles::config_hash(second.as_bytes())
         );
     }
 

@@ -150,16 +150,16 @@ fn resume_republishes_solution_and_summary_in_place_and_on_fork() {
         directory.path(),
     );
     assert_eq!(
-        formats::read_sol(&run.join("solution.sol"))
+        hu_postflop::sol::read_sol(&run.join("solution.sol"))
             .unwrap()
             .meta
             .iterations,
         5
     );
     let sol = run.join("solution.sol");
-    let mut stale = formats::read_sol(&sol).unwrap();
+    let mut stale = hu_postflop::sol::read_sol(&sol).unwrap();
     stale.meta.iterations = 1;
-    formats::write_sol(&sol, &stale).unwrap();
+    hu_postflop::sol::write_sol(&sol, &stale).unwrap();
     std::fs::write(run.join("run.json"), "{}").unwrap();
     let fork = directory.path().join("fork");
     ok(&[
@@ -169,13 +169,13 @@ fn resume_republishes_solution_and_summary_in_place_and_on_fork() {
         fork.to_str().unwrap(),
     ]);
     assert_eq!(
-        formats::read_sol(&sol).unwrap().meta.iterations,
+        hu_postflop::sol::read_sol(&sol).unwrap().meta.iterations,
         1,
         "fork must preserve source"
     );
     ok(&["resume", run.to_str().unwrap()]);
     for path in [&run, &fork] {
-        let artifact = formats::read_sol(&path.join("solution.sol")).unwrap();
+        let artifact = hu_postflop::sol::read_sol(&path.join("solution.sol")).unwrap();
         let result: serde_json::Value =
             serde_json::from_str(&std::fs::read_to_string(path.join("run.json")).unwrap()).unwrap();
         assert_eq!(artifact.meta.iterations, 10);
@@ -254,8 +254,8 @@ fn resume_preserves_storage_streets_and_cumulative_time() {
         "--sol-streets",
         "no-rivers",
     ]);
-    let before = formats::read_sol(&run.join("solution.sol")).unwrap();
-    assert_eq!(before.mode, formats::StreetsStored::NoRivers);
+    let before = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
+    assert_eq!(before.mode, hu_postflop::sol::StreetsStored::NoRivers);
     // Simulate a durable progress mark at the cumulative limit, without
     // relying on machine-dependent solve speed or sleeping in this test.
     let progress = run.join("progress.jsonl");
@@ -278,7 +278,7 @@ fn resume_preserves_storage_streets_and_cumulative_time() {
         fork.to_str().unwrap(),
     ]);
     assert!(String::from_utf8_lossy(&output.stdout).contains("max_time already reached"));
-    let after = formats::read_sol(&fork.join("solution.sol")).unwrap();
+    let after = hu_postflop::sol::read_sol(&fork.join("solution.sol")).unwrap();
     assert_eq!(after.mode, before.mode);
     assert_eq!(after.meta.storage, "i16");
     assert_eq!(after.meta.iterations, before.meta.iterations);
@@ -295,7 +295,10 @@ fn solution_keeps_existing_format_version() {
     let path = run.join("solution.sol");
     let bytes = std::fs::read(&path).unwrap();
     assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 1);
-    assert_eq!(formats::read_sol(&path).unwrap().meta.iterations, 20);
+    assert_eq!(
+        hu_postflop::sol::read_sol(&path).unwrap().meta.iterations,
+        20
+    );
 }
 
 #[test]

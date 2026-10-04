@@ -39,12 +39,12 @@ solversd (crates/daemon)
     │ ② run directory + CLI child process
 solvers (crates/cli)
     │ ③ Rust API
-solver core + formats
+solver core + runfiles
 ```
 
 domain crate は HTTP、job、画面状態を知らない。`protocol` は request/response を定義し、
-run の型を `formats` から再利用する。現在の `formats` は HU checkpoint のため hu-engine へ依存するため、
-独立 DTO crate とみなさない。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
+run の型を `runfiles` から再利用する。`runfiles` は solver crate に依存せず、
+`daemon` の workspace 依存は `runfiles` と `protocol` のみである。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
 
 ## 4. 決定事項
 
@@ -161,7 +161,7 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 ```
 
 これは family 別のファイルをまとめた図であり、すべての run が全ファイルを生成するわけではない。
-定数と DTO は [formats/src/run.rs](../crates/formats/src/run.rs)、lifecycle は
+定数と DTO は [runfiles/src/run.rs](../crates/runfiles/src/run.rs)、lifecycle は
 [cli/src/run_dir.rs](../crates/cli/src/run_dir.rs) が所有する。
 進捗と event を分けることで、時系列 schema を保ち、読取り側に event の除外処理を要求しない。
 
@@ -181,7 +181,7 @@ cancel は solver の協調停止を使い、checkpoint の存在と状態を確
 
 `RunManifest` は schema version、run id、game/config identity、CLI version、command、pid、
 開始/終了時刻、failure/completion を持つ。状態遷移時に一時ファイルへ書き、rename で置き換える。
-wire name と optional field を変更するときは `formats` / `protocol` と reader の互換性を検証する。
+wire name と optional field を変更するときは `runfiles` / `protocol` と reader の互換性を検証する。
 
 ### 5.4 events.jsonl
 

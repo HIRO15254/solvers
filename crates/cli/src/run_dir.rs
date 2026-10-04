@@ -7,7 +7,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use formats::{
+use runfiles::{
     RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_HU_CHECKPOINT_FILE, RUN_HU_SOLUTION_FILE,
     RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RunEventLevel,
     RunEventLog, RunEventPayload, RunManifest, RunState,
@@ -373,7 +373,7 @@ mod tests {
         assert_eq!(manifest.run_id, "run");
         assert!(run.join(RUN_CONFIG_FILE).is_file());
 
-        let (events, _) = formats::read_events(&RunEventLog::path_in(&run), 0).unwrap();
+        let (events, _) = runfiles::read_events(&RunEventLog::path_in(&run), 0).unwrap();
         assert_eq!(
             events.first().unwrap().payload,
             RunEventPayload::State {
@@ -421,7 +421,7 @@ mod tests {
                 .as_deref()
                 .is_some_and(|failure| failure.contains("policy arena"))
         );
-        let (events, _) = formats::read_events(&RunEventLog::path_in(&run), 0).unwrap();
+        let (events, _) = runfiles::read_events(&RunEventLog::path_in(&run), 0).unwrap();
         assert!(events.iter().any(|event| matches!(
             &event.payload,
             RunEventPayload::Failure { message } if message.contains("policy arena")

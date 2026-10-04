@@ -150,7 +150,7 @@ mod tests {
     fn temp_path(name: &str) -> std::path::PathBuf {
         let id = COUNTER.fetch_add(1, Ordering::Relaxed);
         std::env::temp_dir().join(format!(
-            "formats-ckpt-test-{}-{}-{}",
+            "hu-postflop-ckpt-test-{}-{}-{}",
             std::process::id(),
             id,
             name

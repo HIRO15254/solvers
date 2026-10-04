@@ -3,7 +3,7 @@
 
 Each input file is a run directory's `progress.jsonl`, written by
 `solvers solve` / `solvers resume`.
-(see `crates/formats`): one JSON object per line, e.g.
+(see `crates/runfiles`): one JSON object per line, e.g.
 
     {"iteration": 500, "elapsed_secs": 0.12, "expl_p0": 1.2e-3,
      "expl_p1": 1.1e-3, "nash_conv": 2.3e-3}

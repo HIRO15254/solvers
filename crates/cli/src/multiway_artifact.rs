@@ -46,16 +46,16 @@ fn key_hex(key: [u8; 16]) -> String {
 fn read_solution(
     path: &Path,
 ) -> Result<(
-    formats::MultiwaySolutionMetadata,
-    Vec<formats::MultiwayStrategyBlock>,
+    mw_preflop::mwsol::MultiwaySolutionMetadata,
+    Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
 )> {
-    let mut reader =
-        formats::MwSolReader::open(path).with_context(|| format!("opening {}", path.display()))?;
+    let mut reader = mw_preflop::mwsol::MwSolReader::open(path)
+        .with_context(|| format!("opening {}", path.display()))?;
     let metadata = reader.metadata().clone();
     let mut strategies = Vec::with_capacity(reader.strategy_count());
     let mut cursor = 0;
     while cursor < reader.strategy_count() {
-        let page = reader.read_strategy_page(cursor, formats::MWSOL_MAX_PAGE_LIMIT)?;
+        let page = reader.read_strategy_page(cursor, mw_preflop::mwsol::MWSOL_MAX_PAGE_LIMIT)?;
         cursor += page.strategies.len();
         strategies.extend(page.strategies);
     }
@@ -72,7 +72,7 @@ pub enum InspectView {
 }
 
 fn parse_history(
-    metadata: &formats::MultiwaySolutionMetadata,
+    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
     requested: &str,
 ) -> Result<[u8; 16]> {
     if requested.is_empty() || requested == "root" {
@@ -140,8 +140,8 @@ fn matrix(mut cells: Vec<serde_json::Value>) -> Vec<Vec<serde_json::Value>> {
 }
 
 fn strategy_matrix(
-    strategies: &[formats::MultiwayStrategyBlock],
-    weights: &[formats::MultiwayStrategyWeight],
+    strategies: &[mw_preflop::mwsol::MultiwayStrategyBlock],
+    weights: &[mw_preflop::mwsol::MultiwayStrategyWeight],
     history: [u8; 16],
     actor: u8,
 ) -> Vec<Vec<serde_json::Value>> {
@@ -181,8 +181,8 @@ fn strategy_matrix(
 }
 
 fn range_matrix(
-    metadata: &formats::MultiwaySolutionMetadata,
-    strategies: &[formats::MultiwayStrategyBlock],
+    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
+    strategies: &[mw_preflop::mwsol::MultiwayStrategyBlock],
     target: [u8; 16],
 ) -> Result<Vec<serde_json::Value>> {
     let config = parse_solution_config(&metadata.config_toml)?;
@@ -290,7 +290,7 @@ pub fn inspect(
         })?;
     let actor = actor_override.or(state.actor);
     let summary = serde_json::json!({
-        "formatVersion": formats::MWSOL_FORMAT_VERSION,
+        "formatVersion": mw_preflop::mwsol::MWSOL_FORMAT_VERSION,
         "schemaVersion": metadata.schema_version,
         "sweeps": metadata.sweeps,
         "profileType": "approximate-average",
@@ -368,21 +368,21 @@ pub enum ExportFormat {
 }
 
 fn action_fields(
-    action: &formats::MultiwayPublicAction,
+    action: &mw_preflop::mwsol::MultiwayPublicAction,
 ) -> (&'static str, Option<u64>, bool, bool) {
     match action {
-        formats::MultiwayPublicAction::Fold => ("fold", None, false, false),
-        formats::MultiwayPublicAction::Check => ("check", None, false, false),
-        formats::MultiwayPublicAction::Call {
+        mw_preflop::mwsol::MultiwayPublicAction::Fold => ("fold", None, false, false),
+        mw_preflop::mwsol::MultiwayPublicAction::Check => ("check", None, false, false),
+        mw_preflop::mwsol::MultiwayPublicAction::Call {
             amount_millibb,
             all_in,
         } => ("call", Some(*amount_millibb), *all_in, false),
-        formats::MultiwayPublicAction::BetTo {
+        mw_preflop::mwsol::MultiwayPublicAction::BetTo {
             amount_millibb,
             all_in,
             full_raise,
         } => ("bet-to", Some(*amount_millibb), *all_in, *full_raise),
-        formats::MultiwayPublicAction::RaiseTo {
+        mw_preflop::mwsol::MultiwayPublicAction::RaiseTo {
             amount_millibb,
             all_in,
             full_raise,
@@ -542,7 +542,7 @@ fn export_ranges_csv(config_toml: &str) -> Result<String> {
     Ok(csv)
 }
 
-fn export_ev_csv(seats: &[formats::MultiwaySeatResult]) -> String {
+fn export_ev_csv(seats: &[mw_preflop::mwsol::MultiwaySeatResult]) -> String {
     let mut csv = String::from(
         "seat,profile_ev,stderr,ci95_low,ci95_high,measured_deviation_mean,measured_deviation_ci95_high\n",
     );
@@ -647,9 +647,9 @@ impl ComparisonBasis {
 }
 
 fn strategy_l1(
-    key: formats::MultiwayStrategyKey,
-    left: &formats::MultiwayStrategyBlock,
-    right: &formats::MultiwayStrategyBlock,
+    key: mw_preflop::mwsol::MultiwayStrategyKey,
+    left: &mw_preflop::mwsol::MultiwayStrategyBlock,
+    right: &mw_preflop::mwsol::MultiwayStrategyBlock,
 ) -> Result<f64> {
     if left.actions != right.actions || left.probabilities.len() != right.probabilities.len() {
         bail!("action table differs at shared infoset {key:?}");
@@ -664,7 +664,7 @@ fn strategy_l1(
 
 fn replay_public_state(
     game: &HoldemGame<MultiwayAbstractionBackend>,
-    metadata: &formats::MultiwaySolutionMetadata,
+    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
     history: [u8; 16],
 ) -> Result<mw_preflop::BettingState> {
     let mut state = game.root_state();
@@ -698,8 +698,14 @@ fn replay_public_state(
 }
 
 fn compare_same_abstraction(
-    left: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
-    right: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
+    left: &BTreeMap<
+        mw_preflop::mwsol::MultiwayStrategyKey,
+        mw_preflop::mwsol::MultiwayStrategyBlock,
+    >,
+    right: &BTreeMap<
+        mw_preflop::mwsol::MultiwayStrategyKey,
+        mw_preflop::mwsol::MultiwayStrategyBlock,
+    >,
 ) -> Result<(usize, usize, usize, f64, f64)> {
     let mut sum = 0.0;
     let mut maximum = 0.0_f64;
@@ -727,10 +733,16 @@ fn compare_same_abstraction(
 }
 
 fn compare_shared_real_cards(
-    left_meta: &formats::MultiwaySolutionMetadata,
-    right_meta: &formats::MultiwaySolutionMetadata,
-    left: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
-    right: &BTreeMap<formats::MultiwayStrategyKey, formats::MultiwayStrategyBlock>,
+    left_meta: &mw_preflop::mwsol::MultiwaySolutionMetadata,
+    right_meta: &mw_preflop::mwsol::MultiwaySolutionMetadata,
+    left: &BTreeMap<
+        mw_preflop::mwsol::MultiwayStrategyKey,
+        mw_preflop::mwsol::MultiwayStrategyBlock,
+    >,
+    right: &BTreeMap<
+        mw_preflop::mwsol::MultiwayStrategyKey,
+        mw_preflop::mwsol::MultiwayStrategyBlock,
+    >,
 ) -> Result<(usize, usize, usize, f64, f64)> {
     let left_session = build_solution_session(&left_meta.config_toml)
         .context("rebuilding the left abstraction")?;
@@ -774,14 +786,14 @@ fn compare_shared_real_cards(
         for (history, actor, left_state, right_state) in &states {
             let left_private = left_game.bucket(left_state, &world, *actor as usize);
             let right_private = right_game.bucket(right_state, &world, *actor as usize);
-            let left_key = formats::MultiwayStrategyKey {
+            let left_key = mw_preflop::mwsol::MultiwayStrategyKey {
                 history: *history,
                 actor: *actor,
                 street: left_private.street,
                 active_opponents: left_private.active_opponents,
                 bucket_path: left_private.bucket_path,
             };
-            let right_key = formats::MultiwayStrategyKey {
+            let right_key = mw_preflop::mwsol::MultiwayStrategyKey {
                 history: *history,
                 actor: *actor,
                 street: right_private.street,
@@ -894,8 +906,8 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
 
 fn evaluate_prepared(
     config_toml: &str,
-    metadata: &formats::MultiwaySolutionMetadata,
-    blocks: Vec<formats::MultiwayStrategyBlock>,
+    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
+    blocks: Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
     samples: u64,
     seed: u64,
     br_traversals: u64,
@@ -1039,8 +1051,8 @@ fn explicit_range(weights: &[f32]) -> Result<String> {
 }
 
 fn node_conditioned_evaluation(
-    metadata: &formats::MultiwaySolutionMetadata,
-    mut blocks: Vec<formats::MultiwayStrategyBlock>,
+    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
+    mut blocks: Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
     target: [u8; 16],
     samples: u64,
     seed: u64,
@@ -1133,7 +1145,7 @@ fn inspect_ev(
     let (metadata, blocks) = read_solution(path)?;
     let history = parse_history(&metadata, requested_history)?;
     let cache_path = path.with_extension("mwsol.inspect-cache.json");
-    let fingerprint = formats::config_hash_hex(&metadata.config_fingerprint);
+    let fingerprint = runfiles::config_hash_hex(&metadata.config_fingerprint);
     if let Ok(contents) = std::fs::read_to_string(&cache_path)
         && let Ok(mut cached) = serde_json::from_str::<serde_json::Value>(&contents)
         && cached["solutionFingerprint"] == fingerprint

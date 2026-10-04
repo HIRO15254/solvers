@@ -14,11 +14,6 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use formats::{
-    Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayHistoryNode, MultiwayMetricsRow,
-    MultiwayPublicAction, MultiwayPublicState, MultiwaySeatMetrics, MultiwaySeatResult,
-    MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
-};
 use mw_preflop::abstraction::{
     BucketContext, BucketId, MultiwayAbstraction, MultiwayAbstractionBackend,
     TableAbstractionAdapter, ehs2_table_fingerprint,
@@ -30,6 +25,13 @@ use mw_preflop::checkpoint::MultiwayCheckpoint;
 use mw_preflop::config::{
     AbstractionConfig, AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
     UtilityConfig as MultiwayUtility,
+};
+use mw_preflop::metrics::{
+    Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwaySeatMetrics,
+};
+use mw_preflop::mwsol::{
+    MultiwayHistoryNode, MultiwayPublicAction, MultiwayPublicState, MultiwaySeatResult,
+    MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use mw_preflop::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
 use mw_preflop::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
@@ -89,7 +91,7 @@ pub struct MultiwaySession {
     pub stop_rule: Option<StopRule>,
     /// The exact config text this session was built from, unmodified.
     pub config_toml: String,
-    /// Blake3 hash of `config_toml`'s raw bytes (see `formats::config_hash`).
+    /// Blake3 hash of `config_toml`'s raw bytes (see `runfiles::config_hash`).
     pub config_hash: [u8; 32],
     /// The multiway game config (seats, blinds, betting), kept around for
     /// display purposes (seat names/positions, button seat).
@@ -603,7 +605,7 @@ fn build_multiway_session_internal(
         storage: run.storage,
         stop_rule,
         config_toml: raw_toml.to_string(),
-        config_hash: formats::config_hash(raw_toml.as_bytes()),
+        config_hash: runfiles::config_hash(raw_toml.as_bytes()),
         game_config,
         checkpoint_runtime,
     })
@@ -1115,14 +1117,17 @@ fn profile_estimate(value: &mw_preflop::solver::ProfileEstimate) -> Estimate {
     }
 }
 
-fn policy_coverage(value: &mw_preflop::CandidatePolicyCoverage) -> formats::MultiwayPolicyCoverage {
-    let by_street = |counts: mw_preflop::StreetVisitCounts| formats::MultiwayStreetVisitCounts {
-        preflop: counts.preflop,
-        flop: counts.flop,
-        turn: counts.turn,
-        river: counts.river,
-    };
-    formats::MultiwayPolicyCoverage {
+fn policy_coverage(
+    value: &mw_preflop::CandidatePolicyCoverage,
+) -> mw_preflop::metrics::MultiwayPolicyCoverage {
+    let by_street =
+        |counts: mw_preflop::StreetVisitCounts| mw_preflop::metrics::MultiwayStreetVisitCounts {
+            preflop: counts.preflop,
+            flop: counts.flop,
+            turn: counts.turn,
+            river: counts.river,
+        };
+    mw_preflop::metrics::MultiwayPolicyCoverage {
         decision_visits: value.decision_visits,
         stored_strategy_visits: value.stored_strategy_visits,
         uniform_fallback_visits: value.uniform_fallback_visits,
@@ -1287,7 +1292,7 @@ pub fn make_solution(
     MultiwaySolution {
         schema_version: MULTIWAY_SCHEMA_VERSION,
         config_toml: config_toml.to_string(),
-        config_fingerprint: formats::config_hash(config_toml.as_bytes()),
+        config_fingerprint: runfiles::config_hash(config_toml.as_bytes()),
         game_fingerprint: game.game_fingerprint(),
         algorithm_fingerprint,
         abstraction_fingerprint,
@@ -1324,7 +1329,7 @@ mod tests {
     fn algorithm_identity_distinguishes_corrected_updates_from_legacy_artifacts() {
         let config =
             crate::config::parse_internal_config(crate::test_fixtures::LOWERED_3MAX).unwrap();
-        let old_identity = formats::config_hash(&serde_json::to_vec(&config.algorithm).unwrap());
+        let old_identity = runfiles::config_hash(&serde_json::to_vec(&config.algorithm).unwrap());
         let corrected = multiway_algorithm_fingerprint(&config.algorithm).unwrap();
         assert_ne!(old_identity, corrected);
         let restored: crate::config::AlgorithmSection =

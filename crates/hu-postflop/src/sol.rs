@@ -21,7 +21,7 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::hash::{config_hash, config_hash_hex};
+use runfiles::{config_hash, config_hash_hex};
 
 /// Fixed header layout, all multi-byte fields little-endian: magic (8
 /// bytes) + format version (u16) + config hash (32 bytes) + iteration
@@ -358,7 +358,7 @@ mod tests {
     fn temp_path(name: &str) -> std::path::PathBuf {
         let id = COUNTER.fetch_add(1, Ordering::Relaxed);
         std::env::temp_dir().join(format!(
-            "formats-sol-test-{}-{}-{}",
+            "hu-postflop-sol-test-{}-{}-{}",
             std::process::id(),
             id,
             name

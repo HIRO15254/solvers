@@ -149,7 +149,7 @@ impl JobRunner {
             JobCommand::Solve => {
                 process
                     .arg("solve")
-                    .arg(directory.join(formats::RUN_CONFIG_FILE))
+                    .arg(directory.join(runfiles::RUN_CONFIG_FILE))
                     .arg("--out")
                     .arg(directory);
             }
@@ -251,7 +251,11 @@ mod tests {
     fn run_dir(base: &Path, name: &str) -> PathBuf {
         let directory = base.join(name);
         std::fs::create_dir_all(&directory).unwrap();
-        std::fs::write(directory.join(formats::RUN_CONFIG_FILE), "schema = \"x\"\n").unwrap();
+        std::fs::write(
+            directory.join(runfiles::RUN_CONFIG_FILE),
+            "schema = \"x\"\n",
+        )
+        .unwrap();
         directory
     }
 

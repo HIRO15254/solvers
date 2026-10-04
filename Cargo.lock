@@ -282,7 +282,6 @@ dependencies = [
  "anyhow",
  "blake3",
  "clap",
- "formats",
  "hu-engine",
  "hu-postflop",
  "libc",
@@ -291,6 +290,7 @@ dependencies = [
  "rand",
  "rand_chacha",
  "rayon",
+ "runfiles",
  "serde",
  "serde_json",
  "tempfile",
@@ -408,10 +408,10 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "formats",
  "libc",
  "protocol",
  "rand",
+ "runfiles",
  "serde",
  "serde_json",
  "tempfile",
@@ -463,21 +463,6 @@ name = "find-msvc-tools"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
-
-[[package]]
-name = "formats"
-version = "0.1.0"
-dependencies = [
- "blake3",
- "hu-engine",
- "libc",
- "postcard",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "zstd",
-]
 
 [[package]]
 name = "futures-core"
@@ -615,7 +600,14 @@ dependencies = [
  "criterion",
  "hu-engine",
  "nlh",
+ "postcard",
  "rayon",
+ "runfiles",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "zstd",
 ]
 
 [[package]]
@@ -734,6 +726,7 @@ dependencies = [
  "rand",
  "rand_chacha",
  "rayon",
+ "runfiles",
  "rustc-hash",
  "serde",
  "serde_json",
@@ -855,7 +848,7 @@ dependencies = [
 name = "protocol"
 version = "0.1.0"
 dependencies = [
- "formats",
+ "runfiles",
  "serde",
  "serde_json",
 ]
@@ -993,6 +986,17 @@ dependencies = [
  "libc",
  "untrusted 0.9.0",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "runfiles"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libc",
+ "serde",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]

@@ -13,7 +13,7 @@ path = "src/main.rs"
 [dependencies]
 nlh = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
-formats = { workspace = true }
+runfiles = { workspace = true }
 hu-postflop = { workspace = true }
 mw-preflop = { workspace = true }
 anyhow = { workspace = true }

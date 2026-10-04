@@ -17,20 +17,20 @@ fn workspace_root() -> std::path::PathBuf {
 
 /// Fully decodes an `.mwsol` file through the paged `MwSolReader` API
 /// (there is no longer a single-shot `read_mwsol` convenience wrapper).
-fn read_mwsol_full(path: &std::path::Path) -> formats::MultiwaySolution {
-    let mut reader = formats::MwSolReader::open(path).expect("open mwsol");
+fn read_mwsol_full(path: &std::path::Path) -> mw_preflop::mwsol::MultiwaySolution {
+    let mut reader = mw_preflop::mwsol::MwSolReader::open(path).expect("open mwsol");
     let total = reader.strategy_count();
     let mut cursor = 0;
     let mut strategies = Vec::with_capacity(total);
     while cursor < total {
         let page = reader
-            .read_strategy_page(cursor, formats::MWSOL_MAX_PAGE_LIMIT)
+            .read_strategy_page(cursor, mw_preflop::mwsol::MWSOL_MAX_PAGE_LIMIT)
             .expect("read strategy page");
         strategies.extend(page.strategies);
         cursor = page.next_cursor.unwrap_or(total);
     }
     let metadata = reader.metadata().clone();
-    formats::MultiwaySolution {
+    mw_preflop::mwsol::MultiwaySolution {
         schema_version: metadata.schema_version,
         config_toml: metadata.config_toml,
         config_fingerprint: metadata.config_fingerprint,
@@ -486,14 +486,14 @@ fn solve_checkpoint_and_metrics_smoke() {
     let reported_iters: u64 = done_line_field(&stdout, "iterations=").parse().unwrap();
 
     assert!(checkpoint.exists());
-    let loaded = formats::read_checkpoint(&checkpoint).expect("read checkpoint");
+    let loaded = hu_postflop::checkpoint::read_checkpoint(&checkpoint).expect("read checkpoint");
     assert_eq!(loaded.iteration, reported_iters);
 
     let content = std::fs::read_to_string(&metrics).unwrap();
     let mut last_iter = 0u64;
     let mut row_count = 0;
     for line in content.lines() {
-        let row: formats::MetricsRow = serde_json::from_str(line).unwrap();
+        let row: runfiles::MetricsRow = serde_json::from_str(line).unwrap();
         assert!(
             row.iteration > last_iter,
             "rows must be strictly increasing in iteration"
@@ -548,22 +548,24 @@ fn resume_equivalence_postflop() {
         run_b.to_str().unwrap(),
     ]);
     let checkpoint = run_b.join("checkpoint.ckpt");
-    let loaded = formats::read_checkpoint(&checkpoint).unwrap();
+    let loaded = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
     assert_eq!(loaded.iteration, 100);
 
     // The run directory carries the config the checkpoint was stamped with,
     // so continuing to 200 means rewriting both together.
     std::fs::write(run_b.join("run.toml"), RIVER_NO_EARLY_STOP).unwrap();
-    let restamped = formats::Checkpoint {
-        config_hash: formats::config_hash(RIVER_NO_EARLY_STOP.as_bytes()),
+    let restamped = hu_postflop::checkpoint::Checkpoint {
+        config_hash: runfiles::config_hash(RIVER_NO_EARLY_STOP.as_bytes()),
         ..loaded
     };
-    formats::write_checkpoint(&checkpoint, restamped.config_hash, &restamped.state).unwrap();
+    hu_postflop::checkpoint::write_checkpoint(&checkpoint, restamped.config_hash, &restamped.state)
+        .unwrap();
 
     run_solvers_ok(&["resume", run_b.to_str().unwrap()]);
 
-    let straight = formats::read_checkpoint(&run_a.join("checkpoint.ckpt")).unwrap();
-    let resumed = formats::read_checkpoint(&checkpoint).unwrap();
+    let straight =
+        hu_postflop::checkpoint::read_checkpoint(&run_a.join("checkpoint.ckpt")).unwrap();
+    let resumed = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
     assert_eq!(straight.iteration, 200);
     assert_eq!(resumed.iteration, 200);
     assert_eq!(
@@ -998,7 +1000,7 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
         "i16 storage should still converge on the river subgame, got nash_conv={nash_conv}"
     );
 
-    let checkpoint_data = formats::read_checkpoint(&checkpoint).unwrap();
+    let checkpoint_data = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
     assert!(matches!(
         checkpoint_data.state.storage,
         hu_engine::StorageState::I16 { .. }
@@ -1441,7 +1443,7 @@ fn the_abstraction_cache_is_shared_across_runs() {
         serde_json::from_slice(&std::fs::read(warm_run.join("run.json")).unwrap()).unwrap();
     assert_eq!(
         summary["algorithmFingerprint"],
-        formats::config_hash_hex(&artifact.algorithm_fingerprint),
+        runfiles::config_hash_hex(&artifact.algorithm_fingerprint),
         "run summary and solution must identify the same update semantics"
     );
 }

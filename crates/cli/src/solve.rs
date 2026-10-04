@@ -77,7 +77,7 @@ pub fn run(
     }
     // Hashed from the raw file bytes rather than the parsed struct, so
     // `resume` re-derives the same stamp from the run directory's copy.
-    let config_hash = formats::config_hash(raw.as_bytes());
+    let config_hash = runfiles::config_hash(raw.as_bytes());
     if matches!(config.game, GameSection::PreflopMultiway(_)) {
         let mut recorder = crate::run_dir::RunRecorder::start(
             &paths.directory,
@@ -191,7 +191,7 @@ fn solve_heads_up(
     metrics: Option<&Path>,
     checkpoint_sink: Option<(&Path, [u8; 32])>,
     sol_spec: Option<SolExportSpec>,
-    events: Option<&mut formats::RunEventLog>,
+    events: Option<&mut runfiles::RunEventLog>,
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     match config.run.storage {
@@ -222,13 +222,13 @@ fn solve_heads_up(
 /// [`RunHooks::none`] and gets the loop's convergence behavior with
 /// neither.
 pub(crate) struct RunHooks<'a> {
-    pub metrics: Option<&'a mut formats::MetricsWriter>,
+    pub metrics: Option<&'a mut runfiles::MetricsWriter>,
     /// Checkpoint path and the config-file hash to stamp it with.
     pub checkpoint: Option<(&'a Path, [u8; 32])>,
     /// Run event log, when the solve owns a run directory. Checkpoint
     /// events go here so `watch` shows the same lifecycle for a heads-up
     /// run as for a multiway one.
-    pub events: Option<&'a mut formats::RunEventLog>,
+    pub events: Option<&'a mut runfiles::RunEventLog>,
     /// Cooperative cancel flag. Checked once per exploitability check, so
     /// Ctrl-C stops at a checkpoint boundary and leaves the run resumable
     /// rather than killing it mid-iteration.
@@ -278,7 +278,7 @@ pub(crate) fn previous_elapsed(path: &Path) -> Result<Duration> {
     };
     let mut elapsed = Duration::ZERO;
     for line in std::io::BufReader::new(file).lines() {
-        if let Ok(row) = serde_json::from_str::<formats::MetricsRow>(&line?) {
+        if let Ok(row) = serde_json::from_str::<runfiles::MetricsRow>(&line?) {
             elapsed = Duration::try_from_secs_f64(row.elapsed_secs)
                 .context("invalid recorded elapsed solve time")?;
         }
@@ -293,7 +293,7 @@ pub(crate) fn run_with_storage_sol<S: Storage>(
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
-    events: Option<&mut formats::RunEventLog>,
+    events: Option<&mut runfiles::RunEventLog>,
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     run_with_storage_impl::<S>(
@@ -313,7 +313,7 @@ fn run_with_storage_impl<S: Storage>(
     checkpoint: Option<(&Path, [u8; 32])>,
     resume_state: Option<SolverState>,
     sol: Option<SolExportSpec>,
-    events: Option<&mut formats::RunEventLog>,
+    events: Option<&mut runfiles::RunEventLog>,
     cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<RunSummary> {
     let rake = crate::economics::build_rake(&config.rake)?;
@@ -335,7 +335,7 @@ fn run_with_storage_impl<S: Storage>(
         Duration::ZERO
     };
     let mut metrics_writer = metrics
-        .map(formats::MetricsWriter::create_or_append)
+        .map(runfiles::MetricsWriter::create_or_append)
         .transpose()?;
     let mut hooks = RunHooks {
         metrics: metrics_writer.as_mut(),
@@ -414,7 +414,7 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
     {
         hooks.log(format_args!("max_time already reached before resume"));
         if let Some(events) = hooks.events.as_deref_mut() {
-            let _ = events.info(formats::RunEventPayload::Stop {
+            let _ = events.info(runfiles::RunEventPayload::Stop {
                 reason: "time-limit".to_string(),
             });
         }
@@ -439,7 +439,7 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
         // borrows below never overlap.
         let elapsed_secs = (hooks.elapsed_before + hooks.start.elapsed()).as_secs_f64();
         if let Some(writer) = hooks.metrics.as_deref_mut() {
-            writer.append(&formats::MetricsRow {
+            writer.append(&runfiles::MetricsRow {
                 iteration: solver.iteration(),
                 elapsed_secs,
                 expl_p0: expl[Player::P0],
@@ -459,7 +459,7 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
             ));
             hooks.canceled = true;
             if let Some(events) = hooks.events.as_deref_mut() {
-                let _ = events.info(formats::RunEventPayload::Stop {
+                let _ = events.info(runfiles::RunEventPayload::Stop {
                     reason: "cancelled".to_string(),
                 });
             }
@@ -484,7 +484,7 @@ pub(crate) fn run_loop<E: TerminalEvaluator, S: Storage>(
                 solver.iteration()
             ));
             if let Some(events) = hooks.events.as_deref_mut() {
-                let _ = events.info(formats::RunEventPayload::Stop {
+                let _ = events.info(runfiles::RunEventPayload::Stop {
                     reason: "time-limit".to_string(),
                 });
             }
@@ -505,9 +505,9 @@ fn checkpoint_now<E: TerminalEvaluator, S: Storage>(
     let Some((path, hash)) = hooks.checkpoint else {
         return Ok(());
     };
-    formats::write_checkpoint(path, hash, &solver.state())?;
+    hu_postflop::checkpoint::write_checkpoint(path, hash, &solver.state())?;
     if let Some(events) = hooks.events.as_deref_mut() {
-        let _ = events.info(formats::RunEventPayload::Checkpoint {
+        let _ = events.info(runfiles::RunEventPayload::Checkpoint {
             sweeps: solver.iteration(),
         });
     }
