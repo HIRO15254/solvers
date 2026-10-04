@@ -11,16 +11,18 @@
 
 ## Projectの対応
 
-2026-10-04の再構築決定（[製品定義](products.jp.md)）により、既存のR0〜R7 Projectは旧ロードマップに
-対応するものとなった。新しい2製品向けのProject構成は[再構築計画](plans/two-product-restructure.jp.md)
-第6節の再編案として利用者の承認を待っている。承認後にLinearを再編し、この節を新しい対応へ置き換える。
-承認前に同名Projectや再構築の作業Issueを作らない。
+2026-10-04の再構築決定（[製品定義](products.jp.md)）に合わせ、利用者の承認を得て
+[再構築計画](plans/two-product-restructure.jp.md)第6節のとおりLinearを再編した。
 
-| 旧段階 | Linear Project | 現在の扱い |
+| 段階 | Linear Project | 内容 |
 |---|---|---|
-| R0 | [対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16) | 全Issue完了。旧手順書はtagに残る |
-| R1 | [HU検証と汎用ゲーム境界](https://linear.app/sapphire2/project/r1-hu検証と汎用ゲーム境界-078f73df767b) | HU関連のIssueはP1へ移す案（再構築計画第6節） |
-| R2〜R7 | 既存Project | 旧ロードマップとしてarchiveする案 |
+| S1・S2 | [S1: 2製品への再構築](https://linear.app/sapphire2/project/s1-2製品への再構築-8f6ee2797760) | 再構築計画のM0〜M8 |
+| S3 | [P1: NLH HU Postflop Solver](https://linear.app/sapphire2/project/p1-nlh-hu-postflop-solver-43affe7586bb) | P1の品質・性能。旧R1のHU関連Issueを移した |
+| S4 | [P2: NLH Multiway Preflop Solver](https://linear.app/sapphire2/project/p2-nlh-multiway-preflop-solver-e08558d9acd9) | P2の方式決定（製品定義D5）・品質・性能 |
+| S5 | [GUI](https://linear.app/sapphire2/project/gui-98f3f562437d) | daemon経由のWeb GUI |
+| 旧R0 | [対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16) | 全Issue完了。旧手順書はtagに残る |
+| 旧R1 | [HU検証と汎用ゲーム境界](https://linear.app/sapphire2/project/r1-hu検証と汎用ゲーム境界-078f73df767b) | SOL-9・SOL-10は対象外の完了記録として残し、SOL-11はCanceled |
+| 旧R2〜R7 | 既存Project | 旧ロードマップとしてCanceled |
 
 ## 作業IDの対応
 
@@ -28,7 +30,9 @@
 |---|---|---|
 | DEV-01 | [SOL-7](https://linear.app/sapphire2/issue/SOL-7/dev-01-開発文書と証拠管理を整理する) | 文書導線、Linearへの状態一本化。[移行記録](decisions/2026-09-25-development-workflow.jp.md) |
 | R0-01〜R0-06 | SOL-1〜SOL-6 | 完了済み。手順書はtag `archive/pre-two-products-2026-10-04`。SOL-1の参照候補は[HU Postflop参照候補](plans/hu-postflop-validation/README.md)へ移した |
-| M0〜M8 | 未起票（再編の承認後） | [再構築計画](plans/two-product-restructure.jp.md)第4節 |
+| M0〜M8 | SOL-16〜SOL-24（M0=SOL-16から番号順） | [再構築計画](plans/two-product-restructure.jp.md)第4節 |
+| T1-01、T1-05〜T1-08 | SOL-8、SOL-12〜SOL-15（P1へ移した） | 旧手順書はtag。S1の完了後に新Inputの条件で再開・再評価する |
+| P2の方式決定 | SOL-25 | [製品定義](products.jp.md)のD5、第6節S4 |
 
 設計・受入上の必須前提はGitの計画で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は計画を更新し、その影響をLinearの待ち関係へ反映する。

@@ -2,8 +2,8 @@
 
 更新: **2026-10-04**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
 作業状態は[Linear](../status.jp.md)、Input形式の詳細は[`solvers.nlh/v1`草案](nlh-input-v1.jp.md)に置く。
-作業branchは`restructure/two-products`、旧状態はgit tag `archive/pre-two-products-2026-10-04`（ローカル作成済み、
-remoteへのpushは未実施）。
+作業branchは`restructure/two-products`、旧状態はgit tag `archive/pre-two-products-2026-10-04`（mainの`457f034`。
+2026-10-04にremoteへpush済み）。
 
 ## 1. 移行中の規則
 
@@ -105,7 +105,7 @@ mainへ戻すかは、調査の計画を立てる時点で判断する。
 
 | 手順 | 内容 | 完了条件 |
 |---|---|---|
-| **M0 保全** | 旧状態のtag、作業branch | tagがmainの`457f034`を指す。remoteへのpushは利用者の承認後 |
+| **M0 保全** | 旧状態のtag、作業branch | tagがmainの`457f034`を指し、利用者の承認を得てremoteへpushされている |
 | **M1 設計文書** | 製品定義、本計画、Input草案。旧ロードマップ・計画・調査文書を削除し、入口文書を更新 | 文書のリンク検査（`tools/check_docs.py`）が通る。旧R0〜R7計画への導線が残らない |
 | **M2 対象外の削除** | 第3節の「削除」を実施。対応する規範・CLI reference・user guide・例・試験を同じ変更で更新 | 必須検証が通る。HU oracle差分試験とMultiwayの固定seed試験・GTO Wizard参照試験の結果が変わらない。研究featureと`research-*`のcfgが残らない |
 | **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`→`hu-engine`、`holdem`+`game`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、`multiway::{icm, rake_condition}`とconfigのrake部を`economics`へ移す | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に依存方向が第2節と一致する（`spot`はM4で加える） |
@@ -133,19 +133,18 @@ S4の調査のうちコードに依存しない部分は、M2〜M8と並行し�
   M7まで残す。M7で新しい規範が参照する根拠だけを残し、残りはtagへ委ねる。
   `experiments/hu-postflop-reference/`はP1の参照候補として残す。
 
-## 6. Linearの再編案（利用者の承認待ち）
+## 6. Linearの再編（2026-10-04実施）
 
-現行のR0〜R7 Projectは旧ロードマップに対応しており、新しい2製品の作業単位と一致しない。
-承認を得てから次の変更を行う。承認前はLinearを変更しない。
+旧R0〜R7 Projectは旧ロードマップに対応し、新しい2製品の作業単位と一致しなかったため、利用者の承認を得て
+次のとおり再編した。ProjectとIssueの対応は[作業状態の管理先](../status.jp.md)に置く。
 
-| 対象 | 変更案 |
+| 対象 | 実施内容 |
 |---|---|
 | 新Project | 「S1: 2製品への再構築」（M0〜M8）、「P1: NLH HU Postflop Solver」（S3）、「P2: NLH Multiway Preflop Solver」（S4）、「GUI」（S5） |
-| R0（全件Done） | そのまま完了として残す |
-| R1のSOL-9・SOL-10（Done、variant共通境界） | 対象外になった旨を記録して残す |
-| R1のSOL-8・SOL-13（HU参照fixture・閾値） | P1 Projectへ移し、新Inputの条件で作業内容を更新 |
-| R1のSOL-12・SOL-14・SOL-15（HU基準測定・I/O・時間/メモリ） | P1 Projectへ移す。`codex/r1-hu-postflop`の成果を含め、S1完了後に再評価 |
-| R1のSOL-11（抽象化の識別子・写像） | 対象外（lossy抽象化を使わない）としてCanceled |
-| R2〜R7 Project | 旧ロードマップとしてarchive |
-
-`docs/status.jp.md`の対応表は、Linearを再編した変更で更新する。
+| 新Issue | M0〜M8をS1へ（M0・M1はDone、M2はIn Progress、M3以降は順に待ち関係を設定）。P2の方式決定（D5）をP2へ |
+| R0（全件Done） | そのまま完了として残した |
+| R1のSOL-9・SOL-10（Done、variant共通境界） | 対象外になった旨を記録して残した |
+| R1のSOL-8・SOL-13（HU参照fixture・閾値） | P1 Projectへ移し、新Inputの条件と再開条件（M5の完了）を本文に追記した |
+| R1のSOL-12・SOL-14・SOL-15（HU基準測定・I/O・時間/メモリ） | P1 Projectへ移し、`codex/r1-hu-postflop`の成果を含めてS1完了後（M7）に再評価する旨を追記した |
+| R1のSOL-11（抽象化の識別子・写像） | 対象外（P1はlossy抽象化を使わない）としてCanceled |
+| R2〜R7 Project | 旧ロードマップとしてCanceled（利用できるLinear操作にarchiveが無いため、状態と注記で示した） |
