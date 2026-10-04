@@ -33,7 +33,7 @@ Read the relevant route rather than every long document for every change:
 | External references | `LICENSE-POLICY.md` |
 
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
-  or share implementation code between it and `engine`/`game`.
+  or share implementation code between it and `hu-engine`/`hu-postflop::game`.
 
 ## Contract specification synchronization
 

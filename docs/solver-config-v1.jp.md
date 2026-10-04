@@ -920,7 +920,7 @@ TOML surface、型、既定値、条件付き validation、単位のいずれか
 2. `crates/cli/src/solver_config_v1.rs` の parser と test
 3. tree script の文法・条件変数・盤面述語を変えるなら `crates/nlh/src/script/`
    (parser と平坦化)、`crates/nlh/src/board.rs`(盤面述語)、
-   `crates/holdem/src/postflop.rs`(rule 適用)
+   `crates/hu-postflop/src/postflop.rs`(rule 適用)
 4. `examples/` の該当 config と `examples/trees/` の script、
    `crates/cli/src/config_new.rs` の template
 5. `docs/user-guide.jp.md` の利用者向け説明

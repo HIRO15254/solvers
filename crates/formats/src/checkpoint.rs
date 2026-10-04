@@ -1,6 +1,6 @@
 //! `.ckpt` checkpoint codec: a fixed manual-layout header (magic, format
 //! version, config hash, iteration) followed by a zstd-compressed postcard
-//! encoding of `engine::SolverState`.
+//! encoding of `hu_engine::SolverState`.
 //!
 //! Writes are atomic (temp file in the same directory, then renamed into
 //! place) so a process killed mid-write never corrupts a previously-good
@@ -9,7 +9,7 @@
 use std::io::Write;
 use std::path::Path;
 
-use engine::SolverState;
+use hu_engine::SolverState;
 
 /// Fixed header layout, all multi-byte fields little-endian: magic (8
 /// bytes) + format version (u16) + config hash (32 bytes) + iteration
@@ -142,7 +142,7 @@ pub fn write_checkpoint(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use engine::StorageState;
+    use hu_engine::StorageState;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);

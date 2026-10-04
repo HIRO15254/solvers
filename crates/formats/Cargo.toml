@@ -8,7 +8,7 @@ description = "Checkpoint (.ckpt) and metrics (JSONL) file formats for solver ru
 
 [dependencies]
 
-engine = { workspace = true, features = ["serde"] }
+hu-engine = { workspace = true, features = ["serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

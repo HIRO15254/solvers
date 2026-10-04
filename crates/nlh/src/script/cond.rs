@@ -209,7 +209,7 @@ impl ActionKind {
 }
 
 /// Which names and street vocabulary one config family's tree script
-/// exposes. `nlh` has no notion of a family (that lives in `holdem` /
+/// exposes. `nlh` has no notion of a family (that lives in `hu-postflop` /
 /// `multiway`), so a family builds its own `Dialect<V>` naming the `V`
 /// values, action words, and street keywords it wants; [`POSTFLOP`] is the
 /// one the postflop family uses today.

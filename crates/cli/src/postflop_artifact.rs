@@ -14,9 +14,9 @@
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow, bail};
-use engine::{NodeId, NodeKind};
 use formats::{StreetsStored, dequantize_probs};
-use holdem::PostflopNodeInfo;
+use hu_engine::{NodeId, NodeKind};
+use hu_postflop::PostflopNodeInfo;
 use nlh::{PerPlayer, Player, Street, combo_cards};
 use serde::Serialize;
 
@@ -331,7 +331,7 @@ fn reach_at(loaded: &LoadedSol, id: NodeId) -> Result<PerPlayer<Vec<f32>>> {
     let roots = &loaded.pf_game.game.root_ranges;
     let root_slices = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
     let mut failure = None;
-    let reach = engine::reach_at(tree, root_slices, id, |node_id, sref, out| {
+    let reach = hu_engine::reach_at(tree, root_slices, id, |node_id, sref, out| {
         let aux = tree.node(node_id).aux;
         match loaded.blocks.get(&aux) {
             Some(probs) => {

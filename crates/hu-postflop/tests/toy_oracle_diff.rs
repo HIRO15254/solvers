@@ -8,15 +8,15 @@ use std::collections::HashMap;
 
 use cfr_ref::games::{Kuhn, Leduc};
 use cfr_ref::{RefGame, best_response_value, expected_value};
-use engine::{Dcfr, F32Storage, NodeKind, Solver};
-use game::{ChipEv, NoRake, PayoffPipeline, ToyGame};
+use hu_engine::{Dcfr, F32Storage, NodeKind, Solver};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline, ToyGame};
 use nlh::Player;
 
 /// Exports the engine's average strategy as an oracle profile keyed by
 /// `"{card}|{history}"`.
 fn export_profile(
-    toy_info: &[game::ToyNodeInfo],
-    solver: &Solver<game::ToyEvaluator, F32Storage>,
+    toy_info: &[hu_postflop::game::ToyNodeInfo],
+    solver: &Solver<hu_postflop::game::ToyEvaluator, F32Storage>,
 ) -> HashMap<String, Vec<f64>> {
     let tree = &solver.game().tree;
     let mut profile = HashMap::new();
@@ -44,8 +44,8 @@ fn solve_toy(
     toy: ToyGame,
     iters: u64,
 ) -> (
-    Vec<game::ToyNodeInfo>,
-    Solver<game::ToyEvaluator, F32Storage>,
+    Vec<hu_postflop::game::ToyNodeInfo>,
+    Solver<hu_postflop::game::ToyEvaluator, F32Storage>,
 ) {
     let info = toy.node_info.clone();
     let mut solver = Solver::<_, F32Storage>::new(toy.game, Box::<Dcfr>::default(), Some(iters));
@@ -83,17 +83,32 @@ fn chip_ev() -> PayoffPipeline<'static> {
 
 #[test]
 fn kuhn_engine_matches_oracle() {
-    assert_engine_matches_oracle(&Kuhn::default(), game::kuhn(chip_ev()), 1_000, 1e-5);
+    assert_engine_matches_oracle(
+        &Kuhn::default(),
+        hu_postflop::game::kuhn(chip_ev()),
+        1_000,
+        1e-5,
+    );
 }
 
 #[test]
 fn kuhn_engine_matches_oracle_early_iterates() {
     // Also compare a barely-converged profile: agreement must hold for any
     // strategy, not just near equilibrium.
-    assert_engine_matches_oracle(&Kuhn::default(), game::kuhn(chip_ev()), 3, 1e-5);
+    assert_engine_matches_oracle(
+        &Kuhn::default(),
+        hu_postflop::game::kuhn(chip_ev()),
+        3,
+        1e-5,
+    );
 }
 
 #[test]
 fn leduc_engine_matches_oracle() {
-    assert_engine_matches_oracle(&Leduc::default(), game::leduc(chip_ev()), 300, 1e-4);
+    assert_engine_matches_oracle(
+        &Leduc::default(),
+        hu_postflop::game::leduc(chip_ev()),
+        300,
+        1e-4,
+    );
 }

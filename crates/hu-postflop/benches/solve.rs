@@ -4,15 +4,15 @@
 //! `--save-baseline`/`--baseline` (see that doc's "Criterion suite" section)
 //! to A/B solver changes.
 //!
-//! Run with `cargo bench -p holdem`; `cargo bench -p holdem -- --test` runs
+//! Run with `cargo bench -p hu-postflop`; `cargo bench -p hu-postflop -- --test` runs
 //! one iteration per bench as a smoke test.
 
 use std::time::Duration;
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use engine::{Dcfr, F32Storage, ParConfig, Solver};
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_engine::{Dcfr, F32Storage, ParConfig, Solver};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 use nlh::{Card, Chips, PerPlayer, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -38,7 +38,7 @@ fn sequential() -> ParConfig {
 }
 
 /// Turn-start spot: board "2s 7s Ks 2h" (matching `examples/turn_small.toml`
-/// and several `holdem` test fixtures), `postflop_srp20.toml`'s wide
+/// and several `hu-postflop` test fixtures), `postflop_srp20.toml`'s wide
 /// single-raised-pot ranges (so the per-node hand math is realistic),
 /// at `turn_small.toml`'s smaller pot/stack. Per-node cost is driven by hand
 /// count (always 1,326, independent of range sparsity) and tree shape, not

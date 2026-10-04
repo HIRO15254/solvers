@@ -2,7 +2,7 @@
 //! mapping goldens, class-level weight/average summaries, and showdown
 //! equity goldens at the river, turn, and flop.
 
-use holdem::{class_average, class_of_combo, class_weights, range_equity};
+use hu_postflop::{class_average, class_of_combo, class_weights, range_equity};
 use nlh::{Card, NUM_COMBOS, PerPlayer, Player, Range, combo_index};
 
 fn parse_board(s: &str) -> Vec<Card> {

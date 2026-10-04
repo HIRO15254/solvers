@@ -2,9 +2,9 @@
 //! O(n^2) reference, and a full solve against the closed-form solution of
 //! the clairvoyance (polarized-vs-bluffcatcher) game.
 
-use engine::{Dcfr, F32Storage, Solver, TerminalEvaluator};
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{RiverConfig, RiverGame, build_river_game};
+use hu_engine::{Dcfr, F32Storage, Solver, TerminalEvaluator};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{RiverConfig, RiverGame, build_river_game};
 use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 fn chip_ev() -> PayoffPipeline<'static> {

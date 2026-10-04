@@ -17,15 +17,15 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow, bail};
-use engine::{
-    Dcfr, F32Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array, reach_at,
-};
 use formats::{
     SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
     dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
 };
-use game::{PayoffPipeline, RakeModel, UtilityModel};
-use holdem::{
+use hu_engine::{
+    Dcfr, F32Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array, reach_at,
+};
+use hu_postflop::game::{PayoffPipeline, RakeModel, UtilityModel};
+use hu_postflop::{
     PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
     river_entry_state, river_resolve_config,
 };
@@ -56,7 +56,7 @@ impl From<SolStreets> for StreetsStored {
 }
 
 /// Starting street for a postflop subgame, derived from its board length --
-/// mirrors `holdem::build_postflop_game`'s own board-length dispatch (3 =
+/// mirrors `hu_postflop::build_postflop_game`'s own board-length dispatch (3 =
 /// flop, 4 = turn, 5 = river) so callers never duplicate or drift from that
 /// match.
 pub(crate) fn start_street_from_board_len(len: usize) -> Street {
@@ -130,12 +130,12 @@ fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
 /// Walks the tree once carrying both players' reach, calling `visit` at
 /// every action node.
 ///
-/// `engine::reach_at` answers one node by re-walking the path to it, which
+/// `hu_engine::reach_at` answers one node by re-walking the path to it, which
 /// is the right shape for a viewer but quadratic when every node needs an
 /// answer. Only the current path's reaches are alive at a time, so this
 /// stays linear in memory as well as in work.
 fn walk_reaches<F>(
-    tree: &engine::PublicTree,
+    tree: &hu_engine::PublicTree,
     node_id: NodeId,
     reach: &PerPlayer<Vec<f32>>,
     strategy: &dyn Fn(NodeId) -> Vec<f32>,
@@ -540,7 +540,7 @@ impl<S: Storage> StrategyProvider for LiveProvider<'_, S> {
 
 /// A cached river re-solve: the fresh subgame's own solver, plus the map
 /// from trunk node ids (rooted at the river-entry node) to this subgame's
-/// node ids (from `engine::pair_subtrees`), needed to translate a query
+/// node ids (from `hu_engine::pair_subtrees`), needed to translate a query
 /// against the trunk into a query against the re-solved subgame.
 struct RiverSolve {
     solver: Solver<PostflopEvaluator, F32Storage>,
@@ -740,8 +740,8 @@ impl StrategyProvider for SolProvider<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use engine::I16Storage;
-    use holdem::PostflopNodeInfo;
+    use hu_engine::I16Storage;
+    use hu_postflop::PostflopNodeInfo;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -773,7 +773,7 @@ mod tests {
 
     /// Small turn-start config (board "2s 7s Ks 2h", ranges "44,55" vs
     /// "33,66", pot 2, stack 20, turn [0.75], river [1.0], max_aggressive_actions 1/1),
-    /// copied from `crates/holdem/tests/viewer.rs`'s `small_turn_config`: a
+    /// copied from `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config`: a
     /// single chance node whose children are exactly the river-entry nodes,
     /// small enough to build/solve/re-solve fast even in a debug build.
     const TINY_TURN_TOML: &str = r#"
@@ -842,7 +842,7 @@ check_every = 16
     /// float-reduction order across parallel chance-branch fan-out cannot
     /// make any of these tests flaky. Skipping the sequential-only
     /// restriction cuts this fixture's already-noted-elsewhere-as-slow
-    /// solve time (see `crates/holdem/tests/viewer.rs`'s comment on
+    /// solve time (see `crates/hu-postflop/tests/viewer.rs`'s comment on
     /// `small_turn_config`) roughly 3x on this machine's 4 cores.
     fn build_and_solve<S: Storage>(
         raw: &str,
@@ -1102,7 +1102,7 @@ check_every = 16
     /// mapping needed on the trunk side -- `SolProvider::average_strategy`
     /// already translates its answer back to trunk coordinates).
     ///
-    /// As `holdem::viewer`'s module doc spells out, a reach-weighted fresh
+    /// As `hu_postflop::viewer`'s module doc spells out, a reach-weighted fresh
     /// subgame solve reproduces the trunk's river strategy only
     /// approximately: the trunk solved the whole game jointly, so its river
     /// strategy is correlated with every other river-entry node through the

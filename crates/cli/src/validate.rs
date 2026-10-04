@@ -198,7 +198,7 @@ fn validate_solver_config(
     let config = parse_solve_config_at(raw, config_path)?;
     let rake = crate::economics::build_rake(&config.rake)?;
     let utility = crate::economics::build_utility(&config.utility)?;
-    let zero_sum = game::PayoffPipeline {
+    let zero_sum = hu_postflop::game::PayoffPipeline {
         rake: rake.as_ref(),
         utility: utility.as_ref(),
     }

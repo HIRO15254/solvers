@@ -1,6 +1,6 @@
 //! Dimension-changing `ReachMap::Transition` chance deals: `PublicTree` has
 //! supported `SparseTransition { in_dim, out_dim }` with `out_dim != in_dim`
-//! since M1 (see `crates/engine/src/tree.rs`'s `ReachMap` doc comment), but
+//! since M1 (see `crates/hu-engine/src/tree.rs`'s `ReachMap` doc comment), but
 //! every solver walk used to size its chance-branch scratch buffers as if
 //! `out_dim == in_dim` always held. These tests build the same tiny game two
 //! ways — once with duplicated private states left unmerged (a
@@ -10,7 +10,7 @@
 //! `Deal::weight`'s doc comment: "suit-isomorphism classes fold their class
 //! size in here").
 
-use engine::{
+use hu_engine::{
     CompiledGame, Dcfr, F32Storage, McCfg, McSolver, PublicTree, ReachMap, Solver,
     SparseTransition, TempNode, TerminalEvaluator, TreeSpec,
 };
@@ -171,9 +171,9 @@ fn build_game(
 /// (chance, one deal), 1 = P0's action node, 2/3 = P1's action nodes (under
 /// P0's action 0/1). Identical in Game A and Game B — only per-node hand
 /// counts differ.
-const P0_NODE: engine::NodeId = 1;
-const P1_NODE_A0: engine::NodeId = 2;
-const P1_NODE_A1: engine::NodeId = 3;
+const P0_NODE: hu_engine::NodeId = 1;
+const P1_NODE_A0: hu_engine::NodeId = 2;
+const P1_NODE_A1: hu_engine::NodeId = 3;
 
 fn root_ranges() -> (Vec<f32>, Vec<f32>) {
     // Classes: {0,1} carry mass w0/v0, {2,3} carry mass w1/v1. Distinct

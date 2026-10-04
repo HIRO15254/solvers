@@ -1,11 +1,11 @@
 //! Correctness harness for the chance-sampled MCCFR driver
-//! (`engine::McSolver`), mirroring `tests/toys.rs`'s full-traversal harness:
+//! (`hu_engine::McSolver`), mirroring `tests/toys.rs`'s full-traversal harness:
 //! Kuhn (no chance node — the sampled pass degenerates to the exact full
 //! traversal) as a fast smoke test, Leduc (one chance node — the board
 //! card) as the real chance-sampling exit test.
 
-use engine::{F32Storage, McCfg, McSolver, Solver, StorageState, Vanilla, linear_cfr};
-use game::{ChipEv, NoRake, PayoffPipeline};
+use hu_engine::{F32Storage, McCfg, McSolver, Solver, StorageState, Vanilla, linear_cfr};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use nlh::Player;
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -32,11 +32,11 @@ fn mccfr_kuhn_matches_full_traversal_bit_exactly() {
     // node to traverse.
     let iters = 50_000;
 
-    let toy_full = game::kuhn(chip_ev());
+    let toy_full = hu_postflop::game::kuhn(chip_ev());
     let mut full_solver = Solver::<_, F32Storage>::new(toy_full.game, Box::new(Vanilla), None);
     full_solver.run(iters);
 
-    let toy_mc = game::kuhn(chip_ev());
+    let toy_mc = hu_postflop::game::kuhn(chip_ev());
     let mc_cfg = McCfg {
         seed: 7,
         discount_until: 0,
@@ -88,7 +88,7 @@ fn mccfr_kuhn_matches_full_traversal_bit_exactly() {
 #[test]
 #[ignore = "4M MCCFR iterations; CI runs it in release with --include-ignored"]
 fn mccfr_matches_full_traversal_on_leduc() {
-    let node_lookup = game::leduc(chip_ev());
+    let node_lookup = hu_postflop::game::leduc(chip_ev());
     let root = node_lookup.node_by_history("").unwrap();
     let after_check = node_lookup.node_by_history("c").unwrap();
 
@@ -96,7 +96,7 @@ fn mccfr_matches_full_traversal_on_leduc() {
     // converges noticeably slower than the project default (Dcfr::default,
     // alpha=1.5/beta=0/gamma=3) — 20k iterations to clear 2e-3 vs. the 5k
     // `tests/toys.rs` uses with the default schedule.
-    let full_toy = game::leduc(chip_ev());
+    let full_toy = hu_postflop::game::leduc(chip_ev());
     let mut full_solver =
         Solver::<_, F32Storage>::new(full_toy.game, Box::new(linear_cfr()), Some(20_000));
     full_solver.run(20_000);
@@ -121,7 +121,7 @@ fn mccfr_matches_full_traversal_on_leduc() {
     // behind it — hence needing millions, not hundreds of thousands, of
     // sampled iterations for a tight bound (empirically: ~3.6e-3 NashConv
     // at 4M iterations, comfortably under the 5e-3 bar; ~1.3e-2 at 300k).
-    let mc_toy = game::leduc(chip_ev());
+    let mc_toy = hu_postflop::game::leduc(chip_ev());
     let mc_cfg = McCfg {
         seed: 42,
         ..Default::default()
@@ -161,11 +161,11 @@ fn sampled_run_is_deterministic_for_fixed_seed() {
         ..Default::default()
     };
 
-    let toy_a = game::leduc(chip_ev());
+    let toy_a = hu_postflop::game::leduc(chip_ev());
     let mut solver_a = McSolver::<_, F32Storage>::new(toy_a.game, cfg);
     solver_a.run(1_000);
 
-    let toy_b = game::leduc(chip_ev());
+    let toy_b = hu_postflop::game::leduc(chip_ev());
     let mut solver_b = McSolver::<_, F32Storage>::new(toy_b.game, cfg);
     solver_b.run(1_000);
 
@@ -182,14 +182,14 @@ fn state_round_trip_resumes_bit_identically() {
         ..Default::default()
     };
 
-    let toy_x = game::leduc(chip_ev());
+    let toy_x = hu_postflop::game::leduc(chip_ev());
     let mut solver_x = McSolver::<_, F32Storage>::new(toy_x.game, cfg);
     solver_x.run(500);
     let snapshot = solver_x.state();
     solver_x.run(500);
     let x = solver_x.state();
 
-    let toy_y = game::leduc(chip_ev());
+    let toy_y = hu_postflop::game::leduc(chip_ev());
     let mut solver_y = McSolver::<_, F32Storage>::new(toy_y.game, cfg);
     solver_y.restore_state(snapshot).unwrap();
     solver_y.run(500);
@@ -207,7 +207,7 @@ fn state_round_trip_resumes_bit_identically() {
 #[test]
 #[ignore = "300k MCCFR iterations; CI runs it in release with --include-ignored"]
 fn pruning_converges_and_never_panics() {
-    let toy = game::leduc(chip_ev());
+    let toy = hu_postflop::game::leduc(chip_ev());
     let cfg = McCfg {
         seed: 5,
         prune_threshold: Some(-1.0),

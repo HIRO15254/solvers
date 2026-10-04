@@ -8,9 +8,9 @@
 use std::collections::HashMap;
 
 use cfr_ref::{RefGame, best_response_value, expected_value};
-use engine::{Dcfr, F32Storage, NodeKind, ParConfig, Solver};
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_engine::{Dcfr, F32Storage, NodeKind, ParConfig, Solver};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 use nlh::{Card, CardSet, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 const BOARD: &str = "Ks Qs 7h 2d";
@@ -252,7 +252,7 @@ impl RefGame for MicroHoldem {
 // Engine side.
 // ---------------------------------------------------------------------------
 
-fn engine_game() -> holdem::PostflopGame {
+fn engine_game() -> hu_postflop::PostflopGame {
     let pipeline = PayoffPipeline {
         rake: &NoRake,
         utility: &ChipEv,
@@ -276,8 +276,8 @@ fn engine_game() -> holdem::PostflopGame {
 }
 
 fn export_profile(
-    node_info: &[holdem::PostflopNodeInfo],
-    solver: &Solver<holdem::PostflopEvaluator, F32Storage>,
+    node_info: &[hu_postflop::PostflopNodeInfo],
+    solver: &Solver<hu_postflop::PostflopEvaluator, F32Storage>,
 ) -> HashMap<String, Vec<f64>> {
     let tree = &solver.game().tree;
     let mut profile = HashMap::new();

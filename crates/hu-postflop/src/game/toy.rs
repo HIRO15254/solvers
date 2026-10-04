@@ -5,10 +5,10 @@
 //! values, exploitability decay) exercises the same `TempNode` compilation,
 //! payoff baking, chance masks, and solver walks as real poker games.
 
-use engine::{CompiledGame, PublicTree, ReachMap, TempNode, TerminalEvaluator, TreeSpec};
+use hu_engine::{CompiledGame, PublicTree, ReachMap, TempNode, TerminalEvaluator, TreeSpec};
 use nlh::{Chips, PerPlayer, Player, Street};
 
-use crate::payoff::{BakedPayoffs, Outcome, PayoffPipeline, TerminalDescriptor, TerminalKind};
+use super::payoff::{BakedPayoffs, Outcome, PayoffPipeline, TerminalDescriptor, TerminalKind};
 
 /// One betting round of a limit toy game.
 pub struct RoundSpec {
@@ -72,7 +72,7 @@ pub struct ToyGame {
 
 impl ToyGame {
     /// Finds the action node with the given history string.
-    pub fn node_by_history(&self, history: &str) -> Option<engine::NodeId> {
+    pub fn node_by_history(&self, history: &str) -> Option<hu_engine::NodeId> {
         let tag = self
             .node_info
             .iter()
@@ -85,7 +85,7 @@ impl ToyGame {
             .map(|id| id as u32)
     }
 
-    pub fn info(&self, node: engine::NodeId) -> &ToyNodeInfo {
+    pub fn info(&self, node: hu_engine::NodeId) -> &ToyNodeInfo {
         &self.node_info[self.game.tree.tags[node as usize] as usize]
     }
 }
@@ -136,7 +136,7 @@ pub fn build_toy_game(spec: &ToyGameSpec, pipeline: PayoffPipeline<'_>) -> ToyGa
         history: String::new(),
     });
     let deck = spec.deck as u32;
-    let tree = engine::PublicTree::compile(TreeSpec {
+    let tree = hu_engine::PublicTree::compile(TreeSpec {
         root,
         masks: builder.masks,
         transitions: Vec::new(),

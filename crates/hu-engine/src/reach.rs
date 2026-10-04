@@ -6,7 +6,7 @@
 //! scratch-pool/view-splitting discipline in `solver.rs`. Two consumers
 //! drive the design: an offline viewer reconstructing per-hand reach at an
 //! arbitrary node for display, and river re-solve tooling (see
-//! `holdem::viewer`) that needs a trunk subtree's entry reach to seed a
+//! `hu_postflop::viewer`) that needs a trunk subtree's entry reach to seed a
 //! fresh subgame.
 
 use nlh::{PerPlayer, Player};
@@ -203,7 +203,7 @@ impl std::error::Error for SubtreeMismatch {}
 /// the two roots) on full agreement, or the first point of divergence as an
 /// `Err`.
 ///
-/// This is the guard-test primitive behind `holdem::viewer`'s river-resolve
+/// This is the guard-test primitive behind `hu_postflop::viewer`'s river-resolve
 /// contract: two subtrees built from unrelated configs (a trunk's river
 /// entry vs. a from-scratch river-start build) are asserted structurally
 /// identical this way, node for node, forever.

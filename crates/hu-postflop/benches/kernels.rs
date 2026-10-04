@@ -5,15 +5,15 @@
 //! full 1,326-combo table, the same amount of work a real solve asks of
 //! them every terminal visit.
 //!
-//! Run with `cargo bench -p holdem` (see `docs/development.md`); `cargo bench -p
-//! holdem -- --test` runs one iteration per bench as a smoke test.
+//! Run with `cargo bench -p hu-postflop` (see `docs/development.md`); `cargo bench -p
+//! hu-postflop -- --test` runs one iteration per bench as a smoke test.
 
 use std::time::Duration;
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
-use engine::TerminalEvaluator;
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{RiverConfig, RiverGame, build_river_game};
+use hu_engine::TerminalEvaluator;
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{RiverConfig, RiverGame, build_river_game};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {

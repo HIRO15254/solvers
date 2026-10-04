@@ -1,12 +1,12 @@
 //! Correctness of the quantized `I16Storage` backend against the plain
 //! `F32Storage` backend, and of checkpointable solver state, on Leduc.
 //!
-//! Reuses `game::leduc`/`game::kuhn` (the same toy games `tests/toys.rs`
+//! Reuses `hu_postflop::game::leduc`/`hu_postflop::game::kuhn` (the same toy games `tests/toys.rs`
 //! solves) rather than duplicating game setup, since these tests exercise
-//! `engine::Storage` backends, not game-layer logic.
+//! `hu_engine::Storage` backends, not game-layer logic.
 
-use engine::{Dcfr, F32Storage, I16Storage, Solver, StateMismatch, Storage};
-use game::{ChipEv, NoRake, PayoffPipeline};
+use hu_engine::{Dcfr, F32Storage, I16Storage, Solver, StateMismatch, Storage};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use nlh::Player;
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -18,9 +18,9 @@ fn chip_ev() -> PayoffPipeline<'static> {
 
 const LEDUC_VALUE: f64 = -0.0856;
 
-fn solve<S: Storage>(iters: u64) -> Solver<game::ToyEvaluator, S> {
+fn solve<S: Storage>(iters: u64) -> Solver<hu_postflop::game::ToyEvaluator, S> {
     let mut solver = Solver::<_, S>::new(
-        game::leduc(chip_ev()).game,
+        hu_postflop::game::leduc(chip_ev()).game,
         Box::<Dcfr>::default(),
         Some(iters),
     );
@@ -45,7 +45,7 @@ fn leduc_i16_game_value_and_exploitability() {
 fn leduc_i16_matches_f32_at_500_iters() {
     // Root history "": both builds are identical deterministic trees, so
     // the root node id is the same for either.
-    let root = game::leduc(chip_ev())
+    let root = hu_postflop::game::leduc(chip_ev())
         .node_by_history("")
         .expect("leduc has a root");
 
@@ -75,14 +75,20 @@ fn leduc_i16_matches_f32_at_500_iters() {
 /// RNG or other hidden state, so both paths must land on bit-identical
 /// storage state and iteration count.
 fn state_round_trip_is_deterministic<S: Storage>() {
-    let mut solver_a =
-        Solver::<_, S>::new(game::leduc(chip_ev()).game, Box::<Dcfr>::default(), None);
+    let mut solver_a = Solver::<_, S>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        None,
+    );
     solver_a.run(60);
     let checkpoint = solver_a.state();
     solver_a.run(40);
 
-    let mut solver_b =
-        Solver::<_, S>::new(game::leduc(chip_ev()).game, Box::<Dcfr>::default(), None);
+    let mut solver_b = Solver::<_, S>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        None,
+    );
     solver_b
         .restore_state(checkpoint)
         .expect("checkpoint must restore into a freshly built solver of the same shape");
@@ -104,12 +110,18 @@ fn i16_state_round_trip_is_deterministic() {
 
 #[test]
 fn restore_state_rejects_wrong_variant_or_length() {
-    let mut f32_solver =
-        Solver::<_, F32Storage>::new(game::leduc(chip_ev()).game, Box::<Dcfr>::default(), None);
+    let mut f32_solver = Solver::<_, F32Storage>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        None,
+    );
     f32_solver.run(10);
 
-    let mut i16_solver =
-        Solver::<_, I16Storage>::new(game::leduc(chip_ev()).game, Box::<Dcfr>::default(), None);
+    let mut i16_solver = Solver::<_, I16Storage>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        None,
+    );
     i16_solver.run(10);
 
     // Wrong variant: an F32 checkpoint can't restore into an I16 solver.
@@ -120,8 +132,11 @@ fn restore_state_rejects_wrong_variant_or_length() {
     );
 
     // Wrong length: Kuhn's storage shape differs from Leduc's.
-    let kuhn_solver =
-        Solver::<_, F32Storage>::new(game::kuhn(chip_ev()).game, Box::<Dcfr>::default(), None);
+    let kuhn_solver = Solver::<_, F32Storage>::new(
+        hu_postflop::game::kuhn(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        None,
+    );
     let kuhn_state = kuhn_solver.state();
     assert!(matches!(
         f32_solver.restore_state(kuhn_state),
@@ -131,7 +146,7 @@ fn restore_state_rejects_wrong_variant_or_length() {
 
 #[test]
 fn bytes_for_i16_smaller_than_f32_for_leduc_shape() {
-    let leduc = game::leduc(chip_ev());
+    let leduc = hu_postflop::game::leduc(chip_ev());
     let len = leduc.game.tree.storage_len;
     let num_refs = leduc.game.tree.storage_refs.len();
 

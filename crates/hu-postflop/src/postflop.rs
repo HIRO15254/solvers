@@ -18,11 +18,11 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::{Index, IndexMut};
 
-use engine::{
+use crate::game::{BakedPayoffs, PayoffPipeline, TerminalDescriptor, TerminalKind};
+use hu_engine::{
     CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
     TreeSpec,
 };
-use game::{BakedPayoffs, PayoffPipeline, TerminalDescriptor, TerminalKind};
 use nlh::iso::{
     Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with, orbit_perms, permute_combo,
     stabilizer,
@@ -711,7 +711,7 @@ enum NodeAction {
 /// Also the fallback `node_actions` returns when rules empty the list out
 /// entirely (see that function) — the only sound reading of `force` /
 /// `checkdown` / `remove` clearing every candidate, and what keeps
-/// `engine::tree`'s `assert!(num_actions >= 1)` satisfied.
+/// `hu_engine::tree`'s `assert!(num_actions >= 1)` satisfied.
 fn base_actions(state: &LineState) -> Vec<NodeAction> {
     if state.outstanding == Chips::ZERO {
         vec![NodeAction::Check]

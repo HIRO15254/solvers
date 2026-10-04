@@ -1,15 +1,15 @@
 //! Roadmap M4: rake / ICM / general-sum validation on the postflop solver.
 //!
-//! These tests exercise the `game::payoff` pipeline (see its unit tests for
+//! These tests exercise the `hu_postflop::game::payoff` pipeline (see its unit tests for
 //! the pipeline-level invariants) all the way through a real postflop
 //! solve: a pure HU-ICM solve must be identical to its chip-EV twin (ICM is
 //! affine in stacks for two players), a raked solve must leak exactly the
 //! rake in aggregate, and rake must visibly shift both bettor and defender
 //! strategies at a hand-verifiable spot.
 
-use engine::{Dcfr, F32Storage, ParConfig, Solver};
-use game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake};
-use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_engine::{Dcfr, F32Storage, ParConfig, Solver};
+use hu_postflop::game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake};
+use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -88,7 +88,7 @@ fn max_root_strategy_diff(a: &[f32], b: &[f32], p0_range: &Range) -> f32 {
 }
 
 /// HU ICM is an affine, equal-slope function of chip stacks (see
-/// `game::payoff::tests::hu_icm_is_affine_in_chip_ev`), and with `NoRake`
+/// `hu_postflop::game::payoff::tests::hu_icm_is_affine_in_chip_ev`), and with `NoRake`
 /// the total of both players' stacks after any terminal is a constant equal
 /// to the starting total (nothing leaves the game). So every baked ICM
 /// payoff is exactly `slope * baked chip-EV payoff` for one global positive
@@ -276,7 +276,7 @@ fn clairvoyance_frequencies(pipeline: PayoffPipeline<'_>, iterations: u64) -> (f
         Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(iterations));
     solver.run(iterations);
 
-    let freq = |node: engine::NodeId, range: &str, action: usize| -> f64 {
+    let freq = |node: hu_engine::NodeId, range: &str, action: usize| -> f64 {
         let range: Range = range.parse().unwrap();
         let sigma = solver.average_strategy_at(node);
         let mut total = 0.0;

@@ -5,11 +5,11 @@
 //! in particular must stay fast enough to run on every `cargo test`, since
 //! it is the only thing standing between the postflop builder's
 //! betting/sizing logic drifting silently out of sync with
-//! `holdem::viewer`'s replay/reconstruction logic.
+//! `hu_postflop::viewer`'s replay/reconstruction logic.
 
-use engine::{Dcfr, F32Storage, NodeId, NodeKind, ParConfig, PublicTree, Solver};
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{
+use hu_engine::{Dcfr, F32Storage, NodeId, NodeKind, ParConfig, PublicTree, Solver};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{
     PerStreet, PostflopConfig, StreetTree, build_postflop_game, node_streets, river_entry_state,
     river_resolve_config,
 };
@@ -41,7 +41,7 @@ fn sequential() -> ParConfig {
 }
 
 /// Small turn-start config, copied locally from
-/// `crates/holdem/tests/rake_icm.rs`'s `small_turn_config` (board "2s 7s Ks
+/// `crates/hu-postflop/tests/rake_icm.rs`'s `small_turn_config` (board "2s 7s Ks
 /// 2h", ranges "44,55" vs "33,66", pot 2, stack 20, turn 0.75 / river 1.0,
 /// max_raises 1/1): a single chance node (turn -> river) whose children are
 /// exactly the river-entry nodes the guard test needs, and small enough to
@@ -219,12 +219,12 @@ fn river_entry_state_rejects_a_fold_and_a_short_board() {
     let config = small_turn_config();
     assert!(matches!(
         river_entry_state(&config, "f"),
-        Err(holdem::ReplayError::FoldedBeforeRiver)
+        Err(hu_postflop::ReplayError::FoldedBeforeRiver)
     ));
     // Consumes no chance token at all: board stays at 4 cards.
     assert!(matches!(
         river_entry_state(&config, "xx"),
-        Err(holdem::ReplayError::IncompleteBoard { cards: 4 })
+        Err(hu_postflop::ReplayError::IncompleteBoard { cards: 4 })
     ));
 }
 
@@ -249,10 +249,10 @@ fn river_entry_action_nodes(
 
 /// The critical guard test: for a real trunk (both without and with
 /// suit-isomorphism merging), every river-entry node's subtree must be
-/// structurally identical (per `engine::pair_subtrees`) to a from-scratch
+/// structurally identical (per `hu_engine::pair_subtrees`) to a from-scratch
 /// river-start build seeded via `river_entry_state` + `river_resolve_config`
 /// from that node's own history. This is exactly the design contract
-/// documented on `holdem::viewer`'s module doc, checked against the real
+/// documented on `hu_postflop::viewer`'s module doc, checked against the real
 /// builder rather than merely asserted in prose.
 #[test]
 fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
@@ -262,7 +262,7 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
         let trunk = build_postflop_game(&config, chip_ev());
 
         let streets = node_streets(&trunk.game.tree, Street::Turn);
-        let parents = engine::parent_array(&trunk.game.tree);
+        let parents = hu_engine::parent_array(&trunk.game.tree);
         let entries = river_entry_action_nodes(&trunk.game.tree, &streets, &parents);
         assert!(
             !entries.is_empty(),
@@ -284,7 +284,7 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
             let sub_config = river_resolve_config(&config, &state, &full_reach);
             let sub = build_postflop_game(&sub_config, chip_ev());
 
-            engine::pair_subtrees(&trunk.game.tree, id, &sub.game.tree, 0).unwrap_or_else(|e| {
+            hu_engine::pair_subtrees(&trunk.game.tree, id, &sub.game.tree, 0).unwrap_or_else(|e| {
                 panic!(
                     "river-entry subtree mismatch for history {history:?} \
                      (iso_merging={iso_merging}): {e}"
@@ -294,7 +294,7 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
     }
 }
 
-// --- reach consistency at the holdem level -----------------------------
+// --- reach consistency at the hu-postflop level -----------------------------
 
 /// Same turn-start board/ranges/turn-bet-menu as `small_turn_config`, but
 /// with the river bet menu emptied out (`max_raises.river = 0`, no river
@@ -348,7 +348,7 @@ fn reach_at_matches_root_avg_strategy_column_after_a_short_solve() {
         root_ranges[Player::P1].as_slice(),
     );
 
-    let reach = engine::reach_at(tree, root_slices, target, |id, _sref, out: &mut [f32]| {
+    let reach = hu_engine::reach_at(tree, root_slices, target, |id, _sref, out: &mut [f32]| {
         out.copy_from_slice(&solver.average_strategy_at(id));
     });
 

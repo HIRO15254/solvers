@@ -7,11 +7,13 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use engine::{
+use hu_engine::{
     CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
 };
-use game::PayoffPipeline;
-use holdem::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
+use hu_postflop::game::PayoffPipeline;
+use hu_postflop::{
+    PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity,
+};
 use nlh::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
@@ -77,7 +79,7 @@ fn run_config<S: Storage>(
     )?;
     let board_cards = pf_config.board.clone();
 
-    let estimate = holdem::memory_usage(&pf_config);
+    let estimate = hu_postflop::memory_usage(&pf_config);
     postflop_setup::print_memory_estimate(&estimate);
     postflop_setup::warn_unmatched_rules(&pf_config.streets, &estimate.rule_hits);
 
@@ -88,7 +90,7 @@ fn run_config<S: Storage>(
         utility: utility.as_ref(),
     };
     let ev_offset = postflop_setup::subgame_ev_offset(&pf_config, pipeline.utility);
-    let pf_game = holdem::build_postflop_game(&pf_config, pipeline);
+    let pf_game = hu_postflop::build_postflop_game(&pf_config, pipeline);
     let node_info: Vec<PostflopNodeInfo> = pf_game.node_info.clone();
 
     let schedule = postflop_setup::build_schedule(&config.algorithm);
@@ -207,7 +209,7 @@ impl<'a> Repl<'a> {
         let provider = &mut self.provider;
         let mut failure = None;
         let reach =
-            engine::reach_at(
+            hu_engine::reach_at(
                 tree,
                 root_slices,
                 self.current,

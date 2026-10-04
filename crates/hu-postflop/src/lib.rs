@@ -15,6 +15,8 @@
 //! street tagging, history replay, and river-subgame reconstruction for a
 //! reach-weighted re-solve — see its module doc for the design contract.
 
+pub mod game;
+
 mod aggregate;
 mod equity;
 mod kernel;

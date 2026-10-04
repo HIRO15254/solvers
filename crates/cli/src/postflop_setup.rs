@@ -6,9 +6,9 @@
 //! sampled multiway engine.
 
 use anyhow::{Result, anyhow};
-use engine::{CfrPlus, Dcfr, DiscountSchedule, HsDcfr, Vanilla, linear_cfr};
-use game::UtilityModel;
-use holdem::{MemoryEstimate, PerStreet, PostflopConfig, RuleHits, StreetTree};
+use hu_engine::{CfrPlus, Dcfr, DiscountSchedule, HsDcfr, Vanilla, linear_cfr};
+use hu_postflop::game::UtilityModel;
+use hu_postflop::{MemoryEstimate, PerStreet, PostflopConfig, RuleHits, StreetTree};
 use nlh::{Card, Chips, PerPlayer, Player, Range, Street};
 
 use crate::config::AlgorithmSection;
@@ -28,11 +28,11 @@ pub fn with_threads<T: Send>(
     }
 }
 
-pub fn configure_solver<E: engine::TerminalEvaluator, S: engine::Storage>(
-    solver: &mut engine::Solver<E, S>,
+pub fn configure_solver<E: hu_engine::TerminalEvaluator, S: hu_engine::Storage>(
+    solver: &mut hu_engine::Solver<E, S>,
     run: &crate::config::RunSection,
 ) {
-    solver.set_par(engine::ParConfig {
+    solver.set_par(hu_engine::ParConfig {
         chance_depth: run.par_chance_depth.unwrap_or(2),
         min_children: run.par_min_children.unwrap_or(12),
     });
@@ -103,7 +103,7 @@ pub fn parse_preflop_aggressor(value: &str) -> Result<Option<Player>> {
 }
 
 /// Builds a [`PostflopConfig`] from the raw config fields. `streets` and
-/// `min_bet` are handed over already resolved to `holdem`'s new
+/// `min_bet` are handed over already resolved to `hu-postflop`'s new
 /// `StreetTree`-based grammar (TOML `[game.tree]` parsing lives in
 /// `crate::config`/`crate::solver_config_v1`, which construct `StreetTree`
 /// directly rather than an intermediate `bets`-section shape) — this
@@ -254,7 +254,7 @@ pub fn merge_rule_hits(acc: &mut RuleHits, hits: &RuleHits) {
 
 /// Warns (on stderr) about every tree-script rule whose condition never
 /// evaluated true at any decision node while `rule_hits` was being
-/// accumulated -- see `holdem::RuleHits`'s doc comment for exactly what
+/// accumulated -- see `hu_postflop::RuleHits`'s doc comment for exactly what
 /// counts as a match. This check is **empirical, not static**: a
 /// contradiction like `aggressions == 0 && aggressions == 1` is only one
 /// way a rule can go dead (a `when donk` on the street a subgame starts on,
@@ -307,7 +307,7 @@ pub fn warn_unmatched_rules(streets: &PerStreet<StreetTree>, rule_hits: &RuleHit
 /// sum_combo(weight[combo])`.
 ///
 /// `weight` is the acting player's reach *at that node* (see
-/// `engine::reach_at`), not their root range. The two agree at the root and
+/// `hu_engine::reach_at`), not their root range. The two agree at the root and
 /// diverge below it: a hand that folded upstream, or that card removal has
 /// made impossible, still carries root weight but no reach, and counting it
 /// would report a frequency over hands that could not be there.
@@ -340,8 +340,8 @@ pub fn action_frequencies(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use game::{ChipEv, Icm};
-    use holdem::PerStreet;
+    use hu_postflop::PerStreet;
+    use hu_postflop::game::{ChipEv, Icm};
 
     fn config(pot: u32) -> PostflopConfig {
         PostflopConfig {

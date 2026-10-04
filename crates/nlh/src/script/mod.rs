@@ -3,7 +3,7 @@
 //!
 //! This is the frontend only -- tokenizing, substitution, the condition
 //! and block grammar, type-checking, and lowering to rules. It has no
-//! knowledge of a betting tree; `crates/holdem`'s tree builder is the
+//! knowledge of a betting tree; `crates/hu-postflop`'s tree builder is the
 //! consumer that walks decision nodes and replays [`Rule::condition`]
 //! against a [`RuleContext`] it fills in per node.
 //!

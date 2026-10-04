@@ -4,15 +4,15 @@
 //! at realistic postflop-node shapes: `A = 3` actions (a typical
 //! bet/call/fold-shaped node), `H = 1,326` hands (every hold'em combo).
 //!
-//! Run with `cargo bench -p engine` (see `docs/development.md`'s "Criterion
+//! Run with `cargo bench -p hu-engine` (see `docs/development.md`'s "Criterion
 //! suite" section for the full A/B workflow via `--save-baseline`/
-//! `--baseline`); `cargo bench -p engine -- --test` runs one iteration per
+//! `--baseline`); `cargo bench -p hu-engine -- --test` runs one iteration per
 //! bench as a compile+smoke-test check.
 
 use std::time::Duration;
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
-use engine::{
+use hu_engine::{
     Discounts, F32Storage, I16Storage, PublicTree, ReachMap, SparseTransition, Storage, StorageOps,
     StorageRef, TempNode, TreeSpec,
 };
@@ -150,9 +150,9 @@ fn bench_i16(c: &mut Criterion) {
 
 /// A root chance node with a single `Mask` deal over 1,326 dims -- the same
 /// shape `PublicTree::compile` produces for a hold'em turn/river card deal
-/// (see `crates/engine/src/reach.rs`'s tests for the fixture style this
+/// (see `crates/hu-engine/src/reach.rs`'s tests for the fixture style this
 /// mirrors). The mask itself doesn't need real card-removal semantics
-/// (`engine` is poker-agnostic); it just needs realistic size and a mix of
+/// (`hu-engine` is poker-agnostic); it just needs realistic size and a mix of
 /// zeroed/live entries.
 fn mask_tree() -> PublicTree {
     let mask: Vec<f32> = (0..NUM_HANDS)
@@ -171,7 +171,7 @@ fn mask_tree() -> PublicTree {
     })
 }
 
-/// A quotient transition matching `holdem::postflop`'s
+/// A quotient transition matching `hu_postflop::postflop`'s
 /// `quotient_transition` sizing: a merged suit-isomorphism class of 2
 /// members, each contributing `NUM_COMBOS - 51` live (non-dead-card) entries
 /// at weight `1 / num_members` -- 2,550 entries total.

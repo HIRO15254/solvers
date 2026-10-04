@@ -15,7 +15,7 @@
 //! players have contributed exactly `c` at that point: a chance node is
 //! only ever reached right after a call or a check-check, both of which
 //! leave contributions equal — see [`river_entry_state`]'s doc comment).
-//! `crates/holdem/tests/viewer.rs`'s guard test checks this against
+//! `crates/hu-postflop/tests/viewer.rs`'s guard test checks this against
 //! `build_postflop_game` for *every* river-entry node of a real trunk,
 //! forever: if a future change to the builder's betting/sizing logic ever
 //! breaks this equivalence, that test fails immediately rather than
@@ -40,7 +40,7 @@
 
 use std::fmt;
 
-use engine::{NodeId, NodeKind, PublicTree};
+use hu_engine::{NodeId, NodeKind, PublicTree};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
 
 use crate::postflop::{PerStreet, PostflopConfig, StreetTree};
@@ -332,7 +332,7 @@ pub fn river_entry_state(
 /// [`RiverEntryState`] — `entry.pot` already includes both players' `c`),
 /// ranges built from `reach` (each combo's reach becomes that combo's
 /// weight — always a valid weight since reach values are products of `[0,
-/// 1]` factors, per [`engine::reach_at`]'s contract: strategy-column
+/// 1]` factors, per [`hu_engine::reach_at`]'s contract: strategy-column
 /// probabilities and `Mask`/`Transition` weights, none of which ever push a
 /// product outside `[0, 1]`; clamped defensively against float rounding at
 /// the boundary regardless), river tree and `min_bet` copied from `trunk`

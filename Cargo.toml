@@ -3,9 +3,8 @@ resolver = "3"
 members = [
     "crates/nlh",
     "crates/cfr-ref",
-    "crates/engine",
-    "crates/game",
-    "crates/holdem",
+    "crates/hu-engine",
+    "crates/hu-postflop",
     "crates/abstraction",
     "crates/multiway",
     "crates/formats",
@@ -23,9 +22,8 @@ repository = "https://github.com/hiro15254/solvers"
 [workspace.dependencies]
 nlh = { path = "crates/nlh" }
 cfr-ref = { path = "crates/cfr-ref" }
-engine = { path = "crates/engine" }
-game = { path = "crates/game" }
-holdem = { path = "crates/holdem" }
+hu-engine = { path = "crates/hu-engine" }
+hu-postflop = { path = "crates/hu-postflop" }
 abstraction = { path = "crates/abstraction" }
 multiway = { path = "crates/multiway", default-features = false }
 formats = { path = "crates/formats" }

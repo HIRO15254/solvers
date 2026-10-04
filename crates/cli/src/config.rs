@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use std::str::FromStr;
 
 use anyhow::{Context, Result, anyhow, bail};
-use holdem::{PerStreet, StreetTree};
+use hu_postflop::{PerStreet, StreetTree};
 use nlh::Street;
 use nlh::script::{POSTFLOP, PostflopVar, Script};
 use serde::{Deserialize, Serialize};
@@ -624,7 +624,7 @@ pub struct RunSection {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_time_secs: Option<u64>,
     /// Storage backend for regrets/strategy sums. `f32` is the plain
-    /// backend; `i16` is the quantized backend (see `engine::I16Storage`),
+    /// backend; `i16` is the quantized backend (see `hu_engine::I16Storage`),
     /// trading precision for ~4x less memory on large postflop trees.
     #[serde(default)]
     pub storage: StorageKind,
@@ -708,7 +708,7 @@ fn default_check_every() -> u64 {
     25
 }
 
-/// Which `engine::Storage` backend a solve uses. Chosen once from the
+/// Which `hu_engine::Storage` backend a solve uses. Chosen once from the
 /// config (`[run] storage = "f32" | "i16"`) and threaded through as a
 /// generic parameter, so the solve path never pays for a `dyn` indirection
 /// on the hot per-hand loop just to support both backends.

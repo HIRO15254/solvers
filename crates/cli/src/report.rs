@@ -13,9 +13,9 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow};
-use engine::{F32Storage, I16Storage, Solver, Storage};
-use game::PayoffPipeline;
-use holdem::range_equity;
+use hu_engine::{F32Storage, I16Storage, Solver, Storage};
+use hu_postflop::game::PayoffPipeline;
+use hu_postflop::range_equity;
 use nlh::{Card, Player};
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
@@ -120,8 +120,8 @@ fn run_config<S: Storage>(
     // sweep of unpaired boards, say). `tree_streets` is the same
     // `PerStreet<StreetTree>` on every board (only the board itself varies
     // per iteration), so any one board's copy names every rule correctly.
-    let mut rule_hits_acc: Option<holdem::RuleHits> = None;
-    let mut tree_streets: Option<holdem::PerStreet<holdem::StreetTree>> = None;
+    let mut rule_hits_acc: Option<hu_postflop::RuleHits> = None;
+    let mut tree_streets: Option<hu_postflop::PerStreet<hu_postflop::StreetTree>> = None;
 
     for (i, board_cards) in boards.iter().enumerate() {
         let board_str: String = board_cards
@@ -145,7 +145,7 @@ fn run_config<S: Storage>(
             tree_streets = Some(pf_config.streets.clone());
         }
 
-        let estimate = holdem::memory_usage(&pf_config);
+        let estimate = hu_postflop::memory_usage(&pf_config);
         match rule_hits_acc.as_mut() {
             Some(acc) => postflop_setup::merge_rule_hits(acc, &estimate.rule_hits),
             None => rule_hits_acc = Some(estimate.rule_hits.clone()),
@@ -170,7 +170,7 @@ fn run_config<S: Storage>(
             rake: rake.as_ref(),
             utility: utility.as_ref(),
         };
-        let pf_game = holdem::build_postflop_game(&pf_config, pipeline);
+        let pf_game = hu_postflop::build_postflop_game(&pf_config, pipeline);
         let node_info = pf_game.node_info.clone();
 
         let schedule = postflop_setup::build_schedule(&config.algorithm);

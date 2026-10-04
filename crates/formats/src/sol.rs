@@ -70,7 +70,7 @@ pub struct SolMeta {
     pub ev: [f64; 2],
     pub nash_conv: f64,
     /// Informational only: the storage representation ("f32" | "i16") the
-    /// solve ran with. Never round-tripped back into `engine::StorageState`
+    /// solve ran with. Never round-tripped back into `hu_engine::StorageState`
     /// — `.sol` always quantizes to u16 fixed point regardless of this.
     pub storage: String,
     /// Informational only: wall-clock seconds the solve took.

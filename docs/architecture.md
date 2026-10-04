@@ -22,16 +22,16 @@
    Multiway は共有実カード world、2–9 seat の状態・精算、専用 policy arena と sampled traversal を使う。
 6. **再開用 state と閲覧用 artifact を分ける。** 平均戦略、保存時の値、未保存領域の再計算を区別し、
    config と実行 source の identity を検証証拠へ結び付ける。
-7. **oracle の独立性を守る。** `cfr-ref` は凍結し、engine/game と実装を共有しない。
+7. **oracle の独立性を守る。** `cfr-ref` は凍結し、hu-engine/hu-postflop と実装を共有しない。
    ライセンスと外部実装の参照境界は [LICENSE-POLICY.md](../LICENSE-POLICY.md) に従う。
 
 ## 1. 変更箇所と責務
 
 | 変更の種類 | 主な実装 | 保持する境界 |
 |---|---|---|
-| HU CFR、BR、storage、reach | `crates/engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
-| HU postflop の木と terminal kernel | `crates/holdem` | rules/metadata と engine の汎用木を分ける |
-| rake / utility | `crates/game/src/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
+| HU CFR、BR、storage、reach | `crates/hu-engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
+| HU postflop の木と terminal kernel | `crates/hu-postflop` | rules/metadata と engine の汎用木を分ける |
+| rake / utility | `crates/hu-postflop/src/game/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
 | Multiway の card abstraction | `crates/abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
 | 多人数の state / sampling / evaluation | `crates/multiway` | production、read-only 診断、feature-gated 研究経路を区別する |
 | 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 11 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 10 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -53,9 +53,8 @@ crates/
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
 ├── nlh/          # card/range/evaluator、HU基本型、bet size、tree-script front end、suit同型
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
-├── engine/       # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
-├── game/         # payoff pipeline、production tree を使う Kuhn/Leduc
-├── holdem/       # Flop/Turn/River開始の HU postflop、kernel、viewer helper
+├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
+├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc
 ├── abstraction/  # EHS² percentile bucket と cache
 ├── multiway/     # 2–9 seat NLHE、dense arena、sampled solver、checkpoint
 └── formats/      # HU checkpoint、solution、metrics、run-directory DTO/codec
@@ -66,30 +65,29 @@ crates/
 
 ```text
 nlh, cfr-ref                        → workspace内の通常依存なし
-engine                              → nlh
-game                                → nlh, engine
-holdem                              → nlh, engine, game
+hu-engine                           → nlh
+hu-postflop                         → nlh, hu-engine
 abstraction                         → nlh
 multiway                            → nlh, abstraction
-formats                             → engine
+formats                             → hu-engine
 protocol                            → formats
 daemon                              → formats, protocol
-cli                                 → nlh, abstraction, engine, game, holdem, multiway, formats
+cli                                 → nlh, abstraction, hu-engine, hu-postflop, multiway, formats
 ```
 
-`engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
-ルールには依存しない。`formats` は HU checkpoint の `engine::SolverState` を保存するため
-engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
+`hu-engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
+ルールには依存しない。`formats` は HU checkpoint の `hu_engine::SolverState` を保存するため
+hu-engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
 `crates/multiway/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。
 
-## 3. コア表現(engine crate)
+## 3. コア表現(hu-engine crate)
 
-実装入口は [tree.rs](../crates/engine/src/tree.rs)、[solver.rs](../crates/engine/src/solver.rs)、
-[storage.rs](../crates/engine/src/storage.rs)、[schedule.rs](../crates/engine/src/schedule.rs)。
+実装入口は [tree.rs](../crates/hu-engine/src/tree.rs)、[solver.rs](../crates/hu-engine/src/solver.rs)、
+[storage.rs](../crates/hu-engine/src/storage.rs)、[schedule.rs](../crates/hu-engine/src/schedule.rs)。
 以下は責務の要約であり、Rust 型の定義を複製しない。
 
 `TreeSpec` / `TempNode` を `PublicTree::compile` が immutable な public tree へ変換する。
@@ -106,7 +104,7 @@ Chance branch の `Deal` は重みと両者の `ReachMap` を持つ。
   reach は forward、value は backward に写す。
 
 ノードごとの `StorageRef` が hand 次元を持つ。これらの演算は
-[次元変化の試験](../crates/engine/tests/dimension_changing_transitions.rs)で検査されるが、
+[次元変化の試験](../crates/hu-engine/tests/dimension_changing_transitions.rs)で検査されるが、
 Stud/Draw のルール・観測・情報集合を実装済みとするものではない。
 
 Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付き量子化を行う
@@ -125,7 +123,7 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
 
-[McSolver](../crates/engine/src/mccfr.rs) は chance node を sample し、両者の action node は
+[McSolver](../crates/hu-engine/src/mccfr.rs) は chance node を sample し、両者の action node は
 vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、
 ChaCha の seed/word position を含む state を持つ。Multiway の external-sampling 経路とは分ける。
 
@@ -133,9 +131,9 @@ SIMD は compiler の自動 vectorization を基本とする。既存の release
 vectorize され、残る sorted-rank sweep / sparse transition は依存関係や不規則アクセスを持つため、
 `wide` の追加は採用していない。再検討は対象 hardware の linked binary と A/B 測定を根拠にする。
 
-## 4. Payoff pipeline(game crate)
+## 4. Payoff pipeline(hu-postflop::game module)
 
-[payoff.rs](../crates/game/src/payoff.rs) の build-time pipeline は次の 3 段からなる。
+[payoff.rs](../crates/hu-postflop/src/game/payoff.rs) の build-time pipeline は次の 3 段からなる。
 
 1. variant builder が `TerminalDescriptor` に fold/showdown、street、pot、contribution、開始 stack を渡す。
 2. `RakeModel` が控除額を、`UtilityModel` が精算後 stack の効用を計算する。
@@ -148,18 +146,18 @@ vectorize され、残る sorted-rank sweep / sparse transition は依存関係�
 純 HU ICM の affine 性と、卓外 field を持つ tournament ICM を区別する。
 FGS、bounty、profile をこの pipeline だけで実装できるとは仮定しない。
 
-## 5. Mode A: holdem crate(exact postflop)
+## 5. Mode A: hu-postflop crate(exact postflop)
 
-[postflop.rs](../crates/holdem/src/postflop.rs) が `PostflopConfig` から Flop / Turn / River 開始の木を作る。
+[postflop.rs](../crates/hu-postflop/src/postflop.rs) が `PostflopConfig` から Flop / Turn / River 開始の木を作る。
 手札は full combo 空間で表現し、card abstraction を用いない。betting tree の制約は
 選択されたゲームの一部であり、全 NLHE action を含むという意味ではない。
 
 - Suit isomorphism は builder の責務。canonical chance branch とその重み／reach mask を engine へ渡す。
-- [kernel.rs](../crates/holdem/src/kernel.rs) は sorted-rank の O(n+m) showdown sweep と
+- [kernel.rs](../crates/hu-postflop/src/kernel.rs) は sorted-rank の O(n+m) showdown sweep と
   O(n) fold inclusion–exclusion を使う。rank 評価と card-removal 用の表は build 時に準備する。
 - per-hand CFV の正規化は blocker を考慮した相手 reach を使う。公開値の単位と subgame-start 基準は
   [HU 規範](solver-config-v1.jp.md)に従い、途中の自分の bet を利益へ再加算しない。
-- [viewer.rs](../crates/holdem/src/viewer.rs) は history replay と river subgame の再構成を担当する。
+- [viewer.rs](../crates/hu-postflop/src/viewer.rs) は history replay と river subgame の再構成を担当する。
   未保存 river の再 solve は元の solve の結果と区別する。
 - メモリは概ね regret/average の 2 buffer と各 node の action × hand 数で増える。
   Flop tree は 2 層の chance とサイズ・raise cap の組合せで大きくなるため、事前見積りを行う。
@@ -179,8 +177,8 @@ NN、別方式の abstraction、追加 variant の採否は §11 とロードマ
 ## 7. 正当性検証
 
 - Kuhn/Leduc を production の compiled-tree 経路へ通す既知解の検査。
-- [game の oracle 差分試験](../crates/game/tests/oracle_diff.rs)と
-  [holdem の multi-street oracle 差分試験](../crates/holdem/tests/oracle_diff.rs)。
+- [toy game の oracle 差分試験](../crates/hu-postflop/tests/toy_oracle_diff.rs)と
+  [hu-postflop の multi-street oracle 差分試験](../crates/hu-postflop/tests/oracle_diff.rs)。
 - strategy simplex、zero-sum が成立する条件、pure HU ICM、rake/general-sum、
   suit isomorphism、f32/i16、chance の次元変化の不変条件。
 - 保存／再開、量子化、保存時の EV と query の一致、および未保存領域の区別。

@@ -5,8 +5,8 @@
 //! token / node lookup behaves exactly as it did when this module owned the
 //! whole builder.
 
-use engine::{CompiledGame, NodeId};
-use game::PayoffPipeline;
+use crate::game::PayoffPipeline;
+use hu_engine::{CompiledGame, NodeId};
 use nlh::{Card, Chips, PerPlayer, Range};
 
 use crate::postflop::{
@@ -85,7 +85,7 @@ pub fn build_river_game(config: &RiverConfig, pipeline: PayoffPipeline<'_>) -> R
         preflop_aggressor: None,
     };
     // `rule_hits` is a build-diagnostic field only the CLI's dead-rule
-    // warning reads (see `holdem::RuleHits`); this river-only shim has no
+    // warning reads (see `hu_postflop::RuleHits`); this river-only shim has no
     // caller that wants it.
     let PostflopGame {
         game, node_info, ..

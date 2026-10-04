@@ -93,11 +93,11 @@ config・manifest・小さい結果・検証器はignored outputから分離す�
 
 ## Benchmarking
 
-Criterionは小さいhot pathのA/Bに使う。現行suiteはengineのstorage/reach/transitionとholdemのterminal kernel・turn solveを含む。
+Criterionは小さいhot pathのA/Bに使う。現行suiteはhu-engineのstorage/reach/transitionとhu-postflopのterminal kernel・turn solveを含む。
 
 ```text
-cargo bench -p engine -p holdem -- --save-baseline main
-cargo bench -p engine -p holdem -- --baseline main
+cargo bench -p hu-engine -p hu-postflop -- --save-baseline main
+cargo bench -p hu-engine -p hu-postflop -- --baseline main
 ```
 
 baselineは変更前のsource・CPU・threads・ビルド条件と対応付ける。名前がmainでも、その時点のcommitが自動保存されるわけではない。

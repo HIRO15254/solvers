@@ -7,7 +7,7 @@
 //! - [`canonical_flops`]: the 1,755 canonical flops with multiplicities,
 //! - [`deal_groups`]: candidate next cards grouped into isomorphism classes
 //!   under the suit permutations that stabilize the current board — the
-//!   building block for merging turn/river chance branches in the holdem
+//!   building block for merging turn/river chance branches in hu-postflop
 //!   tree builder.
 //!
 //! A board is treated as an unordered flop plus ordered later streets; the

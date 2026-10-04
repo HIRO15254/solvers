@@ -39,7 +39,7 @@ unsupported schema. The pre-restructure state is the git tag
 
 ## Workspace layout
 
-The project has 11 Rust workspace crates. The `solvers` CLI selects the
+The project has 10 Rust workspace crates. The `solvers` CLI selects the
 config family through its `schema`, runs the solver, and writes a run directory.
 `solversd` manages CLI child processes locally or remotely. The exact HU
 postflop path can start on the flop, turn, or river; the sampled Multiway
@@ -55,12 +55,11 @@ crates/
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── nlh         # card/chip/street types, ranges, evaluator, tree-script front end, suit isomorphism
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
-├── engine      # hot core: public tree, storage, discount schedules, vector CFR, best response
-├── game        # terminal payoff pipeline (rake/ICM), compiled-tree toy games
+├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
 ├── abstraction # EHS² percentile bucket abstraction for the multiway solver
 ├── multiway    # generative 2–9 seat NLHE + external-sampling MCCFR
-├── formats     # run/metrics/solutions + HU checkpoint; depends on engine snapshots
-└── holdem      # Mode A: exact multi-street postflop solving, aggregation/equity helpers
+├── formats     # run/metrics/solutions + HU checkpoint; depends on hu-engine snapshots
+└── hu-postflop # exact multi-street postflop, payoff pipeline, toy games, aggregation/equity helpers
 ```
 
 Current specifications and architecture live in `docs/`; actionable plans in

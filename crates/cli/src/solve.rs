@@ -2,12 +2,12 @@ use std::path::Path;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, anyhow};
-use engine::{
+use hu_engine::{
     DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, SolverState, Storage,
     TerminalEvaluator,
 };
-use game::PayoffPipeline;
-use holdem::build_postflop_game;
+use hu_postflop::build_postflop_game;
+use hu_postflop::game::PayoffPipeline;
 use nlh::{PerPlayer, Player};
 
 use crate::config::{GameSection, RunSection, SolveConfig, StorageKind, TreeSection};
@@ -606,7 +606,7 @@ fn solve_postflop<S: Storage>(
     // Cheap dry run before committing to the (possibly very large) real
     // build, so an oversized config fails fast with a size estimate instead
     // of silently eating memory.
-    let estimate = holdem::memory_usage(&config);
+    let estimate = hu_postflop::memory_usage(&config);
     postflop_setup::print_memory_estimate(&estimate);
     // The dry run walks every decision node exactly like the real build
     // (`Counting` mirrors `Builder`), so it already has the full answer to

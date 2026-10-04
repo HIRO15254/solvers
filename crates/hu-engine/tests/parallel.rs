@@ -1,10 +1,10 @@
 //! Chance-node fan-out determinism: a synthetic engine-only game (no
-//! dependency on `game`/`holdem`) with a wide root chance node, solved twice
+//! dependency on `hu-postflop::game`/`hu-postflop`) with a wide root chance node, solved twice
 //! under different [`ParConfig`]s — one that triggers rayon fan-out at the
 //! root, one that forces the fully sequential walk — and checked bit-for-bit
 //! equal.
 
-use engine::{
+use hu_engine::{
     CompiledGame, Dcfr, F32Storage, ParConfig, PublicTree, ReachMap, Solver, TempNode,
     TerminalEvaluator, TreeSpec,
 };

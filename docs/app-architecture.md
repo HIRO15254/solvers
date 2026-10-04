@@ -43,7 +43,7 @@ solver core + formats
 ```
 
 domain crate は HTTP、job、画面状態を知らない。`protocol` は request/response を定義し、
-run の型を `formats` から再利用する。現在の `formats` は HU checkpoint のため engine へ依存するため、
+run の型を `formats` から再利用する。現在の `formats` は HU checkpoint のため hu-engine へ依存するため、
 独立 DTO crate とみなさない。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
 
 ## 4. 決定事項

@@ -7,7 +7,7 @@
 use std::path::Path;
 
 use anyhow::{Context, Result, anyhow};
-use engine::{F32Storage, I16Storage};
+use hu_engine::{F32Storage, I16Storage};
 
 use crate::config::{GameSection, SolveConfig, StorageKind};
 use crate::sol::{SolExportSpec, SolStreets};

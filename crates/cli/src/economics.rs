@@ -1,5 +1,5 @@
-//! Adapters that give the exact heads-up engine (`game::RakeModel` /
-//! `game::UtilityModel`) the two economics models that today exist only in
+//! Adapters that give the exact heads-up engine (`hu_postflop::game::RakeModel` /
+//! `hu_postflop::game::UtilityModel`) the two economics models that today exist only in
 //! the sampled Multiway Preflop engine: the generic condition-based rake
 //! and tournament ICM against a fixed outside field.
 //!
@@ -11,7 +11,7 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 
 use anyhow::{Result, anyhow};
-use game::{
+use hu_postflop::game::{
     ChipEv, GgPreflopRake, Icm, NoRake, PercentCapRake, RakeModel, TerminalDescriptor,
     TerminalKind, UtilityModel,
 };
@@ -302,7 +302,7 @@ impl UtilityModel for TournamentIcm {
     }
 
     fn is_zero_sum_affine(&self) -> bool {
-        // Two-player ICM is affine in stacks (see `game::Icm`'s doc
+        // Two-player ICM is affine in stacks (see `hu_postflop::game::Icm`'s doc
         // comment); adding a nonzero outside field breaks that, since a
         // seat's ICM value then also depends on how it compares to the
         // outside stacks, not just the other seat's stack.
@@ -313,7 +313,7 @@ impl UtilityModel for TournamentIcm {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use game::{ChipEv, Icm, PayoffPipeline};
+    use hu_postflop::game::{ChipEv, Icm, PayoffPipeline};
     use nlh::Chips;
 
     fn showdown_terminal(pot: u32, contrib: (u32, u32)) -> TerminalDescriptor {
@@ -602,7 +602,7 @@ mod tests {
     fn tournament_icm_pipeline_is_not_zero_sum_with_outside_field() {
         let icm = TournamentIcm::new(vec![100.0, 60.0, 30.0], vec![200.0], 1, 0).unwrap();
         let pipeline = PayoffPipeline {
-            rake: &game::NoRake,
+            rake: &hu_postflop::game::NoRake,
             utility: &icm,
         };
         assert!(!pipeline.is_zero_sum());

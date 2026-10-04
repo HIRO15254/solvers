@@ -5,9 +5,9 @@
 
 use std::time::Instant;
 
-use engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
-use game::{ChipEv, NoRake, PayoffPipeline};
-use holdem::{PerStreet, PostflopConfig, StreetTree, build_postflop_game, memory_usage};
+use hu_engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
+use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
+use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game, memory_usage};
 use nlh::script::{ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, Rule};
 use nlh::{
     ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
@@ -22,7 +22,7 @@ fn chip_ev() -> PayoffPipeline<'static> {
     }
 }
 
-/// The pre-script per-street menu shape `crates/holdem/src/postflop.rs` used
+/// The pre-script per-street menu shape `crates/hu-postflop/src/postflop.rs` used
 /// to expose as `StreetMenus`/`StreetTree::from_menus`, before the CLI's
 /// TOML surface moved onto tree scripts and that translation point was
 /// retired from the production module. It survives here, private to this
@@ -72,7 +72,7 @@ fn not(inner: Condition<PostflopVar>) -> Condition<PostflopVar> {
 }
 
 /// One raise menu's levels as `Add Raise` rules gated on `aggressions`,
-/// mirroring `holdem::postflop`'s retired `raise_level_rules`: level `i`
+/// mirroring `hu_postflop::postflop`'s retired `raise_level_rules`: level `i`
 /// (`0`-based) applies when `i < levels.len() - 1` and `aggressions == i +
 /// 1`, and the last level applies when `aggressions >= levels.len()`.
 fn raise_level_rules(
@@ -110,7 +110,7 @@ fn raise_level_rules(
 }
 
 /// Translates [`StreetMenus`] into the equivalent tree-script rules, exactly
-/// as the retired `holdem::postflop::StreetTree::from_menus` did: the donk
+/// as the retired `hu_postflop::postflop::StreetTree::from_menus` did: the donk
 /// menu (if any), the OOP opening menu, the IP opening menu, then OOP's
 /// raise levels, then IP's raise levels, all `Effect::Add`. An unset raise
 /// menu reuses that player's own bet menu as a single level.
@@ -1127,7 +1127,7 @@ fn member_branch_matches_suit_permuted_rep_branch() {
     });
     solver.run(64);
 
-    let find = |history: &str| -> engine::NodeId {
+    let find = |history: &str| -> hu_engine::NodeId {
         let tag = node_info
             .iter()
             .position(|i| i.history == history)
@@ -1302,7 +1302,7 @@ fn an_unset_raise_menu_reuses_the_bet_menu() {
                 ..Default::default()
             },
         );
-        holdem::memory_usage(&PostflopConfig {
+        hu_postflop::memory_usage(&PostflopConfig {
             board: board.clone(),
             ranges: ranges.clone(),
             pot: Chips(10),
@@ -1898,7 +1898,7 @@ fn history_round_trip_uses_r_tokens_through_river_entry_state() {
             )
         });
 
-    let state = holdem::river_entry_state(&config, &entry.history)
+    let state = hu_postflop::river_entry_state(&config, &entry.history)
         .unwrap_or_else(|e| panic!("replay failed for history {:?}: {e}", entry.history));
 
     // c = 7 (both players' turn-street contribution once the raise is
@@ -2274,7 +2274,7 @@ fn tree_script_include_allin_applies_before_rules() {
 
 /// Emptying a node's action list -- however it happens -- falls back to the
 /// base actions rather than leaving the node with zero legal actions, which
-/// `engine::tree`'s `assert!(num_actions >= 1)` would otherwise catch.
+/// `hu_engine::tree`'s `assert!(num_actions >= 1)` would otherwise catch.
 #[test]
 fn tree_script_emptying_a_node_falls_back_to_base_actions() {
     // (a) `force` with no resolvable size: `max_aggressive_actions = 0`
@@ -2407,7 +2407,7 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
         config.preflop_aggressor = preflop_aggressor;
         build_postflop_game(&config, chip_ev())
     };
-    let actions_at = |game: &holdem::PostflopGame, history: &str| -> Vec<String> {
+    let actions_at = |game: &hu_postflop::PostflopGame, history: &str| -> Vec<String> {
         let id = game.node_by_history(history).expect("node history");
         let tag = game.game.tree.tags[id as usize] as usize;
         game.node_info[tag].actions.clone()

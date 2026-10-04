@@ -728,7 +728,7 @@ fn resume_tampered_config_errors() {
 
 /// Tiny turn-start config (single chance node turn->river, tiny ranges, one
 /// bet size per street, one raise cap) -- same shape as
-/// `crates/holdem/tests/viewer.rs`'s `small_turn_config` and
+/// `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config` and
 /// `crates/cli/src/sol.rs`'s own unit-test fixture, duplicated here (rather
 /// than shared) since this is a separate test binary with no access to
 /// `cli`'s internal `sol` module.
@@ -1001,7 +1001,7 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     let checkpoint_data = formats::read_checkpoint(&checkpoint).unwrap();
     assert!(matches!(
         checkpoint_data.state.storage,
-        engine::StorageState::I16 { .. }
+        hu_engine::StorageState::I16 { .. }
     ));
 }
 
