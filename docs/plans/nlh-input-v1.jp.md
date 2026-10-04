@@ -265,7 +265,7 @@ river = 3
 | `spr` | 数値 | effective stack ÷ 現在のpot。effective stackはactorの残stackと、手に残る相手の残stackの最大値のうち小さい方（potが0なら無限大） | ○ | ○ |
 | `pot`、`to_call` | 数値（BB） | 現在のpot、直面しているcall額 | ○ | ○ |
 | `facing_pct` | 数値 | `to_call ÷ pot × 100` | ○ | ○ |
-| `cbet`、`donk` | bool | unopenedで、前streetまでの最後のaggressorがactor自身／他者 | ○ | ○ |
+| `cbet`、`donk` | bool | Postflopでunopenedのとき、直前のstreetの最後のaggressorがactor自身（`cbet`）／他のplayer（`donk`）。直前のstreetに賭けが無ければ両方false。Preflopでは常にfalse | ○ | ○ |
 | `limpers`、`flats`、`squeeze`、`open_cold_calls`、`preflop_participant`、`in_position_to_last_aggressor`、`last_preflop_aggressor_position` | 旧Multiwayと同じ | Preflopの経緯 | ○（lineから導出） | ○ |
 | `board_cards`、`board_suits`、`board_ranks`、`straight_ranks`、`paired`、`monotone`、`two_tone`、`rainbow`、`flush_possible`、`straight_possible`、`high_card`、`low_card` | 旧P1と同じ | そのnodeの盤面 | ○ | ×（`NLH003`） |
 
@@ -506,3 +506,13 @@ max_time = "12h"
 
 あわせて、P2の計算方式と出力品質の保証は調査と実験で決めることになった（製品定義D5）。第10節のP2の
 `[solver]`はそれまでの暫定設定である。
+
+### 実装時の明確化（2026-10-05、利用者の確認待ち）
+
+草案の記述が曖昧だった点を、実装（M4〜M6）のために次のとおり定めた。S1の完了報告で利用者に確認する。
+
+| 事項 | 定め | 理由 |
+|---|---|---|
+| 暗黙のfold（第7節） | 賭けに直面しているplayerだけに起こる。call額が0のplayerの行動は書く | call額が0のときfoldは合法手に無い |
+| `spr`（第9節） | effective stack（actorと、手に残る相手の最大残stackの小さい方）÷ pot | 旧Multiwayの実装と同じ。非対称stackで意味を保つ |
+| `cbet`・`donk`（第9節） | 直前のstreetの最後のaggressorで判定し、直前のstreetがcheckで回ればfalse | 旧P1の実装とpokerの慣習（check後のbetはprobe）に合わせた。旧Multiwayは全streetでPreflopのaggressorを見ていたが、同梱のP2の例はこの変数を使わない |
