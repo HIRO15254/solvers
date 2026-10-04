@@ -1,6 +1,6 @@
 # `solvers.nlh/v1` 共通Input形式（草案）
 
-状態: **草案（2026-10-04）**。[再構築計画](two-product-restructure.jp.md)のM4〜M7で実装し、同時に
+状態: **草案（2026-10-04作成、2026-10-05更新）**。[再構築計画](two-product-restructure.jp.md)のM4〜M7で実装し、同時に
 `docs/nlh-input-v1.jp.md`へ移して規範とする。それまでは現行の`solvers.postflop/v1`・
 `solvers.multiway-preflop/v1`が現行コードの規範であり、本書の項目をparserやhelpへ先行して書かない。
 製品の目的と範囲は[製品定義](../products.jp.md)を参照する。草案で未決だった事項への利用者の決定は第15節にまとめた。
@@ -179,6 +179,8 @@ move   = "x" | "c" | "b" amount | "r" amount | "a"
 - **foldは書かない。** `f`を書くと`NLH004`。Preflopでは、名指したactorより前に行動すべきplayerはfoldした
   とみなす。Preflopの終わり（最初の` / `、無ければlineの終わり）でまだ行動すべきplayerが残っていれば、
   そのplayerもfoldしたとみなす。Postflopのfoldは手を終わらせるためlineに現れず、暗黙のfoldも無い。
+- 暗黙のfoldは賭けに直面している（call額が正の）playerにだけ起こる。call額が0のplayer（limpされたBB、
+  raiseの無い最後のstraddler）は行動を書く（`SB c, BB x`）。書かなければ`NLH004`。
 - streetの区切り` / `は、streetが閉じた位置に必ず書き、それ以外の位置とlineの終わりには書けない
   （次のstreetはboardの枚数が示す）。Postflopのstreetがlineの終わりで閉じていなければ`NLH004`。
 - 行動と額は、tableのforced bet・straddleとNLHの規則（min-raise、stack上限）で合法でなければ`NLH004`。
@@ -260,7 +262,7 @@ river = 3
 | `players` | 数値 | foldしていない人数（P1では常に2） | ○ | ○ |
 | `position` | 文字列 | actorのposition名（`"BTN"`等） | ○ | ○ |
 | `in_position` | bool | Preflopでは actorがBTN、Postflopでは残るplayer中の最終行動者 | ○ | ○ |
-| `spr` | 数値 | actorの残stack ÷ 現在のpot | ○ | ○ |
+| `spr` | 数値 | effective stack ÷ 現在のpot。effective stackはactorの残stackと、手に残る相手の残stackの最大値のうち小さい方（potが0なら無限大） | ○ | ○ |
 | `pot`、`to_call` | 数値（BB） | 現在のpot、直面しているcall額 | ○ | ○ |
 | `facing_pct` | 数値 | `to_call ÷ pot × 100` | ○ | ○ |
 | `cbet`、`donk` | bool | unopenedで、前streetまでの最後のaggressorがactor自身／他者 | ○ | ○ |
@@ -382,6 +384,12 @@ checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
 `solvers validate CONFIG`は製品を決定し、開始状態（pot、各playerのstack、手に残るplayer、OOP/IP、
 effective stack）、treeの診断（paramの一覧、平坦化したrule）、警告を表示する。
 `--show-effective` / `--write-effective PATH`は実効configを出力し、`--format json`は同じ内容を機械可読で返す。
+
+実効configは第2節の順に節を並べ、既定値を持つkeyはすべて書く。既定値の無い任意key（`cap_bb`、
+`allin_threshold`、`preflop_reraise_jam_above_stack`、`max_time`等）は指定したときだけ書く。BB量は整数なら
+整数、それ以外は最短の10進数で書く。`source`は`script`へinline化し、scriptは複数行literal文字列（`'''`）で
+書く。P2の`[ranges]`は全positionを書く（書かなかったpositionは`"random"`）。`[solver]`・`[output]`は
+決定した製品が解釈し、その既定値を明示して書く。
 
 | code | 意味 |
 |---|---|

@@ -1,6 +1,6 @@
 # 再構築計画: 共通Inputを共有する2製品への移行
 
-更新: **2026-10-04**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
+更新: **2026-10-05**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
 作業状態は[Linear](../status.jp.md)、Input形式の詳細は[`solvers.nlh/v1`草案](nlh-input-v1.jp.md)に置く。
 作業branchは`restructure/two-products`、旧状態はgit tag `archive/pre-two-products-2026-10-04`（mainの`457f034`。
 2026-10-04にremoteへpush済み）。
@@ -27,9 +27,9 @@ crateは`crates/`直下に平置きし、名前の接頭辞で所有者を示す
 
 | crate | 責務 | 主な由来 |
 |---|---|---|
-| `nlh` | card、combo、range、役判定、盤面述語、suit同型、chip単位（0.001 BB）、position、2〜9人のNLHベッティング規則（forced bet、min-raise、all-in、side pot）、size literalの解決 | `cards`、`hand-index`、`multiway::{betting, settlement, types}` |
+| `nlh` | card、combo、range、役判定、盤面述語、suit同型、chip単位（0.001 BB）、position、2〜9人のNLHベッティング規則（forced bet、straddle、min-raise、all-in、side pot）、size literalの解決、tree script（条件式・param/define）の汎用処理系 | `cards`、`hand-index`、`multiway::{betting, settlement, types}` |
 | `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/Monte Carlo）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部（M3）。`cli::economics`はM4、`game::payoff`のrake・ICMはM5で載せ替える |
-| `spot` | 共通Input: TOML schema、parse/正規化、tree script（条件式・param/define）、line文法と再生、製品の決定、検証、Spot IR | `cards::script`、`cards::sizing`の文法部、旧`cli`のconfig層（置換） |
+| `spot` | 共通Input: TOML schema、parse/正規化、v1のtree方言（共通の条件変数・size literal）、line文法と再生、製品の決定、検証、Spot IR | 旧`cli`のconfig層（置換） |
 | `runfiles` | run directory契約（`run.toml`、manifest、events、progress、run.json）、config hash | `formats::{run, metrics, hash}` |
 | `hu-engine` | HU vector CFR/BR、storage、discount schedule、chance-sampled driver | `engine` |
 | `hu-postflop` | P1: NLH HU postflop木・showdown kernel・payoff焼込み・`.sol`・checkpoint・照会。payoff pipelineを通す試験用toy game（Kuhn・Leduc） | `holdem`、`game::{payoff, toy}`、`formats::{sol, checkpoint}`、`cli`のpostflop計算部 |
@@ -70,12 +70,16 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
 6. **P2の方式は差し替えられるようにする。** P2の計算方式と品質保証はS4の調査と実験で決める（製品定義D5）。
    S1では暫定方式を変えずに移植し、`spot`・`runfiles`・`cli`・daemonの共通の型に暫定方式固有の量
    （sweep、bucket、trained deviatorのCI等）を持ち込まない。P2の`[solver]`設定と停止判定は`mw-preflop`が解釈する。
+   P1の`[solver]`・`[output]`も同様に`hu-postflop`が解釈し、`spot`は両製品の節を検証・正規化のために製品へ渡す。
+7. **tree scriptは処理系と方言を分ける。** 条件式・param/define・ruleの平坦化を行う汎用の処理系は
+   `nlh::script`に置く（旧2 familyの方言もM7まで同じ処理系を使う）。`solvers.nlh/v1`の方言（共通の条件変数、
+   size literal）は`spot`が定義し、各製品は方言の変数を自分の状態から評価する（2026-10-05決定）。
 
 ## 3. 移植・削除の対応表
 
 | 旧 | 扱い | 理由・移植先 |
 |---|---|---|
-| `cards`、`hand-index` | 移植 | `nlh`。script/sizingの文法部は`spot`へ |
+| `cards`、`hand-index` | 移植 | `nlh`（tree scriptの汎用処理系を含む）。v1の方言（条件変数・size literal）は`spot`に新設 |
 | `engine` | 移植 | `hu-engine` |
 | `game::toy` | 移植 | `hu-postflop`の試験用（公開schemaから外す）。toy gameはpayoff pipelineを通して作るため`payoff`と同じcrateに置く |
 | `game::payoff` | 移植 | `hu-postflop`。HUのrake・ICMはM5でP1を共通Inputへ接続するときに`economics`へ載せ替え、旧実装と数値照合する |
@@ -109,8 +113,8 @@ mainへ戻すかは、調査の計画を立てる時点で判断する。
 | **M0 保全** | 旧状態のtag、作業branch | tagがmainの`457f034`を指し、利用者の承認を得てremoteへpushされている |
 | **M1 設計文書** | 製品定義、本計画、Input草案。旧ロードマップ・計画・調査文書を削除し、入口文書を更新 | 文書のリンク検査（`tools/check_docs.py`）が通る。旧R0〜R7計画への導線が残らない |
 | **M2 対象外の削除** | 第3節の「削除」を実施。対応する規範・CLI reference・user guide・例・試験を同じ変更で更新 | 必須検証が通る。HU oracle差分試験とMultiwayの固定seed試験・GTO Wizard参照試験の結果が変わらない。研究featureと`research-*`のcfgが残らない |
-| **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`→`hu-engine`、`holdem`+`game`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、`multiway::{icm, rake_condition}`とconfigのrake部を`economics`へ移す | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に依存方向が第2節と一致する（`spot`はM4で加える） |
-| **M4 共通Input** | tree script（`nlh::script`）を`spot`へ移し、`spot`に`solvers.nlh/v1`のparse・正規化・line再生・製品の決定・検証・Spot IRを実装。`nlh`のベッティング規則にstraddle（re-straddleを含む）を加える | 草案の全key・error・正規化の冪等性・lineの別表記の拒否・line再生（暗黙fold、min-raise、all-in、side pot、ante、straddle）の試験。straddleの無い卓では既存の規則と同じ結果。CLIへはまだ接続しない |
+| **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`→`hu-engine`、`holdem`+`game`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、`multiway::{icm, rake_condition}`とconfigのrake部を`economics`へ移す | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に、ライブラリcrateの依存方向が第2節と一致する（`spot`はM4で加える。`cli`の直接依存は旧config層を置き換えるM7で揃える） |
+| **M4 共通Input** | `spot`にv1のtree方言（共通の条件変数、size literal）と`solvers.nlh/v1`のparse・正規化・line再生・製品の決定・検証・Spot IRを実装。`nlh`のベッティング規則にstraddle（re-straddleを含む）と、menuに依らないNLHの合法性判定を加える | 草案の全key・error・正規化の冪等性・lineの別表記の拒否・line再生（暗黙fold、min-raise、all-in、side pot、ante、straddle）の試験。straddleの無い卓では既存の規則と同じ結果。CLIへはまだ接続しない |
 | **M5 P1接続** | `hu-postflop`がSpot IRから木を組む（BB単位、tableから導出したpot/stack、手に残らない人を含むICM、lineから導出した条件変数、非対称stack）。CLIのsolve/resume/export/compare/report/inspectをP1で新Inputへ | 旧P1の代表config（`examples/postflop_*`、`river_small`、`turn_small`、`3betpot_fast`）を新Inputへ書き換え、戦略・EV・Exploitabilityが旧実装と数値許容内で一致。oracle差分試験が通る |
 | **M6 P2接続** | `mw-preflop`がSpot IRからtableと木を組む（straddleを含む）。CLIのsolve/resume/status/export/evaluateをP2で新Inputへ | 旧P2の例（`examples/preflop_multiway_v1_*`、`bench_multiway/*`）を新Inputへ書き換え、固定seedのsolve結果が旧実装と一致。GTO Wizard参照試験が通る。straddleのある卓で行動順・min-raiseの基準・条件変数がInput草案第5節の規則どおりの木になる試験 |
 | **M7 旧familyの削除と規範の切替** | 旧parser・旧例・旧規範を削除し、`solvers.nlh/v1`を`docs/`直下の規範へ昇格。CLI reference、user guide、architecture、app-architectureを書き直す。daemon・protocol・CIを更新 | AGENTS.mdの同期対象が全て新Inputを指す。旧schema名は`NLH001`で移行先を案内して拒否。daemonのHTTP試験が通る |
