@@ -16,8 +16,9 @@
   それまでは草案であり、parserやhelpに先行して書かない。
 - productionの計算結果を変える変更と、移動・名前変更・削除だけの変更を同じcommitに混ぜない。
   移動・削除のcommitでは、HU oracle差分試験とMultiwayの固定seed試験が変更前と同じ結果になることを確認する。
-- 機械的な移動・削除・移植は`model: "sonnet"`のサブエージェントへ委譲できる。設計判断、レビュー、
-  統合、debugはメインループが担う（[CLAUDE.md](../../CLAUDE.md)）。
+- 要件が明確な実装と機械的な移動・削除・移植は、Codex（`codex exec`、GPT 6.1 Sol等）か
+  `model: "sonnet"`のサブエージェントへ委譲する。設計判断、レビュー、統合、debugはメインループが担う
+  （[CLAUDE.md](../../CLAUDE.md)）。
 
 ## 2. 目標構成
 
