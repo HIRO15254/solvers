@@ -21,7 +21,7 @@ struct CapturedState {
 }
 
 fn capture(solver: &TestSolver) -> CapturedState {
-    let arena = &solver.dense.as_ref().unwrap().arena;
+    let arena = &solver.dense.arena;
     CapturedState {
         state: solver.snapshot_state(),
         regret_bits: arena.regrets.iter().map(|x| x.to_bits()).collect(),
@@ -49,7 +49,7 @@ fn deltas(solver: &TestSolver) -> Vec<DenseTraversalDelta> {
 #[test]
 fn dense_merge_late_slot_overflow_preserves_entire_state() {
     let mut solver = fixture();
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     let width = dense.tree.nodes[0].action_labels.len();
     assert!(width >= 2);
     let touched = dense.arena.column_id(0, 0).unwrap();
@@ -82,7 +82,7 @@ fn dense_merge_late_slot_overflow_preserves_entire_state() {
 }
 
 fn root_columns(solver: &TestSolver) -> (usize, [u32; 3]) {
-    let dense = solver.dense.as_ref().unwrap();
+    let dense = &solver.dense;
     (
         dense.tree.nodes[0].action_labels.len(),
         [0, 1, 2].map(|bucket| dense.arena.column_id(0, bucket).unwrap()),
@@ -91,7 +91,7 @@ fn root_columns(solver: &TestSolver) -> (usize, [u32; 3]) {
 
 fn seed_earlier_events(solver: &mut TestSolver) -> Vec<DenseTraversalDelta> {
     let (width, [touched, untouched, _]) = root_columns(solver);
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     let range = dense.arena.slot_range(0, 0).unwrap();
     dense.arena.regrets[range.start] = -0.0;
     dense.arena.strategy_sum[range.start] = -0.0;
@@ -252,7 +252,7 @@ fn dense_merge_preflights_late_seat_identity_and_all_counter_increments() {
 // f64 addition followed by f32 rounding, optional floor after every regret
 // addition, touched bits, then counters and completed-sweep discount.
 fn reference_successful_merge(solver: &mut TestSolver, input: Vec<DenseTraversalDelta>) {
-    let arena = &mut solver.dense.as_mut().unwrap().arena;
+    let arena = &mut solver.dense.arena;
     for delta in input {
         solver.total_deal_attempts += delta.deal_attempts;
         solver.terminal_evaluations += delta.terminal_evaluations;
@@ -292,7 +292,7 @@ fn dense_merge_success_matches_ordered_rounding_floor_discount_and_touched_refer
     for solver in [&mut actual, &mut expected] {
         solver.config.discount_every = 2;
         solver.config.discount_until = 5;
-        let arena = &mut solver.dense.as_mut().unwrap().arena;
+        let arena = &mut solver.dense.arena;
         let range = arena.slot_range(0, 0).unwrap();
         arena.regrets[range].fill(16_777_216.0);
         arena.touched_set(0);
@@ -353,17 +353,13 @@ fn dense_merge_real_holdem_worker_deltas_match_success_reference() {
     for _ in 0..4 {
         let input = (0..actual.game.num_players())
             .map(|seat| {
-                match actual
+                actual
                     .generate_traversal_delta(
                         actual.next_sample_id + seat as u64,
                         seat,
                         (actual.completed_sweeps + 1) as f64,
                     )
                     .unwrap()
-                {
-                    AnyTraversalDelta::Dense(delta) => delta,
-                    AnyTraversalDelta::Sparse(_) => panic!("expected dense worker"),
-                }
             })
             .collect::<Vec<_>>();
         reference_successful_merge(&mut expected, input.clone());

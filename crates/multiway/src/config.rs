@@ -475,7 +475,8 @@ pub struct AbstractionConfig {
     #[serde(default)]
     pub artifact_cache: Option<PathBuf>,
     /// Private-information recall used to key the solver's policy storage.
-    /// `Full` (the default) is unchanged sparse, full-recall behavior.
+    /// `Full` remains the serialized default for historical config identity;
+    /// solver construction and restore reject it explicitly.
     /// `Street` switches to a bounded-memory dense arena keyed only by the
     /// current street's bucket (a Monker/Pluribus-style imperfect-recall
     /// abstraction); see `docs/multiway-preflop-v1.jp.md`. Skipped when `Full` so
@@ -519,9 +520,8 @@ impl AbstractionKind {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RecallMode {
-    /// Sparse policy storage keyed by every street's bucket visited so far
-    /// (today's behavior). Memory grows with the number of visited
-    /// information sets.
+    /// Historical bucket-history identity, retained for serialized configs
+    /// and artifacts. Solver construction and restore reject this mode.
     #[default]
     Full,
     /// Dense, preallocated policy storage keyed only by the current

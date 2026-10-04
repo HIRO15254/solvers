@@ -56,7 +56,7 @@ fn compact_drift_matches_dense_growth_and_stable_refresh_bits() {
 fn compact_drift_keeps_first_seen_zero_columns_and_fallbacks_across_streets() {
     let (game, sampler, config) = initialization_holdem_fixture();
     let mut solver = MultiwaySolver::new(game, sampler, config).unwrap();
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     let mut selected = Vec::new();
     for street in [Street::Preflop, Street::Flop, Street::Turn, Street::River] {
         let id = dense
@@ -80,7 +80,7 @@ fn compact_drift_keeps_first_seen_zero_columns_and_fallbacks_across_streets() {
     );
     // Change stored columns from uniform regret matching to positive regret, and
     // insert earlier bucket IDs between previously observed columns.
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     for &(id, bucket) in &selected {
         let range = dense.arena.slot_range(id, bucket).unwrap();
         dense.arena.regrets[range.clone()].fill(-3.0);
@@ -96,7 +96,7 @@ fn compact_drift_keeps_first_seen_zero_columns_and_fallbacks_across_streets() {
     assert_eq!(compact.observed_columns(), 8);
     // Average mass now overrides the positive-regret fallback in the same
     // touched layout, exercising the in-place path with nonzero drift.
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     for &(id, bucket) in &selected {
         let range = dense.arena.slot_range(id, bucket).unwrap();
         dense.arena.strategy_sum[range.clone()].fill(0.0);
@@ -115,7 +115,7 @@ fn compact_drift_keeps_first_seen_zero_columns_and_fallbacks_across_streets() {
 }
 
 #[test]
-fn compact_drift_preserves_sparse_full_recall_refresh() {
+fn compact_drift_preserves_four_street_refresh() {
     let mut solver = four_street_solver(914);
     let mut legacy = std::collections::HashMap::new();
     let mut compact = StrategyDriftTracker::new();
@@ -124,18 +124,13 @@ fn compact_drift_preserves_sparse_full_recall_refresh() {
         solver.run_sweeps(sweeps).unwrap();
         compare_refresh(&solver, &mut legacy, &mut compact);
     }
-    assert!(solver.dense.is_none());
     assert!(
         legacy
             .keys()
-            .any(|k| k.street == 3 && k.bucket_path[0] != UNREACHED_BUCKET)
+            .any(|k| k.street == 3 && k.bucket_path[0] == UNREACHED_BUCKET)
     );
-    let keys: Vec<_> = solver.policies.keys().copied().collect();
-    for key in keys {
-        let column = solver.policies.get_mut(&key).unwrap();
-        column.strategy_sum.fill(0.0);
-        column.regrets.fill(-1.0);
-    }
+    solver.dense.arena.strategy_sum.fill(0.0);
+    solver.dense.arena.regrets.fill(-1.0);
     compare_refresh(&solver, &mut legacy, &mut compact);
     compact.reset();
     legacy.clear();

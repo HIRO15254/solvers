@@ -207,8 +207,8 @@ impl MultiwayCheckpoint {
     /// Atomically saves a live solver without cloning its policy columns.
     ///
     /// The solver stays immutably borrowed until writing completes. Sorting
-    /// scratch contains node IDs for dense storage or references for sparse
-    /// storage; action labels, regrets and strategy sums remain in the solver.
+    /// scratch contains public node IDs; action labels, regrets and strategy
+    /// sums remain in the solver.
     /// Payload and container bytes match [`Self::capture`] followed by
     /// [`Self::with_runtime_metadata`] and [`Self::write_atomic`].
     pub fn write_solver_atomic<G: ExternalSamplingGame>(

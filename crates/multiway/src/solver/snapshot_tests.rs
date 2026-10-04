@@ -54,13 +54,13 @@ fn assert_checkpoint_encoding<G: ExternalSamplingGame>(
 }
 
 #[test]
-fn borrowed_snapshot_matches_empty_dense_and_sparse_state_and_container() {
+fn borrowed_snapshot_matches_empty_dense_and_scalar_state_and_container() {
     let dense = dense_toy_solver(15, 1);
-    let sparse = solver(15, 1 << 20);
+    let scalar = solver(15, 1 << 20);
     assert_snapshot_encoding(&dense);
-    assert_snapshot_encoding(&sparse);
+    assert_snapshot_encoding(&scalar);
     assert_checkpoint_encoding(&dense, "", CheckpointRuntimeState::default());
-    assert_checkpoint_encoding(&sparse, "", CheckpointRuntimeState::default());
+    assert_checkpoint_encoding(&scalar, "", CheckpointRuntimeState::default());
 
     // Absence of owned metadata has always encoded as an empty string.
     let directory = tempfile::tempdir().unwrap();
@@ -83,7 +83,7 @@ fn borrowed_snapshot_matches_empty_dense_and_sparse_state_and_container() {
 }
 
 #[test]
-fn borrowed_snapshot_trained_dense_and_sparse_resume_exactly() {
+fn borrowed_snapshot_trained_dense_and_scalar_resume_exactly() {
     let runtime = CheckpointRuntimeState {
         confirmations_met: 3,
         next_evaluation_sweep: 48,
@@ -105,26 +105,26 @@ fn borrowed_snapshot_trained_dense_and_sparse_resume_exactly() {
     resumed.run_sweeps_with_threads(6, 1).unwrap();
     assert_eq!(dense.snapshot_state(), resumed.snapshot_state());
 
-    let mut sparse = solver(431, 1 << 20);
-    sparse.run_sweeps(18).unwrap();
-    assert_snapshot_encoding(&sparse);
-    let state = assert_checkpoint_encoding(&sparse, "# full recall\n", runtime);
+    let mut scalar = solver(431, 1 << 20);
+    scalar.run_sweeps(18).unwrap();
+    assert_snapshot_encoding(&scalar);
+    let state = assert_checkpoint_encoding(&scalar, "# dense scalar\n", runtime);
     let mut resumed = MultiwaySolver::from_state(
         DominatedChoice,
         DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
         state,
     )
     .unwrap();
-    sparse.run_sweeps(6).unwrap();
+    scalar.run_sweeps(6).unwrap();
     resumed.run_sweeps(6).unwrap();
-    assert_eq!(sparse.snapshot_state(), resumed.snapshot_state());
+    assert_eq!(scalar.snapshot_state(), resumed.snapshot_state());
 }
 
 #[test]
 fn borrowed_snapshot_keeps_zero_touched_columns_and_untouched_ancestors_across_streets() {
     let (game, sampler, config) = initialization_holdem_fixture();
     let mut solver = MultiwaySolver::new(game, sampler, config).unwrap();
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     let mut selected = Vec::new();
     for street in [Street::Preflop, Street::Flop, Street::Turn, Street::River] {
         let id = dense
@@ -188,50 +188,9 @@ fn borrowed_snapshot_keeps_zero_touched_columns_and_untouched_ancestors_across_s
 }
 
 #[test]
-fn borrowed_snapshot_sparse_preserves_all_history_and_full_recall_keys_in_sorted_order() {
-    let mut sparse = four_street_solver(601);
-    sparse.run_sweeps(8).unwrap();
-    let original = sparse.snapshot_state();
-    assert!(
-        original
-            .policies
-            .iter()
-            .any(|entry| entry.key.street == 3 && entry.key.bucket_path[0] != UNREACHED_BUCKET)
-    );
-    sparse.policies.clear();
-    sparse.histories.clear();
-    for entry in original.policies.iter().rev() {
-        sparse.policies.insert(entry.key, entry.column.clone());
-    }
-    for entry in original.histories.iter().rev() {
-        sparse.histories.insert(entry.key, entry.clone());
-    }
-    // A stored edge with no descendant policy must survive in sparse mode.
-    let extra = HistoryEntry {
-        key: HistoryKey::ROOT.child(0, 17),
-        parent: HistoryKey::ROOT,
-        actor: 0,
-        action_index: 17,
-        action_label: "history-only-é".into(),
-    };
-    assert!(!sparse.policies.keys().any(|key| key.history == extra.key));
-    sparse.histories.insert(extra.key, extra.clone());
-    let first = sparse.policies.values_mut().next().unwrap();
-    first.regrets[0] = -0.0;
-    first.strategy_sum[0] = f32::from_bits(1);
-    assert_snapshot_encoding(&sparse);
-    let json = serde_json::to_value(sparse.snapshot_state_ref().unwrap()).unwrap();
-    assert_eq!(
-        json["histories"].as_array().unwrap().len(),
-        original.histories.len() + 1
-    );
-    assert!(sparse.snapshot_state().histories.contains(&extra));
-}
-
-#[test]
 fn borrowed_snapshot_rejects_duplicate_dense_key_prefix_and_invalid_ancestor() {
     let mut solver = dense_toy_solver(12, 1);
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     assert_eq!(dense.tree.nodes.len(), 3);
     for id in [1, 2] {
         dense
@@ -247,7 +206,7 @@ fn borrowed_snapshot_rejects_duplicate_dense_key_prefix_and_invalid_ancestor() {
     ));
 
     let mut solver = dense_toy_solver(12, 1);
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     dense
         .arena
         .touched_set(dense.arena.column_id(1, 0).unwrap());
@@ -261,7 +220,7 @@ fn borrowed_snapshot_rejects_duplicate_dense_key_prefix_and_invalid_ancestor() {
 #[test]
 fn borrowed_snapshot_rejects_touched_count_mismatch_before_serializing_a_length() {
     let mut solver = dense_toy_solver(12, 1);
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     dense
         .arena
         .touched_set(dense.arena.column_id(2, 0).unwrap());
@@ -283,7 +242,7 @@ fn borrowed_snapshot_container_matches_across_compressed_chunk_boundary() {
     solver.run_sweeps(2).unwrap();
     // This is serialization evidence, not an adapter-valid menu for resume.
     // A long borrowed string crosses the writer's 4 MiB chunk boundary.
-    solver.policies.get_mut(&root_key()).unwrap().action_labels[0] = "x".repeat((4 << 20) + 17);
+    solver.dense.tree.nodes[0].action_labels[0] = "x".repeat((4 << 20) + 17);
     assert_checkpoint_encoding(&solver, "", CheckpointRuntimeState::default());
 }
 
@@ -298,7 +257,7 @@ fn borrowed_snapshot_atomic_overwrite_preserves_destination_on_snapshot_error() 
     let original_bytes = std::fs::read(&path).unwrap();
 
     solver.run_sweeps(4).unwrap();
-    let dense = solver.dense.as_mut().unwrap();
+    let dense = &mut solver.dense;
     dense
         .arena
         .touched_set(dense.arena.column_id(2, 0).unwrap());
@@ -320,7 +279,7 @@ fn borrowed_snapshot_atomic_overwrite_preserves_destination_on_snapshot_error() 
     assert_eq!(loaded.state, solver.snapshot_state());
     assert_eq!(loaded.config_toml.as_deref(), Some("# replacement\n"));
 
-    solver.dense.as_mut().unwrap().tree.nodes.pop();
+    solver.dense.tree.nodes.pop();
     assert!(matches!(
         MultiwayCheckpoint::write_solver_atomic(
             &solver,

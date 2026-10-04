@@ -7,7 +7,7 @@ use super::*;
 const TWO_CANDIDATE_CI95_Z: f64 = 2.2414;
 const PARALLEL_EVALUATION_CHUNK_SAMPLES: u64 = 4_096;
 
-/// Borrowed evaluation-only view of either sparse or dense policy storage.
+/// Borrowed evaluation-only view of dense policy storage.
 /// Public `policy()` returns an owned snapshot, but evaluation only reads the
 /// column; borrowing avoids cloning labels, regrets, and strategy sums at every
 /// visited node.
@@ -194,18 +194,12 @@ fn two_candidate_nonnegative_gain_estimate(
 
 impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub(super) fn evaluation_policy(&self, key: InfoKey) -> Option<EvaluationPolicy<'_>> {
-        match &self.dense {
-            None => self.policies.get(&key).map(|column| EvaluationPolicy {
-                action_labels: &column.action_labels,
-                regrets: &column.regrets,
-                strategy_sum: &column.strategy_sum,
-            }),
-            Some(dense) => dense.column_view(key).map(|column| EvaluationPolicy {
-                action_labels: column.action_labels,
-                regrets: column.regrets,
-                strategy_sum: column.strategy_sum,
-            }),
-        }
+        let dense = &self.dense;
+        dense.column_view(key).map(|column| EvaluationPolicy {
+            action_labels: column.action_labels,
+            regrets: column.regrets,
+            strategy_sum: column.strategy_sum,
+        })
     }
 
     /// Trains a fixed deviation policy for `seat` against this solver's CURRENT
@@ -773,144 +767,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
         unreachable!("depth loop returns at its upper bound")
     }
-
-    #[cfg(test)]
-    #[allow(clippy::too_many_arguments)]
-    pub(super) fn traverse(
-        &mut self,
-        state: G::State,
-        world: &SampledWorld,
-        traverser: usize,
-        history: HistoryKey,
-        reach: &mut [f64],
-        sample_importance: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-    ) -> Result<f64, SolverError> {
-        if depth > self.config.max_traversal_depth {
-            return Err(SolverError::DepthLimit {
-                limit: self.config.max_traversal_depth,
-            });
-        }
-
-        let Some(actor) = self.game.actor(&state) else {
-            let mut utilities = vec![0.0; self.game.num_players()];
-            self.game.terminal_utilities(&state, world, &mut utilities);
-            if let Some((seat, &utility)) = utilities
-                .iter()
-                .enumerate()
-                .find(|(_, utility)| !utility.is_finite())
-            {
-                return Err(SolverError::NonFiniteUtility { seat, utility });
-            }
-            self.terminal_evaluations = self
-                .terminal_evaluations
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
-            return Ok(utilities[traverser]);
-        };
-
-        let num_players = self.game.num_players();
-        if actor >= num_players {
-            return Err(SolverError::InvalidActor { actor, num_players });
-        }
-        let actions = self.game.node_actions(&state);
-        let num_actions = self.game.num_actions_of(&actions);
-        if num_actions == 0 {
-            return Err(SolverError::NoActions { actor });
-        }
-        let private = self.game.bucket(&state, world, actor);
-        validate_private_info(private, num_players, RecallMode::Full)?;
-        let key = InfoKey {
-            history,
-            player: actor as u8,
-            street: private.street,
-            active_opponents: private.active_opponents,
-            bucket_path: private.bucket_path,
-        };
-        let strategy = self.strategy_for(key, &actions)?;
-        let mut label_buf = String::new();
-
-        if actor == traverser {
-            let mut action_values = vec![0.0; num_actions];
-            for (action, value) in action_values.iter_mut().enumerate() {
-                let old_reach = reach[actor];
-                reach[actor] *= strategy[action];
-                label_buf.clear();
-                self.game
-                    .write_action_label(&actions, action, &mut label_buf);
-                let child_history = self.record_history(history, actor, action, &label_buf)?;
-                let next = self.game.next_state_with(&state, &actions, action);
-                *value = self.traverse(
-                    next,
-                    world,
-                    traverser,
-                    child_history,
-                    reach,
-                    sample_importance,
-                    rng,
-                    depth + 1,
-                )?;
-                reach[actor] = old_reach;
-            }
-            let node_value = strategy
-                .iter()
-                .zip(&action_values)
-                .map(|(&probability, &value)| probability * value)
-                .sum::<f64>();
-            let column = self
-                .policies
-                .get_mut(&key)
-                .expect("policy inserted before traversal");
-            for (regret, &value) in column.regrets.iter_mut().zip(&action_values) {
-                checked_add_f32(regret, sample_importance * (value - node_value))?;
-            }
-            Ok(node_value)
-        } else {
-            {
-                let column = self
-                    .policies
-                    .get_mut(&key)
-                    .expect("policy inserted before traversal");
-                let linear_weight = (self.completed_sweeps + 1) as f64;
-                for (sum, &probability) in column.strategy_sum.iter_mut().zip(&strategy) {
-                    checked_add_f32(sum, linear_weight * reach[actor] * probability)?;
-                }
-            }
-            let (action, sampling_probability) =
-                sample_exploratory_action(&strategy, self.config.exploration_epsilon, rng);
-            let importance = strategy[action] / sampling_probability;
-            let child_importance = sample_importance * importance;
-            if !child_importance.is_finite() {
-                return Err(SolverError::NumericOverflow);
-            }
-            let old_reach = reach[actor];
-            reach[actor] *= strategy[action];
-            label_buf.clear();
-            self.game
-                .write_action_label(&actions, action, &mut label_buf);
-            let child_history = self.record_history(history, actor, action, &label_buf)?;
-            let next = self.game.next_state_with(&state, &actions, action);
-            let result = self.traverse(
-                next,
-                world,
-                traverser,
-                child_history,
-                reach,
-                child_importance,
-                rng,
-                depth + 1,
-            );
-            reach[actor] = old_reach;
-            // Exploration samples q rather than sigma. This importance
-            // ratio keeps the recursive target-policy value unbiased.
-            let weighted_value = result? * importance;
-            if !weighted_value.is_finite() {
-                return Err(SolverError::NumericOverflow);
-            }
-            Ok(weighted_value)
-        }
-    }
 }
 
 /// Strategy purification/thresholding (Ganzfried & Sandholm, AAMAS 2012):
@@ -978,26 +834,20 @@ mod estimate_tests {
     use super::*;
 
     #[test]
-    fn borrowed_sparse_and_dense_views_match_owned_strategy_arithmetic() {
+    fn borrowed_views_match_owned_strategy_arithmetic() {
         let owned = PolicyColumn {
             action_labels: vec!["fold".into(), "call".into(), "raise".into()],
             regrets: vec![-2.0, 1.0, 3.0],
             strategy_sum: vec![2.0, 3.0, 5.0],
         };
-        let sparse_view = EvaluationPolicy {
+        let view = EvaluationPolicy {
             action_labels: &owned.action_labels,
             regrets: &owned.regrets,
             strategy_sum: &owned.strategy_sum,
         };
-        assert_eq!(sparse_view.action_labels, owned.action_labels);
-        assert_eq!(
-            sparse_view.strategy(false).unwrap().0,
-            owned.average_strategy()
-        );
-        assert_eq!(
-            sparse_view.strategy(true).unwrap().0,
-            owned.current_strategy()
-        );
+        assert_eq!(view.action_labels, owned.action_labels);
+        assert_eq!(view.strategy(false).unwrap().0, owned.average_strategy());
+        assert_eq!(view.strategy(true).unwrap().0, owned.current_strategy());
 
         // Dense storage exposes the same three fields as independent arena
         // slices. Include zero strategy mass to exercise the exact fallback
@@ -1295,6 +1145,20 @@ mod deviator_visit_counter_tests {
             };
             utilities[0] = f64::from(value);
             utilities[1] = -f64::from(value);
+        }
+
+        fn recall_mode(&self) -> RecallMode {
+            RecallMode::Street
+        }
+        fn bucket_count(&self, _street: Street, _active_opponents: u8) -> u32 {
+            8
+        }
+        fn dense_node_context(&self, _state: &Self::State) -> DenseNodeContext {
+            DenseNodeContext {
+                street: Street::Preflop,
+                active_opponents: (self.num_players() - 1) as u8,
+                bucket_active_opponents: (self.num_players() - 1) as u8,
+            }
         }
     }
 

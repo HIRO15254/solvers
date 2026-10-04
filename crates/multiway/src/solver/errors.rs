@@ -12,7 +12,7 @@ pub enum SolverError {
     ZeroMemoryLimit,
     #[error(
         "preallocated production storage requires current-street recall; \
-         bucket-history/full recall grows sparse policy state during the solve"
+         bucket-history/full recall is unsupported"
     )]
     PreallocatedStorageRequiresStreetRecall,
     #[error("traversal depth limit must be positive")]
@@ -39,8 +39,6 @@ pub enum SolverError {
         stored: usize,
         current: usize,
     },
-    #[error("sparse policy memory cap {limit} bytes exceeded; next node needs {needed} bytes")]
-    MemoryLimit { limit: u64, needed: u64 },
     #[error("discount cadence must be positive")]
     ZeroDiscountCadence,
     #[error("sweep batch size must be positive")]
@@ -61,8 +59,6 @@ pub enum SolverError {
     CounterOverflow,
     #[error("traversal count overflow")]
     TraversalCountOverflow,
-    #[error("policy memory accounting overflow")]
-    MemoryAccountingOverflow,
     #[error("solver state version {found} is unsupported (expected {expected})")]
     StateVersion { found: u16, expected: u16 },
     #[error("invalid solver state: {0}")]
@@ -71,10 +67,6 @@ pub enum SolverError {
     DuplicatePolicy(InfoKey),
     #[error("duplicate public history key in solver state: {0:?}")]
     DuplicateHistory(HistoryKey),
-    #[error("public history hash collision or unstable action label at {0:?}")]
-    HistoryCollision(HistoryKey),
-    #[error("public history actor/action index does not fit checkpoint format")]
-    HistoryIndexOverflow,
     #[error(transparent)]
     Tree(#[from] TreeError),
     #[error(
@@ -92,10 +84,7 @@ pub enum SolverError {
     UnmappedDenseHistory(HistoryKey),
     #[error("SolverConfig::prune requires SolverConfig::traverser_vector to be true")]
     PruneRequiresVector,
-    #[error(
-        "SolverConfig::prune requires RecallMode::Street; the full-recall sparse vector worker \
-         does not implement regret-based pruning"
-    )]
+    #[error("SolverConfig::prune requires RecallMode::Street; full recall is unsupported")]
     PruneRequiresStreetRecall,
     #[error("prune threshold must be finite and strictly negative, found {0}")]
     PruneThresholdNotNegative(f64),

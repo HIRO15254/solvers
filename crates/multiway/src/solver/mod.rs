@@ -1,4 +1,4 @@
-//! Sparse, lazy external-sampling MCCFR for sampled multiway games.
+//! Dense current-street external-sampling MCCFR for sampled multiway games.
 //!
 //! This module intentionally does not call its diagnostics exploitability or
 //! Nash convergence: with more than two players the game is general-sum, and
@@ -7,7 +7,6 @@
 //! a two-player zero-sum guarantee.
 
 use std::collections::hash_map::Entry;
-use std::mem::size_of;
 
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -61,8 +60,6 @@ pub const DEFAULT_PRUNE_SKIP_PROBABILITY: f64 = 0.95;
 /// Minimum training visits before an infoset's trained action enters a
 /// [`DeviatorPolicy`]; see [`MultiwaySolver::train_deviator`].
 pub const MIN_DEVIATOR_POLICY_VISITS: u32 = 8;
-const ENTRY_OVERHEAD_BYTES: u64 = 64;
-const HISTORY_OVERHEAD_BYTES: u64 = 48;
 
 fn finalize_drift(totals: Vec<f64>, counts: Vec<u64>) -> Vec<f64> {
     totals
@@ -203,8 +200,8 @@ pub trait ExternalSamplingGame: Send + Sync {
     }
 
     /// Private-recall storage mode the solver should use for this game.
-    /// Toy/test games and any adapter that never opts into
-    /// [`RecallMode::Street`] can rely on the default.
+    /// Adapters must opt into [`RecallMode::Street`] to construct a solver.
+    /// The historical default remains available for identity and rejection.
     fn recall_mode(&self) -> RecallMode {
         RecallMode::Full
     }
@@ -547,15 +544,6 @@ pub struct PolicyColumn {
 }
 
 impl PolicyColumn {
-    fn zeroed(action_labels: Vec<String>) -> Self {
-        let num_actions = action_labels.len();
-        Self {
-            action_labels,
-            regrets: vec![0.0; num_actions],
-            strategy_sum: vec![0.0; num_actions],
-        }
-    }
-
     pub fn num_actions(&self) -> usize {
         self.regrets.len()
     }
@@ -604,10 +592,8 @@ pub struct ActionProbability {
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SolverConfig {
     pub seed: u64,
-    /// Conservative storage-payload cap. Full recall applies it to sparse
-    /// policy/history payload plus hash-entry overhead; street recall applies
-    /// it to the dense arena estimate. The retained public tree, abstraction
-    /// caches, worker scratch, evaluation, allocator overhead, and artifact
+    /// Conservative storage-payload cap for the dense arena estimate. The
+    /// retained public tree, abstraction caches, worker scratch, evaluation, allocator overhead, and artifact
     /// staging are additional process memory and require an external process
     /// limit/headroom policy.
     pub max_memory_bytes: u64,
@@ -629,11 +615,8 @@ pub struct SolverConfig {
     /// Enables "vector-traverser" external sampling: one traversal updates
     /// every feasible hole combo of the sampled traverser seat at once
     /// against the same sampled opponents/board, instead of only the one
-    /// combo the deal sampler happened to deal that seat. Street recall uses
-    /// the optimized dense vector worker. Full recall preserves the bucket
-    /// path by running one weighted sparse scalar traversal per feasible
-    /// combo against the same sampled opponents and board. `false` (the
-    /// default) is the original one-hand-per-traversal algorithm,
+    /// combo the deal sampler happened to deal that seat. Uses the dense
+    /// current-street vector worker. `false` (the default) is the original one-hand-per-traversal algorithm,
     /// byte-identical to before this field existed.
     pub traverser_vector: bool,
     /// Enables Pluribus-style regret-based pruning at traverser decision
@@ -1023,26 +1006,20 @@ pub struct ProfileVariant {
     pub use_current_strategy: bool,
 }
 
-/// Sparse external-sampling MCCFR state.  A policy column exists only after
-/// `(public history, player, bucket)` is visited by a sampled traversal --
-/// unless [`Self::dense`] is `Some`, in which case every column for
-/// [`RecallMode::Street`]'s enumerated tree was preallocated up front and
-/// `policies`/`histories`/`approx_memory_bytes` below are unused (always
-/// empty/zero).
+/// Dense current-street external-sampling MCCFR state. Every policy column
+/// is preallocated from the enumerated public tree; touched bits distinguish
+/// sampled columns from unvisited ones.
 pub struct MultiwaySolver<G: ExternalSamplingGame> {
     game: G,
     sampler: DealSampler,
     config: SolverConfig,
-    policies: FxHashMap<InfoKey, PolicyColumn>,
-    histories: FxHashMap<HistoryKey, HistoryEntry>,
-    approx_memory_bytes: u64,
     traversals: u64,
     completed_sweeps: u64,
     next_sample_id: u64,
     total_deal_attempts: u64,
     terminal_evaluations: u64,
     hand_updates: u64,
-    dense: Option<DenseStorage>,
+    dense: DenseStorage,
 }
 
 /// Composes a backend fingerprint with the private-recall semantics that
@@ -1104,9 +1081,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         )
     }
 
-    /// Constructs the production storage layout. Unlike [`Self::new`], this
-    /// rejects sparse/full recall and does not return until every page of the
-    /// complete current-street policy arena has been touched.
+    /// Constructs the production storage layout. This does not return until
+    /// every page of the complete current-street policy arena has been touched.
     pub fn new_preallocated(
         game: G,
         sampler: DealSampler,
@@ -1167,32 +1143,20 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         materialize: TreeMaterializer<G>,
     ) -> Result<Self, SolverError> {
         validate_setup(&game, &sampler, config)?;
-        let dense = match game.recall_mode() {
-            RecallMode::Full => {
-                #[cfg(any(feature = "research-abstractions", test))]
-                {
-                    None
-                }
-                #[cfg(not(any(feature = "research-abstractions", test)))]
-                {
-                    return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
-                }
-            }
-            RecallMode::Street => Some(DenseStorage::build(
-                &game,
-                config.max_memory_bytes,
-                config.max_traversal_depth,
-                commit_pages,
-                materialize,
-            )?),
-        };
+        if game.recall_mode() != RecallMode::Street {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
+        }
+        let dense = DenseStorage::build(
+            &game,
+            config.max_memory_bytes,
+            config.max_traversal_depth,
+            commit_pages,
+            materialize,
+        )?;
         Ok(Self {
             game,
             sampler,
             config,
-            policies: FxHashMap::default(),
-            histories: FxHashMap::default(),
-            approx_memory_bytes: 0,
             traversals: 0,
             completed_sweeps: 0,
             next_sample_id: 0,
@@ -1326,75 +1290,10 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             ));
         }
 
-        if matches!(game.recall_mode(), RecallMode::Street) {
-            return Self::from_state_dense(game, sampler, state, commit_pages, materialize);
+        if game.recall_mode() != RecallMode::Street {
+            return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
         }
-        #[cfg(not(any(feature = "research-abstractions", test)))]
-        return Err(SolverError::PreallocatedStorageRequiresStreetRecall);
-
-        #[cfg(any(feature = "research-abstractions", test))]
-        {
-            let mut histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
-            histories.reserve(state.histories.len());
-            let mut approx_memory_bytes = 0u64;
-            for entry in state.histories {
-                validate_history_entry(&entry, game.num_players())?;
-                approx_memory_bytes = approx_memory_bytes
-                    .checked_add(history_memory_bytes(&entry.action_label)?)
-                    .ok_or(SolverError::MemoryAccountingOverflow)?;
-                let key = entry.key;
-                if histories.insert(key, entry).is_some() {
-                    return Err(SolverError::DuplicateHistory(key));
-                }
-            }
-            validate_history_graph(&histories)?;
-
-            let mut policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
-            policies.reserve(state.policies.len());
-            for entry in state.policies {
-                validate_column(
-                    entry.key,
-                    &entry.column,
-                    game.num_players(),
-                    RecallMode::Full,
-                )?;
-                if entry.key.history != HistoryKey::ROOT
-                    && !histories.contains_key(&entry.key.history)
-                {
-                    return Err(SolverError::InvalidState(
-                        "policy refers to an unknown public history",
-                    ));
-                }
-                approx_memory_bytes = approx_memory_bytes
-                    .checked_add(entry_memory_bytes(&entry.column.action_labels)?)
-                    .ok_or(SolverError::MemoryAccountingOverflow)?;
-                if policies.insert(entry.key, entry.column).is_some() {
-                    return Err(SolverError::DuplicatePolicy(entry.key));
-                }
-            }
-            if approx_memory_bytes > state.config.max_memory_bytes {
-                return Err(SolverError::MemoryLimit {
-                    limit: state.config.max_memory_bytes,
-                    needed: approx_memory_bytes,
-                });
-            }
-
-            Ok(Self {
-                game,
-                sampler,
-                config: state.config,
-                policies,
-                histories,
-                approx_memory_bytes,
-                traversals: state.traversals,
-                completed_sweeps: state.completed_sweeps,
-                next_sample_id: state.next_sample_id,
-                total_deal_attempts: state.total_deal_attempts,
-                terminal_evaluations: state.terminal_evaluations,
-                hand_updates: state.hand_updates,
-                dense: None,
-            })
-        }
+        Self::from_state_dense(game, sampler, state, commit_pages, materialize)
     }
 
     /// [`Self::from_state_with_config`]'s `RecallMode::Street` path: rebuilds
@@ -1477,16 +1376,13 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             game,
             sampler,
             config: state.config,
-            policies: FxHashMap::default(),
-            histories: FxHashMap::default(),
-            approx_memory_bytes: 0,
             traversals: state.traversals,
             completed_sweeps: state.completed_sweeps,
             next_sample_id: state.next_sample_id,
             total_deal_attempts: state.total_deal_attempts,
             terminal_evaluations: state.terminal_evaluations,
             hand_updates: state.hand_updates,
-            dense: Some(dense_storage),
+            dense: dense_storage,
         })
     }
 
@@ -1509,12 +1405,12 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Returns the fixed arena report for current-street storage. Production
     /// callers require `Some` with `pages_committed = true` before sweep 0.
     pub fn policy_arena_allocation(&self) -> Option<PolicyArenaAllocation> {
-        self.dense.as_ref().map(|dense| PolicyArenaAllocation {
-            nodes: dense.arena.node_count() as u64,
-            columns: dense.arena.total_columns(),
-            slots: dense.arena.total_slots(),
-            bytes: dense.arena.estimated_bytes(),
-            pages_committed: dense.arena.pages_committed(),
+        Some(PolicyArenaAllocation {
+            nodes: self.dense.arena.node_count() as u64,
+            columns: self.dense.arena.total_columns(),
+            slots: self.dense.arena.total_slots(),
+            bytes: self.dense.arena.estimated_bytes(),
+            pages_committed: self.dense.arena.pages_committed(),
         })
     }
 
@@ -1685,7 +1581,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             let mut deltas = deltas.into_iter();
             for _ in 0..batch {
                 let sweep_deltas: Vec<_> = (&mut deltas).take(num_players as usize).collect();
-                self.merge_sweep(sweep_deltas)?;
+                self.merge_sweep_dense(sweep_deltas)?;
                 completed = completed
                     .checked_add(1)
                     .ok_or(SolverError::CounterOverflow)?;
@@ -1708,408 +1604,103 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         sample_id: u64,
         traverser: usize,
         linear_weight: f64,
-    ) -> Result<AnyTraversalDelta, SolverError> {
+    ) -> Result<DenseTraversalDelta, SolverError> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
         let mut action_rng = traversal_action_rng(self.config.seed, sample_id, traverser);
         let mut average_rng = average_strategy_action_rng(self.config.seed, sample_id, traverser);
         let mut reach = vec![1.0; self.game.num_players()];
-        match &self.dense {
-            None if self.config.traverser_vector => {
-                let mut feasible = self.sampler.feasible_combos(traverser, &sample.world);
-                let mut weights: Vec<f64> = feasible.iter().map(|(_, weight)| *weight).collect();
-                normalize_feasible_weights(&mut weights)?;
-                for ((_, weight), normalized) in feasible.iter_mut().zip(weights) {
-                    *weight = normalized;
-                }
-                let base_rng = action_rng.clone();
-                let mut combined = TraversalDelta {
-                    sample_id,
-                    traverser,
-                    deal_attempts: u64::from(sample.attempts),
-                    terminal_evaluations: 0,
-                    hand_updates: feasible.len() as u64,
-                    events: Vec::new(),
-                };
-                for &(combo, weight) in &feasible {
-                    let mut holes = sample.world.hole_combos().to_vec();
-                    holes[traverser] = combo;
-                    let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
-                    let mut combo_rng = base_rng.clone();
-                    let mut combo_reach = vec![1.0; self.game.num_players()];
-                    let mut worker = TraversalWorker::new(self, linear_weight);
+        let dense = &self.dense;
+        if self.config.traverser_vector {
+            let feasible = self.sampler.feasible_combos(traverser, &sample.world);
+            let (combos, weights): (Vec<usize>, Vec<f64>) = feasible.into_iter().unzip();
+            let mut normalized_weights = weights.clone();
+            normalize_feasible_weights(&mut normalized_weights)?;
+            // The averaging traversal tracks one own-reach value per
+            // feasible combo.
+            let own_reach = vec![1.0; combos.len()];
+            let regret_combos = combos.clone();
+            let (regret_result, average_result) = rayon::join(
+                || -> Result<DenseTraversalDelta, SolverError> {
+                    // The regret traversal starts with every feasible combo
+                    // active. Pruning is the only operation that shrinks it.
+                    let active: Vec<usize> = (0..regret_combos.len()).collect();
+                    let mut worker = VectorTraversalWorker::new(
+                        &self.game,
+                        dense,
+                        self.config,
+                        regret_combos,
+                        weights,
+                    )?;
                     worker.traverse(
                         self.game.root_state(),
-                        &combo_world,
+                        0,
+                        &sample.world,
                         traverser,
-                        HistoryKey::ROOT,
-                        &mut combo_reach,
+                        &active,
                         1.0,
-                        &mut combo_rng,
+                        &mut action_rng,
                         0,
                     )?;
-                    let delta = worker.finish(sample_id, traverser, 0);
-                    combined.terminal_evaluations = combined
-                        .terminal_evaluations
-                        .checked_add(delta.terminal_evaluations)
-                        .ok_or(SolverError::CounterOverflow)?;
-                    for mut event in delta.events {
-                        match &mut event {
-                            TraversalEvent::AddRegret { values, .. } => {
-                                for value in values {
-                                    *value *= weight;
-                                }
-                            }
-                            TraversalEvent::AddStrategy { .. }
-                            | TraversalEvent::EnsurePolicy { .. }
-                            | TraversalEvent::EnsureHistory(_) => {}
-                        }
-                        combined.events.push(event);
-                    }
-                }
-                // Rao-Blackwellize the independent average-policy pass over
-                // the same conditionally feasible own range. Each hand gets
-                // the same uniform-opponent random stream; only its own
-                // private strategy and reach differ.
-                let average_base_rng = average_rng.clone();
-                for &(combo, weight) in &feasible {
-                    let mut holes = sample.world.hole_combos().to_vec();
-                    holes[traverser] = combo;
-                    let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
-                    let mut combo_rng = average_base_rng.clone();
-                    let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
-                    average.traverse(
+                    Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
+                },
+                || -> Result<Vec<DenseEvent>, SolverError> {
+                    let mut average = DenseAverageStrategyWorker::new(
+                        &self.game,
+                        dense,
+                        self.config,
+                        linear_weight,
+                    );
+                    average.traverse_vector(
                         self.game.root_state(),
-                        &combo_world,
+                        0,
+                        &sample.world,
                         traverser,
-                        HistoryKey::ROOT,
-                        weight,
-                        &mut combo_rng,
+                        &combos,
+                        &normalized_weights,
+                        &own_reach,
+                        &mut average_rng,
                         0,
                     )?;
-                    combined.events.extend(average.finish());
-                }
-                Ok(AnyTraversalDelta::Sparse(combined))
-            }
-            None => {
-                let mut worker = TraversalWorker::new(self, linear_weight);
-                worker.traverse(
-                    self.game.root_state(),
-                    &sample.world,
-                    traverser,
-                    HistoryKey::ROOT,
-                    &mut reach,
-                    1.0,
-                    &mut action_rng,
-                    0,
-                )?;
-                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
-                average.traverse(
-                    self.game.root_state(),
-                    &sample.world,
-                    traverser,
-                    HistoryKey::ROOT,
-                    1.0,
-                    &mut average_rng,
-                    0,
-                )?;
-                delta.events.extend(average.finish());
-                Ok(AnyTraversalDelta::Sparse(delta))
-            }
-            Some(dense) if self.config.traverser_vector => {
-                let feasible = self.sampler.feasible_combos(traverser, &sample.world);
-                let (combos, weights): (Vec<usize>, Vec<f64>) = feasible.into_iter().unzip();
-                let mut normalized_weights = weights.clone();
-                normalize_feasible_weights(&mut normalized_weights)?;
-                // The averaging traversal tracks one own-reach value per
-                // feasible combo.
-                let own_reach = vec![1.0; combos.len()];
-                let regret_combos = combos.clone();
-                let (regret_result, average_result) = rayon::join(
-                    || -> Result<DenseTraversalDelta, SolverError> {
-                        // The regret traversal starts with every feasible combo
-                        // active. Pruning is the only operation that shrinks it.
-                        let active: Vec<usize> = (0..regret_combos.len()).collect();
-                        let mut worker = VectorTraversalWorker::new(
-                            &self.game,
-                            dense,
-                            self.config,
-                            regret_combos,
-                            weights,
-                        )?;
-                        worker.traverse(
-                            self.game.root_state(),
-                            0,
-                            &sample.world,
-                            traverser,
-                            &active,
-                            1.0,
-                            &mut action_rng,
-                            0,
-                        )?;
-                        Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
-                    },
-                    || -> Result<Vec<DenseEvent>, SolverError> {
-                        let mut average = DenseAverageStrategyWorker::new(
-                            &self.game,
-                            dense,
-                            self.config,
-                            linear_weight,
-                        );
-                        average.traverse_vector(
-                            self.game.root_state(),
-                            0,
-                            &sample.world,
-                            traverser,
-                            &combos,
-                            &normalized_weights,
-                            &own_reach,
-                            &mut average_rng,
-                            0,
-                        )?;
-                        Ok(average.finish())
-                    },
-                );
-                // Preserve the serial contract: regret errors win when both
-                // branches fail, and regret events precede average events.
-                let mut delta = regret_result?;
-                delta.events.extend(average_result?);
-                Ok(AnyTraversalDelta::Dense(delta))
-            }
-            Some(dense) => {
-                let mut worker =
-                    DenseTraversalWorker::new(&self.game, dense, self.config, linear_weight);
-                worker.traverse(
-                    self.game.root_state(),
-                    0,
-                    &sample.world,
-                    traverser,
-                    &mut reach,
-                    1.0,
-                    &mut action_rng,
-                    0,
-                )?;
-                let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average =
-                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
-                average.traverse_scalar(
-                    self.game.root_state(),
-                    0,
-                    &sample.world,
-                    traverser,
-                    1.0,
-                    &mut average_rng,
-                    0,
-                )?;
-                delta.events.extend(average.finish());
-                Ok(AnyTraversalDelta::Dense(delta))
-            }
+                    Ok(average.finish())
+                },
+            );
+            // Preserve the serial contract: regret errors win when both
+            // branches fail, and regret events precede average events.
+            let mut delta = regret_result?;
+            delta.events.extend(average_result?);
+            Ok(delta)
+        } else {
+            let mut worker =
+                DenseTraversalWorker::new(&self.game, dense, self.config, linear_weight);
+            worker.traverse(
+                self.game.root_state(),
+                0,
+                &sample.world,
+                traverser,
+                &mut reach,
+                1.0,
+                &mut action_rng,
+                0,
+            )?;
+            let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
+            let mut average =
+                DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
+            average.traverse_scalar(
+                self.game.root_state(),
+                0,
+                &sample.world,
+                traverser,
+                1.0,
+                &mut average_rng,
+                0,
+            )?;
+            delta.events.extend(average.finish());
+            Ok(delta)
         }
     }
 
-    /// Replays a complete sweep into scratch columns first. This makes the
-    /// merge transactional: a memory or numeric limit never leaves a partial
-    /// sweep whose workers would have to be regenerated from a lost snapshot.
-    ///
-    /// This was measured (see `docs/` history / task report) against a
-    /// key-sharded parallel variant that fanned events out into
-    /// [`MERGE_SHARDS`]-many buckets and applied them with rayon: at this
-    /// benchmark's event volume (a few hundred events per sweep), sharding
-    /// was consistently ~5% *slower* than this serial version, at both 32 and
-    /// 8 shards -- the fixed per-sweep overhead (shard `Vec` allocation, two
-    /// rayon fork-join dispatches, and merging per-shard scratch maps back
-    /// together) exceeded the serial work it replaced. This straightforward
-    /// version is kept as the faster variant.
-    fn merge_sweep(&mut self, deltas: Vec<AnyTraversalDelta>) -> Result<(), SolverError> {
-        if self.dense.is_some() {
-            let deltas = deltas
-                .into_iter()
-                .map(|delta| match delta {
-                    AnyTraversalDelta::Dense(delta) => Ok(delta),
-                    AnyTraversalDelta::Sparse(_) => Err(SolverError::InvalidState(
-                        "a sparse traversal delta was produced by a dense (Street-recall) solver",
-                    )),
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            return self.merge_sweep_dense(deltas);
-        }
-        let deltas = deltas
-            .into_iter()
-            .map(|delta| match delta {
-                AnyTraversalDelta::Sparse(delta) => Ok(delta),
-                AnyTraversalDelta::Dense(_) => Err(SolverError::InvalidState(
-                    "a dense traversal delta was produced by a sparse (full-recall) solver",
-                )),
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-
-        let num_players = self.game.num_players();
-        if deltas.len() != num_players {
-            return Err(SolverError::InvalidState(
-                "parallel sweep did not produce one delta per seat",
-            ));
-        }
-
-        let mut scratch_policies: FxHashMap<InfoKey, PolicyColumn> = FxHashMap::default();
-        let mut scratch_histories: FxHashMap<HistoryKey, HistoryEntry> = FxHashMap::default();
-        let mut memory_bytes = self.approx_memory_bytes;
-        let mut total_deal_attempts = self.total_deal_attempts;
-        let mut terminal_evaluations = self.terminal_evaluations;
-        let mut hand_updates = self.hand_updates;
-
-        for (seat, delta) in deltas.into_iter().enumerate() {
-            let expected_sample_id = self
-                .next_sample_id
-                .checked_add(seat as u64)
-                .ok_or(SolverError::CounterOverflow)?;
-            if delta.sample_id != expected_sample_id || delta.traverser != seat {
-                return Err(SolverError::InvalidState(
-                    "parallel traversal deltas are not in sample-id order",
-                ));
-            }
-            total_deal_attempts = total_deal_attempts
-                .checked_add(delta.deal_attempts)
-                .ok_or(SolverError::CounterOverflow)?;
-            terminal_evaluations = terminal_evaluations
-                .checked_add(delta.terminal_evaluations)
-                .ok_or(SolverError::CounterOverflow)?;
-            hand_updates = hand_updates
-                .checked_add(delta.hand_updates)
-                .ok_or(SolverError::CounterOverflow)?;
-            for event in delta.events {
-                match event {
-                    TraversalEvent::EnsurePolicy { key, action_labels } => {
-                        let stored = scratch_policies
-                            .get(&key)
-                            .or_else(|| self.policies.get(&key));
-                        if let Some(column) = stored {
-                            if column.num_actions() != action_labels.len() {
-                                return Err(SolverError::ActionCountChanged {
-                                    key,
-                                    stored: column.num_actions(),
-                                    current: action_labels.len(),
-                                });
-                            }
-                            if column.action_labels != action_labels {
-                                return Err(SolverError::ActionLabelsChanged { key });
-                            }
-                        } else {
-                            memory_bytes = memory_bytes
-                                .checked_add(entry_memory_bytes(&action_labels)?)
-                                .ok_or(SolverError::MemoryAccountingOverflow)?;
-                            if memory_bytes > self.config.max_memory_bytes {
-                                return Err(SolverError::MemoryLimit {
-                                    limit: self.config.max_memory_bytes,
-                                    needed: memory_bytes,
-                                });
-                            }
-                            scratch_policies.insert(key, PolicyColumn::zeroed(action_labels));
-                        }
-                    }
-                    TraversalEvent::EnsureHistory(entry) => {
-                        let stored = scratch_histories
-                            .get(&entry.key)
-                            .or_else(|| self.histories.get(&entry.key));
-                        if let Some(stored) = stored {
-                            if stored != &entry {
-                                return Err(SolverError::HistoryCollision(entry.key));
-                            }
-                        } else {
-                            memory_bytes = memory_bytes
-                                .checked_add(history_memory_bytes(&entry.action_label)?)
-                                .ok_or(SolverError::MemoryAccountingOverflow)?;
-                            if memory_bytes > self.config.max_memory_bytes {
-                                return Err(SolverError::MemoryLimit {
-                                    limit: self.config.max_memory_bytes,
-                                    needed: memory_bytes,
-                                });
-                            }
-                            scratch_histories.insert(entry.key, entry);
-                        }
-                    }
-                    TraversalEvent::AddRegret { key, values } => {
-                        if let Entry::Vacant(entry) = scratch_policies.entry(key) {
-                            let column =
-                                self.policies.get(&key).ok_or(SolverError::InvalidState(
-                                    "regret delta refers to an uninitialized policy",
-                                ))?;
-                            entry.insert(column.clone());
-                        }
-                        let column = scratch_policies
-                            .get_mut(&key)
-                            .expect("inserted or copied above");
-                        if column.regrets.len() != values.len() {
-                            return Err(SolverError::ActionCountChanged {
-                                key,
-                                stored: column.regrets.len(),
-                                current: values.len(),
-                            });
-                        }
-                        for (target, value) in column.regrets.iter_mut().zip(values) {
-                            checked_add_f32(target, value)?;
-                        }
-                    }
-                    TraversalEvent::AddStrategy { key, values } => {
-                        if let Entry::Vacant(entry) = scratch_policies.entry(key) {
-                            let column =
-                                self.policies.get(&key).ok_or(SolverError::InvalidState(
-                                    "strategy delta refers to an uninitialized policy",
-                                ))?;
-                            entry.insert(column.clone());
-                        }
-                        let column = scratch_policies
-                            .get_mut(&key)
-                            .expect("inserted or copied above");
-                        if column.strategy_sum.len() != values.len() {
-                            return Err(SolverError::ActionCountChanged {
-                                key,
-                                stored: column.strategy_sum.len(),
-                                current: values.len(),
-                            });
-                        }
-                        for (target, value) in column.strategy_sum.iter_mut().zip(values) {
-                            checked_add_f32(target, value)?;
-                        }
-                    }
-                }
-            }
-        }
-
-        let added = num_players as u64;
-        let traversals = self
-            .traversals
-            .checked_add(added)
-            .ok_or(SolverError::CounterOverflow)?;
-        let next_sample_id = self
-            .next_sample_id
-            .checked_add(added)
-            .ok_or(SolverError::CounterOverflow)?;
-        let completed_sweeps = self
-            .completed_sweeps
-            .checked_add(1)
-            .ok_or(SolverError::CounterOverflow)?;
-
-        self.policies.extend(scratch_policies);
-        self.histories.extend(scratch_histories);
-        self.approx_memory_bytes = memory_bytes;
-        self.total_deal_attempts = total_deal_attempts;
-        self.terminal_evaluations = terminal_evaluations;
-        self.hand_updates = hand_updates;
-        self.traversals = traversals;
-        self.next_sample_id = next_sample_id;
-        self.completed_sweeps = completed_sweeps;
-        self.apply_early_discount();
-        Ok(())
-    }
-
-    /// Dense-mode counterpart of [`Self::merge_sweep`]: applies every seat's
-    /// column adds directly into the preallocated arena, in seat order, with
-    /// the same [`checked_add_f32`] used by the sparse path (so accumulation
-    /// order -- and therefore the result -- is independent of thread count).
-    /// There is nothing to "ensure" (no `EnsurePolicy`/`EnsureHistory`
-    /// bookkeeping): every column already exists; only its touched bit and
-    /// values change.
+    /// Replays ordered deltas transactionally into the fixed arena.
     fn merge_sweep_dense(
         &mut self,
         mut deltas: Vec<DenseTraversalDelta>,
@@ -2160,10 +1751,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             .checked_add(1)
             .ok_or(SolverError::CounterOverflow)?;
 
-        let dense = self
-            .dense
-            .as_mut()
-            .expect("merge_sweep_dense only called when dense storage exists");
+        let dense = &mut self.dense;
         // Keep the existing per-addition regret floor and rounding order. The
         // consumed f64 delta slots become an exact journal of old f32 values;
         // no arena copy or additional event-sized allocation is necessary.
@@ -2204,165 +1792,89 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         Ok(())
     }
 
-    /// Runs a resumable number of individual player traversals.  Traversers
-    /// rotate in seat order; one complete rotation is a sweep.
-    #[cfg(test)]
-    fn run_traversals(&mut self, count: u64) -> Result<(), SolverError> {
-        let num_players = self.game.num_players();
-        for _ in 0..count {
-            let traverser = (self.traversals % num_players as u64) as usize;
-            let mut deal_rng = traversal_deal_rng(self.config.seed, self.next_sample_id, traverser);
-            let sample = self.sampler.sample_counted(&mut deal_rng)?;
-            let mut action_rng =
-                traversal_action_rng(self.config.seed, self.next_sample_id, traverser);
-            let mut reach = vec![1.0; num_players];
-            let root = self.game.root_state();
-            self.traverse(
-                root,
-                &sample.world,
-                traverser,
-                HistoryKey::ROOT,
-                &mut reach,
-                1.0,
-                &mut action_rng,
-                0,
-            )?;
-
-            self.total_deal_attempts = self
-                .total_deal_attempts
-                .checked_add(u64::from(sample.attempts))
-                .ok_or(SolverError::CounterOverflow)?;
-            self.traversals = self
-                .traversals
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
-            self.next_sample_id = self
-                .next_sample_id
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
-            let previous_sweeps = self.completed_sweeps;
-            self.completed_sweeps = self.traversals / num_players as u64;
-            if self.completed_sweeps != previous_sweeps {
-                self.apply_early_discount();
-            }
-        }
-        Ok(())
-    }
-
     pub fn current_strategy(&self, key: InfoKey) -> Option<Vec<f32>> {
-        match &self.dense {
-            None => self.policies.get(&key).map(PolicyColumn::current_strategy),
-            Some(dense) => dense
-                .column_view(key)
-                .map(|view| regret_matching_f32(view.regrets)),
-        }
+        let dense = &self.dense;
+        dense
+            .column_view(key)
+            .map(|view| regret_matching_f32(view.regrets))
     }
 
     pub fn average_strategy(&self, key: InfoKey) -> Option<Vec<f32>> {
-        match &self.dense {
-            None => self.policies.get(&key).map(PolicyColumn::average_strategy),
-            Some(dense) => dense.column_view(key).map(|view| {
-                normalize_nonnegative_f32(view.strategy_sum)
-                    .unwrap_or_else(|| regret_matching_f32(view.regrets))
-            }),
-        }
+        let dense = &self.dense;
+        dense.column_view(key).map(|view| {
+            normalize_nonnegative_f32(view.strategy_sum)
+                .unwrap_or_else(|| regret_matching_f32(view.regrets))
+        })
     }
 
     pub fn current_action_probabilities(&self, key: InfoKey) -> Option<Vec<ActionProbability>> {
-        match &self.dense {
-            None => self
-                .policies
-                .get(&key)
-                .map(PolicyColumn::current_action_probabilities),
-            Some(dense) => dense.column_view(key).map(|view| {
-                label_probabilities(view.action_labels, regret_matching_f32(view.regrets))
-            }),
-        }
+        let dense = &self.dense;
+        dense
+            .column_view(key)
+            .map(|view| label_probabilities(view.action_labels, regret_matching_f32(view.regrets)))
     }
 
     pub fn average_action_probabilities(&self, key: InfoKey) -> Option<Vec<ActionProbability>> {
-        match &self.dense {
-            None => self
-                .policies
-                .get(&key)
-                .map(PolicyColumn::average_action_probabilities),
-            Some(dense) => dense.column_view(key).map(|view| {
-                let probabilities = normalize_nonnegative_f32(view.strategy_sum)
-                    .unwrap_or_else(|| regret_matching_f32(view.regrets));
-                label_probabilities(view.action_labels, probabilities)
-            }),
-        }
+        let dense = &self.dense;
+        dense.column_view(key).map(|view| {
+            let probabilities = normalize_nonnegative_f32(view.strategy_sum)
+                .unwrap_or_else(|| regret_matching_f32(view.regrets));
+            label_probabilities(view.action_labels, probabilities)
+        })
     }
 
     pub fn policy(&self, key: InfoKey) -> Option<PolicyColumn> {
-        match &self.dense {
-            None => self.policies.get(&key).cloned(),
-            Some(dense) => dense.column_view(key).map(|view| PolicyColumn {
-                action_labels: view.action_labels.to_vec(),
-                regrets: view.regrets.to_vec(),
-                strategy_sum: view.strategy_sum.to_vec(),
-            }),
-        }
+        let dense = &self.dense;
+        dense.column_view(key).map(|view| PolicyColumn {
+            action_labels: view.action_labels.to_vec(),
+            regrets: view.regrets.to_vec(),
+            strategy_sum: view.strategy_sum.to_vec(),
+        })
     }
 
     pub fn history_entry(&self, key: HistoryKey) -> Option<HistoryEntry> {
-        match &self.dense {
-            None => self.histories.get(&key).cloned(),
-            Some(dense) => {
-                let &node_id = dense.tree.by_history.get(&key)?;
-                let node = &dense.tree.nodes[node_id as usize];
-                let parent_id = node.parent?;
-                let parent = &dense.tree.nodes[parent_id as usize];
-                Some(HistoryEntry {
-                    key,
-                    parent: parent.history,
-                    actor: parent.actor,
-                    action_index: node.parent_action_index,
-                    action_label: parent.action_labels[node.parent_action_index as usize].clone(),
-                })
-            }
-        }
+        let dense = &self.dense;
+        let &node_id = dense.tree.by_history.get(&key)?;
+        let node = &dense.tree.nodes[node_id as usize];
+        let parent_id = node.parent?;
+        let parent = &dense.tree.nodes[parent_id as usize];
+        Some(HistoryEntry {
+            key,
+            parent: parent.history,
+            actor: parent.actor,
+            action_index: node.parent_action_index,
+            action_label: parent.action_labels[node.parent_action_index as usize].clone(),
+        })
     }
 
-    /// All visited history entries whose parent is `parent`, sorted by
-    /// `(actor, action_index)` for a stable UI order. `O(histories)` scan in
-    /// sparse mode; `O(node's actions)` in dense mode (the enumerated tree
-    /// already knows every child, touched or not). Meant for a UI polling
+    /// All enumerated child edges whose parent is `parent`, sorted by
+    /// `(actor, action_index)` for a stable UI order. `O(node's actions)`
+    /// scan, including untouched children. Meant for a UI polling
     /// live progress, not the hot traversal loop.
     pub fn node_children(&self, parent: HistoryKey) -> Vec<HistoryEntry> {
-        let mut children: Vec<HistoryEntry> = match &self.dense {
-            None => self
-                .histories
-                .values()
-                .filter(|entry| entry.parent == parent)
-                .cloned()
-                .collect(),
-            Some(dense) => {
-                let Some(&node_id) = dense.tree.by_history.get(&parent) else {
-                    return Vec::new();
-                };
-                let node = &dense.tree.nodes[node_id as usize];
-                (0..node.action_labels.len())
-                    .map(|action_index| HistoryEntry {
-                        key: parent.child(node.actor as usize, action_index),
-                        parent,
-                        actor: node.actor,
-                        action_index: action_index as u32,
-                        action_label: node.action_labels[action_index].clone(),
-                    })
-                    .collect()
-            }
+        let dense = &self.dense;
+        let Some(&node_id) = dense.tree.by_history.get(&parent) else {
+            return Vec::new();
         };
+        let node = &dense.tree.nodes[node_id as usize];
+        let mut children: Vec<HistoryEntry> = (0..node.action_labels.len())
+            .map(|action_index| HistoryEntry {
+                key: parent.child(node.actor as usize, action_index),
+                parent,
+                actor: node.actor,
+                action_index: action_index as u32,
+                action_label: node.action_labels[action_index].clone(),
+            })
+            .collect();
         children.sort_unstable_by_key(|entry| (entry.actor, entry.action_index));
         children
     }
 
     /// Public metadata for one materialized decision node. Production
     /// current-street solvers use the dense tree, so this is an O(actions)
-    /// read with no traversal or strategy scan. Sparse research solvers do
-    /// not retain enough state to classify unvisited/terminal children.
+    /// read with no traversal or strategy scan.
     pub fn public_node_view(&self, history: HistoryKey) -> Option<PublicNodeView> {
-        let dense = self.dense.as_ref()?;
+        let dense = &self.dense;
         let &node_id = dense.tree.by_history.get(&history)?;
         let node = &dense.tree.nodes[node_id as usize];
         let actions = node
@@ -2395,9 +1907,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     }
 
     /// Current average strategy of every policy column at `history`, sorted
-    /// by key. In dense mode only *touched* buckets are listed, matching
-    /// sparse mode's "only visited columns exist" semantics. `O(policies)`
-    /// (sparse) or `O(node's buckets)` (dense) scan; meant for a UI polling
+    /// by key. Only *touched* buckets are listed. `O(node's buckets)` scan;
+    /// meant for a UI polling
     /// live progress, not the hot traversal loop.
     pub fn strategies_at(&self, history: HistoryKey) -> Vec<(InfoKey, Vec<String>, Vec<f32>)> {
         self.strategies_at_with_mass(history)
@@ -2418,58 +1929,37 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &self,
         history: HistoryKey,
     ) -> Vec<(InfoKey, Vec<String>, Vec<f32>, f64)> {
-        let mut rows: Vec<(InfoKey, Vec<String>, Vec<f32>, f64)> = match &self.dense {
-            None => self
-                .policies
-                .iter()
-                .filter(|(key, _)| key.history == history)
-                .map(|(&key, column)| {
-                    let mass = column
-                        .strategy_sum
-                        .iter()
-                        .map(|&value| f64::from(value))
-                        .sum();
-                    (
-                        key,
-                        column.action_labels.clone(),
-                        column.average_strategy(),
-                        mass,
-                    )
-                })
-                .collect(),
-            Some(dense) => {
-                let Some(&node_id) = dense.tree.by_history.get(&history) else {
-                    return Vec::new();
-                };
-                let node = &dense.tree.nodes[node_id as usize];
-                let bucket_count = dense.arena.bucket_count_of(node_id);
-                let mut rows = Vec::new();
-                for bucket in 0..bucket_count {
-                    let column = dense
-                        .arena
-                        .column_id(node_id, bucket)
-                        .expect("bucket is within this node's range");
-                    if !dense.arena.is_touched(column) {
-                        continue;
-                    }
-                    let range = dense
-                        .arena
-                        .slot_range(node_id, bucket)
-                        .expect("bucket is within this node's range");
-                    let strategy_sum = &dense.arena.strategy_sum[range.clone()];
-                    let mass = strategy_sum.iter().map(|&value| f64::from(value)).sum();
-                    let probabilities = normalize_nonnegative_f32(strategy_sum)
-                        .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
-                    rows.push((
-                        dense.info_key_for(node_id, bucket),
-                        node.action_labels.clone(),
-                        probabilities,
-                        mass,
-                    ));
-                }
-                rows
-            }
+        let dense = &self.dense;
+        let Some(&node_id) = dense.tree.by_history.get(&history) else {
+            return Vec::new();
         };
+        let node = &dense.tree.nodes[node_id as usize];
+        let bucket_count = dense.arena.bucket_count_of(node_id);
+        let mut rows = Vec::new();
+        for bucket in 0..bucket_count {
+            let column = dense
+                .arena
+                .column_id(node_id, bucket)
+                .expect("bucket is within this node's range");
+            if !dense.arena.is_touched(column) {
+                continue;
+            }
+            let range = dense
+                .arena
+                .slot_range(node_id, bucket)
+                .expect("bucket is within this node's range");
+            let strategy_sum = &dense.arena.strategy_sum[range.clone()];
+            let mass = strategy_sum.iter().map(|&value| f64::from(value)).sum();
+            let probabilities = normalize_nonnegative_f32(strategy_sum)
+                .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
+            rows.push((
+                dense.info_key_for(node_id, bucket),
+                node.action_labels.clone(),
+                probabilities,
+                mass,
+            ));
+        }
+
         rows.sort_unstable_by_key(|(key, _, _, _)| *key);
         rows
     }
@@ -2487,87 +1977,69 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     }
 
     pub fn snapshot_state(&self) -> SolverState {
-        match &self.dense {
-            None => {
-                let mut histories: Vec<_> = self.histories.values().cloned().collect();
-                histories.sort_unstable_by_key(|entry| entry.key);
-                let mut policies: Vec<_> = self
-                    .policies
-                    .iter()
-                    .map(|(&key, column)| PolicyEntry {
-                        key,
-                        column: column.clone(),
-                    })
-                    .collect();
-                policies.sort_unstable_by_key(|entry| entry.key);
-                self.finish_snapshot(histories, policies)
-            }
-            Some(dense) => {
-                let mut policies = Vec::new();
-                let mut history_node_ids: std::collections::BTreeSet<NodeId> =
-                    std::collections::BTreeSet::new();
-                for (node_index, node) in dense.tree.nodes.iter().enumerate() {
-                    let node_id = node_index as NodeId;
-                    let bucket_count = dense.arena.bucket_count_of(node_id);
-                    for bucket in 0..bucket_count {
-                        let column = dense
-                            .arena
-                            .column_id(node_id, bucket)
-                            .expect("bucket is within this node's range");
-                        if !dense.arena.is_touched(column) {
-                            continue;
-                        }
-                        let range = dense
-                            .arena
-                            .slot_range(node_id, bucket)
-                            .expect("bucket is within this node's range");
-                        policies.push(PolicyEntry {
-                            key: dense.info_key_for(node_id, bucket),
-                            column: PolicyColumn {
-                                action_labels: node.action_labels.clone(),
-                                regrets: dense.arena.regrets[range.clone()].to_vec(),
-                                strategy_sum: dense.arena.strategy_sum[range].to_vec(),
-                            },
-                        });
-                        // Record every ancestor of a touched column (the
-                        // reachable trie a viewer needs), stopping at the
-                        // first already-recorded ancestor (its own ancestors
-                        // are therefore already present) or at the implicit
-                        // root (which never gets a `HistoryEntry`).
-                        let mut ancestor = Some(node_id);
-                        while let Some(id) = ancestor {
-                            let ancestor_node = &dense.tree.nodes[id as usize];
-                            if ancestor_node.parent.is_none() {
-                                break;
-                            }
-                            if !history_node_ids.insert(id) {
-                                break;
-                            }
-                            ancestor = ancestor_node.parent;
-                        }
-                    }
+        let dense = &self.dense;
+        let mut policies = Vec::new();
+        let mut history_node_ids: std::collections::BTreeSet<NodeId> =
+            std::collections::BTreeSet::new();
+        for (node_index, node) in dense.tree.nodes.iter().enumerate() {
+            let node_id = node_index as NodeId;
+            let bucket_count = dense.arena.bucket_count_of(node_id);
+            for bucket in 0..bucket_count {
+                let column = dense
+                    .arena
+                    .column_id(node_id, bucket)
+                    .expect("bucket is within this node's range");
+                if !dense.arena.is_touched(column) {
+                    continue;
                 }
-                policies.sort_unstable_by_key(|entry| entry.key);
-                let mut histories: Vec<HistoryEntry> = history_node_ids
-                    .into_iter()
-                    .map(|node_id| {
-                        let node = &dense.tree.nodes[node_id as usize];
-                        let parent_id = node.parent.expect("root excluded above");
-                        let parent = &dense.tree.nodes[parent_id as usize];
-                        HistoryEntry {
-                            key: node.history,
-                            parent: parent.history,
-                            actor: parent.actor,
-                            action_index: node.parent_action_index,
-                            action_label: parent.action_labels[node.parent_action_index as usize]
-                                .clone(),
-                        }
-                    })
-                    .collect();
-                histories.sort_unstable_by_key(|entry| entry.key);
-                self.finish_snapshot(histories, policies)
+                let range = dense
+                    .arena
+                    .slot_range(node_id, bucket)
+                    .expect("bucket is within this node's range");
+                policies.push(PolicyEntry {
+                    key: dense.info_key_for(node_id, bucket),
+                    column: PolicyColumn {
+                        action_labels: node.action_labels.clone(),
+                        regrets: dense.arena.regrets[range.clone()].to_vec(),
+                        strategy_sum: dense.arena.strategy_sum[range].to_vec(),
+                    },
+                });
+                // Record every ancestor of a touched column (the
+                // reachable trie a viewer needs), stopping at the
+                // first already-recorded ancestor (its own ancestors
+                // are therefore already present) or at the implicit
+                // root (which never gets a `HistoryEntry`).
+                let mut ancestor = Some(node_id);
+                while let Some(id) = ancestor {
+                    let ancestor_node = &dense.tree.nodes[id as usize];
+                    if ancestor_node.parent.is_none() {
+                        break;
+                    }
+                    if !history_node_ids.insert(id) {
+                        break;
+                    }
+                    ancestor = ancestor_node.parent;
+                }
             }
         }
+        policies.sort_unstable_by_key(|entry| entry.key);
+        let mut histories: Vec<HistoryEntry> = history_node_ids
+            .into_iter()
+            .map(|node_id| {
+                let node = &dense.tree.nodes[node_id as usize];
+                let parent_id = node.parent.expect("root excluded above");
+                let parent = &dense.tree.nodes[parent_id as usize];
+                HistoryEntry {
+                    key: node.history,
+                    parent: parent.history,
+                    actor: parent.actor,
+                    action_index: node.parent_action_index,
+                    action_label: parent.action_labels[node.parent_action_index as usize].clone(),
+                }
+            })
+            .collect();
+        histories.sort_unstable_by_key(|entry| entry.key);
+        self.finish_snapshot(histories, policies)
     }
 
     fn finish_snapshot(
@@ -2622,45 +2094,23 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         let num_players = self.game.num_players();
         let mut totals = vec![0.0; num_players];
         let mut counts = vec![0u64; num_players];
-        match &self.dense {
-            None => {
-                let mut keys: Vec<_> = self.policies.keys().copied().collect();
-                keys.sort_unstable();
-                for key in keys {
-                    let column = self.policies.get(&key).expect("key came from policy map");
-                    let current = column.average_strategy();
-                    let value = prior.get(&key).map_or(0.0, |previous| {
-                        current
-                            .iter()
-                            .zip(previous)
-                            .map(|(&left, &right)| f64::from((left - right).abs()))
-                            .sum::<f64>()
-                            * 0.5
-                    });
-                    totals[key.player as usize] += value;
-                    counts[key.player as usize] += 1;
-                    prior.insert(key, current);
-                }
-            }
-            Some(dense) => {
-                for_each_touched_column(dense, |_column, key, node, range| {
-                    let current =
-                        normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
-                            .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
-                    let value = prior.get(&key).map_or(0.0, |previous| {
-                        current
-                            .iter()
-                            .zip(previous)
-                            .map(|(&left, &right)| f64::from((left - right).abs()))
-                            .sum::<f64>()
-                            * 0.5
-                    });
-                    totals[node.actor as usize] += value;
-                    counts[node.actor as usize] += 1;
-                    prior.insert(key, current);
-                });
-            }
-        }
+        let dense = &self.dense;
+        for_each_touched_column(dense, |_column, key, node, range| {
+            let current = normalize_nonnegative_f32(&dense.arena.strategy_sum[range.clone()])
+                .unwrap_or_else(|| regret_matching_f32(&dense.arena.regrets[range]));
+            let value = prior.get(&key).map_or(0.0, |previous| {
+                current
+                    .iter()
+                    .zip(previous)
+                    .map(|(&left, &right)| f64::from((left - right).abs()))
+                    .sum::<f64>()
+                    * 0.5
+            });
+            totals[node.actor as usize] += value;
+            counts[node.actor as usize] += 1;
+            prior.insert(key, current);
+        });
+
         totals
             .into_iter()
             .zip(counts)
@@ -2688,12 +2138,10 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         tracker: &mut StrategyDriftTracker,
     ) -> Result<Vec<f64>, StrategyDriftError> {
         let num_players = self.game.num_players();
-        let (is_dense, total_columns, total_slots) =
-            self.dense.as_ref().map_or((false, 0, 0), |dense| {
-                (true, dense.arena.total_columns(), dense.arena.total_slots())
-            });
+        let dense = &self.dense;
+        let total_columns = dense.arena.total_columns();
+        let total_slots = dense.arena.total_slots();
         let identity = StrategyDriftIdentity {
-            dense: is_dense,
             players: num_players as u8,
             total_columns,
             total_slots,
@@ -2706,9 +2154,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
             Some(_) => return Err(StrategyDriftError::IncompatibleLayout),
         }
 
-        let Some(dense) = &self.dense else {
-            return Ok(self.strategy_drift_refresh(&mut tracker.sparse_prior));
-        };
         let stored_slots = tracker
             .dense_action_counts
             .iter()
@@ -2808,30 +2253,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     pub fn metrics(&self) -> SolverMetrics {
         let num_players = self.game.num_players();
         let mut positive_regret = vec![0.0; num_players];
-        let (infosets, memory_bytes) = match &self.dense {
-            None => {
-                let mut keys: Vec<_> = self.policies.keys().copied().collect();
-                keys.sort_unstable();
-                for key in keys {
-                    let column = self.policies.get(&key).expect("key came from policy map");
-                    positive_regret[key.player as usize] += column
-                        .regrets
-                        .iter()
-                        .map(|&regret| f64::from(regret.max(0.0)))
-                        .sum::<f64>();
-                }
-                (self.policies.len() as u64, self.approx_memory_bytes)
-            }
-            Some(dense) => {
-                for_each_touched_column(dense, |_column, _, node, range| {
-                    positive_regret[node.actor as usize] += dense.arena.regrets[range]
-                        .iter()
-                        .map(|&regret| f64::from(regret.max(0.0)))
-                        .sum::<f64>();
-                });
-                (dense.arena.touched_count(), dense.arena.estimated_bytes())
-            }
-        };
+        let dense = &self.dense;
+        for_each_touched_column(dense, |_column, _, node, range| {
+            positive_regret[node.actor as usize] += dense.arena.regrets[range]
+                .iter()
+                .map(|&regret| f64::from(regret.max(0.0)))
+                .sum::<f64>();
+        });
+        let (infosets, memory_bytes) = (dense.arena.touched_count(), dense.arena.estimated_bytes());
         for (player, total) in positive_regret.iter_mut().enumerate() {
             let updates = traversals_for_player(self.traversals, num_players, player);
             if updates > 0 {
@@ -2854,101 +2283,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
     }
 
-    #[cfg(test)]
-    fn strategy_for(
-        &mut self,
-        key: InfoKey,
-        actions: &G::Actions,
-    ) -> Result<Vec<f64>, SolverError> {
-        let num_actions = self.game.num_actions_of(actions);
-        if let Some(column) = self.policies.get(&key) {
-            if column.num_actions() != num_actions {
-                return Err(SolverError::ActionCountChanged {
-                    key,
-                    stored: column.num_actions(),
-                    current: num_actions,
-                });
-            }
-            let mut scratch = String::new();
-            for (index, label) in column.action_labels.iter().enumerate() {
-                scratch.clear();
-                self.game.write_action_label(actions, index, &mut scratch);
-                if *label != scratch {
-                    return Err(SolverError::ActionLabelsChanged { key });
-                }
-            }
-            return Ok(regret_matching(&column.regrets));
-        }
-
-        let action_labels: Vec<String> = (0..num_actions)
-            .map(|index| self.game.action_label_of(actions, index))
-            .collect();
-        validate_action_labels(&action_labels)?;
-
-        let added = entry_memory_bytes(&action_labels)?;
-        let needed = self
-            .approx_memory_bytes
-            .checked_add(added)
-            .ok_or(SolverError::MemoryAccountingOverflow)?;
-        if needed > self.config.max_memory_bytes {
-            return Err(SolverError::MemoryLimit {
-                limit: self.config.max_memory_bytes,
-                needed,
-            });
-        }
-        self.policies
-            .insert(key, PolicyColumn::zeroed(action_labels));
-        self.approx_memory_bytes = needed;
-        Ok(vec![1.0 / num_actions as f64; num_actions])
-    }
-
-    #[cfg(test)]
-    fn record_history(
-        &mut self,
-        parent: HistoryKey,
-        actor: usize,
-        action_index: usize,
-        action_label: &str,
-    ) -> Result<HistoryKey, SolverError> {
-        let key = parent.child(actor, action_index);
-        if let Some(existing) = self.histories.get(&key) {
-            if existing.parent != parent
-                || existing.actor as usize != actor
-                || existing.action_index as usize != action_index
-                || existing.action_label != action_label
-            {
-                return Err(SolverError::HistoryCollision(key));
-            }
-            return Ok(key);
-        }
-        let actor = u8::try_from(actor).map_err(|_| SolverError::HistoryIndexOverflow)?;
-        let action_index =
-            u32::try_from(action_index).map_err(|_| SolverError::HistoryIndexOverflow)?;
-        let added = history_memory_bytes(action_label)?;
-        let needed = self
-            .approx_memory_bytes
-            .checked_add(added)
-            .ok_or(SolverError::MemoryAccountingOverflow)?;
-        if needed > self.config.max_memory_bytes {
-            return Err(SolverError::MemoryLimit {
-                limit: self.config.max_memory_bytes,
-                needed,
-            });
-        }
-        self.histories.insert(
-            key,
-            HistoryEntry {
-                key,
-                parent,
-                actor,
-                action_index,
-                action_label: action_label.to_string(),
-            },
-        );
-        self.approx_memory_bytes = needed;
-        Ok(key)
-    }
-
     fn apply_early_discount(&mut self) {
         let sweep = self.completed_sweeps;
         if self.config.discount_until == 0
@@ -2959,32 +2293,14 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         }
         let event = sweep / self.config.discount_every;
         let factor = (event as f64 / (event + 1) as f64) as f32;
-        match &mut self.dense {
-            None => {
-                let mut keys: Vec<_> = self.policies.keys().copied().collect();
-                keys.sort_unstable();
-                for key in keys {
-                    let column = self.policies.get_mut(&key).expect("key came from map");
-                    for value in column.regrets.iter_mut().chain(&mut column.strategy_sum) {
-                        *value *= factor;
-                    }
-                }
-            }
-            // The arena is one flat, node-major-ordered array covering
-            // every enumerated column (touched or not); scaling every slot
-            // linearly is equivalent to (and cheaper than) sorting and
-            // scaling only the touched ones, since an untouched slot is
-            // always zero and `0.0 * factor == 0.0`.
-            Some(dense) => {
-                for value in dense
-                    .arena
-                    .regrets
-                    .iter_mut()
-                    .chain(dense.arena.strategy_sum.iter_mut())
-                {
-                    *value *= factor;
-                }
-            }
+        let dense = &mut self.dense;
+        for value in dense
+            .arena
+            .regrets
+            .iter_mut()
+            .chain(dense.arena.strategy_sum.iter_mut())
+        {
+            *value *= factor;
         }
     }
 }

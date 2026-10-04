@@ -1367,6 +1367,12 @@ mod tests {
                     bucket_active_opponents: 1,
                 }
             }
+            fn recall_mode(&self) -> crate::config::RecallMode {
+                crate::config::RecallMode::Street
+            }
+            fn bucket_count(&self, _street: Street, _active_opponents: u8) -> u32 {
+                1
+            }
         }
 
         let pool = rayon::ThreadPoolBuilder::new()

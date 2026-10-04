@@ -262,15 +262,16 @@ solver arena自体のメモリは別に必要となる。codecが早く終了し
 検査してから戻るため、全payloadのchecksum・長さ検査を省略しない。
 
 production checkpoint書込みはlive solverを不変借用し、policyの値やaction labelを
-複製せず逐次serializeする。dense側の整列・祖先scratchはpublic node数に、
-sparse側は保存entry数に比例する。既存owned snapshot/capture APIを保持し、
+複製せず逐次serializeする。整列・祖先scratchはpublic node数に比例する。
+既存owned snapshot/capture APIを保持し、
 state 4/container 7のbytesを同じ順序で書く。raw一時fileと4MiB chunk圧縮は共通である。
 正式solutionを作る経路にはowned snapshotのstagingが引き続き必要となる。
 
 productionのstrategy driftは`StrategyDriftTracker`へ前回の正規化profileを保持する。
-dense側はcolumn ID、action数、連続したf32確率を使い、InfoKeyごとのHashMapと
+column ID、action数、連続したf32確率を使い、InfoKeyごとのHashMapと
 小vectorを保持しない。初回・resume時のbaseline、初出columnのゼロ寄与、node順の
-f64集計は既存方式と同じである。sparse側は従来mapを使い、tracker領域はarena予算外。
+f64集計は既存方式と同じである。tracker領域はarena予算外。
+solverはtoy testも含めてdense arenaのみを使い、full recallの構築・復元は明示errorで拒否する。
 
 ## 11. 将来の接続点
 

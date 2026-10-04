@@ -5,8 +5,8 @@ use serde::Serialize;
 use serde::ser::{SerializeSeq, Serializer};
 
 use super::{
-    DenseStorage, ExternalSamplingGame, HistoryEntry, HistoryKey, InfoKey, MultiwaySolver, NodeId,
-    PolicyColumn, SOLVER_STATE_VERSION, SolverConfig,
+    DenseStorage, ExternalSamplingGame, HistoryKey, InfoKey, MultiwaySolver, NodeId,
+    SOLVER_STATE_VERSION, SolverConfig,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -42,7 +42,6 @@ impl BorrowedSolverState<'_> {
 }
 
 enum Histories<'a> {
-    Sparse(Vec<&'a HistoryEntry>),
     Dense {
         storage: &'a DenseStorage,
         nodes: Vec<NodeId>,
@@ -50,7 +49,6 @@ enum Histories<'a> {
 }
 
 enum Policies<'a> {
-    Sparse(Vec<(&'a InfoKey, &'a PolicyColumn)>),
     Dense {
         storage: &'a DenseStorage,
         nodes: Vec<NodeId>,
@@ -83,7 +81,6 @@ struct PolicyColumnRef<'a> {
 impl Serialize for Histories<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            Self::Sparse(entries) => entries.serialize(serializer),
             Self::Dense { storage, nodes } => {
                 let mut sequence = serializer.serialize_seq(Some(nodes.len()))?;
                 for &id in nodes {
@@ -107,13 +104,6 @@ impl Serialize for Histories<'_> {
 impl Serialize for Policies<'_> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            Self::Sparse(entries) => {
-                let mut sequence = serializer.serialize_seq(Some(entries.len()))?;
-                for &(key, column) in entries {
-                    sequence.serialize_element(&PolicyEntryRef { key: *key, column })?;
-                }
-                sequence.end()
-            }
             Self::Dense {
                 storage,
                 nodes,
@@ -264,22 +254,9 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// Same values and sequence order as snapshot_state(), without cloning
     /// policy columns or labels. The immutable borrow prevents training until
     /// serialization finishes; scratch scales with public nodes for dense
-    /// storage and stored entry counts for sparse storage, outside the arena.
+    /// storage, outside the arena.
     pub(crate) fn snapshot_state_ref(&self) -> Result<BorrowedSolverState<'_>, SnapshotError> {
-        let (histories, policies) = match &self.dense {
-            Some(storage) => dense_sequences(storage)?,
-            None => {
-                // Sparse history storage also contains entries that need not
-                // be ancestors of a retained policy. Preserve every entry.
-                let mut histories = scratch(self.histories.len())?;
-                histories.extend(self.histories.values());
-                histories.sort_unstable_by_key(|entry| entry.key);
-                let mut policies = scratch(self.policies.len())?;
-                policies.extend(self.policies.iter());
-                policies.sort_unstable_by_key(|(key, _)| **key);
-                (Histories::Sparse(histories), Policies::Sparse(policies))
-            }
-        };
+        let (histories, policies) = dense_sequences(&self.dense)?;
         Ok(BorrowedSolverState {
             schema_version: SOLVER_STATE_VERSION,
             config: self.config,

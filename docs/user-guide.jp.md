@@ -135,9 +135,10 @@ productionの`memory = "auto"`は6 GiB arenaへ解決する。明示値はその
 cgroup/containerまたは外部RSS watchdogにより別に強制する。
 
 旧rollout/k-means backendはSolve中にassignment cacheが増え、bucket-history/full
-recallもsparse policy mapが増えるため、productionからそれぞれ`MWP001`/`MWP002`で
+recallも当時のsparse policy mapが増えるため、productionからそれぞれ`MWP001`/`MWP002`で
 削除された。2026-08にrollout実装本体と`solvers experiment` namespaceも削除した。
 現行の抽象化はEHS² percentile + current-street recallだけである。
+sparse/full-recall storageのruntimeと研究featureは削除済みで、toy testもdense arenaを使う。
 
 ## 5. 何が保証され、何が保証されないか
 

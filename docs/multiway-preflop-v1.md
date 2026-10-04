@@ -26,7 +26,7 @@
 | `Standard frontend` | 標準 betting profile、max aggressive actions、reraise jam、rule priorityの runtimeは `multiway/src/config.rs`、`betting.rs`、`tree.rs`。 |
 | `Script frontend` | `.mwtree` の相対path、script compile、canonical fingerprintは `multiway_v1.rs`、`tree_rules.rs`、`config.rs`。 |
 | ``[game.abstraction]`` | EHS² percentile、bucket幅、Solve前の全assignment/cache buildは `multiway_v1.rs`、`multiway/src/abstraction.rs`、`holdem.rs`。 |
-| ``[game.information]`` | current-street固定、full/bucket-historyのmigration境界は `multiway_v1.rs` の lowerと `solver/mod.rs` の recall mode。 |
+| ``[game.information]`` | current-street固定。`multiway_v1.rs` の lowerがfull/bucket-historyをMWP002で拒否し、`solver/mod.rs` の構築・復元もFullを明示拒否する。toy testもdense arenaのみ。Fullのenum・fingerprintと保存形式は旧artifactのidentityのために保持。 |
 | `Production removal and migration errors` | retired rollout/training/opponent bucketなどを黙って変換しない gateは `multiway_v1.rs`。拒否テストは `crates/cli/tests/common/mod.rs` と `cli_integration.rs`。 |
 | ``[economics]`` | cash/chipEV、rake、tournament-ICMの surface/lowerは `economics.rs` と `multiway/src/icm.rs`/`settlement.rs`。 |
 | `Cash / chipEV` | rake適用順、uncalled refund、utility unitは `economics.rs` と `settlement.rs`、受入テストは `crates/cli/tests/multiway_acceptance.rs`。 |

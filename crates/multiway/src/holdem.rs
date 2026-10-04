@@ -213,9 +213,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     /// instead of the actor's own dealt one. Used by the dense
     /// street-recall vector batch hook (`street == state.street`) to bucket
     /// every feasible traverser combo against one fixed
-    /// board/active-opponent context. The full-recall sparse-vector fallback
-    /// instead substitutes each combo into its sampled world and follows the
-    /// ordinary scalar bucket-path lookup.
+    /// board/active-opponent context.
     fn bucket_for_combo_and_street(
         &self,
         state: &BettingState,

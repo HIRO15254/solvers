@@ -488,7 +488,8 @@ kind = "regret-based"       # 既定。regret-based|none
 `single-hand` と `regret-based` pruningの組合せはerror。
 productionの情報状態は`current-street`固定で、regret-based pruningは
 `range-vector + current-street`のdense workerに実装する。retired full-recall
-artifactは静的に読めるが、そのworkerをproduction solve/resumeで再生しない。
+artifactは静的に読めるが、full-recall storageのruntimeは削除済みで、
+solverの構築・復元は明示errorで拒否する。保存形式・version・fingerprintは変えない。
 `discount.kind="none"` と `pruning.kind="none"` のtableには追加fieldを置けない。
 batch、seed、exploration、discount、pruningはfingerprint/checkpoint互換性に
 関係する。thread数とmemory上限は運用設定であり、変更しても学習stateの互換性を

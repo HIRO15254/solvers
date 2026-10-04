@@ -303,8 +303,8 @@ impl DealSampler {
         })
     }
 
-    /// Feasible hole-combo set for `seat` in `world`, used by both the dense
-    /// and full-recall sparse vector-traverser paths: every positive-weight
+    /// Feasible hole-combo set for `seat` in `world`, used by the dense
+    /// vector-traverser path: every positive-weight
     /// combo in `seat`'s configured range that does not intersect any other
     /// seat's sampled hole cards nor the sampled runout. `world`'s own dealt
     /// combo for `seat` is deliberately not special-cased (it may or may not

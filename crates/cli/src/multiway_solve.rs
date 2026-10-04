@@ -530,10 +530,6 @@ fn run_inner(
                     }
                 }
             }
-            Err(multiway::solver::SolverError::MemoryLimit { .. }) => {
-                status = CompletionStatus::ResourceLimit;
-                break;
-            }
             Err(error) => return Err(error).context("running multiway MCCFR"),
         }
         if cancel.is_some_and(|token| token.load(Ordering::Relaxed)) {

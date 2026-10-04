@@ -189,30 +189,6 @@ pub(super) fn validate_history_entry(
     Ok(())
 }
 
-#[cfg(any(feature = "research-abstractions", test))]
-pub(super) fn validate_history_graph(
-    histories: &FxHashMap<HistoryKey, HistoryEntry>,
-) -> Result<(), SolverError> {
-    for entry in histories.values() {
-        let mut key = entry.parent;
-        for _ in 0..=histories.len() {
-            if key == HistoryKey::ROOT {
-                break;
-            }
-            key = histories
-                .get(&key)
-                .ok_or(SolverError::InvalidState(
-                    "public history has an unknown parent",
-                ))?
-                .parent;
-        }
-        if key != HistoryKey::ROOT {
-            return Err(SolverError::InvalidState("public history contains a cycle"));
-        }
-    }
-    Ok(())
-}
-
 pub(super) fn validate_action_labels(labels: &[String]) -> Result<(), SolverError> {
     if labels.iter().any(|label| label.is_empty()) {
         return Err(SolverError::InvalidActionLabels("empty action label"));
@@ -223,31 +199,6 @@ pub(super) fn validate_action_labels(labels: &[String]) -> Result<(), SolverErro
         }
     }
     Ok(())
-}
-
-pub(super) fn entry_memory_bytes(action_labels: &[String]) -> Result<u64, SolverError> {
-    let labels = action_labels.iter().try_fold(0u64, |total, label| {
-        total
-            .checked_add(size_of::<String>() as u64)
-            .and_then(|value| value.checked_add(label.len() as u64))
-            .ok_or(SolverError::MemoryAccountingOverflow)
-    })?;
-    let vector_bytes = (action_labels.len() as u64)
-        .checked_mul(2 * size_of::<f32>() as u64)
-        .ok_or(SolverError::MemoryAccountingOverflow)?;
-    ((size_of::<InfoKey>() + size_of::<PolicyColumn>()) as u64)
-        .checked_add(ENTRY_OVERHEAD_BYTES)
-        .and_then(|value| value.checked_add(vector_bytes))
-        .and_then(|value| value.checked_add(labels))
-        .ok_or(SolverError::MemoryAccountingOverflow)
-}
-
-pub(super) fn history_memory_bytes(action_label: &str) -> Result<u64, SolverError> {
-    (size_of::<HistoryKey>() as u64)
-        .checked_add(size_of::<HistoryEntry>() as u64)
-        .and_then(|value| value.checked_add(HISTORY_OVERHEAD_BYTES))
-        .and_then(|value| value.checked_add(action_label.len() as u64))
-        .ok_or(SolverError::MemoryAccountingOverflow)
 }
 
 pub(super) fn regret_matching(regrets: &[f32]) -> Vec<f64> {
