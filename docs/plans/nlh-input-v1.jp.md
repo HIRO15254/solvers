@@ -3,7 +3,7 @@
 状態: **草案（2026-10-04）**。[再構築計画](two-product-restructure.jp.md)のM4〜M7で実装し、同時に
 `docs/nlh-input-v1.jp.md`へ移して規範とする。それまでは現行の`solvers.postflop/v1`・
 `solvers.multiway-preflop/v1`が現行コードの規範であり、本書の項目をparserやhelpへ先行して書かない。
-製品の目的と範囲は[製品定義](../products.jp.md)を参照する。末尾の第15節に利用者の確認を要する事項をまとめた。
+製品の目的と範囲は[製品定義](../products.jp.md)を参照する。草案で未決だった事項への利用者の決定は第15節にまとめた。
 
 ## 1. 原則
 
@@ -13,11 +13,12 @@
 - **製品はspotから決まる**（第3節）。利用者は製品名を書かない。`validate`が決定した製品を表示する。
 - **chip量の単位はBB。** big blindの額が1。内部は0.001 BBの整数で、それより細かい値はerror。
 - **strict。** 未知key、決定した製品に適用されないkey、旧形式のkeyはerrorとし、黙って無視・近似しない。
-- **正規化は冪等。** 既定値をすべて明示し、script本文をinline化し、lineを明示形に展開した実効configを
-  `run.toml`へ保存する。実効configを再び正規化すると同じbytesになる。
+- **lineとboardの表記は1通り**（第7節）。同じ行動列・盤面を別の綴りで書けない。
+  string enum、position名、line、boardは大小文字を区別する。
+- **正規化は冪等。** 既定値をすべて明示し、script本文をinline化した実効configを`run.toml`へ保存する。
+  実効configを再び正規化すると同じbytesになる。
 - **自己完結。** 外部file（tree script）は正規化で本文へ置き換える。cache pathやmachine固有の値は書かない。
 - config内の相対pathはconfig fileのdirectory基準。環境変数、`~`、include/extendsは展開しない。
-  string enumは大小文字を区別する（例外はlineの動作記号。第7節）。
 
 ## 2. 全体構造
 
@@ -25,7 +26,7 @@
 schema = "solvers.nlh/v1"   # 必須
 
 [meta]       # 任意。名前・説明・出所。計算と互換性判定に影響しない
-[table]      # 必須。人数・stack・blind/ante
+[table]      # 必須。人数・stack・blind/ante・straddle
 [economics]  # 任意。既定はcash・rakeなし
 [spot]       # 任意。既定はPreflop root
 [ranges]     # P2では任意（既定random）。P1では手に残る2人が必須
@@ -65,12 +66,13 @@ stack_bb = 100       # 必須（stacks_bbで全positionを指定する場合は�
 sb_bb = 0.5          # 既定0.5。0 < sb_bb <= 1
 ante_bb = 0          # 既定0。全員が払うante
 bb_ante_bb = 0       # 既定0。BBだけが払うdead ante。ante_bbとの同時指定（ともに正）はerror
+straddles_bb = []    # 既定[]。live straddleの額（下記「straddle」）
 
 [table.stacks_bb]    # 任意。positionごとの開始stack
 CO = 80
 ```
 
-position名と行動順は人数で決まる（BTNを基準に時計回り）。
+position名と行動順は人数で決まる（BTNを基準に時計回り）。表のPreflopの行動順はstraddleが無い場合。
 
 | players | position（Preflopの行動順） | Postflopの行動順 |
 |---:|---|---|
@@ -83,9 +85,25 @@ position名と行動順は人数で決まる（BTNを基準に時計回り）。
 | 8 | UTG, UTG1, LJ, HJ, CO, BTN, SB, BB | 同様 |
 | 9 | UTG, UTG1, UTG2, LJ, HJ, CO, BTN, SB, BB | 同様 |
 
-- forced betはante、BB ante、blindの順に払う。stackが足りなければその途中でall-inになる。
-- 最小のbetとmin-raiseの基準はBB（=1）。
-- straddle、任意positionのblind上書き、Preflopの最初の行動者の変更はv1に含めない（第15節）。
+- forced betはante、BB ante、blind、straddleの順に払う。ante・blindはstackが足りなければその途中でall-inになる。
+- 最小のbetとmin-raiseの基準はBB（=1）。straddleがある場合のPreflopは次項に従う。
+- seatごとのblind・anteの上書きはv1に含めない（第15節）。
+
+### straddle
+
+- `straddles_bb`の1番目は、Preflopで最初に行動する席（上表の先頭。3人卓ではBTN）が置くstraddle、
+  2番目以降はその次の席から時計回りに続くre-straddle。額は各席の到達額（BB）。
+- 各額は直前の強制bet（BB、または直前のstraddle）の2倍以上で、0.001 BB grid。置ける数は`players − 2`まで
+  （SB・BBの席には置けない）。`players = 2`では書けない。straddlerはanteとstraddleを払った後にstackが
+  残らなければならない。いずれも違反は`NLH003`。
+- すべてlive straddleとする。Preflopの行動は最後のstraddlerの次の席から始まり、最後のstraddlerが最後に
+  行動する（raiseが無ければcheckかraiseを選べる）。それ以外の席の相対順とPostflopの行動順は変わらない。
+- Preflopでは最後のstraddleをBBとして扱う。最小raiseの幅、size literal `3x`の基準額、limpの額は最後の
+  straddle額。straddleは`aggressions`・`raises`に数えない。Postflopの最小betはtableのBB（=1）のまま。
+- 例: 6maxで`straddles_bb = [2, 4]`ならUTGが2 BB、HJが4 BBを置き、Preflopの行動順はCO, BTN, SB, BB, UTG, HJ。
+  最小raiseは8 BBへのraise。line `BTN r10, HJ c`はCO・SB・BB・UTGがfoldし、HJがBTNの10 BBにcallした進行で、
+  開始potは23.5 BB。
+- 6maxのBTN straddleのように、Preflopで最初に行動する席以外から始まるstraddleはv1に含めない（第15節）。
 
 ## 6. `[economics]`
 
@@ -134,31 +152,46 @@ board = "Ks 7h 2d"        # P1で必須。P2では書けない
 
 ### line文法
 
-lineはforced bet投入後からspot開始までの行動列。`,`、`;`、空白のいずれかで区切り、各行動は`<position> <動作>`。
-動作記号は大小文字を区別しない（`BTN R2.5; BB C`は`BTN r2.5, BB c`と同じ）。positionは常に必須で、
-GTO Wizardのposition無し形式（`F-F-F-R2.5-F-C`）は受けない。
+lineはforced bet（ante・blind・straddle）投入後からspot開始までの行動列で、次の1通りの表記だけを受け付ける。
+空文字列はPreflop root。
 
-| 動作 | 意味 |
-|---|---|
-| `f`、`fold` | fold |
-| `x`、`check` | check |
-| `c`、`call` | call（stackが足りなければall-in call） |
-| `b<額>`、`bet <額>` | bet。額はそのstreetでのactorの到達額（BB） |
-| `r<額>`、`raise <額>` | raise。額はそのstreetでのactorの到達額（raise-to、BB） |
-| `a`、`allin` | all-in |
+```text
+line   = street *( " / " street )
+street = action *( ", " action )
+action = position " " move
+move   = "x" | "c" | "b" amount | "r" amount | "a"
+```
 
-- 額は0.001 BB grid。tableのforced betとNLHの規則（min-raise、stack上限）で合法でなければ`NLH004`。
+| 動作 | 意味 | 使う場面 |
+|---|---|---|
+| `x` | check | call額が0のとき |
+| `c` | call | call額が正のとき。stackが足りないall-in callも`c` |
+| `b<額>` | bet | Postflopで、そのstreetにまだ賭けが無いとき |
+| `r<額>` | raise | 賭けに直面しているとき。Preflopの最初のraise（open）も`r` |
+| `a` | all-in | stack全額でのbetまたはraise（min-raiseに届かないall-inを含む） |
+
+- 額はそのstreetでのactorの到達額（BB、raise-to）。0.001 BB gridの10進数を最短の形で書く
+  （`2.5`、`3`、`12.25`。`2.50`、`3.0`、`03`、`+3`は不可）。
+- positionは`[table]`の人数で決まる名前（大文字）で、常に書く。positionの無い形式（GTO Wizardの
+  `F-F-F-R2.5-F-C`）、単語形（`raise 2.5`）、大文字の動作記号、`;`区切り、余分な空白は受けない。
+- 1つの行動の書き方は1通り。stack全額になるbet/raiseを`b`/`r`で書く、call額以下のall-inを`a`で書く、
+  Preflopで`b`を書く、といった別表記は`NLH004`とし、正しい表記をerrorに示す。
+- **foldは書かない。** `f`を書くと`NLH004`。Preflopでは、名指したactorより前に行動すべきplayerはfoldした
+  とみなす。Preflopの終わり（最初の` / `、無ければlineの終わり）でまだ行動すべきplayerが残っていれば、
+  そのplayerもfoldしたとみなす。Postflopのfoldは手を終わらせるためlineに現れず、暗黙のfoldも無い。
+- streetの区切り` / `は、streetが閉じた位置に必ず書き、それ以外の位置とlineの終わりには書けない
+  （次のstreetはboardの枚数が示す）。Postflopのstreetがlineの終わりで閉じていなければ`NLH004`。
+- 行動と額は、tableのforced bet・straddleとNLHの規則（min-raise、stack上限）で合法でなければ`NLH004`。
   lineは`[tree]`のmenuとは照合しない（spot開始前の経緯であり、solveする木ではないため）。
-- `/`でstreetを区切れる（任意）。書いた場合はstreetの境界と一致しなければ`NLH004`。
-- **暗黙のfoldはPreflopだけ。** 名指したactorより前に行動すべきplayerはfoldしたとみなす。boardがあり、
-  lineの終わりでPreflopが閉じていなければ、残る行動者はfoldしたとみなす。Postflopの行動は
-  checkを含めて全て書く。
-- 例: 6maxの`BTN r2.5, BB c`は`UTG f, HJ f, CO f, BTN r2.5, SB f, BB c`と同じ。開始potは5.5 BB、
-  残stackは両者97.5 BB。`UTG r2.5, BTN c`＋Flop boardではSBとBBがfoldしたとみなし、UTG対BTNのspotになる。
-- 正規化後の`run.toml`には、暗黙のfoldを展開した明示形を保存する。
+- 例: 6maxの`BTN r2.5, BB c`はUTG・HJ・CO・SBがfoldした進行で、開始potは5.5 BB、残stackは両者97.5 BB。
+  `UTG r2.5, BTN c`＋Flop boardではSBとBBがfoldしたとみなし、UTG対BTNのspotになる。
+  Turn開始は`BTN r2.5, BB c / BB x, BTN b1.8, BB c`のように書く。
+- 表記が1通りのため、正規化はlineを書き換えない。`validate`は暗黙のfoldを含む全行動を表示する。
 
 ### board
 
+- `Ks 7h 2d`の形で書く。rankは大文字（`A K Q J T 9 8 7 6 5 4 3 2`）、suitは小文字（`s h d c`）、
+  cardの間は空白1つ。解析できない表記や重複cardは`NLH003`。
 - 3〜5枚。lineで閉じたstreetの次の枚数と一致しなければ`NLH004`（Preflopまで→3、Flopまで→4、Turnまで→5）。
 - spotはstreetの開始から始まる。street途中からの開始はv1に含めない。
 
@@ -195,7 +228,7 @@ include_allin = false           # 既定false。全nodeでall-inを候補に足�
 allin_threshold = 0.85          # 任意。解決した額が最大額のこの比率以上ならall-inへ併合
 preflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }  # 任意
 
-[tree.max_aggressive_actions]   # 既定 preflop 4、flop/turn/river 3（第15節）
+[tree.max_aggressive_actions]   # 既定 preflop 4、flop/turn/river 3
 preflop = 4
 flop = 3
 turn = 3
@@ -236,6 +269,8 @@ river = 3
 
 P2のpublic treeはboardに依存せずに全列挙するため、board述語を使えない。盤面述語は今後もsuit置換で
 値が変わらないものに限る（P1のsuit同型併合を壊さないため）。
+blindとstraddleは強制betであり、`aggressions`・`raises`に数えない。straddleがあるときのlimpは
+最後のstraddle額へのcallとする。
 
 ### size literal
 
@@ -267,7 +302,7 @@ storage = "f32"           # 既定f32。f32 | i16
 schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs-dcfr（各paramは旧[algorithm]と同じ）
 
 [solver.stop]
-target = "0.3%pot"        # 任意（第15節）。NashConv/2に対する停止目標
+target = "0.3%pot"        # 任意。既定なし。NashConv/2に対する停止目標
 max_iterations = 1000000  # 既定。安全予算であり収束を意味しない
 check_every = 25          # 既定。Exploitability計算と停止判定の間隔
 
@@ -279,8 +314,14 @@ min_children = 12
 `target`は単位付き文字列。cashでは`"0.3%pot"`（開始potに対する%）または`"0.05bb"`、
 tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconomicsが合わなければ`NLH003`。
 判定には`NashConv / 2`を使い、一般和の場合も同じ量で止めるが零和の収束保証は付けない。
+`target`を書かなければ`max_iterations`か`[run] max_time`に達するまで回し、`validate`は停止目標が
+無いことを警告する。Exploitabilityは`target`の有無によらず`check_every`ごとに計算して報告する。
 
 ### P2（Multiway Preflop）
+
+**暫定。** P2の計算方式と出力品質の保証は未決定で、網羅的な調査と実験で決める（[製品定義](../products.jp.md)D5）。
+本節は旧実装を移植した暫定方式の設定であり、方式を決めた時点で互換性を保たずに置き換えてよい。
+ゲームの記述（`[table]`〜`[tree]`）は方式に依存しないように定め、この置換の影響を受けない。
 
 ```toml
 [solver]
@@ -324,7 +365,9 @@ checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
 ```
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
-- `memory`: P2はpolicy arenaの上限（`auto`は6 GiB）。P1の扱いは第15節。どちらもprocess RSSの上限ではない。
+- `memory`: P1はsolve開始前に見積もる木とstorageの上限で、`auto`は物理メモリの80%。見積りが上限を
+  超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
+  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。
 - `max_time`、checkpointの判定は計算batchの境界で行う。
 
 ## 12. `[output]`
@@ -345,7 +388,7 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 | `NLH001` | schemaが無い・未知。旧family schemaには移行先（本形式）を案内する |
 | `NLH002` | TOMLの構文・型error、未知key、決定した製品に適用されないkey |
 | `NLH003` | 値が範囲外・grid外、range/board/script/size literalの解析error、P2でのboard述語 |
-| `NLH004` | lineの解析error、違法な行動、未知position、street境界やboard枚数との不一致 |
+| `NLH004` | lineの解析error（別表記、`f`の記述を含む）、違法な行動、未知position、street境界やboard枚数との不一致 |
 | `NLH005` | 対象外のspot（第3節） |
 
 memory超過等の資源errorはsolve時に検出し、終了code（CLI reference）で区別する。
@@ -440,13 +483,18 @@ max_time = "12h"
 
 旧schemaは`NLH001`で拒否する。旧configの自動変換コマンドは持たない（第15節）。
 
-## 15. 未決事項（利用者の確認待ち）
+## 15. 利用者の決定（2026-10-04）
 
-| # | 事項 | 草案の提案 |
+草案で未決だった事項を、利用者が次のとおり決めた。本文の各節はこの決定に従う。
+
+| # | 事項 | 決定 |
 |---|---|---|
-| Q1 | P1の既定停止目標 | 既定なし（`max_iterations`まで）。templateで`"0.3%pot"`を明示する |
-| Q2 | `max_aggressive_actions`の既定 | Preflop 4、Postflop各3（旧P2と同じ。旧P1の既定は各2で木が小さい） |
-| Q3 | line文法の綴り | `BTN r2.5, BB c`形式と単語形（`BTN raise 2.5`）を受ける。`;`区切りと大文字の動作記号も受け、参照候補表の`UTG F; HJ F; BTN R2.5; SB F; BB C`をそのまま貼れるようにする。positionの無いGTO Wizardの`F-F-F-R2.5-F-C`形式は受けない |
-| Q4 | straddle、blind上書き、Preflop途中からのP2開始 | v1では持たない。必要になった時点で追加する |
-| Q5 | 旧configの自動変換コマンド | 持たない（旧形式の利用者は自分だけで、例は移行時に書き換えるため） |
-| Q6 | P1の`memory = "auto"` | 上限なし（木とstorageの見積りを表示する）。明示値を超える見積りはsolve開始前にerror |
+| Q1 | P1の既定停止目標 | 既定なし。`target`を書かなければ`max_iterations`か`max_time`まで回す（第10節） |
+| Q2 | `max_aggressive_actions`の既定 | Preflop 4、Flop・Turn・River各3（第9節） |
+| Q3 | lineの表記 | `BTN r2.5, BB c`形式の1通りだけを受ける。foldは書かず、書けばerror。単語形、`;`区切り、大文字の動作記号、positionの無い形式は受けない（第7節） |
+| Q4 | v1に含める卓・spotの機能 | straddleを含める。Preflopで最初に行動する席から始まるlive straddleと、その後のre-straddleの連続を扱う（第5節）。それ以外の位置から始まるstraddle（BTN straddle等）、seatごとのblind・ante上書き、P2のPreflop途中からの開始はv1に含めない |
+| Q5 | 旧configの自動変換コマンド | 持たない。同梱の例と試験用configは移行時に書き換える |
+| Q6 | P1の`memory = "auto"` | 物理メモリの80%を上限とし、solve開始前の見積りが超えればerror。明示した値で上限を変えられる（第11節） |
+
+あわせて、P2の計算方式と出力品質の保証は調査と実験で決めることになった（製品定義D5）。第10節のP2の
+`[solver]`はそれまでの暫定設定である。

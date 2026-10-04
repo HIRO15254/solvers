@@ -1,6 +1,6 @@
 # 再構築計画: 共通Inputを共有する2製品への移行
 
-更新: **2026-10-04**。[製品定義](../products.jp.md)のD1〜D4を、実装・検証できる単位へ分解した実行計画である。
+更新: **2026-10-04**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
 作業状態は[Linear](../status.jp.md)、Input形式の詳細は[`solvers.nlh/v1`草案](nlh-input-v1.jp.md)に置く。
 作業branchは`restructure/two-products`、旧状態はgit tag `archive/pre-two-products-2026-10-04`（ローカル作成済み、
 remoteへのpushは未実施）。
@@ -33,7 +33,7 @@ crateは`crates/`直下に平置きし、名前の接頭辞で所有者を示す
 | `hu-engine` | HU vector CFR/BR、storage、discount schedule、chance-sampled driver | `engine` |
 | `hu-postflop` | P1: NLH HU postflop木・showdown kernel・payoff焼込み・`.sol`・checkpoint・照会。payoff pipelineを通す試験用toy game（Kuhn・Leduc） | `holdem`、`game::{payoff, toy}`、`formats::{sol, checkpoint}`、`cli`のpostflop計算部 |
 | `cfr-ref` | 凍結した独立oracle（test専用、変更しない） | `cfr-ref` |
-| `mw-preflop` | P2: External-Sampling MCCFR、public tree/arena、EHS²抽象化、checkpoint、`.mwsol`、停止評価 | `multiway`（研究経路を除く）、`abstraction::{buckets, ehs}`、`formats::mwsol`、`cli`のmultiway計算部 |
+| `mw-preflop` | P2: 暫定方式（External-Sampling MCCFR、public tree/arena、EHS²抽象化）、checkpoint、`.mwsol`、停止評価 | `multiway`（研究経路を除く）、`abstraction::{buckets, ehs}`、`formats::mwsol`、`cli`のmultiway計算部 |
 | `protocol` | daemonのwire型 | `protocol`（`formats`依存を`runfiles`へ） |
 | `daemon` | `solversd` | `daemon` |
 | `cli` | `solvers`: 共通Inputを読み製品へdispatch、run lifecycle、照会、derive | `cli`（config層を作り直し、run lifecycle等を移植） |
@@ -66,6 +66,9 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
    （旧`formats`がHU engineに依存していた問題を解消する）。
 5. **条件変数は共通語彙。** treeの条件式は両製品で同じ変数名を使う。P1ではlineから導出したPreflop変数を
    読め、P2ではboard述語をerrorにする（P2のpublic treeはboardに依存しないため）。
+6. **P2の方式は差し替えられるようにする。** P2の計算方式と品質保証はS4の調査と実験で決める（製品定義D5）。
+   S1では暫定方式を変えずに移植し、`spot`・`runfiles`・`cli`・daemonの共通の型に暫定方式固有の量
+   （sweep、bucket、trained deviatorのCI等）を持ち込まない。P2の`[solver]`設定と停止判定は`mw-preflop`が解釈する。
 
 ## 3. 移植・削除の対応表
 
@@ -95,6 +98,9 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
 | `protocol`、`daemon` | 移植 | 依存を`runfiles`へ。新Inputを受け付ける |
 | `codex/r1-hu-postflop`（未マージ） | 保留 | Linear SOL-14/15が未完了で、検証済みの部品ではない。S3で内容をレビューし、移植可否を判断する |
 
+削除する`multiway`の研究経路とsparse storageは、S4の方式調査で必要になればtagの旧実装を参照する。
+mainへ戻すかは、調査の計画を立てる時点で判断する。
+
 ## 4. 手順と完了条件
 
 | 手順 | 内容 | 完了条件 |
@@ -103,14 +109,15 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
 | **M1 設計文書** | 製品定義、本計画、Input草案。旧ロードマップ・計画・調査文書を削除し、入口文書を更新 | 文書のリンク検査（`tools/check_docs.py`）が通る。旧R0〜R7計画への導線が残らない |
 | **M2 対象外の削除** | 第3節の「削除」を実施。対応する規範・CLI reference・user guide・例・試験を同じ変更で更新 | 必須検証が通る。HU oracle差分試験とMultiwayの固定seed試験・GTO Wizard参照試験の結果が変わらない。研究featureと`research-*`のcfgが残らない |
 | **M3 構成変更** | (a) 移動・改名: `cards`+`hand-index`→`nlh`、`engine`→`hu-engine`、`holdem`+`game`+`formats::{sol, checkpoint}`→`hu-postflop`、`multiway`+`abstraction::{buckets, ehs}`+`formats::{mwsol, multiway}`→`mw-preflop`、`formats::{run, metrics, hash}`→`runfiles`。(b) 共通規則の抽出: `multiway::{betting, settlement, types}`を`multiway::config`から切り離して`nlh`へ、`multiway::{icm, rake_condition}`とconfigのrake部を`economics`へ移す | 計算結果を変えない（M2と同じ試験と基準出力が同じ）。旧family schemaは新crate上でそのまま動く。(a)の後に`formats`・`game`・`abstraction` crateが無く、protocol・daemonは`runfiles`だけに依存する。(b)の後に依存方向が第2節と一致する（`spot`はM4で加える） |
-| **M4 共通Input** | tree script（`nlh::script`）を`spot`へ移し、`spot`に`solvers.nlh/v1`のparse・正規化・line再生・製品の決定・検証・Spot IRを実装 | 草案の全key・error・正規化の冪等性・line再生（暗黙fold、min-raise、all-in、side pot、ante）の試験。CLIへはまだ接続しない |
+| **M4 共通Input** | tree script（`nlh::script`）を`spot`へ移し、`spot`に`solvers.nlh/v1`のparse・正規化・line再生・製品の決定・検証・Spot IRを実装。`nlh`のベッティング規則にstraddle（re-straddleを含む）を加える | 草案の全key・error・正規化の冪等性・lineの別表記の拒否・line再生（暗黙fold、min-raise、all-in、side pot、ante、straddle）の試験。straddleの無い卓では既存の規則と同じ結果。CLIへはまだ接続しない |
 | **M5 P1接続** | `hu-postflop`がSpot IRから木を組む（BB単位、tableから導出したpot/stack、手に残らない人を含むICM、lineから導出した条件変数、非対称stack）。CLIのsolve/resume/export/compare/report/inspectをP1で新Inputへ | 旧P1の代表config（`examples/postflop_*`、`river_small`、`turn_small`、`3betpot_fast`）を新Inputへ書き換え、戦略・EV・Exploitabilityが旧実装と数値許容内で一致。oracle差分試験が通る |
-| **M6 P2接続** | `mw-preflop`がSpot IRからtableと木を組む。CLIのsolve/resume/status/export/evaluateをP2で新Inputへ | 旧P2の例（`examples/preflop_multiway_v1_*`、`bench_multiway/*`）を新Inputへ書き換え、固定seedのsolve結果が旧実装と一致。GTO Wizard参照試験が通る |
+| **M6 P2接続** | `mw-preflop`がSpot IRからtableと木を組む（straddleを含む）。CLIのsolve/resume/status/export/evaluateをP2で新Inputへ | 旧P2の例（`examples/preflop_multiway_v1_*`、`bench_multiway/*`）を新Inputへ書き換え、固定seedのsolve結果が旧実装と一致。GTO Wizard参照試験が通る。straddleのある卓で行動順・min-raiseの基準・条件変数がInput草案第5節の規則どおりの木になる試験 |
 | **M7 旧familyの削除と規範の切替** | 旧parser・旧例・旧規範を削除し、`solvers.nlh/v1`を`docs/`直下の規範へ昇格。CLI reference、user guide、architecture、app-architectureを書き直す。daemon・protocol・CIを更新 | AGENTS.mdの同期対象が全て新Inputを指す。旧schema名は`NLH001`で移行先を案内して拒否。daemonのHTTP試験が通る |
 | **M8 derive** | P2の完了runとline・boardからP1のInputを生成するCLI | 生成したInputがP1で解ける。P2の木にないsize、3人以上が残るline、boardの衝突、table条件の不一致を明示errorにする試験 |
 
 M1〜M8はこの順に依存する。M4はM3と並行して設計できるが、統合はM3の後に行う。
 S3〜S5（[製品定義](../products.jp.md)第6節）はM7の完了後に、Linearの別課題として進める。
+S4の調査のうちコードに依存しない部分は、M2〜M8と並行してよい。
 
 ## 5. 文書と実験証拠の扱い
 
