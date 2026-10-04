@@ -24,40 +24,6 @@ use crate::types::{MAX_SEATS, MIN_SEATS, Street};
 pub use crate::tree::DenseNodeContext;
 
 mod averaging;
-#[cfg(feature = "research-average-sampling")]
-mod research_diagnostics;
-#[cfg(feature = "research-average-sampling")]
-pub use research_diagnostics::{
-    AverageSamplingDiagnosticsConfig, AverageSamplingDiagnosticsResult,
-    AverageSamplingWithDiagnostics, ResearchPolicySupport, ResearchPolicySupportRow,
-};
-mod conditioned;
-mod endpoint_deviation;
-mod preflop_census;
-mod preflop_deviation;
-mod preflop_proposal;
-pub use preflop_census::{PreflopSupportCensus, PreflopSupportNode};
-pub use preflop_deviation::{
-    PreflopDeviationConfig, PreflopDeviationEvaluation, PreflopDeviationFitMode,
-    PreflopDeviationHeldOut,
-};
-#[cfg(any(test, feature = "research-regret-sampling"))]
-mod regret_sampling;
-pub use conditioned::{
-    ConditionalPrefixEvaluation, ConditionalProfileEvaluation, ConditionalStreetCoverage,
-    WeightedEstimate,
-};
-pub use endpoint_deviation::{
-    CounterfactualEndpointDeviationEvaluation, EndpointDeviationConfig,
-    EndpointDeviationEvaluation, EndpointDeviationFit, EndpointDeviationHeldOut,
-    EndpointDeviationRow, EndpointDeviationSampling,
-};
-pub use preflop_proposal::{
-    PreflopConditionalPrefixEvaluation, PreflopConditionalProfileEvaluation,
-    PreflopProposalMetadata,
-};
-#[cfg(feature = "research-regret-sampling")]
-pub use regret_sampling::RaisedPreflopResearchWork;
 mod drift;
 mod errors;
 mod eval;
@@ -67,12 +33,6 @@ mod workers;
 
 #[cfg(test)]
 mod dense_merge_tests;
-#[cfg(test)]
-mod preflop_deviation_tests;
-#[cfg(test)]
-mod preflop_support_tests;
-#[cfg(test)]
-mod raised_opponent_tests;
 #[cfg(test)]
 mod tests;
 
@@ -224,23 +184,6 @@ pub trait ExternalSamplingGame: Send + Sync {
     /// Active opponents excludes `actor` and is part of the information set.
     fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo;
 
-    /// Private information used only to train and replay a deviation policy.
-    ///
-    /// The default delegates directly to [`Self::bucket`], preserving the
-    /// historical deviator path exactly. Production games may override this
-    /// with a common, finer reference abstraction so policies trained against
-    /// different candidate abstractions are compared on the same information
-    /// partition. Main-solver policy lookup must continue to use
-    /// [`Self::bucket`].
-    fn deviation_bucket(
-        &self,
-        state: &Self::State,
-        world: &SampledWorld,
-        actor: usize,
-    ) -> PrivateInfo {
-        self.bucket(state, world, actor)
-    }
-
     /// Writes one finite utility per seat at a terminal state.
     fn terminal_utilities(&self, state: &Self::State, world: &SampledWorld, utilities: &mut [f64]);
 
@@ -264,15 +207,6 @@ pub trait ExternalSamplingGame: Send + Sync {
     /// [`RecallMode::Street`] can rely on the default.
     fn recall_mode(&self) -> RecallMode {
         RecallMode::Full
-    }
-
-    /// Recall semantics for [`Self::deviation_bucket`].
-    ///
-    /// The default delegates to [`Self::recall_mode`] so games without an
-    /// evaluation-only reference abstraction retain bit-identical deviator
-    /// keys.
-    fn deviation_recall_mode(&self) -> RecallMode {
-        self.recall_mode()
     }
 
     /// Bucket cardinality for `(street, active_opponents)`: the same count
@@ -818,31 +752,8 @@ pub struct ProfileEvaluation {
     pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
 }
 
-/// Ordinary profile evaluation with optional baseline-only branch diagnostics.
-/// The nested evaluation is identical to evaluating without the prefixes.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PrefixProfileEvaluation {
-    pub evaluation: ProfileEvaluation,
-    pub prefixes: Vec<PrefixPolicyCoverage>,
-}
-
-/// Counts on sampled baseline trajectories at and below one public history.
-/// Nested prefixes overlap; their counts must not be added as disjoint strata.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct PrefixPolicyCoverage {
-    pub history: HistoryKey,
-    /// Number of baseline trajectories that reached this exact history.
-    pub reached_samples: u64,
-    /// Trajectories with at least one decision on each street after reaching
-    /// the prefix. An all-in runout has no later decisions and is not counted.
-    pub trajectory_visits_by_street: StreetVisitCounts,
-    /// Decisions at/below the prefix, indexed by acting seat. Zero visits
-    /// mean unmeasured coverage, not a measured zero-quality policy.
-    pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
-}
-
 /// Reach-weighted coverage of the candidate profile on unmodified held-out
-/// baseline trajectories, for both ordinary and reference-deviator evaluation.
+/// baseline trajectories.
 ///
 /// Each sampled decision is attributed to the acting seat. A stored strategy
 /// means the candidate solver had a policy column for that concrete
@@ -1079,146 +990,15 @@ impl CandidatePolicyCoverage {
     }
 }
 
-/// Visit-weighted coverage of one reference-keyed deviator during held-out
-/// replay.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ReferenceDeviationCoverage {
-    /// Number of decisions taken by the deviating seat.
-    pub decision_visits: u64,
-    /// Decisions for which a valid trained action existed at the reference
-    /// information key.
-    pub trained_action_visits: u64,
-    /// Decisions that replayed the candidate baseline strategy because the
-    /// reference key was absent (or its stored action was no longer legal).
-    pub baseline_fallback_visits: u64,
-    /// Deviating-seat decisions attributed to the public street. This sums
-    /// to [`Self::decision_visits`].
-    #[serde(default)]
-    pub decision_visits_by_street: StreetVisitCounts,
-    /// Trained reference actions used by street. This sums to
-    /// [`Self::trained_action_visits`].
-    #[serde(default)]
-    pub trained_action_visits_by_street: StreetVisitCounts,
-    /// Candidate-baseline fallbacks by street. This sums to
-    /// [`Self::baseline_fallback_visits`].
-    #[serde(default)]
-    pub baseline_fallback_visits_by_street: StreetVisitCounts,
-}
-
-impl ReferenceDeviationCoverage {
-    pub fn trained_action_fraction(self) -> f64 {
-        if self.decision_visits == 0 {
-            0.0
-        } else {
-            self.trained_action_visits as f64 / self.decision_visits as f64
-        }
-    }
-
-    fn record(&mut self, street: u8, trained: bool) -> Result<(), SolverError> {
-        self.decision_visits = self
-            .decision_visits
-            .checked_add(1)
-            .ok_or(SolverError::CounterOverflow)?;
-        self.decision_visits_by_street.checked_increment(street)?;
-        if trained {
-            self.trained_action_visits = self
-                .trained_action_visits
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
-            self.trained_action_visits_by_street
-                .checked_increment(street)?;
-        } else {
-            self.baseline_fallback_visits = self
-                .baseline_fallback_visits
-                .checked_add(1)
-                .ok_or(SolverError::CounterOverflow)?;
-            self.baseline_fallback_visits_by_street
-                .checked_increment(street)?;
-        }
-        Ok(())
-    }
-
-    fn checked_add_assign(&mut self, other: Self) -> Result<(), SolverError> {
-        self.decision_visits = self
-            .decision_visits
-            .checked_add(other.decision_visits)
-            .ok_or(SolverError::CounterOverflow)?;
-        self.trained_action_visits = self
-            .trained_action_visits
-            .checked_add(other.trained_action_visits)
-            .ok_or(SolverError::CounterOverflow)?;
-        self.baseline_fallback_visits = self
-            .baseline_fallback_visits
-            .checked_add(other.baseline_fallback_visits)
-            .ok_or(SolverError::CounterOverflow)?;
-        self.decision_visits_by_street
-            .checked_add_assign(other.decision_visits_by_street)?;
-        self.trained_action_visits_by_street
-            .checked_add_assign(other.trained_action_visits_by_street)?;
-        self.baseline_fallback_visits_by_street
-            .checked_add_assign(other.baseline_fallback_visits_by_street)?;
-        Ok(())
-    }
-}
-
-/// Per-physical-world raw values retained for paired comparisons between
-/// candidate abstractions.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ReferenceDeviationWorld {
-    pub sample_id: u64,
-    /// Utility vector from replaying the candidate's unmodified profile.
-    pub baseline_utilities: Vec<f64>,
-    /// `deviating_seat_utilities[i]` is seat `i`'s utility when only that seat
-    /// replays its reference-keyed trained deviator.
-    pub deviating_seat_utilities: Vec<f64>,
-    /// Paired difference
-    /// `deviating_seat_utilities[i] - baseline_utilities[i]`.
-    pub gains: Vec<f64>,
-}
-
-/// Held-out evaluation that considers only the common-reference trained
-/// deviator (plus the no-deviation fallback), never the candidate-specific
-/// regret-greedy heuristic used by [`MultiwaySolver::evaluate_profile`].
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ReferenceDeviationEvaluation {
-    pub evaluation: ProfileEvaluation,
-    /// Candidate-policy coverage measured only on the unmodified baseline
-    /// replay, indexed by acting seat. Retained for JSON compatibility;
-    /// identical to `evaluation.candidate_policy_coverage` in new reports.
-    pub candidate_policy_coverage: Vec<CandidatePolicyCoverage>,
-    pub coverage: Vec<ReferenceDeviationCoverage>,
-    pub worlds: Vec<ReferenceDeviationWorld>,
-}
-
 /// A fixed per-seat deviation policy trained by [`MultiwaySolver::train_deviator`]:
 /// for each information set it visited during training, the single action index
 /// it deviates to. Infosets it never visited fall back to the caller's usual
-/// deviation behavior. A policy trained with the default candidate keys is
-/// compatible with [`MultiwaySolver::evaluate_profile`]; one trained with an
-/// overridden [`ExternalSamplingGame::deviation_bucket`] must be replayed by
-/// [`MultiwaySolver::evaluate_reference_deviators`].
+/// deviation behavior. A policy trained by [`MultiwaySolver::train_deviator`]
+/// is replayed by [`MultiwaySolver::evaluate_profile`].
 #[derive(Clone, Debug, PartialEq)]
 pub struct DeviatorPolicy {
     pub seat: usize,
     pub actions: FxHashMap<InfoKey, u16>,
-}
-
-/// Training-time coverage of the reference information partition.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DeviatorTrainingCoverage {
-    pub traversals: u64,
-    pub visited_infosets: u64,
-    pub retained_infosets: u64,
-    pub total_visits: u64,
-    pub retained_visits: u64,
-}
-
-/// A trained policy together with reference-partition visit counts. The
-/// original [`MultiwaySolver::train_deviator`] API returns only `policy`.
-#[derive(Clone, Debug, PartialEq)]
-pub struct DeviatorTrainingResult {
-    pub policy: DeviatorPolicy,
-    pub coverage: DeviatorTrainingCoverage,
 }
 
 /// Which profile [`MultiwaySolver::evaluate_profile`] replays / a deviator
@@ -1241,97 +1021,6 @@ pub struct ProfileVariant {
     /// of independently normalized per-seat average-policy columns exposed
     /// here.
     pub use_current_strategy: bool,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum AverageSamplingResearchVariant {
-    UniformOne,
-    EnumerateFirstOpponent,
-    /// Fixed full-support postflop check/call proposal; Street recall only.
-    PostflopContinuation,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct AverageSamplingResearchConfig {
-    pub variant: AverageSamplingResearchVariant,
-    pub sweeps: u64,
-    pub threads: usize,
-    pub histories: Vec<HistoryKey>,
-    /// Zero disables evaluation. Positive values must be at least two.
-    pub evaluation_samples: u64,
-    pub evaluation_seeds: Vec<u64>,
-    /// Zero disables additional baseline-only coverage. Positive values must
-    /// be at least two and require ordinary evaluation seeds and prefixes.
-    #[serde(default)]
-    pub coverage_samples: u64,
-    /// Known public histories, validated before any sweep is started.
-    #[serde(default)]
-    pub coverage_prefixes: Vec<HistoryKey>,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum AverageSamplingResearchRowStatus {
-    AverageObserved,
-    ZeroAverageMassOmitted,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct AverageSamplingResearchStrategyRow {
-    pub key: InfoKey,
-    pub status: AverageSamplingResearchRowStatus,
-    /// Present only when the independent average pass accumulated positive
-    /// finite mass. A touched zero-mass column's current-regret fallback is
-    /// deliberately omitted from this average-sampling result.
-    pub actions: Option<Vec<ActionProbability>>,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct AverageSamplingResearchHistory {
-    pub history: HistoryKey,
-    pub strategies: Vec<AverageSamplingResearchStrategyRow>,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct AverageSamplingResearchEvaluation {
-    pub seed: u64,
-    pub result: ProfileEvaluation,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct AverageSamplingResearchCoverageEvaluation {
-    pub seed: u64,
-    pub result: PrefixProfileEvaluation,
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[derive(Clone, Debug, PartialEq, Serialize)]
-pub struct AverageSamplingResearchResult {
-    pub variant: AverageSamplingResearchVariant,
-    pub threads: usize,
-    /// Sweep-driver wall time only, excluding result materialization,
-    /// fingerprinting and both evaluation passes. Not deterministic.
-    pub solve_elapsed_secs: f64,
-    pub metrics: SolverMetrics,
-    /// BLAKE3 over state version, game/config/abstraction identity, progress
-    /// counters, and the exact raw regret arena (dense) or every canonical
-    /// nonzero key/labels/regret column (sparse). Average-only events cannot
-    /// affect it. A runner must additionally match its immutable source and
-    /// executable hashes before treating two values as an A/B invariant.
-    pub current_regret_fingerprint: String,
-    /// Normalized strategies only. Raw mass differs by proposal and is
-    /// deliberately unavailable from this consuming API.
-    pub histories: Vec<AverageSamplingResearchHistory>,
-    pub evaluations: Vec<AverageSamplingResearchEvaluation>,
-    pub coverage_evaluations: Vec<AverageSamplingResearchCoverageEvaluation>,
 }
 
 /// Sparse external-sampling MCCFR state.  A policy column exists only after
@@ -1925,53 +1614,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &mut self,
         sweeps: u64,
         threads: usize,
-        should_continue: F,
-        after_batch: O,
-    ) -> Result<u64, SolverError>
-    where
-        F: FnMut() -> bool,
-        O: FnMut(&Self),
-    {
-        self.run_sweeps_with_threads_until_observed_sampling(
-            sweeps,
-            threads,
-            should_continue,
-            after_batch,
-            AverageOpponentSampling::UniformOne,
-        )
-    }
-
-    fn run_sweeps_with_threads_until_observed_sampling<F, O>(
-        &mut self,
-        sweeps: u64,
-        threads: usize,
-        should_continue: F,
-        after_batch: O,
-        average_sampling: AverageOpponentSampling,
-    ) -> Result<u64, SolverError>
-    where
-        F: FnMut() -> bool,
-        O: FnMut(&Self),
-    {
-        self.run_sweeps_with_sampling::<false, _, _>(
-            sweeps,
-            threads,
-            should_continue,
-            after_batch,
-            average_sampling,
-            &[],
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn run_sweeps_with_sampling<const ENUMERATE_RAISED: bool, F, O>(
-        &mut self,
-        sweeps: u64,
-        threads: usize,
         mut should_continue: F,
         mut after_batch: O,
-        average_sampling: AverageOpponentSampling,
-        raised_preflop_nodes: &[bool],
     ) -> Result<u64, SolverError>
     where
         F: FnMut() -> bool,
@@ -2024,13 +1668,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                             .and_then(|value| value.checked_add(1))
                             .ok_or(SolverError::CounterOverflow)?
                             as f64;
-                        self.generate_traversal_delta_with_sampling::<ENUMERATE_RAISED>(
-                            sample_id,
-                            traverser,
-                            linear_weight,
-                            average_sampling,
-                            raised_preflop_nodes,
-                        )
+                        self.generate_traversal_delta(sample_id, traverser, linear_weight)
                     })
                     .collect::<Vec<_>>()
             });
@@ -2065,45 +1703,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
     /// `self.completed_sweeps` here, so every traversal in a batch can use
     /// its own sweep's weight even though they all read the same policy
     /// snapshot.
-    #[cfg(test)]
     fn generate_traversal_delta(
         &self,
         sample_id: u64,
         traverser: usize,
         linear_weight: f64,
-    ) -> Result<AnyTraversalDelta, SolverError> {
-        self.generate_traversal_delta_with_average_sampling(
-            sample_id,
-            traverser,
-            linear_weight,
-            AverageOpponentSampling::UniformOne,
-        )
-    }
-
-    #[cfg(test)]
-    fn generate_traversal_delta_with_average_sampling(
-        &self,
-        sample_id: u64,
-        traverser: usize,
-        linear_weight: f64,
-        average_sampling: AverageOpponentSampling,
-    ) -> Result<AnyTraversalDelta, SolverError> {
-        self.generate_traversal_delta_with_sampling::<false>(
-            sample_id,
-            traverser,
-            linear_weight,
-            average_sampling,
-            &[],
-        )
-    }
-
-    fn generate_traversal_delta_with_sampling<const ENUMERATE_RAISED: bool>(
-        &self,
-        sample_id: u64,
-        traverser: usize,
-        linear_weight: f64,
-        average_sampling: AverageOpponentSampling,
-        raised_preflop_nodes: &[bool],
     ) -> Result<AnyTraversalDelta, SolverError> {
         let mut deal_rng = traversal_deal_rng(self.config.seed, sample_id, traverser);
         let sample = self.sampler.sample_counted(&mut deal_rng)?;
@@ -2173,11 +1777,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     holes[traverser] = combo;
                     let combo_world = SampledWorld::new(holes, *sample.world.runout())?;
                     let mut combo_rng = average_base_rng.clone();
-                    let mut average = SparseAverageStrategyWorker::with_sampling(
-                        self,
-                        linear_weight,
-                        average_sampling,
-                    );
+                    let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
                     average.traverse(
                         self.game.root_state(),
                         &combo_world,
@@ -2204,11 +1804,7 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                 )?;
                 let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average = SparseAverageStrategyWorker::with_sampling(
-                    self,
-                    linear_weight,
-                    average_sampling,
-                );
+                let mut average = SparseAverageStrategyWorker::new(self, linear_weight);
                 average.traverse(
                     self.game.root_state(),
                     &sample.world,
@@ -2241,9 +1837,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                             self.config,
                             regret_combos,
                             weights,
-                        )?
-                        .with_raised_preflop_nodes(raised_preflop_nodes);
-                        worker.traverse_with_sampling::<ENUMERATE_RAISED>(
+                        )?;
+                        worker.traverse(
                             self.game.root_state(),
                             0,
                             &sample.world,
@@ -2256,12 +1851,11 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                         Ok(worker.finish(sample_id, traverser, u64::from(sample.attempts)))
                     },
                     || -> Result<Vec<DenseEvent>, SolverError> {
-                        let mut average = DenseAverageStrategyWorker::with_sampling(
+                        let mut average = DenseAverageStrategyWorker::new(
                             &self.game,
                             dense,
                             self.config,
                             linear_weight,
-                            average_sampling,
                         );
                         average.traverse_vector(
                             self.game.root_state(),
@@ -2297,13 +1891,8 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                     0,
                 )?;
                 let mut delta = worker.finish(sample_id, traverser, u64::from(sample.attempts));
-                let mut average = DenseAverageStrategyWorker::with_sampling(
-                    &self.game,
-                    dense,
-                    self.config,
-                    linear_weight,
-                    average_sampling,
-                );
+                let mut average =
+                    DenseAverageStrategyWorker::new(&self.game, dense, self.config, linear_weight);
                 average.traverse_scalar(
                     self.game.root_state(),
                     0,
@@ -2317,250 +1906,6 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
                 Ok(AnyTraversalDelta::Dense(delta))
             }
         }
-    }
-
-    /// Runs a fresh solver under one average-policy sampling proposal and
-    /// consumes it, returning only normalized/read-only research output.
-    ///
-    /// This feature-gated API intentionally cannot return a solver or a
-    /// serializable [`SolverState`]. The experimental raw `strategy_sum`
-    /// scaling therefore cannot be written into an ordinary checkpoint or
-    /// solution under the production algorithm identity.
-    #[cfg(feature = "research-average-sampling")]
-    pub fn run_average_sampling_research(
-        mut self,
-        config: AverageSamplingResearchConfig,
-    ) -> Result<AverageSamplingResearchResult, SolverError> {
-        self.run_average_sampling_research_inner(config)
-    }
-
-    #[cfg(feature = "research-average-sampling")]
-    fn run_average_sampling_research_inner(
-        &mut self,
-        config: AverageSamplingResearchConfig,
-    ) -> Result<AverageSamplingResearchResult, SolverError> {
-        if config.variant == AverageSamplingResearchVariant::PostflopContinuation
-            && (self.game.recall_mode() != RecallMode::Street || self.dense.is_none())
-        {
-            return Err(SolverError::InvalidState(
-                "postflop continuation research requires preallocated current-street storage",
-            ));
-        }
-        if self.completed_sweeps != 0 || self.traversals != 0 || self.next_sample_id != 0 {
-            return Err(SolverError::InvalidState(
-                "average-sampling research requires a fresh solver",
-            ));
-        }
-        if config.sweeps == 0 {
-            return Err(SolverError::InvalidState(
-                "average-sampling research requires at least one sweep",
-            ));
-        }
-        match (
-            config.evaluation_samples,
-            config.evaluation_seeds.is_empty(),
-        ) {
-            (0, true) => {}
-            (0, false) => {
-                return Err(SolverError::InvalidState(
-                    "evaluation seeds require at least two evaluation samples",
-                ));
-            }
-            (1, _) => {
-                return Err(SolverError::InvalidState(
-                    "average-sampling research evaluation requires at least two samples",
-                ));
-            }
-            (_, true) => {
-                return Err(SolverError::InvalidState(
-                    "evaluation samples require at least one evaluation seed",
-                ));
-            }
-            (_, false) => {}
-        }
-        match (config.coverage_samples, config.coverage_prefixes.is_empty()) {
-            (0, true) => {}
-            (0, false) => {
-                return Err(SolverError::InvalidState(
-                    "coverage prefixes require at least two coverage samples",
-                ));
-            }
-            (1, _) => {
-                return Err(SolverError::InvalidState(
-                    "average-sampling research coverage requires at least two samples",
-                ));
-            }
-            (_, true) => {
-                return Err(SolverError::InvalidState(
-                    "coverage samples require at least one coverage prefix",
-                ));
-            }
-            (_, false) => {
-                if config.evaluation_samples == 0 {
-                    return Err(SolverError::InvalidState(
-                        "average-sampling research coverage requires ordinary evaluation",
-                    ));
-                }
-            }
-        }
-        self.validate_evaluation_prefixes(&config.coverage_prefixes)?;
-        let internal_variant = match config.variant {
-            AverageSamplingResearchVariant::UniformOne => AverageOpponentSampling::UniformOne,
-            AverageSamplingResearchVariant::EnumerateFirstOpponent => {
-                AverageOpponentSampling::EnumerateFirst
-            }
-            AverageSamplingResearchVariant::PostflopContinuation => {
-                AverageOpponentSampling::PostflopContinuation
-            }
-        };
-        let solve_started = std::time::Instant::now();
-        self.run_sweeps_with_threads_until_observed_sampling(
-            config.sweeps,
-            config.threads,
-            || true,
-            |_| {},
-            internal_variant,
-        )?;
-        let solve_elapsed_secs = solve_started.elapsed().as_secs_f64();
-
-        let histories = config
-            .histories
-            .iter()
-            .copied()
-            .map(|history| {
-                let strategies = self
-                    .strategies_at_with_mass(history)
-                    .into_iter()
-                    .map(|(key, labels, probabilities, mass)| {
-                        if !mass.is_finite() || mass < 0.0 {
-                            return Err(SolverError::NumericOverflow);
-                        }
-                        let (status, actions) = if mass > 0.0 {
-                            (
-                                AverageSamplingResearchRowStatus::AverageObserved,
-                                Some(
-                                    labels
-                                        .into_iter()
-                                        .zip(probabilities)
-                                        .map(|(action, probability)| ActionProbability {
-                                            action,
-                                            probability,
-                                        })
-                                        .collect(),
-                                ),
-                            )
-                        } else {
-                            (
-                                AverageSamplingResearchRowStatus::ZeroAverageMassOmitted,
-                                None,
-                            )
-                        };
-                        Ok(AverageSamplingResearchStrategyRow {
-                            key,
-                            status,
-                            actions,
-                        })
-                    })
-                    .collect::<Result<Vec<_>, SolverError>>()?;
-                Ok(AverageSamplingResearchHistory {
-                    history,
-                    strategies,
-                })
-            })
-            .collect::<Result<Vec<_>, SolverError>>()?;
-        let mut evaluations = Vec::with_capacity(config.evaluation_seeds.len());
-        for &seed in &config.evaluation_seeds {
-            evaluations.push(AverageSamplingResearchEvaluation {
-                seed,
-                result: self.evaluate_profile_with_threads(
-                    config.evaluation_samples,
-                    seed,
-                    None,
-                    ProfileVariant::default(),
-                    config.threads,
-                )?,
-            });
-        }
-        let mut coverage_evaluations = Vec::new();
-        if config.coverage_samples > 0 {
-            coverage_evaluations.reserve(config.evaluation_seeds.len());
-            for &seed in &config.evaluation_seeds {
-                coverage_evaluations.push(AverageSamplingResearchCoverageEvaluation {
-                    seed,
-                    result: self.evaluate_profile_coverage(
-                        config.coverage_samples,
-                        seed,
-                        ProfileVariant::default(),
-                        config.threads,
-                        &config.coverage_prefixes,
-                    )?,
-                });
-            }
-        }
-        Ok(AverageSamplingResearchResult {
-            variant: config.variant,
-            threads: config.threads,
-            solve_elapsed_secs,
-            metrics: self.metrics(),
-            current_regret_fingerprint: self.research_regret_fingerprint(),
-            histories,
-            evaluations,
-            coverage_evaluations,
-        })
-    }
-
-    #[cfg(feature = "research-average-sampling")]
-    fn research_regret_fingerprint(&self) -> String {
-        let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.research-regrets.v2");
-        hasher.update(&SOLVER_STATE_VERSION.to_le_bytes());
-        hasher.update(&self.configuration_fingerprint());
-        hasher.update(&self.abstraction_fingerprint());
-        for counter in [
-            self.completed_sweeps,
-            self.traversals,
-            self.next_sample_id,
-            self.total_deal_attempts,
-            self.terminal_evaluations,
-            self.hand_updates,
-        ] {
-            hasher.update(&counter.to_le_bytes());
-        }
-        match &self.dense {
-            Some(dense) => {
-                hasher.update(b"dense");
-                hasher.update(&(dense.arena.regrets.len() as u64).to_le_bytes());
-                for &regret in &dense.arena.regrets {
-                    hasher.update(&regret.to_bits().to_le_bytes());
-                }
-            }
-            None => {
-                hasher.update(b"sparse");
-                let mut entries = self
-                    .policies
-                    .iter()
-                    .filter(|(_, column)| column.regrets.iter().any(|&regret| regret != 0.0))
-                    .collect::<Vec<_>>();
-                entries.sort_unstable_by_key(|(key, _)| **key);
-                for (key, column) in entries {
-                    hasher.update(&key.history.0);
-                    hasher.update(&[key.player, key.street, key.active_opponents]);
-                    for bucket in key.bucket_path {
-                        hasher.update(&bucket.to_le_bytes());
-                    }
-                    hasher.update(&(column.action_labels.len() as u64).to_le_bytes());
-                    for label in &column.action_labels {
-                        hasher.update(&(label.len() as u64).to_le_bytes());
-                        hasher.update(label.as_bytes());
-                    }
-                    hasher.update(&(column.regrets.len() as u64).to_le_bytes());
-                    for &regret in &column.regrets {
-                        hasher.update(&regret.to_bits().to_le_bytes());
-                    }
-                }
-            }
-        }
-        hasher.finalize().to_hex().to_string()
     }
 
     /// Replays a complete sweep into scratch columns first. This makes the

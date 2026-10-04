@@ -280,7 +280,7 @@ GUI 全機能の完成を HU 検証や通常の教師生成の前提にしない
 ## 9. 研究経路と test 基盤の扱い
 
 Multiway production は current-street recall / dense arena を使い、full-recall の公開入力は拒否する。
-一方で sparse storage は toy test と研究 feature に用途が残る。削除は単純な不要ファイル整理ではなく、
+一方で sparse storage は toy test に用途が残る。削除は単純な不要ファイル整理ではなく、
 独立 test の移植と研究利用の確認を伴う。現在の feature と entry point は
 [Multiway 実装 map](multiway-preflop-v1.md) と各 crate の `Cargo.toml` を参照する。
 

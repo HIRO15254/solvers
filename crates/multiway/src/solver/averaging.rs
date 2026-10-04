@@ -7,47 +7,6 @@ use rustc_hash::FxHashMap;
 use super::workers::{DenseEvent, DenseStorage, TraversalEvent};
 use super::*;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) enum AverageOpponentSampling {
-    UniformOne,
-    EnumerateFirst,
-    PostflopContinuation,
-}
-
-fn is_continuation(label: &str) -> bool {
-    label == "check" || label.starts_with("call:")
-}
-
-/// Card-independent public proposal. A fair mixture of two exact integer
-/// uniform draws avoids a rounded categorical CDF: q(a)=1/(2|A|)+1[a in C]/(2|C|).
-/// It is a fixed scalar for each exact history, so it cancels only when the
-/// expected accumulated average vector is normalized, not as a claim that a
-/// finite-sample normalized ratio is unbiased. No inverse-q update is added.
-fn postflop_continuation_action(
-    street: Street,
-    labels: &[String],
-    rng: &mut impl Rng,
-) -> Result<usize, SolverError> {
-    if labels.is_empty() {
-        return Err(SolverError::InvalidActionLabels(
-            "empty average proposal menu",
-        ));
-    }
-    validate_action_labels(labels)?;
-    let continuations = labels.iter().filter(|label| is_continuation(label)).count();
-    if street == Street::Preflop || continuations == 0 || !rng.gen_bool(0.5) {
-        return Ok(rng.gen_range(0..labels.len()));
-    }
-    let chosen = rng.gen_range(0..continuations);
-    Ok(labels
-        .iter()
-        .enumerate()
-        .filter(|(_, label)| is_continuation(label))
-        .nth(chosen)
-        .expect("chosen continuation is in range")
-        .0)
-}
-
 /// Independent average-policy traversal for sparse, full-recall storage.
 ///
 /// At `averager` nodes every action is followed and `own_reach` is multiplied
@@ -66,20 +25,10 @@ pub(super) struct SparseAverageStrategyWorker<'a, G: ExternalSamplingGame> {
     events: Vec<TraversalEvent>,
     local_policies: FxHashMap<InfoKey, Vec<String>>,
     local_histories: FxHashMap<HistoryKey, HistoryEntry>,
-    opponent_sampling: AverageOpponentSampling,
 }
 
 impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
-    #[cfg(test)]
     pub(super) fn new(solver: &'a MultiwaySolver<G>, linear_weight: f64) -> Self {
-        Self::with_sampling(solver, linear_weight, AverageOpponentSampling::UniformOne)
-    }
-
-    pub(super) fn with_sampling(
-        solver: &'a MultiwaySolver<G>,
-        linear_weight: f64,
-        opponent_sampling: AverageOpponentSampling,
-    ) -> Self {
         Self {
             game: &solver.game,
             policies: &solver.policies,
@@ -89,7 +38,6 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
             events: Vec::new(),
             local_policies: FxHashMap::default(),
             local_histories: FxHashMap::default(),
-            opponent_sampling,
         }
     }
 
@@ -197,28 +145,6 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
         rng: &mut ChaCha20Rng,
         depth: u32,
     ) -> Result<(), SolverError> {
-        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation {
-            return Err(SolverError::InvalidState(
-                "continuation averaging requires Street recall",
-            ));
-        }
-        self.traverse_inner(
-            state, world, averager, history, own_reach, rng, depth, false,
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn traverse_inner(
-        &mut self,
-        state: G::State,
-        world: &SampledWorld,
-        averager: usize,
-        history: HistoryKey,
-        own_reach: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-        first_opponent_seen: bool,
-    ) -> Result<(), SolverError> {
         if depth > self.max_depth {
             return Err(SolverError::DepthLimit {
                 limit: self.max_depth,
@@ -268,7 +194,7 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
                 self.game.write_action_label(&actions, action, &mut label);
                 let child_history = self.record_history(history, actor, action, &label)?;
                 let next = self.game.next_state_with(&state, &actions, action);
-                self.traverse_inner(
+                self.traverse(
                     next,
                     world,
                     averager,
@@ -276,40 +202,8 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
                     child_reach,
                     rng,
                     depth + 1,
-                    first_opponent_seen,
                 )?;
             }
-        } else if self.opponent_sampling == AverageOpponentSampling::EnumerateFirst
-            && !first_opponent_seen
-        {
-            // Consume the draw used by UniformOne, then give every child the
-            // same post-draw stream. The child selected by the discarded draw
-            // is therefore paired exactly with the baseline walk.
-            let discarded_action = rng.gen_range(0..num_actions);
-            let child_base_rng = rng.clone();
-            let mut selected_final_rng = None;
-            let mut label = String::new();
-            for action in 0..num_actions {
-                label.clear();
-                self.game.write_action_label(&actions, action, &mut label);
-                let child_history = self.record_history(history, actor, action, &label)?;
-                let next = self.game.next_state_with(&state, &actions, action);
-                let mut child_rng = child_base_rng.clone();
-                self.traverse_inner(
-                    next,
-                    world,
-                    averager,
-                    child_history,
-                    own_reach,
-                    &mut child_rng,
-                    depth + 1,
-                    true,
-                )?;
-                if action == discarded_action {
-                    selected_final_rng = Some(child_rng);
-                }
-            }
-            *rng = selected_final_rng.expect("discarded action is in the legal action range");
         } else {
             // Uniform public-action sampling is deliberately independent of
             // this opponent's policy, so zero-probability actions retain full
@@ -319,7 +213,7 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
             self.game.write_action_label(&actions, action, &mut label);
             let child_history = self.record_history(history, actor, action, &label)?;
             let next = self.game.next_state_with(&state, &actions, action);
-            self.traverse_inner(
+            self.traverse(
                 next,
                 world,
                 averager,
@@ -327,7 +221,6 @@ impl<'a, G: ExternalSamplingGame> SparseAverageStrategyWorker<'a, G> {
                 own_reach,
                 rng,
                 depth + 1,
-                first_opponent_seen,
             )?;
         }
         Ok(())
@@ -348,32 +241,14 @@ pub(super) struct DenseAverageStrategyWorker<'a, G: ExternalSamplingGame> {
     /// street start)`. Counterfactual branches can reach the same street with
     /// different player counts, so street alone is not a valid cache key.
     bucket_cache: FxHashMap<(usize, u8), Arc<[BucketId]>>,
-    opponent_sampling: AverageOpponentSampling,
 }
 
 impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
-    #[cfg(test)]
     pub(super) fn new(
         game: &'a G,
         dense: &'a DenseStorage,
         config: SolverConfig,
         linear_weight: f64,
-    ) -> Self {
-        Self::with_sampling(
-            game,
-            dense,
-            config,
-            linear_weight,
-            AverageOpponentSampling::UniformOne,
-        )
-    }
-
-    pub(super) fn with_sampling(
-        game: &'a G,
-        dense: &'a DenseStorage,
-        config: SolverConfig,
-        linear_weight: f64,
-        opponent_sampling: AverageOpponentSampling,
     ) -> Self {
         Self {
             game,
@@ -383,7 +258,6 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
             linear_weight,
             events: Vec::new(),
             bucket_cache: FxHashMap::default(),
-            opponent_sampling,
         }
     }
 
@@ -415,36 +289,6 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         Ok(node)
     }
 
-    fn continuation_action(
-        &self,
-        state: &G::State,
-        node: &tree::TreeNode,
-        actions: &G::Actions,
-        rng: &mut ChaCha20Rng,
-    ) -> Result<usize, SolverError> {
-        let context = self.game.dense_node_context(state);
-        if context.street != node.street
-            || context.active_opponents != node.active_opponents
-            || context.bucket_active_opponents != node.bucket_active_opponents
-        {
-            return Err(SolverError::InvalidState(
-                "average proposal public context differs from dense tree",
-            ));
-        }
-        let mut label = String::new();
-        for (action, expected) in node.action_labels.iter().enumerate() {
-            label.clear();
-            self.game.write_action_label(actions, action, &mut label);
-            if label != *expected {
-                return Err(SolverError::InvalidActionLabels(
-                    "average proposal public menu differs from dense tree",
-                ));
-            }
-        }
-        // Neither the world nor any private bucket/strategy enters this path.
-        postflop_continuation_action(node.street, &node.action_labels, rng)
-    }
-
     #[allow(clippy::too_many_arguments)]
     pub(super) fn traverse_scalar(
         &mut self,
@@ -455,30 +299,6 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         own_reach: f64,
         rng: &mut ChaCha20Rng,
         depth: u32,
-    ) -> Result<(), SolverError> {
-        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
-            && self.game.recall_mode() != RecallMode::Street
-        {
-            return Err(SolverError::InvalidState(
-                "continuation averaging requires Street recall",
-            ));
-        }
-        self.traverse_scalar_inner(
-            state, node_id, world, averager, own_reach, rng, depth, false,
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn traverse_scalar_inner(
-        &mut self,
-        state: G::State,
-        node_id: NodeId,
-        world: &SampledWorld,
-        averager: usize,
-        own_reach: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-        first_opponent_seen: bool,
     ) -> Result<(), SolverError> {
         if depth > self.max_depth {
             return Err(SolverError::DepthLimit {
@@ -522,70 +342,15 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
                     return Err(SolverError::NumericOverflow);
                 }
                 let next = self.game.next_state_with(&state, &actions, action);
-                self.traverse_scalar_inner(
-                    next,
-                    child_id,
-                    world,
-                    averager,
-                    child_reach,
-                    rng,
-                    depth + 1,
-                    first_opponent_seen,
-                )?;
+                self.traverse_scalar(next, child_id, world, averager, child_reach, rng, depth + 1)?;
             }
-        } else if self.opponent_sampling == AverageOpponentSampling::EnumerateFirst
-            && !first_opponent_seen
-        {
-            let discarded_action = rng.gen_range(0..num_actions);
-            let child_base_rng = rng.clone();
-            let mut selected_final_rng =
-                if matches!(node.children[discarded_action], Child::Terminal) {
-                    Some(child_base_rng.clone())
-                } else {
-                    None
-                };
-            for (action, child) in node.children.iter().copied().enumerate() {
-                let Child::Decision(child_id) = child else {
-                    continue;
-                };
-                let next = self.game.next_state_with(&state, &actions, action);
-                let mut child_rng = child_base_rng.clone();
-                self.traverse_scalar_inner(
-                    next,
-                    child_id,
-                    world,
-                    averager,
-                    own_reach,
-                    &mut child_rng,
-                    depth + 1,
-                    true,
-                )?;
-                if action == discarded_action {
-                    selected_final_rng = Some(child_rng);
-                }
-            }
-            *rng = selected_final_rng.expect("discarded action has a known dense child");
         } else {
-            let action = if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
-            {
-                self.continuation_action(&state, node, &actions, rng)?
-            } else {
-                rng.gen_range(0..num_actions)
-            };
+            let action = rng.gen_range(0..num_actions);
             let Child::Decision(child_id) = node.children[action] else {
                 return Ok(());
             };
             let next = self.game.next_state_with(&state, &actions, action);
-            self.traverse_scalar_inner(
-                next,
-                child_id,
-                world,
-                averager,
-                own_reach,
-                rng,
-                depth + 1,
-                first_opponent_seen,
-            )?;
+            self.traverse_scalar(next, child_id, world, averager, own_reach, rng, depth + 1)?;
         }
         Ok(())
     }
@@ -602,32 +367,6 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
         own_reach: &[f64],
         rng: &mut ChaCha20Rng,
         depth: u32,
-    ) -> Result<(), SolverError> {
-        if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
-            && self.game.recall_mode() != RecallMode::Street
-        {
-            return Err(SolverError::InvalidState(
-                "continuation averaging requires Street recall",
-            ));
-        }
-        self.traverse_vector_inner(
-            state, node_id, world, averager, combos, weights, own_reach, rng, depth, false,
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn traverse_vector_inner(
-        &mut self,
-        state: G::State,
-        node_id: NodeId,
-        world: &SampledWorld,
-        averager: usize,
-        combos: &[usize],
-        weights: &[f64],
-        own_reach: &[f64],
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-        first_opponent_seen: bool,
     ) -> Result<(), SolverError> {
         if depth > self.max_depth {
             return Err(SolverError::DepthLimit {
@@ -707,7 +446,7 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
                     continue;
                 }
                 let next = self.game.next_state_with(&state, &actions, action);
-                self.traverse_vector_inner(
+                self.traverse_vector(
                     next,
                     child_id,
                     world,
@@ -717,55 +456,15 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
                     &child_reach,
                     rng,
                     depth + 1,
-                    first_opponent_seen,
                 )?;
             }
-        } else if self.opponent_sampling == AverageOpponentSampling::EnumerateFirst
-            && !first_opponent_seen
-        {
-            let discarded_action = rng.gen_range(0..num_actions);
-            let child_base_rng = rng.clone();
-            let mut selected_final_rng =
-                if matches!(node.children[discarded_action], Child::Terminal) {
-                    Some(child_base_rng.clone())
-                } else {
-                    None
-                };
-            for (action, child) in node.children.iter().copied().enumerate() {
-                let Child::Decision(child_id) = child else {
-                    continue;
-                };
-                let next = self.game.next_state_with(&state, &actions, action);
-                let mut child_rng = child_base_rng.clone();
-                self.traverse_vector_inner(
-                    next,
-                    child_id,
-                    world,
-                    averager,
-                    combos,
-                    weights,
-                    own_reach,
-                    &mut child_rng,
-                    depth + 1,
-                    true,
-                )?;
-                if action == discarded_action {
-                    selected_final_rng = Some(child_rng);
-                }
-            }
-            *rng = selected_final_rng.expect("discarded action has a known dense child");
         } else {
-            let action = if self.opponent_sampling == AverageOpponentSampling::PostflopContinuation
-            {
-                self.continuation_action(&state, node, &actions, rng)?
-            } else {
-                rng.gen_range(0..num_actions)
-            };
+            let action = rng.gen_range(0..num_actions);
             let Child::Decision(child_id) = node.children[action] else {
                 return Ok(());
             };
             let next = self.game.next_state_with(&state, &actions, action);
-            self.traverse_vector_inner(
+            self.traverse_vector(
                 next,
                 child_id,
                 world,
@@ -775,13 +474,8 @@ impl<'a, G: ExternalSamplingGame> DenseAverageStrategyWorker<'a, G> {
                 own_reach,
                 rng,
                 depth + 1,
-                first_opponent_seen,
             )?;
         }
         Ok(())
     }
 }
-
-#[cfg(test)]
-#[path = "averaging_continuation_tests.rs"]
-mod continuation_tests;

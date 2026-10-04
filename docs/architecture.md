@@ -241,7 +241,6 @@ client の終了や再接続と計算を分離する。config の検証・正規
 
 ## 10. Multiway Production経路
 
-通常学習と、同じ state を読む診断 API、feature-gated 研究 sampling を以下で分ける。
 production の公開入力は [Multiway 規範](multiway-preflop-v1.jp.md)、実装との対応は
 [実装 map](multiway-preflop-v1.md)を参照する。
 
@@ -266,91 +265,7 @@ cooperative cancelの判定単位は引き続きbatch境界である。
 進捗表示はcompleted sweep/traversal/hand-update counterをO(1)で読む。正式な
 profile EVとtrained deviationは設定された停止判定境界だけで評価する。
 
-### 10.2 通常学習を変更しない条件付き診断
-
-研究用の条件付きbranch監査は `solver/conditioned.rs` に分離する。held-out worldで
-公開prefixを強制しbaseline経路確率で重み付けするが、通常の評価・停止判定へは
-混ぜない。共通のprofile replayがstrategy sourceと行動確率を決め、対局単位の
-分子/分母共分散をsample-id順に集計する。sample結果bufferは約8MiBに制限する。
-Holdem専用 `solver/preflop_proposal.rs` はpreflopのown-combo factorizationを利用し、
-補正付きrange proposalを構築する。学習用samplerは変更せず、評価の強制preflop
-確率を二重に掛けない。異なるtrunkは別の配札予算としてCLIでgroup化する。
-checkpoint監査exampleのfresh固定sweep modeは既存のproduction driverを呼んで凍結評価する。
-raw support出力はbucket計算用に記録されたstreet人数と現在のInfoKey人数を分け、未保存列・ゼロregret・
-非正regret・正regret・平均質量を記録する。zero-weight更新もtouchedを立て得るため、
-保存済み列数を数値regret更新や収束の代用指標にしない。
-Holdemの現在streetの人数記録は行動ごとに更新されるため、開始時に固定した人数ではない。
-
-`solver/endpoint_deviation.rs` の研究評価は、独立fit worldでown InfoKey別の行動を
-選んで固定し、別seedのheld-out worldで指定preflop/postflop endpointの最初の判断だけを変更する。
-rootは空prefix、preflop途中の判断はその直前までの部分prefixをproposal化する。
-postflopでは従来どおり完全preflop trunkを使い、その後の強制行動だけを追加で重み付けする。
-既存のbaseline-only条件付きproposal APIのpostflop限定は維持する。
-後続の本人判断もbaselineに戻す。補正proposalとprefix重みはbaselineから固定し、
-candidate行動確率を重みに掛けない。未採用keyはbaselineのまま分母へ含め、符号付き
-条件付き利得・delta誤差と採用keyの重みcoverageを分ける。sample順の有界集計と
-全bucket出力により、追加計算量と未評価領域を確認できる。通常学習・停止評価には混ぜない。
-ほぼ一定の利得とproposal重みで共分散の差が負に丸められる場合は、固定anchorで
-中心化した残差momentから同じdelta分散を再計算する。従来正常な有限計算経路は
-維持し、非有限のsecond momentや再計算後の不正分散は明示拒否する。
-
-Preflop専用counterfactual endpoint APIは同じfit/replay集計器を使い、別proposal preparationで
-endpoint actorのprefix factorだけを1に置換する。全1326 comboの169-class mappingを各public
-contextで検証し、元の本人factorはclass別metadataに保存する。CF correctionを初期weightとし、
-強制Preflop pathの再重み付けを全てskipするため、本人到達確率0でもsuffixを評価できる。
-既存actual-prefix APIの演算順・乱数・出力は維持する。新wrapperの全weight/fit/gainは
-明示したopponents-prefix targetに属し、学習weightや絶対root reachではない。
-checkpoint監査exampleは最大8個の一意なendpointを同じ復元solverで逐次診断し、繰り返しの
-session構築を避ける。各fit/held-outは独立であり、複数逸脱を合成しない。1個の場合は既存の
-単数JSON field、複数ならtarget別の配列fieldを使い、未使用fieldは省略する。
-`both` はPreflop限定で同じendpointの両targetを別々に実行し、それぞれに全budgetを適用する。
-
-`solver/preflop_deviation.rs` は別のread-only API `evaluate_preflop_deviation` を提供する。
-scope `all-preflop-decisions-with-frozen-postflop` は、各seatの複数Preflop判断を変更する
-独立fit tableを使い、Postflopと未採用keyを指定variantのcandidate baselineへ固定する。
-`eval.rs` のconst true経路だけがこのscopeを選び、candidate private streetで可否を判定し、
-reference keyはPreflopのfit/replayだけに使う。const falseの旧診断は通常budgetの演算/RNGを保つ。
-両fit経路のvisit mapはchecked u64で、8 visits以上を採用し、overflowは明示errorにする。
-正のfit traversalsをseatごとに実行し、held-outは2 samples以上、1〜64個の一意なseedを
-fit seedから分離する。各seatは単独逸脱であり、fit tableを共同戦略に合成しない。
-held-outは最大4096件のusize indexed Rayon結果をsample-id順にWelford集計する。
-全worldを分母として負値も残すpaired gain、seat別CI、fit/replay coverage、baselineだけの
-strategy sourceを返し、O(samples)のworld保持を避ける。fit tableは訪問key数に応じて増える。
-`fitPolicyFingerprint` はsorted fit actionsのみを識別し、baselineのidentityとは分離する。
-監査exampleの明示的な4つの `--preflop-deviation-*` flagからoptional `preflopDeviation` に
-出力する。省略時は無効で、通常の評価/停止・学習default・checkpoint/solution形式は変えない。
-seat別CIを全seat/seedの同時保証やfull BR・multiway equilibriumの保証には拡張しない。
-
-同APIの `_with_fit_mode` variantは研究fit方式を選択し、`fitMode` に既定の
-`local-regret-matching` または `retention-gated` を記録する。retention gateは本人Preflop
-keyの8回目からlocal RMを有効にし、それまではcandidate-keyのbaseline期待値を返す。
-全本人actionを列挙してregret更新するためzero-own-reachでも深い子を探索する。期待値は
-replay samplerのf32累積区間・最終action残余に合わせる。最終tableの純粋argmaxや有限fitの
-誤差は残る。監査exampleの追加任意flag `--preflop-deviation-retention-gate` で選択する。
-
-### 10.3 support 診断と研究用 sampling
-
-`solver/preflop_census.rs` はカードを参照せず公開stateを辿り、materialized Preflop判断の
-全件性とmenuを検証する。arena sliceを借用し、未使用列を含むraw f32 bits/touchedをhash化し、
-nodeごとの数値supportとactor・レイズ回数・人数等だけを保持する。全state snapshotは不要であり、
-数値supportを訪問数や品質と扱わない。研究flag `research-regret-sampling` の
-`run_raised_preflop_research` はfresh dense vector・ε0・pruning無効に限定し、公開eligibilityを
-事前計算して各pathの最初のレイズ後opponent判断を列挙する。子へα×σ、戻り値へσを使い、
-virtual sampled childのRNGを継承する。通常driverはconst falseで従来順を維持し、
-平均walkとproductionの保存identityは変更しない。研究方式のcheckpoint/resumeは未対応である。
-
-平均walkの研究候補 `PostflopContinuation` はStreet recall限定で、公開された
-postflop menuの全行動一様とcheck/call一様を50/50で混合する。preflop/C-emptyは一様。
-カード非依存のhistory別proposal係数は期待累積平均の正規化で相殺されるが、
-有限標本の比率推定誤差は残る。独立regret passとRNGは変えず、fresh専用とする。
-`solver/research_diagnostics.rs` のconsuming Holdem APIは、同じ学習済みstateを内部に
-保持してsupport・endpoint・root評価を実施した後に破棄する。malformed requestは
-学習前に拒否し、raw regretと正規化平均は診断へ出すがraw平均massやsolver handleは
-返さない。productionのalgorithm identityや保存形式をこの研究候補で変更しない。
-
-
-
-### 10.4 checkpoint と strategy drift のメモリ境界
+### 10.2 checkpoint と strategy drift のメモリ境界
 
 Multiway checkpointの読込みは、検証済みchunkから所有型のstateを逐次復元する。
 全展開payloadを別のRAM bufferへ保持しない。stagingは圧縮chunk、展開chunk、

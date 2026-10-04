@@ -14,9 +14,6 @@ enum ToyState {
 #[derive(Clone, Copy)]
 struct DominatedChoice;
 
-#[derive(Clone, Copy)]
-struct CoarseCandidateReferenceChoice;
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum FourStreetState {
     Decision(u8),
@@ -467,95 +464,6 @@ impl ExternalSamplingGame for DominatedChoice {
     }
 }
 
-impl ExternalSamplingGame for CoarseCandidateReferenceChoice {
-    type State = ToyState;
-    type Actions = ToyState;
-
-    fn num_players(&self) -> usize {
-        2
-    }
-
-    fn root_state(&self) -> Self::State {
-        ToyState::Choose
-    }
-
-    fn actor(&self, state: &Self::State) -> Option<usize> {
-        matches!(state, ToyState::Choose).then_some(0)
-    }
-
-    fn node_actions(&self, state: &Self::State) -> Self::Actions {
-        *state
-    }
-
-    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
-        usize::from(matches!(actions, ToyState::Choose)) * 2
-    }
-
-    fn next_state_with(
-        &self,
-        _state: &Self::State,
-        actions: &Self::Actions,
-        action_index: usize,
-    ) -> Self::State {
-        assert_eq!(*actions, ToyState::Choose);
-        ToyState::Terminal(action_index)
-    }
-
-    fn write_action_label(&self, _actions: &Self::Actions, action_index: usize, out: &mut String) {
-        out.push_str(match action_index {
-            0 => "best",
-            1 => "dominated",
-            _ => panic!("action out of range"),
-        });
-    }
-
-    /// Deliberately coarse candidate abstraction: all deals share one key.
-    fn bucket(&self, _state: &Self::State, _world: &SampledWorld, _actor: usize) -> PrivateInfo {
-        PrivateInfo::from_path(
-            Street::Preflop,
-            1,
-            BucketPath {
-                preflop: 0,
-                flop: 0,
-                turn: 0,
-                river: 0,
-            },
-        )
-    }
-
-    /// Common reference abstraction separates the sampled deals.
-    fn deviation_bucket(
-        &self,
-        _state: &Self::State,
-        world: &SampledWorld,
-        actor: usize,
-    ) -> PrivateInfo {
-        PrivateInfo::from_path(
-            Street::Preflop,
-            1,
-            BucketPath {
-                preflop: (world.hole_combo(actor) % 2) as u32,
-                flop: 0,
-                turn: 0,
-                river: 0,
-            },
-        )
-    }
-
-    fn terminal_utilities(
-        &self,
-        state: &Self::State,
-        _world: &SampledWorld,
-        utilities: &mut [f64],
-    ) {
-        let ToyState::Terminal(action) = *state else {
-            panic!("not terminal")
-        };
-        utilities[0] = if action == 0 { 1.0 } else { -1.0 };
-        utilities[1] = -utilities[0];
-    }
-}
-
 fn solver(seed: u64, memory: u64) -> MultiwaySolver<DominatedChoice> {
     solver_with_batch(seed, memory, 1)
 }
@@ -572,27 +480,6 @@ fn solver_with_batch(seed: u64, memory: u64, sweep_batch: u64) -> MultiwaySolver
             discount_every: 5,
             discount_until: 100,
             sweep_batch,
-            traverser_vector: false,
-            prune: false,
-            prune_threshold: DEFAULT_PRUNE_THRESHOLD,
-            prune_skip_probability: DEFAULT_PRUNE_SKIP_PROBABILITY,
-        },
-    )
-    .unwrap()
-}
-
-fn reference_choice_solver(seed: u64) -> MultiwaySolver<CoarseCandidateReferenceChoice> {
-    MultiwaySolver::new(
-        CoarseCandidateReferenceChoice,
-        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
-        SolverConfig {
-            seed,
-            max_memory_bytes: 1 << 20,
-            max_traversal_depth: 16,
-            exploration_epsilon: DEFAULT_EXPLORATION_EPSILON,
-            discount_every: 5,
-            discount_until: 100,
-            sweep_batch: 1,
             traverser_vector: false,
             prune: false,
             prune_threshold: DEFAULT_PRUNE_THRESHOLD,
@@ -770,12 +657,11 @@ fn train_deviator_is_deterministic() {
     let first = solver
         .train_deviator(0, 300, 555, ProfileVariant::default())
         .unwrap();
-    let reported = solver
-        .train_deviator_with_report(0, 300, 555, ProfileVariant::default())
+    let second = solver
+        .train_deviator(0, 300, 555, ProfileVariant::default())
         .unwrap();
-    assert_eq!(first, reported.policy);
+    assert_eq!(first, second);
     assert_eq!(first.seat, 0);
-    assert_eq!(reported.coverage.traversals, 300);
     assert_eq!(solver.snapshot_state(), before);
     // A different seat/seed/traversal count must not accidentally
     // collide with the same trained policy.
@@ -786,176 +672,11 @@ fn train_deviator_is_deterministic() {
 }
 
 #[test]
-fn deviator_training_uses_reference_keys_over_a_coarse_candidate() {
-    let solver = reference_choice_solver(71);
-    let trained = solver
-        .train_deviator_with_report(0, 256, 991, ProfileVariant::default())
-        .unwrap();
-    let mut buckets = trained
-        .policy
-        .actions
-        .keys()
-        .map(|key| key.bucket_path[0])
-        .collect::<Vec<_>>();
-    buckets.sort_unstable();
-    buckets.dedup();
-    assert_eq!(buckets, vec![0, 1]);
-    assert_eq!(trained.coverage.visited_infosets, 2);
-    assert_eq!(trained.coverage.retained_infosets, 2);
-    assert_eq!(trained.coverage.total_visits, 256);
-    assert_eq!(trained.coverage.retained_visits, 256);
-}
-
-#[test]
-fn reference_evaluation_falls_back_to_candidate_baseline_not_greedy() {
-    let mut solver = reference_choice_solver(81);
-    solver.run_sweeps(1).unwrap();
-    let candidate = solver
-        .policies
-        .get_mut(&root_key())
-        .expect("one sweep creates the candidate root policy");
-    // Candidate baseline is pure action 1, while candidate regret-greedy is
-    // pure action 0. This makes the required fallback distinction exact.
-    candidate.strategy_sum = vec![0.0, 1.0];
-    candidate.regrets = vec![1.0, 0.0];
-    let deviators = vec![
-        DeviatorPolicy {
-            seat: 0,
-            actions: FxHashMap::default(),
-        },
-        DeviatorPolicy {
-            seat: 1,
-            actions: FxHashMap::default(),
-        },
-    ];
-
-    let legacy = solver
-        .evaluate_profile(32, 1234, Some(&deviators), ProfileVariant::default())
-        .unwrap();
+fn candidate_coverage_reports_uniform_fallback_without_stored_policies() {
+    let solver = solver(810, 1 << 20);
+    let evaluation = solver.evaluate_average_profile(16, 9876).unwrap();
     assert_eq!(
-        legacy.deviation_gain_lower_bound.as_ref().unwrap()[0].mean,
-        2.0
-    );
-
-    let reference = solver
-        .evaluate_reference_deviators(32, 1234, &deviators, ProfileVariant::default())
-        .unwrap();
-    assert_eq!(reference.evaluation.seats[0].mean, -1.0);
-    assert_eq!(
-        reference.candidate_policy_coverage[0],
-        CandidatePolicyCoverage {
-            decision_visits: 32,
-            stored_strategy_visits: 32,
-            uniform_fallback_visits: 0,
-            decision_visits_by_street: StreetVisitCounts {
-                preflop: 32,
-                ..StreetVisitCounts::default()
-            },
-            stored_strategy_visits_by_street: StreetVisitCounts {
-                preflop: 32,
-                ..StreetVisitCounts::default()
-            },
-            uniform_fallback_visits_by_street: StreetVisitCounts::default(),
-            average_strategy_visits: 32,
-            average_strategy_visits_by_street: StreetVisitCounts {
-                preflop: 32,
-                ..StreetVisitCounts::default()
-            },
-            ..CandidatePolicyCoverage::default()
-        }
-    );
-    assert_eq!(
-        reference.candidate_policy_coverage[0].stored_strategy_fraction(),
-        1.0
-    );
-    assert_eq!(
-        reference
-            .evaluation
-            .deviation_gain_lower_bound
-            .as_ref()
-            .unwrap()[0]
-            .mean,
-        0.0
-    );
-    assert_eq!(
-        reference.coverage[0],
-        ReferenceDeviationCoverage {
-            decision_visits: 32,
-            trained_action_visits: 0,
-            baseline_fallback_visits: 32,
-            decision_visits_by_street: StreetVisitCounts {
-                preflop: 32,
-                ..StreetVisitCounts::default()
-            },
-            trained_action_visits_by_street: StreetVisitCounts::default(),
-            baseline_fallback_visits_by_street: StreetVisitCounts {
-                preflop: 32,
-                ..StreetVisitCounts::default()
-            },
-        }
-    );
-    assert_eq!(reference.coverage[0].trained_action_fraction(), 0.0);
-    assert!(
-        reference
-            .worlds
-            .iter()
-            .all(|world| world.gains == vec![0.0, 0.0])
-    );
-}
-
-#[test]
-fn reference_evaluation_empty_policies_are_exactly_paired_with_baseline() {
-    let mut solver = prefix_solver(83);
-    solver.run_sweeps(3).unwrap();
-    let deviators = vec![
-        DeviatorPolicy {
-            seat: 0,
-            actions: FxHashMap::default(),
-        },
-        DeviatorPolicy {
-            seat: 1,
-            actions: FxHashMap::default(),
-        },
-    ];
-
-    let result = solver
-        .evaluate_reference_deviators(128, 4321, &deviators, ProfileVariant::default())
-        .unwrap();
-
-    for world in &result.worlds {
-        assert_eq!(world.deviating_seat_utilities, world.baseline_utilities);
-        assert_eq!(world.gains, vec![0.0; 2]);
-    }
-    for gain in result
-        .evaluation
-        .deviation_gain_lower_bound
-        .as_ref()
-        .unwrap()
-    {
-        assert_eq!(gain.mean, 0.0);
-        assert_eq!(gain.stderr, 0.0);
-        assert_eq!(gain.ci95, [0.0, 0.0]);
-    }
-}
-
-#[test]
-fn reference_evaluation_reports_candidate_uniform_fallback_coverage() {
-    let solver = reference_choice_solver(810);
-    let deviators = vec![
-        DeviatorPolicy {
-            seat: 0,
-            actions: FxHashMap::default(),
-        },
-        DeviatorPolicy {
-            seat: 1,
-            actions: FxHashMap::default(),
-        },
-    ];
-    let reference = solver
-        .evaluate_reference_deviators(16, 9876, &deviators, ProfileVariant::default())
-        .unwrap();
-    assert_eq!(
-        reference.candidate_policy_coverage[0],
+        evaluation.candidate_policy_coverage[0],
         CandidatePolicyCoverage {
             decision_visits: 16,
             stored_strategy_visits: 0,
@@ -973,73 +694,29 @@ fn reference_evaluation_reports_candidate_uniform_fallback_coverage() {
         }
     );
     assert_eq!(
-        reference.candidate_policy_coverage[0].stored_strategy_fraction(),
+        evaluation.candidate_policy_coverage[0].stored_strategy_fraction(),
         0.0
     );
 }
 
 #[test]
-fn reference_evaluation_looks_up_trained_actions_by_reference_key() {
-    let mut solver = reference_choice_solver(82);
-    solver.run_sweeps(1).unwrap();
-    let candidate = solver
-        .policies
-        .get_mut(&root_key())
-        .expect("one sweep creates the candidate root policy");
-    candidate.strategy_sum = vec![0.0, 1.0];
-    candidate.regrets = vec![1.0, 0.0];
-
-    let mut reference_one = root_key();
-    reference_one.bucket_path[0] = 1;
-    let deviators = vec![
-        DeviatorPolicy {
-            seat: 0,
-            actions: FxHashMap::from_iter([(reference_one, 0)]),
-        },
-        DeviatorPolicy {
-            seat: 1,
-            actions: FxHashMap::default(),
-        },
-    ];
-    let reference = solver
-        .evaluate_reference_deviators(64, 4321, &deviators, ProfileVariant::default())
-        .unwrap();
-    let coverage = reference.coverage[0];
-    assert_eq!(coverage.decision_visits, 64);
-    assert!(coverage.trained_action_visits > 0);
-    assert!(coverage.baseline_fallback_visits > 0);
-    assert_eq!(
-        coverage.trained_action_visits + coverage.baseline_fallback_visits,
-        coverage.decision_visits
-    );
-    assert_eq!(
-        reference
-            .worlds
-            .iter()
-            .filter(|world| world.gains[0] == 2.0)
-            .count() as u64,
-        coverage.trained_action_visits
-    );
-}
-
-#[test]
-fn reference_evaluation_attributes_coverage_to_each_street() {
+fn candidate_coverage_attributes_visits_to_each_street() {
     let solver = four_street_solver(83);
     let hero = solver
-        .train_deviator_with_report(0, 8, 7654, ProfileVariant::default())
+        .train_deviator(0, 8, 7654, ProfileVariant::default())
         .unwrap();
     let opponent = solver
-        .train_deviator_with_report(1, 8, 7655, ProfileVariant::default())
+        .train_deviator(1, 8, 7655, ProfileVariant::default())
         .unwrap();
-    assert_eq!(hero.policy.actions.len(), Street::ALL.len());
-    assert!(opponent.policy.actions.is_empty());
+    assert_eq!(hero.actions.len(), Street::ALL.len());
+    assert!(opponent.actions.is_empty());
 
     let samples = 5;
-    let reference = solver
-        .evaluate_reference_deviators(
+    let evaluation = solver
+        .evaluate_profile(
             samples,
             4322,
-            &[hero.policy, opponent.policy],
+            Some(&[hero, opponent]),
             ProfileVariant::default(),
         )
         .unwrap();
@@ -1050,7 +727,7 @@ fn reference_evaluation_attributes_coverage_to_each_street() {
         river: samples,
     };
 
-    let candidate = reference.candidate_policy_coverage[0];
+    let candidate = evaluation.candidate_policy_coverage[0];
     assert_eq!(candidate.decision_visits, 4 * samples);
     assert_eq!(candidate.uniform_fallback_visits, 4 * samples);
     assert_eq!(candidate.stored_strategy_visits, 0);
@@ -1076,53 +753,20 @@ fn reference_evaluation_attributes_coverage_to_each_street() {
         candidate.decision_visits,
         candidate.stored_strategy_visits + candidate.uniform_fallback_visits
     );
-
-    let deviator = reference.coverage[0];
-    assert_eq!(deviator.decision_visits, 4 * samples);
-    assert_eq!(deviator.trained_action_visits, 4 * samples);
-    assert_eq!(deviator.baseline_fallback_visits, 0);
-    assert_eq!(deviator.decision_visits_by_street, every_street);
-    assert_eq!(deviator.trained_action_visits_by_street, every_street);
     assert_eq!(
-        deviator.baseline_fallback_visits_by_street,
-        StreetVisitCounts::default()
-    );
-    assert_eq!(
-        deviator.decision_visits_by_street.total(),
-        deviator.decision_visits
-    );
-    assert_eq!(
-        deviator.trained_action_visits_by_street.total(),
-        deviator.trained_action_visits
-    );
-    assert_eq!(
-        deviator.baseline_fallback_visits_by_street.total(),
-        deviator.baseline_fallback_visits
-    );
-    assert_eq!(
-        deviator.decision_visits,
-        deviator.trained_action_visits + deviator.baseline_fallback_visits
-    );
-
-    assert_eq!(
-        reference.candidate_policy_coverage[1],
+        evaluation.candidate_policy_coverage[1],
         CandidatePolicyCoverage::default()
     );
-    assert_eq!(reference.coverage[1], ReferenceDeviationCoverage::default());
 
-    let json = serde_json::to_value(&reference).unwrap();
+    let json = serde_json::to_value(&evaluation).unwrap();
     assert_eq!(
         json["candidate_policy_coverage"][0]["decision_visits_by_street"]["flop"],
-        samples
-    );
-    assert_eq!(
-        json["coverage"][0]["trained_action_visits_by_street"]["river"],
         samples
     );
 }
 
 #[test]
-fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street() {
+fn candidate_coverage_distinguishes_average_mass_and_regret_fallback_by_street() {
     let mut solver = four_street_solver(831);
     solver.run_sweeps(1).unwrap();
     assert_eq!(solver.policies.len(), 4);
@@ -1138,17 +782,9 @@ fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street
                 0.0
             });
     }
-    let deviators = (0..2)
-        .map(|seat| DeviatorPolicy {
-            seat,
-            actions: FxHashMap::default(),
-        })
-        .collect::<Vec<_>>();
     let before = solver.snapshot_state();
     let samples = 7;
-    let average = solver
-        .evaluate_reference_deviators(samples, 4323, &deviators, ProfileVariant::default())
-        .unwrap();
+    let average = solver.evaluate_average_profile(samples, 4323).unwrap();
     let coverage = average.candidate_policy_coverage[0];
     assert_eq!(coverage.decision_visits, 4 * samples);
     assert_eq!(coverage.stored_strategy_visits, 4 * samples);
@@ -1181,10 +817,10 @@ fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street
             + coverage.current_strategy_visits
     );
     let current = solver
-        .evaluate_reference_deviators(
+        .evaluate_profile(
             samples,
             4323,
-            &deviators,
+            None,
             ProfileVariant {
                 use_current_strategy: true,
                 ..ProfileVariant::default()
@@ -1201,19 +837,10 @@ fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street
     );
     // Coverage bookkeeping consumes no random draws and changes no utilities
     // or mutable solver state.
-    assert_eq!(current.worlds, average.worlds);
-    assert_eq!(current.evaluation.seats, average.evaluation.seats);
+    assert_eq!(current.seats, average.seats);
     assert_eq!(
-        current.evaluation.deviation_gain_lower_bound,
-        average.evaluation.deviation_gain_lower_bound
-    );
-    assert_eq!(
-        average.evaluation.candidate_policy_coverage,
-        average.candidate_policy_coverage
-    );
-    assert_eq!(
-        current.evaluation.candidate_policy_coverage,
-        current.candidate_policy_coverage
+        current.deviation_gain_lower_bound,
+        average.deviation_gain_lower_bound
     );
     assert_eq!(solver.snapshot_state(), before);
     let json = serde_json::to_value(&average).unwrap();
@@ -1224,33 +851,19 @@ fn reference_evaluation_distinguishes_average_mass_and_regret_fallback_by_street
 }
 
 #[test]
-fn reference_evaluation_dense_zero_average_mass_is_regret_fallback() {
+fn candidate_coverage_dense_zero_average_mass_is_regret_fallback() {
     let mut solver = dense_dominated_solver(832);
     solver.run_sweeps(1).unwrap();
     solver.dense.as_mut().unwrap().arena.strategy_sum.fill(0.0);
-    let deviators = (0..2)
-        .map(|seat| DeviatorPolicy {
-            seat,
-            actions: FxHashMap::default(),
-        })
-        .collect::<Vec<_>>();
     let before = solver.snapshot_state();
-    let reference = solver
-        .evaluate_reference_deviators(16, 4324, &deviators, ProfileVariant::default())
-        .unwrap();
-    let coverage = reference.candidate_policy_coverage[0];
+    let ordinary = solver.evaluate_average_profile(16, 4324).unwrap();
+    let coverage = ordinary.candidate_policy_coverage[0];
     assert_eq!(coverage.decision_visits, 16);
     assert_eq!(coverage.stored_strategy_visits, 16);
     assert_eq!(coverage.regret_fallback_visits, 16);
     assert_eq!(coverage.average_strategy_visits, 0);
     assert_eq!(coverage.uniform_fallback_visits, 0);
     assert_eq!(coverage.average_strategy_fraction(), 0.0);
-    let ordinary = solver.evaluate_average_profile(16, 4324).unwrap();
-    assert_eq!(reference.evaluation.seats, ordinary.seats);
-    assert_eq!(
-        reference.candidate_policy_coverage,
-        ordinary.candidate_policy_coverage
-    );
     assert_eq!(solver.snapshot_state(), before);
 }
 
@@ -1290,245 +903,6 @@ fn coverage_without_street_counters_deserializes_with_zero_defaults() {
         candidate.decision_visits_by_street,
         StreetVisitCounts::default()
     );
-
-    let reference: ReferenceDeviationCoverage = serde_json::from_value(serde_json::json!({
-        "decision_visits": 3,
-        "trained_action_visits": 1,
-        "baseline_fallback_visits": 2
-    }))
-    .unwrap();
-    assert_eq!(reference.decision_visits, 3);
-    assert_eq!(
-        reference.trained_action_visits_by_street,
-        StreetVisitCounts::default()
-    );
-}
-
-#[test]
-fn prefix_coverage_counts_only_decisions_at_and_below_each_street() {
-    let mut solver = four_street_solver(840);
-    solver.run_sweeps(1).unwrap();
-    solver.policies.retain(|key, _| key.street != 1);
-    for (key, column) in &mut solver.policies {
-        column
-            .strategy_sum
-            .fill(if key.street == 2 { 0.0 } else { 1.0 });
-    }
-    let root = HistoryKey::ROOT;
-    let flop = root.child(0, 0);
-    let turn = flop.child(0, 0);
-    let river = turn.child(0, 0);
-    let before = solver.snapshot_state();
-    let samples = 17;
-    let result = solver
-        .evaluate_profile_with_prefixes(
-            samples,
-            551,
-            None,
-            ProfileVariant::default(),
-            2,
-            &[root, flop, turn, river],
-        )
-        .unwrap();
-    assert_eq!(
-        result.evaluation,
-        solver.evaluate_average_profile(samples, 551).unwrap()
-    );
-    assert_eq!(
-        result.prefixes[0].candidate_policy_coverage,
-        result.evaluation.candidate_policy_coverage
-    );
-    for (start, prefix) in result.prefixes.iter().enumerate() {
-        assert_eq!(prefix.reached_samples, samples);
-        let coverage = prefix.candidate_policy_coverage[0];
-        assert_eq!(coverage.decision_visits, (4 - start) as u64 * samples);
-        assert_eq!(
-            coverage.uniform_fallback_visits,
-            if start <= 1 { samples } else { 0 }
-        );
-        assert_eq!(
-            coverage.regret_fallback_visits,
-            if start <= 2 { samples } else { 0 }
-        );
-        for (street_index, street) in Street::ALL.into_iter().enumerate() {
-            assert_eq!(
-                prefix.trajectory_visits_by_street.get(street),
-                if street_index >= start { samples } else { 0 }
-            );
-        }
-        assert_eq!(
-            prefix.candidate_policy_coverage[1],
-            CandidatePolicyCoverage::default()
-        );
-    }
-    let mut expected_baseline = result.evaluation;
-    expected_baseline.deviation_gain_lower_bound = None;
-    let baseline = solver
-        .evaluate_profile_coverage(
-            samples,
-            551,
-            ProfileVariant::default(),
-            2,
-            &[root, flop, turn, river],
-        )
-        .unwrap();
-    assert_eq!(baseline.evaluation, expected_baseline);
-    assert_eq!(baseline.prefixes, result.prefixes);
-    assert_eq!(solver.snapshot_state(), before);
-}
-
-#[test]
-fn prefix_coverage_excludes_unreached_branches_and_all_deviation_trajectories() {
-    let mut solver = prefix_solver(841);
-    solver.run_sweeps(4).unwrap();
-    let root = HistoryKey::ROOT;
-    let left = root.child(1, 0);
-    let right = root.child(1, 1);
-    assert!(solver.history_entry(left).is_some());
-    assert!(solver.history_entry(right).is_some());
-    for (key, column) in &mut solver.policies {
-        if key.history == root {
-            column.strategy_sum = vec![1.0, 0.0];
-            column.regrets = vec![0.0, 1.0];
-        }
-    }
-    let samples = 257;
-    let result = solver
-        .evaluate_profile_with_prefixes(
-            samples,
-            552,
-            None,
-            ProfileVariant::default(),
-            2,
-            &[root, left, right],
-        )
-        .unwrap();
-    assert_eq!(result.prefixes[0].reached_samples, samples);
-    assert_eq!(
-        result.prefixes[0].trajectory_visits_by_street.preflop,
-        samples
-    );
-    assert_eq!(
-        result.prefixes[0]
-            .candidate_policy_coverage
-            .iter()
-            .map(|c| c.decision_visits)
-            .sum::<u64>(),
-        2 * samples
-    );
-    assert_eq!(result.prefixes[1].reached_samples, samples);
-    assert_eq!(
-        result.prefixes[1].candidate_policy_coverage[0].decision_visits,
-        samples
-    );
-    assert_eq!(
-        result.prefixes[1].candidate_policy_coverage[1].decision_visits,
-        0
-    );
-    // The regret-greedy deviation at player 1 takes right, but baseline
-    // average play never does: that trajectory must not enter these counts.
-    assert_eq!(result.prefixes[2].reached_samples, 0);
-    assert_eq!(
-        result.prefixes[2].trajectory_visits_by_street,
-        StreetVisitCounts::default()
-    );
-    assert!(
-        result.prefixes[2]
-            .candidate_policy_coverage
-            .iter()
-            .all(|c| *c == CandidatePolicyCoverage::default())
-    );
-}
-
-#[test]
-fn prefix_coverage_is_identical_across_threads_chunks_and_profile_variants() {
-    let mut solver = prefix_solver(842);
-    solver.run_sweeps(7).unwrap();
-    let prefixes = [
-        HistoryKey::ROOT,
-        HistoryKey::ROOT.child(1, 0),
-        HistoryKey::ROOT.child(1, 1),
-    ];
-    let deviators = (0..2)
-        .map(|seat| DeviatorPolicy {
-            seat,
-            actions: FxHashMap::default(),
-        })
-        .collect::<Vec<_>>();
-    let before = solver.snapshot_state();
-    for variant in [
-        ProfileVariant::default(),
-        ProfileVariant {
-            use_current_strategy: true,
-            ..ProfileVariant::default()
-        },
-        ProfileVariant {
-            purify_threshold: 0.2,
-            ..ProfileVariant::default()
-        },
-    ] {
-        let expected = solver
-            .evaluate_profile_with_threads(4097, 553, Some(&deviators), variant, 1)
-            .unwrap();
-        let serial = solver
-            .evaluate_profile_with_prefixes(4097, 553, Some(&deviators), variant, 1, &prefixes)
-            .unwrap();
-        assert_eq!(serial.evaluation, expected);
-        for threads in [2, 8] {
-            assert_eq!(
-                solver
-                    .evaluate_profile_with_prefixes(
-                        4097,
-                        553,
-                        Some(&deviators),
-                        variant,
-                        threads,
-                        &prefixes
-                    )
-                    .unwrap(),
-                serial
-            );
-            let baseline = solver
-                .evaluate_profile_coverage(4097, 553, variant, threads, &prefixes)
-                .unwrap();
-            assert_eq!(baseline.prefixes, serial.prefixes);
-            assert_eq!(baseline.evaluation.seats, serial.evaluation.seats);
-            assert_eq!(
-                baseline.evaluation.candidate_policy_coverage,
-                serial.evaluation.candidate_policy_coverage
-            );
-            assert!(baseline.evaluation.deviation_gain_lower_bound.is_none());
-        }
-    }
-    assert_eq!(solver.snapshot_state(), before);
-}
-
-#[test]
-fn prefix_coverage_rejects_unknown_duplicate_and_excessive_prefixes() {
-    let solver = prefix_solver(843);
-    let root = HistoryKey::ROOT;
-    for prefixes in [
-        vec![root, root],
-        vec![HistoryKey([255; 16])],
-        vec![root; 65],
-    ] {
-        assert!(matches!(
-            solver.evaluate_profile_coverage(2, 0, ProfileVariant::default(), 1, &prefixes),
-            Err(SolverError::InvalidState(_))
-        ));
-    }
-    assert!(matches!(
-        solver.evaluate_profile_coverage(0, 0, ProfileVariant::default(), 1, &[root]),
-        Err(SolverError::ZeroEvaluationSamples)
-    ));
-    assert!(matches!(
-        solver.evaluate_profile_coverage(2, 0, ProfileVariant::default(), 0, &[root]),
-        Err(SolverError::ZeroThreads)
-    ));
-    let empty = solver
-        .evaluate_profile_coverage(2, 0, ProfileVariant::default(), 1, &[])
-        .unwrap();
-    assert!(empty.prefixes.is_empty());
 }
 
 #[test]
@@ -2380,210 +1754,6 @@ struct DenseToyGame;
 struct ConditionalWeightGame {
     street_recall: bool,
     bucket_zero_combo: usize,
-}
-
-#[test]
-fn endpoint_deviation_override_changes_one_action_without_changing_prefix_weight() {
-    use super::conditioned::ForcedPrefixReplay;
-
-    let own = cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
-    let opponent = cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
-    let world = SampledWorld::new(
-        vec![own, opponent],
-        ["2c", "3d", "4h", "5s", "6c"].map(|c| c.parse().unwrap()),
-    )
-    .unwrap();
-    let mut solver = MultiwaySolver::new(
-        ConditionalWeightGame {
-            street_recall: false,
-            bucket_zero_combo: own,
-        },
-        DealSampler::new(vec![Range::full(), Range::full()]).unwrap(),
-        SolverConfig {
-            max_memory_bytes: 1 << 20,
-            max_traversal_depth: 8,
-            ..SolverConfig::default()
-        },
-    )
-    .unwrap();
-    let private = solver.game.bucket(&solver.game.root_state(), &world, 0);
-    let key = |history| InfoKey {
-        history,
-        player: 0,
-        street: private.street,
-        active_opponents: private.active_opponents,
-        bucket_path: private.bucket_path,
-    };
-    let column = |labels: [&str; 2], average: [f32; 2]| PolicyColumn {
-        action_labels: labels.map(str::to_string).to_vec(),
-        regrets: vec![1.0, 0.0],
-        strategy_sum: average.to_vec(),
-    };
-    solver
-        .policies
-        .insert(key(HistoryKey::ROOT), column(["left", "right"], [1.0, 0.0]));
-    for action in 0..2 {
-        solver.policies.insert(
-            key(HistoryKey::ROOT.child(0, action)),
-            column(["up", "down"], [0.0, 1.0]),
-        );
-    }
-    let right = solver
-        .policies
-        .get_mut(&key(HistoryKey::ROOT.child(0, 1)))
-        .unwrap();
-    right.strategy_sum = vec![1.0, 0.0];
-    right.regrets = vec![0.0, 1.0];
-    let before = solver.snapshot_state();
-    let mut ordinary_rng = evaluation_action_rng(971, 0, None);
-    let mut ordinary_coverage = vec![CandidatePolicyCoverage::default(); 2];
-    let ordinary = solver
-        .evaluate_world(
-            &world,
-            &mut ordinary_rng,
-            None,
-            None,
-            0.0,
-            false,
-            Some(&mut ordinary_coverage),
-            &mut [],
-            None,
-        )
-        .unwrap();
-    assert_eq!(ordinary, vec![-2.0, 2.0]);
-    let mut disabled = ForcedPrefixReplay {
-        actions: &[],
-        endpoint_action: None,
-        weight: 1.0,
-        skip_weight_actions: 0,
-        sources: [false; 3],
-    };
-    let mut disabled_rng = evaluation_action_rng(971, 0, None);
-    let mut disabled_coverage = vec![CandidatePolicyCoverage::default(); 2];
-    assert_eq!(
-        ordinary,
-        solver
-            .evaluate_world(
-                &world,
-                &mut disabled_rng,
-                None,
-                None,
-                0.0,
-                false,
-                Some(&mut disabled_coverage),
-                &mut [],
-                Some(&mut disabled)
-            )
-            .unwrap()
-    );
-    assert_eq!(disabled_coverage, ordinary_coverage);
-    assert_eq!(disabled.weight, 1.0);
-    assert_eq!(
-        disabled_rng.clone().next_u64(),
-        ordinary_rng.clone().next_u64()
-    );
-
-    // "right" has exactly zero baseline probability but remains a legal
-    // deviation. The same actor's later decision must still play "up" (0),
-    // unlike repeating the override (1) or regret-greedy fallback (1).
-    let mut candidate = ForcedPrefixReplay {
-        endpoint_action: Some(1),
-        ..disabled
-    };
-    let mut candidate_rng = evaluation_action_rng(971, 0, None);
-    let value = solver
-        .evaluate_world(
-            &world,
-            &mut candidate_rng,
-            None,
-            None,
-            0.0,
-            false,
-            None,
-            &mut [],
-            Some(&mut candidate),
-        )
-        .unwrap();
-    assert_eq!(value, vec![1.0, -1.0]);
-    assert_eq!(candidate.weight, 1.0);
-    assert_eq!(candidate.sources, [false; 3]);
-    assert_eq!(candidate_rng.next_u64(), ordinary_rng.next_u64());
-
-    // With a nonempty path, the override moves to precisely its endpoint.
-    let mut deeper = ForcedPrefixReplay {
-        actions: &[0],
-        endpoint_action: Some(0),
-        weight: 1.0,
-        skip_weight_actions: 0,
-        sources: [false; 3],
-    };
-    assert_eq!(
-        solver
-            .evaluate_world(
-                &world,
-                &mut evaluation_action_rng(972, 0, None),
-                None,
-                None,
-                0.0,
-                false,
-                None,
-                &mut [],
-                Some(&mut deeper)
-            )
-            .unwrap(),
-        vec![4.0, -4.0]
-    );
-    assert_eq!(deeper.weight, 1.0);
-    let mut invalid = ForcedPrefixReplay {
-        endpoint_action: Some(2),
-        ..deeper
-    };
-    assert!(
-        solver
-            .evaluate_world(
-                &world,
-                &mut evaluation_action_rng(972, 0, None),
-                None,
-                None,
-                0.0,
-                false,
-                None,
-                &mut [],
-                Some(&mut invalid)
-            )
-            .is_err()
-    );
-    assert_eq!(solver.snapshot_state(), before);
-
-    solver
-        .policies
-        .get_mut(&key(HistoryKey::ROOT))
-        .unwrap()
-        .strategy_sum = vec![0.0, 1.0];
-    let mut zero = ForcedPrefixReplay {
-        actions: &[0],
-        endpoint_action: Some(0),
-        weight: 1.0,
-        skip_weight_actions: 0,
-        sources: [false; 3],
-    };
-    assert_eq!(
-        solver
-            .evaluate_world(
-                &world,
-                &mut evaluation_action_rng(972, 0, None),
-                None,
-                None,
-                0.0,
-                false,
-                None,
-                &mut [],
-                Some(&mut zero)
-            )
-            .unwrap(),
-        vec![0.0; 2]
-    );
-    assert_eq!(zero.weight, 0.0);
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -3635,448 +2805,6 @@ fn independent_average_pass_tracks_temporal_own_strategy_and_samples_zero_oppone
 }
 
 #[test]
-fn enumerate_first_opponent_stratifies_one_layer_and_samples_the_next() {
-    let solver = MultiwaySolver::new(
-        AveragePathGame,
-        DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
-        SolverConfig {
-            seed: 19,
-            max_memory_bytes: 1 << 20,
-            max_traversal_depth: 16,
-            ..SolverConfig::default()
-        },
-    )
-    .unwrap();
-    let board = ["2c", "3d", "4h", "5s", "6c"].map(|card| card.parse().unwrap());
-    let world = SampledWorld::new(
-        vec![
-            cards::combo_index("As".parse().unwrap(), "Ah".parse().unwrap()),
-            cards::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap()),
-            cards::combo_index("Qs".parse().unwrap(), "Qh".parse().unwrap()),
-        ],
-        board,
-    )
-    .unwrap();
-    let strategy_events = |mode| {
-        let mut worker = SparseAverageStrategyWorker::with_sampling(&solver, 1.0, mode);
-        let mut rng = ChaCha20Rng::seed_from_u64(808);
-        worker
-            .traverse(
-                solver.game.root_state(),
-                &world,
-                0,
-                HistoryKey::ROOT,
-                1.0,
-                &mut rng,
-                0,
-            )
-            .unwrap();
-        let events = worker
-            .finish()
-            .into_iter()
-            .filter_map(|event| match event {
-                TraversalEvent::AddStrategy { key, values } => Some((key, values)),
-                _ => None,
-            })
-            .collect::<Vec<_>>();
-        (events, rng.next_u64())
-    };
-
-    let (uniform, uniform_next_rng) = strategy_events(AverageOpponentSampling::UniformOne);
-    let (enumerated, enumerated_next_rng) =
-        strategy_events(AverageOpponentSampling::EnumerateFirst);
-    assert_eq!(
-        uniform_next_rng, enumerated_next_rng,
-        "enumeration must leave later averager siblings on the baseline RNG stream"
-    );
-    assert_eq!(uniform.len(), 1);
-    assert_eq!(enumerated.len(), 2);
-    assert!(enumerated.contains(&uniform[0]));
-    assert!(enumerated.iter().all(|(_, values)| values == &[0.5, 0.5]));
-
-    let first_prefixes = enumerated
-        .iter()
-        .map(|(key, _)| {
-            if (0..2).any(|first| {
-                (0..2)
-                    .any(|second| key.history == HistoryKey::ROOT.child(1, first).child(2, second))
-            }) {
-                (0..2)
-                    .find(|&first| {
-                        (0..2).any(|second| {
-                            key.history == HistoryKey::ROOT.child(1, first).child(2, second)
-                        })
-                    })
-                    .unwrap()
-            } else {
-                panic!("unexpected averaged history: {:?}", key.history)
-            }
-        })
-        .collect::<std::collections::BTreeSet<_>>();
-    assert_eq!(first_prefixes, [0, 1].into_iter().collect());
-}
-
-#[test]
-fn enumerate_first_dense_vector_keeps_regrets_exact_and_is_thread_deterministic() {
-    let run = |threads| {
-        let mut solver = dense_vector_toy_solver(919, 2);
-        solver
-            .run_sweeps_with_threads_until_observed_sampling(
-                20,
-                threads,
-                || true,
-                |_| {},
-                AverageOpponentSampling::EnumerateFirst,
-            )
-            .unwrap();
-        solver
-    };
-    let one = run(1);
-    let four = run(4);
-    let repeated = run(4);
-    assert_eq!(one.snapshot_state(), four.snapshot_state());
-    assert_eq!(four.snapshot_state(), repeated.snapshot_state());
-
-    let mut uniform = dense_vector_toy_solver(919, 2);
-    uniform.run_sweeps_with_threads(20, 4).unwrap();
-    assert_eq!(
-        uniform.dense.as_ref().unwrap().arena.regrets,
-        four.dense.as_ref().unwrap().arena.regrets
-    );
-    assert_eq!(uniform.total_deal_attempts, four.total_deal_attempts);
-    assert_eq!(uniform.terminal_evaluations, four.terminal_evaluations);
-    assert_eq!(uniform.hand_updates, four.hand_updates);
-    assert_ne!(
-        uniform.dense.as_ref().unwrap().arena.strategy_sum,
-        four.dense.as_ref().unwrap().arena.strategy_sum
-    );
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn consuming_average_sampling_research_api_is_repeatable_and_regret_identical() {
-    let run = |variant, threads| {
-        dense_vector_toy_solver(920, 2)
-            .run_average_sampling_research(AverageSamplingResearchConfig {
-                variant,
-                sweeps: 20,
-                threads,
-                histories: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
-                evaluation_samples: 32,
-                evaluation_seeds: vec![9090],
-                coverage_samples: 32,
-                coverage_prefixes: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
-            })
-            .unwrap()
-    };
-    let uniform = run(AverageSamplingResearchVariant::UniformOne, 4);
-    let enumerated_one = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 1);
-    let enumerated_four = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 4);
-    let repeated = run(AverageSamplingResearchVariant::EnumerateFirstOpponent, 4);
-
-    assert_eq!(enumerated_one.threads, 1);
-    assert_eq!(enumerated_four.threads, 4);
-    assert_eq!(enumerated_one.metrics, enumerated_four.metrics);
-    assert_eq!(
-        enumerated_one.current_regret_fingerprint,
-        enumerated_four.current_regret_fingerprint
-    );
-    assert_eq!(enumerated_one.histories, enumerated_four.histories);
-    assert_eq!(enumerated_one.evaluations, enumerated_four.evaluations);
-    assert_eq!(
-        enumerated_one.coverage_evaluations,
-        enumerated_four.coverage_evaluations
-    );
-    assert_eq!(enumerated_four.metrics, repeated.metrics);
-    assert_eq!(enumerated_four.histories, repeated.histories);
-    assert_eq!(enumerated_four.evaluations, repeated.evaluations);
-    assert_eq!(
-        enumerated_four.coverage_evaluations,
-        repeated.coverage_evaluations
-    );
-    assert_eq!(
-        enumerated_four.current_regret_fingerprint,
-        repeated.current_regret_fingerprint
-    );
-    for result in [&uniform, &enumerated_one, &enumerated_four, &repeated] {
-        assert!(result.solve_elapsed_secs.is_finite());
-        assert!(result.solve_elapsed_secs >= 0.0);
-    }
-    assert_eq!(
-        uniform.current_regret_fingerprint,
-        enumerated_four.current_regret_fingerprint
-    );
-    assert_eq!(uniform.histories.len(), 2);
-    assert_eq!(enumerated_four.histories.len(), 2);
-    assert_eq!(
-        uniform.metrics.total_deal_attempts,
-        enumerated_four.metrics.total_deal_attempts
-    );
-    assert_eq!(
-        uniform.metrics.hand_updates,
-        enumerated_four.metrics.hand_updates
-    );
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn postflop_continuation_rejects_full_recall_before_learning() {
-    let mut full = solver(925, 1 << 20);
-    let before = full.snapshot_state();
-    assert!(matches!(
-        full.run_average_sampling_research_inner(AverageSamplingResearchConfig {
-            variant: AverageSamplingResearchVariant::PostflopContinuation,
-            sweeps: 16,
-            threads: 2,
-            histories: vec![],
-            evaluation_samples: 0,
-            evaluation_seeds: vec![],
-            coverage_samples: 0,
-            coverage_prefixes: vec![],
-        }),
-        Err(SolverError::InvalidState(
-            "postflop continuation research requires preallocated current-street storage"
-        ))
-    ));
-    assert_eq!(full.snapshot_state(), before);
-    let (game, sampler, config) = initialization_holdem_fixture();
-    let mut sparse = MultiwaySolver::new(game, sampler, config).unwrap();
-    // Valid Street constructors always create dense storage. Exercise the
-    // defensive guard with an intentionally unavailable arena, not by
-    // claiming that the ordinary constructor creates sparse Street storage.
-    assert!(sparse.dense.is_some());
-    sparse.dense = None;
-    let before = sparse.snapshot_state();
-    assert!(
-        sparse
-            .run_average_sampling_research_inner(AverageSamplingResearchConfig {
-                variant: AverageSamplingResearchVariant::PostflopContinuation,
-                sweeps: 16,
-                threads: 2,
-                histories: vec![],
-                evaluation_samples: 0,
-                evaluation_seeds: vec![],
-                coverage_samples: 0,
-                coverage_prefixes: vec![],
-            })
-            .is_err()
-    );
-    assert_eq!(sparse.snapshot_state(), before);
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn consuming_average_sampling_research_api_rejects_nonfresh_solver() {
-    let mut solver = dense_vector_toy_solver(921, 1);
-    solver.run_sweeps(1).unwrap();
-    assert!(matches!(
-        solver.run_average_sampling_research(AverageSamplingResearchConfig {
-            variant: AverageSamplingResearchVariant::EnumerateFirstOpponent,
-            sweeps: 1,
-            threads: 1,
-            histories: vec![HistoryKey::ROOT],
-            evaluation_samples: 0,
-            evaluation_seeds: Vec::new(),
-            coverage_samples: 0,
-            coverage_prefixes: Vec::new(),
-        }),
-        Err(SolverError::InvalidState(
-            "average-sampling research requires a fresh solver"
-        ))
-    ));
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn consuming_average_sampling_research_api_omits_zero_mass_fallbacks() {
-    let solver = MultiwaySolver::new(
-        AveragePathGame,
-        DealSampler::new(vec![Range::full(), Range::full(), Range::full()]).unwrap(),
-        SolverConfig {
-            seed: 922,
-            max_memory_bytes: 1 << 20,
-            max_traversal_depth: 16,
-            ..SolverConfig::default()
-        },
-    )
-    .unwrap();
-    let histories = (0..2)
-        .flat_map(|first| {
-            (0..2).map(move |second| HistoryKey::ROOT.child(1, first).child(2, second))
-        })
-        .collect();
-    let result = solver
-        .run_average_sampling_research(AverageSamplingResearchConfig {
-            variant: AverageSamplingResearchVariant::UniformOne,
-            sweeps: 1,
-            threads: 2,
-            histories,
-            evaluation_samples: 0,
-            evaluation_seeds: Vec::new(),
-            coverage_samples: 0,
-            coverage_prefixes: Vec::new(),
-        })
-        .unwrap();
-    let rows = result
-        .histories
-        .iter()
-        .flat_map(|history| &history.strategies)
-        .collect::<Vec<_>>();
-    assert!(rows.iter().any(|row| {
-        row.status == AverageSamplingResearchRowStatus::AverageObserved && row.actions.is_some()
-    }));
-    assert!(rows.iter().any(|row| {
-        row.status == AverageSamplingResearchRowStatus::ZeroAverageMassOmitted
-            && row.actions.is_none()
-    }));
-    assert!(result.coverage_evaluations.is_empty());
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn average_sampling_research_coverage_preserves_ordinary_baseline_and_state() {
-    let config = AverageSamplingResearchConfig {
-        variant: AverageSamplingResearchVariant::UniformOne,
-        sweeps: 20,
-        threads: 2,
-        histories: vec![HistoryKey::ROOT],
-        evaluation_samples: 32,
-        evaluation_seeds: vec![9090, 9091],
-        coverage_samples: 32,
-        coverage_prefixes: vec![HistoryKey::ROOT, HistoryKey::ROOT.child(0, 0)],
-    };
-    let mut ordinary = dense_vector_toy_solver(923, 2);
-    ordinary
-        .run_sweeps_with_threads(config.sweeps, config.threads)
-        .unwrap();
-    let result = dense_vector_toy_solver(923, 2)
-        .run_average_sampling_research(config.clone())
-        .unwrap();
-    assert_eq!(result.metrics, ordinary.metrics());
-    assert_eq!(
-        result.current_regret_fingerprint,
-        ordinary.research_regret_fingerprint()
-    );
-    assert_eq!(result.coverage_evaluations.len(), 2);
-    for (normal, coverage) in result.evaluations.iter().zip(&result.coverage_evaluations) {
-        let expected = ordinary
-            .evaluate_profile_with_threads(32, normal.seed, None, ProfileVariant::default(), 2)
-            .unwrap();
-        assert_eq!(normal.result, expected);
-        assert_eq!(coverage.seed, normal.seed);
-        let mut expected_baseline = expected;
-        expected_baseline.deviation_gain_lower_bound = None;
-        assert_eq!(coverage.result.evaluation, expected_baseline);
-        let root = &coverage.result.prefixes[0];
-        assert_eq!(root.history, HistoryKey::ROOT);
-        assert_eq!(root.reached_samples, 32);
-        assert_eq!(
-            root.candidate_policy_coverage,
-            normal.result.candidate_policy_coverage
-        );
-        assert!(coverage.result.prefixes[1].reached_samples <= root.reached_samples);
-    }
-    let mut disabled = config;
-    disabled.coverage_samples = 0;
-    disabled.coverage_prefixes.clear();
-    let disabled = dense_vector_toy_solver(923, 2)
-        .run_average_sampling_research(disabled)
-        .unwrap();
-    assert_eq!(disabled.metrics, result.metrics);
-    assert_eq!(
-        disabled.current_regret_fingerprint,
-        result.current_regret_fingerprint
-    );
-    assert_eq!(disabled.histories, result.histories);
-    assert_eq!(disabled.evaluations, result.evaluations);
-    assert!(disabled.coverage_evaluations.is_empty());
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn average_sampling_research_coverage_rejects_invalid_settings_before_solving() {
-    let base = AverageSamplingResearchConfig {
-        variant: AverageSamplingResearchVariant::UniformOne,
-        sweeps: 1,
-        threads: 1,
-        histories: vec![HistoryKey::ROOT],
-        evaluation_samples: 32,
-        evaluation_seeds: vec![9090],
-        coverage_samples: 32,
-        coverage_prefixes: vec![HistoryKey::ROOT],
-    };
-    for (samples, prefixes, error) in [
-        (
-            0,
-            vec![HistoryKey::ROOT],
-            "coverage prefixes require at least two coverage samples",
-        ),
-        (
-            1,
-            vec![HistoryKey::ROOT],
-            "average-sampling research coverage requires at least two samples",
-        ),
-        (
-            32,
-            Vec::new(),
-            "coverage samples require at least one coverage prefix",
-        ),
-        (
-            32,
-            vec![HistoryKey::ROOT; 2],
-            "evaluation prefixes must be unique",
-        ),
-        (
-            32,
-            vec![HistoryKey([255; 16])],
-            "unknown evaluation prefix history",
-        ),
-        (
-            32,
-            vec![HistoryKey::ROOT; 65],
-            "at most 64 evaluation prefixes are supported",
-        ),
-    ] {
-        let mut config = base.clone();
-        config.coverage_samples = samples;
-        config.coverage_prefixes = prefixes;
-        let mut solver = dense_vector_toy_solver(924, 1);
-        // Starting the sweep would fail with DepthLimit instead: these errors
-        // must be resolved before the consuming API does expensive work.
-        solver.config.max_traversal_depth = 0;
-        assert!(matches!(
-            solver.run_average_sampling_research(config),
-            Err(SolverError::InvalidState(message)) if message == error
-        ));
-    }
-    let mut disabled_evaluation = base;
-    disabled_evaluation.evaluation_samples = 0;
-    disabled_evaluation.evaluation_seeds.clear();
-    assert!(matches!(
-        dense_vector_toy_solver(924, 1).run_average_sampling_research(disabled_evaluation),
-        Err(SolverError::InvalidState(
-            "average-sampling research coverage requires ordinary evaluation"
-        ))
-    ));
-}
-
-#[cfg(feature = "research-average-sampling")]
-#[test]
-fn average_sampling_research_legacy_config_disables_coverage() {
-    let config: AverageSamplingResearchConfig = serde_json::from_value(serde_json::json!({
-        "variant": "uniform-one",
-        "sweeps": 1,
-        "threads": 1,
-        "histories": [],
-        "evaluation_samples": 0,
-        "evaluation_seeds": []
-    }))
-    .unwrap();
-    assert_eq!(config.coverage_samples, 0);
-    assert!(config.coverage_prefixes.is_empty());
-}
-
-#[test]
 fn vector_traverser_is_deterministic_across_thread_counts_and_reruns() {
     let mut single_threaded = dense_vector_toy_solver(4104, 1);
     single_threaded.run_sweeps_with_threads(20, 1).unwrap();
@@ -4812,93 +3540,6 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
 }
 
 #[test]
-fn enumerate_first_real_holdem_changes_only_the_average_accumulator() {
-    use crate::abstraction::FeatureHashAbstraction;
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
-    };
-    use crate::holdem::HoldemGame;
-    use crate::types::SeatId;
-
-    let build = || {
-        let mut config = MultiwayConfig {
-            seats: (0..3)
-                .map(|_| SeatConfig {
-                    name: None,
-                    stack_bb: 6.0,
-                    range: String::new(),
-                    betting: None,
-                })
-                .collect(),
-            button: SeatId(0),
-            blinds: BlindConfig::default(),
-            ante: AnteConfig::None,
-            betting: BettingConfig::default(),
-            forced_bets: None,
-            abstraction: AbstractionConfig::default(),
-        };
-        config.abstraction.flop_buckets = 2;
-        config.abstraction.turn_buckets = 2;
-        config.abstraction.river_buckets = 2;
-        config.abstraction.recall = RecallMode::Street;
-        let game = HoldemGame::new(
-            &config,
-            &UtilityConfig::ChipEv,
-            &RakeConfig::None,
-            FeatureHashAbstraction::new(crate::abstraction::FeatureHashParams {
-                flop_buckets: 2,
-                turn_buckets: 2,
-                river_buckets: 2,
-            })
-            .unwrap(),
-        )
-        .unwrap();
-        let sampler = game.deal_sampler().unwrap();
-        MultiwaySolver::new(
-            game,
-            sampler,
-            SolverConfig {
-                seed: 922,
-                max_memory_bytes: 1 << 24,
-                max_traversal_depth: 64,
-                sweep_batch: 1,
-                traverser_vector: true,
-                ..SolverConfig::default()
-            },
-        )
-        .unwrap()
-    };
-
-    let mut uniform = build();
-    uniform.run_sweeps_with_threads(2, 2).unwrap();
-    let mut enumerated = build();
-    enumerated
-        .run_sweeps_with_threads_until_observed_sampling(
-            2,
-            2,
-            || true,
-            |_| {},
-            AverageOpponentSampling::EnumerateFirst,
-        )
-        .unwrap();
-
-    let uniform_dense = uniform.dense.as_ref().unwrap();
-    let enumerated_dense = enumerated.dense.as_ref().unwrap();
-    assert_eq!(uniform_dense.arena.regrets, enumerated_dense.arena.regrets);
-    assert_eq!(uniform.total_deal_attempts, enumerated.total_deal_attempts);
-    assert_eq!(
-        uniform.terminal_evaluations,
-        enumerated.terminal_evaluations
-    );
-    assert_eq!(uniform.hand_updates, enumerated.hand_updates);
-    assert_ne!(
-        uniform_dense.arena.strategy_sum,
-        enumerated_dense.arena.strategy_sum
-    );
-}
-
-#[test]
 fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
     use crate::abstraction::{BucketContext, MultiwayAbstraction};
     use crate::config::{
@@ -4988,13 +3629,7 @@ fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
     let mut average_contexts =
         std::array::from_fn::<_, 4, _>(|_| std::collections::BTreeSet::<u8>::new());
     for seed in 0..16 {
-        let mut worker = DenseAverageStrategyWorker::with_sampling(
-            &solver.game,
-            dense,
-            solver.config,
-            1.0,
-            AverageOpponentSampling::UniformOne,
-        );
+        let mut worker = DenseAverageStrategyWorker::new(&solver.game, dense, solver.config, 1.0);
         worker
             .traverse_vector(
                 solver.game.root_state(),
@@ -5832,318 +4467,6 @@ fn parallel_initialization_uses_requested_pool_instead_of_ambient_pool() {
             assert_eq!(resumed.snapshot_state(), state);
         }
     });
-}
-
-#[test]
-fn conditional_root_matches_baseline_and_is_deterministic_read_only() {
-    let mut solver = prefix_solver(992);
-    solver.run_sweeps(4).unwrap();
-    for column in solver.policies.values_mut() {
-        column.strategy_sum = vec![3.0, 7.0];
-        column.regrets = vec![4.0, 1.0];
-    }
-    let before = solver.snapshot_state();
-    for variant in [
-        ProfileVariant::default(),
-        ProfileVariant {
-            use_current_strategy: true,
-            purify_threshold: 0.0,
-        },
-        ProfileVariant {
-            use_current_strategy: false,
-            purify_threshold: 0.4,
-        },
-    ] {
-        let paths = vec![vec![], vec![0], vec![1]];
-        let one = solver
-            .evaluate_profile_conditioned(4097, 775, variant, 1, &paths)
-            .unwrap();
-        let baseline = solver
-            .evaluate_profile_coverage(4097, 775, variant, 1, &[])
-            .unwrap();
-        assert_eq!(
-            one.total_deal_attempts,
-            baseline.evaluation.total_deal_attempts
-        );
-        let root = &one.prefixes[0];
-        assert_eq!(root.reach_probability.mean, 1.0);
-        assert_eq!(root.reach_probability.stderr, 0.0);
-        assert!((root.effective_sample_size - 4097.0).abs() < 1e-10);
-        for (ours, ordinary) in root.seats.iter().zip(baseline.evaluation.seats) {
-            let ours = ours.unwrap();
-            assert_eq!(ours.mean, ordinary.mean);
-            assert!((ours.stderr - ordinary.stderr).abs() < 1e-14);
-        }
-        assert_eq!(
-            root.coverage_by_street[0].positive_weight_decision_visits,
-            8194
-        );
-        for threads in [2, 8] {
-            assert_eq!(
-                one,
-                solver
-                    .evaluate_profile_conditioned(4097, 775, variant, threads, &paths)
-                    .unwrap()
-            );
-        }
-        let reversed = solver
-            .evaluate_profile_conditioned(4097, 775, variant, 2, &[vec![1], vec![], vec![0]])
-            .unwrap();
-        assert_eq!(one.prefixes[0], reversed.prefixes[1]);
-        assert_eq!(one.prefixes[1], reversed.prefixes[2]);
-    }
-    assert_eq!(solver.snapshot_state(), before);
-}
-
-#[test]
-fn conditional_rare_and_zero_reach_are_distinct_and_exclude_prefix_decisions() {
-    let mut solver = prefix_solver(993);
-    solver.run_sweeps(4).unwrap();
-    for (key, column) in &mut solver.policies {
-        column.strategy_sum = if key.history == HistoryKey::ROOT {
-            vec![1e-9, 1.0]
-        } else {
-            vec![1.0, 0.0]
-        };
-        column.regrets = vec![0.0, 1.0];
-    }
-    let paths = [vec![0]];
-    let rare = solver
-        .evaluate_profile_conditioned(257, 778, ProfileVariant::default(), 2, &paths)
-        .unwrap();
-    let prefix = &rare.prefixes[0];
-    assert_eq!(prefix.positive_weight_samples, 257);
-    assert_eq!(prefix.reach_probability.mean, f64::from(1e-9_f32));
-    assert_eq!(prefix.seats[0].unwrap().mean, 1.0);
-    assert_eq!(
-        prefix.coverage_by_street[0].positive_weight_decision_visits,
-        257
-    );
-    assert_eq!(prefix.coverage_by_seat[1][0].average_fraction, None);
-    assert_eq!(
-        prefix.coverage_by_seat[0][0].average_fraction.unwrap().mean,
-        1.0
-    );
-    let zero = solver
-        .evaluate_profile_conditioned(
-            257,
-            778,
-            ProfileVariant {
-                use_current_strategy: true,
-                purify_threshold: 0.0,
-            },
-            2,
-            &paths,
-        )
-        .unwrap();
-    let prefix = &zero.prefixes[0];
-    assert_eq!(prefix.positive_weight_samples, 0);
-    assert_eq!(prefix.effective_sample_size, 0.0);
-    assert!(prefix.seats.iter().all(Option::is_none));
-    assert_eq!(prefix.coverage_by_street[0].trajectory_probability, None);
-    assert_eq!(prefix.coverage_by_street[0].average_fraction, None);
-}
-
-#[test]
-fn conditional_street_sources_and_path_validation() {
-    let mut solver = four_street_solver(994);
-    solver.run_sweeps(1).unwrap();
-    solver.policies.retain(|key, _| key.street != 1);
-    for (key, column) in &mut solver.policies {
-        column
-            .strategy_sum
-            .fill(if key.street == 2 { 0.0 } else { 1.0 });
-    }
-    let report = solver
-        .evaluate_profile_conditioned(
-            17,
-            774,
-            ProfileVariant::default(),
-            2,
-            &[vec![0], vec![0, 0, 0]],
-        )
-        .unwrap();
-    let flop = &report.prefixes[0];
-    assert_eq!(flop.coverage_by_street[0].average_fraction, None);
-    assert_eq!(
-        flop.coverage_by_street[1]
-            .uniform_fallback_fraction
-            .unwrap()
-            .mean,
-        1.0
-    );
-    assert_eq!(
-        flop.coverage_by_street[2]
-            .regret_fallback_fraction
-            .unwrap()
-            .mean,
-        1.0
-    );
-    assert_eq!(
-        flop.coverage_by_street[3].average_fraction.unwrap().mean,
-        1.0
-    );
-    let river = &report.prefixes[1];
-    assert_eq!(river.prefix_uniform_fallback_fraction.unwrap().mean, 1.0);
-    assert_eq!(river.prefix_regret_fallback_fraction.unwrap().mean, 1.0);
-    assert_eq!(river.prefix_current_fraction.unwrap().mean, 0.0);
-
-    assert_eq!(
-        river.coverage_by_street[2]
-            .trajectory_probability
-            .unwrap()
-            .mean,
-        0.0
-    );
-    assert_eq!(
-        river.coverage_by_street[3]
-            .trajectory_probability
-            .unwrap()
-            .mean,
-        1.0
-    );
-    for paths in [
-        vec![],
-        vec![vec![], vec![]],
-        vec![vec![1]],
-        vec![vec![0; 4]],
-        vec![vec![0; 5]],
-        vec![vec![0]; 65],
-    ] {
-        assert!(
-            solver
-                .evaluate_profile_conditioned(2, 0, ProfileVariant::default(), 1, &paths)
-                .is_err()
-        );
-    }
-    for (samples, threads) in [(0, 1), (1, 1), (2, 0)] {
-        assert!(
-            solver
-                .evaluate_profile_conditioned(
-                    samples,
-                    0,
-                    ProfileVariant::default(),
-                    threads,
-                    &[vec![]]
-                )
-                .is_err()
-        );
-    }
-    assert!(
-        solver
-            .evaluate_profile_conditioned(
-                2,
-                0,
-                ProfileVariant {
-                    purify_threshold: f32::NAN,
-                    use_current_strategy: false
-                },
-                1,
-                &[vec![]]
-            )
-            .is_err()
-    );
-}
-
-#[derive(Clone, Copy)]
-struct ConditionalWorldGame;
-
-impl ExternalSamplingGame for ConditionalWorldGame {
-    type State = PrefixState;
-    type Actions = PrefixState;
-    fn num_players(&self) -> usize {
-        2
-    }
-    fn root_state(&self) -> Self::State {
-        PrefixImportanceGame.root_state()
-    }
-    fn actor(&self, state: &Self::State) -> Option<usize> {
-        PrefixImportanceGame.actor(state)
-    }
-    fn node_actions(&self, state: &Self::State) -> Self::Actions {
-        *state
-    }
-    fn num_actions_of(&self, actions: &Self::Actions) -> usize {
-        PrefixImportanceGame.num_actions_of(actions)
-    }
-    fn next_state_with(
-        &self,
-        state: &Self::State,
-        actions: &Self::Actions,
-        index: usize,
-    ) -> Self::State {
-        PrefixImportanceGame.next_state_with(state, actions, index)
-    }
-    fn write_action_label(&self, actions: &Self::Actions, index: usize, out: &mut String) {
-        PrefixImportanceGame.write_action_label(actions, index, out);
-    }
-    fn bucket(&self, state: &Self::State, world: &SampledWorld, actor: usize) -> PrivateInfo {
-        let mut private = PrefixImportanceGame.bucket(state, world, actor);
-        private.bucket_path[0] = (world.hole_combo(0) % 2) as u32;
-        private
-    }
-    fn terminal_utilities(&self, _: &Self::State, world: &SampledWorld, utilities: &mut [f64]) {
-        utilities[0] = if world.hole_combo(0).is_multiple_of(2) {
-            1.0
-        } else {
-            5.0
-        };
-        utilities[1] = -utilities[0];
-    }
-}
-
-#[test]
-fn conditional_correlated_deals_match_independent_weighted_oracle() {
-    let config = prefix_solver(996).config;
-    let mut solver = MultiwaySolver::new(
-        ConditionalWorldGame,
-        DealSampler::new(vec![Range::full(); 2]).unwrap(),
-        config,
-    )
-    .unwrap();
-    solver.run_sweeps(8).unwrap();
-    for (key, column) in &mut solver.policies {
-        column.strategy_sum = if key.bucket_path[0] == 0 {
-            vec![1.0, 3.0]
-        } else {
-            vec![3.0, 1.0]
-        };
-    }
-    let n = 4097;
-    let report = solver
-        .evaluate_profile_conditioned(n, 779, ProfileVariant::default(), 8, &[vec![0]])
-        .unwrap();
-    let mut weighted = Vec::new();
-    let mut weights = Vec::new();
-    for id in 0..n {
-        let world = solver
-            .sampler
-            .sample_counted(&mut evaluation_deal_rng(779, id))
-            .unwrap()
-            .world;
-        let even = world.hole_combo(0).is_multiple_of(2);
-        let w = if even { 0.25 } else { 0.75 };
-        weights.push(w);
-        weighted.push(w * if even { 1.0 } else { 5.0 });
-    }
-    let den = weights.iter().sum::<f64>();
-    let mean = weighted.iter().sum::<f64>() / den;
-    let residual = weighted
-        .iter()
-        .zip(&weights)
-        .map(|(x, w)| (x - mean * w).powi(2))
-        .sum::<f64>();
-    let stderr = (n as f64 * residual / (n - 1) as f64).sqrt() / den;
-    let actual = report.prefixes[0].seats[0].unwrap();
-    assert!((actual.mean - mean).abs() < 1e-12);
-    assert!((actual.stderr - stderr).abs() < 1e-12);
-    assert!((actual.mean - 4.0).abs() < 0.1);
-    assert!(
-        (report.prefixes[0].effective_sample_size
-            - den.powi(2) / weights.iter().map(|w| w * w).sum::<f64>())
-        .abs()
-            < 1e-9
-    );
 }
 
 #[test]

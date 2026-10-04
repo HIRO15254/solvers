@@ -48,20 +48,11 @@ cargo test --workspace
 | config/CLI/default | family規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
 | CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
-| 研究feature | 明示したfeatureのcompileと該当する小規模test。production品質認定とは区別 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
 | 品質・性能の主張 | [製品定義](products.jp.md)の品質節、対応する固定条件と基準測定 |
 
 文書だけの編集で重いsolverを回す必要はない。逆に、文章の修正に見えてdefaultや公開契約を変える場合は契約変更として扱う。
 `check_docs.py`はファイル参照と入口を調べる軽量検査で、見出しアンカー・外部URL・本文の意味を保証しない。
-
-研究featureの明示compile:
-
-```text
-cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
-cargo test -p multiway --features research-average-sampling --lib average_sampling_research
-cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
-```
 
 Production EHS² table buildや大規模solve等のignored acceptanceは、対応領域の受入前に担当者が対象sourceで実行し、結果を保存する。
 すべてを毎PRで実行する必要はない。全体のrelease acceptanceは次で実行できる。

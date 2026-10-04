@@ -14,11 +14,6 @@ default = []
 # arena requires a game whose public tree can be enumerated up front.
 # Removing it means porting those toy games to the dense tree contract.
 research-abstractions = []
-# One-shot validation API for comparing average-policy opponent sampling.
-# The normal solver API and v1 configuration never select this path.
-research-average-sampling = []
-# Experimental regret-worker sampling; no production config surface.
-research-regret-sampling = []
 
 [dependencies]
 abstraction = { workspace = true }

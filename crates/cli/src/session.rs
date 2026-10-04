@@ -10,7 +10,7 @@
 //! parameters resolved from `[run]`, and the raw config text/hash to stamp
 //! onto whatever artifact the caller eventually writes.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::Instant;
 
 use abstraction::{Ehs2Abstraction, Ehs2Params};
@@ -95,23 +95,6 @@ pub struct MultiwaySession {
     /// display purposes (seat names/positions, button seat).
     pub game_config: multiway::MultiwayConfig,
     pub checkpoint_runtime: Option<multiway::checkpoint::CheckpointRuntimeState>,
-    /// Evaluation-only common abstraction metadata. This is absent from
-    /// ordinary solve/resume sessions and never contributes to checkpoint
-    /// compatibility.
-    pub deviation_reference: Option<DeviationReferenceMetadata>,
-}
-
-/// Identity and persistence location of an evaluation-only common
-/// abstraction attached by [`build_multiway_session_with_deviation`].
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DeviationReferenceMetadata {
-    pub config_hash: [u8; 32],
-    pub game_fingerprint: [u8; 32],
-    /// Backend plus reference recall semantics, composed by the same helper
-    /// used for a primary solver abstraction fingerprint.
-    pub abstraction_fingerprint: [u8; 32],
-    pub recall: RecallMode,
-    pub artifact_cache: Option<PathBuf>,
 }
 
 /// Resource facts derived from the production public tree and configured
@@ -335,7 +318,6 @@ pub(crate) fn build_multiway_session(
 ) -> Result<MultiwaySession> {
     build_multiway_session_internal(
         raw_toml,
-        None,
         resume_checkpoint,
         SessionStoragePolicy::Compatibility,
         AbstractionPolicy::CheapBaseline,
@@ -351,299 +333,9 @@ pub fn build_production_multiway_session(
 ) -> Result<MultiwaySession> {
     build_multiway_session_internal(
         raw_toml,
-        None,
         resume_checkpoint,
         SessionStoragePolicy::PreallocatedProduction,
         AbstractionPolicy::Configured,
-    )
-}
-
-/// A one-shot research session using an abstraction supplied by a
-/// feature-gated caller.  The normal production builder remains the only
-/// route used by `solvers solve`; this type exists so research examples can
-/// compare an alternative abstraction without making it a config-selectable
-/// production backend.
-///
-/// Construction does not drive the production run loop. The research caller
-/// supplies its own sweep/evaluation limits and external timeout; the returned
-/// run settings are descriptive and do not schedule stops or artifacts.
-#[cfg(feature = "research-draw-abstraction")]
-pub struct ResearchMultiwaySession<A: MultiwayAbstraction> {
-    pub solver: MultiwaySolver<HoldemGame<A>>,
-    pub sweeps_target: u64,
-    pub threads: usize,
-    pub evaluation_cadence: u64,
-    pub evaluation_samples: u64,
-    pub evaluation_seed: u64,
-    pub storage: StorageKind,
-    pub stop_rule: Option<StopRule>,
-    pub config_toml: String,
-    pub config_hash: [u8; 32],
-    pub game_config: multiway::MultiwayConfig,
-}
-
-/// Builds a research-only, preallocated multiway session around an already
-/// constructed abstraction.  The supplied abstraction is checked against the
-/// v1 config's effective bucket contract for every active-opponent count before
-/// the policy arena is allocated.  Checkpoints and deviation abstractions are
-/// intentionally unavailable here: callers must construct a fresh session
-/// for each research arm.
-#[cfg(feature = "research-draw-abstraction")]
-pub fn build_research_multiway_session<A: MultiwayAbstraction>(
-    raw_toml: &str,
-    abstraction: A,
-) -> Result<ResearchMultiwaySession<A>> {
-    let config: SolveConfig =
-        crate::config::parse_internal_config(raw_toml).context("parsing research config")?;
-    let SolveConfig {
-        schema: _,
-        game,
-        rake,
-        utility,
-        algorithm,
-        run,
-    } = config;
-    let GameSection::PreflopMultiway(game_config) = game else {
-        return Err(anyhow!(
-            "research multiway session requires kind = \"preflop-multiway\""
-        ));
-    };
-    validate_production_abstraction(&game_config)?;
-    if run.target_nash_conv.is_some() {
-        return Err(anyhow!(
-            "multiway profiles do not expose NashConv; remove run.target_nash_conv"
-        ));
-    }
-    let utility = convert_utility(utility)?;
-    let rake = convert_rake(rake);
-    game_config
-        .validate_economics(&utility, &rake)
-        .context("validating research multiway game and utility")?;
-
-    let preflop_buckets = cards::NUM_CLASSES as u32;
-    if preflop_buckets != 169 {
-        return Err(anyhow!(
-            "research abstraction contract requires 169 preflop classes"
-        ));
-    }
-    for active_opponents in 0..=8 {
-        let expected = [
-            (Street::Preflop, preflop_buckets),
-            (
-                Street::Flop,
-                u32::from(game_config.abstraction.flop_buckets),
-            ),
-            (
-                Street::Turn,
-                u32::from(game_config.abstraction.turn_buckets),
-            ),
-            (
-                Street::River,
-                u32::from(game_config.abstraction.river_buckets),
-            ),
-        ];
-        for (street, count) in expected {
-            if count == 0 {
-                return Err(anyhow!(
-                    "research abstraction contract has zero buckets for {street:?}"
-                ));
-            }
-            let actual = abstraction.num_buckets(street, active_opponents);
-            if actual != count {
-                return Err(anyhow!(
-                    "research abstraction bucket mismatch for {street:?}, active_opponents={active_opponents}: expected {count}, got {actual}"
-                ));
-            }
-        }
-    }
-    let abstraction_fingerprint = abstraction.fingerprint();
-    if abstraction_fingerprint == [0; 32] {
-        return Err(anyhow!(
-            "research abstraction must provide a non-zero fingerprint"
-        ));
-    }
-
-    let game = HoldemGame::new(&game_config, &utility, &rake, abstraction)
-        .context("building research multiway game")?;
-    let game_fingerprint = game.game_fingerprint();
-    if abstraction_fingerprint == game_fingerprint {
-        return Err(anyhow!(
-            "research abstraction fingerprint must be distinct from game fingerprint"
-        ));
-    }
-    let sampler = game.deal_sampler().context("compiling table ranges")?;
-
-    let (
-        algorithm_seed,
-        exploration_epsilon,
-        discount_every,
-        discount_until,
-        traverser_vector,
-        prune,
-        prune_threshold_override,
-        prune_skip_probability,
-    ) = match algorithm {
-        AlgorithmSection::ExternalSamplingMccfr {
-            seed,
-            exploration_epsilon,
-            discount_every,
-            discount_until,
-            traverser_vector,
-            prune,
-            prune_threshold,
-            prune_skip_probability,
-        } => (
-            seed,
-            exploration_epsilon,
-            discount_every,
-            discount_until,
-            traverser_vector,
-            prune,
-            prune_threshold,
-            prune_skip_probability,
-        ),
-        _ => {
-            return Err(anyhow!(
-                "preflop-multiway requires schedule = \"external-sampling-mccfr\""
-            ));
-        }
-    };
-    if prune && !traverser_vector {
-        return Err(anyhow!(
-            "algorithm.prune requires algorithm.traverser_vector = true"
-        ));
-    }
-    if let Some(threshold) = prune_threshold_override
-        && (!threshold.is_finite() || threshold >= 0.0)
-    {
-        return Err(anyhow!(
-            "algorithm.prune_threshold must be finite and strictly negative, found {threshold}"
-        ));
-    }
-    let sweeps = run.sweeps.unwrap_or(run.iterations);
-    if sweeps == 0 {
-        return Err(anyhow!("run.sweeps must be positive for a multiway solve"));
-    }
-    let evaluation_cadence = run.evaluation_cadence.unwrap_or(run.check_every);
-    if evaluation_cadence == 0 {
-        return Err(anyhow!("run.evaluation_cadence must be positive"));
-    }
-    if run.checkpoint_every.is_some() {
-        return Err(anyhow!(
-            "research sessions are one-shot and do not support checkpoint_every"
-        ));
-    }
-    let threads = run.threads.unwrap_or_else(rayon::current_num_threads);
-    if threads == 0 {
-        return Err(anyhow!("run.threads must be positive"));
-    }
-    if run.evaluation_samples == Some(0) {
-        return Err(anyhow!(
-            "run.evaluation_samples must be positive when supplied"
-        ));
-    }
-    if run.sweep_batch == Some(0) {
-        return Err(anyhow!("run.sweep_batch must be positive when supplied"));
-    }
-    if run
-        .stop_dev_gain
-        .is_some_and(|threshold| !threshold.is_finite() || threshold <= 0.0)
-    {
-        return Err(anyhow!(
-            "run.stop_dev_gain must be finite and positive when supplied"
-        ));
-    }
-    if run.stop_confirmations == Some(0) {
-        return Err(anyhow!(
-            "run.stop_confirmations must be positive when supplied"
-        ));
-    }
-    if run
-        .stop_eval_period_secs
-        .is_some_and(|period| !period.is_finite() || period <= 0.0)
-    {
-        return Err(anyhow!(
-            "run.stop_eval_period_secs must be finite and positive when supplied"
-        ));
-    }
-    let stop_rule = run.stop_dev_gain.map(|dev_gain_threshold| StopRule {
-        dev_gain_threshold,
-        confirmations: run.stop_confirmations.unwrap_or(DEFAULT_STOP_CONFIRMATIONS),
-        eval_period_secs: run
-            .stop_eval_period_secs
-            .unwrap_or(DEFAULT_STOP_EVAL_PERIOD_SECS),
-        br_traversals: run.stop_br_traversals.unwrap_or(DEFAULT_STOP_BR_TRAVERSALS),
-    });
-    let evaluation_samples = run.evaluation_samples.unwrap_or(256);
-    let prune_threshold = if !prune {
-        DEFAULT_PRUNE_THRESHOLD
-    } else {
-        prune_threshold_override.unwrap_or_else(|| derive_prune_threshold(&utility, &game_config))
-    };
-    let max_memory_bytes = resolve_policy_memory_limit(
-        SessionStoragePolicy::PreallocatedProduction,
-        run.max_memory_bytes,
-    )?;
-    let solver_config = SolverConfig {
-        seed: run.seed.unwrap_or(algorithm_seed),
-        max_memory_bytes,
-        max_traversal_depth: 512,
-        exploration_epsilon,
-        discount_every,
-        discount_until,
-        sweep_batch: run.sweep_batch.unwrap_or(1),
-        traverser_vector,
-        prune,
-        prune_threshold,
-        prune_skip_probability,
-    };
-    let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
-    let solver =
-        MultiwaySolver::new_preallocated_with_threads(game, sampler, solver_config, threads)
-            .context("initializing research multiway MCCFR")?;
-    let allocation = solver
-        .policy_arena_allocation()
-        .ok_or_else(|| anyhow!("research solver returned without a preallocated policy arena"))?;
-    if !allocation.pages_committed {
-        return Err(anyhow!(
-            "research solver returned before policy arena pages were committed"
-        ));
-    }
-
-    Ok(ResearchMultiwaySession {
-        solver,
-        sweeps_target: sweeps,
-        threads,
-        evaluation_cadence,
-        evaluation_samples,
-        evaluation_seed,
-        storage: run.storage,
-        stop_rule,
-        config_toml: raw_toml.to_string(),
-        config_hash: formats::config_hash(raw_toml.as_bytes()),
-        game_config,
-    })
-}
-
-/// Builds a candidate session with a separately configured common
-/// abstraction used only for deviator training/evaluation.
-///
-/// The reference's public game, ranges, rake, and utility must have the exact
-/// same game fingerprint as the candidate. Its algorithm/run sections are not
-/// used. The reference is attached before checkpoint restore; core
-/// fingerprints intentionally continue to describe only the candidate.
-#[cfg(test)]
-pub(crate) fn build_multiway_session_with_deviation(
-    raw_toml: &str,
-    deviation_raw_toml: &str,
-    resume_checkpoint: Option<&Path>,
-) -> Result<MultiwaySession> {
-    build_multiway_session_internal(
-        raw_toml,
-        Some(deviation_raw_toml),
-        resume_checkpoint,
-        SessionStoragePolicy::Compatibility,
-        AbstractionPolicy::CheapBaseline,
     )
 }
 
@@ -667,7 +359,6 @@ enum AbstractionPolicy {
 
 fn build_multiway_session_internal(
     raw_toml: &str,
-    deviation_raw_toml: Option<&str>,
     resume_checkpoint: Option<&Path>,
     storage_policy: SessionStoragePolicy,
     abstraction_policy: AbstractionPolicy,
@@ -689,11 +380,6 @@ fn build_multiway_session_internal(
     };
     if matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
         validate_production_abstraction(&game_config)?;
-        if deviation_raw_toml.is_some() {
-            return Err(anyhow!(
-                "production sessions do not accept a separately configured deviation abstraction"
-            ));
-        }
     }
     if run.target_nash_conv.is_some() {
         return Err(anyhow!(
@@ -702,16 +388,8 @@ fn build_multiway_session_internal(
     }
     let utility = convert_utility(utility)?;
     let rake = convert_rake(rake);
-    let (mut game, sampler, abstraction_ready) =
+    let (game, sampler, abstraction_ready) =
         build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
-    let mut deviation_reference = deviation_raw_toml
-        .map(|raw| build_deviation_reference(raw, game.game_fingerprint(), abstraction_policy))
-        .transpose()
-        .context("building common deviation reference")?;
-    if let Some(reference) = deviation_reference.as_mut() {
-        let recall = reference.metadata.recall;
-        game = game.with_deviation_abstraction(reference.backend(), recall);
-    }
 
     let (
         algorithm_seed,
@@ -928,7 +606,6 @@ fn build_multiway_session_internal(
         config_hash: formats::config_hash(raw_toml.as_bytes()),
         game_config,
         checkpoint_runtime,
-        deviation_reference: deviation_reference.map(|reference| reference.metadata),
     })
 }
 
@@ -965,68 +642,6 @@ fn validate_production_abstraction(game: &multiway::MultiwayConfig) -> Result<()
         ));
     }
     Ok(())
-}
-
-struct BuiltDeviationReference {
-    backend: Option<MultiwayAbstractionBackend>,
-    metadata: DeviationReferenceMetadata,
-}
-
-impl BuiltDeviationReference {
-    fn backend(&mut self) -> MultiwayAbstractionBackend {
-        self.backend
-            .take()
-            .expect("reference backend is moved into the candidate exactly once")
-    }
-}
-
-fn build_deviation_reference(
-    raw_toml: &str,
-    candidate_game_fingerprint: [u8; 32],
-    abstraction_policy: AbstractionPolicy,
-) -> Result<BuiltDeviationReference> {
-    let config: SolveConfig =
-        crate::config::parse_internal_config(raw_toml).context("parsing reference config")?;
-    let SolveConfig {
-        schema: _,
-        game,
-        rake,
-        utility,
-        algorithm: _,
-        run: _,
-    } = config;
-    let GameSection::PreflopMultiway(game_config) = game else {
-        return Err(anyhow!(
-            "common deviation reference requires kind = \"preflop-multiway\""
-        ));
-    };
-    let utility = convert_utility(utility)?;
-    let rake = convert_rake(rake);
-    let (reference_game, _, _) =
-        build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
-    let reference_game_fingerprint = reference_game.game_fingerprint();
-    if candidate_game_fingerprint != reference_game_fingerprint {
-        return Err(anyhow!(
-            "candidate/reference game fingerprint mismatch: candidate={}, reference={}",
-            formats::config_hash_hex(&candidate_game_fingerprint),
-            formats::config_hash_hex(&reference_game_fingerprint)
-        ));
-    }
-    let recall = game_config.abstraction.recall;
-    let abstraction_fingerprint = multiway::abstraction_fingerprint_with_recall(
-        reference_game.abstraction_fingerprint(),
-        recall,
-    );
-    Ok(BuiltDeviationReference {
-        backend: Some(reference_game.into_abstraction()),
-        metadata: DeviationReferenceMetadata {
-            config_hash: formats::config_hash(raw_toml.as_bytes()),
-            game_fingerprint: reference_game_fingerprint,
-            abstraction_fingerprint,
-            recall,
-            artifact_cache: game_config.abstraction.artifact_cache,
-        },
-    })
 }
 
 /// Scale factor `derive_prune_threshold` applies to the game's total stakes
@@ -1102,8 +717,8 @@ impl StopRuleState {
 /// Trains one burst deviator per seat in parallel, on a deterministic worker
 /// pool sized to `threads` rather than relying on rayon's ambient global
 /// pool (whose thread count the config doesn't control). Shared by every
-/// caller that trains a per-seat best-response burst: the stop-rule check
-/// below, and `mw_eval`'s purification sweep.
+/// caller that trains a per-seat best-response burst, such as the stop-rule
+/// check below.
 pub fn train_deviators_parallel(
     solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
     num_players: usize,
@@ -1123,29 +738,6 @@ pub fn train_deviators_parallel(
             .collect::<std::result::Result<Vec<_>, _>>()
     })
     .map_err(|error| anyhow!("training deviator: {error}"))
-}
-
-/// Reference-evaluation counterpart to [`train_deviators_parallel`] that
-/// retains each seat's training coverage report.
-pub fn train_deviators_with_reports_parallel(
-    solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
-    num_players: usize,
-    threads: usize,
-    traversals: u64,
-    seed: u64,
-    variant: multiway::ProfileVariant,
-) -> Result<Vec<multiway::DeviatorTrainingResult>> {
-    let pool = rayon::ThreadPoolBuilder::new()
-        .num_threads(threads)
-        .build()
-        .map_err(|error| anyhow!("building deviator training thread pool: {error}"))?;
-    pool.install(|| {
-        (0..num_players)
-            .into_par_iter()
-            .map(|seat| solver.train_deviator_with_report(seat, traversals, seed, variant))
-            .collect::<std::result::Result<Vec<_>, _>>()
-    })
-    .map_err(|error| anyhow!("training reference deviator: {error}"))
 }
 
 /// Result of one [`run_stop_rule_check`] call: the evaluation plus what
@@ -1954,7 +1546,6 @@ mod tests {
         let build = |raw: &str, checkpoint: Option<&std::path::Path>| {
             build_multiway_session_internal(
                 raw,
-                None,
                 checkpoint,
                 SessionStoragePolicy::PreallocatedProduction,
                 AbstractionPolicy::CheapBaseline,
@@ -2013,173 +1604,6 @@ mod tests {
         assert_eq!(session.sweeps_target, 2);
         assert_eq!(session.config_toml, raw);
         assert_eq!(session.stop_rule, None);
-        assert_eq!(session.deviation_reference, None);
-        assert!(session.solver.game().deviation_abstraction().is_none());
-    }
-
-    #[cfg(feature = "research-draw-abstraction")]
-    fn research_test_abstraction(buckets: u32) -> FeatureHashAbstraction {
-        FeatureHashAbstraction::new(FeatureHashParams {
-            flop_buckets: buckets,
-            turn_buckets: buckets,
-            river_buckets: buckets,
-        })
-        .unwrap()
-    }
-
-    #[cfg(feature = "research-draw-abstraction")]
-    #[test]
-    fn research_supplied_abstraction_preserves_dense_session_and_updates() {
-        let raw = crate::test_fixtures::LOWERED_3MAX
-            .replace("checkpoint_every = 1\n", "")
-            .replace("[algorithm]\n", "[algorithm]\ntraverser_vector = true\n")
-            .replace("[run]\n", "[run]\nsweep_batch = 2\nthreads = 2\n");
-        let mut expected = build_multiway_session_internal(
-            &raw,
-            None,
-            None,
-            SessionStoragePolicy::PreallocatedProduction,
-            AbstractionPolicy::CheapBaseline,
-        )
-        .unwrap();
-        let mut research =
-            build_research_multiway_session(&raw, research_test_abstraction(8)).unwrap();
-        assert_eq!(research.config_hash, expected.config_hash);
-        assert_eq!(research.sweeps_target, expected.sweeps_target);
-        assert_eq!(research.threads, expected.threads);
-        assert_eq!(research.evaluation_cadence, expected.evaluation_cadence);
-        assert_eq!(research.evaluation_samples, expected.evaluation_samples);
-        assert_eq!(research.evaluation_seed, expected.evaluation_seed);
-        assert_eq!(research.stop_rule, expected.stop_rule);
-        assert!(
-            research
-                .solver
-                .policy_arena_allocation()
-                .unwrap()
-                .pages_committed
-        );
-        assert_eq!(
-            MultiwayCheckpoint::capture(&research.solver),
-            MultiwayCheckpoint::capture(&expected.solver)
-        );
-        expected.solver.run_sweeps_with_threads(4, 2).unwrap();
-        research.solver.run_sweeps_with_threads(4, 2).unwrap();
-        assert_eq!(
-            MultiwayCheckpoint::capture(&research.solver),
-            MultiwayCheckpoint::capture(&expected.solver),
-            "supplied backend must preserve full regret/average state and sample sequence"
-        );
-    }
-
-    #[cfg(feature = "research-draw-abstraction")]
-    #[test]
-    fn research_session_rejects_wrong_budgets_and_unsupported_contracts() {
-        let raw = crate::test_fixtures::LOWERED_3MAX.replace("checkpoint_every = 1\n", "");
-        let error = build_research_multiway_session(&raw, research_test_abstraction(4))
-            .err()
-            .expect("mismatched effective budget must fail");
-        assert!(error.to_string().contains("bucket mismatch"));
-        let full = raw.replace("recall = \"street\"", "recall = \"full\"");
-        let error = build_research_multiway_session(&full, research_test_abstraction(8))
-            .err()
-            .expect("research must not enable removed recall mode");
-        assert!(error.to_string().contains("MWP002"));
-        let error = build_research_multiway_session(
-            crate::test_fixtures::LOWERED_3MAX,
-            research_test_abstraction(8),
-        )
-        .err()
-        .expect("one-shot helper must reject checkpoint scheduling");
-        assert!(error.to_string().contains("checkpoint_every"));
-    }
-
-    #[cfg(feature = "research-draw-abstraction")]
-    #[test]
-    fn research_session_checks_preflop_and_every_opponent_count() {
-        struct BadCounts {
-            street: Street,
-            opponents: u8,
-        }
-        impl MultiwayAbstraction for BadCounts {
-            fn num_buckets(&self, street: Street, opponents: u8) -> u32 {
-                if street == self.street && opponents == self.opponents {
-                    1
-                } else if street == Street::Preflop {
-                    169
-                } else {
-                    8
-                }
-            }
-            fn bucket(&self, _: BucketContext<'_>) -> BucketId {
-                panic!("invalid backend must fail before traversal")
-            }
-            fn fingerprint(&self) -> [u8; 32] {
-                [1; 32]
-            }
-        }
-        let raw = crate::test_fixtures::LOWERED_3MAX.replace("checkpoint_every = 1\n", "");
-        for (street, opponents) in [(Street::Preflop, 0), (Street::River, 8)] {
-            let error = build_research_multiway_session(&raw, BadCounts { street, opponents })
-                .err()
-                .expect("all declared contexts must be checked before allocation");
-            let message = error.to_string();
-            assert!(message.contains("bucket mismatch"), "{message}");
-            assert!(message.contains(&format!("active_opponents={opponents}")));
-        }
-    }
-
-    #[test]
-    fn common_deviation_reference_attaches_before_checkpoint_restore() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let reference_raw = raw
-            .replace("flop_buckets = 8", "flop_buckets = 4")
-            .replace("turn_buckets = 8", "turn_buckets = 4")
-            .replace("river_buckets = 8", "river_buckets = 4")
-            .replace("seed = 17", "seed = 23");
-        let directory = tempfile::tempdir().unwrap();
-        let checkpoint_path = directory.path().join("candidate.mwckpt");
-
-        let mut original = build_multiway_session(raw, None).unwrap();
-        original.solver.run_sweeps(1).unwrap();
-        let candidate_configuration = original.solver.configuration_fingerprint();
-        let candidate_abstraction = original.solver.abstraction_fingerprint();
-        MultiwayCheckpoint::capture(&original.solver)
-            .write_atomic(&checkpoint_path)
-            .unwrap();
-
-        let restored =
-            build_multiway_session_with_deviation(raw, &reference_raw, Some(&checkpoint_path))
-                .unwrap();
-        assert_eq!(restored.solver.metrics().sweeps, 1);
-        assert_eq!(
-            restored.solver.configuration_fingerprint(),
-            candidate_configuration
-        );
-        assert_eq!(
-            restored.solver.abstraction_fingerprint(),
-            candidate_abstraction
-        );
-        let reference = restored
-            .deviation_reference
-            .as_ref()
-            .expect("reference metadata");
-        assert_ne!(reference.abstraction_fingerprint, candidate_abstraction);
-        assert_eq!(reference.recall, RecallMode::Street);
-        assert!(restored.solver.game().deviation_abstraction().is_some());
-    }
-
-    #[test]
-    fn common_deviation_reference_rejects_a_different_game() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let different_game = raw.replacen("stack_bb = 2.0", "stack_bb = 3.0", 1);
-        let error = build_multiway_session_with_deviation(raw, &different_game, None)
-            .err()
-            .expect("different game must fail");
-        let error = format!("{error:#}");
-        assert!(
-            error.contains("candidate/reference game fingerprint mismatch"),
-            "unexpected error: {error}"
-        );
     }
 
     fn with_stop_dev_gain(dev_gain: &str, extra: &str) -> String {

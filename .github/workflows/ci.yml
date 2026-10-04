@@ -42,19 +42,6 @@ jobs:
       - name: Test (debug)
         run: cargo test --workspace
 
-  research-features:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Compile research examples and feature paths
-        run: cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
-      - name: Average-sampling API smoke
-        run: cargo test -p multiway --features research-average-sampling --lib average_sampling_research
-      - name: Regret-sampling smoke
-        run: cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
-
   windows-smoke:
     runs-on: windows-latest
     steps:

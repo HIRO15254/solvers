@@ -31,8 +31,7 @@ Tool tests use disposable `.cache/tool-tests/` fixtures, never Cargo's `target/`
 The workspace audit reports `experiments/` separately alongside build output,
 scratch runs, caches, source, and documentation; it does not delete anything.
 
-CI runs the Python checks alongside the standard Rust verification, explicitly
-compiles research feature paths, runs small sampling API tests, and exercises
+CI runs the Python checks alongside the standard Rust verification, and exercises
 CLI checkpoint/resume and daemon HTTP behavior on Windows. Expensive acceptance
 tests remain in the manually dispatched acceptance workflow.
 

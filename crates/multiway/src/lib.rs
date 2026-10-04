@@ -13,8 +13,6 @@ pub mod config;
 pub mod holdem;
 pub mod icm;
 pub mod rake_condition;
-#[cfg(feature = "research-abstractions")]
-mod research_draw_abstraction;
 pub mod sampler;
 pub mod settlement;
 pub mod solver;
@@ -38,40 +36,14 @@ pub use config::{
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};
 pub use rake_condition::{CompiledRakeCondition, RakeConditionContext};
-#[cfg(feature = "research-abstractions")]
-pub use research_draw_abstraction::{DrawAwareAbstraction, DrawAwareAbstractionError};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
-#[cfg(feature = "research-regret-sampling")]
-pub use solver::RaisedPreflopResearchWork;
 pub use solver::{
-    ActionProbability, CandidatePolicyCoverage, ConditionalPrefixEvaluation,
-    ConditionalProfileEvaluation, ConditionalStreetCoverage,
-    CounterfactualEndpointDeviationEvaluation, DenseNodeContext, DeviatorPolicy,
-    DeviatorTrainingCoverage, DeviatorTrainingResult, EndpointDeviationConfig,
-    EndpointDeviationEvaluation, EndpointDeviationFit, EndpointDeviationHeldOut,
-    EndpointDeviationRow, EndpointDeviationSampling, ExternalSamplingGame, HistoryEntry,
-    HistoryKey, InfoKey, MultiwaySolver, PolicyArenaAllocation, PolicyColumn, PolicyEntry,
-    PrefixPolicyCoverage, PrefixProfileEvaluation, PreflopConditionalPrefixEvaluation,
-    PreflopConditionalProfileEvaluation, PreflopProposalMetadata, PreflopSupportCensus,
-    PreflopSupportNode, PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant,
-    PublicActionDestination, PublicNodeAction, PublicNodeView, ReferenceDeviationCoverage,
-    ReferenceDeviationEvaluation, ReferenceDeviationWorld, SolverConfig, SolverError,
-    SolverMetrics, SolverState, StreetVisitCounts, WeightedEstimate,
-    abstraction_fingerprint_with_recall,
-};
-#[cfg(feature = "research-average-sampling")]
-pub use solver::{
-    AverageSamplingDiagnosticsConfig, AverageSamplingDiagnosticsResult,
-    AverageSamplingResearchConfig, AverageSamplingResearchCoverageEvaluation,
-    AverageSamplingResearchEvaluation, AverageSamplingResearchHistory,
-    AverageSamplingResearchResult, AverageSamplingResearchRowStatus,
-    AverageSamplingResearchStrategyRow, AverageSamplingResearchVariant,
-    AverageSamplingWithDiagnostics, ResearchPolicySupport, ResearchPolicySupportRow,
-};
-pub use solver::{
-    PreflopDeviationConfig, PreflopDeviationEvaluation, PreflopDeviationFitMode,
-    PreflopDeviationHeldOut,
+    ActionProbability, CandidatePolicyCoverage, DenseNodeContext, DeviatorPolicy,
+    ExternalSamplingGame, HistoryEntry, HistoryKey, InfoKey, MultiwaySolver, PolicyArenaAllocation,
+    PolicyColumn, PolicyEntry, PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant,
+    PublicActionDestination, PublicNodeAction, PublicNodeView, SolverConfig, SolverError,
+    SolverMetrics, SolverState, StreetVisitCounts, abstraction_fingerprint_with_recall,
 };
 pub use tree::{PublicTree, TreeError};
 pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};

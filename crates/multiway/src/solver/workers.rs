@@ -735,8 +735,6 @@ pub(super) struct VectorTraversalWorker<'a, G: ExternalSamplingGame> {
     /// Counterfactual branches can reach the same street with different
     /// player counts, so street alone is not a valid cache key.
     bucket_cache: FxHashMap<(usize, u8), Arc<[BucketId]>>,
-    /// Empty for the production specialization, which never reads it.
-    raised_preflop_nodes: &'a [bool],
 }
 
 impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
@@ -759,13 +757,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             weights,
             terminal_combo_scratch: Vec::new(),
             bucket_cache: FxHashMap::default(),
-            raised_preflop_nodes: &[],
         })
-    }
-
-    pub(super) fn with_raised_preflop_nodes(mut self, nodes: &'a [bool]) -> Self {
-        self.raised_preflop_nodes = nodes;
-        self
     }
 
     pub(super) fn finish(
@@ -833,7 +825,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
     /// disabled, `active` is always the full master range at every node
     /// (pruning is the only thing that ever shrinks it), so this is
     /// byte-identical to the pre-pruning algorithm.
-    #[cfg(test)]
     #[allow(clippy::too_many_arguments)]
     pub(super) fn traverse(
         &mut self,
@@ -845,90 +836,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
         sample_importance: f64,
         rng: &mut ChaCha20Rng,
         depth: u32,
-    ) -> Result<Vec<f64>, SolverError> {
-        self.traverse_with_sampling::<false>(
-            state,
-            node_id,
-            world,
-            traverser,
-            active,
-            sample_importance,
-            rng,
-            depth,
-        )
-    }
-
-    #[cfg(test)]
-    #[allow(clippy::too_many_arguments)]
-    pub(super) fn traverse_raised_preflop(
-        &mut self,
-        state: G::State,
-        node_id: NodeId,
-        world: &SampledWorld,
-        traverser: usize,
-        active: &[usize],
-        sample_importance: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-    ) -> Result<Vec<f64>, SolverError> {
-        self.traverse_with_sampling::<true>(
-            state,
-            node_id,
-            world,
-            traverser,
-            active,
-            sample_importance,
-            rng,
-            depth,
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    pub(super) fn traverse_with_sampling<const ENUMERATE_RAISED: bool>(
-        &mut self,
-        state: G::State,
-        node_id: NodeId,
-        world: &SampledWorld,
-        traverser: usize,
-        active: &[usize],
-        sample_importance: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-    ) -> Result<Vec<f64>, SolverError> {
-        if ENUMERATE_RAISED
-            && (self.config.prune
-                || self.config.exploration_epsilon != 0.0
-                || self.raised_preflop_nodes.len() != self.tree.nodes.len())
-        {
-            return Err(SolverError::InvalidState(
-                "raised-opponent research requires zero exploration, no pruning and complete public eligibility",
-            ));
-        }
-        self.traverse_inner::<ENUMERATE_RAISED>(
-            state,
-            node_id,
-            world,
-            traverser,
-            active,
-            sample_importance,
-            rng,
-            depth,
-            false,
-        )
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn traverse_inner<const ENUMERATE_RAISED: bool>(
-        &mut self,
-        state: G::State,
-        node_id: NodeId,
-        world: &SampledWorld,
-        traverser: usize,
-        active: &[usize],
-        sample_importance: f64,
-        rng: &mut ChaCha20Rng,
-        depth: u32,
-        enumerated: bool,
     ) -> Result<Vec<f64>, SolverError> {
         if depth > self.config.max_traversal_depth {
             return Err(SolverError::DepthLimit {
@@ -1061,7 +968,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                         Child::Terminal => {
                             self.terminal_vector(&next_state, world, traverser, &child_active)?
                         }
-                        Child::Decision(child_id) => self.traverse_inner::<ENUMERATE_RAISED>(
+                        Child::Decision(child_id) => self.traverse(
                             next_state,
                             child_id,
                             world,
@@ -1070,7 +977,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                             sample_importance,
                             rng,
                             depth + 1,
-                            enumerated,
                         )?,
                     };
                     let mut scattered = vec![0.0; active_len];
@@ -1083,7 +989,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                         Child::Terminal => {
                             self.terminal_vector(&next_state, world, traverser, active)?
                         }
-                        Child::Decision(child_id) => self.traverse_inner::<ENUMERATE_RAISED>(
+                        Child::Decision(child_id) => self.traverse(
                             next_state,
                             child_id,
                             world,
@@ -1092,7 +998,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                             sample_importance,
                             rng,
                             depth + 1,
-                            enumerated,
                         )?,
                     }
                 };
@@ -1183,55 +1088,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let strategy = regret_matching(&self.arena.regrets[range]);
             let (action, sampling_probability) =
                 sample_exploratory_action(&strategy, self.config.exploration_epsilon, rng);
-            if ENUMERATE_RAISED
-                && !enumerated
-                && node.street == Street::Preflop
-                && num_actions > 1
-                && self.raised_preflop_nodes[node_id as usize]
-            {
-                // The old virtual draw fixes which child's final RNG to keep.
-                // Extra siblings share its starting stream without advancing
-                // later sampled decisions outside this expanded subtree.
-                let child_base_rng = rng.clone();
-                let mut selected_final_rng = None;
-                let mut total = vec![0.0; active.len()];
-                for (candidate, &probability) in strategy.iter().enumerate() {
-                    if probability == 0.0 && candidate != action {
-                        continue;
-                    }
-                    let child_importance = sample_importance * probability;
-                    if !child_importance.is_finite() {
-                        return Err(SolverError::NumericOverflow);
-                    }
-                    let next = self.game.next_state_with(&state, &actions, candidate);
-                    let mut child_rng = child_base_rng.clone();
-                    let values = match node.children[candidate] {
-                        Child::Terminal => self.terminal_vector(&next, world, traverser, active)?,
-                        Child::Decision(child_id) => self.traverse_inner::<ENUMERATE_RAISED>(
-                            next,
-                            child_id,
-                            world,
-                            traverser,
-                            active,
-                            child_importance,
-                            &mut child_rng,
-                            depth + 1,
-                            true,
-                        )?,
-                    };
-                    for (sum, value) in total.iter_mut().zip(values) {
-                        *sum += probability * value;
-                        if !sum.is_finite() {
-                            return Err(SolverError::NumericOverflow);
-                        }
-                    }
-                    if candidate == action {
-                        selected_final_rng = Some(child_rng);
-                    }
-                }
-                *rng = selected_final_rng.expect("virtual selected action was enumerated");
-                return Ok(total);
-            }
             let chosen_probability = strategy[action];
             let importance = chosen_probability / sampling_probability;
             let child_importance = sample_importance * importance;
@@ -1242,7 +1098,7 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
             let next_state = self.game.next_state_with(&state, &actions, action);
             let result = match node.children[action] {
                 Child::Terminal => self.terminal_vector(&next_state, world, traverser, active),
-                Child::Decision(child_id) => self.traverse_inner::<ENUMERATE_RAISED>(
+                Child::Decision(child_id) => self.traverse(
                     next_state,
                     child_id,
                     world,
@@ -1251,7 +1107,6 @@ impl<'a, G: ExternalSamplingGame> VectorTraversalWorker<'a, G> {
                     child_importance,
                     rng,
                     depth + 1,
-                    enumerated,
                 ),
             };
             let mut result = result?;
