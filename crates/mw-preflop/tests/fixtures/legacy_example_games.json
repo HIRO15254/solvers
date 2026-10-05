@@ -1,0 +1,3353 @@
+{
+  "examples/bench_multiway/3max_2bb.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 2,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 2,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 2
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 0,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        }
+      ]
+    },
+    "source_blake3": "f048ea016e9e0f840a6599d2c725d1ac834524b6fd8ce136cf9e829165eb9fdf"
+  },
+  "examples/bench_multiway/6max_100bb_nl50_partial_reference.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 256,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 256,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 256
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": true,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "reraise_jam_above_actor_starting_stack": {
+            "denominator": 3,
+            "numerator": 1
+          }
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "call",
+            "condition": "unopened && position != \"SB\"",
+            "effect": "remove",
+            "priority": 100,
+            "sizes": [],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "limpers > 0 && aggressions == 0",
+            "effect": "replace",
+            "priority": 105,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 4.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"UTG\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 3,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 4,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"CO\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.3
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 5,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 6,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"SB\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 3.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 7,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 8,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 9,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 10,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 11,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 12,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 13,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 14,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 15,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.3
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 16,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 17,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 18,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 19,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 20,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 21,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"SB\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 22,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\" && spr > 1",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 23,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position in [\"CO\", \"BTN\", \"SB\", \"BB\"] && !preflop_participant",
+            "effect": "remove",
+            "priority": 145,
+            "sizes": [],
+            "source_order": 24,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"CO\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 14.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 25,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 14.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 26,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"SB\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 20.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 27,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BB\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 19.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 28,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"UTG\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 19.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 29,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && players == 2 && position == \"SB\" && last_preflop_aggressor_position == \"BB\"",
+            "effect": "replace",
+            "priority": 150,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 21.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 30,
+            "street": "preflop"
+          },
+          {
+            "action": "bet",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 200,
+            "sizes": [
+              {
+                "fraction": 0.5,
+                "kind": "pot-after-call"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 31,
+            "street": "postflop"
+          },
+          {
+            "action": "raise",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 210,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 32,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        }
+      ]
+    },
+    "source_blake3": "1e0cc2babec04f5b46f149b1471e12fd25a73ff6e90a6efe0b625f29cbbcbe8b"
+  },
+  "examples/bench_multiway/6max_100bb_nl50_partial_reference_limp.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 256,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 256,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 256
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": true,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "reraise_jam_above_actor_starting_stack": {
+            "denominator": 3,
+            "numerator": 1
+          }
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "call",
+            "condition": "unopened && position != \"SB\"",
+            "effect": "remove",
+            "priority": 100,
+            "sizes": [],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "limpers > 0 && aggressions == 0",
+            "effect": "replace",
+            "priority": 105,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 3.0
+              },
+              {
+                "kind": "to-bb",
+                "value": 5.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "players == 2 && limpers > 0 && aggressions == 1 && position == \"SB\" && last_preflop_aggressor_position == \"BB\" && spr > 20",
+            "effect": "replace",
+            "priority": 115,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 14.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 3,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "players == 2 && limpers > 0 && aggressions == 1 && position == \"SB\" && last_preflop_aggressor_position == \"BB\" && spr > 1 && spr <= 20",
+            "effect": "replace",
+            "priority": 116,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 18.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 4,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"UTG\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 5,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 6,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"CO\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.3
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 7,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 8,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"SB\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 3.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 9,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 10,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 11,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 12,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 13,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 14,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 15,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 16,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 17,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.3
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 18,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 19,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 20,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 21,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 22,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 23,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"SB\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 24,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\" && spr > 1",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 25,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position in [\"CO\", \"BTN\", \"SB\", \"BB\"] && !preflop_participant",
+            "effect": "remove",
+            "priority": 145,
+            "sizes": [],
+            "source_order": 26,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"CO\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 14.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 27,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 14.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 28,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"SB\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 20.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 29,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"BB\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 19.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 30,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_preflop_aggressor_position == \"HJ\" && spr > 1 && position == \"UTG\"",
+            "effect": "replace",
+            "priority": 146,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 19.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 31,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && players == 2 && position == \"SB\" && last_preflop_aggressor_position == \"BB\"",
+            "effect": "replace",
+            "priority": 150,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 21.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 32,
+            "street": "preflop"
+          },
+          {
+            "action": "bet",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 200,
+            "sizes": [
+              {
+                "fraction": 0.5,
+                "kind": "pot-after-call"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 33,
+            "street": "postflop"
+          },
+          {
+            "action": "raise",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 210,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 34,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        }
+      ]
+    },
+    "source_blake3": "71d5cde553ce190610fe59fb51ee4a6797e5f023a1c49e5e380ae3e0a0fc9142"
+  },
+  "examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 32,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 32,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 32
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "reraise_jam_above_actor_starting_stack": {
+            "denominator": 3,
+            "numerator": 1
+          }
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "call",
+            "condition": "unopened",
+            "effect": "remove",
+            "priority": 100,
+            "sizes": [],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"UTG\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              }
+            ],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.0
+              }
+            ],
+            "source_order": 3,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"CO\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.3
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 4,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 2.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 5,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "unopened && limpers == 0 && position == \"SB\"",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 3.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 6,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"HJ\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              }
+            ],
+            "source_order": 7,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              }
+            ],
+            "source_order": 8,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              }
+            ],
+            "source_order": 9,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              }
+            ],
+            "source_order": 10,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"UTG\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              }
+            ],
+            "source_order": 11,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"CO\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 6.5
+              }
+            ],
+            "source_order": 12,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              }
+            ],
+            "source_order": 13,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.0
+              }
+            ],
+            "source_order": 14,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"HJ\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.3
+              }
+            ],
+            "source_order": 15,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BTN\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 7.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 16,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 11.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 17,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"CO\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.5
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 18,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 12.0
+              }
+            ],
+            "source_order": 19,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"BTN\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 13.0
+              }
+            ],
+            "source_order": 20,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == \"SB\" && position == \"BB\"",
+            "effect": "replace",
+            "priority": 130,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 10.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 21,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"UTG\" && position in [\"HJ\", \"CO\", \"BTN\", \"SB\"]",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 22,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"HJ\" && position in [\"CO\", \"BTN\", \"SB\"]",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 23,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"CO\" && position in [\"BTN\", \"SB\"]",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 24,
+            "street": "preflop"
+          },
+          {
+            "action": "call",
+            "condition": "aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == \"BTN\" && position == \"SB\"",
+            "effect": "remove",
+            "priority": 140,
+            "sizes": [],
+            "source_order": 25,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions == 2 && limpers == 0 && players == 2 && position == \"SB\" && last_preflop_aggressor_position == \"BB\"",
+            "effect": "replace",
+            "priority": 150,
+            "sizes": [
+              {
+                "kind": "to-bb",
+                "value": 21.0
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 26,
+            "street": "preflop"
+          },
+          {
+            "action": "bet",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 200,
+            "sizes": [
+              {
+                "fraction": 0.5,
+                "kind": "pot-after-call"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 27,
+            "street": "postflop"
+          },
+          {
+            "action": "raise",
+            "condition": "players >= 2",
+            "effect": "replace",
+            "priority": 210,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 28,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        }
+      ]
+    },
+    "source_blake3": "ee2f20d833b9c838b556f07fafa0c38b15eb08882577cc9f7289d6eb8ed9bd61"
+  },
+  "examples/bench_multiway/6max_20bb_checkdown.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 32,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 32,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 32
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "raise",
+            "condition": "unopened",
+            "effect": "replace",
+            "priority": 100,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 3.0,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 3",
+            "effect": "remove",
+            "priority": 120,
+            "sizes": [],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": null,
+            "condition": "players >= 2",
+            "effect": "checkdown",
+            "priority": 200,
+            "sizes": [],
+            "source_order": 3,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        }
+      ]
+    },
+    "source_blake3": "348e5b46eb2c27f5d080b43494e7b33377b724cc9dd80706480a14075c5fba53"
+  },
+  "examples/bench_multiway/6max_2bb.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 2,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 2,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 2
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        }
+      ]
+    },
+    "source_blake3": "3b0068fd2cef5445432db25dae84893ec99d66c5e4b3a9de4f2cbd1d03be4d5d"
+  },
+  "examples/bench_multiway/6max_position_selector.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 2,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 2,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 2
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": true,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 2,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "call",
+            "condition": "last_preflop_aggressor_position == \"UTG\"",
+            "effect": "remove",
+            "priority": 100,
+            "sizes": [],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "bet",
+            "condition": "last_preflop_aggressor_position == \"UTG\"",
+            "effect": "replace",
+            "priority": 100,
+            "sizes": [
+              {
+                "fraction": 0.33,
+                "kind": "pot-after-call"
+              }
+            ],
+            "source_order": 1,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 20.0
+        }
+      ]
+    },
+    "source_blake3": "d5e4b7e94a2f9eb914333a266d1b26e27bfcf361d0e5b0e247e9429158763ea5"
+  },
+  "examples/preflop_multiway_v1_3max_smoke.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 2,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 2,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 2
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": true,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 0,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        }
+      ]
+    },
+    "source_blake3": "a5522654962942e6e87173bb28cf739a2095242052686ee574439c88d5a9915d"
+  },
+  "examples/preflop_multiway_v1_default.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 128,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 128,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 128
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 4,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "raise",
+            "condition": "unopened",
+            "effect": "replace",
+            "priority": 100,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "limpers > 0 && aggressions == 0",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "factor": 3.0,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 4",
+            "effect": "remove",
+            "priority": 130,
+            "sizes": [],
+            "source_order": 3,
+            "street": "preflop"
+          },
+          {
+            "action": null,
+            "condition": "players >= 2",
+            "effect": "checkdown",
+            "priority": 200,
+            "sizes": [],
+            "source_order": 4,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 3,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        }
+      ]
+    },
+    "source_blake3": "7386e9d76c924d8aec84ead10272ea3990f80ca810cb3e73528dd2f73b8cad1d"
+  },
+  "examples/preflop_multiway_v1_full_surface.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 32,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 96,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 48
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": true,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 3,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 6,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "reraise_jam_above_actor_starting_stack": {
+            "denominator": 3,
+            "numerator": 1
+          }
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [
+          {
+            "action": "raise",
+            "condition": "unopened",
+            "effect": "replace",
+            "priority": 100,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 0,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "limpers > 0 && aggressions == 0",
+            "effect": "replace",
+            "priority": 110,
+            "sizes": [
+              {
+                "factor": 2.5,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 1,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 1",
+            "effect": "replace",
+            "priority": 120,
+            "sizes": [
+              {
+                "factor": 3.0,
+                "kind": "previous-bet-multiple"
+              },
+              {
+                "kind": "all-in"
+              }
+            ],
+            "source_order": 2,
+            "street": "preflop"
+          },
+          {
+            "action": "raise",
+            "condition": "aggressions >= 4",
+            "effect": "remove",
+            "priority": 130,
+            "sizes": [],
+            "source_order": 3,
+            "street": "preflop"
+          },
+          {
+            "action": null,
+            "condition": "players >= 2",
+            "effect": "checkdown",
+            "priority": 200,
+            "sizes": [],
+            "source_order": 4,
+            "street": "postflop"
+          }
+        ],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 2,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 4,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 100.0
+        }
+      ]
+    },
+    "source_blake3": "e07dadb4f026e0a17ff35dcfc0e0704b11b24c1e89cb8b1159d7f0a7530436ae"
+  },
+  "examples/preflop_multiway_v1_production_smoke.toml": {
+    "game": {
+      "abstraction": {
+        "active_opponent_buckets": [],
+        "artifact_cache": null,
+        "flop_buckets": 2,
+        "kind": "ehs2-table",
+        "recall": "street",
+        "river_buckets": 2,
+        "rollout_samples": 512,
+        "seed": 0,
+        "turn_buckets": 2
+      },
+      "ante": {
+        "kind": "none"
+      },
+      "betting": {
+        "allow_limp": false,
+        "flop": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "preflop": {
+          "bet_sizes": [
+            {
+              "factor": 2.5,
+              "kind": "previous-bet-multiple"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "factor": 3.0,
+              "kind": "previous-bet-multiple"
+            }
+          ]
+        },
+        "river": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        },
+        "rules": [],
+        "turn": {
+          "bet_sizes": [
+            {
+              "fraction": 0.5,
+              "kind": "pot-after-call"
+            }
+          ],
+          "include_allin": true,
+          "max_aggressive_actions": 1,
+          "raise_sizes": [
+            {
+              "fraction": 0.75,
+              "kind": "pot-after-call"
+            }
+          ]
+        }
+      },
+      "blinds": {
+        "big_bb": 1.0,
+        "small_bb": 0.5
+      },
+      "button": 0,
+      "forced_bets": {
+        "antes_bb": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blinds_bb": [
+          0.0,
+          0.5,
+          1.0
+        ],
+        "common_ante_bb": 0.0,
+        "first_to_act": 0,
+        "nominal_big_blind_bb": 1.0
+      },
+      "seats": [
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        },
+        {
+          "betting": null,
+          "name": null,
+          "range": "",
+          "stack_bb": 2.0
+        }
+      ]
+    },
+    "source_blake3": "cc1c3e2e4b5349357d6f778e2e9e80a9dab894f3a12bab0ba41ce612b911aae3"
+  }
+}

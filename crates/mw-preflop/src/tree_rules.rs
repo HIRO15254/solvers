@@ -29,6 +29,168 @@ use crate::betting::{BettingState, SeatStatus};
 use crate::config::{RuleStreet, TreeRule};
 use crate::types::SeatId;
 
+/// A common-input rule. The compiled condition is cached and never reparsed
+/// during tree construction. Its text, effect and sizes define game identity.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NlhTreeRule {
+    pub street: nlh::Street,
+    pub condition: String,
+    pub effect: nlh::script::Effect,
+    pub action: Option<ActionKind>,
+    pub sizes: Vec<nlh::SizeSpec>,
+    #[serde(skip)]
+    compiled: std::sync::OnceLock<Condition<spot::TreeVar>>,
+}
+
+impl NlhTreeRule {
+    pub fn from_compiled(rule: nlh::script::Rule<spot::TreeVar>) -> Self {
+        let condition = rule.condition.to_string();
+        let compiled = std::sync::OnceLock::new();
+        let _ = compiled.set(rule.condition);
+        Self {
+            street: rule.street,
+            condition,
+            effect: rule.effect,
+            action: rule.action,
+            sizes: rule.sizes,
+            compiled,
+        }
+    }
+
+    pub(crate) fn validate(&self) -> Result<(), crate::config::ConfigError> {
+        use crate::config::ConfigError;
+        let invalid = |message: &str| ConfigError::TreeRule(message.into());
+        // Typed lowering installs the compiler's condition directly. Display's
+        // constant spelling is diagnostic text, so it must not be reparsed.
+        use spot::TreeVar::*;
+        let dialect = Dialect {
+            vars: &[
+                Aggressions,
+                Raises,
+                Unopened,
+                Players,
+                Position,
+                InPosition,
+                Spr,
+                Pot,
+                ToCall,
+                FacingPct,
+                Cbet,
+                Donk,
+                Limpers,
+                Flats,
+                Squeeze,
+                OpenColdCalls,
+                PreflopParticipant,
+                InPositionToLastAggressor,
+                LastPreflopAggressorPosition,
+            ],
+            ..spot::NLH_V1
+        };
+        let condition = match self.compiled.get() {
+            Some(cached) if cached.to_string() == self.condition => cached.clone(),
+            Some(_) => {
+                return Err(invalid(
+                    "condition changed after compilation; construct a new rule",
+                ));
+            }
+            None => match self.condition.as_str() {
+                "always" => Condition::Const(true),
+                "never" => Condition::Const(false),
+                _ => Condition::parse(&self.condition, &dialect)
+                    .map_err(|e| ConfigError::TreeRule(e.to_string()))?,
+            },
+        };
+        fn board(c: &Condition<spot::TreeVar>) -> bool {
+            match c {
+                Condition::Const(_) => false,
+                Condition::Truth(v)
+                | Condition::Compare { var: v, .. }
+                | Condition::Member { var: v, .. } => v.is_board_var(),
+                Condition::Not(c) => board(c),
+                Condition::And(a, b) | Condition::Or(a, b) => board(a) || board(b),
+            }
+        }
+        if board(&condition) {
+            return Err(invalid("board variables are unsupported by P2"));
+        }
+        if self.effect == nlh::script::Effect::Checkdown {
+            if self.action.is_some() || !self.sizes.is_empty() {
+                return Err(invalid("checkdown must omit action and sizes"));
+            }
+        } else if self.action.is_none() {
+            return Err(invalid("tree rule requires an action"));
+        }
+        for size in &self.sizes {
+            crate::config::validate_size_spec(size)?;
+        }
+        let _ = self.compiled.set(condition);
+        Ok(())
+    }
+
+    pub(crate) fn matches(&self, state: &BettingState, actor: SeatId) -> bool {
+        self.street == state.street
+            && self
+                .compiled
+                .get()
+                .expect("validated common-input condition")
+                .eval(&NlhContext { state, actor })
+    }
+}
+
+/// Evaluate the product-neutral vocabulary on P2's own shared betting state.
+/// Legacy history selectors retain their meanings; cbet/donk use the preceding street.
+pub struct NlhContext<'a> {
+    pub state: &'a BettingState,
+    pub actor: SeatId,
+}
+impl VarSource<spot::TreeVar> for NlhContext<'_> {
+    fn value(&self, var: spot::TreeVar) -> Value {
+        use spot::TreeVar::*;
+        let (state, actor) = (self.state, self.actor);
+        let old = match var {
+            Position => MultiwayVar::Position,
+            InPosition => MultiwayVar::InPosition,
+            InPositionToLastAggressor => MultiwayVar::InPositionToLastAggressor,
+            LastPreflopAggressorPosition => MultiwayVar::LastPreflopAggressorPosition,
+            PreflopParticipant => MultiwayVar::PreflopParticipant,
+            OpenColdCalls => MultiwayVar::OpenColdCalls,
+            Players => MultiwayVar::Players,
+            Limpers => MultiwayVar::Limpers,
+            Flats => MultiwayVar::Flats,
+            Aggressions | Raises => MultiwayVar::Aggressions,
+            Unopened => MultiwayVar::Unopened,
+            Squeeze => MultiwayVar::Squeeze,
+            Spr => MultiwayVar::Spr,
+            Pot => return Value::Number(state.pot_size().as_bb()),
+            ToCall => return Value::Number(state.amount_to_call(actor).as_bb()),
+            FacingPct => {
+                return Value::Number(if state.pot_size().raw() == 0 {
+                    0.0
+                } else {
+                    state.amount_to_call(actor).raw() as f64 / state.pot_size().raw() as f64 * 100.0
+                });
+            }
+            Cbet | Donk => {
+                return Value::Bool(
+                    state.street != nlh::Street::Preflop
+                        && state.aggressive_actions == 0
+                        && state.previous_street_aggressor.is_some_and(|seat| {
+                            if var == Cbet {
+                                seat == actor
+                            } else {
+                                seat != actor
+                            }
+                        }),
+                );
+            }
+            _ => unreachable!("P2 rejects board variables before evaluation"),
+        };
+        (state, actor).value(old)
+    }
+}
+
 /// One named variable multiway's tree-rule conditions can read -- the same
 /// fifteen the old `context_value` resolved, ported onto `nlh::script`'s
 /// generic condition grammar.

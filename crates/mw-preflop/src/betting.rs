@@ -8,7 +8,10 @@ impl StreetPolicy for BettingConfig {
     fn check_down(&self, state: &BettingState, actor: SeatId) -> bool {
         self.rules.iter().any(|rule| {
             rule.effect == RuleEffect::Checkdown && crate::tree_rules::matches(rule, state, actor)
-        })
+        }) || self
+            .nlh_rules
+            .iter()
+            .any(|rule| rule.effect == RuleEffect::Checkdown && rule.matches(state, actor))
     }
     fn skip_street(&self, street: Street, players: u8) -> bool {
         self.for_street(street)
@@ -47,7 +50,7 @@ impl BettingMenu for BettingState {
             forced_antes: config.forced_antes.clone(),
             common_ante: config.common_ante,
             forced_blinds: config.forced_blinds.clone(),
-            straddles: Vec::new(),
+            straddles: config.straddles.clone(),
             nominal_big_blind: config.nominal_big_blind,
             preflop_first_to_act: config.preflop_first_to_act,
         };
@@ -161,19 +164,26 @@ fn apply_tree_rules(
 ) -> Result<Vec<Action>, BettingError> {
     let mut rules = config.rules.iter().collect::<Vec<_>>();
     rules.sort_by_key(|rule| (rule.priority, rule.source_order));
-    for rule in rules {
-        if !crate::tree_rules::matches(rule, state, actor) {
-            continue;
-        }
-        if rule.effect == RuleEffect::Checkdown {
+    let matched = rules
+        .into_iter()
+        .filter(|rule| crate::tree_rules::matches(rule, state, actor))
+        .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice()))
+        .chain(
+            config
+                .nlh_rules
+                .iter()
+                .filter(|rule| rule.matches(state, actor))
+                .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice())),
+        );
+    for (effect, action, sizes) in matched {
+        if effect == RuleEffect::Checkdown {
             actions.retain(|action| matches!(action, Action::Check));
             continue;
         }
-        let action_kind = rule
-            .action
+        let action_kind = action
             .ok_or_else(|| BettingError::TreeRule("non-checkdown rule requires action".into()))?;
-        let candidates = rule_candidates(state, config, action_kind, &rule.sizes)?;
-        match rule.effect {
+        let candidates = rule_candidates(state, config, action_kind, sizes)?;
+        match effect {
             RuleEffect::Add => actions.extend(candidates),
             RuleEffect::Remove => actions.retain(|action| !action_matches(action, action_kind)),
             RuleEffect::Replace => {
@@ -198,6 +208,7 @@ fn rule_candidates(
     if !matches!(action_kind, RuleAction::Bet | RuleAction::Raise) {
         let mut base = config.clone();
         base.rules.clear();
+        base.nlh_rules.clear();
         return Ok(state
             .legal_actions(&base)?
             .into_iter()
@@ -207,6 +218,7 @@ fn rule_candidates(
 
     let mut scoped = config.clone();
     scoped.rules.clear();
+    scoped.nlh_rules.clear();
     let street = match state.street {
         Street::Preflop => &mut scoped.preflop,
         Street::Flop => &mut scoped.flop,

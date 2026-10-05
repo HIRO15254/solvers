@@ -61,6 +61,18 @@ Production EHS² table buildや大規模solve等のignored acceptanceは、対�
 cargo test --workspace --release -- --include-ignored
 ```
 
+共通InputのP2移行では、次のlibrary acceptanceが旧例と新入力のpublic treeを末端まで照合する。
+4件の大規模例は通常suiteではignoredとし、releaseで明示実行する（深さ・node数による打切りなし）。
+小規模例と、共通Inputで表現できない旧full-surface例のfirst-actor境界は通常suiteに含む。
+
+```text
+cargo test --release -p mw-preflop --test nlh_tree_identity -- --ignored --test-threads=4 --nocapture
+```
+
+`tests/fixtures/legacy_example_games.json` はM5の旧CLI parserから取得したgame設定で、
+各元例のBLAKE3をtestで確認する。元例を変更する場合はsnapshotを意図的に更新し、
+新入力では旧standard menu・all-in・limp可否・priority順・street別capを明示して比較する。
+
 失敗は「変更による不具合」「既存差分」「環境制約」「未判定」を根拠付きで区別する。未実行を成功と記録しない。
 Windowsで並列compileがメモリ割当やページングファイル不足（OS error 1455）に失敗した場合は、
 その実行だけ`CARGO_BUILD_JOBS=1`として再試行する。test自体の資源競合には`-- --test-threads=1`を使える。

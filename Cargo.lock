@@ -749,9 +749,11 @@ dependencies = [
  "rustc-hash",
  "serde",
  "serde_json",
+ "spot",
  "tempfile",
  "thiserror",
  "toml",
+ "toml_edit",
  "zstd",
 ]
 

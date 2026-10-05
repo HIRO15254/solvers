@@ -1438,6 +1438,7 @@ impl V1Config {
                 ante: AnteConfig::None,
                 betting,
                 forced_bets: Some(ForcedBetConfig {
+                    straddles: Vec::new(),
                     blinds_bb: forced_blinds,
                     antes_bb: forced_antes,
                     common_ante_bb: self.game.common_ante_bb,

@@ -109,6 +109,9 @@ pub struct ForcedBetConfig {
     pub common_ante_bb: f64,
     pub nominal_big_blind_bb: f64,
     pub first_to_act: SeatId,
+    /// Ordered live posts (seat, total wager in BB). Empty for old families.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub straddles: Vec<(SeatId, f64)>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -125,6 +128,9 @@ pub struct BettingConfig {
     pub river: StreetBettingConfig,
     #[serde(default)]
     pub rules: Vec<TreeRule>,
+    /// Common-input rules in source order, evaluated by the P2 dialect.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub nlh_rules: Vec<crate::tree_rules::NlhTreeRule>,
 }
 
 impl Default for BettingConfig {
@@ -136,6 +142,7 @@ impl Default for BettingConfig {
             turn: default_postflop_betting(),
             river: default_postflop_betting(),
             rules: Vec::new(),
+            nlh_rules: Vec::new(),
         }
     }
 }
@@ -611,6 +618,7 @@ pub struct ValidatedMultiwayConfig {
     pub common_ante: MwChips,
     pub nominal_big_blind: MwChips,
     pub preflop_first_to_act: SeatId,
+    pub straddles: Vec<(SeatId, MwChips)>,
     pub abstraction: AbstractionConfig,
 }
 
@@ -726,6 +734,38 @@ impl MultiwayConfig {
             let maximum = forced.blinds_bb.iter().copied().fold(0.0, f64::max);
             if maximum != forced.nominal_big_blind_bb {
                 return Err(ConfigError::NominalBlind);
+            }
+            let mut previous = forced.nominal_big_blind_bb;
+            let mut expected = if num_seats == 2 {
+                self.button
+            } else {
+                self.button.advance(3, num_seats)
+            };
+            if forced.straddles.len() > num_seats - 2 {
+                return Err(ConfigError::Number("forced_bets.straddles count".into()));
+            }
+            for &(seat, amount) in &forced.straddles {
+                nonnegative_finite("forced_bets.straddles amount", amount)?;
+                let chips = MwChips::try_from_bb(amount)
+                    .map_err(|_| ConfigError::Number("forced_bets.straddles amount".into()))?;
+                if chips.as_bb() != amount {
+                    return Err(ConfigError::Number("forced_bets.straddles grid".into()));
+                }
+                if seat != expected
+                    || amount < 2.0 * previous
+                    || self.seats[seat.index()].stack_bb <= forced.antes_bb[seat.index()] + amount
+                {
+                    return Err(ConfigError::Number(
+                        "forced_bets.straddles order/amount/stack".into(),
+                    ));
+                }
+                previous = amount;
+                expected = expected.next(num_seats);
+            }
+            if !forced.straddles.is_empty() && forced.first_to_act != expected {
+                return Err(ConfigError::Number(
+                    "forced_bets.straddles first actor".into(),
+                ));
             }
         }
         validate_betting(&self.betting)?;
@@ -873,6 +913,18 @@ impl MultiwayConfig {
             common_ante,
             nominal_big_blind,
             preflop_first_to_act,
+            straddles: self.forced_bets.as_ref().map_or_else(Vec::new, |forced| {
+                forced
+                    .straddles
+                    .iter()
+                    .map(|&(seat, amount)| {
+                        (
+                            seat,
+                            MwChips::try_from_bb(amount).expect("validated straddle must convert"),
+                        )
+                    })
+                    .collect()
+            }),
             abstraction: self.abstraction.clone(),
         })
     }
@@ -894,7 +946,7 @@ impl MultiwayConfig {
     }
 }
 
-fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
+pub(crate) fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
     match *size {
         SizeSpec::ToBb { value } => positive_finite("size.to-bb", value),
         SizeSpec::PotAfterCall { fraction } => positive_finite("size.pot-after-call", fraction),
@@ -928,6 +980,9 @@ fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
 }
 
 fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
+    for rule in &config.nlh_rules {
+        rule.validate()?;
+    }
     for street in Street::ALL {
         let section = config.for_street(street);
         if street != Street::Preflop && section.isolate_sizes.is_some() {

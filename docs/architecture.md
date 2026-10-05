@@ -70,7 +70,7 @@ economics                           → nlh
 spot                                → nlh, economics
 hu-engine                           → nlh
 hu-postflop                         → nlh, economics, spot, hu-engine, runfiles
-mw-preflop                          → nlh, economics, runfiles
+mw-preflop                          → nlh, economics, spot, runfiles
 protocol                            → runfiles
 daemon                              → runfiles, protocol
 cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, runfiles
@@ -84,6 +84,19 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
 製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
+
+P2 のlibrary入口は `mw_preflop::input` の `P2Sections`、`Settings::parse`、`lower`。
+`lower` は `Spot` とP2設定から `MultiwayConfig`、economics、`SolverConfig`、run設定を型付きで返し、
+`input::build_session` は準備済みabstractionを受けてpreallocated solverを構築・復元する。
+lowered configのTOML再変換は行わず、正規化済みconfig bytesはartifact用にそのまま保持する。
+`BettingConfig::nlh_rules` はsource順、`tree_rules::NlhContext` はP2のstateから `TreeVar` を評価する。
+旧ruleは従来のPreflop aggressor、新ruleの `cbet`・`donk` は直前streetのaggressorを参照する。
+`ForcedBetConfig::straddles` と新rule列は空ならserdeで省略し、旧familyのgame identityを保つ。
+旧 `preflop_multiway_v1_full_surface.toml` のHJ開始（seat 4）は共通Inputの卓順では表現できない。
+卓の最初のactorを上書きするkeyは追加せず、例の完全なtree同一性は未対応の移行境界として明示する。
+P2の既存runtime型の上限はstreetごとのaggression capが255（`u8`）、jam ratioの各成分が
+`u32::MAX`。これを超える共通IR値は `NLH003` で拒否し、切詰めや近似は行わない。
+P2のCLI接続・共通Inputのartifact経路はM6の後続phaseで行う。
 
 P1 の共通Input用 `input::NlhPayoff` は、`economics` のrake・ICMをterminalで焼き込む。
 rakeの基準potからuncalled wagerを除き、`players_dealt`は元の卓人数、flopを見た人数は2とする。

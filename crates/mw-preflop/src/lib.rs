@@ -13,6 +13,7 @@ pub mod checkpoint;
 pub mod config;
 pub mod holdem;
 pub mod icm;
+pub mod input;
 pub mod rake_condition;
 pub mod sampler;
 pub mod settlement;
