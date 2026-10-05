@@ -412,6 +412,8 @@ fn temp_dir(tag: &str) -> PathBuf {
         id,
         tag
     ));
+    // Windows reuses process ids; never inherit a previous run's leftovers.
+    let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).expect("create temp dir");
     dir
 }
