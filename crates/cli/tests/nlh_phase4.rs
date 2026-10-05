@@ -56,11 +56,11 @@ fn path(path: &Path) -> &str {
 }
 
 #[test]
-fn draft_human_output_is_readable_and_pinned() {
+fn spec_p1_example_human_output_is_readable_and_pinned() {
     let temp = tempfile::tempdir().unwrap();
-    let config = temp.path().join("draft.toml");
-    let draft = include_str!("../../../docs/plans/nlh-input-v1.jp.md");
-    let example = draft
+    let config = temp.path().join("spec.toml");
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let example = spec
         .split("### P1: 6max")
         .nth(1)
         .unwrap()

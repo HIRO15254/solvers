@@ -28,7 +28,9 @@ REQUIRED_FILES = (
     "docs/cli-reference.jp.md",
     "docs/user-guide.jp.md",
     "docs/plans/two-product-restructure.jp.md",
-    "docs/plans/nlh-input-v1.jp.md",
+    "docs/nlh-input-v1.jp.md",
+    "docs/hu-postflop.jp.md",
+    "docs/mw-preflop.jp.md",
     "docs/plans/task-template.md",
 )
 # Retired documents and their replacements. The retired files remain readable
@@ -41,6 +43,7 @@ MOVED_PATHS = {
     "research/solver-implementation-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
     "research/r0-execution-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
     "research/hu-postflop-validation-plan.jp.md": "docs/products.jp.md",
+    "plans/nlh-input-v1.jp.md": "docs/nlh-input-v1.jp.md",
 }
 HISTORICAL_ROOTS = ("docs/research/", "docs/decisions/")
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")

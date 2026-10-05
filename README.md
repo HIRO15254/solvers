@@ -28,7 +28,9 @@ unsupported schema. The pre-restructure state is the git tag
 - [AGENTS.md](AGENTS.md) — shared entrypoint for AI development
 - [docs/products.jp.md](docs/products.jp.md) — the two products: scope, quality, stages
 - [docs/plans/two-product-restructure.jp.md](docs/plans/two-product-restructure.jp.md) — target architecture and migration plan
-- [docs/plans/nlh-input-v1.jp.md](docs/plans/nlh-input-v1.jp.md) — draft of the shared input format
+- [docs/nlh-input-v1.jp.md](docs/nlh-input-v1.jp.md) — normative shared input format
+- [docs/hu-postflop.jp.md](docs/hu-postflop.jp.md) — P1 computation and artifacts
+- [docs/mw-preflop.jp.md](docs/mw-preflop.jp.md) — provisional P2 method and artifacts
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
 - [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop config contract
 - [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference

@@ -13,7 +13,8 @@
 | 製品の目的・範囲・品質・到達段階・利用者決定 | [製品定義](products.jp.md) |
 | 担当・進捗・依存・ブロッカー・次の一手 | [Linear管理先](status.jp.md)。Markdownへ状態を複製しない |
 | 目標構成・移行手順・完了条件 | [再構築計画](plans/two-product-restructure.jp.md) |
-| 共通Input形式（草案） | [`solvers.nlh/v1`草案](plans/nlh-input-v1.jp.md) |
+| 共通Input形式 | [`solvers.nlh/v1`規範](nlh-input-v1.jp.md) |
+| 製品の計算と成果物 | [P1規範](hu-postflop.jp.md)、[P2暫定規範](mw-preflop.jp.md) |
 | P1の品質検証の参照候補 | [HU Postflop参照候補](plans/hu-postflop-validation/README.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |
@@ -22,10 +23,14 @@
 
 ## 公開契約の正本
 
-再構築計画のM7で`solvers.nlh/v1`へ置き換えるまで、現行コードの契約は次の規範が正本である。
+`solvers.nlh/v1`の入力・計算・成果物は次の規範が正本である。
+旧2 familyは、次のM7の削除段階まで、そのfamilyを実装するコードだけの規範として残す。
 
 | 対象 | 規範 |
 |---|---|
+| `solvers.nlh/v1` 入力 | [nlh-input-v1.jp.md](nlh-input-v1.jp.md) |
+| P1 計算・成果物 | [hu-postflop.jp.md](hu-postflop.jp.md) |
+| P2 暫定計算・成果物 | [mw-preflop.jp.md](mw-preflop.jp.md) |
 | `solvers.multiway-preflop/v1` | [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) |
 | `solvers.postflop/v1` | [solver-config-v1.jp.md](solver-config-v1.jp.md) |
 | `solvers` / `solversd`のコマンド・flag・exit code・HTTP API | [cli-reference.jp.md](cli-reference.jp.md) |

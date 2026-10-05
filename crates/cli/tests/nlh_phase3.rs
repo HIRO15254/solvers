@@ -47,12 +47,12 @@ fn text(path: &Path) -> &str {
 }
 
 #[test]
-fn draft_p1_validate_text_json_effective_and_resources() {
+fn spec_p1_example_validate_text_json_effective_and_resources() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("flop.toml");
     // The exact §14 P1 example is the maintained source, not a hand-copied approximation.
-    let draft = include_str!("../../../docs/plans/nlh-input-v1.jp.md");
-    let example = draft
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let example = spec
         .split("### P1: 6max")
         .nth(1)
         .unwrap()
@@ -304,4 +304,33 @@ fn rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run() {
         );
         assert!(!out.exists());
     }
+}
+
+#[test]
+fn compatibility_hash_ignores_meta_and_run_only() {
+    let base = r#"schema = "solvers.nlh/v1"
+
+[meta]
+name = "a"
+
+[table]
+players = 2
+stack_bb = 100
+
+[run]
+threads = 1
+"#;
+    let hash = |text: &str| cli::nlh_v1::compatibility_hash(text).unwrap();
+    assert_eq!(
+        hash(base),
+        hash(&base.replace("name = \"a\"", "name = \"b\""))
+    );
+    assert_eq!(
+        hash(base),
+        hash(&base.replace("threads = 1", "threads = 2"))
+    );
+    assert_ne!(
+        hash(base),
+        hash(&base.replace("stack_bb = 100", "stack_bb = 50"))
+    );
 }

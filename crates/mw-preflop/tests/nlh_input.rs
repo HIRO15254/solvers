@@ -21,7 +21,7 @@ fn config(players: usize, straddles: &str, script: &str) -> String {
 }
 
 #[test]
-fn draft_p2_example_defaults_normalize_idempotently_and_lower() {
+fn spec_p2_example_defaults_normalize_idempotently_and_lower() {
     let raw = config(
         6,
         "[]",

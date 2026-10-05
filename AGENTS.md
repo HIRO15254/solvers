@@ -26,7 +26,7 @@ Read the relevant route rather than every long document for every change:
 |---|---|
 | Choose work / acceptance | `docs/products.jp.md`, `docs/plans/two-product-restructure.jp.md` |
 | Solver / game semantics | `docs/architecture.md` (current code), target layout in the restructure plan, affected crate and oracle tests |
-| Config / CLI / artifacts | Family specification below, CLI reference and fixtures; target format `docs/plans/nlh-input-v1.jp.md` |
+| Config / CLI / artifacts | Common input `docs/nlh-input-v1.jp.md`, product specifications below, CLI reference and fixtures |
 | Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
 | Quality / measurement | Quality sections of `docs/products.jp.md`, `docs/plans/hu-postflop-validation/` |
 | Development / handoff | `docs/development.md` |
@@ -41,6 +41,7 @@ The normative specifications are:
 
 | family | normative specification |
 |---|---|
+| `solvers.nlh/v1` | `docs/nlh-input-v1.jp.md` (input), `docs/hu-postflop.jp.md` (P1), `docs/mw-preflop.jp.md` (P2) |
 | `solvers.multiway-preflop/v1` | `docs/multiway-preflop-v1.jp.md` |
 | `solvers.postflop/v1` | `docs/solver-config-v1.jp.md` |
 
@@ -49,11 +50,10 @@ second specification. `docs/multiway-preflop-v1.md` is the implementation
 contract map, `docs/cli-reference.jp.md` covers both binaries' complete CLI,
 and `docs/user-guide.jp.md` is the operational guide.
 
-These families remain normative for the code that implements them until
-restructure step M7 replaces them with `solvers.nlh/v1`. The draft
-`docs/plans/nlh-input-v1.jp.md` is not a contract yet: do not expose its keys
-in parsers, help, or templates ahead of the step that implements them, and
-promote it to `docs/` together with that implementation.
+The common input and both product documents are normative for `solvers.nlh/v1`.
+The two old families remain normative only for their implementing code until
+the next step of restructure M7 deletes them. Unsupported common-input behavior
+must remain an explicit migration boundary.
 
 Any contract or default change MUST update every affected artifact in the same
 change set: the normative specification, implementation guide, CLI reference

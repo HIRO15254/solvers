@@ -15,7 +15,7 @@ P2のPreflop rootも同じschemaで `validate` / `solve` / `resume` を実行し
 [3max smoke例](../examples/nlh/preflop_multiway_v1_3max_smoke.toml) と
 [CLI referenceのP2移行節](cli-reference.jp.md#移行中の-solversnlhv1-p2)を参照する。
 P2のmemory autoはarena予算6 GiB。resumeのsolver上書きは `[solver.stop]` へ保存する。
-仕様はM7の規範切替まで [Input草案](plans/nlh-input-v1.jp.md) を使う。
+入力の規範は [`solvers.nlh/v1`](nlh-input-v1.jp.md) である。
 
 ---
 

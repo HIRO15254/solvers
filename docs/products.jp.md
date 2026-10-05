@@ -6,10 +6,10 @@
 破棄し、本リポジトリを**共通のInput形式を共有する2製品**として再構築する。旧状態はgit tag
 `archive/pre-two-products-2026-10-04`で参照できる。作業状態は[Linear](status.jp.md)、
 再構築の手順と目標構成は[再構築計画](plans/two-product-restructure.jp.md)、
-共通Input形式は[`solvers.nlh/v1`草案](plans/nlh-input-v1.jp.md)を参照する。
+共通Input形式は[`solvers.nlh/v1`規範](nlh-input-v1.jp.md)を参照する。
 
-本書は新しいTOML項目・runtime・成果物形式を実装済みとする宣言ではない。現行コードの公開契約は、
-再構築計画のM7で置き換えるまで[現行family規範](README.md#公開契約の正本)が正本である。
+公開契約は[共通Input規範](nlh-input-v1.jp.md)、[P1規範](hu-postflop.jp.md)、[P2暫定規範](mw-preflop.jp.md)に従う。
+未接続の挙動は各規範の実装境界に記す。旧family規範はM7の削除まで旧familyコードだけに適用する。
 
 ## 1. 利用者決定（2026-10-04）
 
@@ -20,7 +20,7 @@
 | D3 | 共通Inputは、卓構成（人数・position・stack・blind/ante）、経済条件（rake/ICM）、range、ベット木の文法、単位（BB）を共有するゲーム記述とする。P1の開始局面はPreflop lineとboardで指定し、pot・stack・aggressorを導出する。P2の解からP1の入力を生成する製品間連携を持つ |
 | D4 | 旧目標のうち **ICM（トーナメント）** と **GUI/daemon** を引き継ぐ。Nodelock、相手profile、ML高速近似、他variant、Multiway Postflop、PKOは対象外 |
 | D5 | **P2の計算方式と出力品質の保証は未決定**とし、網羅的な調査と実験で決める |
-| D6 | 共通Inputの細部（停止目標・木の既定、lineの表記、straddle、旧configの変換、P1のメモリ上限）は[Input草案](plans/nlh-input-v1.jp.md)第15節の決定に従う |
+| D6 | 共通Inputの細部（停止目標・木の既定、lineの表記、straddle、旧configの変換、P1のメモリ上限）は[Input規範](nlh-input-v1.jp.md)付録Aの決定に従う |
 
 対象外とした項目は、新しい利用者決定なしに設計・実装へ戻さない。
 

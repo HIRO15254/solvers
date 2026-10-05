@@ -81,9 +81,9 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 `runfiles` は solver crate に依存しない。Multiway checkpoint と `.mwsol` は
 `crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
-共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
+共通Input `solvers.nlh/v1`（[規範](nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
-製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
+製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。P2 は `mw_preflop::input`（`P2Sections`、`Settings`、`lower`、`build_session`）が同じ IR から型付きで game・solver・run 設定を組む。旧2 familyは M7 で削除するまで並存する。
 
 P2 のlibrary入口は `mw_preflop::input` の `P2Sections`、`Settings::parse`、`lower`。
 `lower` は `Spot` とP2設定から `MultiwayConfig`、economics、`SolverConfig`、run設定を型付きで返し、
@@ -321,7 +321,7 @@ solverはtoy testも含めてdense arenaのみを使い、full recallの構築�
 以下は設計検証が必要な境界であり、実装済みの機能表ではない。
 作業状態は Linear へ集約し、管理先は [status.jp.md](status.jp.md) を参照する。
 目標の crate 構成・依存方向・移行手順は [再構築計画](plans/two-product-restructure.jp.md)、
-共通 Input は [`solvers.nlh/v1` 草案](plans/nlh-input-v1.jp.md) から追う。
+共通 Input は [`solvers.nlh/v1` 規範](nlh-input-v1.jp.md) から追う。
 [製品定義](products.jp.md) が範囲外とした機能（他 variant、NN/ML 近似、Nodelock・profile、
 Multiway postflop、PKO）の接続点はここに置かない。
 

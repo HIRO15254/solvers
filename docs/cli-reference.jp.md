@@ -35,7 +35,7 @@ config に何を書けるかは family ごとの規範仕様を参照する。
 ### 移行中の `solvers.nlh/v1` P1
 
 `validate` / `solve` / `resume` / `inspect` / `report` は共通InputのP1（HU Postflop）spotを受け付ける。
-この移行段階の仕様は [Input草案](plans/nlh-input-v1.jp.md) であり、M7で規範へ昇格する。
+入力の規範は [`solvers.nlh/v1`](nlh-input-v1.jp.md)、計算と成果物は [P1](hu-postflop.jp.md) を参照する。
 P2（Multiway Preflop）も接続済みであり、詳細は次のP2移行節を参照する。
 旧familyの契約は従来どおり。daemon投入は別の移行境界である。
 
@@ -80,7 +80,7 @@ P2（Multiway Preflop）も接続済みであり、詳細は次のP2移行節を
 ### 移行中の `solvers.nlh/v1` P2
 
 board・lineのないPreflop rootはP2が解く。`[solver]` / `[output]` はP2専用の設定を使う。
-共通のtable・economics・ranges・tree・runは [Input草案](plans/nlh-input-v1.jp.md) に従う。
+共通のtable・economics・ranges・tree・runは [`solvers.nlh/v1`](nlh-input-v1.jp.md)、計算と成果物は [P2](mw-preflop.jp.md) に従う。
 旧familyの例と契約はM7まで残す。
 
 - `validate` は製品、tableのposition・stack・first actor、range、tree param/rule、未一致ruleの警告を

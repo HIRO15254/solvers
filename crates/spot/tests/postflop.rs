@@ -59,7 +59,7 @@ fn roundtrip(text: &str) -> String {
 }
 
 #[test]
-fn draft_btn_bb_flop_and_full_action_evidence() {
+fn spec_btn_bb_flop_and_full_action_evidence() {
     let doc = parse(&standard("BTN r2.5, BB c", "Ks 7h 2d"));
     let s = &doc.spot;
     assert_eq!(s.product, Product::HuPostflop);
@@ -115,7 +115,7 @@ fn draft_btn_bb_flop_and_full_action_evidence() {
 }
 
 #[test]
-fn draft_utg_btn_flop_implicit_end_folds() {
+fn spec_utg_btn_flop_implicit_end_folds() {
     let text = config(
         6,
         "",
@@ -140,7 +140,7 @@ fn draft_utg_btn_flop_implicit_end_folds() {
 }
 
 #[test]
-fn draft_turn_start_and_river_start() {
+fn spec_turn_start_and_river_start() {
     let turn = "BTN r2.5, BB c / BB x, BTN b1.8, BB c";
     let d = parse(&standard(turn, "Ks 7h 2d Ac"));
     assert_eq!(d.spot.start.street, Street::Turn);
@@ -172,7 +172,7 @@ fn checked_street_clears_previous_aggressor_but_keeps_preflop_history() {
 }
 
 #[test]
-fn draft_straddle_pot_and_unraised_straddler_check() {
+fn spec_straddle_pot_and_unraised_straddler_check() {
     let text = config(
         6,
         "straddles_bb = [2,4]",

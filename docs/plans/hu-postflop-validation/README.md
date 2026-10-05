@@ -25,7 +25,7 @@ fixture化、自作solverとの比較はまだ行っていない。外部比較�
 
 ## 共通Inputへの対応
 
-各行は[`solvers.nlh/v1`](../nlh-input-v1.jp.md)のゲーム記述へそのまま写せる。
+各行は[`solvers.nlh/v1`](../../nlh-input-v1.jp.md)のゲーム記述へそのまま写せる。
 
 | cases.csvの列 | `solvers.nlh/v1` |
 |---|---|

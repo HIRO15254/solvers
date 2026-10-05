@@ -127,7 +127,7 @@ fn every_common_default_and_section_order() {
 }
 
 #[test]
-fn draft_p2_example_is_idempotent() {
+fn spec_p2_example_is_idempotent() {
     roundtrip(&format!(
         "{ROOT}[tree]\nscript = '''\npreflop {{\n  when unopened {{ replace raise [2.5bb, a] remove call }}\n  when aggressions >= 1 {{ replace raise [3x, a] }}\n}}\nflop, turn, river {{ checkdown }}\n'''\n[run]\nmemory = \"6GiB\"\nmax_time = \"12h\"\n"
     ));

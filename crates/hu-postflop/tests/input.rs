@@ -158,9 +158,9 @@ fn strict_sections_codes_and_other_product_diagnostics() {
 }
 
 #[test]
-fn draft_example_lowering_and_sizes() {
-    let draft = include_str!("../../../docs/plans/nlh-input-v1.jp.md");
-    let example = draft
+fn spec_p1_example_lowering_and_sizes() {
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let example = spec
         .split("### P1:")
         .nth(1)
         .unwrap()

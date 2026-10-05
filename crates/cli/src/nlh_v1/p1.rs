@@ -439,10 +439,12 @@ pub(crate) fn convert_history(history: &str, to_internal: bool) -> String {
     result
 }
 
-/// Compatibility stamp deliberately omits the operating settings in [run].
+/// Compatibility stamp deliberately omits the operating settings in [run]
+/// and the descriptive [meta], neither of which affects the computation.
 pub fn compatibility_hash(effective: &str) -> Result<[u8; 32]> {
     let mut document: toml_edit::DocumentMut = effective.parse()?;
     document.remove("run");
+    document.remove("meta");
     Ok(runfiles::config_hash(document.to_string().as_bytes()))
 }
 
