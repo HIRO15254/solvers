@@ -14,6 +14,11 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 [9月Multiwayの詳細索引](multiway-2026-09/README.md)は当時の測定を調べ直す場合だけ使う。
 各報告の「次」「active」「完了」は実験当時の記述であり、現在の開発優先順位や実行許可を示さない。
 
+保持する実験の設定は削除済みの旧形式（`solvers.multiway-preflop/v1`、`solvers.postflop/v1`）で書かれている。
+現行CLIは`solvers.nlh/v1`だけを読み、これらを`NLH001`で拒否する。旧成果物の照会・再開もできない。
+再実行は各manifestのsource revision、またはtag `archive/pre-two-products-2026-10-04`からbuildしたbinaryで行う。
+新形式への自動変換は無い。現行の条件で測り直す場合は、共通Inputで設定を書き直し、別の実験として記録する。
+
 ## 保存する最小セット
 
 新規runはignored `runs/`へ出力する。現行の採否判断・受入・回帰検証で使う実験だけ、

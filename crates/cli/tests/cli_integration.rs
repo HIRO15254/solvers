@@ -712,10 +712,9 @@ fn resume_tampered_config_errors() {
 
 /// Tiny turn-start config (single chance node turn->river, tiny ranges, one
 /// bet size per street, one raise cap) -- same shape as
-/// `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config` and
-/// `crates/cli/src/sol.rs`'s own unit-test fixture, duplicated here (rather
-/// than shared) since this is a separate test binary with no access to
-/// `cli`'s internal `sol` module.
+/// `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config` and the unit-test
+/// fixture in `crates/hu-postflop/src/artifact.rs`, duplicated here (rather
+/// than shared) because unit-test fixtures are private to their crate.
 const TINY_TURN_TOML: &str = r#"
 schema = "solvers.nlh/v1"
 [table]

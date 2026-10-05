@@ -34,6 +34,9 @@ Read the relevant route rather than every long document for every change:
 
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
   or share implementation code between it and `hu-engine`/`hu-postflop::game`.
+- Keep computation in the product crates (`hu-postflop`, `mw-preflop`). `cli`
+  depends only on `spot`, the two product crates and `runfiles`, and owns
+  arguments, run directories and rendering (`docs/architecture.md` §2).
 
 ## Contract specification synchronization
 

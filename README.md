@@ -8,17 +8,19 @@ For three or more players, results are regret-minimized approximations rather th
 
 ## Status
 
-Being rebuilt as two products that share one input format: the
-**NLH HU Postflop Solver** (exact vector CFR for spots where two players see
-the flop) and the **NLH Multiway Preflop Solver** (sampled MCCFR for 2–9 seat
-preflop). The [product definition](docs/products.jp.md) states their scope and
-quality, and the [restructure plan](docs/plans/two-product-restructure.jp.md)
-the target architecture and migration steps. The commands below describe the
-current v1-only CLI. Other or missing schemas fail with `NLH001`.
-Artifacts embedding removed inputs are refused; re-solve from a current
-config. `status`, `watch`, and `runs ls` still read old run directories. The pre-restructure state is the git tag
-`archive/pre-two-products-2026-10-04`. Task state is managed in Linear; see
-[status and task management](docs/status.jp.md).
+The repository has been rebuilt as two products that share one input
+format: the **NLH HU Postflop Solver** (P1, exact vector CFR for spots where
+two players see the flop) and the **NLH Multiway Preflop Solver** (P2,
+sampled MCCFR for 2–9 seat preflop). The CLI reads only `solvers.nlh/v1`;
+other or missing schemas fail with `NLH001`, and artifacts that embed removed
+inputs are refused, so re-solve from a current config. `status`, `watch`, and
+`runs ls` still read old run directories. P2's method and quality stay
+provisional until the method decision in the
+[product definition](docs/products.jp.md), which also states each product's
+scope and quality. The [restructure plan](docs/plans/two-product-restructure.jp.md)
+records the target architecture and migration steps. The pre-restructure state
+is the git tag `archive/pre-two-products-2026-10-04`. Task state is managed in
+Linear; see [status and task management](docs/status.jp.md).
 
 ## Documentation
 
@@ -32,24 +34,27 @@ config. `status`, `watch`, and `runs ls` still read old run directories. The pre
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
 - [docs/cli-reference.jp.md](docs/cli-reference.jp.md) — commands, flags, exit codes, daemon API
 - [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
-- [docs/app-architecture.md](docs/app-architecture.md) — current CLI/daemon boundaries and proposed Web GUI
+- [docs/app-architecture.md](docs/app-architecture.md) — CLI, daemon, run directory, and viewer boundaries
 - [docs/development.md](docs/development.md) — setup, tests, benchmarks, and change workflow
 - [LICENSE-POLICY.md](LICENSE-POLICY.md) — clean-room policy for AGPL references
 
 ## Workspace layout
 
-The project has 11 Rust workspace crates. The `solvers` CLI parses the
-shared input, selects the product from the spot, and writes a run directory.
+The project has 11 Rust workspace crates. `spot` parses the shared input
+and selects the product; each product crate builds, solves, saves, and queries
+its game. The `solvers` CLI dispatches to them, owns the run directory, and
+renders the results.
 `solversd` manages CLI child processes locally or remotely. The exact HU
 postflop path can start on the flop, turn, or river; the sampled Multiway
-Preflop path is a separate engine. A Web GUI remains a proposed client of
-the daemon — see [docs/app-architecture.md](docs/app-architecture.md).
+Preflop path is a separate engine. A Web GUI is a later stage (S5 in the
+product definition) and will be a client of the daemon — see
+[docs/app-architecture.md](docs/app-architecture.md) for the current boundaries.
 
 ```
 crates/
-├── cli         # `solvers` binary: config / validate / solve / resume /
-│               # status / watch / runs / inspect / evaluate / export /
-│               # compare / report
+├── cli         # `solvers` binary: arguments, run directories, rendering for
+│               # config / validate / solve / resume / status / watch / runs /
+│               # inspect / evaluate / export / compare / report
 ├── protocol    # versioned wire types for the job daemon
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── nlh         # card/range/evaluator, shared 2–9 seat NLH rules and settlement, sizing, tree-script, suit isomorphism
@@ -57,9 +62,9 @@ crates/
 ├── spot        # shared input parser, normalization, line replay, product selection
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
-├── mw-preflop  # P2 menu policy + external-sampling MCCFR + EHS² buckets + .mwsol + metrics
+├── mw-preflop  # P2 menu policy, external-sampling MCCFR, EHS² buckets, solve loop, .mwsol, views
 ├── runfiles    # run-directory contracts, progress metrics, config hashing
-└── hu-postflop # exact multi-street postflop, payoff pipeline, toy games, aggregation/equity helpers, .sol/checkpoint
+└── hu-postflop # exact multi-street postflop, payoff pipeline, solve loop, .sol/checkpoint, views, report, toy games
 ```
 
 Current specifications and architecture live in `docs/`; actionable plans in

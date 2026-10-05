@@ -49,6 +49,7 @@ cargo test --workspace
 | CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
+| 移動・改名・責務の移し替え | 変更前後のbinaryで固定seedのsolve成果物とCLI出力（text/JSON/CSV）を比べ、計時以外の一致を確認。hot pathの所在が変わるなら同時間帯の対計測 |
 | 品質・性能の主張 | [製品定義](products.jp.md)の品質節、対応する固定条件と基準測定 |
 
 文書だけの編集で重いsolverを回す必要はない。逆に、文章の修正に見えてdefaultや公開契約を変える場合は契約変更として扱う。
