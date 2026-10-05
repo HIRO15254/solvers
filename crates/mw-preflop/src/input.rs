@@ -164,6 +164,21 @@ pub struct Settings {
 fn invalid(key: &str, message: impl Into<String>) -> SpotError {
     SpotError::new(Code::NLH003, key, message)
 }
+fn decode_error(section: &str, error: toml::de::Error) -> SpotError {
+    let message = error.to_string();
+    let key = message
+        .split("in `")
+        .nth(1)
+        .and_then(|s| s.split('`').next());
+    let path = key.map_or_else(|| section.to_owned(), |key| format!("{section}.{key}"));
+    let code = if message.contains("invalid type") || message.contains("did not match any variant")
+    {
+        Code::NLH002
+    } else {
+        Code::NLH003
+    };
+    SpotError::new(code, path, message)
+}
 fn keys(
     spot: &Spot,
     table: &toml::Table,
@@ -192,7 +207,7 @@ fn nested<'a>(
         .get(key)
         .map(|v| {
             v.as_table()
-                .ok_or_else(|| invalid(path, "expected a table"))
+                .ok_or_else(|| SpotError::new(Code::NLH002, path, "expected a table"))
         })
         .transpose()
 }
@@ -263,6 +278,28 @@ impl Settings {
                 &[],
             )?;
         }
+        // Check each leaf before serde decoding so type diagnostics retain its full path.
+        fn types(table: &toml::Table, path: &str) -> Result<(), SpotError> {
+            for (key, value) in table {
+                let path = format!("{path}.{key}");
+                let correct = match key.as_str() {
+                    "abstraction" | "buckets" | "discount" | "pruning" | "stop" => value.is_table(),
+                    "kind" | "probability_encoding" => value.is_str(),
+                    "opponent_exploration" => value.is_float() || value.is_integer(),
+                    "target" => value.is_str() || value.is_float() || value.is_integer(),
+                    _ => value.is_integer(),
+                };
+                if !correct {
+                    return Err(SpotError::new(Code::NLH002, path, "wrong TOML type"));
+                }
+                if let Some(table) = value.as_table() {
+                    types(table, &path)?;
+                }
+            }
+            Ok(())
+        }
+        types(solver, "solver")?;
+        types(output, "output")?;
         // An empty enum table means its documented default, like an omitted table.
         let mut values = solver.clone();
         for (name, kind) in [("discount", "periodic"), ("pruning", "regret-based")] {
@@ -277,10 +314,10 @@ impl Settings {
         let settings = Self {
             solver: toml::Value::Table(values)
                 .try_into()
-                .map_err(|e: toml::de::Error| invalid("solver", e.to_string()))?,
+                .map_err(|e: toml::de::Error| decode_error("solver", e))?,
             output: toml::Value::Table(output.clone())
                 .try_into()
-                .map_err(|e: toml::de::Error| invalid("output", e.to_string()))?,
+                .map_err(|e: toml::de::Error| decode_error("output", e))?,
         };
         settings.validate(spot)?;
         Ok(settings)
@@ -359,12 +396,19 @@ pub fn resolve_target(utility: &UtilityConfig, target: &Target) -> Result<f64, S
             UtilityConfig::ChipEv => 0.05,
             UtilityConfig::TournamentIcm { .. } => 0.0001,
         },
-        Target::Name(name) => name.parse::<f64>().map_err(|_| {
-            invalid(
+        Target::Name(name) if name.parse::<f64>().is_ok() => {
+            return Err(SpotError::new(
+                Code::NLH002,
+                "solver.stop.target",
+                "expected a number, not a numeric string",
+            ));
+        }
+        Target::Name(_) => {
+            return Err(invalid(
                 "solver.stop.target",
                 "expected default or a positive number",
-            )
-        })?,
+            ));
+        }
         Target::Value(value) => *value,
     };
     let target = value * scale;
@@ -484,9 +528,13 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             .positions
             .seats()
             .map(|seat| SeatConfig {
-                name: Some(spot.table.positions[seat].clone()),
+                name: None,
                 stack_bb: spot.table.stacks[seat].as_bb(),
-                range: spot.ranges[seat].text.clone(),
+                range: if spot.ranges[seat].text == "random" {
+                    String::new()
+                } else {
+                    spot.ranges[seat].text.clone()
+                },
                 betting: None,
             })
             .collect(),
@@ -513,7 +561,12 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             river_buckets: buckets.river,
             kind: AbstractionKind::Ehs2Table,
             recall: RecallMode::Street,
-            ..AbstractionConfig::default()
+            rollout_samples: 512,
+            points_per_bucket: 8,
+            kmeans_iterations: 20,
+            seed: 0,
+            active_opponent_buckets: Vec::new(),
+            artifact_cache: None,
         },
     };
     game.validate_economics(&spot.economics.utility, &spot.economics.rake)

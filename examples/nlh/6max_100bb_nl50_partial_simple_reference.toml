@@ -1,0 +1,122 @@
+# Common-input version of examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml; legacy standard menus are explicit below.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+
+[table.stacks_bb]
+BTN = 100.0
+SB = 100.0
+BB = 100.0
+UTG = 100.0
+HJ = 100.0
+CO = 100.0
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4.0
+when = "flop_dealt"
+allocation = "main-first"
+rounding_unit_bb = 0.001
+rounding = "down"
+
+[ranges]
+BTN = "random"
+SB = "random"
+BB = "random"
+UTG = "random"
+HJ = "random"
+CO = "random"
+
+[tree]
+script = '''
+preflop when unopened { replace raise [2.5x, a] }
+preflop when !unopened { replace raise [3x, a] }
+flop when unopened { replace bet [50, a] }
+flop when !unopened { replace raise [75, a] }
+turn when unopened { replace bet [50, a] }
+turn when !unopened { replace raise [75, a] }
+river when unopened { replace bet [50, a] }
+river when !unopened { replace raise [75, a] }
+preflop when unopened { remove call }
+preflop when unopened { remove call }
+preflop when aggressions >= 1 { replace raise [2.5x, a] }
+preflop when unopened && limpers == 0 && position == "UTG" { replace raise [2bb] }
+preflop when unopened && limpers == 0 && position == "HJ" { replace raise [2bb] }
+preflop when unopened && limpers == 0 && position == "CO" { replace raise [2.3bb, a] }
+preflop when unopened && limpers == 0 && position == "BTN" { replace raise [2.5bb, a] }
+preflop when unopened && limpers == 0 && position == "SB" { replace raise [3bb, a] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "UTG" && position == "HJ" { replace raise [6.5bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "UTG" && position == "CO" { replace raise [6.5bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "UTG" && position == "BTN" { replace raise [7.5bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "UTG" && position == "SB" { replace raise [10bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "UTG" && position == "BB" { replace raise [12bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "HJ" && position == "CO" { replace raise [6.5bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "HJ" && position == "BTN" { replace raise [7.5bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "HJ" && position == "SB" { replace raise [11bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "HJ" && position == "BB" { replace raise [12.3bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "CO" && position == "BTN" { replace raise [7.5bb, a] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "CO" && position == "SB" { replace raise [11.5bb, a] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "CO" && position == "BB" { replace raise [13.5bb, a] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "BTN" && position == "SB" { replace raise [12bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "BTN" && position == "BB" { replace raise [13bb] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && last_preflop_aggressor_position == "SB" && position == "BB" { replace raise [10bb, a] }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == "UTG" && position in ["HJ", "CO", "BTN", "SB"] { remove call }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == "HJ" && position in ["CO", "BTN", "SB"] { remove call }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == "CO" && position in ["BTN", "SB"] { remove call }
+preflop when aggressions == 1 && limpers == 0 && flats == 0 && spr > 1 && last_preflop_aggressor_position == "BTN" && position == "SB" { remove call }
+preflop when aggressions == 2 && limpers == 0 && players == 2 && position == "SB" && last_preflop_aggressor_position == "BB" { replace raise [21bb, a] }
+flop, turn, river when players >= 2 { replace bet [50, a] }
+flop, turn, river when players >= 2 { replace raise [2.5x, a] }
+'''
+include_allin = true
+
+[tree.max_aggressive_actions]
+preflop = 4
+flop = 1
+turn = 1
+river = 1
+
+[tree.preflop_reraise_jam_above_stack]
+denominator = 3
+numerator = 1
+
+[solver]
+kind = "range-vector"
+seed = 0
+batch_sweeps = 4
+opponent_exploration = 0.0
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[solver.abstraction]
+kind = "ehs2-percentile"
+
+[solver.abstraction.buckets]
+flop = 32
+turn = 32
+river = 32
+
+[solver.stop]
+target = 1000000.0
+check_every_sweeps = 4096
+confirmations = 1000000
+evaluation_samples = 1024
+deviator_traversals = 20000
+max_sweeps = 4096
+
+[run]
+threads = 8
+memory = "8GiB"
+max_time = "2m"
+checkpoint_interval = "5m"
+
+[output]
+probability_encoding = "u16"

@@ -36,7 +36,7 @@ config に何を書けるかは family ごとの規範仕様を参照する。
 
 `validate` / `solve` / `resume` / `inspect` / `report` は共通InputのP1（HU Postflop）spotを受け付ける。
 この移行段階の仕様は [Input草案](plans/nlh-input-v1.jp.md) であり、M7で規範へ昇格する。
-P2 spotはM6まで「P2 is not wired to solvers.nlh/v1 yet」で明示拒否する。
+P2（Multiway Preflop）も接続済みであり、詳細は次のP2移行節を参照する。
 旧familyの契約は従来どおり。daemon投入は別の移行境界である。
 
 - `validate` は製品、開始street・board・pot・stack・OOP/IP、暗黙foldを含む全行動、
@@ -76,6 +76,43 @@ P2 spotはM6まで「P2 is not wired to solvers.nlh/v1 yet」で明示拒否す�
   `3betpot_fast`、`postflop_srp20`、`postflop_pio_tree`（cash/rake）、
   [postflop_pio_icm](../examples/nlh/postflop_pio_icm.toml)（rakeなしのtournament）。
   旧chipを1 BBとしてpot/stackを再現し、旧street capを明示する。
+
+### 移行中の `solvers.nlh/v1` P2
+
+board・lineのないPreflop rootはP2が解く。`[solver]` / `[output]` はP2専用の設定を使う。
+共通のtable・economics・ranges・tree・runは [Input草案](plans/nlh-input-v1.jp.md) に従う。
+旧familyの例と契約はM7まで残す。
+
+- `validate` は製品、tableのposition・stack・first actor、range、tree param/rule、未一致ruleの警告を
+  human/JSONで表示する。`--show-effective` / `--write-effective` は既定値を明示し、sourceをscript本文へ
+  inline化した冪等の実効configを返す。`--resources` はpublic treeを保持せずに数え、
+  current-street policy arenaのnodes・columns・slots・bytes・ICM field・memory limitと`withinLimit`を返す。
+  solve/resumeは検証とarena preflightの後にrun directoryを作る。
+- `solve --threads` / `--memory` / `--max-time` は共通 `[run]` を上書きして保存する。
+  threads autoは `min(logical CPUs, players × batch_sweeps)`、memory autoはarena予算6 GiB。
+  `--sol-streets` は使えない。確率encodingは `[output] probability_encoding = "u16" | "f32"`。
+- `resume RUN_DIR|CHECKPOINT.mwckpt [--out FORK]` はself-contained checkpointのconfigを使い、
+  threads・memory・max_time・checkpoint_intervalを `[run]` へ、`--max-sweeps` / `--stop-target` /
+  `--evaluation-samples` / `--evaluation-cadence` を `[solver.stop]` の
+  max_sweeps / target / evaluation_samples / check_every_sweepsへ保存する。
+  target変更は連続確認をresetする。互換判定は従来どおりgame/abstraction/configuration fingerprint。
+  max_timeは累積solve時間、checkpoint_intervalはwall-clock。終了時にもcheckpointを書き出す。
+- `run.toml`、`checkpoint.mwckpt`、`solution.mwsol` は同じ正規化済み実効configを持つ。
+  manifestと`run.json`は `gameKind = "mw-preflop"`、`configSchema = "solvers.nlh/v1"`、
+  `configHash`は実効config bytesのBLAKE3。`status` / `runs ls` / `watch` は従来のrun directoryを読む。
+  結果・EVの単位は従来どおりcashがBB（metadataは`bb`）、ICMが賞金単位（`prize`）。
+- `export`（summary / tree / strategy / range / ev / actions）、`evaluate`、`inspect` は新Inputを
+  埋め込んだ `.mwsol` を読む。`inspect --view ev --node ...` の非root Preflop nodeは到達確率でrangeを
+  条件付けたtyped samplerを構築する。`compare` は新Inputと旧familyの混在を`--cross-game`でも拒否する。
+- P2のtype errorは完全なdotted keyを持つ`NLH002`、値のerrorは`NLH003`。
+  `[solver.stop] target` は数値または文字列`"default"`だけを受け、数値文字列`"0.05"`は`NLH002`。
+- 移行例は [3max smoke](../examples/nlh/preflop_multiway_v1_3max_smoke.toml)、
+  [production smoke](../examples/nlh/preflop_multiway_v1_production_smoke.toml)、
+  [default](../examples/nlh/preflop_multiway_v1_default.toml)、
+  [full surface](../examples/nlh/preflop_multiway_v1_full_surface.toml)、および`examples/nlh/6max_100bb_nl50_partial*`。
+  standard menu・limp禁止・priority順はscriptへ明示する。
+  **full surfaceは旧例のHJ first actorを表現できず、通常のUTGから始まるため同値比較の対象外。**
+  GTO Wizard参照例は旧familyと同じmenu assertionsを維持する。
 
 ### global option
 

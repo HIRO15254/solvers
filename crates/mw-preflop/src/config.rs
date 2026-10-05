@@ -439,7 +439,7 @@ fn default_postflop_betting() -> StreetBettingConfig {
 /// so `mw_preflop::config::SizeSpec` keeps working for every existing user.
 pub use nlh::SizeSpec;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AbstractionConfig {
     #[serde(default = "default_buckets")]

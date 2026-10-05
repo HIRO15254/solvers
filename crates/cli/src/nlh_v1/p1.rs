@@ -10,12 +10,7 @@ use hu_postflop::input::{self, Algorithm, NlhPayoff, P1Sections, Settings, Solut
 use nlh::{Player, Street};
 use serde_json::{Value, json};
 
-pub const SCHEMA: &str = "solvers.nlh/v1";
-
-pub fn has_schema(raw: &str) -> Result<bool> {
-    let value: toml::Value = toml::from_str(raw).context("parsing config")?;
-    Ok(value.get("schema").and_then(toml::Value::as_str) == Some(SCHEMA))
-}
+use super::SCHEMA;
 
 pub(crate) struct Prepared {
     pub document: spot::Document,
@@ -35,7 +30,7 @@ fn tree_error(error: hu_postflop::TreeBuildError) -> spot::SpotError {
 pub(crate) fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     let document = spot::Document::parse(raw, path)?;
     if document.spot.product != spot::Product::HuPostflop {
-        bail!("NLH005: P2 (Multiway Preflop) is not wired to solvers.nlh/v1 yet (M6)");
+        bail!("NLH005: this command requires a P1 (HU Postflop) spot");
     }
     let settings = Settings::parse(&document.spot, &document.solver, &document.output)?;
     let effective = document.normalize(&P1Sections)?;
@@ -87,7 +82,7 @@ pub(crate) fn warnings_for_hits(p: &Prepared, hits: &hu_postflop::RuleHits) -> V
 }
 
 // The Spot diagnostic IR is milli-BB. Convert only its monetary fields at the CLI boundary.
-fn diagnostic_bb(value: &mut Value) {
+pub(super) fn diagnostic_bb(value: &mut Value) {
     match value {
         Value::Object(fields) => {
             for (key, value) in fields {
@@ -451,7 +446,7 @@ pub fn compatibility_hash(effective: &str) -> Result<[u8; 32]> {
     Ok(runfiles::config_hash(document.to_string().as_bytes()))
 }
 
-fn overrides(
+pub(super) fn overrides(
     raw: &str,
     threads: Option<usize>,
     memory: Option<&str>,

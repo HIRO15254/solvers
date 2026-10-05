@@ -19,6 +19,9 @@ use serde::{Deserialize, Serialize};
 /// file. A schema neither parser owns is the "unsupported config schema"
 /// error, which is also what a removed family now gets.
 pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
+    if crate::nlh_v1::has_schema(raw)? {
+        return crate::nlh_v1::p2::parse_and_lower(raw, std::path::Path::new("embedded.toml"));
+    }
     if crate::multiway_v1::has_v1_schema(raw)? {
         return crate::multiway_v1::parse_and_lower(raw);
     }
@@ -39,6 +42,9 @@ pub fn parse_solve_config(raw: &str) -> anyhow::Result<SolveConfig> {
 /// Only paths already holding internal bytes use this. A config a user
 /// wrote goes through [`parse_solve_config`], which requires a schema.
 pub(crate) fn parse_internal_config(raw: &str) -> anyhow::Result<SolveConfig> {
+    if crate::nlh_v1::has_schema(raw)? {
+        return crate::nlh_v1::p2::parse_and_lower(raw, std::path::Path::new("embedded.toml"));
+    }
     if crate::multiway_v1::has_v1_schema(raw)? {
         return crate::multiway_v1::parse_and_lower(raw);
     }
@@ -63,6 +69,9 @@ pub fn parse_solve_config_at(
     raw: &str,
     config_path: &std::path::Path,
 ) -> anyhow::Result<SolveConfig> {
+    if crate::nlh_v1::has_schema(raw)? {
+        return crate::nlh_v1::p2::parse_and_lower(raw, config_path);
+    }
     if crate::multiway_v1::has_v1_schema(raw)? {
         return crate::multiway_v1::parse_and_lower_at(raw, config_path);
     }

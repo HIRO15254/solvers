@@ -173,6 +173,10 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
         .context("validating production Multiway Preflop contract")?;
     let config =
         crate::config::parse_internal_config(raw_toml).context("parsing config for preflight")?;
+    preflight_multiway_typed(config)
+}
+
+pub(crate) fn preflight_multiway_typed(config: SolveConfig) -> Result<MultiwayResourcePreflight> {
     let SolveConfig {
         game,
         rake,
@@ -365,6 +369,9 @@ fn build_multiway_session_internal(
     storage_policy: SessionStoragePolicy,
     abstraction_policy: AbstractionPolicy,
 ) -> Result<MultiwaySession> {
+    if crate::nlh_v1::has_schema(raw_toml)? {
+        return crate::nlh_v1::p2::build_session(raw_toml, resume_checkpoint);
+    }
     let config: SolveConfig =
         crate::config::parse_internal_config(raw_toml).context("parsing config")?;
     let SolveConfig {
@@ -933,7 +940,7 @@ fn build_multiway_game_from_config(
 /// (differently-shaped) artifact. Unlike the rollout backend, there is no
 /// separate assignment cache to persist after a solve: the table is fully
 /// determined by `params` at build time.
-fn build_ehs2_table_abstraction(
+pub(crate) fn build_ehs2_table_abstraction(
     game_config: &mw_preflop::MultiwayConfig,
 ) -> Result<(TableAbstractionAdapter<Ehs2Abstraction>, AbstractionReady)> {
     let params = Ehs2Params {

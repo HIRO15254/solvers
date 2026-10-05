@@ -282,6 +282,10 @@ fn check(path: &str) {
         .game
         .validated()
         .unwrap();
+    assert_eq!(
+        new.abstraction, old.abstraction,
+        "full abstraction identity"
+    );
     let old = old.validated().unwrap();
     let mut proven = Proof {
         suffixes: vec![None; 1 << 19],
@@ -377,4 +381,21 @@ fn full_surface_has_an_explicit_unrepresentable_first_actor_boundary() {
         new.output.probability_encoding,
         mw_preflop::input::ProbabilityEncoding::F32
     );
+}
+
+#[test]
+fn every_legacy_example_has_identical_full_abstraction_config() {
+    let snapshots: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/legacy_example_games.json")).unwrap();
+    for path in snapshots.as_object().unwrap().keys() {
+        let (old, source) = expected(path);
+        let raw = v1(&old, &source);
+        let doc = spot::Document::parse(&raw, Path::new("v1.toml")).unwrap();
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        assert_eq!(
+            lower(&doc.spot, &settings).unwrap().game.abstraction,
+            old.abstraction,
+            "{path}"
+        );
+    }
 }

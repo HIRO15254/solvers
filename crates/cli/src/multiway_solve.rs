@@ -74,6 +74,10 @@ fn regular_evaluation_due(sweeps: u64, cadence: u64, target: u64) -> bool {
 struct ResultV2 {
     schema_version: u16,
     kind: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    game_kind: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    config_schema: Option<&'static str>,
     status: CompletionStatus,
     approximate_profile: bool,
     approximation_notice: &'static str,
@@ -313,7 +317,8 @@ fn run_inner(
     // round-tripped through the legacy shared schema. Historical research
     // configs can still carry a legacy `--iterations` override in `config`,
     // so only that path is re-serialized.
-    let effective_toml = if crate::multiway_v1::has_v1_schema(raw_config)? {
+    let is_nlh = crate::nlh_v1::has_schema(raw_config)?;
+    let effective_toml = if is_nlh || crate::multiway_v1::has_v1_schema(raw_config)? {
         raw_config.to_owned()
     } else {
         toml::to_string(&config).context("re-serializing the effective multiway config")?
@@ -387,8 +392,16 @@ fn run_inner(
         .strategy_drift_refresh_compact(&mut prior)
         .context("seeding multiway strategy drift")?;
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
-    let is_v1 = crate::multiway_v1::has_v1_schema(raw_config).unwrap_or(false);
-    let checkpoint_interval = if is_v1 {
+    let is_v1 = is_nlh || crate::multiway_v1::has_v1_schema(raw_config).unwrap_or(false);
+    let nlh_run = is_nlh
+        .then(|| crate::nlh_v1::p2::prepare(raw_config, Path::new("run.toml")))
+        .transpose()?
+        .map(|p| p.lowered.run);
+    let checkpoint_interval = if let Some(run) = &nlh_run {
+        Some(Duration::try_from_secs_f64(
+            run.checkpoint_interval_seconds,
+        )?)
+    } else if is_v1 {
         Some(Duration::from_secs(
             crate::multiway_v1::checkpoint_interval_secs(raw_config)?,
         ))
@@ -401,7 +414,11 @@ fn run_inner(
     } else {
         CompletionStatus::Completed
     };
-    let max_time = if is_v1 {
+    let max_time = if let Some(run) = &nlh_run {
+        run.max_time_seconds
+            .map(Duration::try_from_secs_f64)
+            .transpose()?
+    } else if is_v1 {
         crate::multiway_v1::max_time_secs(raw_config)?.map(Duration::from_secs)
     } else {
         None
@@ -793,7 +810,16 @@ fn run_inner(
         );
         // `run.storage` selects the artifact encoding only; the live MCCFR
         // state and `.mwckpt` checkpoints stay f32 regardless.
-        let artifact_storage = if is_v1 {
+        let artifact_storage = if is_nlh {
+            match crate::nlh_v1::p2::prepare(raw_config, Path::new("run.toml"))?
+                .lowered
+                .output
+                .probability_encoding
+            {
+                mw_preflop::input::ProbabilityEncoding::U16 => mw_preflop::mwsol::MwsolStorage::U16,
+                mw_preflop::input::ProbabilityEncoding::F32 => mw_preflop::mwsol::MwsolStorage::F32,
+            }
+        } else if is_v1 {
             match crate::multiway_v1::probability_encoding(raw_config)? {
                 crate::multiway_v1::ProbabilityEncoding::U16 => {
                     mw_preflop::mwsol::MwsolStorage::U16
@@ -813,7 +839,9 @@ fn run_inner(
     }
     let elapsed = started.elapsed().as_secs_f64();
     let effective = crate::config::parse_internal_config(raw_config)?;
-    let effective_config = if is_v1 {
+    let effective_config = if is_nlh {
+        serde_json::to_value(raw_config.parse::<toml::Value>()?)?
+    } else if is_v1 {
         crate::multiway_v1::normalized_config(raw_config)?
     } else {
         serde_json::to_value(&effective)?
@@ -835,6 +863,8 @@ fn run_inner(
     let result = ResultV2 {
         schema_version: MULTIWAY_SCHEMA_VERSION,
         kind: "preflop-multiway",
+        game_kind: is_nlh.then_some("mw-preflop"),
+        config_schema: is_nlh.then_some(crate::nlh_v1::SCHEMA),
         status,
         approximate_profile: true,
         approximation_notice: APPROXIMATION_NOTICE,

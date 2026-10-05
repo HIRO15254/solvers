@@ -667,3 +667,36 @@ fn straddle_configuration_rejects_invalid_posts_without_panicking() {
         assert!(invalid.validated().is_err());
     }
 }
+
+#[test]
+fn p2_type_errors_keep_full_dotted_keys_and_target_is_strict() {
+    let base = config(3, "[]", "");
+    for (suffix, key) in [
+        ("[solver]\nabstraction = 2", "solver.abstraction"),
+        ("[solver]\nseed = '19'", "solver.seed"),
+        (
+            "[solver]\nopponent_exploration = '0.1'",
+            "solver.opponent_exploration",
+        ),
+        (
+            "[solver.abstraction]\nbuckets = 2",
+            "solver.abstraction.buckets",
+        ),
+        (
+            "[solver.abstraction.buckets]\nflop = '2'",
+            "solver.abstraction.buckets.flop",
+        ),
+        ("[solver.stop]\nmax_sweeps = '1'", "solver.stop.max_sweeps"),
+        ("[solver.stop]\ntarget = '0.05'", "solver.stop.target"),
+        ("[solver.stop]\ntarget = true", "solver.stop.target"),
+        (
+            "[output]\nprobability_encoding = 2",
+            "output.probability_encoding",
+        ),
+    ] {
+        let doc = document(&(base.clone() + suffix));
+        let error = doc.normalize(&P2Sections).unwrap_err();
+        assert_eq!(error.code, spot::Code::NLH002, "{suffix}: {error}");
+        assert!(error.to_string().contains(key), "{suffix}: {error}");
+    }
+}

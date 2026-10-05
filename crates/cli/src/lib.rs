@@ -11,7 +11,7 @@
 //! `solvers.multiway-preflop/v1` (`multiway_v1`).
 //! [`config::parse_solve_config`] routes those families by their `schema`.
 //! Validate/solve/resume also accept `solvers.nlh/v1` P1 spots through
-//! [`nlh_v1`]; P2 common-input spots are explicitly refused until M6.
+//! [`nlh_v1`]; the spot selects P1 or P2.
 //!
 //! `solve --checkpoint`/`--metrics` autosave progress (via `hu_postflop::checkpoint`
 //! and `runfiles` JSONL metrics), and `resume` continues a checkpointed run

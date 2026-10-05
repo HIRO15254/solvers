@@ -288,17 +288,8 @@ fn rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run() {
         "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 5\n",
     )
     .unwrap();
-    for args in [
-        vec!["validate", text(&config)],
-        vec!["solve", text(&config), "--out", text(&out)],
-    ] {
-        let result = cli(&args);
-        assert_eq!(result.status.code(), Some(2));
-        assert!(
-            String::from_utf8_lossy(&result.stderr).contains("P2 (Multiway Preflop) is not wired")
-        );
-        assert!(!out.exists());
-    }
+    let result = ok(&["validate", text(&config)]);
+    assert!(String::from_utf8_lossy(&result.stdout).contains("P2 (Multiway Preflop)"));
     std::fs::write(&config, RIVER.replace("replace bet [1bb]", "remove check")).unwrap();
     for args in [
         vec!["validate", text(&config)],

@@ -822,6 +822,11 @@ fn compare_shared_real_cards(
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
     let (left_meta, left_blocks) = read_solution(left_path)?;
     let (right_meta, right_blocks) = read_solution(right_path)?;
+    if crate::nlh_v1::has_schema(&left_meta.config_toml)?
+        != crate::nlh_v1::has_schema(&right_meta.config_toml)?
+    {
+        bail!("cannot compare solvers.nlh/v1 and old-family artifacts");
+    }
     let left_mapping = comparison_mapping(&left_meta.config_toml)?;
     let right_mapping = comparison_mapping(&right_meta.config_toml)?;
     let left_recall = comparison_recall(&left_meta.config_toml)?;
@@ -905,7 +910,7 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
 }
 
 fn evaluate_prepared(
-    config_toml: &str,
+    build: impl FnOnce() -> Result<session::MultiwaySession>,
     metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
     blocks: Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
     samples: u64,
@@ -916,8 +921,7 @@ fn evaluate_prepared(
     if samples == 0 || (train_deviators && br_traversals == 0) {
         bail!("evaluation requires positive samples and deviation traversals");
     }
-    let mut mw_session =
-        build_solution_session(config_toml).context("rebuilding the solution game")?;
+    let mut mw_session = build().context("rebuilding the solution game")?;
     let num_players = mw_session.game_config.seats.len();
     let traversals = metadata.sweeps.saturating_mul(num_players as u64);
     let mut needed_histories: BTreeSet<_> = blocks.iter().map(|block| block.key.history).collect();
@@ -1013,7 +1017,7 @@ fn evaluate_value(
 ) -> Result<serde_json::Value> {
     let (metadata, blocks) = read_solution(path)?;
     evaluate_prepared(
-        &metadata.config_toml,
+        || build_solution_session(&metadata.config_toml),
         &metadata,
         blocks,
         samples,
@@ -1115,16 +1119,20 @@ fn node_conditioned_evaluation(
         seat.range = explicit_range(weights)
             .with_context(|| format!("conditioning seat {seat_index} at {}", key_hex(target)))?;
     }
-    let conditioned_config = toml::to_string(&config)?;
-    evaluate_prepared(
-        &conditioned_config,
-        metadata,
-        blocks,
-        samples,
-        seed,
-        0,
-        false,
-    )
+    let conditioned_seats = game.seats.clone();
+    let session = || {
+        if crate::nlh_v1::has_schema(&metadata.config_toml)? {
+            let mut p =
+                crate::nlh_v1::p2::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
+            // Conditioning changes only the typed sampler ranges, never the input schema.
+            p.lowered.game.seats.clone_from(&conditioned_seats);
+            crate::nlh_v1::p2::build_typed_session(p.lowered, p.effective, None)
+        } else {
+            let conditioned_config = toml::to_string(&config)?;
+            build_solution_session(&conditioned_config)
+        }
+    };
+    evaluate_prepared(session, metadata, blocks, samples, seed, 0, false)
 }
 
 pub fn evaluate(path: &Path, samples: u64, seed: u64, br_traversals: u64) -> Result<()> {
@@ -1162,7 +1170,7 @@ fn inspect_ev(
         (
             "formal-average-profile",
             evaluate_prepared(
-                &metadata.config_toml,
+                || build_solution_session(&metadata.config_toml),
                 &metadata,
                 blocks,
                 samples,

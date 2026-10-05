@@ -252,6 +252,21 @@ fn run_self_contained_multiway(
     // self-contained resume retains two complete checkpoint states at the
     // preallocation peak.
     drop(checkpoint);
+    if crate::nlh_v1::has_schema(&raw)? {
+        return crate::nlh_v1::p2::resume(
+            &raw,
+            checkpoint_path,
+            out,
+            threads,
+            memory,
+            max_time,
+            max_sweeps,
+            stop_target,
+            evaluation_samples,
+            evaluation_cadence,
+            checkpoint_interval,
+        );
+    }
     if !crate::multiway_v1::has_v1_schema(&raw)? {
         return Err(anyhow!(
             "self-contained resume requires a Multiway Preflop v1 checkpoint"
