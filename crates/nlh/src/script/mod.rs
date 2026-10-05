@@ -31,7 +31,7 @@ mod token;
 pub use ast::{ActionKind, Effect, ParamKind, ParamSchema, Rule, Script};
 pub use cond::{
     CmpOp, Condition, Dialect, Literal, POSTFLOP, PartialContext, PostflopVar, PreviousAggressor,
-    RuleContext, Value, VarKind, VarSource, Vars,
+    RuleContext, SizeParser, Value, VarKind, VarSource, Vars,
 };
 
 /// An error compiling a tree script. Every error -- tokenizing, `param` /

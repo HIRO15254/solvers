@@ -128,6 +128,7 @@ pub(crate) static MULTIWAY: Dialect<MultiwayVar> = Dialect {
         ActionKind::Raise,
     ],
     unit: SizeUnit::Bb,
+    size_parser: None,
 };
 
 impl VarSource<MultiwayVar> for (&BettingState, SeatId) {

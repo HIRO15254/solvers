@@ -219,7 +219,12 @@ pub struct Dialect<V: Vars> {
     pub streets: &'static [(&'static str, Street)],
     pub actions: &'static [ActionKind],
     pub unit: SizeUnit,
+    /// Optional strict family grammar. `None` preserves `SizeSpec::parse`.
+    pub size_parser: Option<SizeParser>,
 }
+
+/// A family's optional size-literal grammar, used only during script compilation.
+pub type SizeParser = fn(&str) -> Result<crate::SizeSpec, crate::ParseSizeError>;
 
 /// The postflop tree script's dialect: every [`PostflopVar`], the three
 /// postflop streets, `bet`/`raise` (postflop's tree never adds or removes a
@@ -233,6 +238,7 @@ pub static POSTFLOP: Dialect<PostflopVar> = Dialect {
     ],
     actions: &[ActionKind::Bet, ActionKind::Raise],
     unit: SizeUnit::Chips,
+    size_parser: None,
 };
 
 /// Reserved names a `param` or `define` may never shadow: every dialect

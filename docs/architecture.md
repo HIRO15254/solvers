@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 10 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 11 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -53,6 +53,7 @@ crates/
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
 ├── nlh/          # card/range/evaluator、HU基本型、2–9 seat NLH規則・精算、size解決、tree-script、suit同型
 ├── economics/    # 共有 rake・ICM・utility config、PotRake 実装
+├── spot/         # 共通Input solvers.nlh/v1 の parse・検証・正規化、Spot IR、v1 tree 方言（CLI へは未接続）
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc、.sol、checkpoint
@@ -66,6 +67,7 @@ crates/
 ```text
 nlh, runfiles, cfr-ref               → workspace内の通常依存なし
 economics                           → nlh
+spot                                → nlh, economics
 hu-engine                           → nlh
 hu-postflop                         → nlh, hu-engine, runfiles
 mw-preflop                          → nlh, economics, runfiles
@@ -79,6 +81,9 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 `runfiles` は solver crate に依存しない。Multiway checkpoint と `.mwsol` は
 `crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
+共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・検証・正規化し、製品に依らない
+`Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
+製品が `spot::ProductSections` で検証して既定値を補う。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。

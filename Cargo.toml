@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "crates/nlh",
     "crates/economics",
+    "crates/spot",
     "crates/cfr-ref",
     "crates/hu-engine",
     "crates/hu-postflop",
@@ -22,6 +23,7 @@ repository = "https://github.com/hiro15254/solvers"
 [workspace.dependencies]
 nlh = { path = "crates/nlh" }
 economics = { path = "crates/economics" }
+spot = { path = "crates/spot" }
 cfr-ref = { path = "crates/cfr-ref" }
 hu-engine = { path = "crates/hu-engine" }
 hu-postflop = { path = "crates/hu-postflop" }

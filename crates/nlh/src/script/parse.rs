@@ -783,7 +783,11 @@ fn parse_size_list<V: Vars>(
                 }
             };
             *pos += 1;
-            let spec = SizeSpec::parse(&text, dialect.unit).map_err(|error| ScriptError {
+            let spec = match dialect.size_parser {
+                Some(parse) => parse(&text),
+                None => SizeSpec::parse(&text, dialect.unit),
+            }
+            .map_err(|error| ScriptError {
                 line: token_line,
                 message: error.to_string(),
             })?;
