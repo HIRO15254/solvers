@@ -84,6 +84,9 @@ impl<T> IndexMut<Street> for PerStreet<T> {
 /// fixtures use for the common single-level pot-fraction case.
 #[derive(Clone, Debug)]
 pub struct StreetTree {
+    /// Common-input rules and actor history. `None` selects the legacy dialect.
+    /// When present, `rules` must be empty.
+    pub nlh_rules: Option<Box<crate::input::NlhStreetRules>>,
     /// This street's tree-script rules, in source order. Source order is
     /// the entire priority model -- there is no priority field.
     pub rules: Vec<Rule<PostflopVar>>,
@@ -101,6 +104,7 @@ pub struct StreetTree {
 impl Default for StreetTree {
     fn default() -> Self {
         StreetTree {
+            nlh_rules: None,
             rules: Vec::new(),
             max_aggressive_actions: 2,
             include_allin: false,
@@ -221,6 +225,7 @@ impl StreetTree {
         ));
 
         StreetTree {
+            nlh_rules: None,
             rules,
             max_aggressive_actions,
             include_allin: false,
@@ -244,6 +249,7 @@ impl StreetTree {
         allin_threshold: Option<f64>,
     ) -> StreetTree {
         StreetTree {
+            nlh_rules: None,
             rules: rules
                 .iter()
                 .filter(|rule| rule.street == street)
@@ -645,11 +651,21 @@ fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec])
     let mut targets: Vec<Chips> = Vec::with_capacity(sizes.len());
     for &size in sizes {
         let mut target = match size {
-            SizeSpec::ToBb { .. } => unreachable!(
-                "the bb size literal belongs to the Multiway Preflop family; \
-                 postflop configs are chip-denominated and never produce ToBb"
-            ),
-            SizeSpec::PotAfterCall { fraction } => called_to + scale(pot_after_call, fraction),
+            SizeSpec::ToBb { value } => {
+                assert!(
+                    street.nlh_rules.is_some(),
+                    "BB sizes require the v1 dialect"
+                );
+                scale(Chips(1000), value)
+            }
+            SizeSpec::PotAfterCall { fraction } => {
+                let increment = scale(pot_after_call, fraction);
+                if street.nlh_rules.is_some() {
+                    Chips(called_to.0.saturating_add(increment.0))
+                } else {
+                    called_to + increment
+                }
+            }
             SizeSpec::PreviousBetMultiple { factor } => scale(bet_to_match, factor),
             SizeSpec::MinRaise => minimum,
             SizeSpec::AllIn => maximum,
@@ -786,10 +802,15 @@ pub type RuleHits = PerStreet<Vec<bool>>;
 /// start their walk from, so they can never disagree about how many rules
 /// exist per street.
 fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
+    let len = |tree: &StreetTree| {
+        tree.nlh_rules
+            .as_ref()
+            .map_or(tree.rules.len(), |r| r.rules.len())
+    };
     PerStreet {
-        flop: vec![false; config.streets.flop.rules.len()],
-        turn: vec![false; config.streets.turn.rules.len()],
-        river: vec![false; config.streets.river.rules.len()],
+        flop: vec![false; len(&config.streets.flop)],
+        turn: vec![false; len(&config.streets.turn)],
+        river: vec![false; len(&config.streets.river)],
     }
 }
 
@@ -813,6 +834,9 @@ fn node_actions(
     hits: &mut RuleHits,
 ) -> Vec<NodeAction> {
     let street = &config.streets[state.street];
+    if let Some(rules) = &street.nlh_rules {
+        return nlh_node_actions(state, config, rules, hits);
+    }
     let mut actions = base_actions(state);
 
     if street.include_allin {
@@ -867,6 +891,106 @@ fn node_actions(
     } else {
         actions
     }
+}
+
+/// Common-input policy mirrors P2's per-kind candidates and source-order edits.
+/// An empty menu stays empty; the checked preflight/build APIs reject it.
+fn nlh_node_actions(
+    state: &LineState,
+    config: &PostflopConfig,
+    rules: &crate::input::NlhStreetRules,
+    hits: &mut RuleHits,
+) -> Vec<NodeAction> {
+    let street = &config.streets[state.street];
+    let mut actions = base_actions(state);
+    if street.include_allin {
+        actions.extend(
+            sized_targets(state, config, &[SizeSpec::AllIn])
+                .into_iter()
+                .map(NodeAction::Wager),
+        );
+    }
+    let mut common = rule_context(state, config);
+    let remaining = (config.effective_stack - state.contrib[Player::P0])
+        .min(config.effective_stack - state.contrib[Player::P1]);
+    common.spr = if common.pot == 0.0 {
+        f64::INFINITY
+    } else {
+        remaining.as_f64() / common.pot
+    };
+    common.pot /= 1000.0;
+    common.to_call /= 1000.0;
+    let ctx = crate::input::NlhContext {
+        common,
+        player: &rules.players[state.to_act],
+    };
+    let wager_kind = if state.outstanding == Chips::ZERO {
+        ActionKind::Bet
+    } else {
+        ActionKind::Raise
+    };
+    let matches = |a: &NodeAction, kind| match a {
+        NodeAction::Fold => kind == ActionKind::Fold,
+        NodeAction::Check => kind == ActionKind::Check,
+        NodeAction::Call => kind == ActionKind::Call,
+        NodeAction::Wager(_) => kind == wager_kind,
+    };
+    for (index, rule) in rules.rules.iter().enumerate() {
+        if !rule.condition.eval(&ctx) {
+            continue;
+        }
+        hits[state.street][index] = true;
+        if rule.effect == Effect::Checkdown {
+            actions.retain(|a| matches!(a, NodeAction::Check));
+        } else {
+            let kind = rule
+                .action
+                .expect("compiled non-checkdown rule has an action");
+            let candidates = if matches!(kind, ActionKind::Bet | ActionKind::Raise) {
+                if kind == wager_kind {
+                    sized_targets(state, config, &rule.sizes)
+                        .into_iter()
+                        .map(NodeAction::Wager)
+                        .collect()
+                } else {
+                    Vec::new()
+                }
+            } else {
+                base_actions(state)
+                    .into_iter()
+                    .filter(|a| matches(a, kind))
+                    .collect()
+            };
+            match rule.effect {
+                Effect::Add => actions.extend(candidates),
+                Effect::Remove => actions.retain(|a| !matches(a, kind)),
+                Effect::Replace => {
+                    actions.retain(|a| !matches(a, kind));
+                    actions.extend(candidates);
+                }
+                Effect::Force => actions = candidates,
+                Effect::Checkdown => unreachable!(),
+            }
+        }
+        actions.sort_by_key(|&a| action_sort_key(a));
+        actions.dedup();
+    }
+    actions
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
+pub enum TreeBuildError {
+    #[error("tree rules leave an empty action menu on {street:?} for {player:?}")]
+    EmptyMenu { street: Street, player: Player },
+}
+
+/// Validate the action menus before allocating a compiled game.
+pub fn try_build_postflop_game(
+    config: &PostflopConfig,
+    pipeline: PayoffPipeline<'_>,
+) -> Result<PostflopGame, TreeBuildError> {
+    try_memory_usage(config)?;
+    Ok(build_postflop_game(config, pipeline))
 }
 
 /// Where one [`NodeAction`] leads from `state`. Carries the full state
@@ -1441,6 +1565,11 @@ pub struct MemoryEstimate {
 /// enough to run as a preflight check before committing to a full build of
 /// a large flop tree.
 pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
+    try_memory_usage(config).expect("postflop tree must have nonempty action menus")
+}
+
+/// Counting preflight with a typed error for a menu emptied by common rules.
+pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
     let board_len = config.board.len();
     let start_street = match board_len {
         3 => Street::Flop,
@@ -1458,6 +1587,7 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         action_nodes: 0,
         rank_table_keys: BTreeSet::new(),
         hits: rule_hits_for(config),
+        error: None,
     };
     counting.betting(LineState {
         street: start_street,
@@ -1476,20 +1606,24 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
         street_aggressor: None,
     });
 
-    MemoryEstimate {
+    if let Some(error) = counting.error {
+        return Err(error);
+    }
+    Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
         nodes: counting.nodes,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,
         rule_hits: counting.hits,
-    }
+    })
 }
 
 /// Counting-only mirror of [`Builder`]'s recursion. Reuses the same
 /// `node_actions`/`chance_groups` shape helpers as the real builder so the
 /// two can never disagree about how many children a node has.
 struct Counting<'a> {
+    error: Option<TreeBuildError>,
     config: &'a PostflopConfig,
     sym: Vec<SuitPerm>,
     elements: u64,
@@ -1504,10 +1638,20 @@ struct Counting<'a> {
 
 impl Counting<'_> {
     fn betting(&mut self, state: LineState) {
+        if self.error.is_some() {
+            return;
+        }
         self.nodes += 1;
         self.action_nodes += 1;
 
         let actions = node_actions(&state, self.config, &mut self.hits);
+        if actions.is_empty() {
+            self.error = Some(TreeBuildError::EmptyMenu {
+                street: state.street,
+                player: state.to_act,
+            });
+            return;
+        }
         let num_actions = actions.len() as u64;
         for action in actions {
             match child_step(&state, action) {

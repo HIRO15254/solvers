@@ -609,6 +609,7 @@ version = "0.1.0"
 dependencies = [
  "cfr-ref",
  "criterion",
+ "economics",
  "hu-engine",
  "nlh",
  "postcard",
@@ -616,8 +617,11 @@ dependencies = [
  "runfiles",
  "serde",
  "serde_json",
+ "spot",
  "tempfile",
  "thiserror",
+ "toml",
+ "toml_edit",
  "zstd",
 ]
 

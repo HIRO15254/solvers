@@ -1,0 +1,499 @@
+//! P1-owned sections and pure lowering of the common Spot IR.
+//! Amounts in the lowered tree are milli-BB; economics and reporting are separate.
+use crate::{PerStreet, PostflopConfig, StreetTree};
+use nlh::script::{Rule, Value, VarSource};
+use nlh::{Chips, PerPlayer, Player, Street};
+use serde::{Deserialize, Serialize};
+use spot::{Code, PostflopPlayer, Product, ProductSections, Spot, SpotError, TreeVar};
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum Storage {
+    #[default]
+    F32,
+    I16,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SolutionStreets {
+    #[default]
+    Full,
+    NoRivers,
+}
+
+/// The legacy P1 schedule parameters, with their existing names and defaults.
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
+pub enum Algorithm {
+    Vanilla,
+    CfrPlus,
+    Dcfr {
+        #[serde(default = "alpha")]
+        alpha: f64,
+        #[serde(default)]
+        beta: f64,
+        #[serde(default = "gamma")]
+        gamma: f64,
+        #[serde(default = "yes")]
+        pow4_reset: bool,
+    },
+    LinearCfr,
+    HsDcfr {
+        #[serde(default = "gamma0")]
+        gamma0: f64,
+    },
+}
+fn alpha() -> f64 {
+    1.5
+}
+fn gamma() -> f64 {
+    3.0
+}
+fn gamma0() -> f64 {
+    30.0
+}
+fn yes() -> bool {
+    true
+}
+impl Default for Algorithm {
+    fn default() -> Self {
+        Self::Dcfr {
+            alpha: alpha(),
+            beta: 0.0,
+            gamma: gamma(),
+            pow4_reset: true,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(default, deny_unknown_fields)]
+pub struct Stop {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<String>,
+    pub max_iterations: u64,
+    pub check_every: u64,
+}
+impl Default for Stop {
+    fn default() -> Self {
+        Self {
+            target: None,
+            max_iterations: 1_000_000,
+            check_every: 25,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(default, deny_unknown_fields)]
+pub struct Parallel {
+    pub chance_depth: u32,
+    pub min_children: usize,
+}
+impl Default for Parallel {
+    fn default() -> Self {
+        Self {
+            chance_depth: 2,
+            min_children: 12,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(default, deny_unknown_fields)]
+pub struct Solver {
+    pub iso_merging: bool,
+    pub storage: Storage,
+    pub algorithm: Algorithm,
+    pub stop: Stop,
+    pub parallel: Parallel,
+}
+impl Default for Solver {
+    fn default() -> Self {
+        Self {
+            iso_merging: true,
+            storage: Storage::default(),
+            algorithm: Algorithm::default(),
+            stop: Stop::default(),
+            parallel: Parallel::default(),
+        }
+    }
+}
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(default, deny_unknown_fields)]
+pub struct Output {
+    pub solution_streets: SolutionStreets,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Settings {
+    pub solver: Solver,
+    pub output: Output,
+}
+
+fn invalid(key: &str, message: impl Into<String>) -> SpotError {
+    SpotError::new(Code::NLH003, key, message)
+}
+fn keys(
+    spot: &Spot,
+    table: &toml::Table,
+    path: &str,
+    allowed: &[&str],
+    other: &[&str],
+) -> Result<(), SpotError> {
+    for key in table.keys() {
+        if !allowed.contains(&key.as_str()) {
+            let path = format!("{path}.{key}");
+            return Err(if other.contains(&key.as_str()) {
+                spot::other_product_key(spot, path)
+            } else {
+                SpotError::new(Code::NLH002, path, "unknown key")
+            });
+        }
+    }
+    Ok(())
+}
+fn section<'a>(
+    table: &'a toml::Table,
+    key: &str,
+    path: &str,
+) -> Result<Option<&'a toml::Table>, SpotError> {
+    table
+        .get(key)
+        .map(|v| {
+            v.as_table()
+                .ok_or_else(|| invalid(path, "expected a table"))
+        })
+        .transpose()
+}
+fn decode<T: serde::de::DeserializeOwned>(table: toml::Table, key: &str) -> Result<T, SpotError> {
+    toml::Value::Table(table)
+        .try_into()
+        .map_err(|e| invalid(key, e.to_string()))
+}
+
+impl Settings {
+    pub fn parse(
+        spot: &Spot,
+        solver: &toml::Table,
+        output: &toml::Table,
+    ) -> Result<Self, SpotError> {
+        if spot.product != Product::HuPostflop {
+            return Err(SpotError::new(
+                Code::NLH005,
+                "spot",
+                "P1 settings require a HU postflop spot",
+            ));
+        }
+        keys(
+            spot,
+            solver,
+            "solver",
+            &["iso_merging", "storage", "algorithm", "stop", "parallel"],
+            &[
+                "kind",
+                "seed",
+                "opponent_exploration",
+                "batch_sweeps",
+                "abstraction",
+                "discount",
+                "pruning",
+            ],
+        )?;
+        keys(
+            spot,
+            output,
+            "output",
+            &["solution_streets"],
+            &["probability_encoding"],
+        )?;
+        if let Some(t) = section(solver, "stop", "solver.stop")? {
+            keys(
+                spot,
+                t,
+                "solver.stop",
+                &["target", "max_iterations", "check_every"],
+                &[
+                    "max_sweeps",
+                    "check_every_sweeps",
+                    "confirmations",
+                    "evaluation_samples",
+                    "deviator_traversals",
+                ],
+            )?;
+        }
+        if let Some(t) = section(solver, "parallel", "solver.parallel")? {
+            keys(
+                spot,
+                t,
+                "solver.parallel",
+                &["chance_depth", "min_children"],
+                &[],
+            )?;
+        }
+        let mut solver = solver.clone();
+        if let Some(t) = section(&solver, "algorithm", "solver.algorithm")? {
+            let schedule = t
+                .get("schedule")
+                .map(|v| {
+                    v.as_str()
+                        .ok_or_else(|| invalid("solver.algorithm.schedule", "expected a string"))
+                })
+                .transpose()?
+                .unwrap_or("dcfr");
+            let allowed: &[&str] = match schedule {
+                "vanilla" | "cfr-plus" | "linear-cfr" => &["schedule"],
+                "dcfr" => &["schedule", "alpha", "beta", "gamma", "pow4_reset"],
+                "hs-dcfr" => &["schedule", "gamma0"],
+                _ => {
+                    return Err(invalid(
+                        "solver.algorithm.schedule",
+                        "expected vanilla, cfr-plus, dcfr, linear-cfr or hs-dcfr",
+                    ));
+                }
+            };
+            keys(spot, t, "solver.algorithm", allowed, &[])?;
+            let mut t = t.clone();
+            t.entry("schedule".to_owned())
+                .or_insert(toml::Value::String(schedule.into()));
+            solver.insert("algorithm".into(), toml::Value::Table(t));
+        }
+        let solver: Solver = decode(solver, "solver")?;
+        let output = decode(output.clone(), "output")?;
+        if solver.stop.max_iterations == 0 || solver.stop.check_every == 0 {
+            return Err(invalid(
+                "solver.stop",
+                "max_iterations and check_every must be positive",
+            ));
+        }
+        if solver.parallel.min_children == 0 {
+            return Err(invalid("solver.parallel.min_children", "must be positive"));
+        }
+        let finite = match solver.algorithm {
+            Algorithm::Dcfr {
+                alpha, beta, gamma, ..
+            } => [alpha, beta, gamma].iter().all(|v| v.is_finite()),
+            Algorithm::HsDcfr { gamma0 } => gamma0.is_finite(),
+            _ => true,
+        };
+        if !finite {
+            return Err(invalid("solver.algorithm", "parameters must be finite"));
+        }
+        if let Some(target) = &solver.stop.target {
+            validate_target(spot, target)?;
+        }
+        Ok(Self { solver, output })
+    }
+}
+
+fn validate_target(spot: &Spot, target: &str) -> Result<(), SpotError> {
+    let tournament = matches!(
+        spot.economics.utility,
+        economics::UtilityConfig::TournamentIcm { .. }
+    );
+    let suffix = if tournament {
+        target.strip_suffix("%prizes")
+    } else {
+        target
+            .strip_suffix("%pot")
+            .or_else(|| target.strip_suffix("bb"))
+    };
+    let valid = suffix.is_some_and(|s| {
+        !s.is_empty()
+            && s.bytes().all(|c| c.is_ascii_digit() || c == b'.')
+            && s.parse::<f64>().is_ok_and(|v| v.is_finite() && v >= 0.0)
+    });
+    if valid {
+        Ok(())
+    } else {
+        Err(invalid(
+            "solver.stop.target",
+            "expected a non-negative target: cash N%pot or Nbb, tournament N%prizes",
+        ))
+    }
+}
+
+/// Stateless normalization hook. Parsing is also available through `Settings::parse`.
+pub struct P1Sections;
+impl ProductSections for P1Sections {
+    fn normalize(
+        &self,
+        spot: &Spot,
+        solver: &toml::Table,
+        output: &toml::Table,
+    ) -> Result<(toml_edit::Table, toml_edit::Table), SpotError> {
+        let settings = Settings::parse(spot, solver, output)?;
+        fn table(value: &impl Serialize) -> Result<toml_edit::Table, SpotError> {
+            toml_edit::ser::to_document(value)
+                .map(|doc| doc.as_table().clone())
+                .map_err(|e| invalid("solver", e.to_string()))
+        }
+        let mut solver = table(&settings.solver)?;
+        for key in ["algorithm", "stop", "parallel"] {
+            let item = solver.remove(key).expect("serialized solver section");
+            let nested = item.into_table().expect("serialized solver table");
+            solver.insert(key, toml_edit::Item::Table(nested));
+        }
+        Ok((solver, table(&settings.output)?))
+    }
+}
+
+/// Common rules carry actor-specific constants from the original line.
+#[derive(Clone, Debug)]
+pub struct NlhStreetRules {
+    pub rules: Vec<Rule<TreeVar>>,
+    pub players: PerPlayer<PostflopPlayer>,
+}
+
+/// Lower the validated IR without I/O or allocating a game tree.
+/// The u32 builder boundary is checked for the largest possible terminal pot.
+pub fn lower(spot: &Spot, settings: &Settings) -> Result<PostflopConfig, SpotError> {
+    if spot.product != Product::HuPostflop {
+        return Err(SpotError::new(
+            Code::NLH005,
+            "spot",
+            "P1 requires a HU postflop spot",
+        ));
+    }
+    let oop = spot
+        .context
+        .oop
+        .as_ref()
+        .ok_or_else(|| invalid("spot", "missing OOP"))?;
+    let ip = spot
+        .context
+        .ip
+        .as_ref()
+        .ok_or_else(|| invalid("spot", "missing IP"))?;
+    let stack = spot
+        .context
+        .effective_stack
+        .ok_or_else(|| invalid("spot", "missing effective stack"))?
+        .0;
+    let pot = spot.context.pot.0;
+    if stack
+        .checked_mul(2)
+        .and_then(|s| s.checked_add(pot))
+        .is_none_or(|s| s > u32::MAX as u64)
+    {
+        return Err(invalid(
+            "spot",
+            "pot plus twice the effective stack exceeds the P1 u32 milli-BB limit",
+        ));
+    }
+    let street = |street, cap| -> Result<StreetTree, SpotError> {
+        Ok(StreetTree {
+            nlh_rules: Some(Box::new(NlhStreetRules {
+                rules: spot
+                    .tree
+                    .compiled
+                    .rules
+                    .iter()
+                    .filter(|r| r.street == street && street >= spot.context.street)
+                    .cloned()
+                    .collect(),
+                players: PerPlayer::new(oop.clone(), ip.clone()),
+            })),
+            rules: Vec::new(),
+            max_aggressive_actions: u32::try_from(cap)
+                .map_err(|_| invalid("tree.max_aggressive_actions", "exceeds the P1 u32 limit"))?,
+            include_allin: spot.tree.include_allin,
+            allin_threshold: spot.tree.allin_threshold,
+        })
+    };
+    Ok(PostflopConfig {
+        board: spot.context.board.clone(),
+        ranges: PerPlayer::new(
+            spot.ranges[oop.seat].range.clone(),
+            spot.ranges[ip.seat].range.clone(),
+        ),
+        pot: Chips(pot as u32),
+        effective_stack: Chips(stack as u32),
+        streets: PerStreet {
+            flop: street(Street::Flop, spot.tree.max_aggressive_actions.flop)?,
+            turn: street(Street::Turn, spot.tree.max_aggressive_actions.turn)?,
+            river: street(Street::River, spot.tree.max_aggressive_actions.river)?,
+        },
+        min_bet: Chips(1000),
+        iso_merging: settings.solver.iso_merging,
+        track_node_info: true,
+        preflop_aggressor: spot.context.previous_street_aggressor.and_then(|s| {
+            if s == oop.seat {
+                Some(Player::P0)
+            } else if s == ip.seat {
+                Some(Player::P1)
+            } else {
+                None
+            }
+        }),
+    })
+}
+
+pub(crate) struct NlhContext<'a> {
+    pub common: nlh::script::RuleContext,
+    pub player: &'a PostflopPlayer,
+}
+impl VarSource<TreeVar> for NlhContext<'_> {
+    fn value(&self, var: TreeVar) -> Value {
+        use TreeVar::*;
+        let facts = &self.player.preflop;
+        match var {
+            Position => Value::Text(position_text(&self.player.position)),
+            Limpers => Value::Number(facts.limpers.into()),
+            Flats => Value::Number(facts.flats.into()),
+            Squeeze => Value::Bool(facts.squeeze),
+            OpenColdCalls => Value::Number(facts.open_cold_calls.into()),
+            PreflopParticipant => Value::Bool(facts.preflop_participant),
+            InPositionToLastAggressor => Value::Bool(facts.in_position_to_last_aggressor),
+            LastPreflopAggressorPosition => {
+                Value::Text(position_text(&facts.last_preflop_aggressor_position))
+            }
+            _ => {
+                use nlh::script::PostflopVar as P;
+                let old = match var {
+                    Aggressions => P::Aggressions,
+                    Raises => P::Raises,
+                    Unopened => P::Unopened,
+                    Players => P::Players,
+                    InPosition => P::InPosition,
+                    Spr => P::Spr,
+                    Pot => P::Pot,
+                    ToCall => P::ToCall,
+                    FacingPct => P::FacingPct,
+                    Cbet => P::Cbet,
+                    Donk => P::Donk,
+                    BoardCards => P::BoardCards,
+                    BoardSuits => P::BoardSuits,
+                    BoardRanks => P::BoardRanks,
+                    StraightRanks => P::StraightRanks,
+                    Paired => P::Paired,
+                    Monotone => P::Monotone,
+                    TwoTone => P::TwoTone,
+                    Rainbow => P::Rainbow,
+                    FlushPossible => P::FlushPossible,
+                    StraightPossible => P::StraightPossible,
+                    HighCard => P::HighCard,
+                    LowCard => P::LowCard,
+                    _ => unreachable!("handled above"),
+                };
+                self.common.value(old)
+            }
+        }
+    }
+}
+fn position_text(text: &str) -> &'static str {
+    match text {
+        "BTN" => "BTN",
+        "SB" => "SB",
+        "BB" => "BB",
+        "CO" => "CO",
+        "HJ" => "HJ",
+        "LJ" => "LJ",
+        "UTG" => "UTG",
+        "UTG1" => "UTG1",
+        "UTG2" => "UTG2",
+        "" => "",
+        _ => unreachable!("Spot IR has a canonical position"),
+    }
+}

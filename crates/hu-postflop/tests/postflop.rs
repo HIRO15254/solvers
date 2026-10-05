@@ -165,6 +165,7 @@ fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
     rules.extend(raise_level_rules(street, in_position, &ip_levels));
 
     StreetTree {
+        nlh_rules: None,
         rules,
         max_aggressive_actions: menus.max_aggressive_actions,
         include_allin: menus.include_allin,
@@ -815,6 +816,7 @@ fn memory_usage_matches_allocated() {
     // fold/call branch is a genuinely new tree shape, and `Builder`'s real
     // recursion and `Counting`'s dry-run mirror must still agree on it.
     let force_river = StreetTree {
+        nlh_rules: None,
         rules: vec![
             // Opens the betting so there is a facing-bet node to force at.
             Rule {
@@ -2043,6 +2045,7 @@ fn node_info_records_the_pot_contribution_at_each_node() {
 #[test]
 fn tree_script_effect_add_appends_a_wager_candidate() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2068,6 +2071,7 @@ fn tree_script_effect_add_appends_a_wager_candidate() {
 #[test]
 fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2102,6 +2106,7 @@ fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
 #[test]
 fn tree_script_effect_replace_swaps_the_wager_menu() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2136,6 +2141,7 @@ fn tree_script_effect_replace_swaps_the_wager_menu() {
 #[test]
 fn tree_script_effect_force_drops_fold_check_and_call_too() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2161,6 +2167,7 @@ fn tree_script_effect_force_drops_fold_check_and_call_too() {
 #[test]
 fn tree_script_effect_checkdown_keeps_only_check() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2197,6 +2204,7 @@ fn tree_script_effect_checkdown_keeps_only_check() {
 #[test]
 fn tree_script_rule_action_kind_mismatch_is_inert() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2226,6 +2234,7 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
 #[test]
 fn tree_script_include_allin_applies_before_rules() {
     let replace_river = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2249,6 +2258,7 @@ fn tree_script_include_allin_applies_before_rules() {
     );
 
     let force_river = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2281,6 +2291,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
     // makes `sized_targets` always return empty, so the forced action list
     // is empty from the start.
     let no_room = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
@@ -2306,6 +2317,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
     // (b) `remove`, after an earlier `force` already dropped check: nothing
     // is left at all once the forced wager is also removed.
     let force_then_remove = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2340,6 +2352,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
     // (c) `checkdown` at a node facing a bet: retaining only check leaves
     // nothing, since a facing-bet node has no check to retain.
     let bet_then_checkdown = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2382,6 +2395,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
 #[test]
 fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
     let river = StreetTree {
+        nlh_rules: None,
         rules: vec![
             Rule {
                 street: Street::River,
@@ -2460,6 +2474,7 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
 #[test]
 fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
     let turn = StreetTree {
+        nlh_rules: None,
         rules: vec![Rule {
             street: Street::Turn,
             condition: Condition::Truth(PostflopVar::Paired),
@@ -2568,12 +2583,14 @@ fn rule_hits_fixture() -> PostflopConfig {
         effective_stack: Chips(40),
         streets: PerStreet {
             flop: StreetTree {
+                nlh_rules: None,
                 rules: flop_rules,
                 max_aggressive_actions: 2,
                 include_allin: false,
                 allin_threshold: None,
             },
             turn: StreetTree {
+                nlh_rules: None,
                 rules: turn_rules,
                 max_aggressive_actions: 2,
                 include_allin: false,

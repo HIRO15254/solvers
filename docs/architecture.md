@@ -69,7 +69,7 @@ nlh, runfiles, cfr-ref               → workspace内の通常依存なし
 economics                           → nlh
 spot                                → nlh, economics
 hu-engine                           → nlh
-hu-postflop                         → nlh, hu-engine, runfiles
+hu-postflop                         → nlh, economics, spot, hu-engine, runfiles
 mw-preflop                          → nlh, economics, runfiles
 protocol                            → runfiles
 daemon                              → runfiles, protocol
@@ -83,7 +83,7 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
 共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
-製品が `spot::ProductSections` で検証して既定値を補う。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
+製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。

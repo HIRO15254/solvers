@@ -8,6 +8,10 @@ description = "NLH HU postflop solving, terminal payoff pipeline, and compiled-t
 
 [dependencies]
 nlh = { workspace = true }
+economics = { workspace = true }
+spot = { workspace = true }
+toml = { workspace = true }
+toml_edit = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 runfiles = { workspace = true }
 serde = { workspace = true }
