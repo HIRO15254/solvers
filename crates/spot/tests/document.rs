@@ -884,7 +884,7 @@ fn non_finite_condition_literals_are_located_nlh003_errors_for_both_products() {
     for (base, street) in [
         (ROOT, "preflop"),
         (
-            include_str!("../../../examples/nlh/river_small.toml"),
+            include_str!("../../../examples/hu-postflop/river_small.toml"),
             "river",
         ),
     ] {

@@ -45,7 +45,7 @@ cargo test --workspace
 | 文書・配置 | `python tools/check_docs.py`。説明を実装へ照合。移動した文書の参照を更新 |
 | 共通Pythonツール | `python -m unittest discover -s tools/tests -v` |
 | 保存したMultiway品質根拠 | `python experiments/multiway-2026-09/quality-evidence/verify.py`。solverの再計算とは区別 |
-| config/CLI/default | family規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
+| config/CLI/default | 共通Input・製品規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
 | CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
@@ -61,17 +61,18 @@ Production EHS² table buildや大規模solve等のignored acceptanceは、対�
 cargo test --workspace --release -- --include-ignored
 ```
 
-共通InputのP2移行では、次のlibrary acceptanceが旧例と新入力のpublic treeを末端まで照合する。
-4件の大規模例は通常suiteではignoredとし、releaseで明示実行する（深さ・node数による打切りなし）。
-小規模例と、共通Inputで表現できない旧full-surface例のfirst-actor境界は通常suiteに含む。
+P2の次のlibrary acceptanceはv1 public treeのnode数・整数状態・action順のhashを固定し、
+正規化前後の同一性を確認する。4件の大規模例は通常suiteではignoredとし、releaseで明示実行する
+（深さ・node数による打切りなし）。小規模例とfirst-actor上書きの明示拒否は通常suiteに含む。
 
 ```text
 cargo test --release -p mw-preflop --test nlh_tree_identity -- --ignored --test-threads=4 --nocapture
 ```
 
-`tests/fixtures/legacy_example_games.json` はM5の旧CLI parserから取得したgame設定で、
-各元例のBLAKE3をtestで確認する。元例を変更する場合はsnapshotを意図的に更新し、
-新入力では旧standard menu・all-in・limp可否・priority順・street別capを明示して比較する。
+P2のfixtureは`crates/mw-preflop/tests/fixtures/`、性能用入力は`examples/bench/`に置く。
+`tree_abstractions.json`はabstraction identityの回帰証拠である。
+P1の整数構造回帰は`crates/hu-postflop/tests/tree_identity.rs`で確認する。
+浮動小数点の戦略・EVをhashで固定しない。
 
 失敗は「変更による不具合」「既存差分」「環境制約」「未判定」を根拠付きで区別する。未実行を成功と記録しない。
 Windowsで並列compileがメモリ割当やページングファイル不足（OS error 1455）に失敗した場合は、
@@ -124,13 +125,13 @@ cargo build --release -p cli
 Linuxの例（wall clockとpeak RSS）:
 
 ```sh
-/usr/bin/time -v target/release/solvers solve examples/river_small.toml --out runs/benchmarks/river-baseline
+/usr/bin/time -v target/release/solvers solve examples/hu-postflop/river_small.toml --out runs/benchmarks/river-baseline
 ```
 
 Windows PowerShellの例（wall clockのみ。同名runがあれば別名へ変える）:
 
 ```powershell
-Measure-Command { & ./target/release/solvers.exe solve examples/river_small.toml --out runs/benchmarks/river-baseline }
+Measure-Command { & ./target/release/solvers.exe solve examples/hu-postflop/river_small.toml --out runs/benchmarks/river-baseline }
 ```
 
 Windowsのpeak working setは別途プロセス計測で取得し、取得方法とサンプリング間隔を記録する。未計測のRSSを静的storage見積もりで代用しない。

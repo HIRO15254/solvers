@@ -37,8 +37,8 @@ fn sequential() -> ParConfig {
     }
 }
 
-/// Turn-start spot: board "2s 7s Ks 2h" (matching `examples/turn_small.toml`
-/// and several `hu-postflop` test fixtures), `postflop_srp20.toml`'s wide
+/// Turn-start spot: board "2s 7s Ks 2h" (as in several `hu-postflop` test fixtures),
+/// `crates/cli/tests/fixtures/postflop_srp20.toml`'s wide
 /// single-raised-pot ranges (so the per-node hand math is realistic),
 /// at `turn_small.toml`'s smaller pot/stack. Per-node cost is driven by hand
 /// count (always 1,326, independent of range sparsity) and tree shape, not

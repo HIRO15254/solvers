@@ -6,10 +6,7 @@ use nlh::{StreetPolicy, TableSetup};
 
 impl StreetPolicy for BettingConfig {
     fn check_down(&self, state: &BettingState, actor: SeatId) -> bool {
-        self.rules.iter().any(|rule| {
-            rule.effect == RuleEffect::Checkdown && crate::tree_rules::matches(rule, state, actor)
-        }) || self
-            .nlh_rules
+        self.nlh_rules
             .iter()
             .any(|rule| rule.effect == RuleEffect::Checkdown && rule.matches(state, actor))
     }
@@ -162,19 +159,11 @@ fn apply_tree_rules(
     actor: SeatId,
     mut actions: Vec<Action>,
 ) -> Result<Vec<Action>, BettingError> {
-    let mut rules = config.rules.iter().collect::<Vec<_>>();
-    rules.sort_by_key(|rule| (rule.priority, rule.source_order));
-    let matched = rules
-        .into_iter()
-        .filter(|rule| crate::tree_rules::matches(rule, state, actor))
-        .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice()))
-        .chain(
-            config
-                .nlh_rules
-                .iter()
-                .filter(|rule| rule.matches(state, actor))
-                .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice())),
-        );
+    let matched = config
+        .nlh_rules
+        .iter()
+        .filter(|rule| rule.matches(state, actor))
+        .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice()));
     for (effect, action, sizes) in matched {
         if effect == RuleEffect::Checkdown {
             actions.retain(|action| matches!(action, Action::Check));
@@ -207,7 +196,6 @@ fn rule_candidates(
 ) -> Result<Vec<Action>, BettingError> {
     if !matches!(action_kind, RuleAction::Bet | RuleAction::Raise) {
         let mut base = config.clone();
-        base.rules.clear();
         base.nlh_rules.clear();
         return Ok(state
             .legal_actions(&base)?
@@ -217,7 +205,6 @@ fn rule_candidates(
     }
 
     let mut scoped = config.clone();
-    scoped.rules.clear();
     scoped.nlh_rules.clear();
     let street = match state.street {
         Street::Preflop => &mut scoped.preflop,
@@ -763,15 +750,19 @@ mod tests {
     #[test]
     fn tree_checkdown_skips_a_matching_street_without_decision_nodes() {
         let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        betting.rules.push(crate::config::TreeRule::new(
-            100,
-            0,
-            crate::config::RuleStreet::Flop,
-            "players >= 3".into(),
-            crate::config::RuleEffect::Checkdown,
-            None,
-            Vec::new(),
-        ));
+        betting.nlh_rules = nlh::script::Script::compile(
+            "flop when players >= 3 { checkdown }",
+            &Default::default(),
+            &spot::NLH_V1,
+        )
+        .unwrap()
+        .rules
+        .into_iter()
+        .map(crate::tree_rules::NlhTreeRule::from_compiled)
+        .collect();
+        for rule in &betting.nlh_rules {
+            rule.validate().unwrap();
+        }
         while state.street == Street::Preflop {
             let actions = state.legal_actions(&betting).unwrap();
             let action = actions

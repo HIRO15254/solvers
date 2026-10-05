@@ -259,8 +259,8 @@ mod tests {
         std::fs::create_dir_all(directory).unwrap();
         let mut manifest = RunManifest::new(
             directory.file_name().unwrap().to_string_lossy().to_string(),
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             "aa",
             vec!["solve".into()],
         );
@@ -326,13 +326,8 @@ mod tests {
         let root = tempfile::tempdir().unwrap();
         let run = root.path().join("run-c");
         std::fs::create_dir_all(&run).unwrap();
-        let mut manifest = RunManifest::new(
-            "run-c",
-            "preflop-multiway",
-            None,
-            "aa",
-            vec!["solve".into()],
-        );
+        let mut manifest =
+            RunManifest::new("run-c", "mw-preflop", None, "aa", vec!["solve".into()]);
         manifest.pid = 0;
         manifest.write_atomic(&run).unwrap();
         std::fs::write(run.join(runfiles::RUN_CHECKPOINT_FILE), b"x").unwrap();

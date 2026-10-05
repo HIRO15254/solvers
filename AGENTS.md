@@ -42,18 +42,13 @@ The normative specifications are:
 | family | normative specification |
 |---|---|
 | `solvers.nlh/v1` | `docs/nlh-input-v1.jp.md` (input), `docs/hu-postflop.jp.md` (P1), `docs/mw-preflop.jp.md` (P2) |
-| `solvers.multiway-preflop/v1` | `docs/multiway-preflop-v1.jp.md` |
-| `solvers.postflop/v1` | `docs/solver-config-v1.jp.md` |
 
-`docs/multiway-preflop-cli-spec.jp.md` is a compatibility entrypoint, not a
-second specification. `docs/multiway-preflop-v1.md` is the implementation
-contract map, `docs/cli-reference.jp.md` covers both binaries' complete CLI,
-and `docs/user-guide.jp.md` is the operational guide.
+`docs/cli-reference.jp.md` covers both binaries' complete CLI, and
+`docs/user-guide.jp.md` is the operational guide.
 
 The common input and both product documents are normative for `solvers.nlh/v1`.
-The two old families remain normative only for their implementing code until
-the next step of restructure M7 deletes them. Unsupported common-input behavior
-must remain an explicit migration boundary.
+Unsupported common-input behavior must remain an explicit implementation
+boundary.
 
 Any contract or default change MUST update every affected artifact in the same
 change set: the normative specification, implementation guide, CLI reference

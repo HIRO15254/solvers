@@ -195,7 +195,7 @@ fn parse(body: &str) -> serde_json::Value {
 }
 
 fn config(marker: &str) -> String {
-    serde_json::json!({ "configToml": format!("schema = \"solvers.postflop/v1\"\n# {marker}\n") })
+    serde_json::json!({ "configToml": format!("schema = \"solvers.nlh/v1\"\n# {marker}\n") })
         .to_string()
 }
 
@@ -262,7 +262,7 @@ fn events_resume_from_the_offset_the_previous_page_reported() {
 fn a_config_that_names_a_file_is_refused_as_not_self_contained() {
     let daemon = Daemon::start(1);
     let body = serde_json::json!({
-        "configToml": "schema = \"solvers.postflop/v1\"\n# NEEDS_FILE\n"
+        "configToml": "schema = \"solvers.nlh/v1\"\n# NEEDS_FILE\n"
     })
     .to_string();
     let (status, error) = daemon.post("/v1/runs", &body);
@@ -273,8 +273,8 @@ fn a_config_that_names_a_file_is_refused_as_not_self_contained() {
 #[test]
 fn an_invalid_config_is_refused_before_a_run_directory_exists() {
     let daemon = Daemon::start(1);
-    let body = serde_json::json!({ "configToml": "schema = \"solvers.postflop/v1\"\n# REJECT\n" })
-        .to_string();
+    let body =
+        serde_json::json!({ "configToml": "schema = \"solvers.nlh/v1\"\n# REJECT\n" }).to_string();
     let (status, error) = daemon.post("/v1/runs", &body);
     assert_eq!(status, 400);
     assert_eq!(error["code"], "invalid-config");
@@ -319,7 +319,7 @@ fn cancelling_a_finished_run_is_a_conflict() {
 fn a_duplicate_run_id_is_a_conflict() {
     let daemon = Daemon::start(1);
     let body = serde_json::json!({
-        "configToml": "schema = \"solvers.postflop/v1\"\n",
+        "configToml": "schema = \"solvers.nlh/v1\"\n",
         "runId": "named"
     })
     .to_string();
@@ -418,7 +418,7 @@ fn artifacts_are_listed_and_downloadable_by_contract_name() {
         None,
     );
     assert_eq!(status, 200);
-    assert!(body.contains("solvers.postflop/v1"), "{body:?}");
+    assert!(body.contains("solvers.nlh/v1"), "{body:?}");
 }
 
 /// Anything outside the contract is not reachable, however it is spelled.

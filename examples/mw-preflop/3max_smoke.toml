@@ -1,0 +1,28 @@
+# Short-stack three-max all-in tree with postflop checkdown and one bucket per street.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 3
+stack_bb = 2
+
+[tree]
+script = '''preflop { replace raise [a] }
+flop, turn, river { checkdown }'''
+
+[tree.max_aggressive_actions]
+preflop = 1
+
+[solver.abstraction.buckets]
+flop = 1
+turn = 1
+river = 1
+
+[solver.stop]
+max_sweeps = 2
+check_every_sweeps = 3
+evaluation_samples = 2
+deviator_traversals = 1
+
+[run]
+threads = 1
+memory = "64MiB"

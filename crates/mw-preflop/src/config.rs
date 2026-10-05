@@ -1,17 +1,15 @@
-//! Serde-facing game configuration and shared validation.
+//! Internal typed game configuration and shared validation.
 //!
-//! `MultiwayConfig` is the payload of CLI `kind = "preflop-multiway"`; run,
-//! algorithm, rake, and utility remain sibling sections.  Conversion to
+//! Common-input lowering constructs `MultiwayConfig`; solver settings, rake,
+//! and utility remain separate typed values.  Conversion to
 //! integral [`MwChips`] happens exactly once during validation/compilation so the betting and
 //! settlement layers never see floating-point chip amounts.
 //! Rake and utility configuration are compatibility exports from `economics`.
 
 use std::path::PathBuf;
 use std::str::FromStr;
-use std::sync::OnceLock;
 
 use nlh::Range;
-use nlh::script::Condition;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -126,8 +124,6 @@ pub struct BettingConfig {
     pub turn: StreetBettingConfig,
     #[serde(default = "default_postflop_betting")]
     pub river: StreetBettingConfig,
-    #[serde(default)]
-    pub rules: Vec<TreeRule>,
     /// Common-input rules in source order, evaluated by the P2 dialect.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub nlh_rules: Vec<crate::tree_rules::NlhTreeRule>,
@@ -141,7 +137,6 @@ impl Default for BettingConfig {
             flop: default_postflop_betting(),
             turn: default_postflop_betting(),
             river: default_postflop_betting(),
-            rules: Vec::new(),
             nlh_rules: Vec::new(),
         }
     }
@@ -154,179 +149,6 @@ impl BettingConfig {
             Street::Flop => &self.flop,
             Street::Turn => &self.turn,
             Street::River => &self.river,
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct TreeRule {
-    pub priority: i32,
-    pub source_order: u32,
-    pub street: RuleStreet,
-    pub condition: String,
-    pub effect: RuleEffect,
-    pub action: Option<RuleAction>,
-    pub sizes: Vec<SizeSpec>,
-    /// The compiled form of `condition`, cached so `tree_rules::matches`
-    /// never reparses the string per decision node -- see
-    /// [`TreeRule::compiled`]. Not part of the wire format: `condition`
-    /// stays the one source of truth a config's `[[..rules]]` TOML surface
-    /// carries, so this is skipped by serde and excluded from equality
-    /// (its value is a pure function of `condition`, so it carries no
-    /// information `condition` doesn't already carry) and cloned by
-    /// re-caching whatever was already computed, not by copying the lock.
-    #[serde(skip)]
-    compiled_condition: OnceLock<Condition<crate::tree_rules::MultiwayVar>>,
-}
-
-impl TreeRule {
-    /// Builds a `TreeRule` with an empty compiled-condition cache. The one
-    /// constructor every caller outside this module uses (the field is
-    /// private so a struct literal can't skip it), matching the way
-    /// `nlh::script::Rule<V>` has no cache at all -- its condition is
-    /// already a compiled `Condition<V>`.
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        priority: i32,
-        source_order: u32,
-        street: RuleStreet,
-        condition: String,
-        effect: RuleEffect,
-        action: Option<RuleAction>,
-        sizes: Vec<SizeSpec>,
-    ) -> Self {
-        Self {
-            priority,
-            source_order,
-            street,
-            condition,
-            effect,
-            action,
-            sizes,
-            compiled_condition: OnceLock::new(),
-        }
-    }
-
-    /// Builds a `TreeRule` from an already-compiled `.mwtree` script rule
-    /// (`crate::tree_rules::compile_script`): `condition`'s *text* is
-    /// `compiled`'s own [`std::fmt::Display`] rendering (`nlh::script`'s
-    /// condition-to-text renderer, shared with postflop's `tree`
-    /// diagnostic) -- nesting composes several `when`/`if` conditions into
-    /// one that never existed as one literal source string, so this is the
-    /// only text there is to give it -- and the cache is installed directly
-    /// from `compiled`, so nothing ever reparses that rendering.
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn from_compiled(
-        priority: i32,
-        source_order: u32,
-        street: RuleStreet,
-        compiled: Condition<crate::tree_rules::MultiwayVar>,
-        effect: RuleEffect,
-        action: Option<RuleAction>,
-        sizes: Vec<SizeSpec>,
-    ) -> Self {
-        let condition = compiled.to_string();
-        let compiled_condition = OnceLock::new();
-        // Never fails: freshly constructed and empty until this line.
-        let _ = compiled_condition.set(compiled);
-        Self {
-            priority,
-            source_order,
-            street,
-            condition,
-            effect,
-            action,
-            sizes,
-            compiled_condition,
-        }
-    }
-
-    /// The compiled form of `condition`, computed the first time this rule
-    /// is checked and reused after that. Safe to call unconditionally:
-    /// `MultiwayConfig::validate` (and therefore `validated`, which calls
-    /// it) already compiles -- and would reject -- every rule's condition
-    /// before a `ValidatedMultiwayConfig`, and therefore a `BettingState`,
-    /// can exist; in practice that eager check means this is already warm
-    /// by the time any decision node reaches it.
-    pub(crate) fn compiled(&self) -> &Condition<crate::tree_rules::MultiwayVar> {
-        self.compiled_condition.get_or_init(|| {
-            crate::tree_rules::compile(&self.condition)
-                .expect("condition was already validated when the config was validated")
-        })
-    }
-
-    /// Compiles `condition` and caches it, unless it is already cached
-    /// (either an earlier call to this method, or a script-derived rule
-    /// whose already-parsed condition `crate::tree_rules::compile_script`
-    /// installed directly -- see its doc comment). Returns the parse error,
-    /// rather than panicking like [`Self::compiled`], since this is the
-    /// validating path: `MultiwayConfig::validate` calls it on every rule so
-    /// a bad condition is rejected before a `ValidatedMultiwayConfig` (and
-    /// therefore a `BettingState`) can exist.
-    fn compile_condition(&self) -> Result<(), nlh::script::ScriptError> {
-        if self.compiled_condition.get().is_some() {
-            return Ok(());
-        }
-        let compiled = crate::tree_rules::compile(&self.condition)?;
-        // Can only race with another thread also validating this exact
-        // rule for the first time; either winner's value is the same
-        // compiled condition, so losing the race is not a bug.
-        let _ = self.compiled_condition.set(compiled);
-        Ok(())
-    }
-}
-
-impl Clone for TreeRule {
-    fn clone(&self) -> Self {
-        let compiled_condition = OnceLock::new();
-        if let Some(compiled) = self.compiled_condition.get() {
-            // Never fails: freshly constructed and empty until this line.
-            let _ = compiled_condition.set(compiled.clone());
-        }
-        Self {
-            priority: self.priority,
-            source_order: self.source_order,
-            street: self.street,
-            condition: self.condition.clone(),
-            effect: self.effect,
-            action: self.action,
-            sizes: self.sizes.clone(),
-            compiled_condition,
-        }
-    }
-}
-
-impl PartialEq for TreeRule {
-    fn eq(&self, other: &Self) -> bool {
-        self.priority == other.priority
-            && self.source_order == other.source_order
-            && self.street == other.street
-            && self.condition == other.condition
-            && self.effect == other.effect
-            && self.action == other.action
-            && self.sizes == other.sizes
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum RuleStreet {
-    Preflop,
-    Flop,
-    Turn,
-    River,
-    Postflop,
-}
-
-impl RuleStreet {
-    pub fn matches(self, street: Street) -> bool {
-        match self {
-            Self::Preflop => street == Street::Preflop,
-            Self::Flop => street == Street::Flop,
-            Self::Turn => street == Street::Turn,
-            Self::River => street == Street::River,
-            Self::Postflop => street != Street::Preflop,
         }
     }
 }
@@ -389,7 +211,7 @@ pub struct StreetBettingConfig {
     /// nodes, not even checks; play proceeds straight to the next street (or
     /// showdown). `None` (default) preserves unlimited betting, so every
     /// config predating this field serializes identically and keeps its game
-    /// fingerprint. See `docs/multiway-preflop-v1.jp.md`. Rejected on preflop and
+    /// fingerprint. See `docs/nlh-input-v1.jp.md`. Rejected on preflop and
     /// must be at least `1` when present; also a public-tree property, so a
     /// per-seat betting override must not disagree with the table's value
     /// for the same street (see [`MultiwayConfig::validate`]).
@@ -489,7 +311,7 @@ pub struct AbstractionConfig {
     /// solver construction and restore reject it explicitly.
     /// `Street` switches to a bounded-memory dense arena keyed only by the
     /// current street's bucket (a Monker/Pluribus-style imperfect-recall
-    /// abstraction); see `docs/multiway-preflop-v1.jp.md`. Skipped when `Full` so
+    /// abstraction); see `docs/mw-preflop.jp.md`. Skipped when `Full` so
     /// every legacy config predating this field keeps identical serialized
     /// bytes/config hashes. Recall is independently excluded from game
     /// identity and included in abstraction identity.
@@ -1037,55 +859,6 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
             }
         } else if section.max_betting_players == Some(0) {
             return Err(ConfigError::MaxBettingPlayers);
-        }
-    }
-    if config.rules.len() > 256 {
-        return Err(ConfigError::TreeRule(
-            "at most 256 tree rules are allowed".into(),
-        ));
-    }
-    for (index, rule) in config.rules.iter().enumerate() {
-        if rule.condition.trim().is_empty() {
-            return Err(ConfigError::TreeRule(format!(
-                "tree rule {index} has an empty condition"
-            )));
-        }
-        rule.compile_condition()
-            .map_err(|error| ConfigError::TreeRule(error.to_string()))?;
-        match rule.effect {
-            RuleEffect::Checkdown if rule.action.is_none() && rule.sizes.is_empty() => {}
-            RuleEffect::Checkdown => {
-                return Err(ConfigError::TreeRule(format!(
-                    "checkdown tree rule {index} must omit action and sizes"
-                )));
-            }
-            _ if rule.action.is_none() => {
-                return Err(ConfigError::TreeRule(format!(
-                    "tree rule {index} requires an action"
-                )));
-            }
-            _ => {}
-        }
-        if rule.sizes.len() > 32 {
-            return Err(ConfigError::TreeRule(format!(
-                "tree rule {index} has more than 32 sizes"
-            )));
-        }
-        for size in &rule.sizes {
-            validate_size_spec(size)?;
-        }
-        if rule.effect == RuleEffect::Force
-            && config.rules[..index].iter().any(|other| {
-                other.effect == RuleEffect::Force
-                    && other.priority == rule.priority
-                    && other.street == rule.street
-                    && other.condition.trim() == rule.condition.trim()
-                    && (other.action != rule.action || other.sizes != rule.sizes)
-            })
-        {
-            return Err(ConfigError::TreeRule(format!(
-                "tree rule {index} conflicts with an earlier force at the same priority"
-            )));
         }
     }
     Ok(())

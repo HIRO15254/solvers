@@ -1,14 +1,4 @@
-//! Shared multiway session construction, factored out of
-//! `multiway_solve::run_inner` so both the `solvers` CLI and (eventually) a
-//! GUI worker build the exact same `MultiwaySolver` from a TOML config.
-//!
-//! This module intentionally stops short of anything CLI-specific: no
-//! stdout printing, no `run.storage` restriction (the CLI still hard-rejects
-//! non-f32 storage in `multiway_solve.rs`; the GUI is expected to support
-//! `i16` later), and no checkpoint-cadence loop. It only builds the pieces a
-//! caller needs to drive one: a ready-to-run `MultiwaySolver`, the run
-//! parameters resolved from `[run]`, and the raw config text/hash to stamp
-//! onto whatever artifact the caller eventually writes.
+//! Typed P2 sessions, resource preflight, metrics, and solution export.
 
 use std::path::Path;
 use std::time::Instant;
@@ -18,13 +8,9 @@ use mw_preflop::abstraction::{
     BucketContext, BucketId, MultiwayAbstraction, MultiwayAbstractionBackend,
     TableAbstractionAdapter, ehs2_table_fingerprint,
 };
-#[cfg(test)]
-use mw_preflop::abstraction::{FeatureHashAbstraction, FeatureHashParams};
 use mw_preflop::card_abstraction::{Ehs2Abstraction, Ehs2Params};
-use mw_preflop::checkpoint::MultiwayCheckpoint;
 use mw_preflop::config::{
-    AbstractionConfig, AbstractionKind, FieldPlayerConfig, RakeConfig as MultiwayRake, RecallMode,
-    UtilityConfig as MultiwayUtility,
+    AbstractionConfig, RakeConfig as MultiwayRake, RecallMode, UtilityConfig as MultiwayUtility,
 };
 use mw_preflop::metrics::{
     Estimate, MULTIWAY_SCHEMA_VERSION, MultiwayMetricsRow, MultiwaySeatMetrics,
@@ -33,19 +19,13 @@ use mw_preflop::mwsol::{
     MultiwayHistoryNode, MultiwayPublicAction, MultiwayPublicState, MultiwaySeatResult,
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
-use mw_preflop::solver::{DEFAULT_PRUNE_THRESHOLD, ProfileEvaluation, SolverConfig};
-use mw_preflop::{DealSampler, ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
+use mw_preflop::solver::{ProfileEvaluation, SolverConfig};
+use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
 use rayon::prelude::*;
 
-use crate::config::{
-    AlgorithmSection, GameSection, RakeSection, SolveConfig, StorageKind, UtilitySection,
-};
+use mw_preflop::input::Lowered;
 
-const DEFAULT_MEMORY_LIMIT: u64 = 4 * 1024 * 1024 * 1024;
-
-/// Resolved `run.stop_dev_gain`/`run.stop_confirmations`/
-/// `run.stop_eval_period_secs` convergence stop rule; see
-/// `crate::config::RunSection::stop_dev_gain` for the full semantics.
+/// Resolved P2 convergence stop rule.
 /// `None` in [`MultiwaySession::stop_rule`] means the rule is disabled and
 /// `sweeps_target` is a plain target rather than a safety cap.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -55,10 +35,8 @@ pub struct StopRule {
     pub dev_gain_threshold: f64,
     /// Consecutive passing evaluations required before stopping.
     pub confirmations: u32,
-    /// Wall-clock period, in seconds, between stop-rule evaluations.
-    pub eval_period_secs: f64,
     /// Best-response training traversals per seat per stop-rule evaluation
-    /// (see `crate::config::RunSection::stop_br_traversals`). `0` disables
+    /// `0` disables
     /// the burst.
     pub br_traversals: u64,
 }
@@ -84,10 +62,7 @@ pub struct MultiwaySession {
     pub evaluation_cadence: u64,
     pub evaluation_samples: u64,
     pub evaluation_seed: u64,
-    pub checkpoint_every: Option<u64>,
-    pub storage: StorageKind,
-    /// Convergence-based stop rule; see [`StopRule`]. `None` unless
-    /// `run.stop_dev_gain` is set.
+    /// Convergence-based stop rule resolved from P2 solver settings.
     pub stop_rule: Option<StopRule>,
     /// The exact config text this session was built from, unmodified.
     pub config_toml: String,
@@ -104,6 +79,7 @@ pub struct MultiwaySession {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct MultiwayResourcePreflight {
     pub complete: bool,
+    pub limit: Option<ResourceLimit>,
     pub recall: RecallMode,
     pub decision_nodes: u64,
     pub terminal_edges: Option<u64>,
@@ -111,6 +87,12 @@ pub struct MultiwayResourcePreflight {
     pub policy_columns: Option<u64>,
     pub policy_slots: Option<u64>,
     pub solver_state_bytes: Option<u64>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ResourceLimit {
+    Node,
+    Memory,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -169,42 +151,31 @@ impl MultiwayAbstraction for ResourcePreflightAbstraction {
 /// The tree is walked without retaining nodes, so this reports the arena a
 /// real solve would need without allocating it or building EHS² tables.
 pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePreflight> {
-    crate::multiway_v1::validate_production_contract(raw_toml)
-        .context("validating production Multiway Preflop contract")?;
-    let config =
-        crate::config::parse_internal_config(raw_toml).context("parsing config for preflight")?;
-    preflight_multiway_typed(config)
+    let p = crate::nlh_v1::p2::prepare(raw_toml, Path::new("embedded.toml"))?;
+    preflight_multiway_typed(p.lowered)
 }
 
-pub(crate) fn preflight_multiway_typed(config: SolveConfig) -> Result<MultiwayResourcePreflight> {
+pub fn preflight_multiway_typed(config: Lowered) -> Result<MultiwayResourcePreflight> {
     Ok(preflight_multiway_impl(config, false)?.0)
 }
 
 pub(crate) fn preflight_multiway_with_rule_hits(
-    config: SolveConfig,
+    config: Lowered,
 ) -> Result<(MultiwayResourcePreflight, Vec<bool>)> {
     preflight_multiway_impl(config, true)
 }
 
 fn preflight_multiway_impl(
-    config: SolveConfig,
+    config: Lowered,
     measure_hits: bool,
 ) -> Result<(MultiwayResourcePreflight, Vec<bool>)> {
-    let SolveConfig {
-        game,
+    let Lowered {
+        game: game_config,
         rake,
         utility,
         run,
         ..
     } = config;
-    let GameSection::PreflopMultiway(game_config) = game else {
-        return Err(anyhow!(
-            "multiway resource preflight requires kind = \"preflop-multiway\""
-        ));
-    };
-
-    let utility = convert_utility(utility)?;
-    let rake = convert_rake(rake);
     game_config
         .validate_economics(&utility, &rake)
         .context("validating multiway game and utility for preflight")?;
@@ -275,10 +246,7 @@ fn preflight_multiway_impl(
     let _sampler = game
         .deal_sampler()
         .context("compiling table ranges for preflight")?;
-    let memory_limit = run
-        .max_memory_bytes
-        .filter(|bytes| *bytes != u64::MAX)
-        .unwrap_or(crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES);
+    let memory_limit = run.memory_bytes;
     let arena = match mw_preflop::tree::preflight_arena(&game, memory_limit) {
         Ok(arena) => arena,
         Err(mw_preflop::tree::TreeError::MemoryLimit {
@@ -290,6 +258,7 @@ fn preflight_multiway_impl(
             return Ok((
                 MultiwayResourcePreflight {
                     complete: false,
+                    limit: Some(ResourceLimit::Memory),
                     recall,
                     decision_nodes: node_count as u64,
                     terminal_edges: None,
@@ -301,10 +270,11 @@ fn preflight_multiway_impl(
                 game.tree_rule_hits().unwrap_or_default(),
             ));
         }
-        Err(mw_preflop::tree::TreeError::TooManyNodes { limit }) if measure_hits => {
+        Err(mw_preflop::tree::TreeError::TooManyNodes { limit }) => {
             return Ok((
                 MultiwayResourcePreflight {
                     complete: false,
+                    limit: Some(ResourceLimit::Node),
                     recall,
                     decision_nodes: limit as u64,
                     terminal_edges: None,
@@ -324,6 +294,7 @@ fn preflight_multiway_impl(
     Ok((
         MultiwayResourcePreflight {
             complete: true,
+            limit: None,
             recall,
             decision_nodes: arena.node_count as u64,
             terminal_edges: Some(arena.terminal_edges),
@@ -336,403 +307,81 @@ fn preflight_multiway_impl(
     ))
 }
 
-/// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]
-/// when `run.stop_dev_gain` is set but the corresponding key is omitted.
-const DEFAULT_STOP_CONFIRMATIONS: u32 = 2;
-const DEFAULT_STOP_EVAL_PERIOD_SECS: f64 = 30.0;
-/// Default [`StopRule::br_traversals`] when `run.stop_dev_gain` is set but
-/// `run.stop_br_traversals` is omitted.
-const DEFAULT_STOP_BR_TRAVERSALS: u64 = 2_000;
+/// Build a session from the product's typed settings and effective input.
+pub fn build_production_multiway_session(
+    input: Lowered,
+    effective: String,
+    checkpoint: Option<&Path>,
+) -> Result<MultiwaySession> {
+    let (table, ready) = build_ehs2_table_abstraction(&input.game)?;
+    wrap_session(
+        mw_preflop::input::build_session(
+            input,
+            MultiwayAbstractionBackend::Ehs2Table(table),
+            effective,
+            checkpoint,
+        )?,
+        Some(ready),
+    )
+}
 
-/// Parses `raw_toml`, validates it as a `kind = "preflop-multiway"` config,
-/// and builds a ready-to-run (or ready-to-resume) [`MultiwaySession`].
-///
-/// `resume_checkpoint`, when `Some`, restores solver state from a
-/// `.mwckpt` file (always f32 internally, regardless of `run.storage`) and
-/// verifies its configuration/abstraction fingerprints match this config
-/// before returning.
-/// Test-only session builder. It swaps the configured EHS² percentile table
-/// for the cheap deterministic feature-hash baseline, because building a real
-/// EHS² table costs minutes and these tests exercise session wiring rather
-/// than bucket quality. Production code paths use
-/// [`build_production_multiway_session`].
 #[cfg(test)]
 pub(crate) fn build_multiway_session(
-    raw_toml: &str,
-    resume_checkpoint: Option<&Path>,
+    raw: &str,
+    checkpoint: Option<&Path>,
 ) -> Result<MultiwaySession> {
-    build_multiway_session_internal(
-        raw_toml,
-        resume_checkpoint,
-        SessionStoragePolicy::Compatibility,
-        AbstractionPolicy::CheapBaseline,
+    let p = crate::nlh_v1::p2::prepare(raw, Path::new("embedded.toml"))?;
+    build_test_session(p.lowered, p.effective, checkpoint)
+}
+
+#[cfg(test)]
+pub(crate) fn build_test_session(
+    input: Lowered,
+    effective: String,
+    checkpoint: Option<&Path>,
+) -> Result<MultiwaySession> {
+    use mw_preflop::abstraction::{FeatureHashAbstraction, FeatureHashParams};
+    let a = &input.game.abstraction;
+    let abstraction =
+        MultiwayAbstractionBackend::FeatureHash(FeatureHashAbstraction::new(FeatureHashParams {
+            flop_buckets: u32::from(a.flop_buckets),
+            turn_buckets: u32::from(a.turn_buckets),
+            river_buckets: u32::from(a.river_buckets),
+        })?);
+    wrap_session(
+        mw_preflop::input::build_session(input, abstraction, effective, checkpoint)?,
+        None,
     )
 }
 
-/// Production solve/resume constructor. It accepts only the fixed
-/// EHS2/current-street contract and returns only after the complete policy
-/// arena has been allocated and page-committed.
-pub fn build_production_multiway_session(
-    raw_toml: &str,
-    resume_checkpoint: Option<&Path>,
+fn wrap_session(
+    session: mw_preflop::input::Session<MultiwayAbstractionBackend>,
+    ready: Option<AbstractionReady>,
 ) -> Result<MultiwaySession> {
-    build_multiway_session_internal(
-        raw_toml,
-        resume_checkpoint,
-        SessionStoragePolicy::PreallocatedProduction,
-        AbstractionPolicy::Configured,
-    )
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum SessionStoragePolicy {
-    /// Sparse storage, reachable only from the test-only session builders.
-    #[cfg(test)]
-    Compatibility,
-    PreallocatedProduction,
-}
-
-/// Which card abstraction a session build should use.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum AbstractionPolicy {
-    /// Build what the config selects. The only production choice.
-    Configured,
-    /// Substitute the cheap feature-hash baseline.
-    #[cfg(test)]
-    CheapBaseline,
-}
-
-fn build_multiway_session_internal(
-    raw_toml: &str,
-    resume_checkpoint: Option<&Path>,
-    storage_policy: SessionStoragePolicy,
-    abstraction_policy: AbstractionPolicy,
-) -> Result<MultiwaySession> {
-    if crate::nlh_v1::has_schema(raw_toml)? {
-        return crate::nlh_v1::p2::build_session(raw_toml, resume_checkpoint);
-    }
-    let config: SolveConfig =
-        crate::config::parse_internal_config(raw_toml).context("parsing config")?;
-    let SolveConfig {
-        schema: _,
-        game,
-        rake,
-        utility,
-        algorithm,
-        run,
-    } = config;
-    let GameSection::PreflopMultiway(game_config) = game else {
-        return Err(anyhow!(
-            "multiway solve path requires kind = \"preflop-multiway\""
-        ));
-    };
-    if matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
-        validate_production_abstraction(&game_config)?;
-    }
-    if run.target_nash_conv.is_some() {
-        return Err(anyhow!(
-            "multiway profiles do not expose NashConv; remove run.target_nash_conv"
-        ));
-    }
-    let utility = convert_utility(utility)?;
-    let rake = convert_rake(rake);
-    let (game, sampler, abstraction_ready) =
-        build_multiway_game_from_config(&game_config, &utility, &rake, abstraction_policy)?;
-
-    let (
-        algorithm_seed,
-        exploration_epsilon,
-        discount_every,
-        discount_until,
-        traverser_vector,
-        prune,
-        prune_threshold_override,
-        prune_skip_probability,
-    ) = match algorithm {
-        AlgorithmSection::ExternalSamplingMccfr {
-            seed,
-            exploration_epsilon,
-            discount_every,
-            discount_until,
-            traverser_vector,
-            prune,
-            prune_threshold,
-            prune_skip_probability,
-        } => (
-            seed,
-            exploration_epsilon,
-            discount_every,
-            discount_until,
-            traverser_vector,
-            prune,
-            prune_threshold,
-            prune_skip_probability,
-        ),
-        _ => {
-            return Err(anyhow!(
-                "preflop-multiway requires schedule = \"external-sampling-mccfr\""
-            ));
-        }
-    };
-    if prune && !traverser_vector {
-        return Err(anyhow!(
-            "algorithm.prune requires algorithm.traverser_vector = true"
-        ));
-    }
-    if let Some(threshold) = prune_threshold_override
-        && (!threshold.is_finite() || threshold >= 0.0)
-    {
-        return Err(anyhow!(
-            "algorithm.prune_threshold must be finite and strictly negative, found {threshold}"
-        ));
-    }
-    let sweeps = run.sweeps.unwrap_or(run.iterations);
-    if sweeps == 0 {
-        return Err(anyhow!("run.sweeps must be positive for a multiway solve"));
-    }
-    let evaluation_cadence = run.evaluation_cadence.unwrap_or(run.check_every);
-    if evaluation_cadence == 0 {
-        return Err(anyhow!("run.evaluation_cadence must be positive"));
-    }
-    if run.checkpoint_every == Some(0) {
-        return Err(anyhow!(
-            "run.checkpoint_every must be positive when supplied"
-        ));
-    }
-    let threads = run.threads.unwrap_or_else(rayon::current_num_threads);
-    if threads == 0 {
-        return Err(anyhow!("run.threads must be positive"));
-    }
-    if run.evaluation_samples == Some(0) {
-        return Err(anyhow!(
-            "run.evaluation_samples must be positive when supplied"
-        ));
-    }
-    if run.sweep_batch == Some(0) {
-        return Err(anyhow!("run.sweep_batch must be positive when supplied"));
-    }
-    if run
-        .stop_dev_gain
-        .is_some_and(|threshold| !threshold.is_finite() || threshold <= 0.0)
-    {
-        return Err(anyhow!(
-            "run.stop_dev_gain must be finite and positive when supplied"
-        ));
-    }
-    if run.stop_confirmations == Some(0) {
-        return Err(anyhow!(
-            "run.stop_confirmations must be positive when supplied"
-        ));
-    }
-    if run
-        .stop_eval_period_secs
-        .is_some_and(|period| !period.is_finite() || period <= 0.0)
-    {
-        return Err(anyhow!(
-            "run.stop_eval_period_secs must be finite and positive when supplied"
-        ));
-    }
-    let stop_rule = run.stop_dev_gain.map(|dev_gain_threshold| StopRule {
-        dev_gain_threshold,
-        confirmations: run.stop_confirmations.unwrap_or(DEFAULT_STOP_CONFIRMATIONS),
-        eval_period_secs: run
-            .stop_eval_period_secs
-            .unwrap_or(DEFAULT_STOP_EVAL_PERIOD_SECS),
-        br_traversals: run.stop_br_traversals.unwrap_or(DEFAULT_STOP_BR_TRAVERSALS),
-    });
-
-    let evaluation_samples = run.evaluation_samples.unwrap_or(256);
-    let prune_threshold = if !prune {
-        // Ignored by the engine when `prune` is false; keep the documented
-        // default so a disabled-pruning solver config is still valid input.
-        DEFAULT_PRUNE_THRESHOLD
-    } else {
-        prune_threshold_override.unwrap_or_else(|| derive_prune_threshold(&utility, &game_config))
-    };
-    let max_memory_bytes = resolve_policy_memory_limit(storage_policy, run.max_memory_bytes)?;
-    let solver_config = SolverConfig {
-        seed: run.seed.unwrap_or(algorithm_seed),
-        max_memory_bytes,
-        max_traversal_depth: 512,
-        exploration_epsilon,
-        discount_every,
-        discount_until,
-        sweep_batch: run.sweep_batch.unwrap_or(1),
-        traverser_vector,
-        prune,
-        prune_threshold,
-        prune_skip_probability,
-    };
-    let evaluation_seed = solver_config.seed ^ 0x6576_616c_7561_7465;
-
-    let mut checkpoint_runtime = None;
-    let solver = if let Some(path) = resume_checkpoint {
-        let expected_configuration =
-            mw_preflop::solver::configuration_fingerprint_for_setup(&game, &sampler, solver_config);
-        let expected_abstraction = mw_preflop::abstraction_fingerprint_with_recall(
-            game.abstraction_fingerprint(),
-            game.recall_mode(),
-        );
-        let checkpoint =
-            MultiwayCheckpoint::load(path, expected_configuration, expected_abstraction)
-                .with_context(|| format!("reading multiway checkpoint {}", path.display()))?;
-        checkpoint_runtime = checkpoint.config_toml.as_ref().map(|_| checkpoint.runtime);
-        let solver = match storage_policy {
-            #[cfg(test)]
-            SessionStoragePolicy::Compatibility => MultiwaySolver::from_state_with_config(
-                game,
-                sampler,
-                checkpoint.state,
-                solver_config,
-            ),
-            SessionStoragePolicy::PreallocatedProduction => {
-                MultiwaySolver::from_state_with_config_preallocated_with_threads(
-                    game,
-                    sampler,
-                    checkpoint.state,
-                    solver_config,
-                    threads,
-                )
-            }
-        }
-        .context("restoring multiway MCCFR state")?;
-        if solver.configuration_fingerprint() != checkpoint.header.configuration_fingerprint {
-            return Err(anyhow!(
-                "checkpoint belongs to different table rules or ranges"
-            ));
-        }
-        if solver.abstraction_fingerprint() != checkpoint.header.abstraction_fingerprint {
-            return Err(anyhow!(
-                "checkpoint belongs to a different card abstraction"
-            ));
-        }
-        solver
-    } else {
-        match storage_policy {
-            #[cfg(test)]
-            SessionStoragePolicy::Compatibility => {
-                MultiwaySolver::new(game, sampler, solver_config)
-            }
-            SessionStoragePolicy::PreallocatedProduction => {
-                MultiwaySolver::new_preallocated_with_threads(game, sampler, solver_config, threads)
-            }
-        }
-        .context("initializing multiway MCCFR")?
-    };
-
-    if matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
-        let allocation = solver.policy_arena_allocation().ok_or_else(|| {
-            anyhow!("production solver returned without a preallocated policy arena")
-        })?;
-        if !allocation.pages_committed {
-            return Err(anyhow!(
-                "production solver returned before policy arena pages were committed"
-            ));
-        }
-    }
-
-    if solver.metrics().sweeps > sweeps {
-        return Err(anyhow!(
-            "checkpoint already contains {} sweeps, exceeding target {}",
-            solver.metrics().sweeps,
-            sweeps
-        ));
-    }
-
+    let r = session.run;
     Ok(MultiwaySession {
-        solver,
-        abstraction_ready,
-        sweeps_target: sweeps,
-        threads,
-        evaluation_cadence,
-        evaluation_samples,
-        evaluation_seed,
-        checkpoint_every: run.checkpoint_every,
-        storage: run.storage,
-        stop_rule,
-        config_toml: raw_toml.to_string(),
-        config_hash: runfiles::config_hash(raw_toml.as_bytes()),
-        game_config,
-        checkpoint_runtime,
+        solver: session.solver,
+        abstraction_ready: ready,
+        sweeps_target: r.stop.max_sweeps,
+        threads: r.threads,
+        evaluation_cadence: r.stop.check_every_sweeps,
+        evaluation_samples: r.stop.evaluation_samples,
+        evaluation_seed: r.evaluation_seed,
+        stop_rule: Some(StopRule {
+            dev_gain_threshold: r.dev_gain_threshold,
+            confirmations: r.stop.confirmations,
+            br_traversals: r.stop.deviator_traversals,
+        }),
+        config_toml: session.config_toml,
+        config_hash: session.config_hash,
+        game_config: session.game_config,
+        checkpoint_runtime: session.checkpoint_runtime,
     })
 }
 
-fn resolve_policy_memory_limit(
-    storage_policy: SessionStoragePolicy,
-    configured: Option<u64>,
-) -> Result<u64> {
-    if !matches!(storage_policy, SessionStoragePolicy::PreallocatedProduction) {
-        return Ok(configured.unwrap_or(DEFAULT_MEMORY_LIMIT));
-    }
-    let resolved = match configured {
-        None | Some(u64::MAX) => crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES,
-        Some(bytes) => bytes,
-    };
-    Ok(resolved)
-}
-
-fn validate_production_abstraction(game: &mw_preflop::MultiwayConfig) -> Result<()> {
-    if !matches!(game.abstraction.kind, AbstractionKind::Ehs2Table) {
-        return Err(anyhow!(
-            "MWP001: rollout-kmeans was removed from production because its assignment cache \
-             grows during Solve; use canonical v1 kind = \"ehs2-percentile\""
-        ));
-    }
-    if !matches!(game.abstraction.recall, RecallMode::Street) {
-        return Err(anyhow!(
-            "MWP002: full/bucket-history recall was removed from production because sparse \
-             policy memory grows during Solve; production requires current-street preallocation"
-        ));
-    }
-    if !game.abstraction.active_opponent_buckets.is_empty() {
-        return Err(anyhow!(
-            "MWP001: active-opponent bucket overrides are rollout-only and unavailable in production"
-        ));
-    }
-    Ok(())
-}
-
-/// Scale factor `derive_prune_threshold` applies to the game's total stakes
-/// to get `algorithm.prune_threshold` when the key is omitted. See
-/// `derive_prune_threshold`'s doc comment for its calibration boundary.
-pub(crate) const PRUNE_THRESHOLD_STAKE_FACTOR: f64 = -10.0;
-
-/// Derives `algorithm.prune_threshold` when `algorithm.prune = true` but the
-/// key itself is omitted, from the game's stakes: `-10.0 *` the total
-/// starting stacks (in bb) for `[utility] kind = "chip-ev"`, or `-10.0 *`
-/// the total payouts for `kind = "tournament-icm"`.
-///
-/// This scale was originally calibrated with solver-state version 2's
-/// within-bucket-normalized range-vector regret updates. Version 3 instead
-/// normalizes over the full feasible own range, so each bucket's increment
-/// also carries its conditional feasible mass (roughly 1/169 for a uniform
-/// preflop range, with class-size and blocker variation). The old activation
-/// timing does not validate this threshold under the current estimator.
-/// Compare paired pruned and unpruned runs before drawing speed or quality
-/// conclusions. The 5% unpruned revisit probability provides opportunities
-/// to revisit skipped pairs; periodic discount moves negative regrets toward
-/// zero and can delay or reverse pruning eligibility.
-fn derive_prune_threshold(
-    utility: &MultiwayUtility,
-    game_config: &mw_preflop::MultiwayConfig,
-) -> f64 {
-    let total = match utility {
-        MultiwayUtility::ChipEv => game_config
-            .seats
-            .iter()
-            .map(|seat| seat.stack_bb)
-            .sum::<f64>(),
-        MultiwayUtility::TournamentIcm { payouts, .. } => payouts.iter().sum::<f64>(),
-    };
-    PRUNE_THRESHOLD_STAKE_FACTOR * total
-}
-
-/// Hard cap on the adaptive stop-rule evaluation sample count: matches the
-/// ladder cap documented on `run.stop_dev_gain`, enforced by the CLI drive
-/// loop (`multiway_solve::run_inner`) via [`run_stop_rule_check`].
 pub(crate) const MAX_STOP_RULE_SAMPLES: u64 = 65_536;
 
-/// Mutable state of the wall-clock convergence stop rule (`run.stop_dev_gain`)
+/// Mutable state of the convergence stop rule
 /// across one run, threaded through repeated [`run_stop_rule_check`] calls.
 pub struct StopRuleState {
     /// Adaptive evaluation sample count: starts at the session's
@@ -741,10 +390,6 @@ pub struct StopRuleState {
     pub samples: u64,
     /// Consecutive passing evaluations so far.
     pub confirmations_met: u32,
-    /// Wall clock of the last stop-rule check; the caller compares this
-    /// against `StopRule::eval_period_secs` to decide whether to call
-    /// [`run_stop_rule_check`] again.
-    pub last_eval: Instant,
     /// Monotonically increasing index of the next check, folded into the
     /// training and held-out evaluation seeds. Persisted in checkpoints so
     /// resumed checks continue with fresh batches instead of reusing evidence.
@@ -756,7 +401,6 @@ impl StopRuleState {
         Self {
             samples: initial_samples,
             confirmations_met: 0,
-            last_eval: Instant::now(),
             eval_index: 0,
         }
     }
@@ -828,9 +472,7 @@ fn stop_check_seeds(seed: u64, sequence: u64) -> (u64, u64) {
 /// One stop-rule check: an optional best-response burst, the held-out
 /// evaluation, threshold/width bookkeeping, adaptive sample doubling, and
 /// the confirmations update. Callers are expected to have already checked
-/// their own wall-clock trigger (`state.last_eval.elapsed() >=
-/// stop_rule.eval_period_secs`) before calling this; it unconditionally
-/// performs one check and resets `state.last_eval`.
+/// sweep cadence before calling this; it unconditionally performs one check.
 pub fn run_stop_rule_check(
     solver: &MultiwaySolver<HoldemGame<MultiwayAbstractionBackend>>,
     stop_rule: &StopRule,
@@ -839,7 +481,6 @@ pub fn run_stop_rule_check(
     threads: usize,
     evaluation_seed: u64,
 ) -> Result<StopRuleCheck> {
-    state.last_eval = Instant::now();
     // One observation has no estimable sample variance. The diagnostic API
     // permits it, but its zero standard error must not certify a stop.
     // Persist and report the actual effective sample count.
@@ -922,63 +563,7 @@ pub fn run_stop_rule_check(
     })
 }
 
-/// The `[game]`/`[rake]`/`[utility]`-only core of `build_multiway_session`:
-/// builds (or loads/retrains) the configured card abstraction and returns a
-/// ready-to-use game plus its deal sampler, without touching
-/// `[algorithm]`/`[run]` or constructing a solver.
-fn build_multiway_game_from_config(
-    game_config: &mw_preflop::MultiwayConfig,
-    utility: &MultiwayUtility,
-    rake: &MultiwayRake,
-    abstraction_policy: AbstractionPolicy,
-) -> Result<(
-    HoldemGame<MultiwayAbstractionBackend>,
-    DealSampler,
-    Option<AbstractionReady>,
-)> {
-    game_config
-        .validate_economics(utility, rake)
-        .context("validating multiway game and utility")?;
-    // Only the EHS² backend has a table worth reporting; the test baseline
-    // is built in microseconds.
-    #[allow(unused_assignments)]
-    let mut ready = None;
-    let abstraction = match abstraction_policy {
-        #[cfg(test)]
-        AbstractionPolicy::CheapBaseline => MultiwayAbstractionBackend::FeatureHash(
-            FeatureHashAbstraction::new(FeatureHashParams {
-                flop_buckets: u32::from(game_config.abstraction.flop_buckets),
-                turn_buckets: u32::from(game_config.abstraction.turn_buckets),
-                river_buckets: u32::from(game_config.abstraction.river_buckets),
-            })
-            .context("building the feature-hash baseline abstraction")?,
-        ),
-        AbstractionPolicy::Configured => match game_config.abstraction.kind {
-            AbstractionKind::RolloutKmeans => {
-                return Err(anyhow!(
-                    "MWP001: rollout-kmeans was removed; use kind = \"ehs2-table\""
-                ));
-            }
-            AbstractionKind::Ehs2Table => {
-                let (table, report) = build_ehs2_table_abstraction(game_config)?;
-                ready = Some(report);
-                MultiwayAbstractionBackend::Ehs2Table(table)
-            }
-        },
-    };
-    let game = HoldemGame::new(game_config, utility, rake, abstraction)
-        .context("building generative multiway game")?;
-    let sampler = game.deal_sampler().context("compiling table ranges")?;
-    Ok((game, sampler, ready))
-}
-
-/// Builds (or loads, or rebuilds-and-overwrites -- see
-/// `Ehs2Abstraction::load_or_build`) the precomputed EHS² percentile-table
-/// abstraction for `AbstractionKind::Ehs2Table`, reusing the same
-/// `artifact_cache` config key the rollout backend uses for its own
-/// (differently-shaped) artifact. Unlike the rollout backend, there is no
-/// separate assignment cache to persist after a solve: the table is fully
-/// determined by `params` at build time.
+/// Load the EHS² table with the existing cache key and abstraction fingerprint.
 pub(crate) fn build_ehs2_table_abstraction(
     game_config: &mw_preflop::MultiwayConfig,
 ) -> Result<(TableAbstractionAdapter<Ehs2Abstraction>, AbstractionReady)> {
@@ -1022,80 +607,6 @@ pub(crate) fn build_ehs2_table_abstraction(
             secs: start.elapsed().as_secs_f64(),
         },
     ))
-}
-
-/// Converts the config-schema `[utility]` section into the solver's
-/// `MultiwayUtility`, running cheap `validate_economics` checks without
-/// paying for a full `build_multiway_session` (which also trains the card
-/// abstraction and builds the game).
-pub(crate) fn convert_utility(utility: UtilitySection) -> Result<MultiwayUtility> {
-    Ok(match utility {
-        UtilitySection::ChipEv => MultiwayUtility::ChipEv,
-        UtilitySection::TournamentIcm {
-            outside_field,
-            payouts,
-            samples,
-            seed,
-        } => MultiwayUtility::TournamentIcm {
-            outside_field: outside_field
-                .into_iter()
-                .map(|player| FieldPlayerConfig {
-                    name: player.name,
-                    stack_bb: player.stack_bb,
-                })
-                .collect(),
-            payouts,
-            samples,
-            seed,
-        },
-        UtilitySection::Icm { .. } => {
-            return Err(anyhow!(
-                "legacy HU utility kind = \"icm\" is not valid for preflop-multiway; use kind = \"tournament-icm\""
-            ));
-        }
-    })
-}
-
-/// Converts the config-schema `[rake]` section into the solver's
-/// `MultiwayRake`.
-pub(crate) fn convert_rake(rake: RakeSection) -> MultiwayRake {
-    match rake {
-        RakeSection::None => MultiwayRake::None,
-        RakeSection::PercentCap {
-            rate,
-            cap,
-            no_flop_no_drop,
-        } => MultiwayRake::PercentCap {
-            rate,
-            cap_bb: cap / mw_preflop::types::CHIPS_PER_BB as f64,
-            no_flop_no_drop,
-        },
-        RakeSection::Generic {
-            rate,
-            cap,
-            when,
-            allocation,
-            rounding,
-            // Multiway's own rake grammar fixes the rounding unit at
-            // `.001 BB`; only the heads-up families make it configurable.
-            rounding_unit: _,
-        } => MultiwayRake::Generic {
-            rate,
-            cap_bb: cap,
-            when,
-            allocation,
-            rounding,
-        },
-        RakeSection::GgPreflop {
-            rate,
-            cap,
-            exempt_pot,
-        } => MultiwayRake::GgPreflop {
-            rate,
-            cap_bb: cap / mw_preflop::types::CHIPS_PER_BB as f64,
-            exempt_pot_bb: exempt_pot as f64 / 1_000.0,
-        },
-    }
 }
 
 /// Sweeps until the next `cadence` boundary (a full `cadence` when already
@@ -1271,10 +782,38 @@ fn make_public_tree(
 /// Identifies both configured algorithm settings and the numerical update
 /// semantics. Shared by the run summary and `.mwsol` writers so artifacts
 /// from before a solver-state correction remain distinguishable.
-pub(crate) fn multiway_algorithm_fingerprint(
-    algorithm: &crate::config::AlgorithmSection,
-) -> Result<[u8; 32]> {
-    let material = serde_json::to_vec(algorithm)?;
+pub(crate) fn multiway_algorithm_fingerprint(algorithm: &SolverConfig) -> Result<[u8; 32]> {
+    // Retain the existing artifact identity material without a legacy config type.
+    #[derive(serde::Serialize)]
+    struct Identity {
+        schedule: &'static str,
+        seed: u64,
+        exploration_epsilon: f64,
+        discount_every: u64,
+        discount_until: u64,
+        #[serde(skip_serializing_if = "is_false")]
+        traverser_vector: bool,
+        #[serde(skip_serializing_if = "is_false")]
+        prune: bool,
+        #[serde(skip_serializing_if = "is_default_skip")]
+        prune_skip_probability: f64,
+    }
+    fn is_false(value: &bool) -> bool {
+        !value
+    }
+    fn is_default_skip(value: &f64) -> bool {
+        *value == mw_preflop::solver::DEFAULT_PRUNE_SKIP_PROBABILITY
+    }
+    let material = serde_json::to_vec(&Identity {
+        schedule: "external-sampling-mccfr",
+        seed: algorithm.seed,
+        exploration_epsilon: algorithm.exploration_epsilon,
+        discount_every: algorithm.discount_every,
+        discount_until: algorithm.discount_until,
+        traverser_vector: algorithm.traverser_vector,
+        prune: algorithm.prune,
+        prune_skip_probability: algorithm.prune_skip_probability,
+    })?;
     let mut hasher = blake3::Hasher::new();
     hasher.update(b"solvers.multiway.algorithm.v1");
     hasher.update(&mw_preflop::solver::SOLVER_STATE_VERSION.to_le_bytes());
@@ -1294,9 +833,9 @@ pub fn make_solution(
     state: &mw_preflop::solver::SolverState,
     row: &MultiwayMetricsRow,
 ) -> MultiwaySolution {
-    let effective = crate::config::parse_internal_config(config_toml)
+    let effective = crate::nlh_v1::p2::prepare(config_toml, Path::new("embedded.toml"))
         .expect("solution config was validated before solving");
-    let algorithm_fingerprint = multiway_algorithm_fingerprint(&effective.algorithm)
+    let algorithm_fingerprint = multiway_algorithm_fingerprint(&effective.lowered.solver)
         .expect("effective algorithm is serializable");
     let (histories, public_states) = make_public_tree(game);
     let strategy_weights = state
@@ -1368,27 +907,11 @@ pub fn make_solution(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::RakeSection;
-    use mw_preflop::solver::DEFAULT_PRUNE_SKIP_PROBABILITY;
-
-    #[test]
-    fn algorithm_identity_distinguishes_corrected_updates_from_legacy_artifacts() {
-        let config =
-            crate::config::parse_internal_config(crate::test_fixtures::LOWERED_3MAX).unwrap();
-        let old_identity = runfiles::config_hash(&serde_json::to_vec(&config.algorithm).unwrap());
-        let corrected = multiway_algorithm_fingerprint(&config.algorithm).unwrap();
-        assert_ne!(old_identity, corrected);
-        let restored: crate::config::AlgorithmSection =
-            serde_json::from_slice(&serde_json::to_vec(&config.algorithm).unwrap()).unwrap();
-        assert_eq!(
-            corrected,
-            multiway_algorithm_fingerprint(&restored).unwrap()
-        );
-    }
-
+    const SMOKE: &str =
+        include_str!("../../mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
     #[test]
     fn progress_policy_coverage_reports_only_the_held_out_baseline() {
-        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let session = build_multiway_session(SMOKE, None).unwrap();
         let evaluation = session.solver.evaluate_average_profile(16, 5041).unwrap();
         let metrics = session.solver.metrics();
         let row = metrics_row(&metrics, vec![0.0; 3], 1.0, Some(&evaluation));
@@ -1424,12 +947,11 @@ mod tests {
 
     #[test]
     fn stop_checks_use_fresh_held_out_batches_and_resume_the_sequence() {
-        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None)
-            .expect("build cheap frozen-profile fixture");
+        let session =
+            build_multiway_session(SMOKE, None).expect("build cheap frozen-profile fixture");
         let rule = StopRule {
             dev_gain_threshold: 1.0e6,
             confirmations: 3,
-            eval_period_secs: 1.0,
             br_traversals: 0,
         };
         let mut state = StopRuleState::new(32);
@@ -1471,7 +993,7 @@ mod tests {
 
     #[test]
     fn stop_target_includes_equality_at_the_upper_bound() {
-        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let session = build_multiway_session(SMOKE, None).unwrap();
         let mut state = StopRuleState::new(32);
         let seed = 31;
         let expected = session
@@ -1487,7 +1009,6 @@ mod tests {
         let rule = StopRule {
             dev_gain_threshold: target,
             confirmations: 1,
-            eval_period_secs: 1.0,
             br_traversals: 0,
         };
         let check = run_stop_rule_check(&session.solver, &rule, &mut state, 3, 1, seed).unwrap();
@@ -1497,11 +1018,10 @@ mod tests {
 
     #[test]
     fn stop_check_requires_variance_samples_and_rejects_sequence_overflow() {
-        let session = build_multiway_session(crate::test_fixtures::LOWERED_3MAX, None).unwrap();
+        let session = build_multiway_session(SMOKE, None).unwrap();
         let rule = StopRule {
             dev_gain_threshold: 1.0e6,
             confirmations: 1,
-            eval_period_secs: 1.0,
             br_traversals: 0,
         };
         let mut state = StopRuleState::new(1);
@@ -1523,92 +1043,24 @@ mod tests {
     }
 
     #[test]
-    fn production_policy_memory_auto_is_six_gib_and_explicit_values_pass_through() {
-        let limit = crate::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES;
-        assert_eq!(
-            resolve_policy_memory_limit(SessionStoragePolicy::PreallocatedProduction, None)
-                .unwrap(),
-            limit
-        );
-        assert_eq!(
-            resolve_policy_memory_limit(
-                SessionStoragePolicy::PreallocatedProduction,
-                Some(u64::MAX),
-            )
-            .unwrap(),
-            limit
-        );
-        assert_eq!(
-            resolve_policy_memory_limit(SessionStoragePolicy::PreallocatedProduction, Some(limit),)
-                .unwrap(),
-            limit
-        );
-        assert_eq!(
-            resolve_policy_memory_limit(
-                SessionStoragePolicy::PreallocatedProduction,
-                Some(limit + 1),
-            )
-            .unwrap(),
-            limit + 1
-        );
-        assert_eq!(
-            resolve_policy_memory_limit(SessionStoragePolicy::Compatibility, Some(u64::MAX))
-                .unwrap(),
-            u64::MAX
-        );
-    }
-
-    #[test]
-    fn shared_rake_chip_units_convert_to_multiway_bb() {
-        let rake = convert_rake(RakeSection::PercentCap {
-            rate: 0.05,
-            cap: 3_500.0,
-            no_flop_no_drop: true,
-        });
-        assert!(matches!(
-            rake,
-            MultiwayRake::PercentCap {
-                cap_bb: 3.5,
-                no_flop_no_drop: true,
-                ..
-            }
-        ));
-    }
-
-    #[test]
-    fn legacy_hu_icm_is_rejected_on_multiway_path() {
-        let error = convert_utility(UtilitySection::Icm {
-            payouts: [1.0, 0.0],
-        })
-        .unwrap_err();
-        assert!(error.to_string().contains("tournament-icm"));
-    }
-
-    #[test]
-    fn production_session_initialization_and_resume_preserve_thread_independent_state() {
-        let base = crate::test_fixtures::LOWERED_3MAX.replace("sweeps = 2\n", "sweeps = 8\n");
-        let serial_raw = base.replace("[run]\n", "[run]\nthreads = 1\n");
-        let parallel_raw = base.replace("[run]\n", "[run]\nthreads = 8\n");
-        assert_ne!(serial_raw, base);
-        let build = |raw: &str, checkpoint: Option<&std::path::Path>| {
-            build_multiway_session_internal(
-                raw,
-                checkpoint,
-                SessionStoragePolicy::PreallocatedProduction,
-                AbstractionPolicy::CheapBaseline,
-            )
-            .unwrap()
-        };
-        let mut serial = build(&serial_raw, None);
-        let mut parallel = build(&parallel_raw, None);
-        assert_eq!(serial.threads, 1);
-        assert_eq!(parallel.threads, 8);
+    fn typed_production_sessions_and_resume_preserve_thread_independent_state() {
+        use mw_preflop::checkpoint::MultiwayCheckpoint;
+        let mut p = crate::nlh_v1::p2::prepare(SMOKE, Path::new("smoke.toml")).unwrap();
+        p.lowered.run.stop.max_sweeps = 8;
+        let mut serial_input = p.lowered.clone();
+        serial_input.run.threads = 1;
+        let mut parallel_input = p.lowered;
+        parallel_input.run.threads = 4;
+        let build =
+            |input, checkpoint| build_test_session(input, p.effective.clone(), checkpoint).unwrap();
+        let mut serial = build(serial_input, None);
+        let mut parallel = build(parallel_input.clone(), None);
         assert_eq!(
             serial.solver.policy_arena_allocation(),
             parallel.solver.policy_arena_allocation()
         );
         assert!(
-            parallel
+            serial
                 .solver
                 .policy_arena_allocation()
                 .unwrap()
@@ -1625,10 +1077,9 @@ mod tests {
         let checkpoint = MultiwayCheckpoint::capture(&serial.solver);
         assert_eq!(checkpoint, MultiwayCheckpoint::capture(&parallel.solver));
         let directory = tempfile::tempdir().unwrap();
-        let path = directory.path().join("parallel-construction.mwckpt");
+        let path = directory.path().join("parallel.mwckpt");
         checkpoint.write_atomic(&path).unwrap();
-        let mut resumed = build(&parallel_raw, Some(&path));
-        assert_eq!(resumed.threads, 8);
+        let mut resumed = build(parallel_input, Some(path.as_path()));
         assert_eq!(checkpoint, MultiwayCheckpoint::capture(&resumed.solver));
         serial
             .solver
@@ -1641,182 +1092,6 @@ mod tests {
         assert_eq!(
             MultiwayCheckpoint::capture(&serial.solver),
             MultiwayCheckpoint::capture(&resumed.solver)
-        );
-    }
-
-    #[test]
-    fn multiway_example_builds_a_session() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let session = build_multiway_session(raw, None).expect("build multiway session");
-        assert_eq!(session.sweeps_target, 2);
-        assert_eq!(session.config_toml, raw);
-        assert_eq!(session.stop_rule, None);
-    }
-
-    fn with_stop_dev_gain(dev_gain: &str, extra: &str) -> String {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let anchor = "evaluation_cadence = 1\n";
-        let spliced = raw.replacen(
-            anchor,
-            &format!("{anchor}stop_dev_gain = {dev_gain}\n{extra}"),
-            1,
-        );
-        assert_ne!(spliced, raw, "the splice anchor must have matched");
-        spliced
-    }
-
-    #[test]
-    fn stop_dev_gain_defaults_confirmations_and_period_when_omitted() {
-        let raw = with_stop_dev_gain("0.5", "");
-        let session = build_multiway_session(&raw, None).expect("build multiway session");
-        assert_eq!(
-            session.stop_rule,
-            Some(StopRule {
-                dev_gain_threshold: 0.5,
-                confirmations: DEFAULT_STOP_CONFIRMATIONS,
-                eval_period_secs: DEFAULT_STOP_EVAL_PERIOD_SECS,
-                br_traversals: DEFAULT_STOP_BR_TRAVERSALS,
-            })
-        );
-    }
-
-    #[test]
-    fn stop_dev_gain_honors_explicit_confirmations_and_period() {
-        let raw = with_stop_dev_gain(
-            "0.5",
-            "stop_confirmations = 5\nstop_eval_period_secs = 12.5\nstop_br_traversals = 123\n",
-        );
-        let session = build_multiway_session(&raw, None).expect("build multiway session");
-        assert_eq!(
-            session.stop_rule,
-            Some(StopRule {
-                dev_gain_threshold: 0.5,
-                confirmations: 5,
-                eval_period_secs: 12.5,
-                br_traversals: 123,
-            })
-        );
-    }
-
-    /// `MultiwaySession` intentionally does not derive `Debug` (it embeds a
-    /// live `MultiwaySolver`), so validation-error tests extract the error
-    /// string by hand rather than via `Result::unwrap_err`.
-    fn build_multiway_session_err(raw: &str) -> String {
-        match build_multiway_session(raw, None) {
-            Ok(_) => panic!("expected build_multiway_session to fail"),
-            Err(error) => error.to_string(),
-        }
-    }
-
-    #[test]
-    fn stop_dev_gain_rejects_nonpositive_thresholds() {
-        for bad in ["0.0", "-1.0"] {
-            let raw = with_stop_dev_gain(bad, "");
-            let error = build_multiway_session_err(&raw);
-            assert!(error.contains("stop_dev_gain"), "{bad}: {error}");
-        }
-    }
-
-    #[test]
-    fn stop_confirmations_zero_is_rejected() {
-        let raw = with_stop_dev_gain("0.5", "stop_confirmations = 0\n");
-        let error = build_multiway_session_err(&raw);
-        assert!(error.contains("stop_confirmations"));
-    }
-
-    #[test]
-    fn stop_eval_period_secs_nonpositive_is_rejected() {
-        let raw = with_stop_dev_gain("0.5", "stop_eval_period_secs = 0.0\n");
-        let error = build_multiway_session_err(&raw);
-        assert!(error.contains("stop_eval_period_secs"));
-    }
-
-    /// Splices `extra` right after `discount_until` in `[algorithm]`,
-    /// mirroring `with_stop_dev_gain`'s splice-into-`[run]` helper.
-    fn with_algorithm_extra(extra: &str) -> String {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let anchor = "discount_until = 10000000\n";
-        let spliced = raw.replacen(anchor, &format!("{anchor}{extra}"), 1);
-        assert_ne!(spliced, raw, "the splice anchor must have matched");
-        spliced
-    }
-
-    #[test]
-    fn prune_without_explicit_threshold_derives_from_chip_ev_stakes() {
-        let raw = with_algorithm_extra("traverser_vector = true\nprune = true\n");
-        let session = build_multiway_session(&raw, None).expect("build multiway session");
-        let config = session.solver.config();
-        assert!(config.prune);
-        // The smoke config has 3 seats at 2.0 bb each: -10 * 6.0 = -60.0.
-        assert_eq!(config.prune_threshold, -60.0);
-        assert_eq!(
-            config.prune_skip_probability,
-            DEFAULT_PRUNE_SKIP_PROBABILITY
-        );
-    }
-
-    #[test]
-    fn prune_with_explicit_threshold_uses_it_verbatim() {
-        let raw = with_algorithm_extra(
-            "traverser_vector = true\nprune = true\nprune_threshold = -42.0\nprune_skip_probability = 0.5\n",
-        );
-        let session = build_multiway_session(&raw, None).expect("build multiway session");
-        let config = session.solver.config();
-        assert!(config.prune);
-        assert_eq!(config.prune_threshold, -42.0);
-        assert_eq!(config.prune_skip_probability, 0.5);
-    }
-
-    #[test]
-    fn prune_disabled_by_default_and_ignores_the_derivation() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let session = build_multiway_session(raw, None).expect("build multiway session");
-        let config = session.solver.config();
-        assert!(!config.prune);
-        assert_eq!(config.prune_threshold, DEFAULT_PRUNE_THRESHOLD);
-    }
-
-    #[test]
-    fn prune_without_traverser_vector_is_rejected() {
-        let raw = with_algorithm_extra("prune = true\n");
-        let error = build_multiway_session_err(&raw);
-        assert!(error.contains("traverser_vector"), "{error}");
-    }
-
-    #[test]
-    fn prune_threshold_nonnegative_is_rejected() {
-        let raw =
-            with_algorithm_extra("traverser_vector = true\nprune = true\nprune_threshold = 0.0\n");
-        let error = build_multiway_session_err(&raw);
-        assert!(error.contains("prune_threshold"), "{error}");
-    }
-
-    #[test]
-    #[ignore = "builds full EHS2 tables over every canonical board; CI runs it in release with --include-ignored"]
-    fn ehs2_table_backend_builds_a_session_and_caches_its_tables() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let directory = tempfile::tempdir().unwrap();
-        let cache_path = directory.path().join("ehs2.postcard");
-
-        // Splice `kind = "ehs2-table"` and `artifact_cache` into
-        // `[game.abstraction]` right after the existing `seed` key, mirroring
-        let literal = format!("{:?}", cache_path.display().to_string());
-        let config_with_kind = raw.replacen(
-            "seed = 17\n",
-            &format!("seed = 17\nkind = \"ehs2-table\"\nartifact_cache = {literal}\n"),
-            1,
-        );
-        assert_ne!(
-            config_with_kind, raw,
-            "kind/artifact_cache injection must have matched"
-        );
-
-        let session = build_multiway_session(&config_with_kind, None)
-            .expect("the ehs2-table backend must build a session");
-        assert_eq!(session.sweeps_target, 2);
-        assert!(
-            cache_path.is_file(),
-            "the ehs2 bucket-table cache must be written at build time"
         );
     }
 }

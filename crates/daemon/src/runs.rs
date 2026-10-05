@@ -156,8 +156,8 @@ mod tests {
         std::fs::create_dir_all(&directory).unwrap();
         let mut manifest = RunManifest::new(
             id,
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             "aa",
             vec!["solve".into()],
         );

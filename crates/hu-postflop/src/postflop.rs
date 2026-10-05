@@ -73,8 +73,8 @@ impl<T> IndexMut<Street> for PerStreet<T> {
 
 /// One street's betting grammar: the tree-script rules that get replayed at
 /// every decision node on this street (see [`node_actions`]), plus the
-/// structural limits a script cannot express (`docs/solver-config-v1.jp.md`'s
-/// 適用モデル chapter: `max_aggressive_actions` is a memory-preflight input,
+/// structural limits a script cannot express (`docs/nlh-input-v1.jp.md`'s
+/// section 9: `max_aggressive_actions` is a memory-preflight input,
 /// and `allin_threshold` is a size-resolution rule, not an action-list
 /// add/remove). `rules` used to come only from the five fixed-menu fields
 /// (`oop_bet`/`ip_bet`/`oop_raise`/`ip_raise`/`oop_donk`) a pre-script
@@ -236,7 +236,7 @@ impl StreetTree {
     /// Collects one street's rules out of a compiled tree script's flat rule
     /// list (`nlh::script::Script::rules`), preserving source order --
     /// source order is the script's entire priority model (see
-    /// `docs/solver-config-v1.jp.md`'s script の構造 chapter), so this
+    /// `docs/nlh-input-v1.jp.md`'s tree script chapter), so this
     /// must not reorder or resort what it filters. `rules` is the *whole*
     /// script's rule list (every street's statements interleaved in source
     /// order); this keeps only the ones tagged for `street`, exactly as
@@ -501,7 +501,7 @@ struct LineState {
     /// The last player to bet or raise on the PREVIOUS street; `None` when
     /// that street checked through, or when this is the subgame's first
     /// street. Read by the tree-script `donk` variable via `rule_context` --
-    /// see `docs/solver-config-v1.jp.md`'s 文 — action list の書き換え chapter.
+    /// see `docs/nlh-input-v1.jp.md`'s effectと合法性 chapter.
     previous_aggressor: Option<Player>,
     /// The last player to bet or raise on THIS street so far; `None` until
     /// someone does. Carried forward into the next street's
@@ -601,7 +601,7 @@ fn scale(amount: Chips, fraction: f64) -> Chips {
 /// bumped up to the minimum full raise, clamped to all-in, merged into
 /// all-in past `allin_threshold`, sorted, deduped, and filtered down to
 /// targets that actually raise the bet faced — the resolution order fixed by
-/// `docs/solver-config-v1.jp.md`'s `[game.tree]` size-literal table
+/// `docs/nlh-input-v1.jp.md`'s `[tree]` size-literal table
 /// (identical to `mw_preflop::betting::BettingState::legal_actions`'s size
 /// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
 /// as *additional* contribution over the actor's current street wager — the
@@ -751,8 +751,9 @@ fn action_sort_key(action: NodeAction) -> (u8, u32) {
     }
 }
 
-/// This node's `RuleContext`, filled in from `state`/`config` per
-/// `docs/solver-config-v1.jp.md`'s condition variable table. `actor` is
+/// This node's internal PostflopVar `RuleContext`, filled in from `state`/`config`.
+/// This dialect predates the public common vocabulary in `docs/nlh-input-v1.jp.md`.
+/// `actor` is
 /// `state.to_act`: `in_position` and `previous_aggressor` are both read
 /// relative to whoever is on the move at this node, not either player fixed.
 fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
@@ -789,7 +790,7 @@ fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
 /// doesn't have (see `node_actions`'s inert-rule branch) still had its
 /// guard checked and is not what a script author needs warned about; only
 /// a condition that is never true anywhere is the silent-authoring mistake
-/// `docs/solver-config-v1.jp.md`'s `[game.tree]` chapter's dead-rule
+/// `docs/nlh-input-v1.jp.md`'s `[tree]` chapter's dead-rule
 /// warning exists for.
 ///
 /// A `Vec<bool>` per street, not a `HashMap`: `node_actions` runs at every
@@ -816,7 +817,7 @@ fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
 
 /// Every legal action at `state`: the base non-aggressive action(s), the
 /// `include_allin` default (added before any rule runs, per
-/// `docs/solver-config-v1.jp.md`'s 解決順序 chapter -- a script can
+/// `docs/nlh-input-v1.jp.md` section 9 -- a script can
 /// then edit it away), then this street's tree-script rules applied in
 /// source order. A rule whose `action` doesn't match the node's own wager
 /// kind (`Bet` with no outstanding bet, `Raise` facing one) is inert and

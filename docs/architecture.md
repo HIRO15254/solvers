@@ -31,10 +31,10 @@
 |---|---|---|
 | HU CFR、BR、storage、reach | `crates/hu-engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
 | HU postflop の木と terminal kernel | `crates/hu-postflop` | rules/metadata と engine の汎用木を分ける |
-| rake / utility | `crates/economics`、`crates/hu-postflop/src/game/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
+| rake / utility | `crates/economics`、`crates/hu-postflop/src/input.rs`、`crates/hu-postflop/src/game/payoff.rs` | build-time payoff と run/config adapter を分ける |
 | Multiway の card abstraction | `crates/mw-preflop/src/card_abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
-| 多人数の state / sampling / evaluation | `crates/mw-preflop` | production、read-only 診断、feature-gated 研究経路を区別する |
-| 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
+| 多人数の state / sampling / evaluation | `crates/mw-preflop` | productionとread-only 診断を区別する。研究featureは削除済み |
+| 公開 config / normalizer / run driver | `crates/spot`、製品の`input`、`crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
 | 保存 / run metadata / wire types | `crates/runfiles`、`crates/hu-postflop`、`crates/mw-preflop`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
 | job / HTTP / remote | `crates/daemon` | solver は CLI 子プロセスへ委譲し、永続状態は run directory から読む |
 
@@ -53,7 +53,7 @@ crates/
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
 ├── nlh/          # card/range/evaluator、HU基本型、2–9 seat NLH規則・精算、size解決、tree-script、suit同型
 ├── economics/    # 共有 rake・ICM・utility config、PotRake 実装
-├── spot/         # 共通Input solvers.nlh/v1 の parse・検証・正規化、Spot IR、v1 tree 方言（CLI へは未接続）
+├── spot/         # 共通Input solvers.nlh/v1 の parse・検証・正規化、Spot IR、v1 tree 方言
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc、.sol、checkpoint
@@ -73,30 +73,29 @@ hu-postflop                         → nlh, economics, spot, hu-engine, runfile
 mw-preflop                          → nlh, economics, spot, runfiles
 protocol                            → runfiles
 daemon                              → runfiles, protocol
-cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, runfiles
+cli                                 → nlh, spot, hu-engine, hu-postflop, mw-preflop, runfiles
 ```
 
 `hu-engine` は `nlh::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
 ルールには依存しない。HU checkpoint と `.sol` は `hu-postflop` が所有し、
 `runfiles` は solver crate に依存しない。Multiway checkpoint と `.mwsol` は
-`crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。公開 `SolveConfig` の parse/lower は
-`crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
+`crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。CLIの入力は`solvers.nlh/v1`だけであり、
+旧parserと`SolveConfig`は削除した。
 共通Input `solvers.nlh/v1`（[規範](nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
-製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。P2 は `mw_preflop::input`（`P2Sections`、`Settings`、`lower`、`build_session`）が同じ IR から型付きで game・solver・run 設定を組む。旧2 familyは M7 で削除するまで並存する。
+製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。P2 は `mw_preflop::input`（`P2Sections`、`Settings`、`lower`、`build_session`）が同じ IR から型付きで game・solver・run 設定を組む。CLIは`crates/cli/src/nlh_v1/`から両製品へ接続する。
 
 P2 のlibrary入口は `mw_preflop::input` の `P2Sections`、`Settings::parse`、`lower`。
 `lower` は `Spot` とP2設定から `MultiwayConfig`、economics、`SolverConfig`、run設定を型付きで返し、
 `input::build_session` は準備済みabstractionを受けてpreallocated solverを構築・復元する。
 lowered configのTOML再変換は行わず、正規化済みconfig bytesはartifact用にそのまま保持する。
 `BettingConfig::nlh_rules` はsource順、`tree_rules::NlhContext` はP2のstateから `TreeVar` を評価する。
-旧ruleは従来のPreflop aggressor、新ruleの `cbet`・`donk` は直前streetのaggressorを参照する。
-`ForcedBetConfig::straddles` と新rule列は空ならserdeで省略し、旧familyのgame identityを保つ。
-旧 `preflop_multiway_v1_full_surface.toml` のHJ開始（seat 4）は共通Inputの卓順では表現できない。
-卓の最初のactorを上書きするkeyは追加せず、例の完全なtree同一性は未対応の移行境界として明示する。
+`cbet`・`donk` は直前streetのaggressorを参照する。旧typed rule経路は削除した。
+`ForcedBetConfig::straddles` とrule列は空ならserdeで省略する。
+卓の最初のactorを上書きするkeyは無く、拒否の回帰fixtureを製品testに保持する。
 P2の既存runtime型の上限はstreetごとのaggression capが255（`u8`）、jam ratioの各成分が
 `u32::MAX`。これを超える共通IR値は `NLH003` で拒否し、切詰めや近似は行わない。
-P2のCLI接続・共通Inputのartifact経路はM6の後続phaseで行う。
+P2のCLI session・資源検査・artifact読込みは`input::Lowered`を使う。
 
 P1 の共通Input用 `input::NlhPayoff` は、`economics` のrake・ICMをterminalで焼き込む。
 rakeの基準potからuncalled wagerを除き、`players_dealt`は元の卓人数、flopを見た人数は2とする。
@@ -106,8 +105,8 @@ effective stackの木から実際の残stackへ戻して効用を計算し、`Ut
 outside fieldも含める。dead moneyがある内部payoffは一般和として扱う。
 `input::resolve_target`はNashConv/2の絶対停止閾値を返し、`resolve_memory_limit`は明示bytesまたは
 物理RAMの80%を返す。`check_memory_limit`は`try_memory_usage`のstorage見積りを構築前に検査する
-ためのlibrary helperであり、CLIへの接続は後続段階で行う。物理RAMの問合せはWindowsの
-`GlobalMemoryStatusEx`、Unixの`sysconf`を使う。旧familyのeconomics adapterは従来のままである。
+ためのlibrary helperである。CLIも構築前に上限を検査する。物理RAMの問合せはWindowsの
+`GlobalMemoryStatusEx`、Unixの`sysconf`を使う。旧familyのeconomics adapterは削除した。
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。
@@ -116,7 +115,7 @@ HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snap
 `nlh::betting`、side pot・uncalled refund・odd chip・conservation は `nlh::settlement` が所有する。
 `BettingState::new(&TableSetup, &P)` は `P: StreetPolicy` を通じて製品の check-down / street skip を呼ぶ。
 `TableSetup::straddles` はblind後のlive到達額を順番にpostし、Preflopのcall額・最小raise幅は最後のstraddle額、
-Postflopの最小bet・BB size単位はtableのBBを使う。旧P2のsetupは空のstraddle列を渡す。
+Postflopの最小bet・BB size単位はtableのBBを使う。
 `BettingState::resolve_move(Move)` はmenuに依らずNLHの合法性とbet/raise/all-inの区別を検証して
 `Action`または`IllegalMove`を返す。line再生では解決したactionを`apply_action`と`NoStreetPolicy`で適用する。
 `last_street_aggressor`と`previous_street_aggressor`は自発的なbet/raiseだけを記録し、
@@ -127,7 +126,7 @@ size literal の解決と NLH legality は共有 state の query に置き、P2 
 rake condition は `economics::rake_condition`、rake / utility config と検証は `economics::config` にある。
 `mw_preflop::{config,icm,rake_condition}` と root は旧 API の re-export を維持し、
 `ConfigError::Economics` は共有検証 error を同じ表示で透過的に包む。
-P1 の `cli::economics` と `hu-postflop::game::payoff` は既存のままで、P1 はまだ `economics` に依存しない。
+P1 の共通Input経路は`hu-postflop::input::NlhPayoff`から`economics`を使う。
 旧 `mw_preflop::{types,betting,settlement}` の型・精算 API は共有型への re-export を維持する。
 
 ## 3. コア表現(hu-engine crate)
@@ -188,7 +187,7 @@ vectorize され、残る sorted-rank sweep / sparse transition は依存関係�
 値は開始 stack の utility を基準とする。engine は焼き込み済み定数を参照するだけで、rake や ICM を
 反復ごとに評価しない。`NoRake` / `PercentCapRake` / `GgPreflopRake`、`ChipEv` / 純 HU の `Icm`
 を持ち、汎用 rake と卓外 field を含む tournament ICM の HU adapter は
-[cli/src/economics.rs](../crates/cli/src/economics.rs) にある。
+[cli/src/economics.rs](../crates/hu-postflop/src/input.rs) にある。
 純 HU ICM の affine 性と、卓外 field を持つ tournament ICM を区別する。
 FGS、bounty、profile をこの pipeline だけで実装できるとは仮定しない。
 
@@ -202,7 +201,7 @@ FGS、bounty、profile をこの pipeline だけで実装できるとは仮定�
 - [kernel.rs](../crates/hu-postflop/src/kernel.rs) は sorted-rank の O(n+m) showdown sweep と
   O(n) fold inclusion–exclusion を使う。rank 評価と card-removal 用の表は build 時に準備する。
 - per-hand CFV の正規化は blocker を考慮した相手 reach を使う。公開値の単位と subgame-start 基準は
-  [HU 規範](solver-config-v1.jp.md)に従い、途中の自分の bet を利益へ再加算しない。
+  [P1 規範](hu-postflop.jp.md)に従い、途中の自分の bet を利益へ再加算しない。
 - [viewer.rs](../crates/hu-postflop/src/viewer.rs) は history replay と river subgame の再構成を担当する。
   未保存 river の再 solve は元の solve の結果と区別する。
 - メモリは概ね regret/average の 2 buffer と各 node の action × hand 数で増える。
@@ -236,7 +235,7 @@ HU の品質目標は [products.jp.md](products.jp.md)、参照比較の候補�
 
 ## 8. config・保存・query の境界
 
-公開 TOML は family ごとの parser/normalizer を経て内部 config へ lower する。
+公開TOMLは`spot::Document`でparse・正規化し、製品の`input`で内部configへlowerする。
 `run.toml` は実行に用いた effective config、hash はその identity を保存 artifact へ結び付ける。
 source revision だけで dirty tree を識別できない場合は、source/binary hash も検証記録に残す。
 
@@ -250,7 +249,7 @@ source revision だけで dirty tree を識別できない場合は、source/bin
 
 `.sol` は戦略だけのファイルではない。保存対象 node の値も持ち、`NoRivers` の再 solve で
 元の per-hand 値を上書き解釈しない。`export` / `compare` / `report` と対話 `inspect` が現在の
-query 表面であり、完全なコマンド・family 対応は [CLI reference](cli-reference.jp.md) に置く。
+query 表面であり、完全なコマンド・製品対応は [CLI reference](cli-reference.jp.md) に置く。
 共通 `NodeQuery/NodeReport`、UPI 互換 protocol、`solvers bench`、PyO3/WASM adapter は
 現行の公開 API として扱わない。benchmark は Cargo bench と検証用 runner で行う。
 
@@ -272,8 +271,8 @@ client の終了や再接続と計算を分離する。config の検証・正規
 
 ## 10. Multiway Production経路
 
-production の公開入力は [Multiway 規範](multiway-preflop-v1.jp.md)、実装との対応は
-[実装 map](multiway-preflop-v1.md)を参照する。
+production の公開入力は [共通Input規範](nlh-input-v1.jp.md)、
+計算と成果物は[P2暫定規範](mw-preflop.jp.md)を参照する。
 
 ### 10.1 arena と通常の学習・停止評価
 

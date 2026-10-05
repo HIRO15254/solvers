@@ -244,8 +244,8 @@ mod tests {
         let summary = RunSummary {
             run_id: "run-1".into(),
             state: RunState::Running,
-            game_kind: "preflop-multiway".into(),
-            config_schema: Some("solvers.multiway-preflop/v1".into()),
+            game_kind: "mw-preflop".into(),
+            config_schema: Some("solvers.nlh/v1".into()),
             config_hash: "aa".into(),
             completion: None,
             failure: None,

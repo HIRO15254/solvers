@@ -1,24 +1,21 @@
 use mw_preflop::betting::BettingMenu;
 use std::path::{Path, PathBuf};
 
-use cli::config::GameSection;
 use mw_preflop::{Action, BettingState, SeatId};
 
 fn fixture_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
-        .join("examples/bench_multiway/6max_100bb_nl50_partial_reference_limp.toml")
+        .join("examples/bench/6max_100bb_nl50_partial_reference_limp.toml")
 }
 
 fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
     let path = fixture_path();
     let raw = std::fs::read_to_string(&path).expect("reading limp fixture");
-    let lowered = cli::multiway_v1::parse_and_lower_at(&raw, &path).expect("lowering limp fixture");
-    cli::multiway_v1::validate_production_contract_at(&raw, &path)
-        .expect("production contract for limp fixture");
-    let GameSection::PreflopMultiway(game) = lowered.game else {
-        panic!("fixture must lower to multiway game");
-    };
+    let doc = spot::Document::parse(&raw, &path).unwrap();
+    doc.normalize(&mw_preflop::input::P2Sections).unwrap();
+    let settings = mw_preflop::input::Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+    let game = mw_preflop::input::lower(&doc.spot, &settings).unwrap().game;
     let validated = game.validated().expect("validating limp fixture");
     let state = BettingState::from_config(&validated).expect("building root state");
     (validated, state)

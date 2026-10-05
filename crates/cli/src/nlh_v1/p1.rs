@@ -1,13 +1,15 @@
-//! Common-input P1 CLI adapter. Legacy families retain their runners and units.
+//! Common-input P1 CLI adapter and shared P1 query helpers.
 use std::path::Path;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
     DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, SolverState, Storage,
+    TerminalEvaluator,
 };
 use hu_postflop::input::{self, Algorithm, NlhPayoff, P1Sections, Settings, SolutionStreets};
-use nlh::{Player, Street};
+use hu_postflop::{MemoryEstimate, RuleHits};
+use nlh::{PerPlayer, Player, Street};
 use serde_json::{Value, json};
 
 use super::SCHEMA;
@@ -518,8 +520,12 @@ pub fn resume(
     max_time: Option<&str>,
     interval: Option<&str>,
 ) -> Result<()> {
+    crate::nlh_v1::require_artifact_config(raw)?;
     let historical = prepare(raw, Path::new("run.toml"))?;
     let checkpoint = hu_postflop::checkpoint::read_checkpoint(checkpoint_path)?;
+    if let Some(embedded) = &checkpoint.config_toml {
+        crate::nlh_v1::require_artifact_config(embedded)?;
+    }
     let expected = compatibility_hash(&historical.effective)?;
     if checkpoint.config_hash != expected {
         bail!("checkpoint config hash does not match run.toml; refusing to resume");
@@ -540,7 +546,7 @@ pub fn resume(
         .map(Duration::try_from_secs_f64)
         .transpose()
         .context("invalid checkpoint elapsed time")?
-        .unwrap_or(crate::solve::previous_elapsed(
+        .unwrap_or(previous_elapsed(
             &directory.join(runfiles::RUN_PROGRESS_FILE),
         )?);
     let active = out.unwrap_or(directory);
@@ -595,15 +601,10 @@ fn execute(
         .map(usize::try_from)
         .transpose()?
         .unwrap_or(std::thread::available_parallelism()?.get());
-    let outcome =
-        crate::postflop_setup::with_threads(Some(threads), || match p.settings.solver.storage {
-            input::Storage::F32 => {
-                run::<F32Storage>(&p, &paths, state, elapsed, recorder.events_mut())
-            }
-            input::Storage::I16 => {
-                run::<I16Storage>(&p, &paths, state, elapsed, recorder.events_mut())
-            }
-        });
+    let outcome = with_threads(Some(threads), || match p.settings.solver.storage {
+        input::Storage::F32 => run::<F32Storage>(&p, &paths, state, elapsed, recorder.events_mut()),
+        input::Storage::I16 => run::<I16Storage>(&p, &paths, state, elapsed, recorder.events_mut()),
+    });
     let completion = outcome
         .as_ref()
         .ok()
@@ -659,8 +660,8 @@ fn run<S: Storage>(
     state: Option<SolverState>,
     elapsed_before: Duration,
     events: &mut runfiles::RunEventLog,
-) -> Result<crate::solve::RunSummary> {
-    crate::postflop_setup::print_memory_estimate(&p.estimate);
+) -> Result<RunSummary> {
+    print_memory_estimate(&p.estimate);
     for warning in warnings(p) {
         eprintln!("warning: {warning}");
     }
@@ -738,11 +739,7 @@ fn run<S: Storage>(
         reason: reason.into(),
     });
     let offset = p.payoff.ev_offset();
-    let mut summary = crate::solve::print_done(
-        &solver,
-        elapsed,
-        crate::postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), offset),
-    );
+    let mut summary = print_done(&solver, elapsed, subgame_ev(solver_ev(&solver), offset));
     summary.canceled = canceled;
     save(&solver, p, paths, elapsed.as_secs_f64(), events)?;
     let spec = crate::sol::SolExportSpec {
@@ -786,4 +783,172 @@ fn save<S: Storage>(
         sweeps: solver.iteration(),
     });
     Ok(())
+}
+
+/// Run work in a local pool when the configuration specifies a thread count.
+pub(crate) fn with_threads<T: Send>(
+    threads: Option<usize>,
+    work: impl FnOnce() -> Result<T> + Send,
+) -> Result<T> {
+    match threads {
+        Some(threads) => rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()?
+            .install(work),
+        None => work(),
+    }
+}
+
+/// Applies the payoff's subgame-start offset to a solver's root values.
+///
+/// Under chip EV without rake the two results sum to the starting pot; with
+/// rake, to the pot less the expected rake. They never sum to zero.
+pub(crate) fn subgame_ev(solver_ev: PerPlayer<f64>, offset: PerPlayer<f64>) -> PerPlayer<f64> {
+    PerPlayer::new(
+        solver_ev[Player::P0] + offset[Player::P0],
+        solver_ev[Player::P1] + offset[Player::P1],
+    )
+}
+
+pub(crate) fn print_memory_estimate(estimate: &MemoryEstimate) {
+    println!(
+        "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16)",
+        estimate.nodes,
+        estimate.terminals,
+        estimate.rank_tables,
+        estimate.f32_bytes as f64 / (1024.0 * 1024.0),
+        estimate.i16_bytes as f64 / (1024.0 * 1024.0),
+    );
+}
+
+/// OR-merges `hits` into `acc`, street by street and rule by rule -- the
+/// aggregation `report`'s multi-board sweep needs: a rule counts as
+/// "matched" the moment ANY board's build satisfies it, so this must be a
+/// logical OR across boards, not a per-board report (a rule that only fires
+/// on one board out of twenty is working as intended, not a bug). Panics if `acc` and `hits` don't
+/// have the same per-street rule counts, which would mean they came from
+/// two different tree scripts; callers only ever merge `RuleHits` produced
+/// from the same config's `streets`, so that never happens in practice.
+pub(crate) fn merge_rule_hits(acc: &mut RuleHits, hits: &RuleHits) {
+    for street in [Street::Flop, Street::Turn, Street::River] {
+        let acc_street = &mut acc[street];
+        let hit_street = &hits[street];
+        assert_eq!(
+            acc_street.len(),
+            hit_street.len(),
+            "merged RuleHits must come from the same tree script"
+        );
+        for (a, &b) in acc_street.iter_mut().zip(hit_street) {
+            *a |= b;
+        }
+    }
+}
+
+/// Reach-weighted overall frequency of each action at an action node: for
+/// action `a`, `sum_combo(weight[combo] * avg_strategy[a][combo]) /
+/// sum_combo(weight[combo])`.
+///
+/// `weight` is the acting player's reach *at that node* (see
+/// `hu_engine::reach_at`), not their root range. The two agree at the root and
+/// diverge below it: a hand that folded upstream, or that card removal has
+/// made impossible, still carries root weight but no reach, and counting it
+/// would report a frequency over hands that could not be there.
+///
+/// Returns one frequency per action, and `0.0` for every action when the
+/// node is unreachable (total weight zero).
+pub(crate) fn action_frequencies(
+    avg_strategy: &[f32],
+    weight: &[f32],
+    num_actions: usize,
+    num_hands: usize,
+) -> Vec<f64> {
+    let total: f64 = weight.iter().map(|&w| w as f64).sum();
+    if total <= 0.0 {
+        return vec![0.0; num_actions];
+    }
+    (0..num_actions)
+        .map(|a| {
+            let row = &avg_strategy[a * num_hands..(a + 1) * num_hands];
+            let sum: f64 = weight
+                .iter()
+                .zip(row)
+                .map(|(&w, &s)| w as f64 * s as f64)
+                .sum();
+            sum / total
+        })
+        .collect()
+}
+
+/// Last durable cumulative solve time; truncated tail rows are ignored.
+pub(crate) fn previous_elapsed(path: &Path) -> Result<Duration> {
+    use std::io::BufRead;
+    let file = match std::fs::File::open(path) {
+        Ok(file) => file,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Duration::ZERO),
+        Err(error) => return Err(error.into()),
+    };
+    let mut elapsed = Duration::ZERO;
+    for line in std::io::BufReader::new(file).lines() {
+        if let Ok(row) = serde_json::from_str::<runfiles::MetricsRow>(&line?) {
+            elapsed = Duration::try_from_secs_f64(row.elapsed_secs)
+                .context("invalid recorded elapsed solve time")?;
+        }
+    }
+    Ok(elapsed)
+}
+
+/// Final convergence numbers shared by P1 run publication and solution export.
+pub(crate) struct RunSummary {
+    pub iterations: u64,
+    /// Root EV per player, on the subgame-start reporting basis.
+    pub ev: PerPlayer<f64>,
+    pub wall: Duration,
+    pub expl_p0: f64,
+    pub expl_p1: f64,
+    pub nash_conv: f64,
+    /// The run stopped on request at a checkpoint boundary, not because it
+    /// reached its budget or its convergence target.
+    pub canceled: bool,
+}
+
+/// Final convergence summary, shared by every heads-up caller.
+///
+/// `ev` is already on the subgame-start reporting basis — for postflop that is
+/// the subgame-start basis (see [`crate::nlh_v1::subgame_ev`]). Both
+/// players' numbers are printed because `ev_p1 == -ev_p0` is not guaranteed:
+/// rake makes any game general-sum, and postflop's basis makes the pair sum
+/// to the starting pot rather than to zero.
+pub(crate) fn print_done<E: TerminalEvaluator, S: Storage>(
+    solver: &Solver<E, S>,
+    elapsed: Duration,
+    ev: PerPlayer<f64>,
+) -> RunSummary {
+    let expl = solver.exploitability();
+    let nash_conv = expl[Player::P0] + expl[Player::P1];
+    println!(
+        "done: iterations={} wall={:.2}s ev_p0={:.6} ev_p1={:.6} nash_conv={:.3e}",
+        solver.iteration(),
+        elapsed.as_secs_f64(),
+        ev[Player::P0],
+        ev[Player::P1],
+        nash_conv,
+    );
+    RunSummary {
+        canceled: false,
+        iterations: solver.iteration(),
+        wall: elapsed,
+        ev,
+        expl_p0: expl[Player::P0],
+        expl_p1: expl[Player::P1],
+        nash_conv,
+    }
+}
+
+/// The solver's own root values, before the subgame-start reporting offset (see
+/// [`crate::nlh_v1::subgame_ev`]) is applied.
+pub(crate) fn solver_ev<E: TerminalEvaluator, S: Storage>(solver: &Solver<E, S>) -> PerPlayer<f64> {
+    PerPlayer::new(
+        solver.expected_value(Player::P0),
+        solver.expected_value(Player::P1),
+    )
 }

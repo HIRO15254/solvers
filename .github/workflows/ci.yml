@@ -48,9 +48,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: CLI checkpoint and metrics
+      - name: NLH v1 CLI checkpoint and metrics
         run: cargo test -p cli --test cli_integration solve_checkpoint_and_metrics_smoke -- --exact
-      - name: CLI resume equivalence
+      - name: NLH v1 CLI resume equivalence
         run: cargo test -p cli --test cli_integration resume_equivalence_postflop -- --exact
       - name: Daemon HTTP and child-process smoke
         run: cargo test -p daemon --test http_api

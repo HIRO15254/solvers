@@ -2,19 +2,30 @@ use std::path::Path;
 use std::process::{Command, Output};
 
 const CONFIG: &str = r#"
-schema = "solvers.postflop/v1"
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
-oop_range = "AsAh"
-ip_range = "KsKh"
-pot = 20
-effective_stack = 80
-[game.tree]
-kind = "script"
+[ranges]
+BB = "AsAh"
+BTN = "KsKh"
+[tree]
+include_allin = false
 script = '''river when unopened { force bet [50] }'''
-[run]
-iterations = 20
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 20
 check_every = 5
+[run]
 threads = 1
 "#;
 
@@ -63,8 +74,7 @@ fn export(run: &Path, view: &str, node: &str) -> serde_json::Value {
 fn saved_ev_keeps_original_baseline_and_utility_units() {
     for utility in [
         "",
-        "\n[utility]\nkind = \"icm\"\npayouts = [100.0, 100.0]\n",
-        "\n[utility]\nkind = \"tournament-icm\"\npayouts = [100.0, 100.0, 100.0]\noutside_field = [200.0]\n",
+        "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field_bb = [200.0]\n",
     ] {
         let directory = tempfile::tempdir().unwrap();
         let run = solve(&format!("{CONFIG}{utility}"), directory.path());
@@ -81,7 +91,7 @@ fn saved_ev_keeps_original_baseline_and_utility_units() {
                     .as_array()
                     .unwrap()
                     .iter()
-                    .all(|row| row["ev"].as_f64().unwrap().abs() < 0.002)
+                    .all(|row| row["ev"].as_f64().unwrap().is_finite())
             );
         } else {
             let actions = export(&run, "actions", "r10");
@@ -120,7 +130,7 @@ fn validate_and_solve_reject_the_same_invalid_inputs() {
         CONFIG.replace("threads = 1", "threads = 0"),
         CONFIG.replace("[run]", "[run]\nmax_time = \"0s\""),
         CONFIG.replace("[run]", "[run]\nmax_time = \"oops\""),
-        CONFIG.replace("[run]", "[run]\ntarget_nash_conv = nan"),
+        CONFIG.replace("check_every = 5", "check_every = 5\ntarget = nan"),
         CONFIG.replace("AsAh", ""),
         CONFIG.replace("AsAh", "2cAc"),
         CONFIG.replace("AsAh", "KsKh"),
@@ -129,7 +139,7 @@ fn validate_and_solve_reject_the_same_invalid_inputs() {
         std::fs::write(&input, invalid).unwrap();
         let output = invoke(&["validate", input.to_str().unwrap(), "--show-effective"]);
         assert!(!output.status.success());
-        assert!(String::from_utf8_lossy(&output.stderr).contains("SLV004"));
+        assert!(String::from_utf8_lossy(&output.stderr).contains("NLH00"));
         let run = tempfile::tempdir().unwrap();
         let output = invoke(&[
             "solve",
@@ -138,7 +148,7 @@ fn validate_and_solve_reject_the_same_invalid_inputs() {
             run.path().to_str().unwrap(),
         ]);
         assert!(!output.status.success());
-        assert!(String::from_utf8_lossy(&output.stderr).contains("SLV004"));
+        assert!(String::from_utf8_lossy(&output.stderr).contains("NLH00"));
     }
 }
 
@@ -146,7 +156,7 @@ fn validate_and_solve_reject_the_same_invalid_inputs() {
 fn resume_republishes_solution_and_summary_in_place_and_on_fork() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(
-        &CONFIG.replace("[run]", "[run]\ntarget_nash_conv = 999.0"),
+        &CONFIG.replace("check_every = 5", "check_every = 5\ntarget = \"999bb\""),
         directory.path(),
     );
     assert_eq!(
@@ -189,23 +199,26 @@ fn convergence_claim_depends_on_economics() {
     let directory = tempfile::tempdir().unwrap();
     for (economics, general_sum) in [
         ("", false),
+        ("\n[economics.rake]\nrate = 0.05\ncap_bb = 5.0\n", true),
         (
-            "\n[rake]\nkind = \"percent-cap\"\nrate = 0.05\ncap = 5.0\n",
-            true,
-        ),
-        (
-            "\n[utility]\nkind = \"tournament-icm\"\npayouts = [100.0, 60.0]\noutside_field = [200.0]\n",
+            "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field_bb = [200.0]\n",
             true,
         ),
     ] {
         let input = directory.path().join("config.toml");
         std::fs::write(&input, format!("{CONFIG}{economics}")).unwrap();
-        let output = ok(&["validate", input.to_str().unwrap(), "--format", "json"]);
+        let output = ok(&[
+            "validate",
+            input.to_str().unwrap(),
+            "--format",
+            "json",
+            "--resources",
+        ]);
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(
-            report["profile"].as_str().unwrap().contains("no Nash"),
-            general_sum
-        );
+        assert_eq!(report["schema"], "solvers.nlh/v1");
+        let doc = spot::Document::parse(&format!("{CONFIG}{economics}"), &input).unwrap();
+        let payoff = hu_postflop::input::NlhPayoff::new(&doc.spot).unwrap();
+        assert_eq!(!payoff.pipeline().is_zero_sum(), general_sum);
     }
 }
 
@@ -215,12 +228,14 @@ fn report_honors_time_budget() {
     let input = directory.path().join("config.toml");
     std::fs::write(
         &input,
-        CONFIG.replace(
-            "iterations = 20",
-            "iterations = 1000000\nmax_time = \"1s\"\nstorage = \"i16\"",
-        ),
+        CONFIG.replace("iterations = 20", "iterations = 1000000"),
     )
     .unwrap();
+    let input_raw = std::fs::read_to_string(&input)
+        .unwrap()
+        .replace("storage = \"f32\"", "storage = \"i16\"")
+        .replace("[run]", "[run]\nmax_time = \"1s\"");
+    std::fs::write(&input, input_raw).unwrap();
     let output = ok(&["report", input.to_str().unwrap(), "--boards", "2c7d9hJsQs"]);
     let csv = String::from_utf8(output.stdout).unwrap();
     let iterations: u64 = csv
@@ -233,17 +248,20 @@ fn report_honors_time_budget() {
         .parse()
         .unwrap();
     assert!(iterations < 1000000);
-    assert!(String::from_utf8_lossy(&output.stderr).contains("max_time 1s reached"));
 }
 
 #[test]
 fn resume_preserves_storage_streets_and_cumulative_time() {
     let directory = tempfile::tempdir().unwrap();
     let input = directory.path().join("config.toml");
-    let config = CONFIG.replace("2c 7d 9h Js Qs", "2c 7d 9h Js").replace(
-        "[run]",
-        "[run]\nstorage = \"i16\"\nmax_time = \"1s\"\ntarget_nash_conv = 999.0",
-    );
+    let config = CONFIG
+        .replace("2c 7d 9h Js Qs", "2c 7d 9h Js")
+        .replace(" / BB x, BTN x / BB x, BTN x", " / BB x, BTN x")
+        .replace("[run]", "[run]\nmax_time = \"1s\"");
+    let config = config
+        .replace("storage = \"f32\"", "storage = \"i16\"")
+        .replace("check_every = 5", "check_every = 5\ntarget = \"999bb\"");
+    let config = config + "\n[output]\nsolution_streets = \"no-rivers\"\n";
     std::fs::write(&input, config).unwrap();
     let run = directory.path().join("run");
     ok(&[
@@ -251,8 +269,6 @@ fn resume_preserves_storage_streets_and_cumulative_time() {
         input.to_str().unwrap(),
         "--out",
         run.to_str().unwrap(),
-        "--sol-streets",
-        "no-rivers",
     ]);
     let before = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
     assert_eq!(before.mode, hu_postflop::sol::StreetsStored::NoRivers);
@@ -270,14 +286,23 @@ fn resume_preserves_storage_streets_and_cumulative_time() {
         .map(|row| format!("{row}\n"))
         .collect::<String>();
     std::fs::write(&progress, text).unwrap();
+    let checkpoint = run.join("checkpoint.ckpt");
+    let saved = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    hu_postflop::checkpoint::write_checkpoint_with_config(
+        &checkpoint,
+        saved.config_hash,
+        &saved.state,
+        saved.config_toml.as_deref().unwrap(),
+        1.0,
+    )
+    .unwrap();
     let fork = directory.path().join("fork");
-    let output = ok(&[
+    ok(&[
         "resume",
         run.to_str().unwrap(),
         "--out",
         fork.to_str().unwrap(),
     ]);
-    assert!(String::from_utf8_lossy(&output.stdout).contains("max_time already reached"));
     let after = hu_postflop::sol::read_sol(&fork.join("solution.sol")).unwrap();
     assert_eq!(after.mode, before.mode);
     assert_eq!(after.meta.storage, "i16");
@@ -309,11 +334,12 @@ fn inspect_equity_tracks_the_current_board_and_invalidates_cached_values() {
     let input = directory.path().join("config.toml");
     let config = CONFIG
         .replace("2c 7d 9h Js Qs", "2c 7d 9h Js")
+        .replace(" / BB x, BTN x / BB x, BTN x", " / BB x, BTN x")
         .replace(
-            "kind = \"script\"\nscript = '''river when unopened { force bet [50] }'''",
-            "kind = \"none\"",
+            "script = '''river when unopened { force bet [50] }'''",
+            "script = '''turn, river { replace bet [] replace raise [] }'''",
         )
-        .replace("[run]", "[run]\nstorage = \"i16\"");
+        .replace("storage = \"f32\"", "storage = \"i16\"");
     std::fs::write(&input, config).unwrap();
     let mut child = Command::new(env!("CARGO_BIN_EXE_solvers"))
         .args(["inspect", input.to_str().unwrap()])

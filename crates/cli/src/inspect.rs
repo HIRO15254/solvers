@@ -6,18 +6,16 @@ use std::io::{self, BufRead, Write};
 use std::path::Path;
 use std::time::Instant;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use hu_engine::{
-    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
+    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Storage,
 };
-use hu_postflop::game::PayoffPipeline;
 use hu_postflop::{
     PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity,
 };
 use nlh::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
 
-use crate::config::{GameSection, SolveConfig, StorageKind};
-use crate::postflop_setup;
+use crate::nlh_v1;
 use crate::sol::{LiveProvider, SolProvider, StrategyProvider};
 
 const RANKS: [char; 13] = [
@@ -31,25 +29,16 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
-    if crate::nlh_v1::has_schema(&raw)? {
-        let p = crate::nlh_v1::prepare(&raw, config_path)?;
-        return postflop_setup::with_threads(crate::nlh_v1::threads(&p)?, || {
-            match p.settings.solver.storage {
-                hu_postflop::input::Storage::F32 => {
-                    run_nlh::<F32Storage>(&p, iterations, target_nash_conv)
-                }
-                hu_postflop::input::Storage::I16 => {
-                    run_nlh::<I16Storage>(&p, iterations, target_nash_conv)
-                }
+    let p = crate::nlh_v1::prepare(&raw, config_path)?;
+    crate::nlh_v1::with_threads(crate::nlh_v1::threads(&p)?, || {
+        match p.settings.solver.storage {
+            hu_postflop::input::Storage::F32 => {
+                run_nlh::<F32Storage>(&p, iterations, target_nash_conv)
             }
-        });
-    }
-    let config =
-        crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
-
-    postflop_setup::with_threads(config.run.threads, || match config.run.storage {
-        StorageKind::F32 => run_config::<F32Storage>(config, iterations, target_nash_conv),
-        StorageKind::I16 => run_config::<I16Storage>(config, iterations, target_nash_conv),
+            hu_postflop::input::Storage::I16 => {
+                run_nlh::<I16Storage>(&p, iterations, target_nash_conv)
+            }
+        }
     })
 }
 
@@ -61,10 +50,10 @@ fn run_nlh<S: Storage>(
     let start = Instant::now();
     let (solver, node_info) = crate::nlh_v1::query::<S>(p, iterations, target)?;
     let ev_offset = p.payoff.ev_offset();
-    crate::solve::print_done(
+    crate::nlh_v1::print_done(
         &solver,
         start.elapsed(),
-        postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), ev_offset),
+        nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(&solver), ev_offset),
     );
     let mut provider = LiveProvider {
         solver: &solver,
@@ -84,116 +73,10 @@ fn run_nlh<S: Storage>(
     repl.interact()
 }
 
-fn run_config<S: Storage>(
-    config: SolveConfig,
-    iterations: Option<u64>,
-    target_nash_conv: Option<f64>,
-) -> Result<()> {
-    match &config.game {
-        GameSection::Postflop { .. } => {}
-        _ => {
-            return Err(anyhow!("inspect only supports kind = \"postflop\" configs"));
-        }
-    }
-    let GameSection::Postflop {
-        board,
-        oop_range,
-        ip_range,
-        pot,
-        effective_stack,
-        iso_merging,
-        min_bet,
-        preflop_aggressor,
-        tree,
-    } = config.game
-    else {
-        unreachable!("checked above");
-    };
-
-    let pf_config = postflop_setup::build_postflop_config(
-        &board,
-        &oop_range,
-        &ip_range,
-        pot,
-        effective_stack,
-        iso_merging,
-        min_bet,
-        tree.lower()?,
-        &preflop_aggressor,
-    )?;
-    let board_cards = pf_config.board.clone();
-
-    let estimate = hu_postflop::memory_usage(&pf_config);
-    postflop_setup::print_memory_estimate(&estimate);
-    postflop_setup::warn_unmatched_rules(&pf_config.streets, &estimate.rule_hits);
-
-    let rake = crate::economics::build_rake(&config.rake)?;
-    let utility = crate::economics::build_utility(&config.utility)?;
-    let pipeline = PayoffPipeline {
-        rake: rake.as_ref(),
-        utility: utility.as_ref(),
-    };
-    let ev_offset = postflop_setup::subgame_ev_offset(&pf_config, pipeline.utility);
-    let pf_game = hu_postflop::build_postflop_game(&pf_config, pipeline);
-    let node_info: Vec<PostflopNodeInfo> = pf_game.node_info.clone();
-
-    let schedule = postflop_setup::build_schedule(&config.algorithm);
-    let schedule_name = schedule.name();
-
-    let mut run_cfg = config.run;
-    if let Some(it) = iterations {
-        if it == 0 {
-            return Err(anyhow!("SLV004: iterations must be positive"));
-        }
-        run_cfg.iterations = it;
-    }
-    if let Some(t) = target_nash_conv {
-        if !t.is_finite() || t < 0.0 {
-            return Err(anyhow!(
-                "SLV004: target_nash_conv must be finite and non-negative"
-            ));
-        }
-        run_cfg.target_nash_conv = Some(t);
-    }
-
-    let mut solver = Solver::<_, S>::new(pf_game.game, schedule, Some(run_cfg.iterations));
-    postflop_setup::configure_solver(&mut solver, &run_cfg);
-    println!(
-        "game=postflop schedule={} iterations={}",
-        schedule_name, run_cfg.iterations
-    );
-    let start = Instant::now();
-    crate::solve::run_loop(&mut solver, &run_cfg, &mut crate::solve::RunHooks::none())?;
-    let elapsed = start.elapsed();
-    crate::solve::print_done(
-        &solver,
-        elapsed,
-        postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), ev_offset),
-    );
-
-    let no_color = std::env::var_os("NO_COLOR").is_some();
-    let mut provider = LiveProvider {
-        solver: &solver,
-        ev_offset,
-    };
-    let mut repl = Repl {
-        game: solver.game(),
-        provider: &mut provider,
-        node_info: &node_info,
-        board: board_cards,
-        stack: Vec::new(),
-        current: 0,
-        history: String::new(),
-        equity_cache: None,
-        no_color,
-    };
-    repl.interact()
-}
-
 /// Loads a `.sol` viewer artifact and explores it interactively -- the same
 /// REPL as [`run`], but sourcing strategies from
 /// [`crate::sol::SolProvider`] (dequantized stored blocks, with river
-/// subgames re-solved lazily) instead of a live [`Solver`].
+/// subgames re-solved lazily) instead of a live [`hu_engine::Solver`].
 pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>) -> Result<()> {
     let loaded = crate::sol::load_sol(sol_path, river_iterations, river_target)?;
     println!(
@@ -401,7 +284,7 @@ impl<'a> Repl<'a> {
                     }
                 };
                 let weight = &reach[node.player];
-                let freqs = postflop_setup::action_frequencies(
+                let freqs = nlh_v1::action_frequencies(
                     &avg,
                     weight,
                     sref.num_actions as usize,
@@ -548,8 +431,7 @@ impl<'a> Repl<'a> {
             }
         };
         let weight = &reach[node.player];
-        let freqs =
-            postflop_setup::action_frequencies(&avg, weight, sref.num_actions as usize, num_hands);
+        let freqs = nlh_v1::action_frequencies(&avg, weight, sref.num_actions as usize, num_hands);
         let per_combo = &avg[pos * num_hands..(pos + 1) * num_hands];
         let weights = class_weights(weight);
         let raw = class_average(weight, per_combo);

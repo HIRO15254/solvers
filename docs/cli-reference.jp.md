@@ -1,405 +1,202 @@
-<!-- `solvers` と `solversd` の完全なCLIリファレンス。全コマンド・全flag・全familyを
-     覆う。config surfaceの規範仕様は solver-config-v1.jp.md と
-     multiway-preflop-v1.jp.md。実装は crates/cli/src/lib.rs と crates/daemon。 -->
-
 # CLI リファレンス
 
-`solvers`(ソルバー本体)と `solversd`(job daemon)の全コマンド・全 flag を列挙する。
-config に何を書けるかは family ごとの規範仕様を参照する。
+`solvers`は`solvers.nlh/v1`だけを入力として読む。table・line・boardからP1（HU Postflop）または
+P2（Multiway Preflop）を決める。入力は[共通Input規範](nlh-input-v1.jp.md)、
+計算・単位・成果物は[P1規範](hu-postflop.jp.md)・[P2暫定規範](mw-preflop.jp.md)を参照する。
+本書は`solvers`と`solversd`のコマンド、flag、終了code、HTTP APIを記す。
 
-- [solver-config-v1.jp.md](solver-config-v1.jp.md) — `solvers.postflop/v1`
-- [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) — `solvers.multiway-preflop/v1`
+## 共通のflagと環境変数
 
-## family サポート表
-
-| コマンド | postflop | multiway-preflop |
-|---|:--:|:--:|
-| `config new` | ○ | ○ |
-| `validate` | ○ | ○ |
-| `solve` | ○ | ○ |
-| `resume` | ○ | ○ |
-| `status` / `watch` / `runs ls` | ○ | ○ |
-| `inspect` | ○ | ○ |
-| `report` | ○ | — |
-| `export` / `compare` | ○ | ○ |
-| `evaluate` | — | ○ |
-
-`inspect` は postflop config・postflop の `.sol`・multiway の `.mwsol` を開く。
-
-`solvers.preflop-hu/v1` と `solvers.toy/v1` は製品範囲外として削除した family である。
-その schema を宣言した config は、他の未知 schema と同じく
-`unsupported config schema`(exit code 2)で拒否され、run directory は作られない。
-
-## 共通
-
-### 移行中の `solvers.nlh/v1` P1
-
-`validate` / `solve` / `resume` / `inspect` / `report` は共通InputのP1（HU Postflop）spotを受け付ける。
-入力の規範は [`solvers.nlh/v1`](nlh-input-v1.jp.md)、計算と成果物は [P1](hu-postflop.jp.md) を参照する。
-P2（Multiway Preflop）も接続済みであり、詳細は次のP2移行節を参照する。
-旧familyの契約は従来どおり。daemon投入は別の移行境界である。
-
-- `validate` は製品、開始street・board・pot・stack・OOP/IP、暗黙foldを含む全行動、
-  treeのparam値と展開済みrule、停止目標なし・未一致ruleの警告をhuman/JSONで表示する。
-  金額はBB。`--show-effective` / `--write-effective PATH` は既定値展開・script inline化済みの入力を返す。
-  `--resources` はP1のf32/i16見積りbytesと解決済みmemory limit、`withinLimit`を表示する。
-  validateは上限超過を表示し、solve/resumeが確保前に拒否する。
-  human表示は概念ごとに1行で、lineの `*` は暗黙foldを表す。cashのrake条件または
-  tournament ICMの卓・field人数とexact/sampled、各paramと各rule、警告、任意のresourcesを表示する。
-  JSONの構造は従来どおり。
-- `solve --threads` / `--memory` / `--max-time` は `[run]` を上書きして実効configへ保存する。
-  memoryはbytes整数またはKiB/MiB/GiB、autoは物理RAMの80%。停止判定は `NashConv / 2 <= target`。
-  `--sol-streets` は明示指定（fullも含む）を拒否し、`[output] solution_streets` を使う。
-- `resume RUN_DIR [--out FORK]` は `[run]` のthreads・memory・max_time・checkpoint_intervalだけを
-  CLIで上書きできる。max_timeは累積solve時間（validation/buildを除く）。checkpoint_intervalは
-  wall-clockでbatch境界に確認し、終了時もcheckpointを保存する。
-- `run.toml`、`checkpoint.ckpt`（新Input専用format 2）、`solution.sol` は同じ正規化済み実効configを持つ。
-  manifestと`run.json`の `gameKind = "hu-postflop"`、`configSchema = "solvers.nlh/v1"`、
-  `configHash` はそのbytesのblake3。checkpointの互換hashだけは `[run]` を除く。
-  checkpointには累積solve秒数も保存する。旧familyは従来のformat 1を書き続ける。
-  `run.json` は `utilityUnit`（cashは `BB`、tournamentは `prizes`）、`evP0` / `evP1`、
-  `explP0` / `explP1`、`nashConv`、`iterations`、`wallSecs`を記録する。
-  progressの `elapsed_secs` は `status` / `runs ls` / `watch` とdaemonのrun一覧で読める。
-- exit codeは入力・tree error（streetを示す `NLH003`）が2、checkpoint非互換が3、
-  memory limit超過が75、cooperative cancelが130。solveは検証・見積り・上限確認後にrun directoryを作る。
-- `export` / `compare` / `inspect --sol` は新Inputを埋め込んだ `.sol` を扱う。
-  金額・pot・stack・action label・historyはBB（0.001 BB gridでは最短小数）、cashのEV・NashConvもBB、
-  ICMのEV・NashConvは賞金単位。`--node r3.3`、`--node check/bet 3.3` のように選択できる。
-  `compare` は新Inputと旧familyの `.sol` の混在を `--cross-game` でも拒否する。
-  `no-rivers` のriver照会は埋め込みconfigのalgorithm・storageで再solveする。
-  再solveの反復数とNashConv上限は従来の `--river-iterations` / `--river-target` を使う。
-- live `inspect CONFIG` は `[solver]` / `[run]` を使い、`--iterations` / `--target-nash-conv` で照会用solveを上書きする。
-  後者はNashConvそのものの上限（cashはBB、ICMは賞金単位）。
-  `report CONFIG --boards ...` は各boardで `[spot] board` を置き換えてlineを再生するため、
-  開始streetとlineが合わないboardは拒否する。CSVの形式は旧familyと同じ。
-- 移行例は [examples/nlh](../examples/nlh/river_small.toml) の `river_small`、`turn_small`、
-  `3betpot_fast`、`postflop_srp20`、`postflop_pio_tree`（cash/rake）、
-  [postflop_pio_icm](../examples/nlh/postflop_pio_icm.toml)（rakeなしのtournament）。
-  旧chipを1 BBとしてpot/stackを再現し、旧street capを明示する。
-
-### 移行中の `solvers.nlh/v1` P2
-
-board・lineのないPreflop rootはP2が解く。`[solver]` / `[output]` はP2専用の設定を使う。
-共通のtable・economics・ranges・tree・runは [`solvers.nlh/v1`](nlh-input-v1.jp.md)、計算と成果物は [P2](mw-preflop.jp.md) に従う。
-旧familyの例と契約はM7まで残す。
-
-- `validate` は製品、tableのposition・stack・first actor、range、tree param/ruleをhuman/JSONで表示する。
-  通常は木を走査せず、未使用ruleは未検査であることと`--resources`で検査できることを表示する。
-  `--show-effective` / `--write-effective` は既定値を明示し、sourceをscript本文へ
-  inline化した冪等の実効configを返す。`--resources` はpublic treeを保持せずに数え、
-  current-street policy arenaのnodes・columns・slots・bytes・ICM field・memory limitと`withinLimit`を返す。
-  同じcount中にruleの条件一致を実測し、完全な計測で未一致のruleだけを警告する。
-  memory/node上限で打ち切られた場合は不完全として未一致警告を出さない。
-  JSONの`ruleHitStatus`は`"not-checked"` / `"complete"` / `"incomplete"`で、`warnings`も返す。
-  solve/resumeは検証とarena preflightの後にrun directoryを作る。
-  public tree構築中にも条件一致を実測し、未一致ruleを`warning: ...`としてstderrへ出す。追加の木走査はしない。
-- `solve --threads` / `--memory` / `--max-time` は共通 `[run]` を上書きして保存する。
-  threads autoは `min(logical CPUs, players × batch_sweeps)`、memory autoはarena予算6 GiB。
-  `--sol-streets` は使えない。確率encodingは `[output] probability_encoding = "u16" | "f32"`。
-- `resume RUN_DIR|CHECKPOINT.mwckpt [--out FORK]` はself-contained checkpointのconfigを使い、
-  threads・memory・max_time・checkpoint_intervalを `[run]` へ、`--max-sweeps` / `--stop-target` /
-  `--evaluation-samples` / `--evaluation-cadence` を `[solver.stop]` の
-  max_sweeps / target / evaluation_samples / check_every_sweepsへ保存する。
-  target変更は連続確認をresetする。互換判定は従来どおりgame/abstraction/configuration fingerprint。
-  max_timeは累積solve時間、checkpoint_intervalはwall-clock。終了時にもcheckpointを書き出す。
-- `run.toml`、`checkpoint.mwckpt`、`solution.mwsol` は同じ正規化済み実効configを持つ。
-  manifestと`run.json`は `gameKind = "mw-preflop"`、`configSchema = "solvers.nlh/v1"`、
-  `configHash`は実効config bytesのBLAKE3。`status` / `runs ls` / `watch` は従来のrun directoryを読む。
-  結果・EVの単位は従来どおりcashがBB（metadataは`bb`）、ICMが賞金単位（`prize`）。
-- `export`（summary / tree / strategy / range / ev / actions）、`evaluate`、`inspect` は新Inputを
-  埋め込んだ `.mwsol` を読む。`inspect --view ev --node ...` の非root Preflop nodeは到達確率でrangeを
-  条件付けたtyped samplerを構築する。`compare` は新Inputと旧familyの混在を`--cross-game`でも拒否する。
-- P2のtype errorは完全なdotted keyを持つ`NLH002`、値のerrorは`NLH003`。
-  `[solver.stop] target` は数値または文字列`"default"`だけを受け、数値文字列`"0.05"`は`NLH002`。
-- 移行例は [3max smoke](../examples/nlh/preflop_multiway_v1_3max_smoke.toml)、
-  [production smoke](../examples/nlh/preflop_multiway_v1_production_smoke.toml)、
-  [default](../examples/nlh/preflop_multiway_v1_default.toml)、
-  [full surface](../examples/nlh/preflop_multiway_v1_full_surface.toml)、および`examples/nlh/6max_100bb_nl50_partial*`。
-  standard menu・limp禁止・priority順はscriptへ明示する。
-  **full surfaceは旧例のHJ first actorを表現できず、通常のUTGから始まるため同値比較の対象外。**
-  GTO Wizard参照例は旧familyと同じmenu assertionsを維持する。
-
-### global option
-
-| flag | 意味 |
+| flag / 変数 | 意味 |
 |---|---|
-| `--cache-dir DIR` | machine 単位の cache(abstraction table)の位置 |
-| `-h`, `--help` | ヘルプ |
-| `-V`, `--version` | version |
+| `-h` / `--help` | helpを表示。各subcommandでも使える |
+| `-V` / `--version` | binaryのversionを表示 |
+| `--cache-dir DIR` | machine cacheの場所。全subcommandで指定できる |
+| `SOLVERS_CACHE_DIR` | `--cache-dir`が無い場合のcache。未指定ならOSの利用者cache directory |
+| `NO_COLOR` | ANSI色を無効にする |
+| `SOLVERSD_TOKEN` | daemonのbearer token。`--token`を優先する |
 
-`--cache-dir` は全サブコマンドで受け付ける。cache 位置の決定順は
-`--cache-dir` > `SOLVERS_CACHE_DIR` > OS の user cache directory である。cache は
-machine 資源なので config には書かない。config に local path を書くと、その config を
-別 host へ送れなくなるからである。
-
-### 環境変数
-
-| 変数 | 効果 |
-|---|---|
-| `SOLVERS_CACHE_DIR` | cache 位置。`--cache-dir` に劣後する |
-| `NO_COLOR` | 設定されていれば `inspect` の 13x13 grid の色付けを止める |
-| `SOLVERSD_TOKEN` | `solversd` の bearer token。`--token` に劣後する |
-
-### exit code
-
-| code | 意味 |
-|---|---|
-| `0` | 成功 |
-| `1` | それ以外の失敗 |
-| `2` | config・schema・検証の失敗(`SLV00x` / `MWP001`–`MWP003` を含む) |
-| `3` | artifact / checkpoint が読めない(magic 不一致、version 非対応、fingerprint 不一致、`MWP004`) |
-| `75` | resource limit(memory budget 超過、arena preflight 失敗) |
-| `130` | SIGINT で停止 |
-
-### シグナル
-
-1 回目の SIGINT(Ctrl-C)は cooperative cancel で、checkpoint を書いてから
-`130` で終了する。2 回目は即時終了する。Multiwayのcancelは完了したsolver batchの
-境界で確認するため、判定の遅れは最大1 batchであり、品質評価の
-`check_every_sweeps`間隔には依存しない。判定後のcheckpoint I/Oや成果物出力は
-別途時間を要する。heads-up系のcancelは評価境界で確認し、`check_every`が大きいと
-反応まで最大1 chunkかかる。
-Multiwayのmerge errorは失敗した1 sweepのみを巻き戻し、同じbatch内の先行する
-成功sweepは保持する。cooperative cancelの境界とbatch全体のrollbackを混同しない。
-
----
+cache pathはconfigに書かない。P2のEHS² tableは初回に構築し、以後は互換cacheを読む。
+cacheのbuild/load通知はstderrへ出す。
 
 ## `solvers config new`
 
 ```sh
-solvers config new [--schema SCHEMA] [--template TEMPLATE] [--out PATH]
+solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 ```
 
-| flag | 既定 | 値 |
+| flag | 既定 | 意味 |
 |---|---|---|
-| `--schema` | `multiway-preflop` | `multiway-preflop` \| `postflop` |
-| `--template` | `minimal` | `minimal` \| `full` |
-| `--out PATH` | — | 省略時は stdout |
+| `--product` | `p2` | 生成する製品。どちらもschemaは`solvers.nlh/v1` |
+| `--template` | `minimal` | `minimal`は短い有効例、`full`は実効configの全section・key。既定の無い任意keyは省略 |
+| `--out PATH` | stdout | templateの出力先 |
 
-4 つの template はどれも test で parse され、`minimal` と `full` の両方が
-正規化冪等性まで検査されている。
+P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
+書式の例は[examples索引](../examples/README.md)を参照する。
 
 ## `solvers validate`
 
 ```sh
-solvers validate <CONFIG> [--format FORMAT] [--show-effective]
-                          [--write-effective PATH] [--resources]
+solvers validate <CONFIG> [--format human|json] [--show-effective]
+                         [--write-effective PATH] [--resources]
 ```
 
 | flag | 既定 | 意味 |
 |---|---|---|
-| `--format` | `human` | `human` \| `json` |
-| `--show-effective` | — | 既定値を展開した effective config を stdout へ |
-| `--write-effective PATH` | — | 同じものを再 parse 可能な TOML として書く |
-| `--resources` | — | public tree を構築(保持せず)して policy arena を報告 |
+| `--format` | `human` | 説明文またはJSON |
+| `--show-effective` | 無効 | 既定値を展開し、外部tree sourceをinline化した実効configも表示 |
+| `--write-effective PATH` | 無効 | 再parseできる実効TOMLを保存 |
+| `--resources` | 無効 | P1の木・storage見積り、P2のpublic tree・policy arena countを表示 |
 
-schema 判定・型・値域・条件付き検証・正規化までを行う。abstraction 到達数と
-resource/fingerprint preflight は `solve` 時にだけ走る。
+human表示は製品、開始状態、lineの行動、treeのparam・展開済みrule、警告を示す。
+P1のline表示の`*`は暗黙foldである。金額はBB、utilityはcashでBB、ICMで賞金単位である。
+JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLIの追加fieldはcamelCaseである。
 
-tree script は正規化の一部として parse し、条件をコンパイルする。壊れた script が
-effective config を素通りして solve 時に落ちることはない。正規化では
-`[game.tree] source`(path)が `script`(本文)へ置き換わるので、effective config は
-script file を消しても解ける。
+| field | 内容 |
+|---|---|
+| `status` / `schema` / `gameKind` | `valid` / `solvers.nlh/v1` / `hu-postflop`または`mw-preflop` |
+| `product` | `HuPostflop` / `MultiwayPreflop` |
+| `start` / `effective_stack` | 開始状態とeffective stack。P2ではstackはnull |
+| `actions` | line再生結果。暗黙foldを含む |
+| `tree.params` / `tree.rules` | paramのname・kind・value・description、展開済みrule |
+| `warnings` | 警告文字列の配列 |
+| `amountUnit` / `utilityUnit` | `BB` / `BB`または`prizes` |
+| `table` / `economics` / `ranges` | P2の卓・経済条件・席別range診断 |
+| `ruleHitStatus` | P2のみ。`not-checked` / `complete` / `incomplete` |
+| `resources` | `--resources`指定時のみ。下表を参照 |
+| `effectiveConfig` | `--show-effective`指定時のみ。実効configのobject |
 
-`--resources` は Multiway の dense arena 見積り専用である。heads-up config に渡すと
-error になる。exact engine の tree サイズ見積りは `solve` が tree を組むときに出る。
+| resources field | 製品 | 意味 |
+|---|---|---|
+| `nodes` / `terminals` / `f32Bytes` / `i16Bytes` | P1 | 木のnode・terminal数とstorage別bytes |
+| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | 選択storageの見積り、解決済み上限、上限内か |
+| `complete` / `recall` | P2 | count完了か、`current-street` |
+| `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
+| `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
+| `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
 
-`--show-effective` の出力はそのまま入力に戻せる。正規化は冪等で、effective config を
-もう一度正規化すると同じ bytes が返る。
-
-### `--format json` の body
-
-postflop 契約:
-
-```json
-{
-  "status": "valid",
-  "schema": "solvers.postflop/v1",
-  "gameKind": "postflop",
-  "profile": "vector CFR average profile; converges to Nash for two-player zero-sum games",
-  "effectiveConfig": { "...": "--show-effective のときだけ" },
-  "tree": {
-    "params": [
-      {"name": "cb", "type": "number", "default": 40, "description": "c-bet size (pot %)"}
-    ],
-    "rules": [
-      {"street": "flop", "condition": "donk", "effect": "remove", "action": "bet", "sizes": []},
-      {"street": "flop", "condition": "cbet && paired", "effect": "replace", "action": "bet", "sizes": ["25", "75"]}
-    ]
-  }
-}
-```
-
-`tree` は script を持つ postflop config(`[game.tree] kind = "script"`)にだけ付く
-読み取り専用の診断で、GUI がフォームを組み立てるための情報である
-(`docs/solver-config-v1.jp.md`「param 宣言は変数スキーマである」章)。`params` は
-`param` 宣言の変数スキーマ(`[game.tree.params]` の上書きを反映した実効値付き)、
-`rules` はビルダーが適用する順序そのままの平坦化された rule 列で、`condition` は
-ソース風テキストへ、`sizes` は size literal へ戻して書く。`effectiveConfig` や
-`run.toml` には決して現れない。`kind = "none"` の postflop config では
-`tree` key 自体が無い。
-
-Multiway Preflop(v1)は `seatCount` / `chipUnitBb` を別途持ち、`tree` は無い
-(`docs/multiway-preflop-v1.jp.md` を見よ)。standard ruleまたは`.mwtree` scriptの
-`when` conditionでは、`last_preflop_aggressor_position`を使って直近のpreflop
-aggressorのposition名(`UTG`/`HJ`/`CO`/`BTN`/`SB`/`BB`等)を文字列比較できる。
-未raise時は空文字で、postflopでも値を保持する。
+P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
+未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。
+完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
+validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
+rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
 
 ## `solvers solve`
 
 ```sh
-solvers solve <CONFIG> --out DIR [--sol-streets MODE]
-                                 [--threads N] [--memory SIZE] [--max-time DUR]
+solvers solve <CONFIG> --out DIR [--threads N] [--memory SIZE] [--max-time DUR]
 ```
 
-| flag | 既定 | family | 意味 |
-|---|---|---|---|
-| `--out DIR` | 必須 | 全 | run directory。全 artifact がここに落ちる |
-| `--sol-streets` | `full` | postflop | `full` \| `no-rivers`。`.sol` に戦略と値の block を保存する street |
-| `--threads N` | — | **multiway のみ** | worker thread 数の上書き |
-| `--memory SIZE` | — | **multiway のみ** | policy arena 予算の上書き(`auto` は 6GiB) |
-| `--max-time DUR` | — | **multiway のみ** | 累積 solve 時間の上書き |
+| flag | 意味 |
+|---|---|
+| `--out DIR` | 必須。新しいrun directory。既存の非空directoryはqueued runのadoptを除き拒否 |
+| `--threads N` | `[run] threads`の上書き。P2ではtree構築にも使う |
+| `--memory SIZE` | `[run] memory`の上書き。bytes整数またはKiB/MiB/GiB、`auto` |
+| `--max-time DUR` | `[run] max_time`の上書き。累積solve時間の予算 |
 
-`--threads` / `--memory` / `--max-time` を heads-up config に渡すと error になる。
-heads-up は `[run] threads` と `[run] max_time` を config に書く。
+上書きは実効configに保存する。memoryのautoはP1が物理RAMの80%、P2がarena予算6 GiBである。
+P1の停止条件はNashConv / 2、P2は測定deviationの確認であり、規範の停止設定に従う。
+P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未一致ruleを警告する。
 
-戦略は solution artifact(`.sol` / `.mwsol`)で公開し、postflop のノードを読むのは
-`export --node` である。`--history` は削除した(`solve` / `resume` に渡すと未知の flag として
-error になる)。
+| file | 内容 |
+|---|---|
+| `run.toml` | 正規化・inline化した実効config |
+| `manifest.json` | run identity、state、pid、configSchema、gameKind |
+| `events.jsonl` / `progress.jsonl` | 状態・checkpoint等のevent / 評価境界の進捗 |
+| `run.json` | 終了区間のsummary |
+| `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
+| `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
-`--sol-streets full`(既定)は全 action node の戦略と per-hand 値を保存する。
-`no-rivers` は river の action node を落として artifact を大幅に小さくするが、
-river の戦略も値も持たないので、その後 river ノードを `export` すると error になる。
-
-`--out` が既に空でない directory を指すと、queued run の adopt でない限り error になる。
-
-postflop config を solve すると、木を組む前に `tree: nodes=... terminals=...
-rank_tables=... storage=... MiB (f32) / ... MiB (i16)` という一行を stdout に出す
-(memory preflight の見積り)。その直後、`[game.tree]` のどのルールも一度も
-node に当たらなかった場合は stderr に warning を出す:
-
-```
-warning: 1 tree-script rule matched no node and had no effect:
-  turn rule 2: replace raise [2.5x]  when aggressions == 0 && aggressions == 1
-```
-
-これは実際に木を組みながら「このルールの条件が一度でも真になったノードが
-あったか」を数えた結果であり、静的な構文チェックではない
-(`docs/solver-config-v1.jp.md`「解決順序」章)。あくまで warning であって
-run を失敗させない — 条件と矛盾しない書き方をしていても、盤面や config の
-組み合わせによっては構造的にそのルールへ到達しないことがあり、それ自体は
-不正ではないため。抑制する flag も無い。`solvers report` は複数盤面を
-sweep するため、盤面ごとではなく sweep 全体を通じて一度も当たらなかった
-ルールだけを、sweep 終了後に一度だけ報告する。
+成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
+checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
 ## `solvers resume`
 
 ```sh
-solvers resume <RUN> [--out DIR]
-                     [--threads N] [--memory SIZE] [--max-time DUR]
-                     [--max-sweeps N] [--stop-target X]
+solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
+                     [--checkpoint-interval DUR] [--max-sweeps N] [--stop-target X]
                      [--evaluation-samples N] [--evaluation-cadence N]
-                     [--checkpoint-interval DUR]
 ```
 
-`<RUN>` は `solve --out` が作った run directory、または run directory から取り出した
-自己完結型の `.mwckpt` である。checkpoint から `[run] iterations`(multiway は
-`run.max_sweeps`)の総数まで継続する。
+`RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
+directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。
 
-| flag | 意味 |
-|---|---|
-| `--out DIR` | 元の run を汚さず、新しい空 directory へ fork する |
-| `--threads` / `--memory` / `--max-time` | この resume 区間の上書き |
-| `--max-sweeps` / `--stop-target` / `--evaluation-samples` / `--evaluation-cadence` / `--checkpoint-interval` | multiway の停止・評価・checkpoint 設定の上書き |
+| flag | 適用 | 意味 |
+|---|---|---|
+| `--out DIR` | 両製品 | 新しい空directoryへfork。未指定なら元directoryを更新 |
+| `--threads` / `--memory` / `--max-time` | 両製品 | run設定の上書き。max_timeは再開前を含む累積予算 |
+| `--checkpoint-interval DUR` | 両製品 | wall-clock checkpoint間隔 |
+| `--max-sweeps N` | P2 | `solver.stop.max_sweeps`の累積上限 |
+| `--stop-target X` | P2 | `solver.stop.target` |
+| `--evaluation-samples N` | P2 | `solver.stop.evaluation_samples` |
+| `--evaluation-cadence N` | P2 | `solver.stop.check_every_sweeps` |
 
-`--out` を渡さない resume は同じ directory へ追記する。`manifest.json` の run id と
-作成時刻は保たれ、`events.jsonl` の `seq` も連続する。
+P1へP2専用overrideを渡すと`NLH003`で拒否する。P1は`[run]`・`[meta]`以外を変更できない。
+同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
+終了時にcheckpoint、solution、run.jsonを更新する。P2は再構築中にrule hitも確認する。
 
-## `solvers status`
+## `solvers status` / `solvers watch` / `solvers runs ls`
 
 ```sh
 solvers status <RUN> [--format human|json]
-```
-
-run directory が今どう名乗っているかを報告する。`state` が `running` のまま記録 pid が
-存在しない run は読み手が `interrupted` と導出する。この判定は同一 host 上でのみ
-有効で、network 越しに run directory を読む場合は使えない。
-
-`events.jsonl` の byte offset も報告する。`watch --from` にそのまま渡せる。
-
-## `solvers watch`
-
-```sh
 solvers watch <RUN> [--from OFFSET] [--poll-secs SECS] [--format human|json]
+solvers runs ls <ROOT> [--format human|json]
 ```
 
 | flag | 既定 | 意味 |
 |---|---|---|
-| `--from` | `0` | `events.jsonl` の byte offset。途中から追う |
-| `--poll-secs` | `1` | run が続いている間の poll 間隔 |
-| `--format` | `human` | `human` \| `json` |
+| `--format` | `human` | status/listはJSON object、watchは1 eventにつき1行のJSON |
+| `--from` | `0` | watch開始のevents.jsonl byte offset |
+| `--poll-secs` | `1` | watchのpoll間隔。最小0.05秒 |
 
-run が停止するまで event log を追う。行の途中までしか書かれていない末尾は返さず、
-その byte を offset に含めない。
-
-## `solvers runs ls`
-
-```sh
-solvers runs ls <ROOT> [--format human|json]
-```
-
-`<ROOT>` の直下にある run directory を一覧する。run id、state、進捗、completion を出す。
+statusはstate・進捗・completionと`eventsOffset`を返す。runningのpidが消えた場合は同一hostで
+`interrupted`を導出し、JSONの`recordedState`へ記録状態を残す。`resumable`は停止状態とcheckpointの存在による表示である。
+watchは停止時までeventを追い、不完全な末尾をoffsetに含めない。runs lsはROOT直下だけを列挙する。
+これらはconfigをparseせず、旧run directoryも読める。JSONの`configSchema` / `gameKind`は記録値を保つ。
+旧runの`resumable`表示は現行CLIの再開互換性を保証しない。
 
 ## `solvers inspect`
 
 ```sh
-solvers inspect <CONFIG> [--iterations N] [--target-nash-conv X]     # postflop: その場で解く
-solvers inspect --sol <PATH> [--river-iterations N] [--river-target X]  # postflop: .sol を開く
-solvers inspect <SOLUTION.mwsol> [--node NODE] [--view VIEW]
-                                 [--actor SEAT] [--samples N]
-                                 [--seed N] [--br-traversals N]      # multiway
+solvers inspect <CONFIG> [--iterations N] [--target-nash-conv X]
+solvers inspect --sol PATH [--river-iterations N] [--river-target X]
+solvers inspect <SOLUTION.mwsol> [--node NODE] [--view VIEW] [--actor SEAT]
+                               [--samples N] [--seed N] [--br-traversals N]
 ```
 
-`<CONFIG>` と `--sol` は排他である。`.mwsol` 拡張子なら multiway artifact viewer、
-それ以外の config なら postflop REPL、`--sol` なら postflop artifact viewer になる。
-`.mwsol` v4 readerは2 GiBの固定幅index（最大23,598,721 strategy）、非圧縮4 GiBの
-metadata、非圧縮合計64 GiBのstrategy frameを上限とし、frameを最大4096件ずつ読む。
-10,000,000 strategy上限だった古いreaderは、より大きいv4成果物には更新が必要である。
+P1 configをその場で解いてREPLを開くか、P1の`.sol`またはP2の`.mwsol`を読む。
+CONFIGと`--sol`は排他である。
 
-| flag | 既定 | 適用 | 意味 |
-|---|---|---|---|
-| `--iterations N` | — | postflop live | config の `[run] iterations` を上書き |
-| `--target-nash-conv X` | — | postflop live | 同じく `target_nash_conv` を上書き |
-| `--sol PATH` | — | postflop | `.sol` を読む |
-| `--river-iterations N` | `500` | postflop `--sol` | river subgame の遅延再解決の予算 |
-| `--river-target X` | — | postflop `--sol` | その subgame の `nash_conv` がこれを下回ったら打ち切る |
-| `--node NODE` | `root` | multiway | `root`、32 桁の history key、または `/` 区切りの action label/index |
-| `--view VIEW` | `node` | multiway | `node` \| `summary` \| `strategy` \| `range` \| `ev` |
-| `--actor SEAT` | — | multiway | strategy grid の手番 seat を上書き |
-| `--samples N` | `4096` | multiway | EV/CI 評価の sample 数 |
-| `--seed N` | `1` | multiway | 同上の seed |
-| `--br-traversals N` | `20000` | multiway | best-response traversal 数 |
+| flag | 既定 | 適用・意味 |
+|---|---|---|
+| `--iterations N` | config | P1 live solveの反復上限 |
+| `--target-nash-conv X` | config | P1 live solveのNashConv上限。utility単位 |
+| `--sol PATH` | 無し | P1の保存solutionを開く |
+| `--river-iterations N` | `500` | P1の未保存Riverを遅延再解決する反復予算 |
+| `--river-target X` | 無し | その再解決のNashConv上限 |
+| `--node NODE` | `root` | P2。root、32桁history key、`/`区切りaction label/index |
+| `--view VIEW` | `node` | P2。`node` / `summary` / `strategy` / `range` / `ev` |
+| `--actor SEAT` | nodeのactor | P2 strategy gridのseat |
+| `--samples N` | `4096` | P2 EV/CI評価sample数 |
+| `--seed N` | `1` | P2評価seed |
+| `--br-traversals N` | `20000` | P2 trained deviationの学習予算 |
 
-### postflop REPL
+P1のREPLは次を使う。
 
-| コマンド | 意味 |
+| command | 意味 |
 |---|---|
-| `show` | 現在 node の説明(手番、action 一覧と全体頻度) |
-| `go <action\|index>` | 子へ降りる。chance node では配られたカードを指定 |
-| `up` | 親へ戻る |
-| `root` | root へ戻る |
-| `grid <action\|index>` | class ごとの action 頻度を 13x13 で表示 |
-| `range <oop\|ip>` | その player の root range の class weight を 13x13 で表示 |
-| `eq` | 現在の board と到達レンジで OOP の class 平均 equity を 13x13 で表示 |
-| `combos <class>` | 1 class の combo ごとの action 確率(例 `combos AA`) |
-| `ev` | `ev_oop` / `ev_ip` / `expl_oop` / `expl_ip` / `nash_conv` / `iterations` |
-| `help` | コマンド一覧 |
-| `quit` / `exit` | 終了 |
+| `show` | nodeの手番・action・頻度 |
+| `go <action\|index>` | 子へ進む。chanceではcardを指定 |
+| `up` / `root` | 親 / rootへ戻る |
+| `grid <action\|index>` | class別のaction確率を13×13で表示 |
+| `range <oop\|ip>` | root range weightを表示 |
+| `eq` | 現board・到達rangeでのOOP class equity |
+| `combos <class>` | combo別action確率 |
+| `ev` | root summaryのEV・expl・NashConv・iterations |
+| `help` / `quit` / `exit` | help / 終了 |
 
-`ev` が出す EV は subgame 開始基準である(solver-config-v1.jp.md「EV の基準」)。
-
-iso 併合された trunk では、併合された deal は代表カードだけが並び、末尾に `*` が付く
-(例 `Td*`)。member の remap は保留である。
+iso併合dealは代表cardに`*`を付ける。member表示のremapは未対応である。
+未保存Riverの戦略・値は再計算値であり、保存時の値ではない。
 
 ## `solvers report`
 
@@ -407,16 +204,17 @@ iso 併合された trunk では、併合された deal は代表カードだけ
 solvers report <CONFIG> [--boards LIST] [--boards-file PATH] [--output PATH]
 ```
 
-postflop 専用。config の `board` は無視され、指定した各ボードで同じ config を解いて
-1 行ずつ CSV を出す。
+P1専用。各boardで`spot.board`を置き換えてlineを再生し、root集計のCSVを出す。
+boardはlineの開始streetに合う必要がある。storage・並列設定を使い、max_timeはboardごとに判定する。
 
 | flag | 意味 |
 |---|---|
-| `--boards LIST` | カンマ区切りのボード。`"Ks7h2d,Ks7h2c"` と `"Ks 7h 2d,Ks 7h 2c"` のどちらでも書ける |
-| `--boards-file PATH` | 1 行 1 ボード。空行と `#` 始まりの行は読み飛ばす |
-| `--output PATH` | stdout ではなくこのファイルへ書く |
+| `--boards LIST` | カンマ区切りの3/4/5 card board。例`"Ks7h2d,Ks7h2c"` |
+| `--boards-file PATH` | 1行1board。空行・`#`で始まる行を除く |
+| `--output PATH` | 未指定はstdout |
 
-CSV の列は solver-config-v1.jp.md「`report` の CSV」を参照する。
+未一致ruleは全boardで一度も当たらなかったものだけを最後に警告する。
+CSV列とEVの基準は[P1第8節](hu-postflop.jp.md)を参照する。
 
 ## `solvers export`
 
@@ -424,22 +222,17 @@ CSV の列は solver-config-v1.jp.md「`report` の CSV」を参照する。
 solvers export <SOLUTION> <VIEW> [--node NODE] [--format json|csv] [--output PATH]
 ```
 
-`<VIEW>` は `strategy` \| `actions` \| `range` \| `ev` \| `tree` \| `summary`。
-`--format` の既定は `json`。拡張子が `.mwsol` なら multiway artifact、それ以外は
-postflop の `.sol` として読む。
+VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
+`.sol`はP1、`.mwsol`はP2のreaderで読む。
 
-`--node` は **postflop 専用**で、per-node の view(`tree` / `actions` /
-`strategy` / `ev`)がどのノードを covers するかを決める。
+| flag | 既定 | 意味 |
+|---|---|---|
+| `--format` | `json` | JSONまたはCSV |
+| `--output PATH` | stdout | 出力先 |
+| `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える |
 
-| 値 | 意味 |
-|---|---|
-| `root`(既定) | root node だけ |
-| 履歴文字列(`xr10c`) | その betting line のノード |
-| `/` 区切りの action label(`check/bet 10`) | REPL の `go` と同じ表記で辿ったノード |
-| `all` | artifact が保存している全 action node |
-
-各 view の列は `solver-config-v1.jp.md`「`export` の view」を参照する。進捗行は
-stderr に出るので、stdout をそのままファイルへ流してよい。
+P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
+列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
 ## `solvers compare`
 
@@ -447,23 +240,12 @@ stderr に出るので、stdout をそのままファイルへ流してよい。
 solvers compare <LEFT> <RIGHT> [--cross-game]
 ```
 
-2 つの average profile を比較する。拡張子が `.mwsol` なら multiway、それ以外は
-postflop の `.sol` として読む。
-
-**multiway**: 既定では game fingerprint が一致しない artifact を拒否する。
-`--cross-game` はその検査を外すが、代わりに seat mapping と utility 単位が完全
-一致していることを要求する。
-
-**postflop**: node ごとに突き合わせるので、まず tree の形が一致していることを
-要求する(ノード数と保存 `sref` 集合)。既定ではさらに board / pot / effective
-stack の一致も要求し、`--cross-game` がその検査だけを外す。出力は JSON:
-
-| field | 意味 |
-|---|---|
-| `nodes` | 突き合わせた action node 数 |
-| `mean_strategy_l1` / `max_strategy_l1` / `max_strategy_node` | node ごとの「1 ハンドあたり平均 L1 距離」の平均・最大・最大のノード。0 が同一、2 が排反 |
-| `mean_max_ev_delta` / `max_ev_delta` / `max_ev_node` | node ごとの per-hand EV 差の最大値、その平均・最大・最大のノード(chip-EV は chip、ICM は prize 単位) |
-| `ev_oop` / `ev_ip` / `nash_conv` | 両 artifact の root 値 `[left, right]` |
+同じ製品のsolutionの平均profileを比較し、JSONを出す。
+P1はtree形状と保存node集合、通常はboard・pot・effective stackの一致も要求する。
+`--cross-game`は後者だけを外す。`mean_strategy_l1` / `max_strategy_l1`は戦略差、
+`mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
+EV差はcashでBB、ICMで賞金単位である。
+P2は通常game fingerprintの一致を要求する。`--cross-game`でもseat mappingとutility単位の一致は必要である。
 
 ## `solvers evaluate`
 
@@ -471,43 +253,36 @@ stack の一致も要求し、`--cross-game` がその検査だけを外す。�
 solvers evaluate <SOLUTION.mwsol> [--samples N] [--seed N] [--br-traversals N]
 ```
 
-`.mwsol` 専用。average profile を trained deviation 付きで再評価する。既定は
-`--samples 4096` / `--seed 1` / `--br-traversals 20000`。
-結果はstdoutへJSONで出力し、EHS² cacheのbuild/load通知はstderrへ出す。
-deviationの2候補を比較するCIは候補選択を考慮した近似区間で、選ばれた候補の
-`stderr`だけから再構築しない。Nash/exploitability保証ではない。
-同一sampleのbaselineとdeviator候補はphysical worldと行動乱数列を共有し、
-共通履歴での行動ノイズを揃えたpaired gainから標準誤差を計算する。
-評価JSONの`candidate_policy_coverage`はbaselineの判断訪問をseat/street別に数える。
-`average_strategy_visits`は正の平均質量、`current_strategy_visits`はcurrentの明示指定、
-`regret_fallback_visits`は平均質量0からの代替、`uniform_fallback_visits`は未保存column。
-`stored_strategy_visits`は前3者の合計である。各`*_by_street`がstreet内訳を持つ。
-`solve`/`resume`のprogressとrun summaryでは同じ値をcamelCaseの
-`seats[].candidatePolicyCoverage`として出力し、未評価時はnullとする。
-訪問されなかった深いbranchの品質やNash収束をこのcoverageだけから判断しない。
+P2の保存averageを再評価し、JSONをstdoutへ出す。既定はsamples 4096、seed 1、br-traversals 20000。
+baseline utility、deviation gain・CI、candidate_policy_coverageを報告する。
+coverageは判断訪問の内訳であり、unique infoset網羅率ではない。
+CIは有限候補の推定区間であり、Nash/exploitability保証ではない。
+現行writerはPostflop blockも保存しうるため、Preflop-only出力は未達である。
+完全stateの監査にはcheckpointを使う。[P2第3・6〜7節](mw-preflop.jp.md)を参照する。
 
-規範契約のPreflop-only exportには未解決の実装差分があり、現在のwriterは正の平均質量を
-持つPostflop blockも保存し得る。未訪問・平均質量0のpolicy、raw regret、量子化前の値は
-保存されないため、学習時の完全profileとは同等ではない。完全stateの評価にはcheckpointを使う。
+## 拒否と終了code
 
----
+schemaが無いconfig、未知schema、削除済みschemaは`NLH001`（exit 2）で拒否する。
+旧入力を埋め込んだ`.sol` / `.mwsol` / `.ckpt` / `.mwckpt`・run directoryは、
+resume・inspect（`--sol`を含む）・export・evaluate・compareの読込みでexit 3となる。
+診断は`removed config family ...`と削除済みfamily名を示し、
+`solvers.nlh/v1`から再solveするよう[共通Input規範](nlh-input-v1.jp.md)を案内する。
+`--cross-game`でもこの拒否を外せない。旧configの自動変換は無い。
+旧runのstatus・watch・runs lsは引き続き利用できる。
 
-## HU Postflop の実行・成果物に関する補足
+| code | 意味 |
+|---|---|
+| `0` | 成功。予算到達は品質目標達成を意味しない |
+| `1` | I/O等のその他の失敗 |
+| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005） |
+| `3` | 成果物の破損・非互換・削除済みconfig family |
+| `75` | memory・node等の資源上限 |
+| `130` | solve/resumeの協調停止 |
 
-`solve` / `resume` / live `inspect` / `report` は TOML の storage と並列設定を適用する。
-`report` は各 board ごとに `max_time` を判定する。`resume` は保存済み progress の
-経過時間を引き継ぎ、`solution.sol` と `run.json` も更新する。fork も同様である。
+Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する。
+2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
 
-`inspect` の `eq` は現在の board と両者の到達レンジを使う。`range` は root range、
-`ev` は run 全体の root summary である。ハンド別 EV は `export ... ev --node ...` を使う。
-EV は元の subgame 開始基準を維持し、chip-EV は chip、ICM は prize 単位。
-
-レーキまたは外部 field を含む ICM の一般和設定では `validate` は
-`general-sum utilities, no Nash convergence guarantee` と表示する。
-`.sol` の format version は開発中のため 1 に据え置く。EV 修正前の artifact の値は
-読み込み時に補正されないため、修正後の値は solve / resume で生成し直す。
-
-## `solversd`(job daemon)
+## `solversd`
 
 ```sh
 solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
@@ -516,57 +291,37 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 
 | flag | 既定 | 意味 |
 |---|---|---|
-| `--runs DIR` | `runs` | run directory を置く場所。daemon の状態はこれが全部である |
-| `--bind ADDR` | `127.0.0.1:38127` | bind 先。非 loopback は TLS 必須 |
-| `--tls-cert PEM` / `--tls-key PEM` | — | TLS 証明書チェーンと秘密鍵。両方セットで指定する |
-| `--solver PATH` | 隣の `solvers`、次に PATH 上の `solvers` | 起動する solver binary |
-| `--cache-dir DIR` | — | 全 run へ渡す machine cache |
-| `--max-concurrent N` | `1` | 同時実行数。multiway は sweep 0 前に数 GiB の arena を確保するので、律速は memory であり予算を知るのは運用者だけである |
-| `--token TOKEN` | `SOLVERSD_TOKEN`、無ければ起動時に生成して印字 | client が提示する bearer token |
+| `--runs DIR` | `runs` | run root。daemonの永続状態 |
+| `--bind ADDR` | `127.0.0.1:38127` | 非loopbackはTLS必須 |
+| `--tls-cert PEM` / `--tls-key PEM` | 無し | 証明書と秘密鍵。両方を指定 |
+| `--solver PATH` | 隣のsolvers、次にPATH | 子プロセスbinary |
+| `--cache-dir DIR` | 無し | 各runへ渡すmachine cache |
+| `--max-concurrent N` | `1` | 同時job数 |
+| `--token TOKEN` | 環境変数、次に生成値 | bearer token。起動時に表示 |
+| `-h` / `--help`、`-V` / `--version` | — | help / version |
 
-非 loopback アドレスに TLS 無しで bind することはできない。bearer token が平文で
-network を渡ってしまうからである。
+全endpointはbearer tokenを要求する。
 
-### HTTP API
-
-全 endpoint が bearer token を要求する。
-
-| method | path | 意味 |
+| method | path | 内容 |
 |---|---|---|
-| `POST` | `/v1/validate` | config TOML を検証し、effective config と summary を返す |
-| `GET` | `/v1/runs` | run 一覧 |
-| `POST` | `/v1/runs` | run を作成して job を投入する |
-| `GET` | `/v1/runs/{id}` | 1 run の summary |
-| `GET` | `/v1/runs/{id}/events` | `events.jsonl` |
-| `GET` | `/v1/runs/{id}/artifacts` | artifact 一覧 |
-| `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact 本体 |
-| `GET` | `/v1/runs/{id}/solution/{view}` | solution の view |
-| `POST` | `/v1/runs/{id}/cancel` | cancel |
-| `POST` | `/v1/runs/{id}/resume` | resume |
+| `GET` | `/v1` | protocol/CLI versionと同時実行数 |
+| `POST` | `/v1/validate` | configTomlをCLIで検証・正規化 |
+| `GET` / `POST` | `/v1/runs` | 一覧 / configTomlからjob投入 |
+| `GET` | `/v1/runs/{id}` | state・進捗summary |
+| `GET` | `/v1/runs/{id}/events?from=OFFSET` | event page。nextOffset・terminal付き |
+| `GET` | `/v1/runs/{id}/artifacts` | 契約上のartifact一覧 |
+| `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact本体 |
+| `GET` | `/v1/runs/{id}/solution/{view}` | P2の`.mwsol`をCLI exportで照会 |
+| `POST` | `/v1/runs/{id}/cancel` | 協調停止 |
+| `POST` | `/v1/runs/{id}/resume` | 再開 |
 
-daemon は投入された config を `solvers validate` に通してから run directory へ
-`run.toml` として書き、`solvers solve` を起動する。config 本文を渡すだけなので
-**family 非依存**である。
+daemonは計算せず、CLIへ委譲する。入力は同じ`solvers.nlh/v1`である。
+外部tree sourceなどのfile参照は`ConfigNotSelfContained`で拒否するため、
+`validate --write-effective`でinline化してからconfigTomlを送る。
+HTTP solution viewはP2のみ。P1はartifactを取得してCLIで照会する。
+HTTP契約とviewer境界は[app-architecture.md](app-architecture.md)を参照する。
 
-config が daemon の filesystem 上に無い file(multiway の mwtree `source` など)を
-参照していると、正規化が通らないので `ConfigNotSelfContained` で拒否する。daemon の
-filesystem に対して解決しようとはしない。その場合は effective config を投入する。
+## 同期
 
-## 同期規則
-
-flag、既定値、possible value、exit code、endpoint のいずれかを変更する場合は、
-同じ change set で次を同期する。
-
-1. この文書
-2. `crates/cli/src/lib.rs`(または `crates/daemon/src/main.rs`)の help 文字列
-3. 該当 family の規範仕様の記述
-4. `docs/user-guide.jp.md` の手順
-
-`crates/cli/src/config_new.rs` の `the_cli_reference_covers_every_command` が
-コマンド名と flag の網羅を機械的に検査する。
-
-### Tree 構築
-
-通常のMultiway new/resumeは既存の `run.resources.threads`（または `--threads` override）をTree構築にも適用する。
-1 threadは直列、複数threadは順序を維持して分割する。資源上限の事前確認は直列のまま、
-thread数変更によるsolver state/checkpointの互換性変更はない。
+flag・既定・値・exit code・endpointを変えるときは、規範・help・本書・利用ガイドを同時に更新する。
+`crates/cli/src/config_new.rs`は公開トークンの存在を検査する。意味の一致は契約testで確認する。

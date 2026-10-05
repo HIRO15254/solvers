@@ -9,7 +9,7 @@
 共通Input形式は[`solvers.nlh/v1`規範](nlh-input-v1.jp.md)を参照する。
 
 公開契約は[共通Input規範](nlh-input-v1.jp.md)、[P1規範](hu-postflop.jp.md)、[P2暫定規範](mw-preflop.jp.md)に従う。
-未接続の挙動は各規範の実装境界に記す。旧family規範はM7の削除まで旧familyコードだけに適用する。
+未対応の挙動は各規範の実装境界に記す。公開入力は`solvers.nlh/v1`だけである。
 
 ## 1. 利用者決定（2026-10-04）
 

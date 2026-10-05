@@ -489,7 +489,6 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
         flop: street(caps.flop)?,
         turn: street(caps.turn)?,
         river: street(caps.river)?,
-        rules: Vec::new(),
         nlh_rules: spot
             .tree
             .compiled

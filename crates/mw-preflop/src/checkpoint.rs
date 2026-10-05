@@ -1228,7 +1228,7 @@ mod tests {
             cumulative_solve_millis: 123_456,
         };
         let checkpoint = MultiwayCheckpoint::new(state(), [1; 32], [2; 32])
-            .with_runtime_metadata("schema = \"solvers.multiway-preflop/v1\"", runtime);
+            .with_runtime_metadata("schema = \"solvers.nlh/v1\"", runtime);
         checkpoint.write_atomic(&path).unwrap();
         let loaded = MultiwayCheckpoint::load(&path, [1; 32], [2; 32]).unwrap();
         assert_eq!(

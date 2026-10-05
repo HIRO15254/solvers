@@ -4,7 +4,7 @@
 
 本書は現在の `solvers` / `solversd`、run directory、HTTP protocol の境界と、その理由を記す。
 Web GUI は §8 の設計案であり、現行の実行体に含めない。
-公開オプションと family 別の対応は [CLI reference](cli-reference.jp.md)、config の正本は
+公開オプションと製品別の対応は [CLI reference](cli-reference.jp.md)、config の正本は
 [文書索引](README.md)に示す規範仕様、solver core は [architecture.md](architecture.md) を参照する。
 
 作業状態は Linear で管理し、管理先と運用は [status.jp.md](status.jp.md) を参照する。
@@ -85,16 +85,17 @@ TypeScript の wire 型生成は §8.4 の設計条件であり、現行の実�
 
 ### R6. production config は schema 必須、solve の出力は run directory
 
-公開 family は `solvers.multiway-preflop/v1` と `solvers.postflop/v1`。family は schema が決め、
-利用者が内部の `game.kind` を指定する方式ではない。削除した family(`solvers.toy/v1`、
-`solvers.preflop-hu/v1`)の schema は、ほかの未対応 schema と同じ unsupported schema エラーで拒否する。
+公開入力は`solvers.nlh/v1`だけであり、table・line・boardが製品を決める。
+schemaの省略・未知・削除済みfamilyは`NLH001`で拒否する。
+旧入力を埋め込んだ成果物の照会・再開はexit 3で拒否し、現行入力からの再solveを案内する。
+status・watch・runs lsは旧runの記録も読み、configSchema / gameKindを保持する。
 
 `solve --out` と `resume` が run directory の lifecycle を共有する。
-`--sol-streets` は保存範囲の選択であり、独立した出力先ではない。
+P1の保存範囲は`[output] solution_streets`で選ぶ。
 postflop は戦略と値を `solution.sol` に保存して `export` で読み、第二の JSON 出力や `--history` は持たない。
 詳細・override の可否は CLI reference と規範仕様へ置く。
 
-lowered config は内部 IR として残るが、schema なしの手書き lowered TOML を公開 family として
+lowered config は内部 IR として残るが、schema なしの手書き lowered TOML を公開入力として
 受理しない。既存構造体を使うことと、retired input を再び受け付けることを区別する。
 
 ### R7. remote は同じ daemon を別 host で動かす
@@ -127,7 +128,7 @@ pid/nonce を含む一時ファイルを書いて rename する。同じ内容�
 
 ### R10. remote へ送る config は self-contained
 
-受信 host の filesystem で `game.tree.source` を解決すると、同じ config が別ゲームを指し得る。
+受信 host の filesystem で `tree.source` を解決すると、同じ config が別ゲームを指し得る。
 local `validate --write-effective` は config file の directory を基準に script を解決し、
 本文を inline にして `params` を保持する。run の `run.toml` もこの effective config を使う。
 
@@ -153,7 +154,7 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 <runs-root>/<run-id>/
 ├── run.toml             # 実行した effective config
 ├── manifest.json        # identity / state。atomic replacement
-├── progress.jsonl       # family別の定期数値サンプル
+├── progress.jsonl       # 製品別の定期数値サンプル
 ├── events.jsonl         # state / notice / checkpoint / stop / failure。追記専用
 ├── run.json             # 結果サマリ
 ├── checkpoint.mwckpt    # Multiway の再開用 state
@@ -163,7 +164,7 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 └── stdout.log           # daemon が起動した child の stdout/stderr
 ```
 
-これは family 別のファイルをまとめた図であり、すべての run が全ファイルを生成するわけではない。
+これは製品別のファイルをまとめた図であり、すべての run が全ファイルを生成するわけではない。
 定数と DTO は [runfiles/src/run.rs](../crates/runfiles/src/run.rs)、lifecycle は
 [cli/src/run_dir.rs](../crates/cli/src/run_dir.rs) が所有する。
 進捗と event を分けることで、時系列 schema を保ち、読取り側に event の除外処理を要求しない。
@@ -202,7 +203,7 @@ reader は byte offset を保持し、未完了の最終行を次回へ残す。
 
 `config new` / `validate` が入力、`solve` / `resume` が計算、`status` / `watch` / `runs ls` が監視、
 `inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
-family によって対応する操作が異なるため、ここで共通対応を仮定しない。
+製品によって対応する操作が異なるため、ここで共通対応を仮定しない。
 全コマンド・引数は [cli-reference.jp.md](cli-reference.jp.md) を参照する。
 
 ## 7. daemon protocol
@@ -274,7 +275,7 @@ local/remote の計算コードパスを変えない。PyO3/WASM を UI 導入�
 
 ### 8.6 接続前に確認する条件
 
-対象 family の config/normalizer、query と保存契約、protocol 型生成、認証/TLS、
+共通Input・対象製品のconfig/normalizer、query と保存契約、protocol 型生成、認証/TLS、
 品質・未対応の表示を揃える。どの条件が完了したかは本書のチェックリストに複製せず、
 [status.jp.md](status.jp.md) から辿る Linear の課題と、対応する repository の受入証拠で確認する。
 GUI 全機能の完成を HU 検証や通常の教師生成の前提にしない。
@@ -284,12 +285,12 @@ GUI 全機能の完成を HU 検証や通常の教師生成の前提にしない
 Multiway production は current-street recall / dense arena を使い、full-recall の公開入力は拒否する。
 toy testもcurrent-street recall / dense arenaへ移植済みで、sparse storageのruntimeと
 研究featureは存在しない。full recallのenum・fingerprint・保存形式のidentityは旧artifactの
-静的読込みと明示拒否のために保持する。実装とtestの対応は
-[Multiway 実装 map](multiway-preflop-v1.md) を参照する。
+codecの読込みと明示拒否のために保持する。現行CLIは旧入力のartifactを照会しない。
+計算・成果物の境界は[P2暫定規範](mw-preflop.jp.md)を参照する。
 
 ## 10. 変更時の参照先
 
-- 公開 contract / default: family の規範仕様と [CLI reference](cli-reference.jp.md)。
+- 公開 contract / default: 共通Input・製品の規範仕様と [CLI reference](cli-reference.jp.md)。
 - 目標構成と移行手順: [再構築計画](plans/two-product-restructure.jp.md)。
 - 作業状態の管理先: [status.jp.md](status.jp.md) 経由の Linear。
 - 検証手順と受入証拠: [development.md](development.md)、[products.jp.md](products.jp.md) の品質節。

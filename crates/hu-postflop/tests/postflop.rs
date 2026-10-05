@@ -2039,8 +2039,7 @@ fn node_info_records_the_pot_contribution_at_each_node() {
     }
 }
 
-// --- Tree-script rule application (docs/solver-config-v1.jp.md's
-// 適用モデル chapter) -------------------------------------------------------
+// --- Internal tree-script rule application (public dialect: docs/nlh-input-v1.jp.md §9).
 
 #[test]
 fn tree_script_effect_add_appends_a_wager_candidate() {
@@ -2534,8 +2533,8 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
 /// always acts first), and a raise rule nested under a contradiction
 /// (`aggressions == 0 && aggressions == 1`) that can never be true -- the
 /// exact "never fires" shape a nested `when` can produce (see
-/// `examples/trees/pio.tree`'s comment on it, and this crate's own
-/// `docs/solver-config-v1.jp.md`). Turn has one rule, `Condition::Const(false)`,
+/// `docs/nlh-input-v1.jp.md`'s unused-rule warning definition).
+/// Turn has one rule, `Condition::Const(false)`,
 /// deliberately never true. Single-combo ranges disjoint from the board
 /// keep the build small enough to run without `#[ignore]`.
 fn rule_hits_fixture() -> PostflopConfig {

@@ -51,7 +51,7 @@ fn spec_p1_example_validate_text_json_effective_and_resources() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("flop.toml");
     // The exact §14 P1 example is the maintained source, not a hand-copied approximation.
-    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md").replace("\r\n", "\n");
     let example = spec
         .split("### P1: 6max")
         .nth(1)
@@ -270,19 +270,18 @@ fn rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("NLH002"));
     assert!(!out.exists());
     std::fs::write(&config, RIVER).unwrap();
-    for mode in ["full", "no-rivers"] {
-        let result = cli(&[
-            "solve",
-            text(&config),
-            "--out",
-            text(&out),
-            "--sol-streets",
-            mode,
-        ]);
-        assert_eq!(result.status.code(), Some(2));
-        assert!(String::from_utf8_lossy(&result.stderr).contains("solution_streets"));
-        assert!(!out.exists());
-    }
+    // The removed command-line flag is a usage error; `[output] solution_streets` replaces it.
+    let result = cli(&[
+        "solve",
+        text(&config),
+        "--out",
+        text(&out),
+        "--sol-streets",
+        "full",
+    ]);
+    assert_eq!(result.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&result.stderr).contains("--sol-streets"));
+    assert!(!out.exists());
     std::fs::write(
         &config,
         "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 5\n",

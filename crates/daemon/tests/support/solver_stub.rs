@@ -36,7 +36,7 @@ fn validate(args: &[std::ffi::OsString]) {
         .map(|pair| Path::new(&pair[1]))
         .expect("--write-effective path");
     std::fs::copy(config, effective).expect("write effective config");
-    println!(r#"{{"status":"valid","schema":"solvers.postflop/v1"}}"#);
+    println!(r#"{{"status":"valid","schema":"solvers.nlh/v1"}}"#);
 }
 
 fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
@@ -54,8 +54,8 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
         .to_string_lossy();
     let running = format!(
         concat!(
-            r#"{{"schemaVersion":1,"runId":"{}","state":"running","gameKind":"postflop","#,
-            r#""configSchema":"solvers.postflop/v1","configHash":"aa","cliVersion":"stub","#,
+            r#"{{"schemaVersion":1,"runId":"{}","state":"running","gameKind":"hu-postflop","#,
+            r#""configSchema":"solvers.nlh/v1","configHash":"aa","cliVersion":"stub","#,
             r#""command":["solve"],"pid":{},"createdUnixMs":{},"startedUnixMs":{},"#,
             r#""finishedUnixMs":null,"failure":null,"completion":null}}"#,
         ),
@@ -80,8 +80,8 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
 
     let completed = format!(
         concat!(
-            r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"postflop","#,
-            r#""configSchema":"solvers.postflop/v1","configHash":"aa","cliVersion":"stub","#,
+            r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"hu-postflop","#,
+            r#""configSchema":"solvers.nlh/v1","configHash":"aa","cliVersion":"stub","#,
             r#""command":["solve"],"pid":1,"createdUnixMs":{},"startedUnixMs":{},"#,
             r#""finishedUnixMs":{},"failure":null,"completion":"completed"}}"#,
         ),

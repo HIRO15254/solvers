@@ -316,7 +316,7 @@ fn live_straddles_preserve_order_raise_limp_and_postflop_bb() {
 }
 
 #[test]
-fn common_cbet_and_donk_follow_last_street_while_legacy_rules_keep_preflop() {
+fn common_cbet_and_donk_follow_the_preceding_street() {
     use nlh::betting::Move;
     let lowered = lower(&config(3, "[]", ""));
     let mut state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
@@ -372,15 +372,12 @@ fn common_cbet_and_donk_follow_last_street_while_legacy_rules_keep_preflop() {
             );
         }
     }
-    let legacy = mw_preflop::tree_rules::compile_script(
-        "river when cbet { remove check }",
-        &Default::default(),
-    )
-    .unwrap();
-    let mut betting = lowered.game.betting.clone();
-    betting.rules = legacy;
+    // A river cbet rule is unused after a checked turn: preceding-street
+    // aggression, rather than the original preflop raiser, controls cbet.
+    let raw = config(3, "[]", "river when cbet { remove check }");
+    let betting = lower(&raw).game.betting;
     state.apply(Action::Check, &betting).unwrap();
-    assert!(state.legal_actions(&betting).unwrap().is_empty());
+    assert_eq!(state.legal_actions(&betting).unwrap(), vec![Action::Check]);
 }
 
 #[test]

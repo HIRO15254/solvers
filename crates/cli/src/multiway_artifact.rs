@@ -12,32 +12,14 @@ use serde::Serialize;
 
 use crate::session;
 
-fn parse_solution_config(config_toml: &str) -> Result<crate::config::SolveConfig> {
-    let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
-    crate::config::parse_internal_config(&compatible)
+fn parse_solution_config(config_toml: &str) -> Result<mw_preflop::input::Lowered> {
+    crate::nlh_v1::require_artifact_config(config_toml)?;
+    Ok(crate::nlh_v1::p2::prepare(config_toml, Path::new("embedded.toml"))?.lowered)
 }
 
 fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession> {
-    let (compatible, _) = crate::config::solution_artifact_compatible_config(config_toml)?;
-    let config = crate::config::parse_internal_config(&compatible)?;
-    let crate::config::GameSection::PreflopMultiway(game) = &config.game else {
-        bail!("solution does not contain a Multiway Preflop game");
-    };
-    let retired = !matches!(
-        game.abstraction.kind,
-        mw_preflop::config::AbstractionKind::Ehs2Table
-    ) || !matches!(
-        game.abstraction.recall,
-        mw_preflop::config::RecallMode::Street
-    );
-    if retired {
-        bail!(
-            "MWP004: this historical artifact uses retired rollout/full-recall semantics; \
-             summary, tree, strategy, ranges, and recorded EV remain readable, but live \
-             re-evaluation and real-card comparison are no longer supported"
-        );
-    }
-    session::build_production_multiway_session(&compatible, None)
+    crate::nlh_v1::require_artifact_config(config_toml)?;
+    crate::nlh_v1::p2::build_session(config_toml, None)
 }
 fn key_hex(key: [u8; 16]) -> String {
     key.iter().map(|byte| format!("{byte:02x}")).collect()
@@ -52,6 +34,7 @@ fn read_solution(
     let mut reader = mw_preflop::mwsol::MwSolReader::open(path)
         .with_context(|| format!("opening {}", path.display()))?;
     let metadata = reader.metadata().clone();
+    crate::nlh_v1::require_artifact_config(&metadata.config_toml)?;
     let mut strategies = Vec::with_capacity(reader.strategy_count());
     let mut cursor = 0;
     while cursor < reader.strategy_count() {
@@ -186,9 +169,7 @@ fn range_matrix(
     target: [u8; 16],
 ) -> Result<Vec<serde_json::Value>> {
     let config = parse_solution_config(&metadata.config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = config.game else {
-        bail!("range inspection requires a Multiway Preflop solution");
-    };
+    let game = config.game;
     let mut ranges = game
         .seats
         .iter()
@@ -514,9 +495,7 @@ pub fn export(
 
 fn export_ranges_json(config_toml: &str) -> Result<String> {
     let config = parse_solution_config(config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = config.game else {
-        bail!("range export requires a Multiway Preflop solution");
-    };
+    let game = config.game;
     let rows: Vec<_> = game
         .seats
         .into_iter()
@@ -528,9 +507,7 @@ fn export_ranges_json(config_toml: &str) -> Result<String> {
 
 fn export_ranges_csv(config_toml: &str) -> Result<String> {
     let config = parse_solution_config(config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = config.game else {
-        bail!("range export requires a Multiway Preflop solution");
-    };
+    let game = config.game;
     let mut csv = String::from("seat,range\n");
     for (seat, value) in game.seats.into_iter().enumerate() {
         csv.push_str(&format!(
@@ -565,22 +542,17 @@ fn export_ev_csv(seats: &[mw_preflop::mwsol::MultiwaySeatResult]) -> String {
 
 fn comparison_mapping(config_toml: &str) -> Result<(usize, &'static str)> {
     let config = parse_solution_config(config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = &config.game else {
-        bail!("compare requires Multiway Preflop solutions");
-    };
+    let game = &config.game;
     let unit = match &config.utility {
-        crate::config::UtilitySection::ChipEv => "bb",
-        crate::config::UtilitySection::TournamentIcm { .. }
-        | crate::config::UtilitySection::Icm { .. } => "prize",
+        mw_preflop::UtilityConfig::ChipEv => "bb",
+        mw_preflop::UtilityConfig::TournamentIcm { .. } => "prize",
     };
     Ok((game.seats.len(), unit))
 }
 
 fn comparison_recall(config_toml: &str) -> Result<mw_preflop::RecallMode> {
     let config = parse_solution_config(config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = config.game else {
-        bail!("compare requires Multiway Preflop solutions");
-    };
+    let game = config.game;
     Ok(game.abstraction.recall)
 }
 
@@ -822,11 +794,6 @@ fn compare_shared_real_cards(
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
     let (left_meta, left_blocks) = read_solution(left_path)?;
     let (right_meta, right_blocks) = read_solution(right_path)?;
-    if crate::nlh_v1::has_schema(&left_meta.config_toml)?
-        != crate::nlh_v1::has_schema(&right_meta.config_toml)?
-    {
-        bail!("cannot compare solvers.nlh/v1 and old-family artifacts");
-    }
     let left_mapping = comparison_mapping(&left_meta.config_toml)?;
     let right_mapping = comparison_mapping(&right_meta.config_toml)?;
     let left_recall = comparison_recall(&left_meta.config_toml)?;
@@ -1062,9 +1029,7 @@ fn node_conditioned_evaluation(
     seed: u64,
 ) -> Result<serde_json::Value> {
     let mut config = parse_solution_config(&metadata.config_toml)?;
-    let crate::config::GameSection::PreflopMultiway(game) = &mut config.game else {
-        bail!("node EV requires a Multiway Preflop solution");
-    };
+    let game = &mut config.game;
     let mut ranges = game
         .seats
         .iter()
@@ -1121,16 +1086,9 @@ fn node_conditioned_evaluation(
     }
     let conditioned_seats = game.seats.clone();
     let session = || {
-        if crate::nlh_v1::has_schema(&metadata.config_toml)? {
-            let mut p =
-                crate::nlh_v1::p2::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
-            // Conditioning changes only the typed sampler ranges, never the input schema.
-            p.lowered.game.seats.clone_from(&conditioned_seats);
-            crate::nlh_v1::p2::build_typed_session(p.lowered, p.effective, None)
-        } else {
-            let conditioned_config = toml::to_string(&config)?;
-            build_solution_session(&conditioned_config)
-        }
+        let mut p = crate::nlh_v1::p2::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
+        p.lowered.game.seats.clone_from(&conditioned_seats);
+        crate::nlh_v1::p2::build_typed_session(p.lowered, p.effective, None)
     };
     evaluate_prepared(session, metadata, blocks, samples, seed, 0, false)
 }
@@ -1206,138 +1164,70 @@ fn inspect_ev(
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        ComparisonBasis, build_solution_session, comparison_recall, parse_solution_config,
-    };
-    use crate::session;
-    use mw_preflop::MultiwayAbstraction;
+    use super::*;
 
     #[test]
-    fn solution_reads_normalize_only_historical_full_recall_pruning() {
-        let v1 = format!(
-            "{}\n[game.information]\nrecall = \"bucket-history\"\n\
-             [solver.pruning]\nkind = \"regret-based\"\n",
-            crate::test_fixtures::V1_RETIRED_ROLLOUT
+    fn removed_artifact_families_are_refused_on_every_read_surface() {
+        let raw =
+            include_str!("../../mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
+        let mut session = session::build_multiway_session(raw, None).unwrap();
+        session.solver.run_sweeps_with_threads(1, 1).unwrap();
+        let snapshot = session.solver.snapshot_state();
+        let mut row = session::metrics_row(&session.solver.metrics(), vec![0.0; 3], 0.0, None);
+        row.phase = "completed".into();
+        let mut solution = session::make_solution(
+            &session.config_toml,
+            session.solver.abstraction_fingerprint(),
+            session.solver.configuration_fingerprint(),
+            session.solver.game(),
+            &snapshot,
+            &row,
         );
-        assert!(
-            crate::config::parse_solve_config(&v1).is_err(),
-            "new solve configs must reject the unsupported combination"
-        );
-        let (compatible, migrated) =
-            crate::config::solution_artifact_compatible_config(&v1).unwrap();
-        assert!(migrated);
-        let parsed = parse_solution_config(&compatible).unwrap();
-        let crate::config::AlgorithmSection::ExternalSamplingMccfr { prune, .. } = parsed.algorithm
-        else {
-            panic!()
-        };
-        assert!(!prune);
-
-        {
-            let Err(retired) = build_solution_session(&v1) else {
-                panic!("retired v1 artifact must not rebuild a live production backend");
-            };
-            let retired = retired.to_string();
-            assert!(retired.contains("MWP004"), "{retired}");
+        let dir = tempfile::tempdir().unwrap();
+        let current = dir.path().join("current.mwsol");
+        mw_preflop::mwsol::write_mwsol_with(
+            &current,
+            &solution,
+            mw_preflop::mwsol::MwsolStorage::F32,
+        )
+        .unwrap();
+        for family in ["solvers.multiway-preflop/v1", "solvers.postflop/v1"] {
+            solution.config_toml = format!("schema = '{family}'\n");
+            solution.config_fingerprint = runfiles::config_hash(solution.config_toml.as_bytes());
+            let old = dir.path().join("old.mwsol");
+            mw_preflop::mwsol::write_mwsol_with(
+                &old,
+                &solution,
+                mw_preflop::mwsol::MwsolStorage::F32,
+            )
+            .unwrap();
+            let mut outcomes = vec![
+                inspect(&old, "root", InspectView::Summary, None, 2, 1, 0),
+                evaluate(&old, 2, 1, 0),
+                compare(&old, &current, false),
+                compare(&current, &old, false),
+            ];
+            for view in [
+                ExportView::Summary,
+                ExportView::Tree,
+                ExportView::Strategy,
+                ExportView::Range,
+                ExportView::Actions,
+                ExportView::Ev,
+            ] {
+                outcomes.push(export(&old, view, ExportFormat::Json, None));
+            }
+            for result in outcomes {
+                let error = result.unwrap_err();
+                assert_eq!(crate::error_exit_code(&error), 3);
+                let message = format!("{error:#}");
+                assert!(message.contains(family), "{message}");
+                assert!(
+                    message.contains("re-solve from a solvers.nlh/v1 config"),
+                    "{message}"
+                );
+                assert!(message.contains("docs/nlh-input-v1.jp.md"), "{message}");
+            }
         }
-
-        let single_hand = v1.replace("kind = \"range-vector\"", "kind = \"single-hand\"");
-        let (_, migrated) =
-            crate::config::solution_artifact_compatible_config(&single_hand).unwrap();
-        assert!(
-            !migrated,
-            "an independently invalid single-hand combination must not be relaxed"
-        );
-
-        let current_street = v1.replace("bucket-history", "current-street");
-        let (_, migrated) =
-            crate::config::solution_artifact_compatible_config(&current_street).unwrap();
-        assert!(!migrated);
-
-        let legacy = crate::test_fixtures::lowered_3max_full_recall().replacen(
-            "discount_until = 10000000",
-            "discount_until = 10000000\ntraverser_vector = true\nprune = true",
-            1,
-        );
-        assert!(
-            session::build_multiway_session(&legacy, None).is_err(),
-            "the engine must reject new legacy configs with the no-op bit"
-        );
-        let (compatible, migrated) =
-            crate::config::solution_artifact_compatible_config(&legacy).unwrap();
-        assert!(migrated);
-
-        {
-            let Err(retired) = build_solution_session(&compatible) else {
-                panic!("retired legacy artifact must not rebuild a live production backend");
-            };
-            let retired = retired.to_string();
-            assert!(retired.contains("MWP004"), "{retired}");
-        }
-    }
-
-    #[test]
-    fn compare_routes_different_recall_fingerprints_through_real_cards() {
-        let bucket_history = crate::test_fixtures::lowered_3max_full_recall();
-        let current_street = crate::test_fixtures::LOWERED_3MAX.to_string();
-        assert_ne!(current_street, bucket_history);
-        assert_eq!(
-            comparison_recall(&bucket_history).unwrap(),
-            mw_preflop::RecallMode::Full
-        );
-        assert_eq!(
-            comparison_recall(&current_street).unwrap(),
-            mw_preflop::RecallMode::Street
-        );
-        assert_eq!(
-            comparison_recall(crate::test_fixtures::V1_RETIRED_ROLLOUT).unwrap(),
-            mw_preflop::RecallMode::Street,
-            "the v1 default must lower to current-street recall"
-        );
-
-        // Full recall has no solver left to build, so derive its fingerprint
-        // the same way a session would: from the backend plus the recall
-        // semantics. The current-street side still builds a real session, so
-        // the two stay comparable.
-        let current_street =
-            session::build_multiway_session(&current_street, None).expect("current-street session");
-        let current_street_fingerprint = current_street.solver.abstraction_fingerprint();
-        let backend_fingerprint = current_street.solver.game().abstraction().fingerprint();
-        let bucket_history_fingerprint = mw_preflop::abstraction_fingerprint_with_recall(
-            backend_fingerprint,
-            mw_preflop::RecallMode::Full,
-        );
-        assert_ne!(
-            bucket_history_fingerprint, current_street_fingerprint,
-            "recall semantics must be part of abstraction compatibility"
-        );
-        assert_eq!(
-            ComparisonBasis::for_artifacts(
-                bucket_history_fingerprint,
-                bucket_history_fingerprint,
-                mw_preflop::RecallMode::Full,
-                mw_preflop::RecallMode::Full,
-            ),
-            ComparisonBasis::BucketInfoset
-        );
-        assert_eq!(
-            ComparisonBasis::for_artifacts(
-                bucket_history_fingerprint,
-                current_street_fingerprint,
-                mw_preflop::RecallMode::Full,
-                mw_preflop::RecallMode::Street,
-            ),
-            ComparisonBasis::SharedRealCardSample
-        );
-        assert_eq!(
-            ComparisonBasis::for_artifacts(
-                bucket_history_fingerprint,
-                bucket_history_fingerprint,
-                mw_preflop::RecallMode::Full,
-                mw_preflop::RecallMode::Street,
-            ),
-            ComparisonBasis::SharedRealCardSample,
-            "legacy artifacts may share the backend fingerprint across recall modes"
-        );
     }
 }

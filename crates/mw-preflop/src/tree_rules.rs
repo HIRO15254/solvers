@@ -1,33 +1,8 @@
-//! Multiway's tree-rule condition dialect and evaluator.
-//!
-//! This is a thin adapter over `nlh::script`'s generic condition grammar
-//! (`Vars`, `Condition<V>`, `Dialect<V>`, `VarSource<V>`) -- the same front
-//! end postflop's `.tree` scripts use -- providing the fifteen variables
-//! multiway's `when` strings and `.mwtree` scripts read. `TreeRule::compiled`
-//! (`config.rs`) is what makes evaluation compile-once: a condition string
-//! is parsed here exactly once, the first time it is checked (in practice,
-//! at config validation, since `MultiwayConfig::validate` calls it on every
-//! rule up front), and cached from then on -- `matches` below never
-//! reparses a string per decision node the way the old flat scanner did.
-//!
-//! Reusing `nlh::script` also retires three bugs the old hand-rolled
-//! byte-position parser carried: it stripped comments with
-//! `line.split('#')`, so a `#` inside a string literal truncated the line;
-//! it cast `bytes[index] as char`, so a non-ASCII byte got mangled into
-//! latin-1 instead of erroring; and its effect grammar only recognized
-//! `checkdown` via a whole-body string equality check rather than a real
-//! grammar rule.
-
-use std::collections::BTreeMap;
-
-use nlh::script::{
-    ActionKind, Condition, Dialect, Script, ScriptError, Value, VarKind, VarSource, Vars,
-};
-use nlh::{SizeUnit, position_name};
-
+//! Common-input P2 rule evaluation over the shared betting state.
 use crate::betting::{BettingState, SeatStatus};
-use crate::config::{RuleStreet, TreeRule};
 use crate::types::SeatId;
+use nlh::position_name;
+use nlh::script::{ActionKind, Condition, Dialect, Value, VarSource};
 
 /// A common-input rule. The compiled condition is cached and never reparsed
 /// during tree construction. Its text, effect and sizes define game identity.
@@ -149,154 +124,6 @@ impl VarSource<spot::TreeVar> for NlhContext<'_> {
     fn value(&self, var: spot::TreeVar) -> Value {
         use spot::TreeVar::*;
         let (state, actor) = (self.state, self.actor);
-        let old = match var {
-            Position => MultiwayVar::Position,
-            InPosition => MultiwayVar::InPosition,
-            InPositionToLastAggressor => MultiwayVar::InPositionToLastAggressor,
-            LastPreflopAggressorPosition => MultiwayVar::LastPreflopAggressorPosition,
-            PreflopParticipant => MultiwayVar::PreflopParticipant,
-            OpenColdCalls => MultiwayVar::OpenColdCalls,
-            Players => MultiwayVar::Players,
-            Limpers => MultiwayVar::Limpers,
-            Flats => MultiwayVar::Flats,
-            Aggressions | Raises => MultiwayVar::Aggressions,
-            Unopened => MultiwayVar::Unopened,
-            Squeeze => MultiwayVar::Squeeze,
-            Spr => MultiwayVar::Spr,
-            Pot => return Value::Number(state.pot_size().as_bb()),
-            ToCall => return Value::Number(state.amount_to_call(actor).as_bb()),
-            FacingPct => {
-                return Value::Number(if state.pot_size().raw() == 0 {
-                    0.0
-                } else {
-                    state.amount_to_call(actor).raw() as f64 / state.pot_size().raw() as f64 * 100.0
-                });
-            }
-            Cbet | Donk => {
-                return Value::Bool(
-                    state.street != nlh::Street::Preflop
-                        && state.aggressive_actions == 0
-                        && state.previous_street_aggressor.is_some_and(|seat| {
-                            if var == Cbet {
-                                seat == actor
-                            } else {
-                                seat != actor
-                            }
-                        }),
-                );
-            }
-            _ => unreachable!("P2 rejects board variables before evaluation"),
-        };
-        (state, actor).value(old)
-    }
-}
-
-/// One named variable multiway's tree-rule conditions can read -- the same
-/// fifteen the old `context_value` resolved, ported onto `nlh::script`'s
-/// generic condition grammar.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum MultiwayVar {
-    Position,
-    InPosition,
-    InPositionToLastAggressor,
-    LastPreflopAggressorPosition,
-    PreflopParticipant,
-    OpenColdCalls,
-    Players,
-    Limpers,
-    Flats,
-    Aggressions,
-    Unopened,
-    Squeeze,
-    Cbet,
-    Donk,
-    Spr,
-}
-
-impl Vars for MultiwayVar {
-    fn name(self) -> &'static str {
-        use MultiwayVar::*;
-        match self {
-            Position => "position",
-            InPosition => "in_position",
-            InPositionToLastAggressor => "in_position_to_last_aggressor",
-            LastPreflopAggressorPosition => "last_preflop_aggressor_position",
-            PreflopParticipant => "preflop_participant",
-            OpenColdCalls => "open_cold_calls",
-            Players => "players",
-            Limpers => "limpers",
-            Flats => "flats",
-            Aggressions => "aggressions",
-            Unopened => "unopened",
-            Squeeze => "squeeze",
-            Cbet => "cbet",
-            Donk => "donk",
-            Spr => "spr",
-        }
-    }
-
-    fn kind(self) -> VarKind {
-        use MultiwayVar::*;
-        match self {
-            Position | LastPreflopAggressorPosition => VarKind::Text,
-            InPosition
-            | InPositionToLastAggressor
-            | PreflopParticipant
-            | Unopened
-            | Squeeze
-            | Cbet
-            | Donk => VarKind::Bool,
-            OpenColdCalls | Players | Limpers | Flats | Aggressions | Spr => VarKind::Number,
-        }
-    }
-}
-
-/// Every [`MultiwayVar`], in the order [`MULTIWAY`] exposes them.
-const ALL_MULTIWAY_VARS: &[MultiwayVar] = &[
-    MultiwayVar::Position,
-    MultiwayVar::InPosition,
-    MultiwayVar::InPositionToLastAggressor,
-    MultiwayVar::LastPreflopAggressorPosition,
-    MultiwayVar::PreflopParticipant,
-    MultiwayVar::OpenColdCalls,
-    MultiwayVar::Players,
-    MultiwayVar::Limpers,
-    MultiwayVar::Flats,
-    MultiwayVar::Aggressions,
-    MultiwayVar::Unopened,
-    MultiwayVar::Squeeze,
-    MultiwayVar::Cbet,
-    MultiwayVar::Donk,
-    MultiwayVar::Spr,
-];
-
-/// Multiway's tree-script dialect: every [`MultiwayVar`], all four streets
-/// (unlike postflop, multiway rules can fire preflop), every [`ActionKind`]
-/// (multiway rules do add/remove fold/check/call candidates, unlike
-/// postflop's), and big-blind-denominated sizes.
-pub(crate) static MULTIWAY: Dialect<MultiwayVar> = Dialect {
-    vars: ALL_MULTIWAY_VARS,
-    streets: &[
-        ("preflop", nlh::Street::Preflop),
-        ("flop", nlh::Street::Flop),
-        ("turn", nlh::Street::Turn),
-        ("river", nlh::Street::River),
-    ],
-    actions: &[
-        ActionKind::Fold,
-        ActionKind::Check,
-        ActionKind::Call,
-        ActionKind::Bet,
-        ActionKind::Raise,
-    ],
-    unit: SizeUnit::Bb,
-    size_parser: None,
-};
-
-impl VarSource<MultiwayVar> for (&BettingState, SeatId) {
-    fn value(&self, var: MultiwayVar) -> Value {
-        let (state, actor) = *self;
-        use MultiwayVar::*;
         match var {
             Position => Value::Text(position_name(actor, state.button, state.num_seats())),
             InPosition => Value::Bool(is_in_position(state, actor)),
@@ -309,98 +136,35 @@ impl VarSource<MultiwayVar> for (&BettingState, SeatId) {
             Players => Value::Number(state.non_folded_mask().len() as f64),
             Limpers => Value::Number(f64::from(state.preflop_limpers)),
             Flats => Value::Number(f64::from(state.preflop_flats)),
-            Aggressions => Value::Number(f64::from(state.aggressive_actions)),
+            Aggressions | Raises => Value::Number(f64::from(state.aggressive_actions)),
             Unopened => Value::Bool(state.aggressive_actions == 0),
             Squeeze => Value::Bool(
-                state.street == crate::types::Street::Preflop
+                state.street == nlh::Street::Preflop
                     && state.aggressive_actions > 0
                     && state.preflop_flats > 0,
             ),
-            Cbet => Value::Bool(
-                state.street != crate::types::Street::Preflop
-                    && state.aggressive_actions == 0
-                    && state.last_preflop_aggressor == Some(actor),
-            ),
-            Donk => Value::Bool(
-                state.street != crate::types::Street::Preflop
-                    && state.aggressive_actions == 0
-                    && state.last_preflop_aggressor.is_some()
-                    && state.last_preflop_aggressor != Some(actor),
-            ),
             Spr => Value::Number(spr(state, actor)),
+            Pot => Value::Number(state.pot_size().as_bb()),
+            ToCall => Value::Number(state.amount_to_call(actor).as_bb()),
+            FacingPct => Value::Number(if state.pot_size().raw() == 0 {
+                0.0
+            } else {
+                state.amount_to_call(actor).raw() as f64 / state.pot_size().raw() as f64 * 100.0
+            }),
+            Cbet | Donk => Value::Bool(
+                state.street != nlh::Street::Preflop
+                    && state.aggressive_actions == 0
+                    && state.previous_street_aggressor.is_some_and(|seat| {
+                        if var == Cbet {
+                            seat == actor
+                        } else {
+                            seat != actor
+                        }
+                    }),
+            ),
+            _ => unreachable!("P2 rejects board variables before evaluation"),
         }
     }
-}
-
-/// Compiles one multiway condition string (a `[[..rules]] when = "..."`
-/// value, or a rendered `.mwtree` rule condition -- see
-/// `crate::config::TreeRule::compiled`) against [`MULTIWAY`].
-pub(crate) fn compile(source: &str) -> Result<Condition<MultiwayVar>, ScriptError> {
-    Condition::parse(source, &MULTIWAY)
-}
-
-/// Compiles a whole `.mwtree` script against [`MULTIWAY`], applying
-/// `overrides` to any `param` it declares, and lowers the result straight to
-/// [`TreeRule`]s -- the same `nlh::script` front end (tokenizing,
-/// substitution, nesting, `if`/`else`, `param`/`define`) postflop's `.tree`
-/// scripts compile through, so this is the whole answer to "put multiway's
-/// tree script on the same front end as postflop's". This is the only
-/// caller of [`crate::config::TreeRule::from_compiled`]: each compiled
-/// rule's condition is installed into the returned `TreeRule` directly, not
-/// reparsed from `Display`-rendered text.
-///
-/// Every rule gets `priority` 100 (ties with every other script rule, so
-/// `Vec<TreeRule>`'s sort-by-`(priority, source_order)` is a no-op and
-/// source order -- the flattened script's own order -- decides, matching
-/// `nlh::script::Rule<V>`'s own "no priority field, source order is the
-/// whole model") and `source_order` set to its position in the flattened
-/// list, matching what the old flat scanner already did (it hardcoded the
-/// same 100 for the same reason).
-pub fn compile_script(
-    source: &str,
-    overrides: &BTreeMap<String, String>,
-) -> Result<Vec<TreeRule>, ScriptError> {
-    let script = Script::compile(source, overrides, &MULTIWAY)?;
-    Ok(script
-        .rules
-        .into_iter()
-        .enumerate()
-        .map(|(index, rule)| {
-            TreeRule::from_compiled(
-                100,
-                index as u32,
-                to_rule_street(rule.street),
-                rule.condition,
-                rule.effect,
-                rule.action,
-                rule.sizes,
-            )
-        })
-        .collect())
-}
-
-/// `nlh::Street` has no `Postflop` catch-all (only the typed `[[..rules]]`
-/// TOML surface's [`RuleStreet`] does, and `.mwtree` scripts dropped that
-/// keyword -- see the module docs on `MULTIWAY`), so every variant maps
-/// straight across.
-fn to_rule_street(street: nlh::Street) -> RuleStreet {
-    match street {
-        nlh::Street::Preflop => RuleStreet::Preflop,
-        nlh::Street::Flop => RuleStreet::Flop,
-        nlh::Street::Turn => RuleStreet::Turn,
-        nlh::Street::River => RuleStreet::River,
-    }
-}
-
-/// True when `rule` matches this decision node: its street gates first
-/// (cheap, and checked outside the compiled condition since [`RuleStreet`]'s
-/// `Postflop` catch-all has no equivalent single [`MultiwayVar`]), then its
-/// condition, read from [`TreeRule::compiled`]'s cache rather than reparsed.
-/// Infallible: every rule's condition was already compiled -- and would have
-/// been rejected -- when the owning config was validated, so there is
-/// nothing left to fail here (matching postflop's own `Condition::eval`).
-pub(crate) fn matches(rule: &TreeRule, state: &BettingState, actor: SeatId) -> bool {
-    rule.street.matches(state.street) && rule.compiled().eval(&(state, actor))
 }
 
 fn is_in_position(state: &BettingState, actor: SeatId) -> bool {
@@ -464,24 +228,27 @@ mod tests {
     use crate::betting::BettingMenu;
     use crate::config::{
         AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RuleAction,
-        RuleEffect, RuleStreet, SeatConfig,
+        RuleEffect, SeatConfig,
     };
 
     fn rule(
         condition: &str,
-        street: RuleStreet,
+        street: nlh::Street,
         effect: RuleEffect,
         action: RuleAction,
-    ) -> TreeRule {
-        TreeRule::new(
-            100,
-            0,
+    ) -> NlhTreeRule {
+        let rule = NlhTreeRule::from_compiled(nlh::script::Rule {
             street,
-            condition.to_string(),
+            condition: Condition::parse(condition, &spot::NLH_V1).unwrap(),
             effect,
-            Some(action),
-            Vec::new(),
-        )
+            action: Some(action),
+            sizes: Vec::new(),
+        });
+        rule.validate().unwrap();
+        rule
+    }
+    fn matches(rule: &NlhTreeRule, state: &BettingState, actor: SeatId) -> bool {
+        rule.matches(state, actor)
     }
 
     #[test]
@@ -505,14 +272,14 @@ mod tests {
         let state = BettingState::from_config(&config.validated().unwrap()).unwrap();
         let raise_rule = rule(
             "unopened && position in [\"UTG\", \"HJ\"] && players == 6 && spr > 1",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Replace,
             RuleAction::Raise,
         );
         assert!(matches(&raise_rule, &state, state.to_act.unwrap()));
         let squeeze_rule = rule(
             "!squeeze && flats == 0",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Replace,
             RuleAction::Raise,
         );
@@ -544,7 +311,7 @@ mod tests {
         state.last_preflop_aggressor = Some(SeatId(3));
         let in_position_rule = rule(
             "in_position_to_last_aggressor",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -553,7 +320,7 @@ mod tests {
         state.last_preflop_aggressor = Some(SeatId(0));
         let opener_position_rule = rule(
             "last_preflop_aggressor_position == \"BTN\"",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -561,7 +328,7 @@ mod tests {
         state.street = crate::types::Street::Flop;
         let postflop_opener_position_rule = rule(
             "last_preflop_aggressor_position == \"BTN\"",
-            RuleStreet::Postflop,
+            nlh::Street::Flop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -569,7 +336,7 @@ mod tests {
         state.last_preflop_aggressor = None;
         let unopened_position_rule = rule(
             "last_preflop_aggressor_position == \"\"",
-            RuleStreet::Postflop,
+            nlh::Street::Flop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -583,7 +350,7 @@ mod tests {
         state.street = crate::types::Street::Flop;
         let postflop_rule = rule(
             "in_position_to_last_aggressor",
-            RuleStreet::Postflop,
+            nlh::Street::Flop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -594,7 +361,7 @@ mod tests {
         state.preflop_open_cold_calls = 2;
         let participant_rule = rule(
             "preflop_participant && open_cold_calls == 2",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Remove,
             RuleAction::Call,
         );
@@ -602,7 +369,7 @@ mod tests {
 
         let participant_only_rule = rule(
             "preflop_participant",
-            RuleStreet::Preflop,
+            nlh::Street::Preflop,
             RuleEffect::Remove,
             RuleAction::Call,
         );

@@ -59,7 +59,7 @@ fn path(path: &Path) -> &str {
 fn spec_p1_example_human_output_is_readable_and_pinned() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("spec.toml");
-    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md").replace("\r\n", "\n");
     let example = spec
         .split("### P1: 6max")
         .nth(1)
@@ -185,25 +185,28 @@ fn exports_inspection_report_and_comparison_use_bb() {
     let bad = cli(&["report", path(&config), "--boards", "Ks7h2d"], "");
     assert_eq!(bad.status.code(), Some(2));
     assert!(bad.stdout.is_empty());
-    // Refuse units mixing even if --cross-game would otherwise permit the spot.
-    let old_config = temp.path().join("old.toml");
-    std::fs::write(&old_config, "schema='solvers.postflop/v1'\n[game]\nboard='Ks 7h 2d 3c 9s'\noop_range='JhJd,ThTd'\nip_range='AhAd,QhQd'\npot=10\neffective_stack=50\n[game.tree]\nkind='none'\n[run]\niterations=1\nthreads=1\n").unwrap();
-    let old_run = temp.path().join("old-run");
-    ok(&["solve", path(&old_config), "--out", path(&old_run)], "");
-    let mixed = cli(
-        &[
-            "compare",
-            path(&sol),
-            path(&old_run.join("solution.sol")),
-            "--cross-game",
-        ],
-        "",
-    );
-    assert!(!mixed.status.success());
-    assert!(
-        String::from_utf8_lossy(&mixed.stderr)
-            .contains("cannot compare solvers.nlh/v1 and old-family")
-    );
+    // An artifact with a retired embedded input is refused without reparsing it.
+    let old_sol = temp.path().join("old.sol");
+    let mut artifact = hu_postflop::sol::read_sol(&sol).unwrap();
+    artifact.config_toml = "schema = 'solvers.postflop/v1'\n".into();
+    hu_postflop::sol::write_sol(&old_sol, &artifact).unwrap();
+    for args in [
+        vec!["compare", path(&sol), path(&old_sol), "--cross-game"],
+        vec!["export", path(&old_sol), "summary"],
+        vec!["inspect", path(&old_sol), "--view", "summary"],
+        vec!["inspect", "--sol", path(&old_sol)],
+        vec!["evaluate", path(&old_sol)],
+    ] {
+        let refused = cli(&args, "");
+        let stderr = String::from_utf8_lossy(&refused.stderr);
+        assert_eq!(refused.status.code(), Some(3), "{args:?}: {stderr}");
+        assert!(
+            stderr.contains("solvers.postflop/v1")
+                && stderr.contains("solvers.nlh/v1")
+                && stderr.contains("docs/nlh-input-v1.jp.md"),
+            "{stderr}"
+        );
+    }
 }
 
 #[test]

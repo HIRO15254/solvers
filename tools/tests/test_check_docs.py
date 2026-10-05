@@ -88,6 +88,14 @@ class DocumentationTests(unittest.TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn("use docs/products.jp.md", errors[0])
 
+    def test_every_moved_path_reports_its_replacement(self):
+        for old, new in docs.MOVED_PATHS.items():
+            with self.subTest(old=old):
+                self.write("docs/README.md", f"See `{old}`.")
+                self.assertEqual(docs.check(self.root), [
+                    f"docs/README.md:1: moved path {old}; use {new}"
+                ])
+
     def test_historical_prose_is_allowed_but_its_broken_links_are_not(self):
         for name in ("docs/research/old-survey.md", "docs/decisions/old-decision.md"):
             with self.subTest(name=name):

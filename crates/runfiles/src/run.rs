@@ -369,8 +369,8 @@ mod tests {
     fn manifest() -> RunManifest {
         RunManifest::new(
             "run-1",
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             "abc123",
             vec!["solve".into(), "config.toml".into()],
         )

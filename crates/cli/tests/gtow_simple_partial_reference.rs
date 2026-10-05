@@ -1,7 +1,6 @@
 use mw_preflop::betting::BettingMenu;
 use std::path::{Path, PathBuf};
 
-use cli::config::GameSection;
 use mw_preflop::{Action, BettingConfig, BettingState, SeatId};
 
 #[derive(Debug, PartialEq, Eq)]
@@ -14,19 +13,16 @@ enum MenuAction {
 fn fixture_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
-        .join("examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml")
+        .join("examples/bench/6max_100bb_nl50_partial_simple_reference.toml")
 }
 
 fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
     let path = fixture_path();
     let raw = std::fs::read_to_string(&path).expect("reading Simple reference fixture");
-    cli::multiway_v1::validate_production_contract_at(&raw, &path)
-        .expect("validating the v1 production contract");
-    let lowered = cli::multiway_v1::parse_and_lower_at(&raw, &path)
-        .expect("lowering Simple reference fixture");
-    let GameSection::PreflopMultiway(game) = lowered.game else {
-        panic!("fixture must lower to the multiway game");
-    };
+    let doc = spot::Document::parse(&raw, &path).unwrap();
+    doc.normalize(&mw_preflop::input::P2Sections).unwrap();
+    let settings = mw_preflop::input::Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+    let game = mw_preflop::input::lower(&doc.spot, &settings).unwrap().game;
     let validated = game.validated().expect("validating Simple fixture");
     let state = BettingState::from_config(&validated).expect("building root betting state");
     (validated, state)
@@ -111,7 +107,13 @@ fn expected_menu(call: bool, raises: &[(u64, bool)]) -> Vec<MenuAction> {
 fn simple_fixture_has_requested_caps_buckets_and_five_unopened_menus() {
     let (config, root) = fixture();
     let betting = &config.betting;
-    assert!(!betting.allow_limp);
+    assert!(
+        betting
+            .nlh_rules
+            .iter()
+            .any(|rule| rule.action == Some(nlh::script::ActionKind::Call)
+                && rule.effect == nlh::script::Effect::Remove)
+    );
     assert_eq!(betting.preflop.max_aggressive_actions, 4);
     assert_eq!(betting.flop.max_aggressive_actions, 1);
     assert_eq!(betting.turn.max_aggressive_actions, 1);

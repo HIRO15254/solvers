@@ -11,8 +11,9 @@ use mw_preflop::solver::StrategyDriftTracker;
 use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwaySolver};
 use serde::Serialize;
 
-use crate::config::{GameSection, SolveConfig, StorageKind, UtilitySection};
 use crate::session;
+use mw_preflop::UtilityConfig;
+use mw_preflop::input::Lowered;
 
 const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。";
 const LIVE_OBSERVATION_PERIOD: Duration = Duration::from_secs(2);
@@ -20,7 +21,6 @@ const LIVE_OBSERVATION_PERIOD: Duration = Duration::from_secs(2);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 enum CompletionStatus {
-    Completed,
     ResourceLimit,
     #[serde(rename = "sweep-limit")]
     SweepLimit,
@@ -29,12 +29,6 @@ enum CompletionStatus {
     #[serde(rename = "time-limit")]
     TimeLimit,
     Cancelled,
-    /// The convergence stop rule (`run.stop_dev_gain`) fired: the maximum
-    /// per-seat held-out deviation-gain-lower-bound CI upper bound stayed
-    /// below the configured threshold for `run.stop_confirmations`
-    /// consecutive wall-clock-spaced evaluations. See
-    /// `crate::session::StopRule`.
-    Converged,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -173,7 +167,7 @@ pub enum MultiwayRunObservation {
 #[allow(clippy::too_many_arguments)]
 pub fn run(
     raw_config: &str,
-    config: SolveConfig,
+    config: Lowered,
     output: Option<&Path>,
     metrics_path: Option<&Path>,
     checkpoint_path: Option<&Path>,
@@ -202,7 +196,7 @@ pub fn run(
 #[allow(clippy::too_many_arguments)]
 pub fn run_observed(
     raw_config: &str,
-    config: SolveConfig,
+    config: Lowered,
     output: Option<&Path>,
     metrics_path: Option<&Path>,
     checkpoint_path: Option<&Path>,
@@ -231,7 +225,7 @@ pub fn run_observed(
 #[allow(clippy::too_many_arguments)]
 pub fn resume(
     raw_config: &str,
-    config: SolveConfig,
+    config: Lowered,
     output: Option<&Path>,
     metrics_path: Option<&Path>,
     checkpoint_path: &Path,
@@ -262,7 +256,7 @@ pub fn resume(
 #[allow(clippy::too_many_arguments)]
 pub fn resume_observed(
     raw_config: &str,
-    config: SolveConfig,
+    config: Lowered,
     output: Option<&Path>,
     metrics_path: Option<&Path>,
     checkpoint_path: &Path,
@@ -292,7 +286,7 @@ pub fn resume_observed(
 #[allow(clippy::too_many_arguments)]
 fn run_inner(
     raw_config: &str,
-    config: SolveConfig,
+    config: Lowered,
     output: Option<&Path>,
     metrics_path: Option<&Path>,
     checkpoint_path: Option<&Path>,
@@ -305,38 +299,26 @@ fn run_inner(
     mut observer: Option<&mut dyn FnMut(MultiwayRunObservation)>,
 ) -> Result<()> {
     validate_artifact_paths(output, metrics_path, checkpoint_path, mwsol_path)?;
-    if !matches!(config.game, GameSection::PreflopMultiway(_)) {
-        return Err(anyhow!(
-            "multiway solve path requires kind = \"preflop-multiway\""
-        ));
-    }
-    // Canonical v1 TOML is already materialized with all supported CLI
-    // overrides before this function is called. Keep it in that schema:
-    // lowering `discount.kind = "none"` deliberately uses `u64::MAX` in the
-    // runtime struct, which TOML cannot represent and therefore must not be
-    // round-tripped through the legacy shared schema. Historical research
-    // configs can still carry a legacy `--iterations` override in `config`,
-    // so only that path is re-serialized.
-    let is_nlh = crate::nlh_v1::has_schema(raw_config)?;
-    let effective_toml = if is_nlh || crate::multiway_v1::has_v1_schema(raw_config)? {
-        raw_config.to_owned()
-    } else {
-        toml::to_string(&config).context("re-serializing the effective multiway config")?
+    let effective_toml = raw_config.to_owned();
+    let run_settings = config.run.clone();
+    let output_settings = config.output.clone();
+    let utility_unit = match &config.utility {
+        UtilityConfig::ChipEv => "bb",
+        UtilityConfig::TournamentIcm { .. } => "prize",
     };
+    let algorithm = config.solver;
     #[cfg(not(test))]
     let mut mw_session =
-        session::build_production_multiway_session(&effective_toml, resume_checkpoint)?;
+        session::build_production_multiway_session(config, effective_toml, resume_checkpoint)?;
     #[cfg(test)]
-    let mut mw_session = session::build_multiway_session(&effective_toml, resume_checkpoint)?;
-    if is_nlh {
-        let hits = mw_session
-            .solver
-            .game()
-            .tree_rule_hits()
-            .expect("common-input tree measurement");
-        for warning in crate::nlh_v1::p2::warnings_for_hits(&mw_session.game_config, &hits) {
-            eprintln!("warning: {warning}");
-        }
+    let mut mw_session = session::build_test_session(config, effective_toml, resume_checkpoint)?;
+    let hits = mw_session
+        .solver
+        .game()
+        .tree_rule_hits()
+        .expect("common-input tree measurement");
+    for warning in crate::nlh_v1::p2::warnings_for_hits(&mw_session.game_config, &hits) {
+        eprintln!("warning: {warning}");
     }
     if let Some(ready) = mw_session.abstraction_ready
         && let Some(observer) = &mut observer
@@ -371,7 +353,7 @@ fn run_inner(
 
     // One sweep only yields `seats` parallel traversals, so the machine is
     // undersubscribed whenever `seats x sweep_batch < threads`. Purely a
-    // hint: changing `run.sweep_batch` changes results (see the sweep-batch
+    // hint: changing `solver.batch_sweeps` changes results (see the sweep-batch
     // docs), so it is never adjusted silently.
     if emit_progress {
         let seats = mw_session.game_config.seats.len().max(1) as u64;
@@ -379,8 +361,8 @@ fn run_inner(
         let threads = mw_session.threads as u64;
         if seats * sweep_batch < threads {
             eprintln!(
-                "hint: {seats} seats x run.sweep_batch {sweep_batch} = {} parallel traversals \
-                 < {threads} threads; run.sweep_batch = {} would use every core",
+                "hint: {seats} seats x solver.batch_sweeps {sweep_batch} = {} parallel traversals \
+                 < {threads} threads; solver.batch_sweeps = {} would use every core",
                 seats * sweep_batch,
                 threads.div_ceil(seats)
             );
@@ -402,44 +384,17 @@ fn run_inner(
         .strategy_drift_refresh_compact(&mut prior)
         .context("seeding multiway strategy drift")?;
     let mut last_row = MultiwayMetricsRow::sampling(mw_session.game_config.seats.len());
-    let is_v1 = is_nlh || crate::multiway_v1::has_v1_schema(raw_config).unwrap_or(false);
-    let nlh_run = is_nlh
-        .then(|| crate::nlh_v1::p2::prepare(raw_config, Path::new("run.toml")))
-        .transpose()?
-        .map(|p| p.lowered.run);
-    let checkpoint_interval = if let Some(run) = &nlh_run {
-        Some(Duration::try_from_secs_f64(
-            run.checkpoint_interval_seconds,
-        )?)
-    } else if is_v1 {
-        Some(Duration::from_secs(
-            crate::multiway_v1::checkpoint_interval_secs(raw_config)?,
-        ))
-    } else {
-        None
-    };
+    let checkpoint_interval = Some(Duration::try_from_secs_f64(
+        run_settings.checkpoint_interval_seconds,
+    )?);
     let mut last_checkpoint = Instant::now();
-    let mut status = if is_v1 {
-        CompletionStatus::SweepLimit
-    } else {
-        CompletionStatus::Completed
-    };
-    let max_time = if let Some(run) = &nlh_run {
-        run.max_time_seconds
-            .map(Duration::try_from_secs_f64)
-            .transpose()?
-    } else if is_v1 {
-        crate::multiway_v1::max_time_secs(raw_config)?.map(Duration::from_secs)
-    } else {
-        None
-    };
+    let mut status = CompletionStatus::SweepLimit;
+    let max_time = run_settings
+        .max_time_seconds
+        .map(Duration::try_from_secs_f64)
+        .transpose()?;
     let mut has_evaluation = false;
-    // Convergence stop rule (`run.stop_dev_gain`) state; see
-    // `session::StopRuleState` and the stop-rule block inside the drive loop
-    // below for why this check is wall-clock-driven rather than
-    // cadence-driven: with `stop_dev_gain` set, `sweeps_target` is a safety
-    // cap, not a target, so the sweep count a converged run actually stops
-    // at is machine-dependent (documented on `run.stop_dev_gain`).
+    // Restore the held-out evaluation sequence and consecutive confirmations.
     let mut stop_rule_state = session::StopRuleState::new(mw_session.evaluation_samples);
     let mut last_live_observation = Instant::now();
     let mut published_live_observation = false;
@@ -485,13 +440,8 @@ fn run_inner(
         let current = mw_session.solver.completed_sweeps();
         let evaluation_delta =
             session::distance_to_boundary(current, mw_session.evaluation_cadence);
-        let checkpoint_delta = mw_session
-            .checkpoint_every
-            .map(|cadence| session::distance_to_boundary(current, cadence))
-            .unwrap_or(u64::MAX);
         let chunk = (mw_session.sweeps_target - current)
             .min(evaluation_delta)
-            .min(checkpoint_delta)
             .max(1);
         let chunk_end = current
             .checked_add(chunk)
@@ -573,14 +523,9 @@ fn run_inner(
         }
 
         let sweeps_now = mw_session.solver.completed_sweeps();
-        // v1 evaluates the operational stop rule on deterministic sweep
-        // cadence. Legacy configs retain their documented wall-clock trigger.
-        let stop_check_due = mw_session.stop_rule.is_some_and(|stop_rule| {
-            (is_v1 && sweeps_now % mw_session.evaluation_cadence == 0)
-                || (!is_v1
-                    && stop_rule_state.last_eval.elapsed().as_secs_f64()
-                        >= stop_rule.eval_period_secs)
-        });
+        // Evaluate the operational stop rule on deterministic sweep cadence.
+        let stop_check_due = mw_session.stop_rule.is_some()
+            && sweeps_now.is_multiple_of(mw_session.evaluation_cadence);
         let regular_evaluation_due = regular_evaluation_due(
             sweeps_now,
             mw_session.evaluation_cadence,
@@ -633,11 +578,7 @@ fn run_inner(
             last_quality_observation_sweeps = Some(sweeps_now);
 
             if check.converged {
-                status = if is_v1 {
-                    CompletionStatus::TargetReached
-                } else {
-                    CompletionStatus::Converged
-                };
+                status = CompletionStatus::TargetReached;
                 stop_after_boundary = true;
             }
         } else if regular_evaluation_due {
@@ -681,10 +622,8 @@ fn run_inner(
             published_live_observation = true;
         }
 
-        let checkpoint_due = mw_session
-            .checkpoint_every
-            .is_some_and(|cadence| sweeps_now % cadence == 0)
-            || checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
+        let checkpoint_due =
+            checkpoint_interval.is_some_and(|interval| last_checkpoint.elapsed() >= interval);
         if let Some(path) = checkpoint_path
             && checkpoint_due
             && !stop_after_boundary
@@ -773,13 +712,11 @@ fn run_inner(
         );
     }
     last_row.phase = match status {
-        CompletionStatus::Completed => "completed",
         CompletionStatus::ResourceLimit => "resource_limit",
         CompletionStatus::SweepLimit => "sweep-limit",
         CompletionStatus::TargetReached => "target-reached",
         CompletionStatus::TimeLimit => "time-limit",
         CompletionStatus::Cancelled => "cancelled",
-        CompletionStatus::Converged => "converged",
     }
     .to_string();
     if last_quality_observation_sweeps != Some(last_row.sweeps) {
@@ -818,52 +755,19 @@ fn run_inner(
             &snapshot,
             &last_row,
         );
-        // `run.storage` selects the artifact encoding only; the live MCCFR
-        // state and `.mwckpt` checkpoints stay f32 regardless.
-        let artifact_storage = if is_nlh {
-            match crate::nlh_v1::p2::prepare(raw_config, Path::new("run.toml"))?
-                .lowered
-                .output
-                .probability_encoding
-            {
-                mw_preflop::input::ProbabilityEncoding::U16 => mw_preflop::mwsol::MwsolStorage::U16,
-                mw_preflop::input::ProbabilityEncoding::F32 => mw_preflop::mwsol::MwsolStorage::F32,
-            }
-        } else if is_v1 {
-            match crate::multiway_v1::probability_encoding(raw_config)? {
-                crate::multiway_v1::ProbabilityEncoding::U16 => {
-                    mw_preflop::mwsol::MwsolStorage::U16
-                }
-                crate::multiway_v1::ProbabilityEncoding::F32 => {
-                    mw_preflop::mwsol::MwsolStorage::F32
-                }
-            }
-        } else {
-            match mw_session.storage {
-                StorageKind::F32 => mw_preflop::mwsol::MwsolStorage::F32,
-                StorageKind::I16 => mw_preflop::mwsol::MwsolStorage::I16,
-            }
+        // Solution encoding is independent of live and checkpoint f32 storage.
+        let artifact_storage = match output_settings.probability_encoding {
+            mw_preflop::input::ProbabilityEncoding::U16 => mw_preflop::mwsol::MwsolStorage::U16,
+            mw_preflop::input::ProbabilityEncoding::F32 => mw_preflop::mwsol::MwsolStorage::F32,
         };
         mw_preflop::mwsol::write_mwsol_with(path, &solution, artifact_storage)
             .with_context(|| format!("writing {}", path.display()))?;
     }
     let elapsed = started.elapsed().as_secs_f64();
-    let effective = crate::config::parse_internal_config(raw_config)?;
-    let effective_config = if is_nlh {
-        serde_json::to_value(raw_config.parse::<toml::Value>()?)?
-    } else if is_v1 {
-        crate::multiway_v1::normalized_config(raw_config)?
-    } else {
-        serde_json::to_value(&effective)?
-    };
-    let utility_unit = match &effective.utility {
-        UtilitySection::ChipEv => "bb",
-        UtilitySection::TournamentIcm { .. } | UtilitySection::Icm { .. } => "prize",
-    };
+    let effective_config = serde_json::to_value(raw_config.parse::<toml::Value>()?)?;
     let game_fingerprint = runfiles::config_hash_hex(&mw_session.solver.game().game_fingerprint());
-    let algorithm_fingerprint = runfiles::config_hash_hex(
-        &session::multiway_algorithm_fingerprint(&effective.algorithm)?,
-    );
+    let algorithm_fingerprint =
+        runfiles::config_hash_hex(&session::multiway_algorithm_fingerprint(&algorithm)?);
     let abstraction_fingerprint =
         runfiles::config_hash_hex(&mw_session.solver.abstraction_fingerprint());
     let configuration_fingerprint =
@@ -873,8 +777,8 @@ fn run_inner(
     let result = ResultV2 {
         schema_version: MULTIWAY_SCHEMA_VERSION,
         kind: "preflop-multiway",
-        game_kind: is_nlh.then_some("mw-preflop"),
-        config_schema: is_nlh.then_some(crate::nlh_v1::SCHEMA),
+        game_kind: Some("mw-preflop"),
+        config_schema: Some(crate::nlh_v1::SCHEMA),
         status,
         approximate_profile: true,
         approximation_notice: APPROXIMATION_NOTICE,
@@ -1217,205 +1121,6 @@ mod tests {
     }
 
     #[test]
-    fn multiway_example_parses_the_public_contract() {
-        let raw = crate::test_fixtures::LOWERED_9MAX_ICM;
-        let parsed: SolveConfig = toml::from_str(raw).unwrap();
-        assert!(matches!(parsed.game, GameSection::PreflopMultiway(_)));
-    }
-
-    /// Splices `stop_dev_gain`/`stop_confirmations`/`stop_eval_period_secs`
-    /// into the 3-max smoke config's `[run]` table (right after its last
-    /// key) and overrides `sweeps` to `cap`, so the stop rule's cap acts as
-    /// a safety net rather than the actual target.
-    fn smoke_with_stop_rule(cap: u64, extra_stop_keys: &str) -> String {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let with_cap = raw.replacen("sweeps = 2\n", &format!("sweeps = {cap}\n"), 1);
-        assert_ne!(with_cap, raw, "the sweeps anchor must have matched");
-        let spliced = with_cap.replacen(
-            "evaluation_cadence = 1\n",
-            &format!("evaluation_cadence = 1\n{extra_stop_keys}"),
-            1,
-        );
-        assert_ne!(
-            spliced, with_cap,
-            "the run-section anchor must have matched"
-        );
-        spliced
-    }
-
-    fn run_to_json(raw: &str, config: SolveConfig) -> serde_json::Value {
-        let config_hash = runfiles::config_hash(raw.as_bytes());
-        let dir = tempfile::tempdir().unwrap();
-        let output = dir.path().join("result.json");
-        run(
-            raw,
-            config,
-            Some(&output),
-            None,
-            None,
-            config_hash,
-            None,
-            None,
-            false,
-        )
-        .expect("multiway run should succeed");
-        serde_json::from_str(&std::fs::read_to_string(&output).unwrap())
-            .expect("result output must be valid JSON")
-    }
-
-    fn run_to_json_observed(
-        raw: &str,
-        config: SolveConfig,
-    ) -> (serde_json::Value, Vec<(String, u64)>) {
-        let config_hash = runfiles::config_hash(raw.as_bytes());
-        let dir = tempfile::tempdir().unwrap();
-        let output = dir.path().join("result.json");
-        let mut observations = Vec::new();
-        run_observed(
-            raw,
-            config,
-            Some(&output),
-            None,
-            None,
-            config_hash,
-            None,
-            None,
-            false,
-            &mut |observation| match observation {
-                MultiwayRunObservation::Live(observation) => {
-                    observations.push(("live".into(), observation.sweeps));
-                }
-                MultiwayRunObservation::Quality(observation) => {
-                    observations.push(("quality".into(), observation.metrics.sweeps));
-                }
-                MultiwayRunObservation::Abstraction(observation) => {
-                    observations.push(("abstraction".into(), observation.cached as u64));
-                }
-                MultiwayRunObservation::Checkpoint(observation) => {
-                    observations.push(("checkpoint".into(), observation.sweeps));
-                }
-                MultiwayRunObservation::Stop(observation) => {
-                    observations.push((format!("stop:{}", observation.reason), observation.sweeps));
-                }
-            },
-        )
-        .expect("observed multiway run should succeed");
-        let result = serde_json::from_str(&std::fs::read_to_string(&output).unwrap())
-            .expect("result output must be valid JSON");
-        (result, observations)
-    }
-
-    /// A very lax threshold (1000 bb, far above anything a 2bb-effective-stack
-    /// smoke table could ever produce) with a single required confirmation
-    /// and a near-zero wall-clock evaluation period must converge on the
-    /// very first stop-rule evaluation, stopping well short of the (high)
-    /// sweep cap with status `"converged"`.
-    #[test]
-    fn stop_dev_gain_converges_before_the_sweep_cap_with_a_lax_threshold() {
-        // 50 best-response training traversals per seat is small enough to keep
-        // the test fast while genuinely exercising the training +
-        // evaluate_profile path.
-        let raw = smoke_with_stop_rule(
-            100_000,
-            "stop_dev_gain = 1000.0\nstop_confirmations = 1\nstop_eval_period_secs = 0.01\n\
-             stop_br_traversals = 50\n",
-        );
-        let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
-        let (result, observations) = run_to_json_observed(&raw, config);
-        assert_eq!(result["status"], "converged");
-        let sweeps = result["sweeps"].as_u64().unwrap();
-        assert!(
-            sweeps < 100_000,
-            "expected an early stop, got {sweeps} sweeps"
-        );
-        let quality_at_stop = observations
-            .iter()
-            .filter(|(kind, observation_sweeps)| kind == "quality" && *observation_sweeps == sweeps)
-            .count();
-        assert_eq!(
-            quality_at_stop, 1,
-            "the stop boundary must publish only the post-deviator quality observation"
-        );
-    }
-
-    /// The packaged 3-max smoke fixture, unmodified, is a degenerate
-    /// fold/shove-only preflop tree (2bb stacks, `bet_sizes`/`raise_sizes`
-    /// emptied out on every street): its regret-greedy deviation collapses
-    /// onto the average strategy almost immediately, so its real
-    /// deviation-gain estimate reaches even an astronomically tight
-    /// threshold within a handful of sweeps -- too easy a target to exercise
-    /// "the threshold is unreachable". This restores real preflop bet/raise
-    /// sizing (a bigger, 20bb stack and the crate's normal default preflop
-    /// sizes) while keeping every postflop street exactly as
-    /// check-down-only as the smoke fixture (so the tree, and therefore the
-    /// test, stays fast): a real held-out deviation-gain upper bound on this
-    /// richer preflop tree stays in the several-bb range for many sweeps
-    /// (measured 5-16 bb at 20 sweeps across 8-128 evaluation samples).
-    fn smoke_with_richer_preflop_and_stop_rule(
-        cap: u64,
-        stop_dev_gain: f64,
-        stop_confirmations: u32,
-    ) -> String {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let raw = raw.replace("stack_bb = 2.0", "stack_bb = 20.0");
-        let raw = raw.replacen(
-            "[game.betting.preflop]\nbet_sizes = []\nraise_sizes = []\nmax_aggressive_actions = 1\ninclude_allin = true\n",
-            "[game.betting.preflop]\nbet_sizes = [{ kind = \"to-bb\", value = 2.5 }]\nraise_sizes = [{ kind = \"previous-bet-multiple\", factor = 3.0 }]\nmax_aggressive_actions = 4\ninclude_allin = true\n",
-            1,
-        );
-        let with_cap = raw.replacen("sweeps = 2\n", &format!("sweeps = {cap}\n"), 1);
-        assert_ne!(with_cap, raw, "the sweeps anchor must have matched");
-        let spliced = with_cap.replacen(
-            "evaluation_cadence = 1\n",
-            &format!(
-                "evaluation_cadence = 1\nstop_dev_gain = {stop_dev_gain}\nstop_confirmations = {stop_confirmations}\nstop_eval_period_secs = 0.01\n"
-            ),
-            1,
-        );
-        assert_ne!(
-            spliced, with_cap,
-            "the run-section anchor must have matched"
-        );
-        spliced
-    }
-
-    /// Validation forbids a literal zero threshold, and an astronomically
-    /// tight one (e.g. `1e-9`) is unreachable for the *wrong* reason in an
-    /// automated test: the adaptive sample-doubling rule (see the drive
-    /// loop in `run_inner`) keeps doubling the evaluation sample count
-    /// whenever the CI is too wide to ever settle below the threshold,
-    /// which for `1e-9` runs all the way to the `65_536`-sample cap and
-    /// repeats at that cost every period -- correct behavior, but far too
-    /// slow for a unit test.
-    ///
-    /// Rather than lean on a fragile numeric threshold (a 20-sweep MCCFR
-    /// run's exact deviation-gain estimate depends on sampling noise that
-    /// can occasionally dip under even a several-bb threshold), this makes
-    /// "unreachable" *structural*: `stop_confirmations` is set higher than
-    /// the sweep cap itself, so no sequence of per-sweep stop-rule
-    /// evaluations (at most one per sweep, since `evaluation_cadence = 1`)
-    /// could possibly accumulate enough *consecutive* passes to reach it,
-    /// regardless of what any individual evaluation reports. The run must
-    /// therefore exhaust its (small) sweep cap with status `"completed"`.
-    #[test]
-    fn stop_dev_gain_runs_to_the_cap_when_the_threshold_is_unreachable() {
-        let cap = 20;
-        let raw = smoke_with_richer_preflop_and_stop_rule(cap, 2.0, cap as u32 + 5);
-        let config: SolveConfig = toml::from_str(&raw).expect("parse spliced config");
-        let result = run_to_json(&raw, config);
-        assert_eq!(result["status"], "completed");
-        assert_eq!(result["sweeps"].as_u64().unwrap(), cap);
-    }
-
-    #[test]
-    fn three_player_smoke_contract_parses() {
-        let raw = crate::test_fixtures::LOWERED_3MAX;
-        let parsed: SolveConfig = toml::from_str(raw).unwrap();
-        assert!(matches!(parsed.game, GameSection::PreflopMultiway(_)));
-        assert_eq!(parsed.run.sweeps, Some(2));
-    }
-
-    #[test]
     fn implicit_checkpoint_is_reserved_for_resource_limits() {
         let dir = tempfile::tempdir().unwrap();
         let output = dir.path().join("profile.json");
@@ -1429,11 +1134,11 @@ mod tests {
             final_checkpoint_path(CompletionStatus::ResourceLimit, None, None).as_deref(),
             Some(Path::new("multiway-resource-limit.mwckpt"))
         );
-        assert!(final_checkpoint_path(CompletionStatus::Completed, None, Some(&output)).is_none());
+        assert!(final_checkpoint_path(CompletionStatus::SweepLimit, None, Some(&output)).is_none());
         assert!(final_checkpoint_path(CompletionStatus::Cancelled, None, Some(&output)).is_none());
         let explicit = dir.path().join("explicit.mwckpt");
         assert_eq!(
-            final_checkpoint_path(CompletionStatus::Completed, Some(&explicit), Some(&output))
+            final_checkpoint_path(CompletionStatus::SweepLimit, Some(&explicit), Some(&output))
                 .as_deref(),
             Some(explicit.as_path())
         );
@@ -1499,5 +1204,44 @@ mod tests {
 
         let output = dir.path().join("result.mwckpt");
         assert!(validate_artifact_paths(Some(&output), None, None, None).is_err());
+    }
+    #[test]
+    fn typed_stop_rule_distinguishes_target_reached_from_sweep_limit() {
+        let smoke =
+            include_str!("../../mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
+        for (confirmations, expected_sweeps, expected_status) in
+            [(1, 1, "target-reached"), (5, 2, "sweep-limit")]
+        {
+            let raw = smoke.replace(
+                "confirmations = 1",
+                &format!("confirmations = {confirmations}"),
+            );
+            let p = crate::nlh_v1::p2::prepare(&raw, Path::new("smoke.toml")).unwrap();
+            let directory = tempfile::tempdir().unwrap();
+            let output = directory.path().join("result.json");
+            let mut quality = Vec::new();
+            run_observed(
+                &p.effective,
+                p.lowered,
+                Some(&output),
+                None,
+                None,
+                runfiles::config_hash(p.effective.as_bytes()),
+                None,
+                None,
+                false,
+                &mut |observation| {
+                    if let MultiwayRunObservation::Quality(o) = observation {
+                        quality.push(o.metrics.sweeps);
+                    }
+                },
+            )
+            .unwrap();
+            let result: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(output).unwrap()).unwrap();
+            assert_eq!(result["status"], expected_status);
+            assert_eq!(result["sweeps"], expected_sweeps);
+            assert_eq!(quality.iter().filter(|s| **s == expected_sweeps).count(), 1);
+        }
     }
 }

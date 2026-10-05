@@ -1,10 +1,9 @@
 # solvers
 
-A research-oriented poker solver in Rust. It supports **Heads-Up No-Limit
-Texas Hold'em** through the exact vector engine and a separate sampled
-**2–9 player preflop/full-street** path. The heads-up solver is built around a vector-form
-(range-vs-range) CFR engine with extensibility seams for other variants,
-solving algorithms, rake models, ICM/payout structures, and strategy viewers.
+Two No-Limit Hold'em solvers in Rust share the `solvers.nlh/v1` input:
+**HU Postflop** (P1, exact vector CFR) and **2–9 player Multiway Preflop**
+(P2, provisional sampled MCCFR). P2 traverses postflop to estimate terminal
+utility; it does not accept multiway postflop starting spots.
 For three or more players, results are regret-minimized approximations rather than certified Nash/GTO solutions.
 
 ## Status
@@ -15,10 +14,9 @@ the flop) and the **NLH Multiway Preflop Solver** (sampled MCCFR for 2–9 seat
 preflop). The [product definition](docs/products.jp.md) states their scope and
 quality, and the [restructure plan](docs/plans/two-product-restructure.jp.md)
 the target architecture and migration steps. The commands below describe the
-current code, which still reads the v1 config families until the new input
-format replaces them. The out-of-scope `solvers.toy/v1` and
-`solvers.preflop-hu/v1` families are gone: their configs fail as an
-unsupported schema. The pre-restructure state is the git tag
+current v1-only CLI. Other or missing schemas fail with `NLH001`.
+Artifacts embedding removed inputs are refused; re-solve from a current
+config. `status`, `watch`, and `runs ls` still read old run directories. The pre-restructure state is the git tag
 `archive/pre-two-products-2026-10-04`. Task state is managed in Linear; see
 [status and task management](docs/status.jp.md).
 
@@ -32,8 +30,7 @@ unsupported schema. The pre-restructure state is the git tag
 - [docs/hu-postflop.jp.md](docs/hu-postflop.jp.md) — P1 computation and artifacts
 - [docs/mw-preflop.jp.md](docs/mw-preflop.jp.md) — provisional P2 method and artifacts
 - [docs/user-guide.jp.md](docs/user-guide.jp.md) — CLI usage and operational interpretation
-- [docs/solver-config-v1.jp.md](docs/solver-config-v1.jp.md) — normative Postflop config contract
-- [docs/multiway-preflop-v1.jp.md](docs/multiway-preflop-v1.jp.md) — normative Multiway Preflop v1 contract and complete TOML reference
+- [docs/cli-reference.jp.md](docs/cli-reference.jp.md) — commands, flags, exit codes, daemon API
 - [docs/architecture.md](docs/architecture.md) — solver, workspace, and CLI architecture
 - [docs/app-architecture.md](docs/app-architecture.md) — current CLI/daemon boundaries and proposed Web GUI
 - [docs/development.md](docs/development.md) — setup, tests, benchmarks, and change workflow
@@ -41,8 +38,8 @@ unsupported schema. The pre-restructure state is the git tag
 
 ## Workspace layout
 
-The project has 10 Rust workspace crates. The `solvers` CLI selects the
-config family through its `schema`, runs the solver, and writes a run directory.
+The project has 11 Rust workspace crates. The `solvers` CLI parses the
+shared input, selects the product from the spot, and writes a run directory.
 `solversd` manages CLI child processes locally or remotely. The exact HU
 postflop path can start on the flop, turn, or river; the sampled Multiway
 Preflop path is a separate engine. A Web GUI remains a proposed client of
@@ -57,6 +54,7 @@ crates/
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── nlh         # card/range/evaluator, shared 2–9 seat NLH rules and settlement, sizing, tree-script, suit isomorphism
 ├── economics   # shared rake, exact/sampled ICM, utility config and validation
+├── spot        # shared input parser, normalization, line replay, product selection
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
 ├── mw-preflop  # P2 menu policy + external-sampling MCCFR + EHS² buckets + .mwsol + metrics
@@ -68,30 +66,32 @@ Current specifications and architecture live in `docs/`; actionable plans in
 `docs/plans/`; reusable helpers and their tests in `tools/`; accepted experiment
 evidence in `experiments/`. New solver runs belong in ignored `runs/`, machine
 caches in ignored cache directories, and Cargo output in `target/`.
-Examples are runnable inputs; regression fixtures are retained with their tests.
+User inputs are indexed in [examples/README.md](examples/README.md); performance
+workloads live in `examples/bench/`, and regression fixtures with their tests.
 
 ## Quick start
 
-Every config declares the family it belongs to: `solvers.postflop/v1` or
-`solvers.multiway-preflop/v1`. Every solve writes one run directory.
+Every config declares `schema = "solvers.nlh/v1"`. Every solve writes one
+run directory. Create a template with `solvers config new --product p1|p2
+--template minimal|full`, or copy a user example.
 
 ```sh
 cargo test --workspace            # correctness harness (Kuhn/Leduc known solutions, oracle diff)
-cargo run -p cli --release -- solve examples/river_small.toml --out runs/river-small
+cargo run -p cli --release -- solve examples/hu-postflop/river_small.toml --out runs/river-small
 
 # --- Preflop ---------------------------------------------------------------
 # Multiway Preflop v1: validate, then write one self-contained run directory.
-cargo run -p cli --release -- validate examples/preflop_multiway_v1_3max_smoke.toml
-cargo run -p cli --release -- solve examples/preflop_multiway_v1_3max_smoke.toml \
+cargo run -p cli --release -- validate examples/mw-preflop/3max_smoke.toml
+cargo run -p cli --release -- solve examples/mw-preflop/3max_smoke.toml \
     --out runs/v1-smoke
 
 # Abstraction tables are cached per machine, not per run: the first solve
 # builds them, later ones load compatible cached tables.
 cargo run -p cli --release -- --cache-dir ~/.cache/solvers \
-    solve examples/preflop_multiway_v1_3max_smoke.toml --out runs/v1-cached
+    solve examples/mw-preflop/3max_smoke.toml --out runs/v1-cached
 
 # Size the public tree and policy arena before committing to a long run:
-cargo run -p cli --release -- validate examples/preflop_multiway_v1_default.toml \
+cargo run -p cli --release -- validate examples/mw-preflop/6max_100bb_cash.toml \
     --resources
 
 # Attach to a run from any other process, at any time: a run directory is the
@@ -104,11 +104,11 @@ cargo run -p cli --release -- resume runs/v1-smoke
 
 # --- Postflop --------------------------------------------------------------
 # Exact postflop solve (prints a memory estimate before building the tree):
-cargo run -p cli --release -- solve examples/postflop_srp20.toml --out runs/srp20
+cargo run -p cli --release -- solve examples/hu-postflop/flop_srp.toml --out runs/srp20
 
 # Interactive strategy browser: solve, then explore nodes with 13x13
 # ANSI grids (`show`, `go <action>`, `grid <action>`, `eq`, `combos AKs`, ...):
-cargo run -p cli --release -- inspect examples/river_small.toml
+cargo run -p cli --release -- inspect examples/hu-postflop/river_small.toml
 
 # Machine-readable views over the solved artifact (summary / tree / actions /
 # strategy / ev / range; `--node all` covers every stored node):
@@ -119,7 +119,7 @@ cargo run -p cli --release -- export runs/srp20/solution.sol ev \
 cargo run -p cli --release -- compare runs/a/solution.sol runs/b/solution.sol
 
 # Aggregate CSV across boards (frequencies, EVs, equity per board):
-cargo run -p cli --release -- report examples/river_small.toml \
+cargo run -p cli --release -- report examples/hu-postflop/river_small.toml \
     --boards "2c 7d 9h Js Qs,2c 7d 9h Js Ks" --output report.csv
 ```
 

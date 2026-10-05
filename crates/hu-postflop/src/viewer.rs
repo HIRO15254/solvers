@@ -344,7 +344,7 @@ pub fn river_entry_state(
 ///
 /// `preflop_aggressor: entry.previous_aggressor` is **not** moot, unlike the
 /// paragraph this replaces used to claim: once a street's rules can branch
-/// on `cbet`/`donk` (`docs/solver-config-v1.jp.md`'s 文 — action list の書き換え
+/// on `cbet`/`donk` (`docs/nlh-input-v1.jp.md`'s effectと合法性
 /// chapter), a fresh river subgame that always seeded `previous_aggressor:
 /// None` would offer a *different* menu than the same node has in the
 /// trunk — wrong whenever the trunk's turn was bet or raised into. Carrying

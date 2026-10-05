@@ -11,7 +11,7 @@
 //! and `multiway`'s own variable enum are both just implementations of
 //! [`Vars`], read through [`VarSource<V>`] -- postflop's [`RuleContext`]
 //! implements `VarSource<PostflopVar>` right here, since board/card concepts
-//! belong in `nlh`; `multiway` implements `VarSource<MultiwayVar>` for its
+//! belong in `nlh`; `mw-preflop` implements `VarSource<spot::TreeVar>` for its
 //! own betting-state types, in its own crate, with no orphan-rule problem
 //! (multiway already depends on `nlh`).
 
@@ -862,15 +862,14 @@ impl fmt::Display for PostflopVar {
 /// precedence (`||` lowest, `&&` next, unary `!` tightest, comparisons /
 /// membership / truth tightest of all): a subexpression is parenthesized
 /// only when it sits under an operator that binds tighter than it does.
-/// Reused by every dialect's diagnostics (postflop's `tree` diagnostic) and
-/// by `multiway`'s `.mwtree` frontend, which has no other source text for a
+/// Reused by the common-input tree diagnostics, which have no other source text for a
 /// rule whose condition is a nested `when`/`if` composition that never
 /// existed as one literal string.
 ///
 /// `Not` is the one deliberate exception -- its operand is always
-/// parenthesized, matching this contract's own normalization example
-/// (`!(A) && !(B) && !(C) && D`, in the "正規化" section of
-/// `docs/solver-config-v1.jp.md`): a bare `!paired` reads fine on its own,
+/// parenthesized, for example `!(A) && !(B) && !(C) && D`.
+/// The public condition syntax is in `docs/nlh-input-v1.jp.md` section 9;
+/// a bare `!paired` reads fine on its own,
 /// but scanning a long `&&` chain for which term is negated does not.
 impl<V: Vars> fmt::Display for Condition<V> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

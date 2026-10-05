@@ -1,5 +1,5 @@
 //! `.sol` viewer-artifact CLI support: exporting a solved postflop run to a
-//! compact quantized `.sol` file (`solve --sol`), and loading one back for
+//! compact quantized `.sol` file in the run directory, and loading one back for
 //! read-only strategy queries (`inspect --sol`) through the
 //! [`StrategyProvider`] seam shared with a live in-process solve.
 //!
@@ -18,10 +18,9 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
-    Dcfr, F32Storage, I16Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array,
+    F32Storage, I16Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array,
     reach_at,
 };
-use hu_postflop::game::{PayoffPipeline, RakeModel, UtilityModel};
 use hu_postflop::sol::{
     SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
     dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
@@ -32,11 +31,9 @@ use hu_postflop::{
 };
 use nlh::{Card, PerPlayer, Player, Street};
 
-use crate::config::GameSection;
-use crate::postflop_setup;
-use crate::solve::RunSummary;
+use crate::nlh_v1::RunSummary;
 
-/// `--sol-streets`: which streets get stored strategy blocks in a `.sol`
+/// Which streets get stored strategy blocks in a `.sol`
 /// export. Mirrors `hu_postflop::sol::StreetsStored` one-to-one; kept as a separate
 /// type (rather than teaching `hu_postflop::sol` about `clap`) so the codec crate
 /// stays free of CLI-parsing dependencies.
@@ -71,7 +68,7 @@ pub(crate) fn start_street_from_board_len(len: usize) -> Street {
 
 // --- export (`solve --sol`) ------------------------------------------------
 
-/// Everything `solve --sol` gathers up front (while the raw config text and
+/// Everything common-input P1 solve gathers up front (while the raw config text and
 /// storage-backend choice are still in hand) to export a `.sol` viewer
 /// artifact once the run completes. Threaded through as `Option<SolExportSpec>`
 /// rather than a `RunHooks`-style callback: unlike the per-check-cadence
@@ -203,7 +200,7 @@ pub(crate) fn export_sol<S: Storage>(
     let mode = if start_street == Street::River {
         if spec.mode != SolStreets::Full {
             println!(
-                "note: river-start config, forcing --sol-streets=full \
+                "note: river-start config, forcing solution_streets=full \
                  (no-rivers would store nothing for a config with no streets before the river)"
             );
         }
@@ -339,8 +336,6 @@ pub(crate) fn export_sol<S: Storage>(
 pub(crate) struct LoadedSol {
     pub pf_game: PostflopGame,
     pub config: PostflopConfig,
-    pub rake: Box<dyn RakeModel>,
-    pub utility: Box<dyn UtilityModel>,
     pub meta: SolMeta,
     pub mode: StreetsStored,
     /// Stored blocks keyed by `sref` (== the action node's `Node::aux`).
@@ -353,13 +348,13 @@ pub(crate) struct LoadedSol {
     pub board: Vec<Card>,
     pub river_iterations: u64,
     pub river_target: Option<f64>,
-    pub nlh: Option<(spot::Spot, hu_postflop::input::Settings)>,
+    pub nlh: (spot::Spot, hu_postflop::input::Settings),
 }
 
 /// Reads, verifies, and rebuilds a `.sol` artifact: `hu_postflop::sol::read_sol`
 /// (which itself verifies the header hash against the embedded config text)
-/// -> parse that text as a `SolveConfig` (must be `kind = "postflop"`) ->
-/// rebuild the exact same tree `solve --sol` built -> verify the stored
+/// -> parse the embedded common-input P1 spot ->
+/// rebuild the exact same tree the P1 run built -> verify the stored
 /// block set matches the mode-implied set of action-node `sref`s exactly.
 /// That last check is the artifact's only defense against a hand-edited or
 /// bit-rotted `.sol` file whose header hash still happens to match (e.g. a
@@ -372,68 +367,20 @@ pub(crate) fn load_sol(
 ) -> Result<LoadedSol> {
     let payload = read_sol(path).with_context(|| format!("reading {}", path.display()))?;
 
-    let nlh = crate::nlh_v1::has_schema(&payload.config_toml)?;
-    let (pf_config, rake, utility, nlh) = if nlh {
-        let p = crate::nlh_v1::prepare(&payload.config_toml, Path::new("embedded.toml"))?;
-        (
-            p.config,
-            Box::new(p.payoff.rake) as Box<dyn RakeModel>,
-            Box::new(p.payoff.utility) as Box<dyn UtilityModel>,
-            Some((p.document.spot, p.settings)),
-        )
-    } else {
-        // An artifact embeds whatever config text produced it, so this reads
-        // both the current families and the shapes older artifacts carry.
-        let config = crate::config::parse_internal_config(&payload.config_toml)
-            .context(".sol artifact's embedded config failed to parse")?;
-        match &config.game {
-            GameSection::Postflop { .. } => {}
-            _ => bail!(".sol artifact's embedded config is not kind = \"postflop\""),
-        }
-        let GameSection::Postflop {
-            board,
-            oop_range,
-            ip_range,
-            pot,
-            effective_stack,
-            iso_merging,
-            min_bet,
-            preflop_aggressor,
-            tree,
-        } = config.game
-        else {
-            unreachable!("checked above");
-        };
-
-        let pf_config = postflop_setup::build_postflop_config(
-            &board,
-            &oop_range,
-            &ip_range,
-            pot,
-            effective_stack,
-            iso_merging,
-            min_bet,
-            tree.lower()?,
-            &preflop_aggressor,
-        )?;
-        let rake = crate::economics::build_rake(&config.rake)?;
-        let utility = crate::economics::build_utility(&config.utility)?;
-        (pf_config, rake, utility, None)
-    };
+    crate::nlh_v1::require_artifact_config(&payload.config_toml)?;
+    let p = crate::nlh_v1::prepare(&payload.config_toml, Path::new("embedded.toml"))?;
+    let pf_config = p.config;
+    let payoff = p.payoff;
+    let nlh = (p.document.spot, p.settings);
     let board_cards = pf_config.board.clone();
 
     // stderr, not stdout: `export` writes machine-readable data there, and
     // a progress line in the middle of a CSV would corrupt it.
     eprintln!("rebuilding tree from embedded config...");
     let build_start = Instant::now();
-    let pipeline = PayoffPipeline {
-        rake: rake.as_ref(),
-        utility: utility.as_ref(),
-    };
+    let pipeline = payoff.pipeline();
     let mut pf_game = build_postflop_game(&pf_config, pipeline);
-    if nlh.is_some() {
-        crate::nlh_v1::display_game(&mut pf_game);
-    }
+    crate::nlh_v1::display_game(&mut pf_game);
     eprintln!(
         "tree rebuilt in {:.2}s ({} nodes)",
         build_start.elapsed().as_secs_f64(),
@@ -498,8 +445,6 @@ pub(crate) fn load_sol(
     Ok(LoadedSol {
         pf_game,
         config: pf_config,
-        rake,
-        utility,
         meta: payload.meta,
         mode: payload.mode,
         blocks,
@@ -532,7 +477,7 @@ pub(crate) trait StrategyProvider {
 pub(crate) struct LiveProvider<'a, S: Storage> {
     pub solver: &'a Solver<PostflopEvaluator, S>,
     /// Re-bases the root EV on the start of the subgame (see
-    /// [`crate::postflop_setup::subgame_ev_offset`]).
+    /// the embedded P1 payoff).
     pub ev_offset: PerPlayer<f64>,
 }
 
@@ -543,7 +488,7 @@ impl<S: Storage> StrategyProvider for LiveProvider<'_, S> {
 
     fn ev_line(&mut self) -> String {
         let solver = self.solver;
-        let ev = crate::postflop_setup::subgame_ev(crate::solve::solver_ev(solver), self.ev_offset);
+        let ev = crate::nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(solver), self.ev_offset);
         let (ev_oop, ev_ip) = (ev[Player::P0], ev[Player::P1]);
         let expl = solver.exploitability();
         let nash_conv = expl[Player::P0] + expl[Player::P1];
@@ -678,11 +623,7 @@ impl<'a> SolProvider<'a> {
             }
         }
 
-        let internal_history = if loaded.nlh.is_some() {
-            crate::nlh_v1::convert_history(&history, true)
-        } else {
-            history.clone()
-        };
+        let internal_history = crate::nlh_v1::convert_history(&history, true);
         let state = river_entry_state(&loaded.config, &internal_history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
@@ -695,35 +636,18 @@ impl<'a> SolProvider<'a> {
         // The synthetic river tree starts after both players' sunk wagers.
         // Rebind the v1 payoff to their actual stacks at this entry, keeping
         // folded table players and the outside field unchanged.
-        let payoff = loaded
-            .nlh
-            .as_ref()
-            .map(|(spot, _)| {
-                let mut spot = spot.clone();
-                let spent = loaded.config.effective_stack.0 - state.effective_stack.0;
-                for player in [&spot.context.oop, &spot.context.ip] {
-                    let seat =
-                        &mut spot.context.seats[player.as_ref().expect("P1 player").seat.index()];
-                    seat.remaining_stack.0 -= spent as u64;
-                    seat.total_contribution.0 += spent as u64;
-                }
-                spot.context.pot.0 = state.pot.0 as u64;
-                spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
-                hu_postflop::input::NlhPayoff::new(&spot)
-            })
-            .transpose()?;
-        let pipeline = if let Some(payoff) = &payoff {
-            payoff.pipeline()
-        } else {
-            PayoffPipeline {
-                rake: loaded.rake.as_ref(),
-                utility: loaded.utility.as_ref(),
-            }
-        };
-        let sub_game = build_postflop_game(&sub_cfg, pipeline);
-        let rs = if loaded.nlh.as_ref().is_some_and(|(_, settings)| {
-            settings.solver.storage == hu_postflop::input::Storage::I16
-        }) {
+        let mut spot = loaded.nlh.0.clone();
+        let spent = loaded.config.effective_stack.0 - state.effective_stack.0;
+        for player in [&spot.context.oop, &spot.context.ip] {
+            let seat = &mut spot.context.seats[player.as_ref().expect("P1 player").seat.index()];
+            seat.remaining_stack.0 -= spent as u64;
+            seat.total_contribution.0 += spent as u64;
+        }
+        spot.context.pot.0 = state.pot.0 as u64;
+        spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
+        let payoff = hu_postflop::input::NlhPayoff::new(&spot)?;
+        let sub_game = build_postflop_game(&sub_cfg, payoff.pipeline());
+        let rs = if loaded.nlh.1.solver.storage == hu_postflop::input::Storage::I16 {
             resolve_river::<I16Storage>(loaded, sub_game.game, entry, start, RiverSolver::I16)?
         } else {
             resolve_river::<F32Storage>(loaded, sub_game.game, entry, start, RiverSolver::F32)?
@@ -740,19 +664,14 @@ fn resolve_river<S: Storage>(
     start: Instant,
     wrap: impl FnOnce(Solver<PostflopEvaluator, S>) -> RiverSolver,
 ) -> Result<RiverSolve> {
-    let schedule = loaded
-        .nlh
-        .as_ref()
-        .map(|(_, settings)| crate::nlh_v1::schedule(&settings.solver.algorithm))
-        .unwrap_or_else(|| Box::<Dcfr>::default());
+    let settings = &loaded.nlh.1;
+    let schedule = crate::nlh_v1::schedule(&settings.solver.algorithm);
     let mut solver =
         Solver::<PostflopEvaluator, S>::new(game, schedule, Some(loaded.river_iterations));
-    if let Some((_, settings)) = &loaded.nlh {
-        solver.set_par(hu_engine::ParConfig {
-            chance_depth: settings.solver.parallel.chance_depth,
-            min_children: settings.solver.parallel.min_children,
-        });
-    }
+    solver.set_par(hu_engine::ParConfig {
+        chance_depth: settings.solver.parallel.chance_depth,
+        min_children: settings.solver.parallel.min_children,
+    });
     let mut done = 0u64;
     while done < loaded.river_iterations {
         let chunk = 100.min(loaded.river_iterations - done);
@@ -831,6 +750,7 @@ mod tests {
     use super::*;
     use hu_engine::I16Storage;
     use hu_postflop::PostflopNodeInfo;
+    use hu_postflop::game::{PayoffPipeline, UtilityModel};
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -876,7 +796,7 @@ memory='1GiB'
             canceled: false,
             iterations: 8,
             wall: std::time::Duration::ZERO,
-            ev: postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), offset),
+            ev: crate::nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(&solver), offset),
             expl_p0: expl[Player::P0],
             expl_p1: expl[Player::P1],
             nash_conv: expl[Player::P0] + expl[Player::P1],
@@ -956,7 +876,7 @@ memory='1GiB'
         start_street: Street,
         summary: &RunSummary,
     ) -> Result<()> {
-        let internal = crate::solve::solver_ev(solver);
+        let internal = crate::nlh_v1::solver_ev(solver);
         let offset = PerPlayer::new(
             summary.ev[Player::P0] - internal[Player::P0],
             summary.ev[Player::P1] - internal[Player::P1],
@@ -975,65 +895,57 @@ memory='1GiB'
     }
 
     /// Small turn-start config (board "2s 7s Ks 2h", ranges "44,55" vs
-    /// "33,66", pot 2, stack 20, turn [0.75], river [1.0], max_aggressive_actions 1/1),
+    /// "33,66", pot 2, stack 20, turn [2bb], river [100], max_aggressive_actions 1/1),
     /// copied from `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config`: a
     /// single chance node whose children are exactly the river-entry nodes,
     /// small enough to build/solve/re-solve fast even in a debug build.
     const TINY_TURN_TOML: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
-oop_range = "44,55"
-ip_range = "33,66"
-pot = 2
-effective_stack = 20
-
-[game.tree]
-kind = "script"
-script = '''
-turn { replace bet [75] }
-river { replace bet [100] }
-'''
-
-[game.tree.max_aggressive_actions]
+[ranges]
+BB = "44,55"
+BTN = "33,66"
+[tree]
+script = "turn { replace bet [2bb] } river { replace bet [100] }"
+[tree.max_aggressive_actions]
 turn = 1
 river = 1
-
-[run]
-iterations = 32
+[solver.stop]
+max_iterations = 32
 check_every = 32
-"#;
-
-    /// River-start variant of the same board/ranges (5-card board), used by
-    /// the `Full`-mode test: a river-start config has no streets before the
-    /// river at all, so `export_sol` must force `Full` regardless of the
-    /// caller's requested mode.
-    const TINY_RIVER_TOML: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
-board = "2s 7s Ks 2h 9d"
-oop_range = "44,55"
-ip_range = "33,66"
-pot = 2
-effective_stack = 20
-
-[game.tree]
-kind = "script"
-script = '''
-river { replace bet [100] }
-'''
-
-[game.tree.max_aggressive_actions]
-river = 1
-
 [run]
-iterations = 16
-check_every = 16
+memory = "1GiB"
 "#;
 
-    /// Builds+solves `raw` (a `SolveConfig` TOML, `kind = "postflop"`)
+    /// River-start variant used to verify forced full-street export.
+    const TINY_RIVER_TOML: &str = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2s 7s Ks 2h 9d"
+[ranges]
+BB = "44,55"
+BTN = "33,66"
+[tree]
+script = "river { replace bet [100] }"
+[tree.max_aggressive_actions]
+river = 1
+[solver.stop]
+max_iterations = 16
+check_every = 16
+[run]
+memory = "1GiB"
+"#;
+
+    /// Builds and solves a common-input P1 fixture
     /// in-process, bypassing the CLI's stdout-printing `solve::run` path
     /// (not needed for these unit tests), and returns everything
     /// `export_sol` needs.
@@ -1056,48 +968,22 @@ check_every = 16
         Street,
         RunSummary,
     ) {
-        // The fixtures are source configs, so they go through the contract
-        // parser rather than the internal shape.
-        let config = crate::solver_config_v1::parse_and_lower(raw).expect("parse fixture toml");
-        let GameSection::Postflop {
-            board,
-            oop_range,
-            ip_range,
-            pot,
-            effective_stack,
-            iso_merging,
-            min_bet,
-            preflop_aggressor,
-            tree,
-        } = config.game
-        else {
-            panic!("fixture must be kind = \"postflop\"");
-        };
-        let pf_config = postflop_setup::build_postflop_config(
-            &board,
-            &oop_range,
-            &ip_range,
-            pot,
-            effective_stack,
-            iso_merging,
-            min_bet,
-            tree.lower().expect("lower tree script"),
-            &preflop_aggressor,
-        )
-        .expect("build postflop config");
-        let start_street = start_street_from_board_len(pf_config.board.len());
-        let rake = crate::economics::build_rake(&config.rake).expect("fixture rake");
-        let utility = crate::economics::build_utility(&config.utility).expect("fixture utility");
-        let pipeline = PayoffPipeline {
-            rake: rake.as_ref(),
-            utility: utility.as_ref(),
-        };
-        let ev_offset = crate::postflop_setup::subgame_ev_offset(&pf_config, pipeline.utility);
-        let pf_game = build_postflop_game(&pf_config, pipeline);
+        let p = crate::nlh_v1::prepare(raw, Path::new("test.toml"))
+            .expect("parse common-input fixture");
+        let start_street = p.document.spot.context.street;
+        let ev_offset = p.payoff.ev_offset();
+        let mut pf_game = build_postflop_game(&p.config, p.payoff.pipeline());
+        crate::nlh_v1::display_game(&mut pf_game);
         let node_info = pf_game.node_info.clone();
-
-        let mut solver =
-            Solver::<_, S>::new(pf_game.game, Box::<Dcfr>::default(), Some(iterations));
+        let mut solver = Solver::<_, S>::new(
+            pf_game.game,
+            crate::nlh_v1::schedule(&p.settings.solver.algorithm),
+            Some(iterations),
+        );
+        solver.set_par(hu_engine::ParConfig {
+            chance_depth: p.settings.solver.parallel.chance_depth,
+            min_children: p.settings.solver.parallel.min_children,
+        });
         let start = Instant::now();
         solver.run(iterations);
         let elapsed = start.elapsed();
@@ -1107,7 +993,7 @@ check_every = 16
             canceled: false,
             iterations: solver.iteration(),
             wall: elapsed,
-            ev: crate::postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), ev_offset),
+            ev: crate::nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(&solver), ev_offset),
             expl_p0: expl[Player::P0],
             expl_p1: expl[Player::P1],
             nash_conv,

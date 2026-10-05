@@ -24,25 +24,19 @@
 ## 公開契約の正本
 
 `solvers.nlh/v1`の入力・計算・成果物は次の規範が正本である。
-旧2 familyは、次のM7の削除段階まで、そのfamilyを実装するコードだけの規範として残す。
 
 | 対象 | 規範 |
 |---|---|
 | `solvers.nlh/v1` 入力 | [nlh-input-v1.jp.md](nlh-input-v1.jp.md) |
 | P1 計算・成果物 | [hu-postflop.jp.md](hu-postflop.jp.md) |
 | P2 暫定計算・成果物 | [mw-preflop.jp.md](mw-preflop.jp.md) |
-| `solvers.multiway-preflop/v1` | [multiway-preflop-v1.jp.md](multiway-preflop-v1.jp.md) |
-| `solvers.postflop/v1` | [solver-config-v1.jp.md](solver-config-v1.jp.md) |
 | `solvers` / `solversd`のコマンド・flag・exit code・HTTP API | [cli-reference.jp.md](cli-reference.jp.md) |
 
-[Multiway実装対応表](multiway-preflop-v1.md)は規範から実装・testへの補助資料。
-[旧CLI仕様入口](multiway-preflop-cli-spec.jp.md)は互換入口であり、別の規範ではない。
-
 作業票や計画は公開契約を上書きしない。契約について文書と実装が矛盾するときは、
-該当family規範・CLI規範を基準に差分を記録する。次に実装とtest、最後に補助資料を参照する。
+共通Input・該当製品の規範・CLI規範を基準に差分を記録する。次に実装とtest、最後に補助資料を参照する。
 規範変更はAGENTSの同期範囲に従い、実装・test・例・help・形式を同じ変更で揃える。
 
-`crates/cli/src/config_new.rs`にはtemplateのparse/normalizeと、CLI・HU・Multiway文書の
+`crates/cli/src/config_new.rs`にはP1/P2 templateのparse/normalizeと、共通Inputの全key・literalおよびCLIの
 公開トークン検査がある。文字列の存在だけでは意味や既定値の一致を保証しないため、契約testも確認する。
 
 ## 根拠と証拠

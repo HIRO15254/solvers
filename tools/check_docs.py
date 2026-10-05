@@ -23,8 +23,6 @@ REQUIRED_FILES = (
     "docs/architecture.md",
     "docs/app-architecture.md",
     "docs/development.md",
-    "docs/solver-config-v1.jp.md",
-    "docs/multiway-preflop-v1.jp.md",
     "docs/cli-reference.jp.md",
     "docs/user-guide.jp.md",
     "docs/plans/two-product-restructure.jp.md",
@@ -34,8 +32,13 @@ REQUIRED_FILES = (
     "docs/plans/task-template.md",
 )
 # Retired documents and their replacements. The retired files remain readable
-# at the tag archive/pre-two-products-2026-10-04.
+# in Git history (pre-restructure documents also at
+# archive/pre-two-products-2026-10-04).
 MOVED_PATHS = {
+    "docs/solver-config-v1.jp.md": "docs/nlh-input-v1.jp.md",
+    "docs/multiway-preflop-v1.jp.md": "docs/nlh-input-v1.jp.md",
+    "docs/multiway-preflop-v1.md": "docs/mw-preflop.jp.md",
+    "docs/multiway-preflop-cli-spec.jp.md": "docs/cli-reference.jp.md",
     "docs/product-roadmap.jp.md": "docs/products.jp.md",
     "docs/validation.jp.md": "docs/products.jp.md",
     "plans/solver-implementation-plan.jp.md": "docs/plans/two-product-restructure.jp.md",

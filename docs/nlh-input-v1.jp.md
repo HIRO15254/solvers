@@ -683,12 +683,6 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 
 memory超過等は木構築・solve前の資源検査で検出する。終了codeはCLI referenceに従う。
 
-### 実装境界
-
-旧family専用CLIのdispatchはまだ存在する。第14節の拒否規則は共通parserの契約であり、
-旧dispatchの削除とCLI全体の拒否への切替はM7で同期する。
-未接続の挙動を実装済みと扱わない。
-
 ## 14. 例
 
 ### P1: 6max NL50 BTN対BB SRP、Flop開始
@@ -816,3 +810,4 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | `rounding_unit_bb`（第6節） | 0.001だけを受ける | 第6節 |
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |
 | P2の未使用rule計測（第9節） | 通常の`validate`は未検査を表示する。`validate --resources`のcountと`solve` / `resume`の木構築で実測し、打切り時は不完全として未一致警告を出さない | 第9節・未使用ruleの警告 |
+| `config new`のflag | `--product p2\|p1`（既定`p2`）、`--template minimal\|full`（既定`minimal`）、`--out`を受ける。全templateは共通Input。`full`は同じ製品の`minimal`を正規化した実効configで、節ごとの短いcommentを付ける。既定の無い任意keyは省略する | 第13節・CLI規範 |

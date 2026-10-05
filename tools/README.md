@@ -7,7 +7,7 @@ their tests are archived with the corresponding experiments in
 
 - `workspace_audit.py`: read-only workspace and Git hygiene report.
 - `check_docs.py`: checks the canonical documentation entrypoints, local Markdown
-  link destinations, and retired plan paths in current documentation.
+  link destinations, and retired plan/specification paths in current documentation.
 - `plot_convergence.py`: plot solver progress files.
 
 Run the lightweight checks with the Python standard library (Python 3.10+):

@@ -11,15 +11,11 @@
 //! .tree source ──tokenize──► tokens ──substitute──► tokens ──parse──► AST ──lower──► Vec<Rule>
 //! ```
 //!
-//! See `docs/solver-config-v1.jp.md`'s `[game.tree]` chapter for the
-//! normative grammar this module implements: script の構造,
-//! 文 — action list の書き換え, param と define, 条件式, 盤面述語,
-//! size literal, error. The grammar is the same one
-//! `crates/mw-preflop/src/tree_rules.rs` evaluates today, ported to a
-//! compile-once/evaluate-many shape: multiway re-parses its condition
-//! string at every node, which is fine for a small preflop tree but not for
-//! a postflop tree with hundreds of thousands of decision nodes, so here
-//! parsing produces a typed [`Condition`] tree once and [`Condition::eval`]
+//! Public syntax and vocabulary are defined in `docs/nlh-input-v1.jp.md`
+//! section 9. `spot` owns the common-input dialect; product tree builders
+//! evaluate its compiled conditions. The internal PostflopVar dialect is
+//! retained for HU game construction and independent oracle tests.
+//! Parsing produces a typed [`Condition`] tree once; [`Condition::eval`]
 //! never re-parses or fails.
 
 mod ast;

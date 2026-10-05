@@ -208,12 +208,8 @@ fn summary(loaded: &LoadedSol) -> Summary {
     }
 }
 
-fn amount(loaded: &LoadedSol, value: u32) -> serde_json::Number {
-    if loaded.nlh.is_some() {
-        crate::nlh_v1::bb(value as u64).parse().expect("BB number")
-    } else {
-        value.into()
-    }
+fn amount(_loaded: &LoadedSol, value: u32) -> serde_json::Number {
+    crate::nlh_v1::bb(value as u64).parse().expect("BB number")
 }
 
 fn summary_csv(summary: &Summary) -> String {
@@ -316,8 +312,8 @@ fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> 
     let probs = loaded.blocks.get(&node.aux).ok_or_else(|| {
         anyhow!(
             "this artifact stores no strategy for {:?}: it was written with \
-             --sol-streets no-rivers, which drops river nodes. Re-solve with \
-             --sol-streets full to read river nodes from the artifact",
+             [output] solution_streets = \"no-rivers\", which drops river nodes. \
+             Re-solve with solution_streets = \"full\" to read river nodes from the artifact",
             info.history
         )
     })?;
@@ -385,7 +381,7 @@ fn action_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ActionRo
     for id in selected_action_nodes(loaded, selection) {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
-        let freqs = crate::postflop_setup::action_frequencies(
+        let freqs = crate::nlh_v1::action_frequencies(
             &node.strategy,
             &reach[node.actor],
             node.num_actions,
@@ -567,12 +563,6 @@ fn range_csv(rows: &[RangeRow]) -> String {
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
     let left = load_sol(left_path, 0, None)?;
     let right = load_sol(right_path, 0, None)?;
-    if left.nlh.is_some() != right.nlh.is_some() {
-        bail!(
-            "cannot compare solvers.nlh/v1 and old-family .sol artifacts (different units and economics)"
-        );
-    }
-
     let mut left_srefs: Vec<u32> = left.blocks.keys().copied().collect();
     let mut right_srefs: Vec<u32> = right.blocks.keys().copied().collect();
     left_srefs.sort_unstable();

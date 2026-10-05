@@ -1,9 +1,5 @@
 //! P2 common-input adapter. Game/session construction stays typed.
 use super::SCHEMA;
-use crate::config::{
-    AlgorithmSection, GameSection, RakeSection, RunSection, SolveConfig, StorageKind,
-    UtilitySection,
-};
 use anyhow::{Result, bail};
 use mw_preflop::input::{self, Lowered, P2Sections, Settings};
 use serde_json::json;
@@ -27,123 +23,12 @@ pub(crate) fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     })
 }
 
-// The internal CLI representation supports read-only artifact summaries and
-// algorithm fingerprints. It is never serialized to build a common-input game.
-pub(crate) fn internal(input: Lowered) -> SolveConfig {
-    let utility = match input.utility {
-        mw_preflop::UtilityConfig::ChipEv => UtilitySection::ChipEv,
-        mw_preflop::UtilityConfig::TournamentIcm {
-            outside_field,
-            payouts,
-            samples,
-            seed,
-        } => UtilitySection::TournamentIcm {
-            outside_field: outside_field
-                .into_iter()
-                .map(|p| crate::config::OutsidePlayerSection {
-                    name: p.name,
-                    stack_bb: p.stack_bb,
-                })
-                .collect(),
-            payouts,
-            samples,
-            seed,
-        },
-    };
-    let rake = match input.rake {
-        mw_preflop::config::RakeConfig::None => RakeSection::None,
-        mw_preflop::config::RakeConfig::Generic {
-            rate,
-            cap_bb,
-            when,
-            allocation,
-            rounding,
-        } => RakeSection::Generic {
-            rate,
-            cap: cap_bb,
-            when,
-            allocation,
-            rounding,
-            rounding_unit: 0.001,
-        },
-        _ => unreachable!("common input lowers cash rake to Generic"),
-    };
-    let s = input.solver;
-    let r = input.run;
-    SolveConfig {
-        schema: Some(SCHEMA.into()),
-        game: GameSection::PreflopMultiway(input.game),
-        utility,
-        rake,
-        algorithm: AlgorithmSection::ExternalSamplingMccfr {
-            seed: s.seed,
-            exploration_epsilon: s.exploration_epsilon,
-            discount_every: s.discount_every,
-            discount_until: s.discount_until,
-            traverser_vector: s.traverser_vector,
-            prune: s.prune,
-            // Match the legacy adapter: threshold is derived when sessions are built.
-            prune_threshold: None,
-            prune_skip_probability: s.prune_skip_probability,
-        },
-        run: RunSection {
-            iterations: r.stop.max_sweeps,
-            sweeps: Some(r.stop.max_sweeps),
-            seed: Some(s.seed),
-            check_every: r.stop.check_every_sweeps,
-            max_time_secs: None,
-            storage: StorageKind::F32,
-            target_nash_conv: None,
-            threads: Some(r.threads),
-            par_chance_depth: None,
-            par_min_children: None,
-            max_memory_bytes: Some(r.memory_bytes),
-            checkpoint_every: None,
-            evaluation_samples: Some(r.stop.evaluation_samples),
-            evaluation_cadence: Some(r.stop.check_every_sweeps),
-            sweep_batch: Some(s.sweep_batch),
-            stop_dev_gain: Some(r.dev_gain_threshold),
-            stop_confirmations: Some(r.stop.confirmations),
-            stop_eval_period_secs: Some(30.0),
-            stop_br_traversals: Some(r.stop.deviator_traversals),
-        },
-    }
-}
-
-pub(crate) fn parse_and_lower(raw: &str, path: &Path) -> Result<SolveConfig> {
-    Ok(internal(prepare(raw, path)?.lowered))
-}
-
 pub(crate) fn build_typed_session(
     lowered: Lowered,
     effective: String,
     checkpoint: Option<&Path>,
 ) -> Result<crate::session::MultiwaySession> {
-    let (table, ready) = crate::session::build_ehs2_table_abstraction(&lowered.game)?;
-    let abstraction = mw_preflop::MultiwayAbstractionBackend::Ehs2Table(table);
-    let session = input::build_session(lowered, abstraction, effective, checkpoint)?;
-    let r = session.run;
-    Ok(crate::session::MultiwaySession {
-        solver: session.solver,
-        abstraction_ready: Some(ready),
-        sweeps_target: r.stop.max_sweeps,
-        threads: r.threads,
-        evaluation_cadence: r.stop.check_every_sweeps,
-        evaluation_samples: r.stop.evaluation_samples,
-        evaluation_seed: r.evaluation_seed,
-        checkpoint_every: None,
-        storage: StorageKind::F32,
-        stop_rule: Some(crate::session::StopRule {
-            dev_gain_threshold: r.dev_gain_threshold,
-            confirmations: r.stop.confirmations,
-            eval_period_secs: 30.0,
-            br_traversals: r.stop.deviator_traversals,
-        }),
-        config_toml: session.config_toml,
-        config_hash: session.config_hash,
-        game_config: session.game_config,
-        checkpoint_runtime: session.checkpoint_runtime,
-    })
+    crate::session::build_production_multiway_session(lowered, effective, checkpoint)
 }
 
 pub(crate) fn build_session(
@@ -155,16 +40,25 @@ pub(crate) fn build_session(
 }
 
 fn resources(p: &Prepared) -> Result<(crate::session::MultiwayResourcePreflight, Vec<bool>)> {
-    crate::session::preflight_multiway_with_rule_hits(internal(p.lowered.clone()))
+    crate::session::preflight_multiway_with_rule_hits(p.lowered.clone())
 }
 
 fn check_resources(p: &Prepared) -> Result<()> {
     let (r, _) = resources(p)?;
+    ensure_resources(&r)
+}
+
+fn ensure_resources(r: &crate::session::MultiwayResourcePreflight) -> Result<()> {
     if !r.complete {
         return Err(spot::SpotError::new(
             spot::Code::NLH003,
             "run.memory",
-            "public tree/policy arena exceeds the memory budget",
+            match r.limit {
+                Some(crate::session::ResourceLimit::Node) => {
+                    "public tree/policy arena exceeds the node limit"
+                }
+                _ => "public tree/policy arena exceeds the memory budget",
+            },
         )
         .into());
     }
@@ -476,7 +370,7 @@ fn execute(p: Prepared, directory: &Path, checkpoint: Option<&Path>, reset: bool
             command,
         )?
     };
-    let config = internal(p.lowered);
+    let config = p.lowered;
     let outcome = if let Some(checkpoint) = checkpoint {
         crate::multiway_solve::resume_observed(
             &p.effective,
@@ -522,7 +416,7 @@ mod tests {
         assert_eq!(hits, expected, "count: {}", path.display());
         assert_eq!(
             count,
-            crate::session::preflight_multiway_typed(internal(p.lowered.clone())).unwrap()
+            crate::session::preflight_multiway_typed(p.lowered.clone()).unwrap()
         );
         for threads in [1, 4] {
             let game = HoldemGame::new(
@@ -567,7 +461,12 @@ mod tests {
             "6max_2bb",
             "6max_20bb_checkdown",
         ] {
-            let path = root.join(format!("examples/nlh/{name}.toml"));
+            let directory = if name.starts_with("preflop_multiway_v1_") {
+                "crates/mw-preflop/tests/fixtures"
+            } else {
+                "examples/bench"
+            };
+            let path = root.join(format!("{directory}/{name}.toml"));
             compare_hits(&std::fs::read_to_string(&path).unwrap(), &path);
         }
     }
@@ -604,5 +503,28 @@ mod tests {
         assert_eq!(game.tree_rule_hits().unwrap(), [false]);
         mw_preflop::tree::preflight_arena(&game, u64::MAX).unwrap();
         assert_eq!(game.tree_rule_hits().unwrap(), [true]);
+    }
+    #[test]
+    fn resource_refusals_name_the_actual_limit_and_keep_exit_75() {
+        use crate::session::{MultiwayResourcePreflight, ResourceLimit};
+        for (limit, expected) in [
+            (ResourceLimit::Node, "node limit"),
+            (ResourceLimit::Memory, "memory budget"),
+        ] {
+            let r = MultiwayResourcePreflight {
+                complete: false,
+                limit: Some(limit),
+                recall: mw_preflop::RecallMode::Street,
+                decision_nodes: 1,
+                terminal_edges: None,
+                icm: None,
+                policy_columns: None,
+                policy_slots: None,
+                solver_state_bytes: None,
+            };
+            let error = ensure_resources(&r).unwrap_err();
+            assert!(error.to_string().contains(expected));
+            assert_eq!(crate::error_exit_code(&error), 75);
+        }
     }
 }
