@@ -5,6 +5,11 @@
 視点で説明し、CLIの実行手順をまとめる。Production契約と全TOML項目は
 `docs/multiway-preflop-v1.jp.md`、内部設計は`docs/architecture.md`を参照。
 
+共通Input `solvers.nlh/v1` のP1 spotも `validate` / `solve` / `resume` で扱える。
+BB単位の表示、run override、memory上限、checkpoint互換性は
+[CLI referenceの移行節](cli-reference.jp.md#移行中の-solversnlhv1-p1)を参照する。
+仕様はM7の規範切替まで [Input草案](plans/nlh-input-v1.jp.md) を使う。P2接続はM6で行う。
+
 ---
 
 ## 1. 解いている問題

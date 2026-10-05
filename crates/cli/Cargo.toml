@@ -15,6 +15,7 @@ nlh = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 runfiles = { workspace = true }
 hu-postflop = { workspace = true }
+spot = { workspace = true }
 mw-preflop = { workspace = true }
 anyhow = { workspace = true }
 blake3 = { workspace = true }
@@ -30,7 +31,6 @@ toml_edit = { workspace = true }
 
 [dev-dependencies]
 rand_chacha = { workspace = true }
-spot = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }

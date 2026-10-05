@@ -27,9 +27,37 @@ pub fn run(
     max_time: Option<&str>,
     sol_streets: SolStreets,
 ) -> Result<()> {
+    run_cli(
+        config_path,
+        out,
+        threads,
+        memory,
+        max_time,
+        Some(sol_streets),
+    )
+}
+
+/// CLI entrypoint retains whether --sol-streets was explicitly supplied.
+pub fn run_cli(
+    config_path: &Path,
+    out: &Path,
+    threads: Option<usize>,
+    memory: Option<&str>,
+    max_time: Option<&str>,
+    sol_streets: Option<SolStreets>,
+) -> Result<()> {
     let raw_bytes =
         std::fs::read(config_path).with_context(|| format!("reading {}", config_path.display()))?;
     let source_raw = std::str::from_utf8(&raw_bytes).context("config file is not valid UTF-8")?;
+    if crate::nlh_v1::has_schema(source_raw)? {
+        if sol_streets.is_some() {
+            return Err(anyhow!(
+                "NLH003: --sol-streets is not accepted for solvers.nlh/v1; use [output] solution_streets"
+            ));
+        }
+        return crate::nlh_v1::solve(source_raw, config_path, out, threads, memory, max_time);
+    }
+    let sol_streets = sol_streets.unwrap_or(SolStreets::Full);
     let is_multiway_v1 = crate::multiway_v1::has_v1_schema(source_raw)?;
     let effective_raw = if is_multiway_v1 {
         crate::multiway_v1::apply_solve_overrides(

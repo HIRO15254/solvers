@@ -32,6 +32,34 @@ config に何を書けるかは family ごとの規範仕様を参照する。
 
 ## 共通
 
+### 移行中の `solvers.nlh/v1` P1
+
+`validate` / `solve` / `resume` は共通InputのP1（HU Postflop）spotを受け付ける。
+この移行段階の仕様は [Input草案](plans/nlh-input-v1.jp.md) であり、M7で規範へ昇格する。
+P2 spotはM6まで「P2 is not wired to solvers.nlh/v1 yet」で明示拒否する。
+旧familyの契約は従来どおり。新Inputのqueryコマンドとdaemon投入は別の移行境界である。
+
+- `validate` は製品、開始street・board・pot・stack・OOP/IP、暗黙foldを含む全行動、
+  treeのparam値と展開済みrule、停止目標なし・未一致ruleの警告をhuman/JSONで表示する。
+  金額はBB。`--show-effective` / `--write-effective PATH` は既定値展開・script inline化済みの入力を返す。
+  `--resources` はP1のf32/i16見積りbytesと解決済みmemory limit、`withinLimit`を表示する。
+  validateは上限超過を表示し、solve/resumeが確保前に拒否する。
+- `solve --threads` / `--memory` / `--max-time` は `[run]` を上書きして実効configへ保存する。
+  memoryはbytes整数またはKiB/MiB/GiB、autoは物理RAMの80%。停止判定は `NashConv / 2 <= target`。
+  `--sol-streets` は明示指定（fullも含む）を拒否し、`[output] solution_streets` を使う。
+- `resume RUN_DIR [--out FORK]` は `[run]` のthreads・memory・max_time・checkpoint_intervalだけを
+  CLIで上書きできる。max_timeは累積solve時間（validation/buildを除く）。checkpoint_intervalは
+  wall-clockでbatch境界に確認し、終了時もcheckpointを保存する。
+- `run.toml`、`checkpoint.ckpt`（新Input専用format 2）、`solution.sol` は同じ正規化済み実効configを持つ。
+  manifestと`run.json`の `gameKind = "hu-postflop"`、`configSchema = "solvers.nlh/v1"`、
+  `configHash` はそのbytesのblake3。checkpointの互換hashだけは `[run]` を除く。
+  checkpointには累積solve秒数も保存する。旧familyは従来のformat 1を書き続ける。
+  `run.json` は `utilityUnit`（cashは `BB`、tournamentは `prizes`）、`evP0` / `evP1`、
+  `explP0` / `explP1`、`nashConv`、`iterations`、`wallSecs`を記録する。
+  progressの `elapsed_secs` は `status` / `runs ls` / `watch` とdaemonのrun一覧で読める。
+- exit codeは入力・tree error（streetを示す `NLH003`）が2、checkpoint非互換が3、
+  memory limit超過が75、cooperative cancelが130。solveは検証・見積り・上限確認後にrun directoryを作る。
+
 ### global option
 
 | flag | 意味 |

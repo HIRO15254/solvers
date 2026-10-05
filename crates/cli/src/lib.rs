@@ -6,11 +6,12 @@
 //! `clap`/stdout. `main.rs` is a thin binary shim that just calls
 //! [`main_impl`].
 //!
-//! Two config families are supported: `solvers.postflop/v1` (exact heads-up
+//! Legacy config families are `solvers.postflop/v1` (exact heads-up
 //! postflop, lowered by `solver_config_v1` into [`config::SolveConfig`]) and
 //! `solvers.multiway-preflop/v1` (`multiway_v1`).
-//! [`config::parse_solve_config`] routes a file to its family by its `schema`
-//! key; any other schema is an "unsupported config schema" error.
+//! [`config::parse_solve_config`] routes those families by their `schema`.
+//! Validate/solve/resume also accept `solvers.nlh/v1` P1 spots through
+//! [`nlh_v1`]; P2 common-input spots are explicitly refused until M6.
 //!
 //! `solve --checkpoint`/`--metrics` autosave progress (via `hu_postflop::checkpoint`
 //! and `runfiles` JSONL metrics), and `resume` continues a checkpointed run
@@ -105,6 +106,7 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         || message.contains("mwp001")
         || message.contains("mwp002")
         || message.contains("mwp003")
+        || message.contains("nlh00")
         || message.contains("validating")
         || message.contains("unknown field")
         || message.contains("schema")
@@ -124,6 +126,7 @@ pub mod inspect;
 pub mod multiway_artifact;
 pub mod multiway_solve;
 pub mod multiway_v1;
+pub mod nlh_v1;
 mod postflop_artifact;
 pub mod postflop_setup;
 pub mod report;
@@ -212,7 +215,7 @@ enum Command {
         /// Override v1 worker threads, including Multiway tree construction.
         #[arg(long)]
         threads: Option<usize>,
-        /// Override the v1 policy-arena budget (auto resolves to 6GiB).
+        /// Override v1 memory (P1 auto: 80% physical RAM; legacy Multiway auto: 6GiB).
         #[arg(long)]
         memory: Option<String>,
         /// Override the v1 cumulative solve-time limit.
@@ -223,8 +226,8 @@ enum Command {
         /// omits river action nodes for a much smaller artifact -- the
         /// viewer then re-solves those subtrees on demand, so their values
         /// are recomputed rather than as-solved.
-        #[arg(long = "sol-streets", value_enum, default_value = "full")]
-        sol_streets: sol::SolStreets,
+        #[arg(long = "sol-streets", value_enum)]
+        sol_streets: Option<sol::SolStreets>,
     },
     /// Continue a checkpointed solve to `run.iterations` total iterations.
     /// HU Postflop updates solution.sol and run.json and keeps the cumulative time budget.
@@ -429,7 +432,7 @@ pub fn main_impl() -> Result<()> {
             memory,
             max_time,
             sol_streets,
-        } => solve::run(
+        } => solve::run_cli(
             &config,
             &out,
             threads,

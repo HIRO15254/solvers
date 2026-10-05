@@ -51,6 +51,10 @@ pub struct Checkpoint {
     pub config_hash: [u8; 32],
     pub iteration: u64,
     pub state: SolverState,
+    /// Present only in common-input checkpoints (format 2).
+    pub config_toml: Option<String>,
+    /// Cumulative solve time, excluding tree validation/build and artifact export.
+    pub elapsed_secs: Option<f64>,
 }
 
 fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointError> {
@@ -58,7 +62,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION {
+    if version != FORMAT_VERSION && version != 2 {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -97,11 +101,19 @@ pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
         .expect("sliced to HEADER_LEN");
     let header = parse_header(&header_buf)?;
     let payload = zstd::decode_all(&bytes[HEADER_LEN..])?;
-    let state: SolverState = postcard::from_bytes(&payload)?;
+    let version = u16::from_le_bytes([bytes[8], bytes[9]]);
+    let (state, config_toml, elapsed_secs) = if version == 2 {
+        let (state, config, elapsed): (SolverState, String, f64) = postcard::from_bytes(&payload)?;
+        (state, Some(config), Some(elapsed))
+    } else {
+        (postcard::from_bytes(&payload)?, None, None)
+    };
     Ok(Checkpoint {
         config_hash: header.config_hash,
         iteration: header.iteration,
         state,
+        config_toml,
+        elapsed_secs,
     })
 }
 
@@ -119,6 +131,30 @@ pub fn write_checkpoint(
     buf.extend_from_slice(&build_header(config_hash, state.iteration));
     buf.extend_from_slice(&compressed);
 
+    write_atomic(path, &buf)
+}
+
+/// Self-contained common-input checkpoint. The hash excludes [run]; the
+/// embedded config preserves the complete normalized effective input.
+/// Legacy callers continue writing byte-identical format 1 checkpoints.
+pub fn write_checkpoint_with_config(
+    path: &Path,
+    compatibility_hash: [u8; 32],
+    state: &SolverState,
+    effective_config: &str,
+    elapsed_secs: f64,
+) -> Result<(), CheckpointError> {
+    let payload = postcard::to_allocvec(&(state, effective_config, elapsed_secs))?;
+    let compressed = zstd::encode_all(payload.as_slice(), 0)?;
+    let mut header = build_header(compatibility_hash, state.iteration);
+    header[8..10].copy_from_slice(&2u16.to_le_bytes());
+    let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
+    buf.extend_from_slice(&header);
+    buf.extend_from_slice(&compressed);
+    write_atomic(path, &buf)
+}
+
+fn write_atomic(path: &Path, buf: &[u8]) -> Result<(), CheckpointError> {
     let dir = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
@@ -132,7 +168,7 @@ pub fn write_checkpoint(
     let tmp_path = dir.join(tmp_name);
     {
         let mut file = std::fs::File::create(&tmp_path)?;
-        file.write_all(&buf)?;
+        file.write_all(buf)?;
         file.sync_all()?;
     }
     std::fs::rename(&tmp_path, path)?;
@@ -190,6 +226,20 @@ mod tests {
         assert_eq!(loaded.iteration, state.iteration);
         assert_eq!(loaded.state, state);
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn common_input_round_trip_preserves_config_and_elapsed_time() {
+        let path = temp_path("nlh.ckpt");
+        let state = sample_state_f32();
+        let config = "schema = \"solvers.nlh/v1\"\n";
+        write_checkpoint_with_config(&path, [8; 32], &state, config, 12.5).unwrap();
+        let checkpoint = read_checkpoint(&path).unwrap();
+        assert_eq!(checkpoint.state, state);
+        assert_eq!(checkpoint.config_hash, [8; 32]);
+        assert_eq!(checkpoint.config_toml.as_deref(), Some(config));
+        assert_eq!(checkpoint.elapsed_secs, Some(12.5));
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]

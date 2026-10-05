@@ -44,6 +44,28 @@ pub fn run(
             checkpoint_interval,
         );
     }
+    let raw = std::fs::read_to_string(run_directory.join(runfiles::RUN_CONFIG_FILE))?;
+    if crate::nlh_v1::has_schema(&raw)? {
+        if max_sweeps.is_some()
+            || stop_target.is_some()
+            || evaluation_samples.is_some()
+            || evaluation_cadence.is_some()
+        {
+            return Err(anyhow!(
+                "NLH003: solver overrides are not accepted for P1 resume; only [run] overrides are allowed"
+            ));
+        }
+        return crate::nlh_v1::resume(
+            &raw,
+            run_directory,
+            &checkpoint,
+            out,
+            threads,
+            memory,
+            max_time,
+            checkpoint_interval,
+        );
+    }
     if threads.is_some()
         || memory.is_some()
         || max_time.is_some()

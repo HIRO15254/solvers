@@ -97,9 +97,11 @@ impl RunsRoot {
             progress: progress_row
                 .as_ref()
                 .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
-            elapsed_secs: progress_row
-                .as_ref()
-                .and_then(|row| row.get("elapsedSecs")?.as_f64()),
+            elapsed_secs: progress_row.as_ref().and_then(|row| {
+                row.get("elapsed_secs")
+                    .or_else(|| row.get("elapsedSecs"))?
+                    .as_f64()
+            }),
             events_offset,
             resumable: checkpoint
                 && matches!(
@@ -192,6 +194,22 @@ mod tests {
         assert_eq!(runs[0].run_id, "run-a");
         assert_eq!(runs[0].state, RunState::Completed);
         assert_eq!(runs[0].progress, Some(7));
+    }
+
+    #[test]
+    fn hu_elapsed_time_uses_the_metrics_row_field() {
+        let (_guard, root) = root();
+        write_run(&root, "hu", RunState::Completed);
+        std::fs::write(
+            root.directory("hu")
+                .unwrap()
+                .join(runfiles::RUN_PROGRESS_FILE),
+            "{\"iteration\":12,\"elapsed_secs\":2.5}\n",
+        )
+        .unwrap();
+        let summary = root.summary("hu").unwrap();
+        assert_eq!(summary.progress, Some(12));
+        assert_eq!(summary.elapsed_secs, Some(2.5));
     }
 
     /// A run whose owner died reports `interrupted`, not `running`, and the

@@ -92,6 +92,16 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
+    if crate::nlh_v1::has_schema(&raw)? {
+        return crate::nlh_v1::validate(
+            &raw,
+            config_path,
+            format,
+            show_effective,
+            write_effective,
+            resources,
+        );
+    }
     if !crate::multiway_v1::has_v1_schema(&raw)? {
         return validate_solver_config(
             &raw,

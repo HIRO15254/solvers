@@ -79,9 +79,11 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
         sweeps: progress
             .as_ref()
             .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
-        elapsed_secs: progress
-            .as_ref()
-            .and_then(|row| row.get("elapsedSecs")?.as_f64()),
+        elapsed_secs: progress.as_ref().and_then(|row| {
+            row.get("elapsed_secs")
+                .or_else(|| row.get("elapsedSecs"))?
+                .as_f64()
+        }),
         events_offset,
         // Only a stopped run is worth resuming, and only if it left a
         // checkpoint behind. A completed run is not: it already reached its
@@ -290,6 +292,21 @@ mod tests {
         assert!(status.events_offset > 0);
         assert!(!status.resumable);
         assert!(status.recorded_state.is_none());
+    }
+
+    #[test]
+    fn hu_elapsed_time_uses_the_metrics_row_field() {
+        let root = tempfile::tempdir().unwrap();
+        let run = root.path().join("hu");
+        finished_run(&run, RunState::Completed, false);
+        std::fs::write(
+            run.join(runfiles::RUN_PROGRESS_FILE),
+            "{\"iteration\":12,\"elapsed_secs\":2.5}\n",
+        )
+        .unwrap();
+        let status = read_status(&run).unwrap();
+        assert_eq!(status.sweeps, Some(12));
+        assert_eq!(status.elapsed_secs, Some(2.5));
     }
 
     /// A stopped run with a checkpoint is the case `resume` exists for.
