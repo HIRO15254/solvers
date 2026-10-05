@@ -9,8 +9,8 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use formats::{RunManifest, RunState, is_run_directory, last_progress_row};
 use protocol::RunSummary;
+use runfiles::{RunManifest, RunState, is_run_directory, last_progress_row};
 
 /// The directory holding every run this daemon knows about.
 pub struct RunsRoot {
@@ -78,11 +78,11 @@ impl RunsRoot {
         let observed = manifest.observed_state();
         let progress_row = last_progress_row(directory)
             .with_context(|| format!("reading progress in {}", directory.display()))?;
-        let events_offset = std::fs::metadata(formats::RunEventLog::path_in(directory))
+        let events_offset = std::fs::metadata(runfiles::RunEventLog::path_in(directory))
             .map(|metadata| metadata.len())
             .unwrap_or(0);
-        let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file()
-            || directory.join(formats::RUN_HU_CHECKPOINT_FILE).is_file();
+        let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
+            || directory.join(runfiles::RUN_HU_CHECKPOINT_FILE).is_file();
 
         Ok(RunSummary {
             run_id: manifest.run_id,
@@ -97,9 +97,11 @@ impl RunsRoot {
             progress: progress_row
                 .as_ref()
                 .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
-            elapsed_secs: progress_row
-                .as_ref()
-                .and_then(|row| row.get("elapsedSecs")?.as_f64()),
+            elapsed_secs: progress_row.as_ref().and_then(|row| {
+                row.get("elapsed_secs")
+                    .or_else(|| row.get("elapsedSecs"))?
+                    .as_f64()
+            }),
             events_offset,
             resumable: checkpoint
                 && matches!(
@@ -154,8 +156,8 @@ mod tests {
         std::fs::create_dir_all(&directory).unwrap();
         let mut manifest = RunManifest::new(
             id,
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             "aa",
             vec!["solve".into()],
         );
@@ -164,7 +166,7 @@ mod tests {
         }
         manifest.write_atomic(&directory).unwrap();
         std::fs::write(
-            directory.join(formats::RUN_PROGRESS_FILE),
+            directory.join(runfiles::RUN_PROGRESS_FILE),
             "{\"sweeps\":7,\"elapsedSecs\":0.5}\n",
         )
         .unwrap();
@@ -194,6 +196,22 @@ mod tests {
         assert_eq!(runs[0].progress, Some(7));
     }
 
+    #[test]
+    fn hu_elapsed_time_uses_the_metrics_row_field() {
+        let (_guard, root) = root();
+        write_run(&root, "hu", RunState::Completed);
+        std::fs::write(
+            root.directory("hu")
+                .unwrap()
+                .join(runfiles::RUN_PROGRESS_FILE),
+            "{\"iteration\":12,\"elapsed_secs\":2.5}\n",
+        )
+        .unwrap();
+        let summary = root.summary("hu").unwrap();
+        assert_eq!(summary.progress, Some(12));
+        assert_eq!(summary.elapsed_secs, Some(2.5));
+    }
+
     /// A run whose owner died reports `interrupted`, not `running`, and the
     /// daemon must serve that resolved state rather than the recorded one.
     #[cfg(unix)]
@@ -202,10 +220,10 @@ mod tests {
         let (_guard, root) = root();
         let directory = root.directory("run-c").unwrap();
         std::fs::create_dir_all(&directory).unwrap();
-        let mut manifest = RunManifest::new("run-c", "kuhn", None, "aa", vec!["solve".into()]);
+        let mut manifest = RunManifest::new("run-c", "postflop", None, "aa", vec!["solve".into()]);
         manifest.pid = 0;
         manifest.write_atomic(&directory).unwrap();
-        std::fs::write(directory.join(formats::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(directory.join(runfiles::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
 
         let summary = root.summary("run-c").unwrap();
         assert_eq!(summary.state, RunState::Interrupted);

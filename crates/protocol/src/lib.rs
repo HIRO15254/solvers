@@ -3,7 +3,7 @@
 //! The daemon does not solve anything: it creates run directories, spawns
 //! `solvers solve --out` into them, and serves what those directories say
 //! (`docs/app-architecture.md` R1, R2). So the wire types here are mostly a
-//! projection of the run-directory contract in `formats`, reused rather than
+//! projection of the run-directory contract in `runfiles`, reused rather than
 //! restated -- a second definition of `RunState` would be a second thing to
 //! keep in sync.
 //!
@@ -11,7 +11,7 @@
 //! exist, what a client must send, and how a client resumes an event stream
 //! it was disconnected from.
 
-use formats::{RunEvent, RunState};
+use runfiles::{RunEvent, RunState};
 use serde::{Deserialize, Serialize};
 
 /// Bumped when a change would break an existing client.
@@ -244,8 +244,8 @@ mod tests {
         let summary = RunSummary {
             run_id: "run-1".into(),
             state: RunState::Running,
-            game_kind: "preflop-multiway".into(),
-            config_schema: Some("solvers.multiway-preflop/v1".into()),
+            game_kind: "mw-preflop".into(),
+            config_schema: Some("solvers.nlh/v1".into()),
             config_hash: "aa".into(),
             completion: None,
             failure: None,

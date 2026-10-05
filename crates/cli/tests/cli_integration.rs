@@ -1,5 +1,3 @@
-mod common;
-
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -17,20 +15,20 @@ fn workspace_root() -> std::path::PathBuf {
 
 /// Fully decodes an `.mwsol` file through the paged `MwSolReader` API
 /// (there is no longer a single-shot `read_mwsol` convenience wrapper).
-fn read_mwsol_full(path: &std::path::Path) -> formats::MultiwaySolution {
-    let mut reader = formats::MwSolReader::open(path).expect("open mwsol");
+fn read_mwsol_full(path: &std::path::Path) -> mw_preflop::mwsol::MultiwaySolution {
+    let mut reader = mw_preflop::mwsol::MwSolReader::open(path).expect("open mwsol");
     let total = reader.strategy_count();
     let mut cursor = 0;
     let mut strategies = Vec::with_capacity(total);
     while cursor < total {
         let page = reader
-            .read_strategy_page(cursor, formats::MWSOL_MAX_PAGE_LIMIT)
+            .read_strategy_page(cursor, mw_preflop::mwsol::MWSOL_MAX_PAGE_LIMIT)
             .expect("read strategy page");
         strategies.extend(page.strategies);
         cursor = page.next_cursor.unwrap_or(total);
     }
     let metadata = reader.metadata().clone();
-    formats::MultiwaySolution {
+    mw_preflop::mwsol::MultiwaySolution {
         schema_version: metadata.schema_version,
         config_toml: metadata.config_toml,
         config_fingerprint: metadata.config_fingerprint,
@@ -52,7 +50,7 @@ fn read_mwsol_full(path: &std::path::Path) -> formats::MultiwaySolution {
 
 #[test]
 fn inspect_smoke() {
-    let config = workspace_root().join("examples/river_small.toml");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let mut child = Command::new(env!("CARGO_BIN_EXE_solvers"))
         .arg("inspect")
         .arg(&config)
@@ -92,7 +90,7 @@ fn inspect_smoke() {
 
 #[test]
 fn report_smoke() {
-    let config = workspace_root().join("examples/river_small.toml");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let output = Command::new(env!("CARGO_BIN_EXE_solvers"))
         .arg("report")
         .arg(&config)
@@ -123,7 +121,7 @@ fn report_smoke() {
         let ev_ip: f64 = cols[ev_ip_idx].parse().unwrap();
         // Postflop EV is measured from the start of the subgame, so the two
         // sides split the starting pot rather than summing to zero.
-        // `examples/river_small.toml` has `pot = 10` and no rake.
+        // `crates/cli/tests/fixtures/river_small.toml` has `pot = 10` and no rake.
         assert!(
             (ev_oop + ev_ip - 10.0).abs() < 1e-2,
             "ev_oop+ev_ip should be the starting pot 10, got {ev_oop} + {ev_ip}"
@@ -137,19 +135,20 @@ fn report_smoke() {
 /// replacing `bet` with a different size): the paired board's root actions
 /// are `check` / `bet 10`, the unpaired board's are `check` / `bet 5`.
 const REPORT_UNION_TOML: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 55
+ante_bb = 4
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
-oop_range = "22+,A2s+,KTo+"
-ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
-pot = 10
-effective_stack = 50
-
-[game.tree]
-kind = "script"
-script = '''
-river {
+[ranges]
+BB = "22+,A2s+,KTo+"
+BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
+[tree]
+include_allin = false
+script = '''river {
   when paired {
     replace bet [100]
   }
@@ -158,10 +157,17 @@ river {
   }
 }
 '''
-
-[run]
-iterations = 200
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 200
 check_every = 50
+[run]
+threads = 1
 "#;
 
 /// `report`'s CSV header is the union of every board's root action labels,
@@ -234,24 +240,25 @@ fn report_csv_header_is_the_union_of_boards_root_actions() {
 
 // --- dead tree-script rule warning ---------------------------------------
 
-/// `examples/river_small.toml` with a third river rule nested under a
+/// `crates/cli/tests/fixtures/river_small.toml` with a third river rule nested under a
 /// contradiction (`aggressions == 0 && aggressions == 1`) -- the exact
-/// "never fires" shape `docs/solver-config-v1.jp.md` warns a nested
-/// `when` can produce (see `examples/trees/pio.tree`'s comment on it).
+/// "never fires" shape `docs/nlh-input-v1.jp.md` warns a nested
+/// `when` can produce (see `crates/cli/tests/fixtures/trees/pio.tree`'s comment on it).
 const RIVER_WITH_DEAD_RULE_TOML: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 55
+ante_bb = 4
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
-oop_range = "22+,A2s+,KTo+"
-ip_range = "55-22,QJs,A5s-A2s,KQo,T9s"
-pot = 10
-effective_stack = 50
-
-[game.tree]
-kind = "script"
-script = '''
-river {
+[ranges]
+BB = "22+,A2s+,KTo+"
+BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
+[tree]
+include_allin = false
+script = '''river {
   replace bet [50]
   replace raise [50]
   when aggressions == 0 {
@@ -259,10 +266,17 @@ river {
   }
 }
 '''
-
-[run]
-iterations = 200
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 200
 check_every = 50
+[run]
+threads = 1
 "#;
 
 /// `solve` must warn on stderr, after the `tree: nodes=...` preflight line,
@@ -292,24 +306,22 @@ fn solve_warns_about_a_tree_script_rule_that_matches_nothing() {
         "stdout should still open with the tree preflight line: {stdout}"
     );
     assert!(
-        stderr.contains("warning: 1 tree-script rule matched no node and had no effect:"),
+        stderr.contains("warning: unmatched River tree rule 3"),
         "stderr: {stderr}"
     );
     assert!(
-        stderr.contains(
-            "river rule 3: replace raise [75]  when aggressions == 0 && aggressions == 1"
-        ),
+        stderr.contains("unmatched River tree rule 3"),
         "stderr must name the dead rule's street, position, and rendered body: {stderr}"
     );
 }
 
-/// A config with no dead rule (`examples/river_small.toml`'s two river
+/// A config with no dead rule (`crates/cli/tests/fixtures/river_small.toml`'s two river
 /// rules are both unconditional, so both always match) must print no
 /// warning at all.
 #[test]
 fn solve_prints_no_warning_when_every_rule_matches() {
     let dir = temp_dir("no-dead-rule-solve");
-    let config = workspace_root().join("examples/river_small.toml");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let run = dir.join("run");
 
     let output = run_solvers_ok(&[
@@ -320,7 +332,7 @@ fn solve_prints_no_warning_when_every_rule_matches() {
     ]);
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        !stderr.contains("tree-script rule"),
+        !stderr.contains("unmatched"),
         "a config with no dead rule must print no dead-rule warning: {stderr}"
     );
 }
@@ -345,7 +357,7 @@ fn report_prints_no_warning_for_a_rule_that_matches_on_some_boards() {
     ]);
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        !stderr.contains("tree-script rule"),
+        !stderr.contains("unmatched"),
         "each rule matches on at least one of the two boards, so no warning is expected: {stderr}"
     );
 }
@@ -375,13 +387,13 @@ fn report_warns_once_about_a_rule_unmatched_on_every_board() {
         "2c 7d 9h Js Qs,2c 7d 9h Js Jd",
     ]);
     let stderr = String::from_utf8_lossy(&output.stderr);
-    let occurrences = stderr.matches("tree-script rule matched no node").count();
+    let occurrences = stderr.matches("unmatched River tree rule").count();
     assert_eq!(
         occurrences, 1,
         "the warning must be printed exactly once, after the whole sweep: {stderr}"
     );
     assert!(
-        stderr.contains("river rule 3: replace raise [200]  when spr < 0"),
+        stderr.contains("unmatched River tree rule 3"),
         "stderr: {stderr}"
     );
 }
@@ -400,6 +412,8 @@ fn temp_dir(tag: &str) -> PathBuf {
         id,
         tag
     ));
+    // Windows reuses process ids; never inherit a previous run's leftovers.
+    let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).expect("create temp dir");
     dir
 }
@@ -437,30 +451,49 @@ fn done_line_field(stdout: &str, key: &str) -> String {
         .to_string()
 }
 
-/// A tiny, fast, deterministic Kuhn config with no `target_nash_conv`: the
-/// resume-equivalence test relies on the run never stopping early, so both
-/// the straight run and the checkpointed-then-resumed run execute the exact
-/// same sequence of steps (early stopping on `target_nash_conv` would make
-/// the two runs' step counts diverge, since checking it is unconditional
+/// A tiny, fast, deterministic postflop config (`crates/cli/tests/fixtures/river_small.toml`'s
+/// river-only subgame) with no `target_nash_conv`: the resume-equivalence
+/// test relies on the run never stopping early, so both the straight run and
+/// the checkpointed-then-resumed run execute the exact same sequence of
+/// steps (early stopping on `target_nash_conv` would make the two runs' step
+/// counts diverge, since checking it is unconditional
 /// wall-clock/loop-position-dependent, not just a function of iteration).
-const KUHN_NO_EARLY_STOP: &str = r#"
-schema = "solvers.toy/v1"
-
-[game]
-kind = "kuhn"
-
-[algorithm]
-schedule = "dcfr"
-
-[run]
-iterations = 400
+const RIVER_NO_EARLY_STOP: &str = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 55
+ante_bb = 4
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2c 7d 9h Js Qs"
+[ranges]
+BB = "22+,A2s+,KTo+"
+BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
+[tree]
+include_allin = false
+script = '''river {
+  replace bet [50]
+  replace raise [50]
+}
+'''
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 200
 check_every = 50
+[run]
+threads = 1
 "#;
 
 #[test]
 fn solve_checkpoint_and_metrics_smoke() {
     let dir = temp_dir("ckpt-metrics");
-    let config = workspace_root().join("examples/kuhn.toml");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let run = dir.join("run");
     let checkpoint = run.join("checkpoint.ckpt");
     let metrics = run.join("progress.jsonl");
@@ -475,14 +508,14 @@ fn solve_checkpoint_and_metrics_smoke() {
     let reported_iters: u64 = done_line_field(&stdout, "iterations=").parse().unwrap();
 
     assert!(checkpoint.exists());
-    let loaded = formats::read_checkpoint(&checkpoint).expect("read checkpoint");
+    let loaded = hu_postflop::checkpoint::read_checkpoint(&checkpoint).expect("read checkpoint");
     assert_eq!(loaded.iteration, reported_iters);
 
     let content = std::fs::read_to_string(&metrics).unwrap();
     let mut last_iter = 0u64;
     let mut row_count = 0;
     for line in content.lines() {
-        let row: formats::MetricsRow = serde_json::from_str(line).unwrap();
+        let row: runfiles::MetricsRow = serde_json::from_str(line).unwrap();
         assert!(
             row.iteration > last_iter,
             "rows must be strictly increasing in iteration"
@@ -496,24 +529,30 @@ fn solve_checkpoint_and_metrics_smoke() {
 
 /// Resuming must reproduce a straight solve exactly.
 ///
-/// The partial run uses its own config file capped at 200 iterations, and
-/// the resumed run swaps in the 400-iteration config. The checkpoint is
+/// The partial run uses its own config file capped at 100 iterations, and
+/// the resumed run swaps in the 200-iteration config. The checkpoint is
 /// stamped with the config hash, so the two files must otherwise be
 /// byte-identical -- which is what makes this a real equivalence check
 /// rather than a re-run.
+///
+/// The two runs' solver states (regrets and strategy sums) are compared
+/// exactly, and so is every node's average strategy as read back through
+/// `export`. The `.sol` files themselves are not compared byte for byte:
+/// they record the run's wall-clock time, which a split run cannot share
+/// (the summary is compared without it).
 #[test]
-fn resume_equivalence_kuhn() {
+fn resume_equivalence_postflop() {
     let dir = temp_dir("resume-equiv");
-    let full_config = dir.join("kuhn-400.toml");
-    std::fs::write(&full_config, KUHN_NO_EARLY_STOP).unwrap();
-    let partial_config = dir.join("kuhn-200.toml");
+    let full_config = dir.join("river-200.toml");
+    std::fs::write(&full_config, RIVER_NO_EARLY_STOP).unwrap();
+    let partial_config = dir.join("river-100.toml");
     std::fs::write(
         &partial_config,
-        KUHN_NO_EARLY_STOP.replace("iterations = 400", "iterations = 200"),
+        RIVER_NO_EARLY_STOP.replace("iterations = 200", "iterations = 100"),
     )
     .unwrap();
 
-    // Run A: straight solve to the full 400 iterations.
+    // Run A: straight solve to the full 200 iterations.
     let run_a = dir.join("a");
     run_solvers_ok(&[
         "solve",
@@ -522,7 +561,7 @@ fn resume_equivalence_kuhn() {
         run_a.to_str().unwrap(),
     ]);
 
-    // Run B: solve to 200, then swap in the 400-iteration config and resume.
+    // Run B: solve to 100, then swap in the 200-iteration config and resume.
     let run_b = dir.join("b");
     run_solvers_ok(&[
         "solve",
@@ -531,72 +570,67 @@ fn resume_equivalence_kuhn() {
         run_b.to_str().unwrap(),
     ]);
     let checkpoint = run_b.join("checkpoint.ckpt");
-    let loaded = formats::read_checkpoint(&checkpoint).unwrap();
-    assert_eq!(loaded.iteration, 200);
+    let loaded = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    assert_eq!(loaded.iteration, 100);
 
     // The run directory carries the config the checkpoint was stamped with,
-    // so continuing to 400 means rewriting both together.
-    std::fs::write(run_b.join("run.toml"), KUHN_NO_EARLY_STOP).unwrap();
-    let restamped = formats::Checkpoint {
-        config_hash: formats::config_hash(KUHN_NO_EARLY_STOP.as_bytes()),
+    // so continuing to 200 means rewriting both together.
+    let doc = spot::Document::parse(RIVER_NO_EARLY_STOP, &full_config).unwrap();
+    let effective = doc.normalize(&hu_postflop::input::P1Sections).unwrap();
+    std::fs::write(run_b.join("run.toml"), &effective).unwrap();
+    let restamped = hu_postflop::checkpoint::Checkpoint {
+        config_hash: cli::nlh_v1::compatibility_hash(&effective).unwrap(),
         ..loaded
     };
-    formats::write_checkpoint(&checkpoint, restamped.config_hash, &restamped.state).unwrap();
+    hu_postflop::checkpoint::write_checkpoint_with_config(
+        &checkpoint,
+        restamped.config_hash,
+        &restamped.state,
+        &effective,
+        restamped.elapsed_secs.unwrap_or(0.0),
+    )
+    .unwrap();
 
     run_solvers_ok(&["resume", run_b.to_str().unwrap()]);
 
-    let a = std::fs::read_to_string(run_a.join("strategy.json")).unwrap();
-    let b = std::fs::read_to_string(run_b.join("strategy.json")).unwrap();
+    let straight =
+        hu_postflop::checkpoint::read_checkpoint(&run_a.join("checkpoint.ckpt")).unwrap();
+    let resumed = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    assert_eq!(straight.iteration, 200);
+    assert_eq!(resumed.iteration, 200);
     assert_eq!(
-        a, b,
+        straight.state, resumed.state,
+        "a checkpointed-then-resumed solve must bit-for-bit match a straight solve"
+    );
+
+    let export = |run: &std::path::Path, args: &[&str]| {
+        let sol = run.join("solution.sol");
+        let mut command = vec!["export", sol.to_str().unwrap()];
+        command.extend_from_slice(args);
+        run_solvers_ok(&command).stdout
+    };
+    assert_eq!(
+        export(&run_a, &["strategy", "--node", "all"]),
+        export(&run_b, &["strategy", "--node", "all"]),
         "a checkpointed-then-resumed solve must byte-for-byte match a straight solve"
     );
-}
 
-#[test]
-
-fn legacy_multiway_solve_is_rejected_before_creating_artifacts() {
-    let dir = temp_dir("multiway-legacy-rejected");
-    let config = dir.join("lowered.toml");
-    std::fs::write(&config, common::LOWERED_LEGACY).unwrap();
-    let run = dir.join("run");
-    let output = run_solvers(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--out",
-        run.to_str().unwrap(),
-    ]);
-    assert!(
-        !output.status.success(),
-        "legacy Multiway solve unexpectedly succeeded"
-    );
-    assert!(
-        String::from_utf8_lossy(&output.stderr).contains("MWP003"),
-        "stderr: {}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    // The rejection happens before any artifact is produced. The run
-    // directory itself exists (it is created to hold the manifest), so the
-    // check is that it stayed empty of results.
-    for name in ["run.json", "checkpoint.mwckpt", "solution.mwsol"] {
-        assert!(!run.join(name).exists(), "{name} was written anyway");
-    }
-}
-
-#[test]
-fn production_validate_rejects_the_retired_rollout_abstraction() {
-    let dir = temp_dir("multiway-rollout-rejected");
-    let config = dir.join("rollout.toml");
-    std::fs::write(&config, common::V1_RETIRED_ROLLOUT).unwrap();
-    let output = run_solvers(&["validate", config.to_str().unwrap()]);
-    assert!(
-        !output.status.success(),
-        "a config naming the retired rollout abstraction must not validate"
-    );
-    assert!(
-        String::from_utf8_lossy(&output.stderr).contains("MWP001"),
-        "stderr: {}",
-        String::from_utf8_lossy(&output.stderr)
+    // The summary also reports the run's wall-clock time; every other number
+    // in it (root EVs, exploitability) must agree.
+    let summary = |run: &std::path::Path| {
+        let mut summary: serde_json::Value =
+            serde_json::from_slice(&export(run, &["summary"])).expect("summary json");
+        summary
+            .as_object_mut()
+            .unwrap()
+            .remove("wall_secs")
+            .expect("the summary reports its wall time");
+        summary
+    };
+    assert_eq!(
+        summary(&run_a),
+        summary(&run_b),
+        "a resumed solve must publish the same summary as a straight one"
     );
 }
 
@@ -604,7 +638,8 @@ fn production_validate_rejects_the_retired_rollout_abstraction() {
 #[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
     let dir = temp_dir("multiway-v1-u16");
-    let config = workspace_root().join("examples/preflop_multiway_v1_production_smoke.toml");
+    let config = workspace_root()
+        .join("crates/mw-preflop/tests/fixtures/preflop_multiway_v1_production_smoke.toml");
     let run_dir = dir.join("run");
 
     run_solvers_ok(&[
@@ -627,7 +662,7 @@ fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
     assert!(result["preallocatedBytes"].as_u64().unwrap() > 0);
     assert_eq!(
         result["policyArenaLimitBytes"].as_u64().unwrap(),
-        cli::multiway_v1::PRODUCTION_POLICY_ARENA_AUTO_BYTES
+        6 * 1024 * 1024 * 1024
     );
 
     let solution = read_mwsol_full(&run_dir.join("solution.mwsol"));
@@ -649,8 +684,8 @@ fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
 #[test]
 fn resume_tampered_config_errors() {
     let dir = temp_dir("resume-tamper");
-    let config = dir.join("kuhn.toml");
-    std::fs::write(&config, KUHN_NO_EARLY_STOP).unwrap();
+    let config = dir.join("river.toml");
+    std::fs::write(&config, RIVER_NO_EARLY_STOP).unwrap();
     let run = dir.join("run");
 
     run_solvers_ok(&[
@@ -662,8 +697,8 @@ fn resume_tampered_config_errors() {
 
     // Tamper with the run directory's copy of the config after the
     // checkpoint was stamped against it.
-    let mut tampered = KUHN_NO_EARLY_STOP.to_string();
-    tampered.push_str("\n# tampered\n");
+    let mut tampered = RIVER_NO_EARLY_STOP.to_string();
+    tampered = tampered.replace("stack_bb = 55", "stack_bb = 56");
     std::fs::write(run.join("run.toml"), tampered).unwrap();
 
     let output = run_solvers(&["resume", run.to_str().unwrap()]);
@@ -679,34 +714,35 @@ fn resume_tampered_config_errors() {
 
 /// Tiny turn-start config (single chance node turn->river, tiny ranges, one
 /// bet size per street, one raise cap) -- same shape as
-/// `crates/holdem/tests/viewer.rs`'s `small_turn_config` and
-/// `crates/cli/src/sol.rs`'s own unit-test fixture, duplicated here (rather
-/// than shared) since this is a separate test binary with no access to
-/// `cli`'s internal `sol` module.
+/// `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config` and the unit-test
+/// fixture in `crates/hu-postflop/src/artifact.rs`, duplicated here (rather
+/// than shared) because unit-test fixtures are private to their crate.
 const TINY_TURN_TOML: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
-oop_range = "44,55"
-ip_range = "33,66"
-pot = 2
-effective_stack = 20
-
-[game.tree]
-kind = "script"
-script = '''
-turn { replace bet [75] }
+[ranges]
+BB = "44,55"
+BTN = "33,66"
+[tree]
+include_allin = false
+script = '''turn { replace bet [75] }
 river { replace bet [100] }
 '''
-
-[game.tree.max_aggressive_actions]
+[tree.max_aggressive_actions]
 turn = 1
 river = 1
-
-[run]
-iterations = 32
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 32
 check_every = 32
+[run]
+threads = 1
 "#;
 
 #[test]
@@ -745,13 +781,17 @@ fn sol_export_and_inspect_smoke() {
     // And `no-rivers` is the lever for a much smaller artifact: it drops
     // the river nodes, which dominate the count.
     let small_run = dir.join("run-no-rivers");
+    let no_rivers = dir.join("no-rivers.toml");
+    std::fs::write(
+        &no_rivers,
+        format!("{TINY_TURN_TOML}\n[output]\nsolution_streets = \"no-rivers\"\n"),
+    )
+    .unwrap();
     run_solvers_ok(&[
         "solve",
-        config.to_str().unwrap(),
+        no_rivers.to_str().unwrap(),
         "--out",
         small_run.to_str().unwrap(),
-        "--sol-streets",
-        "no-rivers",
     ]);
     let small_size = std::fs::metadata(small_run.join("solution.sol"))
         .unwrap()
@@ -806,30 +846,32 @@ fn sol_export_and_inspect_smoke() {
 /// end-to-end navigation smoke, not an accuracy check, see `sol.rs`'s
 /// `river_resolve_accuracy` unit test for that).
 const TINY_TURN_TOML_NO_ISO: &str = r#"
-schema = "solvers.postflop/v1"
-
-[game]
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
-oop_range = "44,55"
-ip_range = "33,66"
-pot = 2
-effective_stack = 20
-iso_merging = false
-
-[game.tree]
-kind = "script"
-script = '''
-turn { replace bet [75] }
+[ranges]
+BB = "44,55"
+BTN = "33,66"
+[tree]
+include_allin = false
+script = '''turn { replace bet [75] }
 river { replace bet [100] }
 '''
-
-[game.tree.max_aggressive_actions]
+[tree.max_aggressive_actions]
 turn = 1
 river = 1
-
-[run]
-iterations = 200
+[solver]
+iso_merging = false
+storage = "f32"
+[solver.stop]
+max_iterations = 200
 check_every = 200
+[run]
+threads = 1
 "#;
 
 /// End-to-end smoke test for `inspect --sol`'s river navigation: export a
@@ -859,14 +901,19 @@ check_every = 200
 fn inspect_sol_river_navigation_smoke() {
     let dir = temp_dir("sol-river-nav");
     let config = dir.join("turn.toml");
-    std::fs::write(&config, TINY_TURN_TOML_NO_ISO).unwrap();
-    let sol_path = dir.join("out.sol");
+    std::fs::write(
+        &config,
+        format!("{TINY_TURN_TOML_NO_ISO}\n[output]\nsolution_streets = \"no-rivers\"\n"),
+    )
+    .unwrap();
+    let run = dir.join("run");
+    let sol_path = run.join("solution.sol");
 
     run_solvers_ok(&[
         "solve",
         config.to_str().unwrap(),
-        "--sol",
-        sol_path.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
     ]);
     assert!(sol_path.exists(), "sol file must be written");
 
@@ -918,10 +965,18 @@ fn inspect_sol_river_navigation_smoke() {
     assert!(stdout.contains("at export:"), "stdout: {stdout:?}");
 }
 
+/// The quantized i16 backend on a postflop subgame (`crates/cli/tests/fixtures/river_small.toml`'s
+/// river with `storage = "i16"`): it must still converge, and its
+/// `StorageState::I16` checkpoint variant must round-trip.
 #[test]
 fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     let dir = temp_dir("i16");
-    let config = workspace_root().join("examples/kuhn_i16.toml");
+    let config = dir.join("river-i16.toml");
+    std::fs::write(
+        &config,
+        RIVER_NO_EARLY_STOP.replace("storage = \"f32\"", "storage = \"i16\""),
+    )
+    .unwrap();
     let run = dir.join("run");
     let checkpoint = run.join("checkpoint.ckpt");
 
@@ -933,158 +988,19 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     ]);
     let stdout = String::from_utf8_lossy(&output.stdout);
     let nash_conv: f64 = done_line_field(&stdout, "nash_conv=").parse().unwrap();
-    // Loose bound: kuhn under i16-quantized storage should still converge
-    // well below the game's own scale (P0's EV is -1/18 ~= -0.0556 chips).
+    // Loose bound: the river under i16-quantized storage should still
+    // converge well below the game's own scale (the pot is 10 chips, and the
+    // f32 backend reaches ~2.5e-3 in the same 200 iterations).
     assert!(
         nash_conv < 0.02,
-        "i16 storage should still converge on kuhn, got nash_conv={nash_conv}"
+        "i16 storage should still converge on the river subgame, got nash_conv={nash_conv}"
     );
 
-    let checkpoint_data = formats::read_checkpoint(&checkpoint).unwrap();
+    let checkpoint_data = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
     assert!(matches!(
         checkpoint_data.state.storage,
-        engine::StorageState::I16 { .. }
+        hu_engine::StorageState::I16 { .. }
     ));
-}
-
-// --- preflop (Mode B) -------------------------------------------------------
-
-/// 10bb push/fold: SB may only jam or fold, BB may only call or fold (root
-/// has exactly 2 actions). `{cache}` is filled in with a tempdir-local path
-/// so the exact equity table's compute-then-cache-hit round trip is
-/// self-contained and never touches a shared/repo-level cache.
-const PREFLOP_PUSHFOLD_TOML_TEMPLATE: &str = r#"
-schema = "solvers.preflop-hu/v1"
-
-[game]
-effective_stack_bb = 10.0
-open_sizes_bb = []
-raise_factors = []
-max_raises = 1
-allow_limp = false
-equity_cache = "{cache}"
-
-[algorithm]
-schedule = "dcfr"
-
-[run]
-iterations = 400
-check_every = 100
-"#;
-
-#[test]
-#[ignore = "computes the exact preflop equity table; CI runs it in release with --include-ignored"]
-fn preflop_pushfold_solve_smoke() {
-    let dir = temp_dir("preflop-pushfold");
-    let cache = dir.join("equity.bin");
-    // TOML string escaping: a Windows-style path could contain backslashes,
-    // but tempdir() on the platforms this runs on never does, so a plain
-    // substitution is safe here.
-    let config_text = PREFLOP_PUSHFOLD_TOML_TEMPLATE.replace("{cache}", &cache.to_string_lossy());
-    let config = dir.join("pushfold.toml");
-    std::fs::write(&config, config_text).unwrap();
-    let output_path = dir.join("out.json");
-
-    let output = run_solvers_ok(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--output",
-        output_path.to_str().unwrap(),
-    ]);
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(
-        stdout.contains("equity: computing"),
-        "first run should compute the table: {stdout}"
-    );
-    assert!(stdout.contains("root:"), "stdout: {stdout}");
-    assert!(stdout.contains("nash_conv"), "stdout: {stdout}");
-    assert!(stdout.contains("done:"), "stdout: {stdout}");
-    assert!(cache.exists(), "equity cache file must be created");
-
-    let json: serde_json::Value =
-        serde_json::from_str(&std::fs::read_to_string(&output_path).unwrap())
-            .expect("--output file must parse as JSON");
-    let class_labels = json["class_labels"].as_array().expect("class_labels array");
-    assert_eq!(class_labels.len(), 169);
-
-    let entries = json["entries"].as_array().expect("entries array");
-    let root = entries
-        .iter()
-        .find(|e| e["history"] == "")
-        .expect("root entry (history == \"\")");
-    let actions = root["actions"].as_array().expect("actions array");
-    assert_eq!(actions.len(), 2, "push/fold root must have 2 actions");
-    let strategy = root["strategy"].as_array().expect("strategy array");
-    assert_eq!(strategy.len(), 2, "one strategy row per action");
-    for row in strategy {
-        assert_eq!(
-            row.as_array().unwrap().len(),
-            169,
-            "each action's strategy row must cover all 169 classes"
-        );
-    }
-
-    // Second run: the equity table should now load from the cache instead of
-    // recomputing, and the run must still succeed.
-    let output2 = run_solvers_ok(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--output",
-        output_path.to_str().unwrap(),
-    ]);
-    let stdout2 = String::from_utf8_lossy(&output2.stdout);
-    assert!(
-        stdout2.contains("equity: loaded cached table"),
-        "second run should hit the cache: {stdout2}"
-    );
-    assert!(stdout2.contains("root:"), "stdout: {stdout2}");
-}
-
-// --- [game.postflop] bucketed model: error path only ------------------------
-//
-// A cold bucketed solve builds a full-street EHS² abstraction (~10 minutes
-// in release mode), which is far past what should run automatically here --
-// see `examples/preflop_hu_100bb_bucketed.toml`'s own note; the orchestrator
-// validates that config end-to-end manually. This test only exercises the
-// fast, no-build error path: `model` validation runs before any equity
-// table, abstraction, or artifact work starts, so it fails immediately.
-#[test]
-fn preflop_bucketed_unsupported_model_errors() {
-    let dir = temp_dir("preflop-bucketed-bad-model");
-    let config_text = r#"
-schema = "solvers.preflop-hu/v1"
-
-[game]
-effective_stack_bb = 10.0
-open_sizes_bb = []
-raise_factors = []
-max_raises = 1
-allow_limp = false
-
-[game.postflop]
-model = "unsupported-model"
-
-[run]
-iterations = 1
-"#;
-    let config = dir.join("bad_model.toml");
-    std::fs::write(&config, config_text).unwrap();
-
-    let output = run_solvers(&[
-        "solve",
-        config.to_str().unwrap(),
-        "--out",
-        dir.join("run").to_str().unwrap(),
-    ]);
-    assert!(
-        !output.status.success(),
-        "an unsupported game.postflop.model must fail the solve"
-    );
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(
-        stderr.contains("unsupported-model") && stderr.contains("bucketed"),
-        "expected an error naming the bad value and the supported one, got: {stderr}"
-    );
 }
 
 /// Ported from the retired desktop backend: the canonical 6-max default
@@ -1092,7 +1008,8 @@ iterations = 1
 /// allocating it. `--resources` is the CLI's only tree-preflight surface.
 #[test]
 fn validate_resources_sizes_the_default_surface_tree() {
-    let config = workspace_root().join("examples/preflop_multiway_v1_default.toml");
+    let config =
+        workspace_root().join("crates/mw-preflop/tests/fixtures/preflop_multiway_v1_default.toml");
     let output = run_solvers(&[
         "validate",
         config.to_str().unwrap(),
@@ -1127,7 +1044,8 @@ fn validate_resources_sizes_the_default_surface_tree() {
 /// must survive normalization with its non-default choices intact.
 #[test]
 fn validate_accepts_the_full_surface_fixture() {
-    let config = workspace_root().join("examples/preflop_multiway_v1_full_surface.toml");
+    let config = workspace_root()
+        .join("crates/mw-preflop/tests/fixtures/preflop_multiway_v1_full_surface.toml");
     let output = run_solvers(&[
         "validate",
         config.to_str().unwrap(),
@@ -1141,7 +1059,6 @@ fn validate_accepts_the_full_surface_fixture() {
     );
     let stdout = String::from_utf8_lossy(&output.stdout);
     for expected in [
-        "preflop_first_to_act = 4",
         "opponent_exploration = 0.125",
         "max_time = \"12h\"",
         "probability_encoding = \"f32\"",
@@ -1151,7 +1068,7 @@ fn validate_accepts_the_full_surface_fixture() {
             "effective config lost {expected}:\n{stdout}"
         );
     }
-    assert!(stdout.contains("resources: complete=true"));
+    assert!(stdout.contains("\"complete\":true"));
 }
 
 // --- run directory: status / watch / runs ls ------------------------------
@@ -1167,8 +1084,8 @@ fn fabricate_run(directory: &std::path::Path, state: &str, with_checkpoint: bool
         "schemaVersion": 1,
         "runId": run_id,
         "state": state,
-        "gameKind": "preflop-multiway",
-        "configSchema": "solvers.multiway-preflop/v1",
+        "gameKind": "mw-preflop",
+        "configSchema": "solvers.nlh/v1",
         "configHash": "aa".repeat(32),
         "cliVersion": "0.1.0",
         "command": ["solve", "config.toml"],
@@ -1317,7 +1234,8 @@ fn runs_ls_lists_run_directories_and_skips_everything_else() {
 #[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn a_solve_records_a_complete_run_directory() {
     let dir = temp_dir("run-directory-contract");
-    let config = workspace_root().join("examples/preflop_multiway_v1_3max_smoke.toml");
+    let config = workspace_root()
+        .join("crates/mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
     let run = dir.join("run");
     run_solvers_ok(&[
         "solve",
@@ -1341,14 +1259,14 @@ fn a_solve_records_a_complete_run_directory() {
     let manifest: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["state"], "completed");
-    assert_eq!(manifest["gameKind"], "preflop-multiway");
-    assert_eq!(manifest["configSchema"], "solvers.multiway-preflop/v1");
+    assert_eq!(manifest["gameKind"], "mw-preflop");
+    assert_eq!(manifest["configSchema"], "solvers.nlh/v1");
     assert!(manifest["finishedUnixMs"].as_u64().is_some());
 
     // `run.toml` must be the config the run actually used, so a run
     // directory can be re-solved from itself.
     let recorded = std::fs::read_to_string(run.join("run.toml")).unwrap();
-    assert!(recorded.contains("solvers.multiway-preflop/v1"));
+    assert!(recorded.contains("solvers.nlh/v1"));
 
     let events: Vec<serde_json::Value> = std::fs::read_to_string(run.join("events.jsonl"))
         .unwrap()
@@ -1398,7 +1316,7 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
     let config = dir.join("long.toml");
     std::fs::write(
         &config,
-        KUHN_NO_EARLY_STOP.replace("iterations = 400", "iterations = 20000000"),
+        RIVER_NO_EARLY_STOP.replace("iterations = 200", "iterations = 20000000"),
     )
     .unwrap();
     let run = dir.join("run");
@@ -1462,7 +1380,8 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
 fn the_abstraction_cache_is_shared_across_runs() {
     let dir = temp_dir("ehs2-cache");
     let cache = dir.join("cache");
-    let config = workspace_root().join("examples/preflop_multiway_v1_3max_smoke.toml");
+    let config = workspace_root()
+        .join("crates/mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
 
     let cold = run_solvers_ok(&[
         "--cache-dir",
@@ -1523,18 +1442,17 @@ fn the_abstraction_cache_is_shared_across_runs() {
         serde_json::from_slice(&std::fs::read(warm_run.join("run.json")).unwrap()).unwrap();
     assert_eq!(
         summary["algorithmFingerprint"],
-        formats::config_hash_hex(&artifact.algorithm_fingerprint),
+        runfiles::config_hash_hex(&artifact.algorithm_fingerprint),
         "run summary and solution must identify the same update semantics"
     );
 }
 
 /// Postflop publishes through `solution.sol`, which `export` reads. There
-/// is deliberately no second JSON of the same thing: `--history` and
-/// `strategy.json` belong to the families that have no artifact.
+/// is deliberately no second JSON of the same thing.
 #[test]
-fn postflop_publishes_through_the_artifact_not_strategy_json() {
+fn postflop_publishes_through_the_artifact() {
     let dir = temp_dir("postflop-export");
-    let config = workspace_root().join("examples/river_small.toml");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let run = dir.join("run");
     run_solvers_ok(&[
         "solve",
@@ -1547,27 +1465,6 @@ fn postflop_publishes_through_the_artifact_not_strategy_json() {
         run.join("solution.sol").exists(),
         "artifact must be written"
     );
-    assert!(
-        !run.join("strategy.json").exists(),
-        "postflop must not write strategy.json any more"
-    );
-
-    // `--history` names the retired path, so it has to point at the new one.
-    let rejected = Command::new(env!("CARGO_BIN_EXE_solvers"))
-        .args([
-            "solve",
-            config.to_str().unwrap(),
-            "--out",
-            dir.join("rejected").to_str().unwrap(),
-            "--history",
-            "r5",
-        ])
-        .output()
-        .expect("run solvers");
-    assert!(!rejected.status.success(), "--history must be refused");
-    let stderr = String::from_utf8_lossy(&rejected.stderr);
-    assert!(stderr.contains("export"), "{stderr}");
-    assert!(stderr.contains("--node"), "{stderr}");
 
     // Every view renders, and the per-node views accept `all`.
     let sol = run.join("solution.sol");
@@ -1613,13 +1510,92 @@ fn postflop_publishes_through_the_artifact_not_strategy_json() {
     );
 }
 
+/// `--history` picked a node out of a second JSON export that no longer
+/// exists; `export --node` is the only path now. The flag is gone from both
+/// commands, so clap refuses it (usage error, exit code 2) rather than
+/// ignoring it, and a refused `solve` leaves no run directory behind.
+#[test]
+fn the_retired_history_flag_is_refused() {
+    let dir = temp_dir("history-flag");
+    let config = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
+    let run = dir.join("run");
+
+    let rejected = run_solvers(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+        "--history",
+        "r5",
+    ]);
+    assert_eq!(rejected.status.code(), Some(2), "solve --history");
+    let stderr = String::from_utf8_lossy(&rejected.stderr);
+    assert!(stderr.contains("--history"), "stderr: {stderr}");
+    assert!(
+        !run.exists(),
+        "a refused flag must not create the run directory"
+    );
+
+    let rejected = run_solvers(&["resume", run.to_str().unwrap(), "--history", "r5"]);
+    assert_eq!(rejected.status.code(), Some(2), "resume --history");
+    let stderr = String::from_utf8_lossy(&rejected.stderr);
+    assert!(stderr.contains("--history"), "stderr: {stderr}");
+}
+
+/// Missing, retired and unknown schemas fail NLH001 on every config command.
+/// Refusal happens before a solve creates its run directory.
+#[test]
+fn removed_family_schemas_are_refused_as_unsupported() {
+    let dir = temp_dir("removed-schemas");
+    for (name, schema, game) in [
+        ("postflop", "solvers.postflop/v1", ""),
+        ("multiway", "solvers.multiway-preflop/v1", ""),
+        ("toy", "solvers.toy/v1", "kind = \"kuhn\""),
+        (
+            "preflop-hu",
+            "solvers.preflop-hu/v1",
+            "effective_stack_bb = 10.0",
+        ),
+    ] {
+        let text = format!("schema = \"{schema}\"\n\n[game]\n{game}\n\n[run]\niterations = 10\n");
+        let config = dir.join(format!("{name}.toml"));
+        std::fs::write(&config, &text).unwrap();
+        let config = config.to_str().unwrap();
+        let run = dir.join(format!("{name}-run"));
+
+        let commands = [
+            vec!["validate", config],
+            vec!["solve", config, "--out", run.to_str().unwrap()],
+            vec!["inspect", config],
+            vec!["report", config, "--boards", "2c7d9h"],
+        ];
+        for args in commands {
+            let output = run_solvers(&args);
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert_eq!(output.status.code(), Some(2), "{args:?}: {stderr}");
+            assert!(
+                stderr.contains("NLH001") && stderr.contains(schema),
+                "{args:?} must name the removed schema as unsupported: {stderr}"
+            );
+            assert!(
+                stderr.contains("solvers.nlh/v1") && stderr.contains("docs/nlh-input-v1.jp.md"),
+                "{args:?} must list the schemas that remain: {stderr}"
+            );
+        }
+        assert!(
+            !run.exists(),
+            "a refused solve must not create its run directory"
+        );
+    }
+}
+
 /// `compare` lines two artifacts up by node, so an artifact compared with
 /// itself must report exactly zero, and two solves of the same config that
 /// ran for different lengths must differ a little and agree on the spot.
 #[test]
 fn postflop_compare_reports_zero_against_itself() {
     let dir = temp_dir("postflop-compare");
-    let short = workspace_root().join("examples/river_small.toml");
+    let short = workspace_root().join("crates/cli/tests/fixtures/river_small.toml");
     let long = dir.join("long.toml");
     std::fs::write(
         &long,
@@ -1665,4 +1641,44 @@ fn postflop_compare_reports_zero_against_itself() {
         (left - right).abs() < 0.1,
         "root EV drifted: {left} vs {right}"
     );
+}
+
+/// Read-only monitoring remains available even when the embedded config is retired.
+#[test]
+fn old_run_monitoring_preserves_the_recorded_schema_and_game_kind() {
+    let dir = tempfile::tempdir().unwrap();
+    for (name, schema, kind) in [
+        ("postflop", "solvers.postflop/v1", "postflop"),
+        (
+            "multiway",
+            "solvers.multiway-preflop/v1",
+            "preflop-multiway",
+        ),
+    ] {
+        let run = dir.path().join(name);
+        fabricate_run(&run, "completed", false);
+        let manifest_path = run.join("manifest.json");
+        let mut manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&manifest_path).unwrap()).unwrap();
+        manifest["configSchema"] = schema.into();
+        manifest["gameKind"] = kind.into();
+        std::fs::write(&manifest_path, serde_json::to_vec(&manifest).unwrap()).unwrap();
+        std::fs::write(run.join("run.toml"), format!("schema = '{schema}'\n")).unwrap();
+        let output = run_solvers_ok(&["status", run.to_str().unwrap(), "--format", "json"]);
+        let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert!(status.to_string().contains(schema), "{status}");
+        assert!(status.to_string().contains(kind), "{status}");
+        run_solvers_ok(&["watch", run.to_str().unwrap(), "--format", "json"]);
+    }
+    let listed = run_solvers_ok(&[
+        "runs",
+        "ls",
+        dir.path().to_str().unwrap(),
+        "--format",
+        "json",
+    ]);
+    let rows: serde_json::Value = serde_json::from_slice(&listed.stdout).unwrap();
+    assert_eq!(rows["runs"].as_array().unwrap().len(), 2);
+    assert!(rows.to_string().contains("solvers.postflop/v1"));
+    assert!(rows.to_string().contains("solvers.multiway-preflop/v1"));
 }

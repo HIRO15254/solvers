@@ -1,11 +1,11 @@
 # アーキテクチャ: HU vector engine と Multiway sampled engine
 
-本書は現在の workspace、計算時の表現、維持する不変条件を記す。
-公開入力・既定値・保存契約の正本は [文書索引](README.md) に示す規範仕様であり、
-本書はその代替ではない。作業状態の管理先は [status.jp.md](status.jp.md) から辿る Linear、
-優先順位と受入条件は [product-roadmap.jp.md](product-roadmap.jp.md)、
-検証手順は [development.md](development.md) と [validation.jp.md](validation.jp.md) を参照する。
-将来の接続点は §11 に分け、未実装 API を現行構成へ含めない。
+本書は現行コードの責務、依存方向、計算と保存の境界を記す。
+公開入力は[共通Input規範](nlh-input-v1.jp.md)、計算と成果物は
+[P1規範](hu-postflop.jp.md)・[P2暫定規範](mw-preflop.jp.md)、操作は
+[CLI reference](cli-reference.jp.md)を参照する。仕様や既定値を本書へ複製しない。
+移行の経緯と手順は[再構築計画](plans/two-product-restructure.jp.md)、
+作業状態の管理先は[status.jp.md](status.jp.md)、検証手順は[development.md](development.md)に置く。
 
 ## 0. 維持する設計原則
 
@@ -21,78 +21,70 @@
    Multiway は共有実カード world、2–9 seat の状態・精算、専用 policy arena と sampled traversal を使う。
 6. **再開用 state と閲覧用 artifact を分ける。** 平均戦略、保存時の値、未保存領域の再計算を区別し、
    config と実行 source の identity を検証証拠へ結び付ける。
-7. **oracle の独立性を守る。** `cfr-ref` は凍結し、engine/game と実装を共有しない。
+7. **oracle の独立性を守る。** `cfr-ref` は凍結し、hu-engine/hu-postflop と実装を共有しない。
    ライセンスと外部実装の参照境界は [LICENSE-POLICY.md](../LICENSE-POLICY.md) に従う。
 
-## 1. 変更箇所と責務
+## 1. crateの責務
 
-| 変更の種類 | 主な実装 | 保持する境界 |
-|---|---|---|
-| HU CFR、BR、storage、reach | `crates/engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
-| HU postflop の木と terminal kernel | `crates/holdem` | rules/metadata と engine の汎用木を分ける |
-| rake / utility | `crates/game/src/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
-| HU preflop / bucketed blueprint | `crates/preflop`、`crates/abstraction` | 169-class trunk、継続モデル、lossy bucket の意味を区別する |
-| 多人数の state / sampling / evaluation | `crates/multiway` | production、read-only 診断、feature-gated 研究経路を区別する |
-| 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
-| 保存 / run metadata / wire types | `crates/formats`、`crates/protocol` | format version と algorithm identity は別物。読み手との互換性を確認する |
-| job / HTTP / remote | `crates/daemon` | solver は CLI 子プロセスへ委譲し、永続状態は run directory から読む |
-
-crate 境界は独立した計算経路と依存方向を表す。大きなファイルは schema、lowering、
-preflight、storage、evaluation 等の責務で module 分割し、ファイル行数だけを理由に crate を増やさない。
+| crate | 現行の責務 |
+|---|---|
+| `nlh` | card・combo・range・役判定・suit同型・chip/seat型、NLH bettingと精算、tree scriptの汎用処理系 |
+| `economics` | 共通rake条件・控除・配分、ICM、utility設定 |
+| `spot` | 共通Inputのparse・正規化・line再生・製品判定、Spot IR、tree方言 |
+| `hu-engine` | HUのpublic tree、vector CFR/BR、storage、discount schedule、chance-sampled driver |
+| `hu-postflop` | P1のlower・木・payoff・資源preflight・solve/resume、checkpoint、`.sol`、typed queryとboard report。payoffを通すtoy gameも持つ |
+| `mw-preflop` | P2のlower・session・資源preflight・EHS²・dense arena・sampled solve・停止評価、checkpoint、`.mwsol`、typed query |
+| `runfiles` | run directoryの共通DTO・manifest・events・HU metrics・config hash |
+| `cli` | `solvers`の引数・dispatch・cache policy・signal、run lifecycle、符号化と表示、P1 REPL、exit code |
+| `protocol` | daemonのHTTP request/responseとrun wire型 |
+| `daemon` | `solversd`の認証・queue・子process管理・監視・artifact配信 |
+| `cfr-ref` | 凍結した独立CFR/BR oracle。test専用 |
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 13 crate で構成される。
-`cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
+normal workspace dependencyは次のとおりである。external crateとdev-dependencyは省く。
+`cargo tree -p <crate> --edges normal --depth 1`で確認できる。
 
 ```text
-crates/
-├── cli/          # solvers: 公開schema/normalizer、session、run lifecycle、artifact query
-├── protocol/     # daemon の versioned request/response 型
-├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
-├── cards/        # card/range/evaluator、HU基本型、bet size、tree-script front end
-├── hand-index/   # suit-isomorphism の canonicalization / index
-├── cfr-ref/      # 凍結 scalar CFR / BR oracle
-├── engine/       # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
-├── game/         # payoff pipeline、production tree を使う Kuhn/Leduc
-├── holdem/       # Flop/Turn/River開始の HU postflop、kernel、viewer helper
-├── abstraction/  # EHS² percentile bucket、blueprint transition/equity、cache
-├── preflop/      # HU 169-class trunk と bucketed blueprint
-├── multiway/     # 2–9 seat NLHE、dense arena、sampled solver、checkpoint
-└── formats/      # HU checkpoint、solution、metrics、run-directory DTO/codec
+nlh, runfiles, cfr-ref → workspace内の依存なし
+economics              → nlh
+spot                   → nlh, economics
+hu-engine              → nlh
+hu-postflop            → nlh, economics, spot, hu-engine, runfiles
+mw-preflop             → nlh, economics, spot, runfiles
+protocol               → runfiles
+daemon                 → runfiles, protocol
+cli                    → spot, hu-postflop, mw-preflop, runfiles
 ```
 
-現在の workspace 内の通常依存は次のとおり。矢印は「左が右へ依存」を意味し、
-外部ライブラリと dev-dependency は省略する。
+製品crateは`cli`・`protocol`・`daemon`へ依存しない。CLIが公開APIで必要とする下位型は
+製品crateが個別にre-exportする。`Player`・`PerPlayer`はHU専用であり、P2のseat型へ一般化しない。
+P2固有のsweep・bucket・deviator CIは`mw-preflop`の型に残す。
 
 ```text
-cards, cfr-ref                       → workspace内の通常依存なし
-hand-index, engine                  → cards
-game                                → cards, engine
-holdem                              → cards, hand-index, engine, game
-abstraction                         → cards, hand-index
-preflop                             → cards, hand-index, abstraction, engine, game
-multiway                            → cards, abstraction
-formats                             → engine
-protocol                            → formats
-daemon                              → formats, protocol
-cli                                 → cards, abstraction, engine, game, holdem,
-                                      preflop, multiway, formats
+TOML → spot::Document → Spot IR + 製品別settings節
+                          ├→ hu-postflop::prepare/input → P1 game → run/queries/report
+                          └→ mw-preflop::prepare/input  → P2 session → run/views
+製品のtyped observation → CLI observer → runfiles progress/events/manifest
+製品のsummary/query     → CLI encoder  → run.json・stdout・CSV/JSON
+製品のstate/profile     → 製品codec     → checkpoint・solution
+P2 .mwsol + line/board → mw-preflop::derive → combo weightと未訪問class
+                       → spot::derive + 任意base → hu-postflop::prepare → P1実効Input
 ```
 
-`engine` は `cards::Player` / `PerPlayer<T>` の基本型を使うが、betting や hand evaluator の
-ルールには依存しない。`formats` は HU checkpoint の `engine::SolverState` を保存するため
-engine に依存しており、完全に独立した DTO crate ではない。Multiway checkpoint は
-`crates/multiway/src/checkpoint.rs` が所有する。公開 `SolveConfig` の parse/lower は
-`crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
+製品がsolve loop、停止・資源判定、artifactの読書きを所有する。CLIは実効configとrun identityを
+記録し、observerで進捗とeventを保存する。製品は`AtomicBool`のcancel flagを明示的に受け取る。
+P2のcache利用APIはpathを受け取り、場所の選択はCLIに残す。P1にはmachine cacheが無い。
 
-HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
-別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。
+`mw_preflop::derive`は保存public treeとの整数action照合と平均確率によるrange計算を所有し、
+`views`の確率lookupを共有する。`spot::derive`はline再生、baseの共通条件照合とdocument組立てを行う。
+CLIの`derive` adapterはmanifest・solution hash・入出力・警告表示を担当し、
+P1の`prepare`で検証した正規化Inputだけを書き出す。
 
-## 3. コア表現(engine crate)
+## 3. コア表現(hu-engine crate)
 
-実装入口は [tree.rs](../crates/engine/src/tree.rs)、[solver.rs](../crates/engine/src/solver.rs)、
-[storage.rs](../crates/engine/src/storage.rs)、[schedule.rs](../crates/engine/src/schedule.rs)。
+実装入口は [tree.rs](../crates/hu-engine/src/tree.rs)、[solver.rs](../crates/hu-engine/src/solver.rs)、
+[storage.rs](../crates/hu-engine/src/storage.rs)、[schedule.rs](../crates/hu-engine/src/schedule.rs)。
 以下は責務の要約であり、Rust 型の定義を複製しない。
 
 `TreeSpec` / `TempNode` を `PublicTree::compile` が immutable な public tree へ変換する。
@@ -109,7 +101,7 @@ Chance branch の `Deal` は重みと両者の `ReachMap` を持つ。
   reach は forward、value は backward に写す。
 
 ノードごとの `StorageRef` が hand 次元を持つ。これらの演算は
-[次元変化の試験](../crates/engine/tests/dimension_changing_transitions.rs)で検査されるが、
+[次元変化の試験](../crates/hu-engine/tests/dimension_changing_transitions.rs)で検査されるが、
 Stud/Draw のルール・観測・情報集合を実装済みとするものではない。
 
 Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付き量子化を行う
@@ -128,120 +120,105 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
 
-[McSolver](../crates/engine/src/mccfr.rs) は chance node を sample し、両者の action node は
+[McSolver](../crates/hu-engine/src/mccfr.rs) は chance node を sample し、両者の action node は
 vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、
 ChaCha の seed/word position を含む state を持つ。Multiway の external-sampling 経路とは分ける。
 
-SIMD は compiler の自動 vectorization を基本とする。既存の release/LTO 監査では主要な連続 loop が
-vectorize され、残る sorted-rank sweep / sparse transition は依存関係や不規則アクセスを持つため、
-`wide` の追加は採用していない。再検討は対象 hardware の linked binary と A/B 測定を根拠にする。
+SIMD は compiler の自動 vectorization を基本とする。hot loop の変更は対象 hardware の
+linked binary と A/B 測定で検証する。
 
-## 4. Payoff pipeline(game crate)
+## 4. Payoff pipeline(hu-postflop::game module)
 
-[payoff.rs](../crates/game/src/payoff.rs) の build-time pipeline は次の 3 段からなる。
+`hu_postflop::input::NlhPayoff`がSpot IRのeconomicsと実際の卓stackをP1へ接続する。
+共通rakeとICMは`economics`にあり、CLIはpayoffを構築しない。
+`game::PayoffPipeline`はterminalのfold/showdown・pot・contribution・stackから
+P0 win / tie / P1 winの両者のutilityを`BakedPayoffs`へ焼き込む。
+engineは定数を読む。反復中にrakeやICMを評価しない。
 
-1. variant builder が `TerminalDescriptor` に fold/showdown、street、pot、contribution、開始 stack を渡す。
-2. `RakeModel` が控除額を、`UtilityModel` が精算後 stack の効用を計算する。
-3. `PayoffPipeline` が P0 win / tie / P1 win の両者の値を `BakedPayoffs` へ焼き込む。
+木のeffective stackと、実際の卓stack・foldした席・outside fieldを区別する。
+`run::subgame_ev`とartifact writerは同じ開始時基準を使う。
+blocker付きの相手reachでCFVを正規化してからutility offsetを加える。
+単位とbaselineの正本は[P1規範](hu-postflop.jp.md)である。
 
-値は開始 stack の utility を基準とする。engine は焼き込み済み定数を参照するだけで、rake や ICM を
-反復ごとに評価しない。`NoRake` / `PercentCapRake` / `GgPreflopRake`、`ChipEv` / 純 HU の `Icm`
-を持ち、汎用 rake と卓外 field を含む tournament ICM の HU adapter は
-[cli/src/economics.rs](../crates/cli/src/economics.rs) にある。
-純 HU ICM の affine 性と、卓外 field を持つ tournament ICM を区別する。
-FGS、bounty、profile をこの pipeline だけで実装できるとは仮定しない。
+## 5. Mode A: hu-postflop crate(exact postflop)
 
-## 5. Mode A: holdem crate(exact postflop)
+`postflop`がFlop/Turn/River開始の木を作る。full combo vectorを使い、card abstractionは持たない。
+suit同型の枝・確率・reach写像はbuilderが決める。`kernel`はsorted-rank showdown sweepと
+fold inclusion–exclusionを持つ。rank/card-removalの表はbuild時に用意する。
 
-[postflop.rs](../crates/holdem/src/postflop.rs) が `PostflopConfig` から Flop / Turn / River 開始の木を作る。
-手札は full combo 空間で表現し、card abstraction を用いない。betting tree の制約は
-選択されたゲームの一部であり、全 NLHE action を含むという意味ではない。
+`prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
+`run::run`はlocal poolでf32/i16のgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
+`Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
+callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。
 
-- Suit isomorphism は builder の責務。canonical chance branch とその重み／reach mask を engine へ渡す。
-- [kernel.rs](../crates/holdem/src/kernel.rs) は sorted-rank の O(n+m) showdown sweep と
-  O(n) fold inclusion–exclusion を使う。rank 評価と card-removal 用の表は build 時に準備する。
-- per-hand CFV の正規化は blocker を考慮した相手 reach を使う。公開値の単位と subgame-start 基準は
-  [HU 規範](solver-config-v1.jp.md)に従い、途中の自分の bet を利益へ再加算しない。
-- [viewer.rs](../crates/holdem/src/viewer.rs) は history replay と river subgame の再構成を担当する。
-  未保存 river の再 solve は元の solve の結果と区別する。
-- メモリは概ね regret/average の 2 buffer と各 node の action × hand 数で増える。
-  Flop tree は 2 層の chance とサイズ・raise cap の組合せで大きくなるため、事前見積りを行う。
-  ある 3-bet pot の測定値を SRP や別の action tree の資源保証へ流用しない。
+`sol`と`checkpoint`はcodecである。`artifact`はsolution export、config検証、tree再構築、
+stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのstrategy queryはreachを再構築し、
+同じ設定でRiverをlazy re-solveする。`viewer`はhistory replayとsubgame再構成を担当する。
+`queries`はlive inspection、reach・action frequency・class grid・equity・combo queryを返す。
+`views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。
+`report`は全boardを先に検証し、boardごとの数値とOR集約したrule-hit警告を返す。
+これらのmoduleはstdout/stderrやCLI引数を持たない。
 
-## 6. Mode B: preflop + abstraction crate
+## 6. mw-preflop::card_abstraction module(Multiway の bucket)
 
-[preflop](../crates/preflop/src/lib.rs) の trunk は 169 hand class の reach を使う。
-同一 class 内で combo weight が一様な条件では lossless であり、reach は class ごとの確率密度ではなく
-combo weight の合計である。compatible combo pair の比率を terminal 評価と root normalizer に反映する。
-
-現在の [PostflopModel](../crates/preflop/src/model.rs) は
-`continuation_coef(ctx, player) -> TermCoef { a, b, c }` を返し、class pair の utility を
-`a + b * e_win + c * e_tie` と表す。`EquityShowdown` は realization factor を使う実装である。
-これは range 条件付き value ベクトルを返す API ではなく、NN や solved flop subset をそのまま接続できない。
-
-別の [bucketed.rs](../crates/preflop/src/bucketed.rs) は `BlueprintGame` を組み立てる。
-[abstraction](../crates/abstraction/src/lib.rs) の `Ehs2Abstraction`、bucket 間の transition / equity
-artifact を利用し、engine 側は bucket を私的状態の次元として扱う。`CardAbstraction` は
-具体的な board/combo と bucket の対応を build 時に提供する。
-
-多人数の range 相関や bunching は HU class trunk の単純な延長とは扱わず、共有 world と
-joint belief の検証を伴う別境界とする。NN、別方式の abstraction、追加 variant の採否は §11 と
-ロードマップに従う。
+`card_abstraction::Ehs2Abstraction`はcanonical boardとcomboをEHS² percentile bucketへ写す。
+Preflopは169 hand class、Postflopはstreet別のbucketを使う。P1のexact combo経路とは分ける。
+cacheのbuild/loadと互換性検証は製品側にある。CLIはcache rootを渡し、診断だけを表示する。
 
 ## 7. 正当性検証
 
-- Kuhn/Leduc を production の compiled-tree 経路へ通す既知解の検査。
-- [game の oracle 差分試験](../crates/game/tests/oracle_diff.rs)と
-  [holdem の multi-street oracle 差分試験](../crates/holdem/tests/oracle_diff.rs)。
-- strategy simplex、zero-sum が成立する条件、pure HU ICM、rake/general-sum、
-  suit isomorphism、f32/i16、chance の次元変化の不変条件。
-- 保存／再開、量子化、保存時の EV と query の一致、および未保存領域の区別。
+testは計算層と利用者境界を分けて置く。
 
-実行コマンドと重い ignored test の扱いは [development.md](development.md)、
-HU の参照比較・測定・受入は [validation.jp.md](validation.jp.md) に置く。
-過去の比較値や実行時間を、このアーキテクチャの達成済み品質や普遍的な性能保証にはしない。
+- `nlh`・`economics`・`spot`: betting/精算、単位、rake/ICM、schema・normalizer・line再生。
+- `hu-engine`: storage、reach、chanceの次元変化、CFR/BRとstate復元。
+- `hu-postflop`: kernel、payoff、f32/i16、iso、保存coverageと値、River re-solve。
+  [toy oracle差分](../crates/hu-postflop/tests/toy_oracle_diff.rs)と
+  [postflop oracle差分](../crates/hu-postflop/tests/oracle_diff.rs)は凍結`cfr-ref`と独立に照合する。
+- `mw-preflop`: dense arena、固定seed、thread数独立のmerge、平均profile、停止評価、checkpointとviews。
+- `cli/tests`: 公開入力、help、出力、run lifecycle、signal/resume、artifact dispatchとexit code。
+- `daemon`・`protocol`: HTTP、認証、queue、event offset、再起動とartifact配信。
+
+整数構造の回帰pinは[P1 tree identity](../crates/hu-postflop/tests/tree_identity.rs)と
+[P2 tree identity](../crates/mw-preflop/tests/nlh_tree_identity.rs)にある。
+P2のabstraction identityは`crates/mw-preflop/tests/fixtures/tree_abstractions.json`で固定する。
+浮動小数点の戦略・EVはhashで固定しない。移動の検証では保存済みbaselineと同条件の実行を比較する。
+必須checkとexpensive ignored testは[development.md](development.md)、品質基準は
+[products.jp.md](products.jp.md)、参照候補は[HU検証計画](plans/hu-postflop-validation/README.md)を参照する。
 
 ## 8. config・保存・query の境界
 
-公開 TOML は family ごとの parser/normalizer を経て内部 config へ lower する。
-`run.toml` は実行に用いた effective config、hash はその identity を保存 artifact へ結び付ける。
-source revision だけで dirty tree を識別できない場合は、source/binary hash も検証記録に残す。
+`spot::Document`が共通Inputをparse・正規化する。製品の`input`が自分のsettingsを解釈する。
+`run.toml`は実行したeffective configであり、config hashがartifactと計算identityを結ぶ。
+HU resumeはhistorical/embedded configとcheckpointの互換hashを検証する。
+operational overrideは互換identityから分ける。P2はsessionのgame/abstraction/algorithm identityも検査する。
 
-| 用途 | 現在の所有箇所 | 意味 |
+| 保存物 | 所有箇所 | 内容 |
 |---|---|---|
-| HU checkpoint `.ckpt` | `formats::checkpoint` + CLI driver | 再開に必要な solver state。viewer artifact と互換扱いしない |
-| HU solution `.sol` | `formats::sol` + CLI artifact query | 平均戦略(u16)と per-hand 値(i16/scale)、config、metadata。`Full` / `NoRivers` |
-| Multiway checkpoint `.mwckpt` | `multiway::checkpoint` | state と RNG / policy / history の復元。container と state の version を検査 |
-| Multiway solution `.mwsol` | `formats::mwsol` + CLI artifact query | 正式な平均 profile と metadata。保存 coverage と評価可能範囲を区別 |
-| run / progress / event | `formats::run`、`metrics`、`multiway` | lifecycle、定期測定、離散事象を別データとして保持 |
+| `.ckpt` | `hu_postflop::checkpoint`、`run` | HUの再開stateとconfig、累積solve時間 |
+| `.sol` | `hu_postflop::sol`、`artifact` | 量子化平均戦略・per-hand値、保存範囲、configとmetadata |
+| `.mwckpt` | `mw_preflop::checkpoint`、`session`、`run` | policy・RNG・history・停止確認の復元 |
+| `.mwsol` | `mw_preflop::mwsol`、`session`、`views` | 正式平均profileとidentity、保存coverage、評価data |
+| run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
-`.sol` は戦略だけのファイルではない。保存対象 node の値も持ち、`NoRivers` の再 solve で
-元の per-hand 値を上書き解釈しない。`export` / `compare` / `report` と対話 `inspect` が現在の
-query 表面であり、完全なコマンド・family 対応は [CLI reference](cli-reference.jp.md) に置く。
-共通 `NodeQuery/NodeReport`、UPI 互換 protocol、`solvers bench`、PyO3/WASM adapter は
-現行の公開 API として扱わない。benchmark は Cargo bench と検証用 runner で行う。
+checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
+CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。
+artifact形式と公開操作の意味は製品規範と[CLI reference](cli-reference.jp.md)を参照する。
 
 ## 9. アプリケーション境界
 
-```text
-将来の Web GUI (pure client)
-    ↓ versioned JSON over HTTP
-crates/daemon      solversd: queue、認証/TLS、監視、artifact 配信
-    ↓ child process + run directory
-crates/cli         solvers: config、solve/resume、artifact driver
-    ↓ Rust API
-solver / formats   domain は HTTP、job、画面状態を持たない
-```
-
-`solversd` は実装済みであり、自身では solve しない。永続 job 状態を run directory へ置くことで、
-client の終了や再接続と計算を分離する。config の検証・正規化と artifact query の意味は Rust/CLI 側に
-集約する。Web GUI はこの境界を使う設計案である。詳細は [app-architecture.md](app-architecture.md)。
+`solversd`はCLIを子processとして起動し、自身ではsolveしない。永続状態はrun directoryから読む。
+`protocol`と`daemon`はsolver crateへ依存しない。GUI実装はworkspaceに無い。
+CLIのviewer queryは製品APIを使う。HTTP・job・画面状態はdomainへ入れない。
+現行のHTTPとviewer境界は[app-architecture.md](app-architecture.md)に記す。
 
 ## 10. Multiway Production経路
 
-通常学習と、同じ state を読む診断 API、feature-gated 研究 sampling を以下で分ける。
-production の公開入力は [Multiway 規範](multiway-preflop-v1.jp.md)、実装との対応は
-[実装 map](multiway-preflop-v1.md)を参照する。
+`prepare`がSpot IRのlower・資源preflightを、`session`がtyped game・EHS²・arena・identityを構築する。
+`run`がsolve/resume・時間制限・協調cancel・checkpoint・停止評価を所有する。
+typed observationとdiagnosticをcallbackへ渡し、run summaryを返す。
+progress/eventの保存とJSON/CSV表示はCLIが担う。`views`がartifact query・比較・profile評価を返す。
+`derive`は保存済みPreflop平均戦略からP1用combo rangeを返す。
+P2固有量を`spot`・`runfiles`の共通DTOへ移さない。
 
 ### 10.1 arena と通常の学習・停止評価
 
@@ -264,91 +241,7 @@ cooperative cancelの判定単位は引き続きbatch境界である。
 進捗表示はcompleted sweep/traversal/hand-update counterをO(1)で読む。正式な
 profile EVとtrained deviationは設定された停止判定境界だけで評価する。
 
-### 10.2 通常学習を変更しない条件付き診断
-
-研究用の条件付きbranch監査は `solver/conditioned.rs` に分離する。held-out worldで
-公開prefixを強制しbaseline経路確率で重み付けするが、通常の評価・停止判定へは
-混ぜない。共通のprofile replayがstrategy sourceと行動確率を決め、対局単位の
-分子/分母共分散をsample-id順に集計する。sample結果bufferは約8MiBに制限する。
-Holdem専用 `solver/preflop_proposal.rs` はpreflopのown-combo factorizationを利用し、
-補正付きrange proposalを構築する。学習用samplerは変更せず、評価の強制preflop
-確率を二重に掛けない。異なるtrunkは別の配札予算としてCLIでgroup化する。
-checkpoint監査exampleのfresh固定sweep modeは既存のproduction driverを呼んで凍結評価する。
-raw support出力はbucket計算用に記録されたstreet人数と現在のInfoKey人数を分け、未保存列・ゼロregret・
-非正regret・正regret・平均質量を記録する。zero-weight更新もtouchedを立て得るため、
-保存済み列数を数値regret更新や収束の代用指標にしない。
-Holdemの現在streetの人数記録は行動ごとに更新されるため、開始時に固定した人数ではない。
-
-`solver/endpoint_deviation.rs` の研究評価は、独立fit worldでown InfoKey別の行動を
-選んで固定し、別seedのheld-out worldで指定preflop/postflop endpointの最初の判断だけを変更する。
-rootは空prefix、preflop途中の判断はその直前までの部分prefixをproposal化する。
-postflopでは従来どおり完全preflop trunkを使い、その後の強制行動だけを追加で重み付けする。
-既存のbaseline-only条件付きproposal APIのpostflop限定は維持する。
-後続の本人判断もbaselineに戻す。補正proposalとprefix重みはbaselineから固定し、
-candidate行動確率を重みに掛けない。未採用keyはbaselineのまま分母へ含め、符号付き
-条件付き利得・delta誤差と採用keyの重みcoverageを分ける。sample順の有界集計と
-全bucket出力により、追加計算量と未評価領域を確認できる。通常学習・停止評価には混ぜない。
-ほぼ一定の利得とproposal重みで共分散の差が負に丸められる場合は、固定anchorで
-中心化した残差momentから同じdelta分散を再計算する。従来正常な有限計算経路は
-維持し、非有限のsecond momentや再計算後の不正分散は明示拒否する。
-
-Preflop専用counterfactual endpoint APIは同じfit/replay集計器を使い、別proposal preparationで
-endpoint actorのprefix factorだけを1に置換する。全1326 comboの169-class mappingを各public
-contextで検証し、元の本人factorはclass別metadataに保存する。CF correctionを初期weightとし、
-強制Preflop pathの再重み付けを全てskipするため、本人到達確率0でもsuffixを評価できる。
-既存actual-prefix APIの演算順・乱数・出力は維持する。新wrapperの全weight/fit/gainは
-明示したopponents-prefix targetに属し、学習weightや絶対root reachではない。
-checkpoint監査exampleは最大8個の一意なendpointを同じ復元solverで逐次診断し、繰り返しの
-session構築を避ける。各fit/held-outは独立であり、複数逸脱を合成しない。1個の場合は既存の
-単数JSON field、複数ならtarget別の配列fieldを使い、未使用fieldは省略する。
-`both` はPreflop限定で同じendpointの両targetを別々に実行し、それぞれに全budgetを適用する。
-
-`solver/preflop_deviation.rs` は別のread-only API `evaluate_preflop_deviation` を提供する。
-scope `all-preflop-decisions-with-frozen-postflop` は、各seatの複数Preflop判断を変更する
-独立fit tableを使い、Postflopと未採用keyを指定variantのcandidate baselineへ固定する。
-`eval.rs` のconst true経路だけがこのscopeを選び、candidate private streetで可否を判定し、
-reference keyはPreflopのfit/replayだけに使う。const falseの旧診断は通常budgetの演算/RNGを保つ。
-両fit経路のvisit mapはchecked u64で、8 visits以上を採用し、overflowは明示errorにする。
-正のfit traversalsをseatごとに実行し、held-outは2 samples以上、1〜64個の一意なseedを
-fit seedから分離する。各seatは単独逸脱であり、fit tableを共同戦略に合成しない。
-held-outは最大4096件のusize indexed Rayon結果をsample-id順にWelford集計する。
-全worldを分母として負値も残すpaired gain、seat別CI、fit/replay coverage、baselineだけの
-strategy sourceを返し、O(samples)のworld保持を避ける。fit tableは訪問key数に応じて増える。
-`fitPolicyFingerprint` はsorted fit actionsのみを識別し、baselineのidentityとは分離する。
-監査exampleの明示的な4つの `--preflop-deviation-*` flagからoptional `preflopDeviation` に
-出力する。省略時は無効で、通常の評価/停止・学習default・checkpoint/solution形式は変えない。
-seat別CIを全seat/seedの同時保証やfull BR・multiway equilibriumの保証には拡張しない。
-
-同APIの `_with_fit_mode` variantは研究fit方式を選択し、`fitMode` に既定の
-`local-regret-matching` または `retention-gated` を記録する。retention gateは本人Preflop
-keyの8回目からlocal RMを有効にし、それまではcandidate-keyのbaseline期待値を返す。
-全本人actionを列挙してregret更新するためzero-own-reachでも深い子を探索する。期待値は
-replay samplerのf32累積区間・最終action残余に合わせる。最終tableの純粋argmaxや有限fitの
-誤差は残る。監査exampleの追加任意flag `--preflop-deviation-retention-gate` で選択する。
-
-### 10.3 support 診断と研究用 sampling
-
-`solver/preflop_census.rs` はカードを参照せず公開stateを辿り、materialized Preflop判断の
-全件性とmenuを検証する。arena sliceを借用し、未使用列を含むraw f32 bits/touchedをhash化し、
-nodeごとの数値supportとactor・レイズ回数・人数等だけを保持する。全state snapshotは不要であり、
-数値supportを訪問数や品質と扱わない。研究flag `research-regret-sampling` の
-`run_raised_preflop_research` はfresh dense vector・ε0・pruning無効に限定し、公開eligibilityを
-事前計算して各pathの最初のレイズ後opponent判断を列挙する。子へα×σ、戻り値へσを使い、
-virtual sampled childのRNGを継承する。通常driverはconst falseで従来順を維持し、
-平均walkとproductionの保存identityは変更しない。研究方式のcheckpoint/resumeは未対応である。
-
-平均walkの研究候補 `PostflopContinuation` はStreet recall限定で、公開された
-postflop menuの全行動一様とcheck/call一様を50/50で混合する。preflop/C-emptyは一様。
-カード非依存のhistory別proposal係数は期待累積平均の正規化で相殺されるが、
-有限標本の比率推定誤差は残る。独立regret passとRNGは変えず、fresh専用とする。
-`solver/research_diagnostics.rs` のconsuming Holdem APIは、同じ学習済みstateを内部に
-保持してsupport・endpoint・root評価を実施した後に破棄する。malformed requestは
-学習前に拒否し、raw regretと正規化平均は診断へ出すがraw平均massやsolver handleは
-返さない。productionのalgorithm identityや保存形式をこの研究候補で変更しない。
-
-
-
-### 10.4 checkpoint と strategy drift のメモリ境界
+### 10.2 checkpoint と strategy drift のメモリ境界
 
 Multiway checkpointの読込みは、検証済みchunkから所有型のstateを逐次復元する。
 全展開payloadを別のRAM bufferへ保持しない。stagingは圧縮chunk、展開chunk、
@@ -357,30 +250,13 @@ solver arena自体のメモリは別に必要となる。codecが早く終了し
 検査してから戻るため、全payloadのchecksum・長さ検査を省略しない。
 
 production checkpoint書込みはlive solverを不変借用し、policyの値やaction labelを
-複製せず逐次serializeする。dense側の整列・祖先scratchはpublic node数に、
-sparse側は保存entry数に比例する。既存owned snapshot/capture APIを保持し、
+複製せず逐次serializeする。整列・祖先scratchはpublic node数に比例する。
+既存owned snapshot/capture APIを保持し、
 state 4/container 7のbytesを同じ順序で書く。raw一時fileと4MiB chunk圧縮は共通である。
 正式solutionを作る経路にはowned snapshotのstagingが引き続き必要となる。
 
 productionのstrategy driftは`StrategyDriftTracker`へ前回の正規化profileを保持する。
-dense側はcolumn ID、action数、連続したf32確率を使い、InfoKeyごとのHashMapと
+column ID、action数、連続したf32確率を使い、InfoKeyごとのHashMapと
 小vectorを保持しない。初回・resume時のbaseline、初出columnのゼロ寄与、node順の
-f64集計は既存方式と同じである。sparse側は従来mapを使い、tracker領域はarena予算外。
-
-## 11. 将来の接続点
-
-以下は設計検証が必要な境界であり、実装済みの機能表ではない。
-作業状態は Linear へ集約し、管理先は [status.jp.md](status.jp.md) を参照する。設計の詳細は、
-[実装計画](plans/solver-implementation-plan.jp.md)、[R0 作業票](plans/r0-execution-plan.jp.md)から追う。
-
-| 接続点 | 設計で確認すること |
-|---|---|
-| 共通ゲーム記述 | 配札・観測・交換・情報集合・行動・精算を小さい Stud/Draw 等で検証する。既存 HU hot path には compiled tree と専用 kernel を維持 |
-| NN leaf / 学習 / 局所探索 | 3係数の `PostflopModel` を前提にせず、range 条件付き value、教師の品質・単位・抽象化・horizon、batch 推論の境界を設計 |
-| ICM / Nodelock / profile | legal action、戦略制約、主観評価、客観 EV を分離し、適用 horizon と教師の条件を保存 |
-| subgame re-solve / action translation | 履歴・到達 range・境界値・安全性を検証し、HU の保証を Multiway へ流用しない |
-| GPU CFR | CPU vector の同条件測定を比較基準にする。NN 学習・推論の GPU 利用とは別の採否判断 |
-| viewer / 言語 adapter | 実際に必要な query と保存契約を先に固定し、Web / PyO3 / WASM の独立した依存が生じてから追加 |
-
-学習コード・model registry・dataset pipeline は着手時に solver runtime と依存・成果物を分ける。
-空の将来 crate を先に作らず、教師生成と推論の実際の共有 API が決まってから配置する。
+f64集計は既存方式と同じである。tracker領域はarena予算外。
+solverはtoy testも含めてdense arenaのみを使い、full recallの構築・復元は明示errorで拒否する。

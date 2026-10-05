@@ -1,0 +1,20 @@
+# Specification section 14: six-max 100-BB cash table without limps and with postflop checkdown.
+# The public tree and EHS2 cache require more resources than the smoke example.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[tree]
+script = '''
+preflop {
+  when unopened { replace raise [2.5bb, a]  remove call }
+  when aggressions >= 1 { replace raise [3x, a] }
+}
+flop, turn, river { checkdown }
+'''
+
+[run]
+memory = "6GiB"
+max_time = "12h"

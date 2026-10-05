@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use anyhow::{Context, Result};
 use clap::ValueEnum;
-use formats::{
+use runfiles::{
     RunEvent, RunEventLog, RunManifest, RunState, is_run_directory, last_progress_row, read_events,
 };
 use serde::Serialize;
@@ -62,8 +62,8 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
         .unwrap_or(0);
     // Either engine's checkpoint makes a stopped run resumable; which one
     // is present also says which engine produced the run.
-    let checkpoint = directory.join(formats::RUN_CHECKPOINT_FILE).is_file()
-        || directory.join(formats::RUN_HU_CHECKPOINT_FILE).is_file();
+    let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
+        || directory.join(runfiles::RUN_HU_CHECKPOINT_FILE).is_file();
 
     Ok(RunStatus {
         run_id: manifest.run_id.clone(),
@@ -79,9 +79,11 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
         sweeps: progress
             .as_ref()
             .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
-        elapsed_secs: progress
-            .as_ref()
-            .and_then(|row| row.get("elapsedSecs")?.as_f64()),
+        elapsed_secs: progress.as_ref().and_then(|row| {
+            row.get("elapsed_secs")
+                .or_else(|| row.get("elapsedSecs"))?
+                .as_f64()
+        }),
         events_offset,
         // Only a stopped run is worth resuming, and only if it left a
         // checkpoint behind. A completed run is not: it already reached its
@@ -140,7 +142,7 @@ pub fn watch(
         anyhow::bail!(
             "{} is not a run directory (no {})",
             directory.display(),
-            formats::RUN_MANIFEST_FILE
+            runfiles::RUN_MANIFEST_FILE
         );
     }
     let events_path = RunEventLog::path_in(directory);
@@ -251,14 +253,14 @@ pub fn list(root: &Path, format: ReportFormat) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use formats::{RunEventPayload, RunState};
+    use runfiles::{RunEventPayload, RunState};
 
     fn finished_run(directory: &Path, state: RunState, checkpoint: bool) {
         std::fs::create_dir_all(directory).unwrap();
         let mut manifest = RunManifest::new(
             directory.file_name().unwrap().to_string_lossy().to_string(),
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             "aa",
             vec!["solve".into()],
         );
@@ -268,10 +270,10 @@ mod tests {
         events.state(RunState::Running).unwrap();
         events.state(state).unwrap();
         if checkpoint {
-            std::fs::write(directory.join(formats::RUN_CHECKPOINT_FILE), b"x").unwrap();
+            std::fs::write(directory.join(runfiles::RUN_CHECKPOINT_FILE), b"x").unwrap();
         }
         std::fs::write(
-            directory.join(formats::RUN_PROGRESS_FILE),
+            directory.join(runfiles::RUN_PROGRESS_FILE),
             "{\"sweeps\":42,\"elapsedSecs\":1.5}\n",
         )
         .unwrap();
@@ -292,6 +294,21 @@ mod tests {
         assert!(status.recorded_state.is_none());
     }
 
+    #[test]
+    fn hu_elapsed_time_uses_the_metrics_row_field() {
+        let root = tempfile::tempdir().unwrap();
+        let run = root.path().join("hu");
+        finished_run(&run, RunState::Completed, false);
+        std::fs::write(
+            run.join(runfiles::RUN_PROGRESS_FILE),
+            "{\"iteration\":12,\"elapsed_secs\":2.5}\n",
+        )
+        .unwrap();
+        let status = read_status(&run).unwrap();
+        assert_eq!(status.sweeps, Some(12));
+        assert_eq!(status.elapsed_secs, Some(2.5));
+    }
+
     /// A stopped run with a checkpoint is the case `resume` exists for.
     #[test]
     fn a_canceled_run_with_a_checkpoint_is_resumable() {
@@ -309,16 +326,11 @@ mod tests {
         let root = tempfile::tempdir().unwrap();
         let run = root.path().join("run-c");
         std::fs::create_dir_all(&run).unwrap();
-        let mut manifest = RunManifest::new(
-            "run-c",
-            "preflop-multiway",
-            None,
-            "aa",
-            vec!["solve".into()],
-        );
+        let mut manifest =
+            RunManifest::new("run-c", "mw-preflop", None, "aa", vec!["solve".into()]);
         manifest.pid = 0;
         manifest.write_atomic(&run).unwrap();
-        std::fs::write(run.join(formats::RUN_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(run.join(runfiles::RUN_CHECKPOINT_FILE), b"x").unwrap();
 
         let status = read_status(&run).unwrap();
         assert_eq!(status.state, "interrupted");

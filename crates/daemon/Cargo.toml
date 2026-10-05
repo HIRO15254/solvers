@@ -11,7 +11,7 @@ name = "solversd"
 path = "src/main.rs"
 
 [dependencies]
-formats = { workspace = true }
+runfiles = { workspace = true }
 protocol = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }

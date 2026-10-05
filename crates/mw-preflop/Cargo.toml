@@ -1,0 +1,30 @@
+[package]
+name = "mw-preflop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Sampled 2-9 player NLHE solving with side pots and tournament utility"
+
+[dependencies]
+anyhow = { workspace = true }
+nlh = { workspace = true }
+economics = { workspace = true }
+runfiles = { workspace = true }
+spot = { workspace = true }
+toml = { workspace = true }
+toml_edit = { workspace = true }
+blake3 = { workspace = true }
+postcard = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+rayon = { workspace = true }
+rustc-hash = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+zstd = { workspace = true }
+
+[dev-dependencies]
+libc = { workspace = true }

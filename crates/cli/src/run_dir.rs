@@ -7,10 +7,10 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
-use formats::{
+use runfiles::{
     RUN_CHECKPOINT_FILE, RUN_CONFIG_FILE, RUN_HU_CHECKPOINT_FILE, RUN_HU_SOLUTION_FILE,
-    RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RUN_STRATEGY_FILE,
-    RunEventLevel, RunEventLog, RunEventPayload, RunManifest, RunState,
+    RUN_MANIFEST_FILE, RUN_PROGRESS_FILE, RUN_RESULT_FILE, RUN_SOLUTION_FILE, RunEventLevel,
+    RunEventLog, RunEventPayload, RunManifest, RunState,
 };
 
 use crate::multiway_solve::MultiwayRunObservation;
@@ -26,11 +26,6 @@ pub struct RunPaths {
     pub progress: PathBuf,
     pub checkpoint: PathBuf,
     pub solution: PathBuf,
-    /// Average strategy for the requested betting lines. Toy games and the
-    /// heads-up preflop family only: postflop publishes through
-    /// `solution.sol` and multiway through `solution.mwsol`, both of which
-    /// `export` reads.
-    pub strategy: PathBuf,
 }
 
 impl RunPaths {
@@ -42,7 +37,6 @@ impl RunPaths {
             progress: directory.join(RUN_PROGRESS_FILE),
             checkpoint: directory.join(RUN_CHECKPOINT_FILE),
             solution: directory.join(RUN_SOLUTION_FILE),
-            strategy: directory.join(RUN_STRATEGY_FILE),
         }
     }
 
@@ -54,7 +48,6 @@ impl RunPaths {
             progress: directory.join(RUN_PROGRESS_FILE),
             checkpoint: directory.join(RUN_HU_CHECKPOINT_FILE),
             solution: directory.join(RUN_HU_SOLUTION_FILE),
-            strategy: directory.join(RUN_STRATEGY_FILE),
         }
     }
 }
@@ -223,7 +216,10 @@ impl RunRecorder {
             MultiwayRunObservation::Stop(stop) => Some(RunEventPayload::Stop {
                 reason: stop.reason.clone(),
             }),
-            MultiwayRunObservation::Live(_) | MultiwayRunObservation::Quality(_) => None,
+            MultiwayRunObservation::Live(_)
+            | MultiwayRunObservation::Quality(_)
+            | MultiwayRunObservation::ProgressOpened
+            | MultiwayRunObservation::Progress { .. } => None,
         };
         if let Some(payload) = payload {
             // A failed event write must not abort a solve that is otherwise
@@ -324,10 +320,10 @@ mod tests {
         create_or_adopt(&run).expect("a queued directory must be adoptable");
         let recorder = RunRecorder::start(
             &run,
-            "kuhn",
-            Some("solvers.toy/v1".into()),
+            "hu-postflop",
+            Some("solvers.nlh/v1".into()),
             [1; 32],
-            "schema = \"solvers.toy/v1\"\n",
+            "schema = \"solvers.nlh/v1\"\n",
             vec!["solve".into()],
         )
         .unwrap();
@@ -335,7 +331,7 @@ mod tests {
 
         let manifest = RunManifest::read(&run).unwrap();
         assert_eq!(manifest.state, RunState::Completed);
-        assert_eq!(manifest.game_kind, "kuhn");
+        assert_eq!(manifest.game_kind, "hu-postflop");
         assert_eq!(
             manifest.created_unix_ms, 1_700_000_000_000,
             "the queued moment must survive adoption"
@@ -349,7 +345,8 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let run = directory.path().join("done");
         std::fs::create_dir(&run).unwrap();
-        let mut manifest = RunManifest::new("done", "kuhn", None, "aa", vec!["solve".into()]);
+        let mut manifest =
+            RunManifest::new("done", "hu-postflop", None, "aa", vec!["solve".into()]);
         manifest.finish(RunState::Completed, None);
         manifest.write_atomic(&run).unwrap();
         assert!(create_or_adopt(&run).is_err());
@@ -362,10 +359,10 @@ mod tests {
         create_or_adopt(&run).unwrap();
         let recorder = RunRecorder::start(
             &run,
-            "preflop-multiway",
-            Some("solvers.multiway-preflop/v1".into()),
+            "mw-preflop",
+            Some("solvers.nlh/v1".into()),
             [7; 32],
-            "schema = \"solvers.multiway-preflop/v1\"\n",
+            "schema = \"solvers.nlh/v1\"\n",
             vec!["solve".into()],
         )
         .unwrap();
@@ -380,7 +377,7 @@ mod tests {
         assert_eq!(manifest.run_id, "run");
         assert!(run.join(RUN_CONFIG_FILE).is_file());
 
-        let (events, _) = formats::read_events(&RunEventLog::path_in(&run), 0).unwrap();
+        let (events, _) = runfiles::read_events(&RunEventLog::path_in(&run), 0).unwrap();
         assert_eq!(
             events.first().unwrap().payload,
             RunEventPayload::State {
@@ -402,7 +399,7 @@ mod tests {
         let run = directory.path().join("run");
         create_or_adopt(&run).unwrap();
         let recorder =
-            RunRecorder::start(&run, "preflop-multiway", None, [0; 32], "", Vec::new()).unwrap();
+            RunRecorder::start(&run, "mw-preflop", None, [0; 32], "", Vec::new()).unwrap();
         recorder.finish(Ok(()), Some("cancelled".into())).unwrap();
         assert_eq!(RunManifest::read(&run).unwrap().state, RunState::Canceled);
     }
@@ -413,7 +410,7 @@ mod tests {
         let run = directory.path().join("run");
         create_or_adopt(&run).unwrap();
         let recorder =
-            RunRecorder::start(&run, "preflop-multiway", None, [0; 32], "", Vec::new()).unwrap();
+            RunRecorder::start(&run, "mw-preflop", None, [0; 32], "", Vec::new()).unwrap();
         let error = recorder
             .finish(Err(anyhow::anyhow!("policy arena allocation failed")), None)
             .unwrap_err()
@@ -428,7 +425,7 @@ mod tests {
                 .as_deref()
                 .is_some_and(|failure| failure.contains("policy arena"))
         );
-        let (events, _) = formats::read_events(&RunEventLog::path_in(&run), 0).unwrap();
+        let (events, _) = runfiles::read_events(&RunEventLog::path_in(&run), 0).unwrap();
         assert!(events.iter().any(|event| matches!(
             &event.payload,
             RunEventPayload::Failure { message } if message.contains("policy arena")

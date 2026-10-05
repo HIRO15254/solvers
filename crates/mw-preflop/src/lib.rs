@@ -1,0 +1,63 @@
+//! Sampled multiway NLHE solving for two through nine table seats.
+//!
+//! This crate is deliberately separate from the exact heads-up vector
+//! engine. It samples one physical card world shared by every seat.
+//! Production uses current-street recall and allocates the complete public
+//! tree × bucket × action policy arena before sweep 0. The card abstraction
+//! is an EHS² percentile table.
+
+pub mod abstraction;
+pub mod betting;
+pub mod card_abstraction;
+pub mod checkpoint;
+pub mod config;
+pub mod holdem;
+pub mod icm;
+pub mod input;
+pub mod rake_condition;
+pub mod sampler;
+pub mod settlement;
+pub mod solver;
+pub mod tree;
+pub mod tree_rules;
+pub mod types;
+
+pub use abstraction::{
+    AbstractionError, BucketContext, BucketId, BucketPath, FeatureHashAbstraction,
+    FeatureHashParams, MultiwayAbstraction, MultiwayAbstractionBackend, StreetBucketCounts,
+    TableAbstractionAdapter, ehs2_table_fingerprint,
+};
+pub use betting::{Action, BettingMenu, BettingState, SeatStatus};
+pub use checkpoint::{
+    CHECKPOINT_VERSION, CheckpointError, MultiwayCheckpoint, MultiwayCheckpointHeader,
+};
+pub use config::{
+    AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
+    RecallMode, SeatConfig, StreetBettingConfig,
+};
+pub use economics::icm::{
+    IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta,
+};
+pub use economics::rake_condition::{CompiledRakeCondition, RakeConditionContext};
+pub use economics::{RakeAllocation, RakeRounding, UtilityConfig};
+pub use holdem::{HoldemGame, HoldemGameError};
+pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
+pub use settlement::{PotLayer, Settlement};
+pub use solver::{
+    ActionProbability, CandidatePolicyCoverage, DenseNodeContext, DeviatorPolicy,
+    ExternalSamplingGame, HistoryEntry, HistoryKey, InfoKey, MultiwaySolver, PolicyArenaAllocation,
+    PolicyColumn, PolicyEntry, PrivateInfo, ProfileEstimate, ProfileEvaluation, ProfileVariant,
+    PublicActionDestination, PublicNodeAction, PublicNodeView, SolverConfig, SolverError,
+    SolverMetrics, SolverState, StreetVisitCounts, abstraction_fingerprint_with_recall,
+};
+pub use tree::{PublicTree, TreeError};
+pub use types::{MwChips, SeatId, SeatMask, SeatVec, Street};
+
+pub mod metrics;
+pub mod mwsol;
+
+pub mod derive;
+pub mod prepare;
+pub mod run;
+pub mod session;
+pub mod views;

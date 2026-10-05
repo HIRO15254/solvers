@@ -1,0 +1,123 @@
+{
+  "3max_2bb.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 2,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 2,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 2
+  },
+  "6max_100bb_nl50_partial_reference.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 256,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 256,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 256
+  },
+  "6max_100bb_nl50_partial_reference_limp.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 256,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 256,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 256
+  },
+  "6max_100bb_nl50_partial_simple_reference.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 32,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 32,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 32
+  },
+  "6max_20bb_checkdown.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 32,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 32,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 32
+  },
+  "6max_2bb.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 2,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 2,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 2
+  },
+  "6max_position_selector.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 2,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 2,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 2
+  },
+  "preflop_multiway_v1_3max_smoke.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 2,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 2,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 2
+  },
+  "preflop_multiway_v1_default.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 128,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 128,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 128
+  },
+  "preflop_multiway_v1_full_surface.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 32,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 96,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 48
+  },
+  "preflop_multiway_v1_production_smoke.toml": {
+    "active_opponent_buckets": [],
+    "artifact_cache": null,
+    "flop_buckets": 2,
+    "kind": "ehs2-table",
+    "recall": "street",
+    "river_buckets": 2,
+    "rollout_samples": 512,
+    "seed": 0,
+    "turn_buckets": 2
+  }
+}

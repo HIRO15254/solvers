@@ -1,24 +1,22 @@
+use mw_preflop::betting::BettingMenu;
 use std::path::{Path, PathBuf};
 
-use cli::config::GameSection;
-use multiway::{Action, BettingConfig, BettingState, SeatId};
+use mw_preflop::{Action, BettingConfig, BettingState, SeatId};
 
 fn fixture_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
-        .join("examples/bench_multiway/6max_100bb_nl50_partial_reference.toml")
+        .join("examples/bench/6max_100bb_nl50_partial_reference.toml")
 }
 
-fn fixture() -> (multiway::config::ValidatedMultiwayConfig, BettingState) {
+fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
     let path = fixture_path();
     let raw = std::fs::read_to_string(&path).expect("reading tracked GTOW fixture");
-    let lowered =
-        cli::multiway_v1::parse_and_lower_at(&raw, &path).expect("lowering tracked GTOW fixture");
-    let GameSection::PreflopMultiway(game) = lowered.game else {
-        panic!("fixture must lower to the multiway game");
-    };
+    let doc = spot::Document::parse(&raw, &path).unwrap();
+    let settings = mw_preflop::input::Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+    let game = mw_preflop::input::lower(&doc.spot, &settings).unwrap().game;
     let validated = game.validated().expect("validating tracked GTOW fixture");
-    let state = BettingState::new(&validated).expect("building root betting state");
+    let state = BettingState::from_config(&validated).expect("building root betting state");
     (validated, state)
 }
 

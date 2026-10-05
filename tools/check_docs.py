@@ -19,24 +19,36 @@ REQUIRED_FILES = (
     "AGENTS.md",
     "docs/README.md",
     "docs/status.jp.md",
-    "docs/product-roadmap.jp.md",
+    "docs/products.jp.md",
     "docs/architecture.md",
     "docs/app-architecture.md",
     "docs/development.md",
-    "docs/validation.jp.md",
-    "docs/solver-config-v1.jp.md",
-    "docs/multiway-preflop-v1.jp.md",
     "docs/cli-reference.jp.md",
     "docs/user-guide.jp.md",
-    "docs/plans/solver-implementation-plan.jp.md",
-    "docs/plans/r0-execution-plan.jp.md",
+    "docs/plans/two-product-restructure.jp.md",
+    "docs/nlh-input-v1.jp.md",
+    "docs/hu-postflop.jp.md",
+    "docs/mw-preflop.jp.md",
     "docs/plans/task-template.md",
 )
+# Retired documents and their replacements. The retired files remain readable
+# in Git history (pre-restructure documents also at
+# archive/pre-two-products-2026-10-04).
 MOVED_PATHS = {
-    "research/solver-implementation-plan.jp.md": "docs/plans/solver-implementation-plan.jp.md",
-    "research/r0-execution-plan.jp.md": "docs/plans/r0-execution-plan.jp.md",
-    "research/hu-postflop-validation-plan.jp.md": "docs/validation.jp.md",
+    "docs/solver-config-v1.jp.md": "docs/nlh-input-v1.jp.md",
+    "docs/multiway-preflop-v1.jp.md": "docs/nlh-input-v1.jp.md",
+    "docs/multiway-preflop-v1.md": "docs/mw-preflop.jp.md",
+    "docs/multiway-preflop-cli-spec.jp.md": "docs/cli-reference.jp.md",
+    "docs/product-roadmap.jp.md": "docs/products.jp.md",
+    "docs/validation.jp.md": "docs/products.jp.md",
+    "plans/solver-implementation-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
+    "plans/r0-execution-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
+    "research/solver-implementation-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
+    "research/r0-execution-plan.jp.md": "docs/plans/two-product-restructure.jp.md",
+    "research/hu-postflop-validation-plan.jp.md": "docs/products.jp.md",
+    "plans/nlh-input-v1.jp.md": "docs/nlh-input-v1.jp.md",
 }
+HISTORICAL_ROOTS = ("docs/research/", "docs/decisions/")
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 REFERENCE = re.compile(r"^ {0,3}\[[^\]]+\]:\s*(.*)")
 SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
@@ -126,7 +138,7 @@ def check(root: Path = ROOT) -> list[str]:
             errors.append(f"{name}: missing required documentation entrypoint")
     for document in documents(root):
         relative = document.relative_to(root).as_posix()
-        historical = relative.startswith("docs/research/")
+        historical = relative.startswith(HISTORICAL_ROOTS)
         for number, line in prose_lines(document.read_text(encoding="utf-8-sig")):
             if not historical:
                 for old, new in MOVED_PATHS.items():

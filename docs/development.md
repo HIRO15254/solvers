@@ -1,7 +1,7 @@
 # 開発・検証ガイド
 
-作業の選択・担当・状態は[Linear管理先](status.jp.md)、目標と受入条件は[ロードマップ](product-roadmap.jp.md)、
-実施手順は[作業票](plans/r0-execution-plan.jp.md)を参照する。この文書は環境・変更・検証・引継ぎを扱う。
+作業の選択・担当・状態は[Linear管理先](status.jp.md)、製品の目的と受入条件は[製品定義](products.jp.md)、
+移行の手順と完了条件は[再構築計画](plans/two-product-restructure.jp.md)を参照する。この文書は環境・変更・検証・引継ぎを扱う。
 
 ## 環境準備
 
@@ -45,23 +45,15 @@ cargo test --workspace
 | 文書・配置 | `python tools/check_docs.py`。説明を実装へ照合。移動した文書の参照を更新 |
 | 共通Pythonツール | `python -m unittest discover -s tools/tests -v` |
 | 保存したMultiway品質根拠 | `python experiments/multiway-2026-09/quality-evidence/verify.py`。solverの再計算とは区別 |
-| config/CLI/default | family規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
+| config/CLI/default | 共通Input・製品規範・CLI reference・template・parse/normalize・help・拒否fixture・metadataの同期 |
 | CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
-| 研究feature | 明示したfeatureのcompileと該当する小規模test。production品質認定とは区別 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
-| 品質・性能の主張 | [品質検証ガイド](validation.jp.md)、対応する固定条件と基準測定 |
+| 移動・改名・責務の移し替え | 変更前後のbinaryで固定seedのsolve成果物とCLI出力（text/JSON/CSV）を比べ、計時以外の一致を確認。hot pathの所在が変わるなら同時間帯の対計測 |
+| 品質・性能の主張 | [製品定義](products.jp.md)の品質節、対応する固定条件と基準測定 |
 
 文書だけの編集で重いsolverを回す必要はない。逆に、文章の修正に見えてdefaultや公開契約を変える場合は契約変更として扱う。
 `check_docs.py`はファイル参照と入口を調べる軽量検査で、見出しアンカー・外部URL・本文の意味を保証しない。
-
-研究featureの明示compile:
-
-```text
-cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
-cargo test -p multiway --features research-average-sampling --lib average_sampling_research
-cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
-```
 
 Production EHS² table buildや大規模solve等のignored acceptanceは、対応領域の受入前に担当者が対象sourceで実行し、結果を保存する。
 すべてを毎PRで実行する必要はない。全体のrelease acceptanceは次で実行できる。
@@ -69,6 +61,19 @@ Production EHS² table buildや大規模solve等のignored acceptanceは、対�
 ```text
 cargo test --workspace --release -- --include-ignored
 ```
+
+P2の次のlibrary acceptanceはv1 public treeのnode数・整数状態・action順のhashを固定し、
+正規化前後の同一性を確認する。4件の大規模例は通常suiteではignoredとし、releaseで明示実行する
+（深さ・node数による打切りなし）。小規模例とfirst-actor上書きの明示拒否は通常suiteに含む。
+
+```text
+cargo test --release -p mw-preflop --test nlh_tree_identity -- --ignored --test-threads=4 --nocapture
+```
+
+P2のfixtureは`crates/mw-preflop/tests/fixtures/`、性能用入力は`examples/bench/`に置く。
+`tree_abstractions.json`はabstraction identityの回帰証拠である。
+P1の整数構造回帰は`crates/hu-postflop/tests/tree_identity.rs`で確認する。
+浮動小数点の戦略・EVをhashで固定しない。
 
 失敗は「変更による不具合」「既存差分」「環境制約」「未判定」を根拠付きで区別する。未実行を成功と記録しない。
 Windowsで並列compileがメモリ割当やページングファイル不足（OS error 1455）に失敗した場合は、
@@ -81,7 +86,7 @@ Windowsで並列compileがメモリ割当やページングファイル不足（
 - `runs/`: 新規solver・benchmark実行のignored作業領域。保存対象は選定してexperimentsへ。
 - `.cache/`: 再生成可能なmachine-local cacheやtest用の一時データ。固有の証拠・source snapshotを置かない。
 - `docs/plans/`: 受け入れた作業の手順・成果物・完了条件。状態はLinear。
-- `docs/research/`: 日付付きの調査・未採用案・費用概算。
+- `docs/research/`: 日付付きの調査・未採用案・費用概算（現在は空。旧調査はtagに残る）。
 - `experiments/<campaign>/<experiment>/`: 採否・品質認定に必要なmanifest、config、集計、検証器、報告。
 - 共通Python testは`tools/tests/`、実験だけの検証は当該実験の近くに置く。
 
@@ -102,11 +107,11 @@ config・manifest・小さい結果・検証器はignored outputから分離す�
 
 ## Benchmarking
 
-Criterionは小さいhot pathのA/Bに使う。現行suiteはengineのstorage/reach/transitionとholdemのterminal kernel・turn solveを含む。
+Criterionは小さいhot pathのA/Bに使う。現行suiteはhu-engineのstorage/reach/transitionとhu-postflopのterminal kernel・turn solveを含む。
 
 ```text
-cargo bench -p engine -p holdem -- --save-baseline main
-cargo bench -p engine -p holdem -- --baseline main
+cargo bench -p hu-engine -p hu-postflop -- --save-baseline main
+cargo bench -p hu-engine -p hu-postflop -- --baseline main
 ```
 
 baselineは変更前のsource・CPU・threads・ビルド条件と対応付ける。名前がmainでも、その時点のcommitが自動保存されるわけではない。
@@ -121,18 +126,18 @@ cargo build --release -p cli
 Linuxの例（wall clockとpeak RSS）:
 
 ```sh
-/usr/bin/time -v target/release/solvers solve examples/river_small.toml --out runs/benchmarks/river-baseline
+/usr/bin/time -v target/release/solvers solve examples/hu-postflop/river_small.toml --out runs/benchmarks/river-baseline
 ```
 
 Windows PowerShellの例（wall clockのみ。同名runがあれば別名へ変える）:
 
 ```powershell
-Measure-Command { & ./target/release/solvers.exe solve examples/river_small.toml --out runs/benchmarks/river-baseline }
+Measure-Command { & ./target/release/solvers.exe solve examples/hu-postflop/river_small.toml --out runs/benchmarks/river-baseline }
 ```
 
 Windowsのpeak working setは別途プロセス計測で取得し、取得方法とサンプリング間隔を記録する。未計測のRSSを静的storage見積もりで代用しない。
-Linux RSSとWindows working setも定義を明記して扱う。初期化・CFR・BR・保存を比較する場合は[検証ガイド](validation.jp.md)の区間に分ける。
-旧M3/M5の所要時間・容量目標は過去条件の記録であり、現在のR1/R2受入条件ではない。
+Linux RSSとWindows working setも定義を明記して扱う。初期化・CFR・BR・保存を比較する場合は区間を分けて記録する。
+過去の所要時間・容量目標は当時の条件の記録であり、現在の受入条件ではない。
 
 ## 性能判断で残す理由
 

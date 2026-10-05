@@ -1,0 +1,34 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+
+[economics]
+kind = "cash"
+
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
+board = "2c 7d 9h Js"
+
+[ranges]
+BB = "AA,QQ,JJ,AKs"
+BTN = "KK,TT,AQs,KQs"
+
+[tree]
+script = '''turn, river { replace bet [100] }
+'''
+include_allin = false
+
+[tree.max_aggressive_actions]
+flop = 2
+turn = 1
+river = 1
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+max_iterations = 400
+check_every = 100

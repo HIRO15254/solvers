@@ -1,0 +1,27 @@
+# Small HU river loading river.tree; [tree.params] supplies its bet-size parameter.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 5
+
+[spot]
+line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"
+board = "Ks 7h 2d 3c 9s"
+
+[ranges]
+BTN = "AhAd,QhQd"
+BB = "JhJd,ThTd"
+
+[tree]
+source = "river.tree"
+
+[tree.params]
+size = "1bb"
+
+[solver.stop]
+max_iterations = 16
+check_every = 4
+
+[run]
+threads = 1

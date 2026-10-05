@@ -3,7 +3,8 @@
 Historical comparisons with GTO Wizard. These cases record the reference
 conditions, solver configuration, measured differences, and known tree
 mismatches. They are evidence from July 2026, not the reference set or
-acceptance criteria for the current [R0 plan](../../docs/plans/r0-execution-plan.jp.md).
+acceptance criteria for the current
+[HU postflop reference candidates](../../docs/plans/hu-postflop-validation/README.md).
 
 | Case | Record and configuration | Scope |
 |---|---|---|

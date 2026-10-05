@@ -1,0 +1,14 @@
+[package]
+name = "economics"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Shared NLH rake, ICM evaluation, and utility configuration"
+
+[dependencies]
+nlh = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }

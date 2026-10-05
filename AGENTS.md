@@ -11,20 +11,32 @@ Linear project and task mapping. Linear is the sole authority for task status,
 assignees, blockers, and next actions; do not maintain a Markdown status mirror.
 Specifications, acceptance criteria, and validation evidence stay in Git.
 
+The repository is being rebuilt as two products that share one input format:
+the NLH HU Postflop Solver (P1) and the NLH Multiway Preflop Solver (P2).
+`docs/products.jp.md` defines them; `docs/plans/two-product-restructure.jp.md`
+defines the target architecture and the ordered migration steps M0-M8 on
+branch `restructure/two-products`. The pre-restructure state is the tag
+`archive/pre-two-products-2026-10-04`. Do not reintroduce features the product
+definition excludes (Nodelock, opponent profiles, ML approximation, other
+variants, multiway postflop, PKO) without a new user decision.
+
 Read the relevant route rather than every long document for every change:
 
 | Change | Read next |
 |---|---|
-| Choose work / acceptance | `docs/product-roadmap.jp.md`, the applicable `docs/plans/` ticket |
-| Solver / game semantics | `docs/architecture.md`, affected crate and oracle tests |
-| Config / CLI / artifacts | Family specification below, implementation map, CLI reference and fixtures |
+| Choose work / acceptance | `docs/products.jp.md`, `docs/plans/two-product-restructure.jp.md` |
+| Solver / game semantics | `docs/architecture.md` (current code), target layout in the restructure plan, affected crate and oracle tests |
+| Config / CLI / artifacts | Common input `docs/nlh-input-v1.jp.md`, product specifications below, CLI reference and fixtures |
 | Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
-| Quality / measurement | `docs/validation.jp.md`, experiment manifest and validator |
+| Quality / measurement | Quality sections of `docs/products.jp.md`, `docs/plans/hu-postflop-validation/` |
 | Development / handoff | `docs/development.md` |
 | External references | `LICENSE-POLICY.md` |
 
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
-  or share implementation code between it and `engine`/`game`.
+  or share implementation code between it and `hu-engine`/`hu-postflop::game`.
+- Keep computation in the product crates (`hu-postflop`, `mw-preflop`). `cli`
+  depends only on `spot`, the two product crates and `runfiles`, and owns
+  arguments, run directories and rendering (`docs/architecture.md` §2).
 
 ## Contract specification synchronization
 
@@ -32,14 +44,14 @@ The normative specifications are:
 
 | family | normative specification |
 |---|---|
-| `solvers.multiway-preflop/v1` | `docs/multiway-preflop-v1.jp.md` |
-| `solvers.postflop/v1` | `docs/solver-config-v1.jp.md` |
-| `solvers.preflop-hu/v1`, `solvers.toy/v1` | `docs/solver-config-v1.jp.md` |
+| `solvers.nlh/v1` | `docs/nlh-input-v1.jp.md` (input), `docs/hu-postflop.jp.md` (P1), `docs/mw-preflop.jp.md` (P2) |
 
-`docs/multiway-preflop-cli-spec.jp.md` is a compatibility entrypoint, not a
-second specification. `docs/multiway-preflop-v1.md` is the implementation
-contract map, `docs/cli-reference.jp.md` covers both binaries' complete CLI,
-and `docs/user-guide.jp.md` is the operational guide.
+`docs/cli-reference.jp.md` covers both binaries' complete CLI, and
+`docs/user-guide.jp.md` is the operational guide.
+
+The common input and both product documents are normative for `solvers.nlh/v1`.
+Unsupported common-input behavior must remain an explicit implementation
+boundary.
 
 Any contract or default change MUST update every affected artifact in the same
 change set: the normative specification, implementation guide, CLI reference

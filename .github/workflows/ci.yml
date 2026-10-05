@@ -42,28 +42,15 @@ jobs:
       - name: Test (debug)
         run: cargo test --workspace
 
-  research-features:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Compile research examples and feature paths
-        run: cargo check -p cli -p multiway --all-targets --features cli/research-average-sampling,cli/research-regret-sampling,cli/research-draw-abstraction
-      - name: Average-sampling API smoke
-        run: cargo test -p multiway --features research-average-sampling --lib average_sampling_research
-      - name: Regret-sampling smoke
-        run: cargo test -p multiway --features research-regret-sampling --lib solver::regret_sampling::tests
-
   windows-smoke:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: CLI checkpoint and metrics
+      - name: NLH v1 CLI checkpoint and metrics
         run: cargo test -p cli --test cli_integration solve_checkpoint_and_metrics_smoke -- --exact
-      - name: CLI resume equivalence
-        run: cargo test -p cli --test cli_integration resume_equivalence_kuhn -- --exact
+      - name: NLH v1 CLI resume equivalence
+        run: cargo test -p cli --test cli_integration resume_equivalence_postflop -- --exact
       - name: Daemon HTTP and child-process smoke
         run: cargo test -p daemon --test http_api

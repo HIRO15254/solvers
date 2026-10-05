@@ -1,0 +1,37 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 55
+ante_bb = 4
+
+[economics]
+kind = "cash"
+
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2c 7d 9h Js Qs"
+
+[ranges]
+BB = "22+,A2s+,KTo+"
+BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
+
+[tree]
+script = '''river {
+  replace bet [50]
+  replace raise [50]
+}
+'''
+include_allin = false
+
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+max_iterations = 200
+check_every = 50

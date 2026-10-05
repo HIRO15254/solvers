@@ -3,18 +3,6 @@
 version = 4
 
 [[package]]
-name = "abstraction"
-version = "0.1.0"
-dependencies = [
- "cards",
- "hand-index",
- "postcard",
- "rayon",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -187,16 +175,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
-name = "cards"
-version = "0.1.0"
-dependencies = [
- "aya_poker",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "cast"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -301,23 +279,21 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 name = "cli"
 version = "0.1.0"
 dependencies = [
- "abstraction",
  "anyhow",
  "blake3",
- "cards",
  "clap",
- "engine",
- "formats",
- "game",
- "holdem",
+ "hu-engine",
+ "hu-postflop",
  "libc",
- "multiway",
- "preflop",
+ "mw-preflop",
+ "nlh",
  "rand",
  "rand_chacha",
  "rayon",
+ "runfiles",
  "serde",
  "serde_json",
+ "spot",
  "tempfile",
  "toml",
  "toml_edit",
@@ -433,14 +409,25 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "formats",
  "libc",
  "protocol",
  "rand",
+ "runfiles",
  "serde",
  "serde_json",
  "tempfile",
  "tiny_http",
+]
+
+[[package]]
+name = "economics"
+version = "0.1.0"
+dependencies = [
+ "nlh",
+ "rand",
+ "rand_chacha",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
@@ -460,18 +447,6 @@ name = "embedded-io"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
-
-[[package]]
-name = "engine"
-version = "0.1.0"
-dependencies = [
- "cards",
- "criterion",
- "rand",
- "rand_chacha",
- "rayon",
- "serde",
-]
 
 [[package]]
 name = "equivalent"
@@ -502,21 +477,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
 
 [[package]]
-name = "formats"
-version = "0.1.0"
-dependencies = [
- "blake3",
- "engine",
- "libc",
- "postcard",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
- "zstd",
-]
-
-[[package]]
 name = "futures-core"
 version = "0.3.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -538,15 +498,6 @@ dependencies = [
  "futures-task",
  "pin-project-lite",
  "slab",
-]
-
-[[package]]
-name = "game"
-version = "0.1.0"
-dependencies = [
- "cards",
- "cfr-ref",
- "engine",
 ]
 
 [[package]]
@@ -595,13 +546,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hand-index"
-version = "0.1.0"
-dependencies = [
- "cards",
-]
-
-[[package]]
 name = "hash32"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -643,23 +587,48 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c"
 
 [[package]]
-name = "holdem"
-version = "0.1.0"
-dependencies = [
- "cards",
- "cfr-ref",
- "criterion",
- "engine",
- "game",
- "hand-index",
- "rayon",
-]
-
-[[package]]
 name = "httpdate"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
+
+[[package]]
+name = "hu-engine"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "nlh",
+ "rand",
+ "rand_chacha",
+ "rayon",
+ "serde",
+]
+
+[[package]]
+name = "hu-postflop"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blake3",
+ "cfr-ref",
+ "criterion",
+ "economics",
+ "hu-engine",
+ "libc",
+ "nlh",
+ "postcard",
+ "rayon",
+ "runfiles",
+ "serde",
+ "serde_json",
+ "spot",
+ "tempfile",
+ "thiserror",
+ "toml",
+ "toml_edit",
+ "windows-sys 0.61.2",
+ "zstd",
+]
 
 [[package]]
 name = "indexmap"
@@ -767,24 +736,38 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiway"
+name = "mw-preflop"
 version = "0.1.0"
 dependencies = [
- "abstraction",
+ "anyhow",
  "blake3",
- "cards",
+ "economics",
  "libc",
+ "nlh",
  "postcard",
  "rand",
  "rand_chacha",
  "rayon",
+ "runfiles",
  "rustc-hash",
  "serde",
  "serde_json",
+ "spot",
  "tempfile",
  "thiserror",
  "toml",
+ "toml_edit",
  "zstd",
+]
+
+[[package]]
+name = "nlh"
+version = "0.1.0"
+dependencies = [
+ "aya_poker",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -877,24 +860,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "preflop"
-version = "0.1.0"
-dependencies = [
- "abstraction",
- "cards",
- "engine",
- "game",
- "hand-index",
- "postcard",
- "rand",
- "rand_chacha",
- "rayon",
- "rustc-hash",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -907,7 +872,7 @@ dependencies = [
 name = "protocol"
 version = "0.1.0"
 dependencies = [
- "formats",
+ "runfiles",
  "serde",
  "serde_json",
 ]
@@ -1045,6 +1010,17 @@ dependencies = [
  "libc",
  "untrusted 0.9.0",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "runfiles"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libc",
+ "serde",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]
@@ -1210,6 +1186,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 dependencies = [
  "lock_api",
+]
+
+[[package]]
+name = "spot"
+version = "0.1.0"
+dependencies = [
+ "economics",
+ "nlh",
+ "serde",
+ "tempfile",
+ "thiserror",
+ "toml",
+ "toml_edit",
 ]
 
 [[package]]

@@ -1,0 +1,82 @@
+# Six-max 20-BB benchmark applying rules selected by the last preflop aggressor position.
+# Fixed menus and solver settings provide a large public-tree regression baseline.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+
+[table.stacks_bb]
+BTN = 20.0
+SB = 20.0
+BB = 20.0
+UTG = 20.0
+HJ = 20.0
+CO = 20.0
+
+[economics]
+kind = "cash"
+
+[ranges]
+BTN = "random"
+SB = "random"
+BB = "random"
+UTG = "random"
+HJ = "random"
+CO = "random"
+
+[tree]
+script = '''
+preflop when unopened { replace raise [2.5x, a] }
+preflop when !unopened { replace raise [3x, a] }
+flop when unopened { replace bet [50, a] }
+flop when !unopened { replace raise [75, a] }
+turn when unopened { replace bet [50, a] }
+turn when !unopened { replace raise [75, a] }
+river when unopened { replace bet [50, a] }
+river when !unopened { replace raise [75, a] }
+preflop when last_preflop_aggressor_position == "UTG" { remove call }
+flop, turn, river when last_preflop_aggressor_position == "UTG" { replace bet [33] }
+'''
+include_allin = true
+
+[tree.max_aggressive_actions]
+preflop = 2
+flop = 1
+turn = 1
+river = 1
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[solver.abstraction]
+kind = "ehs2-percentile"
+
+[solver.abstraction.buckets]
+flop = 2
+turn = 2
+river = 2
+
+[solver.stop]
+target = 1000000000000.0
+check_every_sweeps = 1
+confirmations = 1
+evaluation_samples = 8
+deviator_traversals = 1
+max_sweeps = 1
+
+[run]
+threads = 1
+memory = "auto"
+checkpoint_interval = "15m"
+
+[output]
+probability_encoding = "u16"

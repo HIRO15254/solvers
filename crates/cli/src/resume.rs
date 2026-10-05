@@ -1,17 +1,6 @@
-//! `resume`: continue a checkpointed solve to `run.iterations` TOTAL
-//! iterations, using the exact same config that produced the checkpoint
-//! (verified by blake3 hash of the config file's raw bytes) and the exact
-//! same deterministic game-build path as `solve`, so the result is
-//! bit-for-bit identical to an uninterrupted straight solve.
-
-use std::path::Path;
-
+//! Resume a self-contained common-input checkpoint or its run directory.
 use anyhow::{Context, Result, anyhow};
-use engine::{F32Storage, I16Storage};
-
-use crate::config::{GameSection, SolveConfig, StorageKind};
-use crate::sol::{SolExportSpec, SolStreets};
-use crate::solve::run_with_storage_sol;
+use std::path::Path;
 
 #[allow(clippy::too_many_arguments)]
 pub fn run(
@@ -25,14 +14,30 @@ pub fn run(
     evaluation_samples: Option<u64>,
     evaluation_cadence: Option<u64>,
     checkpoint_interval: Option<&str>,
-    histories: &[String],
 ) -> Result<()> {
+    // Run config is also part of the artifact contract: an old directory
+    // cannot become a common-input run by replacing just its checkpoint.
+    if run_directory.is_dir() {
+        let config = run_directory.join(runfiles::RUN_CONFIG_FILE);
+        if config.is_file() {
+            crate::nlh_v1::require_artifact_config(&std::fs::read_to_string(config)?)?;
+        }
+    }
     let checkpoint = resolve_checkpoint(run_directory)?;
     if checkpoint
         .extension()
         .is_some_and(|extension| extension == "mwckpt")
     {
-        return run_self_contained_multiway(
+        let mut payload = mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(&checkpoint)
+            .with_context(|| format!("reading {}", checkpoint.display()))?;
+        let raw = payload.config_toml.take().ok_or_else(||
+            anyhow!("removed config family solvers.multiway-preflop/v1 checkpoint without an embedded config; re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"))?;
+        // Drop the first decoded state before the typed P2 resume reloads it
+        // and commits the dense arena, avoiding duplicate checkpoint memory.
+        drop(payload);
+        crate::nlh_v1::require_artifact_config(&raw)?;
+        return crate::nlh_v1::p2::resume(
+            &raw,
             &checkpoint,
             out,
             threads,
@@ -45,155 +50,47 @@ pub fn run(
             checkpoint_interval,
         );
     }
-    if threads.is_some()
-        || memory.is_some()
-        || max_time.is_some()
-        || max_sweeps.is_some()
+    let payload = hu_postflop::checkpoint::read_checkpoint(&checkpoint)
+        .with_context(|| format!("reading {}", checkpoint.display()))?;
+    let embedded = payload.config_toml.as_deref().ok_or_else(||
+        anyhow!("removed config family solvers.postflop/v1 checkpoint; re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"))?;
+    crate::nlh_v1::require_artifact_config(embedded)?;
+    let directory = if run_directory.is_dir() {
+        run_directory
+    } else {
+        checkpoint
+            .parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new("."))
+    };
+    let raw = if run_directory.is_dir() {
+        std::fs::read_to_string(directory.join(runfiles::RUN_CONFIG_FILE))?
+    } else {
+        embedded.to_owned()
+    };
+    drop(payload);
+    crate::nlh_v1::require_artifact_config(&raw)?;
+    if max_sweeps.is_some()
         || stop_target.is_some()
         || evaluation_samples.is_some()
         || evaluation_cadence.is_some()
-        || checkpoint_interval.is_some()
     {
         return Err(anyhow!(
-            "these resume overrides apply to Multiway Preflop v1 runs only"
+            "NLH003: solver overrides are not accepted for P1 resume; only [run] overrides are allowed"
         ));
     }
-    resume_heads_up(run_directory, &checkpoint, out, histories)
-}
-
-/// Continues a heads-up, postflop, or toy run from its run directory.
-///
-/// The directory is self-describing: `run.toml` is the config the run used,
-/// and its blake3 hash is what the checkpoint was stamped with, so the two
-/// are verified against each other exactly as before.
-fn resume_heads_up(
-    run_directory: &Path,
-    checkpoint_path: &Path,
-    out: Option<&Path>,
-    histories: &[String],
-) -> Result<()> {
-    let config_file = run_directory.join(formats::RUN_CONFIG_FILE);
-    let raw_bytes = std::fs::read(&config_file)
-        .with_context(|| format!("reading {}", config_file.display()))?;
-    let raw = std::str::from_utf8(&raw_bytes).context("run config is not valid UTF-8")?;
-    let config: SolveConfig =
-        crate::config::parse_solve_config(raw).context("parsing the run config")?;
-    let config_hash = formats::config_hash(&raw_bytes);
-    let is_postflop = matches!(config.game, GameSection::Postflop { .. });
-    if is_postflop && histories.iter().any(|history| !history.is_empty()) {
-        return Err(anyhow!(
-            "postflop publishes through solution.sol; use export --node instead of --history"
-        ));
-    }
-    let previous_sol = run_directory.join(formats::RUN_HU_SOLUTION_FILE);
-    let sol_mode = if is_postflop && previous_sol.exists() {
-        match formats::read_sol(&previous_sol)?.mode {
-            formats::StreetsStored::Full => SolStreets::Full,
-            formats::StreetsStored::NoRivers => SolStreets::NoRivers,
-        }
-    } else {
-        SolStreets::Full
-    };
-
-    if matches!(config.game, GameSection::PreflopMultiway(_)) {
-        return Err(anyhow!(
-            "MWP003: legacy preflop-multiway checkpoints cannot be resumed; historical \
-             solutions remain readable, but the rollout/full-recall paths they were produced \
-             with no longer exist"
-        ));
-    }
-
-    let checkpoint = formats::read_checkpoint(checkpoint_path)
-        .with_context(|| format!("reading checkpoint {}", checkpoint_path.display()))?;
-    if checkpoint.config_hash != config_hash {
-        return Err(anyhow!(
-            "checkpoint {} does not match {}: config hash {} != {} \
-             (the checkpoint was produced from a different config; refusing to resume)",
-            checkpoint_path.display(),
-            config_file.display(),
-            formats::config_hash_hex(&checkpoint.config_hash),
-            formats::config_hash_hex(&config_hash),
-        ));
-    }
-    println!(
-        "resuming from checkpoint: iteration={} target={}",
-        checkpoint.iteration, config.run.iterations
-    );
-
-    // A fork copies the run into a fresh directory and continues there, so
-    // the original stays exactly as it was left.
-    let directory = match out {
-        Some(fork) => {
-            crate::run_dir::create_or_adopt(fork)?;
-            std::fs::write(fork.join(formats::RUN_CONFIG_FILE), raw)?;
-            std::fs::copy(checkpoint_path, fork.join(formats::RUN_HU_CHECKPOINT_FILE))?;
-            let progress = run_directory.join(formats::RUN_PROGRESS_FILE);
-            if progress.exists() {
-                std::fs::copy(progress, fork.join(formats::RUN_PROGRESS_FILE))?;
-            }
-            fork
-        }
-        None => run_directory,
-    };
-    let paths = crate::run_dir::RunPaths::heads_up(directory);
-    let mut recorder = crate::run_dir::RunRecorder::reopen(
+    crate::nlh_v1::resume(
+        &raw,
         directory,
-        crate::solve::game_kind_name(&config.game),
-        config.schema.clone(),
-        config_hash,
-        raw,
-        vec!["resume".to_string(), directory.display().to_string()],
-    )?;
-    let checkpoint_sink = Some((paths.checkpoint.as_path(), config_hash));
-    let game_kind = crate::solve::game_kind_name(&config.game);
-    let sol = is_postflop.then(|| SolExportSpec {
-        path: paths.solution.clone(),
-        mode: sol_mode,
-        config_toml: raw.to_string(),
-        storage_name: match config.run.storage {
-            StorageKind::F32 => "f32",
-            StorageKind::I16 => "i16",
-        }
-        .into(),
-    });
-    let output = (!is_postflop).then_some(paths.strategy.as_path());
-    // A storage-backend mismatch (e.g. the config now says `storage =
-    // "i16"` but the checkpoint holds f32 state) surfaces naturally as a
-    // `StateMismatch` from `Solver::restore_state` inside `run_with_storage_sol`
-    // -- no separate check needed here.
-    let outcome = match config.run.storage {
-        StorageKind::F32 => run_with_storage_sol::<F32Storage>(
-            config,
-            output,
-            histories,
-            Some(&paths.progress),
-            checkpoint_sink,
-            Some(checkpoint.state),
-            sol,
-            Some(recorder.events_mut()),
-            Some(&crate::CLI_CANCEL),
-        ),
-        StorageKind::I16 => run_with_storage_sol::<I16Storage>(
-            config,
-            output,
-            histories,
-            Some(&paths.progress),
-            checkpoint_sink,
-            Some(checkpoint.state),
-            sol,
-            Some(recorder.events_mut()),
-            Some(&crate::CLI_CANCEL),
-        ),
-    };
-    let completion = outcome
-        .as_ref()
-        .ok()
-        .map(|summary| crate::solve::write_heads_up_result(&paths.result, game_kind, summary))
-        .transpose()?;
-    recorder.finish(outcome.map(|_summary| ()), completion)
+        &checkpoint,
+        out,
+        threads,
+        memory,
+        max_time,
+        checkpoint_interval,
+    )
 }
 
-#[allow(clippy::too_many_arguments)]
 /// Accepts either a run directory or a checkpoint file.
 ///
 /// A run directory is the documented input -- it is what `solve --out`
@@ -207,8 +104,8 @@ fn resolve_checkpoint(path: &Path) -> Result<std::path::PathBuf> {
     // Which checkpoint a run left behind identifies its engine, so the
     // caller routes on the extension rather than re-parsing the config.
     for name in [
-        formats::RUN_CHECKPOINT_FILE,
-        formats::RUN_HU_CHECKPOINT_FILE,
+        runfiles::RUN_CHECKPOINT_FILE,
+        runfiles::RUN_HU_CHECKPOINT_FILE,
     ] {
         let checkpoint = path.join(name);
         if checkpoint.is_file() {
@@ -219,112 +116,6 @@ fn resolve_checkpoint(path: &Path) -> Result<std::path::PathBuf> {
         "run directory {} has no checkpoint; it never reached its first one",
         path.display()
     ))
-}
-
-#[allow(clippy::too_many_arguments)]
-fn run_self_contained_multiway(
-    checkpoint_path: &Path,
-    out: Option<&Path>,
-    threads: Option<usize>,
-    memory: Option<&str>,
-    max_time: Option<&str>,
-    max_sweeps: Option<u64>,
-    stop_target: Option<f64>,
-    evaluation_samples: Option<u64>,
-    evaluation_cadence: Option<u64>,
-    checkpoint_interval: Option<&str>,
-) -> Result<()> {
-    let mut checkpoint = multiway::checkpoint::MultiwayCheckpoint::load_unchecked(checkpoint_path)
-        .with_context(|| format!("reading {}", checkpoint_path.display()))?;
-    let raw = checkpoint.config_toml.take().ok_or_else(|| {
-        anyhow!("checkpoint is not self-contained: it carries no config to resume from")
-    })?;
-    // `multiway_solve::resume` reloads the checkpoint after lowering the
-    // embedded config. Drop this first decoded state before that second load
-    // and before the full dense arena is page-committed; otherwise a
-    // self-contained resume retains two complete checkpoint states at the
-    // preallocation peak.
-    drop(checkpoint);
-    if !crate::multiway_v1::has_v1_schema(&raw)? {
-        return Err(anyhow!(
-            "self-contained resume requires a Multiway Preflop v1 checkpoint"
-        ));
-    }
-    let (_, historical_noop_pruning) = crate::config::solution_artifact_compatible_config(&raw)?;
-    if historical_noop_pruning {
-        return Err(anyhow!(
-            "this checkpoint uses the historical bucket-history + regret-based pruning \
-             combination whose pruning bit was a no-op; solution artifacts remain readable, \
-             but resuming this checkpoint requires a future explicit offline migration"
-        ));
-    }
-    let raw = crate::multiway_v1::apply_resume_overrides(
-        &raw,
-        threads,
-        memory,
-        max_time,
-        max_sweeps,
-        stop_target,
-        evaluation_samples,
-        evaluation_cadence,
-        checkpoint_interval,
-    )?;
-    let config = crate::config::parse_solve_config(&raw)?;
-    let default_directory = checkpoint_path
-        .parent()
-        .filter(|parent| !parent.as_os_str().is_empty())
-        .unwrap_or_else(|| Path::new("."));
-    let directory = out.unwrap_or(default_directory);
-    if out.is_some() {
-        if directory.exists() {
-            if std::fs::read_dir(directory)?.next().is_some() {
-                return Err(anyhow!("resume --out directory must be empty"));
-            }
-        } else {
-            std::fs::create_dir_all(directory)
-                .with_context(|| format!("creating {}", directory.display()))?;
-        }
-    }
-    let fork_checkpoint = directory.join("checkpoint.mwckpt");
-    if out.is_some() {
-        std::fs::copy(checkpoint_path, &fork_checkpoint).with_context(|| {
-            format!(
-                "copying checkpoint {} to {}",
-                checkpoint_path.display(),
-                fork_checkpoint.display()
-            )
-        })?;
-    }
-    let active_checkpoint = if out.is_some() {
-        fork_checkpoint.as_path()
-    } else {
-        checkpoint_path
-    };
-    let paths = crate::run_dir::RunPaths::multiway(directory);
-    let config_hash = formats::config_hash(raw.as_bytes());
-    let mut recorder = crate::run_dir::RunRecorder::reopen(
-        directory,
-        "preflop-multiway",
-        Some(crate::multiway_v1::SCHEMA.to_string()),
-        config_hash,
-        &raw,
-        vec!["resume".to_string(), directory.display().to_string()],
-    )?;
-    let outcome = crate::multiway_solve::resume_observed(
-        &raw,
-        config,
-        Some(&paths.result),
-        Some(&paths.progress),
-        active_checkpoint,
-        config_hash,
-        Some(&paths.solution),
-        Some(&crate::CLI_CANCEL),
-        stop_target.is_some(),
-        true,
-        &mut |observation| recorder.observe(&observation),
-    );
-    let completion = crate::run_dir::completion_status(directory);
-    recorder.finish(outcome, completion)
 }
 
 #[cfg(test)]
@@ -357,8 +148,100 @@ mod tests {
     #[test]
     fn a_heads_up_run_directory_resolves_to_its_ckpt() {
         let directory = tempfile::tempdir().unwrap();
-        std::fs::write(directory.path().join(formats::RUN_HU_CHECKPOINT_FILE), b"x").unwrap();
+        std::fs::write(
+            directory.path().join(runfiles::RUN_HU_CHECKPOINT_FILE),
+            b"x",
+        )
+        .unwrap();
         let resolved = resolve_checkpoint(directory.path()).unwrap();
         assert_eq!(resolved.extension().unwrap(), "ckpt");
+    }
+
+    fn refused(path: &Path, family: &str) {
+        let errors = [
+            run(path, None, None, None, None, None, None, None, None, None).unwrap_err(),
+            crate::nlh_v1::require_current_artifact(path).unwrap_err(),
+        ];
+        for error in errors {
+            let message = format!("{error:#}");
+            assert!(message.contains(family), "{message}");
+            assert!(
+                message.contains("re-solve from a solvers.nlh/v1 config"),
+                "{message}"
+            );
+            assert!(message.contains("docs/nlh-input-v1.jp.md"), "{message}");
+            assert_eq!(crate::error_exit_code(&error), 3);
+        }
+    }
+
+    fn hu_state() -> hu_engine::SolverState {
+        hu_engine::SolverState {
+            iteration: 0,
+            storage: hu_engine::StorageState::F32 {
+                regrets: Vec::new(),
+                strategy_sum: Vec::new(),
+            },
+        }
+    }
+
+    #[test]
+    fn removed_family_hu_checkpoints_are_refused_embedded_or_legacy() {
+        let directory = tempfile::tempdir().unwrap();
+        let checkpoint = directory.path().join("checkpoint.ckpt");
+        let family = "solvers.postflop/v1";
+        hu_postflop::checkpoint::write_checkpoint_with_config(
+            &checkpoint,
+            [0; 32],
+            &hu_state(),
+            &format!("schema = '{family}'"),
+            0.0,
+        )
+        .unwrap();
+        refused(&checkpoint, family);
+        hu_postflop::checkpoint::write_checkpoint(&checkpoint, [0; 32], &hu_state()).unwrap();
+        refused(&checkpoint, family);
+    }
+
+    #[test]
+    fn removed_family_multiway_checkpoint_is_refused() {
+        let directory = tempfile::tempdir().unwrap();
+        let checkpoint = directory.path().join("checkpoint.mwckpt");
+        let state = mw_preflop::solver::SolverState {
+            schema_version: mw_preflop::solver::SOLVER_STATE_VERSION,
+            config: mw_preflop::solver::SolverConfig::default(),
+            traversals: 0,
+            completed_sweeps: 0,
+            next_sample_id: 0,
+            total_deal_attempts: 0,
+            terminal_evaluations: 0,
+            hand_updates: 0,
+            histories: Vec::new(),
+            policies: Vec::new(),
+        };
+        let family = "solvers.multiway-preflop/v1";
+        mw_preflop::checkpoint::MultiwayCheckpoint::new(state, [0; 32], [0; 32])
+            .with_runtime_metadata(format!("schema = '{family}'"), Default::default())
+            .write_atomic(&checkpoint)
+            .unwrap();
+        refused(&checkpoint, family);
+    }
+
+    #[test]
+    fn removed_family_run_directories_are_refused_before_loading_the_checkpoint() {
+        for (family, checkpoint) in [
+            ("solvers.postflop/v1", runfiles::RUN_HU_CHECKPOINT_FILE),
+            ("solvers.multiway-preflop/v1", runfiles::RUN_CHECKPOINT_FILE),
+        ] {
+            let directory = tempfile::tempdir().unwrap();
+            std::fs::write(
+                directory.path().join(runfiles::RUN_CONFIG_FILE),
+                format!("schema = '{family}'"),
+            )
+            .unwrap();
+            std::fs::write(directory.path().join(checkpoint), b"unused").unwrap();
+            refused(directory.path(), family);
+            std::fs::remove_file(directory.path().join(checkpoint)).unwrap();
+            refused(directory.path(), family);
+        }
     }
 }

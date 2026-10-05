@@ -1,0 +1,38 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 225
+ante_bb = 24
+
+[economics]
+kind = "cash"
+
+[spot]
+line = "BTN c, BB x"
+board = "Ks 7h 2d"
+
+[ranges]
+BB = "22+,A2s+,K9s+,Q9s+,J9s+,T8s+,97s+,87s,76s,A8o+,KTo+,QTo+,JTo"
+BTN = "22+,A2s+,K7s+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o"
+
+[tree]
+script = '''flop, turn, river {
+  replace bet [100]
+  replace raise [100]
+}
+'''
+include_allin = false
+
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+max_iterations = 1000
+check_every = 25
+target = "0.075bb"

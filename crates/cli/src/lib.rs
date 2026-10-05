@@ -1,20 +1,7 @@
 //! `solvers` command-line interface, as a library.
 //!
-//! This crate is split bin+lib so the integration tests can drive the config
-//! schema (`config::SolveConfig`) and multiway session construction
-//! (`session::build_multiway_session`) directly, without going through
-//! `clap`/stdout. `main.rs` is a thin binary shim that just calls
-//! [`main_impl`].
-//!
-//! M1 scope: solve toy games from a TOML config, report convergence, and
-//! export the average strategy as JSON. The config schema is the seed of
-//! the future `formats::SolveConfig` (M3), which will add board/range/tree
-//! sections for hold'em and blake3 config hashing.
-//!
-//! `solve --checkpoint`/`--metrics` autosave progress (via the `formats`
-//! crate's `.ckpt`/JSONL formats), and `resume` continues a checkpointed run
-//! to its configured iteration total bit-for-bit identically to an
-//! uninterrupted solve.
+//! Input is parsed by `spot::Document`; each product owns its typed lowering.
+//! Checkpoints retain the effective common input for self-contained resume.
 
 pub static CLI_CANCEL: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 pub static CLI_EXIT_CODE: std::sync::atomic::AtomicI32 = std::sync::atomic::AtomicI32::new(0);
@@ -75,16 +62,29 @@ pub fn install_signal_handler() -> anyhow::Result<()> {
 }
 
 pub fn error_exit_code(error: &anyhow::Error) -> i32 {
+    if error.is::<derive::InputError>() {
+        return 2;
+    }
+    if let Some(error) = error.downcast_ref::<mw_preflop::derive::DeriveError>() {
+        return match error {
+            mw_preflop::derive::DeriveError::Artifact(_) => 3,
+            _ => 2,
+        };
+    }
+    if error.is::<derive::ArtifactError>() {
+        return 3;
+    }
     if error.chain().any(|cause| {
-        cause.is::<formats::MwSolError>()
-            || cause.is::<formats::SolError>()
-            || cause.is::<formats::CheckpointError>()
-            || cause.is::<multiway::checkpoint::CheckpointError>()
+        cause.is::<mw_preflop::mwsol::MwSolError>()
+            || cause.is::<hu_postflop::sol::SolError>()
+            || cause.is::<hu_postflop::checkpoint::CheckpointError>()
+            || cause.is::<mw_preflop::checkpoint::CheckpointError>()
     }) {
         return 3;
     }
     let message = format!("{error:#}").to_ascii_lowercase();
-    if message.contains("unsupported .mw")
+    if message.contains("removed config family")
+        || message.contains("unsupported .mw")
         || message.contains("mwp004")
         || message.contains("bad magic")
         || message.contains("fingerprint mismatch")
@@ -98,12 +98,14 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         || message.contains("memory limit")
         || message.contains("memory allocation failed")
         || message.contains("arena preflight")
+        || message.contains("node limit")
     {
         75
     } else if message.contains("parsing config")
         || message.contains("mwp001")
         || message.contains("mwp002")
         || message.contains("mwp003")
+        || message.contains("nlh00")
         || message.contains("validating")
         || message.contains("unknown field")
         || message.contains("schema")
@@ -116,26 +118,19 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     }
 }
 pub mod cache;
-pub mod config;
 pub mod config_new;
-pub mod economics;
+pub mod derive;
 pub mod inspect;
 pub mod multiway_artifact;
 pub mod multiway_solve;
-pub mod multiway_v1;
+pub mod nlh_v1;
 mod postflop_artifact;
-pub mod postflop_setup;
-pub mod preflop_setup;
 pub mod report;
 pub mod resume;
 pub mod run_dir;
 pub mod runs;
 pub mod session;
-pub mod sol;
 pub mod solve;
-pub mod solver_config_v1;
-#[cfg(test)]
-mod test_fixtures;
 pub mod validate;
 
 use anyhow::Result;
@@ -157,12 +152,29 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Generate a P1 flop input from a P2 run's saved preflop average strategy.
+    Derive {
+        /// P2 run directory containing solution.mwsol.
+        run: std::path::PathBuf,
+        /// Preflop-only line in common-input notation (implicit folds included).
+        #[arg(long)]
+        line: String,
+        /// Three distinct flop cards, for example "Ks 7h 2d".
+        #[arg(long)]
+        board: String,
+        /// P1 tree, solver, output and run settings (solvers.nlh/v1 TOML).
+        #[arg(long)]
+        base: Option<std::path::PathBuf>,
+        /// Write effective input here; defaults to stdout. Warnings go to stderr.
+        #[arg(long)]
+        out: Option<std::path::PathBuf>,
+    },
     /// Create a configuration template.
     Config {
         #[command(subcommand)]
         command: ConfigCommand,
     },
-    /// Validate a config of any family without starting a solve.
+    /// Validate a solvers.nlh/v1 config without starting a solve.
     Validate {
         config: std::path::PathBuf,
         #[arg(long, value_enum, default_value = "human")]
@@ -212,27 +224,14 @@ enum Command {
         /// Override v1 worker threads, including Multiway tree construction.
         #[arg(long)]
         threads: Option<usize>,
-        /// Override the v1 policy-arena budget (auto resolves to 6GiB).
+        /// Override v1 memory (P1 auto: 80% physical RAM; P2 auto: 6GiB).
         #[arg(long)]
         memory: Option<String>,
         /// Override the v1 cumulative solve-time limit.
         #[arg(long)]
         max_time: Option<String>,
-        /// Betting-line history to export into `strategy.json` (toy and
-        /// heads-up preflop only; repeatable). Defaults to the root node.
-        /// Postflop publishes through `solution.sol`: read a node with
-        /// `export --node` instead.
-        #[arg(long = "history", default_value = "")]
-        history: Vec<String>,
-        /// Which streets get stored strategy and value blocks in the `.sol`
-        /// export. `full` (default) stores every action node. `no-rivers`
-        /// omits river action nodes for a much smaller artifact -- the
-        /// viewer then re-solves those subtrees on demand, so their values
-        /// are recomputed rather than as-solved.
-        #[arg(long = "sol-streets", value_enum, default_value = "full")]
-        sol_streets: sol::SolStreets,
     },
-    /// Continue a checkpointed solve to `run.iterations` total iterations.
+    /// Continue a checkpointed solve to the configured solver stop ceiling.
     /// HU Postflop updates solution.sol and run.json and keeps the cumulative time budget.
     Resume {
         /// Run directory from `solve --out`, or a bare self-contained
@@ -265,15 +264,10 @@ enum Command {
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
-        /// Betting-line history to export into `strategy.json` (toy and
-        /// heads-up preflop only; repeatable). Postflop publishes through
-        /// `solution.sol`; read a node with `export --node` instead.
-        #[arg(long = "history", default_value = "")]
-        history: Vec<String>,
     },
-    /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
+    /// Inspect a formal .mwsol artifact, or open the HU postflop explorer.
     Inspect {
-        /// Path to a .mwsol artifact or legacy postflop config.
+        /// Path to a .mwsol artifact or P1 config.
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
         /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
@@ -292,11 +286,10 @@ enum Command {
         seed: u64,
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
-        /// Overrides `run.iterations` from the config (live solve only).
+        /// Overrides the config's iteration limit (live solve only).
         #[arg(long)]
         iterations: Option<u64>,
-        /// Overrides `run.target_nash_conv` from the config (live solve
-        /// only).
+        /// Overrides the NashConv limit in the config's utility unit (live solve only).
         #[arg(long)]
         target_nash_conv: Option<f64>,
         /// Load a pre-solved `.sol` viewer artifact instead of solving a
@@ -348,9 +341,8 @@ enum Command {
     /// CSV report (one row per board). Uses the configured storage, threads,
     /// and parallel settings; max_time applies separately to each board.
     Report {
-        /// Path to the config file (schema = "solvers.postflop/v1"); its
-        /// own `board` field is ignored in favor of
-        /// `--boards`/`--boards-file`.
+        /// P1 config; replaces its board with --boards/--boards-file.
+        /// For solvers.nlh/v1, each replacement must fit the spot line.
         config: std::path::PathBuf,
         /// Comma-separated boards, each 3/4/5 cards (e.g.
         /// "Ks7h2d,Ks7h2c" or "Ks 7h 2d,Ks 7h 2c").
@@ -380,9 +372,9 @@ enum RunsCommand {
 enum ConfigCommand {
     /// Print or write a valid configuration template.
     New {
-        /// Config family to template.
-        #[arg(long, value_enum, default_value = "multiway-preflop")]
-        schema: config_new::ConfigSchema,
+        /// Product to template.
+        #[arg(long, value_enum, default_value = "p2")]
+        product: config_new::ConfigProduct,
         #[arg(long, value_enum, default_value = "minimal")]
         template: config_new::ConfigTemplate,
         #[arg(long)]
@@ -397,12 +389,19 @@ pub fn main_impl() -> Result<()> {
         cache::set_root_override(root);
     }
     match cli.command {
+        Command::Derive {
+            run,
+            line,
+            board,
+            base,
+            out,
+        } => derive::run(&run, &line, &board, base.as_deref(), out.as_deref()),
         Command::Config { command } => match command {
             ConfigCommand::New {
-                schema,
+                product,
                 template,
                 out,
-            } => config_new::run(schema, template, out.as_deref()),
+            } => config_new::run(product, template, out.as_deref()),
         },
         Command::Status { run, format } => runs::status(&run, format),
         Command::Watch {
@@ -439,16 +438,12 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
-            history,
-            sol_streets,
-        } => solve::run(
+        } => solve::run_cli(
             &config,
             &out,
             threads,
             memory.as_deref(),
             max_time.as_deref(),
-            &history,
-            sol_streets,
         ),
         Command::Resume {
             run,
@@ -456,7 +451,6 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
-            history,
             max_sweeps,
             stop_target,
             evaluation_samples,
@@ -473,7 +467,6 @@ pub fn main_impl() -> Result<()> {
             evaluation_samples,
             evaluation_cadence,
             checkpoint_interval.as_deref(),
-            &history,
         ),
         Command::Inspect {
             config,
@@ -488,31 +481,41 @@ pub fn main_impl() -> Result<()> {
             sol,
             river_iterations,
             river_target,
-        } => match (config, sol) {
-            (Some(config), None) if config.extension().is_some_and(|value| value == "mwsol") => {
-                multiway_artifact::inspect(
-                    &config,
-                    &node,
-                    view,
-                    actor,
-                    samples,
-                    seed,
-                    br_traversals,
-                )
+        } => {
+            if let Some(path) = config.as_deref().or(sol.as_deref()) {
+                nlh_v1::require_current_artifact(path)?;
             }
-            (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
-            (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
-            (None, None) => Err(anyhow::anyhow!("inspect requires either <config> or --sol")),
-            (Some(_), Some(_)) => {
-                unreachable!("clap's conflicts_with prevents both being set")
+            match (config, sol) {
+                (Some(config), None)
+                    if config.extension().is_some_and(|value| value == "mwsol") =>
+                {
+                    multiway_artifact::inspect(
+                        &config,
+                        &node,
+                        view,
+                        actor,
+                        samples,
+                        seed,
+                        br_traversals,
+                    )
+                }
+                (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
+                (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
+                (None, None) => Err(anyhow::anyhow!("inspect requires either <config> or --sol")),
+                (Some(_), Some(_)) => {
+                    unreachable!("clap's conflicts_with prevents both being set")
+                }
             }
-        },
+        }
         Command::Evaluate {
             solution,
             samples,
             seed,
             br_traversals,
-        } => multiway_artifact::evaluate(&solution, samples, seed, br_traversals),
+        } => {
+            nlh_v1::require_current_artifact(&solution)?;
+            multiway_artifact::evaluate(&solution, samples, seed, br_traversals)
+        }
         Command::Export {
             solution,
             view,
@@ -520,6 +523,7 @@ pub fn main_impl() -> Result<()> {
             node,
             output,
         } => {
+            nlh_v1::require_current_artifact(&solution)?;
             if solution.extension().is_some_and(|value| value == "mwsol") {
                 multiway_artifact::export(&solution, view, format, output.as_deref())
             } else {
@@ -531,6 +535,8 @@ pub fn main_impl() -> Result<()> {
             right,
             cross_game,
         } => {
+            nlh_v1::require_current_artifact(&left)?;
+            nlh_v1::require_current_artifact(&right)?;
             if left.extension().is_some_and(|value| value == "mwsol") {
                 multiway_artifact::compare(&left, &right, cross_game)
             } else {

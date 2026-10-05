@@ -1,16 +1,14 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/cards",
-    "crates/hand-index",
+    "crates/nlh",
+    "crates/economics",
+    "crates/spot",
     "crates/cfr-ref",
-    "crates/engine",
-    "crates/game",
-    "crates/holdem",
-    "crates/abstraction",
-    "crates/preflop",
-    "crates/multiway",
-    "crates/formats",
+    "crates/hu-engine",
+    "crates/hu-postflop",
+    "crates/mw-preflop",
+    "crates/runfiles",
     "crates/protocol",
     "crates/daemon",
     "crates/cli",
@@ -23,16 +21,14 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/hiro15254/solvers"
 
 [workspace.dependencies]
-cards = { path = "crates/cards" }
-hand-index = { path = "crates/hand-index" }
+nlh = { path = "crates/nlh" }
+economics = { path = "crates/economics" }
+spot = { path = "crates/spot" }
 cfr-ref = { path = "crates/cfr-ref" }
-engine = { path = "crates/engine" }
-game = { path = "crates/game" }
-holdem = { path = "crates/holdem" }
-abstraction = { path = "crates/abstraction" }
-preflop = { path = "crates/preflop" }
-multiway = { path = "crates/multiway", default-features = false }
-formats = { path = "crates/formats" }
+hu-engine = { path = "crates/hu-engine" }
+hu-postflop = { path = "crates/hu-postflop" }
+mw-preflop = { path = "crates/mw-preflop" }
+runfiles = { path = "crates/runfiles" }
 protocol = { path = "crates/protocol" }
 daemon = { path = "crates/daemon" }
 

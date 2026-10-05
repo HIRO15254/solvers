@@ -1,0 +1,90 @@
+# Migration boundary: the old example starts at HJ. Common input starts at UTG
+# (the normal table first actor). This example is excluded from equivalence claims.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+
+[table.stacks_bb]
+BTN = 100.0
+SB = 100.0
+BB = 100.0
+UTG = 100.0
+HJ = 100.0
+CO = 100.0
+
+[economics]
+kind = "cash"
+
+[ranges]
+BTN = "random"
+SB = "random"
+BB = "random"
+UTG = "random"
+HJ = "random"
+CO = "random"
+
+[tree]
+script = '''
+preflop when unopened { replace raise [2.5x, a] }
+preflop when !unopened { replace raise [3x, a] }
+flop when unopened { replace bet [50, a] }
+flop when !unopened { replace raise [75, a] }
+turn when unopened { replace bet [50, a] }
+turn when !unopened { replace raise [75, a] }
+river when unopened { replace bet [50, a] }
+river when !unopened { replace raise [75, a] }
+preflop when unopened { replace raise [2.5x, a] }
+preflop when limpers > 0 && aggressions == 0 { replace raise [2.5x, a] }
+preflop when aggressions >= 1 { replace raise [3x, a] }
+preflop when aggressions >= 4 { remove raise }
+flop, turn, river when players >= 2 { checkdown }
+'''
+include_allin = true
+
+[tree.max_aggressive_actions]
+preflop = 6
+flop = 3
+turn = 2
+river = 1
+
+[tree.preflop_reraise_jam_above_stack]
+denominator = 3
+numerator = 1
+
+[solver]
+kind = "single-hand"
+seed = 19
+opponent_exploration = 0.125
+batch_sweeps = 3
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[solver.abstraction]
+kind = "ehs2-percentile"
+
+[solver.abstraction.buckets]
+flop = 32
+turn = 48
+river = 96
+
+[solver.stop]
+target = 0.05
+check_every_sweeps = 2000
+confirmations = 5
+evaluation_samples = 8192
+deviator_traversals = 40000
+max_sweeps = 5000000
+
+[run]
+threads = "auto"
+memory = "auto"
+max_time = "12h"
+checkpoint_interval = "15m"
+
+[output]
+probability_encoding = "f32"
