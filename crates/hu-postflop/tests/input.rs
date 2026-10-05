@@ -122,7 +122,7 @@ fn strict_sections_codes_and_other_product_diagnostics() {
         ),
         ("[solver.parallel]\nunknown = 1", Code::NLH002, false),
         ("[solver]\nstorage = 'u16'", Code::NLH003, false),
-        ("[solver]\niso_merging = 'true'", Code::NLH003, false),
+        ("[solver]\niso_merging = 'true'", Code::NLH002, false),
         (
             "[solver.algorithm]\nschedule = 'external-sampling-mccfr'",
             Code::NLH003,

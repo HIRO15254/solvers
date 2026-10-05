@@ -62,6 +62,160 @@ pub fn build_rake(rake: &RakeSection) -> Result<Box<dyn RakeModel>> {
     })
 }
 
+#[cfg(test)]
+mod nlh_differential_tests {
+    use super::*;
+    use hu_postflop::input::{NlhPayoff, Settings, lower};
+    use nlh::Street;
+    use spot::Document;
+    use std::path::Path;
+
+    fn doc(economics: &str) -> Document {
+        let text = format!(
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\n[table.stacks_bb]\nBTN = 100\nSB = 80\nBB = 60\nUTG = 100\nHJ = 100\nCO = 100\n{economics}\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'QQ'"
+        );
+        Document::parse(&text, Path::new("test.toml")).unwrap()
+    }
+    fn descriptor(doc: &Document, bets: (u32, u32), kind: TerminalKind) -> TerminalDescriptor {
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        let config = lower(&doc.spot, &settings).unwrap();
+        let shares = PerPlayer::new(
+            config.starting_share(Player::P0),
+            config.starting_share(Player::P1),
+        );
+        TerminalDescriptor {
+            kind,
+            street: Street::River,
+            pot: config.pot + Chips(bets.0 + bets.1),
+            contrib: PerPlayer::new(
+                shares[Player::P0] + Chips(bets.0),
+                shares[Player::P1] + Chips(bets.1),
+            ),
+            stacks_before: shares.map(|s| config.effective_stack + s),
+        }
+    }
+
+    #[test]
+    fn v1_showdown_rake_matches_legacy_generic_and_fold_differs_by_uncalled_rake() {
+        for (rounding, name) in [
+            (mw_preflop::RakeRounding::Down, "down"),
+            (mw_preflop::RakeRounding::Nearest, "nearest"),
+            (mw_preflop::RakeRounding::Up, "up"),
+        ] {
+            for (allocation, name_allocation) in [
+                (mw_preflop::RakeAllocation::MainFirst, "main-first"),
+                (mw_preflop::RakeAllocation::Proportional, "proportional"),
+            ] {
+                let doc = doc(&format!(
+                    "[economics.rake]\nrate = 0.05\ncap_bb = 0.5\nwhen = 'flop_dealt'\nrounding = '{name}'\nallocation = '{name_allocation}'"
+                ));
+                let new = NlhPayoff::new(&doc.spot).unwrap();
+                let old = GenericRake::compile(
+                    0.05,
+                    Some(500.0),
+                    "flop_dealt",
+                    allocation,
+                    rounding,
+                    1.0,
+                )
+                .unwrap();
+                let showdown = descriptor(&doc, (1001, 1001), TerminalKind::Showdown);
+                assert_eq!(new.rake.rake(&showdown), old.rake(&showdown));
+                let fold = descriptor(&doc, (1000, 0), TerminalKind::Fold { folder: Player::P1 });
+                assert_eq!(new.rake.rake(&fold), 275.0);
+                assert_eq!(old.rake(&fold), 325.0); // Old family rakes the uncalled 1 BB too.
+            }
+        }
+    }
+
+    #[test]
+    fn v1_icm_matches_legacy_with_folded_final_stacks_and_field_exact_and_sampled() {
+        for field_size in [6usize, 15, 16] {
+            let outside_count = field_size - 6;
+            let outside = (0..outside_count)
+                .map(|i| (20 + i).to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+            let payouts = (0..field_size)
+                .rev()
+                .map(|i| (i * 10).to_string())
+                .collect::<Vec<_>>()
+                .join(",");
+            let sampled = if field_size >= 16 {
+                "\nsamples = 1000\nseed = 17"
+            } else {
+                ""
+            };
+            let doc = doc(&format!(
+                "[economics]\nkind = 'tournament'\npayouts = [{payouts}]\noutside_field_bb = [{outside}]{sampled}"
+            ));
+            let models = NlhPayoff::new(&doc.spot).unwrap();
+            let mut fixed: Vec<f64> = doc
+                .spot
+                .context
+                .seats
+                .iter()
+                .filter(|s| s.folded)
+                .map(|s| (s.starting_stack - s.total_contribution).as_bb())
+                .collect();
+            fixed.extend((0..outside_count).map(|i| (20 + i) as f64));
+            let old = TournamentIcm::new(
+                (0..field_size).rev().map(|i| (i * 10) as f64).collect(),
+                fixed,
+                if field_size >= 16 { 1000 } else { 100_000 },
+                if field_size >= 16 { 17 } else { 0 },
+            )
+            .unwrap();
+            let before = old.utility(&PerPlayer::new(60.0, 100.0));
+            let behind = old.utility(&PerPlayer::new(57.5, 97.5));
+            let offset = models.ev_offset();
+            for player in [Player::P0, Player::P1] {
+                assert!((offset[player] - (before[player] - behind[player])).abs() < 1e-12);
+            }
+            let t = descriptor(&doc, (1000, 1000), TerminalKind::Showdown);
+            let baked = models.pipeline().bake(&t);
+            for (actual, result) in [
+                (PerPlayer::new(64.0, 96.5), baked.win_p0),
+                (PerPlayer::new(60.25, 100.25), baked.tie),
+                (PerPlayer::new(56.5, 104.0), baked.win_p1),
+            ] {
+                let expected = old.utility(&actual);
+                for player in [Player::P0, Player::P1] {
+                    assert!(
+                        (result[player] - (expected[player] - before[player])).abs() < 1e-12,
+                        "field={field_size}, player={player:?}"
+                    );
+                    assert!(
+                        (result[player] + offset[player] - (expected[player] - behind[player]))
+                            .abs()
+                            < 1e-12
+                    );
+                }
+            }
+            let fold = descriptor(&doc, (0, 1000), TerminalKind::Fold { folder: Player::P0 });
+            let result = models.pipeline().bake(&fold).win_p1;
+            let expected = old.utility(&PerPlayer::new(57.5, 103.0));
+            for player in [Player::P0, Player::P1] {
+                assert!(
+                    (result[player] + offset[player] - (expected[player] - behind[player])).abs()
+                        < 1e-12
+                );
+            }
+            assert_eq!(models.pipeline().bake(&t).tie, baked.tie); // memo and seed deterministic
+            assert!(!models.pipeline().is_zero_sum());
+        }
+    }
+
+    #[test]
+    fn v1_memory_error_uses_existing_resource_exit_code() {
+        let error = anyhow!(hu_postflop::input::MemoryLimitError {
+            required: 100,
+            limit: 99
+        });
+        assert_eq!(crate::error_exit_code(&error), 75);
+    }
+}
+
 /// Builds the utility model a config's `[utility]` section names.
 pub fn build_utility(utility: &UtilitySection) -> Result<Box<dyn UtilityModel>> {
     Ok(match utility {

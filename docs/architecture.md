@@ -85,6 +85,17 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
 製品が `spot::ProductSections` で検証して既定値を補う。P1 は `hu_postflop::input`（`P1Sections`、`Settings`、`lower`）が `Spot` IR を milli-BB の `PostflopConfig` へ変換し、v1 の rule（`TreeVar`）は `StreetTree::nlh_rules` として旧方言と並べて評価する。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
 
+P1 の共通Input用 `input::NlhPayoff` は、`economics` のrake・ICMをterminalで焼き込む。
+rakeの基準potからuncalled wagerを除き、`players_dealt`は元の卓人数、flopを見た人数は2とする。
+effective stackの木から実際の残stackへ戻して効用を計算し、`UtilityModel::baseline`で両者の実際の
+既投入額を基準にする。`NlhPayoff::ev_offset`をsolver EVに加えると、開始potを除いた残stackの
+効用が報告基準になる。cashの効用はBB、ICMは賞金単位で、fold済みの卓playerの最終stackと
+outside fieldも含める。dead moneyがある内部payoffは一般和として扱う。
+`input::resolve_target`はNashConv/2の絶対停止閾値を返し、`resolve_memory_limit`は明示bytesまたは
+物理RAMの80%を返す。`check_memory_limit`は`try_memory_usage`のstorage見積りを構築前に検査する
+ためのlibrary helperであり、CLIへの接続は後続段階で行う。物理RAMの問合せはWindowsの
+`GlobalMemoryStatusEx`、Unixの`sysconf`を使う。旧familyのeconomics adapterは従来のままである。
+
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。
 

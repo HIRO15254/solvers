@@ -293,6 +293,7 @@ dependencies = [
  "runfiles",
  "serde",
  "serde_json",
+ "spot",
  "tempfile",
  "toml",
  "toml_edit",
@@ -611,6 +612,7 @@ dependencies = [
  "criterion",
  "economics",
  "hu-engine",
+ "libc",
  "nlh",
  "postcard",
  "rayon",
@@ -622,6 +624,7 @@ dependencies = [
  "thiserror",
  "toml",
  "toml_edit",
+ "windows-sys 0.61.2",
  "zstd",
 ]
 

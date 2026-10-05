@@ -92,6 +92,12 @@ impl RakeModel for GgPreflopRake {
 pub trait UtilityModel: Send + Sync {
     fn utility(&self, stacks_after: &PerPlayer<f64>) -> PerPlayer<f64>;
 
+    /// Utility baseline used when baking a terminal. Common-input models
+    /// replace the builder's synthetic pot split with actual contributions.
+    fn baseline(&self, t: &TerminalDescriptor) -> PerPlayer<f64> {
+        self.utility(&t.stacks_before.map(|c| c.as_f64()))
+    }
+
     /// True when utility is an affine function of chip counts with equal
     /// slopes (chip EV, and pure two-player ICM). Enables the zero-sum fast
     /// path and its invariant tests.
@@ -170,7 +176,7 @@ impl PayoffPipeline<'_> {
     }
 
     pub fn bake(&self, t: &TerminalDescriptor) -> BakedPayoffs {
-        let baseline = self.utility.utility(&t.stacks_before.map(|c| c.as_f64()));
+        let baseline = self.utility.baseline(t);
         let outcome_utility = |share: PerPlayer<f64>| -> PerPlayer<f64> {
             let net_pot = t.pot.as_f64() - self.rake.rake(t);
             let stacks_after = PerPlayer::new(

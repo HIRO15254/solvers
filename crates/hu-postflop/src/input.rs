@@ -6,6 +6,13 @@ use nlh::{Chips, PerPlayer, Player, Street};
 use serde::{Deserialize, Serialize};
 use spot::{Code, PostflopPlayer, Product, ProductSections, Spot, SpotError, TreeVar};
 
+mod payoff;
+mod resources;
+pub use payoff::{NlhPayoff, NlhRake, NlhUtility};
+pub use resources::{
+    MemoryLimitError, check_memory_limit, physical_memory_bytes, resolve_memory_limit,
+};
+
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum Storage {
@@ -163,14 +170,38 @@ fn section<'a>(
         .get(key)
         .map(|v| {
             v.as_table()
-                .ok_or_else(|| invalid(path, "expected a table"))
+                .ok_or_else(|| SpotError::new(Code::NLH002, path, "expected a table"))
         })
         .transpose()
 }
-fn decode<T: serde::de::DeserializeOwned>(table: toml::Table, key: &str) -> Result<T, SpotError> {
-    toml::Value::Table(table)
-        .try_into()
-        .map_err(|e| invalid(key, e.to_string()))
+fn decode<T: serde::de::DeserializeOwned>(value: toml::Value, key: &str) -> Result<T, SpotError> {
+    value.try_into().map_err(|e| invalid(key, e.to_string()))
+}
+
+fn field<T: serde::de::DeserializeOwned>(
+    table: &toml::Table,
+    name: &str,
+    path: &str,
+    default: T,
+    valid_type: fn(&toml::Value) -> bool,
+) -> Result<T, SpotError> {
+    match table.get(name) {
+        None => Ok(default),
+        Some(value) if valid_type(value) => decode(value.clone(), path),
+        Some(_) => Err(SpotError::new(Code::NLH002, path, "wrong TOML type")),
+    }
+}
+fn number(value: &toml::Value) -> bool {
+    value.is_float() || value.is_integer()
+}
+fn parameter(table: &toml::Table, name: &str, default: f64) -> Result<f64, SpotError> {
+    let path = format!("solver.algorithm.{name}");
+    let value = field(table, name, &path, default, number)?;
+    if value.is_finite() {
+        Ok(value)
+    } else {
+        Err(invalid(&path, "must be finite"))
+    }
 }
 
 impl Settings {
@@ -232,13 +263,34 @@ impl Settings {
                 &[],
             )?;
         }
-        let mut solver = solver.clone();
-        if let Some(t) = section(&solver, "algorithm", "solver.algorithm")? {
+        let mut settings = Solver {
+            iso_merging: field(
+                solver,
+                "iso_merging",
+                "solver.iso_merging",
+                true,
+                toml::Value::is_bool,
+            )?,
+            storage: field(
+                solver,
+                "storage",
+                "solver.storage",
+                Storage::default(),
+                toml::Value::is_str,
+            )?,
+            ..Solver::default()
+        };
+        if let Some(t) = section(solver, "algorithm", "solver.algorithm")? {
             let schedule = t
                 .get("schedule")
                 .map(|v| {
-                    v.as_str()
-                        .ok_or_else(|| invalid("solver.algorithm.schedule", "expected a string"))
+                    v.as_str().ok_or_else(|| {
+                        SpotError::new(
+                            Code::NLH002,
+                            "solver.algorithm.schedule",
+                            "expected a string",
+                        )
+                    })
                 })
                 .transpose()?
                 .unwrap_or("dcfr");
@@ -254,64 +306,133 @@ impl Settings {
                 }
             };
             keys(spot, t, "solver.algorithm", allowed, &[])?;
-            let mut t = t.clone();
-            t.entry("schedule".to_owned())
-                .or_insert(toml::Value::String(schedule.into()));
-            solver.insert("algorithm".into(), toml::Value::Table(t));
+            settings.algorithm = match schedule {
+                "vanilla" => Algorithm::Vanilla,
+                "cfr-plus" => Algorithm::CfrPlus,
+                "linear-cfr" => Algorithm::LinearCfr,
+                "dcfr" => Algorithm::Dcfr {
+                    alpha: parameter(t, "alpha", alpha())?,
+                    beta: parameter(t, "beta", 0.0)?,
+                    gamma: parameter(t, "gamma", gamma())?,
+                    pow4_reset: field(
+                        t,
+                        "pow4_reset",
+                        "solver.algorithm.pow4_reset",
+                        true,
+                        toml::Value::is_bool,
+                    )?,
+                },
+                "hs-dcfr" => Algorithm::HsDcfr {
+                    gamma0: parameter(t, "gamma0", gamma0())?,
+                },
+                _ => unreachable!("validated schedule"),
+            };
         }
-        let solver: Solver = decode(solver, "solver")?;
-        let output = decode(output.clone(), "output")?;
-        if solver.stop.max_iterations == 0 || solver.stop.check_every == 0 {
-            return Err(invalid(
-                "solver.stop",
-                "max_iterations and check_every must be positive",
-            ));
+        if let Some(t) = section(solver, "stop", "solver.stop")? {
+            settings.stop = Stop {
+                target: field(t, "target", "solver.stop.target", None, toml::Value::is_str)?,
+                max_iterations: field(
+                    t,
+                    "max_iterations",
+                    "solver.stop.max_iterations",
+                    settings.stop.max_iterations,
+                    toml::Value::is_integer,
+                )?,
+                check_every: field(
+                    t,
+                    "check_every",
+                    "solver.stop.check_every",
+                    settings.stop.check_every,
+                    toml::Value::is_integer,
+                )?,
+            };
         }
-        if solver.parallel.min_children == 0 {
-            return Err(invalid("solver.parallel.min_children", "must be positive"));
+        if let Some(t) = section(solver, "parallel", "solver.parallel")? {
+            settings.parallel = Parallel {
+                chance_depth: field(
+                    t,
+                    "chance_depth",
+                    "solver.parallel.chance_depth",
+                    settings.parallel.chance_depth,
+                    toml::Value::is_integer,
+                )?,
+                min_children: field(
+                    t,
+                    "min_children",
+                    "solver.parallel.min_children",
+                    settings.parallel.min_children,
+                    toml::Value::is_integer,
+                )?,
+            };
         }
-        let finite = match solver.algorithm {
-            Algorithm::Dcfr {
-                alpha, beta, gamma, ..
-            } => [alpha, beta, gamma].iter().all(|v| v.is_finite()),
-            Algorithm::HsDcfr { gamma0 } => gamma0.is_finite(),
-            _ => true,
+        let output = Output {
+            solution_streets: field(
+                output,
+                "solution_streets",
+                "output.solution_streets",
+                SolutionStreets::default(),
+                toml::Value::is_str,
+            )?,
         };
-        if !finite {
-            return Err(invalid("solver.algorithm", "parameters must be finite"));
+        for (key, value) in [
+            ("solver.stop.max_iterations", settings.stop.max_iterations),
+            ("solver.stop.check_every", settings.stop.check_every),
+            (
+                "solver.parallel.min_children",
+                settings.parallel.min_children as u64,
+            ),
+        ] {
+            if value == 0 {
+                return Err(invalid(key, "must be positive"));
+            }
         }
-        if let Some(target) = &solver.stop.target {
-            validate_target(spot, target)?;
+        if let Some(target) = &settings.stop.target {
+            resolve_target(spot, target)?;
         }
-        Ok(Self { solver, output })
+        Ok(Self {
+            solver: settings,
+            output,
+        })
     }
 }
 
-fn validate_target(spot: &Spot, target: &str) -> Result<(), SpotError> {
+/// Absolute exploitability (NashConv / 2) threshold, in BB or prize units.
+pub fn resolve_target(spot: &Spot, target: &str) -> Result<f64, SpotError> {
     let tournament = matches!(
         spot.economics.utility,
         economics::UtilityConfig::TournamentIcm { .. }
     );
-    let suffix = if tournament {
-        target.strip_suffix("%prizes")
+    let amount_and_basis = if tournament {
+        let economics::UtilityConfig::TournamentIcm { payouts, .. } = &spot.economics.utility
+        else {
+            unreachable!()
+        };
+        target
+            .strip_suffix("%prizes")
+            .map(|s| (s, payouts.iter().sum::<f64>() / 100.0))
     } else {
         target
             .strip_suffix("%pot")
-            .or_else(|| target.strip_suffix("bb"))
+            .map(|s| (s, spot.context.pot.as_bb() / 100.0))
+            .or_else(|| target.strip_suffix("bb").map(|s| (s, 1.0)))
     };
-    let valid = suffix.is_some_and(|s| {
-        !s.is_empty()
-            && s.bytes().all(|c| c.is_ascii_digit() || c == b'.')
-            && s.parse::<f64>().is_ok_and(|v| v.is_finite() && v >= 0.0)
-    });
-    if valid {
-        Ok(())
-    } else {
-        Err(invalid(
-            "solver.stop.target",
-            "expected a non-negative target: cash N%pot or Nbb, tournament N%prizes",
-        ))
+    if let Some((s, basis)) = amount_and_basis {
+        let mut parts = s.split('.');
+        let digits = |s: &str| !s.is_empty() && s.bytes().all(|c| c.is_ascii_digit());
+        let decimal = digits(parts.next().unwrap_or_default())
+            && parts.next().is_none_or(digits)
+            && parts.next().is_none();
+        if decimal && let Ok(value) = s.parse::<f64>() {
+            let threshold = value * basis;
+            if value > 0.0 && threshold.is_finite() && threshold > 0.0 {
+                return Ok(threshold);
+            }
+        }
     }
+    Err(invalid(
+        "solver.stop.target",
+        "expected a positive plain-decimal target: cash N%pot or Nbb, tournament N%prizes",
+    ))
 }
 
 /// Stateless normalization hook. Parsing is also available through `Settings::parse`.
