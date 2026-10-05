@@ -169,6 +169,8 @@ ICMはhand開始ICMを基準とした賞金単位の増減である。potはunca
 ICMはfoldした卓の席とoutside fieldも含める。
 strategy_weightsは第2節の相対重みであり、nodeの実到達量ではない。
 actionのtree外sizeは近似して照合しない。
+`derive`はPreflopのstrategy blockからP1用のrangeを作る。line上の各席のactionの平均確率をclassごとに掛け、
+未訪問のnode×classはweight 0とする。手順と生成物は[CLI reference](cli-reference.jp.md#solvers-derive)に従う。
 
 evaluateは保存blockからprofileを復元する。未保存columnと量子化前の値は復元できない。
 学習時profile、checkpoint監査、外部solverの完全解と同一視しない。

@@ -62,6 +62,18 @@ pub fn install_signal_handler() -> anyhow::Result<()> {
 }
 
 pub fn error_exit_code(error: &anyhow::Error) -> i32 {
+    if error.is::<derive::InputError>() {
+        return 2;
+    }
+    if let Some(error) = error.downcast_ref::<mw_preflop::derive::DeriveError>() {
+        return match error {
+            mw_preflop::derive::DeriveError::Artifact(_) => 3,
+            _ => 2,
+        };
+    }
+    if error.is::<derive::ArtifactError>() {
+        return 3;
+    }
     if error.chain().any(|cause| {
         cause.is::<mw_preflop::mwsol::MwSolError>()
             || cause.is::<hu_postflop::sol::SolError>()
@@ -107,6 +119,7 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
 }
 pub mod cache;
 pub mod config_new;
+pub mod derive;
 pub mod inspect;
 pub mod multiway_artifact;
 pub mod multiway_solve;
@@ -139,6 +152,23 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Generate a P1 flop input from a P2 run's saved preflop average strategy.
+    Derive {
+        /// P2 run directory containing solution.mwsol.
+        run: std::path::PathBuf,
+        /// Preflop-only line in common-input notation (implicit folds included).
+        #[arg(long)]
+        line: String,
+        /// Three distinct flop cards, for example "Ks 7h 2d".
+        #[arg(long)]
+        board: String,
+        /// P1 tree, solver, output and run settings (solvers.nlh/v1 TOML).
+        #[arg(long)]
+        base: Option<std::path::PathBuf>,
+        /// Write effective input here; defaults to stdout. Warnings go to stderr.
+        #[arg(long)]
+        out: Option<std::path::PathBuf>,
+    },
     /// Create a configuration template.
     Config {
         #[command(subcommand)]
@@ -359,6 +389,13 @@ pub fn main_impl() -> Result<()> {
         cache::set_root_override(root);
     }
     match cli.command {
+        Command::Derive {
+            run,
+            line,
+            board,
+            base,
+            out,
+        } => derive::run(&run, &line, &board, base.as_deref(), out.as_deref()),
         Command::Config { command } => match command {
             ConfigCommand::New {
                 product,

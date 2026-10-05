@@ -54,7 +54,7 @@ product definition) and will be a client of the daemon — see
 crates/
 ├── cli         # `solvers` binary: arguments, run directories, rendering for
 │               # config / validate / solve / resume / status / watch / runs /
-│               # inspect / evaluate / export / compare / report
+│               # inspect / evaluate / export / compare / report / derive
 ├── protocol    # versioned wire types for the job daemon
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── nlh         # card/range/evaluator, shared 2–9 seat NLH rules and settlement, sizing, tree-script, suit isomorphism
@@ -106,6 +106,13 @@ cargo run -p cli --release -- status runs/v1-smoke
 cargo run -p cli --release -- watch  runs/v1-smoke --from 0
 cargo run -p cli --release -- runs ls runs
 cargo run -p cli --release -- resume runs/v1-smoke
+
+# Derive a heads-up flop input from the saved preflop average strategy.
+# More sweeps give this short smoke run coverage of the selected line.
+cargo run -p cli --release -- resume runs/v1-smoke --max-sweeps 64 --evaluation-cadence 65
+cargo run -p cli --release -- derive runs/v1-smoke --line "BTN c, BB x" \
+    --board "Ks 7h 2d" --out runs/derived-flop.toml
+# Use --base for P1 tree/solver settings; see the derive workflow in the user guide.
 
 # --- Postflop --------------------------------------------------------------
 # Exact postflop solve (prints a memory estimate before building the tree):

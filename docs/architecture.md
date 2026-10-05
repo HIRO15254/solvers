@@ -68,11 +68,18 @@ TOML → spot::Document → Spot IR + 製品別settings節
 製品のtyped observation → CLI observer → runfiles progress/events/manifest
 製品のsummary/query     → CLI encoder  → run.json・stdout・CSV/JSON
 製品のstate/profile     → 製品codec     → checkpoint・solution
+P2 .mwsol + line/board → mw-preflop::derive → combo weightと未訪問class
+                       → spot::derive + 任意base → hu-postflop::prepare → P1実効Input
 ```
 
 製品がsolve loop、停止・資源判定、artifactの読書きを所有する。CLIは実効configとrun identityを
 記録し、observerで進捗とeventを保存する。製品は`AtomicBool`のcancel flagを明示的に受け取る。
 P2のcache利用APIはpathを受け取り、場所の選択はCLIに残す。P1にはmachine cacheが無い。
+
+`mw_preflop::derive`は保存public treeとの整数action照合と平均確率によるrange計算を所有し、
+`views`の確率lookupを共有する。`spot::derive`はline再生、baseの共通条件照合とdocument組立てを行う。
+CLIの`derive` adapterはmanifest・solution hash・入出力・警告表示を担当し、
+P1の`prepare`で検証した正規化Inputだけを書き出す。
 
 ## 3. コア表現(hu-engine crate)
 
@@ -210,6 +217,7 @@ CLIのviewer queryは製品APIを使う。HTTP・job・画面状態はdomainへ�
 `run`がsolve/resume・時間制限・協調cancel・checkpoint・停止評価を所有する。
 typed observationとdiagnosticをcallbackへ渡し、run summaryを返す。
 progress/eventの保存とJSON/CSV表示はCLIが担う。`views`がartifact query・比較・profile評価を返す。
+`derive`は保存済みPreflop平均戦略からP1用combo rangeを返す。
 P2固有量を`spot`・`runfiles`の共通DTOへ移さない。
 
 ### 10.1 arena と通常の学習・停止評価

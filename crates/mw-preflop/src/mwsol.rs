@@ -501,7 +501,7 @@ impl From<LegacyMultiwaySolutionMetadata> for MultiwaySolutionMetadata {
 
 impl MultiwaySolutionMetadata {
     #[cfg(test)]
-    fn from_solution(solution: &MultiwaySolution) -> Self {
+    pub(crate) fn from_solution(solution: &MultiwaySolution) -> Self {
         Self {
             schema_version: solution.schema_version,
             config_toml: solution.config_toml.clone(),

@@ -54,7 +54,8 @@ flowchart LR
 ### 3.2 製品間連携（derive）
 
 P2の完了runと、Preflop line・boardを指定してP1のInputを生成する。手に残る2人のrangeは、
-P2の平均戦略をlineに沿って適用したcombo weightとする。table・economics・treeを引き継ぎ、
+P2の平均戦略をlineに沿って適用したcombo weightとし、未訪問のclassはweight 0として警告する。
+table・economics・treeを引き継ぎ、P1用のtreeと計算設定は別の設定fileから差し替えられる。
 生成物は通常のInputファイル（自己完結）として保存する。出所（run id、solution hash、line、board）は
 `[meta]`に記録する。lineがP2の木に存在しないsizeを含む場合は近似せずerrorにする。
 

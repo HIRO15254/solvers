@@ -791,6 +791,8 @@ max_time = "12h"
 | Q9 | `rounding_unit_bb` | 0.001の倍数の任意の正の単位を受ける（第6節） |
 | Q10 | 付録Bのその他の事項 | 記載の定めで確定する |
 | Q11 | 丸めたrakeがpotを超える場合 | potの額とする（第6節） |
+| Q12 | deriveのtreeと計算設定 | 既定でP2のtreeを引き継ぎ、Flop以降の`checkdown`を警告する。`--base`のfileから`[tree]`・`[solver]`・`[output]`・`[run]`を差し替えられ、baseの`[table]`・`[economics]`がP2と違えばerror（CLI reference） |
+| Q13 | deriveで未訪問のnode×class | weight 0として除き、席ごとに警告する（CLI reference） |
 
 P2の方式と品質保証は製品定義D5により未決定である。
 

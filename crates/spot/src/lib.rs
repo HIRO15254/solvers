@@ -1,5 +1,6 @@
 //! Strict `solvers.nlh/v1` document parsing and normalization.
 //! Product implementations own solver/output validation through `ProductSections`.
+pub mod derive;
 mod dialect;
 mod error;
 mod ir;

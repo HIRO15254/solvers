@@ -199,6 +199,9 @@ reader は byte offset を保持し、未完了の最終行を次回へ残す。
 
 `config new` / `validate` が入力、`solve` / `resume` が計算、`status` / `watch` / `runs ls` が監視、
 `inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
+`derive`はP2 runとPreflop line・Flop boardからP1の実効Inputを生成する。
+range計算は`mw_preflop::derive`、共通document組立ては`spot::derive`、
+P1検証は`hu_postflop::prepare`、入出力と表示はCLIにある。daemonにderive endpointは無い。
 製品によって対応する操作が異なるため、ここで共通対応を仮定しない。
 全コマンド・引数は [cli-reference.jp.md](cli-reference.jp.md) を参照する。
 

@@ -133,6 +133,45 @@ compareは通常同一gameを要求する。`--cross-game`でもseat mappingとu
 P1のsolution同士もcompareできるが、treeと保存node集合の一致が必要である。
 P2のPreflop-only出力は未達で、現行artifactにPostflop blockが含まれうる。
 
+### P2からP1の入力を作る（derive）
+
+P2でPreflopの平均戦略を保存し、2人が残るlineとFlopの3枚を指定する。
+小さいsmoke runでは未訪問のclassが残りうるため、以下では追加sweepを行う。
+
+```sh
+solvers solve examples/mw-preflop/3max_smoke.toml --out runs/derive-preflop
+solvers resume runs/derive-preflop --max-sweeps 64 --evaluation-cadence 65
+```
+
+P1用のbaseは単独で有効なspotでなくてよい。次を`p1-base.toml`へ保存する。
+これはFlopの最初の手番をall-inに限定する小さい動作確認用の木である。
+用途に合わせてtreeと停止条件を変更する。
+
+```toml
+schema = "solvers.nlh/v1"
+[tree]
+script = 'flop when unopened { force bet [a] } turn, river { checkdown }'
+[solver.stop]
+max_iterations = 2
+[run]
+threads = 1
+memory = "64MiB"
+```
+
+```sh
+solvers derive runs/derive-preflop --line "BTN c, BB x" --board "Ks 7h 2d" \
+  --base p1-base.toml --out derived-flop.toml
+solvers validate derived-flop.toml
+solvers solve derived-flop.toml --out runs/derived-flop
+```
+
+このlineではSBが暗黙にfoldする。指定できるのはPreflopだけのlineとFlop開始であり、
+暗黙foldを含むaction・sizeはP2の木と完全一致が必要である。foldした席のcard removalは使わない。
+未訪問のnode×classはweight 0として除き、席ごとに警告する。全weightが0の席があれば生成しない。
+baseなしではP2のtreeを引き継ぎ、Flop以降の`checkdown`を警告する。
+baseのtable・economicsがP2と違えばerrorとなり、spot・rangesは生成値で置き換える。
+生成物は出所を`meta.derived_from`へ記録した自己完結の実効Inputであり、通常のP1操作で扱う。
+
 ## 7. daemonから実行する
 
 ```sh

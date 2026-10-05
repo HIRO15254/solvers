@@ -225,6 +225,7 @@ mod tests {
             "export",
             "compare",
             "evaluate",
+            "derive",
             // global and generated help
             "--help",
             "--version",
@@ -267,6 +268,9 @@ mod tests {
             "--boards-file",
             "--output",
             "--cross-game",
+            "--line",
+            "--board",
+            "--base",
             // v1 validation fields and template values
             "p1",
             "p2",

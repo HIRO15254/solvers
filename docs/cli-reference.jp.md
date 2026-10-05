@@ -263,6 +263,46 @@ CIは有限候補の推定区間であり、Nash/exploitability保証ではな�
 現行writerはPostflop blockも保存しうるため、Preflop-only出力は未達である。
 完全stateの監査にはcheckpointを使う。[P2第3・6〜7節](mw-preflop.jp.md)を参照する。
 
+## `solvers derive`
+
+```sh
+solvers derive RUN --line LINE --board BOARD [--base PATH] [--out PATH]
+```
+
+| 引数・flag | 既定 | 意味 |
+|---|---|---|
+| `RUN` | 必須 | P2のrun directory。`solution.mwsol`を読む |
+| `--line LINE` | 必須 | Preflopだけのline。表記は[共通Input第7節](nlh-input-v1.jp.md)と同じ |
+| `--board BOARD` | 必須 | Flopの3枚 |
+| `--base PATH` | なし | P1用の設定。`[tree]`・`[solver]`・`[output]`・`[run]`を使う |
+| `--out PATH` | stdout | 生成したInputの出力先。警告と要約はstderrへ出す |
+
+P2の解から、line・boardで始まるP1のInputを生成する。
+`solution.mwsol`に埋め込まれたP2の実効config、public tree、Preflopの平均戦略を使う。
+`solution.mwsol`が無い、破損している、旧入力を埋め込んでいる場合はexit 3である。
+manifestの状態がcompleted以外でもsolutionがあれば使い、その状態を警告する。
+
+lineはP2の卓で再生する。暗黙のfoldを含む全actionがP2のpublic treeに無ければならない。
+P2の`checkdown`がdecision nodeなしで適用したcheck・foldは、lineの同じaction（暗黙のfoldを含む）と一致する。
+sizeは0.001 BBで完全に一致させ、近似しない。木に無いactionはexit 2で、actorと木にあるactionを示す。
+Postflopのactionを含むline、Preflopが閉じないline、3人以上が残るlineはexit 2である。
+P2はPostflop戦略を提供しないため、生成するspotはFlop開始だけである。boardの検査は共通Inputと同じである。
+
+手に残る2人のrangeは、各席のP2開始rangeのcombo weightに、line上でその席が取った各actionの
+平均確率（169 class）を掛けたweightである。他の席のactionとfoldした席のcard removalは使わない。
+一度も訪問されなかったnode×classはweight 0とし、除いたclassを席ごとに警告する。
+weightが全て0になった席があればexit 2である。
+
+生成するInputは、P2の`[table]`・`[economics]`・`[tree]`、指定した`[spot]`、計算した`[ranges]`、
+`[meta] derived_from`（run id、`solution.mwsol`のBLAKE3 hex、line、board）を持つ。
+`--base`のfileはschemaが`solvers.nlh/v1`のTOMLで、単独で有効なInputである必要は無い。
+その`[tree]`・`[solver]`・`[output]`・`[run]`を使い、`[tree]`が無ければP2のtreeを引き継ぐ。
+baseの`[meta]`のnameとdescriptionは残す。baseの`[table]`・`[economics]`は、正規化した値がP2と一致しなければexit 2である。
+baseの`[spot]`・`[ranges]`はderiveの値で置き換え、置き換えたことを警告する。
+P2のtreeを引き継ぎ、Flop以降に`checkdown`があれば、P1でも一致した手番がcheckかfoldだけになることを警告する。
+生成物はP1として検証し、`validate --write-effective`と同じ正規化した実効configで書く。
+P1として検証できなければ書かずにexit 2である。
+
 ## 拒否と終了code
 
 schemaが無いconfig、未知schema、削除済みschemaは`NLH001`（exit 2）で拒否する。

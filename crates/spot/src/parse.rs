@@ -108,7 +108,7 @@ fn type_error(key: &str, expected: &str) -> SpotError {
 
 /// Check shapes before serde so every unknown key/type error has its complete dotted path.
 /// Open maps are restricted to the documented value kind; solver/output belong to hooks.
-fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotError> {
+pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotError> {
     if let Some(inner) = kind.strip_prefix("array:") {
         let array = value.as_array().ok_or_else(|| type_error(path, "array"))?;
         for (i, v) in array.iter().enumerate() {
@@ -410,7 +410,7 @@ fn chips(number: f64, key: &str, zero: bool) -> Result<MwChips, SpotError> {
     decimal_chips(&number.to_string(), key, zero)
 }
 
-fn validate_bb_literals(item: &toml_edit::Item, path: &str) -> Result<(), SpotError> {
+pub(crate) fn validate_bb_literals(item: &toml_edit::Item, path: &str) -> Result<(), SpotError> {
     if let Some(table) = item.as_table_like() {
         for (key, value) in table.iter() {
             let child = if path.is_empty() {

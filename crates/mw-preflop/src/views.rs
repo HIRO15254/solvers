@@ -146,7 +146,7 @@ fn key_hex(key: [u8; 16]) -> String {
     key.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
-fn read_solution(
+pub(crate) fn read_solution(
     path: &Path,
 ) -> Result<(
     crate::mwsol::MultiwaySolutionMetadata,
@@ -235,7 +235,7 @@ fn parse_runtime_range(raw: &str) -> Result<nlh::Range> {
     }
 }
 
-fn hand_label(index: usize) -> String {
+pub(crate) fn hand_label(index: usize) -> String {
     const RANKS: [char; 13] = [
         'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
     ];
@@ -327,22 +327,13 @@ fn range_matrix(
         .ok_or_else(|| anyhow!("history {} is absent from the public tree", key_hex(target)))?;
     let mut current = [0; 16];
     for step in path {
-        for (bucket, reach) in ranges[step.actor as usize].iter_mut().enumerate() {
-            let probability = strategies
-                .iter()
-                .find(|block| {
-                    block.key.history == current
-                        && block.key.actor == step.actor
-                        && block.key.street == 0
-                        && block.key.bucket_path[0] == bucket as u32
-                })
-                .and_then(|block| block.probabilities.get(step.action_index as usize))
-                .copied();
-            *reach = match (*reach, probability) {
-                (Some(reach), Some(probability)) => Some(reach * f64::from(probability)),
-                _ => None,
-            };
-        }
+        apply_class_action(
+            &mut ranges[step.actor as usize],
+            strategies,
+            current,
+            step.actor,
+            step.action_index,
+        );
         current = metadata
             .histories
             .iter()
@@ -374,6 +365,43 @@ fn range_matrix(
             serde_json::json!({ "seat": seat, "grid": matrix(cells) })
         })
         .collect())
+}
+
+/// Shared saved-average lookup: absence is unvisited, never a uniform fallback.
+pub(crate) fn action_probability(
+    strategies: &[crate::mwsol::MultiwayStrategyBlock],
+    history: [u8; 16],
+    actor: u8,
+    bucket: usize,
+    action: u32,
+) -> Option<f32> {
+    strategies
+        .iter()
+        .find(|block| {
+            block.key.history == history
+                && block.key.actor == actor
+                && block.key.street == 0
+                && block.key.bucket_path[0] == bucket as u32
+        })
+        .and_then(|block| block.probabilities.get(action as usize))
+        .copied()
+}
+
+/// Condition one seat's class vector on its own action, preserving unvisited status.
+pub(crate) fn apply_class_action(
+    values: &mut [Option<f64>],
+    strategies: &[crate::mwsol::MultiwayStrategyBlock],
+    history: [u8; 16],
+    actor: u8,
+    action: u32,
+) {
+    for (bucket, reach) in values.iter_mut().enumerate() {
+        let probability = action_probability(strategies, history, actor, bucket, action);
+        *reach = match (*reach, probability) {
+            (Some(reach), Some(probability)) => Some(reach * f64::from(probability)),
+            _ => None,
+        };
+    }
 }
 
 /// Read a P2 artifact and return the requested typed node view or held-out EV estimate.
@@ -1139,11 +1167,17 @@ fn inspect_ev(
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
-    fn test_solution() -> crate::mwsol::MultiwaySolution {
-        let raw = include_str!("../tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
+    pub(crate) const SMOKE: &str =
+        include_str!("../tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
+
+    pub(crate) fn test_solution() -> crate::mwsol::MultiwaySolution {
+        solution_from(SMOKE)
+    }
+
+    pub(crate) fn solution_from(raw: &str) -> crate::mwsol::MultiwaySolution {
         let mut session = session::build_multiway_session(raw, None).unwrap();
         session.solver.run_sweeps_with_threads(1, 1).unwrap();
         let snapshot = session.solver.snapshot_state();
@@ -1207,6 +1241,9 @@ mod tests {
             crate::mwsol::write_mwsol_with(&old, &solution, crate::mwsol::MwsolStorage::F32)
                 .unwrap();
             let mut outcomes = vec![
+                crate::derive::derive(&old, "BTN c, BB x", "Ks 7h 2d")
+                    .map(|_| ())
+                    .map_err(anyhow::Error::new),
                 inspect(
                     &old,
                     InspectRequest {
