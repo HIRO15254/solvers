@@ -265,6 +265,33 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         }
     }
 
+    /// Experimental L0 supports chip EV only; reject ICM before expanding a tree.
+    pub(crate) fn require_l0_chip_ev(&self) -> anyhow::Result<()> {
+        anyhow::ensure!(
+            matches!(self.utility, UtilityRuntime::ChipEv),
+            "ICM is handled in S4-1b"
+        );
+        Ok(())
+    }
+
+    /// Bake an ordering through the same settlement and utility path as solving.
+    pub(crate) fn l0_ranked_utilities(
+        &self,
+        state: &BettingState,
+        ranks: &SeatVec<Option<u16>>,
+    ) -> anyhow::Result<Vec<f64>> {
+        let settlement = settle_ranked(state, ranks.clone(), self.rake)?;
+        Ok(self.utilities(&settlement)?.iter().copied().collect())
+    }
+
+    pub(crate) fn l0_uncontested_utilities(
+        &self,
+        state: &BettingState,
+    ) -> anyhow::Result<Vec<f64>> {
+        let settlement = settle_uncontested(state, self.rake)?;
+        Ok(self.utilities(&settlement)?.iter().copied().collect())
+    }
+
     /// Abstraction bucket for one `street` (assumed already reached),
     /// factored out so full-recall's [`Self::bucket_path`] and
     /// street-recall's single-street lookup (in [`ExternalSamplingGame::bucket`])
