@@ -8,6 +8,7 @@ description = "Sampled 2-9 player NLHE solving with side pots and tournament uti
 
 [dependencies]
 nlh = { workspace = true }
+economics = { workspace = true }
 runfiles = { workspace = true }
 blake3 = { workspace = true }
 postcard = { workspace = true }

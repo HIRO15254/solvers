@@ -28,9 +28,9 @@
 | ``[game.abstraction]`` | EHS² percentile、bucket幅、Solve前の全assignment/cache buildは `multiway_v1.rs`、`mw-preflop/src/abstraction.rs`、`holdem.rs`。 |
 | ``[game.information]`` | current-street固定。`multiway_v1.rs` の lowerがfull/bucket-historyをMWP002で拒否し、`solver/mod.rs` の構築・復元もFullを明示拒否する。toy testもdense arenaのみ。Fullのenum・fingerprintと保存形式は旧artifactのidentityのために保持。 |
 | `Production removal and migration errors` | retired rollout/training/opponent bucketなどを黙って変換しない gateは `multiway_v1.rs`。拒否テストは `crates/cli/tests/common/mod.rs` と `cli_integration.rs`。 |
-| ``[economics]`` | cash/chipEV、rake、tournament-ICMの surface/lowerは `economics.rs` と `mw-preflop/src/icm.rs`/`settlement.rs`。 |
-| `Cash / chipEV` | rake適用順、uncalled refund、utility unitは `economics.rs` と `settlement.rs`、受入テストは `crates/cli/tests/multiway_acceptance.rs`。 |
-| `Tournament ICM` | exact small-field ICM、large-field sampling、payout/field validationは `economics.rs` と `icm.rs`。 |
+| ``[economics]`` | cash/chipEV、rake、tournament-ICMの surface/lowerは `crates/cli/src/economics.rs` と `crates/economics/src/{config,icm,rake}.rs` / `nlh/src/settlement.rs`。 |
+| `Cash / chipEV` | rake適用順、uncalled refund、utility unitは `crates/cli/src/economics.rs`、`crates/economics/src/rake.rs`、`crates/nlh/src/settlement.rs`、受入テストは `crates/cli/tests/multiway_acceptance.rs`。 |
+| `Tournament ICM` | exact small-field ICM、large-field sampling、payout/field validationは `crates/cli/src/economics.rs` と `crates/economics/src/{config,icm}.rs`。 |
 | ``[solver]`` | `kind`、seed、exploration、batch、discount、pruningの strict enumと互換性は `multiway_v1.rs`、`solver/mod.rs`、`checkpoint.rs`。 |
 | ``[run]`` | sweep/time ceiling、threads/memory、stop cadence、checkpoint intervalとpreflightは `multiway_v1.rs`、`multiway_solve.rs`、`run_dir.rs`。 |
 | ``[output]`` | `probability_encoding` と `.mwsol` exportは `multiway_artifact.rs`、`crates/mw-preflop/src/mwsol.rs`、`multiway_solve.rs`。 |
@@ -179,7 +179,8 @@ GTO Wizardの完全解、学習時の完全profile、またはcheckpoint監査�
 
 入力の公開契約は `crates/cli/src/multiway_v1.rs` がparse/normalizeし、
 `crates/cli/src/config.rs` がschema dispatchします。ゲームの型・tree・cards・
-settlementは `crates/mw-preflop/src/{config,tree,tree_rules,holdem,settlement}.rs`、
+state/tree adapterは `crates/mw-preflop/src/{config,tree,tree_rules,holdem}.rs`、
+settlementは `crates/nlh/src/settlement.rs`、rake/ICMは `crates/economics/src/{config,rake,icm}.rs`、
 solver stateとworkerは `crates/mw-preflop/src/solver/`、CLI lifecycleは
 `crates/cli/src/{session,multiway_solve,run_dir}.rs` が担当します。
 

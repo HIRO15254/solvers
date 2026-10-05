@@ -419,6 +419,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "economics"
+version = "0.1.0"
+dependencies = [
+ "nlh",
+ "rand",
+ "rand_chacha",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "either"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -720,6 +731,7 @@ name = "mw-preflop"
 version = "0.1.0"
 dependencies = [
  "blake3",
+ "economics",
  "libc",
  "nlh",
  "postcard",

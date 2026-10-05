@@ -31,7 +31,7 @@
 |---|---|---|
 | HU CFR、BR、storage、reach | `crates/hu-engine` | poker の betting/showdown を持たない。HU の型・次元・演算順を守る |
 | HU postflop の木と terminal kernel | `crates/hu-postflop` | rules/metadata と engine の汎用木を分ける |
-| rake / utility | `crates/hu-postflop/src/game/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
+| rake / utility | `crates/economics`、`crates/hu-postflop/src/game/payoff.rs`、`crates/cli/src/economics.rs` | build-time payoff と run/config adapter を分ける |
 | Multiway の card abstraction | `crates/mw-preflop/src/card_abstraction` | build 時だけの lossy bucket。cache の format version と bucket 数の意味を区別する |
 | 多人数の state / sampling / evaluation | `crates/mw-preflop` | production、read-only 診断、feature-gated 研究経路を区別する |
 | 公開 config / normalizer / run driver | `crates/cli` | 規範、CLI help、template、runtime、artifact metadata を同時に確認する |
@@ -43,7 +43,7 @@ preflight、storage、evaluation 等の責務で module 分割し、ファイル
 
 ## 2. レイヤ構成と workspace
 
-[Cargo.toml](../Cargo.toml) の workspace は次の 9 crate で構成される。
+[Cargo.toml](../Cargo.toml) の workspace は次の 10 crate で構成される。
 `cli` と `daemon` が実行体を持ち、Web GUI、PyO3、WASM、学習 pipeline はこの実装図には含めない。
 
 ```text
@@ -52,6 +52,7 @@ crates/
 ├── protocol/     # daemon の versioned request/response 型
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
 ├── nlh/          # card/range/evaluator、HU基本型、2–9 seat NLH規則・精算、size解決、tree-script、suit同型
+├── economics/    # 共有 rake・ICM・utility config、PotRake 実装
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc、.sol、checkpoint
@@ -64,9 +65,10 @@ crates/
 
 ```text
 nlh, runfiles, cfr-ref               → workspace内の通常依存なし
+economics                           → nlh
 hu-engine                           → nlh
 hu-postflop                         → nlh, hu-engine, runfiles
-mw-preflop                          → nlh, runfiles
+mw-preflop                          → nlh, economics, runfiles
 protocol                            → runfiles
 daemon                              → runfiles, protocol
 cli                                 → nlh, hu-engine, hu-postflop, mw-preflop, runfiles
@@ -86,7 +88,11 @@ HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snap
 `BettingState::new(&TableSetup, &P)` は `P: StreetPolicy` を通じて製品の check-down / street skip を呼ぶ。
 size literal の解決と NLH legality は共有 state の query に置き、P2 のサイズ選択・limp・raise cap・tree rule は
 `mw_preflop::betting::BettingMenu` に置く。`from_config` が root で一度だけ `TableSetup` を組む。
-精算の `PotRake` は generic で、現行 `CompiledRake` の実装・ICM・utility config は引き続き `mw-preflop` にある。
+精算の `PotRake` は generic で、`CompiledRake` の実装は `economics::rake`、ICM は `economics::icm`、
+rake condition は `economics::rake_condition`、rake / utility config と検証は `economics::config` にある。
+`mw_preflop::{config,icm,rake_condition}` と root は旧 API の re-export を維持し、
+`ConfigError::Economics` は共有検証 error を同じ表示で透過的に包む。
+P1 の `cli::economics` と `hu-postflop::game::payoff` は既存のままで、P1 はまだ `economics` に依存しない。
 旧 `mw_preflop::{types,betting,settlement}` の型・精算 API は共有型への re-export を維持する。
 
 ## 3. コア表現(hu-engine crate)

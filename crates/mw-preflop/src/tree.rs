@@ -1210,10 +1210,11 @@ mod tests {
     use crate::abstraction::{
         BucketContext, BucketId, FeatureHashAbstraction, MultiwayAbstraction,
     };
+    use crate::config::MultiwayConfig;
     use crate::config::{AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, SeatConfig};
-    use crate::config::{MultiwayConfig, RakeConfig, UtilityConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{RakeConfig, UtilityConfig};
 
     fn smoke_config() -> MultiwayConfig {
         MultiwayConfig {

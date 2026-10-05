@@ -54,6 +54,7 @@ crates/
 ├── protocol    # versioned wire types for the job daemon
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
 ├── nlh         # card/range/evaluator, shared 2–9 seat NLH rules and settlement, sizing, tree-script, suit isomorphism
+├── economics   # shared rake, exact/sampled ICM, utility config and validation
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
 ├── mw-preflop  # P2 menu policy + external-sampling MCCFR + EHS² buckets + .mwsol + metrics

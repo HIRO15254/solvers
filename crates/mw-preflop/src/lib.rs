@@ -32,11 +32,14 @@ pub use checkpoint::{
 };
 pub use config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
-    RakeAllocation, RakeRounding, RecallMode, SeatConfig, StreetBettingConfig, UtilityConfig,
+    RecallMode, SeatConfig, StreetBettingConfig,
 };
+pub use economics::icm::{
+    IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta,
+};
+pub use economics::rake_condition::{CompiledRakeCondition, RakeConditionContext};
+pub use economics::{RakeAllocation, RakeRounding, UtilityConfig};
 pub use holdem::{HoldemGame, HoldemGameError};
-pub use icm::{IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta};
-pub use rake_condition::{CompiledRakeCondition, RakeConditionContext};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};
 pub use solver::{

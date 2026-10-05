@@ -3400,11 +3400,11 @@ fn street_recall_node_children_and_strategies_at_use_the_enumerated_tree() {
 fn street_recall_holdem_game_reaches_every_street_without_error() {
     use crate::abstraction::FeatureHashAbstraction;
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{RakeConfig, UtilityConfig};
 
     let mut config = MultiwayConfig {
         seats: (0..3)
@@ -3558,11 +3558,11 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
 fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
     use crate::abstraction::{BucketContext, MultiwayAbstraction};
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{RakeConfig, UtilityConfig};
 
     #[derive(Clone, Copy)]
     struct OpponentCountBucket;
@@ -3765,11 +3765,11 @@ fn vector_traverser_regret_trends_down_as_sweeps_accumulate() {
 fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
     use crate::abstraction::FeatureHashAbstraction;
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{RakeConfig, UtilityConfig};
 
     let mut config = MultiwayConfig {
         seats: (0..3)
@@ -3847,11 +3847,11 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
 fn vector_traverser_holdem_game_reaches_every_street_without_error() {
     use crate::abstraction::FeatureHashAbstraction;
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{RakeConfig, UtilityConfig};
 
     let mut config = MultiwayConfig {
         seats: (0..3)
@@ -3941,11 +3941,11 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
 fn vector_traverser_icm_smoke_test() {
     use crate::abstraction::FeatureHashAbstraction;
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, FieldPlayerConfig,
-        MultiwayConfig, RakeConfig, SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
+    use economics::{FieldPlayerConfig, RakeConfig, UtilityConfig};
 
     let mut config = MultiwayConfig {
         seats: (0..3)
@@ -4059,9 +4059,9 @@ pub(super) fn initialization_holdem_fixture() -> (
 ) {
     use crate::abstraction::{FeatureHashAbstraction, FeatureHashParams};
     use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RakeConfig,
-        SeatConfig, UtilityConfig,
+        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
     };
+    use economics::{RakeConfig, UtilityConfig};
     let game_config = MultiwayConfig {
         seats: (0..3)
             .map(|_| SeatConfig {

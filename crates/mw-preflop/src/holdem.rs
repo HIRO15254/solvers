@@ -9,11 +9,7 @@ use rustc_hash::FxHashMap;
 
 use crate::abstraction::{BucketContext, BucketId, BucketPath, MultiwayAbstraction};
 use crate::betting::{Action, BettingState, HandPhase, SeatStatus};
-use crate::config::{
-    AbstractionConfig, CompiledRake, MultiwayConfig, RakeConfig, RecallMode, UtilityConfig,
-    ValidatedMultiwayConfig,
-};
-use crate::icm::PreparedIcm;
+use crate::config::{AbstractionConfig, MultiwayConfig, RecallMode, ValidatedMultiwayConfig};
 use crate::sampler::{DealSampler, SampleError, SampledWorld};
 use crate::settlement::{
     PotLayer, Settlement, SettlementError, build_rated_pots, settle_ranked, settle_showdown,
@@ -22,6 +18,8 @@ use crate::settlement::{
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::tree::DenseNodeContext;
 use crate::types::{CHIPS_PER_BB, MAX_SEATS, MwChips, SeatId, SeatMask, SeatVec, Street};
+use economics::icm::PreparedIcm;
+use economics::{CompiledRake, RakeConfig, UtilityConfig};
 
 const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
 
@@ -55,7 +53,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         config.validate_economics(utility, rake)?;
         let validated = config.validated()?;
         let root = BettingState::from_config(&validated)?;
-        let compiled_rake = rake.compile()?;
+        let compiled_rake = rake.compile().map_err(crate::config::ConfigError::from)?;
         let utility_runtime = match utility {
             UtilityConfig::ChipEv => UtilityRuntime::ChipEv,
             UtilityConfig::TournamentIcm {
@@ -765,7 +763,7 @@ pub enum HoldemGameError {
     #[error(transparent)]
     Settlement(#[from] SettlementError),
     #[error(transparent)]
-    Icm(#[from] crate::icm::IcmError),
+    Icm(#[from] economics::icm::IcmError),
     #[error("ICM terminal utility cache lock was poisoned")]
     IcmCachePoisoned,
     #[error(transparent)]
@@ -1201,7 +1199,7 @@ mod tests {
     /// folded.
     #[test]
     fn vector_terminal_utilities_fast_path_matches_reference_randomized() {
-        use crate::config::FieldPlayerConfig;
+        use economics::FieldPlayerConfig;
         use nlh::ALL_CARDS;
         use rand::seq::SliceRandom;
         use rand::{Rng, SeedableRng};
