@@ -3,7 +3,7 @@ use crate::TreeVar;
 use economics::{CompiledRake, RakeConfig, UtilityConfig};
 use nlh::betting::BettingState;
 use nlh::script::Script;
-use nlh::{MwChips, Range, SeatVec, TableSetup};
+use nlh::{Card, MwChips, Range, SeatId, SeatVec, Street, TableSetup};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -111,13 +111,105 @@ pub struct Run {
     pub checkpoint_interval_seconds: f64,
 }
 
-/// Validated game context passed to a product. The start currently supports preflop roots.
+/// Values of the legacy multiway history selectors at a postflop decision.
+/// The two preflop-only predicates remain false after preflop closes.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct PreflopFacts {
+    pub limpers: u8,
+    pub flats: u8,
+    pub squeeze: bool,
+    pub open_cold_calls: u8,
+    pub preflop_participant: bool,
+    pub in_position_to_last_aggressor: bool,
+    pub last_preflop_aggressor_position: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct LineAction {
+    pub street: Street,
+    pub seat: SeatId,
+    pub position: String,
+    pub action: nlh::betting::Action,
+    pub implicit: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct StartSeat {
+    pub seat: SeatId,
+    pub position: String,
+    pub starting_stack: MwChips,
+    pub remaining_stack: MwChips,
+    pub total_contribution: MwChips,
+    pub folded: bool,
+    pub refund: MwChips,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct PostflopPlayer {
+    pub seat: SeatId,
+    pub position: String,
+    pub preflop: PreflopFacts,
+}
+
+/// All monetary values use the shared 0.001 BB chip unit, before rake.
+#[derive(Clone, Debug, Serialize)]
+pub struct StartState {
+    pub street: Street,
+    #[serde(serialize_with = "serialize_board")]
+    pub board: Vec<Card>,
+    pub pot: MwChips,
+    pub seats: Vec<StartSeat>,
+    pub folded_seats: Vec<SeatId>,
+    pub oop: Option<PostflopPlayer>,
+    pub ip: Option<PostflopPlayer>,
+    pub effective_stack: Option<MwChips>,
+    pub previous_street_aggressor: Option<SeatId>,
+    pub actions: Vec<LineAction>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ParamDiagnostic {
+    pub name: String,
+    pub kind: String,
+    pub value: String,
+    pub description: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct TreeDiagnostics {
+    pub params: Vec<ParamDiagnostic>,
+    pub rules: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ValidateSummary {
+    pub product: Product,
+    pub start: StartState,
+    pub effective_stack: Option<MwChips>,
+    pub actions: Vec<LineAction>,
+    pub tree: TreeDiagnostics,
+    pub warnings: Vec<String>,
+}
+
+fn serialize_board<S: serde::Serializer>(board: &[Card], serializer: S) -> Result<S::Ok, S::Error> {
+    board
+        .iter()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .serialize(serializer)
+}
+
+/// Validated game context passed to a product, at a preflop or postflop street root.
 #[derive(Clone)]
 pub struct Spot {
     pub meta: Meta,
     pub table: Table,
     pub economics: Economics,
     pub start: BettingState,
+    /// Canonical user spelling, unchanged by normalization.
+    pub line: String,
+    pub board_text: Option<String>,
+    pub context: StartState,
     pub ranges: SeatVec<SeatRange>,
     pub tree: Tree,
     pub run: Run,

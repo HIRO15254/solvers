@@ -2,9 +2,8 @@
 use crate::error::value_error;
 use crate::*;
 use economics::{FieldPlayerConfig, RakeAllocation, RakeConfig, RakeRounding, UtilityConfig};
-use nlh::betting::BettingState;
 use nlh::script::Script;
-use nlh::{MwChips, NoStreetPolicy, SeatId, SeatVec, TableSetup, position_name};
+use nlh::{MwChips, SeatId, SeatVec, TableSetup, position_name};
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -251,7 +250,19 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
             return Err(SpotError::new(
                 Code::NLH001,
                 "schema",
-                format!("unknown schema {s:?}; use solvers.nlh/v1"),
+                if matches!(
+                    s.as_str(),
+                    "solvers.postflop/v1"
+                        | "solvers.multiway-preflop/v1"
+                        | "solvers.toy/v1"
+                        | "solvers.preflop-hu/v1"
+                ) {
+                    format!(
+                        "format {s:?} was replaced by solvers.nlh/v1; old configs are not converted automatically"
+                    )
+                } else {
+                    format!("unknown schema {s:?}; use solvers.nlh/v1")
+                },
             ));
         }
         Some(_) => return Err(type_error("schema", "string")),
@@ -275,33 +286,75 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
         message: e.to_string(),
     })?;
     debug_assert_eq!(raw.schema, "solvers.nlh/v1");
-    if raw.spot.board.is_some() || raw.spot.line.as_ref().is_some_and(|s| !s.is_empty()) {
-        return Err(SpotError::new(
-            Code::NLH005,
-            "spot",
-            "line and board spots are not implemented in this phase",
-        ));
-    }
     let table = table(raw.table)?;
     let economics = economics(raw.economics, table.stacks.len())?;
-    let start = BettingState::new(&table.setup, &NoStreetPolicy)
-        .map_err(|e| value_error("table", e.to_string()))?;
+    let line = raw.spot.line.unwrap_or_default();
+    let board = crate::replay::board(raw.spot.board.as_deref())?;
+    let (start, actions) = crate::replay::line(&table, &line)?;
+    let product = crate::replay::product(&start, &line, &board)?;
+    let context = crate::replay::context(&table, &start, board.clone(), actions)?;
     let mut ranges = raw.ranges;
     check_positions(ranges.keys(), &table.positions, "ranges")?;
+    if product == Product::HuPostflop {
+        for seat in table.positions.seats() {
+            let name = &table.positions[seat];
+            if start.non_folded_mask().contains(seat) {
+                if !ranges.contains_key(name) {
+                    return Err(value_error(
+                        format!("ranges.{name}"),
+                        "both remaining P1 players require a range",
+                    ));
+                }
+            } else if ranges.contains_key(name) {
+                return Err(value_error(
+                    format!("ranges.{name}"),
+                    "P1 ranges may name only the two remaining players",
+                ));
+            }
+        }
+    }
     let ranges = SeatVec::new_unchecked(
         table
             .positions
             .iter()
             .map(|name| {
                 let text = ranges.remove(name).unwrap_or_else(|| "random".into());
-                let range = text.parse().map_err(|e: nlh::ParseRangeError| {
+                let mut range: nlh::Range = text.parse().map_err(|e: nlh::ParseRangeError| {
                     value_error(format!("ranges.{name}"), e.to_string())
                 })?;
+                if product == Product::HuPostflop {
+                    for combo in 0..nlh::NUM_COMBOS {
+                        let (a, b) = nlh::combo_cards(combo);
+                        if board.contains(&a) || board.contains(&b) {
+                            range.set_weight(combo, 0.0);
+                        }
+                    }
+                }
                 Ok(SeatRange { text, range })
             })
             .collect::<Result<Vec<_>, SpotError>>()?,
     );
-    let tree = tree(raw.tree, config_path)?;
+    if let (Some(oop), Some(ip)) = (&context.oop, &context.ip) {
+        let combos = |seat| {
+            (0..nlh::NUM_COMBOS)
+                .filter(|c| ranges[seat].range.weight(*c) > 0.0)
+                .map(nlh::combo_cards)
+                .collect::<Vec<_>>()
+        };
+        let oop_combos = combos(oop.seat);
+        let ip_combos = combos(ip.seat);
+        if !oop_combos.iter().any(|(a, b)| {
+            ip_combos
+                .iter()
+                .any(|(c, d)| a != c && a != d && b != c && b != d)
+        }) {
+            return Err(value_error(
+                "ranges",
+                "no pair of non-overlapping, board-compatible combos exists",
+            ));
+        }
+    }
+    let tree = tree(raw.tree, config_path, product)?;
     let run = run(raw.run)?;
     Ok(Document {
         spot: Spot {
@@ -309,10 +362,13 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
             table,
             economics,
             start,
+            line,
+            board_text: raw.spot.board,
+            context,
             ranges,
             tree,
             run,
-            product: Product::MultiwayPreflop,
+            product,
         },
         solver: raw.solver,
         output: raw.output,
@@ -757,7 +813,7 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
     })
 }
 
-fn tree(raw: RawTree, config_path: &Path) -> Result<Tree, SpotError> {
+fn tree(raw: RawTree, config_path: &Path, product: Product) -> Result<Tree, SpotError> {
     if raw.script.is_some() && raw.source.is_some() {
         return Err(value_error(
             "tree.source",
@@ -806,18 +862,31 @@ fn tree(raw: RawTree, config_path: &Path) -> Result<Tree, SpotError> {
         };
         overrides.insert(key.clone(), text);
     }
-    let compiled = Script::compile(&script, &overrides, &NLH_V1)
-        .map_err(|e| value_error("tree.script", e.to_string()))?;
+    let compiled = Script::compile(&script, &overrides, &NLH_V1).map_err(|e| {
+        if e.line == 0 {
+            for key in overrides.keys() {
+                if e.message == format!("override {key:?} does not name a declared param") {
+                    return value_error(
+                        format!("tree.params.{key}"),
+                        "override does not name a declared param",
+                    );
+                }
+            }
+        }
+        value_error("tree.script", e.to_string())
+    })?;
     let preflop_dialect = nlh::script::Dialect {
         vars: crate::dialect::PREFLOP_VARS,
         ..NLH_V1
     };
-    Script::compile(&script, &overrides, &preflop_dialect).map_err(|e| {
-        value_error(
-            "tree.script",
-            format!("P2 (Multiway Preflop) cannot read board variables: {e}"),
-        )
-    })?;
+    if product == Product::MultiwayPreflop {
+        Script::compile(&script, &overrides, &preflop_dialect).map_err(|e| {
+            value_error(
+                "tree.script",
+                format!("P2 (Multiway Preflop) cannot read board variables: {e}"),
+            )
+        })?;
+    }
     if raw
         .allin_threshold
         .is_some_and(|v| !v.is_finite() || v <= 0.0 || v > 1.0)
@@ -945,9 +1014,12 @@ fn run(raw: RawRun) -> Result<Run, SpotError> {
                 .parse::<u64>()
                 .ok()
                 .and_then(|n| n.checked_mul(scale))
-                .filter(|n| *n > 0)
+                .filter(|n| *n > 0 && *n <= i64::MAX as u64)
                 .ok_or_else(|| {
-                    value_error("run.memory", "memory size must be positive and fit u64")
+                    value_error(
+                        "run.memory",
+                        "memory size must be positive and at most i64::MAX bytes",
+                    )
                 })?;
             Some(bytes)
         }

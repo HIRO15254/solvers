@@ -5,6 +5,8 @@ mod error;
 mod ir;
 mod normalize;
 mod parse;
+mod replay;
+mod summary;
 
 pub use dialect::{NLH_V1, TreeVar, parse_size_literal};
 pub use error::{Code, SpotError};
@@ -18,7 +20,8 @@ pub struct Document {
     pub output: toml::Table,
 }
 
-/// Product-owned validation must return tables with every product default explicit.
+/// Product-owned validation returns insertion-ordered tables with every default explicit.
+/// Products may serialize typed settings with `toml_edit::ser` to retain field order.
 /// The common parser never inspects method-specific solver or output settings.
 pub trait ProductSections {
     fn normalize(
@@ -26,7 +29,7 @@ pub trait ProductSections {
         spot: &Spot,
         solver: &toml::Table,
         output: &toml::Table,
-    ) -> Result<(toml::Table, toml::Table), SpotError>;
+    ) -> Result<(toml_edit::Table, toml_edit::Table), SpotError>;
 }
 
 /// A diagnostic for a setting belonging to the other product.
@@ -50,5 +53,10 @@ impl Document {
     /// Deterministic self-contained TOML; product defaults are supplied by the hook.
     pub fn normalize(&self, product: &impl ProductSections) -> Result<String, SpotError> {
         normalize::document(self, product)
+    }
+
+    /// Common validation evidence; products may add their own operating warnings.
+    pub fn summary(&self) -> ValidateSummary {
+        summary::document(self)
     }
 }

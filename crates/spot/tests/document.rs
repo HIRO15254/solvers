@@ -17,7 +17,7 @@ impl ProductSections for Stub {
         spot: &Spot,
         solver: &toml::Table,
         output: &toml::Table,
-    ) -> Result<(toml::Table, toml::Table), SpotError> {
+    ) -> Result<(toml_edit::Table, toml_edit::Table), SpotError> {
         if solver.contains_key("iso_merging") {
             return Err(other_product_key(spot, "solver.iso_merging"));
         }
@@ -29,7 +29,10 @@ impl ProductSections for Stub {
         output
             .entry("test_default")
             .or_insert(toml::Value::Integer(7));
-        Ok((solver, output))
+        Ok((
+            toml_edit::ser::to_document(&solver).unwrap().into_table(),
+            toml_edit::ser::to_document(&output).unwrap().into_table(),
+        ))
     }
 }
 
@@ -97,7 +100,6 @@ fn every_common_default_and_section_order() {
     let normalized = roundtrip(ROOT);
     let mut previous = 0;
     for section in [
-        "meta",
         "table",
         "economics",
         "spot",
@@ -114,6 +116,10 @@ fn every_common_default_and_section_order() {
     assert!(normalized.contains("script = '''\n'''"));
     assert!(!normalized.contains("allin_threshold"));
     assert!(!normalized.contains("max_time"));
+    assert!(!normalized.contains("[meta]"));
+    assert!(!normalized.contains("[tree.params]"));
+    assert!(!normalized.contains("[table.stacks_bb]"));
+    assert!(normalized.contains("stack_bb = 100"));
     assert_eq!(
         parse(&normalized).solver["test_default"].as_bool(),
         Some(true)
@@ -148,7 +154,7 @@ fn every_cash_key_explicit_and_idempotent() {
     let n = roundtrip(&text);
     assert!(n.contains("CO = 80.123"));
     assert!(n.contains("cap_bb = 4.001"));
-    assert!(n.contains("preflop_reraise_jam_above_stack = { denominator = 3, numerator = 1 }"));
+    assert!(n.contains("preflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }"));
     assert_eq!(parse(&n).solver["opaque"].as_integer(), Some(5));
 }
 
@@ -447,16 +453,16 @@ invalid!(
     "economics.payouts"
 );
 invalid!(
-    spot_line_deferred,
+    line_without_board,
     "[spot]\nline = \"BTN r2.5, BB c\"",
     NLH005,
     "spot"
 );
 invalid!(
-    spot_board_deferred,
+    board_without_closed_preflop,
     "[spot]\nboard = \"Ks 7h 2d\"",
-    NLH005,
-    "spot"
+    NLH004,
+    "spot.board"
 );
 invalid!(spot_type, "[spot]\nline = 1", NLH002, "spot.line");
 invalid!(
@@ -523,7 +529,7 @@ invalid!(
     tree_unknown_param,
     "[tree.params]\nsize = 5",
     NLH003,
-    "tree.script"
+    "tree.params.size"
 );
 invalid!(threads_zero, "[run]\nthreads = 0", NLH003, "run.threads");
 invalid!(
@@ -736,7 +742,6 @@ fn operating_units_and_large_memory_roundtrip() {
         ("\"2MiB\"", 2097152),
         ("\"6GiB\"", 6442450944),
         ("4096", 4096),
-        ("\"9000000000GiB\"", 9663676416000000000),
     ] {
         let text = format!(
             "{ROOT}[run]\nthreads = 1\nmemory = {memory}\nmax_time = \"1m\"\ncheckpoint_interval = \"0.5s\""
@@ -744,6 +749,10 @@ fn operating_units_and_large_memory_roundtrip() {
         assert_eq!(parse(&text).spot.run.memory_bytes, Some(expected));
         roundtrip(&text);
     }
+    assert_eq!(
+        error(&format!("{ROOT}[run]\nmemory = \"9000000000GiB\"")).code,
+        Code::NLH003
+    );
     roundtrip(&format!(
         "{ROOT}[run]\nthreads = \"auto\"\nmemory = \"auto\"\nmax_time = \"1h\""
     ));

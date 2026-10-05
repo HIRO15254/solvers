@@ -81,7 +81,7 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 `runfiles` は solver crate に依存しない。Multiway checkpoint と `.mwsol` は
 `crates/mw-preflop/src/{checkpoint,mwsol}.rs` が所有する。公開 `SolveConfig` の parse/lower は
 `crates/cli/src/config.rs`、`solver_config_v1.rs`、`multiway_v1.rs` にある。
-共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・検証・正規化し、製品に依らない
+共通Input `solvers.nlh/v1`（[草案](plans/nlh-input-v1.jp.md)）は `spot` が parse・line 再生・製品の決定・検証・正規化し、製品に依らない
 `Spot` IR（table、economics、開始状態、range、tree、run）を作る。`[solver]`・`[output]` は解釈せず、
 製品が `spot::ProductSections` で検証して既定値を補う。M5/M6 で各製品と CLI へ接続するまで旧2 familyが現行の入口である。
 
