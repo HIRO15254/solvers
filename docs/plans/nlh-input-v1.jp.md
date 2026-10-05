@@ -520,4 +520,9 @@ max_time = "12h"
 | P1のEVの基準 | 旧P1と同じくspot開始時点を基準にし、chip EVでは2人のEVの和がpot − 期待rakeになる。BB単位で報告する。ICMの基準は、2人が残stackだけを持ちpotを除いた状態（foldしたplayerの最終stackとfieldを含む）のICM値 | 旧P1の出力の意味を保つ |
 | P1のrake条件（第6節） | `flop_dealt`はtrue、`players_dealt`は卓の人数、`players_saw_flop`は2、`showdown`と`won_without_showdown`はterminalごとに判定する | P1のspotは常にflop以降で、2人だけが残る |
 | 停止目標（第10節） | `NashConv / 2 ≤ target`に達した時点で止める | 境界の扱いを1つに定めた |
+| `squeeze`・`in_position_to_last_aggressor`（第9節） | Postflopでは常にfalse。P1でlineから導出する値も同じ | 旧Multiwayの定義（Preflopのnodeだけで意味を持つ）に合わせた |
+| P1でのPreflop専用のtree設定（第9節） | `preflop_reraise_jam_above_stack`、`max_aggressive_actions.preflop`、Preflopのruleを受け付け、効果を持たない。正規化でも残す | deriveでP2の木をP1へそのまま引き継げるようにする |
+| `line`が空で`board`だけがある（第3節） | Preflopが閉じていないため、board枚数の不一致として`NLH004` | 第7節の枚数規則をそのまま適用した |
+| 全順位が同額の`payouts`（第6節） | `NLH003` | ICMの差が生じない。旧Multiwayも拒否していた |
+| 実効configの書き方（第13節） | 節内のkeyは本書の記載順、positionは第5節の表の順。全員のstackが等しければ`stack_bb`だけを書き、異なれば`[table.stacks_bb]`に全positionを書く。時間とmemoryは割り切れる最大の単位（`12h`、`15m`、`6GiB`）。空の表は書かない | 1通りの表記のまま`run.toml`を読みやすくする |
 | treeのscriptの意味（第9節） | 各effectの意味は両製品で同じで、旧Multiwayの規則に従う。P1でもfold・check・callを対象にできる。旧P1と旧Multiwayで端の挙動が違った点はM5の報告で列挙する | scriptを1つの言語として扱い、deriveでP2の木をP1へ引き継げるようにする |
