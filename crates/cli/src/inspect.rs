@@ -4,19 +4,13 @@
 
 use std::io::{self, BufRead, Write};
 use std::path::Path;
-use std::time::Instant;
 
 use anyhow::{Context, Result};
-use hu_engine::{
-    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Storage,
-};
+use hu_postflop::artifact::{SolProvider, StrategyProvider};
+use hu_postflop::queries::{self, LiveProvider, chance_child_label, history_token, resolve_action};
 use hu_postflop::{
-    PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity,
+    Card, CompiledGame, NodeId, NodeKind, PerPlayer, Player, PostflopEvaluator, PostflopNodeInfo,
 };
-use nlh::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
-
-use crate::nlh_v1;
-use crate::sol::{LiveProvider, SolProvider, StrategyProvider};
 
 const RANKS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
@@ -29,56 +23,42 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
-    let p = crate::nlh_v1::prepare(&raw, config_path)?;
-    crate::nlh_v1::with_threads(crate::nlh_v1::threads(&p)?, || {
-        match p.settings.solver.storage {
-            hu_postflop::input::Storage::F32 => {
-                run_nlh::<F32Storage>(&p, iterations, target_nash_conv)
-            }
-            hu_postflop::input::Storage::I16 => {
-                run_nlh::<I16Storage>(&p, iterations, target_nash_conv)
-            }
-        }
-    })
-}
-
-fn run_nlh<S: Storage>(
-    p: &crate::nlh_v1::Prepared,
-    iterations: Option<u64>,
-    target: Option<f64>,
-) -> Result<()> {
-    let start = Instant::now();
-    let (solver, node_info) = crate::nlh_v1::query::<S>(p, iterations, target)?;
-    let ev_offset = p.payoff.ev_offset();
-    crate::nlh_v1::print_done(
-        &solver,
-        start.elapsed(),
-        nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(&solver), ev_offset),
-    );
-    let mut provider = LiveProvider {
-        solver: &solver,
-        ev_offset,
-    };
-    let mut repl = Repl {
-        game: solver.game(),
-        provider: &mut provider,
-        node_info: &node_info,
-        board: p.config.board.clone(),
-        stack: Vec::new(),
-        current: 0,
-        history: String::new(),
-        equity_cache: None,
-        no_color: std::env::var_os("NO_COLOR").is_some(),
-    };
-    repl.interact()
+    let p = hu_postflop::prepare::prepare(&raw, config_path)?;
+    queries::with_live(
+        &p,
+        iterations,
+        target_nash_conv,
+        &crate::CLI_CANCEL,
+        |solved| {
+            crate::nlh_v1::print_done(&solved.summary);
+            let mut provider = LiveProvider(solved);
+            let mut repl = Repl {
+                game: solved.game(),
+                provider: &mut provider,
+                node_info: &solved.node_info,
+                board: solved.board.clone(),
+                stack: Vec::new(),
+                current: 0,
+                history: String::new(),
+                equity_cache: None,
+                no_color: std::env::var_os("NO_COLOR").is_some(),
+            };
+            repl.interact()
+        },
+    )
 }
 
 /// Loads a `.sol` viewer artifact and explores it interactively -- the same
 /// REPL as [`run`], but sourcing strategies from
-/// [`crate::sol::SolProvider`] (dequantized stored blocks, with river
-/// subgames re-solved lazily) instead of a live [`hu_engine::Solver`].
+/// [`hu_postflop::artifact::SolProvider`] (dequantized stored blocks, with river
+/// subgames re-solved lazily) instead of a live solve.
 pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>) -> Result<()> {
-    let loaded = crate::sol::load_sol(sol_path, river_iterations, river_target)?;
+    let loaded = hu_postflop::artifact::load_sol(
+        sol_path,
+        river_iterations,
+        river_target,
+        &mut crate::nlh_v1::print_artifact,
+    )?;
     println!(
         "loaded {} (mode={:?}, iterations={}, nash_conv={:.3e})",
         sol_path.display(),
@@ -91,7 +71,7 @@ pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>
     let board = loaded.board.clone();
     let node_info = &loaded.pf_game.node_info;
     let game = &loaded.pf_game.game;
-    let mut provider = SolProvider::new(&loaded);
+    let mut provider = SolProvider::new(&loaded, Box::new(crate::nlh_v1::print_artifact));
     let mut repl = Repl {
         game,
         provider: &mut provider,
@@ -128,27 +108,7 @@ impl<'a> Repl<'a> {
     /// range instead — which this used to do — answers a different
     /// question: it counts hands that could never have got here.
     fn reach_here(&mut self) -> Result<PerPlayer<Vec<f32>>> {
-        let tree = &self.game.tree;
-        let root_slices = PerPlayer::new(
-            self.game.root_ranges[Player::P0].as_slice(),
-            self.game.root_ranges[Player::P1].as_slice(),
-        );
-        let provider = &mut self.provider;
-        let mut failure = None;
-        let reach =
-            hu_engine::reach_at(
-                tree,
-                root_slices,
-                self.current,
-                |id, _sref, out| match provider.average_strategy(id) {
-                    Ok(avg) => out.copy_from_slice(&avg),
-                    Err(error) => failure = Some(error),
-                },
-            );
-        match failure {
-            Some(error) => Err(error),
-            None => Ok(reach),
-        }
+        queries::reach_here(self.game, self.provider, self.current)
     }
 
     fn interact(&mut self) -> Result<()> {
@@ -268,7 +228,6 @@ impl<'a> Repl<'a> {
                 println!("kind: action ({side} to act)");
                 let tag = tree.tags[self.current as usize] as usize;
                 let info = &node_info[tag];
-                let sref = tree.storage_ref(&node);
                 let avg = match self.provider.average_strategy(self.current) {
                     Ok(avg) => avg,
                     Err(e) => {
@@ -283,13 +242,7 @@ impl<'a> Repl<'a> {
                         return;
                     }
                 };
-                let weight = &reach[node.player];
-                let freqs = nlh_v1::action_frequencies(
-                    &avg,
-                    weight,
-                    sref.num_actions as usize,
-                    sref.num_hands as usize,
-                );
+                let freqs = queries::action_frequencies(self.game, self.current, &avg, &reach);
                 for (i, (label, freq)) in info.actions.iter().zip(freqs.iter()).enumerate() {
                     println!("  [{i}] {label}: {freq:.3}");
                 }
@@ -414,8 +367,6 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let sref = tree.storage_ref(&node);
-        let num_hands = sref.num_hands as usize;
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
             Err(e) => {
@@ -430,17 +381,10 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let weight = &reach[node.player];
-        let freqs = nlh_v1::action_frequencies(&avg, weight, sref.num_actions as usize, num_hands);
-        let per_combo = &avg[pos * num_hands..(pos + 1) * num_hands];
-        let weights = class_weights(weight);
-        let raw = class_average(weight, per_combo);
-        let mut values = [0.0f64; 169];
-        for c in 0..169 {
-            values[c] = raw[c] * 100.0;
-        }
+        let freqs = queries::action_frequencies(self.game, self.current, &avg, &reach);
+        let grid = queries::action_grid(self.game, self.current, pos, &avg, &reach);
         println!("{} (overall freq {:.3})", info.actions[pos], freqs[pos]);
-        self.render_grid(&weights, &values);
+        self.render_grid(&grid.weights, &grid.values);
     }
 
     fn cmd_range(&self, arg: &str) {
@@ -452,19 +396,9 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let root_range = &self.game.root_ranges[player];
-        let w = class_weights(root_range);
-        let max = w.iter().cloned().fold(0.0, f64::max);
-        let mut values = [0.0f64; 169];
-        if max > 0.0 {
-            for c in 0..169 {
-                if w[c] > 0.0 {
-                    values[c] = w[c] / max * 100.0;
-                }
-            }
-        }
+        let grid = queries::range_grid(self.game, player);
         println!("{arg} root range (% of max class weight)");
-        self.render_grid(&w, &values);
+        self.render_grid(&grid.weights, &grid.values);
     }
 
     fn cmd_eq(&mut self) {
@@ -480,23 +414,14 @@ impl<'a> Repl<'a> {
             .as_ref()
             .is_some_and(|(id, _)| *id == self.current)
         {
-            let mut board = self.board.clone();
-            for token in self.history.split('[').skip(1) {
-                if let Some(card) = token.split(']').next().and_then(|s| s.parse::<Card>().ok()) {
-                    board.push(card);
-                }
-            }
-            self.equity_cache = Some((self.current, range_equity(&board, &reach)));
+            self.equity_cache = Some((
+                self.current,
+                queries::equity(&self.board, &self.history, &reach),
+            ));
         }
-        let equity = &self.equity_cache.as_ref().unwrap().1[Player::P0];
-        let weights = class_weights(&reach[Player::P0]);
-        let raw = class_average(&reach[Player::P0], equity);
-        let mut values = [0.0f64; 169];
-        for c in 0..169 {
-            values[c] = raw[c] * 100.0;
-        }
+        let grid = queries::equity_grid(&reach, &self.equity_cache.as_ref().unwrap().1);
         println!("oop equity vs ip at current node (class-averaged, %)");
-        self.render_grid(&weights, &values);
+        self.render_grid(&grid.weights, &grid.values);
     }
 
     fn cmd_combos(&mut self, arg: &str) {
@@ -507,10 +432,10 @@ impl<'a> Repl<'a> {
             println!("error: combos only works at an action node");
             return;
         }
-        let class_range = match arg.parse::<nlh::Range>() {
+        let class = match queries::parse_class(arg) {
             Ok(r) => r,
             Err(e) => {
-                println!("error: parsing {arg:?}: {e}");
+                println!("error: {e}");
                 return;
             }
         };
@@ -518,7 +443,6 @@ impl<'a> Repl<'a> {
         let info = &node_info[tag];
         let sref = tree.storage_ref(&node);
         let num_hands = sref.num_hands as usize;
-        debug_assert_eq!(num_hands, NUM_COMBOS);
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
             Err(e) => {
@@ -527,23 +451,26 @@ impl<'a> Repl<'a> {
             }
         };
         println!("combos {arg}:");
-        for combo in 0..num_hands {
-            if class_range.weight(combo) <= 0.0 {
-                continue;
-            }
-            let (hi, lo) = combo_cards(combo);
+        for row in queries::combo_rows(&class, num_hands, info.actions.len(), &avg) {
             let parts: Vec<String> = info
                 .actions
                 .iter()
-                .enumerate()
-                .map(|(a, label)| format!("{label}={:.3}", avg[a * num_hands + combo]))
+                .zip(row.probabilities)
+                .map(|(label, p)| format!("{label}={p:.3}"))
                 .collect();
-            println!("{hi}{lo} {}", parts.join(" "));
+            println!("{} {}", row.combo, parts.join(" "));
         }
     }
 
     fn cmd_ev(&mut self) {
-        println!("{}", self.provider.ev_line());
+        let s = self.provider.ev_summary();
+        if s.at_export {
+            print!("at export: ");
+        }
+        println!(
+            "ev_oop={:.6} ev_ip={:.6} expl_oop={:.3e} expl_ip={:.3e} nash_conv={:.3e} iterations={}",
+            s.ev[0], s.ev[1], s.expl[0], s.expl[1], s.nash_conv, s.iterations
+        );
     }
 
     fn render_grid(&self, weights: &[f64; 169], values: &[f64; 169]) {
@@ -579,99 +506,4 @@ impl<'a> Repl<'a> {
         };
         format!("\x1b[48;2;{r};{g};{b}m\x1b[30m{cell}\x1b[0m")
     }
-}
-
-/// Resolves a `go`/`grid` argument against an action node's label list: an
-/// exact label match first, else a positional index.
-pub(crate) fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
-    if let Some(p) = actions.iter().position(|a| a == arg) {
-        return Ok(p);
-    }
-    match arg.parse::<usize>() {
-        Ok(idx) if idx < actions.len() => Ok(idx),
-        Ok(idx) => Err(format!(
-            "action index {idx} out of range (0..{})",
-            actions.len()
-        )),
-        Err(_) => Err(format!("unknown action {arg:?}")),
-    }
-}
-
-/// Maps an action label to the history token the tree builder would have
-/// appended: `check`->`"x"`, `fold`->`"f"`, `call`->`"c"`, and bet/raise
-/// labels (`"bet 30"`, `"raise to 30"`) to `"r{amount}"` using the label's
-/// last whitespace-separated token as the amount. Bets and raises share one
-/// token because both simply name the wager the actor moves to.
-fn history_token(label: &str) -> String {
-    match label {
-        "check" => "x".to_string(),
-        "fold" => "f".to_string(),
-        "call" => "c".to_string(),
-        _ => {
-            let amount = label.rsplit(' ').next().unwrap_or(label);
-            format!("r{amount}")
-        }
-    }
-}
-
-/// Identifies the single card a chance mask removes: the mask is 0 for
-/// every combo containing that card and 1 otherwise.
-fn identify_card(mask: &[f32]) -> Option<Card> {
-    for idx in 0..52u8 {
-        let card = Card::from_index(idx);
-        let ok = (0..NUM_COMBOS).all(|combo| {
-            let (c1, c2) = combo_cards(combo);
-            let expect = if c1 == card || c2 == card { 0.0 } else { 1.0 };
-            mask[combo] == expect
-        });
-        if ok {
-            return Some(card);
-        }
-    }
-    None
-}
-
-/// Label for a chance node's `pos`-th child: the dealt card. For a `Mask`
-/// deal (the common unmerged case) this comes straight from the card-removal
-/// mask via [`identify_card`]. For a `Transition` deal (an iso-merged class:
-/// several structurally-equivalent cards folded into one branch) there is no
-/// single mask to read a card from, so instead this reads the representative
-/// card straight out of the child action node's own recorded history -- its
-/// last bracketed `[Xy]` token is exactly the card the builder dealt to
-/// reach it -- and appends `*` to mark that the branch stands in for a whole
-/// merged class (see `cmd_help`'s iso-merging note). Falls back to a bare
-/// `dealN` when neither source applies (e.g. an `Identity` map, which this
-/// builder never uses at a chance node, or an untagged/non-action child).
-pub(crate) fn chance_child_label(
-    tree: &PublicTree,
-    node_info: &[PostflopNodeInfo],
-    node_id: NodeId,
-    pos: usize,
-) -> String {
-    let node = tree.node(node_id);
-    let deal = tree.deal(node, pos);
-    match deal.maps[Player::P0] {
-        ReachMap::Mask(m) => identify_card(&tree.masks[m as usize])
-            .map(|c| c.to_string())
-            .unwrap_or_else(|| format!("deal{pos}")),
-        ReachMap::Transition(_) => tree
-            .children(node_id)
-            .nth(pos)
-            .filter(|&child_id| tree.node(child_id).kind == NodeKind::Action)
-            .and_then(|child_id| {
-                let tag = tree.tags[child_id as usize] as usize;
-                last_bracketed_card(&node_info[tag].history)
-            })
-            .map(|card| format!("{card}*"))
-            .unwrap_or_else(|| format!("deal{pos}")),
-        ReachMap::Identity => format!("deal{pos}"),
-    }
-}
-
-/// Extracts the card inside the last `[Xy]` token in a history string (e.g.
-/// `"xx[9d]"` -> `Some("9d")`), or `None` if there is no bracketed token.
-fn last_bracketed_card(history: &str) -> Option<&str> {
-    let start = history.rfind('[')?;
-    let end = history[start..].find(']')? + start;
-    Some(&history[start + 1..end])
 }

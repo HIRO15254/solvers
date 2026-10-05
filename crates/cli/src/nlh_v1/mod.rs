@@ -5,12 +5,8 @@ pub(crate) mod p2;
 use anyhow::{Result, bail};
 use std::path::Path;
 pub const SCHEMA: &str = "solvers.nlh/v1";
-pub(crate) use p1::{
-    Prepared, RunSummary, action_frequencies, bb, convert_history, display_game, merge_rule_hits,
-    prepare, print_done, query, schedule, solver_ev, subgame_ev, threads, warnings_for_hits,
-    with_threads,
-};
 pub use p1::{compatibility_hash, resume};
+pub(crate) use p1::{print_artifact, print_done};
 
 /// Reject artifacts that require a removed input family before rebuilding a game.
 pub fn require_artifact_config(raw: &str) -> Result<()> {

@@ -1,23 +1,6 @@
-//! `report`: solve the same postflop config across multiple boards and
-//! write a CSV report (one row per board).
-//!
-//! The original design sketch restricted this to 3-card (flop) boards via
-//! `--flops`/`--flops-file` flags. That's changed here to `--boards`/
-//! `--boards-file`, accepting boards of any starting-street length (3, 4,
-//! or 5 cards): a fast debug-build integration test needs river-only (5
-//! card) boards, which solve in seconds even in a debug build, whereas flop
-//! boards take minutes.
-
-use std::path::Path;
-use std::time::Instant;
-
+//! Board-list parsing and CSV rendering for P1 reports.
 use anyhow::{Context, Result, anyhow};
-use hu_engine::{F32Storage, I16Storage, Storage};
-use hu_postflop::range_equity;
-use nlh::{Card, Player};
-
-use crate::nlh_v1;
-
+use std::path::Path;
 pub fn run(
     config_path: &Path,
     boards_arg: Option<&str>,
@@ -26,61 +9,24 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
-    crate::nlh_v1::prepare(&raw, config_path)?;
-    run_nlh(&raw, config_path, boards_arg, boards_file, output)
-}
-
-fn run_nlh(
-    raw: &str,
-    path: &Path,
-    boards_arg: Option<&str>,
-    boards_file: Option<&Path>,
-    output: Option<&Path>,
-) -> Result<()> {
-    let mut rows = Vec::new();
-    let mut labels = Vec::new();
-    // Validate every replacement before solving any board. Replaying the line
-    // enforces its street count and range/card compatibility for each board.
-    let prepared = collect_board_tokens(boards_arg, boards_file)?
+    hu_postflop::prepare::prepare(&raw, config_path)?;
+    let boards: Vec<_> = collect_board_tokens(boards_arg, boards_file)?
         .iter()
-        .map(|token| {
-            let mut doc: toml_edit::DocumentMut = raw.parse()?;
-            if doc
-                .get("spot")
-                .is_none_or(|spot| spot.as_table_like().is_none())
-            {
-                return Err(
-                    spot::SpotError::new(spot::Code::NLH002, "spot", "expected a table").into(),
-                );
-            }
-            doc["spot"]["board"] = toml_edit::value(normalize_board_token(token));
-            crate::nlh_v1::prepare(&doc.to_string(), path)
-        })
-        .collect::<Result<Vec<_>>>()?;
-    let mut hits = prepared.first().map(|p| p.estimate.rule_hits.clone());
-    for p in &prepared {
-        if let Some(hits) = &mut hits {
-            nlh_v1::merge_rule_hits(hits, &p.estimate.rule_hits);
-        }
-        let row = nlh_v1::with_threads(crate::nlh_v1::threads(p)?, || {
-            match p.settings.solver.storage {
-                hu_postflop::input::Storage::F32 => nlh_row::<F32Storage>(p),
-                hu_postflop::input::Storage::I16 => nlh_row::<I16Storage>(p),
-            }
-        })?;
-        for label in &row.1 {
+        .map(|t| normalize_board_token(t))
+        .collect();
+    let rows = hu_postflop::report::compute(
+        &raw,
+        config_path,
+        &boards,
+        &crate::CLI_CANCEL,
+        &mut |warning| eprintln!("warning: {warning}"),
+    )?;
+    let mut labels = Vec::new();
+    for row in &rows {
+        for label in &row.labels {
             if !labels.contains(label) {
                 labels.push(label.clone());
             }
-        }
-        rows.push(row);
-        if crate::CLI_CANCEL.load(std::sync::atomic::Ordering::SeqCst) {
-            break;
-        }
-    }
-    if let (Some(p), Some(hits)) = (prepared.first(), hits) {
-        for warning in crate::nlh_v1::warnings_for_hits(p, &hits) {
-            eprintln!("warning: {warning}");
         }
     }
     let mut header = vec![
@@ -98,7 +44,18 @@ fn run_nlh(
             .map(|label| format!("freq_{}", label.replace(' ', "_"))),
     );
     let mut out = header.join(",") + "\n";
-    for (mut prefix, own_labels, freqs) in rows {
+    for row in rows {
+        let own_labels = row.labels;
+        let freqs = row.frequencies;
+        let mut prefix = vec![
+            row.board,
+            row.iterations.to_string(),
+            fmt_sig(row.wall_secs, 6),
+            fmt_sig(row.nash_conv, 6),
+            fmt_sig(row.ev[0], 6),
+            fmt_sig(row.ev[1], 6),
+            fmt_sig(row.oop_equity, 6),
+        ];
         prefix.extend(labels.iter().map(|label| {
             own_labels
                 .iter()
@@ -116,58 +73,6 @@ fn run_nlh(
     Ok(())
 }
 
-fn nlh_row<S: Storage>(
-    p: &crate::nlh_v1::Prepared,
-) -> Result<(Vec<String>, Vec<String>, Vec<f64>)> {
-    let start = Instant::now();
-    let (solver, info) = crate::nlh_v1::query::<S>(p, None, None)?;
-    let elapsed = start.elapsed();
-    let tree = &solver.game().tree;
-    let sref = tree.storage_ref(tree.node(0));
-    let weights = &solver.game().root_ranges[Player::P0];
-    let freqs = nlh_v1::action_frequencies(
-        &solver.average_strategy_at(0),
-        weights,
-        sref.num_actions as usize,
-        sref.num_hands as usize,
-    );
-    let equity = range_equity(&p.config.board, &solver.game().root_ranges);
-    let total: f64 = weights.iter().map(|&w| w as f64).sum();
-    let equity = if total > 0.0 {
-        weights
-            .iter()
-            .zip(&equity[Player::P0])
-            .map(|(&w, &e)| w as f64 * e as f64)
-            .sum::<f64>()
-            / total
-    } else {
-        0.0
-    };
-    let ev = nlh_v1::subgame_ev(crate::nlh_v1::solver_ev(&solver), p.payoff.ev_offset());
-    let expl = solver.exploitability();
-    let board = p
-        .config
-        .board
-        .iter()
-        .map(Card::to_string)
-        .collect::<Vec<_>>()
-        .join(" ");
-    Ok((
-        vec![
-            board,
-            solver.iteration().to_string(),
-            fmt_sig(elapsed.as_secs_f64(), 6),
-            fmt_sig(expl[Player::P0] + expl[Player::P1], 6),
-            fmt_sig(ev[Player::P0], 6),
-            fmt_sig(ev[Player::P1], 6),
-            fmt_sig(equity, 6),
-        ],
-        info[tree.tags[0] as usize].actions.clone(),
-        freqs,
-    ))
-}
-
-/// Collects raw board tokens from exactly one of `--boards`/`--boards-file`.
 fn collect_board_tokens(
     boards_arg: Option<&str>,
     boards_file: Option<&Path>,
@@ -193,9 +98,6 @@ fn collect_board_tokens(
     }
 }
 
-/// Normalizes a board token: a whitespace-free even-length token (e.g.
-/// "Ks7h2d") is split into 2-char card chunks; anything else (e.g. "Ks 7h
-/// 2d") passes through unchanged.
 fn normalize_board_token(token: &str) -> String {
     if !token.is_empty() && !token.contains(char::is_whitespace) && token.len().is_multiple_of(2) {
         token
@@ -209,7 +111,6 @@ fn normalize_board_token(token: &str) -> String {
     }
 }
 
-/// Formats `x` to `sig` significant figures (fixed-point, not exponential).
 fn fmt_sig(x: f64, sig: usize) -> String {
     if x == 0.0 {
         return "0".to_string();

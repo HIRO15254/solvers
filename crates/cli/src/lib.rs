@@ -117,7 +117,6 @@ pub mod resume;
 pub mod run_dir;
 pub mod runs;
 pub mod session;
-pub mod sol;
 pub mod solve;
 pub mod validate;
 
