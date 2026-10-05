@@ -166,7 +166,7 @@ fn canonical_turns() -> Vec<(Board, u32)> {
 /// When multiple permutations achieve the minimum (the set has a nontrivial
 /// stabilizer) any of them is correct: bucket rows on the canonical board
 /// are stabilizer-invariant, since E[HS²] scores are suit-symmetric.
-fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
+pub(crate) fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
     let mut best = [u8::MAX; 5];
     let mut best_perm: SuitPerm = [0, 1, 2, 3];
     for perm in all_suit_perms() {
@@ -187,7 +187,7 @@ fn canonical_river_set(five: [Card; 5]) -> ([u8; 5], SuitPerm) {
 /// (summing to `C(52, 5) = 2,598,960`), each as its sorted representative.
 /// Expensive (2.6M sets x 24 perms) — only the full-street build path calls
 /// it.
-fn canonical_river_sets() -> Vec<([Card; 5], u32)> {
+pub(crate) fn canonical_river_sets() -> Vec<([Card; 5], u32)> {
     let all: Vec<Card> = ALL_CARDS.into_iter().collect();
     let mut counts: BTreeMap<[u8; 5], u32> = BTreeMap::new();
     for i in 0..52 {

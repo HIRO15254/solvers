@@ -20,6 +20,8 @@ pub mod settlement;
 pub mod solver;
 pub mod tree;
 pub mod tree_rules;
+/// Experimental S4-1a components; not part of the product contract.
+pub mod trunk;
 pub mod types;
 
 pub use abstraction::{
