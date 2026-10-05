@@ -1,6 +1,6 @@
 # 製品定義: NLH HU Postflop Solver / NLH Multiway Preflop Solver
 
-更新: **2026-10-04**。本書は製品の目的・範囲・品質・到達段階の正本である。
+更新: **2026-10-06**。本書は製品の目的・範囲・品質・到達段階の正本である。
 
 2026-10-04の利用者決定により、旧ロードマップ（全variant対応・ML高速近似・Nodelock/相手profile、R0〜R7）を
 破棄し、本リポジトリを**共通のInput形式を共有する2製品**として再構築する。旧状態はgit tag
@@ -105,6 +105,9 @@ chipEVでは全seatの和が `開始pot − E[rake]` になる。P2のPreflop ro
 **計算方式と出力品質の保証は未決定（D5）。** 既存研究・既存solverの方式と品質指標の網羅的な調査と、
 比較実験によって決める（S4）。それまでは旧実装を**暫定方式**とし、S1では計算結果を変えずに移植する。
 下表の「計算」と品質節の停止判定は暫定方式の説明であり、製品の確定仕様ではない。
+2026-10-06に、Preflopの全分岐を決定的に辿るtrunk、差し替え可能なleaf model、モデル内の厳密なseat別最適応答利得を
+候補の方式とし、利用者決定P2D1〜P2D6と段階を[P2方式の再設計計画](plans/p2-method-redesign.jp.md)に置いた。
+D5はS4-1の実験結果を見て確定させる。
 
 | 項目 | 内容 |
 |---|---|
@@ -116,7 +119,8 @@ chipEVでは全seatの和が `開始pot − E[rake]` になる。P2のPreflop ro
 
 ### 品質
 
-何を測り、何を保証し、いつ止めるかは調査と実験で決める（D5）。暫定方式の性質は次のとおり。
+何を測り、何を保証し、いつ止めるかは調査と実験で決める（D5）。候補の主指標は、leaf modelを含むモデルの中の
+seat別最適応答利得`g_i`と`NashConv = Σ g_i`であり、S4-1で妥当性を確かめる（P2D1）。暫定方式の性質は次のとおり。
 
 - 3人以上の結果はregret最小化による近似であり、Nash/GTO保証をしない。2人でもcard abstractionを含むため、
   元ゲームの厳密解とは扱わない。
@@ -133,7 +137,7 @@ chipEVでは全seatの和が `開始pot − E[rake]` になる。P2のPreflop ro
 | **S1 再構築** | 新workspaceで両製品が共通Inputからvalidate/solve/resume/export/監視でき、削除した機能を除き旧v1 familyの対応機能と同等。旧family schemaは移行先を示すerrorで拒否する。daemonが新Inputを受け付ける。手順は[再構築計画](plans/two-product-restructure.jp.md)のM0〜M7 |
 | **S2 製品間連携** | P2の解からderiveしたInputをP1で解ける。line・size・range・table条件の不一致を明示errorにする（計画のM8） |
 | **S3 P1の品質・性能** | 参照24件の条件照合とfixture化、Exploitabilityの閾値固定、メモリ・時間の改善。未マージの`codex/r1-hu-postflop`の成果（compact hand領域、action並列）は検証を経て移植可否を判断する |
-| **S4 P2の方式決定・品質・性能** | 網羅的な調査と比較実験で計算方式と出力品質の保証を決め（D5）、その方式で実装・検証する。`.mwsol`契約の整合、性能改善 |
+| **S4 P2の方式決定・品質・性能** | 網羅的な調査と比較実験で計算方式と出力品質の保証を決め（D5）、その方式で実装・検証する。`.mwsol`契約の整合、性能改善。段階S4-0〜S4-5と完了条件は[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
 | **S5 GUI** | daemon経由のWeb GUI（Setup・Runs・Results）を両製品で使える |
 
 S3〜S5はS1の完了後、互いに独立に進められる。ただしS4の調査のうちコードに依存しない部分（既存研究・既存solverの

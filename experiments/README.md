@@ -7,6 +7,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
+| S4の判断材料 | [P2方式の再設計](p2-method-2026-10/README.md) | 暫定方式のseed間の差（2026-10-06）と、S4-1aで測る暫定方式の解の場所・hash |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

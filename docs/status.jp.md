@@ -32,7 +32,8 @@
 | R0-01〜R0-06 | SOL-1〜SOL-6 | 完了済み。手順書はtag `archive/pre-two-products-2026-10-04`。SOL-1の参照候補は[HU Postflop参照候補](plans/hu-postflop-validation/README.md)へ移した |
 | M0〜M8 | SOL-16〜SOL-24（M0=SOL-16から番号順） | [再構築計画](plans/two-product-restructure.jp.md)第4節 |
 | T1-01、T1-05〜T1-08 | SOL-8、SOL-12〜SOL-15（P1へ移した） | 旧手順書はtag。S1の完了後に新Inputの条件で再開・再評価する |
-| P2の方式決定 | SOL-25 | [製品定義](products.jp.md)のD5、第6節S4 |
+| P2の方式決定 | SOL-25 | [製品定義](products.jp.md)のD5、第6節S4。[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
+| S4-1a、S4-1b | SOL-26、SOL-27（SOL-25の子Issue） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)第5節 |
 
 設計・受入上の必須前提はGitの計画で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は計画を更新し、その影響をLinearの待ち関係へ反映する。
