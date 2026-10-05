@@ -32,6 +32,8 @@ solvers config new --product p2 --template full --out table-full.toml
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。
 金額はBB、内部gridは0.001 BBである。P1のrange指定やline文法は規範の例に従う。
+P1ではPreflop専用のtree設定は効果を持たず、既定値以外を書くと警告が出る。
+`checkdown`は一致した手番をcheck、賭けに直面していればfoldにする。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 旧configの自動変換は無いため、現行例から書き直す。

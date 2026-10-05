@@ -21,6 +21,34 @@ fn config(players: usize, straddles: &str, script: &str) -> String {
 }
 
 #[test]
+fn default_rake_unit_preserves_fingerprints() {
+    use mw_preflop::solver::{ExternalSamplingGame, configuration_fingerprint_for_setup};
+    let raw = config(3, "[]", "flop, turn, river { checkdown }")
+        + "[economics.rake]\nrate = 0.05\ncap_bb = 4\n";
+    let lowered = lower(&raw);
+    let game = mw_preflop::HoldemGame::new(
+        &lowered.game,
+        &lowered.utility,
+        &lowered.rake,
+        mw_preflop::FeatureHashAbstraction::default(),
+    )
+    .unwrap();
+    let configuration =
+        configuration_fingerprint_for_setup(&game, &game.deal_sampler().unwrap(), lowered.solver);
+    // Captured from HEAD 3a9c4ff before adding the configurable unit.
+    assert_eq!(
+        blake3::Hash::from(game.game_fingerprint())
+            .to_hex()
+            .as_str(),
+        "0aa026ee09bf133b09f903c402da02df5ab9b4c6f35a5617f224d51e0194c4e4"
+    );
+    assert_eq!(
+        blake3::Hash::from(configuration).to_hex().as_str(),
+        "6e14c2051bed8b5ad0683e4ca0e5953c079f0731709561aacc9aafbf79740efe"
+    );
+}
+
+#[test]
 fn spec_p2_example_defaults_normalize_idempotently_and_lower() {
     let raw = config(
         6,

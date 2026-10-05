@@ -40,9 +40,9 @@ discount、探索、pruning、batchの設定は入力規範第10節に従う。
 periodic discountは完了sweepがevery_sweepsの倍数かつuntil_sweeps未満のとき、
 event = sweep / every_sweepsとしてregretと平均累積の両方にevent/(event＋1)を掛ける。
 
-`checkdown`はmenu編集に加えてactor選択時にも判定する。一致するとcall額によらずstreetを閉じる。
-そのstreetのdecision nodeと後続effectは実行されない。P1のmenuだけの処理との差は
-[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)と付録Bに従う。
+`checkdown`は一致した手番のmenuをx/fの1つにする。全ruleの適用後もそのx/fだけが残る手番は
+decision nodeを作らず、actor選択時にその行動を自動で適用する。意味は
+[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)に従い、P1と同じ結果になる。
 
 ## 3. 停止評価と品質の意味
 

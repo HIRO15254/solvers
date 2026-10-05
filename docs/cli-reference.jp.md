@@ -80,6 +80,9 @@ P1は通常validateでも木の見積りで未使用ruleを確認する。P2の�
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
+P1では`tree.preflop_reraise_jam_above_stack`、既定4以外の`tree.max_aggressive_actions.preflop`、
+Preflop ruleがあれば、効果が無い設定を1つのwarningにまとめる。validateはhuman表示とJSONの`warnings`、
+solve/resumeはstderr、reportはboard集合に対して1回だけ表示する。正規化された既定値だけでは警告しない。
 
 ## `solvers solve`
 

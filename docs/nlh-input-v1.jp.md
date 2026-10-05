@@ -2,7 +2,7 @@
 
 本書は`solvers.nlh/v1`の入力規範である。製品の範囲は[製品定義](products.jp.md)、
 計算と成果物は[P1](hu-postflop.jp.md)・[P2](mw-preflop.jp.md)、コマンドとflagは
-[CLI reference](cli-reference.jp.md)を参照する。利用者の決定は付録A、確認待ちの事項は付録Bに置く。
+[CLI reference](cli-reference.jp.md)を参照する。利用者の決定は付録A、実装時に定めて利用者が確認した細則は付録Bに置く。
 
 ## 1. 原則
 
@@ -120,12 +120,13 @@ cap_bb = 4                 # 任意。既定は上限なし。非負
 when = "flop_dealt"        # 既定"flop_dealt"（no flop no drop）
 allocation = "main-first"  # 既定。main-first | proportional
 rounding = "down"          # 既定。down | nearest | up
-rounding_unit_bb = 0.001   # 既定0.001
+rounding_unit_bb = 0.001   # 既定0.001。正で0.001の倍数
 ```
 
-`rounding_unit_bb`は0.001のみである。それ以外は`NLH003`である。
-rakeはuncalled wagerを返却した後の全potの合計に率を掛け、0.001 BB単位へ丸め、capで制限する。
-`down`は切捨て、`nearest`は最も近い整数（半端0.5は上）、`up`は切上げである。
+`rounding_unit_bb`は正で0.001の倍数である。それ以外は`NLH003`である。
+rakeはuncalled wagerを返却した後の全potの合計に率を掛け、`rounding_unit_bb`の倍数へ丸め、capで制限する。
+capは単位の倍数でなくてよく、capに達したrakeはcapの額である。丸めた額がpotを超えるときはpotの額とする。
+`down`は切捨て、`nearest`は最も近い倍数（ちょうど中間なら上）、`up`は切上げである。
 `main-first`はmain potから順にrakeを引く。`proportional`は各potのgrossに比例して配分し、
 整数の余りも配って合計rakeを保存する。2人だけの単一potでは配分による差は無い。
 
@@ -327,7 +328,7 @@ turn, river {
 | `remove ACTION` | その種別を全て削除する。size listは書けない |
 | `replace ACTION [sizes]` | その種別を削除して合法候補を追加する |
 | `force ACTION [sizes]` | menu全体をその種別の合法候補だけに置き換える |
-| `checkdown` | 現在のmenuから`check`以外を削除する。actionとsize listは書けない |
+| `checkdown` | menu全体をx/fの1つに置き換える。call額が0なら`check`、正なら`fold`である。actionとsize listは書けない |
 
 `add` / `replace` / `force`は`[]`を必ず書く。空listも許す。
 fold/check/callの候補はNLHの合法性から作り、size listの数値は候補に影響しない。
@@ -337,15 +338,15 @@ fold/check/callの候補はNLHの合法性から作り、size listの数値は�
 betはそのstreetに賭けが無い場合、raiseは賭けがある場合の候補である。Preflopのopenはraiseである。
 対象種別がそのnodeで合法でなければ候補は空である。`add`と`remove`は変化無し、
 `replace`もその種別以外を残す。`force`は他種別を全て消すため空menuになりうる。
-賭けに直面しているnodeへの`checkdown`もcheckが無いため空menuになりうる。
 後続ruleが候補を戻せばよいが、全rule適用後も空なら木構築で`NLH003`である。
 非攻撃actionへの自動復帰は無い。menu編集自体の意味はP1/P2で共通である。
 下位APIのerrorはP1で`TreeBuildError::EmptyMenu`、P2で`NoActions`であり、入力adapterが`NLH003`へ写す。
 
-P2のstate遷移には別の`checkdown`判定がある。actor選択時にいずれかの`checkdown` ruleが一致すると、
-そのstreetを即座に閉じ、decision nodeを作らない。call額が正でもこの判定を行う。
-この場合はmenuの空検査も後続effectも実行されない。P1にはこのstreet短絡が無い。
-共通のmenu編集規則とP2の遷移短絡を区別する。両製品の`checkdown`をそろえるかは利用者の確認待ちである（付録B）。
+`checkdown`は一致した手番のactorだけに効く。他の席への強制や後続streetへの持越しは無い。
+後続のruleはx/fの後のmenuをさらに編集できる。全ruleの適用後も一致した`checkdown`のx/fだけが残る手番では、
+P2はdecision nodeを作らずその行動を自動で適用する。結果は同じで、木を小さくするための省略である。
+P1はこの手番も1つの行動を持つdecision nodeとして保存する。
+`flop, turn, river { checkdown }`のようにstreet全体へ書けば、そのstreetの全員がcheckし、賭けは起きない。
 
 ### `param`と`define`、診断
 
@@ -495,6 +496,7 @@ menu構築は次の順である。
 等号では置換しない。P2のruntimeは0 < 比率 <= 1を要求する。共通parserだけでは比率上限を検証しない。
 P2では`preflop_reraise_jam_above_stack`と`allin_threshold`の同時指定をruntimeが`NLH003`で拒否する。
 P1ではこの設定、Preflop cap、Preflop ruleを受け付けて保持するが効果を持たない。
+この設定があるか、Preflop capが既定の4と異なるか、Preflop ruleがあれば、P1の`validate`と`solve`はwarningで効果が無いことを示す。
 
 `max_aggressive_actions`はstreetのbet＋raise数の上限で、0も許す。
 P1の使用capはu32、P2はu8（0..255）へlowerできなければ`NLH003`である。
@@ -508,12 +510,12 @@ P1は木のdecision nodeで条件が一度でも真になったかを実測す�
 spot開始streetより前のruleは木に含めず、warning対象からも除く。開始street以降は通常どおりである。
 `report`はboard集合全体でhitをORし、全boardで未使用のruleだけを報告する。
 P2は`validate --resources`のarena countと、`solve` / `resume`のpublic tree構築で条件一致を実測する。
-ruleのstreetと同じstreetのdecision nodeで、acting seatに対する条件が一度でも真になればhitである。
+ruleのstreetと同じstreetのdecision node、または`checkdown`で自動適用した手番で、
+acting seatに対する条件が一度でも真になればhitである。
 候補を変更したかではなく条件一致を数え、追加の木走査は行わない。完全な計測で一度も一致しないruleだけを警告する。
 通常の`validate`は木を走査せず、未使用ruleは未検査であることと`--resources`で検査できることを表示する。
 memoryまたはnode上限でcountが打ち切られた場合は不完全と表示し、未一致ruleの警告を出さない。
 P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomplete"`）と`warnings`を返す。
-`checkdown`の遷移短絡でdecision nodeを持たないstreetのruleは一致しない。
 
 ## 10. `[solver]`
 
@@ -784,12 +786,16 @@ max_time = "12h"
 | Q4 | v1に含める卓・spotの機能 | straddleを含める。Preflopで最初に行動する席から始まるlive straddleと、その後のre-straddleの連続を扱う（第5節）。それ以外の位置から始まるstraddle（BTN straddle等）、seatごとのblind・ante上書き、P2のPreflop途中からの開始はv1に含めない |
 | Q5 | 旧configの自動変換コマンド | 持たない。同梱の例と試験用configは移行時に書き換える |
 | Q6 | P1の`memory = "auto"` | 物理メモリの80%を上限とし、solve開始前の見積りが超えればerror。明示した値で上限を変えられる（第11節） |
+| Q7 | `checkdown`の意味 | 一致した手番のactorだけをx/f（call額0ならcheck、正ならfold）にする。両製品で共通（第9節） |
+| Q8 | P1でのPreflop専用のtree設定 | 受け付けて保持し、効果が無いことをwarningで示す（第9節） |
+| Q9 | `rounding_unit_bb` | 0.001の倍数の任意の正の単位を受ける（第6節） |
+| Q10 | 付録Bのその他の事項 | 記載の定めで確定する |
 
 P2の方式と品質保証は製品定義D5により未決定である。
 
 ## 付録B 実装時に定めた事項
 
-次の事項はS1完了報告で利用者に確認する。本文の規則として記載するが、確認済みの利用者決定とは区別する。
+次の事項は実装時に定め、2026-10-05のS1完了報告で利用者が確認した（付録AのQ7〜Q10）。
 
 | 事項 | 定め | 規定先 |
 |---|---|---|
@@ -801,13 +807,14 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | P1のrake条件（第6節） | `flop_dealt`はtrue、`players_dealt`は卓の人数、`players_saw_flop`は2、`showdown`と`won_without_showdown`はterminalごとに判定する | 第6節 |
 | 停止目標（第10節） | `NashConv / 2 ≤ target`に達した時点で止める | 第10節 |
 | `squeeze`・`in_position_to_last_aggressor`（第9節） | Postflopでは常にfalse。P1でlineから導出する値も同じ | 第9節・条件変数 |
-| P1でのPreflop専用のtree設定（第9節） | `preflop_reraise_jam_above_stack`、`max_aggressive_actions.preflop`、Preflopのruleを受け付け、効果を持たない。正規化でも残す | 第9節・size literal |
+| P1でのPreflop専用のtree設定（第9節） | `preflop_reraise_jam_above_stack`、`max_aggressive_actions.preflop`、Preflopのruleを受け付け、効果を持たない。正規化でも残す。既定値以外ならwarningを出す（Q8） | 第9節・size literal |
 | `line`が空で`board`だけがある（第3節） | Preflopが閉じていないため、board枚数の不一致として`NLH004` | 第3節 |
 | 全順位が同額の`payouts`（第6節） | `NLH003` | 第6節 |
 | 実効configの書き方（第13節） | 節内のkeyは本書の記載順、positionは第5節の表の順。全員のstackが等しければ`stack_bb`だけを書き、異なれば`[table.stacks_bb]`に全positionを書く。時間とmemoryは割り切れる最大の単位（`12h`、`15m`、`6GiB`）。空の表は書かない | 第13節 |
 | treeのscriptの意味（第9節） | menu編集の各effectは両製品で同じである。P1でもfold・check・callを対象にできる。最終menuが空のnodeは`NLH003`（旧P1の非攻撃actionへの自動復帰は無い） | 第9節・effectと合法性 |
-| `checkdown`の製品差（第9節） | P2は一致したactorの手番でstreetを閉じる（旧Multiwayの挙動）。P1はそのactorのmenuをcheckだけにする。そろえるかを確認する | 第9節・effectと合法性 |
-| `rounding_unit_bb`（第6節） | 0.001だけを受ける | 第6節 |
+| `checkdown`（第9節） | 一致した手番のmenuをx/fの1つにする。P2はx/fだけが残った手番を木から省略して自動で適用する（Q7） | 第9節・effectと合法性 |
+| `rounding_unit_bb`（第6節） | 0.001の倍数の正の単位へ丸めてからcapで制限する。capは単位の倍数でなくてよい（Q9） | 第6節 |
+| 単位がpotより粗い場合（第6節） | 丸めた額がpotを超えればpotの額とする。Q9の反映時に定めたため次の報告で確認する | 第6節 |
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |
 | P2の未使用rule計測（第9節） | 通常の`validate`は未検査を表示する。`validate --resources`のcountと`solve` / `resume`の木構築で実測し、打切り時は不完全として未一致警告を出さない | 第9節・未使用ruleの警告 |
 | `config new`のflag | `--product p2\|p1`（既定`p2`）、`--template minimal\|full`（既定`minimal`）、`--out`を受ける。全templateは共通Input。`full`は同じ製品の`minimal`を正規化した実効configで、節ごとの短いcommentを付ける。既定の無い任意keyは省略する | 第13節・CLI規範 |

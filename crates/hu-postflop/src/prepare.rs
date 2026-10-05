@@ -66,6 +66,28 @@ pub fn warnings_for_hits(p: &Prepared, hits: &crate::RuleHits) -> Vec<String> {
     if p.target.is_none() {
         warnings.push("no stop target: runs until max_iterations or max_time".into());
     }
+    let tree = &p.document.spot.tree;
+    let mut ignored = Vec::new();
+    if tree.preflop_reraise_jam_above_stack.is_some() {
+        ignored.push("tree.preflop_reraise_jam_above_stack");
+    }
+    if tree.max_aggressive_actions.preflop != spot::MaxAggressiveActions::default().preflop {
+        ignored.push("tree.max_aggressive_actions.preflop");
+    }
+    if tree
+        .compiled
+        .rules
+        .iter()
+        .any(|rule| rule.street == Street::Preflop)
+    {
+        ignored.push("Preflop tree rules");
+    }
+    if !ignored.is_empty() {
+        warnings.push(format!(
+            "{}: have no effect in P1 (HU Postflop)",
+            ignored.join(", ")
+        ));
+    }
     for street in [Street::Flop, Street::Turn, Street::River] {
         for (index, &hit) in hits[street].iter().enumerate() {
             if !hit {

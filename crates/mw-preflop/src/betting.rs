@@ -5,10 +5,34 @@ pub use nlh::betting::{Action, BettingError, BettingState, HandPhase, SeatState,
 use nlh::{StreetPolicy, TableSetup};
 
 impl StreetPolicy for BettingConfig {
-    fn check_down(&self, state: &BettingState, actor: SeatId) -> bool {
-        self.nlh_rules
-            .iter()
-            .any(|rule| rule.effect == RuleEffect::Checkdown && rule.matches(state, actor))
+    fn forced_action(&self, state: &BettingState, actor: SeatId) -> Option<Action> {
+        // Scan once, evaluating conditions only for checkdown rules until one
+        // matches. A later matching edit requires the ordinary final menu.
+        let mut checkdown = false;
+        let mut later_edit = false;
+        for rule in &self.nlh_rules {
+            if (checkdown || rule.effect == RuleEffect::Checkdown) && rule.matches(state, actor) {
+                if rule.effect == RuleEffect::Checkdown {
+                    checkdown = true;
+                    later_edit = false;
+                } else {
+                    later_edit = true;
+                }
+            }
+        }
+        if !checkdown {
+            return None;
+        }
+        let action = check_or_fold(state, actor);
+        if !later_edit
+            || state
+                .legal_actions(self)
+                .is_ok_and(|menu| menu == [action.clone()])
+        {
+            Some(action)
+        } else {
+            None
+        }
     }
     fn skip_street(&self, street: Street, players: u8) -> bool {
         self.for_street(street)
@@ -34,24 +58,7 @@ pub trait BettingMenu: Sized {
 
 impl BettingMenu for BettingState {
     fn from_config(config: &ValidatedMultiwayConfig) -> Result<Self, BettingError> {
-        // Construct once at the root, never during traversal transitions.
-        let setup = TableSetup {
-            button: config.button,
-            starting_stacks: SeatVec::new_unchecked(
-                config
-                    .seats
-                    .iter()
-                    .map(|seat| seat.starting_stack)
-                    .collect(),
-            ),
-            forced_antes: config.forced_antes.clone(),
-            common_ante: config.common_ante,
-            forced_blinds: config.forced_blinds.clone(),
-            straddles: config.straddles.clone(),
-            nominal_big_blind: config.nominal_big_blind,
-            preflop_first_to_act: config.preflop_first_to_act,
-        };
-        Self::new(&setup, &config.betting)
+        from_config_with_policy(config, &config.betting)
     }
     fn legal_actions(&self, config: &BettingConfig) -> Result<Vec<Action>, BettingError> {
         if self.phase != HandPhase::Betting {
@@ -153,6 +160,38 @@ impl BettingMenu for BettingState {
     }
 }
 
+pub(crate) fn from_config_with_policy<P: StreetPolicy>(
+    config: &ValidatedMultiwayConfig,
+    policy: &P,
+) -> Result<BettingState, BettingError> {
+    // Construct once at the root, never during traversal transitions.
+    let setup = TableSetup {
+        button: config.button,
+        starting_stacks: SeatVec::new_unchecked(
+            config
+                .seats
+                .iter()
+                .map(|seat| seat.starting_stack)
+                .collect(),
+        ),
+        forced_antes: config.forced_antes.clone(),
+        common_ante: config.common_ante,
+        forced_blinds: config.forced_blinds.clone(),
+        straddles: config.straddles.clone(),
+        nominal_big_blind: config.nominal_big_blind,
+        preflop_first_to_act: config.preflop_first_to_act,
+    };
+    BettingState::new(&setup, policy)
+}
+
+fn check_or_fold(state: &BettingState, actor: SeatId) -> Action {
+    if state.amount_to_call(actor) == MwChips::ZERO {
+        Action::Check
+    } else {
+        Action::Fold
+    }
+}
+
 fn apply_tree_rules(
     state: &BettingState,
     config: &BettingConfig,
@@ -166,7 +205,7 @@ fn apply_tree_rules(
         .map(|rule| (rule.effect, rule.action, rule.sizes.as_slice()));
     for (effect, action, sizes) in matched {
         if effect == RuleEffect::Checkdown {
-            actions.retain(|action| matches!(action, Action::Check));
+            actions = vec![check_or_fold(state, actor)];
             continue;
         }
         let action_kind = action
@@ -773,5 +812,80 @@ mod tests {
         }
         assert_eq!(state.street, Street::Turn);
         assert_eq!(state.phase, HandPhase::Betting);
+    }
+
+    fn flop(script: &str, players: usize) -> (BettingState, BettingConfig) {
+        let (mut state, mut betting) = state(&vec![20.0; players], 0, AnteConfig::None);
+        betting.nlh_rules =
+            nlh::script::Script::compile(script, &Default::default(), &spot::NLH_V1)
+                .unwrap()
+                .rules
+                .into_iter()
+                .map(crate::tree_rules::NlhTreeRule::from_compiled)
+                .collect();
+        while state.street == Street::Preflop {
+            let action = state
+                .legal_actions(&betting)
+                .unwrap()
+                .into_iter()
+                .find(|a| matches!(a, Action::Call { .. } | Action::Check))
+                .unwrap();
+            state.apply(action, &betting).unwrap();
+        }
+        (state, betting)
+    }
+
+    #[test]
+    fn conditional_checkdown_checks_only_button_and_folds_facing_a_bet() {
+        let (mut state, betting) = flop("flop when position == BTN { checkdown }", 3);
+        assert_eq!(state.to_act, Some(SeatId(1)));
+        assert!(state.legal_actions(&betting).unwrap().len() > 1);
+        state.apply(Action::Check, &betting).unwrap();
+        assert_eq!(state.to_act, Some(SeatId(2)));
+        assert!(state.legal_actions(&betting).unwrap().len() > 1);
+        state.apply(Action::Check, &betting).unwrap();
+        assert_eq!(state.street, Street::Turn); // BTN's check was elided.
+        assert_eq!(state.seats[SeatId(0)].status, SeatStatus::Active);
+
+        let (mut state, betting) = flop("flop when position == BTN { checkdown }", 3);
+        let bet = state
+            .legal_actions(&betting)
+            .unwrap()
+            .into_iter()
+            .find(|a| matches!(a, Action::BetTo { .. }))
+            .unwrap();
+        state.apply(bet, &betting).unwrap();
+        assert_eq!(state.to_act, Some(SeatId(2)));
+        state.apply(Action::Fold, &betting).unwrap();
+        assert_eq!(state.seats[SeatId(0)].status, SeatStatus::Folded);
+        assert_eq!(state.phase, HandPhase::Uncontested { winner: SeatId(1) });
+        assert_eq!(state.to_act, None);
+        assert!(state.pending.is_empty());
+        assert_eq!(state.players_on_street(Street::Flop), 1);
+    }
+
+    #[test]
+    fn later_matching_edits_decide_whether_checkdown_turn_is_elided() {
+        let (mut state, betting) = flop("flop when position == BTN { checkdown add bet [1bb] }", 2);
+        state.apply(Action::Check, &betting).unwrap();
+        assert_eq!(state.street, Street::Flop);
+        assert_eq!(state.to_act, Some(SeatId(0)));
+        let menu = state.legal_actions(&betting).unwrap();
+        assert!(matches!(
+            menu.as_slice(),
+            [
+                Action::Check,
+                Action::BetTo {
+                    to: MwChips(1000),
+                    ..
+                }
+            ]
+        ));
+
+        // Matching but inapplicable raise adds nothing: final check is forced.
+        let (mut state, betting) =
+            flop("flop when position == BTN { checkdown add raise [1bb] }", 2);
+        state.apply(Action::Check, &betting).unwrap();
+        assert_eq!(state.street, Street::Turn);
     }
 }

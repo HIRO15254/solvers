@@ -70,6 +70,11 @@ pub enum RakeConfig {
         when: String,
         allocation: RakeAllocation,
         rounding: RakeRounding,
+        #[serde(
+            default = "default_rounding_unit",
+            skip_serializing_if = "is_default_rounding_unit"
+        )]
+        rounding_unit: MwChips,
     },
     GgPreflop {
         rate: f64,
@@ -92,12 +97,21 @@ pub enum CompiledRake {
         when: CompiledRakeCondition,
         allocation: RakeAllocation,
         rounding: RakeRounding,
+        rounding_unit: MwChips,
     },
     GgPreflop {
         rate: f64,
         cap: MwChips,
         exempt_pot: MwChips,
     },
+}
+
+fn default_rounding_unit() -> MwChips {
+    MwChips(1)
+}
+
+fn is_default_rounding_unit(unit: &MwChips) -> bool {
+    *unit == default_rounding_unit()
 }
 
 impl UtilityConfig {
@@ -168,8 +182,12 @@ impl RakeConfig {
                 ref when,
                 allocation,
                 rounding,
+                rounding_unit,
             } => {
                 rate_value(rate)?;
+                if rounding_unit == MwChips::ZERO {
+                    return Err(ConfigError::Number("rake.rounding_unit".into()));
+                }
                 let cap = cap_bb
                     .map(|cap_bb| {
                         nonnegative_finite("rake.cap_bb", cap_bb)?;
@@ -184,6 +202,7 @@ impl RakeConfig {
                     when,
                     allocation,
                     rounding,
+                    rounding_unit,
                 })
             }
             RakeConfig::GgPreflop {

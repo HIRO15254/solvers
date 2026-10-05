@@ -224,7 +224,8 @@ pub struct TableSetup {
 
 /// Product policy gates for otherwise shared NLH street transitions.
 pub trait StreetPolicy {
-    fn check_down(&self, state: &BettingState, actor: SeatId) -> bool;
+    /// Elide a turn whose final menu contains only a forced check or fold.
+    fn forced_action(&self, state: &BettingState, actor: SeatId) -> Option<Action>;
     fn skip_street(&self, street: Street, players: u8) -> bool;
 }
 
@@ -233,8 +234,8 @@ pub trait StreetPolicy {
 pub struct NoStreetPolicy;
 
 impl StreetPolicy for NoStreetPolicy {
-    fn check_down(&self, _state: &BettingState, _actor: SeatId) -> bool {
-        false
+    fn forced_action(&self, _state: &BettingState, _actor: SeatId) -> Option<Action> {
+        None
     }
     fn skip_street(&self, _street: Street, _players: u8) -> bool {
         false
@@ -663,40 +664,49 @@ impl BettingState {
         Ok(())
     }
 
-    fn finish_or_select<P: StreetPolicy>(&mut self, after: SeatId, betting: &P) {
-        let non_folded = self.non_folded_mask();
-        if non_folded.len() == 1 {
-            self.phase = HandPhase::Uncontested {
-                winner: non_folded.iter().next().expect("one seat exists"),
-            };
-            self.to_act = None;
-            self.pending = SeatMask::EMPTY;
-            return;
-        }
-        self.pending = self.pending.intersection(self.active_mask());
-        if self.active_mask().len() == 1 {
-            let sole_active = self
-                .active_mask()
-                .iter()
-                .next()
-                .expect("one active seat exists");
-            if self.amount_to_call(sole_active) == MwChips::ZERO {
+    fn finish_or_select<P: StreetPolicy>(&mut self, mut after: SeatId, betting: &P) {
+        loop {
+            let non_folded = self.non_folded_mask();
+            if non_folded.len() == 1 {
+                self.phase = HandPhase::Uncontested {
+                    winner: non_folded.iter().next().expect("one seat exists"),
+                };
+                self.to_act = None;
                 self.pending = SeatMask::EMPTY;
+                return;
+            }
+            self.pending = self.pending.intersection(self.active_mask());
+            if self.active_mask().len() == 1 {
+                let sole_active = self
+                    .active_mask()
+                    .iter()
+                    .next()
+                    .expect("one active seat exists");
+                if self.amount_to_call(sole_active) == MwChips::ZERO {
+                    self.pending = SeatMask::EMPTY;
+                    self.end_betting_round(betting);
+                    return;
+                }
+            }
+            if self.pending.is_empty() {
                 self.end_betting_round(betting);
                 return;
             }
-        }
-        if self.pending.is_empty() {
-            self.end_betting_round(betting);
-            return;
-        }
-        self.to_act = self.next_in_mask(after, self.pending);
-        if self
-            .to_act
-            .is_some_and(|actor| betting.check_down(self, actor))
-        {
-            self.pending = SeatMask::EMPTY;
-            self.end_betting_round(betting);
+            self.to_act = self.next_in_mask(after, self.pending);
+            let actor = self.to_act.expect("nonempty pending mask has an actor");
+            match betting.forced_action(self, actor) {
+                Some(Action::Check) => {
+                    self.seats[actor].raise_reopen_at = None;
+                }
+                Some(Action::Fold) => {
+                    self.seats[actor].status = SeatStatus::Folded;
+                }
+                Some(_) => panic!("street policy may only force check or fold"),
+                None => return,
+            }
+            self.pending.remove(actor);
+            self.street_active_players[self.street.index()] = self.non_folded_mask().len() as u8;
+            after = actor;
         }
     }
 

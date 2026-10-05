@@ -400,10 +400,30 @@ invalid!(
 );
 invalid!(
     rake_rounding_unit,
-    "[economics.rake]\nrate = 0.05\nrounding_unit_bb = 0.01",
+    "[economics.rake]\nrate = 0.05\nrounding_unit_bb = 0.0015",
     NLH003,
     "economics.rake.rounding_unit_bb"
 );
+
+#[test]
+fn arbitrary_positive_milli_bb_rake_units_normalize_and_invalid_units_fail() {
+    for unit in ["0.001", "0.01", "0.5", "1", "2.501"] {
+        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit_bb = {unit}\n");
+        let doc = Document::parse(&raw, Path::new("unit.toml")).unwrap();
+        let normalized = doc.normalize(&Stub).unwrap();
+        let reparsed = Document::parse(&normalized, Path::new("unit.toml")).unwrap();
+        assert_eq!(
+            doc.spot.economics.compiled_rake,
+            reparsed.spot.economics.compiled_rake
+        );
+    }
+    for unit in ["0", "-0.001", "0.0015", "nan", "inf", "-inf"] {
+        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit_bb = {unit}\n");
+        let err = Document::parse(&raw, Path::new("unit.toml")).err().unwrap();
+        assert_eq!(err.code, Code::NLH003, "{unit}: {err}");
+        assert_eq!(err.key.as_deref(), Some("economics.rake.rounding_unit_bb"));
+    }
+}
 invalid!(
     rake_allocation_bad,
     "[economics.rake]\nrate = 0.05\nallocation = \"main_first\"",

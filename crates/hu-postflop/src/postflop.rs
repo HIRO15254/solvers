@@ -942,7 +942,11 @@ fn nlh_node_actions(
         }
         hits[state.street][index] = true;
         if rule.effect == Effect::Checkdown {
-            actions.retain(|a| matches!(a, NodeAction::Check));
+            actions = vec![if state.outstanding == Chips::ZERO {
+                NodeAction::Check
+            } else {
+                NodeAction::Fold
+            }];
         } else {
             let kind = rule
                 .action

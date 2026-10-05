@@ -1394,6 +1394,10 @@ impl<G: ExternalSamplingGame> MultiwaySolver<G> {
         &self.game
     }
 
+    pub(crate) fn game_mut(&mut self) -> &mut G {
+        &mut self.game
+    }
+
     pub fn into_components(self) -> (G, DealSampler, SolverConfig) {
         (self.game, self.sampler, self.config)
     }

@@ -333,3 +333,162 @@ threads = 1
         hash(&base.replace("stack_bb = 100", "stack_bb = 50"))
     );
 }
+
+fn p1_ignored_warning(text: &str) -> usize {
+    text.lines()
+        .filter(|line| line.contains("have no effect in P1"))
+        .count()
+}
+
+#[test]
+fn preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("input.toml");
+    let base = RIVER.replace("preflop { replace raise [2.5bb] }\n", "");
+    for (raw, expected) in [
+        (RIVER.to_owned(), "Preflop tree rules"),
+        (
+            base.replace(
+                "script =",
+                "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 2 }\nscript =",
+            ),
+            "tree.preflop_reraise_jam_above_stack",
+        ),
+        (
+            base.clone() + "[tree.max_aggressive_actions]\npreflop = 5\n",
+            "tree.max_aggressive_actions.preflop",
+        ),
+    ] {
+        std::fs::write(&config, raw).unwrap();
+        let result = ok(&["validate", text(&config), "--format", "json"]);
+        let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        let warnings: Vec<_> = json["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|w| w.as_str())
+            .filter(|w| w.contains("have no effect in P1"))
+            .collect();
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].contains(expected));
+        let result = ok(&["validate", text(&config)]);
+        assert_eq!(
+            p1_ignored_warning(&String::from_utf8_lossy(&result.stdout)),
+            1
+        );
+    }
+    for template in ["minimal", "full"] {
+        let result = ok(&["config", "new", "--product", "p1", "--template", template]);
+        std::fs::write(&config, result.stdout).unwrap();
+        let result = ok(&["validate", text(&config), "--format", "json"]);
+        assert_eq!(
+            p1_ignored_warning(&String::from_utf8_lossy(&result.stdout)),
+            0
+        );
+    }
+    std::fs::write(&config, &base).unwrap();
+    let effective = temp.path().join("effective.toml");
+    ok(&[
+        "validate",
+        text(&config),
+        "--write-effective",
+        text(&effective),
+    ]);
+    let result = ok(&["validate", text(&effective), "--format", "json"]);
+    assert_eq!(
+        p1_ignored_warning(&String::from_utf8_lossy(&result.stdout)),
+        0
+    );
+
+    // All three triggers share one warning through solve, resume and report.
+    let raw = RIVER.replace(
+        "script =",
+        "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 2 }\nscript =",
+    ) + "[tree.max_aggressive_actions]\npreflop = 5\n";
+    std::fs::write(&config, raw).unwrap();
+    let run = temp.path().join("run");
+    for args in [
+        vec!["solve", text(&config), "--out", text(&run)],
+        vec!["resume", text(&run)],
+    ] {
+        let result = ok(&args);
+        let stderr = String::from_utf8_lossy(&result.stderr);
+        assert_eq!(p1_ignored_warning(&stderr), 1, "{stderr}");
+        for name in [
+            "Preflop tree rules",
+            "tree.preflop_reraise_jam_above_stack",
+            "tree.max_aggressive_actions.preflop",
+        ] {
+            assert!(stderr.contains(name));
+        }
+    }
+    let report = temp.path().join("report.csv");
+    let result = ok(&[
+        "report",
+        text(&config),
+        "--boards",
+        "Ks7h2d3c9s,Ks7h2d3c8s",
+        "--output",
+        text(&report),
+    ]);
+    assert_eq!(
+        p1_ignored_warning(&String::from_utf8_lossy(&result.stderr)),
+        1
+    );
+}
+
+#[test]
+fn fold_only_checkdown_nodes_solve_save_export_inspect_and_report() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("input.toml");
+    let raw = RIVER
+        .replace("preflop { replace raise [2.5bb] }\n", "")
+        .replace(
+            "river { replace bet [1bb] }",
+            "river when unopened { force bet [1bb] }",
+        )
+        .replace(
+            "river when !unopened { replace raise [a] }",
+            "river when !unopened { checkdown }",
+        );
+    std::fs::write(&config, raw).unwrap();
+    let run = temp.path().join("run");
+    ok(&["solve", text(&config), "--out", text(&run)]);
+    let solution = run.join("solution.sol");
+    let sol = hu_postflop::sol::read_sol(&solution).unwrap();
+    assert!((sol.meta.ev[0] - 5.5).abs() < 1e-6);
+    assert!(sol.meta.ev[1].abs() < 1e-6);
+    for view in ["tree", "strategy", "ev", "summary"] {
+        ok(&["export", text(&solution), view, "--format", "json"]);
+    }
+    let mut child = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args(["inspect", "--sol", text(&solution)])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    use std::io::Write;
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"go 0\nshow\nev\nquit\n")
+        .unwrap();
+    let result = child.wait_with_output().unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(String::from_utf8_lossy(&result.stdout).contains("fold"));
+    let report = temp.path().join("report.csv");
+    ok(&[
+        "report",
+        text(&config),
+        "--boards",
+        "Ks7h2d3c9s,Ks7h2d3c8s",
+        "--output",
+        text(&report),
+    ]);
+}

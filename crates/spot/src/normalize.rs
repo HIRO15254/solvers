@@ -208,6 +208,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         when,
         allocation,
         rounding,
+        rounding_unit,
     } = &spot.economics.rake
     {
         let mut rake = fields([("rate", numeric(*rate))]);
@@ -218,7 +219,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
             ("when", Value::String(when.clone())),
             ("allocation", Value::try_from(allocation).unwrap()),
             ("rounding", Value::try_from(rounding).unwrap()),
-            ("rounding_unit_bb", Value::Float(0.001)),
+            ("rounding_unit_bb", numeric(rounding_unit.as_bb())),
         ] {
             insert(&mut rake, key, v);
         }

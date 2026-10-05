@@ -680,12 +680,11 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
                         .cap_bb
                         .map(|v| chips(v, "economics.rake.cap_bb", true).map(MwChips::as_bb))
                         .transpose()?;
-                    if r.rounding_unit_bb.unwrap_or(0.001) != 0.001 {
-                        return Err(value_error(
-                            "economics.rake.rounding_unit_bb",
-                            "must equal 0.001",
-                        ));
-                    }
+                    let rounding_unit = chips(
+                        r.rounding_unit_bb.unwrap_or(0.001),
+                        "economics.rake.rounding_unit_bb",
+                        false,
+                    )?;
                     let allocation = match r.allocation.as_deref().unwrap_or("main-first") {
                         "main-first" => RakeAllocation::MainFirst,
                         "proportional" => RakeAllocation::Proportional,
@@ -716,6 +715,7 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
                         when,
                         allocation,
                         rounding,
+                        rounding_unit,
                     }
                 }
             };

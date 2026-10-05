@@ -23,6 +23,30 @@ use economics::{CompiledRake, RakeConfig, UtilityConfig};
 
 const ICM_TERMINAL_CACHE_ENTRIES: usize = 65_536;
 
+/// Only tree diagnostics pay for matches at elided turns. Normal traversal
+/// passes BettingConfig directly, with no recording scan or atomic writes.
+struct RecordingPolicy<'a> {
+    betting: &'a crate::config::BettingConfig,
+    rules: &'a [crate::tree_rules::NlhTreeRule],
+    hits: &'a [std::sync::atomic::AtomicBool],
+}
+
+impl nlh::StreetPolicy for RecordingPolicy<'_> {
+    fn forced_action(&self, state: &BettingState, actor: SeatId) -> Option<Action> {
+        let action = self.betting.forced_action(state, actor)?;
+        for (rule, hit) in self.rules.iter().zip(self.hits) {
+            if !hit.load(std::sync::atomic::Ordering::Relaxed) && rule.matches(state, actor) {
+                hit.store(true, std::sync::atomic::Ordering::Relaxed);
+            }
+        }
+        Some(action)
+    }
+
+    fn skip_street(&self, street: Street, players: u8) -> bool {
+        self.betting.skip_street(street, players)
+    }
+}
+
 #[derive(Clone)]
 enum UtilityRuntime {
     ChipEv,
@@ -42,6 +66,7 @@ pub struct HoldemGame<A> {
     rake: CompiledRake,
     game_fingerprint: [u8; 32],
     tree_rule_hits: Option<Vec<std::sync::atomic::AtomicBool>>,
+    completed_tree_rule_hits: Option<Vec<bool>>,
 }
 
 impl<A: MultiwayAbstraction> HoldemGame<A> {
@@ -100,6 +125,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             rake: compiled_rake,
             game_fingerprint,
             tree_rule_hits: None,
+            completed_tree_rule_hits: None,
         })
     }
 
@@ -110,6 +136,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     /// Enable common-input rule diagnostics for tree construction only.
     /// Atomic flags allow the parallel materializer to OR condition matches.
     pub fn with_tree_rule_hits(mut self) -> Self {
+        self.completed_tree_rule_hits = None;
         self.tree_rule_hits = Some(
             self.config
                 .betting
@@ -118,16 +145,35 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 .map(|_| std::sync::atomic::AtomicBool::new(false))
                 .collect(),
         );
+        // The root itself may contain forced preflop turns.
+        self.root = crate::betting::from_config_with_policy(
+            &self.config,
+            &RecordingPolicy {
+                betting: &self.config.betting,
+                rules: &self.config.betting.nlh_rules,
+                hits: self.tree_rule_hits.as_ref().expect("enabled hits"),
+            },
+        )
+        .expect("validated root");
         self
     }
 
     /// Condition matches recorded so far; completeness belongs to the caller.
     pub fn tree_rule_hits(&self) -> Option<Vec<bool>> {
+        if let Some(hits) = &self.completed_tree_rule_hits {
+            return Some(hits.clone());
+        }
         self.tree_rule_hits.as_ref().map(|hits| {
             hits.iter()
                 .map(|hit| hit.load(std::sync::atomic::Ordering::Relaxed))
                 .collect()
         })
+    }
+
+    /// Retain diagnostics while returning solver traversal to the plain policy.
+    pub(crate) fn finish_tree_rule_hits(&mut self) {
+        self.completed_tree_rule_hits = self.tree_rule_hits();
+        self.tree_rule_hits = None;
     }
 
     /// The card abstraction backing this game. Exposed so callers (e.g. the
@@ -679,8 +725,21 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
             })
             .clone();
         let mut next = state.clone();
-        next.apply_from_actions(action, actions, self.betting_for_state(state))
+        let betting = self.betting_for_state(state);
+        if let Some(hits) = &self.tree_rule_hits {
+            next.apply_action(
+                action,
+                &RecordingPolicy {
+                    betting,
+                    rules: &self.config.betting.nlh_rules,
+                    hits,
+                },
+            )
             .expect("legal action must apply");
+        } else {
+            next.apply_from_actions(action, actions, betting)
+                .expect("legal action must apply");
+        }
         next
     }
 
@@ -1020,6 +1079,38 @@ mod tests {
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
         }
+    }
+
+    #[test]
+    fn p2_settlement_uses_the_common_rake_rounding_unit() {
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 5\n[economics.rake]\nrate = 0.1\n";
+        let settle = |raw: &str| {
+            let prepared = crate::prepare::prepare(raw, std::path::Path::new("unit.toml")).unwrap();
+            let game = HoldemGame::new(
+                &prepared.lowered.game,
+                &prepared.lowered.utility,
+                &prepared.lowered.rake,
+                FeatureHashAbstraction::default(),
+            )
+            .unwrap();
+            let world = SampledWorld::new(
+                [("As", "Ah"), ("Ks", "Kh"), ("Qs", "Qh")]
+                    .map(|(a, b)| combo_index(a.parse().unwrap(), b.parse().unwrap()))
+                    .to_vec(),
+                ["2c", "3d", "4h", "7s", "9c"].map(|c| c.parse().unwrap()),
+            )
+            .unwrap();
+            game.settle_terminal(&manual_three_way_allin(), &world)
+                .unwrap()
+        };
+        let fine = settle(raw);
+        let coarse = settle(&(raw.to_owned() + "rounding_unit_bb = 0.5\n"));
+        assert_eq!(fine.total_rake, MwChips(700));
+        assert_eq!(coarse.total_rake, MwChips(500));
+        assert_eq!(
+            coarse.final_stacks[SeatId(0)] - fine.final_stacks[SeatId(0)],
+            MwChips(200)
+        );
     }
 
     /// Correctness oracle: for a fixed side-pot showdown and fixed

@@ -36,7 +36,7 @@ terminal payoffは次の順に作る。
 4. 木のeffective stack上の分配を実際のstackへ写し、utilityを計算する。
 5. utility baselineを引き、solver payoffへ焼き込む。
 
-rakeは全matched potに率を掛け、0.001 BBへ丸め、capを適用する。
+rakeは全matched potに率を掛け、`rounding_unit_bb`の倍数へ丸め、capを適用する。
 P1のhand factsは`flop_dealt = true`、`players_dealt = table.players`、`players_saw_flop = 2`である。
 `showdown`と`won_without_showdown`はterminalで決まる。
 単一potであるため`allocation`による結果差は無い。条件文法と丸めは共通Input第6節に従う。

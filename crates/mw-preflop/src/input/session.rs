@@ -34,7 +34,7 @@ pub fn build_session<A: MultiwayAbstraction>(
         .with_tree_rule_hits();
     let sampler = game.deal_sampler().map_err(|e| error(e.to_string()))?;
     let mut checkpoint_runtime = None;
-    let solver = if let Some(path) = resume_checkpoint {
+    let mut solver = if let Some(path) = resume_checkpoint {
         use crate::ExternalSamplingGame;
         let configuration = configuration_fingerprint_for_setup(&game, &sampler, input.solver);
         let abstraction =
@@ -63,6 +63,7 @@ pub fn build_session<A: MultiwayAbstraction>(
         )
     }
     .map_err(|e| error(e.to_string()))?;
+    solver.game_mut().finish_tree_rule_hits();
     Ok(Session {
         solver,
         game_config: input.game,

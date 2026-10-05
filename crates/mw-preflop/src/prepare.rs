@@ -94,7 +94,18 @@ fn oracle_rule_hits(p: &Prepared) -> Result<Vec<bool>> {
     let rules = &p.document.spot.tree.compiled.rules;
     let mut hits = vec![false; rules.len()];
     let game = p.lowered.game.validated()?;
-    let root = crate::BettingState::from_config(&game)?;
+    // Independent walk retains single-action turns instead of eliding them.
+    // Thus condition matches at forced turns are observed like any decision.
+    struct OraclePolicy<'a>(&'a crate::BettingConfig);
+    impl nlh::StreetPolicy for OraclePolicy<'_> {
+        fn forced_action(&self, _: &crate::BettingState, _: nlh::SeatId) -> Option<crate::Action> {
+            None
+        }
+        fn skip_street(&self, street: nlh::Street, players: u8) -> bool {
+            nlh::StreetPolicy::skip_street(self.0, street, players)
+        }
+    }
+    let root = crate::betting::from_config_with_policy(&game, &OraclePolicy(&game.betting))?;
     let mut seen: Vec<Option<Vec<u8>>> = vec![None; 1 << 16];
     fn visit(
         state: crate::BettingState,
@@ -134,7 +145,7 @@ fn oracle_rule_hits(p: &Prepared) -> Result<Vec<bool>> {
             .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
         for action in &actions {
             let mut next = state.clone();
-            next.apply_from_actions(action.clone(), &actions, betting)?;
+            next.apply_action(action.clone(), &OraclePolicy(betting))?;
             visit(next, betting, rules, hits, seen, depth + 1)?;
         }
         Ok(())
@@ -239,11 +250,13 @@ mod tests {
     }
 
     #[test]
-    fn hits_count_conditions_even_without_menu_changes_and_skip_checkdown_streets() {
+    fn hits_count_conditions_even_without_menu_changes_and_at_forced_turns() {
         let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = '''\npreflop when players == 3 { remove bet }\npreflop when players == 9 { add raise [a] }\nflop, turn, river { checkdown }\n'''\n";
         assert_eq!(
             compare_hits(raw, Path::new("checkdown.toml")),
-            [true, false, false, false, false]
+            // The three postflop rules match at elided checks. Conditions,
+            // rather than menu changes or retained decision nodes, count.
+            [true, false, true, true, true]
         );
         compare_hits(
             "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 2\n",
@@ -270,6 +283,12 @@ mod tests {
         assert_eq!(game.tree_rule_hits().unwrap(), [false]);
         crate::tree::preflight_arena(&game, u64::MAX).unwrap();
         assert_eq!(game.tree_rule_hits().unwrap(), [true]);
+    }
+
+    #[test]
+    fn forced_root_turns_and_later_matching_rules_record_hits() {
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = '''preflop when position == BTN { checkdown remove bet } flop, turn, river { checkdown }'''\n";
+        assert_eq!(compare_hits(raw, Path::new("forced-root.toml")), [true; 5]);
     }
     #[test]
     fn resource_refusals_name_the_actual_limit() {

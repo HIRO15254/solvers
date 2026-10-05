@@ -385,7 +385,6 @@ fn fold_check_call_rules_source_order_and_no_script() {
     for script in [
         "river { remove check }",
         "river { force raise [1bb] }",
-        "river { add bet [1bb] } river when !unopened { checkdown }",
         "river { add bet [1bb] } river when !unopened { force check [] }",
         "river { force bet [1bb] remove bet }",
     ] {
@@ -414,6 +413,56 @@ fn fold_check_call_rules_source_order_and_no_script() {
     let g = game(&config(&included));
     assert_eq!(actions(&g, ""), ["x", "r97500"]);
     assert_eq!(actions(&g, "r97500"), ["f", "c"]);
+}
+
+#[test]
+fn checkdown_facing_bet_is_a_solvable_fold_node_and_later_rules_edit_it() {
+    use hu_engine::{Dcfr, F32Storage, Solver};
+    let raw = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d Ac 9s",
+        "river { add bet [1bb] } river when !unopened { checkdown }",
+    );
+    let g = game(&config(&raw));
+    assert_eq!(actions(&g, "r1000"), ["f"]);
+    let mut solver = Solver::<_, F32Storage>::new(g.game, Box::<Dcfr>::default(), Some(32));
+    solver.run(32);
+    let ev = solver.expected_value(Player::P0);
+    assert!(ev.is_finite() && ev.abs() <= 5500.0, "{ev}");
+
+    let g = game(&config(&raw.replace("checkdown", "checkdown add call []")));
+    assert_eq!(actions(&g, "r1000"), ["f", "c"]);
+    let g = game(&config(&raw.replace(
+        "river { add bet [1bb] } river when !unopened { checkdown }",
+        "river { checkdown add bet [1bb] }",
+    )));
+    assert_eq!(actions(&g, ""), ["x", "r1000"]);
+}
+
+#[test]
+fn p1_payoff_uses_the_common_rake_rounding_unit() {
+    use hu_postflop::game::{TerminalDescriptor, TerminalKind};
+    use hu_postflop::input::NlhPayoff;
+    use nlh::PerPlayer;
+    let raw = standard("") + "[economics.rake]\nrate = 0.1\n";
+    let terminal = TerminalDescriptor {
+        kind: TerminalKind::Showdown,
+        street: Street::River,
+        pot: Chips(5500),
+        contrib: PerPlayer::new(Chips(2750), Chips(2750)),
+        stacks_before: PerPlayer::new(Chips(100000), Chips(100000)),
+    };
+    let fine = NlhPayoff::new(&parse(&raw).spot)
+        .unwrap()
+        .pipeline()
+        .bake(&terminal);
+    let coarse = NlhPayoff::new(&parse(&(raw + "rounding_unit_bb = 0.5\n")).spot)
+        .unwrap()
+        .pipeline()
+        .bake(&terminal);
+    assert!((coarse.win_p0[Player::P0] - fine.win_p0[Player::P0] - 0.05).abs() < 1e-12);
+    assert_eq!(fine.win_p0[Player::P1], coarse.win_p0[Player::P1]);
 }
 
 #[test]

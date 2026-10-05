@@ -31,12 +31,15 @@ impl PotRake for CompiledRake {
                 cap,
                 when,
                 rounding,
+                rounding_unit,
                 ..
             } => {
                 if !when.matches(rake_context) {
                     MwChips::ZERO
                 } else {
-                    let value = percentage_with_rounding(gross, rate, rounding);
+                    // A coarse unit can round past the pot; the rake never exceeds it.
+                    let value =
+                        percentage_with_rounding(gross, rate, rounding, rounding_unit).min(gross);
                     cap.map_or(value, |cap| value.min(cap))
                 }
             }
@@ -106,14 +109,19 @@ fn percentage(amount: MwChips, rate: f64) -> MwChips {
     MwChips((amount.raw() as f64 * rate).floor() as u64)
 }
 
-fn percentage_with_rounding(amount: MwChips, rate: f64, rounding: RakeRounding) -> MwChips {
-    let exact = amount.raw() as f64 * rate;
+fn percentage_with_rounding(
+    amount: MwChips,
+    rate: f64,
+    rounding: RakeRounding,
+    unit: MwChips,
+) -> MwChips {
+    let exact = amount.raw() as f64 * rate / unit.raw() as f64;
     let rounded = match rounding {
         RakeRounding::Down => exact.floor(),
         RakeRounding::Nearest => exact.round(),
         RakeRounding::Up => exact.ceil(),
     };
-    MwChips(rounded as u64)
+    MwChips((rounded as u64).saturating_mul(unit.raw()))
 }
 
 #[cfg(test)]
@@ -202,6 +210,7 @@ mod tests {
                 when: crate::rake_condition::compile("true").unwrap(),
                 allocation: RakeAllocation::MainFirst,
                 rounding: RakeRounding::Down,
+                rounding_unit: MwChips(1),
             },
         )
         .unwrap();
@@ -209,11 +218,11 @@ mod tests {
         assert_eq!(rated.pots[0].rake, MwChips(12));
         assert!(rated.pots[1..].iter().all(|pot| pot.rake == MwChips::ZERO));
         assert_eq!(
-            percentage_with_rounding(MwChips(15), 0.1, RakeRounding::Nearest),
+            percentage_with_rounding(MwChips(15), 0.1, RakeRounding::Nearest, MwChips(1)),
             MwChips(2)
         );
         assert_eq!(
-            percentage_with_rounding(MwChips(11), 0.1, RakeRounding::Up),
+            percentage_with_rounding(MwChips(11), 0.1, RakeRounding::Up, MwChips(1)),
             MwChips(2)
         );
     }
@@ -235,5 +244,58 @@ mod tests {
         .unwrap();
         assert_eq!(settled.total_rake, MwChips::ZERO);
         assert_eq!(settled.final_stacks[SeatId(0)], MwChips(200));
+    }
+
+    #[test]
+    fn half_bb_units_round_then_cap_without_rounding_the_cap() {
+        for (pot, expected) in [
+            (6000, [500, 500, 1000]),
+            (7500, [500, 1000, 1000]),
+            (10000, [1000, 1000, 1000]),
+        ] {
+            for (mode, expected) in [RakeRounding::Down, RakeRounding::Nearest, RakeRounding::Up]
+                .into_iter()
+                .zip(expected)
+            {
+                assert_eq!(
+                    percentage_with_rounding(MwChips(pot), 0.1, mode, MwChips(500)),
+                    MwChips(expected)
+                );
+            }
+        }
+        let state = manual(&[5000, 5000], &[0, 0], &[SeatStatus::AllIn; 2]);
+        let rated = build_rated_pots(
+            &state,
+            CompiledRake::Generic {
+                rate: 0.1,
+                cap: Some(MwChips(725)),
+                when: crate::rake_condition::compile("true").unwrap(),
+                allocation: RakeAllocation::MainFirst,
+                rounding: RakeRounding::Up,
+                rounding_unit: MwChips(500),
+            },
+        )
+        .unwrap();
+        assert_eq!(rated.pots[0].rake, MwChips(725));
+        assert_eq!(rated.pots[0].net, MwChips(9275));
+    }
+
+    #[test]
+    fn a_unit_larger_than_the_pot_takes_at_most_the_pot() {
+        let state = manual(&[1000, 1000], &[0, 0], &[SeatStatus::AllIn; 2]);
+        let rated = build_rated_pots(
+            &state,
+            CompiledRake::Generic {
+                rate: 0.05,
+                cap: None,
+                when: crate::rake_condition::compile("true").unwrap(),
+                allocation: RakeAllocation::MainFirst,
+                rounding: RakeRounding::Up,
+                rounding_unit: MwChips(10_000),
+            },
+        )
+        .unwrap();
+        assert_eq!(rated.pots[0].rake, MwChips(2000));
+        assert_eq!(rated.pots[0].net, MwChips::ZERO);
     }
 }
