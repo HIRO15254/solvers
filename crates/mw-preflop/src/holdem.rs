@@ -1,6 +1,7 @@
 //! Production adapter joining the betting, deal, settlement, utility, and
 //! abstraction layers into one generative no-limit Hold'em game.
 
+use crate::betting::BettingMenu;
 use std::sync::{Arc, Mutex};
 
 use nlh::{combo_cards, rank_of};
@@ -53,7 +54,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
     ) -> Result<Self, HoldemGameError> {
         config.validate_economics(utility, rake)?;
         let validated = config.validated()?;
-        let root = BettingState::new(&validated)?;
+        let root = BettingState::from_config(&validated)?;
         let compiled_rake = rake.compile()?;
         let utility_runtime = match utility {
             UtilityConfig::ChipEv => UtilityRuntime::ChipEv,

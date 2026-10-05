@@ -53,10 +53,10 @@ crates/
 │               # compare / report
 ├── protocol    # versioned wire types for the job daemon
 ├── daemon      # `solversd`: creates run directories and spawns the CLI
-├── nlh         # card/chip/street types, ranges, evaluator, tree-script front end, suit isomorphism
+├── nlh         # card/range/evaluator, shared 2–9 seat NLH rules and settlement, sizing, tree-script, suit isomorphism
 ├── cfr-ref     # frozen scalar CFR oracle for differential testing
 ├── hu-engine   # hot core: public tree, storage, discount schedules, vector CFR, best response
-├── mw-preflop  # generative 2–9 seat NLHE + external-sampling MCCFR + EHS² buckets + .mwsol + metrics
+├── mw-preflop  # P2 menu policy + external-sampling MCCFR + EHS² buckets + .mwsol + metrics
 ├── runfiles    # run-directory contracts, progress metrics, config hashing
 └── hu-postflop # exact multi-street postflop, payoff pipeline, toy games, aggregation/equity helpers, .sol/checkpoint
 ```

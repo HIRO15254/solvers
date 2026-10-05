@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::ops::{Add, AddAssign, Index, IndexMut, Sub};
 
@@ -41,12 +42,35 @@ impl fmt::Display for Chips {
 }
 
 /// Betting street. `Preflop` doubles as "the only street" in toy games.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum Street {
     Preflop,
     Flop,
     Turn,
     River,
+}
+
+impl Street {
+    pub const ALL: [Self; 4] = [Self::Preflop, Self::Flop, Self::Turn, Self::River];
+
+    pub const fn index(self) -> usize {
+        match self {
+            Self::Preflop => 0,
+            Self::Flop => 1,
+            Self::Turn => 2,
+            Self::River => 3,
+        }
+    }
+
+    pub const fn next(self) -> Option<Self> {
+        match self {
+            Self::Preflop => Some(Self::Flop),
+            Self::Flop => Some(Self::Turn),
+            Self::Turn => Some(Self::River),
+            Self::River => None,
+        }
+    }
 }
 
 /// One of the two players. The engine is intentionally heads-up only; this

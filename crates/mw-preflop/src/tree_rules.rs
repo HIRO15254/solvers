@@ -20,10 +20,10 @@
 
 use std::collections::BTreeMap;
 
-use nlh::SizeUnit;
 use nlh::script::{
     ActionKind, Condition, Dialect, Script, ScriptError, Value, VarKind, VarSource, Vars,
 };
+use nlh::{SizeUnit, position_name};
 
 use crate::betting::{BettingState, SeatStatus};
 use crate::config::{RuleStreet, TreeRule};
@@ -240,33 +240,6 @@ pub(crate) fn matches(rule: &TreeRule, state: &BettingState, actor: SeatId) -> b
     rule.street.matches(state.street) && rule.compiled().eval(&(state, actor))
 }
 
-/// The identifier this seat plays under, computed from the button offset for
-/// two through nine seats. A fixed small vocabulary, so every arm is
-/// `&'static str` and nothing here allocates.
-fn position_name(actor: SeatId, button: SeatId, seats: usize) -> &'static str {
-    const LABELS: [&[&str]; 8] = [
-        &["BTN", "BB"],
-        &["BTN", "SB", "BB"],
-        &["CO", "BTN", "SB", "BB"],
-        &["HJ", "CO", "BTN", "SB", "BB"],
-        &["UTG", "HJ", "CO", "BTN", "SB", "BB"],
-        &["UTG", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
-        &["UTG", "UTG1", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
-        &["UTG", "UTG1", "UTG2", "LJ", "HJ", "CO", "BTN", "SB", "BB"],
-    ];
-    let labels = LABELS[seats - 2];
-    let offset = (actor.index() + seats - button.index()) % seats;
-    if seats == 2 {
-        return labels[offset];
-    }
-    match offset {
-        0 => "BTN",
-        1 => "SB",
-        2 => "BB",
-        _ => labels[offset - 3],
-    }
-}
-
 fn is_in_position(state: &BettingState, actor: SeatId) -> bool {
     if state.street == crate::types::Street::Preflop {
         return position_name(actor, state.button, state.num_seats()) == "BTN";
@@ -325,6 +298,7 @@ fn spr(state: &BettingState, actor: SeatId) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::betting::BettingMenu;
     use crate::config::{
         AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, RuleAction,
         RuleEffect, RuleStreet, SeatConfig,
@@ -365,7 +339,7 @@ mod tests {
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
         };
-        let state = BettingState::new(&config.validated().unwrap()).unwrap();
+        let state = BettingState::from_config(&config.validated().unwrap()).unwrap();
         let raise_rule = rule(
             "unopened && position in [\"UTG\", \"HJ\"] && players == 6 && spr > 1",
             RuleStreet::Preflop,
@@ -400,7 +374,7 @@ mod tests {
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
         };
-        let mut state = BettingState::new(&config.validated().unwrap()).unwrap();
+        let mut state = BettingState::from_config(&config.validated().unwrap()).unwrap();
 
         // In a six-handed table with BTN=0, fixed postflop order is
         // SB(1), BB(2), UTG(3), HJ(4), CO(5), BTN(0).

@@ -26,7 +26,7 @@ pub use abstraction::{
     FeatureHashParams, MultiwayAbstraction, MultiwayAbstractionBackend, StreetBucketCounts,
     TableAbstractionAdapter, ehs2_table_fingerprint,
 };
-pub use betting::{Action, BettingState, SeatStatus};
+pub use betting::{Action, BettingMenu, BettingState, SeatStatus};
 pub use checkpoint::{
     CHECKPOINT_VERSION, CheckpointError, MultiwayCheckpoint, MultiwayCheckpointHeader,
 };

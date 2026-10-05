@@ -1,3 +1,4 @@
+use mw_preflop::betting::BettingMenu;
 use std::path::{Path, PathBuf};
 
 use cli::config::GameSection;
@@ -19,7 +20,7 @@ fn fixture() -> (mw_preflop::config::ValidatedMultiwayConfig, BettingState) {
         panic!("fixture must lower to multiway game");
     };
     let validated = game.validated().expect("validating limp fixture");
-    let state = BettingState::new(&validated).expect("building root state");
+    let state = BettingState::from_config(&validated).expect("building root state");
     (validated, state)
 }
 

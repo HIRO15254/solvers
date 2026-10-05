@@ -255,7 +255,7 @@ impl<A: CardAbstraction> MultiwayAbstraction for TableAbstractionAdapter<A> {
     fn num_buckets(&self, street: Street, _active_opponents: u8) -> u32 {
         match street {
             Street::Preflop => NUM_CLASSES as u32,
-            _ => self.inner.num_buckets(to_cards_street(street)),
+            _ => self.inner.num_buckets(street),
         }
     }
 
@@ -420,15 +420,6 @@ fn street_index(street: Street) -> u8 {
         Street::Flop => 1,
         Street::Turn => 2,
         Street::River => 3,
-    }
-}
-
-fn to_cards_street(street: Street) -> nlh::Street {
-    match street {
-        Street::Preflop => nlh::Street::Preflop,
-        Street::Flop => nlh::Street::Flop,
-        Street::Turn => nlh::Street::Turn,
-        Street::River => nlh::Street::River,
     }
 }
 

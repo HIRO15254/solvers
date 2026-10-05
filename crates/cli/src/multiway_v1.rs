@@ -1778,6 +1778,7 @@ fn default_target() -> Target {
 mod tests {
     use super::*;
     use mw_preflop::abstraction::FeatureHashAbstraction;
+    use mw_preflop::betting::BettingMenu;
     use mw_preflop::holdem::HoldemGame;
     use mw_preflop::solver::ExternalSamplingGame;
 
@@ -2217,7 +2218,7 @@ ante_bb = 0.125
             panic!()
         };
         let validated = game.validated().unwrap();
-        let state = mw_preflop::BettingState::new(&validated).unwrap();
+        let state = mw_preflop::BettingState::from_config(&validated).unwrap();
         assert_eq!(state.to_act, Some(SeatId::new_unchecked(4)));
         assert_eq!(state.big_blind.raw(), 2_000);
         assert_eq!(state.current_wager(SeatId::new_unchecked(1)).raw(), 0);
@@ -2259,7 +2260,7 @@ ante_bb = 0.125
             panic!()
         };
         let validated = game.validated().unwrap();
-        let state = mw_preflop::BettingState::new(&validated).unwrap();
+        let state = mw_preflop::BettingState::from_config(&validated).unwrap();
         let actions = state.legal_actions(&validated.betting).unwrap();
         assert!(actions.iter().any(|action| matches!(
             action,

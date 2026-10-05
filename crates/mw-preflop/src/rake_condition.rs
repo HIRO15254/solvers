@@ -1,10 +1,4 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RakeConditionContext {
-    pub flop_dealt: bool,
-    pub showdown: bool,
-    pub players_dealt: u8,
-    pub players_saw_flop: u8,
-}
+pub use nlh::settlement::RakeConditionContext;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompiledRakeCondition {

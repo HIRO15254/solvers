@@ -42,7 +42,9 @@ solvers (crates/cli)
 solver core + runfiles
 ```
 
-domain crate は HTTP、job、画面状態を知らない。`protocol` は request/response を定義し、
+domain crate は HTTP、job、画面状態を知らない。共有の table 型・2–9 seat NLH betting・精算は `nlh`、
+P2 の menu / tree policy と現行 rake adapter は `mw-preflop` に置く。CLI は `BettingMenu` を通じて
+P2 の root state と合法 menu を取得し、共有 state の wire / artifact 形状は維持する。`protocol` は request/response を定義し、
 run の型を `runfiles` から再利用する。`runfiles` は solver crate に依存せず、
 `daemon` の workspace 依存は `runfiles` と `protocol` のみである。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
 

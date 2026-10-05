@@ -51,11 +51,11 @@ crates/
 ├── cli/          # solvers: 公開schema/normalizer、session、run lifecycle、artifact query
 ├── protocol/     # daemon の versioned request/response 型
 ├── daemon/       # solversd: CLI child process、queue、HTTP、token/TLS
-├── nlh/          # card/range/evaluator、HU基本型、bet size、tree-script front end、suit同型
+├── nlh/          # card/range/evaluator、HU基本型、2–9 seat NLH規則・精算、size解決、tree-script、suit同型
 ├── cfr-ref/      # 凍結 scalar CFR / BR oracle
 ├── hu-engine/    # HU PublicTree、storage、CFR/BR、chance-sampled McSolver
 ├── hu-postflop/  # HU postflop、kernel、viewer helper、payoff pipeline、Kuhn/Leduc、.sol、checkpoint
-├── mw-preflop/   # 2–9 seat NLHE、dense arena、sampled solver、checkpoint、.mwsol、metrics、EHS² bucket と cache
+├── mw-preflop/   # P2 menu policy、dense arena、sampled solver、checkpoint、.mwsol、metrics、EHS² bucket と cache
 └── runfiles/     # metrics、run-directory DTO/codec、config hash
 ```
 
@@ -80,6 +80,14 @@ cli                                 → nlh, hu-engine, hu-postflop, mw-preflop,
 
 HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snapshot DTO や共通ゲーム記述を
 別 crate にする場合も、既存形式・oracle 独立性・hot path を維持できる根拠を先に作る。
+
+共有の table 型・position 語彙は `nlh::table`、forced bet・min-raise・all-in・street 遷移は
+`nlh::betting`、side pot・uncalled refund・odd chip・conservation は `nlh::settlement` が所有する。
+`BettingState::new(&TableSetup, &P)` は `P: StreetPolicy` を通じて製品の check-down / street skip を呼ぶ。
+size literal の解決と NLH legality は共有 state の query に置き、P2 のサイズ選択・limp・raise cap・tree rule は
+`mw_preflop::betting::BettingMenu` に置く。`from_config` が root で一度だけ `TableSetup` を組む。
+精算の `PotRake` は generic で、現行 `CompiledRake` の実装・ICM・utility config は引き続き `mw-preflop` にある。
+旧 `mw_preflop::{types,betting,settlement}` の型・精算 API は共有型への re-export を維持する。
 
 ## 3. コア表現(hu-engine crate)
 

@@ -1,4 +1,4 @@
-//! Card, chip, and range primitives shared by all solver crates.
+//! Card, chip, range, table betting and settlement rules shared by the NLH products.
 //!
 //! This crate has no dependency on the engine or any game variant. Card
 //! encoding follows `index = 4 * rank + suit` with rank `0 = Two .. 12 = Ace`
@@ -30,3 +30,13 @@ pub use range::{
 pub use set::CardSet;
 pub use sizing::{ParseSizeError, SizeSpec, SizeUnit, geometric_allin_target};
 pub use types::{Chips, PerPlayer, Player, Street};
+
+pub mod betting;
+pub mod settlement;
+pub mod table;
+pub use betting::{NoStreetPolicy, StreetPolicy, TableSetup};
+pub use settlement::PotRake;
+pub use table::{
+    CHIPS_PER_BB, ChipAmountError, MAX_SEATS, MIN_SEATS, MwChips, SeatError, SeatId, SeatMask,
+    SeatVec, position_name, validate_seat_count,
+};
