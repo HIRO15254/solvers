@@ -793,12 +793,13 @@ max_time = "12h"
 | Q11 | 丸めたrakeがpotを超える場合 | potの額とする（第6節） |
 | Q12 | deriveのtreeと計算設定 | 既定でP2のtreeを引き継ぎ、Flop以降の`checkdown`を警告する。`--base`のfileから`[tree]`・`[solver]`・`[output]`・`[run]`を差し替えられ、baseの`[table]`・`[economics]`がP2と違えばerror（CLI reference） |
 | Q13 | deriveで未訪問のnode×class | weight 0として除き、席ごとに警告する（CLI reference） |
+| Q14 | deriveの実装時の細則（付録B） | 記載の定めで確定する |
 
 P2の方式と品質保証は製品定義D5により未決定である。
 
 ## 付録B 実装時に定めた事項
 
-次の事項は実装時に定め、2026-10-05のS1完了報告で利用者が確認した（付録AのQ7〜Q11）。
+次の事項は実装時に定め、利用者が確認した（2026-10-05のS1完了報告で付録AのQ7〜Q11、2026-10-06のM8完了報告でQ14）。
 
 | 事項 | 定め | 規定先 |
 |---|---|---|
@@ -821,3 +822,7 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |
 | P2の未使用rule計測（第9節） | 通常の`validate`は未検査を表示する。`validate --resources`のcountと`solve` / `resume`の木構築で実測し、打切り時は不完全として未一致警告を出さない | 第9節・未使用ruleの警告 |
 | `config new`のflag | `--product p2\|p1`（既定`p2`）、`--template minimal\|full`（既定`minimal`）、`--out`を受ける。全templateは共通Input。`full`は同じ製品の`minimal`を正規化した実効configで、節ごとの短いcommentを付ける。既定の無い任意keyは省略する | 第13節・CLI規範 |
+| deriveの強制x/f | P2の`checkdown`がdecision nodeなしで適用したcheck・foldは、lineの同じaction（暗黙のfoldを含む）と一致する（Q14） | CLI reference |
+| deriveの未訪問警告 | 開始rangeにweightのあるclassだけを対象にする（Q14） | CLI reference |
+| deriveでbaseに無い設定 | `[solver]`・`[output]`・`[run]`はP1の既定値とし、P2の値を持ち込まない（Q14） | CLI reference |
+| deriveでmanifestが読めない | exit 3とし、run idを推測しない（Q14） | CLI reference |

@@ -279,7 +279,7 @@ solvers derive RUN --line LINE --board BOARD [--base PATH] [--out PATH]
 
 P2の解から、line・boardで始まるP1のInputを生成する。
 `solution.mwsol`に埋め込まれたP2の実効config、public tree、Preflopの平均戦略を使う。
-`solution.mwsol`が無い、破損している、旧入力を埋め込んでいる場合はexit 3である。
+`solution.mwsol`が無い、破損している、旧入力を埋め込んでいる場合と、manifestが読めない場合はexit 3である。
 manifestの状態がcompleted以外でもsolutionがあれば使い、その状態を警告する。
 
 lineはP2の卓で再生する。暗黙のfoldを含む全actionがP2のpublic treeに無ければならない。
@@ -290,13 +290,14 @@ P2はPostflop戦略を提供しないため、生成するspotはFlop開始だ�
 
 手に残る2人のrangeは、各席のP2開始rangeのcombo weightに、line上でその席が取った各actionの
 平均確率（169 class）を掛けたweightである。他の席のactionとfoldした席のcard removalは使わない。
-一度も訪問されなかったnode×classはweight 0とし、除いたclassを席ごとに警告する。
+一度も訪問されなかったnode×classはweight 0とし、開始rangeにあって除いたclassを席ごとに警告する。
 weightが全て0になった席があればexit 2である。
 
 生成するInputは、P2の`[table]`・`[economics]`・`[tree]`、指定した`[spot]`、計算した`[ranges]`、
 `[meta] derived_from`（run id、`solution.mwsol`のBLAKE3 hex、line、board）を持つ。
 `--base`のfileはschemaが`solvers.nlh/v1`のTOMLで、単独で有効なInputである必要は無い。
 その`[tree]`・`[solver]`・`[output]`・`[run]`を使い、`[tree]`が無ければP2のtreeを引き継ぐ。
+`[solver]`・`[output]`・`[run]`はP2から持ち込まず、baseに無ければP1の既定値である。
 baseの`[meta]`のnameとdescriptionは残す。baseの`[table]`・`[economics]`は、正規化した値がP2と一致しなければexit 2である。
 baseの`[spot]`・`[ranges]`はderiveの値で置き換え、置き換えたことを警告する。
 P2のtreeを引き継ぎ、Flop以降に`checkdown`があれば、P1でも一致した手番がcheckかfoldだけになることを警告する。
