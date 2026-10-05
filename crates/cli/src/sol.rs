@@ -18,7 +18,8 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
-    Dcfr, F32Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array, reach_at,
+    Dcfr, F32Storage, I16Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array,
+    reach_at,
 };
 use hu_postflop::game::{PayoffPipeline, RakeModel, UtilityModel};
 use hu_postflop::sol::{
@@ -352,6 +353,7 @@ pub(crate) struct LoadedSol {
     pub board: Vec<Card>,
     pub river_iterations: u64,
     pub river_target: Option<f64>,
+    pub nlh: Option<(spot::Spot, hu_postflop::input::Settings)>,
 }
 
 /// Reads, verifies, and rebuilds a `.sol` artifact: `hu_postflop::sol::read_sol`
@@ -370,43 +372,55 @@ pub(crate) fn load_sol(
 ) -> Result<LoadedSol> {
     let payload = read_sol(path).with_context(|| format!("reading {}", path.display()))?;
 
-    // An artifact embeds whatever config text produced it, so this reads
-    // both the current families and the shapes older artifacts carry.
-    let config = crate::config::parse_internal_config(&payload.config_toml)
-        .context(".sol artifact's embedded config failed to parse")?;
-    match &config.game {
-        GameSection::Postflop { .. } => {}
-        _ => bail!(".sol artifact's embedded config is not kind = \"postflop\""),
-    }
-    let GameSection::Postflop {
-        board,
-        oop_range,
-        ip_range,
-        pot,
-        effective_stack,
-        iso_merging,
-        min_bet,
-        preflop_aggressor,
-        tree,
-    } = config.game
-    else {
-        unreachable!("checked above");
-    };
+    let nlh = crate::nlh_v1::has_schema(&payload.config_toml)?;
+    let (pf_config, rake, utility, nlh) = if nlh {
+        let p = crate::nlh_v1::prepare(&payload.config_toml, Path::new("embedded.toml"))?;
+        (
+            p.config,
+            Box::new(p.payoff.rake) as Box<dyn RakeModel>,
+            Box::new(p.payoff.utility) as Box<dyn UtilityModel>,
+            Some((p.document.spot, p.settings)),
+        )
+    } else {
+        // An artifact embeds whatever config text produced it, so this reads
+        // both the current families and the shapes older artifacts carry.
+        let config = crate::config::parse_internal_config(&payload.config_toml)
+            .context(".sol artifact's embedded config failed to parse")?;
+        match &config.game {
+            GameSection::Postflop { .. } => {}
+            _ => bail!(".sol artifact's embedded config is not kind = \"postflop\""),
+        }
+        let GameSection::Postflop {
+            board,
+            oop_range,
+            ip_range,
+            pot,
+            effective_stack,
+            iso_merging,
+            min_bet,
+            preflop_aggressor,
+            tree,
+        } = config.game
+        else {
+            unreachable!("checked above");
+        };
 
-    let pf_config = postflop_setup::build_postflop_config(
-        &board,
-        &oop_range,
-        &ip_range,
-        pot,
-        effective_stack,
-        iso_merging,
-        min_bet,
-        tree.lower()?,
-        &preflop_aggressor,
-    )?;
+        let pf_config = postflop_setup::build_postflop_config(
+            &board,
+            &oop_range,
+            &ip_range,
+            pot,
+            effective_stack,
+            iso_merging,
+            min_bet,
+            tree.lower()?,
+            &preflop_aggressor,
+        )?;
+        let rake = crate::economics::build_rake(&config.rake)?;
+        let utility = crate::economics::build_utility(&config.utility)?;
+        (pf_config, rake, utility, None)
+    };
     let board_cards = pf_config.board.clone();
-    let rake = crate::economics::build_rake(&config.rake)?;
-    let utility = crate::economics::build_utility(&config.utility)?;
 
     // stderr, not stdout: `export` writes machine-readable data there, and
     // a progress line in the middle of a CSV would corrupt it.
@@ -416,7 +430,10 @@ pub(crate) fn load_sol(
         rake: rake.as_ref(),
         utility: utility.as_ref(),
     };
-    let pf_game = build_postflop_game(&pf_config, pipeline);
+    let mut pf_game = build_postflop_game(&pf_config, pipeline);
+    if nlh.is_some() {
+        crate::nlh_v1::display_game(&mut pf_game);
+    }
     eprintln!(
         "tree rebuilt in {:.2}s ({} nodes)",
         build_start.elapsed().as_secs_f64(),
@@ -492,6 +509,7 @@ pub(crate) fn load_sol(
         board: board_cards,
         river_iterations,
         river_target,
+        nlh,
     })
 }
 
@@ -543,8 +561,22 @@ impl<S: Storage> StrategyProvider for LiveProvider<'_, S> {
 /// node ids (from `hu_engine::pair_subtrees`), needed to translate a query
 /// against the trunk into a query against the re-solved subgame.
 struct RiverSolve {
-    solver: Solver<PostflopEvaluator, F32Storage>,
+    solver: RiverSolver,
     map: HashMap<NodeId, NodeId>,
+}
+
+enum RiverSolver {
+    F32(Solver<PostflopEvaluator, F32Storage>),
+    I16(Solver<PostflopEvaluator, I16Storage>),
+}
+
+impl RiverSolver {
+    fn average_strategy_at(&self, node: NodeId) -> Vec<f32> {
+        match self {
+            Self::F32(solver) => solver.average_strategy_at(node),
+            Self::I16(solver) => solver.average_strategy_at(node),
+        }
+    }
 }
 
 /// Serves strategies from a loaded `.sol` artifact: a stored block is
@@ -646,7 +678,12 @@ impl<'a> SolProvider<'a> {
             }
         }
 
-        let state = river_entry_state(&loaded.config, &history)
+        let internal_history = if loaded.nlh.is_some() {
+            crate::nlh_v1::convert_history(&history, true)
+        } else {
+            history.clone()
+        };
+        let state = river_entry_state(&loaded.config, &internal_history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
 
@@ -655,46 +692,98 @@ impl<'a> SolProvider<'a> {
             loaded.river_iterations
         );
         let start = Instant::now();
-        let pipeline = PayoffPipeline {
-            rake: loaded.rake.as_ref(),
-            utility: loaded.utility.as_ref(),
+        // The synthetic river tree starts after both players' sunk wagers.
+        // Rebind the v1 payoff to their actual stacks at this entry, keeping
+        // folded table players and the outside field unchanged.
+        let payoff = loaded
+            .nlh
+            .as_ref()
+            .map(|(spot, _)| {
+                let mut spot = spot.clone();
+                let spent = loaded.config.effective_stack.0 - state.effective_stack.0;
+                for player in [&spot.context.oop, &spot.context.ip] {
+                    let seat =
+                        &mut spot.context.seats[player.as_ref().expect("P1 player").seat.index()];
+                    seat.remaining_stack.0 -= spent as u64;
+                    seat.total_contribution.0 += spent as u64;
+                }
+                spot.context.pot.0 = state.pot.0 as u64;
+                spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
+                hu_postflop::input::NlhPayoff::new(&spot)
+            })
+            .transpose()?;
+        let pipeline = if let Some(payoff) = &payoff {
+            payoff.pipeline()
+        } else {
+            PayoffPipeline {
+                rake: loaded.rake.as_ref(),
+                utility: loaded.utility.as_ref(),
+            }
         };
         let sub_game = build_postflop_game(&sub_cfg, pipeline);
+        let rs = if loaded.nlh.as_ref().is_some_and(|(_, settings)| {
+            settings.solver.storage == hu_postflop::input::Storage::I16
+        }) {
+            resolve_river::<I16Storage>(loaded, sub_game.game, entry, start, RiverSolver::I16)?
+        } else {
+            resolve_river::<F32Storage>(loaded, sub_game.game, entry, start, RiverSolver::F32)?
+        };
+        self.river_solves.insert(entry, rs);
+        Ok(())
+    }
+}
 
-        let mut solver = Solver::<PostflopEvaluator, F32Storage>::new(
-            sub_game.game,
-            Box::<Dcfr>::default(),
-            Some(loaded.river_iterations),
-        );
-        let mut done = 0u64;
-        while done < loaded.river_iterations {
-            let chunk = 100.min(loaded.river_iterations - done);
-            solver.run(chunk);
-            done += chunk;
-            if let Some(target) = loaded.river_target {
-                let expl = solver.exploitability();
-                if expl[Player::P0] + expl[Player::P1] < target {
-                    break;
-                }
+fn resolve_river<S: Storage>(
+    loaded: &LoadedSol,
+    game: hu_engine::CompiledGame<PostflopEvaluator>,
+    entry: NodeId,
+    start: Instant,
+    wrap: impl FnOnce(Solver<PostflopEvaluator, S>) -> RiverSolver,
+) -> Result<RiverSolve> {
+    let schedule = loaded
+        .nlh
+        .as_ref()
+        .map(|(_, settings)| crate::nlh_v1::schedule(&settings.solver.algorithm))
+        .unwrap_or_else(|| Box::<Dcfr>::default());
+    let mut solver =
+        Solver::<PostflopEvaluator, S>::new(game, schedule, Some(loaded.river_iterations));
+    if let Some((_, settings)) = &loaded.nlh {
+        solver.set_par(hu_engine::ParConfig {
+            chance_depth: settings.solver.parallel.chance_depth,
+            min_children: settings.solver.parallel.min_children,
+        });
+    }
+    let mut done = 0u64;
+    while done < loaded.river_iterations {
+        let chunk = 100.min(loaded.river_iterations - done);
+        solver.run(chunk);
+        done += chunk;
+        if let Some(target) = loaded.river_target {
+            let expl = solver.exploitability();
+            if expl[Player::P0] + expl[Player::P1] < target {
+                break;
             }
         }
-        let expl = solver.exploitability();
-        let nash_conv = expl[Player::P0] + expl[Player::P1];
-        println!(
-            "done: iterations={} wall={:.2}s nash_conv={:.3e}",
-            solver.iteration(),
-            start.elapsed().as_secs_f64(),
-            nash_conv,
-        );
+    }
+    let expl = solver.exploitability();
+    let nash_conv = expl[Player::P0] + expl[Player::P1];
+    println!(
+        "done: iterations={} wall={:.2}s nash_conv={:.3e}",
+        solver.iteration(),
+        start.elapsed().as_secs_f64(),
+        nash_conv,
+    );
 
-        let map: HashMap<NodeId, NodeId> = pair_subtrees(trunk_tree, entry, &solver.game().tree, 0)
+    let map: HashMap<NodeId, NodeId> =
+        pair_subtrees(&loaded.pf_game.game.tree, entry, &solver.game().tree, 0)
             .map_err(|e| anyhow!("river re-solve produced a structurally different subtree: {e}"))?
             .into_iter()
             .collect();
 
-        self.river_solves.insert(entry, RiverSolve { solver, map });
-        Ok(())
-    }
+    Ok(RiverSolve {
+        solver: wrap(solver),
+        map,
+    })
 }
 
 impl StrategyProvider for SolProvider<'_> {
@@ -745,6 +834,120 @@ mod tests {
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
+
+    #[test]
+    fn v1_river_resolve_uses_embedded_vanilla_and_i16() {
+        let raw = r#"schema='solvers.nlh/v1'
+[table]
+players=2
+stack_bb=21
+[spot]
+line='BTN c, BB x / BB x, BTN x'
+board='2s 7s Ks 2h'
+[ranges]
+BB='44,55'
+BTN='33,66'
+[tree]
+script='turn { replace bet [75] } river { replace bet [100] }'
+[tree.max_aggressive_actions]
+turn=1
+river=1
+[solver]
+storage='i16'
+iso_merging=false
+[solver.algorithm]
+schedule='vanilla'
+[solver.parallel]
+chance_depth=0
+[solver.stop]
+max_iterations=8
+check_every=8
+[output]
+solution_streets='no-rivers'
+[run]
+threads=1
+memory='1GiB'
+"#;
+        let p = crate::nlh_v1::prepare(raw, Path::new("test.toml")).unwrap();
+        let (solver, _) = crate::nlh_v1::query::<I16Storage>(&p, None, None).unwrap();
+        let offset = p.payoff.ev_offset();
+        let expl = solver.exploitability();
+        let summary = RunSummary {
+            canceled: false,
+            iterations: 8,
+            wall: std::time::Duration::ZERO,
+            ev: postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), offset),
+            expl_p0: expl[Player::P0],
+            expl_p1: expl[Player::P1],
+            nash_conv: expl[Player::P0] + expl[Player::P1],
+        };
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("test.sol");
+        super::export_sol(
+            &SolExportSpec {
+                path: path.clone(),
+                mode: SolStreets::NoRivers,
+                config_toml: p
+                    .document
+                    .normalize(&hu_postflop::input::P1Sections)
+                    .unwrap(),
+                storage_name: "i16".into(),
+            },
+            &solver,
+            offset,
+            Street::Turn,
+            &summary,
+        )
+        .unwrap();
+        let loaded = load_sol(&path, 8, None).unwrap();
+        let entry = loaded.pf_game.node_by_history("xr1.5c[9d]").unwrap();
+        let mut provider = SolProvider::new(&loaded);
+        provider.average_strategy(entry).unwrap();
+        let resolved = &provider.river_solves[&entry];
+        assert!(matches!(resolved.solver, RiverSolver::I16(_)));
+        // Independent symmetric cash reference: old chip utility expressed in
+        // BB, with the embedded non-default vanilla schedule and i16 storage.
+        struct BbUtility;
+        impl UtilityModel for BbUtility {
+            fn utility(&self, s: &PerPlayer<f64>) -> PerPlayer<f64> {
+                s.map(|v| v / 1000.0)
+            }
+            fn is_zero_sum_affine(&self) -> bool {
+                true
+            }
+        }
+        let root = &loaded.pf_game.game.root_ranges;
+        let reach = reach_at(
+            &loaded.pf_game.game.tree,
+            PerPlayer::new(root[Player::P0].as_slice(), root[Player::P1].as_slice()),
+            entry,
+            |id, _, out| out.copy_from_slice(&provider.average_strategy(id).unwrap()),
+        );
+        let state = river_entry_state(&loaded.config, "xr1500c[9d]").unwrap();
+        let cfg = river_resolve_config(&loaded.config, &state, &reach);
+        let game = build_postflop_game(
+            &cfg,
+            PayoffPipeline {
+                rake: &hu_postflop::game::NoRake,
+                utility: &BbUtility,
+            },
+        );
+        let mut reference =
+            Solver::<_, I16Storage>::new(game.game, Box::new(hu_engine::Vanilla), Some(8));
+        reference.set_par(hu_engine::ParConfig {
+            chance_depth: 0,
+            min_children: 12,
+        });
+        reference.run(8);
+        for (trunk, sub) in provider.river_solves[&entry].map.clone() {
+            if reference.game().tree.node(sub).kind == NodeKind::Action {
+                assert_eq!(
+                    provider.average_strategy(trunk).unwrap(),
+                    reference.average_strategy_at(sub)
+                );
+            }
+        }
+    }
 
     fn export_sol<S: Storage>(
         spec: &SolExportSpec,

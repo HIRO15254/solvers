@@ -1,0 +1,50 @@
+# Migrated from ../postflop_pio_tree.toml: one old chip = one BB.
+# HU table; pot/effective stack and per-street caps match the scaled fixture.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 205.5
+
+[economics]
+kind = "cash"
+
+# v1 separates cash rake and tournament ICM. Rounding uses the 0.001 BB grid.
+[economics.rake]
+rate = 0.05
+cap_bb = 6
+when = "flop_dealt"
+allocation = "main-first"
+rounding = "down"
+rounding_unit_bb = 0.001
+
+[spot]
+line = "BTN r10.5, BB c"
+board = "Qs Jh 2h"
+
+[ranges]
+BB = "TT+,AQs+,KQs"
+BTN = "JJ-99,AQs-ATs,KQs,QJs"
+
+[tree]
+source = "trees/pio.tree"
+include_allin = true
+allin_threshold = 0.8
+
+[tree.max_aggressive_actions]
+flop = 3
+turn = 2
+river = 2
+
+[tree.params]
+cb = 40
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+check_every = 50
+target = "0.025bb"
+
+[run]
+max_time = "2m"

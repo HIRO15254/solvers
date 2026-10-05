@@ -263,9 +263,9 @@ enum Command {
         #[arg(long)]
         checkpoint_interval: Option<String>,
     },
-    /// Inspect a formal .mwsol artifact, or open the legacy postflop explorer.
+    /// Inspect a formal .mwsol artifact, or open the HU postflop explorer.
     Inspect {
-        /// Path to a .mwsol artifact or legacy postflop config.
+        /// Path to a .mwsol artifact or P1/legacy postflop config.
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
         /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
@@ -284,11 +284,10 @@ enum Command {
         seed: u64,
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
-        /// Overrides `run.iterations` from the config (live solve only).
+        /// Overrides the config's iteration limit (live solve only).
         #[arg(long)]
         iterations: Option<u64>,
-        /// Overrides `run.target_nash_conv` from the config (live solve
-        /// only).
+        /// Overrides the NashConv limit in the config's utility unit (live solve only).
         #[arg(long)]
         target_nash_conv: Option<f64>,
         /// Load a pre-solved `.sol` viewer artifact instead of solving a
@@ -340,9 +339,8 @@ enum Command {
     /// CSV report (one row per board). Uses the configured storage, threads,
     /// and parallel settings; max_time applies separately to each board.
     Report {
-        /// Path to the config file (schema = "solvers.postflop/v1"); its
-        /// own `board` field is ignored in favor of
-        /// `--boards`/`--boards-file`.
+        /// P1/legacy postflop config; replaces its board with --boards/--boards-file.
+        /// For solvers.nlh/v1, each replacement must fit the spot line.
         config: std::path::PathBuf,
         /// Comma-separated boards, each 3/4/5 cards (e.g.
         /// "Ks7h2d,Ks7h2c" or "Ks 7h 2d,Ks 7h 2c").

@@ -17,13 +17,13 @@ pub fn has_schema(raw: &str) -> Result<bool> {
     Ok(value.get("schema").and_then(toml::Value::as_str) == Some(SCHEMA))
 }
 
-struct Prepared {
-    document: spot::Document,
-    settings: Settings,
-    config: hu_postflop::PostflopConfig,
-    payoff: NlhPayoff,
+pub(crate) struct Prepared {
+    pub document: spot::Document,
+    pub settings: Settings,
+    pub config: hu_postflop::PostflopConfig,
+    pub payoff: NlhPayoff,
     effective: String,
-    estimate: hu_postflop::MemoryEstimate,
+    pub estimate: hu_postflop::MemoryEstimate,
     limit: u64,
     target: Option<f64>,
 }
@@ -32,7 +32,7 @@ fn tree_error(error: hu_postflop::TreeBuildError) -> spot::SpotError {
     spot::SpotError::new(spot::Code::NLH003, "tree", error.to_string())
 }
 
-fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
+pub(crate) fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     let document = spot::Document::parse(raw, path)?;
     if document.spot.product != spot::Product::HuPostflop {
         bail!("NLH005: P2 (Multiway Preflop) is not wired to solvers.nlh/v1 yet (M6)");
@@ -68,12 +68,16 @@ fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
 }
 
 fn warnings(p: &Prepared) -> Vec<String> {
+    warnings_for_hits(p, &p.estimate.rule_hits)
+}
+
+pub(crate) fn warnings_for_hits(p: &Prepared, hits: &hu_postflop::RuleHits) -> Vec<String> {
     let mut warnings = Vec::new();
     if p.target.is_none() {
         warnings.push("no stop target: runs until max_iterations or max_time".into());
     }
     for street in [Street::Flop, Street::Turn, Street::River] {
-        for (index, &hit) in p.estimate.rule_hits[street].iter().enumerate() {
+        for (index, &hit) in hits[street].iter().enumerate() {
             if !hit {
                 warnings.push(format!("unmatched {street:?} tree rule {}", index + 1));
             }
@@ -157,14 +161,15 @@ pub fn validate(
                 "valid: schema={SCHEMA} product=P1 (HU Postflop) amounts=BB utility={}",
                 utility_unit(&p)
             );
-            println!("start: {}", serde_json::to_string(&value["start"])?);
-            println!("actions: {}", serde_json::to_string(&value["actions"])?);
-            println!("tree: {}", serde_json::to_string(&value["tree"])?);
+            print!("{}", human_summary(&p));
             for warning in warnings(&p) {
                 println!("warning: {warning}");
             }
             if resources {
-                println!("resources: {}", value["resources"]);
+                println!("resources:");
+                for (key, value) in value["resources"].as_object().expect("resources object") {
+                    println!("  {key}: {value}");
+                }
             }
             if show {
                 println!("\n{}", p.effective);
@@ -181,6 +186,73 @@ fn required_bytes(p: &Prepared) -> u64 {
     }
 }
 
+pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
+    Ok(Some(
+        p.document
+            .spot
+            .run
+            .threads
+            .map(usize::try_from)
+            .transpose()?
+            .unwrap_or(std::thread::available_parallelism()?.get()),
+    ))
+}
+
+/// Read-only solve shared by live inspection and board reports.
+pub(crate) fn query<S: Storage>(
+    p: &Prepared,
+    iterations: Option<u64>,
+    target_nash_conv: Option<f64>,
+) -> Result<(
+    Solver<hu_postflop::PostflopEvaluator, S>,
+    Vec<hu_postflop::PostflopNodeInfo>,
+)> {
+    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
+    let iterations = iterations.unwrap_or(p.settings.solver.stop.max_iterations);
+    if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
+        bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
+    }
+    let mut game =
+        hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline()).map_err(tree_error)?;
+    display_game(&mut game);
+    let mut solver = Solver::<_, S>::new(
+        game.game,
+        schedule(&p.settings.solver.algorithm),
+        Some(iterations),
+    );
+    solver.set_par(ParConfig {
+        chance_depth: p.settings.solver.parallel.chance_depth,
+        min_children: p.settings.solver.parallel.min_children,
+    });
+    let start = Instant::now();
+    let target = target_nash_conv.or(p.target.map(|t| 2.0 * t));
+    while solver.iteration() < iterations {
+        if crate::CLI_CANCEL.load(std::sync::atomic::Ordering::SeqCst)
+            || p.document
+                .spot
+                .run
+                .max_time_seconds
+                .is_some_and(|t| start.elapsed().as_secs_f64() >= t)
+        {
+            break;
+        }
+        solver.run(
+            p.settings
+                .solver
+                .stop
+                .check_every
+                .min(iterations - solver.iteration()),
+        );
+        if let Some(target) = target {
+            let expl = solver.exploitability();
+            if expl[Player::P0] + expl[Player::P1] <= target {
+                break;
+            }
+        }
+    }
+    Ok((solver, game.node_info))
+}
+
 fn utility_unit(p: &Prepared) -> &'static str {
     // The normalized economics kind is authoritative and avoids duplicating the economics enum.
     if p.effective.parse::<toml::Value>().expect("normalized TOML")["economics"]["kind"].as_str()
@@ -190,6 +262,186 @@ fn utility_unit(p: &Prepared) -> &'static str {
     } else {
         "prizes"
     }
+}
+
+/// Exact shortest decimal on the milli-BB grid; also used for query labels.
+pub(crate) fn bb(amount: u64) -> String {
+    let fraction = amount % 1000;
+    if fraction == 0 {
+        (amount / 1000).to_string()
+    } else {
+        format!("{}.{fraction:03}", amount / 1000)
+            .trim_end_matches('0')
+            .into()
+    }
+}
+
+fn human_summary(p: &Prepared) -> String {
+    use std::fmt::Write;
+    let spot = &p.document.spot;
+    let start = &spot.context;
+    let mut out = String::new();
+    writeln!(out, "street: {:?}", start.street).unwrap();
+    writeln!(out, "board: {}", spot.board_text.as_deref().unwrap_or("")).unwrap();
+    writeln!(out, "starting pot: {} BB", bb(start.pot.0)).unwrap();
+    for (role, player) in [("OOP", &start.oop), ("IP", &start.ip)] {
+        let player = player.as_ref().expect("P1 player");
+        let seat = &start.seats[player.seat.index()];
+        writeln!(
+            out,
+            "{role}: {} remaining stack {} BB",
+            player.position,
+            bb(seat.remaining_stack.0)
+        )
+        .unwrap();
+    }
+    writeln!(
+        out,
+        "effective stack: {} BB",
+        bb(start.effective_stack.expect("P1 stack").0)
+    )
+    .unwrap();
+    let folded: Vec<_> = start
+        .seats
+        .iter()
+        .filter(|s| s.folded)
+        .map(|s| s.position.as_str())
+        .collect();
+    writeln!(
+        out,
+        "folded: {}",
+        if folded.is_empty() {
+            "none".into()
+        } else {
+            folded.join(", ")
+        }
+    )
+    .unwrap();
+    let mut line = String::new();
+    let mut street = Street::Preflop;
+    for a in &start.actions {
+        if !line.is_empty() {
+            line.push_str(if a.street != street { " / " } else { ", " });
+        }
+        street = a.street;
+        let action = match a.action {
+            nlh::betting::Action::Fold => "f".into(),
+            nlh::betting::Action::Check => "x".into(),
+            nlh::betting::Action::Call { .. } => "c".into(),
+            nlh::betting::Action::BetTo { all_in: true, .. }
+            | nlh::betting::Action::RaiseTo { all_in: true, .. } => "a".into(),
+            nlh::betting::Action::BetTo { to, .. } => format!("b{}", bb(to.0)),
+            nlh::betting::Action::RaiseTo { to, .. } => format!("r{}", bb(to.0)),
+        };
+        write!(
+            line,
+            "{} {action}{}",
+            a.position,
+            if a.implicit { "*" } else { "" }
+        )
+        .unwrap();
+    }
+    writeln!(out, "line: {line}").unwrap();
+    if start.actions.iter().any(|a| a.implicit) {
+        writeln!(out, "* marks an implied fold").unwrap();
+    }
+    let effective: toml::Value = p.effective.parse().expect("effective config");
+    let economics = &effective["economics"];
+    if utility_unit(p) == "BB" {
+        if let Some(rake) = economics.get("rake") {
+            let number = |v: &toml::Value| {
+                v.as_float()
+                    .map(|v| v.to_string())
+                    .unwrap_or_else(|| v.to_string())
+            };
+            writeln!(
+                out,
+                "economics: cash with rake rate={} cap={} when={}",
+                number(&rake["rate"]),
+                rake.get("cap_bb")
+                    .map(|v| format!("{} BB", number(v)))
+                    .unwrap_or_else(|| "none".into()),
+                rake["when"].as_str().unwrap()
+            )
+            .unwrap();
+        } else {
+            writeln!(out, "economics: cash without rake").unwrap();
+        }
+    } else {
+        let table = spot.table.positions.len();
+        let field = table
+            + economics["outside_field_bb"]
+                .as_array()
+                .expect("ICM field")
+                .len();
+        writeln!(
+            out,
+            "economics: tournament ICM table players={table} field players={field} {}",
+            if field <= 15 { "exact" } else { "sampled" }
+        )
+        .unwrap();
+    }
+    let diagnostics = p.document.summary().tree;
+    for param in diagnostics.params {
+        writeln!(
+            out,
+            "tree param: {} = {} ({})",
+            param.name, param.value, param.kind
+        )
+        .unwrap();
+    }
+    for rule in diagnostics.rules {
+        writeln!(out, "tree rule: {rule}").unwrap();
+    }
+    out
+}
+
+/// Convert display metadata only. The compiled tree and all monetary IR stay in milli-BB.
+pub(crate) fn display_game(game: &mut hu_postflop::PostflopGame) {
+    for info in &mut game.node_info {
+        info.history = convert_history(&info.history, false);
+        for label in &mut info.actions {
+            for prefix in ["bet ", "raise to "] {
+                if let Some(amount) = label.strip_prefix(prefix) {
+                    *label = format!("{prefix}{}", bb(amount.parse().expect("builder amount")));
+                    break;
+                }
+            }
+        }
+    }
+}
+
+pub(crate) fn convert_history(history: &str, to_internal: bool) -> String {
+    let mut chars = history.chars().peekable();
+    let mut result = String::new();
+    while let Some(c) = chars.next() {
+        result.push(c);
+        if c == '[' {
+            for c in chars.by_ref() {
+                result.push(c);
+                if c == ']' {
+                    break;
+                }
+            }
+        } else if c == 'r' {
+            let mut amount = String::new();
+            while chars
+                .peek()
+                .is_some_and(|c| c.is_ascii_digit() || *c == '.')
+            {
+                amount.push(chars.next().unwrap());
+            }
+            if to_internal {
+                let amount =
+                    nlh::MwChips::try_from_bb(amount.parse().expect("display history amount"))
+                        .expect("BB history grid");
+                result.push_str(&amount.0.to_string());
+            } else {
+                result.push_str(&bb(amount.parse().expect("builder history amount")));
+            }
+        }
+    }
+    result
 }
 
 /// Compatibility stamp deliberately omits the operating settings in [run].
@@ -384,7 +636,7 @@ fn execute(
     recorder.finish(outcome.map(|_| ()), completion)
 }
 
-fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
+pub(crate) fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
     match algorithm {
         Algorithm::Vanilla => Box::new(hu_engine::Vanilla),
         Algorithm::CfrPlus => Box::new(hu_engine::CfrPlus),

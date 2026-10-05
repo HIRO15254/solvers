@@ -31,6 +31,19 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
+    if crate::nlh_v1::has_schema(&raw)? {
+        let p = crate::nlh_v1::prepare(&raw, config_path)?;
+        return postflop_setup::with_threads(crate::nlh_v1::threads(&p)?, || {
+            match p.settings.solver.storage {
+                hu_postflop::input::Storage::F32 => {
+                    run_nlh::<F32Storage>(&p, iterations, target_nash_conv)
+                }
+                hu_postflop::input::Storage::I16 => {
+                    run_nlh::<I16Storage>(&p, iterations, target_nash_conv)
+                }
+            }
+        });
+    }
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
@@ -38,6 +51,37 @@ pub fn run(
         StorageKind::F32 => run_config::<F32Storage>(config, iterations, target_nash_conv),
         StorageKind::I16 => run_config::<I16Storage>(config, iterations, target_nash_conv),
     })
+}
+
+fn run_nlh<S: Storage>(
+    p: &crate::nlh_v1::Prepared,
+    iterations: Option<u64>,
+    target: Option<f64>,
+) -> Result<()> {
+    let start = Instant::now();
+    let (solver, node_info) = crate::nlh_v1::query::<S>(p, iterations, target)?;
+    let ev_offset = p.payoff.ev_offset();
+    crate::solve::print_done(
+        &solver,
+        start.elapsed(),
+        postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), ev_offset),
+    );
+    let mut provider = LiveProvider {
+        solver: &solver,
+        ev_offset,
+    };
+    let mut repl = Repl {
+        game: solver.game(),
+        provider: &mut provider,
+        node_info: &node_info,
+        board: p.config.board.clone(),
+        stack: Vec::new(),
+        current: 0,
+        history: String::new(),
+        equity_cache: None,
+        no_color: std::env::var_os("NO_COLOR").is_some(),
+    };
+    repl.interact()
 }
 
 fn run_config<S: Storage>(

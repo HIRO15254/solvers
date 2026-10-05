@@ -34,16 +34,19 @@ config に何を書けるかは family ごとの規範仕様を参照する。
 
 ### 移行中の `solvers.nlh/v1` P1
 
-`validate` / `solve` / `resume` は共通InputのP1（HU Postflop）spotを受け付ける。
+`validate` / `solve` / `resume` / `inspect` / `report` は共通InputのP1（HU Postflop）spotを受け付ける。
 この移行段階の仕様は [Input草案](plans/nlh-input-v1.jp.md) であり、M7で規範へ昇格する。
 P2 spotはM6まで「P2 is not wired to solvers.nlh/v1 yet」で明示拒否する。
-旧familyの契約は従来どおり。新Inputのqueryコマンドとdaemon投入は別の移行境界である。
+旧familyの契約は従来どおり。daemon投入は別の移行境界である。
 
 - `validate` は製品、開始street・board・pot・stack・OOP/IP、暗黙foldを含む全行動、
   treeのparam値と展開済みrule、停止目標なし・未一致ruleの警告をhuman/JSONで表示する。
   金額はBB。`--show-effective` / `--write-effective PATH` は既定値展開・script inline化済みの入力を返す。
   `--resources` はP1のf32/i16見積りbytesと解決済みmemory limit、`withinLimit`を表示する。
   validateは上限超過を表示し、solve/resumeが確保前に拒否する。
+  human表示は概念ごとに1行で、lineの `*` は暗黙foldを表す。cashのrake条件または
+  tournament ICMの卓・field人数とexact/sampled、各paramと各rule、警告、任意のresourcesを表示する。
+  JSONの構造は従来どおり。
 - `solve --threads` / `--memory` / `--max-time` は `[run]` を上書きして実効configへ保存する。
   memoryはbytes整数またはKiB/MiB/GiB、autoは物理RAMの80%。停止判定は `NashConv / 2 <= target`。
   `--sol-streets` は明示指定（fullも含む）を拒否し、`[output] solution_streets` を使う。
@@ -59,6 +62,20 @@ P2 spotはM6まで「P2 is not wired to solvers.nlh/v1 yet」で明示拒否す�
   progressの `elapsed_secs` は `status` / `runs ls` / `watch` とdaemonのrun一覧で読める。
 - exit codeは入力・tree error（streetを示す `NLH003`）が2、checkpoint非互換が3、
   memory limit超過が75、cooperative cancelが130。solveは検証・見積り・上限確認後にrun directoryを作る。
+- `export` / `compare` / `inspect --sol` は新Inputを埋め込んだ `.sol` を扱う。
+  金額・pot・stack・action label・historyはBB（0.001 BB gridでは最短小数）、cashのEV・NashConvもBB、
+  ICMのEV・NashConvは賞金単位。`--node r3.3`、`--node check/bet 3.3` のように選択できる。
+  `compare` は新Inputと旧familyの `.sol` の混在を `--cross-game` でも拒否する。
+  `no-rivers` のriver照会は埋め込みconfigのalgorithm・storageで再solveする。
+  再solveの反復数とNashConv上限は従来の `--river-iterations` / `--river-target` を使う。
+- live `inspect CONFIG` は `[solver]` / `[run]` を使い、`--iterations` / `--target-nash-conv` で照会用solveを上書きする。
+  後者はNashConvそのものの上限（cashはBB、ICMは賞金単位）。
+  `report CONFIG --boards ...` は各boardで `[spot] board` を置き換えてlineを再生するため、
+  開始streetとlineが合わないboardは拒否する。CSVの形式は旧familyと同じ。
+- 移行例は [examples/nlh](../examples/nlh/river_small.toml) の `river_small`、`turn_small`、
+  `3betpot_fast`、`postflop_srp20`、`postflop_pio_tree`（cash/rake）、
+  [postflop_pio_icm](../examples/nlh/postflop_pio_icm.toml)（rakeなしのtournament）。
+  旧chipを1 BBとしてpot/stackを再現し、旧street capを明示する。
 
 ### global option
 

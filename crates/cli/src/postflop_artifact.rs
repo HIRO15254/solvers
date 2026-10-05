@@ -162,9 +162,9 @@ fn seat_name(player: Player) -> &'static str {
 #[derive(Serialize)]
 struct Summary {
     board: String,
-    pot: u32,
-    effective_stack: u32,
-    min_bet: u32,
+    pot: serde_json::Number,
+    effective_stack: serde_json::Number,
+    min_bet: serde_json::Number,
     iterations: u64,
     ev_oop: f64,
     ev_ip: f64,
@@ -188,9 +188,9 @@ fn summary(loaded: &LoadedSol) -> Summary {
             .map(nlh::Card::to_string)
             .collect::<Vec<_>>()
             .join(" "),
-        pot: loaded.config.pot.0,
-        effective_stack: loaded.config.effective_stack.0,
-        min_bet: loaded.config.min_bet.0,
+        pot: amount(loaded, loaded.config.pot.0),
+        effective_stack: amount(loaded, loaded.config.effective_stack.0),
+        min_bet: amount(loaded, loaded.config.min_bet.0),
         iterations: loaded.meta.iterations,
         ev_oop: loaded.meta.ev[0],
         ev_ip: loaded.meta.ev[1],
@@ -205,6 +205,14 @@ fn summary(loaded: &LoadedSol) -> Summary {
         },
         nodes: loaded.pf_game.game.tree.nodes.len(),
         stored_nodes: loaded.blocks.len(),
+    }
+}
+
+fn amount(loaded: &LoadedSol, value: u32) -> serde_json::Number {
+    if loaded.nlh.is_some() {
+        crate::nlh_v1::bb(value as u64).parse().expect("BB number")
+    } else {
+        value.into()
     }
 }
 
@@ -241,7 +249,7 @@ struct TreeRow {
     history: String,
     street: String,
     actor: String,
-    pot: u32,
+    pot: serde_json::Number,
     actions: Vec<String>,
     stored: bool,
 }
@@ -256,7 +264,10 @@ fn tree_rows(loaded: &LoadedSol, selection: &Selection) -> Vec<TreeRow> {
                 history: info.history.clone(),
                 street: street_name(info.street).to_string(),
                 actor: seat_name(node.player).to_string(),
-                pot: (info.contrib[Player::P0] + info.contrib[Player::P1]).0,
+                pot: amount(
+                    loaded,
+                    (info.contrib[Player::P0] + info.contrib[Player::P1]).0,
+                ),
                 actions: info.actions.clone(),
                 stored: loaded.blocks.contains_key(&node.aux),
             }
@@ -556,6 +567,11 @@ fn range_csv(rows: &[RangeRow]) -> String {
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
     let left = load_sol(left_path, 0, None)?;
     let right = load_sol(right_path, 0, None)?;
+    if left.nlh.is_some() != right.nlh.is_some() {
+        bail!(
+            "cannot compare solvers.nlh/v1 and old-family .sol artifacts (different units and economics)"
+        );
+    }
 
     let mut left_srefs: Vec<u32> = left.blocks.keys().copied().collect();
     let mut right_srefs: Vec<u32> = right.blocks.keys().copied().collect();

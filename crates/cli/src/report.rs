@@ -29,6 +29,9 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
+    if crate::nlh_v1::has_schema(&raw)? {
+        return run_nlh(&raw, config_path, boards_arg, boards_file, output);
+    }
     let config =
         crate::config::parse_solve_config_at(&raw, config_path).context("parsing config")?;
 
@@ -36,6 +39,143 @@ pub fn run(
         StorageKind::F32 => run_config::<F32Storage>(config, boards_arg, boards_file, output),
         StorageKind::I16 => run_config::<I16Storage>(config, boards_arg, boards_file, output),
     })
+}
+
+fn run_nlh(
+    raw: &str,
+    path: &Path,
+    boards_arg: Option<&str>,
+    boards_file: Option<&Path>,
+    output: Option<&Path>,
+) -> Result<()> {
+    let mut rows = Vec::new();
+    let mut labels = Vec::new();
+    // Validate every replacement before solving any board. Replaying the line
+    // enforces its street count and range/card compatibility for each board.
+    let prepared = collect_board_tokens(boards_arg, boards_file)?
+        .iter()
+        .map(|token| {
+            let mut doc: toml_edit::DocumentMut = raw.parse()?;
+            if doc
+                .get("spot")
+                .is_none_or(|spot| spot.as_table_like().is_none())
+            {
+                return Err(
+                    spot::SpotError::new(spot::Code::NLH002, "spot", "expected a table").into(),
+                );
+            }
+            doc["spot"]["board"] = toml_edit::value(normalize_board_token(token));
+            crate::nlh_v1::prepare(&doc.to_string(), path)
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let mut hits = prepared.first().map(|p| p.estimate.rule_hits.clone());
+    for p in &prepared {
+        if let Some(hits) = &mut hits {
+            postflop_setup::merge_rule_hits(hits, &p.estimate.rule_hits);
+        }
+        let row = postflop_setup::with_threads(crate::nlh_v1::threads(p)?, || {
+            match p.settings.solver.storage {
+                hu_postflop::input::Storage::F32 => nlh_row::<F32Storage>(p),
+                hu_postflop::input::Storage::I16 => nlh_row::<I16Storage>(p),
+            }
+        })?;
+        for label in &row.1 {
+            if !labels.contains(label) {
+                labels.push(label.clone());
+            }
+        }
+        rows.push(row);
+        if crate::CLI_CANCEL.load(std::sync::atomic::Ordering::SeqCst) {
+            break;
+        }
+    }
+    if let (Some(p), Some(hits)) = (prepared.first(), hits) {
+        for warning in crate::nlh_v1::warnings_for_hits(p, &hits) {
+            eprintln!("warning: {warning}");
+        }
+    }
+    let mut header = vec![
+        "board".into(),
+        "iterations".into(),
+        "wall_s".into(),
+        "nash_conv".into(),
+        "ev_oop".into(),
+        "ev_ip".into(),
+        "oop_equity".into(),
+    ];
+    header.extend(
+        labels
+            .iter()
+            .map(|label| format!("freq_{}", label.replace(' ', "_"))),
+    );
+    let mut out = header.join(",") + "\n";
+    for (mut prefix, own_labels, freqs) in rows {
+        prefix.extend(labels.iter().map(|label| {
+            own_labels
+                .iter()
+                .position(|l| l == label)
+                .map(|i| fmt_sig(freqs[i], 6))
+                .unwrap_or_default()
+        }));
+        out.push_str(&(prefix.join(",") + "\n"));
+    }
+    if let Some(path) = output {
+        std::fs::write(path, out)?;
+    } else {
+        print!("{out}");
+    }
+    Ok(())
+}
+
+fn nlh_row<S: Storage>(
+    p: &crate::nlh_v1::Prepared,
+) -> Result<(Vec<String>, Vec<String>, Vec<f64>)> {
+    let start = Instant::now();
+    let (solver, info) = crate::nlh_v1::query::<S>(p, None, None)?;
+    let elapsed = start.elapsed();
+    let tree = &solver.game().tree;
+    let sref = tree.storage_ref(tree.node(0));
+    let weights = &solver.game().root_ranges[Player::P0];
+    let freqs = postflop_setup::action_frequencies(
+        &solver.average_strategy_at(0),
+        weights,
+        sref.num_actions as usize,
+        sref.num_hands as usize,
+    );
+    let equity = range_equity(&p.config.board, &solver.game().root_ranges);
+    let total: f64 = weights.iter().map(|&w| w as f64).sum();
+    let equity = if total > 0.0 {
+        weights
+            .iter()
+            .zip(&equity[Player::P0])
+            .map(|(&w, &e)| w as f64 * e as f64)
+            .sum::<f64>()
+            / total
+    } else {
+        0.0
+    };
+    let ev = postflop_setup::subgame_ev(crate::solve::solver_ev(&solver), p.payoff.ev_offset());
+    let expl = solver.exploitability();
+    let board = p
+        .config
+        .board
+        .iter()
+        .map(Card::to_string)
+        .collect::<Vec<_>>()
+        .join(" ");
+    Ok((
+        vec![
+            board,
+            solver.iteration().to_string(),
+            fmt_sig(elapsed.as_secs_f64(), 6),
+            fmt_sig(expl[Player::P0] + expl[Player::P1], 6),
+            fmt_sig(ev[Player::P0], 6),
+            fmt_sig(ev[Player::P1], 6),
+            fmt_sig(equity, 6),
+        ],
+        info[tree.tags[0] as usize].actions.clone(),
+        freqs,
+    ))
 }
 
 fn run_config<S: Storage>(
