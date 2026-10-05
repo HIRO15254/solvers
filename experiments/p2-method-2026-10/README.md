@@ -7,3 +7,4 @@
 |---|---|---|---|
 | [暫定方式のseed間の差](legacy-seed-noise/README.md) | seedと計算量で暫定方式の解がどれだけ変わるか | S4の判断材料 | `partial` |
 | [L0 hand-class tables](trunk-tables/README.md) | L0評価器の表（T2、T3）は定義どおりか。生成時間は目標内か | S4-1aの部品の検証 | `verified` |
+| [L0評価器の検査と暫定方式の測定](l0-evaluator-check/README.md) | L0評価器は正しいか。暫定方式の解は、L0モデルの中でseatごとにどれだけ得をされる余地があるか | S4-1aの完了条件(2)〜(4) | `verified` |

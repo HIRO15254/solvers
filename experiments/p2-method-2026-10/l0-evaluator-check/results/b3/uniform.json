@@ -1,0 +1,1803 @@
+{
+  "format": "p2-l0-evaluation",
+  "game_fingerprint": "6476cf439a93077be8faa9784a86126dd48ca5bb351e7af1791d4c20074b3a42",
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "nash_conv": 16.25351839550385,
+  "profile": {
+    "kind": "uniform",
+    "path": null
+  },
+  "seats": [
+    {
+      "best_response": 2.880178874976607,
+      "defaulted_mass": 0.0,
+      "gain": 2.5113353501453846,
+      "name": "seat 0",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 0,
+      "telescoping_residual": 9.325873406851315e-15,
+      "top_infosets": [
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.007004566267424951,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.005984473273045707,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.0059797906147139425,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.005887678828687182,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.005137185929464108,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.005107722243448836,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.004987935061907885,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.00492630617075557,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.004703897562294892,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AQo",
+          "local_gain": 0.004682480525826625,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.004624143041384617,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.004449678285293686,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.004384974161268775,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.004333336926306722,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AQo",
+          "local_gain": 0.004105795544965014,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "JJ",
+          "local_gain": 0.004091902374681852,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.004015546147921646,
+          "path": [
+            "fold",
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.0040104983753883675,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KQo",
+          "local_gain": 0.004004534461019991,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "JJ",
+          "local_gain": 0.0037940344060501674,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "value": 0.36884352483122274
+    },
+    {
+      "best_response": 2.681169124292085,
+      "defaulted_mass": 0.0,
+      "gain": 2.42509798850833,
+      "name": "seat 1",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 1,
+      "telescoping_residual": -4.884981308350689e-14,
+      "top_infosets": [
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0037773212875895613,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0033702418814956932,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0033482915495675492,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0033085335433752886,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.003225901331836827,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.0029993129172116613,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.002902087043313424,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.0027370539186227423,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "QQ",
+          "local_gain": 0.0027102025925304063,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.002706633571086667,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0026882217592465465,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AA",
+          "local_gain": 0.0026555407932303326,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AKo",
+          "local_gain": 0.0025975092777119906,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "QQ",
+          "local_gain": 0.0024633623816488776,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "QQ",
+          "local_gain": 0.0024628810278430825,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AKo",
+          "local_gain": 0.002448533324274726,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "QQ",
+          "local_gain": 0.0024334738430753958,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "AKo",
+          "local_gain": 0.002376389677528167,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.00237473311856068,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19500:all-in",
+          "class": "KK",
+          "local_gain": 0.002369363014445566,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "value": 0.25607113578375545
+    },
+    {
+      "best_response": 2.5561571200105524,
+      "defaulted_mass": 0.0,
+      "gain": 2.4538356734975135,
+      "name": "seat 2",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 2,
+      "telescoping_residual": -6.794564910705958e-14,
+      "top_infosets": [
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0020475775947398226,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0018185806849783214,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0018003990207862022,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.001749536390577869,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0017276815699236456,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0016887774115054704,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0016176215124346042,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0016004841431952917,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.001565746232575064,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0015593577251175438,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0015417130644325065,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "fold",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.001520846359690213,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0015155038502780945,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0015097992725861405,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AA",
+          "local_gain": 0.0014883188100961564,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "fold",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0014381466228318275,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "fold",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0014201951062877097,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0014146715627356735,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold",
+            "fold",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "KK",
+          "local_gain": 0.0014079589383454729,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "fold",
+            "call:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:19000:all-in",
+          "class": "AKo",
+          "local_gain": 0.0014070306608220237,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:20000:all-in",
+            "call:19500:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "value": 0.10232144651303869
+    },
+    {
+      "best_response": 3.2998262883239535,
+      "defaulted_mass": 0.0,
+      "gain": 3.151256202891144,
+      "name": "seat 3",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 3,
+      "telescoping_residual": -2.3092638912203256e-14,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:2500",
+          "class": "AA",
+          "local_gain": 0.047983938050544996,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "KK",
+          "local_gain": 0.04236507660866532,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AKo",
+          "local_gain": 0.04211059204103147,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AQo",
+          "local_gain": 0.038480231635643986,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "QQ",
+          "local_gain": 0.03733124431276099,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AJo",
+          "local_gain": 0.035576372510389045,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "KQo",
+          "local_gain": 0.03465654523903188,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "JJ",
+          "local_gain": 0.03312820402256122,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "ATo",
+          "local_gain": 0.032210302981931935,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "KJo",
+          "local_gain": 0.03141353112731257,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "32o",
+          "local_gain": 0.03028768813784188,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "TT",
+          "local_gain": 0.02899289847844117,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "KTo",
+          "local_gain": 0.028833880839089644,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "72o",
+          "local_gain": 0.028633099657417328,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "62o",
+          "local_gain": 0.02849988359678169,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "42o",
+          "local_gain": 0.028098692468114257,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "QJo",
+          "local_gain": 0.027588341912841638,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "52o",
+          "local_gain": 0.02715482348952681,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "A9o",
+          "local_gain": 0.026527108694939582,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "82o",
+          "local_gain": 0.02596579012081942,
+          "path": [],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        }
+      ],
+      "value": 0.14857008543280975
+    },
+    {
+      "best_response": 3.0587332390375876,
+      "defaulted_mass": 0.0,
+      "gain": 2.994061361503415,
+      "name": "seat 4",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 4,
+      "telescoping_residual": -1.1102230246251565e-14,
+      "top_infosets": [
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.0234523607173354,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.020320635725191934,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.017323811648109852,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.01696353818659769,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AQo",
+          "local_gain": 0.01497676715388943,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "JJ",
+          "local_gain": 0.014861175391919905,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AA",
+          "local_gain": 0.013665202825421285,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AJo",
+          "local_gain": 0.013294296809620756,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KQo",
+          "local_gain": 0.013176380428150737,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "TT",
+          "local_gain": 0.01286677503641951,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "32o",
+          "local_gain": 0.012668799509703146,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "KK",
+          "local_gain": 0.012320310330071313,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "ATo",
+          "local_gain": 0.012305697545625204,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AKo",
+          "local_gain": 0.012256878267956876,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "32o",
+          "local_gain": 0.012215375183001309,
+          "path": [
+            "raise-to:2500"
+          ],
+          "profile_row": [
+            0.25,
+            0.25,
+            0.25,
+            0.25
+          ]
+        },
+        {
+          "best_action": "call:2500",
+          "class": "AA",
+          "local_gain": 0.012122413200035499,
+          "path": [
+            "raise-to:2500"
+          ],
+          "profile_row": [
+            0.25,
+            0.25,
+            0.25,
+            0.25
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "72o",
+          "local_gain": 0.01192916469729973,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "42o",
+          "local_gain": 0.011714211487619388,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KJo",
+          "local_gain": 0.011552403368825409,
+          "path": [
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "raise-to:2500",
+          "class": "AQo",
+          "local_gain": 0.011481496690052108,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ]
+        }
+      ],
+      "value": 0.06467187753417258
+    },
+    {
+      "best_response": 2.9180274852827437,
+      "defaulted_mass": 0.0,
+      "gain": 2.717931818958065,
+      "name": "seat 5",
+      "reach_by_active_count": [
+        0.0,
+        0.07571239497600386,
+        0.2340627076366798,
+        0.32758146058387955,
+        0.24748458129710965,
+        0.0987637576088982,
+        0.016395097897376316
+      ],
+      "seat": 5,
+      "telescoping_residual": 1.509903313490213e-14,
+      "top_infosets": [
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.013008390832783453,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.011017782061584333,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.010516276346264402,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.009577984658634337,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.00952036756000824,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KK",
+          "local_gain": 0.009188529939810439,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AQo",
+          "local_gain": 0.008246340545642574,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "QQ",
+          "local_gain": 0.008240337561168041,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AKo",
+          "local_gain": 0.008067435055775708,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "JJ",
+          "local_gain": 0.007936107126815162,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AJo",
+          "local_gain": 0.007589155754864508,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "KQo",
+          "local_gain": 0.007327417781624244,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AQo",
+          "local_gain": 0.007192878641552114,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AA",
+          "local_gain": 0.007006266463763646,
+          "path": [
+            "fold",
+            "raise-to:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "JJ",
+          "local_gain": 0.006940854691501343,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "TT",
+          "local_gain": 0.006812700889590274,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "32o",
+          "local_gain": 0.006737729577005018,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "AJo",
+          "local_gain": 0.006478045220032637,
+          "path": [
+            "raise-to:20000:all-in",
+            "fold"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "fold",
+          "class": "72o",
+          "local_gain": 0.006444753675961419,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "best_action": "call:20000:all-in",
+          "class": "ATo",
+          "local_gain": 0.006320215229757642,
+          "path": [
+            "raise-to:20000:all-in",
+            "call:20000:all-in"
+          ],
+          "profile_row": [
+            0.5,
+            0.5
+          ]
+        }
+      ],
+      "value": 0.2000956663246788
+    }
+  ],
+  "source": "examples/bench/6max_20bb_checkdown.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      670,
+      1883,
+      2075,
+      1145,
+      321,
+      37
+    ]
+  },
+  "timings": {
+    "evaluation": 75.6844962,
+    "phases": {
+      "backward": 0.3946025,
+      "k4": 66.3113455,
+      "reaches": 0.3397209,
+      "t2": 0.3046113,
+      "t3": 8.2769276
+    },
+    "profile": 0.0078615,
+    "tables": 0.2132599,
+    "tree": 0.0914944
+  },
+  "units": "bb",
+  "version": 1,
+  "warnings": []
+}

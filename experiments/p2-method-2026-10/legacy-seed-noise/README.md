@@ -101,4 +101,4 @@ S4-1aの評価器による厳密なseat別利得と比べる基準である（[r
 
 configs、解析script、集計結果、`run.json`はこのdirectoryに置く。solution・checkpoint・CSV export・binaryは
 ignored `runs/p2-method-2026-10/legacy-seed-noise/`にだけあり、パスとSHA-256を[manifest](manifest.json)に記録した。
-S4-1aの評価器はこのsolutionを入力に使う。
+S4-1aの評価器はこのsolutionを入力に使う（結果は[L0評価器の検査と暫定方式の測定](../l0-evaluator-check/README.md)）。

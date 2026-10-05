@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 3,
+  "kind": "preflop-multiway",
+  "gameKind": "mw-preflop",
+  "configSchema": "solvers.nlh/v1",
+  "status": "sweep-limit",
+  "approximateProfile": true,
+  "approximationNotice": "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。",
+  "sweeps": 30000,
+  "traversals": 60000,
+  "infosets": 338,
+  "memoryBytes": 5520,
+  "policyStorage": "preallocated-all-current-street-buckets",
+  "preallocatedNodes": 2,
+  "preallocatedColumns": 338,
+  "preallocatedSlots": 676,
+  "preallocatedBytes": 5520,
+  "preallocatedPagesCommitted": true,
+  "policyArenaLimitBytes": 4294967296,
+  "elapsedSecs": 9.3537351,
+  "traversalsPerSecond": 6414.54984116452,
+  "totalDealAttempts": 60000,
+  "meanDealAttempts": 1.0,
+  "handUpdates": 59400000,
+  "handUpdatesPerSecond": 6350404.342752876,
+  "seats": [
+    {
+      "seat": 0,
+      "profileEv": {
+        "mean": -0.07727050781249999,
+        "stderr": 0.07013763014313294,
+        "ci95": [
+          -0.21474026289304055,
+          0.06019924726804059
+        ]
+      },
+      "averagePositiveRegret": 0.003911323491468405,
+      "strategyDriftL1": 0.027437485585857166,
+      "deviationGainLowerBound": {
+        "mean": 0.0,
+        "stderr": 0.018802304590124146,
+        "ci95": [
+          0.0,
+          0.09830468811532524
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4096,
+        "storedStrategyVisits": 4096,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4096,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4096,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4096,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4096,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 1,
+      "profileEv": {
+        "mean": 0.07727050781249999,
+        "stderr": 0.07013763014313294,
+        "ci95": [
+          -0.06019924726804059,
+          0.21474026289304055
+        ]
+      },
+      "averagePositiveRegret": 0.002463257791707292,
+      "strategyDriftL1": 0.007148729485152747,
+      "deviationGainLowerBound": {
+        "mean": 0.00048828124999999675,
+        "stderr": 0.006597117397499531,
+        "ci95": [
+          0.0,
+          0.015275060184755445
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 2319,
+        "storedStrategyVisits": 2319,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 2319,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 2319,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 2319,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 2319,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    }
+  ],
+  "strategyBlocks": 338,
+  "configHash": "4e8ed7e045637b39281a9f44d93243e24bafa0c0c70e943182d227d2b09ae973",
+  "effectiveConfig": {
+    "economics": {
+      "kind": "cash"
+    },
+    "output": {
+      "probability_encoding": "u16"
+    },
+    "ranges": {
+      "BB": "random",
+      "BTN": "random"
+    },
+    "run": {
+      "checkpoint_interval": "5m",
+      "max_time": "15m",
+      "memory": "4GiB",
+      "threads": 8
+    },
+    "schema": "solvers.nlh/v1",
+    "solver": {
+      "abstraction": {
+        "buckets": {
+          "flop": 32,
+          "river": 32,
+          "turn": 32
+        },
+        "kind": "ehs2-percentile"
+      },
+      "batch_sweeps": 1,
+      "discount": {
+        "kind": "none"
+      },
+      "kind": "range-vector",
+      "opponent_exploration": 0.0,
+      "pruning": {
+        "kind": "none"
+      },
+      "seed": 0,
+      "stop": {
+        "check_every_sweeps": 15000,
+        "confirmations": 1000000,
+        "deviator_traversals": 20000,
+        "evaluation_samples": 4096,
+        "max_sweeps": 30000,
+        "target": 1000000.0
+      }
+    },
+    "spot": {
+      "line": ""
+    },
+    "table": {
+      "ante_bb": 0,
+      "bb_ante_bb": 0,
+      "players": 2,
+      "sb_bb": 0.5,
+      "stack_bb": 10,
+      "straddles_bb": []
+    },
+    "tree": {
+      "include_allin": false,
+      "max_aggressive_actions": {
+        "flop": 3,
+        "preflop": 1,
+        "river": 3,
+        "turn": 3
+      },
+      "script": "preflop {\n  when unopened { replace raise [a]  remove call }\n  when aggressions >= 1 { remove raise }\n}\n"
+    }
+  },
+  "gameFingerprint": "af79fe863f02279ea6448569e3ca2386247852e54c4e38fe2462fc3d3ac1dd88",
+  "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+  "algorithmFingerprint": "59bf7449a0981adadc4f0520bf3cc17dcf6aa56310ab83ad4f8dff902c37df36",
+  "configurationFingerprint": "af27e788671142f5fce47c5da420b85070bffbf4a36338d98388bd17d01e9680",
+  "profileType": "linear-average-regret-minimized-profile",
+  "guaranteeBoundary": "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。",
+  "chipUnitBb": 0.001,
+  "utilityUnit": "bb",
+  "startedUnixMs": 1791235476292,
+  "finishedUnixMs": 1791235485646
+}

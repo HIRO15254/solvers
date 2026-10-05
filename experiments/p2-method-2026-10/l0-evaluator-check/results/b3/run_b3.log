@@ -1,0 +1,8 @@
+20bb_cd: 78s
+20bb_cd_s1: 75s
+20bb_300k_s0: 75s
+20bb_300k_s1: 74s
+uniform: 76s
+20bb_300k_s0_threads8: 113s
+20bb_300k_s0_k4seed1: 77s
+20bb_300k_s0_t3seed1: 76s

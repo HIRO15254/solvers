@@ -1,0 +1,347 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-26",
+  "recorded_on": "2026-10-06",
+  "purpose": "Check the L0 exact best-response evaluator (tuple-enumeration reference, independent push/fold implementation) and measure seat gains and NashConv of the legacy 20bb solutions.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "run_b1.sh and run_b3.sh were run as committed; every comparison passed and all B1/B3 evaluations matched earlier runs of the same binary bit for bit except timings and paths.",
+  "source": {
+    "revision": "bd86510dd1e46ca98c8b8f2b0bd8ced011249dfc",
+    "working_tree": "no changes to tracked files under crates/",
+    "build": "cargo build -p mw-preflop --release --example l0_eval --example trunk_tables",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+    "l0_eval_binary_sha256": "65587231da089b0ee283cdf491ed41523b7ed6f9904a0e6a75f7086f5684a461",
+    "trunk_tables_binary_sha256": "05b36412d93792ada180c18203c71be6e522e9e95667a17bedf2800f2c73b9e2"
+  },
+  "legacy_solver": {
+    "revision": "6451f2c61f71b1c8e2db483bfd4946a74762424c",
+    "binary": "runs/p2-method-2026-10/legacy-seed-noise/bin/solvers.exe",
+    "binary_sha256": "93f1d87d8667fc539dc669c0412b7286abe72cf81e50ecdab1425e703915c154",
+    "use": "solved and exported the B1 legacy solutions (30k sweeps, seed 0, 8 threads)"
+  },
+  "evaluation": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": 2048,
+    "k4_seed": 0,
+    "top_infosets": 20,
+    "threads": "rayon default (16) unless stated"
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "shell": "Git Bash",
+    "python": "3.13.7"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/hu_pushfold_check.py",
+      "sha256": "52e5c6cc56f72849a63b2dd082e1b61bfde73acafab8767e148b2fa6f467c68b",
+      "role": "independent heads-up push/fold checker (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/summarize_b3.py",
+      "sha256": "bbe8e8e69c3d3d6e2db3c7c78657635a9cf438dfa56f7c867816b15628371d95",
+      "role": "B3 summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/run_b1.sh",
+      "sha256": "ba8ad5208bac97deb775513715c18dd25578e0f30ce719214c57b38ac065c885",
+      "role": "B1 procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/run_b3.sh",
+      "sha256": "08c1fb060a55e31e7142ab8d89d1b46be20cf34240ec35da2fa6f7720e44db5f",
+      "role": "B3 procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/run_b1.log",
+      "sha256": "740121dbbf9cce91c6ea235eb71f4a9cb26d783e696e14be933b0e384aeee730",
+      "role": "stdout of run_b1.sh (13 comparisons)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_fp.compare.txt",
+      "sha256": "c999e15be048c1745b9f70d284fd683831865b03bfb03dfefd1f0e0c0d7b207d",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_legacy.compare.txt",
+      "sha256": "255ea46c6f22008d1f3224e385a0f31a6f83ecee1c7320ce36c20f3c840c572e",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_random.compare.txt",
+      "sha256": "451db0530069f5e8b5e95527d39585a41c73e8c0b02c0ccad14ff093d7aac701",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_top.compare.txt",
+      "sha256": "9ae1e3a9e6d50ced6e162dad0213a80197187aebf46cfc62798b6a86009bd749",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_uniform.compare.txt",
+      "sha256": "54fe6055d337fbad336707700424a56520090784d4e46f6b0bd5e6801392a818",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_legacy.compare.txt",
+      "sha256": "e3c7bb940d433ee263b035b1e19428afe0af235a314d2cccf0684a88d33105ae",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_random.compare.txt",
+      "sha256": "88adec4bad9a691cc8bb2f56359d5d787106075992c720a47d207b073b3555d0",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_top.compare.txt",
+      "sha256": "a51c74c1a57f22916e67113768e7bbf1377e72cbb88781aed374fbba18bd2ada",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_uniform.compare.txt",
+      "sha256": "468537d0954e46cfa55567b9b31fa0df5a680e8c4b6646baa64fde9bd0d36ba1",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_legacy.compare.txt",
+      "sha256": "a3af2aadb9f99b14a7c30554dcc0e00d9732e6ee4378bf437fc745b790fdc409",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_random.compare.txt",
+      "sha256": "6394ea2bd98ed75ac2fb43fa5a9a91d3ad0f2571556e442b7f2c28f89dd400c9",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_top.compare.txt",
+      "sha256": "227d236ac77b21d139893d5a2a26ab6917118b28984438f2b5cdc4ca893e6e5b",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_uniform.compare.txt",
+      "sha256": "38f6efe7fb929281c942b25749a861742fcf3d7b354fd95f1d22c3d22059fde1",
+      "role": "hu_pushfold_check.py compare output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_legacy.profile.json",
+      "sha256": "75fc21c7c0469da030d88894d51c3dfb429a278e20578c29744ba5411454a2e2",
+      "role": "class profile converted from the legacy 5bb solution's strategy CSV"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_5bb_legacy.run.json",
+      "sha256": "1f368433643ed9c883897e91931f33f6097524c4d5c90de213bbb289f60089c5",
+      "role": "run.json of the legacy 5bb solve (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_legacy.profile.json",
+      "sha256": "2c5798beec51853271ed80446b20df9b5cfc0e88d3b1ccfe6f7ac99eab0f632c",
+      "role": "class profile converted from the legacy 10bb solution's strategy CSV"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_10bb_legacy.run.json",
+      "sha256": "4328cf82b7cf3734c0c25cab6ebb678e7cee54b505a8b8bd0055a8058f2b457a",
+      "role": "run.json of the legacy 10bb solve (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_legacy.profile.json",
+      "sha256": "d554be0af5174d5228f3b06a42c622f830c2c42fd0b7247272a219d941cd2a63",
+      "role": "class profile converted from the legacy 20bb solution's strategy CSV"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b1/b1_20bb_legacy.run.json",
+      "sha256": "58eaf048c22ffd6ba486417c1bb50d47285f43a4f935b038e20d11ff941658cb",
+      "role": "run.json of the legacy 20bb solve (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_cd.json",
+      "sha256": "27ac265aba26b0c3426ce3f912bbc6e3cf528df0cf4faf4571f7a9f55da7ff2b",
+      "role": "l0_eval output for 20bb_cd"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_cd_s1.json",
+      "sha256": "04cf02068402594c6878cf3624c4f280f5373aa798ef84d935c66621f7dda350",
+      "role": "l0_eval output for 20bb_cd_s1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_300k_s0.json",
+      "sha256": "06ea3e967b4d0b151d643bd3054f710420a14c2c11dfe1956da9cfd688a6076b",
+      "role": "l0_eval output for 20bb_300k_s0"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_300k_s1.json",
+      "sha256": "c3a3fbbc3525ab888941fbcaaaca0b10604765481ff538d69d034927d6b1cff4",
+      "role": "l0_eval output for 20bb_300k_s1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/uniform.json",
+      "sha256": "c4826ddc1b2ca255f07fbfe8b42a637beb6c5539121c6298e6232fb3b4fe6ea6",
+      "role": "l0_eval output for uniform"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_300k_s0_threads8.json",
+      "sha256": "2bcff9a0e03bba115069c1461321a5c013563b249823a61b45c1875eba011d2a",
+      "role": "l0_eval output for 20bb_300k_s0_threads8"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_300k_s0_k4seed1.json",
+      "sha256": "457c54a8cd0af6067171c73fb406ea5ad021438caa74203ae0f4c1e2ea2ed55c",
+      "role": "l0_eval output for 20bb_300k_s0_k4seed1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/20bb_300k_s0_t3seed1.json",
+      "sha256": "f77a4acfcb55cab1a48733bd6de9a508ed388685eb78735c6d683df346fcb1bc",
+      "role": "l0_eval output for 20bb_300k_s0_t3seed1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/summary.md",
+      "sha256": "443fdd0f4e67c13cbcfdde734fd971e795c9f0610f66c6a9cf45a923db35422a",
+      "role": "summarize_b3.py output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/results/b3/run_b3.log",
+      "sha256": "e894da4985e686e1d7f9b4ed16d262487419be0931ea9e3256987996846b316b",
+      "role": "stdout of run_b3.sh (wall times)"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by the procedure"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by the procedure"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed1.bin",
+      "sha256": "7ae88aba099e4753cb0f8ae3568c7e9bb84057ba2cbe6f4e78126f65082cace1",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 1, sensitivity run); regenerated by run_b3.sh"
+    },
+    {
+      "path": ".cache/p2-trunk/t2.csv",
+      "sha256": "ee36bc445ea2ecd2636ab0a2cd540bf90385077380300f6340f343ccb6a0ef6b",
+      "bytes": 1284784,
+      "role": "T2 integer counts exported for hu_pushfold_check.py"
+    },
+    {
+      "path": ".cache/p2-trunk/classes.csv",
+      "sha256": "89f4ca4416c578dfe3cd5d9ce8869d3ad101c247c7b52bf745f7a0fded6efd86",
+      "bytes": 3206,
+      "role": "class table exported for hu_pushfold_check.py"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_5bb/solution.mwsol",
+      "sha256": "68de897541c4f3e99c1eaec2e8268f833cb3c0cf2c7837b21c86e1a478ed89be",
+      "bytes": 48086,
+      "role": "legacy 5bb B1 solution (.mwsol v4); evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_5bb/run.toml",
+      "sha256": "9fa20ce86bf776867c1f3de54607285cff9570421f69353c40efe2cf3144587e",
+      "bytes": 943,
+      "role": "legacy 5bb B1 effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_5bb/manifest.json",
+      "sha256": "e8456e54dadee59f1c2d7d97e067cddb9bf5a1a2ab0b8966422ffce9c87ea5f9",
+      "bytes": 500,
+      "role": "legacy 5bb B1 run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_5bb_strategy.csv",
+      "sha256": "a7cd231d6147b6e695ced9b178381a528cdef5ed1ebea250786a9c832a08995b",
+      "bytes": 68641,
+      "role": "legacy 5bb B1 strategy view CSV export; checker input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_10bb/solution.mwsol",
+      "sha256": "af851eb1808ff460bf84a3af12616e9e72887047c79759641e9a78ff097f4acc",
+      "bytes": 48041,
+      "role": "legacy 10bb B1 solution (.mwsol v4); evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_10bb/run.toml",
+      "sha256": "624e941a2d796c3e5bb1a90a6807791d087761abd8fa9bee68c1bc80b450b191",
+      "bytes": 944,
+      "role": "legacy 10bb B1 effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_10bb/manifest.json",
+      "sha256": "cfc456334c669459f6ae0b7d0b292680d27b472c3ee2514366484842ee6f339a",
+      "bytes": 502,
+      "role": "legacy 10bb B1 run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_10bb_strategy.csv",
+      "sha256": "967881399a9fb7bf5f69b2b812c470dbcc0d3857e327976a481d55cf9af2e0a4",
+      "bytes": 69120,
+      "role": "legacy 10bb B1 strategy view CSV export; checker input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_20bb/solution.mwsol",
+      "sha256": "c52509cfbd297af907e56e82aef600b82fa26cc2772831fc131186733cd0019b",
+      "bytes": 48013,
+      "role": "legacy 20bb B1 solution (.mwsol v4); evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_20bb/run.toml",
+      "sha256": "2204aec859428639a34184ea5b4665407cd1c1b481b4111ec3cf755d8626b0cb",
+      "bytes": 944,
+      "role": "legacy 20bb B1 effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_20bb/manifest.json",
+      "sha256": "65df98b89b5123a2779b1af67486755b69378c11f92093d67dd8c3c1bab196a3",
+      "bytes": 502,
+      "role": "legacy 20bb B1 run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_20bb_strategy.csv",
+      "sha256": "122dcefba5074fce4fbed818d5f4531d874aa7060a4a0abbe2e5f9f067bbb5fd",
+      "bytes": 69678,
+      "role": "legacy 20bb B1 strategy view CSV export; checker input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/solution.mwsol",
+      "sha256": "56e0e558c36b57bc09de2de5029d8d1eb405bc58250961e8f1884f1603116e44",
+      "bytes": 60016881,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/solution.mwsol",
+      "sha256": "8f0f5c42cceae5ae710c44c921336541424e42dbd8587340336fd151bf6bfd5a",
+      "bytes": 60595036,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/solution.mwsol",
+      "sha256": "ad567606c7b76ed6ec8247514fa0f0ea9263f528509d8f23f345124b0a5f91ec",
+      "bytes": 69501997,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/solution.mwsol",
+      "sha256": "c5b1b114a9844e9181ede43035882f109f01e42a59a9a37959a7568a7034802e",
+      "bytes": 71637038,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example l0_eval --example trunk_tables",
+    "bash experiments/p2-method-2026-10/l0-evaluator-check/run_b1.sh <b1 out dir>",
+    "bash experiments/p2-method-2026-10/l0-evaluator-check/run_b3.sh <b3 out dir>",
+    "python experiments/p2-method-2026-10/l0-evaluator-check/summarize_b3.py <b3 out dir>"
+  ]
+}
