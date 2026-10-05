@@ -1,6 +1,6 @@
 //! No-limit Hold'em betting state for two through nine fixed seats.
 //!
-//! Antes are posted before blinds.  Per-player antes are dead individual
+//! Antes are posted before blinds and live straddles. Per-player antes are dead individual
 //! money; a big-blind ante is common main-pot money and does not change the
 //! poster's side-pot cap.  The state keeps an
 //! absolute raise-reopen threshold for every player, which naturally handles
@@ -52,6 +52,54 @@ impl Action {
     pub fn is_aggressive(&self) -> bool {
         matches!(self, Self::BetTo { .. } | Self::RaiseTo { .. })
     }
+}
+
+/// A plain NLH move, independent of a product's tree menu. Bet and raise
+/// amounts are total wagers on this street, not additional contributions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Move {
+    Fold,
+    Check,
+    Call,
+    BetTo(MwChips),
+    RaiseTo(MwChips),
+    AllIn,
+}
+
+/// Why a plain move cannot be played, including canonical move suggestions
+/// and the chip bounds needed by a hand-line parser's diagnostics.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum IllegalMove {
+    #[error("betting state has no player to act")]
+    MissingActor,
+    #[error("seat {0} is not active but was selected to act")]
+    InactiveActor(SeatId),
+    #[error("{attempted:?} is illegal with {to_call} to call; use {correct:?}")]
+    WrongMove {
+        attempted: Move,
+        correct: Move,
+        to_call: MwChips,
+    },
+    #[error("target {target} is below the minimum full target {minimum}")]
+    BelowMinimum { target: MwChips, minimum: MwChips },
+    #[error("target {target} exceeds the maximum target {maximum}")]
+    AboveMaximum { target: MwChips, maximum: MwChips },
+    #[error("target {maximum} uses the entire stack; use {correct:?}")]
+    MustBeAllIn { maximum: MwChips, correct: Move },
+    #[error("all-in target {maximum} does not exceed the bet ({to_call} to call); use {correct:?}")]
+    AllInIsCall {
+        maximum: MwChips,
+        to_call: MwChips,
+        correct: Move,
+    },
+    #[error("raising is not reopened for seat {actor}: bet {bet_to_match}, reopen at {reopen_at}")]
+    RaisingClosed {
+        actor: SeatId,
+        bet_to_match: MwChips,
+        reopen_at: MwChips,
+    },
+    #[error("seat {actor} cannot bet or raise without another active player")]
+    NoActiveOpponent { actor: SeatId },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -138,6 +186,14 @@ pub struct BettingState {
     pub preflop_limpers: u8,
     pub preflop_flats: u8,
     pub last_preflop_aggressor: Option<SeatId>,
+    /// Last voluntary bet/raise on the current street, including short all-ins.
+    /// Forced blind and straddle posts never set this field.
+    #[serde(default)]
+    pub last_street_aggressor: Option<SeatId>,
+    /// Last voluntary bet/raise on the immediately preceding street. A street
+    /// checked through (or skipped by policy) clears this on the next street.
+    #[serde(default)]
+    pub previous_street_aggressor: Option<SeatId>,
     /// Seats that have taken a voluntary preflop call or aggressive action.
     /// Forced contributions are posted before play and never enter this mask.
     #[serde(default)]
@@ -158,6 +214,10 @@ pub struct TableSetup {
     pub forced_antes: SeatVec<MwChips>,
     pub common_ante: MwChips,
     pub forced_blinds: SeatVec<MwChips>,
+    /// Ordered live preflop posts, each (seat, total street wager). Posted
+    /// after blinds. The caller validates seats, amounts and posting order,
+    /// and selects the first actor after the last straddler.
+    pub straddles: Vec<(SeatId, MwChips)>,
     pub nominal_big_blind: MwChips,
     pub preflop_first_to_act: SeatId,
 }
@@ -208,7 +268,7 @@ impl BettingState {
         );
 
         // Forced contributions are applied in the v1 normative order:
-        // individual antes, table-common dead money, then all live blinds.
+        // individual antes, table-common dead money, blinds, then straddles.
         for seat in config.starting_stacks.seats() {
             post(
                 &mut seats[seat],
@@ -228,6 +288,18 @@ impl BettingState {
                 Contribution::Street(Street::Preflop),
             );
         }
+        for &(seat, to) in &config.straddles {
+            let additional = to.saturating_sub(seats[seat].committed_on(Street::Preflop));
+            post(
+                &mut seats[seat],
+                additional,
+                Contribution::Street(Street::Preflop),
+            );
+        }
+        let preflop_level = config
+            .straddles
+            .last()
+            .map_or(config.nominal_big_blind, |&(_, to)| to);
 
         let mut state = Self {
             seats,
@@ -239,8 +311,8 @@ impl BettingState {
             street_active_players: [num_seats as u8, 0, 0, 0],
             to_act: None,
             // A short forced big blind does not lower the nominal call price.
-            bet_to_match: config.nominal_big_blind,
-            last_full_raise: config.nominal_big_blind,
+            bet_to_match: preflop_level,
+            last_full_raise: preflop_level,
             full_wager_established: true,
             pending: SeatMask::EMPTY,
             aggressive_actions: 0,
@@ -250,6 +322,8 @@ impl BettingState {
             preflop_limpers: 0,
             preflop_flats: 0,
             last_preflop_aggressor: None,
+            last_street_aggressor: None,
+            previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
         };
@@ -338,6 +412,83 @@ impl BettingState {
             .difference(SeatMask::from_seat(actor))
             .is_empty();
         self.maximum_target(actor) > self.bet_to_match && raising_open && another_active
+    }
+
+    /// Resolve a strict plain-NLH move without clamping targets or consulting
+    /// a product menu. Apply the returned action with [`Self::apply_action`]
+    /// and [`NoStreetPolicy`] when replaying a hand line.
+    pub fn resolve_move(&self, mv: Move) -> Result<Action, IllegalMove> {
+        let actor = self.to_act.ok_or(IllegalMove::MissingActor)?;
+        if self.seats[actor].status != SeatStatus::Active {
+            return Err(IllegalMove::InactiveActor(actor));
+        }
+        let to_call = self.amount_to_call(actor);
+        let wrong = |correct| IllegalMove::WrongMove {
+            attempted: mv,
+            correct,
+            to_call,
+        };
+        match mv {
+            Move::Fold | Move::Call if to_call == MwChips::ZERO => {
+                return Err(wrong(Move::Check));
+            }
+            Move::Check if to_call > MwChips::ZERO => return Err(wrong(Move::Call)),
+            Move::Fold => return Ok(Action::Fold),
+            Move::Check => return Ok(Action::Check),
+            Move::Call => return Ok(self.call_action(actor)),
+            Move::BetTo(to) if self.bet_to_match > MwChips::ZERO => {
+                return Err(wrong(Move::RaiseTo(to)));
+            }
+            Move::RaiseTo(to) if self.bet_to_match == MwChips::ZERO => {
+                return Err(wrong(Move::BetTo(to)));
+            }
+            _ => {}
+        }
+        let maximum = self.maximum_target(actor);
+        let target = match mv {
+            Move::AllIn => {
+                if maximum <= self.bet_to_match {
+                    return Err(IllegalMove::AllInIsCall {
+                        maximum,
+                        to_call,
+                        correct: Move::Call,
+                    });
+                }
+                maximum
+            }
+            Move::BetTo(target) | Move::RaiseTo(target) => {
+                if target > maximum {
+                    return Err(IllegalMove::AboveMaximum { target, maximum });
+                }
+                if target == maximum {
+                    return Err(IllegalMove::MustBeAllIn {
+                        maximum,
+                        correct: Move::AllIn,
+                    });
+                }
+                let minimum = self.minimum_full_target();
+                if target < minimum {
+                    return Err(IllegalMove::BelowMinimum { target, minimum });
+                }
+                target
+            }
+            Move::Fold | Move::Check | Move::Call => unreachable!("passive moves handled above"),
+        };
+        if let Some(reopen_at) = self.seats[actor].raise_reopen_at
+            && self.bet_to_match < reopen_at
+        {
+            return Err(IllegalMove::RaisingClosed {
+                actor,
+                bet_to_match: self.bet_to_match,
+                reopen_at,
+            });
+        }
+        if !self.can_raise(actor) {
+            return Err(IllegalMove::NoActiveOpponent { actor });
+        }
+        Ok(self
+            .action_for_target(actor, target)
+            .expect("validated target and raising rights"))
     }
 
     /// Resolve one size literal, clamping to the minimum full wager or stack cap.
@@ -479,6 +630,7 @@ impl BettingState {
                     self.preflop_flats = 0;
                 }
                 self.aggressive_actions = self.aggressive_actions.saturating_add(1);
+                self.last_street_aggressor = Some(actor);
                 self.seats[actor].raise_reopen_at = Some(saturating_add(to, self.last_full_raise));
                 self.pending = self.active_mask();
                 self.pending.remove(actor);
@@ -578,6 +730,7 @@ impl BettingState {
         }
         let players_entering_next_street = self.street_active_players[self.street.index()];
         loop {
+            self.previous_street_aggressor = self.last_street_aggressor.take();
             self.street = self.street.next().expect("river handled above");
             self.street_active_players[self.street.index()] = players_entering_next_street;
             if self.street == Street::Flop {
@@ -714,6 +867,7 @@ mod tests {
                 AnteConfig::BigBlind { amount_bb } => MwChips::try_from_bb(amount_bb).unwrap(),
             },
             forced_blinds: SeatVec::try_new(forced_blinds).unwrap(),
+            straddles: Vec::new(),
             nominal_big_blind: MwChips(1000),
             preflop_first_to_act: big_blind.next(num_seats),
         };
@@ -858,8 +1012,12 @@ mod tests {
         let object = encoded.as_object_mut().unwrap();
         object.remove("preflop_participants");
         object.remove("preflop_open_cold_calls");
+        object.remove("last_street_aggressor");
+        object.remove("previous_street_aggressor");
         let decoded: BettingState = serde_json::from_value(encoded).unwrap();
         assert!(decoded.preflop_participants.is_empty());
         assert_eq!(decoded.preflop_open_cold_calls, 0);
+        assert_eq!(decoded.last_street_aggressor, None);
+        assert_eq!(decoded.previous_street_aggressor, None);
     }
 }

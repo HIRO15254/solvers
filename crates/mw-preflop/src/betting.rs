@@ -47,6 +47,7 @@ impl BettingMenu for BettingState {
             forced_antes: config.forced_antes.clone(),
             common_ante: config.common_ante,
             forced_blinds: config.forced_blinds.clone(),
+            straddles: Vec::new(),
             nominal_big_blind: config.nominal_big_blind,
             preflop_first_to_act: config.preflop_first_to_act,
         };

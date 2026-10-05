@@ -456,6 +456,8 @@ mod tests {
             preflop_limpers: 0,
             preflop_flats: 0,
             last_preflop_aggressor: None,
+            last_street_aggressor: None,
+            previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
         }

@@ -86,6 +86,12 @@ HU/Multiway domain は CLI、HTTP、画面状態へ依存しない。将来 snap
 共有の table 型・position 語彙は `nlh::table`、forced bet・min-raise・all-in・street 遷移は
 `nlh::betting`、side pot・uncalled refund・odd chip・conservation は `nlh::settlement` が所有する。
 `BettingState::new(&TableSetup, &P)` は `P: StreetPolicy` を通じて製品の check-down / street skip を呼ぶ。
+`TableSetup::straddles` はblind後のlive到達額を順番にpostし、Preflopのcall額・最小raise幅は最後のstraddle額、
+Postflopの最小bet・BB size単位はtableのBBを使う。旧P2のsetupは空のstraddle列を渡す。
+`BettingState::resolve_move(Move)` はmenuに依らずNLHの合法性とbet/raise/all-inの区別を検証して
+`Action`または`IllegalMove`を返す。line再生では解決したactionを`apply_action`と`NoStreetPolicy`で適用する。
+`last_street_aggressor`と`previous_street_aggressor`は自発的なbet/raiseだけを記録し、
+street遷移で直前streetのaggressorを引き継ぐ（checkで回ったstreetの次は`None`）。旧stateの読込時は両方`None`。
 size literal の解決と NLH legality は共有 state の query に置き、P2 のサイズ選択・limp・raise cap・tree rule は
 `mw_preflop::betting::BettingMenu` に置く。`from_config` が root で一度だけ `TableSetup` を組む。
 精算の `PotRake` は generic で、`CompiledRake` の実装は `economics::rake`、ICM は `economics::icm`、
