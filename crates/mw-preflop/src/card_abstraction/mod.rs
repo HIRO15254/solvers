@@ -42,3 +42,6 @@ pub trait CardAbstraction: Send + Sync {
     /// card with the board or the street was not built.
     fn bucket(&self, board: &[Card], combo: usize) -> u32;
 }
+
+mod cache;
+pub(crate) use cache::cache_path;

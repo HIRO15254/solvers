@@ -216,7 +216,10 @@ impl RunRecorder {
             MultiwayRunObservation::Stop(stop) => Some(RunEventPayload::Stop {
                 reason: stop.reason.clone(),
             }),
-            MultiwayRunObservation::Live(_) | MultiwayRunObservation::Quality(_) => None,
+            MultiwayRunObservation::Live(_)
+            | MultiwayRunObservation::Quality(_)
+            | MultiwayRunObservation::ProgressOpened
+            | MultiwayRunObservation::Progress { .. } => None,
         };
         if let Some(payload) = payload {
             // A failed event write must not abort a solve that is otherwise

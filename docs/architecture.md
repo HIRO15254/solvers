@@ -97,6 +97,13 @@ P2の既存runtime型の上限はstreetごとのaggression capが255（`u8`）�
 `u32::MAX`。これを超える共通IR値は `NLH003` で拒否し、切詰めや近似は行わない。
 P2のCLI session・資源検査・artifact読込みは`input::Lowered`を使う。
 
+P2の準備・資源計数・rule hit測定は`mw_preflop::prepare`と`mw_preflop::session`にある。
+`mw_preflop::run`はsessionを構築・復元し、solveと停止判定を進め、checkpointと`.mwsol`を書く。
+結果は型付きのrun summaryで返し、進捗と診断は呼出側のobserverへ渡す。
+`mw_preflop::views`はartifactの照会、条件付きrange、profile評価、比較を型付きdataで返す。
+CLIはcache rootの選択、`runfiles`によるrun directory管理、進捗とrun summaryの保存、
+text/JSON/CSVの表示、exit codeの対応付けを担う。P1のsolve・照会の計算は現時点でCLIに残る。
+
 P1 の共通Input用 `input::NlhPayoff` は、`economics` のrake・ICMをterminalで焼き込む。
 rakeの基準potからuncalled wagerを除き、`players_dealt`は元の卓人数、flopを見た人数は2とする。
 effective stackの木から実際の残stackへ戻して効用を計算し、`UtilityModel::baseline`で両者の実際の

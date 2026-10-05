@@ -49,6 +49,12 @@ P2 の root state と合法 menu を取得し、共有 state の wire / artifact
 run の型を `runfiles` から再利用する。`runfiles` は solver crate に依存せず、
 `daemon` の workspace 依存は `runfiles` と `protocol` のみである。workspace 全体の依存は [architecture.md §2](architecture.md#2-レイヤ構成と-workspace)。
 
+P2では、CLIが`mw_preflop::{prepare,run,views}`を呼んで計算する。製品APIはcache rootと
+cancel flagを明示的に受け取り、型付きの進捗・診断を通知し、summaryまたは照会dataを返す。
+CLIのadapterは符号化、stdout/stderr、進捗の保存、run directoryのevent、終了状態を担う。
+checkpoint・solution・評価cacheの入出力は製品crateに残る。daemonは同じCLI子processを起動し、
+依存とprotocolは変わらない。
+
 ## 4. 決定事項
 
 以下の R 番号はアプリケーション境界の識別子であり、product roadmap の R0〜R7 とは別である。

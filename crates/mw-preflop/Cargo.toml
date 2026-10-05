@@ -7,6 +7,7 @@ repository.workspace = true
 description = "Sampled 2-9 player NLHE solving with side pots and tournament utility"
 
 [dependencies]
+anyhow = { workspace = true }
 nlh = { workspace = true }
 economics = { workspace = true }
 runfiles = { workspace = true }

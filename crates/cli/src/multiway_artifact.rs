@@ -1,50 +1,7 @@
-use std::collections::{BTreeMap, BTreeSet};
+//! CLI arguments and byte-stable rendering of product-owned artifact views.
+use anyhow::{Context, Result};
+use mw_preflop::views;
 use std::path::Path;
-
-use anyhow::{Context, Result, anyhow, bail};
-use mw_preflop::solver::{
-    HistoryEntry, HistoryKey, InfoKey, PolicyColumn, PolicyEntry, ProfileVariant,
-    SOLVER_STATE_VERSION, SolverState,
-};
-use mw_preflop::{ExternalSamplingGame, HoldemGame, MultiwayAbstractionBackend};
-use rand::{SeedableRng, rngs::StdRng};
-use serde::Serialize;
-
-use crate::session;
-
-fn parse_solution_config(config_toml: &str) -> Result<mw_preflop::input::Lowered> {
-    crate::nlh_v1::require_artifact_config(config_toml)?;
-    Ok(crate::nlh_v1::p2::prepare(config_toml, Path::new("embedded.toml"))?.lowered)
-}
-
-fn build_solution_session(config_toml: &str) -> Result<session::MultiwaySession> {
-    crate::nlh_v1::require_artifact_config(config_toml)?;
-    crate::nlh_v1::p2::build_session(config_toml, None)
-}
-fn key_hex(key: [u8; 16]) -> String {
-    key.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
-fn read_solution(
-    path: &Path,
-) -> Result<(
-    mw_preflop::mwsol::MultiwaySolutionMetadata,
-    Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
-)> {
-    let mut reader = mw_preflop::mwsol::MwSolReader::open(path)
-        .with_context(|| format!("opening {}", path.display()))?;
-    let metadata = reader.metadata().clone();
-    crate::nlh_v1::require_artifact_config(&metadata.config_toml)?;
-    let mut strategies = Vec::with_capacity(reader.strategy_count());
-    let mut cursor = 0;
-    while cursor < reader.strategy_count() {
-        let page = reader.read_strategy_page(cursor, mw_preflop::mwsol::MWSOL_MAX_PAGE_LIMIT)?;
-        cursor += page.strategies.len();
-        strategies.extend(page.strategies);
-    }
-    Ok((metadata, strategies))
-}
-
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
 pub enum InspectView {
     Node,
@@ -52,284 +9,6 @@ pub enum InspectView {
     Strategy,
     Range,
     Ev,
-}
-
-fn parse_history(
-    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    requested: &str,
-) -> Result<[u8; 16]> {
-    if requested.is_empty() || requested == "root" {
-        return Ok([0; 16]);
-    }
-    if requested.len() == 32 && requested.bytes().all(|byte| byte.is_ascii_hexdigit()) {
-        let mut key = [0; 16];
-        for (index, byte) in key.iter_mut().enumerate() {
-            *byte = u8::from_str_radix(&requested[index * 2..index * 2 + 2], 16)
-                .context("invalid history hex")?;
-        }
-        return Ok(key);
-    }
-
-    let mut current = [0; 16];
-    for segment in requested.split('/').filter(|segment| !segment.is_empty()) {
-        let candidates: Vec<_> = metadata
-            .histories
-            .iter()
-            .filter(|edge| edge.parent == current)
-            .collect();
-        let edge = if let Ok(index) = segment.parse::<u32>() {
-            candidates
-                .into_iter()
-                .find(|edge| edge.action_index == index)
-        } else {
-            candidates.into_iter().find(|edge| edge.action == segment)
-        }
-        .ok_or_else(|| {
-            anyhow!(
-                "history segment {segment:?} is not a child of {}",
-                key_hex(current)
-            )
-        })?;
-        current = edge.key;
-    }
-    Ok(current)
-}
-
-fn parse_runtime_range(raw: &str) -> Result<nlh::Range> {
-    if raw.trim().is_empty() {
-        Ok(nlh::Range::full())
-    } else {
-        Ok(raw.parse()?)
-    }
-}
-
-fn hand_label(index: usize) -> String {
-    const RANKS: [char; 13] = [
-        'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
-    ];
-    let row = index / 13;
-    let column = index % 13;
-    if row == column {
-        format!("{}{}", RANKS[row], RANKS[column])
-    } else if row < column {
-        format!("{}{}s", RANKS[row], RANKS[column])
-    } else {
-        format!("{}{}o", RANKS[column], RANKS[row])
-    }
-}
-
-fn matrix(mut cells: Vec<serde_json::Value>) -> Vec<Vec<serde_json::Value>> {
-    (0..13).map(|_| cells.drain(..13).collect()).collect()
-}
-
-fn strategy_matrix(
-    strategies: &[mw_preflop::mwsol::MultiwayStrategyBlock],
-    weights: &[mw_preflop::mwsol::MultiwayStrategyWeight],
-    history: [u8; 16],
-    actor: u8,
-) -> Vec<Vec<serde_json::Value>> {
-    let weight_by_key: BTreeMap<_, _> = weights
-        .iter()
-        .map(|entry| (entry.key, entry.weight))
-        .collect();
-    let cells = (0..nlh::NUM_CLASSES)
-        .map(|bucket| {
-            let block = strategies.iter().find(|block| {
-                block.key.history == history
-                    && block.key.actor == actor
-                    && block.key.street == 0
-                    && block.key.bucket_path[0] == bucket as u32
-            });
-            match block {
-                Some(block) => serde_json::json!({
-                    "hand": hand_label(bucket),
-                    "bucket": bucket,
-                    "status": "visited",
-                    "weight": weight_by_key.get(&block.key).copied().unwrap_or(0.0),
-                    "strategy": block.actions.iter().cloned()
-                        .zip(block.probabilities.iter().copied())
-                        .collect::<BTreeMap<_, _>>(),
-                }),
-                None => serde_json::json!({
-                    "hand": hand_label(bucket),
-                    "bucket": bucket,
-                    "status": "unvisited",
-                    "weight": 0.0,
-                    "strategy": null,
-                }),
-            }
-        })
-        .collect();
-    matrix(cells)
-}
-
-fn range_matrix(
-    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    strategies: &[mw_preflop::mwsol::MultiwayStrategyBlock],
-    target: [u8; 16],
-) -> Result<Vec<serde_json::Value>> {
-    let config = parse_solution_config(&metadata.config_toml)?;
-    let game = config.game;
-    let mut ranges = game
-        .seats
-        .iter()
-        .map(|seat| {
-            let parsed = parse_runtime_range(&seat.range)?;
-            let mut classes = vec![Some(0.0_f64); nlh::NUM_CLASSES];
-            for combo in 0..nlh::NUM_COMBOS {
-                let (first, second) = nlh::combo_cards(combo);
-                let (hi, lo) = if first.rank() >= second.rank() {
-                    (first, second)
-                } else {
-                    (second, first)
-                };
-                let class = nlh::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit());
-                *classes[class].as_mut().expect("initialized") += f64::from(parsed.weight(combo));
-            }
-            Ok::<_, anyhow::Error>(classes)
-        })
-        .collect::<Result<Vec<_>>>()?;
-
-    let path = metadata
-        .resolve_history(target)
-        .ok_or_else(|| anyhow!("history {} is absent from the public tree", key_hex(target)))?;
-    let mut current = [0; 16];
-    for step in path {
-        for (bucket, reach) in ranges[step.actor as usize].iter_mut().enumerate() {
-            let probability = strategies
-                .iter()
-                .find(|block| {
-                    block.key.history == current
-                        && block.key.actor == step.actor
-                        && block.key.street == 0
-                        && block.key.bucket_path[0] == bucket as u32
-                })
-                .and_then(|block| block.probabilities.get(step.action_index as usize))
-                .copied();
-            *reach = match (*reach, probability) {
-                (Some(reach), Some(probability)) => Some(reach * f64::from(probability)),
-                _ => None,
-            };
-        }
-        current = metadata
-            .histories
-            .iter()
-            .find(|edge| {
-                edge.parent == current
-                    && edge.actor == step.actor
-                    && edge.action_index == step.action_index
-            })
-            .map(|edge| edge.key)
-            .ok_or_else(|| anyhow!("public history is internally inconsistent"))?;
-    }
-
-    Ok(ranges
-        .into_iter()
-        .enumerate()
-        .map(|(seat, values)| {
-            let total: f64 = values.iter().flatten().sum();
-            let cells = values
-                .into_iter()
-                .enumerate()
-                .map(|(bucket, reach)| serde_json::json!({
-                    "hand": hand_label(bucket),
-                    "bucket": bucket,
-                    "status": if reach.is_some() { "known" } else { "unvisited" },
-                    "reachWeight": reach,
-                    "normalizedWeight": reach.filter(|_| total > 0.0).map(|value| value / total),
-                }))
-                .collect();
-            serde_json::json!({ "seat": seat, "grid": matrix(cells) })
-        })
-        .collect())
-}
-
-pub fn inspect(
-    path: &Path,
-    requested_history: &str,
-    view: InspectView,
-    actor_override: Option<u8>,
-    samples: u64,
-    seed: u64,
-    br_traversals: u64,
-) -> Result<()> {
-    if matches!(view, InspectView::Ev) {
-        return inspect_ev(path, requested_history, samples, seed, br_traversals);
-    }
-    let (metadata, strategies) = read_solution(path)?;
-    let history = parse_history(&metadata, requested_history)?;
-    let state = metadata
-        .public_states
-        .binary_search_by_key(&history, |state| state.history)
-        .ok()
-        .map(|index| &metadata.public_states[index])
-        .ok_or_else(|| {
-            anyhow!(
-                "history {} is absent from the public tree",
-                key_hex(history)
-            )
-        })?;
-    let actor = actor_override.or(state.actor);
-    let summary = serde_json::json!({
-        "formatVersion": mw_preflop::mwsol::MWSOL_FORMAT_VERSION,
-        "schemaVersion": metadata.schema_version,
-        "sweeps": metadata.sweeps,
-        "profileType": "approximate-average",
-        "visitedInfosets": strategies.len(),
-        "publicNodes": metadata.public_states.len(),
-        "publicHistoryEdges": metadata.histories.len(),
-        "typedActionEntries": metadata.public_states.iter().map(|state| state.legal_actions.len()).sum::<usize>(),
-        "seats": metadata.seats,
-    });
-    let node = serde_json::json!({
-        "history": key_hex(history),
-        "path": metadata.resolve_history(history),
-        "street": state.street,
-        "actor": state.actor,
-        "potMilliBb": state.pot_millibb,
-        "potBb": state.pot_millibb as f64 / 1000.0,
-        "remainingStacksMilliBb": state.remaining_stacks_millibb,
-        "legalActions": state.legal_actions,
-        "children": metadata.histories.iter()
-            .filter(|edge| edge.parent == history)
-            .map(|edge| serde_json::json!({
-                "history": key_hex(edge.key),
-                "actionIndex": edge.action_index,
-                "action": edge.action,
-            }))
-            .collect::<Vec<_>>(),
-    });
-    let rendered = match view {
-        InspectView::Summary => summary,
-        InspectView::Node => serde_json::json!({
-            "summary": summary,
-            "node": node,
-            "strategy13x13": actor.map(|actor| strategy_matrix(
-                &strategies,
-                &metadata.strategy_weights,
-                history,
-                actor,
-            )),
-            "ranges13x13": range_matrix(&metadata, &strategies, history)?,
-        }),
-        InspectView::Strategy => serde_json::json!({
-            "node": node,
-            "actor": actor,
-            "grid": actor.map(|actor| strategy_matrix(
-                &strategies,
-                &metadata.strategy_weights,
-                history,
-                actor,
-            )),
-        }),
-        InspectView::Range => serde_json::json!({
-            "node": node,
-            "ranges": range_matrix(&metadata, &strategies, history)?,
-        }),
-        InspectView::Ev => unreachable!(),
-    };
-    println!("{}", serde_json::to_string_pretty(&rendered)?);
-    Ok(())
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -346,6 +25,91 @@ pub enum ExportView {
 pub enum ExportFormat {
     Json,
     Csv,
+}
+
+impl From<InspectView> for views::InspectView {
+    fn from(value: InspectView) -> Self {
+        match value {
+            InspectView::Node => Self::Node,
+            InspectView::Summary => Self::Summary,
+            InspectView::Strategy => Self::Strategy,
+            InspectView::Range => Self::Range,
+            InspectView::Ev => Self::Ev,
+        }
+    }
+}
+impl From<ExportView> for views::ExportView {
+    fn from(value: ExportView) -> Self {
+        match value {
+            ExportView::Strategy => Self::Strategy,
+            ExportView::Actions => Self::Actions,
+            ExportView::Range => Self::Range,
+            ExportView::Ev => Self::Ev,
+            ExportView::Tree => Self::Tree,
+            ExportView::Summary => Self::Summary,
+        }
+    }
+}
+
+fn key_hex(key: [u8; 16]) -> String {
+    key.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+pub fn inspect(
+    path: &Path,
+    requested_history: &str,
+    view: InspectView,
+    actor_override: Option<u8>,
+    samples: u64,
+    seed: u64,
+    br_traversals: u64,
+) -> Result<()> {
+    let data = views::inspect(
+        path,
+        views::InspectRequest {
+            history: requested_history,
+            view: view.into(),
+            actor: actor_override,
+            samples,
+            seed,
+            br_traversals,
+        },
+        crate::cache::root().as_deref(),
+        &mut crate::multiway_solve::print_abstraction,
+    )?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::to_value(data)?)?
+    );
+    Ok(())
+}
+
+pub fn compare(left: &Path, right: &Path, cross_game: bool) -> Result<()> {
+    let data = views::compare(
+        left,
+        right,
+        cross_game,
+        crate::cache::root().as_deref(),
+        &mut crate::multiway_solve::print_abstraction,
+    )?;
+    println!("{}", serde_json::to_string_pretty(&data)?);
+    Ok(())
+}
+
+pub fn evaluate(path: &Path, samples: u64, seed: u64, br_traversals: u64) -> Result<()> {
+    let data = views::evaluate(
+        path,
+        samples,
+        seed,
+        br_traversals,
+        crate::cache::root().as_deref(),
+        &mut crate::multiway_solve::print_abstraction,
+    )?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::to_value(data)?)?
+    );
+    Ok(())
 }
 
 fn action_fields(
@@ -377,7 +141,11 @@ pub fn export(
     format: ExportFormat,
     output: Option<&Path>,
 ) -> Result<()> {
-    let (metadata, strategies) = read_solution(path)?;
+    let views::ExportData {
+        metadata,
+        strategies,
+        ranges,
+    } = views::export(path, view.into())?;
     let rendered = match (view, format) {
         (ExportView::Summary, ExportFormat::Json) => {
             serde_json::to_string_pretty(&serde_json::json!({
@@ -396,7 +164,7 @@ pub fn export(
         }
         (ExportView::Strategy, ExportFormat::Json) => serde_json::to_string_pretty(&strategies)?,
         (ExportView::Ev, ExportFormat::Json) => serde_json::to_string_pretty(&metadata.seats)?,
-        (ExportView::Range, ExportFormat::Json) => export_ranges_json(&metadata.config_toml)?,
+        (ExportView::Range, ExportFormat::Json) => export_ranges_json(&ranges)?,
         (ExportView::Actions, ExportFormat::Json) => {
             let rows: Vec<_> = metadata
                 .public_states
@@ -481,7 +249,7 @@ pub fn export(
                 strategies.len()
             )
         }
-        (ExportView::Range, ExportFormat::Csv) => export_ranges_csv(&metadata.config_toml)?,
+        (ExportView::Range, ExportFormat::Csv) => export_ranges_csv(&ranges)?,
         (ExportView::Ev, ExportFormat::Csv) => export_ev_csv(&metadata.seats),
     };
     if let Some(output) = output {
@@ -493,23 +261,18 @@ pub fn export(
     Ok(())
 }
 
-fn export_ranges_json(config_toml: &str) -> Result<String> {
-    let config = parse_solution_config(config_toml)?;
-    let game = config.game;
-    let rows: Vec<_> = game
-        .seats
-        .into_iter()
+fn export_ranges_json(ranges: &[views::RangeRow]) -> Result<String> {
+    let rows: Vec<_> = ranges
+        .iter()
         .enumerate()
         .map(|(seat, value)| serde_json::json!({ "seat": seat, "range": value.range }))
         .collect();
     Ok(serde_json::to_string_pretty(&rows)?)
 }
 
-fn export_ranges_csv(config_toml: &str) -> Result<String> {
-    let config = parse_solution_config(config_toml)?;
-    let game = config.game;
+fn export_ranges_csv(ranges: &[views::RangeRow]) -> Result<String> {
     let mut csv = String::from("seat,range\n");
-    for (seat, value) in game.seats.into_iter().enumerate() {
+    for (seat, value) in ranges.iter().enumerate() {
         csv.push_str(&format!(
             "{},\"{}\"\n",
             seat,
@@ -538,696 +301,4 @@ fn export_ev_csv(seats: &[mw_preflop::mwsol::MultiwaySeatResult]) -> String {
         ));
     }
     csv
-}
-
-fn comparison_mapping(config_toml: &str) -> Result<(usize, &'static str)> {
-    let config = parse_solution_config(config_toml)?;
-    let game = &config.game;
-    let unit = match &config.utility {
-        mw_preflop::UtilityConfig::ChipEv => "bb",
-        mw_preflop::UtilityConfig::TournamentIcm { .. } => "prize",
-    };
-    Ok((game.seats.len(), unit))
-}
-
-fn comparison_recall(config_toml: &str) -> Result<mw_preflop::RecallMode> {
-    let config = parse_solution_config(config_toml)?;
-    let game = config.game;
-    Ok(game.abstraction.recall)
-}
-
-const CROSS_ABSTRACTION_SAMPLES: u64 = 1_024;
-const CROSS_ABSTRACTION_SEED: u64 = 0x6d77_636f_6d70_6172;
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SeatComparison {
-    seat: u8,
-    profile_ev_mean_delta: Option<f64>,
-    profile_ev_stderr_delta: Option<f64>,
-    average_positive_regret_delta: f64,
-    strategy_drift_l1_delta: f64,
-    deviation_gain_lower_bound_mean_delta: Option<f64>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct Comparison {
-    basis: &'static str,
-    shared_infosets: usize,
-    only_left: usize,
-    only_right: usize,
-    real_card_samples: Option<u64>,
-    mean_strategy_l1: f64,
-    max_strategy_l1: f64,
-    sweep_delta: i128,
-    left_stop_status: String,
-    right_stop_status: String,
-    seats: Vec<SeatComparison>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum ComparisonBasis {
-    BucketInfoset,
-    SharedRealCardSample,
-}
-
-impl ComparisonBasis {
-    fn for_artifacts(
-        left_fingerprint: [u8; 32],
-        right_fingerprint: [u8; 32],
-        left_recall: mw_preflop::RecallMode,
-        right_recall: mw_preflop::RecallMode,
-    ) -> Self {
-        // Recall is checked independently for compatibility with artifacts
-        // written before recall entered the abstraction fingerprint. Two
-        // legacy current-street/full solutions can carry the same backend
-        // fingerprint even though their infoset keys are not comparable.
-        if left_fingerprint == right_fingerprint && left_recall == right_recall {
-            Self::BucketInfoset
-        } else {
-            Self::SharedRealCardSample
-        }
-    }
-
-    fn label(self) -> &'static str {
-        match self {
-            Self::BucketInfoset => "bucket-infoset",
-            Self::SharedRealCardSample => "shared-real-card-sample",
-        }
-    }
-}
-
-fn strategy_l1(
-    key: mw_preflop::mwsol::MultiwayStrategyKey,
-    left: &mw_preflop::mwsol::MultiwayStrategyBlock,
-    right: &mw_preflop::mwsol::MultiwayStrategyBlock,
-) -> Result<f64> {
-    if left.actions != right.actions || left.probabilities.len() != right.probabilities.len() {
-        bail!("action table differs at shared infoset {key:?}");
-    }
-    Ok(left
-        .probabilities
-        .iter()
-        .zip(&right.probabilities)
-        .map(|(a, b)| f64::from((a - b).abs()))
-        .sum())
-}
-
-fn replay_public_state(
-    game: &HoldemGame<MultiwayAbstractionBackend>,
-    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    history: [u8; 16],
-) -> Result<mw_preflop::BettingState> {
-    let mut state = game.root_state();
-    let path = metadata.resolve_history(history).ok_or_else(|| {
-        anyhow!(
-            "history {} is absent from the public tree",
-            key_hex(history)
-        )
-    })?;
-    for step in path {
-        if game.actor(&state) != Some(step.actor as usize) {
-            bail!(
-                "public history actor differs while rebuilding {}",
-                key_hex(history)
-            );
-        }
-        let actions = game.node_actions(&state);
-        let action_index = usize::try_from(step.action_index)
-            .map_err(|_| anyhow!("public history action index exceeds platform width"))?;
-        if action_index >= game.num_actions_of(&actions)
-            || game.action_label_of(&actions, action_index) != step.action
-        {
-            bail!(
-                "public history action differs while rebuilding {}",
-                key_hex(history)
-            );
-        }
-        state = game.next_state_with(&state, &actions, action_index);
-    }
-    Ok(state)
-}
-
-fn compare_same_abstraction(
-    left: &BTreeMap<
-        mw_preflop::mwsol::MultiwayStrategyKey,
-        mw_preflop::mwsol::MultiwayStrategyBlock,
-    >,
-    right: &BTreeMap<
-        mw_preflop::mwsol::MultiwayStrategyKey,
-        mw_preflop::mwsol::MultiwayStrategyBlock,
-    >,
-) -> Result<(usize, usize, usize, f64, f64)> {
-    let mut sum = 0.0;
-    let mut maximum = 0.0_f64;
-    let mut shared = 0;
-    for (key, left_block) in left {
-        let Some(right_block) = right.get(key) else {
-            continue;
-        };
-        let l1 = strategy_l1(*key, left_block, right_block)?;
-        sum += l1;
-        maximum = maximum.max(l1);
-        shared += 1;
-    }
-    Ok((
-        shared,
-        left.len() - shared,
-        right.len() - shared,
-        if shared == 0 {
-            0.0
-        } else {
-            sum / shared as f64
-        },
-        maximum,
-    ))
-}
-
-fn compare_shared_real_cards(
-    left_meta: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    right_meta: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    left: &BTreeMap<
-        mw_preflop::mwsol::MultiwayStrategyKey,
-        mw_preflop::mwsol::MultiwayStrategyBlock,
-    >,
-    right: &BTreeMap<
-        mw_preflop::mwsol::MultiwayStrategyKey,
-        mw_preflop::mwsol::MultiwayStrategyBlock,
-    >,
-) -> Result<(usize, usize, usize, f64, f64)> {
-    let left_session = build_solution_session(&left_meta.config_toml)
-        .context("rebuilding the left abstraction")?;
-    let right_session = build_solution_session(&right_meta.config_toml)
-        .context("rebuilding the right abstraction")?;
-    let (left_game, sampler, _) = left_session.solver.into_components();
-    let (right_game, _, _) = right_session.solver.into_components();
-
-    let mut states = Vec::new();
-    for left_public in &left_meta.public_states {
-        let Some(actor) = left_public.actor else {
-            continue;
-        };
-        let Some(right_public) = right_meta
-            .public_states
-            .binary_search_by_key(&left_public.history, |state| state.history)
-            .ok()
-            .map(|index| &right_meta.public_states[index])
-        else {
-            continue;
-        };
-        if right_public.actor != Some(actor) || right_public.street != left_public.street {
-            continue;
-        }
-        states.push((
-            left_public.history,
-            actor,
-            replay_public_state(&left_game, left_meta, left_public.history)?,
-            replay_public_state(&right_game, right_meta, right_public.history)?,
-        ));
-    }
-
-    let mut rng = StdRng::seed_from_u64(CROSS_ABSTRACTION_SEED);
-    let mut sum = 0.0;
-    let mut maximum = 0.0_f64;
-    let mut shared = 0;
-    let mut only_left = 0;
-    let mut only_right = 0;
-    for _ in 0..CROSS_ABSTRACTION_SAMPLES {
-        let world = sampler.sample(&mut rng)?;
-        for (history, actor, left_state, right_state) in &states {
-            let left_private = left_game.bucket(left_state, &world, *actor as usize);
-            let right_private = right_game.bucket(right_state, &world, *actor as usize);
-            let left_key = mw_preflop::mwsol::MultiwayStrategyKey {
-                history: *history,
-                actor: *actor,
-                street: left_private.street,
-                active_opponents: left_private.active_opponents,
-                bucket_path: left_private.bucket_path,
-            };
-            let right_key = mw_preflop::mwsol::MultiwayStrategyKey {
-                history: *history,
-                actor: *actor,
-                street: right_private.street,
-                active_opponents: right_private.active_opponents,
-                bucket_path: right_private.bucket_path,
-            };
-            match (left.get(&left_key), right.get(&right_key)) {
-                (Some(left_block), Some(right_block)) => {
-                    let l1 = strategy_l1(left_key, left_block, right_block)?;
-                    sum += l1;
-                    maximum = maximum.max(l1);
-                    shared += 1;
-                }
-                (Some(_), None) => only_left += 1,
-                (None, Some(_)) => only_right += 1,
-                (None, None) => {}
-            }
-        }
-    }
-    if shared == 0 {
-        bail!("different abstractions had no shared visited real-card observations");
-    }
-    Ok((shared, only_left, only_right, sum / shared as f64, maximum))
-}
-
-pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<()> {
-    let (left_meta, left_blocks) = read_solution(left_path)?;
-    let (right_meta, right_blocks) = read_solution(right_path)?;
-    let left_mapping = comparison_mapping(&left_meta.config_toml)?;
-    let right_mapping = comparison_mapping(&right_meta.config_toml)?;
-    let left_recall = comparison_recall(&left_meta.config_toml)?;
-    let right_recall = comparison_recall(&right_meta.config_toml)?;
-    if !cross_game && left_meta.game_fingerprint != right_meta.game_fingerprint {
-        bail!(
-            "solutions have different game fingerprints; pass --cross-game to compare explicitly"
-        );
-    }
-    if cross_game && left_mapping != right_mapping {
-        bail!("cross-game comparison requires identical seat mapping and utility units");
-    }
-    let left: BTreeMap<_, _> = left_blocks
-        .into_iter()
-        .map(|block| (block.key, block))
-        .collect();
-    let right: BTreeMap<_, _> = right_blocks
-        .into_iter()
-        .map(|block| (block.key, block))
-        .collect();
-    let basis = ComparisonBasis::for_artifacts(
-        left_meta.abstraction_fingerprint,
-        right_meta.abstraction_fingerprint,
-        left_recall,
-        right_recall,
-    );
-    let (shared, only_left, only_right, mean, maximum) = match basis {
-        ComparisonBasis::BucketInfoset => compare_same_abstraction(&left, &right)?,
-        ComparisonBasis::SharedRealCardSample => {
-            compare_shared_real_cards(&left_meta, &right_meta, &left, &right)?
-        }
-    };
-    let seats = left_meta
-        .seats
-        .iter()
-        .map(|left_seat| {
-            let right_seat = right_meta
-                .seats
-                .iter()
-                .find(|seat| seat.seat == left_seat.seat)
-                .ok_or_else(|| anyhow!("right solution is missing seat {}", left_seat.seat))?;
-            Ok(SeatComparison {
-                seat: left_seat.seat,
-                profile_ev_mean_delta: left_seat
-                    .profile_ev
-                    .as_ref()
-                    .zip(right_seat.profile_ev.as_ref())
-                    .map(|(left, right)| right.mean - left.mean),
-                profile_ev_stderr_delta: left_seat
-                    .profile_ev
-                    .as_ref()
-                    .zip(right_seat.profile_ev.as_ref())
-                    .map(|(left, right)| right.stderr - left.stderr),
-                average_positive_regret_delta: right_seat.average_positive_regret
-                    - left_seat.average_positive_regret,
-                strategy_drift_l1_delta: right_seat.strategy_drift_l1 - left_seat.strategy_drift_l1,
-                deviation_gain_lower_bound_mean_delta: left_seat
-                    .deviation_gain_lower_bound
-                    .as_ref()
-                    .zip(right_seat.deviation_gain_lower_bound.as_ref())
-                    .map(|(left, right)| right.mean - left.mean),
-            })
-        })
-        .collect::<Result<Vec<_>>>()?;
-    let result = Comparison {
-        basis: basis.label(),
-        shared_infosets: shared,
-        only_left,
-        only_right,
-        real_card_samples: (basis == ComparisonBasis::SharedRealCardSample)
-            .then_some(CROSS_ABSTRACTION_SAMPLES),
-        mean_strategy_l1: mean,
-        max_strategy_l1: maximum,
-        sweep_delta: i128::from(right_meta.sweeps) - i128::from(left_meta.sweeps),
-        left_stop_status: left_meta.stop_status,
-        right_stop_status: right_meta.stop_status,
-        seats,
-    };
-    println!("{}", serde_json::to_string_pretty(&result)?);
-    Ok(())
-}
-
-fn evaluate_prepared(
-    build: impl FnOnce() -> Result<session::MultiwaySession>,
-    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    blocks: Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
-    samples: u64,
-    seed: u64,
-    br_traversals: u64,
-    train_deviators: bool,
-) -> Result<serde_json::Value> {
-    if samples == 0 || (train_deviators && br_traversals == 0) {
-        bail!("evaluation requires positive samples and deviation traversals");
-    }
-    let mut mw_session = build().context("rebuilding the solution game")?;
-    let num_players = mw_session.game_config.seats.len();
-    let traversals = metadata.sweeps.saturating_mul(num_players as u64);
-    let mut needed_histories: BTreeSet<_> = blocks.iter().map(|block| block.key.history).collect();
-    let mut frontier: Vec<_> = needed_histories.iter().copied().collect();
-    while let Some(history) = frontier.pop() {
-        if history == [0; 16] {
-            continue;
-        }
-        let edge = metadata
-            .histories
-            .binary_search_by_key(&history, |edge| edge.key)
-            .ok()
-            .map(|index| &metadata.histories[index])
-            .ok_or_else(|| anyhow!("strategy history is absent from the public tree"))?;
-        if edge.parent != [0; 16] && needed_histories.insert(edge.parent) {
-            frontier.push(edge.parent);
-        }
-    }
-    let state = SolverState {
-        schema_version: SOLVER_STATE_VERSION,
-        config: mw_session.solver.config(),
-        traversals,
-        completed_sweeps: metadata.sweeps,
-        next_sample_id: traversals,
-        total_deal_attempts: 0,
-        terminal_evaluations: 0,
-        hand_updates: traversals,
-        histories: metadata
-            .histories
-            .iter()
-            .filter(|entry| needed_histories.contains(&entry.key))
-            .map(|entry| HistoryEntry {
-                key: HistoryKey(entry.key),
-                parent: HistoryKey(entry.parent),
-                actor: entry.actor,
-                action_index: entry.action_index,
-                action_label: entry.action.clone(),
-            })
-            .collect(),
-        policies: blocks
-            .into_iter()
-            .map(|block| PolicyEntry {
-                key: InfoKey {
-                    history: HistoryKey(block.key.history),
-                    player: block.key.actor,
-                    street: block.key.street,
-                    active_opponents: block.key.active_opponents,
-                    bucket_path: block.key.bucket_path,
-                },
-                column: PolicyColumn {
-                    regrets: vec![0.0; block.probabilities.len()],
-                    strategy_sum: block.probabilities,
-                    action_labels: block.actions,
-                },
-            })
-            .collect(),
-    };
-    let (game, sampler, config) = mw_session.solver.into_components();
-    let restored = mw_preflop::MultiwaySolver::from_state_with_config_preallocated_with_threads(
-        game,
-        sampler,
-        state,
-        config,
-        mw_session.threads,
-    );
-    mw_session.solver = restored.context("restoring the formal average profile")?;
-    let deviators = if train_deviators {
-        Some(session::train_deviators_parallel(
-            &mw_session.solver,
-            num_players,
-            mw_session.threads,
-            br_traversals,
-            seed ^ 0x6576_616c,
-            ProfileVariant::default(),
-        )?)
-    } else {
-        None
-    };
-    let evaluation = mw_session.solver.evaluate_profile(
-        samples,
-        seed,
-        deviators.as_deref(),
-        ProfileVariant::default(),
-    )?;
-    Ok(serde_json::to_value(evaluation)?)
-}
-
-fn evaluate_value(
-    path: &Path,
-    samples: u64,
-    seed: u64,
-    br_traversals: u64,
-) -> Result<serde_json::Value> {
-    let (metadata, blocks) = read_solution(path)?;
-    evaluate_prepared(
-        || build_solution_session(&metadata.config_toml),
-        &metadata,
-        blocks,
-        samples,
-        seed,
-        br_traversals,
-        true,
-    )
-}
-
-fn combo_class(combo: usize) -> usize {
-    let (first, second) = nlh::combo_cards(combo);
-    let (hi, lo) = if first.rank() >= second.rank() {
-        (first, second)
-    } else {
-        (second, first)
-    };
-    nlh::class_index(hi.rank(), lo.rank(), hi.suit() == lo.suit())
-}
-
-fn explicit_range(weights: &[f32]) -> Result<String> {
-    let maximum = weights.iter().copied().fold(0.0_f32, f32::max);
-    if maximum <= 0.0 {
-        bail!("selected node has an unvisited/empty conditional range");
-    }
-    Ok(weights
-        .iter()
-        .enumerate()
-        .filter(|(_, weight)| **weight > 0.0)
-        .map(|(combo, weight)| {
-            let (first, second) = nlh::combo_cards(combo);
-            format!("{first}{second}:{}", weight / maximum)
-        })
-        .collect::<Vec<_>>()
-        .join(","))
-}
-
-fn node_conditioned_evaluation(
-    metadata: &mw_preflop::mwsol::MultiwaySolutionMetadata,
-    mut blocks: Vec<mw_preflop::mwsol::MultiwayStrategyBlock>,
-    target: [u8; 16],
-    samples: u64,
-    seed: u64,
-) -> Result<serde_json::Value> {
-    let mut config = parse_solution_config(&metadata.config_toml)?;
-    let game = &mut config.game;
-    let mut ranges = game
-        .seats
-        .iter()
-        .map(|seat| Ok::<_, anyhow::Error>(parse_runtime_range(&seat.range)?.weights().to_vec()))
-        .collect::<Result<Vec<_>>>()?;
-    let path = metadata
-        .resolve_history(target)
-        .ok_or_else(|| anyhow!("history {} is absent from the public tree", key_hex(target)))?;
-    let mut current = [0; 16];
-    for step in path {
-        let state = metadata
-            .public_states
-            .binary_search_by_key(&current, |state| state.history)
-            .ok()
-            .map(|index| &metadata.public_states[index])
-            .ok_or_else(|| anyhow!("public history is internally inconsistent"))?;
-        if state.street != 0 {
-            bail!("node-conditioned EV currently requires a preflop node");
-        }
-        let mut class_probability = vec![None; nlh::NUM_CLASSES];
-        for block in blocks
-            .iter()
-            .filter(|block| block.key.history == current && block.key.actor == step.actor)
-        {
-            class_probability[block.key.bucket_path[0] as usize] =
-                block.probabilities.get(step.action_index as usize).copied();
-        }
-        for (combo, weight) in ranges[step.actor as usize].iter_mut().enumerate() {
-            *weight *= class_probability[combo_class(combo)].unwrap_or(0.0);
-        }
-        for block in blocks
-            .iter_mut()
-            .filter(|block| block.key.history == current && block.key.actor == step.actor)
-        {
-            block.probabilities.fill(0.0);
-            if let Some(probability) = block.probabilities.get_mut(step.action_index as usize) {
-                *probability = 1.0;
-            }
-        }
-        current = metadata
-            .histories
-            .iter()
-            .find(|edge| {
-                edge.parent == current
-                    && edge.actor == step.actor
-                    && edge.action_index == step.action_index
-            })
-            .map(|edge| edge.key)
-            .ok_or_else(|| anyhow!("public history is internally inconsistent"))?;
-    }
-    for (seat_index, (seat, weights)) in game.seats.iter_mut().zip(&ranges).enumerate() {
-        seat.range = explicit_range(weights)
-            .with_context(|| format!("conditioning seat {seat_index} at {}", key_hex(target)))?;
-    }
-    let conditioned_seats = game.seats.clone();
-    let session = || {
-        let mut p = crate::nlh_v1::p2::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
-        p.lowered.game.seats.clone_from(&conditioned_seats);
-        crate::nlh_v1::p2::build_typed_session(p.lowered, p.effective, None)
-    };
-    evaluate_prepared(session, metadata, blocks, samples, seed, 0, false)
-}
-
-pub fn evaluate(path: &Path, samples: u64, seed: u64, br_traversals: u64) -> Result<()> {
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&evaluate_value(path, samples, seed, br_traversals)?)?
-    );
-    Ok(())
-}
-
-fn inspect_ev(
-    path: &Path,
-    requested_history: &str,
-    samples: u64,
-    seed: u64,
-    br_traversals: u64,
-) -> Result<()> {
-    let (metadata, blocks) = read_solution(path)?;
-    let history = parse_history(&metadata, requested_history)?;
-    let cache_path = path.with_extension("mwsol.inspect-cache.json");
-    let fingerprint = runfiles::config_hash_hex(&metadata.config_fingerprint);
-    if let Ok(contents) = std::fs::read_to_string(&cache_path)
-        && let Ok(mut cached) = serde_json::from_str::<serde_json::Value>(&contents)
-        && cached["solutionFingerprint"] == fingerprint
-        && cached["history"] == key_hex(history)
-        && cached["samples"] == samples
-        && cached["seed"] == seed
-        && cached["brTraversals"] == br_traversals
-    {
-        cached["cacheHit"] = serde_json::Value::Bool(true);
-        println!("{}", serde_json::to_string_pretty(&cached)?);
-        return Ok(());
-    }
-    let (scope, evaluation) = if history == [0; 16] {
-        (
-            "formal-average-profile",
-            evaluate_prepared(
-                || build_solution_session(&metadata.config_toml),
-                &metadata,
-                blocks,
-                samples,
-                seed,
-                br_traversals,
-                true,
-            )?,
-        )
-    } else {
-        (
-            "node-conditioned-profile",
-            node_conditioned_evaluation(&metadata, blocks, history, samples, seed)?,
-        )
-    };
-    let rendered = serde_json::json!({
-        "scope": scope,
-        "history": key_hex(history),
-        "solutionFingerprint": fingerprint,
-        "samples": samples,
-        "seed": seed,
-        "brTraversals": br_traversals,
-        "cacheHit": false,
-        "evaluation": evaluation,
-    });
-    std::fs::write(
-        &cache_path,
-        format!("{}\n", serde_json::to_string_pretty(&rendered)?),
-    )
-    .with_context(|| format!("writing evaluation cache {}", cache_path.display()))?;
-    println!("{}", serde_json::to_string_pretty(&rendered)?);
-    Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn removed_artifact_families_are_refused_on_every_read_surface() {
-        let raw =
-            include_str!("../../mw-preflop/tests/fixtures/preflop_multiway_v1_3max_smoke.toml");
-        let mut session = session::build_multiway_session(raw, None).unwrap();
-        session.solver.run_sweeps_with_threads(1, 1).unwrap();
-        let snapshot = session.solver.snapshot_state();
-        let mut row = session::metrics_row(&session.solver.metrics(), vec![0.0; 3], 0.0, None);
-        row.phase = "completed".into();
-        let mut solution = session::make_solution(
-            &session.config_toml,
-            session.solver.abstraction_fingerprint(),
-            session.solver.configuration_fingerprint(),
-            session.solver.game(),
-            &snapshot,
-            &row,
-        );
-        let dir = tempfile::tempdir().unwrap();
-        let current = dir.path().join("current.mwsol");
-        mw_preflop::mwsol::write_mwsol_with(
-            &current,
-            &solution,
-            mw_preflop::mwsol::MwsolStorage::F32,
-        )
-        .unwrap();
-        for family in ["solvers.multiway-preflop/v1", "solvers.postflop/v1"] {
-            solution.config_toml = format!("schema = '{family}'\n");
-            solution.config_fingerprint = runfiles::config_hash(solution.config_toml.as_bytes());
-            let old = dir.path().join("old.mwsol");
-            mw_preflop::mwsol::write_mwsol_with(
-                &old,
-                &solution,
-                mw_preflop::mwsol::MwsolStorage::F32,
-            )
-            .unwrap();
-            let mut outcomes = vec![
-                inspect(&old, "root", InspectView::Summary, None, 2, 1, 0),
-                evaluate(&old, 2, 1, 0),
-                compare(&old, &current, false),
-                compare(&current, &old, false),
-            ];
-            for view in [
-                ExportView::Summary,
-                ExportView::Tree,
-                ExportView::Strategy,
-                ExportView::Range,
-                ExportView::Actions,
-                ExportView::Ev,
-            ] {
-                outcomes.push(export(&old, view, ExportFormat::Json, None));
-            }
-            for result in outcomes {
-                let error = result.unwrap_err();
-                assert_eq!(crate::error_exit_code(&error), 3);
-                let message = format!("{error:#}");
-                assert!(message.contains(family), "{message}");
-                assert!(
-                    message.contains("re-solve from a solvers.nlh/v1 config"),
-                    "{message}"
-                );
-                assert!(message.contains("docs/nlh-input-v1.jp.md"), "{message}");
-            }
-        }
-    }
 }
