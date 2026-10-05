@@ -45,7 +45,8 @@
 ### 3.2 L0モデル
 
 seat iがcombo h（class c）を持つとき、他のseat jのcomboは互いに独立に、hと重ならないcomboの中からrange weightに
-比例する確率で配られるとみなす（heroから見た2人ずつのcard removal）。
+比例する確率で配られるとみなす（heroから見た2人ずつのcard removal）。seat iから見た配札の同時確率は、全seatの
+range weightの積に比例し、heroと各相手のcardが重ならないことだけを条件にする。2人ではこれが入力のゲームと一致する。
 
 - 相手同士のcardの重なりと、foldしたseatのcard（bunching）は考慮しない。P1がfoldしたplayerのcard removalを
   扱わないのと同じ種類の近似である。
@@ -83,7 +84,7 @@ B1・B2・B4・B5の入力は、使う段階で`examples/bench/`に追加する�
 | 段階 | 内容 | 完了条件 |
 |---|---|---|
 | **S4-0** | 本計画、利用者決定、benchmarkの文書化 | 製品定義・再構築計画・索引と同期し、`tools/check_docs.py`が通る |
-| **S4-1a** | L0モデルの厳密BR評価器。暫定方式の解を測る | (1) 表の恒等式・対称性・既知値の検査 (2) 小さい木で、class組を総当たりする参照実装と一致 (3) B1で、独立実装（Python）のBR・NashConvと一致 (4) B3の暫定方式の解（30k/300k sweep、seed 0/1）のseat別`g_i`と`NashConv`を記録 |
+| **S4-1a** | L0モデルの厳密BR評価器。暫定方式の解を測る。chip EVの木を対象とし、ICMはB2とともにS4-1bで扱う | (1) 表の恒等式・対称性・既知値の検査 (2) 小さい木で、class組を総当たりする参照実装と一致 (3) B1で、独立実装（Python）のBR・NashConvと一致 (4) B3の暫定方式の解（30k/300k sweep、seed 0/1）のseat別`g_i`と`NashConv`を記録 |
 | **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装 | B1の`NashConv`が目標以下（目標値はS4-1bの着手時に決める）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録 |
 | **S4-2** | L1（2人でFlopへ行くleaf） | 小さい例で`NashConv`が下がる。L0とL1の解の差を記録。GTO Wizard参照とのsanity check |
 | **S4-3** | 製品の切替 | `.mwsol` v5（Preflopだけ）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
