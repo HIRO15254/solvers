@@ -382,8 +382,9 @@ comparison = "<" | "<=" | "==" | "!=" | ">=" | ">"
 優先順位は括弧、比較・`in`・bool変数、`!`、`&&`、`||`の順である。
 右辺はliteralだけであり、変数間比較、算術、関数は無い。
 裸tokenは`[A-Za-z0-9_.%-]`の列である。数値literalはそのtokenをf64として解析する。
-符号・指数形（`-1`、`1e3`）のほか`inf`・`NaN`も処理系は受理する。比較はIEEEの規則に従う。
-chip量とsize literalの有限値検査とは別である。引用textにescape構文は無い。
+符号・指数形（`-1`、`1e3`）を受理するが、解析後の値は有限でなければならない。
+`1e999`・`inf`・`NaN`等の非有限値は、param/define・overrideを経由する場合もscriptの行を示す`NLH003`で拒否する。
+比較はIEEEの規則に従う。引用textにescape構文は無い。
 text literalは`"BTN"`などの引用形または裸tokenである。bool比較はtrue/falseを使う。
 数値変数は全比較と`in`、text変数は`==` / `!=` / `in`、bool変数は単独または`==` / `!=`だけである。
 `in`の要素は変数と同じ型に限る。boolの`in`は不可。未知識別子と型不一致は`NLH003`である。
@@ -506,7 +507,12 @@ P1は木のdecision nodeで条件が一度でも真になったかを実測す�
 一度も一致しないruleはwarningでありerrorではない。固定boardで取られない`if`枝も対象になる。
 spot開始streetより前のruleは木に含めず、warning対象からも除く。開始street以降は通常どおりである。
 `report`はboard集合全体でhitをORし、全boardで未使用のruleだけを報告する。
-P2も`validate`がpublic treeのdecision nodeで条件一致を実測し、一度も一致しないruleを警告する。
+P2は`validate --resources`のarena countと、`solve` / `resume`のpublic tree構築で条件一致を実測する。
+ruleのstreetと同じstreetのdecision nodeで、acting seatに対する条件が一度でも真になればhitである。
+候補を変更したかではなく条件一致を数え、追加の木走査は行わない。完全な計測で一度も一致しないruleだけを警告する。
+通常の`validate`は木を走査せず、未使用ruleは未検査であることと`--resources`で検査できることを表示する。
+memoryまたはnode上限でcountが打ち切られた場合は不完全と表示し、未一致ruleの警告を出さない。
+P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomplete"`）と`warnings`を返す。
 `checkdown`の遷移短絡でdecision nodeを持たないstreetのruleは一致しない。
 
 ## 10. `[solver]`
@@ -681,7 +687,6 @@ memory超過等は木構築・solve前の資源検査で検出する。終了cod
 
 旧family専用CLIのdispatchはまだ存在する。第14節の拒否規則は共通parserの契約であり、
 旧dispatchの削除とCLI全体の拒否への切替はM7で同期する。
-共通parserの現行`NLH001` messageは新schema名を示すが文書pathを含まない。文書への案内も同期対象である。
 未接続の挙動を実装済みと扱わない。
 
 ## 14. 例
@@ -810,3 +815,4 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | `checkdown`の製品差（第9節） | P2は一致したactorの手番でstreetを閉じる（旧Multiwayの挙動）。P1はそのactorのmenuをcheckだけにする。そろえるかを確認する | 第9節・effectと合法性 |
 | `rounding_unit_bb`（第6節） | 0.001だけを受ける | 第6節 |
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |
+| P2の未使用rule計測（第9節） | 通常の`validate`は未検査を表示する。`validate --resources`のcountと`solve` / `resume`の木構築で実測し、打切り時は不完全として未一致警告を出さない | 第9節・未使用ruleの警告 |

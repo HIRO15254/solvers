@@ -83,11 +83,16 @@ board・lineのないPreflop rootはP2が解く。`[solver]` / `[output]` はP2�
 共通のtable・economics・ranges・tree・runは [`solvers.nlh/v1`](nlh-input-v1.jp.md)、計算と成果物は [P2](mw-preflop.jp.md) に従う。
 旧familyの例と契約はM7まで残す。
 
-- `validate` は製品、tableのposition・stack・first actor、range、tree param/rule、未一致ruleの警告を
-  human/JSONで表示する。`--show-effective` / `--write-effective` は既定値を明示し、sourceをscript本文へ
+- `validate` は製品、tableのposition・stack・first actor、range、tree param/ruleをhuman/JSONで表示する。
+  通常は木を走査せず、未使用ruleは未検査であることと`--resources`で検査できることを表示する。
+  `--show-effective` / `--write-effective` は既定値を明示し、sourceをscript本文へ
   inline化した冪等の実効configを返す。`--resources` はpublic treeを保持せずに数え、
   current-street policy arenaのnodes・columns・slots・bytes・ICM field・memory limitと`withinLimit`を返す。
+  同じcount中にruleの条件一致を実測し、完全な計測で未一致のruleだけを警告する。
+  memory/node上限で打ち切られた場合は不完全として未一致警告を出さない。
+  JSONの`ruleHitStatus`は`"not-checked"` / `"complete"` / `"incomplete"`で、`warnings`も返す。
   solve/resumeは検証とarena preflightの後にrun directoryを作る。
+  public tree構築中にも条件一致を実測し、未一致ruleを`warning: ...`としてstderrへ出す。追加の木走査はしない。
 - `solve --threads` / `--memory` / `--max-time` は共通 `[run]` を上書きして保存する。
   threads autoは `min(logical CPUs, players × batch_sweeps)`、memory autoはarena予算6 GiB。
   `--sol-streets` は使えない。確率encodingは `[output] probability_encoding = "u16" | "f32"`。

@@ -196,8 +196,14 @@ fn schema_errors_and_error_rendering() {
         let e = error(&format!("schema = \"{old}\"\n"));
         assert_eq!(e.code, Code::NLH001);
         assert!(e.message.contains("solvers.nlh/v1"));
+        assert!(e.message.contains("docs/nlh-input-v1.jp.md"));
     }
     assert_eq!(error("[table]\nplayers = 2").code, Code::NLH001);
+    assert!(
+        error("[table]\nplayers = 2")
+            .message
+            .contains("docs/nlh-input-v1.jp.md")
+    );
     assert_eq!(error("schema = 1").code, Code::NLH002);
     assert_eq!(error("schema = ").code, Code::NLH002);
     for code in [
@@ -870,6 +876,78 @@ fn union_variable_names_types_and_p2_board_rejection() {
             error(&format!("{ROOT}[tree]\nscript = '''{script}'''")).code,
             Code::NLH003
         );
+    }
+}
+
+#[test]
+fn non_finite_condition_literals_are_located_nlh003_errors_for_both_products() {
+    for (base, street) in [
+        (ROOT, "preflop"),
+        (
+            include_str!("../../../examples/nlh/river_small.toml"),
+            "river",
+        ),
+    ] {
+        for number in ["1e999", "-1e999", "inf", "-inf", "nan", "NaN"] {
+            for script in [
+                format!("\n{street} when pot > {number} {{ remove bet }}"),
+                format!("\n{street} when pot in [0, {number}] {{ remove bet }}"),
+                format!("\ndefine bad = pot > {number}\n{street} when bad {{ remove bet }}"),
+                format!("\nparam bound = {number}\n{street} when pot > bound {{ remove bet }}"),
+                format!("\ndefine unused = pot > {number}\n{street} {{ remove bet }}"),
+            ] {
+                let mut config: toml::Value = base.parse().unwrap();
+                config.as_table_mut().unwrap().insert(
+                    "tree".into(),
+                    toml::Value::Table(toml::Table::from_iter([(
+                        "script".into(),
+                        script.clone().into(),
+                    )])),
+                );
+                let e = error(&toml::to_string(&config).unwrap());
+                assert_eq!(e.code, Code::NLH003, "{script}: {e}");
+                assert_eq!(e.key.as_deref(), Some("tree.script"));
+                assert!(
+                    e.message.contains("finite") && e.message.contains("line 2"),
+                    "{script}: {e}"
+                );
+            }
+            let mut config: toml::Value = base.parse().unwrap();
+            config.as_table_mut().unwrap().insert(
+                "tree".into(),
+                toml::Value::Table(toml::Table::from_iter([
+                    (
+                        "script".into(),
+                        format!("\nparam bound = 1\n{street} when pot > bound {{ remove bet }}")
+                            .into(),
+                    ),
+                    (
+                        "params".into(),
+                        toml::Value::Table(toml::Table::from_iter([(
+                            "bound".into(),
+                            number.into(),
+                        )])),
+                    ),
+                ])),
+            );
+            let e = error(&toml::to_string(&config).unwrap());
+            assert_eq!(e.code, Code::NLH003);
+            assert!(
+                e.message.contains("finite") && e.message.contains("line 2"),
+                "{e}"
+            );
+        }
+        for number in ["1e3", "-1", "0", "1.25"] {
+            let mut config: toml::Value = base.parse().unwrap();
+            config.as_table_mut().unwrap().insert(
+                "tree".into(),
+                toml::Value::Table(toml::Table::from_iter([(
+                    "script".into(),
+                    format!("{street} when pot > {number} {{ remove bet }}").into(),
+                )])),
+            );
+            parse(&toml::to_string(&config).unwrap());
+        }
     }
 }
 

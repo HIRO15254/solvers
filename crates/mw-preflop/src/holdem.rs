@@ -41,6 +41,7 @@ pub struct HoldemGame<A> {
     utility: UtilityRuntime,
     rake: CompiledRake,
     game_fingerprint: [u8; 32],
+    tree_rule_hits: Option<Vec<std::sync::atomic::AtomicBool>>,
 }
 
 impl<A: MultiwayAbstraction> HoldemGame<A> {
@@ -98,11 +99,35 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             utility: utility_runtime,
             rake: compiled_rake,
             game_fingerprint,
+            tree_rule_hits: None,
         })
     }
 
     pub fn config(&self) -> &ValidatedMultiwayConfig {
         &self.config
+    }
+
+    /// Enable common-input rule diagnostics for tree construction only.
+    /// Atomic flags allow the parallel materializer to OR condition matches.
+    pub fn with_tree_rule_hits(mut self) -> Self {
+        self.tree_rule_hits = Some(
+            self.config
+                .betting
+                .nlh_rules
+                .iter()
+                .map(|_| std::sync::atomic::AtomicBool::new(false))
+                .collect(),
+        );
+        self
+    }
+
+    /// Condition matches recorded so far; completeness belongs to the caller.
+    pub fn tree_rule_hits(&self) -> Option<Vec<bool>> {
+        self.tree_rule_hits.as_ref().map(|hits| {
+            hits.iter()
+                .map(|hit| hit.load(std::sync::atomic::Ordering::Relaxed))
+                .collect()
+        })
     }
 
     /// The card abstraction backing this game. Exposed so callers (e.g. the
@@ -615,6 +640,17 @@ impl<A: MultiwayAbstraction> ExternalSamplingGame for HoldemGame<A> {
 
     fn actor(&self, state: &Self::State) -> Option<usize> {
         state.to_act.map(SeatId::index)
+    }
+
+    fn record_tree_node(&self, state: &Self::State) {
+        if let Some(hits) = &self.tree_rule_hits {
+            let actor = state.to_act.expect("tree decision actor");
+            for (rule, hit) in self.config.betting.nlh_rules.iter().zip(hits) {
+                if !hit.load(std::sync::atomic::Ordering::Relaxed) && rule.matches(state, actor) {
+                    hit.store(true, std::sync::atomic::Ordering::Relaxed);
+                }
+            }
+        }
     }
 
     /// Expands the node's legal actions exactly once; every other method

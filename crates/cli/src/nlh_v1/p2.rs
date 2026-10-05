@@ -154,12 +154,12 @@ pub(crate) fn build_session(
     build_typed_session(p.lowered, p.effective, checkpoint)
 }
 
-fn resources(p: &Prepared) -> Result<crate::session::MultiwayResourcePreflight> {
-    crate::session::preflight_multiway_typed(internal(p.lowered.clone()))
+fn resources(p: &Prepared) -> Result<(crate::session::MultiwayResourcePreflight, Vec<bool>)> {
+    crate::session::preflight_multiway_with_rule_hits(internal(p.lowered.clone()))
 }
 
 fn check_resources(p: &Prepared) -> Result<()> {
-    let r = resources(p)?;
+    let (r, _) = resources(p)?;
     if !r.complete {
         return Err(spot::SpotError::new(
             spot::Code::NLH003,
@@ -179,9 +179,10 @@ fn utility_unit(p: &Prepared) -> &'static str {
     }
 }
 
-// Find unreachable rules on the board-independent public tree. Cache exact
+// Test oracle: the previous separate walk. Cache exact
 // states in a bounded table: collisions cause a revisit, never a false match.
-fn warnings(p: &Prepared) -> Result<Vec<String>> {
+#[cfg(test)]
+fn oracle_rule_hits(p: &Prepared) -> Result<Vec<bool>> {
     use mw_preflop::betting::BettingMenu;
     use std::hash::{DefaultHasher, Hash, Hasher};
     let rules = &p.document.spot.tree.compiled.rules;
@@ -233,13 +234,18 @@ fn warnings(p: &Prepared) -> Result<Vec<String>> {
         Ok(())
     }
     visit(root, &game.betting, rules, &mut hits, &mut seen, 0)?;
-    Ok(rules
+    Ok(hits)
+}
+
+pub(crate) fn warnings_for_hits(game: &mw_preflop::MultiwayConfig, hits: &[bool]) -> Vec<String> {
+    game.betting
+        .nlh_rules
         .iter()
         .zip(hits)
         .enumerate()
-        .filter(|(_, (_, hit))| !hit)
+        .filter(|(_, (_, hit))| !**hit)
         .map(|(i, (rule, _))| format!("unmatched {:?} tree rule {}", rule.street, i + 1))
-        .collect())
+        .collect()
 }
 
 pub(crate) fn validate(
@@ -252,10 +258,30 @@ pub(crate) fn validate(
 ) -> Result<()> {
     let p = prepare(raw, path)?;
     let mut summary = p.document.summary();
-    summary.warnings = warnings(&p)?;
+    let measured = if with_resources {
+        Some(resources(&p)?)
+    } else {
+        None
+    };
+    let rule_hit_status = match &measured {
+        None => {
+            summary.warnings.push(
+                "unused tree rules not checked; use validate --resources to check them".into(),
+            );
+            "not-checked"
+        }
+        Some((r, hits)) if r.complete => {
+            summary
+                .warnings
+                .extend(warnings_for_hits(&p.lowered.game, hits));
+            "complete"
+        }
+        Some(_) => "incomplete",
+    };
     let mut value = serde_json::to_value(&summary)?;
     super::p1::diagnostic_bb(&mut value);
     value["status"] = json!("valid");
+    value["ruleHitStatus"] = json!(rule_hit_status);
     value["schema"] = json!(SCHEMA);
     value["gameKind"] = json!("mw-preflop");
     value["amountUnit"] = json!("BB");
@@ -280,8 +306,7 @@ pub(crate) fn validate(
             .collect::<Vec<_>>()
     );
 
-    if with_resources {
-        let r = resources(&p)?;
+    if let Some((r, _)) = measured {
         value["resources"] = json!({
             "complete": r.complete, "recall": "current-street", "decisionNodes": r.decision_nodes,
             "terminalEdges": r.terminal_edges, "policyColumns": r.policy_columns,
@@ -321,6 +346,7 @@ pub(crate) fn validate(
                 );
             }
             println!("economics: {}", value["economics"]);
+            println!("rule hits: {rule_hit_status}");
             for rule in &summary.tree.rules {
                 println!("tree rule: {rule}");
             }
@@ -481,4 +507,102 @@ fn execute(p: Prepared, directory: &Path, checkpoint: Option<&Path>, reset: bool
     };
     let completion = crate::run_dir::completion_status(directory);
     recorder.finish(outcome, completion)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mw_preflop::{FeatureHashAbstraction, HoldemGame};
+
+    fn compare_hits(raw: &str, path: &Path) -> Vec<bool> {
+        let p = prepare(raw, path).unwrap();
+        let expected = oracle_rule_hits(&p).unwrap();
+        let (count, hits) = resources(&p).unwrap();
+        assert!(count.complete);
+        assert_eq!(hits, expected, "count: {}", path.display());
+        assert_eq!(
+            count,
+            crate::session::preflight_multiway_typed(internal(p.lowered.clone())).unwrap()
+        );
+        for threads in [1, 4] {
+            let game = HoldemGame::new(
+                &p.lowered.game,
+                &p.lowered.utility,
+                &p.lowered.rake,
+                FeatureHashAbstraction::default(),
+            )
+            .unwrap()
+            .with_tree_rule_hits();
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap();
+            let tree = pool
+                .install(|| {
+                    mw_preflop::tree::enumerate_tree_with_limits_parallel(
+                        &game,
+                        count.decision_nodes as usize,
+                        512,
+                    )
+                })
+                .unwrap();
+            assert_eq!(tree.nodes.len() as u64, count.decision_nodes);
+            assert_eq!(
+                game.tree_rule_hits().unwrap(),
+                expected,
+                "build ({threads} threads): {}",
+                path.display()
+            );
+        }
+        expected
+    }
+
+    #[test]
+    fn counted_and_built_hits_match_previous_walk_on_smoke_examples() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        for name in [
+            "3max_2bb",
+            "preflop_multiway_v1_production_smoke",
+            "preflop_multiway_v1_3max_smoke",
+            "6max_2bb",
+            "6max_20bb_checkdown",
+        ] {
+            let path = root.join(format!("examples/nlh/{name}.toml"));
+            compare_hits(&std::fs::read_to_string(&path).unwrap(), &path);
+        }
+    }
+
+    #[test]
+    fn hits_count_conditions_even_without_menu_changes_and_skip_checkdown_streets() {
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = '''\npreflop when players == 3 { remove bet }\npreflop when players == 9 { add raise [a] }\nflop, turn, river { checkdown }\n'''\n";
+        assert_eq!(
+            compare_hits(raw, Path::new("checkdown.toml")),
+            [true, false, false, false, false]
+        );
+        compare_hits(
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 2\n",
+            Path::new("no-rules.toml"),
+        );
+    }
+
+    #[test]
+    fn node_limited_measurement_retains_only_partial_hits() {
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = 'preflop when position == BB { remove bet }'\n";
+        let p = prepare(raw, Path::new("limited.toml")).unwrap();
+        let game = HoldemGame::new(
+            &p.lowered.game,
+            &p.lowered.utility,
+            &p.lowered.rake,
+            FeatureHashAbstraction::default(),
+        )
+        .unwrap()
+        .with_tree_rule_hits();
+        assert!(matches!(
+            mw_preflop::tree::preflight_arena_with_limits(&game, 1, u64::MAX),
+            Err(mw_preflop::TreeError::TooManyNodes { limit: 1 })
+        ));
+        assert_eq!(game.tree_rule_hits().unwrap(), [false]);
+        mw_preflop::tree::preflight_arena(&game, u64::MAX).unwrap();
+        assert_eq!(game.tree_rule_hits().unwrap(), [true]);
+    }
 }

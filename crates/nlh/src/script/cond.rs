@@ -747,6 +747,12 @@ fn parse_literal(tokens: &[Token], pos: &mut usize) -> Result<(usize, Literal), 
             } else if word == "false" {
                 Literal::Bool(false)
             } else if let Ok(number) = word.parse::<f64>() {
+                if !number.is_finite() {
+                    return Err(ScriptError {
+                        line,
+                        message: "condition number must be finite".into(),
+                    });
+                }
                 Literal::Number(number)
             } else {
                 Literal::Text(word.clone())

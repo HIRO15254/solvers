@@ -412,6 +412,20 @@ fn infer_param_kind(value_text: &str) -> ParamKind {
     }
 }
 
+fn check_finite_numbers(tokens: &[Token]) -> Result<(), ScriptError> {
+    for token in tokens {
+        if let TokenKind::Word(word) = &token.kind
+            && word.parse::<f64>().is_ok_and(|number| !number.is_finite())
+        {
+            return Err(ScriptError {
+                line: token.line,
+                message: "condition number must be finite".into(),
+            });
+        }
+    }
+    Ok(())
+}
+
 /// Processes every `param` / `define` in source order, building the
 /// substitution table and the `param` schema. Reserved names and duplicate
 /// declarations are rejected up front; each declaration's own references
@@ -482,6 +496,7 @@ fn resolve_declarations<V: Vars>(
                         });
                     }
                     raw = override_tokens;
+                    raw[0].line = *name_line;
                 }
                 check_self_and_forward_references(name, &raw, &declared_names, &resolved)?;
                 let expanded = substitute_tokens(&raw, &resolved);
@@ -494,6 +509,7 @@ fn resolve_declarations<V: Vars>(
                     });
                 }
                 let value_text = render_token(&expanded[0].kind);
+                check_finite_numbers(&expanded)?;
                 params.push(ParamSchema {
                     name: name.clone(),
                     kind: infer_param_kind(&value_text),
@@ -508,6 +524,7 @@ fn resolve_declarations<V: Vars>(
             TopLevel::Define { name, tokens, .. } => {
                 check_self_and_forward_references(name, tokens, &declared_names, &resolved)?;
                 let expanded = substitute_tokens(tokens, &resolved);
+                check_finite_numbers(&expanded)?;
                 resolved.insert(name.clone(), Resolution::Define(expanded));
             }
             TopLevel::Street(_) => {}

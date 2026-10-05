@@ -30,7 +30,8 @@ pub fn build_session<A: MultiwayAbstraction>(
 ) -> Result<Session<A>, SpotError> {
     let error = |e: String| SpotError::new(Code::NLH003, "solver", e);
     let game = HoldemGame::new(&input.game, &input.utility, &input.rake, abstraction)
-        .map_err(|e| error(e.to_string()))?;
+        .map_err(|e| error(e.to_string()))?
+        .with_tree_rule_hits();
     let sampler = game.deal_sampler().map_err(|e| error(e.to_string()))?;
     let mut checkpoint_runtime = None;
     let solver = if let Some(path) = resume_checkpoint {

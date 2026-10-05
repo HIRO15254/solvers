@@ -328,6 +328,16 @@ fn run_inner(
         session::build_production_multiway_session(&effective_toml, resume_checkpoint)?;
     #[cfg(test)]
     let mut mw_session = session::build_multiway_session(&effective_toml, resume_checkpoint)?;
+    if is_nlh {
+        let hits = mw_session
+            .solver
+            .game()
+            .tree_rule_hits()
+            .expect("common-input tree measurement");
+        for warning in crate::nlh_v1::p2::warnings_for_hits(&mw_session.game_config, &hits) {
+            eprintln!("warning: {warning}");
+        }
+    }
     if let Some(ready) = mw_session.abstraction_ready
         && let Some(observer) = &mut observer
     {

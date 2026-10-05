@@ -51,6 +51,7 @@ fn p2_validation_effective_resources_types_and_preflight_before_directory() {
     assert_eq!(value["ranges"][0]["combos"], 1326);
     assert_eq!(value["schema"], "solvers.nlh/v1");
     assert_eq!(value["resources"]["withinLimit"], true);
+    assert_eq!(value["ruleHitStatus"], "complete");
     assert!(value["resources"]["solverStateBytes"].as_u64().unwrap() > 0);
     assert_eq!(value["effectiveConfig"]["solver"]["stop"]["max_sweeps"], 1);
     let effective2 = dir.path().join("effective2.toml");
@@ -62,6 +63,8 @@ fn p2_validation_effective_resources_types_and_preflight_before_directory() {
         text(&effective2),
     ]);
     assert!(String::from_utf8_lossy(&human.stdout).contains("P2 (Multiway Preflop)"));
+    assert!(String::from_utf8_lossy(&human.stdout).contains("rule hits: not-checked"));
+    assert!(String::from_utf8_lossy(&human.stdout).contains("use validate --resources"));
     assert_eq!(
         std::fs::read(&effective).unwrap(),
         std::fs::read(effective2).unwrap()
@@ -110,13 +113,34 @@ fn p2_validation_effective_resources_types_and_preflight_before_directory() {
         assert!(stderr.contains(code) && stderr.contains(key), "{stderr}");
     }
     std::fs::write(&input, "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = 'preflop when players == 9 { add raise [a] }'\n").unwrap();
+    let plain = json(&["validate", text(&input), "--format", "json"]);
+    assert_eq!(plain["ruleHitStatus"], "not-checked");
     assert_eq!(
-        json(&["validate", text(&input), "--format", "json"])["warnings"]
-            .as_array()
-            .unwrap()
-            .len(),
-        1
+        plain["warnings"],
+        serde_json::json!([
+            "unused tree rules not checked; use validate --resources to check them"
+        ])
     );
+    let checked = json(&["validate", text(&input), "--format", "json", "--resources"]);
+    assert_eq!(checked["ruleHitStatus"], "complete");
+    assert_eq!(
+        checked["warnings"],
+        serde_json::json!(["unmatched Preflop tree rule 1"])
+    );
+    let human = ok(&["validate", text(&input), "--resources"]);
+    assert!(
+        String::from_utf8_lossy(&human.stdout).contains("warning: unmatched Preflop tree rule 1")
+    );
+    let limited = std::fs::read_to_string(&input).unwrap() + "[run]\nmemory = 1\n";
+    std::fs::write(&input, limited).unwrap();
+    let incomplete = json(&["validate", text(&input), "--format", "json", "--resources"]);
+    assert_eq!(incomplete["ruleHitStatus"], "incomplete");
+    assert_eq!(incomplete["resources"]["complete"], false);
+    assert_eq!(incomplete["warnings"], serde_json::json!([]));
+    let human = ok(&["validate", text(&input), "--resources"]);
+    let text = String::from_utf8_lossy(&human.stdout);
+    assert!(text.contains("rule hits: incomplete"));
+    assert!(!text.contains("unmatched"));
     eprintln!(
         "M6 validate wall time: {:.3}s",
         started.elapsed().as_secs_f64()

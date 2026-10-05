@@ -148,6 +148,10 @@ pub trait ExternalSamplingGame: Send + Sync {
     /// Acting seat, or `None` iff the state is terminal.
     fn actor(&self, state: &Self::State) -> Option<usize>;
 
+    /// Observe a decision node during public-tree counting/materialization.
+    /// Sampling and policy evaluation never call this hook.
+    fn record_tree_node(&self, _state: &Self::State) {}
+
     /// Expands a node's legal actions. Called exactly once per visited
     /// node; the result is handed to [`Self::num_actions_of`],
     /// [`Self::write_action_label`], and [`Self::next_state_with`] instead

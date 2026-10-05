@@ -405,6 +405,7 @@ fn expand_parallel_frontier<G: ExternalSamplingGame>(
     let actor = game
         .actor(&frontier.state)
         .expect("frontier contains only decision states");
+    game.record_tree_node(&frontier.state);
     let actions = game.node_actions(&frontier.state);
     let num_actions = game.num_actions_of(&actions);
     if num_actions == 0 {
@@ -648,6 +649,7 @@ fn preflight_node<G: ExternalSamplingGame>(
         return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
     let node_id = preflight.node_count as NodeId;
+    game.record_tree_node(&state);
     let actions = game.node_actions(&state);
     let num_actions = game.num_actions_of(&actions);
     if num_actions == 0 {
@@ -769,6 +771,7 @@ fn enumerate_node<G: ExternalSamplingGame>(
         return Err(TreeError::TooManyNodes { limit: max_nodes });
     }
     let node_id = nodes.len() as NodeId;
+    game.record_tree_node(&state);
     let actions = game.node_actions(&state);
     let num_actions = game.num_actions_of(&actions);
     if num_actions == 0 {

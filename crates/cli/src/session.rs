@@ -177,6 +177,19 @@ pub fn preflight_multiway_config(raw_toml: &str) -> Result<MultiwayResourcePrefl
 }
 
 pub(crate) fn preflight_multiway_typed(config: SolveConfig) -> Result<MultiwayResourcePreflight> {
+    Ok(preflight_multiway_impl(config, false)?.0)
+}
+
+pub(crate) fn preflight_multiway_with_rule_hits(
+    config: SolveConfig,
+) -> Result<(MultiwayResourcePreflight, Vec<bool>)> {
+    preflight_multiway_impl(config, true)
+}
+
+fn preflight_multiway_impl(
+    config: SolveConfig,
+    measure_hits: bool,
+) -> Result<(MultiwayResourcePreflight, Vec<bool>)> {
     let SolveConfig {
         game,
         rake,
@@ -254,6 +267,11 @@ pub(crate) fn preflight_multiway_typed(config: SolveConfig) -> Result<MultiwayRe
         abstraction,
     )
     .context("building public multiway game for preflight")?;
+    let game = if measure_hits {
+        game.with_tree_rule_hits()
+    } else {
+        game
+    };
     let _sampler = game
         .deal_sampler()
         .context("compiling table ranges for preflight")?;
@@ -269,32 +287,53 @@ pub(crate) fn preflight_multiway_typed(config: SolveConfig) -> Result<MultiwayRe
             needed,
             ..
         }) => {
-            return Ok(MultiwayResourcePreflight {
-                complete: false,
-                recall,
-                decision_nodes: node_count as u64,
-                terminal_edges: None,
-                icm,
-                policy_columns: Some(total_columns),
-                policy_slots: None,
-                solver_state_bytes: Some(needed),
-            });
+            return Ok((
+                MultiwayResourcePreflight {
+                    complete: false,
+                    recall,
+                    decision_nodes: node_count as u64,
+                    terminal_edges: None,
+                    icm,
+                    policy_columns: Some(total_columns),
+                    policy_slots: None,
+                    solver_state_bytes: Some(needed),
+                },
+                game.tree_rule_hits().unwrap_or_default(),
+            ));
+        }
+        Err(mw_preflop::tree::TreeError::TooManyNodes { limit }) if measure_hits => {
+            return Ok((
+                MultiwayResourcePreflight {
+                    complete: false,
+                    recall,
+                    decision_nodes: limit as u64,
+                    terminal_edges: None,
+                    icm,
+                    policy_columns: None,
+                    policy_slots: None,
+                    solver_state_bytes: None,
+                },
+                game.tree_rule_hits().unwrap_or_default(),
+            ));
         }
         Err(error) => {
             return Err(error).context("counting public tree and sizing the policy arena");
         }
     };
 
-    Ok(MultiwayResourcePreflight {
-        complete: true,
-        recall,
-        decision_nodes: arena.node_count as u64,
-        terminal_edges: Some(arena.terminal_edges),
-        icm,
-        policy_columns: Some(arena.total_columns),
-        policy_slots: Some(arena.total_slots),
-        solver_state_bytes: Some(arena.estimated_arena_bytes),
-    })
+    Ok((
+        MultiwayResourcePreflight {
+            complete: true,
+            recall,
+            decision_nodes: arena.node_count as u64,
+            terminal_edges: Some(arena.terminal_edges),
+            icm,
+            policy_columns: Some(arena.total_columns),
+            policy_slots: Some(arena.total_slots),
+            solver_state_bytes: Some(arena.estimated_arena_bytes),
+        },
+        game.tree_rule_hits().unwrap_or_default(),
+    ))
 }
 
 /// Default [`StopRule::confirmations`] and [`StopRule::eval_period_secs`]

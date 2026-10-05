@@ -242,7 +242,7 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
             return Err(SpotError::new(
                 Code::NLH001,
                 "schema",
-                "required schema is solvers.nlh/v1",
+                "required schema is solvers.nlh/v1; see docs/nlh-input-v1.jp.md",
             ));
         }
         Some(Value::String(s)) if s == "solvers.nlh/v1" => {}
@@ -258,10 +258,10 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
                         | "solvers.preflop-hu/v1"
                 ) {
                     format!(
-                        "format {s:?} was replaced by solvers.nlh/v1; old configs are not converted automatically"
+                        "format {s:?} was replaced by solvers.nlh/v1; old configs are not converted automatically; see docs/nlh-input-v1.jp.md"
                     )
                 } else {
-                    format!("unknown schema {s:?}; use solvers.nlh/v1")
+                    format!("unknown schema {s:?}; use solvers.nlh/v1; see docs/nlh-input-v1.jp.md")
                 },
             ));
         }
