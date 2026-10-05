@@ -516,3 +516,8 @@ max_time = "12h"
 | 暗黙のfold（第7節） | 賭けに直面しているplayerだけに起こる。call額が0のplayerの行動は書く | call額が0のときfoldは合法手に無い |
 | `spr`（第9節） | effective stack（actorと、手に残る相手の最大残stackの小さい方）÷ pot | 旧Multiwayの実装と同じ。非対称stackで意味を保つ |
 | `cbet`・`donk`（第9節） | 直前のstreetの最後のaggressorで判定し、直前のstreetがcheckで回ればfalse | 旧P1の実装とpokerの慣習（check後のbetはprobe）に合わせた。旧Multiwayは全streetでPreflopのaggressorを見ていたが、同梱のP2の例はこの変数を使わない |
+| P1のstack（第7・9節） | P1の木はeffective stack（2人の残stackの小さい方）を両者のstackとして組む。`a`はeffective stackまでのall-in、`N%stack`は`N%effective`と同じ値になる。payoffとICMは実際のstackで計算する | HUでは超過分は返却されるだけで戦略に影響しない（旧P1と市販solverの慣習）。ICMの値は実際のstackに依存する |
+| P1のEVの基準 | 旧P1と同じくspot開始時点を基準にし、chip EVでは2人のEVの和がpot − 期待rakeになる。BB単位で報告する。ICMの基準は、2人が残stackだけを持ちpotを除いた状態（foldしたplayerの最終stackとfieldを含む）のICM値 | 旧P1の出力の意味を保つ |
+| P1のrake条件（第6節） | `flop_dealt`はtrue、`players_dealt`は卓の人数、`players_saw_flop`は2、`showdown`と`won_without_showdown`はterminalごとに判定する | P1のspotは常にflop以降で、2人だけが残る |
+| 停止目標（第10節） | `NashConv / 2 ≤ target`に達した時点で止める | 境界の扱いを1つに定めた |
+| treeのscriptの意味（第9節） | 各effectの意味は両製品で同じで、旧Multiwayの規則に従う。P1でもfold・check・callを対象にできる。旧P1と旧Multiwayで端の挙動が違った点はM5の報告で列挙する | scriptを1つの言語として扱い、deriveでP2の木をP1へ引き継げるようにする |
