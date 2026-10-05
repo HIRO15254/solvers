@@ -1,0 +1,5 @@
+    Finished `release` profile [optimized] target(s) in 0.35s
+     Running `target\release\examples\trunk_tables.exe --dir .cache/p2-trunk --export-t2 .cache/p2-trunk/t2.csv --export-classes .cache/p2-trunk/classes.csv`
+T2 build/load: 0.002s; payload BLAKE3 885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87
+AA vs KK equity: 0.819460504677
+T3 build/load: 0.381s; payload 126239620 bytes; BLAKE3 bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8
