@@ -57,6 +57,10 @@ T1の結果（[証拠](../../experiments/p1-perf-2026-10/compact-hands-20261006/
 同梱`flop_srp.toml`は88.4→30.5 GB。i16はblock scaleがsupport次元で変わるためbit一致せず、
 River 500 iterationのNashConvは0.01093→0.01132（同程度）だった。
 
+T2の結果（[証拠](../../experiments/p1-perf-2026-10/engine-bitwise-20261006/README.md)）: storage・EV・BR・
+Exploitabilityが変更前・thread数間でbit一致。評価の走査は零和で3→2回、一般和で4→2回。統合後のTurn木
+（6 iteration、4 threads、ローカル参考値）のsolve時間は変更前23.95秒→T1 4.37秒→T2 2.14秒で、`export`はT1とbyte一致。
+
 ### 一致の定義
 
 同じconfig・反復数で、変更前後の`solvers solve`の結果（`export summary`・`strategy`・`ev`）を比べる。
