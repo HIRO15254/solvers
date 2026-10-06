@@ -219,13 +219,27 @@ pub fn read_sol(path: &Path) -> Result<SolPayload, SolError> {
 /// `config_toml` and `meta.iterations` respectively) so caller and header
 /// can never disagree.
 pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
-    let hash = config_hash(payload.config_toml.as_bytes());
+    write_sol_stream(path, &payload.config_toml, &payload.meta, |writer| {
+        postcard::to_io(payload, writer)?;
+        Ok(())
+    })
+}
+
+/// Same atomic codec as `write_sol`, with a caller-supplied postcard stream.
+/// This permits generating strategy blocks before evaluating/retaining values.
+pub(crate) fn write_sol_stream(
+    path: &Path,
+    config_toml: &str,
+    meta: &SolMeta,
+    write_payload: impl FnOnce(&mut SolWriter<'_>) -> Result<(), SolError>,
+) -> Result<(), SolError> {
+    let hash = config_hash(config_toml.as_bytes());
     let dir = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
     let mut tmp = tempfile::NamedTempFile::new_in(dir)?;
-    tmp.write_all(&build_header(hash, payload.meta.iterations))?;
+    tmp.write_all(&build_header(hash, meta.iterations))?;
     {
         let mut encoder = zstd::stream::write::Encoder::new(tmp.as_file_mut(), 1)?;
         encoder.window_log(20)?;
@@ -237,9 +251,13 @@ pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
                     .map_err(|_| std::io::Error::other("thread count overflow"))?,
             )?;
         }
-        let mut buffered = std::io::BufWriter::with_capacity(64 * 1024, encoder);
-        postcard::to_io(payload, &mut buffered)?;
+        let mut buffered = DeferredFlush(std::io::BufWriter::with_capacity(64 * 1024, encoder));
+        // to_io finalizes each field/block by flushing its writer. Defer
+        // those flushes so zstd sees exactly the whole-payload write pattern.
+        write_payload(&mut buffered)?;
+        buffered.0.flush()?;
         buffered
+            .0
             .into_inner()
             .map_err(|e| e.into_error())?
             .finish()?;
@@ -249,6 +267,27 @@ pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
     #[cfg(unix)]
     std::fs::File::open(dir)?.sync_all()?;
     Ok(())
+}
+
+// Keep the byte-writing path monomorphized; dyn Write here would dispatch
+// for every postcard u8 element in the multi-GB packed blocks.
+pub(crate) type SolWriter<'a> =
+    DeferredFlush<std::io::BufWriter<zstd::stream::write::Encoder<'static, &'a mut std::fs::File>>>;
+
+pub(crate) struct DeferredFlush<W>(W);
+
+impl<W: Write> Write for DeferredFlush<W> {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        self.0.write(bytes)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+
+    fn write_all(&mut self, bytes: &[u8]) -> std::io::Result<()> {
+        self.0.write_all(bytes)
+    }
 }
 
 /// Quantizes an already-normalized probability slice (values in `[0, 1]`,
@@ -440,6 +479,77 @@ mod tests {
             dequantize_values(&bytes, 1.0, 4).is_err(),
             "length mismatch"
         );
+    }
+
+    #[test]
+    fn field_stream_matches_whole_payload_and_compressed_file() {
+        // Cross varint length boundaries, including empty lists. Compare the
+        // raw stream as well as compression through the shared atomic writer.
+        for count in [0, 2, 127, 128, 129, 1024] {
+            let mut payload = sample_payload();
+            payload.blocks = (0..count)
+                .map(|sref| StrategyBlock {
+                    sref,
+                    probs: vec![42; 129],
+                })
+                .collect();
+            payload.values = (0..count)
+                .map(|sref| value_block(sref, &[1.0, -2.0]))
+                .collect();
+            let stream = |writer: &mut dyn Write| -> Result<(), SolError> {
+                postcard::to_io(&payload.config_toml, &mut *writer)?;
+                postcard::to_io(&payload.meta, &mut *writer)?;
+                postcard::to_io(&payload.mode, &mut *writer)?;
+                postcard::to_io(&payload.blocks.len(), &mut *writer)?;
+                for block in &payload.blocks {
+                    postcard::to_io(block, &mut *writer)?;
+                }
+                postcard::to_io(&payload.values.len(), &mut *writer)?;
+                for block in &payload.values {
+                    postcard::to_io(block, &mut *writer)?;
+                }
+                Ok(())
+            };
+            let mut bytes = Vec::new();
+            stream(&mut bytes).unwrap();
+            assert_eq!(bytes, postcard::to_allocvec(&payload).unwrap());
+            let whole = temp_path("whole.sol");
+            let split = temp_path("split.sol");
+            write_sol(&whole, &payload).unwrap();
+            write_sol_stream(&split, &payload.config_toml, &payload.meta, |writer| {
+                stream(writer)
+            })
+            .unwrap();
+            // Independent T3 whole-payload compression path (before the
+            // streaming helper/DeferredFlush), including a >64 KiB payload.
+            let mut legacy = build_header(
+                config_hash(payload.config_toml.as_bytes()),
+                payload.meta.iterations,
+            )
+            .to_vec();
+            let mut encoder = zstd::stream::write::Encoder::new(&mut legacy, 1).unwrap();
+            encoder.window_log(20).unwrap();
+            if rayon::current_num_threads() > 1 {
+                encoder
+                    .multithread(rayon::current_num_threads() as u32)
+                    .unwrap();
+            }
+            let mut buffered = std::io::BufWriter::with_capacity(64 * 1024, encoder);
+            postcard::to_io(&payload, &mut buffered).unwrap();
+            buffered
+                .into_inner()
+                .map_err(|e| e.into_error())
+                .unwrap()
+                .finish()
+                .unwrap();
+            assert_eq!(std::fs::read(&split).unwrap(), legacy);
+            assert_eq!(
+                std::fs::read(&whole).unwrap(),
+                std::fs::read(&split).unwrap()
+            );
+            std::fs::remove_file(whole).unwrap();
+            std::fs::remove_file(split).unwrap();
+        }
     }
 
     #[test]

@@ -201,9 +201,12 @@ version 1/2/3は移行先を示すversion errorで拒否する。現行`solvers.
 `.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
 圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
 
-P1のmemory見積りはstorage、full出力のpacked戦略・値block、索引slot・street配列、圧縮作業予算を含む。
-`saveWorkspaceBytes`はpacked保存領域、`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
+P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、最大1 node分の戦略作業領域、圧縮作業予算を含む。
+戦略はstorageからsref昇順に平均戦略を計算して直接流し、全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
+`saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋最大action node要素数×6 bytes（f32平均戦略＋u16量子化bytes）である。
+戦略作業領域は値slotと同時には必要ないが、保守的に加算する。`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
 圧縮予算は最大payloadの2 MiB job数とrun threads数の小さい方×16 MiB＋共有8 MiB＋実効config長×3で見積もる。
+payloadの上界はf32 storage bytesと（保存作業領域＋全戦略のu16 bytes）の大きい方を使う。逐次出力する戦略も圧縮対象の量へ算入する。
 NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。
 
 P1のresume互換性hashは正規化configから`[run]`と`[meta]`を除いたTOMLのblake3である。

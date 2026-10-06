@@ -37,6 +37,7 @@ impl Write for Count {
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
+        Some("solution-stream") => compare_solution_streams(&args[2], &args[3])?,
         Some("checkpoint") => {
             let checkpoint = hu_postflop::checkpoint::read_checkpoint(Path::new(&args[2]))?;
             let mut hash = blake3::Hasher::new();
@@ -70,14 +71,33 @@ fn main() -> Result<()> {
         Some("solution") => {
             let mut a = hu_postflop::sol::read_sol(Path::new(&args[2]))?;
             let mut b = hu_postflop::sol::read_sol(Path::new(&args[3]))?;
+            let mut payload_sizes = Vec::new();
+            for (path, payload) in [(&args[2], &a), (&args[3], &b)] {
+                let file = std::fs::read(path)?;
+                let raw = zstd::decode_all(&file[hu_postflop::sol::HEADER_LEN..])?;
+                if raw != postcard::to_allocvec(payload)? {
+                    bail!("noncanonical postcard stream in {path}");
+                }
+                payload_sizes.push(raw.len());
+            }
             a.meta.wall_secs = 0.0;
             b.meta.wall_secs = 0.0;
-            if a != b {
+            let a_bytes = postcard::to_allocvec(&a)?;
+            let b_bytes = postcard::to_allocvec(&b)?;
+            if a_bytes != b_bytes {
                 bail!("v2 payloads differ (excluding wall_secs)");
             }
             println!(
-                "v2 payload bit identical: {} strategy/value blocks",
-                a.blocks.len()
+                "{}",
+                serde_json::json!({
+                    "payload_bit_equal_except_wall_secs": true,
+                    "canonical_postcard_streams": true,
+                    "payload_bytes": payload_sizes,
+                    "normalized_payload_blake3": blake3::hash(&a_bytes).to_hex().as_str(),
+                    "strategy_blocks": a.blocks.len(),
+                    "value_blocks": a.values.len(),
+                    "file_bytes_equal": std::fs::read(&args[2])? == std::fs::read(&args[3])?,
+                })
             );
         }
         Some("compression") => {
@@ -118,7 +138,174 @@ fn main() -> Result<()> {
             }
             println!("{}", serde_json::to_string_pretty(&results)?);
         }
-        _ => bail!("verify_save checkpoint PATH | solution OLD NEW | compression PATH"),
+        _ => bail!(
+            "verify_save checkpoint PATH | solution OLD NEW | solution-stream OLD NEW | compression PATH"
+        ),
     }
     Ok(())
+}
+
+/// Compare the v2 field stream directly, without retaining decoded blocks or
+/// multi-GB postcard Vecs. Only wall_secs' eight bytes may differ.
+fn compare_solution_streams(old: &str, new: &str) -> Result<()> {
+    use anyhow::ensure;
+    let mut a = std::fs::File::open(old)?;
+    let mut b = std::fs::File::open(new)?;
+    let mut header_a = [0; hu_postflop::sol::HEADER_LEN];
+    let mut header_b = header_a;
+    a.read_exact(&mut header_a)?;
+    b.read_exact(&mut header_b)?;
+    ensure!(&header_a[..10] == b"SLVRSOLV\x02\x00", "expected .sol v2");
+    ensure!(header_a == header_b, "headers differ");
+    let mut pair = FieldStreams {
+        a: std::io::BufReader::new(zstd::stream::read::Decoder::new(a)?),
+        b: std::io::BufReader::new(zstd::stream::read::Decoder::new(b)?),
+        hash: blake3::Hasher::new(),
+        position: 0,
+        left: vec![0; 64 * 1024],
+        right: vec![0; 64 * 1024],
+    };
+    let config_len = pair.varint()?;
+    let mut config_hash = blake3::Hasher::new();
+    pair.equal(config_len, Some(&mut config_hash))?;
+    ensure!(
+        config_hash.finalize().as_bytes() == &header_a[10..42],
+        "config hash mismatch"
+    );
+    let iterations = pair.varint()?;
+    ensure!(
+        iterations == u64::from_le_bytes(header_a[42..50].try_into()?),
+        "iteration mismatch"
+    );
+    pair.equal(40, None)?; // expl[2], ev[2], nash_conv: five fixed f64s
+    let storage_len = pair.varint()?;
+    pair.equal(storage_len, None)?;
+    let mut wall_a = [0; 8];
+    let mut wall_b = [0; 8];
+    pair.a.read_exact(&mut wall_a)?;
+    pair.b.read_exact(&mut wall_b)?;
+    pair.hash.update(&[0; 8]);
+    pair.position += 8;
+    ensure!(pair.varint()? <= 1, "unsupported street mode");
+    let blocks = pair.varint()?;
+    let mut strategy_srefs = blake3::Hasher::new();
+    let mut previous = None;
+    for _ in 0..blocks {
+        let sref = u32::try_from(pair.varint()?)?;
+        ensure!(previous.is_none_or(|p| sref > p), "unordered strategy sref");
+        previous = Some(sref);
+        strategy_srefs.update(&sref.to_le_bytes());
+        let len = pair.varint()?;
+        ensure!(len % 2 == 0, "invalid u16 block length");
+        pair.equal(len, None)?;
+    }
+    let values = pair.varint()?;
+    ensure!(values == blocks, "strategy/value count mismatch");
+    let mut value_srefs = blake3::Hasher::new();
+    previous = None;
+    for _ in 0..values {
+        let sref = u32::try_from(pair.varint()?)?;
+        ensure!(previous.is_none_or(|p| sref > p), "unordered value sref");
+        previous = Some(sref);
+        value_srefs.update(&sref.to_le_bytes());
+        pair.equal(4, None)?; // fixed f32 scale
+        let len = pair.varint()?;
+        ensure!(len % 2 == 0, "invalid i16 block length");
+        pair.equal(len, None)?;
+    }
+    ensure!(
+        strategy_srefs.finalize() == value_srefs.finalize(),
+        "sref sets differ"
+    );
+    ensure!(
+        pair.a.read(&mut wall_a[..1])? == 0 && pair.b.read(&mut wall_b[..1])? == 0,
+        "trailing payload"
+    );
+    println!(
+        "{}",
+        serde_json::json!({
+            "payload_bit_equal_except_wall_secs": true,
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "payload_bytes": [pair.position, pair.position],
+            "normalized_payload_blake3": pair.hash.finalize().to_hex().as_str(),
+            "strategy_blocks": blocks, "value_blocks": values,
+            "wall_secs": [f64::from_le_bytes(wall_a), f64::from_le_bytes(wall_b)],
+            "file_bytes_equal": files_equal(old, new)?,
+        })
+    );
+    Ok(())
+}
+
+struct FieldStreams<R> {
+    a: R,
+    b: R,
+    hash: blake3::Hasher,
+    position: u64,
+    left: Vec<u8>,
+    right: Vec<u8>,
+}
+
+impl<R: Read> FieldStreams<R> {
+    fn varint(&mut self) -> Result<u64> {
+        let mut value = 0;
+        for shift in (0..=63).step_by(7) {
+            let mut a = [0];
+            let mut b = [0];
+            self.a.read_exact(&mut a)?;
+            self.b.read_exact(&mut b)?;
+            anyhow::ensure!(a == b, "varint differs at byte {}", self.position);
+            let part = a[0] & 0x7f;
+            anyhow::ensure!(shift < 63 || part <= 1, "varint overflow");
+            self.hash.update(&a);
+            self.position += 1;
+            value |= (part as u64) << shift;
+            if a[0] < 0x80 {
+                anyhow::ensure!(shift == 0 || part != 0, "noncanonical varint");
+                return Ok(value);
+            }
+        }
+        bail!("unterminated varint")
+    }
+
+    fn equal(&mut self, mut len: u64, mut extra: Option<&mut blake3::Hasher>) -> Result<()> {
+        while len > 0 {
+            let count = len.min(self.left.len() as u64) as usize;
+            self.a.read_exact(&mut self.left[..count])?;
+            self.b.read_exact(&mut self.right[..count])?;
+            anyhow::ensure!(
+                self.left[..count] == self.right[..count],
+                "payload differs at byte {}",
+                self.position
+            );
+            self.hash.update(&self.left[..count]);
+            if let Some(hash) = extra.as_deref_mut() {
+                hash.update(&self.left[..count]);
+            }
+            self.position += count as u64;
+            len -= count as u64;
+        }
+        Ok(())
+    }
+}
+
+fn files_equal(a: &str, b: &str) -> Result<bool> {
+    let len = std::fs::metadata(a)?.len();
+    if len != std::fs::metadata(b)?.len() {
+        return Ok(false);
+    }
+    let mut a = std::fs::File::open(a)?;
+    let mut b = std::fs::File::open(b)?;
+    let mut left = vec![0; 64 * 1024];
+    let mut right = vec![0; left.len()];
+    let mut remaining = len;
+    while remaining > 0 {
+        let count = remaining.min(left.len() as u64) as usize;
+        a.read_exact(&mut left[..count])?;
+        b.read_exact(&mut right[..count])?;
+        if left[..count] != right[..count] {
+            return Ok(false);
+        }
+        remaining -= count as u64;
+    }
+    Ok(true)
 }

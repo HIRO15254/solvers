@@ -722,6 +722,39 @@ fn allin_runout_matches_direct_equity() {
 
 #[test]
 fn memory_usage_matches_allocated() {
+    fn check_save_workspace(config: &PostflopConfig, game: &hu_postflop::PostflopGame) {
+        use hu_postflop::sol::ValueBlock;
+        use std::mem::size_of;
+        let tree = &game.game.tree;
+        let hands =
+            game.game.evaluator.hands.len(Player::P0) + game.game.evaluator.hands.len(Player::P1);
+        let slots: Vec<_> = tree
+            .storage_refs
+            .iter()
+            .map(|sref| {
+                std::sync::Mutex::new(Some(ValueBlock {
+                    sref: sref.index,
+                    scale: 0.0,
+                    values: vec![0; hands * 2],
+                }))
+            })
+            .collect();
+        let max_elements = tree
+            .storage_refs
+            .iter()
+            .map(|sref| sref.num_actions as usize * sref.num_hands as usize)
+            .max()
+            .unwrap();
+        let allocated = std::mem::size_of_val(slots.as_slice())
+            + slots
+                .iter()
+                .map(|slot| slot.lock().unwrap().as_ref().unwrap().values.capacity())
+                .sum::<usize>()
+            + tree.storage_refs.len() * size_of::<bool>()
+            + tree.nodes.len() * size_of::<Street>()
+            + max_elements * (size_of::<f32>() + size_of::<u16>());
+        assert_eq!(memory_usage(config).save_bytes, allocated as u64);
+    }
     let config = PostflopConfig {
         board: merged_flop(),
         ranges: PerPlayer::new("AA,KK".parse().unwrap(), "QQ,JJ".parse().unwrap()),
@@ -736,6 +769,7 @@ fn memory_usage_matches_allocated() {
     };
     let estimate = memory_usage(&config);
     let game = build_postflop_game(&config, chip_ev());
+    check_save_workspace(&config, &game);
 
     assert_eq!(
         estimate.f32_bytes,
@@ -794,6 +828,7 @@ fn memory_usage_matches_allocated() {
     };
     let rich_estimate = memory_usage(&rich_config);
     let rich_game = build_postflop_game(&rich_config, chip_ev());
+    check_save_workspace(&rich_config, &rich_game);
     let real_terminals = rich_game
         .game
         .tree
@@ -868,6 +903,7 @@ fn memory_usage_matches_allocated() {
     };
     let force_estimate = memory_usage(&force_config);
     let force_game = build_postflop_game(&force_config, chip_ev());
+    check_save_workspace(&force_config, &force_game);
     let force_real_terminals = force_game
         .game
         .tree

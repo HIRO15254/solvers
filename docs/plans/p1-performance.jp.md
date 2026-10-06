@@ -65,6 +65,12 @@ T3の測定（[証拠](../../experiments/p1-perf-2026-10/streaming-save-20261006
 resumeは最終arenaへ直接展開する。`.sol` v2のpacked blockは旧読み手でbit一致（wall_secsを除く）。
 共有Windows PC・Flop 4 iteration・8 threadsの参考値（T3前→T3）でCLI壁時計273.60→38.97秒、peak working set 10.77→4.48 GB。
 checkpointは58.5〜77.8→5.4〜6.7秒、`.sol`は43.6→9.5秒。memory判定にpacked保存領域・codec予算を加える。
+GCP（c2d-highcpu-32、16 threads）のCLI全体（同Flop木、4 iteration）はT3前の201.7秒・peak RSS 29.0 GB（`43e97c6`）から
+24.8秒・4.56 GB（`6234545`）になり、`export strategy/ev`は一致した。
+
+T3b（[証拠](../../experiments/p1-perf-2026-10/sol-strategy-stream-20261007/README.md)）: `.sol`の戦略blockを保持せずsref順に
+storageから直接書き、EV passでは値blockだけを保持する。payloadはwall_secs以外bit一致。保存作業領域の見積りは
+GTO Wizard風の木（`gtow_a`）で25.5→10.8 GBとなり、i16 storageとの合計54.2→39.5 GBで64 GB機の既定上限に収まる。
 
 ### 一致の定義
 

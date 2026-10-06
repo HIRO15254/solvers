@@ -1,0 +1,117 @@
+{
+  "candidate": "6234545+T3b with dyn Write before concrete writer correction",
+  "measurements": {
+    "old": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3b\\latest-old-flop4",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "1baa20c5397482ecc815c2c915f035889893c31af4afc69869c805cd05b7edc0",
+      "exit_code": 0,
+      "wall_seconds": 39.190563300002395,
+      "peak_working_set_bytes": 4480471040,
+      "peak_commit_bytes": 4553871360,
+      "memory_samples": 850,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 16.30385220000244,
+          "save_seconds": 5.180621200001042
+        },
+        {
+          "iteration": 4,
+          "seconds": 28.80337050000162,
+          "save_seconds": 5.929814700000861
+        }
+      ],
+      "solution_seconds": 10.387192800000776,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "5dd8a2d5a940b4ab5cacbb87b4d2e91449a5bfe1ec5c2c27b09ac5a45945f434"
+        },
+        "solution.sol": {
+          "bytes": 176246962,
+          "sha256": "0cb6e2415c20a5bd1f7618614b1e777d32182c97663480b6845a548505cf58cc"
+        }
+      },
+      "measurement_command": [
+        "python",
+        "-X",
+        "utf8",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+        "runs\\p1-t3b\\latest-old-flop4",
+        "runs\\p1-t3b\\latest-old-flop4-measure.json"
+      ]
+    },
+    "new": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3b\\latest-new-flop4",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "da1618415053fa18b2c3d0e75e567c4b735c486522b5c25ffbde2f632c6a4b11",
+      "exit_code": 0,
+      "wall_seconds": 61.89096419999987,
+      "peak_working_set_bytes": 3735863296,
+      "peak_commit_bytes": 3791966208,
+      "memory_samples": 1357,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 17.62854580000203,
+          "save_seconds": 6.4385795000016515
+        },
+        {
+          "iteration": 4,
+          "seconds": 30.471862300000794,
+          "save_seconds": 6.317551200001617
+        }
+      ],
+      "solution_seconds": 31.419101899999077,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "84625a14f4988655e2efe43d2cffab994e3ee9e0f6fd28ca5731fee320543366"
+        },
+        "solution.sol": {
+          "bytes": 176246963,
+          "sha256": "60992760eb297affc165d9755c51ce8b6ce47a9fd6fa698832be173448754584"
+        }
+      },
+      "measurement_command": [
+        "python",
+        "-X",
+        "utf8",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+        "runs\\p1-t3b\\latest-new-flop4",
+        "runs\\p1-t3b\\latest-new-flop4-measure.json"
+      ]
+    }
+  },
+  "binaries": {
+    "old": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+      "sha256": "1baa20c5397482ecc815c2c915f035889893c31af4afc69869c805cd05b7edc0"
+    },
+    "new": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "sha256": "da1618415053fa18b2c3d0e75e567c4b735c486522b5c25ffbde2f632c6a4b11"
+    }
+  },
+  "binary_availability": "new binary overwritten by final build; generated solution files and compact measurement hashes retained",
+  "checkpoint_availability": "intermediate Flop checkpoints removed after recording SHA256/size to free disk; config, solver binaries and solver semantics available to regenerate"
+}

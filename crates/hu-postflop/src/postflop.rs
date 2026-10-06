@@ -1640,8 +1640,8 @@ pub struct MemoryEstimate {
     /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
-    /// Packed strategy/value blocks, indexed slots, and street metadata for
-    /// a full `.sol` export. No all-node f32 values/reaches or payload copy.
+    /// Packed value slots, mode/street metadata and one node's strategy
+    /// workspace for a full `.sol` export. No retained strategy blocks.
     pub save_bytes: u64,
     /// Bounded streaming codec budget (updated for the run's thread count).
     pub compression_bytes: u64,
@@ -1681,6 +1681,7 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         sym: range_preserving_perms(&config.ranges),
         hands: PostflopHands::new(&config.board, &config.ranges),
         elements: 0,
+        max_strategy_elements: 0,
         nodes: 0,
         terminals: 0,
         action_nodes: 0,
@@ -1711,16 +1712,17 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
     Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
-        save_bytes: counting.elements * 2
-            + counting.action_nodes
+        save_bytes: counting.action_nodes
                 * 2
                 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
             + counting.action_nodes
                 * (std::mem::size_of::<
-                    std::sync::Mutex<Option<(crate::sol::StrategyBlock, crate::sol::ValueBlock)>>,
-                >() + std::mem::size_of::<crate::sol::StrategyBlock>()
-                    + std::mem::size_of::<crate::sol::ValueBlock>()) as u64
-            + counting.nodes * std::mem::size_of::<Street>() as u64,
+                    std::sync::Mutex<Option<crate::sol::ValueBlock>>,
+                >() + std::mem::size_of::<bool>()) as u64
+            + counting.nodes * std::mem::size_of::<Street>() as u64
+            // Sequential strategies: f32 average plus packed u16 bytes.
+            // Conservatively add this to the value pass's retained slots.
+            + counting.max_strategy_elements * (4 + 2),
         compression_bytes: 24 * 1024 * 1024,
         nodes: counting.nodes,
         terminals: counting.terminals,
@@ -1738,6 +1740,7 @@ struct Counting<'a> {
     config: &'a PostflopConfig,
     sym: Vec<SuitPerm>,
     elements: u64,
+    max_strategy_elements: u64,
     nodes: u64,
     terminals: u64,
     action_nodes: u64,
@@ -1772,7 +1775,9 @@ impl Counting<'_> {
             }
         }
 
-        self.elements += num_actions * self.hands.len(state.to_act) as u64;
+        let elements = num_actions * self.hands.len(state.to_act) as u64;
+        self.elements += elements;
+        self.max_strategy_elements = self.max_strategy_elements.max(elements);
     }
 
     fn street_end(&mut self, mut state: LineState) {

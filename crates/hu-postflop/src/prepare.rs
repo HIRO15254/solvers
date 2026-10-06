@@ -42,15 +42,7 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         .run
         .threads
         .unwrap_or(std::thread::available_parallelism()?.get() as u64);
-    // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
-    // cannot occupy every requested worker. Budget 16 MiB per active job
-    // plus 8 MiB shared buffers, and the actual small metadata copies.
-    let payload = estimate.f32_bytes.max(estimate.save_bytes);
-    let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
-    estimate.compression_bytes = jobs
-        .saturating_mul(16 * 1024 * 1024)
-        .saturating_add(8 * 1024 * 1024)
-        .saturating_add(effective.len() as u64 * 3);
+    estimate.compression_bytes = compression_workspace(&estimate, threads, effective.len());
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
@@ -67,6 +59,19 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         limit,
         target,
     })
+}
+
+fn compression_workspace(estimate: &crate::MemoryEstimate, threads: u64, config_len: usize) -> u64 {
+    // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
+    // cannot occupy every requested worker. The streamed strategies are
+    // still in the payload, though no longer in save_bytes. Slot overhead
+    // conservatively covers both lists' per-block postcard headers.
+    let solution = estimate.save_bytes.saturating_add(estimate.f32_bytes / 4);
+    let payload = estimate.f32_bytes.max(solution);
+    let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
+    jobs.saturating_mul(16 * 1024 * 1024)
+        .saturating_add(8 * 1024 * 1024)
+        .saturating_add(config_len as u64 * 3)
 }
 
 /// Return warnings from the prepared tree and stop settings.
@@ -302,4 +307,27 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
         state: checkpoint,
         elapsed,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn compression_budget_counts_streamed_strategies_as_payload() {
+        const MIB: u64 = 1024 * 1024;
+        // Asymmetric supports can make the retained values dominate storage.
+        // Values alone fit one job, but values plus strategies require two.
+        let estimate = crate::MemoryEstimate {
+            f32_bytes: MIB,
+            save_bytes: 2 * MIB - 1,
+            ..Default::default()
+        };
+        assert_eq!(
+            super::compression_workspace(&estimate, 8, 100),
+            40 * MIB + 300
+        );
+        assert_eq!(
+            super::compression_workspace(&estimate, 1, 100),
+            24 * MIB + 300
+        );
+    }
 }

@@ -207,6 +207,7 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 
 P1 checkpoint v4はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
+戦略はEV passに先立ってstorageからsref昇順に計算し、1 node分ずつ量子化して直接出力する。EV pass後の値slotもsref順に直接出力し、block用Vecへ移し替えない。
 codecはpacked blockのpostcard直列化も一時payload Vecなしで行う。
 checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
 CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。

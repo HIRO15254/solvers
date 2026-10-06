@@ -72,7 +72,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | storage＋保存作業領域の見積り、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
-| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol` packed保存領域 / run threadsに応じたstreaming圧縮予算 |
+| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋最大1 node分の戦略作業領域 / run threadsに応じたstreaming圧縮予算 |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
 | `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
 

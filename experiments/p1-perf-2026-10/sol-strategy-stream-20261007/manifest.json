@@ -1,0 +1,86 @@
+{
+  "baseline_commit": "6234545c6fe628e6b1d4da0ae225e073b8835a10",
+  "baseline_source": "runs/p1-t3b/old-source (git archive HEAD)",
+  "baseline_archive_sha256": "62bafd0a66f5d853c14515b2ec5cea845e0d7bd0e90a12a16978fc94e9aab657",
+  "new_source": "same HEAD plus working-tree diff; no commit/branch/push operations",
+  "binaries": {
+    "old": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+      "sha256": "1baa20c5397482ecc815c2c915f035889893c31af4afc69869c805cd05b7edc0"
+    },
+    "new": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "sha256": "d7ef2337cb1ee770d2e9e49149af0be9e1ac212b9e44ff11ed6333d8bfd342d0"
+    }
+  },
+  "verifier": {
+    "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+    "sha256": "05ed774b38319fa98331a5ebee1f0931e5cc89fec74067d03e92a120f5314770"
+  },
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "cargo_build_jobs": 2,
+  "config_hashes": {
+    "flop4.toml": "1f8e5e3ba8f23131eb5851f029a1f06f7aa6a86790e3a8a195906abdcc9cc54b",
+    "flop_srp1.toml": "ad2662b99c96be2ffa768f762453d5a1b4e2254ac05e32838ef1a23151ed5d69",
+    "gtow_a-i16.toml": "4b5f5911bbe882770b0072d59f2949a3bedf2664d64e7823f8c9ababbb3715a9",
+    "gtow_a.toml": "dfad6a833148fe0cf2ec94b5e59d8c217d9b4afcad92a6c645c935ac3786e1e2",
+    "gtow_b.toml": "701c5b6734bf67600bb0c09c5258595cd5697a226b5252ac4da16a88e47ac20e",
+    "river6-i16.toml": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1",
+    "turn6-no-rivers.toml": "9ad3f9a9385c007ff2271928bd47e8ac5a3df320b68be944e563e66898f3e3c9",
+    "turn6.toml": "b87d166168de0717043104d5fe06c5ccef5122e848033e587fe56cc395749692"
+  },
+  "scratch_location": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t3b",
+  "first_candidate_binaries": {
+    "old": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+      "sha256": "1baa20c5397482ecc815c2c915f035889893c31af4afc69869c805cd05b7edc0"
+    },
+    "new": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "sha256": "da1618415053fa18b2c3d0e75e567c4b735c486522b5c25ffbde2f632c6a4b11"
+    }
+  },
+  "new_source_files_sha256": {
+    "crates/hu-postflop/examples/verify_save.rs": "01a9819c0798d188004076deaefbc2f0944d46cd902fc7047fc86faf7c3f8f3f",
+    "crates/hu-postflop/src/artifact.rs": "e12c3ea1dc43ba3e066a0a5e8e4330fbb6968f3e300b0da867af833a56140b63",
+    "crates/hu-postflop/src/postflop.rs": "6fef5f8337ae8e10515943cb33cd874c7e31a50f8b5f6fedc760a7760d509d4e",
+    "crates/hu-postflop/src/prepare.rs": "1003761395092b0280a894b4975f88f5c0ab6049eea770f88bab0574d259044f",
+    "crates/hu-postflop/src/sol.rs": "5d9d8e2b361b709d1ab7105bad85db576bca6c3d442db50665aebb862bf16939",
+    "crates/hu-postflop/tests/postflop.rs": "fca758bef669e834b213fd3d52c9bc735d9d6902da276c9f11ef4daec2e1488a",
+    "docs/architecture.md": "c06e181eb87964fb2e61548188e85a51c7b63da75fb3a1e8cb7eb724d93e29aa",
+    "docs/cli-reference.jp.md": "d6dbffa7c9f4d58a8af786b506ad9924097d119687f38ea4b3bf6b177b839c7a",
+    "docs/hu-postflop.jp.md": "6e5c4fdbbc927ac5c6ad7a4ebc915ef53286c62ada9df379808530bb98e9a1e1",
+    "docs/nlh-input-v1.jp.md": "0a8a12cf82600a0286154a1e630e51169be12c6fef6b496b1c2fad405c92b1da",
+    "docs/user-guide.jp.md": "727122d19235fb2c04ad2e25cfa7bf98422890b650cf678a5d0dc3da93aed2a2"
+  },
+  "new_source_diff_sha256": "ba77dc4fb786595c2035e84562a37b7bc9f5326c19220240829f99063452406b",
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+    "logical_processors": 16,
+    "total_physical_memory_bytes": 34275098624,
+    "memory_load_percent": 61
+  },
+  "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+  "fixed_wall_verifier": {
+    "source": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t3b\\old-source\\crates\\hu-postflop\\examples\\verify_t3b.rs",
+    "source_sha256": "a4e0a4c8615f556d66f58a55f981d11b65fa82b389230444cb5029a17c388a32",
+    "binary_sha256": "f3405867794f17a0cbcd78c1fc8ca4b4acb7029476dc21767a80276158f75676",
+    "scope": "experiment-only example importing current codec; baseline solver source/binary unchanged"
+  },
+  "build_commands": [
+    "CARGO_BUILD_JOBS=2 cargo build --release -p cli --manifest-path runs/p1-t3b/old-source/Cargo.toml --target-dir target/p1-t3b-old",
+    "CARGO_BUILD_JOBS=2 cargo build --release -p cli",
+    "CARGO_BUILD_JOBS=2 cargo build --release -p hu-postflop --example verify_save",
+    "CARGO_BUILD_JOBS=2 cargo build --release -p hu-postflop --example verify_t3b --manifest-path runs/p1-t3b/old-source/Cargo.toml --target-dir target/p1-t3b-old"
+  ],
+  "retained_json_sha256": {
+    "comparisons.json": "4e2cdbcfaee228eefcd4cb3c3024a249576ccef10080db29ae14783d054439cc",
+    "compressed.json": "ed39469f2e337d9797a3d02d2e4a179bcae73695215f5f03d1f5a08b927c75f8",
+    "first-candidate.json": "c830bbc156d77b08364268e8369a6666365947f34445b2b16ae70e1abf04a28e",
+    "measurements.json": "af676dee6ee52bc0d3256eff75e131775a1f36e746148efe81fba8913a526e33",
+    "resources.json": "a6231f6e1e4bc676bc1079c99eee1202ef5070b9c6a9e7e81acc7e9fe78842a9",
+    "validation.json": "385d76529361d8b4d0db63dca50b406593df837433327b0b03d2755b1a4a2960"
+  },
+  "hash_note": "SHA-256 of LF-normalized bytes"
+}
