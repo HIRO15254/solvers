@@ -336,6 +336,69 @@ fn resume_preserves_storage_streets_and_cumulative_time() {
 }
 
 #[test]
+fn mixed_resume_preserves_storage_streets_and_cumulative_time() {
+    let directory = tempfile::tempdir().unwrap();
+    let input = directory.path().join("config.toml");
+    let config = CONFIG
+        .replace("2c 7d 9h Js Qs", "2c 7d 9h Js")
+        .replace(" / BB x, BTN x / BB x, BTN x", " / BB x, BTN x")
+        .replace("[run]", "[run]\nmax_time = \"1s\"");
+    let config = config
+        .replace("storage = \"f32\"", "storage = \"i16-f32avg\"")
+        .replace("check_every = 5", "check_every = 5\ntarget = \"999bb\"");
+    let config = config + "\n[output]\nsolution_streets = \"no-rivers\"\n";
+    std::fs::write(&input, config).unwrap();
+    let run = directory.path().join("run");
+    ok(&[
+        "solve",
+        input.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let before = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
+    assert_eq!(before.mode, hu_postflop::sol::StreetsStored::NoRivers);
+    // Simulate a durable progress mark at the cumulative limit, without
+    // relying on machine-dependent solve speed or sleeping in this test.
+    let progress = run.join("progress.jsonl");
+    let mut rows: Vec<serde_json::Value> = std::fs::read_to_string(&progress)
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    rows.last_mut().unwrap()["elapsed_secs"] = 1.0.into();
+    let text = rows
+        .iter()
+        .map(|row| format!("{row}\n"))
+        .collect::<String>();
+    std::fs::write(&progress, text).unwrap();
+    let checkpoint = run.join("checkpoint.ckpt");
+    let saved = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    hu_postflop::checkpoint::write_checkpoint_with_config(
+        &checkpoint,
+        saved.config_hash,
+        &saved.state,
+        saved.config_toml.as_deref().unwrap(),
+        1.0,
+    )
+    .unwrap();
+    let fork = directory.path().join("fork");
+    ok(&[
+        "resume",
+        run.to_str().unwrap(),
+        "--out",
+        fork.to_str().unwrap(),
+    ]);
+    let after = hu_postflop::sol::read_sol(&fork.join("solution.sol")).unwrap();
+    assert_eq!(after.mode, before.mode);
+    assert_eq!(after.meta.storage, "i16-f32avg");
+    assert_eq!(after.meta.iterations, before.meta.iterations);
+    assert_eq!(
+        std::fs::read(fork.join("progress.jsonl")).unwrap(),
+        std::fs::read(progress).unwrap()
+    );
+}
+
+#[test]
 fn solution_uses_compact_format_version_2() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(CONFIG, directory.path());

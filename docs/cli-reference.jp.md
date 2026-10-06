@@ -68,7 +68,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 
 | resources field | 製品 | 意味 |
 |---|---|---|
-| `nodes` / `terminals` / `f32Bytes` / `i16Bytes` | P1 | 木のnode・terminal数とstorage別bytes |
+| `nodes` / `terminals` / `f32Bytes` / `i16Bytes` / `i16F32avgBytes` | P1 | 木のnode・terminal数とstorage別bytes |
 | `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | storage＋保存作業領域の見積り、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
@@ -111,7 +111,8 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
-P1 `.sol`はversion 2、checkpointはversion 4だけを受理する。checkpoint v1/2/3は明示拒否する。旧形式は現行configから再solveする。
+P1 storageは`f32`（既定）・`i16`・`i16-f32avg`。`config new --product p1 --template full`にもこの選択肢を表示する。
+P1 `.sol`はversion 2、checkpointはversion 5だけを受理する。checkpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 

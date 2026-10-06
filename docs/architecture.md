@@ -105,7 +105,7 @@ Chance branch の `Deal` は重みと両者の `ReachMap` を持つ。
 Stud/Draw のルール・観測・情報集合を実装済みとするものではない。
 
 Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付き量子化を行う
-`I16Storage`。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
+`I16Storage`、regretだけ同じi16量子化・戦略累積をf32にする`MixedStorage`（`i16-f32avg`、6L＋4N bytes）。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
 view を渡す。`ParConfig` が chance depth と fan-out を制御する。メモリ削減量・速度・精度は
 ゲームと設定に依存するので、採用条件は測定証拠とともに評価する。
 
@@ -152,7 +152,7 @@ foldは開始supportの包除原理と席間の同一combo対応表を使う。f
 memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
 
 `prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
-`run::run`はlocal poolでf32/i16のgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
+`run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。
 
@@ -176,7 +176,7 @@ testは計算層と利用者境界を分けて置く。
 
 - `nlh`・`economics`・`spot`: betting/精算、単位、rake/ICM、schema・normalizer・line再生。
 - `hu-engine`: storage、reach、chanceの次元変化、CFR/BRとstate復元。
-- `hu-postflop`: kernel、payoff、f32/i16、iso、保存coverageと値、River re-solve。
+- `hu-postflop`: kernel、payoff、f32/i16/i16-f32avg、iso、保存coverageと値、River re-solve。
   [toy oracle差分](../crates/hu-postflop/tests/toy_oracle_diff.rs)と
   [postflop oracle差分](../crates/hu-postflop/tests/oracle_diff.rs)は凍結`cfr-ref`と独立に照合する。
 - `mw-preflop`: dense arena、固定seed、thread数独立のmerge、平均profile、停止評価、checkpointとviews。
@@ -205,7 +205,7 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 | `.mwsol` | `mw_preflop::mwsol`、`session`、`views` | 正式平均profileとidentity、保存coverage、評価data |
 | run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
-P1 checkpoint v4はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。
+P1 checkpoint v5はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。metadataのbackendは3種類のenumで、Mixedの配列順はregrets（i16）、strategy_sum（f32）、regret_scales（f32）。backendと配列長は書込み前に検査し、v1〜4は再solveを案内して拒否する。
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
 戦略はEV passに先立ってstorageからsref昇順に計算し、1 node分ずつ量子化して直接出力する。EV pass後の値slotもsref順に直接出力し、block用Vecへ移し替えない。
 codecはpacked blockのpostcard直列化も一時payload Vecなしで行う。

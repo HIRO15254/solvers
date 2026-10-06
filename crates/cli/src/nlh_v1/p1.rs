@@ -64,6 +64,7 @@ pub fn validate(
         value["resources"] = json!({
             "nodes": p.estimate.nodes, "terminals": p.estimate.terminals,
             "f32Bytes": p.estimate.f32_bytes, "i16Bytes": p.estimate.i16_bytes,
+            "i16F32avgBytes": p.estimate.i16_f32avg_bytes,
             "saveWorkspaceBytes": p.estimate.save_bytes, "compressionWorkspaceBytes": p.estimate.compression_bytes,
             "memoryEstimateBytes": required_bytes(&p), "memoryLimitBytes": p.limit,
             "withinLimit": required_bytes(&p) <= p.limit,
@@ -417,12 +418,13 @@ fn execute(
 
 pub(crate) fn print_memory_estimate(estimate: &hu_postflop::MemoryEstimate) {
     println!(
-        "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16)",
+        "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg)",
         estimate.nodes,
         estimate.terminals,
         estimate.rank_tables,
         estimate.f32_bytes as f64 / (1024.0 * 1024.0),
         estimate.i16_bytes as f64 / (1024.0 * 1024.0),
+        estimate.i16_f32avg_bytes as f64 / (1024.0 * 1024.0),
     );
 }
 

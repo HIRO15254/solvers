@@ -3,7 +3,8 @@ use crate::input::{self, Algorithm, SolutionStreets};
 use crate::prepare::{self, Prepared, compatibility_hash, display_game, warnings};
 use anyhow::{Context, Result, bail};
 use hu_engine::{
-    DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, Storage, TerminalEvaluator,
+    DiscountSchedule, F32Storage, I16Storage, MixedStorage, ParConfig, Solver, Storage,
+    TerminalEvaluator,
 };
 use nlh::{PerPlayer, Player};
 use std::path::Path;
@@ -47,6 +48,7 @@ pub fn run(
     with_threads(threads, || match request.prepared.settings.solver.storage {
         input::Storage::F32 => drive::<F32Storage>(request, observer, diagnostics),
         input::Storage::I16 => drive::<I16Storage>(request, observer, diagnostics),
+        input::Storage::I16F32Avg => drive::<MixedStorage>(request, observer, diagnostics),
     })
 }
 
@@ -230,6 +232,7 @@ fn drive<S: Storage>(
         storage_name: match p.settings.solver.storage {
             input::Storage::F32 => "f32",
             input::Storage::I16 => "i16",
+            input::Storage::I16F32Avg => "i16-f32avg",
         }
         .into(),
     };

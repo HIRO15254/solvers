@@ -14,6 +14,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能・保存一致の検証 | [P1 `.sol`戦略block逐次出力](p1-perf-2026-10/sol-strategy-stream-20261007/README.md) | 2026-10-07。T3b、戦略保持除去、v2 payload・固定wall圧縮bytes一致、資源見積りとFlop peak/time |
 | 性能・保存一致の検証 | [P1 `.sol`戦略block並列生成](p1-perf-2026-10/sol-strategy-par-20261007/README.md) | 2026-10-07。T3c、上限付き1 batch、旧新payload・同thread圧縮bytes一致、2組のFlop計測と資源見積り、既存thread間codec差 |
 | 性能の計測 | [P1 0.1% potまでの収束](p1-perf-2026-10/convergence-20261007/README.md) | 2026-10-07。GCP 32 threadsでschedule別・i16・DCFR係数掃引の0.1%到達、gtow_b 575 iteration、CLI全体の新旧比較 |
+| storage精度・互換性の検証 | [P1 i16-f32avg storage](p1-perf-2026-10/mixed-storage-20261007/README.md) | 2026-10-07。T6、regretの旧i16 bit一致、checkpoint v5、旧f32/i16のv2 payload比較、Turn 3000反復と3 backendの資源見積り |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

@@ -998,6 +998,41 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     ));
 }
 
+#[test]
+fn mixed_i16_storage_solve_converges_and_checkpoint_round_trips() {
+    let dir = temp_dir("i16-f32avg");
+    let config = dir.join("river-i16-f32avg.toml");
+    std::fs::write(
+        &config,
+        RIVER_NO_EARLY_STOP.replace("storage = \"f32\"", "storage = \"i16-f32avg\""),
+    )
+    .unwrap();
+    let run = dir.join("run");
+    let checkpoint = run.join("checkpoint.ckpt");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let nash_conv: f64 = done_line_field(&stdout, "nash_conv=").parse().unwrap();
+    // Loose bound: the river under i16-f32avg-quantized storage should still
+    // converge well below the game's own scale (the pot is 10 chips, and the
+    // f32 backend reaches ~2.5e-3 in the same 200 iterations).
+    assert!(
+        nash_conv < 0.02,
+        "i16-f32avg storage should still converge on the river subgame, got nash_conv={nash_conv}"
+    );
+
+    let checkpoint_data = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    assert!(matches!(
+        checkpoint_data.state.storage,
+        hu_engine::StorageState::Mixed { .. }
+    ));
+}
+
 /// Ported from the retired desktop backend: the canonical 6-max default
 /// surface must build a public tree and size a policy arena without
 /// allocating it. `--resources` is the CLI's only tree-preflight surface.

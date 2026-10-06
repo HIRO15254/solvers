@@ -102,6 +102,11 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
             rendered.push_str(description);
             rendered.push('\n');
         }
+        if line.starts_with("storage =") {
+            rendered.push_str(
+                "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
+            );
+        }
         rendered.push_str(line);
         rendered.push('\n');
     }
@@ -402,6 +407,7 @@ mod tests {
             "hs-dcfr",
             "f32",
             "i16",
+            "i16-f32avg",
             "parallel",
             "chance_depth",
             "min_children",

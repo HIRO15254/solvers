@@ -48,7 +48,7 @@ solvers validate spot.toml --resources
 ```
 
 製品・開始状態・暗黙fold・tree ruleを確認する。実効入力は既定値を展開し、外部scriptをinline化する。
-P1は木とstorage bytesを見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
+P1は木と3種類のstorage bytes（JSON: `f32Bytes`・`i16Bytes`・`i16F32avgBytes`）を見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
 P2の`--resources`はpublic treeのarena countとrule hit測定を行うため、大きい木では時間が掛かる。
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
 withinLimitがfalseならmemoryまたはtreeを見直す。validateの成功はsolve可能なmemoryや品質を保証しない。
@@ -60,7 +60,9 @@ solvers solve spot.toml --out runs/my-spot --threads 4 --memory 2GiB --max-time 
 ```
 
 毎回新しいrun directoryを指定する。overrideはrun.tomlへ保存する。
-P1のmemory見積りはstorage、保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
+P1の`[solver] storage`は`f32`（既定、両arena f32）、`i16`（両arena i16、memory最小）、`i16-f32avg`（regret i16、戦略累積f32）を選べる。0.1% pot程度を目指し旧i16が頭打ちになる場合は`i16-f32avg`を使う。regretの量子化誤差は残る。storage bytesは順に8L、4L＋8N、6L＋4N（L=要素数、N=action node数）。
+
+P1のmemory見積りは選択したstorage、保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
 P1のmemory autoは物理RAMの80%、P2はarena予算6 GiBである。P2のmemoryはRSS全体の上限ではなく、
 tree・cache・thread scratch・評価・checkpoint用の追加memoryが必要である。
 P2のEHS² tableは初回に構築し、以後はmachine cacheを利用する。
@@ -92,7 +94,7 @@ P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 
 旧runのstatus・watch・runs lsも利用でき、JSONのconfigSchema / gameKindは記録値のままである。
 旧runのresumable表示はcheckpointの存在を示すだけで、現行CLIでは再開できない。
-`.sol` version 1とcheckpoint version 1/2/3は読めない。現行configから再solveして`.sol` version 2・checkpoint version 4を作る。
+`.sol` version 1とcheckpoint version 1/2/3/4は読めない。現行configから再solveして`.sol` version 2・checkpoint version 5を作る。
 
 ## 6. 結果を読む
 

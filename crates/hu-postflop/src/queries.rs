@@ -4,7 +4,7 @@ use crate::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, r
 use crate::{prepare, run};
 use anyhow::Result;
 use hu_engine::{
-    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, ReachMap, Solver, Storage,
+    CompiledGame, F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, ReachMap, Solver, Storage,
 };
 use nlh::{Card, PerPlayer, Player, combo_cards};
 use std::sync::atomic::AtomicBool;
@@ -12,6 +12,7 @@ use std::time::Instant;
 enum LiveSolver {
     F32(Solver<PostflopEvaluator, F32Storage>),
     I16(Solver<PostflopEvaluator, I16Storage>),
+    Mixed(Solver<PostflopEvaluator, MixedStorage>),
 }
 /// A live solve with its display metadata and root summary.
 pub struct LiveSolution {
@@ -26,6 +27,7 @@ impl LiveSolution {
         match &self.solver {
             LiveSolver::F32(s) => s.game(),
             LiveSolver::I16(s) => s.game(),
+            LiveSolver::Mixed(s) => s.game(),
         }
     }
 }
@@ -45,6 +47,9 @@ pub fn with_live<T: Send>(
             }
             crate::input::Storage::I16 => {
                 live::<I16Storage>(p, iterations, target, cancel, LiveSolver::I16)
+            }
+            crate::input::Storage::I16F32Avg => {
+                live::<MixedStorage>(p, iterations, target, cancel, LiveSolver::Mixed)
             }
         }?;
         viewer(&solved)
@@ -78,6 +83,7 @@ impl StrategyProvider for LiveProvider<'_> {
         Ok(match &self.0.solver {
             LiveSolver::F32(s) => s.average_strategy_at(node),
             LiveSolver::I16(s) => s.average_strategy_at(node),
+            LiveSolver::Mixed(s) => s.average_strategy_at(node),
         })
     }
     fn ev_summary(&self) -> EvSummary {

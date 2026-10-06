@@ -19,6 +19,8 @@ pub enum Storage {
     #[default]
     F32,
     I16,
+    #[serde(rename = "i16-f32avg")]
+    I16F32Avg,
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]

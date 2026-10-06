@@ -1,0 +1,41 @@
+{
+  "binaries": [
+    {
+      "path": "target/p1-t6-old/release/solvers.exe",
+      "bytes": 7409152,
+      "sha256_raw": "85fb264a6e299856e77beff60a14b238dda0e88fe1df9914eb62e082acfb8b38",
+      "availability": "retained unchanged",
+      "measurement_sha256_raw": "85fb264a6e299856e77beff60a14b238dda0e88fe1df9914eb62e082acfb8b38",
+      "current_sha256_raw": "85fb264a6e299856e77beff60a14b238dda0e88fe1df9914eb62e082acfb8b38",
+      "current_pe_timestamp_utc": "2026-10-06T22:25:49+00:00"
+    },
+    {
+      "path": "target/release/solvers.exe",
+      "bytes": 7568896,
+      "sha256_raw": "a14981a2cc14f2c85a09ae7208454611402ae7fcc13816f02e4b9d8468bae604",
+      "availability": "measurement binary overwritten by verification rebuild; original hash retained here",
+      "measurement_sha256_raw": "a14981a2cc14f2c85a09ae7208454611402ae7fcc13816f02e4b9d8468bae604",
+      "current_sha256_raw": "77f7031f45021105b3fa4f6275977602e053105c7b407b581e6429dee5b92db5",
+      "current_pe_timestamp_utc": "2026-10-06T22:56:49+00:00"
+    },
+    {
+      "path": "target/release/examples/verify_save.exe",
+      "bytes": 965120,
+      "sha256_raw": "f7cd09bdbb2d5c2505a95721de5a64dc5ad0d1fac710bf351d14db4b277670b4",
+      "availability": "measurement binary overwritten by verification rebuild; original hash retained here",
+      "measurement_sha256_raw": "f7cd09bdbb2d5c2505a95721de5a64dc5ad0d1fac710bf351d14db4b277670b4",
+      "current_sha256_raw": "2c165940cd064d4072cf5030551885d5803e9270abcc10687701b7480314c537",
+      "current_pe_timestamp_utc": "2026-10-06T22:57:02+00:00"
+    },
+    {
+      "path": "target/release/examples/p1_bench.exe",
+      "bytes": 2297344,
+      "sha256_raw": "9666d31a3cbd9887a3489282e88a774a0749c2dae1fcdd51a6576023e48c5de7",
+      "availability": "measurement binary overwritten by verification rebuild; original hash retained here",
+      "measurement_sha256_raw": "9666d31a3cbd9887a3489282e88a774a0749c2dae1fcdd51a6576023e48c5de7",
+      "current_sha256_raw": "e2d5c4cf5d3d0c9c1b16b9a34cf8b4b74146934e89371df6137883419c5fc8e4",
+      "current_pe_timestamp_utc": "2026-10-06T22:57:15+00:00"
+    }
+  ],
+  "source_difference_since_measurement": "test-only ReferenceStorage addition; all other source LF hashes verified unchanged"
+}

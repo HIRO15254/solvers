@@ -60,7 +60,9 @@ fn mccfr_kuhn_matches_full_traversal_bit_exactly() {
                 "strategy sums diverged from full traversal"
             );
         }
-        StorageState::I16 { .. } => panic!("expected F32 storage state"),
+        StorageState::I16 { .. } | StorageState::Mixed { .. } => {
+            panic!("expected F32 storage state")
+        }
     }
 
     let expl = mc_solver.exploitability();

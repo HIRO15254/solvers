@@ -131,6 +131,11 @@ pub enum StorageState {
         regret_scales: Vec<f32>,
         strategy_scales: Vec<f32>,
     },
+    Mixed {
+        regrets: Vec<i16>,
+        strategy_sum: Vec<f32>,
+        regret_scales: Vec<f32>,
+    },
 }
 
 /// Raw checkpoint arenas in stable order: regrets, strategy sum, then scales.
@@ -145,6 +150,11 @@ pub enum StorageArrays<'a> {
         regret_scales: &'a [f32],
         strategy_scales: &'a [f32],
     },
+    Mixed {
+        regrets: &'a [i16],
+        strategy_sum: &'a [f32],
+        regret_scales: &'a [f32],
+    },
 }
 
 pub enum StorageArraysMut<'a> {
@@ -158,6 +168,11 @@ pub enum StorageArraysMut<'a> {
         regret_scales: &'a mut [f32],
         strategy_scales: &'a mut [f32],
     },
+    Mixed {
+        regrets: &'a mut [i16],
+        strategy_sum: &'a mut [f32],
+        regret_scales: &'a mut [f32],
+    },
 }
 
 impl StorageState {
@@ -169,6 +184,15 @@ impl StorageState {
             } => StorageArrays::F32 {
                 regrets,
                 strategy_sum,
+            },
+            Self::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => StorageArrays::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
             },
             Self::I16 {
                 regrets,
@@ -191,6 +215,15 @@ impl StorageState {
             } => StorageArraysMut::F32 {
                 regrets,
                 strategy_sum,
+            },
+            Self::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => StorageArraysMut::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
             },
             Self::I16 {
                 regrets,
@@ -1012,9 +1045,328 @@ impl<'a> StorageView for I16View<'a> {
     }
 }
 
+/// i16 regrets with the legacy per-node quantization; f32 strategy sums.
+/// Split views own disjoint arenas/scales and a private regret scratch buffer.
+pub struct MixedStorage {
+    regrets: Vec<i16>,
+    strategy_sum: Vec<f32>,
+    regret_scales: Vec<f32>,
+    scratch: Vec<f32>,
+}
+
+impl StorageOps for MixedStorage {
+    fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        regret_matching_i16_impl(&self.regrets, r.offset, r, out);
+    }
+
+    fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        update_regrets_i16_impl(
+            &mut self.regrets,
+            r.offset,
+            r,
+            inst,
+            d,
+            &mut self.regret_scales[ref_idx as usize],
+            &mut self.scratch,
+        );
+    }
+
+    fn accumulate_strategy(
+        &mut self,
+        r: StorageRef,
+        _ref_idx: u32,
+        weighted: &[f32],
+        d: &Discounts,
+    ) {
+        accumulate_strategy_impl(&mut self.strategy_sum, r.offset, r, weighted, d);
+    }
+
+    fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        average_strategy_impl(&self.strategy_sum, r.offset, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        raw_regrets_i16_impl(
+            &self.regrets,
+            r.offset,
+            r,
+            self.regret_scales[ref_idx as usize],
+            out,
+        );
+    }
+}
+
+impl Storage for MixedStorage {
+    type View<'a> = MixedView<'a>;
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        StorageArrays::Mixed {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+            regret_scales: &self.regret_scales,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        StorageArraysMut::Mixed {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+        }
+    }
+
+    fn new(len: usize, num_refs: usize) -> Self {
+        MixedStorage {
+            regrets: vec![0i16; len],
+            strategy_sum: vec![0.0; len],
+            regret_scales: vec![1.0; num_refs],
+            scratch: Vec::new(),
+        }
+    }
+
+    fn view_mut(&mut self) -> MixedView<'_> {
+        MixedView {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+            base: 0,
+            sref_base: 0,
+            scratch: Vec::new(),
+        }
+    }
+
+    fn bytes_for(len: usize, num_refs: usize) -> u64 {
+        len as u64 * 6 + num_refs as u64 * 4
+    }
+
+    fn state(&self) -> StorageState {
+        StorageState::Mixed {
+            regrets: self.regrets.clone(),
+            strategy_sum: self.strategy_sum.clone(),
+            regret_scales: self.regret_scales.clone(),
+        }
+    }
+
+    fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        match state {
+            StorageState::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => {
+                check_len(self.regrets.len(), regrets.len())?;
+                check_len(self.strategy_sum.len(), strategy_sum.len())?;
+                check_len(self.regret_scales.len(), regret_scales.len())?;
+                self.regrets = regrets;
+                self.strategy_sum = strategy_sum;
+                self.regret_scales = regret_scales;
+                Ok(())
+            }
+            _ => Err(StateMismatch::WrongVariant),
+        }
+    }
+
+    fn scale_all(&mut self, regret: f32, strategy: f32) {
+        for v in &mut self.regret_scales {
+            *v *= regret;
+        }
+        for v in &mut self.strategy_sum {
+            *v *= strategy;
+        }
+    }
+}
+
+pub struct MixedView<'a> {
+    regrets: &'a mut [i16],
+    strategy_sum: &'a mut [f32],
+    regret_scales: &'a mut [f32],
+    base: usize,
+    sref_base: u32,
+    scratch: Vec<f32>,
+}
+
+impl<'a> MixedView<'a> {
+    fn local_offset(&self, r: StorageRef) -> usize {
+        debug_assert!(r.offset >= self.base, "storage ref starts before view base");
+        let local = r.offset - self.base;
+        debug_assert!(
+            local + r.len() <= self.regrets.len(),
+            "storage ref exceeds view bounds"
+        );
+        local
+    }
+
+    fn local_ref(&self, ref_idx: u32) -> usize {
+        debug_assert!(
+            ref_idx >= self.sref_base,
+            "storage ref index starts before view sref base"
+        );
+        let local = (ref_idx - self.sref_base) as usize;
+        debug_assert!(
+            local < self.regret_scales.len(),
+            "storage ref index exceeds view sref bounds"
+        );
+        local
+    }
+}
+
+impl<'a> StorageOps for MixedView<'a> {
+    fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        regret_matching_i16_impl(&*self.regrets, local, r, out);
+    }
+
+    fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        let local = self.local_offset(r);
+        let sidx = self.local_ref(ref_idx);
+        update_regrets_i16_impl(
+            &mut *self.regrets,
+            local,
+            r,
+            inst,
+            d,
+            &mut self.regret_scales[sidx],
+            &mut self.scratch,
+        );
+    }
+
+    fn accumulate_strategy(
+        &mut self,
+        r: StorageRef,
+        _ref_idx: u32,
+        weighted: &[f32],
+        d: &Discounts,
+    ) {
+        let local = self.local_offset(r);
+        accumulate_strategy_impl(&mut *self.strategy_sum, local, r, weighted, d);
+    }
+
+    fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        average_strategy_impl(&*self.strategy_sum, local, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        let sidx = self.local_ref(ref_idx);
+        raw_regrets_i16_impl(&*self.regrets, local, r, self.regret_scales[sidx], out);
+    }
+}
+
+impl<'a> StorageView for MixedView<'a> {
+    fn split(&mut self, spans: &[StorageSpan]) -> Vec<Self> {
+        let base = self.base;
+        let sref_base = self.sref_base;
+        let mut regrets_rest = std::mem::take(&mut self.regrets);
+        let mut strategy_rest = std::mem::take(&mut self.strategy_sum);
+        let mut rscale_rest = std::mem::take(&mut self.regret_scales);
+
+        let mut out = Vec::with_capacity(spans.len());
+        let mut consumed = 0usize;
+        let mut sref_consumed = 0u32;
+        for span in spans {
+            debug_assert!(
+                span.start >= base + consumed && span.end >= span.start,
+                "storage spans must be ascending, disjoint, and within view bounds"
+            );
+            let gap = span.start - (base + consumed);
+            let (_, r_rest) = regrets_rest.split_at_mut(gap);
+            let (_, s_rest) = strategy_rest.split_at_mut(gap);
+            let len = span.end - span.start;
+            let (r_span, r_after) = r_rest.split_at_mut(len);
+            let (s_span, s_after) = s_rest.split_at_mut(len);
+
+            debug_assert!(
+                span.sref_start >= sref_base + sref_consumed && span.sref_end >= span.sref_start,
+                "storage spans must carry ascending, disjoint sref ranges within view bounds"
+            );
+            let sref_gap = (span.sref_start - (sref_base + sref_consumed)) as usize;
+            let (_, rscale_r) = rscale_rest.split_at_mut(sref_gap);
+            let sref_len = (span.sref_end - span.sref_start) as usize;
+            let (rscale_span, rscale_after) = rscale_r.split_at_mut(sref_len);
+
+            out.push(MixedView {
+                regrets: r_span,
+                strategy_sum: s_span,
+                regret_scales: rscale_span,
+                base: span.start,
+                sref_base: span.sref_start,
+                scratch: Vec::new(),
+            });
+            regrets_rest = r_after;
+            strategy_rest = s_after;
+            rscale_rest = rscale_after;
+            consumed = span.end - base;
+            sref_consumed = span.sref_end - sref_base;
+        }
+        out
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn mixed_ops_match_i16_regrets_and_f32_sums_bitwise() {
+        let r = make_ref(0, 3, 257, 0);
+        let mut mixed = MixedStorage::new(r.len(), 1);
+        let mut quantized = I16Storage::new(r.len(), 1);
+        let mut float = F32Storage::new(r.len(), 1);
+        let bits = |v: &[f32]| v.iter().map(|x| x.to_bits()).collect::<Vec<_>>();
+        for t in 1..=100 {
+            let d = Discounts {
+                pos: 0.97,
+                neg: 0.5,
+                avg: 0.83,
+                floor_neg: t % 3 == 0,
+                reset_avg: t % 17 == 0,
+            };
+            let inst: Vec<_> = (0..r.len())
+                .map(|i| ((i * 19 + t) % 61) as f32 - 30.0)
+                .collect();
+            mixed.update_regrets(r, 0, &inst, &d);
+            quantized.update_regrets(r, 0, &inst, &d);
+            let mut sigma = vec![0.0; r.len()];
+            mixed.regret_matching(r, 0, &mut sigma);
+            let weighted: Vec<_> = sigma
+                .iter()
+                .enumerate()
+                .map(|(i, v)| v * (i % 13) as f32 / 13.0)
+                .collect();
+            mixed.accumulate_strategy(r, 0, &weighted, &d);
+            float.accumulate_strategy(r, 0, &weighted, &d);
+            if t % 11 == 0 {
+                mixed.scale_all(0.71, 0.63);
+                quantized.scale_all(0.71, 0.63);
+                float.scale_all(0.71, 0.63);
+            }
+            assert_eq!(mixed.regrets, quantized.regrets);
+            assert_eq!(bits(&mixed.regret_scales), bits(&quantized.regret_scales));
+            assert_eq!(bits(&mixed.strategy_sum), bits(&float.strategy_sum));
+            let mut a = vec![0.0; r.len()];
+            let mut b = a.clone();
+            mixed.average_strategy(r, 0, &mut a);
+            float.average_strategy(r, 0, &mut b);
+            assert_eq!(bits(&a), bits(&b));
+            mixed.raw_regrets(r, 0, &mut a);
+            quantized.raw_regrets(r, 0, &mut b);
+            assert_eq!(bits(&a), bits(&b));
+        }
+        let saved = mixed.state();
+        let mut restored = MixedStorage::new(r.len(), 1);
+        restored.restore_state(saved.clone()).unwrap();
+        assert_eq!(restored.state(), saved);
+        assert_eq!(
+            restored.restore_state(float.state()),
+            Err(StateMismatch::WrongVariant)
+        );
+        assert!(matches!(
+            restored.restore_state(MixedStorage::new(r.len() - 1, 1).state()),
+            Err(StateMismatch::WrongLength { .. })
+        ));
+        assert_eq!(restored.state(), saved);
+        assert_eq!(MixedStorage::bytes_for(r.len(), 1), r.len() as u64 * 6 + 4);
+    }
 
     fn discounts() -> Discounts {
         Discounts {
@@ -1129,6 +1481,39 @@ mod tests {
         assert!(view.strategy_sum.is_empty());
         assert!(view.regret_scales.is_empty());
         assert!(view.strategy_scales.is_empty());
+
+        let (sigma1_split, avg1_split) = run_all_ops(&mut subviews[0], r1, &inst1);
+        let (sigma2_split, avg2_split) = run_all_ops(&mut subviews[1], r2, &inst2);
+
+        // i16 quantization is deterministic, so a split view must match the
+        // unsplit backend bit-for-bit, exactly like F32.
+        assert_eq!(sigma1_direct, sigma1_split);
+        assert_eq!(sigma2_direct, sigma2_split);
+        assert_eq!(avg1_direct, avg1_split);
+        assert_eq!(avg2_direct, avg2_split);
+    }
+
+    #[test]
+    fn mixed_view_split_matches_direct_ops() {
+        let len = 100;
+        let (r1, r2, spans) = split_fixture();
+
+        let inst1: Vec<f32> = (0..r1.len()).map(|i| i as f32 * 0.5 + 1.0).collect();
+        let inst2: Vec<f32> = (0..r2.len()).map(|i| i as f32 * 0.25 - 0.5).collect();
+
+        let mut direct = MixedStorage::new(len, 2);
+        let (sigma1_direct, avg1_direct) = run_all_ops(&mut direct, r1, &inst1);
+        let (sigma2_direct, avg2_direct) = run_all_ops(&mut direct, r2, &inst2);
+
+        let mut split_target = MixedStorage::new(len, 2);
+        let mut view = split_target.view_mut();
+        let mut subviews = view.split(&spans);
+        assert_eq!(subviews.len(), 2);
+
+        // Parent view slices are empty after split.
+        assert!(view.regrets.is_empty());
+        assert!(view.strategy_sum.is_empty());
+        assert!(view.regret_scales.is_empty());
 
         let (sigma1_split, avg1_split) = run_all_ops(&mut subviews[0], r1, &inst1);
         let (sigma2_split, avg2_split) = run_all_ops(&mut subviews[1], r2, &inst2);

@@ -1,0 +1,505 @@
+[
+  {
+    "tag": "turn6-old",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn6-old",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 2.1671333000049344,
+    "log": "runs/p1-t6/turn6-old.log",
+    "free_bytes_after": 8375508992
+  },
+  {
+    "tag": "turn6-new",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn6-new",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 2.1539063999953214,
+    "log": "runs/p1-t6/turn6-new.log",
+    "free_bytes_after": 8338505728
+  },
+  {
+    "tag": "turn6-verify",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn6-old\\solution.sol",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn6-new\\solution.sol"
+    ],
+    "exit_code": 0,
+    "wall_secs": 2.045569100002467,
+    "log": "runs/p1-t6/turn6-verify.log",
+    "free_bytes_after": 8458711040
+  },
+  {
+    "tag": "river6-i16-old",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\river6-i16-old",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.0051313000003574,
+    "log": "runs/p1-t6/river6-i16-old.log",
+    "free_bytes_after": 8523575296
+  },
+  {
+    "tag": "river6-i16-new",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\river6-i16-new",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.004757899994729,
+    "log": "runs/p1-t6/river6-i16-new.log",
+    "free_bytes_after": 8523808768
+  },
+  {
+    "tag": "river6-i16-verify",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\river6-i16-old\\solution.sol",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\river6-i16-new\\solution.sol"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.0064077999995789,
+    "log": "runs/p1-t6/river6-i16-verify.log",
+    "free_bytes_after": 8525836288
+  },
+  {
+    "tag": "gtow_a-f32-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-f32.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 3.006613899997319,
+    "log": "runs/p1-t6/gtow_a-f32-resources.log",
+    "free_bytes_after": 8511356928,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "gtow_a-i16-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 3.006239000002097,
+    "log": "runs/p1-t6/gtow_a-i16-resources.log",
+    "free_bytes_after": 8513171456,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "gtow_a-i16-f32avg-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16-f32avg.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 3.0689589000030537,
+    "log": "runs/p1-t6/gtow_a-i16-f32avg-resources.log",
+    "free_bytes_after": 8515264512,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "gtow_b-f32-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-f32.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.005884000005608,
+    "log": "runs/p1-t6/gtow_b-f32-resources.log",
+    "free_bytes_after": 8511623168,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "gtow_b-i16-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.0051346999971429,
+    "log": "runs/p1-t6/gtow_b-i16-resources.log",
+    "free_bytes_after": 8508825600,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "gtow_b-i16-f32avg-resources",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16-f32avg.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.0059040999985882,
+    "log": "runs/p1-t6/gtow_b-i16-f32avg-resources.log",
+    "free_bytes_after": 8517337088,
+    "superseded": "measurement config initially omitted the solver section; replaced by corrected resources rows below"
+  },
+  {
+    "tag": "mixed-no-rivers-solve",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\mixed-no-rivers-smoke.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\mixed-no-rivers-smoke"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.004894500001683,
+    "log": "runs/p1-t6/mixed-no-rivers-solve.log",
+    "free_bytes_after": 8506499072
+  },
+  {
+    "tag": "mixed-no-rivers-inspect",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "inspect",
+      "--sol",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\mixed-no-rivers-smoke\\solution.sol",
+      "--river-iterations",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.005764099994849,
+    "log": "runs/p1-t6/mixed-no-rivers-inspect.log",
+    "free_bytes_after": 8511561728
+  },
+  {
+    "tag": "f32-iter-time",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\p1_bench.exe",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-f32.toml",
+      "--threads",
+      "8",
+      "--warmup",
+      "2",
+      "--iters",
+      "100",
+      "--evals",
+      "1"
+    ],
+    "exit_code": 0,
+    "wall_secs": 7.077102000002924,
+    "log": "runs/p1-t6/f32-iter-time.log",
+    "free_bytes_after": 8497909760
+  },
+  {
+    "tag": "turn3000-f32",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-f32.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn3000-f32",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 207.3707224000027,
+    "log": "runs/p1-t6/turn3000-f32.log",
+    "free_bytes_after": 8165924864
+  },
+  {
+    "tag": "i16-iter-time",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\p1_bench.exe",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16.toml",
+      "--threads",
+      "8",
+      "--warmup",
+      "2",
+      "--iters",
+      "100",
+      "--evals",
+      "1"
+    ],
+    "exit_code": 0,
+    "wall_secs": 9.009792400000151,
+    "log": "runs/p1-t6/i16-iter-time.log",
+    "free_bytes_after": 8321036288
+  },
+  {
+    "tag": "turn3000-i16",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn3000-i16",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 263.6518741999971,
+    "log": "runs/p1-t6/turn3000-i16.log",
+    "free_bytes_after": 8489848832
+  },
+  {
+    "tag": "i16-f32avg-iter-time",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\p1_bench.exe",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16-f32avg.toml",
+      "--threads",
+      "8",
+      "--warmup",
+      "2",
+      "--iters",
+      "100",
+      "--evals",
+      "1"
+    ],
+    "exit_code": 0,
+    "wall_secs": 8.009276500000851,
+    "log": "runs/p1-t6/i16-f32avg-iter-time.log",
+    "free_bytes_after": 8583733248
+  },
+  {
+    "tag": "turn3000-i16-f32avg",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16-f32avg.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\turn3000-i16-f32avg",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "wall_secs": 241.44454620000033,
+    "log": "runs/p1-t6/turn3000-i16-f32avg.log",
+    "free_bytes_after": 8456368128
+  },
+  {
+    "tag": "gtow_a-f32-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-f32.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 3.4242929999963962,
+    "free_bytes_after": 8326467584,
+    "selected_storage_verified": "f32"
+  },
+  {
+    "tag": "gtow_a-i16-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 3.4857319000002462,
+    "free_bytes_after": 8325980160,
+    "selected_storage_verified": "i16"
+  },
+  {
+    "tag": "gtow_a-i16-f32avg-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16-f32avg.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 4.286727200000314,
+    "free_bytes_after": 8325902336,
+    "selected_storage_verified": "i16-f32avg"
+  },
+  {
+    "tag": "gtow_b-f32-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-f32.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.7297993999964092,
+    "free_bytes_after": 8325926912,
+    "selected_storage_verified": "f32"
+  },
+  {
+    "tag": "gtow_b-i16-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.567527400002291,
+    "free_bytes_after": 8326868992,
+    "selected_storage_verified": "i16"
+  },
+  {
+    "tag": "gtow_b-i16-f32avg-resources-corrected",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16-f32avg.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "wall_secs": 1.6958519000036176,
+    "free_bytes_after": 8326864896,
+    "selected_storage_verified": "i16-f32avg"
+  },
+  {
+    "tag": "measurement-source-release-build",
+    "command": [
+      "cargo",
+      "build",
+      "--release",
+      "-p",
+      "cli",
+      "-p",
+      "hu-postflop",
+      "--bin",
+      "solvers",
+      "--example",
+      "verify_save",
+      "--example",
+      "p1_bench"
+    ],
+    "exit_code": 0,
+    "log": "runs/p1-t6/post-comment-build.log",
+    "notes": "measurement binaries built after SolMeta/SolExportSpec documentation synchronization; executable logic matches the final source"
+  },
+  {
+    "tag": "final-payload-0",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-old",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0
+  },
+  {
+    "tag": "final-payload-1",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-new",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0
+  },
+  {
+    "tag": "final-payload-2",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-old\\solution.sol",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-new\\solution.sol"
+    ],
+    "exit_code": 0
+  },
+  {
+    "tag": "final-payload-3",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-old",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0
+  },
+  {
+    "tag": "final-payload-4",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+      "--out",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-new",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0
+  },
+  {
+    "tag": "final-payload-5",
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-old\\solution.sol",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-new\\solution.sol"
+    ],
+    "exit_code": 0
+  }
+]

@@ -17,8 +17,8 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
-    F32Storage, I16Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array,
-    reach_at,
+    F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, Solver, Storage, pair_subtrees,
+    parent_array, reach_at,
 };
 use nlh::{Card, PerPlayer, Player, Street};
 use rayon::prelude::*;
@@ -69,7 +69,7 @@ pub(crate) struct SolExportSpec {
     /// Raw config file text, byte-for-byte -- becomes `SolPayload::config_toml`
     /// so the viewer can rebuild an identical tree later.
     pub config_toml: String,
-    /// Informational only (`SolMeta::storage`): "f32" or "i16".
+    /// Informational only (`SolMeta::storage`): "f32", "i16", or "i16-f32avg".
     pub storage_name: String,
 }
 
@@ -546,6 +546,7 @@ struct RiverSolve {
 enum RiverSolver {
     F32(Solver<PostflopEvaluator, F32Storage>),
     I16(Solver<PostflopEvaluator, I16Storage>),
+    Mixed(Solver<PostflopEvaluator, MixedStorage>),
 }
 
 impl RiverSolver {
@@ -553,12 +554,14 @@ impl RiverSolver {
         match self {
             Self::F32(s) => s.game(),
             Self::I16(s) => s.game(),
+            Self::Mixed(s) => s.game(),
         }
     }
     fn average_strategy_at(&self, node: NodeId) -> Vec<f32> {
         match self {
             Self::F32(solver) => solver.average_strategy_at(node),
             Self::I16(solver) => solver.average_strategy_at(node),
+            Self::Mixed(solver) => solver.average_strategy_at(node),
         }
     }
 }
@@ -689,24 +692,31 @@ impl<'a> SolProvider<'a> {
         spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
         let payoff = crate::input::NlhPayoff::new(&spot)?;
         let sub_game = build_postflop_game(&sub_cfg, payoff.pipeline());
-        let rs = if loaded.nlh.1.solver.storage == crate::input::Storage::I16 {
-            resolve_river::<I16Storage>(
-                loaded,
-                sub_game.game,
-                entry,
-                start,
-                RiverSolver::I16,
-                &mut self.diagnostics,
-            )?
-        } else {
-            resolve_river::<F32Storage>(
+        let rs = match loaded.nlh.1.solver.storage {
+            crate::input::Storage::F32 => resolve_river::<F32Storage>(
                 loaded,
                 sub_game.game,
                 entry,
                 start,
                 RiverSolver::F32,
                 &mut self.diagnostics,
-            )?
+            )?,
+            crate::input::Storage::I16 => resolve_river::<I16Storage>(
+                loaded,
+                sub_game.game,
+                entry,
+                start,
+                RiverSolver::I16,
+                &mut self.diagnostics,
+            )?,
+            crate::input::Storage::I16F32Avg => resolve_river::<MixedStorage>(
+                loaded,
+                sub_game.game,
+                entry,
+                start,
+                RiverSolver::Mixed,
+                &mut self.diagnostics,
+            )?,
         };
         self.river_solves.insert(entry, rs);
         Ok(())
@@ -1182,6 +1192,7 @@ memory = "1GiB"
                     for raw in [TINY_TURN_TOML, TINY_RIVER_TOML] {
                         outputs.extend(check::<F32Storage>(raw, "f32"));
                         outputs.extend(check::<I16Storage>(raw, "i16"));
+                        outputs.extend(check::<MixedStorage>(raw, "i16-f32avg"));
                     }
                     outputs
                 });

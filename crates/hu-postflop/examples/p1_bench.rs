@@ -5,14 +5,14 @@
 //!
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
-//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16] [--json PATH]
+//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16|i16-f32avg] [--json PATH]
 //! ```
 
 use std::path::PathBuf;
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
-use hu_engine::{F32Storage, I16Storage, ParConfig, Solver, Storage};
+use hu_engine::{F32Storage, I16Storage, MixedStorage, ParConfig, Solver, Storage};
 use hu_postflop::input::Storage as StorageKind;
 use hu_postflop::{Player, prepare};
 
@@ -49,6 +49,7 @@ fn parse_args() -> Result<Args> {
                 parsed.storage = Some(match value()?.as_str() {
                     "f32" => StorageKind::F32,
                     "i16" => StorageKind::I16,
+                    "i16-f32avg" => StorageKind::I16F32Avg,
                     other => bail!("unknown storage {other}"),
                 })
             }
@@ -77,6 +78,7 @@ fn main() -> Result<()> {
             "threads": args.threads,
             "estimateF32Bytes": prepared.estimate.f32_bytes,
             "estimateI16Bytes": prepared.estimate.i16_bytes,
+            "estimateI16F32avgBytes": prepared.estimate.i16_f32avg_bytes,
             "storageElements": prepared.estimate.f32_bytes / 8,
             "nodes": prepared.estimate.nodes,
             "prepareSecs": prepare_secs,
@@ -93,6 +95,9 @@ fn main() -> Result<()> {
     pool.install(|| match prepared.settings.solver.storage {
         StorageKind::F32 => bench::<F32Storage>(&args, &prepared, prepare_secs, "f32"),
         StorageKind::I16 => bench::<I16Storage>(&args, &prepared, prepare_secs, "i16"),
+        StorageKind::I16F32Avg => {
+            bench::<MixedStorage>(&args, &prepared, prepare_secs, "i16-f32avg")
+        }
     })
 }
 
@@ -162,6 +167,7 @@ fn bench<S: Storage>(
         "nodeInfo": node_info,
         "estimateF32Bytes": p.estimate.f32_bytes,
         "estimateI16Bytes": p.estimate.i16_bytes,
+        "estimateI16F32avgBytes": p.estimate.i16_f32avg_bytes,
         "prepareSecs": prepare_secs,
         "buildSecs": build_secs,
         "allocSecs": alloc_secs,

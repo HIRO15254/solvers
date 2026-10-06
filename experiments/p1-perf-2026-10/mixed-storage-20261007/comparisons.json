@@ -1,0 +1,84 @@
+[
+  {
+    "case": "turn6",
+    "comparison": {
+      "canonical_postcard_streams": true,
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        89137084,
+        89137084
+      ],
+      "strategy_blocks": 20482,
+      "value_blocks": 20482
+    },
+    "artifacts": [
+      {
+        "path": "runs/p1-t6/turn6-old/checkpoint.ckpt",
+        "bytes": 122140846,
+        "sha256": "b335ed8fb5cea9f0f21f06ad8ddbb1bd1874b0b59827b7ff55dcb24c08d97e7f",
+        "availability": "deleted after fingerprint"
+      },
+      {
+        "path": "runs/p1-t6/turn6-new/checkpoint.ckpt",
+        "bytes": 122140848,
+        "sha256": "132d790a11a7b6e6fa9273c4ab59b031fb8a6e620c305b97e7ff85f723401382",
+        "availability": "deleted after fingerprint"
+      },
+      {
+        "path": "runs/p1-t6/turn6-old/solution.sol",
+        "bytes": 33316700,
+        "sha256": "9001856e0555e5b100593f8ced0031716a93939115329bb9b3281020875b8e87",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      },
+      {
+        "path": "runs/p1-t6/turn6-new/solution.sol",
+        "bytes": 33316700,
+        "sha256": "ee9ecb34cec2d7a7255417d56f35a9a83d5526811ca303f8911d22924a7d6c0c",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      }
+    ]
+  },
+  {
+    "case": "river6-i16",
+    "comparison": {
+      "canonical_postcard_streams": true,
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        144771,
+        144771
+      ],
+      "strategy_blocks": 34,
+      "value_blocks": 34
+    },
+    "artifacts": [
+      {
+        "path": "runs/p1-t6/river6-i16-old/checkpoint.ckpt",
+        "bytes": 119700,
+        "sha256": "f46f60ae62692fc21a49d8275dbcf53119c215dfdd18ffee22d8d11d57894993",
+        "availability": "deleted after fingerprint"
+      },
+      {
+        "path": "runs/p1-t6/river6-i16-new/checkpoint.ckpt",
+        "bytes": 119700,
+        "sha256": "720e7b240ef88478178dcb308104c30966090a298483d429577c7bef97b857d5",
+        "availability": "deleted after fingerprint"
+      },
+      {
+        "path": "runs/p1-t6/river6-i16-old/solution.sol",
+        "bytes": 73017,
+        "sha256": "cc03ada85684a4b6b6d1eabbbad623f229eb0ad7c81deefd25561ad6c15d1469",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      },
+      {
+        "path": "runs/p1-t6/river6-i16-new/solution.sol",
+        "bytes": 73017,
+        "sha256": "8a45217f3a696c8e8f365cfcc724d423a5c74e045b52784af608846ee8c8a4d7",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      }
+    ]
+  }
+]
