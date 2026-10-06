@@ -119,6 +119,13 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
+CFR は相手 reach の全要素が厳密に 0 の終端評価と、相手 action の regret matching・
+reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは scratch で初期化した
+全 0 buffer を使い回す。更新 player の action と chance の演算、chance/action 並列、
+`ActionViews` の分割は通常の走査と同じ。全呼出し元が `out` を 0 で初期化することを
+不変条件とし、scratch の 0 初期化と再利用 child buffer の clear で維持する。
+記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
+`visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
 
 [McSolver](../crates/hu-engine/src/mccfr.rs) は chance node を sample し、両者の action node は
 vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、

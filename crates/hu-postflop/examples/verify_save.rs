@@ -38,6 +38,7 @@ fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("solution-stream") => compare_solution_streams(&args[2], &args[3])?,
+        Some("checkpoint-compare") => compare_checkpoints(&args[2], &args[3])?,
         Some("checkpoint") => {
             let checkpoint = hu_postflop::checkpoint::read_checkpoint(Path::new(&args[2]))?;
             let mut hash = blake3::Hasher::new();
@@ -139,7 +140,7 @@ fn main() -> Result<()> {
             println!("{}", serde_json::to_string_pretty(&results)?);
         }
         _ => bail!(
-            "verify_save checkpoint PATH | solution OLD NEW | solution-stream OLD NEW | compression PATH"
+            "verify_save checkpoint PATH | checkpoint-compare OLD NEW | solution OLD NEW | solution-stream OLD NEW | compression PATH"
         ),
     }
     Ok(())
@@ -308,4 +309,120 @@ fn files_equal(a: &str, b: &str) -> Result<bool> {
         remaining -= count as u64;
     }
     Ok(true)
+}
+
+/// Bounded comparison of v4 raw arenas, validating each file's digest. Counts
+/// signed-zero differences separately from numerical differences.
+fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
+    use anyhow::ensure;
+    #[derive(serde::Deserialize, PartialEq)]
+    struct Metadata {
+        config_toml: Option<String>,
+        elapsed_secs: Option<f64>,
+        iteration: u64,
+        i16: bool,
+        lengths: [u64; 4],
+    }
+    fn open(path: &str) -> Result<(impl Read, Metadata, blake3::Hasher)> {
+        let mut file = std::fs::File::open(path)?;
+        let mut header = [0; hu_postflop::checkpoint::HEADER_LEN];
+        file.read_exact(&mut header)?;
+        ensure!(
+            &header[..10] == b"SLVRCKPT\x04\x00",
+            "expected checkpoint v4"
+        );
+        let mut decoder = zstd::stream::read::Decoder::new(file)?;
+        decoder.window_log_max(20)?;
+        let mut length = [0; 4];
+        decoder.read_exact(&mut length)?;
+        let len = u32::from_le_bytes(length) as usize;
+        ensure!(len <= 16 * 1024 * 1024, "metadata too large");
+        let mut bytes = vec![0; len];
+        decoder.read_exact(&mut bytes)?;
+        let meta: Metadata = postcard::from_bytes(&bytes)?;
+        ensure!(
+            meta.iteration == u64::from_le_bytes(header[42..50].try_into()?),
+            "iteration mismatch"
+        );
+        if let Some(config) = &meta.config_toml {
+            ensure!(
+                header[10..42] == hu_postflop::prepare::compatibility_hash(config)?,
+                "config hash mismatch"
+            );
+        }
+        let mut hash = blake3::Hasher::new();
+        hash.update(&header);
+        hash.update(&length);
+        hash.update(&bytes);
+        Ok((decoder, meta, hash))
+    }
+    let (mut a, mut ma, mut ha) = open(old)?;
+    let (mut b, mut mb, mut hb) = open(new)?;
+    ma.elapsed_secs = None;
+    mb.elapsed_secs = None;
+    ensure!(
+        ma == mb,
+        "checkpoint metadata differs excluding elapsed_secs"
+    );
+    let mut left = vec![0; 65536];
+    let mut right = vec![0; left.len()];
+    let mut signed_zero_differences = 0u64;
+    let mut elements = 0u64;
+    let mut arena_hashes = [blake3::Hasher::new(), blake3::Hasher::new()];
+    for (index, len) in ma.lengths.into_iter().enumerate() {
+        let integer = ma.i16 && index < 2;
+        let width = if integer { 2 } else { 4 };
+        let mut remaining = len;
+        while remaining > 0 {
+            let count = remaining.min((left.len() / width) as u64) as usize;
+            let size = count * width;
+            a.read_exact(&mut left[..size])?;
+            b.read_exact(&mut right[..size])?;
+            ha.update(&left[..size]);
+            hb.update(&right[..size]);
+            arena_hashes[0].update(&left[..size]);
+            arena_hashes[1].update(&right[..size]);
+            for (x, y) in left[..size]
+                .chunks_exact(width)
+                .zip(right[..size].chunks_exact(width))
+            {
+                if x != y {
+                    ensure!(!integer, "i16 arena {index} differs");
+                    let vx = f32::from_le_bytes(x.try_into()?);
+                    let vy = f32::from_le_bytes(y.try_into()?);
+                    ensure!(
+                        vx == vy && vx == 0.0,
+                        "f32 arena {index} differs: {vx} vs {vy}"
+                    );
+                    signed_zero_differences += 1;
+                }
+            }
+            elements += count as u64;
+            remaining -= count as u64;
+        }
+    }
+    for (reader, hash) in [(&mut a, ha), (&mut b, hb)] {
+        let mut digest = [0; 32];
+        reader.read_exact(&mut digest)?;
+        ensure!(
+            hash.finalize().as_bytes() == &digest,
+            "checkpoint digest mismatch"
+        );
+        ensure!(
+            reader.read(&mut digest[..1])? == 0,
+            "trailing checkpoint bytes"
+        );
+    }
+    println!(
+        "{}",
+        serde_json::json!({
+            "iteration": ma.iteration, "storage": if ma.i16 { "i16" } else { "f32" },
+            "elements": elements, "numeric_equal": true,
+            "signed_zero_bit_differences": signed_zero_differences,
+            "other_bit_differences": 0,
+            "arena_blake3": arena_hashes.map(|h| h.finalize().to_hex().to_string()),
+            "digests_valid": true,
+        })
+    );
+    Ok(())
 }

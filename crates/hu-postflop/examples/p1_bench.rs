@@ -5,7 +5,7 @@
 //!
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
-//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16] [--json PATH]
+//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16] [--json PATH] [--bands]
 //! ```
 
 use std::path::PathBuf;
@@ -24,6 +24,7 @@ struct Args {
     evals: u64,
     storage: Option<StorageKind>,
     json: Option<PathBuf>,
+    bands: bool,
 }
 
 fn parse_args() -> Result<Args> {
@@ -36,6 +37,7 @@ fn parse_args() -> Result<Args> {
         evals: 1,
         storage: None,
         json: None,
+        bands: false,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -52,6 +54,7 @@ fn parse_args() -> Result<Args> {
                     other => bail!("unknown storage {other}"),
                 })
             }
+            "--bands" => parsed.bands = true,
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
             other => config = Some(PathBuf::from(other)),
@@ -132,7 +135,39 @@ fn bench<S: Storage>(
     let warmup_secs = t.elapsed().as_secs_f64();
 
     let t = Instant::now();
-    solver.run(args.iters);
+    let mut bands = Vec::new();
+    let mut band_step_secs = [Vec::new(), Vec::new()];
+    if args.bands {
+        for _ in 0..args.iters {
+            let step_start = Instant::now();
+            solver.step();
+            let seconds = step_start.elapsed().as_secs_f64();
+            let iteration = solver.iteration();
+            if iteration <= 50 {
+                band_step_secs[0].push(seconds);
+            } else if (250..=300).contains(&iteration) {
+                band_step_secs[1].push(seconds);
+            }
+            if matches!(iteration, 50 | 300) {
+                let eval_start = Instant::now();
+                let (_, expl) = solver.evaluate();
+                let index = usize::from(iteration == 300);
+                let steps = &band_step_secs[index];
+                bands.push(serde_json::json!({
+                    "firstIteration": if iteration == 50 { 1 } else { 250 },
+                    "lastIteration": iteration, "samples": steps.len(),
+                    "stepSecs": steps,
+                    "secsPerIter": steps.iter().sum::<f64>() / steps.len() as f64,
+                    "evalSecs": eval_start.elapsed().as_secs_f64(),
+                    "nashConv": expl[Player::P0] + expl[Player::P1],
+                }));
+            }
+        }
+    } else {
+        solver.run(args.iters);
+    }
+    // With --bands this wall interval includes the two sampled evaluations;
+    // the per-band step times above exclude evaluation.
     let iter_secs = t.elapsed().as_secs_f64();
 
     let mut eval_secs = Vec::new();
@@ -149,7 +184,7 @@ fn bench<S: Storage>(
     } else {
         f64::NAN
     };
-    let report = serde_json::json!({
+    let mut report = serde_json::json!({
         "config": args.config.display().to_string(),
         "threads": args.threads,
         "storage": storage_name,
@@ -175,6 +210,9 @@ fn bench<S: Storage>(
         "afterBuildBytes": after_build_mem,
         "peakBytes": peak,
     });
+    if args.bands {
+        report["iterationBands"] = serde_json::json!(bands);
+    }
     println!("{}", serde_json::to_string(&report)?);
     if let Some(path) = &args.json {
         std::fs::write(path, serde_json::to_string_pretty(&report)?)?;

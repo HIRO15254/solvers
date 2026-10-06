@@ -12,6 +12,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能の計測 | [P1 GCP新旧計測（T1＋T2）](p1-perf-2026-10/gcp-ab-20261006/README.md) | 2026-10-06。c2d-highcpu-32で1〜32 threads、Flop木5.3〜5.8倍・評価約10倍・peak 1/2.7、同梱Flop例が64 GB機で解ける |
 | 性能・保存一致の検証 | [P1 checkpoint・solution逐次保存](p1-perf-2026-10/streaming-save-20261006/README.md) | 2026-10-06。v4直接resume、v2 packed block bit一致、保存peak/time、新旧CLI比較 |
 | 性能・保存一致の検証 | [P1 `.sol`戦略block逐次出力](p1-perf-2026-10/sol-strategy-stream-20261007/README.md) | 2026-10-07。T3b、戦略保持除去、v2 payload・固定wall圧縮bytes一致、資源見積りとFlop peak/time |
+| 限定回帰・全0割合の計測（受入未完了） | [P1 全0相手reach部分木](p1-perf-2026-10/dead-subtree-20261007/README.md) | 2026-10-07。全0割合、旧経路とのengine差分、容量停止による未完了検証を保持 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

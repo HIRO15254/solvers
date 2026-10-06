@@ -185,17 +185,31 @@ fn solve<S: Storage>(
             let counter = &solver.game().evaluator.calls;
             counter.store(0, Ordering::Relaxed);
             let expl = solver.exploitability();
-            let terminals = solver
-                .game()
-                .tree
-                .nodes
-                .iter()
-                .filter(|n| n.kind == NodeKind::Terminal)
-                .count();
+            // Root-only EV/BR skips exactly the terminal reaches that are
+            // zero for this seat's opponent. Count from the average profile
+            // independently, rather than assuming every leaf is evaluated.
+            let tree = &solver.game().tree;
+            let roots = solver.game().root_ranges.as_ref().map(|r| r.as_slice());
+            let expected_calls: usize = Player::BOTH
+                .into_iter()
+                .map(|p| {
+                    tree.nodes
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, n)| n.kind == NodeKind::Terminal)
+                        .filter(|&(id, _)| {
+                            let reach = reach_at(tree, roots, id as u32, |n, _, out| {
+                                out.copy_from_slice(&solver.average_strategy_at(n));
+                            });
+                            reach[p.opponent()].iter().any(|&x| x != 0.0)
+                        })
+                        .count()
+                })
+                .sum();
             assert_eq!(
                 counter.load(Ordering::Relaxed),
-                2 * terminals,
-                "one terminal evaluation per seat"
+                expected_calls,
+                "one terminal evaluation per seat with nonzero opponent reach"
             );
             let mut values = Vec::new();
             let ev0 = solver.expected_value(Player::P0);
