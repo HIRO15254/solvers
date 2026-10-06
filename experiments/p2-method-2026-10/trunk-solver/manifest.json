@@ -1,0 +1,206 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-27",
+  "recorded_on": "2026-10-06",
+  "purpose": "S4-1b-1: solve B1 (heads-up push/fold at 5, 10 and 20 bb) to NashConv <= 1e-4 bb/hand with the deterministic DCFR trunk solver on the L0 model, confirm each average profile with l0_eval and the independent Python check, and time single DCFR iterations on B3.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "The solver was implemented by Codex, which also ran the B1 commands; the main loop rebuilt the examples and reran them, and the B1 summaries, checkpoints and average profiles matched Codex's outputs bit for bit. The recorded results are the main loop's run of run.sh with binaries built from the recorded revision. B3 wall times vary by a few percent between runs.",
+  "source": {
+    "revision": "9fbb6ac88f63d7192af31b99bc2a12917edc54c7",
+    "working_tree": "no changes to tracked files",
+    "build": "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+    "trunk_solve_binary_sha256": "a36e1430b2ff71053748d6982843b9659e2910a44949d5da7c2f0a13d9676855",
+    "l0_eval_binary_sha256": "8ccddc4e6a8b2e239f8ac40f7e669567bd4d4b3e6d491ad1c811d10d693e8759"
+  },
+  "solver": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "gamma": 2.0,
+    "seat_order": "alternating 0..n-1",
+    "b1_eval_every": 10,
+    "b1_target_nash_conv": 0.0001,
+    "b3_iterations": 3
+  },
+  "model": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": [
+      2048,
+      256
+    ],
+    "k4_seed": 0
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "shell": "Git Bash",
+    "python": "3.13.7",
+    "threads": "rayon default (16)"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/run.sh",
+      "sha256": "7a11de27d461327b86b3fa48bdee4747cb21653bcc6d3f3808a6d5b7ccdedbcf",
+      "role": "procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/summarize.py",
+      "sha256": "3de0c7329cefedc032b638348a49ba445db9fa0714c555b58f7c903242275932",
+      "role": "summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/run.log",
+      "sha256": "a6a04d7841089c0e932d21a21963e175cae7e0dc544555fe594c11696c3ab0ff",
+      "role": "stdout of run.sh (B3 wall times)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/summary.md",
+      "sha256": "0f0af6b2b71ad008362f3f137aacba431b4082e988beb1cb9ee07a8ab42c71fa",
+      "role": "summarize.py output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_10bb.json",
+      "sha256": "6caa6d47ab8c0dddc766d0c1409a2355a952836cf28544df195020ef1e3b8b68",
+      "role": "trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_10bb.l0eval.json",
+      "sha256": "18c839c4f3bbe9bec57e8fd51c605a9c2801d1b3b13af28e13f3191371fd6c6f",
+      "role": "l0_eval output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_10bb.profile.json",
+      "sha256": "ec956362a7452c9b9f0c4433b76c7443cf8f99f5d4225cc4f1021f0438439f46",
+      "role": "average profile (p2-class-profile) written by trunk_solve"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_10bb.py.json",
+      "sha256": "c7c58aa42d9d1b28317148dd9189c5d72944f9f34f07e788c3d57d96e8ca3601",
+      "role": "hu_pushfold_check.py evaluate output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_20bb.json",
+      "sha256": "fc0ee01d07eabeb63e402cf4ea2ea730e1219e3ac882cad26a4f56424e6ad793",
+      "role": "trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_20bb.l0eval.json",
+      "sha256": "cf1def020bdb6cf242496c5f312f77db0c09d9bcd3f036562ccfe5ffb8bdec1e",
+      "role": "l0_eval output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_20bb.profile.json",
+      "sha256": "a20c8a58503982af23771925e85bc87f577964f82a0ae43d5620bb1a041f55bd",
+      "role": "average profile (p2-class-profile) written by trunk_solve"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_20bb.py.json",
+      "sha256": "791ef25fcc8585d61f0df3aabb11a14b54cfc10ea3cf4e83281e20879056a5b2",
+      "role": "hu_pushfold_check.py evaluate output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_5bb.json",
+      "sha256": "61c2ae0636551cb1d585c5d5bb6cc0901c3b59b3315bc153f8c67c424f8c7904",
+      "role": "trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_5bb.l0eval.json",
+      "sha256": "b0bd043f1fdb81d3ad7318f2f38c56c004837072b95acbd12e34129c38ae6f3d",
+      "role": "l0_eval output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_5bb.profile.json",
+      "sha256": "05241759124c5d5877d3af7768735af31ec792bae235ad858d9e28a3ef175fe3",
+      "role": "average profile (p2-class-profile) written by trunk_solve"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_5bb.py.json",
+      "sha256": "d7ba0a9e4a438a6a31a5ed4922818af2327c5b2eef646e52f875d2fd8f701361",
+      "role": "hu_pushfold_check.py evaluate output for the average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3_k2048.json",
+      "sha256": "bc152bc2ea195913d08635bc7af7bd45eab407234224f55b3359641d693827cb",
+      "role": "trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3_k2048.log",
+      "sha256": "ca78406f5720668f36cdbb64c4ef479decc883ef29fc52eb2f80514d01d00c29",
+      "role": "trunk_solve stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3_k256.json",
+      "sha256": "00c1f648238086c5c76027dc7bfdbb0f91df12f9c2e984f768ec797713d8ed5d",
+      "role": "trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3_k256.log",
+      "sha256": "bb5e42e93fb2fa3eeb9d3e770cdcab88529ec049772dc8449dcb3036ed8542f1",
+      "role": "trunk_solve stdout"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "examples/bench/hu_pushfold_5bb.toml",
+      "sha256": "3171819c8f77201dc482e63c3d285c9f2767df37d5f49dc0039ffcd24f7fc0f9",
+      "role": "B1 5bb game"
+    },
+    {
+      "path": "examples/bench/hu_pushfold_10bb.toml",
+      "sha256": "2855360fb9ea79f16a4e5c7599f59dc93f769308134cbaf4d8cc3b7fff77c88a",
+      "role": "B1 10bb game"
+    },
+    {
+      "path": "examples/bench/hu_pushfold_20bb.toml",
+      "sha256": "f1edf4ddd987caa4e465be33a6769fcc17ea5b9c2fa16422cea33acb20f84139",
+      "role": "B1 20bb game"
+    },
+    {
+      "path": "examples/bench/6max_20bb_checkdown.toml",
+      "sha256": "a5a67887b8f6aaa605e6405a199ce9145f2a5c878495dc3742590e348e7edc96",
+      "role": "B3 game"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-evaluator-check/hu_pushfold_check.py",
+      "sha256": "52e5c6cc56f72849a63b2dd082e1b61bfde73acafab8767e148b2fa6f467c68b",
+      "role": "independent Python push/fold check; recorded by experiments/p2-method-2026-10/l0-evaluator-check"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/classes.csv",
+      "sha256": "89f4ca4416c578dfe3cd5d9ce8869d3ad101c247c7b52bf745f7a0fded6efd86",
+      "bytes": 3206,
+      "role": "class table CSV for the Python check (trunk_tables --export-classes)"
+    },
+    {
+      "path": ".cache/p2-trunk/t2.csv",
+      "sha256": "ee36bc445ea2ecd2636ab0a2cd540bf90385077380300f6340f343ccb6a0ef6b",
+      "bytes": 1284784,
+      "role": "T2 count CSV for the Python check (trunk_tables --export-t2)"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "bash experiments/p2-method-2026-10/trunk-solver/run.sh <out dir>",
+    "python experiments/p2-method-2026-10/trunk-solver/summarize.py <out dir>"
+  ]
+}
