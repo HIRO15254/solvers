@@ -10,10 +10,12 @@ Claude-specific policy and must not redefine project behavior.
 禁止するものではないが、これら上位モデルは設計・調査・アーキテクチャ判断などの複雑なタスクに
 基本的に限ること。メインループは委譲した実装のレビュー・テスト・統合・デバッグを担う。
 
-## Codexの活用（user directive, 2026-10-04）
+## Codexの活用（user directive, 2026-10-04、2026-10-06更新）
 
-要件が明確な実装タスクは、**Codex（GPT 6.1 Sol等）を第一候補として積極的に使う。** Codex MCPが
-接続されていればそれを使い、無ければCodex CLIの`codex exec`（既定model `gpt-6.1-sol`）をshellから
-実行する。指示は自己完結した文書（目的、読むべき文書、変更範囲、禁止事項、検証手順、報告形式）で渡し、
+要件が明確な実装タスクは、**Codex（GPT 6.1 Sol等）を第一候補として積極的に使う。** Codexは
+Claude Codeのplugin `codex@openai-codex`経由で使う（2026-10-06の指示）。短く終わる作業は
+`codex:codex-rescue` agent、10分を超えうる作業は同pluginの`codex-companion.mjs task --background
+--write --prompt-file <指示書>`で起動し、`status`・`result`（`/codex:status`・`/codex:result`）で追う。
+指示は自己完結した文書（目的、読むべき文書、変更範囲、禁止事項、検証手順、報告形式）で渡し、
 Codexにはcommit・pushさせない。メインループは差分をレビューし、必須検証を自分で再実行してから統合する。
 Codexが使えないときや小さな機械的作業には、上記のSonnetサブエージェントを使う。
