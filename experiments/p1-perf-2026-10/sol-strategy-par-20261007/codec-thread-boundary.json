@@ -1,0 +1,28 @@
+{
+  "reason": "archived HEAD codec already produces different fixed-wall file bytes between 1 and 8 threads",
+  "initial_verifier_error": "Error: thread-dependent bytes",
+  "command": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-t8"
+    ],
+    "exit_code": 1,
+    "seconds": 7.846077199996216
+  },
+  "remaining_fixed_files": [
+    {
+      "path": "runs\\p1-t3c\\fixed-turn6-t8-old-8.sol",
+      "bytes": 33316695,
+      "sha256": "38e276ab20f3ed3e09581562e111bab9d2890e0ea63963b8c064f133fe053589",
+      "retained": false
+    },
+    {
+      "path": "runs\\p1-t3c\\fixed-turn6-t8-new-8.sol",
+      "bytes": 33316695,
+      "sha256": "38e276ab20f3ed3e09581562e111bab9d2890e0ea63963b8c064f133fe053589",
+      "retained": false
+    }
+  ]
+}

@@ -635,7 +635,7 @@ checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
 ```
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
-- `memory`: P1はsolve開始前に見積もるstorageと保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・最大1 node分のf32平均戦略とu16量子化bytes・圧縮予算）の上限で、`auto`は物理メモリの80%。戦略blockは逐次出力し全node分は保持しない。見積りが上限を
+- `memory`: P1はsolve開始前に見積もるstorageと保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域・圧縮予算）の上限で、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
   超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
   （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1の木・rank table・構築一時領域・thread scratch等は別途必要である。
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。

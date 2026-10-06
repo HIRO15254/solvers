@@ -8,6 +8,8 @@
 - 利用者の指示（2026-10-06）: P1の速度と使用資源を改良する。マルチコア環境での使用を想定し、そこで速くなること。
   Postflop木の大きさはGTO WizardのMulti size solutionを上限の目安とする。
   ローカル資源が足りない・使われている場合はGCP Spotを20 USDまで使ってよい。
+- 利用者の指示（2026-10-07）: 改善を続ける。Exploitabilityの目標値は0.1% pot程度とする。
+  以後の主指標は、NashConv/2が開始potの0.1%以下になるまでの時間とする。
 - 解の意味（有限木の厳密CFR、平均戦略、厳密BRのExploitability）は変えない。同じ木・range・反復で
   戦略・EV・Exploitabilityが一致することを各段階の受入条件にする（下記「一致」）。
 
@@ -16,6 +18,8 @@
 | ID | 日付 | 決定 |
 |---|---|---|
 | PF1 | 2026-10-06 | 開始rangeのweightが0のhandは計算対象から外す。weightが正なら大きさによらず残す。weight 0のhandの戦略・EVは出力しない |
+| PF2 | 2026-10-07 | i16の精度床への対策は、regretをi16（現行の量子化）・戦略累積をf32で持つ方式とする（確率的丸め・現状維持は採らない） |
+| PF3 | 2026-10-07 | PF2の方式は`storage`の新しい値として追加し、旧`i16`（両arena i16、memory最小だが精度に限界）も残す |
 
 ## 2. 基準測定（2026-10-06、source `43e97c6`）
 
@@ -47,6 +51,9 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T2 | hu-engine: `normalize_columns`のvectorize、EVとBRを1回の走査で計算、chance並列のallocation除去、chanceの無い部分木のaction並列 | 必須検証。storage全要素・EV・BR・Exploitabilityが変更前とbit一致 |
 | T3 | 保存の資源: checkpointをstorageの複製なしで逐次・並列圧縮、`.sol`出力で全node値のf32保持をやめる、終了時の重複保存をやめる。メモリ見積りと実peakの整合 | peak RSSがstorage＋木＋小さな作業領域に収まる。保存物のroundtrip・再開の一致 |
 | T4 | 大きい木と多core: GTO Wizard Multi size相当の木の規模測定、16/32 threadのscaling、SMT・thread既定値の判断 | 基準と同条件の同時間帯計測で改善を示す |
+| T3b/T3c | `.sol`の戦略blockを保持せず流す（T3b）、その生成を上限付きbatchで並列化（T3c） | payloadがwall_secs以外bit一致。保存作業領域の見積りと規範の同期 |
+| T5 | 相手reachが全て0の部分木で終端評価を省く（`cfr_pass`の軽量経路、評価passの省略） | storage・EV・BR・Exploitabilityが変更前と数値一致（符号付き0の差だけ許す）。thread間一致 |
+| T6 | PF2・PF3のstorage（regret i16＋戦略累積f32）の追加。checkpoint version・memory見積り・規範の更新 | regret配列が旧i16とbit一致、戦略累積がf32と同じ演算。0.1%到達をTurn・GTOWb級の木で示す |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -65,12 +72,20 @@ T3の測定（[証拠](../../experiments/p1-perf-2026-10/streaming-save-20261006
 resumeは最終arenaへ直接展開する。`.sol` v2のpacked blockは旧読み手でbit一致（wall_secsを除く）。
 共有Windows PC・Flop 4 iteration・8 threadsの参考値（T3前→T3）でCLI壁時計273.60→38.97秒、peak working set 10.77→4.48 GB。
 checkpointは58.5〜77.8→5.4〜6.7秒、`.sol`は43.6→9.5秒。memory判定にpacked保存領域・codec予算を加える。
-GCP（c2d-highcpu-32、16 threads）のCLI全体（同Flop木、4 iteration）はT3前の201.7秒・peak RSS 29.0 GB（`43e97c6`）から
-24.8秒・4.56 GB（`6234545`）になり、`export strategy/ev`は一致した。
+GCP（c2d-highcpu-32、16 threads）のCLI全体（同Flop木、4 iteration）はS3開始時（`43e97c6`）の201.7秒・peak RSS 29.7 GB
+からT1〜T3後（`6234545`）の24.8秒・4.67 GBになり、`export strategy/ev`は一致した。
 
 T3b（[証拠](../../experiments/p1-perf-2026-10/sol-strategy-stream-20261007/README.md)）: `.sol`の戦略blockを保持せずsref順に
 storageから直接書き、EV passでは値blockだけを保持する。payloadはwall_secs以外bit一致。保存作業領域の見積りは
 GTO Wizard風の木（`gtow_a`）で25.5→10.8 GBとなり、i16 storageとの合計54.2→39.5 GBで64 GB機の既定上限に収まる。
+T3c（[証拠](../../experiments/p1-perf-2026-10/sol-strategy-par-20261007/README.md)）: 戦略blockを上限付きbatchで並列生成する。
+payloadはwall_secs以外bit一致。共有PCでは空きcoreが無く速度差を確認できず、GCPで測る。
+
+0.1% potまでの時間（[証拠](../../experiments/p1-perf-2026-10/convergence-20261007/README.md)、GCP 32 threads、source `6234545`）:
+既定DCFRでTurn 770 iteration・14秒、Flop1（82.9万node）250 iteration・58秒、GTO Wizard風の木（`gtow_b`、f32 21 GB）
+575 iteration・1,006秒。hs-dcfr・linear-cfr・cfr-plusはいずれも遅く、DCFR係数の掃引でも一貫して勝る設定は無かったので
+既定は変えない。両arena i16はTurnとgtow_bで0.1%に届かず（最良0.120%・0.292%）、反復を続けると悪化する。
+この対策をPF2・PF3として決めた（試作の比較はbranch `s3-p1-i16-proto`）。
 
 ### 一致の定義
 

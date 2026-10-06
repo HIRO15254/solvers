@@ -1,0 +1,182 @@
+[
+  {
+    "case": "flop_srp1",
+    "old": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827349,
+        "f32Bytes": 2818917360,
+        "i16Bytes": 1412142360,
+        "memoryEstimateBytes": 3724228233,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 829242,
+        "saveWorkspaceBytes": 628483524,
+        "terminals": 492552,
+        "withinLimit": true
+      }
+    },
+    "new": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827349,
+        "f32Bytes": 2818917360,
+        "i16Bytes": 1412142360,
+        "memoryEstimateBytes": 3792473160,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 829242,
+        "saveWorkspaceBytes": 696728451,
+        "terminals": 492552,
+        "withinLimit": true
+      }
+    }
+  },
+  {
+    "case": "gtow_a",
+    "old": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827640,
+        "f32Bytes": 56626060176,
+        "i16Bytes": 28359313664,
+        "memoryEstimateBytes": 67743560843,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 16088610,
+        "saveWorkspaceBytes": 10840673027,
+        "terminals": 10290309,
+        "withinLimit": false
+      }
+    },
+    "new": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827640,
+        "f32Bytes": 56626060176,
+        "i16Bytes": 28359313664,
+        "memoryEstimateBytes": 67811801312,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 16088610,
+        "saveWorkspaceBytes": 10908913496,
+        "terminals": 10290309,
+        "withinLimit": false
+      }
+    }
+  },
+  {
+    "case": "gtow_a-i16",
+    "old": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827640,
+        "f32Bytes": 56626060176,
+        "i16Bytes": 28359313664,
+        "memoryEstimateBytes": 39476814331,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 16088610,
+        "saveWorkspaceBytes": 10840673027,
+        "terminals": 10290309,
+        "withinLimit": false
+      }
+    },
+    "new": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827640,
+        "f32Bytes": 56626060176,
+        "i16Bytes": 28359313664,
+        "memoryEstimateBytes": 39545054800,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 16088610,
+        "saveWorkspaceBytes": 10908913496,
+        "terminals": 10290309,
+        "withinLimit": false
+      }
+    }
+  },
+  {
+    "case": "gtow_b",
+    "old": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827628,
+        "f32Bytes": 21109207896,
+        "i16Bytes": 10572952820,
+        "memoryEstimateBytes": 25683479243,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 6088200,
+        "saveWorkspaceBytes": 4297443719,
+        "terminals": 3787911,
+        "withinLimit": true
+      }
+    },
+    "new": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "result": {
+        "compressionWorkspaceBytes": 276827628,
+        "f32Bytes": 21109207896,
+        "i16Bytes": 10572952820,
+        "memoryEstimateBytes": 25751719712,
+        "memoryLimitBytes": 27420078899,
+        "nodes": 6088200,
+        "saveWorkspaceBytes": 4365684188,
+        "terminals": 3787911,
+        "withinLimit": true
+      }
+    }
+  }
+]

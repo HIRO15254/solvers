@@ -1640,8 +1640,8 @@ pub struct MemoryEstimate {
     /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
-    /// Packed value slots, mode/street metadata and one node's strategy
-    /// workspace for a full `.sol` export. No retained strategy blocks.
+    /// Packed value slots, mode/street metadata and one bounded parallel
+    /// strategy batch for a full `.sol` export.
     pub save_bytes: u64,
     /// Bounded streaming codec budget (updated for the run's thread count).
     pub compression_bytes: u64,
@@ -1682,6 +1682,7 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         hands: PostflopHands::new(&config.board, &config.ranges),
         elements: 0,
         max_strategy_elements: 0,
+        min_strategy_elements: u64::MAX,
         nodes: 0,
         terminals: 0,
         action_nodes: 0,
@@ -1720,9 +1721,10 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
                     std::sync::Mutex<Option<crate::sol::ValueBlock>>,
                 >() + std::mem::size_of::<bool>()) as u64
             + counting.nodes * std::mem::size_of::<Street>() as u64
-            // Sequential strategies: f32 average plus packed u16 bytes.
-            // Conservatively add this to the value pass's retained slots.
-            + counting.max_strategy_elements * (4 + 2),
+            // Conservatively add the batch to the value pass's retained slots.
+            + crate::sol::strategy_batch_workspace(
+                counting.elements, counting.min_strategy_elements, counting.max_strategy_elements, counting.action_nodes,
+            ),
         compression_bytes: 24 * 1024 * 1024,
         nodes: counting.nodes,
         terminals: counting.terminals,
@@ -1741,6 +1743,7 @@ struct Counting<'a> {
     sym: Vec<SuitPerm>,
     elements: u64,
     max_strategy_elements: u64,
+    min_strategy_elements: u64,
     nodes: u64,
     terminals: u64,
     action_nodes: u64,
@@ -1778,6 +1781,7 @@ impl Counting<'_> {
         let elements = num_actions * self.hands.len(state.to_act) as u64;
         self.elements += elements;
         self.max_strategy_elements = self.max_strategy_elements.max(elements);
+        self.min_strategy_elements = self.min_strategy_elements.min(elements);
     }
 
     fn street_end(&mut self, mut state: LineState) {

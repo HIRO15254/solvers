@@ -752,7 +752,24 @@ fn memory_usage_matches_allocated() {
                 .sum::<usize>()
             + tree.storage_refs.len() * size_of::<bool>()
             + tree.nodes.len() * size_of::<Street>()
-            + max_elements * (size_of::<f32>() + size_of::<u16>());
+            + {
+                let elements = tree
+                    .storage_len
+                    .min(hu_postflop::sol::STRATEGY_BATCH_ELEMENTS.max(max_elements));
+                let headers = size_of::<(hu_engine::StorageRef, Vec<u8>)>()
+                    + size_of::<hu_postflop::sol::StrategyBlock>()
+                    + size_of::<Vec<f32>>()
+                    + 15;
+                let min_elements = tree
+                    .storage_refs
+                    .iter()
+                    .map(|sref| sref.len())
+                    .min()
+                    .unwrap();
+                elements * 8
+                    + tree.storage_refs.len().min(elements / min_elements.max(1)) * headers
+                    + size_of::<Vec<(hu_engine::StorageRef, Vec<u8>)>>()
+            };
         assert_eq!(memory_usage(config).save_bytes, allocated as u64);
     }
     let config = PostflopConfig {

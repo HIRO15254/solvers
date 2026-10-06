@@ -1,0 +1,32 @@
+{
+  "instrumented": true,
+  "calibration": "not performed; diagnostic phase timing only",
+  "command": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+    "solve",
+    "experiments/p1-perf-2026-10/sol-strategy-par-20261007/flop4.toml",
+    "--out",
+    "runs\\p1-t3c\\profile-flop",
+    "--threads",
+    "8"
+  ],
+  "binary_sha256": "180f2dc3ed8b2641cba5e090c27f21c51ebce2b73a9fb809deea431c28cccb82",
+  "artifact_rs_lf_sha256": "32e534091d963be3ba2e7d7b71122820d0a504dba4356d627e2d4bf063922285",
+  "phase_output": [
+    "PROFILE strategy_total=7.1637668 generation=6.110101599999998 writes=1.0422361 batches=43",
+    "PROFILE values_pass=2.8031314",
+    "PROFILE values_write=2.9272365000000002"
+  ],
+  "solution_seconds": 14.186988400004338,
+  "peak_working_set_bytes": 3751501824,
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 1098800954,
+      "sha256": "4542d80877278a4c2bf1b5f311d464b68281bf6b8cdd65d1cd75416b6bb296dd"
+    },
+    "solution.sol": {
+      "bytes": 176246963,
+      "sha256": "af39d822c9d2e758573bd605cae08ab6b0333685450a28f8ab623a7e46bbb36a"
+    }
+  }
+}

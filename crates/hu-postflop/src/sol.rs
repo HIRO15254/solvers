@@ -30,6 +30,27 @@ use runfiles::{config_hash, config_hash_hex};
 /// paying for a zstd decompression.
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
 
+/// Maximum strategy elements generated together (one oversized node is allowed).
+pub const STRATEGY_BATCH_ELEMENTS: usize = 8 * 1024 * 1024;
+
+pub(crate) fn strategy_batch_workspace(
+    elements: u64,
+    min_node: u64,
+    max_node: u64,
+    nodes: u64,
+) -> u64 {
+    let batch = elements.min((STRATEGY_BATCH_ELEMENTS as u64).max(max_node));
+    // f32 average + u16 bytes + postcard bytes. Per-node upper bound also
+    // includes the batch entry, temporary Vec headers and postcard headers.
+    let headers = std::mem::size_of::<(hu_engine::StorageRef, Vec<u8>)>()
+        + std::mem::size_of::<StrategyBlock>()
+        + std::mem::size_of::<Vec<f32>>()
+        + 15;
+    batch * 8
+        + nodes.min(batch / min_node.max(1)) * headers as u64
+        + std::mem::size_of::<Vec<(hu_engine::StorageRef, Vec<u8>)>>() as u64
+}
+
 const MAGIC: &[u8; 8] = b"SLVRSOLV";
 const FORMAT_VERSION: u16 = 2;
 
@@ -99,6 +120,18 @@ pub struct StrategyBlock {
     /// resolved through any other indirection.
     pub sref: u32,
     pub probs: Vec<u8>,
+}
+
+/// Postcard's struct fields concatenate, and Vec<u8> is a varint length
+/// followed by raw bytes. Encode the two headers with postcard, then copy
+/// the already quantized bytes in bulk rather than pushing them one by one.
+pub(crate) fn strategy_block_bytes(block: &StrategyBlock) -> Result<Vec<u8>, postcard::Error> {
+    let mut bytes = postcard::to_extend(
+        &(block.sref, block.probs.len()),
+        Vec::with_capacity(block.probs.len() + 15),
+    )?;
+    bytes.extend_from_slice(&block.probs);
+    Ok(bytes)
 }
 
 /// One action node's per-hand values on the original subgame-start basis.
@@ -395,6 +428,22 @@ pub fn dequantize_probs(
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU64, Ordering};
+
+    #[test]
+    fn bulk_strategy_bytes_match_postcard_at_varint_boundaries() {
+        for sref in [0, 127, 128, u32::MAX] {
+            for len in [0, 1, 127, 128, 16383, 16384] {
+                let block = StrategyBlock {
+                    sref,
+                    probs: (0..len).map(|i| i as u8).collect(),
+                };
+                assert_eq!(
+                    strategy_block_bytes(&block).unwrap(),
+                    postcard::to_allocvec(&block).unwrap()
+                );
+            }
+        }
+    }
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
 

@@ -201,10 +201,11 @@ version 1/2/3は移行先を示すversion errorで拒否する。現行`solvers.
 `.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
 圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
 
-P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、最大1 node分の戦略作業領域、圧縮作業予算を含む。
-戦略はstorageからsref昇順に平均戦略を計算して直接流し、全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
-`saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋最大action node要素数×6 bytes（f32平均戦略＋u16量子化bytes）である。
-戦略作業領域は値slotと同時には必要ないが、保守的に加算する。`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
+P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
+戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
+`saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
+戦略batch予算はB×8 bytes（f32平均戦略4＋u16量子化bytes 2＋postcard bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(StrategyBlock)＋size_of(Vec<f32>)＋15（sref・長さのvarint上界）。符号化Vecは2×node要素数＋15 bytesを事前確保し、成長時の余剰を作らない。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
+workerではsrefとbyte列長のheaderをpostcardで符号化し、量子化済みbyte列をまとめて連結する。既存StrategyBlockのpostcard bytesと同一の形式である。
 圧縮予算は最大payloadの2 MiB job数とrun threads数の小さい方×16 MiB＋共有8 MiB＋実効config長×3で見積もる。
 payloadの上界はf32 storage bytesと（保存作業領域＋全戦略のu16 bytes）の大きい方を使う。逐次出力する戦略も圧縮対象の量へ算入する。
 NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。

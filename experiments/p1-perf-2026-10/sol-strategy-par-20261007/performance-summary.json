@@ -1,0 +1,23 @@
+{
+  "old": {
+    "median_peak_working_set_bytes": 3740059648.0,
+    "median_solution_seconds": 25.328857450000214,
+    "median_wall_seconds": 53.46349249999912
+  },
+  "new": {
+    "median_peak_working_set_bytes": 3752550400.0,
+    "median_solution_seconds": 13.173427849997097,
+    "median_wall_seconds": 40.460340649999125
+  },
+  "target_solution_seconds": 10.5,
+  "target_met_for_both_new_runs": false,
+  "first_candidate_old_solution_seconds": [
+    12.661567600000126,
+    13.316255999998248
+  ],
+  "final_old_solution_seconds": [
+    39.738866899999266,
+    10.918848000001162
+  ],
+  "baseline_variability_note": "Identical archived HEAD binary: final measurements include a large old-side outlier; do not infer a stable speedup from the final median alone."
+}

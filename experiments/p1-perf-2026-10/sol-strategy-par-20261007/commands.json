@@ -1,0 +1,1154 @@
+[
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 1.0353776999982074
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7688315999985207
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.5169218000010005
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.578868099997635
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.420232299999043
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.636763499998779
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.6153687000041828
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.643339400005061
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\old-turn6-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 5.69921130000148
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\new-turn6-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 8.726329400000395
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 8.464333900003112
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 1.2571488999965368
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-t8"
+    ],
+    "exit_code": 1,
+    "seconds": 7.846077199996216
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3486631000050693
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.584949999996752
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.912323500000639
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.740976799999771
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.710909599998558
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 6.540343500004383
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.835173200001009
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.5134821999963606
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 6.138357399999222
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 1.1732782000035513
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 6.77765659999568
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\old-turn6-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 10.009087599995837
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\new-turn6-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 12.771415300005174
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 5.5517433999993955
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.9617914000045857
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.274721200003114
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\cross-turn6",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 7.055982800004131
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\old-river6-i16-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 1.0456814999997732
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\new-river6-i16-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 1.4120105000038166
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.12701150000066264
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08378780000202823
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\fixed-river6-i16-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 1.6029610999976285
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\old-river6-i16-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.21374780000041937
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\new-river6-i16-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.3059322000044631
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08612699999503093
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.17086140000174055
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\fixed-river6-i16-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 1.2784180999951786
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\cross-river6-i16",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 1.0928224000017508
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 4.765973800000211
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 4.783893799998623
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10816000000340864
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07974330000433838
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-no-rivers-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 0.9271832000013092
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 10.522005700004229
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 9.368066900002304
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1148851999969338
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08179779999773018
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\fixed-turn6-no-rivers-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8764219000004232
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\cross-turn6-no-rivers",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 1.0325126000025193
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\measure-1-old",
+      "runs\\p1-t3c\\measure-1-old.json"
+    ],
+    "exit_code": 0,
+    "seconds": 49.29722369999945
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\measure-2-new",
+      "runs\\p1-t3c\\measure-2-new.json"
+    ],
+    "exit_code": 0,
+    "seconds": 47.71318379999866
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\measure-3-old",
+      "runs\\p1-t3c\\measure-3-old.json"
+    ],
+    "exit_code": 0,
+    "seconds": 51.870053700004064
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\measure-4-new",
+      "runs\\p1-t3c\\measure-4-new.json"
+    ],
+    "exit_code": 0,
+    "seconds": 47.96358229999896
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8728919999994105
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7609145000024
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.043480799999088
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 4.741445300001942
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.351839899994957
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 5.209516800001438
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.233122200006619
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "validate",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+      "--resources",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.2415505000026315
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-turn6-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 5.361679199995706
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-turn6-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 5.206125099997735
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 6.061970899994776
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8729300000049989
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-turn6-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 6.947588700000779
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-turn6-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 10.387249200000952
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-turn6-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 10.13053249999939
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 5.617258099999162
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.9813638999985415
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-turn6-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 7.166576499999792
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\cross-turn6",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 7.279546199999459
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-river6-i16-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 0.782739300004323
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-river6-i16-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 1.1249043999996502
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07220409999717958
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.09668919999967329
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-river6-i16-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8667351000040071
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-river6-i16-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16249610000522807
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-river6-i16-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16747960000066087
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08736779999890132
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.08525419999932637
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-river6-i16-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.9148093000039808
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\cross-river6-i16",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8339733999964665
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 4.122239999996964
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8",
+      "--threads",
+      "8"
+    ],
+    "exit_code": 0,
+    "seconds": 4.253247599997849
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.13931419999425998
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.10231070000008913
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-turn6-no-rivers-t8"
+    ],
+    "exit_code": 0,
+    "seconds": 0.8959564999968279
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.378814899995632
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+      "--out",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1",
+      "--threads",
+      "1"
+    ],
+    "exit_code": 0,
+    "seconds": 8.6579356000002
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.09743019999586977
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07104429999890272
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\fixed-turn6-no-rivers-t1"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7984418999985792
+  },
+  {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol",
+      "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol",
+      "runs\\p1-t3c\\final\\cross-turn6-no-rivers",
+      "normalize-threads"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7665620000043418
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\final\\measure-1-old",
+      "runs\\p1-t3c\\final\\measure-1-old.json"
+    ],
+    "exit_code": 0,
+    "seconds": 79.65337120000186
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\final\\measure-2-new",
+      "runs\\p1-t3c\\final\\measure-2-new.json"
+    ],
+    "exit_code": 0,
+    "seconds": 47.56316820000211
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\final\\measure-3-old",
+      "runs\\p1-t3c\\final\\measure-3-old.json"
+    ],
+    "exit_code": 0,
+    "seconds": 45.54947660000471
+  },
+  {
+    "command": [
+      "python",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+      "runs\\p1-t3c\\final\\measure-4-new",
+      "runs\\p1-t3c\\final\\measure-4-new.json"
+    ],
+    "exit_code": 0,
+    "seconds": 50.26246949999768
+  }
+]

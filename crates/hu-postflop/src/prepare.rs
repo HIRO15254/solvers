@@ -65,7 +65,9 @@ fn compression_workspace(estimate: &crate::MemoryEstimate, threads: u64, config_
     // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
     // cannot occupy every requested worker. The streamed strategies are
     // still in the payload, though no longer in save_bytes. Slot overhead
-    // conservatively covers both lists' per-block postcard headers.
+    // conservatively covers both lists' per-block postcard headers. The
+    // parallel strategy batch is already fully budgeted in save_bytes,
+    // independent of threads; do not add per-worker strategy buffers here.
     let solution = estimate.save_bytes.saturating_add(estimate.f32_bytes / 4);
     let payload = estimate.f32_bytes.max(solution);
     let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
