@@ -1,6 +1,6 @@
 # P2方式の再設計計画: Preflop trunkとleaf model
 
-更新: **2026-10-06**。[製品定義](../products.jp.md)のD5（P2の計算方式と出力品質の保証）とS4を、
+更新: **2026-10-07**。[製品定義](../products.jp.md)のD5（P2の計算方式と出力品質の保証）とS4を、
 実装・検証できる段階へ分解した計画である。作業状態は[Linear](../status.jp.md)（SOL-25と子Issue）に置く。
 外部製品・研究の調査は[2026-10-06のP2方式調査](../research/2026-10-06-p2-method-survey.jp.md)、
 暫定方式の測定は[実験記録](../../experiments/p2-method-2026-10/README.md)にある。作業branchは`multiway-preflop-redesign`。
@@ -17,7 +17,9 @@
 - 多人数Preflopの精度を数値で示している外部製品は見つからなかった。Flopへ行く人数の上限が規模を決める最大の要因であり、
   checkdownで妥当なのはpush/foldに近い木である（[調査](../research/2026-10-06-p2-method-survey.jp.md)）。
 
-## 2. 利用者決定（2026-10-06）
+## 2. 利用者決定
+
+P2D1〜P2D6は2026-10-06、P2D7は2026-10-07の決定である。
 
 | ID | 決定 |
 |---|---|
@@ -27,13 +29,15 @@
 | P2D4 | suit非対称なrange（`AhKh`等）はerrorにせず警告し、classの中のcombo weightを平均して扱う |
 | P2D5 | 計算予算の目標は、L0の木で数分〜数十分、L1の木で1〜数時間とする。ローカルで測れない計測はGCPを合計$20まで使える（使う前に見積もりを報告する） |
 | P2D6 | 新方式は新しい`solver.kind`として暫定方式と並存させ、第5節のゲートを通過した後に暫定方式を削除する。`.mwsol` v4の読み込み互換は持たない |
+| P2D7 | 4人以上のshowdownの費用は、solverの中だけの近似で下げる。L0モデル（4人以上は2048標本・seed 0）と評価器・`NashConv`の定義は変えない。solverは少ない標本をiterationごとに替えて使い、到達確率の小さい終端では標本をさらに減らす。B3で`NashConv`の下がり方が厳密なsolverと同程度であることを確かめてから採用する |
 
 ## 3. 方式
 
 ### 3.1 構成
 
 - **Preflop trunk**: 公開Preflop木の全分岐を辿り、全seatの169 classのreachをvectorで持つ決定的なCFR（DCFR、seatごとの交互更新）。
-  乱数を使わず、同じ入力と設定なら同じ解になる。
+  同じ入力と設定なら同じ解になる。4人以上のshowdownは、solverの中ではiterationごとに替わる固定seedの少ない標本で
+  近似してよい（P2D7）。品質指標は常に第3.2節のモデルで測る。
 - **leaf model**: Preflopの終端の値を返す、差し替え可能な部品。
   - L0: showdownのequity。Postflopの判断が無い木（checkdown）とall-inでは、2人なら入力のゲームそのものになる。
     3人以上では第3.2節のcard removalの近似を含む。
@@ -88,7 +92,7 @@ B1・B2・B4・B5の入力は、使う段階で`examples/bench/`に追加する�
 | **S4-1a** | L0モデルの厳密BR評価器。暫定方式の解を測る。chip EVの木を対象とし、ICMはB2とともにS4-1bで扱う | (1) 表の恒等式・対称性・既知値の検査 (2) 小さい木で、class組を総当たりする参照実装と一致 (3) B1で、独立実装（Python）のBR・NashConvと一致 (4) B3の暫定方式の解（30k/300k sweep、seed 0/1）のseat別`g_i`と`NashConv`を記録 |
 | **S4-1a2** | L0の誤差の測定。同じclass profileを入力のゲーム（全seatの手札が重ならない配札。foldしたseatのcardもboardから除く）でMonte Carlo評価してL0と比べる。S4-1bより先に行う（2026-10-06の利用者判断） | B1でL0の厳密な値と標準誤差の範囲で一致。B3の4つの解と一様なprofileで、seat別の値の差（Preflop終端の人数別の内訳つき）と、L0の最適応答を入力のゲームで使ったときの利得を記録 |
 | **S4-1a3** | 入力のゲームでのclass単位の最適応答をMonte Carloで求める。ある配札で最適応答を求め、別の配札で評価する。暫定方式の解の、入力のゲームでの利得を上下から挟む。S4-1bの解を入力のゲームで評価するのにも使う（2026-10-06の利用者判断） | testで、求めた最適応答の同じ配札での値が配札ごとの評価と一致し、1つの(node, class)の行動を変えても値が増えない。B1で、求めた最適応答の利得がL0の厳密な利得と矛盾しない。B3の4つの解で、seat別の利得の下限（別の配札での評価）と上振れした推定（同じ配札での値）を記録 |
-| **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装。L0の`NashConv`が妥当と仮定し、S4-1a3の結論を待たずに並行して着手する（2026-10-06の利用者判断）。S4-1a3で妥当でないと分かれば、完了条件の指標を見直す | B1の3つのstackで`NashConv`が1×10⁻⁴ bb/hand以下（2026-10-06の利用者判断）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録 |
+| **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装。L0の`NashConv`が妥当と仮定し、S4-1a3の結論を待たずに並行して着手する（2026-10-06の利用者判断）。S4-1a3で妥当でないと分かれば、完了条件の指標を見直す | B1の3つのstackで`NashConv`が1×10⁻⁴ bb/hand以下（2026-10-06の利用者判断）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録。後半（S4-1b-2）で、値を変えない計算の整理とP2D7の近似により1 iterationを短くする |
 | **S4-2** | L1（2人でFlopへ行くleaf） | 小さい例で`NashConv`が下がる。L0とL1の解の差を記録。GTO Wizard参照とのsanity check |
 | **S4-3** | 製品の切替 | `.mwsol` v5（Preflopだけ）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
 | **S4-4** | 9max・ICM・straddle、bunchingの補正、GUI | B5が予算内で解ける。bunchingの影響を暫定方式（同時配札）と比べて記録 |
