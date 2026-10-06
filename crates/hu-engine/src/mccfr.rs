@@ -396,8 +396,13 @@ fn mccfr_pass<E: TerminalEvaluator, S: Storage>(
             // child computes. Reusing `accumulate_values` keeps the
             // reach-map back-mapping (mask zeroing / transition backward
             // map) identical to the full traversal.
-            ctx.tree
-                .accumulate_values(deal.maps[ctx.p], total_weight, &child_out, out);
+            ctx.tree.accumulate_values_with_scratch(
+                deal.maps[ctx.p],
+                total_weight,
+                &child_out,
+                out,
+                scratch,
+            );
             scratch.put(child_out);
             scratch.put(opp_next);
             scratch.put(my_next);

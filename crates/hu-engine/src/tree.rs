@@ -342,6 +342,30 @@ impl PublicTree {
     /// zeroes values on hands incompatible with the deal, which is exactly
     /// the card-removal semantics the counterfactual sum requires.
     pub fn accumulate_values(&self, map: ReachMap, weight: f32, child: &[f32], acc: &mut [f32]) {
+        if matches!(map, ReachMap::Transition(_)) {
+            crate::scratch::with_worker_scratch(|scratch| {
+                self.accumulate_values_with_scratch(map, weight, child, acc, scratch);
+            });
+        } else {
+            self.accumulate_values_with_scratch(
+                map,
+                weight,
+                child,
+                acc,
+                &mut crate::Scratch::new(),
+            );
+        }
+    }
+
+    /// As [`Self::accumulate_values`], reusing the backward-map buffer.
+    pub fn accumulate_values_with_scratch(
+        &self,
+        map: ReachMap,
+        weight: f32,
+        child: &[f32],
+        acc: &mut [f32],
+        scratch: &mut crate::Scratch,
+    ) {
         match map {
             ReachMap::Identity => {
                 for (a, &v) in acc.iter_mut().zip(child) {
@@ -356,11 +380,12 @@ impl PublicTree {
             }
             ReachMap::Transition(t) => {
                 let tr = &self.transitions[t as usize];
-                let mut back = vec![0.0; tr.in_dim as usize];
+                let mut back = scratch.take(tr.in_dim as usize);
                 tr.apply_backward(child, &mut back);
                 for (a, &v) in acc.iter_mut().zip(&back) {
                     *a += weight * v;
                 }
+                scratch.put(back);
             }
         }
     }

@@ -190,19 +190,28 @@ impl F32Storage {
 fn normalize_columns(data: &[f32], r: StorageRef, out: &mut [f32]) {
     let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
     debug_assert_eq!(out.len(), r.len());
-    for h in 0..num_hands {
-        let mut total = 0.0f64;
+    // 2 KiB on the stack, independent of hand count; each hand still sums
+    // action 0, 1, ... in f64 and divides (never multiplies a reciprocal).
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f64; BLOCK];
         for a in 0..num_actions {
-            total += data[a * num_hands + h].max(0.0) as f64;
-        }
-        if total > 0.0 {
-            for a in 0..num_actions {
-                out[a * num_hands + h] = (data[a * num_hands + h].max(0.0) as f64 / total) as f32;
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0.0) as f64;
             }
-        } else {
-            let uniform = 1.0 / num_actions as f32;
-            for a in 0..num_actions {
-                out[a * num_hands + h] = uniform;
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for ((dst, &value), &total) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                *dst = if total > 0.0 {
+                    (value.max(0.0) as f64 / total) as f32
+                } else {
+                    uniform
+                };
             }
         }
     }
@@ -442,19 +451,28 @@ impl<'a> StorageView for F32View<'a> {
 fn normalize_columns_i16(data: &[i16], r: StorageRef, out: &mut [f32]) {
     let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
     debug_assert_eq!(out.len(), r.len());
-    for h in 0..num_hands {
-        let mut total = 0.0f64;
+    // 2 KiB on the stack, independent of hand count; each hand still sums
+    // action 0, 1, ... in f64 and divides (never multiplies a reciprocal).
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f64; BLOCK];
         for a in 0..num_actions {
-            total += data[a * num_hands + h].max(0) as f64;
-        }
-        if total > 0.0 {
-            for a in 0..num_actions {
-                out[a * num_hands + h] = (data[a * num_hands + h].max(0) as f64 / total) as f32;
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0) as f64;
             }
-        } else {
-            let uniform = 1.0 / num_actions as f32;
-            for a in 0..num_actions {
-                out[a * num_hands + h] = uniform;
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for ((dst, &value), &total) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                *dst = if total > 0.0 {
+                    (value.max(0) as f64 / total) as f32
+                } else {
+                    uniform
+                };
             }
         }
     }
