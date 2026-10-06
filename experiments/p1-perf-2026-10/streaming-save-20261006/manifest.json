@@ -1,0 +1,64 @@
+{
+  "task": "P1-T3 / SOL-15",
+  "base_commit": "e7a4554bc0a6523028b6d90612d18d2cc0533dce",
+  "evidence_files": {
+    "base-flop.json": "807cb48c165c68ca32caf1909045949b7a3496866dc3e2c5e328b1a14eb04015",
+    "base-river-state.txt": "a6099be9f25c8aceaf685f0f10ea10e0e36bf255fbc095dbea7b11709346bc63",
+    "base-state.txt": "37011b6602639f80aff2c11f40dcaed91f2c9f2743649cb4c4f325d49e1fbbf7",
+    "clippy.log": "b9579b5057861572814c77d5d82899a2f65416a3d5dd9e785f0657d757999df6",
+    "compare_exports.py": "565c9db0bd9b8d09d44c797fc1f37a11466c53965bd36f5e336e084814fc339c",
+    "compression-levels.json": "11b84a484873051a26f2eae2bcd7f0b942befaf73afa032487cb09509fb6107d",
+    "compression-sample.json": "b8a18082f52cfc2cd96e766a89c0248628d7d1869339e71e6c73a6016fe6fbb6",
+    "cpu.json": "9f869ce9a683e343af9afeea4d161f869b15cf94c4ff1104298aae4f881eab33",
+    "docs.log": "ea7c0c46bf8432c528491abf805676fd548534ca1770f14cea44abd4ef11012d",
+    "effective-flop.toml": "d88380275774105f9aa9a90143a9f2e8517a0c2ebb58221878c90280131bd78f",
+    "environment.json": "fc0397fb0970f3a6579ddc18efb1a438e82745698062d1988542ebff13340364",
+    "flop-exports.json": "4a929b00239d9cc08e9ef51d42a73eb55ef755e84e965ea7467c0a5004340415",
+    "flop4.toml": "1f8e5e3ba8f23131eb5851f029a1f06f7aa6a86790e3a8a195906abdcc9cc54b",
+    "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "measure.py": "35015842573453e7bae403826e2975a5c0d249a5a2eae98f26c989a600300a76",
+    "new-final-flop.json": "11ec356ffecbd2088dbeaf41194750474a70d1998e849210edd596ae918e6a51",
+    "new-final-state.txt": "37011b6602639f80aff2c11f40dcaed91f2c9f2743649cb4c4f325d49e1fbbf7",
+    "new-flop.json": "bf159abccf7a242b2492c4eb6243ef53c99e91eab9ff7f96d85d7f0142dbfcdf",
+    "new-river-state.txt": "a6099be9f25c8aceaf685f0f10ea10e0e36bf255fbc095dbea7b11709346bc63",
+    "new-state.txt": "37011b6602639f80aff2c11f40dcaed91f2c9f2743649cb4c4f325d49e1fbbf7",
+    "README.md": "f3ff7bec34468af83b259db32326e7fd091f702f2bda93e4b6160588659b161b",
+    "resources.json": "cff8dea486baf4a55b80b51733fd51348f350fe5f1ae9f79b36f7c5fbfbb68ac",
+    "river-equivalence.txt": "9ba24bcfc2065969bbaaff3e972156922dee85c05ffd171902497144962074c3",
+    "river-exports.json": "5fcb6b5b4b274f3a21490065cdef8e3df037aeb677b58ffb57964ea95d74577f",
+    "river6-i16.toml": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1",
+    "solution-equivalence.txt": "d67518d7c80e080db27481daf12ada0b6ae930483738df242925875d0b11046a",
+    "solution-final-equivalence.txt": "d67518d7c80e080db27481daf12ada0b6ae930483738df242925875d0b11046a",
+    "turn-equivalence.txt": "9ba24bcfc2065969bbaaff3e972156922dee85c05ffd171902497144962074c3",
+    "turn-exports.json": "349b355cd18560ffbb1f0460dad091d5d5cd6fe3a33459a64f540c6968296477",
+    "turn6-no-rivers.toml": "9ad3f9a9385c007ff2271928bd47e8ac5a3df320b68be944e563e66898f3e3c9",
+    "validation.json": "4e327ecb1fb567025a17b368960ad37a6cff65de384d0752e67869d7db92b1eb",
+    "workspace-test.log": "f777ec70cd74468a8d58ae001df6928d406c10d8c83d3112e00f0d97707e41a5"
+  },
+  "large_local_artifacts": {
+    "runs\\p1-t3\\base-flop\\checkpoint.ckpt": {
+      "bytes": 1042043734,
+      "sha256": "a93b96cbf278ed1266efd0f3587feae7c018f06ed586e43c2e347b5bb7654fd3",
+      "availability": "local ignored run artifact; regenerate from committed baseline or working source plus cfg"
+    },
+    "runs\\p1-t3\\base-flop\\solution.sol": {
+      "bytes": 173028002,
+      "sha256": "46c800be5bd43c8ffafe168d6b66ce810890b4a1b60ccf58e2df13ffa6f5b1ac",
+      "availability": "local ignored run artifact; regenerate from committed baseline or working source plus cfg"
+    },
+    "runs\\p1-t3\\new-final-flop\\checkpoint.ckpt": {
+      "bytes": 1098800954,
+      "sha256": "b423936f157e7ae892831865d6c0eb81d51abc3caf3907a3b63ce203ab786c21",
+      "availability": "local ignored run artifact; regenerate from committed baseline or working source plus cfg"
+    },
+    "runs\\p1-t3\\new-final-flop\\solution.sol": {
+      "bytes": 176246962,
+      "sha256": "4c4e29205565bb921f5b965ac64f39d04f26b052c20a10fc6d09a95f14742e39",
+      "availability": "local ignored run artifact; regenerate from committed baseline or working source plus cfg"
+    }
+  },
+  "validation": "validation.json",
+  "reproduction": "measure.py BINARY flop4.toml FRESH_RUN RESULT; verify_save checkpoint PATH; verify_save solution OLD NEW; compare_exports.py BASE_BINARY OLD_SOL NEW_SOL RESULT",
+  "working_tree_base_commit": "9c6f2490b19e72d98f2cf7cdd9c5e39df604a999",
+  "new_source": "P1-T3 commit on branch s3-p1-multicore-perf"
+}

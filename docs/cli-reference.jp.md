@@ -69,9 +69,10 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | resources field | 製品 | 意味 |
 |---|---|---|
 | `nodes` / `terminals` / `f32Bytes` / `i16Bytes` | P1 | 木のnode・terminal数とstorage別bytes |
-| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | 選択storageの見積り、解決済み上限、上限内か |
+| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | storage＋保存作業領域の見積り、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
+| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol` packed保存領域 / run threadsに応じたstreaming圧縮予算 |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
 | `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
 
@@ -110,7 +111,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
-P1 `.sol`はversion 2、checkpointはversion 3だけを受理する。旧形式は現行configから再solveする。
+P1 `.sol`はversion 2、checkpointはversion 4だけを受理する。checkpoint v1/2/3は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -137,7 +138,7 @@ directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検�
 
 P1へP2専用overrideを渡すと`NLH003`で拒否する。P1は`[run]`・`[meta]`以外を変更できない。
 同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
-終了時にcheckpoint、solution、run.jsonを更新する。P2は再構築中にrule hitも確認する。
+終了時にcheckpoint、solution、run.jsonを更新する。P1は直前の保存と同じiterationのcheckpoint再保存・eventを省く。P2は再構築中にrule hitも確認する。
 
 ## `solvers status` / `solvers watch` / `solvers runs ls`
 

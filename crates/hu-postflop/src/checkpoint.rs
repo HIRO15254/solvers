@@ -1,173 +1,434 @@
-//! `.ckpt` checkpoint codec: a fixed manual-layout header (magic, format
-//! version, config hash, iteration) followed by a zstd-compressed postcard
-//! encoding of `hu_engine::SolverState`.
-//!
-//! Writes are atomic (temp file in the same directory, then renamed into
-//! place) so a process killed mid-write never corrupts a previously-good
-//! checkpoint.
-
-use std::io::Write;
+//! Version 4 streaming checkpoints. Only bounded metadata is postcard;
+//! storage is raw little-endian arenas, protected by a BLAKE3 digest.
+use hu_engine::{SolverState, Storage, StorageArrays, StorageArraysMut, StorageState};
+use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::{BufReader, Read, Write};
 use std::path::Path;
 
-use hu_engine::SolverState;
-
-/// Fixed header layout, all multi-byte fields little-endian: magic (8
-/// bytes) + format version (u16) + config hash (32 bytes) + iteration
-/// (u64) = 50 bytes. The iteration is duplicated from the (compressed)
-/// payload so the header alone can report progress without paying for a
-/// zstd decompression.
-pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
-
+pub const HEADER_LEN: usize = 50;
 const MAGIC: &[u8; 8] = b"SLVRCKPT";
-const FORMAT_VERSION: u16 = 3;
+const FORMAT_VERSION: u16 = 4;
+const MAX_METADATA: usize = 16 * 1024 * 1024;
+const IO_CHUNK: usize = 64 * 1024;
 
-/// Errors from reading or writing a `.ckpt` file.
 #[derive(Debug, thiserror::Error)]
 pub enum CheckpointError {
     #[error("not a solvers checkpoint file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported checkpoint format version {found} (expected {expected}); re-solve from solvers.nlh/v1 to create a compact-domain checkpoint (docs/hu-postflop.jp.md)"
+        "unsupported checkpoint format version {found} (expected {expected}); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
     #[error("checkpoint file truncated: expected at least {expected} bytes, got {actual}")]
     Truncated { expected: usize, actual: usize },
+    #[error("invalid checkpoint: {0}")]
+    Invalid(&'static str),
     #[error("checkpoint I/O error: {0}")]
     Io(#[from] std::io::Error),
     #[error("checkpoint payload codec error: {0}")]
     Codec(#[from] postcard::Error),
 }
 
-/// Just the header, for cheap progress checks without decompressing the
-/// (potentially large) payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct CheckpointHeader {
     pub config_hash: [u8; 32],
     pub iteration: u64,
 }
-
-/// A fully decoded checkpoint: header fields plus the restored solver
-/// state.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Checkpoint {
     pub config_hash: [u8; 32],
     pub iteration: u64,
     pub state: SolverState,
-    /// Present in self-contained common-input checkpoints (format 3).
     pub config_toml: Option<String>,
-    /// Cumulative solve time, excluding tree validation/build and artifact export.
     pub elapsed_secs: Option<f64>,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Metadata {
+    config_toml: Option<String>,
+    elapsed_secs: Option<f64>,
+    iteration: u64,
+    i16: bool,
+    lengths: [u64; 4],
+}
+
 fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointError> {
-    if &buf[0..8] != MAGIC {
+    if &buf[..8] != MAGIC {
         return Err(CheckpointError::BadMagic);
     }
-    let version = u16::from_le_bytes([buf[8], buf[9]]);
+    let version = u16::from_le_bytes(buf[8..10].try_into().unwrap());
     if version != FORMAT_VERSION {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
         });
     }
-    let mut config_hash = [0u8; 32];
-    config_hash.copy_from_slice(&buf[10..42]);
-    let iteration = u64::from_le_bytes(buf[42..50].try_into().expect("8-byte slice"));
     Ok(CheckpointHeader {
-        config_hash,
-        iteration,
+        config_hash: buf[10..42].try_into().unwrap(),
+        iteration: u64::from_le_bytes(buf[42..50].try_into().unwrap()),
     })
 }
-
-fn build_header(config_hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
-    let mut buf = [0u8; HEADER_LEN];
-    buf[0..8].copy_from_slice(MAGIC);
+fn build_header(hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
+    let mut buf = [0; HEADER_LEN];
+    buf[..8].copy_from_slice(MAGIC);
     buf[8..10].copy_from_slice(&FORMAT_VERSION.to_le_bytes());
-    buf[10..42].copy_from_slice(&config_hash);
-    buf[42..50].copy_from_slice(&iteration.to_le_bytes());
+    buf[10..42].copy_from_slice(&hash);
+    buf[42..].copy_from_slice(&iteration.to_le_bytes());
     buf
 }
-
-/// Reads and fully decodes a checkpoint (header + zstd-decompressed,
-/// postcard-decoded `SolverState`).
-pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
-    let bytes = std::fs::read(path)?;
-    if bytes.len() < HEADER_LEN {
-        return Err(CheckpointError::Truncated {
-            expected: HEADER_LEN,
-            actual: bytes.len(),
-        });
+fn shape(arrays: &StorageArrays<'_>) -> (bool, [u64; 4]) {
+    match arrays {
+        StorageArrays::F32 {
+            regrets,
+            strategy_sum,
+        } => (
+            false,
+            [regrets.len() as u64, strategy_sum.len() as u64, 0, 0],
+        ),
+        StorageArrays::I16 {
+            regrets,
+            strategy_sum,
+            regret_scales,
+            strategy_scales,
+        } => (
+            true,
+            [
+                regrets.len() as u64,
+                strategy_sum.len() as u64,
+                regret_scales.len() as u64,
+                strategy_scales.len() as u64,
+            ],
+        ),
     }
-    let header_buf: [u8; HEADER_LEN] = bytes[..HEADER_LEN]
-        .try_into()
-        .expect("sliced to HEADER_LEN");
-    let header = parse_header(&header_buf)?;
-    let payload = zstd::decode_all(&bytes[HEADER_LEN..])?;
-    let (state, config_toml, elapsed_secs): (SolverState, Option<String>, Option<f64>) =
-        postcard::from_bytes(&payload)?;
+}
+
+/// Open metadata only. The same open file is retained until restoration, so
+/// replacing the path cannot substitute a different checkpoint mid-resume.
+pub struct CheckpointReader {
+    pub config_hash: [u8; 32],
+    pub iteration: u64,
+    pub config_toml: Option<String>,
+    pub elapsed_secs: Option<f64>,
+    i16: bool,
+    lengths: [u64; 4],
+    decoder: zstd::stream::read::Decoder<'static, BufReader<File>>,
+    hasher: blake3::Hasher,
+}
+impl CheckpointReader {
+    pub fn open(path: &Path) -> Result<Self, CheckpointError> {
+        let mut file = File::open(path)?;
+        let mut header = [0; HEADER_LEN];
+        let actual = usize::try_from(file.metadata()?.len()).unwrap_or(usize::MAX);
+        if actual < HEADER_LEN {
+            return Err(CheckpointError::Truncated {
+                expected: HEADER_LEN,
+                actual,
+            });
+        }
+        file.read_exact(&mut header)?;
+        let parsed = parse_header(&header)?;
+        let mut decoder = zstd::stream::read::Decoder::new(file)?;
+        decoder.window_log_max(20)?;
+        let mut length = [0; 4];
+        decoder.read_exact(&mut length)?;
+        let len = u32::from_le_bytes(length) as usize;
+        if len > MAX_METADATA {
+            return Err(CheckpointError::Invalid("metadata too large"));
+        }
+        let mut bytes = vec![0; len];
+        decoder.read_exact(&mut bytes)?;
+        let metadata: Metadata = postcard::from_bytes(&bytes)?;
+        if metadata.iteration != parsed.iteration {
+            return Err(CheckpointError::Invalid(
+                "header/payload iteration mismatch",
+            ));
+        }
+        if !metadata.i16 && metadata.lengths[2..] != [0, 0] {
+            return Err(CheckpointError::Invalid("unexpected f32 scales"));
+        }
+        if metadata
+            .elapsed_secs
+            .is_some_and(|t| !t.is_finite() || t < 0.0)
+        {
+            return Err(CheckpointError::Invalid("invalid elapsed time"));
+        }
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(&header);
+        hasher.update(&length);
+        hasher.update(&bytes);
+        Ok(Self {
+            config_hash: parsed.config_hash,
+            iteration: parsed.iteration,
+            config_toml: metadata.config_toml,
+            elapsed_secs: metadata.elapsed_secs,
+            i16: metadata.i16,
+            lengths: metadata.lengths,
+            decoder,
+            hasher,
+        })
+    }
+    /// Writes into the final storage allocation; never owns a second arena.
+    /// On failure the caller must discard the partially restored backend.
+    pub fn read_storage(mut self, storage: &mut impl Storage) -> Result<(), CheckpointError> {
+        if shape(&storage.arrays()) != (self.i16, self.lengths) {
+            return Err(CheckpointError::Invalid(
+                "storage backend or lengths mismatch",
+            ));
+        }
+        self.read_arrays(storage.arrays_mut())
+    }
+    fn read_arrays(&mut self, arrays: StorageArraysMut<'_>) -> Result<(), CheckpointError> {
+        match arrays {
+            StorageArraysMut::F32 {
+                regrets,
+                strategy_sum,
+            } => {
+                self.read_array(regrets)?;
+                self.read_array(strategy_sum)?;
+            }
+            StorageArraysMut::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => {
+                self.read_array(regrets)?;
+                self.read_array(strategy_sum)?;
+                self.read_array(regret_scales)?;
+                self.read_array(strategy_scales)?;
+            }
+        }
+        let mut digest = [0; 32];
+        self.decoder.read_exact(&mut digest)?;
+        if self.hasher.finalize().as_bytes() != &digest {
+            return Err(CheckpointError::Invalid("checksum mismatch"));
+        }
+        let mut tail = [0];
+        if self.decoder.read(&mut tail)? != 0 {
+            return Err(CheckpointError::Invalid("trailing payload bytes"));
+        }
+        Ok(())
+    }
+    fn read_array<T: Element>(&mut self, out: &mut [T]) -> Result<(), CheckpointError> {
+        let mut buf = [0; IO_CHUNK];
+        for chunk in out.chunks_mut(IO_CHUNK / T::SIZE) {
+            let bytes = &mut buf[..chunk.len() * T::SIZE];
+            self.decoder.read_exact(bytes)?;
+            self.hasher.update(bytes);
+            for (dst, src) in chunk.iter_mut().zip(bytes.chunks_exact(T::SIZE)) {
+                *dst = T::decode(src);
+            }
+        }
+        Ok(())
+    }
+}
+trait Element: Sized {
+    const SIZE: usize;
+    fn encode(&self, bytes: &mut [u8]);
+    fn decode(bytes: &[u8]) -> Self;
+}
+impl Element for f32 {
+    const SIZE: usize = 4;
+    fn encode(&self, bytes: &mut [u8]) {
+        bytes.copy_from_slice(&self.to_le_bytes());
+    }
+    fn decode(bytes: &[u8]) -> Self {
+        Self::from_le_bytes(bytes.try_into().unwrap())
+    }
+}
+impl Element for i16 {
+    const SIZE: usize = 2;
+    fn encode(&self, bytes: &mut [u8]) {
+        bytes.copy_from_slice(&self.to_le_bytes());
+    }
+    fn decode(bytes: &[u8]) -> Self {
+        Self::from_le_bytes(bytes.try_into().unwrap())
+    }
+}
+fn allocate<T: Default + Clone>(len: u64) -> Result<Vec<T>, CheckpointError> {
+    let len =
+        usize::try_from(len).map_err(|_| CheckpointError::Invalid("array length overflow"))?;
+    let mut out = Vec::new();
+    out.try_reserve_exact(len)
+        .map_err(|_| CheckpointError::Invalid("array allocation failed"))?;
+    out.resize(len, T::default());
+    Ok(out)
+}
+/// Compatibility owned-state reader. Production resume uses `CheckpointReader`.
+pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
+    let mut reader = CheckpointReader::open(path)?;
+    let [a, b, c, d] = reader.lengths;
+    let mut storage = if reader.i16 {
+        StorageState::I16 {
+            regrets: allocate(a)?,
+            strategy_sum: allocate(b)?,
+            regret_scales: allocate(c)?,
+            strategy_scales: allocate(d)?,
+        }
+    } else {
+        StorageState::F32 {
+            regrets: allocate(a)?,
+            strategy_sum: allocate(b)?,
+        }
+    };
+    reader.read_arrays(storage.arrays_mut())?;
     Ok(Checkpoint {
-        config_hash: header.config_hash,
-        iteration: header.iteration,
-        state,
-        config_toml,
-        elapsed_secs,
+        config_hash: reader.config_hash,
+        iteration: reader.iteration,
+        state: SolverState {
+            iteration: reader.iteration,
+            storage,
+        },
+        config_toml: reader.config_toml,
+        elapsed_secs: reader.elapsed_secs,
     })
 }
-
-/// Writes a checkpoint atomically: header+payload go to a temp file in
-/// `path`'s directory, `fsync`ed, then renamed into place.
 pub fn write_checkpoint(
     path: &Path,
-    config_hash: [u8; 32],
+    hash: [u8; 32],
     state: &SolverState,
 ) -> Result<(), CheckpointError> {
-    let payload = postcard::to_allocvec(&(state, None::<String>, None::<f64>))?;
-    let compressed = zstd::encode_all(payload.as_slice(), 0)?;
-
-    let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
-    buf.extend_from_slice(&build_header(config_hash, state.iteration));
-    buf.extend_from_slice(&compressed);
-
-    write_atomic(path, &buf)
+    write_arrays(
+        path,
+        hash,
+        state.iteration,
+        state.storage.arrays(),
+        None,
+        None,
+        1,
+        1,
+    )
 }
-
-/// Self-contained common-input checkpoint. The hash excludes [run]; the
-/// embedded config preserves the complete normalized effective input.
-/// Both writers use format 3; P1 resume requires the embedded config.
 pub fn write_checkpoint_with_config(
     path: &Path,
-    compatibility_hash: [u8; 32],
+    hash: [u8; 32],
     state: &SolverState,
-    effective_config: &str,
-    elapsed_secs: f64,
+    config: &str,
+    elapsed: f64,
 ) -> Result<(), CheckpointError> {
-    let payload = postcard::to_allocvec(&(state, Some(effective_config), Some(elapsed_secs)))?;
-    let compressed = zstd::encode_all(payload.as_slice(), 0)?;
-    let header = build_header(compatibility_hash, state.iteration);
-    let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
-    buf.extend_from_slice(&header);
-    buf.extend_from_slice(&compressed);
-    write_atomic(path, &buf)
+    write_arrays(
+        path,
+        hash,
+        state.iteration,
+        state.storage.arrays(),
+        Some(config),
+        Some(elapsed),
+        1,
+        1,
+    )
 }
-
-fn write_atomic(path: &Path, buf: &[u8]) -> Result<(), CheckpointError> {
+/// Production writer: borrowed arenas, bounded conversion buffer, threaded zstd.
+pub fn write_storage_with_config(
+    path: &Path,
+    hash: [u8; 32],
+    iteration: u64,
+    storage: &impl Storage,
+    config: &str,
+    elapsed: f64,
+    threads: usize,
+) -> Result<(), CheckpointError> {
+    write_arrays(
+        path,
+        hash,
+        iteration,
+        storage.arrays(),
+        Some(config),
+        Some(elapsed),
+        threads,
+        1,
+    )
+}
+#[allow(clippy::too_many_arguments)]
+fn write_arrays(
+    path: &Path,
+    hash: [u8; 32],
+    iteration: u64,
+    arrays: StorageArrays<'_>,
+    config: Option<&str>,
+    elapsed: Option<f64>,
+    threads: usize,
+    level: i32,
+) -> Result<(), CheckpointError> {
+    let (i16, lengths) = shape(&arrays);
+    let metadata = postcard::to_allocvec(&Metadata {
+        config_toml: config.map(str::to_owned),
+        elapsed_secs: elapsed,
+        iteration,
+        i16,
+        lengths,
+    })?;
+    if metadata.len() > MAX_METADATA {
+        return Err(CheckpointError::Invalid("metadata too large"));
+    }
+    let header = build_header(hash, iteration);
     let dir = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
-    let tmp_name = format!(
-        ".{}.tmp",
-        path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("checkpoint.ckpt")
-    );
-    let tmp_path = dir.join(tmp_name);
+    let mut tmp = tempfile::NamedTempFile::new_in(dir)?;
+    tmp.write_all(&header)?;
     {
-        let mut file = std::fs::File::create(&tmp_path)?;
-        file.write_all(buf)?;
-        file.sync_all()?;
+        let mut encoder = zstd::stream::write::Encoder::new(tmp.as_file_mut(), level)?;
+        encoder.window_log(20)?;
+        if threads > 1 {
+            encoder.multithread(
+                u32::try_from(threads)
+                    .map_err(|_| CheckpointError::Invalid("thread count overflow"))?,
+            )?;
+        }
+        encoder.include_checksum(true)?;
+        let length = (metadata.len() as u32).to_le_bytes();
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(&header);
+        hasher.update(&length);
+        hasher.update(&metadata);
+        encoder.write_all(&length)?;
+        encoder.write_all(&metadata)?;
+        match arrays {
+            StorageArrays::F32 {
+                regrets,
+                strategy_sum,
+            } => {
+                write_array(&mut encoder, &mut hasher, regrets)?;
+                write_array(&mut encoder, &mut hasher, strategy_sum)?;
+            }
+            StorageArrays::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => {
+                write_array(&mut encoder, &mut hasher, regrets)?;
+                write_array(&mut encoder, &mut hasher, strategy_sum)?;
+                write_array(&mut encoder, &mut hasher, regret_scales)?;
+                write_array(&mut encoder, &mut hasher, strategy_scales)?;
+            }
+        }
+        encoder.write_all(hasher.finalize().as_bytes())?;
+        encoder.finish()?;
     }
-    std::fs::rename(&tmp_path, path)?;
+    tmp.as_file().sync_all()?;
+    tmp.persist(path)
+        .map_err(|e| CheckpointError::Io(e.error))?;
+    #[cfg(unix)]
+    File::open(dir)?.sync_all()?;
+    Ok(())
+}
+fn write_array<T: Element>(
+    writer: &mut impl Write,
+    hasher: &mut blake3::Hasher,
+    array: &[T],
+) -> Result<(), CheckpointError> {
+    let mut buf = [0; IO_CHUNK];
+    for chunk in array.chunks(IO_CHUNK / T::SIZE) {
+        let bytes = &mut buf[..chunk.len() * T::SIZE];
+        for (value, dst) in chunk.iter().zip(bytes.chunks_exact_mut(T::SIZE)) {
+            value.encode(dst);
+        }
+        hasher.update(bytes);
+        writer.write_all(bytes)?;
+    }
     Ok(())
 }
 
@@ -209,6 +470,151 @@ mod tests {
                 strategy_scales: vec![0.03, 0.04],
             },
         }
+    }
+
+    fn streaming_resume<S: hu_engine::Storage>() {
+        use crate::game::{ChipEv, NoRake, PayoffPipeline, kuhn};
+        use hu_engine::{Dcfr, Solver};
+        let make = || {
+            Solver::<_, S>::new(
+                kuhn(PayoffPipeline {
+                    rake: &NoRake,
+                    utility: &ChipEv,
+                })
+                .game,
+                Box::new(Dcfr::default()),
+                Some(10),
+            )
+        };
+        let mut original = make();
+        original.run(4);
+        let path = temp_path("stream.ckpt");
+        write_storage_with_config(
+            &path,
+            [2; 32],
+            original.iteration(),
+            original.storage(),
+            "config",
+            1.25,
+            4,
+        )
+        .unwrap();
+        let reader = CheckpointReader::open(&path).unwrap();
+        let mut resumed = make();
+        resumed
+            .restore_stream(reader.iteration, |storage| reader.read_storage(storage))
+            .unwrap();
+        assert_eq!(
+            postcard::to_allocvec(&original.state()).unwrap(),
+            postcard::to_allocvec(&resumed.state()).unwrap()
+        );
+        original.run(3);
+        resumed.run(3);
+        assert_eq!(
+            postcard::to_allocvec(&original.state()).unwrap(),
+            postcard::to_allocvec(&resumed.state()).unwrap()
+        );
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn direct_resume_f32_and_i16_bit_identical_after_iterations() {
+        streaming_resume::<hu_engine::F32Storage>();
+        streaming_resume::<hu_engine::I16Storage>();
+    }
+    #[test]
+    fn atomic_replacement_and_failed_save_preserve_the_previous_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("checkpoint.ckpt");
+        write_checkpoint(&path, [1; 32], &sample_state_f32()).unwrap();
+        write_checkpoint(&path, [2; 32], &sample_state_i16()).unwrap();
+        let before = std::fs::read(&path).unwrap();
+        assert!(
+            write_checkpoint_with_config(
+                &path,
+                [0; 32],
+                &sample_state_f32(),
+                &"x".repeat(MAX_METADATA + 1),
+                0.0
+            )
+            .is_err()
+        );
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
+        assert_eq!(read_checkpoint(&path).unwrap().state, sample_state_i16());
+    }
+    #[test]
+    fn direct_reader_rejects_wrong_backend_or_lengths_before_writing() {
+        use hu_engine::{F32Storage, I16Storage};
+        let path = temp_path("shape.ckpt");
+        write_checkpoint(&path, [0; 32], &sample_state_f32()).unwrap();
+        let mut wrong_length = F32Storage::new(4, 0);
+        let before = wrong_length.state();
+        assert!(
+            CheckpointReader::open(&path)
+                .unwrap()
+                .read_storage(&mut wrong_length)
+                .is_err()
+        );
+        assert_eq!(wrong_length.state(), before);
+        let mut wrong_backend = I16Storage::new(3, 2);
+        assert!(
+            CheckpointReader::open(&path)
+                .unwrap()
+                .read_storage(&mut wrong_backend)
+                .is_err()
+        );
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn raw_f32_preserves_signed_zero_and_nan_bits() {
+        let path = temp_path("bits.ckpt");
+        let state = SolverState {
+            iteration: 0,
+            storage: StorageState::F32 {
+                regrets: vec![f32::from_bits(0x80000000), f32::from_bits(0x7fc00001)],
+                strategy_sum: vec![f32::INFINITY],
+            },
+        };
+        write_checkpoint(&path, [0; 32], &state).unwrap();
+        let loaded = read_checkpoint(&path).unwrap();
+        let StorageState::F32 {
+            regrets,
+            strategy_sum,
+        } = loaded.state.storage
+        else {
+            panic!()
+        };
+        assert_eq!(
+            regrets.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+            vec![0x80000000, 0x7fc00001]
+        );
+        assert_eq!(strategy_sum[0].to_bits(), f32::INFINITY.to_bits());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn rejects_corruption_and_trailing_bytes_even_in_valid_zstd_frames() {
+        let path = temp_path("integrity.ckpt");
+        write_checkpoint(&path, [0; 32], &sample_state_f32()).unwrap();
+        let original = std::fs::read(&path).unwrap();
+        let raw = zstd::decode_all(&original[HEADER_LEN..]).unwrap();
+        let replace = |header: &[u8], data: &[u8]| {
+            let mut bytes = header.to_vec();
+            bytes.extend(zstd::encode_all(data, 1).unwrap());
+            std::fs::write(&path, bytes).unwrap();
+            assert!(read_checkpoint(&path).is_err());
+        };
+        let mut header = original[..HEADER_LEN].to_vec();
+        header[10] ^= 1;
+        replace(&header, &raw);
+        let mut corrupt = raw.clone();
+        let last = corrupt.len() - 33;
+        corrupt[last] ^= 1;
+        replace(&original[..HEADER_LEN], &corrupt);
+        let mut extra = raw.clone();
+        extra.push(0);
+        replace(&original[..HEADER_LEN], &extra);
+        replace(&original[..HEADER_LEN], &raw[..raw.len() - 1]);
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
@@ -265,7 +671,7 @@ mod tests {
 
     #[test]
     fn rejects_pre_compact_versions_before_decoding() {
-        for version in [1u16, 2] {
+        for version in [1u16, 2, 3] {
             let path = temp_path("old-format.checkpoint");
             let mut header = build_header([0; 32], 0);
             header[8..10].copy_from_slice(&version.to_le_bytes());

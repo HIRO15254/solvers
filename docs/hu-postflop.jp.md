@@ -133,7 +133,7 @@ node selectorとaction labelによる指定はCLI referenceに従う。
 | `progress.jsonl` | iteration、累積elapsed_secs、expl_p0、expl_p1、nash_convを評価境界で追記 |
 | `events.jsonl` | state/checkpoint/stop/notice/failure。seqは0から単調増加 |
 | `run.json` | solve/resume区間終了のsummary |
-| `checkpoint.ckpt` | wall-clock checkpoint_intervalの到達境界と終了時に保存 |
+| `checkpoint.ckpt` | wall-clock checkpoint_intervalの到達境界と終了時に保存。同じiterationの終了時再保存は省く |
 | `solution.sol` | solve/resume区間終了時に保存 |
 
 manifestは`gameKind = "hu-postflop"`、`configSchema = "solvers.nlh/v1"`を記録する。
@@ -156,6 +156,9 @@ JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに�
 | `evP0` / `evP1` | OOP / IPの第3節のEV |
 | `explP0` / `explP1` / `nashConv` | 最終平均profileの逸脱利得とその和 |
 
+checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
+そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
+停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
@@ -178,13 +181,30 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1はversion errorで明示的に拒否する。現行configから再solveしてversion 2を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 3である。
-圧縮postcard payloadにSolverState、実効config全文、累積elapsed_secsを持つ。
-SolverStateはiterationとstorageのregret・平均累積を持つ再開用状態である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 4である。
+header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
+展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
+
+| 部分 | 内容 |
+|---|---|
+| u32 metadata長＋postcard metadata | 実効config全文（Option<String>）、累積elapsed_secs（Option<f64>）、iteration（u64）、i16 backend（bool）、4配列の長さ（[u64;4]）。metadataは16 MiB以下 |
+| 生配列 | regrets、strategy_sum。f32 backendは2本のf32配列、残りの長さは0。i16 backendは2本のi16配列に続きregret_scales、strategy_scalesのf32配列 |
+| 32-byte digest | header、metadata長、metadata、生配列の連結のBLAKE3 |
+
+header/payloadのiteration一致、backendと全配列長、digest、frame終端、末尾余剰bytesを検査する。
+切詰め・破損はerrorであり、読込み失敗した部分的storageからsolveを再開しない。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-storageの長さはcompact supportで決まる。P1 resumeはversion 3だけを受理し、埋込みconfigを必須とする。
-version 1/2は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
-保存は同directoryのtemporary fileからatomic置換する。
+storageの長さはcompact supportで決まる。P1 resumeはversion 4だけを受理し、埋込みconfigを必須とする。
+version 1/2/3は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
+書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
+保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
+`.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
+圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
+
+P1のmemory見積りはstorage、full出力のpacked戦略・値block、索引slot・street配列、圧縮作業予算を含む。
+`saveWorkspaceBytes`はpacked保存領域、`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
+圧縮予算は最大payloadの2 MiB job数とrun threads数の小さい方×16 MiB＋共有8 MiB＋実効config長×3で見積もる。
+NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。
 
 P1のresume互換性hashは正規化configから`[run]`と`[meta]`を除いたTOMLのblake3である。
 運用thread・memory・時間・checkpoint間隔と名前・説明は変えられるが、solver/outputを変えるとhashは変わる。

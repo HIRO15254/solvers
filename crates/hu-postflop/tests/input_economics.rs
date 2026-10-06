@@ -377,7 +377,13 @@ fn memory_auto_explicit_boundary_and_overflow() {
     assert!(error.to_string().contains("resource limit"));
     let doc = document(&source("", ""));
     let config = lower(&doc.spot, &settings(&doc)).unwrap();
-    assert!(check_memory_limit(&try_memory_usage(&config).unwrap(), Storage::F32, 1).is_err());
+    let estimate = try_memory_usage(&config).unwrap();
+    assert!(estimate.save_bytes > 0);
+    assert!(estimate.compression_bytes > 0);
+    let total = estimate.f32_bytes + estimate.save_bytes + estimate.compression_bytes;
+    check_memory_limit(&estimate, Storage::F32, total).unwrap();
+    assert!(check_memory_limit(&estimate, Storage::F32, estimate.f32_bytes).is_err());
+    assert!(check_memory_limit(&estimate, Storage::F32, 1).is_err());
 }
 
 #[test]

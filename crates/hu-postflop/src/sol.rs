@@ -220,30 +220,34 @@ pub fn read_sol(path: &Path) -> Result<SolPayload, SolError> {
 /// can never disagree.
 pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
     let hash = config_hash(payload.config_toml.as_bytes());
-    let compressed_payload = postcard::to_allocvec(payload)?;
-    let compressed = zstd::encode_all(compressed_payload.as_slice(), 0)?;
-
-    let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
-    buf.extend_from_slice(&build_header(hash, payload.meta.iterations));
-    buf.extend_from_slice(&compressed);
-
     let dir = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
         .unwrap_or_else(|| Path::new("."));
-    let tmp_name = format!(
-        ".{}.tmp",
-        path.file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("solve.sol")
-    );
-    let tmp_path = dir.join(tmp_name);
+    let mut tmp = tempfile::NamedTempFile::new_in(dir)?;
+    tmp.write_all(&build_header(hash, payload.meta.iterations))?;
     {
-        let mut file = std::fs::File::create(&tmp_path)?;
-        file.write_all(&buf)?;
-        file.sync_all()?;
+        let mut encoder = zstd::stream::write::Encoder::new(tmp.as_file_mut(), 1)?;
+        encoder.window_log(20)?;
+        let threads = rayon::current_num_threads();
+        if threads > 1 {
+            encoder.multithread(
+                threads
+                    .try_into()
+                    .map_err(|_| std::io::Error::other("thread count overflow"))?,
+            )?;
+        }
+        let mut buffered = std::io::BufWriter::with_capacity(64 * 1024, encoder);
+        postcard::to_io(payload, &mut buffered)?;
+        buffered
+            .into_inner()
+            .map_err(|e| e.into_error())?
+            .finish()?;
     }
-    std::fs::rename(&tmp_path, path)?;
+    tmp.as_file().sync_all()?;
+    tmp.persist(path).map_err(|e| SolError::Io(e.error))?;
+    #[cfg(unix)]
+    std::fs::File::open(dir)?.sync_all()?;
     Ok(())
 }
 

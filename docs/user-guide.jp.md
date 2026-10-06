@@ -60,6 +60,7 @@ solvers solve spot.toml --out runs/my-spot --threads 4 --memory 2GiB --max-time 
 ```
 
 毎回新しいrun directoryを指定する。overrideはrun.tomlへ保存する。
+P1のmemory見積りはstorageと保存用packed block・圧縮作業予算を含む。木・rank table・thread scratch等は別途必要でRSS上限ではない。
 P1のmemory autoは物理RAMの80%、P2はarena予算6 GiBである。P2のmemoryはRSS全体の上限ではなく、
 tree・cache・thread scratch・評価・checkpoint用の追加memoryが必要である。
 P2のEHS² tableは初回に構築し、以後はmachine cacheを利用する。
@@ -83,7 +84,7 @@ solvers resume runs/my-spot --out runs/my-spot-fork --threads 2
 ```
 
 statusのeventsOffsetからwatchを再開できる。watchのCtrl-Cは監視だけを止める。
-solveのCtrl-Cは境界で停止し、checkpointを保存する。2回目は即時終了する。
+solveのCtrl-Cは境界で停止し、checkpointを保存する。P1は同じiterationの終了時再保存とcheckpoint eventを省く。2回目は即時終了する。
 同じdirectoryへのresumeは累積進捗を引き継ぐ。max_timeも再開前を含む累積時間である。
 P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 `--max-sweeps`・`--stop-target`・`--evaluation-samples`・`--evaluation-cadence`を上書きする。
@@ -91,7 +92,7 @@ P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 
 旧runのstatus・watch・runs lsも利用でき、JSONのconfigSchema / gameKindは記録値のままである。
 旧runのresumable表示はcheckpointの存在を示すだけで、現行CLIでは再開できない。
-`.sol` version 1とcheckpoint version 1/2は読めない。現行configから再solveして`.sol` version 2・checkpoint version 3を作る。
+`.sol` version 1とcheckpoint version 1/2/3は読めない。現行configから再solveして`.sol` version 2・checkpoint version 4を作る。
 
 ## 6. 結果を読む
 

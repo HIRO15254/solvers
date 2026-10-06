@@ -1640,6 +1640,11 @@ pub struct MemoryEstimate {
     /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
+    /// Packed strategy/value blocks, indexed slots, and street metadata for
+    /// a full `.sol` export. No all-node f32 values/reaches or payload copy.
+    pub save_bytes: u64,
+    /// Bounded streaming codec budget (updated for the run's thread count).
+    pub compression_bytes: u64,
     pub nodes: u64,
     pub terminals: u64,
     pub rank_tables: u64,
@@ -1706,6 +1711,17 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
     Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
+        save_bytes: counting.elements * 2
+            + counting.action_nodes
+                * 2
+                * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
+            + counting.action_nodes
+                * (std::mem::size_of::<
+                    std::sync::Mutex<Option<(crate::sol::StrategyBlock, crate::sol::ValueBlock)>>,
+                >() + std::mem::size_of::<crate::sol::StrategyBlock>()
+                    + std::mem::size_of::<crate::sol::ValueBlock>()) as u64
+            + counting.nodes * std::mem::size_of::<Street>() as u64,
+        compression_bytes: 24 * 1024 * 1024,
         nodes: counting.nodes,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,

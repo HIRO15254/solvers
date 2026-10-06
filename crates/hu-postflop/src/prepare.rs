@@ -36,7 +36,21 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         .as_deref()
         .map(|target| input::resolve_target(&document.spot, target))
         .transpose()?;
-    let estimate = crate::try_memory_usage(&config).map_err(tree_error)?;
+    let mut estimate = crate::try_memory_usage(&config).map_err(tree_error)?;
+    let threads = document
+        .spot
+        .run
+        .threads
+        .unwrap_or(std::thread::available_parallelism()?.get() as u64);
+    // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
+    // cannot occupy every requested worker. Budget 16 MiB per active job
+    // plus 8 MiB shared buffers, and the actual small metadata copies.
+    let payload = estimate.f32_bytes.max(estimate.save_bytes);
+    let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
+    estimate.compression_bytes = jobs
+        .saturating_mul(16 * 1024 * 1024)
+        .saturating_add(8 * 1024 * 1024)
+        .saturating_add(effective.len() as u64 * 3);
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
@@ -98,12 +112,14 @@ pub fn warnings_for_hits(p: &Prepared, hits: &crate::RuleHits) -> Vec<String> {
     warnings
 }
 
-/// Required storage bytes for the selected P1 storage backend.
+/// Required storage and save workspace bytes for the selected P1 backend.
 pub fn required_bytes(p: &Prepared) -> u64 {
     match p.settings.solver.storage {
         input::Storage::F32 => p.estimate.f32_bytes,
         input::Storage::I16 => p.estimate.i16_bytes,
     }
+    .saturating_add(p.estimate.save_bytes)
+    .saturating_add(p.estimate.compression_bytes)
 }
 
 pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
@@ -250,17 +266,18 @@ pub(crate) fn require_artifact_config(raw: &str) -> Result<()> {
     Ok(())
 }
 
-/// Verified state and cumulative solve time for a checkpoint continuation.
+/// Metadata-verified reader and cumulative solve time for a continuation.
+/// Full payload integrity is verified while restoring into the final arenas.
 pub struct ResumeState {
-    pub state: hu_engine::SolverState,
+    pub state: crate::checkpoint::CheckpointReader,
     pub elapsed: Option<std::time::Duration>,
 }
 
-/// Verify the historical and embedded inputs and return the restored checkpoint state.
+/// Verify historical/embedded inputs and retain the open checkpoint reader.
 pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
     require_artifact_config(raw)?;
     let historical = prepare(raw, Path::new("run.toml"))?;
-    let checkpoint = crate::checkpoint::read_checkpoint(checkpoint_path)?;
+    let checkpoint = crate::checkpoint::CheckpointReader::open(checkpoint_path)?;
     if let Some(embedded) = &checkpoint.config_toml {
         require_artifact_config(embedded)?;
     }
@@ -282,7 +299,7 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
         .transpose()
         .context("invalid checkpoint elapsed time")?;
     Ok(ResumeState {
-        state: checkpoint.state,
+        state: checkpoint,
         elapsed,
     })
 }

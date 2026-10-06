@@ -216,7 +216,7 @@ fn periodic_checkpoint_and_cumulative_time_limit() {
             .lines()
             .filter(|line| line.contains("\"kind\":\"checkpoint\""))
             .count(),
-        5
+        4
     );
     let limited = temp.path().join("limited");
     ok(&[

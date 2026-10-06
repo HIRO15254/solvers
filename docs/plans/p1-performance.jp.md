@@ -61,6 +61,11 @@ T2の結果（[証拠](../../experiments/p1-perf-2026-10/engine-bitwise-20261006
 Exploitabilityが変更前・thread数間でbit一致。評価の走査は零和で3→2回、一般和で4→2回。統合後のTurn木
 （6 iteration、4 threads、ローカル参考値）のsolve時間は変更前23.95秒→T1 4.37秒→T2 2.14秒で、`export`はT1とbyte一致。
 
+T3の測定（[証拠](../../experiments/p1-perf-2026-10/streaming-save-20261006/README.md)）: checkpoint v4をborrowした配列から逐次保存し、
+resumeは最終arenaへ直接展開する。`.sol` v2のpacked blockは旧読み手でbit一致（wall_secsを除く）。
+共有Windows PC・Flop 4 iteration・8 threadsの参考値（T3前→T3）でCLI壁時計273.60→38.97秒、peak working set 10.77→4.48 GB。
+checkpointは58.5〜77.8→5.4〜6.7秒、`.sol`は43.6→9.5秒。memory判定にpacked保存領域・codec予算を加える。
+
 ### 一致の定義
 
 同じconfig・反復数で、変更前後の`solvers solve`の結果（`export summary`・`strategy`・`ev`）を比べる。

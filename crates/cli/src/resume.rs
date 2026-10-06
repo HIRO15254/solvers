@@ -50,7 +50,7 @@ pub fn run(
             checkpoint_interval,
         );
     }
-    let payload = hu_postflop::checkpoint::read_checkpoint(&checkpoint)
+    let payload = hu_postflop::checkpoint::CheckpointReader::open(&checkpoint)
         .with_context(|| format!("reading {}", checkpoint.display()))?;
     let embedded = payload.config_toml.as_deref().ok_or_else(||
         anyhow!("removed config family solvers.postflop/v1 checkpoint; re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"))?;

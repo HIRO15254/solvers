@@ -3,8 +3,7 @@ use crate::input::{self, Algorithm, SolutionStreets};
 use crate::prepare::{self, Prepared, compatibility_hash, display_game, warnings};
 use anyhow::{Context, Result, bail};
 use hu_engine::{
-    DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, SolverState, Storage,
-    TerminalEvaluator,
+    DiscountSchedule, F32Storage, I16Storage, ParConfig, Solver, Storage, TerminalEvaluator,
 };
 use nlh::{PerPlayer, Player};
 use std::path::Path;
@@ -34,7 +33,7 @@ pub struct RunRequest<'a> {
     pub prepared: &'a Prepared,
     pub checkpoint: &'a Path,
     pub solution: &'a Path,
-    pub state: Option<SolverState>,
+    pub state: Option<crate::checkpoint::CheckpointReader>,
     pub elapsed_before: Duration,
     pub cancel: &'a AtomicBool,
 }
@@ -139,6 +138,7 @@ fn drive<S: Storage>(
         elapsed_before,
         cancel,
     } = request;
+    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
     diagnostics(Diagnostic::Memory(p.estimate.clone()));
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));
@@ -156,13 +156,16 @@ fn drive<S: Storage>(
         min_children: p.settings.solver.parallel.min_children,
     });
     if let Some(state) = state {
+        let iteration = state.iteration;
         solver
-            .restore_state(state)
+            .restore_stream(iteration, |storage| state.read_storage(storage))
             .context("restoring checkpoint state")?;
     }
     observer(Observation::ProgressOpened)?;
     let start = Instant::now();
     let mut last_checkpoint = Instant::now();
+    let mut saved_iteration = None;
+    let mut evaluated = None;
     let interval = Duration::try_from_secs_f64(p.document.spot.run.checkpoint_interval_seconds)?;
     let max_time = p.document.spot.run.max_time_seconds;
     let mut canceled = false;
@@ -181,7 +184,8 @@ fn drive<S: Storage>(
             stop.check_every
                 .min(stop.max_iterations - solver.iteration()),
         );
-        let expl = solver.exploitability();
+        let (ev, expl) = solver.evaluate();
+        evaluated = Some((ev, expl));
         let nash_conv = expl[Player::P0] + expl[Player::P1];
         let elapsed_secs = (elapsed_before + start.elapsed()).as_secs_f64();
         observer(Observation::Progress(runfiles::MetricsRow {
@@ -194,6 +198,7 @@ fn drive<S: Storage>(
         if last_checkpoint.elapsed() >= interval {
             save(&solver, p, checkpoint, elapsed_secs, observer)?;
             last_checkpoint = Instant::now();
+            saved_iteration = Some(solver.iteration());
         }
         if cancel.load(std::sync::atomic::Ordering::SeqCst) {
             canceled = true;
@@ -208,10 +213,13 @@ fn drive<S: Storage>(
     let elapsed = elapsed_before + start.elapsed();
     observer(Observation::Stop { reason })?;
     let offset = p.payoff.ev_offset();
-    let mut summary = summarize(&solver, elapsed, subgame_ev(solver_ev(&solver), offset));
+    let (ev, expl) = evaluated.unwrap_or_else(|| solver.evaluate());
+    let mut summary = summary_from_evaluation(&solver, elapsed, subgame_ev(ev, offset), expl);
     diagnostics(Diagnostic::Done(summary.clone()));
     summary.canceled = canceled;
-    save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
+    if saved_iteration != Some(solver.iteration()) {
+        save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
+    }
     let spec = crate::artifact::SolExportSpec {
         path: solution.to_path_buf(),
         mode: match p.settings.output.solution_streets {
@@ -243,12 +251,14 @@ fn save<S: Storage>(
     elapsed: f64,
     observer: &mut Observer<'_>,
 ) -> Result<()> {
-    crate::checkpoint::write_checkpoint_with_config(
+    crate::checkpoint::write_storage_with_config(
         checkpoint,
         compatibility_hash(&p.effective)?,
-        &solver.state(),
+        solver.iteration(),
+        solver.storage(),
         &p.effective,
         elapsed,
+        rayon::current_num_threads(),
     )?;
     observer(Observation::Checkpoint {
         iterations: solver.iteration(),
@@ -304,6 +314,15 @@ pub(crate) fn summarize<E: TerminalEvaluator, S: Storage>(
     ev: PerPlayer<f64>,
 ) -> RunSummary {
     let expl = solver.exploitability();
+    summary_from_evaluation(solver, elapsed, ev, expl)
+}
+
+fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
+    solver: &Solver<E, S>,
+    elapsed: Duration,
+    ev: PerPlayer<f64>,
+    expl: PerPlayer<f64>,
+) -> RunSummary {
     let nash_conv = expl[Player::P0] + expl[Player::P1];
     RunSummary {
         canceled: false,

@@ -213,7 +213,28 @@ fn solve<S: Storage>(
                     "fused EV/BR {p:?}"
                 );
                 values.extend([ev.to_bits(), br.to_bits(), expl[p].to_bits()]);
+                let (evaluated_ev, evaluated_expl) = solver.evaluate();
+                assert_eq!(evaluated_ev[p].to_bits(), ev.to_bits());
+                assert_eq!(evaluated_expl[p].to_bits(), expl[p].to_bits());
                 let everywhere = solver.expected_values_everywhere(p);
+                let visited = Mutex::new(BTreeSet::new());
+                solver.visit_expected_values(|id, reach, per_hand, avg| {
+                    let tree = &solver.game().tree;
+                    let idx = tree.storage_ref(tree.node(id)).index as usize;
+                    assert_eq!(bits(per_hand[p]), bits(everywhere[idx].as_ref().unwrap()));
+                    assert_eq!(bits(avg), bits(&solver.average_strategy_at(id)));
+                    let expected = reach_at(
+                        tree,
+                        solver.game().root_ranges.as_ref().map(|r| r.as_slice()),
+                        id,
+                        |n, _, out| out.copy_from_slice(&solver.average_strategy_at(n)),
+                    );
+                    for seat in Player::BOTH {
+                        assert_eq!(bits(reach[seat]), bits(&expected[seat]));
+                    }
+                    assert!(visited.lock().unwrap().insert(idx));
+                });
+                assert_eq!(visited.into_inner().unwrap().len(), everywhere.len());
                 for entry in &everywhere {
                     values.extend(entry.as_ref().unwrap().iter().map(|v| v.to_bits() as u64));
                 }
@@ -327,7 +348,16 @@ fn check_asymmetric_empty<S: Storage>() {
                             .chain(solver.best_response_values_at(0, p, reach))
                             .map(|v| v.to_bits() as u64),
                     );
-                    for entry in solver.expected_values_everywhere(p) {
+                    let everywhere = solver.expected_values_everywhere(p);
+                    solver.visit_expected_values(|id, _, per_hand, _| {
+                        let idx = solver
+                            .game()
+                            .tree
+                            .storage_ref(solver.game().tree.node(id))
+                            .index as usize;
+                        assert_eq!(bits(per_hand[p]), bits(everywhere[idx].as_ref().unwrap()));
+                    });
+                    for entry in everywhere {
                         values.extend(entry.unwrap().into_iter().map(|v| v.to_bits() as u64));
                     }
                 }

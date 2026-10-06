@@ -59,6 +59,28 @@ fn solve(config: &str, directory: &Path) -> std::path::PathBuf {
     run
 }
 
+#[test]
+fn checkpoint_events_do_not_repeat_the_final_iteration() {
+    let directory = tempfile::tempdir().unwrap();
+    let config = CONFIG.replace(
+        "threads = 1",
+        "threads = 1\ncheckpoint_interval = \"0.000001s\"",
+    );
+    let run = solve(&config, directory.path());
+    let events = std::fs::read_to_string(run.join("events.jsonl")).unwrap();
+    let iterations: Vec<_> = events
+        .lines()
+        .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+        .filter(|event| event["kind"] == "checkpoint")
+        .map(|event| event["sweeps"].as_u64().unwrap())
+        .collect();
+    assert_eq!(iterations, vec![5, 10, 15, 20]);
+    let saved = hu_postflop::checkpoint::read_checkpoint(&run.join("checkpoint.ckpt")).unwrap();
+    let summary: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(run.join("run.json")).unwrap()).unwrap();
+    assert_eq!(saved.iteration, summary["iterations"].as_u64().unwrap());
+}
+
 fn export(run: &Path, view: &str, node: &str) -> serde_json::Value {
     let output = ok(&[
         "export",

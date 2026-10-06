@@ -189,6 +189,18 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         &self.storage
     }
 
+    /// Restore directly into the existing arenas. Iteration is committed only
+    /// after the reader succeeds; discard this solver if the reader fails.
+    pub fn restore_stream<T, Err>(
+        &mut self,
+        iteration: u64,
+        read: impl FnOnce(&mut S) -> Result<T, Err>,
+    ) -> Result<T, Err> {
+        let result = read(&mut self.storage)?;
+        self.iteration = iteration;
+        Ok(result)
+    }
+
     /// Snapshots the iteration count and storage backend contents for a
     /// checkpoint.
     pub fn state(&self) -> SolverState {
@@ -368,6 +380,34 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         recorded.into_inner().expect("value recorder mutex")
     }
 
+    /// Visit action nodes as both seats' values are produced, carrying both
+    /// reaches from the root. Only path/worker scratch is retained. The
+    /// callback may run concurrently and must copy or pack its borrowed data
+    /// before returning. Arithmetic for each seat follows `ev_pass` exactly.
+    pub fn visit_expected_values<R>(&self, record: R)
+    where
+        R: Fn(NodeId, PerPlayer<&[f32]>, PerPlayer<&[f32]>, &[f32]) + Sync,
+    {
+        let mut scratch = Scratch::new();
+        let dims = self.game.tree.root_dims;
+        let mut flat = scratch.take((dims[Player::P0] + dims[Player::P1]) as usize);
+        let (a, b) = flat.split_at_mut(dims[Player::P0] as usize);
+        profile_pass(
+            &self.game,
+            &self.storage,
+            self.par,
+            &mut scratch,
+            0,
+            PerPlayer::new(
+                &self.game.root_ranges[Player::P0],
+                &self.game.root_ranges[Player::P1],
+            ),
+            PerPlayer::new(a, b),
+            &record,
+            self.par.chance_depth,
+        );
+    }
+
     /// Best-response value against the opponent's average strategy, per deal.
     pub fn best_response_value(&self, p: Player) -> f64 {
         let ctx = ValueCtx {
@@ -403,6 +443,18 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             self.ev_and_br::<true>(Player::P1)
         };
         PerPlayer::new(br0 - ev0, br1 - ev1)
+    }
+
+    /// Root EV and exploitability at the same evaluation boundary. The BR
+    /// convention (including zero-sum accounting) is identical to
+    /// `exploitability`; actual EVs are returned for both seats.
+    pub fn evaluate(&self) -> (PerPlayer<f64>, PerPlayer<f64>) {
+        let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
+        let (ev1, br1) = self.ev_and_br::<true>(Player::P1);
+        (
+            PerPlayer::new(ev0, ev1),
+            PerPlayer::new(br0 - ev0, br1 - if self.game.zero_sum { -ev0 } else { ev1 }),
+        )
     }
 
     fn ev_and_br<const EV: bool>(&self, p: Player) -> (f64, f64) {
@@ -1150,6 +1202,162 @@ fn value_pass<E: TerminalEvaluator, S: Storage, R, const EV: bool, const BR: boo
             }
             scratch.put(sigma);
             record(node_id, if EV { ev } else { br });
+        }
+    }
+}
+
+// Both-seat EV pass with path-local reach and deterministic child reductions.
+#[allow(clippy::too_many_arguments)]
+fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
+    game: &CompiledGame<E>,
+    storage: &S,
+    par: ParConfig,
+    scratch: &mut Scratch,
+    id: NodeId,
+    reach: PerPlayer<&[f32]>,
+    mut ev: PerPlayer<&mut [f32]>,
+    record: &R,
+    budget: u32,
+) where
+    R: Fn(NodeId, PerPlayer<&[f32]>, PerPlayer<&[f32]>, &[f32]) + Sync,
+{
+    let tree = &game.tree;
+    let node = *tree.node(id);
+    match node.kind {
+        NodeKind::Terminal => {
+            for p in Player::BOTH {
+                game.evaluator.eval(node.aux, p, reach[p.opponent()], ev[p]);
+            }
+        }
+        NodeKind::Chance => {
+            let mut flat = scratch.take(
+                chance_len(tree, id, Player::P0, ev[Player::P0].len())
+                    + chance_len(tree, id, Player::P1, ev[Player::P1].len()),
+            );
+            let mut rest = flat.as_mut_slice();
+            let mut rows = Vec::with_capacity(node.num_children as usize);
+            for pos in 0..node.num_children as usize {
+                let deal = *tree.deal(&node, pos);
+                let a =
+                    tree.mapped_dim(deal.maps[Player::P0], ev[Player::P0].len() as u32) as usize;
+                let b =
+                    tree.mapped_dim(deal.maps[Player::P1], ev[Player::P1].len() as u32) as usize;
+                let (row, tail) = rest.split_at_mut(a + b);
+                rest = tail;
+                let (a, b) = row.split_at_mut(a);
+                rows.push((a, b));
+            }
+            let visit = |scratch: &mut Scratch, pos: usize, a: &mut [f32], b: &mut [f32]| {
+                let deal = *tree.deal(&node, pos);
+                let mut r0 = scratch.take(a.len());
+                let mut r1 = scratch.take(b.len());
+                tree.map_reach_into(deal.maps[Player::P0], reach[Player::P0], &mut r0);
+                tree.map_reach_into(deal.maps[Player::P1], reach[Player::P1], &mut r1);
+                profile_pass(
+                    game,
+                    storage,
+                    par,
+                    scratch,
+                    node.first_child + pos as u32,
+                    PerPlayer::new(&r0, &r1),
+                    PerPlayer::new(a, b),
+                    record,
+                    budget.saturating_sub(1),
+                );
+                scratch.put(r1);
+                scratch.put(r0);
+            };
+            if rayon::current_num_threads() > 1
+                && budget > 0
+                && node.num_children as usize >= par.min_children
+            {
+                rows.into_par_iter().enumerate().for_each(|(pos, (a, b))| {
+                    with_worker_scratch(|scratch| visit(scratch, pos, a, b))
+                });
+            } else {
+                for (pos, (a, b)) in rows.into_iter().enumerate() {
+                    visit(scratch, pos, a, b);
+                }
+            }
+            let mut offset = 0;
+            for pos in 0..node.num_children as usize {
+                let deal = *tree.deal(&node, pos);
+                for p in Player::BOTH {
+                    let len = tree.mapped_dim(deal.maps[p], ev[p].len() as u32) as usize;
+                    tree.accumulate_values_with_scratch(
+                        deal.maps[p],
+                        deal.weight,
+                        &flat[offset..offset + len],
+                        ev[p],
+                        scratch,
+                    );
+                    offset += len;
+                }
+            }
+            scratch.put(flat);
+        }
+        NodeKind::Action => {
+            let sref = tree.storage_ref(&node);
+            let hands = sref.num_hands as usize;
+            let mut sigma = scratch.take(sref.len());
+            storage.average_strategy(sref, sref.index, &mut sigma);
+            let dim0 = ev[Player::P0].len();
+            let dim = dim0 + ev[Player::P1].len();
+            let mut flat = scratch.take(dim * node.num_children as usize);
+            let visit = |scratch: &mut Scratch, a: usize, row: &mut [f32]| {
+                let mut next = scratch.take(hands);
+                for h in 0..hands {
+                    next[h] = reach[node.player][h] * sigma[a * hands + h];
+                }
+                let r = if node.player == Player::P0 {
+                    PerPlayer::new(next.as_slice(), reach[Player::P1])
+                } else {
+                    PerPlayer::new(reach[Player::P0], next.as_slice())
+                };
+                let (a_ev, b_ev) = row.split_at_mut(dim0);
+                profile_pass(
+                    game,
+                    storage,
+                    par,
+                    scratch,
+                    node.first_child + a as u32,
+                    r,
+                    PerPlayer::new(a_ev, b_ev),
+                    record,
+                    budget,
+                );
+                scratch.put(next);
+            };
+            if dim != 0 && parallel_actions(tree, id) {
+                flat.par_chunks_mut(dim)
+                    .enumerate()
+                    .for_each(|(a, row)| with_worker_scratch(|scratch| visit(scratch, a, row)));
+            } else {
+                for a in 0..node.num_children as usize {
+                    visit(scratch, a, &mut flat[a * dim..(a + 1) * dim]);
+                }
+            }
+            for a in 0..node.num_children as usize {
+                let row = &flat[a * dim..(a + 1) * dim];
+                let child = PerPlayer::new(&row[..dim0], &row[dim0..]);
+                for p in Player::BOTH {
+                    for h in 0..ev[p].len() {
+                        if node.player == p {
+                            ev[p][h] += sigma[a * hands + h] * child[p][h];
+                        } else {
+                            ev[p][h] += child[p][h];
+                        }
+                    }
+                }
+            }
+            record(
+                id,
+                reach,
+                PerPlayer::new(ev[Player::P0], ev[Player::P1]),
+                &sigma,
+            );
+            scratch.put(flat);
+            scratch.put(sigma);
         }
     }
 }

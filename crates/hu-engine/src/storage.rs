@@ -98,6 +98,13 @@ pub trait Storage: StorageOps + Send + Sync {
     /// or its vector lengths don't match this backend's.
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch>;
 
+    /// Borrow the raw arenas without allocating a snapshot.
+    fn arrays(&self) -> StorageArrays<'_>;
+
+    /// Borrow raw arenas for streaming restoration. Callers must discard the
+    /// backend if an I/O or integrity check fails after writing any elements.
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_>;
+
     /// Scales every accumulated regret by `regret` and every accumulated
     /// strategy-sum by `strategy` (batched early discounting, applied
     /// between iterations — never during a pass, so unlike [`StorageOps`]
@@ -124,6 +131,80 @@ pub enum StorageState {
         regret_scales: Vec<f32>,
         strategy_scales: Vec<f32>,
     },
+}
+
+/// Raw checkpoint arenas in stable order: regrets, strategy sum, then scales.
+pub enum StorageArrays<'a> {
+    F32 {
+        regrets: &'a [f32],
+        strategy_sum: &'a [f32],
+    },
+    I16 {
+        regrets: &'a [i16],
+        strategy_sum: &'a [i16],
+        regret_scales: &'a [f32],
+        strategy_scales: &'a [f32],
+    },
+}
+
+pub enum StorageArraysMut<'a> {
+    F32 {
+        regrets: &'a mut [f32],
+        strategy_sum: &'a mut [f32],
+    },
+    I16 {
+        regrets: &'a mut [i16],
+        strategy_sum: &'a mut [i16],
+        regret_scales: &'a mut [f32],
+        strategy_scales: &'a mut [f32],
+    },
+}
+
+impl StorageState {
+    pub fn arrays(&self) -> StorageArrays<'_> {
+        match self {
+            Self::F32 {
+                regrets,
+                strategy_sum,
+            } => StorageArrays::F32 {
+                regrets,
+                strategy_sum,
+            },
+            Self::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => StorageArrays::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            },
+        }
+    }
+    pub fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        match self {
+            Self::F32 {
+                regrets,
+                strategy_sum,
+            } => StorageArraysMut::F32 {
+                regrets,
+                strategy_sum,
+            },
+            Self::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => StorageArraysMut::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            },
+        }
+    }
 }
 
 /// Error returned by [`Storage::restore_state`] when the supplied
@@ -303,6 +384,19 @@ impl StorageOps for F32Storage {
 
 impl Storage for F32Storage {
     type View<'a> = F32View<'a>;
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        StorageArrays::F32 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        StorageArraysMut::F32 {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+        }
+    }
 
     fn new(len: usize, _num_refs: usize) -> Self {
         F32Storage {
@@ -685,6 +779,23 @@ impl StorageOps for I16Storage {
 
 impl Storage for I16Storage {
     type View<'a> = I16View<'a>;
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        StorageArrays::I16 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+            regret_scales: &self.regret_scales,
+            strategy_scales: &self.strategy_scales,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        StorageArraysMut::I16 {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+            strategy_scales: &mut self.strategy_scales,
+        }
+    }
 
     fn new(len: usize, num_refs: usize) -> Self {
         I16Storage {

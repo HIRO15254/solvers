@@ -114,6 +114,7 @@ fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) 
 /// is the right shape for a viewer but quadratic when every node needs an
 /// answer. Only the current path's reaches are alive at a time, so this
 /// stays linear in memory as well as in work.
+#[cfg(test)]
 fn walk_reaches<F>(
     tree: &hu_engine::PublicTree,
     node_id: NodeId,
@@ -166,9 +167,8 @@ fn walk_reaches<F>(
 /// when that actually overrides the caller's requested mode.
 ///
 /// `summary` supplies the iteration count and exploitability from the just-
-/// finished run; `solver` is queried directly (rather than trusting anything
-/// cached in `summary`) for both players' expected value, since a raked
-/// (general-sum) game's `ev[1]` is never just `-ev[0]`.
+/// finished run. Both root EVs come from that same evaluation boundary;
+/// action-node values are produced by the streaming two-seat profile pass.
 pub(crate) fn export_sol<S: Storage>(
     spec: &SolExportSpec,
     solver: &Solver<PostflopEvaluator, S>,
@@ -189,87 +189,58 @@ pub(crate) fn export_sol<S: Storage>(
         spec.mode
     };
 
-    // One value pass per player records every action node's per-hand
-    // values, so storing them costs two walks of the tree rather than one
-    // walk per node.
-    let recorded = PerPlayer::new(
-        solver.expected_values_everywhere(Player::P0),
-        solver.expected_values_everywhere(Player::P1),
-    );
-
-    // Reaches for every node in one walk, so a node's counterfactual values
-    // can be turned into per-hand chips where they are produced.
-    let mut reaches: Vec<Option<PerPlayer<Vec<f32>>>> = vec![None; tree.nodes.len()];
-    {
-        let strategy = |id: NodeId| solver.average_strategy_at(id);
-        let roots = &solver.game().root_ranges;
-        let root_reach = PerPlayer::new(roots[Player::P0].clone(), roots[Player::P1].clone());
-        walk_reaches(tree, 0, &root_reach, &strategy, &mut |id, reach| {
-            reaches[id as usize] = Some(reach.clone());
-        });
-    }
-
-    let mut blocks = Vec::new();
-    let mut values = Vec::new();
-    for id in 0..tree.nodes.len() as NodeId {
-        let node = tree.node(id);
-        if node.kind != NodeKind::Action {
-            continue;
-        }
+    // Only packed blocks survive the callback; reaches/values are path-local.
+    let slots: Vec<_> = (0..tree.storage_refs.len())
+        .map(|_| std::sync::Mutex::new(None))
+        .collect();
+    solver.visit_expected_values(|id, reach, per_hand, avg| {
         if mode == SolStreets::NoRivers && streets[id as usize] == Street::River {
-            continue;
+            return;
         }
-        let avg = solver.average_strategy_at(id);
-        blocks.push(StrategyBlock {
-            sref: node.aux,
-            probs: quantize_probs(&avg),
-        });
-        let reach = reaches[id as usize]
-            .as_ref()
-            .expect("every action node is visited by the reach walk");
-        let mut per_node = Vec::new();
+        let node = tree.node(id);
+        let mut per_node =
+            Vec::with_capacity(per_hand[Player::P0].len() + per_hand[Player::P1].len());
         for player in Player::BOTH {
-            // A counterfactual value is opponent-reach-weighted, so it has
-            // to be divided by the reach that could be facing this hand
-            // before a utility-valued offset can be added to it. Skipping that would
-            // be a unit error, not a scaling one.
             let compatible = compatible_reach(
                 &solver.game().evaluator.hands,
                 player,
-                &reach[player.opponent()],
+                reach[player.opponent()],
             );
-            // Every node uses the original subgame's utility baseline.
-            // Adding this node's contributions would erase sunk wagers;
-            // adding chips at all would mix units for ICM.
             let offset = ev_offset[player] as f32;
-            let per_hand = recorded[player][node.aux as usize]
-                .as_ref()
-                .expect("every action node is recorded by the value pass");
-            let own = &reach[player];
-            per_node.extend(per_hand.iter().zip(&compatible).zip(own).map(
-                |((value, &facing), &here)| {
-                    // A hand that cannot be held here has no EV to
-                    // report, and neither does one no opponent hand can
-                    // face. Zeroing both is not just tidy: a
-                    // counterfactual value is defined for every hand
-                    // whether or not it can arrive, so storing them all
-                    // would make these blocks dense where the strategy
-                    // blocks are sparse, which is most of what the
-                    // artifact's size is.
-                    if here > 0.0 && facing > 0.0 {
-                        value / facing + offset
-                    } else {
-                        0.0
-                    }
-                },
-            ));
+            per_node.extend(
+                per_hand[player]
+                    .iter()
+                    .zip(&compatible)
+                    .zip(reach[player])
+                    .map(|((&value, &facing), &here)| {
+                        if here > 0.0 && facing > 0.0 {
+                            value / facing + offset
+                        } else {
+                            0.0
+                        }
+                    }),
+            );
         }
         let (scale, bytes) = quantize_values(&per_node);
-        values.push(ValueBlock {
-            sref: node.aux,
-            scale,
-            values: bytes,
-        });
+        *slots[node.aux as usize].lock().expect("artifact slot") = Some((
+            StrategyBlock {
+                sref: node.aux,
+                probs: quantize_probs(avg),
+            },
+            ValueBlock {
+                sref: node.aux,
+                scale,
+                values: bytes,
+            },
+        ));
+    });
+    let mut blocks = Vec::with_capacity(tree.storage_refs.len());
+    let mut values = Vec::with_capacity(tree.storage_refs.len());
+    for slot in slots {
+        if let Some((strategy, value)) = slot.into_inner().expect("artifact slot") {
+            blocks.push(strategy);
+            values.push(value);
+        }
     }
     // Ascending by construction (node ids walked in order and `aux` assigned
     // in build order), but sorted explicitly to make that guarantee robust

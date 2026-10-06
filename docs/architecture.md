@@ -205,6 +205,9 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 | `.mwsol` | `mw_preflop::mwsol`、`session`、`views` | 正式平均profileとidentity、保存coverage、評価data |
 | run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
+P1 checkpoint v4はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。
+`.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
+codecはpacked blockのpostcard直列化も一時payload Vecなしで行う。
 checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
 CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。
 artifact形式と公開操作の意味は製品規範と[CLI reference](cli-reference.jp.md)を参照する。

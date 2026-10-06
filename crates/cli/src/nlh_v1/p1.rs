@@ -64,6 +64,7 @@ pub fn validate(
         value["resources"] = json!({
             "nodes": p.estimate.nodes, "terminals": p.estimate.terminals,
             "f32Bytes": p.estimate.f32_bytes, "i16Bytes": p.estimate.i16_bytes,
+            "saveWorkspaceBytes": p.estimate.save_bytes, "compressionWorkspaceBytes": p.estimate.compression_bytes,
             "memoryEstimateBytes": required_bytes(&p), "memoryLimitBytes": p.limit,
             "withinLimit": required_bytes(&p) <= p.limit,
         });
@@ -313,7 +314,7 @@ pub fn resume(
 fn execute(
     p: hu_postflop::prepare::Prepared,
     directory: &Path,
-    state: Option<hu_postflop::SolverState>,
+    state: Option<hu_postflop::checkpoint::CheckpointReader>,
     elapsed: Duration,
     resumed: bool,
 ) -> Result<()> {

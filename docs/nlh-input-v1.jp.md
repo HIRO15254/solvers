@@ -635,9 +635,9 @@ checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
 ```
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
-- `memory`: P1はsolve開始前に見積もる木とstorageの上限で、`auto`は物理メモリの80%。見積りが上限を
+- `memory`: P1はsolve開始前に見積もるstorageと保存作業領域（full出力のpacked block・索引・圧縮予算）の上限で、`auto`は物理メモリの80%。見積りが上限を
   超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
-  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。
+  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1の木・rank table・構築一時領域・thread scratch等は別途必要である。
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。
