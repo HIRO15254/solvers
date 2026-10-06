@@ -1,0 +1,604 @@
+{
+  "format": "p2-l0-real-check",
+  "game_fingerprint": "af79fe863f02279ea6448569e3ca2386247852e54c4e38fe2462fc3d3ac1dd88",
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l0": {
+    "nash_conv": 0.9978292234919306,
+    "seats": [
+      {
+        "best_response": 0.5589697294180384,
+        "defaulted_mass": 0.0,
+        "gain": 0.5589697294180384,
+        "name": "seat 0",
+        "reach_by_active_count": [
+          0.0,
+          0.7499999999999978,
+          0.24999999999999956
+        ],
+        "seat": 0,
+        "telescoping_residual": -2.220446049250313e-16,
+        "top_infosets": [
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "AKo",
+            "local_gain": 0.011457046058236206,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "AQo",
+            "local_gain": 0.011055130938000828,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "AJo",
+            "local_gain": 0.010662107652425522,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "ATo",
+            "local_gain": 0.010281291691186831,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "AA",
+            "local_gain": 0.01022708445748892,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "KQo",
+            "local_gain": 0.009708506808919597,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "KK",
+            "local_gain": 0.009591782757191379,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "A9o",
+            "local_gain": 0.009399459904069707,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "KJo",
+            "local_gain": 0.009307097358349309,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "QQ",
+            "local_gain": 0.009032842547756378,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "A8o",
+            "local_gain": 0.008992128999377976,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "KTo",
+            "local_gain": 0.00893163580917683,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "A7o",
+            "local_gain": 0.008525427792718426,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "JJ",
+            "local_gain": 0.008477256312477362,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "QJo",
+            "local_gain": 0.00820574193550119,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "K9o",
+            "local_gain": 0.008059694414629542,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "A5o",
+            "local_gain": 0.008007481611034959,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "A6o",
+            "local_gain": 0.008001109636111465,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "TT",
+            "local_gain": 0.007921217183474352,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "raise-to:10000:all-in",
+            "class": "QTo",
+            "local_gain": 0.007823883528082875,
+            "path": [],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          }
+        ],
+        "value": 1.931699892952013e-17,
+        "value_by_active_count": [
+          0.0,
+          -9.86623976961809e-17,
+          4.705437428587089e-17
+        ]
+      },
+      {
+        "best_response": 0.43885949407389224,
+        "defaulted_mass": 0.0,
+        "gain": 0.43885949407389224,
+        "name": "seat 1",
+        "reach_by_active_count": [
+          0.0,
+          0.7499999999999978,
+          0.24999999999999956
+        ],
+        "seat": 1,
+        "telescoping_residual": 1.1102230246251565e-16,
+        "top_infosets": [
+          {
+            "best_action": "call:9000:all-in",
+            "class": "AKo",
+            "local_gain": 0.00919460261932218,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "AA",
+            "local_gain": 0.009095862738031906,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "AQo",
+            "local_gain": 0.008792687499086802,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "KK",
+            "local_gain": 0.008460561037734366,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "AJo",
+            "local_gain": 0.008399664213511494,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "ATo",
+            "local_gain": 0.008018848252272805,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "QQ",
+            "local_gain": 0.007901620828299363,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "KQo",
+            "local_gain": 0.00744606337000557,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "JJ",
+            "local_gain": 0.007346034593020348,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "A9o",
+            "local_gain": 0.00713701646515568,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "KJo",
+            "local_gain": 0.007044653919435281,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "TT",
+            "local_gain": 0.0067899954640173385,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "A8o",
+            "local_gain": 0.006729685560463949,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "KTo",
+            "local_gain": 0.006669192370262803,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "A7o",
+            "local_gain": 0.006262984353804399,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "99",
+            "local_gain": 0.0061215502138356,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "QJo",
+            "local_gain": 0.0059432984965871625,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "K9o",
+            "local_gain": 0.005797250975715514,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "fold",
+            "class": "32o",
+            "local_gain": 0.005745145643912739,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          },
+          {
+            "best_action": "call:9000:all-in",
+            "class": "A5o",
+            "local_gain": 0.005745038172120932,
+            "path": [
+              "raise-to:10000:all-in"
+            ],
+            "profile_row": [
+              0.5,
+              0.5
+            ]
+          }
+        ],
+        "value": 1.483769482992126e-17,
+        "value_by_active_count": [
+          0.0,
+          9.86623976961809e-17,
+          4.705437428587089e-17
+        ]
+      }
+    ]
+  },
+  "profile": {
+    "kind": "uniform",
+    "path": null
+  },
+  "real": {
+    "deals": 16777216,
+    "l0_best_response_gain_sum": {
+      "mean": 0.9970550835132608,
+      "stderr": 0.0007403350145543158
+    },
+    "mean_deal_attempts": 1.0,
+    "seats": [
+      {
+        "l0_best_response_gain": {
+          "mean": 0.5586307048797621,
+          "stderr": 0.00059466992291573
+        },
+        "l0_best_response_value": {
+          "mean": 0.5579810142517101,
+          "stderr": 0.001090930753428896
+        },
+        "name": "seat 0",
+        "seat": 0,
+        "value": {
+          "mean": -0.0006496906280517515,
+          "stderr": 0.0005978047956623974
+        },
+        "value_by_active_count": [
+          {
+            "mean": 0.0,
+            "stderr": 0.0
+          },
+          {
+            "mean": 0.0,
+            "stderr": 0.0
+          },
+          {
+            "mean": -0.0006496906280517515,
+            "stderr": 0.0005978047956623974
+          }
+        ]
+      },
+      {
+        "l0_best_response_gain": {
+          "mean": 0.4384243786335001,
+          "stderr": 0.0005913191087999225
+        },
+        "l0_best_response_value": {
+          "mean": 0.43907406926155057,
+          "stderr": 0.0009781012224361128
+        },
+        "name": "seat 1",
+        "seat": 1,
+        "value": {
+          "mean": 0.0006496906280517515,
+          "stderr": 0.0005978047956623974
+        },
+        "value_by_active_count": [
+          {
+            "mean": 0.0,
+            "stderr": 0.0
+          },
+          {
+            "mean": 0.0,
+            "stderr": 0.0
+          },
+          {
+            "mean": 0.0006496906280517515,
+            "stderr": 0.0005978047956623974
+          }
+        ]
+      }
+    ],
+    "seed": 2,
+    "value_sum": {
+      "mean": 0.0,
+      "stderr": 0.0
+    }
+  },
+  "source": "examples/bench/hu_pushfold_10bb.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      2,
+      1
+    ]
+  },
+  "timings": {
+    "l0": 0.0010701,
+    "profile": 4.4e-6,
+    "real": 1.1149095,
+    "tables": 0.2552092,
+    "tree": 0.0000372
+  },
+  "units": "bb",
+  "version": 1,
+  "warnings": []
+}

@@ -1,0 +1,8 @@
+20bb_cd: 1209s
+20bb_cd_s1: 1062s
+20bb_300k_s0: 227s
+20bb_300k_s1: 181s
+uniform: 4660s
+20bb_300k_s0_threads8: 252s
+20bb_300k_s0_dealseed1: 182s
+exit 0 total 7773s
