@@ -6,10 +6,12 @@
 
 mod eval;
 mod profile;
+mod real;
 mod tree;
 
 pub use eval::{Evaluation, EvaluationOptions, LocalGain, Model, SeatEvaluation, Tables, evaluate};
 pub use profile::{ClassProfileDocument, Profile, ProfileNode};
+pub use real::{Estimate, RealEvaluation, RealOptions, RealSeat, evaluate_real};
 pub use tree::{DecisionExport, Node, Terminal, Tree, TreeExport};
 
 /// Rebuild a legacy artifact's game without loading its production abstraction.

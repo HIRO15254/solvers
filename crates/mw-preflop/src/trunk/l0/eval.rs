@@ -198,6 +198,8 @@ pub struct SeatEvaluation {
     pub defaulted_mass: f64,
     /// Slot k contains reach with k active seats; slot zero is unused.
     pub reach_by_active_count: Vec<f64>,
+    /// Contribution to value from terminals with k active seats.
+    pub value_by_active_count: Vec<f64>,
     pub telescoping_residual: f64,
     pub top_infosets: Vec<LocalGain>,
 }
@@ -205,6 +207,9 @@ pub struct SeatEvaluation {
 #[derive(Debug, Serialize)]
 pub struct Evaluation {
     pub seats: Vec<SeatEvaluation>,
+    /// Pure class best responses, indexed by node * 169 + class for each seat.
+    #[serde(skip)]
+    pub best_response_actions: Vec<Vec<u8>>,
     pub nash_conv: f64,
     pub warnings: Vec<String>,
     pub timings: PhaseTimings,
@@ -575,6 +580,10 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
     let reach = reaches(tree, profile, model);
     let reach_seconds = start.elapsed().as_secs_f64();
     let n = tree.nodes.len();
+    ensure!(
+        tree.nodes.iter().all(|node| node.children.len() <= 254),
+        "L0 nodes may have at most 254 actions"
+    );
     let mut leaves = vec![vec![[0.0; 169]; n]; tree.seats];
     let start = Instant::now();
     let mut three = Vec::new();
@@ -704,11 +713,19 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
     let k4_seconds = start.elapsed().as_secs_f64();
     let start = Instant::now();
     let mut seats = Vec::new();
+    let mut best_response_actions = Vec::new();
     for (p, mut values) in leaves.into_iter().enumerate() {
+        let mut actions = vec![u8::MAX; n * 169];
+        for (z, node) in tree.nodes.iter().enumerate() {
+            if node.actor == Some(p) {
+                actions[z * 169..(z + 1) * 169].fill(0);
+            }
+        }
         let mut best = values.clone();
         let mut locals = Vec::new();
         let mut defaulted_mass = 0.0;
         let mut reach_by_active_count = vec![0.0; tree.seats + 1];
+        let mut value_by_active_count = vec![0.0; tree.seats + 1];
         let mut local_total = 0.0;
         for z in (0..n).rev() {
             let node = &tree.nodes[z];
@@ -723,6 +740,8 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
                         .product::<f64>();
                 if let Some(t) = &node.terminal {
                     reach_by_active_count[t.active.len()] += prob;
+                    value_by_active_count[t.active.len()] +=
+                        weight * reach[z].pi(p, c) * values[z][c];
                     continue;
                 }
                 if node.actor == Some(p) {
@@ -744,6 +763,7 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
                     }
                     values[z][c] = value;
                     best[z][c] = maximum;
+                    actions[z * 169 + c] = best_action as u8;
                     let local = weight * reach[z].pi(p, c) * (maximum - mixed);
                     local_total += local;
                     if local > 0.0 {
@@ -763,6 +783,10 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
                 / model.normalizers[p]
         };
         let value = aggregate(&values[0]);
+        ensure!(
+            (value_by_active_count.iter().sum::<f64>() - value).abs() <= 1e-9 * (1.0 + value.abs()),
+            "terminal values do not sum to value for seat {p}"
+        );
         let best_response = aggregate(&best[0]);
         let gain = best_response - value;
         let residual = local_total - gain;
@@ -806,13 +830,16 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
             gain: gain.max(0.0),
             defaulted_mass,
             reach_by_active_count,
+            value_by_active_count,
             telescoping_residual: residual,
             top_infosets,
         });
+        best_response_actions.push(actions);
     }
     Ok(Evaluation {
         nash_conv: seats.iter().map(|s| s.gain).sum(),
         seats,
+        best_response_actions,
         warnings: model.warnings.clone(),
         timings: PhaseTimings {
             reaches: reach_seconds,

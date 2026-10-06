@@ -271,6 +271,9 @@ fn factorization_matches_tuple_enumeration_side_pots_rake_and_orientation() {
                         assert!(a.gain >= 0.0);
                         close(a.telescoping_residual, 0.0);
                         close(a.reach_by_active_count.iter().sum(), 1.0);
+                        close(a.value_by_active_count.iter().sum(), a.value);
+                        assert_eq!(a.value_by_active_count.len(), players + 1);
+                        assert_eq!(a.value_by_active_count[0], 0.0);
                     }
                     if players == 2 && !rake {
                         close(actual.seats.iter().map(|s| s.value).sum(), 0.0);
@@ -312,10 +315,392 @@ fn sampled_four_way_br_and_thread_determinism() {
     let first = run(1);
     assert_eq!(first.seats, run(1).seats);
     assert_eq!(first.seats, run(4).seats);
+    assert_eq!(first.best_response_actions, run(4).best_response_actions);
     assert!(first.seats.iter().all(|s| s.best_response >= s.value));
     for s in first.seats {
         close(s.telescoping_residual, 0.0);
         close(s.reach_by_active_count.iter().sum(), 1.0);
+        close(s.value_by_active_count.iter().sum(), s.value);
+    }
+}
+
+#[test]
+fn exported_pure_best_responses_attain_l0_values() {
+    for players in [3, 4] {
+        let game = game(&config(players, true, false));
+        let tree = Tree::build(&game).unwrap();
+        let mut document = random_profile(&tree, 72).export(&tree);
+        // Include profile-unreachable nodes: their BR actions still matter.
+        document.nodes[0].probabilities.iter_mut().for_each(|row| {
+            row.fill(0.0);
+            row[0] = 1.0;
+        });
+        let profile = Profile::from_json(&tree, &document).unwrap();
+        let model = Model::new(
+            &game,
+            &Synthetic,
+            EvaluationOptions {
+                k4_samples: 64,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let original = evaluate(&tree, &profile, &model).unwrap();
+        for i in 0..players {
+            let pure = profile
+                .with_pure_rows(&tree, i, &original.best_response_actions[i])
+                .unwrap();
+            close(
+                evaluate(&tree, &pure, &model).unwrap().seats[i].value,
+                original.seats[i].best_response,
+            );
+            for (z, node) in tree.nodes.iter().enumerate() {
+                for c in 0..169 {
+                    let a = original.best_response_actions[i][z * 169 + c];
+                    if node.actor == Some(i) {
+                        assert!(!pure.is_defaulted(z, c));
+                        assert_eq!(pure.row(&tree, z, c)[usize::from(a)], 1.0);
+                        if model.weights()[i][c] == 0.0 {
+                            assert_eq!(a, 0);
+                        }
+                    } else {
+                        assert_eq!(a, u8::MAX);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Independent physical reference: recursively walk every public path, keep
+/// each seat's own profile/BR factors separately, and invoke card-based game
+/// settlement at every leaf. No prepared awards, arena pruning, rank reuse,
+/// joint-reach recurrence, or statistical accumulators from real.rs are used.
+fn real_deal_reference(
+    tree: &Tree,
+    profile: &Profile,
+    responses: &[Vec<u8>],
+    game: &HoldemGame<FeatureHashAbstraction>,
+    world: &crate::SampledWorld,
+) -> (Vec<f64>, Vec<Vec<f64>>, Vec<f64>) {
+    struct Reference<'a> {
+        tree: &'a Tree,
+        profile: &'a Profile,
+        responses: &'a [Vec<u8>],
+        game: &'a HoldemGame<FeatureHashAbstraction>,
+        world: &'a crate::SampledWorld,
+        values: Vec<f64>,
+        by_count: Vec<Vec<f64>>,
+        best: Vec<f64>,
+    }
+    impl Reference<'_> {
+        fn visit(&mut self, z: usize, pi: &[f64], beta: &[f64]) {
+            let node = &self.tree.nodes[z];
+            if let Some(t) = &node.terminal {
+                let payoff = self.game.real_reference_utilities(
+                    &self.game.settle_terminal(&t.state, self.world).unwrap(),
+                );
+                let reach: f64 = pi.iter().product();
+                for i in 0..self.tree.seats {
+                    let value = reach * payoff[i];
+                    self.values[i] += value;
+                    self.by_count[i][t.active.len()] += value;
+                    self.best[i] += beta[i]
+                        * pi.iter()
+                            .enumerate()
+                            .filter(|&(j, _)| j != i)
+                            .map(|(_, p)| p)
+                            .product::<f64>()
+                        * payoff[i];
+                }
+                return;
+            }
+            let actor = node.actor.unwrap();
+            let c = crate::trunk::classes::class(self.world.hole_combo(actor));
+            for (a, &child) in node.children.iter().enumerate() {
+                let mut pi = pi.to_vec();
+                let mut beta = beta.to_vec();
+                pi[actor] *= self.profile.row(self.tree, z, c)[a];
+                beta[actor] *= f64::from(a == usize::from(self.responses[actor][z * 169 + c]));
+                self.visit(child, &pi, &beta);
+            }
+        }
+    }
+    let mut reference = Reference {
+        tree,
+        profile,
+        responses,
+        game,
+        world,
+        values: vec![0.0; tree.seats],
+        by_count: vec![vec![0.0; tree.seats + 1]; tree.seats],
+        best: vec![0.0; tree.seats],
+    };
+    reference.visit(0, &vec![1.0; tree.seats], &vec![1.0; tree.seats]);
+    (reference.values, reference.by_count, reference.best)
+}
+
+fn random_responses(tree: &Tree, rng: &mut ChaCha8Rng) -> Vec<Vec<u8>> {
+    (0..tree.seats)
+        .map(|i| {
+            let mut actions = vec![u8::MAX; tree.nodes.len() * 169];
+            for (z, node) in tree
+                .nodes
+                .iter()
+                .enumerate()
+                .filter(|(_, n)| n.actor == Some(i))
+            {
+                for c in 0..169 {
+                    actions[z * 169 + c] = rng.gen_range(0..node.children.len()) as u8;
+                }
+            }
+            actions
+        })
+        .collect()
+}
+
+#[test]
+fn physical_deal_values_match_independent_recursive_settlement() {
+    let strict = |a: f64, b: f64| {
+        assert!((a - b).abs() <= 1e-12 * (1.0 + b.abs()), "{a} != {b}");
+    };
+    for players in [3, 4] {
+        let game = game(&config(players, players == 4, false));
+        let tree = Tree::build(&game).unwrap();
+        let profile = random_profile(&tree, 97);
+        let mut rng = ChaCha8Rng::seed_from_u64(104);
+        let responses = random_responses(&tree, &mut rng);
+        let sampler = game.deal_sampler().unwrap();
+        let prepared = super::real::Prepared::new(&tree, &game).unwrap();
+        let mut scratch = super::real::Scratch::new(&tree);
+        let mut doc = profile.export(&tree);
+        for node in &mut doc.nodes {
+            for row in &mut node.probabilities {
+                let a = rng.gen_range(0..row.len());
+                row.fill(0.0);
+                row[a] = 1.0;
+            }
+        }
+        let pure = Profile::from_json(&tree, &doc).unwrap();
+        for d in 0..200 {
+            let world = sampler.sample(&mut rng).unwrap();
+            // Dense random profile on all 200 worlds; also exercise zero-reach
+            // subtree pruning and off-profile BR paths on the first 20.
+            for profile in std::iter::once(&profile).chain((d < 20).then_some(&pure)) {
+                scratch.deal(&tree, profile, &responses, &prepared, &world);
+                let (v, k, b) = real_deal_reference(&tree, profile, &responses, &game, &world);
+                for i in 0..players {
+                    strict(scratch.values[i], v[i]);
+                    strict(scratch.best[i], b[i]);
+                    for (active, &expected) in k[i].iter().enumerate() {
+                        strict(scratch.by_count[i][active], expected);
+                    }
+                    strict(scratch.by_count[i].iter().sum(), scratch.values[i]);
+                }
+                if players == 3 {
+                    strict(scratch.values[..players].iter().sum(), 0.0);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn physical_deal_estimates_are_thread_independent_and_validate_inputs() {
+    let game = game(&config(4, true, false));
+    let tree = Tree::build(&game).unwrap();
+    let profile = random_profile(&tree, 75);
+    let responses = random_responses(&tree, &mut ChaCha8Rng::seed_from_u64(97));
+    let options = RealOptions {
+        deals: 20_000,
+        seed: 18,
+    };
+    let run = |threads| {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+            .install(|| evaluate_real(&tree, &profile, &responses, &game, options).unwrap())
+    };
+    let one = run(1);
+    assert_eq!(one, run(4));
+    assert_eq!(one.deals, options.deals);
+    assert_eq!(one.seed, options.seed);
+    assert!(one.mean_deal_attempts >= 1.0);
+    for s in &one.seats {
+        close(
+            s.value_by_active_count.iter().map(|v| v.mean).sum(),
+            s.value.mean,
+        );
+        close(
+            s.l0_best_response_value.mean - s.value.mean,
+            s.l0_best_response_gain.mean,
+        );
+        assert!(s.value.stderr > 0.0);
+        assert_eq!(
+            s.value_by_active_count[0],
+            Estimate {
+                mean: 0.0,
+                stderr: 0.0
+            }
+        );
+    }
+    assert!(
+        evaluate_real(
+            &tree,
+            &profile,
+            &responses,
+            &game,
+            RealOptions {
+                deals: 1,
+                ..options
+            }
+        )
+        .is_err()
+    );
+    assert!(evaluate_real(&tree, &profile, &responses[..3], &game, options).is_err());
+    let mut bad = responses.clone();
+    bad[0].pop();
+    assert!(evaluate_real(&tree, &profile, &bad, &game, options).is_err());
+    let actor = tree.nodes[0].actor.unwrap();
+    let mut bad = responses.clone();
+    bad[actor][0] = u8::MAX;
+    assert!(evaluate_real(&tree, &profile, &bad, &game, options).is_err());
+    assert!(profile.with_pure_rows(&tree, actor, &bad[actor]).is_err());
+    assert!(
+        profile
+            .with_pure_rows(&tree, tree.seats, &responses[0])
+            .is_err()
+    );
+    assert!(
+        profile
+            .with_pure_rows(&tree, 0, &responses[0][..169])
+            .is_err()
+    );
+}
+
+#[test]
+fn physical_estimates_match_direct_sample_statistics_and_seed_stream() {
+    let game = game(&config(4, true, false));
+    let tree = Tree::build(&game).unwrap();
+    let profile = random_profile(&tree, 39);
+    let responses = random_responses(&tree, &mut ChaCha8Rng::seed_from_u64(87));
+    let options = RealOptions {
+        deals: 23,
+        seed: 52,
+    };
+    let actual = evaluate_real(&tree, &profile, &responses, &game, options).unwrap();
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.p2.trunk.l0.real.v1");
+    hasher.update(&options.seed.to_le_bytes());
+    let sampler = game.deal_sampler().unwrap();
+    let mut samples = Vec::new();
+    let mut attempts = 0_u64;
+    for d in 0..options.deals {
+        let mut rng = ChaCha8Rng::from_seed(*hasher.finalize().as_bytes());
+        rng.set_stream(d);
+        let sample = sampler.sample_counted(&mut rng).unwrap();
+        attempts += u64::from(sample.attempts);
+        samples.push(real_deal_reference(
+            &tree,
+            &profile,
+            &responses,
+            &game,
+            &sample.world,
+        ));
+    }
+    let check = |estimate: &Estimate, values: Vec<f64>| {
+        let mean = values.iter().sum::<f64>() / options.deals as f64;
+        let stderr = (values.iter().map(|v| (v - mean).powi(2)).sum::<f64>()
+            / (options.deals - 1) as f64
+            / options.deals as f64)
+            .sqrt();
+        assert!((estimate.mean - mean).abs() <= 1e-12 * (1.0 + mean.abs()));
+        assert!((estimate.stderr - stderr).abs() <= 1e-12 * (1.0 + stderr));
+    };
+    for i in 0..tree.seats {
+        check(
+            &actual.seats[i].value,
+            samples.iter().map(|s| s.0[i]).collect(),
+        );
+        check(
+            &actual.seats[i].l0_best_response_value,
+            samples.iter().map(|s| s.2[i]).collect(),
+        );
+        check(
+            &actual.seats[i].l0_best_response_gain,
+            samples.iter().map(|s| s.2[i] - s.0[i]).collect(),
+        );
+        for k in 0..=tree.seats {
+            check(
+                &actual.seats[i].value_by_active_count[k],
+                samples.iter().map(|s| s.1[i][k]).collect(),
+            );
+        }
+    }
+    check(
+        &actual.value_sum,
+        samples.iter().map(|s| s.0.iter().sum()).collect(),
+    );
+    check(
+        &actual.l0_best_response_gain_sum,
+        samples
+            .iter()
+            .map(|s| (0..tree.seats).map(|i| s.2[i] - s.0[i]).sum())
+            .collect(),
+    );
+    assert_eq!(
+        actual.mean_deal_attempts,
+        attempts as f64 / options.deals as f64
+    );
+}
+
+#[test]
+#[ignore = "release acceptance: real HU tables and 2^20 physical deals"]
+fn real_matches_l0_in_heads_up() {
+    use crate::trunk::tables::HuShowdownTable;
+    struct HuOnly(HuShowdownTable);
+    impl Tables for HuOnly {
+        fn t2(&self, c: usize, d: usize) -> Result<[f64; 3]> {
+            self.0.t2(c, d)
+        }
+        fn p3(&self, _: usize, _: usize, _: usize) -> Result<[f64; 13]> {
+            anyhow::bail!("heads-up cannot reach three-way terminals")
+        }
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let path = root.join("examples/bench/hu_pushfold_10bb.toml");
+    let game = game_from_config(&std::fs::read_to_string(&path).unwrap(), &path).unwrap();
+    let tree = Tree::build(&game).unwrap();
+    let tables = HuOnly(HuShowdownTable::load_or_build(&root.join(".cache/p2-trunk")).unwrap());
+    let profile = random_profile(&tree, 101);
+    let model = Model::new(&game, &tables, EvaluationOptions::default()).unwrap();
+    let l0 = evaluate(&tree, &profile, &model).unwrap();
+    let real = evaluate_real(
+        &tree,
+        &profile,
+        &l0.best_response_actions,
+        &game,
+        RealOptions {
+            deals: 1 << 20,
+            seed: 31,
+        },
+    )
+    .unwrap();
+    for (l, r) in l0.seats.iter().zip(&real.seats) {
+        assert!((r.value.mean - l.value).abs() <= 5.0 * r.value.stderr);
+        assert!(
+            (r.l0_best_response_gain.mean - l.gain).abs() <= 5.0 * r.l0_best_response_gain.stderr
+        );
+        println!(
+            "seat {}: L0 value {}, real {:?}; L0 gain {}, real {:?}",
+            l.seat, l.value, r.value, l.gain, r.l0_best_response_gain
+        );
+        assert_eq!(r.value_by_active_count.len(), 3);
+        close(
+            r.value_by_active_count.iter().map(|v| v.mean).sum(),
+            r.value.mean,
+        );
     }
 }
 

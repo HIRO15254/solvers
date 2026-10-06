@@ -73,6 +73,35 @@ impl Profile {
         self.defaulted[node][class]
     }
 
+    /// Copy the profile, replacing all of one seat's rows with pure actions.
+    pub fn with_pure_rows(&self, tree: &Tree, seat: usize, actions: &[u8]) -> Result<Self> {
+        self.validate(tree)?;
+        ensure!(seat < tree.seats, "seat outside tree");
+        ensure!(
+            actions.len() == tree.nodes.len() * 169,
+            "BR action length mismatch"
+        );
+        let mut profile = self.clone();
+        for (z, node) in tree.nodes.iter().enumerate() {
+            if node.actor != Some(seat) {
+                continue;
+            }
+            for c in 0..169 {
+                let action = usize::from(actions[z * 169 + c]);
+                ensure!(
+                    action < node.children.len(),
+                    "invalid BR action at node {z}, class {c}"
+                );
+                let row =
+                    &mut profile.rows[z][c * node.children.len()..(c + 1) * node.children.len()];
+                row.fill(0.0);
+                row[action] = 1.0;
+                profile.defaulted[z][c] = false;
+            }
+        }
+        Ok(profile)
+    }
+
     pub(crate) fn validate(&self, tree: &Tree) -> Result<()> {
         ensure!(
             self.fingerprint == tree.game_fingerprint && self.rows.len() == tree.nodes.len(),

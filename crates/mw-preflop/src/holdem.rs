@@ -292,6 +292,23 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         Ok(self.utilities(&settlement)?.iter().copied().collect())
     }
 
+    /// Card-independent showdown structure for allocation-free physical deals.
+    pub(crate) fn l0_rated_pots(
+        &self,
+        state: &BettingState,
+    ) -> Result<crate::settlement::PotConstruction, SettlementError> {
+        build_rated_pots(state, self.rake)
+    }
+
+    #[cfg(test)]
+    pub(crate) fn real_reference_utilities(&self, settlement: &Settlement) -> Vec<f64> {
+        self.utilities(settlement)
+            .unwrap()
+            .iter()
+            .copied()
+            .collect()
+    }
+
     /// Abstraction bucket for one `street` (assumed already reached),
     /// factored out so full-recall's [`Self::bucket_path`] and
     /// street-recall's single-street lookup (in [`ExternalSamplingGame::bucket`])
