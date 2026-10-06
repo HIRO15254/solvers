@@ -12,6 +12,7 @@ use crate::{ExternalSamplingGame, FeatureHashAbstraction, HoldemGame, SampledWor
 
 const MAX_SEATS: usize = 9;
 const CHUNK_DEALS: u64 = 4096;
+const FIT_LANES: usize = 16;
 
 #[derive(Debug, Clone, Copy)]
 pub struct RealOptions {
@@ -26,21 +27,26 @@ pub struct Estimate {
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct ResponseEstimate {
+    pub value: Estimate,
+    pub gain: Estimate,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct RealSeat {
     pub seat: usize,
     pub name: String,
     pub value: Estimate,
     pub value_by_active_count: Vec<Estimate>,
-    pub l0_best_response_value: Estimate,
-    pub l0_best_response_gain: Estimate,
+    pub responses: Vec<ResponseEstimate>,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct RealEvaluation {
     pub seats: Vec<RealSeat>,
     pub value_sum: Estimate,
-    /// Per-deal sum over seats of the L0 best responses' gains.
-    pub l0_best_response_gain_sum: Estimate,
+    /// Per-set, per-deal sum over seats of unilateral response gains.
+    pub response_gain_sums: Vec<Estimate>,
     pub deals: u64,
     pub seed: u64,
     pub mean_deal_attempts: f64,
@@ -124,37 +130,15 @@ impl Prepared {
     }
 }
 
-pub(super) struct Scratch {
-    reach: Vec<[f64; MAX_SEATS + 1]>,
-    pub(super) values: [f64; MAX_SEATS],
-    pub(super) by_count: [[f64; MAX_SEATS + 1]; MAX_SEATS],
-    pub(super) best: [f64; MAX_SEATS],
+/// Cards and ranks shared by evaluation and fitting, without heap allocation.
+struct Deal {
+    classes: [usize; MAX_SEATS],
+    ranks: [u16; MAX_SEATS],
+    winners: [usize; 1 << MAX_SEATS],
 }
 
-impl Scratch {
-    pub(super) fn new(tree: &Tree) -> Self {
-        Self {
-            reach: vec![[0.0; MAX_SEATS + 1]; tree.nodes.len()],
-            values: [0.0; MAX_SEATS],
-            by_count: [[0.0; MAX_SEATS + 1]; MAX_SEATS],
-            best: [0.0; MAX_SEATS],
-        }
-    }
-
-    /// All reaches are joint path probabilities: slot zero is the profile,
-    /// slot i+1 replaces just seat i's factors with its pure response.
-    pub(super) fn deal(
-        &mut self,
-        tree: &Tree,
-        profile: &Profile,
-        responses: &[Vec<u8>],
-        prepared: &Prepared,
-        world: &SampledWorld,
-    ) {
-        self.values.fill(0.0);
-        self.by_count.fill([0.0; MAX_SEATS + 1]);
-        self.best.fill(0.0);
-        self.reach[0].fill(1.0);
+impl Deal {
+    fn new(tree: &Tree, world: &SampledWorld) -> Self {
         let mut classes = [0; MAX_SEATS];
         let mut ranks = [0; MAX_SEATS];
         for i in 0..tree.seats {
@@ -177,10 +161,101 @@ impl Scratch {
                 std::cmp::Ordering::Less => winners[rest],
             };
         }
+        Self {
+            classes,
+            ranks,
+            winners,
+        }
+    }
+
+    fn payoff<'a>(
+        &self,
+        tree: &'a Tree,
+        prepared: &Prepared,
+        z: usize,
+        utility: &'a mut [f64; MAX_SEATS],
+    ) -> &'a [f64] {
+        let t = tree.nodes[z].terminal.as_ref().unwrap();
+        let ranks = &self.ranks;
+        let winners = &self.winners;
+        let k = t.active.len();
+        match k {
+            1 => &t.payoffs[0],
+            2 => {
+                let slot = match ranks[t.active[0]].cmp(&ranks[t.active[1]]) {
+                    std::cmp::Ordering::Greater => 0,
+                    std::cmp::Ordering::Equal => 1,
+                    std::cmp::Ordering::Less => 2,
+                };
+                &t.payoffs[slot]
+            }
+            3 => {
+                &t.payoffs[Ordering3::from_ranks(
+                    ranks[t.active[0]],
+                    ranks[t.active[1]],
+                    ranks[t.active[2]],
+                )
+                .index()]
+            }
+            _ => {
+                let showdown = prepared.showdowns[z].as_ref().unwrap();
+                let mut chips = showdown.floor;
+                for pot in &showdown.pots {
+                    let awards = &pot.shares[winners[pot.eligible]];
+                    for i in 0..tree.seats {
+                        chips[i] += awards[i];
+                    }
+                }
+                for i in 0..tree.seats {
+                    utility[i] = (chips[i] as f64 - showdown.starting[i] as f64)
+                        / crate::types::CHIPS_PER_BB as f64;
+                }
+                &utility[..tree.seats]
+            }
+        }
+    }
+}
+
+pub(super) struct Scratch {
+    reach: Vec<f64>,
+    slots: usize,
+    pub(super) values: [f64; MAX_SEATS],
+    pub(super) by_count: [[f64; MAX_SEATS + 1]; MAX_SEATS],
+    pub(super) best: Vec<[f64; MAX_SEATS]>,
+}
+
+impl Scratch {
+    pub(super) fn new(tree: &Tree, sets: usize) -> Self {
+        let slots = 1 + tree.seats * sets;
+        Self {
+            reach: vec![0.0; slots * tree.nodes.len()],
+            slots,
+            values: [0.0; MAX_SEATS],
+            by_count: [[0.0; MAX_SEATS + 1]; MAX_SEATS],
+            best: vec![[0.0; MAX_SEATS]; sets],
+        }
+    }
+
+    /// All reaches are joint path probabilities: slot zero is the profile,
+    /// slot 1+s*seats+i replaces just seat i's factors with response set s.
+    pub(super) fn deal(
+        &mut self,
+        tree: &Tree,
+        profile: &Profile,
+        responses: &[Vec<Vec<u8>>],
+        prepared: &Prepared,
+        world: &SampledWorld,
+    ) {
+        self.values.fill(0.0);
+        self.by_count.fill([0.0; MAX_SEATS + 1]);
+        self.best.fill([0.0; MAX_SEATS]);
+        self.reach[..self.slots].fill(1.0);
+        let deal = Deal::new(tree, world);
+        let classes = &deal.classes;
         let mut z = 0;
         while z < tree.nodes.len() {
-            let reach = self.reach[z];
-            if reach[..=tree.seats].iter().all(|&p| p == 0.0) {
+            let reach = &self.reach[z * self.slots..(z + 1) * self.slots];
+            if reach.iter().all(|&p| p == 0.0) {
                 z = prepared.ends[z];
                 continue;
             }
@@ -188,62 +263,37 @@ impl Scratch {
             if let Some(t) = &node.terminal {
                 let k = t.active.len();
                 let mut utility = [0.0; MAX_SEATS];
-                let payoff = match k {
-                    1 => &t.payoffs[0],
-                    2 => {
-                        let slot = match ranks[t.active[0]].cmp(&ranks[t.active[1]]) {
-                            std::cmp::Ordering::Greater => 0,
-                            std::cmp::Ordering::Equal => 1,
-                            std::cmp::Ordering::Less => 2,
-                        };
-                        &t.payoffs[slot]
-                    }
-                    3 => {
-                        &t.payoffs[Ordering3::from_ranks(
-                            ranks[t.active[0]],
-                            ranks[t.active[1]],
-                            ranks[t.active[2]],
-                        )
-                        .index()]
-                    }
-                    _ => {
-                        let showdown = prepared.showdowns[z].as_ref().unwrap();
-                        let mut chips = showdown.floor;
-                        for pot in &showdown.pots {
-                            let awards = &pot.shares[winners[pot.eligible]];
-                            for i in 0..tree.seats {
-                                chips[i] += awards[i];
-                            }
-                        }
-                        for i in 0..tree.seats {
-                            utility[i] = (chips[i] as f64 - showdown.starting[i] as f64)
-                                / crate::types::CHIPS_PER_BB as f64;
-                        }
-                        &utility[..tree.seats]
-                    }
-                };
+                let payoff = deal.payoff(tree, prepared, z, &mut utility);
                 for i in 0..tree.seats {
                     let value = reach[0] * payoff[i];
                     self.values[i] += value;
                     self.by_count[i][k] += value;
-                    self.best[i] += reach[i + 1] * payoff[i];
+                    for (s, best) in self.best.iter_mut().enumerate() {
+                        best[i] += reach[1 + s * tree.seats + i] * payoff[i];
+                    }
                 }
             } else {
                 let actor = node.actor.unwrap();
                 let c = classes[actor];
                 let row = profile.row(tree, z, c);
-                let action = usize::from(responses[actor][z * 169 + c]);
+                // Copy the parent slots to stack storage before writing children.
+                let mut parent = [0.0; 1 + MAX_SEATS * 4];
+                parent[..self.slots].copy_from_slice(reach);
                 for (a, &child) in node.children.iter().enumerate() {
-                    let mut next = [0.0; MAX_SEATS + 1];
-                    for i in 0..=tree.seats {
-                        next[i] = reach[i]
-                            * if i == actor + 1 {
-                                f64::from(a == action)
-                            } else {
-                                row[a]
-                            };
+                    let next = &mut self.reach[child * self.slots..(child + 1) * self.slots];
+                    next[0] = parent[0] * row[a];
+                    for (s, responses) in responses.iter().enumerate() {
+                        let action = usize::from(responses[actor][z * 169 + c]);
+                        for i in 0..tree.seats {
+                            let slot = 1 + s * tree.seats + i;
+                            next[slot] = parent[slot]
+                                * if i == actor {
+                                    f64::from(a == action)
+                                } else {
+                                    row[a]
+                                };
+                        }
                     }
-                    self.reach[child] = next;
                 }
             }
             z += 1;
@@ -284,23 +334,23 @@ struct Accumulator {
     attempts: u64,
     values: [Moments; MAX_SEATS],
     by_count: [[Moments; MAX_SEATS + 1]; MAX_SEATS],
-    best: [Moments; MAX_SEATS],
-    gains: [Moments; MAX_SEATS],
+    best: Vec<[Moments; MAX_SEATS]>,
+    gains: Vec<[Moments; MAX_SEATS]>,
     sum: Moments,
-    gain_sum: Moments,
+    gain_sums: Vec<Moments>,
 }
 
 impl Accumulator {
-    fn new() -> Self {
+    fn new(sets: usize) -> Self {
         Self {
             n: 0,
             attempts: 0,
             values: [Moments::default(); MAX_SEATS],
             by_count: [[Moments::default(); MAX_SEATS + 1]; MAX_SEATS],
-            best: [Moments::default(); MAX_SEATS],
-            gains: [Moments::default(); MAX_SEATS],
+            best: vec![[Moments::default(); MAX_SEATS]; sets],
+            gains: vec![[Moments::default(); MAX_SEATS]; sets],
             sum: Moments::default(),
-            gain_sum: Moments::default(),
+            gain_sums: vec![Moments::default(); sets],
         }
     }
 
@@ -309,32 +359,40 @@ impl Accumulator {
         self.attempts += u64::from(attempts);
         for i in 0..seats {
             self.values[i].add(scratch.values[i], self.n);
-            self.best[i].add(scratch.best[i], self.n);
-            self.gains[i].add(scratch.best[i] - scratch.values[i], self.n);
+            for s in 0..self.best.len() {
+                self.best[s][i].add(scratch.best[s][i], self.n);
+                self.gains[s][i].add(scratch.best[s][i] - scratch.values[i], self.n);
+            }
             for k in 1..=seats {
                 self.by_count[i][k].add(scratch.by_count[i][k], self.n);
             }
         }
         self.sum.add(scratch.values[..seats].iter().sum(), self.n);
-        self.gain_sum.add(
-            (0..seats)
-                .map(|i| scratch.best[i] - scratch.values[i])
-                .sum(),
-            self.n,
-        );
+        for s in 0..self.best.len() {
+            self.gain_sums[s].add(
+                (0..seats)
+                    .map(|i| scratch.best[s][i] - scratch.values[i])
+                    .sum(),
+                self.n,
+            );
+        }
     }
 
     fn merge(&mut self, other: Self, seats: usize) {
         for i in 0..seats {
             self.values[i].merge(other.values[i], self.n, other.n);
-            self.best[i].merge(other.best[i], self.n, other.n);
-            self.gains[i].merge(other.gains[i], self.n, other.n);
+            for s in 0..self.best.len() {
+                self.best[s][i].merge(other.best[s][i], self.n, other.n);
+                self.gains[s][i].merge(other.gains[s][i], self.n, other.n);
+            }
             for k in 1..=seats {
                 self.by_count[i][k].merge(other.by_count[i][k], self.n, other.n);
             }
         }
         self.sum.merge(other.sum, self.n, other.n);
-        self.gain_sum.merge(other.gain_sum, self.n, other.n);
+        for s in 0..self.best.len() {
+            self.gain_sums[s].merge(other.gain_sums[s], self.n, other.n);
+        }
         self.n += other.n;
         self.attempts += other.attempts;
     }
@@ -346,73 +404,67 @@ impl Accumulator {
 pub fn evaluate_real(
     tree: &Tree,
     profile: &Profile,
-    best_responses: &[Vec<u8>],
+    responses: &[Vec<Vec<u8>>],
     game: &HoldemGame<FeatureHashAbstraction>,
     options: RealOptions,
 ) -> Result<RealEvaluation> {
-    profile.validate(tree)?;
-    game.require_l0_chip_ev()?;
+    validate(tree, profile, game, options)?;
     ensure!(
-        tree.game_fingerprint == game.game_fingerprint(),
-        "game/tree mismatch"
+        responses.len() <= 4,
+        "at most four response sets are supported"
     );
-    ensure!(
-        options.deals >= 2,
-        "real evaluation needs at least two deals"
-    );
-    ensure!(
-        best_responses.len() == tree.seats,
-        "expected one BR vector per seat"
-    );
-    for (i, response) in best_responses.iter().enumerate() {
+    for best_responses in responses {
         ensure!(
-            response.len() == tree.nodes.len() * 169,
-            "BR action length mismatch for seat {i}"
+            best_responses.len() == tree.seats,
+            "expected one BR vector per seat"
         );
-        for (z, node) in tree
-            .nodes
-            .iter()
-            .enumerate()
-            .filter(|(_, n)| n.actor == Some(i))
-        {
+        for (i, response) in best_responses.iter().enumerate() {
             ensure!(
-                node.children.len() <= 254,
-                "L0 nodes may have at most 254 actions"
+                response.len() == tree.nodes.len() * 169,
+                "BR action length mismatch for seat {i}"
             );
-            ensure!(
-                response[z * 169..(z + 1) * 169]
-                    .iter()
-                    .all(|&a| usize::from(a) < node.children.len()),
-                "invalid BR action at node {z}"
-            );
+            for (z, node) in tree
+                .nodes
+                .iter()
+                .enumerate()
+                .filter(|(_, n)| n.actor == Some(i))
+            {
+                ensure!(
+                    node.children.len() <= 254,
+                    "L0 nodes may have at most 254 actions"
+                );
+                ensure!(
+                    response[z * 169..(z + 1) * 169]
+                        .iter()
+                        .all(|&a| usize::from(a) < node.children.len()),
+                    "invalid BR action at node {z}"
+                );
+            }
         }
     }
     let sampler = game.deal_sampler()?;
     let prepared = Prepared::new(tree, game)?;
-    let mut hasher = blake3::Hasher::new();
-    hasher.update(b"solvers.p2.trunk.l0.real.v1");
-    hasher.update(&options.seed.to_le_bytes());
-    let key = *hasher.finalize().as_bytes();
+    let key = deal_key(options.seed);
     let chunks = options.deals.div_ceil(CHUNK_DEALS);
     let results: Vec<_> = (0..chunks)
         .into_par_iter()
         .map_init(
-            || Scratch::new(tree),
+            || Scratch::new(tree, responses.len()),
             |scratch, chunk| -> Result<Accumulator> {
-                let mut result = Accumulator::new();
+                let mut result = Accumulator::new(responses.len());
                 let start = chunk * CHUNK_DEALS;
                 for d in start..start + CHUNK_DEALS.min(options.deals - start) {
                     let mut rng = ChaCha8Rng::from_seed(key);
                     rng.set_stream(d);
                     let sample = sampler.sample_counted(&mut rng)?;
-                    scratch.deal(tree, profile, best_responses, &prepared, &sample.world);
+                    scratch.deal(tree, profile, responses, &prepared, &sample.world);
                     result.add(scratch, tree.seats, sample.attempts);
                 }
                 Ok(result)
             },
         )
         .collect::<Result<_>>()?;
-    let mut total = Accumulator::new();
+    let mut total = Accumulator::new(responses.len());
     for result in results {
         total.merge(result, tree.seats);
     }
@@ -428,16 +480,257 @@ pub fn evaluate_real(
                 .iter()
                 .map(|m| m.estimate(total.n))
                 .collect(),
-            l0_best_response_value: total.best[i].estimate(total.n),
-            l0_best_response_gain: total.gains[i].estimate(total.n),
+            responses: (0..responses.len())
+                .map(|s| ResponseEstimate {
+                    value: total.best[s][i].estimate(total.n),
+                    gain: total.gains[s][i].estimate(total.n),
+                })
+                .collect(),
         })
         .collect();
     Ok(RealEvaluation {
         seats,
         value_sum: total.sum.estimate(total.n),
-        l0_best_response_gain_sum: total.gain_sum.estimate(total.n),
+        response_gain_sums: total
+            .gain_sums
+            .iter()
+            .map(|m| m.estimate(total.n))
+            .collect(),
         deals: options.deals,
         seed: options.seed,
         mean_deal_attempts: total.attempts as f64 / total.n as f64,
+    })
+}
+
+fn validate(
+    tree: &Tree,
+    profile: &Profile,
+    game: &HoldemGame<FeatureHashAbstraction>,
+    options: RealOptions,
+) -> Result<()> {
+    profile.validate(tree)?;
+    game.require_l0_chip_ev()?;
+    ensure!(
+        tree.game_fingerprint == game.game_fingerprint(),
+        "game/tree mismatch"
+    );
+    ensure!(
+        options.deals >= 2,
+        "real evaluation needs at least two deals"
+    );
+    Ok(())
+}
+
+fn deal_key(seed: u64) -> [u8; 32] {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(b"solvers.p2.trunk.l0.real.v1");
+    hasher.update(&seed.to_le_bytes());
+    *hasher.finalize().as_bytes()
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct FittedSeat {
+    pub seat: usize,
+    pub name: String,
+    pub value: f64,
+    pub best_response: f64,
+    pub gain: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct FittedResponses {
+    /// In-sample values on the fitting deals; maximization biases the BR upward.
+    pub seats: Vec<FittedSeat>,
+    /// Per-seat pure actions in node * 169 + class layout.
+    #[serde(skip)]
+    pub actions: Vec<Vec<u8>>,
+    pub deals: u64,
+    pub seed: u64,
+}
+
+struct FitScratch {
+    reach: Vec<[f64; MAX_SEATS]>,
+    weights: Vec<f64>,
+}
+
+impl FitScratch {
+    fn new(tree: &Tree, terminals: usize) -> Self {
+        Self {
+            reach: vec![[0.0; MAX_SEATS]; tree.nodes.len()],
+            weights: vec![0.0; tree.seats * 169 * terminals],
+        }
+    }
+
+    fn deal(
+        &mut self,
+        tree: &Tree,
+        profile: &Profile,
+        prepared: &Prepared,
+        terminal_indices: &[usize],
+        terminals: usize,
+        world: &SampledWorld,
+    ) {
+        let deal = Deal::new(tree, world);
+        self.reach[0].fill(1.0);
+        let offsets: [usize; MAX_SEATS] =
+            std::array::from_fn(|i| (i * 169 + deal.classes[i]) * terminals);
+        let mut z = 0;
+        while z < tree.nodes.len() {
+            let reach = self.reach[z];
+            if reach[..tree.seats].iter().all(|&r| r == 0.0) {
+                z = prepared.ends[z];
+                continue;
+            }
+            let node = &tree.nodes[z];
+            if node.terminal.is_some() {
+                let mut utility = [0.0; MAX_SEATS];
+                let payoff = deal.payoff(tree, prepared, z, &mut utility);
+                for i in 0..tree.seats {
+                    self.weights[offsets[i] + terminal_indices[z]] += reach[i] * payoff[i];
+                }
+            } else {
+                let actor = node.actor.unwrap();
+                let row = profile.row(tree, z, deal.classes[actor]);
+                for (a, &child) in node.children.iter().enumerate() {
+                    for (i, &r) in reach.iter().enumerate().take(tree.seats) {
+                        self.reach[child][i] = r * if i == actor { 1.0 } else { row[a] };
+                    }
+                }
+            }
+            z += 1;
+        }
+    }
+}
+
+/// Fit class-level pure best responses on physical input-game deals. The fixed
+/// sixteen lanes accumulate opponent-reach-weighted terminal payoffs in chunk
+/// order, then merge in lane order, independently of Rayon scheduling.
+/// Evaluate these fixed actions on an independent seed for a lower-bound value.
+pub fn fit_real_responses(
+    tree: &Tree,
+    profile: &Profile,
+    game: &HoldemGame<FeatureHashAbstraction>,
+    options: RealOptions,
+) -> Result<FittedResponses> {
+    validate(tree, profile, game, options)?;
+    for node in tree.nodes.iter().filter(|n| n.actor.is_some()) {
+        ensure!(
+            node.children.len() <= 254,
+            "L0 nodes may have at most 254 actions"
+        );
+    }
+    let prepared = Prepared::new(tree, game)?;
+    let mut terminals = 0;
+    let terminal_indices: Vec<_> = tree
+        .nodes
+        .iter()
+        .map(|n| {
+            if n.terminal.is_some() {
+                let index = terminals;
+                terminals += 1;
+                index
+            } else {
+                usize::MAX
+            }
+        })
+        .collect();
+    let sampler = game.deal_sampler()?;
+    let key = deal_key(options.seed);
+    let chunks = options.deals.div_ceil(CHUNK_DEALS);
+    let lanes = (0..FIT_LANES)
+        .into_par_iter()
+        .map(|lane| -> Result<Vec<f64>> {
+            let mut scratch = FitScratch::new(tree, terminals);
+            for chunk in (lane as u64..chunks).step_by(FIT_LANES) {
+                let start = chunk * CHUNK_DEALS;
+                for d in start..start + CHUNK_DEALS.min(options.deals - start) {
+                    let mut rng = ChaCha8Rng::from_seed(key);
+                    rng.set_stream(d);
+                    let sample = sampler.sample_counted(&mut rng)?;
+                    scratch.deal(
+                        tree,
+                        profile,
+                        &prepared,
+                        &terminal_indices,
+                        terminals,
+                        &sample.world,
+                    );
+                }
+            }
+            Ok(scratch.weights)
+        })
+        .collect::<Result<Vec<_>>>()?;
+    // Reuse lane zero's allocation: even while merging there are only 16 slabs.
+    let mut lanes = lanes.into_iter();
+    let mut weights = lanes.next().unwrap();
+    for lane in lanes {
+        for (w, x) in weights.iter_mut().zip(lane) {
+            *w += x;
+        }
+    }
+    let mut actions = vec![vec![u8::MAX; tree.nodes.len() * 169]; tree.seats];
+    let mut own_reach = vec![0.0; tree.nodes.len()];
+    let mut best = vec![0.0; tree.nodes.len()];
+    let mut seats = Vec::with_capacity(tree.seats);
+    for (i, actions) in actions.iter_mut().enumerate() {
+        let mut value = 0.0;
+        let mut best_response = 0.0;
+        for c in 0..169 {
+            let row = &weights[(i * 169 + c) * terminals..(i * 169 + c + 1) * terminals];
+            own_reach[0] = 1.0;
+            let mut class_value = 0.0;
+            for (z, node) in tree.nodes.iter().enumerate() {
+                if node.terminal.is_some() {
+                    class_value += own_reach[z] * row[terminal_indices[z]];
+                } else {
+                    for (a, &child) in node.children.iter().enumerate() {
+                        own_reach[child] = own_reach[z]
+                            * if node.actor == Some(i) {
+                                profile.row(tree, z, c)[a]
+                            } else {
+                                1.0
+                            };
+                    }
+                }
+            }
+            value += class_value;
+            for (z, node) in tree.nodes.iter().enumerate().rev() {
+                best[z] = if node.terminal.is_some() {
+                    row[terminal_indices[z]]
+                } else if node.actor == Some(i) {
+                    let mut maximum = f64::NEG_INFINITY;
+                    let mut action = 0;
+                    for (a, &child) in node.children.iter().enumerate() {
+                        if best[child] > maximum {
+                            maximum = best[child];
+                            action = a;
+                        }
+                    }
+                    actions[z * 169 + c] = action as u8;
+                    maximum
+                } else {
+                    node.children.iter().map(|&child| best[child]).sum()
+                };
+            }
+            best_response += best[0];
+        }
+        let value = value / options.deals as f64;
+        let best_response = best_response / options.deals as f64;
+        seats.push(FittedSeat {
+            seat: i,
+            name: game.config().seats[SeatId(i as u8)]
+                .name
+                .clone()
+                .unwrap_or_else(|| format!("seat {i}")),
+            value,
+            best_response,
+            gain: best_response - value,
+        });
+    }
+    Ok(FittedResponses {
+        seats,
+        actions,
+        deals: options.deals,
+        seed: options.seed,
     })
 }

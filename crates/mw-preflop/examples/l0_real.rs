@@ -32,11 +32,12 @@ fn main() -> Result<()> {
         deals: 4194304,
         seed: 0,
     };
+    let mut fit_options = l0::RealOptions { deals: 0, seed: 1 };
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         if arg == "--help" {
             println!(
-                "l0_real (--config TOML | --mwsol FILE) [--profile uniform|mwsol|json:FILE] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--threads N] [--top-infosets 20] [--output JSON] [--deals 4194304] [--deal-seed 0]"
+                "l0_real (--config TOML | --mwsol FILE) [--profile uniform|mwsol|json:FILE] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--threads N] [--top-infosets 20] [--output JSON] [--deals 4194304] [--deal-seed 0] [--fit-deals 0] [--fit-seed 1]"
             );
             return Ok(());
         }
@@ -57,6 +58,8 @@ fn main() -> Result<()> {
             "--output" => output = Some(PathBuf::from(value)),
             "--deals" => real_options.deals = value.parse()?,
             "--deal-seed" => real_options.seed = value.parse()?,
+            "--fit-deals" => fit_options.deals = value.parse()?,
+            "--fit-seed" => fit_options.seed = value.parse()?,
             _ => bail!("unknown argument {arg}"),
         }
     }
@@ -68,6 +71,14 @@ fn main() -> Result<()> {
     ensure!(
         real_options.deals >= 2,
         "real evaluation needs at least two deals"
+    );
+    ensure!(
+        fit_options.deals == 0 || fit_options.seed != real_options.seed,
+        "fit seed must differ from deal seed"
+    );
+    ensure!(
+        fit_options.deals == 0 || fit_options.deals >= 2,
+        "fit needs at least two deals"
     );
     let mut reader = solution
         .as_ref()
@@ -138,15 +149,26 @@ fn main() -> Result<()> {
     let evaluation = pool.install(|| l0::evaluate(&tree, &profile, &model))?;
     let evaluation_seconds = start.elapsed().as_secs_f64();
     let start = Instant::now();
-    let real = pool.install(|| {
-        l0::evaluate_real(
-            &tree,
-            &profile,
-            &evaluation.best_response_actions,
-            &game,
-            real_options,
-        )
-    })?;
+    let fit = if fit_options.deals > 0 {
+        Some(pool.install(|| l0::fit_real_responses(&tree, &profile, &game, fit_options))?)
+    } else {
+        None
+    };
+    let fit_seconds = start.elapsed().as_secs_f64();
+    let mut responses = vec![evaluation.best_response_actions.clone()];
+    let mut response_sets = vec!["l0"];
+    if let Some(fit) = &fit {
+        responses.push(fit.actions.clone());
+        response_sets.push("fitted");
+        println!(
+            "Fit: {fit_seconds:.3}s; {} deals, {:.0} deals/s",
+            fit.deals,
+            fit.deals as f64 / fit_seconds
+        );
+    }
+    let start = Instant::now();
+    let real =
+        pool.install(|| l0::evaluate_real(&tree, &profile, &responses, &game, real_options))?;
     let real_seconds = start.elapsed().as_secs_f64();
     for (s, r) in evaluation.seats.iter().zip(&real.seats) {
         println!(
@@ -157,9 +179,15 @@ fn main() -> Result<()> {
             r.value.stderr,
             r.value.mean - s.value,
             s.gain,
-            r.l0_best_response_gain.mean,
-            r.l0_best_response_gain.stderr,
+            r.responses[0].gain.mean,
+            r.responses[0].gain.stderr,
         );
+        if let Some(fit) = &fit {
+            println!(
+                "  fitted: in-sample gain {:.9}, evaluation gain {:.9} +/- {:.9} bb",
+                fit.seats[s.seat].gain, r.responses[1].gain.mean, r.responses[1].gain.stderr
+            );
+        }
         for k in 1..=tree.seats {
             println!(
                 "  k={k}: L0 {:.9}, real {:.9} +/- {:.9}, difference {:.9}",
@@ -179,8 +207,16 @@ fn main() -> Result<()> {
     );
     println!(
         "Real gains of the L0 best responses, summed over seats: {:.9} +/- {:.9} bb",
-        real.l0_best_response_gain_sum.mean, real.l0_best_response_gain_sum.stderr
+        real.response_gain_sums[0].mean, real.response_gain_sums[0].stderr
     );
+    if let Some(fit) = &fit {
+        println!(
+            "Fitted gains summed: in-sample {:.9}, evaluation {:.9} +/- {:.9} bb",
+            fit.seats.iter().map(|s| s.gain).sum::<f64>(),
+            real.response_gain_sums[1].mean,
+            real.response_gain_sums[1].stderr
+        );
+    }
     println!(
         "L0 {evaluation_seconds:.3}s; real {real_seconds:.3}s; {} deals, {:.0} deals/s; mean attempts {:.6}",
         real.deals,
@@ -197,14 +233,15 @@ fn main() -> Result<()> {
             .map(|b| format!("{b:02x}"))
             .collect();
         let result = json!({
-            "format": "p2-l0-real-check", "version": 1,
+            "format": "p2-l0-real-check", "version": 2,
             "source": source, "profile": {"kind": if kind.starts_with("json:") { "json" } else { &kind }, "path": profile_path},
             "game_fingerprint": fingerprint,
             "tables": {"t2": {"file": "t2-v1.bin", "payload_blake3": t2.payload_hash().to_hex().as_str()}, "t3": {"file": format!("t3-v1-n{t3_samples}-seed{t3_seed}.bin"), "payload_blake3": t3.payload_hash().to_hex().as_str(), "samples": t3_samples, "seed": t3_seed}},
             "k4": {"samples": options.k4_samples, "seed": options.seed},
             "terminals": {"counts_by_k": tree.terminal_counts()},
+            "response_sets": response_sets, "fit": fit,
             "l0": {"seats": evaluation.seats, "nash_conv": evaluation.nash_conv}, "real": real, "units": "bb", "warnings": evaluation.warnings,
-            "timings": {"tables": tables_seconds, "tree": tree_seconds, "profile": profile_seconds, "l0": evaluation_seconds, "real": real_seconds}
+            "timings": {"tables": tables_seconds, "tree": tree_seconds, "profile": profile_seconds, "l0": evaluation_seconds, "real": real_seconds, "fit": if fit.is_some() { fit_seconds } else { 0.0 }}
         });
         write_json(&path, &result)?;
     }
