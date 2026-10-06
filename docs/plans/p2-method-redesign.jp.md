@@ -35,7 +35,8 @@
 - **Preflop trunk**: 公開Preflop木の全分岐を辿り、全seatの169 classのreachをvectorで持つ決定的なCFR（DCFR、seatごとの交互更新）。
   乱数を使わず、同じ入力と設定なら同じ解になる。
 - **leaf model**: Preflopの終端の値を返す、差し替え可能な部品。
-  - L0: showdownのequity。Postflopの判断が無い木（checkdown）とall-inでは入力のゲームそのものになる。
+  - L0: showdownのequity。Postflopの判断が無い木（checkdown）とall-inでは、2人なら入力のゲームそのものになる。
+    3人以上では第3.2節のcard removalの近似を含む。
   - L1: 2人でFlopへ行くleafの抽象化Postflop。EHS² bucketの戦略、boardだけをsampleし、両者の1,326 combo vectorで
     showdownを計算する。trunkと同じiterationで更新する。
   - L2: P1で代表的なleafを解いて比べる検証・較正（P2D3により当面は対象外）。
@@ -85,6 +86,7 @@ B1・B2・B4・B5の入力は、使う段階で`examples/bench/`に追加する�
 |---|---|---|
 | **S4-0** | 本計画、利用者決定、benchmarkの文書化 | 製品定義・再構築計画・索引と同期し、`tools/check_docs.py`が通る |
 | **S4-1a** | L0モデルの厳密BR評価器。暫定方式の解を測る。chip EVの木を対象とし、ICMはB2とともにS4-1bで扱う | (1) 表の恒等式・対称性・既知値の検査 (2) 小さい木で、class組を総当たりする参照実装と一致 (3) B1で、独立実装（Python）のBR・NashConvと一致 (4) B3の暫定方式の解（30k/300k sweep、seed 0/1）のseat別`g_i`と`NashConv`を記録 |
+| **S4-1a2** | L0の誤差の測定。同じclass profileを入力のゲーム（全seatの手札が重ならない配札。foldしたseatのcardもboardから除く）でMonte Carlo評価してL0と比べる。S4-1bより先に行う（2026-10-06の利用者判断） | B1でL0の厳密な値と標準誤差の範囲で一致。B3の4つの解と一様なprofileで、seat別の値の差（Preflop終端の人数別の内訳つき）と、L0の最適応答を入力のゲームで使ったときの利得を記録 |
 | **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装 | B1の`NashConv`が目標以下（目標値はS4-1bの着手時に決める）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録 |
 | **S4-2** | L1（2人でFlopへ行くleaf） | 小さい例で`NashConv`が下がる。L0とL1の解の差を記録。GTO Wizard参照とのsanity check |
 | **S4-3** | 製品の切替 | `.mwsol` v5（Preflopだけ）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
@@ -108,4 +110,4 @@ Linearの子Issueは着手が近い段階から作り、先の段階をまとめ
 | 3人以上のleafの費用 | S4-1bでのB4の1 iteration時間 | batch化とreachの小さいleafの省略でも1 iterationが10秒を超えるなら、4人以上のleafの扱いを見直す |
 | 3人以上でCFRが収束しない | S4-1bの`NashConv`の推移 | 下がらなければ別の更新則（fictitious play系など）を試す |
 | bunchingの近似 | S4-4の比較 | 差が大きければ補正を入れる |
-| 指標がモデル内に限られる | L0とL1の差（S4-2） | L1の誤差は当面数値で示さない（P2D3）。必要になったらL2を作る |
+| 指標がモデル内に限られる | L0と入力のゲームの差（S4-1a2）、L0とL1の差（S4-2） | L0の最適応答が入力のゲームで利得を生まないなら、L0の配札の近似を見直す。L1の誤差は当面数値で示さない（P2D3）。必要になったらL2を作る |
