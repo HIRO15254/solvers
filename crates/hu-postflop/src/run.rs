@@ -106,7 +106,7 @@ pub(crate) fn query<S: Storage>(
     Ok((solver, game.node_info))
 }
 
-pub(crate) fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
+pub fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
     match algorithm {
         Algorithm::Vanilla => Box::new(hu_engine::Vanilla),
         Algorithm::CfrPlus => Box::new(hu_engine::CfrPlus),
