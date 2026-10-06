@@ -6,7 +6,7 @@
   "purpose": "S4-1b-1: solve B1 (heads-up push/fold at 5, 10 and 20 bb) to NashConv <= 1e-4 bb/hand with the deterministic DCFR trunk solver on the L0 model, confirm each average profile with l0_eval and the independent Python check, and time single DCFR iterations on B3.",
   "plan": "docs/plans/p2-method-redesign.jp.md",
   "reproducibility": "verified",
-  "reproducibility_note": "The solver was implemented by Codex, which also ran the B1 commands; the main loop rebuilt the examples and reran them, and the B1 summaries, checkpoints and average profiles matched Codex's outputs bit for bit. The recorded results are the main loop's run of run.sh with binaries built from the recorded revision. B3 wall times vary by a few percent between runs.",
+  "reproducibility_note": "The solver was implemented by Codex, which also ran the B1 commands; the main loop rebuilt the examples and reran them, and the B1 summaries, checkpoints and average profiles matched Codex's outputs bit for bit. The recorded results are the main loop's run of run.sh with binaries built from the recorded revision. B3 wall times vary by a few percent between runs. The 200-iteration B3 trial ran trunk_solve through PowerShell Start-Process with the arguments of run_b3_trial.sh while other sessions built and tested other crates, so its wall times are not comparable; its NashConv values are deterministic. The input-game step used the l0_real binary of experiments/p2-method-2026-10/real-br-fit (built from bcd8eb8; trunk::l0::real and the example are unchanged since).",
   "source": {
     "revision": "9fbb6ac88f63d7192af31b99bc2a12917edc54c7",
     "working_tree": "no changes to tracked files",
@@ -15,7 +15,8 @@
     "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
     "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
     "trunk_solve_binary_sha256": "a36e1430b2ff71053748d6982843b9659e2910a44949d5da7c2f0a13d9676855",
-    "l0_eval_binary_sha256": "8ccddc4e6a8b2e239f8ac40f7e669567bd4d4b3e6d491ad1c811d10d693e8759"
+    "l0_eval_binary_sha256": "8ccddc4e6a8b2e239f8ac40f7e669567bd4d4b3e6d491ad1c811d10d693e8759",
+    "l0_real_binary_sha256": "35c487d0b47046645eb96aaad8670b578c00ddd86ffd1812cca8404b30405196"
   },
   "solver": {
     "alpha": 1.5,
@@ -24,7 +25,20 @@
     "seat_order": "alternating 0..n-1",
     "b1_eval_every": 10,
     "b1_target_nash_conv": 0.0001,
-    "b3_iterations": 3
+    "b3_iterations": 3,
+    "b3_trial": {
+      "iterations": 200,
+      "eval_every": 20,
+      "real_fit_deals": 134217728,
+      "real_fit_seed": 1,
+      "real_deals": 16777216,
+      "real_deal_seed": 0,
+      "fit_thresholds": [
+        1,
+        2,
+        3
+      ]
+    }
   },
   "model": {
     "t3_samples": 4096,
@@ -50,6 +64,11 @@
       "role": "procedure"
     },
     {
+      "path": "experiments/p2-method-2026-10/trunk-solver/run_b3_trial.sh",
+      "sha256": "d791e83fc6a7fff25e7a9a99ad3772785f6c59f4b53b91aa7160388d99661aed",
+      "role": "B3 200-iteration trial procedure"
+    },
+    {
       "path": "experiments/p2-method-2026-10/trunk-solver/summarize.py",
       "sha256": "3de0c7329cefedc032b638348a49ba445db9fa0714c555b58f7c903242275932",
       "role": "summary tables (Python standard library only)"
@@ -63,6 +82,46 @@
       "path": "experiments/p2-method-2026-10/trunk-solver/results/summary.md",
       "sha256": "0f0af6b2b71ad008362f3f137aacba431b4082e988beb1cb9ee07a8ab42c71fa",
       "role": "summarize.py output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/b3_200.json",
+      "sha256": "43d800e3f06d33dbf0bd9cb609ce60ea7458a6df8da8a2114d529ff7bb5af66f",
+      "role": "trunk_solve output of the 200-iteration B3 trial"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/b3_200.log",
+      "sha256": "7f96c9390b470b4e2ab8b23d7acad5648326cf73e9e8156c89bb50e5b1b4265f",
+      "role": "trunk_solve output of the 200-iteration B3 trial"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/l0eval_seed0.json",
+      "sha256": "b6f9b43a15f2f55a42fc8cacceea700153364d030088bc406796a4ef0d3d4e02",
+      "role": "l0_eval of the trial's average profile with other K4/T3 seeds"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/l0eval_seed1.json",
+      "sha256": "b1d96d5346c8b89059d6afc4ae37d7266ee1754cdb7522017ef47078847f301f",
+      "role": "l0_eval of the trial's average profile with other K4/T3 seeds"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/l0eval_seed1t3seed1.json",
+      "sha256": "041e3e3708ff382e794e40411b4ac1daa339fac7a020e7393008814a1f3c7bbb",
+      "role": "l0_eval of the trial's average profile with other K4/T3 seeds"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/l0eval_t3seed1.json",
+      "sha256": "238b4da8b73a4876929fc1212d0f78c7c690b2f139bb74236417fd35a5c139fe",
+      "role": "l0_eval of the trial's average profile with other K4/T3 seeds"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/real_fit134217728.json",
+      "sha256": "745ded6dba7d2b757e9cc4d335f586506664bfab0636140a2361a65f84f28fd0",
+      "role": "l0_real output: input-game bracket of the trial's average profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/real_fit134217728.log",
+      "sha256": "94c407be30201b5ff546c369acc273f19fda6f587e455c2be9d4403d93e60d53",
+      "role": "l0_real output: input-game bracket of the trial's average profile"
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-solver/results/b1_10bb.json",
@@ -196,11 +255,25 @@
       "sha256": "ee36bc445ea2ecd2636ab0a2cd540bf90385077380300f6340f343ccb6a0ef6b",
       "bytes": 1284784,
       "role": "T2 count CSV for the Python check (trunk_tables --export-t2)"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed1.bin",
+      "sha256": "7ae88aba099e4753cb0f8ae3568c7e9bb84057ba2cbe6f4e78126f65082cace1",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 1) for the trial's re-evaluation"
+    },
+    {
+      "path": ".cache/p2-trunk/trunk-solver/b3-trial/b3_200.profile.json",
+      "sha256": "acd8ff047d492c166322a164a6b7a3bdb76e8ed31a9bd4c9910d080c2a66d155",
+      "bytes": 64345759,
+      "role": "average profile of the 200-iteration B3 trial (p2-class-profile)"
     }
   ],
   "commands": [
     "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
     "bash experiments/p2-method-2026-10/trunk-solver/run.sh <out dir>",
-    "python experiments/p2-method-2026-10/trunk-solver/summarize.py <out dir>"
+    "python experiments/p2-method-2026-10/trunk-solver/summarize.py <out dir>",
+    "cargo build -p mw-preflop --release --example l0_real",
+    "bash experiments/p2-method-2026-10/trunk-solver/run_b3_trial.sh <trial out dir>"
   ]
 }

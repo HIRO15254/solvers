@@ -10,4 +10,4 @@
 | [L0評価器の検査と暫定方式の測定](l0-evaluator-check/README.md) | L0評価器は正しいか。暫定方式の解は、L0モデルの中でseatごとにどれだけ得をされる余地があるか | S4-1aの完了条件(2)〜(4) | `verified` |
 | [L0の誤差の測定](l0-real-check/README.md) | L0のseatの値と利得は、入力のゲームとどれだけ違うか。L0の最適応答は入力のゲームでも得をするか | S4-1a2の完了条件 | `verified` |
 | [入力のゲームでの最適応答](real-br-fit/README.md) | 入力のゲームで、class単位の最適応答は暫定方式の解に対してどれだけ得をするか。入力のゲームでの`NashConv`をL0の`NashConv`と比べる | S4-1a3の完了条件 | `verified` |
-| [trunkのDCFR solver](trunk-solver/README.md) | L0モデルの上の全幅DCFRはB1の目標（`NashConv` ≤ 1×10⁻⁴）に届くか。B3の1 iterationにどれだけかかるか | S4-1b-1（S4-1bのB1の完了条件） | `verified` |
+| [trunkのDCFR solver](trunk-solver/README.md) | L0モデルの上の全幅DCFRはB1の目標（`NashConv` ≤ 1×10⁻⁴）に届くか。B3の1 iterationにどれだけかかるか。B3の解はL0と入力のゲームで暫定方式の解より良いか | S4-1b-1（S4-1bのB1・B3の`NashConv`の完了条件） | `verified` |

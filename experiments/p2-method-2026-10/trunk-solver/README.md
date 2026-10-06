@@ -2,9 +2,9 @@
 
 | 項目 | 内容 |
 |---|---|
-| 問い | L0モデルの上でPreflopの公開木を全幅のDCFRで解くsolverは、B1の目標（`NashConv` ≤ 1×10⁻⁴ bb/hand）に届くか。B3の1 iterationにどれだけかかるか |
+| 問い | L0モデルの上でPreflopの公開木を全幅のDCFRで解くsolverは、B1の目標（`NashConv` ≤ 1×10⁻⁴ bb/hand）に届くか。B3の1 iterationにどれだけかかるか。B3を解いた解は、L0と入力のゲームで暫定方式の解より良いか |
 | 関連 | SOL-27（S4-1b）、[P2方式の再設計計画](../../../docs/plans/p2-method-redesign.jp.md)の3節・5節 |
-| 位置づけ | S4-1bの前半（S4-1b-1）の証拠。B1の完了条件を満たす。B3の`NashConv`とB4の時間はS4-1b-2で扱う |
+| 位置づけ | S4-1bの前半（S4-1b-1）の証拠。B1とB3の`NashConv`の完了条件を満たす。B4の時間はS4-1b-2で扱う |
 | 再現状態 | `verified`。commit `9fbb6ac`のbinaryで記載の手順を実行した |
 
 ## Solver
@@ -82,6 +82,48 @@ Preflopの公開木全体をDCFRで解く。終端の値はL0モデル（計画3
 - 計画5節は、1 iterationが10秒を超えるなら4人以上の終端の扱いを見直すとしている。B3でもそれを超えた。高速化はS4-1b-2で扱う。
 - 最大の作業memory（peak working set）は約720 MiBだった（Codexの測定、K4 2048・256の2 iteration）。
 
+## B3を200 iteration解いた解
+
+B3を200 iteration（20 iterationごとにcheckpoint）解いた。実行の途中から別のsessionのbuildとtestが並行していたので、
+この節の時間は参考にならない（1 iterationは22〜51秒）。`NashConv`の値は決定的な計算で、並行した処理の影響を受けない。
+出力は[results/b3-trial/](results/b3-trial/)にある。
+
+| iteration | 0 | 20 | 40 | 60 | 80 | 100 | 120 | 140 | 160 | 180 | 200 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| L0の`NashConv` | 16.25 | 0.0978 | 0.0204 | 0.0084 | 0.0046 | 0.0029 | 0.0020 | 0.0015 | 0.0012 | 0.0009 | 0.00077 |
+
+- 40 iterationで、暫定方式の300k sweepの解（0.0531・0.0516）より小さくなった。200 iterationでは約1/70である。
+- solverはK4とT3を固定のseed（どちらも0）で作ったL0の値に対して解く。その乱数への過適合を見るため、200 iterationの
+  平均戦略を別のseedで評価し直した。K4のseedを1にすると0.00086、T3の表のseedを1にすると0.00077、両方で0.00087だった。
+  過適合は約0.0001で小さい。
+
+### 入力のゲームでの`NashConv`
+
+200 iterationの平均戦略を、[入力のゲームでの最適応答](../real-br-fit/README.md)と同じ方法で評価した
+（fit 2^27配札・配札のseed 1、評価 2^24配札・seed 0）。値はbb/hand。fitした応答はin-sample → held-out ± 標準誤差。
+
+| seat | L0の利得 | L0の最適応答 | 純粋 | z = 1 | z = 2 | z = 3 |
+|---|---|---|---|---|---|---|
+| BTN | 0.0001 | 0.0002 ± 0.0002 | 0.0020 → 0.0012 ± 0.0004 | 0.0018 → 0.0013 ± 0.0004 | 0.0013 → 0.0010 ± 0.0003 | 0.0009 → 0.0009 ± 0.0002 |
+| SB | 0.0002 | 0.0004 ± 0.0002 | 0.0039 → 0.0029 ± 0.0005 | 0.0035 → 0.0028 ± 0.0004 | 0.0030 → 0.0026 ± 0.0003 | 0.0024 → 0.0022 ± 0.0003 |
+| BB | 0.0002 | 0.0005 ± 0.0002 | 0.0031 → 0.0014 ± 0.0004 | 0.0026 → 0.0016 ± 0.0003 | 0.0018 → 0.0014 ± 0.0002 | 0.0013 → 0.0011 ± 0.0002 |
+| UTG | 0.0001 | −0.0000 ± 0.0001 | 0.0004 → 0.0002 ± 0.0002 | 0.0003 → 0.0003 ± 0.0001 | 0.0001 → 0.0001 ± 0.0000 | 0.0001 → 0.0001 ± 0.0000 |
+| HJ | 0.0001 | 0.0002 ± 0.0002 | 0.0009 → 0.0010 ± 0.0003 | 0.0008 → 0.0009 ± 0.0002 | 0.0006 → 0.0006 ± 0.0001 | 0.0003 → 0.0002 ± 0.0001 |
+| CO | 0.0001 | −0.0005 ± 0.0002 | 0.0014 → 0.0013 ± 0.0003 | 0.0013 → 0.0013 ± 0.0002 | 0.0011 → 0.0011 ± 0.0002 | 0.0009 → 0.0010 ± 0.0002 |
+| 和 | 0.0008 | 0.0007 ± 0.0004 | 0.0118 → 0.0079 ± 0.0008 | 0.0102 → 0.0083 ± 0.0007 | 0.0079 → 0.0068 ± 0.0005 | 0.0058 → 0.0056 ± 0.0004 |
+
+- 入力のゲームでの`NashConv`は、期待値で約0.008（z = 1のheld-out、0.0083 ± 0.0007）と0.0118（純粋な応答のin-sample）の
+  間にある。暫定方式の`20bb_300k_s0`（同じ方法で0.0395〜0.0445）の約1/3〜1/5で、入力のゲームでも暫定方式の解より良い。
+- L0の`NashConv`（0.00077）は、入力のゲームでの値の約1/10〜1/15だった。L0の均衡に近い解では、残る利得のほとんどが
+  L0モデルの誤差から来る。入力のゲームで得をされる余地は、BTN・SB・BBに集まった（和の約7割）。
+- L0の最適応答は入力のゲームではほとんど得をしない（0.0007 ± 0.0004）。L0の均衡に近い解では、L0の最適応答の利得は
+  入力のゲームでの利得の下限として役に立たない（[入力のゲームでの最適応答](../real-br-fit/README.md)の予想どおり）。
+- 入力のゲームでのseatの値とL0の値の差は、BTN −0.0036、SB −0.0102、BB −0.0270、UTG −0.0010、HJ −0.0020、CO −0.0019
+  （標準誤差0.0005〜0.0012）。暫定方式の解と同じく、L0はどのseatの値も高く見積もり、BBで最も大きい。
+- 逸脱したcell（自分の決定点のcell 923,754のうち）はz = 1で56.8万、z = 3で13.7万。
+- fitは23,525秒（毎秒5,705配札）、評価は6,408秒かかった。均衡に近い解は混合戦略が多く、到達確率0の部分木を飛ばせないので、
+  暫定方式の300kの解（fit 4,245秒）より遅い。並行した処理の分も含む。
+
 ## 時間
 
 - B1: 1つのstackで、solverの実行全体が約0.3秒（解くのは0.06〜0.07秒）。
@@ -98,18 +140,25 @@ workspace rootでGit Bashから実行する。
 cargo build -p mw-preflop --release --example trunk_solve --example l0_eval
 bash experiments/p2-method-2026-10/trunk-solver/run.sh <出力directory>
 python experiments/p2-method-2026-10/trunk-solver/summarize.py <出力directory>
+cargo build -p mw-preflop --release --example l0_real
+bash experiments/p2-method-2026-10/trunk-solver/run_b3_trial.sh <B3の試験の出力directory>
 ```
 
 - [run.sh](run.sh)は、表のcache（`.cache/p2-trunk`、無ければ作る）と、[L0評価器の検査](../l0-evaluator-check/README.md)の
   手順で書き出したclass表・T2のCSV（`.cache/p2-trunk/classes.csv`・`t2.csv`）を使う。
 - [summarize.py](summarize.py)（Python標準ライブラリだけ）はB1・B3の表を出力し、B1で目標に届いたことを確かめる。
+- [run_b3_trial.sh](run_b3_trial.sh)はB3を200 iteration解き、平均戦略を別のseedで評価し直し、入力のゲームで評価する。
+  記録した実行では、`trunk_solve`をPowerShellの`Start-Process`で同じ引数で起動した。全体で約11時間かかった。
 
 ## 保持
 
 [results/](results/)に、B1のsolverの出力・平均戦略・`l0_eval`とPythonの評価、B3のsolverの出力と実行log、集計を置く。
+[results/b3-trial/](results/b3-trial/)に、B3を200 iteration解いたsolverの出力とlog、別のseedでの評価、入力のゲームでの評価を
+置く。その平均戦略（64 MB）はignoredの`.cache/`にだけあり、SHA-256をmanifestに記録した。
 `l0_eval`とPythonの出力にあるprofileのパスは実行時の出力directoryを指すが、同じfileを`results/`に置いた。
 表のcacheとCSVはignoredの`.cache/`にだけあり、パスとSHA-256を[manifest](manifest.json)に記録した。
 
 環境: Windows 11 Home 10.0.26200、Intel Core i7-10700KF（8 core / 16 thread）、RAM 31.9 GiB、rustc 1.97.0、Python 3.13.7。
-16 thread（rayonの既定）で実行した。solverはCodexが実装し、main loopが差分の確認、必須の検証、B1の再実行
+16 thread（rayonの既定）で実行した。入力のゲームでの評価には、[入力のゲームでの最適応答](../real-br-fit/README.md)と同じ
+`bcd8eb8`の`l0_real`を使った（`trunk::l0::real`はその後変わっていない）。solverはCodexが実装し、main loopが差分の確認、必須の検証、B1の再実行
 （Codexの出力とbitで一致）を行った。
