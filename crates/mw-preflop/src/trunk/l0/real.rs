@@ -14,6 +14,9 @@ const MAX_SEATS: usize = 9;
 const CHUNK_DEALS: u64 = 4096;
 const FIT_LANES: usize = 16;
 
+/// Play the profile's mixed row at this decision cell.
+pub const FOLLOW: u8 = 254;
+
 #[derive(Debug, Clone, Copy)]
 pub struct RealOptions {
     pub deals: u64,
@@ -277,7 +280,7 @@ impl Scratch {
                 let c = classes[actor];
                 let row = profile.row(tree, z, c);
                 // Copy the parent slots to stack storage before writing children.
-                let mut parent = [0.0; 1 + MAX_SEATS * 4];
+                let mut parent = [0.0; 1 + MAX_SEATS * 6];
                 parent[..self.slots].copy_from_slice(reach);
                 for (a, &child) in node.children.iter().enumerate() {
                     let next = &mut self.reach[child * self.slots..(child + 1) * self.slots];
@@ -287,7 +290,7 @@ impl Scratch {
                         for i in 0..tree.seats {
                             let slot = 1 + s * tree.seats + i;
                             next[slot] = parent[slot]
-                                * if i == actor {
+                                * if i == actor && action != usize::from(FOLLOW) {
                                     f64::from(a == action)
                                 } else {
                                     row[a]
@@ -410,8 +413,8 @@ pub fn evaluate_real(
 ) -> Result<RealEvaluation> {
     validate(tree, profile, game, options)?;
     ensure!(
-        responses.len() <= 4,
-        "at most four response sets are supported"
+        responses.len() <= 6,
+        "at most six response sets are supported"
     );
     for best_responses in responses {
         ensure!(
@@ -436,7 +439,7 @@ pub fn evaluate_real(
                 ensure!(
                     response[z * 169..(z + 1) * 169]
                         .iter()
-                        .all(|&a| usize::from(a) < node.children.len()),
+                        .all(|&a| a == FOLLOW || usize::from(a) < node.children.len()),
                     "invalid BR action at node {z}"
                 );
             }
@@ -537,6 +540,26 @@ pub struct FittedSeat {
     pub gain: f64,
 }
 
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct GatedSeat {
+    pub seat: usize,
+    /// In-sample value of the gated response on the fitting deals.
+    pub best_response: f64,
+    /// Best response minus the seat's in-sample profile value.
+    pub gain: f64,
+    /// Own decision node/class cells where the response deviates from the profile.
+    pub deviations: u64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct GatedResponse {
+    pub threshold: f64,
+    pub seats: Vec<GatedSeat>,
+    /// Per seat, node * 169 + class: action or FOLLOW; u8::MAX elsewhere.
+    #[serde(skip)]
+    pub actions: Vec<Vec<u8>>,
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct FittedResponses {
     /// In-sample values on the fitting deals; maximization biases the BR upward.
@@ -546,6 +569,8 @@ pub struct FittedResponses {
     pub actions: Vec<Vec<u8>>,
     pub deals: u64,
     pub seed: u64,
+    /// Significance-gated responses, in requested threshold order.
+    pub gated: Vec<GatedResponse>,
 }
 
 struct FitScratch {
@@ -586,7 +611,9 @@ impl FitScratch {
                 let mut utility = [0.0; MAX_SEATS];
                 let payoff = deal.payoff(tree, prepared, z, &mut utility);
                 for i in 0..tree.seats {
-                    self.weights[offsets[i] + terminal_indices[z]] += reach[i] * payoff[i];
+                    if reach[i] != 0.0 {
+                        self.weights[offsets[i] + terminal_indices[z]] += reach[i] * payoff[i];
+                    }
                 }
             } else {
                 let actor = node.actor.unwrap();
@@ -606,13 +633,24 @@ impl FitScratch {
 /// sixteen lanes accumulate opponent-reach-weighted terminal payoffs in chunk
 /// order, then merge in lane order, independently of Rayon scheduling.
 /// Evaluate these fixed actions on an independent seed for a lower-bound value.
+/// Lane standard errors are meaningful only when every lane holds deals
+/// (at least 16 * 4096 deals).
 pub fn fit_real_responses(
     tree: &Tree,
     profile: &Profile,
     game: &HoldemGame<FeatureHashAbstraction>,
     options: RealOptions,
+    thresholds: &[f64],
 ) -> Result<FittedResponses> {
     validate(tree, profile, game, options)?;
+    ensure!(
+        thresholds.len() <= 4,
+        "at most four fit thresholds are supported"
+    );
+    ensure!(
+        thresholds.iter().all(|z| z.is_finite() && *z >= 0.0),
+        "fit thresholds must be finite and nonnegative"
+    );
     for node in tree.nodes.iter().filter(|n| n.actor.is_some()) {
         ensure!(
             node.children.len() <= 254,
@@ -660,10 +698,9 @@ pub fn fit_real_responses(
             Ok(scratch.weights)
         })
         .collect::<Result<Vec<_>>>()?;
-    // Reuse lane zero's allocation: even while merging there are only 16 slabs.
-    let mut lanes = lanes.into_iter();
-    let mut weights = lanes.next().unwrap();
-    for lane in lanes {
+    // Preserve all replicates; copy lane zero to keep the original merge order.
+    let mut weights = lanes[0].clone();
+    for lane in &lanes[1..] {
         for (w, x) in weights.iter_mut().zip(lane) {
             *w += x;
         }
@@ -727,10 +764,123 @@ pub fn fit_real_responses(
             gain: best_response - value,
         });
     }
+    let mut gated = Vec::with_capacity(thresholds.len());
+    let mut pass = GatedPass::new(tree, profile, &terminal_indices);
+    for &threshold in thresholds {
+        let mut actions = vec![vec![u8::MAX; tree.nodes.len() * 169]; tree.seats];
+        let mut gated_seats = Vec::with_capacity(tree.seats);
+        for (i, actions) in actions.iter_mut().enumerate() {
+            let mut best_response = 0.0;
+            let mut deviations = 0;
+            for c in 0..169 {
+                let start = (i * 169 + c) * terminals;
+                let end = start + terminals;
+                let rows = std::array::from_fn(|l| &lanes[l][start..end]);
+                let (value, count) = pass.run(i, c, &weights[start..end], rows, threshold, actions);
+                best_response += value;
+                deviations += count;
+            }
+            let best_response = best_response / options.deals as f64;
+            gated_seats.push(GatedSeat {
+                seat: i,
+                best_response,
+                gain: best_response - seats[i].value,
+                deviations,
+            });
+        }
+        gated.push(GatedResponse {
+            threshold,
+            seats: gated_seats,
+            actions,
+        });
+    }
     Ok(FittedResponses {
         seats,
         actions,
         deals: options.deals,
         seed: options.seed,
+        gated,
     })
+}
+
+/// Reusable backward-pass storage for one seat/class and its sixteen replicates.
+pub(super) struct GatedPass<'a> {
+    tree: &'a Tree,
+    profile: &'a Profile,
+    terminal_indices: &'a [usize],
+    values: Vec<f64>,
+    lane_values: Vec<[f64; FIT_LANES]>,
+}
+
+impl<'a> GatedPass<'a> {
+    pub(super) fn new(tree: &'a Tree, profile: &'a Profile, terminal_indices: &'a [usize]) -> Self {
+        Self {
+            tree,
+            profile,
+            terminal_indices,
+            values: vec![0.0; tree.nodes.len()],
+            lane_values: vec![[0.0; FIT_LANES]; tree.nodes.len()],
+        }
+    }
+
+    pub(super) fn run(
+        &mut self,
+        seat: usize,
+        class: usize,
+        total: &[f64],
+        lanes: [&[f64]; FIT_LANES],
+        threshold: f64,
+        actions: &mut [u8],
+    ) -> (f64, u64) {
+        let mut deviations = 0;
+        for (z, node) in self.tree.nodes.iter().enumerate().rev() {
+            if node.terminal.is_some() {
+                let t = self.terminal_indices[z];
+                self.values[z] = total[t];
+                self.lane_values[z] = std::array::from_fn(|l| lanes[l][t]);
+            } else if node.actor != Some(seat) {
+                self.values[z] = node.children.iter().map(|&child| self.values[child]).sum();
+                self.lane_values[z] = std::array::from_fn(|l| {
+                    node.children
+                        .iter()
+                        .map(|&child| self.lane_values[child][l])
+                        .sum()
+                });
+            } else {
+                let mut maximum = f64::NEG_INFINITY;
+                let mut action = 0;
+                let mut follow = 0.0;
+                let mut lane_follow = [0.0; FIT_LANES];
+                let row = self.profile.row(self.tree, z, class);
+                for (a, &child) in node.children.iter().enumerate() {
+                    if self.values[child] > maximum {
+                        maximum = self.values[child];
+                        action = a;
+                    }
+                    follow += row[a] * self.values[child];
+                    for (l, f) in lane_follow.iter_mut().enumerate() {
+                        *f += row[a] * self.lane_values[child][l];
+                    }
+                }
+                let child = node.children[action];
+                let advantages: [f64; FIT_LANES] =
+                    std::array::from_fn(|l| self.lane_values[child][l] - lane_follow[l]);
+                let mean = advantages.iter().sum::<f64>() / FIT_LANES as f64;
+                let se = (FIT_LANES as f64 / (FIT_LANES - 1) as f64
+                    * advantages.iter().map(|a| (a - mean).powi(2)).sum::<f64>())
+                .sqrt();
+                if maximum - follow > threshold * se {
+                    actions[z * 169 + class] = action as u8;
+                    self.values[z] = maximum;
+                    self.lane_values[z] = self.lane_values[child];
+                    deviations += 1;
+                } else {
+                    actions[z * 169 + class] = FOLLOW;
+                    self.values[z] = follow;
+                    self.lane_values[z] = lane_follow;
+                }
+            }
+        }
+        (self.values[0], deviations)
+    }
 }

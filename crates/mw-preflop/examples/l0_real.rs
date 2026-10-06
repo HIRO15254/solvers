@@ -32,12 +32,13 @@ fn main() -> Result<()> {
         deals: 4194304,
         seed: 0,
     };
+    let mut fit_thresholds = vec![1.0, 2.0, 3.0];
     let mut fit_options = l0::RealOptions { deals: 0, seed: 1 };
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         if arg == "--help" {
             println!(
-                "l0_real (--config TOML | --mwsol FILE) [--profile uniform|mwsol|json:FILE] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--threads N] [--top-infosets 20] [--output JSON] [--deals 4194304] [--deal-seed 0] [--fit-deals 0] [--fit-seed 1]"
+                "l0_real (--config TOML | --mwsol FILE) [--profile uniform|mwsol|json:FILE] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--threads N] [--top-infosets 20] [--output JSON] [--deals 4194304] [--deal-seed 0] [--fit-deals 0] [--fit-seed 1] [--fit-thresholds 1,2,3|none]"
             );
             return Ok(());
         }
@@ -60,6 +61,21 @@ fn main() -> Result<()> {
             "--deal-seed" => real_options.seed = value.parse()?,
             "--fit-deals" => fit_options.deals = value.parse()?,
             "--fit-seed" => fit_options.seed = value.parse()?,
+            "--fit-thresholds" => {
+                fit_thresholds = if value == "none" {
+                    Vec::new()
+                } else {
+                    value
+                        .split(',')
+                        .map(str::parse)
+                        .collect::<std::result::Result<Vec<f64>, _>>()?
+                };
+                ensure!(
+                    fit_thresholds.len() <= 4
+                        && fit_thresholds.iter().all(|z| z.is_finite() && *z >= 0.0),
+                    "fit thresholds must contain at most four finite nonnegative values"
+                );
+            }
             _ => bail!("unknown argument {arg}"),
         }
     }
@@ -150,16 +166,22 @@ fn main() -> Result<()> {
     let evaluation_seconds = start.elapsed().as_secs_f64();
     let start = Instant::now();
     let fit = if fit_options.deals > 0 {
-        Some(pool.install(|| l0::fit_real_responses(&tree, &profile, &game, fit_options))?)
+        Some(pool.install(|| {
+            l0::fit_real_responses(&tree, &profile, &game, fit_options, &fit_thresholds)
+        })?)
     } else {
         None
     };
     let fit_seconds = start.elapsed().as_secs_f64();
     let mut responses = vec![evaluation.best_response_actions.clone()];
-    let mut response_sets = vec!["l0"];
+    let mut response_sets = vec!["l0".to_owned()];
     if let Some(fit) = &fit {
         responses.push(fit.actions.clone());
-        response_sets.push("fitted");
+        response_sets.push("fitted".to_owned());
+        for gated in &fit.gated {
+            responses.push(gated.actions.clone());
+            response_sets.push(format!("gated-z{}", gated.threshold));
+        }
         println!(
             "Fit: {fit_seconds:.3}s; {} deals, {:.0} deals/s",
             fit.deals,
@@ -187,6 +209,14 @@ fn main() -> Result<()> {
                 "  fitted: in-sample gain {:.9}, evaluation gain {:.9} +/- {:.9} bb",
                 fit.seats[s.seat].gain, r.responses[1].gain.mean, r.responses[1].gain.stderr
             );
+            for (g, gated) in fit.gated.iter().enumerate() {
+                let seat = &gated.seats[s.seat];
+                let held_out = &r.responses[2 + g].gain;
+                println!(
+                    "  gated-z{}: in-sample gain {:.9}, evaluation gain {:.9} +/- {:.9} bb; {} deviations",
+                    gated.threshold, seat.gain, held_out.mean, held_out.stderr, seat.deviations
+                );
+            }
         }
         for k in 1..=tree.seats {
             println!(
@@ -216,6 +246,17 @@ fn main() -> Result<()> {
             real.response_gain_sums[1].mean,
             real.response_gain_sums[1].stderr
         );
+        for (g, gated) in fit.gated.iter().enumerate() {
+            let held_out = &real.response_gain_sums[2 + g];
+            println!(
+                "Gated-z{} gains summed: in-sample {:.9}, evaluation {:.9} +/- {:.9} bb; {} deviations",
+                gated.threshold,
+                gated.seats.iter().map(|s| s.gain).sum::<f64>(),
+                held_out.mean,
+                held_out.stderr,
+                gated.seats.iter().map(|s| s.deviations).sum::<u64>()
+            );
+        }
     }
     println!(
         "L0 {evaluation_seconds:.3}s; real {real_seconds:.3}s; {} deals, {:.0} deals/s; mean attempts {:.6}",
@@ -233,7 +274,7 @@ fn main() -> Result<()> {
             .map(|b| format!("{b:02x}"))
             .collect();
         let result = json!({
-            "format": "p2-l0-real-check", "version": 2,
+            "format": "p2-l0-real-check", "version": 3,
             "source": source, "profile": {"kind": if kind.starts_with("json:") { "json" } else { &kind }, "path": profile_path},
             "game_fingerprint": fingerprint,
             "tables": {"t2": {"file": "t2-v1.bin", "payload_blake3": t2.payload_hash().to_hex().as_str()}, "t3": {"file": format!("t3-v1-n{t3_samples}-seed{t3_seed}.bin"), "payload_blake3": t3.payload_hash().to_hex().as_str(), "samples": t3_samples, "seed": t3_seed}},

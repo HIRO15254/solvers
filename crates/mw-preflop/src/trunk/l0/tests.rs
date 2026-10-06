@@ -421,7 +421,12 @@ fn real_deal_reference(
                 let mut pi = pi.to_vec();
                 let mut beta = beta.to_vec();
                 pi[actor] *= self.profile.row(self.tree, z, c)[a];
-                beta[actor] *= f64::from(a == usize::from(self.responses[actor][z * 169 + c]));
+                let action = self.responses[actor][z * 169 + c];
+                beta[actor] *= if action == FOLLOW {
+                    self.profile.row(self.tree, z, c)[a]
+                } else {
+                    f64::from(a == usize::from(action))
+                };
                 self.visit(child, &pi, &beta);
             }
         }
@@ -469,10 +474,26 @@ fn physical_deal_values_match_independent_recursive_settlement() {
         let tree = Tree::build(&game).unwrap();
         let profile = random_profile(&tree, 97);
         let mut rng = ChaCha8Rng::seed_from_u64(104);
-        let responses = vec![
+        let mut responses = vec![
             random_responses(&tree, &mut rng),
             random_responses(&tree, &mut rng),
         ];
+        let mut following = random_responses(&tree, &mut rng);
+        for (i, actions) in following.iter_mut().enumerate() {
+            for (z, _) in tree
+                .nodes
+                .iter()
+                .enumerate()
+                .filter(|(_, n)| n.actor == Some(i))
+            {
+                for c in 0..169 {
+                    if rng.gen_bool(0.3) {
+                        actions[z * 169 + c] = FOLLOW;
+                    }
+                }
+            }
+        }
+        responses.push(following);
         let sampler = game.deal_sampler().unwrap();
         let prepared = super::real::Prepared::new(&tree, &game).unwrap();
         let mut scratch = super::real::Scratch::new(&tree, responses.len());
@@ -566,7 +587,7 @@ fn physical_deal_estimates_are_thread_independent_and_validate_inputs() {
     let zero = evaluate_real(&tree, &profile, &[], &game, small).unwrap();
     assert!(zero.response_gain_sums.is_empty());
     assert!(zero.seats.iter().all(|s| s.responses.is_empty()));
-    let four = vec![responses.clone(); 4];
+    let four = vec![responses.clone(); 6];
     let repeated = evaluate_real(&tree, &profile, &four, &game, small).unwrap();
     assert_eq!(zero.value_sum, repeated.value_sum);
     for (z, r) in zero.seats.iter().zip(&repeated.seats) {
@@ -574,7 +595,7 @@ fn physical_deal_estimates_are_thread_independent_and_validate_inputs() {
         assert_eq!(z.value_by_active_count, r.value_by_active_count);
         assert!(r.responses.iter().all(|s| *s == r.responses[0]));
     }
-    assert!(evaluate_real(&tree, &profile, &vec![responses.clone(); 5], &game, small).is_err());
+    assert!(evaluate_real(&tree, &profile, &vec![responses.clone(); 7], &game, small).is_err());
     let mut bad_second = vec![responses.clone(); 2];
     bad_second[1][0].pop();
     assert!(evaluate_real(&tree, &profile, &bad_second, &game, small).is_err());
@@ -600,6 +621,10 @@ fn physical_deal_estimates_are_thread_independent_and_validate_inputs() {
     bad[actor][0] = u8::MAX;
     assert!(evaluate_real(&tree, &profile, std::slice::from_ref(&bad), &game, options).is_err());
     assert!(profile.with_pure_rows(&tree, actor, &bad[actor]).is_err());
+    bad[actor][0] = tree.nodes[0].children.len() as u8;
+    assert!(evaluate_real(&tree, &profile, std::slice::from_ref(&bad), &game, small).is_err());
+    bad[actor][0] = FOLLOW;
+    assert!(evaluate_real(&tree, &profile, std::slice::from_ref(&bad), &game, small).is_ok());
     assert!(
         profile
             .with_pure_rows(&tree, tree.seats, &responses[0])
@@ -753,7 +778,7 @@ fn fit_matches_evaluation_on_the_same_deals() {
             deals: 3_000,
             seed: 13,
         };
-        let fit = fit_real_responses(&tree, &profile, &game, options).unwrap();
+        let fit = fit_real_responses(&tree, &profile, &game, options, &[]).unwrap();
         let real = evaluate_real(
             &tree,
             &profile,
@@ -789,6 +814,235 @@ fn fit_matches_evaluation_on_the_same_deals() {
 }
 
 #[test]
+fn all_follow_has_exactly_zero_gain() {
+    let game = game(&config(4, true, false));
+    let tree = Tree::build(&game).unwrap();
+    let profile = random_profile(&tree, 39);
+    let actions = vec![vec![FOLLOW; tree.nodes.len() * 169]; tree.seats];
+    let real = evaluate_real(
+        &tree,
+        &profile,
+        &[actions],
+        &game,
+        RealOptions {
+            deals: 8192,
+            seed: 52,
+        },
+    )
+    .unwrap();
+    let zero = Estimate {
+        mean: 0.0,
+        stderr: 0.0,
+    };
+    for seat in &real.seats {
+        assert_eq!(seat.responses[0].value, seat.value);
+        assert_eq!(seat.responses[0].gain, zero);
+    }
+    assert_eq!(real.response_gain_sums[0], zero);
+}
+
+#[test]
+fn gated_pass_matches_recursive_reference() {
+    struct Reference<'a> {
+        tree: &'a Tree,
+        profile: &'a Profile,
+        indices: &'a [usize],
+        total: &'a [f64],
+        lanes: &'a [Vec<f64>],
+        seat: usize,
+        class: usize,
+        threshold: f64,
+        actions: Vec<u8>,
+    }
+    impl Reference<'_> {
+        fn visit(&mut self, z: usize) -> (f64, [f64; 16]) {
+            let node = &self.tree.nodes[z];
+            if node.terminal.is_some() {
+                let t = self.indices[z];
+                return (self.total[t], std::array::from_fn(|l| self.lanes[l][t]));
+            }
+            let children: Vec<_> = node
+                .children
+                .iter()
+                .map(|&child| self.visit(child))
+                .collect();
+            if node.actor != Some(self.seat) {
+                return (
+                    children.iter().map(|v| v.0).sum(),
+                    std::array::from_fn(|l| children.iter().map(|v| v.1[l]).sum()),
+                );
+            }
+            let mut action = 0;
+            let mut maximum = f64::NEG_INFINITY;
+            for (a, value) in children.iter().enumerate() {
+                if value.0 > maximum {
+                    maximum = value.0;
+                    action = a;
+                }
+            }
+            let row = self.profile.row(self.tree, z, self.class);
+            let follow: f64 = children.iter().zip(row).map(|(v, p)| p * v.0).sum();
+            let lane_follow: [f64; 16] =
+                std::array::from_fn(|l| children.iter().zip(row).map(|(v, p)| p * v.1[l]).sum());
+            let advantages: Vec<_> = (0..16)
+                .map(|l| children[action].1[l] - lane_follow[l])
+                .collect();
+            let mean = advantages.iter().sum::<f64>() / 16.0;
+            let se =
+                (16.0 / 15.0 * advantages.iter().map(|a| (a - mean).powi(2)).sum::<f64>()).sqrt();
+            if maximum - follow > self.threshold * se {
+                self.actions[z * 169 + self.class] = action as u8;
+                children[action]
+            } else {
+                self.actions[z * 169 + self.class] = FOLLOW;
+                (follow, lane_follow)
+            }
+        }
+    }
+    let game = game(&config(3, false, false).replace("BB = 1", "BB = 2"));
+    let tree = Tree::build(&game).unwrap();
+    let profile = Profile::uniform(&tree);
+    let random = random_profile(&tree, 712);
+    let mut terminals = 0;
+    let indices: Vec<_> = tree
+        .nodes
+        .iter()
+        .map(|n| {
+            if n.terminal.is_some() {
+                let t = terminals;
+                terminals += 1;
+                t
+            } else {
+                usize::MAX
+            }
+        })
+        .collect();
+    let mut rng = ChaCha8Rng::seed_from_u64(881);
+    for case in 0..3 {
+        let mut lanes = vec![vec![0.0; terminals]; 16];
+        if case == 1 {
+            for (t, x) in lanes[7].iter_mut().enumerate() {
+                *x = (t % 11) as f64 - 5.0;
+            }
+        } else if case == 2 {
+            for lane in &mut lanes {
+                for x in lane {
+                    *x = rng.gen_range(-5.0..5.0);
+                }
+            }
+        }
+        let mut total = lanes[0].clone();
+        for lane in &lanes[1..] {
+            for (x, y) in total.iter_mut().zip(lane) {
+                *x += y;
+            }
+        }
+        let profile = if case == 2 { &random } else { &profile };
+        let mut pass = super::real::GatedPass::new(&tree, profile, &indices);
+        for seat in 0..tree.seats {
+            for class in [0, 73, 168] {
+                for threshold in [0.0, 1.0, 2.0, 1e9] {
+                    let mut actions = vec![u8::MAX; tree.nodes.len() * 169];
+                    let (value, deviations) = pass.run(
+                        seat,
+                        class,
+                        &total,
+                        std::array::from_fn(|l| lanes[l].as_slice()),
+                        threshold,
+                        &mut actions,
+                    );
+                    let mut reference = Reference {
+                        tree: &tree,
+                        profile,
+                        indices: &indices,
+                        total: &total,
+                        lanes: &lanes,
+                        seat,
+                        class,
+                        threshold,
+                        actions: vec![u8::MAX; tree.nodes.len() * 169],
+                    };
+                    let expected = reference.visit(0).0;
+                    assert_eq!(actions, reference.actions);
+                    assert!((value - expected).abs() <= 1e-12 * (1.0 + expected.abs()));
+                    assert_eq!(
+                        deviations,
+                        actions
+                            .iter()
+                            .filter(|&&a| a != FOLLOW && a != u8::MAX)
+                            .count() as u64
+                    );
+                    if case == 0 || (case == 1 && threshold >= 1.0) {
+                        assert_eq!(deviations, 0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn gated_responses_match_evaluation_on_the_same_deals() {
+    for players in [3, 4] {
+        let game = game(&config(players, players == 4, false).replace("BB = 1", "BB = 2"));
+        let tree = Tree::build(&game).unwrap();
+        let profile = random_profile(&tree, if players == 3 { 9 } else { 3 });
+        let options = RealOptions {
+            deals: 16 * 4096,
+            seed: 13,
+        };
+        let fit =
+            fit_real_responses(&tree, &profile, &game, options, &[0.0, 1.0, 2.0, 1e9]).unwrap();
+        let responses: Vec<_> = fit.gated.iter().map(|g| g.actions.clone()).collect();
+        let real = evaluate_real(&tree, &profile, &responses, &game, options).unwrap();
+        for (g, gated) in fit.gated.iter().enumerate() {
+            for seat in &gated.seats {
+                let pure = &fit.seats[seat.seat];
+                let tol = 1e-9 * (1.0 + pure.best_response.abs().max(pure.value.abs()));
+                assert!(
+                    (real.seats[seat.seat].responses[g].value.mean - seat.best_response).abs()
+                        <= tol
+                );
+                assert!(
+                    pure.value - tol <= seat.best_response
+                        && seat.best_response <= pure.best_response + tol
+                );
+                if g == 0 {
+                    assert!((seat.best_response - pure.best_response).abs() <= tol);
+                }
+                if g == 3 {
+                    assert_eq!(seat.deviations, 0);
+                    assert!((seat.best_response - pure.value).abs() <= tol);
+                }
+                for (z, node) in tree.nodes.iter().enumerate() {
+                    for c in 0..169 {
+                        let a = gated.actions[seat.seat][z * 169 + c];
+                        if node.actor == Some(seat.seat) {
+                            assert!(a == FOLLOW || usize::from(a) < node.children.len());
+                        } else {
+                            assert_eq!(a, u8::MAX);
+                        }
+                    }
+                }
+            }
+            assert!(
+                serde_json::to_value(gated)
+                    .unwrap()
+                    .get("actions")
+                    .is_none()
+            );
+        }
+        let count = |g: usize| fit.gated[g].seats.iter().map(|s| s.deviations).sum::<u64>();
+        assert!(
+            count(1) > 0 && count(1) < count(0),
+            "players {players}: z0 {}, z1 {}",
+            count(0),
+            count(1)
+        );
+    }
+}
+
+#[test]
 fn fitted_responses_are_optimal_on_the_fitting_deals() {
     for players in [3, 4] {
         // Give BB a decision instead of posting its entire stack as a blind.
@@ -799,7 +1053,7 @@ fn fitted_responses_are_optimal_on_the_fitting_deals() {
             deals: 3_000,
             seed: 13,
         };
-        let fit = fit_real_responses(&tree, &profile, &game, options).unwrap();
+        let fit = fit_real_responses(&tree, &profile, &game, options, &[]).unwrap();
         let model = Model::new(
             &game,
             &Synthetic,
@@ -870,7 +1124,7 @@ fn fitted_responses_are_thread_independent_and_validate_inputs() {
             .num_threads(threads)
             .build()
             .unwrap()
-            .install(|| fit_real_responses(&tree, &profile, &game, options).unwrap())
+            .install(|| fit_real_responses(&tree, &profile, &game, options, &[1.0, 2.0]).unwrap())
     };
     let one = run(1);
     let four = run(4);
@@ -878,6 +1132,19 @@ fn fitted_responses_are_thread_independent_and_validate_inputs() {
     assert_eq!(one.seats, four.seats);
     assert_eq!(one.deals, four.deals);
     assert_eq!(one.seed, four.seed);
+    for (a, b) in one.gated.iter().zip(&four.gated) {
+        assert_eq!(a.threshold, b.threshold);
+        assert_eq!(a.actions, b.actions);
+        assert_eq!(a.seats, b.seats);
+    }
+    for thresholds in [
+        vec![-1.0],
+        vec![f64::NAN],
+        vec![f64::INFINITY],
+        vec![0.0; 5],
+    ] {
+        assert!(fit_real_responses(&tree, &profile, &game, options, &thresholds).is_err());
+    }
     assert!(
         fit_real_responses(
             &tree,
@@ -886,14 +1153,17 @@ fn fitted_responses_are_thread_independent_and_validate_inputs() {
             RealOptions {
                 deals: 1,
                 ..options
-            }
+            },
+            &[]
         )
         .is_err()
     );
     let other_game = self::game(&config(3, false, false));
-    assert!(fit_real_responses(&tree, &profile, &other_game, options).is_err());
+    assert!(fit_real_responses(&tree, &profile, &other_game, options, &[]).is_err());
     let other_tree = Tree::build(&other_game).unwrap();
-    assert!(fit_real_responses(&tree, &Profile::uniform(&other_tree), &game, options).is_err());
+    assert!(
+        fit_real_responses(&tree, &Profile::uniform(&other_tree), &game, options, &[]).is_err()
+    );
 }
 
 #[test]
@@ -925,12 +1195,13 @@ fn fitted_responses_match_l0_in_heads_up() {
             deals: 1 << 20,
             seed: 1,
         },
+        &[2.0],
     )
     .unwrap();
     let real = evaluate_real(
         &tree,
         &profile,
-        std::slice::from_ref(&fit.actions),
+        &[fit.actions.clone(), fit.gated[0].actions.clone()],
         &game,
         RealOptions {
             deals: 1 << 20,
@@ -940,6 +1211,9 @@ fn fitted_responses_match_l0_in_heads_up() {
     .unwrap();
     for ((l, f), r) in l0.seats.iter().zip(&fit.seats).zip(&real.seats) {
         let gain = &r.responses[0].gain;
+        let gated = &r.responses[1].gain;
+        assert!(gated.mean <= l.gain + 5.0 * gated.stderr);
+        println!("seat {}: gated-z2 held-out {:?}", l.seat, gated);
         assert!(f.gain >= l.gain - 5.0 * gain.stderr);
         assert!(gain.mean <= l.gain + 5.0 * gain.stderr);
         println!(
