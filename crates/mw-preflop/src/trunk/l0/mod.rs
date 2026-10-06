@@ -5,8 +5,10 @@
 //! and folded cards; T3 and larger showdowns retain their sampling uncertainty.
 
 mod eval;
+mod leaves;
 mod profile;
 mod real;
+mod solve;
 mod tree;
 
 pub use eval::{Evaluation, EvaluationOptions, LocalGain, Model, SeatEvaluation, Tables, evaluate};
@@ -14,6 +16,9 @@ pub use profile::{ClassProfileDocument, Profile, ProfileNode};
 pub use real::{
     Estimate, FOLLOW, FittedResponses, FittedSeat, GatedResponse, GatedSeat, RealEvaluation,
     RealOptions, RealSeat, ResponseEstimate, evaluate_real, fit_real_responses,
+};
+pub use solve::{
+    Checkpoint, CheckpointSeat, Progress, Solution, SolveOptions, SolveTimings, solve,
 };
 pub use tree::{DecisionExport, Node, Terminal, Tree, TreeExport};
 

@@ -69,6 +69,11 @@ impl Profile {
         &self.rows[node][class * a..(class + 1) * a]
     }
 
+    pub(super) fn row_mut(&mut self, tree: &Tree, node: usize, class: usize) -> &mut [f64] {
+        let a = tree.nodes[node].labels.len();
+        &mut self.rows[node][class * a..(class + 1) * a]
+    }
+
     pub fn is_defaulted(&self, node: usize, class: usize) -> bool {
         self.defaulted[node][class]
     }

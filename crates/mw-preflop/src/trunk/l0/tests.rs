@@ -32,6 +32,348 @@ impl Tables for Synthetic {
     }
 }
 
+#[test]
+fn shared_leaves_and_solver_values_match_evaluator() {
+    use super::{eval::reaches, leaves::leaf_values, solve::backward_values};
+    for players in [3, 4] {
+        let game = game(&config(players, true, false));
+        let tree = Tree::build(&game).unwrap();
+        let profile = random_profile(&tree, 17);
+        let model = Model::new(
+            &game,
+            &Synthetic,
+            EvaluationOptions {
+                k4_samples: 64,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let reach = reaches(&tree, &profile, &model);
+        let all = leaf_values(&tree, &model, &reach, &(0..players).collect::<Vec<_>>()).unwrap();
+        let evaluation = evaluate(&tree, &profile, &model).unwrap();
+        for p in 0..players {
+            let single = leaf_values(&tree, &model, &reach, &[p]).unwrap();
+            for (a, b) in single.values[p]
+                .iter()
+                .flatten()
+                .zip(all.values[p].iter().flatten())
+            {
+                assert_eq!(a.to_bits(), b.to_bits());
+            }
+            let mut values = single.values[p].clone();
+            backward_values(&tree, &profile, &model.support[p], p, &mut values);
+            let root = model.support[p]
+                .iter()
+                .map(|&c| Classes::get().n(c) as f64 * model.weights()[p][c] * values[0][c])
+                .sum::<f64>()
+                / model.normalizers[p];
+            let x = evaluation.seats[p].value;
+            assert!((root - x).abs() <= 1e-12 * (1.0 + x.abs()));
+            for (z, node) in tree
+                .nodes
+                .iter()
+                .enumerate()
+                .filter(|(_, n)| n.actor == Some(p))
+            {
+                for &c in &model.support[p] {
+                    let residual: f64 = node
+                        .children
+                        .iter()
+                        .zip(profile.row(&tree, z, c))
+                        .map(|(&child, &s)| s * (values[child][c] - values[z][c]))
+                        .sum();
+                    let max = node
+                        .children
+                        .iter()
+                        .map(|&child| values[child][c].abs())
+                        .fold(values[z][c].abs(), f64::max);
+                    assert!(residual.abs() <= 1e-12 * (1.0 + max));
+                }
+            }
+        }
+    }
+}
+
+fn solver_convergence(players: usize) {
+    let game = game(&config(players, false, false));
+    let tree = Tree::build(&game).unwrap();
+    let model = Model::new(
+        &game,
+        &Synthetic,
+        EvaluationOptions {
+            k4_samples: 64,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let solution = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap()
+        .install(|| {
+            solve(
+                &tree,
+                &model,
+                SolveOptions {
+                    iterations: if players == 2 { 3000 } else { 1000 },
+                    eval_every: 250,
+                    target_nash_conv: if players == 2 { Some(1e-5) } else { None },
+                    ..Default::default()
+                },
+                |_| {},
+            )
+            .unwrap()
+        });
+    println!(
+        "{players}-player checkpoints: {:?}",
+        solution
+            .checkpoints
+            .iter()
+            .map(|c| (c.iteration, c.nash_conv))
+            .collect::<Vec<_>>()
+    );
+    let final_checkpoint = solution.checkpoints.last().unwrap();
+    if players == 2 {
+        assert!(solution.reached_target, "{:?}", solution.checkpoints);
+    } else {
+        assert!(
+            final_checkpoint.nash_conv <= 0.02 * solution.checkpoints[0].nash_conv,
+            "{:?}",
+            solution.checkpoints
+        );
+    }
+    let document: ClassProfileDocument =
+        serde_json::from_slice(&serde_json::to_vec(&solution.average.export(&tree)).unwrap())
+            .unwrap();
+    let restored = Profile::from_json(&tree, &document).unwrap();
+    let x = final_checkpoint.nash_conv;
+    assert!(
+        (evaluate(&tree, &restored, &model).unwrap().nash_conv - x).abs()
+            <= 1e-12 * (1.0 + x.abs())
+    );
+    for (z, node) in tree
+        .nodes
+        .iter()
+        .enumerate()
+        .filter(|(_, n)| n.actor.is_some())
+    {
+        let p = node.actor.unwrap();
+        for c in 0..169 {
+            assert!(!solution.average.is_defaulted(z, c));
+            if model.weights()[p][c] == 0.0 {
+                assert_eq!(
+                    solution.average.row(&tree, z, c),
+                    vec![1.0 / node.children.len() as f64; node.children.len()]
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn trunk_solver_converges_two_players() {
+    solver_convergence(2);
+}
+#[test]
+fn trunk_solver_converges_three_players() {
+    solver_convergence(3);
+}
+#[test]
+fn trunk_solver_converges_four_players() {
+    solver_convergence(4);
+}
+
+#[test]
+fn trunk_solver_determinism_checkpoints_and_validation() {
+    let game = game(&config(4, true, false));
+    let tree = Tree::build(&game).unwrap();
+    let model = Model::new(
+        &game,
+        &Synthetic,
+        EvaluationOptions {
+            k4_samples: 64,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let options = SolveOptions {
+        iterations: 9,
+        eval_every: 4,
+        ..Default::default()
+    };
+    let run = |threads| {
+        let mut observed = Vec::new();
+        let result = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+            .install(|| {
+                solve(&tree, &model, options, |p| {
+                    observed.push((p.iteration, p.checkpoint.map(|c| c.iteration)))
+                })
+                .unwrap()
+            });
+        assert_eq!(
+            observed,
+            vec![
+                (0, Some(0)),
+                (1, None),
+                (2, None),
+                (3, None),
+                (4, Some(4)),
+                (5, None),
+                (6, None),
+                (7, None),
+                (8, Some(8)),
+                (9, Some(9))
+            ]
+        );
+        result
+    };
+    let one = run(1);
+    for other in [run(4), run(1)] {
+        for (z, _) in tree
+            .nodes
+            .iter()
+            .enumerate()
+            .filter(|(_, n)| n.actor.is_some())
+        {
+            for c in 0..169 {
+                assert_eq!(
+                    one.average
+                        .row(&tree, z, c)
+                        .iter()
+                        .map(|x| x.to_bits())
+                        .collect::<Vec<_>>(),
+                    other
+                        .average
+                        .row(&tree, z, c)
+                        .iter()
+                        .map(|x| x.to_bits())
+                        .collect::<Vec<_>>()
+                );
+            }
+        }
+        assert_eq!(one.checkpoints.len(), other.checkpoints.len());
+        for (a, b) in one.checkpoints.iter().zip(other.checkpoints) {
+            assert_eq!(a.iteration, b.iteration);
+            assert_eq!(a.nash_conv.to_bits(), b.nash_conv.to_bits());
+            for (a, b) in a.seats.iter().zip(b.seats) {
+                assert_eq!(a.seat, b.seat);
+                assert_eq!(a.value.to_bits(), b.value.to_bits());
+                assert_eq!(a.best_response.to_bits(), b.best_response.to_bits());
+                assert_eq!(a.gain.to_bits(), b.gain.to_bits());
+            }
+        }
+    }
+    let end_only = solve(
+        &tree,
+        &model,
+        SolveOptions {
+            iterations: 2,
+            eval_every: 0,
+            ..options
+        },
+        |_| {},
+    )
+    .unwrap();
+    assert_eq!(
+        end_only
+            .checkpoints
+            .iter()
+            .map(|c| c.iteration)
+            .collect::<Vec<_>>(),
+        vec![2]
+    );
+    let initial_target = solve(
+        &tree,
+        &model,
+        SolveOptions {
+            target_nash_conv: Some(100.0),
+            ..options
+        },
+        |_| {},
+    )
+    .unwrap();
+    assert_eq!(initial_target.iterations, 0);
+    assert!(initial_target.reached_target);
+    for invalid in [
+        SolveOptions {
+            iterations: 0,
+            ..options
+        },
+        SolveOptions {
+            alpha: f64::NAN,
+            ..options
+        },
+        SolveOptions {
+            beta: f64::INFINITY,
+            ..options
+        },
+        SolveOptions {
+            gamma: -1.0,
+            ..options
+        },
+        SolveOptions {
+            gamma: f64::NAN,
+            ..options
+        },
+        SolveOptions {
+            target_nash_conv: Some(-1.0),
+            ..options
+        },
+        SolveOptions {
+            target_nash_conv: Some(f64::NAN),
+            ..options
+        },
+    ] {
+        assert!(solve(&tree, &model, invalid, |_| {}).is_err());
+    }
+    let other = self::game(&config(3, false, false));
+    assert!(solve(&Tree::build(&other).unwrap(), &model, options, |_| {}).is_err());
+}
+
+#[test]
+#[ignore = "release acceptance: deterministic DCFR with real HU tables on B1"]
+fn trunk_solver_meets_b1_target() {
+    use crate::trunk::tables::HuShowdownTable;
+    struct HuOnly(HuShowdownTable);
+    impl Tables for HuOnly {
+        fn t2(&self, c: usize, d: usize) -> Result<[f64; 3]> {
+            self.0.t2(c, d)
+        }
+        fn p3(&self, _: usize, _: usize, _: usize) -> Result<[f64; 13]> {
+            anyhow::bail!("heads-up cannot reach three-way terminals")
+        }
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let tables = HuOnly(HuShowdownTable::load_or_build(&root.join(".cache/p2-trunk")).unwrap());
+    for stack in [5, 10, 20] {
+        let path = root.join(format!("examples/bench/hu_pushfold_{stack}bb.toml"));
+        let game = game_from_config(&std::fs::read_to_string(&path).unwrap(), &path).unwrap();
+        let tree = Tree::build(&game).unwrap();
+        let model = Model::new(&game, &tables, EvaluationOptions::default()).unwrap();
+        let solution = solve(
+            &tree,
+            &model,
+            SolveOptions {
+                iterations: 100_000,
+                eval_every: 10,
+                target_nash_conv: Some(1e-4),
+                ..Default::default()
+            },
+            |_| {},
+        )
+        .unwrap();
+        let checkpoint = solution.checkpoints.last().unwrap();
+        println!(
+            "B1 {stack}bb: {} iterations, NashConv {}, {}s",
+            solution.iterations, checkpoint.nash_conv, checkpoint.seconds
+        );
+        assert!(solution.reached_target, "B1 {stack}bb: {checkpoint:?}");
+    }
+}
+
 fn config(players: usize, rake: bool, limp: bool) -> String {
     let mut raw = format!(
         "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\n[table.stacks_bb]\nBTN = 3\n"
