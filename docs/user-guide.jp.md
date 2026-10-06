@@ -60,7 +60,7 @@ solvers solve spot.toml --out runs/my-spot --threads 4 --memory 2GiB --max-time 
 ```
 
 毎回新しいrun directoryを指定する。overrideはrun.tomlへ保存する。
-P1のmemory見積りはstorage、保存用packed値block・sref slot・保存対象/street配列、最大1 node分の戦略作業領域、圧縮作業予算を含む。戦略blockは逐次出力し全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
+P1のmemory見積りはstorage、保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
 P1のmemory autoは物理RAMの80%、P2はarena予算6 GiBである。P2のmemoryはRSS全体の上限ではなく、
 tree・cache・thread scratch・評価・checkpoint用の追加memoryが必要である。
 P2のEHS² tableは初回に構築し、以後はmachine cacheを利用する。

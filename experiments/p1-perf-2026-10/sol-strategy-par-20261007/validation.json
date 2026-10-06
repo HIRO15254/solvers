@@ -1,0 +1,67 @@
+{
+  "build_jobs": 2,
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 6.9585699000017485,
+      "log": "runs\\p1-t3c\\final\\fmt.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 17.226837299996987,
+      "log": "runs\\p1-t3c\\final\\clippy.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 602.9684538000001,
+      "log": "runs\\p1-t3c\\final\\workspace-test.log"
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8903515999991214,
+      "log": "runs\\p1-t3c\\final\\docs.log"
+    }
+  ],
+  "workspace_test_counts": {
+    "passed": 861,
+    "failed": 0,
+    "ignored": 31
+  },
+  "first_candidate_focused_test_counts": {
+    "lib_passed": 46,
+    "lib_ignored": 1,
+    "postflop_passed": 29,
+    "postflop_ignored": 8
+  },
+  "final_docs_after_index": {
+    "command": [
+      "python",
+      "tools/check_docs.py"
+    ],
+    "exit_code": 0
+  }
+}

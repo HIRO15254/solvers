@@ -1,0 +1,221 @@
+{
+ "task": "P1-T3c",
+ "date": "2026-10-07",
+ "reproduction_status": "verified with the stated inherited codec boundary",
+ "sha256_rule": "text: LF-normalized bytes; binary/archive: raw bytes",
+ "source": {
+  "base_commit": "bedfb89636e6027603c703ca3776e20c05c7dea6",
+  "branch": "s3-p1-multicore-perf",
+  "dirty": true,
+  "unrelated_initial_change": "docs/plans/p1-performance.jp.md (preserved)",
+  "diff_lf_sha256": "196e9a0ccf8c0c3ce8d9da2c655217bbfd260576731329d35b056e313c78f7d4",
+  "files": {
+   "crates/hu-postflop/src/artifact.rs": {
+    "sha256": "3e4b7f3cce42bc51bddfaf7f2dd656207768579d3e69546aa530353d5c5ce6e5",
+    "bytes": 72609
+   },
+   "crates/hu-postflop/src/postflop.rs": {
+    "sha256": "3ee5f4f27aeb530e416fcf3fc4dbdc5f5daf7539b30081d83c63226b1e6af34d",
+    "bytes": 77702
+   },
+   "crates/hu-postflop/src/prepare.rs": {
+    "sha256": "df687565d270388bd2fdb1cef84498a90bf73766476e9c504b53f6e7de23f63a",
+    "bytes": 11657
+   },
+   "crates/hu-postflop/src/sol.rs": {
+    "sha256": "5811dabdc51c0f09a474abae23719c0b61fdb9c3d8c8beff945cd96abd79dadb",
+    "bytes": 29239
+   },
+   "crates/hu-postflop/tests/postflop.rs": {
+    "sha256": "3678c555901ede51efb9c1eda7369a2b24d3f9336ba43e544fd28fa71cff275f",
+    "bytes": 101000
+   },
+   "docs/hu-postflop.jp.md": {
+    "sha256": "b1e062f05470699e7d8f21e1ed1e59782bc9f1643f0842e9928558028165a831",
+    "bytes": 18908
+   },
+   "docs/nlh-input-v1.jp.md": {
+    "sha256": "a62a3398c04427545767d7d00ec1843521af25a1f752a65360081c31aa717985",
+    "bytes": 52688
+   },
+   "docs/cli-reference.jp.md": {
+    "sha256": "95c9a0893210f6a9635d9094b6890914102c826ec4270046f9405942cdddc1ea",
+    "bytes": 21003
+   },
+   "docs/user-guide.jp.md": {
+    "sha256": "ff993b68b0fe29b6858d0f5cc4b670dae62df7d3034c1649f162e7156f87ee25",
+    "bytes": 11772
+   },
+   "experiments/README.md": {
+    "sha256": "715524613748df21a525fbc82768f7a6cb020abc83f3a9f3b0e806083ec1fc9b",
+    "bytes": 4714
+   }
+  },
+  "old_archive": {
+   "path": "runs/p1-t3c/head.tar",
+   "sha256": "fea0f0cc76dead11734f109e3005e72f1ace211bac38eb6e8b4b12a6720b175a",
+   "availability": "scratch; reproducible with git archive at base_commit"
+  },
+  "old_source_path": "runs/p1-t3c/old-source",
+  "new_source_path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco"
+ },
+ "environment": {
+  "os": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+  "logical_processors": 16,
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)\n",
+  "build_jobs": 2,
+  "rustflags": "-C target-cpu=native",
+  "physical_ram_bytes": 34275098624,
+  "physical_ram_query": "Windows GlobalMemoryStatusEx"
+ },
+ "builds": [
+  [
+   "cargo",
+   "build",
+   "--release",
+   "-p",
+   "cli",
+   "--manifest-path",
+   "runs/p1-t3c/old-source/Cargo.toml",
+   "--target-dir",
+   "target/p1-t3c-old"
+  ],
+  [
+   "cargo",
+   "build",
+   "--release",
+   "-p",
+   "cli"
+  ],
+  [
+   "cargo",
+   "build",
+   "--release",
+   "-p",
+   "hu-postflop",
+   "--example",
+   "verify_save"
+  ]
+ ],
+ "dependency_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+ "cargo_config_sha256": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+ "binary": {
+  "old": {
+   "bytes": 7384064,
+   "sha256": "4316e1e4f344faf0ea3152846c3d5895fc63161a92e997bf55ba4bf4891324f3"
+  },
+  "new": {
+   "bytes": 7409152,
+   "sha256": "cef1cc21109fe7e9103ff9f448952a6211d8f38199b89765c84918881f20b01d"
+  },
+  "verify": {
+   "bytes": 963584,
+   "sha256": "7dc2bb7553fb9bb814fd6f4b04bbec02d68f2682ab5dc8aad7fa4960bb9f01c0"
+  },
+  "fixed": {
+   "bytes": 1370624,
+   "sha256": "313a0a7cf792eb5e1d6bbf61a1bd64131adf58d2bf1392dce9f9f8e9112db051"
+  }
+ },
+ "scratch_helpers": {
+  "runs/p1-t3c/old-source/crates/hu-postflop/examples/verify_t3c.rs": {
+   "sha256": "dfa823b068d851783a5c02760683c1d718f77df5045b28dc6cd9ce241d8fefb2"
+  },
+  "runs/p1-t3c/verify-final.py": {
+   "sha256": "f436d8ab381c4e29117fa2583bf79b1975d0e86b8a93221e0a328c341254dda1"
+  },
+  "runs/p1-t3c/profile.py": {
+   "sha256": "3fcbea1a625e34f4535b4c596ddc76c9a133bfbb8c5b8a6e7511b18a2d051376"
+  }
+ },
+ "measure": {
+  "path": "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+  "sha256": "35015842573453e7bae403826e2975a5c0d249a5a2eae98f26c989a600300a76"
+ },
+ "retained_large_artifacts": false,
+ "disk_free_bytes_at_finish": 8704782336,
+ "files": {
+  "binary.json": {
+   "sha256": "1080db830416280599acf70322b867bf1512eee019ae5619a74ced9b624617fe",
+   "bytes": 483
+  },
+  "codec-thread-boundary.json": {
+   "sha256": "7aa93a177b49e6e873ae837f728ccc810f78975de1e601bff1ac540cd2be150c",
+   "bytes": 960
+  },
+  "commands.json": {
+   "sha256": "60433be713181976a98f7e43ffa2f411c24109b21eb75d5043c630bebf2e002b",
+   "bytes": 36015
+  },
+  "comparisons.json": {
+   "sha256": "b8529d39ea975087ac8cf8c4ef9959327c93b88ac824b0aa772dab616e0c4cf3",
+   "bytes": 29069
+  },
+  "first-candidate.json": {
+   "sha256": "ce1ff1b3b426ba8f3d27304ca92bdf0548ae660ff2a02a5e2c7271a29e15251d",
+   "bytes": 119881
+  },
+  "flop4.toml": {
+   "sha256": "1f8e5e3ba8f23131eb5851f029a1f06f7aa6a86790e3a8a195906abdcc9cc54b",
+   "bytes": 648
+  },
+  "flop_srp1.toml": {
+   "sha256": "ad2662b99c96be2ffa768f762453d5a1b4e2254ac05e32838ef1a23151ed5d69",
+   "bytes": 564
+  },
+  "gtow_a-i16.toml": {
+   "sha256": "4b5f5911bbe882770b0072d59f2949a3bedf2664d64e7823f8c9ababbb3715a9",
+   "bytes": 649
+  },
+  "gtow_a.toml": {
+   "sha256": "dfad6a833148fe0cf2ec94b5e59d8c217d9b4afcad92a6c645c935ac3786e1e2",
+   "bytes": 623
+  },
+  "gtow_b.toml": {
+   "sha256": "701c5b6734bf67600bb0c09c5258595cd5697a226b5252ac4da16a88e47ac20e",
+   "bytes": 678
+  },
+  "measurements.json": {
+   "sha256": "0048be446565cd925b0caa57d78c34a531f433f0d1a9f16b37127625b984677b",
+   "bytes": 6487
+  },
+  "performance-summary.json": {
+   "sha256": "57857a5b248bf00e6687c33c744343aeb6aa917d15d1aa1cb0384640bee59efb",
+   "bytes": 766
+  },
+  "profile.json": {
+   "sha256": "3442aea792de567a4ab663d6682fab59fc7e6b967315677607b4eb50d5e2be83",
+   "bytes": 1140
+  },
+  "README.md": {
+   "sha256": "5a2d9f36e5c1a472f5f2978fed48c91c717cbc86972a88730b38e6efe78d9701",
+   "bytes": 7982
+  },
+  "repository-audit.json": {
+   "sha256": "9b8671fb9693d1578754dfc83dbdaffa24c6f01ab12827ae947a51d7e74472f1",
+   "bytes": 1345
+  },
+  "resources.json": {
+   "sha256": "1c29c726e20ad72be60190f04e204eb98c6ec584033109ec053218d441d1453a",
+   "bytes": 5404
+  },
+  "river6-i16.toml": {
+   "sha256": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1",
+   "bytes": 613
+  },
+  "turn6-no-rivers.toml": {
+   "sha256": "9ad3f9a9385c007ff2271928bd47e8ac5a3df320b68be944e563e66898f3e3c9",
+   "bytes": 611
+  },
+  "turn6.toml": {
+   "sha256": "b87d166168de0717043104d5fe06c5ccef5122e848033e587fe56cc395749692",
+   "bytes": 570
+  },
+  "validation.json": {
+   "sha256": "e8269b1bc38d284a9b33ca0dc2c77cf4afea3dac0a2a85bb24202cd95d3da2f1",
+   "bytes": 1287
+  }
+ }
+}

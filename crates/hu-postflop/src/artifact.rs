@@ -3,6 +3,7 @@
 //! reach-weighted river solve; callers render the emitted diagnostics.
 
 use std::collections::{HashMap, HashSet};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -20,6 +21,7 @@ use hu_engine::{
     reach_at,
 };
 use nlh::{Card, PerPlayer, Player, Street};
+use rayon::prelude::*;
 
 use crate::run::RunSummary;
 
@@ -216,21 +218,43 @@ pub(crate) fn export_sol<S: Storage>(
         postcard::to_io(&meta, &mut *writer)?;
         postcard::to_io(&StreetsStored::from(mode), &mut *writer)?;
         postcard::to_io(&block_count, &mut *writer)?;
-        for (sref, &keep) in tree.storage_refs.iter().zip(&stored) {
-            if !keep {
-                continue;
+        let mut start = 0;
+        while start < stored.len() {
+            let (end, count) = strategy_batch_end(
+                &tree.storage_refs,
+                &stored,
+                start,
+                crate::sol::STRATEGY_BATCH_ELEMENTS,
+            );
+            // Exact capacity: no growing lists or unindexed parallel collect.
+            // One batch lives at a time, including while it is written.
+            let mut batch = Vec::with_capacity(count);
+            batch.extend(
+                tree.storage_refs[start..end]
+                    .iter()
+                    .zip(&stored[start..end])
+                    .filter(|(_, keep)| **keep)
+                    .map(|(sref, _)| (*sref, Vec::new())),
+            );
+            batch.par_iter_mut().try_for_each(|(sref, bytes)| {
+                let mut avg = vec![0.0; sref.len()];
+                solver
+                    .storage()
+                    .average_strategy(*sref, sref.index, &mut avg);
+                let block = StrategyBlock {
+                    sref: sref.index,
+                    probs: quantize_probs(&avg),
+                };
+                // u32 sref <= 5 varint bytes, usize length <= 10, raw u16 bytes.
+                // Reserve the upper bound to avoid postcard Vec growth slack.
+                *bytes = crate::sol::strategy_block_bytes(&block)?;
+                Ok::<_, crate::sol::SolError>(())
+            })?;
+            for (_, bytes) in batch {
+                // DeferredFlush keeps the codec's single payload flush boundary.
+                writer.write_all(&bytes)?;
             }
-            // Exactly the average_strategy used by the EV visitor. Only
-            // one node's f32 strategy and u16 bytes are alive at a time.
-            let mut avg = vec![0.0; sref.num_actions as usize * sref.num_hands as usize];
-            solver
-                .storage()
-                .average_strategy(*sref, sref.index, &mut avg);
-            let block = StrategyBlock {
-                sref: sref.index,
-                probs: quantize_probs(&avg),
-            };
-            postcard::to_io(&block, &mut *writer)?;
+            start = end;
         }
 
         // Only packed values survive this pass; reaches/values are path-local.
@@ -290,6 +314,31 @@ pub(crate) fn export_sol<S: Storage>(
         mode,
     });
     Ok(())
+}
+
+/// Contiguous sref interval; skipped streets cost no strategy elements.
+/// An oversized node occupies a batch by itself.
+fn strategy_batch_end(
+    refs: &[hu_engine::StorageRef],
+    stored: &[bool],
+    start: usize,
+    limit: usize,
+) -> (usize, usize) {
+    let mut end = start;
+    let mut elements = 0;
+    let mut count = 0;
+    while end < refs.len() {
+        if stored[end] {
+            let len = refs[end].len();
+            if count > 0 && len > limit.saturating_sub(elements) {
+                break;
+            }
+            elements += len;
+            count += 1;
+        }
+        end += 1;
+    }
+    (end, count)
 }
 
 // --- load (`inspect --sol`) -------------------------------------------------
@@ -1028,8 +1077,28 @@ memory = "1GiB"
     }
 
     #[test]
+    fn strategy_batches_bound_elements_and_skip_unstored_nodes() {
+        let refs: Vec<_> = [3, 2, 99, 11, 2]
+            .into_iter()
+            .enumerate()
+            .map(|(index, len)| hu_engine::StorageRef {
+                offset: 0,
+                num_actions: 1,
+                num_hands: len,
+                index: index as u32,
+            })
+            .collect();
+        let stored = [true, true, false, true, true];
+        assert_eq!(strategy_batch_end(&refs, &stored, 0, 5), (3, 2));
+        assert_eq!(strategy_batch_end(&refs, &stored, 3, 5), (4, 1));
+        assert_eq!(strategy_batch_end(&refs, &stored, 4, 5), (5, 1));
+        assert_eq!(strategy_batch_end(&refs, &[false; 5], 0, 5), (5, 0));
+        assert_eq!(strategy_batch_end(&refs, &stored, 0, 16), (4, 3));
+    }
+
+    #[test]
     fn streamed_strategies_match_ev_pass_and_whole_payload_bits() {
-        fn check<S: Storage>(raw: &str, storage_name: &str) {
+        fn check<S: Storage>(raw: &str, storage_name: &str) -> Vec<Vec<u8>> {
             let (solver, node_info, start_street, mut summary) = build_and_solve::<S>(raw, 3);
             summary.wall = std::time::Duration::ZERO;
             let tree = &solver.game().tree;
@@ -1050,6 +1119,7 @@ memory = "1GiB"
                     .insert(sref.index, quantize_probs(avg));
             });
             let reference = reference.into_inner().unwrap();
+            let mut outputs = Vec::new();
             for mode in [SolStreets::Full, SolStreets::NoRivers] {
                 let path = temp_path("streamed.sol");
                 let spec = SolExportSpec {
@@ -1095,21 +1165,33 @@ memory = "1GiB"
                 let whole_path = temp_path("whole.sol");
                 crate::sol::write_sol(&whole_path, &payload).unwrap();
                 assert_eq!(bytes, std::fs::read(&whole_path).unwrap());
+                outputs.push(bytes);
                 std::fs::remove_file(path).unwrap();
                 std::fs::remove_file(whole_path).unwrap();
             }
+            outputs
         }
-        for threads in [1, 4] {
-            rayon::ThreadPoolBuilder::new()
+        let mut reference = None;
+        for threads in [1, 8] {
+            let outputs = rayon::ThreadPoolBuilder::new()
                 .num_threads(threads)
                 .build()
                 .unwrap()
                 .install(|| {
+                    let mut outputs = Vec::new();
                     for raw in [TINY_TURN_TOML, TINY_RIVER_TOML] {
-                        check::<F32Storage>(raw, "f32");
-                        check::<I16Storage>(raw, "i16");
+                        outputs.extend(check::<F32Storage>(raw, "f32"));
+                        outputs.extend(check::<I16Storage>(raw, "i16"));
                     }
+                    outputs
                 });
+            if let Some(reference) = &reference {
+                assert_eq!(
+                    &outputs, reference,
+                    "compressed bytes differ across threads"
+                );
+            }
+            reference = Some(outputs);
         }
     }
 

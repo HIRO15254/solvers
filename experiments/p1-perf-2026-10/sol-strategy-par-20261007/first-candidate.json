@@ -1,0 +1,3777 @@
+{
+  "commands.json": [
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0353776999982074
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7688315999985207
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.5169218000010005
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.578868099997635
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.420232299999043
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.636763499998779
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.6153687000041828
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.643339400005061
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+        "--out",
+        "runs\\p1-t3c\\old-turn6-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 5.69921130000148
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+        "--out",
+        "runs\\p1-t3c\\new-turn6-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 8.726329400000395
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 8.464333900003112
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 1.2571488999965368
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\fixed-turn6-t8"
+      ],
+      "exit_code": 1,
+      "seconds": 7.846077199996216
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3486631000050693
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.584949999996752
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 5.912323500000639
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.740976799999771
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.710909599998558
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 6.540343500004383
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.835173200001009
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.5134821999963606
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 6.138357399999222
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 1.1732782000035513
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\fixed-turn6-t8"
+      ],
+      "exit_code": 0,
+      "seconds": 6.77765659999568
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+        "--out",
+        "runs\\p1-t3c\\old-turn6-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 10.009087599995837
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+        "--out",
+        "runs\\p1-t3c\\new-turn6-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 12.771415300005174
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 5.5517433999993955
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9617914000045857
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\fixed-turn6-t1"
+      ],
+      "exit_code": 0,
+      "seconds": 8.274721200003114
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\cross-turn6",
+        "normalize-threads"
+      ],
+      "exit_code": 0,
+      "seconds": 7.055982800004131
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+        "--out",
+        "runs\\p1-t3c\\old-river6-i16-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0456814999997732
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+        "--out",
+        "runs\\p1-t3c\\new-river6-i16-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 1.4120105000038166
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.12701150000066264
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08378780000202823
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\fixed-river6-i16-t8"
+      ],
+      "exit_code": 0,
+      "seconds": 1.6029610999976285
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+        "--out",
+        "runs\\p1-t3c\\old-river6-i16-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.21374780000041937
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+        "--out",
+        "runs\\p1-t3c\\new-river6-i16-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.3059322000044631
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08612699999503093
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.17086140000174055
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\fixed-river6-i16-t1"
+      ],
+      "exit_code": 0,
+      "seconds": 1.2784180999951786
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\cross-river6-i16",
+        "normalize-threads"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0928224000017508
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+        "--out",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 4.765973800000211
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+        "--out",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t8",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0,
+      "seconds": 4.783893799998623
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.10816000000340864
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07974330000433838
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\fixed-turn6-no-rivers-t8"
+      ],
+      "exit_code": 0,
+      "seconds": 0.9271832000013092
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+        "--out",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 10.522005700004229
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+        "--out",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t1",
+        "--threads",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 9.368066900002304
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1148851999969338
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+      ],
+      "exit_code": 0,
+      "seconds": 0.08179779999773018
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\fixed-turn6-no-rivers-t1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.8764219000004232
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\cross-turn6-no-rivers",
+        "normalize-threads"
+      ],
+      "exit_code": 0,
+      "seconds": 1.0325126000025193
+    },
+    {
+      "command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-1-old",
+        "runs\\p1-t3c\\measure-1-old.json"
+      ],
+      "exit_code": 0,
+      "seconds": 49.29722369999945
+    },
+    {
+      "command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-2-new",
+        "runs\\p1-t3c\\measure-2-new.json"
+      ],
+      "exit_code": 0,
+      "seconds": 47.71318379999866
+    },
+    {
+      "command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-3-old",
+        "runs\\p1-t3c\\measure-3-old.json"
+      ],
+      "exit_code": 0,
+      "seconds": 51.870053700004064
+    },
+    {
+      "command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-4-new",
+        "runs\\p1-t3c\\measure-4-new.json"
+      ],
+      "exit_code": 0,
+      "seconds": 47.96358229999896
+    }
+  ],
+  "comparisons.json": [
+    {
+      "case": "turn6",
+      "runs": [
+        {
+          "side": "old",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+            "--out",
+            "runs\\p1-t3c\\old-turn6-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 33316699,
+              "sha256": "feafb79d281ae00fa12428d8bf12a7c2ba5f470721dbec0b6a7cc0029cfa8cca"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+            "--out",
+            "runs\\p1-t3c\\new-turn6-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 33316699,
+              "sha256": "4efc2d6e4d16532e1e67e53313d6b68d45bb75a2e7fd1e3bb1a9859eaf6a897d"
+            }
+          }
+        },
+        {
+          "side": "old",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+            "--out",
+            "runs\\p1-t3c\\old-turn6-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 33314375,
+              "sha256": "b09abc203e12f28c9b60264ae44695a4f41156c185e9019d94d6dc31bf04c672"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122129679,
+              "sha256": "0f7306875c9708a2c27a5c579e7132cea6c6ed354067397a5e3d0ddb221a1b48"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+            "--out",
+            "runs\\p1-t3c\\new-turn6-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 33314376,
+              "sha256": "7e65837c4a07a905418781235aec182dd6b5cad27e6a191876ce2aeab93e2f6b"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122129677,
+              "sha256": "131616f82fe1237c7a7e01f28c49accad8a6af73ade35f301b2b607ef996dd43"
+            }
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              89137084,
+              89137084
+            ],
+            "strategy_blocks": 20482,
+            "value_blocks": 20482
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t8\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              89137084,
+              89137084
+            ],
+            "strategy_blocks": 20482,
+            "value_blocks": 20482,
+            "wall_secs": [
+              2.3371353,
+              2.5467018
+            ]
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-turn6-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+            "runs\\p1-t3c\\fixed-turn6-t8"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": true,
+            "codecs": [
+              {
+                "blake3": "f73e6ecd82d9dc372c16ed6539310123d22261fe62a679a9cc6e197f84b41bec",
+                "bytes": 33314371,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "3b2b0773a8e705e0d6ba904fb7d06f90a397e791a7826716722b1c58f464447c",
+                "bytes": 33316695,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": false
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "cf3c8ac1296be7a76b448e95b52dd49cdc772dde396ba382c9618f0b9ba3cbc1",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              89137084,
+              89137084
+            ],
+            "strategy_blocks": 20482,
+            "value_blocks": 20482
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t1\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "cf3c8ac1296be7a76b448e95b52dd49cdc772dde396ba382c9618f0b9ba3cbc1",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              89137084,
+              89137084
+            ],
+            "strategy_blocks": 20482,
+            "value_blocks": 20482,
+            "wall_secs": [
+              5.898824,
+              7.6963153
+            ]
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-turn6-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+            "runs\\p1-t3c\\fixed-turn6-t1"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": true,
+            "codecs": [
+              {
+                "blake3": "62eec5ce2687278f2394b205f05292d01f3f38b6465f5cbf41c41832bdb5b3fa",
+                "bytes": 33314371,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "d6a8d80d17f52b678e58f799fdaedfa88dcbaee56d10d1c0aa0996f29e63683a",
+                "bytes": 33316695,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": false
+          }
+        }
+      ],
+      "cross_thread_comparison": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\new-turn6-t1\\solution.sol",
+          "runs\\p1-t3c\\new-turn6-t8\\solution.sol",
+          "runs\\p1-t3c\\cross-turn6",
+          "normalize-threads"
+        ],
+        "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+        "result": {
+          "archived_HEAD_also_thread_dependent": true,
+          "codecs": [
+            {
+              "blake3": "f73e6ecd82d9dc372c16ed6539310123d22261fe62a679a9cc6e197f84b41bec",
+              "bytes": 33314371,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "3b2b0773a8e705e0d6ba904fb7d06f90a397e791a7826716722b1c58f464447c",
+              "bytes": 33316695,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": false
+        }
+      }
+    },
+    {
+      "case": "river6-i16",
+      "runs": [
+        {
+          "side": "old",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+            "--out",
+            "runs\\p1-t3c\\old-river6-i16-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 73017,
+              "sha256": "db1c8fe13d2b7a015bd2c5054cdad62ac4dc87b0321e7dabe374a301fd39a974"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 119699,
+              "sha256": "332cbdc0a688a95b07732a7d9a4da2d5365876ea222ec37994ba349a068d699f"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+            "--out",
+            "runs\\p1-t3c\\new-river6-i16-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 73017,
+              "sha256": "7e216d02c00e60d26afab774cf5762b093eb66231ac9700690768759c247e527"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 119700,
+              "sha256": "7ae271defbf86a29fc5aa299a08bf7af44095e8add969a30acb2f6107f3e9cfc"
+            }
+          }
+        },
+        {
+          "side": "old",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+            "--out",
+            "runs\\p1-t3c\\old-river6-i16-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 73017,
+              "sha256": "4846a95bda76d6dcdc89c43664e4ebedeae1775cd55f228c9628a7265dc0ff5c"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 119699,
+              "sha256": "95d0db3bfe1dc008b932c2e59e02eb637afbaafb90046e43e8cf3902c38221ab"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+            "--out",
+            "runs\\p1-t3c\\new-river6-i16-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 73017,
+              "sha256": "8308cb7542c1e85f8c246d2fdf0f378aae8b1d6ea919843745504f4b625afc00"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 119698,
+              "sha256": "833687cf017e17e6ef110f81e06f3228b463128237d22319739fecfc7764cdfa"
+            }
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              144771,
+              144771
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              144771,
+              144771
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34,
+            "wall_secs": [
+              0.0085437,
+              0.0122021
+            ]
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-river6-i16-t8\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+            "runs\\p1-t3c\\fixed-river6-i16-t8"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": false,
+            "codecs": [
+              {
+                "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+                "bytes": 73007,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+                "bytes": 73007,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": true
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "e7085fbd4d7ff922b28fbd1ceff83aa27a9fc28c03a4d8ff8deebfba06234348",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              144771,
+              144771
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "e7085fbd4d7ff922b28fbd1ceff83aa27a9fc28c03a4d8ff8deebfba06234348",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              144771,
+              144771
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34,
+            "wall_secs": [
+              0.0115505,
+              0.0459584
+            ]
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-river6-i16-t1\\solution.sol",
+            "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+            "runs\\p1-t3c\\fixed-river6-i16-t1"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": false,
+            "codecs": [
+              {
+                "blake3": "c4bf2493f8f586e0f1f42cd64ef7eecb409f017c80142fd770b2d9700ffcbe0d",
+                "bytes": 73007,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "c4bf2493f8f586e0f1f42cd64ef7eecb409f017c80142fd770b2d9700ffcbe0d",
+                "bytes": 73007,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": true
+          }
+        }
+      ],
+      "cross_thread_comparison": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\new-river6-i16-t1\\solution.sol",
+          "runs\\p1-t3c\\new-river6-i16-t8\\solution.sol",
+          "runs\\p1-t3c\\cross-river6-i16",
+          "normalize-threads"
+        ],
+        "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      }
+    },
+    {
+      "case": "turn6-no-rivers",
+      "runs": [
+        {
+          "side": "old",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+            "--out",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 82571,
+              "sha256": "6e8e27ffaec4196fa3eccf7860f6cdbcf1b8a3405cabec88a2284e516a7a47d1"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122103099,
+              "sha256": "4139564f91b95255f98680cc64f9ea1b73639e893d79e546fb55a02c3c1bceaf"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+            "--out",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t8",
+            "--threads",
+            "8"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 82571,
+              "sha256": "2a16d466dd454af895466e114519fca8dbb0c4f033d021077f68a3ecda10e7d2"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122103101,
+              "sha256": "6089a3505e9cbd697af3b95464a6c019b4ae1248345fdf9cd3d3b787925292b5"
+            }
+          }
+        },
+        {
+          "side": "old",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+            "--out",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 82571,
+              "sha256": "1894fb532c836c787f21a4f7791d4ba437bb711ba0e1af51963323aaf381d330"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122104823,
+              "sha256": "0f839e3281e0b4f82cf94ec5fca2474ff5b68c95b36112d839df94644816cd2e"
+            }
+          }
+        },
+        {
+          "side": "new",
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "solve",
+            "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+            "--out",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t1",
+            "--threads",
+            "1"
+          ],
+          "artifacts": {
+            "solution.sol": {
+              "bytes": 82571,
+              "sha256": "8da636424786c0ecfc08bf931057ecfee913cc25fad44914f9070c71feb986ca"
+            },
+            "checkpoint.ckpt": {
+              "bytes": 122104824,
+              "sha256": "2163d356b5ced453e2e4a10330d39be430b69a17ebcb27be1ea940c04ee51d61"
+            }
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              150985,
+              150985
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              150985,
+              150985
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34,
+            "wall_secs": [
+              2.5284125,
+              2.5207106
+            ]
+          }
+        },
+        {
+          "threads": 8,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t8\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+            "runs\\p1-t3c\\fixed-turn6-no-rivers-t8"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": false,
+            "codecs": [
+              {
+                "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+                "bytes": 82566,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+                "bytes": 82566,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": true
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+          ],
+          "result": {
+            "canonical_postcard_streams": true,
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "8614af7d2f26bae8bdfe694d234e8ad62d17f84deebe6742658ff6b3193665b2",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              150985,
+              150985
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+            "solution-stream",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol"
+          ],
+          "result": {
+            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+            "file_bytes_equal": false,
+            "normalized_payload_blake3": "8614af7d2f26bae8bdfe694d234e8ad62d17f84deebe6742658ff6b3193665b2",
+            "payload_bit_equal_except_wall_secs": true,
+            "payload_bytes": [
+              150985,
+              150985
+            ],
+            "strategy_blocks": 34,
+            "value_blocks": 34,
+            "wall_secs": [
+              7.484172,
+              6.6175408000000004
+            ]
+          }
+        },
+        {
+          "threads": 1,
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+            "runs\\p1-t3c\\old-turn6-no-rivers-t1\\solution.sol",
+            "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+            "runs\\p1-t3c\\fixed-turn6-no-rivers-t1"
+          ],
+          "result": {
+            "archived_HEAD_also_thread_dependent": false,
+            "codecs": [
+              {
+                "blake3": "d167d8c10e49cb9042faa3afbbf248d7c39c0f5239ef444a0442d44d3453fdc1",
+                "bytes": 82566,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 1
+              },
+              {
+                "blake3": "d167d8c10e49cb9042faa3afbbf248d7c39c0f5239ef444a0442d44d3453fdc1",
+                "bytes": 82566,
+                "file_bit_equal_at_wall_secs_zero": true,
+                "threads": 8
+              }
+            ],
+            "normalized_payload_bit_equal": true,
+            "thread_1_8_file_bytes_equal": true
+          }
+        }
+      ],
+      "cross_thread_comparison": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\new-turn6-no-rivers-t1\\solution.sol",
+          "runs\\p1-t3c\\new-turn6-no-rivers-t8\\solution.sol",
+          "runs\\p1-t3c\\cross-turn6-no-rivers",
+          "normalize-threads"
+        ],
+        "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      }
+    }
+  ],
+  "resources.json": [
+    {
+      "case": "flop_srp1",
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827349,
+            "f32Bytes": 2818917360,
+            "i16Bytes": 1412142360,
+            "memoryEstimateBytes": 3724228233,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 829242,
+            "saveWorkspaceBytes": 628483524,
+            "terminals": 492552,
+            "withinLimit": true
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop { replace bet [33] }",
+              "turn { replace bet [75] }",
+              "river { replace bet [75] }",
+              "flop { replace raise [3x] }",
+              "turn { replace raise [3x] }",
+              "river { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop_srp1.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827349,
+            "f32Bytes": 2818917360,
+            "i16Bytes": 1412142360,
+            "memoryEstimateBytes": 3792473160,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 829242,
+            "saveWorkspaceBytes": 696728451,
+            "terminals": 492552,
+            "withinLimit": true
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop { replace bet [33] }",
+              "turn { replace bet [75] }",
+              "river { replace bet [75] }",
+              "flop { replace raise [3x] }",
+              "turn { replace raise [3x] }",
+              "river { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      }
+    },
+    {
+      "case": "gtow_a",
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827640,
+            "f32Bytes": 56626060176,
+            "i16Bytes": 28359313664,
+            "memoryEstimateBytes": 67743560843,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 16088610,
+            "saveWorkspaceBytes": 10840673027,
+            "terminals": 10290309,
+            "withinLimit": false
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [33, 75, 125] }",
+              "river { replace bet [33, 75, 125] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827640,
+            "f32Bytes": 56626060176,
+            "i16Bytes": 28359313664,
+            "memoryEstimateBytes": 67811801312,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 16088610,
+            "saveWorkspaceBytes": 10908913496,
+            "terminals": 10290309,
+            "withinLimit": false
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [33, 75, 125] }",
+              "river { replace bet [33, 75, 125] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      }
+    },
+    {
+      "case": "gtow_a-i16",
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827640,
+            "f32Bytes": 56626060176,
+            "i16Bytes": 28359313664,
+            "memoryEstimateBytes": 39476814331,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 16088610,
+            "saveWorkspaceBytes": 10840673027,
+            "terminals": 10290309,
+            "withinLimit": false
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [33, 75, 125] }",
+              "river { replace bet [33, 75, 125] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_a-i16.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827640,
+            "f32Bytes": 56626060176,
+            "i16Bytes": 28359313664,
+            "memoryEstimateBytes": 39545054800,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 16088610,
+            "saveWorkspaceBytes": 10908913496,
+            "terminals": 10290309,
+            "withinLimit": false
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [33, 75, 125] }",
+              "river { replace bet [33, 75, 125] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      }
+    },
+    {
+      "case": "gtow_b",
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827628,
+            "f32Bytes": 21109207896,
+            "i16Bytes": 10572952820,
+            "memoryEstimateBytes": 25683479243,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 6088200,
+            "saveWorkspaceBytes": 4297443719,
+            "terminals": 3787911,
+            "withinLimit": true
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [50, 100] }",
+              "river { replace bet [50, 100] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "validate",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\gtow_b.toml",
+          "--resources",
+          "--format",
+          "json"
+        ],
+        "result": {
+          "actions": [
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "UTG",
+              "seat": 3,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "HJ",
+              "seat": 4,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "CO",
+              "seat": 5,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "raise-to": {
+                  "all_in": false,
+                  "full_raise": true,
+                  "to": 2.5
+                }
+              },
+              "implicit": false,
+              "position": "BTN",
+              "seat": 0,
+              "street": "preflop"
+            },
+            {
+              "action": "fold",
+              "implicit": true,
+              "position": "SB",
+              "seat": 1,
+              "street": "preflop"
+            },
+            {
+              "action": {
+                "call": {
+                  "all_in": false,
+                  "amount": 1.5
+                }
+              },
+              "implicit": false,
+              "position": "BB",
+              "seat": 2,
+              "street": "preflop"
+            }
+          ],
+          "amountUnit": "BB",
+          "effective_stack": 97.5,
+          "gameKind": "hu-postflop",
+          "product": "HuPostflop",
+          "resources": {
+            "compressionWorkspaceBytes": 276827628,
+            "f32Bytes": 21109207896,
+            "i16Bytes": 10572952820,
+            "memoryEstimateBytes": 25751719712,
+            "memoryLimitBytes": 27420078899,
+            "nodes": 6088200,
+            "saveWorkspaceBytes": 4365684188,
+            "terminals": 3787911,
+            "withinLimit": true
+          },
+          "schema": "solvers.nlh/v1",
+          "start": {
+            "actions": [
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "UTG",
+                "seat": 3,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "HJ",
+                "seat": 4,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "CO",
+                "seat": 5,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "raise-to": {
+                    "all_in": false,
+                    "full_raise": true,
+                    "to": 2.5
+                  }
+                },
+                "implicit": false,
+                "position": "BTN",
+                "seat": 0,
+                "street": "preflop"
+              },
+              {
+                "action": "fold",
+                "implicit": true,
+                "position": "SB",
+                "seat": 1,
+                "street": "preflop"
+              },
+              {
+                "action": {
+                  "call": {
+                    "all_in": false,
+                    "amount": 1.5
+                  }
+                },
+                "implicit": false,
+                "position": "BB",
+                "seat": 2,
+                "street": "preflop"
+              }
+            ],
+            "board": [
+              "Ks",
+              "7h",
+              "2d"
+            ],
+            "effective_stack": 97.5,
+            "folded_seats": [
+              1,
+              3,
+              4,
+              5
+            ],
+            "ip": {
+              "position": "BTN",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 0
+            },
+            "oop": {
+              "position": "BB",
+              "preflop": {
+                "flats": 1,
+                "in_position_to_last_aggressor": false,
+                "last_preflop_aggressor_position": "BTN",
+                "limpers": 0,
+                "open_cold_calls": 0,
+                "preflop_participant": true,
+                "squeeze": false
+              },
+              "seat": 2
+            },
+            "pot": 5.5,
+            "previous_street_aggressor": 0,
+            "seats": [
+              {
+                "folded": false,
+                "position": "BTN",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 0,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "SB",
+                "refund": 0,
+                "remaining_stack": 99.5,
+                "seat": 1,
+                "starting_stack": 100,
+                "total_contribution": 0.5
+              },
+              {
+                "folded": false,
+                "position": "BB",
+                "refund": 0,
+                "remaining_stack": 97.5,
+                "seat": 2,
+                "starting_stack": 100,
+                "total_contribution": 2.5
+              },
+              {
+                "folded": true,
+                "position": "UTG",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 3,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "HJ",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 4,
+                "starting_stack": 100,
+                "total_contribution": 0
+              },
+              {
+                "folded": true,
+                "position": "CO",
+                "refund": 0,
+                "remaining_stack": 100,
+                "seat": 5,
+                "starting_stack": 100,
+                "total_contribution": 0
+              }
+            ],
+            "street": "flop"
+          },
+          "status": "valid",
+          "tree": {
+            "params": [],
+            "rules": [
+              "flop when in_position { replace bet [33, 50, 75, 125] }",
+              "flop when !(in_position) { replace bet [33] }",
+              "turn { replace bet [50, 100] }",
+              "river { replace bet [50, 100] }",
+              "flop when !(unopened) { replace raise [3x] }",
+              "turn when !(unopened) { replace raise [3x] }",
+              "river when !(unopened) { replace raise [3x] }"
+            ]
+          },
+          "utilityUnit": "BB",
+          "warnings": [
+            "no stop target: runs until max_iterations or max_time"
+          ]
+        }
+      }
+    }
+  ],
+  "measurements.json": [
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3c\\measure-1-old",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "4316e1e4f344faf0ea3152846c3d5895fc63161a92e997bf55ba4bf4891324f3",
+      "exit_code": 0,
+      "wall_seconds": 40.95034630000009,
+      "peak_working_set_bytes": 3742916608,
+      "peak_commit_bytes": 3804766208,
+      "memory_samples": 931,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 15.25622740000108,
+          "save_seconds": 5.856620999998995
+        },
+        {
+          "iteration": 4,
+          "seconds": 28.288778699999966,
+          "save_seconds": 7.6021584999980405
+        }
+      ],
+      "solution_seconds": 12.661567600000126,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "fe555cdd3121623ca9a7515a61863fa169214f0bc7d27f13eff2abc116b08543"
+        },
+        "solution.sol": {
+          "bytes": 176246963,
+          "sha256": "5701fb66da309a526cffe23863c631071de0c4a3d39f03adb741c761129d2e7d"
+        }
+      },
+      "side": "old",
+      "index": 1,
+      "measure_command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-1-old",
+        "runs\\p1-t3c\\measure-1-old.json"
+      ]
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3c\\measure-2-new",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "c5d53baced92d3d3b45f2c9b9244a27e02b1ee494adccb1a8990ce2e78039839",
+      "exit_code": 0,
+      "wall_seconds": 38.97379830000136,
+      "peak_working_set_bytes": 3750678528,
+      "peak_commit_bytes": 3808538624,
+      "memory_samples": 915,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 14.179020200004743,
+          "save_seconds": 5.41631210000196
+        },
+        {
+          "iteration": 4,
+          "seconds": 26.127801200003887,
+          "save_seconds": 6.26823300000251
+        }
+      ],
+      "solution_seconds": 12.845997099997476,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "0b2b1dd453d60ec3ea70b697812023e097d80538110d50393b72244e3d9d183a"
+        },
+        "solution.sol": {
+          "bytes": 176246963,
+          "sha256": "e5acc093960c752e69d4bc8a7523da350d81c161351b4cea3e8bcdd5b6b9ff6b"
+        }
+      },
+      "side": "new",
+      "index": 2,
+      "measure_command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-2-new",
+        "runs\\p1-t3c\\measure-2-new.json"
+      ]
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3c\\measure-3-old",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "4316e1e4f344faf0ea3152846c3d5895fc63161a92e997bf55ba4bf4891324f3",
+      "exit_code": 0,
+      "wall_seconds": 43.50352610000118,
+      "peak_working_set_bytes": 3739082752,
+      "peak_commit_bytes": 3800358912,
+      "memory_samples": 967,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 16.638328200002434,
+          "save_seconds": 6.847845700001926
+        },
+        {
+          "iteration": 4,
+          "seconds": 30.187270100002934,
+          "save_seconds": 7.8207236000016565
+        }
+      ],
+      "solution_seconds": 13.316255999998248,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "955702f9c969870e0c4f379da7ef755220c4fb020c3b6796f142e045ded82645"
+        },
+        "solution.sol": {
+          "bytes": 176246962,
+          "sha256": "30bb2c9949c70f5e90886bf0ff31c580bf72d2fe07eb90733ffb8dbd2326ca91"
+        }
+      },
+      "side": "old",
+      "index": 3,
+      "measure_command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-3-old",
+        "runs\\p1-t3c\\measure-3-old.json"
+      ]
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "--out",
+        "runs\\p1-t3c\\measure-4-new",
+        "--threads",
+        "8"
+      ],
+      "binary_sha256": "c5d53baced92d3d3b45f2c9b9244a27e02b1ee494adccb1a8990ce2e78039839",
+      "exit_code": 0,
+      "wall_seconds": 39.55815430000075,
+      "peak_working_set_bytes": 3758116864,
+      "peak_commit_bytes": 3816251392,
+      "memory_samples": 921,
+      "checkpoints": [
+        {
+          "iteration": 2,
+          "seconds": 14.296943000001193,
+          "save_seconds": 5.475065200000245
+        },
+        {
+          "iteration": 4,
+          "seconds": 26.182832300000882,
+          "save_seconds": 6.086491999994905
+        }
+      ],
+      "solution_seconds": 13.37532199999987,
+      "artifacts": {
+        "checkpoint.ckpt": {
+          "bytes": 1098800954,
+          "sha256": "71b574dc14ec3bfad0eda519ddf41296e0a6be2069b63e50cc80baab7904c88c"
+        },
+        "solution.sol": {
+          "bytes": 176246963,
+          "sha256": "53df52bd19f2d2f0012577ed1427ea0381142986e784cfc40ab9b6ddb17b20d4"
+        }
+      },
+      "side": "new",
+      "index": 4,
+      "measure_command": [
+        "python",
+        "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\flop4.toml",
+        "runs\\p1-t3c\\measure-4-new",
+        "runs\\p1-t3c\\measure-4-new.json"
+      ]
+    }
+  ],
+  "binary.json": {
+    "old": {
+      "bytes": 7384064,
+      "sha256": "4316e1e4f344faf0ea3152846c3d5895fc63161a92e997bf55ba4bf4891324f3"
+    },
+    "new": {
+      "bytes": 7409152,
+      "sha256": "c5d53baced92d3d3b45f2c9b9244a27e02b1ee494adccb1a8990ce2e78039839"
+    },
+    "verify": {
+      "bytes": 963584,
+      "sha256": "fd6ad03aef74f1dc587cc5491eb930ae6b90e771b2d2a2f17a6bef191d5c1e7e"
+    },
+    "fixed": {
+      "bytes": 1370624,
+      "sha256": "e1eadf5304757ec201b09d6aca41a7a88862e2261343173489f7a4587eaa7a2d"
+    }
+  },
+  "profile": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+      "solve",
+      "experiments/p1-perf-2026-10/sol-strategy-par-20261007/flop4.toml",
+      "--out",
+      "runs\\p1-t3c\\profile-flop",
+      "--threads",
+      "8"
+    ],
+    "binary_sha256": "180f2dc3ed8b2641cba5e090c27f21c51ebce2b73a9fb809deea431c28cccb82",
+    "exit_code": 0,
+    "wall_seconds": 45.26426020000508,
+    "peak_working_set_bytes": 3751501824,
+    "peak_commit_bytes": 3810463744,
+    "memory_samples": 1018,
+    "checkpoints": [
+      {
+        "iteration": 2,
+        "seconds": 17.082259100003284,
+        "save_seconds": 7.147954400003073
+      },
+      {
+        "iteration": 4,
+        "seconds": 31.077271800000744,
+        "save_seconds": 8.12789519999933
+      }
+    ],
+    "solution_seconds": 14.186988400004338,
+    "artifacts": {
+      "checkpoint.ckpt": {
+        "bytes": 1098800954,
+        "sha256": "4542d80877278a4c2bf1b5f311d464b68281bf6b8cdd65d1cd75416b6bb296dd"
+      },
+      "solution.sol": {
+        "bytes": 176246963,
+        "sha256": "af39d822c9d2e758573bd605cae08ab6b0333685450a28f8ab623a7e46bbb36a"
+      }
+    },
+    "phase_output": [
+      "PROFILE strategy_total=7.1637668 generation=6.110101599999998 writes=1.0422361 batches=43",
+      "PROFILE values_pass=2.8031314",
+      "PROFILE values_write=2.9272365000000002"
+    ]
+  },
+  "source_difference_from_final": "initial worker used postcard::to_extend(&block, Vec::with_capacity(block.probs.len() + 15)); final uses strategy_block_bytes with postcard headers plus bulk-copy byte body",
+  "initial_sol_rs_lf_sha256": "d4a8198e8ac05552b6ec51ecfafc196abf0ebdbf3d15726176ccd3ea4dcb5e5f",
+  "initial_artifact_rs_lf_sha256": "fda38cd3973337d6819ae57077e9476440db6480c08eb4f890e8a6d91ce0fab0"
+}

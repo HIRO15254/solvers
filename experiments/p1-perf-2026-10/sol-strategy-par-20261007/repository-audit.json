@@ -1,0 +1,21 @@
+{
+  "forbidden_crates_unchanged": true,
+  "git_diff_check_exit_code": 0,
+  "modified_text_files_are_LF": true,
+  "config_copy_lf_sha256": {
+    "flop4.toml": "1f8e5e3ba8f23131eb5851f029a1f06f7aa6a86790e3a8a195906abdcc9cc54b",
+    "flop_srp1.toml": "ad2662b99c96be2ffa768f762453d5a1b4e2254ac05e32838ef1a23151ed5d69",
+    "gtow_a-i16.toml": "4b5f5911bbe882770b0072d59f2949a3bedf2664d64e7823f8c9ababbb3715a9",
+    "gtow_a.toml": "dfad6a833148fe0cf2ec94b5e59d8c217d9b4afcad92a6c645c935ac3786e1e2",
+    "gtow_b.toml": "701c5b6734bf67600bb0c09c5258595cd5697a226b5252ac4da16a88e47ac20e",
+    "river6-i16.toml": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1",
+    "turn6-no-rivers.toml": "9ad3f9a9385c007ff2271928bd47e8ac5a3df320b68be944e563e66898f3e3c9",
+    "turn6.toml": "b87d166168de0717043104d5fe06c5ccef5122e848033e587fe56cc395749692"
+  },
+  "old_solver_source_matches_HEAD_lf_sha256": {
+    "crates/hu-postflop/src/artifact.rs": "e12c3ea1dc43ba3e066a0a5e8e4330fbb6968f3e300b0da867af833a56140b63",
+    "crates/hu-postflop/src/sol.rs": "5d9d8e2b361b709d1ab7105bad85db576bca6c3d442db50665aebb862bf16939",
+    "crates/hu-postflop/src/postflop.rs": "6fef5f8337ae8e10515943cb33cd874c7e31a50f8b5f6fedc760a7760d509d4e",
+    "crates/hu-postflop/src/prepare.rs": "4d1b83e7606356a060ce73d526433e767c82dde0f5ed0df3053a50264c649ae4"
+  }
+}
