@@ -3,7 +3,7 @@ use crate::prepare;
 use crate::range_equity;
 use crate::run;
 use anyhow::Result;
-use hu_engine::{F32Storage, I16Storage, Storage};
+use hu_engine::{F32Storage, I16Storage, MixedStorage, Storage};
 use nlh::{Card, Player};
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -55,6 +55,7 @@ pub fn compute(
         let row = run::with_threads(prepare::threads(p)?, || match p.settings.solver.storage {
             crate::input::Storage::F32 => board_row::<F32Storage>(p, cancel),
             crate::input::Storage::I16 => board_row::<I16Storage>(p, cancel),
+            crate::input::Storage::I16F32Avg => board_row::<MixedStorage>(p, cancel),
         })?;
         rows.push(row);
         if cancel.load(Ordering::SeqCst) {

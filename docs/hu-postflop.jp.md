@@ -97,7 +97,17 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 初回の平均係数は0、初回regret係数は1である。DCFRのpow4_resetはt = 4, 16, 64, …で平均を捨てる。
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
-`storage = "f32"`はregretと平均累積をf32で保持する。`i16`はblock scale付きの圧縮storageである。
+`storage`は次の3値を受け付ける。既定は`f32`のままである。Lはstorage要素数、Nはaction node数。
+
+| 値 | 保持方式 | storage bytes | 精度の性質 |
+|---|---|---|---|
+| `f32` | regret・戦略累積ともf32 | 8L | storageの整数量子化なし |
+| `i16` | regret・戦略累積ともnodeごとのf32 scale付きi16 | 4L＋8N | memory最小だが、木によってExploitabilityが開始potの0.1%前後で頭打ちになり得る |
+| `i16-f32avg` | regretは旧i16と同じ量子化、戦略累積はf32 | 6L＋4N | 戦略累積の量子化を避け、旧i16の精度床を改善する。regretの量子化誤差は残り、任意の木で0.1%到達を保証しない |
+
+旧i16の精度床は[収束測定](../experiments/p1-perf-2026-10/convergence-20261007/README.md)でTurn最良0.120%、GTO Wizard風の木で最良0.292%だった。
+`i16-f32avg`は`update_regrets_i16_impl`・`normalize_columns_i16`を旧i16と共用し、平均戦略はf32の累積・正規化を使う。
+同じ木・schedule・反復数ではregret配列とregret scaleが旧i16とbit一致する。
 i16の量子化blockはnodeごとのactorの席別support次元であり、support外handの除去でblock scaleと反復結果が変わり得る。
 新旧layoutのbit一致をi16に要求せず、同じconfig・反復予算で収束品質を照合する。
 storageの量子化誤差と`.sol`の出力量子化を区別する。card/bucket近似は無いが浮動小数点の誤差はある。
@@ -159,6 +169,7 @@ JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに�
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
+checkpointは第7節のversion 5で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
@@ -169,7 +180,7 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 | payload | 意味 |
 |---|---|
 | `config_toml` | 外部tree sourceをinline化した実効config全文。木を決定的に再構築する |
-| `meta` | iterations、expl[2]、ev[2]、nash_conv、storage、wall_secs |
+| `meta` | iterations、expl[2]、ev[2]、nash_conv、storage（`f32` / `i16` / `i16-f32avg`の文字列）、wall_secs |
 | `mode` | full / no-rivers |
 | `blocks` | action nodeごとのactor support次元のu16戦略、sref昇順 |
 | `values` | 同じnode集合のOOP support、IP supportの値（席別次元）。block scale付きi16、sref昇順 |
@@ -181,26 +192,27 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1はversion errorで明示的に拒否する。現行configから再solveしてversion 2を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 4である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5である。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 
 | 部分 | 内容 |
 |---|---|
-| u32 metadata長＋postcard metadata | 実効config全文（Option<String>）、累積elapsed_secs（Option<f64>）、iteration（u64）、i16 backend（bool）、4配列の長さ（[u64;4]）。metadataは16 MiB以下 |
-| 生配列 | regrets、strategy_sum。f32 backendは2本のf32配列、残りの長さは0。i16 backendは2本のi16配列に続きregret_scales、strategy_scalesのf32配列 |
+| u32 metadata長＋postcard metadata | 実効config全文（Option<String>）、累積elapsed_secs（Option<f64>）、iteration（u64）、backend enum（postcard variant index: 0=`f32`、1=`i16`、2=`i16-f32avg`）、4配列の長さ（[u64;4]）。metadataは16 MiB以下 |
+| 生配列 | regrets、strategy_sum。f32 backendは2本のf32配列、残りの長さは0。i16 backendは2本のi16配列に続きregret_scales、strategy_scalesのf32配列。`i16-f32avg`はregrets（i16）、strategy_sum（f32）、regret_scales（f32）の順、4番目の長さは0 |
 | 32-byte digest | header、metadata長、metadata、生配列の連結のBLAKE3 |
 
 header/payloadのiteration一致、backendと全配列長、digest、frame終端、末尾余剰bytesを検査する。
 切詰め・破損はerrorであり、読込み失敗した部分的storageからsolveを再開しない。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-storageの長さはcompact supportで決まる。P1 resumeはversion 4だけを受理し、埋込みconfigを必須とする。
-version 1/2/3は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
+storageの長さはcompact supportで決まる。P1 resumeはversion 5だけを受理し、埋込みconfigを必須とする。
+version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
 保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
 `.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
 圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
 
+`MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`を別々に返し、選択したstorage bytesをmemory上限判定へ使う。
 P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
 戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
 `saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。

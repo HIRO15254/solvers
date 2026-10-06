@@ -368,10 +368,18 @@ fn memory_auto_explicit_boundary_and_overflow() {
     let estimate = MemoryEstimate {
         f32_bytes: 100,
         i16_bytes: 60,
+        i16_f32avg_bytes: 90,
         ..Default::default()
     };
     check_memory_limit(&estimate, Storage::F32, 100).unwrap();
     check_memory_limit(&estimate, Storage::I16, 60).unwrap();
+    check_memory_limit(&estimate, Storage::I16F32Avg, 90).unwrap();
+    assert_eq!(
+        check_memory_limit(&estimate, Storage::I16F32Avg, 89)
+            .unwrap_err()
+            .required,
+        90
+    );
     let error = check_memory_limit(&estimate, Storage::F32, 99).unwrap_err();
     assert_eq!((error.required, error.limit), (100, 99));
     assert!(error.to_string().contains("resource limit"));

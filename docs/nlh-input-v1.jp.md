@@ -526,7 +526,7 @@ P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomp
 ```toml
 [solver]
 iso_merging = true        # 既定true。Turn/Riverのsuit同型を厳密に併合
-storage = "f32"           # 既定f32。f32 | i16
+storage = "f32"           # 既定f32。f32 | i16 | i16-f32avg
 
 [solver.algorithm]
 schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs-dcfr
@@ -564,6 +564,8 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。
+`storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小だが木によって0.1% pot前後で頭打ちになり得る。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
+
 scheduleの更新式は[計算規範](hu-postflop.jp.md#4-計算停止storage)を参照する。
 
 ### P2（Multiway Preflop）
@@ -635,12 +637,13 @@ checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
 ```
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
-- `memory`: P1はsolve開始前に見積もるstorageと保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域・圧縮予算）の上限で、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
+- `memory`: P1は選択したstorageのbytes（`f32_bytes` / `i16_bytes` / `i16_f32avg_bytes`）を使い、solve開始前に見積もるstorageと保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域・圧縮予算）の上限で、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
   超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
   （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1の木・rank table・構築一時領域・thread scratch等は別途必要である。
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。
+- P1 checkpointはversion 5。metadataはbackend種別（`f32` / `i16` / `i16-f32avg`）と配列長を保持する。version 1〜4は移行先を示すerrorで拒否し、現行configから再solveする。[P1第7節](hu-postflop.jp.md#7-solとcheckpoint)を参照。
 - `max_time`、checkpointの判定は計算batchの境界で行う。P1は`check_every` iteration、P2は
   `batch_sweeps`の完了境界である。I/Oや最終出力を中断するhard deadlineではない。
 

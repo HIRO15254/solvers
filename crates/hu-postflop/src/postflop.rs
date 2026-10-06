@@ -1640,6 +1640,8 @@ pub struct MemoryEstimate {
     /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
+    /// Bytes for i16 regrets, f32 strategy sums, and one regret scale per node.
+    pub i16_f32avg_bytes: u64,
     /// Packed value slots, mode/street metadata and one bounded parallel
     /// strategy batch for a full `.sol` export.
     pub save_bytes: u64,
@@ -1713,6 +1715,7 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
     Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
+        i16_f32avg_bytes: counting.elements * 6 + counting.action_nodes * 4,
         save_bytes: counting.action_nodes
                 * 2
                 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64

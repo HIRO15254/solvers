@@ -24,6 +24,7 @@ pub fn check_memory_limit(
     let required = match storage {
         Storage::F32 => estimate.f32_bytes,
         Storage::I16 => estimate.i16_bytes,
+        Storage::I16F32Avg => estimate.i16_f32avg_bytes,
     }
     .saturating_add(estimate.save_bytes)
     .saturating_add(estimate.compression_bytes);

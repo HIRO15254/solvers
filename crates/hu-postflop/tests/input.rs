@@ -158,6 +158,65 @@ fn strict_sections_codes_and_other_product_diagnostics() {
 }
 
 #[test]
+fn all_storage_literals_normalize_and_preserve_backend() {
+    for (name, backend) in [
+        ("f32", Storage::F32),
+        ("i16", Storage::I16),
+        ("i16-f32avg", Storage::I16F32Avg),
+    ] {
+        let doc = parse(&format!("{}\n[solver]\nstorage = '{name}'", standard("")));
+        let effective = doc.normalize(&P1Sections).unwrap();
+        let normalized = parse(&effective);
+        assert_eq!(effective, normalized.normalize(&P1Sections).unwrap());
+        assert_eq!(
+            Settings::parse(&normalized.spot, &normalized.solver, &normalized.output)
+                .unwrap()
+                .solver
+                .storage,
+            backend
+        );
+    }
+}
+
+#[test]
+fn mixed_live_queries_and_report_match_direct_solver() {
+    use hu_postflop::{artifact::StrategyProvider, prepare, queries, report, run};
+    use std::sync::atomic::AtomicBool;
+    let raw = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d 3c 8d",
+        "river { replace bet [50] replace raise [a] }",
+    ) + "\n[solver]\nstorage='i16-f32avg'\n[solver.stop]\nmax_iterations=8\ncheck_every=4\n[run]\nthreads=2\n";
+    let path = Path::new("mixed.toml");
+    let prepared = prepare::prepare(&raw, path).unwrap();
+    let cancel = AtomicBool::new(false);
+    let game = try_build_postflop_game(&prepared.config, prepared.payoff.pipeline()).unwrap();
+    let mut direct = hu_engine::Solver::<_, hu_engine::MixedStorage>::new(
+        game.game,
+        run::schedule(&prepared.settings.solver.algorithm),
+        Some(8),
+    );
+    direct.run(8);
+    let expected = direct.average_strategy_at(0);
+    queries::with_live(&prepared, None, None, &cancel, |live| {
+        assert_eq!(live.summary.iterations, 8);
+        assert_eq!(live.game().tree.storage_len, direct.game().tree.storage_len);
+        assert_eq!(queries::LiveProvider(live).average_strategy(0)?, expected);
+        Ok(())
+    })
+    .unwrap();
+    let rows =
+        report::compute(&raw, path, &["Ks 7h 2d 3c 8d".into()], &cancel, &mut |_| {}).unwrap();
+    assert_eq!(rows[0].iterations, 8);
+    let expl = direct.exploitability();
+    assert_eq!(
+        rows[0].nash_conv.to_bits(),
+        (expl[Player::P0] + expl[Player::P1]).to_bits()
+    );
+}
+
+#[test]
 fn spec_p1_example_lowering_and_sizes() {
     let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
     let example = spec

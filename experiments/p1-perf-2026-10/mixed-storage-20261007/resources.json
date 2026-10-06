@@ -1,0 +1,98 @@
+[
+  {
+    "case": "gtow_a",
+    "storage": "f32",
+    "resources": {
+      "compressionWorkspaceBytes": 276827640,
+      "f32Bytes": 56626060176,
+      "i16Bytes": 28359313664,
+      "i16F32avgBytes": 42492686920,
+      "memoryEstimateBytes": 67811801312,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 16088610,
+      "saveWorkspaceBytes": 10908913496,
+      "terminals": 10290309,
+      "withinLimit": false
+    }
+  },
+  {
+    "case": "gtow_a",
+    "storage": "i16",
+    "resources": {
+      "compressionWorkspaceBytes": 276827640,
+      "f32Bytes": 56626060176,
+      "i16Bytes": 28359313664,
+      "i16F32avgBytes": 42492686920,
+      "memoryEstimateBytes": 39545054800,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 16088610,
+      "saveWorkspaceBytes": 10908913496,
+      "terminals": 10290309,
+      "withinLimit": false
+    }
+  },
+  {
+    "case": "gtow_a",
+    "storage": "i16-f32avg",
+    "resources": {
+      "compressionWorkspaceBytes": 276827661,
+      "f32Bytes": 56626060176,
+      "i16Bytes": 28359313664,
+      "i16F32avgBytes": 42492686920,
+      "memoryEstimateBytes": 53678428077,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 16088610,
+      "saveWorkspaceBytes": 10908913496,
+      "terminals": 10290309,
+      "withinLimit": false
+    }
+  },
+  {
+    "case": "gtow_b",
+    "storage": "f32",
+    "resources": {
+      "compressionWorkspaceBytes": 276827628,
+      "f32Bytes": 21109207896,
+      "i16Bytes": 10572952820,
+      "i16F32avgBytes": 15841080358,
+      "memoryEstimateBytes": 25751719712,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 6088200,
+      "saveWorkspaceBytes": 4365684188,
+      "terminals": 3787911,
+      "withinLimit": true
+    }
+  },
+  {
+    "case": "gtow_b",
+    "storage": "i16",
+    "resources": {
+      "compressionWorkspaceBytes": 276827628,
+      "f32Bytes": 21109207896,
+      "i16Bytes": 10572952820,
+      "i16F32avgBytes": 15841080358,
+      "memoryEstimateBytes": 15215464636,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 6088200,
+      "saveWorkspaceBytes": 4365684188,
+      "terminals": 3787911,
+      "withinLimit": true
+    }
+  },
+  {
+    "case": "gtow_b",
+    "storage": "i16-f32avg",
+    "resources": {
+      "compressionWorkspaceBytes": 276827649,
+      "f32Bytes": 21109207896,
+      "i16Bytes": 10572952820,
+      "i16F32avgBytes": 15841080358,
+      "memoryEstimateBytes": 20483592195,
+      "memoryLimitBytes": 27420078899,
+      "nodes": 6088200,
+      "saveWorkspaceBytes": 4365684188,
+      "terminals": 3787911,
+      "withinLimit": true
+    }
+  }
+]

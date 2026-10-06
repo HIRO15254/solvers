@@ -1,4 +1,4 @@
-//! Version 4 streaming checkpoints. Only bounded metadata is postcard;
+//! Version 5 streaming checkpoints. Only bounded metadata is postcard;
 //! storage is raw little-endian arenas, protected by a BLAKE3 digest.
 use hu_engine::{SolverState, Storage, StorageArrays, StorageArraysMut, StorageState};
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use std::path::Path;
 
 pub const HEADER_LEN: usize = 50;
 const MAGIC: &[u8; 8] = b"SLVRCKPT";
-const FORMAT_VERSION: u16 = 4;
+const FORMAT_VERSION: u16 = 5;
 const MAX_METADATA: usize = 16 * 1024 * 1024;
 const IO_CHUNK: usize = 64 * 1024;
 
@@ -44,12 +44,19 @@ pub struct Checkpoint {
     pub elapsed_secs: Option<f64>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+enum Backend {
+    F32,
+    I16,
+    I16F32Avg,
+}
+
 #[derive(Serialize, Deserialize)]
 struct Metadata {
     config_toml: Option<String>,
     elapsed_secs: Option<f64>,
     iteration: u64,
-    i16: bool,
+    backend: Backend,
     lengths: [u64; 4],
 }
 
@@ -77,14 +84,27 @@ fn build_header(hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
     buf[42..].copy_from_slice(&iteration.to_le_bytes());
     buf
 }
-fn shape(arrays: &StorageArrays<'_>) -> (bool, [u64; 4]) {
+fn shape(arrays: &StorageArrays<'_>) -> (Backend, [u64; 4]) {
     match arrays {
         StorageArrays::F32 {
             regrets,
             strategy_sum,
         } => (
-            false,
+            Backend::F32,
             [regrets.len() as u64, strategy_sum.len() as u64, 0, 0],
+        ),
+        StorageArrays::Mixed {
+            regrets,
+            strategy_sum,
+            regret_scales,
+        } => (
+            Backend::I16F32Avg,
+            [
+                regrets.len() as u64,
+                strategy_sum.len() as u64,
+                regret_scales.len() as u64,
+                0,
+            ],
         ),
         StorageArrays::I16 {
             regrets,
@@ -92,7 +112,7 @@ fn shape(arrays: &StorageArrays<'_>) -> (bool, [u64; 4]) {
             regret_scales,
             strategy_scales,
         } => (
-            true,
+            Backend::I16,
             [
                 regrets.len() as u64,
                 strategy_sum.len() as u64,
@@ -110,7 +130,7 @@ pub struct CheckpointReader {
     pub iteration: u64,
     pub config_toml: Option<String>,
     pub elapsed_secs: Option<f64>,
-    i16: bool,
+    backend: Backend,
     lengths: [u64; 4],
     decoder: zstd::stream::read::Decoder<'static, BufReader<File>>,
     hasher: blake3::Hasher,
@@ -144,8 +164,11 @@ impl CheckpointReader {
                 "header/payload iteration mismatch",
             ));
         }
-        if !metadata.i16 && metadata.lengths[2..] != [0, 0] {
+        if metadata.backend == Backend::F32 && metadata.lengths[2..] != [0, 0] {
             return Err(CheckpointError::Invalid("unexpected f32 scales"));
+        }
+        if metadata.backend == Backend::I16F32Avg && metadata.lengths[3] != 0 {
+            return Err(CheckpointError::Invalid("unexpected mixed strategy scales"));
         }
         if metadata
             .elapsed_secs
@@ -162,7 +185,7 @@ impl CheckpointReader {
             iteration: parsed.iteration,
             config_toml: metadata.config_toml,
             elapsed_secs: metadata.elapsed_secs,
-            i16: metadata.i16,
+            backend: metadata.backend,
             lengths: metadata.lengths,
             decoder,
             hasher,
@@ -171,7 +194,7 @@ impl CheckpointReader {
     /// Writes into the final storage allocation; never owns a second arena.
     /// On failure the caller must discard the partially restored backend.
     pub fn read_storage(mut self, storage: &mut impl Storage) -> Result<(), CheckpointError> {
-        if shape(&storage.arrays()) != (self.i16, self.lengths) {
+        if shape(&storage.arrays()) != (self.backend, self.lengths) {
             return Err(CheckpointError::Invalid(
                 "storage backend or lengths mismatch",
             ));
@@ -186,6 +209,15 @@ impl CheckpointReader {
             } => {
                 self.read_array(regrets)?;
                 self.read_array(strategy_sum)?;
+            }
+            StorageArraysMut::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => {
+                self.read_array(regrets)?;
+                self.read_array(strategy_sum)?;
+                self.read_array(regret_scales)?;
             }
             StorageArraysMut::I16 {
                 regrets,
@@ -259,18 +291,22 @@ fn allocate<T: Default + Clone>(len: u64) -> Result<Vec<T>, CheckpointError> {
 pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
     let mut reader = CheckpointReader::open(path)?;
     let [a, b, c, d] = reader.lengths;
-    let mut storage = if reader.i16 {
-        StorageState::I16 {
+    let mut storage = match reader.backend {
+        Backend::F32 => StorageState::F32 {
+            regrets: allocate(a)?,
+            strategy_sum: allocate(b)?,
+        },
+        Backend::I16 => StorageState::I16 {
             regrets: allocate(a)?,
             strategy_sum: allocate(b)?,
             regret_scales: allocate(c)?,
             strategy_scales: allocate(d)?,
-        }
-    } else {
-        StorageState::F32 {
+        },
+        Backend::I16F32Avg => StorageState::Mixed {
             regrets: allocate(a)?,
             strategy_sum: allocate(b)?,
-        }
+            regret_scales: allocate(c)?,
+        },
     };
     reader.read_arrays(storage.arrays_mut())?;
     Ok(Checkpoint {
@@ -350,12 +386,12 @@ fn write_arrays(
     threads: usize,
     level: i32,
 ) -> Result<(), CheckpointError> {
-    let (i16, lengths) = shape(&arrays);
+    let (backend, lengths) = shape(&arrays);
     let metadata = postcard::to_allocvec(&Metadata {
         config_toml: config.map(str::to_owned),
         elapsed_secs: elapsed,
         iteration,
-        i16,
+        backend,
         lengths,
     })?;
     if metadata.len() > MAX_METADATA {
@@ -392,6 +428,15 @@ fn write_arrays(
             } => {
                 write_array(&mut encoder, &mut hasher, regrets)?;
                 write_array(&mut encoder, &mut hasher, strategy_sum)?;
+            }
+            StorageArrays::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => {
+                write_array(&mut encoder, &mut hasher, regrets)?;
+                write_array(&mut encoder, &mut hasher, strategy_sum)?;
+                write_array(&mut encoder, &mut hasher, regret_scales)?;
             }
             StorageArrays::I16 {
                 regrets,
@@ -517,10 +562,51 @@ mod tests {
         std::fs::remove_file(path).unwrap();
     }
     #[test]
-    fn direct_resume_f32_and_i16_bit_identical_after_iterations() {
+    fn direct_resume_all_backends_bit_identical_after_iterations() {
         streaming_resume::<hu_engine::F32Storage>();
         streaming_resume::<hu_engine::I16Storage>();
+        streaming_resume::<hu_engine::MixedStorage>();
     }
+    #[test]
+    fn mixed_roundtrip_and_all_backend_mismatches_rejected_before_writing() {
+        use hu_engine::{F32Storage, I16Storage, MixedStorage};
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("mixed.ckpt");
+        let mixed = SolverState {
+            iteration: 7,
+            storage: StorageState::Mixed {
+                regrets: vec![-32000, 0, 32000],
+                strategy_sum: vec![0.0, -0.0, 1.25],
+                regret_scales: vec![0.015, 2.0],
+            },
+        };
+        for state in [sample_state_f32(), sample_state_i16(), mixed] {
+            write_checkpoint(&path, [9; 32], &state).unwrap();
+            assert_eq!(
+                postcard::to_allocvec(&read_checkpoint(&path).unwrap().state).unwrap(),
+                postcard::to_allocvec(&state).unwrap()
+            );
+            macro_rules! reject {
+                ($backend:ty) => {
+                    let mut storage = <$backend>::new(3, 2);
+                    if shape(&storage.arrays()).0 != shape(&state.storage.arrays()).0 {
+                        let before = postcard::to_allocvec(&storage.state()).unwrap();
+                        assert!(
+                            CheckpointReader::open(&path)
+                                .unwrap()
+                                .read_storage(&mut storage)
+                                .is_err()
+                        );
+                        assert_eq!(postcard::to_allocvec(&storage.state()).unwrap(), before);
+                    }
+                };
+            }
+            reject!(F32Storage);
+            reject!(I16Storage);
+            reject!(MixedStorage);
+        }
+    }
+
     #[test]
     fn atomic_replacement_and_failed_save_preserve_the_previous_file() {
         let dir = tempfile::tempdir().unwrap();
@@ -671,7 +757,7 @@ mod tests {
 
     #[test]
     fn rejects_pre_compact_versions_before_decoding() {
-        for version in [1u16, 2, 3] {
+        for version in [1u16, 2, 3, 4] {
             let path = temp_path("old-format.checkpoint");
             let mut header = build_header([0; 32], 0);
             header[8..10].copy_from_slice(&version.to_le_bytes());

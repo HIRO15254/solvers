@@ -1,0 +1,156 @@
+{
+  "comparisons": [
+    {
+      "case": "turn6",
+      "result": {
+        "canonical_postcard_streams": true,
+        "file_bytes_equal": false,
+        "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+        "payload_bit_equal_except_wall_secs": true,
+        "payload_bytes": [
+          89137084,
+          89137084
+        ],
+        "strategy_blocks": 20482,
+        "value_blocks": 20482
+      },
+      "matches_original_measurement_payload": true,
+      "artifacts": [
+        {
+          "path": "runs/p1-t6/final-turn6-old/checkpoint.ckpt",
+          "bytes": 122140848,
+          "sha256_raw": "7cda9fe313b2a8c4069cbc2c281ee51599b352b50ab7da0de8ca7c661bbb4fd6",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-turn6-old/solution.sol",
+          "bytes": 33316700,
+          "sha256_raw": "7f2d1addcfc7f2e703c05d359d8d89d161a2b990a81af775fe468399d315a220",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-turn6-new/checkpoint.ckpt",
+          "bytes": 122140847,
+          "sha256_raw": "4c5be5b5a15708d7eaa00da889874e5543d73ba6ae569c584cb4ceb2a190adab",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-turn6-new/solution.sol",
+          "bytes": 33316700,
+          "sha256_raw": "84dfa1c2b3b32fb160e9bd2e74761e9cbd8ff80619c9768f6843db6b4eb17bff",
+          "availability": "deleted after hash/comparison"
+        }
+      ]
+    },
+    {
+      "case": "river6-i16",
+      "result": {
+        "canonical_postcard_streams": true,
+        "file_bytes_equal": false,
+        "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+        "payload_bit_equal_except_wall_secs": true,
+        "payload_bytes": [
+          144771,
+          144771
+        ],
+        "strategy_blocks": 34,
+        "value_blocks": 34
+      },
+      "matches_original_measurement_payload": true,
+      "artifacts": [
+        {
+          "path": "runs/p1-t6/final-river6-i16-old/checkpoint.ckpt",
+          "bytes": 119700,
+          "sha256_raw": "3d388eafc4f681bc3ee211cdf4919e26ca7a5a9715412784413683c30f849aae",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-river6-i16-old/solution.sol",
+          "bytes": 73017,
+          "sha256_raw": "384f3cd04cfb413064c2d48145a78fedf39261ebf2ee18bcdaf57a897f62a19e",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-river6-i16-new/checkpoint.ckpt",
+          "bytes": 119697,
+          "sha256_raw": "6778fd8e40786ecb41b524fcd3f248fb7613a34b26ece7dcfa98a3693d7c3fd4",
+          "availability": "deleted after hash/comparison"
+        },
+        {
+          "path": "runs/p1-t6/final-river6-i16-new/solution.sol",
+          "bytes": 73017,
+          "sha256_raw": "11f9fdc47886dd5a0a75d880a2131359ad24660fb8a92e0728ba5189b0a5ccbd",
+          "availability": "deleted after hash/comparison"
+        }
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-old",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn6.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-new",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-old\\solution.sol",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-turn6-new\\solution.sol"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t6-old\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-old",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\river6-i16.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-new",
+        "--threads",
+        "8"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-old\\solution.sol",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\runs\\p1-t6\\final-river6-i16-new\\solution.sol"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

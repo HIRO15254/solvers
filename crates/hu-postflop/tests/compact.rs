@@ -1,4 +1,4 @@
-use hu_engine::{NodeKind, TerminalEvaluator};
+use hu_engine::{NodeKind, Storage, TerminalEvaluator};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use hu_postflop::{PerStreet, PostflopConfig, try_build_postflop_game, try_memory_usage};
 use nlh::{Card, Chips, PerPlayer, Player, combo_cards};
@@ -36,6 +36,10 @@ fn runouts_mask_fixed_asymmetric_support_and_zero_dead_terminal_values() {
     assert_eq!(
         estimate.i16_bytes,
         tree.storage_len as u64 * 4 + tree.storage_refs.len() as u64 * 8
+    );
+    assert_eq!(
+        estimate.i16_f32avg_bytes,
+        hu_engine::MixedStorage::bytes_for(tree.storage_len, tree.storage_refs.len())
     );
     for node in &tree.nodes {
         if node.kind == NodeKind::Action {

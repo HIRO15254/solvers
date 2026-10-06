@@ -51,6 +51,15 @@ fn main() -> Result<()> {
                     hash_f32(&mut hash, &regrets);
                     hash_f32(&mut hash, &strategy_sum);
                 }
+                StorageState::Mixed {
+                    regrets,
+                    strategy_sum,
+                    regret_scales,
+                } => {
+                    hash_i16(&mut hash, &regrets);
+                    hash_f32(&mut hash, &strategy_sum);
+                    hash_f32(&mut hash, &regret_scales);
+                }
                 StorageState::I16 {
                     regrets,
                     strategy_sum,

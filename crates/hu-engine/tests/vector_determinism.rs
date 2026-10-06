@@ -7,8 +7,9 @@ use std::sync::{
 };
 
 use hu_engine::{
-    CompiledGame, Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, PublicTree, ReachMap, Solver,
-    SparseTransition, Storage, StorageState, TempNode, TerminalEvaluator, TreeSpec, reach_at,
+    CompiledGame, Dcfr, F32Storage, I16Storage, MixedStorage, NodeKind, ParConfig, PublicTree,
+    ReachMap, Solver, SparseTransition, Storage, StorageState, TempNode, TerminalEvaluator,
+    TreeSpec, reach_at,
 };
 use nlh::{PerPlayer, Player};
 
@@ -130,6 +131,16 @@ fn state_bits(state: StorageState) -> Vec<u32> {
             regrets,
             strategy_sum,
         } => [bits(&regrets), bits(&strategy_sum)].concat(),
+        StorageState::Mixed {
+            regrets,
+            strategy_sum,
+            regret_scales,
+        } => {
+            let mut v: Vec<_> = regrets.into_iter().map(|x| x as u16 as u32).collect();
+            v.extend(bits(&strategy_sum));
+            v.extend(bits(&regret_scales));
+            v
+        }
         StorageState::I16 {
             regrets,
             strategy_sum,
@@ -306,6 +317,13 @@ fn action_and_fused_values_i16() {
     check::<I16Storage>(257, false, true, Player::P0);
     check::<I16Storage>(8, false, false, Player::P1);
 }
+#[test]
+fn mixed_storage_action_and_chance_values() {
+    check::<MixedStorage>(257, false, true, Player::P0);
+    check::<MixedStorage>(257, true, false, Player::P1);
+    check_asymmetric_empty::<MixedStorage>();
+}
+
 #[test]
 fn mixed_transition_chance_and_nested_actions() {
     check::<F32Storage>(257, true, true, Player::P0);
