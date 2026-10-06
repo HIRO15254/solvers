@@ -30,7 +30,7 @@ fn main() -> Result<()> {
     while let Some(arg) = args.next() {
         if arg == "--help" {
             println!(
-                "trunk_solve --config TOML [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON]"
+                "trunk_solve --config TOML [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--solver-k4-samples N] [--solver-k4-min-samples M (requires N)] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON]\n--k4-samples and --seed define the model/evaluator; solver K4 flags use iteration-varying samples only during solving."
             );
             return Ok(());
         }
@@ -43,6 +43,8 @@ fn main() -> Result<()> {
             "--t3-samples" => t3_samples = value.parse()?,
             "--t3-seed" => t3_seed = value.parse()?,
             "--k4-samples" => model_options.k4_samples = value.parse()?,
+            "--solver-k4-samples" => options.k4_samples = Some(value.parse()?),
+            "--solver-k4-min-samples" => options.k4_min_samples = Some(value.parse()?),
             "--seed" => model_options.seed = value.parse()?,
             "--threads" => threads = Some(value.parse::<usize>()?),
             "--iterations" => options.iterations = value.parse()?,
@@ -57,6 +59,16 @@ fn main() -> Result<()> {
             _ => bail!("unknown argument {arg}"),
         }
     }
+    ensure!(
+        options.k4_samples != Some(0),
+        "solver K4 samples must be positive"
+    );
+    ensure!(
+        options
+            .k4_min_samples
+            .is_none_or(|min| min >= 1 && options.k4_samples.is_some_and(|n| min <= n)),
+        "--solver-k4-min-samples requires --solver-k4-samples and 1 <= min <= samples"
+    );
     let source = config.context("--config is required")?;
     ensure!(threads != Some(0), "threads must be positive");
     let total = Instant::now();

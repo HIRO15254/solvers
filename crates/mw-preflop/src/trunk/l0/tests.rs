@@ -49,10 +49,24 @@ fn shared_leaves_and_solver_values_match_evaluator() {
         )
         .unwrap();
         let reach = reaches(&tree, &profile, &model);
-        let all = leaf_values(&tree, &model, &reach, &(0..players).collect::<Vec<_>>()).unwrap();
+        let all = leaf_values(
+            &tree,
+            &model,
+            &reach,
+            &(0..players).collect::<Vec<_>>(),
+            super::leaves::K4Plan::model(&model),
+        )
+        .unwrap();
         let evaluation = evaluate(&tree, &profile, &model).unwrap();
         for p in 0..players {
-            let single = leaf_values(&tree, &model, &reach, &[p]).unwrap();
+            let single = leaf_values(
+                &tree,
+                &model,
+                &reach,
+                &[p],
+                super::leaves::K4Plan::model(&model),
+            )
+            .unwrap();
             for (a, b) in single.values[p]
                 .iter()
                 .flatten()
@@ -185,7 +199,7 @@ fn trunk_solver_converges_four_players() {
 
 #[test]
 fn trunk_solver_determinism_checkpoints_and_validation() {
-    let game = game(&config(4, true, false));
+    let game = game(&config(4, true, false).replace("remove call", ""));
     let tree = Tree::build(&game).unwrap();
     let model = Model::new(
         &game,
@@ -201,68 +215,81 @@ fn trunk_solver_determinism_checkpoints_and_validation() {
         eval_every: 4,
         ..Default::default()
     };
-    let run = |threads| {
-        let mut observed = Vec::new();
-        let result = rayon::ThreadPoolBuilder::new()
-            .num_threads(threads)
-            .build()
-            .unwrap()
-            .install(|| {
-                solve(&tree, &model, options, |p| {
-                    observed.push((p.iteration, p.checkpoint.map(|c| c.iteration)))
-                })
+    for options in [
+        options,
+        SolveOptions {
+            k4_samples: Some(32),
+            ..options
+        },
+        SolveOptions {
+            k4_samples: Some(32),
+            k4_min_samples: Some(4),
+            ..options
+        },
+    ] {
+        let run = |threads| {
+            let mut observed = Vec::new();
+            let result = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
                 .unwrap()
-            });
-        assert_eq!(
-            observed,
-            vec![
-                (0, Some(0)),
-                (1, None),
-                (2, None),
-                (3, None),
-                (4, Some(4)),
-                (5, None),
-                (6, None),
-                (7, None),
-                (8, Some(8)),
-                (9, Some(9))
-            ]
-        );
-        result
-    };
-    let one = run(1);
-    for other in [run(4), run(1)] {
-        for (z, _) in tree
-            .nodes
-            .iter()
-            .enumerate()
-            .filter(|(_, n)| n.actor.is_some())
-        {
-            for c in 0..169 {
-                assert_eq!(
-                    one.average
-                        .row(&tree, z, c)
-                        .iter()
-                        .map(|x| x.to_bits())
-                        .collect::<Vec<_>>(),
-                    other
-                        .average
-                        .row(&tree, z, c)
-                        .iter()
-                        .map(|x| x.to_bits())
-                        .collect::<Vec<_>>()
-                );
+                .install(|| {
+                    solve(&tree, &model, options, |p| {
+                        observed.push((p.iteration, p.checkpoint.map(|c| c.iteration)))
+                    })
+                    .unwrap()
+                });
+            assert_eq!(
+                observed,
+                vec![
+                    (0, Some(0)),
+                    (1, None),
+                    (2, None),
+                    (3, None),
+                    (4, Some(4)),
+                    (5, None),
+                    (6, None),
+                    (7, None),
+                    (8, Some(8)),
+                    (9, Some(9))
+                ]
+            );
+            result
+        };
+        let one = run(1);
+        for other in [run(4), run(1)] {
+            for (z, _) in tree
+                .nodes
+                .iter()
+                .enumerate()
+                .filter(|(_, n)| n.actor.is_some())
+            {
+                for c in 0..169 {
+                    assert_eq!(
+                        one.average
+                            .row(&tree, z, c)
+                            .iter()
+                            .map(|x| x.to_bits())
+                            .collect::<Vec<_>>(),
+                        other
+                            .average
+                            .row(&tree, z, c)
+                            .iter()
+                            .map(|x| x.to_bits())
+                            .collect::<Vec<_>>()
+                    );
+                }
             }
-        }
-        assert_eq!(one.checkpoints.len(), other.checkpoints.len());
-        for (a, b) in one.checkpoints.iter().zip(other.checkpoints) {
-            assert_eq!(a.iteration, b.iteration);
-            assert_eq!(a.nash_conv.to_bits(), b.nash_conv.to_bits());
-            for (a, b) in a.seats.iter().zip(b.seats) {
-                assert_eq!(a.seat, b.seat);
-                assert_eq!(a.value.to_bits(), b.value.to_bits());
-                assert_eq!(a.best_response.to_bits(), b.best_response.to_bits());
-                assert_eq!(a.gain.to_bits(), b.gain.to_bits());
+            assert_eq!(one.checkpoints.len(), other.checkpoints.len());
+            for (a, b) in one.checkpoints.iter().zip(other.checkpoints) {
+                assert_eq!(a.iteration, b.iteration);
+                assert_eq!(a.nash_conv.to_bits(), b.nash_conv.to_bits());
+                for (a, b) in a.seats.iter().zip(b.seats) {
+                    assert_eq!(a.seat, b.seat);
+                    assert_eq!(a.value.to_bits(), b.value.to_bits());
+                    assert_eq!(a.best_response.to_bits(), b.best_response.to_bits());
+                    assert_eq!(a.gain.to_bits(), b.gain.to_bits());
+                }
             }
         }
     }
@@ -298,6 +325,24 @@ fn trunk_solver_determinism_checkpoints_and_validation() {
     assert_eq!(initial_target.iterations, 0);
     assert!(initial_target.reached_target);
     for invalid in [
+        SolveOptions {
+            k4_samples: Some(0),
+            ..options
+        },
+        SolveOptions {
+            k4_samples: Some(32),
+            k4_min_samples: Some(0),
+            ..options
+        },
+        SolveOptions {
+            k4_samples: Some(32),
+            k4_min_samples: Some(33),
+            ..options
+        },
+        SolveOptions {
+            k4_min_samples: Some(1),
+            ..options
+        },
         SolveOptions {
             iterations: 0,
             ..options
@@ -1877,5 +1922,390 @@ fn sampler_three_way_matches_fixed_table_within_five_standard_errors() {
             let se = (variance / 8.0 + 36.0 / 65536.0).sqrt();
             assert!((mean - get(&table)).abs() <= 5.0 * se);
         }
+    }
+}
+
+#[test]
+fn incremental_reaches_match_full_rebuild_bitwise() {
+    use super::eval::{reaches, solver_reaches, update_reach};
+    for players in [3, 4] {
+        for limp in [false, true] {
+            let game = game(&config(players, true, limp));
+            let tree = Tree::build(&game).unwrap();
+            let model = Model::new(&game, &Synthetic, EvaluationOptions::default()).unwrap();
+            let mut profile = random_profile(&tree, 21);
+            let mut incremental = solver_reaches(&tree, &profile, &model);
+            for step in 0..=players * 4 {
+                let full = reaches(&tree, &profile, &model);
+                for z in 0..tree.nodes.len() {
+                    for p in 0..players {
+                        for c in 0..169 {
+                            assert_eq!(
+                                incremental[z].pi(p, c).to_bits(),
+                                full[z].pi(p, c).to_bits(),
+                                "pi: step {step}, node {z}, seat {p}, class {c}"
+                            );
+                            if tree.nodes[z].terminal.is_some() {
+                                assert_eq!(
+                                    incremental[z].mass(p, c).to_bits(),
+                                    full[z].mass(p, c).to_bits(),
+                                    "mass: step {step}, node {z}, seat {p}, class {c}"
+                                );
+                            }
+                        }
+                    }
+                }
+                if step == players * 4 {
+                    break;
+                }
+                let p = step % players;
+                let replacement = random_profile(&tree, step as u64 + 50);
+                for (z, node) in tree.nodes.iter().enumerate() {
+                    if node.actor == Some(p) {
+                        for c in 0..169 {
+                            // Alternate dense random and pure rows, covering zero reaches.
+                            let row = profile.row_mut(&tree, z, c);
+                            row.copy_from_slice(replacement.row(&tree, z, c));
+                            if step % 2 == 1 {
+                                row.fill(0.0);
+                                row[c % row.len()] = 1.0;
+                            }
+                        }
+                    }
+                }
+                update_reach(&tree, &profile, &model, &mut incremental, p);
+            }
+        }
+    }
+}
+
+#[test]
+fn three_way_basis_matches_old_contraction_with_residuals_and_zero_mass() {
+    use super::eval::reaches;
+    use super::leaves::{ThreeItem, ThreeTerms, three_values, three_values_reference};
+    let mut saw_corrections = false;
+    for players in [3, 4] {
+        for rake in [false, true] {
+            for limp in [false, true] {
+                let game = game(&config(players, rake, limp));
+                let tree = Tree::build(&game).unwrap();
+                let model = Model::new(&game, &Synthetic, EvaluationOptions::default()).unwrap();
+                let random = random_profile(&tree, 39);
+                let mut pure = random.clone();
+                for (z, node) in tree.nodes.iter().enumerate() {
+                    if node.actor.is_some() {
+                        for c in 0..169 {
+                            let row = pure.row_mut(&tree, z, c);
+                            row.fill(0.0);
+                            row[c % row.len()] = 1.0;
+                        }
+                    }
+                }
+                for profile in [random, pure] {
+                    let reach = reaches(&tree, &profile, &model);
+                    let mut items = Vec::new();
+                    for (z, node) in tree.nodes.iter().enumerate() {
+                        let Some(t) = &node.terminal else { continue };
+                        if t.active.len() != 3 {
+                            continue;
+                        }
+                        for &hero in &t.active {
+                            let others: Vec<_> =
+                                t.active.iter().copied().filter(|&p| p != hero).collect();
+                            let payoffs = t.hero_payoffs(hero);
+                            let terms = ThreeTerms::new(&payoffs);
+                            saw_corrections |= terms.mask != 0;
+                            items.push(ThreeItem {
+                                node: z,
+                                hero,
+                                q: reach[z].rho(&model, others[0]),
+                                r: reach[z].rho(&model, others[1]),
+                                terms,
+                                payoffs,
+                            });
+                        }
+                    }
+                    // Arbitrary out-of-span payoffs, with both tie and strict perturbations.
+                    let mut perturbed = items[0].clone();
+                    perturbed.payoffs[Ordering3::from_ranks(2, 2, 1).index()] += 0.137;
+                    perturbed.payoffs[Ordering3::from_ranks(3, 1, 2).index()] -= 0.271;
+                    perturbed.terms = ThreeTerms::new(&perturbed.payoffs);
+                    assert!(perturbed.terms.mask != 0);
+                    for items in [items, vec![perturbed]] {
+                        for c in 0..169 {
+                            if !model.weights.iter().any(|w| w[c] > 0.0) {
+                                continue;
+                            }
+                            let actual = three_values(c, &items, &tree, &model, &reach).unwrap();
+                            let expected =
+                                three_values_reference(c, &items, &tree, &model, &reach).unwrap();
+                            for (z, p, v) in expected {
+                                let new = actual
+                                    .iter()
+                                    .find(|&&(node, hero, _)| node == z && hero == p)
+                                    .map_or(0.0, |item| item.2);
+                                let item = items
+                                    .iter()
+                                    .find(|item| item.node == z && item.hero == p)
+                                    .unwrap();
+                                let mass: f64 = (0..players)
+                                    .filter(|&j| j != p)
+                                    .map(|j| reach[z].mass(j, c))
+                                    .product();
+                                let scale = item
+                                    .payoffs
+                                    .iter()
+                                    .copied()
+                                    .map(f64::abs)
+                                    .fold(0.0, f64::max)
+                                    * mass;
+                                assert!(
+                                    (new - v).abs() <= 1e-12 * scale,
+                                    "{new} != {v}, scale {scale}"
+                                );
+                            }
+                            // Reverse item traversal must not change any accumulator.
+                            let reversed: Vec<_> = items.iter().rev().cloned().collect();
+                            assert_eq!(
+                                actual,
+                                three_values(c, &reversed, &tree, &model, &reach).unwrap()
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    assert!(
+        saw_corrections,
+        "settlement trees must exercise odd-chip corrections"
+    );
+}
+
+#[test]
+fn k4_model_plan_is_bit_identical_and_iteration_plans_change_streams() {
+    use super::eval::reaches;
+    use super::leaves::{K4Plan, SampleReference, k4_reference, leaf_values};
+    for players in [4, 5] {
+        let mut raw = config(4, true, false).replace("remove call", "");
+        if players == 5 {
+            raw = raw
+                .replace("players = 4", "players = 5")
+                .replace("[ranges]", "HJ = 3\n[ranges]\nHJ = 'AA,QQ'");
+        }
+        let game = game(&raw);
+        let tree = Tree::build(&game).unwrap();
+        let model = Model::new(
+            &game,
+            &Synthetic,
+            EvaluationOptions {
+                k4_samples: 64,
+                seed: 17,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let profile = random_profile(&tree, 92);
+        let reach = reaches(&tree, &profile, &model);
+        let heroes: Vec<_> = (0..tree.seats).collect();
+        let model_values =
+            leaf_values(&tree, &model, &reach, &heroes, K4Plan::model(&model)).unwrap();
+        for SampleReference {
+            node: z,
+            hero: p,
+            class: c,
+            samples: count,
+            value: v,
+        } in k4_reference(&tree, &model, &reach, K4Plan::model(&model)).unwrap()
+        {
+            assert_eq!(count, model.options.k4_samples);
+            assert_eq!(v.to_bits(), model_values.values[p][z][c].to_bits());
+        }
+        let mut pure = profile.clone();
+        for (z, node) in tree.nodes.iter().enumerate() {
+            if node.actor.is_some() {
+                for c in 0..169 {
+                    let row = pure.row_mut(&tree, z, c);
+                    row.fill(0.0);
+                    row[0] = 1.0;
+                }
+            }
+        }
+        let zero_reach = reaches(&tree, &pure, &model);
+        let scaled = SolveOptions {
+            k4_samples: Some(32),
+            k4_min_samples: Some(4),
+            ..Default::default()
+        }
+        .k4_plan(&model, 1);
+        let zero_leaves = leaf_values(&tree, &model, &zero_reach, &heroes, scaled).unwrap();
+        for item in k4_reference(&tree, &model, &zero_reach, scaled).unwrap() {
+            assert_eq!(item.value, 0.0);
+            assert_eq!(zero_leaves.values[item.hero][item.node][item.class], 0.0);
+        }
+        for minimum in [None, Some(4)] {
+            let options = SolveOptions {
+                k4_samples: Some(32),
+                k4_min_samples: minimum,
+                ..Default::default()
+            };
+            let one = options.k4_plan(&model, 1);
+            let two = options.k4_plan(&model, 2);
+            assert_ne!(one.seed, two.seed);
+            assert_ne!(one.seed, model.options.seed);
+            assert_ne!(two.seed, model.options.seed);
+            let a = leaf_values(&tree, &model, &reach, &heroes, one).unwrap();
+            let b = leaf_values(&tree, &model, &reach, &heroes, two).unwrap();
+            let mut saw_full_budget = false;
+            let mut saw_reduced_budget = false;
+            for SampleReference {
+                node: z,
+                hero: p,
+                class: c,
+                samples: count,
+                value,
+            } in k4_reference(&tree, &model, &reach, one).unwrap()
+            {
+                assert!((minimum.unwrap_or(32)..=32).contains(&count));
+                saw_full_budget |= count == 32;
+                saw_reduced_budget |= count < 32;
+                assert_eq!(
+                    value.to_bits(),
+                    a.values[p][z][c].to_bits(),
+                    "prefix at {z}/{p}/{c}, K={count}"
+                );
+            }
+            assert!(saw_full_budget);
+            if minimum.is_some() {
+                assert!(saw_reduced_budget);
+            }
+
+            assert!(
+                tree.nodes
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, node)| node.terminal.as_ref().is_some_and(|t| t.active.len() >= 4))
+                    .any(|(z, t)| t
+                        .terminal
+                        .as_ref()
+                        .unwrap()
+                        .active
+                        .iter()
+                        .any(|&p| model.support[p]
+                            .iter()
+                            .any(|&c| a.values[p][z][c].to_bits() != b.values[p][z][c].to_bits())))
+            );
+            for mass in [1e-20, 0.01, 0.25, 0.999, 1.0] {
+                let count = one.allocation(mass, 1.0);
+                assert!((minimum.unwrap_or(32)..=32).contains(&count));
+                let expected =
+                    minimum.map_or(32, |min| ((32.0 * mass).ceil() as u64).clamp(min, 32));
+                assert_eq!(count, expected);
+            }
+            assert_eq!(one.allocation(1.0, 1.0), 32);
+        }
+    }
+    let encoded = serde_json::to_value(SolveOptions::default()).unwrap();
+    assert!(encoded.get("k4_samples").unwrap().is_null());
+    assert!(encoded.get("k4_min_samples").unwrap().is_null());
+}
+
+#[test]
+fn trunk_solver_converges_four_players_with_solver_k4_approximation() {
+    let game = game(&config(4, false, false));
+    let tree = Tree::build(&game).unwrap();
+    let model = Model::new(
+        &game,
+        &Synthetic,
+        EvaluationOptions {
+            k4_samples: 64,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap();
+    pool.install(|| {
+        let options = SolveOptions {
+            iterations: 1000,
+            eval_every: 0,
+            ..Default::default()
+        };
+        let uniform = evaluate(&tree, &Profile::uniform(&tree), &model)
+            .unwrap()
+            .nash_conv;
+        let exact = solve(&tree, &model, options, |_| {})
+            .unwrap()
+            .checkpoints
+            .last()
+            .unwrap()
+            .nash_conv;
+        let approximate = solve(
+            &tree,
+            &model,
+            SolveOptions {
+                k4_samples: Some(64),
+                ..options
+            },
+            |_| {},
+        )
+        .unwrap()
+        .checkpoints
+        .last()
+        .unwrap()
+        .nash_conv;
+        println!(
+            "K4 convergence: uniform={uniform:.15}, exact={exact:.15}, solver64={approximate:.15}"
+        );
+        assert!(
+            approximate <= 10.0 * exact + 1e-3 * uniform,
+            "exact={exact}, approximate={approximate}, uniform={uniform}"
+        );
+    });
+}
+
+#[test]
+#[ignore = "report three-way payoff correction statistics on uniform B3/B4 profiles"]
+fn three_way_correction_statistics_b3_b4() {
+    use super::leaves::ThreeTerms;
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    for (name, file) in [
+        ("B3", "6max_20bb_checkdown.toml"),
+        (
+            "B4 Simple",
+            "6max_100bb_nl50_partial_simple_reference_checkdown.toml",
+        ),
+        (
+            "B4 General",
+            "6max_100bb_nl50_partial_reference_checkdown.toml",
+        ),
+    ] {
+        let path = root.join("examples/bench").join(file);
+        let game = game_from_config(&std::fs::read_to_string(&path).unwrap(), &path).unwrap();
+        let tree = Tree::build(&game).unwrap();
+        let mut items = 0;
+        let mut corrected = 0;
+        let mut terms = 0;
+        // Uniform actions and full benchmark ranges have positive reaches.
+        for t in tree
+            .nodes
+            .iter()
+            .filter_map(|node| node.terminal.as_ref())
+            .filter(|t| t.active.len() == 3)
+        {
+            for &hero in &t.active {
+                let mask = ThreeTerms::new(&t.hero_payoffs(hero)).mask;
+                items += 1;
+                corrected += usize::from(mask != 0);
+                terms += mask.count_ones() as usize;
+            }
+        }
+        println!(
+            "{name}: items={items}, corrected={corrected}, correction_terms={terms}, mean={:.9}, corrected_mean={:.9}",
+            terms as f64 / items as f64,
+            terms as f64 / corrected.max(1) as f64
+        );
     }
 }

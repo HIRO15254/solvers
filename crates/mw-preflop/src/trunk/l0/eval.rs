@@ -280,6 +280,63 @@ pub(super) fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<
     reaches
 }
 
+/// Solver reads pi at its own decisions (averaging) and rho at terminals.
+/// Mass is read only by leaf_values at terminals; decision masses stay unused.
+pub(super) fn solver_reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
+    let mut reach: Vec<_> = tree
+        .nodes
+        .iter()
+        .map(|_| Reach {
+            pi: vec![1.0; tree.seats * 169],
+            mass: vec![0.0; tree.seats * 169],
+        })
+        .collect();
+    for seat in 0..tree.seats {
+        update_reach(tree, profile, model, &mut reach, seat);
+    }
+    reach
+}
+
+/// Rebuild one seat along the path, retaining the full evaluator's exact
+/// multiplication order and rho sum order, including unsupported pi entries.
+pub(super) fn update_reach(
+    tree: &Tree,
+    profile: &Profile,
+    model: &Model<'_>,
+    reach: &mut [Reach],
+    seat: usize,
+) {
+    let offset = seat * 169;
+    for (z, node) in tree.nodes.iter().enumerate() {
+        if let Some((parent, action)) = node.parent {
+            let (before, after) = reach.split_at_mut(z);
+            after[0].pi[offset..offset + 169]
+                .copy_from_slice(&before[parent].pi[offset..offset + 169]);
+            if tree.nodes[parent].actor == Some(seat) {
+                for &d in &model.support[seat] {
+                    after[0].pi[offset + d] *= profile.row(tree, parent, d)[action];
+                }
+            }
+        } else {
+            reach[z].pi[offset..offset + 169].fill(1.0);
+        }
+    }
+    let classes: Vec<_> = (0..169)
+        .filter(|&c| model.weights.iter().any(|w| w[c] > 0.0))
+        .collect();
+    reach.par_iter_mut().zip(&tree.nodes).for_each(|(r, node)| {
+        if node.terminal.is_some() {
+            let rho = r.rho(model, seat);
+            for &c in &classes {
+                r.mass[offset + c] = rho
+                    .iter()
+                    .map(|&(d, v)| f64::from(Classes::get().k(c, d)) * v)
+                    .sum();
+            }
+        }
+    });
+}
+
 pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Evaluation> {
     profile.validate(tree)?;
     ensure!(
@@ -294,8 +351,13 @@ pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Eva
         tree.nodes.iter().all(|node| node.children.len() <= 254),
         "L0 nodes may have at most 254 actions"
     );
-    let leaves =
-        super::leaves::leaf_values(tree, model, &reach, &(0..tree.seats).collect::<Vec<_>>())?;
+    let leaves = super::leaves::leaf_values(
+        tree,
+        model,
+        &reach,
+        &(0..tree.seats).collect::<Vec<_>>(),
+        super::leaves::K4Plan::model(model),
+    )?;
     let t2_seconds = leaves.t2;
     let t3_seconds = leaves.t3;
     let k4_seconds = leaves.k4;

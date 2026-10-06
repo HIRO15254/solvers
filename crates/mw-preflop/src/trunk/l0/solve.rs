@@ -4,7 +4,10 @@ use serde::Serialize;
 use std::time::Instant;
 
 use super::{Model, Profile, Tree, evaluate};
-use super::{eval::reaches, leaves::leaf_values};
+use super::{
+    eval::{solver_reaches, update_reach},
+    leaves::{K4Plan, leaf_values},
+};
 use crate::ExternalSamplingGame;
 
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -21,6 +24,10 @@ pub struct SolveOptions {
     pub eval_every: u64,
     /// Stop at the first checkpoint at or below this NashConv.
     pub target_nash_conv: Option<f64>,
+    /// Solver-only K4 budget; None retains the model's fixed sample stream.
+    pub k4_samples: Option<u64>,
+    /// Reach-scaled minimum budget; requires k4_samples, 1 <= min <= samples.
+    pub k4_min_samples: Option<u64>,
 }
 
 impl Default for SolveOptions {
@@ -32,6 +39,8 @@ impl Default for SolveOptions {
             gamma: 2.0,
             eval_every: 100,
             target_nash_conv: None,
+            k4_samples: None,
+            k4_min_samples: None,
         }
     }
 }
@@ -77,6 +86,28 @@ pub struct Solution {
     pub average: Profile,
     pub checkpoints: Vec<Checkpoint>,
     pub timings: SolveTimings,
+}
+
+impl SolveOptions {
+    pub(super) fn k4_plan(self, model: &Model<'_>, iteration: u64) -> K4Plan {
+        let Some(samples) = self.k4_samples else {
+            return K4Plan::model(model);
+        };
+        let mut hash = blake3::Hasher::new();
+        hash.update(b"solvers.p2.trunk.l0.solve.k4.v1");
+        hash.update(&model.options.seed.to_le_bytes());
+        hash.update(&iteration.to_le_bytes());
+        let mut seed = u64::from_le_bytes(hash.finalize().as_bytes()[..8].try_into().unwrap());
+        // Reserve the model seed even in the event of a truncated-hash collision.
+        if seed == model.options.seed {
+            seed = seed.wrapping_add(1);
+        }
+        K4Plan {
+            samples,
+            min_samples: self.k4_min_samples,
+            seed,
+        }
+    }
 }
 
 fn regret_matching(regrets: &[f64], row: &mut [f64]) {
@@ -211,6 +242,16 @@ pub fn solve(
         tree.nodes.iter().all(|n| n.children.len() <= 254),
         "L0 nodes may have at most 254 actions"
     );
+    ensure!(
+        options.k4_samples != Some(0),
+        "solver K4 samples must be positive"
+    );
+    ensure!(
+        options
+            .k4_min_samples
+            .is_none_or(|min| { min >= 1 && options.k4_samples.is_some_and(|n| min <= n) }),
+        "solver K4 minimum requires samples and 1 <= min <= samples"
+    );
     let start = Instant::now();
     let mut profile = Profile::uniform(tree);
     let mut regrets = profile.clone();
@@ -267,13 +308,14 @@ pub fn solve(
     let mut average = profile.clone();
     let mut iterations = 0;
     let mut reached_target = false;
+    let phase = Instant::now();
+    let mut reach = solver_reaches(tree, &profile, model);
+    timings.reaches += phase.elapsed().as_secs_f64();
     for t in 1..=options.iterations {
         let discount = Discounts::new(t, options)?;
+        let plan = options.k4_plan(model, t);
         for p in 0..tree.seats {
-            let phase = Instant::now();
-            let reach = reaches(tree, &profile, model);
-            timings.reaches += phase.elapsed().as_secs_f64();
-            let mut leaves = leaf_values(tree, model, &reach, &[p])?;
+            let mut leaves = leaf_values(tree, model, &reach, &[p], plan)?;
             timings.t2 += leaves.t2;
             timings.t3 += leaves.t3;
             timings.k4 += leaves.k4;
@@ -299,6 +341,9 @@ pub fn solve(
                 }
             }
             timings.update += phase.elapsed().as_secs_f64();
+            let phase = Instant::now();
+            update_reach(tree, &profile, model, &mut reach, p);
+            timings.reaches += phase.elapsed().as_secs_f64();
         }
         let take_checkpoint =
             t == options.iterations || (options.eval_every > 0 && t % options.eval_every == 0);
