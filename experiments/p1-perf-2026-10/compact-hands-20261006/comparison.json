@@ -1,0 +1,402 @@
+[
+  {
+    "config": "river_small",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 10,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 18,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "evP1": {
+        "old": 5.0,
+        "new": 5.0,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "turn_small",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 754,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 1418,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "evP1": {
+        "old": 5.0,
+        "new": 5.0,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "tournament_icm",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 10,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 18,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": -14.166666666666664,
+        "new": -14.166666666666664,
+        "exact": true
+      },
+      "evP1": {
+        "old": 24.54761823018392,
+        "new": 24.54761823018392,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "river_script",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 10,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 18,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "evP1": {
+        "old": 5.0,
+        "new": 5.0,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.0,
+        "new": 0.0,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "river_multi",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 14031,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 26737,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 2.052278219928323,
+        "new": 2.052278219928323,
+        "exact": true
+      },
+      "evP1": {
+        "old": 3.030065174060433,
+        "new": 3.030065174060433,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.1544718360395193,
+        "new": 0.1544718360395193,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.13790403297450304,
+        "new": 0.13790403297450304,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.29237586901402235,
+        "new": 0.29237586901402235,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "turn_iso_on",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 130396,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 242316,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 1.9562611671791164,
+        "new": 1.9562611671791164,
+        "exact": true
+      },
+      "evP1": {
+        "old": 3.0198468685061886,
+        "new": 3.0198468685061886,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.06463668818424134,
+        "new": 0.06463668818424134,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.054758844512364346,
+        "new": 0.054758844512364346,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.11939553269660569,
+        "new": 0.11939553269660569,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "turn_iso_off",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 178284,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 331285,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 1.9562611102450411,
+        "new": 1.9562611102450411,
+        "exact": true
+      },
+      "evP1": {
+        "old": 3.019846827968047,
+        "new": 3.019846827968047,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.06463530502783693,
+        "new": 0.06463530502783693,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.0547589200229599,
+        "new": 0.0547589200229599,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.11939422505079683,
+        "new": 0.11939422505079683,
+        "exact": true
+      }
+    }
+  },
+  {
+    "config": "river_fractional",
+    "views": {
+      "summary": {
+        "rows": 1,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "strategy": {
+        "rows": 18,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      },
+      "ev": {
+        "rows": 32,
+        "textExactExceptTime": true,
+        "maxAbs": 0.0,
+        "maxRelative": 0.0
+      }
+    },
+    "metrics": {
+      "evP0": {
+        "old": 2.5310855706532798,
+        "new": 2.5310855706532798,
+        "exact": true
+      },
+      "evP1": {
+        "old": 2.4689144823286266,
+        "new": 2.4689144823286266,
+        "exact": true
+      },
+      "explP0": {
+        "old": 0.33513299624125165,
+        "new": 0.33513299624125165,
+        "exact": true
+      },
+      "explP1": {
+        "old": 0.2892911434173584,
+        "new": 0.2892911434173584,
+        "exact": true
+      },
+      "nashConv": {
+        "old": 0.6244241396586101,
+        "new": 0.6244241396586101,
+        "exact": true
+      }
+    }
+  }
+]

@@ -1,0 +1,1 @@
+{"config":"examples/hu-postflop/flop_srp.toml","estimateF32Bytes":30504079680,"estimateI16Bytes":15277508192,"nodes":8704350,"prepareSecs":4.5600443,"storageElements":3813009960,"threads":1}

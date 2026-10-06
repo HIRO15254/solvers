@@ -1077,15 +1077,17 @@ fn iso_quotient_matches_full_tree_per_hand() {
         "iso EV mismatch: {ev_on} vs {ev_off}"
     );
     assert_eq!(sig_on.len(), sig_off.len());
-    let num_actions = sig_on.len() / NUM_COMBOS;
+    let hands = hu_postflop::PostflopHands::new(&base.board, &ranges);
+    let num_hands = hands.len(Player::P0);
+    let num_actions = sig_on.len() / num_hands;
     for a in 0..num_actions {
         for combo in 0..NUM_COMBOS {
             if ranges[Player::P0].weight(combo) == 0.0 {
                 continue;
             }
             let (x, y) = (
-                sig_on[a * NUM_COMBOS + combo],
-                sig_off[a * NUM_COMBOS + combo],
+                sig_on[a * num_hands + hands.local(Player::P0, combo).unwrap()],
+                sig_off[a * num_hands + hands.local(Player::P0, combo).unwrap()],
             );
             assert!(
                 (x - y).abs() < 1e-4,
@@ -1143,14 +1145,19 @@ fn member_branch_matches_suit_permuted_rep_branch() {
     let node_d = find("xx[8d]");
     let sig_c = solver.average_strategy_at(node_c);
     let sig_d = solver.average_strategy_at(node_d);
-    let num_actions = sig_c.len() / NUM_COMBOS;
+    let hands = &solver.game().evaluator.hands;
+    let num_hands = hands.len(Player::P0);
+    let num_actions = sig_c.len() / num_hands;
     for a in 0..num_actions {
         for combo in 0..NUM_COMBOS {
             if ranges[Player::P0].weight(combo) == 0.0 {
                 continue;
             }
-            let x = sig_c[a * NUM_COMBOS + combo];
-            let y = sig_d[a * NUM_COMBOS + nlh::iso::permute_combo(&perm, combo)];
+            let x = sig_c[a * num_hands + hands.local(Player::P0, combo).unwrap()];
+            let y = sig_d[a * num_hands
+                + hands
+                    .local(Player::P0, nlh::iso::permute_combo(&perm, combo))
+                    .unwrap()];
             assert!(
                 (x - y).abs() < 1e-3,
                 "branches not suit-symmetric: action {a} combo {combo}: {x} vs {y}"

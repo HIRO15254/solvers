@@ -91,6 +91,7 @@ P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 
 旧runのstatus・watch・runs lsも利用でき、JSONのconfigSchema / gameKindは記録値のままである。
 旧runのresumable表示はcheckpointの存在を示すだけで、現行CLIでは再開できない。
+`.sol` version 1とcheckpoint version 1/2は読めない。現行configから再solveして`.sol` version 2・checkpoint version 3を作る。
 
 ## 6. 結果を読む
 
@@ -101,6 +102,7 @@ solvers export runs/preflop/solution.mwsol strategy --format csv --output strate
 ```
 
 summary、tree、actions、strategy、range、evをJSON/CSVで読む。
+P1は開始rangeでweightが正、かつ開始boardと矛盾しないhandだけを計算・保存する。weight 0のhandは出力しない。
 P1のcash EVはspot開始potを基準としたBB、ICM EVは賞金単位である。
 P2のcash utilityはhand開始stackからのBB増減であり、P1の基準とは異なる。
 field・単位・未保存値は[P1規範](hu-postflop.jp.md)・[P2暫定規範](mw-preflop.jp.md)を参照する。

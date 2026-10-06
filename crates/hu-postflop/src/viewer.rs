@@ -41,7 +41,7 @@
 use std::fmt;
 
 use hu_engine::{NodeId, NodeKind, PublicTree};
-use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
+use nlh::{Card, Chips, PerPlayer, Player, Range, Street};
 
 use crate::postflop::{PerStreet, PostflopConfig, StreetTree};
 
@@ -358,8 +358,10 @@ pub fn river_resolve_config(
 ) -> PostflopConfig {
     let build_range = |p: Player| -> Range {
         let mut range = Range::default();
-        for combo in 0..NUM_COMBOS {
-            range.set_weight(combo, reach[p][combo].clamp(0.0, 1.0));
+        let hands = crate::PostflopHands::new(&trunk.board, &trunk.ranges);
+        assert_eq!(reach[p].len(), hands.len(p));
+        for (&combo, &weight) in hands.combos(p).iter().zip(&reach[p]) {
+            range.set_weight(combo as usize, weight.clamp(0.0, 1.0));
         }
         range
     };

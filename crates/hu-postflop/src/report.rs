@@ -81,12 +81,18 @@ fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<B
         sref.num_actions as usize,
         sref.num_hands as usize,
     );
-    let equity = range_equity(&p.config.board, &solver.game().root_ranges);
+    let hands = &solver.game().evaluator.hands;
+    let global = nlh::PerPlayer::new(
+        hands.expand(Player::P0, &solver.game().root_ranges[Player::P0]),
+        hands.expand(Player::P1, &solver.game().root_ranges[Player::P1]),
+    );
+    let equity = range_equity(&p.config.board, &global);
+    let equity = hands.compact(Player::P0, &equity[Player::P0]);
     let total: f64 = weights.iter().map(|&w| w as f64).sum();
     let equity = if total > 0.0 {
         weights
             .iter()
-            .zip(&equity[Player::P0])
+            .zip(&equity)
             .map(|(&w, &e)| w as f64 * e as f64)
             .sum::<f64>()
             / total

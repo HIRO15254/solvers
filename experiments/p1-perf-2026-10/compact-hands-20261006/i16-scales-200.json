@@ -1,0 +1,248 @@
+{
+  "blocks": [
+    {
+      "block": 0,
+      "newRegretScale": 0.5118741989135742,
+      "newStrategyScale": 0.0015622727805748582,
+      "oldRegretScale": 0.5272715091705322,
+      "oldStrategyScale": 0.0015622882638126612
+    },
+    {
+      "block": 1,
+      "newRegretScale": 0.22819340229034424,
+      "newStrategyScale": 0.0015622882638126612,
+      "oldRegretScale": 0.18516160547733307,
+      "oldStrategyScale": 0.0015622882638126612
+    },
+    {
+      "block": 2,
+      "newRegretScale": 0.07766584306955338,
+      "newStrategyScale": 0.0015415099915117025,
+      "oldRegretScale": 0.07550273090600967,
+      "oldStrategyScale": 0.0015540027525275946
+    },
+    {
+      "block": 3,
+      "newRegretScale": 0.07782673835754395,
+      "newStrategyScale": 0.0007392843835987151,
+      "oldRegretScale": 0.08052623271942139,
+      "oldStrategyScale": 0.0008003896800801158
+    },
+    {
+      "block": 4,
+      "newRegretScale": 0.0029995848890393972,
+      "newStrategyScale": 0.001483244588598609,
+      "oldRegretScale": 0.0028626015409827232,
+      "oldStrategyScale": 0.0014914621133357286
+    },
+    {
+      "block": 5,
+      "newRegretScale": 0.03607238084077835,
+      "newStrategyScale": 0.0014230528613552451,
+      "oldRegretScale": 0.03378227353096008,
+      "oldStrategyScale": 0.0014679536689072847
+    },
+    {
+      "block": 6,
+      "newRegretScale": 0.13364233076572418,
+      "newStrategyScale": 0.0009651776636019349,
+      "oldRegretScale": 0.11714579164981842,
+      "oldStrategyScale": 0.0010326949413865805
+    },
+    {
+      "block": 7,
+      "newRegretScale": 0.10291005671024323,
+      "newStrategyScale": 0.0015592161798849702,
+      "oldRegretScale": 0.09700317680835724,
+      "oldStrategyScale": 0.0015590377151966095
+    },
+    {
+      "block": 8,
+      "newRegretScale": 0.0497274249792099,
+      "newStrategyScale": 0.0012738215737044811,
+      "oldRegretScale": 0.05644941329956055,
+      "oldStrategyScale": 0.0012875184183940291
+    },
+    {
+      "block": 9,
+      "newRegretScale": 0.009095973335206509,
+      "newStrategyScale": 0.00147185567766428,
+      "oldRegretScale": 0.008037017658352852,
+      "oldStrategyScale": 0.0014833951136097312
+    },
+    {
+      "block": 10,
+      "newRegretScale": 0.08538081496953964,
+      "newStrategyScale": 0.0014829922001808882,
+      "oldRegretScale": 0.09378156065940857,
+      "oldStrategyScale": 0.0014891924802213907
+    },
+    {
+      "block": 11,
+      "newRegretScale": 0.13203349709510803,
+      "newStrategyScale": 0.0014647213974967599,
+      "oldRegretScale": 0.10943331569433212,
+      "oldStrategyScale": 0.0014552485663443804
+    },
+    {
+      "block": 12,
+      "newRegretScale": 0.07319147139787674,
+      "newStrategyScale": 0.001562232617288828,
+      "oldRegretScale": 0.06086381897330284,
+      "oldStrategyScale": 0.0015622882638126612
+    },
+    {
+      "block": 13,
+      "newRegretScale": 0.043330613523721695,
+      "newStrategyScale": 0.0014261016622185707,
+      "oldRegretScale": 0.05064338818192482,
+      "oldStrategyScale": 0.0014244939666241407
+    },
+    {
+      "block": 14,
+      "newRegretScale": 0.014010602608323097,
+      "newStrategyScale": 0.0014112379867583513,
+      "oldRegretScale": 0.016270926222205162,
+      "oldStrategyScale": 0.0014181385049596429
+    },
+    {
+      "block": 15,
+      "newRegretScale": 0.030783740803599358,
+      "newStrategyScale": 0.0012432488147169352,
+      "oldRegretScale": 0.033914439380168915,
+      "oldStrategyScale": 0.0011926902225241065
+    },
+    {
+      "block": 16,
+      "newRegretScale": 0.1947167068719864,
+      "newStrategyScale": 0.0014332745922729373,
+      "oldRegretScale": 0.13975085318088531,
+      "oldStrategyScale": 0.001341272727586329
+    },
+    {
+      "block": 17,
+      "newRegretScale": 0.19258297979831696,
+      "newStrategyScale": 0.0015622727805748582,
+      "oldRegretScale": 0.1925622671842575,
+      "oldStrategyScale": 0.0015622882638126612
+    },
+    {
+      "block": 18,
+      "newRegretScale": 0.16869844496250153,
+      "newStrategyScale": 0.0015611007111147046,
+      "oldRegretScale": 0.1743510663509369,
+      "oldStrategyScale": 0.0015620458871126175
+    },
+    {
+      "block": 19,
+      "newRegretScale": 0.12341711670160294,
+      "newStrategyScale": 0.001525965752080083,
+      "oldRegretScale": 0.1219906285405159,
+      "oldStrategyScale": 0.001546652289107442
+    },
+    {
+      "block": 20,
+      "newRegretScale": 0.007266933098435402,
+      "newStrategyScale": 0.0015587673988193274,
+      "oldRegretScale": 0.006032305769622326,
+      "oldStrategyScale": 0.0015593779971823096
+    },
+    {
+      "block": 21,
+      "newRegretScale": 0.1258380264043808,
+      "newStrategyScale": 0.001547269755974412,
+      "oldRegretScale": 0.12136917561292648,
+      "oldStrategyScale": 0.001555649098008871
+    },
+    {
+      "block": 22,
+      "newRegretScale": 0.26357823610305786,
+      "newStrategyScale": 0.0015355399809777737,
+      "oldRegretScale": 0.26350173354148865,
+      "oldStrategyScale": 0.0015528607182204723
+    },
+    {
+      "block": 23,
+      "newRegretScale": 0.08534777164459229,
+      "newStrategyScale": 0.0015622882638126612,
+      "oldRegretScale": 0.08743894100189209,
+      "oldStrategyScale": 0.0015622882638126612
+    },
+    {
+      "block": 24,
+      "newRegretScale": 0.09713036566972733,
+      "newStrategyScale": 0.0004260472487658262,
+      "oldRegretScale": 0.10256300866603851,
+      "oldStrategyScale": 0.00044566040742211044
+    },
+    {
+      "block": 25,
+      "newRegretScale": 0.00530443387106061,
+      "newStrategyScale": 0.0015285923145711422,
+      "oldRegretScale": 0.005633234046399593,
+      "oldStrategyScale": 0.0015349948080256581
+    },
+    {
+      "block": 26,
+      "newRegretScale": 0.032471589744091034,
+      "newStrategyScale": 0.0014576383400708437,
+      "oldRegretScale": 0.03669625148177147,
+      "oldStrategyScale": 0.0014652800746262074
+    },
+    {
+      "block": 27,
+      "newRegretScale": 0.15385162830352783,
+      "newStrategyScale": 0.00046216073678806424,
+      "oldRegretScale": 0.16098639369010925,
+      "oldStrategyScale": 0.0004461593634914607
+    },
+    {
+      "block": 28,
+      "newRegretScale": 0.06622136384248734,
+      "newStrategyScale": 0.0015601273626089096,
+      "oldRegretScale": 0.06630226969718933,
+      "oldStrategyScale": 0.001561430050060153
+    },
+    {
+      "block": 29,
+      "newRegretScale": 0.0881848931312561,
+      "newStrategyScale": 0.00001003462057269644,
+      "oldRegretScale": 0.09330283850431442,
+      "oldStrategyScale": 0.000014437380741583183
+    },
+    {
+      "block": 30,
+      "newRegretScale": 0.009767904877662659,
+      "newStrategyScale": 0.0009406866738572717,
+      "oldRegretScale": 0.010402429848909378,
+      "oldStrategyScale": 0.0009157040622085333
+    },
+    {
+      "block": 31,
+      "newRegretScale": 0.015230672433972359,
+      "newStrategyScale": 0.0011307839304208755,
+      "oldRegretScale": 0.015230467543005943,
+      "oldStrategyScale": 0.0011415045009925961
+    },
+    {
+      "block": 32,
+      "newRegretScale": 0.14535461366176605,
+      "newStrategyScale": 0.000013670608495885972,
+      "oldRegretScale": 0.14535412192344666,
+      "oldStrategyScale": 0.000014996516256360337
+    },
+    {
+      "block": 33,
+      "newRegretScale": 0.045358505100011826,
+      "newStrategyScale": 0.0015622882638126612,
+      "oldRegretScale": 0.04870027303695679,
+      "oldStrategyScale": 0.0015622882638126612
+    }
+  ],
+  "changedRegretScales": 34,
+  "changedStrategyScales": 31,
+  "iteration": 200,
+  "legacyMaxStrictlyOutsideSupportBlocks": 13,
+  "newElements": 42287,
+  "oldElements": 129948
+}

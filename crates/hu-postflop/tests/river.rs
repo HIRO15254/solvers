@@ -101,8 +101,11 @@ fn assert_kernel_matches_naive(board_str: &str) {
     // is the first terminal in build order, which for a no-bet tree is the
     // single check-check showdown.
     for p in Player::BOTH {
-        let mut out = vec![0.0f32; NUM_COMBOS];
-        game.game.evaluator.eval(0, p, &reach, &mut out);
+        let hands = &game.game.evaluator.hands;
+        let compact = hands.compact(p.opponent(), &reach);
+        let mut out = vec![0.0f32; hands.len(p)];
+        game.game.evaluator.eval(0, p, &compact, &mut out);
+        let out = hands.expand(p, &out);
         let expected = naive_showdown(board_cards, p, &reach);
         for combo in 0..NUM_COMBOS {
             assert!(
@@ -171,7 +174,13 @@ fn clairvoyance_game_matches_closed_form() {
             let w = range.weight(combo) as f64;
             if w > 0.0 {
                 total += w;
-                bet += w * sigma[NUM_COMBOS + combo] as f64;
+                bet += w * sigma[solver.game().evaluator.hands.len(Player::P0)
+                    + solver
+                        .game()
+                        .evaluator
+                        .hands
+                        .local(Player::P0, combo)
+                        .unwrap()] as f64;
             }
         }
         bet / total
@@ -196,7 +205,13 @@ fn clairvoyance_game_matches_closed_form() {
         let w = qq.weight(combo) as f64;
         if w > 0.0 {
             total += w;
-            call += w * sigma[NUM_COMBOS + combo] as f64;
+            call += w * sigma[solver.game().evaluator.hands.len(Player::P1)
+                + solver
+                    .game()
+                    .evaluator
+                    .hands
+                    .local(Player::P1, combo)
+                    .unwrap()] as f64;
         }
     }
     let call_freq = call / total;

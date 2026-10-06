@@ -1,0 +1,28 @@
+{
+  "actionNodes": 20482,
+  "afterBuildBytes": 18890752,
+  "allocSecs": 0.0000309,
+  "buildSecs": 0.1748574,
+  "config": "runs/p1-perf/cfg/turn_multi.toml",
+  "deals": 1584,
+  "estimateF32Bytes": 613078752,
+  "estimateI16Bytes": 306703232,
+  "evalSecs": [
+    9.1193234
+  ],
+  "iterSecs": 15.6612762,
+  "iters": 3,
+  "nashConv": 22.125351937566666,
+  "nodeInfo": 20483,
+  "nodes": 59379,
+  "peakBytes": 634134528,
+  "prepareSecs": 0.0135515,
+  "secsPerIter": 5.2204254,
+  "storage": "f32",
+  "storageElements": 76634844,
+  "threads": 1,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 1,
+  "warmupSecs": 5.1019807
+}

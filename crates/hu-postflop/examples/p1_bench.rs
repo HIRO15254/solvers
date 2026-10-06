@@ -70,6 +70,23 @@ fn main() -> Result<()> {
         prepared.settings.solver.storage = storage;
     }
     let prepare_secs = t0.elapsed().as_secs_f64();
+    // Zero-work measurement must not allocate a potentially tens-of-GB arena.
+    if args.iters == 0 && args.evals == 0 {
+        let report = serde_json::json!({
+            "config": args.config.display().to_string(),
+            "threads": args.threads,
+            "estimateF32Bytes": prepared.estimate.f32_bytes,
+            "estimateI16Bytes": prepared.estimate.i16_bytes,
+            "storageElements": prepared.estimate.f32_bytes / 8,
+            "nodes": prepared.estimate.nodes,
+            "prepareSecs": prepare_secs,
+        });
+        println!("{}", serde_json::to_string(&report)?);
+        if let Some(path) = &args.json {
+            std::fs::write(path, serde_json::to_string_pretty(&report)?)?;
+        }
+        return Ok(());
+    }
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(args.threads)
         .build()?;

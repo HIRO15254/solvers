@@ -1,0 +1,25 @@
+# HU turn with a shared turn/river menu and all-in raises; includes river chance expansion.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 5
+
+[spot]
+line = "BTN r2.5, BB c / BB x, BTN x"
+board = "Ks 7h 2d 3c"
+
+[ranges]
+BTN = "AhAd,QhQd"
+BB = "JhJd,ThTd"
+
+[tree]
+script = '''turn, river { replace bet [1bb] }
+turn, river when !unopened { replace raise [a] }'''
+
+[solver.stop]
+max_iterations = 16
+check_every = 4
+
+[run]
+threads = 1

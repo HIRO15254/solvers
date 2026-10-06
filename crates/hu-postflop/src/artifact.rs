@@ -79,23 +79,30 @@ pub(crate) struct SolExportSpec {
 /// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
 /// total, minus the reach through each of `h`'s two cards, plus the one
 /// combo that is both of them and was therefore subtracted twice.
-fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
+fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) -> Vec<f32> {
     let total: f64 = opp_reach.iter().map(|&r| r as f64).sum();
     let mut per_card = [0.0f64; 52];
-    for (combo, &reach) in opp_reach.iter().enumerate() {
+    for (&combo, &reach) in hands.combos(p.opponent()).iter().zip(opp_reach) {
         if reach == 0.0 {
             continue;
         }
-        let (hi, lo) = nlh::combo_cards(combo);
+        let (hi, lo) = nlh::combo_cards(combo as usize);
         per_card[hi.index()] += reach as f64;
         per_card[lo.index()] += reach as f64;
     }
-    (0..opp_reach.len())
-        .map(|combo| {
-            let (hi, lo) = nlh::combo_cards(combo);
-            let compatible =
-                total - per_card[hi.index()] - per_card[lo.index()] + opp_reach[combo] as f64;
-            compatible.max(0.0) as f32
+    hands
+        .combos(p)
+        .iter()
+        .enumerate()
+        .map(|(i, &combo)| {
+            let (hi, lo) = nlh::combo_cards(combo as usize);
+            let same = hands.same[p][i];
+            let r = if same == crate::hands::ABSENT {
+                0.0
+            } else {
+                opp_reach[same as usize] as f64
+            };
+            (total - per_card[hi.index()] - per_card[lo.index()] + r).max(0.0) as f32
         })
         .collect()
 }
@@ -226,7 +233,11 @@ pub(crate) fn export_sol<S: Storage>(
             // to be divided by the reach that could be facing this hand
             // before a utility-valued offset can be added to it. Skipping that would
             // be a unit error, not a scaling one.
-            let compatible = compatible_reach(&reach[player.opponent()]);
+            let compatible = compatible_reach(
+                &solver.game().evaluator.hands,
+                player,
+                &reach[player.opponent()],
+            );
             // Every node uses the original subgame's utility baseline.
             // Adding this node's contributions would erase sunk wagers;
             // adding chips at all would mix units for ICM.
@@ -386,6 +397,21 @@ pub fn load_sol(
         ));
     }
 
+    for block in &payload.blocks {
+        let r = pf_game.game.tree.storage_refs[block.sref as usize];
+        dequantize_probs(&block.probs, r.num_actions as usize, r.num_hands as usize)?;
+    }
+    let value_set: HashSet<u32> = payload.values.iter().map(|b| b.sref).collect();
+    if value_set != expected || value_set.len() != payload.values.len() {
+        bail!("artifact value blocks do not match the rebuilt tree");
+    }
+    let value_len = Player::BOTH
+        .iter()
+        .map(|&p| pf_game.game.evaluator.hands.len(p))
+        .sum();
+    for block in &payload.values {
+        dequantize_values(&block.values, block.scale, value_len)?;
+    }
     let blocks: HashMap<u32, Vec<u8>> = payload
         .blocks
         .into_iter()
@@ -491,6 +517,12 @@ enum RiverSolver {
 }
 
 impl RiverSolver {
+    fn game(&self) -> &hu_engine::CompiledGame<PostflopEvaluator> {
+        match self {
+            Self::F32(s) => s.game(),
+            Self::I16(s) => s.game(),
+        }
+    }
     fn average_strategy_at(&self, node: NodeId) -> Vec<f32> {
         match self {
             Self::F32(solver) => solver.average_strategy_at(node),
@@ -725,7 +757,22 @@ impl StrategyProvider for SolProvider<'_> {
         let sub_node = *rs.map.get(&node).ok_or_else(|| {
             anyhow!("node {node} not found in the re-solved river subtree for entry {entry}")
         })?;
-        Ok(rs.solver.average_strategy_at(sub_node))
+        let sub_avg = rs.solver.average_strategy_at(sub_node);
+        let sub_hands = &rs.solver.game().evaluator.hands;
+        let trunk_hands = &loaded.pf_game.game.evaluator.hands;
+        let mut avg = vec![
+            1.0 / sref.num_actions as f32;
+            sref.num_actions as usize * sref.num_hands as usize
+        ];
+        for (i, &global) in sub_hands.combos(n.player).iter().enumerate() {
+            let j = trunk_hands
+                .local(n.player, global as usize)
+                .ok_or_else(|| anyhow!("river support is outside parent range"))?;
+            for a in 0..sref.num_actions as usize {
+                avg[a * sref.num_hands as usize + j] = sub_avg[a * sub_hands.len(n.player) + i];
+            }
+        }
+        Ok(avg)
     }
 
     fn ev_summary(&self) -> EvSummary {
@@ -1395,20 +1442,17 @@ memory = "1GiB"
         let _ = std::fs::remove_file(&path);
     }
 
-    /// Values for hands that cannot be held at a node are stored as zero,
-    /// which is what keeps the value blocks as sparse as the strategy
-    /// blocks. Without it a counterfactual value — defined for every hand,
-    /// reachable or not — would be written for all 1,326 combos and would
-    /// dominate the artifact.
+    /// Value slots exist only for root support. Runout-blocked or otherwise
+    /// unreachable hands inside that support carry zero at the node.
     #[test]
     fn unreachable_hands_are_stored_as_zero() {
         let (solver, node_info, start_street, summary) =
-            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 64);
+            build_and_solve::<F32Storage>(TINY_TURN_TOML, 64);
         let path = temp_path("value-sparsity.sol");
         let spec = SolExportSpec {
             path: path.clone(),
             mode: SolStreets::Full,
-            config_toml: TINY_RIVER_TOML.to_string(),
+            config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
         export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
@@ -1416,32 +1460,39 @@ memory = "1GiB"
         let _ = std::fs::remove_file(&path);
 
         let tree = &solver.game().tree;
-        let root_aux = tree.node(0).aux;
-        let block = payload
-            .values
-            .iter()
-            .find(|b| b.sref == root_aux)
-            .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
-        let stored = dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode");
-
-        for seat in Player::BOTH {
-            let range = &solver.game().root_ranges[seat];
-            let base = seat.index() * num_hands;
-            let mut in_range = 0usize;
-            for hand in 0..num_hands {
-                if range[hand] > 0.0 {
-                    in_range += 1;
-                } else {
-                    assert_eq!(
-                        stored[base + hand],
-                        0.0,
-                        "{seat:?} hand {hand} is out of range but carries a value"
-                    );
+        let hands = &solver.game().evaluator.hands;
+        let value_len = hands.len(Player::P0) + hands.len(Player::P1);
+        assert!(value_len < 2 * nlh::NUM_COMBOS);
+        let blocks: HashMap<_, _> = payload.values.iter().map(|b| (b.sref, b)).collect();
+        let mut zero_slots = 0;
+        walk_reaches(
+            tree,
+            0,
+            &solver.game().root_ranges,
+            &|id| solver.average_strategy_at(id),
+            &mut |id, reach| {
+                let block = blocks[&tree.node(id).aux];
+                let stored = dequantize_values(&block.values, block.scale, value_len)
+                    .expect("compact values");
+                for seat in Player::BOTH {
+                    let base = if seat == Player::P0 {
+                        0
+                    } else {
+                        hands.len(Player::P0)
+                    };
+                    for (i, &here) in reach[seat].iter().enumerate() {
+                        if here <= 0.0 {
+                            zero_slots += 1;
+                            assert_eq!(stored[base + i], 0.0, "{id} {seat:?} {i}");
+                        }
+                    }
                 }
-            }
-            assert!(in_range > 0 && in_range < num_hands, "{seat:?}: {in_range}");
-        }
+            },
+        );
+        assert!(
+            zero_slots > 0,
+            "the fixture must exercise unreachable support slots"
+        );
     }
 
     /// The per-hand values a `.sol` stores must aggregate back to the root
@@ -1473,14 +1524,24 @@ memory = "1GiB"
             .iter()
             .find(|b| b.sref == root_aux)
             .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
+        let hands = &solver.game().evaluator.hands;
+        let value_len = hands.len(Player::P0) + hands.len(Player::P1);
         let stored =
-            dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode values");
+            dequantize_values(&block.values, block.scale, value_len).expect("decode values");
 
         for seat in Player::BOTH {
             let own = &solver.game().root_ranges[seat];
-            let facing = compatible_reach(&solver.game().root_ranges[seat.opponent()]);
-            let base = seat.index() * num_hands;
+            let facing = compatible_reach(
+                &solver.game().evaluator.hands,
+                seat,
+                &solver.game().root_ranges[seat.opponent()],
+            );
+            let num_hands = hands.len(seat);
+            let base = if seat == Player::P0 {
+                0
+            } else {
+                hands.len(Player::P0)
+            };
             let mut weighted = 0.0f64;
             let mut total = 0.0f64;
             for hand in 0..num_hands {

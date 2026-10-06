@@ -765,18 +765,13 @@ fn sol_export_and_inspect_smoke() {
     assert!(sol_path.exists(), "sol file must be written");
     assert!(checkpoint.exists(), "checkpoint file must be written");
 
-    // The two artifacts answer different questions and are sized
-    // accordingly: the checkpoint carries full-precision regrets and
-    // strategy sums so a run can continue, while `.sol` carries 16-bit
-    // quantized strategies and values for reading. Even at the default
-    // `full` mode, which stores every action node, `.sol` stays the smaller
-    // of the two.
+    // Both artifacts have payloads. With compact support this tiny game's
+    // checkpoint can compress below `.sol`: file-size ordering is not a
+    // format contract, because `.sol` also carries values and metadata.
     let sol_size = std::fs::metadata(&sol_path).unwrap().len();
     let ckpt_size = std::fs::metadata(&checkpoint).unwrap().len();
-    assert!(
-        sol_size < ckpt_size,
-        "sol ({sol_size} bytes) should be smaller than the checkpoint ({ckpt_size} bytes)"
-    );
+    assert!(sol_size > hu_postflop::sol::HEADER_LEN as u64);
+    assert!(ckpt_size > hu_postflop::checkpoint::HEADER_LEN as u64);
 
     // And `no-rivers` is the lever for a much smaller artifact: it drops
     // the river nodes, which dominate the count.

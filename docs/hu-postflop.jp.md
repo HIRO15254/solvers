@@ -21,7 +21,10 @@ scriptによる最終空menuも`NLH003`である。
 
 ## 2. card、iso併合、payoff
 
-card abstractionは使わない。boardと矛盾するcomboを除いた実cardのrange vectorを計算する。
+card abstractionは使わない。各席の開始rangeでweightが正、かつ開始boardと矛盾しないcomboだけを計算する。
+利用者決定（2026-10-06）により、weight 0のhandは計算・保存・出力から除く。正なら大きさによらず残す。
+supportはglobal combo番号の昇順で、木全体で席別の次元と番号を固定する。
+後続の配牌と衝突するhandは再番号付けせずmaskでreachを0にする。
 foldしたplayerのhole card removalは計算しない。
 `solver.iso_merging = true`（既定）はTurn/Riverのsuit同型dealを厳密な商として併合する。
 rangeとboardに対して同型な枝だけを併合し、確率とcomboの写像を保持する。
@@ -95,13 +98,15 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
 `storage = "f32"`はregretと平均累積をf32で保持する。`i16`はblock scale付きの圧縮storageである。
+i16の量子化blockはnodeごとのactorの席別support次元であり、support外handの除去でblock scaleと反復結果が変わり得る。
+新旧layoutのbit一致をi16に要求せず、同じconfig・反復予算で収束品質を照合する。
 storageの量子化誤差と`.sol`の出力量子化を区別する。card/bucket近似は無いが浮動小数点の誤差はある。
 零和のCFR理論をrake・ICMを含む一般和へ拡張した収束保証は付けない。
 開始potのfolded dead moneyを含む設定でも、実装のutility判定が一般和経路を選ぶ場合がある。
 
 ## 5. 保存範囲とnode履歴
 
-`[output] solution_streets = "full"`（既定）は全action nodeの戦略と値を保存する。
+`[output] solution_streets = "full"`（既定）は全action nodeの戦略と値を席別supportのcompact次元で保存する。
 `"no-rivers"`はRiver action nodeの戦略と値を保存しない。
 River開始では保存対象が空にならないよう`full`へ強制する。
 未保存Riverへの`export`はerrorである。`inspect`の遅延再解決は新しい計算であり、保存時の値ではない。
@@ -155,7 +160,7 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 ## 7. `.sol`とcheckpoint
 
-`.sol`は`SLVRSOLV` magic、u16 version 1、32-byte config hash、u64 iterationの50-byte headerを持つ。
+`.sol`は`SLVRSOLV` magic、u16 version 2、32-byte config hash、u64 iterationの50-byte headerを持つ。
 多byte値はlittle endian、payloadはzstd圧縮である。
 
 | payload | 意味 |
@@ -163,19 +168,22 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 | `config_toml` | 外部tree sourceをinline化した実効config全文。木を決定的に再構築する |
 | `meta` | iterations、expl[2]、ev[2]、nash_conv、storage、wall_secs |
 | `mode` | full / no-rivers |
-| `blocks` | action nodeごとのu16戦略、sref昇順 |
-| `values` | 同じnode集合のOOP全hand、IP全handの値。block scale付きi16、sref昇順 |
+| `blocks` | action nodeごとのactor support次元のu16戦略、sref昇順 |
+| `values` | 同じnode集合のOOP support、IP supportの値（席別次元）。block scale付きi16、sref昇順 |
 
 `.sol`のheader hashはblake3(config_toml全文)と一致しなければ読込みerrorである。
 `.sol`の戦略はsolve storageによらずu16である。値の分解能はblockのピークに対し約1/32767である。
-そのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
+supportは埋込みconfigから再計算する。開始rangeのweight 0のhandには保存slotが無い。
+support内でもそのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
+version 1はversion errorで明示的に拒否する。現行configから再solveしてversion 2を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 2である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 3である。
 圧縮postcard payloadにSolverState、実効config全文、累積elapsed_secsを持つ。
 SolverStateはiterationとstorageのregret・平均累積を持つ再開用状態である。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-version 1の旧checkpointもcodecは読めるが、v1のresumeには埋込みconfigが必要である。
+storageの長さはcompact supportで決まる。P1 resumeはversion 3だけを受理し、埋込みconfigを必須とする。
+version 1/2は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 保存は同directoryのtemporary fileからatomic置換する。
 
 P1のresume互換性hashは正規化configから`[run]`と`[meta]`を除いたTOMLのblake3である。
@@ -197,7 +205,11 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 
 pot・stack・action額はBB、EVとexplはutility単位である。
 nodeのweightは到達weightであり、root rangeのweightと区別する。frequencyは同じweightで加重する。
-CSVの配列列は`|`で結合する。
+CSVの配列列は`|`で結合する。公開combo表記はglobalの実card表記を維持する。
+開始rangeのweight 0のhandはstrategy/EV/rangeに出力しない。
+support外のcombo照会は「rangeに無い」旨のerrorまたは空結果であり、値0を返さない。
+13×13 class集計はsupportをglobal combo領域へ展開して行う。
+未保存Riverの再解決ではnode reachを新しいrangeとし、親子のsupportをglobal comboで対応付ける。
 
 reportの先頭7列は`board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity`で固定である。
 続く`freq_*`列は入力board順で初めて現れたroot action labelの和集合である。

@@ -7,6 +7,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
+| 性能・厳密一致の検証 | [P1 compact hand domain](p1-perf-2026-10/compact-hands-20261006/README.md) | 2026-10-06。f32新旧一致、i16の200/500反復progress、Turn速度・Flop storage見積り、format移行境界 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
@@ -14,7 +15,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 [9月Multiwayの詳細索引](multiway-2026-09/README.md)は当時の測定を調べ直す場合だけ使う。
 各報告の「次」「active」「完了」は実験当時の記述であり、現在の開発優先順位や実行許可を示さない。
 
-保持する実験の設定は削除済みの旧形式（`solvers.multiway-preflop/v1`、`solvers.postflop/v1`）で書かれている。
+過去の参照比較・Multiway評価の設定は削除済みの旧形式（`solvers.multiway-preflop/v1`、`solvers.postflop/v1`）で書かれている。
 現行CLIは`solvers.nlh/v1`だけを読み、これらを`NLH001`で拒否する。旧成果物の照会・再開もできない。
 再実行は各manifestのsource revision、またはtag `archive/pre-two-products-2026-10-04`からbuildしたbinaryで行う。
 新形式への自動変換は無い。現行の条件で測り直す場合は、共通Inputで設定を書き直し、別の実験として記録する。

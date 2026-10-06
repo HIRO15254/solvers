@@ -1,0 +1,13 @@
+   Compiling hu-postflop v0.1.0 (C:\Users\PC_User\orca\workspaces\solvers\cisco\crates\hu-postflop)
+    Finished `release` profile [optimized] target(s) in 28.94s
+     Running tests\rake_icm.rs (target\release\deps\rake_icm-73ac1d9a2941bdc1.exe)
+
+running 5 tests
+test raked_solve_leaks_exactly_the_rake_in_aggregate ... ok
+test postflop_builder_sets_zero_sum_flag ... ok
+test rake_makes_defender_call_less ... ok
+test pure_hu_icm_postflop_solve_matches_chip_ev ... ok
+test rake_cap_level_changes_strategy ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

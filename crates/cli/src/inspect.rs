@@ -215,7 +215,7 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 println!("kind: chance ({} deals)", children.len());
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, node_info, self.current, pos);
+                    let label = chance_child_label(self.game, node_info, self.current, pos);
                     println!("  [{pos}] {label}");
                 }
             }
@@ -288,7 +288,7 @@ impl<'a> Repl<'a> {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
                 let mut chosen: Option<(usize, String)> = None;
                 for pos in 0..children.len() {
-                    let label = chance_child_label(tree, node_info, self.current, pos);
+                    let label = chance_child_label(self.game, node_info, self.current, pos);
                     // Accept the label with or without its trailing `*`
                     // (see `chance_child_label`'s doc comment): an
                     // iso-merged deal's representative card is still a
@@ -303,9 +303,10 @@ impl<'a> Repl<'a> {
                 let (pos, label) = match chosen {
                     Some(c) => c,
                     None => match arg.parse::<usize>() {
-                        Ok(idx) if idx < children.len() => {
-                            (idx, chance_child_label(tree, node_info, self.current, idx))
-                        }
+                        Ok(idx) if idx < children.len() => (
+                            idx,
+                            chance_child_label(self.game, node_info, self.current, idx),
+                        ),
                         Ok(idx) => {
                             println!(
                                 "error: deal index {idx} out of range (0..{})",
@@ -416,10 +417,10 @@ impl<'a> Repl<'a> {
         {
             self.equity_cache = Some((
                 self.current,
-                queries::equity(&self.board, &self.history, &reach),
+                queries::equity(self.game, &self.board, &self.history, &reach),
             ));
         }
-        let grid = queries::equity_grid(&reach, &self.equity_cache.as_ref().unwrap().1);
+        let grid = queries::equity_grid(self.game, &reach, &self.equity_cache.as_ref().unwrap().1);
         println!("oop equity vs ip at current node (class-averaged, %)");
         self.render_grid(&grid.weights, &grid.values);
     }
@@ -441,8 +442,6 @@ impl<'a> Repl<'a> {
         };
         let tag = tree.tags[self.current as usize] as usize;
         let info = &node_info[tag];
-        let sref = tree.storage_ref(&node);
-        let num_hands = sref.num_hands as usize;
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
             Err(e) => {
@@ -451,7 +450,18 @@ impl<'a> Repl<'a> {
             }
         };
         println!("combos {arg}:");
-        for row in queries::combo_rows(&class, num_hands, info.actions.len(), &avg) {
+        let rows = queries::combo_rows(
+            &class,
+            &self.game.evaluator.hands,
+            node.player,
+            info.actions.len(),
+            &avg,
+        );
+        if rows.is_empty() {
+            println!("error: {arg} is not in the acting player range");
+            return;
+        }
+        for row in rows {
             let parts: Vec<String> = info
                 .actions
                 .iter()

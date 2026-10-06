@@ -19,14 +19,16 @@ use hu_engine::SolverState;
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
 
 const MAGIC: &[u8; 8] = b"SLVRCKPT";
-const FORMAT_VERSION: u16 = 1;
+const FORMAT_VERSION: u16 = 3;
 
 /// Errors from reading or writing a `.ckpt` file.
 #[derive(Debug, thiserror::Error)]
 pub enum CheckpointError {
     #[error("not a solvers checkpoint file (bad magic bytes)")]
     BadMagic,
-    #[error("unsupported checkpoint format version {found} (expected {expected})")]
+    #[error(
+        "unsupported checkpoint format version {found} (expected {expected}); re-solve from solvers.nlh/v1 to create a compact-domain checkpoint (docs/hu-postflop.jp.md)"
+    )]
     BadVersion { found: u16, expected: u16 },
     #[error("checkpoint file truncated: expected at least {expected} bytes, got {actual}")]
     Truncated { expected: usize, actual: usize },
@@ -51,7 +53,7 @@ pub struct Checkpoint {
     pub config_hash: [u8; 32],
     pub iteration: u64,
     pub state: SolverState,
-    /// Present only in common-input checkpoints (format 2).
+    /// Present in self-contained common-input checkpoints (format 3).
     pub config_toml: Option<String>,
     /// Cumulative solve time, excluding tree validation/build and artifact export.
     pub elapsed_secs: Option<f64>,
@@ -62,7 +64,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION && version != 2 {
+    if version != FORMAT_VERSION {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -101,13 +103,8 @@ pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
         .expect("sliced to HEADER_LEN");
     let header = parse_header(&header_buf)?;
     let payload = zstd::decode_all(&bytes[HEADER_LEN..])?;
-    let version = u16::from_le_bytes([bytes[8], bytes[9]]);
-    let (state, config_toml, elapsed_secs) = if version == 2 {
-        let (state, config, elapsed): (SolverState, String, f64) = postcard::from_bytes(&payload)?;
-        (state, Some(config), Some(elapsed))
-    } else {
-        (postcard::from_bytes(&payload)?, None, None)
-    };
+    let (state, config_toml, elapsed_secs): (SolverState, Option<String>, Option<f64>) =
+        postcard::from_bytes(&payload)?;
     Ok(Checkpoint {
         config_hash: header.config_hash,
         iteration: header.iteration,
@@ -124,7 +121,7 @@ pub fn write_checkpoint(
     config_hash: [u8; 32],
     state: &SolverState,
 ) -> Result<(), CheckpointError> {
-    let payload = postcard::to_allocvec(state)?;
+    let payload = postcard::to_allocvec(&(state, None::<String>, None::<f64>))?;
     let compressed = zstd::encode_all(payload.as_slice(), 0)?;
 
     let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
@@ -136,7 +133,7 @@ pub fn write_checkpoint(
 
 /// Self-contained common-input checkpoint. The hash excludes [run]; the
 /// embedded config preserves the complete normalized effective input.
-/// Legacy callers continue writing byte-identical format 1 checkpoints.
+/// Both writers use format 3; P1 resume requires the embedded config.
 pub fn write_checkpoint_with_config(
     path: &Path,
     compatibility_hash: [u8; 32],
@@ -144,10 +141,9 @@ pub fn write_checkpoint_with_config(
     effective_config: &str,
     elapsed_secs: f64,
 ) -> Result<(), CheckpointError> {
-    let payload = postcard::to_allocvec(&(state, effective_config, elapsed_secs))?;
+    let payload = postcard::to_allocvec(&(state, Some(effective_config), Some(elapsed_secs)))?;
     let compressed = zstd::encode_all(payload.as_slice(), 0)?;
-    let mut header = build_header(compatibility_hash, state.iteration);
-    header[8..10].copy_from_slice(&2u16.to_le_bytes());
+    let header = build_header(compatibility_hash, state.iteration);
     let mut buf = Vec::with_capacity(HEADER_LEN + compressed.len());
     buf.extend_from_slice(&header);
     buf.extend_from_slice(&compressed);
@@ -265,6 +261,20 @@ mod tests {
             Err(CheckpointError::BadMagic)
         ));
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn rejects_pre_compact_versions_before_decoding() {
+        for version in [1u16, 2] {
+            let path = temp_path("old-format.checkpoint");
+            let mut header = build_header([0; 32], 0);
+            header[8..10].copy_from_slice(&version.to_le_bytes());
+            std::fs::write(&path, header).unwrap();
+            assert!(
+                matches!(read_checkpoint(&path), Err(CheckpointError::BadVersion { found, expected }) if found == version && expected == FORMAT_VERSION)
+            );
+            let _ = std::fs::remove_file(path);
+        }
     }
 
     #[test]

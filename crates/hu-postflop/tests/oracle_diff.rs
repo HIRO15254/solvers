@@ -291,7 +291,8 @@ fn export_profile(
         let sref = tree.storage_ref(node);
         let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
         for hand in 0..num_hands {
-            let key = format!("{hand}|{}", info.history);
+            let global = solver.game().evaluator.hands.combos(node.player)[hand];
+            let key = format!("{global}|{}", info.history);
             let dist: Vec<f64> = (0..num_actions)
                 .map(|a| sigma[a * num_hands + hand] as f64)
                 .collect();

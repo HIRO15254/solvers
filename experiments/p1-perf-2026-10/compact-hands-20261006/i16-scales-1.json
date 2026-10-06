@@ -1,0 +1,248 @@
+{
+  "blocks": [
+    {
+      "block": 0,
+      "newRegretScale": 0.29812437295913696,
+      "newStrategyScale": 6.250000296859071e-6,
+      "oldRegretScale": 0.29812437295913696,
+      "oldStrategyScale": 6.250000296859071e-6
+    },
+    {
+      "block": 1,
+      "newRegretScale": 0.0026123065035790205,
+      "newStrategyScale": 6.250000296859071e-6,
+      "oldRegretScale": 0.0026123065035790205,
+      "oldStrategyScale": 6.250000296859071e-6
+    },
+    {
+      "block": 2,
+      "newRegretScale": 0.08293195813894272,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.08293195813894272,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 3,
+      "newRegretScale": 0.0001811365655157715,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.0001811365655157715,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 4,
+      "newRegretScale": 0.0062252227216959,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.0062252227216959,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 5,
+      "newRegretScale": 0.03186376392841339,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.03186376392841339,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 6,
+      "newRegretScale": 1.0,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 1.0,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 7,
+      "newRegretScale": 0.08246397227048874,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.08246397227048874,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 8,
+      "newRegretScale": 1.0,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 1.0,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 9,
+      "newRegretScale": 0.012058950029313564,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.012058950029313564,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 10,
+      "newRegretScale": 0.033718083053827286,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.033718083053827286,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 11,
+      "newRegretScale": 1.0,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 1.0,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 12,
+      "newRegretScale": 0.08151577413082123,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.08151577413082123,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 13,
+      "newRegretScale": 1.0,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 1.0,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 14,
+      "newRegretScale": 0.022925106808543205,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.022925106808543205,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 15,
+      "newRegretScale": 0.0370291993021965,
+      "newStrategyScale": 7.812500371073838e-7,
+      "oldRegretScale": 0.0370291993021965,
+      "oldStrategyScale": 7.812500371073838e-7
+    },
+    {
+      "block": 16,
+      "newRegretScale": 1.0,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 1.0,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 17,
+      "newRegretScale": 0.12162656337022781,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 0.12162656337022781,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 18,
+      "newRegretScale": 0.017948804423213005,
+      "newStrategyScale": 7.812500371073838e-6,
+      "oldRegretScale": 0.017948804423213005,
+      "oldStrategyScale": 7.812500371073838e-6
+    },
+    {
+      "block": 19,
+      "newRegretScale": 0.10976516455411911,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.10976516455411911,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 20,
+      "newRegretScale": 0.01648883707821369,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.01648883707821369,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 21,
+      "newRegretScale": 0.002443339442834258,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.002443339442834258,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 22,
+      "newRegretScale": 0.15494713187217712,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 0.15494713187217712,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 23,
+      "newRegretScale": 0.02264760248363018,
+      "newStrategyScale": 7.812500371073838e-6,
+      "oldRegretScale": 0.02264760248363018,
+      "oldStrategyScale": 7.812500371073838e-6
+    },
+    {
+      "block": 24,
+      "newRegretScale": 0.10683807730674744,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.10683807730674744,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 25,
+      "newRegretScale": 0.02908260002732277,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.02908260002732277,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 26,
+      "newRegretScale": 0.0008084247820079327,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.0008084247820079327,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 27,
+      "newRegretScale": 0.15865576267242432,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 0.15865576267242432,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 28,
+      "newRegretScale": 0.021886806935071945,
+      "newStrategyScale": 7.812500371073838e-6,
+      "oldRegretScale": 0.021886806935071945,
+      "oldStrategyScale": 7.812500371073838e-6
+    },
+    {
+      "block": 29,
+      "newRegretScale": 0.11566435545682907,
+      "newStrategyScale": 1.5625000742147677e-6,
+      "oldRegretScale": 0.11566435545682907,
+      "oldStrategyScale": 1.5625000742147677e-6
+    },
+    {
+      "block": 30,
+      "newRegretScale": 0.03065933659672737,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.03065933659672737,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 31,
+      "newRegretScale": 0.003742390079423785,
+      "newStrategyScale": 3.906250185536919e-6,
+      "oldRegretScale": 0.003742390079423785,
+      "oldStrategyScale": 3.906250185536919e-6
+    },
+    {
+      "block": 32,
+      "newRegretScale": 0.16527831554412842,
+      "newStrategyScale": 3.1250001484295353e-6,
+      "oldRegretScale": 0.16527831554412842,
+      "oldStrategyScale": 3.1250001484295353e-6
+    },
+    {
+      "block": 33,
+      "newRegretScale": 0.3162466883659363,
+      "newStrategyScale": 0.000015625000742147677,
+      "oldRegretScale": 0.3162466883659363,
+      "oldStrategyScale": 0.000015625000742147677
+    }
+  ],
+  "changedRegretScales": 0,
+  "changedStrategyScales": 0,
+  "iteration": 1,
+  "legacyMaxStrictlyOutsideSupportBlocks": 0,
+  "newElements": 42287,
+  "oldElements": 129948
+}

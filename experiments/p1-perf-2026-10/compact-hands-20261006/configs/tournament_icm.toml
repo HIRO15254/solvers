@@ -1,0 +1,30 @@
+# Small HU river evaluated with tournament ICM and one player outside the table.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 5
+
+[economics]
+kind = "tournament"
+payouts = [100, 60, 0]
+outside_field_bb = [10]
+
+[spot]
+line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"
+board = "Ks 7h 2d 3c 9s"
+
+[ranges]
+BTN = "AhAd,QhQd"
+BB = "JhJd,ThTd"
+
+[tree]
+script = '''river { replace bet [1bb] }
+river when !unopened { replace raise [a] }'''
+
+[solver.stop]
+max_iterations = 16
+check_every = 4
+
+[run]
+threads = 1

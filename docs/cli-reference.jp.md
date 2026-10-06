@@ -110,6 +110,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
+P1 `.sol`はversion 2、checkpointはversion 3だけを受理する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -234,6 +235,7 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 | `--output PATH` | stdout | 出力先 |
 | `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える |
 
+P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 

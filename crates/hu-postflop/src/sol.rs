@@ -31,7 +31,7 @@ use runfiles::{config_hash, config_hash_hex};
 pub const HEADER_LEN: usize = 8 + 2 + 32 + 8;
 
 const MAGIC: &[u8; 8] = b"SLVRSOLV";
-const FORMAT_VERSION: u16 = 1;
+const FORMAT_VERSION: u16 = 2;
 
 /// Errors from reading or writing a `.sol` file.
 #[derive(Debug, thiserror::Error)]
@@ -87,7 +87,7 @@ pub enum StreetsStored {
 }
 
 /// One action node's quantized strategy. `probs` is action-major (all
-/// hands for action 0, then all hands for action 1, ...) u16 fixed point,
+/// root-support hands for action 0, then action 1, ...) u16 fixed point,
 /// stored as raw little-endian bytes rather than `Vec<u16>` so postcard
 /// serializes it as a length-prefixed byte blob instead of a varint-per-
 /// element sequence.
@@ -130,7 +130,7 @@ pub struct ValueBlock {
     /// Chips (or prize units) one quantization step represents. Zero when
     /// every value in the block is zero.
     pub scale: f32,
-    /// OOP's per-hand values then IP's, little-endian `i16` multiples of
+    /// OOP's compact support values then IP's (seat dimensions may differ), little-endian `i16` multiples of
     /// `scale`, stored as raw bytes for the same reason
     /// [`StrategyBlock::probs`] is.
     pub values: Vec<u8>,
@@ -497,6 +497,21 @@ mod tests {
         std::fs::write(&path, &bytes).unwrap();
         assert!(matches!(read_sol(&path), Err(SolError::BadMagic)));
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn rejects_pre_compact_versions_before_decoding() {
+        {
+            let version = 1u16;
+            let path = temp_path("old-format.sol");
+            let mut header = build_header([0; 32], 0);
+            header[8..10].copy_from_slice(&version.to_le_bytes());
+            std::fs::write(&path, header).unwrap();
+            assert!(
+                matches!(read_sol(&path), Err(SolError::BadVersion { found, expected }) if found == version && expected == FORMAT_VERSION)
+            );
+            let _ = std::fs::remove_file(path);
+        }
     }
 
     #[test]

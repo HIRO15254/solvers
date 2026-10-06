@@ -1,0 +1,60 @@
+{
+  "fmt": {
+    "exitCode": 0,
+    "log": "fmt-final4.log"
+  },
+  "clippy": {
+    "exitCode": 0,
+    "log": "clippy-final4.log"
+  },
+  "workspace": {
+    "passed": 846,
+    "failed": 0,
+    "ignored": 31,
+    "suites": 55,
+    "log": "workspace-tests-final4.log"
+  },
+  "oracleRelease": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0,
+    "suites": 1,
+    "log": "oracle-release-final.log"
+  },
+  "p1ReleaseIncludeIgnored": {
+    "passed": 158,
+    "failed": 0,
+    "ignored": 0,
+    "suites": 16,
+    "log": "p1-release-final3.log"
+  },
+  "rakeReleaseIncludeIgnored": {
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0,
+    "suites": 1,
+    "log": "rake-release-final2.log"
+  },
+  "cliRiverReleaseIncludeIgnored": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "suites": 1,
+    "log": "cli-river-release.log"
+  },
+  "probeFmtClippy": {
+    "exitCode": 0
+  },
+  "sourceProductionUnchangedAfterFinalComparisons": true,
+  "p2IgnoredAcceptanceRun": false,
+  "negativeAttempts": [
+    "CLI tiny artifact compressed-size ordering failed; replaced non-contract assertion.",
+    "Rake helper used compact as global; expanded actions without changing tolerances.",
+    "Rake helper collect type inference failed; annotated Vec.",
+    "During development: local oracle keys, infoset pins, test declaration order, clippy lints, cp932, shared log, interrupted tool sessions.",
+    "Diagnostic only: wrong checkpoint path and node-ID order corrected to storage-ref order.",
+    "Resource diagnostic: validate --json unsupported (exit 2); reran validate --resources (exit 0, withinLimit false).",
+    "Benchmark config byte check initially failed on CRLF/LF only; TOML equivalent; copies now byte-identical.",
+    "Automatic approval rejected baseline snapshot/archive cleanup: blocked by policy."
+  ]
+}

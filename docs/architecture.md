@@ -142,9 +142,14 @@ blocker付きの相手reachでCFVを正規化してからutility offsetを加え
 
 ## 5. Mode A: hu-postflop crate(exact postflop)
 
-`postflop`がFlop/Turn/River開始の木を作る。full combo vectorを使い、card abstractionは持たない。
-suit同型の枝・確率・reach写像はbuilderが決める。`kernel`はsorted-rank showdown sweepと
-fold inclusion–exclusionを持つ。rank/card-removalの表はbuild時に用意する。
+`postflop`がFlop/Turn/River開始の木を作る。`PostflopHands`は席別の開始range supportを
+global combo昇順で保持し、global→local逆引きとexpand/compactを提供する。card abstractionは持たない。
+reach/value/storageの次元は木全体で席別support長に固定し、配牌で衝突するhandは席別maskで0にする。
+suit同型の枝・確率・compact空間の席別商transitionはbuilderが決める。supportの閉包違反は内部不変条件のerrorである。
+`kernel`は5-card boardのsorted card setでdedupeした席別rank tableを使う。
+local index・2枚のcard index・同順位group境界をbuild時に用意し、役順のmergeでshowdownをO(n_oop＋n_ip)で評価する。
+foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
+memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
 
 `prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
 `run::run`はlocal poolでf32/i16のgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。

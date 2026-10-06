@@ -16,6 +16,7 @@
 | 共通Input形式 | [`solvers.nlh/v1`規範](nlh-input-v1.jp.md) |
 | 製品の計算と成果物 | [P1規範](hu-postflop.jp.md)、[P2暫定規範](mw-preflop.jp.md) |
 | P1の品質検証の参照候補 | [HU Postflop参照候補](plans/hu-postflop-validation/README.md) |
+| P1の速度・資源改善の段階と受入条件 | [P1性能計画](plans/p1-performance.jp.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |
 | 環境準備・変更手順・検証・引継ぎ | [development.md](development.md)、[作業票テンプレート](plans/task-template.md) |

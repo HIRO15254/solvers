@@ -1,0 +1,25 @@
+# Small HU river with explicit ranges and a one-BB bet; suitable for a quick solve.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+stack_bb = 5
+
+[spot]
+line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"
+board = "Ks 7h 2d 3c 9s"
+
+[ranges]
+BTN = "AhAd:0.25,QhQd:0.5,AcKc:0,AsQs:0.125"
+BB = "AhAd:0.75,JhJd:0.25,ThTd:0.5"
+
+[tree]
+script = '''river { replace bet [1bb] }
+river when !unopened { replace raise [a] }'''
+
+[solver.stop]
+max_iterations = 16
+check_every = 4
+
+[run]
+threads = 1
