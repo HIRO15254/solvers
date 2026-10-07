@@ -25,6 +25,8 @@
 | PF6 | 2026-10-07 | PF5の設定は`[solver] cfr_precision`、値は`"f32"`（既定）と`"f64"`（旧版とbit一致） |
 | PF7 | 2026-10-07 | P1のDCFR既定係数を`alpha 1.25`、`beta 0.5`、`gamma 4`へ変える（`pow4_reset = false`は維持）。旧値は明示すれば使える |
 | PF8 | 2026-10-07 | `storage = "i16"`で`pow4_reset`を書かないときだけ既定をtrueにする。f32・i16-f32avgの既定はfalseのまま。明示した値が優先 |
+| PF9 | 2026-10-08 | 停止後の保存: memoryに余裕があるとき（並行中の見積りが上限以下）だけ最後のcheckpointと`.sol`を並行して書く。最後のcheckpointを省く`[run] final_checkpoint`（既定true）を追加する。目標到達だけ既定で省く案は採らない |
+| PF10 | 2026-10-08 | `[solver.stop] check_every`に`"auto"`を追加して既定にする。targetのあるrunは直前2回の評価から到達を予測して評価間隔を決める（最小3、最大50 iteration）。targetが無いrunと整数の明示は固定間隔 |
 
 ## 2. 基準測定（2026-10-06、source `43e97c6`）
 
@@ -65,6 +67,8 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T11 | PDCFR+（予測付きのDCFR+）の試作。環境変数で切り替え、mergeしない | 0.1%到達がDCFRより速いこと（不成立のため不採用） |
 | T12 | PF7: DCFRの既定係数の変更。既定に依存する試験・規範・templateの同期 | 旧版の未指定と新版の旧値明示、旧版の新値明示と新版の未指定がbit一致。旧既定のrunを再開できる |
 | T13 | PF8: 旧i16の`pow4_reset`既定をtrueにする。規範・template・試験の同期 | i16の未指定が明示trueと、他storageの未指定が明示falseとbit一致。実効configが値を明示する |
+| T14 | PF9: 最後のcheckpointと`.sol`の並行書き出し（並行中の見積りS＋W＋2Cが上限以下のとき）と`[run] final_checkpoint` | 並行と直列、新旧で`.sol` payload・checkpoint stateが一致。falseで最後のcheckpointを書かず、`.sol`は一致。旧runの再開 |
+| T15 | PF10: `check_every = "auto"`の適応的な評価間隔。再開時はprogressから評価履歴を復元する | 整数の明示と旧版がbit一致。targetの無いautoが旧版と一致。autoで再開と一度に解いたrunの評価iteration・停止・stateが一致 |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -120,7 +124,7 @@ gtow_b 915→734秒（比較はbit一致する`"f64"`）。
 T10（同）: 出力は変更前と一致し、Flop1のpeak RSSはf32で4.21→3.55 GB、i16-f32avgで3.51→2.83 GBに下がった。
 `gtow_a`（16.1M node）＋i16-f32avgの見積りは53.95→43.04 GBとなり、64 GB機（c2d-highcpu-32）の既定上限に収まる。
 実際に750 iteration・3,497秒で0.098%に達した（peak RSS 48.1 GB、process全体3,799秒）。
-checkpointと`.sol`の並行化は約3%の短縮に対してpeakをT10前へ戻すので採らない。
+checkpointと`.sol`の並行化は約3%の短縮に対してpeakをT10前へ戻すので、この時点では採らなかった（後にmemoryに余裕があるときだけ並行する形でPF9・T14とした）。
 profile（同）: Flop1 f32は16 threadsで13.7倍、SMTを含む32 threadsで16.4倍。32 threadsの時間は終端kernel（showdown 30%・fold 16%）、
 `cfr_pass`本体（28%）、列の正規化（7%）が占め、kernelのTLB shootdownが約10%ある。
 T11（[証拠](../../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）: PDCFR+（予測付きDCFR+、係数2.3・5）は0.1%到達がTurn 730→1,760 iteration、
@@ -136,6 +140,8 @@ reset有りならTurn・Riverでも0.1%に届き、どの木でも遅くなら�
 T13: `pow4_reset`の未指定は確定したstorageで解決する。旧版のi16明示trueと新版のi16未指定、旧版のi16未指定と新版の明示false、
 f32・i16-f32avgの未指定どうしが、Turn6の`.sol` payload（wall_secs以外）とroot `export strategy/ev`で一致した。
 旧版でi16未指定のまま途中停止したrunは、保存した実効configのfalseで新版から再開できる。
+評価間隔（[証拠](../../experiments/p1-perf-2026-10/adaptive-check-20261008/README.md)）: 固定25では評価が約4.4%、目標を越えてからの超過が平均約12 iterationある。
+保持した131本の収束曲線で、直前2回の評価から到達を予測して間隔を決める方式を模擬すると、0.1%までの費用は平均0.957倍（最悪1.004倍）だった。これをPF10とした（T15）。
 
 ### 一致の定義
 
