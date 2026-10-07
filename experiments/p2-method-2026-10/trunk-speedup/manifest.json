@@ -94,12 +94,12 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4.run.log",
-      "sha256": "703b2b1c19b5431d6a64f76d3a775f01e898ad81889177fca0ee993feab78849",
+      "sha256": "7830a45b42262dd7374d0e90a5d57548f839d0d95b6b6dc979f647f57b3f2b1d",
       "role": "stdout of the B4 timing runs before the cache fix"
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix.run.log",
-      "sha256": "c132f60768a662e4834b4e61e350cba6c34dd196ca74b0876b3767ad5c2bf25a",
+      "sha256": "0f3eee2eb50e524cd25dd3e42461b7b2d48af8ecf4d616c1553493ba933e6e02",
       "role": "stdout of the B4 timing runs after the cache fix"
     },
     {
@@ -164,7 +164,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_base-model.metrics.json",
-      "sha256": "34136d641655e3969eb7f163cbe4905fd65b94a7873d0c503fa74e3e950c5458",
+      "sha256": "fee1556f40a575d09518d530370821e1ecd47a6568fd55cd5489f9dbf987f88f",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -179,7 +179,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_model.metrics.json",
-      "sha256": "260f571320d9a8df028da59715caf197742643b1b8755bfffde218a8c058fd73",
+      "sha256": "367ebe162e85cd1799a9576d3d5bec617a2c77d31112f73a180fed6cf9d0e6a6",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -194,7 +194,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_s256.metrics.json",
-      "sha256": "720cf3f17fcfe9242325bc34f516666354b88d17f286755a08743968d9f1a0a6",
+      "sha256": "20c98528c18eaee381aa7c3e36297b70647d4c1ed858f7baf64305967c0604a2",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -209,7 +209,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_base-model.metrics.json",
-      "sha256": "ccf44a7929bac9f416e79a39737956c76bf7abf20d0520d70a32b10bb9174ee2",
+      "sha256": "199e615a52ff78fac2282e8eaa893ab30039b240821ef612cc1b0e827cbbb5fd",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -224,7 +224,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_model.metrics.json",
-      "sha256": "d416ab40a1b84458c53c72c8b14146590a493e44e1dfe93e64eff082ce2aeb03",
+      "sha256": "39afb376368f562212235aa407f4acd8b065caa69b0941c527b11a1c5e482d58",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -239,7 +239,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_s256.metrics.json",
-      "sha256": "8f74926454ac0aafc4403f9770e4d1b0a2bba12ce995ffaeae6312444e4c3c4b",
+      "sha256": "111e8dc59779c52be49451dd8c6c87ab157926d6d6d8554533b750b629b22bad",
       "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
     },
     {
@@ -254,7 +254,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_model.metrics.json",
-      "sha256": "b873ba3d2c9167439273fb196c0b22222a8f6cac7dead3c81c41ad3a73dea0ff",
+      "sha256": "49e7c5ddf668fabbd96a4e40480260b583f6435f8c550b14ed57cc2d58a90723",
       "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_s256.metrics.json",
-      "sha256": "dae053513a72c0d60eed576e87f8e94c3a5f3321e3d9941cafa60d0b21b648f2",
+      "sha256": "9ddbfac416808dcf41f4388894c1d081f94c845d35abd97d9eaee7f27f568d57",
       "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
     },
     {
@@ -284,7 +284,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_model.metrics.json",
-      "sha256": "5d44ebaceb64502f028910a130f3ddc49ba678494cbc8154be8b0d7c557f1960",
+      "sha256": "6dc2b0ed072ec2b87259bfc0d9294403fe73b37baa66c87fd3bef0efe3f27017",
       "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
     },
     {
@@ -299,7 +299,7 @@
     },
     {
       "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_s256.metrics.json",
-      "sha256": "469a46477594d6df96c22bee0e9f03ede73e5088be7c611ce06e50c92596a201",
+      "sha256": "c5d22f16b57ee9101361aa9d0ffeb0cd79cbe456ba42b9a907036f92cb199fba",
       "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
     }
   ],
