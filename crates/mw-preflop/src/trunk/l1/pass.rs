@@ -126,12 +126,14 @@ struct Walk<'p, 'a> {
     width: usize,
 }
 
+/// The opponent's reach summed over combos, in total and per card. Plain sums:
+/// a compensated sum chains about four dependent operations per combo, and
+/// over a board's 1,081 combos the rounding error of a plain sum is far below
+/// what the Monte Carlo boards resolve.
 #[derive(Clone, Copy)]
 struct Mass {
     total: f64,
     cards: [f64; 52],
-    correction: f64,
-    card_corrections: [f64; 52],
 }
 
 impl Default for Mass {
@@ -139,17 +141,8 @@ impl Default for Mass {
         Self {
             total: 0.0,
             cards: [0.0; 52],
-            correction: 0.0,
-            card_corrections: [0.0; 52],
         }
     }
-}
-
-fn compensated_add(sum: &mut f64, correction: &mut f64, value: f64) {
-    let adjusted = value - *correction;
-    let next = *sum + adjusted;
-    *correction = (next - *sum) - adjusted;
-    *sum = next;
 }
 
 impl Mass {
@@ -162,13 +155,9 @@ impl Mass {
         total
     }
     fn add(&mut self, catalog: &Classes, h: usize, value: f64) {
-        compensated_add(&mut self.total, &mut self.correction, value);
+        self.total += value;
         for c in catalog.cards(h) {
-            compensated_add(
-                &mut self.cards[c.index()],
-                &mut self.card_corrections[c.index()],
-                value,
-            );
+            self.cards[c.index()] += value;
         }
     }
     fn disjoint(&self, catalog: &Classes, h: usize) -> f64 {
@@ -226,13 +215,9 @@ fn settle(
             let l = total.disjoint(catalog, h) + opponent[h] - w - t;
             output[h] = win * w + tie * t + lose * l;
         }
-        compensated_add(&mut lower.total, &mut lower.correction, equal.total);
-        for i in 0..52 {
-            compensated_add(
-                &mut lower.cards[i],
-                &mut lower.card_corrections[i],
-                equal.cards[i],
-            );
+        lower.total += equal.total;
+        for (sum, &value) in lower.cards.iter_mut().zip(&equal.cards) {
+            *sum += value;
         }
     }
 }

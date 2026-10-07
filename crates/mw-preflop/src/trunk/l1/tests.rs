@@ -80,6 +80,15 @@ fn close(a: f64, b: f64) {
         "{a} != {b}"
     );
 }
+/// The vector pass sums the opponent's masses plainly and subtracts the
+/// blocked ones, so its values carry rounding of order 1e-13 of those masses,
+/// which the pairwise reference (a compensated sum per hand) does not.
+fn near(a: f64, b: f64) {
+    assert!(
+        (a - b).abs() <= 1e-10 * a.abs().max(b.abs()).max(1.0),
+        "{a} != {b}"
+    );
+}
 
 fn compare_trees(a: &Tree, b: &Tree) {
     assert_eq!(a.nodes.len(), b.nodes.len());
@@ -372,8 +381,8 @@ fn vector_matches_pairwise_values_responses_and_regrets() {
                     &mut values,
                     &mut best,
                 );
-                close(scratch.values[h], values[0]);
-                close(scratch.best[h], best[0]);
+                near(scratch.values[h], values[0]);
+                near(scratch.best[h], best[0]);
                 let mut own_reach = vec![own[h]; subtree.nodes.len()];
                 for (z, n) in subtree.nodes.iter().enumerate() {
                     if let Some((parent, a)) = n.parent {
@@ -400,7 +409,7 @@ fn vector_matches_pairwise_values_responses_and_regrets() {
                 }
             }
             for (a, b) in inc.iter().zip(expected) {
-                close(*a, b);
+                near(*a, b);
             }
             for (a, b) in sums.iter().zip(expected_sums) {
                 close(*a, b);
