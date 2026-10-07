@@ -24,6 +24,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 収束の模擬 | [P1 目標到達の評価間隔](p1-perf-2026-10/adaptive-check-20261008/README.md) | 2026-10-08。保持した131本の収束曲線で適応的な評価間隔を模擬（0.1%までの費用 平均0.957倍・最悪1.004倍）。PF10の根拠 |
 | 性能・一致の受入 | [P1 GCP受入（T14 保存並行・T15 適応評価・T16 prefault）](p1-perf-2026-10/accept-t14-t16-20261008/README.md) | 2026-10-08。gtow_bのprocess全体625.6→572.0秒（最後のcheckpoint無しで496.0秒）、auto評価で停止まで3%短縮、確保直後の3 iteration 10.7→3.7秒、`.sol`生成中のprofile |
 | 不採用の試作・計測 | [P1 f32終端kernelの依存chain短縮（T17）と相手reachの0の割合](p1-perf-2026-10/f32-kernel-ilp-20261008/README.md) | 2026-10-08。1・16 threadsで約5%速いが32 threads（SMT）で2〜3%遅く不採用。評価された終端でも相手handの64〜86%はreach 0。T18の根拠 |
+| 不採用の試作・計測 | [P1 f32終端kernelで相手reachの0を飛ばす（T18）](p1-perf-2026-10/f32-sparse-reach-20261008/README.md) | 2026-10-08。従来のf32とbit一致。kernel単体0.74〜0.79倍、1・16 threadsで約6%速いが、32 threadsの0.1%到達は0.99〜1.06倍で不採用 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

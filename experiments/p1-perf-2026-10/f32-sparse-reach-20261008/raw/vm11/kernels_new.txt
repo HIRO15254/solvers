@@ -1,0 +1,459 @@
+   Compiling hu-postflop v0.1.0 (/home/PC_User/new/crates/hu-postflop)
+    Finished `bench` profile [optimized] target(s) in 9.52s
+     Running benches/kernels.rs (target/release/deps/kernels-9ab5abb719018268)
+Gnuplot not found, using plotters backend
+Benchmarking kernels/fold
+Benchmarking kernels/fold: Warming up for 3.0000 s
+Benchmarking kernels/fold: Collecting 20 samples in estimated 3.0000 s (9.6M iterations)
+Benchmarking kernels/fold: Analyzing
+kernels/fold            time:   [312.88 ns 313.04 ns 313.27 ns]
+                        change: [-0.3783% -0.2600% -0.1229%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels/showdown
+Benchmarking kernels/showdown: Warming up for 3.0000 s
+Benchmarking kernels/showdown: Collecting 20 samples in estimated 3.0000 s (5.1M iterations)
+Benchmarking kernels/showdown: Analyzing
+kernels/showdown        time:   [597.89 ns 598.41 ns 599.10 ns]
+                        change: [-2.1603% -2.0385% -1.8848%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 4 outliers among 20 measurements (20.00%)
+  1 (5.00%) low mild
+  2 (10.00%) high mild
+  1 (5.00%) high severe
+Benchmarking kernels/fold_f32
+Benchmarking kernels/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels/fold_f32: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/fold_f32: Analyzing
+kernels/fold_f32        time:   [305.60 ns 305.83 ns 306.06 ns]
+                        change: [-0.3884% -0.2776% -0.1646%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Benchmarking kernels/showdown_f32
+Benchmarking kernels/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels/showdown_f32: Collecting 20 samples in estimated 3.0000 s (6.1M iterations)
+Benchmarking kernels/showdown_f32: Analyzing
+kernels/showdown_f32    time:   [492.87 ns 493.02 ns 493.20 ns]
+                        change: [+0.6262% +0.6724% +0.7155%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_fold_00
+Benchmarking kernels/t18_fold_00: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_00: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_00: Analyzing
+kernels/t18_fold_00     time:   [306.19 ns 306.42 ns 306.64 ns]
+Benchmarking kernels/t18_showdown_00
+Benchmarking kernels/t18_showdown_00: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_00: Collecting 20 samples in estimated 3.0000 s (6.1M iterations)
+Benchmarking kernels/t18_showdown_00: Analyzing
+kernels/t18_showdown_00 time:   [492.83 ns 493.05 ns 493.31 ns]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_fold_50
+Benchmarking kernels/t18_fold_50: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_50: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_50: Analyzing
+kernels/t18_fold_50     time:   [306.14 ns 306.45 ns 306.77 ns]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_showdown_50
+Benchmarking kernels/t18_showdown_50: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_50: Collecting 20 samples in estimated 3.0001 s (6.1M iterations)
+Benchmarking kernels/t18_showdown_50: Analyzing
+kernels/t18_showdown_50 time:   [492.50 ns 493.10 ns 493.54 ns]
+Found 3 outliers among 20 measurements (15.00%)
+  2 (10.00%) low severe
+  1 (5.00%) high mild
+Benchmarking kernels/t18_fold_80
+Benchmarking kernels/t18_fold_80: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_80: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_80: Analyzing
+kernels/t18_fold_80     time:   [305.68 ns 305.89 ns 306.08 ns]
+Benchmarking kernels/t18_showdown_80
+Benchmarking kernels/t18_showdown_80: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_80: Collecting 20 samples in estimated 3.0000 s (6.1M iterations)
+Benchmarking kernels/t18_showdown_80: Analyzing
+kernels/t18_showdown_80 time:   [490.02 ns 490.08 ns 490.13 ns]
+Found 4 outliers among 20 measurements (20.00%)
+  2 (10.00%) low severe
+  2 (10.00%) high mild
+Benchmarking kernels/t18_fold_95
+Benchmarking kernels/t18_fold_95: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_95: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_95: Analyzing
+kernels/t18_fold_95     time:   [306.11 ns 306.31 ns 306.50 ns]
+Benchmarking kernels/t18_showdown_95
+Benchmarking kernels/t18_showdown_95: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_95: Collecting 20 samples in estimated 3.0001 s (6.1M iterations)
+Benchmarking kernels/t18_showdown_95: Analyzing
+kernels/t18_showdown_95 time:   [493.31 ns 493.61 ns 494.02 ns]
+Found 2 outliers among 20 measurements (10.00%)
+  1 (5.00%) high mild
+  1 (5.00%) high severe
+
+Benchmarking kernels_wide/fold
+Benchmarking kernels_wide/fold: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold: Collecting 20 samples in estimated 3.0004 s (682k iterations)
+Benchmarking kernels_wide/fold: Analyzing
+kernels_wide/fold       time:   [4.4080 µs 4.4093 µs 4.4114 µs]
+                        change: [+0.9308% +0.9888% +1.0530%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 20 measurements (15.00%)
+  1 (5.00%) high mild
+  2 (10.00%) high severe
+Benchmarking kernels_wide/showdown
+Benchmarking kernels_wide/showdown: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown: Collecting 20 samples in estimated 3.0011 s (368k iterations)
+Benchmarking kernels_wide/showdown: Analyzing
+kernels_wide/showdown   time:   [8.1445 µs 8.1463 µs 8.1482 µs]
+                        change: [-2.1818% -1.9030% -1.6445%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels_wide/fold_f32
+Benchmarking kernels_wide/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold_f32: Collecting 20 samples in estimated 3.0001 s (615k iterations)
+Benchmarking kernels_wide/fold_f32: Analyzing
+kernels_wide/fold_f32   time:   [4.8826 µs 4.8854 µs 4.8902 µs]
+                        change: [+0.7410% +0.9468% +1.1453%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/showdown_f32
+Benchmarking kernels_wide/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown_f32: Collecting 20 samples in estimated 3.0006 s (474k iterations)
+Benchmarking kernels_wide/showdown_f32: Analyzing
+kernels_wide/showdown_f32
+                        time:   [6.3210 µs 6.3222 µs 6.3234 µs]
+                        change: [+0.2266% +0.3701% +0.4950%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Benchmarking kernels_wide/t18_fold_00
+Benchmarking kernels_wide/t18_fold_00: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_00: Collecting 20 samples in estimated 3.0002 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_00: Analyzing
+kernels_wide/t18_fold_00
+                        time:   [4.8790 µs 4.8816 µs 4.8853 µs]
+Found 3 outliers among 20 measurements (15.00%)
+  2 (10.00%) high mild
+  1 (5.00%) high severe
+Benchmarking kernels_wide/t18_showdown_00
+Benchmarking kernels_wide/t18_showdown_00: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_00: Collecting 20 samples in estimated 3.0004 s (474k iterations)
+Benchmarking kernels_wide/t18_showdown_00: Analyzing
+kernels_wide/t18_showdown_00
+                        time:   [6.3217 µs 6.3231 µs 6.3244 µs]
+Found 2 outliers among 20 measurements (10.00%)
+  1 (5.00%) low mild
+  1 (5.00%) high severe
+Benchmarking kernels_wide/t18_fold_50
+Benchmarking kernels_wide/t18_fold_50: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_50: Collecting 20 samples in estimated 3.0002 s (614k iterations)
+Benchmarking kernels_wide/t18_fold_50: Analyzing
+kernels_wide/t18_fold_50
+                        time:   [4.8833 µs 4.8848 µs 4.8866 µs]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/t18_showdown_50
+Benchmarking kernels_wide/t18_showdown_50: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_50: Collecting 20 samples in estimated 3.0006 s (474k iterations)
+Benchmarking kernels_wide/t18_showdown_50: Analyzing
+kernels_wide/t18_showdown_50
+                        time:   [6.3218 µs 6.3232 µs 6.3247 µs]
+Benchmarking kernels_wide/t18_fold_80
+Benchmarking kernels_wide/t18_fold_80: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_80: Collecting 20 samples in estimated 3.0001 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_80: Analyzing
+kernels_wide/t18_fold_80
+                        time:   [4.8790 µs 4.8800 µs 4.8813 µs]
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels_wide/t18_showdown_80
+Benchmarking kernels_wide/t18_showdown_80: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_80: Collecting 20 samples in estimated 3.0001 s (474k iterations)
+Benchmarking kernels_wide/t18_showdown_80: Analyzing
+kernels_wide/t18_showdown_80
+                        time:   [6.3241 µs 6.3258 µs 6.3276 µs]
+Benchmarking kernels_wide/t18_fold_95
+Benchmarking kernels_wide/t18_fold_95: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_95: Collecting 20 samples in estimated 3.0010 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_95: Analyzing
+kernels_wide/t18_fold_95
+                        time:   [4.8834 µs 4.8853 µs 4.8876 µs]
+Benchmarking kernels_wide/t18_showdown_95
+Benchmarking kernels_wide/t18_showdown_95: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_95: Collecting 20 samples in estimated 3.0002 s (476k iterations)
+Benchmarking kernels_wide/t18_showdown_95: Analyzing
+kernels_wide/t18_showdown_95
+                        time:   [6.2989 µs 6.3001 µs 6.3014 µs]
+Found 2 outliers among 20 measurements (10.00%)
+  1 (5.00%) low severe
+  1 (5.00%) low mild
+
+t18 realistic fold: 399 calls, 337953/431319 zeros (78.353%), reach hash 30ee1f4ab69d4c30
+Benchmarking kernels_realistic/t18_fold
+Benchmarking kernels_realistic/t18_fold: Warming up for 3.0000 s
+Benchmarking kernels_realistic/t18_fold: Collecting 20 samples in estimated 3.3001 s (1680 iterations)
+Benchmarking kernels_realistic/t18_fold: Analyzing
+kernels_realistic/t18_fold
+                        time:   [1.9485 ms 1.9489 ms 1.9493 ms]
+Found 3 outliers among 20 measurements (15.00%)
+  1 (5.00%) low mild
+  1 (5.00%) high mild
+  1 (5.00%) high severe
+t18 realistic showdown: 410 calls, 361737/443210 zeros (81.618%), reach hash 70559fb8e64a706c
+Benchmarking kernels_realistic/t18_showdown
+Benchmarking kernels_realistic/t18_showdown: Warming up for 3.0000 s
+Benchmarking kernels_realistic/t18_showdown: Collecting 20 samples in estimated 3.3293 s (1260 iterations)
+Benchmarking kernels_realistic/t18_showdown: Analyzing
+kernels_realistic/t18_showdown
+                        time:   [2.8084 ms 2.8091 ms 2.8099 ms]
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+
+    Finished `bench` profile [optimized] target(s) in 0.08s
+     Running benches/kernels.rs (target/release/deps/kernels-9ab5abb719018268)
+Gnuplot not found, using plotters backend
+Benchmarking kernels/fold
+Benchmarking kernels/fold: Warming up for 3.0000 s
+Benchmarking kernels/fold: Collecting 20 samples in estimated 3.0000 s (9.5M iterations)
+Benchmarking kernels/fold: Analyzing
+kernels/fold            time:   [314.62 ns 314.83 ns 315.09 ns]
+                        change: [+0.3548% +0.5146% +0.7036%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 20 measurements (15.00%)
+  1 (5.00%) low severe
+  1 (5.00%) high mild
+  1 (5.00%) high severe
+Benchmarking kernels/showdown
+Benchmarking kernels/showdown: Warming up for 3.0000 s
+Benchmarking kernels/showdown: Collecting 20 samples in estimated 3.0000 s (5.0M iterations)
+Benchmarking kernels/showdown: Analyzing
+kernels/showdown        time:   [605.28 ns 606.05 ns 607.19 ns]
+                        change: [+0.9903% +1.2166% +1.4412%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 4 outliers among 20 measurements (20.00%)
+  1 (5.00%) high mild
+  3 (15.00%) high severe
+Benchmarking kernels/fold_f32
+Benchmarking kernels/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels/fold_f32: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/fold_f32: Analyzing
+kernels/fold_f32        time:   [305.61 ns 305.84 ns 306.05 ns]
+                        change: [-0.0642% +0.0244% +0.1102%] (p = 0.60 > 0.05)
+                        No change in performance detected.
+Benchmarking kernels/showdown_f32
+Benchmarking kernels/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels/showdown_f32: Collecting 20 samples in estimated 3.0000 s (5.9M iterations)
+Benchmarking kernels/showdown_f32: Analyzing
+kernels/showdown_f32    time:   [505.62 ns 505.78 ns 505.95 ns]
+                        change: [+2.5664% +2.6079% +2.6481%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Benchmarking kernels/t18_fold_00
+Benchmarking kernels/t18_fold_00: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_00: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_00: Analyzing
+kernels/t18_fold_00     time:   [306.15 ns 306.30 ns 306.43 ns]
+                        change: [-0.0232% +0.0638% +0.1483%] (p = 0.18 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_showdown_00
+Benchmarking kernels/t18_showdown_00: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_00: Collecting 20 samples in estimated 3.0001 s (5.9M iterations)
+Benchmarking kernels/t18_showdown_00: Analyzing
+kernels/t18_showdown_00 time:   [505.89 ns 506.02 ns 506.16 ns]
+                        change: [+2.6136% +2.6584% +2.7069%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels/t18_fold_50
+Benchmarking kernels/t18_fold_50: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_50: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_50: Analyzing
+kernels/t18_fold_50     time:   [305.56 ns 305.76 ns 305.92 ns]
+                        change: [-0.2426% -0.1422% -0.0294%] (p = 0.01 < 0.05)
+                        Change within noise threshold.
+Found 2 outliers among 20 measurements (10.00%)
+  1 (5.00%) low mild
+  1 (5.00%) high severe
+Benchmarking kernels/t18_showdown_50
+Benchmarking kernels/t18_showdown_50: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_50: Collecting 20 samples in estimated 3.0000 s (5.9M iterations)
+Benchmarking kernels/t18_showdown_50: Analyzing
+kernels/t18_showdown_50 time:   [505.58 ns 505.79 ns 506.04 ns]
+                        change: [+2.4943% +2.5769% +2.6678%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels/t18_fold_80
+Benchmarking kernels/t18_fold_80: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_80: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_80: Analyzing
+kernels/t18_fold_80     time:   [305.91 ns 306.23 ns 306.56 ns]
+                        change: [-0.0524% +0.0570% +0.1704%] (p = 0.34 > 0.05)
+                        No change in performance detected.
+Benchmarking kernels/t18_showdown_80
+Benchmarking kernels/t18_showdown_80: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_80: Collecting 20 samples in estimated 3.0001 s (5.9M iterations)
+Benchmarking kernels/t18_showdown_80: Analyzing
+kernels/t18_showdown_80 time:   [505.51 ns 505.66 ns 505.82 ns]
+                        change: [+3.1426% +3.1748% +3.2089%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_fold_95
+Benchmarking kernels/t18_fold_95: Warming up for 3.0000 s
+Benchmarking kernels/t18_fold_95: Collecting 20 samples in estimated 3.0000 s (9.8M iterations)
+Benchmarking kernels/t18_fold_95: Analyzing
+kernels/t18_fold_95     time:   [305.26 ns 305.42 ns 305.59 ns]
+                        change: [-0.3458% -0.2638% -0.1860%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels/t18_showdown_95
+Benchmarking kernels/t18_showdown_95: Warming up for 3.0000 s
+Benchmarking kernels/t18_showdown_95: Collecting 20 samples in estimated 3.0000 s (5.9M iterations)
+Benchmarking kernels/t18_showdown_95: Analyzing
+kernels/t18_showdown_95 time:   [505.60 ns 505.74 ns 505.89 ns]
+                        change: [+2.4181% +2.4693% +2.5154%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+
+Benchmarking kernels_wide/fold
+Benchmarking kernels_wide/fold: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold: Collecting 20 samples in estimated 3.0002 s (683k iterations)
+Benchmarking kernels_wide/fold: Analyzing
+kernels_wide/fold       time:   [4.4027 µs 4.4040 µs 4.4057 µs]
+                        change: [-0.2206% -0.1558% -0.0931%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 20 measurements (15.00%)
+  1 (5.00%) high mild
+  2 (10.00%) high severe
+Benchmarking kernels_wide/showdown
+Benchmarking kernels_wide/showdown: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown: Collecting 20 samples in estimated 3.0010 s (338k iterations)
+Benchmarking kernels_wide/showdown: Analyzing
+kernels_wide/showdown   time:   [9.0023 µs 9.0049 µs 9.0079 µs]
+                        change: [+10.527% +10.564% +10.605%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Benchmarking kernels_wide/fold_f32
+Benchmarking kernels_wide/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold_f32: Collecting 20 samples in estimated 3.0002 s (615k iterations)
+Benchmarking kernels_wide/fold_f32: Analyzing
+kernels_wide/fold_f32   time:   [4.8784 µs 4.8809 µs 4.8841 µs]
+                        change: [-0.5679% -0.3519% -0.1700%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high severe
+Benchmarking kernels_wide/showdown_f32
+Benchmarking kernels_wide/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown_f32: Collecting 20 samples in estimated 3.0002 s (456k iterations)
+Benchmarking kernels_wide/showdown_f32: Analyzing
+kernels_wide/showdown_f32
+                        time:   [6.5353 µs 6.5375 µs 6.5394 µs]
+                        change: [+3.3116% +3.3573% +3.3942%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) low mild
+Benchmarking kernels_wide/t18_fold_00
+Benchmarking kernels_wide/t18_fold_00: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_00: Collecting 20 samples in estimated 3.0009 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_00: Analyzing
+kernels_wide/t18_fold_00
+                        time:   [4.8812 µs 4.8829 µs 4.8856 µs]
+                        change: [+0.0348% +0.1476% +0.2744%] (p = 0.02 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/t18_showdown_00
+Benchmarking kernels_wide/t18_showdown_00: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_00: Collecting 20 samples in estimated 3.0011 s (456k iterations)
+Benchmarking kernels_wide/t18_showdown_00: Analyzing
+kernels_wide/t18_showdown_00
+                        time:   [6.5273 µs 6.5285 µs 6.5298 µs]
+                        change: [+3.1886% +3.2417% +3.2917%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) low mild
+Benchmarking kernels_wide/t18_fold_50
+Benchmarking kernels_wide/t18_fold_50: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_50: Collecting 20 samples in estimated 3.0005 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_50: Analyzing
+kernels_wide/t18_fold_50
+                        time:   [4.8802 µs 4.8809 µs 4.8817 µs]
+                        change: [-0.1683% -0.1108% -0.0568%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/t18_showdown_50
+Benchmarking kernels_wide/t18_showdown_50: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_50: Collecting 20 samples in estimated 3.0007 s (455k iterations)
+Benchmarking kernels_wide/t18_showdown_50: Analyzing
+kernels_wide/t18_showdown_50
+                        time:   [6.5374 µs 6.5385 µs 6.5399 µs]
+                        change: [+3.3842% +3.4229% +3.4614%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Benchmarking kernels_wide/t18_fold_80
+Benchmarking kernels_wide/t18_fold_80: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_80: Collecting 20 samples in estimated 3.0004 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_80: Analyzing
+kernels_wide/t18_fold_80
+                        time:   [4.8813 µs 4.8842 µs 4.8881 µs]
+                        change: [+0.0110% +0.0673% +0.1251%] (p = 0.03 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 20 measurements (15.00%)
+  3 (15.00%) high mild
+Benchmarking kernels_wide/t18_showdown_80
+Benchmarking kernels_wide/t18_showdown_80: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_80: Collecting 20 samples in estimated 3.0006 s (455k iterations)
+Benchmarking kernels_wide/t18_showdown_80: Analyzing
+kernels_wide/t18_showdown_80
+                        time:   [6.5423 µs 6.5437 µs 6.5458 µs]
+                        change: [+3.4271% +3.4757% +3.5256%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Benchmarking kernels_wide/t18_fold_95
+Benchmarking kernels_wide/t18_fold_95: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_fold_95: Collecting 20 samples in estimated 3.0009 s (615k iterations)
+Benchmarking kernels_wide/t18_fold_95: Analyzing
+kernels_wide/t18_fold_95
+                        time:   [4.8772 µs 4.8781 µs 4.8790 µs]
+                        change: [-0.1872% -0.1474% -0.1110%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/t18_showdown_95
+Benchmarking kernels_wide/t18_showdown_95: Warming up for 3.0000 s
+Benchmarking kernels_wide/t18_showdown_95: Collecting 20 samples in estimated 3.0009 s (456k iterations)
+Benchmarking kernels_wide/t18_showdown_95: Analyzing
+kernels_wide/t18_showdown_95
+                        time:   [6.5365 µs 6.5378 µs 6.5392 µs]
+                        change: [+3.7156% +3.7586% +3.8047%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 2 outliers among 20 measurements (10.00%)
+  1 (5.00%) low mild
+  1 (5.00%) high severe
+
+t18 realistic fold: 399 calls, 337953/431319 zeros (78.353%), reach hash 30ee1f4ab69d4c30
+Benchmarking kernels_realistic/t18_fold
+Benchmarking kernels_realistic/t18_fold: Warming up for 3.0000 s
+Benchmarking kernels_realistic/t18_fold: Collecting 20 samples in estimated 3.2776 s (1680 iterations)
+Benchmarking kernels_realistic/t18_fold: Analyzing
+kernels_realistic/t18_fold
+                        time:   [1.9506 ms 1.9519 ms 1.9534 ms]
+                        change: [+0.0095% +0.0932% +0.1669%] (p = 0.03 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 20 measurements (15.00%)
+  1 (5.00%) low mild
+  2 (10.00%) high mild
+t18 realistic showdown: 410 calls, 361737/443210 zeros (81.618%), reach hash 70559fb8e64a706c
+Benchmarking kernels_realistic/t18_showdown
+Benchmarking kernels_realistic/t18_showdown: Warming up for 3.0000 s
+Benchmarking kernels_realistic/t18_showdown: Collecting 20 samples in estimated 3.3113 s (1260 iterations)
+Benchmarking kernels_realistic/t18_showdown: Analyzing
+kernels_realistic/t18_showdown
+                        time:   [2.6256 ms 2.6265 ms 2.6274 ms]
+                        change: [-6.5495% -6.4803% -6.4063%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+

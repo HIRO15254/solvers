@@ -1,17 +1,13 @@
-//! Micro-benchmarks for `PostflopEvaluator::eval`'s two terminal kernels
-//! (`kernel::showdown_kernel`'s sorted-rank sweep, `kernel::fold_kernel`'s
-//! inclusion-exclusion fold), exercised over a real river subgame with
-//! wide (full-ish) ranges on both sides so the kernels sweep close to the
-//! full 1,326-combo table, the same amount of work a real solve asks of
-//! them every terminal visit.
+//! Terminal micro-benchmarks through the real evaluator dispatch: f64 `eval`
+//! and f32 `eval_cfr`, on narrow asymmetric and full-support river ranges.
 //!
 //! Run with `cargo bench -p hu-postflop` (see `docs/development.md`); `cargo bench -p
 //! hu-postflop -- --test` runs one iteration per bench as a smoke test.
 
-use std::time::Duration;
+use std::{collections::BTreeSet, time::Duration};
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
-use hu_engine::TerminalEvaluator;
+use hu_engine::{CfrPrecision, Dcfr, F32Storage, NodeKind, Solver, TerminalEvaluator, reach_at};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use hu_postflop::{RiverConfig, RiverGame, build_river_game};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
@@ -27,9 +23,7 @@ fn parse_cards(s: &str) -> Vec<Card> {
     s.split_whitespace().map(|c| c.parse().unwrap()).collect()
 }
 
-/// A single-bet river subgame with full-ish ranges on both sides: `oop`
-/// plays a value-heavy range, `ip` a wider one, so the showdown/fold kernels
-/// sweep close to the full 1,326-combo table on both sides. One bet size
+/// The original narrow, asymmetric single-bet river subgame. One bet size
 /// and `max_raises = 1` keep the tree tiny while still producing exactly
 /// the two terminal shapes this bench needs (see `terminal_ids`).
 fn river_config() -> RiverConfig {
@@ -43,6 +37,23 @@ fn river_config() -> RiverConfig {
         effective_stack: Chips(80),
         bet_fractions: PerPlayer::new(vec![0.75], vec![0.75]),
         max_raises: 1,
+    }
+}
+
+/// Full support with asymmetric fractional weights: 1,081 live combos per
+/// seat after the river board is removed from the 1,326-combo table.
+fn wide_river_config() -> RiverConfig {
+    let range = |offset| {
+        let mut range = Range::full();
+        for combo in 0..NUM_COMBOS {
+            range.set_weight(combo, ((combo * 17 + offset) % 101 + 1) as f32 / 103.0);
+        }
+        range
+    };
+    RiverConfig {
+        board: parse_cards("2c 7d 9h Js Qs").try_into().unwrap(),
+        ranges: PerPlayer::new(range(3), range(11)),
+        ..river_config()
     }
 }
 
@@ -78,17 +89,21 @@ fn terminal_ids(game: &RiverGame) -> (u32, u32) {
 }
 
 fn bench_kernels(c: &mut Criterion) {
-    let config = river_config();
-    let built = build_river_game(&config, chip_ev());
+    bench_case(c, "kernels", river_config());
+    bench_case(c, "kernels_wide", wide_river_config());
+    bench_realistic(c);
+}
+
+fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
+    let mut built = build_river_game(&config, chip_ev());
+    built.game.evaluator.set_cfr_precision(CfrPrecision::F32);
     let (fold_id, showdown_id) = terminal_ids(&built);
 
-    // The already board-conflict-zeroed root range: a realistic dense-ish
-    // reach vector, the same shape `cfr_pass`/`value_pass` pass to
-    // `TerminalEvaluator::eval` at every terminal visit.
+    // Board-compatible compact reach, as passed by CFR and value traversal.
     let opp_reach = built.game.root_ranges[Player::P1].clone();
-    let mut out = vec![0.0f32; NUM_COMBOS];
+    let mut out = vec![0.0f32; built.game.evaluator.hands.len(Player::P0)];
 
-    let mut group = c.benchmark_group("kernels");
+    let mut group = c.benchmark_group(name);
 
     group.bench_function("fold", |b| {
         b.iter(|| {
@@ -114,6 +129,139 @@ fn bench_kernels(c: &mut Criterion) {
         });
     });
 
+    for (name, terminal) in [("fold_f32", fold_id), ("showdown_f32", showdown_id)] {
+        group.bench_function(name, |b| {
+            b.iter(|| {
+                built.game.evaluator.eval_cfr(
+                    black_box(terminal),
+                    black_box(Player::P0),
+                    black_box(&opp_reach),
+                    &mut out,
+                );
+                black_box(&out);
+            });
+        });
+    }
+
+    // One deterministic permutation gives nested masks with the requested
+    // zero counts (rounded to the nearest hand), rather than probabilities.
+    let mut order: Vec<usize> = (0..opp_reach.len()).collect();
+    let mut state = 0x1234_5678u32;
+    for i in (1..order.len()).rev() {
+        state ^= state << 13;
+        state ^= state >> 17;
+        state ^= state << 5;
+        order.swap(i, state as usize % (i + 1));
+    }
+    for zeros in [0, 50, 80, 95] {
+        let mut reach = opp_reach.clone();
+        let zero_count = (reach.len() * zeros + 50) / 100;
+        for &i in &order[..zero_count] {
+            reach[i] = 0.0;
+        }
+        for (kind, terminal) in [("fold", fold_id), ("showdown", showdown_id)] {
+            group.bench_function(format!("t18_{kind}_{zeros:02}"), |b| {
+                b.iter(|| {
+                    built.game.evaluator.eval_cfr(
+                        black_box(terminal),
+                        black_box(Player::P0),
+                        black_box(&reach),
+                        &mut out,
+                    );
+                    black_box(&out);
+                });
+            });
+        }
+    }
+
+    group.finish();
+}
+
+fn bench_realistic(c: &mut Criterion) {
+    let config = RiverConfig {
+        bet_fractions: PerPlayer::new(vec![0.33, 0.75, 1.5], vec![0.33, 0.75, 1.5]),
+        max_raises: 3,
+        effective_stack: Chips(200),
+        ..wide_river_config()
+    };
+    let built = build_river_game(&config, chip_ev());
+    // On the river every terminal except a child labeled "fold" is showdown.
+    let mut folds = BTreeSet::new();
+    for info in &built.node_info {
+        let id = built.node_by_history(&info.history).unwrap();
+        let node = built.game.tree.node(id);
+        for (action, label) in info.actions.iter().enumerate() {
+            if label == "fold" {
+                let child = built.game.tree.node(node.first_child + action as u32);
+                assert_eq!(child.kind, NodeKind::Terminal);
+                folds.insert(child.aux);
+            }
+        }
+    }
+    let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
+    solver.set_cfr_precision(CfrPrecision::F32);
+    let mut sets = [Vec::new(), Vec::new()];
+    for iterations in [300, 50, 50] {
+        solver.run(iterations);
+        let game = solver.game();
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind != NodeKind::Terminal {
+                continue;
+            }
+            let reach = reach_at(
+                &game.tree,
+                game.root_ranges.as_ref().map(|r| r.as_slice()),
+                id as u32,
+                |id, _, out| out.copy_from_slice(&solver.current_strategy_at(id)),
+            );
+            for p in Player::BOTH {
+                let opponent = &reach[p.opponent()];
+                // Match cfr_pass's all-zero-terminal pruning.
+                if opponent.iter().any(|&r| r != 0.0) {
+                    let kind = usize::from(!folds.contains(&node.aux));
+                    sets[kind].push((node.aux, p, opponent.clone()));
+                }
+            }
+        }
+    }
+    let game = solver.game();
+    let mut out = PerPlayer::new(
+        vec![0.0; game.evaluator.hands.len(Player::P0)],
+        vec![0.0; game.evaluator.hands.len(Player::P1)],
+    );
+    let mut group = c.benchmark_group("kernels_realistic");
+    for (kind, set) in ["fold", "showdown"].into_iter().zip(sets) {
+        let entries: usize = set.iter().map(|(_, _, r)| r.len()).sum();
+        let zeros: usize = set
+            .iter()
+            .map(|(_, _, r)| r.iter().filter(|&&v| v == 0.0).count())
+            .sum();
+        // Verify that both executables construct exactly the same workload.
+        let hash = set
+            .iter()
+            .flat_map(|(_, _, r)| r)
+            .fold(0xcbf2_9ce4_8422_2325u64, |h, r| {
+                (h ^ u64::from(r.to_bits())).wrapping_mul(0x100_0000_01b3)
+            });
+        eprintln!(
+            "t18 realistic {kind}: {} calls, {zeros}/{entries} zeros ({:.3}%), reach hash {hash:016x}",
+            set.len(),
+            100.0 * zeros as f64 / entries as f64
+        );
+        group.bench_function(format!("t18_{kind}"), |b| {
+            b.iter(|| {
+                for (terminal, player, reach) in &set {
+                    game.evaluator.eval_cfr(
+                        black_box(*terminal),
+                        black_box(*player),
+                        black_box(reach),
+                        &mut out[*player],
+                    );
+                    black_box(&out[*player]);
+                }
+            });
+        });
+    }
     group.finish();
 }
 

@@ -1,0 +1,52 @@
+21:43:12 T18_SETUP_DONE
+21:46:44 kernels new done
+21:50:14 kernels t18 done
+21:53:39 kernels new done
+21:57:03 kernels t18 done
+21:57:08 bench flop1_t32_new_1 s/iter=0.1969
+21:57:08 bench turn2_t32_new_1 s/iter=0.0017
+21:57:08 bench river_t32_new_1 s/iter=0.0004
+21:57:12 bench flop1_t16_new_1 s/iter=0.2133
+21:57:21 bench flop1_t1_new_1 s/iter=2.8333
+21:57:44 bench gtowb_t32_new_1 s/iter=1.4067
+21:57:50 bench flop1_t32_t18_1 s/iter=0.1980
+21:57:50 bench turn2_t32_t18_1 s/iter=0.0017
+21:57:50 bench river_t32_t18_1 s/iter=0.0004
+21:57:53 bench flop1_t16_t18_1 s/iter=0.1999
+21:58:02 bench flop1_t1_t18_1 s/iter=2.6487
+21:58:25 bench gtowb_t32_t18_1 s/iter=1.3780
+21:58:30 bench flop1_t32_new_2 s/iter=0.1843
+21:58:30 bench turn2_t32_new_2 s/iter=0.0016
+21:58:30 bench river_t32_new_2 s/iter=0.0004
+21:58:34 bench flop1_t16_new_2 s/iter=0.2126
+21:58:43 bench flop1_t1_new_2 s/iter=2.8271
+21:59:06 bench gtowb_t32_new_2 s/iter=1.4080
+21:59:12 bench flop1_t32_t18_2 s/iter=0.1972
+21:59:12 bench turn2_t32_t18_2 s/iter=0.0017
+21:59:12 bench river_t32_t18_2 s/iter=0.0004
+21:59:15 bench flop1_t16_t18_2 s/iter=0.2008
+21:59:24 bench flop1_t1_t18_2 s/iter=2.7214
+21:59:47 bench gtowb_t32_t18_2 s/iter=1.3700
+21:59:52 bench flop1_t32_new_3 s/iter=0.1869
+21:59:52 bench turn2_t32_new_3 s/iter=0.0017
+21:59:52 bench river_t32_new_3 s/iter=0.0004
+21:59:56 bench flop1_t16_new_3 s/iter=0.2135
+22:00:05 bench flop1_t1_new_3 s/iter=2.8699
+22:00:27 bench gtowb_t32_new_3 s/iter=1.3287
+22:00:33 bench flop1_t32_t18_3 s/iter=0.1962
+22:00:33 bench turn2_t32_t18_3 s/iter=0.0016
+22:00:33 bench river_t32_t18_3 s/iter=0.0004
+22:00:36 bench flop1_t16_t18_3 s/iter=0.2035
+22:00:45 bench flop1_t1_t18_3 s/iter=2.6590
+22:01:08 bench gtowb_t32_t18_3 s/iter=1.3744
+22:01:08 T18_BENCH_DONE
+22:01:09 c_turn2_new exit=0 wall=0.5 iters=242 solve=0.410066719
+22:01:09 c_turn2_t18 exit=0 wall=0.5 iters=242 solve=0.421424839
+22:01:53 c_flop1_new exit=0 wall=44.1 iters=184 solve=34.911908865
+22:02:37 c_flop1_t18 exit=0 wall=43.8 iters=184 solve=34.991439305
+22:07:25 c_flop3_new exit=0 wall=265.6 iters=412 solve=242.43443098
+22:12:05 c_flop3_t18 exit=0 wall=279.7 iters=412 solve=256.780347733
+22:20:09 c_gtowb_new exit=0 wall=483.4 iters=312 solve=431.859075127
+22:28:10 c_gtowb_t18 exit=0 wall=480.0 iters=312 solve=428.560097645
+22:28:11 T18_SOLVE_DONE
+22:28:11 T18_DONE

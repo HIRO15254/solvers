@@ -1,0 +1,132 @@
+{
+  "scheme": "exact 16-hand block zero detection; dense loops if no reach entry is zero, otherwise skip both signs of zero with one f32 accumulator per original sum",
+  "source_revision": "e14f93136e8d18dd6a890f456f7bb6dbf3244178",
+  "uncommitted_files": [
+    "crates/hu-postflop/src/kernel.rs",
+    "crates/hu-postflop/benches/kernels.rs",
+    "docs/hu-postflop.jp.md"
+  ],
+  "build": {
+    "jobs": 2,
+    "incremental": 0,
+    "target_cpu": "native"
+  },
+  "benchmark": {
+    "sequence": "A B A B A B",
+    "filter": "t18",
+    "warmup_seconds": 0.5,
+    "measurement_seconds": 1,
+    "samples": 30,
+    "priority": "AboveNormal",
+    "logical_cpu": 2,
+    "executables": {
+      "t18-bench-base-exact.exe": "774defb330bcd8ba9b925d63cb8f3b354bec7ff60589f3b879297ff3fdcb7c9e",
+      "t18-bench-blocks.exe": "04e3b617fcc6d58b6449bfee3f906b6e82f341bc9d9a703957efe12301cfc073"
+    }
+  },
+  "tests": {
+    "passed": 187,
+    "failed": 0,
+    "ignored": 16
+  },
+  "fmt": "pass",
+  "clippy": "pass",
+  "check_docs": "pass (23 Markdown files)",
+  "workloads": [
+    "t18 realistic fold: 399 calls, 337953/431319 zeros (78.353%), reach hash 30ee1f4ab69d4c30",
+    "t18 realistic showdown: 410 calls, 361737/443210 zeros (81.618%), reach hash 70559fb8e64a706c"
+  ],
+  "medians": {
+    "kernels/t18_fold_00": {
+      "baseline_ns": 522.1501042390549,
+      "new_ns": 483.47988642308235,
+      "ratio": 0.9259404192357141
+    },
+    "kernels/t18_fold_50": {
+      "baseline_ns": 530.5514930496508,
+      "new_ns": 457.9918688714009,
+      "ratio": 0.8632373574878254
+    },
+    "kernels/t18_fold_80": {
+      "baseline_ns": 530.0877099534819,
+      "new_ns": 442.68006700167507,
+      "ratio": 0.8351072071460074
+    },
+    "kernels/t18_fold_95": {
+      "baseline_ns": 532.5856007758346,
+      "new_ns": 438.3800473854454,
+      "ratio": 0.8231165971194923
+    },
+    "kernels/t18_showdown_00": {
+      "baseline_ns": 996.2270005723731,
+      "new_ns": 1011.3499178609255,
+      "ratio": 1.0151801921448262
+    },
+    "kernels/t18_showdown_50": {
+      "baseline_ns": 993.8274157224295,
+      "new_ns": 954.0811518324608,
+      "ratio": 0.9600068751765352
+    },
+    "kernels/t18_showdown_80": {
+      "baseline_ns": 992.0604334226989,
+      "new_ns": 914.6941472301337,
+      "ratio": 0.9220145430801585
+    },
+    "kernels/t18_showdown_95": {
+      "baseline_ns": 992.4193024038225,
+      "new_ns": 907.3021105227831,
+      "ratio": 0.9142326316357714
+    },
+    "kernels_realistic/t18_fold": {
+      "baseline_ns": 2269538.4615384615,
+      "new_ns": 2065535.3125,
+      "ratio": 0.910112495339615
+    },
+    "kernels_realistic/t18_showdown": {
+      "baseline_ns": 4364962.5,
+      "new_ns": 3989813.5714285714,
+      "ratio": 0.914054489913389
+    },
+    "kernels_wide/t18_fold_00": {
+      "baseline_ns": 5540.559153713299,
+      "new_ns": 5646.568830467273,
+      "ratio": 1.0191333895754775
+    },
+    "kernels_wide/t18_fold_50": {
+      "baseline_ns": 5610.036324786324,
+      "new_ns": 4800.771535580524,
+      "ratio": 0.8557469609188986
+    },
+    "kernels_wide/t18_fold_80": {
+      "baseline_ns": 5562.816610380377,
+      "new_ns": 4414.320563195809,
+      "ratio": 0.793540551913676
+    },
+    "kernels_wide/t18_fold_95": {
+      "baseline_ns": 5576.720779220779,
+      "new_ns": 4412.040224389622,
+      "ratio": 0.7911531523739127
+    },
+    "kernels_wide/t18_showdown_00": {
+      "baseline_ns": 10458.111357750648,
+      "new_ns": 10448.638110666412,
+      "ratio": 0.999094172287885
+    },
+    "kernels_wide/t18_showdown_50": {
+      "baseline_ns": 10379.140211640211,
+      "new_ns": 10680.958842604141,
+      "ratio": 1.0290793480779303
+    },
+    "kernels_wide/t18_showdown_80": {
+      "baseline_ns": 10426.861868109008,
+      "new_ns": 8753.776323278315,
+      "ratio": 0.8395408353928716
+    },
+    "kernels_wide/t18_showdown_95": {
+      "baseline_ns": 10381.920955882353,
+      "new_ns": 8583.438021122845,
+      "ratio": 0.826767806998136
+    }
+  },
+  "uncertainty": "Shared-machine contention changes absolute timing substantially; EPYC end-to-end performance has not been measured here."
+}
