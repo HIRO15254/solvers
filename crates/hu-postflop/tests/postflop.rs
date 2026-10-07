@@ -723,7 +723,6 @@ fn allin_runout_matches_direct_equity() {
 #[test]
 fn memory_usage_matches_allocated() {
     fn check_save_workspace(config: &PostflopConfig, game: &hu_postflop::PostflopGame) {
-        use hu_postflop::sol::ValueBlock;
         use std::mem::size_of;
         let tree = &game.game.tree;
         let hands =
@@ -732,11 +731,11 @@ fn memory_usage_matches_allocated() {
             .storage_refs
             .iter()
             .map(|sref| {
-                std::sync::Mutex::new(Some(ValueBlock {
-                    sref: sref.index,
-                    scale: 0.0,
-                    values: vec![0; hands * 2],
-                }))
+                // Encoded block: values plus the header reserve.
+                let _ = sref;
+                std::sync::Mutex::new(Some(Ok::<Vec<u8>, postcard::Error>(Vec::with_capacity(
+                    hands * 2 + 14,
+                ))))
             })
             .collect();
         let max_elements = tree
@@ -748,7 +747,15 @@ fn memory_usage_matches_allocated() {
         let allocated = std::mem::size_of_val(slots.as_slice())
             + slots
                 .iter()
-                .map(|slot| slot.lock().unwrap().as_ref().unwrap().values.capacity())
+                .map(|slot| {
+                    slot.lock()
+                        .unwrap()
+                        .as_ref()
+                        .unwrap()
+                        .as_ref()
+                        .unwrap()
+                        .capacity()
+                })
                 .sum::<usize>()
             + tree.storage_refs.len() * size_of::<bool>()
             + tree.nodes.len() * size_of::<Street>()

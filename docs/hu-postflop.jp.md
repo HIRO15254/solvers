@@ -240,8 +240,8 @@ version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solver
 
 `MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をCとして、表示とmemory上限判定は`max(S, S − R + W) + C`を使う。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
 P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
-戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
-`saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
+戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockを同じ形式（sref・scale・長さのheaderと量子化bytes）に符号化してslotに保持し、書き手がsref昇順に流す。
+`saveWorkspaceBytes`は値block bytes＋action node数×14（値block headerの上限）＋action node数×（`Mutex<Option<Result<Vec<u8>, postcard::Error>>>`（符号化済み値block bytes）と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
 戦略batch予算はB×8 bytes（f32平均戦略4＋u16量子化bytes 2＋postcard bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(StrategyBlock)＋size_of(Vec<f32>)＋15（sref・長さのvarint上界）。符号化Vecは2×node要素数＋15 bytesを事前確保し、成長時の余剰を作らない。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
 workerではsrefとbyte列長のheaderをpostcardで符号化し、量子化済みbyte列をまとめて連結する。既存StrategyBlockのpostcard bytesと同一の形式である。
 圧縮予算は最大payloadの2 MiB job数とrun threads数の小さい方×16 MiB＋共有8 MiB＋実効config長×3で見積もる。

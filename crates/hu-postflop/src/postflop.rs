@@ -1794,9 +1794,10 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         save_bytes: counting.action_nodes
                 * 2
                 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
+            + counting.action_nodes * crate::sol::VALUE_BLOCK_HEADER_BYTES as u64
             + counting.action_nodes
                 * (std::mem::size_of::<
-                    std::sync::Mutex<Option<crate::sol::ValueBlock>>,
+                    std::sync::Mutex<Option<Result<Vec<u8>, postcard::Error>>>,
                 >() + std::mem::size_of::<bool>()) as u64
             + counting.nodes * std::mem::size_of::<Street>() as u64
             // Conservatively add the batch to the value pass's retained slots.

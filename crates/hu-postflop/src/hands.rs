@@ -70,3 +70,37 @@ impl PostflopHands {
         self.combos[p].iter().map(|&h| global[h as usize]).collect()
     }
 }
+
+/// `[hi, lo]` card indices of every combo, higher card first.
+const COMBO_CARD_TABLE: [[u8; 2]; NUM_COMBOS] = {
+    let mut table = [[0u8; 2]; NUM_COMBOS];
+    let mut hi = 1;
+    while hi < 52 {
+        let mut lo = 0;
+        while lo < hi {
+            table[hi * (hi - 1) / 2 + lo] = [hi as u8, lo as u8];
+            lo += 1;
+        }
+        hi += 1;
+    }
+    table
+};
+
+/// O(1) equivalent of [`nlh::combo_cards`], returning card indices.
+pub(crate) fn combo_card_indices(combo: usize) -> [usize; 2] {
+    let [hi, lo] = COMBO_CARD_TABLE[combo];
+    [usize::from(hi), usize::from(lo)]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn combo_card_table_matches_nlh() {
+        for combo in 0..NUM_COMBOS {
+            let (hi, lo) = combo_cards(combo);
+            assert_eq!(combo_card_indices(combo), [hi.index(), lo.index()]);
+        }
+    }
+}

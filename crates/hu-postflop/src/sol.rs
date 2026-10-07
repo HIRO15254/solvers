@@ -169,6 +169,21 @@ pub struct ValueBlock {
     pub values: Vec<u8>,
 }
 
+/// Upper bound of the postcard header: u32 varint 5 + f32 4 + length varint 5.
+pub(crate) const VALUE_BLOCK_HEADER_BYTES: usize = 14;
+
+/// Same bulk encoding as [`strategy_block_bytes`] for a value block: the
+/// `(sref, scale, len)` header goes through postcard and `values` is copied
+/// in one piece. Byte-identical to `postcard::to_allocvec(block)`.
+pub(crate) fn value_block_bytes(block: &ValueBlock) -> Result<Vec<u8>, postcard::Error> {
+    let mut bytes = postcard::to_extend(
+        &(block.sref, block.scale, block.values.len()),
+        Vec::with_capacity(block.values.len() + VALUE_BLOCK_HEADER_BYTES),
+    )?;
+    bytes.extend_from_slice(&block.values);
+    Ok(bytes)
+}
+
 /// The full decoded `.sol` contents.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SolPayload {
@@ -441,6 +456,25 @@ mod tests {
                     strategy_block_bytes(&block).unwrap(),
                     postcard::to_allocvec(&block).unwrap()
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn bulk_value_bytes_match_postcard_at_varint_boundaries() {
+        for sref in [0, 127, 128, 16384, u32::MAX] {
+            for len in [0, 1, 127, 128, 16383, 16384, 300_000] {
+                for scale in [0.0, -0.0, 1.5, f32::MIN_POSITIVE, f32::MAX] {
+                    let block = ValueBlock {
+                        sref,
+                        scale,
+                        values: (0..len).map(|i| i as u8).collect(),
+                    };
+                    assert_eq!(
+                        value_block_bytes(&block).unwrap(),
+                        postcard::to_allocvec(&block).unwrap()
+                    );
+                }
             }
         }
     }
