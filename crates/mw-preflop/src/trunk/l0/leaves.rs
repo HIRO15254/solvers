@@ -4,13 +4,14 @@ use rand::{Rng, RngCore, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
-use std::{collections::BTreeMap, time::Instant};
+use std::{cell::Cell, collections::BTreeMap, time::Instant};
 
 use super::eval::Reach;
 use super::{Model, Terminal, Tree};
 use crate::trunk::classes::{Classes, Ordering3};
 
 pub(crate) struct LeafValues {
+    /// `[seat][node][class]`; empty for seats that are not heroes.
     pub values: Vec<Vec<[f64; 169]>>,
     pub t2: f64,
     pub t3: f64,
@@ -83,6 +84,13 @@ impl ThreeTerms {
     }
 }
 
+thread_local! {
+    /// `three_values`'s `[k][d][e]` slab (3.9 MB), kept per thread: allocated
+    /// per hero class, it committed fresh zeroed pages for every class, seat
+    /// and iteration.
+    static THREE_SLAB: Cell<Vec<f64>> = const { Cell::new(Vec::new()) };
+}
+
 /// Fixed-order bilinear forms, batched only with identical correction masks.
 /// Independent item accumulators make grouping and class/thread order irrelevant.
 pub(crate) fn three_values(
@@ -119,18 +127,25 @@ pub(crate) fn three_values(
         .fold(0, |mask, (item, _)| mask | item.terms.mask);
     let basis = three_basis();
     let catalog = Classes::get();
-    let mut slab = vec![0.0; 17 * 169 * 169];
+    // Every entry read below (support × support, the four basis rows and the
+    // masked corrections) is written first, so a reused slab is not cleared.
+    let mut slab = THREE_SLAB.take();
+    slab.resize(17 * 169 * 169, 0.0);
     for &d in &support {
         for &e in &support {
             let p = model.tables.p3(c, d, e)?;
+            let mut sums = [0.0; 4];
             for o in 0..13 {
                 let value = f64::from(catalog.k(c, d)) * f64::from(catalog.k(c, e)) * p[o];
                 for k in 0..4 {
-                    slab[(k * 169 + d) * 169 + e] += basis[k][o] * value;
+                    sums[k] += basis[k][o] * value;
                 }
                 if corrections & (1 << o) != 0 {
                     slab[((4 + o) * 169 + d) * 169 + e] = value;
                 }
+            }
+            for k in 0..4 {
+                slab[(k * 169 + d) * 169 + e] = sums[k];
             }
         }
     }
@@ -191,6 +206,7 @@ pub(crate) fn three_values(
             }
         }
     }
+    THREE_SLAB.set(slab);
     Ok(output)
 }
 
@@ -530,7 +546,15 @@ pub(crate) fn leaf_values(
     plan: K4Plan,
 ) -> Result<LeafValues> {
     let n = tree.nodes.len();
-    let mut leaves = vec![vec![[0.0; 169]; n]; tree.seats];
+    let mut leaves: Vec<_> = (0..tree.seats)
+        .map(|p| {
+            if heroes.contains(&p) {
+                vec![[0.0; 169]; n]
+            } else {
+                Vec::new()
+            }
+        })
+        .collect();
     let start = Instant::now();
     let mut three = Vec::new();
     let mut sampled = Vec::new();
