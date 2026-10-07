@@ -85,7 +85,7 @@ payloadはwall_secs以外bit一致。共有PCでは空きcoreが無く速度差�
 既定DCFRでTurn 770 iteration・14秒、Flop1（82.9万node）250 iteration・58秒、GTO Wizard風の木（`gtow_b`、f32 21 GB）
 575 iteration・1,006秒。hs-dcfr・linear-cfr・cfr-plusはいずれも遅く、DCFR係数の掃引でも一貫して勝る設定は無かったので
 既定は変えない。両arena i16はTurnとgtow_bで0.1%に届かず（最良0.120%・0.292%）、反復を続けると悪化する。
-この対策をPF2・PF3として決めた（試作の比較はbranch `s3-p1-i16-proto`）。
+この対策をPF2・PF3として決めた（試作の比較は[i16精度試作](../../experiments/p1-perf-2026-10/i16-precision-20261007/README.md)）。
 
 ### 一致の定義
 

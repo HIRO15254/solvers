@@ -1,0 +1,2033 @@
+{
+  "experiment": "P1-Q1 i16 precision 20261007",
+  "baseCommit": "6234545c6fe628e6b1d4da0ae225e073b8835a10",
+  "branch": "s3-p1-i16-proto",
+  "dirty": true,
+  "sourceSha256": {
+    "crates/hu-engine/src/storage.rs": "854b363769b648ab531e323f68955bc28d20e9fc84e87cdf3b474d9617679c53",
+    "crates/hu-postflop/examples/p1_i16_precision.rs": "27e6f1494c5ed56634763740c77523ab048bfe76d63b1df7d5ce0f468217d0a8",
+    "Cargo.lock": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+    ".cargo/config.toml": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21"
+  },
+  "sourceRetention": "Current workspace files only; no commit, source snapshot or patch retained, per instruction.",
+  "binary": {
+    "path": "target/release/examples/p1_i16_precision.exe",
+    "sha256": "b72644d30abceaed2f57b6a132a617adfd51be08385ff64f7163f3f2144270ef",
+    "buildCommand": "CARGO_BUILD_JOBS=2 cargo build --release -p hu-postflop --example p1_i16_precision"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "Intel Core i7-10700KF @ 3.80GHz",
+    "logicalProcessors": 16,
+    "physicalMemoryBytes": 34275098624,
+    "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+    "RUSTFLAGS": null,
+    "cargoConfig": "# Research builds target the local machine. CI overrides this via RUSTFLAGS.\n[build]\nrustflags = [\"-C\", \"target-cpu=native\"]\n",
+    "buildJobs": 2,
+    "timingCaveat": "Busy PC; concurrent local compilation/tests; no isolated timing guarantee."
+  },
+  "memoryDefinition": {
+    "L": "sum of action*hand elements in ONE arena",
+    "N": "number of action nodes",
+    "H": "sum of hand counts over action nodes",
+    "nodeMetadataBytesPerArena": 32,
+    "excluded": "Storage object (I16 200 / f32 48 bytes on x64), allocator bookkeeping, scratch and transient views. Add 4*sum(scratch capacities) plus view/object sizes; game/tree and exported state-hash buffer are not storage arenas.",
+    "publicEstimate": "MemoryEstimate::i16_bytes / I16Storage::bytes_for intentionally remain V0 in prototype."
+  },
+  "metric": "(NashConv/2)/initialPotBb*100, cash BB utilities; first observed crossings at check_every=50.",
+  "configsSha256": {
+    "configs/river_f32.toml": "6789e63a23fe0dc4a5d74c33bbbad2508adbd1be25e7d96ef3683e51c709ee45",
+    "configs/river_i16.toml": "5b0008a462d555e1bb0973c6759fbac2656ca5c09b0e9ca00ca41f277588a890",
+    "configs/turn_f32.toml": "47659597719aed78b8fc46d3c2af0bc76fba5ee9a9ad843cda03607a2e424d73",
+    "configs/turn_i16.toml": "cd264b67606823a7fef4c33535fa884b4798766358573f27e4a60ba5c5e31b76"
+  },
+  "runs": [
+    {
+      "case": "river",
+      "variant": "f32",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_f32.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_f32.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_f32_t1.jsonl"
+      ],
+      "environment": {},
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 350,
+        "0.1": 500,
+        "0.05": 800
+      },
+      "finalPctPot": 0.0059888034029211635,
+      "minimumPctPot": 0.0059888034029211635,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.0014249771333333335,
+      "medianBatchSecsPerIter": 0.001379454,
+      "iterSecs": 4.274931400000001,
+      "evalSecs": 0.0897356,
+      "prepareSecs": 0.0019253,
+      "buildSecs": 0.0005967,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "8L",
+      "predictedArenaBytes": 338296,
+      "allocatedArenaBytes": 338296,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 8.0,
+      "stateBlake3": "50525c17ba9ed3c8b8824bef58d55ded8be0240b069293a2b66866bfb141192f",
+      "progress": "progress/river_f32_t1.jsonl",
+      "progressSha256": "ab31b068cc283dc858917ba217845881f6faea120149506f642a405772172faa",
+      "finalExploitabilityBits": [
+        4555058472430565376,
+        4554364906462795776
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "f32",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_f32.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_f32.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_f32_t4.jsonl"
+      ],
+      "environment": {},
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 350,
+        "0.1": 500,
+        "0.05": 800
+      },
+      "finalPctPot": 0.0059888034029211635,
+      "minimumPctPot": 0.0059888034029211635,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.001276484233333333,
+      "medianBatchSecsPerIter": 0.00124797,
+      "iterSecs": 3.8294526999999987,
+      "evalSecs": 0.0590745,
+      "prepareSecs": 0.0015979,
+      "buildSecs": 0.0007746,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "8L",
+      "predictedArenaBytes": 338296,
+      "allocatedArenaBytes": 338296,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 8.0,
+      "stateBlake3": "50525c17ba9ed3c8b8824bef58d55ded8be0240b069293a2b66866bfb141192f",
+      "progress": "progress/river_f32_t4.jsonl",
+      "progressSha256": "9dd3a713ec709274e4ed90febede9e1f8ddb432885e03a7f0945c3f38f5da8d6",
+      "finalExploitabilityBits": [
+        4555058472430565376,
+        4554364906462795776
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V0",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V0_t1.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V0"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 300,
+        "0.1": 550,
+        "0.05": 1150
+      },
+      "finalPctPot": 0.036635275678421016,
+      "minimumPctPot": 0.021715982553951765,
+      "minimumIteration": 1800,
+      "secsPerIter": 0.0018143472000000003,
+      "medianBatchSecsPerIter": 0.0017960580000000001,
+      "iterSecs": 5.443041600000001,
+      "evalSecs": 0.0663666,
+      "prepareSecs": 0.0019772,
+      "buildSecs": 0.0006772,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+8N",
+      "predictedArenaBytes": 169420,
+      "allocatedArenaBytes": 169420,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.0064322368576635,
+      "stateBlake3": "b4027907265ff4deb8e5240900fde67988e1b1ea2dd729805a76ec5d604a56e0",
+      "progress": "progress/river_V0_t1.jsonl",
+      "progressSha256": "b18787b43c844604cc86dba2c5c05d2c9ab386165db97080949a51194b19e35a",
+      "finalExploitabilityBits": [
+        4567106011092687488,
+        4566308188515206656
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V0",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V0_t4.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V0"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 300,
+        "0.1": 550,
+        "0.05": 1150
+      },
+      "finalPctPot": 0.036635275678421016,
+      "minimumPctPot": 0.021715982553951765,
+      "minimumIteration": 1800,
+      "secsPerIter": 0.001475363533333334,
+      "medianBatchSecsPerIter": 0.001432862,
+      "iterSecs": 4.426090600000002,
+      "evalSecs": 0.0553943,
+      "prepareSecs": 0.0015369,
+      "buildSecs": 0.0005592,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+8N",
+      "predictedArenaBytes": 169420,
+      "allocatedArenaBytes": 169420,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.0064322368576635,
+      "stateBlake3": "b4027907265ff4deb8e5240900fde67988e1b1ea2dd729805a76ec5d604a56e0",
+      "progress": "progress/river_V0_t4.jsonl",
+      "progressSha256": "6eab6d0c845848df74f1ca5a156ec9421ad44071a125a96bdcc6fc3bb7c3ad04",
+      "finalExploitabilityBits": [
+        4567106011092687488,
+        4566308188515206656
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V1",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V1_t1.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V1"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 400,
+        "0.1": 550,
+        "0.05": 850
+      },
+      "finalPctPot": 0.006862567326749118,
+      "minimumPctPot": 0.006862567326749118,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.0018599769333333333,
+      "medianBatchSecsPerIter": 0.0018245079999999999,
+      "iterSecs": 5.5799308,
+      "evalSecs": 0.0812407,
+      "prepareSecs": 0.0022527,
+      "buildSecs": 0.0005882,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N",
+      "predictedArenaBytes": 171596,
+      "allocatedArenaBytes": 171596,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.057890131718968,
+      "stateBlake3": "71c4afe481d4173961a703cbed744a0aecbaad01b2193bf64406325254a7496c",
+      "progress": "progress/river_V1_t1.jsonl",
+      "progressSha256": "29618f259702a8ea906e50d7c8d09ee8ee19486c87b61602a7070181f7cdf8eb",
+      "finalExploitabilityBits": [
+        4555604678479674368,
+        4555591691356893184
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V1",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V1_t4.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V1"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 400,
+        "0.1": 550,
+        "0.05": 850
+      },
+      "finalPctPot": 0.006862567326749118,
+      "minimumPctPot": 0.006862567326749118,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.002218711,
+      "medianBatchSecsPerIter": 0.002184101,
+      "iterSecs": 6.656133,
+      "evalSecs": 0.0520271,
+      "prepareSecs": 0.0021263,
+      "buildSecs": 0.0008279,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N",
+      "predictedArenaBytes": 171596,
+      "allocatedArenaBytes": 171596,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.057890131718968,
+      "stateBlake3": "71c4afe481d4173961a703cbed744a0aecbaad01b2193bf64406325254a7496c",
+      "progress": "progress/river_V1_t4.jsonl",
+      "progressSha256": "62e270ce9d7bc6ddaf46132206c8c96055d5a3cc6866251a9ebdb566833ec64c",
+      "finalExploitabilityBits": [
+        4555604678479674368,
+        4555591691356893184
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V2",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V2_t1.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V2"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 300,
+        "0.1": 500,
+        "0.05": 1050
+      },
+      "finalPctPot": 0.1083213430062412,
+      "minimumPctPot": 0.02819050888507212,
+      "minimumIteration": 1500,
+      "secsPerIter": 0.002804493633333333,
+      "medianBatchSecsPerIter": 0.0028467989999999997,
+      "iterSecs": 8.4134809,
+      "evalSecs": 0.1212534,
+      "prepareSecs": 0.0018166,
+      "buildSecs": 0.000599,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 200938,
+      "allocatedArenaBytes": 200938,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.751767682739376,
+      "stateBlake3": "d329cb7e964e24f9d1e78efc32a098e8a009e62dca5c9f2e8bc24074bcd28105",
+      "progress": "progress/river_V2_t1.jsonl",
+      "progressSha256": "d7d2727adce998af8f5a4b2b5b7a0787c060f4220f00a6bfd28c1041aed06c1e",
+      "finalExploitabilityBits": [
+        4577265884939380192,
+        4563694560166635520
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V2",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V2_t4.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V2"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 300,
+        "0.1": 500,
+        "0.05": 1050
+      },
+      "finalPctPot": 0.1083213430062412,
+      "minimumPctPot": 0.02819050888507212,
+      "minimumIteration": 1500,
+      "secsPerIter": 0.0030999659999999996,
+      "medianBatchSecsPerIter": 0.003028455,
+      "iterSecs": 9.299897999999999,
+      "evalSecs": 0.1125656,
+      "prepareSecs": 0.0019243,
+      "buildSecs": 0.0005731,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 200938,
+      "allocatedArenaBytes": 200938,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.751767682739376,
+      "stateBlake3": "d329cb7e964e24f9d1e78efc32a098e8a009e62dca5c9f2e8bc24074bcd28105",
+      "progress": "progress/river_V2_t4.jsonl",
+      "progressSha256": "8689a401bddf4306068b72c34c052f5a08e16267d6dd1ab1c0e1f5c8c0c3cf92",
+      "finalExploitabilityBits": [
+        4577265884939380192,
+        4563694560166635520
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V3",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V3_t1.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V3"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 400,
+        "0.1": 550,
+        "0.05": 900
+      },
+      "finalPctPot": 0.007827075751077783,
+      "minimumPctPot": 0.007827075751077783,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.004206522366666665,
+      "medianBatchSecsPerIter": 0.004139985,
+      "iterSecs": 12.619567099999994,
+      "evalSecs": 0.0863642,
+      "prepareSecs": 0.0014608,
+      "buildSecs": 0.0006516,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 200938,
+      "allocatedArenaBytes": 200938,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.751767682739376,
+      "stateBlake3": "9b2d7c8506fce74b4b628b209d047b1252ffe4fe4d70a5e4c8eb7ce5d98dddcc",
+      "progress": "progress/river_V3_t1.jsonl",
+      "progressSha256": "8f6d0da17c28a1ae3761ea55cb9d21e6c95a9a70d56334b2a6d2271dd1081cfc",
+      "finalExploitabilityBits": [
+        4556918657723467776,
+        4556234836519757824
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V3",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V3_t4.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V3"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 300,
+        "0.2": 400,
+        "0.1": 550,
+        "0.05": 900
+      },
+      "finalPctPot": 0.007827075751077783,
+      "minimumPctPot": 0.007827075751077783,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.003526211699999998,
+      "medianBatchSecsPerIter": 0.0034818690000000003,
+      "iterSecs": 10.578635099999994,
+      "evalSecs": 0.10618760000000001,
+      "prepareSecs": 0.001947,
+      "buildSecs": 0.0005774,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 200938,
+      "allocatedArenaBytes": 200938,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.751767682739376,
+      "stateBlake3": "9b2d7c8506fce74b4b628b209d047b1252ffe4fe4d70a5e4c8eb7ce5d98dddcc",
+      "progress": "progress/river_V3_t4.jsonl",
+      "progressSha256": "9b012dffa05a3b21793a87c549663df23860d16cdc61e0ac47d976435a6f27bc",
+      "finalExploitabilityBits": [
+        4556918657723467776,
+        4556234836519757824
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V4",
+      "threads": 1,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "1",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V4_t1.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V4"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 300,
+        "0.1": 500,
+        "0.05": 850
+      },
+      "finalPctPot": 0.00656602126601397,
+      "minimumPctPot": 0.00656602126601397,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.0017333948,
+      "medianBatchSecsPerIter": 0.001731413,
+      "iterSecs": 5.2001843999999995,
+      "evalSecs": 0.0632653,
+      "prepareSecs": 0.001598,
+      "buildSecs": 0.0005605,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "6L+8N",
+      "predictedArenaBytes": 253994,
+      "allocatedArenaBytes": 253994,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 6.0064322368576635,
+      "stateBlake3": "3477193ff75513dec3ce3c5697765235eb67715229e3d1e246ac24d4e3c31c5c",
+      "progress": "progress/river_V4_t1.jsonl",
+      "progressSha256": "c9d52d070e2bf257d1235ab2732c34f9a494016898c0b8a2e123abc6120f815d",
+      "finalExploitabilityBits": [
+        4555433595731181568,
+        4555161040083656704
+      ]
+    },
+    {
+      "case": "river",
+      "variant": "V4",
+      "threads": 4,
+      "probe": false,
+      "config": "configs/river_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\river_i16.toml",
+        "4",
+        "3000",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\river_V4_t4.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V4"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 3000,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 250,
+        "0.2": 300,
+        "0.1": 500,
+        "0.05": 850
+      },
+      "finalPctPot": 0.00656602126601397,
+      "minimumPctPot": 0.00656602126601397,
+      "minimumIteration": 3000,
+      "secsPerIter": 0.0015823892999999995,
+      "medianBatchSecsPerIter": 0.001479529,
+      "iterSecs": 4.747167899999998,
+      "evalSecs": 0.13147040000000002,
+      "prepareSecs": 0.0020258,
+      "buildSecs": 0.000559,
+      "storageElements": 42287,
+      "actionNodes": 34,
+      "nodeHands": 14671,
+      "arenaBytesFormula": "6L+8N",
+      "predictedArenaBytes": 253994,
+      "allocatedArenaBytes": 253994,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 6.0064322368576635,
+      "stateBlake3": "3477193ff75513dec3ce3c5697765235eb67715229e3d1e246ac24d4e3c31c5c",
+      "progress": "progress/river_V4_t4.jsonl",
+      "progressSha256": "8439feec1aa39bc4598bef8e6ba803e47d6383bc86acf818b566e9be4e3c7b96",
+      "finalExploitabilityBits": [
+        4555433595731181568,
+        4555161040083656704
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "f32",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_f32.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_f32.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_f32_t1_probe.jsonl"
+      ],
+      "environment": {},
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.838875647004826,
+      "minimumPctPot": 7.838875647004826,
+      "minimumIteration": 50,
+      "secsPerIter": 1.019083576,
+      "medianBatchSecsPerIter": 1.019083576,
+      "iterSecs": 50.9541788,
+      "evalSecs": 0.8854083,
+      "prepareSecs": 0.0099706,
+      "buildSecs": 0.1776627,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "8L",
+      "predictedArenaBytes": 208058400,
+      "allocatedArenaBytes": 208058400,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 8.0,
+      "stateBlake3": "941b73ba8a4d4b9ba48c1973e2aaff524650289b686d58e7d31cf3c8ce6c33bd",
+      "progress": "progress/turn_f32_t1_probe.jsonl",
+      "progressSha256": "7deba955b371bd166160da1bb500d5eb0aceda16263d52b8674c0663ca1f8f6f",
+      "finalExploitabilityBits": [
+        4602433134169998950,
+        4600443494940668910
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "f32",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_f32.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_f32.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_f32_t4_probe.jsonl"
+      ],
+      "environment": {},
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.838875647004826,
+      "minimumPctPot": 7.838875647004826,
+      "minimumIteration": 50,
+      "secsPerIter": 0.36778447,
+      "medianBatchSecsPerIter": 0.36778447,
+      "iterSecs": 18.3892235,
+      "evalSecs": 0.3219926,
+      "prepareSecs": 0.0135302,
+      "buildSecs": 0.1272121,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "8L",
+      "predictedArenaBytes": 208058400,
+      "allocatedArenaBytes": 208058400,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 8.0,
+      "stateBlake3": "941b73ba8a4d4b9ba48c1973e2aaff524650289b686d58e7d31cf3c8ce6c33bd",
+      "progress": "progress/turn_f32_t4_probe.jsonl",
+      "progressSha256": "b3f97f04db3e2783b70fa815fd1578acfbf3e8fed5a3a3b5ceace39aad3f2c39",
+      "finalExploitabilityBits": [
+        4602433134169998950,
+        4600443494940668910
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "f32",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_f32.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_f32.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_f32_t8.jsonl"
+      ],
+      "environment": {},
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 450,
+        "0.2": 550,
+        "0.1": 800,
+        "0.05": 1400
+      },
+      "finalPctPot": 0.04130025187049484,
+      "minimumPctPot": 0.04130025187049484,
+      "minimumIteration": 1500,
+      "secsPerIter": 0.3127047032,
+      "medianBatchSecsPerIter": 0.303597665,
+      "iterSecs": 469.0570548,
+      "evalSecs": 9.1605356,
+      "prepareSecs": 0.0126859,
+      "buildSecs": 0.1465575,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "8L",
+      "predictedArenaBytes": 208058400,
+      "allocatedArenaBytes": 208058400,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 8.0,
+      "stateBlake3": "89e1e2c2cb2e150265fd6e20a852132fe0f9c536e1d8e3965993c1c2885b346b",
+      "progress": "progress/turn_f32_t8.jsonl",
+      "progressSha256": "eb80a4051f53b96284f392698ee57458185c257e82e53148b4ca0bab025ec775",
+      "finalExploitabilityBits": [
+        4568130787941903360,
+        4566625109419716096
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V0",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V0_t1_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V0"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 8.314037910357058,
+      "minimumPctPot": 8.314037910357058,
+      "minimumIteration": 50,
+      "secsPerIter": 1.122398124,
+      "medianBatchSecsPerIter": 1.122398124,
+      "iterSecs": 56.1199062,
+      "evalSecs": 1.0716953,
+      "prepareSecs": 0.0122905,
+      "buildSecs": 0.2283927,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+8N",
+      "predictedArenaBytes": 104193056,
+      "allocatedArenaBytes": 104193056,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.006300384891934,
+      "stateBlake3": "4472fef88232fb22f17aaecd78750fa9910cf83e5905710bdd7e7a0b77a69285",
+      "progress": "progress/turn_V0_t1_probe.jsonl",
+      "progressSha256": "627ab5bbbeee7d2bdcb2b3a6cc120784b9179cc2c78a9c8854606f4322b6233a",
+      "finalExploitabilityBits": [
+        4602875221715480535,
+        4600746578712910100
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V0",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V0_t4_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V0"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 8.314037910357058,
+      "minimumPctPot": 8.314037910357058,
+      "minimumIteration": 50,
+      "secsPerIter": 0.46637814400000005,
+      "medianBatchSecsPerIter": 0.46637814400000005,
+      "iterSecs": 23.3189072,
+      "evalSecs": 0.4164788,
+      "prepareSecs": 0.0156277,
+      "buildSecs": 0.147581,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+8N",
+      "predictedArenaBytes": 104193056,
+      "allocatedArenaBytes": 104193056,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.006300384891934,
+      "stateBlake3": "4472fef88232fb22f17aaecd78750fa9910cf83e5905710bdd7e7a0b77a69285",
+      "progress": "progress/turn_V0_t4_probe.jsonl",
+      "progressSha256": "43391fafe89fd77034b5d1beb87847ed68746d08e66b21a19f52f2b4b1976a13",
+      "finalExploitabilityBits": [
+        4602875221715480535,
+        4600746578712910100
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V0",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V0_t8.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V0"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 500,
+        "0.2": 1050,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 0.3369795562492728,
+      "minimumPctPot": 0.12253442768352536,
+      "minimumIteration": 1050,
+      "secsPerIter": 0.36004170999999996,
+      "medianBatchSecsPerIter": 0.36199898099999994,
+      "iterSecs": 540.062565,
+      "evalSecs": 9.0899813,
+      "prepareSecs": 0.010785,
+      "buildSecs": 0.147478,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+8N",
+      "predictedArenaBytes": 104193056,
+      "allocatedArenaBytes": 104193056,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.006300384891934,
+      "stateBlake3": "3563c1cc48a364a93359def6ab71cb77a0b0bda78d6f57f90f9f79aa1238f1fb",
+      "progress": "progress/turn_V0_t8.jsonl",
+      "progressSha256": "a65a2b776d7cbcb54c4eda7aff3fe405a476587faf8a4a0e6ce1264a34f09485",
+      "finalExploitabilityBits": [
+        4579863953815177152,
+        4581986107259210208
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V1",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V1_t1_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V1"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.545800397925715,
+      "minimumPctPot": 7.545800397925715,
+      "minimumIteration": 50,
+      "secsPerIter": 1.33343434,
+      "medianBatchSecsPerIter": 1.33343434,
+      "iterSecs": 66.671717,
+      "evalSecs": 0.953343,
+      "prepareSecs": 0.0123462,
+      "buildSecs": 0.162503,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N",
+      "predictedArenaBytes": 105503904,
+      "allocatedArenaBytes": 105503904,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.056703464027407,
+      "stateBlake3": "df69f05e4528c519cf5e01752a6e2e85abf7baf26a451682b73e2bd74a6c9a0d",
+      "progress": "progress/turn_V1_t1_probe.jsonl",
+      "progressSha256": "1f6ffeb169febb096498fe9dc1c11e7cd2ec5fd8c6cc03c5ab08ab6a4fbff3a5",
+      "finalExploitabilityBits": [
+        4602083015501251294,
+        4600212860433097120
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V1",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V1_t4_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V1"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.545800397925715,
+      "minimumPctPot": 7.545800397925715,
+      "minimumIteration": 50,
+      "secsPerIter": 0.43636091,
+      "medianBatchSecsPerIter": 0.43636091,
+      "iterSecs": 21.8180455,
+      "evalSecs": 0.4085999,
+      "prepareSecs": 0.0106725,
+      "buildSecs": 0.1153536,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N",
+      "predictedArenaBytes": 105503904,
+      "allocatedArenaBytes": 105503904,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.056703464027407,
+      "stateBlake3": "df69f05e4528c519cf5e01752a6e2e85abf7baf26a451682b73e2bd74a6c9a0d",
+      "progress": "progress/turn_V1_t4_probe.jsonl",
+      "progressSha256": "5fae4507e5327caf1517e5751a42ec8ee592705ae25f84ac113a9cb4698f95df",
+      "finalExploitabilityBits": [
+        4602083015501251294,
+        4600212860433097120
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V1",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V1_t8.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V1"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 400,
+        "0.2": 500,
+        "0.1": 850,
+        "0.05": 1350
+      },
+      "finalPctPot": 0.05316697329251168,
+      "minimumPctPot": 0.04953458737485942,
+      "minimumIteration": 1350,
+      "secsPerIter": 0.39885700406666674,
+      "medianBatchSecsPerIter": 0.392362422,
+      "iterSecs": 598.2855061000001,
+      "evalSecs": 9.1837145,
+      "prepareSecs": 0.0099949,
+      "buildSecs": 0.1931446,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N",
+      "predictedArenaBytes": 105503904,
+      "allocatedArenaBytes": 105503904,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.056703464027407,
+      "stateBlake3": "176d8fc8a1c417fb7843a88bf68d5757e2a3b5cd6ac388d6c21b6356a0b97aae",
+      "progress": "progress/turn_V1_t8.jsonl",
+      "progressSha256": "1636e06be0c3c17b871b61fb6611234b2b9e0b076b94888ce9ba304731205495",
+      "finalExploitabilityBits": [
+        4568750941520639488,
+        4569027319837620224
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V2",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V2_t1_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V2"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.660654202510547,
+      "minimumPctPot": 7.660654202510547,
+      "minimumIteration": 50,
+      "secsPerIter": 1.819450156,
+      "medianBatchSecsPerIter": 1.819450156,
+      "iterSecs": 90.9725078,
+      "evalSecs": 1.2806237999999999,
+      "prepareSecs": 0.012626,
+      "buildSecs": 0.1532746,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "7e73234877cf44633efb56a1999a99c85bc84ce5e2e7e381bc3c2d900a567373",
+      "progress": "progress/turn_V2_t1_probe.jsonl",
+      "progressSha256": "e9922cddce774ab4389b5888942d5ff3da1480c2ad7fc0263024dd0cb8eb66a8",
+      "finalExploitabilityBits": [
+        4602041913799576843,
+        4600481554577444916
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V2",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V2_t4_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V2"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.660654202510547,
+      "minimumPctPot": 7.660654202510547,
+      "minimumIteration": 50,
+      "secsPerIter": 0.6127212320000001,
+      "medianBatchSecsPerIter": 0.6127212320000001,
+      "iterSecs": 30.6360616,
+      "evalSecs": 0.4020265,
+      "prepareSecs": 0.0140903,
+      "buildSecs": 0.1123879,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "7e73234877cf44633efb56a1999a99c85bc84ce5e2e7e381bc3c2d900a567373",
+      "progress": "progress/turn_V2_t4_probe.jsonl",
+      "progressSha256": "8b89c119a107d66e41e02cd0ac2ed3e459c58358326377a63bcf0342db23a83f",
+      "finalExploitabilityBits": [
+        4602041913799576843,
+        4600481554577444916
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V2",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V2_t8.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V2"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 400,
+        "0.2": 1050,
+        "0.1": 1150,
+        "0.05": null
+      },
+      "finalPctPot": 0.07339362332173603,
+      "minimumPctPot": 0.06616917635040576,
+      "minimumIteration": 1400,
+      "secsPerIter": 0.4392718148,
+      "medianBatchSecsPerIter": 0.431282019,
+      "iterSecs": 658.9077222,
+      "evalSecs": 8.7936734,
+      "prepareSecs": 0.0103425,
+      "buildSecs": 0.0963028,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "5e3bcc5d4a35ca582f41c679a8187585960584f33e51e0f1213403412c4f38eb",
+      "progress": "progress/turn_V2_t8.jsonl",
+      "progressSha256": "2ec5ade3ef5c15e5f10895483c175b51de11ab86b04a7086615bf0b20466848f",
+      "finalExploitabilityBits": [
+        4572202807984419456,
+        4569656609923141120
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V3",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V3_t1_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V3"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.865978694409162,
+      "minimumPctPot": 7.865978694409162,
+      "minimumIteration": 50,
+      "secsPerIter": 2.464028682,
+      "medianBatchSecsPerIter": 2.464028682,
+      "iterSecs": 123.2014341,
+      "evalSecs": 1.0266401,
+      "prepareSecs": 0.0106768,
+      "buildSecs": 0.2408971,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "facc1eac24265e917c3fc47e066d83c3c3434ef35995b2687de70716e27fcb58",
+      "progress": "progress/turn_V3_t1_probe.jsonl",
+      "progressSha256": "d126475d9b3431c2e3b48a287fcd6f0fd6cee78080f2154776f5d26cb6f475de",
+      "finalExploitabilityBits": [
+        4602535928916961673,
+        4600394407154350128
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V3",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V3_t4_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V3"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 7.865978694409162,
+      "minimumPctPot": 7.865978694409162,
+      "minimumIteration": 50,
+      "secsPerIter": 0.812772572,
+      "medianBatchSecsPerIter": 0.812772572,
+      "iterSecs": 40.6386286,
+      "evalSecs": 0.3723923,
+      "prepareSecs": 0.0129308,
+      "buildSecs": 0.1382728,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "facc1eac24265e917c3fc47e066d83c3c3434ef35995b2687de70716e27fcb58",
+      "progress": "progress/turn_V3_t4_probe.jsonl",
+      "progressSha256": "131fa81d936995620156ca53c3f8f0f7ac40b79003145e71a24180ac8e9c628e",
+      "finalExploitabilityBits": [
+        4602535928916961673,
+        4600394407154350128
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V3",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V3_t8.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V3"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 400,
+        "0.2": 500,
+        "0.1": 850,
+        "0.05": 1500
+      },
+      "finalPctPot": 0.049205969686421706,
+      "minimumPctPot": 0.049205969686421706,
+      "minimumIteration": 1500,
+      "secsPerIter": 0.5205997257333335,
+      "medianBatchSecsPerIter": 0.515574009,
+      "iterSecs": 780.8995886000001,
+      "evalSecs": 8.9036943,
+      "prepareSecs": 0.010645,
+      "buildSecs": 0.118751,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "4L+72N+2H",
+      "predictedArenaBytes": 123937704,
+      "allocatedArenaBytes": 123937704,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 4.7654967643700035,
+      "stateBlake3": "8c1042d625398d416a1c926a7404207ff84a18e80db46539d34fd2f455123d7f",
+      "progress": "progress/turn_V3_t8.jsonl",
+      "progressSha256": "d1d6006738ff1c3e18ae483dd5d57eb0afa03285f9f3e8d2bf8f74dfbf148f21",
+      "finalExploitabilityBits": [
+        4568071251726973440,
+        4568702329859083264
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V4",
+      "threads": 1,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "1",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V4_t1_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V4"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 8.313717226932168,
+      "minimumPctPot": 8.313717226932168,
+      "minimumIteration": 50,
+      "secsPerIter": 1.0309753480000001,
+      "medianBatchSecsPerIter": 1.0309753480000001,
+      "iterSecs": 51.5487674,
+      "evalSecs": 0.8382591,
+      "prepareSecs": 0.0114374,
+      "buildSecs": 0.1086349,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "6L+8N",
+      "predictedArenaBytes": 156207656,
+      "allocatedArenaBytes": 156207656,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 6.006300384891934,
+      "stateBlake3": "282fdb280969b5aa10a70376671d4f0bb9dac6d240c1d85e5f47583f4ba75342",
+      "progress": "progress/turn_V4_t1_probe.jsonl",
+      "progressSha256": "fde89207fb31724a64116aea7bae147a1cb653b3479d65fe4f77b5e2945a54e6",
+      "finalExploitabilityBits": [
+        4602874544884806031,
+        4600747296913167860
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V4",
+      "threads": 4,
+      "probe": true,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "4",
+        "50",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V4_t4_probe.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V4"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 50,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": null,
+        "0.2": null,
+        "0.1": null,
+        "0.05": null
+      },
+      "finalPctPot": 8.313717226932168,
+      "minimumPctPot": 8.313717226932168,
+      "minimumIteration": 50,
+      "secsPerIter": 0.35309075399999995,
+      "medianBatchSecsPerIter": 0.35309075399999995,
+      "iterSecs": 17.6545377,
+      "evalSecs": 0.293483,
+      "prepareSecs": 0.0474858,
+      "buildSecs": 0.1043015,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "6L+8N",
+      "predictedArenaBytes": 156207656,
+      "allocatedArenaBytes": 156207656,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 6.006300384891934,
+      "stateBlake3": "282fdb280969b5aa10a70376671d4f0bb9dac6d240c1d85e5f47583f4ba75342",
+      "progress": "progress/turn_V4_t4_probe.jsonl",
+      "progressSha256": "c0b1f1a13485f84d17234283694d4b53f593703b6b979371f78efeca74d5603b",
+      "finalExploitabilityBits": [
+        4602874544884806031,
+        4600747296913167860
+      ]
+    },
+    {
+      "case": "turn",
+      "variant": "V4",
+      "threads": 8,
+      "probe": false,
+      "config": "configs/turn_i16.toml",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\target\\release\\examples\\p1_i16_precision.exe",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\configs\\turn_i16.toml",
+        "8",
+        "1500",
+        "50",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-i16\\experiments\\p1-perf-2026-10\\i16-precision-20261007\\progress\\turn_V4_t8.jsonl"
+      ],
+      "environment": {
+        "SOLVERS_I16_VARIANT": "V4"
+      },
+      "stopReason": "max-iterations",
+      "maxIterations": 1500,
+      "checkEvery": 50,
+      "initialPotBb": 5.5,
+      "schedule": {
+        "alpha": 1.5,
+        "beta": 0.0,
+        "gamma": 3.0,
+        "pow4_reset": true,
+        "schedule": "dcfr"
+      },
+      "firstObservedIterationAtPctPot": {
+        "0.3": 450,
+        "0.2": 500,
+        "0.1": 750,
+        "0.05": 1450
+      },
+      "finalPctPot": 0.04264543468949626,
+      "minimumPctPot": 0.04264543468949626,
+      "minimumIteration": 1500,
+      "secsPerIter": 0.33121231873333334,
+      "medianBatchSecsPerIter": 0.33070085800000004,
+      "iterSecs": 496.8184781,
+      "evalSecs": 9.6054737,
+      "prepareSecs": 0.0122035,
+      "buildSecs": 0.1247358,
+      "storageElements": 26007300,
+      "actionNodes": 20482,
+      "nodeHands": 9216900,
+      "arenaBytesFormula": "6L+8N",
+      "predictedArenaBytes": 156207656,
+      "allocatedArenaBytes": 156207656,
+      "formulaMatchesAllocation": true,
+      "arenaBytesPerElement": 6.006300384891934,
+      "stateBlake3": "0eff7d7bc0d55c6a69c2a9ac77e350f9a54da9751827ed2fd1f014f5741830c2",
+      "progress": "progress/turn_V4_t8.jsonl",
+      "progressSha256": "937f67a1fb654268dcc464b754c452824582c79c7d4fb2e16694702209602292",
+      "finalExploitabilityBits": [
+        4567979256488660992,
+        4567130293083865856
+      ]
+    }
+  ],
+  "determinism": [
+    {
+      "case": "river",
+      "variant": "f32",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "river",
+      "variant": "V0",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "river",
+      "variant": "V1",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "river",
+      "variant": "V2",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "river",
+      "variant": "V3",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "river",
+      "variant": "V4",
+      "iterations": 3000,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "f32",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "V0",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "V1",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "V2",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "V3",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    },
+    {
+      "case": "turn",
+      "variant": "V4",
+      "iterations": 50,
+      "allProgressExploitabilityBitsEqual": true,
+      "fullFinalStorageStateHashEqual": true
+    }
+  ],
+  "validation": [
+    {
+      "command": "cargo fmt --all --check",
+      "CARGO_BUILD_JOBS": 2,
+      "SOLVERS_I16_VARIANT": "unset (V0)",
+      "exitCode": 0,
+      "passed": 0,
+      "ignored": 0,
+      "completedSuites": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logRetention": "scratch only; full logs intentionally omitted from retained evidence"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "CARGO_BUILD_JOBS": 2,
+      "SOLVERS_I16_VARIANT": "unset (V0)",
+      "exitCode": 0,
+      "passed": 0,
+      "ignored": 0,
+      "completedSuites": 0,
+      "logSha256": "e2e025e24968a1dca17d53df22d74190f21873e5809f74c3a862b1dc298addee",
+      "logRetention": "scratch only; full logs intentionally omitted from retained evidence"
+    },
+    {
+      "command": "cargo test -p hu-engine",
+      "CARGO_BUILD_JOBS": 2,
+      "SOLVERS_I16_VARIANT": "unset (V0)",
+      "exitCode": 0,
+      "passed": 34,
+      "ignored": 0,
+      "completedSuites": 5,
+      "logSha256": "dd1b026da71bde5e9feb9b431fbb8a1ec9a9aea8ff487ba0106a3b48d7e8aa22",
+      "logRetention": "scratch only; full logs intentionally omitted from retained evidence"
+    },
+    {
+      "command": "cargo test -p hu-postflop",
+      "CARGO_BUILD_JOBS": 2,
+      "SOLVERS_I16_VARIANT": "unset (V0)",
+      "exitCode": 0,
+      "passed": 147,
+      "ignored": 16,
+      "completedSuites": 16,
+      "logSha256": "e36c7332667e594d15f0fbf04b8f03027289d869002ac9df5fbe78ca9bba6334",
+      "logRetention": "scratch only; full logs intentionally omitted from retained evidence"
+    },
+    {
+      "command": "cargo test --workspace",
+      "CARGO_BUILD_JOBS": 2,
+      "SOLVERS_I16_VARIANT": "unset (V0)",
+      "exitCode": 0,
+      "passed": 862,
+      "ignored": 31,
+      "completedSuites": 56,
+      "logSha256": "c6de5af3f51fe88a3e7ad848e4c12559ff6525200eaf8c60faf83ee6e5f40f00",
+      "logRetention": "scratch only; full logs intentionally omitted from retained evidence"
+    }
+  ],
+  "evidenceValidation": {
+    "completeRuns": 30,
+    "allProgressGridsAndMetricsChecked": true,
+    "allMemoryFormulasMatchMeasuredArenaAllocations": true,
+    "allThreadComparisonsExact": true,
+    "sourceHashesRecheckedAtHandoff": true,
+    "retainedFileCount": 36,
+    "retainedBytes": 324074,
+    "documentationCheck": "passed: 23 Markdown files",
+    "gitDiffCheck": "passed"
+  },
+  "exponentOptimizationVerification": {
+    "oldBinarySha256": "e74c1d3d51ca204e486a271bafd5fdfcc74baf36f392098f5dc6963c53cc9fef",
+    "oldStorageSourceSha256": "87dcbcb248ff53b5c9bfde47570bde09b236fe46b32a0d9acd3eba1e8b5a1d36",
+    "all12RiverStateHashesUnchanged": true,
+    "comparisons": [
+      {
+        "variant": "f32",
+        "threads": 1,
+        "stateBlake3": "50525c17ba9ed3c8b8824bef58d55ded8be0240b069293a2b66866bfb141192f"
+      },
+      {
+        "variant": "f32",
+        "threads": 4,
+        "stateBlake3": "50525c17ba9ed3c8b8824bef58d55ded8be0240b069293a2b66866bfb141192f"
+      },
+      {
+        "variant": "V0",
+        "threads": 1,
+        "stateBlake3": "b4027907265ff4deb8e5240900fde67988e1b1ea2dd729805a76ec5d604a56e0"
+      },
+      {
+        "variant": "V0",
+        "threads": 4,
+        "stateBlake3": "b4027907265ff4deb8e5240900fde67988e1b1ea2dd729805a76ec5d604a56e0"
+      },
+      {
+        "variant": "V1",
+        "threads": 1,
+        "stateBlake3": "71c4afe481d4173961a703cbed744a0aecbaad01b2193bf64406325254a7496c"
+      },
+      {
+        "variant": "V1",
+        "threads": 4,
+        "stateBlake3": "71c4afe481d4173961a703cbed744a0aecbaad01b2193bf64406325254a7496c"
+      },
+      {
+        "variant": "V2",
+        "threads": 1,
+        "stateBlake3": "d329cb7e964e24f9d1e78efc32a098e8a009e62dca5c9f2e8bc24074bcd28105"
+      },
+      {
+        "variant": "V2",
+        "threads": 4,
+        "stateBlake3": "d329cb7e964e24f9d1e78efc32a098e8a009e62dca5c9f2e8bc24074bcd28105"
+      },
+      {
+        "variant": "V3",
+        "threads": 1,
+        "stateBlake3": "9b2d7c8506fce74b4b628b209d047b1252ffe4fe4d70a5e4c8eb7ce5d98dddcc"
+      },
+      {
+        "variant": "V3",
+        "threads": 4,
+        "stateBlake3": "9b2d7c8506fce74b4b628b209d047b1252ffe4fe4d70a5e4c8eb7ce5d98dddcc"
+      },
+      {
+        "variant": "V4",
+        "threads": 1,
+        "stateBlake3": "3477193ff75513dec3ce3c5697765235eb67715229e3d1e246ac24d4e3c31c5c"
+      },
+      {
+        "variant": "V4",
+        "threads": 4,
+        "stateBlake3": "3477193ff75513dec3ce3c5697765235eb67715229e3d1e246ac24d4e3c31c5c"
+      }
+    ]
+  },
+  "recommendation": {
+    "variant": "V1",
+    "criterion": "lowest-memory experimental variant with final Exploitability <= 0.1% pot in both measured cases; otherwise f32",
+    "scope": "River 3000 / Turn 1500; provisional, no production/default change"
+  }
+}

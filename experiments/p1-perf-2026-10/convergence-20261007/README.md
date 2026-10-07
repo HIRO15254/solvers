@@ -54,7 +54,7 @@ CLI全体（Flop1、4 iteration）: 16 threadsで旧201.7秒・peak RSS 29.7 GB�
 ## 判断
 
 - scheduleの既定は変えない（掃引で一貫して勝る設定が無い）。
-- i16の精度床への対策は試作（`i16-precision-20261007`、branch `s3-p1-i16-proto`）で比べ、利用者決定PF2・PF3
+- i16の精度床への対策は試作（[i16精度試作](../i16-precision-20261007/README.md)）で比べ、利用者決定PF2・PF3
   （計画第1節）により、regretをi16・戦略累積をf32で持つstorageを新しい値として追加し、旧i16も残す。
 - 既定の`check_every`25では評価が時間の約8%を占める。
 

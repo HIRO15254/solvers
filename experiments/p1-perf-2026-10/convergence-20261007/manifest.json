@@ -7,7 +7,7 @@
  "machine": "GCP c2d-highcpu-32 Spot europe-west4-a, VM p1perf-3, 2026-10-06T15:02Z..19:02Z",
  "retained_elsewhere": "stdout/time logs and CLI export CSVs under ignored runs/p1-perf/vm3/results (not Git-backed)",
  "files": {
-  "README.md": "88ef9f826ea6f0f447d5144c1c180791aa00081147033b423f5f524e8fc6213b",
+  "README.md": "2f25e846440ecf3afa42a970e6be7e3eae50935b69fd225280a6c04b58a011c7",
   "configs/conv/flop1_cfr-plus.toml": "c51a7b675c3e3e55ac5f5bf79b165171ca6e059e0dc679c2669b8cefe3814781",
   "configs/conv/flop1_dcfr-i16.toml": "1f7d5f1ffb339b098aa0832db2956170b159e526b43458a0613aa91060022eeb",
   "configs/conv/flop1_dcfr.toml": "5aa71b8458ff58f462d34d5d739f43ef0f938e0f55a63de64a4f0539dc830efd",

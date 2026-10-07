@@ -1,0 +1,3 @@
+{"actionNodes":20482,"buildSecs":0.162503,"checkEvery":50,"initialPotBb":5.5,"iterations":50,"kind":"metadata","nodeHands":9216900,"prepareSecs":0.0123462,"schedule":{"alpha":1.5,"beta":0.0,"gamma":3.0,"pow4_reset":true,"schedule":"dcfr"},"storageElements":26007300,"threads":1,"variant":"V1"}
+{"batchIterSecs":66.671717,"evalSecs":0.953343,"exploitabilityBits":[4602083015501251294,4600212860433097120],"exploitabilityPctPot":7.545800397925715,"iterSecs":66.671717,"iteration":50,"kind":"progress","nashConv":0.8300380437718288}
+{"allocatedStorageBytes":105503904,"kind":"final","secsPerIter":1.33343434,"stateBlake3":"df69f05e4528c519cf5e01752a6e2e85abf7baf26a451682b73e2bd74a6c9a0d"}

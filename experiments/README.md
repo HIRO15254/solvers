@@ -14,6 +14,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能・保存一致の検証 | [P1 `.sol`戦略block逐次出力](p1-perf-2026-10/sol-strategy-stream-20261007/README.md) | 2026-10-07。T3b、戦略保持除去、v2 payload・固定wall圧縮bytes一致、資源見積りとFlop peak/time |
 | 性能・保存一致の検証 | [P1 `.sol`戦略block並列生成](p1-perf-2026-10/sol-strategy-par-20261007/README.md) | 2026-10-07。T3c、上限付き1 batch、旧新payload・同thread圧縮bytes一致、2組のFlop計測と資源見積り、既存thread間codec差 |
 | 性能の計測 | [P1 0.1% potまでの収束](p1-perf-2026-10/convergence-20261007/README.md) | 2026-10-07。GCP 32 threadsでschedule別・i16・DCFR係数掃引の0.1%到達、gtow_b 575 iteration、CLI全体の新旧比較 |
+| 精度試作・収束計測（historical-only） | [P1 i16 precision](p1-perf-2026-10/i16-precision-20261007/README.md) | 2026-10-07。V0〜V4、River 3000 / Turn 1500、確率的丸めとhand列指数の比較。PF2・PF3の根拠。試作sourceは削除済み |
 | storage精度・互換性の検証 | [P1 i16-f32avg storage](p1-perf-2026-10/mixed-storage-20261007/README.md) | 2026-10-07。T6、regretの旧i16 bit一致、checkpoint v5、旧f32/i16のv2 payload比較、Turn 3000反復と3 backendの資源見積り |
 | 限定回帰・全0割合の計測（受入未完了） | [P1 全0相手reach部分木](p1-perf-2026-10/dead-subtree-20261007/README.md) | 2026-10-07。全0割合、旧経路とのengine差分、容量停止による未完了検証を保持 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
