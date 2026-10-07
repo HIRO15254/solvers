@@ -1,0 +1,26 @@
+b6 start 2026-10-07T16:51:03+09:00
+b6-n1-plain exit 0
+b6-n32-plain exit 0
+b6-n32-cv exit 0
+b6-n32-cv-strat exit 0
+b6-n32-cv-strat-reg exit 0
+b6-n32-final exit 0
+b6-n32-final-postflop1 exit 0
+b6-n8-final exit 0
+b6-n64-final exit 0
+b6-n32-final-evalplain exit 0
+b6-n32-final-evalcv exit 0
+b6-n32-final-eval16k exit 0
+b6-l0 exit 0
+b6-n1-plain l0_eval exit 0
+b6-n32-final l0_eval exit 0
+check exit 0
+b7 start 2026-10-07T18:43:14+09:00
+b7-n32 exit 127
+b7-n8 exit 0
+finished 2026-10-07T18:45:41+09:00
+b7 rerun with 0c7c464 started 2026-10-07T19:25:45+09:00
+b7-n32 exit 0
+b7-n8 exit 0
+b7 finished 2026-10-07T19:35:10+09:00
+check: b6-300-{final,plain}-{34d7811,0c7c464} (results/check/run_bitcheck.sh with BINS="34d7811 0c7c464"), exit 0
