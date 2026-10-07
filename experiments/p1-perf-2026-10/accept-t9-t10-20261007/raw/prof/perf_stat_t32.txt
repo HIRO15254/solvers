@@ -1,0 +1,16 @@
+# started on Wed Oct  7 09:16:55 2026
+
+
+ Performance counter stats for '/home/PC_User/t10/target/release/examples/p1_bench /home/PC_User/cfg/flop1_f32.toml --storage f32 --threads 32 --warmup 1 --iters 20 --evals 0':
+
+         156937.67 msec task-clock                       #   24.856 CPUs utilized          
+            106447      context-switches                 #  678.276 /sec                   
+               226      cpu-migrations                   #    1.440 /sec                   
+            784107      page-faults                      #    4.996 K/sec                  
+
+       6.313983216 seconds time elapsed
+
+     129.158888000 seconds user
+      27.914388000 seconds sys
+
+

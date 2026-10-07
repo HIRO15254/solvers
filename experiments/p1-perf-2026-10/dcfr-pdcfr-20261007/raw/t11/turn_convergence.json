@@ -1,0 +1,29 @@
+[
+  {
+    "algorithm": "dcfr",
+    "prototype": null,
+    "iterations": 730,
+    "solverWallSecs": 139.5715898,
+    "processWallSecs": 141.97944229999848,
+    "nashConv": 0.010825452768926325,
+    "targetReached": true
+  },
+  {
+    "algorithm": "pdcfr-2.3-5",
+    "prototype": "2.3,5",
+    "iterations": 1760,
+    "solverWallSecs": 365.2645019,
+    "processWallSecs": 366.6428482999909,
+    "nashConv": 0.010947271878050446,
+    "targetReached": true
+  },
+  {
+    "algorithm": "pcfr-inf-2",
+    "prototype": "inf,2",
+    "iterations": 1770,
+    "solverWallSecs": 375.176071,
+    "processWallSecs": 376.6632418999943,
+    "nashConv": 0.010971116657842006,
+    "targetReached": true
+  }
+]

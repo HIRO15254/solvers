@@ -1,0 +1,10 @@
+total 50906976
+drwxr-xr-x  2 PC_User PC_User        4096 Oct  7 09:12 .
+drwxr-xr-x 11 PC_User PC_User        4096 Oct  7 08:09 ..
+-rw-------  1 PC_User PC_User 32622745138 Oct  7 09:10 checkpoint.ckpt
+-rw-r--r--  1 PC_User PC_User         333 Oct  7 09:12 events.jsonl
+-rw-r--r--  1 PC_User PC_User         479 Oct  7 09:12 manifest.json
+-rw-r--r--  1 PC_User PC_User        4220 Oct  7 09:07 progress.jsonl
+-rw-r--r--  1 PC_User PC_User         411 Oct  7 09:12 run.json
+-rw-r--r--  1 PC_User PC_User        1234 Oct  7 08:09 run.toml
+-rw-------  1 PC_User PC_User 19505951279 Oct  7 09:12 solution.sol

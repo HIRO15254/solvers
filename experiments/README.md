@@ -19,6 +19,8 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 限定回帰・全0割合の計測 | [P1 全0相手reach部分木](p1-perf-2026-10/dead-subtree-20261007/README.md) | 2026-10-07。T5の全0割合、旧経路とのengine差分。GCP受入は次行 |
 | 性能・厳密一致の受入 | [P1 GCP受入（T5・T3c・T6・reset）](p1-perf-2026-10/gcp-accept-20261007/README.md) | 2026-10-07。T5の旧新・thread間一致と0.1%到達5〜8%短縮、T3cの`.sol`区間、T6のgtow_b到達、reset無し比較、profile・allocator・保存時間 |
 | 精度緩和の試作・計測 | [P1 CFR passの精度（f32化）とT8a](p1-perf-2026-10/cfr-precision-20261007/README.md) | 2026-10-07。f32 kernel・norm f32の1 iteration 9〜10%短縮と0.1%到達、深い目標の曲線、thread間一致。bit一致T8a候補の不採用。PF5・PF6の根拠 |
+| 性能・一致の受入 | [P1 GCP受入（T9 f32既定・T10 regret解放）](p1-perf-2026-10/accept-t9-t10-20261007/README.md) | 2026-10-07。`"f64"`の旧版bit一致、f32既定の0.1%到達10〜20%短縮、T10の出力一致と保存peak、gtow_aを64 GB機で0.1%まで、thread scaling・profile |
+| 収束の計測・試作 | [P1 DCFR係数の掃引とPDCFR+](p1-perf-2026-10/dcfr-pdcfr-20261007/README.md) | 2026-10-07。DCFR係数の掃引と10の木・3 storageでの確認（PF7の根拠）、旧i16のreset依存（PF8の根拠）、PDCFR+試作（T11）の不採用 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

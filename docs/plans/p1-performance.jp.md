@@ -23,6 +23,8 @@
 | PF4 | 2026-10-07 | DCFRの既定`pow4_reset`を`false`へ変える。明示した`true`は従来どおり使える |
 | PF5 | 2026-10-07 | CFR passの終端kernelとregret matchingをf32で計算することを既定にする。旧版とbit一致する計算も設定で選べるようにする。評価（Exploitability・EV・BR）はf64のまま |
 | PF6 | 2026-10-07 | PF5の設定は`[solver] cfr_precision`、値は`"f32"`（既定）と`"f64"`（旧版とbit一致） |
+| PF7 | 2026-10-07 | P1のDCFR既定係数を`alpha 1.25`、`beta 0.5`、`gamma 4`へ変える（`pow4_reset = false`は維持）。旧値は明示すれば使える |
+| PF8 | 2026-10-07 | `storage = "i16"`で`pow4_reset`を書かないときだけ既定をtrueにする。f32・i16-f32avgの既定はfalseのまま。明示した値が優先 |
 
 ## 2. 基準測定（2026-10-06、source `43e97c6`）
 
@@ -59,6 +61,10 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T6 | PF2・PF3のstorage（regret i16＋戦略累積f32）の追加。checkpoint version・memory見積り・規範の更新 | regret配列が旧i16とbit一致、戦略累積がf32と同じ演算。0.1%到達をTurn・GTOWb級の木で示す |
 | T7 | PF4: DCFRの既定`pow4_reset = false`。既定に依存する試験・規範・templateの同期 | 明示`true`が旧既定と、既定が旧の明示`false`とbit一致。実効configが値を明示する |
 | T9 | PF5・PF6: `cfr_precision`の追加（既定f32）。互換hashから除き、旧runを再開できるようにする。規範・templateの同期 | `"f64"`が旧版とbit一致。f32のthread間bit一致。評価がf64。旧runのresume |
+| T10 | 最後のcheckpointの後にregret arenaを解放し、`.sol`生成の作業領域をその分だけ重ねる。memory見積りの更新 | `.sol` payload・checkpoint・export・NashConvが変更前と一致。保存時peakと見積りが下がる |
+| T11 | PDCFR+（予測付きのDCFR+）の試作。環境変数で切り替え、mergeしない | 0.1%到達がDCFRより速いこと（不成立のため不採用） |
+| T12 | PF7: DCFRの既定係数の変更。既定に依存する試験・規範・templateの同期 | 旧版の未指定と新版の旧値明示、旧版の新値明示と新版の未指定がbit一致。旧既定のrunを再開できる |
+| T13 | PF8: 旧i16の`pow4_reset`既定をtrueにする。規範・template・試験の同期 | i16の未指定が明示trueと、他storageの未指定が明示falseとbit一致。実効configが値を明示する |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -108,6 +114,25 @@ T8（[証拠](../../experiments/p1-perf-2026-10/cfr-precision-20261007/README.md
 環境変数で切り替えてGCPで測った。1 iterationは32 threadsで9〜10%短く、0.1%到達はTurn 14.2→12.3秒、Flop1 55.7→48.8秒、
 gtow_b 912→720秒。0.01%台までの曲線に劣化は無く、thread間でbit一致した。これを根拠にPF5・PF6とした（T9）。
 加算順序を保ったまま同順位groupを1回で走査する案（T8a）は、bit一致したが32 threadsで最大2.5%、1 threadでは最大8%遅く、採らない。
+T9（[GCP受入](../../experiments/p1-perf-2026-10/accept-t9-t10-20261007/README.md)）: `"f64"`のNashConv系列はTurn・Flop1・gtow_bで旧版とbit一致し、
+既定f32の系列はthread数によらずbit一致した。0.1%到達（32 threads）はTurn 13.9→12.5秒、Flop1 55.7→50.5秒、
+gtow_b 915→734秒（比較はbit一致する`"f64"`）。
+T10（同）: 出力は変更前と一致し、Flop1のpeak RSSはf32で4.21→3.55 GB、i16-f32avgで3.51→2.83 GBに下がった。
+`gtow_a`（16.1M node）＋i16-f32avgの見積りは53.95→43.04 GBとなり、64 GB機（c2d-highcpu-32）の既定上限に収まる。
+実際に750 iteration・3,497秒で0.098%に達した（peak RSS 48.1 GB、process全体3,799秒）。
+checkpointと`.sol`の並行化は約3%の短縮に対してpeakをT10前へ戻すので採らない。
+profile（同）: Flop1 f32は16 threadsで13.7倍、SMTを含む32 threadsで16.4倍。32 threadsの時間は終端kernel（showdown 30%・fold 16%）、
+`cfr_pass`本体（28%）、列の正規化（7%）が占め、kernelのTLB shootdownが約10%ある。
+T11（[証拠](../../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）: PDCFR+（予測付きDCFR+、係数2.3・5）は0.1%到達がTurn 730→1,760 iteration、
+3-bet pot Flop 210→460 iterationと遅い。PCFR+（係数∞・2）もTurnで1,770 iteration、予測を外した同係数のDCFRは1,080 iterationで、
+予測が収束を遅くしている。memoryもf32 storageの1.5倍要るので採らない。
+DCFR係数（[証拠](../../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)、GCP 32 threads）: `alpha`を下げて`beta`を正にする組合せを掃引した。
+`alpha 1.25, beta 0.5, gamma 4`の0.1%到達iterationは、f32の10個の木（3-bet・4-bet pot、monotone、200bbを含む）と
+i16-f32avgの3つの木で既定の0.60〜1.05倍、gtow_bの時間は0.1%まで734→465秒、0.05%まで1,045→589秒だった。これをPF7とした（T12）。
+T12: 旧版の未指定と新版の旧係数明示、旧版の新係数明示と新版の未指定が、Turn6の`.sol` payload（wall_secs以外）とroot `export strategy/ev`で一致した。
+旧既定のrunは保存した実効configの係数で新版から再開でき、旧係数で解き直した結果と一致する。
+旧i16（両arena i16）はresetをやめると（PF4）精度床が深くなり、Turnの最良が0.120%→0.76%になった。
+reset有りならTurn・Riverでも0.1%に届き、どの木でも遅くならなかったので、i16だけ既定をreset有りにする（PF8、T13）。
 
 ### 一致の定義
 
