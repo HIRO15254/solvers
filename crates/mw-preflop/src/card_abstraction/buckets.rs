@@ -450,7 +450,9 @@ fn percentile_thresholds(mut scored: Vec<(f32, u32)>, k: u32) -> Vec<f64> {
     if k == 1 || scored.is_empty() {
         return Vec::new();
     }
-    scored.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    // In place: the river's scores are over 1 GB. The order of equal scores
+    // does not matter, since a cut inside a run of them yields its score.
+    scored.sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     let total_weight: u64 = scored.iter().map(|&(_, w)| w as u64).sum();
 
     let mut thresholds = Vec::with_capacity((k - 1) as usize);
@@ -494,7 +496,12 @@ fn build_table(
         )
         .collect();
 
-    let mut global: Vec<(f32, u32)> = Vec::new();
+    // Sized up front, so growing it never holds two buffers at once.
+    let live = scored
+        .iter()
+        .map(|(_, scores, _)| scores.iter().filter(|s| !s.is_nan()).count())
+        .sum();
+    let mut global: Vec<(f32, u32)> = Vec::with_capacity(live);
     for (_, scores, weight) in &scored {
         global.extend(
             scores
@@ -879,6 +886,45 @@ mod tests {
                     } else {
                         assert_eq!(u32::from(bucket), abs.bucket(&board, h));
                     }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn percentile_thresholds_do_not_depend_on_the_order_of_ties() {
+        use rand::{Rng, SeedableRng};
+        use rand_chacha::ChaCha8Rng;
+        let mut rng = ChaCha8Rng::seed_from_u64(23);
+        for distinct in [1, 3, 50, 5000] {
+            let scored: Vec<(f32, u32)> = (0..20_000)
+                .map(|_| {
+                    let s = rng.gen_range(0..distinct) as f32 / distinct as f32;
+                    (s, rng.gen_range(1..40))
+                })
+                .collect();
+            for k in [1, 2, 3, 32, 128] {
+                // The stable sort the thresholds were first computed with.
+                let mut sorted = scored.clone();
+                sorted.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+                let total: u64 = sorted.iter().map(|&(_, w)| w as u64).sum();
+                let mut expected = Vec::new();
+                let (mut cum, mut next) = (0, 1);
+                for &(s, w) in &sorted {
+                    cum += w as u64;
+                    while next < k as u64 && cum * k as u64 >= total * next {
+                        expected.push(s as f64);
+                        next += 1;
+                    }
+                }
+                expected.resize((k as usize).saturating_sub(1), f64::INFINITY);
+                let mut shuffled = scored.clone();
+                shuffled.reverse();
+                for got in [
+                    percentile_thresholds(scored.clone(), k),
+                    percentile_thresholds(shuffled, k),
+                ] {
+                    assert_eq!(got, expected, "distinct {distinct}, k {k}");
                 }
             }
         }
