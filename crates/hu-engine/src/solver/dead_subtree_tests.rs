@@ -303,11 +303,17 @@ impl<V: StorageView> StorageOps for TrackingView<V> {
 
     fn update_regrets(&mut self, r: StorageRef, index: u32, inst: &[f32], d: &Discounts) {
         assert!(inst.iter().all(|&x| x == 0.0));
-        self.activity
-            .update_workers
-            .lock()
-            .unwrap()
-            .insert(rayon::current_thread_index().unwrap());
+        let seen = {
+            let mut workers = self.activity.update_workers.lock().unwrap();
+            workers.insert(rayon::current_thread_index().unwrap());
+            workers.len()
+        };
+        if seen < 2 {
+            // Pruned work is so fast that one worker can finish every task
+            // before another steals one. Give idle workers time to steal; a
+            // sequential run still records a single worker.
+            std::thread::sleep(std::time::Duration::from_millis(2));
+        }
         self.inner.update_regrets(r, index, inst, d);
     }
 

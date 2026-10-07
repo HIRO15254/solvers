@@ -1,5 +1,40 @@
 use crate::CfrPrecision;
 use crate::schedule::Discounts;
+use rayon::prelude::*;
+
+/// Arenas smaller than this are left to the allocator's lazy zero pages.
+const PREFAULT_MIN_BYTES: usize = 64 << 20;
+const PREFAULT_PAGE_BYTES: usize = 4096;
+const PREFAULT_CHUNK_BYTES: usize = 1 << 20;
+
+/// Touches every page of a freshly allocated, all-zero arena by writing zero,
+/// in parallel on the current rayon pool.
+///
+/// Large `vec![0; n]` arenas come from untouched zero pages. The first CFR
+/// iteration reads an element before writing it, so the read maps the shared
+/// zero page and the later write takes a copy-on-write fault with a TLB
+/// shootdown to every CPU of the process. Writing first, without reading,
+/// avoids that. Only for arenas that are all zero (`T::default()`).
+fn prefault_zeroed<T: Copy + Default + Send>(arena: &mut [T]) {
+    prefault_zeroed_above(arena, PREFAULT_MIN_BYTES);
+}
+
+fn prefault_zeroed_above<T: Copy + Default + Send>(arena: &mut [T], min_bytes: usize) {
+    let size = std::mem::size_of::<T>();
+    if size == 0 || std::mem::size_of_val(arena) < min_bytes {
+        return;
+    }
+    let page = (PREFAULT_PAGE_BYTES / size).max(1);
+    let chunk = (PREFAULT_CHUNK_BYTES / size).max(page);
+    arena.par_chunks_mut(chunk).for_each(|part| {
+        for i in (0..part.len()).step_by(page) {
+            // SAFETY: `i < part.len()`, so the pointer is in bounds, valid and
+            // aligned for `T`. The arena is all `T::default()`, so the store
+            // leaves it unchanged; `volatile` keeps the store from being elided.
+            unsafe { std::ptr::write_volatile(part.as_mut_ptr().add(i), T::default()) }
+        }
+    });
+}
 
 #[cfg(test)]
 mod precision_tests {
@@ -636,10 +671,14 @@ impl Storage for F32Storage {
     }
 
     fn new(len: usize, _num_refs: usize) -> Self {
+        let mut regrets = vec![0.0; len];
+        let mut strategy_sum = vec![0.0; len];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
         F32Storage {
             regrets_released: false,
-            regrets: vec![0.0; len],
-            strategy_sum: vec![0.0; len],
+            regrets,
+            strategy_sum,
         }
     }
 
@@ -1126,12 +1165,18 @@ impl Storage for I16Storage {
     }
 
     fn new(len: usize, num_refs: usize) -> Self {
+        let mut regrets = vec![0i16; len];
+        let mut strategy_sum = vec![0i16; len];
+        let regret_scales = vec![1.0; num_refs];
+        let strategy_scales = vec![1.0; num_refs];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
         I16Storage {
             regrets_released: false,
-            regrets: vec![0i16; len],
-            strategy_sum: vec![0i16; len],
-            regret_scales: vec![1.0; num_refs],
-            strategy_scales: vec![1.0; num_refs],
+            regrets,
+            strategy_sum,
+            regret_scales,
+            strategy_scales,
             scratch: Vec::new(),
         }
     }
@@ -1461,11 +1506,16 @@ impl Storage for MixedStorage {
     }
 
     fn new(len: usize, num_refs: usize) -> Self {
+        let mut regrets = vec![0i16; len];
+        let mut strategy_sum = vec![0.0; len];
+        let regret_scales = vec![1.0; num_refs];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
         MixedStorage {
             regrets_released: false,
-            regrets: vec![0i16; len],
-            strategy_sum: vec![0.0; len],
-            regret_scales: vec![1.0; num_refs],
+            regrets,
+            strategy_sum,
+            regret_scales,
             scratch: Vec::new(),
         }
     }
@@ -1671,6 +1721,21 @@ impl<'a> StorageView for MixedView<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prefault_keeps_arena_zero() {
+        // A few pages, threshold bypassed; lengths not page-aligned.
+        let mut a = vec![0.0f32; 5 * 1024 + 7];
+        prefault_zeroed_above(&mut a, 0);
+        assert!(a.iter().all(|&x| x.to_bits() == 0));
+        let mut b = vec![0i16; 3 * 2048 + 5];
+        prefault_zeroed_above(&mut b, 0);
+        assert!(b.iter().all(|&x| x == 0));
+        // Below the threshold nothing happens.
+        prefault_zeroed(&mut b);
+        let mut empty: Vec<f32> = Vec::new();
+        prefault_zeroed_above(&mut empty, 0);
+    }
 
     #[test]
     fn mixed_ops_match_i16_regrets_and_f32_sums_bitwise() {
