@@ -302,6 +302,13 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         "checkpoint_interval",
         Value::String(duration(run.checkpoint_interval_seconds)),
     );
+    if spot.product == Product::HuPostflop {
+        insert(
+            &mut run_fields,
+            "final_checkpoint",
+            Value::Boolean(run.final_checkpoint),
+        );
+    }
     write_table(&mut text, "run", &run_fields);
     write_product(&mut text, "output", output);
     Ok(text)

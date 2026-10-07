@@ -221,10 +221,8 @@ fn drive<S: Storage>(
     let mut summary = summary_from_evaluation(&solver, elapsed, subgame_ev(ev, offset), expl);
     diagnostics(Diagnostic::Done(summary.clone()));
     summary.canceled = canceled;
-    if saved_iteration != Some(solver.iteration()) {
-        save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
-    }
-    solver.release_regrets();
+    let final_checkpoint =
+        p.document.spot.run.final_checkpoint && saved_iteration != Some(solver.iteration());
     let spec = crate::artifact::SolExportSpec {
         path: solution.to_path_buf(),
         mode: match p.settings.output.solution_streets {
@@ -239,15 +237,59 @@ fn drive<S: Storage>(
         }
         .into(),
     };
-    crate::artifact::export_sol(
-        &spec,
-        &solver,
-        offset,
-        p.document.spot.context.street,
-        &summary,
-        &mut |d| diagnostics(Diagnostic::Artifact(d)),
-    )?;
+    if parallel_finalize(
+        final_checkpoint,
+        &p.estimate,
+        p.settings.solver.storage,
+        p.limit,
+    ) {
+        // join inherits the installed run pool for BOTH closures. In particular,
+        // save's current_num_threads and the solution's strategy batches must
+        // never fall back to the global pool. Each closure only borrows solver.
+        let (checkpoint_result, solution_result) = rayon::join(
+            || save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer),
+            || {
+                crate::artifact::export_sol(
+                    &spec,
+                    &solver,
+                    offset,
+                    p.document.spot.context.street,
+                    &summary,
+                    &mut |d| diagnostics(Diagnostic::Artifact(d)),
+                )
+            },
+        );
+        // join waits for both writers, even on error. A successful .sol may
+        // remain on checkpoint failure; the caller records the run as failed.
+        checkpoint_result?;
+        solution_result?;
+    } else {
+        if final_checkpoint {
+            save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
+        }
+        solver.release_regrets();
+        crate::artifact::export_sol(
+            &spec,
+            &solver,
+            offset,
+            p.document.spot.context.street,
+            &summary,
+            &mut |d| diagnostics(Diagnostic::Artifact(d)),
+        )?;
+    }
     Ok(summary)
+}
+
+fn parallel_finalize(
+    final_checkpoint: bool,
+    estimate: &crate::MemoryEstimate,
+    backend: input::Storage,
+    limit: u64,
+) -> bool {
+    final_checkpoint
+        && estimate
+            .parallel_save_bytes(backend)
+            .is_some_and(|peak| peak <= limit)
 }
 
 fn save<S: Storage>(
@@ -338,5 +380,47 @@ fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
         expl_p0: expl[Player::P0],
         expl_p1: expl[Player::P1],
         nash_conv,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parallel_finalization_requires_a_save_and_room_for_both_codecs() {
+        let estimate = crate::MemoryEstimate {
+            f32_bytes: 100,
+            i16_bytes: 60,
+            i16_f32avg_bytes: 80,
+            save_bytes: 40,
+            compression_bytes: 10,
+            ..Default::default()
+        };
+        for (backend, peak) in [
+            (input::Storage::F32, 160),
+            (input::Storage::I16, 120),
+            (input::Storage::I16F32Avg, 140),
+        ] {
+            assert_eq!(estimate.parallel_save_bytes(backend), Some(peak));
+            assert!(!parallel_finalize(true, &estimate, backend, peak - 1));
+            assert!(parallel_finalize(true, &estimate, backend, peak));
+            assert!(parallel_finalize(true, &estimate, backend, peak + 1));
+            assert!(!parallel_finalize(false, &estimate, backend, u64::MAX));
+        }
+        for (storage, workspace, codec) in [(u64::MAX, 1, 0), (0, 0, u64::MAX)] {
+            let overflow = crate::MemoryEstimate {
+                f32_bytes: storage,
+                save_bytes: workspace,
+                compression_bytes: codec,
+                ..Default::default()
+            };
+            assert!(!parallel_finalize(
+                true,
+                &overflow,
+                input::Storage::F32,
+                u64::MAX
+            ));
+        }
     }
 }

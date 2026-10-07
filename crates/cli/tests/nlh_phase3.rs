@@ -46,6 +46,258 @@ fn text(path: &Path) -> &str {
     path.to_str().unwrap()
 }
 
+fn normalized_solution(path: &Path) -> Vec<u8> {
+    let mut payload = hu_postflop::sol::read_sol(&path.join("solution.sol")).unwrap();
+    payload.meta.wall_secs = 0.0;
+    let mut config: toml_edit::DocumentMut = payload.config_toml.parse().unwrap();
+    config.remove("run");
+    payload.config_toml = config.to_string();
+    postcard::to_allocvec(&payload).unwrap()
+}
+
+#[test]
+fn omitted_final_checkpoint_resumes_periodic_state_with_crash_style_progress() {
+    use hu_postflop::{prepare, run};
+    use std::sync::atomic::AtomicBool;
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    for storage in ["f32", "i16", "i16-f32avg"] {
+        let raw = RIVER
+            .replace(
+                "[solver.stop]",
+                &format!("[solver]\nstorage = '{storage}'\n[solver.stop]"),
+            )
+            .replace(
+                "checkpoint_interval = \"15m\"",
+                "checkpoint_interval = '1s'\nfinal_checkpoint = false",
+            );
+        let p = prepare::prepare(&raw, Path::new("periodic.toml")).unwrap();
+        let directory = temp.path().join(storage);
+        std::fs::create_dir(&directory).unwrap();
+        std::fs::write(directory.join("run.toml"), &p.effective).unwrap();
+        let checkpoint = directory.join("checkpoint.ckpt");
+        let solution = directory.join("solution.sol");
+        let mut metrics =
+            runfiles::MetricsWriter::create_or_append(&directory.join("progress.jsonl")).unwrap();
+        let mut saved = Vec::new();
+        let summary = run::run(
+            run::RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |observation| {
+                match observation {
+                    run::Observation::Progress(row) => {
+                        let first = row.iteration == 4;
+                        metrics.append(&row)?;
+                        // Force exactly one periodic checkpoint in a tiny river
+                        // solve, with ample room for the remaining iterations.
+                        if first {
+                            std::thread::sleep(Duration::from_millis(1100));
+                        }
+                    }
+                    run::Observation::Checkpoint { iterations } => saved.push(iterations),
+                    _ => {}
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(summary.iterations, 16);
+        assert_eq!(saved, [4]);
+        assert_eq!(
+            hu_postflop::checkpoint::read_checkpoint(&checkpoint)
+                .unwrap()
+                .iteration,
+            4
+        );
+        let omitted_solution = normalized_solution(&directory);
+        let before = std::fs::read(directory.join("progress.jsonl")).unwrap();
+        // Editing this operational key must be accepted by compatibility_hash.
+        std::fs::write(
+            directory.join("run.toml"),
+            p.effective
+                .replace("final_checkpoint = false", "final_checkpoint = true"),
+        )
+        .unwrap();
+        ok(&["resume", text(&directory), "--checkpoint-interval", "1h"]);
+        let after = std::fs::read(directory.join("progress.jsonl")).unwrap();
+        assert!(after.starts_with(&before));
+        let iterations: Vec<_> = std::str::from_utf8(&after)
+            .unwrap()
+            .lines()
+            .map(|line| {
+                serde_json::from_str::<runfiles::MetricsRow>(line)
+                    .unwrap()
+                    .iteration
+            })
+            .collect();
+        assert_eq!(iterations, [4, 8, 12, 16, 8, 12, 16]);
+        let config = temp.path().join(format!("straight-{storage}.toml"));
+        std::fs::write(
+            &config,
+            raw.replace("final_checkpoint = false", "final_checkpoint = true")
+                .replace("'1s'", "'1h'"),
+        )
+        .unwrap();
+        let straight = temp.path().join(format!("straight-{storage}"));
+        ok(&["solve", text(&config), "--out", text(&straight)]);
+        let resumed = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+        let once =
+            hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+        assert_eq!(resumed.iteration, 16);
+        assert_eq!(resumed.state, once.state);
+        assert_eq!(
+            normalized_solution(&directory),
+            normalized_solution(&straight)
+        );
+        assert_eq!(omitted_solution, normalized_solution(&straight));
+    }
+}
+
+#[test]
+fn false_without_periodic_checkpoint_still_exports_but_cannot_resume() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("omit.toml");
+    std::fs::write(&config, format!("{RIVER}\nfinal_checkpoint = false\n")).unwrap();
+    let directory = temp.path().join("run");
+    ok(&["solve", text(&config), "--out", text(&directory)]);
+    assert!(!directory.join("checkpoint.ckpt").exists());
+    assert!(directory.join("solution.sol").exists());
+    let events = std::fs::read_to_string(directory.join("events.jsonl")).unwrap();
+    assert!(!events.contains("\"kind\":\"checkpoint\""));
+    let error = cli(&["resume", text(&directory)]);
+    assert_eq!(error.status.code(), Some(1));
+    let message = String::from_utf8_lossy(&error.stderr);
+    assert!(message.contains("final_checkpoint = false"));
+    assert!(message.contains("re-solve from run.toml"));
+}
+
+#[test]
+fn finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors() {
+    use hu_postflop::{prepare, run};
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    for parallel in [false, true] {
+        let mut p = prepare::prepare(
+            &RIVER.replace("threads = 1", "threads = 3"),
+            Path::new("river.toml"),
+        )
+        .unwrap();
+        let peak = p
+            .estimate
+            .parallel_save_bytes(p.settings.solver.storage)
+            .unwrap();
+        p.limit = if parallel { peak } else { peak - 1 };
+        assert!(p.estimate.required_bytes(p.settings.solver.storage) <= p.limit);
+        for (checkpoint_error, solution_error) in
+            [(false, false), (true, false), (false, true), (true, true)]
+        {
+            let directory = tempfile::tempdir_in(temp.path()).unwrap();
+            let checkpoint = directory.path().join(if checkpoint_error {
+                "missing/checkpoint.ckpt"
+            } else {
+                "checkpoint.ckpt"
+            });
+            let solution = directory.path().join(if solution_error {
+                "missing/solution.sol"
+            } else {
+                "solution.sol"
+            });
+            let mut checkpoints = 0;
+            let result = run::run(
+                run::RunRequest {
+                    prepared: &p,
+                    checkpoint: &checkpoint,
+                    solution: &solution,
+                    state: None,
+                    elapsed_before: Duration::ZERO,
+                    cancel: &AtomicBool::new(false),
+                },
+                &mut |o| {
+                    assert_eq!(rayon::current_num_threads(), 3);
+                    if matches!(o, run::Observation::Checkpoint { .. }) {
+                        assert!(checkpoint.is_file());
+                        checkpoints += 1;
+                    }
+                    Ok(())
+                },
+                &mut |_| assert_eq!(rayon::current_num_threads(), 3),
+            );
+            assert_eq!(checkpoints, usize::from(!checkpoint_error));
+            if checkpoint_error {
+                assert!(
+                    result
+                        .err()
+                        .unwrap()
+                        .downcast_ref::<hu_postflop::checkpoint::CheckpointError>()
+                        .is_some()
+                );
+                assert_eq!(solution.is_file(), parallel && !solution_error);
+            } else if solution_error {
+                assert!(result.is_err());
+            } else {
+                assert!(result.is_ok());
+            }
+        }
+    }
+    // Omission applies to every stop reason, and never emits a final checkpoint.
+    for reason in [
+        "max-iterations",
+        "target-reached",
+        "time-limit",
+        "cancelled",
+    ] {
+        let raw = format!("{}\nfinal_checkpoint = false\n", RIVER);
+        let raw = match reason {
+            "target-reached" => raw.replace(
+                "max_iterations = 16",
+                "max_iterations = 16\ntarget = '100bb'",
+            ),
+            "time-limit" => format!("{raw}max_time = '0.000001s'\n"),
+            _ => raw,
+        };
+        let p = prepare::prepare(&raw, Path::new("omit.toml")).unwrap();
+        let directory = tempfile::tempdir_in(temp.path()).unwrap();
+        let checkpoint = directory.path().join("checkpoint.ckpt");
+        let solution = directory.path().join("solution.sol");
+        let cancel = AtomicBool::new(false);
+        let mut stop = None;
+        run::run(
+            run::RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                elapsed_before: Duration::ZERO,
+                cancel: &cancel,
+            },
+            &mut |o| {
+                match o {
+                    run::Observation::Progress(_) if reason == "cancelled" => {
+                        cancel.store(true, Ordering::SeqCst)
+                    }
+                    run::Observation::Stop { reason } => stop = Some(reason),
+                    run::Observation::Checkpoint { .. } => panic!("unexpected checkpoint"),
+                    _ => {}
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(stop, Some(reason));
+        assert!(!checkpoint.exists());
+        assert!(solution.is_file());
+    }
+}
+
 #[test]
 fn spec_p1_example_validate_text_json_effective_and_resources() {
     let temp = tempfile::tempdir().unwrap();

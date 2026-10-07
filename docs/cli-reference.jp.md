@@ -80,7 +80,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
 未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
-P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpoint後にregret配列とscaleを解放し、`.sol`を生成する。
+P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`ならregretを保持してcheckpointと`.sol`を並行生成する。それ以外はcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`の順とする。solve開始の見積り式は変わらない。
 
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
@@ -130,6 +130,8 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 
 `RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
 directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
+P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
+最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
 
 | flag | 適用 | 意味 |
 |---|---|---|
@@ -143,7 +145,7 @@ directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検�
 
 P1へP2専用overrideを渡すと`NLH003`で拒否する。P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。その他の設定変更は互換性が必要である。
 同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
-終了時にcheckpoint、solution、run.jsonを更新する。P1は直前の保存と同じiterationのcheckpoint再保存・eventを省く。P2は再構築中にrule hitも確認する。
+終了時にsolution、run.jsonを更新する。P1のcheckpointは`final_checkpoint = true`の場合だけ更新し、直前の保存と同じiterationの再保存・eventを省く。P2は終了時のcheckpointを更新する。P2は再構築中にrule hitも確認する。
 
 ## `solvers status` / `solvers watch` / `solvers runs ls`
 
@@ -331,7 +333,7 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
 
-Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する。
+Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
 2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
 
 ## `solversd`

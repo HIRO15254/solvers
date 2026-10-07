@@ -37,6 +37,21 @@ impl Write for Count {
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
+        Some("finalization-memory") => {
+            let path = Path::new(&args[2]);
+            let p = hu_postflop::prepare::prepare(&std::fs::read_to_string(path)?, path)?;
+            let peak = p.estimate.parallel_save_bytes(p.settings.solver.storage);
+            println!(
+                "{}",
+                serde_json::json!({
+                    "serial_peak": p.estimate.required_bytes(p.settings.solver.storage),
+                    "parallel_peak": peak, "memory_limit": p.limit,
+                    "save_bytes": p.estimate.save_bytes,
+                    "compression_bytes": p.estimate.compression_bytes,
+                    "parallel_if_final_save_needed": p.document.spot.run.final_checkpoint && peak.is_some_and(|bytes| bytes <= p.limit),
+                })
+            );
+        }
         Some("solution-stream") => compare_solution_streams(&args[2], &args[3])?,
         Some("checkpoint-compare") => compare_checkpoints(&args[2], &args[3])?,
         Some("checkpoint") => {
@@ -348,16 +363,22 @@ fn files_equal(a: &str, b: &str) -> Result<bool> {
     Ok(true)
 }
 
-/// Bounded comparison of v4 raw arenas, validating each file's digest. Counts
-/// signed-zero differences separately from numerical differences.
+/// Bounded comparison of v5 raw arenas, validating each digest. Only wall
+/// time and operational [run] config may differ; recorded threads must match.
 fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
     use anyhow::ensure;
+    #[derive(serde::Deserialize, PartialEq)]
+    enum Backend {
+        F32,
+        I16,
+        I16F32Avg,
+    }
     #[derive(serde::Deserialize, PartialEq)]
     struct Metadata {
         config_toml: Option<String>,
         elapsed_secs: Option<f64>,
         iteration: u64,
-        i16: bool,
+        backend: Backend,
         lengths: [u64; 4],
     }
     fn open(path: &str) -> Result<(impl Read, Metadata, blake3::Hasher)> {
@@ -365,8 +386,8 @@ fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
         let mut header = [0; hu_postflop::checkpoint::HEADER_LEN];
         file.read_exact(&mut header)?;
         ensure!(
-            &header[..10] == b"SLVRCKPT\x04\x00",
-            "expected checkpoint v4"
+            &header[..10] == b"SLVRCKPT\x05\x00",
+            "expected checkpoint v5"
         );
         let mut decoder = zstd::stream::read::Decoder::new(file)?;
         decoder.window_log_max(20)?;
@@ -397,17 +418,28 @@ fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
     let (mut b, mut mb, mut hb) = open(new)?;
     ma.elapsed_secs = None;
     mb.elapsed_secs = None;
+    let mut threads = Vec::new();
+    for meta in [&mut ma, &mut mb] {
+        let mut config: toml_edit::DocumentMut = meta.config_toml.as_deref().unwrap().parse()?;
+        threads.push(config["run"]["threads"].to_string());
+        config.remove("run");
+        meta.config_toml = Some(config.to_string());
+    }
+    ensure!(threads[0] == threads[1], "recorded thread counts differ");
     ensure!(
         ma == mb,
-        "checkpoint metadata differs excluding elapsed_secs"
+        "checkpoint metadata differs excluding elapsed_secs and [run]"
     );
     let mut left = vec![0; 65536];
     let mut right = vec![0; left.len()];
-    let mut signed_zero_differences = 0u64;
     let mut elements = 0u64;
     let mut arena_hashes = [blake3::Hasher::new(), blake3::Hasher::new()];
     for (index, len) in ma.lengths.into_iter().enumerate() {
-        let integer = ma.i16 && index < 2;
+        let integer = match ma.backend {
+            Backend::F32 => false,
+            Backend::I16 => index < 2,
+            Backend::I16F32Avg => index == 0,
+        };
         let width = if integer { 2 } else { 4 };
         let mut remaining = len;
         while remaining > 0 {
@@ -419,21 +451,11 @@ fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
             hb.update(&right[..size]);
             arena_hashes[0].update(&left[..size]);
             arena_hashes[1].update(&right[..size]);
-            for (x, y) in left[..size]
-                .chunks_exact(width)
-                .zip(right[..size].chunks_exact(width))
-            {
-                if x != y {
-                    ensure!(!integer, "i16 arena {index} differs");
-                    let vx = f32::from_le_bytes(x.try_into()?);
-                    let vy = f32::from_le_bytes(y.try_into()?);
-                    ensure!(
-                        vx == vy && vx == 0.0,
-                        "f32 arena {index} differs: {vx} vs {vy}"
-                    );
-                    signed_zero_differences += 1;
-                }
-            }
+            ensure!(
+                left[..size] == right[..size],
+                "arena {index} differs at element {}",
+                len - remaining
+            );
             elements += count as u64;
             remaining -= count as u64;
         }
@@ -453,9 +475,9 @@ fn compare_checkpoints(old: &str, new: &str) -> Result<()> {
     println!(
         "{}",
         serde_json::json!({
-            "iteration": ma.iteration, "storage": if ma.i16 { "i16" } else { "f32" },
-            "elements": elements, "numeric_equal": true,
-            "signed_zero_bit_differences": signed_zero_differences,
+            "iteration": ma.iteration, "storage": match ma.backend { Backend::F32 => "f32", Backend::I16 => "i16", Backend::I16F32Avg => "i16-f32avg" },
+            "recorded_threads": threads, "elements": elements, "bit_equal": true,
+            "signed_zero_bit_differences": 0,
             "other_bit_differences": 0,
             "arena_blake3": arena_hashes.map(|h| h.finalize().to_hex().to_string()),
             "digests_valid": true,

@@ -215,7 +215,7 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 | run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
 P1 checkpoint v5はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。metadataのbackendは3種類のenumで、Mixedの配列順はregrets（i16）、strategy_sum（f32）、regret_scales（f32）。backendと配列長は書込み前に検査し、v1〜4は再solveを案内して拒否する。
-solve/resumeの`drive`は区間終了時の最後のcheckpoint後に`Solver::release_regrets`でregret arenaとscaleを解放し、その後`.sol`を生成する。反復中のcheckpointとcurrent strategyを提供するlive queryはregretを保持する。memory preflightは`max(storage, storage − regret + save_bytes) + compression_bytes`を使う。
+solve/resumeの`drive`は、終了時に新たなcheckpointが必要で`S + W + 2C ≤ limit`ならrun用Rayon poolの`join`でcheckpointと`.sol`を並行生成し、regretを保持する。その他は最後のcheckpoint（P1の`run.final_checkpoint = true`、既定値、の場合）→ `Solver::release_regrets`でregret arenaとscaleを解放 → `.sol`の順とする。falseは全停止理由で最後のcheckpointだけを省く。反復中のcheckpointとcurrent strategyを提供するlive queryはregretを保持する。memory preflightは`max(storage, storage − regret + save_bytes) + compression_bytes`を使う。
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
 戦略はEV passに先立ってstorageからsref昇順に計算し、1 node分ずつ量子化して直接出力する。EV pass後の値slotもsref順に直接出力し、block用Vecへ移し替えない。
 codecはpacked blockのpostcard直列化も一時payload Vecなしで行う。

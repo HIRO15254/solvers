@@ -1707,6 +1707,22 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 }
 
 impl MemoryEstimate {
+    /// Final checkpoint and solution peak, retaining all storage: S + W + 2C.
+    /// Both codecs use zstd level 1, window_log(20), and the run's worker count.
+    /// C bounds either encoder (using the larger payload); W already includes
+    /// the bounded Rayon strategy batch. No state snapshot is allocated.
+    /// Overflow means the parallel peak cannot fit a u64 memory limit.
+    pub fn parallel_save_bytes(&self, backend: crate::input::Storage) -> Option<u64> {
+        let storage = match backend {
+            crate::input::Storage::F32 => self.f32_bytes,
+            crate::input::Storage::I16 => self.i16_bytes,
+            crate::input::Storage::I16F32Avg => self.i16_f32avg_bytes,
+        };
+        storage
+            .checked_add(self.save_bytes)?
+            .checked_add(self.compression_bytes.checked_mul(2)?)
+    }
+
     /// Peak of solving/checkpointing and saving after regret release, plus
     /// the conservative streaming compression budget. Arithmetic saturates.
     pub fn required_bytes(&self, backend: crate::input::Storage) -> u64 {

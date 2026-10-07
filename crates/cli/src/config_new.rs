@@ -110,6 +110,11 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
                 "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
             );
         }
+        if line.starts_with("final_checkpoint =") {
+            rendered.push_str(
+                "# P1: save the final resumable state; false keeps only periodic checkpoints.\n",
+            );
+        }
         if line.starts_with("pow4_reset =") {
             rendered.push_str(
                 "# Reset DCFR averages at iterations 4, 16, 64, ...; default false for f32/i16-f32avg.\n\
@@ -160,9 +165,11 @@ mod tests {
                             }
                         }
                         assert!(effective.contains("pow4_reset = false"));
+                        assert!(effective.contains("final_checkpoint = true"));
                         if matches!(template, ConfigTemplate::Full) {
                             assert!(raw.contains("pow4_reset = false"));
                             assert!(raw.contains("omitting pow4_reset defaults to true"));
+                            assert!(raw.contains("false keeps only periodic checkpoints"));
                         }
                         assert_eq!(
                             settings.solver.algorithm,
@@ -171,6 +178,8 @@ mod tests {
                         hu_postflop::input::lower(&document.spot, &settings).unwrap();
                     }
                     ConfigProduct::P2 => {
+                        assert!(!raw.contains("final_checkpoint"));
+                        assert!(!effective.contains("final_checkpoint"));
                         let settings = mw_preflop::input::Settings::parse(
                             &document.spot,
                             &document.solver,
@@ -469,6 +478,7 @@ mod tests {
             "auto",
             "max_time",
             "checkpoint_interval",
+            "final_checkpoint",
             "output",
             "probability_encoding",
             "u16",

@@ -28,6 +28,7 @@ toml = { workspace = true }
 toml_edit = { workspace = true }
 
 [dev-dependencies]
+postcard = { workspace = true }
 nlh = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 rand_chacha = { workspace = true }

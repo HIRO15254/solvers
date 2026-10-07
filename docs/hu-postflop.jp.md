@@ -151,7 +151,7 @@ node selectorとaction labelによる指定はCLI referenceに従う。
 | `progress.jsonl` | iteration、累積elapsed_secs、expl_p0、expl_p1、nash_convを評価境界で追記 |
 | `events.jsonl` | state/checkpoint/stop/notice/failure。seqは0から単調増加 |
 | `run.json` | solve/resume区間終了のsummary |
-| `checkpoint.ckpt` | wall-clock checkpoint_intervalの到達境界と終了時に保存。同じiterationの終了時再保存は省く |
+| `checkpoint.ckpt` | wall-clock checkpoint_intervalの到達境界に保存。終了時は`final_checkpoint = true`（既定）の場合だけ保存。同じiterationの終了時再保存は省く |
 | `solution.sol` | solve/resume区間終了時に保存 |
 
 manifestは`gameKind = "hu-postflop"`、`configSchema = "solvers.nlh/v1"`を記録する。
@@ -177,12 +177,16 @@ JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに�
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
-solve/resumeの区間終了時は最後のcheckpoint → regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由で同じ順序とし、同iterationのcheckpoint再保存を省く場合も解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
+solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + 2C`がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
 
 checkpointは第7節のversion 5で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
+
+`[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
+
+最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。両encoderはlevel 1・1 MiB window・run threadsのzstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。solve開始のmemory見積り式・checkpoint v5・`.sol` v2は変わらない。
 
 `.sol`は`SLVRSOLV` magic、u16 version 2、32-byte config hash、u64 iterationの50-byte headerを持つ。
 多byte値はlittle endian、payloadはzstd圧縮である。
