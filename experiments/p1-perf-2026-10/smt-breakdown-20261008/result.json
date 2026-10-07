@@ -1,0 +1,351 @@
+{
+ "experiment": "smt-breakdown-20261008",
+ "question": "What limits one CFR iteration at the default 32 threads (SMT) after T17 and T18 failed there?",
+ "vm": "GCP c2d-highcpu-32 Spot europe-west4-b (p1perf-7), AMD EPYC 7B13, 16 cores / 32 threads, 2026-10-07T22:28Z..23:02Z",
+ "binary": "zstats: T18 tree (a56e307 + T18 patch) with scripts/zstats_patch.py; diag/diag2: a56e307 (T16) with scripts/diag_patch.py (+ diag2_patch.py)",
+ "diag_bits": {
+  "1": "terminal kernels (eval_cfr)",
+  "2": "regret updates",
+  "4": "strategy-sum accumulation",
+  "8": "showdown own-hand loop",
+  "16": "fold own-hand loop",
+  "32": "opponent passes (add_relaxed_f32)",
+  "64": "52-card merge of a tied group"
+ },
+ "stream_GBps": {
+  "8": {
+   "rmw": [
+    134.4,
+    139.8,
+    140.1
+   ],
+   "read_reduction": [
+    37.2,
+    37.2,
+    37.2
+   ]
+  },
+  "16": {
+   "rmw": [
+    129.4,
+    132.6,
+    133.4
+   ],
+   "read_reduction": [
+    73.5,
+    74.0,
+    74.3
+   ]
+  },
+  "32": {
+   "rmw": [
+    128.1,
+    131.3,
+    132.6
+   ],
+   "read_reduction": [
+    116.4,
+    126.3,
+    125.1
+   ]
+  }
+ },
+ "zstats": {
+  "c_turn2_w300": {
+   "elements": 61463640,
+   "opp_all_zero": 20877087,
+   "own_all_zero": 14341046,
+   "both_all_zero": 32233,
+   "nodes": 234060,
+   "nodes_opp_all_zero": 76162,
+   "nodes_own_all_zero": 64490,
+   "nodes_both_all_zero": 177,
+   "elements_own_hand_zero": 36212281,
+   "elements_own_hand_zero_opp_nonzero": 29605716,
+   "opp_all_zero_fraction": 0.3397,
+   "own_all_zero_fraction": 0.2333,
+   "both_all_zero_fraction": 0.0005,
+   "elements_own_hand_zero_fraction": 0.5892,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.4817
+  },
+  "c_flop1_w25": {
+   "elements": 3523646700,
+   "opp_all_zero": 115689699,
+   "own_all_zero": 31159864,
+   "both_all_zero": 0,
+   "nodes": 3354600,
+   "nodes_opp_all_zero": 117198,
+   "nodes_own_all_zero": 31586,
+   "nodes_both_all_zero": 0,
+   "elements_own_hand_zero": 2266822933,
+   "elements_own_hand_zero_opp_nonzero": 2193199373,
+   "opp_all_zero_fraction": 0.0328,
+   "own_all_zero_fraction": 0.0088,
+   "both_all_zero_fraction": 0.0,
+   "elements_own_hand_zero_fraction": 0.6433,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.6224
+  },
+  "c_flop1_w200": {
+   "elements": 3523646700,
+   "opp_all_zero": 840340679,
+   "own_all_zero": 777712645,
+   "both_all_zero": 102530,
+   "nodes": 3354600,
+   "nodes_opp_all_zero": 825271,
+   "nodes_own_all_zero": 722760,
+   "nodes_both_all_zero": 109,
+   "elements_own_hand_zero": 2338964458,
+   "elements_own_hand_zero_opp_nonzero": 2118782024,
+   "opp_all_zero_fraction": 0.2385,
+   "own_all_zero_fraction": 0.2207,
+   "both_all_zero_fraction": 0.0,
+   "elements_own_hand_zero_fraction": 0.6638,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.6013
+  },
+  "c_flop3_w150": {
+   "elements": 10834732280,
+   "opp_all_zero": 814415880,
+   "own_all_zero": 572673972,
+   "both_all_zero": 689804,
+   "nodes": 9552530,
+   "nodes_opp_all_zero": 709771,
+   "nodes_own_all_zero": 552882,
+   "nodes_both_all_zero": 710,
+   "elements_own_hand_zero": 8405810788,
+   "elements_own_hand_zero_opp_nonzero": 7887904943,
+   "opp_all_zero_fraction": 0.0752,
+   "own_all_zero_fraction": 0.0529,
+   "both_all_zero_fraction": 0.0001,
+   "elements_own_hand_zero_fraction": 0.7758,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.728
+  },
+  "c_gtowb_w100": {
+   "elements": 7915952961,
+   "opp_all_zero": 714402142,
+   "own_all_zero": 414894567,
+   "both_all_zero": 1250408,
+   "nodes": 6880827,
+   "nodes_opp_all_zero": 658927,
+   "nodes_own_all_zero": 408913,
+   "nodes_both_all_zero": 1334,
+   "elements_own_hand_zero": 6153474214,
+   "elements_own_hand_zero_opp_nonzero": 5708887280,
+   "opp_all_zero_fraction": 0.0902,
+   "own_all_zero_fraction": 0.0524,
+   "both_all_zero_fraction": 0.0002,
+   "elements_own_hand_zero_fraction": 0.7774,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.7212
+  },
+  "c_gtowb_w250": {
+   "elements": 13193254935,
+   "opp_all_zero": 2637734413,
+   "own_all_zero": 2008002413,
+   "both_all_zero": 18742951,
+   "nodes": 11468045,
+   "nodes_opp_all_zero": 2378878,
+   "nodes_own_all_zero": 1876713,
+   "nodes_both_all_zero": 18925,
+   "elements_own_hand_zero": 10642462068,
+   "elements_own_hand_zero_opp_nonzero": 9130795746,
+   "opp_all_zero_fraction": 0.1999,
+   "own_all_zero_fraction": 0.1522,
+   "both_all_zero_fraction": 0.0014,
+   "elements_own_hand_zero_fraction": 0.8067,
+   "elements_own_hand_zero_opp_nonzero_fraction": 0.6921
+  }
+ },
+ "diag": {
+  "t32": {
+   "d0": {
+    "secs_per_iter": [
+     0.1732,
+     0.1745
+    ],
+    "vs_d0": 0.0
+   },
+   "d1": {
+    "secs_per_iter": [
+     0.0908,
+     0.0902
+    ],
+    "vs_d0": -0.479
+   },
+   "d2": {
+    "secs_per_iter": [
+     0.1801,
+     0.1742
+    ],
+    "vs_d0": 0.019
+   },
+   "d4": {
+    "secs_per_iter": [
+     0.1655,
+     0.1672
+    ],
+    "vs_d0": -0.043
+   },
+   "d6": {
+    "secs_per_iter": [
+     0.1674,
+     0.1736
+    ],
+    "vs_d0": -0.019
+   },
+   "d7": {
+    "secs_per_iter": [
+     0.0799,
+     0.0768
+    ],
+    "vs_d0": -0.549
+   }
+  },
+  "t16": {
+   "d0": {
+    "secs_per_iter": [
+     0.2028,
+     0.2023
+    ],
+    "vs_d0": 0.0
+   },
+   "d1": {
+    "secs_per_iter": [
+     0.0975,
+     0.0981
+    ],
+    "vs_d0": -0.517
+   },
+   "d2": {
+    "secs_per_iter": [
+     0.2097,
+     0.2093
+    ],
+    "vs_d0": 0.034
+   },
+   "d4": {
+    "secs_per_iter": [
+     0.1951,
+     0.1948
+    ],
+    "vs_d0": -0.038
+   },
+   "d6": {
+    "secs_per_iter": [
+     0.2023,
+     0.2021
+    ],
+    "vs_d0": -0.002
+   },
+   "d7": {
+    "secs_per_iter": [
+     0.0842,
+     0.0836
+    ],
+    "vs_d0": -0.586
+   }
+  }
+ },
+ "diag2": {
+  "t32": {
+   "d6": {
+    "secs_per_iter": [
+     0.171,
+     0.1762
+    ],
+    "vs_d6": 0.0
+   },
+   "d14": {
+    "secs_per_iter": [
+     0.1472,
+     0.1426
+    ],
+    "vs_d6": -0.165
+   },
+   "d22": {
+    "secs_per_iter": [
+     0.1519,
+     0.1522
+    ],
+    "vs_d6": -0.124
+   },
+   "d38": {
+    "secs_per_iter": [
+     0.1348,
+     0.1347
+    ],
+    "vs_d6": -0.224
+   },
+   "d70": {
+    "secs_per_iter": [
+     0.1689,
+     0.1713
+    ],
+    "vs_d6": -0.02
+   },
+   "d30": {
+    "secs_per_iter": [
+     0.1245,
+     0.1244
+    ],
+    "vs_d6": -0.283
+   },
+   "d7": {
+    "secs_per_iter": [
+     0.0757,
+     0.0752
+    ],
+    "vs_d6": -0.565
+   }
+  },
+  "t16": {
+   "d6": {
+    "secs_per_iter": [
+     0.2019,
+     0.2029
+    ],
+    "vs_d6": 0.0
+   },
+   "d14": {
+    "secs_per_iter": [
+     0.1781,
+     0.1781
+    ],
+    "vs_d6": -0.12
+   },
+   "d22": {
+    "secs_per_iter": [
+     0.1812,
+     0.1812
+    ],
+    "vs_d6": -0.105
+   },
+   "d38": {
+    "secs_per_iter": [
+     0.1463,
+     0.1461
+    ],
+    "vs_d6": -0.278
+   },
+   "d70": {
+    "secs_per_iter": [
+     0.201,
+     0.2008
+    ],
+    "vs_d6": -0.007
+   },
+   "d30": {
+    "secs_per_iter": [
+     0.1597,
+     0.1571
+    ],
+    "vs_d6": -0.217
+   },
+   "d7": {
+    "secs_per_iter": [
+     0.0834,
+     0.0834
+    ],
+    "vs_d6": -0.588
+   }
+  }
+ }
+}

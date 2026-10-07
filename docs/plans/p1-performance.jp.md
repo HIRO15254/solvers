@@ -158,6 +158,9 @@ T17（[証拠](../../experiments/p1-perf-2026-10/f32-kernel-ilp-20261008/README.
 64〜86%はreachが0だった（gtow_bで80%、呼出しの半数は90%以上が0）。
 T18（[証拠](../../experiments/p1-perf-2026-10/f32-sparse-reach-20261008/README.md)）: 0の項を飛ばすとkernel単体は実際のreachで0.74〜0.79倍、
 1・16 threadsの1 iterationは約6%短い。既定の32 threadsでは0.1%到達が0.99〜1.06倍で、採らない。出力は従来のf32とbit一致した。
+32 threadsの内訳（[証拠](../../experiments/p1-perf-2026-10/smt-breakdown-20261008/README.md)）: memory帯域は律速でない（RMW約130 GB/sに対しFlop1は約40 GB/s）。
+処理を止めた診断では、終端kernelが1 iterationの約半分を占め、32 threadsではそのうち自身のhandのloop（showdown・fold）が半分以上だった。
+戦略和の加算は約4%、regret更新は差が無い。更新側nodeのstorage要素の58〜81%は自身のhandのreachが0だった。
 T19（[証拠](../../experiments/p1-perf-2026-10/sol-encode-20261008/README.md)）: `compatible_reach`の線形探索を除いても保存時間は変わらず、律速は値blockを1 byteずつ
 serializeする書き手threadだった。EV passのworkerで一括符号化すると、gtow_b（25 iteration）の停止後の保存はtmpfsで20.7→13.8秒になり、payloadはbit一致した。
 pd-balancedでは書込み速度が律速のまま（約45秒）。
