@@ -1,0 +1,134 @@
+   Compiling hu-postflop v0.1.0 (/home/PC_User/t17/crates/hu-postflop)
+    Finished `bench` profile [optimized] target(s) in 8.40s
+     Running benches/kernels.rs (target/release/deps/kernels-9ab5abb719018268)
+Gnuplot not found, using plotters backend
+Benchmarking kernels/fold
+Benchmarking kernels/fold: Warming up for 3.0000 s
+Benchmarking kernels/fold: Collecting 20 samples in estimated 3.0000 s (9.5M iterations)
+Benchmarking kernels/fold: Analyzing
+kernels/fold            time:   [314.04 ns 314.55 ns 315.26 ns]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high severe
+Benchmarking kernels/showdown
+Benchmarking kernels/showdown: Warming up for 3.0000 s
+Benchmarking kernels/showdown: Collecting 20 samples in estimated 3.0000 s (5.1M iterations)
+Benchmarking kernels/showdown: Analyzing
+kernels/showdown        time:   [590.76 ns 591.28 ns 591.91 ns]
+Benchmarking kernels/fold_f32
+Benchmarking kernels/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels/fold_f32: Collecting 20 samples in estimated 3.0000 s (11M iterations)
+Benchmarking kernels/fold_f32: Analyzing
+kernels/fold_f32        time:   [293.33 ns 293.58 ns 293.93 ns]
+Found 3 outliers among 20 measurements (15.00%)
+  3 (15.00%) high severe
+Benchmarking kernels/showdown_f32
+Benchmarking kernels/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels/showdown_f32: Collecting 20 samples in estimated 3.0001 s (6.6M iterations)
+Benchmarking kernels/showdown_f32: Analyzing
+kernels/showdown_f32    time:   [456.44 ns 456.80 ns 457.11 ns]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+
+Benchmarking kernels_wide/fold
+Benchmarking kernels_wide/fold: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold: Collecting 20 samples in estimated 3.0003 s (687k iterations)
+Benchmarking kernels_wide/fold: Analyzing
+kernels_wide/fold       time:   [4.3675 µs 4.3748 µs 4.3804 µs]
+Found 4 outliers among 20 measurements (20.00%)
+  3 (15.00%) low severe
+  1 (5.00%) low mild
+Benchmarking kernels_wide/showdown
+Benchmarking kernels_wide/showdown: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown: Collecting 20 samples in estimated 3.0011 s (365k iterations)
+Benchmarking kernels_wide/showdown: Analyzing
+kernels_wide/showdown   time:   [8.1674 µs 8.1843 µs 8.1976 µs]
+Benchmarking kernels_wide/fold_f32
+Benchmarking kernels_wide/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold_f32: Collecting 20 samples in estimated 3.0005 s (1.1M iterations)
+Benchmarking kernels_wide/fold_f32: Analyzing
+kernels_wide/fold_f32   time:   [2.6069 µs 2.6082 µs 2.6098 µs]
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high mild
+Benchmarking kernels_wide/showdown_f32
+Benchmarking kernels_wide/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown_f32: Collecting 20 samples in estimated 3.0011 s (470k iterations)
+Benchmarking kernels_wide/showdown_f32: Analyzing
+kernels_wide/showdown_f32
+                        time:   [6.4003 µs 6.4216 µs 6.4399 µs]
+
+    Finished `bench` profile [optimized] target(s) in 0.09s
+     Running benches/kernels.rs (target/release/deps/kernels-9ab5abb719018268)
+Gnuplot not found, using plotters backend
+Benchmarking kernels/fold
+Benchmarking kernels/fold: Warming up for 3.0000 s
+Benchmarking kernels/fold: Collecting 20 samples in estimated 3.0000 s (9.6M iterations)
+Benchmarking kernels/fold: Analyzing
+kernels/fold            time:   [312.51 ns 312.72 ns 312.99 ns]
+                        change: [-0.5661% -0.4062% -0.2458%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 2 outliers among 20 measurements (10.00%)
+  2 (10.00%) high mild
+Benchmarking kernels/showdown
+Benchmarking kernels/showdown: Warming up for 3.0000 s
+Benchmarking kernels/showdown: Collecting 20 samples in estimated 3.0001 s (5.0M iterations)
+Benchmarking kernels/showdown: Analyzing
+kernels/showdown        time:   [595.14 ns 595.44 ns 595.67 ns]
+                        change: [+0.5314% +0.6178% +0.7056%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Benchmarking kernels/fold_f32
+Benchmarking kernels/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels/fold_f32: Collecting 20 samples in estimated 3.0001 s (11M iterations)
+Benchmarking kernels/fold_f32: Analyzing
+kernels/fold_f32        time:   [274.21 ns 276.01 ns 279.16 ns]
+                        change: [-5.4050% -4.3375% -3.3388%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Benchmarking kernels/showdown_f32
+Benchmarking kernels/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels/showdown_f32: Collecting 20 samples in estimated 3.0001 s (6.6M iterations)
+Benchmarking kernels/showdown_f32: Analyzing
+kernels/showdown_f32    time:   [455.03 ns 455.36 ns 455.92 ns]
+                        change: [-0.3276% -0.1176% +0.1877%] (p = 0.40 > 0.05)
+                        No change in performance detected.
+Found 4 outliers among 20 measurements (20.00%)
+  3 (15.00%) high mild
+  1 (5.00%) high severe
+
+Benchmarking kernels_wide/fold
+Benchmarking kernels_wide/fold: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold: Collecting 20 samples in estimated 3.0002 s (686k iterations)
+Benchmarking kernels_wide/fold: Analyzing
+kernels_wide/fold       time:   [4.3693 µs 4.3716 µs 4.3733 µs]
+                        change: [-0.3501% -0.1990% -0.0427%] (p = 0.02 < 0.05)
+                        Change within noise threshold.
+Found 4 outliers among 20 measurements (20.00%)
+  3 (15.00%) low mild
+  1 (5.00%) high mild
+Benchmarking kernels_wide/showdown
+Benchmarking kernels_wide/showdown: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown: Collecting 20 samples in estimated 3.0007 s (359k iterations)
+Benchmarking kernels_wide/showdown: Analyzing
+kernels_wide/showdown   time:   [8.8854 µs 8.8890 µs 8.8943 µs]
+                        change: [+8.6673% +8.8574% +9.0396%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 1 outliers among 20 measurements (5.00%)
+  1 (5.00%) high severe
+Benchmarking kernels_wide/fold_f32
+Benchmarking kernels_wide/fold_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/fold_f32: Collecting 20 samples in estimated 3.0004 s (1.1M iterations)
+Benchmarking kernels_wide/fold_f32: Analyzing
+kernels_wide/fold_f32   time:   [2.6108 µs 2.6185 µs 2.6255 µs]
+                        change: [+0.0322% +0.2046% +0.3862%] (p = 0.03 < 0.05)
+                        Change within noise threshold.
+Found 4 outliers among 20 measurements (20.00%)
+  4 (20.00%) high mild
+Benchmarking kernels_wide/showdown_f32
+Benchmarking kernels_wide/showdown_f32: Warming up for 3.0000 s
+Benchmarking kernels_wide/showdown_f32: Collecting 20 samples in estimated 3.0013 s (476k iterations)
+Benchmarking kernels_wide/showdown_f32: Analyzing
+kernels_wide/showdown_f32
+                        time:   [6.3958 µs 6.4063 µs 6.4205 µs]
+                        change: [-0.3105% -0.0630% +0.2037%] (p = 0.64 > 0.05)
+                        No change in performance detected.
+Found 3 outliers among 20 measurements (15.00%)
+  3 (15.00%) high mild
+

@@ -1,0 +1,218 @@
+{
+  "task": "T17",
+  "date": "2026-10-08",
+  "source_revision": "a56e307353e7502b22d5e56011aa7747956bc7f9",
+  "source_state": "Uncommitted changes; baseline contains new bench cases and original HEAD kernels.",
+  "source_sha256_utf8_lf": {
+    "crates/hu-postflop/src/kernel.rs": "62e35886c1fd3645b35fd438e33a3bc589f4f6ab389e4a8265ebb631c1b05bd5",
+    "crates/hu-postflop/benches/kernels.rs": "4aa200419ce5777eedb6965a8035a42ac550da2eb308df796a76ae68deb91d96"
+  },
+  "environment": {
+    "processor_identifier": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+    "host": "x86_64-pc-windows-msvc",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "llvm": "22.1.6",
+    "cargo": "1.97.0 (c980f4866 2026-06-30)",
+    "CARGO_BUILD_JOBS": 2,
+    "CARGO_INCREMENTAL": 0,
+    "rustflags": [
+      "-C",
+      "target-cpu=native"
+    ],
+    "bench_profile": {
+      "lto": "thin",
+      "codegen_units": 1
+    },
+    "machine_load": "Shared with another heavy job; no EPYC measurement."
+  },
+  "binaries": {
+    "baseline": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t17-bench-base.exe",
+      "sha256": "020526dcebf67883f5867236eb7ce8ec26df8e4c2b7cd3edab70a8201c714e25"
+    },
+    "new": {
+      "path": "runs/t17/t17-bench-v4.exe",
+      "sha256": "cf7b8a1be16928e8c9b4e188a5954ce754e0d7f073abb31840f24c9d0fa047b0"
+    }
+  },
+  "method": {
+    "build_command": "cargo bench -p hu-postflop --bench kernels --no-run",
+    "run_command": "<executable> --bench ^<bench-name>$ --noplot",
+    "order_per_bench": [
+      "A",
+      "B",
+      "A",
+      "B",
+      "A",
+      "B"
+    ],
+    "samples": 20,
+    "warmup_seconds": 3,
+    "measurement_seconds": 3,
+    "statistic": "Median of three Criterion median.point_estimate values per executable, in nanoseconds.",
+    "runs_serialized": true,
+    "compilation_and_tests_finished_before_AB": true
+  },
+  "cases": {
+    "kernels": {
+      "board": "Ks 7h 2d Jc 9s",
+      "p0_range": "22+,A2s+,KTo+",
+      "p1_range": "55-22,QJs,A5s-A2s,KQo,T9s"
+    },
+    "kernels_wide": {
+      "board": "2c 7d 9h Js Qs",
+      "live_combos_per_seat": 1081,
+      "weights": "((global_combo * 17 + seat_offset) % 101 + 1) / 103.0; seat_offsets = [3, 11]"
+    },
+    "pot": 20,
+    "effective_stack": 80,
+    "bet_fractions": [
+      0.75,
+      0.75
+    ],
+    "max_raises": 1
+  },
+  "AB_results": [
+    {
+      "bench": "kernels/fold_f32",
+      "baseline_round_medians_ns": [
+        655.1300266886708,
+        694.0008160522273,
+        745.7216361324354
+      ],
+      "new_round_medians_ns": [
+        640.1572764812613,
+        599.0144588397434,
+        613.9448967105961
+      ],
+      "baseline_median_ns": 694.0008160522273,
+      "new_median_ns": 613.9448967105961,
+      "speedup": 1.1303959358088258
+    },
+    {
+      "bench": "kernels/showdown_f32",
+      "baseline_round_medians_ns": [
+        1111.2773858150763,
+        1167.2054467416274,
+        1242.9286745140487
+      ],
+      "new_round_medians_ns": [
+        1213.9741745419758,
+        1039.6264277150249,
+        1055.4389355742296
+      ],
+      "baseline_median_ns": 1167.2054467416274,
+      "new_median_ns": 1055.4389355742296,
+      "speedup": 1.1058957627961576
+    },
+    {
+      "bench": "kernels_wide/fold_f32",
+      "baseline_round_medians_ns": [
+        7391.471725204329,
+        7106.184479762305,
+        6998.928043371119
+      ],
+      "new_round_medians_ns": [
+        6178.613860202715,
+        6197.372448979591,
+        5670.273880980963
+      ],
+      "baseline_median_ns": 7106.184479762305,
+      "new_median_ns": 6178.613860202715,
+      "speedup": 1.1501260056942866
+    },
+    {
+      "bench": "kernels_wide/showdown_f32",
+      "baseline_round_medians_ns": [
+        12454.358559287737,
+        13721.504058042301,
+        13673.57432334636
+      ],
+      "new_round_medians_ns": [
+        12208.088094554503,
+        12680.102328863797,
+        13634.880103359174
+      ],
+      "baseline_median_ns": 13673.57432334636,
+      "new_median_ns": 12680.102328863797,
+      "speedup": 1.0783488940953667
+    }
+  ],
+  "variants": [
+    {
+      "variant": 1,
+      "scheme": "High-card register run sums, padded masked card arrays, untied fast path, separate tied below-add and sparse clear passes.",
+      "pilot_medians_ns": {
+        "kernels/fold_f32": 628.4102394472316,
+        "kernels_wide/showdown_f32": 17302.056751727803,
+        "kernels_wide/fold_f32": 6349.659770114942,
+        "kernels/showdown_f32": 1168.3006349929165
+      },
+      "disposition": "rejected",
+      "reason": "Extra rank-group run/pass bookkeeping; standalone pilots were noisy and did not establish a consistent showdown gain."
+    },
+    {
+      "variant": 2,
+      "scheme": "Variant 1 with four independent lanes for whole-support sums.",
+      "pilot_medians_ns": {
+        "kernels/fold_f32": 622.9917098596047,
+        "kernels/showdown_f32": 1093.7241854740405,
+        "kernels_wide/fold_f32": 5778.910049711138,
+        "kernels_wide/showdown_f32": 15067.12678548856
+      },
+      "disposition": "rejected",
+      "reason": "Extra rank-group run/pass bookkeeping; standalone pilots were noisy and did not establish a consistent showdown gain."
+    },
+    {
+      "variant": 3,
+      "scheme": "Variant 2 with a combined touched-card merge/clear for ties smaller than 16 hands and dense merge/clear otherwise.",
+      "pilot_medians_ns": {
+        "kernels_wide/showdown_f32": 13927.121794871795,
+        "kernels_wide/fold_f32": 6256.4425472443345,
+        "kernels/fold_f32": 644.4422736271752,
+        "kernels/showdown_f32": 1156.7821513837457
+      },
+      "disposition": "rejected",
+      "reason": "Extra rank-group run/pass bookkeeping; standalone pilots were noisy and did not establish a consistent showdown gain."
+    },
+    {
+      "variant": 4,
+      "scheme": "Variant 3 with direct additions inside rank groups instead of register run sums; selected.",
+      "pilot_medians_ns": {
+        "kernels/showdown_f32": 1515.3395727048455,
+        "kernels_wide/fold_f32": 8402.088250266093,
+        "kernels_wide/showdown_f32": 12954.741704374057,
+        "kernels/fold_f32": 633.7835102060328
+      },
+      "disposition": "selected",
+      "reason": "Simpler rank-group loop, positive medians in all four final alternating comparisons."
+    }
+  ],
+  "accuracy": {
+    "test": "f32_synthetic_kernels_close",
+    "baseline_maximum": 8.772814801493133e-07,
+    "new_maximum": 6.176062010357593e-07,
+    "unchanged_threshold": 1e-05,
+    "real_terminal_new_maximum": 8.249051771498866e-07
+  },
+  "verification": {
+    "fmt": "cargo fmt --all --check: passed",
+    "clippy": "cargo clippy -p hu-postflop --all-targets -- -D warnings: passed",
+    "tests": {
+      "command": "cargo test -p hu-postflop -- --nocapture --test-threads=2",
+      "passed": 186,
+      "failed": 0,
+      "ignored": 16,
+      "full_output": "runs/t17/tests.log (local ignored scratch)"
+    },
+    "docs": "python tools/check_docs.py: passed, 23 Markdown files",
+    "smoke": "All eight f64/f32 bench cases passed with --test.",
+    "preserved": "Five f64 kernel/helper function bodies, legacy module, and original synthetic accuracy test match HEAD byte-for-byte after newline normalization.",
+    "determinism": "Existing tests passed for 1 vs 4 threads, all storage backends, and exact saved EV; new scratch-history/dead-hand test passed."
+  },
+  "limitations": [
+    "Standalone variant pilots are not alternating A/B evidence and have substantial timing noise.",
+    "Local final gains are 1.08-1.15x, below the hoped-for 1.3-1.5x.",
+    "No EPYC Milan or end-to-end solve measurement. Full logs and executables are local scratch; compact results are retained here."
+  ]
+}

@@ -1,0 +1,700 @@
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock:ppp (30266 samples, percent: local period)
+--------------------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         : 3     Disassembly of section .text:
+         :
+         : 5     00000000000b5bf0 <hu_engine::storage::normalize_columns_f32>:
+         : 6     hu_engine::storage::normalize_columns_f32:
+         : 506   }
+         : 507   }
+         : 508   }
+         : 509   }
+         :
+         : 511   fn normalize_columns_f32(data: &[f32], r: StorageRef, out: &mut [f32]) {
+    0.00 :   b5bf0:  push   %rbp
+    0.00 :   b5bf1:  mov    %rsp,%rbp
+    0.00 :   b5bf4:  push   %r15
+    0.00 :   b5bf6:  push   %r14
+    0.00 :   b5bf8:  push   %r13
+    0.03 :   b5bfa:  push   %r12
+    0.00 :   b5bfc:  push   %rbx
+    0.00 :   b5bfd:  and    $0xffffffffffffffe0,%rsp
+    0.00 :   b5c01:  sub    $0xd40,%rsp
+    0.01 :   b5c08:  mov    %edx,%eax
+         : 3757  div_ceil():
+    0.00 :   b5c0a:  mov    %ecx,0x1c(%rsp)
+    0.12 :   b5c0e:  shr    $0x8,%eax
+    0.04 :   b5c11:  xor    %ecx,%ecx
+    0.00 :   b5c13:  test   %dl,%dl
+    0.00 :   b5c15:  mov    %r9,0x50(%rsp)
+    0.02 :   b5c1a:  mov    %r8,0x48(%rsp)
+    0.01 :   b5c1f:  mov    %rsi,0x28(%rsp)
+    0.01 :   b5c24:  mov    %rdi,0x40(%rsp)
+    0.03 :   b5c29:  setne  %cl
+         : 3765  hu_engine::storage::normalize_columns_f32:
+    0.01 :   b5c2c:  add    %rax,%rcx
+         : 447   spec_next():
+    0.02 :   b5c2f:  je     b674a <hu_engine::storage::normalize_columns_f32+0xb5a>
+    0.00 :   b5c35:  movzwl 0x1c(%rsp),%eax
+    0.33 :   b5c3a:  vmovss -0x9f31e(%rip),%xmm1        # 16924 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.07 :   b5c42:  mov    %edx,%ebx
+    0.00 :   b5c44:  mov    0x195efd(%rip),%r12        # 24bb48 <memset@GLIBC_2.2.5>
+    0.00 :   b5c4b:  mov    %rbx,%r15
+    0.00 :   b5c4e:  vcvtsi2ss %eax,%xmm15,%xmm0
+    0.15 :   b5c52:  mov    %eax,%edx
+    0.01 :   b5c54:  mov    %rax,0x20(%rsp)
+    0.00 :   b5c59:  mov    0x40(%rsp),%rax
+    0.06 :   b5c5e:  and    $0xffffffe0,%edx
+    0.00 :   b5c61:  mov    %rdx,0x78(%rsp)
+    0.01 :   b5c66:  add    $0xffffffffffffffe0,%rdx
+    0.00 :   b5c6a:  mov    %rdx,0x80(%rsp)
+    0.03 :   b5c72:  vdivss %xmm0,%xmm1,%xmm4
+    0.43 :   b5c76:  vmovq  %rbx,%xmm0
+    0.00 :   b5c7b:  vpbroadcastq %xmm0,%ymm0
+    0.00 :   b5c80:  lea    0x60(%rax),%rsi
+    0.01 :   b5c84:  add    $0x20,%rax
+    0.00 :   b5c88:  vmovdqa %ymm0,0x260(%rsp)
+    0.00 :   b5c91:  vmovsd 0x28(%rsp),%xmm0
+    0.02 :   b5c97:  mov    %rax,0x60(%rsp)
+    0.00 :   b5c9c:  mov    0x48(%rsp),%rax
+    0.10 :   b5ca1:  mov    %rsi,0x68(%rsp)
+    0.01 :   b5ca6:  add    $0x20,%rax
+    0.00 :   b5caa:  mov    %rax,0x58(%rsp)
+    0.00 :   b5caf:  xor    %eax,%eax
+    0.00 :   b5cb1:  vbroadcastsd %xmm0,%ymm0
+    0.01 :   b5cb6:  vbroadcastss %xmm4,%ymm5
+    0.00 :   b5cbb:  vmovaps %xmm4,0x90(%rsp)
+    0.00 :   b5cc4:  vmovaps %ymm0,0x240(%rsp)
+    0.04 :   b5ccd:  vmovaps %ymm5,0x1c0(%rsp)
+    0.01 :   b5cd6:  jmp    b5d3a <hu_engine::storage::normalize_columns_f32+0x14a>
+    0.00 :   b5cd8:  nopl   0x0(%rax,%rax,1)
+    0.00 :   b5ce0:  mov    0x30(%rsp),%rax
+    0.02 :   b5ce5:  mov    0x88(%rsp),%rcx
+    0.05 :   b5ced:  addq   $0x400,0x68(%rsp)
+    0.02 :   b5cf6:  addq   $0x400,0x40(%rsp)
+    0.01 :   b5cff:  addq   $0x400,0x60(%rsp)
+    0.02 :   b5d08:  addq   $0x400,0x58(%rsp)
+    0.03 :   b5d11:  addq   $0x400,0x48(%rsp)
+    0.02 :   b5d1a:  mov    0x195e27(%rip),%r12        # 24bb48 <memset@GLIBC_2.2.5>
+    0.03 :   b5d21:  add    $0xffffffffffffff00,%r15
+    0.02 :   b5d28:  add    $0x100,%rax
+    0.04 :   b5d2e:  dec    %rcx
+    0.01 :   b5d31:  test   %rcx,%rcx
+    0.00 :   b5d34:  je     b674a <hu_engine::storage::normalize_columns_f32+0xb5a>
+         : 493   hu_engine::storage::normalize_columns_f32:
+         : 514   // CFR f32: f32 positive sums, then one reciprocal per hand.
+         : 515   const BLOCK: usize = 256;
+         : 516   let uniform = 1.0 / num_actions as f32;
+         : 517   for first in (0..num_hands).step_by(BLOCK) {
+         : 518   let len = BLOCK.min(num_hands - first);
+         : 519   let mut totals = [0.0f32; BLOCK];
+    0.00 :   b5d3a:  cmp    $0x1,%r15
+    0.01 :   b5d3e:  mov    %r15,%r13
+    0.00 :   b5d41:  mov    %rax,0x30(%rsp)
+    0.02 :   b5d46:  mov    $0x100,%eax
+    0.00 :   b5d4b:  mov    $0x400,%edx
+    0.02 :   b5d50:  lea    0x528(%rsp),%rdi
+    0.08 :   b5d58:  mov    %rcx,0x88(%rsp)
+    0.01 :   b5d60:  adc    $0x0,%r13
+    0.02 :   b5d64:  cmp    $0x100,%r13
+    0.00 :   b5d6b:  cmovae %rax,%r13
+    0.00 :   b5d6f:  mov    %r13d,%r14d
+    0.00 :   b5d72:  and    $0x1fc,%r14d
+    0.00 :   b5d79:  cmp    $0x100,%r15
+    0.01 :   b5d80:  cmovb  %r15,%rax
+    0.07 :   b5d84:  xor    %esi,%esi
+    0.00 :   b5d86:  mov    %rax,0x70(%rsp)
+    0.01 :   b5d8b:  vzeroupper
+    0.01 :   b5d8e:  call   *%r12
+    0.00 :   b5d91:  mov    0x30(%rsp),%r11
+         : 513   let len = BLOCK.min(num_hands - first);
+    0.00 :   b5d96:  mov    %rbx,%rax
+    0.00 :   b5d99:  mov    $0x100,%ecx
+    0.00 :   b5d9e:  sub    %r11,%rax
+         : 514   min<usize>():
+    0.03 :   b5da1:  cmp    $0x100,%rax
+    0.06 :   b5da7:  cmovae %rcx,%rax
+    0.00 :   b5dab:  cmpw   $0x0,0x1c(%rsp)
+    0.01 :   b5db1:  mov    %rax,0x38(%rsp)
+         : 1081  hu_engine::storage::normalize_columns_f32:
+    0.01 :   b5db6:  je     b5de0 <hu_engine::storage::normalize_columns_f32+0x1f0>
+    0.00 :   b5db8:  cmp    %r11,%rbx
+    0.01 :   b5dbb:  jne    b5e40 <hu_engine::storage::normalize_columns_f32+0x250>
+    0.00 :   b5dc1:  cmpw   $0x80,0x1c(%rsp)
+    0.00 :   b5dc8:  mov    0x70(%rsp),%r12
+    0.00 :   b5dcd:  jae    b5ff9 <hu_engine::storage::normalize_columns_f32+0x409>
+         : 1051  checked_sub():
+    0.00 :   b5dd3:  xor    %ecx,%ecx
+    0.00 :   b5dd5:  jmp    b6441 <hu_engine::storage::normalize_columns_f32+0x851>
+         : 1051  hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5dda:  nopw   0x0(%rax,%rax,1)
+    0.00 :   b5de0:  mov    $0x400,%edx
+    0.00 :   b5de5:  lea    0x928(%rsp),%rdi
+    0.00 :   b5ded:  xor    %esi,%esi
+    0.00 :   b5def:  call   *%r12
+    0.00 :   b5df2:  vmovss -0x9f4d6(%rip),%xmm2        # 16924 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.00 :   b5dfa:  vmovaps 0x90(%rsp),%xmm4
+    0.00 :   b5e03:  vmovaps 0x1c0(%rsp),%ymm5
+    0.00 :   b5e0c:  vbroadcastss -0x9f4f1(%rip),%ymm3        # 16924 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.00 :   b5e15:  vxorps %xmm6,%xmm6,%xmm6
+    0.00 :   b5e19:  vpxor  %xmm7,%xmm7,%xmm7
+    0.00 :   b5e1d:  vpxor  %xmm8,%xmm8,%xmm8
+    0.00 :   b5e22:  cmp    0x30(%rsp),%rbx
+         : 305   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.00 :   b5e27:  je     b5ce0 <hu_engine::storage::normalize_columns_f32+0xf0>
+    0.00 :   b5e2d:  jmp    b6500 <hu_engine::storage::normalize_columns_f32+0x910>
+         : 306   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5e32:  data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.02 :   b5e40:  mov    0x40(%rsp),%r8
+    0.02 :   b5e45:  mov    0x68(%rsp),%r9
+    0.04 :   b5e4a:  mov    0x70(%rsp),%r12
+    0.04 :   b5e4f:  mov    %r13d,%eax
+    0.00 :   b5e52:  mov    %r13d,%ecx
+    0.00 :   b5e55:  mov    %r13d,%edx
+    0.00 :   b5e58:  and    $0x1e0,%eax
+    0.00 :   b5e5d:  and    $0x1e0,%ecx
+    0.00 :   b5e63:  and    $0x1fc,%edx
+    0.01 :   b5e69:  xor    %r10d,%r10d
+    0.03 :   b5e6c:  vxorps %xmm4,%xmm4,%xmm4
+    0.07 :   b5e70:  vxorps %xmm5,%xmm5,%xmm5
+    0.00 :   b5e74:  vxorps %xmm6,%xmm6,%xmm6
+    0.00 :   b5e78:  jmp    b5e9c <hu_engine::storage::normalize_columns_f32+0x2ac>
+    0.00 :   b5e7a:  nopw   0x0(%rax,%rax,1)
+    0.01 :   b5e80:  lea    0x0(,%rbx,4),%rsi
+    0.03 :   b5e88:  inc    %r10
+         : 325   spec_next<usize>():
+    0.02 :   b5e8b:  add    %rsi,%r9
+    0.06 :   b5e8e:  add    %rsi,%r8
+         : 902   hu_engine::storage::normalize_columns_f32:
+    0.04 :   b5e91:  cmp    0x20(%rsp),%r10
+         : 1917  spec_next<usize>():
+    0.05 :   b5e96:  je     b6477 <hu_engine::storage::normalize_columns_f32+0x887>
+         : 901   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5e9c:  mov    0x38(%rsp),%rsi
+         : 516   for a in 0..num_actions {
+         : 517   let row = &data[a * num_hands + first..a * num_hands + first + len];
+    0.05 :   b5ea1:  mov    %r10,%rdi
+    0.01 :   b5ea4:  imul   %rbx,%rdi
+    0.02 :   b5ea8:  add    %r11,%rdi
+    0.08 :   b5eab:  add    %rdi,%rsi
+    0.05 :   b5eae:  cmp    0x28(%rsp),%rsi
+         : 523   checked_sub():
+    0.04 :   b5eb3:  ja     b6797 <hu_engine::storage::normalize_columns_f32+0xba7>
+         : 1051  hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5eb9:  cmp    $0x4,%r15
+    0.05 :   b5ebd:  jae    b5ed0 <hu_engine::storage::normalize_columns_f32+0x2e0>
+         : 305   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.00 :   b5ebf:  xor    %esi,%esi
+    0.00 :   b5ec1:  jmp    b5fd0 <hu_engine::storage::normalize_columns_f32+0x3e0>
+    0.00 :   b5ec6:  cs nopw 0x0(%rax,%rax,1)
+    0.03 :   b5ed0:  cmp    $0x20,%r15
+    0.05 :   b5ed4:  jae    b5ee0 <hu_engine::storage::normalize_columns_f32+0x2f0>
+    0.00 :   b5ed6:  xor    %edi,%edi
+    0.00 :   b5ed8:  jmp    b5f90 <hu_engine::storage::normalize_columns_f32+0x3a0>
+         : 310   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5edd:  nopl   (%rax)
+    0.00 :   b5ee0:  xor    %esi,%esi
+    0.03 :   b5ee2:  data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 517   for (total, &value) in totals[..len].iter_mut().zip(row) {
+    0.01 :   b5ef0:  vmovups -0x60(%r9,%rsi,4),%ymm0
+   16.12 :   b5ef7:  vmovups -0x40(%r9,%rsi,4),%ymm1
+   10.46 :   b5efe:  vmovups -0x20(%r9,%rsi,4),%ymm2
+   10.38 :   b5f05:  vmovups (%r9,%rsi,4),%ymm3
+   11.05 :   b5f0b:  vmaxps %ymm6,%ymm0,%ymm0
+         : 1052  max():
+    0.53 :   b5f0f:  vmaxps %ymm6,%ymm1,%ymm1
+    0.53 :   b5f13:  vmaxps %ymm6,%ymm2,%ymm2
+    0.77 :   b5f17:  vmaxps %ymm6,%ymm3,%ymm3
+         : 1054  hu_engine::storage::normalize_columns_f32:
+         : 518   *total += value.max(0.0);
+    0.87 :   b5f1b:  vaddps 0x528(%rsp,%rsi,4),%ymm0,%ymm0
+    0.95 :   b5f24:  vaddps 0x548(%rsp,%rsi,4),%ymm1,%ymm1
+    0.97 :   b5f2d:  vaddps 0x568(%rsp,%rsi,4),%ymm2,%ymm2
+    1.01 :   b5f36:  vaddps 0x588(%rsp,%rsi,4),%ymm3,%ymm3
+    1.19 :   b5f3f:  vmovups %ymm0,0x528(%rsp,%rsi,4)
+    0.38 :   b5f48:  vmovups %ymm1,0x548(%rsp,%rsi,4)
+    0.48 :   b5f51:  vmovups %ymm2,0x568(%rsp,%rsi,4)
+    0.64 :   b5f5a:  vmovups %ymm3,0x588(%rsp,%rsi,4)
+         : 527   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.61 :   b5f63:  add    $0x20,%rsi
+    0.12 :   b5f67:  cmp    %rsi,%rax
+    0.17 :   b5f6a:  jne    b5ef0 <hu_engine::storage::normalize_columns_f32+0x300>
+    0.00 :   b5f6c:  cmp    %rcx,%r13
+    0.04 :   b5f6f:  je     b5e80 <hu_engine::storage::normalize_columns_f32+0x290>
+         : 308   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5f75:  mov    %rcx,%rdi
+    0.03 :   b5f78:  mov    %rcx,%rsi
+    0.01 :   b5f7b:  test   $0x1c,%r13b
+    0.02 :   b5f7f:  je     b5fd0 <hu_engine::storage::normalize_columns_f32+0x3e0>
+    0.01 :   b5f81:  data16 data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 517   for (total, &value) in totals[..len].iter_mut().zip(row) {
+    0.03 :   b5f90:  vmovups (%r8,%rdi,4),%xmm0
+         : 519   max():
+    1.60 :   b5f96:  vmaxps %xmm5,%xmm0,%xmm0
+         : 1052  hu_engine::storage::normalize_columns_f32:
+         : 518   *total += value.max(0.0);
+    0.21 :   b5f9a:  vaddps 0x528(%rsp,%rdi,4),%xmm0,%xmm0
+    0.45 :   b5fa3:  vmovups %xmm0,0x528(%rsp,%rdi,4)
+         : 521   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.25 :   b5fac:  add    $0x4,%rdi
+    0.09 :   b5fb0:  cmp    %rdi,%r14
+    0.09 :   b5fb3:  jne    b5f90 <hu_engine::storage::normalize_columns_f32+0x3a0>
+    0.00 :   b5fb5:  mov    %rdx,%rsi
+    0.00 :   b5fb8:  cmp    %rdx,%r13
+    0.02 :   b5fbb:  je     b5e80 <hu_engine::storage::normalize_columns_f32+0x290>
+         : 309   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5fc1:  data16 data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 517   for (total, &value) in totals[..len].iter_mut().zip(row) {
+    0.00 :   b5fd0:  vmovss (%r8,%rsi,4),%xmm0
+         : 519   max():
+    0.06 :   b5fd6:  vmaxss %xmm4,%xmm0,%xmm0
+         : 1052  hu_engine::storage::normalize_columns_f32:
+         : 518   *total += value.max(0.0);
+    0.05 :   b5fda:  vaddss 0x528(%rsp,%rsi,4),%xmm0,%xmm0
+    0.12 :   b5fe3:  vmovss %xmm0,0x528(%rsp,%rsi,4)
+         : 521   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.07 :   b5fec:  inc    %rsi
+    0.04 :   b5fef:  cmp    %rsi,%r13
+    0.04 :   b5ff2:  jne    b5fd0 <hu_engine::storage::normalize_columns_f32+0x3e0>
+    0.00 :   b5ff4:  jmp    b5e80 <hu_engine::storage::normalize_columns_f32+0x290>
+         : 307   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b5ff9:  vmovsd 0x38(%rsp),%xmm1
+    0.00 :   b5fff:  vmovaps -0x658e7(%rip),%ymm4        # 50720 <anon.91a0cb0676d70bbb60d721a980762f11.1589.llvm.14638686124532110308+0x60>
+    0.00 :   b6007:  vmovdqa -0x65aaf(%rip),%ymm2        # 50560 <anon.fdeb6c5f296ed8eccda7480b1dc5c5ff.74.llvm.12454684531821468198+0x358>
+    0.00 :   b600f:  vmovdqa -0x658b7(%rip),%ymm5        # 50760 <anon.91a0cb0676d70bbb60d721a980762f11.1589.llvm.14638686124532110308+0xa0>
+    0.00 :   b6017:  vmovdqa -0x65b5f(%rip),%ymm13        # 504c0 <anon.fdeb6c5f296ed8eccda7480b1dc5c5ff.74.llvm.12454684531821468198+0x2b8>
+    0.00 :   b601f:  vmovdqa -0x65c67(%rip),%ymm6        # 503c0 <anon.fdeb6c5f296ed8eccda7480b1dc5c5ff.74.llvm.12454684531821468198+0x1b8>
+    0.00 :   b6027:  vmovdqa -0x65c2f(%rip),%ymm7        # 50400 <anon.fdeb6c5f296ed8eccda7480b1dc5c5ff.74.llvm.12454684531821468198+0x1f8>
+    0.00 :   b602f:  vmovdqa -0x65b97(%rip),%ymm8        # 504a0 <anon.fdeb6c5f296ed8eccda7480b1dc5c5ff.74.llvm.12454684531821468198+0x298>
+    0.00 :   b6037:  vmovdqa -0x6595f(%rip),%ymm9        # 506e0 <anon.91a0cb0676d70bbb60d721a980762f11.1589.llvm.14638686124532110308+0x20>
+    0.00 :   b603f:  vmovq  %r11,%xmm0
+    0.00 :   b6044:  mov    0x80(%rsp),%rax
+    0.00 :   b604c:  vpbroadcastq %xmm0,%ymm0
+    0.00 :   b6051:  vmovdqa %ymm0,0x2a0(%rsp)
+    0.00 :   b605a:  vbroadcastsd %xmm1,%ymm0
+    0.00 :   b605f:  vmovaps %ymm4,0x1a0(%rsp)
+    0.00 :   b6068:  vmovdqa %ymm2,%ymm4
+    0.00 :   b606c:  vmovaps %ymm0,0x280(%rsp)
+    0.00 :   b6075:  data16 cs nopw 0x0(%rax,%rax,1)
+    0.00 :   b6080:  vmovdqa 0x260(%rsp),%ymm0
+         : 516   let row = &data[a * num_hands + first..a * num_hands + first + len];
+    0.00 :   b6089:  vpsrlq $0x20,%ymm9,%ymm10
+    0.00 :   b608f:  vpsrlq $0x20,%ymm13,%ymm15
+    0.00 :   b6095:  vmovdqa %ymm4,0x300(%rsp)
+    0.00 :   b609e:  vmovdqa %ymm13,0x2c0(%rsp)
+    0.00 :   b60a7:  vmovdqa %ymm5,0x2e0(%rsp)
+    0.00 :   b60b0:  vpsrlq $0x20,%ymm0,%ymm11
+    0.00 :   b60b5:  vpmuludq %ymm0,%ymm10,%ymm10
+    0.00 :   b60b9:  vpsrlq $0x20,%ymm0,%ymm14
+    0.00 :   b60be:  vpmuludq %ymm0,%ymm15,%ymm15
+    0.00 :   b60c2:  vpmuludq %ymm11,%ymm9,%ymm12
+    0.00 :   b60c7:  vpmuludq %ymm14,%ymm13,%ymm14
+    0.00 :   b60cc:  vpmuludq %ymm4,%ymm11,%ymm11
+    0.00 :   b60d0:  vpaddq %ymm10,%ymm12,%ymm10
+    0.00 :   b60d5:  vpsrlq $0x20,%ymm0,%ymm12
+    0.00 :   b60da:  vpaddq %ymm15,%ymm14,%ymm14
+    0.00 :   b60df:  vpsrlq $0x20,%ymm4,%ymm15
+    0.00 :   b60e4:  vpsllq $0x20,%ymm10,%ymm1
+    0.00 :   b60ea:  vpsrlq $0x20,%ymm8,%ymm10
+    0.00 :   b60f0:  vpmuludq %ymm12,%ymm8,%ymm12
+    0.00 :   b60f5:  vpmuludq %ymm0,%ymm15,%ymm15
+    0.00 :   b60f9:  vpmuludq %ymm0,%ymm10,%ymm10
+    0.00 :   b60fd:  vmovdqa %ymm1,0x180(%rsp)
+    0.00 :   b6106:  vpmuludq %ymm0,%ymm9,%ymm1
+    0.00 :   b610a:  vpaddq %ymm15,%ymm11,%ymm11
+    0.00 :   b610f:  vpmuludq %ymm0,%ymm4,%ymm15
+    0.00 :   b6113:  vmovdqa 0x2a0(%rsp),%ymm4
+    0.00 :   b611c:  vpaddq %ymm10,%ymm12,%ymm10
+    0.00 :   b6121:  vpsrlq $0x20,%ymm0,%ymm12
+    0.00 :   b6126:  vmovdqa %ymm1,0x160(%rsp)
+    0.00 :   b612f:  vpmuludq %ymm0,%ymm8,%ymm1
+    0.00 :   b6133:  vpsllq $0x20,%ymm11,%ymm11
+    0.00 :   b6139:  vpsllq $0x20,%ymm10,%ymm3
+    0.00 :   b613f:  vpsrlq $0x20,%ymm7,%ymm10
+    0.00 :   b6144:  vpmuludq %ymm7,%ymm12,%ymm12
+    0.00 :   b6148:  vpmuludq %ymm0,%ymm10,%ymm10
+    0.00 :   b614c:  vmovdqa %ymm1,0x140(%rsp)
+    0.00 :   b6155:  vpmuludq %ymm0,%ymm7,%ymm1
+    0.00 :   b6159:  vpaddq %ymm10,%ymm12,%ymm10
+    0.00 :   b615e:  vpsrlq $0x20,%ymm0,%ymm12
+    0.00 :   b6163:  vpsllq $0x20,%ymm10,%ymm2
+    0.00 :   b6169:  vpsrlq $0x20,%ymm6,%ymm10
+    0.00 :   b616e:  vpmuludq %ymm6,%ymm12,%ymm12
+    0.00 :   b6172:  vmovdqa %ymm1,0x120(%rsp)
+    0.00 :   b617b:  vpmuludq %ymm0,%ymm10,%ymm10
+    0.00 :   b617f:  vpaddq %ymm4,%ymm15,%ymm15
+    0.00 :   b6183:  vpaddq %ymm11,%ymm15,%ymm15
+    0.00 :   b6188:  vpaddq %ymm10,%ymm12,%ymm10
+    0.00 :   b618d:  vpsrlq $0x20,%ymm0,%ymm12
+    0.00 :   b6192:  vpsllq $0x20,%ymm10,%ymm1
+    0.00 :   b6198:  vpsrlq $0x20,%ymm5,%ymm10
+    0.00 :   b619d:  vmovdqa %ymm1,0x100(%rsp)
+    0.00 :   b61a6:  vpmuludq %ymm0,%ymm6,%ymm1
+    0.00 :   b61aa:  vpmuludq %ymm0,%ymm10,%ymm10
+    0.00 :   b61ae:  vmovdqa %ymm1,0xe0(%rsp)
+    0.00 :   b61b7:  vpsllq $0x20,%ymm14,%ymm1
+    0.00 :   b61bd:  vpsrlq $0x20,%ymm0,%ymm14
+    0.00 :   b61c2:  vmovdqa %ymm1,0xc0(%rsp)
+    0.00 :   b61cb:  vpmuludq %ymm0,%ymm13,%ymm1
+    0.00 :   b61cf:  vpmuludq %ymm5,%ymm14,%ymm14
+    0.00 :   b61d3:  vmovdqa %ymm1,0xa0(%rsp)
+    0.00 :   b61dc:  vmovdqa 0x1a0(%rsp),%ymm1
+    0.00 :   b61e5:  vpaddq %ymm10,%ymm14,%ymm10
+    0.00 :   b61ea:  vpmuludq %ymm0,%ymm5,%ymm14
+    0.00 :   b61ee:  vmovdqa 0x280(%rsp),%ymm5
+    0.00 :   b61f7:  vpsllq $0x20,%ymm10,%ymm10
+    0.00 :   b61fd:  vpaddq %ymm4,%ymm14,%ymm11
+    0.00 :   b6201:  vpaddq %ymm10,%ymm11,%ymm11
+    0.00 :   b6206:  vpsrlq $0x20,%ymm1,%ymm13
+    0.00 :   b620b:  vpmuludq %ymm1,%ymm12,%ymm12
+    0.00 :   b620f:  vpmuludq %ymm0,%ymm13,%ymm13
+    0.00 :   b6213:  vpaddq %ymm13,%ymm12,%ymm12
+    0.00 :   b6218:  vpmuludq %ymm0,%ymm1,%ymm13
+    0.00 :   b621c:  vpsllq $0x20,%ymm12,%ymm12
+    0.00 :   b6222:  vpaddq %ymm4,%ymm13,%ymm10
+    0.00 :   b6226:  vpaddq %ymm12,%ymm10,%ymm12
+    0.00 :   b622b:  vpaddq 0xa0(%rsp),%ymm4,%ymm10
+    0.00 :   b6234:  vpaddq 0xc0(%rsp),%ymm10,%ymm0
+    0.00 :   b623d:  vpaddq 0xe0(%rsp),%ymm4,%ymm10
+    0.00 :   b6246:  vmovdqa %ymm12,0xa0(%rsp)
+    0.00 :   b624f:  vpaddq %ymm5,%ymm12,%ymm14
+    0.00 :   b6253:  vmovdqa %ymm11,0xc0(%rsp)
+    0.00 :   b625c:  vpaddq %ymm5,%ymm11,%ymm12
+    0.00 :   b6260:  vpaddq %ymm5,%ymm15,%ymm11
+    0.00 :   b6264:  vmovdqa %ymm15,0xe0(%rsp)
+    0.00 :   b626d:  vpaddq 0x100(%rsp),%ymm10,%ymm1
+    0.00 :   b6276:  vpaddq 0x120(%rsp),%ymm4,%ymm10
+    0.00 :   b627f:  vmovdqa %ymm0,0x220(%rsp)
+    0.00 :   b6288:  vpaddq %ymm5,%ymm0,%ymm0
+    0.00 :   b628c:  vpaddq %ymm2,%ymm10,%ymm2
+    0.00 :   b6290:  vpaddq 0x140(%rsp),%ymm4,%ymm10
+    0.00 :   b6299:  vmovdqa %ymm11,0x140(%rsp)
+    0.00 :   b62a2:  vmovdqa %ymm1,0x200(%rsp)
+    0.00 :   b62ab:  vmovdqa %ymm2,0x1e0(%rsp)
+    0.00 :   b62b4:  vpaddq %ymm3,%ymm10,%ymm3
+    0.00 :   b62b8:  vpaddq 0x160(%rsp),%ymm4,%ymm10
+    0.00 :   b62c1:  vmovdqa %ymm12,0x160(%rsp)
+    0.00 :   b62ca:  vpaddq 0x180(%rsp),%ymm10,%ymm4
+    0.00 :   b62d3:  vpbroadcastq -0x6618c(%rip),%ymm10        # 50150 <anon.91a0cb0676d70bbb60d721a980762f11.746.llvm.14638686124532110308+0x20>
+    0.00 :   b62dc:  vmovdqa %ymm14,0x180(%rsp)
+    0.00 :   b62e5:  vpaddq %ymm5,%ymm3,%ymm15
+    0.00 :   b62e9:  vpxor  %ymm10,%ymm11,%ymm13
+    0.00 :   b62ee:  vpxor  0x240(%rsp),%ymm10,%ymm11
+    0.00 :   b62f7:  vpxor  %ymm10,%ymm12,%ymm12
+    0.00 :   b62fc:  vpcmpgtq %ymm11,%ymm13,%ymm13
+    0.00 :   b6301:  vpcmpgtq %ymm11,%ymm12,%ymm12
+    0.00 :   b6306:  vpackssdw %ymm12,%ymm13,%ymm12
+    0.00 :   b630b:  vpxor  %ymm10,%ymm14,%ymm13
+    0.00 :   b6310:  vpxor  %ymm0,%ymm10,%ymm14
+    0.00 :   b6314:  vpcmpgtq %ymm11,%ymm13,%ymm13
+    0.00 :   b6319:  vpcmpgtq %ymm11,%ymm14,%ymm14
+    0.00 :   b631e:  vpermq $0xd8,%ymm12,%ymm12
+    0.00 :   b6324:  vpackssdw %ymm14,%ymm13,%ymm13
+    0.00 :   b6329:  vpaddq %ymm5,%ymm2,%ymm14
+    0.00 :   b632d:  vmovdqa %ymm3,%ymm2
+    0.00 :   b6331:  vmovdqa %ymm4,%ymm3
+    0.00 :   b6335:  vpermq $0xd8,%ymm13,%ymm13
+    0.00 :   b633b:  vmovdqa %ymm14,0x100(%rsp)
+    0.00 :   b6344:  vpxor  %ymm10,%ymm14,%ymm14
+    0.00 :   b6349:  vpcmpgtq %ymm11,%ymm14,%ymm14
+    0.00 :   b634e:  vpackssdw %ymm13,%ymm12,%ymm12
+    0.00 :   b6353:  vpaddq %ymm5,%ymm1,%ymm13
+    0.00 :   b6357:  vpaddq %ymm5,%ymm4,%ymm1
+    0.00 :   b635b:  vmovdqa 0x2e0(%rsp),%ymm5
+    0.00 :   b6364:  vmovdqa 0x300(%rsp),%ymm4
+    0.00 :   b636d:  vmovdqa %ymm13,0x120(%rsp)
+    0.00 :   b6376:  vpxor  %ymm10,%ymm13,%ymm13
+    0.00 :   b637b:  vpcmpgtq %ymm11,%ymm13,%ymm13
+    0.00 :   b6380:  vpackssdw %ymm14,%ymm13,%ymm14
+    0.00 :   b6385:  vpxor  %ymm10,%ymm15,%ymm13
+    0.00 :   b638a:  vpxor  %ymm1,%ymm10,%ymm10
+    0.00 :   b638e:  vpcmpgtq %ymm11,%ymm13,%ymm13
+    0.00 :   b6393:  vpcmpgtq %ymm11,%ymm10,%ymm10
+    0.00 :   b6398:  vpermq $0xd8,%ymm12,%ymm11
+    0.00 :   b639e:  vpermq $0xd8,%ymm14,%ymm12
+    0.00 :   b63a4:  vpackssdw %ymm10,%ymm13,%ymm10
+    0.00 :   b63a9:  vmovdqa 0x2c0(%rsp),%ymm13
+    0.00 :   b63b2:  vpermq $0xd8,%ymm10,%ymm10
+    0.00 :   b63b8:  vpackssdw %ymm10,%ymm12,%ymm10
+    0.00 :   b63bd:  vpermq $0xd8,%ymm10,%ymm10
+    0.00 :   b63c3:  vpacksswb %ymm10,%ymm11,%ymm10
+    0.00 :   b63c8:  vpmovmskb %ymm10,%ecx
+    0.00 :   b63cd:  test   %ecx,%ecx
+         : 659   spec_next<usize>():
+    0.00 :   b63cf:  jne    b641d <hu_engine::storage::normalize_columns_f32+0x82d>
+    0.00 :   b63d1:  vpbroadcastq -0x662a2(%rip),%ymm11        # 50138 <anon.91a0cb0676d70bbb60d721a980762f11.746.llvm.14638686124532110308+0x8>
+    0.00 :   b63da:  vmovdqa 0x1a0(%rsp),%ymm12
+    0.00 :   b63e3:  vpaddq %ymm11,%ymm12,%ymm12
+    0.00 :   b63e8:  vpaddq %ymm4,%ymm11,%ymm4
+    0.00 :   b63ec:  vpaddq %ymm5,%ymm11,%ymm5
+    0.00 :   b63f0:  vpaddq %ymm11,%ymm13,%ymm13
+    0.00 :   b63f5:  vpaddq %ymm6,%ymm11,%ymm6
+    0.00 :   b63f9:  vpaddq %ymm7,%ymm11,%ymm7
+    0.00 :   b63fd:  vpaddq %ymm11,%ymm8,%ymm8
+    0.00 :   b6402:  vpaddq %ymm11,%ymm9,%ymm9
+    0.00 :   b6407:  vmovdqa %ymm12,0x1a0(%rsp)
+    0.00 :   b6410:  test   %rax,%rax
+    0.00 :   b6413:  lea    -0x20(%rax),%rax
+    0.00 :   b6417:  jne    b6080 <hu_engine::storage::normalize_columns_f32+0x490>
+    0.00 :   b641d:  vmovdqa %ymm0,%ymm4
+    0.00 :   b6421:  vpermq $0xd8,%ymm10,%ymm0
+    0.00 :   b6427:  vpmovmskb %ymm0,%eax
+    0.00 :   b642b:  test   %eax,%eax
+    0.00 :   b642d:  jne    b67d4 <hu_engine::storage::normalize_columns_f32+0xbe4>
+    0.00 :   b6433:  mov    0x78(%rsp),%rax
+    0.00 :   b6438:  mov    %rax,%rcx
+    0.00 :   b643b:  cmp    0x20(%rsp),%eax
+    0.00 :   b643f:  je     b6477 <hu_engine::storage::normalize_columns_f32+0x887>
+         : 924   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b6441:  mov    0x20(%rsp),%rax
+         : 926   checked_sub():
+    0.00 :   b6446:  mov    %rbx,%rdi
+    0.00 :   b6449:  imul   %rcx,%rdi
+    0.00 :   b644d:  add    %r11,%rdi
+    0.00 :   b6450:  sub    %rcx,%rax
+    0.00 :   b6453:  data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.00 :   b6460:  lea    (%r12,%rdi,1),%rcx
+    0.00 :   b6464:  cmp    0x28(%rsp),%rcx
+    0.00 :   b6469:  ja     b6784 <hu_engine::storage::normalize_columns_f32+0xb94>
+         : 1058  lt():
+    0.00 :   b646f:  add    %rbx,%rdi
+    0.00 :   b6472:  dec    %rax
+         : 1918  spec_next<usize>():
+    0.00 :   b6475:  jne    b6460 <hu_engine::storage::normalize_columns_f32+0x870>
+         : 901   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b6477:  mov    $0x400,%edx
+    0.01 :   b647c:  lea    0x928(%rsp),%rdi
+    0.02 :   b6484:  xor    %esi,%esi
+    0.01 :   b6486:  vzeroupper
+    0.02 :   b6489:  call   *0x1956b9(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+    0.00 :   b648f:  vmovss -0x9fb73(%rip),%xmm2        # 16924 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.03 :   b6497:  vmovaps 0x90(%rsp),%xmm4
+    0.01 :   b64a0:  vmovaps 0x1c0(%rsp),%ymm5
+    0.03 :   b64a9:  vbroadcastss -0x9fb8e(%rip),%ymm3        # 16924 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.08 :   b64b2:  mov    0x20(%rsp),%rax
+    0.06 :   b64b7:  vpxor  %xmm8,%xmm8,%xmm8
+    0.00 :   b64bc:  vpxor  %xmm7,%xmm7,%xmm7
+    0.00 :   b64c0:  vxorps %xmm6,%xmm6,%xmm6
+    0.00 :   b64c4:  mov    %rbx,%rdi
+         : 916   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.00 :   b64c7:  cmp    0x30(%rsp),%rbx
+    0.01 :   b64cc:  jne    b6500 <hu_engine::storage::normalize_columns_f32+0x910>
+         : 306   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b64ce:  xchg   %ax,%ax
+    0.00 :   b64d0:  lea    (%r12,%rdi,1),%rcx
+    0.00 :   b64d4:  cmp    0x28(%rsp),%rcx
+    0.00 :   b64d9:  ja     b675c <hu_engine::storage::normalize_columns_f32+0xb6c>
+    0.00 :   b64df:  cmp    0x50(%rsp),%rcx
+         : 452   index_mut<f32>():
+    0.00 :   b64e4:  ja     b67ac <hu_engine::storage::normalize_columns_f32+0xbbc>
+         : 452   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b64ea:  add    %rbx,%rdi
+         : 1917  lt():
+    0.00 :   b64ed:  dec    %rax
+         : 1917  hu_engine::storage::normalize_columns_f32:
+    0.00 :   b64f0:  jne    b64d0 <hu_engine::storage::normalize_columns_f32+0x8e0>
+         : 901   spec_next<usize>():
+    0.00 :   b64f2:  jmp    b5ce0 <hu_engine::storage::normalize_columns_f32+0xf0>
+         : 901   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.00 :   b64f7:  nopw   0x0(%rax,%rax,1)
+    0.00 :   b6500:  cmp    $0x8,%r15
+    0.01 :   b6504:  jae    b6510 <hu_engine::storage::normalize_columns_f32+0x920>
+         : 306   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b6506:  xor    %eax,%eax
+    0.00 :   b6508:  jmp    b6565 <hu_engine::storage::normalize_columns_f32+0x975>
+    0.00 :   b650a:  nopw   0x0(%rax,%rax,1)
+    0.00 :   b6510:  mov    %r13d,%ecx
+    0.04 :   b6513:  mov    %r13d,%eax
+    0.05 :   b6516:  and    $0x1f8,%ecx
+    0.00 :   b651c:  and    $0x1f8,%eax
+    0.00 :   b6521:  xor    %edx,%edx
+    0.00 :   b6523:  data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 522   }
+         : 523   }
+         : 524   let mut inverses = [0.0f32; BLOCK];
+         : 525   for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
+    0.00 :   b6530:  vmovups 0x528(%rsp,%rdx,4),%ymm0
+         : 523   *inverse = if total > 0.0 { total.recip() } else { 0.0 };
+    0.19 :   b6539:  vcmpltps %ymm0,%ymm8,%ymm1
+    0.19 :   b653e:  vdivps %ymm0,%ymm3,%ymm0
+    8.53 :   b6542:  vandps %ymm0,%ymm1,%ymm0
+    0.33 :   b6546:  vmovups %ymm0,0x928(%rsp,%rdx,4)
+         : 528   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.62 :   b654f:  add    $0x8,%rdx
+    0.10 :   b6553:  cmp    %rdx,%rcx
+    0.08 :   b6556:  jne    b6530 <hu_engine::storage::normalize_columns_f32+0x940>
+    0.00 :   b6558:  nopl   0x0(%rax,%rax,1)
+    0.00 :   b6560:  cmp    %rax,%r13
+    0.01 :   b6563:  je     b658d <hu_engine::storage::normalize_columns_f32+0x99d>
+         : 309   hu_engine::storage::normalize_columns_f32:
+         : 522   for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
+    0.00 :   b6565:  vmovss 0x528(%rsp,%rax,4),%xmm1
+    0.04 :   b656e:  vxorps %xmm0,%xmm0,%xmm0
+         : 523   *inverse = if total > 0.0 { total.recip() } else { 0.0 };
+    0.08 :   b6572:  vucomiss %xmm0,%xmm1
+    0.14 :   b6576:  jbe    b657c <hu_engine::storage::normalize_columns_f32+0x98c>
+    0.22 :   b6578:  vdivss %xmm1,%xmm2,%xmm0
+    0.79 :   b657c:  vmovss %xmm0,0x928(%rsp,%rax,4)
+    0.19 :   b6585:  inc    %rax
+         : 529   next<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>():
+    0.00 :   b6588:  cmp    %rax,%r13
+    0.00 :   b658b:  jne    b6565 <hu_engine::storage::normalize_columns_f32+0x975>
+         : 306   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b658d:  cmpw   $0x0,0x1c(%rsp)
+         : 308   spec_next<usize>():
+    0.02 :   b6593:  je     b5ce0 <hu_engine::storage::normalize_columns_f32+0xf0>
+    0.05 :   b6599:  mov    0x48(%rsp),%r8
+    0.02 :   b659e:  mov    0x40(%rsp),%r9
+    0.02 :   b65a3:  mov    0x58(%rsp),%r10
+    0.03 :   b65a8:  mov    0x60(%rsp),%r11
+    0.00 :   b65ad:  mov    %r13d,%eax
+    0.00 :   b65b0:  mov    %r13d,%ecx
+    0.00 :   b65b3:  mov    %r13d,%edx
+    0.00 :   b65b6:  and    $0x1f0,%eax
+    0.07 :   b65bb:  and    $0x1f0,%ecx
+    0.03 :   b65c1:  and    $0x1fc,%edx
+    0.02 :   b65c7:  xor    %r12d,%r12d
+    0.03 :   b65ca:  jmp    b65f2 <hu_engine::storage::normalize_columns_f32+0xa02>
+    0.00 :   b65cc:  nopl   0x0(%rax)
+    0.00 :   b65d0:  lea    0x0(,%rbx,4),%rsi
+    0.07 :   b65d8:  inc    %r12
+    0.02 :   b65db:  add    %rsi,%r11
+    0.03 :   b65de:  add    %rsi,%r10
+    0.02 :   b65e1:  add    %rsi,%r9
+    0.02 :   b65e4:  add    %rsi,%r8
+         : 920   lt():
+    0.03 :   b65e7:  cmp    0x20(%rsp),%r12
+         : 1917  spec_next<usize>():
+    0.01 :   b65ec:  je     b5ce0 <hu_engine::storage::normalize_columns_f32+0xf0>
+         : 901   hu_engine::storage::normalize_columns_f32:
+         : 526   }
+         : 527   for a in 0..num_actions {
+         : 528   let row = &data[a * num_hands + first..a * num_hands + first + len];
+    0.00 :   b65f2:  mov    %r12,%rdi
+    0.05 :   b65f5:  imul   %rbx,%rdi
+    0.07 :   b65f9:  add    0x30(%rsp),%rdi
+    0.07 :   b65fe:  mov    0x38(%rsp),%rsi
+    0.14 :   b6603:  add    %rdi,%rsi
+    0.04 :   b6606:  cmp    0x28(%rsp),%rsi
+    0.04 :   b660b:  ja     b676f <hu_engine::storage::normalize_columns_f32+0xb7f>
+         : 536   index_mut<f32>():
+    0.00 :   b6611:  cmp    0x50(%rsp),%rsi
+    0.07 :   b6616:  ja     b67bf <hu_engine::storage::normalize_columns_f32+0xbcf>
+         : 453   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b661c:  cmp    $0x4,%r15
+         : 534   .iter_mut()
+         : 535   .zip(row)
+         : 536   .zip(&totals[..len])
+         : 537   .zip(&inverses[..len])
+         : 538   {
+         : 539   *dst = if total > 0.0 {
+    0.00 :   b6620:  jae    b6630 <hu_engine::storage::normalize_columns_f32+0xa40>
+    0.00 :   b6622:  xor    %esi,%esi
+    0.00 :   b6624:  jmp    b6722 <hu_engine::storage::normalize_columns_f32+0xb32>
+    0.00 :   b6629:  nopl   0x0(%rax)
+    0.00 :   b6630:  cmp    $0x10,%r15
+    0.07 :   b6634:  jae    b6640 <hu_engine::storage::normalize_columns_f32+0xa50>
+    0.00 :   b6636:  xor    %edi,%edi
+    0.00 :   b6638:  jmp    b66d0 <hu_engine::storage::normalize_columns_f32+0xae0>
+    0.00 :   b663d:  nopl   (%rax)
+    0.00 :   b6640:  xor    %esi,%esi
+    0.07 :   b6642:  data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.02 :   b6650:  vcmpltps 0x528(%rsp,%rsi,4),%ymm8,%ymm0
+    2.03 :   b665a:  vcmpltps 0x548(%rsp,%rsi,4),%ymm8,%ymm1
+         : 528   for (((dst, &value), &total), &inverse) in dst
+    2.03 :   b6664:  vmaskmovps -0x20(%r11,%rsi,4),%ymm0,%ymm2
+    1.41 :   b666b:  vmaskmovps (%r11,%rsi,4),%ymm1,%ymm3
+    1.60 :   b6671:  vmaxps %ymm8,%ymm2,%ymm2
+         : 1052  max():
+    0.59 :   b6676:  vmaxps %ymm8,%ymm3,%ymm3
+         : 1052  hu_engine::storage::normalize_columns_f32:
+         : 535   value.max(0.0) * inverse
+    0.80 :   b667b:  vmulps 0x928(%rsp,%rsi,4),%ymm2,%ymm2
+    7.07 :   b6684:  vmulps 0x948(%rsp,%rsi,4),%ymm3,%ymm3
+    4.00 :   b668d:  vblendvps %ymm0,%ymm2,%ymm5,%ymm0
+    0.37 :   b6693:  vblendvps %ymm1,%ymm3,%ymm5,%ymm1
+         : 534   *dst = if total > 0.0 {
+    0.53 :   b6699:  vmovups %ymm0,-0x20(%r10,%rsi,4)
+    0.60 :   b66a0:  vmovups %ymm1,(%r10,%rsi,4)
+    0.78 :   b66a6:  add    $0x10,%rsi
+         : 309   next<core::iter::adapters::zip::Zip<core::iter::adapters::zip::Zip<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>():
+    0.07 :   b66aa:  cmp    %rsi,%rax
+    0.11 :   b66ad:  jne    b6650 <hu_engine::storage::normalize_columns_f32+0xa60>
+    0.00 :   b66af:  cmp    %rcx,%r13
+    0.11 :   b66b2:  je     b65d0 <hu_engine::storage::normalize_columns_f32+0x9e0>
+         : 308   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b66b8:  mov    %rcx,%rdi
+    0.05 :   b66bb:  mov    %rcx,%rsi
+    0.01 :   b66be:  test   $0xc,%r13b
+    0.03 :   b66c2:  je     b6722 <hu_engine::storage::normalize_columns_f32+0xb32>
+    0.00 :   b66c4:  data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.00 :   b66d0:  vcmpltps 0x528(%rsp,%rdi,4),%xmm7,%xmm0
+         : 528   for (((dst, &value), &total), &inverse) in dst
+    0.05 :   b66da:  vmaskmovps (%r9,%rdi,4),%xmm0,%xmm1
+         : 530   max():
+    0.03 :   b66e0:  vmaxps %xmm7,%xmm1,%xmm1
+         : 1052  hu_engine::storage::normalize_columns_f32:
+         : 535   value.max(0.0) * inverse
+    0.05 :   b66e4:  vmulps 0x928(%rsp,%rdi,4),%xmm1,%xmm1
+    0.34 :   b66ed:  vblendvps %xmm0,%xmm1,%xmm5,%xmm0
+         : 534   *dst = if total > 0.0 {
+    0.07 :   b66f3:  vmovups %xmm0,(%r8,%rdi,4)
+         : 536   next<core::iter::adapters::zip::Zip<core::iter::adapters::zip::Zip<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>():
+    0.04 :   b66f9:  add    $0x4,%rdi
+    0.01 :   b66fd:  cmp    %rdi,%r14
+    0.01 :   b6700:  jne    b66d0 <hu_engine::storage::normalize_columns_f32+0xae0>
+    0.01 :   b6702:  mov    %rdx,%rsi
+    0.00 :   b6705:  cmp    %rdx,%r13
+    0.00 :   b6708:  jne    b6722 <hu_engine::storage::normalize_columns_f32+0xb32>
+    0.00 :   b670a:  jmp    b65d0 <hu_engine::storage::normalize_columns_f32+0x9e0>
+         : 310   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b670f:  nop
+    0.02 :   b6710:  vmovss %xmm0,(%r8,%rsi,4)
+    0.06 :   b6716:  inc    %rsi
+         : 536   next<core::iter::adapters::zip::Zip<core::iter::adapters::zip::Zip<core::slice::iter::IterMut<f32>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>, core::slice::iter::Iter<f32>>():
+    0.00 :   b6719:  cmp    %rsi,%r13
+    0.01 :   b671c:  je     b65d0 <hu_engine::storage::normalize_columns_f32+0x9e0>
+         : 306   hu_engine::storage::normalize_columns_f32:
+         : 528   for (((dst, &value), &total), &inverse) in dst
+    0.00 :   b6722:  vmovss 0x528(%rsp,%rsi,4),%xmm0
+         : 534   *dst = if total > 0.0 {
+    0.03 :   b672b:  vucomiss %xmm6,%xmm0
+    0.12 :   b672f:  vmovaps %xmm4,%xmm0
+    0.03 :   b6733:  jbe    b6710 <hu_engine::storage::normalize_columns_f32+0xb20>
+         : 528   for (((dst, &value), &total), &inverse) in dst
+    0.09 :   b6735:  vmovss (%r9,%rsi,4),%xmm0
+         : 530   max():
+    0.03 :   b673b:  vmaxss %xmm6,%xmm0,%xmm0
+         : 1052  hu_engine::storage::normalize_columns_f32:
+         : 535   value.max(0.0) * inverse
+    0.00 :   b673f:  vmulss 0x928(%rsp,%rsi,4),%xmm0,%xmm0
+    0.12 :   b6748:  jmp    b6710 <hu_engine::storage::normalize_columns_f32+0xb20>
+         : 542   uniform
+         : 543   };
+         : 544   }
+         : 545   }
+         : 546   }
+         : 547   }
+    0.00 :   b674a:  lea    -0x28(%rbp),%rsp
+    0.01 :   b674e:  pop    %rbx
+    0.03 :   b674f:  pop    %r12
+    0.01 :   b6751:  pop    %r13
+    0.01 :   b6753:  pop    %r14
+    0.03 :   b6755:  pop    %r15
+    0.03 :   b6757:  pop    %rbp
+    0.02 :   b6758:  vzeroupper
+    0.01 :   b675b:  ret
+    0.00 :   b675c:  cmp    $0x100,%r15
+         : 444   index<f32>():
+    0.00 :   b6763:  mov    $0x100,%esi
+    0.00 :   b6768:  cmovb  %r15,%rsi
+    0.00 :   b676c:  add    %rdi,%rsi
+    0.00 :   b676f:  mov    0x28(%rsp),%rdx
+    0.00 :   b6774:  lea    0x18bfa5(%rip),%rcx        # 242720 <anon.b9b0f6540b114da495e1727a310e585d.80.llvm.3851074823628847784+0x30>
+    0.00 :   b677b:  vzeroupper
+    0.00 :   b677e:  call   *0x195334(%rip)        # 24bab8 <_DYNAMIC+0x2c8>
+         : 450   hu_engine::storage::normalize_columns_f32:
+    0.00 :   b6784:  cmp    $0x100,%r15
+         : 444   index<f32>():

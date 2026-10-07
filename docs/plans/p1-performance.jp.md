@@ -70,6 +70,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T14 | PF9: 最後のcheckpointと`.sol`の並行書き出し（並行中の見積りS＋W＋2Cが上限以下のとき）と`[run] final_checkpoint` | 並行と直列、新旧で`.sol` payload・checkpoint stateが一致。falseで最後のcheckpointを書かず、`.sol`は一致。旧runの再開 |
 | T15 | PF10: `check_every = "auto"`の適応的な評価間隔。再開時はprogressから評価履歴を復元する | 整数の明示と旧版がbit一致。targetの無いautoが旧版と一致。autoで再開と一度に解いたrunの評価iteration・停止・stateが一致 |
 | T16 | 64 MiB以上のstorage arenaを確保時にrun poolで並列にprefaultし、最初のiterationでのzero page上のcopy-on-writeをなくす | `.sol` payload・checkpoint arena・progressが変更前とbit一致 |
+| T17 | f32終端kernelの依存chainを独立した累積器で短くし、同順位groupの52要素処理を減らす試作（mergeしない） | 32 threadsで0.1%到達が速いこと（不成立のため不採用） |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -150,6 +151,9 @@ Turn6・target 1% potでは、autoが評価7回・184 iterationで止まった�
 T14〜T16のGCP受入（[証拠](../../experiments/p1-perf-2026-10/accept-t14-t16-20261008/README.md)、32 threads）: gtow_bのprocess全体はT13の625.6秒から572.0秒、
 最後のcheckpointを省くと496.0秒になった。T16で確保直後の3 iterationが10.7→3.7秒、T15で停止までの時間が固定25の463.1→449.1秒（他の木は0.93〜0.98倍）、
 T14で停止後の保存が145.2→123.0秒（diskの書込み律速）。`.sol`生成中は`compatible_reach`の線形探索が25%を占めた。
+T17（[証拠](../../experiments/p1-perf-2026-10/f32-kernel-ilp-20261008/README.md)）: f32 kernelの依存chainを4本の累積器で短くすると、1・16 threadsでは1 iterationが約5%短いが、
+既定にあたる32 threads（SMT）では2〜3%長く、採らない。待ち時間はSMTの相方threadが既に埋めている。評価された終端でも、kernelが走査する相手handの
+64〜86%はreachが0だった（gtow_bで80%、呼出しの半数は90%以上が0）。
 
 ### 一致の定義
 

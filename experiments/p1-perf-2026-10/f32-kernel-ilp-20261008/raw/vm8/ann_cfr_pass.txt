@@ -1,0 +1,1500 @@
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock:ppp (131732 samples, percent: local period)
+---------------------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         : 3      Disassembly of section .text:
+         :
+         : 5      0000000000128a70 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>:
+         : 6      hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 655    /// the root buffer from scratch, chance/action parallel rows come from fresh
+         : 656    /// scratch buffers, each own-action CFV row is visited once, and the reused
+         : 657    /// sequential opponent-action buffer is cleared before every child. This
+         : 658    /// lets zero-opponent-reach terminals leave `out` untouched.
+         : 659    #[allow(clippy::too_many_arguments)]
+         : 660    fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+    0.02 :   128a70: push   %rbp
+    0.01 :   128a71: push   %r15
+    0.02 :   128a73: push   %r14
+    0.01 :   128a75: push   %r13
+    0.02 :   128a77: push   %r12
+    0.02 :   128a79: push   %rbx
+    0.03 :   128a7a: sub    $0x218,%rsp
+         : 669    ) {
+         : 670    debug_assert!(
+         : 671    out.iter().all(|&x| x == 0.0),
+         : 672    "CFR output must start at zero"
+         : 673    );
+         : 674    let node = *ctx.tree.node(node_id);
+    0.00 :   128a81: mov    0x10(%rdi),%rax
+    0.11 :   128a85: mov    %rdx,0x30(%rsp)
+    0.04 :   128a8a: mov    %rsi,%rdx
+    0.00 :   128a8d: mov    %rdi,0xd0(%rsp)
+         : 293    }
+         : 294    }
+         : 295    }
+         :
+         : 297    pub fn node(&self, id: NodeId) -> &Node {
+         : 298    &self.nodes[id as usize]
+    0.03 :   128a95: mov    %ecx,%r14d
+    0.00 :   128a98: mov    0x10(%rax),%rsi
+    0.19 :   128a9c: cmp    %r14,%rsi
+         : 273    index<hu_engine::tree::Node>():
+    0.01 :   128a9f: jbe    12bfe1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3571>
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128aa5: mov    0x270(%rsp),%ebp
+         : 275    index<hu_engine::tree::Node, usize, alloc::alloc::Global>():
+    0.00 :   128aac: mov    %rax,0x20(%rsp)
+         : 277    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   128ab1: mov    0x8(%rax),%rax
+         : 615    index<hu_engine::tree::Node>():
+    0.01 :   128ab5: lea    (%r14,%r14,2),%r13
+    0.00 :   128ab9: mov    %ecx,%r12d
+    0.00 :   128abc: mov    0x258(%rsp),%r10
+    0.00 :   128ac4: mov    %r9,0x40(%rsp)
+    0.02 :   128ac9: mov    %r8,0x48(%rsp)
+         : 277    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.02 :   128ace: mov    0x8(%rax,%r13,4),%ecx
+         : 670    index<hu_engine::tree::Node>():
+    0.35 :   128ad3: lea    (%rax,%r13,4),%r15
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128ad7: mov    %ecx,0x108(%rsp)
+    0.00 :   128ade: mov    (%rax,%r13,4),%rax
+    0.04 :   128ae2: mov    %rax,0x100(%rsp)
+         : 670    match node.kind {
+    0.00 :   128aea: movzbl 0x10a(%rsp),%eax
+    0.16 :   128af2: test   %eax,%eax
+    0.01 :   128af4: je     128b3a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xca>
+    0.00 :   128af6: cmp    $0x1,%eax
+    0.02 :   128af9: jne    128cc6 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x256>
+    0.00 :   128aff: mov    $0xffffffffffffff90,%rax
+    0.00 :   128b06: cmp    $0x1,%ebp
+         : 2473   saturating_sub():
+    0.00 :   128b09: mov    %ebp,%ebx
+    0.00 :   128b0b: mov    %r15,0xc0(%rsp)
+    0.00 :   128b13: adc    $0xffffffff,%ebx
+    0.00 :   128b16: mov    %ebx,0x5c(%rsp)
+         : 2476   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128b1a: mov    %fs:(%rax),%rax
+         : 342    /// is better than `Registry::current().num_threads()` because it
+         : 343    /// avoids incrementing the `Arc`.
+         : 344    pub(super) fn current_num_threads() -> usize {
+         : 345    unsafe {
+         : 346    let worker_thread = WorkerThread::current();
+         : 347    if worker_thread.is_null() {
+    0.00 :   128b1e: test   %rax,%rax
+         : 349    current_num_threads():
+    0.00 :   128b21: je     128e9f <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x42f>
+         : 343    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128b27: add    $0x110,%rax
+         : 442    as_ref<alloc::sync::ArcInner<rayon_core::registry::Registry>>():
+    0.00 :   128b2d: test   %ebp,%ebp
+         : 442    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 681    NodeKind::Chance => {
+         : 682    // `chance_depth` bounds how many chance-node crossings remain
+         : 683    // eligible for fan-out, so it decrements here regardless of
+         : 684    // whether this particular node ends up parallelizing.
+         : 685    let child_budget = par_budget.saturating_sub(1);
+         : 686    if rayon::current_num_threads() > 1
+    0.00 :   128b2f: jne    128eb5 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x445>
+    0.00 :   128b35: jmp    128ee3 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x473>
+    0.00 :   128b3a: mov    0xd0(%rsp),%rcx
+         : 78     }
+         : 79     }
+         :
+         : 81     /// One of the two players. The engine is intentionally heads-up only; this
+         : 82     /// type makes every N=2 assumption explicit and greppable.
+         : 83     #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+    0.12 :   128b42: movzbl 0x10b(%rsp),%eax
+         : 85     eq():
+    0.00 :   128b4a: mov    %r15,0xc0(%rsp)
+    0.00 :   128b52: cmp    0x28(%rcx),%al
+         : 80     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 798    scratch.put(opp_next);
+         : 799    scratch.put(my_next);
+         : 800    }
+         : 801    }
+         : 802    }
+         : 803    NodeKind::Action if node.player == ctx.p => {
+    0.04 :   128b55: jne    128d44 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x2d4>
+    0.00 :   128b5b: mov    %rdx,%r10
+    0.00 :   128b5e: mov    0x20(%rsp),%rdx
+         : 306    pub fn deal(&self, node: &Node, child_pos: usize) -> &Deal {
+         : 307    &self.deals[node.aux as usize + child_pos]
+         : 308    }
+         :
+         : 310    pub fn storage_ref(&self, node: &Node) -> StorageRef {
+         : 311    self.storage_refs[node.aux as usize]
+    0.00 :   128b63: mov    0x104(%rsp),%edi
+         : 313    storage_ref():
+    0.00 :   128b6a: mov    %r12d,0xe0(%rsp)
+         : 307    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128b72: mov    0x40(%rdx),%rsi
+    0.03 :   128b76: cmp    %rdi,%rsi
+         : 273    index<hu_engine::storage::StorageRef>():
+    0.00 :   128b79: jbe    12bff1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3581>
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128b7f: mov    0x38(%rdx),%rax
+         : 615    index<hu_engine::storage::StorageRef>():
+    0.01 :   128b83: lea    (%rdi,%rdi,2),%rcx
+         : 273    storage_ref():
+    0.00 :   128b87: movzwl 0x16(%rax,%rcx,8),%esi
+    0.10 :   128b8c: mov    0x8(%rax,%rcx,8),%r9d
+    0.01 :   128b91: mov    (%rax,%rcx,8),%rdi
+    0.01 :   128b95: movzwl 0x10(%rax,%rcx,8),%r8d
+    0.00 :   128b9b: mov    0xc(%rax,%rcx,8),%r12d
+    0.00 :   128ba0: mov    %si,0x174(%rsp)
+         : 312    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 800    let sref = ctx.tree.storage_ref(&node);
+         : 801    let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
+    0.00 :   128ba8: mov    %r9d,%ebx
+    0.00 :   128bab: mov    %r8w,0x160(%rsp)
+    0.00 :   128bb4: mov    %r9d,0x50(%rsp)
+    0.00 :   128bb9: mov    %rdi,0x118(%rsp)
+         : 806    storage_ref():
+    0.01 :   128bc1: mov    0x12(%rax,%rcx,8),%eax
+         : 307    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 814    // slot along with its element range.
+         : 815    let own_span = StorageSpan {
+         : 816    start: sref.offset,
+         : 817    end: sref.offset + sref.len(),
+         : 818    sref_start: sref.index,
+         : 819    sref_end: sref.index + 1,
+    0.00 :   128bc5: lea    0x1(%r12),%ecx
+         : 800    let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
+    0.00 :   128bca: mov    %rbx,0x120(%rsp)
+         : 817    };
+         : 818    let mut views =
+         : 819    ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
+    0.00 :   128bd2: mov    %rdi,0x68(%rsp)
+         : 821    storage_ref():
+    0.00 :   128bd7: mov    %eax,0x170(%rsp)
+         : 307    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 800    let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
+    0.00 :   128bde: movzwl %r8w,%eax
+    0.00 :   128be2: mov    %rax,0xc8(%rsp)
+         : 161    pub index: u32,
+         : 162    }
+         :
+         : 164    impl StorageRef {
+         : 165    pub fn len(&self) -> usize {
+         : 166    self.num_actions as usize * self.num_hands as usize
+    0.00 :   128bea: imul   %rbx,%rax
+         : 168    len():
+    0.00 :   128bee: mov    %rax,0xd8(%rsp)
+         : 162    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 812    end: sref.offset + sref.len(),
+    0.01 :   128bf6: add    %rdi,%rax
+         : 817    ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
+    0.00 :   128bf9: mov    %rax,0x70(%rsp)
+    0.00 :   128bfe: mov    %r12d,0x78(%rsp)
+    0.00 :   128c03: mov    %ecx,0x7c(%rsp)
+    0.00 :   128c07: movq   $0x1,0x60(%rsp)
+    0.00 :   128c10: mov    0xe0(%rsp),%ecx
+    0.00 :   128c17: lea    0x188(%rsp),%rdi
+    0.00 :   128c1f: lea    0x60(%rsp),%r8
+    0.00 :   128c24: mov    %r10,%rsi
+    0.00 :   128c27: mov    %ebp,%r9d
+    0.00 :   128c2a: call   159080 <<hu_engine::solver::ActionViews<hu_engine::storage::F32View>>::split_for>
+    0.00 :   128c2f: mov    0x30(%rsp),%rcx
+    0.00 :   128c34: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.01 :   128c38: test   %rax,%rax
+    0.00 :   128c3b: je     129671 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xc01>
+    0.00 :   128c41: dec    %rax
+    0.00 :   128c44: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128c48: lea    (%rax,%rax,2),%rax
+    0.00 :   128c4c: mov    0x8(%rcx),%rcx
+    0.00 :   128c50: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.02 :   128c55: vmovaps %xmm0,0x60(%rsp)
+    0.01 :   128c5b: mov    0xd8(%rsp),%rdx
+         : 1735   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   128c63: movq   $0x0,0x70(%rsp)
+    0.00 :   128c6c: test   %rdx,%rdx
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   128c6f: je     12969d <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xc2d>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128c75: cmp    0x60(%rsp),%rdx
+    0.02 :   128c7a: ja     12bbf5 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3185>
+    0.00 :   128c80: xor    %r14d,%r14d
+    0.00 :   128c83: mov    0x68(%rsp),%r15
+    0.00 :   128c88: lea    (%r15,%r14,4),%rdi
+    0.00 :   128c8c: cmp    $0x1,%rdx
+    0.00 :   128c90: je     128cb8 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x248>
+         : 901    spec_next<usize>():
+    0.00 :   128c92: lea    -0x4(,%rdx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128c9a: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   128c9c: call   *0x122ea6(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+    0.01 :   128ca2: mov    0xd8(%rsp),%rcx
+         : 1935   spec_next<usize>():
+    0.00 :   128caa: lea    (%r14,%rcx,1),%rax
+    0.00 :   128cae: lea    -0x1(%r14,%rcx,1),%r14
+    0.00 :   128cb3: lea    -0x4(%r15,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128cb8: inc    %r14
+    0.01 :   128cbb: movl   $0x0,(%rdi)
+         : 1934   write<f32>():
+    0.02 :   128cc1: jmp    1296a0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xc30>
+         : 1934   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128cc6: mov    0x260(%rsp),%r9
+    0.01 :   128cce: lea    0x0(,%r10,4),%rax
+         : 315    all<f32, hu_engine::solver::cfr_pass::{closure_env#0}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>():
+    0.00 :   128cd6: xor    %ecx,%ecx
+    0.00 :   128cd8: vxorps %xmm0,%xmm0,%xmm0
+    0.00 :   128cdc: nopl   0x0(%rax)
+         : 317    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.09 :   128ce0: cmp    %rcx,%rax
+    0.06 :   128ce3: je     12ba7a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x300a>
+         : 181    all<f32, hu_engine::solver::cfr_pass::{closure_env#0}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>():
+    0.00 :   128ce9: mov    0x250(%rsp),%rdx
+    0.04 :   128cf1: vmovss (%rdx,%rcx,1),%xmm1
+    0.21 :   128cf6: add    $0x4,%rcx
+         : 318    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 672    if !PRUNE || !opp_reach.iter().all(|&x| x == 0.0) {
+    0.00 :   128cfa: vucomiss %xmm0,%xmm1
+         : 674    all<f32, hu_engine::solver::cfr_pass::{closure_env#0}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>():
+    0.67 :   128cfe: jne    128d02 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x292>
+    3.63 :   128d00: jnp    128ce0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x270>
+         : 317    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.03 :   128d02: mov    0xd0(%rsp),%rax
+         : 673    ctx.evaluator.eval_cfr(node.aux, ctx.p, opp_reach, out);
+    0.13 :   128d0a: mov    0x104(%rsp),%esi
+    0.02 :   128d11: mov    0x18(%rax),%rdi
+    0.04 :   128d15: movzbl 0x28(%rax),%edx
+         : 444    impl TerminalEvaluator for PostflopEvaluator {
+         : 445    fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+         : 446    self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
+         : 447    }
+         : 448    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+         : 449    self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
+    0.00 :   128d19: movzbl 0x108(%rdi),%eax
+         : 451    eval_cfr():
+    0.10 :   128d20: mov    0x250(%rsp),%rcx
+    0.00 :   128d28: mov    %r10,%r8
+    0.00 :   128d2b: push   %rax
+    0.00 :   128d2c: push   0x270(%rsp)
+    0.00 :   128d33: call   d3880 <<hu_postflop::postflop::PostflopEvaluator>::eval_with_kernel>
+    0.01 :   128d38: add    $0x228,%rsp
+    0.01 :   128d3f: jmp    12ba81 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3011>
+         : 451    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128d44: mov    0x20(%rsp),%r13
+    0.00 :   128d49: mov    0x104(%rsp),%edi
+         : 307    storage_ref():
+    0.01 :   128d50: mov    %rdx,0x18(%rsp)
+         : 307    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128d55: mov    0x40(%r13),%rsi
+    0.00 :   128d59: cmp    %rdi,%rsi
+         : 273    index<hu_engine::storage::StorageRef>():
+    0.00 :   128d5c: jbe    12bffe <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x358e>
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128d62: mov    0x38(%r13),%rax
+         : 615    index<hu_engine::storage::StorageRef>():
+    0.00 :   128d66: lea    (%rdi,%rdi,2),%rcx
+    0.00 :   128d6a: xor    %esi,%esi
+         : 274    storage_ref():
+    0.00 :   128d6c: mov    0x10(%rax,%rcx,8),%rdx
+    0.09 :   128d71: mov    %rdx,0x180(%rsp)
+    0.00 :   128d79: vmovups (%rax,%rcx,8),%xmm0
+         : 309    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.02 :   128d7e: lea    0x0(,%r10,4),%rax
+         : 315    storage_ref():
+    0.00 :   128d86: vmovaps %xmm0,0x170(%rsp)
+    0.01 :   128d8f: vxorps %xmm0,%xmm0,%xmm0
+         : 308    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 923    // read (never updated) before any child is touched, so the
+         : 924    // read itself never needs protecting from a descendant's
+         : 925    // split — only the per-child recursion below does, against a
+         : 926    // *sibling's* descendant split (see `ActionViews`).
+         : 927    let sref = ctx.tree.storage_ref(&node);
+         : 928    let num_hands = sref.num_hands as usize;
+    0.00 :   128d93: mov    0x178(%rsp),%edx
+    0.03 :   128d9a: mov    %rdx,0x200(%rsp)
+    0.00 :   128da2: data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.04 :   128db0: mov    %rsi,%rcx
+    0.00 :   128db3: cmp    %rsi,%rax
+    0.01 :   128db6: je     128dd1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x361>
+         : 181    all<f32, hu_engine::solver::cfr_pass::{closure_env#4}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>():
+    0.00 :   128db8: mov    0x250(%rsp),%rsi
+    0.01 :   128dc0: vmovss (%rsi,%rcx,1),%xmm1
+    0.05 :   128dc5: lea    0x4(%rcx),%rsi
+         : 318    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 925    debug_assert_eq!(num_hands, opp_reach.len());
+         : 926    let zero_opp = PRUNE && opp_reach.iter().all(|&x| x == 0.0);
+    0.04 :   128dc9: vucomiss %xmm0,%xmm1
+         : 928    all<f32, hu_engine::solver::cfr_pass::{closure_env#4}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>():
+    0.21 :   128dcd: jne    128dd1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x361>
+    0.38 :   128dcf: jnp    128db0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x340>
+         : 317    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 926    let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
+    0.00 :   128dd1: movzwl 0x180(%rsp),%esi
+    0.02 :   128dd9: xor    %ebx,%ebx
+    0.00 :   128ddb: imul   %rdx,%rsi
+         : 930    eq<f32>():
+    0.00 :   128ddf: cmp    %rcx,%rax
+         : 1715   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 925    let zero_opp = PRUNE && opp_reach.iter().all(|&x| x == 0.0);
+    0.00 :   128de2: sete   0x5c(%rsp)
+         : 926    let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
+    0.01 :   128de7: cmovne %rsi,%rbx
+    0.01 :   128deb: mov    0x30(%rsp),%rsi
+    0.00 :   128df0: mov    0x10(%rsi),%rdx
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.01 :   128df4: test   %rdx,%rdx
+    0.00 :   128df7: je     129980 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xf10>
+    0.00 :   128dfd: dec    %rdx
+    0.00 :   128e00: mov    %rdx,0x10(%rsi)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   128e04: lea    (%rdx,%rdx,2),%rdx
+    0.01 :   128e08: mov    0x8(%rsi),%rsi
+    0.00 :   128e0c: vmovups (%rsi,%rdx,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.03 :   128e11: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   128e17: movq   $0x0,0x70(%rsp)
+    0.00 :   128e20: test   %rbx,%rbx
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   128e23: je     1299a4 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xf34>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128e29: cmp    0x60(%rsp),%rbx
+    0.02 :   128e2e: ja     12bc31 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x31c1>
+    0.00 :   128e34: mov    %r12d,%ebp
+         : 675    extend_with<f32, alloc::alloc::Global>():
+    0.00 :   128e37: xor    %r14d,%r14d
+         : 677    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128e3a: mov    0x68(%rsp),%r12
+    0.00 :   128e3f: lea    (%r12,%r14,4),%rdi
+    0.00 :   128e43: cmp    $0x1,%rbx
+    0.00 :   128e47: je     128e67 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3f7>
+         : 901    spec_next<usize>():
+    0.00 :   128e49: lea    -0x4(,%rbx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128e51: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   128e53: call   *0x122cef(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.01 :   128e59: lea    (%r14,%rbx,1),%rax
+    0.00 :   128e5d: lea    -0x1(%r14,%rbx,1),%r14
+    0.00 :   128e62: lea    -0x4(%r12,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128e67: movl   $0x0,(%rdi)
+    0.02 :   128e6d: inc    %r14
+         : 20     increment_len():
+    0.00 :   128e70: mov    0x18(%rsp),%rbx
+    0.00 :   128e75: mov    %ebp,%r12d
+         : 21     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 27     /// Pops a buffer (or allocates a new one), resizing it to `len` zeros.
+         : 28     pub fn take(&mut self, len: usize) -> Vec<f32> {
+         : 29     let mut buf = self.free.pop().unwrap_or_default();
+         : 30     buf.clear();
+         : 31     buf.resize(len, 0.0);
+         : 32     buf
+    0.00 :   128e78: vmovaps 0x60(%rsp),%xmm0
+         : 927    if !zero_opp {
+    0.01 :   128e7e: cmpb   $0x0,0x5c(%rsp)
+         : 929    take():
+    0.00 :   128e83: mov    %r14,0x130(%rsp)
+    0.01 :   128e8b: vmovaps %xmm0,0x120(%rsp)
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128e94: je     1299ca <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xf5a>
+    0.00 :   128e9a: jmp    1299ff <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xf8f>
+    0.00 :   128e9f: mov    %r12d,%r15d
+    0.00 :   128ea2: mov    %rdx,%r12
+         : 931    current_num_threads():
+         : 343    global_registry().num_threads()
+    0.00 :   128ea5: call   *0x123095(%rip)        # 24bf40 <_DYNAMIC+0x750>
+    0.00 :   128eab: mov    %r12,%rdx
+    0.00 :   128eae: mov    %r15d,%r12d
+    0.00 :   128eb1: test   %ebp,%ebp
+         : 348    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 681    if rayon::current_num_threads() > 1
+    0.00 :   128eb3: je     128ee3 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x473>
+    0.00 :   128eb5: mov    (%rax),%rax
+    0.00 :   128eb8: cmpq   $0x1,0x208(%rax)
+    0.00 :   128ec0: jbe    128ee3 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x473>
+         : 683    && node.num_children as usize >= ctx.par.min_children
+    0.00 :   128ec2: movzwl 0x108(%rsp),%ecx
+    0.00 :   128eca: mov    0xd0(%rsp),%rax
+    0.00 :   128ed2: mov    %rcx,0xc8(%rsp)
+    0.00 :   128eda: cmp    %rcx,(%rax)
+    0.00 :   128edd: jbe    1295a9 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xb39>
+         : 754    ActionViews::split_for(storage, ctx.tree, node_id, None, child_budget);
+    0.00 :   128ee3: movq   $0x0,0x60(%rsp)
+    0.00 :   128eec: mov    0x20(%rsp),%r14
+    0.00 :   128ef1: lea    0x1c8(%rsp),%rdi
+    0.00 :   128ef9: lea    0x60(%rsp),%r8
+    0.00 :   128efe: mov    %rdx,%rsi
+    0.00 :   128f01: mov    %r12d,%ecx
+    0.00 :   128f04: mov    %ebx,%r9d
+    0.00 :   128f07: mov    %r14,%rdx
+    0.00 :   128f0a: call   159080 <<hu_engine::solver::ActionViews<hu_engine::storage::F32View>>::split_for>
+    0.00 :   128f0f: mov    0xc0(%rsp),%r15
+         : 796    }
+    0.00 :   128f17: mov    0x1c8(%rsp),%rcx
+         : 298    node.first_child..node.first_child + node.num_children as u32
+    0.00 :   128f1f: mov    (%r15),%edx
+         : 300    children():
+    0.00 :   128f22: movzwl 0x8(%r15),%eax
+    0.00 :   128f27: mov    %rcx,0xd8(%rsp)
+    0.00 :   128f2f: mov    %rax,0x118(%rsp)
+    0.00 :   128f37: add    %edx,%eax
+    0.00 :   128f39: mov    %rdx,0x1f8(%rsp)
+         : 303    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128f41: cmp    %eax,%edx
+    0.00 :   128f43: jae    12958d <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xb1d>
+         : 901    spec_next<u32>():
+    0.00 :   128f49: mov    0xd0(%rsp),%rax
+    0.00 :   128f51: movzbl 0x1e0(%rsp),%esi
+    0.00 :   128f59: mov    0x1d0(%rsp),%rcx
+    0.00 :   128f61: movzbl 0x28(%rax),%edx
+    0.00 :   128f65: mov    0x1d8(%rsp),%rax
+    0.00 :   128f6d: mov    %rsi,0xf8(%rsp)
+    0.00 :   128f75: mov    %rcx,0x1b8(%rsp)
+    0.00 :   128f7d: mov    %rax,0x160(%rsp)
+    0.00 :   128f85: lea    (%rsi,%rsi,4),%rax
+    0.00 :   128f89: mov    %dl,0xc0(%rsp)
+    0.00 :   128f90: lea    (%rcx,%rax,8),%rax
+    0.00 :   128f94: mov    %rax,0x1c0(%rsp)
+    0.00 :   128f9c: xor    %eax,%eax
+    0.00 :   128f9e: jmp    128ff1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x581>
+         : 906    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128fa0: mov    0x10(%rsp),%rdx
+    0.00 :   128fa5: mov    0x8(%r13),%rax
+         : 615    non_null<alloc::alloc::Global, alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   128fa9: mov    0x18(%rsp),%rsi
+         : 615    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128fae: lea    (%rbx,%rbx,2),%rcx
+         : 962    lt():
+    0.00 :   128fb2: addq   $0x28,0x1c0(%rsp)
+         : 1917   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128fbb: add    $0x3,%r12
+         : 1047   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   128fbf: inc    %rdx
+         : 1047   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   128fc2: mov    %r14,(%rax,%rcx,8)
+         : 1934   write<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   128fc6: mov    %rbp,0x8(%rax,%rcx,8)
+    0.00 :   128fcb: mov    %rsi,0x10(%rax,%rcx,8)
+    0.00 :   128fd0: mov    0x20(%rsp),%r14
+         : 1936   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   128fd5: mov    %r12,0x10(%r13)
+    0.00 :   128fd9: mov    %rdx,%rax
+    0.00 :   128fdc: movzbl 0xc0(%rsp),%edx
+         : 1049   lt():
+    0.00 :   128fe4: cmp    %eax,0x118(%rsp)
+         : 1917   spec_next<u32>():
+    0.00 :   128feb: je     12958d <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xb1d>
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 302    &self.deals[node.aux as usize + child_pos]
+    0.00 :   128ff1: mov    0x104(%rsp),%edi
+    0.00 :   128ff8: mov    0x28(%r14),%rsi
+         : 1865   as_slice<hu_engine::tree::Deal, alloc::alloc::Global>():
+    0.00 :   128ffc: mov    %rax,0x10(%rsp)
+    0.00 :   129001: add    %rax,%rdi
+         : 1866   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129004: cmp    %rsi,%rdi
+         : 273    index<hu_engine::tree::Deal>():
+    0.00 :   129007: jae    12bf55 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x34e5>
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12900d: mov    0x20(%r14),%rax
+         : 615    index<hu_engine::tree::Deal>():
+    0.00 :   129011: lea    (%rdi,%rdi,4),%rcx
+         : 273    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 758    ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+    0.00 :   129015: test   %dl,%dl
+         : 756    let deal = *ctx.tree.deal(&node, pos);
+    0.00 :   129017: vmovss 0x10(%rax,%rcx,4),%xmm0
+    0.00 :   12901d: mov    0x4(%rax,%rcx,4),%r15d
+    0.00 :   129022: mov    0xc(%rax,%rcx,4),%ebp
+    0.00 :   129026: mov    (%rax,%rcx,4),%r13d
+    0.00 :   12902a: mov    0x8(%rax,%rcx,4),%r12d
+         : 758    ctx.tree.mapped_dim(deal.maps[ctx.p], my_reach.len() as u32) as usize;
+    0.00 :   12902f: mov    %r15d,%edx
+    0.00 :   129032: cmovne %ebp,%edx
+    0.00 :   129035: mov    %r13d,%esi
+    0.00 :   129038: cmovne %r12d,%esi
+    0.00 :   12903c: vmovss %xmm0,0x168(%rsp)
+    0.00 :   129045: mov    0x122f4c(%rip),%rbx        # 24bf98 <_DYNAMIC+0x7a8>
+    0.00 :   12904c: mov    0x40(%rsp),%rcx
+    0.00 :   129051: mov    %r14,%rdi
+    0.00 :   129054: mov    %esi,0x8(%rsp)
+    0.00 :   129058: mov    %edx,0x28(%rsp)
+    0.00 :   12905c: call   *%rbx
+    0.00 :   12905e: mov    %eax,0x18(%rsp)
+         : 761    .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
+    0.00 :   129062: cmpb   $0x0,0xc0(%rsp)
+    0.00 :   12906a: cmovne %r13d,%r12d
+    0.00 :   12906e: cmovne %r15d,%ebp
+    0.00 :   129072: mov    0x258(%rsp),%rcx
+    0.00 :   12907a: mov    %r14,%rdi
+    0.00 :   12907d: mov    %r12d,%esi
+    0.00 :   129080: mov    %ebp,%edx
+    0.00 :   129082: call   *%rbx
+    0.00 :   129084: mov    0x30(%rsp),%rcx
+    0.00 :   129089: mov    %eax,%r15d
+    0.00 :   12908c: mov    %r12d,0xe0(%rsp)
+    0.00 :   129094: mov    %ebp,0x38(%rsp)
+    0.00 :   129098: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   12909c: test   %rax,%rax
+    0.00 :   12909f: je     1290d0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x660>
+    0.00 :   1290a1: dec    %rax
+    0.00 :   1290a4: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1290a8: lea    (%rax,%rax,2),%rdx
+    0.00 :   1290ac: mov    0x8(%rcx),%rcx
+    0.00 :   1290b0: vmovups (%rcx,%rdx,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   1290b5: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1290bb: mov    0x60(%rsp),%rcx
+         : 28     take():
+    0.00 :   1290c0: jmp    1290e6 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x676>
+         : 28     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1290c2: data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 30     new<f32>():
+    0.00 :   1290d0: movq   $0x0,0x60(%rsp)
+    0.00 :   1290d9: movq   $0x4,0x68(%rsp)
+    0.00 :   1290e2: xor    %ecx,%ecx
+    0.00 :   1290e4: xor    %eax,%eax
+         : 468    take():
+    0.00 :   1290e6: mov    0x18(%rsp),%edx
+    0.00 :   1290ea: mov    0x38(%rsp),%r14d
+         : 471    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1290ef: movq   $0x0,0x70(%rsp)
+    0.00 :   1290f8: mov    %edx,%ebx
+    0.00 :   1290fa: test   %edx,%edx
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   1290fc: je     129220 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x7b0>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129102: cmp    %rbx,%rcx
+    0.00 :   129105: jb     129508 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xa98>
+    0.00 :   12910b: xor    %r13d,%r13d
+    0.00 :   12910e: mov    0x68(%rsp),%rbp
+    0.00 :   129113: cmpl   $0x1,0x18(%rsp)
+    0.00 :   129118: lea    0x0(%rbp,%r13,4),%rdi
+         : 962    add<f32>():
+    0.00 :   12911d: mov    %rbp,0xf0(%rsp)
+         : 962    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129125: je     129146 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x6d6>
+         : 901    spec_next<usize>():
+    0.00 :   129127: lea    -0x4(,%rbx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12912f: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129131: call   *0x122a11(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   129137: lea    0x0(%r13,%rbx,1),%rax
+    0.00 :   12913c: lea    -0x1(%r13,%rbx,1),%r13
+    0.00 :   129141: lea    -0x4(%rbp,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129146: movl   $0x0,(%rdi)
+         : 1934   write<f32>():
+    0.00 :   12914c: mov    0x30(%rsp),%rcx
+         : 1934   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129151: inc    %r13
+         : 20     take():
+    0.00 :   129154: mov    0x60(%rsp),%rax
+    0.00 :   129159: mov    %rax,0xe8(%rsp)
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129161: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129165: mov    %rbx,0x1a8(%rsp)
+    0.00 :   12916d: test   %rax,%rax
+    0.00 :   129170: je     129249 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x7d9>
+    0.00 :   129176: mov    0x30(%rsp),%rcx
+    0.00 :   12917b: dec    %rax
+    0.00 :   12917e: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129182: lea    (%rax,%rax,2),%rax
+    0.00 :   129186: mov    0x8(%rcx),%rcx
+    0.00 :   12918a: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   12918f: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129195: mov    0x60(%rsp),%rbx
+    0.00 :   12919a: movq   $0x0,0x70(%rsp)
+    0.00 :   1291a3: test   %r15d,%r15d
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   1291a6: je     12926f <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x7ff>
+    0.00 :   1291ac: mov    %r13,%r12
+    0.00 :   1291af: mov    %r15d,%r13d
+         : 3528   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1291b2: cmp    %r13,%rbx
+    0.00 :   1291b5: jb     12952c <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xabc>
+    0.00 :   1291bb: xor    %r14d,%r14d
+    0.00 :   1291be: mov    0x68(%rsp),%rbx
+    0.00 :   1291c3: lea    (%rbx,%r14,4),%rdi
+         : 962    add<f32>():
+    0.00 :   1291c7: mov    %rbx,0xc8(%rsp)
+         : 962    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1291cf: cmp    $0x1,%r15d
+    0.00 :   1291d3: je     1291f3 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x783>
+         : 901    spec_next<usize>():
+    0.00 :   1291d5: lea    -0x4(,%r13,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1291dd: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   1291df: call   *0x122963(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   1291e5: lea    (%r14,%r13,1),%rax
+    0.00 :   1291e9: lea    -0x1(%r14,%r13,1),%r14
+    0.00 :   1291ee: lea    -0x4(%rbx,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1291f3: movl   $0x0,(%rdi)
+    0.00 :   1291f9: inc    %r14
+         : 20     increment_len():
+    0.00 :   1291fc: mov    %r12,%r13
+    0.00 :   1291ff: mov    0x20(%rsp),%r15
+    0.00 :   129204: mov    0x122d9d(%rip),%r12        # 24bfa8 <_DYNAMIC+0x7b8>
+    0.00 :   12920b: mov    %r14,0x50(%rsp)
+         : 23     take():
+    0.00 :   129210: mov    0x60(%rsp),%rbx
+    0.00 :   129215: mov    0x38(%rsp),%r14d
+         : 29     extend_with<f32, alloc::alloc::Global>():
+    0.00 :   12921a: jmp    129291 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x821>
+         : 3675   take():
+    0.00 :   12921c: nopl   0x0(%rax)
+    0.00 :   129220: mov    0x68(%rsp),%rdx
+    0.00 :   129225: mov    %rcx,0xe8(%rsp)
+    0.00 :   12922d: xor    %r13d,%r13d
+    0.00 :   129230: mov    %rdx,0xf0(%rsp)
+    0.00 :   129238: mov    %rbx,0x1a8(%rsp)
+         : 32     pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129240: test   %rax,%rax
+    0.00 :   129243: jne    129176 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x706>
+         : 2846   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129249: movq   $0x0,0x60(%rsp)
+         : 465    new<f32>():
+    0.00 :   129252: movq   $0x4,0x68(%rsp)
+    0.00 :   12925b: xor    %ebx,%ebx
+         : 466    clear<f32, alloc::alloc::Global>():
+    0.00 :   12925d: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   129266: test   %r15d,%r15d
+    0.00 :   129269: jne    1291ac <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x73c>
+         : 3527   take():
+    0.00 :   12926f: mov    0x68(%rsp),%rax
+    0.00 :   129274: mov    0x20(%rsp),%r15
+    0.00 :   129279: mov    0x122d28(%rip),%r12        # 24bfa8 <_DYNAMIC+0x7b8>
+    0.00 :   129280: movq   $0x0,0x50(%rsp)
+    0.00 :   129289: mov    %rax,0xc8(%rsp)
+         : 32     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 766    .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
+    0.00 :   129291: sub    $0x8,%rsp
+    0.00 :   129295: mov    0xf8(%rsp),%rbp
+    0.00 :   12929d: mov    0x10(%rsp),%esi
+    0.00 :   1292a1: mov    0x30(%rsp),%edx
+    0.00 :   1292a5: mov    0x50(%rsp),%rcx
+    0.00 :   1292aa: mov    0x48(%rsp),%r8
+    0.00 :   1292af: mov    %r15,%rdi
+    0.00 :   1292b2: mov    %rbp,%r9
+    0.00 :   1292b5: push   %r13
+    0.00 :   1292b7: mov    %rbx,0x48(%rsp)
+    0.00 :   1292bc: call   *%r12
+    0.00 :   1292bf: add    $0x10,%rsp
+    0.00 :   1292c3: mov    0xe0(%rsp),%esi
+         : 768    .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
+    0.00 :   1292ca: sub    $0x8,%rsp
+    0.00 :   1292ce: mov    0x258(%rsp),%rcx
+    0.00 :   1292d6: mov    0x260(%rsp),%r8
+    0.00 :   1292de: mov    0xd0(%rsp),%r9
+    0.00 :   1292e6: mov    %r14d,%edx
+    0.00 :   1292e9: mov    %r15,%rdi
+    0.00 :   1292ec: push   0x58(%rsp)
+    0.00 :   1292f0: call   *%r12
+    0.00 :   1292f3: add    $0x10,%rsp
+    0.00 :   1292f7: mov    0x30(%rsp),%rcx
+    0.00 :   1292fc: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129300: test   %rax,%rax
+    0.00 :   129303: je     129390 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x920>
+    0.00 :   129309: dec    %rax
+    0.00 :   12930c: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129310: lea    (%rax,%rax,2),%rax
+    0.00 :   129314: mov    0x8(%rcx),%rcx
+    0.00 :   129318: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   12931d: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129323: mov    0x60(%rsp),%r15
+         : 28     resize<f32, alloc::alloc::Global>():
+    0.00 :   129328: cmpl   $0x0,0x18(%rsp)
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12932d: movq   $0x0,0x70(%rsp)
+    0.00 :   129336: je     1293b5 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x945>
+    0.00 :   129338: cmp    0x1a8(%rsp),%r15
+    0.00 :   129340: jb     129550 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xae0>
+    0.00 :   129346: xor    %r14d,%r14d
+    0.00 :   129349: mov    0x68(%rsp),%rbx
+    0.00 :   12934e: cmpl   $0x1,0x18(%rsp)
+    0.00 :   129353: lea    (%rbx,%r14,4),%rdi
+    0.00 :   129357: je     12937f <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x90f>
+         : 901    spec_next<usize>():
+    0.00 :   129359: mov    0x1a8(%rsp),%r15
+    0.00 :   129361: lea    -0x4(,%r15,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129369: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   12936b: call   *0x1227d7(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   129371: lea    (%r14,%r15,1),%rax
+    0.00 :   129375: lea    -0x1(%r14,%r15,1),%r14
+    0.00 :   12937a: lea    -0x4(%rbx,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12937f: movl   $0x0,(%rdi)
+    0.00 :   129385: inc    %r14
+         : 20     take():
+    0.00 :   129388: mov    0x60(%rsp),%r15
+    0.00 :   12938d: jmp    1293bd <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x94d>
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12938f: nop
+         : 31     new<f32>():
+    0.00 :   129390: movq   $0x0,0x60(%rsp)
+    0.00 :   129399: movq   $0x4,0x68(%rsp)
+    0.00 :   1293a2: xor    %r15d,%r15d
+         : 467    resize<f32, alloc::alloc::Global>():
+    0.00 :   1293a5: cmpl   $0x0,0x18(%rsp)
+         : 3526   clear<f32, alloc::alloc::Global>():
+    0.00 :   1293aa: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   1293b3: jne    129338 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x8c8>
+         : 3526   take():
+    0.00 :   1293b5: mov    0x68(%rsp),%rbx
+    0.00 :   1293ba: xor    %r14d,%r14d
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1293bd: mov    0x1b8(%rsp),%rsi
+    0.00 :   1293c5: cmpq   $0xffffffffffffffff,0xd8(%rsp)
+    0.00 :   1293ce: mov    0x10(%rsp),%rcx
+    0.00 :   1293d3: mov    %r13,0x18(%rsp)
+         : 634    match self {
+    0.00 :   1293d8: je     1293fc <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x98c>
+         : 636    child<hu_engine::storage::F32View>():
+    0.00 :   1293da: mov    0xf8(%rsp),%rax
+    0.00 :   1293e2: mov    0x1c0(%rsp),%rsi
+         : 639    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1293ea: lea    (%rax,%rcx,1),%rdi
+         : 279    index_mut<hu_engine::storage::F32View>():
+    0.00 :   1293ee: cmp    0x160(%rsp),%rdi
+    0.00 :   1293f6: jae    12bf7b <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x350b>
+         : 280    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1293fc: mov    0x1f8(%rsp),%rax
+    0.00 :   129404: add    %rax,%rcx
+         : 775    cfr_pass::<_, _, PRUNE>(
+    0.00 :   129407: mov    0x5c(%rsp),%eax
+    0.00 :   12940b: sub    $0x8,%rsp
+    0.00 :   12940f: mov    0x38(%rsp),%r13
+    0.00 :   129414: mov    0xd8(%rsp),%rdi
+    0.00 :   12941c: mov    0x20(%rsp),%r9
+    0.00 :   129421: mov    %rbp,%r8
+    0.00 :   129424: mov    %r13,%rdx
+    0.00 :   129427: push   %rax
+    0.00 :   129428: push   %r14
+    0.00 :   12942a: push   %rbx
+    0.00 :   12942b: push   0x70(%rsp)
+    0.00 :   12942f: push   0xf0(%rsp)
+    0.00 :   129436: call   128a70 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>
+    0.00 :   12943b: add    $0x30,%rsp
+    0.00 :   12943f: vmovss 0x168(%rsp),%xmm0
+    0.00 :   129448: mov    0x28(%rsp),%edx
+    0.00 :   12944c: mov    0x20(%rsp),%rdi
+    0.00 :   129451: mov    0x8(%rsp),%esi
+         : 785    ctx.tree.accumulate_values_with_scratch(
+    0.00 :   129455: mov    0x260(%rsp),%r9
+    0.00 :   12945d: mov    %rbx,%rcx
+    0.00 :   129460: mov    %r14,%r8
+    0.00 :   129463: push   %r13
+    0.00 :   129465: push   0x270(%rsp)
+    0.00 :   12946c: call   *0x122b3e(%rip)        # 24bfb0 <_DYNAMIC+0x7c0>
+    0.00 :   129472: add    $0x10,%rsp
+    0.00 :   129476: mov    0x10(%r13),%r12
+         : 1038   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   12947a: cmp    0x0(%r13),%r12
+    0.00 :   12947e: jne    129489 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xa19>
+    0.00 :   129480: mov    %r13,%rdi
+    0.00 :   129483: call   *0x122acf(%rip)        # 24bf58 <_DYNAMIC+0x768>
+         : 1043   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129489: mov    0x8(%r13),%rax
+    0.00 :   12948d: lea    (%r12,%r12,2),%rcx
+    0.00 :   129491: mov    %r15,(%rax,%rcx,8)
+         : 1934   write<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   129495: mov    %rbx,0x8(%rax,%rcx,8)
+         : 1934   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   12949a: lea    0x1(%r12),%rbx
+         : 1047   write<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   12949f: mov    %r14,0x10(%rax,%rcx,8)
+         : 1934   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   1294a4: mov    %rbx,0x10(%r13)
+         : 1047   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1294a8: cmp    0x0(%r13),%rbx
+         : 1041   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   1294ac: jne    1294b7 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xa47>
+    0.00 :   1294ae: mov    %r13,%rdi
+    0.00 :   1294b1: call   *0x122aa1(%rip)        # 24bf58 <_DYNAMIC+0x768>
+         : 1043   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1294b7: mov    0x8(%r13),%rax
+         : 615    non_null<alloc::alloc::Global, alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   1294bb: mov    0x38(%rsp),%rdx
+    0.00 :   1294c0: mov    0xc8(%rsp),%rdi
+    0.00 :   1294c8: mov    0x50(%rsp),%rsi
+    0.00 :   1294cd: mov    0xe8(%rsp),%r14
+         : 618    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1294d5: lea    (%rbx,%rbx,2),%rcx
+         : 962    push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   1294d9: lea    0x2(%r12),%rbx
+         : 1047   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1294de: mov    %rdx,(%rax,%rcx,8)
+         : 1934   write<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   1294e2: mov    %rdi,0x8(%rax,%rcx,8)
+    0.00 :   1294e7: mov    %rsi,0x10(%rax,%rcx,8)
+         : 1935   push_mut<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   1294ec: mov    %rbx,0x10(%r13)
+    0.00 :   1294f0: cmp    0x0(%r13),%rbx
+    0.00 :   1294f4: jne    128fa0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x530>
+    0.00 :   1294fa: mov    %r13,%rdi
+    0.00 :   1294fd: call   *0x122a55(%rip)        # 24bf58 <_DYNAMIC+0x768>
+    0.00 :   129503: jmp    128fa0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x530>
+         : 1044   reserve<alloc::alloc::Global>():
+    0.00 :   129508: mov    $0x4,%ecx
+    0.00 :   12950d: mov    $0x4,%r8d
+    0.00 :   129513: lea    0x60(%rsp),%rdi
+    0.00 :   129518: xor    %esi,%esi
+    0.00 :   12951a: mov    %rbx,%rdx
+    0.00 :   12951d: call   b2010 <<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>>
+         : 681    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129522: mov    0x70(%rsp),%r13
+         : 3055   len<f32, alloc::alloc::Global>():
+    0.00 :   129527: jmp    12910e <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x69e>
+         : 3055   reserve<alloc::alloc::Global>():
+    0.00 :   12952c: mov    $0x4,%ecx
+    0.00 :   129531: mov    $0x4,%r8d
+    0.00 :   129537: lea    0x60(%rsp),%rdi
+    0.00 :   12953c: xor    %esi,%esi
+    0.00 :   12953e: mov    %r13,%rdx
+    0.00 :   129541: call   b2010 <<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>>
+         : 681    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129546: mov    0x70(%rsp),%r14
+         : 3055   len<f32, alloc::alloc::Global>():
+    0.00 :   12954b: jmp    1291be <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x74e>
+         : 3055   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129550: mov    0x1a8(%rsp),%rdx
+         : 3057   reserve<alloc::alloc::Global>():
+    0.00 :   129558: mov    $0x4,%ecx
+    0.00 :   12955d: mov    $0x4,%r8d
+    0.00 :   129563: lea    0x60(%rsp),%rdi
+    0.00 :   129568: xor    %esi,%esi
+    0.00 :   12956a: call   b2010 <<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>>
+         : 680    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12956f: mov    0x70(%rsp),%r14
+         : 3055   non_null<alloc::alloc::Global, f32>():
+    0.00 :   129574: mov    0x68(%rsp),%rbx
+         : 615    lt():
+    0.00 :   129579: cmpl   $0x1,0x18(%rsp)
+         : 1917   add<f32>():
+    0.00 :   12957e: lea    (%rbx,%r14,4),%rdi
+         : 962    spec_next<usize>():
+    0.00 :   129582: jne    129359 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x8e9>
+    0.00 :   129588: jmp    12937f <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x90f>
+         : 902    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12958d: cmpq   $0x0,0xd8(%rsp)
+         : 826    drop_glue<hu_engine::solver::ActionViews<hu_engine::storage::F32View>>():
+    0.00 :   129596: jle    12ba7a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x300a>
+         : 826    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 796    }
+    0.00 :   12959c: mov    0x1d0(%rsp),%rdi
+         : 798    <std::alloc::System as core::alloc::global::GlobalAlloc>::dealloc:
+    0.00 :   1295a4: jmp    12ba71 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3001>
+         : 49     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1295a9: mov    0xc0(%rsp),%r15
+    0.00 :   1295b1: mov    %r12d,0xe0(%rsp)
+    0.00 :   1295b9: xor    %ecx,%ecx
+         : 298    node.first_child..node.first_child + node.num_children as u32
+    0.00 :   1295bb: mov    (%r15),%r12d
+         : 300    children():
+    0.00 :   1295be: movzwl 0x8(%r15),%ebp
+    0.00 :   1295c3: add    %r12d,%ebp
+         : 300    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1295c6: mov    %ebp,%eax
+         : 991    size_hint<u32>():
+    0.00 :   1295c8: sub    %r12d,%eax
+    0.00 :   1295cb: cmovb  %ecx,%eax
+         : 992    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1295ce: jbe    12a486 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1a16>
+         : 461    try_allocate_in<alloc::alloc::Global>():
+    0.00 :   1295d4: shl    $0x3,%rax
+    0.00 :   1295d8: mov    %rdx,0x18(%rsp)
+    0.00 :   1295dd: lea    (%rax,%rax,2),%rbx
+         : 465    <std::alloc::System as core::alloc::global::GlobalAlloc>::alloc:
+    0.00 :   1295e1: mov    %rbx,%rdi
+    0.00 :   1295e4: call   *0x122516(%rip)        # 24bb00 <malloc@GLIBC_2.2.5>
+         : 16     try_allocate_in<alloc::alloc::Global>():
+    0.00 :   1295ea: test   %rax,%rax
+    0.00 :   1295ed: je     12c027 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x35b7>
+         : 471    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1295f3: mov    %rax,%r15
+         : 473    from_iter<hu_engine::storage::StorageSpan, core::iter::adapters::map::Map<core::ops::range::Range<u32>, hu_engine::solver::cfr_pass::{closure_env#1}<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>>>():
+    0.00 :   1295f6: mov    0x20(%rsp),%rax
+         : 475    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1295fb: mov    %ebp,%ecx
+         : 1917   lt():
+    0.00 :   1295fd: xor    %r8d,%r8d
+         : 1917   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129600: mov    0xa0(%rax),%rsi
+         : 1865   lt():
+    0.00 :   129607: mov    %r12,%rax
+    0.00 :   12960a: sub    %rcx,%rax
+         : 1918   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12960d: lea    0x0(,%r12,8),%rcx
+         : 901    spec_next<u32>():
+    0.00 :   129615: lea    (%rcx,%rcx,2),%rdx
+    0.00 :   129619: xor    %ecx,%ecx
+         : 902    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12961b: nopl   0x0(%rax,%rax,1)
+         : 904    index<hu_engine::storage::StorageSpan>():
+    0.00 :   129620: lea    (%r12,%rcx,1),%rdi
+    0.00 :   129624: cmp    %rdi,%rsi
+    0.00 :   129627: jbe    12bfbe <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x354e>
+         : 275    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12962d: mov    0x20(%rsp),%rdi
+    0.00 :   129632: inc    %rcx
+         : 20     increment_len():
+    0.00 :   129635: mov    0x98(%rdi),%rdi
+         : 20     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12963c: add    %rdx,%rdi
+    0.00 :   12963f: vmovups (%r8,%rdi,1),%xmm0
+         : 1934   write<hu_engine::storage::StorageSpan>():
+    0.02 :   129645: mov    0x10(%r8,%rdi,1),%rdi
+    0.01 :   12964a: mov    %rdi,0x10(%r15,%r8,1)
+         : 1935   lt():
+    0.00 :   12964f: mov    %rax,%rdi
+         : 1917   write<hu_engine::storage::StorageSpan>():
+    0.00 :   129652: vmovups %xmm0,(%r15,%r8,1)
+         : 1934   lt():
+    0.00 :   129658: add    $0x18,%r8
+    0.00 :   12965c: add    %rcx,%rdi
+         : 1918   spec_next<u32>():
+    0.00 :   12965f: jne    129620 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xbb0>
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129661: mov    0x18(%rsp),%rdx
+    0.00 :   129666: cmp    %r12d,%ebp
+         : 635    current_memory<alloc::alloc::Global>():
+    0.00 :   129669: setbe  %bl
+    0.00 :   12966c: jmp    12a48e <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1a1e>
+         : 636    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129671: movq   $0x0,0x60(%rsp)
+         : 465    new<f32>():
+    0.00 :   12967a: movq   $0x4,0x68(%rsp)
+    0.00 :   129683: mov    0xd8(%rsp),%rdx
+         : 466    clear<f32, alloc::alloc::Global>():
+    0.00 :   12968b: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   129694: test   %rdx,%rdx
+    0.00 :   129697: jne    128c75 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x205>
+         : 3527   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12969d: xor    %r14d,%r14d
+         : 626    match self {
+    0.00 :   1296a0: mov    0x188(%rsp),%rax
+    0.00 :   1296a8: vmovaps 0x60(%rsp),%xmm0
+         : 28     take():
+    0.00 :   1296ae: mov    0x198(%rsp),%rcx
+    0.00 :   1296b6: mov    %r14,0x150(%rsp)
+         : 29     own<hu_engine::storage::F32View>():
+    0.00 :   1296be: cmp    $0xffffffffffffffff,%rax
+    0.00 :   1296c2: mov    %rax,0xe8(%rsp)
+    0.00 :   1296ca: mov    %rcx,0xf0(%rsp)
+    0.00 :   1296d2: setne  %al
+    0.00 :   1296d5: test   %rcx,%rcx
+    0.00 :   1296d8: sete   %cl
+         : 632    take():
+    0.00 :   1296db: vmovaps %xmm0,0x140(%rsp)
+         : 28     own<hu_engine::storage::F32View>():
+    0.00 :   1296e4: test   %cl,%al
+    0.00 :   1296e6: jne    12c00b <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x359b>
+         : 628    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1296ec: mov    0xd0(%rsp),%rax
+    0.00 :   1296f4: mov    0x118(%rsp),%r15
+    0.00 :   1296fc: mov    0x50(%rsp),%r14d
+    0.00 :   129701: movzwl 0x160(%rsp),%ebp
+         : 820    views
+    0.00 :   129709: mov    0x170(%rsp),%r11d
+    0.00 :   129711: movzwl 0x174(%rsp),%r10d
+         : 823    own<hu_engine::storage::F32View>():
+    0.00 :   12971a: mov    0x190(%rsp),%rdi
+         : 825    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129722: mov    0x148(%rsp),%rcx
+    0.04 :   12972a: mov    0x150(%rsp),%r8
+         : 822    .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
+    0.00 :   129732: movzbl 0x29(%rax),%r9d
+         : 820    views
+    0.00 :   129737: mov    %r15,0x60(%rsp)
+    0.00 :   12973c: mov    %r14d,0x68(%rsp)
+    0.00 :   129741: mov    %r12d,0x6c(%rsp)
+    0.00 :   129746: mov    %bp,0x70(%rsp)
+    0.00 :   12974b: mov    %r11d,0x72(%rsp)
+    0.00 :   129750: mov    %r10w,0x76(%rsp)
+    0.01 :   129756: lea    0x60(%rsp),%rsi
+         : 822    .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
+    0.00 :   12975b: mov    %r12d,%edx
+    0.00 :   12975e: mov    %rdi,0x28(%rsp)
+    0.00 :   129763: call   *0x12289f(%rip)        # 24c008 <_DYNAMIC+0x818>
+    0.01 :   129769: mov    0x48(%rsp),%r12
+    0.00 :   12976e: mov    0x30(%rsp),%rcx
+    0.00 :   129773: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.02 :   129777: test   %rax,%rax
+    0.00 :   12977a: je     129f9a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x152a>
+    0.00 :   129780: dec    %rax
+    0.00 :   129783: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129787: lea    (%rax,%rax,2),%rdx
+    0.00 :   12978b: mov    0x8(%rcx),%rcx
+    0.00 :   12978f: vmovups (%rcx,%rdx,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.05 :   129794: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   12979a: mov    0x60(%rsp),%rcx
+         : 28     take():
+    0.05 :   12979f: mov    0xd8(%rsp),%rdx
+         : 28     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1297a7: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   1297b0: test   %rdx,%rdx
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1297b3: je     129fca <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x155a>
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   1297b9: mov    %rdx,%rax
+         : 3528   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1297bc: cmp    %rcx,%rdx
+    0.00 :   1297bf: ja     12bcd2 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3262>
+    0.00 :   1297c5: xor    %r14d,%r14d
+    0.00 :   1297c8: mov    0x68(%rsp),%rbp
+    0.00 :   1297cd: lea    0x0(%rbp,%r14,4),%rdi
+    0.00 :   1297d2: cmp    $0x1,%rax
+    0.00 :   1297d6: je     1297f9 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xd89>
+         : 901    spec_next<usize>():
+    0.00 :   1297d8: lea    -0x4(,%rax,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1297e0: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   1297e2: mov    %rax,%r15
+    0.00 :   1297e5: call   *0x12235d(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1935   spec_next<usize>():
+    0.01 :   1297eb: lea    (%r14,%r15,1),%rax
+    0.00 :   1297ef: lea    -0x1(%r14,%r15,1),%r14
+    0.00 :   1297f4: lea    -0x4(%rbp,%rax,4),%rdi
+         : 903    extend_with<f32, alloc::alloc::Global>():
+    0.00 :   1297f9: mov    0x30(%rsp),%rax
+         : 905    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1297fe: movl   $0x0,(%rdi)
+    0.01 :   129804: inc    %r14
+         : 20     take():
+    0.00 :   129807: mov    0x60(%rsp),%rcx
+         : 28     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12980c: mov    0x10(%rax),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.02 :   129810: mov    %rcx,0xf8(%rsp)
+    0.00 :   129818: test   %rax,%rax
+    0.00 :   12981b: je     129fe3 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1573>
+    0.00 :   129821: mov    0x30(%rsp),%rcx
+    0.00 :   129826: dec    %rax
+         : 2849   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129829: lea    (%rax,%rax,2),%rdx
+         : 864    pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   12982d: mov    %rax,0x10(%rcx)
+         : 2849   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   129831: mov    0x8(%rcx),%rcx
+    0.00 :   129835: vmovups (%rcx,%rdx,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.05 :   12983a: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   129840: mov    0x60(%rsp),%rcx
+    0.04 :   129845: cmpl   $0x0,0x50(%rsp)
+    0.00 :   12984a: movq   $0x0,0x70(%rsp)
+         : 3036   clear<f32, alloc::alloc::Global>():
+    0.00 :   129853: mov    %rbp,0x8(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   129858: je     12a012 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x15a2>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12985e: cmp    %rbx,%rcx
+    0.00 :   129861: jb     12bd17 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x32a7>
+    0.00 :   129867: xor    %r15d,%r15d
+    0.00 :   12986a: mov    0x68(%rsp),%r13
+    0.00 :   12986f: cmpl   $0x1,0x50(%rsp)
+    0.00 :   129874: lea    0x0(%r13,%r15,4),%rdi
+    0.01 :   129879: je     129899 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xe29>
+         : 901    spec_next<usize>():
+    0.00 :   12987b: lea    -0x4(,%rbx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129883: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129885: call   *0x1222bd(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   12988b: lea    (%r15,%rbx,1),%rax
+    0.00 :   12988f: lea    -0x1(%r15,%rbx,1),%r15
+    0.00 :   129894: lea    -0x4(%r13,%rax,4),%rdi
+         : 903    extend_with<f32, alloc::alloc::Global>():
+    0.00 :   129899: mov    0x30(%rsp),%rax
+         : 905    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12989e: movl   $0x0,(%rdi)
+    0.00 :   1298a4: inc    %r15
+         : 20     take():
+    0.00 :   1298a7: mov    0x60(%rsp),%rcx
+    0.00 :   1298ac: mov    %r15,0x18(%rsp)
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1298b1: mov    0x10(%rax),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   1298b5: mov    %rcx,0x110(%rsp)
+    0.01 :   1298bd: test   %rax,%rax
+    0.00 :   1298c0: je     12a031 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x15c1>
+    0.00 :   1298c6: mov    0x30(%rsp),%rcx
+    0.00 :   1298cb: dec    %rax
+    0.00 :   1298ce: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   1298d2: lea    (%rax,%rax,2),%rax
+    0.00 :   1298d6: mov    0x8(%rcx),%rcx
+    0.00 :   1298da: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.04 :   1298df: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   1298e5: mov    0x60(%rsp),%rax
+         : 28     resize<f32, alloc::alloc::Global>():
+    0.04 :   1298ea: cmpl   $0x0,0x50(%rsp)
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   1298ef: movq   $0x0,0x70(%rsp)
+    0.00 :   1298f8: je     12a059 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x15e9>
+    0.00 :   1298fe: cmp    %rbx,%rax
+    0.00 :   129901: jb     12bd5a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x32ea>
+    0.00 :   129907: xor    %eax,%eax
+    0.00 :   129909: mov    0x68(%rsp),%r15
+    0.00 :   12990e: cmpl   $0x1,0x50(%rsp)
+    0.00 :   129913: lea    (%r15,%rax,4),%rdi
+    0.00 :   129917: je     12994c <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xedc>
+         : 901    spec_next<usize>():
+    0.00 :   129919: lea    -0x4(,%rbx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129921: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129923: mov    %r15,0x10(%rsp)
+    0.00 :   129928: mov    %rax,%r15
+    0.00 :   12992b: call   *0x122217(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+    0.00 :   129931: mov    0x10(%rsp),%rcx
+         : 1937   spec_next<usize>():
+    0.00 :   129936: lea    (%r15,%rbx,1),%rax
+    0.00 :   12993a: lea    -0x4(%rcx,%rax,4),%rdi
+    0.00 :   12993f: mov    %r15,%rcx
+    0.00 :   129942: mov    0x10(%rsp),%r15
+    0.00 :   129947: lea    -0x1(%rcx,%rbx,1),%rax
+         : 905    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   12994c: movl   $0x0,(%rdi)
+    0.00 :   129952: inc    %rax
+         : 20     take():
+    0.00 :   129955: mov    0x60(%rsp),%rcx
+    0.00 :   12995a: mov    %rax,0x38(%rsp)
+    0.00 :   12995f: mov    %rcx,0x1b0(%rsp)
+         : 30     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 834    if !out.is_empty() && parallel_actions(ctx.tree, node_id) {
+    0.00 :   129967: cmpq   $0x0,0x268(%rsp)
+    0.00 :   129970: mov    %r15,0x10(%rsp)
+    0.00 :   129975: jne    12a083 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1613>
+    0.00 :   12997b: jmp    12a1ae <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x173e>
+    0.00 :   129980: movq   $0x0,0x60(%rsp)
+         : 465    new<f32>():
+    0.00 :   129989: movq   $0x4,0x68(%rsp)
+         : 465    clear<f32, alloc::alloc::Global>():
+    0.00 :   129992: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   12999b: test   %rbx,%rbx
+    0.00 :   12999e: jne    128e29 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3b9>
+         : 3527   take():
+    0.00 :   1299a4: vmovaps 0x60(%rsp),%xmm0
+    0.00 :   1299aa: mov    0x70(%rsp),%rdx
+    0.00 :   1299af: mov    0x18(%rsp),%rbx
+    0.00 :   1299b4: mov    %rdx,0x130(%rsp)
+    0.00 :   1299bc: vmovaps %xmm0,0x120(%rsp)
+         : 32     eq<f32>():
+    0.00 :   1299c5: cmp    %rcx,%rax
+         : 1715   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 927    if !zero_opp {
+    0.00 :   1299c8: je     1299ff <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xf8f>
+    0.00 :   1299ca: mov    0xd0(%rsp),%rax
+         : 928    storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
+    0.00 :   1299d2: mov    0x17c(%rsp),%edx
+    0.00 :   1299d9: mov    0x128(%rsp),%rcx
+    0.05 :   1299e1: mov    0x130(%rsp),%r8
+    0.00 :   1299e9: movzbl 0x29(%rax),%r9d
+    0.00 :   1299ee: lea    0x170(%rsp),%rsi
+    0.00 :   1299f6: mov    %rbx,%rdi
+    0.00 :   1299f9: call   *0x122609(%rip)        # 24c008 <_DYNAMIC+0x818>
+         : 931    }
+         :
+         : 933    let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
+    0.00 :   1299ff: mov    0x270(%rsp),%r9d
+    0.02 :   129a07: movq   $0x0,0x60(%rsp)
+    0.00 :   129a10: lea    0x188(%rsp),%rdi
+    0.00 :   129a18: lea    0x60(%rsp),%r8
+    0.00 :   129a1d: mov    %rbx,%rsi
+    0.00 :   129a20: mov    %r13,%rdx
+    0.00 :   129a23: mov    %r12d,%ecx
+    0.00 :   129a26: call   159080 <<hu_engine::solver::ActionViews<hu_engine::storage::F32View>>::split_for>
+    0.00 :   129a2b: mov    0x30(%rsp),%rcx
+         :
+         : 936    // `take` initializes this reusable buffer to zero. In the
+         : 937    // zero-reach case it is shared immutably by parallel children.
+         : 938    let mut opp_next = scratch.take(num_hands);
+    0.00 :   129a30: mov    0x200(%rsp),%rbx
+    0.00 :   129a38: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129a3c: test   %rax,%rax
+    0.00 :   129a3f: je     129abd <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x104d>
+    0.00 :   129a41: dec    %rax
+    0.00 :   129a44: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129a48: lea    (%rax,%rax,2),%rdx
+    0.00 :   129a4c: mov    0x8(%rcx),%rcx
+    0.00 :   129a50: vmovups (%rcx,%rdx,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.01 :   129a55: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   129a5b: movq   $0x0,0x70(%rsp)
+    0.01 :   129a64: test   %rbx,%rbx
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   129a67: je     129adf <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x106f>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129a69: cmp    0x60(%rsp),%rbx
+    0.02 :   129a6e: ja     12bc70 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3200>
+    0.00 :   129a74: xor    %r14d,%r14d
+    0.00 :   129a77: mov    0x68(%rsp),%r15
+    0.00 :   129a7c: lea    (%r15,%r14,4),%rdi
+    0.00 :   129a80: cmp    $0x1,%rbx
+    0.00 :   129a84: je     129aa4 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1034>
+         : 901    spec_next<usize>():
+    0.00 :   129a86: lea    -0x4(,%rbx,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129a8e: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129a90: call   *0x1220b2(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   129a96: lea    (%r14,%rbx,1),%rax
+    0.00 :   129a9a: lea    -0x1(%r14,%rbx,1),%r14
+    0.00 :   129a9f: lea    -0x4(%r15,%rax,4),%rdi
+         : 903    extend_with<f32, alloc::alloc::Global>():
+    0.01 :   129aa4: mov    0x30(%rsp),%rax
+         : 905    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129aa9: movl   $0x0,(%rdi)
+         : 1934   write<f32>():
+    0.00 :   129aaf: mov    0x40(%rsp),%rdx
+         : 1934   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129ab4: inc    %r14
+    0.00 :   129ab7: mov    0x10(%rax),%rax
+         : 2845   extend_with<f32, alloc::alloc::Global>():
+    0.00 :   129abb: jmp    129ae7 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1077>
+         : 3675   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129abd: movq   $0x0,0x60(%rsp)
+         : 465    new<f32>():
+    0.00 :   129ac6: movq   $0x4,0x68(%rsp)
+    0.00 :   129acf: xor    %eax,%eax
+         : 466    clear<f32, alloc::alloc::Global>():
+    0.00 :   129ad1: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   129ada: test   %rbx,%rbx
+    0.00 :   129add: jne    129a69 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0xff9>
+         : 3527   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129adf: mov    0x40(%rsp),%rdx
+         : 3529   take():
+    0.00 :   129ae4: xor    %r14d,%r14d
+    0.00 :   129ae7: vmovaps 0x60(%rsp),%xmm0
+    0.00 :   129aed: mov    %r14,0x150(%rsp)
+    0.00 :   129af5: vmovaps %xmm0,0x140(%rsp)
+         : 30     pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129afe: test   %rax,%rax
+    0.00 :   129b01: je     129ba6 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1136>
+    0.00 :   129b07: mov    0x30(%rsp),%rcx
+    0.00 :   129b0c: dec    %rax
+    0.00 :   129b0f: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129b13: lea    (%rax,%rax,2),%rax
+    0.00 :   129b17: mov    0x8(%rcx),%rcx
+    0.01 :   129b1b: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.02 :   129b20: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.01 :   129b26: mov    0x60(%rsp),%rax
+    0.04 :   129b2b: movq   $0x0,0x70(%rsp)
+    0.00 :   129b34: test   %rdx,%rdx
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   129b37: je     129bcc <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x115c>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129b3d: cmp    %rax,%rdx
+    0.00 :   129b40: ja     12bcac <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x323c>
+    0.00 :   129b46: xor    %ebp,%ebp
+    0.00 :   129b48: mov    0x68(%rsp),%rbx
+         : 615    non_null<alloc::alloc::Global, f32>():
+    0.00 :   129b4d: mov    0x40(%rsp),%r14
+         : 615    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129b52: lea    (%rbx,%rbp,4),%rdi
+    0.00 :   129b56: cmp    $0x1,%r14
+    0.00 :   129b5a: je     129b7b <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x110b>
+         : 901    spec_next<usize>():
+    0.00 :   129b5c: lea    -0x4(,%r14,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129b64: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129b66: call   *0x121fdc(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   129b6c: lea    0x0(%rbp,%r14,1),%rax
+    0.00 :   129b71: lea    -0x1(%rbp,%r14,1),%rbp
+    0.00 :   129b76: lea    -0x4(%rbx,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129b7b: movl   $0x0,(%rdi)
+    0.00 :   129b81: inc    %rbp
+         : 20     take():
+    0.00 :   129b84: mov    0x60(%rsp),%rax
+    0.00 :   129b89: mov    %rax,0xe8(%rsp)
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 937    let mut child_out = scratch.take(my_reach.len());
+         : 938    if !out.is_empty() && parallel_actions(ctx.tree, node_id) {
+    0.00 :   129b91: cmpq   $0x0,0x268(%rsp)
+    0.00 :   129b9a: mov    %rbp,0x18(%rsp)
+    0.00 :   129b9f: jne    129bef <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x117f>
+    0.00 :   129ba1: jmp    129ca4 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1234>
+    0.00 :   129ba6: movq   $0x0,0x60(%rsp)
+         : 465    new<f32>():
+    0.00 :   129baf: movq   $0x4,0x68(%rsp)
+    0.00 :   129bb8: xor    %eax,%eax
+         : 466    clear<f32, alloc::alloc::Global>():
+    0.00 :   129bba: movq   $0x0,0x70(%rsp)
+         : 3036   resize<f32, alloc::alloc::Global>():
+    0.00 :   129bc3: test   %rdx,%rdx
+    0.00 :   129bc6: jne    129b3d <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x10cd>
+         : 3527   take():
+    0.00 :   129bcc: mov    0x68(%rsp),%rbx
+    0.00 :   129bd1: mov    %rax,0xe8(%rsp)
+    0.00 :   129bd9: xor    %ebp,%ebp
+         : 30     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129bdb: cmpq   $0x0,0x268(%rsp)
+    0.00 :   129be4: mov    %rbp,0x18(%rsp)
+    0.00 :   129be9: je     129ca4 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1234>
+    0.00 :   129bef: mov    %r13,%rdi
+    0.00 :   129bf2: mov    %r12d,%esi
+    0.00 :   129bf5: call   *0x1223cd(%rip)        # 24bfc8 <_DYNAMIC+0x7d8>
+    0.00 :   129bfb: test   %al,%al
+    0.00 :   129bfd: je     129ca4 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1234>
+    0.00 :   129c03: mov    0x30(%rsp),%rcx
+         : 938    let mut flat = scratch.take(node.num_children as usize * out.len());
+    0.00 :   129c08: movzwl 0x108(%rsp),%r14d
+    0.00 :   129c11: imul   0x268(%rsp),%r14
+    0.00 :   129c1a: mov    0x10(%rcx),%rax
+         : 2845   pop<alloc::vec::Vec<f32, alloc::alloc::Global>, alloc::alloc::Global>():
+    0.00 :   129c1e: test   %rax,%rax
+    0.00 :   129c21: je     12a98a <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1f1a>
+    0.00 :   129c27: dec    %rax
+    0.00 :   129c2a: mov    %rax,0x10(%rcx)
+         : 2850   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129c2e: lea    (%rax,%rax,2),%rax
+    0.00 :   129c32: mov    0x8(%rcx),%rcx
+    0.00 :   129c36: vmovups (%rcx,%rax,8),%xmm0
+         : 1734   read<alloc::vec::Vec<f32, alloc::alloc::Global>>():
+    0.00 :   129c3b: vmovaps %xmm0,0x60(%rsp)
+         : 1734   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129c41: mov    0x60(%rsp),%r13
+    0.00 :   129c46: movq   $0x0,0x70(%rsp)
+    0.00 :   129c4f: test   %r14,%r14
+         : 3526   resize<f32, alloc::alloc::Global>():
+    0.00 :   129c52: je     12a9b1 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1f41>
+         : 3526   hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129c58: cmp    %r13,%r14
+    0.00 :   129c5b: ja     12bf19 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x34a9>
+    0.00 :   129c61: xor    %r15d,%r15d
+    0.00 :   129c64: mov    0x68(%rsp),%r12
+    0.00 :   129c69: lea    (%r12,%r15,4),%rdi
+    0.00 :   129c6d: cmp    $0x1,%r14
+    0.00 :   129c71: je     129c91 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1221>
+         : 901    spec_next<usize>():
+    0.00 :   129c73: lea    -0x4(,%r14,4),%rdx
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129c7b: xor    %esi,%esi
+         : 1934   write<f32>():
+    0.00 :   129c7d: call   *0x121ec5(%rip)        # 24bb48 <memset@GLIBC_2.2.5>
+         : 1934   spec_next<usize>():
+    0.00 :   129c83: lea    (%r15,%r14,1),%rax
+    0.00 :   129c87: lea    -0x1(%r15,%r14,1),%r15
+    0.00 :   129c8c: lea    -0x4(%r12,%rax,4),%rdi
+         : 903    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129c91: movl   $0x0,(%rdi)
+    0.00 :   129c97: inc    %r15
+         : 20     take():
+    0.00 :   129c9a: mov    0x60(%rsp),%r13
+    0.00 :   129c9f: jmp    12a9b9 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1f49>
+         : 29     hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129ca4: mov    0xc0(%rsp),%rax
+    0.00 :   129cac: mov    (%rax),%r14d
+         : 299    children():
+    0.01 :   129caf: movzwl 0x8(%rax),%eax
+    0.00 :   129cb3: mov    %rax,0xc8(%rsp)
+    0.00 :   129cbb: add    %r14d,%eax
+         : 301    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129cbe: cmp    %eax,%r14d
+    0.01 :   129cc1: jae    12ae1e <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x23ae>
+         : 901    spec_next<u32>():
+    0.00 :   129cc7: mov    0x190(%rsp),%rcx
+    0.00 :   129ccf: mov    0x188(%rsp),%rax
+    0.00 :   129cd7: mov    0x260(%rsp),%rdi
+    0.00 :   129cdf: mov    %rcx,0x20(%rsp)
+    0.00 :   129ce4: mov    0x268(%rsp),%rcx
+    0.00 :   129cec: mov    %rax,0x50(%rsp)
+    0.00 :   129cf1: movzbl 0x1a0(%rsp),%eax
+    0.00 :   129cf9: lea    -0x1(%rcx),%r8
+    0.00 :   129cfd: mov    %rax,0x28(%rsp)
+    0.00 :   129d02: mov    0x198(%rsp),%rax
+    0.00 :   129d0a: cmp    %r8,%rbp
+    0.00 :   129d0d: cmovb  %rbp,%r8
+    0.00 :   129d11: lea    0x4(%rbx,%r8,4),%rdx
+    0.00 :   129d16: lea    0x4(%rdi,%r8,4),%rcx
+    0.01 :   129d1b: lea    0x1(%r8),%rsi
+    0.00 :   129d1f: mov    %r8,0x10(%rsp)
+    0.00 :   129d24: cmp    %rdx,%rdi
+    0.00 :   129d27: mov    %rax,0x8(%rsp)
+         : 914    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+         : 988    }
+         : 989    }
+         : 990    scratch.put(flat);
+         : 991    } else {
+         : 992    for (a, child) in ctx.tree.children(node_id).enumerate() {
+         : 993    if !zero_opp {
+    0.00 :   129d2c: movzbl 0x5c(%rsp),%eax
+    0.00 :   129d31: setb   %dl
+    0.00 :   129d34: cmp    %rcx,%rbx
+    0.00 :   129d37: setb   %cl
+    0.00 :   129d3a: and    %dl,%cl
+    0.00 :   129d3c: and    $0x1f,%esi
+    0.00 :   129d3f: mov    %cl,0x38(%rsp)
+    0.00 :   129d43: mov    $0x20,%ecx
+    0.00 :   129d48: cmovne %rsi,%rcx
+    0.00 :   129d4c: xor    %r15d,%r15d
+    0.00 :   129d4f: xor    %r12d,%r12d
+    0.01 :   129d52: neg    %rcx
+    0.00 :   129d55: lea    0x1(%r8,%rcx,1),%r13
+    0.00 :   129d5a: jmp    129d77 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x1307>
+    0.00 :   129d5c: nopl   0x0(%rax)
+    0.00 :   129d60: inc    %r14d
+         : 1010   spec_next<u32>():
+    0.01 :   129d63: add    $0x4,%r12
+    0.00 :   129d67: mov    %rsi,%r15
+         : 902    lt():
+    0.01 :   129d6a: cmp    0xc8(%rsp),%esi
+         : 1917   spec_next<u32>():
+    0.07 :   129d71: je     12ae1e <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x23ae>
+         : 901    hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>:
+    0.00 :   129d77: lea    0x1(%r15),%rbp
+    0.02 :   129d7b: test   $0x1,%al
+    0.00 :   129d7d: jne    129e24 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x13b4>
+         : 989    let row = &sigma[a * num_hands..(a + 1) * num_hands];
+    0.00 :   129d83: mov    0x200(%rsp),%rsi
+    0.04 :   129d8b: mov    0x130(%rsp),%rdx
+    0.02 :   129d93: mov    %rsi,%rdi
+    0.00 :   129d96: mov    %rsi,%rax
+    0.00 :   129d99: imul   %r15,%rdi

@@ -1,0 +1,11 @@
+tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16) / 2017.5 MiB (i16-f32avg)
+memory estimate: 3208.3 MiB (f32) / 1866.7 MiB (i16) / 2537.5 MiB (i16-f32avg)
+iter=      25 expl_p0=8.222e-1 expl_p1=5.176e-1 nash_conv=1.340e0
+iter=      50 expl_p0=1.531e-1 expl_p1=7.943e-2 nash_conv=2.325e-1
+iter=     100 expl_p0=2.896e-2 expl_p1=1.394e-2 nash_conv=4.290e-2
+iter=     150 expl_p0=1.069e-2 expl_p1=6.022e-3 nash_conv=1.671e-2
+iter=     174 expl_p0=7.838e-3 expl_p1=4.479e-3 nash_conv=1.232e-2
+iter=     182 expl_p0=7.135e-3 expl_p1=4.179e-3 nash_conv=1.131e-2
+iter=     185 expl_p0=6.823e-3 expl_p1=4.044e-3 nash_conv=1.087e-2
+done: iterations=185 wall=36.67s ev_p0=1.528186 ev_p1=3.314489 nash_conv=1.087e-2
+sol: wrote /home/PC_User/work8/c_flop1_t17/solution.sol (895.39 MB, 335460 blocks, mode=Full)

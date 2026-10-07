@@ -1,0 +1,15 @@
+tree: nodes=2544580 terminals=1586149 rank_tables=799 storage=8266.2 MiB (f32) / 4140.4 MiB (i16) / 6203.3 MiB (i16-f32avg)
+memory estimate: 8786.2 MiB (f32) / 4660.4 MiB (i16) / 6723.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.141e0 expl_p1=7.388e-1 nash_conv=1.880e0
+iter=      50 expl_p0=3.037e-1 expl_p1=2.107e-1 nash_conv=5.145e-1
+iter=     100 expl_p0=5.639e-2 expl_p1=4.968e-2 nash_conv=1.061e-1
+iter=     150 expl_p0=2.311e-2 expl_p1=1.816e-2 nash_conv=4.127e-2
+iter=     200 expl_p0=1.292e-2 expl_p1=9.889e-3 nash_conv=2.281e-2
+iter=     250 expl_p0=8.079e-3 expl_p1=6.289e-3 nash_conv=1.437e-2
+iter=     300 expl_p0=5.716e-3 expl_p1=4.821e-3 nash_conv=1.054e-2
+iter=     350 expl_p0=4.560e-3 expl_p1=3.809e-3 nash_conv=8.368e-3
+iter=     400 expl_p0=3.455e-3 expl_p1=2.839e-3 nash_conv=6.293e-3
+iter=     421 expl_p0=3.054e-3 expl_p1=2.569e-3 nash_conv=5.623e-3
+iter=     425 expl_p0=2.999e-3 expl_p1=2.501e-3 nash_conv=5.500e-3
+done: iterations=425 wall=267.21s ev_p0=1.912628 ev_p1=2.897033 nash_conv=5.500e-3
+sol: wrote /home/PC_User/work8/c_flop3_t17/solution.sol (2324.81 MB, 955253 blocks, mode=Full)
