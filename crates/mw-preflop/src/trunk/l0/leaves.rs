@@ -10,7 +10,7 @@ use super::eval::Reach;
 use super::{Model, Terminal, Tree};
 use crate::trunk::classes::{Classes, Ordering3};
 
-pub(super) struct LeafValues {
+pub(crate) struct LeafValues {
     pub values: Vec<Vec<[f64; 169]>>,
     pub t2: f64,
     pub t3: f64,
@@ -18,14 +18,14 @@ pub(super) struct LeafValues {
 }
 
 #[derive(Clone)]
-pub(super) struct ThreeItem {
-    pub(super) node: usize,
-    pub(super) hero: usize,
-    pub(super) q: Vec<(usize, f64)>,
-    pub(super) r: Vec<(usize, f64)>,
+pub(crate) struct ThreeItem {
+    pub(crate) node: usize,
+    pub(crate) hero: usize,
+    pub(crate) q: Vec<(usize, f64)>,
+    pub(crate) r: Vec<(usize, f64)>,
     #[cfg(test)]
-    pub(super) payoffs: Vec<f64>,
-    pub(super) terms: ThreeTerms,
+    pub(crate) payoffs: Vec<f64>,
+    pub(crate) terms: ThreeTerms,
 }
 
 /// Hero's fractional share of a three-way pot, two pairwise pots, and a constant.
@@ -54,14 +54,14 @@ fn three_basis() -> [[f64; 13]; 4] {
 }
 
 #[derive(Clone)]
-pub(super) struct ThreeTerms {
+pub(crate) struct ThreeTerms {
     weights: [f64; 4],
     residuals: [f64; 13],
-    pub(super) mask: u16,
+    pub(crate) mask: u16,
 }
 
 impl ThreeTerms {
-    pub(super) fn new(u: &[f64]) -> Self {
+    pub(crate) fn new(u: &[f64]) -> Self {
         let at = |h, x, y| u[Ordering3::from_ranks(h, x, y).index()];
         let constant = at(1, 3, 2); // X > Y > hero
         let a2 = at(2, 3, 1) - constant;
@@ -85,7 +85,7 @@ impl ThreeTerms {
 
 /// Fixed-order bilinear forms, batched only with identical correction masks.
 /// Independent item accumulators make grouping and class/thread order irrelevant.
-pub(super) fn three_values(
+pub(crate) fn three_values(
     c: usize,
     items: &[ThreeItem],
     tree: &Tree,
@@ -195,21 +195,21 @@ pub(super) fn three_values(
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(super) struct K4Plan {
+pub(crate) struct K4Plan {
     pub samples: u64,
     pub min_samples: Option<u64>,
     pub seed: u64,
 }
 
 impl K4Plan {
-    pub(super) fn model(model: &Model<'_>) -> Self {
+    pub(crate) fn model(model: &Model<'_>) -> Self {
         Self {
             samples: model.options.k4_samples,
             min_samples: None,
             seed: model.options.seed,
         }
     }
-    pub(super) fn allocation(self, mass: f64, reference: f64) -> u64 {
+    pub(crate) fn allocation(self, mass: f64, reference: f64) -> u64 {
         match self.min_samples {
             None => self.samples,
             Some(min) => {
@@ -230,7 +230,7 @@ fn opponent_mass(reach: &Reach, seats: usize, hero: usize, c: usize) -> f64 {
 /// Sixteen items form the innermost loop so the table is streamed once per
 /// cache-sized block, with independent fixed-order accumulations per item.
 #[cfg(test)]
-pub(super) fn three_values_reference(
+pub(crate) fn three_values_reference(
     c: usize,
     items: &[ThreeItem],
     tree: &Tree,
@@ -522,7 +522,7 @@ fn sample_value(
 
 /// Hero-conditioned terminal values, excluding the hero's own reach/weight.
 /// Filtering heroes preserves each contraction and sample stream's order.
-pub(super) fn leaf_values(
+pub(crate) fn leaf_values(
     tree: &Tree,
     model: &Model<'_>,
     reach: &[Reach],
@@ -538,7 +538,11 @@ pub(super) fn leaf_values(
         .filter(|&c| model.weights.iter().any(|w| w[c] > 0.0))
         .collect();
     let mut t2_slab = vec![[0.0; 3]; 169 * 169];
-    if tree.terminal_counts()[2] > 0 {
+    if tree.nodes.iter().any(|n| {
+        n.terminal
+            .as_ref()
+            .is_some_and(|t| t.active.len() == 2 && t.l1.is_none())
+    }) {
         for &c in &support {
             for &d in &support {
                 t2_slab[c * 169 + d] = model.tables.t2(c, d)?;
@@ -549,6 +553,10 @@ pub(super) fn leaf_values(
         let Some(t) = &node.terminal else { continue };
         for (p, seat_leaves) in leaves.iter_mut().enumerate() {
             if !heroes.contains(&p) {
+                continue;
+            }
+            // L1 replaces the active players' values; folded seats keep the constant path.
+            if t.l1.is_some() && t.active.contains(&p) {
                 continue;
             }
             if (t.active.len() >= 4 || (t.active.len() == 3 && model.sample_three_way()))
@@ -799,7 +807,7 @@ fn sample_value_reference(
 }
 
 #[cfg(test)]
-pub(super) struct SampleReference {
+pub(crate) struct SampleReference {
     pub node: usize,
     pub hero: usize,
     pub class: usize,
@@ -811,7 +819,7 @@ pub(super) struct SampleReference {
 /// A model plan runs exactly the original fixed-budget computation; scaled plans
 /// independently select the stream prefix and its normalization.
 #[cfg(test)]
-pub(super) fn k4_reference(
+pub(crate) fn k4_reference(
     tree: &Tree,
     model: &Model<'_>,
     reach: &[Reach],

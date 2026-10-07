@@ -50,16 +50,20 @@ impl Default for EvaluationOptions {
 
 pub struct Model<'a> {
     game: &'a HoldemGame<FeatureHashAbstraction>,
-    pub(super) tables: &'a dyn Tables,
-    pub(super) options: EvaluationOptions,
-    pub(super) weights: Vec<[f64; 169]>,
+    pub(crate) tables: &'a dyn Tables,
+    pub(crate) options: EvaluationOptions,
+    pub(crate) weights: Vec<[f64; 169]>,
     pub warnings: Vec<String>,
-    pub(super) support: Vec<Vec<usize>>,
-    pub(super) live: Vec<Vec<Vec<usize>>>,
-    pub(super) normalizers: Vec<f64>,
+    pub(crate) support: Vec<Vec<usize>>,
+    pub(crate) live: Vec<Vec<Vec<usize>>>,
+    pub(crate) normalizers: Vec<f64>,
 }
 
 impl<'a> Model<'a> {
+    pub fn evaluation_options(&self) -> EvaluationOptions {
+        self.options
+    }
+
     pub fn weights(&self) -> &[[f64; 169]] {
         &self.weights
     }
@@ -129,7 +133,7 @@ impl<'a> Model<'a> {
         })
     }
 
-    pub(super) fn sample_three_way(&self) -> bool {
+    pub(crate) fn sample_three_way(&self) -> bool {
         #[cfg(test)]
         {
             self.options.sample_three_way
@@ -141,7 +145,7 @@ impl<'a> Model<'a> {
     }
 }
 
-pub(super) fn deal_normalizers(weights: &[[f64; 169]], support: &[Vec<usize>]) -> Result<Vec<f64>> {
+pub(crate) fn deal_normalizers(weights: &[[f64; 169]], support: &[Vec<usize>]) -> Result<Vec<f64>> {
     let catalog = Classes::get();
     let z: Vec<[f64; 169]> = weights
         .iter()
@@ -221,19 +225,19 @@ pub struct PhaseTimings {
     pub backward: f64,
 }
 
-pub(super) struct Reach {
+pub(crate) struct Reach {
     pi: Vec<f64>,
     mass: Vec<f64>,
 }
 
 impl Reach {
-    pub(super) fn pi(&self, seat: usize, c: usize) -> f64 {
+    pub(crate) fn pi(&self, seat: usize, c: usize) -> f64 {
         self.pi[seat * 169 + c]
     }
-    pub(super) fn mass(&self, seat: usize, c: usize) -> f64 {
+    pub(crate) fn mass(&self, seat: usize, c: usize) -> f64 {
         self.mass[seat * 169 + c]
     }
-    pub(super) fn rho(&self, model: &Model<'_>, seat: usize) -> Vec<(usize, f64)> {
+    pub(crate) fn rho(&self, model: &Model<'_>, seat: usize) -> Vec<(usize, f64)> {
         model.support[seat]
             .iter()
             .filter_map(|&d| {
@@ -244,7 +248,7 @@ impl Reach {
     }
 }
 
-pub(super) fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
+pub(crate) fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
     let mut reaches: Vec<Reach> = Vec::with_capacity(tree.nodes.len());
     for n in &tree.nodes {
         let mut pi = if let Some((p, _)) = n.parent {
@@ -282,7 +286,7 @@ pub(super) fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<
 
 /// Solver reads pi at its own decisions (averaging) and rho at terminals.
 /// Mass is read only by leaf_values at terminals; decision masses stay unused.
-pub(super) fn solver_reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
+pub(crate) fn solver_reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
     let mut reach: Vec<_> = tree
         .nodes
         .iter()
@@ -299,7 +303,7 @@ pub(super) fn solver_reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) 
 
 /// Rebuild one seat along the path, retaining the full evaluator's exact
 /// multiplication order and rho sum order, including unsupported pi entries.
-pub(super) fn update_reach(
+pub(crate) fn update_reach(
     tree: &Tree,
     profile: &Profile,
     model: &Model<'_>,
@@ -338,6 +342,10 @@ pub(super) fn update_reach(
 }
 
 pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Evaluation> {
+    ensure!(
+        tree.l1_leaf_count() == 0,
+        "L1 leaves require the L1 evaluator"
+    );
     profile.validate(tree)?;
     ensure!(
         tree.game_fingerprint == model.game.game_fingerprint(),

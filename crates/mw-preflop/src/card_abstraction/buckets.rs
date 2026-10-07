@@ -794,6 +794,22 @@ fn lookup(table: &StreetTable, key: &[u8], combo: usize, board: &[Card], orig_co
     b as u32
 }
 
+impl Ehs2Abstraction {
+    /// Map every combo through one canonicalization of the public board.
+    pub(crate) fn bucket_row(&self, board: &[Card]) -> [u16; NUM_COMBOS] {
+        let (street, key, perm) = canonicalize_query(board);
+        let table = match street {
+            Street::Flop => self.flop.as_ref(),
+            Street::Turn => self.turn.as_ref(),
+            Street::River => self.river.as_ref(),
+            Street::Preflop => unreachable!(),
+        }
+        .expect("bucket street not built");
+        let row = table.boards.get(&key).expect("bucket board not built");
+        std::array::from_fn(|combo| row[permute_combo(&perm, combo)])
+    }
+}
+
 impl CardAbstraction for Ehs2Abstraction {
     fn num_buckets(&self, street: Street) -> u32 {
         match street {
@@ -825,6 +841,48 @@ mod tests {
     use super::*;
     use nlh::combo_index;
     use nlh::iso::{all_suit_perms, permute_card};
+
+    #[test]
+    fn bucket_rows_equal_individual_queries_for_random_boards() {
+        use rand::{Rng, SeedableRng};
+        use rand_chacha::ChaCha8Rng;
+        let mut rng = ChaCha8Rng::seed_from_u64(19);
+        let mut boards = Vec::new();
+        for _ in 0..2 {
+            let mut cards = Vec::new();
+            while cards.len() < 5 {
+                let card = Card::from_index(rng.gen_range(0..52));
+                if !cards.contains(&card) {
+                    cards.push(card);
+                }
+            }
+            for n in 3..=5 {
+                boards.push(cards[..n].to_vec());
+            }
+        }
+        let abs = Ehs2Abstraction::build_for_boards(
+            Ehs2Params {
+                flop_buckets: 4,
+                turn_buckets: 4,
+                river_buckets: 4,
+            },
+            &boards,
+        );
+        for board in &boards {
+            for perm in all_suit_perms().iter().take(4) {
+                let board: Vec<_> = board.iter().map(|&c| permute_card(perm, c)).collect();
+                let row = abs.bucket_row(&board);
+                for (h, &bucket) in row.iter().enumerate() {
+                    let (a, b) = combo_cards(h);
+                    if board.contains(&a) || board.contains(&b) {
+                        assert_eq!(bucket, u16::MAX);
+                    } else {
+                        assert_eq!(u32::from(bucket), abs.bucket(&board, h));
+                    }
+                }
+            }
+        }
+    }
 
     fn parse(s: &str) -> Vec<Card> {
         s.split_whitespace().map(|c| c.parse().unwrap()).collect()

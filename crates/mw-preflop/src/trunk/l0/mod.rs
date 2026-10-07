@@ -4,11 +4,11 @@
 //! evaluation performs no I/O. Multiway deals ignore opponent/opponent overlap
 //! and folded cards; T3 and larger showdowns retain their sampling uncertainty.
 
-mod eval;
-mod leaves;
+pub(crate) mod eval;
+pub(crate) mod leaves;
 mod profile;
 mod real;
-mod solve;
+pub(crate) mod solve;
 mod tree;
 
 pub use eval::{Evaluation, EvaluationOptions, LocalGain, Model, SeatEvaluation, Tables, evaluate};
@@ -20,7 +20,7 @@ pub use real::{
 pub use solve::{
     Checkpoint, CheckpointSeat, Progress, Solution, SolveOptions, SolveTimings, solve,
 };
-pub use tree::{DecisionExport, Node, Terminal, Tree, TreeExport};
+pub use tree::{DecisionExport, FlopLeaves, Node, Terminal, Tree, TreeExport};
 
 /// Rebuild a legacy artifact's game without loading its production abstraction.
 pub fn game_from_solution(

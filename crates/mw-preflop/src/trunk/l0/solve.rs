@@ -89,7 +89,7 @@ pub struct Solution {
 }
 
 impl SolveOptions {
-    pub(super) fn k4_plan(self, model: &Model<'_>, iteration: u64) -> K4Plan {
+    pub(crate) fn k4_plan(self, model: &Model<'_>, iteration: u64) -> K4Plan {
         let Some(samples) = self.k4_samples else {
             return K4Plan::model(model);
         };
@@ -110,7 +110,7 @@ impl SolveOptions {
     }
 }
 
-fn regret_matching(regrets: &[f64], row: &mut [f64]) {
+pub(crate) fn regret_matching(regrets: &[f64], row: &mut [f64]) {
     let sum: f64 = regrets.iter().map(|r| r.max(0.0)).sum();
     if sum > 0.0 {
         for (s, r) in row.iter_mut().zip(regrets) {
@@ -121,14 +121,14 @@ fn regret_matching(regrets: &[f64], row: &mut [f64]) {
     }
 }
 
-struct Discounts {
-    positive: f64,
-    nonpositive: f64,
-    average: f64,
+pub(crate) struct Discounts {
+    pub(crate) positive: f64,
+    pub(crate) nonpositive: f64,
+    pub(crate) average: f64,
 }
 
 impl Discounts {
-    fn new(t: u64, options: SolveOptions) -> Result<Self> {
+    pub(crate) fn new(t: u64, options: SolveOptions) -> Result<Self> {
         let factor = |exponent: f64| {
             let x = (t as f64).powf(exponent);
             if x.is_infinite() { 1.0 } else { x / (x + 1.0) }
@@ -146,7 +146,7 @@ impl Discounts {
     }
 }
 
-fn update_row(
+pub(crate) fn update_row(
     regrets: &mut [f64],
     sums: &mut [f64],
     row: &[f64],
@@ -166,7 +166,7 @@ fn update_row(
     }
 }
 
-pub(super) fn backward_values(
+pub(crate) fn backward_values(
     tree: &Tree,
     profile: &Profile,
     support: &[usize],
@@ -193,7 +193,7 @@ pub(super) fn backward_values(
     }
 }
 
-fn average_profile(tree: &Tree, sums: &Profile, model: &Model<'_>) -> Profile {
+pub(crate) fn average_profile(tree: &Tree, sums: &Profile, model: &Model<'_>) -> Profile {
     let mut average = Profile::uniform(tree);
     for (z, node) in tree.nodes.iter().enumerate() {
         let Some(p) = node.actor else { continue };
@@ -220,6 +220,7 @@ pub fn solve(
     options: SolveOptions,
     mut observer: impl FnMut(&Progress<'_>),
 ) -> Result<Solution> {
+    ensure!(tree.l1_leaf_count() == 0, "L1 leaves require the L1 solver");
     ensure!(options.iterations >= 1, "iterations must be positive");
     ensure!(
         options.alpha.is_finite()

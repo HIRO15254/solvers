@@ -9,9 +9,17 @@ use crate::{SeatId, SeatStatus, SeatVec, Street, betting::HandPhase};
 
 /// DFS arena; every parent precedes its children. Ordering slots use ascending
 /// active seats, independently of the hero evaluating the terminal.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FlopLeaves {
+    Reject,
+    Checkdown,
+    L1,
+}
+
 pub struct Tree {
     pub nodes: Vec<Node>,
     pub seats: usize,
+    pub flop_leaves: usize,
     pub game_fingerprint: [u8; 32],
 }
 
@@ -26,6 +34,7 @@ pub struct Node {
 
 pub struct Terminal {
     pub active: Vec<usize>,
+    pub l1: Option<crate::trunk::l1::Subtree>,
     pub state: BettingState,
     /// One uncontested vector, three two-way vectors, or thirteen three-way
     /// vectors. Larger showdowns use the lazily filled ordering cache.
@@ -97,31 +106,76 @@ impl Terminal {
 
 impl Tree {
     pub fn build(game: &HoldemGame<FeatureHashAbstraction>) -> Result<Self> {
-        Self::build_root(game, game.root_state())
+        Self::build_with(game, FlopLeaves::Reject)
     }
 
+    pub fn build_with(game: &HoldemGame<FeatureHashAbstraction>, mode: FlopLeaves) -> Result<Self> {
+        Self::build_mode(game, game.root_state(), mode)
+    }
+
+    #[cfg(test)]
     pub(super) fn build_root(
         game: &HoldemGame<FeatureHashAbstraction>,
         root: BettingState,
     ) -> Result<Self> {
+        Self::build_mode(game, root, FlopLeaves::Reject)
+    }
+
+    fn build_mode(
+        game: &HoldemGame<FeatureHashAbstraction>,
+        root: BettingState,
+        mode: FlopLeaves,
+    ) -> Result<Self> {
         game.require_l0_chip_ev()?;
         let mut tree = Self {
             nodes: Vec::new(),
+            flop_leaves: 0,
             seats: game.num_players(),
             game_fingerprint: game.game_fingerprint(),
         };
-        tree.visit(game, root, HistoryKey::ROOT, None)?;
+        tree.visit(game, root, HistoryKey::ROOT, None, mode)?;
         Ok(tree)
     }
 
     fn visit(
         &mut self,
         game: &HoldemGame<FeatureHashAbstraction>,
-        state: BettingState,
+        mut state: BettingState,
         history: HistoryKey,
         parent: Option<(usize, usize)>,
+        mode: FlopLeaves,
     ) -> Result<usize> {
         let index = self.nodes.len();
+        let mut l1 = None;
+        if state.phase == HandPhase::Betting
+            && state.street != Street::Preflop
+            && mode != FlopLeaves::Reject
+        {
+            self.flop_leaves += 1;
+            let active: Vec<_> = (0..self.seats)
+                .filter(|&i| state.seats[SeatId(i as u8)].status != SeatStatus::Folded)
+                .collect();
+            if mode == FlopLeaves::L1
+                && active.len() == 2
+                && active
+                    .iter()
+                    .all(|&i| state.seats[SeatId(i as u8)].status == SeatStatus::Active)
+            {
+                l1 = Some(crate::trunk::l1::Subtree::build(
+                    game,
+                    state.clone(),
+                    [active[0], active[1]],
+                )?);
+            }
+            while state.phase == HandPhase::Betting {
+                let actions = game.node_actions(&state);
+                let check = actions
+                    .iter()
+                    .position(|a| matches!(a, crate::betting::Action::Check))
+                    .ok_or_else(|| anyhow::anyhow!("checkdown requires a legal check"))?;
+                state = game.next_state_with(&state, &actions, check);
+            }
+        }
         let is_terminal = state.phase != HandPhase::Betting;
         let actor = if is_terminal {
             None
@@ -152,6 +206,7 @@ impl Tree {
                 .collect();
             let mut t = Terminal {
                 active,
+                l1,
                 state: state.clone(),
                 payoffs: Vec::new(),
                 cache: RwLock::new(FxHashMap::default()),
@@ -226,6 +281,7 @@ impl Tree {
                     game.next_state_with(&state, &actions, a),
                     history.child(actor, a),
                     Some((index, a)),
+                    mode,
                 )?;
                 self.nodes[index].children.push(child);
             }
@@ -260,6 +316,13 @@ impl Tree {
                 })
                 .collect(),
         }
+    }
+
+    pub fn l1_leaf_count(&self) -> usize {
+        self.nodes
+            .iter()
+            .filter(|n| n.terminal.as_ref().is_some_and(|t| t.l1.is_some()))
+            .count()
     }
 
     pub fn terminal_counts(&self) -> Vec<usize> {

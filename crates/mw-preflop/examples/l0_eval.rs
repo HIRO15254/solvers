@@ -72,7 +72,10 @@ fn main() -> Result<()> {
         l0::game_from_config(&std::fs::read_to_string(source)?, source)?
     };
     let start = Instant::now();
-    let tree = Tree::build(&game)?;
+    let tree = Tree::build_with(&game, l0::FlopLeaves::Checkdown)?;
+    if tree.flop_leaves > 0 {
+        println!("Postflop menus evaluated in L0 Checkdown mode.");
+    }
     let tree_seconds = start.elapsed().as_secs_f64();
     if let Some(path) = export_tree {
         write_json(&path, &tree.export())?;

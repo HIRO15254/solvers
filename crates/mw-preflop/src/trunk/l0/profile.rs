@@ -69,7 +69,7 @@ impl Profile {
         &self.rows[node][class * a..(class + 1) * a]
     }
 
-    pub(super) fn row_mut(&mut self, tree: &Tree, node: usize, class: usize) -> &mut [f64] {
+    pub(crate) fn row_mut(&mut self, tree: &Tree, node: usize, class: usize) -> &mut [f64] {
         let a = tree.nodes[node].labels.len();
         &mut self.rows[node][class * a..(class + 1) * a]
     }
