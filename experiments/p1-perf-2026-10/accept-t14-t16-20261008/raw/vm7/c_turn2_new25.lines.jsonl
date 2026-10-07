@@ -1,0 +1,14 @@
+{"t": 0.014, "line": "tree: nodes=22107 terminals=14280 rank_tables=48 storage=15.6 MiB (f32) / 7.9 MiB (i16) / 11.8 MiB (i16-f32avg)"}
+{"t": 0.014, "line": "memory estimate: 227.6 MiB (f32) / 223.7 MiB (i16) / 227.6 MiB (i16-f32avg)"}
+{"t": 0.102, "line": "iter=      25 expl_p0=2.881e0 expl_p1=2.019e0 nash_conv=4.899e0"}
+{"t": 0.143, "line": "iter=      50 expl_p0=6.872e-1 expl_p1=6.505e-1 nash_conv=1.338e0"}
+{"t": 0.184, "line": "iter=      75 expl_p0=3.180e-1 expl_p1=2.675e-1 nash_conv=5.855e-1"}
+{"t": 0.224, "line": "iter=     100 expl_p0=1.834e-1 expl_p1=1.414e-1 nash_conv=3.248e-1"}
+{"t": 0.263, "line": "iter=     125 expl_p0=1.153e-1 expl_p1=8.514e-2 nash_conv=2.005e-1"}
+{"t": 0.302, "line": "iter=     150 expl_p0=7.843e-2 expl_p1=5.613e-2 nash_conv=1.346e-1"}
+{"t": 0.34, "line": "iter=     175 expl_p0=5.655e-2 expl_p1=3.885e-2 nash_conv=9.540e-2"}
+{"t": 0.377, "line": "iter=     200 expl_p0=4.045e-2 expl_p1=2.831e-2 nash_conv=6.876e-2"}
+{"t": 0.414, "line": "iter=     225 expl_p0=3.053e-2 expl_p1=2.136e-2 nash_conv=5.189e-2"}
+{"t": 0.451, "line": "iter=     250 expl_p0=2.510e-2 expl_p1=1.837e-2 nash_conv=4.347e-2"}
+{"t": 0.451, "line": "done: iterations=250 wall=0.42s ev_p0=7.681513 ev_p1=12.799682 nash_conv=4.347e-2"}
+{"t": 0.509, "line": "sol: wrote /home/PC_User/work/c_turn2_new25/solution.sol (5.25 MB, 7802 blocks, mode=Full)"}

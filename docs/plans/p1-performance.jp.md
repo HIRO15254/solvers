@@ -69,6 +69,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T13 | PF8: 旧i16の`pow4_reset`既定をtrueにする。規範・template・試験の同期 | i16の未指定が明示trueと、他storageの未指定が明示falseとbit一致。実効configが値を明示する |
 | T14 | PF9: 最後のcheckpointと`.sol`の並行書き出し（並行中の見積りS＋W＋2Cが上限以下のとき）と`[run] final_checkpoint` | 並行と直列、新旧で`.sol` payload・checkpoint stateが一致。falseで最後のcheckpointを書かず、`.sol`は一致。旧runの再開 |
 | T15 | PF10: `check_every = "auto"`の適応的な評価間隔。再開時はprogressから評価履歴を復元する | 整数の明示と旧版がbit一致。targetの無いautoが旧版と一致。autoで再開と一度に解いたrunの評価iteration・停止・stateが一致 |
+| T16 | 64 MiB以上のstorage arenaを確保時にrun poolで並列にprefaultし、最初のiterationでのzero page上のcopy-on-writeをなくす | `.sol` payload・checkpoint arena・progressが変更前とbit一致 |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -146,6 +147,9 @@ T14: 並行・直列・旧版で`.sol` payload（wall_secsと`[run]`行以外）
 `final_checkpoint = false`でも`.sol`は同じで、省いたrunは定期checkpointから一度に解いたrunと同じ結果へ再開できる。
 T15: 整数の`check_every = 25`は旧版と一致し、targetの無いautoは保存configの値以外が旧版と一致した。
 Turn6・target 1% potでは、autoが評価7回・184 iterationで止まった（固定25は8回・200 iteration）。途中停止と重複progressからの再開も一致した。
+T14〜T16のGCP受入（[証拠](../../experiments/p1-perf-2026-10/accept-t14-t16-20261008/README.md)、32 threads）: gtow_bのprocess全体はT13の625.6秒から572.0秒、
+最後のcheckpointを省くと496.0秒になった。T16で確保直後の3 iterationが10.7→3.7秒、T15で停止までの時間が固定25の463.1→449.1秒（他の木は0.93〜0.98倍）、
+T14で停止後の保存が145.2→123.0秒（diskの書込み律速）。`.sol`生成中は`compatible_reach`の線形探索が25%を占めた。
 
 ### 一致の定義
 

@@ -1,0 +1,72 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+sb_bb = 0.5
+ante_bb = 0
+bb_ante_bb = 0
+straddles_bb = []
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+when = "flop_dealt"
+allocation = "main-first"
+rounding = "down"
+rounding_unit_bb = 0.001
+
+[spot]
+line = "BTN r2.5, BB r11, BTN c"
+board = "Jh Th 8c"
+
+[ranges]
+BTN = "JJ-55,AQs-A9s,A5s-A4s,KQs-KTs,QJs-QTs,JTs,T9s,98s,87s,76s,65s,AQo,KQo"
+BB = "QQ+,AKs,AQs,A5s-A3s,KQs,K9s,QJs,76s,65s,AKo,AQo"
+
+[tree]
+script = '''
+flop { replace bet [33, 75] }
+turn, river { replace bet [66] }
+flop, turn, river { replace raise [3x] }
+'''
+include_allin = false
+
+[tree.max_aggressive_actions]
+preflop = 4
+flop = 2
+turn = 2
+river = 2
+
+[solver]
+iso_merging = true
+storage = "f32"
+cfr_precision = "f32"
+
+[solver.algorithm]
+schedule = "dcfr"
+alpha = 1.25
+beta = 0.5
+gamma = 4.0
+pow4_reset = false
+
+[solver.stop]
+target = "0.1%pot"
+max_iterations = 2000
+check_every = "auto"
+
+[solver.parallel]
+chance_depth = 2
+min_children = 12
+
+[run]
+threads = 32
+memory = "auto"
+checkpoint_interval = "10h"
+final_checkpoint = true
+
+[output]
+solution_streets = "full"

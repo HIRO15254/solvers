@@ -1,0 +1,6 @@
+{"t": 0.5, "line": "tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)"}
+{"t": 0.5, "line": "memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)"}
+{"t": 45.423, "line": "iter=      25 expl_p0=1.671e0 expl_p1=1.727e0 nash_conv=3.398e0"}
+{"t": 87.545, "line": "iter=      50 expl_p0=3.832e-1 expl_p1=3.988e-1 nash_conv=7.820e-1"}
+{"t": 87.545, "line": "done: iterations=50 wall=81.42s ev_p0=1.466115 ev_p1=3.397870 nash_conv=7.820e-1"}
+{"t": 135.839, "line": "sol: wrote /home/PC_User/work/gtowb_perf/solution.sol (6448.60 MB, 2293609 blocks, mode=Full)"}

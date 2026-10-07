@@ -1,0 +1,13 @@
+{"t": 0.498, "line": "tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)"}
+{"t": 0.498, "line": "memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)"}
+{"t": 42.204, "line": "iter=      25 expl_p0=1.671e0 expl_p1=1.727e0 nash_conv=3.398e0"}
+{"t": 80.969, "line": "iter=      50 expl_p0=3.832e-1 expl_p1=3.988e-1 nash_conv=7.820e-1"}
+{"t": 155.792, "line": "iter=     100 expl_p0=6.321e-2 expl_p1=5.860e-2 nash_conv=1.218e-1"}
+{"t": 228.444, "line": "iter=     150 expl_p0=2.534e-2 expl_p1=2.399e-2 nash_conv=4.933e-2"}
+{"t": 299.072, "line": "iter=     200 expl_p0=1.563e-2 expl_p1=1.414e-2 nash_conv=2.977e-2"}
+{"t": 368.958, "line": "iter=     250 expl_p0=1.011e-2 expl_p1=8.463e-3 nash_conv=1.857e-2"}
+{"t": 435.122, "line": "iter=     300 expl_p0=6.283e-3 expl_p1=5.721e-3 nash_conv=1.200e-2"}
+{"t": 447.897, "line": "iter=     309 expl_p0=5.853e-3 expl_p1=5.206e-3 nash_conv=1.106e-2"}
+{"t": 453.113, "line": "iter=     312 expl_p0=5.753e-3 expl_p1=5.140e-3 nash_conv=1.089e-2"}
+{"t": 453.113, "line": "done: iterations=312 wall=447.87s ev_p0=1.506897 ev_p1=3.323676 nash_conv=1.089e-2"}
+{"t": 520.828, "line": "sol: wrote /home/PC_User/work/gtowb_new_2/solution.sol (6451.71 MB, 2293609 blocks, mode=Full)"}

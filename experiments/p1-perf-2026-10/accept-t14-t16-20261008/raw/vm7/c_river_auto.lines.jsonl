@@ -1,0 +1,14 @@
+{"t": 0.014, "line": "tree: nodes=99 terminals=65 rank_tables=1 storage=0.3 MiB (f32) / 0.2 MiB (i16) / 0.2 MiB (i16-f32avg)"}
+{"t": 0.014, "line": "memory estimate: 24.5 MiB (f32) / 24.5 MiB (i16) / 24.5 MiB (i16-f32avg)"}
+{"t": 0.025, "line": "iter=      25 expl_p0=4.476e-1 expl_p1=3.796e-1 nash_conv=8.272e-1"}
+{"t": 0.035, "line": "iter=      50 expl_p0=1.746e-1 expl_p1=1.673e-1 nash_conv=3.418e-1"}
+{"t": 0.055, "line": "iter=     100 expl_p0=5.071e-2 expl_p1=4.582e-2 nash_conv=9.652e-2"}
+{"t": 0.074, "line": "iter=     150 expl_p0=3.446e-2 expl_p1=2.044e-2 nash_conv=5.490e-2"}
+{"t": 0.093, "line": "iter=     200 expl_p0=1.751e-2 expl_p1=1.506e-2 nash_conv=3.257e-2"}
+{"t": 0.112, "line": "iter=     250 expl_p0=9.182e-3 expl_p1=1.030e-2 nash_conv=1.948e-2"}
+{"t": 0.13, "line": "iter=     300 expl_p0=6.987e-3 expl_p1=7.293e-3 nash_conv=1.428e-2"}
+{"t": 0.144, "line": "iter=     340 expl_p0=5.773e-3 expl_p1=6.171e-3 nash_conv=1.194e-2"}
+{"t": 0.15, "line": "iter=     357 expl_p0=5.511e-3 expl_p1=5.524e-3 nash_conv=1.104e-2"}
+{"t": 0.152, "line": "iter=     360 expl_p0=5.117e-3 expl_p1=5.401e-3 nash_conv=1.052e-2"}
+{"t": 0.152, "line": "done: iterations=360 wall=0.14s ev_p0=1.936808 ev_p1=3.160604 nash_conv=1.052e-2"}
+{"t": 0.166, "line": "sol: wrote /home/PC_User/work/c_river_auto/solution.sol (81.9 KB, 34 blocks, mode=Full)"}

@@ -22,6 +22,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能・一致の受入 | [P1 GCP受入（T9 f32既定・T10 regret解放）](p1-perf-2026-10/accept-t9-t10-20261007/README.md) | 2026-10-07。`"f64"`の旧版bit一致、f32既定の0.1%到達10〜20%短縮、T10の出力一致と保存peak、gtow_aを64 GB機で0.1%まで、thread scaling・profile |
 | 収束の計測・試作 | [P1 DCFR係数の掃引とPDCFR+](p1-perf-2026-10/dcfr-pdcfr-20261007/README.md) | 2026-10-07。DCFR係数の掃引と10の木・3 storageでの確認（PF7の根拠）、旧i16のreset依存（PF8の根拠）、PDCFR+試作（T11）の不採用 |
 | 収束の模擬 | [P1 目標到達の評価間隔](p1-perf-2026-10/adaptive-check-20261008/README.md) | 2026-10-08。保持した131本の収束曲線で適応的な評価間隔を模擬（0.1%までの費用 平均0.957倍・最悪1.004倍）。PF10の根拠 |
+| 性能・一致の受入 | [P1 GCP受入（T14 保存並行・T15 適応評価・T16 prefault）](p1-perf-2026-10/accept-t14-t16-20261008/README.md) | 2026-10-08。gtow_bのprocess全体625.6→572.0秒（最後のcheckpoint無しで496.0秒）、auto評価で停止まで3%短縮、確保直後の3 iteration 10.7→3.7秒、`.sol`生成中のprofile |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

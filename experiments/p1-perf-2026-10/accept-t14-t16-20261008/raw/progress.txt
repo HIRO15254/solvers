@@ -1,0 +1,81 @@
+18:10:58 SETUP_DONE
+18:11:01 bench bench_flop1_old_1 done
+18:11:03 bench bench_flop1_new_1 done
+18:11:06 bench bench_flop1_old_2 done
+18:11:07 bench bench_flop1_new_2 done
+18:11:25 bench bench_gtowb_old_1 done
+18:11:34 bench bench_gtowb_new_1 done
+18:11:52 bench bench_gtowb_old_2 done
+18:12:01 bench bench_gtowb_new_2 done
+18:12:01 BENCH_DONE
+18:22:27 gtowb_old_1 exit=0 wall=625.7 iters=325 after_done=145.606
+18:31:58 gtowb_new_1 exit=0 wall=568.0 iters=312 after_done=122.945
+18:41:48 gtowb_new25_1 exit=0 wall=586.4 iters=325 after_done=123.256
+18:52:17 gtowb_old_2 exit=0 wall=625.5 iters=325 after_done=144.838
+19:01:57 gtowb_new_2 exit=0 wall=576.1 iters=312 after_done=123.0
+19:10:17 gtowb_nofinal_1 exit=0 wall=496.0 iters=312 after_done=45.737
+19:10:18 GTOWB_DONE
+19:11:15 c_flop1_new25 exit=0 wall=57.6 iters=200 after_done=19.187
+19:12:11 c_flop1_auto exit=0 wall=55.5 iters=184 after_done=19.65
+19:12:21 c_flop2_new25 exit=0 wall=9.1 iters=225 after_done=2.032
+19:12:30 c_flop2_auto exit=0 wall=8.6 iters=207 after_done=2.036
+19:12:30 c_turn2_new25 exit=0 wall=0.5 iters=250 after_done=0.078
+19:12:31 c_turn2_auto exit=0 wall=0.5 iters=242 after_done=0.081
+19:12:31 c_river_new25 exit=0 wall=0.2 iters=375 after_done=0.028
+19:12:31 c_river_auto exit=0 wall=0.2 iters=360 after_done=0.019
+19:17:40 c_flop3_new25 exit=0 wall=309.2 iters=425 after_done=50.232
+19:22:45 c_flop3_auto exit=0 wall=303.0 iters=412 after_done=50.283
+19:22:46 SMALL_DONE
+19:24:19 T17_SETUP_DONE
+19:25:03 gtowb_perf exit=0 wall=136.6 iters=50 after_done=49.084
+19:25:04 PERF_DONE
+19:25:04 ALL_DONE
+19:25:34 kernels new done
+19:26:45 kernels t17 done
+19:27:48 kernels new done
+19:28:52 kernels t17 done
+19:28:57 bench flop1_t32_new_1 s/iter=0.1896
+19:28:57 bench turn2_t32_new_1 s/iter=0.0016
+19:28:57 bench river_t32_new_1 s/iter=0.0004
+19:29:00 bench flop1_t16_new_1 s/iter=0.2149
+19:29:10 bench flop1_t1_new_1 s/iter=2.8384
+19:29:32 bench gtowb_t32_new_1 s/iter=1.3487
+19:29:38 bench flop1_t32_t17_1 s/iter=0.1949
+19:29:38 bench turn2_t32_t17_1 s/iter=0.0016
+19:29:38 bench river_t32_t17_1 s/iter=0.0004
+19:29:41 bench flop1_t16_t17_1 s/iter=0.2047
+19:29:50 bench flop1_t1_t17_1 s/iter=2.6764
+19:30:14 bench gtowb_t32_t17_1 s/iter=1.4139
+19:30:19 bench flop1_t32_new_2 s/iter=0.1891
+19:30:19 bench turn2_t32_new_2 s/iter=0.0016
+19:30:19 bench river_t32_new_2 s/iter=0.0004
+19:30:22 bench flop1_t16_new_2 s/iter=0.2143
+19:30:32 bench flop1_t1_new_2 s/iter=2.8477
+19:30:54 bench gtowb_t32_new_2 s/iter=1.3449
+19:30:59 bench flop1_t32_t17_2 s/iter=0.1902
+19:31:00 bench turn2_t32_t17_2 s/iter=0.0015
+19:31:00 bench river_t32_t17_2 s/iter=0.0004
+19:31:03 bench flop1_t16_t17_2 s/iter=0.2016
+19:31:12 bench flop1_t1_t17_2 s/iter=2.7330
+19:31:35 bench gtowb_t32_t17_2 s/iter=1.3751
+19:31:35 T17_BENCH_DONE
+19:31:35 c_turn2_new exit=0 wall=0.5 iters=242 solve=0.420791787
+19:31:36 c_turn2_t17 exit=0 wall=0.5 iters=231 solve=0.384319674
+19:32:20 c_flop1_new exit=0 wall=44.5 iters=184 solve=35.363757658
+19:33:06 c_flop1_t17 exit=0 wall=45.9 iters=185 solve=36.669935057000004
+19:37:40 c_flop3_new exit=0 wall=273.5 iters=412 solve=250.833772129
+19:42:31 c_flop3_t17 exit=0 wall=290.1 iters=425 solve=267.210978683
+19:50:42 c_gtowb_new exit=0 wall=490.9 iters=312 solve=439.306777784
+19:58:55 c_gtowb_t17 exit=0 wall=492.5 iters=307 solve=440.766384337
+19:58:57 T17_SOLVE_DONE
+19:58:57 T17_DONE
+19:59:36 ANNOTATE_DONE
+20:00:23 kstats c_flop1 w20 KSTATS [4165738, 1902650273, 1452848769, 5321142, 2234675483, 1707768248, 8467501, 2919240]
+20:01:11 kstats c_flop1 w200 KSTATS [3232991, 1456212201, 972904752, 4117333, 1705459677, 1153937933, 5391017, 1777278]
+20:01:12 kstats c_turn2 w300 KSTATS [272828, 27532064, 17499052, 325992, 31473396, 19896363, 404893, 125096]
+20:03:12 kstats c_flop3 w150 KSTATS [13336979, 5963138708, 5128978404, 15752559, 6476038388, 5535906626, 28721943, 13490012]
+20:03:12 kstats c_river w300 KSTATS [2634, 1108894, 658458, 2720, 1145120, 832196, 3832, 1708]
+20:10:32 kstats c_gtowb w250 KSTATS [13238303, 6033343763, 4816711871, 15249667, 6397066468, 5124411151, 24625719, 14161980]
+20:10:32 KSTATS_DONE
+20:11:34 SC_SETUP_DONE
+20:13:01 sc new_1 wall=87.14 after_done=45.66
