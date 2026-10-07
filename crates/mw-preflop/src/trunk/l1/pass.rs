@@ -348,13 +348,19 @@ impl Scratch {
     }
 }
 
+/// A per-combo array on the heap. Callers hold these across nested parallel
+/// loops, where rayon may stack several leaves' frames on one worker thread.
+pub(crate) type Combos = Box<[f64; NUM_COMBOS]>;
+
+/// The opponent's and hero's combo weights and the folded seats' mass per
+/// combo.
 pub(crate) fn inputs(
     tree: &Tree,
     model: &Model<'_>,
     reach: &Reach,
     terminal: usize,
     hero: usize,
-) -> ([f64; NUM_COMBOS], [f64; NUM_COMBOS], [f64; NUM_COMBOS]) {
+) -> (Combos, Combos, Combos) {
     let active = &tree.nodes[terminal].terminal.as_ref().unwrap().active;
     let opponent = *active.iter().find(|&&s| s != hero).unwrap();
     let rho = |seat: usize, h: usize| {
@@ -369,9 +375,9 @@ pub(crate) fn inputs(
             / Q
     });
     (
-        std::array::from_fn(|h| rho(opponent, h)),
-        std::array::from_fn(|h| rho(hero, h)),
-        std::array::from_fn(|h| folded[class(h)]),
+        Box::new(std::array::from_fn(|h| rho(opponent, h))),
+        Box::new(std::array::from_fn(|h| rho(hero, h))),
+        Box::new(std::array::from_fn(|h| folded[class(h)])),
     )
 }
 

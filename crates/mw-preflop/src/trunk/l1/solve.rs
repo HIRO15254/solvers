@@ -289,7 +289,7 @@ pub fn solve(
                     }
                     let (opponent, own, scale) = inputs(tree, model, &reach[z], z, p);
                     if opponent.iter().all(|&r| r == 0.0) {
-                        return Some((i, z, [0.0; 169], None));
+                        return Some((i, z, vec![0.0; 169], None));
                     }
                     let rows = storage.profile(subtree, false);
                     let weight = 1.0 / training_boards.len() as f64;
@@ -299,8 +299,9 @@ pub fn solve(
                         .map_init(Scratch::default, |scratch, chunk| {
                             let mut increments = vec![0.0; rows.len()];
                             let mut additions = vec![0.0; rows.len()];
-                            let mut values = [0.0; 169];
-                            let mut moments = [[0.0; 169]; 4];
+                            // On the heap like inputs().
+                            let mut values = vec![0.0; 169];
+                            let mut moments = vec![[0.0; 169]; 4];
                             for board in chunk {
                                 scratch.pass(
                                     &Pass {
@@ -393,7 +394,7 @@ pub fn solve(
                         }
                     }
                 } else {
-                    leaves.values[p][z] = v;
+                    leaves.values[p][z].copy_from_slice(&v);
                 }
             }
             timings.postflop += phase.elapsed().as_secs_f64();

@@ -210,19 +210,20 @@ pub fn evaluate(
                 }
                 let rows = storage.profile(subtree, true);
                 let (opponent, own, scale) = inputs(tree, model, &reach[z], z, p);
-                let mut sigma = [[0.0; 169]; 2];
-                let mut beta = [[0.0; 169]; 2];
-                // Per half: sums of checkdown, its square, and its products
-                // with the primary and auxiliary differences.
-                let mut moments = [[[0.0; 169]; 2]; 4];
+                // Per half; on the heap like inputs(). moments holds the sums of
+                // checkdown, its square, and its products with the primary and
+                // auxiliary differences.
+                let mut sigma = vec![[0.0; 169]; 2];
+                let mut beta = vec![[0.0; 169]; 2];
+                let mut moments = vec![[[0.0; 169]; 2]; 4];
                 if opponent.iter().any(|&r| r != 0.0) {
                     let chunks: Vec<_> = boards
                         .par_chunks(CHUNK)
                         .enumerate()
                         .map_init(Scratch::default, |scratch, (i, chunk)| {
-                            let mut sigma = [[0.0; 169]; 2];
-                            let mut beta = [[0.0; 169]; 2];
-                            let mut moments = [[[0.0; 169]; 2]; 4];
+                            let mut sigma = vec![[0.0; 169]; 2];
+                            let mut beta = vec![[0.0; 169]; 2];
+                            let mut moments = vec![[[0.0; 169]; 2]; 4];
                             for (k, board) in chunk.iter().enumerate() {
                                 let j = i * CHUNK + k;
                                 scratch.pass(

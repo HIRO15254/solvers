@@ -458,7 +458,7 @@ fn check_only_matches_showdown_and_training_matches_evaluation() {
         let mut direct = vec![0.0; NUM_COMBOS];
         terminal_values(
             &board,
-            &opponent,
+            &opponent[..],
             &t.nodes[z].terminal.as_ref().unwrap().payoffs,
             hero,
             usize::from(hero != subtree.active[0]),
