@@ -1,0 +1,25 @@
+20:11:34 SC_SETUP_DONE
+20:13:01 sc new_1 wall=87.14 after_done=45.66
+20:14:28 sc sc_1 wall=86.99 after_done=45.76
+20:15:55 sc new_2 wall=87.05 after_done=45.68
+20:17:22 sc sc_2 wall=87.02 after_done=45.6
+20:20:07 sc compare {"canonical_postcard_streams":true,"config_precision_excluded":false,"config_run_excluded":false,"file_bytes_equal":false,"normalized_payload_blake3":"e1d8e58da8b52e10dd83ec00ee538385cdd51970d50a510187aaad20e081122f","payload_bit_equal_except_wall_secs":true,"payload_bytes":[9507078156,9507078156],"
+20:20:10 SC_DONE
+20:24:58 shm new_1 wall=61.65 after_done=20.95
+20:26:01 shm sc_1 wall=61.98 after_done=20.72
+20:27:05 shm new_2 wall=62.21 after_done=21.2
+20:28:08 shm sc_2 wall=62.5 after_done=20.46
+20:29:11 shm new_3 wall=61.83 after_done=20.8
+20:30:16 shm sc_3 wall=63.76 after_done=22.33
+20:30:17 SHM_DONE
+20:34:46 PROF2_DONE main=29750 top=29787
+20:53:17 t19 shm_new_1 wall=62.02 after_done=20.7
+20:54:12 t19 shm_sc2_1 wall=54.33 after_done=13.86
+20:55:15 t19 shm_new_2 wall=61.94 after_done=20.75
+20:56:11 t19 shm_sc2_2 wall=54.35 after_done=13.83
+20:57:13 t19 shm_new_3 wall=61.77 after_done=20.55
+20:58:07 t19 shm_sc2_3 wall=54.02 after_done=13.71
+21:00:45 t19 compare {"canonical_postcard_streams":true,"config_precision_excluded":false,"config_run_excluded":false,"file_bytes_equal":false,"normalized_payload_blake3":"e1d8e58da8b52e10dd83ec00ee538385cdd51970d50a510187aaad20e081122f","payload_bit_equal_except_wall_secs":true,"payload_bytes":[9507078156,9507078156],"
+21:02:14 t19 disk_new_1 wall=87.32 after_done=46.09
+21:03:42 t19 disk_sc2_1 wall=86.05 after_done=45.56
+21:03:43 T19_DONE

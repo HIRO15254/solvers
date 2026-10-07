@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 184K of event 'cpu-clock:ppp'
+# Event count (approx.): 184262262078
+#
+# Overhead  Symbol                                                                                                                                                                                                                                                                                             
+# ........  ...................................................................................................................................................................................................................................................................................................
+#
+     4.01%  [.] <hu_postflop::sol::ValueBlock as serde_core::ser::Serialize>::serialize::<&mut postcard::ser::serializer::Serializer<postcard::ser::flavors::io::WriteFlavor<&mut hu_postflop::sol::DeferredFlush<std::io::buffered::bufwriter::BufWriter<zstd::stream::write::Encoder<&mut std::fs::File>>>>>>
+     0.64%  [.] 0x0000000000152d8a
+     0.40%  [k] _raw_spin_unlock_irq
+     0.18%  [k] memset_erms
+     0.18%  [k] __alloc_pages
+     0.18%  [k] charge_memcg
+     0.12%  [k] vma_alloc_folio
+     0.10%  [k] copy_user_enhanced_fast_string
+     0.09%  [k] __list_del_entry_valid
+     0.08%  [k] get_mem_cgroup_from_mm
+     0.08%  [k] __mem_cgroup_charge
+     0.07%  [.] 0x000000000009633f
+     0.05%  [k] generic_perform_write
+     0.05%  [k] shmem_get_folio_gfp
+     0.05%  [.] 0x0000000000152a8d
+     0.04%  [k] try_charge_memcg
+     0.04%  [.] 0x0000000000095091
+     0.04%  [.] write
+     0.04%  [.] 0x0000000000095073
+     0.03%  [k] shmem_alloc_and_acct_folio
+     0.03%  [k] shmem_write_begin
+     0.03%  [k] shmem_write_end
+     0.03%  [k] __folio_alloc
+     0.03%  [k] __rcu_read_unlock
+     0.03%  [k] folio_add_lru
+     0.03%  [k] __filemap_get_folio
+     0.03%  [k] fault_in_readable
+     0.03%  [.] 0x000000000009672c
+     0.03%  [k] kthread_blkcg
+     0.03%  [k] __rcu_read_lock
+     0.03%  [k] shmem_add_to_page_cache
+     0.02%  [.] core::ptr::drop_glue::<alloc::vec::Vec<hu_postflop::postflop::PostflopNodeInfo>>
+     0.02%  [.] 0x000000000009507e
+     0.02%  [k] xas_load
+     0.02%  [k] policy_node
+     0.02%  [.] 0x00000000000961e4
+     0.02%  [k] shmem_alloc_folio
+     0.02%  [.] 0x0000000000152bf1
+     0.02%  [k] _raw_spin_trylock
+     0.02%  [.] hu_postflop::artifact::export_sol::<hu_engine::storage::F32Storage>
+     0.02%  [k] __cgroup_throttle_swaprate
+     0.02%  [k] copy_page_from_iter_atomic
+     0.02%  [.] 0x0000000000096682
+     0.02%  [.] 0x0000000000152c29
+     0.02%  [.] 0x0000000000152c2e
+     0.01%  [k] xas_descend
+     0.01%  [.] 0x0000000000152c24
+     0.01%  [k] page_remove_rmap
+     0.01%  [.] 0x0000000000152c33
