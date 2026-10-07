@@ -32,7 +32,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 | `--out PATH` | stdout | templateの出力先 |
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
-P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false`が既定で、full templateに明示する。resetを使う場合は`[solver.algorithm] pow4_reset = true`を指定する。
+P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseで、明示値は常に優先する。full templateは既定storageのf32に対応する`pow4_reset = false`を明示するため、i16の既定resetを使う場合はこの行を削除するかtrueにする。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
 ## `solvers validate`

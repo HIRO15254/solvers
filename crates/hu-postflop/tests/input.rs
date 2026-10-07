@@ -198,6 +198,29 @@ fn cfr_precision_contract_and_legacy_checkpoint() {
 fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
     for (section, reset) in [
         ("", false),
+        ("[solver]\nstorage = 'i16'", true),
+        ("[solver]\nstorage = 'f32'", false),
+        ("[solver]\nstorage = 'i16-f32avg'", false),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\nschedule = 'dcfr'",
+            true,
+        ),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\nalpha = 1.5",
+            true,
+        ),
+        (
+            "[solver]\nstorage = 'i16-f32avg'\n[solver.algorithm]\nschedule = 'dcfr'",
+            false,
+        ),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\npow4_reset = false",
+            false,
+        ),
+        (
+            "[solver]\nstorage = 'f32'\n[solver.algorithm]\npow4_reset = true",
+            true,
+        ),
         ("[solver.algorithm]\nschedule = 'dcfr'", false),
         ("[solver.algorithm]\npow4_reset = true", true),
         (
@@ -208,7 +231,11 @@ fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
         let doc = parse(&format!("{}\n{section}", standard("")));
         let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
         let expected = Algorithm::Dcfr {
-            alpha: 1.25,
+            alpha: if section.contains("alpha = 1.5") {
+                1.5
+            } else {
+                1.25
+            },
             beta: 0.5,
             gamma: 4.0,
             pow4_reset: reset,
@@ -217,6 +244,14 @@ fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
         let effective = doc.normalize(&P1Sections).unwrap();
         assert!(effective.contains(&format!("pow4_reset = {reset}")));
         assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let restored = parse(&effective);
+        assert_eq!(
+            Settings::parse(&restored.spot, &restored.solver, &restored.output)
+                .unwrap()
+                .solver
+                .algorithm,
+            expected
+        );
         let schedule = hu_postflop::run::schedule(&settings.solver.algorithm);
         for t in [4, 16, 64] {
             assert_eq!(schedule.at(t, Some(64)).reset_avg, reset);
@@ -237,6 +272,19 @@ fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
                 pow4_reset: reset,
             }
         );
+    }
+}
+
+#[test]
+fn i16_other_schedules_do_not_gain_dcfr_defaults() {
+    for schedule in ["vanilla", "cfr-plus", "linear-cfr", "hs-dcfr"] {
+        let doc = parse(&format!(
+            "{}\n[solver]\nstorage = 'i16'\n[solver.algorithm]\nschedule = '{schedule}'",
+            standard("")
+        ));
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(!effective.contains("pow4_reset"));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
     }
 }
 

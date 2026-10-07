@@ -8,7 +8,7 @@
 //!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16|i16-f32avg] [--json PATH] [--bands]
 //! ```
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
@@ -69,10 +69,8 @@ fn main() -> Result<()> {
     let args = parse_args()?;
     let raw = std::fs::read_to_string(&args.config)?;
     let t0 = Instant::now();
-    let mut prepared = prepare::prepare(&raw, &args.config)?;
-    if let Some(storage) = args.storage {
-        prepared.settings.solver.storage = storage;
-    }
+    let raw = input_with_storage(&raw, &args.config, args.storage)?;
+    let prepared = prepare::prepare(&raw, &args.config)?;
     let prepare_secs = t0.elapsed().as_secs_f64();
     // Zero-work measurement must not allocate a potentially tens-of-GB arena.
     if args.iters == 0 && args.evals == 0 {
@@ -103,6 +101,51 @@ fn main() -> Result<()> {
             bench::<MixedStorage>(&args, &prepared, prepare_secs, "i16-f32avg")
         }
     })
+}
+
+fn input_with_storage(raw: &str, path: &Path, storage: Option<StorageKind>) -> Result<String> {
+    let Some(storage) = storage else {
+        return Ok(raw.into());
+    };
+    // Apply the override before normalization makes omitted defaults explicit.
+    let mut document = spot::Document::parse(raw, path)?;
+    document
+        .solver
+        .insert("storage".into(), toml::Value::try_from(storage)?);
+    Ok(document.normalize(&hu_postflop::input::P1Sections)?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hu_postflop::input::{Algorithm, Settings};
+
+    #[test]
+    fn storage_override_resolves_omitted_reset_and_preserves_explicit_values() {
+        let base = include_str!("../../../examples/hu-postflop/river_small.toml");
+        let path = Path::new("input.toml");
+        for (original, storage, explicit) in [
+            ("f32", StorageKind::I16, None),
+            ("i16", StorageKind::F32, None),
+            ("i16", StorageKind::I16F32Avg, None),
+            ("f32", StorageKind::I16, Some(false)),
+            ("i16", StorageKind::F32, Some(true)),
+        ] {
+            let mut raw = format!("{base}\n[solver]\nstorage = '{original}'\n");
+            if let Some(reset) = explicit {
+                raw.push_str(&format!("[solver.algorithm]\npow4_reset = {reset}\n"));
+            }
+            let effective = input_with_storage(&raw, path, Some(storage)).unwrap();
+            let document = spot::Document::parse(&effective, path).unwrap();
+            let settings =
+                Settings::parse(&document.spot, &document.solver, &document.output).unwrap();
+            assert_eq!(settings.solver.storage, storage);
+            let Algorithm::Dcfr { pow4_reset, .. } = settings.solver.algorithm else {
+                panic!("expected dcfr");
+            };
+            assert_eq!(pow4_reset, explicit.unwrap_or(storage == StorageKind::I16));
+        }
+    }
 }
 
 fn bench<S: Storage>(

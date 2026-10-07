@@ -269,6 +269,60 @@ fn explicit_legacy_dcfr_saved_config_resumes_and_omitted_original_is_rejected() 
 }
 
 #[test]
+fn i16_saved_false_from_pf7_resumes_without_adopting_new_default() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("pf7-i16.toml");
+    let raw = RIVER.replace(
+        "[solver.stop]",
+        "[solver]\nstorage = 'i16'\n[solver.algorithm]\nalpha = 1.25\nbeta = 0.5\ngamma = 4.0\npow4_reset = false\n[solver.stop]",
+    );
+    std::fs::write(&config, &raw).unwrap();
+    let partial = temp.path().join("partial");
+    ok(&[
+        "solve",
+        text(&config),
+        "--out",
+        text(&partial),
+        "--max-time",
+        "0.000001s",
+    ]);
+    let effective = std::fs::read_to_string(partial.join("run.toml")).unwrap();
+    assert!(effective.contains("pow4_reset = false"));
+    let checkpoint =
+        hu_postflop::checkpoint::read_checkpoint(&partial.join("checkpoint.ckpt")).unwrap();
+    assert!(checkpoint.iteration < 16);
+    assert_eq!(checkpoint.config_toml.as_deref(), Some(effective.as_str()));
+    assert_eq!(
+        hu_postflop::sol::read_sol(&partial.join("solution.sol"))
+            .unwrap()
+            .config_toml,
+        effective
+    );
+    let resumed = temp.path().join("resumed");
+    ok(&[
+        "resume",
+        text(&partial),
+        "--out",
+        text(&resumed),
+        "--max-time",
+        "1h",
+    ]);
+    let straight = temp.path().join("straight");
+    ok(&["solve", text(&config), "--out", text(&straight)]);
+    let resumed_state =
+        hu_postflop::checkpoint::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+    let straight_state =
+        hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(resumed_state.iteration, 16);
+    assert_eq!(resumed_state.state, straight_state.state);
+    assert!(
+        std::fs::read_to_string(resumed.join("run.toml"))
+            .unwrap()
+            .contains("pow4_reset = false")
+    );
+}
+
+#[test]
 fn periodic_checkpoint_and_cumulative_time_limit() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("river.toml");

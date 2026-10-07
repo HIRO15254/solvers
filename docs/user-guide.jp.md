@@ -79,11 +79,11 @@ no-riversはRiverの戦略と値を省く。
 
 ## 5. 監視・停止・再開する
 
-P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false`が既定である。従来のresetを使う場合は`pow4_reset = true`を明示する。
+P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定である。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseとなる（利用者決定PF8、2026-10-07）。明示したtrue・falseはどのstorageでも優先する。full templateはf32用の`pow4_reset = false`を明示しているため、storageをi16に変えて既定resetを使う場合はこの行を削除するかtrueにする。
 保存された実効configは係数とresetを明示するため、旧係数1.5・0・3や旧既定reset=trueのrun・checkpoint・solutionは保存値で再開・照会できる。
 旧runの`run.toml`を係数や`pow4_reset`未指定の元configに戻すと、新既定との互換性hash不一致で再開を拒否する。
 P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。精度keyの無い旧runは新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。
-旧係数で再solveして比較する場合は`alpha = 1.5`、`beta = 0.0`、`gamma = 3.0`を明示する。resetを使っていた条件では`pow4_reset = true`も明示する。`compare`はalgorithmの差を拒否しない。
+旧係数で再solveして比較する場合は`alpha = 1.5`、`beta = 0.0`、`gamma = 3.0`を明示する。旧i16のreset無し条件を再現するには`pow4_reset = false`を明示する。reset有り条件は`pow4_reset = true`を明示する。`compare`はalgorithmの差を拒否しない。
 
 ```sh
 solvers status runs/my-spot --format json

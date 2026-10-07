@@ -556,21 +556,23 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 | `vanilla` | discount無しのCFR。追加param無し |
 | `cfr-plus` | 負regretを0に切るCFR+。追加param無し |
 | `linear-cfr` | iterationに比例した平均重み。追加param無し |
-| `dcfr` | `alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false` |
+| `dcfr` | `alpha = 1.25`、`beta = 0.5`、`gamma = 4`。`pow4_reset`は`storage = "i16"`ならtrue、それ以外はfalse |
 | `hs-dcfr` | `gamma0 = 30` |
 | `dcfr.alpha` / `beta` / `gamma`、`hs-dcfr.gamma0` | 有限f64。負値もparserは受理する。regret正側・負側・平均重みのdiscountを指定する |
-| `dcfr.pow4_reset` | bool、既定false。trueを明示すると4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
+| `dcfr.pow4_reset` | bool。未指定時は確定した`solver.storage`が`"i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalse。明示したtrue・falseはstorageによらず優先する。trueなら4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
 | `stop.max_iterations` / `check_every` | 正のu64。既定1,000,000 / 25。上限iterationと評価間隔 |
 | `parallel.chance_depth` | 非負u32。既定2。chance分岐を並列化する深さ |
 | `parallel.min_children` | 正のusize。既定12。並列化する最小child数 |
 
-測定した全ての木でreset無しの0.1% pot到達が同じか早かったため、利用者決定PF4（2026-10-07）でDCFRの既定をfalseへ変更した。
+f32・i16-f32avgで測定した全ての木でreset無しの0.1% pot到達が同じか早かったため、利用者決定PF4（2026-10-07）でDCFRの既定をfalseへ変更した。この測定には旧i16を含んでいなかった。
 
-GCP掃引で0.1% pot到達iterationが旧係数比でf32の10木では0.65〜1.05倍、i16-f32avgの3木では0.60〜0.74倍だったため、利用者決定PF7（2026-10-07）でDCFRの既定係数を1.25・0.5・4へ変更した（[測定証拠](../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）。`pow4_reset = false`は維持する。
+GCP掃引で0.1% pot到達iterationが旧係数比でf32の10木では0.65〜1.05倍、i16-f32avgの3木では0.60〜0.74倍だったため、利用者決定PF7（2026-10-07）でDCFRの既定係数を1.25・0.5・4へ変更した（[測定証拠](../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）。
+
+旧i16はreset無しだとTurn・Riverで0.1% potに届かず、reset有りなら到達したため、利用者決定PF8（2026-10-07）で旧i16の未指定時だけ`pow4_reset`の既定をtrueへ変更した（同測定証拠の「旧i16の精度床」）。f32・i16-f32avgはfalseを維持する。実効configは値を明示保存するため、既存run・checkpoint・`.sol`は保存値で再開・照会する。
 
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。
-`storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小だが木によって0.1% pot前後で頭打ちになり得る。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
+`storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小で、reset有り・CFR計算f32なら測定したTurn・Riverでも0.1% potに届く。ただし全ての木での到達を保証せず、以前の旧係数・reset有りの計測ではGTO Wizard風の大きい木gtow_bで最良0.292% potに留まった。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
 
 利用者決定PF5・PF6（2026-10-07）により、1 iterationが約1割短縮したf32を既定とする。
 `solver.cfr_precision`はgame定義にもstate形式にも影響しないため、resume・deriveの互換性hashから除外する。

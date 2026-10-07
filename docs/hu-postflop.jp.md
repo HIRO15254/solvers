@@ -102,7 +102,7 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 | `linear-cfr` | DCFRのalpha = beta = gamma = 1、平均reset無し |
 | `hs-dcfr` | 予算nに対してalpha = 1＋3t/n、beta = −1−2t/n、gamma = gamma0−5t/n、reset無し |
 
-初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは既定falseで、trueを明示するとt = 4, 16, 64, …で平均を捨てる。
+初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存し、既存run・checkpoint・`.sol`は保存値で再開・照会する。
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
 `storage`は次の3値を受け付ける。既定は`f32`のままである。Lはstorage要素数、Nはaction node数。

@@ -82,7 +82,7 @@ pub struct Dcfr {
     pub beta: f64,
     pub gamma: f64,
     /// Reset the average strategy at power-of-4 iterations. The low-level
-    /// default is on; P1's public input default is off.
+    /// default is on; P1's public input defaults on only for i16 storage.
     pub pow4_reset: bool,
 }
 

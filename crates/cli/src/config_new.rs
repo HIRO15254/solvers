@@ -112,7 +112,8 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         }
         if line.starts_with("pow4_reset =") {
             rendered.push_str(
-                "# false (default); set true to reset DCFR averages at iterations 4, 16, 64, ...\n",
+                "# Reset DCFR averages at iterations 4, 16, 64, ...; default false for f32/i16-f32avg.\n\
+# With storage = i16, omitting pow4_reset defaults to true; explicit values take priority.\n",
             );
         }
         rendered.push_str(line);
@@ -159,6 +160,10 @@ mod tests {
                             }
                         }
                         assert!(effective.contains("pow4_reset = false"));
+                        if matches!(template, ConfigTemplate::Full) {
+                            assert!(raw.contains("pow4_reset = false"));
+                            assert!(raw.contains("omitting pow4_reset defaults to true"));
+                        }
                         assert_eq!(
                             settings.solver.algorithm,
                             hu_postflop::input::Algorithm::default()

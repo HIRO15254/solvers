@@ -32,7 +32,8 @@ pub enum SolutionStreets {
     NoRivers,
 }
 
-/// P1 schedule parameters and public input defaults.
+/// P1 schedule parameters. Standalone defaults assume f32 storage;
+/// `Settings::parse` resolves omitted DCFR resets using the final storage.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
 pub enum Algorithm {
@@ -303,6 +304,11 @@ impl Settings {
             )?,
             ..Solver::default()
         };
+        // Resolve only after storage is known, including an omitted algorithm section.
+        let default_reset = settings.storage == Storage::I16;
+        if let Algorithm::Dcfr { pow4_reset, .. } = &mut settings.algorithm {
+            *pow4_reset = default_reset;
+        }
         if let Some(t) = section(solver, "algorithm", "solver.algorithm")? {
             let schedule = t
                 .get("schedule")
@@ -341,7 +347,7 @@ impl Settings {
                         t,
                         "pow4_reset",
                         "solver.algorithm.pow4_reset",
-                        false,
+                        default_reset,
                         toml::Value::is_bool,
                     )?,
                 },

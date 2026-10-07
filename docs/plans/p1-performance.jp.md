@@ -133,6 +133,9 @@ T12: 旧版の未指定と新版の旧係数明示、旧版の新係数明示と
 旧既定のrunは保存した実効configの係数で新版から再開でき、旧係数で解き直した結果と一致する。
 旧i16（両arena i16）はresetをやめると（PF4）精度床が深くなり、Turnの最良が0.120%→0.76%になった。
 reset有りならTurn・Riverでも0.1%に届き、どの木でも遅くならなかったので、i16だけ既定をreset有りにする（PF8、T13）。
+T13: `pow4_reset`の未指定は確定したstorageで解決する。旧版のi16明示trueと新版のi16未指定、旧版のi16未指定と新版の明示false、
+f32・i16-f32avgの未指定どうしが、Turn6の`.sol` payload（wall_secs以外）とroot `export strategy/ev`で一致した。
+旧版でi16未指定のまま途中停止したrunは、保存した実効configのfalseで新版から再開できる。
 
 ### 一致の定義
 
