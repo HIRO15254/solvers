@@ -1,0 +1,34 @@
+Tree: 16912 decisions, 20122 terminals (0.749s)
+Tables: 0.152s; model: 0.003s
+Iteration 1: wall 10.756839s; reaches 0.884386; t2 0.664667; t3 3.054769; k4 5.609335; update 0.104943; evaluation 0.000000
+Iteration 2: wall 5.599913s; reaches 0.226492; t2 0.548010; t3 1.429323; k4 2.930050; update 0.114526; evaluation 0.000000
+Iteration 3: wall 7.592863s; reaches 0.226475; t2 0.547157; t3 1.418120; k4 4.916921; update 0.122510; evaluation 0.000000
+Iteration 4: wall 7.503362s; reaches 0.218962; t2 0.526308; t3 1.095885; k4 5.200039; update 0.114269; evaluation 0.000000
+Iteration 5: wall 9.037744s; reaches 0.210095; t2 0.508910; t3 1.121453; k4 6.733055; update 0.121073; evaluation 0.000000
+Iteration 6: wall 9.381407s; reaches 0.204536; t2 0.493611; t3 1.028324; k4 7.200588; update 0.108002; evaluation 0.000000
+Iteration 7: wall 9.868938s; reaches 0.210384; t2 0.496276; t3 0.956687; k4 7.744979; update 0.112011; evaluation 0.000000
+Iteration 8: wall 10.235915s; reaches 0.215237; t2 0.474633; t3 0.969891; k4 8.096917; update 0.120437; evaluation 0.000000
+Iteration 9: wall 10.313344s; reaches 0.206866; t2 0.466801; t3 0.961725; k4 8.223578; update 0.105042; evaluation 0.000000
+Iteration 10: wall 11.285799s; reaches 0.213390; t2 0.485849; t3 1.003132; k4 9.096918; update 0.120357; evaluation 0.000000
+Iteration 11: wall 11.009472s; reaches 0.209414; t2 0.450655; t3 0.947005; k4 8.940564; update 0.107547; evaluation 0.000000
+Iteration 12: wall 11.649617s; reaches 0.205025; t2 0.531414; t3 0.953491; k4 9.477745; update 0.118333; evaluation 0.000000
+Iteration 13: wall 11.994229s; reaches 0.214937; t2 0.497473; t3 0.980396; k4 9.791888; update 0.136612; evaluation 0.000000
+Iteration 14: wall 11.617770s; reaches 0.219477; t2 0.461750; t3 0.917703; k4 9.536050; update 0.123764; evaluation 0.000000
+Iteration 15: wall 11.699239s; reaches 0.205317; t2 0.445641; t3 0.919133; k4 9.623972; update 0.132899; evaluation 0.000000
+Iteration 16: wall 11.224804s; reaches 0.207329; t2 0.443914; t3 0.865505; k4 9.241363; update 0.117977; evaluation 0.000000
+Iteration 17: wall 12.204312s; reaches 0.217132; t2 0.467215; t3 0.932288; k4 10.065875; update 0.117802; evaluation 0.000000
+Iteration 18: wall 11.731314s; reaches 0.217515; t2 0.458694; t3 0.891721; k4 9.655374; update 0.134150; evaluation 0.000000
+Iteration 19: wall 11.237608s; reaches 0.215855; t2 0.458976; t3 0.822442; k4 9.232600; update 0.128725; evaluation 0.000000
+Iteration 20: wall 11.407230s; reaches 0.213048; t2 0.444075; t3 0.801667; k4 9.482953; update 0.109391; evaluation 0.000000
+Iteration 21: wall 11.348041s; reaches 0.191836; t2 0.424037; t3 0.793286; k4 9.465009; update 0.114640; evaluation 0.000000
+Iteration 22: wall 11.086748s; reaches 0.196859; t2 0.429925; t3 0.782713; k4 9.209912; update 0.111180; evaluation 0.000000
+Iteration 23: wall 10.998358s; reaches 0.197771; t2 0.431093; t3 0.780044; k4 9.115685; update 0.116376; evaluation 0.000000
+Iteration 24: wall 10.960971s; reaches 0.201304; t2 0.414287; t3 0.776730; k4 9.092650; update 0.120382; evaluation 0.000000
+Iteration 25: wall 10.870797s; reaches 0.208377; t2 0.399205; t3 0.765945; k4 9.032192; update 0.113108; evaluation 0.000000
+Iteration 26: wall 11.020532s; reaches 0.196184; t2 0.429236; t3 0.766937; k4 9.159080; update 0.113271; evaluation 0.000000
+Iteration 27: wall 10.913384s; reaches 0.194262; t2 0.427314; t3 0.738292; k4 9.091953; update 0.112674; evaluation 0.000000
+Iteration 28: wall 10.863116s; reaches 0.196577; t2 0.415359; t3 0.729411; k4 9.029999; update 0.128474; evaluation 0.000000
+Iteration 29: wall 10.673660s; reaches 0.197964; t2 0.399292; t3 0.721430; k4 8.880164; update 0.119817; evaluation 0.000000
+Iteration 30: wall 114.249366s; reaches 0.188051; t2 0.400905; t3 0.719559; k4 8.884043; update 0.143877; evaluation 103.554096
+Checkpoint 30: NashConv 0.394186326440; gains [0.027913219089901464, 0.12553327597283942, 0.11818660126124272, 0.04430148551830626, 0.04821837922335362, 0.03003336537480507]; 420.400854s
+Iterations: 30; reached target: false; solve phases SolveTimings { reaches: 6.911054899999998, t2: 14.042681800000011, t3: 29.645006900000023, k4: 251.7614533999999, update: 3.5641667000000026, evaluation: 103.5540958 }
