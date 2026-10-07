@@ -23,6 +23,7 @@ mod equity;
 mod hands;
 pub use hands::PostflopHands;
 mod kernel;
+pub use hu_engine::CfrPrecision;
 mod postflop;
 mod river;
 mod viewer;

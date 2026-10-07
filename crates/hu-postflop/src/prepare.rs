@@ -218,6 +218,13 @@ pub fn compatibility_hash(effective: &str) -> Result<[u8; 32]> {
     let mut document: toml_edit::DocumentMut = effective.parse()?;
     document.remove("run");
     document.remove("meta");
+    // CFR precision changes neither the game definition nor the state format.
+    if let Some(solver) = document
+        .get_mut("solver")
+        .and_then(toml_edit::Item::as_table_mut)
+    {
+        solver.remove("cfr_precision");
+    }
     Ok(runfiles::config_hash(document.to_string().as_bytes()))
 }
 

@@ -527,6 +527,7 @@ P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomp
 [solver]
 iso_merging = true        # 既定true。Turn/Riverのsuit同型を厳密に併合
 storage = "f32"           # 既定f32。f32 | i16 | i16-f32avg
+cfr_precision = "f32"     # 既定f32。f32 | f64（旧版とbit一致）
 
 [solver.algorithm]
 schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs-dcfr
@@ -551,6 +552,7 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 
 | key / schedule | 既定・範囲・意味 |
 |---|---|
+| `cfr_precision` | `"f32"`（既定）または`"f64"`。CFR passの終端kernelとcurrent strategyのregret matchingだけを選択。評価・平均戦略・保存EVはf64 |
 | `vanilla` | discount無しのCFR。追加param無し |
 | `cfr-plus` | 負regretを0に切るCFR+。追加param無し |
 | `linear-cfr` | iterationに比例した平均重み。追加param無し |
@@ -567,6 +569,9 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。
 `storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小だが木によって0.1% pot前後で頭打ちになり得る。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
+
+利用者決定PF5・PF6（2026-10-07）により、1 iterationが約1割短縮したf32を既定とする。
+`solver.cfr_precision`はgame定義にもstate形式にも影響しないため、resume・deriveの互換性hashから除外する。
 
 scheduleの更新式は[計算規範](hu-postflop.jp.md#4-計算停止storage)を参照する。
 

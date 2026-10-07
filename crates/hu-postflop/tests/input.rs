@@ -61,6 +61,7 @@ fn sections_defaults_order_and_idempotence() {
     let s = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
     assert!(s.solver.iso_merging);
     assert_eq!(s.solver.storage, Storage::F32);
+    assert_eq!(s.solver.cfr_precision, hu_postflop::CfrPrecision::F32);
     assert_eq!(s.output.solution_streets, SolutionStreets::Full);
     assert_eq!(s.solver.stop.max_iterations, 1_000_000);
     assert_eq!(s.solver.stop.check_every, 25);
@@ -81,6 +82,7 @@ fn sections_defaults_order_and_idempotence() {
     let keys = [
         "iso_merging =",
         "storage =",
+        "cfr_precision =",
         "[solver.algorithm]",
         "schedule =",
         "alpha =",
@@ -105,6 +107,91 @@ fn sections_defaults_order_and_idempotence() {
         })
         .collect();
     assert!(offsets.windows(2).all(|w| w[0] < w[1]), "{effective}");
+}
+
+#[test]
+fn cfr_precision_contract_and_legacy_checkpoint() {
+    use hu_postflop::{CfrPrecision, checkpoint, prepare};
+    let base = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d 3c 8d",
+        "river { replace bet [50] }",
+    );
+    for (section, precision) in [
+        ("", CfrPrecision::F32),
+        ("[solver]\ncfr_precision='f32'", CfrPrecision::F32),
+        ("[solver]\ncfr_precision='f64'", CfrPrecision::F64),
+    ] {
+        let raw = format!("{base}\n{section}");
+        let p = prepare::prepare(&raw, Path::new("input.toml")).unwrap();
+        assert_eq!(p.settings.solver.cfr_precision, precision);
+        assert!(
+            p.effective
+                .contains(&format!("cfr_precision = \"{}\"", precision.name()))
+        );
+        let f32 = p
+            .effective
+            .replace("cfr_precision = \"f64\"", "cfr_precision = \"f32\"");
+        assert_eq!(
+            prepare::compatibility_hash(&p.effective).unwrap(),
+            prepare::compatibility_hash(&f32).unwrap()
+        );
+    }
+    for (value, code) in [
+        ("'exact'", Code::NLH003),
+        ("32", Code::NLH002),
+        ("true", Code::NLH002),
+        ("[]", Code::NLH002),
+    ] {
+        let doc = parse(&format!("{base}\n[solver]\ncfr_precision={value}"));
+        let error = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap_err();
+        assert_eq!(error.code, code);
+        assert!(error.to_string().contains("solver.cfr_precision"));
+    }
+    // Recreate a legacy checkpoint identity using an effective config with no key.
+    let p = prepare::prepare(&base, Path::new("input.toml")).unwrap();
+    let legacy = p.effective.replace("cfr_precision = \"f32\"\n", "");
+    assert_eq!(
+        prepare::compatibility_hash(&legacy).unwrap(),
+        prepare::compatibility_hash(&p.effective).unwrap()
+    );
+    let built = try_build_postflop_game(&p.config, p.payoff.pipeline()).unwrap();
+    let mut old = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        built.game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(20),
+    );
+    old.run(12);
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("checkpoint.ckpt");
+    checkpoint::write_storage_with_config(
+        &path,
+        prepare::compatibility_hash(&legacy).unwrap(),
+        12,
+        old.storage(),
+        &legacy,
+        0.0,
+        1,
+    )
+    .unwrap();
+    let restored = prepare::restore(&legacy, &path).unwrap();
+    assert_eq!(restored.state.iteration, 12);
+    let prepared = prepare::prepare(&legacy, Path::new("run.toml")).unwrap();
+    assert_eq!(prepared.settings.solver.cfr_precision, CfrPrecision::F32);
+    let built = try_build_postflop_game(&prepared.config, prepared.payoff.pipeline()).unwrap();
+    let game = built.game;
+    let mut solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(20),
+    );
+    solver.set_cfr_precision(prepared.settings.solver.cfr_precision);
+    solver
+        .restore_stream(12, |s| restored.state.read_storage(s))
+        .unwrap();
+    solver.run(8);
+    assert_eq!(solver.iteration(), 20);
 }
 
 #[test]
@@ -243,6 +330,7 @@ fn mixed_live_queries_and_report_match_direct_solver() {
         run::schedule(&prepared.settings.solver.algorithm),
         Some(8),
     );
+    direct.set_cfr_precision(prepared.settings.solver.cfr_precision);
     direct.run(8);
     let expected = direct.average_strategy_at(0);
     queries::with_live(&prepared, None, None, &cancel, |live| {
@@ -264,7 +352,7 @@ fn mixed_live_queries_and_report_match_direct_solver() {
 
 #[test]
 fn spec_p1_example_lowering_and_sizes() {
-    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md").replace("\r\n", "\n");
     let example = spec
         .split("### P1:")
         .nth(1)

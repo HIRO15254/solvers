@@ -33,3 +33,22 @@ pub use storage::{
 pub use tree::{
     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, SparseTransition, TempNode, TreeSpec,
 };
+
+/// Arithmetic precision of CFR terminals and current-strategy regret matching.
+/// Evaluation and average strategy retain their f64 arithmetic in either mode.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
+pub enum CfrPrecision {
+    #[default]
+    F64,
+    F32,
+}
+impl CfrPrecision {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::F64 => "f64",
+            Self::F32 => "f32",
+        }
+    }
+}

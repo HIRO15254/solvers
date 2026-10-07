@@ -117,6 +117,100 @@ pub(crate) fn fold_kernel(
     }
 }
 
+fn add_relaxed_f32(hands: &[Hand], reach: &[f32], total: &mut f32, card: &mut [f32; 52]) {
+    for h in hands {
+        let r = reach[h.local as usize];
+        *total += r;
+        card[h.cards[0] as usize] += r;
+        card[h.cards[1] as usize] += r;
+    }
+}
+pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f32; 52]) {
+    let mut total = 0.0;
+    let mut card = [0.0; 52];
+    add_relaxed_f32(hands, reach, &mut total, &mut card);
+    (total, card)
+}
+fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
+    let other = same[h.local as usize];
+    if other == ABSENT {
+        0.0
+    } else {
+        reach[other as usize]
+    }
+}
+pub(crate) fn showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
+    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
+    let mut below_total = 0.0;
+    let mut below_card = [0.0; 52];
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            let mut group_total = 0.0;
+            // Total adds groups; strictly-below card sums add individual hands.
+            add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
+            below_total += group_total;
+            os = oe;
+            oi += 1;
+        }
+        let mut group_total = 0.0;
+        let mut group_card = [0.0; 52];
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
+        for &h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            let same = same_reach_relaxed_f32(same, h, reach);
+            let win = below_total - below_card[a] - below_card[b];
+            let tie = group_total - group_card[a] - group_card[b] + same;
+            let compat = all_total - all_card[a] - all_card[b] + same;
+            let lose = compat - win - tie;
+            out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+        }
+        if tied {
+            below_total += group_total;
+            for (below, group) in below_card.iter_mut().zip(group_card) {
+                *below += group;
+            }
+            os = oe;
+            oi += 1;
+        }
+        start = end;
+    }
+}
+pub(crate) fn fold_kernel_relaxed_f32(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let u = u as f32;
+    let (total, card) = compat_sums_relaxed_f32(opp, reach);
+    for &h in own {
+        let [a, b] = h.cards.map(usize::from);
+        if board & ((1u64 << a) | (1u64 << b)) != 0 {
+            out[h.local as usize] = 0.0;
+            continue;
+        }
+        out[h.local as usize] =
+            u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+    }
+}
+
 #[cfg(test)]
 mod legacy {
     use nlh::{HandRank, combo_cards};
@@ -233,6 +327,93 @@ mod tests {
     use crate::{PostflopConfig, PostflopHands, build_postflop_game};
     use hu_engine::TerminalEvaluator;
     use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
+
+    #[test]
+    fn f32_synthetic_kernels_close() {
+        let list = |stride: usize| {
+            let mut hands: Vec<Hand> = (0..NUM_COMBOS)
+                .filter(|h| h % stride != 0)
+                .enumerate()
+                .map(|(local, h)| {
+                    let (a, b) = combo_cards(h);
+                    Hand {
+                        local: local as u16,
+                        cards: [a.index() as u8, b.index() as u8],
+                    }
+                })
+                .collect();
+            // Identical combos must have the same synthetic rank in both seats.
+            let rank =
+                |h: &Hand| HandRank((u16::from(h.cards[0]) * 53 + u16::from(h.cards[1])) % 19);
+            hands.sort_by_key(|h| (rank(h), h.local));
+            let mut groups = Vec::new();
+            for (i, h) in hands.iter().enumerate() {
+                let rank = rank(h);
+                if groups.last().is_none_or(|&(r, _)| r != rank) {
+                    groups.push((rank, i + 1));
+                } else {
+                    groups.last_mut().unwrap().1 = i + 1;
+                }
+            }
+            RankedHands { hands, groups }
+        };
+        let own = list(3);
+        let opp = list(5);
+        let mut same = vec![ABSENT; own.hands.len()];
+        for h in &own.hands {
+            if let Some(o) = opp.hands.iter().find(|o| o.cards == h.cards) {
+                same[h.local as usize] = o.local;
+            }
+        }
+        let mut maximum = 0.0f64;
+        for scale in [0.0, 0.001, 1.0, 100.0] {
+            let reach: Vec<f32> = (0..opp.hands.len())
+                .map(|i| {
+                    if i % 7 == 0 {
+                        0.0
+                    } else {
+                        (i * 17 % 101 + 1) as f32 / 103.0 * scale
+                    }
+                })
+                .collect();
+            for kind in 0..2 {
+                let mut exact = vec![0.0; own.hands.len()];
+                let mut out = exact.clone();
+                if kind == 0 {
+                    showdown_kernel(&own, &opp, &same, [1.25, -0.125, -1.75], &reach, &mut exact);
+                } else {
+                    fold_kernel(&own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut exact);
+                }
+                {
+                    if kind == 0 {
+                        showdown_kernel_relaxed_f32(
+                            &own,
+                            &opp,
+                            &same,
+                            [1.25, -0.125, -1.75],
+                            &reach,
+                            &mut out,
+                        );
+                    } else {
+                        fold_kernel_relaxed_f32(
+                            &own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut out,
+                        );
+                    }
+                    let denom = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
+                    for (&a, &b) in exact.iter().zip(&out) {
+                        assert!(b.is_finite());
+                        if denom == 0.0 {
+                            assert_eq!(a, b);
+                        } else {
+                            maximum = maximum.max((f64::from(a) - f64::from(b)).abs() / denom);
+                        }
+                    }
+                }
+            }
+        }
+        assert!(maximum < 1e-5);
+        println!("synthetic f32 relative infinity error: {maximum:e}");
+    }
 
     #[test]
     fn asymmetric_fractional_support_matches_dense_kernels_bitwise() {

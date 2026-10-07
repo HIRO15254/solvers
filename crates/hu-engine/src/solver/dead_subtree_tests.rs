@@ -243,6 +243,7 @@ fn nonzero_subnormal_opponent_reach_is_evaluated() {
     );
     let discounts = Dcfr::default().at(1, None);
     let ctx = PassCtx {
+        cfr_precision: CfrPrecision::F64,
         tree: &solver.game.tree,
         evaluator: &solver.game.evaluator,
         p: Player::P0,
@@ -345,6 +346,7 @@ fn check_parallel_updates<S: Storage>(par: ParConfig) {
             let g = game(257);
             let discounts = Dcfr::default().at(1, None);
             let ctx = PassCtx {
+                cfr_precision: CfrPrecision::F64,
                 tree: &g.tree,
                 evaluator: &g.evaluator,
                 p: Player::P0,

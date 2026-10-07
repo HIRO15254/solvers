@@ -57,6 +57,7 @@ fn solve_toy(
         }),
         Some(iters),
     );
+    solver.set_cfr_precision(hu_postflop::CfrPrecision::F64);
     solver.run(iters);
     (info, solver)
 }

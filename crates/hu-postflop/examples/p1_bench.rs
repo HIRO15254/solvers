@@ -79,6 +79,7 @@ fn main() -> Result<()> {
         let report = serde_json::json!({
             "config": args.config.display().to_string(),
             "threads": args.threads,
+            "cfrPrecision": prepared.settings.solver.cfr_precision.name(),
             "estimateF32Bytes": prepared.estimate.f32_bytes,
             "estimateI16Bytes": prepared.estimate.i16_bytes,
             "estimateI16F32avgBytes": prepared.estimate.i16_f32avg_bytes,
@@ -129,6 +130,7 @@ fn bench<S: Storage>(
         hu_postflop::run::schedule(&p.settings.solver.algorithm),
         Some(p.settings.solver.stop.max_iterations),
     );
+    solver.set_cfr_precision(p.settings.solver.cfr_precision);
     solver.set_par(ParConfig {
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
@@ -192,6 +194,7 @@ fn bench<S: Storage>(
     let mut report = serde_json::json!({
         "config": args.config.display().to_string(),
         "threads": args.threads,
+        "cfrPrecision": p.settings.solver.cfr_precision.name(),
         "storage": storage_name,
         "nodes": nodes,
         "actionNodes": action_nodes,

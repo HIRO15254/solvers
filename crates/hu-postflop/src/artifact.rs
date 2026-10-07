@@ -735,6 +735,7 @@ fn resolve_river<S: Storage>(
     let schedule = crate::run::schedule(&settings.solver.algorithm);
     let mut solver =
         Solver::<PostflopEvaluator, S>::new(game, schedule, Some(loaded.river_iterations));
+    solver.set_cfr_precision(settings.solver.cfr_precision);
     solver.set_par(hu_engine::ParConfig {
         chance_depth: settings.solver.parallel.chance_depth,
         min_children: settings.solver.parallel.min_children,

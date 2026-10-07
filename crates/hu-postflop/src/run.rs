@@ -74,6 +74,7 @@ pub(crate) fn query<S: Storage>(
         schedule(&p.settings.solver.algorithm),
         Some(iterations),
     );
+    solver.set_cfr_precision(p.settings.solver.cfr_precision);
     solver.set_par(ParConfig {
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
@@ -153,6 +154,7 @@ fn drive<S: Storage>(
         schedule(&p.settings.solver.algorithm),
         Some(stop.max_iterations),
     );
+    solver.set_cfr_precision(p.settings.solver.cfr_precision);
     solver.set_par(ParConfig {
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,

@@ -113,6 +113,8 @@ view を渡す。`ParConfig` が chance depth と fan-out を制御する。メ�
 regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr` と `linear_cfr`
 を備える。CLI の選択肢と既定値は規範仕様に置き、本書には別の既定値表を作らない。
 
+`CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
+
 `Solver<E,S>` は alternating update を行い、平均戦略を解として扱う。
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する
 未正規化 payoff を返す。EV と best response は同じ compiled tree / evaluator を使う一方、

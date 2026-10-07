@@ -112,6 +112,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
+P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`f32`（既定）・`i16`・`i16-f32avg`。`config new --product p1 --template full`にもこの選択肢を表示する。
 P1 `.sol`はversion 2、checkpointはversion 5だけを受理する。checkpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
@@ -126,7 +127,7 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 ```
 
 `RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
-directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。
+directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
 
 | flag | 適用 | 意味 |
 |---|---|---|
@@ -138,7 +139,7 @@ directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検�
 | `--evaluation-samples N` | P2 | `solver.stop.evaluation_samples` |
 | `--evaluation-cadence N` | P2 | `solver.stop.check_every_sweeps` |
 
-P1へP2専用overrideを渡すと`NLH003`で拒否する。P1は`[run]`・`[meta]`以外を変更できない。
+P1へP2専用overrideを渡すと`NLH003`で拒否する。P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。その他の設定変更は互換性が必要である。
 同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
 終了時にcheckpoint、solution、run.jsonを更新する。P1は直前の保存と同じiterationのcheckpoint再保存・eventを省く。P2は再構築中にrule hitも確認する。
 

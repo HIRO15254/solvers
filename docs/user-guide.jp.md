@@ -72,6 +72,8 @@ P1はNashConv / 2の目標、P2は測定deviationの目標を検査する。
 反復・sweep・時間の上限で終わったことは品質目標の達成を意味しない。
 保存物はrun.toml、manifest.json、events.jsonl、progress.jsonl、run.jsonと、
 P1のcheckpoint.ckpt / solution.solまたはP2のcheckpoint.mwckpt / solution.mwsolである。
+P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。
+
 P1の保存streetは`[output] solution_streets`で設定する。
 no-riversはRiverの戦略と値を省く。
 
@@ -80,6 +82,7 @@ no-riversはRiverの戦略と値を省く。
 P1のDCFRは`[solver.algorithm] pow4_reset = false`が既定である。従来のresetを使う場合は`pow4_reset = true`を明示する。
 保存された実効configはこの値を含むため、旧既定trueのrun・checkpoint・solutionは保存値で再開・照会できる。
 旧runの`run.toml`を`pow4_reset`未指定の元configに戻すと、新既定falseとの互換性hash不一致で再開を拒否する。
+P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。精度keyの無い旧runは新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。
 旧条件で再solveして比較する場合はtrueを明示する。`compare`はalgorithmの差を拒否しない。
 
 ```sh

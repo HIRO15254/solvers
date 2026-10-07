@@ -102,6 +102,9 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
             rendered.push_str(description);
             rendered.push('\n');
         }
+        if line.starts_with("cfr_precision =") {
+            rendered.push_str("# CFR arithmetic: f32 (default) | f64 (legacy bit-identical); evaluation stays f64.\n");
+        }
         if line.starts_with("storage =") {
             rendered.push_str(
                 "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
@@ -212,6 +215,7 @@ mod tests {
             hu_postflop::run::schedule(&settings.solver.algorithm),
             Some(100),
         );
+        solver.set_cfr_precision(settings.solver.cfr_precision);
         solver.run(100);
         assert_eq!(solver.iteration(), 100);
         assert!(
@@ -403,6 +407,7 @@ mod tests {
             "solver",
             "iso_merging",
             "storage",
+            "cfr_precision",
             "algorithm",
             "schedule",
             "alpha",

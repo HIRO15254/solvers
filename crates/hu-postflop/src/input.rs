@@ -1,6 +1,7 @@
 //! P1-owned sections and pure lowering of the common Spot IR.
 //! Amounts in the lowered tree are milli-BB; economics and reporting are separate.
 use crate::{PerStreet, PostflopConfig, StreetTree};
+pub use hu_engine::CfrPrecision;
 use nlh::script::{Rule, Value, VarSource};
 use nlh::{Chips, PerPlayer, Player, Street};
 use serde::{Deserialize, Serialize};
@@ -111,15 +112,21 @@ impl Default for Parallel {
 pub struct Solver {
     pub iso_merging: bool,
     pub storage: Storage,
+    #[serde(default = "default_cfr_precision")]
+    pub cfr_precision: CfrPrecision,
     pub algorithm: Algorithm,
     pub stop: Stop,
     pub parallel: Parallel,
+}
+fn default_cfr_precision() -> CfrPrecision {
+    CfrPrecision::F32
 }
 impl Default for Solver {
     fn default() -> Self {
         Self {
             iso_merging: true,
             storage: Storage::default(),
+            cfr_precision: default_cfr_precision(),
             algorithm: Algorithm::default(),
             stop: Stop::default(),
             parallel: Parallel::default(),
@@ -220,7 +227,14 @@ impl Settings {
             spot,
             solver,
             "solver",
-            &["iso_merging", "storage", "algorithm", "stop", "parallel"],
+            &[
+                "iso_merging",
+                "storage",
+                "cfr_precision",
+                "algorithm",
+                "stop",
+                "parallel",
+            ],
             &[
                 "kind",
                 "seed",
@@ -275,6 +289,13 @@ impl Settings {
                 "storage",
                 "solver.storage",
                 Storage::default(),
+                toml::Value::is_str,
+            )?,
+            cfr_precision: field(
+                solver,
+                "cfr_precision",
+                "solver.cfr_precision",
+                default_cfr_precision(),
                 toml::Value::is_str,
             )?,
             ..Solver::default()

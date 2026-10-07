@@ -3,6 +3,7 @@ use std::sync::Mutex;
 use nlh::{PerPlayer, Player};
 use rayon::prelude::*;
 
+use crate::CfrPrecision;
 use crate::schedule::{DiscountSchedule, Discounts};
 use crate::scratch::{Scratch, with_worker_scratch};
 use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
@@ -18,6 +19,13 @@ use crate::tree::{NodeId, NodeKind, PublicTree};
 /// into deal weights and the game normalizer at build time.
 pub trait TerminalEvaluator: Send + Sync {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]);
+    /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
+    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        self.eval(terminal, p, opp_reach, out);
+    }
+    /// Select the arithmetic of `eval_cfr`. Evaluators without a relaxed
+    /// kernel ignore it; `Solver::set_cfr_precision` forwards here.
+    fn set_cfr_precision(&mut self, _precision: CfrPrecision) {}
 }
 
 /// Everything the solver needs: the compiled tree, the terminal evaluator,
@@ -133,6 +141,7 @@ pub struct Solver<E, S> {
     planned_iters: Option<u64>,
     iteration: u64,
     par: ParConfig,
+    cfr_precision: CfrPrecision,
 }
 
 impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
@@ -165,6 +174,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             planned_iters,
             iteration: 0,
             par: ParConfig::default(),
+            cfr_precision: CfrPrecision::F64,
         }
     }
 
@@ -173,6 +183,13 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// existing call site keeps working unchanged.
     pub fn set_par(&mut self, par: ParConfig) {
         self.par = par;
+    }
+
+    /// Select CFR terminal and current-strategy arithmetic for both this
+    /// solver and its evaluator; evaluation and averages stay exact.
+    pub fn set_cfr_precision(&mut self, precision: CfrPrecision) {
+        self.cfr_precision = precision;
+        self.game.evaluator.set_cfr_precision(precision);
     }
 
     pub fn iteration(&self) -> u64 {
@@ -238,6 +255,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 evaluator: &self.game.evaluator,
                 p,
                 discounts: &discounts,
+                cfr_precision: self.cfr_precision,
                 par: self.par,
             };
             let mut out = self.scratch.take(self.game.tree.root_dims[p] as usize);
@@ -535,6 +553,7 @@ struct PassCtx<'w, E> {
     evaluator: &'w E,
     p: Player,
     discounts: &'w Discounts,
+    cfr_precision: CfrPrecision,
     par: ParConfig,
 }
 
@@ -640,7 +659,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     match node.kind {
         NodeKind::Terminal => {
             if !PRUNE || !opp_reach.iter().all(|&x| x == 0.0) {
-                ctx.evaluator.eval(node.aux, ctx.p, opp_reach, out);
+                ctx.evaluator.eval_cfr(node.aux, ctx.p, opp_reach, out);
             }
         }
         NodeKind::Chance => {
@@ -787,7 +806,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
 
             let mut sigma = scratch.take(sref.len());
-            views.own().regret_matching(sref, sref.index, &mut sigma);
+            views
+                .own()
+                .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
 
             // One flat action-major buffer: action `a`'s row is that
             // action's own `out` parameter, so its recursion writes
@@ -893,7 +914,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             let zero_opp = PRUNE && opp_reach.iter().all(|&x| x == 0.0);
             let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
             if !zero_opp {
-                storage.regret_matching(sref, sref.index, &mut sigma);
+                storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
             }
 
             let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);

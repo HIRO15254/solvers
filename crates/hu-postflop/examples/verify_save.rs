@@ -92,6 +92,32 @@ fn main() -> Result<()> {
             }
             a.meta.wall_secs = 0.0;
             b.meta.wall_secs = 0.0;
+            // Explicit opt-ins: the legacy/PF5 comparison drops the recorded
+            // precision, and thread-count comparisons drop the operational [run].
+            let flags = &args[4..];
+            for flag in flags {
+                if !matches!(flag.as_str(), "--ignore-cfr-precision" | "--ignore-run") {
+                    bail!("unknown solution flag {flag}");
+                }
+            }
+            let ignore_precision = flags.iter().any(|s| s == "--ignore-cfr-precision");
+            let ignore_run = flags.iter().any(|s| s == "--ignore-run");
+            if ignore_precision || ignore_run {
+                for payload in [&mut a, &mut b] {
+                    let mut config: toml_edit::DocumentMut = payload.config_toml.parse()?;
+                    if ignore_precision
+                        && let Some(solver) = config
+                            .get_mut("solver")
+                            .and_then(toml_edit::Item::as_table_mut)
+                    {
+                        solver.remove("cfr_precision");
+                    }
+                    if ignore_run {
+                        config.remove("run");
+                    }
+                    payload.config_toml = config.to_string();
+                }
+            }
             let a_bytes = postcard::to_allocvec(&a)?;
             let b_bytes = postcard::to_allocvec(&b)?;
             if a_bytes != b_bytes {
@@ -101,6 +127,8 @@ fn main() -> Result<()> {
                 "{}",
                 serde_json::json!({
                     "payload_bit_equal_except_wall_secs": true,
+                    "config_precision_excluded": ignore_precision,
+                    "config_run_excluded": ignore_run,
                     "canonical_postcard_streams": true,
                     "payload_bytes": payload_sizes,
                     "normalized_payload_blake3": blake3::hash(&a_bytes).to_hex().as_str(),

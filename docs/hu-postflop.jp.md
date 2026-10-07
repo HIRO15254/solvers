@@ -84,6 +84,14 @@ HU vector CFRが平均戦略を作り、同じ木の厳密best responseで評価
 targetの既定は無い。max_iterations / max_timeは安全予算であり、到達自体は収束を意味しない。
 target無しでも`check_every`ごとにexploitabilityを測る。
 
+`[solver] cfr_precision`は`"f32"`（既定）と`"f64"`を選べる。対象はCFR passの終端kernelとcurrent strategyのregret matchingである。
+f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
+showdownの同順位groupは自身のtotal/card和でtieを計算し、処理後のbelow card和へgroupのcard和を加える。
+strictly belowのgroupを先に追加する場合は、card和へhand順に直接加算する。
+regret matchingは正部分をf32で合計し、その和のf32逆数を各正部分へ掛ける。和が0なら一様分布とする。
+Exploitability・EV・BR評価、平均戦略の正規化、`.sol`保存EVは両モードで従来の厳密なf64計算を使う。
+両モードで決定性とthread数による結果不変を保つ。旧版とのbit一致は`f64`だけで保証する。
+
 scheduleは入力規範第10節の5つである。iteration tの更新前にs = t−1を使って累積値をdiscountする。
 
 | schedule | 更新則 |
@@ -222,8 +230,9 @@ workerではsrefとbyte列長のheaderをpostcardで符号化し、量子化済�
 payloadの上界はf32 storage bytesと（保存作業領域＋全戦略のu16 bytes）の大きい方を使う。逐次出力する戦略も圧縮対象の量へ算入する。
 NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。
 
-P1のresume互換性hashは正規化configから`[run]`と`[meta]`を除いたTOMLのblake3である。
-運用thread・memory・時間・checkpoint間隔と名前・説明は変えられるが、solver/outputを変えるとhashは変わる。
+P1のresume互換性hashは正規化configから`[run]`・`[meta]`・`solver.cfr_precision`を除いたTOMLのblake3である。
+運用thread・memory・時間・checkpoint間隔と名前・説明は変えられるが、`solver.cfr_precision`以外のsolver/outputを変えるとhashは変わる。
+CFR精度はgame定義にもstate形式にも影響しないため互換性hashから除外し、keyの無い旧runは新既定f32で再開する。
 実効config全文のmanifest/solution hashとは別である。
 resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 再開後のcheckpoint / solution / run.jsonは同じ最終iterationを記録する。

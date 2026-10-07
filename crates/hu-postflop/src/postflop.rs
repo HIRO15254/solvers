@@ -420,6 +420,7 @@ struct PostflopTerminal {
 /// from the river-only evaluator to runouts at any street.
 pub struct PostflopEvaluator {
     terminals: Vec<PostflopTerminal>,
+    cfr_precision: hu_engine::CfrPrecision,
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
     rank_tables: Vec<PerPlayer<RankedHands>>,
@@ -431,8 +432,31 @@ pub struct PostflopEvaluator {
     pub(crate) mask_cards: Vec<Card>,
 }
 
+#[cfg(test)]
+#[path = "precision_tests.rs"]
+mod precision_tests;
+
 impl TerminalEvaluator for PostflopEvaluator {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
+    }
+    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
+    }
+    /// Set CFR terminal arithmetic; all evaluation calls remain f64.
+    fn set_cfr_precision(&mut self, precision: hu_engine::CfrPrecision) {
+        self.cfr_precision = precision;
+    }
+}
+impl PostflopEvaluator {
+    fn eval_with_kernel(
+        &self,
+        terminal: u32,
+        p: Player,
+        opp_reach: &[f32],
+        out: &mut [f32],
+        variant: hu_engine::CfrPrecision,
+    ) {
         debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
         debug_assert_eq!(out.len(), self.hands.len(p));
         let term = &self.terminals[terminal as usize];
@@ -452,7 +476,11 @@ impl TerminalEvaluator for PostflopEvaluator {
         };
         match term.kind {
             TerminalKind::Fold { .. } => {
-                kernel::fold_kernel(
+                let kernel = match variant {
+                    hu_engine::CfrPrecision::F64 => kernel::fold_kernel,
+                    hu_engine::CfrPrecision::F32 => kernel::fold_kernel_relaxed_f32,
+                };
+                kernel(
                     &self.fold_combos[p],
                     &self.fold_combos[p.opponent()],
                     &self.hands.same[p],
@@ -464,7 +492,11 @@ impl TerminalEvaluator for PostflopEvaluator {
             }
             TerminalKind::Showdown => {
                 out.fill(0.0);
-                kernel::showdown_kernel(
+                let kernel = match variant {
+                    hu_engine::CfrPrecision::F64 => kernel::showdown_kernel,
+                    hu_engine::CfrPrecision::F32 => kernel::showdown_kernel_relaxed_f32,
+                };
+                kernel(
                     &self.rank_tables[term.table as usize][p],
                     &self.rank_tables[term.table as usize][p.opponent()],
                     &self.hands.same[p],
@@ -1210,6 +1242,7 @@ fn build_checked(
     } = builder;
 
     let evaluator = PostflopEvaluator {
+        cfr_precision: hu_engine::CfrPrecision::F64,
         terminals,
         rank_tables,
         fold_combos,

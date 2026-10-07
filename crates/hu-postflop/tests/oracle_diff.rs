@@ -321,6 +321,7 @@ fn assert_engine_matches_oracle(iters: u64, tol: f64) {
         }),
         Some(iters),
     );
+    solver.set_cfr_precision(hu_postflop::CfrPrecision::F64);
     solver.set_par(sequential());
     solver.run(iters);
     let profile = export_profile(&node_info, &solver);
