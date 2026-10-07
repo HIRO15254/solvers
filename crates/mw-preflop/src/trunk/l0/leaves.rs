@@ -538,11 +538,7 @@ pub(crate) fn leaf_values(
         .filter(|&c| model.weights.iter().any(|w| w[c] > 0.0))
         .collect();
     let mut t2_slab = vec![[0.0; 3]; 169 * 169];
-    if tree.nodes.iter().any(|n| {
-        n.terminal
-            .as_ref()
-            .is_some_and(|t| t.active.len() == 2 && t.l1.is_none())
-    }) {
+    if tree.terminal_counts()[2] > 0 {
         for &c in &support {
             for &d in &support {
                 t2_slab[c * 169 + d] = model.tables.t2(c, d)?;
@@ -555,10 +551,8 @@ pub(crate) fn leaf_values(
             if !heroes.contains(&p) {
                 continue;
             }
-            // L1 replaces the active players' values; folded seats keep the constant path.
-            if t.l1.is_some() && t.active.contains(&p) {
-                continue;
-            }
+            // L1 leaves keep their exact checkdown value: the L1 solver and
+            // evaluator replace it, or correct it with sampled boards.
             if (t.active.len() >= 4 || (t.active.len() == 3 && model.sample_three_way()))
                 && t.active.contains(&p)
             {

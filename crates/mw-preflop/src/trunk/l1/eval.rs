@@ -167,6 +167,7 @@ pub fn evaluate(
     model: &Model<'_>,
     strategies: &Strategies,
     boards: &[Board],
+    control: bool,
 ) -> Result<Evaluation> {
     ensure!(
         boards.len() >= 2 && boards.len().is_multiple_of(2),
@@ -197,13 +198,8 @@ pub fn evaluate(
             .par_iter()
             .map_init(Scratch::default, |scratch, storage| {
                 let z = storage.terminal;
-                let subtree = tree.nodes[z]
-                    .terminal
-                    .as_ref()
-                    .unwrap()
-                    .l1
-                    .as_ref()
-                    .unwrap();
+                let terminal = tree.nodes[z].terminal.as_ref().unwrap();
+                let subtree = terminal.l1.as_ref().unwrap();
                 if !subtree.active.contains(&p) {
                     return None;
                 }
@@ -229,9 +225,14 @@ pub fn evaluate(
                         );
                         let s = class_values(&scratch.values, &scale);
                         let b = class_values(&scratch.best, &scale);
+                        let checkdown = if control {
+                            scratch.checkdown(board, terminal, p, &opponent, &scale)
+                        } else {
+                            [0.0; 169]
+                        };
                         for c in 0..169 {
-                            sigma[j % 2][c] += s[c] / (boards.len() / 2) as f64;
-                            beta[j % 2][c] += b[c] / (boards.len() / 2) as f64;
+                            sigma[j % 2][c] += (s[c] - checkdown[c]) / (boards.len() / 2) as f64;
+                            beta[j % 2][c] += (b[c] - checkdown[c]) / (boards.len() / 2) as f64;
                         }
                     }
                 }
@@ -240,8 +241,16 @@ pub fn evaluate(
             .collect();
         for (z, s, b) in output.into_iter().flatten() {
             for h in 0..2 {
-                sigma[h][z] = s[h];
-                beta[h][z] = b[h];
+                if control {
+                    // leaf_values left the exact checkdown value here.
+                    for c in 0..169 {
+                        sigma[h][z][c] += s[h][c];
+                        beta[h][z][c] += b[h][c];
+                    }
+                } else {
+                    sigma[h][z] = s[h];
+                    beta[h][z] = b[h];
+                }
             }
         }
         let all = |halves: &[Slab; 2]| {

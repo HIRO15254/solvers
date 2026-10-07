@@ -1,7 +1,7 @@
 use super::{Board, BucketSource, Subtree, cards::Q};
 use crate::trunk::{
     classes::{Classes, class},
-    l0::{Model, Tree, eval::Reach, solve::Discounts},
+    l0::{Model, Terminal, Tree, eval::Reach, solve::Discounts},
 };
 use nlh::NUM_COMBOS;
 
@@ -100,6 +100,7 @@ pub(crate) struct Scratch {
     own: Vec<f64>,
     pub(crate) values: Vec<f64>,
     pub(crate) best: Vec<f64>,
+    checkdown: Vec<f64>,
 }
 
 #[derive(Clone, Copy)]
@@ -203,6 +204,28 @@ pub(crate) struct Pass<'a> {
 }
 
 impl Scratch {
+    /// Class values of the leaf's checkdown line on one board: the control
+    /// variate whose mean over all boards is the exact L0 (T2) value.
+    pub(crate) fn checkdown(
+        &mut self,
+        board: &Board,
+        terminal: &Terminal,
+        hero: usize,
+        opponent: &[f64; NUM_COMBOS],
+        scale: &[f64; NUM_COMBOS],
+    ) -> [f64; 169] {
+        self.checkdown.resize(NUM_COMBOS, 0.0);
+        terminal_values(
+            board,
+            opponent,
+            &terminal.payoffs,
+            hero,
+            usize::from(terminal.active[0] != hero),
+            &mut self.checkdown,
+        );
+        class_values(&self.checkdown, scale)
+    }
+
     pub(crate) fn pass(
         &mut self,
         pass: &Pass<'_>,

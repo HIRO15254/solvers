@@ -518,7 +518,7 @@ fn evaluator_matches_training_leaf_values_with_folded_seat_masses() {
         }
         let board = fixed("As 4d 5h 6c 7s");
         let boards = [Board::new(board, &Buckets), Board::new(board, &Buckets)];
-        let evaluation = evaluate(&t, &profile, &m, &strategies, &boards).unwrap();
+        let evaluation = evaluate(&t, &profile, &m, &strategies, &boards, false).unwrap();
         let mut leaves = leaf_values(
             &t,
             &m,
@@ -572,6 +572,60 @@ fn evaluator_matches_training_leaf_values_with_folded_seat_masses() {
         }
         assert!(l0::evaluate(&t, &profile, &m).is_err());
         assert!(l0::solve(&t, &m, SolveOptions::default(), |_| {}).is_err());
+    }
+}
+
+#[test]
+fn control_variate_with_check_only_postflop_reproduces_l0_checkdown() {
+    for players in [2, 3] {
+        let g = game(&config(players, false));
+        let t = Tree::build_with(&g, FlopLeaves::L1).unwrap();
+        let checkdown = Tree::build_with(&g, FlopLeaves::Checkdown).unwrap();
+        let m = Model::new(&g, &Synthetic, EvaluationOptions::default()).unwrap();
+        let mut document = Profile::uniform(&t).export(&t);
+        let mut rng = ChaCha8Rng::seed_from_u64(82);
+        for node in &mut document.nodes {
+            for row in &mut node.probabilities {
+                for p in row {
+                    *p = rng.gen_range(0.01..1.0);
+                }
+            }
+        }
+        let profile = Profile::from_json(&t, &document).unwrap();
+        let mut strategies = Strategies::new(&t, &Buckets);
+        for storage in &mut strategies.leaves {
+            let subtree = t.nodes[storage.terminal]
+                .terminal
+                .as_ref()
+                .unwrap()
+                .l1
+                .as_ref()
+                .unwrap();
+            storage.sums = checks(subtree, storage);
+        }
+        // Synthetic T2 differs from any board's showdown: only the control
+        // variate's exact baseline can reproduce the L0 checkdown model.
+        let boards = [
+            Board::new(fixed("As 4d 5h 6c 7s"), &Buckets),
+            Board::new(fixed("Ah Kd 2c 3s 7h"), &Buckets),
+        ];
+        let expected = l0::evaluate(
+            &checkdown,
+            &Profile::from_json(&checkdown, &document).unwrap(),
+            &m,
+        )
+        .unwrap();
+        let observed = evaluate(&t, &profile, &m, &strategies, &boards, true).unwrap();
+        for (o, e) in observed.seats.iter().zip(&expected.seats) {
+            close(o.value, e.value);
+            close(o.value_a, e.value);
+            close(o.value_b, e.value);
+            close(o.gain, e.gain);
+            close(o.held_gain, e.gain);
+        }
+        close(observed.nash_conv, expected.nash_conv);
+        let plain = evaluate(&t, &profile, &m, &strategies, &boards, false).unwrap();
+        assert!((plain.nash_conv - expected.nash_conv).abs() > 1e-6);
     }
 }
 
@@ -740,5 +794,34 @@ fn primary_nash_conv_convergence_smoke() {
     let initial = solution.checkpoints[0].evaluation.nash_conv;
     let end = solution.checkpoints.last().unwrap().evaluation.nash_conv;
     eprintln!("L1 smoke: {initial:.12} -> {end:.12}");
+    assert!(end < initial * 0.25, "{initial} -> {end}");
+}
+
+#[test]
+fn control_variate_solve_converges() {
+    let g = game(&config(2, false));
+    let t = Tree::build_with(&g, FlopLeaves::L1).unwrap();
+    let m = Model::new(&g, &Synthetic, EvaluationOptions::default()).unwrap();
+    let solution = solve(
+        &t,
+        &m,
+        &Buckets,
+        Options {
+            trunk: SolveOptions {
+                iterations: 100,
+                eval_every: 100,
+                ..Default::default()
+            },
+            l1_eval_boards: 16,
+            l1_train_control: true,
+            l1_eval_control: true,
+            ..Default::default()
+        },
+        |_| {},
+    )
+    .unwrap();
+    let initial = solution.checkpoints[0].evaluation.nash_conv;
+    let end = solution.checkpoints.last().unwrap().evaluation.nash_conv;
+    eprintln!("L1 control-variate smoke: {initial:.12} -> {end:.12}");
     assert!(end < initial * 0.25, "{initial} -> {end}");
 }

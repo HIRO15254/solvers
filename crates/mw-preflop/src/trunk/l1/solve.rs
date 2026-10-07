@@ -24,6 +24,11 @@ pub struct Options {
     pub l1_seed: u64,
     pub l1_eval_boards: u32,
     pub l1_eval_seed: u64,
+    /// Train on the exact L0 checkdown value plus the sampled boards' mean
+    /// L1-minus-checkdown difference (an unbiased control variate).
+    pub l1_train_control: bool,
+    /// The same control variate for the evaluator's leaf estimates.
+    pub l1_eval_control: bool,
 }
 
 impl Default for Options {
@@ -34,6 +39,8 @@ impl Default for Options {
             l1_seed: 0,
             l1_eval_boards: 1024,
             l1_eval_seed: 0,
+            l1_train_control: false,
+            l1_eval_control: false,
         }
     }
 }
@@ -146,7 +153,14 @@ pub fn solve(
                       postflop: &Strategies,
                       timings: &mut Timings|
      -> Result<Checkpoint> {
-        let e = evaluate(tree, average, model, postflop, &eval_boards)?;
+        let e = evaluate(
+            tree,
+            average,
+            model,
+            postflop,
+            &eval_boards,
+            options.l1_eval_control,
+        )?;
         timings.trunk.evaluation += e.seconds;
         Ok(Checkpoint {
             iteration,
@@ -203,13 +217,8 @@ pub fn solve(
                 .par_iter_mut()
                 .map_init(Scratch::default, |scratch, storage| {
                     let z = storage.terminal;
-                    let subtree = tree.nodes[z]
-                        .terminal
-                        .as_ref()
-                        .unwrap()
-                        .l1
-                        .as_ref()
-                        .unwrap();
+                    let terminal = tree.nodes[z].terminal.as_ref().unwrap();
+                    let subtree = terminal.l1.as_ref().unwrap();
                     if !subtree.active.contains(&p) {
                         return None;
                     }
@@ -238,8 +247,13 @@ pub fn solve(
                             Some((&mut increments, &mut additions, weight)),
                         );
                         let v = class_values(&scratch.values, &scale);
+                        let checkdown = if options.l1_train_control {
+                            scratch.checkdown(board, terminal, p, &opponent, &scale)
+                        } else {
+                            [0.0; 169]
+                        };
                         for c in 0..169 {
-                            values[c] += weight * v[c];
+                            values[c] += weight * (v[c] - checkdown[c]);
                         }
                     }
                     discount(storage, subtree, p, &increments, &additions, &dcfr);
@@ -247,7 +261,14 @@ pub fn solve(
                 })
                 .collect();
             for (z, v) in outputs.into_iter().flatten() {
-                leaves.values[p][z] = v;
+                if options.l1_train_control {
+                    // leaf_values left the exact checkdown value here.
+                    for (value, correction) in leaves.values[p][z].iter_mut().zip(v) {
+                        *value += correction;
+                    }
+                } else {
+                    leaves.values[p][z] = v;
+                }
             }
             timings.postflop += phase.elapsed().as_secs_f64();
             let phase = Instant::now();
