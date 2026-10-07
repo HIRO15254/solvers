@@ -34,6 +34,7 @@ flop, turn, river {
 
 [solver.stop]
 target = "0.3%pot"
+# Default check_every = "auto" adapts evaluation intervals from 3 to 50 iterations.
 
 [run]
 max_time = "1h"

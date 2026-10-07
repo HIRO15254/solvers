@@ -142,6 +142,10 @@ f32・i16-f32avgの未指定どうしが、Turn6の`.sol` payload（wall_secs以
 旧版でi16未指定のまま途中停止したrunは、保存した実効configのfalseで新版から再開できる。
 評価間隔（[証拠](../../experiments/p1-perf-2026-10/adaptive-check-20261008/README.md)）: 固定25では評価が約4.4%、目標を越えてからの超過が平均約12 iterationある。
 保持した131本の収束曲線で、直前2回の評価から到達を予測して間隔を決める方式を模擬すると、0.1%までの費用は平均0.957倍（最悪1.004倍）だった。これをPF10とした（T15）。
+T14: 並行・直列・旧版で`.sol` payload（wall_secsと`[run]`行以外）、root `export strategy/ev`、checkpointのarenaが一致した（Turn6、4 threads）。
+`final_checkpoint = false`でも`.sol`は同じで、省いたrunは定期checkpointから一度に解いたrunと同じ結果へ再開できる。
+T15: 整数の`check_every = 25`は旧版と一致し、targetの無いautoは保存configの値以外が旧版と一致した。
+Turn6・target 1% potでは、autoが評価7回・184 iterationで止まった（固定25は8回・200 iteration）。途中停止と重複progressからの再開も一致した。
 
 ### 一致の定義
 

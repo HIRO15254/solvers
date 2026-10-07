@@ -111,13 +111,17 @@ fn main() -> Result<()> {
             // precision, and thread-count comparisons drop the operational [run].
             let flags = &args[4..];
             for flag in flags {
-                if !matches!(flag.as_str(), "--ignore-cfr-precision" | "--ignore-run") {
+                if !matches!(
+                    flag.as_str(),
+                    "--ignore-cfr-precision" | "--ignore-run" | "--equivalent-auto-cadence"
+                ) {
                     bail!("unknown solution flag {flag}");
                 }
             }
             let ignore_precision = flags.iter().any(|s| s == "--ignore-cfr-precision");
             let ignore_run = flags.iter().any(|s| s == "--ignore-run");
-            if ignore_precision || ignore_run {
+            let equivalent_auto = flags.iter().any(|s| s == "--equivalent-auto-cadence");
+            if ignore_precision || ignore_run || equivalent_auto {
                 for payload in [&mut a, &mut b] {
                     let mut config: toml_edit::DocumentMut = payload.config_toml.parse()?;
                     if ignore_precision
@@ -129,6 +133,19 @@ fn main() -> Result<()> {
                     }
                     if ignore_run {
                         config.remove("run");
+                    }
+                    if equivalent_auto {
+                        // PF10 records auto explicitly even though a targetless run
+                        // computes identically to legacy fixed 25. Reject any other
+                        // cadence or target rather than masking a solver difference.
+                        let stop = &mut config["solver"]["stop"];
+                        if stop.get("target").is_some()
+                            || !(stop["check_every"].as_str() == Some("auto")
+                                || stop["check_every"].as_integer() == Some(25))
+                        {
+                            bail!("auto cadence equivalence requires no target and auto or 25");
+                        }
+                        stop["check_every"] = toml_edit::value(25);
                     }
                     payload.config_toml = config.to_string();
                 }
@@ -144,6 +161,7 @@ fn main() -> Result<()> {
                     "payload_bit_equal_except_wall_secs": true,
                     "config_precision_excluded": ignore_precision,
                     "config_run_excluded": ignore_run,
+                    "targetless_auto_cadence_normalized": equivalent_auto,
                     "canonical_postcard_streams": true,
                     "payload_bytes": payload_sizes,
                     "normalized_payload_blake3": blake3::hash(&a_bytes).to_hex().as_str(),

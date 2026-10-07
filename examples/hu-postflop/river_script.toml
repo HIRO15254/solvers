@@ -22,6 +22,7 @@ size = "1bb"
 [solver.stop]
 max_iterations = 16
 check_every = 4
+# Integer cadence stays fixed; default "auto" adapts with target, otherwise evaluates every 25.
 
 [run]
 threads = 1

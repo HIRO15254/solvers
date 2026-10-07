@@ -164,6 +164,9 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 定数と DTO は [runfiles/src/run.rs](../crates/runfiles/src/run.rs)、lifecycle は
 [cli/src/run_dir.rs](../crates/cli/src/run_dir.rs) が所有する。
 進捗と event を分けることで、時系列 schema を保ち、読取り側に event の除外処理を要求しない。
+P1の`solver.stop.check_every`は`"auto"`が既定。target有りのprogressは初回25 iteration、以降3〜50 iterationの適応評価ごとに追記するため、GUIは等間隔を仮定しない。target無しのautoは固定25、整数は固定指定間隔である。
+autoでは中断・max_time・定期checkpointを25 iteration以下のsub-batch境界で判定する。整数は指定間隔で判定する。
+auto再開は`progress.jsonl`のcheckpoint iteration以下の評価行を使い、同じiterationの重複は最後の行を採用する。progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25（max_iterationsで切る）から評価し、一度に解いたrunとの評価iteration一致は保証しない。checkpoint形式は変えない。
 
 ### 5.2 state 遷移
 

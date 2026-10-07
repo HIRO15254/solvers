@@ -17,7 +17,7 @@ toml_edit = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 runfiles = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
 thiserror = { workspace = true }
 postcard = { workspace = true }
 zstd = { workspace = true, features = ["zstdmt"] }

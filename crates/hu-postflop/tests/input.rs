@@ -1,5 +1,7 @@
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::input::{Algorithm, P1Sections, Settings, SolutionStreets, Storage, lower};
+use hu_postflop::input::{
+    Algorithm, CheckEvery, P1Sections, Settings, SolutionStreets, Storage, lower,
+};
 use hu_postflop::{
     PostflopConfig, PostflopGame, StreetTree, TreeBuildError, build_postflop_game, memory_usage,
     try_build_postflop_game, try_memory_usage,
@@ -64,7 +66,7 @@ fn sections_defaults_order_and_idempotence() {
     assert_eq!(s.solver.cfr_precision, hu_postflop::CfrPrecision::F32);
     assert_eq!(s.output.solution_streets, SolutionStreets::Full);
     assert_eq!(s.solver.stop.max_iterations, 1_000_000);
-    assert_eq!(s.solver.stop.check_every, 25);
+    assert_eq!(s.solver.stop.check_every, CheckEvery::Auto);
     assert_eq!(s.solver.stop.target, None);
     assert_eq!(s.solver.parallel.chance_depth, 2);
     assert_eq!(s.solver.parallel.min_children, 12);
@@ -78,6 +80,7 @@ fn sections_defaults_order_and_idempotence() {
         }
     );
     let effective = doc.normalize(&P1Sections).unwrap();
+    assert!(effective.contains("check_every = \"auto\""));
     assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
     let keys = [
         "iso_merging =",
@@ -107,6 +110,55 @@ fn sections_defaults_order_and_idempotence() {
         })
         .collect();
     assert!(offsets.windows(2).all(|w| w[0] < w[1]), "{effective}");
+}
+
+#[test]
+fn evaluation_cadence_literals_normalize_idempotently() {
+    for (literal, expected) in [
+        ("\"auto\"", CheckEvery::Auto),
+        ("1", CheckEvery::Fixed(1)),
+        ("25", CheckEvery::Fixed(25)),
+        ("9223372036854775807", CheckEvery::Fixed(i64::MAX as u64)),
+    ] {
+        let doc = parse(&format!(
+            "{}\n[solver.stop]\ncheck_every = {literal}\n",
+            standard("")
+        ));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        assert_eq!(settings.solver.stop.check_every, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(effective.contains(&format!("check_every = {literal}")));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let decoded: hu_postflop::input::Solver =
+            effective.parse::<toml::Table>().unwrap()["solver"]
+                .clone()
+                .try_into()
+                .unwrap();
+        assert_eq!(decoded.stop.check_every, expected);
+    }
+}
+
+#[test]
+fn evaluation_cadence_rejects_invalid_literals_with_contract_error_codes() {
+    for (literal, code) in [
+        ("\"AUTO\"", Code::NLH002),
+        ("\"25\"", Code::NLH002),
+        ("\"fixed\"", Code::NLH002),
+        ("1.0", Code::NLH002),
+        ("true", Code::NLH002),
+        ("[]", Code::NLH002),
+        ("{}", Code::NLH002),
+        ("0", Code::NLH003),
+        ("-1", Code::NLH003),
+    ] {
+        let doc = parse(&format!(
+            "{}\n[solver.stop]\ncheck_every = {literal}\n",
+            standard("")
+        ));
+        let error = doc.normalize(&P1Sections).unwrap_err();
+        assert_eq!(error.code, code, "{literal}: {error}");
+        assert_eq!(error.key.as_deref(), Some("solver.stop.check_every"));
+    }
 }
 
 #[test]

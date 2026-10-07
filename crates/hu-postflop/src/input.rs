@@ -78,20 +78,80 @@ impl Default for Algorithm {
     }
 }
 
+/// Evaluation cadence: adaptive with a target, or a fixed iteration interval.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CheckEvery {
+    #[default]
+    Auto,
+    Fixed(u64),
+}
+
+impl Serialize for CheckEvery {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Self::Auto => serializer.serialize_str("auto"),
+            Self::Fixed(interval) => serializer.serialize_u64(*interval),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for CheckEvery {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct Visitor;
+        impl serde::de::Visitor<'_> for Visitor {
+            type Value = CheckEvery;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("a positive integer or the string \"auto\"")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
+                if value == "auto" {
+                    Ok(CheckEvery::Auto)
+                } else {
+                    Err(E::invalid_value(serde::de::Unexpected::Str(value), &self))
+                }
+            }
+
+            fn visit_u64<E: serde::de::Error>(self, value: u64) -> Result<Self::Value, E> {
+                if value > 0 {
+                    Ok(CheckEvery::Fixed(value))
+                } else {
+                    Err(E::invalid_value(
+                        serde::de::Unexpected::Unsigned(value),
+                        &self,
+                    ))
+                }
+            }
+
+            fn visit_i64<E: serde::de::Error>(self, value: i64) -> Result<Self::Value, E> {
+                match u64::try_from(value) {
+                    Ok(value) => self.visit_u64(value),
+                    Err(_) => Err(E::invalid_value(
+                        serde::de::Unexpected::Signed(value),
+                        &self,
+                    )),
+                }
+            }
+        }
+        deserializer.deserialize_any(Visitor)
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(default, deny_unknown_fields)]
 pub struct Stop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target: Option<String>,
     pub max_iterations: u64,
-    pub check_every: u64,
+    pub check_every: CheckEvery,
 }
 impl Default for Stop {
     fn default() -> Self {
         Self {
             target: None,
             max_iterations: 1_000_000,
-            check_every: 25,
+            check_every: CheckEvery::Auto,
         }
     }
 }
@@ -203,6 +263,21 @@ fn field<T: serde::de::DeserializeOwned>(
 }
 fn number(value: &toml::Value) -> bool {
     value.is_float() || value.is_integer()
+}
+
+fn check_every(table: &toml::Table) -> Result<CheckEvery, SpotError> {
+    const PATH: &str = "solver.stop.check_every";
+    match table.get("check_every") {
+        None => Ok(CheckEvery::Auto),
+        Some(toml::Value::String(value)) if value == "auto" => Ok(CheckEvery::Auto),
+        Some(toml::Value::Integer(value)) if *value > 0 => Ok(CheckEvery::Fixed(*value as u64)),
+        Some(toml::Value::Integer(_)) => Err(invalid(PATH, "must be positive")),
+        Some(_) => Err(SpotError::new(
+            Code::NLH002,
+            PATH,
+            "expected a positive integer or the string \"auto\"",
+        )),
+    }
 }
 fn parameter(table: &toml::Table, name: &str, default: f64) -> Result<f64, SpotError> {
     let path = format!("solver.algorithm.{name}");
@@ -367,13 +442,7 @@ impl Settings {
                     settings.stop.max_iterations,
                     toml::Value::is_integer,
                 )?,
-                check_every: field(
-                    t,
-                    "check_every",
-                    "solver.stop.check_every",
-                    settings.stop.check_every,
-                    toml::Value::is_integer,
-                )?,
+                check_every: check_every(t)?,
             };
         }
         if let Some(t) = section(solver, "parallel", "solver.parallel")? {
@@ -405,7 +474,6 @@ impl Settings {
         };
         for (key, value) in [
             ("solver.stop.max_iterations", settings.stop.max_iterations),
-            ("solver.stop.check_every", settings.stop.check_every),
             (
                 "solver.parallel.min_children",
                 settings.parallel.min_children as u64,

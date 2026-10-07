@@ -52,6 +52,7 @@ include_allin = false
 river = 2
 
 [solver.stop]
+# check_every defaults to "auto": adaptive with target, otherwise every 25 iterations.
 max_iterations = 100
 "#;
 
@@ -104,6 +105,11 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         }
         if line.starts_with("cfr_precision =") {
             rendered.push_str("# CFR arithmetic: f32 (default) | f64 (legacy bit-identical); evaluation stays f64.\n");
+        }
+        if line.starts_with("check_every =") {
+            rendered.push_str(
+                "# auto: adaptive every 3-50 iterations with target, otherwise every 25; an integer fixes the interval.\n",
+            );
         }
         if line.starts_with("storage =") {
             rendered.push_str(
@@ -166,10 +172,17 @@ mod tests {
                         }
                         assert!(effective.contains("pow4_reset = false"));
                         assert!(effective.contains("final_checkpoint = true"));
+                        assert!(effective.contains("check_every = \"auto\""));
+                        assert_eq!(
+                            settings.solver.stop.check_every,
+                            hu_postflop::input::CheckEvery::Auto
+                        );
                         if matches!(template, ConfigTemplate::Full) {
                             assert!(raw.contains("pow4_reset = false"));
                             assert!(raw.contains("omitting pow4_reset defaults to true"));
                             assert!(raw.contains("false keeps only periodic checkpoints"));
+                            assert!(raw.contains("check_every = \"auto\""));
+                            assert!(raw.contains("adaptive every 3-50 iterations with target"));
                         }
                         assert_eq!(
                             settings.solver.algorithm,

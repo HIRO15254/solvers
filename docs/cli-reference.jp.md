@@ -33,6 +33,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
 P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseで、明示値は常に優先する。full templateは既定storageのf32に対応する`pow4_reset = false`を明示するため、i16の既定resetを使う場合はこの行を削除するかtrueにする。
+P1の`[solver.stop] check_every`は`"auto"`が既定で、full templateにも明示する。target有りは3〜50 iterationの適応評価、target無しは固定25である。正の整数は従来の固定間隔で、旧版と同じ停止を得るには`check_every = 25`を明示する。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
 ## `solvers validate`
@@ -103,6 +104,7 @@ solvers solve <CONFIG> --out DIR [--threads N] [--memory SIZE] [--max-time DUR]
 
 上書きは実効configに保存する。memoryのautoはP1が物理RAMの80%、P2がarena予算6 GiBである。
 P1の停止条件はNashConv / 2、P2は測定deviationの確認であり、規範の停止設定に従う。
+P1の`check_every = "auto"`は初回25 iteration、以降は評価iterationとNashConv / 2の履歴から間隔を決める（[入力規範第10節](nlh-input-v1.jp.md#10-solver)）。progressは評価ごとに出すため、target有りでは不等間隔になる。autoの中断・max_time・定期checkpoint判定は25 iteration以下のsub-batch境界で行い、整数では指定間隔で行う。
 P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未一致ruleを警告する。
 
 | file | 内容 |
@@ -132,6 +134,7 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
 P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
 最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
+P1のautoはrun directoryの`progress.jsonl`からcheckpoint iteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。同じ方式で次の評価iterationを再計算する。progressが無い・読めない場合（裸のcheckpointを含む）は履歴無しでcheckpoint iteration＋25から評価し、max_iterationsで切る。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えず、旧run.tomlの`check_every = 25`は固定25で再開できる。
 
 | flag | 適用 | 意味 |
 |---|---|---|
@@ -334,7 +337,7 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `130` | solve/resumeの協調停止 |
 
 Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
-2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
+P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境界で判定する。2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
 
 ## `solversd`
 

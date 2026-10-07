@@ -35,8 +35,88 @@ pub struct RunRequest<'a> {
     pub checkpoint: &'a Path,
     pub solution: &'a Path,
     pub state: Option<crate::checkpoint::CheckpointReader>,
+    /// Evaluations through the restored checkpoint, as (iteration, NashConv / 2).
+    pub evaluation_history: Vec<(u64, f64)>,
     pub elapsed_before: Duration,
     pub cancel: &'a AtomicBool,
+}
+
+// PF10: all scheduling constants live here, independent of execution resources.
+const BASE_CHECK_STEP: u64 = 25;
+const MIN_CHECK_STEP: u64 = 3;
+const MAX_CHECK_STEP: u64 = 50;
+const PREDICTION_FRACTION: f64 = 0.8;
+const MIN_CONVERGENCE_SLOPE: f64 = 0.05;
+
+/// Deterministic evaluation schedule. `history` is sorted, with unique iterations.
+/// A checkpoint between evaluations keeps the schedule anchored at the last check.
+pub fn next_evaluation(
+    history: &[(u64, f64)],
+    target: Option<f64>,
+    current: u64,
+    max_iterations: u64,
+    check_every: input::CheckEvery,
+) -> u64 {
+    if let input::CheckEvery::Fixed(step) = check_every {
+        return current.saturating_add(step).min(max_iterations);
+    }
+    let base = history.last().map_or(current, |&(t, _)| t);
+    let mut step = BASE_CHECK_STEP;
+    if let Some(target) = target
+        && let [.., (t0, v0), (t1, v1)] = history
+        && *t0 > 0
+        && t1 > t0
+        && v0.is_finite()
+        && v1.is_finite()
+        && *v0 > 0.0
+        && *v1 > 0.0
+        && target.is_finite()
+        && target > 0.0
+    {
+        let slope = (v0 / v1).ln() / (*t1 as f64 / *t0 as f64).ln();
+        if slope.is_finite() && slope > MIN_CONVERGENCE_SLOPE {
+            let prediction = *t1 as f64 * (v1 / target).powf(1.0 / slope);
+            let predicted_step = (PREDICTION_FRACTION * (prediction - *t1 as f64)).ceil();
+            if predicted_step.is_finite() {
+                step = predicted_step.clamp(MIN_CHECK_STEP as f64, MAX_CHECK_STEP as f64) as u64;
+            }
+        }
+    }
+    base.saturating_add(step).max(current).min(max_iterations)
+}
+
+/// Reconstruct the append-only progress history; the last row wins for duplicates.
+/// Missing, unreadable or invalid progress deliberately falls back to no history.
+pub fn read_evaluation_history(path: &Path, checkpoint_iteration: u64) -> Vec<(u64, f64)> {
+    // The schedule must see the exact in-memory values, so NashConv is parsed
+    // with Rust's correctly rounded f64 parser rather than serde_json's.
+    #[derive(serde::Deserialize)]
+    struct Row<'a> {
+        iteration: u64,
+        #[serde(borrow)]
+        nash_conv: &'a serde_json::value::RawValue,
+    }
+    fn read(path: &Path, checkpoint_iteration: u64) -> Result<Vec<(u64, f64)>> {
+        use std::io::BufRead;
+        let mut rows = std::collections::BTreeMap::new();
+        for line in std::io::BufReader::new(std::fs::File::open(path)?).lines() {
+            let line = line?;
+            let row: Row<'_> = serde_json::from_str(&line)?;
+            if row.iteration <= checkpoint_iteration {
+                let nash_conv: f64 = row.nash_conv.get().parse()?;
+                rows.insert(row.iteration, nash_conv / 2.0);
+            }
+        }
+        Ok(rows.into_iter().collect())
+    }
+    read(path, checkpoint_iteration).unwrap_or_default()
+}
+
+fn batch_step(check_every: input::CheckEvery, remaining: u64) -> u64 {
+    match check_every {
+        input::CheckEvery::Auto => remaining.min(BASE_CHECK_STEP),
+        input::CheckEvery::Fixed(_) => remaining,
+    }
 }
 /// Build/restore and solve P1, writing checkpoint and solution artifacts and returning convergence data.
 pub fn run(
@@ -80,7 +160,10 @@ pub(crate) fn query<S: Storage>(
         min_children: p.settings.solver.parallel.min_children,
     });
     let start = Instant::now();
-    let target = target_nash_conv.or(p.target.map(|t| 2.0 * t));
+    let target = target_nash_conv.map(|t| t / 2.0).or(p.target);
+    let check_every = p.settings.solver.stop.check_every;
+    let mut history = Vec::new();
+    let mut next_check = next_evaluation(&history, target, 0, iterations, check_every);
     while solver.iteration() < iterations {
         if cancel.load(std::sync::atomic::Ordering::SeqCst)
             || p.document
@@ -91,18 +174,23 @@ pub(crate) fn query<S: Storage>(
         {
             break;
         }
-        solver.run(
-            p.settings
-                .solver
-                .stop
-                .check_every
-                .min(iterations - solver.iteration()),
-        );
-        if let Some(target) = target {
-            let expl = solver.exploitability();
-            if expl[Player::P0] + expl[Player::P1] <= target {
-                break;
+        solver.run(batch_step(check_every, next_check - solver.iteration()));
+        if solver.iteration() == next_check {
+            if let Some(target) = target {
+                let expl = solver.exploitability();
+                let value = (expl[Player::P0] + expl[Player::P1]) / 2.0;
+                history.push((solver.iteration(), value));
+                if value <= target {
+                    break;
+                }
             }
+            next_check = next_evaluation(
+                &history,
+                target,
+                solver.iteration(),
+                iterations,
+                check_every,
+            );
         }
     }
     Ok((solver, game.node_info))
@@ -138,6 +226,7 @@ fn drive<S: Storage>(
         checkpoint,
         solution,
         state,
+        evaluation_history: mut history,
         elapsed_before,
         cancel,
     } = request;
@@ -174,7 +263,22 @@ fn drive<S: Storage>(
     let max_time = p.document.spot.run.max_time_seconds;
     let mut canceled = false;
     let mut reason = "max-iterations";
+    let mut next_check = next_evaluation(
+        &history,
+        p.target,
+        solver.iteration(),
+        stop.max_iterations,
+        stop.check_every,
+    );
     while solver.iteration() < stop.max_iterations {
+        if matches!(stop.check_every, input::CheckEvery::Auto)
+            && history.last().is_some_and(|&(t, v)| {
+                t == solver.iteration() && p.target.is_some_and(|target| v <= target)
+            })
+        {
+            reason = "target-reached";
+            break;
+        }
         if max_time.is_some_and(|limit| (elapsed_before + start.elapsed()).as_secs_f64() >= limit) {
             reason = "time-limit";
             break;
@@ -184,21 +288,35 @@ fn drive<S: Storage>(
             reason = "cancelled";
             break;
         }
-        solver.run(
-            stop.check_every
-                .min(stop.max_iterations - solver.iteration()),
-        );
-        let (ev, expl) = solver.evaluate();
-        evaluated = Some((ev, expl));
-        let nash_conv = expl[Player::P0] + expl[Player::P1];
+        solver.run(batch_step(
+            stop.check_every,
+            next_check - solver.iteration(),
+        ));
+        // A stop between evaluations must summarize the actual checkpoint state.
+        evaluated = None;
+        let mut target_reached = false;
+        if solver.iteration() == next_check {
+            let (ev, expl) = solver.evaluate();
+            evaluated = Some((ev, expl));
+            let nash_conv = expl[Player::P0] + expl[Player::P1];
+            observer(Observation::Progress(runfiles::MetricsRow {
+                iteration: solver.iteration(),
+                elapsed_secs: (elapsed_before + start.elapsed()).as_secs_f64(),
+                expl_p0: expl[Player::P0],
+                expl_p1: expl[Player::P1],
+                nash_conv,
+            }))?;
+            history.push((solver.iteration(), nash_conv / 2.0));
+            target_reached = p.target.is_some_and(|target| nash_conv / 2.0 <= target);
+            next_check = next_evaluation(
+                &history,
+                p.target,
+                solver.iteration(),
+                stop.max_iterations,
+                stop.check_every,
+            );
+        }
         let elapsed_secs = (elapsed_before + start.elapsed()).as_secs_f64();
-        observer(Observation::Progress(runfiles::MetricsRow {
-            iteration: solver.iteration(),
-            elapsed_secs,
-            expl_p0: expl[Player::P0],
-            expl_p1: expl[Player::P1],
-            nash_conv,
-        }))?;
         if last_checkpoint.elapsed() >= interval {
             save(&solver, p, checkpoint, elapsed_secs, observer)?;
             last_checkpoint = Instant::now();
@@ -209,8 +327,15 @@ fn drive<S: Storage>(
             reason = "cancelled";
             break;
         }
-        if p.target.is_some_and(|target| nash_conv / 2.0 <= target) {
+        if target_reached {
             reason = "target-reached";
+            break;
+        }
+        if matches!(stop.check_every, input::CheckEvery::Auto)
+            && max_time
+                .is_some_and(|limit| (elapsed_before + start.elapsed()).as_secs_f64() >= limit)
+        {
+            reason = "time-limit";
             break;
         }
     }
@@ -386,6 +511,72 @@ fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn progress_values_round_trip_without_changing_schedule_inputs() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join(runfiles::RUN_PROGRESS_FILE);
+        let mut writer = runfiles::MetricsWriter::create_or_append(&path).unwrap();
+        let mut bits = 123456789_u64;
+        let mut expected = Vec::new();
+        for iteration in 1..=256 {
+            bits = bits.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let value = f64::from_bits((bits & ((1_u64 << 52) - 1)) | (1023_u64 << 52));
+            writer
+                .append(&runfiles::MetricsRow {
+                    iteration,
+                    elapsed_secs: 0.0,
+                    expl_p0: value,
+                    expl_p1: value,
+                    nash_conv: value * 2.0,
+                })
+                .unwrap();
+            expected.push((iteration, value));
+        }
+        drop(writer);
+        assert_eq!(read_evaluation_history(&path, 256), expected);
+    }
+
+    #[test]
+    fn adaptive_schedule_is_bounded_and_uses_only_evaluations() {
+        let next = |h: &[(u64, f64)], target, current, max| {
+            next_evaluation(h, target, current, max, input::CheckEvery::Auto)
+        };
+        assert_eq!(next(&[], Some(1.0), 0, 1000), 25);
+        assert_eq!(next(&[], Some(1.0), 77, 1000), 102);
+        assert_eq!(next(&[(25, 4.0)], Some(1.0), 25, 1000), 50);
+        let h = [(25, 4.0), (50, 2.0)]; // slope 1, arrival 100, ceil(.8*50)=40
+        assert_eq!(next(&h, Some(1.0), 50, 1000), 90);
+        assert_eq!(next(&h, Some(1.0), 75, 1000), 90);
+        assert_eq!(next(&h, None, 50, 1000), 75);
+        assert_eq!(next(&h, Some(0.01), 50, 1000), 100); // upper bound
+        assert_eq!(next(&h, Some(1.99), 50, 1000), 53); // lower bound
+        assert_eq!(next(&h, Some(3.0), 50, 1000), 53); // prediction in the past
+        assert_eq!(next(&h, Some(1.0), 50, 61), 61);
+        assert_eq!(next(&[], Some(1.0), 0, 9), 9);
+        for h in [
+            [(25, 2.0), (50, 2.0)],
+            [(25, 2.0), (50, 1.99)], // slope <= .05
+            [(25, 1.0), (50, 2.0)],
+            [(25, f64::NAN), (50, 2.0)],
+            [(25, 2.0), (50, f64::INFINITY)],
+            [(0, 4.0), (50, 2.0)],
+            [(25, 0.0), (50, 2.0)],
+        ] {
+            assert_eq!(next(&h, Some(1.0), 50, 1000), 75);
+        }
+        assert_eq!(
+            next(&[(25, 4.0), (50, 2.0)], Some(f64::MIN_POSITIVE), 50, 1000),
+            75
+        );
+        assert_eq!(
+            next_evaluation(&h, Some(1.0), 77, 1000, input::CheckEvery::Fixed(25)),
+            102
+        );
+        assert_eq!(batch_step(input::CheckEvery::Auto, 50), 25);
+        assert_eq!(batch_step(input::CheckEvery::Auto, 7), 7);
+        assert_eq!(batch_step(input::CheckEvery::Fixed(50), 50), 50);
+    }
 
     #[test]
     fn parallel_finalization_requires_a_save_and_room_for_both_codecs() {

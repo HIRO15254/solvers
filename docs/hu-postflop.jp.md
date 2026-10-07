@@ -82,7 +82,13 @@ HU vector CFRが平均戦略を作り、同じ木の厳密best responseで評価
 `solver.stop.target`指定時は評価境界で`NashConv / 2 <= target`なら停止する。
 `%pot`は開始potの百分率、`bb`はBB額、`%prizes`は賞金総額の百分率である。
 targetの既定は無い。max_iterations / max_timeは安全予算であり、到達自体は収束を意味しない。
-target無しでも`check_every`ごとにexploitabilityを測る。
+`solver.stop.check_every`は`"auto"`が既定で、target有りなら初回25 iteration、以降は直前2回の評価から
+到達を予測した3〜50 iterationの適応間隔でexploitabilityを測る。方式と定数は[入力規範第10節](nlh-input-v1.jp.md#10-solver)に従い、時間・thread数に依存しない。
+target無しのautoは固定25、正の整数を明示すると従来の固定間隔になる。
+target有りの停止iterationは旧版と変わり得る。旧版と同じ停止を得るには`check_every = 25`を明示する。
+autoでは評価の間を25 iteration以下のsub-batchに分け、各境界で中断・max_time・定期checkpointを判定する。
+整数では従来どおり指定間隔で判定する。sub-batchの区切りはCFRの結果を変えない。
+live queryのtarget判定にも同じ評価方式を使う。
 
 `[solver] cfr_precision`は`"f32"`（既定）と`"f64"`を選べる。対象はCFR passの終端kernelとcurrent strategyのregret matchingである。
 f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
@@ -160,6 +166,12 @@ runningのpidが存在しないinterruptedは読み手が同一hostで導出す�
 eventsのcheckpointの`sweeps`はP1ではiteration数である。
 stop reasonは`max-iterations` / `target-reached` / `time-limit` / `cancelled`である。
 JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに含めない。
+
+autoの評価ごとにprogressを追記するため、target有りでは行のiteration間隔が変わる。
+再開時は`progress.jsonl`のcheckpoint iteration以下の行から評価履歴を復元し、同じiterationの重複は最後の行を採用する。
+次の評価を同じ方式で再計算し、同じconfigの一度に解いたrunと評価iteration・停止iteration・stateを揃える。
+progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25から評価する（max_iterationsで切る）。
+この場合は評価iterationの一致を保証しない。評価履歴はcheckpointには追加せず、形式version 5を維持する。
 
 `run.json`は次のfieldを持つ。
 

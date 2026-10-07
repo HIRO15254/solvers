@@ -280,7 +280,7 @@ pub fn solve(
     let p = prepare(&raw, path)?;
     input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
     crate::run_dir::create_or_adopt(out)?;
-    execute(p, out, None, Duration::ZERO, false)
+    execute(p, out, None, Vec::new(), Duration::ZERO, false)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -298,24 +298,27 @@ pub fn resume(
     let raw = overrides(raw, threads, memory, max_time, interval)?;
     let p = prepare(&raw, Path::new("run.toml"))?;
     input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
-    let elapsed = checkpoint.elapsed.unwrap_or(previous_elapsed(
-        &directory.join(runfiles::RUN_PROGRESS_FILE),
-    )?);
+    let progress = directory.join(runfiles::RUN_PROGRESS_FILE);
+    let history = run::read_evaluation_history(&progress, checkpoint.state.iteration);
+    let elapsed = match checkpoint.elapsed {
+        Some(elapsed) => elapsed,
+        None => previous_elapsed(&progress).unwrap_or(Duration::ZERO),
+    };
     let active = out.unwrap_or(directory);
     if out.is_some() {
         crate::run_dir::create_or_adopt(active)?;
-        let progress = directory.join(runfiles::RUN_PROGRESS_FILE);
-        if progress.exists() {
-            std::fs::copy(progress, active.join(runfiles::RUN_PROGRESS_FILE))?;
+        if let Ok(progress) = std::fs::read(&progress) {
+            std::fs::write(active.join(runfiles::RUN_PROGRESS_FILE), progress)?;
         }
     }
-    execute(p, active, Some(checkpoint.state), elapsed, true)
+    execute(p, active, Some(checkpoint.state), history, elapsed, true)
 }
 
 fn execute(
     p: hu_postflop::prepare::Prepared,
     directory: &Path,
     state: Option<hu_postflop::checkpoint::CheckpointReader>,
+    evaluation_history: Vec<(u64, f64)>,
     elapsed: Duration,
     resumed: bool,
 ) -> Result<()> {
@@ -352,6 +355,7 @@ fn execute(
             checkpoint: &paths.checkpoint,
             solution: &paths.solution,
             state,
+            evaluation_history,
             elapsed_before: elapsed,
             cancel: &crate::CLI_CANCEL,
         },

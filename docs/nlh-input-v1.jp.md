@@ -535,7 +535,7 @@ schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs
 [solver.stop]
 target = "0.3%pot"        # 任意。既定なし。NashConv/2に対する停止目標
 max_iterations = 1000000  # 既定。安全予算であり収束を意味しない
-check_every = 25          # 既定。Exploitability計算と停止判定の間隔
+check_every = "auto"      # 既定。target有りは適応間隔、無しは固定25 iteration
 
 [solver.parallel]         # 任意。性能調整
 chance_depth = 2
@@ -546,7 +546,25 @@ min_children = 12
 tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconomicsが合わなければ`NLH003`。
 判定には`NashConv / 2`を使い、一般和の場合も同じ量で止めるが零和の収束保証は付けない。
 `target`を書かなければ`max_iterations`か`[run] max_time`に達するまで回し、`validate`は停止目標が
-無いことを警告する。Exploitabilityは`target`の有無によらず`check_every`ごとに計算して報告する。
+無いことを警告する。Exploitabilityは評価境界ごとに計算して報告する。
+
+`check_every`は`"auto"`（既定）または正のu64である。整数を明示すると従来どおり固定間隔で評価する。
+他の文字列や型は`NLH002`、0・負整数は`NLH003`で拒否する。
+`"auto"`でtargetが無い場合も固定25 iterationである。targetがある場合は次の決定的な適応間隔を使う。
+初回はiteration 25、評価履歴が2点未満なら次は25 iteration後とし、いずれもmax_iterationsで切る。
+直前2回の評価を`(t0, v0)`、`(t1, v1)`（vはNashConv / 2）として、
+`s = ln(v0 / v1) / ln(t1 / t0)`を計算する。有限の`s > 0.05`なら
+`t* = t1 × (v1 / target)^(1 / s)`、`step = ceil(0.8 × (t* − t1))`とし、
+非有限の値がある場合や`s <= 0.05`ならstepは25とする。stepを3〜50 iterationに収め、
+max_iterationsまでの残りで切る。間隔は評価iterationと値だけで決まり、時間やthread数には依存しない。
+停止条件は従来どおり`NashConv / 2 <= target`であるが、target有りの停止iterationは旧版と変わり得る。
+旧版と同じ停止を得るには`check_every = 25`を明示する。
+
+利用者決定PF10（2026-10-08）により、131本の収束曲線を使った模擬で0.1% pot到達時間が
+平均約4.3%短縮した方式を既定にした（[模擬script](../experiments/p1-perf-2026-10/adaptive-check-20261008/scripts/simulate.py)、
+[結果](../experiments/p1-perf-2026-10/adaptive-check-20261008/result.json)）。
+実効configには`"auto"`または整数を必ず明示し、再読込みしても同じ値になる。
+旧run.tomlの`check_every = 25`は固定25のまま再開する。互換性hashの対象は変更しない。
 
 #### P1の設定値
 
@@ -560,7 +578,8 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 | `hs-dcfr` | `gamma0 = 30` |
 | `dcfr.alpha` / `beta` / `gamma`、`hs-dcfr.gamma0` | 有限f64。負値もparserは受理する。regret正側・負側・平均重みのdiscountを指定する |
 | `dcfr.pow4_reset` | bool。未指定時は確定した`solver.storage`が`"i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalse。明示したtrue・falseはstorageによらず優先する。trueなら4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
-| `stop.max_iterations` / `check_every` | 正のu64。既定1,000,000 / 25。上限iterationと評価間隔 |
+| `stop.max_iterations` | 正のu64。既定1,000,000。上限iteration |
+| `stop.check_every` | `"auto"`（既定）または正のu64。autoはtarget有りで3〜50 iterationの適応評価、target無しで固定25。整数は固定評価間隔 |
 | `parallel.chance_depth` | 非負u32。既定2。chance分岐を並列化する深さ |
 | `parallel.min_children` | 正のusize。既定12。並列化する最小child数 |
 
@@ -657,8 +676,9 @@ final_checkpoint = true      # P1のみ。既定true。falseは終了時の再�
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。
 - P1 checkpointはversion 5。metadataはbackend種別（`f32` / `i16` / `i16-f32avg`）と配列長を保持する。version 1〜4は移行先を示すerrorで拒否し、現行configから再solveする。[P1第7節](hu-postflop.jp.md#7-solとcheckpoint)を参照。
-- `max_time`、checkpointの判定は計算batchの境界で行う。P1は`check_every` iteration、P2は
-  `batch_sweeps`の完了境界である。I/Oや最終出力を中断するhard deadlineではない。
+- 中断・`max_time`・checkpointの判定は計算batchの境界で行う。P1の`check_every = "auto"`は評価間を25 iteration以下のsub-batchに分け、その完了境界で判定する。整数は従来どおり指定iteration間隔、P2は
+  `batch_sweeps`の完了境界である。sub-batchの区切りは計算結果を変えない。I/Oや最終出力を中断するhard deadlineではない。
+- P1のauto再開はrun directoryの`progress.jsonl`からcheckpointのiteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。次の評価iterationは同じ方式で再計算する。progressが無い・読めない場合は履歴無しとし、checkpointのiteration＋25（max_iterationsで切る）を最初の評価とする。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えない。
 
 ## 12. `[output]`
 

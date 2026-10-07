@@ -60,6 +60,7 @@ solvers solve spot.toml --out runs/my-spot --threads 4 --memory 2GiB --max-time 
 ```
 
 毎回新しいrun directoryを指定する。overrideはrun.tomlへ保存する。
+P1の`[solver.stop] check_every`は`"auto"`が既定（PF10、2026-10-08）。targetがあると初回25 iteration、以降は評価値から到達を予測した3〜50 iterationの適応間隔で測り、`NashConv / 2 <= target`で止まる。target無しは固定25、整数の明示は従来の固定間隔である。target有りでは停止iterationが旧版と変わり得るため、旧版と同じ停止を得るには`check_every = 25`を明示する。実効configはautoか整数を必ず保存する。
 P1の`[solver] storage`は`f32`（既定、両arena f32）、`i16`（両arena i16、memory最小）、`i16-f32avg`（regret i16、戦略累積f32）を選べる。0.1% pot程度を目指し旧i16が頭打ちになる場合は`i16-f32avg`を使う。regretの量子化誤差は残る。storage bytesは順に8L、4L＋8N、6L＋4N（L=要素数、N=action node数）。
 
 P1のmemory見積りは`max(storage, storage − regret + 保存作業領域) + 圧縮予算`。regret bytesはf32で4L、i16・i16-f32avgで2L＋4N。solve/resumeは最後のcheckpointを新たに書き、並行peak `S + W + 2C`（S=選択storage、W=保存作業領域、C=圧縮予算）が上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`生成の順とする。全停止理由に適用し、solve開始の見積り式は変わらない。反復中のcheckpointでは解放しない。保存作業領域は保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
@@ -80,6 +81,8 @@ no-riversはRiverの戦略と値を省く。
 ## 5. 監視・停止・再開する
 
 P1の`[run] final_checkpoint = false`は終了時の再開state保存を省く設定で、既定はtrue（PF9、2026-10-08）。目標到達・iteration上限・時間上限・cancelの全てに適用し、定期checkpointと`.sol`は従来どおり保存する。保存した`run.toml`を編集してresumeにも適用できる。P2では指定不可（`NLH002`）。省いたrunは最終状態から再開できず、最後の定期checkpointから続ける。定期checkpointも無ければ`run.toml`から再solveする。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残るためiterationが重複し得る。
+autoの評価は時間・thread数に依存せず、progressは評価ごとに追記するためtarget有りでは不等間隔になる。中断・max_time・定期checkpointの判定はautoで25 iteration以下のsub-batchごと、整数で指定間隔ごとに行う。
+autoの再開はprogress.jsonlのcheckpoint iteration以下の行を使い、同じiterationの重複は最後の行を採用して次の評価を再計算する。同じconfigで一度に解いたrunと評価iteration・停止iteration・stateが一致する。progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25（max_iterationsで切る）から評価するため、評価iteration一致を保証しない。裸のcheckpointだけを移した場合も同様である。checkpoint形式は変わらず、旧run.tomlの`check_every = 25`は固定25で再開する。
 
 P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定である。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseとなる（利用者決定PF8、2026-10-07）。明示したtrue・falseはどのstorageでも優先する。full templateはf32用の`pow4_reset = false`を明示しているため、storageをi16に変えて既定resetを使う場合はこの行を削除するかtrueにする。
 保存された実効configは係数とresetを明示するため、旧係数1.5・0・3や旧既定reset=trueのrun・checkpoint・solutionは保存値で再開・照会できる。
