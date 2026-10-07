@@ -1066,3 +1066,157 @@ fn regression_control_matches_per_board_reference() {
         }
     }
 }
+
+#[test]
+fn average_round_trip_is_bit_identical_and_evaluates_identically() {
+    let g = game(&config(2, false));
+    let tree = Tree::build_with(&g, FlopLeaves::L1).unwrap();
+    let mut original = Strategies::new(&tree, &Buckets);
+    for (i, value) in original
+        .leaves
+        .iter_mut()
+        .flat_map(|l| &mut l.sums)
+        .enumerate()
+    {
+        *value = (i + 1) as f64 / 7.0;
+    }
+    let mut bytes = Vec::new();
+    original.write_average(&tree, &mut bytes).unwrap();
+    assert_eq!(
+        bytes.len(),
+        56 + original.leaves.len() * 16 + original.slots * 8 + 32
+    );
+    let mut loaded = Strategies::new(&tree, &Buckets);
+    for leaf in &mut loaded.leaves {
+        leaf.regrets.fill(123.0);
+    }
+    loaded.read_average(&tree, &mut bytes.as_slice()).unwrap();
+    for (a, b) in original.leaves.iter().zip(&loaded.leaves) {
+        assert_eq!(
+            a.sums.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+            b.sums.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+        );
+        assert!(b.regrets.iter().all(|&v| v == 123.0));
+    }
+    let model = Model::new(&g, &Synthetic, EvaluationOptions::default()).unwrap();
+    let profile = Profile::uniform(&tree);
+    let boards = evaluation_boards(
+        &Buckets,
+        &Options {
+            l1_eval_boards: 4,
+            ..Default::default()
+        },
+    );
+    let a = evaluate(&tree, &profile, &model, &original, &boards, true, true).unwrap();
+    let b = evaluate(&tree, &profile, &model, &loaded, &boards, true, true).unwrap();
+    assert_eq!(a.seats, b.seats);
+    for (a, b) in [
+        a.nash_conv,
+        a.held_nash_conv,
+        a.auxiliary_nash_conv,
+        a.auxiliary_held_nash_conv,
+    ]
+    .into_iter()
+    .zip([
+        b.nash_conv,
+        b.held_nash_conv,
+        b.auxiliary_nash_conv,
+        b.auxiliary_held_nash_conv,
+    ]) {
+        assert_eq!(a.to_bits(), b.to_bits());
+    }
+    // The format must preserve arbitrary f64 bits too, without numeric validation.
+    let bits = [0_u64, 1 << 63, 0x7ff8_0000_0000_0042, 0x7ff0_0000_0000_0000];
+    for (i, v) in original
+        .leaves
+        .iter_mut()
+        .flat_map(|l| &mut l.sums)
+        .enumerate()
+    {
+        *v = f64::from_bits(bits[i % bits.len()]);
+    }
+    bytes.clear();
+    original.write_average(&tree, &mut bytes).unwrap();
+    loaded.read_average(&tree, &mut bytes.as_slice()).unwrap();
+    for (a, b) in original
+        .leaves
+        .iter()
+        .flat_map(|l| &l.sums)
+        .zip(loaded.leaves.iter().flat_map(|l| &l.sums))
+    {
+        assert_eq!(a.to_bits(), b.to_bits());
+    }
+}
+
+#[test]
+fn average_rejects_corruption_truncation_trailing_bytes_and_wrong_tree() {
+    let g = game(&config(2, false));
+    let tree = Tree::build_with(&g, FlopLeaves::L1).unwrap();
+    let mut storage = Strategies::new(&tree, &Buckets);
+    for leaf in &mut storage.leaves {
+        leaf.sums.fill(7.0);
+        leaf.regrets.fill(11.0);
+    }
+    let mut bytes = Vec::new();
+    storage.write_average(&tree, &mut bytes).unwrap();
+    let payload = 56 + storage.leaves.len() * 16;
+    for (offset, message) in [
+        (0, "magic"),
+        (8, "fingerprint"),
+        (40, "leaf count"),
+        (48, "slots"),
+        (56, "terminal"),
+        (64, "sums length"),
+        (payload, "hash"),
+    ] {
+        let mut bad = bytes.clone();
+        bad[offset] ^= 1;
+        let error = storage
+            .read_average(&tree, &mut bad.as_slice())
+            .unwrap_err();
+        assert!(error.to_string().contains(message), "{error}");
+        assert!(
+            storage
+                .leaves
+                .iter()
+                .flat_map(|l| &l.sums)
+                .all(|&v| v == 7.0)
+        );
+    }
+    for len in [0, 7, 55, payload + 1, bytes.len() - 1] {
+        assert!(storage.read_average(&tree, &mut &bytes[..len]).is_err());
+    }
+    let mut trailing = bytes.clone();
+    trailing.push(0);
+    assert!(
+        storage
+            .read_average(&tree, &mut trailing.as_slice())
+            .unwrap_err()
+            .to_string()
+            .contains("trailing")
+    );
+    let other_game = game(&config(2, false).replace("BTN = 3", "BTN = 4"));
+    let other = Tree::build_with(&other_game, FlopLeaves::L1).unwrap();
+    let mut other_storage = Strategies::new(&other, &Buckets);
+    assert!(
+        other_storage
+            .read_average(&other, &mut bytes.as_slice())
+            .unwrap_err()
+            .to_string()
+            .contains("fingerprint")
+    );
+    assert!(
+        storage
+            .leaves
+            .iter()
+            .flat_map(|l| &l.sums)
+            .all(|&v| v == 7.0)
+    );
+    assert!(
+        storage
+            .leaves
+            .iter()
+            .flat_map(|l| &l.regrets)
+            .all(|&v| v == 11.0)
+    );
+}

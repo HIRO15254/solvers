@@ -8,7 +8,7 @@ mod tree;
 pub use cards::{Board, BucketSource, Sampling};
 pub use eval::{Evaluation, SeatEvaluation, evaluate};
 pub use pass::{LeafStrategy, Strategies};
-pub use solve::{Checkpoint, Options, Progress, Solution, Timings, solve};
+pub use solve::{Checkpoint, Options, Progress, Solution, Timings, evaluation_boards, solve};
 pub use tree::{Node, Subtree};
 
 #[cfg(test)]

@@ -120,7 +120,7 @@ pub struct Solution {
 /// scores it on the odd ones, and the reverse, so the halves must be
 /// independent: stratified halves each get their own random shift and are
 /// interleaved, rather than splitting one stratified sample.
-pub(super) fn evaluation_boards(source: &dyn BucketSource, options: &Options) -> Vec<Board> {
+pub fn evaluation_boards(source: &dyn BucketSource, options: &Options) -> Vec<Board> {
     let count = options.l1_eval_boards;
     let seed = options.l1_eval_seed;
     if options.l1_eval_sampling == Sampling::Random {

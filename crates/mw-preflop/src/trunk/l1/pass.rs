@@ -3,7 +3,9 @@ use crate::trunk::{
     classes::{Classes, class},
     l0::{Model, Terminal, Tree, eval::Reach, solve::Discounts},
 };
+use anyhow::{Context, Result, ensure};
 use nlh::NUM_COMBOS;
+use std::io::{BufReader, BufWriter, Read, Write};
 
 #[derive(Clone)]
 pub struct LeafStrategy {
@@ -57,6 +59,102 @@ impl Strategies {
             nodes,
             slots,
         }
+    }
+
+    /// Save only the average accumulators, with a checksum over the header and payload.
+    pub fn write_average(&self, tree: &Tree, out: &mut impl Write) -> Result<()> {
+        let mut out = BufWriter::new(out);
+        let mut hash = blake3::Hasher::new();
+        let mut write = |bytes: &[u8]| -> Result<()> {
+            out.write_all(bytes)?;
+            hash.update(bytes);
+            Ok(())
+        };
+        write(b"P2L1AVG1")?;
+        write(&tree.game_fingerprint)?;
+        write(&(self.leaves.len() as u64).to_le_bytes())?;
+        write(&(self.slots as u64).to_le_bytes())?;
+        for leaf in &self.leaves {
+            write(&(leaf.terminal as u64).to_le_bytes())?;
+            write(&(leaf.sums.len() as u64).to_le_bytes())?;
+        }
+        for leaf in &self.leaves {
+            for value in &leaf.sums {
+                write(&value.to_le_bytes())?;
+            }
+        }
+        out.write_all(hash.finalize().as_bytes())?;
+        out.flush()?;
+        Ok(())
+    }
+
+    /// Load into storage built for the same tree and bucket source. Failed
+    /// validation leaves all accumulators unchanged; regrets are never modified.
+    pub fn read_average(&mut self, tree: &Tree, input: &mut impl Read) -> Result<()> {
+        fn read<const N: usize>(
+            input: &mut impl Read,
+            hash: &mut blake3::Hasher,
+        ) -> Result<[u8; N]> {
+            let mut bytes = [0; N];
+            input
+                .read_exact(&mut bytes)
+                .context("truncated L1 average or read error")?;
+            hash.update(&bytes);
+            Ok(bytes)
+        }
+        let mut input = BufReader::new(input);
+        let mut hash = blake3::Hasher::new();
+        ensure!(
+            &read::<8>(&mut input, &mut hash)? == b"P2L1AVG1",
+            "wrong L1 average magic"
+        );
+        ensure!(
+            read::<32>(&mut input, &mut hash)? == tree.game_fingerprint,
+            "L1 average game fingerprint mismatch"
+        );
+        ensure!(
+            u64::from_le_bytes(read(&mut input, &mut hash)?) == self.leaves.len() as u64,
+            "L1 average leaf count mismatch"
+        );
+        ensure!(
+            u64::from_le_bytes(read(&mut input, &mut hash)?) == self.slots as u64,
+            "L1 average slots mismatch"
+        );
+        for (i, leaf) in self.leaves.iter().enumerate() {
+            ensure!(
+                u64::from_le_bytes(read(&mut input, &mut hash)?) == leaf.terminal as u64,
+                "L1 average leaf {i} terminal mismatch"
+            );
+            ensure!(
+                u64::from_le_bytes(read(&mut input, &mut hash)?) == leaf.sums.len() as u64,
+                "L1 average leaf {i} sums length mismatch"
+            );
+        }
+        // Stage only decoded sums, rather than a second copy of the binary file.
+        let mut sums = Vec::with_capacity(self.leaves.len());
+        for leaf in &self.leaves {
+            let mut values = Vec::with_capacity(leaf.sums.len());
+            for _ in 0..leaf.sums.len() {
+                values.push(f64::from_le_bytes(read(&mut input, &mut hash)?));
+            }
+            sums.push(values);
+        }
+        let mut checksum = [0; 32];
+        input
+            .read_exact(&mut checksum)
+            .context("truncated L1 average checksum")?;
+        ensure!(
+            checksum == *hash.finalize().as_bytes(),
+            "L1 average hash mismatch"
+        );
+        ensure!(
+            input.read(&mut [0; 1])? == 0,
+            "trailing bytes in L1 average"
+        );
+        for (leaf, values) in self.leaves.iter_mut().zip(sums) {
+            leaf.sums = values;
+        }
+        Ok(())
     }
 
     pub fn storage_bytes(&self) -> usize {

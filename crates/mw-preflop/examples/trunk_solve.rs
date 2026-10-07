@@ -16,6 +16,19 @@ fn write_json(path: &Path, value: &impl serde::Serialize) -> Result<()> {
     Ok(())
 }
 
+struct HashingReader<'a, R> {
+    input: &'a mut R,
+    hash: &'a mut blake3::Hasher,
+}
+
+impl<R: std::io::Read> std::io::Read for HashingReader<'_, R> {
+    fn read(&mut self, bytes: &mut [u8]) -> std::io::Result<usize> {
+        let n = self.input.read(bytes)?;
+        self.hash.update(&bytes[..n]);
+        Ok(n)
+    }
+}
+
 fn sampling(value: &str) -> Result<l1::Sampling> {
     match value {
         "random" => Ok(l1::Sampling::Random),
@@ -39,11 +52,14 @@ fn main() -> Result<()> {
     let mut print_every = 0;
     let mut output = None;
     let mut output_profile = None;
+    let mut output_postflop = None;
+    let mut evaluate_profile = None;
+    let mut evaluate_postflop = None;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         if arg == "--help" {
             println!(
-                "trunk_solve --config TOML [--leaf-model l0|l1] [--ehs2-cache PATH (required for l1)] [--l1-boards 32] [--l1-seed 0] [--l1-eval-boards 1024 (even, >=2)] [--l1-eval-seed 0] [--l1-train-control true] [--l1-train-regression true] [--l1-eval-control true] [--l1-eval-regression true] [--l1-sampling random|stratified (stratified)] [--l1-eval-sampling random|stratified (random)] [--l1-postflop-beta 0] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--solver-k4-samples N] [--solver-k4-min-samples M (requires N)] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0 (l0) / 1 (l1)] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON]\n--k4-samples and --seed define the model/evaluator; solver K4 flags use iteration-varying samples only during solving."
+                "trunk_solve --config TOML [--leaf-model l0|l1] [--ehs2-cache PATH (required for l1)] [--l1-boards 32] [--l1-seed 0] [--l1-eval-boards 1024 (even, >=2)] [--l1-eval-seed 0] [--l1-train-control true] [--l1-train-regression true] [--l1-eval-control true] [--l1-eval-regression true] [--l1-sampling random|stratified (stratified)] [--l1-eval-sampling random|stratified (random)] [--l1-postflop-beta 0] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--solver-k4-samples N] [--solver-k4-min-samples M (requires N)] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0 (l0) / 1 (l1)] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON] [--output-postflop FILE (l1 only)] [--evaluate-profile JSON --evaluate-postflop FILE (l1 only)]\nEvaluation mode skips solving; solver-only flags are ignored, except --output-profile and --output-postflop which are rejected.\n--k4-samples and --seed define the model/evaluator; solver K4 flags use iteration-varying samples only during solving."
             );
             return Ok(());
         }
@@ -82,19 +98,37 @@ fn main() -> Result<()> {
             "--print-every" => print_every = value.parse::<u64>()?,
             "--output" => output = Some(PathBuf::from(value)),
             "--output-profile" => output_profile = Some(PathBuf::from(value)),
+            "--output-postflop" => output_postflop = Some(PathBuf::from(value)),
+            "--evaluate-profile" => evaluate_profile = Some(PathBuf::from(value)),
+            "--evaluate-postflop" => evaluate_postflop = Some(PathBuf::from(value)),
             _ => bail!("unknown argument {arg}"),
         }
     }
     ensure!(
-        options.k4_samples != Some(0),
-        "solver K4 samples must be positive"
+        evaluate_profile.is_some() == evaluate_postflop.is_some(),
+        "--evaluate-profile and --evaluate-postflop must be provided together"
+    );
+    let evaluating = evaluate_profile.is_some();
+    ensure!(
+        leaf_model == "l1" || (!evaluating && output_postflop.is_none()),
+        "--output-postflop and saved evaluation require --leaf-model l1"
     );
     ensure!(
-        options
-            .k4_min_samples
-            .is_none_or(|min| min >= 1 && options.k4_samples.is_some_and(|n| min <= n)),
-        "--solver-k4-min-samples requires --solver-k4-samples and 1 <= min <= samples"
+        !evaluating || (output_profile.is_none() && output_postflop.is_none()),
+        "--output-profile and --output-postflop are not allowed in evaluation mode"
     );
+    if !evaluating {
+        ensure!(
+            options.k4_samples != Some(0),
+            "solver K4 samples must be positive"
+        );
+        ensure!(
+            options
+                .k4_min_samples
+                .is_none_or(|min| min >= 1 && options.k4_samples.is_some_and(|n| min <= n)),
+            "--solver-k4-min-samples requires --solver-k4-samples and 1 <= min <= samples"
+        );
+    }
     ensure!(
         leaf_model == "l0" || leaf_model == "l1",
         "--leaf-model must be l0 or l1"
@@ -111,7 +145,7 @@ fn main() -> Result<()> {
         "--ehs2-cache is required for l1"
     );
     ensure!(
-        l1_options.l1_boards > 0
+        (evaluating || l1_options.l1_boards > 0)
             && l1_options.l1_eval_boards >= 2
             && l1_options.l1_eval_boards.is_multiple_of(2),
         "invalid L1 board counts"
@@ -164,6 +198,10 @@ fn main() -> Result<()> {
             print_every,
             output.as_deref(),
             output_profile.as_deref(),
+            output_postflop.as_deref(),
+            evaluate_profile
+                .as_deref()
+                .zip(evaluate_postflop.as_deref()),
             &t2,
             &t3,
             tree_seconds,
@@ -269,6 +307,8 @@ fn run_l1(
     print_every: u64,
     output: Option<&Path>,
     output_profile: Option<&Path>,
+    output_postflop: Option<&Path>,
+    evaluation_inputs: Option<(&Path, &Path)>,
     t2: &HuShowdownTable,
     t3: &ThreeWayTable,
     tree_seconds: f64,
@@ -312,7 +352,7 @@ fn run_l1(
         "bytes": bytes,
         "blake3": hasher.finalize().to_hex().as_str(),
     });
-    let storage = l1::Strategies::new(tree, &abstraction);
+    let mut storage = l1::Strategies::new(tree, &abstraction);
     println!(
         "L1: {} leaves; {} postflop decisions; {} slots; {} storage bytes",
         storage.leaves.len(),
@@ -320,6 +360,90 @@ fn run_l1(
         storage.slots,
         storage.storage_bytes()
     );
+    if let Some((profile_path, postflop_path)) = evaluation_inputs {
+        let start = Instant::now();
+        let profile_bytes = std::fs::read(profile_path)
+            .with_context(|| format!("reading {}", profile_path.display()))?;
+        let profile_hash = blake3::hash(&profile_bytes);
+        let document: l0::ClassProfileDocument = serde_json::from_slice(&profile_bytes)?;
+        let profile = l0::Profile::from_json(tree, &document)?;
+        drop(document);
+        drop(profile_bytes);
+        let mut postflop_file = std::fs::File::open(postflop_path)
+            .with_context(|| format!("reading {}", postflop_path.display()))?;
+        // Hash the same stream that read_average validates, including the checksum.
+        let mut postflop_hash = blake3::Hasher::new();
+        storage.read_average(
+            tree,
+            &mut HashingReader {
+                input: &mut postflop_file,
+                hash: &mut postflop_hash,
+            },
+        )?;
+        let load_seconds = start.elapsed().as_secs_f64();
+        let start = Instant::now();
+        let boards = pool.install(|| l1::evaluation_boards(&abstraction, &options));
+        let boards_seconds = start.elapsed().as_secs_f64();
+        let evaluation = pool.install(|| {
+            l1::evaluate(
+                tree,
+                &profile,
+                model,
+                &storage,
+                &boards,
+                options.l1_eval_control,
+                options.l1_eval_regression,
+            )
+        })?;
+        let e = &evaluation;
+        let gains = |f: fn(&l1::SeatEvaluation) -> f64| e.seats.iter().map(f).collect::<Vec<_>>();
+        println!(
+            "Evaluation: NashConv {:.12}; held {:.12}; auxiliary {:.12}; auxiliary held {:.12}; \
+             gains {:?}; held gains {:?}; auxiliary gains {:?}; auxiliary held gains {:?}; \
+             evaluation {:.6}s",
+            e.nash_conv,
+            e.held_nash_conv,
+            e.auxiliary_nash_conv,
+            e.auxiliary_held_nash_conv,
+            gains(|s| s.gain),
+            gains(|s| s.held_gain),
+            gains(|s| s.auxiliary_gain),
+            gains(|s| s.auxiliary_held_gain),
+            e.seconds
+        );
+        if let Some(path) = output {
+            write_json(
+                path,
+                &json!({
+                    "format": "p2-trunk-evaluation",
+                    "version": 1,
+                    "leaf_model": "l1",
+                    "source": source,
+                    "game_fingerprint": blake3::Hash::from(tree.game_fingerprint).to_hex().as_str(),
+                    "profile": {"path": profile_path, "blake3": profile_hash.to_hex().as_str()},
+                    "postflop": {"path": postflop_path, "blake3": postflop_hash.finalize().to_hex().as_str()},
+                    "ehs2": ehs2_metadata,
+                    "tables": {
+                        "t2": {"payload_blake3": t2.payload_hash().to_hex().as_str()},
+                        "t3": {"payload_blake3": t3.payload_hash().to_hex().as_str()},
+                    },
+                    "k4": {"samples": model.evaluation_options().k4_samples, "seed": model.evaluation_options().seed},
+                    "evaluation_options": {
+                        "boards": options.l1_eval_boards, "seed": options.l1_eval_seed,
+                        "sampling": options.l1_eval_sampling, "control": options.l1_eval_control,
+                        "regression": options.l1_eval_regression,
+                    },
+                    "evaluation": evaluation,
+                    "timings": {
+                        "tree": tree_seconds, "tables": tables_seconds, "model": model_seconds,
+                        "load": load_seconds, "boards": boards_seconds, "evaluation": e.seconds,
+                        "total": total.elapsed().as_secs_f64(),
+                    },
+                }),
+            )?;
+        }
+        return Ok(());
+    }
     drop(storage);
     let mut previous = l1::Timings::default();
     let mut iteration_start = Instant::now();
@@ -375,6 +499,11 @@ fn run_l1(
     }
     if let Some(path) = output_profile {
         write_json(path, &solution.average.export(tree))?;
+    }
+    if let Some(path) = output_postflop {
+        solution
+            .postflop
+            .write_average(tree, &mut std::fs::File::create(path)?)?;
     }
     if let Some(path) = output {
         write_json(
