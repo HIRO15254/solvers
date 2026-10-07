@@ -18,6 +18,7 @@ script = '''river { replace bet [1bb] }
 river when !unopened { replace raise [a] }'''
 
 # Storage choices in [solver]: f32 (default), i16, i16-f32avg.
+# DCFR defaults to pow4_reset = false; set true in [solver.algorithm] for resets.
 [solver.stop]
 max_iterations = 16
 check_every = 4

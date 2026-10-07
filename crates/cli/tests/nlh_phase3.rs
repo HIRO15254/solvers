@@ -76,6 +76,10 @@ fn spec_p1_example_validate_text_json_effective_and_resources() {
     ]);
     let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(json["product"], "HuPostflop");
+    assert_eq!(
+        json["effectiveConfig"]["solver"]["algorithm"]["pow4_reset"],
+        false
+    );
     assert_eq!(json["start"]["pot"], 5.5);
     assert_eq!(json["start"]["effective_stack"], 97.5);
     assert_eq!(json["start"]["oop"]["position"], "BB");
@@ -131,6 +135,7 @@ fn solve_resume_fork_effective_hashes_units_and_monitoring() {
         "1h",
     ]);
     let effective = std::fs::read_to_string(run.join("run.toml")).unwrap();
+    assert!(effective.contains("pow4_reset = false"));
     let solution = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
     let checkpoint =
         hu_postflop::checkpoint::read_checkpoint(&run.join("checkpoint.ckpt")).unwrap();
@@ -200,6 +205,58 @@ fn solve_resume_fork_effective_hashes_units_and_monitoring() {
             .code(),
         Some(3)
     );
+    assert!(!rejected.exists());
+}
+
+#[test]
+fn explicit_dcfr_reset_saved_config_resumes_and_omitted_original_is_rejected() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("reset.toml");
+    let raw = RIVER.replace(
+        "[solver.stop]",
+        "[solver.algorithm]\npow4_reset = true\n[solver.stop]",
+    );
+    std::fs::write(&config, &raw).unwrap();
+    let run = temp.path().join("reset");
+    ok(&[
+        "solve",
+        text(&config),
+        "--out",
+        text(&run),
+        "--max-time",
+        "0.000001s",
+    ]);
+    let checkpoint_path = run.join("checkpoint.ckpt");
+    let checkpoint = hu_postflop::checkpoint::read_checkpoint(&checkpoint_path).unwrap();
+    assert!(checkpoint.iteration < 16);
+    let effective = std::fs::read_to_string(run.join("run.toml")).unwrap();
+    assert!(effective.contains("pow4_reset = true"));
+    assert_eq!(checkpoint.config_toml.as_deref(), Some(effective.as_str()));
+    let solution = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
+    assert_eq!(solution.config_toml, effective);
+    let resumed = temp.path().join("resumed");
+    ok(&[
+        "resume",
+        text(&checkpoint_path),
+        "--out",
+        text(&resumed),
+        "--max-time",
+        "1h",
+    ]);
+    let straight = temp.path().join("straight");
+    ok(&["solve", text(&config), "--out", text(&straight)]);
+    let resumed_state =
+        hu_postflop::checkpoint::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+    let straight_state =
+        hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(resumed_state.iteration, 16);
+    assert_eq!(resumed_state.state, straight_state.state);
+    // Simulate replacing an old run's expanded config with its omitted original.
+    std::fs::write(run.join("run.toml"), RIVER).unwrap();
+    let rejected = temp.path().join("rejected-reset");
+    let result = cli(&["resume", text(&run), "--out", text(&rejected)]);
+    assert_eq!(result.status.code(), Some(3));
+    assert!(String::from_utf8_lossy(&result.stderr).contains("config hash does not match"));
     assert!(!rejected.exists());
 }
 

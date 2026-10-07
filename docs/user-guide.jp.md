@@ -77,6 +77,11 @@ no-riversはRiverの戦略と値を省く。
 
 ## 5. 監視・停止・再開する
 
+P1のDCFRは`[solver.algorithm] pow4_reset = false`が既定である。従来のresetを使う場合は`pow4_reset = true`を明示する。
+保存された実効configはこの値を含むため、旧既定trueのrun・checkpoint・solutionは保存値で再開・照会できる。
+旧runの`run.toml`を`pow4_reset`未指定の元configに戻すと、新既定falseとの互換性hash不一致で再開を拒否する。
+旧条件で再solveして比較する場合はtrueを明示する。`compare`はalgorithmの差を拒否しない。
+
 ```sh
 solvers status runs/my-spot --format json
 solvers watch runs/my-spot --from 0

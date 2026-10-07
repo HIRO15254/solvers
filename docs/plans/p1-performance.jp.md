@@ -99,6 +99,8 @@ gtow_b 650・1,299秒（f32は575・1,023秒）。peak RSSは22.4 GB（f32 27.4 
 平均reset無しでは、gtow_bの0.1%到達がf32 575→550、i16-f32avg 650→625 iterationとなり、どの木でも遅くならなかったのでPF4とした。
 allocatorの差し替え（mimalloc・jemalloc・glibc tunables）は効果が無かった。停止後の保存はgtow_bで約122秒（全体の11%）かかり、
 checkpointはcloud diskの書込み速度で決まる（tmpfsでは50.9→11.9秒）。
+T7: PF4を実装した。旧版の未指定と新版の`pow4_reset = true`、旧版の`false`と新版の未指定が、`.sol` payload（wall_secs以外）と`export`で一致する。
+実効configが値を明示保存するので、旧既定のrun・checkpoint・solutionは保存値で再開・照会できる。凍結oracleとの差分試験はtrueを明示して従来の期待値を保つ。
 
 ### 一致の定義
 

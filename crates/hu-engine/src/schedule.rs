@@ -81,14 +81,13 @@ pub struct Dcfr {
     pub alpha: f64,
     pub beta: f64,
     pub gamma: f64,
-    /// Reset the average strategy at power-of-4 iterations. Measured to
-    /// improve convergence on poker trees (observed in b-inary's solver);
-    /// defaults on.
+    /// Reset the average strategy at power-of-4 iterations. The low-level
+    /// default is on; P1's public input default is off.
     pub pow4_reset: bool,
 }
 
 impl Default for Dcfr {
-    /// Project default: alpha=1.5, beta=0, gamma=3.0, power-of-4 resets.
+    /// Legacy engine default: alpha=1.5, beta=0, gamma=3.0, power-of-4 resets.
     fn default() -> Self {
         Dcfr {
             alpha: 1.5,

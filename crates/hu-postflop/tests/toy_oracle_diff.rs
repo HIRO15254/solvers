@@ -48,7 +48,15 @@ fn solve_toy(
     Solver<hu_postflop::game::ToyEvaluator, F32Storage>,
 ) {
     let info = toy.node_info.clone();
-    let mut solver = Solver::<_, F32Storage>::new(toy.game, Box::<Dcfr>::default(), Some(iters));
+    // Preserve the reset-enabled profile used by this frozen-oracle comparison.
+    let mut solver = Solver::<_, F32Storage>::new(
+        toy.game,
+        Box::new(Dcfr {
+            pow4_reset: true,
+            ..Dcfr::default()
+        }),
+        Some(iters),
+    );
     solver.run(iters);
     (info, solver)
 }

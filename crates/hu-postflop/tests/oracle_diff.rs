@@ -312,7 +312,15 @@ fn sequential() -> ParConfig {
 fn assert_engine_matches_oracle(iters: u64, tol: f64) {
     let game = engine_game();
     let node_info = game.node_info.clone();
-    let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(iters));
+    // Preserve the reset-enabled profile used by this frozen-oracle comparison.
+    let mut solver = Solver::<_, F32Storage>::new(
+        game.game,
+        Box::new(Dcfr {
+            pow4_reset: true,
+            ..Dcfr::default()
+        }),
+        Some(iters),
+    );
     solver.set_par(sequential());
     solver.run(iters);
     let profile = export_profile(&node_info, &solver);
@@ -353,7 +361,14 @@ fn uniform_profiles_agree_between_engine_and_oracle() {
     // rather than a solve bug, so this is the first test to consult when
     // the differential tests above fail.
     let game = engine_game();
-    let solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
+    let solver = Solver::<_, F32Storage>::new(
+        game.game,
+        Box::new(Dcfr {
+            pow4_reset: true,
+            ..Dcfr::default()
+        }),
+        Some(1),
+    );
     let oracle = MicroHoldem::new();
     let empty: HashMap<String, Vec<f64>> = HashMap::new();
     for (p, op) in [(Player::P0, 0), (Player::P1, 1)] {

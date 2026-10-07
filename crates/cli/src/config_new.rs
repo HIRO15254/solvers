@@ -107,6 +107,11 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
                 "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
             );
         }
+        if line.starts_with("pow4_reset =") {
+            rendered.push_str(
+                "# false (default); set true to reset DCFR averages at iterations 4, 16, 64, ...\n",
+            );
+        }
         rendered.push_str(line);
         rendered.push('\n');
     }
@@ -144,6 +149,11 @@ mod tests {
                             &document.output,
                         )
                         .unwrap();
+                        assert!(effective.contains("pow4_reset = false"));
+                        assert_eq!(
+                            settings.solver.algorithm,
+                            hu_postflop::input::Algorithm::default()
+                        );
                         hu_postflop::input::lower(&document.spot, &settings).unwrap();
                     }
                     ConfigProduct::P2 => {
@@ -199,7 +209,7 @@ mod tests {
         let game = hu_postflop::try_build_postflop_game(&config, payoff.pipeline()).unwrap();
         let mut solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
             game.game,
-            Box::new(hu_engine::Dcfr::default()),
+            hu_postflop::run::schedule(&settings.solver.algorithm),
             Some(100),
         );
         solver.run(100);

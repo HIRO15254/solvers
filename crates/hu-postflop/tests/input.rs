@@ -73,7 +73,7 @@ fn sections_defaults_order_and_idempotence() {
             alpha: 1.5,
             beta: 0.0,
             gamma: 3.0,
-            pow4_reset: true
+            pow4_reset: false
         }
     );
     let effective = doc.normalize(&P1Sections).unwrap();
@@ -86,7 +86,7 @@ fn sections_defaults_order_and_idempotence() {
         "alpha =",
         "beta =",
         "gamma =",
-        "pow4_reset =",
+        "pow4_reset = false",
         "[solver.stop]",
         "max_iterations =",
         "check_every =",
@@ -105,6 +105,52 @@ fn sections_defaults_order_and_idempotence() {
         })
         .collect();
     assert!(offsets.windows(2).all(|w| w[0] < w[1]), "{effective}");
+}
+
+#[test]
+fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
+    for (section, reset) in [
+        ("", false),
+        ("[solver.algorithm]\nschedule = 'dcfr'", false),
+        ("[solver.algorithm]\npow4_reset = true", true),
+        (
+            "[solver.algorithm]\nschedule = 'dcfr'\npow4_reset = false",
+            false,
+        ),
+    ] {
+        let doc = parse(&format!("{}\n{section}", standard("")));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        let expected = Algorithm::Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
+            pow4_reset: reset,
+        };
+        assert_eq!(settings.solver.algorithm, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(effective.contains(&format!("pow4_reset = {reset}")));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let schedule = hu_postflop::run::schedule(&settings.solver.algorithm);
+        for t in [4, 16, 64] {
+            assert_eq!(schedule.at(t, Some(64)).reset_avg, reset);
+        }
+    }
+    for (raw, reset) in [
+        ("schedule = 'dcfr'", false),
+        ("schedule = 'dcfr'\npow4_reset = true", true),
+        ("schedule = 'dcfr'\npow4_reset = false", false),
+    ] {
+        let algorithm: Algorithm = toml::from_str(raw).unwrap();
+        assert_eq!(
+            algorithm,
+            Algorithm::Dcfr {
+                alpha: 1.5,
+                beta: 0.0,
+                gamma: 3.0,
+                pow4_reset: reset,
+            }
+        );
+    }
 }
 
 #[test]

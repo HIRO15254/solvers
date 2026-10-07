@@ -31,7 +31,7 @@ pub enum SolutionStreets {
     NoRivers,
 }
 
-/// The legacy P1 schedule parameters, with their existing names and defaults.
+/// P1 schedule parameters and public input defaults.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
 pub enum Algorithm {
@@ -44,7 +44,7 @@ pub enum Algorithm {
         beta: f64,
         #[serde(default = "gamma")]
         gamma: f64,
-        #[serde(default = "yes")]
+        #[serde(default)]
         pow4_reset: bool,
     },
     LinearCfr,
@@ -62,16 +62,13 @@ fn gamma() -> f64 {
 fn gamma0() -> f64 {
     30.0
 }
-fn yes() -> bool {
-    true
-}
 impl Default for Algorithm {
     fn default() -> Self {
         Self::Dcfr {
             alpha: alpha(),
             beta: 0.0,
             gamma: gamma(),
-            pow4_reset: true,
+            pow4_reset: false,
         }
     }
 }
@@ -320,7 +317,7 @@ impl Settings {
                         t,
                         "pow4_reset",
                         "solver.algorithm.pow4_reset",
-                        true,
+                        false,
                         toml::Value::is_bool,
                     )?,
                 },
