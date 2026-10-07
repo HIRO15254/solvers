@@ -177,6 +177,8 @@ JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに�
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
+solve/resumeの区間終了時は最後のcheckpoint → regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由で同じ順序とし、同iterationのcheckpoint再保存を省く場合も解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
+
 checkpointは第7節のversion 5で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
@@ -220,7 +222,7 @@ version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solver
 `.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
 圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
 
-`MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`を別々に返し、選択したstorage bytesをmemory上限判定へ使う。
+`MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をCとして、表示とmemory上限判定は`max(S, S − R + W) + C`を使う。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
 P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
 戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passで値blockだけをslotに保持してsref昇順に流す。
 `saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<ValueBlock>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。

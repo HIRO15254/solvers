@@ -426,6 +426,12 @@ pub(crate) fn print_memory_estimate(estimate: &hu_postflop::MemoryEstimate) {
         estimate.i16_bytes as f64 / (1024.0 * 1024.0),
         estimate.i16_f32avg_bytes as f64 / (1024.0 * 1024.0),
     );
+    println!(
+        "memory estimate: {:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg)",
+        estimate.required_bytes(input::Storage::F32) as f64 / (1024.0 * 1024.0),
+        estimate.required_bytes(input::Storage::I16) as f64 / (1024.0 * 1024.0),
+        estimate.required_bytes(input::Storage::I16F32Avg) as f64 / (1024.0 * 1024.0),
+    );
 }
 
 pub(crate) fn previous_elapsed(path: &Path) -> Result<Duration> {

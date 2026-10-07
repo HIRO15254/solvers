@@ -70,7 +70,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | resources field | 製品 | 意味 |
 |---|---|---|
 | `nodes` / `terminals` / `f32Bytes` / `i16Bytes` / `i16F32avgBytes` | P1 | 木のnode・terminal数とstorage別bytes |
-| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | storage＋保存作業領域の見積り、解決済み上限、上限内か |
+| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage, storage − regret + saveWorkspaceBytes) + compressionWorkspaceBytes`、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
 | `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / run threadsに応じたstreaming圧縮予算 |
@@ -80,6 +80,8 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
 未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
+P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpoint後にregret配列とscaleを解放し、`.sol`を生成する。
+
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
 P1では`tree.preflop_reraise_jam_above_stack`、既定4以外の`tree.max_aggressive_actions.preflop`、

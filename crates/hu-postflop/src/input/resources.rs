@@ -14,20 +14,14 @@ pub struct MemoryLimitError {
     pub limit: u64,
 }
 
-/// Check storage plus packed-save and codec workspace before building a game.
+/// Check the peak before/after regret release plus codec workspace before building a game.
 /// The CLI maps this resource error to exit code 75, as for P2.
 pub fn check_memory_limit(
     estimate: &MemoryEstimate,
     storage: Storage,
     limit: u64,
 ) -> Result<(), MemoryLimitError> {
-    let required = match storage {
-        Storage::F32 => estimate.f32_bytes,
-        Storage::I16 => estimate.i16_bytes,
-        Storage::I16F32Avg => estimate.i16_f32avg_bytes,
-    }
-    .saturating_add(estimate.save_bytes)
-    .saturating_add(estimate.compression_bytes);
+    let required = estimate.required_bytes(storage);
     if required > limit {
         Err(MemoryLimitError { required, limit })
     } else {

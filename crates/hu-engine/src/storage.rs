@@ -202,6 +202,19 @@ pub trait Storage: StorageOps + Send + Sync {
     /// scale arrays.
     fn new(len: usize, num_refs: usize) -> Self;
 
+    /// Permanently frees the regret arena and its node scales (zero capacity).
+    /// Average strategy and evaluation remain available. Regret operations,
+    /// mutable views, snapshots, checkpoint arrays and restoration panic after
+    /// release, including for empty arenas. Calling release again is harmless.
+    fn release_regrets(&mut self);
+
+    fn regrets_released(&self) -> bool;
+
+    /// Panics if a regret-dependent operation follows release.
+    fn assert_regrets_available(&self) {
+        assert!(!self.regrets_released(), "regrets have been released");
+    }
+
     /// Borrows the whole backend as a single view covering every element,
     /// ready to be [`StorageView::split`] into per-subtree views.
     fn view_mut(&mut self) -> Self::View<'_>;
@@ -405,16 +418,19 @@ pub trait StorageView: StorageOps + Send + Sized {
 
 /// Plain `f32` backend: two flat arenas.
 pub struct F32Storage {
+    regrets_released: bool,
     regrets: Vec<f32>,
     strategy_sum: Vec<f32>,
 }
 
 impl F32Storage {
     pub fn snapshot(&self) -> (Vec<f32>, Vec<f32>) {
+        self.assert_regrets_available();
         (self.regrets.clone(), self.strategy_sum.clone())
     }
 
     pub fn restore(&mut self, snapshot: (Vec<f32>, Vec<f32>)) {
+        self.assert_regrets_available();
         assert_eq!(snapshot.0.len(), self.regrets.len());
         assert_eq!(snapshot.1.len(), self.strategy_sum.len());
         self.regrets = snapshot.0;
@@ -548,6 +564,7 @@ fn raw_regrets_impl(regrets: &[f32], offset: usize, r: StorageRef, out: &mut [f3
 
 impl StorageOps for F32Storage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         regret_matching_impl(&self.regrets, r.offset, r, out);
     }
     fn regret_matching_cfr(
@@ -557,6 +574,7 @@ impl StorageOps for F32Storage {
         out: &mut [f32],
         norm: CfrPrecision,
     ) {
+        self.assert_regrets_available();
         match norm {
             CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
             CfrPrecision::F32 => {
@@ -566,6 +584,7 @@ impl StorageOps for F32Storage {
     }
 
     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
         update_regrets_impl(&mut self.regrets, r.offset, r, inst, d);
     }
 
@@ -584,6 +603,7 @@ impl StorageOps for F32Storage {
     }
 
     fn raw_regrets(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         raw_regrets_impl(&self.regrets, r.offset, r, out);
     }
 }
@@ -591,13 +611,24 @@ impl StorageOps for F32Storage {
 impl Storage for F32Storage {
     type View<'a> = F32View<'a>;
 
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
     fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
         StorageArrays::F32 {
             regrets: &self.regrets,
             strategy_sum: &self.strategy_sum,
         }
     }
     fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
         StorageArraysMut::F32 {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -606,12 +637,14 @@ impl Storage for F32Storage {
 
     fn new(len: usize, _num_refs: usize) -> Self {
         F32Storage {
+            regrets_released: false,
             regrets: vec![0.0; len],
             strategy_sum: vec![0.0; len],
         }
     }
 
     fn view_mut(&mut self) -> F32View<'_> {
+        self.assert_regrets_available();
         F32View {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -624,6 +657,7 @@ impl Storage for F32Storage {
     }
 
     fn state(&self) -> StorageState {
+        self.assert_regrets_available();
         StorageState::F32 {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
@@ -631,6 +665,7 @@ impl Storage for F32Storage {
     }
 
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
         match state {
             StorageState::F32 {
                 regrets,
@@ -647,6 +682,7 @@ impl Storage for F32Storage {
     }
 
     fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
         for v in &mut self.regrets {
             *v *= regret;
         }
@@ -956,6 +992,7 @@ fn raw_regrets_i16_impl(
 /// own empty `scratch`, grown lazily by whatever nodes that view's rayon
 /// task visits.
 pub struct I16Storage {
+    regrets_released: bool,
     regrets: Vec<i16>,
     strategy_sum: Vec<i16>,
     regret_scales: Vec<f32>,
@@ -966,6 +1003,7 @@ pub struct I16Storage {
 impl I16Storage {
     #[allow(clippy::type_complexity)]
     pub fn snapshot(&self) -> (Vec<i16>, Vec<i16>, Vec<f32>, Vec<f32>) {
+        self.assert_regrets_available();
         (
             self.regrets.clone(),
             self.strategy_sum.clone(),
@@ -975,6 +1013,7 @@ impl I16Storage {
     }
 
     pub fn restore(&mut self, snapshot: (Vec<i16>, Vec<i16>, Vec<f32>, Vec<f32>)) {
+        self.assert_regrets_available();
         assert_eq!(snapshot.0.len(), self.regrets.len());
         assert_eq!(snapshot.1.len(), self.strategy_sum.len());
         assert_eq!(snapshot.2.len(), self.regret_scales.len());
@@ -988,6 +1027,7 @@ impl I16Storage {
 
 impl StorageOps for I16Storage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         regret_matching_i16_impl(&self.regrets, r.offset, r, out);
     }
     fn regret_matching_cfr(
@@ -997,6 +1037,7 @@ impl StorageOps for I16Storage {
         out: &mut [f32],
         norm: CfrPrecision,
     ) {
+        self.assert_regrets_available();
         match norm {
             CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
             CfrPrecision::F32 => {
@@ -1006,6 +1047,7 @@ impl StorageOps for I16Storage {
     }
 
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
         update_regrets_i16_impl(
             &mut self.regrets,
             r.offset,
@@ -1040,6 +1082,7 @@ impl StorageOps for I16Storage {
     }
 
     fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         raw_regrets_i16_impl(
             &self.regrets,
             r.offset,
@@ -1053,7 +1096,18 @@ impl StorageOps for I16Storage {
 impl Storage for I16Storage {
     type View<'a> = I16View<'a>;
 
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regret_scales = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
     fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
         StorageArrays::I16 {
             regrets: &self.regrets,
             strategy_sum: &self.strategy_sum,
@@ -1062,6 +1116,7 @@ impl Storage for I16Storage {
         }
     }
     fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
         StorageArraysMut::I16 {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -1072,6 +1127,7 @@ impl Storage for I16Storage {
 
     fn new(len: usize, num_refs: usize) -> Self {
         I16Storage {
+            regrets_released: false,
             regrets: vec![0i16; len],
             strategy_sum: vec![0i16; len],
             regret_scales: vec![1.0; num_refs],
@@ -1081,6 +1137,7 @@ impl Storage for I16Storage {
     }
 
     fn view_mut(&mut self) -> I16View<'_> {
+        self.assert_regrets_available();
         I16View {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -1097,6 +1154,7 @@ impl Storage for I16Storage {
     }
 
     fn state(&self) -> StorageState {
+        self.assert_regrets_available();
         StorageState::I16 {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
@@ -1106,6 +1164,7 @@ impl Storage for I16Storage {
     }
 
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
         match state {
             StorageState::I16 {
                 regrets,
@@ -1128,6 +1187,7 @@ impl Storage for I16Storage {
     }
 
     fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
         for v in &mut self.regret_scales {
             *v *= regret;
         }
@@ -1303,6 +1363,7 @@ impl<'a> StorageView for I16View<'a> {
 /// i16 regrets with the legacy per-node quantization; f32 strategy sums.
 /// Split views own disjoint arenas/scales and a private regret scratch buffer.
 pub struct MixedStorage {
+    regrets_released: bool,
     regrets: Vec<i16>,
     strategy_sum: Vec<f32>,
     regret_scales: Vec<f32>,
@@ -1311,6 +1372,7 @@ pub struct MixedStorage {
 
 impl StorageOps for MixedStorage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         regret_matching_i16_impl(&self.regrets, r.offset, r, out);
     }
     fn regret_matching_cfr(
@@ -1320,6 +1382,7 @@ impl StorageOps for MixedStorage {
         out: &mut [f32],
         norm: CfrPrecision,
     ) {
+        self.assert_regrets_available();
         match norm {
             CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
             CfrPrecision::F32 => {
@@ -1329,6 +1392,7 @@ impl StorageOps for MixedStorage {
     }
 
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
         update_regrets_i16_impl(
             &mut self.regrets,
             r.offset,
@@ -1355,6 +1419,7 @@ impl StorageOps for MixedStorage {
     }
 
     fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         raw_regrets_i16_impl(
             &self.regrets,
             r.offset,
@@ -1368,7 +1433,18 @@ impl StorageOps for MixedStorage {
 impl Storage for MixedStorage {
     type View<'a> = MixedView<'a>;
 
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regret_scales = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
     fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
         StorageArrays::Mixed {
             regrets: &self.regrets,
             strategy_sum: &self.strategy_sum,
@@ -1376,6 +1452,7 @@ impl Storage for MixedStorage {
         }
     }
     fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
         StorageArraysMut::Mixed {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -1385,6 +1462,7 @@ impl Storage for MixedStorage {
 
     fn new(len: usize, num_refs: usize) -> Self {
         MixedStorage {
+            regrets_released: false,
             regrets: vec![0i16; len],
             strategy_sum: vec![0.0; len],
             regret_scales: vec![1.0; num_refs],
@@ -1393,6 +1471,7 @@ impl Storage for MixedStorage {
     }
 
     fn view_mut(&mut self) -> MixedView<'_> {
+        self.assert_regrets_available();
         MixedView {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -1408,6 +1487,7 @@ impl Storage for MixedStorage {
     }
 
     fn state(&self) -> StorageState {
+        self.assert_regrets_available();
         StorageState::Mixed {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
@@ -1416,6 +1496,7 @@ impl Storage for MixedStorage {
     }
 
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
         match state {
             StorageState::Mixed {
                 regrets,
@@ -1435,6 +1516,7 @@ impl Storage for MixedStorage {
     }
 
     fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
         for v in &mut self.regret_scales {
             *v *= regret;
         }
@@ -1968,5 +2050,37 @@ mod tests {
         let mut sigma_after = vec![0.0; r.len()];
         backend.regret_matching(r, r.index, &mut sigma_after);
         assert_eq!(sigma, sigma_after);
+    }
+}
+
+#[cfg(test)]
+mod release_tests {
+    use super::*;
+
+    #[test]
+    fn release_returns_all_regret_capacity_including_empty_storage() {
+        for (len, refs) in [(100, 4), (0, 0)] {
+            let mut f32 = F32Storage::new(len, refs);
+            let mut i16 = I16Storage::new(len, refs);
+            let mut mixed = MixedStorage::new(len, refs);
+            f32.release_regrets();
+            i16.release_regrets();
+            mixed.release_regrets();
+            assert_eq!((f32.regrets.len(), f32.regrets.capacity()), (0, 0));
+            assert_eq!((i16.regrets.len(), i16.regrets.capacity()), (0, 0));
+            assert_eq!((mixed.regrets.len(), mixed.regrets.capacity()), (0, 0));
+            assert_eq!(
+                (i16.regret_scales.len(), i16.regret_scales.capacity()),
+                (0, 0)
+            );
+            assert_eq!(
+                (mixed.regret_scales.len(), mixed.regret_scales.capacity()),
+                (0, 0)
+            );
+            assert_eq!(f32.strategy_sum.len(), len);
+            assert_eq!(i16.strategy_sum.len(), len);
+            assert_eq!(i16.strategy_scales.len(), refs);
+            assert_eq!(mixed.strategy_sum.len(), len);
+        }
     }
 }

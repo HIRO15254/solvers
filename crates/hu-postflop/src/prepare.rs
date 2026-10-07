@@ -121,13 +121,7 @@ pub fn warnings_for_hits(p: &Prepared, hits: &crate::RuleHits) -> Vec<String> {
 
 /// Required storage and save workspace bytes for the selected P1 backend.
 pub fn required_bytes(p: &Prepared) -> u64 {
-    match p.settings.solver.storage {
-        input::Storage::F32 => p.estimate.f32_bytes,
-        input::Storage::I16 => p.estimate.i16_bytes,
-        input::Storage::I16F32Avg => p.estimate.i16_f32avg_bytes,
-    }
-    .saturating_add(p.estimate.save_bytes)
-    .saturating_add(p.estimate.compression_bytes)
+    p.estimate.required_bytes(p.settings.solver.storage)
 }
 
 pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {

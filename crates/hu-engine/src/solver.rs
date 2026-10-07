@@ -200,6 +200,14 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         &self.game
     }
 
+    /// Permanently frees regrets after the final checkpoint. Average strategy,
+    /// evaluation and EV passes remain available. Running iterations, reading
+    /// current strategy, snapshotting/checkpointing or restoring then panics.
+    /// Create a new solver to resume from a previously saved checkpoint.
+    pub fn release_regrets(&mut self) {
+        self.storage.release_regrets();
+    }
+
     /// Read-only access to the raw storage backend, e.g. to snapshot
     /// regrets/strategy sums for a determinism check.
     pub fn storage(&self) -> &S {
@@ -213,6 +221,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         iteration: u64,
         read: impl FnOnce(&mut S) -> Result<T, Err>,
     ) -> Result<T, Err> {
+        self.storage.assert_regrets_available();
         let result = read(&mut self.storage)?;
         self.iteration = iteration;
         Ok(result)
@@ -275,6 +284,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     }
 
     pub fn run(&mut self, iterations: u64) {
+        self.storage.assert_regrets_available();
         for _ in 0..iterations {
             self.step();
         }
@@ -521,6 +531,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 
     /// Current (regret-matching) strategy at an action node.
     pub fn current_strategy_at(&self, node: NodeId) -> Vec<f32> {
+        self.storage.assert_regrets_available();
         self.node_strategy(node, |sref, out| {
             self.storage.regret_matching(sref, sref.index, out)
         })

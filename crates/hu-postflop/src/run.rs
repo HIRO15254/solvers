@@ -224,6 +224,7 @@ fn drive<S: Storage>(
     if saved_iteration != Some(solver.iteration()) {
         save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
     }
+    solver.release_regrets();
     let spec = crate::artifact::SolExportSpec {
         path: solution.to_path_buf(),
         mode: match p.settings.output.solution_streets {

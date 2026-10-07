@@ -59,6 +59,13 @@ impl Storage for ReferenceStorage {
             float: F32Storage::new(len, refs),
         }
     }
+    fn release_regrets(&mut self) {
+        self.quantized.release_regrets();
+        self.float.release_regrets();
+    }
+    fn regrets_released(&self) -> bool {
+        self.quantized.regrets_released()
+    }
     fn view_mut(&mut self) -> ReferenceView<'_> {
         Reference {
             quantized: self.quantized.view_mut(),
@@ -435,3 +442,125 @@ fn mixed_postflop_regrets_match_i16_and_threads_are_bitwise_equal() {
         );
     }
 }
+
+// Capture floats as bits, including signed zero, and sort the streaming EV
+// callbacks because Rayon may visit nodes in a different order.
+fn evaluation_bits<S: Storage>(solver: &Solver<hu_postflop::game::ToyEvaluator, S>) -> Vec<u64> {
+    let mut bits = Vec::new();
+    let (ev, expl) = solver.evaluate();
+    for p in Player::BOTH {
+        bits.extend([
+            ev[p].to_bits(),
+            expl[p].to_bits(),
+            solver.expected_value(p).to_bits(),
+        ]);
+        for values in solver.expected_values_everywhere(p) {
+            bits.push(u64::from(values.is_some()));
+            bits.extend(values.into_iter().flatten().map(|v| v.to_bits() as u64));
+        }
+    }
+    for (node, n) in solver.game().tree.nodes.iter().enumerate() {
+        if matches!(n.kind, hu_engine::NodeKind::Action) {
+            bits.extend(
+                solver
+                    .average_strategy_at(node as u32)
+                    .iter()
+                    .map(|v| v.to_bits() as u64),
+            );
+        }
+    }
+    let visits = std::sync::Mutex::new(Vec::new());
+    solver.visit_expected_values(|node, reaches, values, scales| {
+        let mut row = vec![node as u64];
+        for p in Player::BOTH {
+            row.extend(reaches[p].iter().map(|v| v.to_bits() as u64));
+            row.extend(values[p].iter().map(|v| v.to_bits() as u64));
+        }
+        row.extend(scales.iter().map(|v| v.to_bits() as u64));
+        visits.lock().unwrap().push(row);
+    });
+    let mut visits = visits.into_inner().unwrap();
+    visits.sort();
+    bits.extend(visits.into_iter().flatten());
+    bits
+}
+
+fn release_preserves_evaluation<S: Storage>() {
+    let mut solver = solve::<S>(40);
+    let before = evaluation_bits(&solver);
+    let checkpoint = solver.state();
+    solver.release_regrets();
+    solver.release_regrets(); // idempotent
+    assert!(solver.storage().regrets_released());
+    assert_eq!(before, evaluation_bits(&solver));
+    let mut resumed = Solver::<_, S>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        Some(40),
+    );
+    resumed.restore_state(checkpoint).unwrap();
+    assert_eq!(before, evaluation_bits(&resumed));
+    resumed.run(1);
+}
+
+macro_rules! release_tests {
+    ($backend:ty, $values:ident, $run:ident, $current:ident, $checkpoint:ident, $restore:ident) => {
+        #[test]
+        fn $values() {
+            release_preserves_evaluation::<$backend>();
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $run() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.run(0);
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $current() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.current_strategy_at(0);
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $checkpoint() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.storage().arrays(); // streaming checkpoint entrypoint
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $restore() {
+            let mut solver = solve::<$backend>(1);
+            let state = solver.state();
+            solver.release_regrets();
+            solver.restore_state(state).unwrap();
+        }
+    };
+}
+release_tests!(
+    F32Storage,
+    released_f32_values,
+    released_f32_run,
+    released_f32_current,
+    released_f32_checkpoint,
+    released_f32_restore
+);
+release_tests!(
+    I16Storage,
+    released_i16_values,
+    released_i16_run,
+    released_i16_current,
+    released_i16_checkpoint,
+    released_i16_restore
+);
+release_tests!(
+    MixedStorage,
+    released_mixed_values,
+    released_mixed_run,
+    released_mixed_current,
+    released_mixed_checkpoint,
+    released_mixed_restore
+);

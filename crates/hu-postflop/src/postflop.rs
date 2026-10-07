@@ -1675,6 +1675,11 @@ pub struct MemoryEstimate {
     pub i16_bytes: u64,
     /// Bytes for i16 regrets, f32 strategy sums, and one regret scale per node.
     pub i16_f32avg_bytes: u64,
+    /// Releasable f32 regret arena (4L bytes).
+    pub f32_regret_bytes: u64,
+    /// Releasable i16 regret arena and node scales (2L + 4N bytes),
+    /// shared by i16 and i16-f32avg backends.
+    pub i16_regret_bytes: u64,
     /// Packed value slots, mode/street metadata and one bounded parallel
     /// strategy batch for a full `.sol` export.
     pub save_bytes: u64,
@@ -1699,6 +1704,25 @@ pub struct MemoryEstimate {
 /// a large flop tree.
 pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
     try_memory_usage(config).expect("postflop tree must have nonempty action menus")
+}
+
+impl MemoryEstimate {
+    /// Peak of solving/checkpointing and saving after regret release, plus
+    /// the conservative streaming compression budget. Arithmetic saturates.
+    pub fn required_bytes(&self, backend: crate::input::Storage) -> u64 {
+        let (storage, regrets) = match backend {
+            crate::input::Storage::F32 => (self.f32_bytes, self.f32_regret_bytes),
+            crate::input::Storage::I16 => (self.i16_bytes, self.i16_regret_bytes),
+            crate::input::Storage::I16F32Avg => (self.i16_f32avg_bytes, self.i16_regret_bytes),
+        };
+        storage
+            .max(
+                storage
+                    .saturating_sub(regrets)
+                    .saturating_add(self.save_bytes),
+            )
+            .saturating_add(self.compression_bytes)
+    }
 }
 
 /// Counting preflight with a typed error for a menu emptied by common rules.
@@ -1749,6 +1773,8 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
         i16_f32avg_bytes: counting.elements * 6 + counting.action_nodes * 4,
+        f32_regret_bytes: counting.elements * 4,
+        i16_regret_bytes: counting.elements * 2 + counting.action_nodes * 4,
         save_bytes: counting.action_nodes
                 * 2
                 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64

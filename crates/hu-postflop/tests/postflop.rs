@@ -770,7 +770,13 @@ fn memory_usage_matches_allocated() {
                     + tree.storage_refs.len().min(elements / min_elements.max(1)) * headers
                     + size_of::<Vec<(hu_engine::StorageRef, Vec<u8>)>>()
             };
-        assert_eq!(memory_usage(config).save_bytes, allocated as u64);
+        let estimate = memory_usage(config);
+        assert_eq!(estimate.save_bytes, allocated as u64);
+        assert_eq!(estimate.f32_regret_bytes, tree.storage_len as u64 * 4);
+        assert_eq!(
+            estimate.i16_regret_bytes,
+            tree.storage_len as u64 * 2 + tree.storage_refs.len() as u64 * 4
+        );
     }
     let config = PostflopConfig {
         board: merged_flop(),
