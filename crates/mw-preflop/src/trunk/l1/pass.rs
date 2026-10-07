@@ -97,15 +97,29 @@ impl LeafStrategy {
 /// summation order.
 pub(crate) const CHUNK: usize = 8;
 
-/// Arena slabs are resized once per leaf, then reused across boards/leaves
-/// within a Rayon worker. There are no allocations inside the node loops.
+/// Per-depth slabs, grown to the deepest leaf tree and reused across boards and
+/// leaves within a Rayon worker. A pass walks the tree depth first, so it only
+/// touches the slabs along one path: a few hundred KB instead of every node's
+/// combo arrays, which kept the pass waiting on memory.
 #[derive(Default)]
 pub(crate) struct Scratch {
+    /// The opponent's and hero's reach per depth, `[depth][combo]`.
     opponent: Vec<f64>,
     own: Vec<f64>,
+    /// Values per depth and action, `[depth][action][combo]`: a node's
+    /// children leave theirs one depth below it. The root's are the first
+    /// `NUM_COMBOS`, which is all callers read.
     pub(crate) values: Vec<f64>,
     pub(crate) best: Vec<f64>,
     checkdown: Vec<f64>,
+}
+
+/// One pass's inputs and its slab layout.
+struct Walk<'p, 'a> {
+    pass: &'p Pass<'a>,
+    local: usize,
+    /// The most actions at any node of the tree: the stride of a depth's values.
+    width: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -236,112 +250,153 @@ impl Scratch {
         pass: &Pass<'_>,
         mut updates: Option<(&mut [f64], &mut [f64], f64)>,
     ) {
-        let Pass {
+        let walk = Walk {
+            pass,
+            local: usize::from(pass.tree.active[0] != pass.hero),
+            width: pass
+                .tree
+                .nodes
+                .iter()
+                .map(|n| n.children.len())
+                .max()
+                .unwrap_or(0)
+                .max(1),
+        };
+        self.grow(&walk, 0);
+        self.opponent[..NUM_COMBOS].copy_from_slice(pass.opponent);
+        self.own[..NUM_COMBOS].copy_from_slice(pass.own);
+        self.visit(&walk, &mut updates, 0, 0, [0, 0], 0);
+        // Overlapping hero combos contribute zero even when scratch was reused.
+        for h in 0..NUM_COMBOS {
+            if pass.board.ranks[h] == 0 {
+                self.values[h] = 0.0;
+                if pass.auxiliary {
+                    self.best[h] = 0.0;
+                }
+            }
+        }
+    }
+
+    /// Makes room for a node at `depth` and its children's values.
+    fn grow(&mut self, walk: &Walk<'_, '_>, depth: usize) {
+        let reach = (depth + 1) * NUM_COMBOS;
+        if self.opponent.len() < reach {
+            self.opponent.resize(reach, 0.0);
+            self.own.resize(reach, 0.0);
+        }
+        let values = (depth + 2) * walk.width * NUM_COMBOS;
+        if self.values.len() < values {
+            self.values.resize(values, 0.0);
+        }
+        if walk.pass.auxiliary && self.best.len() < values {
+            self.best.resize(values, 0.0);
+        }
+    }
+
+    /// Writes node `z`'s values at `out`, given the opponent's and hero's reach
+    /// at the offsets `[opponent, own]`. An action leaves the other player's reach
+    /// unchanged, so the child shares that slab instead of multiplying it by 1;
+    /// a slab at `depth` is only rewritten after the subtrees that read it.
+    /// The arithmetic and the order of every sum match a pass over all nodes
+    /// at once, so results are bit-identical to it.
+    fn visit(
+        &mut self,
+        walk: &Walk<'_, '_>,
+        updates: &mut Option<(&mut [f64], &mut [f64], f64)>,
+        z: usize,
+        depth: usize,
+        [opponent, own]: [usize; 2],
+        out: usize,
+    ) {
+        let &Pass {
             tree,
             storage,
             rows,
             board,
             hero,
-            opponent,
-            own,
             scale,
             auxiliary,
-        } = *pass;
-        let local = usize::from(tree.active[0] != hero);
-        let size = tree.nodes.len() * NUM_COMBOS;
-        self.opponent.resize(size, 0.0);
-        self.own.resize(size, 0.0);
-        self.values.resize(size, 0.0);
-        if auxiliary {
-            self.best.resize(size, 0.0);
-        }
-        self.opponent[..NUM_COMBOS].copy_from_slice(opponent);
-        self.own[..NUM_COMBOS].copy_from_slice(own);
-        for (z, n) in tree.nodes.iter().enumerate() {
-            if let Some((parent, a)) = n.parent {
-                let pn = &tree.nodes[parent];
-                let buckets = &board.buckets[pn.street.index() - 1];
-                for &h in &board.sorted {
-                    let probability =
-                        rows[storage.offsets[parent] + buckets[h] as usize * pn.children.len() + a];
-                    self.opponent[z * NUM_COMBOS + h] = self.opponent[parent * NUM_COMBOS + h]
-                        * if pn.actor == Some(local) {
-                            1.0
-                        } else {
-                            probability
-                        };
-                    self.own[z * NUM_COMBOS + h] = self.own[parent * NUM_COMBOS + h]
-                        * if pn.actor == Some(local) {
-                            probability
-                        } else {
-                            1.0
-                        };
-                }
+            ..
+        } = walk.pass;
+        let local = walk.local;
+        let n = &tree.nodes[z];
+        if n.actor.is_none() {
+            terminal_values(
+                board,
+                &self.opponent[opponent..opponent + NUM_COMBOS],
+                &n.payoffs,
+                hero,
+                local,
+                &mut self.values[out..out + NUM_COMBOS],
+            );
+            if auxiliary {
+                self.best[out..out + NUM_COMBOS]
+                    .copy_from_slice(&self.values[out..out + NUM_COMBOS]);
             }
+            return;
         }
-        for (z, n) in tree.nodes.iter().enumerate().rev() {
-            let offset = z * NUM_COMBOS;
-            if n.actor.is_none() {
-                terminal_values(
-                    board,
-                    &self.opponent[offset..offset + NUM_COMBOS],
-                    &n.payoffs,
-                    hero,
-                    local,
-                    &mut self.values[offset..offset + NUM_COMBOS],
-                );
-                if auxiliary {
-                    self.best[offset..offset + NUM_COMBOS]
-                        .copy_from_slice(&self.values[offset..offset + NUM_COMBOS]);
-                }
-                continue;
-            }
-            let buckets = &board.buckets[n.street.index() - 1];
+        self.grow(walk, depth + 1);
+        let mine = n.actor == Some(local);
+        let k = n.children.len();
+        let buckets = &board.buckets[n.street.index() - 1];
+        let offset = storage.offsets[z];
+        let next = (depth + 1) * NUM_COMBOS;
+        let children = (depth + 1) * walk.width * NUM_COMBOS;
+        for (a, &child) in n.children.iter().enumerate() {
+            let (slab, from) = if mine {
+                (&mut self.own, own)
+            } else {
+                (&mut self.opponent, opponent)
+            };
             for &h in &board.sorted {
-                let row = storage.offsets[z] + buckets[h] as usize * n.children.len();
-                let mut value = 0.0;
-                let mut best = if n.actor == Some(local) {
-                    f64::NEG_INFINITY
-                } else {
-                    0.0
-                };
-                for (a, &child) in n.children.iter().enumerate() {
-                    let child = child * NUM_COMBOS + h;
-                    value += self.values[child]
-                        * if n.actor == Some(local) {
-                            rows[row + a]
-                        } else {
-                            1.0
-                        };
-                    if auxiliary {
-                        if n.actor == Some(local) {
-                            best = best.max(self.best[child]);
-                        } else {
-                            best += self.best[child];
-                        }
-                    }
-                }
-                self.values[offset + h] = value;
-                if auxiliary {
-                    self.best[offset + h] = best;
-                }
-                if n.actor == Some(local)
-                    && let Some((regrets, sums, weight)) = updates.as_mut()
-                {
-                    for (a, &child) in n.children.iter().enumerate() {
-                        regrets[row + a] +=
-                            *weight * scale[h] * (self.values[child * NUM_COMBOS + h] - value);
-                        sums[row + a] += *weight * self.own[offset + h] * rows[row + a];
-                    }
-                }
+                slab[next + h] = slab[from + h] * rows[offset + buckets[h] as usize * k + a];
             }
+            let reach = if mine { [opponent, next] } else { [next, own] };
+            self.visit(
+                walk,
+                updates,
+                child,
+                depth + 1,
+                reach,
+                children + a * NUM_COMBOS,
+            );
         }
-        // Overlapping hero combos contribute zero even when scratch was reused.
-        for h in 0..NUM_COMBOS {
-            if board.ranks[h] == 0 {
-                self.values[h] = 0.0;
+        for &h in &board.sorted {
+            let row = offset + buckets[h] as usize * k;
+            let mut value = 0.0;
+            if mine {
+                let mut best = f64::NEG_INFINITY;
+                for a in 0..k {
+                    let child = children + a * NUM_COMBOS + h;
+                    value += self.values[child] * rows[row + a];
+                    if auxiliary {
+                        best = best.max(self.best[child]);
+                    }
+                }
+                self.values[out + h] = value;
                 if auxiliary {
-                    self.best[h] = 0.0;
+                    self.best[out + h] = best;
+                }
+                if let Some((regrets, sums, weight)) = updates.as_mut() {
+                    for a in 0..k {
+                        regrets[row + a] += *weight
+                            * scale[h]
+                            * (self.values[children + a * NUM_COMBOS + h] - value);
+                        sums[row + a] += *weight * self.own[own + h] * rows[row + a];
+                    }
+                }
+            } else {
+                let mut best = 0.0;
+                for a in 0..k {
+                    let child = children + a * NUM_COMBOS + h;
+                    value += self.values[child];
+                    if auxiliary {
+                        best += self.best[child];
+                    }
+                }
+                self.values[out + h] = value;
+                if auxiliary {
+                    self.best[out + h] = best;
                 }
             }
         }
