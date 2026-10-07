@@ -906,6 +906,47 @@ fn stratified_boards_cover_turns_and_rivers_uniformly() {
 }
 
 #[test]
+fn stratified_evaluation_halves_have_separate_shifts() {
+    use super::cards::boards;
+    let options = Options {
+        l1_eval_boards: 8,
+        l1_eval_seed: 4,
+        l1_eval_sampling: Sampling::Stratified,
+        ..Options::default()
+    };
+    let all = super::solve::evaluation_boards(&Buckets, &options);
+    assert_eq!(all.len(), 8);
+    for (parity, domain) in [
+        (0, b"solvers.p2.trunk.l1.eval.v1.even".as_slice()),
+        (1, b"solvers.p2.trunk.l1.eval.v1.odd"),
+    ] {
+        let half = boards(&Buckets, domain, 4, None, 4, Sampling::Stratified);
+        for (k, board) in half.iter().enumerate() {
+            assert_eq!(all[2 * k + parity].cards, board.cards);
+        }
+    }
+    let random = Options {
+        l1_eval_sampling: Sampling::Random,
+        ..options
+    };
+    let expected = boards(
+        &Buckets,
+        b"solvers.p2.trunk.l1.eval.v1",
+        4,
+        None,
+        8,
+        Sampling::Random,
+    );
+    let actual = super::solve::evaluation_boards(&Buckets, &random);
+    assert!(
+        actual
+            .iter()
+            .zip(&expected)
+            .all(|(a, b)| a.cards == b.cards)
+    );
+}
+
+#[test]
 fn regression_control_matches_per_board_reference() {
     use super::cards::boards;
     use crate::trunk::l0::{

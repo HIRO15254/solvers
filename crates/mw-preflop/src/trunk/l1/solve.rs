@@ -1,5 +1,5 @@
 use super::{
-    BucketSource, Evaluation, Sampling, Strategies,
+    Board, BucketSource, Evaluation, Sampling, Strategies,
     cards::boards,
     evaluate,
     pass::{CHUNK, Pass, Scratch, class_values, discount, inputs},
@@ -116,6 +116,34 @@ pub struct Solution {
     pub timings: Timings,
 }
 
+/// The evaluator's boards. It picks a best response on the even boards and
+/// scores it on the odd ones, and the reverse, so the halves must be
+/// independent: stratified halves each get their own random shift and are
+/// interleaved, rather than splitting one stratified sample.
+pub(super) fn evaluation_boards(source: &dyn BucketSource, options: &Options) -> Vec<Board> {
+    let count = options.l1_eval_boards;
+    let seed = options.l1_eval_seed;
+    if options.l1_eval_sampling == Sampling::Random {
+        return boards(
+            source,
+            b"solvers.p2.trunk.l1.eval.v1",
+            seed,
+            None,
+            count,
+            Sampling::Random,
+        );
+    }
+    let [even, odd] = [
+        b"solvers.p2.trunk.l1.eval.v1.even".as_slice(),
+        b"solvers.p2.trunk.l1.eval.v1.odd",
+    ]
+    .map(|domain| boards(source, domain, seed, None, count / 2, Sampling::Stratified));
+    even.into_iter()
+        .zip(odd)
+        .flat_map(|(a, b)| [a, b])
+        .collect()
+}
+
 pub fn solve(
     tree: &Tree,
     model: &Model<'_>,
@@ -170,14 +198,7 @@ pub fn solve(
     let mut timings = Timings::default();
     let phase = Instant::now();
     let eval_boards = if o.eval_every > 0 {
-        boards(
-            source,
-            b"solvers.p2.trunk.l1.eval.v1",
-            options.l1_eval_seed,
-            None,
-            options.l1_eval_boards,
-            options.l1_eval_sampling,
-        )
+        evaluation_boards(source, &options)
     } else {
         Vec::new()
     };
