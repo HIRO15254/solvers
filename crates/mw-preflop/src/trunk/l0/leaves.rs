@@ -569,61 +569,75 @@ pub(crate) fn leaf_values(
             }
         }
     }
-    for (z, node) in tree.nodes.iter().enumerate() {
-        let Some(t) = &node.terminal else { continue };
-        for (p, seat_leaves) in leaves.iter_mut().enumerate() {
-            if !heroes.contains(&p) {
-                continue;
-            }
-            // L1 leaves keep their exact checkdown value: the L1 solver and
-            // evaluator replace it, or correct it with sampled boards.
-            if (t.active.len() >= 4 || (t.active.len() == 3 && model.sample_three_way()))
-                && t.active.contains(&p)
-            {
-                sampled.extend(model.support[p].iter().map(|&c| (z, p, c)));
-                continue;
-            }
-            if t.active.len() == 3 && t.active.contains(&p) {
-                let others: Vec<_> = t.active.iter().copied().filter(|&j| j != p).collect();
-                three.push(ThreeItem {
-                    node: z,
-                    hero: p,
-                    q: reach[z].rho(model, others[0]),
-                    r: reach[z].rho(model, others[1]),
-                    terms: ThreeTerms::new(&t.hero_payoffs(p)),
-                    #[cfg(test)]
-                    payoffs: t.hero_payoffs(p),
-                });
-                continue;
-            }
-            let payoff = if t.active.len() == 2 && t.active.contains(&p) {
-                t.hero_payoffs(p)
-            } else {
-                Vec::new()
-            };
-            let other = t.active.iter().copied().find(|&j| j != p);
-            let rho = other.map(|j| reach[z].rho(model, j)).unwrap_or_default();
-            for &c in &model.support[p] {
-                seat_leaves[z][c] = if payoff.is_empty() {
-                    t.payoffs[0][p]
-                        * (0..tree.seats)
-                            .filter(|&j| j != p)
+    for (p, seat_leaves) in leaves.iter_mut().enumerate() {
+        if !heroes.contains(&p) {
+            continue;
+        }
+        // Terminals are independent: rows are written in parallel, and the
+        // terminals left to T3 (`Some`) or K4 (`None`) collected in node order.
+        let deferred: Vec<_> = tree
+            .nodes
+            .par_iter()
+            .zip(seat_leaves.par_iter_mut())
+            .enumerate()
+            .filter_map(|(z, (node, row))| {
+                let t = node.terminal.as_ref()?;
+                // L1 leaves keep their exact checkdown value: the L1 solver and
+                // evaluator replace it, or correct it with sampled boards.
+                if (t.active.len() >= 4 || (t.active.len() == 3 && model.sample_three_way()))
+                    && t.active.contains(&p)
+                {
+                    return Some((z, None));
+                }
+                if t.active.len() == 3 && t.active.contains(&p) {
+                    let others: Vec<_> = t.active.iter().copied().filter(|&j| j != p).collect();
+                    return Some((
+                        z,
+                        Some(ThreeItem {
+                            node: z,
+                            hero: p,
+                            q: reach[z].rho(model, others[0]),
+                            r: reach[z].rho(model, others[1]),
+                            terms: ThreeTerms::new(&t.hero_payoffs(p)),
+                            #[cfg(test)]
+                            payoffs: t.hero_payoffs(p),
+                        }),
+                    ));
+                }
+                if t.active.len() == 2 && t.active.contains(&p) {
+                    let payoff = t.hero_payoffs(p);
+                    let other = t.active.iter().copied().find(|&j| j != p).unwrap();
+                    let rho = reach[z].rho(model, other);
+                    for &c in &model.support[p] {
+                        let folded: f64 = (0..tree.seats)
+                            .filter(|j| !t.active.contains(j))
                             .map(|j| reach[z].mass(j, c))
-                            .product::<f64>()
-                } else {
-                    let folded: f64 = (0..tree.seats)
-                        .filter(|j| !t.active.contains(j))
-                        .map(|j| reach[z].mass(j, c))
-                        .product();
-                    let mut outcomes = [0.0; 3];
-                    for &(d, r) in &rho {
-                        let t2 = t2_slab[c * 169 + d];
-                        for o in 0..3 {
-                            outcomes[o] += t2[o] * r;
+                            .product();
+                        let mut outcomes = [0.0; 3];
+                        for &(d, r) in &rho {
+                            let t2 = t2_slab[c * 169 + d];
+                            for o in 0..3 {
+                                outcomes[o] += t2[o] * r;
+                            }
                         }
+                        row[c] = folded * (0..3).map(|o| payoff[o] * outcomes[o]).sum::<f64>();
                     }
-                    folded * (0..3).map(|o| payoff[o] * outcomes[o]).sum::<f64>()
-                };
+                } else {
+                    for &c in &model.support[p] {
+                        row[c] = t.payoffs[0][p]
+                            * (0..tree.seats)
+                                .filter(|&j| j != p)
+                                .map(|j| reach[z].mass(j, c))
+                                .product::<f64>();
+                    }
+                }
+                None
+            })
+            .collect();
+        for (z, terminal) in deferred {
+            match terminal {
+                Some(item) => three.push(item),
+                None => sampled.extend(model.support[p].iter().map(|&c| (z, p, c))),
             }
         }
     }
