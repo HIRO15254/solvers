@@ -92,6 +92,11 @@ impl LeafStrategy {
     }
 }
 
+/// Boards per parallel task. Chunks are fixed and summed in order, so results
+/// do not depend on the thread count; up to one chunk keeps the sequential
+/// summation order.
+pub(crate) const CHUNK: usize = 8;
+
 /// Arena slabs are resized once per leaf, then reused across boards/leaves
 /// within a Rayon worker. There are no allocations inside the node loops.
 #[derive(Default)]

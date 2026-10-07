@@ -709,8 +709,13 @@ fn solve_is_deterministic_across_threads_and_seed_changes_results() {
                             eval_every: 5,
                             ..Default::default()
                         },
-                        l1_eval_boards: 4,
+                        // Several board chunks per leaf in training and evaluation.
+                        l1_boards: 20,
+                        l1_eval_boards: 20,
                         l1_seed: seed,
+                        l1_train_control: true,
+                        l1_eval_control: true,
+                        l1_sampling: Sampling::Stratified,
                         ..Default::default()
                     },
                     |_| {},
@@ -824,4 +829,47 @@ fn control_variate_solve_converges() {
     let end = solution.checkpoints.last().unwrap().evaluation.nash_conv;
     eprintln!("L1 control-variate smoke: {initial:.12} -> {end:.12}");
     assert!(end < initial * 0.25, "{initial} -> {end}");
+}
+
+#[test]
+fn stratified_boards_cover_turns_and_rivers_uniformly() {
+    use super::cards::{board_at, boards};
+    use std::collections::BTreeSet;
+    // A grid over one flop's interval deals every (turn, river) exactly once.
+    for flop in [0, 1, 777, 1754] {
+        let ends: Vec<u32> = nlh::iso::canonical_flops()
+            .iter()
+            .scan(0, |end, (_, w)| {
+                *end += w;
+                Some(*end)
+            })
+            .collect();
+        let start = if flop == 0 { 0 } else { ends[flop - 1] };
+        let width = f64::from(ends[flop] - start);
+        let mut seen = BTreeSet::new();
+        for j in 0..49 * 48 {
+            let x = f64::from(start) + (j as f64 + 0.5) / (49.0 * 48.0) * width;
+            let b = board_at(x);
+            let mask = b.iter().fold(0_u64, |m, c| m | (1 << c.index()));
+            assert_eq!(mask.count_ones(), 5);
+            seen.insert((b[3].index(), b[4].index()));
+        }
+        assert_eq!(seen.len(), 49 * 48);
+    }
+    // Unit spacing from any offset puts exactly each flop's multiplicity of
+    // points in its interval: the paired-flop share is exact.
+    let exact = 22_100.0 - 52.0 * 48.0 * 44.0 / 6.0;
+    for offset in [0.0, 0.25, 0.999] {
+        let paired = (0..22_100)
+            .filter(|&k| {
+                let b = board_at(offset + f64::from(k));
+                let r: Vec<_> = b[..3].iter().map(|c| c.rank()).collect();
+                r[0] == r[1] || r[1] == r[2] || r[0] == r[2]
+            })
+            .count() as f64;
+        assert_eq!(paired, exact);
+    }
+    let a = boards(&Buckets, b"test", 3, Some(1), 8, Sampling::Stratified);
+    let b = boards(&Buckets, b"test", 3, Some(2), 8, Sampling::Stratified);
+    assert_ne!(a[0].cards, b[0].cards);
 }

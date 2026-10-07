@@ -1,8 +1,8 @@
 use super::{
-    BucketSource, Evaluation, Strategies,
+    BucketSource, Evaluation, Sampling, Strategies,
     cards::boards,
     evaluate,
-    pass::{Pass, Scratch, class_values, discount, inputs},
+    pass::{CHUNK, Pass, Scratch, class_values, discount, inputs},
 };
 use crate::trunk::l0::{
     Model, Profile, SolveOptions, SolveTimings, Tree,
@@ -29,6 +29,8 @@ pub struct Options {
     pub l1_train_control: bool,
     /// The same control variate for the evaluator's leaf estimates.
     pub l1_eval_control: bool,
+    pub l1_sampling: Sampling,
+    pub l1_eval_sampling: Sampling,
 }
 
 impl Default for Options {
@@ -41,6 +43,8 @@ impl Default for Options {
             l1_eval_seed: 0,
             l1_train_control: false,
             l1_eval_control: false,
+            l1_sampling: Sampling::Random,
+            l1_eval_sampling: Sampling::Random,
         }
     }
 }
@@ -129,6 +133,7 @@ pub fn solve(
             options.l1_eval_seed,
             None,
             options.l1_eval_boards,
+            options.l1_eval_sampling,
         )
     } else {
         Vec::new()
@@ -204,6 +209,7 @@ pub fn solve(
             options.l1_seed,
             Some(t),
             options.l1_boards,
+            options.l1_sampling,
         );
         timings.board_preparation += phase.elapsed().as_secs_f64();
         for p in 0..tree.seats {
@@ -215,7 +221,7 @@ pub fn solve(
             let outputs: Vec<_> = postflop
                 .leaves
                 .par_iter_mut()
-                .map_init(Scratch::default, |scratch, storage| {
+                .map(|storage| {
                     let z = storage.terminal;
                     let terminal = tree.nodes[z].terminal.as_ref().unwrap();
                     let subtree = terminal.l1.as_ref().unwrap();
@@ -227,33 +233,53 @@ pub fn solve(
                         return Some((z, [0.0; 169]));
                     }
                     let rows = storage.profile(subtree, false);
-                    let mut increments = vec![0.0; rows.len()];
-                    let mut additions = vec![0.0; rows.len()];
-                    let mut values = [0.0; 169];
                     let weight = 1.0 / training_boards.len() as f64;
-                    for board in &training_boards {
-                        scratch.pass(
-                            &Pass {
-                                tree: subtree,
-                                storage,
-                                rows: &rows,
-                                board,
-                                hero: p,
-                                opponent: &opponent,
-                                own: &own,
-                                scale: &scale,
-                                auxiliary: false,
-                            },
-                            Some((&mut increments, &mut additions, weight)),
-                        );
-                        let v = class_values(&scratch.values, &scale);
-                        let checkdown = if options.l1_train_control {
-                            scratch.checkdown(board, terminal, p, &opponent, &scale)
-                        } else {
-                            [0.0; 169]
-                        };
-                        for c in 0..169 {
-                            values[c] += weight * (v[c] - checkdown[c]);
+                    let shared = &*storage;
+                    let mut chunks = training_boards
+                        .par_chunks(CHUNK)
+                        .map_init(Scratch::default, |scratch, chunk| {
+                            let mut increments = vec![0.0; rows.len()];
+                            let mut additions = vec![0.0; rows.len()];
+                            let mut values = [0.0; 169];
+                            for board in chunk {
+                                scratch.pass(
+                                    &Pass {
+                                        tree: subtree,
+                                        storage: shared,
+                                        rows: &rows,
+                                        board,
+                                        hero: p,
+                                        opponent: &opponent,
+                                        own: &own,
+                                        scale: &scale,
+                                        auxiliary: false,
+                                    },
+                                    Some((&mut increments, &mut additions, weight)),
+                                );
+                                let v = class_values(&scratch.values, &scale);
+                                let checkdown = if options.l1_train_control {
+                                    scratch.checkdown(board, terminal, p, &opponent, &scale)
+                                } else {
+                                    [0.0; 169]
+                                };
+                                for c in 0..169 {
+                                    values[c] += weight * (v[c] - checkdown[c]);
+                                }
+                            }
+                            (increments, additions, values)
+                        })
+                        .collect::<Vec<_>>()
+                        .into_iter();
+                    let (mut increments, mut additions, mut values) = chunks.next().unwrap();
+                    for (i, a, v) in chunks {
+                        for (x, y) in increments.iter_mut().zip(i) {
+                            *x += y;
+                        }
+                        for (x, y) in additions.iter_mut().zip(a) {
+                            *x += y;
+                        }
+                        for (x, y) in values.iter_mut().zip(v) {
+                            *x += y;
                         }
                     }
                     discount(storage, subtree, p, &increments, &additions, &dcfr);

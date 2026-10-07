@@ -1,6 +1,6 @@
 use super::{
     Board, Strategies,
-    pass::{Pass, Scratch, class_values, inputs},
+    pass::{CHUNK, Pass, Scratch, class_values, inputs},
 };
 use crate::ExternalSamplingGame;
 use crate::trunk::{
@@ -196,7 +196,7 @@ pub fn evaluate(
         let output: Vec<_> = strategies
             .leaves
             .par_iter()
-            .map_init(Scratch::default, |scratch, storage| {
+            .map(|storage| {
                 let z = storage.terminal;
                 let terminal = tree.nodes[z].terminal.as_ref().unwrap();
                 let subtree = terminal.l1.as_ref().unwrap();
@@ -208,31 +208,52 @@ pub fn evaluate(
                 let mut sigma = [[0.0; 169]; 2];
                 let mut beta = [[0.0; 169]; 2];
                 if opponent.iter().any(|&r| r != 0.0) {
-                    for (j, board) in boards.iter().enumerate() {
-                        scratch.pass(
-                            &Pass {
-                                tree: subtree,
-                                storage,
-                                rows: &rows,
-                                board,
-                                hero: p,
-                                opponent: &opponent,
-                                own: &own,
-                                scale: &scale,
-                                auxiliary: true,
-                            },
-                            None,
-                        );
-                        let s = class_values(&scratch.values, &scale);
-                        let b = class_values(&scratch.best, &scale);
-                        let checkdown = if control {
-                            scratch.checkdown(board, terminal, p, &opponent, &scale)
-                        } else {
-                            [0.0; 169]
-                        };
-                        for c in 0..169 {
-                            sigma[j % 2][c] += (s[c] - checkdown[c]) / (boards.len() / 2) as f64;
-                            beta[j % 2][c] += (b[c] - checkdown[c]) / (boards.len() / 2) as f64;
+                    let chunks: Vec<_> = boards
+                        .par_chunks(CHUNK)
+                        .enumerate()
+                        .map_init(Scratch::default, |scratch, (i, chunk)| {
+                            let mut sigma = [[0.0; 169]; 2];
+                            let mut beta = [[0.0; 169]; 2];
+                            for (k, board) in chunk.iter().enumerate() {
+                                let j = i * CHUNK + k;
+                                scratch.pass(
+                                    &Pass {
+                                        tree: subtree,
+                                        storage,
+                                        rows: &rows,
+                                        board,
+                                        hero: p,
+                                        opponent: &opponent,
+                                        own: &own,
+                                        scale: &scale,
+                                        auxiliary: true,
+                                    },
+                                    None,
+                                );
+                                let s = class_values(&scratch.values, &scale);
+                                let b = class_values(&scratch.best, &scale);
+                                let checkdown = if control {
+                                    scratch.checkdown(board, terminal, p, &opponent, &scale)
+                                } else {
+                                    [0.0; 169]
+                                };
+                                let half = (boards.len() / 2) as f64;
+                                for c in 0..169 {
+                                    sigma[j % 2][c] += (s[c] - checkdown[c]) / half;
+                                    beta[j % 2][c] += (b[c] - checkdown[c]) / half;
+                                }
+                            }
+                            (sigma, beta)
+                        })
+                        .collect();
+                    let mut chunks = chunks.into_iter();
+                    (sigma, beta) = chunks.next().unwrap();
+                    for (s, b) in chunks {
+                        for h in 0..2 {
+                            for c in 0..169 {
+                                sigma[h][c] += s[h][c];
+                                beta[h][c] += b[h][c];
+                            }
                         }
                     }
                 }
