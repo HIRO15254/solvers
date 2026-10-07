@@ -79,11 +79,11 @@ no-riversはRiverの戦略と値を省く。
 
 ## 5. 監視・停止・再開する
 
-P1のDCFRは`[solver.algorithm] pow4_reset = false`が既定である。従来のresetを使う場合は`pow4_reset = true`を明示する。
-保存された実効configはこの値を含むため、旧既定trueのrun・checkpoint・solutionは保存値で再開・照会できる。
-旧runの`run.toml`を`pow4_reset`未指定の元configに戻すと、新既定falseとの互換性hash不一致で再開を拒否する。
+P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false`が既定である。従来のresetを使う場合は`pow4_reset = true`を明示する。
+保存された実効configは係数とresetを明示するため、旧係数1.5・0・3や旧既定reset=trueのrun・checkpoint・solutionは保存値で再開・照会できる。
+旧runの`run.toml`を係数や`pow4_reset`未指定の元configに戻すと、新既定との互換性hash不一致で再開を拒否する。
 P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。精度keyの無い旧runは新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。
-旧条件で再solveして比較する場合はtrueを明示する。`compare`はalgorithmの差を拒否しない。
+旧係数で再solveして比較する場合は`alpha = 1.5`、`beta = 0.0`、`gamma = 3.0`を明示する。resetを使っていた条件では`pow4_reset = true`も明示する。`compare`はalgorithmの差を拒否しない。
 
 ```sh
 solvers status runs/my-spot --format json

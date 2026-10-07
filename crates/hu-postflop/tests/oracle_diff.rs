@@ -312,12 +312,14 @@ fn sequential() -> ParConfig {
 fn assert_engine_matches_oracle(iters: u64, tol: f64) {
     let game = engine_game();
     let node_info = game.node_info.clone();
-    // Preserve the reset-enabled profile used by this frozen-oracle comparison.
+    // Preserve the legacy coefficients and resets used by this frozen-oracle comparison.
     let mut solver = Solver::<_, F32Storage>::new(
         game.game,
         Box::new(Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
             pow4_reset: true,
-            ..Dcfr::default()
         }),
         Some(iters),
     );
@@ -365,8 +367,10 @@ fn uniform_profiles_agree_between_engine_and_oracle() {
     let solver = Solver::<_, F32Storage>::new(
         game.game,
         Box::new(Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
             pow4_reset: true,
-            ..Dcfr::default()
         }),
         Some(1),
     );

@@ -152,6 +152,12 @@ mod tests {
                             &document.output,
                         )
                         .unwrap();
+                        for coefficient in ["alpha = 1.25", "beta = 0.5", "gamma = 4.0"] {
+                            assert!(effective.contains(coefficient));
+                            if matches!(template, ConfigTemplate::Full) {
+                                assert!(raw.contains(coefficient));
+                            }
+                        }
                         assert!(effective.contains("pow4_reset = false"));
                         assert_eq!(
                             settings.solver.algorithm,

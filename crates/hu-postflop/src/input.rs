@@ -41,7 +41,7 @@ pub enum Algorithm {
     Dcfr {
         #[serde(default = "alpha")]
         alpha: f64,
-        #[serde(default)]
+        #[serde(default = "beta")]
         beta: f64,
         #[serde(default = "gamma")]
         gamma: f64,
@@ -55,10 +55,13 @@ pub enum Algorithm {
     },
 }
 fn alpha() -> f64 {
-    1.5
+    1.25
+}
+fn beta() -> f64 {
+    0.5
 }
 fn gamma() -> f64 {
-    3.0
+    4.0
 }
 fn gamma0() -> f64 {
     30.0
@@ -67,7 +70,7 @@ impl Default for Algorithm {
     fn default() -> Self {
         Self::Dcfr {
             alpha: alpha(),
-            beta: 0.0,
+            beta: beta(),
             gamma: gamma(),
             pow4_reset: false,
         }
@@ -332,7 +335,7 @@ impl Settings {
                 "linear-cfr" => Algorithm::LinearCfr,
                 "dcfr" => Algorithm::Dcfr {
                     alpha: parameter(t, "alpha", alpha())?,
-                    beta: parameter(t, "beta", 0.0)?,
+                    beta: parameter(t, "beta", beta())?,
                     gamma: parameter(t, "gamma", gamma())?,
                     pow4_reset: field(
                         t,

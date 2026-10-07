@@ -556,7 +556,7 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 | `vanilla` | discount無しのCFR。追加param無し |
 | `cfr-plus` | 負regretを0に切るCFR+。追加param無し |
 | `linear-cfr` | iterationに比例した平均重み。追加param無し |
-| `dcfr` | `alpha = 1.5`、`beta = 0`、`gamma = 3`、`pow4_reset = false` |
+| `dcfr` | `alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false` |
 | `hs-dcfr` | `gamma0 = 30` |
 | `dcfr.alpha` / `beta` / `gamma`、`hs-dcfr.gamma0` | 有限f64。負値もparserは受理する。regret正側・負側・平均重みのdiscountを指定する |
 | `dcfr.pow4_reset` | bool、既定false。trueを明示すると4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
@@ -565,6 +565,8 @@ tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconom
 | `parallel.min_children` | 正のusize。既定12。並列化する最小child数 |
 
 測定した全ての木でreset無しの0.1% pot到達が同じか早かったため、利用者決定PF4（2026-10-07）でDCFRの既定をfalseへ変更した。
+
+GCP掃引で0.1% pot到達iterationが旧係数比でf32の10木では0.65〜1.05倍、i16-f32avgの3木では0.60〜0.74倍だったため、利用者決定PF7（2026-10-07）でDCFRの既定係数を1.25・0.5・4へ変更した（[測定証拠](../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）。`pow4_reset = false`は維持する。
 
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。

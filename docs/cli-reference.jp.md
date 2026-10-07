@@ -32,7 +32,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 | `--out PATH` | stdout | templateの出力先 |
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
-P1のDCFRは`pow4_reset = false`が既定で、full templateに明示する。resetを使う場合は`[solver.algorithm] pow4_reset = true`を指定する。
+P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`、`pow4_reset = false`が既定で、full templateに明示する。resetを使う場合は`[solver.algorithm] pow4_reset = true`を指定する。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
 ## `solvers validate`

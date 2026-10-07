@@ -71,9 +71,9 @@ fn sections_defaults_order_and_idempotence() {
     assert_eq!(
         s.solver.algorithm,
         Algorithm::Dcfr {
-            alpha: 1.5,
-            beta: 0.0,
-            gamma: 3.0,
+            alpha: 1.25,
+            beta: 0.5,
+            gamma: 4.0,
             pow4_reset: false
         }
     );
@@ -208,9 +208,9 @@ fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
         let doc = parse(&format!("{}\n{section}", standard("")));
         let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
         let expected = Algorithm::Dcfr {
-            alpha: 1.5,
-            beta: 0.0,
-            gamma: 3.0,
+            alpha: 1.25,
+            beta: 0.5,
+            gamma: 4.0,
             pow4_reset: reset,
         };
         assert_eq!(settings.solver.algorithm, expected);
@@ -231,12 +231,82 @@ fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
         assert_eq!(
             algorithm,
             Algorithm::Dcfr {
-                alpha: 1.5,
-                beta: 0.0,
-                gamma: 3.0,
+                alpha: 1.25,
+                beta: 0.5,
+                gamma: 4.0,
                 pow4_reset: reset,
             }
         );
+    }
+}
+
+#[test]
+fn dcfr_coefficients_defaults_and_explicit_values_survive_all_input_paths() {
+    assert_eq!(
+        Algorithm::default(),
+        Algorithm::Dcfr {
+            alpha: 1.25,
+            beta: 0.5,
+            gamma: 4.0,
+            pow4_reset: false,
+        }
+    );
+    for (params, alpha, beta, gamma) in [
+        ("", 1.25, 0.5, 4.0),
+        ("alpha = 1.5\nbeta = 0.0\ngamma = 3.0", 1.5, 0.0, 3.0),
+        ("alpha = 1.5", 1.5, 0.5, 4.0),
+        ("beta = 0.0", 1.25, 0.0, 4.0),
+        ("gamma = 3.0", 1.25, 0.5, 3.0),
+    ] {
+        let raw = format!("schedule = 'dcfr'\n{params}");
+        let expected = Algorithm::Dcfr {
+            alpha,
+            beta,
+            gamma,
+            pow4_reset: false,
+        };
+        let algorithm: Algorithm = toml::from_str(&raw).unwrap();
+        assert_eq!(algorithm, expected);
+        let doc = parse(&format!("{}\n[solver.algorithm]\n{raw}", standard("")));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        assert_eq!(settings.solver.algorithm, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let restored = parse(&effective);
+        assert_eq!(
+            Settings::parse(&restored.spot, &restored.solver, &restored.output)
+                .unwrap()
+                .solver
+                .algorithm,
+            expected
+        );
+        let schedule = hu_postflop::run::schedule(&expected);
+        let engine = hu_engine::Dcfr {
+            alpha,
+            beta,
+            gamma,
+            pow4_reset: false,
+        };
+        for t in [1, 4, 16, 64] {
+            let actual = schedule.at(t, Some(64));
+            let expected = hu_engine::DiscountSchedule::at(&engine, t, Some(64));
+            assert_eq!(
+                (
+                    actual.pos,
+                    actual.neg,
+                    actual.avg,
+                    actual.floor_neg,
+                    actual.reset_avg
+                ),
+                (
+                    expected.pos,
+                    expected.neg,
+                    expected.avg,
+                    expected.floor_neg,
+                    expected.reset_avg
+                )
+            );
+        }
     }
 }
 

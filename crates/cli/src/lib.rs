@@ -372,7 +372,7 @@ enum RunsCommand {
 enum ConfigCommand {
     /// Print or write a valid configuration template.
     New {
-        /// Product to template (P1 DCFR defaults to pow4_reset = false).
+        /// Product to template (P1 DCFR: alpha=1.25, beta=0.5, gamma=4, pow4_reset=false).
         #[arg(long, value_enum, default_value = "p2")]
         product: config_new::ConfigProduct,
         #[arg(long, value_enum, default_value = "minimal")]

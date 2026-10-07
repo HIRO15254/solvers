@@ -88,6 +88,7 @@ pub struct Dcfr {
 
 impl Default for Dcfr {
     /// Legacy engine default: alpha=1.5, beta=0, gamma=3.0, power-of-4 resets.
+    /// P1 public input defaults independently to 1.25/0.5/4.0, without resets.
     fn default() -> Self {
         Dcfr {
             alpha: 1.5,
