@@ -1,0 +1,40 @@
+ 28.30% [.] hu_postflop::kernel::showdown_kernel
+ 17.25% [.] hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::I16View, true>
+ 16.68% [.] hu_engine::storage::normalize_columns_i16
+ 11.96% [.] hu_postflop::kernel::fold_kernel
+ 6.92% [.] hu_engine::storage::accumulate_strategy_i16_impl
+ 6.17% [.] hu_engine::storage::update_regrets_i16_impl
+ 3.19% [k] smp_call_function_many_cond
+ 1.48% [.] 0x000000000015354a
+ 1.19% [k] __x2apic_send_IPI_mask
+ 0.63% [.] hu_engine::solver::value_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::I16Storage, hu_engine::solver::no_record, true, true, false>
+ 0.47% [k] llist_add_batch
+ 0.36% [k] native_queued_spin_lock_slowpath
+ 0.25% [k] _raw_spin_unlock_irqrestore
+ 0.25% [.] <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval
+ 0.25% [.] 0x0000000000153504
+ 0.24% [.] 0x0000000000153509
+ 0.24% [.] 0x000000000015350e
+ 0.24% [.] 0x0000000000153513
+ 0.20% [.] <hu_engine::tree::PublicTree>::map_reach_into
+ 0.16% [.] rayon::iter::plumbing::bridge_producer_consumer::helper::<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::I16View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::I16View, true>::{closure#2}>>
+ 0.15% [.] <hu_engine::tree::PublicTree>::accumulate_values_with_scratch
+ 0.14% [.] hu_engine::solver::parallel_actions
+ 0.13% [.] <hu_engine::solver::ActionViews<hu_engine::storage::I16View>>::split_for
+ 0.11% [.] crossbeam_epoch::default::with_handle::<crossbeam_epoch::default::pin::{closure#0}, crossbeam_epoch::guard::Guard>
+ 0.10% [k] should_flush_tlb
+ 0.09% [k] native_write_msr
+ 0.09% [k] do_user_addr_fault
+ 0.09% [k] clear_page_erms
+ 0.09% [.] 0x00000000001534cd
+ 0.08% [.] 0x0000000000153480
+ 0.07% [.] 0x0000000000152d8a
+ 0.07% [.] malloc
+ 0.06% [.] rayon_core::join::join_context::<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::I16View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::I16View, true>::{closure#2}>>::{closure#0}, rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::I16View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::I16View, true>::{closure#2}>>::{closure#1}, (), ()>::{closure#0}
+ 0.06% [k] __handle_mm_fault
+ 0.06% [.] __sched_yield
+ 0.05% [k] __schedule
+ 0.04% [.] cfree
+ 0.04% [k] _raw_spin_unlock_irq
+ 0.04% [.] <rayon_core::registry::WorkerThread>::take_local_job
+ 0.04% [k] flush_tlb_mm_range

@@ -1,7 +1,8 @@
 # P1-T5 / T5b: 相手reach全0の枝刈り（2026-10-07）
 
 T5bで既存CFRの並列構造を保つ形に変更した。指定の軽量検証は成功。
-**workspace全試験・大型旧新比較・速度測定はGCPで利用者が実施予定。速度改善は未認定**。
+**2026-10-07追記: GCPでの受入（workspace全試験、4 configの旧新・thread間一致、0.1%到達の速度）は[GCP受入](../gcp-accept-20261007/README.md)で完了した。結果はbit一致のまま0.1%到達が5〜8%短い。**
+以下の「GCPで実施予定」は当時の記述である。
 branch `s3-p1-prune`、基準HEAD `bedfb89`。commit・push・branch操作なし。
 
 ## 計測結果

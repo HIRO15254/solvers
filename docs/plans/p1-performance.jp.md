@@ -20,6 +20,7 @@
 | PF1 | 2026-10-06 | 開始rangeのweightが0のhandは計算対象から外す。weightが正なら大きさによらず残す。weight 0のhandの戦略・EVは出力しない |
 | PF2 | 2026-10-07 | i16の精度床への対策は、regretをi16（現行の量子化）・戦略累積をf32で持つ方式とする（確率的丸め・現状維持は採らない） |
 | PF3 | 2026-10-07 | PF2の方式は`storage`の新しい値として追加し、旧`i16`（両arena i16、memory最小だが精度に限界）も残す |
+| PF4 | 2026-10-07 | DCFRの既定`pow4_reset`を`false`へ変える。明示した`true`は従来どおり使える |
 
 ## 2. 基準測定（2026-10-06、source `43e97c6`）
 
@@ -54,6 +55,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T3b/T3c | `.sol`の戦略blockを保持せず流す（T3b）、その生成を上限付きbatchで並列化（T3c） | payloadがwall_secs以外bit一致。保存作業領域の見積りと規範の同期 |
 | T5 | 相手reachが全て0の部分木で終端評価を省く（`cfr_pass`の軽量経路、評価passの省略） | storage・EV・BR・Exploitabilityが変更前と数値一致（符号付き0の差だけ許す）。thread間一致 |
 | T6 | PF2・PF3のstorage（regret i16＋戦略累積f32）の追加。checkpoint version・memory見積り・規範の更新 | regret配列が旧i16とbit一致、戦略累積がf32と同じ演算。0.1%到達をTurn・GTOWb級の木で示す |
+| T7 | PF4: DCFRの既定`pow4_reset = false`。既定に依存する試験・規範・templateの同期 | 明示`true`が旧既定と、既定が旧の明示`false`とbit一致。実効configが値を明示する |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -86,6 +88,17 @@ payloadはwall_secs以外bit一致。共有PCでは空きcoreが無く速度差�
 575 iteration・1,006秒。hs-dcfr・linear-cfr・cfr-plusはいずれも遅く、DCFR係数の掃引でも一貫して勝る設定は無かったので
 既定は変えない。両arena i16はTurnとgtow_bで0.1%に届かず（最良0.120%・0.292%）、反復を続けると悪化する。
 この対策をPF2・PF3として決めた（試作の比較は[i16精度試作](../../experiments/p1-perf-2026-10/i16-precision-20261007/README.md)）。
+
+T5（[証拠](../../experiments/p1-perf-2026-10/dead-subtree-20261007/README.md)、[GCP受入](../../experiments/p1-perf-2026-10/gcp-accept-20261007/README.md)）: 相手reachが全て0の終端評価と相手nodeの
+regret matchingを省く。GCPで4 configの`.sol` payload・export・progressが変更前・thread数間で一致し、workspace試験も成功した。
+0.1%到達（32 threads）はTurn 14.9→14.3秒、Flop1 60.4→55.9秒、gtow_b 1,023→944秒。
+T3cの`.sol`区間はGCPのgtow_b（4 iteration）で36.7→24.2秒。
+T6（[証拠](../../experiments/p1-perf-2026-10/mixed-storage-20261007/README.md)、[GCP受入](../../experiments/p1-perf-2026-10/gcp-accept-20261007/README.md)）: `storage = "i16-f32avg"`を追加した。
+regretは旧i16とbit一致し、f32/i16の出力は変わらない。0.1%到達はTurn 750 iteration・16.4秒、Flop1 250・68.7秒、
+gtow_b 650・1,299秒（f32は575・1,023秒）。peak RSSは22.4 GB（f32 27.4 GB）、1 iterationはf32より12〜15%長い。
+平均reset無しでは、gtow_bの0.1%到達がf32 575→550、i16-f32avg 650→625 iterationとなり、どの木でも遅くならなかったのでPF4とした。
+allocatorの差し替え（mimalloc・jemalloc・glibc tunables）は効果が無かった。停止後の保存はgtow_bで約122秒（全体の11%）かかり、
+checkpointはcloud diskの書込み速度で決まる（tmpfsでは50.9→11.9秒）。
 
 ### 一致の定義
 

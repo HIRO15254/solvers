@@ -1,0 +1,40 @@
+ 31.80% [.] hu_postflop::kernel::showdown_kernel
+ 23.31% [.] hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>
+ 13.38% [.] hu_postflop::kernel::fold_kernel
+ 9.94% [.] hu_engine::storage::normalize_columns
+ 8.11% [k] smp_call_function_many_cond
+ 2.34% [k] __x2apic_send_IPI_mask
+ 1.63% [k] llist_add_batch
+ 1.54% [.] 0x000000000015354a
+ 0.64% [.] hu_engine::solver::value_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32Storage, hu_engine::solver::no_record, true, true, false>
+ 0.52% [k] native_queued_spin_lock_slowpath
+ 0.37% [k] _raw_spin_unlock_irqrestore
+ 0.30% [.] <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval
+ 0.27% [.] 0x0000000000153509
+ 0.26% [.] 0x0000000000153504
+ 0.26% [k] native_write_msr
+ 0.25% [.] <hu_engine::tree::PublicTree>::map_reach_into
+ 0.24% [.] 0x0000000000153513
+ 0.22% [.] 0x000000000015350e
+ 0.18% [.] <hu_engine::tree::PublicTree>::accumulate_values_with_scratch
+ 0.18% [k] do_user_addr_fault
+ 0.17% [.] hu_engine::solver::parallel_actions
+ 0.16% [k] should_flush_tlb
+ 0.15% [k] clear_page_erms
+ 0.14% [.] rayon::iter::plumbing::bridge_producer_consumer::helper::<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::F32View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>::{closure#2}>>
+ 0.13% [.] <hu_engine::solver::ActionViews<hu_engine::storage::F32View>>::split_for
+ 0.13% [.] 0x0000000000152d8a
+ 0.12% [k] __handle_mm_fault
+ 0.10% [.] crossbeam_epoch::default::with_handle::<crossbeam_epoch::default::pin::{closure#0}, crossbeam_epoch::guard::Guard>
+ 0.10% [k] flush_tlb_mm_range
+ 0.10% [k] _raw_spin_unlock_irq
+ 0.08% [.] 0x00000000001534cd
+ 0.08% [k] wp_page_copy
+ 0.08% [k] _find_next_bit
+ 0.08% [.] rayon_core::join::join_context::<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::F32View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>::{closure#2}>>::{closure#0}, rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::enumerate::EnumerateProducer<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<&mut [f32]>, rayon::vec::DrainProducer<hu_engine::storage::F32View>>>, rayon::iter::for_each::ForEachConsumer<hu_engine::solver::cfr_pass<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>::{closure#2}>>::{closure#1}, (), ()>::{closure#0}
+ 0.06% [k] up_read
+ 0.06% [k] __schedule
+ 0.06% [.] 0x0000000000152c3b
+ 0.06% [.] 0x0000000000153480
+ 0.05% [k] get_page_from_freelist
+ 0.05% [k] down_read_trylock

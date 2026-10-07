@@ -1,5 +1,7 @@
 # P1-T3c `.sol`戦略blockの上限付き並列生成
 
+2026-10-07追記: GCP c2d-highcpu-32（32 threads）のgtow_b・4 iterationで、`.sol`区間はT3b 36.7秒→T3c 24.2秒だった（[GCP受入](../gcp-accept-20261007/README.md)）。以下の「速度を確認できず」は共有PCでの当時の記述である。
+
 2026-10-07。比較元はHEAD `bedfb89636e6027603c703ca3776e20c05c7dea6`（T3b）。branchは`s3-p1-multicore-perf`、新側は未commitの作業ツリー。commit・push・branch操作なし。Linear SOL-15のteam IDとIn Progressを読取確認し、広いT1〜T4の状態は更新していない。
 
 **変更fileと方式**
