@@ -1,7 +1,7 @@
 use anyhow::{Result, ensure};
 use rustc_hash::FxHashMap;
 use serde::Serialize;
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 use crate::trunk::classes::Ordering3;
 use crate::{BettingState, ExternalSamplingGame, FeatureHashAbstraction, HistoryKey, HoldemGame};
@@ -30,7 +30,7 @@ pub struct Terminal {
     /// One uncontested vector, three two-way vectors, or thirteen three-way
     /// vectors. Larger showdowns use the lazily filled ordering cache.
     pub payoffs: Vec<Vec<f64>>,
-    pub(crate) cache: Mutex<FxHashMap<u64, [f64; 9]>>,
+    pub(crate) cache: RwLock<FxHashMap<u64, [f64; 9]>>,
 }
 
 impl Terminal {
@@ -154,7 +154,7 @@ impl Tree {
                 active,
                 state: state.clone(),
                 payoffs: Vec::new(),
-                cache: Mutex::new(FxHashMap::default()),
+                cache: RwLock::new(FxHashMap::default()),
             };
             if matches!(state.phase, HandPhase::Uncontested { .. }) {
                 t.payoffs.push(game.l0_uncontested_utilities(&state)?);

@@ -3,6 +3,7 @@ use nlh::{Card, rank_of};
 use rand::{Rng, RngCore, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
+use rustc_hash::FxHashMap;
 use std::{collections::BTreeMap, time::Instant};
 
 use super::eval::Reach;
@@ -427,12 +428,9 @@ fn sample_value(
                 .collect::<Vec<_>>()
         })
         .collect();
-    // Item-local cache avoids serializing parallel sampling on a terminal lock.
-    let mut cache = t
-        .cache
-        .lock()
-        .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?
-        .clone();
+    // Memoize only this item's patterns; publish shared misses once sampling ends.
+    let mut cache = FxHashMap::default();
+    let mut new_entries = Vec::new();
     let mut total = 0.0;
     for (s, words) in random_words.iter().enumerate() {
         let mut rng = SampleRng {
@@ -479,28 +477,46 @@ fn sample_value(
             pattern |= order << (4 * i);
         }
         if let std::collections::hash_map::Entry::Vacant(entry) = cache.entry(pattern) {
-            let ordering: Vec<_> = (0..t.active.len())
-                .map(|i| ((pattern >> (4 * i)) & 15) as u16)
-                .collect();
-            let u = t.ranked(model.game(), &ordering)?;
-            for (j, &utility) in u.iter().enumerate() {
-                if !t.active.contains(&j) {
-                    ensure!(
-                        utility == t.payoffs[0][j],
-                        "folded payoff depends on ordering"
-                    );
+            let shared = t
+                .cache
+                .read()
+                .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?
+                .get(&pattern)
+                .copied();
+            let payoff = if let Some(payoff) = shared {
+                payoff
+            } else {
+                // The read guard is dropped before computing settlement.
+                let ordering: Vec<_> = (0..t.active.len())
+                    .map(|i| ((pattern >> (4 * i)) & 15) as u16)
+                    .collect();
+                let u = t.ranked(model.game(), &ordering)?;
+                for (j, &utility) in u.iter().enumerate() {
+                    if !t.active.contains(&j) {
+                        ensure!(
+                            utility == t.payoffs[0][j],
+                            "folded payoff depends on ordering"
+                        );
+                    }
                 }
-            }
-            let mut payoff = [0.0; 9];
-            payoff[..u.len()].copy_from_slice(&u);
+                let mut payoff = [0.0; 9];
+                payoff[..u.len()].copy_from_slice(&u);
+                new_entries.push((pattern, payoff));
+                payoff
+            };
             entry.insert(payoff);
         }
         total += cache[&pattern][hero];
     }
-    t.cache
-        .lock()
-        .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?
-        .extend(cache);
+    if !new_entries.is_empty() {
+        let mut shared = t
+            .cache
+            .write()
+            .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?;
+        for (pattern, payoff) in new_entries {
+            shared.entry(pattern).or_insert(payoff);
+        }
+    }
     Ok(mass * (total / random_words.len() as f64))
 }
 
@@ -707,7 +723,7 @@ fn sample_value_reference(
     // Item-local cache avoids serializing parallel sampling on a terminal lock.
     let mut cache = t
         .cache
-        .lock()
+        .read()
         .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?
         .clone();
     let mut total = 0.0;
@@ -775,7 +791,7 @@ fn sample_value_reference(
         total += cache[&pattern][hero];
     }
     t.cache
-        .lock()
+        .write()
         .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?
         .extend(cache);
     // For the model-plan regression words.len() is exactly model K4 samples.

@@ -2083,6 +2083,79 @@ fn three_way_basis_matches_old_contraction_with_residuals_and_zero_mass() {
 }
 
 #[test]
+fn k4_leaf_values_and_cache_patterns_match_cold_warm_and_thread_counts() {
+    use super::eval::reaches;
+    use super::leaves::{K4Plan, leaf_values};
+
+    let game = game(&config(4, true, false).replace("remove call", ""));
+    let tree = Tree::build(&game).unwrap();
+    let parallel_tree = Tree::build(&game).unwrap();
+    assert!(tree.terminal_counts()[4] > 0);
+    let profile = random_profile(&tree, 92);
+    let model = Model::new(
+        &game,
+        &Synthetic,
+        EvaluationOptions {
+            k4_samples: 64,
+            seed: 17,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let reach = reaches(&tree, &profile, &model);
+    let heroes: Vec<_> = (0..tree.seats).collect();
+    let run = |tree: &Tree, threads| {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+            .install(|| leaf_values(tree, &model, &reach, &heroes, K4Plan::model(&model)).unwrap())
+    };
+    let patterns = |tree: &Tree| {
+        tree.nodes
+            .iter()
+            .map(|node| {
+                let mut keys: Vec<_> = node
+                    .terminal
+                    .as_ref()
+                    .map(|t| t.cache.read().unwrap().keys().copied().collect())
+                    .unwrap_or_default();
+                keys.sort_unstable();
+                keys
+            })
+            .collect::<Vec<_>>()
+    };
+    assert!(patterns(&tree).iter().all(Vec::is_empty));
+    assert!(patterns(&parallel_tree).iter().all(Vec::is_empty));
+    let cold = run(&tree, 1);
+    let expected_patterns = patterns(&tree);
+    assert!(expected_patterns.iter().any(|keys| !keys.is_empty()));
+    let warm = run(&tree, 1);
+    assert_eq!(patterns(&tree), expected_patterns);
+    let parallel_cold = run(&parallel_tree, 4);
+    assert_eq!(patterns(&parallel_tree), expected_patterns);
+    let parallel_warm = run(&parallel_tree, 4);
+    assert_eq!(patterns(&parallel_tree), expected_patterns);
+
+    let mut saw_nonzero = false;
+    for (z, node) in tree.nodes.iter().enumerate() {
+        if !node.terminal.as_ref().is_some_and(|t| t.active.len() >= 4) {
+            continue;
+        }
+        for p in 0..tree.seats {
+            for c in 0..169 {
+                let expected = cold.values[p][z][c].to_bits();
+                saw_nonzero |= cold.values[p][z][c] != 0.0;
+                for other in [&warm, &parallel_cold, &parallel_warm] {
+                    assert_eq!(other.values[p][z][c].to_bits(), expected, "{z}/{p}/{c}");
+                }
+            }
+        }
+    }
+    assert!(saw_nonzero);
+}
+
+#[test]
 fn k4_model_plan_is_bit_identical_and_iteration_plans_change_streams() {
     use super::eval::reaches;
     use super::leaves::{K4Plan, SampleReference, k4_reference, leaf_values};
