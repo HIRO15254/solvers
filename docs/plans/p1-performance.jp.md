@@ -21,6 +21,8 @@
 | PF2 | 2026-10-07 | i16の精度床への対策は、regretをi16（現行の量子化）・戦略累積をf32で持つ方式とする（確率的丸め・現状維持は採らない） |
 | PF3 | 2026-10-07 | PF2の方式は`storage`の新しい値として追加し、旧`i16`（両arena i16、memory最小だが精度に限界）も残す |
 | PF4 | 2026-10-07 | DCFRの既定`pow4_reset`を`false`へ変える。明示した`true`は従来どおり使える |
+| PF5 | 2026-10-07 | CFR passの終端kernelとregret matchingをf32で計算することを既定にする。旧版とbit一致する計算も設定で選べるようにする。評価（Exploitability・EV・BR）はf64のまま |
+| PF6 | 2026-10-07 | PF5の設定は`[solver] cfr_precision`、値は`"f32"`（既定）と`"f64"`（旧版とbit一致） |
 
 ## 2. 基準測定（2026-10-06、source `43e97c6`）
 
@@ -56,6 +58,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T5 | 相手reachが全て0の部分木で終端評価を省く（`cfr_pass`の軽量経路、評価passの省略） | storage・EV・BR・Exploitabilityが変更前と数値一致（符号付き0の差だけ許す）。thread間一致 |
 | T6 | PF2・PF3のstorage（regret i16＋戦略累積f32）の追加。checkpoint version・memory見積り・規範の更新 | regret配列が旧i16とbit一致、戦略累積がf32と同じ演算。0.1%到達をTurn・GTOWb級の木で示す |
 | T7 | PF4: DCFRの既定`pow4_reset = false`。既定に依存する試験・規範・templateの同期 | 明示`true`が旧既定と、既定が旧の明示`false`とbit一致。実効configが値を明示する |
+| T9 | PF5・PF6: `cfr_precision`の追加（既定f32）。互換hashから除き、旧runを再開できるようにする。規範・templateの同期 | `"f64"`が旧版とbit一致。f32のthread間bit一致。評価がf64。旧runのresume |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -101,12 +104,17 @@ allocatorの差し替え（mimalloc・jemalloc・glibc tunables）は効果が�
 checkpointはcloud diskの書込み速度で決まる（tmpfsでは50.9→11.9秒）。
 T7: PF4を実装した。旧版の未指定と新版の`pow4_reset = true`、旧版の`false`と新版の未指定が、`.sol` payload（wall_secs以外）と`export`で一致する。
 実効configが値を明示保存するので、旧既定のrun・checkpoint・solutionは保存値で再開・照会できる。凍結oracleとの差分試験はtrueを明示して従来の期待値を保つ。
+T8（[証拠](../../experiments/p1-perf-2026-10/cfr-precision-20261007/README.md)）: CFR passの終端kernelとregret matchingをf32にする試作を、
+環境変数で切り替えてGCPで測った。1 iterationは32 threadsで9〜10%短く、0.1%到達はTurn 14.2→12.3秒、Flop1 55.7→48.8秒、
+gtow_b 912→720秒。0.01%台までの曲線に劣化は無く、thread間でbit一致した。これを根拠にPF5・PF6とした（T9）。
+加算順序を保ったまま同順位groupを1回で走査する案（T8a）は、bit一致したが32 threadsで最大2.5%、1 threadでは最大8%遅く、採らない。
 
 ### 一致の定義
 
 同じconfig・反復数で、変更前後の`solvers solve`の結果（`export summary`・`strategy`・`ev`）を比べる。
 weightが正のhandの戦略・EV・`nashConv`がbit一致、少なくとも相対1e-6以内とする。
 浮動小数点の演算順序を変える最適化（f32化、逆数の乗算等）は一致の扱いを別に定めてから行う。
+PF5のf32計算では、旧版とのbit一致の代わりに、同じbinary・同じ入力でthread数によらずbit一致すること、`cfr_precision = "f64"`が旧版とbit一致することを受入条件にする。
 
 ## 4. 計測
 
