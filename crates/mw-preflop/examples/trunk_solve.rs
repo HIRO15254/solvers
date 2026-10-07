@@ -34,6 +34,7 @@ fn main() -> Result<()> {
     let mut t3_seed = 0;
     let mut model_options = EvaluationOptions::default();
     let mut options = SolveOptions::default();
+    let mut beta = None;
     let mut threads = None;
     let mut print_every = 0;
     let mut output = None;
@@ -42,7 +43,7 @@ fn main() -> Result<()> {
     while let Some(arg) = args.next() {
         if arg == "--help" {
             println!(
-                "trunk_solve --config TOML [--leaf-model l0|l1] [--ehs2-cache PATH (required for l1)] [--l1-boards 1] [--l1-seed 0] [--l1-eval-boards 1024 (even, >=2)] [--l1-eval-seed 0] [--l1-train-control false] [--l1-eval-control false] [--l1-sampling random|stratified] [--l1-eval-sampling random|stratified] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--solver-k4-samples N] [--solver-k4-min-samples M (requires N)] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON]\n--k4-samples and --seed define the model/evaluator; solver K4 flags use iteration-varying samples only during solving."
+                "trunk_solve --config TOML [--leaf-model l0|l1] [--ehs2-cache PATH (required for l1)] [--l1-boards 32] [--l1-seed 0] [--l1-eval-boards 1024 (even, >=2)] [--l1-eval-seed 0] [--l1-train-control true] [--l1-train-regression true] [--l1-eval-control true] [--l1-eval-regression true] [--l1-sampling random|stratified (stratified)] [--l1-eval-sampling random|stratified (random)] [--l1-postflop-beta 0] [--tables-dir PATH] [--t3-samples 4096] [--t3-seed 0] [--k4-samples 2048] [--seed 0] [--solver-k4-samples N] [--solver-k4-min-samples M (requires N)] [--threads N] [--iterations 1000] [--eval-every 100] [--target-nash-conv X] [--alpha 1.5] [--beta 0 (l0) / 1 (l1)] [--gamma 2] [--print-every 0] [--output JSON] [--output-profile JSON]\n--k4-samples and --seed define the model/evaluator; solver K4 flags use iteration-varying samples only during solving."
             );
             return Ok(());
         }
@@ -57,9 +58,12 @@ fn main() -> Result<()> {
             "--l1-eval-boards" => l1_options.l1_eval_boards = value.parse()?,
             "--l1-eval-seed" => l1_options.l1_eval_seed = value.parse()?,
             "--l1-train-control" => l1_options.l1_train_control = value.parse()?,
+            "--l1-train-regression" => l1_options.l1_train_regression = value.parse()?,
             "--l1-eval-control" => l1_options.l1_eval_control = value.parse()?,
+            "--l1-eval-regression" => l1_options.l1_eval_regression = value.parse()?,
             "--l1-sampling" => l1_options.l1_sampling = sampling(&value)?,
             "--l1-eval-sampling" => l1_options.l1_eval_sampling = sampling(&value)?,
+            "--l1-postflop-beta" => l1_options.l1_postflop_beta = value.parse()?,
             "--config" => config = Some(PathBuf::from(value)),
             "--tables-dir" => tables_dir = value.into(),
             "--t3-samples" => t3_samples = value.parse()?,
@@ -73,7 +77,7 @@ fn main() -> Result<()> {
             "--eval-every" => options.eval_every = value.parse()?,
             "--target-nash-conv" => options.target_nash_conv = Some(value.parse()?),
             "--alpha" => options.alpha = value.parse()?,
-            "--beta" => options.beta = value.parse()?,
+            "--beta" => beta = Some(value.parse()?),
             "--gamma" => options.gamma = value.parse()?,
             "--print-every" => print_every = value.parse::<u64>()?,
             "--output" => output = Some(PathBuf::from(value)),
@@ -95,6 +99,13 @@ fn main() -> Result<()> {
         leaf_model == "l0" || leaf_model == "l1",
         "--leaf-model must be l0 or l1"
     );
+    // The leaf models' own defaults; --beta overrides either.
+    if leaf_model == "l1" {
+        options.beta = l1_options.trunk.beta;
+    }
+    if let Some(beta) = beta {
+        options.beta = beta;
+    }
     ensure!(
         leaf_model != "l1" || ehs2_cache.is_some(),
         "--ehs2-cache is required for l1"

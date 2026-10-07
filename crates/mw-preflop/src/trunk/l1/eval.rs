@@ -168,7 +168,12 @@ pub fn evaluate(
     strategies: &Strategies,
     boards: &[Board],
     control: bool,
+    regression: bool,
 ) -> Result<Evaluation> {
+    ensure!(
+        !regression || control,
+        "regression needs the control variate"
+    );
     ensure!(
         boards.len() >= 2 && boards.len().is_multiple_of(2),
         "L1 evaluation boards must be even and >= 2"
@@ -207,6 +212,9 @@ pub fn evaluate(
                 let (opponent, own, scale) = inputs(tree, model, &reach[z], z, p);
                 let mut sigma = [[0.0; 169]; 2];
                 let mut beta = [[0.0; 169]; 2];
+                // Per half: sums of checkdown, its square, and its products
+                // with the primary and auxiliary differences.
+                let mut moments = [[[0.0; 169]; 2]; 4];
                 if opponent.iter().any(|&r| r != 0.0) {
                     let chunks: Vec<_> = boards
                         .par_chunks(CHUNK)
@@ -214,6 +222,7 @@ pub fn evaluate(
                         .map_init(Scratch::default, |scratch, (i, chunk)| {
                             let mut sigma = [[0.0; 169]; 2];
                             let mut beta = [[0.0; 169]; 2];
+                            let mut moments = [[[0.0; 169]; 2]; 4];
                             for (k, board) in chunk.iter().enumerate() {
                                 let j = i * CHUNK + k;
                                 scratch.pass(
@@ -242,31 +251,56 @@ pub fn evaluate(
                                     sigma[j % 2][c] += (s[c] - checkdown[c]) / half;
                                     beta[j % 2][c] += (b[c] - checkdown[c]) / half;
                                 }
+                                if regression {
+                                    let m = &mut moments;
+                                    for c in 0..169 {
+                                        let x = checkdown[c];
+                                        m[0][j % 2][c] += x;
+                                        m[1][j % 2][c] += x * x;
+                                        m[2][j % 2][c] += (s[c] - x) * x;
+                                        m[3][j % 2][c] += (b[c] - x) * x;
+                                    }
+                                }
                             }
-                            (sigma, beta)
+                            (sigma, beta, moments)
                         })
                         .collect();
                     let mut chunks = chunks.into_iter();
-                    (sigma, beta) = chunks.next().unwrap();
-                    for (s, b) in chunks {
+                    (sigma, beta, moments) = chunks.next().unwrap();
+                    for (s, b, m) in chunks {
                         for h in 0..2 {
                             for c in 0..169 {
                                 sigma[h][c] += s[h][c];
                                 beta[h][c] += b[h][c];
+                                for k in 0..4 {
+                                    moments[k][h][c] += m[k][h][c];
+                                }
                             }
                         }
                     }
                 }
-                Some((z, sigma, beta))
+                Some((z, sigma, beta, moments))
             })
             .collect();
-        for (z, s, b) in output.into_iter().flatten() {
+        let n = (boards.len() / 2) as f64;
+        for (z, s, b, m) in output.into_iter().flatten() {
             for h in 0..2 {
                 if control {
-                    // leaf_values left the exact checkdown value here.
+                    // leaf_values left the exact checkdown value (T2) here.
                     for c in 0..169 {
+                        let t2 = sigma[h][z][c];
                         sigma[h][z][c] += s[h][c];
                         beta[h][z][c] += b[h][c];
+                        // Regression: mean(L1) - beta (mean(checkdown) - T2) with
+                        // beta = Cov(L1, checkdown) / Var(checkdown) from this half.
+                        let mean = m[0][h][c] / n;
+                        let variance = m[1][h][c] / n - mean * mean;
+                        if regression && variance > 1e-12 * (m[1][h][c] / n) {
+                            let primary = (m[2][h][c] / n - s[h][c] * mean) / variance;
+                            let auxiliary = (m[3][h][c] / n - b[h][c] * mean) / variance;
+                            sigma[h][z][c] -= primary * (mean - t2);
+                            beta[h][z][c] -= auxiliary * (mean - t2);
+                        }
                     }
                 } else {
                     sigma[h][z] = s[h];

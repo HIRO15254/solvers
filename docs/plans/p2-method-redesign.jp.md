@@ -44,8 +44,13 @@ P2D1〜P2D6は2026-10-06、P2D7とP2D8は2026-10-07の決定である。
     3人以上では第3.2節のcard removalの近似を含む。
   - L1: 2人でFlopへ行き、両者にstackが残るleafの抽象化Postflop。木は入力のPostflop menuで作る。戦略はstreetごとの
     EHS² percentile bucket（暫定方式の表。現在のstreetのbucketだけを見て、boardは区別しない）で持つ。iterationごとに
-    5枚のboardをsampleして全L1 leafで共有し、両者の1,326 combo vectorでregretを更新して、classの値をtrunkへ返す
-    （trunkと同じDCFR）。3人以上でFlopへ行くleaf（P2D2）と2人のall-inはL0で評価する。chip EVだけを扱い、ICMはS4-4で扱う。
+    5枚のboardを複数（既定は32枚）、層別に（flopを重みどおりに均等に、その中でturnとriverを均等に）sampleして全L1 leafで
+    共有し、boardごとに両者の1,326 combo vectorでregretを更新する（trunkと同じDCFR）。trunkへ返すclassの値は、L0の
+    checkdownの厳密な値（T2）に、sampleしたboardでのL1とcheckdownの差の平均を足したもの（control variate）とし、
+    checkdownの標本平均とT2の差に、過去のiterationで当てはめた回帰係数を掛けて引く。L1を含む木では、trunkのDCFRの
+    負のregretの割引の指数βを1とする（L0の木とPostflopの戦略は0）。S4-2aのB6で、trunkがboardの標本のばらつきに
+    追従しにくくなり、主指標が約半分になった。Postflopも1にすると、主指標は変わらず補助指標が増えた。
+    3人以上でFlopへ行くleaf（P2D2）と2人のall-inはL0で評価する。chip EVだけを扱い、ICMはS4-4で扱う。
   - L2: P1で代表的なleafを解いて比べる検証・較正（P2D3により当面は対象外）。
 - **品質指標**: leaf modelを含むモデルの中で、各seatの最適応答を全幅で厳密に計算し、
   `g_i = BR_i(σ_-i) − u_i(σ)`と`NashConv`を出力と停止判定に使う。L1を含む木では第3.3節のとおりMonte Carlo推定になる（P2D8）。
@@ -77,7 +82,8 @@ range weightの積に比例し、heroと各相手のcardが重ならないこと
 - L1を含む木（P2D8）: 主指標はPostflopの平均戦略を固定したPreflopの逸脱だけの利得、補助指標はPostflopでも
   応答者が実際のboardと手札を見て最適に打つ場合の利得である。L1 leafの値は固定seedの評価用boardで推定するので、
   同じboardで最適応答を求めた値（上振れする）と、boardを半分に分けて一方で求めた最適応答をもう一方で評価した値
-  （下振れする）を併記する。評価用boardはcheckpoint間で共通にする。
+  （下振れする）を併記する。評価用boardはcheckpoint間で共通にする。L1 leafの値は、半分のboardごとに学習と同じ
+  control variate（回帰係数はその半分で当てはめる）で推定する。
 
 ## 4. benchmark
 
@@ -103,7 +109,7 @@ B1・B2・B4〜B7の入力は、使う段階で`examples/bench/`に追加する�
 | **S4-1a2** | L0の誤差の測定。同じclass profileを入力のゲーム（全seatの手札が重ならない配札。foldしたseatのcardもboardから除く）でMonte Carlo評価してL0と比べる。S4-1bより先に行う（2026-10-06の利用者判断） | B1でL0の厳密な値と標準誤差の範囲で一致。B3の4つの解と一様なprofileで、seat別の値の差（Preflop終端の人数別の内訳つき）と、L0の最適応答を入力のゲームで使ったときの利得を記録 |
 | **S4-1a3** | 入力のゲームでのclass単位の最適応答をMonte Carloで求める。ある配札で最適応答を求め、別の配札で評価する。暫定方式の解の、入力のゲームでの利得を上下から挟む。S4-1bの解を入力のゲームで評価するのにも使う（2026-10-06の利用者判断） | testで、求めた最適応答の同じ配札での値が配札ごとの評価と一致し、1つの(node, class)の行動を変えても値が増えない。B1で、求めた最適応答の利得がL0の厳密な利得と矛盾しない。B3の4つの解で、seat別の利得の下限（別の配札での評価）と上振れした推定（同じ配札での値）を記録 |
 | **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装。L0の`NashConv`が妥当と仮定し、S4-1a3の結論を待たずに並行して着手する（2026-10-06の利用者判断）。S4-1a3で妥当でないと分かれば、完了条件の指標を見直す | B1の3つのstackで`NashConv`が1×10⁻⁴ bb/hand以下（2026-10-06の利用者判断）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録。後半（S4-1b-2）で、値を変えない計算の整理とP2D7の近似により1 iterationを短くする |
-| **S4-2a** | L1の核と評価器。Flopで木を切り、2人でFlopへ行くleafにPostflopの抽象化木を付けて、trunkと同じiterationで更新する。P2D8の主指標と補助指標を測る評価器。Postflopの判断が残る入力をL0で解くmode（Flop以降をcheckdownとみなす）も作る。B6で試す | (1) 固定したboardで、vectorの計算が手札の組を総当たりする参照実装と一致する。checkだけを選ぶPostflop戦略のL1の値が、全boardの平均でL0と一致する。L0のmodeで解いたB7がB3とbit一致する (2) B6で主指標がiterationとともに下がり、評価用boardによる推定の幅（上振れと下振れの差）の程度まで届く。数値目標は初回の測定を見て利用者と決める (3) B6のL0とL1の解の差、1 iterationの時間、評価の時間を記録 |
+| **S4-2a** | L1の核と評価器。Flopで木を切り、2人でFlopへ行くleafにPostflopの抽象化木を付けて、trunkと同じiterationで更新する。P2D8の主指標と補助指標を測る評価器。Postflopの判断が残る入力をL0で解くmode（Flop以降をcheckdownとみなす）も作る。B6で試す | (1) 固定したboardで、vectorの計算が手札の組を総当たりする参照実装と一致する。checkだけを選ぶPostflop戦略のL1の値が、全boardの平均でL0と一致する。L0のmodeで解いたB7がB3とbit一致する (2) B6で主指標がiterationとともに下がり、2000 iteration以内に、評価用4096 boardの上振れする値（同じboardで最適応答を求めた値）が0.005 bb/hand以下になる（2026-10-07の利用者判断） (3) B6のL0とL1の解の差、1 iterationの時間、評価の時間を記録 |
 | **S4-2b** | 6maxのL1。B7とB4 Simpleの元の木を解く | P2D5の予算（L1の木で1〜数時間）で主指標の推移を記録。L0とL1の解の差を記録。B4 Simpleのopenのclass表を、GTO Wizard参照・L0の解・暫定方式の記録と並べる（sanity check）。合否の基準はS4-2bの着手時に決める |
 | **S4-3** | 製品の切替 | `.mwsol` v5（Preflopだけ）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
 | **S4-4** | 9max・ICM・straddle、bunchingの補正、GUI | B5が予算内で解ける。bunchingの影響を暫定方式（同時配札）と比べて記録 |
@@ -126,5 +132,5 @@ Linearの子Issueは着手が近い段階から作り、先の段階をまとめ
 | 3人以上のleafの費用 | S4-1bでのB4の1 iteration時間 | batch化とreachの小さいleafの省略でも1 iterationが10秒を超えるなら、4人以上のleafの扱いを見直す |
 | 3人以上でCFRが収束しない | S4-1bの`NashConv`の推移 | 下がらなければ別の更新則（fictitious play系など）を試す |
 | bunchingの近似 | S4-4の比較 | 差が大きければ補正を入れる |
-| L1のboardのsampleでtrunkの値がばらつき、収束しない | S4-2aのB6での主指標の推移 | 1 iterationで使うboardを増やす。それでも下がらなければL1の値の扱い（iteration間の平均など）を見直す |
+| L1のboardのsampleでtrunkの値がばらつき、収束しない | S4-2aのB6での主指標の推移 | 1 iterationで使うboardを増やす。それでも下がらなければL1の値の扱い（iteration間の平均など）を見直す。S4-2aでは、boardを増やし、層別のsample、control variateと回帰係数、trunkのβ = 1を採用した（第3.1節）。iteration間の平均はβ = 1と同程度に効いたが、併用しても下がらなかったので採らなかった |
 | 指標がモデル内に限られる | L0と入力のゲームの差（S4-1a2）、入力のゲームでの最適応答（S4-1a3）、L0とL1の差（S4-2） | L0の最適応答が入力のゲームで利得を生まないなら、L0の配札の近似を見直す。L1のbucketによる誤差は補助指標（P2D8）で目安だけを示し、P1との比較は当面行わない（P2D3）。必要になったらL2を作る |

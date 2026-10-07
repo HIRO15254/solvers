@@ -518,7 +518,7 @@ fn evaluator_matches_training_leaf_values_with_folded_seat_masses() {
         }
         let board = fixed("As 4d 5h 6c 7s");
         let boards = [Board::new(board, &Buckets), Board::new(board, &Buckets)];
-        let evaluation = evaluate(&t, &profile, &m, &strategies, &boards, false).unwrap();
+        let evaluation = evaluate(&t, &profile, &m, &strategies, &boards, false, false).unwrap();
         let mut leaves = leaf_values(
             &t,
             &m,
@@ -615,7 +615,7 @@ fn control_variate_with_check_only_postflop_reproduces_l0_checkdown() {
             &m,
         )
         .unwrap();
-        let observed = evaluate(&t, &profile, &m, &strategies, &boards, true).unwrap();
+        let observed = evaluate(&t, &profile, &m, &strategies, &boards, true, false).unwrap();
         for (o, e) in observed.seats.iter().zip(&expected.seats) {
             close(o.value, e.value);
             close(o.value_a, e.value);
@@ -624,7 +624,11 @@ fn control_variate_with_check_only_postflop_reproduces_l0_checkdown() {
             close(o.held_gain, e.gain);
         }
         close(observed.nash_conv, expected.nash_conv);
-        let plain = evaluate(&t, &profile, &m, &strategies, &boards, false).unwrap();
+        let plain = evaluate(&t, &profile, &m, &strategies, &boards, false, false).unwrap();
+        // With check-only play L1 equals the checkdown on every board, so any
+        // fitted coefficient leaves the exact baseline.
+        let fitted = evaluate(&t, &profile, &m, &strategies, &boards, true, true).unwrap();
+        close(fitted.nash_conv, expected.nash_conv);
         assert!((plain.nash_conv - expected.nash_conv).abs() > 1e-6);
     }
 }
@@ -714,7 +718,10 @@ fn solve_is_deterministic_across_threads_and_seed_changes_results() {
                         l1_eval_boards: 20,
                         l1_seed: seed,
                         l1_train_control: true,
+                        l1_train_regression: true,
+                        l1_postflop_beta: 0.5,
                         l1_eval_control: true,
+                        l1_eval_regression: true,
                         l1_sampling: Sampling::Stratified,
                         ..Default::default()
                     },
@@ -751,19 +758,26 @@ fn solve_is_deterministic_across_threads_and_seed_changes_results() {
             .zip(c.postflop.leaves)
             .any(|(a, c)| a.regrets != c.regrets)
     );
-    for count in [0, 1, 3] {
+    let invalid = [0, 1, 3]
+        .map(|count| Options {
+            l1_eval_boards: count,
+            ..Default::default()
+        })
+        .into_iter()
+        .chain([
+            Options {
+                l1_train_control: false,
+                ..Default::default()
+            },
+            Options {
+                l1_eval_control: false,
+                ..Default::default()
+            },
+        ]);
+    for options in invalid {
         assert!(
-            solve(
-                &t,
-                &m,
-                &Buckets,
-                Options {
-                    l1_eval_boards: count,
-                    ..Default::default()
-                },
-                |_| {}
-            )
-            .is_err()
+            solve(&t, &m, &Buckets, options, |_| {}).is_err(),
+            "{options:?}"
         );
     }
 }
@@ -788,8 +802,14 @@ fn primary_nash_conv_convergence_smoke() {
                         eval_every: 100,
                         ..Default::default()
                     },
+                    // The plain estimator: random boards' L1 values, no control variates.
                     l1_eval_boards: 16,
                     l1_boards: 2,
+                    l1_train_control: false,
+                    l1_train_regression: false,
+                    l1_eval_control: false,
+                    l1_eval_regression: false,
+                    l1_sampling: Sampling::Random,
                     ..Default::default()
                 },
                 |_| {},
@@ -803,10 +823,12 @@ fn primary_nash_conv_convergence_smoke() {
 }
 
 #[test]
-fn control_variate_solve_converges() {
+fn default_settings_solve_converges() {
     let g = game(&config(2, false));
     let t = Tree::build_with(&g, FlopLeaves::L1).unwrap();
     let m = Model::new(&g, &Synthetic, EvaluationOptions::default()).unwrap();
+    let defaults = Options::default();
+    assert_eq!(defaults.trunk.beta, 1.0);
     let solution = solve(
         &t,
         &m,
@@ -815,19 +837,19 @@ fn control_variate_solve_converges() {
             trunk: SolveOptions {
                 iterations: 100,
                 eval_every: 100,
-                ..Default::default()
+                ..defaults.trunk
             },
+            // Fewer boards than the default keep the test short.
+            l1_boards: 8,
             l1_eval_boards: 16,
-            l1_train_control: true,
-            l1_eval_control: true,
-            ..Default::default()
+            ..defaults
         },
         |_| {},
     )
     .unwrap();
     let initial = solution.checkpoints[0].evaluation.nash_conv;
     let end = solution.checkpoints.last().unwrap().evaluation.nash_conv;
-    eprintln!("L1 control-variate smoke: {initial:.12} -> {end:.12}");
+    eprintln!("L1 default-settings smoke: {initial:.12} -> {end:.12}");
     assert!(end < initial * 0.25, "{initial} -> {end}");
 }
 
@@ -872,4 +894,125 @@ fn stratified_boards_cover_turns_and_rivers_uniformly() {
     let a = boards(&Buckets, b"test", 3, Some(1), 8, Sampling::Stratified);
     let b = boards(&Buckets, b"test", 3, Some(2), 8, Sampling::Stratified);
     assert_ne!(a[0].cards, b[0].cards);
+}
+
+#[test]
+fn regression_control_matches_per_board_reference() {
+    use super::cards::boards;
+    use crate::trunk::l0::{
+        leaves::{K4Plan, leaf_values},
+        solve::backward_values,
+    };
+    for players in [2, 3] {
+        let g = game(&config(players, false));
+        let t = Tree::build_with(&g, FlopLeaves::L1).unwrap();
+        let m = Model::new(&g, &Synthetic, EvaluationOptions::default()).unwrap();
+        let mut document = Profile::uniform(&t).export(&t);
+        let mut rng = ChaCha8Rng::seed_from_u64(83);
+        for node in &mut document.nodes {
+            for row in &mut node.probabilities {
+                for p in row {
+                    *p = rng.gen_range(0.01..1.0);
+                }
+            }
+        }
+        let profile = Profile::from_json(&t, &document).unwrap();
+        let reach = reaches(&t, &profile, &m);
+        let mut strategies = Strategies::new(&t, &Buckets);
+        for storage in &mut strategies.leaves {
+            for s in &mut storage.sums {
+                *s = rng.gen_range(0.01..1.0);
+            }
+        }
+        let sample = boards(&Buckets, b"regression", 5, None, 12, Sampling::Random);
+        let evaluation = evaluate(&t, &profile, &m, &strategies, &sample, true, true).unwrap();
+        let unit = evaluate(&t, &profile, &m, &strategies, &sample, true, false).unwrap();
+        assert!(
+            evaluation
+                .seats
+                .iter()
+                .zip(&unit.seats)
+                .any(|(a, b)| (a.value_a - b.value_a).abs() > 1e-9)
+        );
+        let base = leaf_values(
+            &t,
+            &m,
+            &reach,
+            &(0..players).collect::<Vec<_>>(),
+            K4Plan::model(&m),
+        )
+        .unwrap()
+        .values;
+        for (p, base) in base.into_iter().enumerate() {
+            let mut halves = [base.clone(), base];
+            let mut scratch = Scratch::default();
+            for storage in &strategies.leaves {
+                let z = storage.terminal;
+                let terminal = t.nodes[z].terminal.as_ref().unwrap();
+                let subtree = terminal.l1.as_ref().unwrap();
+                if !subtree.active.contains(&p) {
+                    continue;
+                }
+                let rows = storage.profile(subtree, true);
+                let (opponent, own, scale) = inputs(&t, &m, &reach[z], z, p);
+                let mut values = [Vec::new(), Vec::new()];
+                for (j, board) in sample.iter().enumerate() {
+                    scratch.pass(
+                        &Pass {
+                            tree: subtree,
+                            storage,
+                            rows: &rows,
+                            board,
+                            hero: p,
+                            opponent: &opponent,
+                            own: &own,
+                            scale: &scale,
+                            auxiliary: false,
+                        },
+                        None,
+                    );
+                    let s = class_values(&scratch.values, &scale);
+                    let x = scratch.checkdown(board, terminal, p, &opponent, &scale);
+                    values[j % 2].push((s, x));
+                }
+                for (h, half) in values.iter().enumerate() {
+                    let n = half.len() as f64;
+                    for c in 0..169 {
+                        let t2 = halves[h][z][c];
+                        let ms = half.iter().map(|(s, _)| s[c]).sum::<f64>() / n;
+                        let mx = half.iter().map(|(_, x)| x[c]).sum::<f64>() / n;
+                        let var = half.iter().map(|(_, x)| (x[c] - mx).powi(2)).sum::<f64>() / n;
+                        let cov = half
+                            .iter()
+                            .map(|(s, x)| (s[c] - ms) * (x[c] - mx))
+                            .sum::<f64>()
+                            / n;
+                        let second = half.iter().map(|(_, x)| x[c] * x[c]).sum::<f64>() / n;
+                        halves[h][z][c] = if var > 1e-12 * second {
+                            ms - cov / var * (mx - t2)
+                        } else {
+                            t2 + ms - mx
+                        };
+                    }
+                }
+            }
+            for (h, values) in halves.iter_mut().enumerate() {
+                backward_values(&t, &profile, &m.support[p], p, values);
+                let value = m.support[p]
+                    .iter()
+                    .map(|&c| Classes::get().n(c) as f64 * m.weights[p][c] * values[0][c])
+                    .sum::<f64>()
+                    / m.normalizers[p];
+                let observed = if h == 0 {
+                    evaluation.seats[p].value_a
+                } else {
+                    evaluation.seats[p].value_b
+                };
+                assert!(
+                    (value - observed).abs() <= 1e-9 * value.abs().max(1.0),
+                    "seat {p} half {h}: {value} != {observed}"
+                );
+            }
+        }
+    }
 }
