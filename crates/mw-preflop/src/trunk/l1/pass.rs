@@ -112,6 +112,10 @@ pub(crate) struct Scratch {
     pub(crate) values: Vec<f64>,
     pub(crate) best: Vec<f64>,
     checkdown: Vec<f64>,
+    /// The opponent's total mass per depth, valid while `fresh`: terminals
+    /// that share an opponent slab (a hero's fold and call, say) sum it once.
+    totals: Vec<Mass>,
+    fresh: Vec<bool>,
 }
 
 /// One pass's inputs and its slab layout.
@@ -149,9 +153,17 @@ fn compensated_add(sum: &mut f64, correction: &mut f64, value: f64) {
 }
 
 impl Mass {
-    fn add(&mut self, h: usize, value: f64) {
+    /// The opponent's reach summed over the board's live combos.
+    fn of(board: &Board, catalog: &Classes, opponent: &[f64]) -> Self {
+        let mut total = Self::default();
+        for &h in &board.sorted {
+            total.add(catalog, h, opponent[h]);
+        }
+        total
+    }
+    fn add(&mut self, catalog: &Classes, h: usize, value: f64) {
         compensated_add(&mut self.total, &mut self.correction, value);
-        for c in Classes::get().cards(h) {
+        for c in catalog.cards(h) {
             compensated_add(
                 &mut self.cards[c.index()],
                 &mut self.card_corrections[c.index()],
@@ -159,8 +171,8 @@ impl Mass {
             );
         }
     }
-    fn disjoint(&self, h: usize) -> f64 {
-        let [a, b] = Classes::get().cards(h);
+    fn disjoint(&self, catalog: &Classes, h: usize) -> f64 {
+        let [a, b] = catalog.cards(h);
         self.total - self.cards[a.index()] - self.cards[b.index()]
     }
 }
@@ -173,14 +185,29 @@ pub(crate) fn terminal_values(
     local: usize,
     output: &mut [f64],
 ) {
+    let catalog = Classes::get();
+    let total = Mass::of(board, catalog, opponent);
+    settle(
+        board, catalog, &total, opponent, payoffs, hero, local, output,
+    );
+}
+
+/// [`terminal_values`] given the opponent's total mass.
+#[allow(clippy::too_many_arguments)]
+fn settle(
+    board: &Board,
+    catalog: &Classes,
+    total: &Mass,
+    opponent: &[f64],
+    payoffs: &[Vec<f64>],
+    hero: usize,
+    local: usize,
+    output: &mut [f64],
+) {
     output.fill(0.0);
-    let mut total = Mass::default();
-    for &h in &board.sorted {
-        total.add(h, opponent[h]);
-    }
     if payoffs.len() == 1 {
         for &h in &board.sorted {
-            output[h] = (total.disjoint(h) + opponent[h]) * payoffs[0][hero];
+            output[h] = (total.disjoint(catalog, h) + opponent[h]) * payoffs[0][hero];
         }
         return;
     }
@@ -191,12 +218,12 @@ pub(crate) fn terminal_values(
     for &(start, end) in &board.groups {
         let mut equal = Mass::default();
         for &h in &board.sorted[start..end] {
-            equal.add(h, opponent[h]);
+            equal.add(catalog, h, opponent[h]);
         }
         for &h in &board.sorted[start..end] {
-            let w = lower.disjoint(h);
-            let t = equal.disjoint(h) + opponent[h];
-            let l = total.disjoint(h) + opponent[h] - w - t;
+            let w = lower.disjoint(catalog, h);
+            let t = equal.disjoint(catalog, h) + opponent[h];
+            let l = total.disjoint(catalog, h) + opponent[h] - w - t;
             output[h] = win * w + tie * t + lose * l;
         }
         compensated_add(&mut lower.total, &mut lower.correction, equal.total);
@@ -265,6 +292,7 @@ impl Scratch {
         self.grow(&walk, 0);
         self.opponent[..NUM_COMBOS].copy_from_slice(pass.opponent);
         self.own[..NUM_COMBOS].copy_from_slice(pass.own);
+        self.fresh[0] = false;
         self.visit(&walk, &mut updates, 0, 0, [0, 0], 0);
         // Overlapping hero combos contribute zero even when scratch was reused.
         for h in 0..NUM_COMBOS {
@@ -283,6 +311,8 @@ impl Scratch {
         if self.opponent.len() < reach {
             self.opponent.resize(reach, 0.0);
             self.own.resize(reach, 0.0);
+            self.totals.resize(depth + 1, Mass::default());
+            self.fresh.resize(depth + 1, false);
         }
         let values = (depth + 2) * walk.width * NUM_COMBOS;
         if self.values.len() < values {
@@ -321,9 +351,18 @@ impl Scratch {
         let local = walk.local;
         let n = &tree.nodes[z];
         if n.actor.is_none() {
-            terminal_values(
+            let catalog = Classes::get();
+            let slab = &self.opponent[opponent..opponent + NUM_COMBOS];
+            let d = opponent / NUM_COMBOS;
+            if !self.fresh[d] {
+                self.totals[d] = Mass::of(board, catalog, slab);
+                self.fresh[d] = true;
+            }
+            settle(
                 board,
-                &self.opponent[opponent..opponent + NUM_COMBOS],
+                catalog,
+                &self.totals[d],
+                slab,
                 &n.payoffs,
                 hero,
                 local,
@@ -350,6 +389,9 @@ impl Scratch {
             };
             for &h in &board.sorted {
                 slab[next + h] = slab[from + h] * rows[offset + buckets[h] as usize * k + a];
+            }
+            if !mine {
+                self.fresh[depth + 1] = false;
             }
             let reach = if mine { [opponent, next] } else { [next, own] };
             self.visit(
