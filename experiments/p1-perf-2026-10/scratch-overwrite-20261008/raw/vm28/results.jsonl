@@ -1,0 +1,8 @@
+{"tag": "c_turn2_f64_t21", "side": "t21", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.474, "iterations": 247, "wallSecs": 0.399718318, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_f64_t23", "side": "t23", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.467, "iterations": 247, "wallSecs": 0.393093778, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_t21", "side": "t21", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.383, "iterations": 235, "wallSecs": 0.311583019, "nashConv": 0.04428407393998057}
+{"tag": "c_turn2_t23", "side": "t23", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.378, "iterations": 235, "wallSecs": 0.305693019, "nashConv": 0.04428407393998057}
+{"tag": "c_flop1_t21", "side": "t21", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 30.356, "iterations": 184, "wallSecs": 22.256191552, "nashConv": 0.010765295636889216}
+{"tag": "c_flop1_t23", "side": "t23", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 30.003, "iterations": 184, "wallSecs": 21.855369339, "nashConv": 0.010765295636889216}
+{"tag": "c_gtowb_t21", "side": "t21", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 326.601, "iterations": 319, "wallSecs": 277.127167989, "nashConv": 0.010708677062780447}
+{"tag": "c_gtowb_t23", "side": "t23", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 323.511, "iterations": 319, "wallSecs": 271.711869014, "nashConv": 0.010708677062780447}

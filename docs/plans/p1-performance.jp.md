@@ -76,6 +76,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T20 | f32のCFR passで、showdown sweepが効用を掛けたcard別の和を1本だけ持つ（A）。更新側nodeの終端の子を先にまとめて評価し、同じboardのfold・showdownを1回のkernel呼出しにする（B） | f64が変更前とbit一致。f32がthread数によらずbit一致。32 threadsで0.1%到達が速いこと |
 | T21 | f32のCFR passで、相手nodeの終端の子を`add_cfr_opponent_terminals`でnodeの値へ直接加える。同じboardのfold・callの組は1回のkernel呼出し、単独の終端は直接加えるkernelにする | f64が変更前とbit一致。f32がthread数によらずbit一致。32 threadsで0.1%到達が速いこと |
 | T22 | `cfr_pass`と評価passのhandごとのloopを、長さを揃えたsliceの`zip`で書いて境界検査を外し、vector化する。PRUNEの0判定を16要素ずつ調べる | `.sol` payloadがf32・f64とも変更前とbit一致。32 threadsで0.1%到達が速いこと |
+| T23 | `cfr_pass`で、読む前に全要素を書く作業buffer（`sigma`、子へ渡すreach）を0で埋めずに取る（`Scratch::take_overwrite`、debug buildはNaNで埋める） | `.sol` payloadがf32・f64とも変更前とbit一致。32 threadsで0.1%到達が速いこと |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -174,6 +175,7 @@ T21（[証拠](../../experiments/p1-perf-2026-10/opponent-terminals-20261008/REA
 f64は`.sol` payload・checkpoint arena・progressが旧版とbit一致し、f32は1・4 threadsでbit一致、融合した加算の相対誤差は最大9.3e-7だった。
 T22（[証拠](../../experiments/p1-perf-2026-10/cfr-loops-20261008/README.md)）: T20後のprofileで、`cfr_pass`の時間の45%が境界検査付きのscalarなindex loop（相手nodeの`opp_next`、戦略和へ渡す積）だった。
 sliceの`zip`で書き直すと、32 threadsの1 iterationがFlop1・gtow_bで0.75〜0.76倍（1 threadも同率、Turn2は0.82倍）、目標到達が0.75〜0.85倍、評価が0.92倍になった。`.sol` payloadはf32・f64ともbit一致した。
+T23（[証拠](../../experiments/p1-perf-2026-10/scratch-overwrite-20261008/README.md)）: T22・T21の上で、32 threadsの1 iterationが0.978〜0.983倍（16 threadsは0.986倍）、目標到達が0.980〜0.983倍になった。`.sol` payloadはf32・f64ともbit一致した。
 
 ### 一致の定義
 

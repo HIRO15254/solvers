@@ -1,0 +1,4 @@
+<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals
+<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings
+hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>
+hu_engine::storage::normalize_columns_f32

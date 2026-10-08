@@ -1,0 +1,103 @@
+## <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals
+
+Sorted summary for file /home/PC_User/prof_t23/release/examples/p1_bench
+----------------------------------------------
+
+   17.40 kernel.rs:141
+    9.96 kernel.rs:316
+    8.52 non_null.rs:1714
+    7.16 kernel.rs:342
+    4.63 kernel.rs:142
+    4.56 kernel.rs:139
+    4.37 kernel.rs:318
+    3.55 kernel.rs:337
+    2.28 kernel.rs:332
+    2.13 kernel.rs:317
+    1.62 kernel.rs:339
+    1.62 kernel.rs:319
+    0.80 kernel.rs:0
+    0.64 postflop.rs:543
+    0.60 kernel.rs:169
+    0.55 macros.rs:180
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (21598 samples, percent: local period)
+## hottest instructions
+    8.36 :   f581f:  vmovss %xmm8,0x60(%rsp,%rax,4) // kernel.rs:141
+    6.88 :   f5ba5:  vmovss %xmm10,0x60(%rsp,%r15,4)
+    5.61 :   f4d68:  vmovss %xmm8,0x60(%rsp,%rax,4)
+    3.79 :   f5d30:  vmovss %xmm9,(%r15,%rbx,4)
+    2.79 :   f5bdd:  vmovss %xmm9,0x150(%rsp,%r15,4)
+    2.63 :   f5825:  movzbl 0x3(%r14),%edi // kernel.rs:142
+    2.50 :   f57f4:  cmp    %rdi,0x8(%rsp) // kernel.rs:139
+    2.43 :   f54e5:  vmovss %xmm9,0x60(%rsp,%r15,4) // kernel.rs:316
+    2.18 :   f4f08:  vmovss %xmm6,0x60(%rsp,%rax,4) // kernel.rs:141
+    1.99 :   f5d36:  cmp    %r9,%r8 // non_null.rs:1714
+    1.83 :   f5d2a:  vaddss (%r15,%rbx,4),%xmm9,%xmm9 // kernel.rs:342
+    1.65 :   f5d0a:  add    $0x4,%r8 // non_null.rs:1714
+    1.55 :   f4d87:  add    $0x4,%r14 // non_null.rs:1714
+    1.54 :   f5631:  vmovss %xmm8,(%rax,%rbx,4) // kernel.rs:342
+    1.45 :   f5c88:  jbe    f62c7 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x18e7> // kernel.rs:332
+    1.37 :   f5bac:  cmp    $0x3400,%bp // kernel.rs:317
+    1.28 :   f4d6e:  movzbl 0x3(%r14),%edi // kernel.rs:142
+    1.18 :   f5cb5:  jbe    f5cd8 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x12f8> // kernel.rs:337
+    1.06 :   f4d44:  cmp    %rdi,%rcx // kernel.rs:139
+    1.05 :   f551d:  vmovss %xmm8,0x150(%rsp,%r15,4) // kernel.rs:318
+    1.04 :   f5d25:  vaddss %xmm10,%xmm9,%xmm9 // kernel.rs:339
+    1.00 :   f4ee4:  cmp    %rdi,%rcx // kernel.rs:139
+    0.91 :   f5be7:  vaddss 0x150(%rsp,%rbx,1),%xmm10,%xmm9 // kernel.rs:319
+    0.87 :   f583e:  add    $0x4,%r14 // non_null.rs:1714
+    0.83 :   f5c93:  jbe    f62af <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x18cf>
+    0.80 :   f5cdb:  shr    $0x8,%r15d // kernel.rs:0
+    0.76 :   f5bcd:  vmovss %xmm9,0x60(%rsp,%rbx,1)
+    0.72 :   f4d77:  jae    f626f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x188f>
+    0.70 :   f5bf0:  vmovss %xmm9,0x150(%rsp,%rbx,1)
+    0.70 :   f4d91:  cmp    %rbx,%r14
+    0.68 :   f5d0e:  vsubss 0x150(%rsp,%r15,4),%xmm11,%xmm11 // kernel.rs:337
+    0.66 :   f5b8d:  jae    f618c <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x17ac> // kernel.rs:316
+    0.64 :   f4ba2:  cmpb   $0x2,0x3c(%rdx) // postflop.rs:543
+    0.63 :   f5bf9:  cmp    %r8,%r12 // non_null.rs:1714
+    0.63 :   f560d:  mov    0x2f0(%rsp),%rax // kernel.rs:337
+    0.63 :   f5037:  vmovss %xmm4,0x60(%rsp,%rax,4) // kernel.rs:141
+    0.63 :   f4f27:  add    $0x4,%r11 // non_null.rs:1714
+    0.63 :   f4d52:  cmp    $0x34,%rax // kernel.rs:141
+    0.60 :   f5a8b:  vmovss %xmm9,0x150(%rsp,%rax,4) // kernel.rs:169
+    0.57 :   f5d06:  vmulss %xmm1,%xmm9,%xmm9 // kernel.rs:339
+    0.55 :   f5d39:  jne    f5c60 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1280> // macros.rs:180
+    0.55 :   f5d18:  mov    0x2f0(%rsp),%r15
+    0.53 :   f5bd3:  vaddss 0x150(%rsp,%r15,4),%xmm10,%xmm9 // kernel.rs:318
+    0.52 :   f5d02:  vmulss %xmm2,%xmm10,%xmm10 // kernel.rs:337
+    0.50 :   f5636:  cmp    %rdx,%r12 // non_null.rs:1714
+    0.50 :   f562c:  vaddss (%rax,%rbx,4),%xmm8,%xmm8
+    0.48 :   f4d62:  vaddss 0x60(%rsp,%rax,4),%xmm7,%xmm8
+    0.47 :   f5cf3:  jbe    f61bc <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x17dc>
+    0.47 :   f5c64:  cmp    %rbx,%rsi
+    0.47 :   f5848:  cmp    %rbx,%r14
+    0.47 :   f55bf:  movzbl %r15b,%r13d
+    0.46 :   f5b88:  cmp    $0x34,%r15w
+    0.46 :   f5819:  vaddss 0x60(%rsp,%rax,4),%xmm7,%xmm8
+    0.46 :   f4f0e:  movzbl 0x3(%r11),%edi
+    0.45 :   f54ec:  cmp    $0x3400,%r13w
+    0.41 :   f5b9b:  shr    $0x8,%ebx
+    0.40 :   f5d8e:  vmovups %ymm10,0x170(%rsp)
+    0.40 :   f53cd:  vmovss %xmm8,0x150(%rsp,%rax,4)
+    0.35 :   f5b75:  cmp    %rdi,%rcx
+    0.34 :   f5cc5:  vxorps %xmm10,%xmm10,%xmm10
+    0.34 :   f5bbe:  vaddss %xmm9,%xmm8,%xmm8
+    0.34 :   f5527:  vaddss 0x150(%rsp,%rbx,1),%xmm9,%xmm8
+    0.32 :   f5bc7:  vaddss 0x60(%rsp,%rbx,1),%xmm9,%xmm9
+    0.31 :   f5b9e:  vaddss 0x60(%rsp,%r15,4),%xmm9,%xmm10
+    0.31 :   f5619:  add    $0x4,%r12
+    0.31 :   f550d:  vmovss %xmm8,0x60(%rsp,%rbx,1)
+    0.30 :   f5ca7:  vmovss (%r12,%rbp,1),%xmm9
+    0.30 :   f55b3:  jbe    f621b <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x183b>
+    0.29 :   f5a82:  vaddss 0x150(%rsp,%rax,4),%xmm8,%xmm9
+    0.29 :   f5595:  cmp    %rbx,%r8
+    0.29 :   f51be:  vaddss (%rax,%rdi,4),%xmm3,%xmm3
+    0.27 :   f55fd:  jbe    f61bc <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x17dc>
+    0.26 :   f5df1:  vmulps 0x120(%rsp),%xmm7,%xmm9
+    0.26 :   f5da9:  vaddps 0x1b0(%rsp),%ymm10,%ymm10
+    0.26 :   f531a:  mov    %r11,0x18(%rsp)
+    0.26 :   f4f31:  cmp    %r10,%r11
+    0.25 :   f5b99:  mov    %ebx,%ebp
+    0.25 :   f54cc:  jae    f618c <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x17ac>
+    0.25 :   f4f02:  vaddss 0x60(%rsp,%rax,4),%xmm5,%xmm6
+    0.25 :   f4ef2:  cmp    $0x34,%rax

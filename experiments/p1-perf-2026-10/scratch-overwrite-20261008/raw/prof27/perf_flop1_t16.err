@@ -1,0 +1,2 @@
+[ perf record: Woken up 2 times to write data ]
+[ perf record: Captured and wrote 2.427 MB /home/PC_User/perf27_flop1_t16.data (63373 samples) ]
