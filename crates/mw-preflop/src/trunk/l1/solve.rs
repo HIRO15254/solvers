@@ -1,8 +1,8 @@
 use super::{
     Board, BucketSource, Evaluation, Sampling, Strategies,
-    cards::boards,
+    cards::{boards, boards_into},
     evaluate,
-    pass::{CHUNK, Pass, Scratch, class_values, discount, inputs},
+    pass::{CHUNK, Pass, class_values, discount, inputs, scratch},
 };
 use crate::trunk::l0::{
     Model, Profile, SolveOptions, SolveTimings, Tree,
@@ -10,11 +10,23 @@ use crate::trunk::l0::{
     leaves::leaf_values,
     solve::{Discounts, average_profile, backward_values, regret_matching, update_row},
 };
+use crate::trunk::scratch::Reused;
 use crate::{ExternalSamplingGame, Street};
 use anyhow::{Result, ensure};
 use rayon::prelude::*;
 use serde::Serialize;
-use std::time::Instant;
+use std::{cell::RefCell, time::Instant};
+
+thread_local! {
+    static UPDATES: RefCell<Vec<Vec<f64>>> = const { RefCell::new(Vec::new()) };
+}
+
+fn updates(size: usize) -> Reused<Vec<f64>> {
+    let mut values = Reused::take(&UPDATES);
+    values.resize(size, 0.0);
+    values.fill(0.0);
+    values
+}
 
 /// Per-iteration decay of the moments behind the training regression
 /// coefficient. Only earlier iterations' boards enter it, so each iteration's
@@ -272,6 +284,7 @@ pub fn solve(
         };
         postflop.leaves.len() * tree.seats
     ];
+    let mut training_boards = Vec::new();
     for t in 1..=o.iterations {
         let dcfr = Discounts::new(t, o)?;
         let postflop_dcfr = Discounts::new(
@@ -282,13 +295,14 @@ pub fn solve(
             },
         )?;
         let phase = Instant::now();
-        let training_boards = boards(
+        boards_into(
             source,
             b"solvers.p2.trunk.l1.board.v1",
             options.l1_seed,
             Some(t),
             options.l1_boards,
             options.l1_sampling,
+            &mut training_boards,
         );
         timings.board_preparation += phase.elapsed().as_secs_f64();
         for p in 0..tree.seats {
@@ -317,9 +331,9 @@ pub fn solve(
                     let shared = &*storage;
                     let mut chunks = training_boards
                         .par_chunks(CHUNK)
-                        .map_init(Scratch::default, |scratch, chunk| {
-                            let mut increments = vec![0.0; rows.len()];
-                            let mut additions = vec![0.0; rows.len()];
+                        .map_init(scratch, |scratch, chunk| {
+                            let mut increments = updates(rows.len());
+                            let mut additions = updates(rows.len());
                             // On the heap like inputs().
                             let mut values = vec![0.0; 169];
                             let mut moments = vec![[0.0; 169]; 4];
@@ -367,10 +381,10 @@ pub fn solve(
                         for (x, y) in moments.iter_mut().flatten().zip(m.iter().flatten()) {
                             *x += y;
                         }
-                        for (x, y) in increments.iter_mut().zip(inc) {
+                        for (x, y) in increments.iter_mut().zip(inc.iter().copied()) {
                             *x += y;
                         }
-                        for (x, y) in additions.iter_mut().zip(a) {
+                        for (x, y) in additions.iter_mut().zip(a.iter().copied()) {
                             *x += y;
                         }
                         for (x, y) in values.iter_mut().zip(v) {

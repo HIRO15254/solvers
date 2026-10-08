@@ -1,11 +1,25 @@
 use super::{Board, BucketSource, Subtree, cards::Q};
+use crate::trunk::scratch::Reused;
 use crate::trunk::{
     classes::{Classes, class},
     l0::{Model, Terminal, Tree, eval::Reach, solve::Discounts},
 };
 use anyhow::{Context, Result, ensure};
 use nlh::NUM_COMBOS;
-use std::io::{BufReader, BufWriter, Read, Write};
+use std::{
+    cell::RefCell,
+    io::{BufReader, BufWriter, Read, Write},
+};
+
+thread_local! {
+    static SCRATCH: RefCell<Vec<Scratch>> = const { RefCell::new(Vec::new()) };
+    static ROWS: RefCell<Vec<Vec<f64>>> = const { RefCell::new(Vec::new()) };
+    static INPUTS: RefCell<Vec<Combos>> = const { RefCell::new(Vec::new()) };
+}
+
+pub(crate) fn scratch() -> Reused<Scratch> {
+    Reused::take(&SCRATCH)
+}
 
 #[derive(Clone)]
 pub struct LeafStrategy {
@@ -163,8 +177,10 @@ impl Strategies {
 }
 
 impl LeafStrategy {
-    pub(crate) fn profile(&self, tree: &Subtree, average: bool) -> Vec<f64> {
-        let mut rows = vec![0.0; self.regrets.len()];
+    pub(crate) fn profile(&self, tree: &Subtree, average: bool) -> Reused<Vec<f64>> {
+        let mut rows = Reused::take(&ROWS);
+        rows.resize(self.regrets.len(), 0.0);
+        rows.fill(0.0);
         for (z, n) in tree.nodes.iter().enumerate() {
             if n.actor.is_none() {
                 continue;
@@ -196,8 +212,8 @@ impl LeafStrategy {
 pub(crate) const CHUNK: usize = 8;
 
 /// Per-depth slabs, grown to the deepest leaf tree and reused across boards and
-/// leaves within a Rayon worker. A pass walks the tree depth first, so it only
-/// touches the slabs along one path: a few hundred KB instead of every node's
+/// leaves and jobs via a thread-local pool. A pass walks the tree depth first,
+/// so it only touches the slabs along one path: a few hundred KB instead of every node's
 /// combo arrays, which kept the pass waiting on memory.
 #[derive(Default)]
 pub(crate) struct Scratch {
@@ -372,6 +388,9 @@ impl Scratch {
                 .unwrap_or(0)
                 .max(1),
         };
+        // Roots are copied, child reaches and values are written before
+        // recursion/reduction, and Mass reads only board.sorted. Blocked
+        // root values are cleared below; other blocked slab entries are unused.
         self.grow(&walk, 0);
         self.opponent[..NUM_COMBOS].copy_from_slice(pass.opponent);
         self.own[..NUM_COMBOS].copy_from_slice(pass.own);
@@ -540,7 +559,7 @@ pub(crate) fn inputs(
     reach: &Reach,
     terminal: usize,
     hero: usize,
-) -> (Combos, Combos, Combos) {
+) -> (Reused<Combos>, Reused<Combos>, Reused<Combos>) {
     let active = &tree.nodes[terminal].terminal.as_ref().unwrap().active;
     let opponent = *active.iter().find(|&&s| s != hero).unwrap();
     let rho = |seat: usize, h: usize| {
@@ -554,11 +573,19 @@ pub(crate) fn inputs(
             .product::<f64>()
             / Q
     });
-    (
-        Box::new(std::array::from_fn(|h| rho(opponent, h))),
-        Box::new(std::array::from_fn(|h| rho(hero, h))),
-        Box::new(std::array::from_fn(|h| folded[class(h)])),
-    )
+    let mut opponent_input = Reused::take_with(&INPUTS, || Box::new([0.0; NUM_COMBOS]));
+    let mut own = Reused::take_with(&INPUTS, || Box::new([0.0; NUM_COMBOS]));
+    let mut scale = Reused::take_with(&INPUTS, || Box::new([0.0; NUM_COMBOS]));
+    for h in 0..NUM_COMBOS {
+        opponent_input[h] = rho(opponent, h);
+    }
+    for h in 0..NUM_COMBOS {
+        own[h] = rho(hero, h);
+    }
+    for h in 0..NUM_COMBOS {
+        scale[h] = folded[class(h)];
+    }
+    (opponent_input, own, scale)
 }
 
 pub(crate) fn class_values(values: &[f64], scale: &[f64; NUM_COMBOS]) -> [f64; 169] {

@@ -1,6 +1,6 @@
 use super::{
     Board, Strategies,
-    pass::{CHUNK, Pass, Scratch, class_values, inputs},
+    pass::{CHUNK, Pass, class_values, inputs, scratch},
 };
 use crate::ExternalSamplingGame;
 use crate::trunk::{
@@ -220,7 +220,7 @@ pub fn evaluate(
                     let chunks: Vec<_> = boards
                         .par_chunks(CHUNK)
                         .enumerate()
-                        .map_init(Scratch::default, |scratch, (i, chunk)| {
+                        .map_init(scratch, |scratch, (i, chunk)| {
                             let mut sigma = vec![[0.0; 169]; 2];
                             let mut beta = vec![[0.0; 169]; 2];
                             let mut moments = vec![[[0.0; 169]; 2]; 4];
@@ -309,15 +309,15 @@ pub fn evaluate(
                 }
             }
         }
-        let all = |halves: &[Slab; 2]| {
+        let all = |halves: [&Slab; 2]| {
             halves[0]
                 .iter()
-                .zip(&halves[1])
+                .zip(halves[1])
                 .map(|(a, b)| std::array::from_fn(|c| (a[c] + b[c]) * 0.5))
                 .collect::<Slab>()
         };
-        let sa = all(&sigma);
-        let ba = all(&beta);
+        let sa = all([&sigma[0], &sigma[1]]);
+        let ba = all([&beta[0], &beta[1]]);
         let primary = backward(tree, profile, model, &reach, p, &sa, &sa)?;
         let auxiliary = backward(tree, profile, model, &reach, p, &sa, &ba)?;
         let a = backward(tree, profile, model, &reach, p, &sigma[0], &sigma[0])?;

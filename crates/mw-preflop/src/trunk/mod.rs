@@ -8,3 +8,5 @@ pub mod l0;
 pub mod tables;
 
 pub mod l1;
+
+mod scratch;

@@ -132,6 +132,29 @@ pub(crate) fn boards(
     count: u32,
     sampling: Sampling,
 ) -> Vec<Board> {
+    let mut output = Vec::new();
+    boards_into(
+        source,
+        domain,
+        seed,
+        iteration,
+        count,
+        sampling,
+        &mut output,
+    );
+    output
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn boards_into(
+    source: &dyn BucketSource,
+    domain: &[u8],
+    seed: u64,
+    iteration: Option<u64>,
+    count: u32,
+    sampling: Sampling,
+    output: &mut Vec<Board>,
+) {
     if sampling == Sampling::Stratified {
         let mut hash = blake3::Hasher::new();
         hash.update(domain);
@@ -140,13 +163,14 @@ pub(crate) fn boards(
         let shift = (bits >> 11) as f64 / (1_u64 << 53) as f64;
         let offset = (shift + iteration.unwrap_or(0) as f64 * 0.618_033_988_749_894_9).fract();
         let total = f64::from(*flops().ends.last().unwrap());
-        return (0..count)
+        (0..count)
             .into_par_iter()
             .map(|k| {
                 let x = (offset + f64::from(k)) / f64::from(count) * total;
                 Board::new(board_at(x), source)
             })
-            .collect();
+            .collect_into_vec(output);
+        return;
     }
     (0..count)
         .into_par_iter()
@@ -171,5 +195,5 @@ pub(crate) fn boards(
             });
             Board::new(cards, source)
         })
-        .collect()
+        .collect_into_vec(output);
 }

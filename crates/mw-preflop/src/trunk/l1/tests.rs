@@ -344,10 +344,14 @@ fn vector_matches_pairwise_values_responses_and_regrets() {
     let opponent = std::array::from_fn(|h| rho[class(h)]);
     let own = std::array::from_fn(|h| rho[(class(h) + 7) % 169]);
     let scale = std::array::from_fn(|h| 0.5 + rho[(class(h) + 13) % 169]);
+    let mut scratch = Scratch::default();
     for cards in [fixed("Ah Kd 2c 3s 7h"), fixed("Ac Kc Qc Jc Tc")] {
         let board = Board::new(cards, &Buckets);
         for hero in subtree.active {
-            let mut scratch = Scratch::default();
+            // Reuse across heroes/boards, poisoning prior values so a stale
+            // read cannot hide behind the previous pass's plausible results.
+            scratch.values.fill(f64::NAN);
+            scratch.best.fill(f64::NAN);
             let mut inc = vec![0.0; rows.len()];
             let mut sums = inc.clone();
             scratch.pass(
@@ -364,6 +368,12 @@ fn vector_matches_pairwise_values_responses_and_regrets() {
                 },
                 Some((&mut inc, &mut sums, 1.0)),
             );
+            for h in 0..NUM_COMBOS {
+                if board.ranks[h] == 0 {
+                    assert_eq!(scratch.values[h].to_bits(), 0.0_f64.to_bits());
+                    assert_eq!(scratch.best[h].to_bits(), 0.0_f64.to_bits());
+                }
+            }
             let mut expected = vec![0.0; rows.len()];
             let mut expected_sums = expected.clone();
             for &h in &board.sorted {
