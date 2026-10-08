@@ -1,0 +1,269 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-25",
+  "recorded_on": "2026-10-06",
+  "purpose": "Seed-to-seed differences of the legacy P2 solver on the 20bb checkdown benchmark at 30k and 300k sweeps.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "partial",
+  "reproducibility_note": "seed_tv.py was rerun on the retained CSV exports and matched the reported numbers; the solver runs were not repeated.",
+  "source": {
+    "revision": "6451f2c61f71b1c8e2db483bfd4946a74762424c",
+    "working_tree": "no changes to tracked files",
+    "build": "cargo build --release",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "binary_sha256": "93f1d87d8667fc539dc669c0412b7286abe72cf81e50ecdab1425e703915c154",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397"
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "python": "3.13.7"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/seed_tv.py",
+      "sha256": "2062c2926de51dc7157492872fd0aabec8913ddd64184fa30d1209b9f055dbc0",
+      "role": "analysis script (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/configs/20bb_cd.toml",
+      "sha256": "a5a67887b8f6aaa605e6405a199ce9145f2a5c878495dc3742590e348e7edc96",
+      "role": "seed 0, 30k sweeps; same bytes as examples/bench/6max_20bb_checkdown.toml at 6451f2c"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/configs/20bb_cd_s1.toml",
+      "sha256": "83ef72acf20565fcc06691ac497d07e43138cd12abde34da660a56d2745703bd",
+      "role": "seed 1, 30k sweeps"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/configs/20bb_300k_s0.toml",
+      "sha256": "f509c15fabeb43bea8bac466876a2abd160fc0253aef18aa90ee0a1fc142f395",
+      "role": "seed 0, 300k sweeps"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/configs/20bb_300k_s1.toml",
+      "sha256": "002a6cac922f9577c151bd37b9f6baff1707b9ef5c6cb1f84d24259cd8617458",
+      "role": "seed 1, 300k sweeps"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/30k_seed0_vs_seed1.txt",
+      "sha256": "f1be46c4ce27bce62133f88da008dbbc6816a48810f58ada455ac374968bd97b",
+      "role": "seed_tv.py output for 20bb_cd vs 20bb_cd_s1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/300k_seed0_vs_seed1.txt",
+      "sha256": "af16b5b62116a4a9cf7e8f30696d1a5322efb541cd1b54a1c21ac998fa3dc458",
+      "role": "seed_tv.py output for 20bb_300k_s0 vs 20bb_300k_s1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/run-json/20bb_cd.json",
+      "sha256": "6a2e01cc056615b09e7e21c4b7b2753f5f5b891a7886123d0149d8b59019c4d1",
+      "role": "run.json of 20bb_cd (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/run-json/20bb_cd_s1.json",
+      "sha256": "7f82ce98c7078a09db200cde99ada0fa0a0b528f833e17fc664dbc802e7b25ca",
+      "role": "run.json of 20bb_cd_s1 (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/run-json/20bb_300k_s0.json",
+      "sha256": "b1f710db28cfeef21cdc0bdf8fc01ec7dd05945951e8e009b42215751eef12c6",
+      "role": "run.json of 20bb_300k_s0 (raw bytes)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/legacy-seed-noise/results/run-json/20bb_300k_s1.json",
+      "sha256": "d09bfd1277edc45175550f9a30122d23beb0112f0cdb9ebe52a454e8db68e4ce",
+      "role": "run.json of 20bb_300k_s1 (raw bytes)"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/solution.mwsol",
+      "sha256": "56e0e558c36b57bc09de2de5029d8d1eb405bc58250961e8f1884f1603116e44",
+      "bytes": 60016881,
+      "role": "20bb_cd: solution (.mwsol v4); S4-1a evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/checkpoint.mwckpt",
+      "sha256": "eb73e7cd8aea45a3c6fb70ffff4fbd00f35b96a52c779c7d24316088d59068c0",
+      "bytes": 7050004,
+      "role": "20bb_cd: final checkpoint"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/manifest.json",
+      "sha256": "1b529b874d168c61251569e27b3750667ff426af0671cb67525c8c8fa3235870",
+      "bytes": 602,
+      "role": "20bb_cd: run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/run.toml",
+      "sha256": "bec2d8bee85e28e3b013f5f1be21e67c3ce87e90169f505c772e7ce6c9e94b5a",
+      "bytes": 1505,
+      "role": "20bb_cd: effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/progress.jsonl",
+      "sha256": "9675f4de0ee88ee171c9d3ca1189d8627dfb5b8225524b08e77814fa3dd63e57",
+      "bytes": 17914,
+      "role": "20bb_cd: progress log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/events.jsonl",
+      "sha256": "805e1c162ad0a4ffa72513e1c14acf3845944ea4a46837397cf402b7b40949fe",
+      "bytes": 353,
+      "role": "20bb_cd: event log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_strategy.csv",
+      "sha256": "fd047d60c322c623c31d95f589b266fdb39d6504809c337ecd541b250c2e5ce6",
+      "bytes": 93915487,
+      "role": "20bb_cd: strategy view CSV export"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/solution.mwsol",
+      "sha256": "8f0f5c42cceae5ae710c44c921336541424e42dbd8587340336fd151bf6bfd5a",
+      "bytes": 60595036,
+      "role": "20bb_cd_s1: solution (.mwsol v4); S4-1a evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/checkpoint.mwckpt",
+      "sha256": "c8fb70c04c147061b2494ee0cb357af1247729cdef3798b4e2c9374cf582b9f7",
+      "bytes": 6714910,
+      "role": "20bb_cd_s1: final checkpoint"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/manifest.json",
+      "sha256": "154bcf1c4f663787d533f08e84c9271603d3db0059392f5d7190cac653dbc13c",
+      "bytes": 608,
+      "role": "20bb_cd_s1: run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/run.toml",
+      "sha256": "cd81e06a1ed9b188eb3dfee7f4cae897b9273d578a865febb0b0aca0b0114123",
+      "bytes": 1506,
+      "role": "20bb_cd_s1: effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/progress.jsonl",
+      "sha256": "3d7bd43b293032ca2dac96e8a74c26bf13a9020dbb9a107e92b5c52777ca8307",
+      "bytes": 17926,
+      "role": "20bb_cd_s1: progress log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/events.jsonl",
+      "sha256": "d5944f5f12f27cdee96219b2e53acc333302b43e3ce03db3020b4446e0fb1739",
+      "bytes": 353,
+      "role": "20bb_cd_s1: event log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1_strategy.csv",
+      "sha256": "07123d96e1ca4bf012055c1955bf687b51506e9eabcf7a97ea3b74fbbded9e46",
+      "bytes": 94680100,
+      "role": "20bb_cd_s1: strategy view CSV export"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/solution.mwsol",
+      "sha256": "ad567606c7b76ed6ec8247514fa0f0ea9263f528509d8f23f345124b0a5f91ec",
+      "bytes": 69501997,
+      "role": "20bb_300k_s0: solution (.mwsol v4); S4-1a evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/checkpoint.mwckpt",
+      "sha256": "035752588cb6bd2535303eb6f1e99bd61eb86cc3f34d7a7eaca0dedf5b48a1e8",
+      "bytes": 8568878,
+      "role": "20bb_300k_s0: final checkpoint"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/manifest.json",
+      "sha256": "db046598fdb4c0b4bb431ef0f32b1e534ad31fd8eaf2a7d5380b16cb47dc3a40",
+      "bytes": 612,
+      "role": "20bb_300k_s0: run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/run.toml",
+      "sha256": "7e8d3f2920d28ec3e10775caa695a72fabd3f5cbf77b4f145c8e5d9cb15cfa50",
+      "bytes": 1508,
+      "role": "20bb_300k_s0: effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/progress.jsonl",
+      "sha256": "cd4938d556e48a2fd87def5d327412fd9ca4a6d4714e4fc48e1dede3a10b2928",
+      "bytes": 19216,
+      "role": "20bb_300k_s0: progress log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/events.jsonl",
+      "sha256": "a1b4b8e10948a93985a892f749dc98ff0e58b8c8576edbd1272c38431347ad63",
+      "bytes": 437,
+      "role": "20bb_300k_s0: event log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0_strategy.csv",
+      "sha256": "d48e9fba8779b3233216f1eca5d528a0d1c3fb31eacae1feaad3582632596327",
+      "bytes": 107885518,
+      "role": "20bb_300k_s0: strategy view CSV export"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/solution.mwsol",
+      "sha256": "c5b1b114a9844e9181ede43035882f109f01e42a59a9a37959a7568a7034802e",
+      "bytes": 71637038,
+      "role": "20bb_300k_s1: solution (.mwsol v4); S4-1a evaluator input"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/checkpoint.mwckpt",
+      "sha256": "654922fe264cf88f0d73d7943565d5bc2aacf7e6af1f0ef4b7953ff3dcaa2bf4",
+      "bytes": 8673815,
+      "role": "20bb_300k_s1: final checkpoint"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/manifest.json",
+      "sha256": "a1bafe19654b7d4749d7751027a7c49697c1232901c9b42e0d959c74ca127961",
+      "bytes": 612,
+      "role": "20bb_300k_s1: run manifest"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/run.toml",
+      "sha256": "8ff03bfe5ebd50bccb6b8c0943eabf3b596de87a9003ffc6c134a963c8cb8edb",
+      "bytes": 1508,
+      "role": "20bb_300k_s1: effective config written by the CLI"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/progress.jsonl",
+      "sha256": "0b04f9750128728811278ab1ad4757d22c442650addbc80b4f6504f6c994d6c0",
+      "bytes": 19171,
+      "role": "20bb_300k_s1: progress log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/events.jsonl",
+      "sha256": "04eb2a6995ffeefce8cfa104adc00b1c581ca258fb1db4e4ede62da55cad1b21",
+      "bytes": 437,
+      "role": "20bb_300k_s1: event log"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1_strategy.csv",
+      "sha256": "114f793b1f366c3d07c862b8b6ad318a117059e6df96d43219b886682d666f85",
+      "bytes": 110859276,
+      "role": "20bb_300k_s1: strategy view CSV export"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_tree.csv",
+      "sha256": "144c76d3c692e93962252bc4711476cdd877a0837364ad959a7d9494790c35b5",
+      "bytes": 969987,
+      "role": "tree view CSV export of 20bb_cd (same public tree for all runs)"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/bin/solvers.exe",
+      "sha256": "93f1d87d8667fc539dc669c0412b7286abe72cf81e50ecdab1425e703915c154",
+      "bytes": 6985216,
+      "role": "release binary used for all four runs"
+    }
+  ],
+  "commands": [
+    "solvers solve experiments/p2-method-2026-10/legacy-seed-noise/configs/<run>.toml --out runs/p2-method-2026-10/legacy-seed-noise/<run>  (20bb_cd was solved from examples/bench/6max_20bb_checkdown.toml with --max-time 6m)",
+    "solvers export runs/p2-method-2026-10/legacy-seed-noise/<run>/solution.mwsol strategy --format csv --output runs/p2-method-2026-10/legacy-seed-noise/<run>_strategy.csv",
+    "solvers export runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/solution.mwsol tree --format csv --output runs/p2-method-2026-10/legacy-seed-noise/20bb_tree.csv",
+    "python experiments/p2-method-2026-10/legacy-seed-noise/seed_tv.py --tree <tree csv> --a <seed 0 strategy csv> --b <seed 1 strategy csv>"
+  ]
+}

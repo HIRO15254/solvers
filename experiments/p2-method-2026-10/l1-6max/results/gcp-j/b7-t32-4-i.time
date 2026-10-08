@@ -1,0 +1,23 @@
+	Command being timed: "/home/PC_User/trunk_solve-i --config examples/bench/6max_20bb.toml --leaf-model l1 --ehs2-cache /home/PC_User/ehs2/v2-f32-t32-r32.postcard --solver-k4-samples 256 --solver-k4-min-samples 16 --iterations 30 --eval-every 0 --print-every 1 --threads 32 --output /home/PC_User/results/b7-t32-4-i.json --output-profile /home/PC_User/results/b7-t32-4-i.profile.json"
+	User time (seconds): 818.02
+	System time (seconds): 8.56
+	Percent of CPU this job got: 2438%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:33.90
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1425816
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 538733
+	Voluntary context switches: 402230
+	Involuntary context switches: 6700
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 123584
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

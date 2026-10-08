@@ -1,0 +1,183 @@
+{
+  "checkpoints": [
+    {
+      "auxiliary_held_nash_conv": 6.1139122123436795,
+      "auxiliary_nash_conv": 6.113912212343676,
+      "evaluation_seconds": 108.4480126,
+      "held_nash_conv": 2.4093679259710363,
+      "iteration": 0,
+      "nash_conv": 2.4093679259710363,
+      "seats": [
+        {
+          "auxiliary_best_response": 3.022428805984391,
+          "auxiliary_gain": 3.241756561329283,
+          "auxiliary_held_a_to_b": 3.241374339420851,
+          "auxiliary_held_b_to_a": 3.242138783237715,
+          "auxiliary_held_gain": 3.241756561329283,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": 1.188079322829672,
+          "gain": 1.4074070781745642,
+          "held_a_to_b": 1.407419728857928,
+          "held_b_to_a": 1.407394427491201,
+          "held_gain": 1.4074070781745645,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 0,
+          "telescoping_residual": -1.1102230246251565e-15,
+          "value": -0.21932775534489216,
+          "value_a": -0.2193343200105574,
+          "value_b": -0.219321190679227
+        },
+        {
+          "auxiliary_best_response": 3.091483406359286,
+          "auxiliary_gain": 2.8721556510143933,
+          "auxiliary_held_a_to_b": 2.87235350108632,
+          "auxiliary_held_b_to_a": 2.871957800942472,
+          "auxiliary_held_gain": 2.872155651014396,
+          "auxiliary_telescoping_residual": 3.9968028886505635e-15,
+          "best_response": 1.221288603141365,
+          "gain": 1.0019608477964723,
+          "held_a_to_b": 1.001953255536552,
+          "held_b_to_a": 1.0019684400563924,
+          "held_gain": 1.001960847796472,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 1,
+          "telescoping_residual": 6.661338147750939e-16,
+          "value": 0.2193277553448926,
+          "value_a": 0.2193343200105574,
+          "value_b": 0.2193211906792272
+        }
+      ],
+      "seconds": 108.6332736
+    },
+    {
+      "auxiliary_held_nash_conv": 1.863857706099489,
+      "auxiliary_nash_conv": 1.863857706099489,
+      "evaluation_seconds": 110.2220741,
+      "held_nash_conv": 0.0003033309976052563,
+      "iteration": 1000,
+      "nash_conv": 0.0015706681082835947,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.8487261718705823,
+          "auxiliary_gain": 0.814389144182253,
+          "auxiliary_held_a_to_b": 0.8144569788253774,
+          "auxiliary_held_b_to_a": 0.8143213095391277,
+          "auxiliary_held_gain": 0.8143891441822526,
+          "auxiliary_telescoping_residual": -7.771561172376096e-16,
+          "best_response": 0.03493625420667493,
+          "gain": 0.0005992265183456386,
+          "held_a_to_b": 0.00029373616963691146,
+          "held_b_to_a": 0.0001612387136624635,
+          "held_gain": 0.00022748744164968748,
+          "l1_reach_share": 0.617524077570707,
+          "seat": 0,
+          "telescoping_residual": 3.148523108897905e-16,
+          "value": 0.03433702768832929,
+          "value_a": 0.03490703459722213,
+          "value_b": 0.033767020779436274
+        },
+        {
+          "auxiliary_best_response": 1.0139295191088307,
+          "auxiliary_gain": 1.049468561917236,
+          "auxiliary_held_a_to_b": 1.0494034888596662,
+          "auxiliary_held_b_to_a": 1.0495336349748066,
+          "auxiliary_held_gain": 1.0494685619172364,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": -0.034567601218467255,
+          "gain": 0.0009714415899379561,
+          "held_a_to_b": -0.00009348946839116135,
+          "held_b_to_a": 0.000245176580302299,
+          "held_gain": 0.00007584355595556883,
+          "l1_reach_share": 0.6175240775707068,
+          "seat": 1,
+          "telescoping_residual": -9.573505183047004e-17,
+          "value": -0.03553904280840521,
+          "value_a": -0.03729494796507042,
+          "value_b": -0.03378313765173977
+        }
+      ],
+      "seconds": 447.1804036
+    }
+  ],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard"
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "a7e9ad90f312f1760d0ab75d3d625f7e48ab58352785240207d3517b41df080f",
+  "iterations": 1000,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 5,
+    "postflop_nodes": 302,
+    "slots": 21696,
+    "storage_bytes": 347136
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 1000,
+    "gamma": 2.0,
+    "iterations": 1000,
+    "k4_min_samples": null,
+    "k4_samples": null,
+    "l1_boards": 32,
+    "l1_eval_boards": 16384,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "random",
+    "l1_eval_seed": 0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "l1_train_smoothing": 0.0,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/hu_20bb_postflop.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      11,
+      11
+    ]
+  },
+  "timings": {
+    "model": 0.003214,
+    "solve": {
+      "board_preparation": 1.6985837999999984,
+      "evaluation": 218.6700867,
+      "evaluation_board_preparation": 0.1849142,
+      "k4": 0.007728299999999977,
+      "postflop": 223.94571240000005,
+      "reaches": 0.8242422,
+      "t2": 1.653464599999999,
+      "t3": 0.0004478000000000078,
+      "update": 0.12805720000000004
+    },
+    "tables": 0.1649026,
+    "total": 448.4391125,
+    "tree": 0.0013637
+  },
+  "version": 2,
+  "warnings": []
+}

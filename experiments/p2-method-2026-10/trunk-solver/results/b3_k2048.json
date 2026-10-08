@@ -1,0 +1,103 @@
+{
+  "checkpoints": [
+    {
+      "iteration": 3,
+      "nash_conv": 3.999521239375169,
+      "seats": [
+        {
+          "best_response": 0.906587515699438,
+          "gain": 1.0847561580778027,
+          "seat": 0,
+          "value": -0.17816864237836474
+        },
+        {
+          "best_response": 0.47919486571546555,
+          "gain": 0.8664291546743523,
+          "seat": 1,
+          "value": -0.38723428895888684
+        },
+        {
+          "best_response": 0.21686375124597537,
+          "gain": 0.6696019811054004,
+          "seat": 2,
+          "value": -0.452738229859425
+        },
+        {
+          "best_response": 0.9382088152606576,
+          "gain": 0.47995959441177544,
+          "seat": 3,
+          "value": 0.45824922084888214
+        },
+        {
+          "best_response": 0.9587090540346027,
+          "gain": 0.4543724181919844,
+          "seat": 4,
+          "value": 0.5043366358426183
+        },
+        {
+          "best_response": 0.9622094681990337,
+          "gain": 0.4444019329138541,
+          "seat": 5,
+          "value": 0.5178075352851796
+        }
+      ],
+      "seconds": 156.7102532
+    }
+  ],
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "6476cf439a93077be8faa9784a86126dd48ca5bb351e7af1791d4c20074b3a42",
+  "iterations": 3,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "options": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "eval_every": 0,
+    "gamma": 2.0,
+    "iterations": 3,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/6max_20bb_checkdown.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      670,
+      1883,
+      2075,
+      1145,
+      321,
+      37
+    ]
+  },
+  "timings": {
+    "model": 0.0039452,
+    "solve": {
+      "evaluation": 72.4292519,
+      "k4": 62.12849969999999,
+      "reaches": 3.8139966999999992,
+      "t2": 0.6885545000000001,
+      "t3": 16.5294782,
+      "update": 0.1546797
+    },
+    "tables": 0.1608895,
+    "total": 157.0249376,
+    "tree": 0.0683759
+  },
+  "version": 1,
+  "warnings": []
+}

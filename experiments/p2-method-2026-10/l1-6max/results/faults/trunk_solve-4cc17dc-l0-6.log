@@ -1,0 +1,11 @@
+Postflop menus solved in L0 Checkdown mode.
+Tree: 5466 decisions, 6131 terminals (0.077s)
+Tables: 0.269s; model: 0.004s
+Iteration 1: wall 3.442963s; reaches 0.311296; t2 0.267965; t3 1.656094; k4 0.971704; update 0.053537; evaluation 0.000000
+Iteration 2: wall 2.118084s; reaches 0.093881; t2 0.221171; t3 0.974243; k4 0.637143; update 0.051301; evaluation 0.000000
+Iteration 3: wall 2.558516s; reaches 0.086392; t2 0.197674; t3 1.214978; k4 0.847121; update 0.057940; evaluation 0.000000
+Iteration 4: wall 2.549452s; reaches 0.080248; t2 0.185138; t3 1.077873; k4 1.019934; update 0.049136; evaluation 0.000000
+Iteration 5: wall 2.409399s; reaches 0.096130; t2 0.172846; t3 1.023734; k4 0.930599; update 0.052160; evaluation 0.000000
+Iteration 6: wall 72.352847s; reaches 0.078448; t2 0.167425; t3 0.946543; k4 0.999757; update 0.061658; evaluation 69.965485
+Checkpoint 6: NashConv 1.098118579931; gains [0.2937007092518026, 0.25520585927620654, 0.2576798797314482, 0.08506423554872786, 0.0895235562616124, 0.11694433986132852]; 85.439741s
+Iterations: 6; reached target: false; solve phases SolveTimings { reaches: 0.7463945000000003, t2: 1.2122195, t3: 6.893464399999998, k4: 5.4062569, update: 0.3257324000000001, evaluation: 69.9654855 }

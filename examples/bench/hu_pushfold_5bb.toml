@@ -1,0 +1,65 @@
+# Heads-up 5-BB push/fold benchmark (B1 of docs/plans/p2-method-redesign.jp.md).
+# The button may only fold or move all in; the big blind may only fold or call.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 2
+
+[table.stacks_bb]
+BTN = 5.0
+BB = 5.0
+
+[economics]
+kind = "cash"
+
+[ranges]
+BTN = "random"
+BB = "random"
+
+[tree]
+script = '''
+preflop {
+  when unopened { replace raise [a]  remove call }
+  when aggressions >= 1 { remove raise }
+}
+'''
+
+[tree.max_aggressive_actions]
+preflop = 1
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[solver.abstraction]
+kind = "ehs2-percentile"
+
+[solver.abstraction.buckets]
+flop = 32
+turn = 32
+river = 32
+
+[solver.stop]
+target = 1000000.0
+check_every_sweeps = 15000
+confirmations = 1000000
+evaluation_samples = 4096
+deviator_traversals = 20000
+max_sweeps = 30000
+
+[run]
+threads = 8
+memory = "4GiB"
+max_time = "15m"
+checkpoint_interval = "5m"
+
+[output]
+probability_encoding = "u16"

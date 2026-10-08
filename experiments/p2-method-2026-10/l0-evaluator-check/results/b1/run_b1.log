@@ -1,0 +1,39 @@
+== b1_5bb_uniform
+nash_conv: python=0.779484864709 rust=0.779484864709 diff=2.220e-16
+PASS: largest difference 2.220e-16
+== b1_5bb_random
+nash_conv: python=0.772196320988 rust=0.772196320988 diff=1.110e-16
+PASS: largest difference 1.665e-16
+== b1_5bb_top
+nash_conv: python=0.658720540566 rust=0.658720540566 diff=0.000e+00
+PASS: largest difference 3.331e-16
+== b1_5bb_legacy
+nash_conv: python=0.000478133465 rust=0.000478133465 diff=8.327e-17
+PASS: largest difference 8.327e-17
+== b1_10bb_uniform
+nash_conv: python=0.997829223492 rust=0.997829223492 diff=1.110e-16
+PASS: largest difference 2.220e-16
+== b1_10bb_random
+nash_conv: python=0.961358449468 rust=0.961358449468 diff=0.000e+00
+PASS: largest difference 2.220e-16
+== b1_10bb_top
+nash_conv: python=0.510284305671 rust=0.510284305671 diff=0.000e+00
+PASS: largest difference 1.388e-16
+== b1_10bb_legacy
+nash_conv: python=0.001201481259 rust=0.001201481259 diff=1.665e-16
+PASS: largest difference 1.665e-16
+== b1_20bb_uniform
+nash_conv: python=1.695954267283 rust=1.695954267283 diff=8.882e-16
+PASS: largest difference 8.882e-16
+== b1_20bb_random
+nash_conv: python=1.606068185925 rust=1.606068185925 diff=8.882e-16
+PASS: largest difference 8.882e-16
+== b1_20bb_top
+nash_conv: python=0.336453638624 rust=0.336453638624 diff=1.665e-16
+PASS: largest difference 1.665e-16
+== b1_20bb_legacy
+nash_conv: python=0.002786839173 rust=0.002786839173 diff=2.776e-17
+PASS: largest difference 3.053e-16
+== b1_10bb_fp
+nash_conv: python=0.003214366595 rust=0.003214366595 diff=6.939e-17
+PASS: largest difference 2.290e-16

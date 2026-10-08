@@ -1,0 +1,14 @@
+b1_5bb_uniform: 1s
+b1_5bb_random: 0s
+b1_5bb_legacy: 1s
+b1_10bb_uniform: 0s
+b1_10bb_random: 1s
+b1_10bb_legacy: 1s
+b1_20bb_uniform: 1s
+b1_20bb_random: 0s
+b1_20bb_legacy: 1s
+seeds_10bb_uniform_s0: 1s
+seeds_10bb_uniform_s1: 2s
+seeds_10bb_uniform_s2: 2s
+seeds_10bb_uniform_s3: 1s
+seeds_10bb_uniform_s4: 2s

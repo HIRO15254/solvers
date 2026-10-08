@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 3,
+  "kind": "preflop-multiway",
+  "gameKind": "mw-preflop",
+  "configSchema": "solvers.nlh/v1",
+  "status": "sweep-limit",
+  "approximateProfile": true,
+  "approximationNotice": "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。",
+  "sweeps": 30000,
+  "traversals": 180000,
+  "infosets": 556596,
+  "memoryBytes": 15924464,
+  "policyStorage": "preallocated-all-current-street-buckets",
+  "preallocatedNodes": 5466,
+  "preallocatedColumns": 923754,
+  "preallocatedSlots": 1959724,
+  "preallocatedBytes": 15924464,
+  "preallocatedPagesCommitted": true,
+  "policyArenaLimitBytes": 51539607552,
+  "elapsedSecs": 41.820964000000004,
+  "traversalsPerSecond": 4304.061475005693,
+  "totalDealAttempts": 180000,
+  "meanDealAttempts": 1.0,
+  "handUpdates": 119880000,
+  "handUpdatesPerSecond": 2866504.9423537916,
+  "seats": [
+    {
+      "seat": 0,
+      "profileEv": {
+        "mean": 0.16046142578124983,
+        "stderr": 0.08219875287839526,
+        "ci95": [
+          -0.0006481298604048835,
+          0.3215709814229045
+        ]
+      },
+      "averagePositiveRegret": 0.546961134036059,
+      "strategyDriftL1": 0.037095364550408017,
+      "deviationGainLowerBound": {
+        "mean": 0.0,
+        "stderr": 0.05044922697641892,
+        "ci95": [
+          0.0,
+          0.09946605750119547
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4212,
+        "storedStrategyVisits": 4212,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4212,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4212,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4212,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4212,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 1,
+      "profileEv": {
+        "mean": -0.23748779296875042,
+        "stderr": 0.1036668616182172,
+        "ci95": [
+          -0.4406748417404561,
+          -0.03430074419704471
+        ]
+      },
+      "averagePositiveRegret": 0.47171931398603556,
+      "strategyDriftL1": 0.03368156833663555,
+      "deviationGainLowerBound": {
+        "mean": 0.0,
+        "stderr": 0.05519700634302643,
+        "ci95": [
+          0.0,
+          0.1003421051735093
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4339,
+        "storedStrategyVisits": 4339,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4339,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4339,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4339,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4339,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 2,
+      "profileEv": {
+        "mean": -0.368652343749999,
+        "stderr": 0.09845488379053204,
+        "ci95": [
+          -0.5616239159794418,
+          -0.17568077152055622
+        ]
+      },
+      "averagePositiveRegret": 0.4763494846683472,
+      "strategyDriftL1": 0.03500973926358011,
+      "deviationGainLowerBound": {
+        "mean": 0.07690429687500008,
+        "stderr": 0.051760618885279275,
+        "ci95": [
+          0.0,
+          0.19292054804446507
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 3168,
+        "storedStrategyVisits": 3168,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 3168,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 3168,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 3168,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 3168,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 3,
+      "profileEv": {
+        "mean": 0.2377929687500001,
+        "stderr": 0.07606859918408745,
+        "ci95": [
+          0.08869851434918871,
+          0.3868874231508115
+        ]
+      },
+      "averagePositiveRegret": 0.4968903873829707,
+      "strategyDriftL1": 0.049834563325759085,
+      "deviationGainLowerBound": {
+        "mean": 0.03442382812499993,
+        "stderr": 0.03843146528009928,
+        "ci95": [
+          0.0,
+          0.12056411440381447
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4217,
+        "storedStrategyVisits": 4217,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4217,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4217,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4217,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4217,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 4,
+      "profileEv": {
+        "mean": 0.04626464843750023,
+        "stderr": 0.07032521034263353,
+        "ci95": [
+          -0.09157276383406149,
+          0.18410206070906193
+        ]
+      },
+      "averagePositiveRegret": 0.587670362369422,
+      "strategyDriftL1": 0.05906769249794055,
+      "deviationGainLowerBound": {
+        "mean": 0.08715820312500022,
+        "stderr": 0.08789890033504318,
+        "ci95": [
+          0.0,
+          0.28417479833596604
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4206,
+        "storedStrategyVisits": 4206,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4206,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4206,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4206,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4206,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    },
+    {
+      "seat": 5,
+      "profileEv": {
+        "mean": 0.1616210937500001,
+        "stderr": 0.0784111752822047,
+        "ci95": [
+          0.007935190196878883,
+          0.31530699730312134
+        ]
+      },
+      "averagePositiveRegret": 0.5556151787931419,
+      "strategyDriftL1": 0.03901269163927441,
+      "deviationGainLowerBound": {
+        "mean": 0.004150390624999938,
+        "stderr": 0.050598352739551544,
+        "ci95": [
+          0.0,
+          0.11756153845543078
+        ]
+      },
+      "candidatePolicyCoverage": {
+        "decisionVisits": 4224,
+        "storedStrategyVisits": 4224,
+        "uniformFallbackVisits": 0,
+        "averageStrategyVisits": 4224,
+        "currentStrategyVisits": 0,
+        "regretFallbackVisits": 0,
+        "decisionVisitsByStreet": {
+          "preflop": 4224,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "storedStrategyVisitsByStreet": {
+          "preflop": 4224,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "uniformFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "averageStrategyVisitsByStreet": {
+          "preflop": 4224,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "currentStrategyVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        },
+        "regretFallbackVisitsByStreet": {
+          "preflop": 0,
+          "flop": 0,
+          "turn": 0,
+          "river": 0
+        }
+      }
+    }
+  ],
+  "strategyBlocks": 556596,
+  "configHash": "6a751333e0b2eb4d8b409eb9af5d4e493adbcd7c00241aada549624069fe7e1d",
+  "effectiveConfig": {
+    "economics": {
+      "kind": "cash"
+    },
+    "output": {
+      "probability_encoding": "u16"
+    },
+    "ranges": {
+      "BB": "random",
+      "BTN": "random",
+      "CO": "random",
+      "HJ": "random",
+      "SB": "random",
+      "UTG": "random"
+    },
+    "run": {
+      "checkpoint_interval": "5m",
+      "max_time": "15m",
+      "memory": "48GiB",
+      "threads": 8
+    },
+    "schema": "solvers.nlh/v1",
+    "solver": {
+      "abstraction": {
+        "buckets": {
+          "flop": 32,
+          "river": 32,
+          "turn": 32
+        },
+        "kind": "ehs2-percentile"
+      },
+      "batch_sweeps": 1,
+      "discount": {
+        "kind": "none"
+      },
+      "kind": "range-vector",
+      "opponent_exploration": 0.0,
+      "pruning": {
+        "kind": "none"
+      },
+      "seed": 1,
+      "stop": {
+        "check_every_sweeps": 15000,
+        "confirmations": 1000000,
+        "deviator_traversals": 20000,
+        "evaluation_samples": 4096,
+        "max_sweeps": 30000,
+        "target": 1000000.0
+      }
+    },
+    "spot": {
+      "line": ""
+    },
+    "table": {
+      "ante_bb": 0,
+      "bb_ante_bb": 0,
+      "players": 6,
+      "sb_bb": 0.5,
+      "stack_bb": 20,
+      "straddles_bb": []
+    },
+    "tree": {
+      "include_allin": true,
+      "max_aggressive_actions": {
+        "flop": 1,
+        "preflop": 3,
+        "river": 1,
+        "turn": 1
+      },
+      "script": "preflop when unopened { replace raise [2.5x, a] }\npreflop when !unopened { replace raise [3x, a] }\nflop when unopened { replace bet [50, a] }\nflop when !unopened { replace raise [75, a] }\nturn when unopened { replace bet [50, a] }\nturn when !unopened { replace raise [75, a] }\nriver when unopened { replace bet [50, a] }\nriver when !unopened { replace raise [75, a] }\npreflop when unopened { remove call }\npreflop when unopened { replace raise [2.5x, a] }\npreflop when aggressions >= 1 { replace raise [3x, a] }\npreflop when aggressions >= 3 { remove raise }\nflop, turn, river when players >= 2 { checkdown }\n"
+    }
+  },
+  "gameFingerprint": "6476cf439a93077be8faa9784a86126dd48ca5bb351e7af1791d4c20074b3a42",
+  "abstractionFingerprint": "1562cd5fc04d838fecfbc15ad25b382effbea9ea42417dbb76c74e546a19d313",
+  "algorithmFingerprint": "760e4df6f4625a1be857c69c9699a2604dbd40fb90022c1de730888163ca4dd7",
+  "configurationFingerprint": "5cbead66615bc2e5f9754707eca2f9158b10710820ada73b8bd4677eee13d758",
+  "profileType": "linear-average-regret-minimized-profile",
+  "guaranteeBoundary": "3人以上は多人数・一般和ゲームのregret-minimized approximationです。Nash/GTO保証やexploitability指標ではありません。",
+  "chipUnitBb": 0.001,
+  "utilityUnit": "bb",
+  "startedUnixMs": 1791223392003,
+  "finishedUnixMs": 1791223433824
+}

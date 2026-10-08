@@ -1,0 +1,1958 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-31",
+  "recorded_on": "2026-10-08",
+  "purpose": "S4-2b: solve B7 (6-max 20bb with postflop) and B4 Simple's original tree with the L1 leaf model in the P2D5 budget; record the primary metric of decision P2D8, the L0-L1 difference and B4 Simple's unopened class tables against GTO Wizard Simple; check the solver's K4 minimum samples of P2D7 on B3; measure the evaluation's spread on saved solutions and B4 Simple with 128 EHS² buckets; time J at 16 and 32 threads on GCP and trace its memory locally. B7's saved solution and the 128-bucket solution's 8192-board evaluations were put on hold when the user paused the work on 2026-10-08.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "Runs are deterministic for a given seed and do not depend on the thread count; times depend on the machine and its load (load.log). Changes A, B, D, E, G, H, I and J keep profiles and checkpoints bit-identical; C (plain sums) changes the rounding only. The saved B4 Simple solution reproduced the recorded profile bit for bit, the saved B6 solution the S4-2b B6 record of change C.",
+  "source": {
+    "revisions": {
+      "4cc17dcee01f140ab83a66838337e86f81fed39a": {
+        "trunk_solve_binary_sha256": "519fa3e96b851b125e21a0b23c1fbf1c9e98a0b68b0194a074398f81a57ad303",
+        "l0_eval_binary_sha256": "3402a9190754ce7120206b094f1e73bad0f51e3eb8fcee8c9bb5dc9f53744432",
+        "used_for": "results/final b7-l1, b7-l0, the failed first runs and every l0_eval"
+      },
+      "30df60be2a9a4a06fe154c95529cd55dee909c76": {
+        "trunk_solve_binary_sha256": "2d0da9122b724d9bb58ca5efbd117c3c8dfead410c2f4634c58e7a8714fe62f8",
+        "used_for": "results/k4-min, results/speed (baseline)"
+      },
+      "b16dd9bd3e6eb429cb2254f019becacca41d71af": {
+        "trunk_solve_binary_sha256": "960febb1e3989aedefb9ab34d83292227646d9e1ca443014591afdc7cfbfe87c",
+        "used_for": "results/plain"
+      },
+      "6cd6baa59da55ce9dee5c40c440d87568a954abd": {
+        "trunk_solve_binary_sha256": "1792fa41a6e688930659befdb55c88b79c65bb4ebd972d6cf6df15a1c5dc6eef",
+        "used_for": "results/final b4s-l1 (rerun), results/speed/e (d)"
+      },
+      "6658f2d64c7873f06b71c2445af18360ff081f86": {
+        "trunk_solve_binary_sha256": "31d93359b4778c54ff5c45586be64bd3c1c512078348533a2988600b0519e858",
+        "used_for": "results/final b4s-l0 and b7-l0-all (reruns), results/speed/e (e)"
+      },
+      "594d087945c425d36d5ebe7e71538a4c79d5bd09": {
+        "trunk_solve_binary_sha256": "192dc6356bfc6891edc5431a966e68c5b2efff0616ddecbca1a12bb6efe14f6a",
+        "used_for": "results/saved b6 and b4s, results/eval-saved except b4s-stratified-1024-s5"
+      },
+      "46060c64d2fbc97432136f07bb529236b92cca60": {
+        "trunk_solve_binary_sha256": "68e9a92d46abe0d28adf6c4eac55ebe169193970a957f4b7c94342b660dfc1bd",
+        "used_for": "results/table-peak, results/buckets, results/eval-saved b4s-stratified-1024-s5, results/memory-j (i); results/gcp-j (i) built on the VM"
+      },
+      "7b8d704bd8e316bab7c850c9d460bf3b9ac1ead6": {
+        "trunk_solve_binary_sha256": "b5805b664d72ca7f272fbf4c8569d054e57d4bcf17f099e06a7969e81975eca5",
+        "used_for": "results/memory-j (j); results/gcp-j (j) built on the VM"
+      }
+    },
+    "development_binaries": {
+      "70c159e75b78aa47b8b8f43522de09234703d6e51266d2626aeed02606ddc7b9": {
+        "name": "sparse",
+        "change": "30df60b with the sparse showdown merge"
+      },
+      "4e85b9c6be51b79e48d5f5d078d212c53d6967881f8553b89ccb190ec9563b8e": {
+        "name": "memo",
+        "change": "sparse with 4cc17dc's per-slab total mass"
+      },
+      "5d1bdc94d063ae7f3e3a3530a25b8affae889e9cd012420c2dfe17ac8e8c6903": {
+        "name": "guide",
+        "change": "memo with K4 CDF guide tables and one ordering-cache lookup per sample; results/speed/pass b3-min and b4s-min ran this binary"
+      },
+      "c8a09cd3d54ae65ac93ccb01cbf5cc87045bbabdac9fa68d963e20b4f0e2df55": {
+        "name": "memo2",
+        "change": "4cc17dc's pass with guide's K4 change"
+      },
+      "4a1f4926dd168492ffa3a67e97cf4d8d58b407a7e08cf6eecdb4dee1c65f7cb1": {
+        "name": "inter",
+        "change": "b16dd9b with the regret updates reordered to alternate buckets (results/plain/cpu-ab)"
+      },
+      "c4c2cd960f2672165e6a564271c96ec8f97dc687a6ddf1142ad13a086fab073a": {
+        "name": "reuse",
+        "change": "development version of change D used for results/faults"
+      }
+    },
+    "build": "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397"
+  },
+  "solver": {
+    "alpha": 1.5,
+    "gamma": 2.0,
+    "trunk_beta": "1 (L1) or 0 (L0)",
+    "postflop_beta": 0,
+    "seat_order": "alternating 0..n-1",
+    "solver_k4_samples": 256,
+    "solver_k4_min_samples": "16 (results/final except b7-l0-all, saved b7 and b4s, buckets)"
+  },
+  "model": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": 2048,
+    "k4_seed": 0,
+    "l1_seed": 0,
+    "l1_eval_seed": 0,
+    "l1_boards": 32,
+    "l1_eval_boards": "1024 (B6 4096), eval-saved: 1024 with seeds 0-7 and 8192"
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB, commit limit 39.9 GB (8 GB page file), shared with other work",
+    "shell": "Git Bash",
+    "python": "3.13.7",
+    "threads": "rayon default (16)",
+    "gcp": "results/gcp-j only: GCP c2d-highcpu-32 Spot (AMD EPYC, 32 vCPU, 64 GB), Ubuntu 24.04, rustc 1.97.0; see results/gcp-j/lscpu.txt"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/run.sh",
+      "sha256": "af095ed35048a579baa1ac34f127aa347dace955deef423bc3f77d2f1ca76b0d",
+      "role": "S4-2b procedure: B7 and B4 Simple with L1, B3 and B4 Simple with L0, l0_eval"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/run_save.sh",
+      "sha256": "dc4f62b51dd203e85e724c976038bd93a54a85df4fe70bb9a0ca4f031d246e78",
+      "role": "procedure: solve B6, B7 and B4 Simple again, saving the Preflop and Postflop averages"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/run_eval_saved.sh",
+      "sha256": "0970125fd1c79abc3283863651f46afe04c3b34ac4d2d3d0595ff0a879c26065",
+      "role": "procedure: evaluate saved solutions with other evaluation boards"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/run_buckets.sh",
+      "sha256": "e9e494ac70a491a397b3adc273a7489ce6dddea1ba5521384c590f67800fdc03",
+      "role": "procedure: B4 Simple with N EHS² buckets per street"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/summarize.py",
+      "sha256": "c91683e491d444a556e39a9cf838d52de0981f3fe167213ee39faeb66691cac9",
+      "role": "summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/summarize_eval.py",
+      "sha256": "95289a648c2d8e92e4fb7a265bb8e26c0e02379c8b752cf5277a2d081df8e8ee",
+      "role": "summary of run_eval_saved.sh (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/rfi.py",
+      "sha256": "85e359f3060870f9ab287cc630a1f237833bc0c3059953f0c9db6708de0cdbbf",
+      "role": "the five unopened class tables against GTO Wizard Simple (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/flop_buckets.py",
+      "sha256": "c50d95ce8a24808b3daf52ccc9730aa87a67cc3fdf6b961a923489f1aff23e01",
+      "role": "flop buckets of chosen classes in an EHS² cache (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/summarize_time.py",
+      "sha256": "0a9d9a8b01ae6888b038c58b7109c3e0feb4de257929a58444e45be01210832c",
+      "role": "paired timing tables of results/gcp-j (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/summary.md",
+      "sha256": "3fd70f7077bde12500e2d1fb794f85319d8b887972d69a491f408917660ae1ac",
+      "role": "generated table (summary.md)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-summary.md",
+      "sha256": "c175f102cfd588f0e77ec8d13c7e0f666cdb7e7f40e9d420f3d4255e06367fc4",
+      "role": "generated table (eval-summary.md)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets-summary.md",
+      "sha256": "598e2fa691d471f51121aaf2bf8eebddeb8f9efe63dc07485c90ed6e6b9dc12b",
+      "role": "generated table (buckets-summary.md)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/rfi.md",
+      "sha256": "3c04eb974841e70c2e9fbd2ce5af093f3c6ca28ef70f7326907777df3fcd4d66",
+      "role": "generated table (rfi.md)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/time-summary.md",
+      "sha256": "f165624d1d0f4c96c4eaececf871829976149f997b84c179b0afde47952d0ffa",
+      "role": "generated table (time-summary.md)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l0.json",
+      "sha256": "0cb550144386363c54a3f3b9c57afc3deec0d7303d133ee6f3a4d2f92947cfce",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l0.log",
+      "sha256": "718bc52a87bfba324338f41eb9eeb74376c898e3ca64c1ba8882f2fbd7c04472",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l1.json",
+      "sha256": "4be10f07b807b71498173c2e1a4d8c8c0933d417f1031f1fafc5c1aafaa15d3a",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l1.l0eval.json",
+      "sha256": "88fa55fb8b1f7c48945c96483aa0c5866c44fcdcd6a89e357c6e3177c6a6df02",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: l0_eval output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l1.l0eval.log",
+      "sha256": "edfa83628f4f914f530b90305b5851fbc80b22a9cfaa6ccfaadee6cf84db48a9",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b4s-l1.log",
+      "sha256": "b81b1fc9158b1b405e90d1048f08187021acbe1b77b6cf2cd3e6cee020053493",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l0-all.json",
+      "sha256": "018c2ab0df8b560a1da703506bbefe015858e2a49f1a66926c85e1f70df76781",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l0-all.log",
+      "sha256": "1697ab3723d68bfebea4cfa39de74c5c0ed2634fc10b0dd06c0e97f70d9eede9",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l0.json",
+      "sha256": "632c8063724425582371fdfbc48f91b451156f1e0d12fd282ed593495c9d7efd",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l0.log",
+      "sha256": "096089f6152bdd487eb39ffcef200422e70ec2736d5c473746d93e7148914230",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l1.json",
+      "sha256": "2de69c52df0cec0c8b0722e15a54cab1f32ef444cb7e883eb70f18e73f269137",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l1.l0eval.json",
+      "sha256": "eaa65b6daee72c0971acd0c02effe10538352067e50be881b15c0ddaaff0d938",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: l0_eval output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l1.l0eval.log",
+      "sha256": "e543ede13ee68a60a449b7e0e70dddff510fefc133a56355eda5c7c9f4e772b1",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/b7-l1.log",
+      "sha256": "f6688f86b42acea5a86a89c09eccff941f0e52729c661340cc8da5cec52f58b0",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/load.log",
+      "sha256": "90cdb5c288baa1d16dbfb005bcb4680506c9063e91fce766af53ef73035f86d0",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: machine load every 10 s"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/run.log",
+      "sha256": "7316263ddd6bd68e268a22b3d8630aa18d6b387abcb2669ad97a820dd155591a",
+      "role": "recorded S4-2b runs (run.sh); binaries per run in source.revisions: start and exit times of the runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/failed/b4s-l0.20261008-first.log",
+      "sha256": "71c209360bf9af3bdc0ee4be0e288f6151de000bc24679d2d404d8d4ea60e144",
+      "role": "runs of results/final stopped by allocation failures (machine commit near its limit): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/failed/b4s-l1.20261008-first.log",
+      "sha256": "b4dbdfc2b0e53086b326279f3300975c6ce2d118bd79d8d6b14e5b2d9f3543aa",
+      "role": "runs of results/final stopped by allocation failures (machine commit near its limit): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/failed/b4s-l1.l0eval.20261008-first.log",
+      "sha256": "3011dae85b668ec0330164148cd95d22de99173d9ba1cc6e95a022cccdd4f3ff",
+      "role": "runs of results/final stopped by allocation failures (machine commit near its limit): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/final/failed/b7-l0-all.20261008-first.log",
+      "sha256": "bbfa9c2c8d39ac99ceab68cdf03cbde7773c5113d340368ba1893866996d738d",
+      "role": "runs of results/final stopped by allocation failures (machine commit near its limit): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/k4-min/b3_s256_m16.json",
+      "sha256": "1e3a716af1d716a64d96c606fcd928ff8af559972bba92e8d38835d2e6a20916",
+      "role": "P2D7 check: B3, 200 iterations, solver K4 256 with minimum 16 or 64, the binary of 30df60b: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/k4-min/b3_s256_m16.log",
+      "sha256": "6572a1ed33661ae930bbef13d403cbab3308e32642d8bcbb05b59368c165bf6d",
+      "role": "P2D7 check: B3, 200 iterations, solver K4 256 with minimum 16 or 64, the binary of 30df60b: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/k4-min/b3_s256_m64.json",
+      "sha256": "f610104a64162419f1f8db0686cad93a2f114bdf2f6430e6828cc6a7e476ec42",
+      "role": "P2D7 check: B3, 200 iterations, solver K4 256 with minimum 16 or 64, the binary of 30df60b: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/k4-min/b3_s256_m64.log",
+      "sha256": "20eac9e85a06519d7383234d4d418d3fd2589102b10c5ac024a545f304b25574",
+      "role": "P2D7 check: B3, 200 iterations, solver K4 256 with minimum 16 or 64, the binary of 30df60b: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/k4-min/run.sh",
+      "sha256": "ebc77079ae831d02efe6f91bb81c52efa2a7113a164c89a5cb8dc66f3f9ed8b0",
+      "role": "P2D7 check: B3, 200 iterations, solver K4 256 with minimum 16 or 64, the binary of 30df60b: procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/b6-n32-final-plain.json",
+      "sha256": "72e8778b7877b705a71aabf8e11cf758c065aad2eb8d1e66d63bbe571126467c",
+      "role": "change C: B6 with the S4-2a defaults, the binary of b16dd9b: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/b6-n32-final-plain.log",
+      "sha256": "7556950a0c444ebef34f8fa8c15a02b92cf600de0ee0451a16bbb14efb6fe1e4",
+      "role": "change C: B6 with the S4-2a defaults, the binary of b16dd9b: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/b6-n32-final-plain.profile.json",
+      "sha256": "00ae9eb3672892db4f2495b7ba0195730b8b979aa55a349d01a044a9213e5c28",
+      "role": "change C: B6 with the S4-2a defaults, the binary of b16dd9b: average Preflop profile (p2-class-profile)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/1-4cc17dc.json",
+      "sha256": "c78db524d83d6f950f5a8fc2a5b1f4bbaed54fe19100b6ba803d1f6acfd21a4a",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/1-4cc17dc.log",
+      "sha256": "bddebaedb17a278cd80b7fb081aeff106e712b4bd99069d92db83f4ee9579a71",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/2-plain.json",
+      "sha256": "b3992babaccb89aec9e302cf5719fb1631ab9322d23f39cf30c3fa8c1b6b7bd0",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/2-plain.log",
+      "sha256": "b0dd9e452114dce9dec77873b17f65cdbbb66b2c2b738ebc07279b2e71e6a000",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/3-inter.json",
+      "sha256": "a94c4580db5970c1fdd5b0048188a4487a752b40c6a5cf63c146aa9fe83a226c",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/3-inter.log",
+      "sha256": "64609983b1e5121556d0c14606b42557c60ad2d73688d500f9096fe5d18e9c75",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/4-inter.json",
+      "sha256": "d222b44c7426ad3892bacb69391fabb7455d73c397e4288d1aa5c8335ae65bce",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/4-inter.log",
+      "sha256": "b307153cdaa462809950b8bc2accb8d1f2e8d7324cceefcc84050e8f9c4575fa",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/5-plain.json",
+      "sha256": "35eee419d8df14a37797b040a4fca5711c1ac672e942d86e2219d8b27ad06c9d",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/5-plain.log",
+      "sha256": "0bb48100e0144942d0ddb8fa772f6c93d89527deed6b2ae51775844c48f6cfee",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/6-4cc17dc.json",
+      "sha256": "8d0b9201e134e517fc427e504daf10a92fd97e8644775b55ba0c8ce870e5c4ec",
+      "role": "change C: 1-thread CPU time, alternating binaries: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/6-4cc17dc.log",
+      "sha256": "532cfa065628293c7b609b8dc21c56562c3b435a8ece14c76a9b3adb062bbaa4",
+      "role": "change C: 1-thread CPU time, alternating binaries: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/cpu.txt",
+      "sha256": "87dbeb602c86188363febde2edcbee3c8d0a4085f97c1f8213204a9baf8390df",
+      "role": "change C: 1-thread CPU time, alternating binaries: measurement summary"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/plain/cpu-ab/cpu_ab.ps1",
+      "sha256": "7f665a9e835c2ec5e90c68b611b64d5b2b4722d3419bc834daa93240c9fb2541",
+      "role": "change C: 1-thread CPU time, alternating binaries: procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-1-m0.json",
+      "sha256": "72eacec2ad8f0fe87c39ac2ff3d81a569201070f26a2c7c48fd36df62a921ee1",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-1-m0.log",
+      "sha256": "c25f17e484d5cbada39066320dedf7e32740cbdf34702304893c1689f2839edb",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-2-m16.json",
+      "sha256": "ca21775e7c98faeaeaf3a36d69cbc7f46dd4c1f1d51c25c90acd56849d9364d5",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-2-m16.log",
+      "sha256": "7d15a56316309c52203428b45479cfc7f832c2fcfa543518d8fa55adcf3453d5",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-3-m64.json",
+      "sha256": "5f6f0fa33524115208d1690d620f952e7e72c9a66d5d1c7f50147e68be799ed9",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-3-m64.log",
+      "sha256": "eea9e95adddc8f828e621849a44aaa25e1ba2d4fc63ca56657f517489aab3c04",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-4-m64.json",
+      "sha256": "87f49e879911bb733a151d3f6fd0f1015d66422010931d9d56a24725549fd358",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-4-m64.log",
+      "sha256": "ccac489a98ff53820402f0ed0bf3ca7ea114d23282410a1c48509f43b8d3ab31",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-5-m16.json",
+      "sha256": "655183574a131ae76c7ee567db7447f5efd1c2439e355d06ade290d7ea4ca4b7",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-5-m16.log",
+      "sha256": "c78c48cecd217d731b9ef16575b9a8b44833090206988d221d9f1f1dfb7417ae",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-6-m0.json",
+      "sha256": "f742b123b0ff622451018ae215004484c1da4886dae00f5b8f42826ab810c2ee",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b3-min-6-m0.log",
+      "sha256": "b6632f76696cc61438df721a0539af5f44214e2e4a30bd130ecb48dcc2601303",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-1-30df60b.json",
+      "sha256": "8be8b34a8723b1840fb9bc99737d8f777106b6def6d531dcf6c139c324f549db",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-1-30df60b.log",
+      "sha256": "c8f20bfc7486a3a9d80cd3b7e17eb61dbf0cc325a47fe87de84236d90db16421",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-2-sparse.json",
+      "sha256": "b1da7895c206fa07ace1f323f216a4df9ae8b69e649d138676cadf5ca193998d",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-2-sparse.log",
+      "sha256": "4231f13c5ddcf7d1de5a87b2d81367e433d1dd9ed928efedee0753dbac0f6513",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-3-memo.json",
+      "sha256": "113b5f12afcc388e130dd40c6b627c0814145bdb48b7310a07c51af5d0f09d2b",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-3-memo.log",
+      "sha256": "11b39f18a9b8e19adb359a1423a46ab9d45f550e8dc0f6f8b18be11f046f8d29",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-4-guide.json",
+      "sha256": "b65d0e0a69083514ff1a91135e6ef5553d3c1dce83b4b5f55b8bedf0e51ef441",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-4-guide.log",
+      "sha256": "f7fc3849ca20e1a8ff3026201d0eeb001a250db89006bba7485d6ee35a26ecec",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-5-guide.json",
+      "sha256": "fd9d0a9dfd62471d9784139b711ba62217bc5309ba6b6c5d6ad559722cb3ae2b",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-5-guide.log",
+      "sha256": "e92dd23ad9dedf2b8848a9bec7ae1cd04054e98baf83c1344a4880f4d1581fb5",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-6-memo.json",
+      "sha256": "e8f02be52b26cbb1c2c141b181aed51e172332e8a2efa71bfb86a7ae0a9219e1",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-6-memo.log",
+      "sha256": "5da62fc70cb84fd94227603c5a07f2d5d704d2e7e4f6d25a121acdbc0c5ba9d5",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-7-sparse.json",
+      "sha256": "7bb433b94c88a2c6ae8792efe16fb59b5fe7fb71ea31065cf305fb8bf3ffe08a",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-7-sparse.log",
+      "sha256": "9c4459b999fca1f14bdf74d6d13f34c7ad429af614cbe3158bd5741f85ab052f",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-8-30df60b.json",
+      "sha256": "180f565941fdae46be5b6e2cf33c8d978b9ec0781f9963ed7198f461630a3258",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-8-30df60b.log",
+      "sha256": "67c292e2e60504698decba43acc5c775c29b7ff5daff6aeb03311fad57d07d00",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-1-m16.json",
+      "sha256": "93b522587baff15fbffa95e3b47e666179a6f663cdb71b69bf5bd0ed2646441e",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-1-m16.log",
+      "sha256": "36bb63b18c2b169869a542e32686a96a476fa8ab7b49c53c8d150529837b5765",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-2-m64.json",
+      "sha256": "ef0d8b5e9c5e9c352b8056c6639970e640a58b78544779f66f363f8b33769fb9",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-2-m64.log",
+      "sha256": "eaa25dfaf7d7ff36e7ba5ec2bc0ac1f17354394fa1dfcf0eb10600c09295288c",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-3-m64.json",
+      "sha256": "52b28100872ee7fa8098346f3ab5de02d56e60e10c984ea4ffa9e6609be63840",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-3-m64.log",
+      "sha256": "322c8cd291e4b4b9dd8d4a3a17d89a42a9c6c5b564567154473101aef65d4529",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-4-m16.json",
+      "sha256": "d70487bb6d5ddfc74977eac2deb551834237e5514eaecd04deafda1e1409d7c6",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b4s-min-4-m16.log",
+      "sha256": "0bdda62bac3b7087f019af6c4eab545074cb4ad8f626a389c27b92510c9d70e4",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-1-30df60b.json",
+      "sha256": "5fb9bb89778de256e8d2c62274e9a2e9d99f6207689f78baa5804680aa3ed244",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-1-30df60b.log",
+      "sha256": "36061b10ad191d86340859e414a9d082f03b42095104453793dbdeac1dc9b2bc",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-2-memo.json",
+      "sha256": "d0d7cb470d868c9030bc1ecb396ce7c2a9d85e3783c67fe12d8e887761120282",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-2-memo.log",
+      "sha256": "084e25bb0d1f88a09ebc77c822cfd819d067e4c00233c72b3e471b84c1e2493d",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-3-guide.json",
+      "sha256": "2fa460c4e177734fcb2b59971cd59fcfd8caf6545bf42cd886a966d7dd788d39",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-3-guide.log",
+      "sha256": "1946ced2106fee95f2b555e3b577acd9fe1ddd03dcb353c290bc0af00441c0b5",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-4-guide.json",
+      "sha256": "303510f677361c8bde4fc056d9298e0583ac49a8d75c6308fbffbf392937ae7b",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-4-guide.log",
+      "sha256": "353e2a534896146d6a9c09aaced93b4b133edf69650b06fce74069e0cac15d0e",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-5-memo.json",
+      "sha256": "8ee721604269a330b6505d2344f821514e2594d62cb6f9dbd441dd6a1ee122f7",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-5-memo.log",
+      "sha256": "88f3398d746c99f645187ec33f2a075e624f52060573ebea74e46b6d0757e609",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-6-30df60b.json",
+      "sha256": "9e041626796517a94f5399e4aba85c5bd910a887c998d94e171a0fc5436f292e",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/b7-6-30df60b.log",
+      "sha256": "2482dac37491a52978d1608931dc807c4ff81b7155dbed289228f0f05443546f",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/load.log",
+      "sha256": "9885144eb854fdd616d557995a51ccbdacbb89c93b3dbcbbf79abd861e1250ab",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): machine load every 10 s"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/pass/run.sh",
+      "sha256": "1da4fef8ac94030473f96455c30404dbb3dca2abbc7e691ced57e6209cdfe2f8",
+      "role": "paired timing of 30df60b and development binaries (see source.development_binaries): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-1-30df60b.json",
+      "sha256": "371ca7af07d2820ebc05a12612a64c4631590af11957397995c96fa9dbec98b1",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-1-30df60b.log",
+      "sha256": "74bf312ec46bd096646afdf8961b3089669501f7754711e0222a18b42ea165a8",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-2-memo2.json",
+      "sha256": "45467bf9fa95db59f88caaa37aec9186c69964163f3c7cd49a9be147a7b193e3",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-2-memo2.log",
+      "sha256": "16145ab71ba835b52e616f9ba95c3bafe69672a9d4e37da8dceba65c10a374f7",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-3-guide.json",
+      "sha256": "4e03884c721e9fe82db4e7e3a300c40d3562f54c6b7c7ad3c8b7d32209d08bca",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-3-guide.log",
+      "sha256": "15936754c185ece320bbbbe89171eeb606d02c06accf4f561b4e545a386838c7",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-4-guide.json",
+      "sha256": "c8b56782883a52b07168f5fc99ea9a622348c23f22c877d6cfe9d0e76194c116",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-4-guide.log",
+      "sha256": "fcd9b00367714dab34a7112d8d84abcaf1188c385120f2161021079f62c2d883",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-5-memo2.json",
+      "sha256": "e65d15a3e29018b554f4771bc4e42e0ad124712a726e3ee85ef2f702bede7acf",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-5-memo2.log",
+      "sha256": "dca53fd35293b8d8cd5403b02ea28437ba5c2c816d2a5a0f665b3ff5edd434a5",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-6-30df60b.json",
+      "sha256": "d2b14c005db89658f6acf1a7ca78932f684b86fa82e36c0dcd786dceb8e52913",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/b4s-6-30df60b.log",
+      "sha256": "05da7fafc692770d1c11b9603c3001ea9e5ce348f3763235115fe94a35afc827",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/round2/run.sh",
+      "sha256": "ed07577fa634b8b0723605ee100393f5ccd3b00f6f4845cfbb89f04c2eb35818",
+      "role": "paired timing after dropping the sparse merge (see source.development_binaries): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-1-d.json",
+      "sha256": "8a98531ba845213b9e1bfc4c756a2c871865b2eba9772b11ac0dcd567548959b",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-1-d.log",
+      "sha256": "3bab46658c81f86a0e1a26810c43be35418e85a17728335cf114fe83b5986830",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-2-e.json",
+      "sha256": "9f3b61a0a70e2f3ec225e490d5f8c12d3aefa0e7e39497d8074cc598e57b401f",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-2-e.log",
+      "sha256": "c26c06db543a4647582ddc44ec00b180738d0189844b1e3a00a19b4a34d6fba8",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-3-e.json",
+      "sha256": "cae589f5fa9c566872d2d2310b89bf1746fada1a445be2acd7434d329a920ea8",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-3-e.log",
+      "sha256": "de90ea0aef0fb2cc17351cf025431917e8e7cb9affffcb135cd368c3a4d5d956",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-4-d.json",
+      "sha256": "02b96df916630dc27873d8b7e3f50e0d8fb0024c316245d0ae1833850a83ca34",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b4s-4-d.log",
+      "sha256": "41f5a301cb5113d529f5d50327f9ef497e29763ef6a9a1a47483449cb9b93ccf",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-1-d.json",
+      "sha256": "59f9323b4743f0e10dc1170c0c0e6e93a5ecce1957ca684ab8b0726c25d9e6e3",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-1-d.log",
+      "sha256": "46ed4ab2a07234610841814ef350fcf2c3e887759f0c3f45befe5e0568e9b304",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-2-e.json",
+      "sha256": "bcc2cff0a0859ba6a5d36c4cbf269c325813a48ab77835038e7567a69f7a40b9",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-2-e.log",
+      "sha256": "704c764ff8c6a15a9781ccfbededbc4f1653a3f002629c61d046878dc56be57d",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-3-e.json",
+      "sha256": "60607ce5a96483cd0f70fad40ac7146f518799cc7da5c752743b7006b5606b68",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-3-e.log",
+      "sha256": "bd9396b52a90841494a2139e8e17e5401da7e1639a00c09b2372afdfc33fc37a",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-4-d.json",
+      "sha256": "bb0afccaa7875996510535517a3dc77deb79125234b982b390da3d1f1f5d8256",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/b7-4-d.log",
+      "sha256": "ee88d832768dfa56f6ac1d04a1f5dc0527d68c0cec931dc3200c3cd1244d6e74",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/e/run.sh",
+      "sha256": "db63f392f7413f06d634edaf15d09ad2a0cfae5c2f69e9c32bd5375ed63564cd",
+      "role": "change E: paired timing of the binaries of 6cd6baa (d) and 6658f2d (e): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/speed/summary.py",
+      "sha256": "007a9ae46bd0a2bcf3eec4e53f622af5a1af2e15ba66352c00cbdee778b3dcc8",
+      "role": "timing summary script: summary script"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-12.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-12.faults",
+      "sha256": "1fda99d9381d967405da52dbb604ee2cbdca7ecaad01e6452fe741117284fa80",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): page faults (faults.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-12.json",
+      "sha256": "ff391ba5c6e7bcc1062f0dd6561a3e0d3235c3fa5bfcb1d5becf0263ff64233c",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-12.log",
+      "sha256": "cfba7119c74c611896043f12d110122add0f4c4f992858bd81d02504506f8847",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-6.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-6.json",
+      "sha256": "21edd08f37c5ff464492e898bd59a99ef98afb494ce3244bbcc5393252d3dde4",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-4cc17dc-l0-6.log",
+      "sha256": "a10579c64500ff3c9c9a62c525d13abaf15a861624b0ff9026fb23e6a8f1e504",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-plain-l1-8.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-plain-l1-8.faults",
+      "sha256": "0a1b69504576cfb7fd8dcab68f7f0a765447ad61efff0e51e179ef69e8cfa523",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): page faults (faults.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-plain-l1-8.json",
+      "sha256": "a3ad783d26d3b7117b1f2058f023dfa2998a71e831b5c5cac002ed3f47eb91e6",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-plain-l1-8.log",
+      "sha256": "5e50fbccfcf305ba592df58f98953074732c3cb1cb56ba2582489f012f5c3125",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l0-12.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l0-12.faults",
+      "sha256": "862e96f41efa32982d34d2b7ac4104d3c14dab6378a10329c162d509cafec54a",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): page faults (faults.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l0-12.json",
+      "sha256": "1a9fc0c7212b9f8884dd4e991989508d12d1306cf2edcebc4fa6eebd3dbea5ad",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l0-12.log",
+      "sha256": "c287b95d5524da713a4f0185cef2b8af23d2d45c2d9b94e906e5de98801c1aa2",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l1-8.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l1-8.faults",
+      "sha256": "dcda49d52e6f9bcd29cbcf86c3744440c8ad2433af9d2fcac59500ef13a11cdd",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): page faults (faults.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l1-8.json",
+      "sha256": "5b40f1c446fe5798436e4c3dc6bdf0fc82247d3a098cb8f2995e8a4a4e273102",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/faults/trunk_solve-reuse-l1-8.log",
+      "sha256": "675e74924cde1dc7da82fe31d678a27e7e0763562a5412c4b19bb613cda251dd",
+      "role": "change D: page faults before and after (development binaries 4cc17dc, plain and reuse): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/b6-b128.toml",
+      "sha256": "0d387576fc015d06fb8eb032f2310e7f80d60a9c839deb7c7a9bd2fa35ed745e",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: game input"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build128.log",
+      "sha256": "c3776ecfd8a26ee7a40adb5c8a6cf3ee2568153807359a5fdbdcb3bd7e32357b",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build128.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build128.peak",
+      "sha256": "cef4e070418966468395df36620e29acbe1a5bff6fd8c32c0f9aa3bffe60dff7",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build32.log",
+      "sha256": "6dbc82496ea1932664f05d21b445f3ae93c33798ad4950bf74c94f50989f4aab",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build32.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/build32.peak",
+      "sha256": "8611ac0a91593c43882fc82a7e6ed9581e8fdbaab043195964751096fb2492a4",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load128.log",
+      "sha256": "dab8722cea0eb9b593cfa439facada992b097b7164fe65017826142c75892b6e",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load128.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load128.peak",
+      "sha256": "7e9e00503f2243efe88118b5ac7db112bde66676e2cb8e540389c97d5d0db364",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load32.log",
+      "sha256": "bf1f14e4f79d749f004de79f8e2f8ab6d90b5885ab214f3b01e61815dca2140f",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load32.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/table-peak/load32.peak",
+      "sha256": "7e9e00503f2243efe88118b5ac7db112bde66676e2cb8e540389c97d5d0db364",
+      "role": "changes H and I: peak commit of building and loading the EHS² tables, the binary of 46060c6: peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-i-30.json",
+      "sha256": "eb0133b3addddfad0cf8179d9106ccc000c38cca37db3f417332f38a31ff1520",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-i-30.log",
+      "sha256": "ff24b096d252153efca124656595950455c7d2f18c5acd2ac8a5b1ce39c23bad",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-i-30.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-i-30.log.trace",
+      "sha256": "4ff4a0578f7fbdc22e9010cdf784035e073c32dd882bd51e1e3561e9622c28af",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): private bytes, peak commit and page faults every second (trace.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-i-30.peak",
+      "sha256": "537d4556be46441f3adc8515d8c4e648def01b9cb3329fd1a37e397424244f1c",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-150.json",
+      "sha256": "944d321796f10356c3d7e0ceee8c17962aff046bb5dda7cfcdb2c30ac465ca95",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-150.log",
+      "sha256": "55faa5d934a1b9d3a8788539f93eacdee14e585fed1d761b5417071734bcd4bb",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-150.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-150.log.trace",
+      "sha256": "14ad7fd52308665b534d501624de1610573ed305754af5438e90ff2eb69d3e3d",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): private bytes, peak commit and page faults every second (trace.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-150.peak",
+      "sha256": "29facbaebcdfe2ad45e05afd700d149e28ef774d6a98f291b3ac6c45a48df338",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-30.json",
+      "sha256": "bcd444f9cda80754799dce769cf9b21660ea318440a33f7bf213698314721d5b",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-30.log",
+      "sha256": "69f249439f7502abf250b9d67b78284ce469aced037b1fa64d687b0993edcc39",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-30.log.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): stderr"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-30.log.trace",
+      "sha256": "44ed85659612282930ae27e98c8bd039ccffeddc4445bd88e0fbb62ddfd1edda",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): private bytes, peak commit and page faults every second (trace.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/memory-j/b4s-j-30.peak",
+      "sha256": "f71c72ab5dcec6579a34dc3800e7e295d842b5b7375203f26d7b5ccf651be100",
+      "role": "change J: private bytes, peak commit and page faults over time on B4 Simple (trace.ps1), the binaries of 46060c6 (i) and 7b8d704 (j): peak commit and wall time (peak.ps1 output)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-1-i.json",
+      "sha256": "731a516e9c1e12dbb4e274425c3c6455484ad91b40bd52098f20925e92940542",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-1-i.log",
+      "sha256": "79b1b70d5c06d67a2cca04914bb747c02aecf563da1dc6a1834e5e172c89b08b",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-1-i.time",
+      "sha256": "a9e57769a4665af66466b2023e14a690790007b5d3d7f620487721a21cf10fef",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-2-j.json",
+      "sha256": "6a3b8eb1ec2028c0708c7616a3823330f2ac962f98d7044589dea709e57a79b0",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-2-j.log",
+      "sha256": "c19ed3403aa42a30ba7b9132857e76b1dee8c10816423f85aa2838e0bc3a2ce3",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-2-j.time",
+      "sha256": "a84d1650c55ecb8d66c7916b8e967b579e453266c55816ce4f1c9104701763e7",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-3-j.json",
+      "sha256": "6352681eb0ed8cb7661d61b85ad2421ff86b62c3b35460b4baefa158f3f3167a",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-3-j.log",
+      "sha256": "b3f9d2ebd66c7e1eef7ed1f9ada067a0d99743a87f298965cb6c721a0846c942",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-3-j.time",
+      "sha256": "ec82f44a12504e94cb49697654c7a06fca7aaa405a68889eb55bfdb9c44b67c5",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-4-i.json",
+      "sha256": "4d2940209a4b67ebdd7c313c74fd17610a426f265f219f18010fe6bac7ec88b2",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-4-i.log",
+      "sha256": "9ba2b34bc70d681c785fa8e36a3bd475a41df0295693f969e9ed4a3e464c5560",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16-4-i.time",
+      "sha256": "7b15dfc6e20a0cc1799349a84ad6d6a4c2777419cd67c2d86b2d17e8c35773cd",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t16.profiles.sha256",
+      "sha256": "821d47a2018cd3508c5f1e1de433b3f21eb371fbbece58d7f14b1d83b1170f60",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: sha256 of the average profiles of the paired runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-1-i.json",
+      "sha256": "e85b484907d86c09cdaffbb3509032347e24f25823742f741c1c59d5c1b01267",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-1-i.log",
+      "sha256": "3f896d8d8b5e1d3d71fed33361506b452ddf2be1b0dfd45ab165934d38c6eefd",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-1-i.time",
+      "sha256": "c2654b13997830cc9e6ab89c92837da4f718738ed1771e68e0a5e20ce500e7da",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-2-j.json",
+      "sha256": "dff8f7deb1ead146355ab379a54587f601920fa16fb96efb2988a47607907f8a",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-2-j.log",
+      "sha256": "8f6fa205f9a1fa989b462596303ff64e2753f9377595d260f5f93435a1898d79",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-2-j.time",
+      "sha256": "147eaf6b260d8c871265614641ec7f516dc33a041000d448dd9f762a659e2f31",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-3-j.json",
+      "sha256": "51a0b0903423974d0594af4a366225691163ab0e4c63389360be7aa15c55da59",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-3-j.log",
+      "sha256": "27252797960c487fda632fe465321d850e9bc93f6a8742a945940b6cb17830c4",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-3-j.time",
+      "sha256": "011337869b8352165e23de442811db412df7523097c404320937b5d9a55b49d2",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-4-i.json",
+      "sha256": "c3f0a1a6df062da5f34f42c07d1d03f29addaf3c83cd4e4e63006e22e18ad6db",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-4-i.log",
+      "sha256": "2addbab680cb41245ddcc84ab4260fed380fe4c2fa41a930ba9c0d7d10641e01",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32-4-i.time",
+      "sha256": "c4fce8e925b112d05d790d9cc8a4b189d4fc2af41d6f39be2c2ae3001de80b54",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b4s-t32.profiles.sha256",
+      "sha256": "bafa0b73e63f5a8c9656877f1f7ef6bfaa28f92037121fdebbaabc63365bce71",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: sha256 of the average profiles of the paired runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-1-i.json",
+      "sha256": "6c1781514830b5a55b22c433e490130924ecdaec8557cd8e63f4224cc70230cf",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-1-i.log",
+      "sha256": "dea67445f6a568fa2bdd39cda098dca611f2ea9b0a5b95df31ccadc064f6649d",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-1-i.time",
+      "sha256": "f33fdefa389dde309465467675698c871e1ffbfcb94d4d6cc57e2db82f006fe2",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-2-j.json",
+      "sha256": "41a33a0732e496dd2b6da01cf8e71c8e667b6118b097d58effa48a4100607f6b",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-2-j.log",
+      "sha256": "bdc6dff89ca5a0e8ddf77166e55e5081abeffb0df7d36a17ecb7eb22e9094bcb",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-2-j.time",
+      "sha256": "f09d70c79cd97136fe224630dba1d947d73cad1d49f7b8637e532a724062209c",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-3-j.json",
+      "sha256": "2ea2e09fb4e725cd0a769893dcc34d00057b69ee6a0a296ed3cb158b9560ec5f",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-3-j.log",
+      "sha256": "1ea781b5c14e82716c1bf76bbdd3582a408ed5567c1009189fe62f0c864ad1ea",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-3-j.time",
+      "sha256": "aac84d4bc793fd7f044f87abd90e64756f3d81886d0c614747ec1fc01c6e6ac4",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-4-i.json",
+      "sha256": "e730e3bb1578cc3452c1851c58edcf7b1238f61e9ffce805402d847836018a6a",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-4-i.log",
+      "sha256": "1724cf8e37fca186ddb11204626e71b282965e69b56feb9b04156011ace9a465",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16-4-i.time",
+      "sha256": "a59173ea7cd43dc227ad0a35320a726926f379c43f8ba0149827aea7cf6f3d66",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t16.profiles.sha256",
+      "sha256": "1852c6d4ea41a3e42213dad450f4f42a8c8f3953fb5d4e0c95fed19f06c15825",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: sha256 of the average profiles of the paired runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-1-i.json",
+      "sha256": "c78930b209822509b3484d2eabeb8c477bb695560fbc1d79de5458b6f814cec9",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-1-i.log",
+      "sha256": "4a30ca0caff50df4e53858733e3e687378ce2c333c817bfebcae95a2b618a486",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-1-i.time",
+      "sha256": "ac33e0ea160a259b0cc65cb86d04722980545c9bfd74409c0994e44efa286018",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-2-j.json",
+      "sha256": "2ac268315a7c22b5aad744b1fa6dc00509b98ea68f0654db04eed0f91bd75d95",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-2-j.log",
+      "sha256": "7bfaace2097ae8cfb10313d99472c74b032534fe8d5e93c7153aa5c793ae700e",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-2-j.time",
+      "sha256": "5eb0af7168b4ec2e90f4ff14ea46cccb0e08895e0194456acdc8500d25e6dcf6",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-3-j.json",
+      "sha256": "9dc6cbc1baae7450e36584a2bc695fbb7c61390a38dd7e0b5e1955c5020a137e",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-3-j.log",
+      "sha256": "0af78302222f25c57ba5a84c08ce2550e4f01906dfcd0f5c47fd1a8ab2f809b5",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-3-j.time",
+      "sha256": "5dd4ba4dabb425dadce09c974fefdeb11748b58d61a51fccdb54e7fb7e83d1b2",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-4-i.json",
+      "sha256": "92d34703d27a242d0475464fe769dbf222ba1a8743749083fb3fd869811f2273",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-4-i.log",
+      "sha256": "624c9c61f75dd5cbefea237b6a87e207df394d24c7705842554537c6fa22e2fc",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32-4-i.time",
+      "sha256": "65925ce97b31da7908fca7e13109daf35735fb83af59759d0c56f5787895b6cd",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/b7-t32.profiles.sha256",
+      "sha256": "c88329f2e8abfcbd753c5c09db62091758cdfc2287547cdc261fdc12093713c4",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: sha256 of the average profiles of the paired runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/build.log",
+      "sha256": "3ab963468573dab4e6225aa6f0f8257dabb5134510418292b6466697b9ac82db",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: VM build output, rustc version and binary sha256"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/create.log",
+      "sha256": "e08f4b7b432314f067661d732e0381467887caad0aee7290daaa0e70cef2c92f",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: gcloud output of creating the VM"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/delete.log",
+      "sha256": "10df30f2f52f923ae69fbb2e35e8095158b4e527a28e4cedb368f0c3f1895a63",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: gcloud output of deleting the VM"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/gcp_j.sh",
+      "sha256": "d6760a2b6a50fe28261adf3ffb490dcd026f410bfc614041fd8b7e3fa8e5cda3",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/lscpu.txt",
+      "sha256": "ac51346656b63becc120606c7a05ae98f349f0f6ddf672819499b57475bd817c",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: VM CPU and memory (lscpu, free -g, nproc)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/progress.txt",
+      "sha256": "c3f1dc9fc110070a1d89136c30478a5772b04571f629b94ba2c334582c792233",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: start and exit times of the runs (UTC)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/run_j.sh",
+      "sha256": "5a5dd2d418add4a411d0c5a8461dd456047b2ffa24ad45dbbb83a415184aaf60",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/setup.log",
+      "sha256": "3b419c69ff321ee6851fa5489a2bb0c9a2ef093815a709dbd05391f89767267f",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: VM setup output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/setup_j.sh",
+      "sha256": "f656d0855ae81c4dc17f583e7b81e0404c1928fb785b05e76942e59b240169c9",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/tables.log",
+      "sha256": "b2ef6bf45b5a689daff68e792fdf3e943fd15982b89c1e8894ef53398b78f492",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: VM table build output and table sha256"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/gcp-j/tables.time",
+      "sha256": "a45b7c6e01e4ed295b38d8a81c781cb7ca40673526bba8bb7841e3f48b148187",
+      "role": "change J: paired timing of 46060c6 (i) and 7b8d704 (j) at 32 and 16 threads on a GCP c2d-highcpu-32 Spot VM (Ubuntu 24.04), both built there: /usr/bin/time -v output (CPU time, max RSS, page faults)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b4s.json",
+      "sha256": "0eff73a2e9298e5181c14a326d077a6f8d77d006054798bb47ef9921df3fff9e",
+      "role": "solutions solved again with saved averages (run_save.sh): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b4s.log",
+      "sha256": "378d42d8f92aa71fb574866d77e51a0bcd136b868feab356b95b03c5e519db29",
+      "role": "solutions solved again with saved averages (run_save.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b4s.run",
+      "sha256": "2bd2fb2a138b13f551a49b866669646333518d16dfb1b9b1ac06c9d081fae46e",
+      "role": "solutions solved again with saved averages (run_save.sh): start and exit times"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b6.json",
+      "sha256": "4c210bdc991e6a7ae286d44cebe3c14e99dfea23091d7affdd8a089b42ee474d",
+      "role": "solutions solved again with saved averages (run_save.sh): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b6.log",
+      "sha256": "762a7cc7fd23148cd1cb2f9be212c68d5b64fcc15336929ee886c6444bc0f851",
+      "role": "solutions solved again with saved averages (run_save.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b6.postflop.bin",
+      "sha256": "27920b2dc5c03333ca0b07942caa45f980a117394511f2cd6c218f73c3c4c2f6",
+      "role": "solutions solved again with saved averages (run_save.sh): average Postflop strategy (P2L1AVG1)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b6.profile.json",
+      "sha256": "00ae9eb3672892db4f2495b7ba0195730b8b979aa55a349d01a044a9213e5c28",
+      "role": "solutions solved again with saved averages (run_save.sh): average Preflop profile (p2-class-profile)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/saved/b6.run",
+      "sha256": "8e7a392fd2c3f2ec1d8501e4f53c6c72b8ccad64c1f6cf87a81797f9fa235c13",
+      "role": "solutions solved again with saved averages (run_save.sh): start and exit times"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s0.json",
+      "sha256": "1144bea672d5ec970cd8b627250024638e6b1bd8ca4a8612f8817a94b86a2ced",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s0.log",
+      "sha256": "570a04cb93e69d335f67013308a9a85ee72e2c8ac245128f32694c8108b2b1d1",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s1.json",
+      "sha256": "05ca043a63e93fc5443f758045b960432c0d5ac8cc227cae05cd2bb1a64eba50",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s1.log",
+      "sha256": "a739d17a4a6f756ca82e7f2cd39d9755ea05f5083feb9c1fea3cba333cac227d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s2.json",
+      "sha256": "1853543b701dea663f011f06a64967f191a2f64095a5cbb94398287c15d70574",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s2.log",
+      "sha256": "182fc0e3d8f7ceea6826f1e37ff91e6c9bccabee9fd0dbcb91a442ebba6e41a9",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s3.json",
+      "sha256": "73a6382677f16345d3eb876d6883d624bcf6edaa079f48f7f0540825725bed9c",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s3.log",
+      "sha256": "9edcaa837d232bf8be5b5056695e8a0cdab7e86e6a4621734ff2f0440458ca83",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s4.json",
+      "sha256": "547a58277c560c695dd1db8161b2a9bb85f048164cc71a88eae56ba9623491c1",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s4.log",
+      "sha256": "2de697a4a4f6f4e1b7dcde4f6f6e184c8f0af91241ed635bcedeae48d7aa3882",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s5.json",
+      "sha256": "ee00cd60bf0c6cc8ef2582978b82f2ccca275bcf598efc1f931820390f97a466",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s5.log",
+      "sha256": "5664094382133a416a4b03f348acbe4ece84e9551b148a112b4050c15bea0b13",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s6.json",
+      "sha256": "e72265afe730ecc2912f24e3cf0057eec0ba1b2dea7adb28281b8a30de360038",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s6.log",
+      "sha256": "44cbd761ed1c8dd4b5d9d4247d833fe3a0754c6b77c545eff17716c79d271769",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s7.json",
+      "sha256": "ba56307123940194fe3d2238dac7fafb92ddbd9fd593a250ae8c451539cc25c2",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-1024-s7.log",
+      "sha256": "7b7ce6ec75e76bdd0288e2e54f02afa2febb743697ec68a0e06215e763ab8ec0",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-8192-s0.json",
+      "sha256": "d61138091ac9535e727b478569e6661106d1e8ef4bd9e1d14bcad1ade6827f9f",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-random-8192-s0.log",
+      "sha256": "f57cd0d5806b1b6f9b9a69b03c71e75fd90eee1c9c651ce88cef8d3bbdf3fed1",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s0.json",
+      "sha256": "d05e84512c152283db4a7cb79a8a486da3aa5940844bb2a7837e6fb7f50ad604",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s0.log",
+      "sha256": "703551f6270d9f0ddcff6a246a6073fd69aa4107633de8c012f76d536a4ed41b",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s1.json",
+      "sha256": "acf23b7a252765be20a5f1cf9f21d384449bff5a6ecfc8e0b4228fc5ea5fb652",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s1.log",
+      "sha256": "ea3321c09f6aa747946ff8537c5a97beec30722e64f56590f7311d613e97af62",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s2.json",
+      "sha256": "fe81a1ae803b8cd86125ebfdcc1edb737ec5ffc7b313cbb7a6bcd5b8fd34ee81",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s2.log",
+      "sha256": "dbee5c2c1123b3905dc44541ac112ac7803d4993200dd3bc06494623f381967a",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s3.json",
+      "sha256": "1a602ec2d65f13b7ea438af65f18d03da19ed053d1a58802311c2f6f9569a9d4",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s3.log",
+      "sha256": "4933c0a060a5c7149ee4c169ac068749a40b39c561c75fd08906eece50f3f545",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s4.json",
+      "sha256": "f30adfaa19ecf862dc13542b49cd3e374c3f735a202b3e2920cf89c1a82fa391",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s4.log",
+      "sha256": "212ea2d886be7db8293a511e0d1b5f8611b4d02a7f7a83c05fb9fbdb41d3e42d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s5.json",
+      "sha256": "697e320ee95b3a90c30df7a55d449eae85c386042479327a3fcd8224d5c0a34d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s5.log",
+      "sha256": "3e358728d1d2bda21f410e925473d75d98436a68c033cf0659e18ed59b68ac51",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s6.json",
+      "sha256": "e6aee54874f30e1e5a77746f151f76f975643736496570fa3251d2afc7bc0dbc",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s6.log",
+      "sha256": "331b013b430368d878fb21e6dd295402409460439ab2e91761fd62fd0c7d85a6",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s7.json",
+      "sha256": "60a60793571241c5379a79593e6ee97412b83b0a22b5ce421892c6c85f601f80",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-1024-s7.log",
+      "sha256": "8bac68d88c0b9f56878a6d1f2b57d8e8b4c86aac7a091b761aede079f6f3a911",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-8192-s0.json",
+      "sha256": "12422d30a2333b99252dd81e11790c895d8f43ac3721334a95d7799166d03dfc",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s-stratified-8192-s0.log",
+      "sha256": "d0bb13f79f7b2f5d2ff23e4813e3469f7839e1ed0e51d793ff6a12e79c94a76d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b4s.run",
+      "sha256": "d3c725cf0d8c0366362630178ea965ad13c53baa80d940f4ae35fbed063db574",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): start and exit times"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s0.json",
+      "sha256": "4d4b2ff5808ee9ebb61e7358886f558782efc275f10f5011c13b06d54fc56cc7",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s0.log",
+      "sha256": "387c685ebf267c1da21ee8227bf1d8f91313d0aa6524851602b544f3821db744",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s1.json",
+      "sha256": "86d582537fa0d69c78261e47f717f82c9702454870036c0b8713a69c2da330b4",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s1.log",
+      "sha256": "208d6c9bd74961e23f6b1248e0b278d01747fb9ae5558a33841a5bb694f03f6c",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s2.json",
+      "sha256": "7a79a55cb82f37e2dc93f0b1e49deee97df96389a99504f80dc614908d9d3409",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s2.log",
+      "sha256": "a4ba1d54024f4cda46f08a1d00d0cc818029cffd2562f120e6edb1ab63745b29",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s3.json",
+      "sha256": "4a6ad25681a576dea82c003c0329632833fb61df71c4e5ae0552a0eb2a40e434",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s3.log",
+      "sha256": "b273b2a8c930591a68fff3b5930f6d859e2b351b3e520aca75b47dd5a59586c8",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s4.json",
+      "sha256": "315718324496719759e0a68165933b80fbeeb98714dc03627e3d7539ad2ca340",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s4.log",
+      "sha256": "f43921a8e3ced0d426403710b32d7d515d11f6f26aca488e33a58312a9792e3d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s5.json",
+      "sha256": "059f2b08ce76d6c18397267dbd17063295932ac71ff8b5a95ffa35dad53304cf",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s5.log",
+      "sha256": "1c0a3fdf67a4bac500fe8a7916cc26504f0ad4c8acfbca90907f302024af0470",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s6.json",
+      "sha256": "12d3b9752cda1675a8b79c4c6690ced1e70ec46953c4ca5fddb44697580ffe26",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s6.log",
+      "sha256": "05727067277f1310b82f692daf1e52a441a5cc50f7b7cf8c6f377c6df2cde965",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s7.json",
+      "sha256": "eac8ecf7bb4bfc31d6147bd180af8def945573934c4ded0e658783d058b46c0f",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-1024-s7.log",
+      "sha256": "686a085b667674edc7172b2562c0394bb18c6b806f325f0cf33187aba248c740",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-8192-s0.json",
+      "sha256": "1ed7cd69f209efdb1d0c1dcfaf8136d45db7adbef93d5e0b53652169afacb64b",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-random-8192-s0.log",
+      "sha256": "6a44810524fbd37d546ccda5347121c0fc944b0d9085a196eefafa5f1842cce3",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s0.json",
+      "sha256": "b508570245cc0160d6da62b9671fa7cf3ec5273c6a74f60087f423846e5c6f5d",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s0.log",
+      "sha256": "1f979cd3658a788ef1c894e7674357420f1133c93f138929000e534fb6d69348",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s1.json",
+      "sha256": "054dd54985f55b982b2a9c31176ef7682b92a4694e2ee8271f28e26638d7b2cc",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s1.log",
+      "sha256": "a4982e8ee51cdad5a936eb8ebdfe334c31fd68dce8f88d17100bba6343ba6af6",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s2.json",
+      "sha256": "1f765ef9ab1f532aa7c40d98512265624623e8dce66d94d367d8e62a52ede1be",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s2.log",
+      "sha256": "1f513d006b91808c5977521495d62b41f56dbd222835dd5168e21e0a6cab72cf",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s3.json",
+      "sha256": "32a59e86a04bd8de7a79b5606682a01884ec55f3a3d3cd126448a8690fcec727",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s3.log",
+      "sha256": "3094076415d98b5a3db61c853c7eb96950eda7d0f8e84cfca828c40c6ac03511",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s4.json",
+      "sha256": "01f3c0ff594c757d7ec3a5bd51a8609f31eec90cb9667428d4d0e428c09fb79c",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s4.log",
+      "sha256": "93192236d0211499055b6ce8b633ae793bdb04772b96e46c15430f81eb4345cf",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s5.json",
+      "sha256": "3d1fbe5d243ee3de95c306714172f9955086a5ab0657f45cb8610c3a25de0a07",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s5.log",
+      "sha256": "9a98c97d4dafa7d32500dc8d741856e975909b3399755c9b0d45d6fa168851ce",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s6.json",
+      "sha256": "0562ba1f55c6f773998cbcdec511fbf6559d0e2d4995aaacfe7048a375a71a7f",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s6.log",
+      "sha256": "531a8e933badc14aeb4aee10b9ca06733b34fa417d7f73dc262d598bb73af5e1",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s7.json",
+      "sha256": "e5cd799ed86b2584535d8153ba3554be0cd74f044b233295ae8eda0a5f85ea52",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-1024-s7.log",
+      "sha256": "a00906d2fcec6d55eef7bfaa6314d33aecfc3b3750b908eee64a9e56b73eb043",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-8192-s0.json",
+      "sha256": "7ded1a6e1cf39fd68b3750ed55e0195aad76337825b0b1eb56174fa3185da844",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): trunk_solve output (p2-trunk-evaluation)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6-stratified-8192-s0.log",
+      "sha256": "e07372b701775eb16fabdd7219896a5a82f2160f6cebf2d6348013b79fe67d6f",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/b6.run",
+      "sha256": "9fcde91bd774b02c2cbdb4f2f72d721fd7b620a057e143a93eb9594cb389e78c",
+      "role": "saved solutions evaluated with other boards (run_eval_saved.sh): start and exit times"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/eval-saved/failed/b4s-stratified-1024-s5.log",
+      "sha256": "882902e721518fa34a695712bdab0c42ebbafd9420adc0db25595a2eaf1bdff1",
+      "role": "an evaluation stopped by an allocation failure: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/b128.run",
+      "sha256": "3218878197abbf6a7ee9b412d1555c4b74baf2d52cf724eb5af5eb7fedda6969",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: start and exit times"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/b4s-b128.json",
+      "sha256": "9fdd2a02dc56135853b93a1fa94b4dac3fbb9ee4e3b4c268587c9a72ec3aeb75",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/b4s-b128.log",
+      "sha256": "a22bb54ec90522a8ebf1959f17cbf8d663fd2c4cf3c503bbad1f815db8656900",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/b4s-b128.toml",
+      "sha256": "3fc8bd9ed6aa8bd8f6efb83567397dfca7176cf8aef45cd40ec6f4d5fe925f5b",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: game input"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/flop-buckets-32.txt",
+      "sha256": "1008b197948a7ff0a546560bc645e6bba7bdfd01ff590b22faf634053e3fe9e8",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: measurement summary"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/rfi-b128.md",
+      "sha256": "3c04eb974841e70c2e9fbd2ce5af093f3c6ca28ef70f7326907777df3fcd4d66",
+      "role": "B4 Simple with 128 EHS² buckets per street (run_buckets.sh), the binary of 46060c6: generated table"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/failed/b4s-b128.log.1",
+      "sha256": "f6f7e80992ba5cdfcb0a61e8b6fce58cb3e827904c1a05c303c005c9795b19eb",
+      "role": "the first 128-bucket run, stopped by an allocation failure at iteration 590: stdout of the stopped first run"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/commit_log.ps1",
+      "sha256": "0b25d639d4caed8988cc4563fb9c4ad8805b9799590d1957e8e01de1aceed601",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/faults.ps1",
+      "sha256": "1128ecb4fc0e75fe658db415735b664ca84f028da02c83db6bc2622950787ab8",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/peak.ps1",
+      "sha256": "7d37f8bf5ef502584091937568bee78d31782fa46e809d424136ce6f83398adc",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/peak_tables.sh",
+      "sha256": "00fef6b37c46eb6b5eb301c3e4159179bf82c944f6f0df4a3844d5a65da0bcb1",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/queue_memj.sh",
+      "sha256": "6e21ac3ef87f4829d71a955d29b77767644b6637a85611461d92baf6840a7928",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/trace.ps1",
+      "sha256": "faf01cdf214f075f17d4a9c3ef07768b378aef59a022c482f23d2762968da19b",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/tools/when_free.sh",
+      "sha256": "8e03b9315c157e8252138d57f73939938e42f57a93e608be8eebdfb30d31bb23",
+      "role": "measurement helpers run from the work's scratchpad (paths inside need rewriting): procedure"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "examples/bench/hu_20bb_postflop.toml",
+      "sha256": "77e0cd44864c572d84d0459830703624769fcb18c867c7a17047044b7196d60f",
+      "role": "B6 game"
+    },
+    {
+      "path": "examples/bench/6max_20bb.toml",
+      "sha256": "a8a7817222d0cc49bd75089857525d2de4b70dece7490fbb533c86ee1124ce7b",
+      "role": "B7 game"
+    },
+    {
+      "path": "examples/bench/6max_20bb_checkdown.toml",
+      "sha256": "a5a67887b8f6aaa605e6405a199ce9145f2a5c878495dc3742590e348e7edc96",
+      "role": "B3 game (B7 with checkdown leaves), used by results/k4-min and speed"
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_simple_reference.toml",
+      "sha256": "148d088641873010182679972c0639b186bcb81a28eb5fcd56100b1a0e53bdb5",
+      "role": "B4 Simple game (the original tree)"
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-simple-preflop-2026-09-09.json",
+      "sha256": "c69c9b1ce5470d8272b0ca90e93859ba2e69115d3b2cebbcaf52114677cea228",
+      "role": "GTO Wizard Simple reference (five unopened class tables)"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": "%LOCALAPPDATA%/solvers/ehs2/v2-f32-t32-r32.postcard",
+      "sha256": "35a6826c09c36961404e0bcc076b1ff6101d8a3d421dc682a7fcf8f0505e7cb2",
+      "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+      "bytes": 357378844,
+      "role": "EHS² percentile bucket cache (32/32/32), the L1 postflop abstraction; the runs record its blake3"
+    },
+    {
+      "path": "%LOCALAPPDATA%/solvers/ehs2/v2-f128-t128-r128.postcard",
+      "sha256": "b4d283eac343325920956f41e2676dabe679f8e48eb643196db92a39b6dca74b",
+      "blake3": "74f3ce548a97f61f877274f2c85bd8af825ee2d8c85498901644730557bb0a01",
+      "bytes": 357381151,
+      "role": "EHS² percentile bucket cache (128/128/128) for results/buckets; built by the binary of 46060c6"
+    },
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/final/b4s-l0.profile.json",
+      "sha256": "e5c0f3a1b35334615abc09e35123cf9c9cb6a40dea37552ae2fb3b5ff3e01c91",
+      "bytes": 83434637,
+      "role": "average Preflop profile (p2-class-profile) of a results/final run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/final/b4s-l1.profile.json",
+      "sha256": "acc93329a94b979e988f8c11ec380e4f4355be632b4a6340772a8823294edcf9",
+      "bytes": 83301994,
+      "role": "average Preflop profile (p2-class-profile) of a results/final run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/final/b7-l0-all.profile.json",
+      "sha256": "a8577ea849072264dd55d0904553c53046744a8fc40d5e22a32365ca3acf016d",
+      "bytes": 65144818,
+      "role": "average Preflop profile (p2-class-profile) of a results/final run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/final/b7-l0.profile.json",
+      "sha256": "b53c7a87b02c02687001019d92f5412deb8bf676bb5b6a3ebb2487fdaee1fcdb",
+      "bytes": 68490228,
+      "role": "average Preflop profile (p2-class-profile) of a results/final run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/final/b7-l1.profile.json",
+      "sha256": "90a44fec4c64c9f6bbe677567928ee0c38b422f45c994e78b29f52d4cf028e40",
+      "bytes": 64050993,
+      "role": "average Preflop profile (p2-class-profile) of a results/final run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/saved/b4s.postflop.bin",
+      "sha256": "52b82cb599a77dba1a659341f4d5446b664bc23011c229b87bc8e94d9c9798e6",
+      "bytes": 12011352,
+      "role": "average Postflop strategy (P2L1AVG1) of a results/saved run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/saved/b4s.profile.json",
+      "sha256": "acc93329a94b979e988f8c11ec380e4f4355be632b4a6340772a8823294edcf9",
+      "bytes": 83301994,
+      "role": "average Preflop profile (p2-class-profile) of a results/saved run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/buckets/b4s-b128.postflop.bin",
+      "sha256": "ed838b4e6f1626f5429e5fd3003dee2e6c342e9f2762fbaa8d0ef3c5b49e0537",
+      "bytes": 48030552,
+      "role": "average Postflop strategy (P2L1AVG1) of a results/buckets run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-6max/buckets/b4s-b128.profile.json",
+      "sha256": "69e7225cee4fad7679b9bac6054f788e369cb1fa674b70b7951c820f5aac32ff",
+      "bytes": 83175182,
+      "role": "average Preflop profile (p2-class-profile) of a results/buckets run, kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/k4-min/b3_s256_m16.profile.json",
+      "sha256": "f19b7d7d61fc7d9942e63f5eb4c73e33846cfce06eb661adf13291b00cd08914",
+      "bytes": 67938209,
+      "role": "average profile of a results/k4-min run (p2-class-profile)"
+    },
+    {
+      "path": ".cache/p2-trunk/k4-min/b3_s256_m64.profile.json",
+      "sha256": "83c112ea6792c4b9da344bea28365c05cf283913202f0dadfae3988d83ed455e",
+      "bytes": 66228937,
+      "role": "average profile of a results/k4-min run (p2-class-profile)"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "bash experiments/p2-method-2026-10/l1-6max/run.sh <out>/final",
+    "bash experiments/p2-method-2026-10/l1-6max/run_save.sh <out>/saved",
+    "bash experiments/p2-method-2026-10/l1-6max/run_eval_saved.sh <out>/eval-saved <name>:<config>:<prefix>...",
+    "bash experiments/p2-method-2026-10/l1-6max/run_buckets.sh <out>/buckets 128",
+    "python experiments/p2-method-2026-10/l1-6max/summarize.py <out>/final",
+    "python experiments/p2-method-2026-10/l1-6max/summarize_eval.py <out>/eval-saved",
+    "python experiments/p2-method-2026-10/l1-6max/rfi.py <label>=<profile>..."
+  ]
+}

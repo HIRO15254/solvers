@@ -1,0 +1,2021 @@
+{
+  "format": "p2-l0-evaluation",
+  "game_fingerprint": "384b4970528cefd28ca40fc8a23c2ce6a4f7017000e6eefd3f871bd041b58f89",
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "nash_conv": 0.799168475256115,
+  "profile": {
+    "kind": "json",
+    "path": ".cache/p2-trunk/l1-6max/final/b4s-l1.profile.json"
+  },
+  "seats": [
+    {
+      "best_response": 0.3065566183293075,
+      "defaulted_mass": 0.0,
+      "gain": 0.10071173936620623,
+      "name": "seat 0",
+      "reach_by_active_count": [
+        0.0,
+        0.7704966583332741,
+        0.22887323761003556,
+        0.0006151339402450327,
+        0.000014887988021796237,
+        8.105001128898807e-8,
+        1.0783942892628774e-9
+      ],
+      "seat": 0,
+      "telescoping_residual": -3.039235529911366e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0032115886011450556,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            4.1635488548746614e-11,
+            0.8478360656321347,
+            0.15216393432622996
+          ]
+        },
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.002679805938065445,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            6.24531523408103e-11,
+            0.6597394222172667,
+            0.34026057772028023
+          ]
+        },
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0014976003674944487,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            6.245315234081033e-11,
+            0.3856671239817639,
+            0.614332875955783
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "99",
+          "local_gain": 0.001277887149686061,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300"
+          ],
+          "profile_row": [
+            0.9999919219117086,
+            7.978201831404546e-6,
+            9.988645994534184e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "88",
+          "local_gain": 0.0012596358315922094,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300"
+          ],
+          "profile_row": [
+            0.9999169920039334,
+            0.00008298434206834035,
+            2.3653998337729897e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "TT",
+          "local_gain": 0.0011989192954853605,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.8687026495103986,
+            0.13129735048960148
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "TT",
+          "local_gain": 0.0011847163691865873,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999973531172521,
+            0.000026468827479005917
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "99",
+          "local_gain": 0.0010933724313035424,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.9983888591093706,
+            0.0016111408906293735
+          ]
+        },
+        {
+          "best_action": "call:11250",
+          "class": "AJo",
+          "local_gain": 0.0010803359673597136,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            0.9999234648089715,
+            0.00007617156437180145,
+            3.6362665665156826e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "88",
+          "local_gain": 0.001047881663987803,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.95171241505877,
+            0.04828758494123002
+          ]
+        },
+        {
+          "best_action": "call:9500",
+          "class": "ATo",
+          "local_gain": 0.0010297091697607588,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "raise-to:12000",
+            "fold"
+          ],
+          "profile_row": [
+            0.23302724035633154,
+            7.375171283188195e-6,
+            0.7669653437161192,
+            4.075626606342278e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "99",
+          "local_gain": 0.0009805778835860637,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9998645974263637,
+            0.00013540257363631254
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "77",
+          "local_gain": 0.0009798741877860987,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.963346198753277,
+            0.03665380124672306
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "44",
+          "local_gain": 0.0009690025671332381,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300"
+          ],
+          "profile_row": [
+            0.999989074731528,
+            0.00001091979658704813,
+            5.471884937372286e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "33",
+          "local_gain": 0.0009324973190830057,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300"
+          ],
+          "profile_row": [
+            0.9999969103537266,
+            3.0844558967387817e-6,
+            5.1903767753109804e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "44",
+          "local_gain": 0.0009212249940035695,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999996486373437,
+            3.5136265635563027e-7
+          ]
+        },
+        {
+          "best_action": "call:11250",
+          "class": "JJ",
+          "local_gain": 0.000915167248623594,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            0.000021496632956262993,
+            0.0061052157842979215,
+            0.9938732875827458
+          ]
+        },
+        {
+          "best_action": "call:11250",
+          "class": "AJo",
+          "local_gain": 0.0008899084114673822,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold",
+            "raise-to:18750"
+          ],
+          "profile_row": [
+            0.9999986984268232,
+            1.0772420269491396e-6,
+            2.2433114996204333e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "88",
+          "local_gain": 0.0008842046023593201,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.8321366552353727,
+            0.16786334476462733
+          ]
+        },
+        {
+          "best_action": "raise-to:7500",
+          "class": "44",
+          "local_gain": 0.0008824988541946009,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999999044129264,
+            9.558707369302077e-8
+          ]
+        }
+      ],
+      "value": 0.20584487896310125,
+      "value_by_active_count": [
+        0.0,
+        0.23214637529179546,
+        -0.026716958543857274,
+        0.00039561502001786295,
+        0.000019709416235008002,
+        1.1559596895483924e-7,
+        2.218294476207476e-8
+      ]
+    },
+    {
+      "best_response": -0.07840314905859871,
+      "defaulted_mass": 0.0,
+      "gain": 0.17202446889734843,
+      "name": "seat 1",
+      "reach_by_active_count": [
+        0.0,
+        0.7705692690014851,
+        0.22874868015052724,
+        0.0006649753240618109,
+        0.000016979171027965957,
+        9.518372126940821e-8,
+        1.1691582736765526e-9
+      ],
+      "seat": 1,
+      "telescoping_residual": -6.800116025829084e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:10000",
+          "class": "AJo",
+          "local_gain": 0.0015823158235096486,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9661352475279746,
+            0.03386475247202535
+          ]
+        },
+        {
+          "best_action": "call:16500",
+          "class": "AQo",
+          "local_gain": 0.001445823737008003,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "raise-to:11000",
+            "fold",
+            "raise-to:27500"
+          ],
+          "profile_row": [
+            0.996785593172765,
+            0.003211531263980916,
+            2.875563254030727e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "ATo",
+          "local_gain": 0.0012917259515465495,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999913255219074,
+            8.674478092593692e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "TT",
+          "local_gain": 0.0012897748462371472,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999999803384913,
+            1.9661508694140288e-7
+          ]
+        },
+        {
+          "best_action": "call:15000",
+          "class": "AQo",
+          "local_gain": 0.0012592716270422512,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:10000",
+            "fold",
+            "raise-to:25000"
+          ],
+          "profile_row": [
+            0.99999637600876,
+            2.587859640041894e-6,
+            1.0361315999284342e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "88",
+          "local_gain": 0.0011907984200240555,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999999833726293,
+            1.6627370755122374e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "TT",
+          "local_gain": 0.0011860347243550008,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999995542118156,
+            4.457881843865504e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "99",
+          "local_gain": 0.001164923728070543,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999998636498889,
+            1.3635011109889727e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "66",
+          "local_gain": 0.0011543937885558316,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9923872330689734,
+            0.007612766931026611
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A9o",
+          "local_gain": 0.0011247793233403326,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500"
+          ],
+          "profile_row": [
+            0.9999889125155469,
+            0.000011087484453058572
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "77",
+          "local_gain": 0.0011246745471490752,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999999922862021,
+            7.713797900391501e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "55",
+          "local_gain": 0.0010990984976191416,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999999215895293,
+            7.841047068485047e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "99",
+          "local_gain": 0.0010772312423928349,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999999908130891,
+            9.186910901651689e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "88",
+          "local_gain": 0.0010722127742274737,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999997363556304,
+            2.6364436964564977e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "77",
+          "local_gain": 0.001061868383208216,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9836293438321284,
+            0.01637065616787157
+          ]
+        },
+        {
+          "best_action": "raise-to:10000",
+          "class": "44",
+          "local_gain": 0.0010330100766604183,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999999124823877,
+            8.751761230396161e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "66",
+          "local_gain": 0.0010256979792454418,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9753568204267217,
+            0.024643179573278367
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A5o",
+          "local_gain": 0.0009896925076393166,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500"
+          ],
+          "profile_row": [
+            0.999999361453471,
+            6.385465289742876e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:11000",
+          "class": "55",
+          "local_gain": 0.0009860848577720577,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9879571999937088,
+            0.012042800006291304
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "77",
+          "local_gain": 0.0009860240468928052,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500"
+          ],
+          "profile_row": [
+            0.9999998757841273,
+            1.2421587271269804e-7
+          ]
+        }
+      ],
+      "value": -0.25042761795594715,
+      "value_by_active_count": [
+        0.0,
+        -0.15342161633785287,
+        -0.09711180252544355,
+        0.00010411191755422396,
+        1.6786299731432988e-6,
+        -5.848647431801557e-9,
+        1.6208475858881576e-8
+      ]
+    },
+    {
+      "best_response": -0.2255297727490451,
+      "defaulted_mass": 0.0,
+      "gain": 0.21695830263755086,
+      "name": "seat 2",
+      "reach_by_active_count": [
+        0.0,
+        0.771789794792034,
+        0.22752592744140185,
+        0.0006659195991926021,
+        0.000018265123170018932,
+        9.113781847451603e-8,
+        1.9063669180234555e-9
+      ],
+      "seat": 2,
+      "telescoping_residual": -9.298117831235686e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0021476341832715995,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:3000",
+            "raise-to:10000",
+            "raise-to:21000"
+          ],
+          "profile_row": [
+            3.1226577445414613e-11,
+            0.9999990364434084,
+            9.635253650594483e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:13000",
+          "class": "A2o",
+          "local_gain": 0.0017242191444913082,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "fold"
+          ],
+          "profile_row": [
+            0.999998067856037,
+            1.0743870798834362e-7,
+            1.824705255001116e-6
+          ]
+        },
+        {
+          "best_action": "call:1500",
+          "class": "K8o",
+          "local_gain": 0.0012707635910894285,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999886512589884,
+            6.802169756078877e-6,
+            4.546571255499715e-6
+          ]
+        },
+        {
+          "best_action": "call:1000",
+          "class": "A8o",
+          "local_gain": 0.0011886634781994618,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9719623695404144,
+            0.005172863271484833,
+            0.022864767188100734
+          ]
+        },
+        {
+          "best_action": "call:1500",
+          "class": "K7o",
+          "local_gain": 0.001155530668000685,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "fold"
+          ],
+          "profile_row": [
+            0.999998373487806,
+            1.4071009659526357e-7,
+            1.485802097465252e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A5o",
+          "local_gain": 0.0011502038691293555,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9975628688557922,
+            0.0002997552788988678,
+            0.0021373758653089265
+          ]
+        },
+        {
+          "best_action": "call:1000",
+          "class": "A3o",
+          "local_gain": 0.0011361482844676044,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999988167731664,
+            1.018442904925818e-7,
+            1.081382543226032e-6
+          ]
+        },
+        {
+          "best_action": "call:1000",
+          "class": "A7o",
+          "local_gain": 0.0011200605777235803,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.998595934759721,
+            0.0007507735882462121,
+            0.000653291652032795
+          ]
+        },
+        {
+          "best_action": "call:1000",
+          "class": "A2o",
+          "local_gain": 0.0011181616113138328,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999992073456085,
+            2.3429322258509092e-7,
+            5.583611687688828e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A4o",
+          "local_gain": 0.0011124877992264358,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999543274562845,
+            0.00003023532866652715,
+            0.000015437215048933845
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A6o",
+          "local_gain": 0.0011114937576577387,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9997790135222074,
+            0.00016202894263694185,
+            0.00005895753515560797
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A3o",
+          "local_gain": 0.0010997448443809759,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999992965170572,
+            1.216740771236299e-6,
+            5.818088656724325e-6
+          ]
+        },
+        {
+          "best_action": "call:1300",
+          "class": "A6o",
+          "local_gain": 0.0010990927175816762,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9994908079330759,
+            0.0004681075998749314,
+            0.000041036270152601087,
+            4.819689657939235e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:12000",
+          "class": "A2o",
+          "local_gain": 0.001088373423607851,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999994489401285,
+            3.1974410184185115e-8,
+            5.478624304791435e-6
+          ]
+        },
+        {
+          "best_action": "call:1500",
+          "class": "K6o",
+          "local_gain": 0.001065407478870407,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999996706950072,
+            5.7884495741955955e-8,
+            2.71420497057252e-7
+          ]
+        },
+        {
+          "best_action": "call:1300",
+          "class": "A4o",
+          "local_gain": 0.001059289553689716,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999430886476766,
+            0.000014909793564146633,
+            0.00004180877551133977,
+            1.927832480321647e-7
+          ]
+        },
+        {
+          "best_action": "call:1300",
+          "class": "A3o",
+          "local_gain": 0.0010432070559460015,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999823821027772,
+            1.1289314852763213e-7,
+            0.000017334397648985466,
+            1.706064254071936e-7
+          ]
+        },
+        {
+          "best_action": "call:1300",
+          "class": "A2o",
+          "local_gain": 0.0010224019811347256,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999893485900332,
+            7.383301718683946e-8,
+            0.000010470686698680091,
+            1.068902509441976e-7
+          ]
+        },
+        {
+          "best_action": "call:1500",
+          "class": "K5o",
+          "local_gain": 0.0009983009531696976,
+          "path": [
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:2500",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999983696366094,
+            2.0491496044794614e-7,
+            1.425448430171701e-6
+          ]
+        },
+        {
+          "best_action": "call:1000",
+          "class": "A6o",
+          "local_gain": 0.0009939188438429657,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.8169931188121694,
+            0.0022081664329230374,
+            0.18079871475490755
+          ]
+        }
+      ],
+      "value": -0.44248807538659596,
+      "value_by_active_count": [
+        0.0,
+        -0.413454972249395,
+        -0.028969768622469683,
+        -0.0000697254778024862,
+        6.213041763656002e-6,
+        1.84214461292868e-7,
+        -6.29314494034488e-9
+      ]
+    },
+    {
+      "best_response": 0.21983781985347572,
+      "defaulted_mass": 0.0,
+      "gain": 0.0974692437551903,
+      "name": "seat 3",
+      "reach_by_active_count": [
+        0.0,
+        0.7710318583128062,
+        0.22829203642610554,
+        0.0006594094327865338,
+        0.000016611590259089748,
+        8.27302832189507e-8,
+        1.5077472805441798e-9
+      ],
+      "seat": 3,
+      "telescoping_residual": -3.400058012914542e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:2000",
+          "class": "88",
+          "local_gain": 0.004199754748166307,
+          "path": [],
+          "profile_row": [
+            0.9999957446511497,
+            4.255348850298172e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "77",
+          "local_gain": 0.003896812439477619,
+          "path": [],
+          "profile_row": [
+            0.9999998014318512,
+            1.985681488283751e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "66",
+          "local_gain": 0.0035425555148660146,
+          "path": [],
+          "profile_row": [
+            0.9999986062253096,
+            1.393774690405359e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "55",
+          "local_gain": 0.003087091579058676,
+          "path": [],
+          "profile_row": [
+            0.9999992428610278,
+            7.571389721524706e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A4o",
+          "local_gain": 0.0026411696315015855,
+          "path": [],
+          "profile_row": [
+            0.9997268561017965,
+            0.0002731438982035258
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "44",
+          "local_gain": 0.002605823043184236,
+          "path": [],
+          "profile_row": [
+            0.9999995764065479,
+            4.2359345211634715e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A6o",
+          "local_gain": 0.0025070034221734714,
+          "path": [],
+          "profile_row": [
+            0.8303562450509324,
+            0.1696437549490677
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A3o",
+          "local_gain": 0.0023964074098604196,
+          "path": [],
+          "profile_row": [
+            0.9999312386977616,
+            0.00006876130223853144
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A2o",
+          "local_gain": 0.002191456100233253,
+          "path": [],
+          "profile_row": [
+            0.9999163175583189,
+            0.00008368244168109392
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "33",
+          "local_gain": 0.002082993528419694,
+          "path": [],
+          "profile_row": [
+            0.9999997078949912,
+            2.921050088659083e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A5o",
+          "local_gain": 0.001998377517916828,
+          "path": [],
+          "profile_row": [
+            0.6443062075588258,
+            0.3556937924411742
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "22",
+          "local_gain": 0.001507479105769014,
+          "path": [],
+          "profile_row": [
+            0.999997618536162,
+            2.3814638379751153e-6
+          ]
+        },
+        {
+          "best_action": "call:5500",
+          "class": "AJo",
+          "local_gain": 0.0013252284656956013,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999932635855332,
+            5.376144274163333e-9,
+            6.724400554071413e-6,
+            6.637768539459957e-9
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "AJo",
+          "local_gain": 0.0013159047690504,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999917207565402,
+            1.8447845646608777e-9,
+            8.272783233343172e-6,
+            4.615441901611354e-9
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "AJo",
+          "local_gain": 0.0012117215400352548,
+          "path": [
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999903309463573,
+            9.354652046762183e-10,
+            9.663586648174595e-6,
+            4.531529352178114e-9
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "ATo",
+          "local_gain": 0.001097870171667711,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999994777389731,
+            8.481999953334786e-10,
+            5.204233759503596e-7,
+            9.89451004240874e-10
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "99",
+          "local_gain": 0.0010809568995679964,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999999951068195,
+            3.9291189904959737e-10,
+            2.7386754501500964e-8,
+            2.11521385953753e-8
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "ATo",
+          "local_gain": 0.0010668650531791527,
+          "path": [
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999975669796617,
+            7.865080772505498e-10,
+            2.4297849249186563e-6,
+            2.4489053084450472e-9
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "99",
+          "local_gain": 0.0010486168531599004,
+          "path": [
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999999961798552,
+            3.9291189904959773e-10,
+            2.868500994728337e-8,
+            9.12352613270118e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "K8o",
+          "local_gain": 0.001045726458531517,
+          "path": [],
+          "profile_row": [
+            0.999973910750174,
+            0.00002608924982596535
+          ]
+        }
+      ],
+      "value": 0.12236857609828543,
+      "value_by_active_count": [
+        0.0,
+        0.09587923771567912,
+        0.02701219549323362,
+        -0.0005094572829315747,
+        -0.000013240279074339816,
+        -1.4369318113002108e-7,
+        -1.5855438775920246e-8
+      ]
+    },
+    {
+      "best_response": 0.2371687261349219,
+      "defaulted_mass": 0.0,
+      "gain": 0.09868856383857139,
+      "name": "seat 4",
+      "reach_by_active_count": [
+        0.0,
+        0.7708789491186336,
+        0.22847901957076422,
+        0.0006262555450288632,
+        0.00001568998312162399,
+        8.460910011000157e-8,
+        1.1733365744240233e-9
+      ],
+      "seat": 4,
+      "telescoping_residual": -3.3029134982598407e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:2000",
+          "class": "77",
+          "local_gain": 0.002931029025540758,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.9999356911452412,
+            0.00006430885475889953
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "66",
+          "local_gain": 0.0025973383330409805,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.9999843311429264,
+            0.000015668857073613262
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "55",
+          "local_gain": 0.002280339864072727,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.9999931046675662,
+            6.895332433734173e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A4o",
+          "local_gain": 0.0018852536744162897,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.9991902944620552,
+            0.0008097055379448182
+          ]
+        },
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0018555638017894295,
+          "path": [
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:16250"
+          ],
+          "profile_row": [
+            6.245315234081034e-11,
+            0.4621237729409567,
+            0.5378762269965901
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "44",
+          "local_gain": 0.0018533026042230783,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.999999296209056,
+            7.037909440489135e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "JJ",
+          "local_gain": 0.0017275390350637333,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9848159372087509,
+            0.015184062791249026
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A3o",
+          "local_gain": 0.0016826113198619543,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.999666791774779,
+            0.0003332082252209719
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "A2o",
+          "local_gain": 0.001518681636905156,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.999653199349546,
+            0.00034680065045398253
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "TT",
+          "local_gain": 0.0014812711962296596,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.959904761099289,
+            0.04009523890071107
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "77",
+          "local_gain": 0.0014038602670803718,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9934510589265341,
+            0.006548941073465957
+          ]
+        },
+        {
+          "best_action": "raise-to:2000",
+          "class": "33",
+          "local_gain": 0.0014033450208655231,
+          "path": [
+            "fold"
+          ],
+          "profile_row": [
+            0.9999983429919053,
+            1.6570080947609764e-6
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "99",
+          "local_gain": 0.001390435823533537,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.999999422516858,
+            5.774831420718141e-7
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "55",
+          "local_gain": 0.001280609343178352,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9999999769378202,
+            2.306217973738645e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "88",
+          "local_gain": 0.0012127928789228998,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.826058615929938,
+            0.17394138407006202
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "66",
+          "local_gain": 0.001211716140431012,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.8650507592491395,
+            0.13494924075086057
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "44",
+          "local_gain": 0.0011897820965744278,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9998124982464566,
+            0.0001875017535434078
+          ]
+        },
+        {
+          "best_action": "call:4500",
+          "class": "ATo",
+          "local_gain": 0.001147840977208396,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999930964704298,
+            7.922094761447205e-10,
+            6.901672484805256e-6,
+            1.0648758070271153e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "33",
+          "local_gain": 0.0011236669514307297,
+          "path": [
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9999999998126405,
+            1.8735945698732742e-10
+          ]
+        },
+        {
+          "best_action": "call:5500",
+          "class": "ATo",
+          "local_gain": 0.001111627868323323,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "fold",
+            "raise-to:7500",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999994210422337,
+            9.819060775061564e-11,
+            5.772132347046737e-7,
+            1.6463410855673269e-9
+          ]
+        }
+      ],
+      "value": 0.13848016229635052,
+      "value_by_active_count": [
+        0.0,
+        0.11936343132994273,
+        0.019531545631404853,
+        -0.00039413082328661095,
+        -0.000020853949985237307,
+        1.6478647572904007e-7,
+        5.321800969097535e-9
+      ]
+    },
+    {
+      "best_response": 0.2797360138261499,
+      "defaulted_mass": 0.0,
+      "gain": 0.1133161567612479,
+      "name": "seat 5",
+      "reach_by_active_count": [
+        0.0,
+        0.7711693570344781,
+        0.22820459534299525,
+        0.0006107464540590927,
+        0.000015222590790768762,
+        7.740840450425724e-8,
+        1.1692554652340585e-9
+      ],
+      "seat": 5,
+      "telescoping_residual": -5.051514762044462e-15,
+      "top_infosets": [
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0018858034798102349,
+          "path": [
+            "raise-to:2000",
+            "fold",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:16250"
+          ],
+          "profile_row": [
+            6.245315234081029e-11,
+            0.47765875380896494,
+            0.5223412461285819
+          ]
+        },
+        {
+          "best_action": "raise-to:2300",
+          "class": "66",
+          "local_gain": 0.001858658858263303,
+          "path": [
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999663295521196,
+            0.00003366808845644548,
+            2.3594240203402262e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:100000:all-in",
+          "class": "AA",
+          "local_gain": 0.0018246325980593142,
+          "path": [
+            "fold",
+            "raise-to:2000",
+            "raise-to:6500",
+            "fold",
+            "fold",
+            "fold",
+            "raise-to:16250"
+          ],
+          "profile_row": [
+            6.245315234081029e-11,
+            0.4417972164356908,
+            0.558202783501856
+          ]
+        },
+        {
+          "best_action": "raise-to:2300",
+          "class": "55",
+          "local_gain": 0.00159152108993525,
+          "path": [
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999761316499886,
+            0.000023866556182325837,
+            1.793829196205855e-9
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "TT",
+          "local_gain": 0.0015635493578524252,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9999380234376554,
+            0.00006197656234464442
+          ]
+        },
+        {
+          "best_action": "call:5200",
+          "class": "ATo",
+          "local_gain": 0.00148613518666236,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "raise-to:7500",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999854743958858,
+            7.089072744174346e-8,
+            0.000014392976791474664,
+            6.173659518331428e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "TT",
+          "local_gain": 0.0013548596352721627,
+          "path": [
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999205249699888,
+            0.00007947503001123939
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "99",
+          "local_gain": 0.00133900321195389,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.999968909945121,
+            0.00003109005487902804
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "77",
+          "local_gain": 0.0012374067851994958,
+          "path": [
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.9954359328748332,
+            0.004564067125166833
+          ]
+        },
+        {
+          "best_action": "raise-to:2300",
+          "class": "44",
+          "local_gain": 0.0012229105844480533,
+          "path": [
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.999987620058173,
+            0.00001237978554684037,
+            1.5628018852597379e-10
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "99",
+          "local_gain": 0.0012222895308309346,
+          "path": [
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999789314902305,
+            0.00002106850976950661
+          ]
+        },
+        {
+          "best_action": "raise-to:2300",
+          "class": "A3o",
+          "local_gain": 0.0011664440624928533,
+          "path": [
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.981058162715336,
+            0.01894183715975771,
+            1.2490630465821827e-10
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "66",
+          "local_gain": 0.0011511422751251602,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.8990013303561559,
+            0.10099866964384413
+          ]
+        },
+        {
+          "best_action": "call:5200",
+          "class": "KQo",
+          "local_gain": 0.0011390886285518613,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "raise-to:7500",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999884040116124,
+            5.465731758143993e-7,
+            0.000010984234427873505,
+            6.518078397993346e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "77",
+          "local_gain": 0.0011333988301647584,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.8409012720135083,
+            0.1590987279864917
+          ]
+        },
+        {
+          "best_action": "raise-to:2300",
+          "class": "A2o",
+          "local_gain": 0.0011209840115278008,
+          "path": [
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9988670080449298,
+            0.001132991830163895,
+            1.2490630465821824e-10
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "88",
+          "local_gain": 0.0011161500423504387,
+          "path": [
+            "raise-to:2000",
+            "fold"
+          ],
+          "profile_row": [
+            0.8571689014308237,
+            0.14283109856917636
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "44",
+          "local_gain": 0.0011051576311506604,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9999999998126405,
+            1.8735945698732742e-10
+          ]
+        },
+        {
+          "best_action": "call:5200",
+          "class": "A9o",
+          "local_gain": 0.0011015285146373172,
+          "path": [
+            "fold",
+            "fold",
+            "raise-to:2300",
+            "raise-to:7500",
+            "fold",
+            "fold"
+          ],
+          "profile_row": [
+            0.9999992873254964,
+            4.1330121422512815e-8,
+            6.419312120909292e-7,
+            2.9413170226546967e-8
+          ]
+        },
+        {
+          "best_action": "raise-to:6500",
+          "class": "ATo",
+          "local_gain": 0.001096535070150648,
+          "path": [
+            "fold",
+            "raise-to:2000"
+          ],
+          "profile_row": [
+            0.9999627543491939,
+            0.000037245650806148725
+          ]
+        }
+      ],
+      "value": 0.16641985706490198,
+      "value_by_active_count": [
+        0.0,
+        0.1770086491780004,
+        -0.010438570709312088,
+        -0.00014732786730862398,
+        -3.0395834859687162e-6,
+        1.3433053501340718e-7,
+        1.171647590060469e-8
+      ]
+    }
+  ],
+  "source": "examples/bench/6max_100bb_nl50_partial_simple_reference.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      971,
+      2546,
+      2590,
+      1318,
+      340,
+      36
+    ]
+  },
+  "timings": {
+    "evaluation": 68.1438925,
+    "phases": {
+      "backward": 0.4170024,
+      "k4": 63.5340427,
+      "reaches": 0.3950036,
+      "t2": 0.2807299,
+      "t3": 3.4463821
+    },
+    "profile": 0.4052935,
+    "tables": 0.2582863,
+    "tree": 0.7400975
+  },
+  "units": "bb",
+  "version": 1,
+  "warnings": []
+}

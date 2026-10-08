@@ -19,7 +19,7 @@
 //! does the Waugh perfect-hash index for compact cache keys — until then,
 //! canonical boards (suit-isomorphism representatives) key everything.
 
-mod buckets;
+pub(crate) mod buckets;
 mod ehs;
 
 pub use buckets::{BucketCacheError, CACHE_FORMAT_VERSION, Ehs2Abstraction, Ehs2Params};

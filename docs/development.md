@@ -86,7 +86,7 @@ Windowsで並列compileがメモリ割当やページングファイル不足（
 - `runs/`: 新規solver・benchmark実行のignored作業領域。保存対象は選定してexperimentsへ。
 - `.cache/`: 再生成可能なmachine-local cacheやtest用の一時データ。固有の証拠・source snapshotを置かない。
 - `docs/plans/`: 受け入れた作業の手順・成果物・完了条件。状態はLinear。
-- `docs/research/`: 日付付きの調査・未採用案・費用概算（現在は空。旧調査はtagに残る）。
+- `docs/research/`: 日付付きの調査・未採用案・費用概算（旧調査はtagに残る）。
 - `experiments/<campaign>/<experiment>/`: 採否・品質認定に必要なmanifest、config、集計、検証器、報告。
 - 共通Python testは`tools/tests/`、実験だけの検証は当該実験の近くに置く。
 

@@ -1,0 +1,170 @@
+{
+  "checkpoints": [
+    {
+      "iteration": 0,
+      "nash_conv": 0.7794848647090193,
+      "seats": [
+        {
+          "best_response": 0.5000000000000001,
+          "gain": 0.5000000000000001,
+          "seat": 0,
+          "value": 9.658499464760065e-18
+        },
+        {
+          "best_response": 0.2794848647090192,
+          "gain": 0.2794848647090192,
+          "seat": 1,
+          "value": 7.41884741496063e-18
+        }
+      ],
+      "seconds": 0.0008983
+    },
+    {
+      "iteration": 10,
+      "nash_conv": 0.004570385701431867,
+      "seats": [
+        {
+          "best_response": 0.05821377237100935,
+          "gain": 0.002483007971791684,
+          "seat": 0,
+          "value": 0.05573076439921767
+        },
+        {
+          "best_response": -0.05364338666957763,
+          "gain": 0.002087377729640183,
+          "seat": 1,
+          "value": -0.055730764399217814
+        }
+      ],
+      "seconds": 0.0165969
+    },
+    {
+      "iteration": 20,
+      "nash_conv": 0.0006824140467114742,
+      "seats": [
+        {
+          "best_response": 0.05652113792599079,
+          "gain": 0.00035156771128249525,
+          "seat": 0,
+          "value": 0.056169570214708295
+        },
+        {
+          "best_response": -0.05583872387927915,
+          "gain": 0.00033084633542897895,
+          "seat": 1,
+          "value": -0.05616957021470813
+        }
+      ],
+      "seconds": 0.0278144
+    },
+    {
+      "iteration": 30,
+      "nash_conv": 0.0002186417120409942,
+      "seats": [
+        {
+          "best_response": 0.05628168508750546,
+          "gain": 0.00011383787144480378,
+          "seat": 0,
+          "value": 0.056167847216060655
+        },
+        {
+          "best_response": -0.056063043375465034,
+          "gain": 0.00010480384059619041,
+          "seat": 1,
+          "value": -0.056167847216061224
+        }
+      ],
+      "seconds": 0.0441181
+    },
+    {
+      "iteration": 40,
+      "nash_conv": 0.0001068402199379051,
+      "seats": [
+        {
+          "best_response": 0.05623876907298787,
+          "gain": 0.0000638069727528709,
+          "seat": 0,
+          "value": 0.056174962100234996
+        },
+        {
+          "best_response": -0.056131928853049774,
+          "gain": 0.00004303324718503421,
+          "seat": 1,
+          "value": -0.05617496210023481
+        }
+      ],
+      "seconds": 0.056515
+    },
+    {
+      "iteration": 50,
+      "nash_conv": 0.00006334130052781939,
+      "seats": [
+        {
+          "best_response": 0.05622327938776474,
+          "gain": 0.00004179394775301326,
+          "seat": 0,
+          "value": 0.056181485440011725
+        },
+        {
+          "best_response": -0.05615993808723691,
+          "gain": 0.000021547352774806128,
+          "seat": 1,
+          "value": -0.05618148544001172
+        }
+      ],
+      "seconds": 0.0694123
+    }
+  ],
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "abeea010462d3cb6cecc1bbea7801c93846988839692f5a6faafa7d934273aa6",
+  "iterations": 50,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "options": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "eval_every": 10,
+    "gamma": 2.0,
+    "iterations": 100000,
+    "target_nash_conv": 0.0001
+  },
+  "reached_target": true,
+  "source": "examples/bench/hu_pushfold_5bb.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      2,
+      1
+    ]
+  },
+  "timings": {
+    "model": 0.0036962,
+    "solve": {
+      "evaluation": 0.0042998,
+      "k4": 0.00005139999999999999,
+      "reaches": 0.014840899999999995,
+      "t2": 0.047085900000000014,
+      "t3": 6.799999999999994e-6,
+      "update": 0.0004427000000000004
+    },
+    "tables": 0.1997715,
+    "total": 0.3709843,
+    "tree": 0.0000401
+  },
+  "version": 1,
+  "warnings": []
+}

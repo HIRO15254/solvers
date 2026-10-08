@@ -1,0 +1,170 @@
+{
+  "checkpoints": [
+    {
+      "iteration": 0,
+      "nash_conv": 0.9978292234919306,
+      "seats": [
+        {
+          "best_response": 0.5589697294180384,
+          "gain": 0.5589697294180384,
+          "seat": 0,
+          "value": 1.931699892952013e-17
+        },
+        {
+          "best_response": 0.43885949407389224,
+          "gain": 0.43885949407389224,
+          "seat": 1,
+          "value": 1.483769482992126e-17
+        }
+      ],
+      "seconds": 0.0008446
+    },
+    {
+      "iteration": 10,
+      "nash_conv": 0.0055613185667738735,
+      "seats": [
+        {
+          "best_response": -0.04265244121976506,
+          "gain": 0.003147808618212747,
+          "seat": 0,
+          "value": -0.045800249837977806
+        },
+        {
+          "best_response": 0.04821375978653878,
+          "gain": 0.0024135099485611267,
+          "seat": 1,
+          "value": 0.045800249837977654
+        }
+      ],
+      "seconds": 0.0136735
+    },
+    {
+      "iteration": 20,
+      "nash_conv": 0.0008513193117651655,
+      "seats": [
+        {
+          "best_response": -0.04499173787644107,
+          "gain": 0.0004887157328325384,
+          "seat": 0,
+          "value": -0.04548045360927361
+        },
+        {
+          "best_response": 0.04584305718820617,
+          "gain": 0.00036260357893262707,
+          "seat": 1,
+          "value": 0.045480453609273545
+        }
+      ],
+      "seconds": 0.0226513
+    },
+    {
+      "iteration": 30,
+      "nash_conv": 0.000276667083896974,
+      "seats": [
+        {
+          "best_response": -0.04525329925221819,
+          "gain": 0.00015835059448338767,
+          "seat": 0,
+          "value": -0.045411649846701575
+        },
+        {
+          "best_response": 0.045529966336115474,
+          "gain": 0.0001183164894135863,
+          "seat": 1,
+          "value": 0.04541164984670189
+        }
+      ],
+      "seconds": 0.0354864
+    },
+    {
+      "iteration": 40,
+      "nash_conv": 0.00012393494119847248,
+      "seats": [
+        {
+          "best_response": -0.045318577550280154,
+          "gain": 0.00007309793371425288,
+          "seat": 0,
+          "value": -0.045391675483994406
+        },
+        {
+          "best_response": 0.045442512491478106,
+          "gain": 0.0000508370074842196,
+          "seat": 1,
+          "value": 0.045391675483993886
+        }
+      ],
+      "seconds": 0.0450699
+    },
+    {
+      "iteration": 50,
+      "nash_conv": 0.00006459474773849727,
+      "seats": [
+        {
+          "best_response": -0.045342570406376945,
+          "gain": 0.00003815251138128417,
+          "seat": 0,
+          "value": -0.04538072291775823
+        },
+        {
+          "best_response": 0.045407165154114984,
+          "gain": 0.0000264422363572131,
+          "seat": 1,
+          "value": 0.04538072291775777
+        }
+      ],
+      "seconds": 0.0553239
+    }
+  ],
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "af79fe863f02279ea6448569e3ca2386247852e54c4e38fe2462fc3d3ac1dd88",
+  "iterations": 50,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "options": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "eval_every": 10,
+    "gamma": 2.0,
+    "iterations": 100000,
+    "target_nash_conv": 0.0001
+  },
+  "reached_target": true,
+  "source": "examples/bench/hu_pushfold_10bb.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      2,
+      1
+    ]
+  },
+  "timings": {
+    "model": 0.0034227,
+    "solve": {
+      "evaluation": 0.0040349999999999995,
+      "k4": 0.00003210000000000002,
+      "reaches": 0.009411099999999999,
+      "t2": 0.038338199999999996,
+      "t3": 4.599999999999997e-6,
+      "update": 0.0003605000000000003
+    },
+    "tables": 0.1699472,
+    "total": 0.2935319,
+    "tree": 0.000039
+  },
+  "version": 1,
+  "warnings": []
+}

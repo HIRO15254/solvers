@@ -1,0 +1,6 @@
+{
+  "run": "b4_simple_s256",
+  "solve": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\hind\\target\\release\\examples\\trunk_solve.exe",
+  "wall_seconds": 130.4,
+  "peak_working_set_mib": 1071.0
+}

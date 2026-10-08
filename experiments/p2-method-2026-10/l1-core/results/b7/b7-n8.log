@@ -1,0 +1,14 @@
+Tree: 5466 decisions, 6131 terminals (0.108s)
+Tables: 0.165s; model: 0.003s
+L1: 186 leaves; 8052 postflop decisions; 555648 slots; 8890368 storage bytes
+Iteration 1: wall 6.969994s; reaches 0.293374; t2 0.200327; t3 1.374129; k4 4.132693; update 0.041193; board preparation 0.045142; postflop 0.725092; evaluation 0.000000
+Iteration 2: wall 4.063149s; reaches 0.081397; t2 0.188002; t3 0.761690; k4 2.240495; update 0.040116; board preparation 0.000351; postflop 0.613092; evaluation 0.000000
+Iteration 3: wall 4.886177s; reaches 0.086201; t2 0.176514; t3 0.792107; k4 2.866087; update 0.048865; board preparation 0.000290; postflop 0.782773; evaluation 0.000000
+Iteration 4: wall 4.925361s; reaches 0.077351; t2 0.169936; t3 0.704420; k4 2.979702; update 0.043096; board preparation 0.000261; postflop 0.806960; evaluation 0.000000
+Iteration 5: wall 4.973757s; reaches 0.066740; t2 0.154718; t3 0.594565; k4 3.170452; update 0.037484; board preparation 0.000461; postflop 0.824306; evaluation 0.000000
+Iteration 6: wall 5.104236s; reaches 0.074083; t2 0.163563; t3 0.573817; k4 3.260781; update 0.040194; board preparation 0.000328; postflop 0.856424; evaluation 0.000000
+Iteration 7: wall 4.970877s; reaches 0.074192; t2 0.155758; t3 0.512419; k4 3.223272; update 0.040296; board preparation 0.000261; postflop 0.841552; evaluation 0.000000
+Iteration 8: wall 4.865378s; reaches 0.064406; t2 0.149317; t3 0.498861; k4 3.167249; update 0.040611; board preparation 0.000298; postflop 0.828254; evaluation 0.000000
+Iteration 9: wall 4.856061s; reaches 0.068919; t2 0.154132; t3 0.497360; k4 3.155241; update 0.041636; board preparation 0.000475; postflop 0.807753; evaluation 0.000000
+Iteration 10: wall 4.921069s; reaches 0.072056; t2 0.149818; t3 0.480597; k4 3.222450; update 0.044486; board preparation 0.000315; postflop 0.815091; evaluation 0.000000
+Iterations: 10; reached target: false; solve phases Timings { trunk: SolveTimings { reaches: 0.9587177, t2: 1.6620849000000004, t3: 6.789965800000001, k4: 31.418422700000008, update: 0.41797739999999994, evaluation: 0.0 }, board_preparation: 0.04818150000000001, postflop: 7.901295599999998, evaluation_board_preparation: 1e-7 }

@@ -1,0 +1,7 @@
+Tree: 6845 decisions, 7801 terminals (0.268s)
+Tables: 0.166s; model: 0.003s
+Iteration 1: wall 39.854678s; reaches 0.321659; t2 0.282326; t3 1.907057; k4 37.104850; update 0.050075; evaluation 0.000000
+Iteration 2: wall 22.727275s; reaches 0.085839; t2 0.214035; t3 0.760021; k4 21.459426; update 0.052609; evaluation 0.000000
+Iteration 3: wall 92.971665s; reaches 0.074674; t2 0.193979; t3 0.682997; k4 22.577805; update 0.061523; evaluation 69.245395
+Checkpoint 3: NashConv 9.291590665282; gains [2.982999022212596, 2.1252566317813546, 1.7828678737289803, 0.5166350586444362, 0.5140907501991, 1.3697413287150975]; 155.557760s
+Iterations: 3; reached target: false; solve phases SolveTimings { reaches: 0.4821719, t2: 0.6903398999999999, t3: 3.3500751, k4: 81.1420817, update: 0.1642065, evaluation: 69.2453952 }

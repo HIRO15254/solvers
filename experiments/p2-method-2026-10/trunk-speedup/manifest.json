@@ -1,0 +1,355 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-27",
+  "recorded_on": "2026-10-07",
+  "purpose": "S4-1b-2: shorten one DCFR iteration of the L0 trunk solver with model-preserving changes and the solver-only K4 approximation of decision P2D7, check on B3 that the approximation converges like the exact solver, and record the iteration time on B4 (Simple and General reference trees with checkdown).",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "Codex implemented both changes; the main loop reviewed the diffs, reran the required checks, reran B1 (average profiles bit-identical and checkpoints identical except wall times to experiments/p2-method-2026-10/trunk-solver) and re-evaluated the exact solver's 200-iteration B3 profile with l0_eval (NashConv relative difference 2.2e-13). All recorded runs are the main loop's. The B3 run used the binary of e95f45f, before the cache fix, so its wall times include the cache slowdown; its NashConv values are deterministic and unchanged by the bit-identical fix. B4 timings ran on a quiet machine (results/load.log shows no builds, tests or evaluators); other cargo processes ran during the first five minutes of the B3 run. The B3 3-iteration and B4 General 10-iteration NashConv after the cache fix were checked in Codex's runs only.",
+  "source": {
+    "revisions": {
+      "9fbb6ac88f63d7192af31b99bc2a12917edc54c7": {
+        "trunk_solve_binary_sha256": "a36e1430b2ff71053748d6982843b9659e2910a44949d5da7c2f0a13d9676855",
+        "used_for": "B4 baseline (results/b4/*base-model*)"
+      },
+      "e95f45f9c6b08fceca19ef33b1dd23e82ae91e10": {
+        "trunk_solve_binary_sha256": "f2aa04926ddc6cad5fe8220c02c84114a059d721e6787178ec3530abd520508d",
+        "l0_eval_binary_sha256": "5df610e7b3eb7f4a28266adcc443c36584667772336b7c21383b8c73a6845cfc",
+        "used_for": "checks (results/check), B3 (results/b3-s256), B4 before the cache fix (results/b4 model and s256)"
+      },
+      "724f67ad4195be87370892f37a53c8f2c012c366": {
+        "trunk_solve_binary_sha256": "fa117d9d6607e6b0aa4ad55927e75eace991ae46092ea6d89267a887d5013962",
+        "l0_eval_binary_sha256": "c2577800fc22553cc201fa8f4790f5bf852176527a71c4d793939c4212e5e2c8",
+        "used_for": "B4 after the cache fix (results/b4-cachefix)"
+      }
+    },
+    "working_tree": "each binary was built from a tree whose tracked files equal the named commit",
+    "build": "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397"
+  },
+  "solver": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "gamma": 2.0,
+    "seat_order": "alternating 0..n-1",
+    "b3": {
+      "iterations": 200,
+      "eval_every": 20,
+      "solver_k4_samples": 256
+    },
+    "b4": {
+      "model_iterations": 3,
+      "solver_k4_iterations_before_fix": 10,
+      "solver_k4_iterations_after_fix": 30,
+      "solver_k4_samples": 256
+    }
+  },
+  "model": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": 2048,
+    "k4_seed": 0
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "shell": "Git Bash; PowerShell 7 for run_b4.ps1",
+    "python": "3.13.7",
+    "threads": "rayon default (16)"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/run_b3_solver_k4.sh",
+      "sha256": "5a6ea83f0fb07aa054f63983083a54b31fdc8d32d4aba37a4e7e09c4995bfdab",
+      "role": "B3 200-iteration procedure with solver K4 256"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/run_b4.ps1",
+      "sha256": "bc605b0ec7b026958fe6232c098d7ae32dc90f118a1311c0008d013957483821",
+      "role": "B4 timing procedure (PowerShell 7)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/sample_load.ps1",
+      "sha256": "b9d772f7287bd3ec3fc2a63d52070edfe7c3382e8b53befa40581302f3917f74",
+      "role": "machine load sampler run beside the B3 run and the B4 timings"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/summarize.py",
+      "sha256": "a794f1b7f83fccaeb58f86b2a632a44eb6d7a1442745b0520f7a47a09de85804",
+      "role": "summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/load.log",
+      "sha256": "3d2dd4fad329bd363757db6a925f8d5c3e07a4687fd1a87ad74a92084de78937",
+      "role": "machine load every 10 s during the B3 run and the B4 timings"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/summary.md",
+      "sha256": "4e16e223efedf5f67ce4fc9d68a94b8aa81dc6e40309000aed952eaad6b8d3d0",
+      "role": "summarize.py output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4.run.log",
+      "sha256": "7830a45b42262dd7374d0e90a5d57548f839d0d95b6b6dc979f647f57b3f2b1d",
+      "role": "stdout of the B4 timing runs before the cache fix"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix.run.log",
+      "sha256": "0f3eee2eb50e524cd25dd3e42461b7b2d48af8ecf4d616c1553493ba933e6e02",
+      "role": "stdout of the B4 timing runs after the cache fix"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_10bb.json",
+      "sha256": "7aa9e93157f649d35b1fbb2ecc4672ccacd152d08253b6685a5e169de521e7fa",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_10bb.profile.json",
+      "sha256": "ec956362a7452c9b9f0c4433b76c7443cf8f99f5d4225cc4f1021f0438439f46",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_20bb.json",
+      "sha256": "42bda1957196049739c22fc7101a5281b58416dd7a4ac65ae2ba62149ac8a145",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_20bb.profile.json",
+      "sha256": "a20c8a58503982af23771925e85bc87f577964f82a0ae43d5620bb1a041f55bd",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_5bb.json",
+      "sha256": "544700755f3dc42f18aa97ac419b4f68d2ef4a2dc006014a4ec83468bdb919b0",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/b1_5bb.profile.json",
+      "sha256": "05241759124c5d5877d3af7768735af31ec792bae235ad858d9e28a3ef175fe3",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/l0eval_b3_200.json",
+      "sha256": "fb06eb787ff5374b14a97cb269119d9deee05281546778da11e928d084af5205",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/check/l0eval_b3_200.log",
+      "sha256": "dac55071278afdc65bf5d8c7026b9f28c27c6eeb0ff14134c9149dfbf7da6d29",
+      "role": "identity checks with the binaries of e95f45f: B1 solver outputs and profiles (bit-identical to ../trunk-solver except wall times), l0_eval of the exact solver's B3 200-iteration profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b3-s256/b3_s256.json",
+      "sha256": "aa64b8efe59881c91a7dbe82c8e4d99d6ada8e10d755f8b2a843f8457688330f",
+      "role": "trunk_solve output of B3 with solver K4 256 (binary of e95f45f)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b3-s256/b3_s256.log",
+      "sha256": "07dfc31a887bd9b1bc6f7b5aa4ad6a0740b19c93818333484506617e93f839f0",
+      "role": "trunk_solve output of B3 with solver K4 256 (binary of e95f45f)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_base-model.json",
+      "sha256": "64fd4cc3526a11ba1cc4d112fb5b49a5bcc91253b6e3c945556ec05595e6c04e",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_base-model.log",
+      "sha256": "1368945ccba666ead861133d6575a6d0f998249855666214b2cc179156b5f7b2",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_base-model.metrics.json",
+      "sha256": "fee1556f40a575d09518d530370821e1ecd47a6568fd55cd5489f9dbf987f88f",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_model.json",
+      "sha256": "d6107adbf80d53bb2ed8c13d7a05cbb55a43aa90d88c415bc9b7aa9caba296b8",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_model.log",
+      "sha256": "c0830ee5c5781ce8cb8780162451de8f07ffb40f100dc69ecb75bf3c144b5594",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_model.metrics.json",
+      "sha256": "367ebe162e85cd1799a9576d3d5bec617a2c77d31112f73a180fed6cf9d0e6a6",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_s256.json",
+      "sha256": "cc7f48ccb7322c73c494dd6bd6f031772f65e6fa354879fd92cdc58244a30881",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_s256.log",
+      "sha256": "74b223cc19d3fa958eb011f027869a7c03e7ade1eb72553a14b8b9f3204488df",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_general_s256.metrics.json",
+      "sha256": "20c98528c18eaee381aa7c3e36297b70647d4c1ed858f7baf64305967c0604a2",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_base-model.json",
+      "sha256": "d6aa6b750f4496830bf89e6bbc77e82aa48e1727428e5a20d60ecc4545979280",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_base-model.log",
+      "sha256": "dde7f46c1fc60c84093041e2d72d6a8394a1468d62cbc0a02190c02785dfd6d0",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_base-model.metrics.json",
+      "sha256": "199e615a52ff78fac2282e8eaa893ab30039b240821ef612cc1b0e827cbbb5fd",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_model.json",
+      "sha256": "02f205efcc4bf33f8e9b073c4be7bc0d66bb210dd205201e61d12383bee5c896",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_model.log",
+      "sha256": "2bfcca96a73ba7059064da7df2b26b4f9e8cd0be3e673a85cf891683560206b1",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_model.metrics.json",
+      "sha256": "39afb376368f562212235aa407f4acd8b065caa69b0941c527b11a1c5e482d58",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_s256.json",
+      "sha256": "26ca1354679a2f8759a298115e1e28f20686fb375293745ae9c96648b56d4032",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_s256.log",
+      "sha256": "7014a98bfee41d56b30e073c112e8c509792fc0d35e550ba91a1bb9bde2b8f76",
+      "role": "B4 timing: trunk_solve stdout; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4/b4_simple_s256.metrics.json",
+      "sha256": "111e8dc59779c52be49451dd8c6c87ab157926d6d6d8554533b750b629b22bad",
+      "role": "B4 timing: run wall time and peak working set; binary of 9fbb6ac (base-model) or e95f45f (model, s256)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_model.json",
+      "sha256": "9f8665207cd5bb5f2d3b478e570baa65afaf7fd718c4fd243b9a4b3d85e9acbd",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_model.log",
+      "sha256": "783a1672894a2fcd5d42e0efd30885464199c36f4504ba4eaa1f85c9ff9bdf2c",
+      "role": "B4 timing: trunk_solve stdout; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_model.metrics.json",
+      "sha256": "49e7c5ddf668fabbd96a4e40480260b583f6435f8c550b14ed57cc2d58a90723",
+      "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_s256.json",
+      "sha256": "2c672282969ae15b1db3f8da1f1ff638e85affc1910046e0ed363b8a7b00c671",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_s256.log",
+      "sha256": "14b3952ced698def7c5db1178216f348bf3f75b6c866bf7ed0f453825393129f",
+      "role": "B4 timing: trunk_solve stdout; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_general_s256.metrics.json",
+      "sha256": "9ddbfac416808dcf41f4388894c1d081f94c845d35abd97d9eaee7f27f568d57",
+      "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_model.json",
+      "sha256": "9ee6f1f1fa43528ec4f59f0e93ea832768c6433b782ee3a07456e4e0234cc815",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_model.log",
+      "sha256": "af9865b0f4a76f409b70a44789523cae95ea791ca0292f45ba13fa8e58ae9f0e",
+      "role": "B4 timing: trunk_solve stdout; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_model.metrics.json",
+      "sha256": "6dc2b0ed072ec2b87259bfc0d9294403fe73b37baa66c87fd3bef0efe3f27017",
+      "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_s256.json",
+      "sha256": "402e64d20d96ebd1f8da4c69296b2af161f1acae6f41672081f0ac040ae3160b",
+      "role": "B4 timing: trunk_solve output (p2-trunk-solve); binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_s256.log",
+      "sha256": "d51653667a8f762b7ae86d11fc6933408a1ec24b01ee2cd016793f11464592f7",
+      "role": "B4 timing: trunk_solve stdout; binary of 724f67a"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-speedup/results/b4-cachefix/b4_simple_s256.metrics.json",
+      "sha256": "c5d22f16b57ee9101361aa9d0ffeb0cd79cbe456ba42b9a907036f92cb199fba",
+      "role": "B4 timing: run wall time and peak working set; binary of 724f67a"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "examples/bench/6max_20bb_checkdown.toml",
+      "sha256": "a5a67887b8f6aaa605e6405a199ce9145f2a5c878495dc3742590e348e7edc96",
+      "role": "B3 game"
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_simple_reference_checkdown.toml",
+      "sha256": "3faa6de8a1581107db61cc71554f73f88ddd09d4505fb842cc764f406a597cb9",
+      "role": "B4 Simple game"
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_reference_checkdown.toml",
+      "sha256": "286c42c070f361e515e3a1b28e503ca8c15ac1f7e1523d6f53fb205fee47781f",
+      "role": "B4 General game"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/trunk-solver/results/b3-trial/b3_200.json",
+      "sha256": "43d800e3f06d33dbf0bd9cb609ce60ea7458a6df8da8a2114d529ff7bb5af66f",
+      "role": "exact solver's 200-iteration B3 run for comparison; recorded by experiments/p2-method-2026-10/trunk-solver"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/trunk-solver/b3-solver-k4/b3_s256.profile.json",
+      "sha256": "0211c9a94ad5d819645b67fe52a62cb21f2b4c9ba2cb4912e578c2ef23a7e6dd",
+      "bytes": 64950416,
+      "role": "average profile of the B3 run with solver K4 256 (p2-class-profile)"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "bash experiments/p2-method-2026-10/trunk-speedup/run_b3_solver_k4.sh <out dir>",
+    "pwsh experiments/p2-method-2026-10/trunk-speedup/run_b4.ps1 <out dir> -Iterations 3 -Tag model",
+    "pwsh experiments/p2-method-2026-10/trunk-speedup/run_b4.ps1 <out dir> -Iterations 30 -SolverK4 256",
+    "python experiments/p2-method-2026-10/trunk-speedup/summarize.py <results dir>"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "format": "p2-l0-tree",
+  "version": 1,
+  "nodes": [
+    {
+      "path": [],
+      "actor": 0,
+      "actions": [
+        "fold",
+        "raise-to:20000:all-in"
+      ]
+    },
+    {
+      "path": [
+        "raise-to:20000:all-in"
+      ],
+      "actor": 1,
+      "actions": [
+        "fold",
+        "call:19000:all-in"
+      ]
+    }
+  ]
+}
