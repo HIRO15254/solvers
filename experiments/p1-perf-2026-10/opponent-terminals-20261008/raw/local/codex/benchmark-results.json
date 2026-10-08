@@ -1,0 +1,55 @@
+{
+  "statistic": "median across three runs of Criterion sample median point estimates",
+  "cases": 193,
+  "reach_hash": "809d6afa6023b0d6",
+  "affinity_mask": 1,
+  "RAYON_NUM_THREADS": 1,
+  "run_order": [
+    "base1",
+    "new1",
+    "base2",
+    "new2",
+    "base3",
+    "new3"
+  ],
+  "binaries": {
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t21-bench-base.exe": "803c8de7d7838bd7e039cf0b87ecfe06b05931ab3dabd5acd6fbb26bff599066",
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t21-bench-new.exe": "3d5d425c98a0019ba8b9ad19b36eb7881dd405ebb74bbbd5d335593d744233ee",
+    "runs\\t21\\solvers-head.exe": "f66b8e8f53cec4ec058f767535e1307c0ae102334f50fdc1f1f086805ce90f30",
+    "runs\\t21\\solvers-new.exe": "80bdf78777a733f975faeacada9ea200cc8748f3ced9ece2388373e17471cc11"
+  },
+  "rows": [
+    {
+      "bench": "kernels_realistic/t21_opponent_default",
+      "base_runs_ms": [
+        3.84350608974359,
+        3.9313231359649126,
+        4.294695833333334
+      ],
+      "new_runs_ms": [
+        4.079986201298701,
+        3.9749,
+        4.099714950980392
+      ],
+      "base_median_ms": 3.9313231359649126,
+      "new_median_ms": 4.079986201298701,
+      "new_over_base": 1.037815020590339
+    },
+    {
+      "bench": "kernels_realistic/t21_opponent_add",
+      "base_runs_ms": [
+        3.7757798295454545,
+        3.71142453125,
+        3.896079166666667
+      ],
+      "new_runs_ms": [
+        3.3465204761904763,
+        3.432105,
+        3.5894751428571428
+      ],
+      "base_median_ms": 3.7757798295454545,
+      "new_median_ms": 3.432105,
+      "new_over_base": 0.9089791129090206
+    }
+  ]
+}

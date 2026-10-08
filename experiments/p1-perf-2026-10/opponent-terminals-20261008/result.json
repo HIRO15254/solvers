@@ -1,0 +1,204 @@
+{
+ "base": "t22c",
+ "runs": {
+  "vm27": {
+   "p1_bench": {
+    "flop1_t16": {
+     "median_secs_per_iter": {
+      "t21": 0.13946,
+      "t22c": 0.1504
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.9273
+     }
+    },
+    "flop1_t1": {
+     "median_secs_per_iter": {
+      "t21": 1.7494,
+      "t22c": 1.86854
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.9362
+     }
+    },
+    "flop1_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.12075,
+      "t22c": 0.13019
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.9275
+     }
+    },
+    "gtowb_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.83782,
+      "t22c": 0.89185
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.9394
+     }
+    },
+    "river_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.00023,
+      "t22c": 0.00026
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.8846
+     }
+    },
+    "turn2_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.00118,
+      "t22c": 0.0012
+     },
+     "ratio_vs_t22c": {
+      "t21": 0.9833
+     }
+    }
+   },
+   "eval_secs_median": {},
+   "solves_32t": {
+    "c_turn2_f64": {
+     "t22c": {
+      "iterations": 247,
+      "solve_secs": 0.398,
+      "secs_per_iter": 0.00161
+     },
+     "t21": {
+      "iterations": 247,
+      "solve_secs": 0.405,
+      "secs_per_iter": 0.00164
+     },
+     "solve_ratio_vs_t22c": {
+      "t21": 1.0176
+     }
+    },
+    "c_turn2": {
+     "t22c": {
+      "iterations": 236,
+      "solve_secs": 0.312,
+      "secs_per_iter": 0.00132,
+      "crossing": 233.5
+     },
+     "t21": {
+      "iterations": 235,
+      "solve_secs": 0.318,
+      "secs_per_iter": 0.00135,
+      "crossing": 232.2
+     },
+     "solve_ratio_vs_t22c": {
+      "t21": 1.0192
+     }
+    },
+    "c_flop1": {
+     "t22c": {
+      "iterations": 193,
+      "solve_secs": 24.874,
+      "secs_per_iter": 0.12888,
+      "crossing": 190.6
+     },
+     "t21": {
+      "iterations": 184,
+      "solve_secs": 22.152,
+      "secs_per_iter": 0.12039,
+      "crossing": 182.6
+     },
+     "solve_ratio_vs_t22c": {
+      "t21": 0.8906
+     }
+    },
+    "c_flop3": {
+     "t22c": {
+      "iterations": 407,
+      "solve_secs": 167.915,
+      "secs_per_iter": 0.41257,
+      "crossing": 406.9
+     },
+     "t21": {
+      "iterations": 410,
+      "solve_secs": 158.124,
+      "secs_per_iter": 0.38567,
+      "crossing": 408.4
+     },
+     "solve_ratio_vs_t22c": {
+      "t21": 0.9417
+     }
+    },
+    "c_gtowb": {
+     "t22c": {
+      "iterations": 314,
+      "solve_secs": 294.664,
+      "secs_per_iter": 0.93842,
+      "crossing": 311.2
+     },
+     "t21": {
+      "iterations": 319,
+      "solve_secs": 276.952,
+      "secs_per_iter": 0.86819,
+      "crossing": 316.8
+     },
+     "solve_ratio_vs_t22c": {
+      "t21": 0.9399
+     }
+    }
+   },
+   "sol_payload_bit_equal": {
+    "c_turn2_f64_t22c_t21": true
+   },
+   "checks": {
+    "fmt": "0",
+    "clippy": "0",
+    "test": "0",
+    "tests": {
+     "passed": 930,
+     "failed": 0,
+     "ignored": 32
+    }
+   }
+  }
+ },
+ "local_codex_on_f918dc5": {
+  "kernel_bench": [
+   {
+    "bench": "kernels_realistic/t21_opponent_default",
+    "base_runs_ms": [
+     3.84350608974359,
+     3.9313231359649126,
+     4.294695833333334
+    ],
+    "new_runs_ms": [
+     4.079986201298701,
+     3.9749,
+     4.099714950980392
+    ],
+    "base_median_ms": 3.9313231359649126,
+    "new_median_ms": 4.079986201298701,
+    "new_over_base": 1.037815020590339
+   },
+   {
+    "bench": "kernels_realistic/t21_opponent_add",
+    "base_runs_ms": [
+     3.7757798295454545,
+     3.71142453125,
+     3.896079166666667
+    ],
+    "new_runs_ms": [
+     3.3465204761904763,
+     3.432105,
+     3.5894751428571428
+    ],
+    "base_median_ms": 3.7757798295454545,
+    "new_median_ms": 3.432105,
+    "new_over_base": 0.9089791129090206
+   }
+  ],
+  "tests": {
+   "passed": 924,
+   "failed": 0,
+   "ignored": 31
+  },
+  "artifact_comparison": "PASS: 15 comparisons; 12 HEAD/new f64, 3 new f32 across threads"
+ }
+}

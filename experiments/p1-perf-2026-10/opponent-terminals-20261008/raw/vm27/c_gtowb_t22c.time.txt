@@ -1,0 +1,23 @@
+	Command being timed: "/home/PC_User/t22c/target/release/solvers solve /home/PC_User/work_vm27/c_gtowb.toml --out /home/PC_User/work_vm27/c_gtowb_t22c --threads 32"
+	User time (seconds): 9521.61
+	System time (seconds): 42.31
+	Percent of CPU this job got: 2792%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 5:42.46
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 22908884
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1499509
+	Voluntary context switches: 1325015
+	Involuntary context switches: 121186
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 13256640
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

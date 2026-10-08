@@ -1,0 +1,7 @@
+{
+  "case": "turn-f32-f32-1.toml",
+  "head_sha256": "79f315b38e2abe5478a647f2bd8aaf5cf6cd28994f755b9efaff17543cb4ab7a",
+  "new_sha256": "a355852c73fbce4c51e84cd7ae4a486e5a8980f2454e3946aaecb145dcc17ace",
+  "states_differ": true,
+  "purpose": "Detect accidental reuse of archived HEAD libraries in the current CLI build; f32 rounding changes are allowed"
+}

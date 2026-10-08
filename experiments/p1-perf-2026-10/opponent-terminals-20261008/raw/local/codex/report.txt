@@ -1,0 +1,48 @@
+T21 completed in the specified worktree; HEAD f918dc5, branch s3-p1-multicore-perf. All changes remain uncommitted.
+
+Files changed:
+- crates/hu-engine/src/solver.rs
+- crates/hu-engine/src/solver/opponent_terminal_tests.rs (new)
+- crates/hu-postflop/src/kernel.rs
+- crates/hu-postflop/src/postflop.rs
+- crates/hu-postflop/src/precision_tests.rs
+- crates/hu-postflop/src/opponent_precision_tests.rs (new)
+- crates/hu-postflop/benches/kernels.rs
+- docs/hu-postflop.jp.md
+- docs/architecture.md
+
+API: TerminalEvaluator::add_cfr_opponent_terminals(&self, terminals: &[u32], p: Player, reaches: &[&[f32]], out: &mut [f32], tmp: &mut [f32]). The default clears tmp before each eval_cfr and adds its values into out in order. Existing evaluators use that default.
+
+The opponent Action branch of cfr_pass (solver.rs:1021) batches terminals only for F32 && !zero_opp. It overwrites terminal sigma rows with opp_reach * sigma, avoiding extra hand buffers or heap metadata. Two-entry stack batches retain child order; PRUNE drops all-zero terminal reaches, including signed zero. All terminal rows are skipped in sequential and parallel recursion and in parallel reduction. Nonterminal rows are summed in child order after terminals. ActionViews, the zero_opp path, scratch acquisition/return and child-output initialization remain in place. The F64 flag is false, preserving its original terminal recursion and child-order floating operations.
+
+PostflopEvaluator fuses adjacent same-board fold/showdown contributions, including reversed input order. The rank table's opponent list supplies fold sums because it covers all board-live support entries and dead reach is zero. The sweep starts with lose-weighted call sums plus fold-weighted fold sums, and restores both same-combo corrections in one own-hand add loop. One lookup and the existing ABSENT check serve both reaches. Lone fold/showdown kernels add directly. Dead own entries and the supplied tmp remain untouched in f32. No unsafe, dependency, Cargo.toml, format, mw-preflop or cfr-ref source changes.
+
+Benchmark protocol: baseline executable built after adding only cases/helper, before changing engine/kernel code; final executable rebuilt for final source. Both retained at the requested Temp/scratchpad paths. Ran base1,new1,base2,new2,base3,new3 directly with --bench kernels_realistic/t21_opponent --noplot, processor affinity mask 1, RAYON_NUM_THREADS=1. Local Intel i7-10700KF, 16 logical processors; rustc 1.97.0 / LLVM 22.1.6, target-cpu=native, thin LTO, one codegen unit. 193 opponent-node case snapshots from f64 solve iterations 300/350/400. Every run has reach hash 809d6afa6023b0d6. Times measure the entire 193-case batch. Medians below are medians across three Criterion sample-median point estimates; raw estimates and all logs are retained.
+
+kernels_realistic/t21_opponent_default: base 3.931323 ms, new 4.079986 ms, new/base 1.037815
+  Base runs (ms): [3.84350608974359, 3.9313231359649126, 4.294695833333334]
+  New runs (ms): [4.079986201298701, 3.9749, 4.099714950980392]
+kernels_realistic/t21_opponent_add: base 3.775780 ms, new 3.432105 ms, new/base 0.908979
+  Base runs (ms): [3.7757798295454545, 3.71142453125, 3.896079166666667]
+  New runs (ms): [3.3465204761904763, 3.432105, 3.5894751428571428]
+
+The fused method median is 9.10% lower than its baseline; the unchanged default control is 3.78% higher across binaries. Within the final executable fused/default medians are 0.8412. Shared-machine noise limits the claim to this local microbenchmark; the 32-thread AMD VM end-to-end measurement is left to the reviewer.
+
+Variants: only the requested safe fusion/direct-add implementation was evaluated. No additional performance variants were tried or rejected, so there are no alternative-variant measurements. A duplicate same-combo lookup was consolidated before final measurement to keep the existing single ABSENT check; no separate performance claim is made for that source cleanup. The zero/write/add baseline is measured above. No ILP/multi-accumulator or unsafe variants were attempted.
+
+Accuracy: final precision tests compare the fused add with the public default add on real rank tables, both seats, dense/sparse/zero and -0.0 reaches, only-one-reach-zero cases, mixed-sign/zero utilities, reversed pairs, lone terminals, same-kind/different-board fallbacks and larger/empty batches. Separate add kernels match write-then-add bitwise on live hands; dead hands retain initial values including -0.0. Coverage checks independently match every opponent support entry against board compatibility, and compare full-list versus rank-list fold sums. Largest relative infinity-norm error: 9.325569711770378e-7 versus separate f32 eval/add; 8.463865894446113e-7 versus f64 kernels (tolerance 1e-5). Dispatch maximum: 7.636809979505579e-7. Engine recorded-call tests detect accidental terminal recursion, verify ordered batches/reaches and PRUNE on/off, zero/empty dimensions, and both sequential and action-parallel branches with an independent ordered reduction.
+
+Identity: f64 fold/showdown/compat kernels, eval, eval_cfr and eval_with_kernel bodies match HEAD source byte-for-byte (f64-source-check.json). Twelve distinct HEAD/new debug-CLI comparisons (river/turn x F32/I16/Mixed x 1/4 threads) match canonical .sol payloads, checkpoint arena bytes/header and all progress metrics. Only timing metadata is excluded; operational threads lines are stripped for cross-thread comparisons. Optimized benchmark f64 workload hashes also match all six runs. Full f32 solves at 1 and 4 threads match all checkpoint arenas, .sol payloads, progress, evaluation and saved EVs for all backends, both in unit tests and three additional CLI comparisons. The current CLI was recompiled after detecting shared-output cache collisions with the archived build; verbose source build logs and distinct binary hashes are retained. A positive control verifies that f32 HEAD/new states actually differ, as permitted, while new 1/4-thread states agree.
+
+Verification on final source:
+- cargo fmt --all --check: PASS (fmt.log)
+- cargo clippy --workspace --all-targets -- -D warnings: PASS (clippy.log)
+- cargo test --workspace: PASS, 924 passed / 0 failed / 31 ignored (full output tests.log)
+- python tools/check_docs.py: PASS, 23 Markdown files (check-docs.log)
+- six required alternating benchmark runs: PASS (benchmark-results.json and bench-*.log / estimates)
+- final precision test executable, --nocapture: PASS, 6 tests (precision-final.log)
+- git diff --check: PASS
+
+All Cargo builds/tests were serialized, incremental disabled. A final clippy run with two jobs hit the memory/page-file limit; its log is retained as clippy-memory-failure.log. Waited a minute and retried with one job, then used one job for subsequent Cargo work. An earlier complete workspace run also passed, before the shared-lookup cleanup (tests-before-lookup.log).
+
+No unresolved implementation issue. Limits: artifact A/B uses debug CLI builds and finite fixtures; the reviewer checks release artifacts and 32-thread end-to-end behavior on Milan. Local benchmark noise is material, as shown by the default control. Evidence stays under runs/t21; the requested benchmark executables stay at the specified Temp location. Source manifest/snapshot includes both new untracked tests; source-diff.patch contains tracked-file differences. No experiments files were created or edited.
