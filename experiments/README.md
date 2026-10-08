@@ -27,6 +27,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 不採用の試作・計測 | [P1 f32終端kernelで相手reachの0を飛ばす（T18）](p1-perf-2026-10/f32-sparse-reach-20261008/README.md) | 2026-10-08。従来のf32とbit一致。kernel単体0.74〜0.79倍、1・16 threadsで約6%速いが、32 threadsの0.1%到達は0.99〜1.06倍で不採用 |
 | 性能・一致の受入 | [P1 `.sol`の値block符号化（T19）](p1-perf-2026-10/sol-encode-20261008/README.md) | 2026-10-08。保存の律速は書き手threadの1 byteずつのserialize。EV workerで一括符号化し、tmpfsで停止後の保存20.7→13.8秒、payloadはbit一致 |
 | 性能の計測（使い捨ての診断build） | [P1 32 threadsでの1 iterationの内訳](p1-perf-2026-10/smt-breakdown-20261008/README.md) | 2026-10-08。memory帯域は律速でない。終端kernelが約半分、32 threadsではその半分以上が自身のhandのloop。戦略和の加算は約4%。T20の根拠 |
+| 性能・精度・一致の受入 | [P1 f32終端kernelの自身handのloopとfold・showdownの融合（T20）](p1-perf-2026-10/terminal-own-hands-20261008/README.md) | 2026-10-08。32 threadsの1 iterationが8〜9%短く、目標到達は4本の木で0.93〜0.98倍。効いたのは融合で、showdownのloop単独は32 threadsで差なし。f64はbit一致 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

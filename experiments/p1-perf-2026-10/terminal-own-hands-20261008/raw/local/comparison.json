@@ -1,0 +1,210 @@
+{
+ "f32-f64-base-vs-new": {
+  "sol_payload_equal": true,
+  "checkpoint": "{\"arena_blake3\":[\"f7785b597abdd0c0bfedc458af0c396fca6b7edd5ac2686cc262107d3e3ac271\",\"f7785b597abdd0c0bfedc458af0c396fca6b7edd5ac2686cc262107d3e3ac271\"],\"bit_equal\":true,\"digests_valid\":true,\"elements\":52014600,\"iteration\":183,\"other_bit_differences\":0,\"recorded_threads\":[\" 4\",\" 4\"],\"signed_zero_bit_",
+  "progress_equal": true
+ },
+ "f32-f32-new-t1-vs-t4": {
+  "sol_payload_equal": true,
+  "checkpoint": "skipped (thread comparison)",
+  "progress_equal": true
+ },
+ "f32-f32-base-vs-new": {
+  "base": [
+   [
+    25,
+    2.5214782213774942
+   ],
+   [
+    50,
+    1.041741343733158
+   ],
+   [
+    100,
+    0.340125053341205
+   ],
+   [
+    150,
+    0.15822002020439607
+   ],
+   [
+    176,
+    0.11403389386069973
+   ],
+   [
+    179,
+    0.11249439303848996
+   ],
+   [
+    184,
+    0.1090272155812726
+   ]
+  ],
+  "new": [
+   [
+    25,
+    2.485687040410469
+   ],
+   [
+    50,
+    0.9930886910404396
+   ],
+   [
+    100,
+    0.31401798678224824
+   ],
+   [
+    150,
+    0.166852081115186
+   ],
+   [
+    187,
+    0.11192294524089252
+   ],
+   [
+    190,
+    0.11074455414622641
+   ],
+   [
+    193,
+    0.1071438121175079
+   ]
+  ]
+ },
+ "i16-f32avg-f64-base-vs-new": {
+  "sol_payload_equal": true,
+  "checkpoint": "{\"arena_blake3\":[\"f74184a55c946de6a9ca7a3535e6815f4d4389d88078d906b16258187b0aaa9e\",\"f74184a55c946de6a9ca7a3535e6815f4d4389d88078d906b16258187b0aaa9e\"],\"bit_equal\":true,\"digests_valid\":true,\"elements\":52035082,\"iteration\":177,\"other_bit_differences\":0,\"recorded_threads\":[\" 4\",\" 4\"],\"signed_zero_bit_",
+  "progress_equal": true
+ },
+ "i16-f32avg-f32-new-t1-vs-t4": {
+  "sol_payload_equal": true,
+  "checkpoint": "skipped (thread comparison)",
+  "progress_equal": true
+ },
+ "i16-f32avg-f32-base-vs-new": {
+  "base": [
+   [
+    25,
+    2.4021563973683615
+   ],
+   [
+    50,
+    1.6844164449856134
+   ],
+   [
+    100,
+    0.375554840107705
+   ],
+   [
+    150,
+    0.14566594673168765
+   ],
+   [
+    166,
+    0.12277347570313613
+   ],
+   [
+    175,
+    0.10737398876676607
+   ]
+  ],
+  "new": [
+   [
+    25,
+    2.4652764475878235
+   ],
+   [
+    50,
+    1.0246487502250066
+   ],
+   [
+    100,
+    0.3199424622981991
+   ],
+   [
+    150,
+    0.15068465624610616
+   ],
+   [
+    173,
+    0.11618166963542087
+   ],
+   [
+    178,
+    0.10927675844233609
+   ]
+  ]
+ },
+ "i16-f64-base-vs-new": {
+  "sol_payload_equal": true,
+  "checkpoint": "{\"arena_blake3\":[\"2aa5cf3d86ad3212c5121366db68222dc1d9b184465256f17c1e6d44adb7ddbf\",\"2aa5cf3d86ad3212c5121366db68222dc1d9b184465256f17c1e6d44adb7ddbf\"],\"bit_equal\":true,\"digests_valid\":true,\"elements\":52055564,\"iteration\":186,\"other_bit_differences\":0,\"recorded_threads\":[\" 4\",\" 4\"],\"signed_zero_bit_",
+  "progress_equal": true
+ },
+ "i16-f32-new-t1-vs-t4": {
+  "sol_payload_equal": true,
+  "checkpoint": "skipped (thread comparison)",
+  "progress_equal": true
+ },
+ "i16-f32-base-vs-new": {
+  "base": [
+   [
+    25,
+    2.712114794552973
+   ],
+   [
+    50,
+    1.704881331083528
+   ],
+   [
+    100,
+    0.42560819290253254
+   ],
+   [
+    150,
+    0.14752517986938352
+   ],
+   [
+    165,
+    0.12376019732398036
+   ],
+   [
+    174,
+    0.11267033042107388
+   ],
+   [
+    177,
+    0.10911315513633346
+   ]
+  ],
+  "new": [
+   [
+    25,
+    2.796664610655811
+   ],
+   [
+    50,
+    1.0273193247101668
+   ],
+   [
+    100,
+    0.33581519359837086
+   ],
+   [
+    150,
+    0.15162299189892303
+   ],
+   [
+    172,
+    0.1162944442907099
+   ],
+   [
+    177,
+    0.11406715855907223
+   ],
+   [
+    185,
+    0.10552561962103335
+   ]
+  ]
+ }
+}

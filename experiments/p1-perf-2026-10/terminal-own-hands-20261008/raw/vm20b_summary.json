@@ -1,0 +1,564 @@
+{
+ "bench": {
+  "flop1_t16": {
+   "base": [
+    0.21475,
+    0.21187,
+    0.2129
+   ],
+   "t20ab": [
+    0.19587,
+    0.19568,
+    0.19602
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.92
+   }
+  },
+  "flop1_t1": {
+   "base": [
+    2.8306,
+    2.81433,
+    2.98667
+   ],
+   "t20ab": [
+    2.60185,
+    2.59754,
+    2.60497
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9192
+   }
+  },
+  "flop1_t32": {
+   "base": [
+    0.18543,
+    0.18482,
+    0.18483
+   ],
+   "t20ab": [
+    0.17013,
+    0.16899,
+    0.16981
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9187
+   }
+  },
+  "gtowb_t32": {
+   "base": [
+    1.31455,
+    1.39897,
+    1.31018
+   ],
+   "t20ab": [
+    1.19191,
+    1.19373,
+    1.19071
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9067
+   }
+  },
+  "river_t32": {
+   "base": [
+    0.00038,
+    0.00038,
+    0.00037
+   ],
+   "t20ab": [
+    0.00035,
+    0.00034,
+    0.00035
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9211
+   }
+  },
+  "turn2_t32": {
+   "base": [
+    0.00155,
+    0.00158,
+    0.00166
+   ],
+   "t20ab": [
+    0.00145,
+    0.00147,
+    0.00149
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9304
+   }
+  }
+ },
+ "solve": {
+  "c_turn2_f64": {
+   "base": {
+    "iterations": 247,
+    "solve_secs": 0.464,
+    "secs_per_iter": 0.00188,
+    "nashConv": 0.04382061321793773,
+    "wall": 0.533
+   },
+   "t20ab": {
+    "iterations": 247,
+    "solve_secs": 0.484,
+    "secs_per_iter": 0.00196,
+    "nashConv": 0.04382061321793773,
+    "wall": 0.559
+   },
+   "ratio_vs_base": {
+    "t20ab": 1.0431
+   }
+  },
+  "c_turn2": {
+   "base": {
+    "iterations": 242,
+    "solve_secs": 0.41,
+    "secs_per_iter": 0.00169,
+    "nashConv": 0.04497432717459682,
+    "wall": 0.479
+   },
+   "t20ab": {
+    "iterations": 236,
+    "solve_secs": 0.381,
+    "secs_per_iter": 0.00162,
+    "nashConv": 0.043774582504659376,
+    "wall": 0.452
+   },
+   "ratio_vs_base": {
+    "t20ab": 0.9293
+   }
+  },
+  "c_flop1": {
+   "base": {
+    "iterations": 184,
+    "solve_secs": 33.577,
+    "secs_per_iter": 0.18248,
+    "nashConv": 0.010967310301566946,
+    "wall": 41.727
+   },
+   "t20ab": {
+    "iterations": 193,
+    "solve_secs": 32.837,
+    "secs_per_iter": 0.17014,
+    "nashConv": 0.010727990668512377,
+    "wall": 40.929
+   },
+   "ratio_vs_base": {
+    "t20ab": 0.978
+   }
+  },
+  "c_flop3": {
+   "base": {
+    "iterations": 412,
+    "solve_secs": 237.725,
+    "secs_per_iter": 0.577,
+    "nashConv": 0.005481467495965675,
+    "wall": 259.165
+   },
+   "t20ab": {
+    "iterations": 407,
+    "solve_secs": 222.708,
+    "secs_per_iter": 0.54719,
+    "nashConv": 0.0054979971996328425,
+    "wall": 243.717
+   },
+   "ratio_vs_base": {
+    "t20ab": 0.9368
+   }
+  },
+  "c_gtowb": {
+   "base": {
+    "iterations": 312,
+    "solve_secs": 418.452,
+    "secs_per_iter": 1.34119,
+    "nashConv": 0.010893536732213827,
+    "wall": 464.799
+   },
+   "t20ab": {
+    "iterations": 314,
+    "solve_secs": 393.147,
+    "secs_per_iter": 1.25206,
+    "nashConv": 0.010710730977387506,
+    "wall": 444.521
+   },
+   "ratio_vs_base": {
+    "t20ab": 0.9395
+   }
+  }
+ },
+ "kernels": {
+  "kernels/fold": {
+   "base": [
+    0.3149,
+    0.3161
+   ],
+   "t20ab": [
+    0.3118,
+    0.3119
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9884
+   }
+  },
+  "kernels/showdown": {
+   "base": [
+    0.6808,
+    0.6135
+   ],
+   "t20ab": [
+    0.5846,
+    0.6061
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.92
+   }
+  },
+  "kernels/fold_f32": {
+   "base": [
+    0.3308,
+    0.3162
+   ],
+   "t20ab": [
+    0.3036,
+    0.3078
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.945
+   }
+  },
+  "kernels/showdown_f32": {
+   "base": [
+    0.4765,
+    0.526
+   ],
+   "t20ab": [
+    0.4073,
+    0.412
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.8173
+   }
+  },
+  "kernels/t18_fold_00": {
+   "base": [
+    0.3299,
+    0.3164
+   ],
+   "t20ab": [
+    0.3037,
+    0.3079
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9463
+   }
+  },
+  "kernels/t18_showdown_00": {
+   "base": [
+    0.4767,
+    0.5261
+   ],
+   "t20ab": [
+    0.4074,
+    0.4121
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.8172
+   }
+  },
+  "kernels/t18_fold_50": {
+   "base": [
+    0.3304,
+    0.3161
+   ],
+   "t20ab": [
+    0.3044,
+    0.3351
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9892
+   }
+  },
+  "kernels/t18_showdown_50": {
+   "base": [
+    0.4765,
+    0.526
+   ],
+   "t20ab": [
+    0.4076,
+    0.4121
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.8177
+   }
+  },
+  "kernels/t18_fold_80": {
+   "base": [
+    0.3305,
+    0.3165
+   ],
+   "t20ab": [
+    0.3037,
+    0.3078
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9451
+   }
+  },
+  "kernels/t18_showdown_80": {
+   "base": [
+    0.477,
+    0.5262
+   ],
+   "t20ab": [
+    0.4074,
+    0.4119
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.8167
+   }
+  },
+  "kernels/t18_fold_95": {
+   "base": [
+    0.3301,
+    0.3164
+   ],
+   "t20ab": [
+    0.3038,
+    0.3083
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9468
+   }
+  },
+  "kernels/t18_showdown_95": {
+   "base": [
+    0.477,
+    0.5265
+   ],
+   "t20ab": [
+    0.4072,
+    0.4117
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.816
+   }
+  },
+  "kernels_wide/fold": {
+   "base": [
+    4.3902,
+    4.3922
+   ],
+   "t20ab": [
+    4.3755,
+    4.368
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9956
+   }
+  },
+  "kernels_wide/showdown": {
+   "base": [
+    8.1208,
+    8.1562
+   ],
+   "t20ab": [
+    8.3574,
+    8.1238
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0125
+   }
+  },
+  "kernels_wide/fold_f32": {
+   "base": [
+    4.7338,
+    4.7414
+   ],
+   "t20ab": [
+    4.8462,
+    4.8444
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0227
+   }
+  },
+  "kernels_wide/showdown_f32": {
+   "base": [
+    6.2715,
+    6.3397
+   ],
+   "t20ab": [
+    5.898,
+    5.7749
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9256
+   }
+  },
+  "kernels_wide/t18_fold_00": {
+   "base": [
+    4.7327,
+    4.7379
+   ],
+   "t20ab": [
+    4.8384,
+    4.8459
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0226
+   }
+  },
+  "kernels_wide/t18_showdown_00": {
+   "base": [
+    6.2784,
+    6.3367
+   ],
+   "t20ab": [
+    5.8985,
+    5.7815
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9259
+   }
+  },
+  "kernels_wide/t18_fold_50": {
+   "base": [
+    4.734,
+    4.7402
+   ],
+   "t20ab": [
+    4.8425,
+    4.8442
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0224
+   }
+  },
+  "kernels_wide/t18_showdown_50": {
+   "base": [
+    6.2594,
+    6.3453
+   ],
+   "t20ab": [
+    5.8981,
+    5.7803
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9265
+   }
+  },
+  "kernels_wide/t18_fold_80": {
+   "base": [
+    4.7337,
+    4.7374
+   ],
+   "t20ab": [
+    4.839,
+    4.8437
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0223
+   }
+  },
+  "kernels_wide/t18_showdown_80": {
+   "base": [
+    6.2535,
+    6.33
+   ],
+   "t20ab": [
+    5.8934,
+    5.7802
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9277
+   }
+  },
+  "kernels_wide/t18_fold_95": {
+   "base": [
+    4.7392,
+    4.7391
+   ],
+   "t20ab": [
+    4.8409,
+    4.844
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0218
+   }
+  },
+  "kernels_wide/t18_showdown_95": {
+   "base": [
+    6.2583,
+    6.3384
+   ],
+   "t20ab": [
+    5.8913,
+    5.7781
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9264
+   }
+  },
+  "kernels_realistic/t20_separate": {
+   "base": [
+    2196.1,
+    2215.3
+   ],
+   "t20ab": [
+    2110.6,
+    2104.6
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9555
+   }
+  },
+  "kernels_realistic/t20_siblings": {
+   "base": [
+    2196.4,
+    2216.7
+   ],
+   "t20ab": [
+    1298.0,
+    1283.1
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.5849
+   }
+  },
+  "kernels_realistic/t18_fold": {
+   "base": [
+    1877.0,
+    1912.7
+   ],
+   "t20ab": [
+    1937.2,
+    1915.0
+   ],
+   "ratio_vs_base": {
+    "t20ab": 1.0165
+   }
+  },
+  "kernels_realistic/t18_showdown": {
+   "base": [
+    2504.0,
+    2570.1
+   ],
+   "t20ab": [
+    2302.1,
+    2313.5
+   ],
+   "ratio_vs_base": {
+    "t20ab": 0.9096
+   }
+  }
+ },
+ "compare": {
+  "c_turn2_f64_base_t20ab": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "085e993ab2796ed8d4acbf1ae3edb42aaea934267996b874e4f0cbed56c6420a",
+   "payload_bit_equal_except_wall_secs": true
+  }
+ }
+}

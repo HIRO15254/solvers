@@ -1,0 +1,110 @@
+23:25:37 SETUP20_DONE
+23:29:24 vm20a kernels base done
+23:33:05 vm20a kernels t20a done
+23:36:45 vm20a kernels base done
+23:40:20 vm20a kernels t20a done
+23:40:25 vm20a bench flop1_t32_base_1 s/iter=0.1849
+23:40:25 vm20a bench turn2_t32_base_1 s/iter=0.0016
+23:40:25 vm20a bench river_t32_base_1 s/iter=0.0004
+23:40:29 vm20a bench flop1_t16_base_1 s/iter=0.2124
+23:40:38 vm20a bench flop1_t1_base_1 s/iter=2.8794
+23:41:00 vm20a bench gtowb_t32_base_1 s/iter=1.3054
+23:41:05 vm20a bench flop1_t32_t20a_1 s/iter=0.1856
+23:41:05 vm20a bench turn2_t32_t20a_1 s/iter=0.0015
+23:41:05 vm20a bench river_t32_t20a_1 s/iter=0.0004
+23:41:09 vm20a bench flop1_t16_t20a_1 s/iter=0.2210
+23:41:18 vm20a bench flop1_t1_t20a_1 s/iter=2.8317
+23:41:40 vm20a bench gtowb_t32_t20a_1 s/iter=1.3146
+23:41:45 vm20a bench flop1_t32_base_2 s/iter=0.1831
+23:41:45 vm20a bench turn2_t32_base_2 s/iter=0.0016
+23:41:45 vm20a bench river_t32_base_2 s/iter=0.0004
+23:41:49 vm20a bench flop1_t16_base_2 s/iter=0.2123
+23:41:58 vm20a bench flop1_t1_base_2 s/iter=2.8152
+23:42:20 vm20a bench gtowb_t32_base_2 s/iter=1.3466
+23:42:26 vm20a bench flop1_t32_t20a_2 s/iter=0.1856
+23:42:26 vm20a bench turn2_t32_t20a_2 s/iter=0.0015
+23:42:26 vm20a bench river_t32_t20a_2 s/iter=0.0004
+23:42:29 vm20a bench flop1_t16_t20a_2 s/iter=0.2103
+23:42:38 vm20a bench flop1_t1_t20a_2 s/iter=2.7964
+23:43:00 vm20a bench gtowb_t32_t20a_2 s/iter=1.3066
+23:43:05 vm20a bench flop1_t32_base_3 s/iter=0.1839
+23:43:06 vm20a bench turn2_t32_base_3 s/iter=0.0016
+23:43:06 vm20a bench river_t32_base_3 s/iter=0.0004
+23:43:09 vm20a bench flop1_t16_base_3 s/iter=0.2148
+23:43:18 vm20a bench flop1_t1_base_3 s/iter=2.8116
+23:43:40 vm20a bench gtowb_t32_base_3 s/iter=1.3079
+23:43:45 vm20a bench flop1_t32_t20a_3 s/iter=0.1851
+23:43:45 vm20a bench turn2_t32_t20a_3 s/iter=0.0015
+23:43:46 vm20a bench river_t32_t20a_3 s/iter=0.0004
+23:43:49 vm20a bench flop1_t16_t20a_3 s/iter=0.2088
+23:43:58 vm20a bench flop1_t1_t20a_3 s/iter=2.8137
+23:44:20 vm20a bench gtowb_t32_t20a_3 s/iter=1.3148
+23:44:20 vm20a BENCH_DONE
+23:44:21 vm20a c_turn2_f64_base exit=0 wall=0.5 iters=247 solve=0.471194419
+23:44:21 vm20a c_turn2_f64_t20a exit=0 wall=0.5 iters=247 solve=0.469732587
+23:44:21 vm20a compare c_turn2_f64_base_t20a exit=0 '{"canonical_postcard_streams":true,"config_precision_excluded":false,"config_run_excluded":false,"file_bytes_equal":false,"normalized_payload_blake3":"085e993ab2796ed8d4acbf1ae3edb42aaea934267996b874e'
+23:44:22 vm20a c_turn2_base exit=0 wall=0.5 iters=242 solve=0.411012693
+23:44:22 vm20a c_turn2_t20a exit=0 wall=0.5 iters=239 solve=0.390120764
+23:45:05 vm20a c_flop1_base exit=0 wall=42.4 iters=184 solve=34.239660764999996
+23:45:47 vm20a c_flop1_t20a exit=0 wall=42.0 iters=187 solve=33.823714658
+23:50:06 vm20a c_flop3_base exit=0 wall=258.5 iters=412 solve=237.066242585
+23:54:32 vm20a c_flop3_t20a exit=0 wall=266.2 iters=435 solve=245.376892815
+00:02:13 vm20a c_gtowb_base exit=0 wall=460.8 iters=312 solve=414.267738515
+00:09:43 vm20a c_gtowb_t20a exit=0 wall=449.0 iters=305 solve=397.385477967
+00:09:44 vm20a SOLVE_DONE
+00:09:44 vm20a_DONE
+00:10:53 SETUP21_DONE
+00:14:30 vm20b kernels base done
+00:18:11 vm20b kernels t20ab done
+00:21:52 vm20b kernels base done
+00:25:28 vm20b kernels t20ab done
+00:25:33 vm20b bench flop1_t32_base_1 s/iter=0.1854
+00:25:33 vm20b bench turn2_t32_base_1 s/iter=0.0015
+00:25:33 vm20b bench river_t32_base_1 s/iter=0.0004
+00:25:36 vm20b bench flop1_t16_base_1 s/iter=0.2147
+00:25:46 vm20b bench flop1_t1_base_1 s/iter=2.8306
+00:26:08 vm20b bench gtowb_t32_base_1 s/iter=1.3145
+00:26:12 vm20b bench flop1_t32_t20ab_1 s/iter=0.1701
+00:26:13 vm20b bench turn2_t32_t20ab_1 s/iter=0.0014
+00:26:13 vm20b bench river_t32_t20ab_1 s/iter=0.0003
+00:26:16 vm20b bench flop1_t16_t20ab_1 s/iter=0.1959
+00:26:25 vm20b bench flop1_t1_t20ab_1 s/iter=2.6018
+00:26:45 vm20b bench gtowb_t32_t20ab_1 s/iter=1.1919
+00:26:50 vm20b bench flop1_t32_base_2 s/iter=0.1848
+00:26:50 vm20b bench turn2_t32_base_2 s/iter=0.0016
+00:26:50 vm20b bench river_t32_base_2 s/iter=0.0004
+00:26:54 vm20b bench flop1_t16_base_2 s/iter=0.2119
+00:27:03 vm20b bench flop1_t1_base_2 s/iter=2.8143
+00:27:26 vm20b bench gtowb_t32_base_2 s/iter=1.3990
+00:27:31 vm20b bench flop1_t32_t20ab_2 s/iter=0.1690
+00:27:31 vm20b bench turn2_t32_t20ab_2 s/iter=0.0015
+00:27:31 vm20b bench river_t32_t20ab_2 s/iter=0.0003
+00:27:34 vm20b bench flop1_t16_t20ab_2 s/iter=0.1957
+00:27:43 vm20b bench flop1_t1_t20ab_2 s/iter=2.5975
+00:28:04 vm20b bench gtowb_t32_t20ab_2 s/iter=1.1937
+00:28:09 vm20b bench flop1_t32_base_3 s/iter=0.1848
+00:28:09 vm20b bench turn2_t32_base_3 s/iter=0.0017
+00:28:09 vm20b bench river_t32_base_3 s/iter=0.0004
+00:28:12 vm20b bench flop1_t16_base_3 s/iter=0.2129
+00:28:22 vm20b bench flop1_t1_base_3 s/iter=2.9867
+00:28:44 vm20b bench gtowb_t32_base_3 s/iter=1.3102
+00:28:49 vm20b bench flop1_t32_t20ab_3 s/iter=0.1698
+00:28:49 vm20b bench turn2_t32_t20ab_3 s/iter=0.0015
+00:28:49 vm20b bench river_t32_t20ab_3 s/iter=0.0003
+00:28:52 vm20b bench flop1_t16_t20ab_3 s/iter=0.1960
+00:29:01 vm20b bench flop1_t1_t20ab_3 s/iter=2.6050
+00:29:22 vm20b bench gtowb_t32_t20ab_3 s/iter=1.1907
+00:29:22 vm20b BENCH_DONE
+00:29:22 vm20b c_turn2_f64_base exit=0 wall=0.5 iters=247 solve=0.463635857
+00:29:23 vm20b c_turn2_f64_t20ab exit=0 wall=0.6 iters=247 solve=0.484308523
+00:29:23 vm20b compare c_turn2_f64_base_t20ab exit=0 '{"canonical_postcard_streams":true,"config_precision_excluded":false,"config_run_excluded":false,"file_bytes_equal":false,"normalized_payload_blake3":"085e993ab2796ed8d4acbf1ae3edb42aaea934267996b874e'
+00:29:23 vm20b c_turn2_base exit=0 wall=0.5 iters=242 solve=0.409635983
+00:29:24 vm20b c_turn2_t20ab exit=0 wall=0.5 iters=236 solve=0.381408117
+00:30:05 vm20b c_flop1_base exit=0 wall=41.7 iters=184 solve=33.576751068
+00:30:47 vm20b c_flop1_t20ab exit=0 wall=40.9 iters=193 solve=32.836578571
+00:35:06 vm20b c_flop3_base exit=0 wall=259.2 iters=412 solve=237.724557142
+00:39:10 vm20b c_flop3_t20ab exit=0 wall=243.7 iters=407 solve=222.707623843
+00:46:55 vm20b c_gtowb_base exit=0 wall=464.8 iters=312 solve=418.452458169
+00:54:21 vm20b c_gtowb_t20ab exit=0 wall=444.5 iters=314 solve=393.146902633
+00:54:22 vm20b SOLVE_DONE
+00:54:22 vm20b_DONE

@@ -1,0 +1,86 @@
+{
+  "unit": "ns",
+  "affinity": "logical CPU 0 (Windows)",
+  "rayon_threads": 1,
+  "command_options": [
+    "--bench",
+    "kernels_wide/showdown_f32|kernels_realistic/t18_showdown",
+    "--warm-up-time",
+    "0.3",
+    "--measurement-time",
+    "1",
+    "--sample-size",
+    "20",
+    "--nresamples",
+    "1000"
+  ],
+  "cycles": 3,
+  "binaries": {
+    "base": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t20-bench-base.exe",
+      "sha256": "e27bbf59162ce83c9bf29bd0a776084922133f49a11dc56b0ccc810e34b0c0f4"
+    },
+    "hands": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t20-bench-a-hands.exe",
+      "sha256": "576802eebfef954878242e6a2cb8a6614ecab76c66431406ba5e9b401d09e8a0"
+    },
+    "merge": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t20-bench-a-merge.exe",
+      "sha256": "46860eecf8de969ba027fd22c108105654e0c263b00adfcf5ba56d8a998c97a1"
+    }
+  },
+  "benchmarks": {
+    "kernels_realistic/t18_showdown": {
+      "base": {
+        "samples": [
+          4600360.714285715,
+          6106827.435897436,
+          4888058.333333334
+        ],
+        "median": 4888058.333333334
+      },
+      "hands": {
+        "samples": [
+          5048119.117647059,
+          5365953.472222222,
+          4541642.803030303
+        ],
+        "median": 5048119.117647059
+      },
+      "merge": {
+        "samples": [
+          4216348.660714285,
+          4311250.0,
+          4347969.852941176
+        ],
+        "median": 4311250.0
+      }
+    },
+    "kernels_wide/showdown_f32": {
+      "base": {
+        "samples": [
+          11452.75641025641,
+          11018.888339149002,
+          11892.020335985853
+        ],
+        "median": 11452.75641025641
+      },
+      "hands": {
+        "samples": [
+          10689.951811529538,
+          11109.97133027523,
+          10669.77564102564
+        ],
+        "median": 10689.951811529538
+      },
+      "merge": {
+        "samples": [
+          9862.664889138367,
+          8950.041666666668,
+          9885.988775173326
+        ],
+        "median": 9862.664889138367
+      }
+    }
+  }
+}
