@@ -1,0 +1,24 @@
+step0-1-step0-kernels-t25_lone_btn_bb affinity=0x1
+step0-1-step0-kernels-t25_current_btn_bb affinity=0x1
+step0-1-step0-kernels-t25_batch_btn_bb affinity=0x1
+step0-1-step0-kernels-t25_lone_wide affinity=0x1
+step0-1-step0-kernels-t25_current_wide affinity=0x1
+step0-1-step0-kernels-t25_batch_wide affinity=0x1
+step0-2-step0-kernels-t25_lone_btn_bb affinity=0x1
+step0-2-step0-kernels-t25_current_btn_bb affinity=0x1
+step0-2-step0-kernels-t25_batch_btn_bb affinity=0x1
+step0-2-step0-kernels-t25_lone_wide affinity=0x1
+step0-2-step0-kernels-t25_current_wide affinity=0x1
+step0-2-step0-kernels-t25_batch_wide affinity=0x1
+step0-3-step0-kernels-t25_lone_btn_bb affinity=0x1
+step0-3-step0-kernels-t25_current_btn_bb affinity=0x1
+step0-3-step0-kernels-t25_batch_btn_bb affinity=0x1
+step0-3-step0-kernels-t25_lone_wide affinity=0x1
+step0-3-step0-kernels-t25_current_wide affinity=0x1
+step0-3-step0-kernels-t25_batch_wide affinity=0x1
+step0-kernels t25_lone_btn_bb 2956715.0 [2956715.0, 2971111.111111111, 2863510.0]
+step0-kernels t25_current_btn_bb 2426165.1785714286 [2429875.0, 2426165.1785714286, 2390713.9194139196]
+step0-kernels t25_batch_btn_bb 1469331.625 [1469331.625, 1410628.1764705882, 1470674.393939394]
+step0-kernels t25_lone_wide 7555445.721925134 [7434655.509868421, 7555445.721925134, 7605308.333333334]
+step0-kernels t25_current_wide 5906324.696969697 [5903291.666666667, 5974774.444444444, 5906324.696969697]
+step0-kernels t25_batch_wide 4082408.0882352944 [4353416.071428571, 4059337.5, 4082408.0882352944]

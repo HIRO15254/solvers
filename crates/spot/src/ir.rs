@@ -109,6 +109,8 @@ pub struct Run {
     pub memory_bytes: Option<u64>,
     pub max_time_seconds: Option<f64>,
     pub checkpoint_interval_seconds: f64,
+    /// P1 only: save the final state in addition to periodic checkpoints.
+    pub final_checkpoint: bool,
 }
 
 /// Values of the legacy multiway history selectors at a postflop decision.

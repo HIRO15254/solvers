@@ -1,0 +1,36 @@
+scalar-v-base
+kernels/fold_f32: 270.067 -> 659.422 ns, ratio 2.44170
+kernels_realistic/t18_fold: 1447693.889 -> 1021653.075 ns, ratio 0.70571
+kernels_wide/fold_f32: 3570.635 -> 2403.404 ns, ratio 0.67310
+own-variant
+kernels/fold_f32: 656.415 -> 806.454 ns, ratio 1.22857
+kernels_realistic/t18_fold: 983394.000 -> 956335.764 ns, ratio 0.97248
+kernels_wide/fold_f32: 2395.498 -> 2222.674 ns, ratio 0.92785
+cached-final
+kernels/fold_f32: 269.836 -> 282.057 ns, ratio 1.04529
+kernels/showdown_f32: 421.030 -> 434.747 ns, ratio 1.03258
+kernels_realistic/t18_fold: 1417293.939 -> 926647.064 ns, ratio 0.65381
+kernels_realistic/t18_showdown: 2152237.321 -> 2071652.381 ns, ratio 0.96256
+kernels_realistic/t20_siblings: 1231198.690 -> 1195732.566 ns, ratio 0.97119
+kernels_realistic/t21_opponent_add: 1489038.375 -> 1365455.744 ns, ratio 0.91701
+kernels_wide/fold_f32: 3561.942 -> 2231.192 ns, ratio 0.62640
+kernels_wide/showdown_f32: 5261.612 -> 5036.208 ns, ratio 0.95716
+seat-own
+kernels/fold_f32: 285.175 -> 314.513 ns, ratio 1.10288
+kernels_realistic/t18_fold: 1192955.876 -> 909675.184 ns, ratio 0.76254
+kernels_wide/fold_f32: 2855.877 -> 2222.901 ns, ratio 0.77836
+final
+kernels/fold_f32: 544.919 -> 560.831 ns, ratio 1.02920
+kernels/showdown_f32: 861.815 -> 877.831 ns, ratio 1.01858
+kernels_realistic/t18_fold: 2476013.510 -> 1856989.394 ns, ratio 0.74999
+kernels_realistic/t18_showdown: 4446120.682 -> 4264784.375 ns, ratio 0.95921
+kernels_realistic/t20_siblings: 2421582.540 -> 2361005.556 ns, ratio 0.97498
+kernels_realistic/t21_opponent_add: 3017144.500 -> 2655570.202 ns, ratio 0.88016
+kernels_wide/fold_f32: 6416.395 -> 4185.379 ns, ratio 0.65229
+kernels_wide/showdown_f32: 9517.942 -> 9482.255 ns, ratio 0.99625
+workspace totals: {'passed': 927, 'failed': 0, 'ignored': 31}
+f64 identity: 15 byte-identical evidence files
+t20 realistic siblings identical workload hash f0a02219889d2f32
+t21 realistic opponents identical workload hash 809d6afa6023b0d6
+t18 realistic fold identical workload hash 7d7fdd05467aeba0
+t18 realistic showdown identical workload hash c5d74f58cffa8921

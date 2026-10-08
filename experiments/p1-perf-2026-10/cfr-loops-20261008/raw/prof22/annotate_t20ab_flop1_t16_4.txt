@@ -1,0 +1,96 @@
+## hu_postflop::kernel::fold_kernel_relaxed_f32
+
+Sorted summary for file /home/PC_User/prof_t20ab/release/examples/p1_bench
+----------------------------------------------
+
+   41.06 kernel.rs:134
+   23.61 kernel.rs:332
+   11.92 kernel.rs:333
+    6.04 kernel.rs:135
+    5.54 kernel.rs:328
+    4.22 kernel.rs:132
+    0.94 kernel.rs:149
+    0.68 non_null.rs:1714
+    0.50 kernel.rs:329
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (10775 samples, percent: local period)
+## hottest instructions
+   39.79 :   ddb58:  vmovss %xmm3,(%rsp,%rcx,4)
+   18.31 :   ddcf2:  vmovss %xmm2,(%rdx,%rcx,4)
+    6.17 :   ddcae:  vmovss 0xd0(%rsp,%r11,4),%xmm3 // kernel.rs:333
+    5.54 :   ddc54:  bts    %r11,%r10 // kernel.rs:328
+    5.11 :   ddcea:  vaddss %xmm4,%xmm2,%xmm2
+    4.89 :   ddb5d:  cmp    $0x34,%rax // kernel.rs:135
+    4.22 :   ddb36:  jbe    ddd48 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x288> // kernel.rs:132
+    3.09 :   ddcee:  vmulss %xmm0,%xmm2,%xmm2 // kernel.rs:332
+    1.18 :   ddc2a:  cmp    %rcx,%rax // kernel.rs:332
+    1.03 :   ddcd9:  cmp    %rcx,%rax // kernel.rs:332
+    0.94 :   ddccd:  jbe    dddcd <hu_postflop::kernel::fold_kernel_relaxed_f32+0x30d> // kernel.rs:149
+    0.74 :   ddb44:  jae    ddd30 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x270> // kernel.rs:134
+    0.68 :   ddc6d:  add    $0x4,%rdi // non_null.rs:1714
+    0.63 :   ddce6:  vsubss %xmm3,%xmm2,%xmm2 // kernel.rs:333
+    0.61 :   ddb6b:  vaddss (%rsp,%rax,4),%xmm2,%xmm2
+    0.54 :   ddb74:  vmovss %xmm2,(%rsp,%rax,4)
+    0.53 :   ddb53:  vaddss (%rsp,%rcx,4),%xmm2,%xmm3
+    0.50 :   ddc60:  jbe    ddd5b <hu_postflop::kernel::fold_kernel_relaxed_f32+0x29b> // kernel.rs:329
+    0.48 :   ddb7c:  jne    ddb30 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x70>
+    0.47 :   ddc58:  test   %r14,%r10
+    0.45 :   ddc84:  cmp    $0x34,%r10w
+    0.39 :   ddc95:  jae    ddd9f <hu_postflop::kernel::fold_kernel_relaxed_f32+0x2df>
+    0.38 :   ddb70:  add    $0x4,%rdx
+    0.37 :   ddc4b:  shr    $0x8,%r11d
+    0.35 :   ddcdc:  jbe    ddd89 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x2c9>
+    0.32 :   ddc45:  movzwl (%rdi),%ecx
+    0.31 :   ddc4f:  shlx   %r13,%r12,%r10
+    0.27 :   ddc9e:  jbe    dddb7 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x2f7>
+    0.23 :   ddb8d:  vmovups 0x80(%rsp),%ymm3
+    0.20 :   ddb33:  cmp    %rax,%rsi
+    0.19 :   ddc5b:  je     ddc80 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1c0>
+    0.14 :   ddb79:  cmp    %r11,%rdx
+    0.12 :   ddcb8:  movzwl (%r8,%rcx,2),%r10d
+    0.09 :   ddc89:  jae    ddd71 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x2b1>
+    0.09 :   ddc48:  mov    %r13d,%r11d
+    0.08 :   ddcf7:  add    $0x4,%rdi
+    0.08 :   ddcc4:  je     ddc26 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x166>
+    0.06 :   ddcfe:  jne    ddc40 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x180>
+    0.06 :   ddb61:  jae    ddd18 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x258>
+    0.06 :   ddb4f:  movzbl 0x3(%rdx),%eax
+    0.06 :   ddb40:  cmp    $0x34,%rcx
+    0.02 :   ddcbd:  cmp    $0xffff,%r10
+    0.02 :   ddbf5:  test   %r10,%r10
+    0.02 :   ddbb3:  vmovups %ymm4,0x170(%rsp)
+    0.02 :   ddb14:  vmovups %ymm1,(%rsp)
+    0.01 :   ddd12:  pop    %r15
+    0.01 :   ddd0b:  pop    %rbx
+    0.01 :   ddc40:  movzwl 0x2(%rdi),%r13d
+    0.01 :   ddc06:  mov    0x1e8(%rsp),%rdx
+    0.01 :   ddbec:  vmovups %ymm3,0xf0(%rsp)
+    0.01 :   ddbc5:  vmovups 0x20(%rsp),%ymm3
+    0.01 :   ddb26:  cs nopw 0x0(%rax,%rax,1)
+    0.01 :   ddb19:  test   %rcx,%rcx
+    0.01 :   ddb02:  vmovups %ymm1,0x60(%rsp)
+    0.01 :   ddae3:  vxorps %xmm1,%xmm1,%xmm1
+    0.01 :   ddadb:  mov    0x1d8(%rsp),%rbx
+    0.01 :   ddac9:  sub    $0x1a0,%rsp
+    0.00 :   dddda:  call   *0x16f5f8(%rip)        # 24d3d8 <_DYNAMIC+0x218>
+    0.00 :   dddd7:  vzeroupper
+    0.00 :   dddd4:  mov    %r10,%rdi
+    0.00 :   dddcd:  lea    0x16774c(%rip),%rdx        # 245520 <anon.976db570a0660a8fc185b2bd9e02aacd.679.llvm.15699067133791131088+0x240>
+    0.00 :   dddc7:  call   *0x16f60b(%rip)        # 24d3d8 <_DYNAMIC+0x218>
+    0.00 :   dddc4:  vzeroupper
+    0.00 :   dddc1:  mov    %r9,%rsi
+    0.00 :   dddbe:  mov    %rcx,%rdi
+    0.00 :   dddb7:  lea    0x16774a(%rip),%rdx        # 245508 <anon.976db570a0660a8fc185b2bd9e02aacd.679.llvm.15699067133791131088+0x228>
+    0.00 :   dddb1:  call   *0x16f621(%rip)        # 24d3d8 <_DYNAMIC+0x218>
+    0.00 :   dddae:  vzeroupper
+    0.00 :   dddab:  mov    %r11,%rdi
+    0.00 :   ddda6:  mov    $0x34,%esi
+    0.00 :   ddd9f:  lea    0x1677aa(%rip),%rdx        # 245550 <anon.976db570a0660a8fc185b2bd9e02aacd.679.llvm.15699067133791131088+0x270>
+    0.00 :   ddd99:  call   *0x16f639(%rip)        # 24d3d8 <_DYNAMIC+0x218>
+    0.00 :   ddd96:  vzeroupper
+    0.00 :   ddd93:  mov    %rax,%rsi
+    0.00 :   ddd90:  mov    %rcx,%rdi
+    0.00 :   ddd89:  lea    0x1677d8(%rip),%rdx        # 245568 <anon.976db570a0660a8fc185b2bd9e02aacd.679.llvm.15699067133791131088+0x288>
+    0.00 :   ddd83:  call   *0x16f64f(%rip)        # 24d3d8 <_DYNAMIC+0x218>
+    0.00 :   ddd80:  vzeroupper
+    0.00 :   ddd7d:  mov    %r10,%rdi
+    0.00 :   ddd78:  mov    $0x34,%esi

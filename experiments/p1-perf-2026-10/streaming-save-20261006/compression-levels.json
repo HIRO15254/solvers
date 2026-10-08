@@ -1,0 +1,20 @@
+[
+  {
+    "compressed_bytes": 1098800904,
+    "decode_compress_seconds": 14.454786,
+    "input_bytes": 2818918504,
+    "level": 1
+  },
+  {
+    "compressed_bytes": 1068275564,
+    "decode_compress_seconds": 15.8614576,
+    "input_bytes": 2818918504,
+    "level": 2
+  },
+  {
+    "compressed_bytes": 1042018155,
+    "decode_compress_seconds": 14.3503942,
+    "input_bytes": 2818918504,
+    "level": 3
+  }
+]

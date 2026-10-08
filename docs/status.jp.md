@@ -34,6 +34,7 @@
 | T1-01、T1-05〜T1-08 | SOL-8、SOL-12〜SOL-15（P1へ移した） | 旧手順書はtag。S1の完了後に新Inputの条件で再開・再評価する |
 | P2の方式決定 | SOL-25 | [製品定義](products.jp.md)のD5、第6節S4。[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
 | S4-1a、S4-1b | SOL-26、SOL-27（SOL-25の子Issue） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)第5節 |
+| P1速度・資源改善（T1〜T26） | SOL-15 | [P1性能計画](plans/p1-performance.jp.md)第3節 |
 
 設計・受入上の必須前提はGitの計画で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は計画を更新し、その影響をLinearの待ち関係へ反映する。

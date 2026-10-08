@@ -1,0 +1,13 @@
+tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16)
+iter=       2 expl_p0=7.794e0 expl_p1=1.927e1 nash_conv=2.706e1
+iter=       4 expl_p0=1.389e1 expl_p1=6.707e0 nash_conv=2.059e1
+done: iterations=4 wall=16.23s ev_p0=-4.060810 ev_p1=8.715177 nash_conv=2.059e1
+sol: wrote /tmp/cli_flop1_new/solution.sol (165.02 MB, 335460 blocks, mode=Full)
+total 1186628
+-rw-r--r-- 1 PC_User PC_User 1042043734 Oct  6 13:58 checkpoint.ckpt
+-rw-r--r-- 1 PC_User PC_User        410 Oct  6 13:58 events.jsonl
+-rw-r--r-- 1 PC_User PC_User        476 Oct  6 13:58 manifest.json
+-rw-r--r-- 1 PC_User PC_User        262 Oct  6 13:57 progress.jsonl
+-rw-r--r-- 1 PC_User PC_User        403 Oct  6 13:58 run.json
+-rw-r--r-- 1 PC_User PC_User       1083 Oct  6 13:57 run.toml
+-rw-r--r-- 1 PC_User PC_User  173032376 Oct  6 13:58 solution.sol

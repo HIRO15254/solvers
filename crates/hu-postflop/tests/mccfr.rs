@@ -60,7 +60,9 @@ fn mccfr_kuhn_matches_full_traversal_bit_exactly() {
                 "strategy sums diverged from full traversal"
             );
         }
-        StorageState::I16 { .. } => panic!("expected F32 storage state"),
+        StorageState::I16 { .. } | StorageState::Mixed { .. } => {
+            panic!("expected F32 storage state")
+        }
     }
 
     let expl = mc_solver.exploitability();
@@ -93,7 +95,7 @@ fn mccfr_matches_full_traversal_on_leduc() {
     let after_check = node_lookup.node_by_history("c").unwrap();
 
     // linear_cfr() (the schedule MCCFR's batched discounting approximates)
-    // converges noticeably slower than the project default (Dcfr::default,
+    // converges noticeably slower than the legacy engine default (Dcfr::default,
     // alpha=1.5/beta=0/gamma=3) — 20k iterations to clear 2e-3 vs. the 5k
     // `tests/toys.rs` uses with the default schedule.
     let full_toy = hu_postflop::game::leduc(chip_ev());

@@ -1,0 +1,826 @@
+diff --git a/crates/hu-postflop/benches/kernels.rs b/crates/hu-postflop/benches/kernels.rs
+index 859d61b..9e578dd 100644
+--- a/crates/hu-postflop/benches/kernels.rs
++++ b/crates/hu-postflop/benches/kernels.rs
+@@ -95,6 +95,7 @@ fn bench_kernels(c: &mut Criterion) {
+     bench_case(c, "kernels_wide", wide_river_config());
+     bench_realistic(c);
+     bench_t25_btn_bb(c);
++    bench_t26_nine(c);
+ }
+ 
+ fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
+@@ -438,7 +439,13 @@ struct T25Call {
+ // RiverConfig has no explicit include_allin option; its fractions are clamped
+ // to the remaining stack by the existing river builder.
+ fn bench_t25_btn_bb(c: &mut Criterion) {
+-    let config = RiverConfig {
++    let config = t25_btn_bb_config();
++    let built = build_river_game(&config, chip_ev());
++    bench_t25_game(c, "btn_bb", built.game);
++}
++
++fn t25_btn_bb_config() -> RiverConfig {
++    RiverConfig {
+         board: parse_cards("Ks 7h 2d 3c 9s").try_into().unwrap(),
+         ranges: PerPlayer::new(
+             "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
+@@ -448,9 +455,63 @@ fn bench_t25_btn_bb(c: &mut Criterion) {
+         max_raises: 3,
+         effective_stack: Chips(200),
+         ..river_config()
+-    };
+-    let built = build_river_game(&config, chip_ev());
+-    let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
++    }
++}
++
++// Match the common Flop1 river subtree: one bet75%, one raise3x, and two
++// aggressive actions, giving five showdowns and four folds. The river shim
++// cannot express a distinct raise menu, so use the same general builder.
++fn bench_t26_nine(c: &mut Criterion) {
++    use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
++    let base = t25_btn_bb_config();
++    let mut river = StreetTree::pot_fractions(&[0.75], &[0.75], 2);
++    for rule in &mut river.rules {
++        if rule.action == Some(nlh::script::ActionKind::Raise) {
++            rule.sizes = vec![nlh::SizeSpec::PreviousBetMultiple { factor: 3.0 }];
++        }
++    }
++    let built = build_postflop_game(
++        &PostflopConfig {
++            board: base.board.to_vec(),
++            ranges: base.ranges,
++            pot: base.pot,
++            effective_stack: base.effective_stack,
++            streets: PerStreet {
++                river,
++                ..Default::default()
++            },
++            ..Default::default()
++        },
++        chip_ev(),
++    );
++    assert_eq!(
++        built
++            .game
++            .tree
++            .nodes
++            .iter()
++            .filter(|n| n.kind == NodeKind::Terminal)
++            .count(),
++        9
++    );
++    assert_eq!(
++        built
++            .node_info
++            .iter()
++            .flat_map(|n| &n.actions)
++            .filter(|a| *a == "fold")
++            .count(),
++        4
++    );
++    bench_t25_game(c, "nine", built.game);
++}
++
++fn bench_t25_game(
++    c: &mut Criterion,
++    label: &str,
++    game: hu_engine::CompiledGame<hu_postflop::PostflopEvaluator>,
++) {
++    let mut solver = Solver::<_, F32Storage>::new(game, Box::new(Dcfr::default()), Some(400));
+     solver.set_cfr_precision(CfrPrecision::F64);
+     let mut workloads = Vec::new();
+     for iterations in [300, 50, 50] {
+@@ -460,7 +521,7 @@ fn bench_t25_btn_bb(c: &mut Criterion) {
+         }
+     }
+     solver.set_cfr_precision(CfrPrecision::F32);
+-    bench_t25(c, "btn_bb", &solver, &workloads);
++    bench_t25(c, label, &solver, &workloads);
+ }
+ struct T25Workload {
+     p: Player,
+@@ -621,6 +682,39 @@ fn bench_t25(
+         "t25 {label} maximum relative infinity error={max_error:e}; width-1/full grouping bitwise equal"
+     );
+     let mut group = c.benchmark_group("kernels_realistic");
++    // Isolate the actual input pack used by the lane kernels. Buffers are
++    // warmed outside the timer; each replay touches exactly the same reach
++    // entries as the full terminal replay (regardless of kind partitioning).
++    let max_opp = reaches.iter().flatten().map(|r| r.len()).max().unwrap();
++    let mut interleaved = vec![0.0f32; (max_opp + 1) * 8];
++    group.bench_function(format!("t26_interleave_{label}"), |b| {
++        b.iter(|| {
++            for rs in &reaches {
++                for lanes in rs.chunks(8) {
++                    let width = lanes.len();
++                    let len = lanes[0].len();
++                    let buf = &mut interleaved[..(len + 1) * width];
++                    macro_rules! pack {
++                        ($lanes:literal) => {
++                            t26_interleave::<$lanes>(lanes, buf)
++                        };
++                    }
++                    match width {
++                        1 => pack!(1),
++                        2 => pack!(2),
++                        3 => pack!(3),
++                        4 => pack!(4),
++                        5 => pack!(5),
++                        6 => pack!(6),
++                        7 => pack!(7),
++                        8 => pack!(8),
++                        _ => unreachable!(),
++                    }
++                    black_box(&buf);
++                }
++            }
++        })
++    });
+     for mode in ["t25_lone", "t25_current", "t25_batch"] {
+         group.bench_function(format!("{mode}_{label}"), |b| {
+             b.iter(|| {
+@@ -734,6 +828,21 @@ fn bench_t25(
+     group.finish();
+ }
+ 
++// Duplicate just the input pack for its isolated cost estimate; fixed-width
++// specialization and summation-free write order match the kernel exactly.
++#[inline(never)]
++fn t26_interleave<const LANES: usize>(reaches: &[&[f32]], buffer: &mut [f32]) {
++    assert_eq!(reaches.len(), LANES);
++    let len = reaches[0].len();
++    let (rows, _) = buffer.as_chunks_mut::<LANES>();
++    rows[len].fill(0.0);
++    for (lane, &reach) in reaches.iter().enumerate() {
++        for (row, &r) in rows[..len].iter_mut().zip(reach) {
++            row[lane] = r;
++        }
++    }
++}
++
+ // Baseline of the engine's current opponent-terminal path.
+ fn baseline_opponent_add<E: TerminalEvaluator>(
+     evaluator: &E,
+diff --git a/crates/hu-postflop/src/kernel.rs b/crates/hu-postflop/src/kernel.rs
+index 5fc8ace..61e4f40 100644
+--- a/crates/hu-postflop/src/kernel.rs
++++ b/crates/hu-postflop/src/kernel.rs
+@@ -39,6 +39,9 @@ pub(crate) struct RankedHands {
+     pub hands: Vec<Hand>,
+     // Rank and exclusive end offset; within a group, global combo order.
+     pub groups: Vec<(HandRank, usize)>,
++    // Board-dead locals precomputed for CFR lane outputs. Non-CFR tables do
++    // not use this list. Clear only these entries, without a full output fill.
++    pub dead: Vec<u16>,
+ }
+ fn add(hands: &[Hand], reach: &[f32], total: &mut f64, card: &mut [f64; 52]) {
+     for h in hands {
+@@ -154,6 +157,44 @@ struct TerminalLaneBuffers {
+     reach: Vec<f32>,
+     values: Vec<f32>,
+ }
++
++// Batch indices are increasing within their (table, kind) group. Fetch each
++// independent output slice once, splitting the reference slice safely, so
++// per-hand stores do not repeatedly reload pointers through `outs[indices]`.
++fn lane_outputs<'a, const LANES: usize>(
++    outs: &'a mut [&mut [f32]],
++    indices: &[usize],
++) -> [&'a mut [f32]; LANES] {
++    let mut tail = outs;
++    let mut first = 0;
++    std::array::from_fn(|lane| {
++        let previous = std::mem::take(&mut tail);
++        let (_, after) = previous.split_at_mut(indices[lane] - first);
++        let (row, rest) = after.split_first_mut().unwrap();
++        tail = rest;
++        first = indices[lane] + 1;
++        &mut **row
++    })
++}
++
++// Copy each column of eight consecutive local rows into a fixed-size output
++// block. This keeps the output pointer fixed and stores adjacent entries;
++// LLVM chooses scalar or vector instructions for each lane width.
++// Full chunks and tails use the same entry order; dead rows were cleared in
++// the interleaved buffer, so this overwrites every output, including +0.0s.
++fn store_lane_values<const LANES: usize>(values: &[[f32; LANES]], rows: [&mut [f32]; LANES]) {
++    let (blocks, tail) = values.as_chunks::<8>();
++    for (lane, row) in rows.into_iter().enumerate() {
++        let (out_blocks, out_tail) = row.as_chunks_mut::<8>();
++        for (block, dst) in blocks.iter().zip(out_blocks) {
++            *dst = std::array::from_fn(|h| block[h][lane]);
++        }
++        for (dst, value) in out_tail.iter_mut().zip(tail) {
++            *dst = value[lane];
++        }
++    }
++}
++
+ thread_local! {
+     // Retain the high-water lengths to avoid zeroing on alternating full and
+     // partial batches. Each call touches only support_length * lane_count.
+@@ -183,12 +224,13 @@ fn add_lane_hands<const LANES: usize>(
+     }
+ }
+ 
+-/// Single-board f32 batch, including folds with equal win/tie/lose utilities.
++/// Single-board f32 showdown batch. River folds use the separate entry below.
+ /// Reused worker buffers hold (opponent support + 1) * active lanes reaches
+ /// and own support * active lanes values. After first use/growth there is no
+-/// allocation or bulk buffer zeroing. Only the sentinel row is cleared.
+-/// Stack arrays are 52 * active lanes card sums and a few lane vectors
+-/// (less than 3 KiB at eight lanes). Dead own outputs are explicitly cleared.
++/// allocation or bulk buffer zeroing. Packing clears only the reach sentinel.
++/// Stack arrays are 52 * active lanes card sums and a few lane vectors.
++/// Dead value-buffer rows are cleared, then the blocked copy writes every
++/// output entry, including positive zero for board-dead own hands.
+ /// Width specialization keeps even a one-lane call proportional to its width;
+ /// every width uses the same per-terminal summation order.
+ pub(crate) fn terminal_batch_kernel_f32(
+@@ -199,11 +241,39 @@ pub(crate) fn terminal_batch_kernel_f32(
+     reaches: &[&[f32]],
+     outs: &mut [&mut [f32]],
+     indices: &[usize],
++) {
++    terminal_batch_kernel_f32_impl::<false>(own, opp, same, utilities, reaches, outs, indices);
++}
++
++/// River folds always use this lane kernel, regardless of caller grouping.
++/// It computes unweighted compatibility sums in rank-table hand order, then
++/// multiplies u_fold * (total - card[a] - card[b] + same), like the lone f32
++/// fold kernel. Applying the utility last avoids utility-scaled cancellation.
++pub(crate) fn fold_batch_kernel_f32(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: &[[f32; 3]],
++    reaches: &[&[f32]],
++    outs: &mut [&mut [f32]],
++    indices: &[usize],
++) {
++    terminal_batch_kernel_f32_impl::<true>(own, opp, same, utilities, reaches, outs, indices);
++}
++
++fn terminal_batch_kernel_f32_impl<const FOLD: bool>(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: &[[f32; 3]],
++    reaches: &[&[f32]],
++    outs: &mut [&mut [f32]],
++    indices: &[usize],
+ ) {
+     TERMINAL_LANE_BUFFERS.with_borrow_mut(|scratch| {
+         macro_rules! dispatch {
+             ($lanes:literal) => {
+-                terminal_batch_lanes_f32::<$lanes>(
++                terminal_batch_lanes_f32::<$lanes, FOLD>(
+                     own, opp, same, utilities, reaches, outs, indices, scratch,
+                 )
+             };
+@@ -226,7 +296,7 @@ pub(crate) fn terminal_batch_kernel_f32(
+ // Keep the width-specific frames separate: inlining the dispatch otherwise
+ // reserves the eight-lane frame even for a one-lane call.
+ #[inline(never)]
+-fn terminal_batch_lanes_f32<const LANES: usize>(
++fn terminal_batch_lanes_f32<const LANES: usize, const FOLD: bool>(
+     own: &RankedHands,
+     opp: &RankedHands,
+     same: &[u16],
+@@ -254,9 +324,12 @@ fn terminal_batch_lanes_f32<const LANES: usize>(
+     let (buf, _) = scratch.reach[..reach_size].as_chunks_mut::<LANES>();
+     let (values, _) = scratch.values[..value_size].as_chunks_mut::<LANES>();
+     buf[opp_len].fill(0.0);
+-    for &i in indices {
+-        assert_eq!(outs[i].len(), own_len);
+-        outs[i].fill(0.0);
++    let rows = lane_outputs::<LANES>(outs, indices);
++    for row in &rows {
++        assert_eq!(row.len(), own_len);
++    }
++    for &local in &own.dead {
++        values[local as usize].fill(0.0);
+     }
+     for (lane, &reach) in reaches.iter().enumerate() {
+         assert_eq!(reach.len(), opp_len);
+@@ -278,85 +351,96 @@ fn terminal_batch_lanes_f32<const LANES: usize>(
+     let mut total = [0.0; LANES];
+     let mut card = [[0.0; LANES]; 52];
+     add_lane_hands(&opp.hands, buf, [1.0; LANES], &mut total, &mut card);
+-    for (t, u) in total.iter_mut().zip(lose) {
+-        *t *= u;
+-    }
+-    for row in &mut card {
+-        for (c, u) in row.iter_mut().zip(lose) {
+-            *c *= u;
+-        }
+-    }
+-    let mut oi = 0;
+-    let mut os = 0;
+-    let mut start = 0;
+-    for &(rank, end) in &own.groups {
+-        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+-            let oe = opp.groups[oi].1;
+-            add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
+-            os = oe;
+-            oi += 1;
+-        }
+-        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+-        let oe = if tied { opp.groups[oi].1 } else { os };
+-        let mut group_total = [0.0; LANES];
+-        for h in &opp.hands[os..oe] {
+-            let r = buf[h.local as usize];
+-            for (t, r) in group_total.iter_mut().zip(r) {
+-                *t += r;
+-            }
+-            for &c in &h.cards {
+-                for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
+-                    *v += w * r;
+-                }
+-            }
+-        }
+-        for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
+-            *t += w * g;
+-        }
+-        for h in &own.hands[start..end] {
++    if FOLD {
++        // One opponent pass above, one live-own pass here: no rank groups.
++        for h in &own.hands {
+             let [a, b] = h.cards.map(usize::from);
+             let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
+             let row = &mut values[h.local as usize];
+-            for (((((v, t), ca), cb), s), u) in row
++            for (((((v, t), ca), cb), r), u) in row
+                 .iter_mut()
+                 .zip(total)
+                 .zip(card[a])
+                 .zip(card[b])
+                 .zip(identical)
+-                .zip(tie)
++                .zip(win)
+             {
+-                *v = t - ca - cb + u * s;
++                *v = u * (t - ca - cb + r);
+             }
+         }
+-        if tied {
+-            // Re-read just the tied hands instead of resetting/merging a
+-            // 52 x 8 group array for every own rank. Total retains the same
+-            // group-wise addition order as the existing relaxed sweep.
+-            for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
+-                *t += w * g;
++    } else {
++        for (t, u) in total.iter_mut().zip(lose) {
++            *t *= u;
++        }
++        for row in &mut card {
++            for (c, u) in row.iter_mut().zip(lose) {
++                *c *= u;
++            }
++        }
++        let mut oi = 0;
++        let mut os = 0;
++        let mut start = 0;
++        for &(rank, end) in &own.groups {
++            while oi < opp.groups.len() && opp.groups[oi].0 < rank {
++                let oe = opp.groups[oi].1;
++                add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
++                os = oe;
++                oi += 1;
+             }
++            let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
++            let oe = if tied { opp.groups[oi].1 } else { os };
++            let mut group_total = [0.0; LANES];
+             for h in &opp.hands[os..oe] {
+                 let r = buf[h.local as usize];
++                for (t, r) in group_total.iter_mut().zip(r) {
++                    *t += r;
++                }
+                 for &c in &h.cards {
+-                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
++                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
+                         *v += w * r;
+                     }
+                 }
+             }
+-            os = oe;
+-            oi += 1;
+-        }
+-        start = end;
+-    }
+-    // Only live rows were computed; unused worker-buffer rows are untouched.
+-    // Outputs were cleared above so board-dead own entries stay positive zero.
+-    for (lane, &index) in indices.iter().enumerate() {
+-        let out = &mut outs[index];
+-        for h in &own.hands {
+-            let local = h.local as usize;
+-            out[local] = values[local][lane];
++            for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
++                *t += w * g;
++            }
++            for h in &own.hands[start..end] {
++                let [a, b] = h.cards.map(usize::from);
++                let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
++                let row = &mut values[h.local as usize];
++                for (((((v, t), ca), cb), s), u) in row
++                    .iter_mut()
++                    .zip(total)
++                    .zip(card[a])
++                    .zip(card[b])
++                    .zip(identical)
++                    .zip(tie)
++                {
++                    *v = t - ca - cb + u * s;
++                }
++            }
++            if tied {
++                // Re-read just the tied hands instead of resetting/merging a
++                // 52 x 8 group array for every own rank. Total retains the same
++                // group-wise addition order as the existing relaxed sweep.
++                for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
++                    *t += w * g;
++                }
++                for h in &opp.hands[os..oe] {
++                    let r = buf[h.local as usize];
++                    for &c in &h.cards {
++                        for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
++                            *v += w * r;
++                        }
++                    }
++                }
++                os = oe;
++                oi += 1;
++            }
++            start = end;
+         }
+     }
++    store_lane_values(values, rows);
+ }
+ 
+ fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
+@@ -818,7 +902,11 @@ mod tests {
+                     groups.last_mut().unwrap().1 = i + 1;
+                 }
+             }
+-            RankedHands { hands, groups }
++            RankedHands {
++                hands,
++                groups,
++                dead: Vec::new(),
++            }
+         };
+         let own = list(3);
+         let opp = list(5);
+diff --git a/crates/hu-postflop/src/lane_precision_tests.rs b/crates/hu-postflop/src/lane_precision_tests.rs
+new file mode 100644
+index 0000000..a120e97
+--- /dev/null
++++ b/crates/hu-postflop/src/lane_precision_tests.rs
+@@ -0,0 +1,171 @@
++//! Every lane width and terminal kind on actual turn-to-river rank tables.
++use super::*;
++use rayon::prelude::*;
++
++#[test]
++fn t26_all_widths_kinds_and_orders_match_f64_and_singletons() {
++    let mut maximum = 0.0f64;
++    for wide in [false, true] {
++        let mut cfg = config();
++        cfg.ranges = if wide {
++            PerPlayer::new(nlh::Range::full(), nlh::Range::full())
++        } else {
++            PerPlayer::new(
++                "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
++                "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o".parse().unwrap(),
++            )
++        };
++        let mut built = build_postflop_game(
++            &cfg,
++            PayoffPipeline {
++                rake: &NoRake,
++                utility: &ChipEv,
++            },
++        );
++        let e = &mut built.game.evaluator;
++        e.set_cfr_precision(CfrPrecision::F32);
++        // Multiple real river boards create dead own rows inside the root
++        // supports, testing overwritten worker buffers and chunk remainders.
++        // Include the timed board and rivers that kill the final support
++        // entry on each realistic seat, exercising dead rows in copy tails.
++        let tables = ["9s", "Ah", "Js"].map(|card| {
++            let river: nlh::Card = card.parse().unwrap();
++            e.terminals
++                .iter()
++                .enumerate()
++                .find_map(|(id, t)| {
++                    (t.board_mask.count_ones() == 5
++                        && t.board_mask & (1 << river.index()) != 0
++                        && e.batch_tables[id] != u32::MAX)
++                        .then_some(e.batch_tables[id])
++                })
++                .unwrap()
++        });
++        for table in tables {
++            let candidates: [Vec<u32>; 2] = std::array::from_fn(|fold| {
++                e.terminals
++                    .iter()
++                    .enumerate()
++                    .filter_map(|(id, t)| {
++                        (e.batch_tables[id] == table
++                            && usize::from(matches!(
++                                t.kind,
++                                super::super::TerminalKind::Fold { .. }
++                            )) == fold)
++                            .then_some(id as u32)
++                    })
++                    .collect()
++            });
++            assert!(candidates.iter().all(|ids| !ids.is_empty()));
++            for p in Player::BOTH {
++                assert!(!e.rank_tables[table as usize][p].dead.is_empty());
++                let ids: Vec<_> = candidates
++                    .iter()
++                    .flat_map(|ids| (0..8).map(|lane| ids[lane % ids.len()]))
++                    .collect();
++                for pattern in 0..5 {
++                    let reaches: Vec<Vec<f32>> = ids
++                        .iter()
++                        .enumerate()
++                        .map(|(slot, &id)| {
++                            let board = e.terminals[id as usize].board_mask;
++                            e.hands
++                                .combos(p.opponent())
++                                .iter()
++                                .enumerate()
++                                .map(|(h, &combo)| {
++                                    let (a, b) = combo_cards(combo as usize);
++                                    if board & ((1 << a.index()) | (1 << b.index())) != 0
++                                        || pattern == 3
++                                    {
++                                        0.0
++                                    } else if pattern == 4 || (h + slot) % 7 == 0 {
++                                        -0.0
++                                    } else {
++                                        ((h * 37 + slot * 19) % 101 + 1) as f32 / 103.0
++                                            * [1.0, 0.001, 100.0][pattern]
++                                    }
++                                })
++                                .collect()
++                        })
++                        .collect();
++                    let run = |order: &[usize], width: usize| {
++                        let mut results = vec![vec![0.0; e.hands.len(p)]; ids.len()];
++                        for slots in order.chunks(width) {
++                            let ts: Vec<_> = slots.iter().map(|&i| ids[i]).collect();
++                            let rs: Vec<_> = slots.iter().map(|&i| reaches[i].as_slice()).collect();
++                            let mut rows = vec![vec![0.0; e.hands.len(p)]; slots.len()];
++                            e.eval_cfr_batch(
++                                &ts,
++                                p,
++                                &rs,
++                                &mut rows.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
++                            );
++                            for (&slot, row) in slots.iter().zip(rows) {
++                                results[slot] = row;
++                            }
++                        }
++                        results
++                    };
++                    let order: Vec<_> = (0..ids.len()).collect();
++                    let singleton = run(&order, 1);
++                    for (slot, (&id, row)) in ids.iter().zip(&singleton).enumerate() {
++                        let mut exact = vec![0.0; row.len()];
++                        e.eval(id, p, &reaches[slot], &mut exact);
++                        maximum = maximum.max(relative_error(&exact, row));
++                        assert!(
++                            maximum < 1e-5,
++                            "wide={wide} p={p:?} slot={slot} pattern={pattern}: {maximum:e}"
++                        );
++                        for &dead in &e.rank_tables[table as usize][p].dead {
++                            assert_eq!(row[dead as usize].to_bits(), 0);
++                        }
++                    }
++                    let expected: Vec<_> = singleton.iter().map(|r| bits(r)).collect();
++                    // Homogeneous calls guarantee every width1..8 is tested
++                    // for both kernels; mixed calls test kind partitioning,
++                    // reversed lane order, caller grouping and thread count.
++                    for width in 1..=8 {
++                        for start in [0, 8] {
++                            let slots: Vec<_> = (start..start + width).collect();
++                            let actual = run(&slots, width);
++                            for &slot in &slots {
++                                assert_eq!(bits(&actual[slot]), expected[slot]);
++                            }
++                        }
++                    }
++                    let mixed: Vec<_> = (0..8).flat_map(|i| [i, i + 8]).collect();
++                    let mut reversed = mixed.clone();
++                    reversed.reverse();
++                    let mut rotated = mixed.clone();
++                    rotated.rotate_left(5);
++                    for threads in [1, 4] {
++                        let pool = rayon::ThreadPoolBuilder::new()
++                            .num_threads(threads)
++                            .build()
++                            .unwrap();
++                        let variants = pool.install(|| {
++                            [(&mixed, 16), (&reversed, 7), (&rotated, 5), (&order, 8)]
++                                .par_iter()
++                                .map(|(order, width)| {
++                                    run(order, *width)
++                                        .iter()
++                                        .map(|r| bits(r))
++                                        .collect::<Vec<_>>()
++                                })
++                                .collect::<Vec<_>>()
++                        });
++                        for actual in variants {
++                            assert_eq!(actual, expected);
++                        }
++                    }
++                }
++            }
++        }
++        println!(
++            "T26 wide={wide} supports={}/{} maximum relative infinity error={maximum:e}",
++            e.hands.len(Player::P0),
++            e.hands.len(Player::P1)
++        );
++    }
++}
+diff --git a/crates/hu-postflop/src/postflop.rs b/crates/hu-postflop/src/postflop.rs
+index 65cb3ed..3065403 100644
+--- a/crates/hu-postflop/src/postflop.rs
++++ b/crates/hu-postflop/src/postflop.rs
+@@ -485,7 +485,20 @@ impl TerminalEvaluator for PostflopEvaluator {
+                     order.push(i);
+                 }
+             }
+-            order.sort_unstable_by_key(|&i| self.batch_tables[terminals[i] as usize]);
++            // Preserve increasing caller indices within each table so output
++            // slices can be borrowed together once per lane-kernel call.
++            let is_fold = |i: usize| {
++                matches!(
++                    self.terminals[terminals[i] as usize].kind,
++                    TerminalKind::Fold { .. }
++                )
++            };
++            // Separate kinds for every call: a fold's arithmetic cannot depend
++            // on whether it happens to share the caller's batch with a showdown.
++            // CFR subtrees normally contain one table, so this is already an
++            // ascending run. Filtering each kind below avoids a kind sort and
++            // its repeated terminal/table lookups on these small hot calls.
++            order.sort_unstable_by_key(|&i| (self.batch_tables[terminals[i] as usize], i));
+             let mut remaining = order.as_slice();
+             while let Some(&first) = remaining.first() {
+                 let table_id = self.batch_tables[terminals[first] as usize];
+@@ -493,30 +506,59 @@ impl TerminalEvaluator for PostflopEvaluator {
+                     .partition_point(|&i| self.batch_tables[terminals[i] as usize] == table_id);
+                 let (group, tail) = remaining.split_at(end);
+                 let table = &self.rank_tables[table_id as usize];
+-                for indices in group.chunks(kernel::TERMINAL_LANES) {
+-                    let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
+-                    let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
+-                    for ((reach, utility), &i) in
+-                        reaches.iter_mut().zip(&mut utilities).zip(indices)
+-                    {
+-                        *reach = opp_reaches[i];
+-                        let term = &self.terminals[terminals[i] as usize];
+-                        let u = Self::cfr_utilities(term, p);
+-                        *utility = if matches!(term.kind, TerminalKind::Fold { .. }) {
+-                            [u[0] as f32; 3]
++                for fold in [false, true] {
++                    let mut selected = group.iter().copied().filter(|&i| is_fold(i) == fold);
++                    loop {
++                        let mut indices = [0; kernel::TERMINAL_LANES];
++                        let mut count = 0;
++                        for (i, dst) in selected
++                            .by_ref()
++                            .take(kernel::TERMINAL_LANES)
++                            .zip(&mut indices)
++                        {
++                            *dst = i;
++                            count += 1;
++                        }
++                        if count == 0 {
++                            break;
++                        }
++                        let indices = &indices[..count];
++                        let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
++                        let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
++                        for ((reach, utility), &i) in
++                            reaches.iter_mut().zip(&mut utilities).zip(indices)
++                        {
++                            *reach = opp_reaches[i];
++                            let term = &self.terminals[terminals[i] as usize];
++                            let u = Self::cfr_utilities(term, p);
++                            *utility = if fold {
++                                [u[0] as f32; 3]
++                            } else {
++                                u.map(|v| v as f32)
++                            };
++                        }
++                        if fold {
++                            kernel::fold_batch_kernel_f32(
++                                &table[p],
++                                &table[p.opponent()],
++                                &self.hands.same[p],
++                                &utilities[..indices.len()],
++                                &reaches[..indices.len()],
++                                outs,
++                                indices,
++                            );
+                         } else {
+-                            u.map(|v| v as f32)
+-                        };
++                            kernel::terminal_batch_kernel_f32(
++                                &table[p],
++                                &table[p.opponent()],
++                                &self.hands.same[p],
++                                &utilities[..indices.len()],
++                                &reaches[..indices.len()],
++                                outs,
++                                indices,
++                            );
++                        }
+                     }
+-                    kernel::terminal_batch_kernel_f32(
+-                        &table[p],
+-                        &table[p.opponent()],
+-                        &self.hands.same[p],
+-                        &utilities[..indices.len()],
+-                        &reaches[..indices.len()],
+-                        outs,
+-                        indices,
+-                    );
+                 }
+                 remaining = tail;
+             }
+@@ -1888,9 +1930,11 @@ impl Builder<'_> {
+         let board_set: CardSet = board5.iter().copied().collect();
+         let ranked = |p: Player| {
+             let mut sorted = Vec::new();
++            let mut dead = Vec::new();
+             for (local, &global) in self.hands.combos(p).iter().enumerate() {
+                 let (a, b) = combo_cards(global as usize);
+                 if board_set.contains(a) || board_set.contains(b) {
++                    dead.push(local as u16);
+                     continue;
+                 }
+                 sorted.push((
+@@ -1900,7 +1944,10 @@ impl Builder<'_> {
+                 ));
+             }
+             sorted.sort_unstable();
+-            let mut table = RankedHands::default();
++            let mut table = RankedHands {
++                dead,
++                ..Default::default()
++            };
+             for (rank, global, local) in sorted {
+                 if table.groups.last().is_none_or(|&(r, _)| r != rank) {
+                     table.groups.push((rank, table.hands.len()));
+diff --git a/crates/hu-postflop/src/precision_tests.rs b/crates/hu-postflop/src/precision_tests.rs
+index 17be958..f39c635 100644
+--- a/crates/hu-postflop/src/precision_tests.rs
++++ b/crates/hu-postflop/src/precision_tests.rs
+@@ -683,3 +683,6 @@ mod opponent_precision_tests;
+ 
+ #[path = "batch_precision_tests.rs"]
+ mod batch_precision_tests;
++
++#[path = "lane_precision_tests.rs"]
++mod lane_precision_tests;
+diff --git a/docs/architecture.md b/docs/architecture.md
+index c2cd178..affd389 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -119,7 +119,8 @@ f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION
+ node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
+ 不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
+ sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
+-既定batch hookは個別の`eval_cfr`、P1の同一board終端は最大8 laneの順位走査を使う。f64は従来の再帰passを維持する。
++既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。
++showdownは順位走査、River foldは専用の互換reach kernelを使う。f64は従来の再帰passを維持する。
+ このsubtree経路の外では、以下の直下終端の処理を使う。
+ f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
+ action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
+diff --git a/docs/hu-postflop.jp.md b/docs/hu-postflop.jp.md
+index 421df71..e9ad8e8 100644
+--- a/docs/hu-postflop.jp.md
++++ b/docs/hu-postflop.jp.md
+@@ -97,7 +97,10 @@ showdownはloseの効用で重み付けしたtotal/card和から始め、相手g
+ 同順位groupの処理後、直下終端の融合経路は52枚のcard和merge、lane batch経路は同順位handの再走査でtieの重みをwinへ変換する。
+ chanceを含まずaction並列化の閾値未満のsubtreeでは、f32のCFRを非再帰の3段階で処理する。
+ 上から戦略とreachを計算し、全0相手reachの終端をPRUNEで除いた後、subtree内の全終端を
+-`eval_cfr_batch`へ1回で渡す。同一boardのshowdownとRiver foldは最大8 laneの順位走査を共有する。
++`eval_cfr_batch`へ1回で渡す。同一board内で種類別にまとめ、showdownは最大8 laneの順位走査、
++River foldは別の最大8 lane kernelで相手のtotal/card和と自handの互換reachだけを計算する。
++foldは常にこの専用経路を使い、効用は互換reachの計算後に掛けるため、同じcall内の終端の種類・lane位置で結果は変わらない。
++出力はlocal index順の8 hand blockで各終端の行へ転置し、board-dead自handは正の0に保つ。
+ その後、下から子順に値を合成し、各更新nodeのregretとreach付き戦略を従来の順で更新する。
+ 全0相手reachの下でも更新playerのnodeを訪問する。arenaは席別supportに応じてworkerごとに再利用する。
+ このsubtree経路の外では、次の直下終端の融合を使う。f64のCFRは従来の再帰経路を維持する。

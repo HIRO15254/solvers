@@ -1,0 +1,6 @@
+1791404826.671219289 tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)
+1791404826.672574377 memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)
+1791404826.673846593 warning: no stop target: runs until max_iterations or max_time
+1791404868.216761485 iter=      25 expl_p0=1.671e0 expl_p1=1.727e0 nash_conv=3.398e0
+1791404868.218263072 done: iterations=25 wall=36.78s ev_p0=1.290367 ev_p1=3.572787 nash_conv=3.398e0
+1791404887.918644168 sol: wrote /dev/shm/sc_2/solution.sol (6363.51 MB, 2293609 blocks, mode=Full)

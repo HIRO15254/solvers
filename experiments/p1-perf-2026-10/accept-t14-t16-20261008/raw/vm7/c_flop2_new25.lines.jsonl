@@ -1,0 +1,13 @@
+{"t": 0.046, "line": "tree: nodes=471738 terminals=276957 rank_tables=799 storage=308.7 MiB (f32) / 155.8 MiB (i16) / 232.2 MiB (i16-f32avg)"}
+{"t": 0.046, "line": "memory estimate: 828.7 MiB (f32) / 748.1 MiB (i16) / 824.5 MiB (i16-f32avg)"}
+{"t": 1.135, "line": "iter=      25 expl_p0=2.247e0 expl_p1=1.053e0 nash_conv=3.300e0"}
+{"t": 1.899, "line": "iter=      50 expl_p0=5.260e-1 expl_p1=2.594e-1 nash_conv=7.854e-1"}
+{"t": 2.651, "line": "iter=      75 expl_p0=2.677e-1 expl_p1=1.360e-1 nash_conv=4.036e-1"}
+{"t": 3.402, "line": "iter=     100 expl_p0=1.558e-1 expl_p1=7.533e-2 nash_conv=2.311e-1"}
+{"t": 4.153, "line": "iter=     125 expl_p0=9.063e-2 expl_p1=4.821e-2 nash_conv=1.388e-1"}
+{"t": 4.889, "line": "iter=     150 expl_p0=5.729e-2 expl_p1=3.355e-2 nash_conv=9.083e-2"}
+{"t": 5.617, "line": "iter=     175 expl_p0=3.914e-2 expl_p1=2.424e-2 nash_conv=6.338e-2"}
+{"t": 6.344, "line": "iter=     200 expl_p0=2.939e-2 expl_p1=1.855e-2 nash_conv=4.795e-2"}
+{"t": 7.073, "line": "iter=     225 expl_p0=2.254e-2 expl_p1=1.453e-2 nash_conv=3.707e-2"}
+{"t": 7.074, "line": "done: iterations=225 wall=6.65s ev_p0=8.134076 ev_p1=12.140289 nash_conv=3.707e-2"}
+{"t": 9.037, "line": "sol: wrote /home/PC_User/work/c_flop2_new25/solution.sol (98.70 MB, 193296 blocks, mode=Full)"}

@@ -1,0 +1,57 @@
+07:16:49 T25_BUILT
+07:17:50 SETUP50_DONE
+07:17:53 vm50 bench flop1_t32_t25_1 s/iter=0.0962
+07:17:53 vm50 bench turn2_t32_t25_1 s/iter=0.0010
+07:17:53 vm50 bench river_t32_t25_1 s/iter=0.0002
+07:17:56 vm50 bench flop1_t16_t25_1 s/iter=0.1119
+07:18:01 vm50 bench flop1_t1_t25_1 s/iter=1.4507
+07:18:15 vm50 bench gtowb_t32_t25_1 s/iter=0.6744
+07:18:18 vm50 bench flop1_t32_t26_1 s/iter=0.0903
+07:18:18 vm50 bench turn2_t32_t26_1 s/iter=0.0009
+07:18:18 vm50 bench river_t32_t26_1 s/iter=0.0002
+07:18:20 vm50 bench flop1_t16_t26_1 s/iter=0.1056
+07:18:25 vm50 bench flop1_t1_t26_1 s/iter=1.3517
+07:18:39 vm50 bench gtowb_t32_t26_1 s/iter=0.6236
+07:18:42 vm50 bench flop1_t32_t25_2 s/iter=0.0965
+07:18:42 vm50 bench turn2_t32_t25_2 s/iter=0.0010
+07:18:42 vm50 bench river_t32_t25_2 s/iter=0.0002
+07:18:44 vm50 bench flop1_t16_t25_2 s/iter=0.1115
+07:18:50 vm50 bench flop1_t1_t25_2 s/iter=1.4443
+07:19:04 vm50 bench gtowb_t32_t25_2 s/iter=0.6732
+07:19:07 vm50 bench flop1_t32_t26_2 s/iter=0.0904
+07:19:07 vm50 bench turn2_t32_t26_2 s/iter=0.0010
+07:19:07 vm50 bench river_t32_t26_2 s/iter=0.0002
+07:19:09 vm50 bench flop1_t16_t26_2 s/iter=0.1056
+07:19:14 vm50 bench flop1_t1_t26_2 s/iter=1.3456
+07:19:28 vm50 bench gtowb_t32_t26_2 s/iter=0.6243
+07:19:31 vm50 bench flop1_t32_t25_3 s/iter=0.0966
+07:19:31 vm50 bench turn2_t32_t25_3 s/iter=0.0010
+07:19:31 vm50 bench river_t32_t25_3 s/iter=0.0002
+07:19:33 vm50 bench flop1_t16_t25_3 s/iter=0.1112
+07:19:39 vm50 bench flop1_t1_t25_3 s/iter=1.4375
+07:19:53 vm50 bench gtowb_t32_t25_3 s/iter=0.6737
+07:19:56 vm50 bench flop1_t32_t26_3 s/iter=0.0906
+07:19:56 vm50 bench turn2_t32_t26_3 s/iter=0.0009
+07:19:56 vm50 bench river_t32_t26_3 s/iter=0.0002
+07:19:58 vm50 bench flop1_t16_t26_3 s/iter=0.1067
+07:20:03 vm50 bench flop1_t1_t26_3 s/iter=1.3487
+07:20:17 vm50 bench gtowb_t32_t26_3 s/iter=0.6289
+07:20:17 vm50 BENCH_DONE
+07:20:17 vm50 c_turn2_f64_t25 exit=0 wall=0.5 iters=247 solve=0.404189943
+07:20:18 vm50 c_turn2_f64_t26 exit=0 wall=0.5 iters=247 solve=0.39208488
+07:20:18 vm50 compare c_turn2_f64_t25_t26 exit=0 '{"canonical_postcard_streams":true,"config_precision_excluded":false,"config_run_excluded":false,"file_bytes_equal":false,"normalized_payload_blake3":"085e993ab2796ed8d4acbf1ae3edb42aaea934267996b874e'
+07:20:18 vm50 c_turn2_t25 exit=0 wall=0.3 iters=239 solve=0.271421868
+07:20:18 vm50 c_turn2_t26 exit=0 wall=0.3 iters=235 solve=0.25234947
+07:20:46 vm50 c_flop1_t25 exit=0 wall=27.3 iters=192 solve=19.202295896
+07:21:12 vm50 c_flop1_t26 exit=0 wall=26.1 iters=192 solve=17.945344018
+07:23:44 vm50 c_flop3_t25 exit=0 wall=151.4 iters=426 solve=130.041889174
+07:26:01 vm50 c_flop3_t26 exit=0 wall=137.2 iters=414 solve=115.94304958
+07:30:24 vm50 c_gtowb_t25 exit=0 wall=262.4 iters=305 solve=215.171004601
+07:34:43 vm50 c_gtowb_t26 exit=0 wall=258.6 iters=316 solve=206.949690195
+07:34:45 vm50 SOLVE_DONE
+07:34:45 vm50_DONE
+07:38:01 VM50_CHECKS_DONE
+07:38:40 prof51 flop1_t32 report done
+07:38:55 prof51 gtowb_t32 report done
+07:38:57 VM51_ALL_DONE
+07:42:33 VM53_ALL_DONE

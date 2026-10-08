@@ -1,0 +1,4 @@
+    Blocking waiting for file lock on build directory
+    Finished `release` profile [optimized] target(s) in 6m 59s
+     Running `target\release\examples\p1_bench.exe runs/p1-perf/cfg/turn_multi.toml --threads 1 --warmup 1 --iters 3 --json experiments/p1-performance/compact-hand-domain/turn-new-final.json`
+{"actionNodes":20482,"afterBuildBytes":18526208,"allocSecs":0.0000267,"buildSecs":0.1942812,"config":"runs/p1-perf/cfg/turn_multi.toml","deals":1584,"estimateF32Bytes":208058400,"estimateI16Bytes":104193056,"evalSecs":[2.0679846],"iterSecs":2.6485844,"iters":3,"nashConv":22.125351937566666,"nodeInfo":20483,"nodes":59379,"peakBytes":228077568,"prepareSecs":0.0158779,"secsPerIter":0.8828614666666666,"storage":"f32","storageElements":26007300,"threads":1,"transitionEntries":0,"transitions":0,"warmupIters":1,"warmupSecs":1.0261715}

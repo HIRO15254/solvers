@@ -32,6 +32,8 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 | `--out PATH` | stdout | templateの出力先 |
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
+P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseで、明示値は常に優先する。full templateは既定storageのf32に対応する`pow4_reset = false`を明示するため、i16の既定resetを使う場合はこの行を削除するかtrueにする。
+P1の`[solver.stop] check_every`は`"auto"`が既定で、full templateにも明示する。target有りは3〜50 iterationの適応評価、target無しは固定25である。正の整数は従来の固定間隔で、旧版と同じ停止を得るには`check_every = 25`を明示する。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
 ## `solvers validate`
@@ -68,16 +70,19 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 
 | resources field | 製品 | 意味 |
 |---|---|---|
-| `nodes` / `terminals` / `f32Bytes` / `i16Bytes` | P1 | 木のnode・terminal数とstorage別bytes |
-| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | 選択storageの見積り、解決済み上限、上限内か |
+| `nodes` / `terminals` / `f32Bytes` / `i16Bytes` / `i16F32avgBytes` | P1 | 木のnode・terminal数とstorage別bytes |
+| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage, storage − regret + saveWorkspaceBytes) + compressionWorkspaceBytes`、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
+| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / run threadsに応じたstreaming圧縮予算 |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
 | `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
 
 P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
 未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
+P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`ならregretを保持してcheckpointと`.sol`を並行生成する。それ以外はcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`の順とする。solve開始の見積り式は変わらない。
+
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
 P1では`tree.preflop_reraise_jam_above_stack`、既定4以外の`tree.max_aggressive_actions.preflop`、
@@ -99,6 +104,7 @@ solvers solve <CONFIG> --out DIR [--threads N] [--memory SIZE] [--max-time DUR]
 
 上書きは実効configに保存する。memoryのautoはP1が物理RAMの80%、P2がarena予算6 GiBである。
 P1の停止条件はNashConv / 2、P2は測定deviationの確認であり、規範の停止設定に従う。
+P1の`check_every = "auto"`は初回25 iteration、以降は評価iterationとNashConv / 2の履歴から間隔を決める（[入力規範第10節](nlh-input-v1.jp.md#10-solver)）。progressは評価ごとに出すため、target有りでは不等間隔になる。autoの中断・max_time・定期checkpoint判定は25 iteration以下のsub-batch境界で行い、整数では指定間隔で行う。
 P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未一致ruleを警告する。
 
 | file | 内容 |
@@ -110,6 +116,9 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
+P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
+P1 storageは`f32`（既定）・`i16`・`i16-f32avg`。`config new --product p1 --template full`にもこの選択肢を表示する。
+P1 `.sol`はversion 2、checkpointはversion 5だけを受理する。checkpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -122,7 +131,10 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 ```
 
 `RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
-directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。
+directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
+P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
+最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
+P1のautoはrun directoryの`progress.jsonl`からcheckpoint iteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。同じ方式で次の評価iterationを再計算する。progressが無い・読めない場合（裸のcheckpointを含む）は履歴無しでcheckpoint iteration＋25から評価し、max_iterationsで切る。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えず、旧run.tomlの`check_every = 25`は固定25で再開できる。
 
 | flag | 適用 | 意味 |
 |---|---|---|
@@ -134,9 +146,9 @@ directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検�
 | `--evaluation-samples N` | P2 | `solver.stop.evaluation_samples` |
 | `--evaluation-cadence N` | P2 | `solver.stop.check_every_sweeps` |
 
-P1へP2専用overrideを渡すと`NLH003`で拒否する。P1は`[run]`・`[meta]`以外を変更できない。
+P1へP2専用overrideを渡すと`NLH003`で拒否する。P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。その他の設定変更は互換性が必要である。
 同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
-終了時にcheckpoint、solution、run.jsonを更新する。P2は再構築中にrule hitも確認する。
+終了時にsolution、run.jsonを更新する。P1のcheckpointは`final_checkpoint = true`の場合だけ更新し、直前の保存と同じiterationの再保存・eventを省く。P2は終了時のcheckpointを更新する。P2は再構築中にrule hitも確認する。
 
 ## `solvers status` / `solvers watch` / `solvers runs ls`
 
@@ -234,6 +246,7 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 | `--output PATH` | stdout | 出力先 |
 | `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える |
 
+P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
@@ -323,8 +336,8 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
 
-Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する。
-2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
+Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
+P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境界で判定する。2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
 
 ## `solversd`
 

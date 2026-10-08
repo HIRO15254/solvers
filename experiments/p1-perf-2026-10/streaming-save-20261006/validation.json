@@ -1,0 +1,25 @@
+{
+  "fmt": {
+    "command": "cargo fmt --all --check",
+    "exit_code": 0
+  },
+  "clippy": {
+    "command": "cargo clippy --workspace --all-targets -- -D warnings",
+    "exit_code": 0
+  },
+  "workspace_tests": {
+    "command": "cargo test --workspace",
+    "exit_code": 0,
+    "passed": 856,
+    "failed": 0,
+    "ignored": 31,
+    "suites": 56
+  },
+  "build_jobs": 2,
+  "docs": {
+    "command": "python tools/check_docs.py",
+    "exit_code": 0
+  },
+  "initial_failure": "Modified normative documents were saved with CRLF; spec_p1_example_lowering_and_sizes failed. Documents restored to LF, complete workspace rerun succeeded.",
+  "excluded_setup_run": "Initial additional River input had no solver.stop table, so replacement did not set six iterations. Owned baseline process was stopped, explicit six-iteration i16 input rerun on both binaries. Excluded from performance/equivalence evidence."
+}

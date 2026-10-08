@@ -368,19 +368,79 @@ fn memory_auto_explicit_boundary_and_overflow() {
     let estimate = MemoryEstimate {
         f32_bytes: 100,
         i16_bytes: 60,
+        i16_f32avg_bytes: 90,
         ..Default::default()
     };
     check_memory_limit(&estimate, Storage::F32, 100).unwrap();
     check_memory_limit(&estimate, Storage::I16, 60).unwrap();
+    check_memory_limit(&estimate, Storage::I16F32Avg, 90).unwrap();
+    assert_eq!(
+        check_memory_limit(&estimate, Storage::I16F32Avg, 89)
+            .unwrap_err()
+            .required,
+        90
+    );
     let error = check_memory_limit(&estimate, Storage::F32, 99).unwrap_err();
     assert_eq!((error.required, error.limit), (100, 99));
     assert!(error.to_string().contains("resource limit"));
     let doc = document(&source("", ""));
     let config = lower(&doc.spot, &settings(&doc)).unwrap();
-    assert!(check_memory_limit(&try_memory_usage(&config).unwrap(), Storage::F32, 1).is_err());
+    let estimate = try_memory_usage(&config).unwrap();
+    assert!(estimate.save_bytes > 0);
+    assert!(estimate.compression_bytes > 0);
+    let total = estimate.required_bytes(Storage::F32);
+    check_memory_limit(&estimate, Storage::F32, total).unwrap();
+    assert_eq!(
+        check_memory_limit(&estimate, Storage::F32, total - 1)
+            .unwrap_err()
+            .required,
+        total
+    );
+    assert!(check_memory_limit(&estimate, Storage::F32, estimate.f32_bytes).is_err());
+    assert!(check_memory_limit(&estimate, Storage::F32, 1).is_err());
 }
 
 #[test]
 fn physical_ram_query_returns_positive_bytes() {
     assert!(physical_memory_bytes().unwrap() > 0);
+}
+
+#[test]
+fn memory_peak_before_and_after_release_all_backends() {
+    // L=100, N=10: f32 regret=400, i16 regret=240.
+    for (backend, storage, regrets) in [
+        (Storage::F32, 800, 400),
+        (Storage::I16, 480, 240),
+        (Storage::I16F32Avg, 640, 240),
+    ] {
+        for save in [regrets - 1, regrets, regrets + 1] {
+            let estimate = MemoryEstimate {
+                f32_bytes: 800,
+                i16_bytes: 480,
+                i16_f32avg_bytes: 640,
+                f32_regret_bytes: 400,
+                i16_regret_bytes: 240,
+                save_bytes: save,
+                compression_bytes: 30,
+                ..Default::default()
+            };
+            let expected = storage + save.saturating_sub(regrets) + 30;
+            assert_eq!(estimate.required_bytes(backend), expected);
+            check_memory_limit(&estimate, backend, expected).unwrap();
+            assert_eq!(
+                check_memory_limit(&estimate, backend, expected - 1)
+                    .unwrap_err()
+                    .required,
+                expected
+            );
+        }
+    }
+    let estimate = MemoryEstimate {
+        f32_bytes: u64::MAX,
+        f32_regret_bytes: 1,
+        save_bytes: u64::MAX,
+        compression_bytes: 1,
+        ..Default::default()
+    };
+    assert_eq!(estimate.required_bytes(Storage::F32), u64::MAX);
 }

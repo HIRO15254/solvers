@@ -722,6 +722,69 @@ fn allin_runout_matches_direct_equity() {
 
 #[test]
 fn memory_usage_matches_allocated() {
+    fn check_save_workspace(config: &PostflopConfig, game: &hu_postflop::PostflopGame) {
+        use std::mem::size_of;
+        let tree = &game.game.tree;
+        let hands =
+            game.game.evaluator.hands.len(Player::P0) + game.game.evaluator.hands.len(Player::P1);
+        let slots: Vec<_> = tree
+            .storage_refs
+            .iter()
+            .map(|sref| {
+                // Encoded block: values plus the header reserve.
+                let _ = sref;
+                std::sync::Mutex::new(Some(Ok::<Vec<u8>, postcard::Error>(Vec::with_capacity(
+                    hands * 2 + 14,
+                ))))
+            })
+            .collect();
+        let max_elements = tree
+            .storage_refs
+            .iter()
+            .map(|sref| sref.num_actions as usize * sref.num_hands as usize)
+            .max()
+            .unwrap();
+        let allocated = std::mem::size_of_val(slots.as_slice())
+            + slots
+                .iter()
+                .map(|slot| {
+                    slot.lock()
+                        .unwrap()
+                        .as_ref()
+                        .unwrap()
+                        .as_ref()
+                        .unwrap()
+                        .capacity()
+                })
+                .sum::<usize>()
+            + tree.storage_refs.len() * size_of::<bool>()
+            + tree.nodes.len() * size_of::<Street>()
+            + {
+                let elements = tree
+                    .storage_len
+                    .min(hu_postflop::sol::STRATEGY_BATCH_ELEMENTS.max(max_elements));
+                let headers = size_of::<(hu_engine::StorageRef, Vec<u8>)>()
+                    + size_of::<hu_postflop::sol::StrategyBlock>()
+                    + size_of::<Vec<f32>>()
+                    + 15;
+                let min_elements = tree
+                    .storage_refs
+                    .iter()
+                    .map(|sref| sref.len())
+                    .min()
+                    .unwrap();
+                elements * 8
+                    + tree.storage_refs.len().min(elements / min_elements.max(1)) * headers
+                    + size_of::<Vec<(hu_engine::StorageRef, Vec<u8>)>>()
+            };
+        let estimate = memory_usage(config);
+        assert_eq!(estimate.save_bytes, allocated as u64);
+        assert_eq!(estimate.f32_regret_bytes, tree.storage_len as u64 * 4);
+        assert_eq!(
+            estimate.i16_regret_bytes,
+            tree.storage_len as u64 * 2 + tree.storage_refs.len() as u64 * 4
+        );
+    }
     let config = PostflopConfig {
         board: merged_flop(),
         ranges: PerPlayer::new("AA,KK".parse().unwrap(), "QQ,JJ".parse().unwrap()),
@@ -736,6 +799,7 @@ fn memory_usage_matches_allocated() {
     };
     let estimate = memory_usage(&config);
     let game = build_postflop_game(&config, chip_ev());
+    check_save_workspace(&config, &game);
 
     assert_eq!(
         estimate.f32_bytes,
@@ -794,6 +858,7 @@ fn memory_usage_matches_allocated() {
     };
     let rich_estimate = memory_usage(&rich_config);
     let rich_game = build_postflop_game(&rich_config, chip_ev());
+    check_save_workspace(&rich_config, &rich_game);
     let real_terminals = rich_game
         .game
         .tree
@@ -868,6 +933,7 @@ fn memory_usage_matches_allocated() {
     };
     let force_estimate = memory_usage(&force_config);
     let force_game = build_postflop_game(&force_config, chip_ev());
+    check_save_workspace(&force_config, &force_game);
     let force_real_terminals = force_game
         .game
         .tree
@@ -1077,15 +1143,17 @@ fn iso_quotient_matches_full_tree_per_hand() {
         "iso EV mismatch: {ev_on} vs {ev_off}"
     );
     assert_eq!(sig_on.len(), sig_off.len());
-    let num_actions = sig_on.len() / NUM_COMBOS;
+    let hands = hu_postflop::PostflopHands::new(&base.board, &ranges);
+    let num_hands = hands.len(Player::P0);
+    let num_actions = sig_on.len() / num_hands;
     for a in 0..num_actions {
         for combo in 0..NUM_COMBOS {
             if ranges[Player::P0].weight(combo) == 0.0 {
                 continue;
             }
             let (x, y) = (
-                sig_on[a * NUM_COMBOS + combo],
-                sig_off[a * NUM_COMBOS + combo],
+                sig_on[a * num_hands + hands.local(Player::P0, combo).unwrap()],
+                sig_off[a * num_hands + hands.local(Player::P0, combo).unwrap()],
             );
             assert!(
                 (x - y).abs() < 1e-4,
@@ -1143,14 +1211,19 @@ fn member_branch_matches_suit_permuted_rep_branch() {
     let node_d = find("xx[8d]");
     let sig_c = solver.average_strategy_at(node_c);
     let sig_d = solver.average_strategy_at(node_d);
-    let num_actions = sig_c.len() / NUM_COMBOS;
+    let hands = &solver.game().evaluator.hands;
+    let num_hands = hands.len(Player::P0);
+    let num_actions = sig_c.len() / num_hands;
     for a in 0..num_actions {
         for combo in 0..NUM_COMBOS {
             if ranges[Player::P0].weight(combo) == 0.0 {
                 continue;
             }
-            let x = sig_c[a * NUM_COMBOS + combo];
-            let y = sig_d[a * NUM_COMBOS + nlh::iso::permute_combo(&perm, combo)];
+            let x = sig_c[a * num_hands + hands.local(Player::P0, combo).unwrap()];
+            let y = sig_d[a * num_hands
+                + hands
+                    .local(Player::P0, nlh::iso::permute_combo(&perm, combo))
+                    .unwrap()];
             assert!(
                 (x - y).abs() < 1e-3,
                 "branches not suit-symmetric: action {a} combo {combo}: {x} vs {y}"

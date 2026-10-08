@@ -1,0 +1,302 @@
+{
+  "work_item": "P1-T5 / SOL-15",
+  "status": "partial_capacity_stop",
+  "stop": {
+    "reason": "free C: space dropped to 4226043904 bytes while old Flop save and workspace tests were active; old checkpoint ultimately 1467151731 bytes and solution 360347459 bytes; a second save plus continued build growth risked the user 3 GB floor",
+    "free_bytes_observed": 4226043904,
+    "user_floor_bytes": 3000000000,
+    "free_bytes_after_stopping_before_cleanup": 6891978752,
+    "free_bytes_after_hash_and_cleanup": 8719134720
+  },
+  "checks": {
+    "cargo_fmt_all_check": {
+      "exit": 0,
+      "status": "passed"
+    },
+    "cargo_clippy_workspace_all_targets_D_warnings": {
+      "exit": 0,
+      "status": "passed"
+    },
+    "cargo_test_workspace": {
+      "status": "interrupted_capacity_stop",
+      "completed_suite_totals": {
+        "passed": 68,
+        "failed": 0,
+        "ignored": 5
+      },
+      "full_suite_passed": false
+    },
+    "engine_dead_subtree_tests": {
+      "command": "cargo test -p hu-engine --lib dead_subtree_tests",
+      "passed": 3,
+      "failed": 0,
+      "seconds": 13.45,
+      "threads": [
+        1,
+        8
+      ],
+      "storage": [
+        "f32",
+        "i16"
+      ],
+      "schedules": [
+        "dcfr",
+        "cfr+",
+        "hs-dcfr"
+      ],
+      "iterations": 20,
+      "fixtures": "zero action reaches, whole-zero masks, dimension-changing transitions, empty spaces, nested action/chance parallelism; nonzero subnormal must be evaluated; recording callbacks preserve signed-zero bits"
+    },
+    "check_docs": {
+      "command": "python tools/check_docs.py",
+      "status": "passed",
+      "exit": 0,
+      "output": "Documentation check passed: 23 Markdown files.\n"
+    }
+  },
+  "old_flop_solve": {
+    "iterations": 300,
+    "threads": 8,
+    "storage": "f32",
+    "wall_secs": 448.3627363,
+    "progress": [
+      {
+        "iteration": 25,
+        "elapsed_secs": 46.66787,
+        "expl_p0": 0.7697439729990836,
+        "expl_p1": 0.4842134307168946,
+        "nash_conv": 1.2539574037159782
+      },
+      {
+        "iteration": 50,
+        "elapsed_secs": 98.8196476,
+        "expl_p0": 0.17270528136816288,
+        "expl_p1": 0.09769425554807376,
+        "nash_conv": 0.27039953691623664
+      },
+      {
+        "iteration": 75,
+        "elapsed_secs": 155.4827668,
+        "expl_p0": 0.07254544632551607,
+        "expl_p1": 0.03301576725169053,
+        "nash_conv": 0.1055612135772066
+      },
+      {
+        "iteration": 100,
+        "elapsed_secs": 198.1714445,
+        "expl_p0": 0.042305824377976364,
+        "expl_p1": 0.017203674769394217,
+        "nash_conv": 0.05950949914737058
+      },
+      {
+        "iteration": 125,
+        "elapsed_secs": 227.9277616,
+        "expl_p0": 0.027491172574927725,
+        "expl_p1": 0.01160814164468027,
+        "nash_conv": 0.039099314219607995
+      },
+      {
+        "iteration": 150,
+        "elapsed_secs": 256.5765108,
+        "expl_p0": 0.019261378127495732,
+        "expl_p1": 0.008401209257793973,
+        "nash_conv": 0.027662587385289705
+      },
+      {
+        "iteration": 175,
+        "elapsed_secs": 287.5245052,
+        "expl_p0": 0.014361800749653653,
+        "expl_p1": 0.0063820434833398165,
+        "nash_conv": 0.02074384423299347
+      },
+      {
+        "iteration": 200,
+        "elapsed_secs": 321.4809075,
+        "expl_p0": 0.011249044215351,
+        "expl_p1": 0.0050009103186909876,
+        "nash_conv": 0.016249954534041988
+      },
+      {
+        "iteration": 225,
+        "elapsed_secs": 353.8269763,
+        "expl_p0": 0.009090400172687807,
+        "expl_p1": 0.004055087780087008,
+        "nash_conv": 0.013145487952774815
+      },
+      {
+        "iteration": 250,
+        "elapsed_secs": 384.4861125,
+        "expl_p0": 0.007489387500340561,
+        "expl_p1": 0.003434488974856653,
+        "nash_conv": 0.010923876475197214
+      },
+      {
+        "iteration": 275,
+        "elapsed_secs": 416.7334697,
+        "expl_p0": 0.007196983200270735,
+        "expl_p1": 0.0038907957118031744,
+        "nash_conv": 0.011087778912073909
+      },
+      {
+        "iteration": 300,
+        "elapsed_secs": 448.3626835,
+        "expl_p0": 0.006368637786110187,
+        "expl_p1": 0.003170828345378962,
+        "nash_conv": 0.00953946613148915
+      }
+    ],
+    "artifacts_deleted_after_hash": {
+      "checkpoint.ckpt": {
+        "sha256_raw": "ac045292e27706a1e0060271ec5284967e4015ad4f4fce3b01a7e3d22ca968db",
+        "bytes": 1467151731
+      },
+      "solution.sol": {
+        "sha256_raw": "0e60db4759b51c1d990d6e7a34405d19ac7ad8a70c91be7b8511181f9e30482f",
+        "bytes": 360347459
+      }
+    },
+    "checkpoint_self_validation_only": {
+      "arena_blake3": [
+        "e900a4b2b12009d373590a7b6eab0cf1da019ddaeb6fc3d4294c01503aa55254",
+        "e900a4b2b12009d373590a7b6eab0cf1da019ddaeb6fc3d4294c01503aa55254"
+      ],
+      "digests_valid": true,
+      "elements": 704729340,
+      "iteration": 300,
+      "numeric_equal": true,
+      "other_bit_differences": 0,
+      "signed_zero_bit_differences": 0,
+      "storage": "f32"
+    },
+    "solution_self_validation_only": {
+      "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+      "file_bytes_equal": true,
+      "normalized_payload_blake3": "e0c198fb9376c68d870297d526c25ace7c5a4f4f400feda716c86f3e2537c7e9",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        1323285705,
+        1323285705
+      ],
+      "strategy_blocks": 335460,
+      "value_blocks": 335460,
+      "wall_secs": [
+        448.3627363,
+        448.3627363
+      ]
+    }
+  },
+  "new_flop_partial": {
+    "iterations_recorded": 25,
+    "progress": [
+      {
+        "iteration": 25,
+        "elapsed_secs": 22.1621005,
+        "expl_p0": 0.7697439729990836,
+        "expl_p1": 0.4842134307168946,
+        "nash_conv": 1.2539574037159782
+      }
+    ],
+    "matching_old_prefix": true
+  },
+  "external_old_new_final_storage_and_exports": {
+    "status": "not_completed",
+    "signed_zero_bit_difference_count": "not_measured",
+    "other_bit_differences": "not_measured"
+  },
+  "speed": {
+    "status": "not_run",
+    "planned_order": "old,new,old,new per case",
+    "planned_bands": [
+      [
+        1,
+        50
+      ],
+      [
+        250,
+        300
+      ]
+    ],
+    "separate_evaluation_iterations": [
+      50,
+      300
+    ],
+    "no_speedup_claim": true
+  },
+  "parallel_dead_walk_alternative": {
+    "status": "not_benchmarked",
+    "implementation": "sequential; never splits the supplied subtree view; normal live-tree chance/action parallelism stays enabled"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "processor_identifier": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+    "physical_memory_bytes": 34275098624,
+    "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+    "build_jobs": 2,
+    "release_flags": "workspace .cargo/config.toml target-cpu=native; thin LTO; codegen-units=1",
+    "verification_env": {
+      "CARGO_PROFILE_DEV_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG": "0",
+      "CARGO_INCREMENTAL": "0"
+    },
+    "cache_permissions": "transferred target denied writes; retained at target/transferred-cache, copied release cache into new writable target and target/prune-old"
+  },
+  "old_source": {
+    "archive_files": 562,
+    "old_source_differences": [],
+    "archive_sha256": "fea0f0cc76dead11734f109e3005e72f1ace211bac38eb6e8b4b12a6720b175a"
+  },
+  "binaries": {
+    "target\\prune-old\\release\\solvers.exe": {
+      "sha256_raw": "c1a059d1674e370bd1cad3bcb67fe9a5a32e5e7c52a37fc9b6cb5fccb2565610",
+      "bytes": 7384064
+    },
+    "target\\release\\solvers.exe": {
+      "sha256_raw": "1ad563e45d8cfd296dbf12764c990cdc6828968d734948ff77a7dd057a451080",
+      "bytes": 7399424
+    },
+    "target\\prune-old\\release\\prune-old-bands.exe": {
+      "sha256_raw": "01a897f176bf884ea21eb226f7e5b87eac9f80537677d395de81b4251e4dc078",
+      "bytes": 2248704
+    },
+    "target\\release\\examples\\p1_bench.exe": {
+      "sha256_raw": "c47b219a55d0f81f4d8ddf3eabe8453043236e964d985a80ea9c6941bec79caa",
+      "bytes": 2252288
+    },
+    "target\\release\\examples\\verify_save.exe": {
+      "sha256_raw": "a77e8b33bc15d767659f2f461e315c41b749eb9f4ae32c92a0c0571789d4668e",
+      "bytes": 1260032
+    }
+  },
+  "artifact_availability": "old large checkpoint/.sol deleted after hash and self-validation; no completed new large artifacts; raw logs and archive remain ignored under runs/ and are not Git-backed evidence",
+  "linear": "read SOL-15, sapphire2/Solvers team ID matched; In Progress. No status write or completion claim.",
+  "build_commands": [
+    "CARGO_BUILD_JOBS=2 cargo build --release -p hu-postflop --example p1_bench (temporary instrumentation)",
+    "CARGO_BUILD_JOBS=2 cargo build --release --manifest-path runs/dead-subtree-20261007/old-source/Cargo.toml --target-dir target/prune-old -p cli -p hu-postflop --example p1_bench --bin solvers",
+    "CARGO_BUILD_JOBS=2 cargo build --release -p cli -p hu-postflop --bin solvers --example p1_bench --example verify_save",
+    "CARGO_BUILD_JOBS=2 cargo build --release --manifest-path runs/dead-subtree-20261007/old-bench-harness/Cargo.toml --target-dir target/prune-old",
+    "CARGO_BUILD_JOBS=2 cargo build --release -p hu-postflop --example p1_bench --example verify_save"
+  ],
+  "runtime_commands": [
+    "target/release/examples/p1_bench.exe runs/p1-perf/conv/flop1_dcfr.toml --threads 8 --warmup 0 --iters 300 --evals 0 --json runs/dead-subtree-20261007/profile-flop-bench.json",
+    "target/release/examples/p1_bench.exe runs/p1-perf/conv/turn_dcfr.toml --threads 8 --warmup 0 --iters 300 --evals 0 --json runs/dead-subtree-20261007/profile-turn-bench.json",
+    "target/prune-old/release/solvers.exe solve experiments/p1-perf-2026-10/dead-subtree-20261007/flop1_f32.toml --threads 8 --out runs/dead-subtree-20261007/flop1-f32-old-r2",
+    "target/release/solvers.exe solve experiments/p1-perf-2026-10/dead-subtree-20261007/flop1_f32.toml --threads 8 --out runs/dead-subtree-20261007/flop1-f32-new (interrupted)",
+    "target/release/examples/verify_save.exe checkpoint-compare runs/dead-subtree-20261007/flop1-f32-old-r2/checkpoint.ckpt runs/dead-subtree-20261007/flop1-f32-old-r2/checkpoint.ckpt (self-validation only)",
+    "target/release/examples/verify_save.exe solution-stream runs/dead-subtree-20261007/flop1-f32-old-r2/solution.sol runs/dead-subtree-20261007/flop1-f32-old-r2/solution.sol (self-validation only)"
+  ],
+  "failed_attempts": [
+    {
+      "command": "old Flop solve with --out runs/dead-subtree-20261007/flop1-f32-old",
+      "result": "memory allocation of 1409458680 bytes failed while instrumentation/builds overlapped; retried alone successfully"
+    },
+    {
+      "command": "initial focused engine unit compile",
+      "result": "test helper missing type parameter and HsDcfr not Default; corrected"
+    },
+    {
+      "command": "initial workspace clippy",
+      "result": "verify_save op_ref; corrected and final workspace clippy passed"
+    }
+  ]
+}

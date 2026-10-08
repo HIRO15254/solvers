@@ -100,6 +100,7 @@ struct RawRun {
     memory: Option<Value>,
     max_time: Option<String>,
     checkpoint_interval: Option<String>,
+    final_checkpoint: Option<bool>,
 }
 
 fn type_error(key: &str, expected: &str) -> SpotError {
@@ -187,6 +188,7 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             ("memory", "auto_integer"),
             ("max_time", "string"),
             ("checkpoint_interval", "string"),
+            ("final_checkpoint", "bool"),
         ],
         primitive => {
             let valid = match primitive {
@@ -355,7 +357,7 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
         }
     }
     let tree = tree(raw.tree, config_path, product)?;
-    let run = run(raw.run)?;
+    let run = run(raw.run, product)?;
     Ok(Document {
         spot: Spot {
             meta: raw.meta,
@@ -974,7 +976,17 @@ fn duration(text: &str, key: &str) -> Result<f64, SpotError> {
     Ok(seconds)
 }
 
-fn run(raw: RawRun) -> Result<Run, SpotError> {
+fn run(raw: RawRun, product: Product) -> Result<Run, SpotError> {
+    if raw.final_checkpoint.is_some() && product != Product::HuPostflop {
+        return Err(SpotError::new(
+            Code::NLH002,
+            "run.final_checkpoint",
+            format!(
+                "this spot is solved by {}; this key belongs to the other product",
+                product.name()
+            ),
+        ));
+    }
     let threads = match raw.threads {
         None => None,
         Some(Value::String(s)) if s == "auto" => None,
@@ -1036,5 +1048,6 @@ fn run(raw: RawRun) -> Result<Run, SpotError> {
             raw.checkpoint_interval.as_deref().unwrap_or("15m"),
             "run.checkpoint_interval",
         )?,
+        final_checkpoint: raw.final_checkpoint.unwrap_or(true),
     })
 }

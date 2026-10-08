@@ -1,0 +1,1 @@
+v2 payload bit identical: 335460 strategy/value blocks

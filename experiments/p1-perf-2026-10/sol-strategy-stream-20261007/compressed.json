@@ -1,0 +1,84 @@
+{
+  "turn6": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\examples\\verify_t3b.exe",
+      "runs\\p1-t3b\\old-turn6\\solution.sol",
+      "runs\\p1-t3b\\typed-new-turn6\\solution.sol",
+      "runs\\p1-t3b\\typed-turn6-old-fixed.sol",
+      "runs\\p1-t3b\\typed-turn6-new-fixed.sol"
+    ],
+    "blake3": "3b2b0773a8e705e0d6ba904fb7d06f90a397e791a7826716722b1c58f464447c",
+    "bytes": 33316695,
+    "file_bit_equal_at_wall_secs_zero": true,
+    "new_codec": "current write_sol_stream with individual fields/blocks",
+    "old_codec": "archived HEAD 6234545 write_sol",
+    "threads": 8
+  },
+  "river6-i16": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\examples\\verify_t3b.exe",
+      "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+      "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol",
+      "runs\\p1-t3b\\typed-river6-i16-old-fixed.sol",
+      "runs\\p1-t3b\\typed-river6-i16-new-fixed.sol"
+    ],
+    "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+    "bytes": 73007,
+    "file_bit_equal_at_wall_secs_zero": true,
+    "new_codec": "current write_sol_stream with individual fields/blocks",
+    "old_codec": "archived HEAD 6234545 write_sol",
+    "threads": 8
+  },
+  "turn6-no-rivers": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\examples\\verify_t3b.exe",
+      "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+      "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol",
+      "runs\\p1-t3b\\typed-turn6-no-rivers-old-fixed.sol",
+      "runs\\p1-t3b\\typed-turn6-no-rivers-new-fixed.sol"
+    ],
+    "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+    "bytes": 82566,
+    "file_bit_equal_at_wall_secs_zero": true,
+    "new_codec": "current write_sol_stream with individual fields/blocks",
+    "old_codec": "archived HEAD 6234545 write_sol",
+    "threads": 8
+  },
+  "flop4-payload": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+      "solution-stream",
+      "runs\\p1-t3b\\typed-old-flop4\\solution.sol",
+      "runs\\p1-t3b\\typed-new-flop4\\solution.sol"
+    ],
+    "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+    "file_bytes_equal": false,
+    "normalized_payload_blake3": "a3655c2fee1816bd085656111129500ef29301c805fcbd113ee2fe636d50d7a7",
+    "payload_bit_equal_except_wall_secs": true,
+    "payload_bytes": [
+      1323285700,
+      1323285700
+    ],
+    "strategy_blocks": 335460,
+    "value_blocks": 335460,
+    "wall_secs": [
+      24.7590069,
+      24.9304069
+    ]
+  },
+  "flop4": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\examples\\verify_t3b.exe",
+      "runs\\p1-t3b\\typed-old-flop4\\solution.sol",
+      "runs\\p1-t3b\\typed-new-flop4\\solution.sol",
+      "runs\\p1-t3b\\typed-flop4-old-fixed.sol",
+      "runs\\p1-t3b\\typed-flop4-new-fixed.sol"
+    ],
+    "blake3": "8ae414a68e9ebd6ab88540d07816ac40c121004489a33a3346cfee9f169c6c2f",
+    "bytes": 176246960,
+    "file_bit_equal_at_wall_secs_zero": true,
+    "new_codec": "current write_sol_stream with individual fields/blocks",
+    "old_codec": "archived HEAD 6234545 write_sol",
+    "threads": 8
+  }
+}

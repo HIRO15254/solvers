@@ -1,0 +1,2 @@
+[ perf record: Woken up 3 times to write data ]
+[ perf record: Captured and wrote 6.073 MB /home/PC_User/perf31_gtowb_t32.data (158889 samples) ]

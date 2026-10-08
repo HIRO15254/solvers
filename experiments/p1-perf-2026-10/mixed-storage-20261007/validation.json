@@ -1,0 +1,170 @@
+{
+  "environment": {
+    "CARGO_BUILD_JOBS": 2,
+    "RUST_TEST_THREADS": 2,
+    "CARGO_NET_OFFLINE": true
+  },
+  "results": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_secs": 3.6198836999974446,
+      "log": "runs/p1-t6/validation-0.log",
+      "free_bytes_after": 8482074624,
+      "tail": []
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "wall_secs": 1.7475959000003058,
+      "log": "runs/p1-t6/validation-1.log",
+      "free_bytes_after": 8481054720,
+      "tail": [
+        "    Checking hu-postflop v0.1.0 (C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\crates\\hu-postflop)",
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.21s"
+      ]
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "wall_secs": 335.58904999999504,
+      "log": "runs/p1-t6/validation-2.log",
+      "free_bytes_after": 4711219200,
+      "test_counts": {
+        "passed": 871,
+        "failed": 0,
+        "ignored": 31
+      },
+      "tail": [
+        "   Doc-tests runfiles",
+        "",
+        "running 0 tests",
+        "",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "",
+        "   Doc-tests spot",
+        "",
+        "running 0 tests",
+        "",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        ""
+      ]
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "wall_secs": 0.11637019999761833,
+      "log": "runs/p1-t6/validation-3.log",
+      "free_bytes_after": 4676878336,
+      "tail": [
+        "Documentation check passed: 23 Markdown files."
+      ]
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "cli"
+      ],
+      "exit_code": 0,
+      "wall_secs": 70.94099409999762,
+      "log": "runs/p1-t6/validation-4.log",
+      "free_bytes_after": 7471472640,
+      "tail": [
+        "   Compiling hu-postflop v0.1.0 (C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\crates\\hu-postflop)",
+        "   Compiling cli v0.1.0 (C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\crates\\cli)",
+        "    Finished `release` profile [optimized] target(s) in 1m 10s"
+      ]
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "hu-postflop",
+        "--example",
+        "verify_save",
+        "--example",
+        "p1_bench"
+      ],
+      "exit_code": 0,
+      "wall_secs": 25.245907800002897,
+      "log": "runs/p1-t6/validation-5.log",
+      "free_bytes_after": 7470628864,
+      "tail": [
+        "   Compiling hu-postflop v0.1.0 (C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\crates\\hu-postflop)",
+        "    Finished `release` profile [optimized] target(s) in 25.18s"
+      ]
+    }
+  ],
+  "final_documentation_sync_checks": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_secs": 1.0074300999986008,
+      "log": "runs/p1-t6/final-check-0.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "wall_secs": 0.497647500000312,
+      "log": "runs/p1-t6/final-check-1.log"
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "wall_secs": 0.10759910000342643,
+      "log": "runs/p1-t6/final-check-2.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "wall_secs": 0.06460480000532698,
+      "log": "runs/p1-t6/final-check-3.log"
+    }
+  ],
+  "measurement_vs_handoff_changes": "Only a test-side reference backend combining existing I16Storage and F32Storage was added after measurement. All other source LF hashes were checked unchanged; the complete workspace checks were rerun. Rebuilding changed executable raw hashes; measurement and current hashes/PE timestamps are recorded separately, and final v2 payloads were bit-identical to both HEAD and the original measurement."
+}

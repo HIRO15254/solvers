@@ -1,0 +1,36 @@
+columns-nine-1-t25-kernels
+columns-nine-1-transpose-kernels
+columns-nine-1-columns-kernels
+columns-btn_bb-1-t25-kernels
+columns-btn_bb-1-transpose-kernels
+columns-btn_bb-1-columns-kernels
+columns-wide-1-t25-kernels
+columns-wide-1-transpose-kernels
+columns-wide-1-columns-kernels
+columns-nine-2-t25-kernels
+columns-nine-2-transpose-kernels
+columns-nine-2-columns-kernels
+columns-btn_bb-2-t25-kernels
+columns-btn_bb-2-transpose-kernels
+columns-btn_bb-2-columns-kernels
+columns-wide-2-t25-kernels
+columns-wide-2-transpose-kernels
+columns-wide-2-columns-kernels
+columns-nine-3-t25-kernels
+columns-nine-3-transpose-kernels
+columns-nine-3-columns-kernels
+columns-btn_bb-3-t25-kernels
+columns-btn_bb-3-transpose-kernels
+columns-btn_bb-3-columns-kernels
+columns-wide-3-t25-kernels
+columns-wide-3-transpose-kernels
+columns-wide-3-columns-kernels
+nine t25-kernels 98089.24086757991 [109956.5064102564, 89599.34012066366, 98089.24086757991]
+nine transpose-kernels 89562.48089658686 [111249.71324296141, 89562.48089658686, 86330.26204564667]
+nine columns-kernels 84336.52234636871 [87425.5720157036, 83705.14471057884, 84336.52234636871]
+btn_bb t25-kernels 1434909.6875 [1597791.4814814816, 1434909.6875, 1392568.1818181816]
+btn_bb transpose-kernels 1325373.523391813 [1448555.5, 1325373.523391813, 1148440.2529761905]
+btn_bb columns-kernels 1109614.2857142857 [1151645.5128205128, 1109614.2857142857, 1085003.0185758513]
+wide t25-kernels 3839724.837662338 [3825422.916666667, 4416710.416666666, 3839724.837662338]
+wide transpose-kernels 3475322.8846153845 [3642463.229166667, 3399876.4285714286, 3475322.8846153845]
+wide columns-kernels 3282779.125 [3270538.75, 3324871.25, 3282779.125]

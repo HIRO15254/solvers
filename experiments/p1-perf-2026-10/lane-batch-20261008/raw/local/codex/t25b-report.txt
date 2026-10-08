@@ -1,0 +1,122 @@
+T25b: lane-batched f32 CFR after removing T24
+Status: completed locally, uncommitted on s3-p1-t25 at 76089bc; baseline b01d4a4 (T23).
+Local whole-iteration reductions: river39.3%, turn2 22.1%, flop1 18.4%. Milan32-thread results remain for the reviewer.
+
+Files changed (relative HEAD):
+  crates/hu-engine/src/solver.rs
+  crates/hu-engine/src/solver/batch.rs
+  crates/hu-engine/src/solver/batch_tests.rs
+  crates/hu-engine/src/solver/opponent_terminal_tests.rs
+  crates/hu-postflop/benches/kernels.rs
+  crates/hu-postflop/src/batch_precision_tests.rs
+  crates/hu-postflop/src/kernel.rs
+  crates/hu-postflop/src/opponent_precision_tests.rs
+  crates/hu-postflop/src/postflop.rs
+  crates/hu-postflop/src/precision_tests.rs
+  docs/architecture.md
+  docs/hu-postflop.jp.md
+opponent_precision_tests.rs is only the T24 reversal; it equals b01d4a4 exactly.
+No Cargo.toml, dependencies, frozen crates, format or experiments changes; no commit/stash/reset/branch switch.
+
+Step 0:
+Reverse-applied the supplied t24.patch to five files: kernel.rs, postflop.rs, precision_tests.rs, opponent_precision_tests.rs, hu-postflop.jp.md.
+One compat-helper hunk rejected next to the new lane kernel; restored that block from b01d4a4 by hand, retaining T25a.
+Qualified the new support bound as nlh::NUM_COMBOS. Removed dense_compat_sums_f32, DENSE_MIN_HANDS and dense combo kernel parameters.
+The original kernels/math are identical to T23. Reverse log/reject and both complete source patches are retained.
+Rebuilt and reported the following T25a results before editing the engine; three alternating runs per method/workload, CPU0 mask0x1, Rayon1.
+Time is median of three Criterion median estimates; each replay combines both players and three snapshots (846 terminal outputs).
+Both use pot20/stack200, bet fractions0.33/0.75/1.5, max_raises3, f64 solving300+50+50. RiverConfig has no explicit all-in flag; stack clamping applies.
+BTN/BB uses the requested ranges on Ks7h2d3c9s. Wide retains the existing board2c7d9hJsQs.
+Each player/snapshot:141 terminals,18 eight-lane batches,97.9167% fill;423 terminals/player over three snapshots.
+Workload | supports P0/P1 | lone ms | current ms | batch ms | batch/current | batch/lone
+btn_bb | 407/441 | 2.956715 | 2.426165 | 1.469332 | 0.605619 | 0.496947
+wide | 1081/1081 | 7.555446 | 5.906325 | 4.082408 | 0.691193 | 0.540327
+Current reproduces CFR pairs, action order, action-strategy child reaches and zero pruning; opponent terminal pairs output aggregate node CFVs.
+Lone/batch output individual terminal values, including zero reaches. Caller output/reference metadata is prepared outside the timer.
+
+Refreshed fixed-work estimates against T23 (one external repeat,20 Criterion samples; estimates include a full sweep):
+Workload | batch us/terminal | real one-lane us/call | zero one-lane us/call | zero eight-lane us/call (us/lane)
+btn_bb | 1.737 | 4.476 | 4.402 | 10.766 (1.346)
+wide | 4.826 | 11.565 | 10.690 | 28.512 (3.564)
+Zero reaches do not bypass the sweep; these are fixed-work estimates at a support/width, not pure dispatch timings.
+
+Kernel layout and grouping:
+T25a API eval_cfr_batch accepts arbitrary terminal IDs (including repeats), opponent slices and separate zeroed output rows.
+Evaluator maps river folds to existing showdown rank tables at construction, sorts reused TLS indices by table, then dispatches widths1..8.
+Early folds/runouts without a single table and f64 precision fall back to eval_cfr. Default trait API calls eval_cfr once per terminal.
+Kernel TLS float vectors use active prefixes (opp_support+1)*L and own_support*L; only sentinel row cleared, live values written, caller outputs cleared.
+Active reach+value prefixes: BTN/BB27,168B and wide69,216B atL8. Stack card sums52*L floats plus lane vectors.
+Tied hands are reread instead of resetting52*L group sums; interleaved output is copied to separate terminal rows.
+Linked width8 kernel frame2,904B; evaluator entry552B. Engine frames1,080..1,128B, rather than the original87KiB fixed stack prototype.
+Warm calls allocate no new buffers; first use/growth can allocate and worker high-water capacities are retained.
+
+Engine:
+Entry: F32 && Action && !subtree_has_chance[node] && subtree_elements(node)<2*ACTION_PAR_MIN_ELEMENTS (32768).
+Exactly the ActionViews Ambient bound, entered at the first eligible recursion node; no internal recursive traversal or parallel actions.
+Verified fill reserves contiguous sibling blocks; parent IDs precede children and descendants are a contiguous interval excluding the root.
+A metadata-only sizing walk finds the descendant end/max own work length, then three phases:
+1. Root then ascending descendants: regret matching; actor-scaled child reaches; unchanged reaches share root/ancestor offsets.
+2. One eval_cfr_batch over the collected terminal IDs and separate zeroed value rows.
+3. Descending descendants then root: own CFV/action-order sums; v_a-CFV; update_regrets then accumulate_strategy with phase1 own-reach*sigma rows.
+Opponent CFVs sum children in child order. PRUNE skips matching at zero-opp opponent nodes and excludes zero-reach terminals; own descendants still update.
+All-zero rows stay shared. PRUNE false evaluates zero reaches. Root output receives its value row.
+Four LIFO scratch float arenas: sigma and scaled reaches mirror storage span, node values use nodes*own_support, work uses largest own action block.
+Leased TLS metadata uses node reach offsets, terminal IDs and empty recycled reference vectors. No RefCell borrow crosses evaluator calls.
+Safe in-place collect recycles empty reference-vector allocations across lifetimes; debug checks verified pointer retention on the installed standard library.
+Old T20/T21 hooks remain outside eligible subtrees; f64 recursive match, EV/BR/evaluation passes and file formats unchanged.
+Other evaluators use the batch default; engine/toy tests show exact values/state for the independent evaluator.
+
+Maximum logical arena sizes per call (bytes; larger allocator high-water capacities may be retained):
+Tree | root supports P0/P1 | batch roots/player/pass | nodes/terminals at max | sigma | scaled reaches | values | work | metadata | engine total | kernel active
+river | [441, 407] | 5 | 50/33 | 83308 | 83308 | 88200 | 7056 | 2388 | 264260 | 27168
+turn2 | [81, 115] | 624 | 75/49 | 29008 | 29008 | 34500 | 2300 | 3564 | 98380 | 6304
+flop1 | [479, 436] | 58800 | 15/9 | 25620 | 25620 | 28740 | 5748 | 684 | 86412 | 29312
+Totals include node+terminal reference metadata, exclude caller/root buffers and kernel stack. Kernel active is reusable reach+value storage.
+Full per-root/per-player rows are retained in arenas.jsonl; sums over all calls describe traffic, not simultaneous retained memory.
+
+p1_bench whole-iteration benchmark:
+Reviewer-provided t23-p1_bench.exe used as-is; new built with cargo build --release -p hu-postflop --example p1_bench.
+Three alternating baseline/new runs, --evals0; river threads1 warmup20 iters200; turn2 threads1 warmup5 iters50; flop1 threads4 warmup2 iters6.
+Single-thread mask0x1; four-thread mask0x55 (logical CPUs0/2/4/6); Rayon threads1/4. Local Intel i7-10700KF, not the Milan VM.
+Tree | baseline seconds/iteration | new seconds/iteration | new/base | paired ratio range
+river | 0.000446990 | 0.000271213 | 0.606755 | 0.568567..0.752461
+turn2 | 0.027093030 | 0.021118638 | 0.779486 | 0.740278..0.790274
+flop1 | 1.028216567 | 0.839383733 | 0.816349 | 0.816349..0.837088
+Flop1 was run; peak process memory reached3,005,984,768B (~2.80GiB), within measured commit headroom (~7.29GB before run).
+Raw JSON/logs, configuration/executable hashes and paired ratios are retained. River timings show considerable host noise.
+
+Accuracy, determinism and identity:
+Independent real-card river/full-turn traversal tests compare every own/opponent action CFV, regret and strategy sum: both players, PRUNE true/false, zero action/root reaches.
+The corrected called-turn fixture was rerun after the full suite: maximum relative difference0, pass. Warm second calls exercise metadata reuse.
+Actual PostflopEvaluator river/turn comparison against recursive per-terminal f32: max relative per-node state difference8.373884944753294e-7 (<1e-5).
+T25a real48-rank-table tests include river/early folds, dead hands, all-zero/-0.0, every lane versus f64: max relative error1.8357778809248764e-6.
+Grouping singleton/packed8/packed7/mixed/reordered calls and Rayon1/4 tested bitwise. Existing F32Storage/I16Storage/MixedStorage determinism tests now assert eligible subtrees exist.
+F64: full turn tree12-iteration solve, numerical progress at4/8/12; all three storage backends at1/4threads.
+Fresh actual b01d4a4 production source baseline was built only for identity tests, then restored; reviewer p1 benchmark baseline was never rebuilt.
+All18 decoded .sol payload/checkpoint arena/progress files byte-equal to baseline and across thread counts; elapsed wall-clock fields excluded.
+Source audit:34 original functions/recursive matches unchanged from T23, including f64/EV/BR/math kernels.
+
+Verification:
+cargo test --workspace: 929 passed, 0 failed, 31 ignored (full output tests.log).
+After the test-only turn-payoff correction, the affected unit test passed again (batch-unit-final.log); production sources used in full tests/benchmarks are unchanged.
+Final cargo fmt --all --check and cargo clippy --workspace --all-targets -- -D warnings passed.
+python tools/check_docs.py passed (23 Markdown files); both Japanese CFR description and engine architecture updated.
+Initial workspace run caught an obsolete T21 hook assertion for an empty-support eligible subtree; updated routing expectation, retained numerical/state assertions, full rerun passed.
+All Cargo commands serialized with CARGO_BUILD_JOBS=1, CARGO_INCREMENTAL=0. No T25b OOM retry required.
+Release linked executable inspection shows AVX2 reach/value/regret loops in all three engine storage specializations and lane arithmetic in width8 kernel.
+One accumulator per hand/lane; no ILP trick, unsafe or reach-dependent branch inside per-hand loops. Bounds checks remain only for shared hand/card indexing.
+
+Historical T25a variants (before T24 removal; useful within-series, not T23 baseline timings):
+BTN/BB fixed87KiB stack1.687485ms; support-sized interleaved1.672297ms; reset/merge1.918003ms (1.147x reread); direct scatter1.668987ms (0.998x, noise tie, own arithmetic scalarized).
+Kept support-sized TLS/interleaved and tied-hand reread. Original/final real singleton: BTN/BB11.788/4.746us, wide24.204/15.849us.
+No max-four-lane alternative tried. Raw variant evidence remains under runs/t25a; those timings are historical, T24 baseline.
+
+Remaining uncertainties:
+Local1/4-thread results do not establish Milan16/32-thread or SMT/L1 behavior; reviewer VM iteration benchmarks remain decisive.
+Engine arenas are substantially larger than32KiB; these are reused worker heap buffers, and the terminal active prefixes remain proportional to supports/width.
+High-water capacity retention and current std in-place Vec collection are deliberate reuse choices. No allocation counter was added; reuse is structurally verified and debug pointer-tested.
+
+Artifacts:
+manifest.json, summary.json, f64-identity.json, source-vs-head.patch/source-vs-t23.patch and source snapshots describe the final uncommitted state.
+C:\Users\PC_User\AppData\Local\Temp\claude\C--Users-PC-User-orca-workspaces-solvers-cisco\7b8f3bb9-2812-4052-b020-84dc5d1829b4\scratchpad\t25b-p1_bench.exe
+C:\Users\PC_User\AppData\Local\Temp\claude\C--Users-PC-User-orca-workspaces-solvers-cisco\7b8f3bb9-2812-4052-b020-84dc5d1829b4\scratchpad\t25a-bench.exe (refreshed T23 stage1 executable)

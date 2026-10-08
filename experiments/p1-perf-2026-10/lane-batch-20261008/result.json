@@ -1,0 +1,199 @@
+{
+ "base": "t23",
+ "runs": {
+  "vm40": {
+   "p1_bench": {
+    "flop1_t16": {
+     "median_secs_per_iter": {
+      "t23": 0.13812,
+      "t25": 0.11224
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8126
+     }
+    },
+    "flop1_t1": {
+     "median_secs_per_iter": {
+      "t23": 1.72523,
+      "t25": 1.46339
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8482
+     }
+    },
+    "flop1_t32": {
+     "median_secs_per_iter": {
+      "t23": 0.11928,
+      "t25": 0.09779
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8198
+     }
+    },
+    "gtowb_t32": {
+     "median_secs_per_iter": {
+      "t23": 0.82771,
+      "t25": 0.68806
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8313
+     }
+    },
+    "river_t32": {
+     "median_secs_per_iter": {
+      "t23": 0.00022,
+      "t25": 0.00018
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8182
+     }
+    },
+    "turn2_t32": {
+     "median_secs_per_iter": {
+      "t23": 0.00112,
+      "t25": 0.00097
+     },
+     "ratio_vs_t23": {
+      "t25": 0.8661
+     }
+    }
+   },
+   "eval_secs_median": {},
+   "solves_32t": {
+    "c_turn2_f64": {
+     "t23": {
+      "iterations": 247,
+      "solve_secs": 0.398,
+      "secs_per_iter": 0.00161
+     },
+     "t25": {
+      "iterations": 247,
+      "solve_secs": 0.398,
+      "secs_per_iter": 0.00161
+     },
+     "solve_ratio_vs_t23": {
+      "t25": 1.0
+     }
+    },
+    "c_turn2": {
+     "t23": {
+      "iterations": 235,
+      "solve_secs": 0.293,
+      "secs_per_iter": 0.00125,
+      "crossing": 232.2
+     },
+     "t25": {
+      "iterations": 239,
+      "solve_secs": 0.281,
+      "secs_per_iter": 0.00118,
+      "crossing": 235.9
+     },
+     "solve_ratio_vs_t23": {
+      "t25": 0.959
+     }
+    },
+    "c_flop1": {
+     "t23": {
+      "iterations": 184,
+      "solve_secs": 21.891,
+      "secs_per_iter": 0.11897,
+      "crossing": 182.6
+     },
+     "t25": {
+      "iterations": 192,
+      "solve_secs": 19.464,
+      "secs_per_iter": 0.10137,
+      "crossing": 191.8
+     },
+     "solve_ratio_vs_t23": {
+      "t25": 0.8891
+     }
+    },
+    "c_flop3": {
+     "t23": {
+      "iterations": 410,
+      "solve_secs": 154.813,
+      "secs_per_iter": 0.37759,
+      "crossing": 408.4
+     },
+     "t25": {
+      "iterations": 426,
+      "solve_secs": 132.48,
+      "secs_per_iter": 0.31099,
+      "crossing": 424.9
+     },
+     "solve_ratio_vs_t23": {
+      "t25": 0.8557
+     }
+    },
+    "c_gtowb": {
+     "t23": {
+      "iterations": 319,
+      "solve_secs": 271.805,
+      "secs_per_iter": 0.85205,
+      "crossing": 316.8
+     },
+     "t25": {
+      "iterations": 305,
+      "solve_secs": 219.776,
+      "secs_per_iter": 0.72058,
+      "crossing": 304.9
+     },
+     "solve_ratio_vs_t23": {
+      "t25": 0.8086
+     }
+    }
+   },
+   "sol_payload_bit_equal": {
+    "c_turn2_f64_t23_t25": true
+   },
+   "checks": {
+    "fmt": "0",
+    "clippy": "0",
+    "test": "101",
+    "tests": {
+     "passed": 189,
+     "failed": 1,
+     "ignored": 7
+    }
+   }
+  }
+ },
+ "final_patch_checks_vm43": {
+  "patch": "scripts/t25.patch",
+  "checks": {
+   "fmt": "0",
+   "clippy": "0",
+   "test": "0",
+   "check_docs": "0",
+   "tests": {
+    "passed": 933,
+    "failed": 0,
+    "ignored": 32
+   }
+  },
+  "note": "vm40 measured scripts/t25-measured.patch; the final patch differs only in two engine test files and docs/hu-postflop.jp.md"
+ },
+ "memory_bandwidth_probe": {
+  "1": {
+   "rmw_2r1w_GBps": 51.8,
+   "triad_2r1w_GBps": 34.5
+  },
+  "4": {
+   "rmw_2r1w_GBps": 138.4,
+   "triad_2r1w_GBps": 96.9
+  },
+  "8": {
+   "rmw_2r1w_GBps": 147.3,
+   "triad_2r1w_GBps": 104.6
+  },
+  "16": {
+   "rmw_2r1w_GBps": 138.0,
+   "triad_2r1w_GBps": 99.8
+  },
+  "32": {
+   "rmw_2r1w_GBps": 137.8,
+   "triad_2r1w_GBps": 99.1
+  }
+ }
+}

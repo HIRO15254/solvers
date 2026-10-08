@@ -1,0 +1,108 @@
+{
+  "command": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+    "solve",
+    "experiments/p1-perf-2026-10/streaming-save-20261006/flop4.toml",
+    "--out",
+    "runs/p1-t3/new-final-flop",
+    "--threads",
+    "8"
+  ],
+  "binary_sha256": "92d658cb262222512cf4187a2cb9a3768fc79df24592b985a0207f575d50413d",
+  "exit_code": 0,
+  "wall_seconds": 38.9672759999994,
+  "peak_working_set_bytes": 4482621440,
+  "peak_commit_bytes": 4559519744,
+  "memory_samples": 652,
+  "checkpoints": [
+    {
+      "iteration": 2,
+      "seconds": 16.046318199998495,
+      "save_seconds": 5.3949503999974695
+    },
+    {
+      "iteration": 4,
+      "seconds": 29.501485500000854,
+      "save_seconds": 6.700827000000572
+    }
+  ],
+  "solution_seconds": 9.465790499998548,
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 1098800954,
+      "sha256": "b423936f157e7ae892831865d6c0eb81d51abc3caf3907a3b63ce203ab786c21"
+    },
+    "solution.sol": {
+      "bytes": 176246962,
+      "sha256": "4c4e29205565bb921f5b965ac64f39d04f26b052c20a10fc6d09a95f14742e39"
+    }
+  },
+  "stdout": [
+    {
+      "seconds": 1.1497664999988046,
+      "line": "tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16)"
+    },
+    {
+      "seconds": 1.1498095999995712,
+      "line": "warning: no stop target: runs until max_iterations or max_time"
+    },
+    {
+      "seconds": 10.651367800001026,
+      "line": "iter=       2 expl_p0=7.794e0 expl_p1=1.927e1 nash_conv=2.706e1"
+    },
+    {
+      "seconds": 22.80065850000028,
+      "line": "iter=       4 expl_p0=1.389e1 expl_p1=6.707e0 nash_conv=2.059e1"
+    },
+    {
+      "seconds": 29.345071700001427,
+      "line": "done: iterations=4 wall=26.19s ev_p0=-4.060810 ev_p1=8.715177 nash_conv=2.059e1"
+    },
+    {
+      "seconds": 37.31633090000105,
+      "line": "sol: wrote runs/p1-t3/new-final-flop\\solution.sol (168.08 MB, 335460 blocks, mode=Full)"
+    }
+  ],
+  "events": [
+    {
+      "seconds": 1.172523799999908,
+      "seq": 0,
+      "unixMs": 1791295876739,
+      "level": "info",
+      "kind": "state",
+      "state": "running"
+    },
+    {
+      "seconds": 16.046318199998495,
+      "seq": 1,
+      "unixMs": 1791295891644,
+      "level": "info",
+      "kind": "checkpoint",
+      "sweeps": 2
+    },
+    {
+      "seconds": 29.501485500000854,
+      "seq": 2,
+      "unixMs": 1791295905044,
+      "level": "info",
+      "kind": "checkpoint",
+      "sweeps": 4
+    },
+    {
+      "seconds": 29.501492899998993,
+      "seq": 3,
+      "unixMs": 1791295905044,
+      "level": "info",
+      "kind": "stop",
+      "reason": "max-iterations"
+    },
+    {
+      "seconds": 38.91040290000092,
+      "seq": 4,
+      "unixMs": 1791295914505,
+      "level": "info",
+      "kind": "state",
+      "state": "completed"
+    }
+  ]
+}

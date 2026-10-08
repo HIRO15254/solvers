@@ -1,0 +1,15 @@
+{
+ "hash_note": "SHA-256 of LF-normalized bytes",
+ "source": {
+  "solvers": "no solver run; simulation over curves recorded by 31a8b7a (GCP sweeps) and the local phase-J build, kept in ../dcfr-pdcfr-20261007/raw (manifested there)",
+  "script": "scripts/simulate.py (Python 3, standard library only)"
+ },
+ "machine": "local Windows PC (simulation only)",
+ "inputs": "experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/raw/{sweep1..4,localj}.{results,progress}.jsonl and raw/conv/c_gtowb_*.progress.jsonl",
+ "reproduction_status": "verified",
+ "files": {
+  "README.md": "5a5dba8c78b0bf6fb21e81a759c33d7d2951be0be91808162d27239ef4617726",
+  "result.json": "9ccbdcfc683335b00a1d1d706f4e8ca998b51e6e863e78125e635269a55ac228",
+  "scripts/simulate.py": "78b5396f358964af3dd930bdbac0687a94ed9e1535cace60cb7b6ba9e18934e0"
+ }
+}

@@ -1,0 +1,46 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB r11, BTN r24, BB c"
+board = "Qd 8c 3h"
+
+[ranges]
+BTN = "QQ+,AKs,A5s-A4s,AKo"
+BB = "QQ-TT,AKs,AQs,KQs,AKo"
+
+[tree]
+script = '''
+flop { replace bet [33, 75] }
+turn, river { replace bet [75] }
+flop, turn, river { replace raise [3x] }
+'''
+
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+
+[solver]
+storage = "f32"
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+target = "0.1%pot"
+max_iterations = 2000
+check_every = 25
+
+[run]
+checkpoint_interval = "10h"

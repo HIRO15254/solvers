@@ -1,0 +1,2 @@
+f64 add, compat_sums, same_reach, showdown_kernel, fold_kernel: unchanged function bodies and signatures. Shared Hand layout unchanged.
+TerminalEvaluator::eval: unchanged. F64 dispatch uses the original kernels and argument values.

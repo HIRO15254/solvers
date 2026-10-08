@@ -1,0 +1,17 @@
+FMT_OK
+CLIPPY_EXIT 0
+TEST_EXIT 0
+TOTAL passed 899 failed 0 ignored 31
+Documentation check passed: 23 Markdown files.
+DOCS_EXIT 0
+C:              476G  470G  6.7G  99% /c
+    Finished `release` profile [optimized] target(s) in 3m 09s
+    Finished `release` profile [optimized] target(s) in 1m 24s
+{"storage": "f32", "payload_equal": true, "checkpoint_equal": true, "checkpoint": "iteration=6 storage_blake3=8d244b30f92b592a0cc592694427522c9645fcf71f08f55a7057e83704381418", "export_equal": {"strategy": true, "ev": true}, "nashconv_equal": true}
+{"storage": "i16", "payload_equal": true, "checkpoint_equal": true, "checkpoint": "iteration=6 storage_blake3=11a502c862a657f253274174dfe81641bf6c4c8fa0508310e9ac001b1e7cccce", "export_equal": {"strategy": true, "ev": true}, "nashconv_equal": true}
+{"storage": "i16-f32avg", "payload_equal": true, "checkpoint_equal": true, "checkpoint": "iteration=6 storage_blake3=0c4df62c022bfaa7872826f1b1f3351a80c6112aabc5a83fe4f3c264bdc695e1", "export_equal": {"strategy": true, "ev": true}, "nashconv_equal": true}
+{"gtow_a": "t9", "exit": 0, "estimate": 53678428146, "storage": 42492686920, "save": 10908913496, "compression": 276827730}
+{"gtow_a": "t10", "exit": 0, "estimate": 42769514650, "storage": 42492686920, "save": 10908913496, "compression": 276827730}
+ALL_EQUAL
+
+[exited with code 0]

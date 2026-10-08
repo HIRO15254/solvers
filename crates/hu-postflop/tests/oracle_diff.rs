@@ -291,7 +291,8 @@ fn export_profile(
         let sref = tree.storage_ref(node);
         let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
         for hand in 0..num_hands {
-            let key = format!("{hand}|{}", info.history);
+            let global = solver.game().evaluator.hands.combos(node.player)[hand];
+            let key = format!("{global}|{}", info.history);
             let dist: Vec<f64> = (0..num_actions)
                 .map(|a| sigma[a * num_hands + hand] as f64)
                 .collect();
@@ -311,7 +312,18 @@ fn sequential() -> ParConfig {
 fn assert_engine_matches_oracle(iters: u64, tol: f64) {
     let game = engine_game();
     let node_info = game.node_info.clone();
-    let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(iters));
+    // Preserve the legacy coefficients and resets used by this frozen-oracle comparison.
+    let mut solver = Solver::<_, F32Storage>::new(
+        game.game,
+        Box::new(Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
+            pow4_reset: true,
+        }),
+        Some(iters),
+    );
+    solver.set_cfr_precision(hu_postflop::CfrPrecision::F64);
     solver.set_par(sequential());
     solver.run(iters);
     let profile = export_profile(&node_info, &solver);
@@ -352,7 +364,16 @@ fn uniform_profiles_agree_between_engine_and_oracle() {
     // rather than a solve bug, so this is the first test to consult when
     // the differential tests above fail.
     let game = engine_game();
-    let solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
+    let solver = Solver::<_, F32Storage>::new(
+        game.game,
+        Box::new(Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
+            pow4_reset: true,
+        }),
+        Some(1),
+    );
     let oracle = MicroHoldem::new();
     let empty: HashMap<String, Vec<f64>> = HashMap::new();
     for (p, op) in [(Player::P0, 0), (Player::P1, 1)] {

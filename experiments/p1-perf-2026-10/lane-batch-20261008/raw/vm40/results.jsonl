@@ -1,0 +1,10 @@
+{"tag": "c_turn2_f64_t23", "side": "t23", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.473, "iterations": 247, "wallSecs": 0.397634328, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_f64_t25", "side": "t25", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.471, "iterations": 247, "wallSecs": 0.398046267, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_t23", "side": "t23", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.366, "iterations": 235, "wallSecs": 0.292631989, "nashConv": 0.04428407393998057}
+{"tag": "c_turn2_t25", "side": "t25", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.353, "iterations": 239, "wallSecs": 0.281259266, "nashConv": 0.0437456340189899}
+{"tag": "c_flop1_t23", "side": "t23", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 29.975, "iterations": 184, "wallSecs": 21.890684713, "nashConv": 0.010765295636889216}
+{"tag": "c_flop1_t25", "side": "t25", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 27.611, "iterations": 192, "wallSecs": 19.463975752, "nashConv": 0.010981154167701956}
+{"tag": "c_flop3_t23", "side": "t23", "base": "c_flop3", "precision": "f32", "exit": 0, "wall": 176.476, "iterations": 410, "wallSecs": 154.81274947, "nashConv": 0.005437709837328664}
+{"tag": "c_flop3_t25", "side": "t25", "base": "c_flop3", "precision": "f32", "exit": 0, "wall": 153.862, "iterations": 426, "wallSecs": 132.48046556, "nashConv": 0.005468692941560271}
+{"tag": "c_gtowb_t23", "side": "t23", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 321.658, "iterations": 319, "wallSecs": 271.80533155, "nashConv": 0.010708677062780447}
+{"tag": "c_gtowb_t25", "side": "t25", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 266.66, "iterations": 305, "wallSecs": 219.776015468, "nashConv": 0.010986145104803113}

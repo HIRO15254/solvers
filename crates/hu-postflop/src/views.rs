@@ -90,7 +90,7 @@ fn resolve_selection(loaded: &LoadedSol, node: &str) -> Result<Selection> {
             NodeKind::Chance => (0..children.len())
                 .find(|&pos| {
                     let label = crate::queries::chance_child_label(
-                        tree,
+                        &loaded.pf_game.game,
                         &loaded.pf_game.node_info,
                         current,
                         pos,
@@ -370,7 +370,9 @@ fn strategy_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<Strate
             rows.push(StrategyRow {
                 history: node.info.history.clone(),
                 actor: seat_name(node.actor).to_string(),
-                combo: combo_label(hand),
+                combo: combo_label(
+                    loaded.pf_game.game.evaluator.hands.combos(node.actor)[hand] as usize,
+                ),
                 weight,
                 probabilities: (0..node.num_actions)
                     .map(|a| node.strategy[a * node.num_hands + hand])
@@ -403,9 +405,9 @@ fn value_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ValueRow>
         for seat in Player::BOTH {
             let base = match seat {
                 Player::P0 => 0,
-                Player::P1 => node.num_hands,
+                Player::P1 => loaded.pf_game.game.evaluator.hands.len(Player::P0),
             };
-            for hand in 0..node.num_hands {
+            for hand in 0..loaded.pf_game.game.evaluator.hands.len(seat) {
                 let weight = reach[seat][hand];
                 if weight <= 0.0 {
                     continue;
@@ -413,7 +415,9 @@ fn value_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ValueRow>
                 rows.push(ValueRow {
                     history: node.info.history.clone(),
                     seat: seat_name(seat).to_string(),
-                    combo: combo_label(hand),
+                    combo: combo_label(
+                        loaded.pf_game.game.evaluator.hands.combos(seat)[hand] as usize,
+                    ),
                     weight,
                     ev: node.values[base + hand],
                 });
@@ -444,7 +448,7 @@ fn range_rows(loaded: &LoadedSol) -> Vec<RangeRow> {
             }
             rows.push(RangeRow {
                 seat: seat_name(seat).to_string(),
-                combo: combo_label(hand),
+                combo: combo_label(loaded.pf_game.game.evaluator.hands.combos(seat)[hand] as usize),
                 weight,
             });
         }

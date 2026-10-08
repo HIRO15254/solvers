@@ -1,0 +1,4 @@
+# The parameter comes from [tree.params] in the TOML input.
+param size = 1bb
+river { replace bet [size] }
+river when !unopened { replace raise [a] }

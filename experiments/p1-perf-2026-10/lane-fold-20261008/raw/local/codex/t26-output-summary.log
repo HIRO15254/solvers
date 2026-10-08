@@ -1,0 +1,36 @@
+output-nine-1-t25-kernels
+output-nine-1-transpose-kernels
+output-nine-1-direct-kernels
+output-btn_bb-1-t25-kernels
+output-btn_bb-1-transpose-kernels
+output-btn_bb-1-direct-kernels
+output-wide-1-t25-kernels
+output-wide-1-transpose-kernels
+output-wide-1-direct-kernels
+output-nine-2-t25-kernels
+output-nine-2-transpose-kernels
+output-nine-2-direct-kernels
+output-btn_bb-2-t25-kernels
+output-btn_bb-2-transpose-kernels
+output-btn_bb-2-direct-kernels
+output-wide-2-t25-kernels
+output-wide-2-transpose-kernels
+output-wide-2-direct-kernels
+output-nine-3-t25-kernels
+output-nine-3-transpose-kernels
+output-nine-3-direct-kernels
+output-btn_bb-3-t25-kernels
+output-btn_bb-3-transpose-kernels
+output-btn_bb-3-direct-kernels
+output-wide-3-t25-kernels
+output-wide-3-transpose-kernels
+output-wide-3-direct-kernels
+nine t25-kernels 96938.8255033557 [96938.8255033557, 95248.17290940767, 97856.52960526316]
+nine transpose-kernels 84284.41176470587 [83996.05401234567, 84284.41176470587, 87371.73295454546]
+nine direct-kernels 95334.27704194261 [97313.33333333333, 95334.27704194261, 91540.4136622391]
+btn_bb t25-kernels 1303386.5584415584 [1615117.2435897435, 1303386.5584415584, 1281309.0909090908]
+btn_bb transpose-kernels 1348041.7095588236 [1161982.0707070706, 1348041.7095588236, 1399960.9090909092]
+btn_bb direct-kernels 1386122.3484848486 [1386122.3484848486, 1355268.5491276402, 1406310.101010101]
+wide t25-kernels 4253100.577731092 [4323422.5, 4055533.0528846155, 4253100.577731092]
+wide transpose-kernels 3635985.5235042735 [3678421.5263157897, 3635985.5235042735, 3456334.435096154]
+wide direct-kernels 4237740.224358974 [3601601.041666667, 4237740.224358974, 4263594.360902255]

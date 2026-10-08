@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "equal": true,
+    "compared_bytes": 300,
+    "sha256": "01147eb450694dfe916fa533a5e47dd227ce8561e30c56a6302f44ccaa5b6872",
+    "excluded_fields": [
+      "wall_secs"
+    ]
+  },
+  "strategy": {
+    "equal": true,
+    "compared_bytes": 70487,
+    "sha256": "2c6b1c60e721d06bd2f4465cec0b3514662c95fea356ac51c7c7190ce0f02cd8",
+    "excluded_fields": []
+  },
+  "ev": {
+    "equal": true,
+    "compared_bytes": 97615,
+    "sha256": "e45bab19bae254467099130de13c971ad203c27c1e2af7d554370c2eee405794",
+    "excluded_fields": []
+  }
+}

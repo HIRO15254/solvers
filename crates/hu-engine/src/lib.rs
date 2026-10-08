@@ -26,9 +26,29 @@ pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, 
 pub use scratch::Scratch;
 pub use solver::{CompiledGame, ParConfig, Solver, SolverState, TerminalEvaluator};
 pub use storage::{
-    F32Storage, F32View, I16Storage, I16View, StateMismatch, Storage, StorageOps, StorageRef,
-    StorageSpan, StorageState, StorageView,
+    F32Storage, F32View, I16Storage, I16View, MixedStorage, MixedView, StateMismatch, Storage,
+    StorageArrays, StorageArraysMut, StorageOps, StorageRef, StorageSpan, StorageState,
+    StorageView,
 };
 pub use tree::{
     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, SparseTransition, TempNode, TreeSpec,
 };
+
+/// Arithmetic precision of CFR terminals and current-strategy regret matching.
+/// Evaluation and average strategy retain their f64 arithmetic in either mode.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
+pub enum CfrPrecision {
+    #[default]
+    F64,
+    F32,
+}
+impl CfrPrecision {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::F64 => "f64",
+            Self::F32 => "f32",
+        }
+    }
+}

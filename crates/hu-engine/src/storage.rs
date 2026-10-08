@@ -1,4 +1,149 @@
+use crate::CfrPrecision;
 use crate::schedule::Discounts;
+use rayon::prelude::*;
+
+/// Arenas smaller than this are left to the allocator's lazy zero pages.
+const PREFAULT_MIN_BYTES: usize = 64 << 20;
+const PREFAULT_PAGE_BYTES: usize = 4096;
+const PREFAULT_CHUNK_BYTES: usize = 1 << 20;
+
+/// Touches every page of a freshly allocated, all-zero arena by writing zero,
+/// in parallel on the current rayon pool.
+///
+/// Large `vec![0; n]` arenas come from untouched zero pages. The first CFR
+/// iteration reads an element before writing it, so the read maps the shared
+/// zero page and the later write takes a copy-on-write fault with a TLB
+/// shootdown to every CPU of the process. Writing first, without reading,
+/// avoids that. Only for arenas that are all zero (`T::default()`).
+fn prefault_zeroed<T: Copy + Default + Send>(arena: &mut [T]) {
+    prefault_zeroed_above(arena, PREFAULT_MIN_BYTES);
+}
+
+fn prefault_zeroed_above<T: Copy + Default + Send>(arena: &mut [T], min_bytes: usize) {
+    let size = std::mem::size_of::<T>();
+    if size == 0 || std::mem::size_of_val(arena) < min_bytes {
+        return;
+    }
+    let page = (PREFAULT_PAGE_BYTES / size).max(1);
+    let chunk = (PREFAULT_CHUNK_BYTES / size).max(page);
+    arena.par_chunks_mut(chunk).for_each(|part| {
+        for i in (0..part.len()).step_by(page) {
+            // SAFETY: `i < part.len()`, so the pointer is in bounds, valid and
+            // aligned for `T`. The arena is all `T::default()`, so the store
+            // leaves it unchanged; `volatile` keeps the store from being elided.
+            unsafe { std::ptr::write_volatile(part.as_mut_ptr().add(i), T::default()) }
+        }
+    });
+}
+
+#[cfg(test)]
+mod precision_tests {
+    use super::*;
+
+    fn check<S: Storage>() {
+        // Cross a block boundary; cover negative regrets and zero columns.
+        let r = StorageRef {
+            offset: 7,
+            num_actions: 7,
+            num_hands: 259,
+            index: 0,
+        };
+        let mut storage = S::new(r.offset + r.len(), 1);
+        let data: Vec<f32> = (0..r.len())
+            .map(|i| {
+                if (i % 259).is_multiple_of(11) {
+                    -1.0
+                } else {
+                    ((i * 37 % 101) as f32 - 20.0) / 103.0
+                }
+            })
+            .collect();
+        let d = Discounts {
+            pos: 1.0,
+            neg: 1.0,
+            avg: 1.0,
+            floor_neg: false,
+            reset_avg: false,
+        };
+        storage.update_regrets(r, 0, &data, &d);
+        storage.accumulate_strategy(r, 0, &data, &d);
+        let mut exact = vec![0.0; r.len()];
+        let mut relaxed = exact.clone();
+        storage.regret_matching(r, 0, &mut exact);
+        storage.regret_matching_cfr(r, 0, &mut relaxed, CfrPrecision::F64);
+        assert_eq!(
+            exact.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+            relaxed.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+        );
+        storage.regret_matching_cfr(r, 0, &mut relaxed, CfrPrecision::F32);
+        let max = exact
+            .iter()
+            .zip(&relaxed)
+            .map(|(&a, &b)| f64::from((a - b).abs()))
+            .fold(0.0, f64::max);
+        assert!(max < 1e-6);
+        assert!(
+            exact
+                .iter()
+                .zip(&relaxed)
+                .any(|(a, b)| a.to_bits() != b.to_bits())
+        );
+        for h in 0..259 {
+            let sum: f32 = (0..7).map(|a| relaxed[a * 259 + h]).sum();
+            assert!((sum - 1.0).abs() < 1e-6);
+            if h.is_multiple_of(11) {
+                for a in 0..7 {
+                    assert_eq!(relaxed[a * 259 + h], 1.0 / 7.0);
+                }
+            }
+        }
+        // Full backend and rebased view use the identical selected normalization.
+        {
+            let mut view = storage.view_mut();
+            let span = StorageSpan {
+                start: r.offset,
+                end: r.offset + r.len(),
+                sref_start: 0,
+                sref_end: 1,
+            };
+            let view = view.split(&[span]).pop().unwrap();
+            let mut through_view = vec![0.0; r.len()];
+            view.regret_matching_cfr(r, 0, &mut through_view, CfrPrecision::F32);
+            assert_eq!(through_view, relaxed);
+        }
+        println!(
+            "{} norm f32 max absolute error={max:e}",
+            std::any::type_name::<S>()
+        );
+        let mut average = vec![0.0; r.len()];
+        let mut expected = average.clone();
+        storage.average_strategy(r, 0, &mut average);
+        match storage.arrays() {
+            StorageArrays::F32 { strategy_sum, .. } | StorageArrays::Mixed { strategy_sum, .. } => {
+                normalize_columns(
+                    &strategy_sum[r.offset..r.offset + r.len()],
+                    r,
+                    &mut expected,
+                )
+            }
+            StorageArrays::I16 { strategy_sum, .. } => normalize_columns_i16(
+                &strategy_sum[r.offset..r.offset + r.len()],
+                r,
+                &mut expected,
+            ),
+        }
+        assert_eq!(
+            average.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+            expected.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+        );
+    }
+    #[test]
+    fn f32_normalization_all_backends_and_views() {
+        check::<F32Storage>();
+        check::<I16Storage>();
+        check::<MixedStorage>();
+    }
+}
 
 /// Location of one action node's data inside a storage buffer. Layout is
 /// action-major: element `(a, h)` lives at `offset + a * num_hands + h`.
@@ -47,6 +192,17 @@ pub trait StorageOps {
     /// uniform strategy.
     fn regret_matching(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]);
 
+    /// CFR-only hook; other implementations retain their exact behavior.
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        _norm: CfrPrecision,
+    ) {
+        self.regret_matching(r, ref_idx, out);
+    }
+
     /// Applies pre-add discounting to stored regrets, then adds `inst`.
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts);
 
@@ -81,6 +237,19 @@ pub trait Storage: StorageOps + Send + Sync {
     /// scale arrays.
     fn new(len: usize, num_refs: usize) -> Self;
 
+    /// Permanently frees the regret arena and its node scales (zero capacity).
+    /// Average strategy and evaluation remain available. Regret operations,
+    /// mutable views, snapshots, checkpoint arrays and restoration panic after
+    /// release, including for empty arenas. Calling release again is harmless.
+    fn release_regrets(&mut self);
+
+    fn regrets_released(&self) -> bool;
+
+    /// Panics if a regret-dependent operation follows release.
+    fn assert_regrets_available(&self) {
+        assert!(!self.regrets_released(), "regrets have been released");
+    }
+
     /// Borrows the whole backend as a single view covering every element,
     /// ready to be [`StorageView::split`] into per-subtree views.
     fn view_mut(&mut self) -> Self::View<'_>;
@@ -97,6 +266,13 @@ pub trait Storage: StorageOps + Send + Sync {
     /// by [`Storage::state`]. Fails if `state` is the wrong backend variant
     /// or its vector lengths don't match this backend's.
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch>;
+
+    /// Borrow the raw arenas without allocating a snapshot.
+    fn arrays(&self) -> StorageArrays<'_>;
+
+    /// Borrow raw arenas for streaming restoration. Callers must discard the
+    /// backend if an I/O or integrity check fails after writing any elements.
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_>;
 
     /// Scales every accumulated regret by `regret` and every accumulated
     /// strategy-sum by `strategy` (batched early discounting, applied
@@ -124,6 +300,113 @@ pub enum StorageState {
         regret_scales: Vec<f32>,
         strategy_scales: Vec<f32>,
     },
+    Mixed {
+        regrets: Vec<i16>,
+        strategy_sum: Vec<f32>,
+        regret_scales: Vec<f32>,
+    },
+}
+
+/// Raw checkpoint arenas in stable order: regrets, strategy sum, then scales.
+pub enum StorageArrays<'a> {
+    F32 {
+        regrets: &'a [f32],
+        strategy_sum: &'a [f32],
+    },
+    I16 {
+        regrets: &'a [i16],
+        strategy_sum: &'a [i16],
+        regret_scales: &'a [f32],
+        strategy_scales: &'a [f32],
+    },
+    Mixed {
+        regrets: &'a [i16],
+        strategy_sum: &'a [f32],
+        regret_scales: &'a [f32],
+    },
+}
+
+pub enum StorageArraysMut<'a> {
+    F32 {
+        regrets: &'a mut [f32],
+        strategy_sum: &'a mut [f32],
+    },
+    I16 {
+        regrets: &'a mut [i16],
+        strategy_sum: &'a mut [i16],
+        regret_scales: &'a mut [f32],
+        strategy_scales: &'a mut [f32],
+    },
+    Mixed {
+        regrets: &'a mut [i16],
+        strategy_sum: &'a mut [f32],
+        regret_scales: &'a mut [f32],
+    },
+}
+
+impl StorageState {
+    pub fn arrays(&self) -> StorageArrays<'_> {
+        match self {
+            Self::F32 {
+                regrets,
+                strategy_sum,
+            } => StorageArrays::F32 {
+                regrets,
+                strategy_sum,
+            },
+            Self::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => StorageArrays::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            },
+            Self::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => StorageArrays::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            },
+        }
+    }
+    pub fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        match self {
+            Self::F32 {
+                regrets,
+                strategy_sum,
+            } => StorageArraysMut::F32 {
+                regrets,
+                strategy_sum,
+            },
+            Self::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => StorageArraysMut::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            },
+            Self::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            } => StorageArraysMut::I16 {
+                regrets,
+                strategy_sum,
+                regret_scales,
+                strategy_scales,
+            },
+        }
+    }
 }
 
 /// Error returned by [`Storage::restore_state`] when the supplied
@@ -170,16 +453,19 @@ pub trait StorageView: StorageOps + Send + Sized {
 
 /// Plain `f32` backend: two flat arenas.
 pub struct F32Storage {
+    regrets_released: bool,
     regrets: Vec<f32>,
     strategy_sum: Vec<f32>,
 }
 
 impl F32Storage {
     pub fn snapshot(&self) -> (Vec<f32>, Vec<f32>) {
+        self.assert_regrets_available();
         (self.regrets.clone(), self.strategy_sum.clone())
     }
 
     pub fn restore(&mut self, snapshot: (Vec<f32>, Vec<f32>)) {
+        self.assert_regrets_available();
         assert_eq!(snapshot.0.len(), self.regrets.len());
         assert_eq!(snapshot.1.len(), self.strategy_sum.len());
         self.regrets = snapshot.0;
@@ -190,19 +476,66 @@ impl F32Storage {
 fn normalize_columns(data: &[f32], r: StorageRef, out: &mut [f32]) {
     let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
     debug_assert_eq!(out.len(), r.len());
-    for h in 0..num_hands {
-        let mut total = 0.0f64;
+    // 2 KiB on the stack, independent of hand count; each hand still sums
+    // action 0, 1, ... in f64 and divides (never multiplies a reciprocal).
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f64; BLOCK];
         for a in 0..num_actions {
-            total += data[a * num_hands + h].max(0.0) as f64;
-        }
-        if total > 0.0 {
-            for a in 0..num_actions {
-                out[a * num_hands + h] = (data[a * num_hands + h].max(0.0) as f64 / total) as f32;
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0.0) as f64;
             }
-        } else {
-            let uniform = 1.0 / num_actions as f32;
-            for a in 0..num_actions {
-                out[a * num_hands + h] = uniform;
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for ((dst, &value), &total) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                *dst = if total > 0.0 {
+                    (value.max(0.0) as f64 / total) as f32
+                } else {
+                    uniform
+                };
+            }
+        }
+    }
+}
+
+fn normalize_columns_f32(data: &[f32], r: StorageRef, out: &mut [f32]) {
+    let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
+    debug_assert_eq!(out.len(), r.len());
+    // CFR f32: f32 positive sums, then one reciprocal per hand.
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f32; BLOCK];
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0.0);
+            }
+        }
+        let mut inverses = [0.0f32; BLOCK];
+        for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
+            *inverse = if total > 0.0 { total.recip() } else { 0.0 };
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for (((dst, &value), &total), &inverse) in dst
+                .iter_mut()
+                .zip(row)
+                .zip(&totals[..len])
+                .zip(&inverses[..len])
+            {
+                *dst = if total > 0.0 {
+                    value.max(0.0) * inverse
+                } else {
+                    uniform
+                };
             }
         }
     }
@@ -266,10 +599,27 @@ fn raw_regrets_impl(regrets: &[f32], offset: usize, r: StorageRef, out: &mut [f3
 
 impl StorageOps for F32Storage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         regret_matching_impl(&self.regrets, r.offset, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        self.assert_regrets_available();
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                normalize_columns_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
+            }
+        }
     }
 
     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
         update_regrets_impl(&mut self.regrets, r.offset, r, inst, d);
     }
 
@@ -288,6 +638,7 @@ impl StorageOps for F32Storage {
     }
 
     fn raw_regrets(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         raw_regrets_impl(&self.regrets, r.offset, r, out);
     }
 }
@@ -295,14 +646,44 @@ impl StorageOps for F32Storage {
 impl Storage for F32Storage {
     type View<'a> = F32View<'a>;
 
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
+        StorageArrays::F32 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
+        StorageArraysMut::F32 {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+        }
+    }
+
     fn new(len: usize, _num_refs: usize) -> Self {
+        let mut regrets = vec![0.0; len];
+        let mut strategy_sum = vec![0.0; len];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
         F32Storage {
-            regrets: vec![0.0; len],
-            strategy_sum: vec![0.0; len],
+            regrets_released: false,
+            regrets,
+            strategy_sum,
         }
     }
 
     fn view_mut(&mut self) -> F32View<'_> {
+        self.assert_regrets_available();
         F32View {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -315,6 +696,7 @@ impl Storage for F32Storage {
     }
 
     fn state(&self) -> StorageState {
+        self.assert_regrets_available();
         StorageState::F32 {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
@@ -322,6 +704,7 @@ impl Storage for F32Storage {
     }
 
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
         match state {
             StorageState::F32 {
                 regrets,
@@ -338,6 +721,7 @@ impl Storage for F32Storage {
     }
 
     fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
         for v in &mut self.regrets {
             *v *= regret;
         }
@@ -371,6 +755,21 @@ impl<'a> StorageOps for F32View<'a> {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         let local = self.local_offset(r);
         regret_matching_impl(&*self.regrets, local, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                let local = self.local_offset(r);
+                normalize_columns_f32(&self.regrets[local..local + r.len()], r, out);
+            }
+        }
     }
 
     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
@@ -442,19 +841,66 @@ impl<'a> StorageView for F32View<'a> {
 fn normalize_columns_i16(data: &[i16], r: StorageRef, out: &mut [f32]) {
     let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
     debug_assert_eq!(out.len(), r.len());
-    for h in 0..num_hands {
-        let mut total = 0.0f64;
+    // 2 KiB on the stack, independent of hand count; each hand still sums
+    // action 0, 1, ... in f64 and divides (never multiplies a reciprocal).
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f64; BLOCK];
         for a in 0..num_actions {
-            total += data[a * num_hands + h].max(0) as f64;
-        }
-        if total > 0.0 {
-            for a in 0..num_actions {
-                out[a * num_hands + h] = (data[a * num_hands + h].max(0) as f64 / total) as f32;
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0) as f64;
             }
-        } else {
-            let uniform = 1.0 / num_actions as f32;
-            for a in 0..num_actions {
-                out[a * num_hands + h] = uniform;
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for ((dst, &value), &total) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                *dst = if total > 0.0 {
+                    (value.max(0) as f64 / total) as f32
+                } else {
+                    uniform
+                };
+            }
+        }
+    }
+}
+
+fn normalize_columns_i16_f32(data: &[i16], r: StorageRef, out: &mut [f32]) {
+    let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
+    debug_assert_eq!(out.len(), r.len());
+    // CFR f32: f32 positive sums, then one reciprocal per hand.
+    const BLOCK: usize = 256;
+    let uniform = 1.0 / num_actions as f32;
+    for first in (0..num_hands).step_by(BLOCK) {
+        let len = BLOCK.min(num_hands - first);
+        let mut totals = [0.0f32; BLOCK];
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            for (total, &value) in totals[..len].iter_mut().zip(row) {
+                *total += value.max(0) as f32;
+            }
+        }
+        let mut inverses = [0.0f32; BLOCK];
+        for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
+            *inverse = if total > 0.0 { total.recip() } else { 0.0 };
+        }
+        for a in 0..num_actions {
+            let row = &data[a * num_hands + first..a * num_hands + first + len];
+            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+            for (((dst, &value), &total), &inverse) in dst
+                .iter_mut()
+                .zip(row)
+                .zip(&totals[..len])
+                .zip(&inverses[..len])
+            {
+                *dst = if total > 0.0 {
+                    value.max(0) as f32 * inverse
+                } else {
+                    uniform
+                };
             }
         }
     }
@@ -585,6 +1031,7 @@ fn raw_regrets_i16_impl(
 /// own empty `scratch`, grown lazily by whatever nodes that view's rayon
 /// task visits.
 pub struct I16Storage {
+    regrets_released: bool,
     regrets: Vec<i16>,
     strategy_sum: Vec<i16>,
     regret_scales: Vec<f32>,
@@ -595,6 +1042,7 @@ pub struct I16Storage {
 impl I16Storage {
     #[allow(clippy::type_complexity)]
     pub fn snapshot(&self) -> (Vec<i16>, Vec<i16>, Vec<f32>, Vec<f32>) {
+        self.assert_regrets_available();
         (
             self.regrets.clone(),
             self.strategy_sum.clone(),
@@ -604,6 +1052,7 @@ impl I16Storage {
     }
 
     pub fn restore(&mut self, snapshot: (Vec<i16>, Vec<i16>, Vec<f32>, Vec<f32>)) {
+        self.assert_regrets_available();
         assert_eq!(snapshot.0.len(), self.regrets.len());
         assert_eq!(snapshot.1.len(), self.strategy_sum.len());
         assert_eq!(snapshot.2.len(), self.regret_scales.len());
@@ -617,10 +1066,27 @@ impl I16Storage {
 
 impl StorageOps for I16Storage {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         regret_matching_i16_impl(&self.regrets, r.offset, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        self.assert_regrets_available();
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                normalize_columns_i16_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
+            }
+        }
     }
 
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
         update_regrets_i16_impl(
             &mut self.regrets,
             r.offset,
@@ -655,6 +1121,7 @@ impl StorageOps for I16Storage {
     }
 
     fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
         raw_regrets_i16_impl(
             &self.regrets,
             r.offset,
@@ -668,17 +1135,54 @@ impl StorageOps for I16Storage {
 impl Storage for I16Storage {
     type View<'a> = I16View<'a>;
 
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regret_scales = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
+        StorageArrays::I16 {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+            regret_scales: &self.regret_scales,
+            strategy_scales: &self.strategy_scales,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
+        StorageArraysMut::I16 {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+            strategy_scales: &mut self.strategy_scales,
+        }
+    }
+
     fn new(len: usize, num_refs: usize) -> Self {
+        let mut regrets = vec![0i16; len];
+        let mut strategy_sum = vec![0i16; len];
+        let regret_scales = vec![1.0; num_refs];
+        let strategy_scales = vec![1.0; num_refs];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
         I16Storage {
-            regrets: vec![0i16; len],
-            strategy_sum: vec![0i16; len],
-            regret_scales: vec![1.0; num_refs],
-            strategy_scales: vec![1.0; num_refs],
+            regrets_released: false,
+            regrets,
+            strategy_sum,
+            regret_scales,
+            strategy_scales,
             scratch: Vec::new(),
         }
     }
 
     fn view_mut(&mut self) -> I16View<'_> {
+        self.assert_regrets_available();
         I16View {
             regrets: &mut self.regrets,
             strategy_sum: &mut self.strategy_sum,
@@ -695,6 +1199,7 @@ impl Storage for I16Storage {
     }
 
     fn state(&self) -> StorageState {
+        self.assert_regrets_available();
         StorageState::I16 {
             regrets: self.regrets.clone(),
             strategy_sum: self.strategy_sum.clone(),
@@ -704,6 +1209,7 @@ impl Storage for I16Storage {
     }
 
     fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
         match state {
             StorageState::I16 {
                 regrets,
@@ -726,6 +1232,7 @@ impl Storage for I16Storage {
     }
 
     fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
         for v in &mut self.regret_scales {
             *v *= regret;
         }
@@ -780,6 +1287,21 @@ impl<'a> StorageOps for I16View<'a> {
     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
         let local = self.local_offset(r);
         regret_matching_i16_impl(&*self.regrets, local, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                let local = self.local_offset(r);
+                normalize_columns_i16_f32(&self.regrets[local..local + r.len()], r, out);
+            }
+        }
     }
 
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
@@ -883,9 +1405,399 @@ impl<'a> StorageView for I16View<'a> {
     }
 }
 
+/// i16 regrets with the legacy per-node quantization; f32 strategy sums.
+/// Split views own disjoint arenas/scales and a private regret scratch buffer.
+pub struct MixedStorage {
+    regrets_released: bool,
+    regrets: Vec<i16>,
+    strategy_sum: Vec<f32>,
+    regret_scales: Vec<f32>,
+    scratch: Vec<f32>,
+}
+
+impl StorageOps for MixedStorage {
+    fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
+        regret_matching_i16_impl(&self.regrets, r.offset, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        self.assert_regrets_available();
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                normalize_columns_i16_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
+            }
+        }
+    }
+
+    fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        self.assert_regrets_available();
+        update_regrets_i16_impl(
+            &mut self.regrets,
+            r.offset,
+            r,
+            inst,
+            d,
+            &mut self.regret_scales[ref_idx as usize],
+            &mut self.scratch,
+        );
+    }
+
+    fn accumulate_strategy(
+        &mut self,
+        r: StorageRef,
+        _ref_idx: u32,
+        weighted: &[f32],
+        d: &Discounts,
+    ) {
+        accumulate_strategy_impl(&mut self.strategy_sum, r.offset, r, weighted, d);
+    }
+
+    fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        average_strategy_impl(&self.strategy_sum, r.offset, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        self.assert_regrets_available();
+        raw_regrets_i16_impl(
+            &self.regrets,
+            r.offset,
+            r,
+            self.regret_scales[ref_idx as usize],
+            out,
+        );
+    }
+}
+
+impl Storage for MixedStorage {
+    type View<'a> = MixedView<'a>;
+
+    fn release_regrets(&mut self) {
+        self.regrets = Vec::new();
+        self.regret_scales = Vec::new();
+        self.regrets_released = true;
+    }
+
+    fn regrets_released(&self) -> bool {
+        self.regrets_released
+    }
+
+    fn arrays(&self) -> StorageArrays<'_> {
+        self.assert_regrets_available();
+        StorageArrays::Mixed {
+            regrets: &self.regrets,
+            strategy_sum: &self.strategy_sum,
+            regret_scales: &self.regret_scales,
+        }
+    }
+    fn arrays_mut(&mut self) -> StorageArraysMut<'_> {
+        self.assert_regrets_available();
+        StorageArraysMut::Mixed {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+        }
+    }
+
+    fn new(len: usize, num_refs: usize) -> Self {
+        let mut regrets = vec![0i16; len];
+        let mut strategy_sum = vec![0.0; len];
+        let regret_scales = vec![1.0; num_refs];
+        prefault_zeroed(&mut regrets);
+        prefault_zeroed(&mut strategy_sum);
+        MixedStorage {
+            regrets_released: false,
+            regrets,
+            strategy_sum,
+            regret_scales,
+            scratch: Vec::new(),
+        }
+    }
+
+    fn view_mut(&mut self) -> MixedView<'_> {
+        self.assert_regrets_available();
+        MixedView {
+            regrets: &mut self.regrets,
+            strategy_sum: &mut self.strategy_sum,
+            regret_scales: &mut self.regret_scales,
+            base: 0,
+            sref_base: 0,
+            scratch: Vec::new(),
+        }
+    }
+
+    fn bytes_for(len: usize, num_refs: usize) -> u64 {
+        len as u64 * 6 + num_refs as u64 * 4
+    }
+
+    fn state(&self) -> StorageState {
+        self.assert_regrets_available();
+        StorageState::Mixed {
+            regrets: self.regrets.clone(),
+            strategy_sum: self.strategy_sum.clone(),
+            regret_scales: self.regret_scales.clone(),
+        }
+    }
+
+    fn restore_state(&mut self, state: StorageState) -> Result<(), StateMismatch> {
+        self.assert_regrets_available();
+        match state {
+            StorageState::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            } => {
+                check_len(self.regrets.len(), regrets.len())?;
+                check_len(self.strategy_sum.len(), strategy_sum.len())?;
+                check_len(self.regret_scales.len(), regret_scales.len())?;
+                self.regrets = regrets;
+                self.strategy_sum = strategy_sum;
+                self.regret_scales = regret_scales;
+                Ok(())
+            }
+            _ => Err(StateMismatch::WrongVariant),
+        }
+    }
+
+    fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.assert_regrets_available();
+        for v in &mut self.regret_scales {
+            *v *= regret;
+        }
+        for v in &mut self.strategy_sum {
+            *v *= strategy;
+        }
+    }
+}
+
+pub struct MixedView<'a> {
+    regrets: &'a mut [i16],
+    strategy_sum: &'a mut [f32],
+    regret_scales: &'a mut [f32],
+    base: usize,
+    sref_base: u32,
+    scratch: Vec<f32>,
+}
+
+impl<'a> MixedView<'a> {
+    fn local_offset(&self, r: StorageRef) -> usize {
+        debug_assert!(r.offset >= self.base, "storage ref starts before view base");
+        let local = r.offset - self.base;
+        debug_assert!(
+            local + r.len() <= self.regrets.len(),
+            "storage ref exceeds view bounds"
+        );
+        local
+    }
+
+    fn local_ref(&self, ref_idx: u32) -> usize {
+        debug_assert!(
+            ref_idx >= self.sref_base,
+            "storage ref index starts before view sref base"
+        );
+        let local = (ref_idx - self.sref_base) as usize;
+        debug_assert!(
+            local < self.regret_scales.len(),
+            "storage ref index exceeds view sref bounds"
+        );
+        local
+    }
+}
+
+impl<'a> StorageOps for MixedView<'a> {
+    fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        regret_matching_i16_impl(&*self.regrets, local, r, out);
+    }
+    fn regret_matching_cfr(
+        &self,
+        r: StorageRef,
+        ref_idx: u32,
+        out: &mut [f32],
+        norm: CfrPrecision,
+    ) {
+        match norm {
+            CfrPrecision::F64 => self.regret_matching(r, ref_idx, out),
+            CfrPrecision::F32 => {
+                let local = self.local_offset(r);
+                normalize_columns_i16_f32(&self.regrets[local..local + r.len()], r, out);
+            }
+        }
+    }
+
+    fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+        let local = self.local_offset(r);
+        let sidx = self.local_ref(ref_idx);
+        update_regrets_i16_impl(
+            &mut *self.regrets,
+            local,
+            r,
+            inst,
+            d,
+            &mut self.regret_scales[sidx],
+            &mut self.scratch,
+        );
+    }
+
+    fn accumulate_strategy(
+        &mut self,
+        r: StorageRef,
+        _ref_idx: u32,
+        weighted: &[f32],
+        d: &Discounts,
+    ) {
+        let local = self.local_offset(r);
+        accumulate_strategy_impl(&mut *self.strategy_sum, local, r, weighted, d);
+    }
+
+    fn average_strategy(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        average_strategy_impl(&*self.strategy_sum, local, r, out);
+    }
+
+    fn raw_regrets(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]) {
+        let local = self.local_offset(r);
+        let sidx = self.local_ref(ref_idx);
+        raw_regrets_i16_impl(&*self.regrets, local, r, self.regret_scales[sidx], out);
+    }
+}
+
+impl<'a> StorageView for MixedView<'a> {
+    fn split(&mut self, spans: &[StorageSpan]) -> Vec<Self> {
+        let base = self.base;
+        let sref_base = self.sref_base;
+        let mut regrets_rest = std::mem::take(&mut self.regrets);
+        let mut strategy_rest = std::mem::take(&mut self.strategy_sum);
+        let mut rscale_rest = std::mem::take(&mut self.regret_scales);
+
+        let mut out = Vec::with_capacity(spans.len());
+        let mut consumed = 0usize;
+        let mut sref_consumed = 0u32;
+        for span in spans {
+            debug_assert!(
+                span.start >= base + consumed && span.end >= span.start,
+                "storage spans must be ascending, disjoint, and within view bounds"
+            );
+            let gap = span.start - (base + consumed);
+            let (_, r_rest) = regrets_rest.split_at_mut(gap);
+            let (_, s_rest) = strategy_rest.split_at_mut(gap);
+            let len = span.end - span.start;
+            let (r_span, r_after) = r_rest.split_at_mut(len);
+            let (s_span, s_after) = s_rest.split_at_mut(len);
+
+            debug_assert!(
+                span.sref_start >= sref_base + sref_consumed && span.sref_end >= span.sref_start,
+                "storage spans must carry ascending, disjoint sref ranges within view bounds"
+            );
+            let sref_gap = (span.sref_start - (sref_base + sref_consumed)) as usize;
+            let (_, rscale_r) = rscale_rest.split_at_mut(sref_gap);
+            let sref_len = (span.sref_end - span.sref_start) as usize;
+            let (rscale_span, rscale_after) = rscale_r.split_at_mut(sref_len);
+
+            out.push(MixedView {
+                regrets: r_span,
+                strategy_sum: s_span,
+                regret_scales: rscale_span,
+                base: span.start,
+                sref_base: span.sref_start,
+                scratch: Vec::new(),
+            });
+            regrets_rest = r_after;
+            strategy_rest = s_after;
+            rscale_rest = rscale_after;
+            consumed = span.end - base;
+            sref_consumed = span.sref_end - sref_base;
+        }
+        out
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prefault_keeps_arena_zero() {
+        // A few pages, threshold bypassed; lengths not page-aligned.
+        let mut a = vec![0.0f32; 5 * 1024 + 7];
+        prefault_zeroed_above(&mut a, 0);
+        assert!(a.iter().all(|&x| x.to_bits() == 0));
+        let mut b = vec![0i16; 3 * 2048 + 5];
+        prefault_zeroed_above(&mut b, 0);
+        assert!(b.iter().all(|&x| x == 0));
+        // Below the threshold nothing happens.
+        prefault_zeroed(&mut b);
+        let mut empty: Vec<f32> = Vec::new();
+        prefault_zeroed_above(&mut empty, 0);
+    }
+
+    #[test]
+    fn mixed_ops_match_i16_regrets_and_f32_sums_bitwise() {
+        let r = make_ref(0, 3, 257, 0);
+        let mut mixed = MixedStorage::new(r.len(), 1);
+        let mut quantized = I16Storage::new(r.len(), 1);
+        let mut float = F32Storage::new(r.len(), 1);
+        let bits = |v: &[f32]| v.iter().map(|x| x.to_bits()).collect::<Vec<_>>();
+        for t in 1..=100 {
+            let d = Discounts {
+                pos: 0.97,
+                neg: 0.5,
+                avg: 0.83,
+                floor_neg: t % 3 == 0,
+                reset_avg: t % 17 == 0,
+            };
+            let inst: Vec<_> = (0..r.len())
+                .map(|i| ((i * 19 + t) % 61) as f32 - 30.0)
+                .collect();
+            mixed.update_regrets(r, 0, &inst, &d);
+            quantized.update_regrets(r, 0, &inst, &d);
+            let mut sigma = vec![0.0; r.len()];
+            mixed.regret_matching(r, 0, &mut sigma);
+            let weighted: Vec<_> = sigma
+                .iter()
+                .enumerate()
+                .map(|(i, v)| v * (i % 13) as f32 / 13.0)
+                .collect();
+            mixed.accumulate_strategy(r, 0, &weighted, &d);
+            float.accumulate_strategy(r, 0, &weighted, &d);
+            if t % 11 == 0 {
+                mixed.scale_all(0.71, 0.63);
+                quantized.scale_all(0.71, 0.63);
+                float.scale_all(0.71, 0.63);
+            }
+            assert_eq!(mixed.regrets, quantized.regrets);
+            assert_eq!(bits(&mixed.regret_scales), bits(&quantized.regret_scales));
+            assert_eq!(bits(&mixed.strategy_sum), bits(&float.strategy_sum));
+            let mut a = vec![0.0; r.len()];
+            let mut b = a.clone();
+            mixed.average_strategy(r, 0, &mut a);
+            float.average_strategy(r, 0, &mut b);
+            assert_eq!(bits(&a), bits(&b));
+            mixed.raw_regrets(r, 0, &mut a);
+            quantized.raw_regrets(r, 0, &mut b);
+            assert_eq!(bits(&a), bits(&b));
+        }
+        let saved = mixed.state();
+        let mut restored = MixedStorage::new(r.len(), 1);
+        restored.restore_state(saved.clone()).unwrap();
+        assert_eq!(restored.state(), saved);
+        assert_eq!(
+            restored.restore_state(float.state()),
+            Err(StateMismatch::WrongVariant)
+        );
+        assert!(matches!(
+            restored.restore_state(MixedStorage::new(r.len() - 1, 1).state()),
+            Err(StateMismatch::WrongLength { .. })
+        ));
+        assert_eq!(restored.state(), saved);
+        assert_eq!(MixedStorage::bytes_for(r.len(), 1), r.len() as u64 * 6 + 4);
+    }
 
     fn discounts() -> Discounts {
         Discounts {
@@ -1000,6 +1912,39 @@ mod tests {
         assert!(view.strategy_sum.is_empty());
         assert!(view.regret_scales.is_empty());
         assert!(view.strategy_scales.is_empty());
+
+        let (sigma1_split, avg1_split) = run_all_ops(&mut subviews[0], r1, &inst1);
+        let (sigma2_split, avg2_split) = run_all_ops(&mut subviews[1], r2, &inst2);
+
+        // i16 quantization is deterministic, so a split view must match the
+        // unsplit backend bit-for-bit, exactly like F32.
+        assert_eq!(sigma1_direct, sigma1_split);
+        assert_eq!(sigma2_direct, sigma2_split);
+        assert_eq!(avg1_direct, avg1_split);
+        assert_eq!(avg2_direct, avg2_split);
+    }
+
+    #[test]
+    fn mixed_view_split_matches_direct_ops() {
+        let len = 100;
+        let (r1, r2, spans) = split_fixture();
+
+        let inst1: Vec<f32> = (0..r1.len()).map(|i| i as f32 * 0.5 + 1.0).collect();
+        let inst2: Vec<f32> = (0..r2.len()).map(|i| i as f32 * 0.25 - 0.5).collect();
+
+        let mut direct = MixedStorage::new(len, 2);
+        let (sigma1_direct, avg1_direct) = run_all_ops(&mut direct, r1, &inst1);
+        let (sigma2_direct, avg2_direct) = run_all_ops(&mut direct, r2, &inst2);
+
+        let mut split_target = MixedStorage::new(len, 2);
+        let mut view = split_target.view_mut();
+        let mut subviews = view.split(&spans);
+        assert_eq!(subviews.len(), 2);
+
+        // Parent view slices are empty after split.
+        assert!(view.regrets.is_empty());
+        assert!(view.strategy_sum.is_empty());
+        assert!(view.regret_scales.is_empty());
 
         let (sigma1_split, avg1_split) = run_all_ops(&mut subviews[0], r1, &inst1);
         let (sigma2_split, avg2_split) = run_all_ops(&mut subviews[1], r2, &inst2);
@@ -1170,5 +2115,37 @@ mod tests {
         let mut sigma_after = vec![0.0; r.len()];
         backend.regret_matching(r, r.index, &mut sigma_after);
         assert_eq!(sigma, sigma_after);
+    }
+}
+
+#[cfg(test)]
+mod release_tests {
+    use super::*;
+
+    #[test]
+    fn release_returns_all_regret_capacity_including_empty_storage() {
+        for (len, refs) in [(100, 4), (0, 0)] {
+            let mut f32 = F32Storage::new(len, refs);
+            let mut i16 = I16Storage::new(len, refs);
+            let mut mixed = MixedStorage::new(len, refs);
+            f32.release_regrets();
+            i16.release_regrets();
+            mixed.release_regrets();
+            assert_eq!((f32.regrets.len(), f32.regrets.capacity()), (0, 0));
+            assert_eq!((i16.regrets.len(), i16.regrets.capacity()), (0, 0));
+            assert_eq!((mixed.regrets.len(), mixed.regrets.capacity()), (0, 0));
+            assert_eq!(
+                (i16.regret_scales.len(), i16.regret_scales.capacity()),
+                (0, 0)
+            );
+            assert_eq!(
+                (mixed.regret_scales.len(), mixed.regret_scales.capacity()),
+                (0, 0)
+            );
+            assert_eq!(f32.strategy_sum.len(), len);
+            assert_eq!(i16.strategy_sum.len(), len);
+            assert_eq!(i16.strategy_scales.len(), refs);
+            assert_eq!(mixed.strategy_sum.len(), len);
+        }
     }
 }

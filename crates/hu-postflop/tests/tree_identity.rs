@@ -14,7 +14,9 @@ struct Identity {
     nodes: [u64; 3],
     /// Public decision nodes by OOP/IP.
     decisions: [u64; 2],
-    /// Concrete engine infoset slots by OOP/IP, including masked-zero combo slots.
+    /// Concrete engine infoset slots by OOP/IP, including runout-masked slots within root support.
+    // PF1 (2026-10-06): pins now count seat-specific positive root support,
+    // excluding starting-board conflicts. Public topology/hash pins are unchanged.
     infosets: [u64; 2],
     /// Builder action labels use integer milli-BB amounts.
     root_actions: Vec<String>,
@@ -105,7 +107,7 @@ fn river_small() {
         Identity {
             nodes: [6, 0, 9],
             decisions: [3, 3],
-            infosets: [3978, 3978],
+            infosets: [408, 153],
             root_actions: vec!["check".into(), "bet 5000".into()],
             structure: "c669c8ac1217f22c389445709867bdfc2a356ea751184311fa69937cf9f2b44f".into(),
         },
@@ -118,7 +120,7 @@ fn turn_small() {
         Identity {
             nodes: [580, 3, 722],
             decisions: [290, 290],
-            infosets: [384540, 384540],
+            infosets: [5510, 5800],
             root_actions: vec!["check".into(), "bet 20000".into()],
             structure: "3da11a7eeda55c11a1fa19e0ebed6beae60c32a1c5214e2d00d5c57efa24301f".into(),
         },
@@ -131,7 +133,7 @@ fn postflop_srp20() {
         Identity {
             nodes: [52436, 642, 87420],
             decisions: [26218, 26218],
-            infosets: [34765068, 34765068],
+            infosets: [7839182, 10801816],
             root_actions: vec!["check".into(), "bet 50000".into()],
             structure: "49cf040541382b2cc52e806e01a88b08e56cdd500938f1aadd9624e0ee29cda9".into(),
         },
@@ -144,7 +146,7 @@ fn three_bet_pot_fast() {
         Identity {
             nodes: [63602, 545, 84675],
             decisions: [31801, 31801],
-            infosets: [42168126, 42168126],
+            infosets: [2003463, 5088160],
             root_actions: vec!["check".into(), "bet 150000".into()],
             structure: "d6907929912e16d8a8969f20b16a60f88de290384065c21d5db3d5dd8b53853e".into(),
         },
@@ -157,7 +159,7 @@ fn postflop_pio_tree() {
         Identity {
             nodes: [108045, 436, 172695],
             decisions: [54023, 54022],
-            infosets: [71634498, 71633172],
+            infosets: [1836782, 1620660],
             root_actions: vec!["check".into()],
             structure: "e17ced7199fdd8b8c807722a2227b0bf995ce3e7ad92d990714d7f693d2b72c4".into(),
         },
@@ -170,7 +172,7 @@ fn postflop_pio_icm() {
         Identity {
             nodes: [108045, 436, 172695],
             decisions: [54023, 54022],
-            infosets: [71634498, 71633172],
+            infosets: [1836782, 1620660],
             root_actions: vec!["check".into()],
             structure: "e17ced7199fdd8b8c807722a2227b0bf995ce3e7ad92d990714d7f693d2b72c4".into(),
         },

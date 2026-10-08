@@ -1,0 +1,30 @@
+schema='solvers.nlh/v1'
+[table]
+players=2
+stack_bb=21
+[spot]
+line='BTN c, BB x / BB x, BTN x'
+board='2s 7s Ks 2h'
+[ranges]
+BB='44,55'
+BTN='33,66'
+[tree]
+script='turn { replace bet [75] } river { replace bet [100] }'
+[tree.max_aggressive_actions]
+turn=1
+river=1
+[solver]
+storage='i16-f32avg'
+iso_merging=false
+[solver.algorithm]
+schedule='vanilla'
+[solver.parallel]
+chance_depth=0
+[solver.stop]
+max_iterations=8
+check_every=8
+[output]
+solution_streets='no-rivers'
+[run]
+threads=1
+memory='1GiB'

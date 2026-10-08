@@ -1,0 +1,299 @@
+{
+  "affinity_mask": 1,
+  "args": [
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t24-bench-new.exe",
+    "--bench",
+    "^(kernels(_wide)?/(fold|showdown)_f32|kernels_realistic/(t18_fold|t18_showdown|t20_siblings|t21_opponent_add))$",
+    "--noplot"
+  ],
+  "records": [
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 272.43012062166554
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 412.2545648738807
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 5731.87112131259
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 9517.942445337778
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 2692115.277777778
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 2421582.5396825396
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 2476013.51010101
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 4446120.681818182
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 560.8306194393151
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 881.5896491372754
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 4185.37938252224
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 9482.255124111649
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 2655570.202020202
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 2361005.5555555555
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1856989.393939394
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 4529867.447916666
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 544.9194998715424
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 861.8154482556504
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 6609.426266654582
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 11328.88929529383
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 3206868.333333333
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1212575.8333333335
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1444747.6052631577
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2164251.470588235
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 302.5586457508815
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 407.85712560386474
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2216.972083593263
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 4662.420689437365
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1223163.5416666665
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 2099569.2307692305
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1685553.187134503
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 4137107.638888889
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 551.8469396464309
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 871.6163973796024
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 6416.395215239709
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 9293.098159509202
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 3017144.5
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 2560394.0
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 2744243.125
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 4620057.391640866
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 726.0654938507919
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 877.8306447232633
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 4721.730899256254
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 11667.37644988811
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 3445444.4615384615
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 2560167.3684210526
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 2299078.9884868423
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 4264784.375
+    }
+  ]
+}

@@ -17,10 +17,11 @@ toml_edit = { workspace = true }
 hu-engine = { workspace = true, features = ["serde"] }
 runfiles = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
 thiserror = { workspace = true }
 postcard = { workspace = true }
-zstd = { workspace = true }
+zstd = { workspace = true, features = ["zstdmt"] }
+blake3 = { workspace = true }
 tempfile = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
@@ -28,6 +29,9 @@ libc = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_System_SystemInformation"] }
+
+[target.'cfg(windows)'.dev-dependencies]
+windows-sys = { workspace = true, features = ["Win32_System_ProcessStatus", "Win32_System_Threading"] }
 
 [dev-dependencies]
 blake3 = { workspace = true }

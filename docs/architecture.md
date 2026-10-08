@@ -105,7 +105,7 @@ Chance branch の `Deal` は重みと両者の `ReachMap` を持つ。
 Stud/Draw のルール・観測・情報集合を実装済みとするものではない。
 
 Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付き量子化を行う
-`I16Storage`。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
+`I16Storage`、regretだけ同じi16量子化・戦略累積をf32にする`MixedStorage`（`i16-f32avg`、6L＋4N bytes）。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
 view を渡す。`ParConfig` が chance depth と fan-out を制御する。メモリ削減量・速度・精度は
 ゲームと設定に依存するので、採用条件は測定証拠とともに評価する。
 
@@ -113,12 +113,40 @@ view を渡す。`ParConfig` が chance depth と fan-out を制御する。メ�
 regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr` と `linear_cfr`
 を備える。CLI の選択肢と既定値は規範仕様に置き、本書には別の既定値表を作らない。
 
+`CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
+f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
+最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
+node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
+不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
+sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
+既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。
+showdownは順位走査、River foldは専用の互換reach kernelを使う。f64は従来の再帰passを維持する。
+このsubtree経路の外では、以下の直下終端の処理を使う。
+f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
+action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
+全0相手reachのpruningと`ActionViews`のstorage分割を維持する。既定hookは個別の`eval_cfr`を呼ぶ。
+P1は同一boardのfold・showdownをf32 kernelで融合する。
+相手playerのactionでは、f32かつ全0相手reachの省略経路でない場合に、終端の戦略行を
+`opp_reach * sigma`へ上書きし、最大2件のstack batchで`add_cfr_opponent_terminals`へ渡す。
+PRUNE時は全0の子reachを除く。終端を子順で先に`out`へ加算し、逐次・並列とも終端再帰と
+並列の終端行加算を飛ばした後、非終端の値を子順で加算する。`ActionViews`とscratchの
+取得・返却規律は維持する。既定hookはtmpを0初期化して`eval_cfr`、加算の順で処理する。
+P1の同一board fold・showdownは異なる子reachでも1回の自hand loopで直接加算し、
+単独終端も直接加算する。dead自handの値は変更しない。f64のCFR経路と`eval`は従来どおりである。
+
 `Solver<E,S>` は alternating update を行い、平均戦略を解として扱う。
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する
 未正規化 payoff を返す。EV と best response は同じ compiled tree / evaluator を使う一方、
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
 `expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
 全 action node の値を 1 回の走査で計算する。
+CFR は相手 reach の全要素が厳密に 0 の終端評価と、相手 action の regret matching・
+reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは scratch で初期化した
+全 0 buffer を使い回す。更新 player の action と chance の演算、chance/action 並列、
+`ActionViews` の分割は通常の走査と同じ。全呼出し元が `out` を 0 で初期化することを
+不変条件とし、scratch の 0 初期化と再利用 child buffer の clear で維持する。
+記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
+`visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
 
 [McSolver](../crates/hu-engine/src/mccfr.rs) は chance node を sample し、両者の action node は
 vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、
@@ -142,12 +170,17 @@ blocker付きの相手reachでCFVを正規化してからutility offsetを加え
 
 ## 5. Mode A: hu-postflop crate(exact postflop)
 
-`postflop`がFlop/Turn/River開始の木を作る。full combo vectorを使い、card abstractionは持たない。
-suit同型の枝・確率・reach写像はbuilderが決める。`kernel`はsorted-rank showdown sweepと
-fold inclusion–exclusionを持つ。rank/card-removalの表はbuild時に用意する。
+`postflop`がFlop/Turn/River開始の木を作る。`PostflopHands`は席別の開始range supportを
+global combo昇順で保持し、global→local逆引きとexpand/compactを提供する。card abstractionは持たない。
+reach/value/storageの次元は木全体で席別support長に固定し、配牌で衝突するhandは席別maskで0にする。
+suit同型の枝・確率・compact空間の席別商transitionはbuilderが決める。supportの閉包違反は内部不変条件のerrorである。
+`kernel`は5-card boardのsorted card setでdedupeした席別rank tableを使う。
+local index・2枚のcard index・同順位group境界をbuild時に用意し、役順のmergeでshowdownをO(n_oop＋n_ip)で評価する。
+foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
+memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
 
 `prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
-`run::run`はlocal poolでf32/i16のgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
+`run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。
 
@@ -176,7 +209,7 @@ testは計算層と利用者境界を分けて置く。
 
 - `nlh`・`economics`・`spot`: betting/精算、単位、rake/ICM、schema・normalizer・line再生。
 - `hu-engine`: storage、reach、chanceの次元変化、CFR/BRとstate復元。
-- `hu-postflop`: kernel、payoff、f32/i16、iso、保存coverageと値、River re-solve。
+- `hu-postflop`: kernel、payoff、f32/i16/i16-f32avg、iso、保存coverageと値、River re-solve。
   [toy oracle差分](../crates/hu-postflop/tests/toy_oracle_diff.rs)と
   [postflop oracle差分](../crates/hu-postflop/tests/oracle_diff.rs)は凍結`cfr-ref`と独立に照合する。
 - `mw-preflop`: dense arena、固定seed、thread数独立のmerge、平均profile、停止評価、checkpointとviews。
@@ -205,6 +238,11 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 | `.mwsol` | `mw_preflop::mwsol`、`session`、`views` | 正式平均profileとidentity、保存coverage、評価data |
 | run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
+P1 checkpoint v5はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。metadataのbackendは3種類のenumで、Mixedの配列順はregrets（i16）、strategy_sum（f32）、regret_scales（f32）。backendと配列長は書込み前に検査し、v1〜4は再solveを案内して拒否する。
+solve/resumeの`drive`は、終了時に新たなcheckpointが必要で`S + W + 2C ≤ limit`ならrun用Rayon poolの`join`でcheckpointと`.sol`を並行生成し、regretを保持する。その他は最後のcheckpoint（P1の`run.final_checkpoint = true`、既定値、の場合）→ `Solver::release_regrets`でregret arenaとscaleを解放 → `.sol`の順とする。falseは全停止理由で最後のcheckpointだけを省く。反復中のcheckpointとcurrent strategyを提供するlive queryはregretを保持する。memory preflightは`max(storage, storage − regret + save_bytes) + compression_bytes`を使う。
+`.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
+戦略はEV passに先立ってstorageからsref昇順に計算し、1 node分ずつ量子化して直接出力する。EV pass後の値slotもsref順に直接出力し、block用Vecへ移し替えない。
+codecはpacked blockのpostcard直列化も一時payload Vecなしで行う。
 checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
 CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。
 artifact形式と公開操作の意味は製品規範と[CLI reference](cli-reference.jp.md)を参照する。

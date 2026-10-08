@@ -1,0 +1,5 @@
+{
+  "name": "Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz",
+  "logical_processors": 16,
+  "physical_cores": "not measured (CIM access denied)"
+}

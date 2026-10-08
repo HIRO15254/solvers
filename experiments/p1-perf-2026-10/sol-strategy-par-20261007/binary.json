@@ -1,0 +1,18 @@
+{
+  "old": {
+    "bytes": 7384064,
+    "sha256": "4316e1e4f344faf0ea3152846c3d5895fc63161a92e997bf55ba4bf4891324f3"
+  },
+  "new": {
+    "bytes": 7409152,
+    "sha256": "cef1cc21109fe7e9103ff9f448952a6211d8f38199b89765c84918881f20b01d"
+  },
+  "verify": {
+    "bytes": 963584,
+    "sha256": "7dc2bb7553fb9bb814fd6f4b04bbec02d68f2682ab5dc8aad7fa4960bb9f01c0"
+  },
+  "fixed": {
+    "bytes": 1370624,
+    "sha256": "313a0a7cf792eb5e1d6bbf61a1bd64131adf58d2bf1392dce9f9f8e9112db051"
+  }
+}

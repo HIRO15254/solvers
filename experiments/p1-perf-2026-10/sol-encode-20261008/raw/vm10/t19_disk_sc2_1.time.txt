@@ -1,0 +1,23 @@
+	Command being timed: "/home/PC_User/sc2/target/release/solvers solve /home/PC_User/work10/g25.toml --out /home/PC_User/work10/disk_sc2_1 --threads 32"
+	User time (seconds): 1235.58
+	System time (seconds): 40.71
+	Percent of CPU this job got: 1483%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:26.05
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 22654324
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 3
+	Minor (reclaiming a frame) page faults: 1439701
+	Voluntary context switches: 1312011
+	Involuntary context switches: 127364
+	Swaps: 0
+	File system inputs: 552
+	File system outputs: 13032544
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

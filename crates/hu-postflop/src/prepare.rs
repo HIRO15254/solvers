@@ -36,7 +36,13 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         .as_deref()
         .map(|target| input::resolve_target(&document.spot, target))
         .transpose()?;
-    let estimate = crate::try_memory_usage(&config).map_err(tree_error)?;
+    let mut estimate = crate::try_memory_usage(&config).map_err(tree_error)?;
+    let threads = document
+        .spot
+        .run
+        .threads
+        .unwrap_or(std::thread::available_parallelism()?.get() as u64);
+    estimate.compression_bytes = compression_workspace(&estimate, threads, effective.len());
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
@@ -53,6 +59,21 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         limit,
         target,
     })
+}
+
+fn compression_workspace(estimate: &crate::MemoryEstimate, threads: u64, config_len: usize) -> u64 {
+    // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
+    // cannot occupy every requested worker. The streamed strategies are
+    // still in the payload, though no longer in save_bytes. Slot overhead
+    // conservatively covers both lists' per-block postcard headers. The
+    // parallel strategy batch is already fully budgeted in save_bytes,
+    // independent of threads; do not add per-worker strategy buffers here.
+    let solution = estimate.save_bytes.saturating_add(estimate.f32_bytes / 4);
+    let payload = estimate.f32_bytes.max(solution);
+    let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
+    jobs.saturating_mul(16 * 1024 * 1024)
+        .saturating_add(8 * 1024 * 1024)
+        .saturating_add(config_len as u64 * 3)
 }
 
 /// Return warnings from the prepared tree and stop settings.
@@ -98,12 +119,9 @@ pub fn warnings_for_hits(p: &Prepared, hits: &crate::RuleHits) -> Vec<String> {
     warnings
 }
 
-/// Required storage bytes for the selected P1 storage backend.
+/// Required storage and save workspace bytes for the selected P1 backend.
 pub fn required_bytes(p: &Prepared) -> u64 {
-    match p.settings.solver.storage {
-        input::Storage::F32 => p.estimate.f32_bytes,
-        input::Storage::I16 => p.estimate.i16_bytes,
-    }
+    p.estimate.required_bytes(p.settings.solver.storage)
 }
 
 pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
@@ -194,6 +212,13 @@ pub fn compatibility_hash(effective: &str) -> Result<[u8; 32]> {
     let mut document: toml_edit::DocumentMut = effective.parse()?;
     document.remove("run");
     document.remove("meta");
+    // CFR precision changes neither the game definition nor the state format.
+    if let Some(solver) = document
+        .get_mut("solver")
+        .and_then(toml_edit::Item::as_table_mut)
+    {
+        solver.remove("cfr_precision");
+    }
     Ok(runfiles::config_hash(document.to_string().as_bytes()))
 }
 
@@ -250,17 +275,18 @@ pub(crate) fn require_artifact_config(raw: &str) -> Result<()> {
     Ok(())
 }
 
-/// Verified state and cumulative solve time for a checkpoint continuation.
+/// Metadata-verified reader and cumulative solve time for a continuation.
+/// Full payload integrity is verified while restoring into the final arenas.
 pub struct ResumeState {
-    pub state: hu_engine::SolverState,
+    pub state: crate::checkpoint::CheckpointReader,
     pub elapsed: Option<std::time::Duration>,
 }
 
-/// Verify the historical and embedded inputs and return the restored checkpoint state.
+/// Verify historical/embedded inputs and retain the open checkpoint reader.
 pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
     require_artifact_config(raw)?;
     let historical = prepare(raw, Path::new("run.toml"))?;
-    let checkpoint = crate::checkpoint::read_checkpoint(checkpoint_path)?;
+    let checkpoint = crate::checkpoint::CheckpointReader::open(checkpoint_path)?;
     if let Some(embedded) = &checkpoint.config_toml {
         require_artifact_config(embedded)?;
     }
@@ -282,7 +308,30 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
         .transpose()
         .context("invalid checkpoint elapsed time")?;
     Ok(ResumeState {
-        state: checkpoint.state,
+        state: checkpoint,
         elapsed,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn compression_budget_counts_streamed_strategies_as_payload() {
+        const MIB: u64 = 1024 * 1024;
+        // Asymmetric supports can make the retained values dominate storage.
+        // Values alone fit one job, but values plus strategies require two.
+        let estimate = crate::MemoryEstimate {
+            f32_bytes: MIB,
+            save_bytes: 2 * MIB - 1,
+            ..Default::default()
+        };
+        assert_eq!(
+            super::compression_workspace(&estimate, 8, 100),
+            40 * MIB + 300
+        );
+        assert_eq!(
+            super::compression_workspace(&estimate, 1, 100),
+            24 * MIB + 300
+        );
+    }
 }

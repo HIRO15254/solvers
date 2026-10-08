@@ -1,0 +1,9 @@
+{
+  "config": "experiments/p1-performance/compact-hand-domain/configs/flop_srp1.toml",
+  "estimateF32Bytes": 8170239168,
+  "estimateI16Bytes": 4087803264,
+  "nodes": 829242,
+  "prepareSecs": 0.2580738,
+  "storageElements": 1021279896,
+  "threads": 1
+}

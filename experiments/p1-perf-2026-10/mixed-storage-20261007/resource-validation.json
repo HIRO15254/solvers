@@ -1,0 +1,95 @@
+{
+  "corrected_commands": [
+    {
+      "tag": "gtow_a-f32-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-f32.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 3.4242929999963962,
+      "free_bytes_after": 8326467584,
+      "selected_storage_verified": "f32"
+    },
+    {
+      "tag": "gtow_a-i16-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 3.4857319000002462,
+      "free_bytes_after": 8325980160,
+      "selected_storage_verified": "i16"
+    },
+    {
+      "tag": "gtow_a-i16-f32avg-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_a-i16-f32avg.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 4.286727200000314,
+      "free_bytes_after": 8325902336,
+      "selected_storage_verified": "i16-f32avg"
+    },
+    {
+      "tag": "gtow_b-f32-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-f32.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 1.7297993999964092,
+      "free_bytes_after": 8325926912,
+      "selected_storage_verified": "f32"
+    },
+    {
+      "tag": "gtow_b-i16-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 1.567527400002291,
+      "free_bytes_after": 8326868992,
+      "selected_storage_verified": "i16"
+    },
+    {
+      "tag": "gtow_b-i16-f32avg-resources-corrected",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+        "validate",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\gtow_b-i16-f32avg.toml",
+        "--resources",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "wall_secs": 1.6958519000036176,
+      "free_bytes_after": 8326864896,
+      "selected_storage_verified": "i16-f32avg"
+    }
+  ],
+  "checks": "config selected storage and memoryEstimateBytes == selected storage + save + compression"
+}

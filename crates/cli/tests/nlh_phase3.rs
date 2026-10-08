@@ -46,6 +46,600 @@ fn text(path: &Path) -> &str {
     path.to_str().unwrap()
 }
 
+fn normalized_solution(path: &Path) -> Vec<u8> {
+    let mut payload = hu_postflop::sol::read_sol(&path.join("solution.sol")).unwrap();
+    payload.meta.wall_secs = 0.0;
+    let mut config: toml_edit::DocumentMut = payload.config_toml.parse().unwrap();
+    config.remove("run");
+    payload.config_toml = config.to_string();
+    postcard::to_allocvec(&payload).unwrap()
+}
+
+fn progress_rows(directory: &Path) -> Vec<runfiles::MetricsRow> {
+    std::fs::read_to_string(directory.join(runfiles::RUN_PROGRESS_FILE))
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+}
+
+#[test]
+fn auto_target_resume_preserves_evaluation_schedule_and_state() {
+    use hu_postflop::{checkpoint, prepare, run};
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    let raw = RIVER
+        .replace(
+            "max_iterations = 16",
+            "max_iterations = 500\ntarget = '0.0000001bb'",
+        )
+        .replace("check_every = 4\n", "")
+        .replace(
+            "checkpoint_interval = \"15m\"",
+            "checkpoint_interval = '0.000000001s'",
+        );
+    let config = temp.path().join("auto.toml");
+    std::fs::write(&config, &raw).unwrap();
+    let p = prepare::prepare(&raw, &config).unwrap();
+    let straight = temp.path().join("straight");
+    ok(&["solve", text(&config), "--out", text(&straight)]);
+    let once = checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+    let expected = progress_rows(&straight);
+    assert_eq!(
+        expected
+            .iter()
+            .take(3)
+            .map(|r| r.iteration)
+            .collect::<Vec<_>>(),
+        [25, 50, 100]
+    );
+    assert!(expected.last().unwrap().nash_conv / 2.0 <= p.target.unwrap());
+    for target_override in [None, Some(2.0 * p.target.unwrap())] {
+        hu_postflop::queries::with_live(
+            &p,
+            None,
+            target_override,
+            &AtomicBool::new(false),
+            |live| {
+                assert_eq!(live.summary.iterations, once.iteration);
+                assert_eq!(live.summary.nash_conv, expected.last().unwrap().nash_conv);
+                Ok(())
+            },
+        )
+        .unwrap();
+    }
+    let report = hu_postflop::report::compute(
+        &raw,
+        &config,
+        &["Ks 7h 2d 3c 9s".into()],
+        &AtomicBool::new(false),
+        &mut |_| {},
+    )
+    .unwrap();
+    assert_eq!(report[0].iterations, once.iteration);
+    assert_eq!(report[0].nash_conv, expected.last().unwrap().nash_conv);
+
+    // Cancel at an evaluation and at the sub-batch checkpoint inside the
+    // 50 -> 100 evaluation interval, where no Progress row is emitted.
+    for interrupted_at in [50, 75] {
+        let directory = temp.path().join(format!("resume-{interrupted_at}"));
+        std::fs::create_dir(&directory).unwrap();
+        std::fs::write(directory.join("run.toml"), &p.effective).unwrap();
+        let checkpoint_path = directory.join("checkpoint.ckpt");
+        let solution = directory.join("solution.sol");
+        let progress = directory.join(runfiles::RUN_PROGRESS_FILE);
+        let mut writer = runfiles::MetricsWriter::create_or_append(&progress).unwrap();
+        let cancel = AtomicBool::new(false);
+        let mut saved = Vec::new();
+        let summary = run::run(
+            run::RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint_path,
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &cancel,
+            },
+            &mut |observation| {
+                match observation {
+                    run::Observation::Progress(row) => {
+                        writer.append(&row)?;
+                        if row.iteration == interrupted_at {
+                            cancel.store(true, Ordering::SeqCst);
+                        }
+                    }
+                    run::Observation::Checkpoint { iterations } => {
+                        saved.push(iterations);
+                        if iterations == interrupted_at {
+                            cancel.store(true, Ordering::SeqCst);
+                        }
+                    }
+                    _ => {}
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(summary.iterations, interrupted_at);
+        assert!(summary.canceled);
+        assert_eq!(saved.last(), Some(&interrupted_at));
+        if interrupted_at == 75 {
+            assert_eq!(saved, [25, 50, 75]);
+            assert_eq!(
+                progress_rows(&directory)
+                    .iter()
+                    .map(|r| r.iteration)
+                    .collect::<Vec<_>>(),
+                [25, 50]
+            );
+            let game =
+                hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline()).unwrap();
+            let mut solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+                game.game,
+                run::schedule(&p.settings.solver.algorithm),
+                Some(p.settings.solver.stop.max_iterations),
+            );
+            solver.set_cfr_precision(p.settings.solver.cfr_precision);
+            solver.set_par(hu_engine::ParConfig {
+                chance_depth: p.settings.solver.parallel.chance_depth,
+                min_children: p.settings.solver.parallel.min_children,
+            });
+            for _ in 0..3 {
+                solver.run(25);
+            }
+            assert_eq!(
+                checkpoint::read_checkpoint(&checkpoint_path).unwrap().state,
+                solver.state()
+            );
+            let (ev, expl) = solver.evaluate();
+            let offset = p.payoff.ev_offset();
+            for player in [nlh::Player::P0, nlh::Player::P1] {
+                assert_eq!(summary.ev[player], ev[player] + offset[player]);
+            }
+            assert_eq!(
+                summary.nash_conv,
+                expl[nlh::Player::P0] + expl[nlh::Player::P1]
+            );
+        }
+        // Crash-style progress may contain duplicate rows and evaluations
+        // newer than the retained checkpoint; only the retained prefix counts.
+        for row in &expected {
+            writer.append(row).unwrap();
+        }
+        drop(writer);
+        let history = run::read_evaluation_history(&progress, interrupted_at);
+        let expected_history: Vec<_> = expected
+            .iter()
+            .filter(|r| r.iteration <= interrupted_at)
+            .map(|r| (r.iteration, r.nash_conv / 2.0))
+            .collect();
+        assert_eq!(history, expected_history);
+        assert_eq!(
+            run::next_evaluation(
+                &history,
+                p.target,
+                interrupted_at,
+                p.settings.solver.stop.max_iterations,
+                p.settings.solver.stop.check_every,
+            ),
+            100
+        );
+        let old_rows = progress_rows(&directory).len();
+        if interrupted_at == 50 {
+            run::run(
+                run::RunRequest {
+                    prepared: &p,
+                    checkpoint: &checkpoint_path,
+                    solution: &solution,
+                    state: Some(checkpoint::CheckpointReader::open(&checkpoint_path).unwrap()),
+                    evaluation_history: history,
+                    elapsed_before: Duration::ZERO,
+                    cancel: &AtomicBool::new(false),
+                },
+                &mut |observation| {
+                    if let run::Observation::Progress(row) = observation {
+                        runfiles::MetricsWriter::create_or_append(&progress)?.append(&row)?;
+                    }
+                    Ok(())
+                },
+                &mut |_| {},
+            )
+            .unwrap();
+        } else {
+            ok(&["resume", text(&directory)]);
+        }
+        let resumed = checkpoint::read_checkpoint(&checkpoint_path).unwrap();
+        assert_eq!(resumed.iteration, once.iteration);
+        assert_eq!(resumed.state, once.state);
+        assert_eq!(
+            normalized_solution(&directory),
+            normalized_solution(&straight)
+        );
+        let actual = progress_rows(&directory);
+        let continuation = &actual[old_rows..];
+        let remaining: Vec<_> = expected
+            .iter()
+            .filter(|r| r.iteration > interrupted_at)
+            .collect();
+        assert_eq!(continuation.len(), remaining.len());
+        for (actual, expected) in continuation.iter().zip(remaining) {
+            let mut actual = *actual;
+            let mut expected = *expected;
+            actual.elapsed_secs = 0.0;
+            expected.elapsed_secs = 0.0;
+            assert_eq!(actual, expected);
+        }
+    }
+}
+
+#[test]
+fn progress_history_uses_last_row_and_falls_back_when_unavailable() {
+    use hu_postflop::run;
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join(runfiles::RUN_PROGRESS_FILE);
+    assert!(run::read_evaluation_history(&path, 50).is_empty());
+    assert!(run::read_evaluation_history(temp.path(), 50).is_empty());
+    let mut writer = runfiles::MetricsWriter::create_or_append(&path).unwrap();
+    for (iteration, nash_conv) in [(50, 2.0), (25, 4.0), (50, 1.0), (75, 0.5)] {
+        writer
+            .append(&runfiles::MetricsRow {
+                iteration,
+                elapsed_secs: 0.0,
+                expl_p0: nash_conv / 2.0,
+                expl_p1: nash_conv / 2.0,
+                nash_conv,
+            })
+            .unwrap();
+    }
+    drop(writer);
+    assert_eq!(
+        run::read_evaluation_history(&path, 50),
+        [(25, 2.0), (50, 0.5)]
+    );
+    std::fs::write(&path, "invalid progress\n").unwrap();
+    let history = run::read_evaluation_history(&path, 75);
+    assert!(history.is_empty());
+    assert_eq!(
+        run::next_evaluation(
+            &history,
+            Some(0.1),
+            75,
+            500,
+            hu_postflop::input::CheckEvery::Auto
+        ),
+        100
+    );
+}
+
+#[test]
+fn explicit_legacy_check_every_25_resumes_with_fixed_evaluations() {
+    use hu_postflop::{checkpoint, prepare, run};
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    let raw = RIVER
+        .replace(
+            "max_iterations = 16",
+            "max_iterations = 500\ntarget = '0.0000001bb'",
+        )
+        .replace("check_every = 4", "check_every = 25");
+    let config = temp.path().join("legacy.toml");
+    std::fs::write(&config, &raw).unwrap();
+    let p = prepare::prepare(&raw, &config).unwrap();
+    let straight = temp.path().join("straight");
+    ok(&["solve", text(&config), "--out", text(&straight)]);
+    let directory = temp.path().join("resume");
+    std::fs::create_dir(&directory).unwrap();
+    // Preserve the historical explicit integer, rather than converting it to auto.
+    std::fs::write(directory.join("run.toml"), &raw).unwrap();
+    let checkpoint_path = directory.join("checkpoint.ckpt");
+    let solution = directory.join("solution.sol");
+    let mut writer =
+        runfiles::MetricsWriter::create_or_append(&directory.join(runfiles::RUN_PROGRESS_FILE))
+            .unwrap();
+    let cancel = AtomicBool::new(false);
+    run::run(
+        run::RunRequest {
+            prepared: &p,
+            checkpoint: &checkpoint_path,
+            solution: &solution,
+            state: None,
+            evaluation_history: Vec::new(),
+            elapsed_before: Duration::ZERO,
+            cancel: &cancel,
+        },
+        &mut |observation| {
+            if let run::Observation::Progress(row) = observation {
+                writer.append(&row)?;
+                cancel.store(true, Ordering::SeqCst);
+            }
+            Ok(())
+        },
+        &mut |_| {},
+    )
+    .unwrap();
+    drop(writer);
+    assert_eq!(
+        checkpoint::read_checkpoint(&checkpoint_path)
+            .unwrap()
+            .iteration,
+        25
+    );
+    ok(&["resume", text(&directory)]);
+    let resumed = checkpoint::read_checkpoint(&checkpoint_path).unwrap();
+    let once = checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(resumed.state, once.state);
+    assert_eq!(resumed.iteration, once.iteration);
+    assert_eq!(
+        normalized_solution(&directory),
+        normalized_solution(&straight)
+    );
+    assert_eq!(
+        progress_rows(&directory)
+            .iter()
+            .map(|r| r.iteration)
+            .collect::<Vec<_>>(),
+        progress_rows(&straight)
+            .iter()
+            .map(|r| r.iteration)
+            .collect::<Vec<_>>()
+    );
+    assert!(
+        progress_rows(&directory)
+            .iter()
+            .all(|r| r.iteration % 25 == 0)
+    );
+}
+
+#[test]
+fn omitted_final_checkpoint_resumes_periodic_state_with_crash_style_progress() {
+    use hu_postflop::{prepare, run};
+    use std::sync::atomic::AtomicBool;
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    for storage in ["f32", "i16", "i16-f32avg"] {
+        let raw = RIVER
+            .replace(
+                "[solver.stop]",
+                &format!("[solver]\nstorage = '{storage}'\n[solver.stop]"),
+            )
+            .replace(
+                "checkpoint_interval = \"15m\"",
+                "checkpoint_interval = '1s'\nfinal_checkpoint = false",
+            );
+        let p = prepare::prepare(&raw, Path::new("periodic.toml")).unwrap();
+        let directory = temp.path().join(storage);
+        std::fs::create_dir(&directory).unwrap();
+        std::fs::write(directory.join("run.toml"), &p.effective).unwrap();
+        let checkpoint = directory.join("checkpoint.ckpt");
+        let solution = directory.join("solution.sol");
+        let mut metrics =
+            runfiles::MetricsWriter::create_or_append(&directory.join("progress.jsonl")).unwrap();
+        let mut saved = Vec::new();
+        let summary = run::run(
+            run::RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |observation| {
+                match observation {
+                    run::Observation::Progress(row) => {
+                        let first = row.iteration == 4;
+                        metrics.append(&row)?;
+                        // Force exactly one periodic checkpoint in a tiny river
+                        // solve, with ample room for the remaining iterations.
+                        if first {
+                            std::thread::sleep(Duration::from_millis(1100));
+                        }
+                    }
+                    run::Observation::Checkpoint { iterations } => saved.push(iterations),
+                    _ => {}
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(summary.iterations, 16);
+        assert_eq!(saved, [4]);
+        assert_eq!(
+            hu_postflop::checkpoint::read_checkpoint(&checkpoint)
+                .unwrap()
+                .iteration,
+            4
+        );
+        let omitted_solution = normalized_solution(&directory);
+        let before = std::fs::read(directory.join("progress.jsonl")).unwrap();
+        // Editing this operational key must be accepted by compatibility_hash.
+        std::fs::write(
+            directory.join("run.toml"),
+            p.effective
+                .replace("final_checkpoint = false", "final_checkpoint = true"),
+        )
+        .unwrap();
+        ok(&["resume", text(&directory), "--checkpoint-interval", "1h"]);
+        let after = std::fs::read(directory.join("progress.jsonl")).unwrap();
+        assert!(after.starts_with(&before));
+        let iterations: Vec<_> = std::str::from_utf8(&after)
+            .unwrap()
+            .lines()
+            .map(|line| {
+                serde_json::from_str::<runfiles::MetricsRow>(line)
+                    .unwrap()
+                    .iteration
+            })
+            .collect();
+        assert_eq!(iterations, [4, 8, 12, 16, 8, 12, 16]);
+        let config = temp.path().join(format!("straight-{storage}.toml"));
+        std::fs::write(
+            &config,
+            raw.replace("final_checkpoint = false", "final_checkpoint = true")
+                .replace("'1s'", "'1h'"),
+        )
+        .unwrap();
+        let straight = temp.path().join(format!("straight-{storage}"));
+        ok(&["solve", text(&config), "--out", text(&straight)]);
+        let resumed = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+        let once =
+            hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+        assert_eq!(resumed.iteration, 16);
+        assert_eq!(resumed.state, once.state);
+        assert_eq!(
+            normalized_solution(&directory),
+            normalized_solution(&straight)
+        );
+        assert_eq!(omitted_solution, normalized_solution(&straight));
+    }
+}
+
+#[test]
+fn false_without_periodic_checkpoint_still_exports_but_cannot_resume() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("omit.toml");
+    std::fs::write(&config, format!("{RIVER}\nfinal_checkpoint = false\n")).unwrap();
+    let directory = temp.path().join("run");
+    ok(&["solve", text(&config), "--out", text(&directory)]);
+    assert!(!directory.join("checkpoint.ckpt").exists());
+    assert!(directory.join("solution.sol").exists());
+    let events = std::fs::read_to_string(directory.join("events.jsonl")).unwrap();
+    assert!(!events.contains("\"kind\":\"checkpoint\""));
+    let error = cli(&["resume", text(&directory)]);
+    assert_eq!(error.status.code(), Some(1));
+    let message = String::from_utf8_lossy(&error.stderr);
+    assert!(message.contains("final_checkpoint = false"));
+    assert!(message.contains("re-solve from run.toml"));
+}
+
+#[test]
+fn finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors() {
+    use hu_postflop::{prepare, run};
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::time::Duration;
+    let temp = tempfile::tempdir().unwrap();
+    for parallel in [false, true] {
+        let mut p = prepare::prepare(
+            &RIVER.replace("threads = 1", "threads = 3"),
+            Path::new("river.toml"),
+        )
+        .unwrap();
+        let peak = p
+            .estimate
+            .parallel_save_bytes(p.settings.solver.storage)
+            .unwrap();
+        p.limit = if parallel { peak } else { peak - 1 };
+        assert!(p.estimate.required_bytes(p.settings.solver.storage) <= p.limit);
+        for (checkpoint_error, solution_error) in
+            [(false, false), (true, false), (false, true), (true, true)]
+        {
+            let directory = tempfile::tempdir_in(temp.path()).unwrap();
+            let checkpoint = directory.path().join(if checkpoint_error {
+                "missing/checkpoint.ckpt"
+            } else {
+                "checkpoint.ckpt"
+            });
+            let solution = directory.path().join(if solution_error {
+                "missing/solution.sol"
+            } else {
+                "solution.sol"
+            });
+            let mut checkpoints = 0;
+            let result = run::run(
+                run::RunRequest {
+                    prepared: &p,
+                    checkpoint: &checkpoint,
+                    solution: &solution,
+                    state: None,
+                    evaluation_history: Vec::new(),
+                    elapsed_before: Duration::ZERO,
+                    cancel: &AtomicBool::new(false),
+                },
+                &mut |o| {
+                    assert_eq!(rayon::current_num_threads(), 3);
+                    if matches!(o, run::Observation::Checkpoint { .. }) {
+                        assert!(checkpoint.is_file());
+                        checkpoints += 1;
+                    }
+                    Ok(())
+                },
+                &mut |_| assert_eq!(rayon::current_num_threads(), 3),
+            );
+            assert_eq!(checkpoints, usize::from(!checkpoint_error));
+            if checkpoint_error {
+                assert!(
+                    result
+                        .err()
+                        .unwrap()
+                        .downcast_ref::<hu_postflop::checkpoint::CheckpointError>()
+                        .is_some()
+                );
+                assert_eq!(solution.is_file(), parallel && !solution_error);
+            } else if solution_error {
+                assert!(result.is_err());
+            } else {
+                assert!(result.is_ok());
+            }
+        }
+    }
+    // Omission applies to every stop reason, and never emits a final checkpoint.
+    for reason in [
+        "max-iterations",
+        "target-reached",
+        "time-limit",
+        "cancelled",
+    ] {
+        let raw = format!("{}\nfinal_checkpoint = false\n", RIVER);
+        let raw = match reason {
+            "target-reached" => raw.replace(
+                "max_iterations = 16",
+                "max_iterations = 16\ntarget = '100bb'",
+            ),
+            "time-limit" => format!("{raw}max_time = '0.000001s'\n"),
+            _ => raw,
+        };
+        let p = prepare::prepare(&raw, Path::new("omit.toml")).unwrap();
+        let directory = tempfile::tempdir_in(temp.path()).unwrap();
+        let checkpoint = directory.path().join("checkpoint.ckpt");
+        let solution = directory.path().join("solution.sol");
+        let cancel = AtomicBool::new(false);
+        let mut stop = None;
+        run::run(
+            run::RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &cancel,
+            },
+            &mut |o| {
+                match o {
+                    run::Observation::Progress(_) if reason == "cancelled" => {
+                        cancel.store(true, Ordering::SeqCst)
+                    }
+                    run::Observation::Stop { reason } => stop = Some(reason),
+                    run::Observation::Checkpoint { .. } => panic!("unexpected checkpoint"),
+                    _ => {}
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(stop, Some(reason));
+        assert!(!checkpoint.exists());
+        assert!(solution.is_file());
+    }
+}
+
 #[test]
 fn spec_p1_example_validate_text_json_effective_and_resources() {
     let temp = tempfile::tempdir().unwrap();
@@ -76,6 +670,13 @@ fn spec_p1_example_validate_text_json_effective_and_resources() {
     ]);
     let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(json["product"], "HuPostflop");
+    assert_eq!(
+        json["effectiveConfig"]["solver"]["algorithm"]["pow4_reset"],
+        false
+    );
+    for (key, value) in [("alpha", 1.25), ("beta", 0.5), ("gamma", 4.0)] {
+        assert_eq!(json["effectiveConfig"]["solver"]["algorithm"][key], value);
+    }
     assert_eq!(json["start"]["pot"], 5.5);
     assert_eq!(json["start"]["effective_stack"], 97.5);
     assert_eq!(json["start"]["oop"]["position"], "BB");
@@ -131,6 +732,7 @@ fn solve_resume_fork_effective_hashes_units_and_monitoring() {
         "1h",
     ]);
     let effective = std::fs::read_to_string(run.join("run.toml")).unwrap();
+    assert!(effective.contains("pow4_reset = false"));
     let solution = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
     let checkpoint =
         hu_postflop::checkpoint::read_checkpoint(&run.join("checkpoint.ckpt")).unwrap();
@@ -204,6 +806,117 @@ fn solve_resume_fork_effective_hashes_units_and_monitoring() {
 }
 
 #[test]
+fn explicit_legacy_dcfr_saved_config_resumes_and_omitted_original_is_rejected() {
+    for reset in [false, true] {
+        let temp = tempfile::tempdir().unwrap();
+        let config = temp.path().join("reset.toml");
+        let algorithm = format!(
+            "[solver.algorithm]\nalpha = 1.5\nbeta = 0.0\ngamma = 3.0\npow4_reset = {reset}\n[solver.stop]"
+        );
+        let raw = RIVER.replace("[solver.stop]", &algorithm);
+        std::fs::write(&config, &raw).unwrap();
+        let run = temp.path().join("reset");
+        ok(&[
+            "solve",
+            text(&config),
+            "--out",
+            text(&run),
+            "--max-time",
+            "0.000001s",
+        ]);
+        let checkpoint_path = run.join("checkpoint.ckpt");
+        let checkpoint = hu_postflop::checkpoint::read_checkpoint(&checkpoint_path).unwrap();
+        assert!(checkpoint.iteration < 16);
+        let effective = std::fs::read_to_string(run.join("run.toml")).unwrap();
+        for value in ["alpha = 1.5", "beta = 0.0", "gamma = 3.0"] {
+            assert!(effective.contains(value));
+        }
+        assert!(effective.contains(&format!("pow4_reset = {reset}")));
+        assert_eq!(checkpoint.config_toml.as_deref(), Some(effective.as_str()));
+        let solution = hu_postflop::sol::read_sol(&run.join("solution.sol")).unwrap();
+        assert_eq!(solution.config_toml, effective);
+        let resumed = temp.path().join("resumed");
+        ok(&[
+            "resume",
+            text(&checkpoint_path),
+            "--out",
+            text(&resumed),
+            "--max-time",
+            "1h",
+        ]);
+        let straight = temp.path().join("straight");
+        ok(&["solve", text(&config), "--out", text(&straight)]);
+        let resumed_state =
+            hu_postflop::checkpoint::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+        let straight_state =
+            hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+        assert_eq!(resumed_state.iteration, 16);
+        assert_eq!(resumed_state.state, straight_state.state);
+        // Simulate replacing an old run's expanded config with its omitted original.
+        std::fs::write(run.join("run.toml"), RIVER).unwrap();
+        let rejected = temp.path().join("rejected-reset");
+        let result = cli(&["resume", text(&run), "--out", text(&rejected)]);
+        assert_eq!(result.status.code(), Some(3));
+        assert!(String::from_utf8_lossy(&result.stderr).contains("config hash does not match"));
+        assert!(!rejected.exists());
+    }
+}
+
+#[test]
+fn i16_saved_false_from_pf7_resumes_without_adopting_new_default() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("pf7-i16.toml");
+    let raw = RIVER.replace(
+        "[solver.stop]",
+        "[solver]\nstorage = 'i16'\n[solver.algorithm]\nalpha = 1.25\nbeta = 0.5\ngamma = 4.0\npow4_reset = false\n[solver.stop]",
+    );
+    std::fs::write(&config, &raw).unwrap();
+    let partial = temp.path().join("partial");
+    ok(&[
+        "solve",
+        text(&config),
+        "--out",
+        text(&partial),
+        "--max-time",
+        "0.000001s",
+    ]);
+    let effective = std::fs::read_to_string(partial.join("run.toml")).unwrap();
+    assert!(effective.contains("pow4_reset = false"));
+    let checkpoint =
+        hu_postflop::checkpoint::read_checkpoint(&partial.join("checkpoint.ckpt")).unwrap();
+    assert!(checkpoint.iteration < 16);
+    assert_eq!(checkpoint.config_toml.as_deref(), Some(effective.as_str()));
+    assert_eq!(
+        hu_postflop::sol::read_sol(&partial.join("solution.sol"))
+            .unwrap()
+            .config_toml,
+        effective
+    );
+    let resumed = temp.path().join("resumed");
+    ok(&[
+        "resume",
+        text(&partial),
+        "--out",
+        text(&resumed),
+        "--max-time",
+        "1h",
+    ]);
+    let straight = temp.path().join("straight");
+    ok(&["solve", text(&config), "--out", text(&straight)]);
+    let resumed_state =
+        hu_postflop::checkpoint::read_checkpoint(&resumed.join("checkpoint.ckpt")).unwrap();
+    let straight_state =
+        hu_postflop::checkpoint::read_checkpoint(&straight.join("checkpoint.ckpt")).unwrap();
+    assert_eq!(resumed_state.iteration, 16);
+    assert_eq!(resumed_state.state, straight_state.state);
+    assert!(
+        std::fs::read_to_string(resumed.join("run.toml"))
+            .unwrap()
+            .contains("pow4_reset = false")
+    );
+}
+
+#[test]
 fn periodic_checkpoint_and_cumulative_time_limit() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("river.toml");
@@ -216,7 +929,7 @@ fn periodic_checkpoint_and_cumulative_time_limit() {
             .lines()
             .filter(|line| line.contains("\"kind\":\"checkpoint\""))
             .count(),
-        5
+        4
     );
     let limited = temp.path().join("limited");
     ok(&[

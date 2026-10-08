@@ -1,0 +1,1808 @@
+diff --git a/crates/hu-engine/src/solver.rs b/crates/hu-engine/src/solver.rs
+index 163d016..a10e49c 100644
+--- a/crates/hu-engine/src/solver.rs
++++ b/crates/hu-engine/src/solver.rs
+@@ -9,6 +9,8 @@ use crate::scratch::{Scratch, with_worker_scratch};
+ use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
+ use crate::tree::{NodeId, NodeKind, PublicTree};
+ 
++mod batch;
++
+ /// Variant-owned terminal evaluation — the only variant code on the hot
+ /// path, called per terminal or sibling batch per pass, amortized over all hands.
+ ///
+@@ -23,6 +25,24 @@ pub trait TerminalEvaluator: Send + Sync {
+     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+         self.eval(terminal, p, opp_reach, out);
+     }
++    /// CFR terminals for updating player `p`, each with its own opponent
++    /// reach and zero-initialized output. Default: one `eval_cfr` per terminal.
++    /// Overrides may batch with relaxed f32 rounding; a terminal's result must
++    /// be bitwise independent of its lane, caller grouping and thread count.
++    /// Outputs receive individual terminal values, without summing terminals.
++    fn eval_cfr_batch(
++        &self,
++        terminals: &[u32],
++        p: Player,
++        opp_reaches: &[&[f32]],
++        outs: &mut [&mut [f32]],
++    ) {
++        assert_eq!(terminals.len(), opp_reaches.len());
++        assert_eq!(terminals.len(), outs.len());
++        for ((&terminal, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
++            self.eval_cfr(terminal, p, reach, out);
++        }
++    }
+     /// CFR terminal children of one updating-player node, with identical
+     /// opponent reach. Each output starts at zero. The engine supplies small
+     /// batches in child order; other evaluators retain per-terminal behavior.
+@@ -730,6 +750,18 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+         "CFR output must start at zero"
+     );
+     let node = *ctx.tree.node(node_id);
++    // Exactly the chance-free Ambient bound in ActionViews::split_for.
++    // No descendant can parallelize or consume this storage view. Enter at
++    // the first eligible action node; its complete f32 walk is non-recursive.
++    if ctx.cfr_precision == CfrPrecision::F32
++        && node.kind == NodeKind::Action
++        && !ctx.tree.subtree_has_chance[node_id as usize]
++        && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
++        && batch::enabled()
++    {
++        batch::run::<_, _, PRUNE>(ctx, storage, scratch, node_id, my_reach, opp_reach, out);
++        return;
++    }
+     match node.kind {
+         NodeKind::Terminal => {
+             if !PRUNE || !all_zero(opp_reach) {
+@@ -1178,6 +1210,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+             scratch.put(sigma);
+         }
+     }
++    #[cfg(test)]
++    batch::record(node_id, out);
+ }
+ 
+ /// Read-only context threaded through [`value_pass`].
+diff --git a/crates/hu-engine/src/solver/opponent_terminal_tests.rs b/crates/hu-engine/src/solver/opponent_terminal_tests.rs
+index c544b68..35be1fc 100644
+--- a/crates/hu-engine/src/solver/opponent_terminal_tests.rs
++++ b/crates/hu-engine/src/solver/opponent_terminal_tests.rs
+@@ -176,7 +176,12 @@ fn run<const PRUNE: bool>(
+         .filter(|batch| batch.first().is_some_and(|(id, _)| *id >= 1000))
+         .collect();
+     let all_zero = reach.iter().all(|&r| r == 0.0);
+-    let batched = precision == CfrPrecision::F32 && !(PRUNE && all_zero);
++    // T21 is retained outside the T25b subtree entry. In particular, the
++    // zero-dimension tree fits the new bound and uses the default whole batch.
++    let subtree_batch = precision == CfrPrecision::F32
++        && !tree.subtree_has_chance[0]
++        && subtree_elements(&tree, 0) < 2 * ACTION_PAR_MIN_ELEMENTS;
++    let batched = precision == CfrPrecision::F32 && !subtree_batch && !(PRUNE && all_zero);
+     let mut wanted = Vec::new();
+     for (action, id) in [(0, 1000), (2, 1001), (4, 1002)] {
+         let r: Vec<_> = reach
+@@ -225,7 +230,7 @@ fn run<const PRUNE: bool>(
+     let mut ordered = vec![0.0; own_dim as usize];
+     let mut storage = F32Storage::new(tree.storage_len, tree.storage_refs.len());
+     storage.update_regrets(sref, sref.index, &regrets, &seed);
+-    let order: Vec<_> = if precision == CfrPrecision::F32 && !(PRUNE && all_zero) {
++    let order: Vec<_> = if batched {
+         vec![0, 2, 4, 1, 3]
+     } else {
+         vec![0, 1, 2, 3, 4]
+diff --git a/crates/hu-postflop/benches/kernels.rs b/crates/hu-postflop/benches/kernels.rs
+index 6d2cfa2..859d61b 100644
+--- a/crates/hu-postflop/benches/kernels.rs
++++ b/crates/hu-postflop/benches/kernels.rs
+@@ -94,6 +94,7 @@ fn bench_kernels(c: &mut Criterion) {
+     bench_case(c, "kernels", river_config());
+     bench_case(c, "kernels_wide", wide_river_config());
+     bench_realistic(c);
++    bench_t25_btn_bb(c);
+ }
+ 
+ fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
+@@ -216,8 +217,12 @@ fn bench_realistic(c: &mut Criterion) {
+     let mut sets = [Vec::new(), Vec::new()];
+     let mut siblings = Vec::new();
+     let mut opponents = Vec::new();
++    let mut t25 = Vec::new();
+     for iterations in [300, 50, 50] {
+         solver.run(iterations);
++        for p in Player::BOTH {
++            t25.push(t25_workload(&solver, p));
++        }
+         let game = solver.game();
+         for &(id, p, fold, showdown) in &sibling_nodes {
+             let reach = reach_at(
+@@ -275,6 +280,7 @@ fn bench_realistic(c: &mut Criterion) {
+         }
+     }
+     solver.set_cfr_precision(CfrPrecision::F32);
++    bench_t25(c, "wide", &solver, &t25);
+     let game = solver.game();
+     let mut out = PerPlayer::new(
+         vec![0.0; game.evaluator.hands.len(Player::P0)],
+@@ -421,6 +427,313 @@ criterion_group! {
+ }
+ criterion_main!(benches);
+ 
++struct T25Call {
++    // Indices of terminal children in child order (after zero-reach pruning).
++    indices: Vec<usize>,
++    opponent: bool,
++}
++
++// Primary T25 workload: the P1 test spot's actual BTN/BB preflop supports,
++// with the same betting menu, stack and f64 snapshot schedule as the wide case.
++// RiverConfig has no explicit include_allin option; its fractions are clamped
++// to the remaining stack by the existing river builder.
++fn bench_t25_btn_bb(c: &mut Criterion) {
++    let config = RiverConfig {
++        board: parse_cards("Ks 7h 2d 3c 9s").try_into().unwrap(),
++        ranges: PerPlayer::new(
++            "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
++            "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o".parse().unwrap(),
++        ),
++        bet_fractions: PerPlayer::new(vec![0.33, 0.75, 1.5], vec![0.33, 0.75, 1.5]),
++        max_raises: 3,
++        effective_stack: Chips(200),
++        ..river_config()
++    };
++    let built = build_river_game(&config, chip_ev());
++    let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
++    solver.set_cfr_precision(CfrPrecision::F64);
++    let mut workloads = Vec::new();
++    for iterations in [300, 50, 50] {
++        solver.run(iterations);
++        for p in Player::BOTH {
++            workloads.push(t25_workload(&solver, p));
++        }
++    }
++    solver.set_cfr_precision(CfrPrecision::F32);
++    bench_t25(c, "btn_bb", &solver, &workloads);
++}
++struct T25Workload {
++    p: Player,
++    terminals: Vec<u32>,
++    reaches: Vec<Vec<f32>>,
++    calls: Vec<T25Call>,
++}
++
++fn t25_workload(
++    solver: &Solver<hu_postflop::PostflopEvaluator, F32Storage>,
++    p: Player,
++) -> T25Workload {
++    let game = solver.game();
++    let mut workload = T25Workload {
++        p,
++        terminals: Vec::new(),
++        reaches: Vec::new(),
++        calls: Vec::new(),
++    };
++    for (id, node) in game.tree.nodes.iter().enumerate() {
++        if node.kind != NodeKind::Action {
++            continue;
++        }
++        let reach = reach_at(
++            &game.tree,
++            game.root_ranges.as_ref().map(|r| r.as_slice()),
++            id as u32,
++            |id, _, out| out.copy_from_slice(&solver.current_strategy_at(id)),
++        );
++        let strategy = solver.current_strategy_at(id as u32);
++        let opponent = node.player != p;
++        let mut indices = Vec::new();
++        for (a, child) in game.tree.children(id as u32).enumerate() {
++            let child = game.tree.node(child);
++            if child.kind != NodeKind::Terminal {
++                continue;
++            }
++            let mut r = reach[p.opponent()].clone();
++            if opponent {
++                let len = r.len();
++                for (r, &s) in r.iter_mut().zip(&strategy[a * len..(a + 1) * len]) {
++                    *r *= s;
++                }
++            }
++            let index = workload.terminals.len();
++            workload.terminals.push(child.aux);
++            if r.iter().any(|&r| r != 0.0) {
++                indices.push(index);
++            }
++            workload.reaches.push(r);
++        }
++        if !indices.is_empty() {
++            workload.calls.push(T25Call { indices, opponent });
++        }
++    }
++    assert_eq!(
++        workload.terminals.len(),
++        game.tree
++            .nodes
++            .iter()
++            .filter(|n| n.kind == NodeKind::Terminal)
++            .count()
++    );
++    workload
++}
++
++fn bench_t25(
++    c: &mut Criterion,
++    label: &str,
++    solver: &Solver<hu_postflop::PostflopEvaluator, F32Storage>,
++    workloads: &[T25Workload],
++) {
++    let e = &solver.game().evaluator;
++    eprintln!(
++        "t25 {label} supports: P0={} P1={}",
++        e.hands.len(Player::P0),
++        e.hands.len(Player::P1)
++    );
++    for (snapshot, w) in workloads.iter().enumerate() {
++        let batches = w.terminals.len().div_ceil(8);
++        let active: usize = w.calls.iter().map(|c| c.indices.len()).sum();
++        let hash = w
++            .reaches
++            .iter()
++            .flatten()
++            .fold(0xcbf2_9ce4_8422_2325u64, |h, r| {
++                (h ^ u64::from(r.to_bits())).wrapping_mul(0x100_0000_01b3)
++            });
++        eprintln!(
++            "t25 {label} snapshot={} player={:?}: terminals={} active={} batches={} lane_fill={:.6} reach_hash={hash:016x}",
++            snapshot / 2,
++            w.p,
++            w.terminals.len(),
++            active,
++            batches,
++            w.terminals.len() as f64 / (batches * 8) as f64
++        );
++    }
++    // Allocate outputs, references and all call metadata before the timer.
++    let mut outputs: Vec<Vec<Vec<f32>>> = workloads
++        .iter()
++        .map(|w| vec![vec![0.0; e.hands.len(w.p)]; w.terminals.len()])
++        .collect();
++    let mut refs: Vec<Vec<&mut [f32]>> = outputs
++        .iter_mut()
++        .map(|rows| rows.iter_mut().map(Vec::as_mut_slice).collect())
++        .collect();
++    let reaches: Vec<Vec<&[f32]>> = workloads
++        .iter()
++        .map(|w| w.reaches.iter().map(Vec::as_slice).collect())
++        .collect();
++    let mut node_outputs: Vec<Vec<Vec<f32>>> = workloads
++        .iter()
++        .map(|w| vec![vec![0.0; e.hands.len(w.p)]; w.calls.len()])
++        .collect();
++    let mut tmp = vec![0.0; e.hands.len(Player::P0).max(e.hands.len(Player::P1))];
++    // Validate the optimized executable on the exact timed snapshot reaches.
++    // This also checks width-1 versus full-batch bitwise agreement after LTO.
++    let mut max_error = 0.0f64;
++    for ((w, outs), rs) in workloads.iter().zip(&mut refs).zip(&reaches) {
++        e.eval_cfr_batch(&w.terminals, w.p, rs, outs);
++        let mut exact = vec![0.0; e.hands.len(w.p)];
++        let mut alone = exact.clone();
++        for ((&id, &reach), out) in w.terminals.iter().zip(rs).zip(outs.iter()) {
++            e.eval(id, w.p, reach, &mut exact);
++            let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
++            let error = exact
++                .iter()
++                .zip(out.iter())
++                .map(|(&a, &b)| {
++                    assert!(b.is_finite());
++                    (f64::from(a) - f64::from(b)).abs()
++                })
++                .fold(0.0, f64::max);
++            if scale == 0.0 {
++                assert_eq!(error, 0.0);
++            } else {
++                max_error = max_error.max(error / scale);
++            }
++            alone.fill(0.0);
++            e.eval_cfr_batch(&[id], w.p, &[reach], &mut [&mut alone]);
++            assert!(
++                alone
++                    .iter()
++                    .zip(out.iter())
++                    .all(|(a, b)| a.to_bits() == b.to_bits())
++            );
++        }
++        for out in outs {
++            out.fill(0.0);
++        }
++    }
++    assert!(
++        max_error < 1e-5,
++        "{label} relative max-norm error {max_error}"
++    );
++    eprintln!(
++        "t25 {label} maximum relative infinity error={max_error:e}; width-1/full grouping bitwise equal"
++    );
++    let mut group = c.benchmark_group("kernels_realistic");
++    for mode in ["t25_lone", "t25_current", "t25_batch"] {
++        group.bench_function(format!("{mode}_{label}"), |b| {
++            b.iter(|| {
++                for (((w, outs), reaches), node_outs) in workloads
++                    .iter()
++                    .zip(&mut refs)
++                    .zip(&reaches)
++                    .zip(&mut node_outputs)
++                {
++                    // The engine supplies zeroed terminal rows/node outputs.
++                    for out in outs.iter_mut() {
++                        out.fill(0.0);
++                    }
++                    match mode {
++                        "t25_lone" => {
++                            for ((&id, &reach), out) in
++                                w.terminals.iter().zip(reaches).zip(outs.iter_mut())
++                            {
++                                e.eval_cfr(black_box(id), black_box(w.p), black_box(reach), out);
++                            }
++                        }
++                        "t25_batch" => e.eval_cfr_batch(
++                            black_box(&w.terminals),
++                            black_box(w.p),
++                            black_box(reaches),
++                            outs,
++                        ),
++                        _ => {
++                            for (call, node_out) in w.calls.iter().zip(node_outs) {
++                                node_out.fill(0.0);
++                                for pair in call.indices.chunks(2) {
++                                    let a = pair[0];
++                                    let mut ids = [w.terminals[a], 0];
++                                    let mut rs = [reaches[a], &[]];
++                                    if pair.len() == 2 {
++                                        ids[1] = w.terminals[pair[1]];
++                                        rs[1] = reaches[pair[1]];
++                                    }
++                                    if call.opponent {
++                                        let num_hands = node_out.len();
++                                        e.add_cfr_opponent_terminals(
++                                            black_box(&ids[..pair.len()]),
++                                            black_box(w.p),
++                                            black_box(&rs[..pair.len()]),
++                                            node_out,
++                                            &mut tmp[..num_hands],
++                                        );
++                                    } else if pair.len() == 2 {
++                                        let (before, after) = outs.split_at_mut(pair[1]);
++                                        e.eval_cfr_siblings(
++                                            black_box(&ids),
++                                            black_box(w.p),
++                                            black_box(rs[0]),
++                                            &mut [&mut *before[a], &mut *after[0]],
++                                        );
++                                    } else {
++                                        e.eval_cfr_siblings(
++                                            black_box(&ids[..1]),
++                                            black_box(w.p),
++                                            black_box(rs[0]),
++                                            &mut [&mut *outs[a]],
++                                        );
++                                    }
++                                }
++                                black_box(node_out);
++                            }
++                        }
++                    }
++                    black_box(outs);
++                }
++            })
++        });
++    }
++    // Fixed-work estimates, measured separately from the whole-subtree replay.
++    // Zero reaches still exercise the complete batch path (no zero skipping).
++    let w = &workloads[0];
++    let zero = vec![0.0; e.hands.len(w.p.opponent())];
++    let zero_rows = vec![zero.clone(); 8];
++    let zero_refs: Vec<_> = zero_rows.iter().map(Vec::as_slice).collect();
++    group.bench_function(format!("t25_zero_eight_{label}"), |b| {
++        b.iter(|| {
++            for out in &mut refs[0][..8] {
++                out.fill(0.0);
++            }
++            e.eval_cfr_batch(
++                black_box(&w.terminals[..8]),
++                black_box(w.p),
++                black_box(&zero_refs),
++                &mut refs[0][..8],
++            );
++            black_box(&refs[0][..8]);
++        })
++    });
++    // Use the same showdown terminal for the real and zero one-lane calls.
++    // All non-fold terminals on the river are showdowns; locate check-check.
++    let terminal = w.terminals[0];
++    for (kind, reach) in [("one_lane", reaches[0][0]), ("zero_lane", zero.as_slice())] {
++        group.bench_function(format!("t25_{kind}_{label}"), |b| {
++            b.iter(|| {
++                refs[0][0].fill(0.0);
++                e.eval_cfr_batch(
++                    black_box(&[terminal]),
++                    black_box(w.p),
++                    black_box(&[reach]),
++                    &mut [&mut *refs[0][0]],
++                );
++                black_box(&refs[0][0]);
++            })
++        });
++    }
++    group.finish();
++}
++
+ // Baseline of the engine's current opponent-terminal path.
+ fn baseline_opponent_add<E: TerminalEvaluator>(
+     evaluator: &E,
+diff --git a/crates/hu-postflop/src/kernel.rs b/crates/hu-postflop/src/kernel.rs
+index 60001bb..5fc8ace 100644
+--- a/crates/hu-postflop/src/kernel.rs
++++ b/crates/hu-postflop/src/kernel.rs
+@@ -148,6 +148,217 @@ pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f
+     add_relaxed_f32(hands, reach, &mut total, &mut card);
+     (total, card)
+ }
++
++pub(crate) const TERMINAL_LANES: usize = 8;
++struct TerminalLaneBuffers {
++    reach: Vec<f32>,
++    values: Vec<f32>,
++}
++thread_local! {
++    // Retain the high-water lengths to avoid zeroing on alternating full and
++    // partial batches. Each call touches only support_length * lane_count.
++    static TERMINAL_LANE_BUFFERS: std::cell::RefCell<TerminalLaneBuffers> =
++        const { std::cell::RefCell::new(TerminalLaneBuffers { reach: Vec::new(), values: Vec::new() }) };
++}
++
++// Each fixed-size array is one independent value per terminal. These loops
++// vectorize across terminals, sharing hand/card indices and rank control flow.
++fn add_lane_hands<const LANES: usize>(
++    hands: &[Hand],
++    reach: &[[f32; LANES]],
++    weight: [f32; LANES],
++    total: &mut [f32; LANES],
++    card: &mut [[f32; LANES]; 52],
++) {
++    for h in hands {
++        let r = reach[h.local as usize];
++        for ((t, r), w) in total.iter_mut().zip(r).zip(weight) {
++            *t += w * r;
++        }
++        for &c in &h.cards {
++            for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(weight) {
++                *v += w * r;
++            }
++        }
++    }
++}
++
++/// Single-board f32 batch, including folds with equal win/tie/lose utilities.
++/// Reused worker buffers hold (opponent support + 1) * active lanes reaches
++/// and own support * active lanes values. After first use/growth there is no
++/// allocation or bulk buffer zeroing. Only the sentinel row is cleared.
++/// Stack arrays are 52 * active lanes card sums and a few lane vectors
++/// (less than 3 KiB at eight lanes). Dead own outputs are explicitly cleared.
++/// Width specialization keeps even a one-lane call proportional to its width;
++/// every width uses the same per-terminal summation order.
++pub(crate) fn terminal_batch_kernel_f32(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: &[[f32; 3]],
++    reaches: &[&[f32]],
++    outs: &mut [&mut [f32]],
++    indices: &[usize],
++) {
++    TERMINAL_LANE_BUFFERS.with_borrow_mut(|scratch| {
++        macro_rules! dispatch {
++            ($lanes:literal) => {
++                terminal_batch_lanes_f32::<$lanes>(
++                    own, opp, same, utilities, reaches, outs, indices, scratch,
++                )
++            };
++        }
++        match reaches.len() {
++            1 => dispatch!(1),
++            2 => dispatch!(2),
++            3 => dispatch!(3),
++            4 => dispatch!(4),
++            5 => dispatch!(5),
++            6 => dispatch!(6),
++            7 => dispatch!(7),
++            8 => dispatch!(8),
++            _ => panic!("terminal batch must have 1..=8 lanes"),
++        }
++    });
++}
++
++#[allow(clippy::too_many_arguments)]
++// Keep the width-specific frames separate: inlining the dispatch otherwise
++// reserves the eight-lane frame even for a one-lane call.
++#[inline(never)]
++fn terminal_batch_lanes_f32<const LANES: usize>(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: &[[f32; 3]],
++    reaches: &[&[f32]],
++    outs: &mut [&mut [f32]],
++    indices: &[usize],
++    scratch: &mut TerminalLaneBuffers,
++) {
++    assert_eq!(reaches.len(), LANES);
++    assert_eq!(utilities.len(), reaches.len());
++    assert_eq!(indices.len(), reaches.len());
++    let opp_len = reaches[0].len();
++    assert!(opp_len <= nlh::NUM_COMBOS);
++    let own_len = same.len();
++    let reach_size = (opp_len + 1) * LANES;
++    let value_size = own_len * LANES;
++    // Grow only on first use/larger supports, not on every width transition.
++    if scratch.reach.len() < reach_size {
++        scratch.reach.resize(reach_size, 0.0);
++    }
++    if scratch.values.len() < value_size {
++        scratch.values.resize(value_size, 0.0);
++    }
++    let (buf, _) = scratch.reach[..reach_size].as_chunks_mut::<LANES>();
++    let (values, _) = scratch.values[..value_size].as_chunks_mut::<LANES>();
++    buf[opp_len].fill(0.0);
++    for &i in indices {
++        assert_eq!(outs[i].len(), own_len);
++        outs[i].fill(0.0);
++    }
++    for (lane, &reach) in reaches.iter().enumerate() {
++        assert_eq!(reach.len(), opp_len);
++        for (row, &r) in buf[..opp_len].iter_mut().zip(reach) {
++            row[lane] = r;
++        }
++    }
++    let mut win = [0.0; LANES];
++    let mut tie = win;
++    let mut lose = win;
++    for (((w, t), l), &[uw, ut, ul]) in win.iter_mut().zip(&mut tie).zip(&mut lose).zip(utilities) {
++        *w = uw;
++        *t = ut;
++        *l = ul;
++    }
++    let win_lose: [f32; LANES] = std::array::from_fn(|i| win[i] - lose[i]);
++    let tie_lose: [f32; LANES] = std::array::from_fn(|i| tie[i] - lose[i]);
++    let win_tie: [f32; LANES] = std::array::from_fn(|i| win[i] - tie[i]);
++    let mut total = [0.0; LANES];
++    let mut card = [[0.0; LANES]; 52];
++    add_lane_hands(&opp.hands, buf, [1.0; LANES], &mut total, &mut card);
++    for (t, u) in total.iter_mut().zip(lose) {
++        *t *= u;
++    }
++    for row in &mut card {
++        for (c, u) in row.iter_mut().zip(lose) {
++            *c *= u;
++        }
++    }
++    let mut oi = 0;
++    let mut os = 0;
++    let mut start = 0;
++    for &(rank, end) in &own.groups {
++        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
++            let oe = opp.groups[oi].1;
++            add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
++            os = oe;
++            oi += 1;
++        }
++        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
++        let oe = if tied { opp.groups[oi].1 } else { os };
++        let mut group_total = [0.0; LANES];
++        for h in &opp.hands[os..oe] {
++            let r = buf[h.local as usize];
++            for (t, r) in group_total.iter_mut().zip(r) {
++                *t += r;
++            }
++            for &c in &h.cards {
++                for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
++                    *v += w * r;
++                }
++            }
++        }
++        for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
++            *t += w * g;
++        }
++        for h in &own.hands[start..end] {
++            let [a, b] = h.cards.map(usize::from);
++            let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
++            let row = &mut values[h.local as usize];
++            for (((((v, t), ca), cb), s), u) in row
++                .iter_mut()
++                .zip(total)
++                .zip(card[a])
++                .zip(card[b])
++                .zip(identical)
++                .zip(tie)
++            {
++                *v = t - ca - cb + u * s;
++            }
++        }
++        if tied {
++            // Re-read just the tied hands instead of resetting/merging a
++            // 52 x 8 group array for every own rank. Total retains the same
++            // group-wise addition order as the existing relaxed sweep.
++            for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
++                *t += w * g;
++            }
++            for h in &opp.hands[os..oe] {
++                let r = buf[h.local as usize];
++                for &c in &h.cards {
++                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
++                        *v += w * r;
++                    }
++                }
++            }
++            os = oe;
++            oi += 1;
++        }
++        start = end;
++    }
++    // Only live rows were computed; unused worker-buffer rows are untouched.
++    // Outputs were cleared above so board-dead own entries stay positive zero.
++    for (lane, &index) in indices.iter().enumerate() {
++        let out = &mut outs[index];
++        for h in &own.hands {
++            let local = h.local as usize;
++            out[local] = values[local][lane];
++        }
++    }
++}
++
+ fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
+     let other = same[h.local as usize];
+     if other == ABSENT {
+diff --git a/crates/hu-postflop/src/postflop.rs b/crates/hu-postflop/src/postflop.rs
+index 77e00c5..65cb3ed 100644
+--- a/crates/hu-postflop/src/postflop.rs
++++ b/crates/hu-postflop/src/postflop.rs
+@@ -15,6 +15,7 @@
+ //! fold) live in [`crate::kernel`] and are shared verbatim with the
+ //! river-only shim in [`crate::river`].
+ 
++use std::cell::RefCell;
+ use std::collections::{BTreeMap, BTreeSet};
+ use std::ops::{Index, IndexMut};
+ 
+@@ -424,6 +425,10 @@ pub struct PostflopEvaluator {
+     /// Showdown rank tables, deduped by completed 5-card board (see
+     /// [`Builder::rank_table_id`]).
+     rank_tables: Vec<PerPlayer<RankedHands>>,
++    /// Batch-only table lookup. River folds share their board's showdown
++    /// table; earlier folds (or boards without a table) keep the MAX sentinel.
++    /// The existing terminal table/dispatch and all existing kernels are unchanged.
++    batch_tables: Vec<u32>,
+     /// Live combos disjoint from the subgame's *starting* board, used by
+     /// every fold terminal regardless of street or runout — see the
+     /// invariant documented on [`kernel::fold_kernel`].
+@@ -436,6 +441,12 @@ pub struct PostflopEvaluator {
+ #[path = "precision_tests.rs"]
+ mod precision_tests;
+ 
++thread_local! {
++    // Only caller indices, no reaches/outputs or evaluator-owned references.
++    // Allocates on first use/growth, then reuses capacity on each worker.
++    static TERMINAL_BATCH_ORDER: RefCell<Vec<usize>> = const { RefCell::new(Vec::new()) };
++}
++
+ impl TerminalEvaluator for PostflopEvaluator {
+     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+         self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
+@@ -443,6 +454,74 @@ impl TerminalEvaluator for PostflopEvaluator {
+     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+         self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
+     }
++    fn eval_cfr_batch(
++        &self,
++        terminals: &[u32],
++        p: Player,
++        opp_reaches: &[&[f32]],
++        outs: &mut [&mut [f32]],
++    ) {
++        assert_eq!(terminals.len(), opp_reaches.len());
++        assert_eq!(terminals.len(), outs.len());
++        if self.cfr_precision != hu_engine::CfrPrecision::F32 {
++            for ((&id, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
++                self.eval_cfr(id, p, reach, out);
++            }
++            return;
++        }
++        TERMINAL_BATCH_ORDER.with_borrow_mut(|order| {
++            order.clear();
++            for (i, ((&id, &reach), out)) in terminals
++                .iter()
++                .zip(opp_reaches)
++                .zip(outs.iter_mut())
++                .enumerate()
++            {
++                assert_eq!(reach.len(), self.hands.len(p.opponent()));
++                assert_eq!(out.len(), self.hands.len(p));
++                if self.batch_tables[id as usize] == u32::MAX {
++                    self.eval_cfr(id, p, reach, out);
++                } else {
++                    order.push(i);
++                }
++            }
++            order.sort_unstable_by_key(|&i| self.batch_tables[terminals[i] as usize]);
++            let mut remaining = order.as_slice();
++            while let Some(&first) = remaining.first() {
++                let table_id = self.batch_tables[terminals[first] as usize];
++                let end = remaining
++                    .partition_point(|&i| self.batch_tables[terminals[i] as usize] == table_id);
++                let (group, tail) = remaining.split_at(end);
++                let table = &self.rank_tables[table_id as usize];
++                for indices in group.chunks(kernel::TERMINAL_LANES) {
++                    let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
++                    let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
++                    for ((reach, utility), &i) in
++                        reaches.iter_mut().zip(&mut utilities).zip(indices)
++                    {
++                        *reach = opp_reaches[i];
++                        let term = &self.terminals[terminals[i] as usize];
++                        let u = Self::cfr_utilities(term, p);
++                        *utility = if matches!(term.kind, TerminalKind::Fold { .. }) {
++                            [u[0] as f32; 3]
++                        } else {
++                            u.map(|v| v as f32)
++                        };
++                    }
++                    kernel::terminal_batch_kernel_f32(
++                        &table[p],
++                        &table[p.opponent()],
++                        &self.hands.same[p],
++                        &utilities[..indices.len()],
++                        &reaches[..indices.len()],
++                        outs,
++                        indices,
++                    );
++                }
++                remaining = tail;
++            }
++        });
++    }
+     fn eval_cfr_siblings(
+         &self,
+         terminals: &[u32],
+@@ -1407,10 +1486,28 @@ fn build_checked(
+         ..
+     } = builder;
+ 
++    // Precompute only the new batch dispatch. Fold terminal metadata remains
++    // unchanged so every existing CFR/evaluation path retains its behavior.
++    let board_tables: BTreeMap<_, _> = terminals
++        .iter()
++        .filter(|t| matches!(t.kind, TerminalKind::Showdown) && t.board_mask.count_ones() == 5)
++        .map(|t| (t.board_mask, t.table))
++        .collect();
++    let batch_tables = terminals
++        .iter()
++        .map(|t| {
++            if matches!(t.kind, TerminalKind::Showdown) {
++                t.table
++            } else {
++                board_tables.get(&t.board_mask).copied().unwrap_or(u32::MAX)
++            }
++        })
++        .collect();
+     let evaluator = PostflopEvaluator {
+         cfr_precision: hu_engine::CfrPrecision::F64,
+         terminals,
+         rank_tables,
++        batch_tables,
+         fold_combos,
+         hands,
+         mask_cards,
+diff --git a/crates/hu-postflop/src/precision_tests.rs b/crates/hu-postflop/src/precision_tests.rs
+index 5c06a19..17be958 100644
+--- a/crates/hu-postflop/src/precision_tests.rs
++++ b/crates/hu-postflop/src/precision_tests.rs
+@@ -127,6 +127,146 @@ fn bits(v: &[f32]) -> Vec<u32> {
+     v.iter().map(|v| v.to_bits()).collect()
+ }
+ 
++#[test]
++fn t25_batch_accuracy_and_bitwise_grouping() {
++    use rayon::prelude::*;
++    let mut cfg = config();
++    // Real runout tables, full support on one seat and asymmetric support
++    // on the other: includes board-dead own hands and ABSENT same combos.
++    cfg.ranges[Player::P0] = nlh::Range::full();
++    let mut built = build_postflop_game(
++        &cfg,
++        PayoffPipeline {
++            rake: &NoRake,
++            utility: &ChipEv,
++        },
++    );
++    let e = &mut built.game.evaluator;
++    // Repeat IDs with distinct reaches so each river table fills eight lanes,
++    // even though this deliberately small betting tree has fewer terminals.
++    let ids: Vec<_> = (0..e.terminals.len() as u32)
++        .cycle()
++        .take(e.terminals.len() * 2)
++        .collect();
++    let mut max_error = 0.0f64;
++    let mut river_folds = 0;
++    let mut early_folds = 0;
++    for (t, &table) in e.terminals.iter().zip(&e.batch_tables) {
++        if matches!(t.kind, super::TerminalKind::Fold { .. }) {
++            if t.board_mask.count_ones() == 5 {
++                assert_ne!(table, u32::MAX);
++                river_folds += 1;
++            } else {
++                assert_eq!(table, u32::MAX);
++                early_folds += 1;
++            }
++        }
++    }
++    assert!(river_folds > 0 && early_folds > 0 && e.rank_tables.len() > 1);
++    for p in Player::BOTH {
++        for pattern in 0..5 {
++            let reaches: Vec<Vec<f32>> = ids
++                .iter()
++                .enumerate()
++                .map(|(slot, &id)| {
++                    let board = e.terminals[id as usize].board_mask;
++                    e.hands
++                        .combos(p.opponent())
++                        .iter()
++                        .enumerate()
++                        .map(|(i, &h)| {
++                            let (a, b) = combo_cards(h as usize);
++                            if board & ((1 << a.index()) | (1 << b.index())) != 0 || pattern == 3 {
++                                0.0
++                            } else if pattern == 4 || (i + slot) % 7 == 0 {
++                                -0.0
++                            } else {
++                                ((i * 37 + slot * 19) % 101 + 1) as f32 / 103.0
++                                    * [1.0, 0.001, 100.0][pattern]
++                            }
++                        })
++                        .collect()
++                })
++                .collect();
++            let refs: Vec<_> = reaches.iter().map(Vec::as_slice).collect();
++            let run = |e: &PostflopEvaluator, order: &[usize], chunk: usize| {
++                let mut results = vec![vec![0.0; e.hands.len(p)]; ids.len()];
++                for indices in order.chunks(chunk) {
++                    let terminals: Vec<_> = indices.iter().map(|&i| ids[i]).collect();
++                    let rs: Vec<_> = indices.iter().map(|&i| refs[i]).collect();
++                    let mut rows = vec![vec![0.0; e.hands.len(p)]; indices.len()];
++                    let mut outs: Vec<_> = rows.iter_mut().map(Vec::as_mut_slice).collect();
++                    e.eval_cfr_batch(&terminals, p, &rs, &mut outs);
++                    for (&i, row) in indices.iter().zip(rows) {
++                        results[i] = row;
++                    }
++                }
++                results
++            };
++            let order: Vec<_> = (0..ids.len()).collect();
++            e.set_cfr_precision(CfrPrecision::F32);
++            let baseline = run(e, &order, 1);
++            for (slot, (&id, row)) in ids.iter().zip(&baseline).enumerate() {
++                let mut exact = vec![0.0; row.len()];
++                e.eval(id, p, refs[slot], &mut exact);
++                max_error = max_error.max(relative_error(&exact, row));
++                assert!(max_error < 1e-5, "batch max relative error {max_error}");
++                let board = e.terminals[id as usize].board_mask;
++                for (&combo, &value) in e.hands.combos(p).iter().zip(row) {
++                    let (a, b) = combo_cards(combo as usize);
++                    if board & ((1 << a.index()) | (1 << b.index())) != 0 {
++                        assert_eq!(value.to_bits(), 0);
++                    }
++                }
++            }
++            let baseline_bits: Vec<_> = baseline.iter().map(|r| bits(r)).collect();
++            let mut reversed = order.clone();
++            reversed.reverse();
++            let mut rotated = order.clone();
++            rotated.rotate_left(3);
++            let mut packed = order.clone();
++            packed.sort_unstable_by_key(|&i| e.batch_tables[ids[i] as usize]);
++            for threads in [1, 4] {
++                let pool = rayon::ThreadPoolBuilder::new()
++                    .num_threads(threads)
++                    .build()
++                    .unwrap();
++                let variants = pool.install(|| {
++                    [
++                        (&packed, 8),
++                        (&packed, 7),
++                        (&reversed, 13),
++                        (&rotated, ids.len()),
++                    ]
++                    .par_iter()
++                    .map(|(order, chunk)| {
++                        run(e, order, *chunk)
++                            .iter()
++                            .map(|r| bits(r))
++                            .collect::<Vec<_>>()
++                    })
++                    .collect::<Vec<_>>()
++                });
++                for variant in variants {
++                    assert_eq!(variant, baseline_bits);
++                }
++            }
++            // f64 batch is exactly the old per-terminal path.
++            e.set_cfr_precision(CfrPrecision::F64);
++            let exact_batch = run(e, &reversed, 13);
++            for (slot, (&id, row)) in ids.iter().zip(exact_batch).enumerate() {
++                let mut exact = vec![0.0; row.len()];
++                e.eval_cfr(id, p, refs[slot], &mut exact);
++                assert_eq!(bits(&row), bits(&exact));
++            }
++            e.eval_cfr_batch(&[], p, &[], &mut []);
++        }
++    }
++    println!(
++        "t25 maximum relative infinity error={max_error:e}; river folds={river_folds}, early folds={early_folds}"
++    );
++}
++
+ #[test]
+ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
+     let game = game();
+@@ -427,6 +567,14 @@ fn deterministic<S: Storage>() {
+                 .install(|| {
+                     let game = game().game;
+                     assert!(game.tree.storage_len > 0);
++                    // Exercise the T25b entry with every backend/thread count:
++                    // chance-free action subtrees below the 2*16384 bound.
++                    assert!(game.tree.nodes.iter().enumerate().any(|(id, n)| {
++                        let span = game.tree.storage_spans[id];
++                        n.kind == NodeKind::Action
++                            && !game.tree.subtree_has_chance[id]
++                            && span.end - span.start < 32_768
++                    }));
+                     let mut solver =
+                         hu_engine::Solver::<_, S>::new(game, Box::<Dcfr>::default(), Some(12));
+                     // One call selects both the regret matching and the evaluator kernels.
+@@ -532,3 +680,6 @@ fn precision_all_backends_deterministic_and_saved_ev_exact() {
+ 
+ #[path = "opponent_precision_tests.rs"]
+ mod opponent_precision_tests;
++
++#[path = "batch_precision_tests.rs"]
++mod batch_precision_tests;
+diff --git a/docs/architecture.md b/docs/architecture.md
+index d9c3c82..c2cd178 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -114,6 +114,13 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
+ を備える。CLI の選択肢と既定値は規範仕様に置き、本書には別の既定値表を作らない。
+ 
+ `CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
++f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
++最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
++node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
++不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
++sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
++既定batch hookは個別の`eval_cfr`、P1の同一board終端は最大8 laneの順位走査を使う。f64は従来の再帰passを維持する。
++このsubtree経路の外では、以下の直下終端の処理を使う。
+ f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
+ action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
+ 全0相手reachのpruningと`ActionViews`のstorage分割を維持する。既定hookは個別の`eval_cfr`を呼ぶ。
+diff --git a/docs/hu-postflop.jp.md b/docs/hu-postflop.jp.md
+index 6cb5634..421df71 100644
+--- a/docs/hu-postflop.jp.md
++++ b/docs/hu-postflop.jp.md
+@@ -94,7 +94,13 @@ live queryのtarget判定にも同じ評価方式を使う。
+ f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
+ showdownはloseの効用で重み付けしたtotal/card和から始め、相手groupを順位順にtie、winの重みへ増分更新する。
+ 自handの値は共通totalから2枚のcard和を引き、同一comboのtie補正を加える。相手reachが0でも分岐せず加算する。
+-同順位groupの処理後は既存の52枚のcard和mergeでtieの重みをwinへ変換する。
++同順位groupの処理後、直下終端の融合経路は52枚のcard和merge、lane batch経路は同順位handの再走査でtieの重みをwinへ変換する。
++chanceを含まずaction並列化の閾値未満のsubtreeでは、f32のCFRを非再帰の3段階で処理する。
++上から戦略とreachを計算し、全0相手reachの終端をPRUNEで除いた後、subtree内の全終端を
++`eval_cfr_batch`へ1回で渡す。同一boardのshowdownとRiver foldは最大8 laneの順位走査を共有する。
++その後、下から子順に値を合成し、各更新nodeのregretとreach付き戦略を従来の順で更新する。
++全0相手reachの下でも更新playerのnodeを訪問する。arenaは席別supportに応じてworkerごとに再利用する。
++このsubtree経路の外では、次の直下終端の融合を使う。f64のCFRは従来の再帰経路を維持する。
+ 更新playerのactionで同じ相手reachを受ける同一boardのfold・showdown終端は、f32に限り1回のkernelで評価する。
+ 相手和と自handのloopを共有し、fold出力は全要素を0で初期化してからshowdown順位表の全live自handへ書き込む。
+ 相手playerのactionでも、f32に限り終端の子reach（相手reach×各actionの戦略）を先に計算し、
+diff --git a/crates/hu-engine/src/solver/batch.rs b/crates/hu-engine/src/solver/batch.rs
+new file mode 100644
+index 0000000..878cc51
+--- /dev/null
++++ b/crates/hu-engine/src/solver/batch.rs
+@@ -0,0 +1,250 @@
++//! Non-recursive f32 CFR for a chance-free subtree below the action split bound.
++use super::*;
++
++#[derive(Clone, Copy, Default)]
++struct Reaches {
++    my: usize,
++    opp: usize,
++    zero_opp: bool,
++}
++
++#[derive(Default)]
++struct Metadata {
++    nodes: Vec<Reaches>,
++    terminals: Vec<u32>,
++    reaches: Vec<&'static [f32]>,
++    outputs: Vec<&'static mut [f32]>,
++}
++
++thread_local! {
++    // Lease metadata just like worker scratch: no RefCell borrow crosses an
++    // evaluator call, which may itself use Rayon or reenter on this worker.
++    static METADATA: std::cell::RefCell<Vec<Metadata>> = const { std::cell::RefCell::new(Vec::new()) };
++}
++
++// Empty reference vectors contain no borrowed data. In-place collect recycles
++// their allocation across lifetimes; the standard library keeps the same layout.
++// Debug checks verify reuse, including after evaluator calls and size changes.
++fn shared_rows<'b>(mut rows: Vec<&[f32]>) -> Vec<&'b [f32]> {
++    rows.clear();
++    let allocation = rows.as_ptr();
++    let result: Vec<_> = rows.into_iter().map(|_| unreachable!()).collect();
++    debug_assert_eq!(allocation, result.as_ptr());
++    result
++}
++fn mutable_rows<'b>(mut rows: Vec<&mut [f32]>) -> Vec<&'b mut [f32]> {
++    rows.clear();
++    let allocation = rows.as_ptr();
++    let result: Vec<_> = rows.into_iter().map(|_| unreachable!()).collect();
++    debug_assert_eq!(allocation, result.as_ptr());
++    result
++}
++
++fn reach<'a>(rows: &'a [f32], root: &'a [f32], offset: usize) -> &'a [f32] {
++    if offset == usize::MAX {
++        root
++    } else {
++        &rows[offset..offset + root.len()]
++    }
++}
++
++pub(super) fn enabled() -> bool {
++    #[cfg(test)]
++    {
++        !tests::recursive_mode()
++    }
++    #[cfg(not(test))]
++    {
++        true
++    }
++}
++
++#[allow(clippy::too_many_arguments)]
++pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
++    ctx: &PassCtx<'_, E>,
++    storage: &mut V,
++    scratch: &mut Scratch,
++    root: NodeId,
++    my_reach: &[f32],
++    opp_reach: &[f32],
++    out: &mut [f32],
++) {
++    struct Lease(Metadata);
++    impl Drop for Lease {
++        fn drop(&mut self) {
++            METADATA.with(|pool| pool.borrow_mut().push(std::mem::take(&mut self.0)));
++        }
++    }
++    let mut lease = Lease(METADATA.with(|pool| pool.borrow_mut().pop().unwrap_or_default()));
++    let metadata = &mut lease.0;
++    let tree = ctx.tree;
++    let node = tree.node(root);
++    let first = node.first_child as usize;
++    let mut end = first + node.num_children as usize;
++    let mut id = first;
++    let mut work_len = 0;
++    // fill reserves siblings before filling them: descendants occupy one
++    // interval starting at first_child, excluding root's parent-block slot.
++    // Extend its bound from child blocks in this metadata-only sizing walk.
++    while id < end {
++        let node = &tree.nodes[id];
++        if node.kind == NodeKind::Action {
++            end = end.max(node.first_child as usize + node.num_children as usize);
++            if node.player == ctx.p {
++                work_len = work_len.max(tree.storage_ref(node).len());
++            }
++        } else {
++            debug_assert_eq!(node.kind, NodeKind::Terminal);
++        }
++        id += 1;
++    }
++    if node.player == ctx.p {
++        work_len = work_len.max(tree.storage_ref(node).len());
++    }
++    let count = end - first + 1;
++    let span = tree.storage_spans[root as usize];
++    let sigma_len = span.end - span.start;
++    let own_len = my_reach.len();
++    let mut sigma = scratch.take_overwrite(sigma_len);
++    let mut scaled = scratch.take_overwrite(sigma_len);
++    let mut values = scratch.take(count * own_len);
++    let mut work = scratch.take_overwrite(work_len);
++    metadata.nodes.resize(count, Reaches::default());
++    metadata.nodes[0] = Reaches {
++        my: usize::MAX,
++        opp: usize::MAX,
++        zero_opp: false,
++    };
++    let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
++
++    // Phase 1: all strategies and action-scaled reaches, in parent-before-child
++    // order. Unchanged reaches are indices into ancestors (or the input rows).
++    for (index, id) in walk().enumerate() {
++        let node = tree.node(id);
++        if node.kind == NodeKind::Terminal {
++            continue;
++        }
++        let sref = tree.storage_ref(node);
++        let offset = sref.offset - span.start;
++        let parent = metadata.nodes[index];
++        let (previous, children) = scaled.split_at_mut(offset);
++        let my = reach(previous, my_reach, parent.my);
++        let opp = reach(previous, opp_reach, parent.opp);
++        let zero_opp = PRUNE && node.player != ctx.p && all_zero(opp);
++        metadata.nodes[index].zero_opp = zero_opp;
++        let strategy = &mut sigma[offset..offset + sref.len()];
++        if !zero_opp {
++            storage.regret_matching_cfr(sref, sref.index, strategy, CfrPrecision::F32);
++        }
++        let length = sref.num_hands as usize;
++        for (a, child) in tree.children(id).enumerate() {
++            let mut next = parent;
++            next.zero_opp = false;
++            let start = a * length;
++            if !zero_opp {
++                let row = &mut children[start..start + length];
++                if node.player == ctx.p {
++                    mul_into(row, my, &strategy[start..start + length]);
++                    next.my = offset + start;
++                } else {
++                    mul_into(row, opp, &strategy[start..start + length]);
++                    next.opp = offset + start;
++                }
++            }
++            metadata.nodes[child as usize - first + 1] = next;
++        }
++    }
++
++    // Phase 2: one call, separate zeroed terminal rows. PRUNE leaves excluded
++    // rows zero, without preventing updates at own nodes below a zero reach.
++    metadata.terminals.clear();
++    let mut reaches = shared_rows(std::mem::take(&mut metadata.reaches));
++    let mut outputs = mutable_rows(std::mem::take(&mut metadata.outputs));
++    let mut rows = values.chunks_exact_mut(own_len.max(1));
++    for (index, id) in walk().enumerate() {
++        let row = if own_len == 0 {
++            &mut []
++        } else {
++            rows.next().unwrap()
++        };
++        let node = tree.node(id);
++        if node.kind == NodeKind::Terminal {
++            let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
++            if !PRUNE || !all_zero(opp) {
++                metadata.terminals.push(node.aux);
++                reaches.push(opp);
++                outputs.push(row);
++            }
++        }
++    }
++    ctx.evaluator
++        .eval_cfr_batch(&metadata.terminals, ctx.p, &reaches, &mut outputs);
++    metadata.outputs = mutable_rows(outputs);
++    metadata.reaches = shared_rows(reaches);
++
++    // Phase 3: child-before-parent. Per-node action order and storage update
++    // arguments/order match recursion; every storage ref is independent.
++    for id in walk().rev() {
++        let index = if id == root {
++            0
++        } else {
++            id as usize - first + 1
++        };
++        let node = tree.node(id);
++        if node.kind == NodeKind::Action {
++            let sref = tree.storage_ref(node);
++            let offset = sref.offset - span.start;
++            let strategy = &sigma[offset..offset + sref.len()];
++            let (parents, children) = values.split_at_mut((index + 1) * own_len);
++            let value = &mut parents[index * own_len..];
++            let child_row = |child: NodeId| {
++                let start = (child as usize - first - index) * own_len;
++                &children[start..start + own_len]
++            };
++            if node.player == ctx.p {
++                for (child, row) in tree.children(id).zip(strategy.chunks_exact(own_len.max(1))) {
++                    for ((dst, &s), &v) in value.iter_mut().zip(row).zip(child_row(child)) {
++                        *dst += s * v;
++                    }
++                }
++                let tmp = &mut work[..sref.len()];
++                for (child, row) in tree.children(id).zip(tmp.chunks_exact_mut(own_len.max(1))) {
++                    for ((dst, &v), &cfv) in row.iter_mut().zip(child_row(child)).zip(value.iter())
++                    {
++                        *dst = v - cfv;
++                    }
++                }
++                storage.update_regrets(sref, sref.index, tmp, ctx.discounts);
++                // Phase 1 already wrote my_reach * sigma for every action.
++                // Reuse those exact rows for the average update, after regrets.
++                storage.accumulate_strategy(
++                    sref,
++                    sref.index,
++                    &scaled[offset..offset + sref.len()],
++                    ctx.discounts,
++                );
++            } else if !metadata.nodes[index].zero_opp {
++                for child in tree.children(id) {
++                    for (dst, &v) in value.iter_mut().zip(child_row(child)) {
++                        *dst += v;
++                    }
++                }
++            }
++        }
++        #[cfg(test)]
++        record(id, &values[index * own_len..(index + 1) * own_len]);
++    }
++    out.copy_from_slice(&values[..own_len]);
++    scratch.put(work);
++    scratch.put(values);
++    scratch.put(scaled);
++    scratch.put(sigma);
++}
++
++#[cfg(test)]
++pub(super) fn record(id: NodeId, values: &[f32]) {
++    tests::record(id, values);
++}
++#[cfg(test)]
++#[path = "batch_tests.rs"]
++mod tests;
+diff --git a/crates/hu-engine/src/solver/batch_tests.rs b/crates/hu-engine/src/solver/batch_tests.rs
+new file mode 100644
+index 0000000..1bd3ee9
+--- /dev/null
++++ b/crates/hu-engine/src/solver/batch_tests.rs
+@@ -0,0 +1,363 @@
++//! Differential traversal tests with real cards, full river deals, compatible
++//! hands and independent pairwise showdown/fold payoffs. The product tests
++//! separately compare the actual rank-sweep evaluator with recursive CFR.
++use super::*;
++use crate::{F32Storage, StorageOps, TempNode, TreeSpec};
++use nlh::{Card, Range, combo_cards, rank_of};
++use std::cell::{Cell, RefCell};
++use std::collections::BTreeMap;
++
++thread_local! {
++    static RECURSIVE: Cell<bool> = const { Cell::new(false) };
++    static VALUES: RefCell<Option<BTreeMap<NodeId, Vec<f32>>>> = const { RefCell::new(None) };
++}
++pub(super) fn recursive_mode() -> bool {
++    RECURSIVE.get()
++}
++pub(super) fn record(id: NodeId, values: &[f32]) {
++    VALUES.with_borrow_mut(|rows| {
++        if let Some(rows) = rows {
++            rows.insert(id, values.to_vec());
++        }
++    });
++}
++
++struct Poker {
++    hands: PerPlayer<Vec<[Card; 2]>>,
++    matrices: Vec<PerPlayer<Vec<f32>>>,
++}
++// The evaluator is Sync; the test stays serial, but the trait requires it.
++// Use atomics for the call count rather than any unsafe Sync implementation.
++struct Evaluator {
++    hands: PerPlayer<Vec<[Card; 2]>>,
++    matrices: Vec<PerPlayer<Vec<f32>>>,
++    batches: std::sync::atomic::AtomicUsize,
++}
++impl TerminalEvaluator for Evaluator {
++    fn eval(&self, id: u32, p: Player, reach: &[f32], out: &mut [f32]) {
++        for (dst, payoffs) in out
++            .iter_mut()
++            .zip(self.matrices[id as usize][p].chunks_exact(reach.len().max(1)))
++        {
++            let mut value = 0.0;
++            for (&u, &r) in payoffs.iter().zip(reach) {
++                value += u * r;
++            }
++            *dst = value;
++        }
++    }
++    fn eval_cfr_batch(&self, ids: &[u32], p: Player, reaches: &[&[f32]], outs: &mut [&mut [f32]]) {
++        self.batches
++            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
++        for ((&id, &r), out) in ids.iter().zip(reaches).zip(outs) {
++            self.eval_cfr(id, p, r, out);
++        }
++    }
++}
++fn mask(cards: impl IntoIterator<Item = Card>) -> u64 {
++    cards.into_iter().fold(0, |m, c| m | (1 << c.index()))
++}
++fn terminal(e: &mut Poker, board: &[Card], fold: Option<Player>, amount: f32) -> TempNode {
++    let board_mask = mask(board.iter().copied());
++    let matrix = PerPlayer::new(Player::P0, Player::P1).map(|p| {
++        let mut matrix = Vec::new();
++        for own in &e.hands[p] {
++            for opp in &e.hands[p.opponent()] {
++                let own_mask = mask(*own);
++                let opp_mask = mask(*opp);
++                let value = if (own_mask | opp_mask) & board_mask != 0 || own_mask & opp_mask != 0 {
++                    0.0
++                } else if let Some(winner) = fold {
++                    if p == winner { amount } else { -amount }
++                } else {
++                    let a = rank_of(board.iter().copied().chain(*own));
++                    let b = rank_of(board.iter().copied().chain(*opp));
++                    match a.cmp(&b) {
++                        std::cmp::Ordering::Greater => amount,
++                        std::cmp::Ordering::Equal => 0.0,
++                        std::cmp::Ordering::Less => -amount,
++                    }
++                };
++                matrix.push(value);
++            }
++        }
++        matrix
++    });
++    let id = e.matrices.len() as u32;
++    e.matrices.push(matrix);
++    TempNode::Terminal { id, tag: 0 }
++}
++fn action(p: Player, children: Vec<TempNode>) -> TempNode {
++    TempNode::Action {
++        player: p,
++        children,
++        tag: 0,
++    }
++}
++fn river(e: &mut Poker, board: &[Card], base: f32) -> TempNode {
++    // Matched prior contributions give +/-base at checkdown. A river bet15
++    // or raise40 adds the matched stake; a folded raise refunds its excess.
++    let check_show = terminal(e, board, None, base);
++    let check_fold = terminal(e, board, Some(Player::P1), base);
++    let check_call = terminal(e, board, None, base + 15.0);
++    let check = action(
++        Player::P1,
++        vec![check_show, action(Player::P0, vec![check_fold, check_call])],
++    );
++    let bet_fold = terminal(e, board, Some(Player::P0), base);
++    let bet_call = terminal(e, board, None, base + 15.0);
++    let raise_fold = terminal(e, board, Some(Player::P1), base + 15.0);
++    let raise_call = terminal(e, board, None, base + 40.0);
++    let bet = action(
++        Player::P1,
++        vec![
++            bet_fold,
++            bet_call,
++            action(Player::P0, vec![raise_fold, raise_call]),
++        ],
++    );
++    action(Player::P0, vec![check, bet])
++}
++fn fixture(turn: bool) -> (PublicTree, Evaluator) {
++    let mut board: Vec<Card> = "Ks 7h 2d 3c"
++        .split_whitespace()
++        .map(|c| c.parse().unwrap())
++        .collect();
++    if !turn {
++        board.push("9s".parse().unwrap());
++    }
++    let board_mask = mask(board.iter().copied());
++    let hands = PerPlayer::new(Player::P0, Player::P1).map(|p| {
++        let range: Range = if p == Player::P0 {
++            "AA,77,AQs,KQs,JTs"
++        } else {
++            "QQ,22,AJs,KJs,T9s"
++        }
++        .parse()
++        .unwrap();
++        range
++            .weights()
++            .iter()
++            .enumerate()
++            .filter_map(|(i, &w)| {
++                let (a, b) = combo_cards(i);
++                (w > 0.0 && mask([a, b]) & board_mask == 0).then_some([a, b])
++            })
++            .collect::<Vec<_>>()
++    });
++    let dims = hands.as_ref().map(|h| h.len() as u32);
++    let mut e = Poker {
++        hands,
++        matrices: Vec::new(),
++    };
++    let mut masks = Vec::new();
++    let root = if turn {
++        let mut deals = Vec::new();
++        for card in nlh::ALL_CARDS {
++            if board_mask & mask([card]) != 0 {
++                continue;
++            }
++            let maps = PerPlayer::new(Player::P0, Player::P1).map(|p| {
++                let id = masks.len() as u32;
++                masks.push(
++                    e.hands[p]
++                        .iter()
++                        .map(|h| if h.contains(&card) { 0.0 } else { 1.0 })
++                        .collect(),
++                );
++                crate::ReachMap::Mask(id)
++            });
++            let mut complete = board.clone();
++            complete.push(card);
++            deals.push((1.0 / 44.0, maps, river(&mut e, &complete, 25.0)));
++        }
++        let fold = terminal(&mut e, &board, Some(Player::P0), 10.0);
++        // Facing a turn bet15 into pot20: fold, or call then the full river.
++        // The called turn stake carries into each river payoff above.
++        action(Player::P1, vec![fold, TempNode::Chance { deals, tag: 0 }])
++    } else {
++        river(&mut e, &board, 10.0)
++    };
++    let tree = PublicTree::compile(TreeSpec {
++        root,
++        root_dims: dims,
++        masks,
++        transitions: vec![],
++    });
++    (
++        tree,
++        Evaluator {
++            hands: e.hands,
++            matrices: e.matrices,
++            batches: std::sync::atomic::AtomicUsize::new(0),
++        },
++    )
++}
++fn relative(exact: &[f32], actual: &[f32]) -> f64 {
++    let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
++    let error = exact
++        .iter()
++        .zip(actual)
++        .map(|(&a, &b)| {
++            assert!(b.is_finite());
++            (f64::from(a) - f64::from(b)).abs()
++        })
++        .fold(0.0, f64::max);
++    if scale == 0.0 {
++        assert_eq!(error, 0.0);
++        0.0
++    } else {
++        error / scale
++    }
++}
++fn check<const PRUNE: bool>(tree: &PublicTree, e: &Evaluator, p: Player, zero: bool) -> f64 {
++    let seed = Discounts {
++        pos: 1.0,
++        neg: 1.0,
++        avg: 1.0,
++        floor_neg: false,
++        reset_avg: false,
++    };
++    let mut reference = F32Storage::new(tree.storage_len, tree.storage_refs.len());
++    for node in tree.nodes.iter().filter(|n| n.kind == NodeKind::Action) {
++        let sref = tree.storage_ref(node);
++        let mut regrets = vec![1.0; sref.len()];
++        // Zero whole action rows at opponent nodes, including ancestors of
++        // own nodes: these descendants must still discount/update storage.
++        if node.player != p && sref.index % 2 == 1 {
++            let len = sref.num_hands as usize;
++            regrets[sref.len() - len..].fill(-1.0);
++        }
++        reference.update_regrets(sref, sref.index, &regrets, &seed);
++        reference.accumulate_strategy(sref, sref.index, &regrets, &seed);
++    }
++    let mut actual = F32Storage::new(tree.storage_len, tree.storage_refs.len());
++    actual.restore_state(reference.state()).unwrap();
++    let discounts = Discounts {
++        pos: 0.9,
++        neg: 0.7,
++        avg: 0.8,
++        floor_neg: false,
++        reset_avg: false,
++    };
++    let ctx = PassCtx {
++        tree,
++        evaluator: e,
++        p,
++        discounts: &discounts,
++        cfr_precision: CfrPrecision::F32,
++        par: ParConfig::default(),
++    };
++    let my = vec![0.75; e.hands[p].len()];
++    let opp: Vec<_> = (0..e.hands[p.opponent()].len())
++        .map(|h| {
++            if zero || h % 5 == 0 {
++                -0.0
++            } else {
++                (h + 1) as f32 / 31.0
++            }
++        })
++        .collect();
++    let mut out = vec![0.0; my.len()];
++    let mut expected = out.clone();
++    RECURSIVE.set(true);
++    VALUES.set(Some(BTreeMap::new()));
++    cfr_pass::<_, _, PRUNE>(
++        &ctx,
++        &mut reference.view_mut(),
++        &mut Scratch::new(),
++        0,
++        &my,
++        &opp,
++        &mut expected,
++        0,
++    );
++    let expected_nodes = VALUES.take().unwrap();
++    RECURSIVE.set(false);
++    VALUES.set(Some(BTreeMap::new()));
++    let before = e.batches.load(std::sync::atomic::Ordering::Relaxed);
++    let mut scratch = Scratch::new();
++    cfr_pass::<_, _, PRUNE>(
++        &ctx,
++        &mut actual.view_mut(),
++        &mut scratch,
++        0,
++        &my,
++        &opp,
++        &mut out,
++        0,
++    );
++    let actual_nodes = VALUES.take().unwrap();
++    assert!(e.batches.load(std::sync::atomic::Ordering::Relaxed) > before);
++    let mut maximum = relative(&expected, &out);
++    let (
++        crate::StorageState::F32 {
++            regrets: ar,
++            strategy_sum: aa,
++        },
++        crate::StorageState::F32 {
++            regrets: br,
++            strategy_sum: ba,
++        },
++    ) = (reference.state(), actual.state())
++    else {
++        unreachable!()
++    };
++    for (id, node) in tree
++        .nodes
++        .iter()
++        .enumerate()
++        .filter(|(_, n)| n.kind == NodeKind::Action)
++    {
++        maximum = maximum.max(relative(
++            &expected_nodes[&(id as u32)],
++            &actual_nodes[&(id as u32)],
++        ));
++        let sref = tree.storage_ref(node);
++        maximum = maximum.max(relative(
++            &ar[sref.offset..sref.offset + sref.len()],
++            &br[sref.offset..sref.offset + sref.len()],
++        ));
++        maximum = maximum.max(relative(
++            &aa[sref.offset..sref.offset + sref.len()],
++            &ba[sref.offset..sref.offset + sref.len()],
++        ));
++    }
++    assert!(
++        maximum < 1e-5,
++        "{p:?} PRUNE={PRUNE} zero={zero}: {maximum:e}"
++    );
++    // A second warm call checks recycling of reference metadata allocations.
++    out.fill(0.0);
++    cfr_pass::<_, _, PRUNE>(
++        &ctx,
++        &mut actual.view_mut(),
++        &mut scratch,
++        0,
++        &my,
++        &opp,
++        &mut out,
++        0,
++    );
++    maximum
++}
++#[test]
++fn river_and_turn_values_and_updates_match_recursive_with_and_without_prune() {
++    rayon::ThreadPoolBuilder::new()
++        .num_threads(1)
++        .build()
++        .unwrap()
++        .install(|| {
++            let mut maximum = 0.0f64;
++            for turn in [false, true] {
++                let (tree, e) = fixture(turn);
++                for p in Player::BOTH {
++                    for zero in [false, true] {
++                        maximum = maximum.max(check::<true>(&tree, &e, p, zero));
++                        maximum = maximum.max(check::<false>(&tree, &e, p, zero));
++                    }
++                }
++            }
++            println!("T25b traversal maximum relative per-node difference={maximum:e}");
++        });
++}
+diff --git a/crates/hu-postflop/src/batch_precision_tests.rs b/crates/hu-postflop/src/batch_precision_tests.rs
+new file mode 100644
+index 0000000..253ba32
+--- /dev/null
++++ b/crates/hu-postflop/src/batch_precision_tests.rs
+@@ -0,0 +1,165 @@
++//! Actual rank-sweep evaluator versus recursive per-terminal f32 CFR.
++use super::*;
++use hu_engine::{CompiledGame, Discounts, NodeKind, StorageOps};
++use std::sync::atomic::{AtomicUsize, Ordering};
++
++struct Probe {
++    evaluator: PostflopEvaluator,
++    batches: AtomicUsize,
++}
++impl TerminalEvaluator for Probe {
++    fn eval(&self, id: u32, p: Player, reach: &[f32], out: &mut [f32]) {
++        self.evaluator.eval(id, p, reach, out);
++    }
++    fn eval_cfr(&self, id: u32, p: Player, reach: &[f32], out: &mut [f32]) {
++        self.evaluator.eval_cfr(id, p, reach, out);
++    }
++    // Sibling/opponent hooks deliberately use the defaults: the reference
++    // recursion evaluates every terminal individually, with f32 matching.
++    fn eval_cfr_batch(&self, ids: &[u32], p: Player, reaches: &[&[f32]], outs: &mut [&mut [f32]]) {
++        self.batches.fetch_add(1, Ordering::Relaxed);
++        self.evaluator.eval_cfr_batch(ids, p, reaches, outs);
++    }
++    fn set_cfr_precision(&mut self, precision: CfrPrecision) {
++        self.evaluator.set_cfr_precision(precision);
++    }
++}
++fn solver(
++    cfg: &PostflopConfig,
++    recursive: bool,
++    zero: Option<Player>,
++) -> hu_engine::Solver<Probe, F32Storage> {
++    let game = build_postflop_game(
++        cfg,
++        PayoffPipeline {
++            rake: &NoRake,
++            utility: &ChipEv,
++        },
++    )
++    .game;
++    let mut tree = game.tree;
++    if recursive {
++        // Test-only metadata change prevents the new entry, without adding a
++        // production switch. A one-thread pool keeps the old view ambient.
++        tree.subtree_has_chance.fill(true);
++    }
++    let mut ranges = game.root_ranges;
++    if let Some(p) = zero {
++        ranges[p].fill(-0.0);
++    }
++    let mut solver = hu_engine::Solver::new(
++        CompiledGame {
++            tree,
++            root_ranges: ranges,
++            normalizer: game.normalizer,
++            zero_sum: game.zero_sum,
++            evaluator: Probe {
++                evaluator: game.evaluator,
++                batches: AtomicUsize::new(0),
++            },
++        },
++        Box::<Dcfr>::default(),
++        Some(12),
++    );
++    solver.set_cfr_precision(CfrPrecision::F32);
++    let seed = Discounts {
++        pos: 1.0,
++        neg: 1.0,
++        avg: 1.0,
++        floor_neg: false,
++        reset_avg: false,
++    };
++    let mut storage = F32Storage::new(
++        solver.game().tree.storage_len,
++        solver.game().tree.storage_refs.len(),
++    );
++    for node in solver
++        .game()
++        .tree
++        .nodes
++        .iter()
++        .filter(|n| n.kind == NodeKind::Action)
++    {
++        let sref = solver.game().tree.storage_ref(node);
++        let mut regrets = vec![1.0; sref.len()];
++        if sref.index % 2 == 1 {
++            let start = sref.len() - sref.num_hands as usize;
++            regrets[start..].fill(-1.0);
++        }
++        storage.update_regrets(sref, sref.index, &regrets, &seed);
++        storage.accumulate_strategy(sref, sref.index, &regrets, &seed);
++    }
++    solver
++        .restore_state(hu_engine::SolverState {
++            iteration: 1,
++            storage: storage.state(),
++        })
++        .unwrap();
++    solver
++}
++#[test]
++fn actual_river_and_turn_batches_match_recursive_per_terminal_f32() {
++    rayon::ThreadPoolBuilder::new()
++        .num_threads(1)
++        .build()
++        .unwrap()
++        .install(|| {
++            let mut maximum = 0.0f64;
++            for river in [false, true] {
++                let mut cfg = config();
++                if river {
++                    cfg.board.push("9s".parse().unwrap());
++                    cfg.pot = Chips(20);
++                    cfg.effective_stack = Chips(200);
++                    cfg.streets.river =
++                        StreetTree::pot_fractions(&[0.33, 0.75, 1.5], &[0.33, 0.75, 1.5], 3);
++                }
++                for p in Player::BOTH {
++                    for zero in [None, Some(p.opponent())] {
++                        let mut actual = solver(&cfg, false, zero);
++                        let mut reference = solver(&cfg, true, zero);
++                        actual.run(1);
++                        reference.run(1);
++                        assert!(actual.game().evaluator.batches.load(Ordering::Relaxed) > 0);
++                        assert_eq!(
++                            reference.game().evaluator.batches.load(Ordering::Relaxed),
++                            0
++                        );
++                        let (
++                            StorageState::F32 {
++                                regrets: ar,
++                                strategy_sum: aa,
++                            },
++                            StorageState::F32 {
++                                regrets: br,
++                                strategy_sum: ba,
++                            },
++                        ) = (reference.state().storage, actual.state().storage)
++                        else {
++                            unreachable!()
++                        };
++                        for node in actual
++                            .game()
++                            .tree
++                            .nodes
++                            .iter()
++                            .filter(|n| n.kind == NodeKind::Action && n.player == p)
++                        {
++                            let sref = actual.game().tree.storage_ref(node);
++                            let row = sref.offset..sref.offset + sref.len();
++                            maximum =
++                                maximum.max(relative_error(&ar[row.clone()], &br[row.clone()]));
++                            maximum = maximum.max(relative_error(&aa[row.clone()], &ba[row]));
++                        }
++                        assert!(
++                            maximum < 1e-5,
++                            "river={river} p={p:?} zero={zero:?}: {maximum:e}"
++                        );
++                    }
++                }
++            }
++            println!(
++                "T25b actual rank evaluator maximum relative per-node state difference={maximum:e}"
++            );
++        });
++}

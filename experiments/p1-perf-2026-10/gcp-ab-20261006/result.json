@@ -1,0 +1,478 @@
+{
+  "vm": "GCP c2d-highcpu-32 Spot, us-central1-b, AMD EPYC 7B13 (16 core / 32 thread), 64 GB, Debian 12, rustc 1.97.0, target-cpu=native, THP always",
+  "window": "2026-10-06T13:34Z..14:12Z",
+  "base": "43e97c6",
+  "new": "e7a4554 (P1-T1 cf45d5e + P1-T2 31808e8)",
+  "method": "p1_bench, base and new alternated per thread count on the same VM; median of the rounds",
+  "ab": {
+    "turn": {
+      "config": "turn_multi.toml",
+      "iters": 5,
+      "threads": {
+        "1": {
+          "base": {
+            "secsPerIter": 1.4023091964,
+            "evalSecs": 2.700647255,
+            "warmupSecs": 1.7213972549999998,
+            "peakBytes": 636530688,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 76634844,
+            "estimateF32Bytes": 613078752
+          },
+          "new": {
+            "secsPerIter": 0.2741513348,
+            "evalSecs": 0.265986325,
+            "warmupSecs": 0.376120148,
+            "peakBytes": 230068224,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 26007300,
+            "estimateF32Bytes": 208058400
+          },
+          "iterSpeedup": 5.115091624204633,
+          "evalSpeedup": 10.153331209790577,
+          "nashConvEqual": true
+        },
+        "4": {
+          "base": {
+            "secsPerIter": 0.3634566984,
+            "evalSecs": 0.684006435,
+            "warmupSecs": 0.966048194,
+            "peakBytes": 638541824,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 76634844,
+            "estimateF32Bytes": 613078752
+          },
+          "new": {
+            "secsPerIter": 0.0705861008,
+            "evalSecs": 0.067980879,
+            "warmupSecs": 0.249153572,
+            "peakBytes": 242810880,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 26007300,
+            "estimateF32Bytes": 208058400
+          },
+          "iterSpeedup": 5.149125596692543,
+          "evalSpeedup": 10.061747436363689,
+          "nashConvEqual": true
+        },
+        "8": {
+          "base": {
+            "secsPerIter": 0.189537711,
+            "evalSecs": 0.351506581,
+            "warmupSecs": 0.616319404,
+            "peakBytes": 638738432,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 76634844,
+            "estimateF32Bytes": 613078752
+          },
+          "new": {
+            "secsPerIter": 0.0363335356,
+            "evalSecs": 0.034553853,
+            "warmupSecs": 0.167994307,
+            "peakBytes": 249909248,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 26007300,
+            "estimateF32Bytes": 208058400
+          },
+          "iterSpeedup": 5.2166052070088105,
+          "evalSpeedup": 10.172717381184667,
+          "nashConvEqual": true
+        },
+        "16": {
+          "base": {
+            "secsPerIter": 0.109663412,
+            "evalSecs": 0.192050447,
+            "warmupSecs": 0.563677018,
+            "peakBytes": 639967232,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 76634844,
+            "estimateF32Bytes": 613078752
+          },
+          "new": {
+            "secsPerIter": 0.019440617,
+            "evalSecs": 0.018498005,
+            "warmupSecs": 0.140262246,
+            "peakBytes": 258023424,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 26007300,
+            "estimateF32Bytes": 208058400
+          },
+          "iterSpeedup": 5.640942980359111,
+          "evalSpeedup": 10.382224839921927,
+          "nashConvEqual": true
+        },
+        "32": {
+          "base": {
+            "secsPerIter": 0.12132523840000001,
+            "evalSecs": 0.231695642,
+            "warmupSecs": 0.574961781,
+            "peakBytes": 642646016,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 76634844,
+            "estimateF32Bytes": 613078752
+          },
+          "new": {
+            "secsPerIter": 0.0171942294,
+            "evalSecs": 0.018497934,
+            "warmupSecs": 0.139132598,
+            "peakBytes": 268812288,
+            "nashConv": [
+              10.827313985886878
+            ],
+            "runs": 2,
+            "storageElements": 26007300,
+            "estimateF32Bytes": 208058400
+          },
+          "iterSpeedup": 7.056160272003816,
+          "evalSpeedup": 12.525487549041964,
+          "nashConvEqual": true
+        }
+      }
+    },
+    "flop1": {
+      "config": "flop_srp1.toml",
+      "iters": 3,
+      "threads": {
+        "1": {
+          "base": {
+            "secsPerIter": 19.107199866666665,
+            "evalSecs": 33.887365886,
+            "warmupSecs": 23.636043353,
+            "peakBytes": 8438554624,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 3.5915945086666667,
+            "evalSecs": 3.376905714,
+            "warmupSecs": 5.033749223,
+            "peakBytes": 3080224768,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 5.319976912917145,
+          "evalSpeedup": 10.035034660727872,
+          "nashConvEqual": true
+        },
+        "8": {
+          "base": {
+            "secsPerIter": 2.3394310166666665,
+            "evalSecs": 4.058252386,
+            "warmupSecs": 7.903847751,
+            "peakBytes": 8451252224,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 0.4586026106666667,
+            "evalSecs": 0.425014439,
+            "warmupSecs": 2.088670265,
+            "peakBytes": 3123056640,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 5.101216090475053,
+          "evalSpeedup": 9.54850474150597,
+          "nashConvEqual": true
+        },
+        "16": {
+          "base": {
+            "secsPerIter": 1.3330045336666667,
+            "evalSecs": 2.086916263,
+            "warmupSecs": 6.09520977,
+            "peakBytes": 8461045760,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 0.23444156500000002,
+            "evalSecs": 0.21648682,
+            "warmupSecs": 1.454852341,
+            "peakBytes": 3177816064,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 5.685871162251739,
+          "evalSpeedup": 9.639922943114966,
+          "nashConvEqual": true
+        },
+        "32": {
+          "base": {
+            "secsPerIter": 1.2235561130000001,
+            "evalSecs": 1.943812321,
+            "warmupSecs": 7.308396567,
+            "peakBytes": 8466415616,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 0.2104517,
+            "evalSecs": 0.196161869,
+            "warmupSecs": 1.422522759,
+            "peakBytes": 3287195648,
+            "nashConv": [
+              20.594223056561596
+            ],
+            "runs": 2,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 5.813952146739609,
+          "evalSpeedup": 9.909226145270873,
+          "nashConvEqual": true
+        }
+      }
+    },
+    "flop1_i16": {
+      "config": "flop_srp1.toml --storage i16",
+      "iters": 3,
+      "threads": {
+        "16": {
+          "base": {
+            "secsPerIter": 1.3840372766666666,
+            "evalSecs": 2.1238465460000002,
+            "warmupSecs": 3.974816606,
+            "peakBytes": 4378603520,
+            "nashConv": [
+              20.600452896333458
+            ],
+            "runs": 1,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 0.31208146766666667,
+            "evalSecs": 0.220819021,
+            "warmupSecs": 1.004574268,
+            "peakBytes": 1772437504,
+            "nashConv": [
+              20.60042632203881
+            ],
+            "runs": 1,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 4.43485890724198,
+          "evalSpeedup": 9.618041672234387,
+          "nashConvEqual": false
+        },
+        "32": {
+          "base": {
+            "secsPerIter": 1.2983247636666666,
+            "evalSecs": 1.9527792019999999,
+            "warmupSecs": 4.970604288,
+            "peakBytes": 4384792576,
+            "nashConv": [
+              20.600452896333458
+            ],
+            "runs": 1,
+            "storageElements": 1021279896,
+            "estimateF32Bytes": 8170239168
+          },
+          "new": {
+            "secsPerIter": 0.25813495833333333,
+            "evalSecs": 0.202815967,
+            "warmupSecs": 0.95420704,
+            "peakBytes": 1874169856,
+            "nashConv": [
+              20.60042632203881
+            ],
+            "runs": 1,
+            "storageElements": 352364670,
+            "estimateF32Bytes": 2818917360
+          },
+          "iterSpeedup": 5.029635552074747,
+          "evalSpeedup": 9.628330702384984,
+          "nashConvEqual": false
+        }
+      }
+    }
+  },
+  "largeNewOnly": [
+    {
+      "config": "/home/PC_User/cfg/flop_srp2.toml",
+      "storage": "f32",
+      "threads": 32,
+      "nodes": 8704350,
+      "storageElements": 3813009960,
+      "estimateF32Bytes": 30504079680,
+      "estimateI16Bytes": 15277508192,
+      "buildSecs": 6.020687536,
+      "warmupSecs": 12.267719353,
+      "secsPerIter": 2.2205694865,
+      "evalSecs": [
+        2.301807741
+      ],
+      "nashConv": 43.85810310036614,
+      "peakBytes": 33276264448
+    },
+    {
+      "config": "/home/PC_User/cfg/gtow_b.toml",
+      "storage": "f32",
+      "threads": 32,
+      "nodes": 6088200,
+      "storageElements": 2638650987,
+      "estimateF32Bytes": 21109207896,
+      "estimateI16Bytes": 10572952820,
+      "buildSecs": 4.296260325,
+      "warmupSecs": 8.516826365,
+      "secsPerIter": 1.5202055095,
+      "evalSecs": [
+        1.605986463
+      ],
+      "nashConv": 34.25171579430075,
+      "peakBytes": 23121661952
+    },
+    {
+      "config": "/home/PC_User/cfg/gtow_a.toml",
+      "storage": "i16",
+      "threads": 32,
+      "nodes": 16088610,
+      "storageElements": 7078257522,
+      "estimateF32Bytes": 56626060176,
+      "estimateI16Bytes": 28359313664,
+      "buildSecs": 11.058362658,
+      "warmupSecs": 14.283616965,
+      "secsPerIter": 4.9377159535,
+      "evalSecs": [
+        4.58957425
+      ],
+      "nashConv": 44.46742809284436,
+      "peakBytes": 33176084480
+    }
+  ],
+  "cli": {
+    "config": "flop_srp1_cli.toml (4 iterations, check_every 2, checkpoint_interval 1s), --threads 16, /usr/bin/time -v",
+    "exportsIdentical": "root strategy/ev CSV byte-identical; summary identical except wall_secs",
+    "sides": {
+      "base": {
+        "processWallSecs": 198.16,
+        "maxRssBytes": 29743751168,
+        "solveWallSecs": 103.7,
+        "checkpointBytes": 2466841144,
+        "solBytes": 210304000,
+        "eventsSecsFromRunning": [
+          [
+            "state",
+            "running",
+            0.0
+          ],
+          [
+            "checkpoint",
+            2,
+            47.867
+          ],
+          [
+            "checkpoint",
+            4,
+            104.358
+          ],
+          [
+            "stop",
+            "max-iterations",
+            104.358
+          ],
+          [
+            "checkpoint",
+            4,
+            159.821
+          ],
+          [
+            "state",
+            "completed",
+            197.686
+          ]
+        ]
+      },
+      "new": {
+        "processWallSecs": 55.39,
+        "maxRssBytes": 10951065600,
+        "solveWallSecs": 16.23,
+        "checkpointBytes": 1042043734,
+        "solBytes": 173032376,
+        "eventsSecsFromRunning": [
+          [
+            "state",
+            "running",
+            0.0
+          ],
+          [
+            "checkpoint",
+            2,
+            16.241
+          ],
+          [
+            "stop",
+            "max-iterations",
+            16.914
+          ],
+          [
+            "checkpoint",
+            4,
+            38.545
+          ],
+          [
+            "state",
+            "completed",
+            55.095
+          ]
+        ]
+      }
+    }
+  }
+}

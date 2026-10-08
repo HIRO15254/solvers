@@ -1,0 +1,38 @@
+[
+  {
+    "compress_seconds": 0.6052219,
+    "compressed_bytes": 107468483,
+    "input_bytes": 134217728,
+    "level": 1
+  },
+  {
+    "compress_seconds": 0.6976322,
+    "compressed_bytes": 104451257,
+    "input_bytes": 134217728,
+    "level": 2
+  },
+  {
+    "compress_seconds": 1.5307534,
+    "compressed_bytes": 102021167,
+    "input_bytes": 134217728,
+    "level": 3
+  },
+  {
+    "compress_seconds": 1.5406259,
+    "compressed_bytes": 102021167,
+    "input_bytes": 134217728,
+    "level": 3
+  },
+  {
+    "compress_seconds": 0.9999089,
+    "compressed_bytes": 104451257,
+    "input_bytes": 134217728,
+    "level": 2
+  },
+  {
+    "compress_seconds": 0.6689399,
+    "compressed_bytes": 107468483,
+    "input_bytes": 134217728,
+    "level": 1
+  }
+]

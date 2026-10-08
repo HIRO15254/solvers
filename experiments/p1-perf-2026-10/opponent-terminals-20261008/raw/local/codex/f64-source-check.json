@@ -1,0 +1,32 @@
+[
+  {
+    "file": "crates/hu-postflop/src/kernel.rs",
+    "function": "pub(crate) fn showdown_kernel(",
+    "identical_to_head": true
+  },
+  {
+    "file": "crates/hu-postflop/src/kernel.rs",
+    "function": "pub(crate) fn fold_kernel(",
+    "identical_to_head": true
+  },
+  {
+    "file": "crates/hu-postflop/src/kernel.rs",
+    "function": "pub(crate) fn compat_sums(",
+    "identical_to_head": true
+  },
+  {
+    "file": "crates/hu-postflop/src/postflop.rs",
+    "function": "fn eval_with_kernel(",
+    "identical_to_head": true
+  },
+  {
+    "file": "crates/hu-postflop/src/postflop.rs",
+    "function": "fn eval(",
+    "identical_to_head": true
+  },
+  {
+    "file": "crates/hu-postflop/src/postflop.rs",
+    "function": "fn eval_cfr(",
+    "identical_to_head": true
+  }
+]

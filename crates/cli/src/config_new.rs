@@ -52,6 +52,7 @@ include_allin = false
 river = 2
 
 [solver.stop]
+# check_every defaults to "auto": adaptive with target, otherwise every 25 iterations.
 max_iterations = 100
 "#;
 
@@ -102,6 +103,30 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
             rendered.push_str(description);
             rendered.push('\n');
         }
+        if line.starts_with("cfr_precision =") {
+            rendered.push_str("# CFR arithmetic: f32 (default) | f64 (legacy bit-identical); evaluation stays f64.\n");
+        }
+        if line.starts_with("check_every =") {
+            rendered.push_str(
+                "# auto: adaptive every 3-50 iterations with target, otherwise every 25; an integer fixes the interval.\n",
+            );
+        }
+        if line.starts_with("storage =") {
+            rendered.push_str(
+                "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
+            );
+        }
+        if line.starts_with("final_checkpoint =") {
+            rendered.push_str(
+                "# P1: save the final resumable state; false keeps only periodic checkpoints.\n",
+            );
+        }
+        if line.starts_with("pow4_reset =") {
+            rendered.push_str(
+                "# Reset DCFR averages at iterations 4, 16, 64, ...; default false for f32/i16-f32avg.\n\
+# With storage = i16, omitting pow4_reset defaults to true; explicit values take priority.\n",
+            );
+        }
         rendered.push_str(line);
         rendered.push('\n');
     }
@@ -139,9 +164,35 @@ mod tests {
                             &document.output,
                         )
                         .unwrap();
+                        for coefficient in ["alpha = 1.25", "beta = 0.5", "gamma = 4.0"] {
+                            assert!(effective.contains(coefficient));
+                            if matches!(template, ConfigTemplate::Full) {
+                                assert!(raw.contains(coefficient));
+                            }
+                        }
+                        assert!(effective.contains("pow4_reset = false"));
+                        assert!(effective.contains("final_checkpoint = true"));
+                        assert!(effective.contains("check_every = \"auto\""));
+                        assert_eq!(
+                            settings.solver.stop.check_every,
+                            hu_postflop::input::CheckEvery::Auto
+                        );
+                        if matches!(template, ConfigTemplate::Full) {
+                            assert!(raw.contains("pow4_reset = false"));
+                            assert!(raw.contains("omitting pow4_reset defaults to true"));
+                            assert!(raw.contains("false keeps only periodic checkpoints"));
+                            assert!(raw.contains("check_every = \"auto\""));
+                            assert!(raw.contains("adaptive every 3-50 iterations with target"));
+                        }
+                        assert_eq!(
+                            settings.solver.algorithm,
+                            hu_postflop::input::Algorithm::default()
+                        );
                         hu_postflop::input::lower(&document.spot, &settings).unwrap();
                     }
                     ConfigProduct::P2 => {
+                        assert!(!raw.contains("final_checkpoint"));
+                        assert!(!effective.contains("final_checkpoint"));
                         let settings = mw_preflop::input::Settings::parse(
                             &document.spot,
                             &document.solver,
@@ -194,9 +245,10 @@ mod tests {
         let game = hu_postflop::try_build_postflop_game(&config, payoff.pipeline()).unwrap();
         let mut solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
             game.game,
-            Box::new(hu_engine::Dcfr::default()),
+            hu_postflop::run::schedule(&settings.solver.algorithm),
             Some(100),
         );
+        solver.set_cfr_precision(settings.solver.cfr_precision);
         solver.run(100);
         assert_eq!(solver.iteration(), 100);
         assert!(
@@ -388,6 +440,7 @@ mod tests {
             "solver",
             "iso_merging",
             "storage",
+            "cfr_precision",
             "algorithm",
             "schedule",
             "alpha",
@@ -402,6 +455,7 @@ mod tests {
             "hs-dcfr",
             "f32",
             "i16",
+            "i16-f32avg",
             "parallel",
             "chance_depth",
             "min_children",
@@ -437,6 +491,7 @@ mod tests {
             "auto",
             "max_time",
             "checkpoint_interval",
+            "final_checkpoint",
             "output",
             "probability_encoding",
             "u16",

@@ -1,0 +1,21 @@
+{
+  "storage": "i16-f32avg",
+  "schedule": "vanilla",
+  "mode": "no-rivers",
+  "river_iterations": 8,
+  "lazy_river_resolve_succeeded": true,
+  "artifacts": [
+    {
+      "path": "runs/p1-t6/mixed-no-rivers-smoke/checkpoint.ckpt",
+      "bytes": 8607,
+      "sha256": "6b58502d7bd0497a25573a29e03a1148dc6dc3b322002223da63db0fc197fb62",
+      "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+    },
+    {
+      "path": "runs/p1-t6/mixed-no-rivers-smoke/solution.sol",
+      "bytes": 973,
+      "sha256": "c920495c32020941bdfc0e3df6d2dfdc493c581c59efba9a056422818a82283a",
+      "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+    }
+  ]
+}

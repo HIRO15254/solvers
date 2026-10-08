@@ -1,0 +1,20 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 184K of event 'cpu-clock:ppp'
+# Event count (approx.): 184262262078
+#
+# Overhead  Symbol                                                                                                                                                                                                                                                                                             
+# ........  ...................................................................................................................................................................................................................................................................................................
+#
+     4.01%  [.] <hu_postflop::sol::ValueBlock as serde_core::ser::Serialize>::serialize::<&mut postcard::ser::serializer::Serializer<postcard::ser::flavors::io::WriteFlavor<&mut hu_postflop::sol::DeferredFlush<std::io::buffered::bufwriter::BufWriter<zstd::stream::write::Encoder<&mut std::fs::File>>>>>>
+            |          
+             --4.01%--0x8948fb8948d68949
+
+
+
+#
+# (Tip: Show individual samples with: perf script)
+#

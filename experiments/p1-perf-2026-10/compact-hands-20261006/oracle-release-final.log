@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling hu-postflop v0.1.0 (C:\Users\PC_User\orca\workspaces\solvers\cisco\crates\hu-postflop)
+    Finished `release` profile [optimized] target(s) in 1m 16s
+     Running tests\oracle_diff.rs (target\release\deps\oracle_diff-7b2926e538e9475f.exe)
+
+running 3 tests
+test multistreet_engine_matches_scalar_oracle_early_iterates ... ok
+test uniform_profiles_agree_between_engine_and_oracle ... ok
+test multistreet_engine_matches_scalar_oracle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+

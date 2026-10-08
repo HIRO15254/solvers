@@ -526,7 +526,8 @@ P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomp
 ```toml
 [solver]
 iso_merging = true        # 既定true。Turn/Riverのsuit同型を厳密に併合
-storage = "f32"           # 既定f32。f32 | i16
+storage = "f32"           # 既定f32。f32 | i16 | i16-f32avg
+cfr_precision = "f32"     # 既定f32。f32 | f64（旧版とbit一致）
 
 [solver.algorithm]
 schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs-dcfr
@@ -534,7 +535,7 @@ schedule = "dcfr"         # 既定。vanilla | cfr-plus | dcfr | linear-cfr | hs
 [solver.stop]
 target = "0.3%pot"        # 任意。既定なし。NashConv/2に対する停止目標
 max_iterations = 1000000  # 既定。安全予算であり収束を意味しない
-check_every = 25          # 既定。Exploitability計算と停止判定の間隔
+check_every = "auto"      # 既定。target有りは適応間隔、無しは固定25 iteration
 
 [solver.parallel]         # 任意。性能調整
 chance_depth = 2
@@ -545,25 +546,56 @@ min_children = 12
 tournamentでは`"0.01%prizes"`（賞金総額に対する%）。単位とeconomicsが合わなければ`NLH003`。
 判定には`NashConv / 2`を使い、一般和の場合も同じ量で止めるが零和の収束保証は付けない。
 `target`を書かなければ`max_iterations`か`[run] max_time`に達するまで回し、`validate`は停止目標が
-無いことを警告する。Exploitabilityは`target`の有無によらず`check_every`ごとに計算して報告する。
+無いことを警告する。Exploitabilityは評価境界ごとに計算して報告する。
+
+`check_every`は`"auto"`（既定）または正のu64である。整数を明示すると従来どおり固定間隔で評価する。
+他の文字列や型は`NLH002`、0・負整数は`NLH003`で拒否する。
+`"auto"`でtargetが無い場合も固定25 iterationである。targetがある場合は次の決定的な適応間隔を使う。
+初回はiteration 25、評価履歴が2点未満なら次は25 iteration後とし、いずれもmax_iterationsで切る。
+直前2回の評価を`(t0, v0)`、`(t1, v1)`（vはNashConv / 2）として、
+`s = ln(v0 / v1) / ln(t1 / t0)`を計算する。有限の`s > 0.05`なら
+`t* = t1 × (v1 / target)^(1 / s)`、`step = ceil(0.8 × (t* − t1))`とし、
+非有限の値がある場合や`s <= 0.05`ならstepは25とする。stepを3〜50 iterationに収め、
+max_iterationsまでの残りで切る。間隔は評価iterationと値だけで決まり、時間やthread数には依存しない。
+停止条件は従来どおり`NashConv / 2 <= target`であるが、target有りの停止iterationは旧版と変わり得る。
+旧版と同じ停止を得るには`check_every = 25`を明示する。
+
+利用者決定PF10（2026-10-08）により、131本の収束曲線を使った模擬で0.1% pot到達時間が
+平均約4.3%短縮した方式を既定にした（[模擬script](../experiments/p1-perf-2026-10/adaptive-check-20261008/scripts/simulate.py)、
+[結果](../experiments/p1-perf-2026-10/adaptive-check-20261008/result.json)）。
+実効configには`"auto"`または整数を必ず明示し、再読込みしても同じ値になる。
+旧run.tomlの`check_every = 25`は固定25のまま再開する。互換性hashの対象は変更しない。
 
 #### P1の設定値
 
 | key / schedule | 既定・範囲・意味 |
 |---|---|
+| `cfr_precision` | `"f32"`（既定）または`"f64"`。CFR passの終端kernelとcurrent strategyのregret matchingだけを選択。評価・平均戦略・保存EVはf64 |
 | `vanilla` | discount無しのCFR。追加param無し |
 | `cfr-plus` | 負regretを0に切るCFR+。追加param無し |
 | `linear-cfr` | iterationに比例した平均重み。追加param無し |
-| `dcfr` | `alpha = 1.5`、`beta = 0`、`gamma = 3`、`pow4_reset = true` |
+| `dcfr` | `alpha = 1.25`、`beta = 0.5`、`gamma = 4`。`pow4_reset`は`storage = "i16"`ならtrue、それ以外はfalse |
 | `hs-dcfr` | `gamma0 = 30` |
 | `dcfr.alpha` / `beta` / `gamma`、`hs-dcfr.gamma0` | 有限f64。負値もparserは受理する。regret正側・負側・平均重みのdiscountを指定する |
-| `dcfr.pow4_reset` | bool。4の累乗iterationで平均戦略をresetする |
-| `stop.max_iterations` / `check_every` | 正のu64。既定1,000,000 / 25。上限iterationと評価間隔 |
+| `dcfr.pow4_reset` | bool。未指定時は確定した`solver.storage`が`"i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalse。明示したtrue・falseはstorageによらず優先する。trueなら4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
+| `stop.max_iterations` | 正のu64。既定1,000,000。上限iteration |
+| `stop.check_every` | `"auto"`（既定）または正のu64。autoはtarget有りで3〜50 iterationの適応評価、target無しで固定25。整数は固定評価間隔 |
 | `parallel.chance_depth` | 非負u32。既定2。chance分岐を並列化する深さ |
 | `parallel.min_children` | 正のusize。既定12。並列化する最小child数 |
 
+f32・i16-f32avgで測定した全ての木でreset無しの0.1% pot到達が同じか早かったため、利用者決定PF4（2026-10-07）でDCFRの既定をfalseへ変更した。この測定には旧i16を含んでいなかった。
+
+GCP掃引で0.1% pot到達iterationが旧係数比でf32の10木では0.65〜1.05倍、i16-f32avgの3木では0.60〜0.74倍だったため、利用者決定PF7（2026-10-07）でDCFRの既定係数を1.25・0.5・4へ変更した（[測定証拠](../experiments/p1-perf-2026-10/dcfr-pdcfr-20261007/README.md)）。
+
+旧i16はreset無しだとTurn・Riverで0.1% potに届かず、reset有りなら到達したため、利用者決定PF8（2026-10-07）で旧i16の未指定時だけ`pow4_reset`の既定をtrueへ変更した（同測定証拠の「旧i16の精度床」）。f32・i16-f32avgはfalseを維持する。実効configは値を明示保存するため、既存run・checkpoint・`.sol`は保存値で再開・照会する。
+
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。
+`storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小で、reset有り・CFR計算f32なら測定したTurn・Riverでも0.1% potに届く。ただし全ての木での到達を保証せず、以前の旧係数・reset有りの計測ではGTO Wizard風の大きい木gtow_bで最良0.292% potに留まった。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
+
+利用者決定PF5・PF6（2026-10-07）により、1 iterationが約1割短縮したf32を既定とする。
+`solver.cfr_precision`はgame定義にもstate形式にも影響しないため、resume・deriveの互換性hashから除外する。
+
 scheduleの更新式は[計算規範](hu-postflop.jp.md#4-計算停止storage)を参照する。
 
 ### P2（Multiway Preflop）
@@ -632,17 +664,21 @@ threads = "auto"              # 既定auto。または正の整数
 memory = "auto"               # 既定auto。正のbytes整数、または整数+KiB|MiB|GiB
 max_time = "12h"              # 任意。validation・cache構築を除く累積solve時間。s|m|h
 checkpoint_interval = "15m"   # 既定15m。wall-clockでの保存間隔
+final_checkpoint = true      # P1のみ。既定true。falseは終了時の再開state保存を省く
 ```
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
-- `memory`: P1はsolve開始前に見積もる木とstorageの上限で、`auto`は物理メモリの80%。見積りが上限を
+- `final_checkpoint`: P1のみのbool、既定true。falseではtarget到達・max_iterations・time-limit・cancelの全停止理由で最後のcheckpointを省く。定期checkpointは従来どおり保存し、`.sol`も生成する。省いたrunは最終状態から再開できず、定期checkpointがあればその保存iterationから再開する。checkpointが一つも無ければ再solveが必要。P2で明示すると`NLH002`。利用者決定PF9（2026-10-08）のA＋Bに従う。
+- `memory`: P1は選択したstorageのbytes（`f32_bytes` / `i16_bytes` / `i16_f32avg_bytes`）をS、解放するregret arenaをR、保存作業領域をW、圧縮予算をCとして、`max(S, S − R + W) + C`でsolve開始前に見積もる。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。最後のcheckpointを新たに書く場合、並行peak `S + W + 2C`が上限以下ならregretを解放せずcheckpointと`.sol`を並行生成する。両方のzstd encoderにCを計上する。余裕が無ければ最後のcheckpoint（指定時）→ regretとそのscaleの解放 → `.sol`生成の順とする。solve開始の見積り式と可否判定は変えない。保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域）と圧縮予算を含み、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
   超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
-  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。
+  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1の木・rank table・構築一時領域・thread scratch等は別途必要である。
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。
-- `max_time`、checkpointの判定は計算batchの境界で行う。P1は`check_every` iteration、P2は
-  `batch_sweeps`の完了境界である。I/Oや最終出力を中断するhard deadlineではない。
+- P1 checkpointはversion 5。metadataはbackend種別（`f32` / `i16` / `i16-f32avg`）と配列長を保持する。version 1〜4は移行先を示すerrorで拒否し、現行configから再solveする。[P1第7節](hu-postflop.jp.md#7-solとcheckpoint)を参照。
+- 中断・`max_time`・checkpointの判定は計算batchの境界で行う。P1の`check_every = "auto"`は評価間を25 iteration以下のsub-batchに分け、その完了境界で判定する。整数は従来どおり指定iteration間隔、P2は
+  `batch_sweeps`の完了境界である。sub-batchの区切りは計算結果を変えない。I/Oや最終出力を中断するhard deadlineではない。
+- P1のauto再開はrun directoryの`progress.jsonl`からcheckpointのiteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。次の評価iterationは同じ方式で再計算する。progressが無い・読めない場合は履歴無しとし、checkpointのiteration＋25（max_iterationsで切る）を最初の評価とする。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えない。
 
 ## 12. `[output]`
 

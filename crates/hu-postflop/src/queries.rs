@@ -4,14 +4,15 @@ use crate::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, r
 use crate::{prepare, run};
 use anyhow::Result;
 use hu_engine::{
-    CompiledGame, F32Storage, I16Storage, NodeId, NodeKind, PublicTree, ReachMap, Solver, Storage,
+    CompiledGame, F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, ReachMap, Solver, Storage,
 };
-use nlh::{Card, NUM_COMBOS, PerPlayer, Player, combo_cards};
+use nlh::{Card, PerPlayer, Player, combo_cards};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 enum LiveSolver {
     F32(Solver<PostflopEvaluator, F32Storage>),
     I16(Solver<PostflopEvaluator, I16Storage>),
+    Mixed(Solver<PostflopEvaluator, MixedStorage>),
 }
 /// A live solve with its display metadata and root summary.
 pub struct LiveSolution {
@@ -26,6 +27,7 @@ impl LiveSolution {
         match &self.solver {
             LiveSolver::F32(s) => s.game(),
             LiveSolver::I16(s) => s.game(),
+            LiveSolver::Mixed(s) => s.game(),
         }
     }
 }
@@ -45,6 +47,9 @@ pub fn with_live<T: Send>(
             }
             crate::input::Storage::I16 => {
                 live::<I16Storage>(p, iterations, target, cancel, LiveSolver::I16)
+            }
+            crate::input::Storage::I16F32Avg => {
+                live::<MixedStorage>(p, iterations, target, cancel, LiveSolver::Mixed)
             }
         }?;
         viewer(&solved)
@@ -78,6 +83,7 @@ impl StrategyProvider for LiveProvider<'_> {
         Ok(match &self.0.solver {
             LiveSolver::F32(s) => s.average_strategy_at(node),
             LiveSolver::I16(s) => s.average_strategy_at(node),
+            LiveSolver::Mixed(s) => s.average_strategy_at(node),
         })
     }
     fn ev_summary(&self) -> EvSummary {
@@ -145,15 +151,27 @@ pub fn action_grid(
 ) -> Grid {
     let node = game.tree.node(current);
     let hands = game.tree.storage_ref(node).num_hands as usize;
-    let weight = &reach[node.player];
+    let weight = game
+        .evaluator
+        .hands
+        .expand(node.player, &reach[node.player]);
+    let value = game
+        .evaluator
+        .hands
+        .expand(node.player, &avg[pos * hands..(pos + 1) * hands]);
     Grid {
-        weights: class_weights(weight),
-        values: class_average(weight, &avg[pos * hands..(pos + 1) * hands]).map(|v| v * 100.0),
+        weights: class_weights(&weight),
+        values: class_average(&weight, &value).map(|v| v * 100.0),
     }
 }
 /// Root-range weights as percentages of the largest hand-class weight.
 pub fn range_grid(game: &CompiledGame<PostflopEvaluator>, player: Player) -> Grid {
-    let weights = class_weights(&game.root_ranges[player]);
+    let weights = class_weights(
+        &game
+            .evaluator
+            .hands
+            .expand(player, &game.root_ranges[player]),
+    );
     let max = weights.iter().cloned().fold(0.0, f64::max);
     let values = weights.map(|w| {
         if max > 0.0 && w > 0.0 {
@@ -165,20 +183,35 @@ pub fn range_grid(game: &CompiledGame<PostflopEvaluator>, player: Player) -> Gri
     Grid { weights, values }
 }
 /// Current-node equity; the viewer may retain the result until navigation changes.
-pub fn equity(board: &[Card], history: &str, reach: &PerPlayer<Vec<f32>>) -> PerPlayer<Vec<f32>> {
+pub fn equity(
+    game: &CompiledGame<PostflopEvaluator>,
+    board: &[Card],
+    history: &str,
+    reach: &PerPlayer<Vec<f32>>,
+) -> PerPlayer<Vec<f32>> {
     let mut board = board.to_vec();
     for token in history.split('[').skip(1) {
         if let Some(card) = token.split(']').next().and_then(|s| s.parse::<Card>().ok()) {
             board.push(card);
         }
     }
-    range_equity(&board, reach)
+    let hands = &game.evaluator.hands;
+    let global = PerPlayer::new(
+        hands.expand(Player::P0, &reach[Player::P0]),
+        hands.expand(Player::P1, &reach[Player::P1]),
+    );
+    range_equity(&board, &global)
 }
 /// Class-averaged OOP equity percentages against the current IP reach.
-pub fn equity_grid(reach: &PerPlayer<Vec<f32>>, equity: &PerPlayer<Vec<f32>>) -> Grid {
+pub fn equity_grid(
+    game: &CompiledGame<PostflopEvaluator>,
+    reach: &PerPlayer<Vec<f32>>,
+    equity: &PerPlayer<Vec<f32>>,
+) -> Grid {
+    let weight = game.evaluator.hands.expand(Player::P0, &reach[Player::P0]);
     Grid {
-        weights: class_weights(&reach[Player::P0]),
-        values: class_average(&reach[Player::P0], &equity[Player::P0]).map(|v| v * 100.0),
+        weights: class_weights(&weight),
+        values: class_average(&weight, &equity[Player::P0]).map(|v| v * 100.0),
     }
 }
 /// One concrete combo's per-action probabilities.
@@ -197,18 +230,22 @@ pub fn parse_class(arg: &str) -> Result<ComboClass, String> {
 /// Probabilities for the concrete combos selected by a parsed expression.
 pub fn combo_rows(
     class: &ComboClass,
-    num_hands: usize,
+    hands: &crate::PostflopHands,
+    player: Player,
     actions: usize,
     avg: &[f32],
 ) -> Vec<ComboRow> {
-    debug_assert_eq!(num_hands, NUM_COMBOS);
-    (0..num_hands)
-        .filter(|&c| class.0.weight(c) > 0.0)
-        .map(|combo| {
-            let (hi, lo) = combo_cards(combo);
+    let num_hands = hands.len(player);
+    hands
+        .combos(player)
+        .iter()
+        .enumerate()
+        .filter(|&(_, &c)| class.0.weight(c as usize) > 0.0)
+        .map(|(local, &combo)| {
+            let (hi, lo) = combo_cards(combo as usize);
             ComboRow {
                 combo: format!("{hi}{lo}"),
-                probabilities: (0..actions).map(|a| avg[a * num_hands + combo]).collect(),
+                probabilities: (0..actions).map(|a| avg[a * num_hands + local]).collect(),
             }
         })
         .collect()
@@ -228,25 +265,9 @@ pub fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
     }
 }
 
-/// Identify the single card removed by a chance mask.
-fn identify_card(mask: &[f32]) -> Option<Card> {
-    for idx in 0..52u8 {
-        let card = Card::from_index(idx);
-        let ok = (0..NUM_COMBOS).all(|combo| {
-            let (c1, c2) = combo_cards(combo);
-            let expect = if c1 == card || c2 == card { 0.0 } else { 1.0 };
-            mask[combo] == expect
-        });
-        if ok {
-            return Some(card);
-        }
-    }
-    None
-}
-
 /// Label for a chance node's `pos`-th child: the dealt card. For a `Mask`
 /// deal (the common unmerged case) this comes straight from the card-removal
-/// mask via [`identify_card`]. For a `Transition` deal (an iso-merged class:
+/// builder metadata. For a `Transition` deal (an iso-merged class:
 /// several structurally-equivalent cards folded into one branch) there is no
 /// single mask to read a card from, so instead this reads the representative
 /// card straight out of the child action node's own recorded history -- its
@@ -256,17 +277,16 @@ fn identify_card(mask: &[f32]) -> Option<Card> {
 /// `dealN` when neither source applies (e.g. an `Identity` map, which this
 /// builder never uses at a chance node, or an untagged/non-action child).
 pub fn chance_child_label(
-    tree: &PublicTree,
+    game: &CompiledGame<PostflopEvaluator>,
     node_info: &[PostflopNodeInfo],
     node_id: NodeId,
     pos: usize,
 ) -> String {
+    let tree = &game.tree;
     let node = tree.node(node_id);
     let deal = tree.deal(node, pos);
     match deal.maps[Player::P0] {
-        ReachMap::Mask(m) => identify_card(&tree.masks[m as usize])
-            .map(|c| c.to_string())
-            .unwrap_or_else(|| format!("deal{pos}")),
+        ReachMap::Mask(m) => game.evaluator.mask_cards[m as usize].to_string(),
         ReachMap::Transition(_) => tree
             .children(node_id)
             .nth(pos)

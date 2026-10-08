@@ -1,0 +1,12 @@
+tree: nodes=22107 terminals=14280 rank_tables=48 storage=15.6 MiB (f32) / 7.9 MiB (i16) / 11.8 MiB (i16-f32avg)
+memory estimate: 227.6 MiB (f32) / 223.7 MiB (i16) / 227.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.850e0 expl_p1=2.089e0 nash_conv=4.939e0
+iter=      50 expl_p0=6.782e-1 expl_p1=6.192e-1 nash_conv=1.297e0
+iter=     100 expl_p0=1.662e-1 expl_p1=1.203e-1 nash_conv=2.864e-1
+iter=     150 expl_p0=6.910e-2 expl_p1=5.055e-2 nash_conv=1.196e-1
+iter=     200 expl_p0=3.617e-2 expl_p1=2.480e-2 nash_conv=6.097e-2
+iter=     223 expl_p0=2.956e-2 expl_p1=1.983e-2 nash_conv=4.939e-2
+iter=     232 expl_p0=2.669e-2 expl_p1=1.836e-2 nash_conv=4.506e-2
+iter=     235 expl_p0=2.637e-2 expl_p1=1.792e-2 nash_conv=4.428e-2
+done: iterations=235 wall=0.31s ev_p0=7.681368 ev_p1=12.799491 nash_conv=4.428e-2
+sol: wrote /home/PC_User/work_vm28/c_turn2_t23/solution.sol (5.25 MB, 7802 blocks, mode=Full)

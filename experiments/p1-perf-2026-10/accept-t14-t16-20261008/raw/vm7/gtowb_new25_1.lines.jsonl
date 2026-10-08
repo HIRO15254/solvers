@@ -1,0 +1,17 @@
+{"t": 0.501, "line": "tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)"}
+{"t": 0.501, "line": "memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)"}
+{"t": 41.117, "line": "iter=      25 expl_p0=1.671e0 expl_p1=1.727e0 nash_conv=3.398e0"}
+{"t": 78.907, "line": "iter=      50 expl_p0=3.832e-1 expl_p1=3.988e-1 nash_conv=7.820e-1"}
+{"t": 116.326, "line": "iter=      75 expl_p0=1.339e-1 expl_p1=1.249e-1 nash_conv=2.588e-1"}
+{"t": 153.23, "line": "iter=     100 expl_p0=6.321e-2 expl_p1=5.860e-2 nash_conv=1.218e-1"}
+{"t": 189.7, "line": "iter=     125 expl_p0=3.571e-2 expl_p1=3.440e-2 nash_conv=7.011e-2"}
+{"t": 225.687, "line": "iter=     150 expl_p0=2.534e-2 expl_p1=2.399e-2 nash_conv=4.933e-2"}
+{"t": 261.01, "line": "iter=     175 expl_p0=1.921e-2 expl_p1=1.827e-2 nash_conv=3.748e-2"}
+{"t": 295.867, "line": "iter=     200 expl_p0=1.563e-2 expl_p1=1.414e-2 nash_conv=2.977e-2"}
+{"t": 330.977, "line": "iter=     225 expl_p0=1.295e-2 expl_p1=1.106e-2 nash_conv=2.401e-2"}
+{"t": 365.196, "line": "iter=     250 expl_p0=1.011e-2 expl_p1=8.463e-3 nash_conv=1.857e-2"}
+{"t": 398.698, "line": "iter=     275 expl_p0=7.789e-3 expl_p1=6.769e-3 nash_conv=1.456e-2"}
+{"t": 431.335, "line": "iter=     300 expl_p0=6.283e-3 expl_p1=5.721e-3 nash_conv=1.200e-2"}
+{"t": 463.133, "line": "iter=     325 expl_p0=5.179e-3 expl_p1=4.783e-3 nash_conv=9.963e-3"}
+{"t": 463.133, "line": "done: iterations=325 wall=457.90s ev_p0=1.506552 ev_p1=3.323455 nash_conv=9.963e-3"}
+{"t": 530.758, "line": "sol: wrote /home/PC_User/work/gtowb_new25_1/solution.sol (6457.85 MB, 2293609 blocks, mode=Full)"}

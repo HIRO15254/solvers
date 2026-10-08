@@ -13,8 +13,8 @@ use std::time::Duration;
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use hu_engine::{
-    Discounts, F32Storage, I16Storage, PublicTree, ReachMap, SparseTransition, Storage, StorageOps,
-    StorageRef, TempNode, TreeSpec,
+    Discounts, F32Storage, I16Storage, PublicTree, ReachMap, Scratch, SparseTransition, Storage,
+    StorageOps, StorageRef, TempNode, TreeSpec,
 };
 use nlh::{PerPlayer, Player};
 
@@ -236,6 +236,23 @@ fn bench_tree(c: &mut Criterion) {
         b.iter(|| {
             transition.apply_forward(black_box(&reach), &mut out);
             black_box(&out);
+        });
+    });
+
+    let mut transition_tree = mask_tree();
+    transition_tree.transitions.push(merged_class_transition());
+    let mut scratch = Scratch::new();
+    group.bench_function("accumulate_values_transition_scratch", |b| {
+        b.iter(|| {
+            acc.fill(0.0);
+            transition_tree.accumulate_values_with_scratch(
+                ReachMap::Transition(0),
+                black_box(0.7),
+                black_box(&child_vals),
+                &mut acc,
+                &mut scratch,
+            );
+            black_box(&acc);
         });
     });
 

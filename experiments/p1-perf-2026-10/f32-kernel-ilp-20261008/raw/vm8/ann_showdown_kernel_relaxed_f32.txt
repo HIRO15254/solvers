@@ -1,0 +1,596 @@
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock:ppp (116855 samples, percent: local period)
+---------------------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         : 3     Disassembly of section .text:
+         :
+         : 5     00000000000ddd80 <hu_postflop::kernel::showdown_kernel_relaxed_f32>:
+         : 6     hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 172   }
+         : 173   }
+         : 174   /// Sweep ranks with a call-local tied-group scratch array. Untied groups have
+         : 175   /// zero tie and zero identical-combo reach. Small ties merge and clear touched
+         : 176   /// entries; large ties use a dense merge, avoiding repeated visits to each card.
+         : 177   pub(crate) fn showdown_kernel_relaxed_f32(
+    0.01 :   ddd80:  push   %rbp
+    0.00 :   ddd81:  push   %r15
+    0.00 :   ddd83:  push   %r14
+    0.01 :   ddd85:  push   %r13
+    0.01 :   ddd87:  push   %r12
+    0.00 :   ddd89:  push   %rbx
+    0.01 :   ddd8a:  sub    $0x368,%rsp
+    0.00 :   ddd91:  vmovsd (%r8),%xmm0
+         : 186   new<[f64; 3]>():
+    0.00 :   ddd96:  vmovsd 0x8(%r8),%xmm2
+    0.00 :   ddd9c:  vmovsd 0x10(%r8),%xmm1
+    0.00 :   ddda2:  mov    0x3a0(%rsp),%rbx
+         : 188   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.01 :   dddaa:  mov    0x8(%rsi),%r14
+    0.16 :   dddae:  mov    0x10(%rsi),%r12
+         : 1865  as_slice<hu_postflop::kernel::Hand, alloc::alloc::Global>():
+    0.01 :   dddb2:  mov    %rdi,%r13
+    0.00 :   dddb5:  lea    0x50(%rsp),%rdi
+    0.00 :   dddba:  mov    %rcx,0x38(%rsp)
+    0.00 :   dddbf:  mov    %rdx,0x48(%rsp)
+    0.00 :   dddc4:  mov    %rsi,%rbp
+    0.00 :   dddc7:  mov    %r9,%r15
+         : 1870  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 181   utilities: [f64; 3],
+         : 182   reach: &[f32],
+         : 183   out: &mut [f32],
+         : 184   ) {
+         : 185   let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
+         : 186   let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
+    0.00 :   dddca:  mov    %r9,%rcx
+    0.01 :   dddcd:  mov    %r14,%rsi
+    0.00 :   dddd0:  mov    %r12,%rdx
+    0.00 :   dddd3:  mov    %rbx,%r8
+    0.00 :   dddd6:  vmovsd %xmm0,0x8(%rsp)
+    0.01 :   ddddc:  vmovsd %xmm2,(%rsp)
+    0.00 :   ddde1:  vmovsd %xmm1,0x18(%rsp)
+    0.00 :   ddde7:  call   dd7a0 <hu_postflop::kernel::compat_sums_relaxed_f32>
+    0.01 :   dddec:  vmovups 0x134(%rsp),%ymm1
+    0.04 :   dddf5:  vmovss 0x50(%rsp),%xmm0
+    0.00 :   dddfb:  mov    0x28(%r13),%rdx
+    0.02 :   dddff:  vmovups %ymm1,0x340(%rsp)
+    0.02 :   dde08:  vmovups 0x114(%rsp),%ymm1
+    0.02 :   dde11:  vmovups %ymm1,0x320(%rsp)
+    0.01 :   dde1a:  vmovups 0xf4(%rsp),%ymm1
+    0.00 :   dde23:  vmovups %ymm1,0x300(%rsp)
+    0.00 :   dde2c:  vmovups 0xd4(%rsp),%ymm1
+    0.01 :   dde35:  vmovups %ymm1,0x2e0(%rsp)
+    0.00 :   dde3e:  vmovups 0xb4(%rsp),%ymm1
+    0.00 :   dde47:  vmovups %ymm1,0x2c0(%rsp)
+    0.01 :   dde50:  vmovups 0x94(%rsp),%ymm1
+    0.00 :   dde59:  vmovups %ymm1,0x2a0(%rsp)
+    0.01 :   dde62:  vmovups 0x74(%rsp),%ymm1
+    0.00 :   dde68:  vmovups %ymm1,0x280(%rsp)
+    0.01 :   dde71:  vmovups 0x54(%rsp),%ymm1
+    0.00 :   dde77:  vmovups %ymm1,0x260(%rsp)
+    0.01 :   dde80:  vxorps %xmm1,%xmm1,%xmm1
+    0.00 :   dde84:  vmovups %ymm1,0x240(%rsp)
+    0.01 :   dde8d:  vmovups %ymm1,0x220(%rsp)
+    0.00 :   dde96:  vmovups %ymm1,0x200(%rsp)
+    0.01 :   dde9f:  vmovups %ymm1,0x1e0(%rsp)
+    0.01 :   ddea8:  vmovups %ymm1,0x1c0(%rsp)
+    0.01 :   ddeb1:  vmovups %ymm1,0x1a0(%rsp)
+    0.01 :   ddeba:  vmovups %ymm1,0x180(%rsp)
+    0.01 :   ddec3:  vmovups %ymm1,0x160(%rsp)
+    0.01 :   ddecc:  vmovups %ymm1,0x130(%rsp)
+    0.02 :   dded5:  vmovups %ymm1,0x110(%rsp)
+    0.01 :   ddede:  vmovups %ymm1,0xf0(%rsp)
+    0.01 :   ddee7:  vmovups %ymm1,0xd0(%rsp)
+    0.02 :   ddef0:  vmovups %ymm1,0xb0(%rsp)
+    0.01 :   ddef9:  vmovups %ymm1,0x90(%rsp)
+    0.02 :   ddf02:  vmovups %ymm1,0x70(%rsp)
+    0.01 :   ddf08:  vmovups %ymm1,0x50(%rsp)
+    0.02 :   ddf0e:  test   %rdx,%rdx
+    0.00 :   ddf11:  je     de4a9 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x729>
+         : 181   next<(nlh::eval::HandRank, usize)>():
+    0.00 :   ddf17:  mov    %rdx,%rcx
+    0.00 :   ddf1a:  mov    0x20(%r13),%rdx
+    0.00 :   ddf1e:  shl    $0x4,%rcx
+    0.00 :   ddf22:  vmovsd 0x8(%rsp),%xmm2
+    0.00 :   ddf28:  vmovsd (%rsp),%xmm3
+    0.00 :   ddf2d:  vmovsd 0x18(%rsp),%xmm4
+    0.01 :   ddf33:  mov    %r14,%rax
+    0.01 :   ddf36:  mov    0x20(%rbp),%r14
+    0.01 :   ddf3a:  mov    0x3b0(%rsp),%rsi
+    0.00 :   ddf42:  mov    0x3a8(%rsp),%r11
+    0.00 :   ddf4a:  mov    0x28(%rbp),%rbp
+    0.00 :   ddf4e:  vxorps %xmm5,%xmm5,%xmm5
+    0.00 :   ddf52:  xor    %edi,%edi
+    0.00 :   ddf54:  mov    %rax,0x8(%rsp)
+    0.01 :   ddf59:  add    %rdx,%rcx
+    0.00 :   ddf5c:  mov    %rcx,0x40(%rsp)
+    0.00 :   ddf61:  mov    0x8(%r13),%rcx
+    0.01 :   ddf65:  vcvtsd2ss %xmm2,%xmm2,%xmm2
+    0.00 :   ddf69:  vcvtsd2ss %xmm3,%xmm3,%xmm3
+    0.00 :   ddf6d:  vcvtsd2ss %xmm4,%xmm4,%xmm4
+    0.00 :   ddf71:  mov    %rcx,0x30(%rsp)
+    0.01 :   ddf76:  mov    0x10(%r13),%rcx
+    0.00 :   ddf7a:  xor    %r13d,%r13d
+    0.00 :   ddf7d:  mov    %rcx,0x10(%rsp)
+    0.01 :   ddf82:  xor    %ecx,%ecx
+    0.00 :   ddf84:  jmp    ddfa5 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x225>
+    0.00 :   ddf86:  cs nopw 0x0(%rax,%rax,1)
+    0.00 :   ddf90:  mov    %rdi,%r10
+    0.00 :   ddf93:  add    $0x10,%rdx
+    0.00 :   ddf97:  mov    %r10,%rdi
+         : 212   eq<(nlh::eval::HandRank, usize)>():
+    0.00 :   ddf9a:  cmp    0x40(%rsp),%rdx
+         : 1715  next<(nlh::eval::HandRank, usize)>():
+    0.00 :   ddf9f:  je     de4a9 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x729>
+         : 181   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   ddfa5:  mov    %rcx,%r8
+         : 188   let mut below_card = [0.0; 64];
+         : 189   let mut group_card = [0.0; 64];
+         : 190   let mut oi = 0;
+         : 191   let mut os = 0;
+         : 192   let mut start = 0;
+         : 193   for &(rank, end) in &own.groups {
+    0.07 :   ddfa8:  mov    0x8(%rdx),%rcx
+    0.42 :   ddfac:  mov    %rcx,(%rsp)
+         : 189   while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+    0.23 :   ddfb0:  cmp    %rbp,%r13
+    0.05 :   ddfb3:  jae    de2ca <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x54a>
+    0.00 :   ddfb9:  movzwl (%rdx),%ecx
+    0.06 :   ddfbc:  jmp    ddfd3 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x253>
+    0.00 :   ddfbe:  xchg   %ax,%ax
+         : 193   let oe = opp.groups[oi].1;
+         : 194   let mut group_total = 0.0;
+         : 195   add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
+         : 196   below_total += group_total;
+    0.00 :   ddfc0:  vaddss %xmm6,%xmm5,%xmm5
+         : 195   os = oe;
+         : 196   oi += 1;
+    0.03 :   ddfc4:  inc    %r13
+    0.00 :   ddfc7:  mov    %r9,%rdi
+         : 189   while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+    0.00 :   ddfca:  cmp    %rbp,%r13
+    0.00 :   ddfcd:  je     de2c0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x540>
+    0.05 :   ddfd3:  mov    %r13,%r9
+         : 273   index<(nlh::eval::HandRank, usize)>():
+    0.10 :   ddfd6:  shl    $0x4,%r9
+    0.07 :   ddfda:  lea    (%r14,%r9,1),%rax
+         : 274   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.10 :   ddfde:  cmp    %cx,(%r14,%r9,1)
+    0.48 :   ddfe3:  jae    de080 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x300>
+         : 190   let oe = opp.groups[oi].1;
+    0.00 :   ddfe9:  mov    0x8(%rax),%r9
+    0.10 :   ddfed:  cmp    %rdi,%r9
+         : 1051  checked_sub():
+    0.01 :   ddff0:  jb     de4be <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x73e>
+    0.00 :   ddff6:  cmp    %r12,%r9
+    0.00 :   ddff9:  ja     de4be <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x73e>
+         : 1053  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   ddfff:  mov    %r9,%rax
+         : 1715  eq<hu_postflop::kernel::Hand>():
+    0.02 :   de002:  sub    %rdi,%rax
+    0.01 :   de005:  vxorps %xmm6,%xmm6,%xmm6
+         : 1716  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.02 :   de009:  je     ddfc0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x240>
+    0.04 :   de00b:  mov    0x8(%rsp),%r10
+         : 182   add_relaxed_f32():
+    0.05 :   de010:  lea    (%r10,%rdi,4),%r10
+    0.01 :   de014:  lea    (%r10,%rax,4),%rax
+    0.02 :   de018:  nopl   0x0(%rax,%rax,1)
+         : 127   let r = reach[h.local as usize];
+    0.00 :   de020:  movzwl (%r10),%edi
+    0.08 :   de024:  cmp    %rdi,%rbx
+    0.06 :   de027:  jbe    de520 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7a0>
+    0.00 :   de02d:  vmovss (%r15,%rdi,4),%xmm7
+    0.16 :   de033:  movzbl 0x2(%r10),%edi
+         : 129   card[h.cards[0] as usize & 63] += r;
+    0.04 :   de038:  and    $0x3f,%edi
+    0.01 :   de03b:  vaddss 0x160(%rsp,%rdi,4),%xmm7,%xmm8
+         : 128   *total += r;
+    1.09 :   de044:  vaddss %xmm7,%xmm6,%xmm6
+         : 129   card[h.cards[0] as usize & 63] += r;
+    0.02 :   de048:  vmovss %xmm8,0x160(%rsp,%rdi,4)
+    0.11 :   de051:  movzbl 0x3(%r10),%edi
+         : 132   eq<hu_postflop::kernel::Hand>():
+    0.03 :   de056:  add    $0x4,%r10
+         : 1715  add_relaxed_f32():
+         : 130   card[h.cards[1] as usize & 63] += r;
+    0.03 :   de05a:  and    $0x3f,%edi
+    0.01 :   de05d:  vaddss 0x160(%rsp,%rdi,4),%xmm7,%xmm7
+    0.44 :   de066:  vmovss %xmm7,0x160(%rsp,%rdi,4)
+         : 134   eq<hu_postflop::kernel::Hand>():
+    0.10 :   de06f:  cmp    %rax,%r10
+         : 1715  next<hu_postflop::kernel::Hand>():
+    0.13 :   de072:  jne    de020 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x2a0>
+    0.00 :   de074:  jmp    ddfc0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x240>
+         : 182   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de079:  nopl   0x0(%rax)
+         : 199   }
+         : 200   let mut group_total = 0.0;
+         : 201   let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+         : 202   let oe = if tied { opp.groups[oi].1 } else { os };
+    0.00 :   de080:  jne    de2c6 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x546>
+    0.07 :   de086:  mov    0x8(%rax),%rax
+    0.10 :   de08a:  mov    %rax,%rcx
+         : 1051  checked_sub():
+    0.04 :   de08d:  sub    %rdi,%rcx
+    0.10 :   de090:  mov    %rcx,0x28(%rsp)
+    0.06 :   de095:  jb     de4ef <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x76f>
+         : 1053  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.10 :   de09b:  cmp    %r12,%rax
+         : 439   index<hu_postflop::kernel::Hand>():
+    0.21 :   de09e:  ja     de4ef <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x76f>
+         : 439   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de0a4:  vxorps %xmm6,%xmm6,%xmm6
+    0.00 :   de0a8:  mov    %rax,0x20(%rsp)
+    0.07 :   de0ad:  cmp    %rdi,%rax
+    0.03 :   de0b0:  je     de116 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x396>
+    0.00 :   de0b2:  mov    0x8(%rsp),%rax
+         : 182   add_relaxed_f32():
+    0.06 :   de0b7:  lea    (%rax,%rdi,4),%rcx
+    0.09 :   de0bb:  mov    0x28(%rsp),%rax
+    0.17 :   de0c0:  lea    (%rcx,%rax,4),%r10
+    0.07 :   de0c4:  data16 data16 cs nopw 0x0(%rax,%rax,1)
+         : 127   let r = reach[h.local as usize];
+    0.24 :   de0d0:  movzwl (%rcx),%r9d
+    0.27 :   de0d4:  cmp    %r9,%rbx
+    0.99 :   de0d7:  jbe    de546 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7c6>
+    0.00 :   de0dd:  movzbl 0x2(%rcx),%eax
+    0.07 :   de0e1:  vmovss (%r15,%r9,4),%xmm7
+         : 129   card[h.cards[0] as usize & 63] += r;
+    1.42 :   de0e7:  and    $0x3f,%eax
+    0.07 :   de0ea:  vaddss 0x50(%rsp,%rax,4),%xmm7,%xmm8
+         : 128   *total += r;
+   15.83 :   de0f0:  vaddss %xmm7,%xmm6,%xmm6
+         : 129   card[h.cards[0] as usize & 63] += r;
+    0.18 :   de0f4:  vmovss %xmm8,0x50(%rsp,%rax,4)
+    1.30 :   de0fa:  movzbl 0x3(%rcx),%eax
+         : 132   eq<hu_postflop::kernel::Hand>():
+    0.11 :   de0fe:  add    $0x4,%rcx
+         : 1715  add_relaxed_f32():
+         : 130   card[h.cards[1] as usize & 63] += r;
+    0.44 :   de102:  and    $0x3f,%eax
+    0.01 :   de105:  vaddss 0x50(%rsp,%rax,4),%xmm7,%xmm7
+    2.31 :   de10b:  vmovss %xmm7,0x50(%rsp,%rax,4)
+         : 134   eq<hu_postflop::kernel::Hand>():
+    0.58 :   de111:  cmp    %r10,%rcx
+         : 1715  next<hu_postflop::kernel::Hand>():
+    1.84 :   de114:  jne    de0d0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x350>
+         : 181   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de116:  mov    (%rsp),%rax
+    0.08 :   de11a:  cmp    %r8,%rax
+         : 1051  checked_sub():
+    0.06 :   de11d:  jb     de505 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x785>
+    0.00 :   de123:  cmp    0x10(%rsp),%rax
+    0.02 :   de128:  ja     de505 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x785>
+         : 1053  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de12e:  cmp    %rax,%r8
+    0.01 :   de131:  je     de21c <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x49c>
+    0.00 :   de137:  mov    0x30(%rsp),%rax
+    0.01 :   de13c:  mov    (%rsp),%rcx
+         : 202   if tied {
+         : 203   add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
+         : 204   for &h in &own.hands[start..end] {
+    0.09 :   de140:  lea    (%rax,%rcx,4),%rcx
+    0.12 :   de144:  lea    (%rax,%r8,4),%r10
+         : 90    get_offset_len_noubcheck<hu_postflop::kernel::Hand>():
+    0.27 :   de148:  mov    %rcx,0x18(%rsp)
+         : 90    hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.02 :   de14d:  nopl   (%rax)
+    0.05 :   de150:  movzwl (%r10),%r8d
+         : 162   let other = same[h.local as usize];
+    0.23 :   de154:  cmp    %r8,0x38(%rsp)
+         : 164   same_reach_relaxed_f32():
+    0.04 :   de159:  jbe    de55c <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7dc>
+         : 163   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de15f:  mov    0x48(%rsp),%rax
+    0.13 :   de164:  movzwl 0x2(%r10),%ecx
+         : 166   same_reach_relaxed_f32():
+    0.19 :   de169:  movzwl (%rax,%r8,2),%r9d
+    1.08 :   de16e:  cmp    $0xffff,%r9
+         : 163   if other == ABSENT {
+    3.75 :   de175:  je     de190 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x410>
+         : 166   reach[other as usize]
+    0.00 :   de177:  cmp    %r9,%rbx
+    0.06 :   de17a:  jbe    de587 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x807>
+    0.00 :   de180:  vmovss (%r15,%r9,4),%xmm7
+         : 170   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 209   let same = same_reach_relaxed_f32(same, h, reach);
+         : 210   let win = below_total - below_card[a] - below_card[b];
+         : 211   let tie = group_total - group_card[a] - group_card[b] + same;
+         : 212   let compat = all_total - all_card[a] - all_card[b] + same;
+         : 213   let lose = compat - win - tie;
+         : 214   out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+    1.09 :   de186:  cmp    %r8,%rsi
+    0.01 :   de189:  ja     de19d <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x41d>
+    0.00 :   de18b:  jmp    de574 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7f4>
+    0.00 :   de190:  vxorps %xmm7,%xmm7,%xmm7
+    0.04 :   de194:  cmp    %r8,%rsi
+    0.00 :   de197:  jbe    de574 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7f4>
+    0.00 :   de19d:  mov    $0x608,%eax
+         : 222   eq<hu_postflop::kernel::Hand>():
+    0.00 :   de1a2:  add    $0x4,%r10
+         : 1715  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.07 :   de1a6:  bextr  %eax,%ecx,%eax
+    0.11 :   de1ab:  and    $0x3f,%ecx
+         : 206   let tie = group_total - group_card[a] - group_card[b] + same;
+    0.52 :   de1ae:  shl    $0x2,%ecx
+    3.16 :   de1b1:  shl    $0x2,%eax
+    0.47 :   de1b4:  vsubss 0x50(%rsp,%rcx,1),%xmm6,%xmm8
+         : 207   let compat = all_total - all_card[a] - all_card[b] + same;
+    0.90 :   de1ba:  vsubss 0x260(%rsp,%rcx,1),%xmm0,%xmm10
+         : 205   let win = below_total - below_card[a] - below_card[b];
+    0.21 :   de1c3:  vsubss 0x160(%rsp,%rcx,1),%xmm5,%xmm9
+         : 206   let tie = group_total - group_card[a] - group_card[b] + same;
+    0.26 :   de1cc:  vsubss 0x50(%rsp,%rax,1),%xmm8,%xmm8
+         : 207   let compat = all_total - all_card[a] - all_card[b] + same;
+    0.90 :   de1d2:  vsubss 0x260(%rsp,%rax,1),%xmm10,%xmm10
+         : 205   let win = below_total - below_card[a] - below_card[b];
+    0.53 :   de1db:  vsubss 0x160(%rsp,%rax,1),%xmm9,%xmm9
+         : 206   let tie = group_total - group_card[a] - group_card[b] + same;
+    0.98 :   de1e4:  vaddss %xmm7,%xmm8,%xmm8
+         : 207   let compat = all_total - all_card[a] - all_card[b] + same;
+    3.84 :   de1e8:  vaddss %xmm7,%xmm10,%xmm7
+         : 208   let lose = compat - win - tie;
+    0.87 :   de1ec:  vsubss %xmm9,%xmm7,%xmm7
+         : 209   out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+    2.95 :   de1f1:  vmulss %xmm2,%xmm9,%xmm9
+         : 208   let lose = compat - win - tie;
+    0.78 :   de1f5:  vsubss %xmm8,%xmm7,%xmm7
+         : 209   out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+    5.16 :   de1fa:  vmulss %xmm3,%xmm8,%xmm8
+    0.56 :   de1fe:  vmulss %xmm4,%xmm7,%xmm7
+   14.46 :   de202:  vaddss %xmm9,%xmm8,%xmm8
+    0.07 :   de207:  vaddss %xmm7,%xmm8,%xmm7
+    1.13 :   de20b:  vmovss %xmm7,(%r11,%r8,4)
+         : 215   eq<hu_postflop::kernel::Hand>():
+    4.05 :   de211:  cmp    0x18(%rsp),%r10
+         : 1715  next<hu_postflop::kernel::Hand>():
+    0.07 :   de216:  jne    de150 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x3d0>
+         : 181   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 212   }
+         : 213   below_total += group_total;
+         : 214   if oe - os < 16 {
+    0.00 :   de21c:  cmpq   $0x10,0x28(%rsp)
+    0.04 :   de222:  mov    0x8(%rsp),%r9
+    0.00 :   de227:  jae    de373 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x5f3>
+    0.00 :   de22d:  mov    0x20(%rsp),%r10
+         : 219   eq<hu_postflop::kernel::Hand>():
+    0.01 :   de232:  cmp    %rdi,%r10
+         : 1715  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de235:  je     de48c <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x70c>
+         : 181   next<hu_postflop::kernel::Hand>():
+    0.00 :   de23b:  lea    0x0(,%r10,4),%rax
+    0.04 :   de243:  shl    $0x2,%rdi
+         : 182   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.39 :   de247:  nopw   0x0(%rax,%rax,1)
+         : 214   for h in &opp.hands[os..oe] {
+         : 215   for c in h.cards {
+    0.01 :   de250:  movzwl 0x2(%r9,%rdi,1),%ecx
+    0.25 :   de256:  add    $0x4,%rdi
+         : 215   let c = c as usize & 63;
+    0.77 :   de25a:  mov    %ecx,%r8d
+    0.21 :   de25d:  and    $0x3f,%r8d
+    0.03 :   de261:  shr    $0x8,%ecx
+         : 216   below_card[c] += group_card[c];
+    0.17 :   de264:  shl    $0x2,%r8d
+    0.57 :   de268:  shl    $0x2,%ecx
+    0.60 :   de26b:  vmovss 0x50(%rsp,%r8,1),%xmm7
+         : 218   // A repeated card now contributes zero on later visits.
+         : 219   group_card[c] = 0.0;
+    0.30 :   de272:  movl   $0x0,0x50(%rsp,%r8,1)
+         : 216   below_card[c] += group_card[c];
+    0.30 :   de27b:  movzbl %cl,%ecx
+    0.74 :   de27e:  vaddss 0x160(%rsp,%r8,1),%xmm7,%xmm7
+    6.72 :   de288:  vmovss %xmm7,0x160(%rsp,%r8,1)
+    0.41 :   de292:  vmovss 0x50(%rsp,%rcx,1),%xmm7
+         : 218   group_card[c] = 0.0;
+    0.16 :   de298:  movl   $0x0,0x50(%rsp,%rcx,1)
+         : 216   below_card[c] += group_card[c];
+    0.31 :   de2a0:  vaddss 0x160(%rsp,%rcx,1),%xmm7,%xmm7
+    1.61 :   de2a9:  vmovss %xmm7,0x160(%rsp,%rcx,1)
+         : 219   eq<hu_postflop::kernel::Hand>():
+    0.24 :   de2b2:  cmp    %rdi,%rax
+         : 1715  next<hu_postflop::kernel::Hand>():
+    0.06 :   de2b5:  jne    de250 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x4d0>
+    0.00 :   de2b7:  jmp    de48c <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x70c>
+         : 182   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de2bc:  nopl   0x0(%rax)
+    0.00 :   de2c0:  mov    %r9,%rdi
+    0.00 :   de2c3:  mov    %rbp,%r13
+    0.01 :   de2c6:  mov    (%rsp),%rcx
+    0.14 :   de2ca:  cmp    %r8,%rcx
+         : 1051  checked_sub():
+    0.01 :   de2cd:  jb     de4d4 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x754>
+    0.00 :   de2d3:  cmp    0x10(%rsp),%rcx
+    0.02 :   de2d8:  ja     de4d4 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x754>
+         : 1053  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de2de:  cmp    %rcx,%r8
+    0.02 :   de2e1:  je     ddf90 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x210>
+    0.00 :   de2e7:  mov    0x30(%rsp),%rax
+         : 230   }
+         : 231   }
+         : 232   os = oe;
+         : 233   oi += 1;
+         : 234   } else {
+         : 235   for &h in &own.hands[start..end] {
+    0.02 :   de2ec:  lea    (%rax,%rcx,4),%r9
+    0.02 :   de2f0:  lea    (%rax,%r8,4),%r8
+    0.00 :   de2f4:  data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.00 :   de300:  movzwl (%r8),%ecx
+         : 234   let [a, b] = h.cards.map(|c| c as usize & 63);
+         : 235   let win = below_total - below_card[a] - below_card[b];
+         : 236   let compat = all_total - all_card[a] - all_card[b];
+         : 237   out[h.local as usize] = u_win * win + u_lose * (compat - win);
+    0.13 :   de304:  cmp    %rcx,%rsi
+    0.01 :   de307:  jbe    de533 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x7b3>
+         : 230   for &h in &own.hands[start..end] {
+    0.00 :   de30d:  movzwl 0x2(%r8),%eax
+         : 232   eq<hu_postflop::kernel::Hand>():
+    0.05 :   de312:  add    $0x4,%r8
+         : 1715  hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 231   let [a, b] = h.cards.map(|c| c as usize & 63);
+    0.01 :   de316:  mov    %eax,%r10d
+         : 233   {closure#2}():
+    0.01 :   de319:  and    $0x3f,%r10d
+         : 232   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.05 :   de31d:  shr    $0x8,%eax
+         : 232   let win = below_total - below_card[a] - below_card[b];
+    0.26 :   de320:  shl    $0x2,%r10d
+    0.02 :   de324:  shl    $0x2,%eax
+    0.02 :   de327:  vsubss 0x160(%rsp,%r10,1),%xmm5,%xmm6
+         : 233   let compat = all_total - all_card[a] - all_card[b];
+    0.32 :   de331:  vsubss 0x260(%rsp,%r10,1),%xmm0,%xmm7
+         : 232   let win = below_total - below_card[a] - below_card[b];
+    0.08 :   de33b:  movzbl %al,%eax
+    0.00 :   de33e:  vsubss 0x160(%rsp,%rax,1),%xmm6,%xmm6
+         : 233   let compat = all_total - all_card[a] - all_card[b];
+    0.16 :   de347:  vsubss 0x260(%rsp,%rax,1),%xmm7,%xmm7
+         : 234   out[h.local as usize] = u_win * win + u_lose * (compat - win);
+    0.11 :   de350:  vsubss %xmm6,%xmm7,%xmm7
+    0.53 :   de354:  vmulss %xmm2,%xmm6,%xmm6
+    0.08 :   de358:  vmulss %xmm4,%xmm7,%xmm7
+    0.74 :   de35c:  vaddss %xmm7,%xmm6,%xmm6
+    0.10 :   de360:  vmovss %xmm6,(%r11,%rcx,4)
+         : 240   eq<hu_postflop::kernel::Hand>():
+    0.32 :   de366:  cmp    %r9,%r8
+         : 1715  next<hu_postflop::kernel::Hand>():
+    0.00 :   de369:  jne    de300 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x580>
+         : 181   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de36b:  mov    %rdi,%r10
+    0.00 :   de36e:  jmp    de493 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x713>
+         : 223   *below += *group;
+    0.00 :   de373:  vmovups 0x50(%rsp),%ymm7
+    0.02 :   de379:  vmovups 0x70(%rsp),%ymm8
+    0.00 :   de37f:  vmovups 0x90(%rsp),%ymm9
+    0.02 :   de388:  vmovups 0xb0(%rsp),%ymm10
+         : 224   *group = 0.0;
+    0.08 :   de391:  vmovups %ymm1,0x50(%rsp)
+    0.01 :   de397:  vmovups %ymm1,0x70(%rsp)
+    0.01 :   de39d:  vmovups %ymm1,0x90(%rsp)
+    0.01 :   de3a6:  vmovups %ymm1,0xb0(%rsp)
+    0.01 :   de3af:  mov    0x20(%rsp),%r10
+         : 223   *below += *group;
+    0.00 :   de3b4:  vaddps 0x160(%rsp),%ymm7,%ymm7
+    0.02 :   de3bd:  vaddps 0x180(%rsp),%ymm8,%ymm8
+    0.02 :   de3c6:  vmovups %ymm7,0x160(%rsp)
+    0.08 :   de3cf:  vmovups %ymm8,0x180(%rsp)
+    0.02 :   de3d8:  vaddps 0x1a0(%rsp),%ymm9,%ymm7
+    0.02 :   de3e1:  vaddps 0x1c0(%rsp),%ymm10,%ymm8
+    0.02 :   de3ea:  vmovups %ymm7,0x1a0(%rsp)
+    0.01 :   de3f3:  vmovups %ymm8,0x1c0(%rsp)
+    0.01 :   de3fc:  vmovups 0xd0(%rsp),%ymm7
+    0.00 :   de405:  vmovups 0xf0(%rsp),%ymm8
+         : 224   *group = 0.0;
+    0.01 :   de40e:  vmovups %ymm1,0xd0(%rsp)
+    0.08 :   de417:  vmovups %ymm1,0xf0(%rsp)
+         : 223   *below += *group;
+    0.02 :   de420:  vaddps 0x1e0(%rsp),%ymm7,%ymm7
+    0.05 :   de429:  vaddps 0x200(%rsp),%ymm8,%ymm8
+    0.03 :   de432:  vmovups %ymm7,0x1e0(%rsp)
+    0.02 :   de43b:  vmovups %ymm8,0x200(%rsp)
+    0.03 :   de444:  vmovups 0x110(%rsp),%ymm7
+    0.01 :   de44d:  vmovups 0x130(%rsp),%ymm8
+         : 224   *group = 0.0;
+    0.01 :   de456:  vmovups %ymm1,0x110(%rsp)
+    0.07 :   de45f:  vmovups %ymm1,0x130(%rsp)
+         : 223   *below += *group;
+    0.02 :   de468:  vaddps 0x220(%rsp),%ymm7,%ymm7
+    0.07 :   de471:  vaddps 0x240(%rsp),%ymm8,%ymm8
+    0.05 :   de47a:  vmovups %ymm7,0x220(%rsp)
+    0.03 :   de483:  vmovups %ymm8,0x240(%rsp)
+    0.24 :   de48c:  vaddss %xmm6,%xmm5,%xmm5
+         : 228   oi += 1;
+    0.22 :   de490:  inc    %r13
+    0.03 :   de493:  mov    (%rsp),%rcx
+         : 231   next<(nlh::eval::HandRank, usize)>():
+    0.06 :   de497:  add    $0x10,%rdx
+    0.05 :   de49b:  mov    %r10,%rdi
+         : 234   eq<(nlh::eval::HandRank, usize)>():
+    0.10 :   de49e:  cmp    0x40(%rsp),%rdx
+         : 1715  next<(nlh::eval::HandRank, usize)>():
+    0.07 :   de4a3:  jne    ddfa5 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x225>
+         : 181   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 239   }
+         : 240   }
+         : 241   start = end;
+         : 242   }
+         : 243   }
+    0.00 :   de4a9:  add    $0x368,%rsp
+    0.00 :   de4b0:  pop    %rbx
+    0.01 :   de4b1:  pop    %r12
+    0.00 :   de4b3:  pop    %r13
+    0.00 :   de4b5:  pop    %r14
+    0.00 :   de4b7:  pop    %r15
+    0.00 :   de4b9:  pop    %rbp
+    0.00 :   de4ba:  vzeroupper
+    0.00 :   de4bd:  ret
+    0.00 :   de4be:  lea    0x1657f3(%rip),%rcx        # 243cb8 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x2b8>
+         : 444   index<hu_postflop::kernel::Hand>():
+    0.00 :   de4c5:  mov    %r9,%rsi
+    0.00 :   de4c8:  mov    %r12,%rdx
+    0.00 :   de4cb:  vzeroupper
+    0.00 :   de4ce:  call   *0x16d5e4(%rip)        # 24bab8 <_DYNAMIC+0x2c8>
+         : 447   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de4d4:  mov    %rcx,%rsi
+    0.00 :   de4d7:  lea    0x16577a(%rip),%rcx        # 243c58 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x258>
+         : 444   index<hu_postflop::kernel::Hand>():
+    0.00 :   de4de:  mov    0x10(%rsp),%rdx
+         : 444   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de4e3:  mov    %r8,%rdi
+         : 444   index<hu_postflop::kernel::Hand>():
+    0.00 :   de4e6:  vzeroupper
+    0.00 :   de4e9:  call   *0x16d5c9(%rip)        # 24bab8 <_DYNAMIC+0x2c8>
+    0.00 :   de4ef:  lea    0x1657aa(%rip),%rcx        # 243ca0 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x2a0>
+    0.00 :   de4f6:  mov    %rax,%rsi
+    0.00 :   de4f9:  mov    %r12,%rdx
+    0.00 :   de4fc:  vzeroupper
+    0.00 :   de4ff:  call   *0x16d5b3(%rip)        # 24bab8 <_DYNAMIC+0x2c8>
+         : 450   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de505:  mov    %rax,%rsi
+    0.00 :   de508:  lea    0x165779(%rip),%rcx        # 243c88 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x288>
+         : 444   index<hu_postflop::kernel::Hand>():
+    0.00 :   de50f:  mov    0x10(%rsp),%rdx
+    0.00 :   de514:  mov    %r8,%rdi
+    0.00 :   de517:  vzeroupper
+    0.00 :   de51a:  call   *0x16d598(%rip)        # 24bab8 <_DYNAMIC+0x2c8>
+         : 447   add_relaxed_f32():
+         : 127   let r = reach[h.local as usize];
+    0.00 :   de520:  lea    0x1655e1(%rip),%rdx        # 243b08 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x108>
+    0.00 :   de527:  mov    %rbx,%rsi
+    0.00 :   de52a:  vzeroupper
+    0.00 :   de52d:  call   *0x16d4d5(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 132   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 234   out[h.local as usize] = u_win * win + u_lose * (compat - win);
+    0.00 :   de533:  lea    0x165706(%rip),%rdx        # 243c40 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x240>
+    0.00 :   de53a:  mov    %rcx,%rdi
+    0.00 :   de53d:  vzeroupper
+    0.00 :   de540:  call   *0x16d4c2(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 239   add_relaxed_f32():
+         : 127   let r = reach[h.local as usize];
+    0.00 :   de546:  lea    0x1655bb(%rip),%rdx        # 243b08 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x108>
+         : 129   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de54d:  mov    %r9,%rdi
+    0.00 :   de550:  mov    %rbx,%rsi
+    0.00 :   de553:  vzeroupper
+    0.00 :   de556:  call   *0x16d4ac(%rip)        # 24ba08 <_DYNAMIC+0x218>
+    0.00 :   de55c:  mov    0x38(%rsp),%rsi
+         : 135   same_reach_relaxed_f32():
+         : 162   let other = same[h.local as usize];
+    0.00 :   de561:  lea    0x165648(%rip),%rdx        # 243bb0 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x1b0>
+    0.00 :   de568:  mov    %r8,%rdi
+    0.00 :   de56b:  vzeroupper
+    0.00 :   de56e:  call   *0x16d494(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 167   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+         : 209   out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+    0.00 :   de574:  lea    0x1656f5(%rip),%rdx        # 243c70 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x270>
+    0.00 :   de57b:  mov    %r8,%rdi
+    0.00 :   de57e:  vzeroupper
+    0.00 :   de581:  call   *0x16d481(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 214   same_reach_relaxed_f32():
+         : 166   reach[other as usize]
+    0.00 :   de587:  lea    0x16563a(%rip),%rdx        # 243bc8 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x1c8>
+         : 168   hu_postflop::kernel::showdown_kernel_relaxed_f32:
+    0.00 :   de58e:  mov    %r9,%rdi
+    0.00 :   de591:  mov    %rbx,%rsi
+    0.00 :   de594:  vzeroupper
+    0.00 :   de597:  call   *0x16d46b(%rip)        # 24ba08 <_DYNAMIC+0x218>

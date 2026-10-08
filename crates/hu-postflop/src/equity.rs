@@ -4,12 +4,12 @@
 
 use nlh::{Card, CardSet, HandRank, NUM_COMBOS, PerPlayer, Player, combo_cards, rank_of};
 
-use crate::kernel;
+use crate::kernel::{self, Hand, RankedHands};
 
 /// Every live combo's `(HandRank, combo)` pair for a completed 5-card
 /// board, sorted ascending by rank — the same construction
 /// `postflop::Builder::rank_table_id` uses for its showdown tables.
-fn rank_table(board5: &[Card; 5]) -> Vec<(HandRank, u32)> {
+fn rank_table(board5: &[Card; 5]) -> RankedHands {
     let board_set: CardSet = board5.iter().copied().collect();
     let mut sorted: Vec<(HandRank, u32)> = Vec::with_capacity(NUM_COMBOS);
     for combo in 0..NUM_COMBOS {
@@ -21,7 +21,19 @@ fn rank_table(board5: &[Card; 5]) -> Vec<(HandRank, u32)> {
         sorted.push((rank, combo as u32));
     }
     sorted.sort_unstable();
-    sorted
+    let mut table = RankedHands::default();
+    for (rank, combo) in sorted {
+        if table.groups.last().is_none_or(|&(r, _)| r != rank) {
+            table.groups.push((rank, table.hands.len()));
+        }
+        let (a, b) = combo_cards(combo as usize);
+        table.hands.push(Hand {
+            local: combo as u16,
+            cards: [a.index() as u8, b.index() as u8],
+        });
+        table.groups.last_mut().unwrap().1 = table.hands.len();
+    }
+    table
 }
 
 /// Every unordered completion of `board` (3, 4, or 5 cards) to a full
@@ -72,6 +84,7 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
     let mut num_out = vec![0.0f32; NUM_COMBOS];
     let mut denom_out = vec![0.0f32; NUM_COMBOS];
 
+    let same: Vec<u16> = (0..NUM_COMBOS as u16).collect();
     for missing in runouts(board) {
         let mut board5 = [board[0]; 5];
         board5[..board.len()].copy_from_slice(board);
@@ -81,9 +94,24 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
         for p in Player::BOTH {
             let opp = p.opponent();
             num_out.fill(0.0);
-            kernel::showdown_kernel(&sorted, 1.0, 0.5, 0.0, &ranges[opp], &mut num_out);
+            kernel::showdown_kernel(
+                &sorted,
+                &sorted,
+                &same,
+                [1.0, 0.5, 0.0],
+                &ranges[opp],
+                &mut num_out,
+            );
             denom_out.fill(0.0);
-            kernel::fold_kernel(&sorted, 1.0, &ranges[opp], &mut denom_out);
+            kernel::fold_kernel(
+                &sorted.hands,
+                &sorted.hands,
+                &same,
+                1.0,
+                0,
+                &ranges[opp],
+                &mut denom_out,
+            );
             for combo in 0..NUM_COMBOS {
                 numerator[p][combo] += num_out[combo] as f64;
                 denominator[p][combo] += denom_out[combo] as f64;

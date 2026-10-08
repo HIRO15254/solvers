@@ -1,6 +1,7 @@
 //! P1-owned sections and pure lowering of the common Spot IR.
 //! Amounts in the lowered tree are milli-BB; economics and reporting are separate.
 use crate::{PerStreet, PostflopConfig, StreetTree};
+pub use hu_engine::CfrPrecision;
 use nlh::script::{Rule, Value, VarSource};
 use nlh::{Chips, PerPlayer, Player, Street};
 use serde::{Deserialize, Serialize};
@@ -19,6 +20,8 @@ pub enum Storage {
     #[default]
     F32,
     I16,
+    #[serde(rename = "i16-f32avg")]
+    I16F32Avg,
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
@@ -29,7 +32,8 @@ pub enum SolutionStreets {
     NoRivers,
 }
 
-/// The legacy P1 schedule parameters, with their existing names and defaults.
+/// P1 schedule parameters. Standalone defaults assume f32 storage;
+/// `Settings::parse` resolves omitted DCFR resets using the final storage.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
 pub enum Algorithm {
@@ -38,11 +42,11 @@ pub enum Algorithm {
     Dcfr {
         #[serde(default = "alpha")]
         alpha: f64,
-        #[serde(default)]
+        #[serde(default = "beta")]
         beta: f64,
         #[serde(default = "gamma")]
         gamma: f64,
-        #[serde(default = "yes")]
+        #[serde(default)]
         pow4_reset: bool,
     },
     LinearCfr,
@@ -52,25 +56,85 @@ pub enum Algorithm {
     },
 }
 fn alpha() -> f64 {
-    1.5
+    1.25
+}
+fn beta() -> f64 {
+    0.5
 }
 fn gamma() -> f64 {
-    3.0
+    4.0
 }
 fn gamma0() -> f64 {
     30.0
-}
-fn yes() -> bool {
-    true
 }
 impl Default for Algorithm {
     fn default() -> Self {
         Self::Dcfr {
             alpha: alpha(),
-            beta: 0.0,
+            beta: beta(),
             gamma: gamma(),
-            pow4_reset: true,
+            pow4_reset: false,
         }
+    }
+}
+
+/// Evaluation cadence: adaptive with a target, or a fixed iteration interval.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CheckEvery {
+    #[default]
+    Auto,
+    Fixed(u64),
+}
+
+impl Serialize for CheckEvery {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match self {
+            Self::Auto => serializer.serialize_str("auto"),
+            Self::Fixed(interval) => serializer.serialize_u64(*interval),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for CheckEvery {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct Visitor;
+        impl serde::de::Visitor<'_> for Visitor {
+            type Value = CheckEvery;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("a positive integer or the string \"auto\"")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, value: &str) -> Result<Self::Value, E> {
+                if value == "auto" {
+                    Ok(CheckEvery::Auto)
+                } else {
+                    Err(E::invalid_value(serde::de::Unexpected::Str(value), &self))
+                }
+            }
+
+            fn visit_u64<E: serde::de::Error>(self, value: u64) -> Result<Self::Value, E> {
+                if value > 0 {
+                    Ok(CheckEvery::Fixed(value))
+                } else {
+                    Err(E::invalid_value(
+                        serde::de::Unexpected::Unsigned(value),
+                        &self,
+                    ))
+                }
+            }
+
+            fn visit_i64<E: serde::de::Error>(self, value: i64) -> Result<Self::Value, E> {
+                match u64::try_from(value) {
+                    Ok(value) => self.visit_u64(value),
+                    Err(_) => Err(E::invalid_value(
+                        serde::de::Unexpected::Signed(value),
+                        &self,
+                    )),
+                }
+            }
+        }
+        deserializer.deserialize_any(Visitor)
     }
 }
 
@@ -80,14 +144,14 @@ pub struct Stop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target: Option<String>,
     pub max_iterations: u64,
-    pub check_every: u64,
+    pub check_every: CheckEvery,
 }
 impl Default for Stop {
     fn default() -> Self {
         Self {
             target: None,
             max_iterations: 1_000_000,
-            check_every: 25,
+            check_every: CheckEvery::Auto,
         }
     }
 }
@@ -112,15 +176,21 @@ impl Default for Parallel {
 pub struct Solver {
     pub iso_merging: bool,
     pub storage: Storage,
+    #[serde(default = "default_cfr_precision")]
+    pub cfr_precision: CfrPrecision,
     pub algorithm: Algorithm,
     pub stop: Stop,
     pub parallel: Parallel,
+}
+fn default_cfr_precision() -> CfrPrecision {
+    CfrPrecision::F32
 }
 impl Default for Solver {
     fn default() -> Self {
         Self {
             iso_merging: true,
             storage: Storage::default(),
+            cfr_precision: default_cfr_precision(),
             algorithm: Algorithm::default(),
             stop: Stop::default(),
             parallel: Parallel::default(),
@@ -194,6 +264,21 @@ fn field<T: serde::de::DeserializeOwned>(
 fn number(value: &toml::Value) -> bool {
     value.is_float() || value.is_integer()
 }
+
+fn check_every(table: &toml::Table) -> Result<CheckEvery, SpotError> {
+    const PATH: &str = "solver.stop.check_every";
+    match table.get("check_every") {
+        None => Ok(CheckEvery::Auto),
+        Some(toml::Value::String(value)) if value == "auto" => Ok(CheckEvery::Auto),
+        Some(toml::Value::Integer(value)) if *value > 0 => Ok(CheckEvery::Fixed(*value as u64)),
+        Some(toml::Value::Integer(_)) => Err(invalid(PATH, "must be positive")),
+        Some(_) => Err(SpotError::new(
+            Code::NLH002,
+            PATH,
+            "expected a positive integer or the string \"auto\"",
+        )),
+    }
+}
 fn parameter(table: &toml::Table, name: &str, default: f64) -> Result<f64, SpotError> {
     let path = format!("solver.algorithm.{name}");
     let value = field(table, name, &path, default, number)?;
@@ -221,7 +306,14 @@ impl Settings {
             spot,
             solver,
             "solver",
-            &["iso_merging", "storage", "algorithm", "stop", "parallel"],
+            &[
+                "iso_merging",
+                "storage",
+                "cfr_precision",
+                "algorithm",
+                "stop",
+                "parallel",
+            ],
             &[
                 "kind",
                 "seed",
@@ -278,8 +370,20 @@ impl Settings {
                 Storage::default(),
                 toml::Value::is_str,
             )?,
+            cfr_precision: field(
+                solver,
+                "cfr_precision",
+                "solver.cfr_precision",
+                default_cfr_precision(),
+                toml::Value::is_str,
+            )?,
             ..Solver::default()
         };
+        // Resolve only after storage is known, including an omitted algorithm section.
+        let default_reset = settings.storage == Storage::I16;
+        if let Algorithm::Dcfr { pow4_reset, .. } = &mut settings.algorithm {
+            *pow4_reset = default_reset;
+        }
         if let Some(t) = section(solver, "algorithm", "solver.algorithm")? {
             let schedule = t
                 .get("schedule")
@@ -312,13 +416,13 @@ impl Settings {
                 "linear-cfr" => Algorithm::LinearCfr,
                 "dcfr" => Algorithm::Dcfr {
                     alpha: parameter(t, "alpha", alpha())?,
-                    beta: parameter(t, "beta", 0.0)?,
+                    beta: parameter(t, "beta", beta())?,
                     gamma: parameter(t, "gamma", gamma())?,
                     pow4_reset: field(
                         t,
                         "pow4_reset",
                         "solver.algorithm.pow4_reset",
-                        true,
+                        default_reset,
                         toml::Value::is_bool,
                     )?,
                 },
@@ -338,13 +442,7 @@ impl Settings {
                     settings.stop.max_iterations,
                     toml::Value::is_integer,
                 )?,
-                check_every: field(
-                    t,
-                    "check_every",
-                    "solver.stop.check_every",
-                    settings.stop.check_every,
-                    toml::Value::is_integer,
-                )?,
+                check_every: check_every(t)?,
             };
         }
         if let Some(t) = section(solver, "parallel", "solver.parallel")? {
@@ -376,7 +474,6 @@ impl Settings {
         };
         for (key, value) in [
             ("solver.stop.max_iterations", settings.stop.max_iterations),
-            ("solver.stop.check_every", settings.stop.check_every),
             (
                 "solver.parallel.min_children",
                 settings.parallel.min_children as u64,

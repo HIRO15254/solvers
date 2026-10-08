@@ -3,12 +3,13 @@
 //! reach-weighted river solve; callers render the emitted diagnostics.
 
 use std::collections::{HashMap, HashSet};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use crate::sol::{
-    SolMeta, SolPayload, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs,
-    dequantize_values, quantize_probs, quantize_values, read_sol, write_sol,
+    SolMeta, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs, dequantize_values,
+    quantize_probs, quantize_values, read_sol, write_sol_stream,
 };
 use crate::{
     PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
@@ -16,10 +17,11 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
-    F32Storage, I16Storage, NodeId, NodeKind, Solver, Storage, pair_subtrees, parent_array,
-    reach_at,
+    F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, Solver, Storage, pair_subtrees,
+    parent_array, reach_at,
 };
 use nlh::{Card, PerPlayer, Player, Street};
+use rayon::prelude::*;
 
 use crate::run::RunSummary;
 
@@ -67,7 +69,7 @@ pub(crate) struct SolExportSpec {
     /// Raw config file text, byte-for-byte -- becomes `SolPayload::config_toml`
     /// so the viewer can rebuild an identical tree later.
     pub config_toml: String,
-    /// Informational only (`SolMeta::storage`): "f32" or "i16".
+    /// Informational only (`SolMeta::storage`): "f32", "i16", or "i16-f32avg".
     pub storage_name: String,
 }
 
@@ -79,23 +81,30 @@ pub(crate) struct SolExportSpec {
 /// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
 /// total, minus the reach through each of `h`'s two cards, plus the one
 /// combo that is both of them and was therefore subtracted twice.
-fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
+fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) -> Vec<f32> {
     let total: f64 = opp_reach.iter().map(|&r| r as f64).sum();
     let mut per_card = [0.0f64; 52];
-    for (combo, &reach) in opp_reach.iter().enumerate() {
+    for (&combo, &reach) in hands.combos(p.opponent()).iter().zip(opp_reach) {
         if reach == 0.0 {
             continue;
         }
-        let (hi, lo) = nlh::combo_cards(combo);
-        per_card[hi.index()] += reach as f64;
-        per_card[lo.index()] += reach as f64;
+        let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
+        per_card[hi] += reach as f64;
+        per_card[lo] += reach as f64;
     }
-    (0..opp_reach.len())
-        .map(|combo| {
-            let (hi, lo) = nlh::combo_cards(combo);
-            let compatible =
-                total - per_card[hi.index()] - per_card[lo.index()] + opp_reach[combo] as f64;
-            compatible.max(0.0) as f32
+    hands
+        .combos(p)
+        .iter()
+        .enumerate()
+        .map(|(i, &combo)| {
+            let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
+            let same = hands.same[p][i];
+            let r = if same == crate::hands::ABSENT {
+                0.0
+            } else {
+                opp_reach[same as usize] as f64
+            };
+            (total - per_card[hi] - per_card[lo] + r).max(0.0) as f32
         })
         .collect()
 }
@@ -107,6 +116,7 @@ fn compatible_reach(opp_reach: &[f32]) -> Vec<f32> {
 /// is the right shape for a viewer but quadratic when every node needs an
 /// answer. Only the current path's reaches are alive at a time, so this
 /// stays linear in memory as well as in work.
+#[cfg(test)]
 fn walk_reaches<F>(
     tree: &hu_engine::PublicTree,
     node_id: NodeId,
@@ -159,9 +169,8 @@ fn walk_reaches<F>(
 /// when that actually overrides the caller's requested mode.
 ///
 /// `summary` supplies the iteration count and exploitability from the just-
-/// finished run; `solver` is queried directly (rather than trusting anything
-/// cached in `summary`) for both players' expected value, since a raked
-/// (general-sum) game's `ev[1]` is never just `-ev[0]`.
+/// finished run. Both root EVs come from that same evaluation boundary;
+/// action-node values are produced by the streaming two-seat profile pass.
 pub(crate) fn export_sol<S: Storage>(
     spec: &SolExportSpec,
     solver: &Solver<PostflopEvaluator, S>,
@@ -182,111 +191,121 @@ pub(crate) fn export_sol<S: Storage>(
         spec.mode
     };
 
-    // One value pass per player records every action node's per-hand
-    // values, so storing them costs two walks of the tree rather than one
-    // walk per node.
-    let recorded = PerPlayer::new(
-        solver.expected_values_everywhere(Player::P0),
-        solver.expected_values_everywhere(Player::P1),
-    );
-
-    // Reaches for every node in one walk, so a node's counterfactual values
-    // can be turned into per-hand chips where they are produced.
-    let mut reaches: Vec<Option<PerPlayer<Vec<f32>>>> = vec![None; tree.nodes.len()];
-    {
-        let strategy = |id: NodeId| solver.average_strategy_at(id);
-        let roots = &solver.game().root_ranges;
-        let root_reach = PerPlayer::new(roots[Player::P0].clone(), roots[Player::P1].clone());
-        walk_reaches(tree, 0, &root_reach, &strategy, &mut |id, reach| {
-            reaches[id as usize] = Some(reach.clone());
-        });
+    // Node ids need not be ordered by sref. Index the mode selection instead
+    // of sorting/retaining packed strategies or a node-id list.
+    let mut stored = vec![false; tree.storage_refs.len()];
+    for (id, node) in tree.nodes.iter().enumerate() {
+        if node.kind == NodeKind::Action
+            && (mode == SolStreets::Full || streets[id] != Street::River)
+        {
+            stored[node.aux as usize] = true;
+        }
     }
-
-    let mut blocks = Vec::new();
-    let mut values = Vec::new();
-    for id in 0..tree.nodes.len() as NodeId {
-        let node = tree.node(id);
-        if node.kind != NodeKind::Action {
-            continue;
-        }
-        if mode == SolStreets::NoRivers && streets[id as usize] == Street::River {
-            continue;
-        }
-        let avg = solver.average_strategy_at(id);
-        blocks.push(StrategyBlock {
-            sref: node.aux,
-            probs: quantize_probs(&avg),
-        });
-        let reach = reaches[id as usize]
-            .as_ref()
-            .expect("every action node is visited by the reach walk");
-        let mut per_node = Vec::new();
-        for player in Player::BOTH {
-            // A counterfactual value is opponent-reach-weighted, so it has
-            // to be divided by the reach that could be facing this hand
-            // before a utility-valued offset can be added to it. Skipping that would
-            // be a unit error, not a scaling one.
-            let compatible = compatible_reach(&reach[player.opponent()]);
-            // Every node uses the original subgame's utility baseline.
-            // Adding this node's contributions would erase sunk wagers;
-            // adding chips at all would mix units for ICM.
-            let offset = ev_offset[player] as f32;
-            let per_hand = recorded[player][node.aux as usize]
-                .as_ref()
-                .expect("every action node is recorded by the value pass");
-            let own = &reach[player];
-            per_node.extend(per_hand.iter().zip(&compatible).zip(own).map(
-                |((value, &facing), &here)| {
-                    // A hand that cannot be held here has no EV to
-                    // report, and neither does one no opponent hand can
-                    // face. Zeroing both is not just tidy: a
-                    // counterfactual value is defined for every hand
-                    // whether or not it can arrive, so storing them all
-                    // would make these blocks dense where the strategy
-                    // blocks are sparse, which is most of what the
-                    // artifact's size is.
-                    if here > 0.0 && facing > 0.0 {
-                        value / facing + offset
-                    } else {
-                        0.0
-                    }
-                },
-            ));
-        }
-        let (scale, bytes) = quantize_values(&per_node);
-        values.push(ValueBlock {
-            sref: node.aux,
-            scale,
-            values: bytes,
-        });
-    }
-    // Ascending by construction (node ids walked in order and `aux` assigned
-    // in build order), but sorted explicitly to make that guarantee robust
-    // to any future change in how `aux` is assigned.
-    blocks.sort_by_key(|b| b.sref);
-    values.sort_by_key(|b| b.sref);
-    let block_count = blocks.len();
-
+    let block_count = stored.iter().filter(|&&keep| keep).count();
     let meta = SolMeta {
         iterations: summary.iterations,
         expl: [summary.expl_p0, summary.expl_p1],
-        // Already on the subgame-start basis: the run summary carries the
-        // same numbers `done:` printed, so an artifact and the console can
-        // never disagree about what EV means.
+        // Already on the subgame-start basis, as printed by `done:`.
         ev: [summary.ev[Player::P0], summary.ev[Player::P1]],
         nash_conv: summary.nash_conv,
         storage: spec.storage_name.clone(),
         wall_secs: summary.wall.as_secs_f64(),
     };
+    write_sol_stream(&spec.path, &spec.config_toml, &meta, |writer| {
+        // Postcard structs concatenate fields; Vec is a varint length then
+        // its elements. Keep SolPayload's field order, without owning it.
+        postcard::to_io(&spec.config_toml, &mut *writer)?;
+        postcard::to_io(&meta, &mut *writer)?;
+        postcard::to_io(&StreetsStored::from(mode), &mut *writer)?;
+        postcard::to_io(&block_count, &mut *writer)?;
+        let mut start = 0;
+        while start < stored.len() {
+            let (end, count) = strategy_batch_end(
+                &tree.storage_refs,
+                &stored,
+                start,
+                crate::sol::STRATEGY_BATCH_ELEMENTS,
+            );
+            // Exact capacity: no growing lists or unindexed parallel collect.
+            // One batch lives at a time, including while it is written.
+            let mut batch = Vec::with_capacity(count);
+            batch.extend(
+                tree.storage_refs[start..end]
+                    .iter()
+                    .zip(&stored[start..end])
+                    .filter(|(_, keep)| **keep)
+                    .map(|(sref, _)| (*sref, Vec::new())),
+            );
+            batch.par_iter_mut().try_for_each(|(sref, bytes)| {
+                let mut avg = vec![0.0; sref.len()];
+                solver
+                    .storage()
+                    .average_strategy(*sref, sref.index, &mut avg);
+                let block = StrategyBlock {
+                    sref: sref.index,
+                    probs: quantize_probs(&avg),
+                };
+                // u32 sref <= 5 varint bytes, usize length <= 10, raw u16 bytes.
+                // Reserve the upper bound to avoid postcard Vec growth slack.
+                *bytes = crate::sol::strategy_block_bytes(&block)?;
+                Ok::<_, crate::sol::SolError>(())
+            })?;
+            for (_, bytes) in batch {
+                // DeferredFlush keeps the codec's single payload flush boundary.
+                writer.write_all(&bytes)?;
+            }
+            start = end;
+        }
 
-    let payload = SolPayload {
-        config_toml: spec.config_toml.clone(),
-        meta,
-        mode: mode.into(),
-        blocks,
-        values,
-    };
-    write_sol(&spec.path, &payload).with_context(|| format!("writing {}", spec.path.display()))?;
+        // Only packed values survive this pass; reaches/values are path-local.
+        let slots: Vec<_> = (0..tree.storage_refs.len())
+            .map(|_| std::sync::Mutex::new(None))
+            .collect();
+        solver.visit_expected_values(|id, reach, per_hand, _avg| {
+            if mode == SolStreets::NoRivers && streets[id as usize] == Street::River {
+                return;
+            }
+            let node = tree.node(id);
+            let mut per_node =
+                Vec::with_capacity(per_hand[Player::P0].len() + per_hand[Player::P1].len());
+            for player in Player::BOTH {
+                let compatible = compatible_reach(
+                    &solver.game().evaluator.hands,
+                    player,
+                    reach[player.opponent()],
+                );
+                let offset = ev_offset[player] as f32;
+                per_node.extend(
+                    per_hand[player]
+                        .iter()
+                        .zip(&compatible)
+                        .zip(reach[player])
+                        .map(|((&value, &facing), &here)| {
+                            if here > 0.0 && facing > 0.0 {
+                                value / facing + offset
+                            } else {
+                                0.0
+                            }
+                        }),
+                );
+            }
+            let (scale, bytes) = quantize_values(&per_node);
+            *slots[node.aux as usize].lock().expect("artifact slot") =
+                Some(crate::sol::value_block_bytes(&ValueBlock {
+                    sref: node.aux,
+                    scale,
+                    values: bytes,
+                }));
+        });
+        postcard::to_io(&block_count, &mut *writer)?;
+        for slot in slots {
+            if let Some(encoded) = slot.into_inner().expect("artifact slot") {
+                writer.write_all(&encoded?)?;
+            }
+        }
+        Ok(())
+    })
+    .with_context(|| format!("writing {}", spec.path.display()))?;
 
     let size = std::fs::metadata(&spec.path).map(|m| m.len()).unwrap_or(0);
     diagnostics(Diagnostic::Written {
@@ -296,6 +315,31 @@ pub(crate) fn export_sol<S: Storage>(
         mode,
     });
     Ok(())
+}
+
+/// Contiguous sref interval; skipped streets cost no strategy elements.
+/// An oversized node occupies a batch by itself.
+fn strategy_batch_end(
+    refs: &[hu_engine::StorageRef],
+    stored: &[bool],
+    start: usize,
+    limit: usize,
+) -> (usize, usize) {
+    let mut end = start;
+    let mut elements = 0;
+    let mut count = 0;
+    while end < refs.len() {
+        if stored[end] {
+            let len = refs[end].len();
+            if count > 0 && len > limit.saturating_sub(elements) {
+                break;
+            }
+            elements += len;
+            count += 1;
+        }
+        end += 1;
+    }
+    (end, count)
 }
 
 // --- load (`inspect --sol`) -------------------------------------------------
@@ -386,6 +430,21 @@ pub fn load_sol(
         ));
     }
 
+    for block in &payload.blocks {
+        let r = pf_game.game.tree.storage_refs[block.sref as usize];
+        dequantize_probs(&block.probs, r.num_actions as usize, r.num_hands as usize)?;
+    }
+    let value_set: HashSet<u32> = payload.values.iter().map(|b| b.sref).collect();
+    if value_set != expected || value_set.len() != payload.values.len() {
+        bail!("artifact value blocks do not match the rebuilt tree");
+    }
+    let value_len = Player::BOTH
+        .iter()
+        .map(|&p| pf_game.game.evaluator.hands.len(p))
+        .sum();
+    for block in &payload.values {
+        dequantize_values(&block.values, block.scale, value_len)?;
+    }
     let blocks: HashMap<u32, Vec<u8>> = payload
         .blocks
         .into_iter()
@@ -488,13 +547,22 @@ struct RiverSolve {
 enum RiverSolver {
     F32(Solver<PostflopEvaluator, F32Storage>),
     I16(Solver<PostflopEvaluator, I16Storage>),
+    Mixed(Solver<PostflopEvaluator, MixedStorage>),
 }
 
 impl RiverSolver {
+    fn game(&self) -> &hu_engine::CompiledGame<PostflopEvaluator> {
+        match self {
+            Self::F32(s) => s.game(),
+            Self::I16(s) => s.game(),
+            Self::Mixed(s) => s.game(),
+        }
+    }
     fn average_strategy_at(&self, node: NodeId) -> Vec<f32> {
         match self {
             Self::F32(solver) => solver.average_strategy_at(node),
             Self::I16(solver) => solver.average_strategy_at(node),
+            Self::Mixed(solver) => solver.average_strategy_at(node),
         }
     }
 }
@@ -625,24 +693,31 @@ impl<'a> SolProvider<'a> {
         spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
         let payoff = crate::input::NlhPayoff::new(&spot)?;
         let sub_game = build_postflop_game(&sub_cfg, payoff.pipeline());
-        let rs = if loaded.nlh.1.solver.storage == crate::input::Storage::I16 {
-            resolve_river::<I16Storage>(
-                loaded,
-                sub_game.game,
-                entry,
-                start,
-                RiverSolver::I16,
-                &mut self.diagnostics,
-            )?
-        } else {
-            resolve_river::<F32Storage>(
+        let rs = match loaded.nlh.1.solver.storage {
+            crate::input::Storage::F32 => resolve_river::<F32Storage>(
                 loaded,
                 sub_game.game,
                 entry,
                 start,
                 RiverSolver::F32,
                 &mut self.diagnostics,
-            )?
+            )?,
+            crate::input::Storage::I16 => resolve_river::<I16Storage>(
+                loaded,
+                sub_game.game,
+                entry,
+                start,
+                RiverSolver::I16,
+                &mut self.diagnostics,
+            )?,
+            crate::input::Storage::I16F32Avg => resolve_river::<MixedStorage>(
+                loaded,
+                sub_game.game,
+                entry,
+                start,
+                RiverSolver::Mixed,
+                &mut self.diagnostics,
+            )?,
         };
         self.river_solves.insert(entry, rs);
         Ok(())
@@ -661,6 +736,7 @@ fn resolve_river<S: Storage>(
     let schedule = crate::run::schedule(&settings.solver.algorithm);
     let mut solver =
         Solver::<PostflopEvaluator, S>::new(game, schedule, Some(loaded.river_iterations));
+    solver.set_cfr_precision(settings.solver.cfr_precision);
     solver.set_par(hu_engine::ParConfig {
         chance_depth: settings.solver.parallel.chance_depth,
         min_children: settings.solver.parallel.min_children,
@@ -725,7 +801,22 @@ impl StrategyProvider for SolProvider<'_> {
         let sub_node = *rs.map.get(&node).ok_or_else(|| {
             anyhow!("node {node} not found in the re-solved river subtree for entry {entry}")
         })?;
-        Ok(rs.solver.average_strategy_at(sub_node))
+        let sub_avg = rs.solver.average_strategy_at(sub_node);
+        let sub_hands = &rs.solver.game().evaluator.hands;
+        let trunk_hands = &loaded.pf_game.game.evaluator.hands;
+        let mut avg = vec![
+            1.0 / sref.num_actions as f32;
+            sref.num_actions as usize * sref.num_hands as usize
+        ];
+        for (i, &global) in sub_hands.combos(n.player).iter().enumerate() {
+            let j = trunk_hands
+                .local(n.player, global as usize)
+                .ok_or_else(|| anyhow!("river support is outside parent range"))?;
+            for a in 0..sref.num_actions as usize {
+                avg[a * sref.num_hands as usize + j] = sub_avg[a * sub_hands.len(n.player) + i];
+            }
+        }
+        Ok(avg)
     }
 
     fn ev_summary(&self) -> EvSummary {
@@ -995,6 +1086,126 @@ memory = "1GiB"
             nash_conv,
         };
         (solver, node_info, start_street, summary)
+    }
+
+    #[test]
+    fn strategy_batches_bound_elements_and_skip_unstored_nodes() {
+        let refs: Vec<_> = [3, 2, 99, 11, 2]
+            .into_iter()
+            .enumerate()
+            .map(|(index, len)| hu_engine::StorageRef {
+                offset: 0,
+                num_actions: 1,
+                num_hands: len,
+                index: index as u32,
+            })
+            .collect();
+        let stored = [true, true, false, true, true];
+        assert_eq!(strategy_batch_end(&refs, &stored, 0, 5), (3, 2));
+        assert_eq!(strategy_batch_end(&refs, &stored, 3, 5), (4, 1));
+        assert_eq!(strategy_batch_end(&refs, &stored, 4, 5), (5, 1));
+        assert_eq!(strategy_batch_end(&refs, &[false; 5], 0, 5), (5, 0));
+        assert_eq!(strategy_batch_end(&refs, &stored, 0, 16), (4, 3));
+    }
+
+    #[test]
+    fn streamed_strategies_match_ev_pass_and_whole_payload_bits() {
+        fn check<S: Storage>(raw: &str, storage_name: &str) -> Vec<Vec<u8>> {
+            let (solver, node_info, start_street, mut summary) = build_and_solve::<S>(raw, 3);
+            summary.wall = std::time::Duration::ZERO;
+            let tree = &solver.game().tree;
+            let reference = std::sync::Mutex::new(HashMap::new());
+            solver.visit_expected_values(|id, _, _, avg| {
+                let sref = tree.storage_ref(tree.node(id));
+                let mut direct = vec![0.0; sref.len()];
+                solver
+                    .storage()
+                    .average_strategy(sref, sref.index, &mut direct);
+                assert_eq!(
+                    avg.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+                    direct.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
+                );
+                reference
+                    .lock()
+                    .unwrap()
+                    .insert(sref.index, quantize_probs(avg));
+            });
+            let reference = reference.into_inner().unwrap();
+            let mut outputs = Vec::new();
+            for mode in [SolStreets::Full, SolStreets::NoRivers] {
+                let path = temp_path("streamed.sol");
+                let spec = SolExportSpec {
+                    path: path.clone(),
+                    mode,
+                    config_toml: raw.to_string(),
+                    storage_name: storage_name.to_string(),
+                };
+                export_sol(&spec, &solver, &node_info, start_street, &summary).unwrap();
+                let payload = read_sol(&path).unwrap();
+                let streets = node_streets(tree, start_street);
+                let expected: HashSet<_> = tree
+                    .nodes
+                    .iter()
+                    .enumerate()
+                    .filter(|(id, node)| {
+                        node.kind == NodeKind::Action
+                            && (mode == SolStreets::Full
+                                || start_street == Street::River
+                                || streets[*id] != Street::River)
+                    })
+                    .map(|(_, node)| node.aux)
+                    .collect();
+                assert_eq!(payload.blocks.len(), expected.len());
+                assert_eq!(
+                    payload
+                        .values
+                        .iter()
+                        .map(|b| b.sref)
+                        .collect::<HashSet<_>>(),
+                    expected
+                );
+                assert!(payload.blocks.windows(2).all(|w| w[0].sref < w[1].sref));
+                for block in &payload.blocks {
+                    assert!(expected.contains(&block.sref));
+                    assert_eq!(&block.probs, &reference[&block.sref]);
+                }
+                let bytes = std::fs::read(&path).unwrap();
+                assert_eq!(
+                    zstd::decode_all(&bytes[crate::sol::HEADER_LEN..]).unwrap(),
+                    postcard::to_allocvec(&payload).unwrap()
+                );
+                let whole_path = temp_path("whole.sol");
+                crate::sol::write_sol(&whole_path, &payload).unwrap();
+                assert_eq!(bytes, std::fs::read(&whole_path).unwrap());
+                outputs.push(bytes);
+                std::fs::remove_file(path).unwrap();
+                std::fs::remove_file(whole_path).unwrap();
+            }
+            outputs
+        }
+        let mut reference = None;
+        for threads in [1, 8] {
+            let outputs = rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap()
+                .install(|| {
+                    let mut outputs = Vec::new();
+                    for raw in [TINY_TURN_TOML, TINY_RIVER_TOML] {
+                        outputs.extend(check::<F32Storage>(raw, "f32"));
+                        outputs.extend(check::<I16Storage>(raw, "i16"));
+                        outputs.extend(check::<MixedStorage>(raw, "i16-f32avg"));
+                    }
+                    outputs
+                });
+            if let Some(reference) = &reference {
+                assert_eq!(
+                    &outputs, reference,
+                    "compressed bytes differ across threads"
+                );
+            }
+            reference = Some(outputs);
+        }
     }
 
     /// Covers both "round trip" and "`SolProvider` seam" test concerns in one
@@ -1395,20 +1606,17 @@ memory = "1GiB"
         let _ = std::fs::remove_file(&path);
     }
 
-    /// Values for hands that cannot be held at a node are stored as zero,
-    /// which is what keeps the value blocks as sparse as the strategy
-    /// blocks. Without it a counterfactual value — defined for every hand,
-    /// reachable or not — would be written for all 1,326 combos and would
-    /// dominate the artifact.
+    /// Value slots exist only for root support. Runout-blocked or otherwise
+    /// unreachable hands inside that support carry zero at the node.
     #[test]
     fn unreachable_hands_are_stored_as_zero() {
         let (solver, node_info, start_street, summary) =
-            build_and_solve::<F32Storage>(TINY_RIVER_TOML, 64);
+            build_and_solve::<F32Storage>(TINY_TURN_TOML, 64);
         let path = temp_path("value-sparsity.sol");
         let spec = SolExportSpec {
             path: path.clone(),
             mode: SolStreets::Full,
-            config_toml: TINY_RIVER_TOML.to_string(),
+            config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
         export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
@@ -1416,32 +1624,39 @@ memory = "1GiB"
         let _ = std::fs::remove_file(&path);
 
         let tree = &solver.game().tree;
-        let root_aux = tree.node(0).aux;
-        let block = payload
-            .values
-            .iter()
-            .find(|b| b.sref == root_aux)
-            .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
-        let stored = dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode");
-
-        for seat in Player::BOTH {
-            let range = &solver.game().root_ranges[seat];
-            let base = seat.index() * num_hands;
-            let mut in_range = 0usize;
-            for hand in 0..num_hands {
-                if range[hand] > 0.0 {
-                    in_range += 1;
-                } else {
-                    assert_eq!(
-                        stored[base + hand],
-                        0.0,
-                        "{seat:?} hand {hand} is out of range but carries a value"
-                    );
+        let hands = &solver.game().evaluator.hands;
+        let value_len = hands.len(Player::P0) + hands.len(Player::P1);
+        assert!(value_len < 2 * nlh::NUM_COMBOS);
+        let blocks: HashMap<_, _> = payload.values.iter().map(|b| (b.sref, b)).collect();
+        let mut zero_slots = 0;
+        walk_reaches(
+            tree,
+            0,
+            &solver.game().root_ranges,
+            &|id| solver.average_strategy_at(id),
+            &mut |id, reach| {
+                let block = blocks[&tree.node(id).aux];
+                let stored = dequantize_values(&block.values, block.scale, value_len)
+                    .expect("compact values");
+                for seat in Player::BOTH {
+                    let base = if seat == Player::P0 {
+                        0
+                    } else {
+                        hands.len(Player::P0)
+                    };
+                    for (i, &here) in reach[seat].iter().enumerate() {
+                        if here <= 0.0 {
+                            zero_slots += 1;
+                            assert_eq!(stored[base + i], 0.0, "{id} {seat:?} {i}");
+                        }
+                    }
                 }
-            }
-            assert!(in_range > 0 && in_range < num_hands, "{seat:?}: {in_range}");
-        }
+            },
+        );
+        assert!(
+            zero_slots > 0,
+            "the fixture must exercise unreachable support slots"
+        );
     }
 
     /// The per-hand values a `.sol` stores must aggregate back to the root
@@ -1473,14 +1688,24 @@ memory = "1GiB"
             .iter()
             .find(|b| b.sref == root_aux)
             .expect("root value block");
-        let num_hands = tree.storage_ref(tree.node(0)).num_hands as usize;
+        let hands = &solver.game().evaluator.hands;
+        let value_len = hands.len(Player::P0) + hands.len(Player::P1);
         let stored =
-            dequantize_values(&block.values, block.scale, num_hands * 2).expect("decode values");
+            dequantize_values(&block.values, block.scale, value_len).expect("decode values");
 
         for seat in Player::BOTH {
             let own = &solver.game().root_ranges[seat];
-            let facing = compatible_reach(&solver.game().root_ranges[seat.opponent()]);
-            let base = seat.index() * num_hands;
+            let facing = compatible_reach(
+                &solver.game().evaluator.hands,
+                seat,
+                &solver.game().root_ranges[seat.opponent()],
+            );
+            let num_hands = hands.len(seat);
+            let base = if seat == Player::P0 {
+                0
+            } else {
+                hands.len(Player::P0)
+            };
             let mut weighted = 0.0f64;
             let mut total = 0.0f64;
             for hand in 0..num_hands {

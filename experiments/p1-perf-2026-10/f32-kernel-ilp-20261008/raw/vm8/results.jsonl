@@ -1,0 +1,8 @@
+{"tag": "c_turn2_new", "side": "new", "base": "c_turn2", "exit": 0, "wall": 0.52, "iterations": 242, "wallSecs": 0.420791787, "nashConv": 0.04497432717459682}
+{"tag": "c_turn2_t17", "side": "t17", "base": "c_turn2", "exit": 0, "wall": 0.479, "iterations": 231, "wallSecs": 0.384319674, "nashConv": 0.04449807721260868}
+{"tag": "c_flop1_new", "side": "new", "base": "c_flop1", "exit": 0, "wall": 44.507, "iterations": 184, "wallSecs": 35.363757658, "nashConv": 0.010967310301566946}
+{"tag": "c_flop1_t17", "side": "t17", "base": "c_flop1", "exit": 0, "wall": 45.891, "iterations": 185, "wallSecs": 36.669935057000004, "nashConv": 0.010866639769547715}
+{"tag": "c_flop3_new", "side": "new", "base": "c_flop3", "exit": 0, "wall": 273.472, "iterations": 412, "wallSecs": 250.833772129, "nashConv": 0.005481467495965675}
+{"tag": "c_flop3_t17", "side": "t17", "base": "c_flop3", "exit": 0, "wall": 290.086, "iterations": 425, "wallSecs": 267.210978683, "nashConv": 0.0054998907331603175}
+{"tag": "c_gtowb_new", "side": "new", "base": "c_gtowb", "exit": 0, "wall": 490.925, "iterations": 312, "wallSecs": 439.306777784, "nashConv": 0.010893536732213827}
+{"tag": "c_gtowb_t17", "side": "t17", "base": "c_gtowb", "exit": 0, "wall": 492.513, "iterations": 307, "wallSecs": 440.766384337, "nashConv": 0.010789297573716383}

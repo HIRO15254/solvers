@@ -1,0 +1,19 @@
+
+running 4 tests
+real terminal relative infinity errors: [0.0, 8.187703931397686e-7]; folds=98 showdowns=240
+test postflop::precision_tests::f32_real_terminals_close_and_eval_stays_exact ... ok
+T20 fused vs separate relative infinity error: 6.192494943827879e-7; pairs=96 dead entries=37392
+test postflop::precision_tests::siblings_match_separate_calls_cover_live_hands_and_zero_dead_entries ... ok
+T20 weighted relative infinity errors [f64, HEAD f32]: [7.98666945002097e-7, 8.483688147683195e-7]
+test postflop::precision_tests::weighted_showdown_matches_head_f32_and_f64_on_real_boards ... ok
+test postflop::precision_tests::precision_all_backends_deterministic_and_saved_ev_exact ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 55 filtered out; finished in 9.35s
+
+
+running 1 test
+synthetic f32 relative infinity error: 8.772814801493133e-7
+test kernel::tests::f32_synthetic_kernels_close ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 58 filtered out; finished in 0.01s
+

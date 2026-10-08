@@ -17,9 +17,14 @@ BB = "JhJd,ThTd"
 script = '''river { replace bet [1bb] }
 river when !unopened { replace raise [a] }'''
 
+# CFR arithmetic in [solver]: cfr_precision = "f32" (default) | "f64" (legacy bit-identical).
+# Storage choices in [solver]: f32 (default), i16, i16-f32avg.
+# DCFR defaults: alpha = 1.25, beta = 0.5, gamma = 4.
+# Omitted pow4_reset: true for i16, false for f32/i16-f32avg; explicit values take priority.
 [solver.stop]
 max_iterations = 16
 check_every = 4
+# Integer cadence stays fixed; default "auto" adapts with target, otherwise evaluates every 25.
 
 [run]
 threads = 1

@@ -1,0 +1,106 @@
+## hu_postflop::kernel::terminal_batch_lanes_f32::<3, false>
+
+Sorted summary for file /home/PC_User/prof_t26/release/examples/p1_bench
+----------------------------------------------
+
+   13.34 kernel.rs:432
+   11.36 kernel.rs:220
+   11.01 kernel.rs:418
+    9.72 kernel.rs:399
+    8.15 kernel.rs:0
+    2.53 kernel.rs:408
+    2.34 non_null.rs:1714
+    1.99 kernel.rs:214
+    1.49 kernel.rs:219
+    1.37 kernel.rs:414
+    1.29 kernel.rs:430
+    1.17 kernel.rs:218
+    1.14 kernel.rs:397
+    0.97 kernel.rs:413
+    0.94 kernel.rs:382
+    0.80 kernel.rs:331
+    0.67 kernel.rs:429
+    0.62 cmp.rs:482
+    0.57 kernel.rs:393
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (4024 samples, percent: local period)
+## hottest instructions
+    4.57 :   cb0b8:  vsubps %xmm13,%xmm7,%xmm13 // kernel.rs:418
+    4.20 :   ca55f:  vmovlps %xmm2,0x130(%rsp,%rax,4)
+    3.43 :   caf55:  vmovlps %xmm14,0x130(%rsp,%r9,4)
+    3.38 :   cb15e:  vmulss 0x8(%r15,%rax,4),%xmm5,%xmm12
+    3.08 :   cb08e:  vmovss 0x8(%r15,%rcx,4),%xmm12
+    2.78 :   caf45:  vmovss 0x8(%r15,%r10,4),%xmm13 // kernel.rs:0
+    2.73 :   ca55b:  vaddps %xmm2,%xmm1,%xmm2 // kernel.rs:220
+    2.66 :   cb155:  vmulps %xmm4,%xmm11,%xmm11
+    1.99 :   ca524:  cmp    %ax,%r12w // kernel.rs:214
+    1.89 :   ca571:  vmovss %xmm2,0x138(%rsp,%rax,4)
+    1.71 :   cb177:  vmovss %xmm13,0x138(%rsp,%rcx,4)
+    1.62 :   cb0c7:  vsubss 0x138(%rsp,%rcx,4),%xmm6,%xmm13
+    1.57 :   caf6d:  vmovss %xmm15,0x138(%rsp,%r9,4)
+    1.47 :   caf50:  vaddps %xmm14,%xmm11,%xmm14 // kernel.rs:399
+    1.42 :   caf3b:  vmovsd 0x130(%rsp,%r9,4),%xmm14 // kernel.rs:399
+    1.34 :   cb159:  vaddps %xmm11,%xmm12,%xmm13
+    1.34 :   cb0df:  vmulss 0x18(%rsp),%xmm12,%xmm11
+    1.29 :   cb180:  movzbl 0x3(%r13),%edi // kernel.rs:430
+    1.24 :   cb0ea:  vmovss %xmm11,0x8(%r10)
+    1.22 :   ca547:  vmovss 0x8(%r15,%rax,4),%xmm0 // kernel.rs:0
+    1.17 :   ca57a:  movzbl 0x3(%r8),%edi // kernel.rs:218
+    1.14 :   caf77:  movzbl 0x3(%rax),%r9d // kernel.rs:397
+    1.12 :   cb0f0:  cmp    %rdi,%rax // non_null.rs:1714
+    1.09 :   ca5a6:  vmovlps %xmm1,0x130(%rsp,%rax,4)
+    1.07 :   cb1b7:  vmovss %xmm11,0x138(%rsp,%rax,4)
+    1.07 :   cb044:  mov    0x68(%rsp),%rcx // kernel.rs:408
+    0.97 :   cb095:  lea    (%r11,%r11,2),%rcx // kernel.rs:413
+    0.94 :   cad3e:  mov    %rax,0x8(%rsp) // kernel.rs:382
+    0.92 :   cafa7:  vmovlps %xmm11,0x130(%rsp,%r9,4) // kernel.rs:399
+    0.92 :   caf5f:  vmulss %xmm3,%xmm13,%xmm14
+    0.89 :   cb16e:  vaddss 0x138(%rsp,%rcx,4),%xmm12,%xmm13
+    0.84 :   cb14c:  vmovsd 0x130(%rsp,%rcx,4),%xmm12 // kernel.rs:432
+    0.84 :   cb0c2:  vaddps %xmm13,%xmm11,%xmm11
+    0.80 :   ca537:  jae    cb5d9 <hu_postflop::kernel::terminal_batch_lanes_f32::<3, false>+0x17e9> // kernel.rs:219
+    0.80 :   ca044:  cmp    %rdi,%r14 // kernel.rs:331
+    0.77 :   cb1a5:  vmovlps %xmm11,0x130(%rsp,%rax,4) // kernel.rs:432
+    0.77 :   cb0da:  vmovlps %xmm11,(%r10)
+    0.77 :   cb075:  lea    (%r9,%r9,2),%r9
+    0.77 :   ca5a2:  vaddps %xmm2,%xmm1,%xmm1 // kernel.rs:220
+    0.75 :   cb025:  cmp    %r10,%r14 // kernel.rs:408
+    0.72 :   cb049:  movzbl %r9b,%r11d
+    0.70 :   ca54e:  lea    (%rdi,%rdi,2),%rax // kernel.rs:219
+    0.67 :   cb1ae:  vaddss 0x138(%rsp,%rax,4),%xmm12,%xmm11
+    0.67 :   cb146:  vmovsd (%r15,%rax,4),%xmm11 // kernel.rs:429
+    0.67 :   ca568:  vaddss 0x138(%rsp,%rax,4),%xmm0,%xmm2
+    0.62 :   cb0e5:  vaddss %xmm13,%xmm11,%xmm11
+    0.62 :   caf94:  add    $0x4,%rax // non_null.rs:1714
+    0.62 :   cad85:  cmp    %r10w,%si // cmp.rs:482
+    0.60 :   cb06b:  jae    cb568 <hu_postflop::kernel::terminal_batch_lanes_f32::<3, false>+0x1778> // kernel.rs:414
+    0.60 :   cafc5:  cmp    %rcx,%rax // non_null.rs:1714
+    0.57 :   caf14:  cmp    %r10w,%r12w // kernel.rs:393
+    0.55 :   cb088:  vmovsd (%r15,%rcx,4),%xmm11 // kernel.rs:0
+    0.52 :   cb039:  movzwl 0x2(%rdx,%rdi,1),%r9d // kernel.rs:0
+    0.50 :   caf27:  jae    cb4ad <hu_postflop::kernel::terminal_batch_lanes_f32::<3, false>+0x16bd>
+    0.47 :   cb1c0:  cmp    %rsi,%r13
+    0.47 :   cb062:  shr    $0x8,%r9d
+    0.45 :   cb3ad:  vmovss %xmm2,-0x3c(%rdx)
+    0.45 :   caf63:  vaddss 0x138(%rsp,%r9,4),%xmm14,%xmm15
+    0.45 :   ca5c1:  cmp    %rcx,%r8
+    0.42 :   cb2bb:  vmovss %xmm5,0x3c(%rsi)
+    0.42 :   cb142:  lea    (%rdi,%rdi,2),%rcx
+    0.42 :   cb0a3:  vmovsd 0x130(%rsp,%rcx,4),%xmm13
+    0.42 :   cb054:  cmp    $0x33,%r11w
+    0.42 :   cafa2:  vaddps %xmm12,%xmm11,%xmm11
+    0.40 :   cb2ac:  vmovss %xmm2,0x18(%rsi)
+    0.40 :   ca533:  cmp    $0x34,%rdi
+    0.40 :   ca063:  movq   $0x0,(%r8,%rsi,4)
+    0.37 :   cb07e:  lea    (%r10,%r10,2),%r10
+    0.37 :   ca5b8:  vmovss %xmm0,0x138(%rsp,%rax,4)
+    0.37 :   ca5af:  vaddss 0x138(%rsp,%rax,4),%xmm0,%xmm0
+    0.37 :   ca595:  add    $0x4,%r8
+    0.37 :   ca591:  vaddss %xmm0,%xmm6,%xmm6
+    0.35 :   cb32d:  vmovss %xmm2,-0x3c(%rdx)
+    0.35 :   cb0ac:  lea    (%r14,%r10,4),%r10
+    0.35 :   cafbb:  vmovss %xmm11,0x138(%rsp,%r9,4)
+    0.35 :   caf4c:  vmulps %xmm2,%xmm12,%xmm11
+    0.32 :   cb099:  vmovsd 0x130(%rsp,%r9,4),%xmm14
+    0.32 :   caf8f:  vaddss %xmm13,%xmm9,%xmm9
+    0.30 :   cb3c1:  vmovss %xmm6,-0xc(%rdx)
+    0.30 :   cb332:  vmovss %xmm3,-0x30(%rdx)

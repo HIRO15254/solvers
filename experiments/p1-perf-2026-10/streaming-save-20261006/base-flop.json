@@ -1,0 +1,122 @@
+{
+  "command": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3-base\\release\\solvers.exe",
+    "solve",
+    "experiments/p1-perf-2026-10/streaming-save-20261006/flop4.toml",
+    "--out",
+    "runs/p1-t3/base-flop",
+    "--threads",
+    "8"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 273.5991961,
+  "peak_working_set_bytes": 10771910656,
+  "peak_commit_bytes": 12362457088,
+  "memory_samples": 4887,
+  "checkpoints": [
+    {
+      "iteration": 2,
+      "seconds": 67.47056519999751,
+      "save_seconds": 58.54303949999667
+    },
+    {
+      "iteration": 4,
+      "seconds": 151.41600649999964,
+      "save_seconds": 77.76130340000236
+    },
+    {
+      "iteration": 4,
+      "seconds": 229.9883641999986,
+      "save_seconds": 74.96503229999871
+    }
+  ],
+  "solution_seconds": 43.61083190000136,
+  "artifacts": {
+    "checkpoint.ckpt": {
+      "bytes": 1042043734,
+      "sha256": "a93b96cbf278ed1266efd0f3587feae7c018f06ed586e43c2e347b5bb7654fd3"
+    },
+    "solution.sol": {
+      "bytes": 173028002,
+      "sha256": "46c800be5bd43c8ffafe168d6b66ce810890b4a1b60ccf58e2df13ffa6f5b1ac"
+    }
+  },
+  "stdout": [
+    {
+      "seconds": 0.9143163999979151,
+      "line": "tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16)"
+    },
+    {
+      "seconds": 0.914373899999191,
+      "line": "warning: no stop target: runs until max_iterations or max_time"
+    },
+    {
+      "seconds": 8.927525700000842,
+      "line": "iter=       2 expl_p0=7.794e0 expl_p1=1.927e1 nash_conv=2.706e1"
+    },
+    {
+      "seconds": 73.65470309999728,
+      "line": "iter=       4 expl_p0=1.389e1 expl_p1=6.707e0 nash_conv=2.059e1"
+    },
+    {
+      "seconds": 155.0233318999999,
+      "line": "done: iterations=4 wall=148.42s ev_p0=-4.060810 ev_p1=8.715177 nash_conv=2.059e1"
+    },
+    {
+      "seconds": 270.7695051999981,
+      "line": "sol: wrote runs/p1-t3/base-flop\\solution.sol (165.01 MB, 335460 blocks, mode=Full)"
+    }
+  ],
+  "events": [
+    {
+      "seconds": 0.8521956000004138,
+      "seq": 0,
+      "unixMs": 1791294551440,
+      "level": "info",
+      "kind": "state",
+      "state": "running"
+    },
+    {
+      "seconds": 67.47056519999751,
+      "seq": 1,
+      "unixMs": 1791294617988,
+      "level": "info",
+      "kind": "checkpoint",
+      "sweeps": 2
+    },
+    {
+      "seconds": 151.41600649999964,
+      "seq": 2,
+      "unixMs": 1791294701992,
+      "level": "info",
+      "kind": "checkpoint",
+      "sweeps": 4
+    },
+    {
+      "seconds": 151.41601289999744,
+      "seq": 3,
+      "unixMs": 1791294701992,
+      "level": "info",
+      "kind": "stop",
+      "reason": "max-iterations"
+    },
+    {
+      "seconds": 229.9883641999986,
+      "seq": 4,
+      "unixMs": 1791294780544,
+      "level": "info",
+      "kind": "checkpoint",
+      "sweeps": 4
+    },
+    {
+      "seconds": 273.5543667999991,
+      "seq": 5,
+      "unixMs": 1791294824108,
+      "level": "info",
+      "kind": "state",
+      "state": "completed"
+    }
+  ],
+  "binary_sha256": "cfb8c0894486d8821b68d7a11cda805ad6a3a07509ed0c20696921cbf8c89ed7",
+  "binary_hash_note": "Captured after run; baseline solvers.exe built once and unchanged"
+}

@@ -1,0 +1,207 @@
+{
+  "initial": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 8.92656580000039
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 26.314074400001118
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 717.7597311999998,
+      "passed": 858,
+      "failed": 0,
+      "ignored": 31,
+      "suites": 56
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 2.132643900000403
+    }
+  ],
+  "final": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 9.851447600001848
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 27.306413300000713
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 644.1751206000008,
+      "passed": 859,
+      "failed": 0,
+      "ignored": 31,
+      "suites": 56
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.2151495999969484
+    }
+  ],
+  "final_budget_test": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "hu-postflop",
+      "--lib",
+      "prepare::tests::compression_budget_counts_streamed_strategies_as_payload"
+    ],
+    "exit_code": 0,
+    "seconds": 28.391508200002136
+  },
+  "cargo_build_jobs": 2,
+  "corrected_clippy_attempt": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 101,
+    "seconds": 14.585051400001248
+  },
+  "corrected_clippy_reason": "items_after_test_module: moved the added test module to the file end; computation unchanged",
+  "intermediate_check_run": "an earlier run was stopped deliberately to add the compression payload-budget correction; final workspace suite ran after the computation correction",
+  "before_typed_writer": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 12.4307824000025
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 32.793641500000376
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 740.2077847,
+      "passed": 859,
+      "failed": 0,
+      "ignored": 31,
+      "suites": 56
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_docs.py"
+      ],
+      "exit_code": 0,
+      "seconds": 1.535674899998412
+    }
+  ],
+  "typed_focused_test": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "hu-postflop",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "passed": 45,
+    "ignored": 1
+  },
+  "handoff": {
+    "checks": [
+      {
+        "command": [
+          "python",
+          "tools/check_docs.py"
+        ],
+        "exit_code": 0,
+        "seconds": 1.1758594000020821
+      },
+      {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "seconds": 0.23942040000110865
+      }
+    ],
+    "head": "6234545",
+    "branch": "s3-p1-multicore-perf",
+    "excluded_crates_unchanged": true,
+    "evidence_file_types_checked": true,
+    "final_binary_hashes_checked": true,
+    "comparisons_checked": true
+  }
+}

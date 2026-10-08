@@ -37,7 +37,7 @@ pub fn require_current_artifact(path: &Path) -> Result<()> {
             require_artifact_config(&std::fs::read_to_string(config)?)?;
         }
     } else if path.extension().is_some_and(|e| e == "ckpt") {
-        let checkpoint = hu_postflop::checkpoint::read_checkpoint(path)?;
+        let checkpoint = hu_postflop::checkpoint::CheckpointReader::open(path)?;
         let raw = checkpoint.config_toml.as_deref().ok_or_else(|| anyhow::anyhow!(
             "removed config family solvers.postflop/v1 checkpoint: re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"
         ))?;

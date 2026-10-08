@@ -765,18 +765,13 @@ fn sol_export_and_inspect_smoke() {
     assert!(sol_path.exists(), "sol file must be written");
     assert!(checkpoint.exists(), "checkpoint file must be written");
 
-    // The two artifacts answer different questions and are sized
-    // accordingly: the checkpoint carries full-precision regrets and
-    // strategy sums so a run can continue, while `.sol` carries 16-bit
-    // quantized strategies and values for reading. Even at the default
-    // `full` mode, which stores every action node, `.sol` stays the smaller
-    // of the two.
+    // Both artifacts have payloads. With compact support this tiny game's
+    // checkpoint can compress below `.sol`: file-size ordering is not a
+    // format contract, because `.sol` also carries values and metadata.
     let sol_size = std::fs::metadata(&sol_path).unwrap().len();
     let ckpt_size = std::fs::metadata(&checkpoint).unwrap().len();
-    assert!(
-        sol_size < ckpt_size,
-        "sol ({sol_size} bytes) should be smaller than the checkpoint ({ckpt_size} bytes)"
-    );
+    assert!(sol_size > hu_postflop::sol::HEADER_LEN as u64);
+    assert!(ckpt_size > hu_postflop::checkpoint::HEADER_LEN as u64);
 
     // And `no-rivers` is the lever for a much smaller artifact: it drops
     // the river nodes, which dominate the count.
@@ -1000,6 +995,41 @@ fn i16_storage_solve_converges_and_checkpoint_round_trips() {
     assert!(matches!(
         checkpoint_data.state.storage,
         hu_engine::StorageState::I16 { .. }
+    ));
+}
+
+#[test]
+fn mixed_i16_storage_solve_converges_and_checkpoint_round_trips() {
+    let dir = temp_dir("i16-f32avg");
+    let config = dir.join("river-i16-f32avg.toml");
+    std::fs::write(
+        &config,
+        RIVER_NO_EARLY_STOP.replace("storage = \"f32\"", "storage = \"i16-f32avg\""),
+    )
+    .unwrap();
+    let run = dir.join("run");
+    let checkpoint = run.join("checkpoint.ckpt");
+
+    let output = run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let nash_conv: f64 = done_line_field(&stdout, "nash_conv=").parse().unwrap();
+    // Loose bound: the river under i16-f32avg-quantized storage should still
+    // converge well below the game's own scale (the pot is 10 chips, and the
+    // f32 backend reaches ~2.5e-3 in the same 200 iterations).
+    assert!(
+        nash_conv < 0.02,
+        "i16-f32avg storage should still converge on the river subgame, got nash_conv={nash_conv}"
+    );
+
+    let checkpoint_data = hu_postflop::checkpoint::read_checkpoint(&checkpoint).unwrap();
+    assert!(matches!(
+        checkpoint_data.state.storage,
+        hu_engine::StorageState::Mixed { .. }
     ));
 }
 

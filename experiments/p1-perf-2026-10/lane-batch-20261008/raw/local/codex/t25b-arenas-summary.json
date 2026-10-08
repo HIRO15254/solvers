@@ -1,0 +1,234 @@
+[
+ {
+  "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_river.toml",
+  "nodes": 99,
+  "reports": [
+   {
+    "player": "P0",
+    "entries": 5,
+    "requestedBytesSum": 520564,
+    "maximum": {
+     "engineBytes": 264260,
+     "kernelActiveBytes": 27168,
+     "metadataBytes": 2388,
+     "nodes": 50,
+     "root": 1,
+     "scaledReachBytes": 83308,
+     "sigmaBytes": 83308,
+     "terminals": 33,
+     "valueBytes": 88200,
+     "workBytes": 7056
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 2,
+      "nodes": 3,
+      "roots": 1
+     },
+     {
+      "terminals": 10,
+      "nodes": 15,
+      "roots": 3
+     },
+     {
+      "terminals": 33,
+      "nodes": 50,
+      "roots": 1
+     }
+    ]
+   },
+   {
+    "player": "P1",
+    "entries": 5,
+    "requestedBytesSum": 509944,
+    "maximum": {
+     "engineBytes": 258544,
+     "kernelActiveBytes": 27168,
+     "metadataBytes": 2388,
+     "nodes": 50,
+     "root": 1,
+     "scaledReachBytes": 83308,
+     "sigmaBytes": 83308,
+     "terminals": 33,
+     "valueBytes": 81400,
+     "workBytes": 8140
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 2,
+      "nodes": 3,
+      "roots": 1
+     },
+     {
+      "terminals": 10,
+      "nodes": 15,
+      "roots": 3
+     },
+     {
+      "terminals": 33,
+      "nodes": 50,
+      "roots": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_turn2.toml",
+  "nodes": 22107,
+  "reports": [
+   {
+    "player": "P0",
+    "entries": 624,
+    "requestedBytesSum": 24991296,
+    "maximum": {
+     "engineBytes": 87500,
+     "kernelActiveBytes": 6304,
+     "metadataBytes": 3564,
+     "nodes": 75,
+     "root": 58,
+     "scaledReachBytes": 29008,
+     "sigmaBytes": 29008,
+     "terminals": 49,
+     "valueBytes": 24300,
+     "workBytes": 1620
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 5,
+      "nodes": 9,
+      "roots": 192
+     },
+     {
+      "terminals": 13,
+      "nodes": 21,
+      "roots": 96
+     },
+     {
+      "terminals": 29,
+      "nodes": 45,
+      "roots": 192
+     },
+     {
+      "terminals": 37,
+      "nodes": 57,
+      "roots": 96
+     },
+     {
+      "terminals": 49,
+      "nodes": 75,
+      "roots": 48
+     }
+    ]
+   },
+   {
+    "player": "P1",
+    "entries": 624,
+    "requestedBytesSum": 28203072,
+    "maximum": {
+     "engineBytes": 98380,
+     "kernelActiveBytes": 6304,
+     "metadataBytes": 3564,
+     "nodes": 75,
+     "root": 58,
+     "scaledReachBytes": 29008,
+     "sigmaBytes": 29008,
+     "terminals": 49,
+     "valueBytes": 34500,
+     "workBytes": 2300
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 5,
+      "nodes": 9,
+      "roots": 192
+     },
+     {
+      "terminals": 13,
+      "nodes": 21,
+      "roots": 96
+     },
+     {
+      "terminals": 29,
+      "nodes": 45,
+      "roots": 192
+     },
+     {
+      "terminals": 37,
+      "nodes": 57,
+      "roots": 96
+     },
+     {
+      "terminals": 49,
+      "nodes": 75,
+      "roots": 48
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_flop1.toml",
+  "nodes": 829242,
+  "reports": [
+   {
+    "player": "P0",
+    "entries": 58800,
+    "requestedBytesSum": 4745536320,
+    "maximum": {
+     "engineBytes": 86412,
+     "kernelActiveBytes": 29312,
+     "metadataBytes": 684,
+     "nodes": 15,
+     "root": 828135,
+     "scaledReachBytes": 25620,
+     "sigmaBytes": 25620,
+     "terminals": 9,
+     "valueBytes": 28740,
+     "workBytes": 5748
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 5,
+      "nodes": 9,
+      "roots": 9408
+     },
+     {
+      "terminals": 9,
+      "nodes": 15,
+      "roots": 49392
+     }
+    ]
+   },
+   {
+    "player": "P1",
+    "entries": 58800,
+    "requestedBytesSum": 4574818752,
+    "maximum": {
+     "engineBytes": 83316,
+     "kernelActiveBytes": 29312,
+     "metadataBytes": 684,
+     "nodes": 15,
+     "root": 828135,
+     "scaledReachBytes": 25620,
+     "sigmaBytes": 25620,
+     "terminals": 9,
+     "valueBytes": 26160,
+     "workBytes": 5232
+    },
+    "histogram_terminals_nodes": [
+     {
+      "terminals": 5,
+      "nodes": 9,
+      "roots": 9408
+     },
+     {
+      "terminals": 9,
+      "nodes": 15,
+      "roots": 49392
+     }
+    ]
+   }
+  ]
+ }
+]

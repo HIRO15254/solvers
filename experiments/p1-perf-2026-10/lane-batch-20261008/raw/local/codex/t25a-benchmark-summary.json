@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "btn_bb": {
+      "median_ns": {
+        "lone": 3643366.333333333,
+        "current": 2853839.0350877196,
+        "batch": 1561279.019138756
+      },
+      "ratios_of_medians": {
+        "current": 0.5470802662459084,
+        "lone": 0.42852649892889977
+      },
+      "paired": {
+        "current": {
+          "ratios": [
+            0.4875751512707966,
+            0.5717112916850704,
+            0.5435533924011972
+          ],
+          "median": 0.5435533924011972
+        },
+        "lone": {
+          "ratios": [
+            0.42852649892889977,
+            0.4624996372528897,
+            0.3970771257701837
+          ],
+          "median": 0.42852649892889977
+        }
+      },
+      "batch_ns_per_terminal": 1845.483474159286
+    },
+    "wide": {
+      "median_ns": {
+        "lone": 7044776.785714285,
+        "current": 5842915.833333333,
+        "batch": 4564619.419642857
+      },
+      "ratios_of_medians": {
+        "current": 0.7812228602715952,
+        "lone": 0.6479437970127311
+      },
+      "paired": {
+        "current": {
+          "ratios": [
+            0.7485632911865188,
+            0.8050514303638542,
+            0.9773835275068846
+          ],
+          "median": 0.8050514303638542
+        },
+        "lone": {
+          "ratios": [
+            0.5959789965507853,
+            0.6479437970127311,
+            0.8252421949038944
+          ],
+          "median": 0.6479437970127311
+        }
+      },
+      "batch_ns_per_terminal": 5395.531228892266
+    }
+  },
+  "workloads": {
+    "wide/0/P0": {
+      "terminals": 141,
+      "active": 139,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "350c03ddf022cf22"
+    },
+    "wide/0/P1": {
+      "terminals": 141,
+      "active": 121,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "acca776ca8e7fe25"
+    },
+    "wide/1/P0": {
+      "terminals": 141,
+      "active": 131,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "980013900725e9fa"
+    },
+    "wide/1/P1": {
+      "terminals": 141,
+      "active": 134,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "c3b9ba00784d5eb0"
+    },
+    "wide/2/P0": {
+      "terminals": 141,
+      "active": 137,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "b368eb9f134cc700"
+    },
+    "wide/2/P1": {
+      "terminals": 141,
+      "active": 131,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "f08d25950ae5e29a"
+    },
+    "btn_bb/0/P0": {
+      "terminals": 141,
+      "active": 141,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "edc1e8b9309bd5db"
+    },
+    "btn_bb/0/P1": {
+      "terminals": 141,
+      "active": 131,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "3b582d2ebac3fe97"
+    },
+    "btn_bb/1/P0": {
+      "terminals": 141,
+      "active": 136,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "d354ba4c41195f3d"
+    },
+    "btn_bb/1/P1": {
+      "terminals": 141,
+      "active": 131,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "1f4a4f79600020ea"
+    },
+    "btn_bb/2/P0": {
+      "terminals": 141,
+      "active": 131,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "0dbd77041853c788"
+    },
+    "btn_bb/2/P1": {
+      "terminals": 141,
+      "active": 129,
+      "batches": 18,
+      "lane_fill": 0.979167,
+      "reach_hash": "a3fcbd548b5c193f"
+    }
+  },
+  "consistent_workload_logs": 36
+}

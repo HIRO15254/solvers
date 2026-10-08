@@ -1,0 +1,99 @@
+{
+  "work_item": "P1-T5b / SOL-15",
+  "implementation": "cfr_dead_pass removed; normal chance/action parallelism and ActionViews splits retained; prune only zero-opponent terminals and opponent-action matching/reach multiplication/child-value summation; value_pass !RECORD early return unchanged",
+  "source_base": "bedfb89636e6027603c703ca3776e20c05c7dea6",
+  "dirty": true,
+  "checks": {
+    "cargo fmt --all --check": {
+      "exit": 0
+    },
+    "cargo clippy --workspace --all-targets -- -D warnings": {
+      "exit": 0
+    },
+    "cargo test -p hu-engine": {
+      "exit": 0,
+      "passed": 32,
+      "failed": 0,
+      "ignored": 0,
+      "suites": 5,
+      "log_sha256_lf": "7cc582dc333098d38d522c8000cf34d5dbae89eb2451ca8e13c6194ba947e15a"
+    },
+    "cargo test -p hu-postflop": {
+      "exit": 0,
+      "passed": 150,
+      "failed": 0,
+      "ignored": 16,
+      "suites": 16,
+      "log_sha256_lf": "b8068bf8af040995caea672c3ed79e61186561fcd257bbf18259cde858e860cf"
+    },
+    "python tools/check_docs.py": {
+      "exit": 0,
+      "output": "Documentation check passed: 23 Markdown files."
+    }
+  },
+  "environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "out_initialization_audit": {
+    "assertion": "debug_assert all out == 0 at every cfr_pass entry",
+    "root": "Scratch::take",
+    "chance_parallel": "flat Scratch::take; each variable-dimension row visited once",
+    "chance_sequential": "child_out Scratch::take inside deal loop",
+    "own_action_parallel": "cfvs Scratch::take; each disjoint row visited once",
+    "own_action_sequential": "cfvs Scratch::take; each action row visited once",
+    "opponent_action_parallel_zero_and_nonzero": "flat Scratch::take; each disjoint row visited once",
+    "opponent_action_sequential": "child_out.fill(0.0) before every child",
+    "zero_opponent_reach": "one Scratch::take opponent buffer reused sequentially or shared immutably by parallel children"
+  },
+  "differential_tests": {
+    "storage": [
+      "f32",
+      "i16"
+    ],
+    "threads": [
+      1,
+      8
+    ],
+    "schedules": [
+      "dcfr",
+      "cfr+",
+      "hs-dcfr"
+    ],
+    "iterations": 20,
+    "assertions": [
+      "storage numeric equality at each iteration against PRUNE=false",
+      "EV/BR/Exploitability numeric equality",
+      "state equality between threads 1 and 8",
+      "every action callback recorded with original per-node value bits",
+      "multiple workers perform zero-reach storage updates with chance depth 0 and 2",
+      "opponent regret-matching calls reduced",
+      "nonzero subnormal CFR/EV reach evaluated",
+      "formerly nonzero scratch buffer reset before skipped terminal"
+    ]
+  },
+  "initial_failure": {
+    "command": "cargo test -p hu-engine",
+    "tests": [
+      "action_and_fused_values_f32",
+      "action_and_fused_values_i16",
+      "mixed_transition_chance_and_nested_actions"
+    ],
+    "cause": "preexisting terminal-count assertion assumed every leaf was evaluated; zero average opponent reaches are now skipped",
+    "resolution": "independently count nonzero-opponent terminal reaches via reach_at and average strategy; focused 4 tests and final full hu-engine pass"
+  },
+  "gcp_acceptance": {
+    "runner": "user, per P1-T5b instruction",
+    "not_run_locally": [
+      "cargo test --workspace",
+      "large old/new f32/i16 checkpoint and root/all export comparison",
+      "Flop 300 / Turn 3000 iteration binary acceptance",
+      "old,new,old,new speed measurements on requested bands"
+    ]
+  },
+  "previous_evidence": "validation.json and release binary hashes describe the prior T5 sequential proposal; no T5b release build or large solve executed locally",
+  "free_disk_bytes_after_tests": 8317726720,
+  "raw_logs": "ignored runs/dead-subtree-20261007/t5b-*.log; aggregated results retained here"
+}

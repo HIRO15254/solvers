@@ -1,0 +1,14 @@
+tree: nodes=2544580 terminals=1586149 rank_tables=799 storage=8266.2 MiB (f32) / 4140.4 MiB (i16) / 6203.3 MiB (i16-f32avg)
+memory estimate: 8786.2 MiB (f32) / 4660.4 MiB (i16) / 6723.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.142e0 expl_p1=7.380e-1 nash_conv=1.880e0
+iter=      50 expl_p0=3.050e-1 expl_p1=2.114e-1 nash_conv=5.165e-1
+iter=     100 expl_p0=5.640e-2 expl_p1=5.034e-2 nash_conv=1.067e-1
+iter=     150 expl_p0=2.235e-2 expl_p1=1.834e-2 nash_conv=4.069e-2
+iter=     200 expl_p0=1.307e-2 expl_p1=1.088e-2 nash_conv=2.395e-2
+iter=     250 expl_p0=9.024e-3 expl_p1=7.372e-3 nash_conv=1.640e-2
+iter=     300 expl_p0=6.068e-3 expl_p1=4.766e-3 nash_conv=1.083e-2
+iter=     350 expl_p0=4.373e-3 expl_p1=3.532e-3 nash_conv=7.905e-3
+iter=     400 expl_p0=3.340e-3 expl_p1=2.784e-3 nash_conv=6.123e-3
+iter=     419 expl_p0=2.996e-3 expl_p1=2.485e-3 nash_conv=5.481e-3
+done: iterations=419 wall=175.18s ev_p0=1.912584 ev_p1=2.897030 nash_conv=5.481e-3
+sol: wrote /home/PC_User/work_vm30/c_flop3_t24/solution.sol (2329.12 MB, 955253 blocks, mode=Full)

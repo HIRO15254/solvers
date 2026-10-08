@@ -1,0 +1,12 @@
+{"tag": "c_turn2_f64_b22", "side": "b22", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.537, "iterations": 247, "wallSecs": 0.463599259, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_f64_t22", "side": "t22", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.513, "iterations": 247, "wallSecs": 0.403064683, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_f64_t22b", "side": "t22b", "base": "c_turn2", "precision": "f64", "exit": 0, "wall": 0.474, "iterations": 247, "wallSecs": 0.401692798, "nashConv": 0.04382061321793773}
+{"tag": "c_turn2_b22", "side": "b22", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.441, "iterations": 236, "wallSecs": 0.370247652, "nashConv": 0.043774582504659376}
+{"tag": "c_turn2_t22", "side": "t22", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.398, "iterations": 236, "wallSecs": 0.326007856, "nashConv": 0.043774582504659376}
+{"tag": "c_turn2_t22b", "side": "t22b", "base": "c_turn2", "precision": "f32", "exit": 0, "wall": 0.388, "iterations": 236, "wallSecs": 0.31390257, "nashConv": 0.043774582504659376}
+{"tag": "c_flop1_b22", "side": "b22", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 40.942, "iterations": 193, "wallSecs": 32.838106302, "nashConv": 0.010727990668512377}
+{"tag": "c_flop1_t22", "side": "t22", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 33.867, "iterations": 193, "wallSecs": 25.680012051, "nashConv": 0.010727990668512377}
+{"tag": "c_flop1_t22b", "side": "t22b", "base": "c_flop1", "precision": "f32", "exit": 0, "wall": 33.075, "iterations": 193, "wallSecs": 24.894330006, "nashConv": 0.010727990668512377}
+{"tag": "c_gtowb_b22", "side": "b22", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 444.085, "iterations": 314, "wallSecs": 392.771083785, "nashConv": 0.010710730977387506}
+{"tag": "c_gtowb_t22", "side": "t22", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 356.185, "iterations": 314, "wallSecs": 304.603879864, "nashConv": 0.010710730977387506}
+{"tag": "c_gtowb_t22b", "side": "t22b", "base": "c_gtowb", "precision": "f32", "exit": 0, "wall": 346.491, "iterations": 314, "wallSecs": 294.797474614, "nashConv": 0.010710730977387506}

@@ -1,0 +1,19 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 220K of event 'cpu-clock:ppp'
+# Event count (approx.): 220262262042
+#
+# Overhead  Shared Object    
+# ........  .................
+#
+    83.16%  p1_bench         
+    12.94%  [kernel.kallsyms]
+     3.90%  libc.so.6        
+
+
+#
+# (Tip: Show individual samples with: perf script)
+#

@@ -5,9 +5,172 @@
 //! solves) rather than duplicating game setup, since these tests exercise
 //! `hu_engine::Storage` backends, not game-layer logic.
 
-use hu_engine::{Dcfr, F32Storage, I16Storage, Solver, StateMismatch, Storage};
+use hu_engine::{Dcfr, F32Storage, I16Storage, MixedStorage, Solver, StateMismatch, Storage};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use nlh::Player;
+
+// Independent composition of the two existing backends. This records the
+// actual reach-weighted strategy inputs produced by a complete traversal,
+// including split views, without using MixedStorage/MixedView's op routing.
+struct Reference<A, B> {
+    quantized: A,
+    float: B,
+}
+
+type ReferenceStorage = Reference<I16Storage, F32Storage>;
+type ReferenceView<'a> = Reference<hu_engine::I16View<'a>, hu_engine::F32View<'a>>;
+
+impl<A: hu_engine::StorageOps, B: hu_engine::StorageOps> hu_engine::StorageOps for Reference<A, B> {
+    fn regret_matching(&self, r: hu_engine::StorageRef, idx: u32, out: &mut [f32]) {
+        self.quantized.regret_matching(r, idx, out);
+    }
+    fn update_regrets(
+        &mut self,
+        r: hu_engine::StorageRef,
+        idx: u32,
+        inst: &[f32],
+        d: &hu_engine::Discounts,
+    ) {
+        self.quantized.update_regrets(r, idx, inst, d);
+    }
+    fn accumulate_strategy(
+        &mut self,
+        r: hu_engine::StorageRef,
+        idx: u32,
+        weighted: &[f32],
+        d: &hu_engine::Discounts,
+    ) {
+        self.float.accumulate_strategy(r, idx, weighted, d);
+    }
+    fn average_strategy(&self, r: hu_engine::StorageRef, idx: u32, out: &mut [f32]) {
+        self.float.average_strategy(r, idx, out);
+    }
+    fn raw_regrets(&self, r: hu_engine::StorageRef, idx: u32, out: &mut [f32]) {
+        self.quantized.raw_regrets(r, idx, out);
+    }
+}
+
+impl Storage for ReferenceStorage {
+    type View<'a> = ReferenceView<'a>;
+
+    fn new(len: usize, refs: usize) -> Self {
+        Self {
+            quantized: I16Storage::new(len, refs),
+            float: F32Storage::new(len, refs),
+        }
+    }
+    fn release_regrets(&mut self) {
+        self.quantized.release_regrets();
+        self.float.release_regrets();
+    }
+    fn regrets_released(&self) -> bool {
+        self.quantized.regrets_released()
+    }
+    fn view_mut(&mut self) -> ReferenceView<'_> {
+        Reference {
+            quantized: self.quantized.view_mut(),
+            float: self.float.view_mut(),
+        }
+    }
+    fn bytes_for(len: usize, refs: usize) -> u64 {
+        I16Storage::bytes_for(len, refs) + F32Storage::bytes_for(len, refs)
+    }
+    fn state(&self) -> hu_engine::StorageState {
+        let hu_engine::StorageArrays::Mixed {
+            regrets,
+            strategy_sum,
+            regret_scales,
+        } = self.arrays()
+        else {
+            unreachable!()
+        };
+        hu_engine::StorageState::Mixed {
+            regrets: regrets.to_vec(),
+            strategy_sum: strategy_sum.to_vec(),
+            regret_scales: regret_scales.to_vec(),
+        }
+    }
+    fn restore_state(&mut self, state: hu_engine::StorageState) -> Result<(), StateMismatch> {
+        let hu_engine::StorageState::Mixed {
+            regrets,
+            strategy_sum,
+            regret_scales,
+        } = state
+        else {
+            return Err(StateMismatch::WrongVariant);
+        };
+        let hu_engine::StorageArraysMut::Mixed {
+            regrets: dst_r,
+            strategy_sum: dst_s,
+            regret_scales: dst_scales,
+        } = self.arrays_mut()
+        else {
+            unreachable!()
+        };
+        for (expected, actual) in [
+            (dst_r.len(), regrets.len()),
+            (dst_s.len(), strategy_sum.len()),
+            (dst_scales.len(), regret_scales.len()),
+        ] {
+            if expected != actual {
+                return Err(StateMismatch::WrongLength { expected, actual });
+            }
+        }
+        dst_r.copy_from_slice(&regrets);
+        dst_s.copy_from_slice(&strategy_sum);
+        dst_scales.copy_from_slice(&regret_scales);
+        Ok(())
+    }
+    fn arrays(&self) -> hu_engine::StorageArrays<'_> {
+        match (self.quantized.arrays(), self.float.arrays()) {
+            (
+                hu_engine::StorageArrays::I16 {
+                    regrets,
+                    regret_scales,
+                    ..
+                },
+                hu_engine::StorageArrays::F32 { strategy_sum, .. },
+            ) => hu_engine::StorageArrays::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            },
+            _ => unreachable!(),
+        }
+    }
+    fn arrays_mut(&mut self) -> hu_engine::StorageArraysMut<'_> {
+        match (self.quantized.arrays_mut(), self.float.arrays_mut()) {
+            (
+                hu_engine::StorageArraysMut::I16 {
+                    regrets,
+                    regret_scales,
+                    ..
+                },
+                hu_engine::StorageArraysMut::F32 { strategy_sum, .. },
+            ) => hu_engine::StorageArraysMut::Mixed {
+                regrets,
+                strategy_sum,
+                regret_scales,
+            },
+            _ => unreachable!(),
+        }
+    }
+    fn scale_all(&mut self, regret: f32, strategy: f32) {
+        self.quantized.scale_all(regret, 1.0);
+        self.float.scale_all(1.0, strategy);
+    }
+}
+
+impl<'a> hu_engine::StorageView for ReferenceView<'a> {
+    fn split(&mut self, spans: &[hu_engine::StorageSpan]) -> Vec<Self> {
+        self.quantized
+            .split(spans)
+            .into_iter()
+            .zip(self.float.split(spans))
+            .map(|(quantized, float)| Reference { quantized, float })
+            .collect()
+    }
+}
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -168,3 +331,236 @@ fn bytes_for_i16_smaller_than_f32_for_leduc_shape() {
         "expected i16 close to half of f32 for large len, ratio = {ratio}"
     );
 }
+
+#[test]
+fn mixed_state_round_trip_is_deterministic() {
+    state_round_trip_is_deterministic::<MixedStorage>();
+}
+
+#[test]
+fn mixed_postflop_regrets_match_i16_and_threads_are_bitwise_equal() {
+    use hu_engine::{ParConfig, StorageState};
+    use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+    use nlh::{Chips, PerPlayer};
+    let config = PostflopConfig {
+        board: "Ks 7h 2d 3c"
+            .split_whitespace()
+            .map(|c| c.parse().unwrap())
+            .collect(),
+        ranges: PerPlayer::new(
+            "AA,QQ,AJs,76s".parse().unwrap(),
+            "KK,JJ,KQs,54s".parse().unwrap(),
+        ),
+        pot: Chips(2000),
+        effective_stack: Chips(5000),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::pot_fractions(&[0.5], &[1.0], 1),
+            river: StreetTree::pot_fractions(&[0.5], &[1.0], 1),
+        },
+        iso_merging: false,
+        ..Default::default()
+    };
+    let run = |threads, mixed| {
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap();
+        pool.install(|| {
+            let game = build_postflop_game(&config, chip_ev()).game;
+            let par = ParConfig {
+                chance_depth: 2,
+                min_children: 2,
+            };
+            if mixed {
+                let mut solver =
+                    Solver::<_, MixedStorage>::new(game, Box::<Dcfr>::default(), Some(100));
+                solver.set_par(par);
+                solver.run(100);
+                solver.state().storage
+            } else {
+                let mut solver =
+                    Solver::<_, I16Storage>::new(game, Box::<Dcfr>::default(), Some(100));
+                solver.set_par(par);
+                solver.run(100);
+                solver.state().storage
+            }
+        })
+    };
+    let one = run(1, true);
+    let four = run(4, true);
+    assert_eq!(
+        postcard::to_allocvec(&one).unwrap(),
+        postcard::to_allocvec(&four).unwrap()
+    );
+    for threads in [1, 4] {
+        let StorageState::I16 {
+            regrets,
+            regret_scales,
+            ..
+        } = run(threads, false)
+        else {
+            unreachable!()
+        };
+        let StorageState::Mixed {
+            regrets: actual,
+            regret_scales: scales,
+            ..
+        } = &one
+        else {
+            unreachable!()
+        };
+        assert_eq!(&regrets, actual);
+        assert_eq!(
+            regret_scales
+                .iter()
+                .map(|x| x.to_bits())
+                .collect::<Vec<_>>(),
+            scales.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
+        );
+        let reference = rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+            .install(|| {
+                let mut solver = Solver::<_, ReferenceStorage>::new(
+                    build_postflop_game(&config, chip_ev()).game,
+                    Box::<Dcfr>::default(),
+                    Some(100),
+                );
+                solver.set_par(ParConfig {
+                    chance_depth: 2,
+                    min_children: 2,
+                });
+                solver.run(100);
+                solver.state().storage
+            });
+        assert_eq!(
+            postcard::to_allocvec(&one).unwrap(),
+            postcard::to_allocvec(&reference).unwrap(),
+            "real-game strategy sums must match f32 accumulation of the same inputs ({threads} threads)"
+        );
+    }
+}
+
+// Capture floats as bits, including signed zero, and sort the streaming EV
+// callbacks because Rayon may visit nodes in a different order.
+fn evaluation_bits<S: Storage>(solver: &Solver<hu_postflop::game::ToyEvaluator, S>) -> Vec<u64> {
+    let mut bits = Vec::new();
+    let (ev, expl) = solver.evaluate();
+    for p in Player::BOTH {
+        bits.extend([
+            ev[p].to_bits(),
+            expl[p].to_bits(),
+            solver.expected_value(p).to_bits(),
+        ]);
+        for values in solver.expected_values_everywhere(p) {
+            bits.push(u64::from(values.is_some()));
+            bits.extend(values.into_iter().flatten().map(|v| v.to_bits() as u64));
+        }
+    }
+    for (node, n) in solver.game().tree.nodes.iter().enumerate() {
+        if matches!(n.kind, hu_engine::NodeKind::Action) {
+            bits.extend(
+                solver
+                    .average_strategy_at(node as u32)
+                    .iter()
+                    .map(|v| v.to_bits() as u64),
+            );
+        }
+    }
+    let visits = std::sync::Mutex::new(Vec::new());
+    solver.visit_expected_values(|node, reaches, values, scales| {
+        let mut row = vec![node as u64];
+        for p in Player::BOTH {
+            row.extend(reaches[p].iter().map(|v| v.to_bits() as u64));
+            row.extend(values[p].iter().map(|v| v.to_bits() as u64));
+        }
+        row.extend(scales.iter().map(|v| v.to_bits() as u64));
+        visits.lock().unwrap().push(row);
+    });
+    let mut visits = visits.into_inner().unwrap();
+    visits.sort();
+    bits.extend(visits.into_iter().flatten());
+    bits
+}
+
+fn release_preserves_evaluation<S: Storage>() {
+    let mut solver = solve::<S>(40);
+    let before = evaluation_bits(&solver);
+    let checkpoint = solver.state();
+    solver.release_regrets();
+    solver.release_regrets(); // idempotent
+    assert!(solver.storage().regrets_released());
+    assert_eq!(before, evaluation_bits(&solver));
+    let mut resumed = Solver::<_, S>::new(
+        hu_postflop::game::leduc(chip_ev()).game,
+        Box::<Dcfr>::default(),
+        Some(40),
+    );
+    resumed.restore_state(checkpoint).unwrap();
+    assert_eq!(before, evaluation_bits(&resumed));
+    resumed.run(1);
+}
+
+macro_rules! release_tests {
+    ($backend:ty, $values:ident, $run:ident, $current:ident, $checkpoint:ident, $restore:ident) => {
+        #[test]
+        fn $values() {
+            release_preserves_evaluation::<$backend>();
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $run() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.run(0);
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $current() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.current_strategy_at(0);
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $checkpoint() {
+            let mut solver = solve::<$backend>(1);
+            solver.release_regrets();
+            solver.storage().arrays(); // streaming checkpoint entrypoint
+        }
+        #[test]
+        #[should_panic(expected = "regrets have been released")]
+        fn $restore() {
+            let mut solver = solve::<$backend>(1);
+            let state = solver.state();
+            solver.release_regrets();
+            solver.restore_state(state).unwrap();
+        }
+    };
+}
+release_tests!(
+    F32Storage,
+    released_f32_values,
+    released_f32_run,
+    released_f32_current,
+    released_f32_checkpoint,
+    released_f32_restore
+);
+release_tests!(
+    I16Storage,
+    released_i16_values,
+    released_i16_run,
+    released_i16_current,
+    released_i16_checkpoint,
+    released_i16_restore
+);
+release_tests!(
+    MixedStorage,
+    released_mixed_values,
+    released_mixed_run,
+    released_mixed_current,
+    released_mixed_checkpoint,
+    released_mixed_restore
+);

@@ -1,0 +1,42 @@
+{
+  "affinity_mask": 1,
+  "rayon_threads": 1,
+  "records": [
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_one_lane_btn_bb",
+      "median_ns": 4475.654689403167
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_zero_lane_btn_bb",
+      "median_ns": 4401.559532924962
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_zero_eight_btn_bb",
+      "median_ns": 10766.270260747006
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_one_lane_wide",
+      "median_ns": 11564.569560894335
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_zero_lane_wide",
+      "median_ns": 10689.854907898058
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t25b\\step0-kernels.exe",
+      "repeat": 1,
+      "bench": "kernels_realistic/t25_zero_eight_wide",
+      "median_ns": 28511.658086658084
+    }
+  ]
+}

@@ -7,6 +7,33 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
+| 性能・厳密一致の検証 | [P1 compact hand domain](p1-perf-2026-10/compact-hands-20261006/README.md) | 2026-10-06。f32新旧一致、i16の200/500反復progress、Turn速度・Flop storage見積り、format移行境界 |
+| 性能・厳密一致の検証 | [P1 engine評価pass統合](p1-perf-2026-10/engine-bitwise-20261006/README.md) | 2026-10-06。EV/BR統合走査・action並列・allocation削減が変更前・thread数間でbit一致 |
+| 性能の計測 | [P1 GCP新旧計測（T1＋T2）](p1-perf-2026-10/gcp-ab-20261006/README.md) | 2026-10-06。c2d-highcpu-32で1〜32 threads、Flop木5.3〜5.8倍・評価約10倍・peak 1/2.7、同梱Flop例が64 GB機で解ける |
+| 性能・保存一致の検証 | [P1 checkpoint・solution逐次保存](p1-perf-2026-10/streaming-save-20261006/README.md) | 2026-10-06。v4直接resume、v2 packed block bit一致、保存peak/time、新旧CLI比較 |
+| 性能・保存一致の検証 | [P1 `.sol`戦略block逐次出力](p1-perf-2026-10/sol-strategy-stream-20261007/README.md) | 2026-10-07。T3b、戦略保持除去、v2 payload・固定wall圧縮bytes一致、資源見積りとFlop peak/time |
+| 性能・保存一致の検証 | [P1 `.sol`戦略block並列生成](p1-perf-2026-10/sol-strategy-par-20261007/README.md) | 2026-10-07。T3c、上限付き1 batch、旧新payload・同thread圧縮bytes一致、2組のFlop計測と資源見積り、既存thread間codec差 |
+| 性能の計測 | [P1 0.1% potまでの収束](p1-perf-2026-10/convergence-20261007/README.md) | 2026-10-07。GCP 32 threadsでschedule別・i16・DCFR係数掃引の0.1%到達、gtow_b 575 iteration、CLI全体の新旧比較 |
+| 精度試作・収束計測（historical-only） | [P1 i16 precision](p1-perf-2026-10/i16-precision-20261007/README.md) | 2026-10-07。V0〜V4、River 3000 / Turn 1500、確率的丸めとhand列指数の比較。PF2・PF3の根拠。試作sourceは削除済み |
+| storage精度・互換性の検証 | [P1 i16-f32avg storage](p1-perf-2026-10/mixed-storage-20261007/README.md) | 2026-10-07。T6、regretの旧i16 bit一致、checkpoint v5、旧f32/i16のv2 payload比較、Turn 3000反復と3 backendの資源見積り |
+| 限定回帰・全0割合の計測 | [P1 全0相手reach部分木](p1-perf-2026-10/dead-subtree-20261007/README.md) | 2026-10-07。T5の全0割合、旧経路とのengine差分。GCP受入は次行 |
+| 性能・厳密一致の受入 | [P1 GCP受入（T5・T3c・T6・reset）](p1-perf-2026-10/gcp-accept-20261007/README.md) | 2026-10-07。T5の旧新・thread間一致と0.1%到達5〜8%短縮、T3cの`.sol`区間、T6のgtow_b到達、reset無し比較、profile・allocator・保存時間 |
+| 精度緩和の試作・計測 | [P1 CFR passの精度（f32化）とT8a](p1-perf-2026-10/cfr-precision-20261007/README.md) | 2026-10-07。f32 kernel・norm f32の1 iteration 9〜10%短縮と0.1%到達、深い目標の曲線、thread間一致。bit一致T8a候補の不採用。PF5・PF6の根拠 |
+| 性能・一致の受入 | [P1 GCP受入（T9 f32既定・T10 regret解放）](p1-perf-2026-10/accept-t9-t10-20261007/README.md) | 2026-10-07。`"f64"`の旧版bit一致、f32既定の0.1%到達10〜20%短縮、T10の出力一致と保存peak、gtow_aを64 GB機で0.1%まで、thread scaling・profile |
+| 収束の計測・試作 | [P1 DCFR係数の掃引とPDCFR+](p1-perf-2026-10/dcfr-pdcfr-20261007/README.md) | 2026-10-07。DCFR係数の掃引と10の木・3 storageでの確認（PF7の根拠）、旧i16のreset依存（PF8の根拠）、PDCFR+試作（T11）の不採用 |
+| 収束の模擬 | [P1 目標到達の評価間隔](p1-perf-2026-10/adaptive-check-20261008/README.md) | 2026-10-08。保持した131本の収束曲線で適応的な評価間隔を模擬（0.1%までの費用 平均0.957倍・最悪1.004倍）。PF10の根拠 |
+| 性能・一致の受入 | [P1 GCP受入（T14 保存並行・T15 適応評価・T16 prefault）](p1-perf-2026-10/accept-t14-t16-20261008/README.md) | 2026-10-08。gtow_bのprocess全体625.6→572.0秒（最後のcheckpoint無しで496.0秒）、auto評価で停止まで3%短縮、確保直後の3 iteration 10.7→3.7秒、`.sol`生成中のprofile |
+| 不採用の試作・計測 | [P1 f32終端kernelの依存chain短縮（T17）と相手reachの0の割合](p1-perf-2026-10/f32-kernel-ilp-20261008/README.md) | 2026-10-08。1・16 threadsで約5%速いが32 threads（SMT）で2〜3%遅く不採用。評価された終端でも相手handの64〜86%はreach 0。T18の根拠 |
+| 不採用の試作・計測 | [P1 f32終端kernelで相手reachの0を飛ばす（T18）](p1-perf-2026-10/f32-sparse-reach-20261008/README.md) | 2026-10-08。従来のf32とbit一致。kernel単体0.74〜0.79倍、1・16 threadsで約6%速いが、32 threadsの0.1%到達は0.99〜1.06倍で不採用 |
+| 性能・一致の受入 | [P1 `.sol`の値block符号化（T19）](p1-perf-2026-10/sol-encode-20261008/README.md) | 2026-10-08。保存の律速は書き手threadの1 byteずつのserialize。EV workerで一括符号化し、tmpfsで停止後の保存20.7→13.8秒、payloadはbit一致 |
+| 性能の計測（使い捨ての診断build） | [P1 32 threadsでの1 iterationの内訳](p1-perf-2026-10/smt-breakdown-20261008/README.md) | 2026-10-08。memory帯域は律速でない。終端kernelが約半分、32 threadsではその半分以上が自身のhandのloop。戦略和の加算は約4%。T20の根拠 |
+| 性能・精度・一致の受入 | [P1 f32終端kernelの自身handのloopとfold・showdownの融合（T20）](p1-perf-2026-10/terminal-own-hands-20261008/README.md) | 2026-10-08。32 threadsの1 iterationが8〜9%短く、目標到達は4本の木で0.93〜0.98倍。効いたのは融合で、showdownのloop単独は32 threadsで差なし。f64はbit一致 |
+| 性能・一致の受入 | [P1 CFR passのhandごとのloopのvector化（T22）](p1-perf-2026-10/cfr-loops-20261008/README.md) | 2026-10-08。T20後のprofileで`cfr_pass`の45%が境界検査付きのscalar loop。`zip`で書き直し、32 threadsの1 iterationが0.75〜0.82倍、目標到達0.75〜0.85倍、評価0.92倍。出力はbit一致 |
+| 性能・精度・一致の受入 | [P1 相手nodeの終端の子をnodeの値へ直接加える（T21）](p1-perf-2026-10/opponent-terminals-20261008/README.md) | 2026-10-08。T22の上で32 threadsの1 iterationが0.93倍前後、目標到達は大きい3本の木で0.89〜0.94倍。f64はbit一致、f32の相対誤差は最大9.3e-7 |
+| 性能・一致の受入 | [P1 全要素を上書きするscratch bufferの0埋めを省く（T23）](p1-perf-2026-10/scratch-overwrite-20261008/README.md) | 2026-10-08。CFR passで読む前に全要素を書くbufferの0埋め（memset）をやめ、32 threadsの1 iterationと目標到達が0.978〜0.983倍。出力はbit一致。T23後のprofileも記録 |
+| 不採用の試作・計測 | [P1 combo順の密配置でf32の包除和とfold kernelをvector化する（T24）](p1-perf-2026-10/dense-compat-20261008/README.md) | 2026-10-08。kernel単体は全supportのrangeで0.52〜0.89倍だが、実際の木で32 threadsの1 iterationが1.12〜1.14倍、目標到達1.14〜1.16倍に遅く不採用。kernel benchは実際のrangeでも測る |
+| 性能・一致の受入 | [P1 chanceの無い部分木の終端を8 laneでまとめて評価する（T25）](p1-perf-2026-10/lane-batch-20261008/README.md) | 2026-10-08。f32のCFR passで、river部分木の終端を同じboardごとに最大8個まとめて1回のsweepで評価し、32 threadsの1 iterationが0.82〜0.84倍、目標到達が0.81〜0.90倍。f64はbit一致。T25後のprofileも記録 |
+| 性能・一致の受入 | [P1 lane batchの出力の写しを速くし、riverのfoldを専用のlane kernelへ分ける（T26）](p1-perf-2026-10/lane-fold-20261008/README.md) | 2026-10-08。lane値を出力行へ8 handずつ写し、riverのfoldを順位sweepの無いlane kernelで評価する。32 threadsの1 iterationが0.93〜0.94倍、目標到達が0.89〜0.96倍。f64はbit一致 |
 | S4の判断材料 | [P2方式の再設計](p2-method-2026-10/README.md) | 暫定方式のseed間の差（2026-10-06）と、その解の場所・hash。L0の表と評価器の検証、暫定方式の解のseat別利得と`NashConv`（S4-1b以降の比較の基準）。L0と入力のゲームの差（seatの値の誤差と、L0の最適応答が入力のゲームで得る利得）。入力のゲームでのclass単位の`NashConv`の下限と上振れした推定。trunkのDCFR solverのB1の結果、B3の1 iterationの時間、B3の解の入力のゲームでの`NashConv` |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
@@ -15,7 +42,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 [9月Multiwayの詳細索引](multiway-2026-09/README.md)は当時の測定を調べ直す場合だけ使う。
 各報告の「次」「active」「完了」は実験当時の記述であり、現在の開発優先順位や実行許可を示さない。
 
-保持する実験の設定は削除済みの旧形式（`solvers.multiway-preflop/v1`、`solvers.postflop/v1`）で書かれている。
+過去の参照比較・Multiway評価の設定は削除済みの旧形式（`solvers.multiway-preflop/v1`、`solvers.postflop/v1`）で書かれている。
 現行CLIは`solvers.nlh/v1`だけを読み、これらを`NLH001`で拒否する。旧成果物の照会・再開もできない。
 再実行は各manifestのsource revision、またはtag `archive/pre-two-products-2026-10-04`からbuildしたbinaryで行う。
 新形式への自動変換は無い。現行の条件で測り直す場合は、共通Inputで設定を書き直し、別の実験として記録する。

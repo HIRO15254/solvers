@@ -1,0 +1,105 @@
+## <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings
+
+Sorted summary for file /home/PC_User/prof_t20ab/release/examples/p1_bench
+----------------------------------------------
+
+   16.24 kernel.rs:246
+   14.48 kernel.rs:234
+   13.40 kernel.rs:134
+   12.52 kernel.rs:244
+    4.32 kernel.rs:236
+    2.91 kernel.rs:0
+    2.90 kernel.rs:146
+    2.20 non_null.rs:1714
+    2.11 kernel.rs:149
+    1.87 kernel.rs:235
+    1.70 kernel.rs:237
+    1.52 macros.rs:180
+    1.37 kernel.rs:162
+    1.32 kernel.rs:135
+    1.31 kernel.rs:132
+    1.09 kernel.rs:145
+    0.75 kernel.rs:247
+    0.69 postflop.rs:462
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (35179 samples, percent: local period)
+## hottest instructions
+   12.97 :   f3f3a:  vmovss %xmm11,0xb0(%rsp,%r10,4) // kernel.rs:234
+   12.65 :   f3ad9:  vmovss %xmm2,0xb0(%rsp,%rax,4)
+   10.19 :   f40ce:  vmovss %xmm10,(%r9,%r8,4)
+    3.45 :   f4097:  vmovss %xmm11,(%r14,%r8,4)
+    3.09 :   f40ca:  vmulss %xmm2,%xmm10,%xmm10 // kernel.rs:246
+    3.02 :   f4080:  mov    0x98(%rsp),%r14
+    2.90 :   f4017:  je     f4040 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x8a0> // kernel.rs:146
+    2.81 :   f406c:  jbe    f4337 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb97> // kernel.rs:244
+    2.54 :   f3f7f:  vmovss %xmm10,0x180(%rsp,%r10,4)
+    2.11 :   f4028:  movzbl %r9b,%r10d // kernel.rs:149
+    2.09 :   f409d:  cmp    %r8,0x10(%rsp) // kernel.rs:246
+    1.78 :   f3f75:  vaddss 0x180(%rsp,%r10,4),%xmm11,%xmm10 // kernel.rs:236
+    1.77 :   f407c:  vmulss %xmm1,%xmm10,%xmm11
+    1.61 :   f3afd:  add    $0x4,%rsi // non_null.rs:1714
+    1.52 :   f3b0d:  jne    f3ab0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x310> // macros.rs:180
+    1.47 :   f4092:  vaddss %xmm12,%xmm11,%xmm11
+    1.35 :   f3f29:  mov    %r9d,%r14d // kernel.rs:0
+    1.14 :   f3f6b:  vmovss %xmm10,0xb0(%rsp,%r9,1) // kernel.rs:235
+    1.09 :   f4010:  cmp    $0xffff,%r10 // kernel.rs:145
+    1.08 :   f3f89:  vaddss 0x180(%rsp,%r9,1),%xmm11,%xmm10 // kernel.rs:237
+    0.99 :   f3f14:  movzbl %r9b,%r10d // kernel.rs:0
+    0.90 :   f3f1d:  jae    f42c3 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb23>
+    0.87 :   f40a2:  jbe    f431f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb7f>
+    0.75 :   f40c0:  mov    0x70(%rsp),%r9 // kernel.rs:247
+    0.75 :   f3ad0:  vaddss 0xb0(%rsp,%rax,4),%xmm1,%xmm2 // kernel.rs:134
+    0.74 :   f3e0c:  vmovss %xmm10,0x180(%rsp,%r9,4)
+    0.73 :   f3f44:  cmp    $0x3400,%r14w // kernel.rs:235
+    0.71 :   f3ab6:  jbe    f43d2 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xc32>
+    0.69 :   f3ae2:  movzbl 0x3(%rsi),%edi // kernel.rs:135
+    0.69 :   f38b8:  jne    f3890 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xf0> // postflop.rs:462
+    0.63 :   f3ae6:  cmp    $0x34,%rdi
+    0.62 :   f3f93:  vmovss %xmm10,0x180(%rsp,%r9,1)
+    0.62 :   f3e02:  vaddss 0x180(%rsp,%r9,4),%xmm9,%xmm10 // kernel.rs:162
+    0.61 :   f3f18:  cmp    $0x34,%r10w // kernel.rs:234
+    0.60 :   f3ab3:  cmp    %rdi,%rbx // kernel.rs:132
+    0.59 :   f3f9d:  cmp    %rbp,%r8 // non_null.rs:1714
+    0.57 :   f3f58:  vaddss %xmm10,%xmm9,%xmm9 // kernel.rs:0
+    0.48 :   f3f2c:  shr    $0x8,%r9d
+    0.43 :   f3d6a:  mov    0x88(%rsp),%r14
+    0.42 :   f3b0a:  cmp    %rdx,%rsi
+    0.41 :   f413e:  vaddps 0x1c0(%rsp),%ymm10,%ymm10
+    0.41 :   f3e82:  vmovups %ymm8,0x150(%rsp)
+    0.41 :   f3870:  je     f3840 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xa0>
+    0.38 :   f3eb8:  cmp    %rdi,%rsi
+    0.37 :   f4101:  mov    %rsi,%rdi
+    0.33 :   f40d4:  cmp    %r11,%rbp
+    0.33 :   f3af4:  vaddss 0xb0(%rsp,%rdi,4),%xmm1,%xmm1
+    0.32 :   f401c:  jbe    f437f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xbdf>
+    0.32 :   f3f05:  cmp    %r11,%rbx
+    0.32 :   f3ac4:  jae    f43a5 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xc05>
+    0.28 :   f4162:  vmovups %ymm11,0x1e0(%rsp)
+    0.27 :   f4186:  vmovups %ymm10,0x200(%rsp)
+    0.27 :   f3ff5:  cmp    %r8,%rdx
+    0.25 :   f4072:  vsubss 0x180(%rsp,%r10,4),%xmm3,%xmm12
+    0.25 :   f3f4a:  jae    f42db <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb3b>
+    0.24 :   f3fab:  mov    0x40(%rsp),%r10
+    0.24 :   f3e32:  add    $0x4,%r8
+    0.23 :   f3f08:  jbe    f42f3 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb53>
+    0.22 :   f3ed7:  mov    %rbp,0x28(%rsp)
+    0.22 :   f3eaf:  vmovups %ymm8,0xb0(%rsp)
+    0.22 :   f3ea6:  vmovups %ymm8,0xd0(%rsp)
+    0.22 :   f3e9d:  vmovups %ymm8,0xf0(%rsp)
+    0.21 :   f3d84:  mov    0x30(%rsp),%rdx
+    0.20 :   f41b3:  jmp    f3d40 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x5a0>
+    0.20 :   f4174:  vaddps 0x200(%rsp),%ymm10,%ymm10
+    0.20 :   f3edc:  vxorps %xmm9,%xmm9,%xmm9
+    0.19 :   f412c:  vmovups %ymm11,0x1a0(%rsp)
+    0.18 :   f4198:  vmovups %ymm11,0x220(%rsp)
+    0.18 :   f3f54:  vmulss %xmm5,%xmm10,%xmm11
+    0.17 :   f40b2:  add    $0x4,%rbp
+    0.17 :   f3e66:  mov    $0x1,%r8b
+    0.17 :   f3e58:  mov    %rdi,%rsi
+    0.17 :   f3dbd:  cmp    %rdi,%rsi
+    0.16 :   f3fbe:  ja     f4247 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xaa7>
+    0.16 :   f3e8b:  vmovups %ymm8,0x130(%rsp)
+    0.16 :   f3e62:  mov    0x8(%rsi),%rsi
+    0.15 :   f3daf:  cmp    %r10w,%r8w
+    0.14 :   f4061:  jae    f434f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xbaf>
+    0.14 :   f3fe7:  nopw   0x0(%rax,%rax,1)
+    0.14 :   f3e94:  vmovups %ymm8,0x110(%rsp)

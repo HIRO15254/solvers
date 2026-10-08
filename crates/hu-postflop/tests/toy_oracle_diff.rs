@@ -48,7 +48,18 @@ fn solve_toy(
     Solver<hu_postflop::game::ToyEvaluator, F32Storage>,
 ) {
     let info = toy.node_info.clone();
-    let mut solver = Solver::<_, F32Storage>::new(toy.game, Box::<Dcfr>::default(), Some(iters));
+    // Preserve the legacy coefficients and resets used by this frozen-oracle comparison.
+    let mut solver = Solver::<_, F32Storage>::new(
+        toy.game,
+        Box::new(Dcfr {
+            alpha: 1.5,
+            beta: 0.0,
+            gamma: 3.0,
+            pow4_reset: true,
+        }),
+        Some(iters),
+    );
+    solver.set_cfr_precision(hu_postflop::CfrPrecision::F64);
     solver.run(iters);
     (info, solver)
 }

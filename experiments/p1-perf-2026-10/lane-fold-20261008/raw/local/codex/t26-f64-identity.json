@@ -1,0 +1,96 @@
+{
+  "baseline": "T25: saved runs/t25b/f64-new artifacts (also byte-equal to b01d4a4)",
+  "all_equal": true,
+  "files": [
+    {
+      "name": "F32Storage-1-payload.bin",
+      "bytes": 301670,
+      "sha256": "2d8aa1bfb35ba99219c22dddc318ef87d6988b961b570d1985c591529643507e"
+    },
+    {
+      "name": "F32Storage-1-progress.bin",
+      "bytes": 99,
+      "sha256": "8294d4665b0bcf915abec44956a14d0f58cbffb5b135267e6e67be2e96185032"
+    },
+    {
+      "name": "F32Storage-1-state.bin",
+      "bytes": 598976,
+      "sha256": "c92c6c948d20b262bfa7abeafa746c5e18abab0b48d9d3434cd8445eec076c25"
+    },
+    {
+      "name": "F32Storage-4-payload.bin",
+      "bytes": 301670,
+      "sha256": "2d8aa1bfb35ba99219c22dddc318ef87d6988b961b570d1985c591529643507e"
+    },
+    {
+      "name": "F32Storage-4-progress.bin",
+      "bytes": 99,
+      "sha256": "8294d4665b0bcf915abec44956a14d0f58cbffb5b135267e6e67be2e96185032"
+    },
+    {
+      "name": "F32Storage-4-state.bin",
+      "bytes": 598976,
+      "sha256": "c92c6c948d20b262bfa7abeafa746c5e18abab0b48d9d3434cd8445eec076c25"
+    },
+    {
+      "name": "I16Storage-1-payload.bin",
+      "bytes": 301670,
+      "sha256": "cd57d1dd04c9d715e98cc8d5e29d5be9d7589eb59252e1eee48448b25469144d"
+    },
+    {
+      "name": "I16Storage-1-progress.bin",
+      "bytes": 99,
+      "sha256": "140d353bef2cbab95212928500fcd11a2bd756e15f11be6615f78ba5b5238bbc"
+    },
+    {
+      "name": "I16Storage-1-state.bin",
+      "bytes": 301056,
+      "sha256": "4c5e6041172c7e5de011be79e04019c008babb604a0dc7be28e9dca81655dfa8"
+    },
+    {
+      "name": "I16Storage-4-payload.bin",
+      "bytes": 301670,
+      "sha256": "cd57d1dd04c9d715e98cc8d5e29d5be9d7589eb59252e1eee48448b25469144d"
+    },
+    {
+      "name": "I16Storage-4-progress.bin",
+      "bytes": 99,
+      "sha256": "140d353bef2cbab95212928500fcd11a2bd756e15f11be6615f78ba5b5238bbc"
+    },
+    {
+      "name": "I16Storage-4-state.bin",
+      "bytes": 301056,
+      "sha256": "4c5e6041172c7e5de011be79e04019c008babb604a0dc7be28e9dca81655dfa8"
+    },
+    {
+      "name": "MixedStorage-1-payload.bin",
+      "bytes": 301672,
+      "sha256": "ec41495f6d6d190ac77232887723602951f3c05c52ca565b482cf08c0e5c27a2"
+    },
+    {
+      "name": "MixedStorage-1-progress.bin",
+      "bytes": 99,
+      "sha256": "837faf1241d37dfd94701ddfa0c9f0428c7abd74d349e05ecd1bd8bacd5901b1"
+    },
+    {
+      "name": "MixedStorage-1-state.bin",
+      "bytes": 450016,
+      "sha256": "f2329ddade360e84b4fa3c510b35f056c7c33f1f6298077aee16c769b7a194e8"
+    },
+    {
+      "name": "MixedStorage-4-payload.bin",
+      "bytes": 301672,
+      "sha256": "ec41495f6d6d190ac77232887723602951f3c05c52ca565b482cf08c0e5c27a2"
+    },
+    {
+      "name": "MixedStorage-4-progress.bin",
+      "bytes": 99,
+      "sha256": "837faf1241d37dfd94701ddfa0c9f0428c7abd74d349e05ecd1bd8bacd5901b1"
+    },
+    {
+      "name": "MixedStorage-4-state.bin",
+      "bytes": 450016,
+      "sha256": "f2329ddade360e84b4fa3c510b35f056c7c33f1f6298077aee16c769b7a194e8"
+    }
+  ]
+}

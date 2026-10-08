@@ -1,0 +1,194 @@
+{
+  "work_item": "P1-T5 / T5b / SOL-15",
+  "status": "local_t5b_checks_verified_gcp_acceptance_pending",
+  "source": {
+    "base_commit": "bedfb89636e6027603c703ca3776e20c05c7dea6",
+    "branch": "s3-p1-prune",
+    "dirty": true,
+    "modified_files": [
+      {
+        "path": "crates/hu-engine/src/solver.rs",
+        "sha256_lf": "c323cf3223cac4b6b62c3f5b50357c68995456306abcd8f89e71f5d237d41368",
+        "lf_bytes": 58298,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-engine/src/solver/dead_subtree_tests.rs",
+        "sha256_lf": "45f0c4957364c3bd5f9acd4fa4e50f3f37f0ad3e07294337f754592950781ba6",
+        "lf_bytes": 13613,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-engine/tests/vector_determinism.rs",
+        "sha256_lf": "1d6593521377b21b728cfeec8395b51c3cc3882f2c374f8cf2e0a5e934df39de",
+        "lf_bytes": 14387,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-postflop/examples/p1_bench.rs",
+        "sha256_lf": "adfcb8b987554f79fbba6f573da14a81daed6ac8efcaae033bb9bb9fc34635f4",
+        "lf_bytes": 9615,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-postflop/examples/verify_save.rs",
+        "sha256_lf": "e21f5fa0b7e01c5509b5f1255dd6d8c48097b4860bd38a67c8a54d717390d5c8",
+        "lf_bytes": 16684,
+        "contains_crlf": false
+      },
+      {
+        "path": "docs/architecture.md",
+        "sha256_lf": "a4b598261c83125d999906dd6c562155985639c46d6ea6b147520e8c52f8acbf",
+        "lf_bytes": 20710,
+        "contains_crlf": false
+      },
+      {
+        "path": "experiments/README.md",
+        "sha256_lf": "d01ec5091e602b577271080aa740a723d43d3935b36761e7f1fa0b58d5237126",
+        "lf_bytes": 4684,
+        "contains_crlf": false
+      }
+    ],
+    "source_availability": "current T5b changes remain uncommitted in this worktree; prior T5 source hashes are historical identifiers, not current files; archived HEAD source remains under ignored runs/dead-subtree-20261007/old-source",
+    "cargo_lock": {
+      "path": "Cargo.lock",
+      "sha256_lf": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+      "lf_bytes": 40857,
+      "contains_crlf": false
+    },
+    "build_config": {
+      "path": ".cargo/config.toml",
+      "sha256_lf": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "lf_bytes": 125,
+      "contains_crlf": false
+    }
+  },
+  "files": [
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/flop1_f32.toml",
+      "sha256_lf": "4a086fa40206e04189b8dbd53ee549d5abb457825db913788ebf1995c43c5523",
+      "lf_bytes": 716,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/flop1_i16.toml",
+      "sha256_lf": "291213dd3b53b00005c2b93c39a6079ec63d7f19e5708a114ddbfc2b68b00bc7",
+      "lf_bytes": 716,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/flop1_measurement.toml",
+      "sha256_lf": "5aa71b8458ff58f462d34d5d739f43ef0f938e0f55a63de64a4f0539dc830efd",
+      "lf_bytes": 717,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/measurement.json",
+      "sha256_lf": "ea906b59a4a286ed48dd2876bf8aea834d5e9523ece6a47ffc1d2a4fd7ded59c",
+      "lf_bytes": 2195,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/README.md",
+      "sha256_lf": "f044ca5e521e81801917ffb767713b93adb815addc2da7d70a79e8f0372476f0",
+      "lf_bytes": 4136,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/turn_f32.toml",
+      "sha256_lf": "c7450ccf6f74e685596ef556d800adf6151d6ee5e7afa3813011ddf7cb57d259",
+      "lf_bytes": 673,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/turn_i16.toml",
+      "sha256_lf": "13ae3bac1525fc1b87e1cbf331d18e88a39ff79722e41444def10ed51f1a1dbc",
+      "lf_bytes": 673,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/turn_measurement.toml",
+      "sha256_lf": "c7450ccf6f74e685596ef556d800adf6151d6ee5e7afa3813011ddf7cb57d259",
+      "lf_bytes": 673,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/validation-t5b.json",
+      "sha256_lf": "efdb4b8059259607c937e79e2055699f6da4b46a2115a6c163b5581c33d005b5",
+      "lf_bytes": 3903,
+      "contains_crlf": false
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/dead-subtree-20261007/validation.json",
+      "sha256_lf": "fa98e74ba116fdc1746e72cc9adc87017becbf59726e0f94854423a3ef9f0891",
+      "lf_bytes": 11269,
+      "contains_crlf": false
+    }
+  ],
+  "hash_policy": "text files hashed after CRLF -> LF normalization; manifest excludes its own hash; binaries and deleted large artifacts use raw SHA-256 in validation.json",
+  "large_artifacts": "prior T5 artifacts deleted after raw hashes and self-validation; current T5b large old/new acceptance to be performed by user on GCP",
+  "raw_logs": "ignored runs/dead-subtree-20261007; not Git-backed evidence",
+  "previous_t5_source_hashes": {
+    "base_commit": "bedfb89636e6027603c703ca3776e20c05c7dea6",
+    "branch": "s3-p1-prune",
+    "dirty": true,
+    "modified_files": [
+      {
+        "path": "crates/hu-engine/src/solver.rs",
+        "sha256_lf": "73b99ef9d89c5e19dd73e8a0c5584c13abc56337b0354bda0e276d4c8b92e7aa",
+        "lf_bytes": 59171,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-engine/src/solver/dead_subtree_tests.rs",
+        "sha256_lf": "22085c7f726cdc093447c53e26ee454f02e351be66c26255b3ab1411329ca030",
+        "lf_bytes": 8120,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-engine/tests/vector_determinism.rs",
+        "sha256_lf": "1a64b3c16a1c51da8fa71c3e593c2e2537ae9313f5def16ea69b5e6602bcd7d9",
+        "lf_bytes": 13565,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-postflop/examples/p1_bench.rs",
+        "sha256_lf": "adfcb8b987554f79fbba6f573da14a81daed6ac8efcaae033bb9bb9fc34635f4",
+        "lf_bytes": 9615,
+        "contains_crlf": false
+      },
+      {
+        "path": "crates/hu-postflop/examples/verify_save.rs",
+        "sha256_lf": "e21f5fa0b7e01c5509b5f1255dd6d8c48097b4860bd38a67c8a54d717390d5c8",
+        "lf_bytes": 16684,
+        "contains_crlf": false
+      },
+      {
+        "path": "docs/architecture.md",
+        "sha256_lf": "db1228cfa5824d1f93bd65a9e764a74a824ce312bd9f64d653bc69ecd3412e46",
+        "lf_bytes": 20505,
+        "contains_crlf": false
+      },
+      {
+        "path": "experiments/README.md",
+        "sha256_lf": "d01ec5091e602b577271080aa740a723d43d3935b36761e7f1fa0b58d5237126",
+        "lf_bytes": 4684,
+        "contains_crlf": false
+      }
+    ],
+    "source_availability": "modified sources are left in this worktree for user review/commit; no commit or push; base source archived under ignored runs/dead-subtree-20261007/old-source",
+    "cargo_lock": {
+      "path": "Cargo.lock",
+      "sha256_lf": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+      "lf_bytes": 40857,
+      "contains_crlf": false
+    },
+    "build_config": {
+      "path": ".cargo/config.toml",
+      "sha256_lf": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+      "lf_bytes": 125,
+      "contains_crlf": false
+    }
+  },
+  "validation": "validation-t5b.json records current local tests; validation.json describes prior sequential T5 only"
+}

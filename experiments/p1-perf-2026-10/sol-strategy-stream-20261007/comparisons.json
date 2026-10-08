@@ -1,0 +1,701 @@
+{
+  "turn6": {
+    "config_sha256": "b87d166168de0717043104d5fe06c5ccef5122e848033e587fe56cc395749692",
+    "solve": {
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3b\\old-turn6",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 5.011757500000385,
+        "solution_bytes": 33316700,
+        "solution_sha256": "422e17e25ad3a6ec654aaa44adb3263d6244ddbe433b8ae354a37106057df32f"
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3b\\typed-new-turn6",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 6.666179099996953,
+        "solution_bytes": 33316699,
+        "solution_sha256": "0347441a6c071977053e5185695c5252a50b74a36e3f976b8a359b8ac366fb2e"
+      }
+    },
+    "exports": {
+      "root-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 3.1791507999987516,
+          "bytes": 93019,
+          "sha256": "1f138c59df6acdeaf0cd7874069615551a158fa984636c4ad5c145b2ee3e55c7"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 3.0962662999991153,
+          "bytes": 93019,
+          "sha256": "1f138c59df6acdeaf0cd7874069615551a158fa984636c4ad5c145b2ee3e55c7"
+        }
+      },
+      "root-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 3.215451399999438,
+          "bytes": 96196,
+          "sha256": "69ee19e49b3b246c47187d4b775d9e45f2033ce5510d6383fc7fdcf5b78adb77"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 3.0928727999998955,
+          "bytes": 96196,
+          "sha256": "69ee19e49b3b246c47187d4b775d9e45f2033ce5510d6383fc7fdcf5b78adb77"
+        }
+      },
+      "all-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 35.31212310000046,
+          "bytes": 1016295326,
+          "sha256": "7a7add07d71cfdc51d92a914afc134a80d5e5dca8771d312988bee5d55cf332b"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 29.11660579999807,
+          "bytes": 1016295326,
+          "sha256": "7a7add07d71cfdc51d92a914afc134a80d5e5dca8771d312988bee5d55cf332b"
+        }
+      },
+      "all-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 53.86613470000157,
+          "bytes": 1372270694,
+          "sha256": "bfd35b297c33fb7b215288e1e12f208a2d629ed7772ba4bad2d3d7a9df09ea42"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 39.80799079999997,
+          "bytes": 1372270694,
+          "sha256": "bfd35b297c33fb7b215288e1e12f208a2d629ed7772ba4bad2d3d7a9df09ea42"
+        }
+      }
+    },
+    "payload": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3b\\old-turn6\\solution.sol",
+        "runs\\p1-t3b\\typed-new-turn6\\solution.sol"
+      ],
+      "canonical_postcard_streams": true,
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        89137084,
+        89137084
+      ],
+      "strategy_blocks": 20482,
+      "value_blocks": 20482
+    },
+    "bounded_verifier": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3b\\old-turn6\\solution.sol",
+        "runs\\p1-t3b\\typed-new-turn6\\solution.sol"
+      ],
+      "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        89137084,
+        89137084
+      ],
+      "strategy_blocks": 20482,
+      "value_blocks": 20482,
+      "wall_secs": [
+        2.5952346,
+        3.0757395
+      ]
+    }
+  },
+  "river6-i16": {
+    "config_sha256": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1",
+    "solve": {
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3b\\old-river6-i16",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 1.7724519000003056,
+        "solution_bytes": 73017,
+        "solution_sha256": "6b40619b849473c685be027635baeb7ed9dfcea224e73e4bc007c47dd253b0cb"
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3b\\typed-new-river6-i16",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 1.2657175000022107,
+        "solution_bytes": 73017,
+        "solution_sha256": "de83c80d5ba629757fbceda2ccb948f77878f7ad26c7ab67bce291e3850d00e0"
+      }
+    },
+    "exports": {
+      "root-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-river6-i16-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.1778993999978411,
+          "bytes": 85237,
+          "sha256": "c314929f85429113e6a0114b912c74822ef756e6446c63cdf28aeb6893f64812"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-river6-i16-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.13281559999813908,
+          "bytes": 85237,
+          "sha256": "c314929f85429113e6a0114b912c74822ef756e6446c63cdf28aeb6893f64812"
+        }
+      },
+      "root-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-river6-i16-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.17883880000226782,
+          "bytes": 92303,
+          "sha256": "367628e87b5252fff45c3dddfcefc39bab5f410abfb1e4231a0ffa18dc7ca575"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-river6-i16-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.12194240000098944,
+          "bytes": 92303,
+          "sha256": "367628e87b5252fff45c3dddfcefc39bab5f410abfb1e4231a0ffa18dc7ca575"
+        }
+      },
+      "all-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-river6-i16-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.25828120000005583,
+          "bytes": 1984122,
+          "sha256": "f22871aa9e2a4e3ce819b1bae09a32ef3968be268049d418eb1700979f76da3f"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-river6-i16-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.1854337000004307,
+          "bytes": 1984122,
+          "sha256": "f22871aa9e2a4e3ce819b1bae09a32ef3968be268049d418eb1700979f76da3f"
+        }
+      },
+      "all-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-river6-i16-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.31136460000197985,
+          "bytes": 2410453,
+          "sha256": "cb6ae727b9c94fd6c51e29934cf711980a18cb2abf1dc737478b60586fd9eeaa"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-river6-i16-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.29518889999962994,
+          "bytes": 2410453,
+          "sha256": "cb6ae727b9c94fd6c51e29934cf711980a18cb2abf1dc737478b60586fd9eeaa"
+        }
+      }
+    },
+    "payload": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+        "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol"
+      ],
+      "canonical_postcard_streams": true,
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        144771,
+        144771
+      ],
+      "strategy_blocks": 34,
+      "value_blocks": 34
+    },
+    "bounded_verifier": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3b\\old-river6-i16\\solution.sol",
+        "runs\\p1-t3b\\typed-new-river6-i16\\solution.sol"
+      ],
+      "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        144771,
+        144771
+      ],
+      "strategy_blocks": 34,
+      "value_blocks": 34,
+      "wall_secs": [
+        0.0089011,
+        0.0103451
+      ]
+    }
+  },
+  "turn6-no-rivers": {
+    "config_sha256": "9ad3f9a9385c007ff2271928bd47e8ac5a3df320b68be944e563e66898f3e3c9",
+    "solve": {
+      "old": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3b\\old-turn6-no-rivers",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 8.885987500001647,
+        "solution_bytes": 82571,
+        "solution_sha256": "ecd61cac8c9481ffb6b7b86d6fb1f15458c92cf38a907c585c005789b7c246e3"
+      },
+      "new": {
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3b\\typed-new-turn6-no-rivers",
+          "--threads",
+          "8"
+        ],
+        "exit_code": 0,
+        "seconds": 5.096910999996908,
+        "solution_bytes": 82571,
+        "solution_sha256": "074b9979a22fa654cf0b725262872066d4b6b67f7c3f6b92679ad9453ebd50bd"
+      }
+    },
+    "exports": {
+      "root-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-no-rivers-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5749389999982668,
+          "bytes": 93019,
+          "sha256": "1f138c59df6acdeaf0cd7874069615551a158fa984636c4ad5c145b2ee3e55c7"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol",
+            "strategy",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-no-rivers-root-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.540245699998195,
+          "bytes": 93019,
+          "sha256": "1f138c59df6acdeaf0cd7874069615551a158fa984636c4ad5c145b2ee3e55c7"
+        }
+      },
+      "root-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-no-rivers-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.715884900000674,
+          "bytes": 96196,
+          "sha256": "69ee19e49b3b246c47187d4b775d9e45f2033ce5510d6383fc7fdcf5b78adb77"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol",
+            "ev",
+            "--node",
+            "root",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-no-rivers-root-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.34124549999978626,
+          "bytes": 96196,
+          "sha256": "69ee19e49b3b246c47187d4b775d9e45f2033ce5510d6383fc7fdcf5b78adb77"
+        }
+      },
+      "all-strategy": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-no-rivers-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.8774990999991132,
+          "bytes": 2443260,
+          "sha256": "05e9230780114e13e9d702ac2c22d57f6fef33e82a339ebd38487b4d3a5802bf"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol",
+            "strategy",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-no-rivers-all-strategy.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5585504999980913,
+          "bytes": 2443260,
+          "sha256": "05e9230780114e13e9d702ac2c22d57f6fef33e82a339ebd38487b4d3a5802bf"
+        }
+      },
+      "all-ev": {
+        "bit_equal": true,
+        "old": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\export-old-turn6-no-rivers-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7521371000002546,
+          "bytes": 2973818,
+          "sha256": "f4ea4d01751cf102871a725f7967708db3af41e527e38cc913eb8d519e69c496"
+        },
+        "new": {
+          "command": [
+            "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+            "export",
+            "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol",
+            "ev",
+            "--node",
+            "all",
+            "--format",
+            "json",
+            "--output",
+            "runs\\p1-t3b\\typed-export-new-turn6-no-rivers-all-ev.json"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5692509000000427,
+          "bytes": 2973818,
+          "sha256": "f4ea4d01751cf102871a725f7967708db3af41e527e38cc913eb8d519e69c496"
+        }
+      }
+    },
+    "payload": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution",
+        "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+        "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol"
+      ],
+      "canonical_postcard_streams": true,
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        150985,
+        150985
+      ],
+      "strategy_blocks": 34,
+      "value_blocks": 34
+    },
+    "bounded_verifier": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+        "solution-stream",
+        "runs\\p1-t3b\\old-turn6-no-rivers\\solution.sol",
+        "runs\\p1-t3b\\typed-new-turn6-no-rivers\\solution.sol"
+      ],
+      "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+      "file_bytes_equal": false,
+      "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+      "payload_bit_equal_except_wall_secs": true,
+      "payload_bytes": [
+        150985,
+        150985
+      ],
+      "strategy_blocks": 34,
+      "value_blocks": 34,
+      "wall_secs": [
+        5.527569,
+        2.6939717
+      ]
+    }
+  }
+}

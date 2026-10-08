@@ -1,0 +1,34 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "architecture": "AMD64",
+  "physical_ram_bytes": 34275098624,
+  "available_ram_bytes_at_recording": 12558798848,
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)\n",
+  "build_jobs": 2,
+  "rustflags": "-C target-cpu=native; profile.release lto=thin codegen-units=1",
+  "base_commit": "e7a4554bc0a6523028b6d90612d18d2cc0533dce",
+  "binaries": {
+    "target/p1-t3-base/release/solvers.exe": {
+      "sha256": "cfb8c0894486d8821b68d7a11cda805ad6a3a07509ed0c20696921cbf8c89ed7",
+      "bytes": 7377920
+    },
+    "target/release/solvers.exe": {
+      "sha256": "92d658cb262222512cf4187a2cb9a3768fc79df24592b985a0207f575d50413d",
+      "bytes": 7387136
+    },
+    "target/p1-t3-base/release/examples/verify_save.exe": {
+      "sha256": "c760eda153f96c89c60e4dac90cb872605484d14cdb874f645db02c7ede0ebd4",
+      "bytes": 458240
+    },
+    "target/release/examples/verify_save.exe": {
+      "sha256": "69c2e05e3500a940de20c0728469360a2bb82abbb79619d2db704cddcefe609f",
+      "bytes": 913408
+    }
+  },
+  "base_archive_sha256": "4e76260168f0b2c705164a4c7ccbf8a70c326ffb9fc51a90bad473f9ecdd8c0f",
+  "base_archive_availability": "Archive removed; regenerate with git archive e7a4554bc0a6523028b6d90612d18d2cc0533dce",
+  "baseline_source_copy": "base-source/ remains because automated approval review rejected deletion (blocked by policy)",
+  "working_tree_base_commit": "9c6f2490b19e72d98f2cf7cdd9c5e39df604a999",
+  "head_movement": "Concurrent experiments-only commit; no crates changed; preserved. No commit/push/branch operation performed by this task."
+}

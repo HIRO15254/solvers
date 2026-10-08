@@ -50,7 +50,7 @@ pub fn run(
             checkpoint_interval,
         );
     }
-    let payload = hu_postflop::checkpoint::read_checkpoint(&checkpoint)
+    let payload = hu_postflop::checkpoint::CheckpointReader::open(&checkpoint)
         .with_context(|| format!("reading {}", checkpoint.display()))?;
     let embedded = payload.config_toml.as_deref().ok_or_else(||
         anyhow!("removed config family solvers.postflop/v1 checkpoint; re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"))?;
@@ -112,6 +112,19 @@ fn resolve_checkpoint(path: &Path) -> Result<std::path::PathBuf> {
             return Ok(checkpoint);
         }
     }
+    let omitted = std::fs::read_to_string(path.join(runfiles::RUN_CONFIG_FILE))
+        .ok()
+        .and_then(|raw| spot::Document::parse(&raw, &path.join(runfiles::RUN_CONFIG_FILE)).ok())
+        .is_some_and(|document| {
+            document.spot.product == spot::Product::HuPostflop
+                && !document.spot.run.final_checkpoint
+        });
+    if omitted {
+        return Err(anyhow!(
+            "run directory {} has no checkpoint; no resumable state was saved (final_checkpoint = false may omit it); re-solve from run.toml",
+            path.display()
+        ));
+    }
     Err(anyhow!(
         "run directory {} has no checkpoint; it never reached its first one",
         path.display()
@@ -131,6 +144,25 @@ mod tests {
             .unwrap_err()
             .to_string();
         assert!(error.contains("never reached its first one"), "{error}");
+    }
+
+    #[test]
+    fn missing_p2_checkpoint_keeps_the_existing_diagnostic() {
+        let directory = tempfile::tempdir().unwrap();
+        std::fs::write(
+            directory.path().join(runfiles::RUN_CONFIG_FILE),
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack_bb = 100\n",
+        )
+        .unwrap();
+        assert_eq!(
+            resolve_checkpoint(directory.path())
+                .unwrap_err()
+                .to_string(),
+            format!(
+                "run directory {} has no checkpoint; it never reached its first one",
+                directory.path().display()
+            )
+        );
     }
 
     /// A checkpoint file that was moved out of its run directory is still

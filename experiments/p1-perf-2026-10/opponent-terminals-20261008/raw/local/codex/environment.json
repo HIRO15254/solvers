@@ -1,0 +1,19 @@
+{
+  "cpu": "Intel Core i7-10700KF @ 3.80GHz",
+  "logical_processors": 16,
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6\n",
+  "flags": [
+    "-C",
+    "target-cpu=native"
+  ],
+  "profile": {
+    "bench": {
+      "lto": "thin",
+      "codegen-units": 1
+    }
+  },
+  "CARGO_INCREMENTAL": 0,
+  "initial_CARGO_BUILD_JOBS": 2,
+  "retry_CARGO_BUILD_JOBS": 1,
+  "memory_failure_log": "clippy-memory-failure.log"
+}

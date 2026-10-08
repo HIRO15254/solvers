@@ -1,5 +1,7 @@
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::input::{Algorithm, P1Sections, Settings, SolutionStreets, Storage, lower};
+use hu_postflop::input::{
+    Algorithm, CheckEvery, P1Sections, Settings, SolutionStreets, Storage, lower,
+};
 use hu_postflop::{
     PostflopConfig, PostflopGame, StreetTree, TreeBuildError, build_postflop_game, memory_usage,
     try_build_postflop_game, try_memory_usage,
@@ -61,32 +63,35 @@ fn sections_defaults_order_and_idempotence() {
     let s = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
     assert!(s.solver.iso_merging);
     assert_eq!(s.solver.storage, Storage::F32);
+    assert_eq!(s.solver.cfr_precision, hu_postflop::CfrPrecision::F32);
     assert_eq!(s.output.solution_streets, SolutionStreets::Full);
     assert_eq!(s.solver.stop.max_iterations, 1_000_000);
-    assert_eq!(s.solver.stop.check_every, 25);
+    assert_eq!(s.solver.stop.check_every, CheckEvery::Auto);
     assert_eq!(s.solver.stop.target, None);
     assert_eq!(s.solver.parallel.chance_depth, 2);
     assert_eq!(s.solver.parallel.min_children, 12);
     assert_eq!(
         s.solver.algorithm,
         Algorithm::Dcfr {
-            alpha: 1.5,
-            beta: 0.0,
-            gamma: 3.0,
-            pow4_reset: true
+            alpha: 1.25,
+            beta: 0.5,
+            gamma: 4.0,
+            pow4_reset: false
         }
     );
     let effective = doc.normalize(&P1Sections).unwrap();
+    assert!(effective.contains("check_every = \"auto\""));
     assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
     let keys = [
         "iso_merging =",
         "storage =",
+        "cfr_precision =",
         "[solver.algorithm]",
         "schedule =",
         "alpha =",
         "beta =",
         "gamma =",
-        "pow4_reset =",
+        "pow4_reset = false",
         "[solver.stop]",
         "max_iterations =",
         "check_every =",
@@ -105,6 +110,304 @@ fn sections_defaults_order_and_idempotence() {
         })
         .collect();
     assert!(offsets.windows(2).all(|w| w[0] < w[1]), "{effective}");
+}
+
+#[test]
+fn evaluation_cadence_literals_normalize_idempotently() {
+    for (literal, expected) in [
+        ("\"auto\"", CheckEvery::Auto),
+        ("1", CheckEvery::Fixed(1)),
+        ("25", CheckEvery::Fixed(25)),
+        ("9223372036854775807", CheckEvery::Fixed(i64::MAX as u64)),
+    ] {
+        let doc = parse(&format!(
+            "{}\n[solver.stop]\ncheck_every = {literal}\n",
+            standard("")
+        ));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        assert_eq!(settings.solver.stop.check_every, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(effective.contains(&format!("check_every = {literal}")));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let decoded: hu_postflop::input::Solver =
+            effective.parse::<toml::Table>().unwrap()["solver"]
+                .clone()
+                .try_into()
+                .unwrap();
+        assert_eq!(decoded.stop.check_every, expected);
+    }
+}
+
+#[test]
+fn evaluation_cadence_rejects_invalid_literals_with_contract_error_codes() {
+    for (literal, code) in [
+        ("\"AUTO\"", Code::NLH002),
+        ("\"25\"", Code::NLH002),
+        ("\"fixed\"", Code::NLH002),
+        ("1.0", Code::NLH002),
+        ("true", Code::NLH002),
+        ("[]", Code::NLH002),
+        ("{}", Code::NLH002),
+        ("0", Code::NLH003),
+        ("-1", Code::NLH003),
+    ] {
+        let doc = parse(&format!(
+            "{}\n[solver.stop]\ncheck_every = {literal}\n",
+            standard("")
+        ));
+        let error = doc.normalize(&P1Sections).unwrap_err();
+        assert_eq!(error.code, code, "{literal}: {error}");
+        assert_eq!(error.key.as_deref(), Some("solver.stop.check_every"));
+    }
+}
+
+#[test]
+fn cfr_precision_contract_and_legacy_checkpoint() {
+    use hu_postflop::{CfrPrecision, checkpoint, prepare};
+    let base = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d 3c 8d",
+        "river { replace bet [50] }",
+    );
+    for (section, precision) in [
+        ("", CfrPrecision::F32),
+        ("[solver]\ncfr_precision='f32'", CfrPrecision::F32),
+        ("[solver]\ncfr_precision='f64'", CfrPrecision::F64),
+    ] {
+        let raw = format!("{base}\n{section}");
+        let p = prepare::prepare(&raw, Path::new("input.toml")).unwrap();
+        assert_eq!(p.settings.solver.cfr_precision, precision);
+        assert!(
+            p.effective
+                .contains(&format!("cfr_precision = \"{}\"", precision.name()))
+        );
+        let f32 = p
+            .effective
+            .replace("cfr_precision = \"f64\"", "cfr_precision = \"f32\"");
+        assert_eq!(
+            prepare::compatibility_hash(&p.effective).unwrap(),
+            prepare::compatibility_hash(&f32).unwrap()
+        );
+    }
+    for (value, code) in [
+        ("'exact'", Code::NLH003),
+        ("32", Code::NLH002),
+        ("true", Code::NLH002),
+        ("[]", Code::NLH002),
+    ] {
+        let doc = parse(&format!("{base}\n[solver]\ncfr_precision={value}"));
+        let error = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap_err();
+        assert_eq!(error.code, code);
+        assert!(error.to_string().contains("solver.cfr_precision"));
+    }
+    // Recreate a legacy checkpoint identity using an effective config with no key.
+    let p = prepare::prepare(&base, Path::new("input.toml")).unwrap();
+    let legacy = p.effective.replace("cfr_precision = \"f32\"\n", "");
+    assert_eq!(
+        prepare::compatibility_hash(&legacy).unwrap(),
+        prepare::compatibility_hash(&p.effective).unwrap()
+    );
+    let built = try_build_postflop_game(&p.config, p.payoff.pipeline()).unwrap();
+    let mut old = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        built.game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(20),
+    );
+    old.run(12);
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("checkpoint.ckpt");
+    checkpoint::write_storage_with_config(
+        &path,
+        prepare::compatibility_hash(&legacy).unwrap(),
+        12,
+        old.storage(),
+        &legacy,
+        0.0,
+        1,
+    )
+    .unwrap();
+    let restored = prepare::restore(&legacy, &path).unwrap();
+    assert_eq!(restored.state.iteration, 12);
+    let prepared = prepare::prepare(&legacy, Path::new("run.toml")).unwrap();
+    assert_eq!(prepared.settings.solver.cfr_precision, CfrPrecision::F32);
+    let built = try_build_postflop_game(&prepared.config, prepared.payoff.pipeline()).unwrap();
+    let game = built.game;
+    let mut solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(20),
+    );
+    solver.set_cfr_precision(prepared.settings.solver.cfr_precision);
+    solver
+        .restore_stream(12, |s| restored.state.read_storage(s))
+        .unwrap();
+    solver.run(8);
+    assert_eq!(solver.iteration(), 20);
+}
+
+#[test]
+fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
+    for (section, reset) in [
+        ("", false),
+        ("[solver]\nstorage = 'i16'", true),
+        ("[solver]\nstorage = 'f32'", false),
+        ("[solver]\nstorage = 'i16-f32avg'", false),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\nschedule = 'dcfr'",
+            true,
+        ),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\nalpha = 1.5",
+            true,
+        ),
+        (
+            "[solver]\nstorage = 'i16-f32avg'\n[solver.algorithm]\nschedule = 'dcfr'",
+            false,
+        ),
+        (
+            "[solver]\nstorage = 'i16'\n[solver.algorithm]\npow4_reset = false",
+            false,
+        ),
+        (
+            "[solver]\nstorage = 'f32'\n[solver.algorithm]\npow4_reset = true",
+            true,
+        ),
+        ("[solver.algorithm]\nschedule = 'dcfr'", false),
+        ("[solver.algorithm]\npow4_reset = true", true),
+        (
+            "[solver.algorithm]\nschedule = 'dcfr'\npow4_reset = false",
+            false,
+        ),
+    ] {
+        let doc = parse(&format!("{}\n{section}", standard("")));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        let expected = Algorithm::Dcfr {
+            alpha: if section.contains("alpha = 1.5") {
+                1.5
+            } else {
+                1.25
+            },
+            beta: 0.5,
+            gamma: 4.0,
+            pow4_reset: reset,
+        };
+        assert_eq!(settings.solver.algorithm, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(effective.contains(&format!("pow4_reset = {reset}")));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let restored = parse(&effective);
+        assert_eq!(
+            Settings::parse(&restored.spot, &restored.solver, &restored.output)
+                .unwrap()
+                .solver
+                .algorithm,
+            expected
+        );
+        let schedule = hu_postflop::run::schedule(&settings.solver.algorithm);
+        for t in [4, 16, 64] {
+            assert_eq!(schedule.at(t, Some(64)).reset_avg, reset);
+        }
+    }
+    for (raw, reset) in [
+        ("schedule = 'dcfr'", false),
+        ("schedule = 'dcfr'\npow4_reset = true", true),
+        ("schedule = 'dcfr'\npow4_reset = false", false),
+    ] {
+        let algorithm: Algorithm = toml::from_str(raw).unwrap();
+        assert_eq!(
+            algorithm,
+            Algorithm::Dcfr {
+                alpha: 1.25,
+                beta: 0.5,
+                gamma: 4.0,
+                pow4_reset: reset,
+            }
+        );
+    }
+}
+
+#[test]
+fn i16_other_schedules_do_not_gain_dcfr_defaults() {
+    for schedule in ["vanilla", "cfr-plus", "linear-cfr", "hs-dcfr"] {
+        let doc = parse(&format!(
+            "{}\n[solver]\nstorage = 'i16'\n[solver.algorithm]\nschedule = '{schedule}'",
+            standard("")
+        ));
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert!(!effective.contains("pow4_reset"));
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+    }
+}
+
+#[test]
+fn dcfr_coefficients_defaults_and_explicit_values_survive_all_input_paths() {
+    assert_eq!(
+        Algorithm::default(),
+        Algorithm::Dcfr {
+            alpha: 1.25,
+            beta: 0.5,
+            gamma: 4.0,
+            pow4_reset: false,
+        }
+    );
+    for (params, alpha, beta, gamma) in [
+        ("", 1.25, 0.5, 4.0),
+        ("alpha = 1.5\nbeta = 0.0\ngamma = 3.0", 1.5, 0.0, 3.0),
+        ("alpha = 1.5", 1.5, 0.5, 4.0),
+        ("beta = 0.0", 1.25, 0.0, 4.0),
+        ("gamma = 3.0", 1.25, 0.5, 3.0),
+    ] {
+        let raw = format!("schedule = 'dcfr'\n{params}");
+        let expected = Algorithm::Dcfr {
+            alpha,
+            beta,
+            gamma,
+            pow4_reset: false,
+        };
+        let algorithm: Algorithm = toml::from_str(&raw).unwrap();
+        assert_eq!(algorithm, expected);
+        let doc = parse(&format!("{}\n[solver.algorithm]\n{raw}", standard("")));
+        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
+        assert_eq!(settings.solver.algorithm, expected);
+        let effective = doc.normalize(&P1Sections).unwrap();
+        assert_eq!(effective, parse(&effective).normalize(&P1Sections).unwrap());
+        let restored = parse(&effective);
+        assert_eq!(
+            Settings::parse(&restored.spot, &restored.solver, &restored.output)
+                .unwrap()
+                .solver
+                .algorithm,
+            expected
+        );
+        let schedule = hu_postflop::run::schedule(&expected);
+        let engine = hu_engine::Dcfr {
+            alpha,
+            beta,
+            gamma,
+            pow4_reset: false,
+        };
+        for t in [1, 4, 16, 64] {
+            let actual = schedule.at(t, Some(64));
+            let expected = hu_engine::DiscountSchedule::at(&engine, t, Some(64));
+            assert_eq!(
+                (
+                    actual.pos,
+                    actual.neg,
+                    actual.avg,
+                    actual.floor_neg,
+                    actual.reset_avg
+                ),
+                (
+                    expected.pos,
+                    expected.neg,
+                    expected.avg,
+                    expected.floor_neg,
+                    expected.reset_avg
+                )
+            );
+        }
+    }
 }
 
 #[test]
@@ -158,8 +461,68 @@ fn strict_sections_codes_and_other_product_diagnostics() {
 }
 
 #[test]
+fn all_storage_literals_normalize_and_preserve_backend() {
+    for (name, backend) in [
+        ("f32", Storage::F32),
+        ("i16", Storage::I16),
+        ("i16-f32avg", Storage::I16F32Avg),
+    ] {
+        let doc = parse(&format!("{}\n[solver]\nstorage = '{name}'", standard("")));
+        let effective = doc.normalize(&P1Sections).unwrap();
+        let normalized = parse(&effective);
+        assert_eq!(effective, normalized.normalize(&P1Sections).unwrap());
+        assert_eq!(
+            Settings::parse(&normalized.spot, &normalized.solver, &normalized.output)
+                .unwrap()
+                .solver
+                .storage,
+            backend
+        );
+    }
+}
+
+#[test]
+fn mixed_live_queries_and_report_match_direct_solver() {
+    use hu_postflop::{artifact::StrategyProvider, prepare, queries, report, run};
+    use std::sync::atomic::AtomicBool;
+    let raw = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d 3c 8d",
+        "river { replace bet [50] replace raise [a] }",
+    ) + "\n[solver]\nstorage='i16-f32avg'\n[solver.stop]\nmax_iterations=8\ncheck_every=4\n[run]\nthreads=2\n";
+    let path = Path::new("mixed.toml");
+    let prepared = prepare::prepare(&raw, path).unwrap();
+    let cancel = AtomicBool::new(false);
+    let game = try_build_postflop_game(&prepared.config, prepared.payoff.pipeline()).unwrap();
+    let mut direct = hu_engine::Solver::<_, hu_engine::MixedStorage>::new(
+        game.game,
+        run::schedule(&prepared.settings.solver.algorithm),
+        Some(8),
+    );
+    direct.set_cfr_precision(prepared.settings.solver.cfr_precision);
+    direct.run(8);
+    let expected = direct.average_strategy_at(0);
+    queries::with_live(&prepared, None, None, &cancel, |live| {
+        assert_eq!(live.summary.iterations, 8);
+        assert_eq!(live.game().tree.storage_len, direct.game().tree.storage_len);
+        assert_eq!(queries::LiveProvider(live).average_strategy(0)?, expected);
+        Ok(())
+    })
+    .unwrap();
+    let rows =
+        report::compute(&raw, path, &["Ks 7h 2d 3c 8d".into()], &cancel, &mut |_| {}).unwrap();
+    assert_eq!(rows[0].iterations, 8);
+    let expl = direct.exploitability();
+    assert_eq!(
+        rows[0].nash_conv.to_bits(),
+        (expl[Player::P0] + expl[Player::P1]).to_bits()
+    );
+}
+
+#[test]
 fn spec_p1_example_lowering_and_sizes() {
-    let spec = include_str!("../../../docs/nlh-input-v1.jp.md");
+    let spec = include_str!("../../../docs/nlh-input-v1.jp.md").replace("\r\n", "\n");
     let example = spec
         .split("### P1:")
         .nth(1)

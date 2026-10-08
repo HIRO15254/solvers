@@ -1,0 +1,74 @@
+{
+  "records": [
+    {
+      "case": "flop",
+      "iteration": 25,
+      "terminals": 985104,
+      "dead_terminals": 18064,
+      "actions": 670920,
+      "dead_actions": 6417,
+      "zero_terminal_fraction": 0.0183371501892186,
+      "zero_action_fraction": 0.009564478626363799
+    },
+    {
+      "case": "flop",
+      "iteration": 100,
+      "terminals": 985104,
+      "dead_terminals": 109456,
+      "actions": 670920,
+      "dead_actions": 53338,
+      "zero_terminal_fraction": 0.1111111111111111,
+      "zero_action_fraction": 0.07949979133130626
+    },
+    {
+      "case": "flop",
+      "iteration": 300,
+      "terminals": 985104,
+      "dead_terminals": 218898,
+      "actions": 670920,
+      "dead_actions": 130401,
+      "zero_terminal_fraction": 0.22220801052477707,
+      "zero_action_fraction": 0.19436147379717403
+    },
+    {
+      "case": "turn",
+      "iteration": 25,
+      "terminals": 77728,
+      "dead_terminals": 3030,
+      "actions": 40964,
+      "dead_actions": 926,
+      "zero_terminal_fraction": 0.03898209139563606,
+      "zero_action_fraction": 0.022605214334537643
+    },
+    {
+      "case": "turn",
+      "iteration": 100,
+      "terminals": 77728,
+      "dead_terminals": 3550,
+      "actions": 40964,
+      "dead_actions": 1195,
+      "zero_terminal_fraction": 0.04567208727871552,
+      "zero_action_fraction": 0.029171955863685185
+    },
+    {
+      "case": "turn",
+      "iteration": 300,
+      "terminals": 77728,
+      "dead_terminals": 7332,
+      "actions": 40964,
+      "dead_actions": 3254,
+      "zero_terminal_fraction": 0.09432894195142033,
+      "zero_action_fraction": 0.07943560199199297
+    }
+  ],
+  "threads": 8,
+  "storage": "f32",
+  "method": "unpruned cfr_pass node-entry counters; counts sum both alternating player passes; counters enabled only at iterations 25,100,300",
+  "timing_share": "not measured; instrumented elapsed time is not used for speed comparisons",
+  "instrumentation_source_sha256_lf": "3928fc964ed340da6adb5a9e7e26721be8951b1f0e13bf16eee4abc247a914cf",
+  "configuration_files": {
+    "flop": "flop1_measurement.toml",
+    "turn": "turn_measurement.toml"
+  },
+  "seed": "none (deterministic full tree traversal)"
+}

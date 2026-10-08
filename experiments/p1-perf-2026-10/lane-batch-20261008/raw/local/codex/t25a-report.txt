@@ -1,0 +1,100 @@
+T25a stage 1: uncommitted implementation and measurement
+
+Result: realistic BTN/BB batch/current=0.547, batch/lone=0.429. Wide=0.781 and 0.648.
+These are single-logical-CPU Intel-host microbenchmarks, not 32-thread Milan whole-CFR results.
+
+Changed files:
+  crates/hu-engine/src/solver.rs
+  crates/hu-postflop/benches/kernels.rs
+  crates/hu-postflop/src/kernel.rs
+  crates/hu-postflop/src/postflop.rs
+  crates/hu-postflop/src/precision_tests.rs
+
+Implementation:
+  TerminalEvaluator::eval_cfr_batch defaults to one eval_cfr per terminal. Existing CFR pass is untouched.
+  PostflopEvaluator precomputes eligible table IDs for showdowns and complete-board folds without altering existing terminal metadata.
+  A reusable thread-local Vec of caller indices is sorted by table and split into batches of up to eight.
+  Earlier-street folds and terminals without one table fall back to eval_cfr. f64 precision always falls back.
+  The current model expands all-in runouts into chance edges and single-board showdowns; there is no aggregate all-in terminal to batch.
+  Kernel worker-local Vec<f32> buffers use active prefixes: (opponent_support+1)*L reaches, own_support*L values.
+  Length/capacity high-water marks are retained; only first use/growth allocates/initializes. Each call overwrites reach rows and clears its sentinel.
+  Values are written/read only for ranked own hands. Actual output slices are cleared to preserve positive-zero board-dead entries.
+  Scratch active prefixes at L=8: BTN/BB 27,168 B (26.53 KiB), wide 69,216 B (67.59 KiB). This excludes caller inputs/outputs.
+  Grouping index prefix is eight bytes per eligible requested terminal on this x64 host (high-water capacity retained).
+  Stack uses 52*L*4 B of card sums plus lane vectors. Linked width-1 frame=424 B, width-8=2904 B; evaluator entry=552 B plus saved registers.
+  Widths 1..8 are specialized with inline(never) to avoid reserving the eight-lane frame on singleton calls. Batch path stack total is under 4 KiB.
+  One total accumulator per lane, no reach-dependent branches in per-hand loops, safe Rust only.
+  Tied hands are reread for the win-minus-tie update, avoiding a 52*L group reset/merge. Interleaved output is transposed to caller slices.
+
+Benchmarks:
+  BTN/BB board Ks 7h 2d 3c 9s; secondary wide board2c 7d 9h Js Qs (existing realistic workload).
+  Both pot20, effective_stack200, fractions0.33/0.75/1.5, max_raises3.
+  RiverConfig has no explicit all-in option; existing fraction-to-stack clamping is used.
+  Both cases solve in f64 for 300+50+50 iterations; reaches/current strategies are captured at each snapshot.
+  Each timed replay combines both players and all three snapshots: 141 terminals/player/snapshot, 423/player total, 846 total outputs.
+  Each player/snapshot:18 batches, fill141/(18*8)=97.9167%. Supports BTN/BB407/441; wide1081/1081.
+  Lone/batch evaluate every terminal, including zero reaches. Current reproduces child-order pairs and exact-zero pruning from CFR.
+  Current opponent calls produce aggregate node values; lone/batch produce individual terminal values.
+  Output/reference/call metadata is preallocated outside timer. All methods include output clearing.
+  Three alternating repeats per mode/workload, pinned mask0x1, RAYON_NUM_THREADS=1; median of Criterion median estimates (20 samples each).
+  Workload | supports P0/P1 | terminals/player/snapshot | lane fill | lone ms | current ms | batch ms | batch/current | batch/lone
+  btn_bb | 407/441 | 141 | 97.917% | 3.643366 | 2.853839 | 1.561279 | 0.547080 | 0.428526
+    Paired batch/current ratios: [0.4875751512707966, 0.5717112916850704, 0.5435533924011972]; paired median 0.543553.
+  wide | 1081/1081 | 141 | 97.917% | 7.044777 | 5.842916 | 4.564619 | 0.781223 | 0.647944
+    Paired batch/current ratios: [0.7485632911865188, 0.8050514303638542, 0.9773835275068846]; paired median 0.805051.
+
+Fixed-work estimates (one external run per case, median of 20 Criterion samples; not pure dispatch overhead):
+  Workload | full-replay batch us/terminal | real one-lane us/call | zero one-lane us/call | zero eight-lane us/call (us/lane)
+  btn_bb | 1.845 | 4.746 | 5.604 | 13.208 (1.651)
+  wide | 5.396 | 15.849 | 16.227 | 46.612 (5.826)
+  Zero reaches execute the full sweep, so these estimate fixed work at the selected support/width rather than arithmetic bypass.
+  Original fixed 1327x8/1326x8 stack prototype one-lane estimates: BTN/BB11.788us, wide24.204us (same real singleton input, one external run).
+  Final one-lane is 0.403x / 0.655x those estimates. This is suggestive, not an SMT/L1 performance measurement.
+
+Variants (BTN/BB full replay, three alternating repeats, before final width-frame split):
+  Fixed ~87KiB stack arrays:1.687485ms; support-sized interleaved:1.672297ms.
+  Support-sized group reset/merge:1.918003ms (1.147x support-sized reread); rejected.
+  Support-sized direct output scatter:1.668987ms (0.998x interleaved, timing tie); rejected because own-hand arithmetic scalarized.
+  Interleaved output retains AVX2 own-hand arithmetic despite the extra reused output buffer.
+  Fixed-to-support full-replay difference was within noise. Footprint and singleton fixed-work estimates favor support-sized buffers.
+  No maximum-four-lane versus maximum-eight-lane variant was attempted; widths1..8 serve partial batches.
+  Raw variant samples/logs and intermediate development measurements are retained, including noisy development series.
+
+Assembly:
+  Final linked executable, PDB/PE unwind inspection and disassembly retained in final-batch.asm and final-assembly-functions.txt.
+  Eight-lane kernel0x140139820..0x14013beb0:19 YMM vmulps,14 YMM vaddps,5 YMM vsubps.
+  Own-hand vector subtraction at0x14013b385/0x14013b38e, followed by lane-vector arithmetic/store.
+  Fixed-array/zipped lane loops have no per-lane bounds checks. Shared hand/card indexing retains safe-Rust index guards.
+
+Accuracy and determinism:
+  Real 48 river rank tables with asymmetric supports and absent identical combos; 96 river folds plus2 earlier fold fallbacks.
+  Repeated terminal IDs with distinct reaches fill eight lanes; both seats, five reach patterns including all-zero and -0.0.
+  Relative infinity error compared with f64 eval must be below1e-5; board-dead own values must have bits0.
+  Singleton versus packed8, packed7, reversed mixed13, rotated whole-call batches tested bitwise on rayon1/4-thread pools.
+  f64 fallback tested bitwise against eval_cfr; empty batches tested. Release benchmark additionally checks timed reaches vs f64 and singleton/full equality.
+  Release largest relative error:BTN/BB8.795815349800194e-7, wide1.2951561920274756e-6.
+  Workspace test maximum relative error: 1.8357778809248764e-6
+
+Verification:
+  Exit codes {'fmt': 0, 'clippy': 0, 'tests': 0, 'check-docs': 0}
+  Workspace totals passed/failed/ignored/measured/filtered=[928, 0, 31, 0, 0]
+  Cargo commands were serialized with CARGO_BUILD_JOBS=1 and CARGO_INCREMENTAL=0. Tests used --test-threads=1 --nocapture.
+  Initial test build failed with a 2MiB allocation failure/STATUS_STACK_BUFFER_OVERRUN in rustc for mw-preflop lib tests.
+  Waited60seconds then retried unchanged settings; initial log preserved as tests-build-failure.log.
+  Full workspace test output:tests.log. fmt.log,clippy.log,check-docs.log preserve the other checks.
+  Existing-path source audit:36 old function bodies identical to HEAD (existing-path-audit.txt).
+
+Limits and stage 2:
+  No existing CFR/evaluation/EV/BR path calls the new API; source audit plus regression suite protect stage-1 behavior.
+  Current HEAD contains T24. Its later rejection changes the comparison baseline; rerun then.
+  Wide paired ratios0.749..0.977 show host noise. BTN/BB0.488..0.572 is a clearer local gain.
+  Stage2 needs stable zero-initialized terminal CFV rows and opponent reach slices in a subtree arena, preserving action strategy scaling and zero pruning.
+  Collect across a chance-free river subtree, call once, then consume separate terminal rows in the existing bottom-up regret/value pass.
+  Duplicate terminal IDs with separate reaches are supported; no caller lane/table ordering contract is needed.
+  The benchmark excludes collection, reach-copy/arena management and bottom-up CFR backups. Worker TLS retains largest-ever capacity.
+  Two Milan SMT threads sharing32KiB L1D still require whole-CFR1/16/32-thread measurement; no gain there is claimed.
+
+Executable:
+C:\Users\PC_User\AppData\Local\Temp\claude\C--Users-PC-User-orca-workspaces-solvers-cisco\7b8f3bb9-2812-4052-b020-84dc5d1829b4\scratchpad\t25a-bench.exe
+  SHA256 db9632e35c91c586cc85ccfc671ec2e4ba1bfe17a5c3c2d260fec3e0c0e2197c
+Source revision/config/status/hashes recorded in manifest.json; uncommitted source.patch retained. No experiments files changed.

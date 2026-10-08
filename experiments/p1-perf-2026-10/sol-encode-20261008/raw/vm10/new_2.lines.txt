@@ -1,0 +1,6 @@
+1791404069.222533154 tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)
+1791404069.224013572 memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)
+1791404069.225254190 warning: no stop target: runs until max_iterations or max_time
+1791404110.076561214 iter=      25 expl_p0=1.671e0 expl_p1=1.727e0 nash_conv=3.398e0
+1791404110.078092743 done: iterations=25 wall=36.05s ev_p0=1.290367 ev_p1=3.572787 nash_conv=3.398e0
+1791404155.001827482 sol: wrote /home/PC_User/work10/new_2/solution.sol (6363.51 MB, 2293609 blocks, mode=Full)

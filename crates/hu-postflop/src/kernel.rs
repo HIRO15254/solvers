@@ -1,117 +1,1097 @@
-//! Terminal evaluation kernels shared by every postflop terminal (fold and
-//! showdown, at any street). Extracted verbatim from the original
-//! river-only evaluator so the multi-street builder and the river shim run
-//! the exact same math.
+//! Terminal evaluation kernels over the fixed seat-specific compact supports
+//! (see [`crate::PostflopHands`]), shared by every fold and showdown terminal.
 //!
-//! Invariant relied on by both kernels: by the time a reach vector reaches
-//! a terminal, the engine's chance-node masks have already zeroed the
-//! opponent's reach on every combo blocked by a board card dealt on the
-//! path to that terminal. A kernel may therefore be handed a `sorted` combo
-//! list that is a *superset* of the combos actually live at this specific
-//! terminal — `fold_kernel` in particular is handed one list per game
-//! (disjoint only from the game's starting board) and reused for fold
-//! terminals at every street and every runout, rather than a separate exact
-//! list per board — and the inclusion-exclusion sums below stay exactly
-//! correct, because every "dead" combo the superset drags in contributes
-//! zero.
+//! Invariant relied on by both kernels: by the time a reach vector reaches a
+//! terminal, the chance masks have already zeroed the opponent's reach on
+//! every hand blocked by a card dealt on the path. A kernel may therefore be
+//! handed a hand list that is a superset of the hands live at this terminal
+//! (`fold_kernel` reuses one list per seat for every street and runout), and
+//! the inclusion-exclusion sums stay exact because dead hands contribute zero.
+//! The f64 sums add the nonzero terms in the same order as the former dense
+//! kernels (rank order, then global combo order), so results are bit-identical.
+//! The f32 showdown sweep maintains one utility-weighted total/card array:
+//! all hands start at lose, tied groups move to tie, then to win. Own hands
+//! need two card loads plus the identical-combo tie correction. Opponent
+//! additions are unconditional and follow fixed rank/hand order, independent
+//! of thread count. Only live ranked own entries are written; the caller
+//! zeros the remaining entries. The fused f32 showdown/fold variant shares
+//! opponent sums and the own-hand loop for terminal siblings with the same
+//! board and opponent reach. It clears the fold output first and writes only
+//! live ranked own hands; the rank table must cover every board-live support
+//! entry. Opponent-node add variants leave dead own entries untouched. For
+//! different fold/call reaches on one board, fold compat sums use the
+//! showdown opponent list: it covers every board-live support entry, and
+//! omitted dead entries have zero reach. The sweep starts at
+//! u_lose * call_total/card + u_fold * fold_total/card and restores both
+//! identical-combo corrections, adding both outcomes in one own-hand loop.
+//! Lone terminals also add directly, without a temporary or an add pass.
+//! Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
 
-use nlh::{HandRank, combo_cards};
-
-/// Sum of `opp_reach` over combos disjoint from hand `h`, via
-/// inclusion-exclusion on h's two cards.
-pub(crate) fn compat_sums(sorted: &[(HandRank, u32)], opp_reach: &[f32]) -> (f64, [f64; 52]) {
-    let mut total = 0.0f64;
-    let mut per_card = [0.0f64; 52];
-    for &(_, combo) in sorted {
-        let r = opp_reach[combo as usize] as f64;
+use crate::hands::ABSENT;
+use nlh::HandRank;
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Hand {
+    pub local: u16,
+    pub cards: [u8; 2],
+}
+#[derive(Default)]
+pub(crate) struct RankedHands {
+    pub hands: Vec<Hand>,
+    // Rank and exclusive end offset; within a group, global combo order.
+    pub groups: Vec<(HandRank, usize)>,
+    // Board-dead locals precomputed for CFR lane outputs. Non-CFR tables do
+    // not use this list. Clear only these entries, without a full output fill.
+    pub dead: Vec<u16>,
+}
+fn add(hands: &[Hand], reach: &[f32], total: &mut f64, card: &mut [f64; 52]) {
+    for h in hands {
+        let r = reach[h.local as usize] as f64;
         if r != 0.0 {
-            let (c1, c2) = combo_cards(combo as usize);
-            total += r;
-            per_card[c1.index()] += r;
-            per_card[c2.index()] += r;
+            *total += r;
+            card[h.cards[0] as usize] += r;
+            card[h.cards[1] as usize] += r;
         }
     }
-    (total, per_card)
 }
-
-/// Exact showdown evaluation of every live hand against the full opponent
-/// reach vector: an O(n + m) sweep over ascending equal-rank groups, keeping
-/// strictly-below prefix sums; ties are handled with the group's own sums.
-///
-/// `out` is not zeroed here — the caller fills it once per `eval` call (see
-/// `postflop::PostflopEvaluator::eval`) and both kernels only ever write the
-/// entries named in `sorted`.
+pub(crate) fn compat_sums(hands: &[Hand], reach: &[f32]) -> (f64, [f64; 52]) {
+    let mut total = 0.0;
+    let mut card = [0.0; 52];
+    add(hands, reach, &mut total, &mut card);
+    (total, card)
+}
+fn same_reach(same: &[u16], h: Hand, reach: &[f32]) -> f64 {
+    let other = same[h.local as usize];
+    if other == ABSENT {
+        0.0
+    } else {
+        reach[other as usize] as f64
+    }
+}
 pub(crate) fn showdown_kernel(
-    sorted: &[(HandRank, u32)],
-    u_win: f64,
-    u_tie: f64,
-    u_lose: f64,
-    opp_reach: &[f32],
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
     out: &mut [f32],
 ) {
-    let (all_total, all_card) = compat_sums(sorted, opp_reach);
-
-    let mut below_total = 0.0f64;
-    let mut below_card = [0.0f64; 52];
-    let mut group_start = 0;
-    while group_start < sorted.len() {
-        let rank = sorted[group_start].0;
-        let mut group_end = group_start;
-        while group_end < sorted.len() && sorted[group_end].0 == rank {
-            group_end += 1;
+    let [u_win, u_tie, u_lose] = utilities;
+    let (all_total, all_card) = compat_sums(&opp.hands, reach);
+    let mut below_total = 0.0;
+    let mut below_card = [0.0; 52];
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            let mut group_total = 0.0;
+            // Legacy total adds groups; card sums add individual hands.
+            add(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
+            below_total += group_total;
+            os = oe;
+            oi += 1;
         }
-        let group = &sorted[group_start..group_end];
-
-        let mut group_total = 0.0f64;
-        let mut group_card = [0.0f64; 52];
-        for &(_, combo) in group {
-            let r = opp_reach[combo as usize] as f64;
-            if r != 0.0 {
-                let (c1, c2) = combo_cards(combo as usize);
-                group_total += r;
-                group_card[c1.index()] += r;
-                group_card[c2.index()] += r;
-            }
-        }
-
-        for &(_, combo) in group {
-            let idx = combo as usize;
-            let (c1, c2) = combo_cards(idx);
-            let (i1, i2) = (c1.index(), c2.index());
-            // Inclusion-exclusion: the o == h combo is subtracted
-            // twice by the per-card sums, so groups containing h
-            // (tie, all) add its reach back once.
-            let win = below_total - below_card[i1] - below_card[i2];
-            let tie = group_total - group_card[i1] - group_card[i2] + opp_reach[idx] as f64;
-            let compat = all_total - all_card[i1] - all_card[i2] + opp_reach[idx] as f64;
+        let mut group_total = 0.0;
+        let mut group_card = [0.0; 52];
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        add(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
+        for &h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            let same = same_reach(same, h, reach);
+            let win = below_total - below_card[a] - below_card[b];
+            let tie = group_total - group_card[a] - group_card[b] + same;
+            let compat = all_total - all_card[a] - all_card[b] + same;
             let lose = compat - win - tie;
-            out[idx] = (u_win * win + u_tie * tie + u_lose * lose) as f32;
+            out[h.local as usize] = (u_win * win + u_tie * tie + u_lose * lose) as f32;
         }
-
-        below_total += group_total;
-        for &(_, combo) in group {
-            let r = opp_reach[combo as usize] as f64;
-            if r != 0.0 {
-                let (c1, c2) = combo_cards(combo as usize);
-                below_card[c1.index()] += r;
-                below_card[c2.index()] += r;
-            }
+        if tied {
+            below_total += group_total;
+            let mut unused = 0.0;
+            add(&opp.hands[os..oe], reach, &mut unused, &mut below_card);
+            os = oe;
+            oi += 1;
         }
-        group_start = group_end;
+        start = end;
+    }
+}
+pub(crate) fn fold_kernel(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let (total, card) = compat_sums(opp, reach);
+    for &h in own {
+        let [a, b] = h.cards.map(usize::from);
+        if board & ((1u64 << a) | (1u64 << b)) != 0 {
+            out[h.local as usize] = 0.0;
+            continue;
+        }
+        out[h.local as usize] =
+            (u * (total - card[a] - card[b] + same_reach(same, h, reach))) as f32;
     }
 }
 
-/// O(n) inclusion-exclusion fold kernel: every live hand in `sorted` wins
-/// the same outcome `u`, scaled by the opponent reach compatible with it.
-///
-/// `sorted`'s combo list need not be filtered down to this terminal's exact
-/// board — see the module-level invariant above.
-pub(crate) fn fold_kernel(sorted: &[(HandRank, u32)], u: f64, opp_reach: &[f32], out: &mut [f32]) {
-    let (all_total, all_card) = compat_sums(sorted, opp_reach);
-    for &(_, combo) in sorted {
-        let (c1, c2) = combo_cards(combo as usize);
-        let compat = all_total - all_card[c1.index()] - all_card[c2.index()]
-            + opp_reach[combo as usize] as f64;
-        out[combo as usize] = (u * compat) as f32;
+fn add_relaxed_f32(hands: &[Hand], reach: &[f32], total: &mut f32, card: &mut [f32; 52]) {
+    for h in hands {
+        let r = reach[h.local as usize];
+        *total += r;
+        card[h.cards[0] as usize] += r;
+        card[h.cards[1] as usize] += r;
+    }
+}
+pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f32; 52]) {
+    let mut total = 0.0;
+    let mut card = [0.0; 52];
+    add_relaxed_f32(hands, reach, &mut total, &mut card);
+    (total, card)
+}
+
+pub(crate) const TERMINAL_LANES: usize = 8;
+struct TerminalLaneBuffers {
+    reach: Vec<f32>,
+    values: Vec<f32>,
+}
+
+// Batch indices are increasing within their (table, kind) group. Fetch each
+// independent output slice once, splitting the reference slice safely, so
+// per-hand stores do not repeatedly reload pointers through `outs[indices]`.
+fn lane_outputs<'a, const LANES: usize>(
+    outs: &'a mut [&mut [f32]],
+    indices: &[usize],
+) -> [&'a mut [f32]; LANES] {
+    let mut tail = outs;
+    let mut first = 0;
+    std::array::from_fn(|lane| {
+        let previous = std::mem::take(&mut tail);
+        let (_, after) = previous.split_at_mut(indices[lane] - first);
+        let (row, rest) = after.split_first_mut().unwrap();
+        tail = rest;
+        first = indices[lane] + 1;
+        &mut **row
+    })
+}
+
+// Copy each column of eight consecutive local rows into a fixed-size output
+// block. This keeps the output pointer fixed and stores adjacent entries;
+// LLVM chooses scalar or vector instructions for each lane width.
+// Full chunks and tails use the same entry order; dead rows were cleared in
+// the interleaved buffer, so this overwrites every output, including +0.0s.
+fn store_lane_values<const LANES: usize>(values: &[[f32; LANES]], rows: [&mut [f32]; LANES]) {
+    let (blocks, tail) = values.as_chunks::<8>();
+    for (lane, row) in rows.into_iter().enumerate() {
+        let (out_blocks, out_tail) = row.as_chunks_mut::<8>();
+        for (block, dst) in blocks.iter().zip(out_blocks) {
+            *dst = std::array::from_fn(|h| block[h][lane]);
+        }
+        for (dst, value) in out_tail.iter_mut().zip(tail) {
+            *dst = value[lane];
+        }
+    }
+}
+
+thread_local! {
+    // Retain the high-water lengths to avoid zeroing on alternating full and
+    // partial batches. Each call touches only support_length * lane_count.
+    static TERMINAL_LANE_BUFFERS: std::cell::RefCell<TerminalLaneBuffers> =
+        const { std::cell::RefCell::new(TerminalLaneBuffers { reach: Vec::new(), values: Vec::new() }) };
+}
+
+// Each fixed-size array is one independent value per terminal. These loops
+// vectorize across terminals, sharing hand/card indices and rank control flow.
+fn add_lane_hands<const LANES: usize>(
+    hands: &[Hand],
+    reach: &[[f32; LANES]],
+    weight: [f32; LANES],
+    total: &mut [f32; LANES],
+    card: &mut [[f32; LANES]; 52],
+) {
+    for h in hands {
+        let r = reach[h.local as usize];
+        for ((t, r), w) in total.iter_mut().zip(r).zip(weight) {
+            *t += w * r;
+        }
+        for &c in &h.cards {
+            for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(weight) {
+                *v += w * r;
+            }
+        }
+    }
+}
+
+/// Single-board f32 showdown batch. River folds use the separate entry below.
+/// Reused worker buffers hold (opponent support + 1) * active lanes reaches
+/// and own support * active lanes values. After first use/growth there is no
+/// allocation or bulk buffer zeroing. Packing clears only the reach sentinel.
+/// Stack arrays are 52 * active lanes card sums and a few lane vectors.
+/// Dead value-buffer rows are cleared, then the blocked copy writes every
+/// output entry, including positive zero for board-dead own hands.
+/// Width specialization keeps even a one-lane call proportional to its width;
+/// every width uses the same per-terminal summation order.
+pub(crate) fn terminal_batch_kernel_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    terminal_batch_kernel_f32_impl::<false>(own, opp, same, utilities, reaches, outs, indices);
+}
+
+/// River folds always use this lane kernel, regardless of caller grouping.
+/// It computes unweighted compatibility sums in rank-table hand order, then
+/// multiplies u_fold * (total - card[a] - card[b] + same), like the lone f32
+/// fold kernel. Applying the utility last avoids utility-scaled cancellation.
+pub(crate) fn fold_batch_kernel_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    terminal_batch_kernel_f32_impl::<true>(own, opp, same, utilities, reaches, outs, indices);
+}
+
+fn terminal_batch_kernel_f32_impl<const FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    TERMINAL_LANE_BUFFERS.with_borrow_mut(|scratch| {
+        macro_rules! dispatch {
+            ($lanes:literal) => {
+                terminal_batch_lanes_f32::<$lanes, FOLD>(
+                    own, opp, same, utilities, reaches, outs, indices, scratch,
+                )
+            };
+        }
+        match reaches.len() {
+            1 => dispatch!(1),
+            2 => dispatch!(2),
+            3 => dispatch!(3),
+            4 => dispatch!(4),
+            5 => dispatch!(5),
+            6 => dispatch!(6),
+            7 => dispatch!(7),
+            8 => dispatch!(8),
+            _ => panic!("terminal batch must have 1..=8 lanes"),
+        }
+    });
+}
+
+#[allow(clippy::too_many_arguments)]
+// Keep the width-specific frames separate: inlining the dispatch otherwise
+// reserves the eight-lane frame even for a one-lane call.
+#[inline(never)]
+fn terminal_batch_lanes_f32<const LANES: usize, const FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+    scratch: &mut TerminalLaneBuffers,
+) {
+    assert_eq!(reaches.len(), LANES);
+    assert_eq!(utilities.len(), reaches.len());
+    assert_eq!(indices.len(), reaches.len());
+    let opp_len = reaches[0].len();
+    assert!(opp_len <= nlh::NUM_COMBOS);
+    let own_len = same.len();
+    let reach_size = (opp_len + 1) * LANES;
+    let value_size = own_len * LANES;
+    // Grow only on first use/larger supports, not on every width transition.
+    if scratch.reach.len() < reach_size {
+        scratch.reach.resize(reach_size, 0.0);
+    }
+    if scratch.values.len() < value_size {
+        scratch.values.resize(value_size, 0.0);
+    }
+    let (buf, _) = scratch.reach[..reach_size].as_chunks_mut::<LANES>();
+    let (values, _) = scratch.values[..value_size].as_chunks_mut::<LANES>();
+    buf[opp_len].fill(0.0);
+    let rows = lane_outputs::<LANES>(outs, indices);
+    for row in &rows {
+        assert_eq!(row.len(), own_len);
+    }
+    for &local in &own.dead {
+        values[local as usize].fill(0.0);
+    }
+    for (lane, &reach) in reaches.iter().enumerate() {
+        assert_eq!(reach.len(), opp_len);
+        for (row, &r) in buf[..opp_len].iter_mut().zip(reach) {
+            row[lane] = r;
+        }
+    }
+    let mut win = [0.0; LANES];
+    let mut tie = win;
+    let mut lose = win;
+    for (((w, t), l), &[uw, ut, ul]) in win.iter_mut().zip(&mut tie).zip(&mut lose).zip(utilities) {
+        *w = uw;
+        *t = ut;
+        *l = ul;
+    }
+    let win_lose: [f32; LANES] = std::array::from_fn(|i| win[i] - lose[i]);
+    let tie_lose: [f32; LANES] = std::array::from_fn(|i| tie[i] - lose[i]);
+    let win_tie: [f32; LANES] = std::array::from_fn(|i| win[i] - tie[i]);
+    let mut total = [0.0; LANES];
+    let mut card = [[0.0; LANES]; 52];
+    add_lane_hands(&opp.hands, buf, [1.0; LANES], &mut total, &mut card);
+    if FOLD {
+        // One opponent pass above, one live-own pass here: no rank groups.
+        for h in &own.hands {
+            let [a, b] = h.cards.map(usize::from);
+            let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
+            let row = &mut values[h.local as usize];
+            for (((((v, t), ca), cb), r), u) in row
+                .iter_mut()
+                .zip(total)
+                .zip(card[a])
+                .zip(card[b])
+                .zip(identical)
+                .zip(win)
+            {
+                *v = u * (t - ca - cb + r);
+            }
+        }
+    } else {
+        for (t, u) in total.iter_mut().zip(lose) {
+            *t *= u;
+        }
+        for row in &mut card {
+            for (c, u) in row.iter_mut().zip(lose) {
+                *c *= u;
+            }
+        }
+        let mut oi = 0;
+        let mut os = 0;
+        let mut start = 0;
+        for &(rank, end) in &own.groups {
+            while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+                let oe = opp.groups[oi].1;
+                add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
+                os = oe;
+                oi += 1;
+            }
+            let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+            let oe = if tied { opp.groups[oi].1 } else { os };
+            let mut group_total = [0.0; LANES];
+            for h in &opp.hands[os..oe] {
+                let r = buf[h.local as usize];
+                for (t, r) in group_total.iter_mut().zip(r) {
+                    *t += r;
+                }
+                for &c in &h.cards {
+                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
+                        *v += w * r;
+                    }
+                }
+            }
+            for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
+                *t += w * g;
+            }
+            for h in &own.hands[start..end] {
+                let [a, b] = h.cards.map(usize::from);
+                let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
+                let row = &mut values[h.local as usize];
+                for (((((v, t), ca), cb), s), u) in row
+                    .iter_mut()
+                    .zip(total)
+                    .zip(card[a])
+                    .zip(card[b])
+                    .zip(identical)
+                    .zip(tie)
+                {
+                    *v = t - ca - cb + u * s;
+                }
+            }
+            if tied {
+                // Re-read just the tied hands instead of resetting/merging a
+                // 52 x 8 group array for every own rank. Total retains the same
+                // group-wise addition order as the existing relaxed sweep.
+                for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
+                    *t += w * g;
+                }
+                for h in &opp.hands[os..oe] {
+                    let r = buf[h.local as usize];
+                    for &c in &h.cards {
+                        for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
+                            *v += w * r;
+                        }
+                    }
+                }
+                os = oe;
+                oi += 1;
+            }
+            start = end;
+        }
+    }
+    store_lane_values(values, rows);
+}
+
+fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
+    let other = same[h.local as usize];
+    if other == ABSENT {
+        0.0
+    } else {
+        reach[other as usize]
+    }
+}
+fn add_weighted_f32(
+    hands: &[Hand],
+    reach: &[f32],
+    weight: f32,
+    total: &mut f32,
+    card: &mut [f32; 52],
+) {
+    for h in hands {
+        let r = weight * reach[h.local as usize];
+        *total += r;
+        card[h.cards[0] as usize] += r;
+        card[h.cards[1] as usize] += r;
+    }
+}
+pub(crate) fn showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [win, tie, lose] = utilities;
+    showdown_relaxed_f32::<false, false, false>(
+        own,
+        opp,
+        same,
+        [win, tie, lose, 0.0],
+        reach,
+        out,
+        &mut [],
+        &[],
+    );
+}
+
+/// Utilities are [showdown win, tie, lose, fold]. The fold output is cleared
+/// here, then written only for live ranked own hands. Both outcomes share all
+/// opponent passes and the identical-combo lookup in one own-hand loop.
+pub(crate) fn showdown_fold_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 4],
+    reach: &[f32],
+    out: &mut [f32],
+    fold_out: &mut [f32],
+) {
+    showdown_relaxed_f32::<true, false, false>(
+        own,
+        opp,
+        same,
+        utilities,
+        reach,
+        out,
+        fold_out,
+        &[],
+    );
+}
+
+/// Add a lone showdown directly; only live ranked own hands are visited.
+pub(crate) fn add_showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [win, tie, lose] = utilities;
+    showdown_relaxed_f32::<false, true, false>(
+        own,
+        opp,
+        same,
+        [win, tie, lose, 0.0],
+        reach,
+        out,
+        &mut [],
+        &[],
+    );
+}
+
+/// Different action-scaled reaches, same board. Fold compatible mass is
+/// linear in total/card sums: seed the showdown sweep with both weighted
+/// masses and restore the identical-combo fold correction in the own loop.
+pub(crate) fn add_showdown_fold_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 4],
+    call_reach: &[f32],
+    fold_reach: &[f32],
+    out: &mut [f32],
+) {
+    showdown_relaxed_f32::<false, true, true>(
+        own,
+        opp,
+        same,
+        utilities,
+        call_reach,
+        out,
+        &mut [],
+        fold_reach,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same_indices: &[u16],
+    utilities: [f64; 4],
+    reach: &[f32],
+    out: &mut [f32],
+    fold_out: &mut [f32],
+    fold_reach: &[f32],
+) {
+    let [u_win, u_tie, u_lose, u_fold] = utilities.map(|u| u as f32);
+    if FOLD {
+        fold_out.fill(0.0);
+    }
+    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
+    let mut total = u_lose * all_total;
+    let mut card = all_card.map(|v| u_lose * v);
+    if OPP_FOLD {
+        // The rank table covers all board-live support hands; omitted dead
+        // hands have zero reach, so it supplies the fold compat sums too.
+        let (fold_total, fold_card) = compat_sums_relaxed_f32(&opp.hands, fold_reach);
+        total += u_fold * fold_total;
+        for (c, f) in card.iter_mut().zip(fold_card) {
+            *c += u_fold * f;
+        }
+    }
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            add_weighted_f32(
+                &opp.hands[os..oe],
+                reach,
+                u_win - u_lose,
+                &mut total,
+                &mut card,
+            );
+            os = oe;
+            oi += 1;
+        }
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        let mut group_total = 0.0;
+        let mut group_card = [0.0; 52];
+        for h in &opp.hands[os..oe] {
+            let [a, b] = h.cards.map(usize::from);
+            let r = reach[h.local as usize];
+            let weighted = (u_tie - u_lose) * r;
+            group_total += r;
+            group_card[a] += r;
+            group_card[b] += r;
+            card[a] += weighted;
+            card[b] += weighted;
+        }
+        total += (u_tie - u_lose) * group_total;
+        // K - C[a] - C[b] + u_tie * same: two card loads per own hand.
+        for &h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            // Reuse one identical-combo lookup and its existing ABSENT
+            // check for both reaches; no second data-dependent branch.
+            let (same, fold_same) = if OPP_FOLD {
+                let other = same_indices[h.local as usize];
+                if other == ABSENT {
+                    (0.0, 0.0)
+                } else {
+                    (reach[other as usize], fold_reach[other as usize])
+                }
+            } else {
+                (same_reach_relaxed_f32(same_indices, h, reach), 0.0)
+            };
+            let mut value = total - card[a] - card[b] + u_tie * same;
+            if OPP_FOLD {
+                value += u_fold * fold_same;
+            }
+            if ADD {
+                out[h.local as usize] += value;
+            } else {
+                out[h.local as usize] = value;
+            }
+            if FOLD {
+                fold_out[h.local as usize] =
+                    u_fold * (all_total - all_card[a] - all_card[b] + same);
+            }
+        }
+        if tied {
+            // Reuse the existing 52-card merge to convert tie to win.
+            total += (u_win - u_tie) * group_total;
+            for (c, g) in card.iter_mut().zip(group_card) {
+                *c += (u_win - u_tie) * g;
+            }
+            os = oe;
+            oi += 1;
+        }
+        start = end;
+    }
+}
+
+// Frozen fdd3618 f32 implementation for accuracy regression tests.
+#[cfg(test)]
+pub(crate) fn head_showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
+    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
+    let mut below_total = 0.0;
+    let mut below_card = [0.0; 52];
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            let mut group_total = 0.0;
+            // Total adds groups; strictly-below card sums add individual hands.
+            add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
+            below_total += group_total;
+            os = oe;
+            oi += 1;
+        }
+        let mut group_total = 0.0;
+        let mut group_card = [0.0; 52];
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
+        for &h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            let same = same_reach_relaxed_f32(same, h, reach);
+            let win = below_total - below_card[a] - below_card[b];
+            let tie = group_total - group_card[a] - group_card[b] + same;
+            let compat = all_total - all_card[a] - all_card[b] + same;
+            let lose = compat - win - tie;
+            out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
+        }
+        if tied {
+            below_total += group_total;
+            for (below, group) in below_card.iter_mut().zip(group_card) {
+                *below += group;
+            }
+            os = oe;
+            oi += 1;
+        }
+        start = end;
+    }
+}
+pub(crate) fn fold_kernel_relaxed_f32(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    fold_relaxed_f32::<false>(own, opp, same, u, board, reach, out);
+}
+pub(crate) fn add_fold_kernel_relaxed_f32(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    fold_relaxed_f32::<true>(own, opp, same, u, board, reach, out);
+}
+fn fold_relaxed_f32<const ADD: bool>(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let u = u as f32;
+    let (total, card) = compat_sums_relaxed_f32(opp, reach);
+    for &h in own {
+        let [a, b] = h.cards.map(usize::from);
+        if board & ((1u64 << a) | (1u64 << b)) != 0 {
+            if !ADD {
+                out[h.local as usize] = 0.0;
+            }
+            continue;
+        }
+        let value = u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+        if ADD {
+            out[h.local as usize] += value;
+        } else {
+            out[h.local as usize] = value;
+        }
+    }
+}
+
+#[cfg(test)]
+mod legacy {
+    use nlh::{HandRank, combo_cards};
+
+    /// Sum of `opp_reach` over combos disjoint from hand `h`, via
+    /// inclusion-exclusion on h's two cards.
+    pub(crate) fn compat_sums(sorted: &[(HandRank, u32)], opp_reach: &[f32]) -> (f64, [f64; 52]) {
+        let mut total = 0.0f64;
+        let mut per_card = [0.0f64; 52];
+        for &(_, combo) in sorted {
+            let r = opp_reach[combo as usize] as f64;
+            if r != 0.0 {
+                let (c1, c2) = combo_cards(combo as usize);
+                total += r;
+                per_card[c1.index()] += r;
+                per_card[c2.index()] += r;
+            }
+        }
+        (total, per_card)
+    }
+
+    /// Exact showdown evaluation of every live hand against the full opponent
+    /// reach vector: an O(n + m) sweep over ascending equal-rank groups, keeping
+    /// strictly-below prefix sums; ties are handled with the group's own sums.
+    ///
+    /// `out` is not zeroed here — the caller fills it once per `eval` call (see
+    /// `postflop::PostflopEvaluator::eval`) and both kernels only ever write the
+    /// entries named in `sorted`.
+    pub(crate) fn showdown_kernel(
+        sorted: &[(HandRank, u32)],
+        u_win: f64,
+        u_tie: f64,
+        u_lose: f64,
+        opp_reach: &[f32],
+        out: &mut [f32],
+    ) {
+        let (all_total, all_card) = compat_sums(sorted, opp_reach);
+
+        let mut below_total = 0.0f64;
+        let mut below_card = [0.0f64; 52];
+        let mut group_start = 0;
+        while group_start < sorted.len() {
+            let rank = sorted[group_start].0;
+            let mut group_end = group_start;
+            while group_end < sorted.len() && sorted[group_end].0 == rank {
+                group_end += 1;
+            }
+            let group = &sorted[group_start..group_end];
+
+            let mut group_total = 0.0f64;
+            let mut group_card = [0.0f64; 52];
+            for &(_, combo) in group {
+                let r = opp_reach[combo as usize] as f64;
+                if r != 0.0 {
+                    let (c1, c2) = combo_cards(combo as usize);
+                    group_total += r;
+                    group_card[c1.index()] += r;
+                    group_card[c2.index()] += r;
+                }
+            }
+
+            for &(_, combo) in group {
+                let idx = combo as usize;
+                let (c1, c2) = combo_cards(idx);
+                let (i1, i2) = (c1.index(), c2.index());
+                // Inclusion-exclusion: the o == h combo is subtracted
+                // twice by the per-card sums, so groups containing h
+                // (tie, all) add its reach back once.
+                let win = below_total - below_card[i1] - below_card[i2];
+                let tie = group_total - group_card[i1] - group_card[i2] + opp_reach[idx] as f64;
+                let compat = all_total - all_card[i1] - all_card[i2] + opp_reach[idx] as f64;
+                let lose = compat - win - tie;
+                out[idx] = (u_win * win + u_tie * tie + u_lose * lose) as f32;
+            }
+
+            below_total += group_total;
+            for &(_, combo) in group {
+                let r = opp_reach[combo as usize] as f64;
+                if r != 0.0 {
+                    let (c1, c2) = combo_cards(combo as usize);
+                    below_card[c1.index()] += r;
+                    below_card[c2.index()] += r;
+                }
+            }
+            group_start = group_end;
+        }
+    }
+
+    /// O(n) inclusion-exclusion fold kernel: every live hand in `sorted` wins
+    /// the same outcome `u`, scaled by the opponent reach compatible with it.
+    ///
+    /// `sorted`'s combo list need not be filtered down to this terminal's exact
+    /// board — see the module-level invariant above.
+    pub(crate) fn fold_kernel(
+        sorted: &[(HandRank, u32)],
+        u: f64,
+        opp_reach: &[f32],
+        out: &mut [f32],
+    ) {
+        let (all_total, all_card) = compat_sums(sorted, opp_reach);
+        for &(_, combo) in sorted {
+            let (c1, c2) = combo_cards(combo as usize);
+            let compat = all_total - all_card[c1.index()] - all_card[c2.index()]
+                + opp_reach[combo as usize] as f64;
+            out[combo as usize] = (u * compat) as f32;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::game::{ChipEv, NoRake, PayoffPipeline};
+    use crate::{PostflopConfig, PostflopHands, build_postflop_game};
+    use hu_engine::TerminalEvaluator;
+    use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
+
+    #[test]
+    fn f32_synthetic_kernels_close() {
+        let list = |stride: usize| {
+            let mut hands: Vec<Hand> = (0..NUM_COMBOS)
+                .filter(|h| h % stride != 0)
+                .enumerate()
+                .map(|(local, h)| {
+                    let (a, b) = combo_cards(h);
+                    Hand {
+                        local: local as u16,
+                        cards: [a.index() as u8, b.index() as u8],
+                    }
+                })
+                .collect();
+            // Identical combos must have the same synthetic rank in both seats.
+            let rank =
+                |h: &Hand| HandRank((u16::from(h.cards[0]) * 53 + u16::from(h.cards[1])) % 19);
+            hands.sort_by_key(|h| (rank(h), h.local));
+            let mut groups = Vec::new();
+            for (i, h) in hands.iter().enumerate() {
+                let rank = rank(h);
+                if groups.last().is_none_or(|&(r, _)| r != rank) {
+                    groups.push((rank, i + 1));
+                } else {
+                    groups.last_mut().unwrap().1 = i + 1;
+                }
+            }
+            RankedHands {
+                hands,
+                groups,
+                dead: Vec::new(),
+            }
+        };
+        let own = list(3);
+        let opp = list(5);
+        let mut same = vec![ABSENT; own.hands.len()];
+        for h in &own.hands {
+            if let Some(o) = opp.hands.iter().find(|o| o.cards == h.cards) {
+                same[h.local as usize] = o.local;
+            }
+        }
+        let mut maximum = 0.0f64;
+        for scale in [0.0, 0.001, 1.0, 100.0] {
+            let reach: Vec<f32> = (0..opp.hands.len())
+                .map(|i| {
+                    if i % 7 == 0 {
+                        0.0
+                    } else {
+                        (i * 17 % 101 + 1) as f32 / 103.0 * scale
+                    }
+                })
+                .collect();
+            for kind in 0..2 {
+                let mut exact = vec![0.0; own.hands.len()];
+                let mut out = exact.clone();
+                if kind == 0 {
+                    showdown_kernel(&own, &opp, &same, [1.25, -0.125, -1.75], &reach, &mut exact);
+                } else {
+                    fold_kernel(&own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut exact);
+                }
+                {
+                    if kind == 0 {
+                        showdown_kernel_relaxed_f32(
+                            &own,
+                            &opp,
+                            &same,
+                            [1.25, -0.125, -1.75],
+                            &reach,
+                            &mut out,
+                        );
+                    } else {
+                        fold_kernel_relaxed_f32(
+                            &own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut out,
+                        );
+                    }
+                    let denom = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
+                    for (&a, &b) in exact.iter().zip(&out) {
+                        assert!(b.is_finite());
+                        if denom == 0.0 {
+                            assert_eq!(a, b);
+                        } else {
+                            maximum = maximum.max((f64::from(a) - f64::from(b)).abs() / denom);
+                        }
+                    }
+                }
+            }
+        }
+        assert!(maximum < 1e-5);
+        println!("synthetic f32 relative infinity error: {maximum:e}");
+    }
+
+    #[test]
+    fn asymmetric_fractional_support_matches_dense_kernels_bitwise() {
+        for board in ["2c 7d 9h Js Qs", "Ah Kh Qd Jc Ts", "2s 3s 4s 5s 6s"] {
+            let board: Vec<Card> = board
+                .split_whitespace()
+                .map(|c| c.parse().unwrap())
+                .collect();
+            let board_set: CardSet = board.iter().copied().collect();
+            let range = |p: Player| {
+                let mut r = Range::default();
+                for h in 0..NUM_COMBOS {
+                    if !(h + p.index() * 3).is_multiple_of(p.index() + 3) {
+                        r.set_weight(h, ((h % 17 + 1) as f32) / 17.0);
+                    }
+                }
+                r
+            };
+            let config = PostflopConfig {
+                board: board.clone(),
+                ranges: PerPlayer::new(range(Player::P0), range(Player::P1)),
+                pot: Chips(2),
+                effective_stack: Chips(5),
+                ..Default::default()
+            };
+            let game = build_postflop_game(
+                &config,
+                PayoffPipeline {
+                    rake: &NoRake,
+                    utility: &ChipEv,
+                },
+            );
+            let hands = &game.game.evaluator.hands;
+            let mut sorted = Vec::new();
+            let mut fold = Vec::new();
+            for h in 0..NUM_COMBOS {
+                let (a, b) = combo_cards(h);
+                if board_set.contains(a) || board_set.contains(b) {
+                    continue;
+                }
+                sorted.push((rank_of(board.iter().copied().chain([a, b])), h as u32));
+                fold.push((nlh::HandRank(0), h as u32));
+            }
+            sorted.sort_unstable();
+            for p in Player::BOTH {
+                let opp = p.opponent();
+                let reach: Vec<f32> = game.game.root_ranges[opp]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &w)| {
+                        if i % 7 == 0 {
+                            0.0
+                        } else {
+                            w * ((i % 11 + 1) as f32 / 11.0)
+                        }
+                    })
+                    .collect();
+                let global_reach = hands.expand(opp, &reach);
+                let mut actual = vec![f32::NAN; hands.len(p)];
+                game.game.evaluator.eval(0, p, &reach, &mut actual);
+                let mut expected = vec![0.0; NUM_COMBOS];
+                legacy::showdown_kernel(&sorted, 1.0, 0.0, -1.0, &global_reach, &mut expected);
+                for (&h, &v) in hands.combos(p).iter().zip(&actual) {
+                    assert_eq!(
+                        v.to_bits(),
+                        expected[h as usize].to_bits(),
+                        "showdown {board:?} {p:?} {h}"
+                    );
+                }
+                let list = |q| {
+                    hands
+                        .combos(q)
+                        .iter()
+                        .enumerate()
+                        .map(|(i, &h)| {
+                            let (a, b) = combo_cards(h as usize);
+                            Hand {
+                                local: i as u16,
+                                cards: [a.index() as u8, b.index() as u8],
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                };
+                fold_kernel(
+                    &list(p),
+                    &list(opp),
+                    &hands.same[p],
+                    -1.25,
+                    0,
+                    &reach,
+                    &mut actual,
+                );
+                legacy::fold_kernel(&fold, -1.25, &global_reach, &mut expected);
+                for (&h, &v) in hands.combos(p).iter().zip(&actual) {
+                    assert_eq!(
+                        v.to_bits(),
+                        expected[h as usize].to_bits(),
+                        "fold {board:?} {p:?} {h}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn support_keeps_every_positive_weight_and_has_global_round_trip() {
+        let board: Vec<Card> = "2c 7d 9h"
+            .split_whitespace()
+            .map(|c| c.parse().unwrap())
+            .collect();
+        let mut p0 = Range::default();
+        let a = nlh::combo_index("As".parse().unwrap(), "Ah".parse().unwrap());
+        let b = nlh::combo_index("Ks".parse().unwrap(), "Kh".parse().unwrap());
+        let blocked = nlh::combo_index(board[0], "3c".parse().unwrap());
+        p0.set_weight(a, f32::from_bits(1));
+        p0.set_weight(blocked, 1.0);
+        let mut p1 = Range::default();
+        p1.set_weight(b, 0.25);
+        let hands = PostflopHands::new(&board, &PerPlayer::new(p0, p1));
+        assert_eq!(hands.combos(Player::P0), &[a as u16]);
+        assert_eq!(hands.combos(Player::P1), &[b as u16]);
+        assert_eq!(hands.local(Player::P0, blocked), None);
+        assert_eq!(hands.local(Player::P0, b), None);
+        assert_eq!(hands.same[Player::P0], [crate::hands::ABSENT]);
+        assert_eq!(
+            hands.compact(Player::P1, &hands.expand(Player::P1, &[0.625])),
+            [0.625]
+        );
     }
 }

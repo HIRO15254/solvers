@@ -1,0 +1,147 @@
+{
+ "base": "t21",
+ "runs": {
+  "vm28": {
+   "p1_bench": {
+    "flop1_t16": {
+     "median_secs_per_iter": {
+      "t21": 0.13962,
+      "t23": 0.13763
+     },
+     "ratio_vs_t21": {
+      "t23": 0.9857
+     }
+    },
+    "flop1_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.12135,
+      "t23": 0.11865
+     },
+     "ratio_vs_t21": {
+      "t23": 0.9778
+     }
+    },
+    "gtowb_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.83822,
+      "t23": 0.82085
+     },
+     "ratio_vs_t21": {
+      "t23": 0.9793
+     }
+    },
+    "turn2_t32": {
+     "median_secs_per_iter": {
+      "t21": 0.00115,
+      "t23": 0.00113
+     },
+     "ratio_vs_t21": {
+      "t23": 0.9826
+     }
+    }
+   },
+   "eval_secs_median": {
+    "flop1_t16": {
+     "t21": 0.2254,
+     "t23": 0.2258
+    },
+    "flop1_t32": {
+     "t21": 0.1943,
+     "t23": 0.194
+    },
+    "gtowb_t32": {
+     "t21": 1.4213,
+     "t23": 1.4214
+    },
+    "turn2_t32": {
+     "t21": 0.0023,
+     "t23": 0.0022
+    }
+   },
+   "solves_32t": {
+    "c_turn2_f64": {
+     "t21": {
+      "iterations": 247,
+      "solve_secs": 0.4,
+      "secs_per_iter": 0.00162
+     },
+     "t23": {
+      "iterations": 247,
+      "solve_secs": 0.393,
+      "secs_per_iter": 0.00159
+     },
+     "solve_ratio_vs_t21": {
+      "t23": 0.9825
+     }
+    },
+    "c_turn2": {
+     "t21": {
+      "iterations": 235,
+      "solve_secs": 0.312,
+      "secs_per_iter": 0.00133,
+      "crossing": 232.2
+     },
+     "t23": {
+      "iterations": 235,
+      "solve_secs": 0.306,
+      "secs_per_iter": 0.0013,
+      "crossing": 232.2
+     },
+     "solve_ratio_vs_t21": {
+      "t23": 0.9808
+     }
+    },
+    "c_flop1": {
+     "t21": {
+      "iterations": 184,
+      "solve_secs": 22.256,
+      "secs_per_iter": 0.12096,
+      "crossing": 182.6
+     },
+     "t23": {
+      "iterations": 184,
+      "solve_secs": 21.855,
+      "secs_per_iter": 0.11878,
+      "crossing": 182.6
+     },
+     "solve_ratio_vs_t21": {
+      "t23": 0.982
+     }
+    },
+    "c_gtowb": {
+     "t21": {
+      "iterations": 319,
+      "solve_secs": 277.127,
+      "secs_per_iter": 0.86874,
+      "crossing": 316.8
+     },
+     "t23": {
+      "iterations": 319,
+      "solve_secs": 271.712,
+      "secs_per_iter": 0.85176,
+      "crossing": 316.8
+     },
+     "solve_ratio_vs_t21": {
+      "t23": 0.9805
+     }
+    }
+   },
+   "sol_payload_bit_equal": {
+    "c_flop1_t21_t23": true,
+    "c_gtowb_t21_t23": true,
+    "c_turn2_f64_t21_t23": true,
+    "c_turn2_t21_t23": true
+   },
+   "checks": {
+    "fmt": "0",
+    "clippy": "0",
+    "test": "0",
+    "tests": {
+     "passed": 930,
+     "failed": 0,
+     "ignored": 32
+    }
+   }
+  }
+ }
+}

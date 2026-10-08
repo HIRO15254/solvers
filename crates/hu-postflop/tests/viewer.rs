@@ -13,7 +13,7 @@ use hu_postflop::{
     PerStreet, PostflopConfig, StreetTree, build_postflop_game, node_streets, river_entry_state,
     river_resolve_config,
 };
-use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range, Street};
+use nlh::{Card, Chips, PerPlayer, Player, Range, Street};
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -273,7 +273,10 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
         // board-conflicting combos internally via `build_postflop_game`'s
         // own range_vec construction, so this is a valid "everyone always
         // reaches" range for the structural-equivalence check.
-        let full_reach = PerPlayer::new(vec![1.0f32; NUM_COMBOS], vec![1.0f32; NUM_COMBOS]);
+        let full_reach = PerPlayer::new(
+            vec![1.0f32; trunk.game.evaluator.hands.len(Player::P0)],
+            vec![1.0f32; trunk.game.evaluator.hands.len(Player::P1)],
+        );
 
         for id in entries {
             let tag = trunk.game.tree.tags[id as usize];
@@ -353,7 +356,11 @@ fn reach_at_matches_root_avg_strategy_column_after_a_short_solve() {
     });
 
     let root_sigma = solver.average_strategy_at(0);
-    let column = &root_sigma[0..NUM_COMBOS]; // action 0's column, action-major
+    let column = &root_sigma[0..solver
+        .game()
+        .tree
+        .storage_ref(solver.game().tree.node(0))
+        .num_hands as usize]; // action 0's column, action-major
 
     let acting = root.player;
     let expected: Vec<f32> = root_ranges[acting]

@@ -1,0 +1,25 @@
+valid: schema=solvers.nlh/v1 product=P1 (HU Postflop) amounts=BB utility=BB
+street: Flop
+board: Ks 7h 2d
+starting pot: 5.5 BB
+OOP: BB remaining stack 97.5 BB
+IP: BTN remaining stack 97.5 BB
+effective stack: 97.5 BB
+folded: SB, UTG, HJ, CO
+line: UTG f*, HJ f*, CO f*, BTN r2.5, SB f*, BB c
+* marks an implied fold
+economics: cash with rake rate=0.05 cap=4 BB when=flop_dealt
+tree rule: flop { replace bet [33, 75] }
+tree rule: turn { replace bet [33, 75] }
+tree rule: river { replace bet [33, 75] }
+tree rule: flop { replace raise [3x] }
+tree rule: turn { replace raise [3x] }
+tree rule: river { replace raise [3x] }
+resources:
+  f32Bytes: 30504079680
+  i16Bytes: 15277508192
+  memoryEstimateBytes: 30504079680
+  memoryLimitBytes: 27420078899
+  nodes: 8704350
+  terminals: 5513100
+  withinLimit: false

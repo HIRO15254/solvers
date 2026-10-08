@@ -15,10 +15,13 @@
 //! fold) live in [`crate::kernel`] and are shared verbatim with the
 //! river-only shim in [`crate::river`].
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::{Index, IndexMut};
 
+use crate::PostflopHands;
 use crate::game::{BakedPayoffs, PayoffPipeline, TerminalDescriptor, TerminalKind};
+use crate::kernel::{Hand, RankedHands};
 use hu_engine::{
     CompiledGame, NodeId, PublicTree, ReachMap, SparseTransition, TempNode, TerminalEvaluator,
     TreeSpec,
@@ -32,8 +35,8 @@ use nlh::script::{
     RuleContext,
 };
 use nlh::{
-    ALL_CARDS, BoardFacts, Card, CardSet, Chips, HandRank, NUM_COMBOS, PerPlayer, Player, Range,
-    SizeSpec, Street, combo_cards, combo_index, geometric_allin_target, rank_of,
+    ALL_CARDS, BoardFacts, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec,
+    Street, combo_cards, combo_index, geometric_allin_target, rank_of,
 };
 
 use crate::kernel;
@@ -405,6 +408,7 @@ impl PostflopGame {
 }
 
 struct PostflopTerminal {
+    board_mask: u64,
     kind: TerminalKind,
     payoffs: BakedPayoffs,
     /// Index into `PostflopEvaluator::rank_tables` for `Showdown`
@@ -413,24 +417,335 @@ struct PostflopTerminal {
     table: u32,
 }
 
-/// Exact terminal evaluation over 1,326-combo reach vectors, generalized
+/// Exact terminal evaluation over fixed seat-specific compact vectors, generalized
 /// from the river-only evaluator to runouts at any street.
 pub struct PostflopEvaluator {
     terminals: Vec<PostflopTerminal>,
+    cfr_precision: hu_engine::CfrPrecision,
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
-    rank_tables: Vec<Vec<(HandRank, u32)>>,
+    rank_tables: Vec<PerPlayer<RankedHands>>,
+    /// Batch-only table lookup. River folds share their board's showdown
+    /// table; earlier folds (or boards without a table) keep the MAX sentinel.
+    /// The existing terminal table/dispatch and all existing kernels are unchanged.
+    batch_tables: Vec<u32>,
     /// Live combos disjoint from the subgame's *starting* board, used by
     /// every fold terminal regardless of street or runout — see the
     /// invariant documented on [`kernel::fold_kernel`].
-    fold_combos: Vec<(HandRank, u32)>,
+    fold_combos: PerPlayer<Vec<Hand>>,
+    pub hands: PostflopHands,
+    pub(crate) mask_cards: Vec<Card>,
+}
+
+#[cfg(test)]
+#[path = "precision_tests.rs"]
+mod precision_tests;
+
+thread_local! {
+    // Only caller indices, no reaches/outputs or evaluator-owned references.
+    // Allocates on first use/growth, then reuses capacity on each worker.
+    static TERMINAL_BATCH_ORDER: RefCell<Vec<usize>> = const { RefCell::new(Vec::new()) };
 }
 
 impl TerminalEvaluator for PostflopEvaluator {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
-        debug_assert_eq!(opp_reach.len(), NUM_COMBOS);
-        debug_assert_eq!(out.len(), NUM_COMBOS);
-        out.fill(0.0);
+        self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
+    }
+    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
+    }
+    fn eval_cfr_batch(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reaches: &[&[f32]],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), opp_reaches.len());
+        assert_eq!(terminals.len(), outs.len());
+        if self.cfr_precision != hu_engine::CfrPrecision::F32 {
+            for ((&id, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
+                self.eval_cfr(id, p, reach, out);
+            }
+            return;
+        }
+        TERMINAL_BATCH_ORDER.with_borrow_mut(|order| {
+            order.clear();
+            for (i, ((&id, &reach), out)) in terminals
+                .iter()
+                .zip(opp_reaches)
+                .zip(outs.iter_mut())
+                .enumerate()
+            {
+                assert_eq!(reach.len(), self.hands.len(p.opponent()));
+                assert_eq!(out.len(), self.hands.len(p));
+                if self.batch_tables[id as usize] == u32::MAX {
+                    self.eval_cfr(id, p, reach, out);
+                } else {
+                    order.push(i);
+                }
+            }
+            // Preserve increasing caller indices within each table so output
+            // slices can be borrowed together once per lane-kernel call.
+            let is_fold = |i: usize| {
+                matches!(
+                    self.terminals[terminals[i] as usize].kind,
+                    TerminalKind::Fold { .. }
+                )
+            };
+            // Separate kinds for every call: a fold's arithmetic cannot depend
+            // on whether it happens to share the caller's batch with a showdown.
+            // CFR subtrees normally contain one table, so this is already an
+            // ascending run. Filtering each kind below avoids a kind sort and
+            // its repeated terminal/table lookups on these small hot calls.
+            order.sort_unstable_by_key(|&i| (self.batch_tables[terminals[i] as usize], i));
+            let mut remaining = order.as_slice();
+            while let Some(&first) = remaining.first() {
+                let table_id = self.batch_tables[terminals[first] as usize];
+                let end = remaining
+                    .partition_point(|&i| self.batch_tables[terminals[i] as usize] == table_id);
+                let (group, tail) = remaining.split_at(end);
+                let table = &self.rank_tables[table_id as usize];
+                for fold in [false, true] {
+                    let mut selected = group.iter().copied().filter(|&i| is_fold(i) == fold);
+                    loop {
+                        let mut indices = [0; kernel::TERMINAL_LANES];
+                        let mut count = 0;
+                        for (i, dst) in selected
+                            .by_ref()
+                            .take(kernel::TERMINAL_LANES)
+                            .zip(&mut indices)
+                        {
+                            *dst = i;
+                            count += 1;
+                        }
+                        if count == 0 {
+                            break;
+                        }
+                        let indices = &indices[..count];
+                        let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
+                        let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
+                        for ((reach, utility), &i) in
+                            reaches.iter_mut().zip(&mut utilities).zip(indices)
+                        {
+                            *reach = opp_reaches[i];
+                            let term = &self.terminals[terminals[i] as usize];
+                            let u = Self::cfr_utilities(term, p);
+                            *utility = if fold {
+                                [u[0] as f32; 3]
+                            } else {
+                                u.map(|v| v as f32)
+                            };
+                        }
+                        if fold {
+                            kernel::fold_batch_kernel_f32(
+                                &table[p],
+                                &table[p.opponent()],
+                                &self.hands.same[p],
+                                &utilities[..indices.len()],
+                                &reaches[..indices.len()],
+                                outs,
+                                indices,
+                            );
+                        } else {
+                            kernel::terminal_batch_kernel_f32(
+                                &table[p],
+                                &table[p.opponent()],
+                                &self.hands.same[p],
+                                &utilities[..indices.len()],
+                                &reaches[..indices.len()],
+                                outs,
+                                indices,
+                            );
+                        }
+                    }
+                }
+                remaining = tail;
+            }
+        });
+    }
+    fn eval_cfr_siblings(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reach: &[f32],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), outs.len());
+        let pair = if self.cfr_precision == hu_engine::CfrPrecision::F32 && terminals.len() >= 2 {
+            terminals.iter().enumerate().find_map(|(f, &id)| {
+                let fold = &self.terminals[id as usize];
+                if !matches!(fold.kind, TerminalKind::Fold { .. }) {
+                    return None;
+                }
+                terminals.iter().enumerate().find_map(|(s, &id)| {
+                    let showdown = &self.terminals[id as usize];
+                    (matches!(showdown.kind, TerminalKind::Showdown)
+                        && fold.board_mask == showdown.board_mask)
+                        .then_some((f, s))
+                })
+            })
+        } else {
+            None
+        };
+        if let Some((f, s)) = pair {
+            let fold = &self.terminals[terminals[f] as usize];
+            let show = &self.terminals[terminals[s] as usize];
+            let utilities = match p {
+                Player::P0 => [
+                    show.payoffs.win_p0[p],
+                    show.payoffs.tie[p],
+                    show.payoffs.win_p1[p],
+                    fold.payoffs.win_p0[p],
+                ],
+                Player::P1 => [
+                    show.payoffs.win_p1[p],
+                    show.payoffs.tie[p],
+                    show.payoffs.win_p0[p],
+                    fold.payoffs.win_p1[p],
+                ],
+            };
+            let (fold_out, show_out) = if f < s {
+                let (before, after) = outs.split_at_mut(s);
+                (&mut *before[f], &mut *after[0])
+            } else {
+                let (before, after) = outs.split_at_mut(f);
+                (&mut *after[0], &mut *before[s])
+            };
+            debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
+            debug_assert_eq!(fold_out.len(), self.hands.len(p));
+            debug_assert_eq!(show_out.len(), self.hands.len(p));
+            show_out.fill(0.0);
+            let table = &self.rank_tables[show.table as usize];
+            kernel::showdown_fold_kernel_relaxed_f32(
+                &table[p],
+                &table[p.opponent()],
+                &self.hands.same[p],
+                utilities,
+                opp_reach,
+                show_out,
+                fold_out,
+            );
+        }
+        for (i, (&terminal, out)) in terminals.iter().zip(outs).enumerate() {
+            if pair.is_none_or(|(f, s)| i != f && i != s) {
+                self.eval_cfr(terminal, p, opp_reach, out);
+            }
+        }
+    }
+    fn add_cfr_opponent_terminals(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        reaches: &[&[f32]],
+        out: &mut [f32],
+        tmp: &mut [f32],
+    ) {
+        assert_eq!(terminals.len(), reaches.len());
+        assert_eq!(out.len(), tmp.len());
+        debug_assert_eq!(out.len(), self.hands.len(p));
+        if self.cfr_precision != hu_engine::CfrPrecision::F32 {
+            for (&terminal, &reach) in terminals.iter().zip(reaches) {
+                tmp.fill(0.0);
+                self.eval_cfr(terminal, p, reach, tmp);
+                for (dst, &v) in out.iter_mut().zip(tmp.iter()) {
+                    *dst += v;
+                }
+            }
+            return;
+        }
+        let mut i = 0;
+        while i < terminals.len() {
+            // Fuse adjacent contributions only, preserving batch order even
+            // if a caller supplies more than the engine's two terminals.
+            if i + 1 < terminals.len() {
+                let a = &self.terminals[terminals[i] as usize];
+                let b = &self.terminals[terminals[i + 1] as usize];
+                let pair = match (a.kind, b.kind) {
+                    (TerminalKind::Fold { .. }, TerminalKind::Showdown) => Some((i, i + 1)),
+                    (TerminalKind::Showdown, TerminalKind::Fold { .. }) => Some((i + 1, i)),
+                    _ => None,
+                };
+                if let Some((f, s)) = pair.filter(|_| a.board_mask == b.board_mask) {
+                    let fold = &self.terminals[terminals[f] as usize];
+                    let show = &self.terminals[terminals[s] as usize];
+                    let [win, tie, lose] = Self::cfr_utilities(show, p);
+                    let [u_fold, _, _] = Self::cfr_utilities(fold, p);
+                    let table = &self.rank_tables[show.table as usize];
+                    debug_assert_eq!(reaches[f].len(), self.hands.len(p.opponent()));
+                    debug_assert_eq!(reaches[s].len(), self.hands.len(p.opponent()));
+                    kernel::add_showdown_fold_kernel_relaxed_f32(
+                        &table[p],
+                        &table[p.opponent()],
+                        &self.hands.same[p],
+                        [win, tie, lose, u_fold],
+                        reaches[s],
+                        reaches[f],
+                        out,
+                    );
+                    i += 2;
+                    continue;
+                }
+            }
+            let term = &self.terminals[terminals[i] as usize];
+            let utilities = Self::cfr_utilities(term, p);
+            debug_assert_eq!(reaches[i].len(), self.hands.len(p.opponent()));
+            match term.kind {
+                TerminalKind::Fold { .. } => kernel::add_fold_kernel_relaxed_f32(
+                    &self.fold_combos[p],
+                    &self.fold_combos[p.opponent()],
+                    &self.hands.same[p],
+                    utilities[0],
+                    term.board_mask,
+                    reaches[i],
+                    out,
+                ),
+                TerminalKind::Showdown => {
+                    let table = &self.rank_tables[term.table as usize];
+                    kernel::add_showdown_kernel_relaxed_f32(
+                        &table[p],
+                        &table[p.opponent()],
+                        &self.hands.same[p],
+                        utilities,
+                        reaches[i],
+                        out,
+                    );
+                }
+            }
+            i += 1;
+        }
+    }
+    /// Set CFR terminal arithmetic; all evaluation calls remain f64.
+    fn set_cfr_precision(&mut self, precision: hu_engine::CfrPrecision) {
+        self.cfr_precision = precision;
+    }
+}
+impl PostflopEvaluator {
+    // Fold win payoffs are baked identically for both rank orientations.
+    fn cfr_utilities(term: &PostflopTerminal, p: Player) -> [f64; 3] {
+        match p {
+            Player::P0 => [
+                term.payoffs.win_p0[p],
+                term.payoffs.tie[p],
+                term.payoffs.win_p1[p],
+            ],
+            Player::P1 => [
+                term.payoffs.win_p1[p],
+                term.payoffs.tie[p],
+                term.payoffs.win_p0[p],
+            ],
+        }
+    }
+    fn eval_with_kernel(
+        &self,
+        terminal: u32,
+        p: Player,
+        opp_reach: &[f32],
+        out: &mut [f32],
+        variant: hu_engine::CfrPrecision,
+    ) {
+        debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
+        debug_assert_eq!(out.len(), self.hands.len(p));
         let term = &self.terminals[terminal as usize];
         // Orient payoff constants to the traversing player: `u_win` is p's
         // utility when p's hand wins, etc.
@@ -448,14 +763,31 @@ impl TerminalEvaluator for PostflopEvaluator {
         };
         match term.kind {
             TerminalKind::Fold { .. } => {
-                kernel::fold_kernel(&self.fold_combos, u_win, opp_reach, out);
+                let kernel = match variant {
+                    hu_engine::CfrPrecision::F64 => kernel::fold_kernel,
+                    hu_engine::CfrPrecision::F32 => kernel::fold_kernel_relaxed_f32,
+                };
+                kernel(
+                    &self.fold_combos[p],
+                    &self.fold_combos[p.opponent()],
+                    &self.hands.same[p],
+                    u_win,
+                    term.board_mask,
+                    opp_reach,
+                    out,
+                );
             }
             TerminalKind::Showdown => {
-                kernel::showdown_kernel(
-                    &self.rank_tables[term.table as usize],
-                    u_win,
-                    u_tie,
-                    u_lose,
+                out.fill(0.0);
+                let kernel = match variant {
+                    hu_engine::CfrPrecision::F64 => kernel::showdown_kernel,
+                    hu_engine::CfrPrecision::F32 => kernel::showdown_kernel_relaxed_f32,
+                };
+                kernel(
+                    &self.rank_tables[term.table as usize][p],
+                    &self.rank_tables[term.table as usize][p.opponent()],
+                    &self.hands.same[p],
+                    [u_win, u_tie, u_lose],
                     opp_reach,
                     out,
                 );
@@ -987,6 +1319,10 @@ fn nlh_node_actions(
 pub enum TreeBuildError {
     #[error("tree rules leave an empty action menu on {street:?} for {player:?}")]
     EmptyMenu { street: Street, player: Player },
+    #[error(
+        "internal invariant: iso permutation maps {player:?} combo {combo} outside root support"
+    )]
+    SupportNotClosed { player: Player, combo: usize },
 }
 
 /// Validate the action menus before allocating a compiled game.
@@ -995,7 +1331,7 @@ pub fn try_build_postflop_game(
     pipeline: PayoffPipeline<'_>,
 ) -> Result<PostflopGame, TreeBuildError> {
     try_memory_usage(config)?;
-    Ok(build_postflop_game(config, pipeline))
+    build_checked(config, pipeline)
 }
 
 /// Where one [`NodeAction`] leads from `state`. Carries the full state
@@ -1067,22 +1403,25 @@ fn child_step(state: &LineState, action: NodeAction) -> ChildStep {
 }
 
 struct Builder<'a> {
+    hands: PostflopHands,
+    error: Option<TreeBuildError>,
     config: &'a PostflopConfig,
     pipeline: PayoffPipeline<'a>,
     /// Suit permutations preserving both ranges (see
     /// [`range_preserving_perms`]).
     sym: Vec<SuitPerm>,
     terminals: Vec<PostflopTerminal>,
-    rank_tables: Vec<Vec<(HandRank, u32)>>,
+    rank_tables: Vec<PerPlayer<RankedHands>>,
     rank_table_ids: BTreeMap<[Card; 5], u32>,
     masks: Vec<Vec<f32>>,
+    mask_cards: Vec<Card>,
     /// Per-card reach mask, built lazily and cached by card index (at most
     /// 52 masks total regardless of how many chance nodes share a card).
-    card_masks: [Option<u32>; 52],
+    card_masks: [Option<PerPlayer<u32>>; 52],
     /// Quotient transitions for merged deal classes, interned by
     /// (board, members).
     transitions: Vec<SparseTransition>,
-    transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), u32>,
+    transition_ids: BTreeMap<(Vec<Card>, Vec<Card>), PerPlayer<u32>>,
     node_info: Vec<PostflopNodeInfo>,
     /// Accumulated by every [`node_actions`] call this walk makes -- see
     /// [`RuleHits`].
@@ -1091,6 +1430,12 @@ struct Builder<'a> {
 
 /// Builds a postflop subgame through the payoff pipeline.
 pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>) -> PostflopGame {
+    build_checked(config, pipeline).expect("postflop builder invariants")
+}
+fn build_checked(
+    config: &PostflopConfig,
+    pipeline: PayoffPipeline<'_>,
+) -> Result<PostflopGame, TreeBuildError> {
     let board_len = config.board.len();
     assert!(
         (3..=5).contains(&board_len),
@@ -1107,6 +1452,8 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
 
     let zero_sum = pipeline.is_zero_sum();
     let mut builder = Builder {
+        hands: PostflopHands::new(&config.board, &config.ranges),
+        error: None,
         config,
         pipeline,
         sym: range_preserving_perms(&config.ranges),
@@ -1114,6 +1461,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         rank_tables: Vec::new(),
         rank_table_ids: BTreeMap::new(),
         masks: Vec::new(),
+        mask_cards: Vec::new(),
         card_masks: [None; 52],
         transitions: Vec::new(),
         transition_ids: BTreeMap::new(),
@@ -1141,64 +1489,89 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         street_aggressor: None,
     });
 
-    // Root ranges as 1,326-weight vectors with board conflicts zeroed.
-    let range_vec = |p: Player| -> Vec<f32> {
-        (0..NUM_COMBOS)
-            .map(|combo| {
-                let (c1, c2) = combo_cards(combo);
-                if board_set.contains(c1) || board_set.contains(c2) {
-                    0.0
-                } else {
-                    config.ranges[p].weight(combo)
+    if let Some(error) = builder.error.take() {
+        return Err(error);
+    }
+    let hands = builder.hands.clone();
+    let range_vec = |p: Player| {
+        hands
+            .combos(p)
+            .iter()
+            .map(|&h| config.ranges[p].weight(h as usize))
+            .collect::<Vec<f32>>()
+    };
+    let ranges = PerPlayer::new(range_vec(Player::P0), range_vec(Player::P1));
+    let fold = |p: Player| {
+        hands
+            .combos(p)
+            .iter()
+            .enumerate()
+            .map(|(i, &h)| {
+                let (a, b) = combo_cards(h as usize);
+                Hand {
+                    local: i as u16,
+                    cards: [a.index() as u8, b.index() as u8],
                 }
             })
             .collect()
     };
-    let ranges = PerPlayer::new(range_vec(Player::P0), range_vec(Player::P1));
-
-    // Live combos disjoint from the *starting* board — the universal fold
-    // list every fold terminal in the tree shares (see
-    // `PostflopEvaluator::fold_combos`).
-    let fold_combos: Vec<(HandRank, u32)> = (0..NUM_COMBOS)
-        .filter_map(|combo| {
-            let (c1, c2) = combo_cards(combo);
-            if board_set.contains(c1) || board_set.contains(c2) {
-                None
-            } else {
-                Some((HandRank(0), combo as u32))
-            }
-        })
-        .collect();
+    let fold_combos = PerPlayer::new(fold(Player::P0), fold(Player::P1));
 
     let Builder {
         terminals,
         rank_tables,
         masks,
+        mask_cards,
         transitions,
         node_info,
         hits,
         ..
     } = builder;
 
+    // Precompute only the new batch dispatch. Fold terminal metadata remains
+    // unchanged so every existing CFR/evaluation path retains its behavior.
+    let board_tables: BTreeMap<_, _> = terminals
+        .iter()
+        .filter(|t| matches!(t.kind, TerminalKind::Showdown) && t.board_mask.count_ones() == 5)
+        .map(|t| (t.board_mask, t.table))
+        .collect();
+    let batch_tables = terminals
+        .iter()
+        .map(|t| {
+            if matches!(t.kind, TerminalKind::Showdown) {
+                t.table
+            } else {
+                board_tables.get(&t.board_mask).copied().unwrap_or(u32::MAX)
+            }
+        })
+        .collect();
     let evaluator = PostflopEvaluator {
+        cfr_precision: hu_engine::CfrPrecision::F64,
         terminals,
         rank_tables,
+        batch_tables,
         fold_combos,
+        hands,
+        mask_cards,
     };
 
     // Joint compatible weight, via the same inclusion-exclusion the fold
     // kernel uses. Only the pair-compat sum — no live-count denominators
     // (the 1/45, 1/44 deal weights already live on the chance branches).
-    let (all_total, all_card) = kernel::compat_sums(&evaluator.fold_combos, &ranges[Player::P1]);
-    let normalizer: f64 = evaluator
-        .fold_combos
+    let (all_total, all_card) =
+        kernel::compat_sums(&evaluator.fold_combos[Player::P1], &ranges[Player::P1]);
+    let normalizer: f64 = evaluator.fold_combos[Player::P0]
         .iter()
-        .map(|&(_, combo)| {
-            let idx = combo as usize;
-            let (c1, c2) = combo_cards(idx);
+        .map(|h| {
+            let idx = h.local as usize;
+            let same = evaluator.hands.same[Player::P0][idx];
+            let r = if same == crate::hands::ABSENT {
+                0.0
+            } else {
+                ranges[Player::P1][same as usize] as f64
+            };
             ranges[Player::P0][idx] as f64
-                * (all_total - all_card[c1.index()] - all_card[c2.index()]
-                    + ranges[Player::P1][idx] as f64)
+                * (all_total - all_card[h.cards[0] as usize] - all_card[h.cards[1] as usize] + r)
         })
         .sum();
     assert!(normalizer > 0.0, "ranges share no compatible combos");
@@ -1207,10 +1580,13 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         root,
         masks,
         transitions,
-        root_dims: PerPlayer::new(NUM_COMBOS as u32, NUM_COMBOS as u32),
+        root_dims: PerPlayer::new(
+            evaluator.hands.len(Player::P0) as u32,
+            evaluator.hands.len(Player::P1) as u32,
+        ),
     });
 
-    PostflopGame {
+    Ok(PostflopGame {
         game: CompiledGame {
             tree,
             evaluator,
@@ -1220,7 +1596,7 @@ pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>
         },
         node_info,
         rule_hits: hits,
-    }
+    })
 }
 
 impl Builder<'_> {
@@ -1365,10 +1741,16 @@ impl Builder<'_> {
             // exactly, per hand.
             let maps = if group.members.len() == 1 {
                 let mask_id = self.card_mask(group.representative);
-                PerPlayer::new(ReachMap::Mask(mask_id), ReachMap::Mask(mask_id))
+                PerPlayer::new(
+                    ReachMap::Mask(mask_id[Player::P0]),
+                    ReachMap::Mask(mask_id[Player::P1]),
+                )
             } else {
                 let id = self.quotient_transition(&state.board, group);
-                PerPlayer::new(ReachMap::Transition(id), ReachMap::Transition(id))
+                PerPlayer::new(
+                    ReachMap::Transition(id[Player::P0]),
+                    ReachMap::Transition(id[Player::P1]),
+                )
             };
 
             let mut board = state.board.clone();
@@ -1424,7 +1806,7 @@ impl Builder<'_> {
     /// Quotient transition for a merged deal class (see the comment at the
     /// use site in [`Self::deal_chance`]). Interned by (board, members):
     /// identical classes recur across betting lines of the same street.
-    fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> u32 {
+    fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> PerPlayer<u32> {
         let key = (board.to_vec(), group.members.clone());
         if let Some(&id) = self.transition_ids.get(&key) {
             return id;
@@ -1436,40 +1818,61 @@ impl Builder<'_> {
         let rep = group.representative;
         let perms = orbit_perms(&stab, rep, &group.members);
         let member_avg = 1.0 / perms.len() as f32;
-        let mut entries: Vec<(u32, u32, f32)> = Vec::with_capacity(perms.len() * (NUM_COMBOS - 51));
-        for perm in &perms {
-            for h in 0..NUM_COMBOS {
-                let (c1, c2) = combo_cards(h);
-                if c1 == rep || c2 == rep {
-                    continue; // dead in rep coordinates
+        let mut ids = PerPlayer::new(0, 0);
+        for p in Player::BOTH {
+            let mut entries = Vec::with_capacity(perms.len() * self.hands.len(p));
+            for perm in &perms {
+                for (local, &global) in self.hands.combos(p).iter().enumerate() {
+                    let (a, b) = combo_cards(global as usize);
+                    if a == rep || b == rep {
+                        continue;
+                    }
+                    let mapped = self.hands.local(p, permute_combo(perm, global as usize));
+                    if let Some(mapped) = mapped {
+                        debug_assert_eq!(
+                            self.hands.combos(p)[mapped] as usize,
+                            permute_combo(perm, global as usize)
+                        );
+                        entries.push((mapped as u32, local as u32, member_avg));
+                    } else {
+                        self.error = Some(TreeBuildError::SupportNotClosed {
+                            player: p,
+                            combo: global as usize,
+                        });
+                    }
                 }
-                entries.push((permute_combo(perm, h) as u32, h as u32, member_avg));
             }
+            ids[p] = self.transitions.len() as u32;
+            self.transitions.push(SparseTransition {
+                in_dim: self.hands.len(p) as u32,
+                out_dim: self.hands.len(p) as u32,
+                entries,
+            });
         }
-        let id = self.transitions.len() as u32;
-        self.transitions.push(SparseTransition {
-            in_dim: NUM_COMBOS as u32,
-            out_dim: NUM_COMBOS as u32,
-            entries,
-        });
-        self.transition_ids.insert(key, id);
-        id
+        self.transition_ids.insert(key, ids);
+        ids
     }
-
-    fn card_mask(&mut self, card: Card) -> u32 {
-        if let Some(id) = self.card_masks[card.index()] {
-            return id;
+    fn card_mask(&mut self, card: Card) -> PerPlayer<u32> {
+        if let Some(ids) = self.card_masks[card.index()] {
+            return ids;
         }
-        let id = self.masks.len() as u32;
-        let mask: Vec<f32> = (0..NUM_COMBOS)
-            .map(|combo| {
-                let (c1, c2) = combo_cards(combo);
-                if c1 == card || c2 == card { 0.0 } else { 1.0 }
-            })
-            .collect();
-        self.masks.push(mask);
-        self.card_masks[card.index()] = Some(id);
-        id
+        let mut ids = PerPlayer::new(0, 0);
+        for p in Player::BOTH {
+            ids[p] = self.masks.len() as u32;
+            let mask = self
+                .hands
+                .combos(p)
+                .iter()
+                .map(|&h| {
+                    let (a, b) = combo_cards(h as usize);
+                    if a == card || b == card { 0.0 } else { 1.0 }
+                })
+                .collect();
+            self.masks.push(mask);
+            self.mask_cards.push(card);
+        }
+        self.card_masks[card.index()] = Some(ids);
+        ids
     }
 
     fn terminal(&mut self, state: &LineState, kind: TerminalKind) -> TempNode {
@@ -1500,6 +1903,10 @@ impl Builder<'_> {
         };
         let id = self.terminals.len() as u32;
         self.terminals.push(PostflopTerminal {
+            board_mask: state
+                .board
+                .iter()
+                .fold(0, |mask, c| mask | (1u64 << c.index())),
             kind,
             payoffs,
             table,
@@ -1521,18 +1928,42 @@ impl Builder<'_> {
             return id;
         }
         let board_set: CardSet = board5.iter().copied().collect();
-        let mut sorted: Vec<(HandRank, u32)> = Vec::new();
-        for combo in 0..NUM_COMBOS {
-            let (c1, c2) = combo_cards(combo);
-            if board_set.contains(c1) || board_set.contains(c2) {
-                continue;
+        let ranked = |p: Player| {
+            let mut sorted = Vec::new();
+            let mut dead = Vec::new();
+            for (local, &global) in self.hands.combos(p).iter().enumerate() {
+                let (a, b) = combo_cards(global as usize);
+                if board_set.contains(a) || board_set.contains(b) {
+                    dead.push(local as u16);
+                    continue;
+                }
+                sorted.push((
+                    rank_of(board5.iter().copied().chain([a, b])),
+                    global,
+                    local as u16,
+                ));
             }
-            let rank = rank_of(board5.iter().copied().chain([c1, c2]));
-            sorted.push((rank, combo as u32));
-        }
-        sorted.sort_unstable();
+            sorted.sort_unstable();
+            let mut table = RankedHands {
+                dead,
+                ..Default::default()
+            };
+            for (rank, global, local) in sorted {
+                if table.groups.last().is_none_or(|&(r, _)| r != rank) {
+                    table.groups.push((rank, table.hands.len()));
+                }
+                let (a, b) = combo_cards(global as usize);
+                table.hands.push(Hand {
+                    local,
+                    cards: [a.index() as u8, b.index() as u8],
+                });
+                table.groups.last_mut().unwrap().1 = table.hands.len();
+            }
+            table
+        };
+        let table = PerPlayer::new(ranked(Player::P0), ranked(Player::P1));
         let id = self.rank_tables.len() as u32;
-        self.rank_tables.push(sorted);
+        self.rank_tables.push(table);
         self.rank_table_ids.insert(key, id);
         id
     }
@@ -1552,6 +1983,18 @@ pub struct MemoryEstimate {
     /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
+    /// Bytes for i16 regrets, f32 strategy sums, and one regret scale per node.
+    pub i16_f32avg_bytes: u64,
+    /// Releasable f32 regret arena (4L bytes).
+    pub f32_regret_bytes: u64,
+    /// Releasable i16 regret arena and node scales (2L + 4N bytes),
+    /// shared by i16 and i16-f32avg backends.
+    pub i16_regret_bytes: u64,
+    /// Packed value slots, mode/street metadata and one bounded parallel
+    /// strategy batch for a full `.sol` export.
+    pub save_bytes: u64,
+    /// Bounded streaming codec budget (updated for the run's thread count).
+    pub compression_bytes: u64,
     pub nodes: u64,
     pub terminals: u64,
     pub rank_tables: u64,
@@ -1573,6 +2016,41 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
     try_memory_usage(config).expect("postflop tree must have nonempty action menus")
 }
 
+impl MemoryEstimate {
+    /// Final checkpoint and solution peak, retaining all storage: S + W + 2C.
+    /// Both codecs use zstd level 1, window_log(20), and the run's worker count.
+    /// C bounds either encoder (using the larger payload); W already includes
+    /// the bounded Rayon strategy batch. No state snapshot is allocated.
+    /// Overflow means the parallel peak cannot fit a u64 memory limit.
+    pub fn parallel_save_bytes(&self, backend: crate::input::Storage) -> Option<u64> {
+        let storage = match backend {
+            crate::input::Storage::F32 => self.f32_bytes,
+            crate::input::Storage::I16 => self.i16_bytes,
+            crate::input::Storage::I16F32Avg => self.i16_f32avg_bytes,
+        };
+        storage
+            .checked_add(self.save_bytes)?
+            .checked_add(self.compression_bytes.checked_mul(2)?)
+    }
+
+    /// Peak of solving/checkpointing and saving after regret release, plus
+    /// the conservative streaming compression budget. Arithmetic saturates.
+    pub fn required_bytes(&self, backend: crate::input::Storage) -> u64 {
+        let (storage, regrets) = match backend {
+            crate::input::Storage::F32 => (self.f32_bytes, self.f32_regret_bytes),
+            crate::input::Storage::I16 => (self.i16_bytes, self.i16_regret_bytes),
+            crate::input::Storage::I16F32Avg => (self.i16_f32avg_bytes, self.i16_regret_bytes),
+        };
+        storage
+            .max(
+                storage
+                    .saturating_sub(regrets)
+                    .saturating_add(self.save_bytes),
+            )
+            .saturating_add(self.compression_bytes)
+    }
+}
+
 /// Counting preflight with a typed error for a menu emptied by common rules.
 pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
     let board_len = config.board.len();
@@ -1586,7 +2064,10 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
     let mut counting = Counting {
         config,
         sym: range_preserving_perms(&config.ranges),
+        hands: PostflopHands::new(&config.board, &config.ranges),
         elements: 0,
+        max_strategy_elements: 0,
+        min_strategy_elements: u64::MAX,
         nodes: 0,
         terminals: 0,
         action_nodes: 0,
@@ -1617,6 +2098,23 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
     Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
+        i16_f32avg_bytes: counting.elements * 6 + counting.action_nodes * 4,
+        f32_regret_bytes: counting.elements * 4,
+        i16_regret_bytes: counting.elements * 2 + counting.action_nodes * 4,
+        save_bytes: counting.action_nodes
+                * 2
+                * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
+            + counting.action_nodes * crate::sol::VALUE_BLOCK_HEADER_BYTES as u64
+            + counting.action_nodes
+                * (std::mem::size_of::<
+                    std::sync::Mutex<Option<Result<Vec<u8>, postcard::Error>>>,
+                >() + std::mem::size_of::<bool>()) as u64
+            + counting.nodes * std::mem::size_of::<Street>() as u64
+            // Conservatively add the batch to the value pass's retained slots.
+            + crate::sol::strategy_batch_workspace(
+                counting.elements, counting.min_strategy_elements, counting.max_strategy_elements, counting.action_nodes,
+            ),
+        compression_bytes: 24 * 1024 * 1024,
         nodes: counting.nodes,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,
@@ -1628,10 +2126,13 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
 /// `node_actions`/`chance_groups` shape helpers as the real builder so the
 /// two can never disagree about how many children a node has.
 struct Counting<'a> {
+    hands: PostflopHands,
     error: Option<TreeBuildError>,
     config: &'a PostflopConfig,
     sym: Vec<SuitPerm>,
     elements: u64,
+    max_strategy_elements: u64,
+    min_strategy_elements: u64,
     nodes: u64,
     terminals: u64,
     action_nodes: u64,
@@ -1666,7 +2167,10 @@ impl Counting<'_> {
             }
         }
 
-        self.elements += num_actions * NUM_COMBOS as u64;
+        let elements = num_actions * self.hands.len(state.to_act) as u64;
+        self.elements += elements;
+        self.max_strategy_elements = self.max_strategy_elements.max(elements);
+        self.min_strategy_elements = self.min_strategy_elements.min(elements);
     }
 
     fn street_end(&mut self, mut state: LineState) {

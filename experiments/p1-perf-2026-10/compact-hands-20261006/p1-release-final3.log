@@ -1,0 +1,257 @@
+    Finished `release` profile [optimized] target(s) in 0.70s
+     Running unittests src\lib.rs (target\release\deps\hu_postflop-51de70344b6748e4.exe)
+
+running 38 tests
+test checkpoint::tests::round_trip_i16 ... ok
+test checkpoint::tests::rejects_pre_compact_versions_before_decoding ... ok
+test checkpoint::tests::common_input_round_trip_preserves_config_and_elapsed_time ... ok
+test checkpoint::tests::round_trip_f32 ... ok
+test checkpoint::tests::rejects_truncated_header ... ok
+test checkpoint::tests::rejects_truncated_payload ... ok
+test artifact::tests::stored_values_aggregate_to_the_reported_root_ev ... ok
+test game::payoff::tests::gg_preflop_rake_semantics ... ok
+test game::payoff::tests::chip_ev_is_zero_sum ... ok
+test checkpoint::tests::write_is_atomic_leaves_no_tmp_file_behind ... ok
+test checkpoint::tests::rejects_bad_magic ... ok
+test checkpoint::tests::rejects_bad_version ... ok
+test artifact::tests::v1_river_resolve_uses_embedded_vanilla_and_i16 ... ok
+test artifact::tests::full_mode_forced_on_river_start_config ... ok
+test game::payoff::tests::hu_icm_is_affine_in_chip_ev ... ok
+test sol::tests::dequantize_rejects_wrong_length ... ok
+test sol::tests::quantize_dequantize_round_trip ... ok
+test game::payoff::tests::rake_breaks_zero_sum ... ok
+test game::payoff::tests::icm_conserves_prize_pool_across_stack_splits ... ok
+test game::payoff::tests::is_zero_sum_matches_free_rake_and_affine_utility ... ok
+test kernel::tests::support_keeps_every_positive_weight_and_has_global_round_trip ... ok
+test postflop::tests::every_member_of_a_merged_class_has_the_representative_board_facts ... ok
+test sol::tests::rejects_bad_magic ... ok
+test kernel::tests::asymmetric_fractional_support_matches_dense_kernels_bitwise ... ok
+test sol::tests::rejects_pre_compact_versions_before_decoding ... ok
+test sol::tests::rejects_hash_mismatch ... ok
+test sol::tests::rejects_truncated_header ... ok
+test sol::tests::rejects_truncated_payload ... ok
+test viewer::tests::previous_aggressor_carries_the_turns_ip_bettor_into_river_entry ... ok
+test sol::tests::rejects_bad_version ... ok
+test sol::tests::round_trip ... ok
+test viewer::tests::previous_aggressor_is_none_when_the_turn_checks_through ... ok
+test sol::tests::value_quantization_round_trips_within_tolerance ... ok
+test artifact::tests::round_trip_and_sol_provider_no_rivers_f32 ... ok
+test artifact::tests::i16_export_dequantizes_to_valid_distributions ... ok
+test artifact::tests::stored_values_cover_exactly_the_stored_strategy_nodes ... ok
+test artifact::tests::unreachable_hands_are_stored_as_zero ... ok
+test artifact::tests::river_resolve_accuracy ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.44s
+
+     Running tests\aggregate.rs (target\release\deps\aggregate-f626d6e02f29fd3d.exe)
+
+running 6 tests
+test class_average_weighted_by_range ... ok
+test class_mapping_goldens ... ok
+test class_weights_matches_range_total ... ok
+test river_equity_golden_full_house_kicker ... ok
+test turn_equity_smoke_aa_qq_vs_kk ... ok
+test flop_equity_sanity_aa_vs_kk ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+
+     Running tests\compact.rs (target\release\deps\compact-cc5f092995ecf700.exe)
+
+running 2 tests
+test queries_keep_global_combos_and_exclude_zero_weight_hands ... ok
+test runouts_mask_fixed_asymmetric_support_and_zero_dead_terminal_values ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\input.rs (target\release\deps\input-aafe699966c07b54.exe)
+
+running 14 tests
+test lowering_rejects_overflow_and_wrong_product ... ok
+test p1_payoff_uses_the_common_rake_rounding_unit ... ok
+test antes_bb_ante_and_straddles_are_in_the_starting_pot ... ok
+test sections_defaults_order_and_idempotence ... ok
+test spec_p1_example_lowering_and_sizes ... ok
+test turn_start_previous_aggressor_and_earlier_rules_skipped ... ok
+test spr_uses_both_remaining_stacks_and_amount_variables_use_bb ... ok
+test checkdown_facing_bet_is_a_solvable_fold_node_and_later_rules_edit_it ... ok
+test line_history_constants_and_limped_previous_aggressor ... ok
+test effective_stack_allin_and_size_resolution ... ok
+test strict_sections_codes_and_other_product_diagnostics ... ok
+test fold_check_call_rules_source_order_and_no_script ... ok
+test each_tree_variable_is_evaluated_at_p1_nodes ... ok
+test v1_and_scaled_legacy_trees_are_identical ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests\input_economics.rs (target\release\deps\input_economics-eb6af1decb67989a.exe)
+
+running 11 tests
+test physical_ram_query_returns_positive_bytes ... ok
+test two_player_free_chip_ev_retains_the_zero_sum_shortcut ... ok
+test actual_contributions_and_dead_money_cancel_from_reported_chip_ev ... ok
+test unequal_actual_contributions_and_ante_dead_money_set_the_ev_shift ... ok
+test memory_auto_explicit_boundary_and_overflow ... ok
+test rake_rounds_before_capping_on_milli_bb_grid ... ok
+test rake_excludes_uncalled_wager_and_uses_table_hand_facts ... ok
+test section_value_errors_have_full_paths_and_nlh003 ... ok
+test targets_resolve_in_bb_or_prizes_and_no_default ... ok
+test section_type_errors_have_full_paths_and_nlh002 ... ok
+test chip_ev_identity_on_small_solved_spots ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\mccfr.rs (target\release\deps\mccfr-ab4c49c7abbf0a79.exe)
+
+running 5 tests
+test state_round_trip_resumes_bit_identically ... ok
+test sampled_run_is_deterministic_for_fixed_seed ... ok
+test mccfr_kuhn_matches_full_traversal_bit_exactly ... ok
+test pruning_converges_and_never_panics ... ok
+test mccfr_matches_full_traversal_on_leduc has been running for over 60 seconds
+     Running tests\oracle_diff.rs (target\release\deps\oracle_diff-7b2926e538e9475f.exe)
+test mccfr_matches_full_traversal_on_leduc ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 167.61s
+
+
+running 3 tests
+test uniform_profiles_agree_between_engine_and_oracle ... ok
+test multistreet_engine_matches_scalar_oracle_early_iterates ... ok
+test multistreet_engine_matches_scalar_oracle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running tests\postflop.rs (target\release\deps\postflop-b590b30334929c3b.exe)
+
+running 37 tests
+test allin_threshold_merges_a_near_max_size_into_allin ... ok
+test member_branch_matches_suit_permuted_rep_branch ... ok
+test an_unset_raise_menu_reuses_the_bet_menu ... ok
+test donk_menu_controls_oop_opening_action_after_a_called_ip_bet ... ok
+test asymmetric_ranges_suppress_iso_merging ... ok
+test history_round_trip_uses_r_tokens_through_river_entry_state ... ok
+test min_bet_refuses_to_open_below_its_own_value ... ok
+test memory_usage_rule_hits_match_the_real_build ... ok
+test iso_quotient_matches_full_tree_per_hand ... ok
+test i16_storage_matches_f32_on_small_turn_spot ... ok
+test include_allin_adds_one_action_without_duplicating_an_already_allin_size ... ok
+test memory_usage_matches_allocated ... ok
+test matching_raise_and_bet_fractions_reproduce_shared_size_tree ... ok
+test raise_levels_apply_distinct_multiples_per_level ... ok
+test per_node_values_at_the_root_agree_with_the_root_expected_value ... ok
+test rule_hits_are_tracked_per_rule_and_do_not_collide_across_streets ... ok
+test raise_fractions_size_independently_of_bet_fractions ... ok
+test tree_script_effect_checkdown_keeps_only_check ... ok
+test sub_minimum_raise_is_bumped_to_the_minimum_full_raise ... ok
+test odd_pot_terminal_payoffs_match_the_neighboring_even_pots ... ok
+test tree_script_board_predicate_selects_different_menus_on_different_runouts ... ok
+test tree_script_effect_add_appends_a_wager_candidate ... ok
+test node_info_records_the_pot_contribution_at_each_node ... ok
+test no_bet_flop_value_matches_direct_enumeration ... ok
+test tree_script_preflop_aggressor_drives_cbet_and_donk ... ok
+test tree_script_rule_action_kind_mismatch_is_inert ... ok
+test tree_script_effect_remove_strips_every_wager_of_that_kind ... ok
+test tree_script_effect_replace_swaps_the_wager_menu ... ok
+test tree_script_effect_force_drops_fold_check_and_call_too ... ok
+test tree_script_emptying_a_node_falls_back_to_base_actions ... ok
+test tree_script_include_allin_applies_before_rules ... ok
+test untracked_node_info_stays_empty ... ok
+test iso_on_off_converge_to_same_value ... ok
+test no_bet_flop_value_full_ranges ... ok
+test flop_solve_is_zero_sum ... ok
+test allin_runout_matches_direct_equity ... ok
+test smoke_solve_3bet_pot has been running for over 60 seconds
+test smoke_solve_3bet_pot ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 206.07s
+
+     Running tests\rake_icm.rs (target\release\deps\rake_icm-73ac1d9a2941bdc1.exe)
+
+running 5 tests
+test postflop_builder_sets_zero_sum_flag ... ok
+test rake_makes_defender_call_less ... ok
+test raked_solve_leaks_exactly_the_rake_in_aggregate ... ok
+test pure_hu_icm_postflop_solve_matches_chip_ev ... ok
+test rake_cap_level_changes_strategy ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests\river.rs (target\release\deps\river-9916342d17a1a832.exe)
+
+running 4 tests
+test river_solve_is_zero_sum ... ok
+test clairvoyance_game_matches_closed_form ... ok
+test showdown_kernel_matches_naive_mixed_board ... ok
+test showdown_kernel_matches_naive_tie_heavy_board ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests\storage_backends.rs (target\release\deps\storage_backends-0d56b71cdfc56b37.exe)
+
+running 6 tests
+test bytes_for_i16_smaller_than_f32_for_leduc_shape ... ok
+test f32_state_round_trip_is_deterministic ... ok
+test i16_state_round_trip_is_deterministic ... ok
+test restore_state_rejects_wrong_variant_or_length ... ok
+test leduc_i16_matches_f32_at_500_iters ... ok
+test leduc_i16_game_value_and_exploitability ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+
+     Running tests\toy_oracle_diff.rs (target\release\deps\toy_oracle_diff-e2ff182d5e71568f.exe)
+
+running 3 tests
+test kuhn_engine_matches_oracle ... ok
+test kuhn_engine_matches_oracle_early_iterates ... ok
+test leduc_engine_matches_oracle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests\toys.rs (target\release\deps\toys-f9f061ff6d7abe10.exe)
+
+running 10 tests
+test kuhn_zero_sum_invariant ... ok
+test kuhn_game_value_and_exploitability ... ok
+test zero_sum_flag_tracks_pipeline ... ok
+test zero_sum_fast_path_matches_general_sum_accounting ... ok
+test raked_game_is_not_zero_sum_and_asymmetric ... ok
+test pure_hu_icm_solve_matches_chip_ev_solve ... ok
+test kuhn_equilibrium_family_membership ... ok
+test discount_schedules_beat_vanilla ... ok
+test exploitability_decreases_over_time ... ok
+test leduc_game_value_and_exploitability ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+     Running tests\tree_identity.rs (target\release\deps\tree_identity-d2ae42735e8e48f8.exe)
+
+running 6 tests
+test river_small ... ok
+test turn_small ... ok
+test three_bet_pot_fast ... ok
+test postflop_srp20 ... ok
+test postflop_pio_tree ... ok
+test postflop_pio_icm ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+     Running tests\viewer.rs (target\release\deps\viewer-14825706c1c6989c.exe)
+
+running 8 tests
+test river_entry_state_accumulates_contribution_across_two_streets ... ok
+test node_streets_tags_turn_start_board_correctly ... ok
+test reach_at_matches_root_avg_strategy_column_after_a_short_solve ... ok
+test river_entry_state_bet_call_turn_line ... ok
+test river_entry_state_check_check_turn_line ... ok
+test river_entry_state_rejects_a_fold_and_a_short_board ... ok
+test node_streets_layers_flop_turn_river_on_multi_street_board ... ok
+test river_trunk_matches_fresh_river_resolve_at_every_entry_node ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+   Doc-tests hu_postflop
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

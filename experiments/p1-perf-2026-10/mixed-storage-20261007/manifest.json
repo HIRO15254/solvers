@@ -1,0 +1,344 @@
+{
+  "task": "P1-T6 / PF2 / PF3",
+  "reproduction_status": "verified for the local instructions; GTOW-scale solve not executed",
+  "source": {
+    "baseline_commit": "06415d2d11524cdd0e136b8694a9e8036da0824d",
+    "branch": "s3-p1-multicore-perf",
+    "initial_dirty": false,
+    "measurement_dirty": true,
+    "commit_push_branch_changes": false,
+    "patch_path": "runs/p1-t6/source.patch",
+    "patch_sha256_lf": "67563c9ea0a1cc013ab881de119b611974909ec098fb20a777c570474f9b8291",
+    "files": [
+      {
+        "path": "crates/cli/src/config_new.rs",
+        "bytes": 15650,
+        "sha256_lf": "8b195d03071ec0d071454fc9a4687911bad81652088472841d07639a152a7c9a"
+      },
+      {
+        "path": "crates/cli/src/nlh_v1/p1.rs",
+        "bytes": 17515,
+        "sha256_lf": "01059a21a684d6ba49edbbccf8ffad723912e9091422076f92e6dfdb8dcc579d"
+      },
+      {
+        "path": "crates/cli/tests/cli_integration.rs",
+        "bytes": 61407,
+        "sha256_lf": "066856bd0d9f78cf9a7b398e70fbe8c9f6200ef8d42577a9b36405fd25263224"
+      },
+      {
+        "path": "crates/cli/tests/postflop_contract.rs",
+        "bytes": 16089,
+        "sha256_lf": "97f09ddeb6eef5bf8ba170e4dda15de5842ad823cd0101df548ddb4cff69ab7e"
+      },
+      {
+        "path": "crates/hu-engine/src/lib.rs",
+        "bytes": 1405,
+        "sha256_lf": "4c872c156d8c06ff335c9296d9437d826ba50fe57ab1d34e35dd1f6c71d83d23"
+      },
+      {
+        "path": "crates/hu-engine/src/storage.rs",
+        "bytes": 59217,
+        "sha256_lf": "9e2d79496c406c25a7991aa5f9a24d2ce74941163e3429a1483912fb7965cb8c"
+      },
+      {
+        "path": "crates/hu-engine/tests/vector_determinism.rs",
+        "bytes": 14063,
+        "sha256_lf": "f1185c97c1fde9561da9919d038bba2d3d4de9d47338e1727c45c9c25f7efe1c"
+      },
+      {
+        "path": "crates/hu-postflop/examples/p1_bench.rs",
+        "bytes": 8338,
+        "sha256_lf": "37064279bad9bf7c69d92bbb77aee4966bce4252e91d34b950ee3c7fd9097b08"
+      },
+      {
+        "path": "crates/hu-postflop/examples/verify_save.rs",
+        "bytes": 12533,
+        "sha256_lf": "1c6a05507d5afbc60565fdc0b08c3d098237524472f5bd05875169337c23215d"
+      },
+      {
+        "path": "crates/hu-postflop/src/artifact.rs",
+        "bytes": 73170,
+        "sha256_lf": "10b0b5bcf0ff639422da501ad0b8f922689dfa5f540ab124de08a1429bd61013"
+      },
+      {
+        "path": "crates/hu-postflop/src/checkpoint.rs",
+        "bytes": 28419,
+        "sha256_lf": "da1117d2b9fa2dd655f52af1fd3df25b85866204947940b6789c9ff27f5273cb"
+      },
+      {
+        "path": "crates/hu-postflop/src/input.rs",
+        "bytes": 20135,
+        "sha256_lf": "8202d697ae4dc5a0dad37eca7feb1bfe35e7cc423c3f426e3c57c370f775ec23"
+      },
+      {
+        "path": "crates/hu-postflop/src/input/resources.rs",
+        "bytes": 2579,
+        "sha256_lf": "47915231139a5c1c7365c492b78f744c4341a15f66300a323d496442082ee505"
+      },
+      {
+        "path": "crates/hu-postflop/src/postflop.rs",
+        "bytes": 77891,
+        "sha256_lf": "24b53b7f7be9a89a4218017dd608ee03429f99cf6de5f374d0e8b19ec605bc31"
+      },
+      {
+        "path": "crates/hu-postflop/src/prepare.rs",
+        "bytes": 11723,
+        "sha256_lf": "18e20849f0de21d32317c4f633a353e5858ca68eff4915ddc1ce617dfb0ad956"
+      },
+      {
+        "path": "crates/hu-postflop/src/queries.rs",
+        "bytes": 11345,
+        "sha256_lf": "8cfd6065eda7afa814a2d81e355ceca3aae3d91380f044f6c6c29925d01b6b4d"
+      },
+      {
+        "path": "crates/hu-postflop/src/report.rs",
+        "bytes": 4326,
+        "sha256_lf": "a2fbd51bddcdd7fe3f672918981eb84f1f07f35241e812941154bdc2d1d6bd53"
+      },
+      {
+        "path": "crates/hu-postflop/src/run.rs",
+        "bytes": 11722,
+        "sha256_lf": "15302a47a63188058e70977dabfe9a17fd92e49fb76ce3ae7e206b72897fedfd"
+      },
+      {
+        "path": "crates/hu-postflop/src/sol.rs",
+        "bytes": 29254,
+        "sha256_lf": "e9326a6e2460f3cfe76bf684871a00438bc0573a33257a6449b318d73dd32853"
+      },
+      {
+        "path": "crates/hu-postflop/tests/compact.rs",
+        "bytes": 3659,
+        "sha256_lf": "58b3a8236b5c78851f931052b72582b15e57257947790c549824a8a08103951f"
+      },
+      {
+        "path": "crates/hu-postflop/tests/input.rs",
+        "bytes": 20987,
+        "sha256_lf": "3bb17c798dc13d2335044e6eba2434878e9462eb00c1fce53f638fda4eaac944"
+      },
+      {
+        "path": "crates/hu-postflop/tests/input_economics.rs",
+        "bytes": 14649,
+        "sha256_lf": "3a475504e5159d1ebf2b32acefd508df7f29be0bdb355c349b9c16cd331314f1"
+      },
+      {
+        "path": "crates/hu-postflop/tests/mccfr.rs",
+        "bytes": 8817,
+        "sha256_lf": "d55bfc18bcd00277e27b718eec5303420bbdf32225177b4d91b773fa1eb3c72d"
+      },
+      {
+        "path": "crates/hu-postflop/tests/storage_backends.rs",
+        "bytes": 14311,
+        "sha256_lf": "e88d735f53356357662342e11fdba0c960b6d2605b2f75b56166a6fd543781f1"
+      },
+      {
+        "path": "docs/architecture.md",
+        "bytes": 20345,
+        "sha256_lf": "0141330171091a129e1de7dfd760108b77ab14dcbc0e86f7556fe44d95757baf"
+      },
+      {
+        "path": "docs/cli-reference.jp.md",
+        "bytes": 21161,
+        "sha256_lf": "089d48dbf0fb7d86bab0138162ae7a680a00fc0bdb09a4f67ca98d81e0227717"
+      },
+      {
+        "path": "docs/hu-postflop.jp.md",
+        "bytes": 20362,
+        "sha256_lf": "49673ba89957d0307df6d74dd482670050d206c854757717c6c9b513e163b994"
+      },
+      {
+        "path": "docs/nlh-input-v1.jp.md",
+        "bytes": 53472,
+        "sha256_lf": "d143505ca5c95d993f09a62e6b0b7e558458690d92e767acb035256ee10d5a27"
+      },
+      {
+        "path": "docs/user-guide.jp.md",
+        "bytes": 12220,
+        "sha256_lf": "2dcb88342d0f76449fd638bd8f800ddfa98a9daca337f4be65aa73fcbba2c079"
+      },
+      {
+        "path": "examples/hu-postflop/river_small.toml",
+        "bytes": 501,
+        "sha256_lf": "8741996abf804a061566d9768518130ed979cf3908e82e35bce1a19f02161be4"
+      },
+      {
+        "path": "experiments/README.md",
+        "bytes": 5202,
+        "sha256_lf": "4ffd11a4301f9053c7b55660a70725bb4c8aaccd1f49625bfa0596e33fd26e7a"
+      }
+    ],
+    "old_snapshot": "runs/p1-t6/old-source; git archive HEAD, no edits"
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu": "Intel64 Family 6 Model 165 Stepping 5, GenuineIntel",
+    "logical_processors": 16,
+    "physical_ram_bytes": 34275098624,
+    "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\nbinary: rustc\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\ncommit-date: 2026-07-07\nhost: x86_64-pc-windows-msvc\nrelease: 1.97.0\nLLVM version: 22.1.6",
+    "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+    "python": "3.13.7",
+    "CARGO_BUILD_JOBS": 2,
+    "RUST_TEST_THREADS": 2,
+    "rustflags_env": null,
+    "cargo_lock_sha256_lf": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+    "cargo_config_sha256_lf": "144d563007668a15d8bacbadd5b026b3ce346a0e57fa7e73ea8235346090cd21",
+    "cargo_config": "# Research builds target the local machine. CI overrides this via RUSTFLAGS.\n[build]\nrustflags = [\"-C\", \"target-cpu=native\"]\n",
+    "disk_free_bytes_at_handoff": 7546527744
+  },
+  "binaries": [
+    {
+      "path": "target/p1-t6-old/release/solvers.exe",
+      "bytes": 7409152,
+      "sha256_raw": "85fb264a6e299856e77beff60a14b238dda0e88fe1df9914eb62e082acfb8b38",
+      "availability": "retained in ignored Cargo target; rebuild from recorded source"
+    },
+    {
+      "path": "target/release/solvers.exe",
+      "bytes": 7568896,
+      "sha256_raw": "77f7031f45021105b3fa4f6275977602e053105c7b407b581e6429dee5b92db5",
+      "availability": "retained in ignored Cargo target; rebuild from recorded source"
+    },
+    {
+      "path": "target/release/examples/verify_save.exe",
+      "bytes": 965120,
+      "sha256_raw": "2c165940cd064d4072cf5030551885d5803e9270abcc10687701b7480314c537",
+      "availability": "retained in ignored Cargo target; rebuild from recorded source"
+    },
+    {
+      "path": "target/release/examples/p1_bench.exe",
+      "bytes": 2297344,
+      "sha256_raw": "e2d5c4cf5d3d0c9c1b16b9a34cf8b4b74146934e89371df6137883419c5fc8e4",
+      "availability": "retained in ignored Cargo target; rebuild from recorded source"
+    }
+  ],
+  "measurement_binary_records": "measurement-binaries.json; original measurement raw hashes and final rebuild hashes are distinct. Production source unchanged; final v2 payload equivalence verified in final-comparisons.json.",
+  "hash_rule": "Text/source/evidence SHA-256 uses LF-normalized bytes (CRLF -> LF); binary/artifact fingerprints use raw bytes.",
+  "evidence": [
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/commands.json",
+      "bytes": 18105,
+      "sha256_lf": "e312e2fac857271a70046eb9cafb4b4ec23d687040b98afca027cbdb7b9fe505"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/comparisons.json",
+      "bytes": 2962,
+      "sha256_lf": "9fc30677fe4a28e2ca691ad6304983e092846c2bf4499aaed5d73decb4387547"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_a-f32.toml",
+      "bytes": 649,
+      "sha256_lf": "35b29cc657e421dd9aec5108474d71a10c57cddef131cc6dc6833cdcd4ae7cf8"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_a-i16-f32avg.toml",
+      "bytes": 656,
+      "sha256_lf": "624310fbc1ea1546e386ed57916540a021690a02f01e37dec8de6b58ebca4a1c"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_a-i16.toml",
+      "bytes": 649,
+      "sha256_lf": "4b5f5911bbe882770b0072d59f2949a3bedf2664d64e7823f8c9ababbb3715a9"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_b-f32.toml",
+      "bytes": 704,
+      "sha256_lf": "fa281dd32232ef4b0fb7ea3b3d64c9da07baa303536af5cd7488d650f645e840"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_b-i16-f32avg.toml",
+      "bytes": 711,
+      "sha256_lf": "a3c3bf943e9a288c030502c407a746699a27b408ab41dc19599ade94818eca09"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/gtow_b-i16.toml",
+      "bytes": 704,
+      "sha256_lf": "f971ea2f5d21035e9832c9310418bac66bf8cff52472aaeb10acb882453e2ae3"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/mixed-no-rivers-smoke.toml",
+      "bytes": 493,
+      "sha256_lf": "49d0829e86c3f94707678aa1c8214ee8fb2c6d89c297308acaa574a0b3dcfbd2"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/river6-i16.toml",
+      "bytes": 613,
+      "sha256_lf": "0894d4d97320dd74122d6ca1974a9f94e3f5f5686111b8c3c92ef8e8ce48f3e1"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/turn3000-f32.toml",
+      "bytes": 685,
+      "sha256_lf": "d967e0b6ada52b16f393782ce1a6244ff8253762b510864e4db0cb5d17e43aa4"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/turn3000-i16-f32avg.toml",
+      "bytes": 692,
+      "sha256_lf": "928b81c053fc61fbc53ee833e59199bc969327a1d315b4a701849420011fadee"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/turn3000-i16.toml",
+      "bytes": 685,
+      "sha256_lf": "d06eabe457a84aaab0d2906798f87f2dc1a19a4356d1111a3bceaeb1d98daaf1"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/configs/turn6.toml",
+      "bytes": 570,
+      "sha256_lf": "b87d166168de0717043104d5fe06c5ccef5122e848033e587fe56cc395749692"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/convergence.json",
+      "bytes": 5892,
+      "sha256_lf": "4fcb5d351cc612ad46e0516c5f668fca9b1253d3d467b9896acf60b67f9abd88"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/final-comparisons.json",
+      "bytes": 5879,
+      "sha256_lf": "9ac2e061a31e69292127c6a6f73a2d7c3034727258668c9b8927260a7c860790"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/measurement-binaries.json",
+      "bytes": 2261,
+      "sha256_lf": "7171182ff1c42f7ce80c4f9f88cd5ea271c6314231138f873e52f17e815f670a"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/progress/turn3000-f32.jsonl",
+      "bytes": 8440,
+      "sha256_lf": "9e5094cad213ec5a371a80561aa22af8614e69039dee0157a4845ca87d2aff5c"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/progress/turn3000-i16-f32avg.jsonl",
+      "bytes": 8447,
+      "sha256_lf": "6d0ca753722a3968aaf91e3ee396e8101a22f4ac6d77765745109f11bc9662b5"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/progress/turn3000-i16.jsonl",
+      "bytes": 8315,
+      "sha256_lf": "009d7526c04d268cb3d49041a934a2e3b45b0338eb9c40957d8e2b426303638c"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/README.md",
+      "bytes": 9771,
+      "sha256_lf": "40eb7c66f5d388585e84976884237df2044ce1e3cae38ce21aae81f3dd9ebf1f"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/resource-validation.json",
+      "bytes": 3441,
+      "sha256_lf": "cb5a370f1a70cc47741e5f077941d3c080f86c8636a4df2b46598c7e2dc76a2b"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/resources.json",
+      "bytes": 2561,
+      "sha256_lf": "da5fe1e6dc31f7bf2f92956936fe00b824b41696730f048fb3831d7163cdc4fa"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/river-resolve.json",
+      "bytes": 720,
+      "sha256_lf": "8a764854dd98c5da31309c61340449011add97d19370460c1521a54e3486d439"
+    },
+    {
+      "path": "experiments/p1-perf-2026-10/mixed-storage-20261007/validation.json",
+      "bytes": 4530,
+      "sha256_lf": "9492cf2eb395be99b107ca0e51027656631e84cd0cd98e8480021fe84b403dc7"
+    }
+  ],
+  "retention": "Only README, aggregate JSON, config, progress and this manifest retained here. Large solutions/checkpoints deleted after hashes and comparisons; see comparisons/convergence JSON.",
+  "commands": "commands.json and validation.json; old build: CARGO_BUILD_JOBS=2 cargo build --release -p cli --offline --target-dir <workspace>/target/p1-t6-old from runs/p1-t6/old-source"
+}

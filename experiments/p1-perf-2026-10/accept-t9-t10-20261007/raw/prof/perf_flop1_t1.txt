@@ -1,0 +1,31 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 18K of event 'cpu-clock:ppp'
+# Event count (approx.): 18027027009
+#
+# Overhead  Symbol                                                                                                                                                                                                                                                                                         IPC   [IPC Coverage]
+# ........  .............................................................................................................................................................................................................................................................................................  ....................
+#
+    30.70%  [.] hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>                                                                                                                                                                                 -      -            
+    28.37%  [.] hu_postflop::kernel::showdown_kernel_relaxed_f32                                                                                                                                                                                                                                           -      -            
+    15.79%  [.] hu_postflop::kernel::fold_kernel_relaxed_f32                                                                                                                                                                                                                                               -      -            
+     8.16%  [.] hu_engine::storage::normalize_columns_f32                                                                                                                                                                                                                                                  -      -            
+     1.79%  [.] 0x000000000015354a                                                                                                                                                                                                                                                                         -      -            
+     1.07%  [k] _raw_spin_unlock_irqrestore                                                                                                                                                                                                                                                                -      -            
+     0.97%  [k] do_user_addr_fault                                                                                                                                                                                                                                                                         -      -            
+     0.81%  [k] clear_page_erms                                                                                                                                                                                                                                                                            -      -            
+     0.53%  [k] __handle_mm_fault                                                                                                                                                                                                                                                                          -      -            
+     0.44%  [k] wp_page_copy                                                                                                                                                                                                                                                                               -      -            
+     0.43%  [.] 0x0000000000153513                                                                                                                                                                                                                                                                         -      -            
+     0.41%  [.] <hu_engine::tree::PublicTree>::map_reach_into                                                                                                                                                                                                                                              -      -            
+     0.41%  [.] 0x0000000000153504                                                                                                                                                                                                                                                                         -      -            
+     0.38%  [.] 0x000000000015350e                                                                                                                                                                                                                                                                         -      -            
+     0.33%  [k] flush_tlb_mm_range                                                                                                                                                                                                                                                                         -      -            
+
+
+#
+# (Tip: List events using substring match: perf list <keyword>)
+#

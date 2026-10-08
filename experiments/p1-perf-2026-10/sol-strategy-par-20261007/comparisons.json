@@ -1,0 +1,830 @@
+[
+  {
+    "case": "turn6",
+    "runs": [
+      {
+        "side": "old",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-turn6-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 33316699,
+            "sha256": "5e30baac2483c21a121c1506ce75070d0b969d3ed232e3b1495b54e982015179"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122140848,
+            "sha256": "95990dbf4b3633e227406213b5d32878b5c96e0a09b8fc05c392ff4648de3309"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-turn6-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 33316699,
+            "sha256": "1eb03d2a59a92e6cc019dc3840ab75e44b3e1cc686361ca22315f50fb08be446"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122140847,
+            "sha256": "3a4f738d68499983f890f16d465b39c7c02f15b7d343b8500049a2c44de157c8"
+          }
+        }
+      },
+      {
+        "side": "old",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-turn6-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 33314375,
+            "sha256": "0a00352fcadb12544fa636b46bb54bf2cf3df9e75d022d291f5a9e39a1ade7f3"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122129680,
+            "sha256": "9eed8a034ce72db1a809d2c38c36b966f43df79bb8e573f00efc3259866fd02f"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-turn6-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 33314375,
+            "sha256": "425c51c3f209166d7507d7b4683e66d69801aa0ddad08445d5f4d7a6a760fe55"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122129680,
+            "sha256": "f5787a0773662bce0402f6feb54f5c386d7ca3d75ba6c7e8f0207d9dd832925e"
+          }
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            89137084,
+            89137084
+          ],
+          "strategy_blocks": 20482,
+          "value_blocks": 20482
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "f74a503ba02cf746dbe95b8aced35526f455ff01047723574cd458e2e3d76291",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            89137084,
+            89137084
+          ],
+          "strategy_blocks": 20482,
+          "value_blocks": 20482,
+          "wall_secs": [
+            2.3353927,
+            2.1572857
+          ]
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-turn6-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-turn6-t8"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": true,
+          "codecs": [
+            {
+              "blake3": "f73e6ecd82d9dc372c16ed6539310123d22261fe62a679a9cc6e197f84b41bec",
+              "bytes": 33314371,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "3b2b0773a8e705e0d6ba904fb7d06f90a397e791a7826716722b1c58f464447c",
+              "bytes": 33316695,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": false
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "cf3c8ac1296be7a76b448e95b52dd49cdc772dde396ba382c9618f0b9ba3cbc1",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            89137084,
+            89137084
+          ],
+          "strategy_blocks": 20482,
+          "value_blocks": 20482
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "cf3c8ac1296be7a76b448e95b52dd49cdc772dde396ba382c9618f0b9ba3cbc1",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            89137084,
+            89137084
+          ],
+          "strategy_blocks": 20482,
+          "value_blocks": 20482,
+          "wall_secs": [
+            6.0736117,
+            5.9581923
+          ]
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-turn6-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-turn6-t1"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": true,
+          "codecs": [
+            {
+              "blake3": "62eec5ce2687278f2394b205f05292d01f3f38b6465f5cbf41c41832bdb5b3fa",
+              "bytes": 33314371,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "d6a8d80d17f52b678e58f799fdaedfa88dcbaee56d10d1c0aa0996f29e63683a",
+              "bytes": 33316695,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": false
+        }
+      }
+    ],
+    "cross_thread_comparison": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\final\\new-turn6-t1\\solution.sol",
+        "runs\\p1-t3c\\final\\new-turn6-t8\\solution.sol",
+        "runs\\p1-t3c\\final\\cross-turn6",
+        "normalize-threads"
+      ],
+      "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+      "result": {
+        "archived_HEAD_also_thread_dependent": true,
+        "codecs": [
+          {
+            "blake3": "f73e6ecd82d9dc372c16ed6539310123d22261fe62a679a9cc6e197f84b41bec",
+            "bytes": 33314371,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 1
+          },
+          {
+            "blake3": "3b2b0773a8e705e0d6ba904fb7d06f90a397e791a7826716722b1c58f464447c",
+            "bytes": 33316695,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 8
+          }
+        ],
+        "normalized_payload_bit_equal": true,
+        "thread_1_8_file_bytes_equal": false
+      }
+    }
+  },
+  {
+    "case": "river6-i16",
+    "runs": [
+      {
+        "side": "old",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-river6-i16-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 73017,
+            "sha256": "a8eaef94ceb3230d350ddf6567c2e670e1aa5eeabaf3125870ea83d75e70b5a5"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 119699,
+            "sha256": "0fe69f8bdc2d2f838bc1fcbccc4341bf7adb45b56c29bfffed2731aac68a848a"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-river6-i16-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 73017,
+            "sha256": "4b5695c113a095ef4578255c16ef57c39a98d1e99761e06fe609d93ce55db897"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 119697,
+            "sha256": "fc2995a5cda969ead22fc7b4235b3857f8d84fa104e55f3ce4b55e7699b4fa3d"
+          }
+        }
+      },
+      {
+        "side": "old",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-river6-i16-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 73017,
+            "sha256": "dd8263049498bcae4a679bb086a07fc39dfe2376915c1be536132cdbcbc00520"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 119699,
+            "sha256": "6771401be48859b8d7d92b89e0e3e22cae0e53d2d834705194f84c352021ce62"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\river6-i16.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-river6-i16-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 73017,
+            "sha256": "f0498cd69153a0f5fb67a950f3784b0b768bbb9943041fe4c41eca03082c7b00"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 119702,
+            "sha256": "5b2803ac9db3e5aca9b847d24cf258083f01fde24112947898a4cbf9d5441cb7"
+          }
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            144771,
+            144771
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "6262cb308bb46ec8432acbe2992180d4eab53ecb748d75272b4ee9d07736e4d5",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            144771,
+            144771
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34,
+          "wall_secs": [
+            0.0125239,
+            0.0171368
+          ]
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-river6-i16-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-river6-i16-t8"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "e7085fbd4d7ff922b28fbd1ceff83aa27a9fc28c03a4d8ff8deebfba06234348",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            144771,
+            144771
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "e7085fbd4d7ff922b28fbd1ceff83aa27a9fc28c03a4d8ff8deebfba06234348",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            144771,
+            144771
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34,
+          "wall_secs": [
+            0.0317129,
+            0.0399808
+          ]
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-river6-i16-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-river6-i16-t1"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "c4bf2493f8f586e0f1f42cd64ef7eecb409f017c80142fd770b2d9700ffcbe0d",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "c4bf2493f8f586e0f1f42cd64ef7eecb409f017c80142fd770b2d9700ffcbe0d",
+              "bytes": 73007,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      }
+    ],
+    "cross_thread_comparison": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\final\\new-river6-i16-t1\\solution.sol",
+        "runs\\p1-t3c\\final\\new-river6-i16-t8\\solution.sol",
+        "runs\\p1-t3c\\final\\cross-river6-i16",
+        "normalize-threads"
+      ],
+      "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+      "result": {
+        "archived_HEAD_also_thread_dependent": false,
+        "codecs": [
+          {
+            "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+            "bytes": 73007,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 1
+          },
+          {
+            "blake3": "9eaabba805c06836af4e809089447144d3cc1ebddb6a1cc8acb89bb73a77e19c",
+            "bytes": 73007,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 8
+          }
+        ],
+        "normalized_payload_bit_equal": true,
+        "thread_1_8_file_bytes_equal": true
+      }
+    }
+  },
+  {
+    "case": "turn6-no-rivers",
+    "runs": [
+      {
+        "side": "old",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 82571,
+            "sha256": "e48a62816852d05c52018e0f7eb5850bbc764a7af2d5e3b345a329fb9df809f8"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122103099,
+            "sha256": "e2759788c8e43797c7c635714fed8ebbbe0a368d22f9c9236206106d6d3be78c"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8",
+          "--threads",
+          "8"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 82571,
+            "sha256": "383d690245dc260016deed5be04414884e1e764a1117e1d1e5b57fc384e978ed"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122103103,
+            "sha256": "3416704880a3f5673221801b75b484430236970edd76a3ddbbbfd9d66ef96c69"
+          }
+        }
+      },
+      {
+        "side": "old",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 82571,
+            "sha256": "87c86a2b67d037bf9038e0e7a330b59716493032960e8e8e772ae3881a35cbad"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122104823,
+            "sha256": "adaef20f640c722d02065e4e29a96dbf2fa56d25f1eeed09f312f9a3046b42af"
+          }
+        }
+      },
+      {
+        "side": "new",
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+          "solve",
+          "experiments\\p1-perf-2026-10\\sol-strategy-par-20261007\\turn6-no-rivers.toml",
+          "--out",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1",
+          "--threads",
+          "1"
+        ],
+        "artifacts": {
+          "solution.sol": {
+            "bytes": 82570,
+            "sha256": "3c52ec068f8258320670646e2f86e6173c4eb1d43dbfdac86a8003e9812f5ec7"
+          },
+          "checkpoint.ckpt": {
+            "bytes": 122104823,
+            "sha256": "5e20fbfcd4fe1d77c6e1ca47af5d43431fa9e7028ba223d5a6bf5023251cbc0b"
+          }
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            150985,
+            150985
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "578e94935a582752fd39d9064c9355ee4a4cd1cf8a26b1c127e1ba4b00653b10",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            150985,
+            150985
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34,
+          "wall_secs": [
+            2.1582965,
+            2.491
+          ]
+        }
+      },
+      {
+        "threads": 8,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-turn6-no-rivers-t8"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol"
+        ],
+        "result": {
+          "canonical_postcard_streams": true,
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "8614af7d2f26bae8bdfe694d234e8ad62d17f84deebe6742658ff6b3193665b2",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            150985,
+            150985
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\examples\\verify_save.exe",
+          "solution-stream",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol"
+        ],
+        "result": {
+          "comparison_method": "bounded v2 field-stream comparison, exact bytes",
+          "file_bytes_equal": false,
+          "normalized_payload_blake3": "8614af7d2f26bae8bdfe694d234e8ad62d17f84deebe6742658ff6b3193665b2",
+          "payload_bit_equal_except_wall_secs": true,
+          "payload_bytes": [
+            150985,
+            150985
+          ],
+          "strategy_blocks": 34,
+          "value_blocks": 34,
+          "wall_secs": [
+            5.975517,
+            6.0194522
+          ]
+        }
+      },
+      {
+        "threads": 1,
+        "command": [
+          "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+          "runs\\p1-t3c\\final\\old-turn6-no-rivers-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol",
+          "runs\\p1-t3c\\final\\fixed-turn6-no-rivers-t1"
+        ],
+        "result": {
+          "archived_HEAD_also_thread_dependent": false,
+          "codecs": [
+            {
+              "blake3": "d167d8c10e49cb9042faa3afbbf248d7c39c0f5239ef444a0442d44d3453fdc1",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 1
+            },
+            {
+              "blake3": "d167d8c10e49cb9042faa3afbbf248d7c39c0f5239ef444a0442d44d3453fdc1",
+              "bytes": 82566,
+              "file_bit_equal_at_wall_secs_zero": true,
+              "threads": 8
+            }
+          ],
+          "normalized_payload_bit_equal": true,
+          "thread_1_8_file_bytes_equal": true
+        }
+      }
+    ],
+    "cross_thread_comparison": {
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3c-old\\release\\examples\\verify_t3c.exe",
+        "runs\\p1-t3c\\final\\new-turn6-no-rivers-t1\\solution.sol",
+        "runs\\p1-t3c\\final\\new-turn6-no-rivers-t8\\solution.sol",
+        "runs\\p1-t3c\\final\\cross-turn6-no-rivers",
+        "normalize-threads"
+      ],
+      "normalization": "wall_secs=0; assert only run.threads differs in effective config, then use the same config/header",
+      "result": {
+        "archived_HEAD_also_thread_dependent": false,
+        "codecs": [
+          {
+            "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+            "bytes": 82566,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 1
+          },
+          {
+            "blake3": "d2ef982e12d95926065ab917c5f1d5b8c9b58eef9dc585edaefb6391f5258035",
+            "bytes": 82566,
+            "file_bit_equal_at_wall_secs_zero": true,
+            "threads": 8
+          }
+        ],
+        "normalized_payload_bit_equal": true,
+        "thread_1_8_file_bytes_equal": true
+      }
+    }
+  }
+]

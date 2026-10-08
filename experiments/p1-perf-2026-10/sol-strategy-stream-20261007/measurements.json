@@ -1,0 +1,102 @@
+{
+  "old": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+      "--out",
+      "runs\\p1-t3b\\typed-old-flop4",
+      "--threads",
+      "8"
+    ],
+    "binary_sha256": "1baa20c5397482ecc815c2c915f035889893c31af4afc69869c805cd05b7edc0",
+    "exit_code": 0,
+    "wall_seconds": 38.66964530000041,
+    "peak_working_set_bytes": 4478320640,
+    "peak_commit_bytes": 4554969088,
+    "memory_samples": 792,
+    "checkpoints": [
+      {
+        "iteration": 2,
+        "seconds": 15.380343000000721,
+        "save_seconds": 4.990672700001596
+      },
+      {
+        "iteration": 4,
+        "seconds": 28.13825590000124,
+        "save_seconds": 6.386572999999771
+      }
+    ],
+    "solution_seconds": 10.53138939999917,
+    "artifacts": {
+      "checkpoint.ckpt": {
+        "bytes": 1098800954,
+        "sha256": "d66b9ddca32ad88cfbae41d925c2a72461aaeba8b69863ec8439d20c2b2d0137"
+      },
+      "solution.sol": {
+        "bytes": 176246963,
+        "sha256": "04bc25229f0d5f9c37e1a02c1f30b56900600c6ff447377aa4844c8fe879548c"
+      }
+    },
+    "measurement_command": [
+      "python",
+      "-X",
+      "utf8",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\p1-t3b-old\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+      "runs\\p1-t3b\\typed-old-flop4",
+      "runs\\p1-t3b\\typed-old-flop4-measure.json"
+    ]
+  },
+  "new": {
+    "command": [
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "solve",
+      "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+      "--out",
+      "runs\\p1-t3b\\typed-new-flop4",
+      "--threads",
+      "8"
+    ],
+    "binary_sha256": "d7ef2337cb1ee770d2e9e49149af0be9e1ac212b9e44ff11ed6333d8bfd342d0",
+    "exit_code": 0,
+    "wall_seconds": 40.307501400002366,
+    "peak_working_set_bytes": 3740540928,
+    "peak_commit_bytes": 3805143040,
+    "memory_samples": 846,
+    "checkpoints": [
+      {
+        "iteration": 2,
+        "seconds": 15.194197500000882,
+        "save_seconds": 5.089668399999937
+      },
+      {
+        "iteration": 4,
+        "seconds": 28.036025000001246,
+        "save_seconds": 6.641363300001103
+      }
+    ],
+    "solution_seconds": 12.27147640000112,
+    "artifacts": {
+      "checkpoint.ckpt": {
+        "bytes": 1098800954,
+        "sha256": "146209939d883770166e48880269872fb6e7e85caaf7eb6f650145afb4bbabc7"
+      },
+      "solution.sol": {
+        "bytes": 176246963,
+        "sha256": "5c62af790efb479f298ad7a3ca832a4444c7f78c17386a8c7fb50bd2b04c4b3c"
+      }
+    },
+    "measurement_command": [
+      "python",
+      "-X",
+      "utf8",
+      "experiments/p1-perf-2026-10/streaming-save-20261006/measure.py",
+      "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\target\\release\\solvers.exe",
+      "experiments\\p1-perf-2026-10\\sol-strategy-stream-20261007\\flop4.toml",
+      "runs\\p1-t3b\\typed-new-flop4",
+      "runs\\p1-t3b\\typed-new-flop4-measure.json"
+    ]
+  }
+}

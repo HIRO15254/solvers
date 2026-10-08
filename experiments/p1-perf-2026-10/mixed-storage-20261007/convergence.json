@@ -1,0 +1,185 @@
+[
+  {
+    "storage": "f32",
+    "pot_bb": 5.5,
+    "iterations": 3000,
+    "threads": 8,
+    "check_every": 50,
+    "first_iterations_by_percent_pot": {
+      "0.3": 450,
+      "0.2": 550,
+      "0.1": 800,
+      "0.05": 1400
+    },
+    "final_percent_pot": 0.013470267750651218,
+    "best_percent_pot": 0.013470267750651218,
+    "final_nash_conv": 0.001481729452571634,
+    "elapsed_secs": 205.9642617,
+    "secs_per_iteration_cfr": 0.060958399999999996,
+    "timing": {
+      "actionNodes": 20482,
+      "afterBuildBytes": 18898944,
+      "allocSecs": 1.67e-05,
+      "buildSecs": 0.0506365,
+      "config": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-f32.toml",
+      "deals": 1584,
+      "estimateF32Bytes": 208058400,
+      "estimateI16Bytes": 104193056,
+      "estimateI16F32avgBytes": 156125728,
+      "evalSecs": [
+        0.0587693
+      ],
+      "iterSecs": 6.09584,
+      "iters": 100,
+      "nashConv": 0.2642580304369708,
+      "nodeInfo": 20483,
+      "nodes": 59379,
+      "peakBytes": 253550592,
+      "prepareSecs": 0.0085607,
+      "secsPerIter": 0.060958399999999996,
+      "storage": "f32",
+      "storageElements": 26007300,
+      "threads": 8,
+      "transitionEntries": 0,
+      "transitions": 0,
+      "warmupIters": 2,
+      "warmupSecs": 0.1185558
+    },
+    "artifacts": [
+      {
+        "path": "runs/p1-t6/turn3000-f32/checkpoint.ckpt",
+        "bytes": 124705992,
+        "sha256": "2fab25e5447d46ca5106e70835d763b2305df794358611c57d0bf5592b701d71",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      },
+      {
+        "path": "runs/p1-t6/turn3000-f32/solution.sol",
+        "bytes": 33787236,
+        "sha256": "c90a84b0de5da6828fc280ab448dd8bb6d34debb42eea374fc7e8132f7dee808",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      }
+    ]
+  },
+  {
+    "storage": "i16",
+    "pot_bb": 5.5,
+    "iterations": 3000,
+    "threads": 8,
+    "check_every": 50,
+    "first_iterations_by_percent_pot": {
+      "0.3": 500,
+      "0.2": 1050,
+      "0.1": null,
+      "0.05": null
+    },
+    "final_percent_pot": 0.5922387167663851,
+    "best_percent_pot": 0.12253442768352536,
+    "final_nash_conv": 0.06514625884430236,
+    "elapsed_secs": 262.8151453,
+    "secs_per_iteration_cfr": 0.082584626,
+    "timing": {
+      "actionNodes": 20482,
+      "afterBuildBytes": 18890752,
+      "allocSecs": 5.95e-05,
+      "buildSecs": 0.0567428,
+      "config": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16.toml",
+      "deals": 1584,
+      "estimateF32Bytes": 208058400,
+      "estimateI16Bytes": 104193056,
+      "estimateI16F32avgBytes": 156125728,
+      "evalSecs": [
+        0.0689588
+      ],
+      "iterSecs": 8.2584626,
+      "iters": 100,
+      "nashConv": 0.27605776147656047,
+      "nodeInfo": 20483,
+      "nodes": 59379,
+      "peakBytes": 151969792,
+      "prepareSecs": 0.0069427,
+      "secsPerIter": 0.082584626,
+      "storage": "i16",
+      "storageElements": 26007300,
+      "threads": 8,
+      "transitionEntries": 0,
+      "transitions": 0,
+      "warmupIters": 2,
+      "warmupSecs": 0.1373841
+    },
+    "artifacts": [
+      {
+        "path": "runs/p1-t6/turn3000-i16/checkpoint.ckpt",
+        "bytes": 52755006,
+        "sha256": "26ca37c4477b7c8dffc288671d4c1c2512a88d53123593cf5b257b96062e2ec0",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      },
+      {
+        "path": "runs/p1-t6/turn3000-i16/solution.sol",
+        "bytes": 27042347,
+        "sha256": "2a8a4cdfd77451cf14df5cd6efb47bc25818b9e925470ad36d743a66759b7cde",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      }
+    ]
+  },
+  {
+    "storage": "i16-f32avg",
+    "pot_bb": 5.5,
+    "iterations": 3000,
+    "threads": 8,
+    "check_every": 50,
+    "first_iterations_by_percent_pot": {
+      "0.3": 450,
+      "0.2": 500,
+      "0.1": 750,
+      "0.05": 1450
+    },
+    "final_percent_pot": 0.011006204825337772,
+    "best_percent_pot": 0.011006204825337772,
+    "final_nash_conv": 0.001210682530787155,
+    "elapsed_secs": 240.1602991,
+    "secs_per_iteration_cfr": 0.071986117,
+    "timing": {
+      "actionNodes": 20482,
+      "afterBuildBytes": 18362368,
+      "allocSecs": 3.66e-05,
+      "buildSecs": 0.0577239,
+      "config": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\mixed-storage-20261007\\configs\\turn3000-i16-f32avg.toml",
+      "deals": 1584,
+      "estimateF32Bytes": 208058400,
+      "estimateI16Bytes": 104193056,
+      "estimateI16F32avgBytes": 156125728,
+      "evalSecs": [
+        0.0557008
+      ],
+      "iterSecs": 7.1986117,
+      "iters": 100,
+      "nashConv": 0.2758146866014306,
+      "nodeInfo": 20483,
+      "nodes": 59379,
+      "peakBytes": 203812864,
+      "prepareSecs": 0.0068765,
+      "secsPerIter": 0.071986117,
+      "storage": "i16-f32avg",
+      "storageElements": 26007300,
+      "threads": 8,
+      "transitionEntries": 0,
+      "transitions": 0,
+      "warmupIters": 2,
+      "warmupSecs": 0.1308695
+    },
+    "artifacts": [
+      {
+        "path": "runs/p1-t6/turn3000-i16-f32avg/checkpoint.ckpt",
+        "bytes": 76093095,
+        "sha256": "f32a5483e147f9dd4f678e2fcd3a2512172de7b659b79cbb81f42a8fb4d7abf8",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      },
+      {
+        "path": "runs/p1-t6/turn3000-i16-f32avg/solution.sol",
+        "bytes": 32123065,
+        "sha256": "cdf3a4b792aa0dd949537cc2435dd17fc0345a396d98583cf282670d290a3876",
+        "availability": "deleted after fingerprint/comparison; regenerate from config and binary"
+      }
+    ]
+  }
+]

@@ -1,0 +1,107 @@
+## <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings
+
+Sorted summary for file /home/PC_User/prof_t23/release/examples/p1_bench
+----------------------------------------------
+
+   15.74 kernel.rs:347
+   13.72 kernel.rs:316
+   13.39 kernel.rs:141
+    6.69 kernel.rs:337
+    6.09 kernel.rs:344
+    4.74 kernel.rs:318
+    2.78 kernel.rs:0
+    2.73 kernel.rs:153
+    2.35 kernel.rs:156
+    2.20 non_null.rs:1714
+    1.93 kernel.rs:317
+    1.88 kernel.rs:319
+    1.42 macros.rs:180
+    1.40 kernel.rs:169
+    1.31 kernel.rs:142
+    1.28 kernel.rs:139
+    1.07 kernel.rs:152
+    0.85 kernel.rs:348
+    0.75 postflop.rs:462
+    0.52 postflop.rs:457
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (35988 samples, percent: local period)
+## hottest instructions
+   12.66 :   f4059:  vmovss %xmm2,0xb0(%rsp,%rax,4)
+   12.27 :   f44ba:  vmovss %xmm11,0xb0(%rsp,%r10,4) // kernel.rs:316
+    9.71 :   f464e:  vmovss %xmm10,(%r9,%r8,4)
+    3.45 :   f4617:  vmovss %xmm11,(%r14,%r8,4) // kernel.rs:344
+    3.23 :   f4600:  mov    0x98(%rsp),%r14
+    3.10 :   f464a:  vmulss %xmm2,%xmm10,%xmm10 // kernel.rs:347
+    3.01 :   f44ff:  vmovss %xmm10,0x180(%rsp,%r10,4)
+    2.73 :   f4597:  je     f45c0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x8a0> // kernel.rs:153
+    2.64 :   f45ec:  jbe    f48b7 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb97> // kernel.rs:344
+    2.35 :   f45a8:  movzbl %r9b,%r10d // kernel.rs:156
+    2.10 :   f461d:  cmp    %r8,0x10(%rsp) // kernel.rs:347
+    1.85 :   f45fc:  vmulss %xmm1,%xmm10,%xmm12 // kernel.rs:337
+    1.73 :   f44f5:  vaddss 0x180(%rsp,%r10,4),%xmm11,%xmm10 // kernel.rs:318
+    1.61 :   f4612:  vaddss %xmm11,%xmm12,%xmm11
+    1.53 :   f407d:  add    $0x4,%rsi // non_null.rs:1714
+    1.42 :   f408d:  jne    f4030 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x310> // macros.rs:180
+    1.31 :   f44a9:  mov    %r9d,%r14d // kernel.rs:0
+    1.07 :   f4590:  cmp    $0xffff,%r10 // kernel.rs:152
+    1.06 :   f4509:  vaddss 0x180(%rsp,%r9,1),%xmm11,%xmm10 // kernel.rs:319
+    1.03 :   f44eb:  vmovss %xmm10,0xb0(%rsp,%r9,1) // kernel.rs:317
+    0.89 :   f44c4:  cmp    $0x3400,%r14w // kernel.rs:317
+    0.85 :   f4640:  mov    0x70(%rsp),%r9 // kernel.rs:348
+    0.84 :   f4494:  movzbl %r9b,%r10d // kernel.rs:0
+    0.83 :   f4622:  jbe    f489f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb7f>
+    0.82 :   f4513:  vmovss %xmm10,0x180(%rsp,%r9,1)
+    0.79 :   f449d:  jae    f4843 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb23>
+    0.75 :   f3e38:  jne    f3e10 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xf0> // postflop.rs:462
+    0.74 :   f438c:  vmovss %xmm10,0x180(%rsp,%r9,4)
+    0.73 :   f4050:  vaddss 0xb0(%rsp,%rax,4),%xmm1,%xmm2 // kernel.rs:141
+    0.73 :   f4033:  cmp    %rdi,%rbx // kernel.rs:139
+    0.70 :   f4062:  movzbl 0x3(%rsi),%edi // kernel.rs:142
+    0.68 :   f451d:  cmp    %rbp,%r8 // non_null.rs:1714
+    0.66 :   f4498:  cmp    $0x34,%r10w // kernel.rs:316
+    0.66 :   f4382:  vaddss 0x180(%rsp,%r9,4),%xmm9,%xmm10 // kernel.rs:169
+    0.63 :   f44d8:  vaddss %xmm10,%xmm9,%xmm9 // kernel.rs:0
+    0.61 :   f4066:  cmp    $0x34,%rdi
+    0.55 :   f4036:  jbe    f4952 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xc32>
+    0.52 :   f3df0:  je     f3dc0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xa0> // postflop.rs:457
+    0.48 :   f46be:  vaddps 0x1c0(%rsp),%ymm10,%ymm10
+    0.48 :   f44ac:  shr    $0x8,%r9d
+    0.47 :   f408a:  cmp    %rdx,%rsi
+    0.40 :   f42ea:  mov    0x88(%rsp),%r14
+    0.38 :   f4654:  cmp    %r11,%rbp
+    0.38 :   f4074:  vaddss 0xb0(%rsp,%rdi,4),%xmm1,%xmm1
+    0.36 :   f4575:  cmp    %r8,%rdx
+    0.36 :   f4402:  vmovups %ymm8,0x150(%rsp)
+    0.35 :   f4681:  mov    %rsi,%rdi
+    0.33 :   f459c:  jbe    f48ff <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xbdf>
+    0.31 :   f4044:  jae    f4925 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xc05>
+    0.29 :   f4706:  vmovups %ymm10,0x200(%rsp)
+    0.29 :   f4485:  cmp    %r11,%rbx
+    0.28 :   f44ca:  jae    f485b <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb3b>
+    0.28 :   f4438:  cmp    %rdi,%rsi
+    0.27 :   f4632:  add    $0x4,%rbp
+    0.27 :   f442f:  vmovups %ymm8,0xb0(%rsp)
+    0.27 :   f43b2:  add    $0x4,%r8
+    0.26 :   f46ac:  vmovups %ymm11,0x1a0(%rsp)
+    0.26 :   f45f2:  vsubss 0x180(%rsp,%r10,4),%xmm3,%xmm11
+    0.25 :   f46e2:  vmovups %ymm11,0x1e0(%rsp)
+    0.23 :   f46f4:  vaddps 0x200(%rsp),%ymm10,%ymm10
+    0.23 :   f441d:  vmovups %ymm8,0xf0(%rsp)
+    0.21 :   f4414:  vmovups %ymm8,0x110(%rsp)
+    0.21 :   f4304:  mov    0x30(%rsp),%rdx
+    0.20 :   f4733:  jmp    f42c0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0x5a0>
+    0.20 :   f445c:  vxorps %xmm9,%xmm9,%xmm9
+    0.20 :   f4426:  vmovups %ymm8,0xd0(%rsp)
+    0.18 :   f4718:  vmovups %ymm11,0x220(%rsp)
+    0.18 :   f452b:  mov    0x40(%rsp),%r10
+    0.18 :   f44d4:  vmulss %xmm5,%xmm10,%xmm11
+    0.18 :   f4457:  mov    %rbp,0x28(%rsp)
+    0.17 :   f4488:  jbe    f4873 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xb53>
+    0.17 :   f4396:  movzbl 0x3(%r8),%edi
+    0.16 :   f4721:  vaddps 0x240(%rsp),%xmm10,%xmm10
+    0.16 :   f470f:  vmulps 0x170(%rsp),%xmm7,%xmm10
+    0.16 :   f44e1:  vaddss 0xb0(%rsp,%r9,1),%xmm10,%xmm10
+    0.16 :   f433d:  cmp    %rdi,%rsi
+    0.16 :   f432f:  cmp    %r10w,%r8w
+    0.16 :   f4040:  cmp    $0x34,%rax
+    0.14 :   f4671:  vmulps 0xd0(%rsp),%ymm7,%ymm11
+    0.14 :   f45e1:  jae    f48cf <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::eval_cfr_siblings+0xbaf>

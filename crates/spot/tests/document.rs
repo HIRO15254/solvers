@@ -53,6 +53,29 @@ fn roundtrip(text: &str) -> String {
 }
 
 #[test]
+fn final_checkpoint_is_a_p1_boolean_default_and_not_a_p2_key() {
+    let p1 = format!(
+        "{ROOT}[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n"
+    );
+    assert!(parse(&p1).spot.run.final_checkpoint);
+    assert!(roundtrip(&p1).contains("checkpoint_interval = \"15m\"\nfinal_checkpoint = true"));
+    for value in ["true", "false"] {
+        let raw = format!("{p1}[run]\nfinal_checkpoint = {value}\n");
+        assert_eq!(parse(&raw).spot.run.final_checkpoint, value == "true");
+        assert!(roundtrip(&raw).contains(&format!("final_checkpoint = {value}")));
+        let error = error(&format!("{ROOT}[run]\nfinal_checkpoint = {value}\n"));
+        assert_eq!(error.code, Code::NLH002);
+        assert_eq!(error.key.as_deref(), Some("run.final_checkpoint"));
+    }
+    assert!(!roundtrip(ROOT).contains("final_checkpoint"));
+    for value in ["1", "'false'", "[]"] {
+        let error = error(&format!("{p1}[run]\nfinal_checkpoint = {value}\n"));
+        assert_eq!(error.code, Code::NLH002);
+        assert_eq!(error.key.as_deref(), Some("run.final_checkpoint"));
+    }
+}
+
+#[test]
 fn every_common_default_and_section_order() {
     let doc = parse(ROOT);
     let s = &doc.spot;

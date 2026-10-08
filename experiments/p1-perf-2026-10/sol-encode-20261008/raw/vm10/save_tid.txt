@@ -1,0 +1,60 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 184K of event 'cpu-clock:ppp'
+# Event count (approx.): 184262262078
+#
+# Overhead      Pid:Command
+# ........  ...............
+#
+     9.33%    29787:solvers
+     2.59%    29757:solvers
+     2.56%    29765:solvers
+     2.55%    29759:solvers
+     2.54%    29768:solvers
+     2.53%    29761:solvers
+     2.53%    29772:solvers
+     2.53%    29760:solvers
+     2.53%    29758:solvers
+     2.53%    29764:solvers
+     2.53%    29767:solvers
+     2.52%    29763:solvers
+     2.52%    29766:solvers
+     2.52%    29770:solvers
+     2.52%    29778:solvers
+     2.52%    29775:solvers
+     2.52%    29782:solvers
+     2.52%    29762:solvers
+     2.52%    29777:solvers
+     2.52%    29781:solvers
+     2.51%    29769:solvers
+     2.51%    29779:solvers
+     2.51%    29773:solvers
+     2.51%    29785:solvers
+     2.51%    29783:solvers
+     2.50%    29774:solvers
+     2.50%    29788:solvers
+     2.50%    29771:solvers
+     2.49%    29784:solvers
+     2.48%    29780:solvers
+     2.48%    29786:solvers
+     2.47%    29776:solvers
+     0.49%    30194:solvers
+     0.48%    30189:solvers
+     0.48%    30177:solvers
+     0.42%    30176:solvers
+     0.41%    30183:solvers
+     0.41%    30182:solvers
+     0.40%    30203:solvers
+     0.40%    30180:solvers
+     0.40%    30181:solvers
+     0.40%    30197:solvers
+     0.40%    30205:solvers
+     0.40%    30200:solvers
+     0.39%    30175:solvers
+     0.39%    30188:solvers
+     0.39%    30196:solvers
+     0.38%    30198:solvers
+     0.38%    30187:solvers

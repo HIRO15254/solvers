@@ -1,0 +1,1215 @@
+From 5e7a4c1c5a88c31c06c6f470eba0b3dba3739492 Mon Sep 17 00:00:00 2001
+From: HIRO15254 <60770863+HIRO15254@users.noreply.github.com>
+Date: Wed, 7 Oct 2026 12:30:04 +0900
+Subject: [PATCH] wip(p1): T8 prototype of relaxed CFR terminal kernels and f32
+ regret matching
+
+Environment-selected variants (SOLVERS_P1_KERNEL=exact|f64fold|f32,
+SOLVERS_P1_NORM=exact|f32) apply only to the CFR pass; evaluation, average
+strategy and saved EVs keep the exact kernels. Unset means exact.
+Measurement-only prototype pending a user decision.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ crates/hu-engine/src/lib.rs                   |   4 +-
+ crates/hu-engine/src/solver.rs                |  26 +-
+ .../src/solver/dead_subtree_tests.rs          |   2 +
+ crates/hu-engine/src/storage.rs               | 266 +++++++++++++++
+ crates/hu-postflop/examples/p1_bench.rs       |   4 +
+ crates/hu-postflop/src/kernel.rs              | 303 ++++++++++++++++++
+ crates/hu-postflop/src/lib.rs                 |   2 +
+ crates/hu-postflop/src/postflop.rs            |  41 ++-
+ crates/hu-postflop/src/prototype_tests.rs     | 262 +++++++++++++++
+ 9 files changed, 902 insertions(+), 8 deletions(-)
+ create mode 100644 crates/hu-postflop/src/prototype_tests.rs
+
+diff --git a/crates/hu-engine/src/lib.rs b/crates/hu-engine/src/lib.rs
+index 793871d..2ee8b82 100644
+--- a/crates/hu-engine/src/lib.rs
++++ b/crates/hu-engine/src/lib.rs
+@@ -26,8 +26,8 @@ pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla,
+ pub use scratch::Scratch;
+ pub use solver::{CompiledGame, ParConfig, Solver, SolverState, TerminalEvaluator};
+ pub use storage::{
+-    F32Storage, F32View, I16Storage, I16View, MixedStorage, MixedView, StateMismatch, Storage,
+-    StorageArrays, StorageArraysMut, StorageOps, StorageRef, StorageSpan, StorageState,
++    CfrNorm, F32Storage, F32View, I16Storage, I16View, MixedStorage, MixedView, StateMismatch,
++    Storage, StorageArrays, StorageArraysMut, StorageOps, StorageRef, StorageSpan, StorageState,
+     StorageView,
+ };
+ pub use tree::{
+diff --git a/crates/hu-engine/src/solver.rs b/crates/hu-engine/src/solver.rs
+index b610f3c..5a4977c 100644
+--- a/crates/hu-engine/src/solver.rs
++++ b/crates/hu-engine/src/solver.rs
+@@ -5,7 +5,9 @@ use rayon::prelude::*;
+ 
+ use crate::schedule::{DiscountSchedule, Discounts};
+ use crate::scratch::{Scratch, with_worker_scratch};
+-use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
++use crate::storage::{
++    CfrNorm, StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView,
++};
+ use crate::tree::{NodeId, NodeKind, PublicTree};
+ 
+ /// Variant-owned terminal evaluation — the only variant code on the hot
+@@ -18,6 +20,10 @@ use crate::tree::{NodeId, NodeKind, PublicTree};
+ /// into deal weights and the game normalizer at build time.
+ pub trait TerminalEvaluator: Send + Sync {
+     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]);
++    /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
++    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
++        self.eval(terminal, p, opp_reach, out);
++    }
+ }
+ 
+ /// Everything the solver needs: the compiled tree, the terminal evaluator,
+@@ -133,6 +139,7 @@ pub struct Solver<E, S> {
+     planned_iters: Option<u64>,
+     iteration: u64,
+     par: ParConfig,
++    cfr_norm: CfrNorm,
+ }
+ 
+ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
+@@ -165,6 +172,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
+             planned_iters,
+             iteration: 0,
+             par: ParConfig::default(),
++            cfr_norm: CfrNorm::selected(),
+         }
+     }
+ 
+@@ -175,6 +183,12 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
+         self.par = par;
+     }
+ 
++    /// Explicit prototype selection for tests without changing process environment.
++    #[doc(hidden)]
++    pub fn set_cfr_norm(&mut self, norm: CfrNorm) {
++        self.cfr_norm = norm;
++    }
++
+     pub fn iteration(&self) -> u64 {
+         self.iteration
+     }
+@@ -238,6 +252,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
+                 evaluator: &self.game.evaluator,
+                 p,
+                 discounts: &discounts,
++                cfr_norm: self.cfr_norm,
+                 par: self.par,
+             };
+             let mut out = self.scratch.take(self.game.tree.root_dims[p] as usize);
+@@ -535,6 +550,7 @@ struct PassCtx<'w, E> {
+     evaluator: &'w E,
+     p: Player,
+     discounts: &'w Discounts,
++    cfr_norm: CfrNorm,
+     par: ParConfig,
+ }
+ 
+@@ -640,7 +656,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+     match node.kind {
+         NodeKind::Terminal => {
+             if !PRUNE || !opp_reach.iter().all(|&x| x == 0.0) {
+-                ctx.evaluator.eval(node.aux, ctx.p, opp_reach, out);
++                ctx.evaluator.eval_cfr(node.aux, ctx.p, opp_reach, out);
+             }
+         }
+         NodeKind::Chance => {
+@@ -787,7 +803,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                 ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
+ 
+             let mut sigma = scratch.take(sref.len());
+-            views.own().regret_matching(sref, sref.index, &mut sigma);
++            views
++                .own()
++                .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_norm);
+ 
+             // One flat action-major buffer: action `a`'s row is that
+             // action's own `out` parameter, so its recursion writes
+@@ -893,7 +911,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+             let zero_opp = PRUNE && opp_reach.iter().all(|&x| x == 0.0);
+             let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
+             if !zero_opp {
+-                storage.regret_matching(sref, sref.index, &mut sigma);
++                storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_norm);
+             }
+ 
+             let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
+diff --git a/crates/hu-engine/src/solver/dead_subtree_tests.rs b/crates/hu-engine/src/solver/dead_subtree_tests.rs
+index 082be4c..42fb53f 100644
+--- a/crates/hu-engine/src/solver/dead_subtree_tests.rs
++++ b/crates/hu-engine/src/solver/dead_subtree_tests.rs
+@@ -243,6 +243,7 @@ fn nonzero_subnormal_opponent_reach_is_evaluated() {
+     );
+     let discounts = Dcfr::default().at(1, None);
+     let ctx = PassCtx {
++        cfr_norm: CfrNorm::Exact,
+         tree: &solver.game.tree,
+         evaluator: &solver.game.evaluator,
+         p: Player::P0,
+@@ -345,6 +346,7 @@ fn check_parallel_updates<S: Storage>(par: ParConfig) {
+             let g = game(257);
+             let discounts = Dcfr::default().at(1, None);
+             let ctx = PassCtx {
++                cfr_norm: CfrNorm::Exact,
+                 tree: &g.tree,
+                 evaluator: &g.evaluator,
+                 p: Player::P0,
+diff --git a/crates/hu-engine/src/storage.rs b/crates/hu-engine/src/storage.rs
+index 2009a4d..dfa6d6c 100644
+--- a/crates/hu-engine/src/storage.rs
++++ b/crates/hu-engine/src/storage.rs
+@@ -1,5 +1,139 @@
++/// Experimental CFR current-strategy normalization (never average strategy).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub enum CfrNorm {
++    #[default]
++    Exact,
++    F32,
++}
++impl CfrNorm {
++    pub fn selected() -> Self {
++        static SELECTED: std::sync::OnceLock<CfrNorm> = std::sync::OnceLock::new();
++        *SELECTED.get_or_init(|| match std::env::var("SOLVERS_P1_NORM") {
++            Err(std::env::VarError::NotPresent) => Self::Exact,
++            Ok(s) if s == "exact" => Self::Exact,
++            Ok(s) if s == "f32" => Self::F32,
++            other => panic!("invalid SOLVERS_P1_NORM: {other:?}"),
++        })
++    }
++    pub fn name(self) -> &'static str {
++        match self {
++            Self::Exact => "exact",
++            Self::F32 => "f32",
++        }
++    }
++}
++
+ use crate::schedule::Discounts;
+ 
++#[cfg(test)]
++mod prototype_norm_tests {
++    use super::*;
++
++    fn check<S: Storage>() {
++        // Cross a block boundary; cover negative regrets and zero columns.
++        let r = StorageRef {
++            offset: 7,
++            num_actions: 7,
++            num_hands: 259,
++            index: 0,
++        };
++        let mut storage = S::new(r.offset + r.len(), 1);
++        let data: Vec<f32> = (0..r.len())
++            .map(|i| {
++                if (i % 259).is_multiple_of(11) {
++                    -1.0
++                } else {
++                    ((i * 37 % 101) as f32 - 20.0) / 103.0
++                }
++            })
++            .collect();
++        let d = Discounts {
++            pos: 1.0,
++            neg: 1.0,
++            avg: 1.0,
++            floor_neg: false,
++            reset_avg: false,
++        };
++        storage.update_regrets(r, 0, &data, &d);
++        storage.accumulate_strategy(r, 0, &data, &d);
++        let mut exact = vec![0.0; r.len()];
++        let mut relaxed = exact.clone();
++        storage.regret_matching(r, 0, &mut exact);
++        storage.regret_matching_cfr(r, 0, &mut relaxed, CfrNorm::Exact);
++        assert_eq!(
++            exact.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++            relaxed.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
++        );
++        storage.regret_matching_cfr(r, 0, &mut relaxed, CfrNorm::F32);
++        let max = exact
++            .iter()
++            .zip(&relaxed)
++            .map(|(&a, &b)| f64::from((a - b).abs()))
++            .fold(0.0, f64::max);
++        assert!(max < 1e-6);
++        assert!(
++            exact
++                .iter()
++                .zip(&relaxed)
++                .any(|(a, b)| a.to_bits() != b.to_bits())
++        );
++        for h in 0..259 {
++            let sum: f32 = (0..7).map(|a| relaxed[a * 259 + h]).sum();
++            assert!((sum - 1.0).abs() < 1e-6);
++            if h.is_multiple_of(11) {
++                for a in 0..7 {
++                    assert_eq!(relaxed[a * 259 + h], 1.0 / 7.0);
++                }
++            }
++        }
++        // Full backend and rebased view use the identical selected normalization.
++        {
++            let mut view = storage.view_mut();
++            let span = StorageSpan {
++                start: r.offset,
++                end: r.offset + r.len(),
++                sref_start: 0,
++                sref_end: 1,
++            };
++            let view = view.split(&[span]).pop().unwrap();
++            let mut through_view = vec![0.0; r.len()];
++            view.regret_matching_cfr(r, 0, &mut through_view, CfrNorm::F32);
++            assert_eq!(through_view, relaxed);
++        }
++        println!(
++            "{} norm f32 max absolute error={max:e}",
++            std::any::type_name::<S>()
++        );
++        let mut average = vec![0.0; r.len()];
++        let mut expected = average.clone();
++        storage.average_strategy(r, 0, &mut average);
++        match storage.arrays() {
++            StorageArrays::F32 { strategy_sum, .. } | StorageArrays::Mixed { strategy_sum, .. } => {
++                normalize_columns(
++                    &strategy_sum[r.offset..r.offset + r.len()],
++                    r,
++                    &mut expected,
++                )
++            }
++            StorageArrays::I16 { strategy_sum, .. } => normalize_columns_i16(
++                &strategy_sum[r.offset..r.offset + r.len()],
++                r,
++                &mut expected,
++            ),
++        }
++        assert_eq!(
++            average.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++            expected.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
++        );
++    }
++    #[test]
++    fn prototype_norm_all_backends_and_views() {
++        check::<F32Storage>();
++        check::<I16Storage>();
++        check::<MixedStorage>();
++    }
++}
++
+ /// Location of one action node's data inside a storage buffer. Layout is
+ /// action-major: element `(a, h)` lives at `offset + a * num_hands + h`.
+ #[derive(Clone, Copy, Debug)]
+@@ -47,6 +181,11 @@ pub trait StorageOps {
+     /// uniform strategy.
+     fn regret_matching(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]);
+ 
++    /// CFR-only hook; other implementations retain their exact behavior.
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], _norm: CfrNorm) {
++        self.regret_matching(r, ref_idx, out);
++    }
++
+     /// Applies pre-add discounting to stored regrets, then adds `inst`.
+     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts);
+ 
+@@ -331,6 +470,44 @@ fn normalize_columns(data: &[f32], r: StorageRef, out: &mut [f32]) {
+     }
+ }
+ 
++fn normalize_columns_f32(data: &[f32], r: StorageRef, out: &mut [f32]) {
++    let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
++    debug_assert_eq!(out.len(), r.len());
++    // CFR prototype: f32 positive sums, then one reciprocal per hand.
++    const BLOCK: usize = 256;
++    let uniform = 1.0 / num_actions as f32;
++    for first in (0..num_hands).step_by(BLOCK) {
++        let len = BLOCK.min(num_hands - first);
++        let mut totals = [0.0f32; BLOCK];
++        for a in 0..num_actions {
++            let row = &data[a * num_hands + first..a * num_hands + first + len];
++            for (total, &value) in totals[..len].iter_mut().zip(row) {
++                *total += value.max(0.0);
++            }
++        }
++        let mut inverses = [0.0f32; BLOCK];
++        for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
++            *inverse = if total > 0.0 { total.recip() } else { 0.0 };
++        }
++        for a in 0..num_actions {
++            let row = &data[a * num_hands + first..a * num_hands + first + len];
++            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
++            for (((dst, &value), &total), &inverse) in dst
++                .iter_mut()
++                .zip(row)
++                .zip(&totals[..len])
++                .zip(&inverses[..len])
++            {
++                *dst = if total > 0.0 {
++                    value.max(0.0) * inverse
++                } else {
++                    uniform
++                };
++            }
++        }
++    }
++}
++
+ // Shared op bodies, parameterized by the arena slice and the *local* offset
+ // within it. `F32Storage` calls these with `r.offset` directly (global
+ // offsets); `F32View` rebases first. Keeping the logic here means the two
+@@ -391,6 +568,14 @@ impl StorageOps for F32Storage {
+     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+         regret_matching_impl(&self.regrets, r.offset, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                normalize_columns_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
+         update_regrets_impl(&mut self.regrets, r.offset, r, inst, d);
+@@ -508,6 +693,15 @@ impl<'a> StorageOps for F32View<'a> {
+         let local = self.local_offset(r);
+         regret_matching_impl(&*self.regrets, local, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                let local = self.local_offset(r);
++                normalize_columns_f32(&self.regrets[local..local + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
+         let local = self.local_offset(r);
+@@ -605,6 +799,44 @@ fn normalize_columns_i16(data: &[i16], r: StorageRef, out: &mut [f32]) {
+     }
+ }
+ 
++fn normalize_columns_i16_f32(data: &[i16], r: StorageRef, out: &mut [f32]) {
++    let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
++    debug_assert_eq!(out.len(), r.len());
++    // CFR prototype: f32 positive sums, then one reciprocal per hand.
++    const BLOCK: usize = 256;
++    let uniform = 1.0 / num_actions as f32;
++    for first in (0..num_hands).step_by(BLOCK) {
++        let len = BLOCK.min(num_hands - first);
++        let mut totals = [0.0f32; BLOCK];
++        for a in 0..num_actions {
++            let row = &data[a * num_hands + first..a * num_hands + first + len];
++            for (total, &value) in totals[..len].iter_mut().zip(row) {
++                *total += value.max(0) as f32;
++            }
++        }
++        let mut inverses = [0.0f32; BLOCK];
++        for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
++            *inverse = if total > 0.0 { total.recip() } else { 0.0 };
++        }
++        for a in 0..num_actions {
++            let row = &data[a * num_hands + first..a * num_hands + first + len];
++            let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
++            for (((dst, &value), &total), &inverse) in dst
++                .iter_mut()
++                .zip(row)
++                .zip(&totals[..len])
++                .zip(&inverses[..len])
++            {
++                *dst = if total > 0.0 {
++                    value.max(0) as f32 * inverse
++                } else {
++                    uniform
++                };
++            }
++        }
++    }
++}
++
+ /// Dequantizes a block of `i16`s (`value = stored_i16 as f32 * scale`) into
+ /// `out`, which must already be sized to `q.len()`.
+ fn dequantize_block(q: &[i16], scale: f32, out: &mut [f32]) {
+@@ -764,6 +996,14 @@ impl StorageOps for I16Storage {
+     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+         regret_matching_i16_impl(&self.regrets, r.offset, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                normalize_columns_i16_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+         update_regrets_i16_impl(
+@@ -943,6 +1183,15 @@ impl<'a> StorageOps for I16View<'a> {
+         let local = self.local_offset(r);
+         regret_matching_i16_impl(&*self.regrets, local, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                let local = self.local_offset(r);
++                normalize_columns_i16_f32(&self.regrets[local..local + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+         let local = self.local_offset(r);
+@@ -1058,6 +1307,14 @@ impl StorageOps for MixedStorage {
+     fn regret_matching(&self, r: StorageRef, _ref_idx: u32, out: &mut [f32]) {
+         regret_matching_i16_impl(&self.regrets, r.offset, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                normalize_columns_i16_f32(&self.regrets[r.offset..r.offset + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+         update_regrets_i16_impl(
+@@ -1214,6 +1471,15 @@ impl<'a> StorageOps for MixedView<'a> {
+         let local = self.local_offset(r);
+         regret_matching_i16_impl(&*self.regrets, local, r, out);
+     }
++    fn regret_matching_cfr(&self, r: StorageRef, ref_idx: u32, out: &mut [f32], norm: CfrNorm) {
++        match norm {
++            CfrNorm::Exact => self.regret_matching(r, ref_idx, out),
++            CfrNorm::F32 => {
++                let local = self.local_offset(r);
++                normalize_columns_i16_f32(&self.regrets[local..local + r.len()], r, out);
++            }
++        }
++    }
+ 
+     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts) {
+         let local = self.local_offset(r);
+diff --git a/crates/hu-postflop/examples/p1_bench.rs b/crates/hu-postflop/examples/p1_bench.rs
+index e7ddefc..2cec4c4 100644
+--- a/crates/hu-postflop/examples/p1_bench.rs
++++ b/crates/hu-postflop/examples/p1_bench.rs
+@@ -79,6 +79,8 @@ fn main() -> Result<()> {
+         let report = serde_json::json!({
+             "config": args.config.display().to_string(),
+             "threads": args.threads,
++            "kernel": hu_postflop::CfrKernel::selected().name(),
++            "norm": hu_engine::CfrNorm::selected().name(),
+             "estimateF32Bytes": prepared.estimate.f32_bytes,
+             "estimateI16Bytes": prepared.estimate.i16_bytes,
+             "estimateI16F32avgBytes": prepared.estimate.i16_f32avg_bytes,
+@@ -192,6 +194,8 @@ fn bench<S: Storage>(
+     let mut report = serde_json::json!({
+         "config": args.config.display().to_string(),
+         "threads": args.threads,
++            "kernel": hu_postflop::CfrKernel::selected().name(),
++            "norm": hu_engine::CfrNorm::selected().name(),
+         "storage": storage_name,
+         "nodes": nodes,
+         "actionNodes": action_nodes,
+diff --git a/crates/hu-postflop/src/kernel.rs b/crates/hu-postflop/src/kernel.rs
+index e7608cf..8fcea6d 100644
+--- a/crates/hu-postflop/src/kernel.rs
++++ b/crates/hu-postflop/src/kernel.rs
+@@ -10,6 +10,34 @@
+ //! The f64 sums add the nonzero terms in the same order as the former dense
+ //! kernels (rank order, then global combo order), so results are bit-identical.
+ 
++/// Experimental CFR terminal kernels; evaluation always uses Exact.
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub enum CfrKernel {
++    #[default]
++    Exact,
++    F64Fold,
++    F32,
++}
++impl CfrKernel {
++    pub fn selected() -> Self {
++        static SELECTED: std::sync::OnceLock<CfrKernel> = std::sync::OnceLock::new();
++        *SELECTED.get_or_init(|| match std::env::var("SOLVERS_P1_KERNEL") {
++            Err(std::env::VarError::NotPresent) => Self::Exact,
++            Ok(s) if s == "exact" => Self::Exact,
++            Ok(s) if s == "f64fold" => Self::F64Fold,
++            Ok(s) if s == "f32" => Self::F32,
++            other => panic!("invalid SOLVERS_P1_KERNEL: {other:?}"),
++        })
++    }
++    pub fn name(self) -> &'static str {
++        match self {
++            Self::Exact => "exact",
++            Self::F64Fold => "f64fold",
++            Self::F32 => "f32",
++        }
++    }
++}
++
+ use crate::hands::ABSENT;
+ use nlh::HandRank;
+ #[derive(Clone, Copy, Debug)]
+@@ -117,6 +145,193 @@ pub(crate) fn fold_kernel(
+     }
+ }
+ 
++fn add_relaxed_f64(hands: &[Hand], reach: &[f32], total: &mut f64, card: &mut [f64; 52]) {
++    for h in hands {
++        let r = reach[h.local as usize] as f64;
++        *total += r;
++        card[h.cards[0] as usize] += r;
++        card[h.cards[1] as usize] += r;
++    }
++}
++pub(crate) fn compat_sums_relaxed_f64(hands: &[Hand], reach: &[f32]) -> (f64, [f64; 52]) {
++    let mut total = 0.0;
++    let mut card = [0.0; 52];
++    add_relaxed_f64(hands, reach, &mut total, &mut card);
++    (total, card)
++}
++fn same_reach_relaxed_f64(same: &[u16], h: Hand, reach: &[f32]) -> f64 {
++    let other = same[h.local as usize];
++    if other == ABSENT {
++        0.0
++    } else {
++        reach[other as usize] as f64
++    }
++}
++pub(crate) fn showdown_kernel_relaxed_f64(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: [f64; 3],
++    reach: &[f32],
++    out: &mut [f32],
++) {
++    let [u_win, u_tie, u_lose] = utilities;
++    let (all_total, all_card) = compat_sums_relaxed_f64(&opp.hands, reach);
++    let mut below_total = 0.0;
++    let mut below_card = [0.0; 52];
++    let mut oi = 0;
++    let mut os = 0;
++    let mut start = 0;
++    for &(rank, end) in &own.groups {
++        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
++            let oe = opp.groups[oi].1;
++            let mut group_total = 0.0;
++            // Legacy total adds groups; card sums add_relaxed_f64 individual hands.
++            add_relaxed_f64(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
++            below_total += group_total;
++            os = oe;
++            oi += 1;
++        }
++        let mut group_total = 0.0;
++        let mut group_card = [0.0; 52];
++        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
++        let oe = if tied { opp.groups[oi].1 } else { os };
++        add_relaxed_f64(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
++        for &h in &own.hands[start..end] {
++            let [a, b] = h.cards.map(usize::from);
++            let same = same_reach_relaxed_f64(same, h, reach);
++            let win = below_total - below_card[a] - below_card[b];
++            let tie = group_total - group_card[a] - group_card[b] + same;
++            let compat = all_total - all_card[a] - all_card[b] + same;
++            let lose = compat - win - tie;
++            out[h.local as usize] = (u_win * win + u_tie * tie + u_lose * lose) as f32;
++        }
++        if tied {
++            below_total += group_total;
++            for (below, group) in below_card.iter_mut().zip(group_card) {
++                *below += group;
++            }
++            os = oe;
++            oi += 1;
++        }
++        start = end;
++    }
++}
++pub(crate) fn fold_kernel_relaxed_f64(
++    own: &[Hand],
++    opp: &[Hand],
++    same: &[u16],
++    u: f64,
++    board: u64,
++    reach: &[f32],
++    out: &mut [f32],
++) {
++    let (total, card) = compat_sums_relaxed_f64(opp, reach);
++    for &h in own {
++        let [a, b] = h.cards.map(usize::from);
++        if board & ((1u64 << a) | (1u64 << b)) != 0 {
++            out[h.local as usize] = 0.0;
++            continue;
++        }
++        out[h.local as usize] =
++            (u * (total - card[a] - card[b] + same_reach_relaxed_f64(same, h, reach))) as f32;
++    }
++}
++
++fn add_relaxed_f32(hands: &[Hand], reach: &[f32], total: &mut f32, card: &mut [f32; 52]) {
++    for h in hands {
++        let r = reach[h.local as usize];
++        *total += r;
++        card[h.cards[0] as usize] += r;
++        card[h.cards[1] as usize] += r;
++    }
++}
++pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f32; 52]) {
++    let mut total = 0.0;
++    let mut card = [0.0; 52];
++    add_relaxed_f32(hands, reach, &mut total, &mut card);
++    (total, card)
++}
++fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
++    let other = same[h.local as usize];
++    if other == ABSENT {
++        0.0
++    } else {
++        reach[other as usize]
++    }
++}
++pub(crate) fn showdown_kernel_relaxed_f32(
++    own: &RankedHands,
++    opp: &RankedHands,
++    same: &[u16],
++    utilities: [f64; 3],
++    reach: &[f32],
++    out: &mut [f32],
++) {
++    let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
++    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
++    let mut below_total = 0.0;
++    let mut below_card = [0.0; 52];
++    let mut oi = 0;
++    let mut os = 0;
++    let mut start = 0;
++    for &(rank, end) in &own.groups {
++        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
++            let oe = opp.groups[oi].1;
++            let mut group_total = 0.0;
++            // Legacy total adds groups; card sums add_relaxed_f32 individual hands.
++            add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
++            below_total += group_total;
++            os = oe;
++            oi += 1;
++        }
++        let mut group_total = 0.0;
++        let mut group_card = [0.0; 52];
++        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
++        let oe = if tied { opp.groups[oi].1 } else { os };
++        add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
++        for &h in &own.hands[start..end] {
++            let [a, b] = h.cards.map(usize::from);
++            let same = same_reach_relaxed_f32(same, h, reach);
++            let win = below_total - below_card[a] - below_card[b];
++            let tie = group_total - group_card[a] - group_card[b] + same;
++            let compat = all_total - all_card[a] - all_card[b] + same;
++            let lose = compat - win - tie;
++            out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
++        }
++        if tied {
++            below_total += group_total;
++            for (below, group) in below_card.iter_mut().zip(group_card) {
++                *below += group;
++            }
++            os = oe;
++            oi += 1;
++        }
++        start = end;
++    }
++}
++pub(crate) fn fold_kernel_relaxed_f32(
++    own: &[Hand],
++    opp: &[Hand],
++    same: &[u16],
++    u: f64,
++    board: u64,
++    reach: &[f32],
++    out: &mut [f32],
++) {
++    let u = u as f32;
++    let (total, card) = compat_sums_relaxed_f32(opp, reach);
++    for &h in own {
++        let [a, b] = h.cards.map(usize::from);
++        if board & ((1u64 << a) | (1u64 << b)) != 0 {
++            out[h.local as usize] = 0.0;
++            continue;
++        }
++        out[h.local as usize] =
++            u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
++    }
++}
++
+ #[cfg(test)]
+ mod legacy {
+     use nlh::{HandRank, combo_cards};
+@@ -234,6 +449,94 @@ mod tests {
+     use hu_engine::TerminalEvaluator;
+     use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
+ 
++    #[test]
++    fn prototype_synthetic_kernels_close() {
++        let list = |stride: usize| {
++            let mut hands: Vec<Hand> = (0..NUM_COMBOS)
++                .filter(|h| h % stride != 0)
++                .enumerate()
++                .map(|(local, h)| {
++                    let (a, b) = combo_cards(h);
++                    Hand {
++                        local: local as u16,
++                        cards: [a.index() as u8, b.index() as u8],
++                    }
++                })
++                .collect();
++            // Identical combos must have the same synthetic rank in both seats.
++            let rank =
++                |h: &Hand| HandRank((u16::from(h.cards[0]) * 53 + u16::from(h.cards[1])) % 19);
++            hands.sort_by_key(|h| (rank(h), h.local));
++            let mut groups = Vec::new();
++            for (i, h) in hands.iter().enumerate() {
++                let rank = rank(h);
++                if groups.last().is_none_or(|&(r, _)| r != rank) {
++                    groups.push((rank, i + 1));
++                } else {
++                    groups.last_mut().unwrap().1 = i + 1;
++                }
++            }
++            RankedHands { hands, groups }
++        };
++        let own = list(3);
++        let opp = list(5);
++        let mut same = vec![ABSENT; own.hands.len()];
++        for h in &own.hands {
++            if let Some(o) = opp.hands.iter().find(|o| o.cards == h.cards) {
++                same[h.local as usize] = o.local;
++            }
++        }
++        let mut maxima = [0.0f64; 2];
++        for scale in [0.0, 0.001, 1.0, 100.0] {
++            let reach: Vec<f32> = (0..opp.hands.len())
++                .map(|i| {
++                    if i % 7 == 0 {
++                        0.0
++                    } else {
++                        (i * 17 % 101 + 1) as f32 / 103.0 * scale
++                    }
++                })
++                .collect();
++            for kind in 0..2 {
++                let mut exact = vec![0.0; own.hands.len()];
++                let mut out = exact.clone();
++                if kind == 0 {
++                    showdown_kernel(&own, &opp, &same, [1.25, -0.125, -1.75], &reach, &mut exact);
++                } else {
++                    fold_kernel(&own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut exact);
++                }
++                for (v, kernel) in [CfrKernel::F64Fold, CfrKernel::F32].into_iter().enumerate() {
++                    if kind == 0 {
++                        let f = if kernel == CfrKernel::F64Fold {
++                            showdown_kernel_relaxed_f64
++                        } else {
++                            showdown_kernel_relaxed_f32
++                        };
++                        f(&own, &opp, &same, [1.25, -0.125, -1.75], &reach, &mut out);
++                    } else {
++                        let f = if kernel == CfrKernel::F64Fold {
++                            fold_kernel_relaxed_f64
++                        } else {
++                            fold_kernel_relaxed_f32
++                        };
++                        f(&own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut out);
++                    }
++                    let denom = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
++                    for (&a, &b) in exact.iter().zip(&out) {
++                        assert!(b.is_finite());
++                        if denom == 0.0 {
++                            assert_eq!(a, b);
++                        } else {
++                            maxima[v] = maxima[v].max((f64::from(a) - f64::from(b)).abs() / denom);
++                        }
++                    }
++                }
++            }
++        }
++        assert!(maxima.into_iter().all(|x| x < 1e-5));
++        println!("synthetic relative infinity errors f64fold/f32: {maxima:?}");
++    }
++
+     #[test]
+     fn asymmetric_fractional_support_matches_dense_kernels_bitwise() {
+         for board in ["2c 7d 9h Js Qs", "Ah Kh Qd Jc Ts", "2s 3s 4s 5s 6s"] {
+diff --git a/crates/hu-postflop/src/lib.rs b/crates/hu-postflop/src/lib.rs
+index 8f6c93e..fbcfa8a 100644
+--- a/crates/hu-postflop/src/lib.rs
++++ b/crates/hu-postflop/src/lib.rs
+@@ -23,6 +23,8 @@ mod equity;
+ mod hands;
+ pub use hands::PostflopHands;
+ mod kernel;
++#[doc(hidden)]
++pub use kernel::CfrKernel;
+ mod postflop;
+ mod river;
+ mod viewer;
+diff --git a/crates/hu-postflop/src/postflop.rs b/crates/hu-postflop/src/postflop.rs
+index eea49d5..33c7e07 100644
+--- a/crates/hu-postflop/src/postflop.rs
++++ b/crates/hu-postflop/src/postflop.rs
+@@ -420,6 +420,7 @@ struct PostflopTerminal {
+ /// from the river-only evaluator to runouts at any street.
+ pub struct PostflopEvaluator {
+     terminals: Vec<PostflopTerminal>,
++    cfr_kernel: kernel::CfrKernel,
+     /// Showdown rank tables, deduped by completed 5-card board (see
+     /// [`Builder::rank_table_id`]).
+     rank_tables: Vec<PerPlayer<RankedHands>>,
+@@ -431,8 +432,33 @@ pub struct PostflopEvaluator {
+     pub(crate) mask_cards: Vec<Card>,
+ }
+ 
++#[cfg(test)]
++#[path = "prototype_tests.rs"]
++mod prototype_tests;
++
+ impl TerminalEvaluator for PostflopEvaluator {
+     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
++        self.eval_with_kernel(terminal, p, opp_reach, out, kernel::CfrKernel::Exact);
++    }
++    fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
++        self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_kernel);
++    }
++}
++impl PostflopEvaluator {
++    #[doc(hidden)]
++    pub fn set_cfr_kernel(&mut self, kernel: kernel::CfrKernel) {
++        self.cfr_kernel = kernel;
++    }
++
++    #[doc(hidden)]
++    pub fn eval_with_kernel(
++        &self,
++        terminal: u32,
++        p: Player,
++        opp_reach: &[f32],
++        out: &mut [f32],
++        variant: kernel::CfrKernel,
++    ) {
+         debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
+         debug_assert_eq!(out.len(), self.hands.len(p));
+         let term = &self.terminals[terminal as usize];
+@@ -452,7 +478,12 @@ impl TerminalEvaluator for PostflopEvaluator {
+         };
+         match term.kind {
+             TerminalKind::Fold { .. } => {
+-                kernel::fold_kernel(
++                let kernel = match variant {
++                    kernel::CfrKernel::Exact => kernel::fold_kernel,
++                    kernel::CfrKernel::F64Fold => kernel::fold_kernel_relaxed_f64,
++                    kernel::CfrKernel::F32 => kernel::fold_kernel_relaxed_f32,
++                };
++                kernel(
+                     &self.fold_combos[p],
+                     &self.fold_combos[p.opponent()],
+                     &self.hands.same[p],
+@@ -464,7 +495,12 @@ impl TerminalEvaluator for PostflopEvaluator {
+             }
+             TerminalKind::Showdown => {
+                 out.fill(0.0);
+-                kernel::showdown_kernel(
++                let kernel = match variant {
++                    kernel::CfrKernel::Exact => kernel::showdown_kernel,
++                    kernel::CfrKernel::F64Fold => kernel::showdown_kernel_relaxed_f64,
++                    kernel::CfrKernel::F32 => kernel::showdown_kernel_relaxed_f32,
++                };
++                kernel(
+                     &self.rank_tables[term.table as usize][p],
+                     &self.rank_tables[term.table as usize][p.opponent()],
+                     &self.hands.same[p],
+@@ -1210,6 +1246,7 @@ fn build_checked(
+     } = builder;
+ 
+     let evaluator = PostflopEvaluator {
++        cfr_kernel: kernel::CfrKernel::selected(),
+         terminals,
+         rank_tables,
+         fold_combos,
+diff --git a/crates/hu-postflop/src/prototype_tests.rs b/crates/hu-postflop/src/prototype_tests.rs
+new file mode 100644
+index 0000000..beda164
+--- /dev/null
++++ b/crates/hu-postflop/src/prototype_tests.rs
+@@ -0,0 +1,262 @@
++//! Explicit selection avoids global environment races and OnceLock resets.
++use crate::game::{ChipEv, NoRake, PayoffPipeline};
++use crate::*;
++use hu_engine::{
++    CfrNorm, Dcfr, F32Storage, I16Storage, MixedStorage, Storage, StorageState, TerminalEvaluator,
++};
++use nlh::{Chips, combo_cards};
++
++fn config() -> PostflopConfig {
++    PostflopConfig {
++        board: "Ks 7h 2d 3c"
++            .split_whitespace()
++            .map(|s| s.parse().unwrap())
++            .collect(),
++        ranges: PerPlayer::new(
++            "22+,A2s+,KTs+,QJs,JTs,AJo+".parse().unwrap(),
++            "99-22,AJs-A2s,KJs-K2s,QJs,JTs,AJo-A2o".parse().unwrap(),
++        ),
++        pot: Chips(6),
++        effective_stack: Chips(9),
++        streets: PerStreet {
++            turn: StreetTree {
++                include_allin: true,
++                max_aggressive_actions: 1,
++                ..Default::default()
++            },
++            river: StreetTree {
++                include_allin: true,
++                max_aggressive_actions: 1,
++                ..Default::default()
++            },
++            ..Default::default()
++        },
++        ..Default::default()
++    }
++}
++fn game() -> PostflopGame {
++    build_postflop_game(
++        &config(),
++        PayoffPipeline {
++            rake: &NoRake,
++            utility: &ChipEv,
++        },
++    )
++}
++
++// Zero-valued CFVs make pointwise relative error undefined. Report the relative
++// infinity-norm error max|variant-exact| / max|exact| for each terminal vector.
++fn relative_error(exact: &[f32], variant: &[f32]) -> f64 {
++    let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
++    let error = exact
++        .iter()
++        .zip(variant)
++        .map(|(&a, &b)| {
++            assert!(b.is_finite());
++            (f64::from(a) - f64::from(b)).abs()
++        })
++        .fold(0.0, f64::max);
++    if scale == 0.0 {
++        assert_eq!(error, 0.0);
++        0.0
++    } else {
++        error / scale
++    }
++}
++
++#[test]
++fn prototype_real_terminals_close_and_eval_stays_exact() {
++    let mut game = game();
++    let evaluator = &mut game.game.evaluator;
++    let mut maxima = [0.0f64; 3];
++    let mut folds = 0;
++    let mut showdowns = 0;
++    for node in &game.game.tree.nodes {
++        if node.kind != NodeKind::Terminal {
++            continue;
++        }
++        let term = &evaluator.terminals[node.aux as usize];
++        let board = term.board_mask;
++        match term.kind {
++            super::TerminalKind::Fold { .. } => folds += 1,
++            _ => showdowns += 1,
++        }
++        for p in Player::BOTH {
++            for pattern in 0..3 {
++                let reach: Vec<f32> = evaluator
++                    .hands
++                    .combos(p.opponent())
++                    .iter()
++                    .enumerate()
++                    .map(|(i, &h)| {
++                        let (a, b) = combo_cards(h as usize);
++                        if board & ((1u64 << a.index()) | (1u64 << b.index())) != 0
++                            || (i + pattern) % 7 == 0
++                        {
++                            0.0
++                        } else {
++                            ((i * 37 % 101 + 1) as f32 / 103.0) * [1.0, 0.001, 100.0][pattern]
++                        }
++                    })
++                    .collect();
++                let mut exact = vec![0.0; evaluator.hands.len(p)];
++                evaluator.eval(node.aux, p, &reach, &mut exact);
++                for (idx, variant) in [CfrKernel::Exact, CfrKernel::F64Fold, CfrKernel::F32]
++                    .into_iter()
++                    .enumerate()
++                {
++                    evaluator.set_cfr_kernel(variant);
++                    let mut out = vec![f32::NAN; exact.len()];
++                    evaluator.eval_cfr(node.aux, p, &reach, &mut out);
++                    maxima[idx] = maxima[idx].max(relative_error(&exact, &out));
++                    assert!(maxima[idx] < 1e-5, "{variant:?}: {}", maxima[idx]);
++                    // Calling eval after selecting a relaxed CFR kernel stays bit-exact.
++                    evaluator.eval(node.aux, p, &reach, &mut out);
++                    assert_eq!(bits(&out), bits(&exact));
++                }
++            }
++        }
++    }
++    assert!(folds > 0 && showdowns > 0);
++    println!(
++        "real terminal relative infinity errors: {maxima:?}; folds={folds} showdowns={showdowns}"
++    );
++}
++
++fn bits(v: &[f32]) -> Vec<u32> {
++    v.iter().map(|v| v.to_bits()).collect()
++}
++fn state_bits(state: StorageState) -> Vec<u8> {
++    let mut out = Vec::new();
++    let mut float = |v: &[f32]| {
++        for x in v {
++            out.extend_from_slice(&x.to_le_bytes());
++        }
++    };
++    match state {
++        StorageState::F32 {
++            regrets,
++            strategy_sum,
++        } => {
++            float(&regrets);
++            float(&strategy_sum);
++        }
++        StorageState::I16 {
++            regrets,
++            strategy_sum,
++            regret_scales,
++            strategy_scales,
++        } => {
++            float(&regret_scales);
++            float(&strategy_scales);
++            for x in regrets.into_iter().chain(strategy_sum) {
++                out.extend_from_slice(&x.to_le_bytes());
++            }
++        }
++        StorageState::Mixed {
++            regrets,
++            strategy_sum,
++            regret_scales,
++        } => {
++            float(&strategy_sum);
++            float(&regret_scales);
++            for x in regrets {
++                out.extend_from_slice(&x.to_le_bytes());
++            }
++        }
++    }
++    out
++}
++fn deterministic<S: Storage>() {
++    for kernel in [CfrKernel::Exact, CfrKernel::F64Fold, CfrKernel::F32] {
++        for norm in [CfrNorm::Exact, CfrNorm::F32] {
++            let solve = |threads| {
++                rayon::ThreadPoolBuilder::new()
++                    .num_threads(threads)
++                    .build()
++                    .unwrap()
++                    .install(|| {
++                        let mut game = game().game;
++                        assert!(game.tree.storage_len > 0);
++                        game.evaluator.set_cfr_kernel(kernel);
++                        let mut solver =
++                            hu_engine::Solver::<_, S>::new(game, Box::<Dcfr>::default(), Some(12));
++                        solver.set_cfr_norm(norm);
++                        solver.set_par(hu_engine::ParConfig {
++                            chance_depth: 2,
++                            min_children: 2,
++                        });
++                        solver.run(12);
++                        let state = solver.state();
++                        // Restore the same state into an explicitly exact solver.
++                        // EV/BR and the streaming save-value pass must ignore CFR choices.
++                        let mut exact_game = self::game().game;
++                        exact_game.evaluator.set_cfr_kernel(CfrKernel::Exact);
++                        let mut exact = hu_engine::Solver::<_, S>::new(
++                            exact_game,
++                            Box::<Dcfr>::default(),
++                            Some(12),
++                        );
++                        exact.set_cfr_norm(CfrNorm::Exact);
++                        exact.restore_state(state.clone()).unwrap();
++                        let evaluated = solver.evaluate();
++                        let expected = exact.evaluate();
++                        for p in Player::BOTH {
++                            assert_eq!(evaluated.0[p].to_bits(), expected.0[p].to_bits());
++                            assert_eq!(evaluated.1[p].to_bits(), expected.1[p].to_bits());
++                        }
++                        let saved = std::sync::Mutex::new(std::collections::BTreeMap::new());
++                        solver.visit_expected_values(|node, values, reaches, sigma| {
++                            saved.lock().unwrap().insert(
++                                node,
++                                (
++                                    bits(values[Player::P0]),
++                                    bits(values[Player::P1]),
++                                    bits(reaches[Player::P0]),
++                                    bits(reaches[Player::P1]),
++                                    bits(sigma),
++                                ),
++                            );
++                        });
++                        let exact_saved = std::sync::Mutex::new(std::collections::BTreeMap::new());
++                        exact.visit_expected_values(|node, values, reaches, sigma| {
++                            exact_saved.lock().unwrap().insert(
++                                node,
++                                (
++                                    bits(values[Player::P0]),
++                                    bits(values[Player::P1]),
++                                    bits(reaches[Player::P0]),
++                                    bits(reaches[Player::P1]),
++                                    bits(sigma),
++                                ),
++                            );
++                        });
++                        assert_eq!(
++                            saved.into_inner().unwrap(),
++                            exact_saved.into_inner().unwrap()
++                        );
++                        (state.iteration, state_bits(state.storage), evaluated)
++                    })
++            };
++            let a = solve(1);
++            let b = solve(4);
++            assert_eq!(a.0, b.0);
++            assert_eq!(
++                a.1,
++                b.1,
++                "{} {kernel:?} {norm:?}",
++                std::any::type_name::<S>()
++            );
++            for p in Player::BOTH {
++                assert_eq!(a.2.0[p].to_bits(), b.2.0[p].to_bits());
++                assert_eq!(a.2.1[p].to_bits(), b.2.1[p].to_bits());
++            }
++        }
++    }
++}
++#[test]
++fn prototype_all_backends_all_variants_deterministic() {
++    deterministic::<F32Storage>();
++    deterministic::<I16Storage>();
++    deterministic::<MixedStorage>();
++}
+-- 
+2.45.1.windows.1
+

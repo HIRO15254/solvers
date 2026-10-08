@@ -1,0 +1,11 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "cpu": "Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz",
+  "logicalProcessors": 16,
+  "totalPhysicalBytes": 34275098624,
+  "availablePhysicalBytesAtCapture": 13388029952,
+  "cargoBuildJobs": 2,
+  "benchmarkThreads": 1,
+  "baseRevision": "43e97c67bd6448787f73a33dc954597730326571",
+  "note": "PC is shared with other computation; timings are reference measurements."
+}

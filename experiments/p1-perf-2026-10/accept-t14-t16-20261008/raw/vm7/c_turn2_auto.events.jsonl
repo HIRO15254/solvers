@@ -1,0 +1,4 @@
+{"seq":0,"unixMs":1791400350828,"level":"info","kind":"state","state":"running"}
+{"seq":1,"unixMs":1791400351255,"level":"info","kind":"stop","reason":"target-reached"}
+{"seq":2,"unixMs":1791400351325,"level":"info","kind":"checkpoint","sweeps":242}
+{"seq":3,"unixMs":1791400351329,"level":"info","kind":"state","state":"completed"}

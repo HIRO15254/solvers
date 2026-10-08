@@ -1,0 +1,15 @@
+tree: nodes=2544580 terminals=1586149 rank_tables=799 storage=8266.2 MiB (f32) / 4140.4 MiB (i16) / 6203.3 MiB (i16-f32avg)
+memory estimate: 8786.2 MiB (f32) / 4660.4 MiB (i16) / 6723.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.145e0 expl_p1=7.394e-1 nash_conv=1.884e0
+iter=      50 expl_p0=3.039e-1 expl_p1=2.113e-1 nash_conv=5.152e-1
+iter=     100 expl_p0=5.583e-2 expl_p1=4.803e-2 nash_conv=1.039e-1
+iter=     150 expl_p0=2.331e-2 expl_p1=1.830e-2 nash_conv=4.161e-2
+iter=     200 expl_p0=1.234e-2 expl_p1=9.432e-3 nash_conv=2.178e-2
+iter=     250 expl_p0=8.420e-3 expl_p1=6.613e-3 nash_conv=1.503e-2
+iter=     300 expl_p0=5.667e-3 expl_p1=4.774e-3 nash_conv=1.044e-2
+iter=     350 expl_p0=4.199e-3 expl_p1=3.671e-3 nash_conv=7.870e-3
+iter=     400 expl_p0=3.128e-3 expl_p1=2.714e-3 nash_conv=5.841e-3
+iter=     409 expl_p0=2.995e-3 expl_p1=2.565e-3 nash_conv=5.560e-3
+iter=     412 expl_p0=2.932e-3 expl_p1=2.549e-3 nash_conv=5.481e-3
+done: iterations=412 wall=237.72s ev_p0=1.912585 ev_p1=2.896976 nash_conv=5.481e-3
+sol: wrote /home/PC_User/work_vm20b/c_flop3_base/solution.sol (2326.08 MB, 955253 blocks, mode=Full)

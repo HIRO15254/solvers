@@ -1,0 +1,164 @@
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock:ppp (41938 samples, percent: local period)
+--------------------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         : 3     Disassembly of section .text:
+         :
+         : 5     00000000000ddb60 <hu_postflop::kernel::fold_kernel_relaxed_f32>:
+         : 6     hu_postflop::kernel::fold_kernel_relaxed_f32:
+         : 242   start = end;
+         : 243   }
+         : 244   }
+         : 245   /// Inclusion-exclusion using four-lane support sums; own dead hands still need the
+         : 246   /// board test because the reusable hand list can be a superset of live hands.
+         : 247   pub(crate) fn fold_kernel_relaxed_f32(
+    0.00 :   ddb60:  push   %rbp
+    0.03 :   ddb61:  push   %r15
+    0.00 :   ddb63:  push   %r14
+    0.00 :   ddb65:  push   %r13
+    0.01 :   ddb67:  push   %r12
+    0.02 :   ddb69:  push   %rbx
+    0.01 :   ddb6a:  sub    $0x218,%rsp
+    0.00 :   ddb71:  mov    0x260(%rsp),%r15
+    0.02 :   ddb79:  mov    0x258(%rsp),%r13
+    0.00 :   ddb81:  mov    %rdi,%r12
+    0.00 :   ddb84:  lea    0x114(%rsp),%rdi
+    0.00 :   ddb8c:  mov    %r8,%r14
+    0.00 :   ddb8f:  mov    %rsi,%rbp
+         : 252   board: u64,
+         : 253   reach: &[f32],
+         : 254   out: &mut [f32],
+         : 255   ) {
+         : 256   let u = u as f32;
+         : 257   let (total, card) = compat_sums_relaxed_f32(opp, reach);
+    0.00 :   ddb92:  mov    %rdx,%rsi
+    0.00 :   ddb95:  mov    %rcx,%rdx
+    0.00 :   ddb98:  vmovsd %xmm0,0x8(%rsp)
+    0.02 :   ddb9e:  mov    %r9,%rbx
+    0.00 :   ddba1:  mov    %r13,%rcx
+    0.00 :   ddba4:  mov    %r15,%r8
+    0.00 :   ddba7:  call   dd7a0 <hu_postflop::kernel::compat_sums_relaxed_f32>
+    0.00 :   ddbac:  vmovups 0x1d8(%rsp),%ymm2
+    0.10 :   ddbb5:  vmovups 0x1b8(%rsp),%ymm3
+    0.01 :   ddbbe:  vmovups 0x1f8(%rsp),%ymm1
+    0.02 :   ddbc7:  vmovss 0x114(%rsp),%xmm0
+    0.00 :   ddbd0:  vmovups %ymm2,0xd0(%rsp)
+    0.02 :   ddbd9:  vmovups 0x198(%rsp),%ymm2
+    0.01 :   ddbe2:  vmovups %ymm3,0xb0(%rsp)
+    0.01 :   ddbeb:  vmovups 0x178(%rsp),%ymm3
+    0.00 :   ddbf4:  vmovups %ymm1,0xf0(%rsp)
+    0.01 :   ddbfd:  vmovups %ymm2,0x90(%rsp)
+    0.01 :   ddc06:  vmovups 0x158(%rsp),%ymm2
+    0.00 :   ddc0f:  vmovups %ymm3,0x70(%rsp)
+    0.00 :   ddc15:  vmovups 0x138(%rsp),%ymm3
+    0.01 :   ddc1e:  vmovups %ymm2,0x50(%rsp)
+    0.01 :   ddc24:  vmovups 0x118(%rsp),%ymm2
+    0.01 :   ddc2d:  vmovups %ymm3,0x30(%rsp)
+    0.02 :   ddc33:  vmovups %ymm2,0x10(%rsp)
+    0.01 :   ddc39:  test   %rbp,%rbp
+    0.00 :   ddc3c:  je     ddd19 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1b9>
+         : 181   next<hu_postflop::kernel::Hand>():
+    0.00 :   ddc42:  vmovsd 0x8(%rsp),%xmm1
+    0.00 :   ddc48:  mov    0x270(%rsp),%rsi
+    0.00 :   ddc50:  mov    0x268(%rsp),%rcx
+    0.01 :   ddc58:  mov    0x250(%rsp),%rdx
+    0.00 :   ddc60:  lea    (%r12,%rbp,4),%r8
+    0.00 :   ddc64:  mov    $0x608,%r9d
+    0.01 :   ddc6a:  mov    $0x1,%r10d
+    0.01 :   ddc70:  vcvtsd2ss %xmm1,%xmm1,%xmm1
+    0.00 :   ddc74:  jmp    ddc8d <hu_postflop::kernel::fold_kernel_relaxed_f32+0x12d>
+    0.00 :   ddc76:  cs nopw 0x0(%rax,%rax,1)
+         : 192   eq<hu_postflop::kernel::Hand>():
+    0.03 :   ddc80:  add    $0x4,%r12
+    0.31 :   ddc84:  cmp    %r8,%r12
+         : 1716  next<hu_postflop::kernel::Hand>():
+    0.10 :   ddc87:  je     ddd19 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1b9>
+         : 181   hu_postflop::kernel::fold_kernel_relaxed_f32:
+         : 253   for &h in own {
+    0.00 :   ddc8d:  movzwl 0x2(%r12),%r11d
+    0.70 :   ddc93:  movzwl (%r12),%edi
+         : 254   let [a, b] = h.cards.map(|c| c as usize & 63);
+    0.20 :   ddc98:  bextr  %r9d,%r11d,%eax
+         : 256   {closure#0}():
+    0.15 :   ddc9d:  and    $0x3f,%r11d
+         : 255   hu_postflop::kernel::fold_kernel_relaxed_f32:
+         : 255   if board & ((1u64 << a) | (1u64 << b)) != 0 {
+   10.32 :   ddca1:  shlx   %rax,%r10,%rbp
+    0.46 :   ddca6:  bts    %r11,%rbp
+    1.02 :   ddcaa:  test   %rdx,%rbp
+    0.31 :   ddcad:  je     ddcc0 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x160>
+         : 256   out[h.local as usize] = 0.0;
+    0.00 :   ddcaf:  cmp    %rdi,%rsi
+    1.08 :   ddcb2:  jbe    ddd2e <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1ce>
+    0.00 :   ddcb4:  movl   $0x0,(%rcx,%rdi,4)
+    1.04 :   ddcbb:  jmp    ddc80 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x120>
+    0.00 :   ddcbd:  nopl   (%rax)
+         : 162   let other = same[h.local as usize];
+    0.01 :   ddcc0:  cmp    %rdi,%rbx
+         : 164   same_reach_relaxed_f32():
+    0.89 :   ddcc3:  jbe    ddd4e <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1ee>
+         : 163   hu_postflop::kernel::fold_kernel_relaxed_f32:
+         : 260   continue;
+         : 261   }
+         : 262   out[h.local as usize] =
+         : 263   u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+    0.00 :   ddcc9:  vmovss 0x10(%rsp,%rax,4),%xmm3
+    1.67 :   ddccf:  vmovss 0x10(%rsp,%r11,4),%xmm2
+         : 266   same_reach_relaxed_f32():
+         : 162   let other = same[h.local as usize];
+    0.63 :   ddcd6:  movzwl (%r14,%rdi,2),%eax
+   10.03 :   ddcdb:  cmp    $0xffff,%rax
+         : 163   if other == ABSENT {
+    0.29 :   ddce1:  je     ddcf6 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x196>
+         : 166   reach[other as usize]
+    0.00 :   ddce3:  cmp    %rax,%r15
+    1.04 :   ddce6:  jbe    ddd61 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x201>
+    0.00 :   ddce8:  vmovss 0x0(%r13,%rax,4),%xmm4
+         : 170   hu_postflop::kernel::fold_kernel_relaxed_f32:
+         : 259   out[h.local as usize] =
+    3.96 :   ddcef:  cmp    %rdi,%rsi
+    0.01 :   ddcf2:  ja     ddcff <hu_postflop::kernel::fold_kernel_relaxed_f32+0x19f>
+    0.00 :   ddcf4:  jmp    ddd3e <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1de>
+    0.00 :   ddcf6:  vxorps %xmm4,%xmm4,%xmm4
+    1.32 :   ddcfa:  cmp    %rdi,%rsi
+    0.01 :   ddcfd:  jbe    ddd3e <hu_postflop::kernel::fold_kernel_relaxed_f32+0x1de>
+         : 260   u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+    0.00 :   ddcff:  vsubss %xmm2,%xmm0,%xmm2
+    2.43 :   ddd03:  vsubss %xmm3,%xmm2,%xmm2
+    7.28 :   ddd07:  vaddss %xmm4,%xmm2,%xmm2
+         : 259   out[h.local as usize] =
+   18.03 :   ddd0b:  vmulss %xmm1,%xmm2,%xmm2
+   35.93 :   ddd0f:  vmovss %xmm2,(%rcx,%rdi,4)
+    0.12 :   ddd14:  jmp    ddc80 <hu_postflop::kernel::fold_kernel_relaxed_f32+0x120>
+         : 262   }
+         : 263   }
+    0.00 :   ddd19:  add    $0x218,%rsp
+    0.05 :   ddd20:  pop    %rbx
+    0.07 :   ddd21:  pop    %r12
+    0.01 :   ddd23:  pop    %r13
+    0.01 :   ddd25:  pop    %r14
+    0.01 :   ddd27:  pop    %r15
+    0.01 :   ddd29:  pop    %rbp
+    0.00 :   ddd2a:  vzeroupper
+    0.00 :   ddd2d:  ret
+         : 256   out[h.local as usize] = 0.0;
+    0.00 :   ddd2e:  lea    0x165ef3(%rip),%rdx        # 243c28 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x228>
+    0.00 :   ddd35:  vzeroupper
+    0.00 :   ddd38:  call   *0x16dcca(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 259   out[h.local as usize] =
+    0.00 :   ddd3e:  lea    0x165ecb(%rip),%rdx        # 243c10 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x210>
+    0.00 :   ddd45:  vzeroupper
+    0.00 :   ddd48:  call   *0x16dcba(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 263   same_reach_relaxed_f32():
+         : 162   let other = same[h.local as usize];
+    0.00 :   ddd4e:  lea    0x165e5b(%rip),%rdx        # 243bb0 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x1b0>
+    0.00 :   ddd55:  mov    %rbx,%rsi
+    0.00 :   ddd58:  vzeroupper
+    0.00 :   ddd5b:  call   *0x16dca7(%rip)        # 24ba08 <_DYNAMIC+0x218>
+         : 166   reach[other as usize]
+    0.00 :   ddd61:  lea    0x165e60(%rip),%rdx        # 243bc8 <anon.c30b2709c43079fc1cb444c2fc499603.660.llvm.9468281625985148181+0x1c8>
+    0.00 :   ddd68:  mov    %rax,%rdi
+    0.00 :   ddd6b:  mov    %r15,%rsi
+    0.00 :   ddd6e:  vzeroupper
+    0.00 :   ddd71:  call   *0x16dc91(%rip)        # 24ba08 <_DYNAMIC+0x218>

@@ -1,0 +1,9 @@
+{
+  "config": "runs/p1-perf/cfg/flop_srp1.toml",
+  "estimateF32Bytes": 2818917360,
+  "estimateI16Bytes": 1412142360,
+  "nodes": 829242,
+  "prepareSecs": 0.4223253,
+  "storageElements": 352364670,
+  "threads": 1
+}

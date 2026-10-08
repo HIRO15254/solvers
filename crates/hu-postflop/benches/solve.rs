@@ -74,6 +74,7 @@ fn bench_solve(c: &mut Criterion) {
     let config = turn_config();
     let built = build_postflop_game(&config, chip_ev());
     let mut solver = Solver::<_, F32Storage>::new(built.game, Box::<Dcfr>::default(), Some(5));
+    solver.set_cfr_precision(hu_postflop::CfrPrecision::F32);
     let snapshot = solver.state();
 
     let mut group = c.benchmark_group("solve");

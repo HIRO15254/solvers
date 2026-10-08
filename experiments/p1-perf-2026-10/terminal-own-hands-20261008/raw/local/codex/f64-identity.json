@@ -1,0 +1,412 @@
+{
+  "base_revision": "fdd36185e883c3fe0ab38828aacf44bf1bed4c70",
+  "workspace_revision": "a2dcbf259ce51865391e42fde3d035aa901760d3",
+  "binaries": {
+    "base": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t20-cli-base.exe",
+      "sha256": "68b4d29aaecf7b608e5b2593d5cf0e3e6053fd0f227118641b8941662ff5ecf8"
+    },
+    "AB": {
+      "path": "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t20-cli-ab.exe",
+      "sha256": "d6d519a290789847a6eeebff5ef47953a0c57ea4b32decd9d1e2f26e72bc78df"
+    }
+  },
+  "cases": [
+    {
+      "case": "river-f32-1",
+      "config_sha256": "284ac1b99f35a2ea36036595266fa033c3112583920d7b73c7933f0c56139aa1",
+      "check": "bit-identical: .sol payload 1060 bytes; checkpoint state 228 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.3471441268920898,
+          "expl_p1": 1.0535149574279785,
+          "nash_conv": 2.4006590843200684
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.12680673599243164,
+          "expl_p1": 0.014126062393188477,
+          "nash_conv": 0.14093279838562012
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.01852107048034668,
+          "expl_p1": 0.0018422603607177734,
+          "nash_conv": 0.020363330841064453
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0046176910400390625,
+          "expl_p1": 0.0004520416259765625,
+          "nash_conv": 0.005069732666015625
+        }
+      ],
+      "sol_payload_sha256": "0a010192b972d374dce5d12578edd8fb4638b4b8ef093e781101b3cce276f474",
+      "checkpoint_state_sha256": "51d50e85fbbe717343d7dade1ef65cc862820cbe12b170ab170cf1f4be75c615"
+    },
+    {
+      "case": "river-f32-4",
+      "config_sha256": "421250437cc74e56678c4fa566f15b1787ef71fecde611e9efd881099766c50c",
+      "check": "bit-identical: .sol payload 1060 bytes; checkpoint state 228 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.3471441268920898,
+          "expl_p1": 1.0535149574279785,
+          "nash_conv": 2.4006590843200684
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.12680673599243164,
+          "expl_p1": 0.014126062393188477,
+          "nash_conv": 0.14093279838562012
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.01852107048034668,
+          "expl_p1": 0.0018422603607177734,
+          "nash_conv": 0.020363330841064453
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0046176910400390625,
+          "expl_p1": 0.0004520416259765625,
+          "nash_conv": 0.005069732666015625
+        }
+      ],
+      "sol_payload_sha256": "44d86ca2d2f6276ee843651e876aedc41e2953bad36e23af85b4d6d3a92cac24",
+      "checkpoint_state_sha256": "51d50e85fbbe717343d7dade1ef65cc862820cbe12b170ab170cf1f4be75c615"
+    },
+    {
+      "case": "river-i16-1",
+      "config_sha256": "2fd50777b3c1accf3f26ed528b4380bd1dd74c32b0737cce6a5e27ab45ff1b72",
+      "check": "bit-identical: .sol payload 1059 bytes; checkpoint state 182 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.955942153930664,
+          "expl_p1": 0.5440578460693359,
+          "nash_conv": 2.5
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.10770559310913086,
+          "expl_p1": 0.010660648345947266,
+          "nash_conv": 0.11836624145507812
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.015418291091918945,
+          "expl_p1": 0.0014846324920654297,
+          "nash_conv": 0.016902923583984375
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0,
+          "expl_p1": 0.0,
+          "nash_conv": 0.0
+        }
+      ],
+      "sol_payload_sha256": "533e924cf8afeab8c1620abd0207229818ab6bb996c47f84538d67e4dd19b1ba",
+      "checkpoint_state_sha256": "1db78ee12265a6d69c4b979619d60b0323baa9496658c87188a03155a4bfdcf0"
+    },
+    {
+      "case": "river-i16-4",
+      "config_sha256": "5684e055886f02d2009cbf45d3cd5b4f9c64d04d61b9571bd6091c173147df6c",
+      "check": "bit-identical: .sol payload 1059 bytes; checkpoint state 182 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.955942153930664,
+          "expl_p1": 0.5440578460693359,
+          "nash_conv": 2.5
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.10770559310913086,
+          "expl_p1": 0.010660648345947266,
+          "nash_conv": 0.11836624145507812
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.015418291091918945,
+          "expl_p1": 0.0014846324920654297,
+          "nash_conv": 0.016902923583984375
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0,
+          "expl_p1": 0.0,
+          "nash_conv": 0.0
+        }
+      ],
+      "sol_payload_sha256": "de1a11655452033a6e9a4fd1391a2edf1dae0f535b7dfed7e488845476cee83d",
+      "checkpoint_state_sha256": "1db78ee12265a6d69c4b979619d60b0323baa9496658c87188a03155a4bfdcf0"
+    },
+    {
+      "case": "river-i16-f32avg-1",
+      "config_sha256": "a11e0bfabf9e1e3d882123d09c6c330d5d25f5c7fccacc463e9d2e4be788ba56",
+      "check": "bit-identical: .sol payload 1074 bytes; checkpoint state 215 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.3471293449401855,
+          "expl_p1": 1.0535306930541992,
+          "nash_conv": 2.4006600379943848
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.12680554389953613,
+          "expl_p1": 0.014127969741821289,
+          "nash_conv": 0.14093351364135742
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.018520832061767578,
+          "expl_p1": 0.001842498779296875,
+          "nash_conv": 0.020363330841064453
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.004617452621459961,
+          "expl_p1": 0.00045228004455566406,
+          "nash_conv": 0.005069732666015625
+        }
+      ],
+      "sol_payload_sha256": "28f4d0662f5afb298c89bf1c5b943790389247cff4f4ef5af82ae0764c744687",
+      "checkpoint_state_sha256": "71e84157f75d89f0764cdf75bfa742621560116146688dc1aa6095dcce3903d7"
+    },
+    {
+      "case": "river-i16-f32avg-4",
+      "config_sha256": "f3456af50246c495ed3eb4a502d83d8db2007150703f64fcb32c99174e102728",
+      "check": "bit-identical: .sol payload 1074 bytes; checkpoint state 215 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 1.3471293449401855,
+          "expl_p1": 1.0535306930541992,
+          "nash_conv": 2.4006600379943848
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.12680554389953613,
+          "expl_p1": 0.014127969741821289,
+          "nash_conv": 0.14093351364135742
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.018520832061767578,
+          "expl_p1": 0.001842498779296875,
+          "nash_conv": 0.020363330841064453
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.004617452621459961,
+          "expl_p1": 0.00045228004455566406,
+          "nash_conv": 0.005069732666015625
+        }
+      ],
+      "sol_payload_sha256": "3a7acf405c3614ea7ecbe4cf91b40419950714f6d61bc3020a7ddea9768a35e0",
+      "checkpoint_state_sha256": "71e84157f75d89f0764cdf75bfa742621560116146688dc1aa6095dcce3903d7"
+    },
+    {
+      "case": "turn-f32-1",
+      "config_sha256": "5c5f5cc312eea4d1cd9591b9bd72e2a47253fe078a30b68f608bca74dd65bc8f",
+      "check": "bit-identical: .sol payload 24429 bytes; checkpoint state 32486 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.081999659538269,
+          "expl_p1": 0.8937726020812988,
+          "nash_conv": 2.975772261619568
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.617668867111206,
+          "expl_p1": 0.33330249786376953,
+          "nash_conv": 0.9509713649749756
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.10118627548217773,
+          "expl_p1": 0.057929039001464844,
+          "nash_conv": 0.15911531448364258
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.02463054656982422,
+          "expl_p1": 0.014983892440795898,
+          "nash_conv": 0.03961443901062012
+        }
+      ],
+      "sol_payload_sha256": "e1052c04ca0d30534108619636917298b77985a83e032d2308c81f990caeaf94",
+      "checkpoint_state_sha256": "bf5c57ecacbce796288db8983dbb5c753570f5b5286fd218969418b709e77f8d"
+    },
+    {
+      "case": "turn-f32-4",
+      "config_sha256": "ba56bc1fcea3845319b27d84f1e5812b669161d0f3f1319f009675ca32971447",
+      "check": "bit-identical: .sol payload 24429 bytes; checkpoint state 32486 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.081999659538269,
+          "expl_p1": 0.8937726020812988,
+          "nash_conv": 2.975772261619568
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.617668867111206,
+          "expl_p1": 0.33330249786376953,
+          "nash_conv": 0.9509713649749756
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.10118627548217773,
+          "expl_p1": 0.057929039001464844,
+          "nash_conv": 0.15911531448364258
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.02463054656982422,
+          "expl_p1": 0.014983892440795898,
+          "nash_conv": 0.03961443901062012
+        }
+      ],
+      "sol_payload_sha256": "cf36c0890a9cdd3533bb049f99eb6f988f3f6a89fc7b0fbceccb00467041bf26",
+      "checkpoint_state_sha256": "bf5c57ecacbce796288db8983dbb5c753570f5b5286fd218969418b709e77f8d"
+    },
+    {
+      "case": "turn-i16-1",
+      "config_sha256": "5021e3e18b7e46b9baf53d019681a4e04ec8669745bd258790b5b39c758de82d",
+      "check": "bit-identical: .sol payload 24428 bytes; checkpoint state 23778 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.75951224565506,
+          "expl_p1": 0.2428112030029297,
+          "nash_conv": 3.0023234486579895
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.6114565134048462,
+          "expl_p1": 0.32509660720825195,
+          "nash_conv": 0.9365531206130981
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.09854936599731445,
+          "expl_p1": 0.0571904182434082,
+          "nash_conv": 0.15573978424072266
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0,
+          "expl_p1": 0.0,
+          "nash_conv": 0.0
+        }
+      ],
+      "sol_payload_sha256": "cb42ea0eb2f16f0ccf2bfa7c9914f146969b031132e658094442c730bcd2b0ba",
+      "checkpoint_state_sha256": "763eeadd89ea37c9b3ab4061e871be664e72c489a5553eec5b11ddeec81ecdbc"
+    },
+    {
+      "case": "turn-i16-4",
+      "config_sha256": "1f26e83e4d1f28aebf96a202b1a2d0fa0304bc544de925a222728a9fdf8a2296",
+      "check": "bit-identical: .sol payload 24428 bytes; checkpoint state 23778 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.75951224565506,
+          "expl_p1": 0.2428112030029297,
+          "nash_conv": 3.0023234486579895
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.6114565134048462,
+          "expl_p1": 0.32509660720825195,
+          "nash_conv": 0.9365531206130981
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.09854936599731445,
+          "expl_p1": 0.0571904182434082,
+          "nash_conv": 0.15573978424072266
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.0,
+          "expl_p1": 0.0,
+          "nash_conv": 0.0
+        }
+      ],
+      "sol_payload_sha256": "29bc01ef82a8816fd610cb29782892ba01b281e10bb7184bdc510d0a1e0f7b2b",
+      "checkpoint_state_sha256": "763eeadd89ea37c9b3ab4061e871be664e72c489a5553eec5b11ddeec81ecdbc"
+    },
+    {
+      "case": "turn-i16-f32avg-1",
+      "config_sha256": "830709f4b526db794042ab268892441e6c11f4d6f3b0cfb5d7ffd0a4bb82e477",
+      "check": "bit-identical: .sol payload 24443 bytes; checkpoint state 30404 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.082008719444275,
+          "expl_p1": 0.8937656879425049,
+          "nash_conv": 2.97577440738678
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.6176626682281494,
+          "expl_p1": 0.3332953453063965,
+          "nash_conv": 0.9509580135345459
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.10118627548217773,
+          "expl_p1": 0.05792975425720215,
+          "nash_conv": 0.15911602973937988
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.024630069732666016,
+          "expl_p1": 0.014984607696533203,
+          "nash_conv": 0.03961467742919922
+        }
+      ],
+      "sol_payload_sha256": "afd38982275b4c6ffa2209a85c40555a5e96b915c6e1630eca47f9af837953c5",
+      "checkpoint_state_sha256": "d7df71409e09c921ec877bbf7ac6b3897be090ddd224b1a7cc237ed2b534f544"
+    },
+    {
+      "case": "turn-i16-f32avg-4",
+      "config_sha256": "ab6d2cd11a66d3f6f284d4b5d4aae3c08a7f07da5444a1008b3c282c8f42f4f3",
+      "check": "bit-identical: .sol payload 24443 bytes; checkpoint state 30404 bytes; iteration=16",
+      "progress": [
+        {
+          "iteration": 4,
+          "expl_p0": 2.082008719444275,
+          "expl_p1": 0.8937656879425049,
+          "nash_conv": 2.97577440738678
+        },
+        {
+          "iteration": 8,
+          "expl_p0": 0.6176626682281494,
+          "expl_p1": 0.3332953453063965,
+          "nash_conv": 0.9509580135345459
+        },
+        {
+          "iteration": 12,
+          "expl_p0": 0.10118627548217773,
+          "expl_p1": 0.05792975425720215,
+          "nash_conv": 0.15911602973937988
+        },
+        {
+          "iteration": 16,
+          "expl_p0": 0.024630069732666016,
+          "expl_p1": 0.014984607696533203,
+          "nash_conv": 0.03961467742919922
+        }
+      ],
+      "sol_payload_sha256": "7050215980ff8ea39a4a4e37caf4bb2b96ab4fd4c4f4353d1e612b76315226d1",
+      "checkpoint_state_sha256": "d7df71409e09c921ec877bbf7ac6b3897be090ddd224b1a7cc237ed2b534f544"
+    }
+  ]
+}

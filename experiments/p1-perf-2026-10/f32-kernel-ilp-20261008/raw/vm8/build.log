@@ -1,0 +1,6 @@
+   Compiling cli v0.1.0 (/home/PC_User/t17/crates/cli)
+    Finished `release` profile [optimized] target(s) in 1m 03s
+   Compiling hu-postflop v0.1.0 (/home/PC_User/t17/crates/hu-postflop)
+    Finished `release` profile [optimized] target(s) in 28.50s
+   Compiling hu-postflop v0.1.0 (/home/PC_User/t17/crates/hu-postflop)
+    Finished `release` profile [optimized + debuginfo] target(s) in 28.65s

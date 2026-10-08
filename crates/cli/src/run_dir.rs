@@ -240,9 +240,8 @@ impl RunRecorder {
     /// Records the outcome of the solve and closes the manifest.
     ///
     /// `completion` is the solver's terminal status (`target-reached`,
-    /// `cancelled`, ...). A `cancelled` status is not a failure: the run
-    /// stopped on request with a checkpoint written, so it closes as
-    /// `Canceled` and stays resumable.
+    /// `cancelled`, ...). A `cancelled` status closes the run as `Canceled`.
+    /// Resumability depends on a saved checkpoint; P1 can omit its final one.
     pub fn finish(mut self, outcome: Result<()>, completion: Option<String>) -> Result<()> {
         match outcome {
             Ok(()) => {

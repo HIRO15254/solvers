@@ -66,7 +66,13 @@ fn solve_root_strategy(pipeline: PayoffPipeline<'_>, iterations: u64) -> (Vec<f3
     solver.run(iterations);
     let expl = solver.exploitability();
     let nash_conv = expl[Player::P0] + expl[Player::P1];
-    (solver.average_strategy_at(0), nash_conv)
+    let h = &solver.game().evaluator.hands;
+    let avg = solver.average_strategy_at(0);
+    let global = avg
+        .chunks(h.len(Player::P0))
+        .flat_map(|row| h.expand(Player::P0, row))
+        .collect();
+    (global, nash_conv)
 }
 
 /// Max absolute pointwise difference between two root average strategies,
@@ -285,7 +291,18 @@ fn clairvoyance_frequencies(pipeline: PayoffPipeline<'_>, iterations: u64) -> (f
             let w = range.weight(combo) as f64;
             if w > 0.0 {
                 total += w;
-                hit += w * sigma[action * NUM_COMBOS + combo] as f64;
+                hit += w * sigma[action
+                    * solver
+                        .game()
+                        .evaluator
+                        .hands
+                        .len(solver.game().tree.node(node).player)
+                    + solver
+                        .game()
+                        .evaluator
+                        .hands
+                        .local(solver.game().tree.node(node).player, combo)
+                        .unwrap()] as f64;
             }
         }
         hit / total
@@ -395,7 +412,14 @@ fn rake_cap_level_changes_strategy() {
         solver.run(iterations);
         let expl = solver.exploitability();
         let nash_conv = expl[Player::P0] + expl[Player::P1];
-        (solver.average_strategy_at(0), nash_conv)
+        // The comparison helper indexes global combos; expand each compact action.
+        let hands = &solver.game().evaluator.hands;
+        let avg = solver.average_strategy_at(0);
+        let global = avg
+            .chunks(hands.len(Player::P0))
+            .flat_map(|row| hands.expand(Player::P0, row))
+            .collect::<Vec<_>>();
+        (global, nash_conv)
     };
 
     let (sig_loose_cap, conv_loose_cap) = run(4.0);

@@ -1,0 +1,243 @@
+{
+  "actions": [
+    {
+      "action": "fold",
+      "implicit": true,
+      "position": "UTG",
+      "seat": 3,
+      "street": "preflop"
+    },
+    {
+      "action": "fold",
+      "implicit": true,
+      "position": "HJ",
+      "seat": 4,
+      "street": "preflop"
+    },
+    {
+      "action": "fold",
+      "implicit": true,
+      "position": "CO",
+      "seat": 5,
+      "street": "preflop"
+    },
+    {
+      "action": {
+        "raise-to": {
+          "all_in": false,
+          "full_raise": true,
+          "to": 2.5
+        }
+      },
+      "implicit": false,
+      "position": "BTN",
+      "seat": 0,
+      "street": "preflop"
+    },
+    {
+      "action": "fold",
+      "implicit": true,
+      "position": "SB",
+      "seat": 1,
+      "street": "preflop"
+    },
+    {
+      "action": {
+        "call": {
+          "all_in": false,
+          "amount": 1.5
+        }
+      },
+      "implicit": false,
+      "position": "BB",
+      "seat": 2,
+      "street": "preflop"
+    }
+  ],
+  "amountUnit": "BB",
+  "effective_stack": 97.5,
+  "gameKind": "hu-postflop",
+  "product": "HuPostflop",
+  "resources": {
+    "compressionWorkspaceBytes": 142609582,
+    "f32Bytes": 2818917360,
+    "i16Bytes": 1412142360,
+    "memoryEstimateBytes": 4326599884,
+    "memoryLimitBytes": 27420078899,
+    "nodes": 829242,
+    "saveWorkspaceBytes": 1365072942,
+    "terminals": 492552,
+    "withinLimit": true
+  },
+  "schema": "solvers.nlh/v1",
+  "start": {
+    "actions": [
+      {
+        "action": "fold",
+        "implicit": true,
+        "position": "UTG",
+        "seat": 3,
+        "street": "preflop"
+      },
+      {
+        "action": "fold",
+        "implicit": true,
+        "position": "HJ",
+        "seat": 4,
+        "street": "preflop"
+      },
+      {
+        "action": "fold",
+        "implicit": true,
+        "position": "CO",
+        "seat": 5,
+        "street": "preflop"
+      },
+      {
+        "action": {
+          "raise-to": {
+            "all_in": false,
+            "full_raise": true,
+            "to": 2.5
+          }
+        },
+        "implicit": false,
+        "position": "BTN",
+        "seat": 0,
+        "street": "preflop"
+      },
+      {
+        "action": "fold",
+        "implicit": true,
+        "position": "SB",
+        "seat": 1,
+        "street": "preflop"
+      },
+      {
+        "action": {
+          "call": {
+            "all_in": false,
+            "amount": 1.5
+          }
+        },
+        "implicit": false,
+        "position": "BB",
+        "seat": 2,
+        "street": "preflop"
+      }
+    ],
+    "board": [
+      "Ks",
+      "7h",
+      "2d"
+    ],
+    "effective_stack": 97.5,
+    "folded_seats": [
+      1,
+      3,
+      4,
+      5
+    ],
+    "ip": {
+      "position": "BTN",
+      "preflop": {
+        "flats": 1,
+        "in_position_to_last_aggressor": false,
+        "last_preflop_aggressor_position": "BTN",
+        "limpers": 0,
+        "open_cold_calls": 0,
+        "preflop_participant": true,
+        "squeeze": false
+      },
+      "seat": 0
+    },
+    "oop": {
+      "position": "BB",
+      "preflop": {
+        "flats": 1,
+        "in_position_to_last_aggressor": false,
+        "last_preflop_aggressor_position": "BTN",
+        "limpers": 0,
+        "open_cold_calls": 0,
+        "preflop_participant": true,
+        "squeeze": false
+      },
+      "seat": 2
+    },
+    "pot": 5.5,
+    "previous_street_aggressor": 0,
+    "seats": [
+      {
+        "folded": false,
+        "position": "BTN",
+        "refund": 0,
+        "remaining_stack": 97.5,
+        "seat": 0,
+        "starting_stack": 100,
+        "total_contribution": 2.5
+      },
+      {
+        "folded": true,
+        "position": "SB",
+        "refund": 0,
+        "remaining_stack": 99.5,
+        "seat": 1,
+        "starting_stack": 100,
+        "total_contribution": 0.5
+      },
+      {
+        "folded": false,
+        "position": "BB",
+        "refund": 0,
+        "remaining_stack": 97.5,
+        "seat": 2,
+        "starting_stack": 100,
+        "total_contribution": 2.5
+      },
+      {
+        "folded": true,
+        "position": "UTG",
+        "refund": 0,
+        "remaining_stack": 100,
+        "seat": 3,
+        "starting_stack": 100,
+        "total_contribution": 0
+      },
+      {
+        "folded": true,
+        "position": "HJ",
+        "refund": 0,
+        "remaining_stack": 100,
+        "seat": 4,
+        "starting_stack": 100,
+        "total_contribution": 0
+      },
+      {
+        "folded": true,
+        "position": "CO",
+        "refund": 0,
+        "remaining_stack": 100,
+        "seat": 5,
+        "starting_stack": 100,
+        "total_contribution": 0
+      }
+    ],
+    "street": "flop"
+  },
+  "status": "valid",
+  "tree": {
+    "params": [],
+    "rules": [
+      "flop { replace bet [33] }",
+      "turn { replace bet [75] }",
+      "river { replace bet [75] }",
+      "flop { replace raise [3x] }",
+      "turn { replace raise [3x] }",
+      "river { replace raise [3x] }"
+    ]
+  },
+  "utilityUnit": "BB",
+  "warnings": [
+    "no stop target: runs until max_iterations or max_time"
+  ]
+}
