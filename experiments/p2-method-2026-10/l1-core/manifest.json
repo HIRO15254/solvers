@@ -1,0 +1,731 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-30",
+  "recorded_on": "2026-10-07",
+  "purpose": "S4-2a: solve B6 (heads-up 20bb with postflop) with the L1 leaf model in the same DCFR iterations as the trunk; measure the primary metric of decision P2D8 (in-sample and held-out) and the auxiliary metric, the effect of each change that reduces the boards' noise, the evaluator variants, the difference from L0, and the iteration and evaluation time on B6 and B7.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "The recorded runs were executed once each with the listed binaries and commands. The final binary of 34d7811 reproduced the exploration run b6v4-n32-treg-a15-b1 bit for bit (results/check). The binary of 0c7c464 (the stack fix) gave B6 profiles and checkpoints bit-identical to 34d7811 over 300 iterations with and without the control variates. Runs are deterministic for a given seed and do not depend on the thread count; times depend on the machine and its load (results/load.log).",
+  "source": {
+    "revisions": {
+      "34d78112a0af3ccf986e1c61558738d8b63c25ae": {
+        "trunk_solve_binary_sha256": "207d091e610ca6031d2976ba9886a8b015ad9c9898e14219481aaf6d2ec1582d",
+        "l0_eval_binary_sha256": "186a24535ef45d2b5621f92c66bd5f91590b770d9461eb573bde0070b858d002",
+        "used_for": "results/b6, results/check"
+      },
+      "0c7c4641a70a83fa196f9159fe86a91ead43dcbf": {
+        "trunk_solve_binary_sha256": "5806bdefe12e0d137b06f547cdca4f5ff2ba774ade59bac26880f2be63d43d33",
+        "l0_eval_binary_sha256": "657b1cc73ca9a553aa4b14b8bb3408fad015c17d805eac5a2312983fe7753ab6",
+        "used_for": "results/b7 (the binary of 34d7811 overflowed a worker stack in the B7 evaluation)"
+      }
+    },
+    "exploration_binaries": {
+      "05ebaa88d3744f6eca5c06d2226b28017b034f9c3a6d21a8a381d9dac0456923": {
+        "used_for": [
+          "b6v3-n32-trainS-evalR-unit",
+          "b6v3-n32-trainS-evalR-regression",
+          "b6v3-n32-trainS-treg-evalR-regression",
+          "b6v3-n32-trainS-beta05-evalR-regression",
+          "b6v3-n32-trainS-beta1-evalR-regression"
+        ],
+        "built_from": "working trees between 76c4d8b and 34d7811 (not committed)"
+      },
+      "1b546442cfa336f964601812d43a8782b54c987b10f43cc88bf17db9da7410b8": {
+        "used_for": [
+          "b6v3-n32-trainS-smooth90-evalR-regression",
+          "b6v3-n32-trainS-smooth98-evalR-regression",
+          "b6v4-*",
+          "b6v5-*"
+        ],
+        "built_from": "working trees between 76c4d8b and 34d7811 (not committed)"
+      },
+      "48153dcaa5687120a982fe45f9a5574cc6caf62e964c02286037f81c52c76559": {
+        "used_for": [
+          "b6v6-*",
+          "b6v7-*"
+        ],
+        "built_from": "working trees between 76c4d8b and 34d7811 (not committed)"
+      }
+    },
+    "working_tree": "the binaries of 34d7811 and 0c7c464 were built from trees whose tracked files equal the commits",
+    "build": "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397"
+  },
+  "solver": {
+    "alpha": 1.5,
+    "gamma": 2.0,
+    "trunk_beta": "1 (final) or 0",
+    "postflop_beta": "0 (final) or 1",
+    "seat_order": "alternating 0..n-1",
+    "b6_iterations": 2000,
+    "b7_iterations": 10,
+    "b7_solver_k4_samples": 256
+  },
+  "model": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": 2048,
+    "k4_seed": 0,
+    "l1_seed": 0,
+    "l1_eval_seed": 0
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "shell": "Git Bash",
+    "python": "3.13.7",
+    "threads": "rayon default (16)"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/run_b6.sh",
+      "sha256": "20bc5dcf35fbd3e3a2905581f9adce3dab767e7ce92a480527d17f71da1dcf03",
+      "role": "B6 procedure: training changes one at a time, board counts, evaluator variants, L0 and l0_eval"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/run_b7.sh",
+      "sha256": "4dd88d749ca015789b810c45bdd931ff4222a89bf4ea085014ed4dc689f5dfd1",
+      "role": "B7 procedure: iteration and evaluation time"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/summarize.py",
+      "sha256": "e90fff67b571c5f30af2119ff02e83886ad9d1e8433ac5a8d390fc48884a4ec6",
+      "role": "summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/summary.md",
+      "sha256": "b123d79d500667174592b2439f2dbd922f75db4a9acbe2708fd18223203c8345",
+      "role": "summarize.py output over the full output directory (with all profiles)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/load.log",
+      "sha256": "c52f2265b7ecf23acb18222fd640a83c34006f3a90786e9e24c83742da91620d",
+      "role": "machine load every 10 s during the recorded runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/run.log",
+      "sha256": "0e4df221ed73fdb375703bb87124e9f8c42920b3042cf3b480b98014e80e6cf0",
+      "role": "exit codes and start times of the recorded runs"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-l0.json",
+      "sha256": "7389bde61b4343be6c66b47fa27fb799c91e4d6530b64312d059a617e1c6cba1",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-l0.log",
+      "sha256": "6408ad5865cdf1ba1fa1f3a6563315ca8f5796fd8a41bffcb18f56b3babfbc05",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-l0.profile.json",
+      "sha256": "90b5332fb78142b3cbe76f81d154ddac2450824c45751b03041fc11cc9aa5b61",
+      "role": "B6 with the binaries of 34d7811: average profile (p2-class-profile)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n1-plain.json",
+      "sha256": "7f049fd3582772b7f8113016e494033956c73b06580b9538c3d8cba63d020c5a",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n1-plain.l0eval.json",
+      "sha256": "b5780686c349793ec627b2ca540b1cc14492dae8ab9b32cd9e00cb6b366b5bae",
+      "role": "B6 with the binaries of 34d7811: l0_eval output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n1-plain.l0eval.log",
+      "sha256": "1f4f47497874a896ef85825ae9b63f8cc20db1d4bb6bc2f240473d0d64a4817d",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n1-plain.log",
+      "sha256": "eb33d1c35b264fb187dfa34eabd2177d69e0372e60cb3c905daa5955d8137dee",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv-strat-reg.json",
+      "sha256": "97d1ddf7aea31ac253eeb39ef30b65c370112339a9eb4459acd93fdc1cac5721",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv-strat-reg.log",
+      "sha256": "fe2de51de9ff14657b897ba0793acf44a31a322f00185a9bfe0921359ad6d632",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv-strat.json",
+      "sha256": "f410d9f1c3788a34ca4e45f0416ded22e3e1c0720b0d89ee08b0d9eac0bbc8bc",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv-strat.log",
+      "sha256": "298741c280abc362fffda675406a2a556a5cc0e25596cabdc555c6b365100014",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv.json",
+      "sha256": "f4e9b1f5e349e7bf82570acc4e83b19a115882f29e522691f912356a96cc5485",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-cv.log",
+      "sha256": "f05ee0094cf79215e747296a036fe8161a050964b9cde6fff9bf3e2522544028",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-eval16k.json",
+      "sha256": "5351df549f722abdcf4060ced3162045b499bb342575cb74b7be7b4296ad522d",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-eval16k.log",
+      "sha256": "75ce79d547577ed07f8e99d265b798944158570819c35845b9e5c73790f95194",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-evalcv.json",
+      "sha256": "53e959201923454e164f1ec9f76266db2ff8caf6b4599a95e8bfc8ad31e737a5",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-evalcv.log",
+      "sha256": "48959cf76cefa24b55b0dfb6a82d4707160dee470acd0b53a8c8e2b5452b1e26",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-evalplain.json",
+      "sha256": "e102139d895936d6caf0936de6cce6b56b8e93538593017ec2c176dff223c234",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-evalplain.log",
+      "sha256": "03806ed149c232ffa35fb890f96a97a6b4021ef1b6725708875fb485c19fbf6d",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-postflop1.json",
+      "sha256": "c3931f48d6d6ca3bee049c9b531e76fe23edb4ba8f82bb93fc9202e0b6b990a5",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final-postflop1.log",
+      "sha256": "0fe1c1037a436cd287dd5d103d36b49417d418d7db5ce5bbefb2ad5f6fcceff6",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final.json",
+      "sha256": "7cdbb1eedda6de4626fd56bcd2ec569dd819ecfbfcbaa40e6a1a3db9b05545b4",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final.l0eval.json",
+      "sha256": "6fd5f37c56a36e47ee3f01dde6a19ffbcb514b1110cfeb31fcc35fe09e61424a",
+      "role": "B6 with the binaries of 34d7811: l0_eval output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final.l0eval.log",
+      "sha256": "359dac3d7ff80897fdccb3b14875f04fc600d138abea081eb243b3eaf11fc69d",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final.log",
+      "sha256": "cbdd9127a457a3de865312c78acd9b372964c405b205cfe421b9226d09aeaf42",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-final.profile.json",
+      "sha256": "daefdf314408bc6d4f2d5782014c40c8be0d4c019085063b25b83299f9efb3ed",
+      "role": "B6 with the binaries of 34d7811: average profile (p2-class-profile)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-plain.json",
+      "sha256": "d1ff7a7950e03e8b8482202d42828a688f5d1ae3cc9a6665d4abab1aeca82698",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n32-plain.log",
+      "sha256": "1d43dfc8e374aad1f8eae77aecee56cdfa0ec224fe33891354d15da840117140",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n64-final.json",
+      "sha256": "e221866724f9dba6f73c06d0da32e6ae1e7c661e4b9d3ef9709af53a16eec0df",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n64-final.log",
+      "sha256": "b7b90c7d194836207c3d7dfdf7dafb773f99cf4e72e440147511207d6dbdad89",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n8-final.json",
+      "sha256": "710f6ff1371b3f2fa121ec95699bf4cbc6326b846649d861ce748fa7fd7efb6e",
+      "role": "B6 with the binaries of 34d7811: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b6/b6-n8-final.log",
+      "sha256": "97ae340c0963c2abe868aca2f3d4bb2c4d05c0580ca870772ee03abc2cd691d7",
+      "role": "B6 with the binaries of 34d7811: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b7/b7-n32.json",
+      "sha256": "77bf8a6b12f588678a5c57ee1a20a6cc17e00c7a435c87ee47acd81bfdb679f3",
+      "role": "B7 with the binary of 0c7c464: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b7/b7-n32.log",
+      "sha256": "a1e2e5ccdaac01b5178ed6abfc67099e770daa123a24b5a8f0249aadadcb1e10",
+      "role": "B7 with the binary of 0c7c464: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b7/b7-n8.json",
+      "sha256": "31c560fcde90c7f8ef0ff51fe21cf6989f4bdbf3d5d0b50ec4246b3128c43172",
+      "role": "B7 with the binary of 0c7c464: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/b7/b7-n8.log",
+      "sha256": "2a5584de9d461d1acc1f3a7ae6c883791fd96378944f0705d38cd1325fac0524",
+      "role": "B7 with the binary of 0c7c464: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-final-0c7c464.json",
+      "sha256": "2ff3ddb8d4d2871b4022c5b96c6a790b06d5e6c3f954e7b0a912a6de1bd3035d",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-final-0c7c464.log",
+      "sha256": "bb03f52aceba3fda2bdf6016aff02e51906946cd5632685ea8e512335545e383",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-final-34d7811.json",
+      "sha256": "cfcebe36732779e30fa5f7f933581ac49aae6e2b3785278af321b396e80e4cba",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-final-34d7811.log",
+      "sha256": "be7765474833d96d762413bfa8cd6e958700bd0b9ea7cdccb58cf7f34efea12b",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-plain-0c7c464.json",
+      "sha256": "07d18f5b8d66c0a195c0a64988613f0b9d088f88132be31df3b5ff62d75f517d",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-plain-0c7c464.log",
+      "sha256": "0f07aa228e409090962cf01bf9edd93b8f0a7bc6f5cafe073b952b795f470fe9",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-plain-34d7811.json",
+      "sha256": "394005607b601e357d17dc8ae260b1bf0f7e1b36324cfd05369cf617ab120716",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/b6-300-plain-34d7811.log",
+      "sha256": "8899126cb2b1fd0a64f1c2054f681fd8ca85c713ab9491d90439f2ed1a8782ef",
+      "role": "B6, 300 iterations, the binaries of 34d7811 and 0c7c464 compared (identical profiles and checkpoints): stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/check-b6v4-n32-treg-a15-b1.json",
+      "sha256": "10b4e9c39ad19851be7990da2e0293100d74debcce00ddff9d92a1ebcfbdafe7",
+      "role": "the binary of 34d7811 reproducing exploration/b6v4-n32-treg-a15-b1: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/check-b6v4-n32-treg-a15-b1.log",
+      "sha256": "68924bf1419beef2c028e41f02c680fa26c906d28a0ba198347e6f138ab2a034",
+      "role": "the binary of 34d7811 reproducing exploration/b6v4-n32-treg-a15-b1: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/check/run_bitcheck.sh",
+      "sha256": "14321c50f03c790c3c6d43b713d70cae175c4ab1da76818a44c99364ef678f29",
+      "role": "procedure of the binary comparison in results/check (run on 2026-10-07 with BINS=\"34d7811 heap\" and then BINS=0c7c464; heap was the uncommitted fix)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-beta05-evalR-regression.json",
+      "sha256": "a099b8bacc31ce86d9fe36f64dda05fcf5bc5c22c3706a98e97684428d1ff46a",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-beta05-evalR-regression.log",
+      "sha256": "3beabaa339be3dcfd9e0cea2b741e9582c5b3dee821f1c8643cee9d8a54756f7",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-beta1-evalR-regression.json",
+      "sha256": "cafcd0f15be5c2c71bad77ca7e98d11f1dbf84b6c966936139beb9e9e18d3ebd",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-beta1-evalR-regression.log",
+      "sha256": "1d015d2a3cd0c7277504199b9447a96b64a207cf7b8e1d3557827bc8c94df23f",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-evalR-regression.json",
+      "sha256": "0a4687d1aa19c8371994270fd45d4c1c615be2a87c43d565d84aee6bd7f47f3d",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-evalR-regression.log",
+      "sha256": "30923f6983b4776a67cf7b081a647d1694f0e2514f014bdba73bc84b31a55655",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-evalR-unit.json",
+      "sha256": "3c27bb3bbd161213cbf62a4d3c3940508437790837de0ac76bb06678772322ba",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-evalR-unit.log",
+      "sha256": "7ef2413e0dcfda5cee9086030e1c473e4dfc379808fd52809c79a281cd67f299",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-smooth90-evalR-regression.json",
+      "sha256": "fae0438f2a14805a9c61a2ec06375c4c13293e3aca634d184dfa290a55dffd8e",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-smooth90-evalR-regression.log",
+      "sha256": "a2d10b0c50db4fd608901919810273fc7e6deb57bc22b71cd956cc6c0526381f",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-smooth98-evalR-regression.json",
+      "sha256": "c20540e309b0dc49fd1e6f995012ffb4b472a94405f655e4eacf6e0d5fdfb86a",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-smooth98-evalR-regression.log",
+      "sha256": "d7ba7779515f6b6f43aa41a024902dc051dfa50b2600cc0c7468817e5ef3469d",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-treg-evalR-regression.json",
+      "sha256": "e0786b8fea5637e1d261f7fc4197deec11b5a91808fd74555530901a35233c04",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v3-n32-trainS-treg-evalR-regression.log",
+      "sha256": "08b8cdbd6a715cc9ff7da3b39af6b30d7c1068c670188e40eed4f528efcd8d5e",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a1-b1.json",
+      "sha256": "c3023b3c89f38eb36ea657eebc5b2ad0eb981c288587a471240182b6c38a2698",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a1-b1.log",
+      "sha256": "1b6077d0f978042bb675e94a16bfa6f66b5e05596972800ce38e6271b43dc23d",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b05.json",
+      "sha256": "f88e25696e356dccd3ca8f7de28564d4b9adc21aa71d5e65e9e86b179489030c",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b05.log",
+      "sha256": "d3b018fe95c5757409bf7b8abbf11ecb6bee73a2d4e3deb1ccfb1db6eb00d9f2",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b1.json",
+      "sha256": "115516a253a76d39aff5e4850c08195f1e3840c39a075bbc7f199fe10250c157",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b1.log",
+      "sha256": "2176c3022399a48c188e4549ea3d103d7fbb6f889e61a024a8027beab4c7141e",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b2.json",
+      "sha256": "2c1e9e3df0ad6b401b05768488eafd7b7551e99154142af4cc842e1baa80764f",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a15-b2.log",
+      "sha256": "fccf6e1ff07de339cbaf63e1e383599d276eda2e290d896c35022ad2bc4a07ba",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a3-b1.json",
+      "sha256": "6d0141b613ded19bea0276c0acd2bed3e99f11c776f4522568ddbed29f3830f5",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v4-n32-treg-a3-b1.log",
+      "sha256": "264fa359e3755958290d1dbfecd3551055c52997230f8af33fad1ef2d2d8ee31",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b0-s98-e16k.json",
+      "sha256": "e2c63a9ba28e8707c4e36bceaae0fc933b5f1eaac7dd45181878e852f71bd1dc",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b0-s98-e16k.log",
+      "sha256": "f8a97557089f7ba26013b4f6d2d08215c5523155dfe802b98c073d841c205a41",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-e16k.json",
+      "sha256": "8a5e0a40c8d812553c8e74ab68ad8250d6963ab564ba5343994217ef6fec8277",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-e16k.log",
+      "sha256": "491fad5b634dc55444e8c91eeeb54c59dcdcd2a37ffb251702fd4dd6fed9f397",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-s98-e16k.json",
+      "sha256": "f9a1d0111d4c2601aa245f2c79af25c42d1380ba535c4ea7ba23517c1b54f3be",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-s98-e16k.log",
+      "sha256": "c8ac646ed3c0fd47a77a4ff1420621517a2d64f867a2ec69a0f2e36a5cae2770",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-s99-e16k.json",
+      "sha256": "da9c2508a93e7bc52604c35958df533ba46a4452555d93e50a240d7395733b18",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n32-treg-b1-s99-e16k.log",
+      "sha256": "4cbf35c9de6b2d7145dec7690aa1e14e4329c4f99722ca05bd59c0d68fefc211",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n8-treg-b1-s98-e16k.json",
+      "sha256": "abe8276ca906f1a9d2940b934f6fedef68ad889f9fe32d962c8087060c23de7b",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v5-n8-treg-b1-s98-e16k.log",
+      "sha256": "b671ab65f560ca77ce0c3e1f55c6f09ced8a0cd5eaa5a06e2dc44efa60084cf1",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v6-n32-treg-b0-pb1.json",
+      "sha256": "826f738c0fbb79f131c3d9d24458d7df4ad2e3ecea052805a6c51fb2d47a0a00",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v6-n32-treg-b0-pb1.log",
+      "sha256": "d79c102dbb90017f07faf50cad5eaca6d5469eb9765d9f4aa9b04cb85608bdc7",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v6-n32-treg-b1-pb0.json",
+      "sha256": "2aedcf0015790337bec913fd231ce645ce22d9b644c5bd14b5055802e55e3457",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v6-n32-treg-b1-pb0.log",
+      "sha256": "4de5c28870c3a5f6bb932e6fb571097ba822462ce28070be30b3a18005bc7115",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n16-split-e16k.json",
+      "sha256": "ac16badc6e07ae97b881cc28f729e4f36b2cc8311a58f9832f992c0ba981d861",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n16-split-e16k.log",
+      "sha256": "44c2cd73f1b4c74ea20c01beef2df89ad5dcd5e015d0765e33abe8cac165c4bd",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n32-split-e16k.json",
+      "sha256": "c030b6d472e157369d228cd556c16c10dc17634d914d21123d1b7aec96f7322b",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n32-split-e16k.log",
+      "sha256": "abc8a01586631779850abbea3fcdbebbcef758048103a8cee2d6eb934857b010",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n32-split-s90-e16k.json",
+      "sha256": "21221a7c707f48bba6226fd702a45fd201c953a1d43a9a88f5c81b8cf903e804",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n32-split-s90-e16k.log",
+      "sha256": "0cb9a65d8ec4bdd906d692e84603c435f134b4c956a3e8cf15e6ad7935a36e46",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n64-split-e16k.json",
+      "sha256": "96eaa622a1626bc32e8c37c7495acf6cfd550cfd12a3406817d6a2e1b61eeb67",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n64-split-e16k.log",
+      "sha256": "0d089e96d64510b144d94bff21effce621449f3ca77089ba3cca104c2125df27",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n8-split-e16k.json",
+      "sha256": "21d3bec8da599bfbbb0ad4c97e111beae0a73f727427c662b13a17966b475908",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: trunk_solve output (p2-trunk-solve)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-core/results/exploration/b6v7-n8-split-e16k.log",
+      "sha256": "5c89b5ca97b6a7a1f196850845c24970e168e3c38733cca00f015af41667b724",
+      "role": "development binaries (see source.exploration_binaries), 1000 iterations: stdout"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "examples/bench/hu_20bb_postflop.toml",
+      "sha256": "77e0cd44864c572d84d0459830703624769fcb18c867c7a17047044b7196d60f",
+      "role": "B6 game"
+    },
+    {
+      "path": "examples/bench/6max_20bb.toml",
+      "sha256": "a8a7817222d0cc49bd75089857525d2de4b70dece7490fbb533c86ee1124ce7b",
+      "role": "B7 game"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": "%LOCALAPPDATA%/solvers/ehs2/v2-f32-t32-r32.postcard",
+      "sha256": "35a6826c09c36961404e0bcc076b1ff6101d8a3d421dc682a7fcf8f0505e7cb2",
+      "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+      "bytes": 357378844,
+      "role": "EHS² percentile bucket cache (32/32/32), the L1 postflop abstraction; the runs record its blake3"
+    },
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by trunk_solve when missing"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n1-plain.profile.json",
+      "sha256": "38e8eecd05eb798ddb9675a1d3a8ddee8cd19035511fb0ad615011e9704aae15",
+      "bytes": 216969,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-cv-strat-reg.profile.json",
+      "sha256": "12e20328d16951fe4df1f1bf871f8ef0ba160f98ace2e153dec27d3ef987c783",
+      "bytes": 218421,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-cv-strat.profile.json",
+      "sha256": "a07ce6b573ce28b3cd2bb3ca31ecc6f3aef06ee48adf0fa0013e77a86cb0cf33",
+      "bytes": 218233,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-cv.profile.json",
+      "sha256": "abe5a4aad19e64f03851c473bd21ee400a0e016da9aa830703087ee71f69bb83",
+      "bytes": 218620,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-final-eval16k.profile.json",
+      "sha256": "daefdf314408bc6d4f2d5782014c40c8be0d4c019085063b25b83299f9efb3ed",
+      "bytes": 216131,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-final-evalcv.profile.json",
+      "sha256": "daefdf314408bc6d4f2d5782014c40c8be0d4c019085063b25b83299f9efb3ed",
+      "bytes": 216131,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-final-evalplain.profile.json",
+      "sha256": "daefdf314408bc6d4f2d5782014c40c8be0d4c019085063b25b83299f9efb3ed",
+      "bytes": 216131,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-final-postflop1.profile.json",
+      "sha256": "2d1702abb5b56e935d1f4600cd3cc7c7df43c634bfebda69b9e57d66ae168e9a",
+      "bytes": 216793,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n32-plain.profile.json",
+      "sha256": "27853ebc8468ba0d58ca00cee687700d2363689fae4a08844050bb67b4282258",
+      "bytes": 218537,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n64-final.profile.json",
+      "sha256": "0fe735f4945ba0731930341664677bf0bd2b24448c2fca29ddedfe1d3f300ab3",
+      "bytes": 216342,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b6/b6-n8-final.profile.json",
+      "sha256": "89fa5fd4e6ddd1d584f650f5c0940526a380563a45b870b83cc3966d41097763",
+      "bytes": 216395,
+      "role": "average profile of a recorded B6 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b7/b7-n32.profile.json",
+      "sha256": "d184423edb39204062d80053b17022863eb1c4f7f010d06b17a3418e5f5502a4",
+      "bytes": 60633316,
+      "role": "average profile of a recorded B7 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/final/b7/b7-n8.profile.json",
+      "sha256": "3b03885a31fceb825125a457f6ed9e99af2379c13deff3d743117f8f5baa9598",
+      "bytes": 60563960,
+      "role": "average profile of a recorded B7 run (p2-class-profile), kept out of results/"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/bitcheck/final-0c7c464.profile.json",
+      "sha256": "0c9d50b9efdfc50a785925cea0922692c84d8f9a3aa40f87ab7d990cb57e92f7",
+      "bytes": 216041,
+      "role": "average profile of a results/check binary comparison run (b6-300-<name>)"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/bitcheck/final-34d7811.profile.json",
+      "sha256": "0c9d50b9efdfc50a785925cea0922692c84d8f9a3aa40f87ab7d990cb57e92f7",
+      "bytes": 216041,
+      "role": "average profile of a results/check binary comparison run (b6-300-<name>)"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/bitcheck/plain-0c7c464.profile.json",
+      "sha256": "58397bc92a6a23d8d6ad7019566d38319ce63b97cf178df11347bc782c910fb7",
+      "bytes": 217652,
+      "role": "average profile of a results/check binary comparison run (b6-300-<name>)"
+    },
+    {
+      "path": ".cache/p2-trunk/l1-core/bitcheck/plain-34d7811.profile.json",
+      "sha256": "58397bc92a6a23d8d6ad7019566d38319ce63b97cf178df11347bc782c910fb7",
+      "bytes": 217652,
+      "role": "average profile of a results/check binary comparison run (b6-300-<name>)"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example trunk_solve --example l0_eval",
+    "bash experiments/p2-method-2026-10/l1-core/run_b6.sh <out dir>/b6",
+    "bash experiments/p2-method-2026-10/l1-core/run_b7.sh <out dir>/b7",
+    "python experiments/p2-method-2026-10/l1-core/summarize.py <out dir>"
+  ]
+}

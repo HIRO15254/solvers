@@ -1,0 +1,6 @@
+{
+  "run": "b4_general_model",
+  "solve": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\hind\\target\\release\\examples\\trunk_solve.exe",
+  "wall_seconds": 211.4,
+  "peak_working_set_mib": 2030.0
+}

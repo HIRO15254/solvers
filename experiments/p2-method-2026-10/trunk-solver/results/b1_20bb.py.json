@@ -1,0 +1,22 @@
+{
+  "format": "p2-hu-pushfold-check",
+  "version": 1,
+  "stack_bb": 20.0,
+  "profile": ".cache/p2-trunk/trunk-solver/run1/b1_20bb.profile.json",
+  "seats": [
+    {
+      "seat": 0,
+      "value": -0.18319730450655125,
+      "best_response": -0.1831447820038429,
+      "gain": 5.2522502708346464e-05
+    },
+    {
+      "seat": 1,
+      "value": 0.18319730450655125,
+      "best_response": 0.18324165379327872,
+      "gain": 4.434928672747418e-05
+    }
+  ],
+  "nash_conv": 9.687178943582064e-05,
+  "zero_sum_residual": 0.0
+}

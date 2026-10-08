@@ -1,0 +1,14 @@
+Tree: 6845 decisions, 7801 terminals (0.265s)
+Tables: 0.159s; model: 0.004s
+Iteration 1: wall 8.599704s; reaches 0.320682; t2 0.271966; t3 1.856372; k4 5.933506; update 0.046420; evaluation 0.000000
+Iteration 2: wall 5.315395s; reaches 0.081084; t2 0.208040; t3 0.785399; k4 4.056157; update 0.050715; evaluation 0.000000
+Iteration 3: wall 5.303733s; reaches 0.080624; t2 0.203162; t3 0.698912; k4 4.138486; update 0.044565; evaluation 0.000000
+Iteration 4: wall 5.084121s; reaches 0.076366; t2 0.182027; t3 0.622806; k4 4.027161; update 0.044155; evaluation 0.000000
+Iteration 5: wall 5.290582s; reaches 0.080608; t2 0.180439; t3 0.610000; k4 4.230377; update 0.050647; evaluation 0.000000
+Iteration 6: wall 5.593692s; reaches 0.077966; t2 0.182102; t3 0.617022; k4 4.526518; update 0.053282; evaluation 0.000000
+Iteration 7: wall 6.248920s; reaches 0.082492; t2 0.201102; t3 0.647868; k4 5.122222; update 0.048366; evaluation 0.000000
+Iteration 8: wall 7.171633s; reaches 0.072400; t2 0.172771; t3 0.700100; k4 6.050345; update 0.044232; evaluation 0.000000
+Iteration 9: wall 6.454480s; reaches 0.071455; t2 0.174556; t3 0.577553; k4 5.449126; update 0.045522; evaluation 0.000000
+Iteration 10: wall 74.527309s; reaches 0.076342; t2 0.186551; t3 0.574854; k4 6.302348; update 0.053626; evaluation 67.200512
+Checkpoint 10: NashConv 1.944780148929; gains [0.22236657543708804, 0.24919550964168213, 0.3380046250426223, 0.34530183923576513, 0.6684979257202285, 0.12141367385158408]; 129.616246s
+Iterations: 10; reached target: false; solve phases SolveTimings { reaches: 1.0200184, t2: 1.962717299999999, t3: 7.6908863, k4: 49.8362468, update: 0.4815292, evaluation: 67.2005116 }

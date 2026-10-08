@@ -1,0 +1,5 @@
+Tree: 6845 decisions, 7801 terminals (3.956s)
+Tables: 0.346s; model: 0.015s
+L1: 304 leaves; 20748 postflop decisions; 1500800 slots; 24012800 storage bytes
+memory allocation of 19801392 bytes failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

@@ -1,0 +1,6 @@
+b4_simple_base-model: 178s, peak 841 MiB
+b4_general_base-model: 263s, peak 1698 MiB
+b4_simple_model: 156s, peak 1064 MiB
+b4_general_model: 232s, peak 1701 MiB
+b4_simple_s256: 130s, peak 1071 MiB
+b4_general_s256: 383s, peak 1703 MiB

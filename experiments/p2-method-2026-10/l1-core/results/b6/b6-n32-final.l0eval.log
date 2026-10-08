@@ -1,0 +1,6 @@
+Postflop menus evaluated in L0 Checkdown mode.
+Tree: 12 decisions, 22 terminals (0.000s)
+Profile: 0.001s; tables: 0.155s
+seat 0: value -0.057843599, BR -0.000702416, gain 0.057141182 bb; defaulted mass 0.000000; reach k [0.33199232872906215, 0.6680076712709377]
+seat 1: value 0.057843599, BR 0.128682357, gain 0.070838758 bb; defaulted mass 0.000000; reach k [0.33199232872906204, 0.6680076712709379]
+NashConv 0.127979940 bb; evaluation 0.002s; phases PhaseTimings { reaches: 0.000589, t2: 0.0010366, t3: 2e-6, k4: 5.9e-6, backward: 0.0002267 }

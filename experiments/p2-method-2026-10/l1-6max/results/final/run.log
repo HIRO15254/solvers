@@ -1,0 +1,30 @@
+b7-l1 start 2026-10-07T23:39:12+09:00
+b7-l1 exit 0 2026-10-08T01:07:15+09:00
+b7-l0 start 2026-10-08T01:07:15+09:00
+b7-l0 exit 0 2026-10-08T01:37:08+09:00
+b7-l0-all start 2026-10-08T01:37:08+09:00
+b7-l0-all exit 127 2026-10-08T02:00:28+09:00
+b4s-l0 start 2026-10-08T02:00:29+09:00
+b4s-l0 exit 127 2026-10-08T02:02:39+09:00
+b4s-l1 start 2026-10-08T02:02:39+09:00
+b4s-l1 exit 127 2026-10-08T02:04:31+09:00
+b7-l1 l0_eval exit 0
+b4s-l1 l0_eval exit 1
+finished 2026-10-08T02:05:46+09:00
+headroom ok 2026-10-08T02:55:04.9598233+09:00 committed=36.97 limit=39.92
+b4s-l1 binary .cache/p2-trunk/l1-core/bin/trunk_solve-d.exe
+b4s-l1 start 2026-10-08T02:55:19+09:00
+b4s-l1 exit 0 2026-10-08T05:17:49+09:00
+b4s-l1 l0_eval exit 0
+finished 2026-10-08T05:18:58+09:00
+headroom ok 2026-10-08T05:40:58.3281246+09:00 committed=36.65 limit=39.92
+b4s-l0 binary .cache/p2-trunk/l1-core/bin/trunk_solve-e.exe
+b4s-l0 start 2026-10-08T05:41:06+09:00
+b4s-l0 exit 0 2026-10-08T06:01:32+09:00
+finished 2026-10-08T06:01:32+09:00
+headroom ok 2026-10-08T06:04:58.1711523+09:00 committed=36.69 limit=39.92
+b7-l0-all binary .cache/p2-trunk/l1-core/bin/trunk_solve-e.exe
+b7-l0-all start 2026-10-08T06:05:03+09:00
+b7-l0-all exit 0 2026-10-08T06:57:19+09:00
+finished 2026-10-08T06:57:19+09:00
+rerun done 2026-10-08T06:57:19+09:00

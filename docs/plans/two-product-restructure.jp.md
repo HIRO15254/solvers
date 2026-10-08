@@ -1,6 +1,6 @@
 # 再構築計画: 共通Inputを共有する2製品への移行
 
-更新: **2026-10-05**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
+更新: **2026-10-06**。[製品定義](../products.jp.md)のD1〜D6を、実装・検証できる単位へ分解した実行計画である。
 作業状態は[Linear](../status.jp.md)、Input形式の詳細は[`solvers.nlh/v1`規範](../nlh-input-v1.jp.md)に置く。
 作業branchは`restructure/two-products`、旧状態はgit tag `archive/pre-two-products-2026-10-04`（mainの`457f034`。
 2026-10-04にremoteへpush済み）。
@@ -71,6 +71,8 @@ cli                       → spot, hu-postflop, mw-preflop, runfiles
    S1では暫定方式を変えずに移植し、`spot`・`runfiles`・`cli`・daemonの共通の型に暫定方式固有の量
    （sweep、bucket、trained deviatorのCI等）を持ち込まない。P2の`[solver]`設定と停止判定は`mw-preflop`が解釈する。
    P1の`[solver]`・`[output]`も同様に`hu-postflop`が解釈し、`spot`は両製品の節を検証・正規化のために製品へ渡す。
+   S4の方式（Preflop trunkとleaf model）は新しい`solver.kind`として暫定方式と並存させ、段階と完了条件は
+   [P2方式の再設計計画](p2-method-redesign.jp.md)に置く（2026-10-06決定）。
 7. **tree scriptは処理系と方言を分ける。** 条件式・param/define・ruleの平坦化を行う汎用の処理系は
    `nlh::script`に置く。`solvers.nlh/v1`の方言（共通の条件変数、
    size literal）は`spot`が定義し、各製品は方言の変数を自分の状態から評価する（2026-10-05決定）。

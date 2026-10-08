@@ -1,0 +1,232 @@
+{
+  "checkpoints": [
+    {
+      "auxiliary_held_nash_conv": 6.115251736219794,
+      "auxiliary_nash_conv": 6.115251736219793,
+      "evaluation_seconds": 27.8442861,
+      "held_nash_conv": 2.4093828103532218,
+      "iteration": 0,
+      "nash_conv": 2.4093828103532204,
+      "seats": [
+        {
+          "auxiliary_best_response": 3.023558304845646,
+          "auxiliary_gain": 3.242883205121959,
+          "auxiliary_held_a_to_b": 3.242965549101226,
+          "auxiliary_held_b_to_a": 3.2428008611426904,
+          "auxiliary_held_gain": 3.2428832051219585,
+          "auxiliary_telescoping_residual": -8.881784197001252e-16,
+          "best_response": 1.1881179206668855,
+          "gain": 1.4074428209431984,
+          "held_a_to_b": 1.4074299079270323,
+          "held_b_to_a": 1.4074557339593667,
+          "held_gain": 1.4074428209431995,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 0,
+          "telescoping_residual": 8.881784197001252e-16,
+          "value": -0.219324900276313,
+          "value_a": -0.2193321324951403,
+          "value_b": -0.21931766805748598
+        },
+        {
+          "auxiliary_best_response": 3.091693431374148,
+          "auxiliary_gain": 2.872368531097835,
+          "auxiliary_held_a_to_b": 2.872094974386737,
+          "auxiliary_held_b_to_a": 2.8726420878089343,
+          "auxiliary_held_gain": 2.8723685310978357,
+          "auxiliary_telescoping_residual": 8.881784197001252e-16,
+          "best_response": 1.2212648896863356,
+          "gain": 1.001939989410022,
+          "held_a_to_b": 1.0019425043970673,
+          "held_b_to_a": 1.0019374744229776,
+          "held_gain": 1.0019399894100225,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 1,
+          "telescoping_residual": 1.3322676295501878e-15,
+          "value": 0.21932490027631352,
+          "value_a": 0.2193321324951403,
+          "value_b": 0.21931766805748631
+        }
+      ],
+      "seconds": 27.8909428
+    },
+    {
+      "auxiliary_held_nash_conv": 1.5891019100416446,
+      "auxiliary_nash_conv": 1.5895780910451203,
+      "evaluation_seconds": 31.0728721,
+      "held_nash_conv": 0.0015503400902871084,
+      "iteration": 500,
+      "nash_conv": 0.004303367901133309,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.7093731187608323,
+          "auxiliary_gain": 0.6739759293317071,
+          "auxiliary_held_a_to_b": 0.671674520830662,
+          "auxiliary_held_b_to_a": 0.6762773378327538,
+          "auxiliary_held_gain": 0.6739759293317079,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": 0.0369787410365543,
+          "gain": 0.0015815516074291283,
+          "held_a_to_b": 0.0002852732413544598,
+          "held_b_to_a": 0.001019294016427079,
+          "held_gain": 0.0006522836288907694,
+          "l1_reach_share": 0.6236763664039211,
+          "seat": 0,
+          "telescoping_residual": 7.48099499014998e-17,
+          "value": 0.03539718942912517,
+          "value_a": 0.03627313147918984,
+          "value_b": 0.03452124737906042
+        },
+        {
+          "auxiliary_best_response": 0.8789307813520992,
+          "auxiliary_gain": 0.915602161713413,
+          "auxiliary_held_a_to_b": 0.9154534056046584,
+          "auxiliary_held_b_to_a": 0.9147985558152146,
+          "auxiliary_held_gain": 0.9151259807099366,
+          "auxiliary_telescoping_residual": 3.3306690738754696e-16,
+          "best_response": -0.033949564067609614,
+          "gain": 0.002721816293704181,
+          "held_a_to_b": 0.0012005573691393281,
+          "held_b_to_a": 0.0005955555536533499,
+          "held_gain": 0.000898056461396339,
+          "l1_reach_share": 0.6236763664039221,
+          "seat": 1,
+          "telescoping_residual": 1.3877787807814457e-17,
+          "value": -0.036671380361313795,
+          "value_a": -0.03803571000930111,
+          "value_b": -0.03530705071332643
+        }
+      ],
+      "seconds": 171.9765561
+    },
+    {
+      "auxiliary_held_nash_conv": 1.6586761123366167,
+      "auxiliary_nash_conv": 1.6591162752574706,
+      "evaluation_seconds": 29.4073632,
+      "held_nash_conv": -0.0006859895692036162,
+      "iteration": 1000,
+      "nash_conv": 0.0027046729508101927,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.7351661279869834,
+          "auxiliary_gain": 0.6995582095878019,
+          "auxiliary_held_a_to_b": 0.6976570442944132,
+          "auxiliary_held_b_to_a": 0.7014593748811897,
+          "auxiliary_held_gain": 0.6995582095878015,
+          "auxiliary_telescoping_residual": -2.220446049250313e-16,
+          "best_response": 0.036724040080914476,
+          "gain": 0.001116121681732904,
+          "held_a_to_b": 0.00007794484216374492,
+          "held_b_to_a": 0.00039089082204379205,
+          "held_gain": 0.0002344178321037685,
+          "l1_reach_share": 0.6206172509875476,
+          "seat": 0,
+          "telescoping_residual": 4.5102810375396984e-17,
+          "value": 0.03560791839918157,
+          "value_a": 0.03664683379097332,
+          "value_b": 0.0345690030073898
+        },
+        {
+          "auxiliary_best_response": 0.9226007756068111,
+          "auxiliary_gain": 0.9595580656696688,
+          "auxiliary_held_a_to_b": 0.9592685334980211,
+          "auxiliary_held_b_to_a": 0.9589672719996093,
+          "auxiliary_held_gain": 0.9591179027488153,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": -0.03536873879378051,
+          "gain": 0.0015885512690772888,
+          "held_a_to_b": -0.0010981639818723812,
+          "held_b_to_a": -0.0007426508207423882,
+          "held_gain": -0.0009204074013073847,
+          "l1_reach_share": 0.6206172509875488,
+          "seat": 1,
+          "telescoping_residual": -3.469446951953614e-17,
+          "value": -0.0369572900628578,
+          "value_a": -0.0383834161102282,
+          "value_b": -0.03553116401548748
+        }
+      ],
+      "seconds": 315.4878771
+    }
+  ],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard"
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "a7e9ad90f312f1760d0ab75d3d625f7e48ab58352785240207d3517b41df080f",
+  "iterations": 1000,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 5,
+    "postflop_nodes": 302,
+    "slots": 21696,
+    "storage_bytes": 347136
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "eval_every": 500,
+    "gamma": 2.0,
+    "iterations": 1000,
+    "k4_min_samples": null,
+    "k4_samples": null,
+    "l1_boards": 32,
+    "l1_eval_boards": 4096,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "random",
+    "l1_eval_seed": 0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": false,
+    "l1_train_smoothing": 0.98,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/hu_20bb_postflop.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      11,
+      11
+    ]
+  },
+  "timings": {
+    "model": 0.0056463,
+    "solve": {
+      "board_preparation": 1.7546823000000003,
+      "evaluation": 88.32452140000001,
+      "evaluation_board_preparation": 0.0462786,
+      "k4": 0.0086041,
+      "postflop": 221.3017473,
+      "reaches": 1.9398473999999954,
+      "t2": 1.8919773999999994,
+      "t3": 0.000590599999999999,
+      "update": 0.14116080000000014
+    },
+    "tables": 0.2410271,
+    "total": 317.0177947,
+    "tree": 0.001555
+  },
+  "version": 2,
+  "warnings": []
+}

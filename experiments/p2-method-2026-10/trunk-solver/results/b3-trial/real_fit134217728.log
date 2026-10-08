@@ -1,0 +1,76 @@
+Tree: 5466 decisions, 6131 terminals (0.068s)
+Profile: 0.343s; tables: 0.160s
+Fit: 23525.013s; 134217728 deals, 5705 deals/s
+seat 0: L0 value 0.165280702, real 0.161706470 +/- 0.000913131, difference -0.003574232; L0 gain 0.000118769, real BR gain 0.000156432 +/- 0.000180392 bb
+  fitted: in-sample gain 0.002038388, evaluation gain 0.001185328 +/- 0.000416591 bb
+  gated-z1: in-sample gain 0.001815586, evaluation gain 0.001292547 +/- 0.000361931 bb; 94725 deviations
+  gated-z2: in-sample gain 0.001343576, evaluation gain 0.000956093 +/- 0.000256332 bb; 34205 deviations
+  gated-z3: in-sample gain 0.000862394, evaluation gain 0.000862180 +/- 0.000204174 bb; 21850 deviations
+  k=1: L0 0.120213917, real 0.118788444 +/- 0.000152152, difference -0.001425473
+  k=2: L0 0.040243854, real 0.038453524 +/- 0.000864468, difference -0.001790329
+  k=3: L0 0.004355320, real 0.004088881 +/- 0.000224199, difference -0.000266439
+  k=4: L0 0.000458034, real 0.000393066 +/- 0.000033895, difference -0.000064968
+  k=5: L0 0.000009073, real -0.000012199 +/- 0.000006236, difference -0.000021272
+  k=6: L0 0.000000504, real -0.000005247 +/- 0.000001710, difference -0.000005750
+seat 1: L0 value -0.192358458, real -0.202519515 +/- 0.001168436, difference -0.010161057; L0 gain 0.000194037, real BR gain 0.000371320 +/- 0.000219597 bb
+  fitted: in-sample gain 0.003913715, evaluation gain 0.002855638 +/- 0.000452391 bb
+  gated-z1: in-sample gain 0.003463232, evaluation gain 0.002816675 +/- 0.000370370 bb; 101638 deviations
+  gated-z2: in-sample gain 0.002981948, evaluation gain 0.002586047 +/- 0.000333555 bb; 34123 deviations
+  gated-z3: in-sample gain 0.002414956, evaluation gain 0.002232132 +/- 0.000289297 bb; 20975 deviations
+  k=1: L0 -0.100404938, real -0.101005680 +/- 0.000175805, difference -0.000600742
+  k=2: L0 -0.088165651, real -0.096524437 +/- 0.001117705, difference -0.008358786
+  k=3: L0 -0.003578401, real -0.004615327 +/- 0.000261270, difference -0.001036926
+  k=4: L0 -0.000211383, real -0.000383562 +/- 0.000037075, difference -0.000172179
+  k=5: L0 0.000002654, real 0.000012179 +/- 0.000008855, difference 0.000009526
+  k=6: L0 -0.000000738, real -0.000002687 +/- 0.000002659, difference -0.000001949
+seat 2: L0 value -0.241820175, real -0.268860938 +/- 0.001214831, difference -0.027040763; L0 gain 0.000202899, real BR gain 0.000528663 +/- 0.000169548 bb
+  fitted: in-sample gain 0.003141168, evaluation gain 0.001420029 +/- 0.000366651 bb
+  gated-z1: in-sample gain 0.002599589, evaluation gain 0.001629925 +/- 0.000291954 bb; 113665 deviations
+  gated-z2: in-sample gain 0.001830756, evaluation gain 0.001399236 +/- 0.000225454 bb; 39290 deviations
+  gated-z3: in-sample gain 0.001258500, evaluation gain 0.001113673 +/- 0.000162053 bb; 23781 deviations
+  k=1: L0 0.001629542, real -0.005349129 +/- 0.000183689, difference -0.006978671
+  k=2: L0 -0.213918776, real -0.231538331 +/- 0.001162790, difference -0.017619555
+  k=3: L0 -0.028575296, real -0.030952213 +/- 0.000271815, difference -0.002376917
+  k=4: L0 -0.000943155, real -0.001006628 +/- 0.000035412, difference -0.000063474
+  k=5: L0 -0.000011549, real -0.000016242 +/- 0.000005343, difference -0.000004694
+  k=6: L0 -0.000000941, real 0.000001607 +/- 0.000004518, difference 0.000002547
+seat 3: L0 value 0.088602928, real 0.087590141 +/- 0.000507921, difference -0.001012786; L0 gain 0.000083599, real BR gain -0.000022660 +/- 0.000074819 bb
+  fitted: in-sample gain 0.000447820, evaluation gain 0.000217310 +/- 0.000184553 bb
+  gated-z1: in-sample gain 0.000328448, evaluation gain 0.000283903 +/- 0.000089269 bb; 80910 deviations
+  gated-z2: in-sample gain 0.000132909, evaluation gain 0.000114480 +/- 0.000026896 bb; 32002 deviations
+  gated-z3: in-sample gain 0.000082471, evaluation gain 0.000089160 +/- 0.000020094 bb; 19318 deviations
+  k=1: L0 -0.031897476, real -0.033080799 +/- 0.000082546, difference -0.001183323
+  k=2: L0 0.107567526, real 0.107782220 +/- 0.000477409, difference 0.000214694
+  k=3: L0 0.012462665, real 0.012440051 +/- 0.000134401, difference -0.000022614
+  k=4: L0 0.000468809, real 0.000449503 +/- 0.000032989, difference -0.000019305
+  k=5: L0 0.000001168, real -0.000003427 +/- 0.000007103, difference -0.000004595
+  k=6: L0 0.000000236, real 0.000002592 +/- 0.000005598, difference 0.000002356
+seat 4: L0 value 0.101839408, real 0.099871276 +/- 0.000587420, difference -0.001968132; L0 gain 0.000087003, real BR gain 0.000155567 +/- 0.000174818 bb
+  fitted: in-sample gain 0.000891537, evaluation gain 0.000964147 +/- 0.000252932 bb
+  gated-z1: in-sample gain 0.000763699, evaluation gain 0.000885277 +/- 0.000161738 bb; 85014 deviations
+  gated-z2: in-sample gain 0.000558508, evaluation gain 0.000643919 +/- 0.000130118 bb; 37779 deviations
+  gated-z3: in-sample gain 0.000313187, evaluation gain 0.000232538 +/- 0.000083643 bb; 23140 deviations
+  k=1: L0 -0.010735636, real -0.011898784 +/- 0.000098143, difference -0.001163148
+  k=2: L0 0.100777612, real 0.100323916 +/- 0.000552978, difference -0.000453696
+  k=3: L0 0.011489652, real 0.011163007 +/- 0.000146434, difference -0.000326645
+  k=4: L0 0.000302744, real 0.000279527 +/- 0.000028746, difference -0.000023217
+  k=5: L0 0.000003718, real 0.000005797 +/- 0.000007191, difference 0.000002079
+  k=6: L0 0.000001317, real -0.000002188 +/- 0.000001963, difference -0.000003505
+seat 5: L0 value 0.124149524, real 0.122212566 +/- 0.000698254, difference -0.001936958; L0 gain 0.000079167, real BR gain -0.000480168 +/- 0.000216585 bb
+  fitted: in-sample gain 0.001386758, evaluation gain 0.001286575 +/- 0.000313599 bb
+  gated-z1: in-sample gain 0.001267753, evaluation gain 0.001342629 +/- 0.000231029 bb; 91576 deviations
+  gated-z2: in-sample gain 0.001082542, evaluation gain 0.001103575 +/- 0.000197183 bb; 44221 deviations
+  gated-z3: in-sample gain 0.000899060, evaluation gain 0.001024295 +/- 0.000183577 bb; 28271 deviations
+  k=1: L0 0.033769137, real 0.032545948 +/- 0.000122024, difference -0.001223189
+  k=2: L0 0.082058055, real 0.081503108 +/- 0.000658704, difference -0.000554947
+  k=3: L0 0.008033158, real 0.007875601 +/- 0.000167503, difference -0.000157557
+  k=4: L0 0.000269517, real 0.000268094 +/- 0.000027238, difference -0.000001424
+  k=5: L0 0.000017040, real 0.000013891 +/- 0.000008229, difference -0.000003148
+  k=6: L0 0.000002616, real 0.000005923 +/- 0.000004594, difference 0.000003307
+Seat-value sums: L0 0.045693929464, real 0.000000000000 +/- 0.000000000000 bb; L0 NashConv 0.000765475
+Real gains of the L0 best responses, summed over seats: 0.000709153 +/- 0.000439883 bb
+Fitted gains summed: in-sample 0.011819385, evaluation 0.007929026 +/- 0.000836201 bb
+Gated-z1 gains summed: in-sample 0.010238306, evaluation 0.008250957 +/- 0.000669228 bb; 567528 deviations
+Gated-z2 gains summed: in-sample 0.007930238, evaluation 0.006803349 +/- 0.000539845 bb; 221620 deviations
+Gated-z3 gains summed: in-sample 0.005830568, evaluation 0.005553978 +/- 0.000443121 bb; 137335 deviations
+L0 69.203s; real 6407.992s; 16777216 deals, 2618 deals/s; mean attempts 1.000000

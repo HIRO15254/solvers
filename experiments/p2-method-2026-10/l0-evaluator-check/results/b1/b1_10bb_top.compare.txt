@@ -1,0 +1,8 @@
+seat 0 value: python=0.020448017395 rust=0.020448017395 diff=1.110e-16
+seat 0 best_response: python=0.379140079453 rust=0.379140079453 diff=5.551e-17
+seat 0 gain: python=0.358692062058 rust=0.358692062058 diff=5.551e-17
+seat 1 value: python=-0.020448017395 rust=-0.020448017395 diff=7.633e-17
+seat 1 best_response: python=0.131144226218 rust=0.131144226218 diff=1.388e-16
+seat 1 gain: python=0.151592243613 rust=0.151592243613 diff=5.551e-17
+nash_conv: python=0.510284305671 rust=0.510284305671 diff=0.000e+00
+PASS: largest difference 1.388e-16

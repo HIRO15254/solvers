@@ -1,0 +1,38 @@
+reach-weighted TV (reach from A, uniform class prior)
+depth  0: TV=0.0338  reach mass=1.0000  mass stored in one export only=0.00e+00
+depth  1: TV=0.0525  reach mass=1.0000  mass stored in one export only=0.00e+00
+depth  2: TV=0.0701  reach mass=1.0000  mass stored in one export only=0.00e+00
+depth  3: TV=0.0958  reach mass=1.0000  mass stored in one export only=0.00e+00
+depth  4: TV=0.1238  reach mass=1.0000  mass stored in one export only=0.00e+00
+depth  5: TV=0.1258  reach mass=0.8179  mass stored in one export only=0.00e+00
+depth  6: TV=0.1527  reach mass=0.1697  mass stored in one export only=1.98e-04
+depth  7: TV=0.2223  reach mass=0.0401  mass stored in one export only=4.73e-03
+depth  8: TV=0.3810  reach mass=0.0077  mass stored in one export only=3.61e-03
+depth  9: TV=0.2513  reach mass=0.0011  mass stored in one export only=9.80e-04
+depth 10: TV=0.0850  reach mass=0.0001  mass stored in one export only=1.32e-04
+depth 11: TV=0.0277  reach mass=0.0000  mass stored in one export only=9.61e-06
+depth 12: TV=0.0000  reach mass=0.0000  mass stored in one export only=1.19e-06
+depth 13: TV=0.0000  reach mass=0.0000  mass stored in one export only=1.14e-09
+overall TV 0.0856
+(node, class) pairs: in both=264637 in one only=291683
+unweighted TV over pairs stored in both
+depth  0: pairs=    169 mean=0.034 median=0.000 p90=0.081
+depth  1: pairs=    507 mean=0.062 median=0.000 p90=0.227
+depth  2: pairs=   1521 mean=0.125 median=0.003 p90=0.494
+depth  3: pairs=   4394 mean=0.233 median=0.049 p90=0.803
+depth  4: pairs=  12168 mean=0.325 median=0.218 p90=0.879
+depth  5: pairs=  32279 mean=0.350 median=0.296 p90=0.859
+depth  6: pairs=  26593 mean=0.355 median=0.324 p90=0.871
+depth  7: pairs=  35138 mean=0.321 median=0.278 p90=0.817
+depth  8: pairs=  56323 mean=0.247 median=0.084 p90=0.511
+depth  9: pairs=  53689 mean=0.101 median=0.000 p90=0.500
+depth 10: pairs=  30970 mean=0.038 median=0.000 p90=0.000
+depth 11: pairs=   9540 mean=0.017 median=0.000 p90=0.000
+depth 12: pairs=   1235 mean=0.005 median=0.000 p90=0.000
+depth 13: pairs=    111 mean=0.000 median=0.000 p90=0.000
+first-in nodes (all previous actions fold), unweighted TV over classes stored in A
+first-in UTG: classes=169 mean=0.034 max=0.941
+first-in BTN: classes=169 mean=0.098 max=0.982
+first-in CO: classes=169 mean=0.061 max=0.825
+first-in SB: classes=169 mean=0.126 max=0.879
+first-in HJ: classes=169 mean=0.043 max=0.639

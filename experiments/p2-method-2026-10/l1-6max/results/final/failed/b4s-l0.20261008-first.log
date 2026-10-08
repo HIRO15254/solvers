@@ -1,0 +1,7 @@
+Postflop menus solved in L0 Checkdown mode.
+Tree: 6845 decisions, 7801 terminals (1.505s)
+Tables: 0.495s; model: 0.007s
+Checkpoint 0: NashConv 65.930791699558; gains [11.045244316328478, 10.425357905366312, 9.834242322965528, 11.349533058217352, 11.568740422302646, 11.707673674377773]; 93.793074s
+Iteration 10: wall 2.902141s; reaches 0.116883; t2 0.261549; t3 0.936528; k4 1.276460; update 0.110734; evaluation 0.000000
+memory allocation of 3884296 bytes failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

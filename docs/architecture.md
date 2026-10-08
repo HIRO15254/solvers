@@ -198,6 +198,11 @@ stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのst
 Preflopは169 hand class、Postflopはstreet別のbucketを使う。P1のexact combo経路とは分ける。
 cacheのbuild/loadと互換性検証は製品側にある。CLIはcache rootを渡し、診断だけを表示する。
 
+実験中の`trunk` module（[P2方式の再設計計画](plans/p2-method-redesign.jp.md)のS4-1a、製品契約の外）は、
+169 hand classと、L0モデルの2人showdown表（厳密）・3人の順位表（Monte Carlo）を持つ。`trunk::l0`はPostflopに
+判断の無い木で、class単位のprofileに対するseat別の最適応答の利得と`NashConv`をL0モデルの中で計算する
+（example `l0_eval`）。CLIからは使わない。
+
 ## 7. 正当性検証
 
 testは計算層と利用者境界を分けて置く。

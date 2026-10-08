@@ -1,0 +1,4 @@
+Tree: 12 decisions, 22 terminals (0.001s)
+Tables: 0.165s; model: 0.003s
+L1: 5 leaves; 302 postflop decisions; 21696 slots; 347136 storage bytes
+Evaluation: NashConv 0.005512555003; held -0.007972024321; auxiliary 1.717864288273; auxiliary held 1.717407841863; gains [0.0023381573908774697, 0.0031743976118686276]; held gains [-0.0026333986743062674, -0.005338625646802184]; auxiliary gains [0.718695291717307, 0.9991689965555489]; auxiliary held gains [0.7186952917173068, 0.9987125501455374]; evaluation 1.224113s

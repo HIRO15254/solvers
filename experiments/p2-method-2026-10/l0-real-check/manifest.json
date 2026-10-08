@@ -1,0 +1,280 @@
+{
+  "format": "experiment-manifest",
+  "version": 1,
+  "work_item": "SOL-28",
+  "recorded_on": "2026-10-06",
+  "purpose": "Measure how far the L0 model's seat values and gains are from the input game by evaluating the same class profiles on physical deals, and what the L0 best responses gain there.",
+  "plan": "docs/plans/p2-method-redesign.jp.md",
+  "reproducibility": "verified",
+  "reproducibility_note": "run_b1.sh was run twice with identical results except timings; run_b3.sh was run once as committed and its 8-thread rerun matched the 16-thread run bit for bit.",
+  "source": {
+    "revision": "55e84a9609de2a42ae26258839e8673ca8fe2d9e",
+    "working_tree": "no changes to tracked files under crates/",
+    "build": "cargo build -p mw-preflop --release --example l0_real --example l0_eval --example trunk_tables",
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "rustflags": "-C target-cpu=native (repository .cargo/config.toml); release thin LTO, codegen-units 1",
+    "cargo_lock_sha256": "ad66442597906f7b4c45653d22f43bf2e975b5cb5f27946224ce5d543b3e5397",
+    "l0_real_binary_sha256": "d8ee0156e1b3a5d68b116a2b01720f311906932a4913ecbcaa6b3bab5896eda1",
+    "l0_eval_binary_sha256": "c521cdb00ff8aa5d59b4e70ed433e56f4beda8e81c4f2ede12e583dbca420ff0",
+    "trunk_tables_binary_sha256": "a114321a992db82e5352e49d997b3ab0fc67a027286d1e31fee226c4039ed165"
+  },
+  "evaluation": {
+    "t3_samples": 4096,
+    "t3_seed": 0,
+    "k4_samples": 2048,
+    "k4_seed": 0,
+    "b1_deals": 4194304,
+    "b1_seed_check_deals": 16777216,
+    "b3_deals": 33554432,
+    "deal_seed": "0 unless stated",
+    "threads": "rayon default (16) unless stated"
+  },
+  "environment": {
+    "os": "Windows 11 Home 10.0.26200",
+    "cpu": "Intel Core i7-10700KF, 8 cores / 16 threads",
+    "memory": "31.9 GiB",
+    "shell": "Git Bash",
+    "python": "3.13.7"
+  },
+  "files": [
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/run_b1.sh",
+      "sha256": "7f51735dd82ace6876c91a1707bd9072cb45d1e41ca8a64179d8f7e648e684b3",
+      "role": "B1 procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/run_b3.sh",
+      "sha256": "f6e05065bf6eaa158e4070c86eb70502b2ed274cbe41b668bb9e3c7bd30aab08",
+      "role": "B3 procedure"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/summarize.py",
+      "sha256": "b79164c1e38c3d3cc77d83fdfdaaa070cf3c5e7ae74e410a1c8bf127083662bd",
+      "role": "B1/B3 summary tables (Python standard library only)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/run_b1.log",
+      "sha256": "8dd8653ce460247e04dfbad95d984a5cfeefdb4beb4fffd41180395fe60c8b80",
+      "role": "stdout of run_b1.sh (wall times)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/summary.md",
+      "sha256": "fff3b709ec5271a830c649860b2f61c9e6df18d0b6125452593e638762429c10",
+      "role": "summarize.py b1 output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/run_b3.log",
+      "sha256": "cf86e1a11ddb67532edd8b492d0058e154c711050ab8e65d12c655dd2a4b233d",
+      "role": "stdout of run_b3.sh (wall times)"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/summary.md",
+      "sha256": "1dded307a07fb0f927479a77a28efdcdac44bf9343beba336a866c02ee791a7a",
+      "role": "summarize.py b3 output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_10bb_tree.json",
+      "sha256": "cc131bd5f42bf5f297542b46533d994aa520d1dbd505d0040a6bca443df6992f",
+      "role": "decision tree written by l0_eval --export-tree; input of the random profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_20bb_tree.json",
+      "sha256": "b4115b70ccb2b9f8a0767eda3ff1844c7767f4639d0641f5750033d7f5741a69",
+      "role": "decision tree written by l0_eval --export-tree; input of the random profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_5bb_tree.json",
+      "sha256": "0de7609d19845dc9c6a96c6c446687e05dd69843e401a111e954877c272dd3f3",
+      "role": "decision tree written by l0_eval --export-tree; input of the random profile"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_10bb_random.profile.json",
+      "sha256": "47f4f99b7a7289a16adf1c5fb87808390c371a1c9a5b1cd482a3ac5258b1c8f8",
+      "role": "random class profile written by hu_pushfold_check.py profile --kind random --seed 1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_20bb_random.profile.json",
+      "sha256": "aff802845814052db823779b615713a880f8bbc594c6643d264a489b4fa03cc0",
+      "role": "random class profile written by hu_pushfold_check.py profile --kind random --seed 1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_5bb_random.profile.json",
+      "sha256": "89030c85b252017e09447d3c12f44195fead1cdfa2c0eb28bd67ae0ffd0145b3",
+      "role": "random class profile written by hu_pushfold_check.py profile --kind random --seed 1"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_10bb_legacy.json",
+      "sha256": "2c9531dcfc2e5729d89d50cc28e964c0a8f94502f83d402d95a166367e8f30b7",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_10bb_random.json",
+      "sha256": "4c5e2e016a24f28defe206148152fc990eda77e23c8ad1166831e52ecd119508",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_10bb_uniform.json",
+      "sha256": "1f302026baaa86679ecfa030086f8f97730107fe2d75fcf11bf7e7677eb3de3c",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_20bb_legacy.json",
+      "sha256": "b65df128d313f24edd7e82767e94faf5dc57af39037251226e328a8a68a79ba2",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_20bb_random.json",
+      "sha256": "38f2dcc4ba557c9b6e51bad5b673eb8d2134acd0f0355ce92fbfbec5321a8377",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_20bb_uniform.json",
+      "sha256": "0b52ef0c493a5b70cdcad358b9e6063e3c95fd631ef93a70d3bc123441170dee",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_5bb_legacy.json",
+      "sha256": "43b5ae79ad6a38a9bcdaa7de9e25f0989a03ede720ccb9f30a0092a9b59f125b",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_5bb_random.json",
+      "sha256": "44c35d6d1af44b0e3fdcec4403976dfcb33a99f45a2bddd8a2d4119fb7887178",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/b1_5bb_uniform.json",
+      "sha256": "2ca49abf17a579956bd60e784435f13b50699dd8d04c546128f1834f44e64631",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/seeds_10bb_uniform_s0.json",
+      "sha256": "df42bce6e5b61458a90d49c0db17b00a13d67242112bec8a6fe7d2edc976152a",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/seeds_10bb_uniform_s1.json",
+      "sha256": "e22a14b7764378ab45c86ad4d71f5c9097049b7b75f29dd1a6f61a713b7a7f3b",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/seeds_10bb_uniform_s2.json",
+      "sha256": "6bf0197b64322e64d480862b5ce11b71760d2be2af8f52b988ab8bc85c511f29",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/seeds_10bb_uniform_s3.json",
+      "sha256": "97731ce8c7e64d03fea258cc7feac35dbc95e7bb7d209488242a237b83f151b9",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b1/seeds_10bb_uniform_s4.json",
+      "sha256": "73ccdfc206c7c6ecb9abf5a37a92643ce4d70bf58001ac4bdfa53f031d14a957",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_300k_s0.json",
+      "sha256": "0802e5c6e482f0a0c23ba126b5eb12ca63f7e77a0c2f6a68a3067d46c156060c",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_300k_s0_dealseed1.json",
+      "sha256": "0c495c46374b16024bddcedabfb20950c72ec0651c853352c6cb6e2bf8c67bcd",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_300k_s0_threads8.json",
+      "sha256": "4c838471aa2565e6d9237d7eeb0e2f697a79b498a2f9cce84464d69ba1c1c98f",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_300k_s1.json",
+      "sha256": "b85c9a1ffc2f2dec28072b7b4eb61b1f568c87d0bff6b65688529ef7970c5d53",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_cd.json",
+      "sha256": "4221fae4116c7ddd8c52a9b6ef763be2d7919beef8f5fe7467a7f522b24da482",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/20bb_cd_s1.json",
+      "sha256": "4e0cb71dc99a6d9ada38270d60e8804f123dd2bccbd14e55486d039c126e452d",
+      "role": "l0_real output"
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l0-real-check/results/b3/uniform.json",
+      "sha256": "afb8dd04135e45577831fd4ddc812f291af3a4b65aaeacea518b4e9937ed1a6e",
+      "role": "l0_real output"
+    }
+  ],
+  "local_only_inputs": [
+    {
+      "path": ".cache/p2-trunk/t2-v1.bin",
+      "sha256": "d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3",
+      "bytes": 685706,
+      "role": "T2 cache; regenerated by the procedure"
+    },
+    {
+      "path": ".cache/p2-trunk/t3-v1-n4096-seed0.bin",
+      "sha256": "27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144",
+      "bytes": 126239862,
+      "role": "T3 cache (seed 0); regenerated by the procedure"
+    },
+    {
+      "path": ".cache/p2-trunk/classes.csv",
+      "sha256": "89f4ca4416c578dfe3cd5d9ce8869d3ad101c247c7b52bf745f7a0fded6efd86",
+      "bytes": 3206,
+      "role": "class table exported for hu_pushfold_check.py"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_5bb/solution.mwsol",
+      "sha256": "68de897541c4f3e99c1eaec2e8268f833cb3c0cf2c7837b21c86e1a478ed89be",
+      "bytes": 48086,
+      "role": "legacy 5bb B1 solution; recorded by experiments/p2-method-2026-10/l0-evaluator-check/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_10bb/solution.mwsol",
+      "sha256": "af851eb1808ff460bf84a3af12616e9e72887047c79759641e9a78ff097f4acc",
+      "bytes": 48041,
+      "role": "legacy 10bb B1 solution; recorded by experiments/p2-method-2026-10/l0-evaluator-check/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/l0-evaluator-check/b1_20bb/solution.mwsol",
+      "sha256": "c52509cfbd297af907e56e82aef600b82fa26cc2772831fc131186733cd0019b",
+      "bytes": 48013,
+      "role": "legacy 20bb B1 solution; recorded by experiments/p2-method-2026-10/l0-evaluator-check/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd/solution.mwsol",
+      "sha256": "56e0e558c36b57bc09de2de5029d8d1eb405bc58250961e8f1884f1603116e44",
+      "bytes": 60016881,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_cd_s1/solution.mwsol",
+      "sha256": "8f0f5c42cceae5ae710c44c921336541424e42dbd8587340336fd151bf6bfd5a",
+      "bytes": 60595036,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s0/solution.mwsol",
+      "sha256": "ad567606c7b76ed6ec8247514fa0f0ea9263f528509d8f23f345124b0a5f91ec",
+      "bytes": 69501997,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    },
+    {
+      "path": "runs/p2-method-2026-10/legacy-seed-noise/20bb_300k_s1/solution.mwsol",
+      "sha256": "c5b1b114a9844e9181ede43035882f109f01e42a59a9a37959a7568a7034802e",
+      "bytes": 71637038,
+      "role": "B3 input; recorded by experiments/p2-method-2026-10/legacy-seed-noise/manifest.json"
+    }
+  ],
+  "commands": [
+    "cargo build -p mw-preflop --release --example l0_real --example l0_eval --example trunk_tables",
+    "bash experiments/p2-method-2026-10/l0-real-check/run_b1.sh <b1 out dir>",
+    "bash experiments/p2-method-2026-10/l0-real-check/run_b3.sh <b3 out dir>",
+    "python experiments/p2-method-2026-10/l0-real-check/summarize.py b1 <b1 out dir>",
+    "python experiments/p2-method-2026-10/l0-real-check/summarize.py b3 <b3 out dir>"
+  ]
+}

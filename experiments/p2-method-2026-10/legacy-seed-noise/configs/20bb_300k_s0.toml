@@ -1,0 +1,86 @@
+# Six-max 20-BB benchmark with preflop betting and postflop checkdown.
+# Fixed solver settings are retained for structural and performance regression checks.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+
+[table.stacks_bb]
+BTN = 20.0
+SB = 20.0
+BB = 20.0
+UTG = 20.0
+HJ = 20.0
+CO = 20.0
+
+[economics]
+kind = "cash"
+
+[ranges]
+BTN = "random"
+SB = "random"
+BB = "random"
+UTG = "random"
+HJ = "random"
+CO = "random"
+
+[tree]
+script = '''
+preflop when unopened { replace raise [2.5x, a] }
+preflop when !unopened { replace raise [3x, a] }
+flop when unopened { replace bet [50, a] }
+flop when !unopened { replace raise [75, a] }
+turn when unopened { replace bet [50, a] }
+turn when !unopened { replace raise [75, a] }
+river when unopened { replace bet [50, a] }
+river when !unopened { replace raise [75, a] }
+preflop when unopened { remove call }
+preflop when unopened { replace raise [2.5x, a] }
+preflop when aggressions >= 1 { replace raise [3x, a] }
+preflop when aggressions >= 3 { remove raise }
+flop, turn, river when players >= 2 { checkdown }
+'''
+include_allin = true
+
+[tree.max_aggressive_actions]
+preflop = 3
+flop = 1
+turn = 1
+river = 1
+
+[solver]
+kind = "range-vector"
+seed = 0
+opponent_exploration = 0.0
+batch_sweeps = 1
+
+[solver.discount]
+kind = "none"
+
+[solver.pruning]
+kind = "none"
+
+[solver.abstraction]
+kind = "ehs2-percentile"
+
+[solver.abstraction.buckets]
+flop = 32
+turn = 32
+river = 32
+
+[solver.stop]
+target = 1000000.0
+check_every_sweeps = 150000
+confirmations = 1000000
+evaluation_samples = 4096
+deviator_traversals = 20000
+max_sweeps = 300000
+
+[run]
+threads = 8
+memory = "48GiB"
+max_time = "30m"
+checkpoint_interval = "5m"
+
+[output]
+probability_encoding = "u16"
