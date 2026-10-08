@@ -1,0 +1,31 @@
+{
+  "actionNodes": 7802,
+  "afterBuildBytes": 13045760,
+  "allocSecs": 0.0000158,
+  "buildSecs": 0.017153474,
+  "cfrPrecision": "f32",
+  "config": "/home/PC_User/work_vm26/c_turn2.toml",
+  "deals": 1200,
+  "estimateF32Bytes": 16390304,
+  "estimateI16Bytes": 8257568,
+  "estimateI16F32avgBytes": 12323936,
+  "evalSecs": [
+    0.002412179,
+    0.001993927
+  ],
+  "iterSecs": 0.148106589,
+  "iters": 100,
+  "nashConv": 0.24312318032592684,
+  "nodeInfo": 7803,
+  "nodes": 22107,
+  "peakBytes": 39493632,
+  "prepareSecs": 0.002278888,
+  "secsPerIter": 0.00148106589,
+  "storage": "f32",
+  "storageElements": 2048788,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 5,
+  "warmupSecs": 0.032498891
+}

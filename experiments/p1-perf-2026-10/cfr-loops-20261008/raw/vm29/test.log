@@ -1,0 +1,1418 @@
+   Compiling cfg-if v1.0.4
+   Compiling fastrand v2.4.1
+   Compiling quickdiv v0.1.1
+   Compiling once_cell v1.21.4
+   Compiling memchr v2.8.2
+   Compiling itoa v1.0.18
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.0
+   Compiling arrayref v0.3.9
+   Compiling cpufeatures v0.3.0
+   Compiling constant_time_eq v0.4.2
+   Compiling arrayvec v0.7.8
+   Compiling either v1.16.0
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling libc v0.2.186
+   Compiling aya_base v0.1.0
+   Compiling toml_write v0.1.2
+   Compiling winnow v0.7.15
+   Compiling serde_core v1.0.228
+   Compiling zmij v1.0.21
+   Compiling crossbeam-utils v0.8.21
+   Compiling utf8parse v0.2.2
+   Compiling scopeguard v1.2.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling colorchoice v1.0.5
+   Compiling anstyle v1.0.14
+   Compiling anstyle-query v1.1.5
+   Compiling byteorder v1.5.0
+   Compiling anstyle-parse v1.0.0
+   Compiling lock_api v0.4.14
+   Compiling strsim v0.11.1
+   Compiling clap_lex v1.1.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling ciborium-io v0.2.2
+   Compiling regex-syntax v0.8.11
+   Compiling plotters-backend v0.3.7
+   Compiling anyhow v1.0.103
+   Compiling cast v0.3.0
+   Compiling same-file v1.0.6
+   Compiling oorandom v11.1.5
+   Compiling anes v0.1.6
+   Compiling zerocopy v0.8.52
+   Compiling miniphf v0.1.0
+   Compiling thiserror v2.0.18
+   Compiling num-traits v0.2.19
+   Compiling itertools v0.10.5
+   Compiling rustc-hash v2.1.3
+   Compiling cfr-ref v0.1.0 (/home/PC_User/t22c/crates/cfr-ref)
+   Compiling untrusted v0.9.0
+   Compiling spin v0.5.2
+   Compiling rustix v1.1.4
+   Compiling cobs v0.3.0
+   Compiling walkdir v2.5.0
+   Compiling anstream v1.0.0
+   Compiling aya_codegen v0.1.0
+   Compiling hash32 v0.2.1
+   Compiling untrusted v0.7.1
+   Compiling base64 v0.13.1
+   Compiling log v0.4.33
+   Compiling chunked_transfer v1.5.0
+   Compiling ascii v1.1.0
+   Compiling httpdate v1.0.3
+   Compiling spin v0.9.8
+   Compiling zeroize v1.9.0
+   Compiling plotters-svg v0.3.7
+   Compiling crossbeam-epoch v0.9.18
+   Compiling clap_builder v4.6.0
+   Compiling rustls-pemfile v0.2.1
+   Compiling indexmap v2.14.0
+   Compiling crossbeam-deque v0.8.6
+   Compiling aya_poker v0.1.0
+   Compiling rayon-core v1.13.0
+   Compiling plotters v0.3.7
+   Compiling jobserver v0.1.34
+   Compiling getrandom v0.2.17
+   Compiling getrandom v0.4.3
+   Compiling is-terminal v0.4.17
+   Compiling rayon v1.12.0
+   Compiling rand_core v0.6.4
+   Compiling regex-automata v0.4.14
+   Compiling cc v1.2.65
+   Compiling criterion-plot v0.5.0
+   Compiling tempfile v3.27.0
+   Compiling serde v1.0.228
+   Compiling serde_json v1.0.150
+   Compiling blake3 v1.8.5
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling ring v0.17.14
+   Compiling ring v0.16.20
+   Compiling clap v4.6.1
+   Compiling regex v1.12.4
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling heapless v0.7.17
+   Compiling toml_edit v0.22.27
+   Compiling tinytemplate v1.2.1
+   Compiling runfiles v0.1.0 (/home/PC_User/t22c/crates/runfiles)
+   Compiling postcard v1.1.3
+   Compiling protocol v0.1.0 (/home/PC_User/t22c/crates/protocol)
+   Compiling ppv-lite86 v0.2.21
+   Compiling half v2.7.1
+   Compiling ciborium-ll v0.2.2
+   Compiling rand_chacha v0.3.1
+   Compiling ciborium v0.2.2
+   Compiling toml v0.8.23
+   Compiling rand v0.8.6
+   Compiling rustls v0.20.9
+   Compiling criterion v0.5.1
+   Compiling webpki v0.22.4
+   Compiling sct v0.7.1
+   Compiling zstd-safe v7.2.4
+   Compiling zstd v0.13.3
+   Compiling tiny_http v0.12.0
+   Compiling daemon v0.1.0 (/home/PC_User/t22c/crates/daemon)
+   Compiling nlh v0.1.0 (/home/PC_User/t22c/crates/nlh)
+   Compiling economics v0.1.0 (/home/PC_User/t22c/crates/economics)
+   Compiling hu-engine v0.1.0 (/home/PC_User/t22c/crates/hu-engine)
+   Compiling spot v0.1.0 (/home/PC_User/t22c/crates/spot)
+   Compiling hu-postflop v0.1.0 (/home/PC_User/t22c/crates/hu-postflop)
+   Compiling mw-preflop v0.1.0 (/home/PC_User/t22c/crates/mw-preflop)
+   Compiling cli v0.1.0 (/home/PC_User/t22c/crates/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.85s
+     Running unittests src/lib.rs (target/debug/deps/cfr_ref-de6511cc71749350)
+
+running 2 tests
+test games::tests::uniform_profile_is_exploitable ... ok
+test games::tests::oracle_cfr_solves_kuhn ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
+
+     Running unittests src/lib.rs (target/debug/deps/cli-4090f3921db1a9e6)
+
+running 29 tests
+test resume::tests::a_checkpoint_file_path_is_passed_through ... ok
+test resume::tests::a_heads_up_run_directory_resolves_to_its_ckpt ... ok
+test nlh_v1::p2::tests::product_diagnostics_keep_cli_exit_mapping ... ok
+test resume::tests::a_run_directory_without_a_checkpoint_is_rejected ... ok
+test resume::tests::missing_p2_checkpoint_keeps_the_existing_diagnostic ... ok
+test tests::policy_arena_allocation_failure_uses_the_resource_exit_code ... ok
+test tests::the_command_surface_has_no_experiment_namespace ... ok
+test resume::tests::removed_family_run_directories_are_refused_before_loading_the_checkpoint ... ok
+test run_dir::tests::a_populated_directory_is_refused ... ok
+test config_new::tests::the_cli_reference_covers_every_command ... ok
+test run_dir::tests::a_finished_run_directory_is_not_adopted ... ok
+test runs::tests::an_abandoned_run_reports_interrupted_and_keeps_the_recorded_state ... ok
+test runs::tests::watching_a_finished_run_returns_immediately ... ok
+test runs::tests::a_canceled_run_with_a_checkpoint_is_resumable ... ok
+test runs::tests::status_reports_progress_and_an_events_offset ... ok
+test runs::tests::hu_elapsed_time_uses_the_metrics_row_field ... ok
+test runs::tests::watching_from_an_offset_skips_what_was_already_read ... ok
+test run_dir::tests::a_cancelled_run_closes_as_canceled ... ok
+test run_dir::tests::a_completed_run_closes_its_manifest_and_events ... ok
+test run_dir::tests::a_failed_run_records_the_error_and_returns_it ... ok
+test runs::tests::listing_finds_run_directories_and_ignores_other_entries ... ok
+test run_dir::tests::a_queued_run_directory_is_adopted_and_keeps_its_identity ... ok
+test resume::tests::removed_family_hu_checkpoints_are_refused_embedded_or_legacy ... ok
+test config_new::tests::full_templates_preserve_the_minimal_spot ... ok
+test config_new::tests::full_templates_list_every_effective_key ... ok
+test resume::tests::removed_family_multiway_checkpoint_is_refused ... ok
+test config_new::tests::common_input_reference_covers_every_effective_key_and_literal ... ok
+test config_new::tests::all_templates_validate_and_normalize_idempotently ... ok
+test config_new::tests::minimal_p1_template_solves ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/main.rs (target/debug/deps/solvers-eef9f443b45a6ba7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_integration.rs (target/debug/deps/cli_integration-6f0edcc675fe42e3)
+
+running 31 tests
+test a_canceled_heads_up_solve_closes_as_canceled_and_resumes ... ignored, spawns and signals a solve; explicit release acceptance only
+test a_solve_records_a_complete_run_directory ... ignored, builds the full EHS2 tables; explicit release acceptance only
+test inspect_sol_river_navigation_smoke ... ignored, solves twice; CI runs it in release with --include-ignored
+test multiway_v1_u16_storage_writes_a_quantized_mwsol ... ignored, builds the full EHS2 tables; explicit release acceptance only
+test the_abstraction_cache_is_shared_across_runs ... ignored, builds the full EHS2 tables once; explicit release acceptance only
+test status_reports_an_abandoned_run_as_interrupted_and_resumable ... ok
+test runs_ls_lists_run_directories_and_skips_everything_else ... ok
+test status_reports_a_finished_run_as_json ... ok
+test status_reports_a_canceled_heads_up_run_as_resumable ... ok
+test watch_rejects_a_directory_that_is_not_a_run ... ok
+test the_retired_history_flag_is_refused ... ok
+test watch_replays_a_finished_run_and_resumes_from_an_offset ... ok
+test old_run_monitoring_preserves_the_recorded_schema_and_game_kind ... ok
+test removed_family_schemas_are_refused_as_unsupported ... ok
+test resume_tampered_config_errors ... ok
+test solve_prints_no_warning_when_every_rule_matches ... ok
+test solve_warns_about_a_tree_script_rule_that_matches_nothing ... ok
+test solve_checkpoint_and_metrics_smoke ... ok
+test i16_storage_solve_converges_and_checkpoint_round_trips ... ok
+test report_csv_header_is_the_union_of_boards_root_actions ... ok
+test report_warns_once_about_a_rule_unmatched_on_every_board ... ok
+test report_prints_no_warning_for_a_rule_that_matches_on_some_boards ... ok
+test inspect_smoke ... ok
+test mixed_i16_storage_solve_converges_and_checkpoint_round_trips ... ok
+test report_smoke ... ok
+test postflop_publishes_through_the_artifact ... ok
+test resume_equivalence_postflop ... ok
+test sol_export_and_inspect_smoke ... ok
+test postflop_compare_reports_zero_against_itself ... ok
+test validate_resources_sizes_the_default_surface_tree ... ok
+test validate_accepts_the_full_surface_fixture ... ok
+
+test result: ok. 26 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 6.24s
+
+     Running tests/gtow_limp_reference.rs (target/debug/deps/gtow_limp_reference-5777286c362e5432)
+
+running 2 tests
+test limp_fixture_jam_has_no_nonjam_iso_and_open_branch_is_unchanged ... ok
+test limp_fixture_has_bb_three_and_five_iso_menus_and_sb_responses ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/gtow_partial_reference.rs (target/debug/deps/gtow_partial_reference-fd88a79bfc0833bf)
+
+running 3 tests
+test tracked_fixture_keeps_four_raise_caps_and_256_postflop_buckets ... ok
+test jam_and_btn_blind_branches_retain_the_observed_calls ... ok
+test utg_open_hj_three_bet_has_the_observed_no_cold_call_menus ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/gtow_simple_partial_reference.rs (target/debug/deps/gtow_simple_partial_reference-3842aecd0d33670b)
+
+running 4 tests
+test sb_open_bb_three_bet_has_the_observed_sb_four_bet_menu ... ok
+test simple_fixture_has_requested_caps_buckets_and_five_unopened_menus ... ok
+test co_btn_and_sb_open_jams_keep_the_next_seats_call ... ok
+test simple_fixture_matches_all_fifteen_observed_no_caller_responses ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/nlh_derive.rs (target/debug/deps/nlh_derive-4ba106a8e9ede405)
+
+running 1 test
+test saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_inputs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.08s
+
+     Running tests/nlh_examples.rs (target/debug/deps/nlh_examples-065e91ab7157bbd6)
+
+running 4 tests
+test fold_rake_refunds_the_uncalled_bet_before_charging ... ok
+test small_p2_user_examples_solve_with_one_bucket_per_street ... ok
+test small_p1_user_examples_solve ... ok
+test every_user_example_validates_and_normalizes_idempotently ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.42s
+
+     Running tests/nlh_p2.rs (target/debug/deps/nlh_p2-be8c63e02994cb26)
+
+running 2 tests
+test fixed_seed_smoke_resume_and_inspect_lifecycle ... ignored, production EHS² cache build and repeated artifact evaluation; run explicitly with --release --ignored
+test p2_validation_effective_resources_types_and_preflight_before_directory ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.66s
+
+     Running tests/nlh_phase3.rs (target/debug/deps/nlh_phase3-843bd129cdc4a58f)
+
+running 15 tests
+test compatibility_hash_ignores_meta_and_run_only ... ok
+test progress_history_uses_last_row_and_falls_back_when_unavailable ... ok
+test rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run ... ok
+test false_without_periodic_checkpoint_still_exports_but_cannot_resume ... ok
+test fold_only_checkdown_nodes_solve_save_export_inspect_and_report ... ok
+test explicit_legacy_check_every_25_resumes_with_fixed_evaluations ... ok
+test i16_saved_false_from_pf7_resumes_without_adopting_new_default ... ok
+test preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn ... ok
+test solve_resume_fork_effective_hashes_units_and_monitoring ... ok
+test finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors ... ok
+test periodic_checkpoint_and_cumulative_time_limit ... ok
+test explicit_legacy_dcfr_saved_config_resumes_and_omitted_original_is_rejected ... ok
+test auto_target_resume_preserves_evaluation_schedule_and_state ... ok
+test omitted_final_checkpoint_resumes_periodic_state_with_crash_style_progress ... ok
+test spec_p1_example_validate_text_json_effective_and_resources ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.48s
+
+     Running tests/nlh_phase4.rs (target/debug/deps/nlh_phase4-e0ef5849f5cbcd12)
+
+running 3 tests
+test no_rivers_artifact_can_resolve_decimal_history_with_icm_and_asymmetric_stacks ... ok
+test exports_inspection_report_and_comparison_use_bb ... ok
+test spec_p1_example_human_output_is_readable_and_pinned ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.08s
+
+     Running tests/postflop_contract.rs (target/debug/deps/postflop_contract-8c0e8ba3c0bf5eae)
+
+running 10 tests
+test solution_uses_compact_format_version_2 ... ok
+test checkpoint_events_do_not_repeat_the_final_iteration ... ok
+test convergence_claim_depends_on_economics ... ok
+test validate_and_solve_reject_the_same_invalid_inputs ... ok
+test resume_preserves_storage_streets_and_cumulative_time ... ok
+test mixed_resume_preserves_storage_streets_and_cumulative_time ... ok
+test resume_republishes_solution_and_summary_in_place_and_on_fork ... ok
+test inspect_equity_tracks_the_current_board_and_invalidates_cached_values ... ok
+test saved_ev_keeps_original_baseline_and_utility_units ... ok
+test report_honors_time_budget ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+
+     Running unittests src/main.rs (target/debug/deps/solversd-f3b7787e83e95a2f)
+
+running 17 tests
+test jobs::tests::child_process_helper ... ignored, spawned explicitly by the queue test
+test api::tests::content_types_follow_the_file_kind ... ok
+test api::tests::a_validation_error_naming_a_missing_file_is_classified_as_not_self_contained ... ok
+test api::tests::only_contract_file_names_are_artifacts ... ok
+test jobs::tests::cancelling_an_unknown_job_says_so ... ok
+test http::tests::query_values_are_read_by_name ... ok
+test jobs::tests::cancelling_a_queued_job_removes_it_without_signalling ... ok
+test runs::tests::ids_that_escape_the_root_are_refused ... ok
+test tls::tests::a_public_bind_without_tls_is_refused ... ok
+test tests::generated_tokens_are_long_and_not_repeated ... ok
+test tls::tests::loopback_addresses_are_recognized ... ok
+test jobs::tests::submissions_past_the_limit_are_queued ... ok
+test runs::tests::allocate_refuses_an_existing_id_and_generates_a_free_one ... ok
+test runs::tests::an_abandoned_run_is_reported_as_interrupted ... ok
+test runs::tests::hu_elapsed_time_uses_the_metrics_row_field ... ok
+test runs::tests::listing_reports_each_run_directory_once ... ok
+test tls::tests::an_unresolvable_bind_is_an_error ... ok
+
+test result: ok. 16 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/http_api.rs (target/debug/deps/http_api-008084cdeaf4a01f)
+
+running 15 tests
+test unknown_runs_and_routes_report_not_found ... ok
+test a_request_without_the_token_is_refused ... ok
+test a_config_that_names_a_file_is_refused_as_not_self_contained ... ok
+test an_invalid_config_is_refused_before_a_run_directory_exists ... ok
+test a_run_past_the_limit_is_queued_and_visible ... ok
+test an_artifact_outside_the_contract_is_not_found ... ok
+test a_submitted_config_becomes_a_run_directory ... ok
+test cancelling_a_finished_run_is_a_conflict ... ok
+test a_missing_artifact_is_reported_as_unavailable ... ok
+test a_solution_view_of_a_run_without_one_is_unavailable ... ok
+test artifacts_are_listed_and_downloadable_by_contract_name ... ok
+test events_resume_from_the_offset_the_previous_page_reported ... ok
+test a_duplicate_run_id_is_a_conflict ... ok
+test a_restart_picks_up_a_run_that_was_still_queued ... ok
+test the_listing_reports_every_run_the_root_holds ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running unittests src/lib.rs (target/debug/deps/economics-6d7cf941795ba188)
+
+running 26 tests
+test config::tests::icm_sample_minimum_applies_only_to_sampled_fields ... ok
+test icm::tests::cached_baseline_matches_direct_delta_and_outside_stack_matters ... ok
+test icm::tests::exact_heads_up_matches_chip_fraction ... ok
+test icm::tests::exact_mode_does_not_require_monte_carlo_samples ... ok
+test icm::tests::exact_zero_stacks_split_remaining_places ... ok
+test icm::tests::prepared_race_memory_matches_the_runtime_buffer_layout ... ok
+test icm::tests::field_above_ten_thousand_is_rejected ... ok
+test icm::tests::sampled_mode_rejects_fewer_than_two_samples ... ok
+test icm::tests::simultaneous_busts_use_starting_stack_and_split_ties ... ok
+test icm::tests::outside_stack_compression_is_bounded_and_preserves_chip_mass ... ok
+test icm::tests::terminal_icm_handles_one_remaining_player ... ok
+test icm::tests::exact_three_through_seven_match_finish_order_enumeration ... ok
+test rake::tests::a_unit_larger_than_the_pot_takes_at_most_the_pot ... ok
+test rake::tests::generic_rake_honors_main_first_allocation_and_rounding ... ok
+test rake::tests::half_bb_units_round_then_cap_without_rounding_the_cap ... ok
+test rake::tests::rake_is_capped_and_conserved ... ok
+test rake::tests::no_flop_no_drop_skips_rake ... ok
+test icm::tests::oversized_prepared_race_memory_is_rejected_before_allocation ... ok
+test rake_condition::tests::is_never_detects_an_unsatisfiable_condition ... ok
+test rake_condition::tests::boolean_and_integer_conditions_compile_to_a_truth_table ... ok
+test icm::tests::ten_thousand_player_prepared_field_smoke_test ... ok
+test icm::tests::one_hundred_player_sample_smoke_test ... ok
+test icm::tests::exact_boundary_is_fifteen_players ... ok
+test icm::tests::prepared_large_field_reuses_identical_races_for_zero_delta ... ok
+test icm::tests::sampled_mode_is_deterministic_and_reports_error ... ok
+test icm::tests::prepared_large_field_is_deterministic_and_preserves_table_chip_effect ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src/lib.rs (target/debug/deps/hu_engine-41e4b50f2801f4f1)
+
+running 31 tests
+test reach::tests::pair_subtrees_identical_trees_pair_fully ... ok
+test reach::tests::pair_subtrees_extra_child_errs_with_useful_message ... ok
+test reach::tests::parent_array_and_path_on_two_level_tree ... ok
+test reach::tests::reach_at_through_mask_deal_zeroes_masked_entries_for_both_players ... ok
+test reach::tests::reach_at_root_is_root_ranges ... ok
+test reach::tests::reach_at_through_one_action_node_scales_acting_player_only ... ok
+test reach::tests::reach_at_through_transition_deal_matches_apply_forward ... ok
+test schedule::tests::cfr_plus_is_linear_weighting ... ok
+test schedule::tests::dcfr_default_parameters ... ok
+test schedule::tests::hs_dcfr_needs_budget ... ok
+test schedule::tests::power_of_4_reset ... ok
+test solver::loop_tests::all_zero_matches_the_scalar_test ... ok
+test solver::loop_tests::mul_into_matches_indexed_products ... ok
+test storage::release_tests::release_returns_all_regret_capacity_including_empty_storage ... ok
+test solver::dead_subtree_tests::nonzero_subnormal_opponent_reach_is_evaluated ... ok
+test storage::tests::bytes_for_i16_smaller_than_f32 ... ok
+test storage::tests::f32_scale_all_scales_arrays ... ok
+test storage::tests::i16_quantization_round_trips_approximately ... ok
+test storage::tests::i16_scale_all_scales_dequantized_values ... ok
+test storage::tests::i16_view_split_matches_direct_ops ... ok
+test storage::tests::i16_state_round_trip ... ok
+test storage::tests::mixed_view_split_matches_direct_ops ... ok
+test storage::tests::view_split_matches_direct_ops ... ok
+test tree::tests::spans_tile_across_chance_subtree ... ok
+test storage::precision_tests::f32_normalization_all_backends_and_views ... ok
+test storage::tests::prefault_keeps_arena_zero ... ok
+test storage::tests::mixed_ops_match_i16_regrets_and_f32_sums_bitwise ... ok
+test solver::dead_subtree_tests::zero_opponent_pass_keeps_parallel_updates ... ok
+test solver::sibling_tests::sibling_rows_default_pruning_empty_dimensions_and_parallel_actions ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_f32_matches_full_walk ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_i16_matches_full_walk ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.74s
+
+     Running tests/dimension_changing_transitions.rs (target/debug/deps/dimension_changing_transitions-799eb9aedb0a8598)
+
+running 4 tests
+test asymmetric_dims_run_without_panicking_and_converge ... ok
+test merge_split_differential_solver ... ok
+test asymmetric_dims_mcsolver_runs_without_panicking ... ok
+test merge_split_differential_mcsolver ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/parallel.rs (target/debug/deps/parallel-d7053c6f794270e9)
+
+running 1 test
+test parallel_chance_fanout_is_bitwise_deterministic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/vector_determinism.rs (target/debug/deps/vector_determinism-14aa1f8c2a6a5bee)
+
+running 5 tests
+test empty_private_spaces_preserve_traversal ... ok
+test action_and_fused_values_i16 ... ok
+test action_and_fused_values_f32 ... ok
+test mixed_storage_action_and_chance_values ... ok
+test mixed_transition_chance_and_nested_actions ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 28.42s
+
+     Running unittests src/lib.rs (target/debug/deps/hu_postflop-c7521d7664c02b32)
+
+running 59 tests
+test artifact::tests::river_resolve_accuracy ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test artifact::tests::strategy_batches_bound_elements_and_skip_unstored_nodes ... ok
+test game::payoff::tests::chip_ev_is_zero_sum ... ok
+test checkpoint::tests::rejects_pre_compact_versions_before_decoding ... ok
+test game::payoff::tests::icm_conserves_prize_pool_across_stack_splits ... ok
+test game::payoff::tests::is_zero_sum_matches_free_rake_and_affine_utility ... ok
+test game::payoff::tests::hu_icm_is_affine_in_chip_ev ... ok
+test game::payoff::tests::gg_preflop_rake_semantics ... ok
+test game::payoff::tests::rake_breaks_zero_sum ... ok
+test hands::tests::combo_card_table_matches_nlh ... ok
+test prepare::tests::compression_budget_counts_streamed_strategies_as_payload ... ok
+test kernel::tests::support_keeps_every_positive_weight_and_has_global_round_trip ... ok
+test run::tests::adaptive_schedule_is_bounded_and_uses_only_evaluations ... ok
+test checkpoint::tests::write_is_atomic_leaves_no_tmp_file_behind ... ok
+test checkpoint::tests::round_trip_i16 ... ok
+test checkpoint::tests::rejects_bad_magic ... ok
+test checkpoint::tests::round_trip_f32 ... ok
+test sol::tests::dequantize_rejects_wrong_length ... ok
+test run::tests::parallel_finalization_requires_a_save_and_room_for_both_codecs ... ok
+test checkpoint::tests::rejects_truncated_header ... ok
+test checkpoint::tests::rejects_bad_version ... ok
+test checkpoint::tests::common_input_round_trip_preserves_config_and_elapsed_time ... ok
+test checkpoint::tests::rejects_truncated_payload ... ok
+test checkpoint::tests::raw_f32_preserves_signed_zero_and_nan_bits ... ok
+test sol::tests::quantize_dequantize_round_trip ... ok
+test checkpoint::tests::direct_reader_rejects_wrong_backend_or_lengths_before_writing ... ok
+test sol::tests::rejects_pre_compact_versions_before_decoding ... ok
+test sol::tests::value_quantization_round_trips_within_tolerance ... ok
+test viewer::tests::previous_aggressor_carries_the_turns_ip_bettor_into_river_entry ... ok
+test viewer::tests::previous_aggressor_is_none_when_the_turn_checks_through ... ok
+test run::tests::progress_values_round_trip_without_changing_schedule_inputs ... ok
+test kernel::tests::f32_synthetic_kernels_close ... ok
+test sol::tests::bulk_strategy_bytes_match_postcard_at_varint_boundaries ... ok
+test checkpoint::tests::rejects_corruption_and_trailing_bytes_even_in_valid_zstd_frames ... ok
+test checkpoint::tests::mixed_roundtrip_and_all_backend_mismatches_rejected_before_writing ... ok
+test postflop::tests::every_member_of_a_merged_class_has_the_representative_board_facts ... ok
+test sol::tests::rejects_bad_magic ... ok
+test sol::tests::round_trip ... ok
+test sol::tests::rejects_bad_version ... ok
+test sol::tests::rejects_truncated_header ... ok
+test sol::tests::rejects_hash_mismatch ... ok
+test sol::tests::rejects_truncated_payload ... ok
+test checkpoint::tests::direct_resume_all_backends_bit_identical_after_iterations ... ok
+test kernel::tests::asymmetric_fractional_support_matches_dense_kernels_bitwise ... ok
+test checkpoint::tests::atomic_replacement_and_failed_save_preserve_the_previous_file ... ok
+test artifact::tests::full_mode_forced_on_river_start_config ... ok
+test artifact::tests::stored_values_aggregate_to_the_reported_root_ev ... ok
+test artifact::tests::unreachable_hands_are_stored_as_zero ... ok
+test artifact::tests::round_trip_and_sol_provider_no_rivers_f32 ... ok
+test artifact::tests::stored_values_cover_exactly_the_stored_strategy_nodes ... ok
+test artifact::tests::i16_export_dequantizes_to_valid_distributions ... ok
+test artifact::tests::v1_river_resolve_uses_embedded_vanilla_and_i16 ... ok
+test sol::tests::field_stream_matches_whole_payload_and_compressed_file ... ok
+test sol::tests::bulk_value_bytes_match_postcard_at_varint_boundaries ... ok
+test postflop::precision_tests::f32_real_terminals_close_and_eval_stays_exact ... ok
+test postflop::precision_tests::siblings_match_separate_calls_cover_live_hands_and_zero_dead_entries ... ok
+test artifact::tests::streamed_strategies_match_ev_pass_and_whole_payload_bits ... ok
+test postflop::precision_tests::weighted_showdown_matches_head_f32_and_f64_on_real_boards ... ok
+test postflop::precision_tests::precision_all_backends_deterministic_and_saved_ev_exact ... ok
+
+test result: ok. 58 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 6.35s
+
+     Running tests/aggregate.rs (target/debug/deps/aggregate-71e1328b6a9af867)
+
+running 6 tests
+test flop_equity_sanity_aa_vs_kk ... ignored, ~1,176 flop runouts; CI runs it in release
+test class_mapping_goldens ... ok
+test class_weights_matches_range_total ... ok
+test class_average_weighted_by_range ... ok
+test river_equity_golden_full_house_kicker ... ok
+test turn_equity_smoke_aa_qq_vs_kk ... ok
+
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/compact.rs (target/debug/deps/compact-18974cf042f50634)
+
+running 2 tests
+test queries_keep_global_combos_and_exclude_zero_weight_hands ... ok
+test runouts_mask_fixed_asymmetric_support_and_zero_dead_terminal_values ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/input.rs (target/debug/deps/input-3beae2acbba4727a)
+
+running 22 tests
+test lowering_rejects_overflow_and_wrong_product ... ok
+test antes_bb_ante_and_straddles_are_in_the_starting_pot ... ok
+test p1_payoff_uses_the_common_rake_rounding_unit ... ok
+test sections_defaults_order_and_idempotence ... ok
+test evaluation_cadence_rejects_invalid_literals_with_contract_error_codes ... ok
+test evaluation_cadence_literals_normalize_idempotently ... ok
+test all_storage_literals_normalize_and_preserve_backend ... ok
+test line_history_constants_and_limped_previous_aggressor ... ok
+test i16_other_schedules_do_not_gain_dcfr_defaults ... ok
+test spec_p1_example_lowering_and_sizes ... ok
+test dcfr_coefficients_defaults_and_explicit_values_survive_all_input_paths ... ok
+test spr_uses_both_remaining_stacks_and_amount_variables_use_bb ... ok
+test turn_start_previous_aggressor_and_earlier_rules_skipped ... ok
+test checkdown_facing_bet_is_a_solvable_fold_node_and_later_rules_edit_it ... ok
+test strict_sections_codes_and_other_product_diagnostics ... ok
+test mixed_live_queries_and_report_match_direct_solver ... ok
+test effective_stack_allin_and_size_resolution ... ok
+test dcfr_reset_defaults_and_explicit_values_survive_all_input_paths ... ok
+test cfr_precision_contract_and_legacy_checkpoint ... ok
+test fold_check_call_rules_source_order_and_no_script ... ok
+test v1_and_scaled_legacy_trees_are_identical ... ok
+test each_tree_variable_is_evaluated_at_p1_nodes ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+     Running tests/input_economics.rs (target/debug/deps/input_economics-7fdbeab9564f80a7)
+
+running 12 tests
+test physical_ram_query_returns_positive_bytes ... ok
+test memory_peak_before_and_after_release_all_backends ... ok
+test two_player_free_chip_ev_retains_the_zero_sum_shortcut ... ok
+test actual_contributions_and_dead_money_cancel_from_reported_chip_ev ... ok
+test unequal_actual_contributions_and_ante_dead_money_set_the_ev_shift ... ok
+test rake_rounds_before_capping_on_milli_bb_grid ... ok
+test memory_auto_explicit_boundary_and_overflow ... ok
+test rake_excludes_uncalled_wager_and_uses_table_hand_facts ... ok
+test section_value_errors_have_full_paths_and_nlh003 ... ok
+test targets_resolve_in_bb_or_prizes_and_no_default ... ok
+test section_type_errors_have_full_paths_and_nlh002 ... ok
+test chip_ev_identity_on_small_solved_spots ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/mccfr.rs (target/debug/deps/mccfr-0b0c188e5aa05a0d)
+
+running 5 tests
+test mccfr_matches_full_traversal_on_leduc ... ignored, 4M MCCFR iterations; CI runs it in release with --include-ignored
+test pruning_converges_and_never_panics ... ignored, 300k MCCFR iterations; CI runs it in release with --include-ignored
+test state_round_trip_resumes_bit_identically ... ok
+test sampled_run_is_deterministic_for_fixed_seed ... ok
+test mccfr_kuhn_matches_full_traversal_bit_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 2.14s
+
+     Running tests/oracle_diff.rs (target/debug/deps/oracle_diff-46a208407a82346f)
+
+running 3 tests
+test multistreet_engine_matches_scalar_oracle ... ignored, 200-iteration turn-tree solve is slow unoptimized; CI runs it in release
+test uniform_profiles_agree_between_engine_and_oracle ... ok
+test multistreet_engine_matches_scalar_oracle_early_iterates ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/postflop.rs (target/debug/deps/postflop-3017253ffaf005d6)
+
+running 37 tests
+test allin_runout_matches_direct_equity ... ignored, flop-starting trees run two chance deals (~6k nodes); CI runs it in release
+test flop_solve_is_zero_sum ... ignored, flop-starting trees run two chance deals (~6k nodes); CI runs it in release
+test i16_storage_matches_f32_on_small_turn_spot ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test iso_on_off_converge_to_same_value ... ignored, two 2000-iteration turn-tree solves are slow unoptimized; CI runs it in release
+test iso_quotient_matches_full_tree_per_hand ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test member_branch_matches_suit_permuted_rep_branch ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test no_bet_flop_value_full_ranges ... ignored, full-range enumeration is heavy; CI runs it in release
+test smoke_solve_3bet_pot ... ignored, perf smoke; CI runs it in release
+test tree_script_effect_checkdown_keeps_only_check ... ok
+test tree_script_effect_add_appends_a_wager_candidate ... ok
+test min_bet_refuses_to_open_below_its_own_value ... ok
+test tree_script_rule_action_kind_mismatch_is_inert ... ok
+test node_info_records_the_pot_contribution_at_each_node ... ok
+test allin_threshold_merges_a_near_max_size_into_allin ... ok
+test tree_script_effect_force_drops_fold_check_and_call_too ... ok
+test tree_script_effect_remove_strips_every_wager_of_that_kind ... ok
+test raise_levels_apply_distinct_multiples_per_level ... ok
+test raise_fractions_size_independently_of_bet_fractions ... ok
+test tree_script_effect_replace_swaps_the_wager_menu ... ok
+test sub_minimum_raise_is_bumped_to_the_minimum_full_raise ... ok
+test include_allin_adds_one_action_without_duplicating_an_already_allin_size ... ok
+test history_round_trip_uses_r_tokens_through_river_entry_state ... ok
+test matching_raise_and_bet_fractions_reproduce_shared_size_tree ... ok
+test tree_script_include_allin_applies_before_rules ... ok
+test odd_pot_terminal_payoffs_match_the_neighboring_even_pots ... ok
+test untracked_node_info_stays_empty ... ok
+test an_unset_raise_menu_reuses_the_bet_menu ... ok
+test tree_script_preflop_aggressor_drives_cbet_and_donk ... ok
+test per_node_values_at_the_root_agree_with_the_root_expected_value ... ok
+test tree_script_emptying_a_node_falls_back_to_base_actions ... ok
+test tree_script_board_predicate_selects_different_menus_on_different_runouts ... ok
+test rule_hits_are_tracked_per_rule_and_do_not_collide_across_streets ... ok
+test asymmetric_ranges_suppress_iso_merging ... ok
+test memory_usage_rule_hits_match_the_real_build ... ok
+test donk_menu_controls_oop_opening_action_after_a_called_ip_bet ... ok
+test no_bet_flop_value_matches_direct_enumeration ... ok
+test memory_usage_matches_allocated ... ok
+
+test result: ok. 29 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/rake_icm.rs (target/debug/deps/rake_icm-c490e7bf77c8a1d4)
+
+running 5 tests
+test pure_hu_icm_postflop_solve_matches_chip_ev ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test rake_cap_level_changes_strategy ... ignored, slow unoptimized; CI runs it in release with --include-ignored
+test postflop_builder_sets_zero_sum_flag ... ok
+test raked_solve_leaks_exactly_the_rake_in_aggregate ... ok
+test rake_makes_defender_call_less ... ok
+
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/river.rs (target/debug/deps/river-c745e4f91460b8f4)
+
+running 4 tests
+test clairvoyance_game_matches_closed_form ... ignored, 20k iterations is slow unoptimized; CI runs it in release
+test river_solve_is_zero_sum ... ok
+test showdown_kernel_matches_naive_mixed_board ... ok
+test showdown_kernel_matches_naive_tie_heavy_board ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.77s
+
+     Running tests/storage_backends.rs (target/debug/deps/storage_backends-f82875c0449f07f2)
+
+running 23 tests
+test bytes_for_i16_smaller_than_f32_for_leduc_shape ... ok
+test released_mixed_current - should panic ... ok
+test released_f32_run - should panic ... ok
+test released_mixed_restore - should panic ... ok
+test released_f32_checkpoint - should panic ... ok
+test released_i16_run - should panic ... ok
+test released_i16_current - should panic ... ok
+test released_f32_restore - should panic ... ok
+test released_f32_current - should panic ... ok
+test released_mixed_checkpoint - should panic ... ok
+test released_mixed_run - should panic ... ok
+test released_i16_checkpoint - should panic ... ok
+test released_i16_restore - should panic ... ok
+test restore_state_rejects_wrong_variant_or_length ... ok
+test released_f32_values ... ok
+test released_mixed_values ... ok
+test released_i16_values ... ok
+test f32_state_round_trip_is_deterministic ... ok
+test mixed_state_round_trip_is_deterministic ... ok
+test i16_state_round_trip_is_deterministic ... ok
+test leduc_i16_matches_f32_at_500_iters ... ok
+test mixed_postflop_regrets_match_i16_and_threads_are_bitwise_equal ... ok
+test leduc_i16_game_value_and_exploitability ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.30s
+
+     Running tests/toy_oracle_diff.rs (target/debug/deps/toy_oracle_diff-26cb36c115cea7d7)
+
+running 3 tests
+test kuhn_engine_matches_oracle_early_iterates ... ok
+test kuhn_engine_matches_oracle ... ok
+test leduc_engine_matches_oracle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+     Running tests/toys.rs (target/debug/deps/toys-6bf90cfba4ac4f11)
+
+running 10 tests
+test zero_sum_flag_tracks_pipeline ... ok
+test kuhn_zero_sum_invariant ... ok
+test raked_game_is_not_zero_sum_and_asymmetric ... ok
+test kuhn_game_value_and_exploitability ... ok
+test pure_hu_icm_solve_matches_chip_ev_solve ... ok
+test zero_sum_fast_path_matches_general_sum_accounting ... ok
+test kuhn_equilibrium_family_membership ... ok
+test discount_schedules_beat_vanilla ... ok
+test exploitability_decreases_over_time ... ok
+test leduc_game_value_and_exploitability ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.26s
+
+     Running tests/tree_identity.rs (target/debug/deps/tree_identity-15ab462802e4e176)
+
+running 6 tests
+test river_small ... ok
+test turn_small ... ok
+test three_bet_pot_fast ... ok
+test postflop_pio_tree ... ok
+test postflop_pio_icm ... ok
+test postflop_srp20 ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.73s
+
+     Running tests/viewer.rs (target/debug/deps/viewer-3533ad8eb68f7e68)
+
+running 8 tests
+test river_entry_state_accumulates_contribution_across_two_streets ... ok
+test river_entry_state_bet_call_turn_line ... ok
+test river_entry_state_check_check_turn_line ... ok
+test river_entry_state_rejects_a_fold_and_a_short_board ... ok
+test node_streets_tags_turn_start_board_correctly ... ok
+test reach_at_matches_root_avg_strategy_column_after_a_short_solve ... ok
+test node_streets_layers_flop_turn_river_on_multi_street_board ... ok
+test river_trunk_matches_fresh_river_resolve_at_every_entry_node ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.27s
+
+     Running unittests src/lib.rs (target/debug/deps/mw_preflop-e48e05977d52ccdf)
+
+running 264 tests
+test abstraction::tests::fingerprint_depends_on_parameters ... ok
+test abstraction::tests::opponent_count_participates_in_postflop_features ... ok
+test abstraction::tests::feature_hash_is_suit_isomorphic ... ok
+test abstraction::tests::full_path_uses_every_shared_board_prefix ... ok
+test betting::tests::all_in_seat_counts_toward_the_checkdown_threshold ... ok
+test betting::tests::allin_threshold_absent_leaves_default_legal_actions_unchanged ... ok
+test betting::tests::max_betting_players_boundary_equal_count_still_gets_betting ... ok
+test betting::tests::max_betting_players_collapses_every_postflop_street_when_persistently_exceeded ... ok
+test betting::tests::folds_during_flop_betting_can_reenable_a_stricter_turn_threshold ... ok
+test betting::tests::allin_threshold_merges_a_qualifying_size_into_a_deduplicated_all_in ... ok
+test card_abstraction::buckets::tests::canonical_river_sets_count_pin ... ignored, expensive (2.6M sets x 24 perms); CI runs it in release with --include-ignored
+test betting::tests::conditional_checkdown_checks_only_button_and_folds_facing_a_bet ... ok
+test betting::tests::exact_reraise_jam_ratio_is_strict_at_one_third_and_deduplicates_all_in ... ok
+test betting::tests::preflop_open_and_isolation_sizes_are_distinct ... ok
+test card_abstraction::buckets::tests::flop_street_full_build_small_k ... ignored, full-street EHS² build; CI runs it in release with --include-ignored
+test betting::tests::stack_fraction_ladder_scales_off_the_actors_maximum ... ok
+test betting::tests::tree_checkdown_skips_a_matching_street_without_decision_nodes ... ok
+test betting::tests::later_matching_edits_decide_whether_checkdown_turn_is_elided ... ok
+test betting::tests::min_raise_size_emits_exactly_the_minimum_full_raise_target ... ok
+test card_abstraction::buckets::tests::load_rejects_bad_magic ... ok
+test card_abstraction::buckets::tests::load_rejects_bad_version ... ok
+test card_abstraction::cache::tests::the_file_name_carries_the_bucket_counts_and_format_version ... ok
+test card_abstraction::ehs::tests::royal_flush_is_the_strict_nuts ... ok
+test card_abstraction::ehs::tests::ehs2_on_river_matches_hand_strength_exactly ... ok
+test card_abstraction::ehs::tests::board_plays_for_every_live_combo ... ok
+test checkpoint::tests::impossible_raw_reservation_fails_gracefully ... ok
+test checkpoint::tests::checkpoint_version_below_minimum_supported_is_rejected ... ok
+test config::tests::ehs2_table_rejects_active_opponent_bucket_overrides ... ok
+test config::tests::allin_threshold_validation_rejects_zero_above_one_and_nan ... ok
+test config::tests::default_config_toml_and_behavior_are_unchanged_by_new_size_variants ... ok
+test config::tests::default_abstraction_kind_is_rollout_kmeans_and_is_omitted_from_serialization ... ok
+test config::tests::default_recall_mode_is_full_and_is_omitted_from_serialization ... ok
+test config::tests::max_betting_players_rejects_zero_and_preflop ... ok
+test config::tests::max_betting_players_seat_override_must_match_the_table ... ok
+test config::tests::rejects_bad_button_empty_range_and_unknown_fields ... ok
+test config::tests::min_raise_and_stack_fraction_sizes_validate_and_round_trip ... ok
+test config::tests::exact_reraise_jam_ratio_validates_round_trips_and_conflicts_are_rejected ... ok
+test config::tests::max_betting_players_absent_field_serializes_byte_identically ... ok
+test config::tests::rollout_training_parameters_are_validated_and_ehs2_rejects_nondefaults ... ok
+test config::tests::minimal_three_seat_config_applies_defaults_and_round_trips ... ok
+test config::tests::rollout_training_defaults_are_omitted_and_nondefaults_round_trip ... ok
+test config::tests::stack_fraction_rejects_nonpositive_or_nonfinite_values ... ok
+test config::tests::validated_config_uses_thousand_chips_per_bb ... ok
+test config::tests::tournament_field_and_rake_are_validated_together ... ok
+test config::tests::validates_seat_betting_and_opponent_bucket_overrides ... ok
+test holdem::tests::abstraction_settings_do_not_change_game_identity ... ok
+test holdem::tests::actor_specific_betting_profile_overrides_global_sizes ... ok
+test derive::tests::unvisited_has_zero_weight_and_reports_classes ... ok
+test holdem::tests::adapter_generates_three_seat_root_and_structured_actions ... ok
+test holdem::tests::future_runout_never_enters_preflop_or_flop_private_info ... ok
+test checkpoint::tests::v7_round_trips_self_contained_config_and_runtime_state ... ok
+test checkpoint::tests::truncated_chunk_payload_is_rejected ... ok
+test holdem::tests::vector_terminal_utilities_are_constant_for_uncontested_pots ... ok
+test holdem::tests::vector_terminal_utilities_match_scalar_settlement_for_several_combos ... ok
+test checkpoint::tests::compatibility_hashes_are_enforced_before_payload_decode ... ok
+test holdem::tests::p2_settlement_uses_the_common_rake_rounding_unit ... ok
+test metrics::tests::row_round_trips_without_heads_up_names ... ok
+test metrics::tests::progress_rows_without_policy_coverage_remain_readable ... ok
+test mwsol::tests::borrowed_v4_metadata_has_identical_postcard_wire_bytes ... ok
+test metrics::tests::progress_writer_assigns_monotonic_event_sequences ... ok
+test mwsol::tests::counting_hash_writer_handles_short_writes_and_io_errors ... ok
+test mwsol::tests::compact_history_trie_resolves_and_is_integrity_checked ... ok
+test mwsol::tests::an_unselected_corrupt_frame_does_not_expand_but_fails_when_selected ... ok
+test mwsol::tests::failed_write_preserves_existing_artifact ... ok
+test mwsol::tests::i16_storage_is_rejected_by_v4 ... ok
+test checkpoint::tests::checkpoint_version_5_loads_with_prune_defaulted_to_false ... ok
+test mwsol::tests::declared_decompression_lengths_and_limits_are_enforced ... ok
+test checkpoint::tests::declared_uncompressed_size_is_bounded_before_table_allocation ... ok
+test mwsol::tests::indexed_artifact_round_trips_and_pages_selected_frames ... ok
+test mwsol::tests::quantize_i16_sums_exactly_and_stays_non_negative ... ok
+test checkpoint::tests::chunk_offsets_are_validated_even_with_a_valid_table_checksum ... ok
+test mwsol::tests::rejects_unsorted_or_unmarked_profiles ... ok
+test mwsol::tests::shared_quantizer_matches_the_previous_wire_algorithm ... ok
+test mwsol::tests::strategy_limit_is_derived_from_two_gibibyte_index_budget ... ok
+test mwsol::tests::oversized_header_count_is_rejected_before_index_access ... ok
+test mwsol::tests::version_one_is_explicitly_unsupported ... ok
+test mwsol::tests::index_offsets_are_checked_even_with_a_valid_index_checksum ... ok
+test mwsol::tests::legacy_versions_remain_readable_behind_the_migration_gate ... ok
+test mwsol::tests::u16_storage_round_trips_and_uses_the_full_denominator ... ok
+test checkpoint::tests::streaming_decode_checks_whole_payload_checksum ... ok
+test mwsol::tests::truncation_and_trailing_bytes_are_rejected_by_exact_file_length ... ok
+test prepare::tests::resource_refusals_name_the_actual_limit ... ok
+test mwsol::tests::metadata_and_index_corruption_are_detected_before_strategy_reads ... ok
+test card_abstraction::ehs::tests::ehs2_turn_matches_independent_brute_force_loop ... ok
+test prepare::tests::node_limited_measurement_retains_only_partial_hits ... ok
+test checkpoint::tests::checkpoint_round_trips_non_default_prune_fields ... ok
+test run::tests::artifact_destination_aliases_and_implicit_checkpoint_collisions_are_rejected ... ok
+test run::tests::artifact_destinations_must_be_pairwise_distinct ... ok
+test run::tests::checkpoint_progress_uses_current_counters_without_quality_estimates ... ok
+test run::tests::implicit_checkpoint_is_reserved_for_resource_limits ... ok
+test run::tests::operational_boundaries_are_prioritized_and_checkpoint_needs_a_sink ... ok
+test sampler::tests::sampler_throughput_benchmark ... ignored, manual release-mode sampler throughput benchmark
+test sampler::tests::incompatible_ranges_fail_exact_preflight ... ok
+test sampler::tests::hole_combo_rejects_an_unoccupied_fixed_slot - should panic ... ok
+test sampler::tests::validates_manually_constructed_worlds ... ok
+test sampler::tests::feasible_but_impractical_ranges_fail_deterministic_pilot ... ok
+test session::tests::boundaries_are_positive_and_repeat ... ok
+test sampler::tests::uniform_nine_way_world_has_twenty_three_unique_cards ... ok
+test prepare::tests::forced_root_turns_and_later_matching_rules_record_hits ... ok
+test mwsol::tests::deep_history_trie_validation_is_stack_safe_and_linear_after_sorting ... ok
+test checkpoint::tests::checkpoint_version_6_streams_owned_fields_across_chunks ... ok
+test mwsol::tests::index_chunks_have_bounded_tail_and_f32_u16_decode_same_profiles ... ok
+test prepare::tests::hits_count_conditions_even_without_menu_changes_and_at_forced_turns ... ok
+test sampler::tests::seeded_sampling_is_reproducible ... ok
+test checkpoint::tests::chunk_checksum_identifies_corrupted_chunk ... ok
+test derive::tests::synthetic_solution_without_blocks_refuses_empty_surviving_range ... ok
+test checkpoint::tests::identical_state_produces_identical_checkpoint_bytes ... ok
+test session::tests::stop_check_requires_variance_samples_and_rejects_sequence_overflow ... ok
+test solver::eval::deviator_visit_counter_tests::deviator_training_visit_overflow_is_explicit_before_local_regret_updates ... ok
+test solver::eval::deviator_visit_counter_tests::deviator_training_visits_advance_beyond_the_old_u32_limit ... ok
+test solver::eval::estimate_tests::borrowed_views_match_owned_strategy_arithmetic ... ok
+test derive::tests::own_action_product_preserves_combo_weights_and_missing_probability ... ok
+test checkpoint::tests::streaming_decode_checks_unconsumed_chunks_even_after_codec_failure ... ok
+test solver::eval::estimate_tests::evaluation_policy_source_requires_valid_observed_average_mass ... ok
+test solver::eval::estimate_tests::duplicate_candidate_keeps_diagnostic_and_widens_for_selection ... ok
+test solver::eval::estimate_tests::paired_profile_action_matches_the_existing_sampler_without_a_fixed_action ... ok
+test solver::eval::estimate_tests::fixed_candidate_action_consumes_one_draw_and_keeps_shared_prefix_aligned ... ok
+test solver::eval::estimate_tests::simultaneous_envelope_clamps_the_no_deviation_option_at_zero ... ok
+test solver::eval::estimate_tests::simultaneous_envelope_is_candidate_order_invariant ... ok
+test solver::eval::estimate_tests::simultaneous_envelope_retains_lower_mean_high_variance_upper ... ok
+test solver::snapshot::allocation_tests::snapshot_scratch_rejects_length_overflow_and_impossible_reservation ... ok
+test session::tests::progress_policy_coverage_reports_only_the_held_out_baseline ... ok
+test solver::dense_merge_tests::dense_merge_late_invalid_column_or_shape_restores_prior_events ... ok
+test session::tests::stop_target_includes_equality_at_the_upper_bound ... ok
+test sampler::tests::optimized_deck_path_matches_legacy_seed_streams ... ok
+test solver::dense_merge_tests::dense_merge_late_slot_overflow_preserves_entire_state ... ok
+test solver::tests::candidate_coverage_attributes_visits_to_each_street ... ok
+test solver::tests::coverage_without_street_counters_deserializes_with_zero_defaults ... ok
+test solver::tests::candidate_coverage_reports_uniform_fallback_without_stored_policies ... ok
+test solver::tests::candidate_coverage_distinguishes_average_mass_and_regret_fallback_by_street ... ok
+test solver::tests::dense_vector_delta_keeps_regret_events_before_average_events ... ok
+test solver::tests::batched_discount_scales_regret_and_strategy_at_cadence ... ok
+test solver::eval::estimate_tests::common_action_stream_eliminates_shared_prefix_noise_from_paired_gain ... ok
+test solver::dense_merge_tests::dense_merge_success_matches_ordered_rounding_floor_discount_and_touched_reference ... ok
+test solver::tests::dominated_action_disappears_from_current_and_average_policy ... ok
+test solver::tests::candidate_coverage_dense_zero_average_mass_is_regret_fallback ... ok
+test solver::dense_merge_tests::dense_merge_strategy_overflow_reverses_overlapping_events_and_floor ... ok
+test solver::tests::exploration_corrects_regret_updates_below_sampled_opponent_actions ... ok
+test solver::tests::drift_tests::compact_drift_rejects_different_configuration_until_explicit_reset ... ok
+test solver::tests::evaluate_with_rejects_mismatched_deviator_slices ... ok
+test checkpoint::tests::chunked_checkpoint_round_trips_multiple_chunks_and_overwrites ... ok
+test solver::tests::drift_tests::compact_drift_preserves_four_street_refresh ... ok
+test solver::tests::history_keys_are_stable_and_action_sensitive ... ok
+test session::tests::stop_checks_use_fresh_held_out_batches_and_resume_the_sequence ... ok
+test solver::tests::independent_action_substream_ignores_deal_rng_consumption ... ok
+test solver::tests::independent_average_pass_tracks_temporal_own_strategy_and_samples_zero_opponent_actions ... ok
+test solver::tests::evaluate_with_none_matches_plain_evaluation ... ok
+test derive::tests::formatting_preserves_nonuniform_starting_combos_and_roundtrips ... ok
+test solver::tests::interruptible_parallel_run_polls_boundaries_and_preserves_determinism ... ok
+test solver::tests::observed_sweep_batches_report_committed_state_without_changing_results ... ok
+test solver::tests::node_children_and_strategies_at_expose_a_live_average_profile ... ok
+test run::tests::typed_stop_rule_distinguishes_target_reached_from_sweep_limit ... ok
+test solver::tests::held_out_profile_evaluation_is_deterministic_and_read_only ... ok
+test solver::tests::production_preallocation_rejects_full_recall_before_any_traversal ... ok
+test solver::dense_merge_tests::dense_merge_first_slot_or_first_event_failure_leaves_unprocessed_values_alone ... ok
+test solver::tests::production_preallocation_obeys_the_exact_arena_byte_boundary ... ok
+test solver::tests::drift_tests::compact_drift_keeps_first_seen_zero_columns_and_fallbacks_across_streets ... ok
+test solver::tests::prune_requires_street_recall ... ok
+test solver::tests::prune_requires_vector_traverser ... ok
+test solver::tests::prune_skip_probability_must_be_in_unit_range ... ok
+test solver::tests::prune_threshold_must_be_finite_and_negative ... ok
+test derive::tests::forced_checkdown_turns_need_no_decision_node ... ok
+test holdem::tests::vector_terminal_utilities_fast_path_matches_reference_randomized ... ok
+test solver::tests::production_resume_rejects_duplicate_dense_checkpoint_entries ... ok
+test solver::tests::purify_strategy_zeroes_and_renormalizes ... ok
+test solver::tests::purify_threshold_out_of_range_is_rejected ... ok
+test solver::dense_merge_tests::dense_merge_preflights_late_seat_identity_and_all_counter_increments ... ok
+test solver::tests::pruned_bucket_action_gets_no_update_and_others_are_unchanged ... ok
+test solver::tests::purified_evaluation_with_zero_threshold_is_byte_identical ... ok
+test solver::tests::ordered_deltas_make_thread_counts_and_resume_bit_identical ... ok
+test solver::tests::restore_rejects_algorithm_changes_even_when_memory_limit_changes ... ok
+test solver::tests::resume_rejects_inconsistent_sample_id ... ok
+test solver::tests::resume_rejects_mismatched_sweep_batch ... ok
+test solver::tests::resume_rejects_pre_conditional_weight_solver_state ... ok
+test solver::tests::drift_tests::compact_drift_resume_seeds_the_checkpoint_profile_before_training ... ok
+test solver::tests::resume_rejects_street_only_bucket_cache_solver_state ... ok
+test solver::tests::resume_rejects_mismatched_traverser_vector ... ok
+test solver::tests::abstraction_fingerprint_domain_separates_street_recall ... ok
+test solver::tests::resource_limit_state_resumes_with_a_larger_operational_limit ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_rejects_duplicate_dense_key_prefix_and_invalid_ancestor ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_rejects_touched_count_mismatch_before_serializing_a_length ... ok
+test solver::tests::prune_disabled_is_byte_identical ... ok
+test checkpoint::tests::streaming_payload_spans_numeric_and_string_boundaries_with_bounded_staging ... ok
+test solver::tests::drift_tests::compact_drift_matches_dense_growth_and_stable_refresh_bits ... ok
+test solver::tests::street_recall_discount_fires_and_matches_pinned_arithmetic ... ok
+test solver::tests::production_resume_rebuilds_and_commits_the_complete_arena_before_returning ... ok
+test solver::tests::stopping_and_restarting_on_a_full_batch_boundary_preserves_state ... ok
+test solver::tests::street_recall_node_children_and_strategies_at_use_the_enumerated_tree ... ok
+test solver::tests::strategy_mass_differs_across_buckets_after_a_short_solve ... ok
+test solver::tests::street_recall_preflight_fails_before_allocating_when_memory_limit_is_tiny ... ok
+test solver::tests::street_recall_checkpoint_round_trip_and_resume ... ok
+test solver::tests::parallel_initialization_rejects_zero_threads_and_insufficient_resume_memory ... ok
+test solver::tests::street_recall_snapshot_info_keys_carry_unreached_in_noncurrent_slots ... ok
+test solver::tests::street_recall_reproduces_the_dominated_choice_trajectory ... ok
+test solver::tests::purified_evaluation_runs_and_stays_finite ... ok
+test solver::tests::real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street ... ok
+test solver::tests::street_recall_is_deterministic_across_thread_counts ... ok
+test solver::tests::street_recall_sweep_batch_one_and_four_are_each_internally_consistent ... ok
+test solver::tests::prune_with_unreachable_threshold_is_byte_identical ... ok
+test solver::tests::sweep_batching_is_bit_identical_across_thread_counts ... ok
+test solver::tests::vector_conditional_weights_match_the_scalar_chance_expectation ... ok
+test solver::tests::train_deviator_is_deterministic ... ok
+test solver::tests::vector_traverser_hand_updates_exceed_one_and_matches_scalar_metrics_shape ... ok
+test solver::tests::sweep_batching_reduces_regret_comparably_to_unbatched ... ok
+test session::tests::typed_production_sessions_and_resume_preserve_thread_independent_state ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_trained_dense_and_scalar_resume_exactly ... ok
+test solver::tests::vector_traverser_rejects_full_recall_game ... ok
+test solver::tests::vector_traverser_checkpoint_v5_round_trip_and_resume ... ok
+test solver::tests::parallel_initialization_preserves_exact_memory_and_depth_errors ... ok
+test solver::tests::zero_sweep_batch_is_rejected ... ok
+test solver::tests::zero_target_exploration_touches_dense_column_without_regret_support ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_matches_empty_dense_and_scalar_state_and_container ... ok
+test solver::tests::vector_traverser_sweep_batch_is_internally_consistent ... ok
+test solver::tests::parallel_initialization_uses_requested_pool_instead_of_ambient_pool ... ok
+test solver::tests::visited_history_trie_resolves_stable_action_labels ... ok
+test solver::tests::street_recall_holdem_game_reaches_every_street_without_error ... ok
+test solver::dense_merge_tests::dense_merge_real_holdem_worker_deltas_match_success_reference ... ok
+test tree::tests::impossible_parallel_merge_reservation_returns_a_typed_error ... ok
+test tree::tests::impossible_policy_buffer_reservation_returns_a_typed_error ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_keeps_zero_touched_columns_and_untouched_ancestors_across_streets ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_atomic_overwrite_preserves_destination_on_snapshot_error ... ok
+test tree::tests::dense_column_count_is_rejected_before_wire_id_overflow ... ok
+test tree::tests::non_retaining_preflight_node_checkpoint_is_inclusive ... ok
+test solver::tests::vector_traverser_root_strategy_sum_is_dense_after_few_sweeps ... ok
+test tree::tests::non_retaining_preflight_obeys_exact_byte_boundary ... ok
+test tree::tests::parallel_fallback_releases_planning_states_before_serial_root ... ok
+test tree::tests::non_retaining_preflight_stops_on_byte_boundary ... ok
+test tree::tests::production_depth_guard_fails_before_unbounded_recursion ... ok
+test solver::tests::street_recall_regret_trends_down_as_sweeps_accumulate ... ok
+test tree_rules::tests::new_preflop_selectors_track_pairwise_position_participation_and_cold_calls ... ok
+test tree_rules::tests::selector_parser_supports_position_counts_flags_and_spr ... ok
+test solver::tests::parallel_initialization_holdem_matches_serial_tree_arena_and_checkpoint ... ok
+test tree::tests::enumerated_tree_node_and_terminal_counts_are_stable ... ok
+test tree::tests::preflight_fails_before_allocating_when_memory_limit_is_tiny ... ok
+test solver::tests::snapshot_tests::borrowed_snapshot_container_matches_across_compressed_chunk_boundary ... ok
+test solver::tests::vector_traverser_is_deterministic_across_thread_counts_and_reruns ... ok
+test tree::tests::configurable_node_limit_has_an_inclusive_decision_node_boundary ... ok
+test views::tests::matching_ev_cache_preserves_opaque_fields_without_rebuilding ... ok
+test solver::tests::vector_traverser_icm_smoke_test ... ok
+test tree::tests::max_betting_players_threshold_shrinks_the_enumerated_tree ... ok
+test tree::tests::ordered_parallel_enumeration_preserves_limit_and_depth_errors ... ok
+test tree::tests::ordered_parallel_enumeration_is_serial_exact_and_repeatable ... ok
+test tree::tests::arena_preflight_matches_manual_bucket_sum ... ok
+test tree::tests::column_and_slot_addressing_round_trip ... ok
+test views::tests::removed_artifact_families_are_refused_on_every_read_surface ... ok
+test solver::tests::parallel_initialization_resume_adopts_memory_and_preserves_continuation ... ok
+test tree::tests::non_retaining_preflight_matches_materialized_arena ... ok
+test tree::tests::touched_bit_is_idempotent_and_counts_once ... ok
+test checkpoint::stream::tests::decoding_many_small_fields_does_not_retain_the_whole_payload ... ok
+test solver::tests::vector_traverser_holdem_game_reaches_every_street_without_error ... ok
+test card_abstraction::ehs::tests::aa_beats_72o_in_ehs2_on_a_dry_flop ... ok
+test card_abstraction::ehs::tests::ehs2_squared_expectation_never_exceeds_linear_expectation ... ok
+test card_abstraction::buckets::tests::canonical_turn_count_pin ... ok
+test solver::tests::three_player_one_step_estimator_matches_full_enumeration_oracle ... ok
+test solver::tests::trained_deviator_finds_gain_against_a_barely_trained_profile ... ok
+test card_abstraction::buckets::tests::dead_combo_panics - should panic ... ok
+test prepare::tests::counted_and_built_hits_match_previous_walk_on_smoke_examples ... ok
+test card_abstraction::buckets::tests::monotonicity_smoke_on_a_fixed_flop ... ok
+test card_abstraction::buckets::tests::build_for_boards_suit_perm_invariance ... ok
+test card_abstraction::buckets::tests::load_rejects_mismatched_params ... ok
+test card_abstraction::buckets::tests::every_live_combo_gets_a_bucket_below_k ... ok
+test card_abstraction::buckets::tests::cache_round_trip ... ok
+test solver::tests::held_out_profile_parallelism_is_bit_identical ... ok
+test solver::tests::vector_traverser_regret_trends_down_as_sweeps_accumulate ... ok
+
+test result: ok. 261 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 6.70s
+
+     Running tests/extreme_k.rs (target/debug/deps/extreme_k-50c996512cd58255)
+
+running 2 tests
+test k1_river_is_a_single_information_free_bucket ... ok
+test extreme_small_bucket_counts_degrade_gracefully ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.35s
+
+     Running tests/nlh_input.rs (target/debug/deps/nlh_input-f5a597d1f721b2b0)
+
+running 12 tests
+test straddle_configuration_rejects_invalid_posts_without_panicking ... ok
+test common_cbet_and_donk_follow_the_preceding_street ... ok
+test default_rake_unit_preserves_fingerprints ... ok
+test economics_resources_and_algorithm_lower_with_legacy_meanings ... ok
+test p2_type_errors_keep_full_dotted_keys_and_target_is_strict ... ok
+test tree_controls_source_order_and_integer_boundaries_are_explicit ... ok
+test live_straddles_preserve_order_raise_limp_and_postflop_bb ... ok
+test scriptless_tree_has_only_passive_actions_and_sb_one_is_supported ... ok
+test spec_p2_example_defaults_normalize_idempotently_and_lower ... ok
+test product_owned_keys_and_values_have_nlh_diagnostics ... ok
+test typed_session_retains_effective_config_and_checks_resume_fingerprints ... ok
+test random_preflop_lines_agree_with_spot_facts_and_replay ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s
+
+     Running tests/nlh_tree_identity.rs (target/debug/deps/nlh_tree_identity-0f787b71a308f49d)
+
+running 12 tests
+test bench_selector ... ignored, exhaustive multi-million-node tree; run with --release --ignored
+test reference ... ignored, exhaustive multi-million-node tree; run with --release --ignored
+test reference_limp ... ignored, exhaustive multi-million-node tree; run with --release --ignored
+test reference_simple ... ignored, exhaustive multi-million-node tree; run with --release --ignored
+test full_surface_has_an_explicit_unrepresentable_first_actor_boundary ... ok
+test production_smoke ... ok
+test bench_3max_2bb ... ok
+test smoke_3max ... ok
+test bench_6max_2bb ... ok
+test fixtures_keep_the_previously_proven_full_abstraction_config ... ok
+test bench_checkdown ... ok
+test default_6max ... ok
+
+test result: ok. 8 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 2.57s
+
+     Running unittests src/lib.rs (target/debug/deps/nlh-ae43a452f8437b84)
+
+running 119 tests
+test betting::tests::lone_active_big_blind_runs_out_without_a_check_node ... ok
+test betting::tests::bba_is_posted_before_a_short_big_blind ... ok
+test betting::tests::cumulative_short_raises_reopen_at_the_absolute_threshold ... ok
+test betting::tests::participant_fields_default_when_deserializing_older_betting_state ... ok
+test betting::tests::limp_around_preserves_big_blind_option_and_all_streets_advance ... ok
+test betting::tests::forced_posts_and_action_order_cover_heads_up_and_multiway ... ok
+test board::tests::flush_possible_on_turn_with_three_of_a_suit ... ok
+test board::tests::monotone_flop ... ok
+test board::tests::high_and_low_rank_are_pinned ... ok
+test betting::tests::preflop_participants_and_non_bb_open_cold_calls_exclude_forced_posts ... ok
+test board::tests::new_panics_on_empty_board - should panic ... ok
+test board::tests::new_panics_on_repeated_card - should panic ... ok
+test board::tests::new_panics_on_too_many_cards - should panic ... ok
+test board::tests::paired_flop ... ok
+test board::tests::rainbow_flop ... ok
+test board::tests::rainbow_is_impossible_on_a_five_card_board ... ok
+test board::tests::river_texture_golden ... ok
+test board::tests::straight_ranks_ace_king_two_is_two ... ok
+test board::tests::turn_and_river_invariant_under_every_suit_permutation_exhaustive ... ignored
+test board::tests::straight_ranks_can_be_one ... ok
+test board::tests::straight_ranks_nine_seven_five_is_three ... ok
+test board::tests::two_tone_flop ... ok
+test card::tests::known_cards ... ok
+test card::tests::parse_display_roundtrip ... ok
+test card::tests::rank_name_matches_rank_chars ... ok
+test card::tests::rank_name_panics_out_of_range - should panic ... ok
+test card::tests::rejects_garbage ... ok
+test eval::tests::hand_category_ordering ... ok
+test eval::tests::kickers_matter ... ok
+test iso::tests::canonical_river_count_is_134459 ... ignored, expensive (2.6M boards x 24 perms); CI runs it in release
+test eval::tests::seven_card_uses_best_five ... ok
+test iso::tests::dead_cards_split_groups ... ok
+test iso::tests::monotone_flop_merges_offsuit_turns ... ok
+test iso::tests::paired_suits_merge ... ok
+test iso::tests::rainbow_flop_has_trivial_stabilizer_beyond_identity ... ok
+test range::tests::class_index_layout ... ok
+test iso::tests::canonicalization_is_idempotent_and_isomorphism_invariant ... ok
+test range::tests::connector_and_gapper_dash_ranges ... ok
+test range::tests::rejects_garbage ... ok
+test range::tests::random_selects_every_combo ... ok
+test range::tests::rejects_ranges_that_select_no_combos ... ok
+test range::tests::full_range ... ok
+test range::tests::class_counts ... ok
+test script::cond::tests::every_error_has_a_line_number ... ok
+test range::tests::weights ... ok
+test script::cond::tests::bool_compared_to_number_is_rejected ... ok
+test range::tests::combo_index_bijection ... ok
+test script::cond::tests::display_output_reparses_to_an_equal_condition ... ok
+test script::cond::tests::facing_pct_is_to_call_over_pot ... ok
+test script::cond::tests::not_binds_tighter_than_and ... ok
+test script::cond::tests::ordering_on_bool_is_rejected ... ok
+test script::cond::tests::bare_word_literal_matches_quoted_string ... ok
+test script::cond::tests::ordering_on_text_is_rejected ... ok
+test script::cond::tests::cbet_and_donk_and_facing_pct_at_pot_zero ... ok
+test script::cond::tests::precedence_matches_or_lowest_and_next_not_tightest ... ok
+test script::lower::tests::if_else_chain_matches_the_spec_worked_example ... ok
+test script::lower::tests::if_with_no_else_leaves_unmatched_nodes_with_no_extra_rule ... ok
+test script::cond::tests::number_var_bare_is_rejected ... ok
+test script::cond::tests::specialize_folds_board_only_conditions ... ok
+test script::cond::tests::parens_override_precedence ... ok
+test script::lower::tests::nested_when_matches_the_spec_worked_example ... ok
+test script::cond::tests::unknown_identifier_is_rejected_and_named ... ok
+test script::lower::tests::nesting_depth_of_three_ands_every_level ... ok
+test script::lower::tests::unconditioned_statement_gets_const_true ... ok
+test script::lower::tests::same_street_in_two_separate_blocks_lowers_independently ... ok
+test script::parse::tests::add_with_empty_sizes_is_accepted ... ok
+test script::parse::tests::checkdown_with_action_or_sizes_is_rejected ... ok
+test script::parse::tests::forward_reference_is_rejected ... ok
+test script::parse::tests::duplicate_street_in_one_list_is_rejected ... ok
+test script::parse::tests::param_description_is_the_comment_run_directly_above ... ok
+test script::parse::tests::errors_carry_a_plausible_line_number ... ok
+test script::parse::tests::define_is_parenthesized_when_substituted ... ok
+test script::parse::tests::reserved_name_param_is_rejected ... ok
+test script::parse::tests::remove_with_sizes_is_rejected ... ok
+test script::parse::tests::param_with_two_tokens_is_rejected ... ok
+test script::parse::tests::empty_body_is_rejected_at_every_level ... ok
+test script::parse::tests::same_street_in_two_blocks_is_accepted ... ok
+test script::parse::tests::self_reference_is_rejected ... ok
+test script::parse::tests::trailing_comment_on_the_param_line_is_not_a_description ... ok
+test script::parse::tests::reserved_name_define_is_rejected ... ok
+test script::parse::tests::param_override_replaces_the_effective_value ... ok
+test script::token::tests::comment_runs_to_end_of_line ... ok
+test script::parse::tests::type_errors_are_rejected ... ok
+test script::token::tests::non_ascii_character_errors_with_a_line_number_instead_of_being_mangled ... ok
+test script::token::tests::non_ascii_inside_a_string_or_comment_is_fine ... ok
+test script::token::tests::double_equals_wins_over_two_single_equals ... ok
+test script::token::tests::puncts_match_longest_first ... ok
+test script::parse::tests::unknown_identifier_in_a_condition_is_rejected ... ok
+test script::token::tests::hash_inside_a_string_literal_is_not_a_comment ... ok
+test script::token::tests::unterminated_string_is_an_error_at_its_start_line ... ok
+test script::parse::tests::unknown_override_key_is_rejected ... ok
+test script::token::tests::line_numbers_track_newlines_across_the_source ... ok
+test script::parse::tests::spec_complete_tree_compiles_with_the_expected_rule_shape ... ok
+test script::token::tests::word_rule_covers_identifiers_numbers_and_size_literals ... ok
+test set::tests::full_deck ... ok
+test settlement::tests::exact_cards_reject_duplicates ... ok
+test settlement::tests::side_pots_and_unmatched_top_are_exact ... ok
+test set::tests::insert_contains_remove ... ok
+test settlement::tests::ties_split_each_side_pot_and_odd_chip_starts_after_button ... ok
+test sizing::tests::a_bare_fraction_says_sizes_are_percentages ... ok
+test sizing::tests::geometric_all_in_matches_hand_computed_target ... ok
+test sizing::tests::percentages_render_short_and_exact ... ok
+test sizing::tests::rejects_bad_literals ... ok
+test settlement::tests::bba_is_common_main_pot_money_without_side_pot_credit ... ok
+test sizing::tests::round_trips_every_variant_in_bb_unit ... ok
+test sizing::tests::round_trips_every_variant_in_chips_unit ... ok
+test settlement::tests::exact_showdown_ranks_live_hands ... ok
+test sizing::tests::serde_json_shape_is_unchanged ... ok
+test table::tests::bb_conversion_uses_thousand_chip_grid ... ok
+test table::tests::seat_masks_iterate_in_table_order ... ok
+test table::tests::seat_vec_checks_table_size_and_indexes_by_seat ... ok
+test settlement::tests::folded_money_remains_in_main_and_side_pots ... ok
+test table::tests::serde_rejects_invalid_seat_primitives ... ok
+test sizing::tests::the_pre_pio_spellings_still_parse_and_normalize ... ok
+test sizing::tests::the_pio_spellings_parse ... ok
+test iso::tests::canonical_flop_count_is_1755 ... ok
+test board::tests::flop_invariant_under_every_suit_permutation ... ok
+test iso::tests::canonical_turn_count_is_16432 ... ok
+test board::tests::turn_and_river_invariant_under_strided_suit_permutation_sweep ... ok
+
+test result: ok. 117 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+     Running tests/plain_betting.rs (target/debug/deps/plain_betting-34b534728971139b)
+
+running 18 tests
+test all_in_calls_for_less_or_exactly_the_bet_are_calls ... ok
+test cumulative_short_all_ins_reopen_the_original_raiser ... ok
+test aggressors_track_each_street_and_checked_through_street_clears_history ... ok
+test antes_and_big_blind_ante_never_change_minimum_raise ... ok
+test checking_preserves_raising_rights_against_a_short_opening_all_in ... ok
+test deep_restraddle_chains_use_the_last_level_and_clockwise_order ... ok
+test full_and_short_stack_targets_must_be_written_as_all_in ... ok
+test inactive_actor_is_rejected ... ok
+test lone_active_player_cannot_raise_against_an_all_in_player ... ok
+test move_without_actor_is_rejected ... ok
+test player_yet_to_act_can_raise_over_a_non_reopening_short_all_in ... ok
+test short_all_in_does_not_reopen_an_actor_who_already_acted ... ok
+test six_max_straddles_set_preflop_price_order_and_preserve_postflop_bb ... ok
+test straddle_posts_are_to_amounts_after_blinds_and_dead_money ... ok
+test target_above_maximum_is_rejected_without_clamping ... ok
+test target_below_minimum_is_rejected_without_clamping ... ok
+test three_handed_button_straddle_acts_last ... ok
+test wrong_moves_report_the_canonical_move_and_call_amount ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/protocol-4ad205ab4be976e4)
+
+running 5 tests
+test tests::error_codes_map_to_the_statuses_clients_branch_on ... ok
+test tests::a_create_request_needs_only_a_config ... ok
+test tests::an_event_page_carries_the_offset_to_resume_from ... ok
+test tests::a_run_summary_uses_stable_camel_case_names ... ok
+test tests::solution_views_round_trip_through_their_names ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/runfiles-a62f20c7d857e36c)
+
+running 11 tests
+test hash::tests::deterministic_and_sensitive_to_bytes ... ok
+test hash::tests::hex_round_trips_through_blake3 ... ok
+test run::tests::a_finished_manifest_is_never_stale ... ok
+test run::tests::a_manifest_owned_by_a_live_process_is_not_stale ... ok
+test metrics::tests::rows_round_trip_and_append_across_writers ... ok
+test run::tests::a_running_manifest_without_its_process_reads_as_interrupted ... ok
+test run::tests::a_reopened_log_continues_the_sequence ... ok
+test run::tests::events_resume_from_a_byte_offset_without_gaps ... ok
+test run::tests::a_partial_trailing_line_is_not_returned ... ok
+test run::tests::manifest_round_trips_through_the_run_directory ... ok
+test run::tests::manifest_rewrite_leaves_no_temporary_behind ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/spot-00988efe9a10c0f3)
+
+running 3 tests
+test replay::tests::short_allin_call_refunds_uncalled_wager ... ok
+test derive::tests::base_shape_schema_and_subgrid_amounts_remain_strict ... ok
+test derive::tests::base_table_equality_uses_normalized_values_and_tree_source_is_relative ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/document.rs (target/debug/deps/document-1bfb6afde7eafda1)
+
+running 81 tests
+test ante_negative ... ok
+test antes_exclusive ... ok
+test bbante_off_grid ... ok
+test board_without_closed_preflop ... ok
+test bad_stack_override ... ok
+test bad_economics_kind ... ok
+test bad_range ... ok
+test empty_range ... ok
+test checkpoint_negative ... ok
+test cash_tournament_key ... ok
+test line_without_board ... ok
+test max_time_bad ... ok
+test memory_bad_suffix ... ok
+test max_time_zero ... ok
+test memory_fraction ... ok
+test memory_overflow ... ok
+test missing_rake_rate ... ok
+test players_wrong_type ... ok
+test memory_zero ... ok
+test rake_allocation_bad ... ok
+test rake_cap_grid ... ok
+test rake_rate_high ... ok
+test product_sections_are_raw_until_hook_validation ... ok
+test every_common_default_and_section_order ... ok
+test dotted_type_errors_for_every_common_shape ... ok
+test solver_wrong_type ... ok
+test spot_type ... ok
+test rake_rate_nan ... ok
+test sb_off_grid ... ok
+test sb_zero ... ok
+test rake_when_bad ... ok
+test straddle_bad_type ... ok
+test restraddle_too_small ... ok
+test rake_rounding_unit ... ok
+test schema_errors_and_error_rendering ... ok
+test rake_rounding_bad ... ok
+test straddle_off_grid ... ok
+test range_type ... ok
+test sb_too_big ... ok
+test straddle_ante_no_chips_left ... ok
+test threads_type ... ok
+test straddle_no_chips_left ... ok
+test threads_unknown ... ok
+test too_many_straddles ... ok
+test tournament_outside_zero ... ok
+test straddle_too_small ... ok
+test tournament_exact_seed ... ok
+test tournament_exact_samples ... ok
+test threads_zero ... ok
+test tournament_missing_payouts ... ok
+test tree_ratio_zero ... ok
+test tree_script_source_exclusive ... ok
+test tree_threshold_inf ... ok
+test tree_unknown_param ... ok
+test tree_ratio_den_missing ... ok
+test tree_param_array ... ok
+test tree_threshold_high ... ok
+test tournament_payout_order ... ok
+test tree_limit_negative ... ok
+test tournament_rake ... ok
+test tournament_too_many_prizes ... ok
+test tree_param_nonfinite ... ok
+test tree_threshold_low ... ok
+test tree_ratio_den_negative ... ok
+test spec_p2_example_is_idempotent ... ok
+test table_required_grid_and_incomplete_paths ... ok
+test unknown_keys_at_every_closed_level ... ok
+test table_sizes_heads_up_positions_and_forced_posts ... ok
+test source_is_relative_inlined_and_idempotent ... ok
+test operating_units_and_large_memory_roundtrip ... ok
+test arbitrary_positive_milli_bb_rake_units_normalize_and_invalid_units_fail ... ok
+test rake_defaults_and_variants ... ok
+test every_cash_key_explicit_and_idempotent ... ok
+test script_diagnostics_and_literal_delimiter ... ok
+test strict_size_literal_accept_reject_and_variants ... ok
+test tournament_exact_and_sampled_defaults_and_explicit ... ok
+test literal_script_comments_strings_and_initial_newlines_roundtrip ... ok
+test union_variable_names_types_and_p2_board_rejection ... ok
+test original_toml_bb_precision_is_never_rounded ... ok
+test final_checkpoint_is_a_p1_boolean_default_and_not_a_p2_key ... ok
+test non_finite_condition_literals_are_located_nlh003_errors_for_both_products ... ok
+
+test result: ok. 81 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/postflop.rs (target/debug/deps/postflop-1d42cded6e988df8)
+
+running 22 tests
+test old_schemas_have_a_dedicated_migration_message_and_unknown_params_have_a_key ... ok
+test implicit_folds_cannot_skip_a_check ... ok
+test p1_ranges_required_and_folded_positions_forbidden ... ok
+test short_allin_reopen_is_enforced_during_line_replay ... ok
+test product_hook_field_order_is_preserved ... ok
+test every_unsupported_product_case_is_explained ... ok
+test errors_name_correct_spelling ... ok
+test board_spelling_duplicates_and_count_boundaries ... ok
+test spec_btn_bb_flop_and_full_action_evidence ... ok
+test checked_street_clears_previous_aggressor_but_keeps_preflop_history ... ok
+test all_alternative_line_spellings_are_nlh004 ... ok
+test ante_and_bb_ante_dead_money_and_asymmetric_remaining_stacks ... ok
+test heads_up_limp_and_shortest_grid_amount ... ok
+test spec_turn_start_and_river_start ... ok
+test validate_summary_is_serializable_and_rules_recompile ... ok
+test every_preflop_fact_matches_legacy_postflop_definitions ... ok
+test spec_utg_btn_flop_implicit_end_folds ... ok
+test p1_ranges_filter_board_cards_and_require_disjoint_pair ... ok
+test spec_straddle_pot_and_unraised_straddler_check ... ok
+test normalized_key_order_stacks_units_empty_tables_and_meta_inline ... ok
+test positions_follow_documentation_order_and_equal_stacks_use_one_key ... ok
+test p1_accepts_every_board_variable_and_preserves_preflop_tree_settings ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+   Doc-tests cfr_ref
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests cli
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests economics
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hu_engine
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hu_postflop
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests mw_preflop
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests nlh
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests runfiles
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests spot
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

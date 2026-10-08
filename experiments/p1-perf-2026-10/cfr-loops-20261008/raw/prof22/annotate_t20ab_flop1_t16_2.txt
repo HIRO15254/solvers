@@ -1,0 +1,103 @@
+## hu_postflop::kernel::showdown_kernel_relaxed_f32
+
+Sorted summary for file /home/PC_User/prof_t20ab/release/examples/p1_bench
+----------------------------------------------
+
+   14.39 kernel.rs:234
+   13.41 kernel.rs:134
+   13.23 kernel.rs:244
+    9.53 non_null.rs:1714
+    5.97 kernel.rs:236
+    4.03 kernel.rs:235
+    4.02 kernel.rs:149
+    3.41 kernel.rs:135
+    2.95 kernel.rs:0
+    2.75 kernel.rs:132
+    2.74 kernel.rs:254
+    2.69 kernel.rs:237
+    2.00 kernel.rs:145
+    1.09 kernel.rs:162
+    0.67 kernel.rs:252
+    0.62 kernel.rs:231
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (20229 samples, percent: local period)
+## hottest instructions
+   12.23 :   de1d8:  vmovss %xmm9,0x50(%rsp,%r12,4) // kernel.rs:234
+   11.24 :   dde99:  vmovss %xmm5,0x50(%rsp,%r11,4)
+    5.05 :   de213:  vmovss %xmm8,0x128(%rsp,%r12,4)
+    3.82 :   de334:  cmp    %r13,%r11 // non_null.rs:1714
+    3.70 :   de32e:  vmovss %xmm8,(%r10,%r14,4)
+    2.92 :   de2a5:  jbe    de54b <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x76b> // kernel.rs:149
+    2.86 :   de2ff:  jbe    de500 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x720> // kernel.rs:244
+    2.75 :   dde74:  cmp    %r8,%rsi // kernel.rs:132
+    2.64 :   ddeba:  add    $0x4,%r10 // non_null.rs:1714
+    2.28 :   ddea0:  movzbl 0x3(%r10),%r8d // kernel.rs:135
+    2.18 :   de313:  mov    0x238(%rsp),%r10
+    2.07 :   de1df:  cmp    $0x3400,%r10w // kernel.rs:235
+    2.04 :   de30f:  vmulss %xmm0,%xmm8,%xmm8
+    1.74 :   de21d:  vaddss 0x128(%rsp,%r15,1),%xmm9,%xmm8 // kernel.rs:237
+    1.58 :   de386:  vmovups %ymm9,0x148(%rsp) // kernel.rs:254
+    1.46 :   de329:  vaddss %xmm9,%xmm8,%xmm8 // kernel.rs:244
+    1.41 :   de1be:  jae    de4d0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x6f0>
+    1.28 :   de202:  vmovss %xmm8,0x50(%rsp,%r15,1)
+    1.16 :   ddec5:  cmp    %rax,%r10
+    1.13 :   ddea9:  jae    de576 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x796>
+    1.13 :   dde82:  cmp    $0x34,%r11 // kernel.rs:134
+    1.12 :   de289:  jbe    de4e8 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x708>
+    1.10 :   de2b1:  movzbl %r15b,%r12d
+    1.09 :   de0bc:  vmovss %xmm8,0x128(%rsp,%r15,4) // kernel.rs:162
+    1.04 :   dde92:  vaddss 0x50(%rsp,%r11,4),%xmm4,%xmm5
+    1.01 :   de1cd:  shr    $0x8,%r15d // kernel.rs:0
+    0.99 :   de31b:  add    $0x4,%r11 // non_null.rs:1714
+    0.99 :   de2ba:  jb     de2e4 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x504> // kernel.rs:244
+    0.96 :   de227:  vmovss %xmm8,0x128(%rsp,%r15,1)
+    0.92 :   de231:  cmp    %r11,%r14 // non_null.rs:1714
+    0.91 :   de209:  vaddss 0x128(%rsp,%r12,4),%xmm9,%xmm8 // kernel.rs:236
+    0.87 :   de284:  cmp    %r14,0x30(%rsp) // kernel.rs:145
+    0.75 :   de1b9:  cmp    $0x34,%r12w // kernel.rs:234
+    0.74 :   de1f3:  vaddss %xmm7,%xmm8,%xmm7 // kernel.rs:0
+    0.69 :   de1fb:  vaddss 0x50(%rsp,%r15,1),%xmm8,%xmm8 // kernel.rs:235
+    0.67 :   de354:  vmulss %xmm7,%xmm4,%xmm7 // kernel.rs:252
+    0.67 :   de2d5:  movzbl %r15b,%r12d // kernel.rs:0
+    0.62 :   de1a6:  cmp    %r13,%rsi // kernel.rs:231
+    0.60 :   de398:  vaddps 0x168(%rsp),%ymm8,%ymm8
+    0.56 :   de34e:  vmulps 0x70(%rsp),%ymm5,%ymm9 // kernel.rs:254
+    0.53 :   de132:  vmovups %ymm6,0xf0(%rsp) // kernel.rs:0
+    0.48 :   de299:  cmp    $0xffff,%r12
+    0.48 :   de022:  mov    %r11,0x48(%rsp)
+    0.47 :   de35e:  vaddps 0x128(%rsp),%ymm8,%ymm8
+    0.46 :   de3fb:  vaddps 0x1e8(%rsp),%xmm8,%xmm8
+    0.45 :   de1ca:  mov    %r15d,%r10d
+    0.44 :   de1b5:  movzbl %r15b,%r12d
+    0.40 :   de3a1:  vaddps 0x188(%rsp),%ymm9,%ymm9
+    0.40 :   de0e2:  add    $0x4,%r11
+    0.39 :   de3e9:  vmulps 0x110(%rsp),%xmm5,%xmm8
+    0.37 :   de1ef:  vmulss %xmm3,%xmm8,%xmm9
+    0.34 :   de0b2:  vaddss 0x128(%rsp,%r15,4),%xmm7,%xmm8
+    0.31 :   de162:  cmp    %rdi,%rbx
+    0.29 :   de1d1:  vaddss 0x50(%rsp,%r12,4),%xmm8,%xmm9
+    0.28 :   de234:  jne    de1a0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x3c0>
+    0.28 :   de0c6:  movzbl 0x3(%r11),%edi
+    0.28 :   de00f:  add    $0x10,%r10
+    0.27 :   de1f7:  add    $0x4,%r11
+    0.26 :   de25c:  vaddss %xmm1,%xmm8,%xmm1
+    0.25 :   de3c5:  vmulps 0xf0(%rsp),%ymm5,%ymm9
+    0.25 :   de1e5:  jae    de4b8 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x6d8>
+    0.24 :   de2b5:  cmp    $0x34,%r12w
+    0.24 :   de19b:  nopl   0x0(%rax,%rax,1)
+    0.24 :   de05f:  cmp    %r12w,%bx
+    0.23 :   de2a0:  je     de2d0 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x4f0>
+    0.23 :   de094:  cmp    %rdi,%rsi
+    0.22 :   de109:  jmp    de129 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x349>
+    0.21 :   de13b:  vmovups %ymm6,0xd0(%rsp)
+    0.21 :   de04f:  mov    %rax,%rbx
+    0.19 :   de018:  je     de412 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x632>
+    0.18 :   de40d:  jmp    de000 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x220>
+    0.18 :   de3bc:  vmovups %ymm9,0x188(%rsp)
+    0.18 :   de2de:  jae    de533 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x753>
+    0.18 :   de280:  movzwl (%r11),%r14d
+    0.18 :   de156:  vmovups %ymm6,0x70(%rsp)
+    0.18 :   de06d:  cmp    %rdi,%rbx
+    0.17 :   de37d:  vmulps 0x90(%rsp),%ymm5,%ymm8
+    0.17 :   de1a9:  jbe    de4a5 <hu_postflop::kernel::showdown_kernel_relaxed_f32+0x6c5>
+    0.17 :   de0ef:  cmp    %r14,%r11
+    0.16 :   de144:  vmovups %ymm6,0xb0(%rsp)

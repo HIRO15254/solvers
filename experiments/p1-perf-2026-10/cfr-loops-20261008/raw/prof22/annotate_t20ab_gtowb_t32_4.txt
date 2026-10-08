@@ -1,0 +1,96 @@
+## hu_engine::storage::normalize_columns_f32
+
+Sorted summary for file /home/PC_User/prof_t20ab/release/examples/p1_bench
+----------------------------------------------
+
+   37.50 storage.rs:517
+   15.00 f32.rs:1051
+    8.64 storage.rs:535
+    6.73 storage.rs:523
+    6.70 storage.rs:518
+    4.51 storage.rs:0
+    3.72 storage.rs:528
+    3.16 storage.rs:534
+    2.51 zip.rs:308
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (17169 samples, percent: local period)
+## hottest instructions
+   17.99 :   b6217:  vmovups -0x40(%r9,%rsi,4),%ymm1 // storage.rs:517
+    9.87 :   b621e:  vmovups -0x20(%r9,%rsi,4),%ymm2
+    9.70 :   b622b:  vmaxps %ymm6,%ymm0,%ymm0 // f32.rs:1051
+    9.65 :   b6225:  vmovups (%r9,%rsi,4),%ymm3
+    7.84 :   b69a4:  vmulps 0x948(%rsp,%rsi,4),%ymm3,%ymm3
+    6.19 :   b6862:  vandps %ymm0,%ymm1,%ymm0 // storage.rs:523
+    4.51 :   b69ad:  vblendvps %ymm0,%ymm2,%ymm5,%ymm0 // storage.rs:0
+    2.15 :   b6984:  vmaskmovps -0x20(%r11,%rsi,4),%ymm0,%ymm2 // storage.rs:528
+    2.02 :   b697a:  vcmpltps 0x548(%rsp,%rsi,4),%ymm8,%ymm1 // storage.rs:534
+    1.85 :   b6991:  vmaxps %ymm8,%ymm2,%ymm2 // f32.rs:1051
+    1.57 :   b698b:  vmaskmovps (%r11,%rsi,4),%ymm1,%ymm3
+    1.45 :   b62b6:  vmaxps %xmm5,%xmm0,%xmm0 // f32.rs:1051
+    1.26 :   b625f:  vmovups %ymm0,0x528(%rsp,%rsi,4)
+    1.22 :   b6256:  vaddps 0x588(%rsp,%rsi,4),%ymm3,%ymm3
+    1.10 :   b6244:  vaddps 0x548(%rsp,%rsi,4),%ymm1,%ymm1
+    1.04 :   b624d:  vaddps 0x568(%rsp,%rsi,4),%ymm2,%ymm2
+    0.96 :   b623b:  vaddps 0x528(%rsp,%rsi,4),%ymm0,%ymm0 // storage.rs:518
+    0.95 :   b69c6:  add    $0x10,%rsi // zip.rs:308
+    0.80 :   b699b:  vmulps 0x928(%rsp,%rsi,4),%ymm2,%ymm2 // storage.rs:535
+    0.80 :   b686f:  add    $0x8,%rdx // zip.rs:308
+    0.79 :   b6237:  vmaxps %ymm6,%ymm3,%ymm3
+    0.76 :   b6283:  add    $0x20,%rsi // zip.rs:308
+    0.61 :   b627a:  vmovups %ymm3,0x588(%rsp,%rsi,4)
+    0.61 :   b6233:  vmaxps %ymm6,%ymm2,%ymm2
+    0.59 :   b69b9:  vmovups %ymm0,-0x20(%r10,%rsi,4) // storage.rs:534
+    0.59 :   b6996:  vmaxps %ymm8,%ymm3,%ymm3
+    0.55 :   b69c0:  vmovups %ymm1,(%r10,%rsi,4)
+    0.54 :   b6866:  vmovups %ymm0,0x928(%rsp,%rdx,4)
+    0.52 :   b62c3:  vmovups %xmm0,0x528(%rsp,%rdi,4) // storage.rs:518
+    0.50 :   b6271:  vmovups %ymm2,0x568(%rsp,%rsi,4)
+    0.47 :   b622f:  vmaxps %ymm6,%ymm1,%ymm1
+    0.43 :   b6a0d:  vblendvps %xmm0,%xmm1,%xmm5,%xmm0
+    0.39 :   b6268:  vmovups %ymm1,0x548(%rsp,%rsi,4)
+    0.37 :   b69b3:  vblendvps %ymm1,%ymm3,%ymm5,%ymm1
+    0.37 :   b689c:  vmovss %xmm0,0x928(%rsp,%rax,4)
+    0.33 :   b5f96:  vmovq  %rbx,%xmm0
+    0.32 :   b5f5a:  vmovss -0x9f3fe(%rip),%xmm1        # 16b64 <anon.9db0e70d40dde81f12c8ca192f736706.2.llvm.10475255002528510751+0x83>
+    0.27 :   b62cc:  add    $0x4,%rdi
+    0.22 :   b6303:  vmovss %xmm0,0x528(%rsp,%rsi,4)
+    0.22 :   b5f72:  mov    %eax,%edx
+    0.22 :   b5f2e:  shr    $0x8,%eax
+    0.20 :   b62ba:  vaddps 0x528(%rsp,%rdi,4),%xmm0,%xmm0
+    0.17 :   b6a4f:  vmovaps %xmm4,%xmm0
+    0.17 :   b6873:  cmp    %rdx,%rcx
+    0.16 :   b628a:  jne    b6210 <hu_engine::storage::normalize_columns_f32+0x300>
+    0.15 :   b6898:  vdivss %xmm1,%xmm2,%xmm0
+    0.15 :   b6859:  vcmpltps %ymm0,%ymm8,%ymm1
+    0.15 :   b6287:  cmp    %rsi,%rax
+    0.14 :   b685e:  vdivps %ymm0,%ymm3,%ymm0
+    0.12 :   b6a68:  jmp    b6a30 <hu_engine::storage::normalize_columns_f32+0xb20>
+    0.12 :   b6a55:  vmovss (%r9,%rsi,4),%xmm0
+    0.12 :   b6896:  jbe    b689c <hu_engine::storage::normalize_columns_f32+0x98c>
+    0.12 :   b6876:  jne    b6850 <hu_engine::storage::normalize_columns_f32+0x940>
+    0.11 :   b62d0:  cmp    %rdi,%r14
+    0.10 :   b6a19:  add    $0x4,%rdi
+    0.10 :   b68a5:  inc    %rax
+    0.10 :   b61b1:  cmp    0x20(%rsp),%r10
+    0.09 :   b62d3:  jne    b62b0 <hu_engine::storage::normalize_columns_f32+0x3a0>
+    0.09 :   b61c1:  mov    %r10,%rdi
+    0.09 :   b60c7:  cmovae %rcx,%rax
+    0.09 :   b60a4:  xor    %esi,%esi
+    0.09 :   b6005:  mov    0x88(%rsp),%rcx
+    0.08 :   b69cd:  jne    b6970 <hu_engine::storage::normalize_columns_f32+0xa60>
+    0.08 :   b6962:  data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.08 :   b630c:  inc    %rsi
+    0.08 :   b62f6:  vmaxss %xmm4,%xmm0,%xmm0
+    0.08 :   b6190:  vxorps %xmm5,%xmm5,%xmm5
+    0.08 :   b5f7e:  and    $0xffffffe0,%edx
+    0.07 :   b69db:  mov    %rcx,%rsi
+    0.07 :   b692b:  ja     b6a8f <hu_engine::storage::normalize_columns_f32+0xb7f>
+    0.07 :   b68f8:  inc    %r12
+    0.07 :   b6892:  vucomiss %xmm0,%xmm1
+    0.07 :   b61cb:  add    %rdi,%rsi
+    0.07 :   b5fc1:  mov    %rsi,0x68(%rsp)
+    0.06 :   b6a6f:  pop    %r12
+    0.06 :   b6a36:  inc    %rsi
+    0.06 :   b6a13:  vmovups %xmm0,(%r8,%rdi,4)
+    0.06 :   b6a00:  vmaxps %xmm7,%xmm1,%xmm1
+    0.06 :   b69d2:  je     b68f0 <hu_engine::storage::normalize_columns_f32+0x9e0>
+    0.06 :   b69ca:  cmp    %rsi,%rax

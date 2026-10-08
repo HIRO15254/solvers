@@ -1,0 +1,219 @@
+{
+ "bench": {
+  "flop1_t16": {
+   "b22": [
+    0.19781,
+    0.19681,
+    0.19683
+   ],
+   "t22": [
+    0.15364,
+    0.15368,
+    0.1541
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.7808
+   }
+  },
+  "flop1_t1": {
+   "b22": [
+    2.60339,
+    2.62521,
+    2.60809
+   ],
+   "t22": [
+    1.98018,
+    1.97495,
+    1.97915
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.7589
+   }
+  },
+  "flop1_t32": {
+   "b22": [
+    0.16905,
+    0.16895,
+    0.17182
+   ],
+   "t22": [
+    0.13173,
+    0.13184,
+    0.13157
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.7792
+   }
+  },
+  "gtowb_t32": {
+   "b22": [
+    1.19155,
+    1.19194,
+    1.19
+   ],
+   "t22": [
+    0.91777,
+    0.91573,
+    0.91875
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.7702
+   }
+  },
+  "river_t32": {
+   "b22": [
+    0.00035,
+    0.00034,
+    0.00034
+   ],
+   "t22": [
+    0.00026,
+    0.00026,
+    0.00026
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.7647
+   }
+  },
+  "turn2_t32": {
+   "b22": [
+    0.00146,
+    0.00153,
+    0.00156
+   ],
+   "t22": [
+    0.00122,
+    0.00126,
+    0.00125
+   ],
+   "ratio_vs_b22": {
+    "t22": 0.817
+   }
+  }
+ },
+ "solve": {
+  "c_turn2_f64": {
+   "b22": {
+    "iterations": 247,
+    "solve_secs": 0.476,
+    "secs_per_iter": 0.00193,
+    "nashConv": 0.04382061321793773,
+    "wall": 0.549
+   },
+   "t22": {
+    "iterations": 247,
+    "solve_secs": 0.411,
+    "secs_per_iter": 0.00166,
+    "nashConv": 0.04382061321793773,
+    "wall": 0.485
+   },
+   "ratio_vs_b22": {
+    "t22": 0.8634
+   }
+  },
+  "c_turn2": {
+   "b22": {
+    "iterations": 236,
+    "solve_secs": 0.384,
+    "secs_per_iter": 0.00163,
+    "nashConv": 0.043774582504659376,
+    "wall": 0.457
+   },
+   "t22": {
+    "iterations": 236,
+    "solve_secs": 0.323,
+    "secs_per_iter": 0.00137,
+    "nashConv": 0.043774582504659376,
+    "wall": 0.395
+   },
+   "ratio_vs_b22": {
+    "t22": 0.8411
+   }
+  },
+  "c_flop1": {
+   "b22": {
+    "iterations": 193,
+    "solve_secs": 32.727,
+    "secs_per_iter": 0.16957,
+    "nashConv": 0.010727990668512377,
+    "wall": 40.87
+   },
+   "t22": {
+    "iterations": 193,
+    "solve_secs": 25.509,
+    "secs_per_iter": 0.13217,
+    "nashConv": 0.010727990668512377,
+    "wall": 33.697
+   },
+   "ratio_vs_b22": {
+    "t22": 0.7794
+   }
+  },
+  "c_flop3": {
+   "b22": {
+    "iterations": 407,
+    "solve_secs": 218.77,
+    "secs_per_iter": 0.53752,
+    "nashConv": 0.0054979971996328425,
+    "wall": 239.935
+   },
+   "t22": {
+    "iterations": 407,
+    "solve_secs": 172.013,
+    "secs_per_iter": 0.42264,
+    "nashConv": 0.0054979971996328425,
+    "wall": 193.483
+   },
+   "ratio_vs_b22": {
+    "t22": 0.7863
+   }
+  },
+  "c_gtowb": {
+   "b22": {
+    "iterations": 314,
+    "solve_secs": 391.585,
+    "secs_per_iter": 1.24709,
+    "nashConv": 0.010710730977387506,
+    "wall": 443.001
+   },
+   "t22": {
+    "iterations": 314,
+    "solve_secs": 305.093,
+    "secs_per_iter": 0.97163,
+    "nashConv": 0.010710730977387506,
+    "wall": 352.449
+   },
+   "ratio_vs_b22": {
+    "t22": 0.7791
+   }
+  }
+ },
+ "kernels": {},
+ "compare": {
+  "c_flop1_b22_t22": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "51dba4ee279076a7eb5b7aad5f61459211d788c599a15aab713608fbee13d4db",
+   "payload_bit_equal_except_wall_secs": true
+  },
+  "c_flop3_b22_t22": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "39a06d00e130e12efc4b44b550e836d3b5795f310a404c4acbdb9dc44112a111",
+   "payload_bit_equal_except_wall_secs": true
+  },
+  "c_gtowb_b22_t22": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "b952e3cd100d8dae317fa90bad1a7101e386d1400261bc5681048ffffb554661",
+   "payload_bit_equal_except_wall_secs": true
+  },
+  "c_turn2_b22_t22": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "9f17aaf7f4dd30709cc1265295ec6368837c57d199937bb7817f709bb99b0924",
+   "payload_bit_equal_except_wall_secs": true
+  },
+  "c_turn2_f64_b22_t22": {
+   "file_bytes_equal": false,
+   "normalized_payload_blake3": "085e993ab2796ed8d4acbf1ae3edb42aaea934267996b874e4f0cbed56c6420a",
+   "payload_bit_equal_except_wall_secs": true
+  }
+ }
+}

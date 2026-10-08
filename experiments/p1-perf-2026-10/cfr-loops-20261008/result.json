@@ -1,0 +1,361 @@
+{
+ "base": "b22",
+ "runs": {
+  "vm25": {
+   "p1_bench": {
+    "flop1_t16": {
+     "median_secs_per_iter": {
+      "b22": 0.19683,
+      "t22": 0.15368
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7808
+     }
+    },
+    "flop1_t1": {
+     "median_secs_per_iter": {
+      "b22": 2.60809,
+      "t22": 1.97915
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7589
+     }
+    },
+    "flop1_t32": {
+     "median_secs_per_iter": {
+      "b22": 0.16905,
+      "t22": 0.13173
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7792
+     }
+    },
+    "gtowb_t32": {
+     "median_secs_per_iter": {
+      "b22": 1.19155,
+      "t22": 0.91777
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7702
+     }
+    },
+    "river_t32": {
+     "median_secs_per_iter": {
+      "b22": 0.00034,
+      "t22": 0.00026
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7647
+     }
+    },
+    "turn2_t32": {
+     "median_secs_per_iter": {
+      "b22": 0.00153,
+      "t22": 0.00125
+     },
+     "ratio_vs_b22": {
+      "t22": 0.817
+     }
+    }
+   },
+   "eval_secs_median": {},
+   "solves_32t": {
+    "c_turn2_f64": {
+     "b22": {
+      "iterations": 247,
+      "solve_secs": 0.476,
+      "secs_per_iter": 0.00193
+     },
+     "t22": {
+      "iterations": 247,
+      "solve_secs": 0.411,
+      "secs_per_iter": 0.00166
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.8634
+     }
+    },
+    "c_turn2": {
+     "b22": {
+      "iterations": 236,
+      "solve_secs": 0.384,
+      "secs_per_iter": 0.00163,
+      "crossing": 233.5
+     },
+     "t22": {
+      "iterations": 236,
+      "solve_secs": 0.323,
+      "secs_per_iter": 0.00137,
+      "crossing": 233.5
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.8411
+     }
+    },
+    "c_flop1": {
+     "b22": {
+      "iterations": 193,
+      "solve_secs": 32.727,
+      "secs_per_iter": 0.16957,
+      "crossing": 190.6
+     },
+     "t22": {
+      "iterations": 193,
+      "solve_secs": 25.509,
+      "secs_per_iter": 0.13217,
+      "crossing": 190.6
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.7794
+     }
+    },
+    "c_flop3": {
+     "b22": {
+      "iterations": 407,
+      "solve_secs": 218.77,
+      "secs_per_iter": 0.53752,
+      "crossing": 406.9
+     },
+     "t22": {
+      "iterations": 407,
+      "solve_secs": 172.013,
+      "secs_per_iter": 0.42264,
+      "crossing": 406.9
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.7863
+     }
+    },
+    "c_gtowb": {
+     "b22": {
+      "iterations": 314,
+      "solve_secs": 391.585,
+      "secs_per_iter": 1.24709,
+      "crossing": 311.2
+     },
+     "t22": {
+      "iterations": 314,
+      "solve_secs": 305.093,
+      "secs_per_iter": 0.97163,
+      "crossing": 311.2
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.7791
+     }
+    }
+   },
+   "sol_payload_bit_equal": {
+    "c_flop1_b22_t22": true,
+    "c_flop3_b22_t22": true,
+    "c_gtowb_b22_t22": true,
+    "c_turn2_b22_t22": true,
+    "c_turn2_f64_b22_t22": true
+   },
+   "checks": {
+    "fmt": "0",
+    "clippy": "101",
+    "test": "0",
+    "tests": {
+     "passed": 925,
+     "failed": 0,
+     "ignored": 32
+    }
+   }
+  },
+  "vm26": {
+   "p1_bench": {
+    "flop1_t16": {
+     "median_secs_per_iter": {
+      "b22": 0.19639,
+      "t22": 0.15506,
+      "t22b": 0.1503
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7896,
+      "t22b": 0.7653
+     }
+    },
+    "flop1_t32": {
+     "median_secs_per_iter": {
+      "b22": 0.16945,
+      "t22": 0.13188,
+      "t22b": 0.12957
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7783,
+      "t22b": 0.7647
+     }
+    },
+    "gtowb_t32": {
+     "median_secs_per_iter": {
+      "b22": 1.19247,
+      "t22": 0.9183,
+      "t22b": 0.88911
+     },
+     "ratio_vs_b22": {
+      "t22": 0.7701,
+      "t22b": 0.7456
+     }
+    },
+    "turn2_t32": {
+     "median_secs_per_iter": {
+      "b22": 0.00148,
+      "t22": 0.00123,
+      "t22b": 0.00121
+     },
+     "ratio_vs_b22": {
+      "t22": 0.8311,
+      "t22b": 0.8176
+     }
+    }
+   },
+   "eval_secs_median": {
+    "flop1_t16": {
+     "b22": 0.2448,
+     "t22": 0.2422,
+     "t22b": 0.2277
+    },
+    "flop1_t32": {
+     "b22": 0.2137,
+     "t22": 0.2119,
+     "t22b": 0.1963
+    },
+    "gtowb_t32": {
+     "b22": 1.5739,
+     "t22": 1.5814,
+     "t22b": 1.4429
+    },
+    "turn2_t32": {
+     "b22": 0.0021,
+     "t22": 0.0022,
+     "t22b": 0.0021
+    }
+   },
+   "solves_32t": {
+    "c_turn2_f64": {
+     "b22": {
+      "iterations": 247,
+      "solve_secs": 0.464,
+      "secs_per_iter": 0.00188
+     },
+     "t22": {
+      "iterations": 247,
+      "solve_secs": 0.403,
+      "secs_per_iter": 0.00163
+     },
+     "t22b": {
+      "iterations": 247,
+      "solve_secs": 0.402,
+      "secs_per_iter": 0.00163
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.8685,
+      "t22b": 0.8664
+     }
+    },
+    "c_turn2": {
+     "b22": {
+      "iterations": 236,
+      "solve_secs": 0.37,
+      "secs_per_iter": 0.00157,
+      "crossing": 233.5
+     },
+     "t22": {
+      "iterations": 236,
+      "solve_secs": 0.326,
+      "secs_per_iter": 0.00138,
+      "crossing": 233.5
+     },
+     "t22b": {
+      "iterations": 236,
+      "solve_secs": 0.314,
+      "secs_per_iter": 0.00133,
+      "crossing": 233.5
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.8811,
+      "t22b": 0.8486
+     }
+    },
+    "c_flop1": {
+     "b22": {
+      "iterations": 193,
+      "solve_secs": 32.838,
+      "secs_per_iter": 0.17015,
+      "crossing": 190.6
+     },
+     "t22": {
+      "iterations": 193,
+      "solve_secs": 25.68,
+      "secs_per_iter": 0.13306,
+      "crossing": 190.6
+     },
+     "t22b": {
+      "iterations": 193,
+      "solve_secs": 24.894,
+      "secs_per_iter": 0.12899,
+      "crossing": 190.6
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.782,
+      "t22b": 0.7581
+     }
+    },
+    "c_gtowb": {
+     "b22": {
+      "iterations": 314,
+      "solve_secs": 392.771,
+      "secs_per_iter": 1.25086,
+      "crossing": 311.2
+     },
+     "t22": {
+      "iterations": 314,
+      "solve_secs": 304.604,
+      "secs_per_iter": 0.97008,
+      "crossing": 311.2
+     },
+     "t22b": {
+      "iterations": 314,
+      "solve_secs": 294.797,
+      "secs_per_iter": 0.93885,
+      "crossing": 311.2
+     },
+     "solve_ratio_vs_b22": {
+      "t22": 0.7755,
+      "t22b": 0.7506
+     }
+    }
+   },
+   "sol_payload_bit_equal": {
+    "c_flop1_b22_t22": true,
+    "c_flop1_b22_t22b": true,
+    "c_gtowb_b22_t22": true,
+    "c_gtowb_b22_t22b": true,
+    "c_turn2_b22_t22": true,
+    "c_turn2_b22_t22b": true,
+    "c_turn2_f64_b22_t22": true,
+    "c_turn2_f64_b22_t22b": true
+   },
+   "checks": {
+    "fmt": "0",
+    "clippy": "101",
+    "test": "101",
+    "tests": {
+     "passed": 0,
+     "failed": 0,
+     "ignored": 0
+    }
+   }
+  }
+ },
+ "committed_tree_checks_vm29": {
+  "fmt": "0",
+  "clippy": "0",
+  "test": "0",
+  "tests": {
+   "passed": 927,
+   "failed": 0,
+   "ignored": 32
+  }
+ }
+}

@@ -74,6 +74,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T18 | f32終端kernelで相手reachの0の項を飛ばす試作（従来のf32とbit一致、mergeしない）。実際のreachを含むkernel benchは残す | 32 threadsで0.1%到達が速いこと（不成立のため不採用） |
 | T19 | `.sol`の値blockをEV passのworkerでpostcardと同じbytesへ一括符号化し、書き手は`write_all`だけにする。`compatible_reach`のcard対を定数表で引く | `.sol` payloadが変更前とbit一致。保存作業領域の見積りと実確保の一致 |
 | T20 | f32のCFR passで、showdown sweepが効用を掛けたcard別の和を1本だけ持つ（A）。更新側nodeの終端の子を先にまとめて評価し、同じboardのfold・showdownを1回のkernel呼出しにする（B） | f64が変更前とbit一致。f32がthread数によらずbit一致。32 threadsで0.1%到達が速いこと |
+| T22 | `cfr_pass`と評価passのhandごとのloopを、長さを揃えたsliceの`zip`で書いて境界検査を外し、vector化する。PRUNEの0判定を16要素ずつ調べる | `.sol` payloadがf32・f64とも変更前とbit一致。32 threadsで0.1%到達が速いこと |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -168,6 +169,8 @@ pd-balancedでは書込み速度が律速のまま（約45秒）。
 T20（[証拠](../../experiments/p1-perf-2026-10/terminal-own-hands-20261008/README.md)）: A+Bで32 threadsの1 iterationが0.91〜0.93倍（1・16 threadsも0.92倍）、目標到達はTurn2 0.927・Flop1 0.978・Flop3 0.937・gtow_b 0.940倍だった。
 Aだけでは32 threadsの1 iterationが縮まず（1.005〜1.009倍）、効いたのは呼出しと走査を1組減らすBだった。目標までの反復数はf32の丸めの違いで−3%〜+6%揺れる。
 f64は`.sol` payload・checkpoint arena・progressが旧版とbit一致し、f32は1・4 threadsでbit一致、f64に対する相対誤差は最大8.8e-7だった。
+T22（[証拠](../../experiments/p1-perf-2026-10/cfr-loops-20261008/README.md)）: T20後のprofileで、`cfr_pass`の時間の45%が境界検査付きのscalarなindex loop（相手nodeの`opp_next`、戦略和へ渡す積）だった。
+sliceの`zip`で書き直すと、32 threadsの1 iterationがFlop1・gtow_bで0.75〜0.76倍（1 threadも同率、Turn2は0.82倍）、目標到達が0.75〜0.85倍、評価が0.92倍になった。`.sol` payloadはf32・f64ともbit一致した。
 
 ### 一致の定義
 
