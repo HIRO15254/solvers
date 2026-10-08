@@ -176,7 +176,12 @@ fn run<const PRUNE: bool>(
         .filter(|batch| batch.first().is_some_and(|(id, _)| *id >= 1000))
         .collect();
     let all_zero = reach.iter().all(|&r| r == 0.0);
-    let batched = precision == CfrPrecision::F32 && !(PRUNE && all_zero);
+    // T21 is retained outside the T25b subtree entry. In particular, the
+    // zero-dimension tree fits the new bound and uses the default whole batch.
+    let subtree_batch = precision == CfrPrecision::F32
+        && !tree.subtree_has_chance[0]
+        && subtree_elements(&tree, 0) < 2 * ACTION_PAR_MIN_ELEMENTS;
+    let batched = precision == CfrPrecision::F32 && !subtree_batch && !(PRUNE && all_zero);
     let mut wanted = Vec::new();
     for (action, id) in [(0, 1000), (2, 1001), (4, 1002)] {
         let r: Vec<_> = reach
@@ -225,7 +230,7 @@ fn run<const PRUNE: bool>(
     let mut ordered = vec![0.0; own_dim as usize];
     let mut storage = F32Storage::new(tree.storage_len, tree.storage_refs.len());
     storage.update_regrets(sref, sref.index, &regrets, &seed);
-    let order: Vec<_> = if precision == CfrPrecision::F32 && !(PRUNE && all_zero) {
+    let order: Vec<_> = if batched {
         vec![0, 2, 4, 1, 3]
     } else {
         vec![0, 1, 2, 3, 4]

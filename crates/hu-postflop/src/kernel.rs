@@ -148,6 +148,217 @@ pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f
     add_relaxed_f32(hands, reach, &mut total, &mut card);
     (total, card)
 }
+
+pub(crate) const TERMINAL_LANES: usize = 8;
+struct TerminalLaneBuffers {
+    reach: Vec<f32>,
+    values: Vec<f32>,
+}
+thread_local! {
+    // Retain the high-water lengths to avoid zeroing on alternating full and
+    // partial batches. Each call touches only support_length * lane_count.
+    static TERMINAL_LANE_BUFFERS: std::cell::RefCell<TerminalLaneBuffers> =
+        const { std::cell::RefCell::new(TerminalLaneBuffers { reach: Vec::new(), values: Vec::new() }) };
+}
+
+// Each fixed-size array is one independent value per terminal. These loops
+// vectorize across terminals, sharing hand/card indices and rank control flow.
+fn add_lane_hands<const LANES: usize>(
+    hands: &[Hand],
+    reach: &[[f32; LANES]],
+    weight: [f32; LANES],
+    total: &mut [f32; LANES],
+    card: &mut [[f32; LANES]; 52],
+) {
+    for h in hands {
+        let r = reach[h.local as usize];
+        for ((t, r), w) in total.iter_mut().zip(r).zip(weight) {
+            *t += w * r;
+        }
+        for &c in &h.cards {
+            for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(weight) {
+                *v += w * r;
+            }
+        }
+    }
+}
+
+/// Single-board f32 batch, including folds with equal win/tie/lose utilities.
+/// Reused worker buffers hold (opponent support + 1) * active lanes reaches
+/// and own support * active lanes values. After first use/growth there is no
+/// allocation or bulk buffer zeroing. Only the sentinel row is cleared.
+/// Stack arrays are 52 * active lanes card sums and a few lane vectors
+/// (less than 3 KiB at eight lanes). Dead own outputs are explicitly cleared.
+/// Width specialization keeps even a one-lane call proportional to its width;
+/// every width uses the same per-terminal summation order.
+pub(crate) fn terminal_batch_kernel_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    TERMINAL_LANE_BUFFERS.with_borrow_mut(|scratch| {
+        macro_rules! dispatch {
+            ($lanes:literal) => {
+                terminal_batch_lanes_f32::<$lanes>(
+                    own, opp, same, utilities, reaches, outs, indices, scratch,
+                )
+            };
+        }
+        match reaches.len() {
+            1 => dispatch!(1),
+            2 => dispatch!(2),
+            3 => dispatch!(3),
+            4 => dispatch!(4),
+            5 => dispatch!(5),
+            6 => dispatch!(6),
+            7 => dispatch!(7),
+            8 => dispatch!(8),
+            _ => panic!("terminal batch must have 1..=8 lanes"),
+        }
+    });
+}
+
+#[allow(clippy::too_many_arguments)]
+// Keep the width-specific frames separate: inlining the dispatch otherwise
+// reserves the eight-lane frame even for a one-lane call.
+#[inline(never)]
+fn terminal_batch_lanes_f32<const LANES: usize>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+    scratch: &mut TerminalLaneBuffers,
+) {
+    assert_eq!(reaches.len(), LANES);
+    assert_eq!(utilities.len(), reaches.len());
+    assert_eq!(indices.len(), reaches.len());
+    let opp_len = reaches[0].len();
+    assert!(opp_len <= nlh::NUM_COMBOS);
+    let own_len = same.len();
+    let reach_size = (opp_len + 1) * LANES;
+    let value_size = own_len * LANES;
+    // Grow only on first use/larger supports, not on every width transition.
+    if scratch.reach.len() < reach_size {
+        scratch.reach.resize(reach_size, 0.0);
+    }
+    if scratch.values.len() < value_size {
+        scratch.values.resize(value_size, 0.0);
+    }
+    let (buf, _) = scratch.reach[..reach_size].as_chunks_mut::<LANES>();
+    let (values, _) = scratch.values[..value_size].as_chunks_mut::<LANES>();
+    buf[opp_len].fill(0.0);
+    for &i in indices {
+        assert_eq!(outs[i].len(), own_len);
+        outs[i].fill(0.0);
+    }
+    for (lane, &reach) in reaches.iter().enumerate() {
+        assert_eq!(reach.len(), opp_len);
+        for (row, &r) in buf[..opp_len].iter_mut().zip(reach) {
+            row[lane] = r;
+        }
+    }
+    let mut win = [0.0; LANES];
+    let mut tie = win;
+    let mut lose = win;
+    for (((w, t), l), &[uw, ut, ul]) in win.iter_mut().zip(&mut tie).zip(&mut lose).zip(utilities) {
+        *w = uw;
+        *t = ut;
+        *l = ul;
+    }
+    let win_lose: [f32; LANES] = std::array::from_fn(|i| win[i] - lose[i]);
+    let tie_lose: [f32; LANES] = std::array::from_fn(|i| tie[i] - lose[i]);
+    let win_tie: [f32; LANES] = std::array::from_fn(|i| win[i] - tie[i]);
+    let mut total = [0.0; LANES];
+    let mut card = [[0.0; LANES]; 52];
+    add_lane_hands(&opp.hands, buf, [1.0; LANES], &mut total, &mut card);
+    for (t, u) in total.iter_mut().zip(lose) {
+        *t *= u;
+    }
+    for row in &mut card {
+        for (c, u) in row.iter_mut().zip(lose) {
+            *c *= u;
+        }
+    }
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
+            os = oe;
+            oi += 1;
+        }
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        let mut group_total = [0.0; LANES];
+        for h in &opp.hands[os..oe] {
+            let r = buf[h.local as usize];
+            for (t, r) in group_total.iter_mut().zip(r) {
+                *t += r;
+            }
+            for &c in &h.cards {
+                for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
+                    *v += w * r;
+                }
+            }
+        }
+        for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
+            *t += w * g;
+        }
+        for h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
+            let row = &mut values[h.local as usize];
+            for (((((v, t), ca), cb), s), u) in row
+                .iter_mut()
+                .zip(total)
+                .zip(card[a])
+                .zip(card[b])
+                .zip(identical)
+                .zip(tie)
+            {
+                *v = t - ca - cb + u * s;
+            }
+        }
+        if tied {
+            // Re-read just the tied hands instead of resetting/merging a
+            // 52 x 8 group array for every own rank. Total retains the same
+            // group-wise addition order as the existing relaxed sweep.
+            for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
+                *t += w * g;
+            }
+            for h in &opp.hands[os..oe] {
+                let r = buf[h.local as usize];
+                for &c in &h.cards {
+                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
+                        *v += w * r;
+                    }
+                }
+            }
+            os = oe;
+            oi += 1;
+        }
+        start = end;
+    }
+    // Only live rows were computed; unused worker-buffer rows are untouched.
+    // Outputs were cleared above so board-dead own entries stay positive zero.
+    for (lane, &index) in indices.iter().enumerate() {
+        let out = &mut outs[index];
+        for h in &own.hands {
+            let local = h.local as usize;
+            out[local] = values[local][lane];
+        }
+    }
+}
+
 fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
     let other = same[h.local as usize];
     if other == ABSENT {

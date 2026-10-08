@@ -128,6 +128,146 @@ fn bits(v: &[f32]) -> Vec<u32> {
 }
 
 #[test]
+fn t25_batch_accuracy_and_bitwise_grouping() {
+    use rayon::prelude::*;
+    let mut cfg = config();
+    // Real runout tables, full support on one seat and asymmetric support
+    // on the other: includes board-dead own hands and ABSENT same combos.
+    cfg.ranges[Player::P0] = nlh::Range::full();
+    let mut built = build_postflop_game(
+        &cfg,
+        PayoffPipeline {
+            rake: &NoRake,
+            utility: &ChipEv,
+        },
+    );
+    let e = &mut built.game.evaluator;
+    // Repeat IDs with distinct reaches so each river table fills eight lanes,
+    // even though this deliberately small betting tree has fewer terminals.
+    let ids: Vec<_> = (0..e.terminals.len() as u32)
+        .cycle()
+        .take(e.terminals.len() * 2)
+        .collect();
+    let mut max_error = 0.0f64;
+    let mut river_folds = 0;
+    let mut early_folds = 0;
+    for (t, &table) in e.terminals.iter().zip(&e.batch_tables) {
+        if matches!(t.kind, super::TerminalKind::Fold { .. }) {
+            if t.board_mask.count_ones() == 5 {
+                assert_ne!(table, u32::MAX);
+                river_folds += 1;
+            } else {
+                assert_eq!(table, u32::MAX);
+                early_folds += 1;
+            }
+        }
+    }
+    assert!(river_folds > 0 && early_folds > 0 && e.rank_tables.len() > 1);
+    for p in Player::BOTH {
+        for pattern in 0..5 {
+            let reaches: Vec<Vec<f32>> = ids
+                .iter()
+                .enumerate()
+                .map(|(slot, &id)| {
+                    let board = e.terminals[id as usize].board_mask;
+                    e.hands
+                        .combos(p.opponent())
+                        .iter()
+                        .enumerate()
+                        .map(|(i, &h)| {
+                            let (a, b) = combo_cards(h as usize);
+                            if board & ((1 << a.index()) | (1 << b.index())) != 0 || pattern == 3 {
+                                0.0
+                            } else if pattern == 4 || (i + slot) % 7 == 0 {
+                                -0.0
+                            } else {
+                                ((i * 37 + slot * 19) % 101 + 1) as f32 / 103.0
+                                    * [1.0, 0.001, 100.0][pattern]
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            let refs: Vec<_> = reaches.iter().map(Vec::as_slice).collect();
+            let run = |e: &PostflopEvaluator, order: &[usize], chunk: usize| {
+                let mut results = vec![vec![0.0; e.hands.len(p)]; ids.len()];
+                for indices in order.chunks(chunk) {
+                    let terminals: Vec<_> = indices.iter().map(|&i| ids[i]).collect();
+                    let rs: Vec<_> = indices.iter().map(|&i| refs[i]).collect();
+                    let mut rows = vec![vec![0.0; e.hands.len(p)]; indices.len()];
+                    let mut outs: Vec<_> = rows.iter_mut().map(Vec::as_mut_slice).collect();
+                    e.eval_cfr_batch(&terminals, p, &rs, &mut outs);
+                    for (&i, row) in indices.iter().zip(rows) {
+                        results[i] = row;
+                    }
+                }
+                results
+            };
+            let order: Vec<_> = (0..ids.len()).collect();
+            e.set_cfr_precision(CfrPrecision::F32);
+            let baseline = run(e, &order, 1);
+            for (slot, (&id, row)) in ids.iter().zip(&baseline).enumerate() {
+                let mut exact = vec![0.0; row.len()];
+                e.eval(id, p, refs[slot], &mut exact);
+                max_error = max_error.max(relative_error(&exact, row));
+                assert!(max_error < 1e-5, "batch max relative error {max_error}");
+                let board = e.terminals[id as usize].board_mask;
+                for (&combo, &value) in e.hands.combos(p).iter().zip(row) {
+                    let (a, b) = combo_cards(combo as usize);
+                    if board & ((1 << a.index()) | (1 << b.index())) != 0 {
+                        assert_eq!(value.to_bits(), 0);
+                    }
+                }
+            }
+            let baseline_bits: Vec<_> = baseline.iter().map(|r| bits(r)).collect();
+            let mut reversed = order.clone();
+            reversed.reverse();
+            let mut rotated = order.clone();
+            rotated.rotate_left(3);
+            let mut packed = order.clone();
+            packed.sort_unstable_by_key(|&i| e.batch_tables[ids[i] as usize]);
+            for threads in [1, 4] {
+                let pool = rayon::ThreadPoolBuilder::new()
+                    .num_threads(threads)
+                    .build()
+                    .unwrap();
+                let variants = pool.install(|| {
+                    [
+                        (&packed, 8),
+                        (&packed, 7),
+                        (&reversed, 13),
+                        (&rotated, ids.len()),
+                    ]
+                    .par_iter()
+                    .map(|(order, chunk)| {
+                        run(e, order, *chunk)
+                            .iter()
+                            .map(|r| bits(r))
+                            .collect::<Vec<_>>()
+                    })
+                    .collect::<Vec<_>>()
+                });
+                for variant in variants {
+                    assert_eq!(variant, baseline_bits);
+                }
+            }
+            // f64 batch is exactly the old per-terminal path.
+            e.set_cfr_precision(CfrPrecision::F64);
+            let exact_batch = run(e, &reversed, 13);
+            for (slot, (&id, row)) in ids.iter().zip(exact_batch).enumerate() {
+                let mut exact = vec![0.0; row.len()];
+                e.eval_cfr(id, p, refs[slot], &mut exact);
+                assert_eq!(bits(&row), bits(&exact));
+            }
+            e.eval_cfr_batch(&[], p, &[], &mut []);
+        }
+    }
+    println!(
+        "t25 maximum relative infinity error={max_error:e}; river folds={river_folds}, early folds={early_folds}"
+    );
+}
+
+#[test]
 fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
     let game = game();
     let e = &game.game.evaluator;
@@ -427,6 +567,14 @@ fn deterministic<S: Storage>() {
                 .install(|| {
                     let game = game().game;
                     assert!(game.tree.storage_len > 0);
+                    // Exercise the T25b entry with every backend/thread count:
+                    // chance-free action subtrees below the 2*16384 bound.
+                    assert!(game.tree.nodes.iter().enumerate().any(|(id, n)| {
+                        let span = game.tree.storage_spans[id];
+                        n.kind == NodeKind::Action
+                            && !game.tree.subtree_has_chance[id]
+                            && span.end - span.start < 32_768
+                    }));
                     let mut solver =
                         hu_engine::Solver::<_, S>::new(game, Box::<Dcfr>::default(), Some(12));
                     // One call selects both the regret matching and the evaluator kernels.
@@ -532,3 +680,6 @@ fn precision_all_backends_deterministic_and_saved_ev_exact() {
 
 #[path = "opponent_precision_tests.rs"]
 mod opponent_precision_tests;
+
+#[path = "batch_precision_tests.rs"]
+mod batch_precision_tests;

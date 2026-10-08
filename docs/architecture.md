@@ -114,6 +114,13 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 を備える。CLI の選択肢と既定値は規範仕様に置き、本書には別の既定値表を作らない。
 
 `CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
+f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
+最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
+node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
+不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
+sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
+既定batch hookは個別の`eval_cfr`、P1の同一board終端は最大8 laneの順位走査を使う。f64は従来の再帰passを維持する。
+このsubtree経路の外では、以下の直下終端の処理を使う。
 f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
 action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
 全0相手reachのpruningと`ActionViews`のstorage分割を維持する。既定hookは個別の`eval_cfr`を呼ぶ。

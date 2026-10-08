@@ -9,6 +9,8 @@ use crate::scratch::{Scratch, with_worker_scratch};
 use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageState, StorageView};
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
+mod batch;
+
 /// Variant-owned terminal evaluation — the only variant code on the hot
 /// path, called per terminal or sibling batch per pass, amortized over all hands.
 ///
@@ -22,6 +24,24 @@ pub trait TerminalEvaluator: Send + Sync {
     /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval(terminal, p, opp_reach, out);
+    }
+    /// CFR terminals for updating player `p`, each with its own opponent
+    /// reach and zero-initialized output. Default: one `eval_cfr` per terminal.
+    /// Overrides may batch with relaxed f32 rounding; a terminal's result must
+    /// be bitwise independent of its lane, caller grouping and thread count.
+    /// Outputs receive individual terminal values, without summing terminals.
+    fn eval_cfr_batch(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reaches: &[&[f32]],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), opp_reaches.len());
+        assert_eq!(terminals.len(), outs.len());
+        for ((&terminal, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
+            self.eval_cfr(terminal, p, reach, out);
+        }
     }
     /// CFR terminal children of one updating-player node, with identical
     /// opponent reach. Each output starts at zero. The engine supplies small
@@ -730,6 +750,18 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         "CFR output must start at zero"
     );
     let node = *ctx.tree.node(node_id);
+    // Exactly the chance-free Ambient bound in ActionViews::split_for.
+    // No descendant can parallelize or consume this storage view. Enter at
+    // the first eligible action node; its complete f32 walk is non-recursive.
+    if ctx.cfr_precision == CfrPrecision::F32
+        && node.kind == NodeKind::Action
+        && !ctx.tree.subtree_has_chance[node_id as usize]
+        && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
+        && batch::enabled()
+    {
+        batch::run::<_, _, PRUNE>(ctx, storage, scratch, node_id, my_reach, opp_reach, out);
+        return;
+    }
     match node.kind {
         NodeKind::Terminal => {
             if !PRUNE || !all_zero(opp_reach) {
@@ -1178,6 +1210,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             scratch.put(sigma);
         }
     }
+    #[cfg(test)]
+    batch::record(node_id, out);
 }
 
 /// Read-only context threaded through [`value_pass`].

@@ -15,6 +15,7 @@
 //! fold) live in [`crate::kernel`] and are shared verbatim with the
 //! river-only shim in [`crate::river`].
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::ops::{Index, IndexMut};
 
@@ -424,6 +425,10 @@ pub struct PostflopEvaluator {
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
     rank_tables: Vec<PerPlayer<RankedHands>>,
+    /// Batch-only table lookup. River folds share their board's showdown
+    /// table; earlier folds (or boards without a table) keep the MAX sentinel.
+    /// The existing terminal table/dispatch and all existing kernels are unchanged.
+    batch_tables: Vec<u32>,
     /// Live combos disjoint from the subgame's *starting* board, used by
     /// every fold terminal regardless of street or runout — see the
     /// invariant documented on [`kernel::fold_kernel`].
@@ -436,12 +441,86 @@ pub struct PostflopEvaluator {
 #[path = "precision_tests.rs"]
 mod precision_tests;
 
+thread_local! {
+    // Only caller indices, no reaches/outputs or evaluator-owned references.
+    // Allocates on first use/growth, then reuses capacity on each worker.
+    static TERMINAL_BATCH_ORDER: RefCell<Vec<usize>> = const { RefCell::new(Vec::new()) };
+}
+
 impl TerminalEvaluator for PostflopEvaluator {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
     }
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
+    }
+    fn eval_cfr_batch(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reaches: &[&[f32]],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), opp_reaches.len());
+        assert_eq!(terminals.len(), outs.len());
+        if self.cfr_precision != hu_engine::CfrPrecision::F32 {
+            for ((&id, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
+                self.eval_cfr(id, p, reach, out);
+            }
+            return;
+        }
+        TERMINAL_BATCH_ORDER.with_borrow_mut(|order| {
+            order.clear();
+            for (i, ((&id, &reach), out)) in terminals
+                .iter()
+                .zip(opp_reaches)
+                .zip(outs.iter_mut())
+                .enumerate()
+            {
+                assert_eq!(reach.len(), self.hands.len(p.opponent()));
+                assert_eq!(out.len(), self.hands.len(p));
+                if self.batch_tables[id as usize] == u32::MAX {
+                    self.eval_cfr(id, p, reach, out);
+                } else {
+                    order.push(i);
+                }
+            }
+            order.sort_unstable_by_key(|&i| self.batch_tables[terminals[i] as usize]);
+            let mut remaining = order.as_slice();
+            while let Some(&first) = remaining.first() {
+                let table_id = self.batch_tables[terminals[first] as usize];
+                let end = remaining
+                    .partition_point(|&i| self.batch_tables[terminals[i] as usize] == table_id);
+                let (group, tail) = remaining.split_at(end);
+                let table = &self.rank_tables[table_id as usize];
+                for indices in group.chunks(kernel::TERMINAL_LANES) {
+                    let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
+                    let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
+                    for ((reach, utility), &i) in
+                        reaches.iter_mut().zip(&mut utilities).zip(indices)
+                    {
+                        *reach = opp_reaches[i];
+                        let term = &self.terminals[terminals[i] as usize];
+                        let u = Self::cfr_utilities(term, p);
+                        *utility = if matches!(term.kind, TerminalKind::Fold { .. }) {
+                            [u[0] as f32; 3]
+                        } else {
+                            u.map(|v| v as f32)
+                        };
+                    }
+                    kernel::terminal_batch_kernel_f32(
+                        &table[p],
+                        &table[p.opponent()],
+                        &self.hands.same[p],
+                        &utilities[..indices.len()],
+                        &reaches[..indices.len()],
+                        outs,
+                        indices,
+                    );
+                }
+                remaining = tail;
+            }
+        });
     }
     fn eval_cfr_siblings(
         &self,
@@ -1407,10 +1486,28 @@ fn build_checked(
         ..
     } = builder;
 
+    // Precompute only the new batch dispatch. Fold terminal metadata remains
+    // unchanged so every existing CFR/evaluation path retains its behavior.
+    let board_tables: BTreeMap<_, _> = terminals
+        .iter()
+        .filter(|t| matches!(t.kind, TerminalKind::Showdown) && t.board_mask.count_ones() == 5)
+        .map(|t| (t.board_mask, t.table))
+        .collect();
+    let batch_tables = terminals
+        .iter()
+        .map(|t| {
+            if matches!(t.kind, TerminalKind::Showdown) {
+                t.table
+            } else {
+                board_tables.get(&t.board_mask).copied().unwrap_or(u32::MAX)
+            }
+        })
+        .collect();
     let evaluator = PostflopEvaluator {
         cfr_precision: hu_engine::CfrPrecision::F64,
         terminals,
         rank_tables,
+        batch_tables,
         fold_combos,
         hands,
         mask_cards,

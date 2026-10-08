@@ -94,6 +94,7 @@ fn bench_kernels(c: &mut Criterion) {
     bench_case(c, "kernels", river_config());
     bench_case(c, "kernels_wide", wide_river_config());
     bench_realistic(c);
+    bench_t25_btn_bb(c);
 }
 
 fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
@@ -216,8 +217,12 @@ fn bench_realistic(c: &mut Criterion) {
     let mut sets = [Vec::new(), Vec::new()];
     let mut siblings = Vec::new();
     let mut opponents = Vec::new();
+    let mut t25 = Vec::new();
     for iterations in [300, 50, 50] {
         solver.run(iterations);
+        for p in Player::BOTH {
+            t25.push(t25_workload(&solver, p));
+        }
         let game = solver.game();
         for &(id, p, fold, showdown) in &sibling_nodes {
             let reach = reach_at(
@@ -275,6 +280,7 @@ fn bench_realistic(c: &mut Criterion) {
         }
     }
     solver.set_cfr_precision(CfrPrecision::F32);
+    bench_t25(c, "wide", &solver, &t25);
     let game = solver.game();
     let mut out = PerPlayer::new(
         vec![0.0; game.evaluator.hands.len(Player::P0)],
@@ -420,6 +426,313 @@ criterion_group! {
     targets = bench_kernels
 }
 criterion_main!(benches);
+
+struct T25Call {
+    // Indices of terminal children in child order (after zero-reach pruning).
+    indices: Vec<usize>,
+    opponent: bool,
+}
+
+// Primary T25 workload: the P1 test spot's actual BTN/BB preflop supports,
+// with the same betting menu, stack and f64 snapshot schedule as the wide case.
+// RiverConfig has no explicit include_allin option; its fractions are clamped
+// to the remaining stack by the existing river builder.
+fn bench_t25_btn_bb(c: &mut Criterion) {
+    let config = RiverConfig {
+        board: parse_cards("Ks 7h 2d 3c 9s").try_into().unwrap(),
+        ranges: PerPlayer::new(
+            "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
+            "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o".parse().unwrap(),
+        ),
+        bet_fractions: PerPlayer::new(vec![0.33, 0.75, 1.5], vec![0.33, 0.75, 1.5]),
+        max_raises: 3,
+        effective_stack: Chips(200),
+        ..river_config()
+    };
+    let built = build_river_game(&config, chip_ev());
+    let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
+    solver.set_cfr_precision(CfrPrecision::F64);
+    let mut workloads = Vec::new();
+    for iterations in [300, 50, 50] {
+        solver.run(iterations);
+        for p in Player::BOTH {
+            workloads.push(t25_workload(&solver, p));
+        }
+    }
+    solver.set_cfr_precision(CfrPrecision::F32);
+    bench_t25(c, "btn_bb", &solver, &workloads);
+}
+struct T25Workload {
+    p: Player,
+    terminals: Vec<u32>,
+    reaches: Vec<Vec<f32>>,
+    calls: Vec<T25Call>,
+}
+
+fn t25_workload(
+    solver: &Solver<hu_postflop::PostflopEvaluator, F32Storage>,
+    p: Player,
+) -> T25Workload {
+    let game = solver.game();
+    let mut workload = T25Workload {
+        p,
+        terminals: Vec::new(),
+        reaches: Vec::new(),
+        calls: Vec::new(),
+    };
+    for (id, node) in game.tree.nodes.iter().enumerate() {
+        if node.kind != NodeKind::Action {
+            continue;
+        }
+        let reach = reach_at(
+            &game.tree,
+            game.root_ranges.as_ref().map(|r| r.as_slice()),
+            id as u32,
+            |id, _, out| out.copy_from_slice(&solver.current_strategy_at(id)),
+        );
+        let strategy = solver.current_strategy_at(id as u32);
+        let opponent = node.player != p;
+        let mut indices = Vec::new();
+        for (a, child) in game.tree.children(id as u32).enumerate() {
+            let child = game.tree.node(child);
+            if child.kind != NodeKind::Terminal {
+                continue;
+            }
+            let mut r = reach[p.opponent()].clone();
+            if opponent {
+                let len = r.len();
+                for (r, &s) in r.iter_mut().zip(&strategy[a * len..(a + 1) * len]) {
+                    *r *= s;
+                }
+            }
+            let index = workload.terminals.len();
+            workload.terminals.push(child.aux);
+            if r.iter().any(|&r| r != 0.0) {
+                indices.push(index);
+            }
+            workload.reaches.push(r);
+        }
+        if !indices.is_empty() {
+            workload.calls.push(T25Call { indices, opponent });
+        }
+    }
+    assert_eq!(
+        workload.terminals.len(),
+        game.tree
+            .nodes
+            .iter()
+            .filter(|n| n.kind == NodeKind::Terminal)
+            .count()
+    );
+    workload
+}
+
+fn bench_t25(
+    c: &mut Criterion,
+    label: &str,
+    solver: &Solver<hu_postflop::PostflopEvaluator, F32Storage>,
+    workloads: &[T25Workload],
+) {
+    let e = &solver.game().evaluator;
+    eprintln!(
+        "t25 {label} supports: P0={} P1={}",
+        e.hands.len(Player::P0),
+        e.hands.len(Player::P1)
+    );
+    for (snapshot, w) in workloads.iter().enumerate() {
+        let batches = w.terminals.len().div_ceil(8);
+        let active: usize = w.calls.iter().map(|c| c.indices.len()).sum();
+        let hash = w
+            .reaches
+            .iter()
+            .flatten()
+            .fold(0xcbf2_9ce4_8422_2325u64, |h, r| {
+                (h ^ u64::from(r.to_bits())).wrapping_mul(0x100_0000_01b3)
+            });
+        eprintln!(
+            "t25 {label} snapshot={} player={:?}: terminals={} active={} batches={} lane_fill={:.6} reach_hash={hash:016x}",
+            snapshot / 2,
+            w.p,
+            w.terminals.len(),
+            active,
+            batches,
+            w.terminals.len() as f64 / (batches * 8) as f64
+        );
+    }
+    // Allocate outputs, references and all call metadata before the timer.
+    let mut outputs: Vec<Vec<Vec<f32>>> = workloads
+        .iter()
+        .map(|w| vec![vec![0.0; e.hands.len(w.p)]; w.terminals.len()])
+        .collect();
+    let mut refs: Vec<Vec<&mut [f32]>> = outputs
+        .iter_mut()
+        .map(|rows| rows.iter_mut().map(Vec::as_mut_slice).collect())
+        .collect();
+    let reaches: Vec<Vec<&[f32]>> = workloads
+        .iter()
+        .map(|w| w.reaches.iter().map(Vec::as_slice).collect())
+        .collect();
+    let mut node_outputs: Vec<Vec<Vec<f32>>> = workloads
+        .iter()
+        .map(|w| vec![vec![0.0; e.hands.len(w.p)]; w.calls.len()])
+        .collect();
+    let mut tmp = vec![0.0; e.hands.len(Player::P0).max(e.hands.len(Player::P1))];
+    // Validate the optimized executable on the exact timed snapshot reaches.
+    // This also checks width-1 versus full-batch bitwise agreement after LTO.
+    let mut max_error = 0.0f64;
+    for ((w, outs), rs) in workloads.iter().zip(&mut refs).zip(&reaches) {
+        e.eval_cfr_batch(&w.terminals, w.p, rs, outs);
+        let mut exact = vec![0.0; e.hands.len(w.p)];
+        let mut alone = exact.clone();
+        for ((&id, &reach), out) in w.terminals.iter().zip(rs).zip(outs.iter()) {
+            e.eval(id, w.p, reach, &mut exact);
+            let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
+            let error = exact
+                .iter()
+                .zip(out.iter())
+                .map(|(&a, &b)| {
+                    assert!(b.is_finite());
+                    (f64::from(a) - f64::from(b)).abs()
+                })
+                .fold(0.0, f64::max);
+            if scale == 0.0 {
+                assert_eq!(error, 0.0);
+            } else {
+                max_error = max_error.max(error / scale);
+            }
+            alone.fill(0.0);
+            e.eval_cfr_batch(&[id], w.p, &[reach], &mut [&mut alone]);
+            assert!(
+                alone
+                    .iter()
+                    .zip(out.iter())
+                    .all(|(a, b)| a.to_bits() == b.to_bits())
+            );
+        }
+        for out in outs {
+            out.fill(0.0);
+        }
+    }
+    assert!(
+        max_error < 1e-5,
+        "{label} relative max-norm error {max_error}"
+    );
+    eprintln!(
+        "t25 {label} maximum relative infinity error={max_error:e}; width-1/full grouping bitwise equal"
+    );
+    let mut group = c.benchmark_group("kernels_realistic");
+    for mode in ["t25_lone", "t25_current", "t25_batch"] {
+        group.bench_function(format!("{mode}_{label}"), |b| {
+            b.iter(|| {
+                for (((w, outs), reaches), node_outs) in workloads
+                    .iter()
+                    .zip(&mut refs)
+                    .zip(&reaches)
+                    .zip(&mut node_outputs)
+                {
+                    // The engine supplies zeroed terminal rows/node outputs.
+                    for out in outs.iter_mut() {
+                        out.fill(0.0);
+                    }
+                    match mode {
+                        "t25_lone" => {
+                            for ((&id, &reach), out) in
+                                w.terminals.iter().zip(reaches).zip(outs.iter_mut())
+                            {
+                                e.eval_cfr(black_box(id), black_box(w.p), black_box(reach), out);
+                            }
+                        }
+                        "t25_batch" => e.eval_cfr_batch(
+                            black_box(&w.terminals),
+                            black_box(w.p),
+                            black_box(reaches),
+                            outs,
+                        ),
+                        _ => {
+                            for (call, node_out) in w.calls.iter().zip(node_outs) {
+                                node_out.fill(0.0);
+                                for pair in call.indices.chunks(2) {
+                                    let a = pair[0];
+                                    let mut ids = [w.terminals[a], 0];
+                                    let mut rs = [reaches[a], &[]];
+                                    if pair.len() == 2 {
+                                        ids[1] = w.terminals[pair[1]];
+                                        rs[1] = reaches[pair[1]];
+                                    }
+                                    if call.opponent {
+                                        let num_hands = node_out.len();
+                                        e.add_cfr_opponent_terminals(
+                                            black_box(&ids[..pair.len()]),
+                                            black_box(w.p),
+                                            black_box(&rs[..pair.len()]),
+                                            node_out,
+                                            &mut tmp[..num_hands],
+                                        );
+                                    } else if pair.len() == 2 {
+                                        let (before, after) = outs.split_at_mut(pair[1]);
+                                        e.eval_cfr_siblings(
+                                            black_box(&ids),
+                                            black_box(w.p),
+                                            black_box(rs[0]),
+                                            &mut [&mut *before[a], &mut *after[0]],
+                                        );
+                                    } else {
+                                        e.eval_cfr_siblings(
+                                            black_box(&ids[..1]),
+                                            black_box(w.p),
+                                            black_box(rs[0]),
+                                            &mut [&mut *outs[a]],
+                                        );
+                                    }
+                                }
+                                black_box(node_out);
+                            }
+                        }
+                    }
+                    black_box(outs);
+                }
+            })
+        });
+    }
+    // Fixed-work estimates, measured separately from the whole-subtree replay.
+    // Zero reaches still exercise the complete batch path (no zero skipping).
+    let w = &workloads[0];
+    let zero = vec![0.0; e.hands.len(w.p.opponent())];
+    let zero_rows = vec![zero.clone(); 8];
+    let zero_refs: Vec<_> = zero_rows.iter().map(Vec::as_slice).collect();
+    group.bench_function(format!("t25_zero_eight_{label}"), |b| {
+        b.iter(|| {
+            for out in &mut refs[0][..8] {
+                out.fill(0.0);
+            }
+            e.eval_cfr_batch(
+                black_box(&w.terminals[..8]),
+                black_box(w.p),
+                black_box(&zero_refs),
+                &mut refs[0][..8],
+            );
+            black_box(&refs[0][..8]);
+        })
+    });
+    // Use the same showdown terminal for the real and zero one-lane calls.
+    // All non-fold terminals on the river are showdowns; locate check-check.
+    let terminal = w.terminals[0];
+    for (kind, reach) in [("one_lane", reaches[0][0]), ("zero_lane", zero.as_slice())] {
+        group.bench_function(format!("t25_{kind}_{label}"), |b| {
+            b.iter(|| {
+                refs[0][0].fill(0.0);
+                e.eval_cfr_batch(
+                    black_box(&[terminal]),
+                    black_box(w.p),
+                    black_box(&[reach]),
+                    &mut [&mut *refs[0][0]],
+                );
+                black_box(&refs[0][0]);
+            })
+        });
+    }
+    group.finish();
+}
 
 // Baseline of the engine's current opponent-terminal path.
 fn baseline_opponent_add<E: TerminalEvaluator>(
