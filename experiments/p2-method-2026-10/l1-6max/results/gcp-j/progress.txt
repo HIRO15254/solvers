@@ -1,0 +1,19 @@
+06:22:17 SETUP_START
+06:26:01 SETUP_DONE
+06:26:35 b7-t32-1-i exit 0
+06:27:10 b7-t32-2-j exit 0
+06:27:45 b7-t32-3-j exit 0
+06:28:19 b7-t32-4-i exit 0
+06:28:45 b4s-t32-1-i exit 0
+06:29:12 b4s-t32-2-j exit 0
+06:29:38 b4s-t32-3-j exit 0
+06:30:05 b4s-t32-4-i exit 0
+06:30:48 b7-t16-1-i exit 0
+06:31:30 b7-t16-2-j exit 0
+06:32:13 b7-t16-3-j exit 0
+06:32:55 b7-t16-4-i exit 0
+06:33:28 b4s-t16-1-i exit 0
+06:34:01 b4s-t16-2-j exit 0
+06:34:33 b4s-t16-3-j exit 0
+06:35:06 b4s-t16-4-i exit 0
+06:35:06 ALL_DONE

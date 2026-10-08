@@ -1,0 +1,88 @@
+{
+  "checkpoints": [],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard"
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "384b4970528cefd28ca40fc8a23c2ce6a4f7017000e6eefd3f871bd041b58f89",
+  "iterations": 4,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 304,
+    "postflop_nodes": 20748,
+    "slots": 1500800,
+    "storage_bytes": 24012800
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 0,
+    "gamma": 2.0,
+    "iterations": 4,
+    "k4_min_samples": 64,
+    "k4_samples": 256,
+    "l1_boards": 32,
+    "l1_eval_boards": 1024,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "random",
+    "l1_eval_seed": 0,
+    "l1_postflop_beta": 0.0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/6max_100bb_nl50_partial_simple_reference.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      971,
+      2546,
+      2590,
+      1318,
+      340,
+      36
+    ]
+  },
+  "timings": {
+    "model": 0.0064056,
+    "solve": {
+      "board_preparation": 0.035764699999999996,
+      "evaluation": 0.0,
+      "evaluation_board_preparation": 0.0,
+      "k4": 6.311508400000001,
+      "postflop": 11.780042499999999,
+      "reaches": 0.6266703999999998,
+      "t2": 0.9682563,
+      "t3": 4.704485200000001,
+      "update": 0.23110299999999995
+    },
+    "tables": 0.1812241,
+    "total": 28.5646956,
+    "tree": 1.8389628
+  },
+  "version": 2,
+  "warnings": []
+}

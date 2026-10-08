@@ -1,0 +1,8 @@
+1 4cc17dc cpu 27.45 s exit 0
+2 plain cpu 21.30 s exit 0
+3 inter cpu 27.28 s exit 0
+4 inter cpu 27.69 s exit 0
+5 plain cpu 21.36 s exit 0
+6 4cc17dc cpu 26.92 s exit 0
+
+[exited with code 0]

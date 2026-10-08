@@ -1,0 +1,176 @@
+{
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard"
+  },
+  "evaluation": {
+    "auxiliary_held_nash_conv": 20.20244562620978,
+    "auxiliary_nash_conv": 20.206969274191778,
+    "evaluation_seconds": 168.4783619,
+    "held_nash_conv": -0.005039742500141969,
+    "nash_conv": 0.0096452791956545,
+    "seats": [
+      {
+        "auxiliary_best_response": 3.3320702926915664,
+        "auxiliary_gain": 3.1170871100571387,
+        "auxiliary_held_a_to_b": 3.0942175430708945,
+        "auxiliary_held_b_to_a": 3.139724519325079,
+        "auxiliary_held_gain": 3.116971031197987,
+        "auxiliary_telescoping_residual": -1.0524914273446484e-13,
+        "best_response": 0.21662449042943763,
+        "gain": 0.0016413077950098998,
+        "held_a_to_b": 0.00003890416505308858,
+        "held_b_to_a": -0.00047727966780364284,
+        "held_gain": -0.00021918775137527713,
+        "l1_reach_share": 0.218226208540189,
+        "seat": 0,
+        "telescoping_residual": -2.168404344971009e-17,
+        "value": 0.21498318263442773,
+        "value_a": 0.21450289094147976,
+        "value_b": 0.2154634743273759
+      },
+      {
+        "auxiliary_best_response": 3.210096011065483,
+        "auxiliary_gain": 3.4954226606737757,
+        "auxiliary_held_a_to_b": 3.452413833991145,
+        "auxiliary_held_b_to_a": 3.5381481907788137,
+        "auxiliary_held_gain": 3.4952810123849796,
+        "auxiliary_telescoping_residual": -1.0880185641326534e-13,
+        "best_response": -0.28368688176042645,
+        "gain": 0.0016397678478666244,
+        "held_a_to_b": -0.0005946960608356755,
+        "held_b_to_a": -0.000544688743618682,
+        "held_gain": -0.0005696924022271788,
+        "l1_reach_share": 0.21805140970761386,
+        "seat": 1,
+        "telescoping_residual": 1.3162214373974024e-16,
+        "value": -0.28532664960829307,
+        "value_a": -0.2857811333879204,
+        "value_b": -0.28487216582866604
+      },
+      {
+        "auxiliary_best_response": 2.6889257059608154,
+        "auxiliary_gain": 3.2286131522254085,
+        "auxiliary_held_a_to_b": 3.1968577773891185,
+        "auxiliary_held_b_to_a": 3.25261278864103,
+        "auxiliary_held_gain": 3.2247352830150744,
+        "auxiliary_telescoping_residual": -1.7363888105137448e-13,
+        "best_response": -0.5375799085322936,
+        "gain": 0.002107537732299658,
+        "held_a_to_b": -0.0040128936333678755,
+        "held_b_to_a": -0.002332166285873627,
+        "held_gain": -0.0031725299596207512,
+        "l1_reach_share": 0.21687696180739005,
+        "seat": 2,
+        "telescoping_residual": 1.7780915628762273e-16,
+        "value": -0.5396874462645933,
+        "value_a": -0.5395720492811951,
+        "value_b": -0.539802843247991
+      },
+      {
+        "auxiliary_best_response": 3.622951374690732,
+        "auxiliary_gain": 3.4994719504051544,
+        "auxiliary_held_a_to_b": 3.449802644112143,
+        "auxiliary_held_b_to_a": 3.548796144073416,
+        "auxiliary_held_gain": 3.4992993940927795,
+        "auxiliary_telescoping_residual": -2.4868995751603507e-14,
+        "best_response": 0.12465593463221926,
+        "gain": 0.0011765103466417348,
+        "held_a_to_b": -0.0005524217616674487,
+        "held_b_to_a": 0.00006948258455211076,
+        "held_gain": -0.00024146958855766898,
+        "l1_reach_share": 0.2175174403722298,
+        "seat": 3,
+        "telescoping_residual": -2.862293735361732e-17,
+        "value": 0.12347942428557752,
+        "value_a": 0.1224655600493208,
+        "value_b": 0.12449328852183397
+      },
+      {
+        "auxiliary_best_response": 3.5995137052813284,
+        "auxiliary_gain": 3.45769128607026,
+        "auxiliary_held_a_to_b": 3.4239072656934764,
+        "auxiliary_held_b_to_a": 3.4912213611309255,
+        "auxiliary_held_gain": 3.4575643134122007,
+        "auxiliary_telescoping_residual": -9.725553695716371e-14,
+        "best_response": 0.14332692689759444,
+        "gain": 0.0015045076865259077,
+        "held_a_to_b": 0.00007147039837884783,
+        "held_b_to_a": -0.00009035050855105142,
+        "held_gain": -9.440055086101795e-6,
+        "l1_reach_share": 0.21775311306245482,
+        "seat": 4,
+        "telescoping_residual": -6.418476861114186e-17,
+        "value": 0.14182241921106853,
+        "value_a": 0.14087057584090626,
+        "value_b": 0.142774262581231
+      },
+      {
+        "auxiliary_best_response": 3.575926586269216,
+        "auxiliary_gain": 3.408683114760039,
+        "auxiliary_held_a_to_b": 3.3901463721773464,
+        "auxiliary_held_b_to_a": 3.4270428120361682,
+        "auxiliary_held_gain": 3.4085945921067573,
+        "auxiliary_telescoping_residual": -7.460698725481052e-14,
+        "best_response": 0.16881911929648746,
+        "gain": 0.0015756477873106745,
+        "held_a_to_b": -0.00009899901568355407,
+        "held_b_to_a": -0.0015558464708664288,
+        "held_gain": -0.0008274227432749914,
+        "l1_reach_share": 0.21750574977742962,
+        "seat": 5,
+        "telescoping_residual": -1.9949319973733282e-17,
+        "value": 0.1672434715091768,
+        "value_a": 0.16659558826405743,
+        "value_b": 0.16789135475429615
+      }
+    ]
+  },
+  "evaluation_options": {
+    "boards": 1024,
+    "control": true,
+    "regression": true,
+    "sampling": "stratified",
+    "seed": 3
+  },
+  "format": "p2-trunk-evaluation",
+  "game_fingerprint": "384b4970528cefd28ca40fc8a23c2ce6a4f7017000e6eefd3f871bd041b58f89",
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "leaf_model": "l1",
+  "postflop": {
+    "blake3": "c1b0b1b36623086f4833c0a69ea59be17a8560886d24780e7f5fbe431128c2a6",
+    "path": ".cache/p2-trunk/l1-6max/saved/b4s.postflop.bin"
+  },
+  "profile": {
+    "blake3": "74597fb9673298b46918832337488f62b6cc86bb31721c4ff854bd2ae9821907",
+    "path": ".cache/p2-trunk/l1-6max/saved/b4s.profile.json"
+  },
+  "source": "examples/bench/6max_100bb_nl50_partial_simple_reference.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "timings": {
+    "boards": 0.0521177,
+    "evaluation": 168.4783619,
+    "load": 0.5206541,
+    "model": 0.0035513,
+    "tables": 0.1613103,
+    "total": 172.1600468,
+    "tree": 1.8404593999999999
+  },
+  "version": 1
+}

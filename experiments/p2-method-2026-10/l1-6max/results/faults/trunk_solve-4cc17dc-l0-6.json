@@ -1,0 +1,105 @@
+{
+  "checkpoints": [
+    {
+      "iteration": 6,
+      "nash_conv": 1.0981185799311262,
+      "seats": [
+        {
+          "best_response": 0.3007733294454398,
+          "gain": 0.2937007092518026,
+          "seat": 0,
+          "value": 0.007072620193637193
+        },
+        {
+          "best_response": -0.04358458113397747,
+          "gain": 0.25520585927620654,
+          "seat": 1,
+          "value": -0.298790440410184
+        },
+        {
+          "best_response": -0.08435962876649111,
+          "gain": 0.2576798797314482,
+          "seat": 2,
+          "value": -0.3420395084979393
+        },
+        {
+          "best_response": 0.27299015578909086,
+          "gain": 0.08506423554872786,
+          "seat": 3,
+          "value": 0.187925920240363
+        },
+        {
+          "best_response": 0.3512027337300579,
+          "gain": 0.0895235562616124,
+          "seat": 4,
+          "value": 0.2616791774684455
+        },
+        {
+          "best_response": 0.43742785769126924,
+          "gain": 0.11694433986132852,
+          "seat": 5,
+          "value": 0.3204835178299407
+        }
+      ],
+      "seconds": 85.4397412
+    }
+  ],
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "f737ed623bd6bc983ae167b45c3176226b25ee2e3f84afe6cd6544e7d134ded4",
+  "iterations": 6,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "options": {
+    "alpha": 1.5,
+    "beta": 0.0,
+    "eval_every": 0,
+    "gamma": 2.0,
+    "iterations": 6,
+    "k4_min_samples": 16,
+    "k4_samples": 256,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/6max_20bb.toml",
+  "tables": {
+    "t2": {
+      "file": "t2-v1.bin",
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "file": "t3-v1-n4096-seed0.bin",
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8",
+      "samples": 4096,
+      "seed": 0
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      670,
+      1883,
+      2075,
+      1145,
+      321,
+      37
+    ]
+  },
+  "timings": {
+    "model": 0.0038698,
+    "solve": {
+      "evaluation": 69.9654855,
+      "k4": 5.4062569,
+      "reaches": 0.7463945000000003,
+      "t2": 1.2122195,
+      "t3": 6.893464399999998,
+      "update": 0.3257324000000001
+    },
+    "tables": 0.2693249,
+    "total": 85.9049524,
+    "tree": 0.0768782
+  },
+  "version": 1,
+  "warnings": []
+}

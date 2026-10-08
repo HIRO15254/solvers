@@ -1,0 +1,7 @@
+Tree: 5466 decisions, 6131 terminals (0.080s)
+Tables: 54.397s; model: 0.003s
+L1: 186 leaves; 8052 postflop decisions; 555648 slots; 8890368 storage bytes
+Iterations: 1; reached target: false; solve phases Timings { trunk: SolveTimings { reaches: 0.331122417, t2: 0.03006224, t3: 0.48030370499999997, k4: 13.029147236, update: 0.03369557, evaluation: 0.0 }, board_preparation: 0.01910619, postflop: 0.34823303600000005, evaluation_board_preparation: 2.31e-7 }
+35a6826c09c36961404e0bcc076b1ff6101d8a3d421dc682a7fcf8f0505e7cb2  /home/PC_User/ehs2/v2-f32-t32-r32.postcard
+d38f69893024c0f95f807ef15538ed1f77d36f1d8faf38eff89baa92a98551c3  .cache/p2-trunk/t2-v1.bin
+27f70892dd5d8e1aa163dbb2171e3d5b1d14b25e69a3bb9d10362041297d4144  .cache/p2-trunk/t3-v1-n4096-seed0.bin

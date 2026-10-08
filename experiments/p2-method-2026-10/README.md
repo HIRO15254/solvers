@@ -13,3 +13,4 @@
 | [trunkのDCFR solver](trunk-solver/README.md) | L0モデルの上の全幅DCFRはB1の目標（`NashConv` ≤ 1×10⁻⁴）に届くか。B3の1 iterationにどれだけかかるか。B3の解はL0と入力のゲームで暫定方式の解より良いか | S4-1b-1（S4-1bのB1・B3の`NashConv`の完了条件） | `verified` |
 | [trunk solverの高速化](trunk-speedup/README.md) | 値を変えない整理とP2D7のsolverの中だけのK4の近似で、1 iterationはどれだけ短くなるか。近似したsolverはB3で厳密なsolverと同じように`NashConv`を下げるか。B4の1 iterationはどれだけかかるか | S4-1b-2（P2D7の採用条件、S4-1bのB4の時間の完了条件） | `verified` |
 | [L1の核と評価器](l1-core/README.md) | 抽象化Postflop（L1）をtrunkと同じiterationで解くと、B6でP2D8の主指標は目標（2000 iteration以内に評価用4096 boardの上振れする値 ≤ 0.005）に届くか。boardのばらつきを減らす変更はそれぞれどれだけ効くか。L0とL1の解はどれだけ違うか。B6とB7の1 iterationと評価にどれだけかかるか | S4-2a（完了条件(2)・(3)） | `verified` |
+| [6-maxのL1](l1-6max/README.md) | L1でB7とB4 Simpleの元の木を決定P2D5の予算で解くと、P2D8の主指標はどう推移するか。L0とL1の解はどれだけ違うか。B4 Simpleのopenのclass表はGTO Wizard参照と比べてどうか。評価のばらつき、bucketの細かさ、16・32 threadの時間 | S4-2bの初回の記録（基準は利用者が決める。一部保留） | `verified` |
