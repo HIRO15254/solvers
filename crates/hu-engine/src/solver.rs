@@ -763,8 +763,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                                 .tree
                                 .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
                                 as usize;
-                            let mut my_next = scratch.take(row.len());
-                            let mut opp_next = scratch.take(opp_dim);
+                            let mut my_next = scratch.take_overwrite(row.len());
+                            let mut opp_next = scratch.take_overwrite(opp_dim);
                             ctx.tree
                                 .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
                             ctx.tree.map_reach_into(
@@ -823,8 +823,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                         .tree
                         .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
                         as usize;
-                    let mut my_next = scratch.take(my_dim);
-                    let mut opp_next = scratch.take(opp_dim);
+                    let mut my_next = scratch.take_overwrite(my_dim);
+                    let mut opp_next = scratch.take_overwrite(opp_dim);
                     ctx.tree
                         .map_reach_into(deal.maps[ctx.p], my_reach, &mut my_next);
                     ctx.tree
@@ -879,7 +879,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             let mut views =
                 ActionViews::split_for(storage, ctx.tree, node_id, Some(own_span), par_budget);
 
-            let mut sigma = scratch.take(sref.len());
+            let mut sigma = scratch.take_overwrite(sref.len());
             views
                 .own()
                 .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
@@ -928,7 +928,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             // Reused across actions (not re-taken per action): its
             // recursive use always returns before the next action starts,
             // so overwriting it in place is safe.
-            let mut my_next = scratch.take(num_hands);
+            let mut my_next = scratch.take_overwrite(num_hands);
 
             if !out.is_empty() && parallel_actions(ctx.tree, node_id) {
                 let ActionViews::Split { views, has_own } = &mut views else {
@@ -945,7 +945,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                             return;
                         }
                         with_worker_scratch(|scratch| {
-                            let mut reach = scratch.take(num_hands);
+                            let mut reach = scratch.take_overwrite(num_hands);
                             mul_into(&mut reach, my_reach, &sigma[a * num_hands..]);
                             cfr_pass::<_, _, PRUNE>(
                                 ctx,
@@ -1028,16 +1028,21 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             let num_hands = sref.num_hands as usize;
             debug_assert_eq!(num_hands, opp_reach.len());
             let zero_opp = PRUNE && all_zero(opp_reach);
-            let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
+            let mut sigma = scratch.take_overwrite(if zero_opp { 0 } else { sref.len() });
             if !zero_opp {
                 storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
             }
 
             let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
 
-            // `take` initializes this reusable buffer to zero. In the
-            // zero-reach case it is shared immutably by parallel children.
-            let mut opp_next = scratch.take(num_hands);
+            // In the zero-reach case this reusable buffer stays zero and is
+            // shared immutably by parallel children; otherwise every use
+            // overwrites it first.
+            let mut opp_next = if zero_opp {
+                scratch.take(num_hands)
+            } else {
+                scratch.take_overwrite(num_hands)
+            };
             let mut child_out = scratch.take(my_reach.len());
             let terminals = ctx.cfr_precision == CfrPrecision::F32 && !zero_opp;
             if terminals {
@@ -1111,7 +1116,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                                     par_budget,
                                 );
                             } else {
-                                let mut reach = scratch.take(num_hands);
+                                let mut reach = scratch.take_overwrite(num_hands);
                                 mul_into(&mut reach, opp_reach, &sigma[a * num_hands..]);
                                 cfr_pass::<_, _, PRUNE>(
                                     ctx,

@@ -27,6 +27,23 @@ impl Scratch {
         buf
     }
 
+    /// As [`Self::take`], but reused elements are not zeroed: the caller
+    /// must write every element before reading any. Only growth beyond the
+    /// buffer's previous length is zero-filled. Debug builds fill the whole
+    /// buffer with NaN instead, so a missed write shows up in tests.
+    pub fn take_overwrite(&mut self, len: usize) -> Vec<f32> {
+        let mut buf = self.free.pop().unwrap_or_default();
+        if cfg!(debug_assertions) {
+            buf.clear();
+            buf.resize(len, f32::NAN);
+        } else if buf.len() >= len {
+            buf.truncate(len);
+        } else {
+            buf.resize(len, 0.0);
+        }
+        buf
+    }
+
     /// Returns a buffer to the pool for reuse.
     pub fn put(&mut self, buf: Vec<f32>) {
         self.free.push(buf);
