@@ -752,14 +752,29 @@ BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,
 
 [tree]
 script = '''
-flop, turn, river {
-  replace bet [33, 75]
-  replace raise [3x]
+flop {
+  when donk { remove bet }
+  replace bet [33]
+  replace raise [50]
+  when aggressions >= 2 { replace raise [a] }
+}
+turn {
+  when donk { remove bet }
+  replace bet [50]
+  when cbet { replace bet [75] }
+  replace raise [a]
+  when spr > 3 { replace raise [50] }
+}
+river {
+  replace bet [50, a]
+  when in_position { replace bet [75, a] }
+  replace raise [a]
 }
 '''
+allin_threshold = 0.67
 
 [solver.stop]
-target = "0.3%pot"
+target = "0.1%pot"
 
 [run]
 max_time = "1h"

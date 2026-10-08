@@ -38,6 +38,30 @@ P1ではPreflop専用のtree設定は効果を持たず、既定値以外を書�
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 旧configの自動変換は無いため、現行例から書き直す。
 
+### P1の木の大きさを決める
+
+P1のmemoryと時間は、行動の候補数の積でほぼ決まる。0.1% pot程度の解を少ない資源で得るには、
+GTO Wizard（GTOW）の公開情報と[雛形の計測](../experiments/p1-efficiency-2026-10/templates-20261009/README.md)から、次の順で木を絞る。
+
+- flopのbet sizeの数は木を最も大きくするが、EVへの影響は小さい。GTOWの比較では、flopのsize 1本と3本の差は
+  多くの盤面で0.01 bb以内だった。SRPのflopはまず1〜2 sizeにする。
+- flop戦略への影響はturnのsizeの方がriverより大きい。riverには小さいbetとall-inのように離れた2 sizeを置く。
+- donkは`when donk { remove bet }`で消す。raiseは`when aggressions >= 2 { replace raise [a] }`で2回目以降をall-inにする。
+  `allin_threshold = 0.67`は残りstackの大半を入れるbetをall-inへまとめる。
+- 3BP・4BPはSPRが低く木が小さいので、flopに3 sizeを置いても軽い。
+
+同梱の[flop_srp.toml](../examples/hu-postflop/flop_srp.toml)・[flop_3bp.toml](../examples/hu-postflop/flop_3bp.toml)・
+[flop_4bp.toml](../examples/hu-postflop/flop_4bp.toml)はこの方針の雛形である。8C/16T・12 threadのPCで0.1% potまでの目安は次の通り。
+
+| 例 | node数 | f32 storage | 0.1% potまでの反復 | 時間 |
+|---|---:|---:|---:|---:|
+| flop_srp | 1.16M | 3.7 GiB | 389 | 3.5分 |
+| flop_3bp | 2.22M | 1.4 GiB | 260 | 1分 |
+| flop_4bp | 0.47M | 0.1 GiB | 99 | 2.5秒 |
+
+flop_srpのflopに75%を足すとstorageは約1.8倍、時間は約1.7倍になり、OOPのEVは0.015 BB（0.27% pot）しか変わらなかった。
+全streetに33・75%と3x raiseを置く旧来の木は28 GiBを超える。
+
 ## 3. 検証して実効入力を保存する
 
 ```sh
