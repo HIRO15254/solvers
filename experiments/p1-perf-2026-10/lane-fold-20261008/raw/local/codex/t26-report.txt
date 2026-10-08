@@ -1,0 +1,96 @@
+T26: output blocks and dedicated river-fold lanes
+2026-10-08; branch s3-p1-t25; git HEAD 76089bc is rejected T24 WIP.
+Baseline is the saved uncommitted T25 state, not HEAD. Changes remain uncommitted.
+All new evidence is runs/t26; runs/t25b and experiments were not changed.
+Source delta against T25:
+crates/hu-postflop/benches/kernels.rs
+crates/hu-postflop/src/kernel.rs
+crates/hu-postflop/src/lane_precision_tests.rs
+crates/hu-postflop/src/postflop.rs
+crates/hu-postflop/src/precision_tests.rs
+docs/architecture.md
+docs/hu-postflop.jp.md
+Engine files are byte-identical to the saved T25 sources; no API, storage-format, dependency, or legacy kernel change.
+
+A: output variants
+Saved T25 sources before edits; built t25-kernels.exe with original T25 kernel/evaluator and the new nine-terminal workload. No old production path retained.
+Each output slice is borrowed once with safe slice splitting. Chosen column blocks copy eight consecutive local rows into adjacent output entries, followed by at most seven tail entries.
+Precomputed board-dead local lists clear only dead interleaved rows to +0.0; live rows are overwritten by the own-hand loop. Copy writes every output entry and does not fill outputs first.
+Caller/engine zeroing in the existing benchmark/API remains unchanged and is present in all compared measurements.
+Three alternating runs per variant, one pinned logical CPU, RAYON_NUM_THREADS=1. Times below are milliseconds per six player/snapshot sets.
+First output series, logical CPU0:
+workload | t25-kernels | transpose-kernels | direct-kernels
+nine | 0.096939 | 0.084284 | 0.095334
+btn_bb | 1.303387 | 1.348042 | 1.386122
+wide | 4.253101 | 3.635986 | 4.237740
+Second output series, logical CPU0:
+workload | t25-kernels | transpose-kernels | columns-kernels
+nine | 0.098089 | 0.089562 | 0.084337
+btn_bb | 1.434910 | 1.325374 | 1.109614
+wide | 3.839725 | 3.475323 | 3.282779
+Full 8 x LANES block transpose emits vector shuffles/stores, but column blocks were faster on all three workloads in their direct comparison. Direct own-loop stores remove the value buffer, but scalarize the own-hand arithmetic and did not reliably beat T25.
+Host timing shifts affected separate series; compare variants within their own alternating series. Full transpose versus T25 changed sign on BTN/BB between series.
+
+B: separate kinds
+River folds with batch_tables != u32::MAX always use the fold-only specialization. Showdowns always use the rank sweep. Sort by (table, caller index), then filter showdowns and folds separately; each kind fills batches of up to eight, with indices increasing.
+Fold kernel interleaves reaches, makes one ranked-opponent compatibility-sum pass and one live-own pass: u_fold * (total - card[a] - card[b] + identical_reach). Utility-last matches the algebra of the lone fold kernel and avoids cancellation in utility-scaled sums; rank-order versus combo-order sums may round differently.
+No rank-group control flow in fold specialization, no zero-reach branches in hand loops, no allocations after worker-buffer warm-up/growth. Missing tables, earlier folds, runouts and f64 keep T25 fallback.
+Initially sorted (table, kind, caller index). Replaced with table sort plus two linear filters to avoid reordering the usual single-table subtree. In grouping.json, median paired filter/kind-sort ratios were:
+  nine: 0.9754 (large timing shifts; larger workloads effectively tied)
+  btn_bb: 1.0030 (large timing shifts; larger workloads effectively tied)
+  wide: 0.9950 (large timing shifts; larger workloads effectively tied)
+A alone is the measured mixed fold/showdown sweep alternative. Final B always splits kinds to preserve the kind-specific rounding rule; no conditional fold-fill policy was retained.
+
+Final required kernel comparison, logical CPU12 (mask0x1000):
+Both players, snapshots after 300+50+50 f64 iterations, actual reach_at/current_strategy reaches. Original bench names unchanged.
+nine: BTN/BB 407/441 supports, Ks7h2d3c9s, pot20/stack200, bet0.75, raise3x, max_aggressive_actions2, 9 terminals (5 showdown/4 fold).
+btn_bb: same ranges/board/stack, bet0.33/0.75/1.5, max_raises3, 141 terminals.
+wide: weighted full supports1081/1081, original 2c7d9hJsQs board, bet0.33/0.75/1.5, max_raises3, pot20/stack200, 141 terminals.
+Each timed replay writes six sets: 54 terminal rows for nine, 846 otherwise. Terminal counts are per player per snapshot.
+workload | T25 ms | A ms | A+B ms | A/T25 | (A+B)/T25 | (A+B)/A | A+B us/terminal
+nine | 0.091163 | 0.080144 | 0.080337 | 0.8791 | 0.8813 | 1.0024 | 1.4877
+btn_bb | 1.293784 | 1.021347 | 0.960139 | 0.7894 | 0.7421 | 0.9401 | 1.1349
+wide | 3.827226 | 3.050024 | 2.873339 | 0.7969 | 0.7508 | 0.9421 | 3.3964
+These are medians of three saved Criterion median estimates (20 samples, 3s measurement), with baseline/A/A+B alternated each repeat. Paired B/T25 ratios:
+  nine: [0.4804851746804343, 0.9073046154809348, 0.8436379416466674], median 0.8436
+  btn_bb: [0.7734082272547607, 0.7698866245200724, 0.7250265464901341], median 0.7699
+  wide: [0.776936352881105, 0.745629939762889, 0.7814743149508923], median 0.7769
+Several first-repeat estimates were roughly half later ones, despite one-CPU affinity. Nine first B was notably faster. Report ratio-of-medians and paired samples; do not infer precise SMT/32-thread gains from this local host.
+The earlier CPU0 final.json series is the initial kind-sort B, not the chosen final filter path; confirm.json is the final required comparison.
+Input packing unchanged. Linked width8 pack uses unrolled scalar loads and strided scalar stores with loop-length checks, no reach-dependent branches. Isolated t26_interleave estimates (ms per six sets):
+  nine: 0.009153
+  btn_bb: 0.162030
+  wide: 0.715922
+This isolated helper uses the old mixed width8/partial grouping and the same total reach entries, not final kind-specific widths. It is a cost estimate, not an exact fraction of final kernel time. One invocation uses 20 Criterion samples.
+All saved bench logs agree on each of 18 solved reach hashes, supports, terminal counts and pruning metadata; workload-audit.json checks this across executables and repeats.
+
+Buffers and linked executable audit
+Thread-local reach Vec: (opponent_support+1)*L floats; last row is +0 sentinel, ABSENT lookup uses min(opp_len). Thread-local values Vec: own_support*L floats. Vectors retain high-water length/capacity; only active prefixes are touched. Dead-row list is per table/seat, u16 per dead local. Group index Vec reuses worker capacity; selected batch indices use 8 usize stack entries.
+Active reach+value bytes = 4*(own_support+opponent_support+1)*L: BTN/BB 27,168 atL8, 16,980 atL5 and13,584 atL4; wide69,216 atL8. Common Flop1 supports479/436: T25L8=29,312, new showL5=18,320/foldL4=14,656. Values remain interleaved; direct-store variant alone drops them.
+Stack card sums =52*L*4 bytes (1,664B atL8), plus lane vectors and output refs. Width-specific functions stay uninlined so small batches do not reserve width8 frame.
+filter-kernels.exe and required t26-p1_bench.exe both audited with llvm-objdump and PE unwind function bounds. PDB symbols locate eval_cfr_batch; PE call graph locates private width specializations.
+width8 showdown: bench0x1401449e0..0x1401478fd / p1 0x14003b470..0x14003e38d, stack reservation0xd58=3416B; fold: bench0x140147900..0x140149409 /p1 0x14003e390..0x14003fe99,0x878=2168B (excluding pushed registers and nested callee frames).
+Fold own loop has two YMM vsubps, one vaddps, one vmulps and one full-width interleaved store; shared opponent helper has YMM arithmetic. Showdown lane arithmetic stays vectorized.
+Chosen width8 main output loop loads eight strided scalars and stores eight adjacent scalars with the output pointer retained per row. It does NOT use a full-width store for these blocks; the small tail uses masked gathers/stores. Full-matrix variant instead has unpack/shuffle/permute and YMM stores, stack0xde8=3560B. Direct variant frame0xa88=2696B, but own-loop arithmetic scalarized. Index safety checks remain for local/card gathers; lane arithmetic and block copies have no per-lane bounds checks.
+Assembly evidence: filter-batch.asm, p1-batch.asm, show8.asm, fold8.asm, transpose-batch.asm, direct-batch.asm and corresponding function reports.
+
+Whole CFR iterations
+Baseline is reviewer-supplied scratchpad/t25b-p1_bench.exe; new built cargo build --release -p hu-postflop --example p1_bench and copied to requested scratchpad/t26-p1_bench.exe. Hashes recorded per run.
+Configs unchanged in experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs. All use --evals0. River threads1/warmup20/iters200; turn2 threads1/warmup5/iters50; Flop1 threads4/warmup2/iters6. Baseline/new alternate three times per tree. Single-thread CPU12, four-thread mask0x55 (0,2,4,6). Flop1 ran; available commit headroom was about8GB.
+workload | T25 ms/iter | T26 ms/iter | T26/T25 | paired ratios
+river | 0.171775 | 0.157060 | 0.9143 | [0.9181446072152224, 0.9070474052708706, 0.9143327026633679]
+turn2 | 12.164398 | 11.478420 | 0.9436 | [0.9484148847734916, 0.946900904363838, 0.943607731348481]
+flop1 | 459.423683 | 451.988433 | 0.9838 | [0.9838161368912159, 0.9730145806094893, 1.0658900589067692]
+Flop1 has one paired regression (+6.6%); its median gain is small. Target EPYC32-thread measurement remains with reviewer.
+
+Verification
+cargo test --workspace -- --test-threads=1 --nocapture: {'passed': 930, 'failed': 0, 'ignored': 31}; full output tests.log, exit0. Ignored expensive tests remain ignored per development instructions.
+cargo fmt --all --check, cargo clippy --workspace --all-targets -- -D warnings, python tools/check_docs.py: passed (23 Markdown files). All Cargo commands serial, CARGO_BUILD_JOBS=1/CARGO_INCREMENTAL=0. No compiler crash/OOM occurred in T26.
+New all-width test uses real turn-to-river rank tables for 9s/Ah/Js, both players, actual BTN/BB and full ranges, and reaches scaled1/.001/100/all+0/all-0 with dead opponent hands masked. Tests singleton/full/mixed/reversed/rotated groups, every width1..8 for both kinds, and 1/4-thread worker execution. Ah/Js exercise dead entries at the realistic support tails; dead outputs have +0 bits.
+Largest relative infinity-norm error in new test: 1.1554165204342634e-06; required tolerance1e-5. Bench solved wide workload reaches a larger 1.2951561920274756e-06 across saved variants; selected final wide bench logs report1.2951561920274756e-6.
+Largest across all final lane accuracy checks (including existing broader-board batch test): 1.8357778809248764e-06.
+Existing product batch/recursive test maximum per-node state difference7.729739949003041e-7; generic engine traversal reference difference0. PRUNE/zero-opponent tests and all storage backends thread-determinism tests pass, with batches exercised.
+F64: T25b capture method reused on full turn tree, 12iterations in4/8/12 progress chunks, all F32Storage/I16Storage/MixedStorage backends at1/4threads. All18 decoded .sol payload, checkpoint-arena/scales and numerical-progress artifacts byte-equal T25 and across threads. Saved T25 artifacts were already equal b01d4a4. Elapsed wall-clock summary fields excluded as in T25 method. f64-identity.json holds hashes; temporary test instrumentation restored.
+f64-source-audit.txt proves all engine files and old eval/EV/BR/CFR terminal kernel bodies unchanged from saved T25. Git diff --check passed. No experiments/Cargo.toml/frozen-crate edits; no git history/index changes.
+
+Uncertainty: local shared Intel host exhibits large timing shifts. A+B meets accuracy/determinism and beats T25 medians; B over A is tied on nine and about6% faster on larger cases. Target SMT cache/profile gains require reviewer EPYC measurements. Block-copy scalarization is confirmed, not assumed to be SIMD. No further alternative was silently retained.

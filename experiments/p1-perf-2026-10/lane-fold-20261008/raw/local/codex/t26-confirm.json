@@ -1,0 +1,222 @@
+{
+  "affinity_mask": 4096,
+  "rayon_threads": 1,
+  "records": [
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 1,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 91162.94936947111
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 1,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 81278.25484764542
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 1,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 43802.44565217391
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 1,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 662569.5211038961
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 1,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 550215.673076923
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 1,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 512436.71875
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 1,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 2112718.3673469387
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 1,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 1833281.7708333335
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 1,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 1641447.702991453
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 2,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 88545.1851851852
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 2,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 77393.74065071055
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 2,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 80337.45519713261
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 2,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 1293783.5714285714
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 2,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 1023034.3156843157
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 2,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 996066.6666666667
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 2,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 3853572.7678571427
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 2,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 3096517.8571428573
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 2,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 2873339.230769231
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 3,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 96048.8125
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 3,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 80143.6170212766
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 3,
+      "case": "nine",
+      "method": "t25_batch_nine",
+      "median_ns": 81030.4224751067
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 3,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 1324280.902777778
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 3,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 1021346.530612245
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 3,
+      "case": "btn_bb",
+      "method": "t25_batch_btn_bb",
+      "median_ns": 960138.8095238095
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\t25-kernels.exe",
+      "executable_sha256": "6df4f6f50ed0d6a164bdf9c1899b0a4b028001d176caded1f47b09e003bc7ba9",
+      "repeat": 3,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 3827226.1363636367
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\columns-kernels.exe",
+      "executable_sha256": "739912a83a0f30d20aac66749f3711e4b0e76caa3471767abfaba2e2d342e215",
+      "repeat": 3,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 3050023.833333333
+    },
+    {
+      "executable": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco-t25\\runs\\t26\\filter-kernels.exe",
+      "executable_sha256": "3ce46e846917576e0d66075f2da53493f4a375fb9332d0475d04a09ba83ce44c",
+      "repeat": 3,
+      "case": "wide",
+      "method": "t25_batch_wide",
+      "median_ns": 2990878.923076923
+    }
+  ]
+}

@@ -79,6 +79,7 @@ range・board `Ks 7h 2d`は同梱の`examples/hu-postflop/flop_srp.toml`と同�
 | T23 | `cfr_pass`で、読む前に全要素を書く作業buffer（`sigma`、子へ渡すreach）を0で埋めずに取る（`Scratch::take_overwrite`、debug buildはNaNで埋める） | `.sol` payloadがf32・f64とも変更前とbit一致。32 threadsで0.1%到達が速いこと |
 | T24 | f32終端kernelの包除和を、combo順の1326要素の密配列で区間ごとのvector演算にする試作（単独foldは自comboの値も密に計算、mergeしない） | 32 threadsで0.1%到達が速いこと（不成立のため不採用） |
 | T25 | f32のCFR passで、chanceを含まず内部で並列化しない部分木を再帰せず3段（戦略とreach、全終端の一括評価、値と更新）で進め、同じboardの終端（riverのfoldを含む）を最大8 laneの1回のsweepで評価する（`eval_cfr_batch`） | f64が変更前とbit一致。f32が組分け・thread数によらずbit一致。32 threadsで0.1%到達が速いこと |
+| T26 | T25のlane batchで、lane値を出力行へlocal index順に8 handずつ写し（board-deadは値bufferの行だけ0にする）、rank表を持つfoldを常に順位sweepの無い専用のlane kernelで評価する | f64が変更前とbit一致。f32が組分け・thread数によらずbit一致。32 threadsで0.1%到達が速いこと |
 
 T1とT2は別worktreeで並行し、T2をT1へ統合してからT3を行う。各段階の数値は
 `experiments/p1-perf-2026-10/`に条件・source・結果とともに残す。
@@ -182,6 +183,7 @@ T24（[証拠](../../experiments/p1-perf-2026-10/dense-compat-20261008/README.md
 実際のsupportは数百handで、1326要素の固定費が減った作業を上回った。kernel benchは実際のrangeでも測る。
 T25（[証拠](../../experiments/p1-perf-2026-10/lane-batch-20261008/README.md)）: 32 threadsの1 iterationがFlop1 0.820・gtow_b 0.831倍（1 threadは0.848倍、16 threadsは0.813倍）、目標到達がFlop1 0.889・Flop3 0.856・gtow_b 0.809倍だった。目標までの反復数はf32の丸めの違いで−4%〜+5%揺れる。
 f64は`.sol` payload・checkpoint arena・progressが旧版とbit一致し、f32は組分けと1・4 threadsでbit一致、再帰の処理との差は最大で相対8.4e-7だった。peak RSSの増加は1%未満。
+T26（[証拠](../../experiments/p1-perf-2026-10/lane-fold-20261008/README.md)）: T25の上で、32 threadsの1 iterationがFlop1 0.937・gtow_b 0.927倍（1 threadは0.934倍、16 threadsは0.948倍）、目標到達がFlop1 0.935・Flop3 0.892・gtow_b 0.962倍だった（gtow_bは反復数が+3.6%）。f64は`.sol` payload・checkpoint arena・progressが旧版とbit一致し、f32は組分けと1・4 threadsでbit一致した。
 
 ### 一致の定義
 

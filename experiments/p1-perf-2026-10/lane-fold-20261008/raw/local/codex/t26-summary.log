@@ -1,0 +1,106 @@
+{
+  "verification": {
+    "test_totals": {
+      "passed": 930,
+      "failed": 0,
+      "ignored": 31
+    },
+    "t26_lane_errors": [
+      1.054715315762178e-06,
+      1.1554165204342634e-06
+    ],
+    "existing_batch_error": 1.8357778809248764e-06,
+    "f64_identity": true,
+    "fmt": 0,
+    "clippy": 0,
+    "check-docs": 0,
+    "f64-capture": 0,
+    "build-p1": 0
+  },
+  "changed_files": [
+    "crates/hu-postflop/benches/kernels.rs",
+    "crates/hu-postflop/src/kernel.rs",
+    "crates/hu-postflop/src/lane_precision_tests.rs",
+    "crates/hu-postflop/src/postflop.rs",
+    "crates/hu-postflop/src/precision_tests.rs",
+    "docs/architecture.md",
+    "docs/hu-postflop.jp.md"
+  ],
+  "p1": {
+    "river": {
+      "samples_secs": {
+        "base": [
+          0.000171748,
+          0.000171964,
+          0.000171775
+        ],
+        "new": [
+          0.0001576895,
+          0.0001559795,
+          0.0001570595
+        ]
+      },
+      "medians_secs": {
+        "base": 0.000171775,
+        "new": 0.0001570595
+      },
+      "ratio": 0.9143327026633679,
+      "paired_ratios": [
+        0.9181446072152224,
+        0.9070474052708706,
+        0.9143327026633679
+      ],
+      "median_paired_ratio": 0.9143327026633679
+    },
+    "turn2": {
+      "samples_secs": {
+        "base": [
+          0.012171418,
+          0.012112824,
+          0.012164398
+        ],
+        "new": [
+          0.011543554000000001,
+          0.011469644000000001,
+          0.01147842
+        ]
+      },
+      "medians_secs": {
+        "base": 0.012164398,
+        "new": 0.01147842
+      },
+      "ratio": 0.943607731348481,
+      "paired_ratios": [
+        0.9484148847734916,
+        0.946900904363838,
+        0.943607731348481
+      ],
+      "median_paired_ratio": 0.946900904363838
+    },
+    "flop1": {
+      "samples_secs": {
+        "base": [
+          0.45942368333333333,
+          0.45962413333333335,
+          0.44604098333333336
+        ],
+        "new": [
+          0.45198843333333333,
+          0.4472209833333333,
+          0.47543065
+        ]
+      },
+      "medians_secs": {
+        "base": 0.45942368333333333,
+        "new": 0.45198843333333333
+      },
+      "ratio": 0.9838161368912159,
+      "paired_ratios": [
+        0.9838161368912159,
+        0.9730145806094893,
+        1.0658900589067692
+      ],
+      "median_paired_ratio": 0.9838161368912159
+    }
+  }
+}

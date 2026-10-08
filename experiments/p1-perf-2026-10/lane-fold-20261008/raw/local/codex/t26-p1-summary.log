@@ -1,0 +1,21 @@
+p1-river-1-base affinity=0x1000
+p1-river-1-new affinity=0x1000
+p1-river-2-base affinity=0x1000
+p1-river-2-new affinity=0x1000
+p1-river-3-base affinity=0x1000
+p1-river-3-new affinity=0x1000
+p1-turn2-1-base affinity=0x1000
+p1-turn2-1-new affinity=0x1000
+p1-turn2-2-base affinity=0x1000
+p1-turn2-2-new affinity=0x1000
+p1-turn2-3-base affinity=0x1000
+p1-turn2-3-new affinity=0x1000
+p1-flop1-1-base affinity=0x55
+p1-flop1-1-new affinity=0x55
+p1-flop1-2-base affinity=0x55
+p1-flop1-2-new affinity=0x55
+p1-flop1-3-base affinity=0x55
+p1-flop1-3-new affinity=0x55
+river {'base': 0.000171775, 'new': 0.0001570595} new/base 0.9143327026633679 paired [0.9181446072152224, 0.9070474052708706, 0.9143327026633679]
+turn2 {'base': 0.012164398, 'new': 0.01147842} new/base 0.943607731348481 paired [0.9484148847734916, 0.946900904363838, 0.943607731348481]
+flop1 {'base': 0.45942368333333333, 'new': 0.45198843333333333} new/base 0.9838161368912159 paired [0.9838161368912159, 0.9730145806094893, 1.0658900589067692]

@@ -1,0 +1,105 @@
+## hu_postflop::kernel::terminal_batch_lanes_f32::<5, false>
+
+Sorted summary for file /home/PC_User/prof_t26/release/examples/p1_bench
+----------------------------------------------
+
+   16.08 kernel.rs:0
+   15.52 kernel.rs:399
+   14.14 kernel.rs:432
+    5.61 kernel.rs:418
+    2.53 non_null.rs:1714
+    1.46 kernel.rs:409
+    1.42 kernel.rs:414
+    1.27 cmp.rs:1077
+    1.20 kernel.rs:331
+    1.19 kernel.rs:382
+    1.13 kernel.rs:430
+    1.02 kernel.rs:397
+    0.75 kernel.rs:398
+    0.74 cmp.rs:482
+    0.73 kernel.rs:408
+    0.70 specialize.rs:25
+    0.61 kernel.rs:220
+    0.57 kernel.rs:336
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (14836 samples, percent: local period)
+## hottest instructions
+   10.95 :   cf41d:  vmovss 0x10(%r15,%r14,4),%xmm3
+    5.04 :   cf4d9:  vmovups %xmm7,0x1a8(%rsp,%rdi,4)
+    4.72 :   cf2ab:  vmovups %xmm13,0x1a8(%rsp,%r8,4)
+    3.67 :   cf2a1:  vaddps 0x1a8(%rsp,%r8,4),%xmm6,%xmm13
+    3.05 :   cf4c9:  vmulss 0x10(%r15,%rcx,4),%xmm11,%xmm6 // kernel.rs:432
+    2.49 :   cf414:  mov    %r14d,%r14d // kernel.rs:0
+    2.27 :   cf43c:  vaddps %xmm6,%xmm10,%xmm6 // kernel.rs:418
+    1.62 :   cf513:  vmovups %xmm3,0x1a8(%rsp,%rcx,4) // kernel.rs:432
+    1.52 :   cf2b5:  vmulps %xmm3,%xmm4,%xmm13
+    1.46 :   cf3ba:  cmp    %r8,0x38(%rsp) // kernel.rs:409
+    1.44 :   cf463:  cmp    %rdi,%rcx // non_null.rs:1714
+    1.42 :   cf3e7:  jae    cfadf <hu_postflop::kernel::terminal_batch_lanes_f32::<5, false>+0x173f> // kernel.rs:414
+    1.27 :   cf3b3:  cmp    %rbp,%r10 // cmp.rs:1077
+    1.27 :   cf2c9:  vmovss %xmm10,0x1b8(%rsp,%r8,4)
+    1.25 :   cf4eb:  vmovss %xmm7,0x1b8(%rsp,%rdi,4)
+    1.23 :   cf298:  vshufps $0x93,%xmm6,%xmm6,%xmm6
+    1.20 :   ce654:  cmp    %rdi,0x38(%rsp) // kernel.rs:331
+    1.19 :   cf068:  mov    %rax,0x60(%rsp) // kernel.rs:382
+    1.16 :   cf306:  vaddss 0x1b8(%rsp,%r8,4),%xmm13,%xmm3
+    1.13 :   cf4f4:  movzbl 0x3(%rdx),%edi // kernel.rs:430
+    1.11 :   cf459:  vaddss %xmm3,%xmm10,%xmm3
+    1.09 :   cf52e:  cmp    %rsi,%rdx // non_null.rs:1714
+    1.09 :   cf292:  vinsertps $0x30,%xmm7,%xmm3,%xmm6 // kernel.rs:399
+    1.02 :   cf2d3:  movzbl 0x3(%rcx),%r8d // kernel.rs:397
+    0.98 :   cf28b:  vmovups 0x4(%r15,%r9,4),%xmm3 // kernel.rs:0
+    0.96 :   cf44a:  vsubss 0x1b8(%rsp,%r9,4),%xmm10,%xmm10
+    0.94 :   cf4e2:  vaddss 0x1b8(%rsp,%rdi,4),%xmm6,%xmm7
+    0.93 :   cf51c:  vaddss 0x1b8(%rsp,%rcx,4),%xmm6,%xmm3
+    0.85 :   cf2fc:  vmovups %xmm3,0x1a8(%rsp,%r8,4) // kernel.rs:399
+    0.76 :   cf525:  vmovss %xmm3,0x1b8(%rsp,%rcx,4)
+    0.75 :   cf281:  lea    (%r8,%r8,4),%r8 // kernel.rs:398
+    0.74 :   cf0b6:  cmp    %si,%cx // cmp.rs:482
+    0.73 :   cf395:  cmp    %r8,%r14 // kernel.rs:408
+    0.70 :   cf440:  vsubss 0x1b8(%rsp,%r10,4),%xmm13,%xmm10
+    0.70 :   ce675:  movl   $0x0,0x10(%r8,%rsi,4) // specialize.rs:25
+    0.61 :   cf13c:  vmovups %xmm10,0x1a8(%rsp,%rcx,4) // kernel.rs:220
+    0.60 :   cf2ea:  vaddss %xmm7,%xmm14,%xmm14 // kernel.rs:0
+    0.57 :   cf66b:  vmovss %xmm5,0x64(%rsi) // kernel.rs:336
+    0.57 :   cf45d:  vmovss %xmm3,0x10(%r8)
+    0.56 :   cf4d0:  vaddps 0x1a8(%rsp,%rdi,4),%xmm3,%xmm7
+    0.55 :   cf3a6:  mov    0x88(%rsp),%r10 // kernel.rs:0
+    0.51 :   cf11f:  vmulss (%r15,%r8,4),%xmm5,%xmm6 // kernel.rs:0
+    0.46 :   cf4b5:  jae    cfaff <hu_postflop::kernel::terminal_batch_lanes_f32::<5, false>+0x175f>
+    0.46 :   cf433:  lea    0x0(%rbp,%r8,4),%r8
+    0.45 :   cf657:  vmovss %xmm1,0x14(%rsi)
+    0.45 :   cf3cf:  cmp    $0x33,%r10w
+    0.44 :   cf70d:  add    $0xa0,%rdx
+    0.41 :   cf794:  vmovss %xmm6,-0x14(%rdx)
+    0.41 :   cf780:  vmovss %xmm2,-0x64(%rdx)
+    0.41 :   cf264:  cmp    %r9w,%r12w
+    0.40 :   cf8a5:  vmovss %xmm3,-0x50(%rdx)
+    0.40 :   cf6ff:  vmovss %xmm5,-0x28(%rdx)
+    0.40 :   cf67d:  add    $0xa0,%rsi
+    0.40 :   cf31a:  cmp    %rsi,%rcx
+    0.39 :   cf8af:  vmovss %xmm5,-0x28(%rdx)
+    0.39 :   cf4c3:  vmulps (%r15,%rcx,4),%xmm13,%xmm3
+    0.39 :   cf3fa:  mov    0x80(%rsp),%rbp
+    0.37 :   cf79d:  add    $0xa0,%rdx
+    0.37 :   cf29d:  vmulps %xmm6,%xmm12,%xmm6
+    0.36 :   cf81f:  vmovss %xmm5,-0x28(%rdx)
+    0.36 :   cf810:  vmovss %xmm2,-0x64(%rdx)
+    0.36 :   cf78f:  vmovss %xmm5,-0x28(%rdx)
+    0.36 :   cf3b6:  cmovb  %r10,%rbp
+    0.36 :   cf277:  jae    cf9bf <hu_postflop::kernel::terminal_batch_lanes_f32::<5, false>+0x161f>
+    0.35 :   cf82d:  add    $0xa0,%rdx
+    0.34 :   cf815:  vmovss %xmm3,-0x50(%rdx)
+    0.34 :   cf785:  vmovss %xmm3,-0x50(%rdx)
+    0.33 :   cf65c:  vmovss %xmm2,0x28(%rsi)
+    0.33 :   cf4bf:  lea    (%rdi,%rdi,4),%rdi
+    0.32 :   cf824:  vmovss %xmm6,-0x14(%rdx)
+    0.32 :   cf6f5:  vmovss %xmm3,-0x50(%rdx)
+    0.32 :   cf661:  vmovss %xmm3,0x3c(%rsi)
+    0.31 :   cf675:  vmovss %xmm7,0x8c(%rsi)
+    0.31 :   cf3dd:  shr    $0x8,%r9d
+    0.31 :   cf2e6:  vaddps %xmm3,%xmm15,%xmm15
+    0.30 :   cf8b4:  vmovss %xmm6,-0x14(%rdx)
+    0.30 :   cf8a0:  vmovss %xmm2,-0x64(%rdx)
+    0.30 :   cf6f0:  vmovss %xmm2,-0x64(%rdx)
+    0.30 :   cf666:  vmovss %xmm4,0x50(%rsi)
+    0.30 :   cf406:  add    $0x4,%rdi

@@ -1,0 +1,48 @@
+grouping-nine-1-t25-kernels
+grouping-nine-1-columns-kernels
+grouping-nine-1-kind-sort-kernels
+grouping-nine-1-filter-kernels
+grouping-btn_bb-1-t25-kernels
+grouping-btn_bb-1-columns-kernels
+grouping-btn_bb-1-kind-sort-kernels
+grouping-btn_bb-1-filter-kernels
+grouping-wide-1-t25-kernels
+grouping-wide-1-columns-kernels
+grouping-wide-1-kind-sort-kernels
+grouping-wide-1-filter-kernels
+grouping-nine-2-t25-kernels
+grouping-nine-2-columns-kernels
+grouping-nine-2-kind-sort-kernels
+grouping-nine-2-filter-kernels
+grouping-btn_bb-2-t25-kernels
+grouping-btn_bb-2-columns-kernels
+grouping-btn_bb-2-kind-sort-kernels
+grouping-btn_bb-2-filter-kernels
+grouping-wide-2-t25-kernels
+grouping-wide-2-columns-kernels
+grouping-wide-2-kind-sort-kernels
+grouping-wide-2-filter-kernels
+grouping-nine-3-t25-kernels
+grouping-nine-3-columns-kernels
+grouping-nine-3-kind-sort-kernels
+grouping-nine-3-filter-kernels
+grouping-btn_bb-3-t25-kernels
+grouping-btn_bb-3-columns-kernels
+grouping-btn_bb-3-kind-sort-kernels
+grouping-btn_bb-3-filter-kernels
+grouping-wide-3-t25-kernels
+grouping-wide-3-columns-kernels
+grouping-wide-3-kind-sort-kernels
+grouping-wide-3-filter-kernels
+nine t25-kernels 101986.7941712204 [89975.26898902738, 106010.3839245622, 101986.7941712204]
+nine columns-kernels 76629.27162992951 [76629.27162992951, 43144.34147298225, 83171.61410018553]
+nine kind-sort-kernels 79137.6984126984 [79137.6984126984, 44832.04427083333, 88103.42813051146]
+nine filter-kernels 47030.39795918367 [78517.79987373739, 43728.25445816187, 47030.39795918367]
+btn_bb t25-kernels 667915.6100478468 [1582175.6535947714, 667915.6100478468, 663624.6590909092]
+btn_bb columns-kernels 669613.4920634921 [1223814.981617647, 546047.8054298642, 669613.4920634921]
+btn_bb kind-sort-kernels 549121.25 [1234028.125, 547431.8376068375, 549121.25]
+btn_bb filter-kernels 564054.0680473372 [1237776.736111111, 564054.0680473372, 524784.9296536797]
+wide t25-kernels 3641240.3921568627 [4419545.972222222, 3641240.3921568627, 2204633.3333333335]
+wide columns-kernels 3748611.0714285714 [3748611.0714285714, 4711232.5, 1754866.5740740742]
+wide kind-sort-kernels 3512510.950854701 [3512510.950854701, 3819780.5882352944, 1617473.888888889]
+wide filter-kernels 3381253.409090909 [3661598.10371517, 3381253.409090909, 1609466.049382716]

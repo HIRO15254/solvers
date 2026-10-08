@@ -1,0 +1,7 @@
+crates/hu-postflop/benches/kernels.rs
+crates/hu-postflop/src/kernel.rs
+crates/hu-postflop/src/lane_precision_tests.rs
+crates/hu-postflop/src/postflop.rs
+crates/hu-postflop/src/precision_tests.rs
+docs/architecture.md
+docs/hu-postflop.jp.md

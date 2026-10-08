@@ -33,6 +33,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能・一致の受入 | [P1 全要素を上書きするscratch bufferの0埋めを省く（T23）](p1-perf-2026-10/scratch-overwrite-20261008/README.md) | 2026-10-08。CFR passで読む前に全要素を書くbufferの0埋め（memset）をやめ、32 threadsの1 iterationと目標到達が0.978〜0.983倍。出力はbit一致。T23後のprofileも記録 |
 | 不採用の試作・計測 | [P1 combo順の密配置でf32の包除和とfold kernelをvector化する（T24）](p1-perf-2026-10/dense-compat-20261008/README.md) | 2026-10-08。kernel単体は全supportのrangeで0.52〜0.89倍だが、実際の木で32 threadsの1 iterationが1.12〜1.14倍、目標到達1.14〜1.16倍に遅く不採用。kernel benchは実際のrangeでも測る |
 | 性能・一致の受入 | [P1 chanceの無い部分木の終端を8 laneでまとめて評価する（T25）](p1-perf-2026-10/lane-batch-20261008/README.md) | 2026-10-08。f32のCFR passで、river部分木の終端を同じboardごとに最大8個まとめて1回のsweepで評価し、32 threadsの1 iterationが0.82〜0.84倍、目標到達が0.81〜0.90倍。f64はbit一致。T25後のprofileも記録 |
+| 性能・一致の受入 | [P1 lane batchの出力の写しを速くし、riverのfoldを専用のlane kernelへ分ける（T26）](p1-perf-2026-10/lane-fold-20261008/README.md) | 2026-10-08。lane値を出力行へ8 handずつ写し、riverのfoldを順位sweepの無いlane kernelで評価する。32 threadsの1 iterationが0.93〜0.94倍、目標到達が0.89〜0.96倍。f64はbit一致 |
 | 過去の参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |

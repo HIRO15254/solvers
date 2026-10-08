@@ -1,0 +1,36 @@
+confirm-nine-1-t25-kernels
+confirm-nine-1-columns-kernels
+confirm-nine-1-filter-kernels
+confirm-btn_bb-1-t25-kernels
+confirm-btn_bb-1-columns-kernels
+confirm-btn_bb-1-filter-kernels
+confirm-wide-1-t25-kernels
+confirm-wide-1-columns-kernels
+confirm-wide-1-filter-kernels
+confirm-nine-2-t25-kernels
+confirm-nine-2-columns-kernels
+confirm-nine-2-filter-kernels
+confirm-btn_bb-2-t25-kernels
+confirm-btn_bb-2-columns-kernels
+confirm-btn_bb-2-filter-kernels
+confirm-wide-2-t25-kernels
+confirm-wide-2-columns-kernels
+confirm-wide-2-filter-kernels
+confirm-nine-3-t25-kernels
+confirm-nine-3-columns-kernels
+confirm-nine-3-filter-kernels
+confirm-btn_bb-3-t25-kernels
+confirm-btn_bb-3-columns-kernels
+confirm-btn_bb-3-filter-kernels
+confirm-wide-3-t25-kernels
+confirm-wide-3-columns-kernels
+confirm-wide-3-filter-kernels
+nine t25-kernels 91162.94936947111 [91162.94936947111, 88545.1851851852, 96048.8125]
+nine columns-kernels 80143.6170212766 [81278.25484764542, 77393.74065071055, 80143.6170212766]
+nine filter-kernels 80337.45519713261 [43802.44565217391, 80337.45519713261, 81030.4224751067]
+btn_bb t25-kernels 1293783.5714285714 [662569.5211038961, 1293783.5714285714, 1324280.902777778]
+btn_bb columns-kernels 1021346.530612245 [550215.673076923, 1023034.3156843157, 1021346.530612245]
+btn_bb filter-kernels 960138.8095238095 [512436.71875, 996066.6666666667, 960138.8095238095]
+wide t25-kernels 3827226.1363636367 [2112718.3673469387, 3853572.7678571427, 3827226.1363636367]
+wide columns-kernels 3050023.833333333 [1833281.7708333335, 3096517.8571428573, 3050023.833333333]
+wide filter-kernels 2873339.230769231 [1641447.702991453, 2873339.230769231, 2990878.923076923]
