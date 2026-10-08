@@ -1,5 +1,7 @@
 //! Terminal micro-benchmarks through the real evaluator dispatch: f64 `eval`
 //! and f32 `eval_cfr`, on narrow asymmetric and full-support river ranges.
+//! Realistic calls and fold/showdown sibling pairs use the same f64-solved
+//! reach workload across baseline and optimized executables.
 //!
 //! Run with `cargo bench -p hu-postflop` (see `docs/development.md`); `cargo bench -p
 //! hu-postflop -- --test` runs one iteration per bench as a smoke test.
@@ -187,9 +189,19 @@ fn bench_realistic(c: &mut Criterion) {
     let built = build_river_game(&config, chip_ev());
     // On the river every terminal except a child labeled "fold" is showdown.
     let mut folds = BTreeSet::new();
+    let mut sibling_nodes = Vec::new();
     for info in &built.node_info {
         let id = built.node_by_history(&info.history).unwrap();
         let node = built.game.tree.node(id);
+        let terminal = |label: &str| {
+            info.actions.iter().position(|s| s == label).and_then(|a| {
+                let child = built.game.tree.node(node.first_child + a as u32);
+                (child.kind == NodeKind::Terminal).then_some(child.aux)
+            })
+        };
+        if let (Some(fold), Some(showdown)) = (terminal("fold"), terminal("call")) {
+            sibling_nodes.push((id, node.player, fold, showdown));
+        }
         for (action, label) in info.actions.iter().enumerate() {
             if label == "fold" {
                 let child = built.game.tree.node(node.first_child + action as u32);
@@ -199,11 +211,25 @@ fn bench_realistic(c: &mut Criterion) {
         }
     }
     let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
-    solver.set_cfr_precision(CfrPrecision::F32);
+    // Freeze collection arithmetic across base/A/A+B.
+    solver.set_cfr_precision(CfrPrecision::F64);
     let mut sets = [Vec::new(), Vec::new()];
+    let mut siblings = Vec::new();
     for iterations in [300, 50, 50] {
         solver.run(iterations);
         let game = solver.game();
+        for &(id, p, fold, showdown) in &sibling_nodes {
+            let reach = reach_at(
+                &game.tree,
+                game.root_ranges.as_ref().map(|r| r.as_slice()),
+                id,
+                |id, _, out| out.copy_from_slice(&solver.current_strategy_at(id)),
+            );
+            let opponent = &reach[p.opponent()];
+            if opponent.iter().any(|&r| r != 0.0) {
+                siblings.push((p, fold, showdown, opponent.clone()));
+            }
+        }
         for (id, node) in game.tree.nodes.iter().enumerate() {
             if node.kind != NodeKind::Terminal {
                 continue;
@@ -224,12 +250,61 @@ fn bench_realistic(c: &mut Criterion) {
             }
         }
     }
+    solver.set_cfr_precision(CfrPrecision::F32);
     let game = solver.game();
     let mut out = PerPlayer::new(
         vec![0.0; game.evaluator.hands.len(Player::P0)],
         vec![0.0; game.evaluator.hands.len(Player::P1)],
     );
     let mut group = c.benchmark_group("kernels_realistic");
+    let hash = siblings
+        .iter()
+        .flat_map(|(_, _, _, r)| r)
+        .fold(0xcbf2_9ce4_8422_2325u64, |h, r| {
+            (h ^ u64::from(r.to_bits())).wrapping_mul(0x100_0000_01b3)
+        });
+    eprintln!(
+        "t20 realistic siblings: {} pairs, reach hash {hash:016x}",
+        siblings.len()
+    );
+    let mut fold_out = out.clone();
+    for fused in [false, true] {
+        group.bench_function(
+            if fused {
+                "t20_siblings"
+            } else {
+                "t20_separate"
+            },
+            |b| {
+                b.iter(|| {
+                    for (p, fold, showdown, reach) in &siblings {
+                        if fused {
+                            game.evaluator.eval_cfr_siblings(
+                                black_box(&[*fold, *showdown]),
+                                black_box(*p),
+                                black_box(reach),
+                                &mut [&mut fold_out[*p], &mut out[*p]],
+                            );
+                        } else {
+                            game.evaluator.eval_cfr(
+                                black_box(*fold),
+                                black_box(*p),
+                                black_box(reach),
+                                &mut fold_out[*p],
+                            );
+                            game.evaluator.eval_cfr(
+                                black_box(*showdown),
+                                black_box(*p),
+                                black_box(reach),
+                                &mut out[*p],
+                            );
+                        }
+                        black_box((&fold_out[*p], &out[*p]));
+                    }
+                });
+            },
+        );
+    }
     for (kind, set) in ["fold", "showdown"].into_iter().zip(sets) {
         let entries: usize = set.iter().map(|(_, _, r)| r.len()).sum();
         let zeros: usize = set

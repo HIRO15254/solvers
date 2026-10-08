@@ -443,6 +443,75 @@ impl TerminalEvaluator for PostflopEvaluator {
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
     }
+    fn eval_cfr_siblings(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reach: &[f32],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), outs.len());
+        let pair = if self.cfr_precision == hu_engine::CfrPrecision::F32 && terminals.len() >= 2 {
+            terminals.iter().enumerate().find_map(|(f, &id)| {
+                let fold = &self.terminals[id as usize];
+                if !matches!(fold.kind, TerminalKind::Fold { .. }) {
+                    return None;
+                }
+                terminals.iter().enumerate().find_map(|(s, &id)| {
+                    let showdown = &self.terminals[id as usize];
+                    (matches!(showdown.kind, TerminalKind::Showdown)
+                        && fold.board_mask == showdown.board_mask)
+                        .then_some((f, s))
+                })
+            })
+        } else {
+            None
+        };
+        if let Some((f, s)) = pair {
+            let fold = &self.terminals[terminals[f] as usize];
+            let show = &self.terminals[terminals[s] as usize];
+            let utilities = match p {
+                Player::P0 => [
+                    show.payoffs.win_p0[p],
+                    show.payoffs.tie[p],
+                    show.payoffs.win_p1[p],
+                    fold.payoffs.win_p0[p],
+                ],
+                Player::P1 => [
+                    show.payoffs.win_p1[p],
+                    show.payoffs.tie[p],
+                    show.payoffs.win_p0[p],
+                    fold.payoffs.win_p1[p],
+                ],
+            };
+            let (fold_out, show_out) = if f < s {
+                let (before, after) = outs.split_at_mut(s);
+                (&mut *before[f], &mut *after[0])
+            } else {
+                let (before, after) = outs.split_at_mut(f);
+                (&mut *after[0], &mut *before[s])
+            };
+            debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
+            debug_assert_eq!(fold_out.len(), self.hands.len(p));
+            debug_assert_eq!(show_out.len(), self.hands.len(p));
+            show_out.fill(0.0);
+            let table = &self.rank_tables[show.table as usize];
+            kernel::showdown_fold_kernel_relaxed_f32(
+                &table[p],
+                &table[p.opponent()],
+                &self.hands.same[p],
+                utilities,
+                opp_reach,
+                show_out,
+                fold_out,
+            );
+        }
+        for (i, (&terminal, out)) in terminals.iter().zip(outs).enumerate() {
+            if pair.is_none_or(|(f, s)| i != f && i != s) {
+                self.eval_cfr(terminal, p, opp_reach, out);
+            }
+        }
+    }
     /// Set CFR terminal arithmetic; all evaluation calls remain f64.
     fn set_cfr_precision(&mut self, precision: hu_engine::CfrPrecision) {
         self.cfr_precision = precision;

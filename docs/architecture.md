@@ -114,6 +114,10 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 を備える。CLI の選択肢と既定値は規範仕様に置き、本書には別の既定値表を作らない。
 
 `CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
+f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
+action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
+全0相手reachのpruningと`ActionViews`のstorage分割を維持する。既定hookは個別の`eval_cfr`を呼ぶ。
+P1は同一boardのfold・showdownをf32 kernelで融合する。f64のCFR経路と`eval`は従来どおりである。
 
 `Solver<E,S>` は alternating update を行い、平均戦略を解として扱う。
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する

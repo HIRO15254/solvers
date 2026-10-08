@@ -92,8 +92,11 @@ live queryのtarget判定にも同じ評価方式を使う。
 
 `[solver] cfr_precision`は`"f32"`（既定）と`"f64"`を選べる。対象はCFR passの終端kernelとcurrent strategyのregret matchingである。
 f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
-showdownの同順位groupは自身のtotal/card和でtieを計算し、処理後のbelow card和へgroupのcard和を加える。
-strictly belowのgroupを先に追加する場合は、card和へhand順に直接加算する。
+showdownはloseの効用で重み付けしたtotal/card和から始め、相手groupを順位順にtie、winの重みへ増分更新する。
+自handの値は共通totalから2枚のcard和を引き、同一comboのtie補正を加える。相手reachが0でも分岐せず加算する。
+同順位groupの処理後は既存の52枚のcard和mergeでtieの重みをwinへ変換する。
+更新playerのactionで同じ相手reachを受ける同一boardのfold・showdown終端は、f32に限り1回のkernelで評価する。
+相手和と自handのloopを共有し、fold出力は全要素を0で初期化してからshowdown順位表の全live自handへ書き込む。
 regret matchingは正部分をf32で合計し、その和のf32逆数を各正部分へ掛ける。和が0なら一様分布とする。
 Exploitability・EV・BR評価、平均戦略の正規化、`.sol`保存EVは両モードで従来の厳密なf64計算を使う。
 両モードで決定性とthread数による結果不変を保つ。旧版とのbit一致は`f64`だけで保証する。

@@ -9,6 +9,16 @@
 //! the inclusion-exclusion sums stay exact because dead hands contribute zero.
 //! The f64 sums add the nonzero terms in the same order as the former dense
 //! kernels (rank order, then global combo order), so results are bit-identical.
+//! The f32 showdown sweep maintains one utility-weighted total/card array:
+//! all hands start at lose, tied groups move to tie, then to win. Own hands
+//! need two card loads plus the identical-combo tie correction. Opponent
+//! additions are unconditional and follow fixed rank/hand order, independent
+//! of thread count. Only live ranked own entries are written; the caller
+//! zeros the remaining entries. The fused f32 showdown/fold variant shares
+//! opponent sums and the own-hand loop for terminal siblings with the same
+//! board and opponent reach. It clears the fold output first and writes only
+//! live ranked own hands; the rank table must cover every board-live support
+//! entry. Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
 
 use crate::hands::ABSENT;
 use nlh::HandRank;
@@ -139,7 +149,120 @@ fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
         reach[other as usize]
     }
 }
+fn add_weighted_f32(
+    hands: &[Hand],
+    reach: &[f32],
+    weight: f32,
+    total: &mut f32,
+    card: &mut [f32; 52],
+) {
+    for h in hands {
+        let r = weight * reach[h.local as usize];
+        *total += r;
+        card[h.cards[0] as usize] += r;
+        card[h.cards[1] as usize] += r;
+    }
+}
 pub(crate) fn showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [win, tie, lose] = utilities;
+    showdown_relaxed_f32::<false>(own, opp, same, [win, tie, lose, 0.0], reach, out, &mut []);
+}
+
+/// Utilities are [showdown win, tie, lose, fold]. The fold output is cleared
+/// here, then written only for live ranked own hands. Both outcomes share all
+/// opponent passes and the identical-combo lookup in one own-hand loop.
+pub(crate) fn showdown_fold_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 4],
+    reach: &[f32],
+    out: &mut [f32],
+    fold_out: &mut [f32],
+) {
+    showdown_relaxed_f32::<true>(own, opp, same, utilities, reach, out, fold_out);
+}
+
+fn showdown_relaxed_f32<const FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 4],
+    reach: &[f32],
+    out: &mut [f32],
+    fold_out: &mut [f32],
+) {
+    let [u_win, u_tie, u_lose, u_fold] = utilities.map(|u| u as f32);
+    if FOLD {
+        fold_out.fill(0.0);
+    }
+    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
+    let mut total = u_lose * all_total;
+    let mut card = all_card.map(|v| u_lose * v);
+    let mut oi = 0;
+    let mut os = 0;
+    let mut start = 0;
+    for &(rank, end) in &own.groups {
+        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+            let oe = opp.groups[oi].1;
+            add_weighted_f32(
+                &opp.hands[os..oe],
+                reach,
+                u_win - u_lose,
+                &mut total,
+                &mut card,
+            );
+            os = oe;
+            oi += 1;
+        }
+        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+        let oe = if tied { opp.groups[oi].1 } else { os };
+        let mut group_total = 0.0;
+        let mut group_card = [0.0; 52];
+        for h in &opp.hands[os..oe] {
+            let [a, b] = h.cards.map(usize::from);
+            let r = reach[h.local as usize];
+            let weighted = (u_tie - u_lose) * r;
+            group_total += r;
+            group_card[a] += r;
+            group_card[b] += r;
+            card[a] += weighted;
+            card[b] += weighted;
+        }
+        total += (u_tie - u_lose) * group_total;
+        // K - C[a] - C[b] + u_tie * same: two card loads per own hand.
+        for &h in &own.hands[start..end] {
+            let [a, b] = h.cards.map(usize::from);
+            let same = same_reach_relaxed_f32(same, h, reach);
+            out[h.local as usize] = total - card[a] - card[b] + u_tie * same;
+            if FOLD {
+                fold_out[h.local as usize] =
+                    u_fold * (all_total - all_card[a] - all_card[b] + same);
+            }
+        }
+        if tied {
+            // Reuse the existing 52-card merge to convert tie to win.
+            total += (u_win - u_tie) * group_total;
+            for (c, g) in card.iter_mut().zip(group_card) {
+                *c += (u_win - u_tie) * g;
+            }
+            os = oe;
+            oi += 1;
+        }
+        start = end;
+    }
+}
+
+// Frozen fdd3618 f32 implementation for accuracy regression tests.
+#[cfg(test)]
+pub(crate) fn head_showdown_kernel_relaxed_f32(
     own: &RankedHands,
     opp: &RankedHands,
     same: &[u16],

@@ -10,7 +10,7 @@ use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageSta
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
-/// path, called once per terminal per pass and amortized over all hands.
+/// path, called per terminal or sibling batch per pass, amortized over all hands.
 ///
 /// Writes, for each of player `p`'s hands, the unnormalized expected payoff
 /// to `p`: the sum over opponent hands of `opp_reach[o] * compat(h, o) *
@@ -22,6 +22,21 @@ pub trait TerminalEvaluator: Send + Sync {
     /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval(terminal, p, opp_reach, out);
+    }
+    /// CFR terminal children of one updating-player node, with identical
+    /// opponent reach. Each output starts at zero. The engine supplies small
+    /// batches in child order; other evaluators retain per-terminal behavior.
+    fn eval_cfr_siblings(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reach: &[f32],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), outs.len());
+        for (&terminal, out) in terminals.iter().zip(outs) {
+            self.eval_cfr(terminal, p, opp_reach, out);
+        }
     }
     /// Select the arithmetic of `eval_cfr`. Evaluators without a relaxed
     /// kernel ignore it; `Solver::set_cfr_precision` forwards here.
@@ -825,6 +840,42 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             // action's own `out` parameter, so its recursion writes
             // straight into place instead of returning a fresh `Vec`.
             let mut cfvs = scratch.take(sref.len());
+            // Keep the f64 traversal exactly as before. In f32, terminal
+            // rows need no own reach or storage, so evaluate them together
+            // before either sequential or parallel nonterminal recursion.
+            // Stack batches of two avoid per-action-node heap allocations.
+            let siblings = ctx.cfr_precision == CfrPrecision::F32;
+            if siblings && (!PRUNE || !opp_reach.iter().all(|&x| x == 0.0)) {
+                let mut pending = None;
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let child = ctx.tree.node(child);
+                    if child.kind != NodeKind::Terminal {
+                        continue;
+                    }
+                    if let Some((previous, terminal)) = pending.take() {
+                        let (before, after) = cfvs.split_at_mut(a * num_hands);
+                        let first = &mut before[previous * num_hands..(previous + 1) * num_hands];
+                        let second = &mut after[..num_hands];
+                        debug_assert!(first.iter().chain(second.iter()).all(|&v| v == 0.0));
+                        ctx.evaluator.eval_cfr_siblings(
+                            &[terminal, child.aux],
+                            ctx.p,
+                            opp_reach,
+                            &mut [first, second],
+                        );
+                    } else {
+                        pending = Some((a, child.aux));
+                    }
+                }
+                if let Some((a, terminal)) = pending {
+                    ctx.evaluator.eval_cfr_siblings(
+                        &[terminal],
+                        ctx.p,
+                        opp_reach,
+                        &mut [&mut cfvs[a * num_hands..(a + 1) * num_hands]],
+                    );
+                }
+            }
             let mut node_cfv = scratch.take(num_hands);
             // Reused across actions (not re-taken per action): its
             // recursive use always returns before the next action starts,
@@ -840,6 +891,11 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     .zip(cfvs.par_chunks_mut(num_hands))
                     .enumerate()
                     .for_each(|(a, (view, row))| {
+                        if siblings
+                            && ctx.tree.node(node.first_child + a as u32).kind == NodeKind::Terminal
+                        {
+                            return;
+                        }
                         with_worker_scratch(|scratch| {
                             let mut reach = scratch.take(num_hands);
                             for h in 0..num_hands {
@@ -860,6 +916,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     });
             } else {
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    if siblings && ctx.tree.node(child).kind == NodeKind::Terminal {
+                        continue;
+                    }
                     let row = &sigma[a * num_hands..(a + 1) * num_hands];
                     for h in 0..num_hands {
                         my_next[h] = my_reach[h] * row[h];
@@ -1513,3 +1572,7 @@ pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
 #[cfg(test)]
 #[path = "solver/dead_subtree_tests.rs"]
 mod dead_subtree_tests;
+
+#[cfg(test)]
+#[path = "solver/sibling_tests.rs"]
+mod sibling_tests;
