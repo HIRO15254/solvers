@@ -683,3 +683,6 @@ mod opponent_precision_tests;
 
 #[path = "batch_precision_tests.rs"]
 mod batch_precision_tests;
+
+#[path = "lane_precision_tests.rs"]
+mod lane_precision_tests;

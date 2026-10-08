@@ -95,6 +95,7 @@ fn bench_kernels(c: &mut Criterion) {
     bench_case(c, "kernels_wide", wide_river_config());
     bench_realistic(c);
     bench_t25_btn_bb(c);
+    bench_t26_nine(c);
 }
 
 fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
@@ -438,7 +439,13 @@ struct T25Call {
 // RiverConfig has no explicit include_allin option; its fractions are clamped
 // to the remaining stack by the existing river builder.
 fn bench_t25_btn_bb(c: &mut Criterion) {
-    let config = RiverConfig {
+    let config = t25_btn_bb_config();
+    let built = build_river_game(&config, chip_ev());
+    bench_t25_game(c, "btn_bb", built.game);
+}
+
+fn t25_btn_bb_config() -> RiverConfig {
+    RiverConfig {
         board: parse_cards("Ks 7h 2d 3c 9s").try_into().unwrap(),
         ranges: PerPlayer::new(
             "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
@@ -448,9 +455,63 @@ fn bench_t25_btn_bb(c: &mut Criterion) {
         max_raises: 3,
         effective_stack: Chips(200),
         ..river_config()
-    };
-    let built = build_river_game(&config, chip_ev());
-    let mut solver = Solver::<_, F32Storage>::new(built.game, Box::new(Dcfr::default()), Some(400));
+    }
+}
+
+// Match the common Flop1 river subtree: one bet75%, one raise3x, and two
+// aggressive actions, giving five showdowns and four folds. The river shim
+// cannot express a distinct raise menu, so use the same general builder.
+fn bench_t26_nine(c: &mut Criterion) {
+    use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+    let base = t25_btn_bb_config();
+    let mut river = StreetTree::pot_fractions(&[0.75], &[0.75], 2);
+    for rule in &mut river.rules {
+        if rule.action == Some(nlh::script::ActionKind::Raise) {
+            rule.sizes = vec![nlh::SizeSpec::PreviousBetMultiple { factor: 3.0 }];
+        }
+    }
+    let built = build_postflop_game(
+        &PostflopConfig {
+            board: base.board.to_vec(),
+            ranges: base.ranges,
+            pot: base.pot,
+            effective_stack: base.effective_stack,
+            streets: PerStreet {
+                river,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+        chip_ev(),
+    );
+    assert_eq!(
+        built
+            .game
+            .tree
+            .nodes
+            .iter()
+            .filter(|n| n.kind == NodeKind::Terminal)
+            .count(),
+        9
+    );
+    assert_eq!(
+        built
+            .node_info
+            .iter()
+            .flat_map(|n| &n.actions)
+            .filter(|a| *a == "fold")
+            .count(),
+        4
+    );
+    bench_t25_game(c, "nine", built.game);
+}
+
+fn bench_t25_game(
+    c: &mut Criterion,
+    label: &str,
+    game: hu_engine::CompiledGame<hu_postflop::PostflopEvaluator>,
+) {
+    let mut solver = Solver::<_, F32Storage>::new(game, Box::new(Dcfr::default()), Some(400));
     solver.set_cfr_precision(CfrPrecision::F64);
     let mut workloads = Vec::new();
     for iterations in [300, 50, 50] {
@@ -460,7 +521,7 @@ fn bench_t25_btn_bb(c: &mut Criterion) {
         }
     }
     solver.set_cfr_precision(CfrPrecision::F32);
-    bench_t25(c, "btn_bb", &solver, &workloads);
+    bench_t25(c, label, &solver, &workloads);
 }
 struct T25Workload {
     p: Player,
@@ -621,6 +682,39 @@ fn bench_t25(
         "t25 {label} maximum relative infinity error={max_error:e}; width-1/full grouping bitwise equal"
     );
     let mut group = c.benchmark_group("kernels_realistic");
+    // Isolate the actual input pack used by the lane kernels. Buffers are
+    // warmed outside the timer; each replay touches exactly the same reach
+    // entries as the full terminal replay (regardless of kind partitioning).
+    let max_opp = reaches.iter().flatten().map(|r| r.len()).max().unwrap();
+    let mut interleaved = vec![0.0f32; (max_opp + 1) * 8];
+    group.bench_function(format!("t26_interleave_{label}"), |b| {
+        b.iter(|| {
+            for rs in &reaches {
+                for lanes in rs.chunks(8) {
+                    let width = lanes.len();
+                    let len = lanes[0].len();
+                    let buf = &mut interleaved[..(len + 1) * width];
+                    macro_rules! pack {
+                        ($lanes:literal) => {
+                            t26_interleave::<$lanes>(lanes, buf)
+                        };
+                    }
+                    match width {
+                        1 => pack!(1),
+                        2 => pack!(2),
+                        3 => pack!(3),
+                        4 => pack!(4),
+                        5 => pack!(5),
+                        6 => pack!(6),
+                        7 => pack!(7),
+                        8 => pack!(8),
+                        _ => unreachable!(),
+                    }
+                    black_box(&buf);
+                }
+            }
+        })
+    });
     for mode in ["t25_lone", "t25_current", "t25_batch"] {
         group.bench_function(format!("{mode}_{label}"), |b| {
             b.iter(|| {
@@ -732,6 +826,21 @@ fn bench_t25(
         });
     }
     group.finish();
+}
+
+// Duplicate just the input pack for its isolated cost estimate; fixed-width
+// specialization and summation-free write order match the kernel exactly.
+#[inline(never)]
+fn t26_interleave<const LANES: usize>(reaches: &[&[f32]], buffer: &mut [f32]) {
+    assert_eq!(reaches.len(), LANES);
+    let len = reaches[0].len();
+    let (rows, _) = buffer.as_chunks_mut::<LANES>();
+    rows[len].fill(0.0);
+    for (lane, &reach) in reaches.iter().enumerate() {
+        for (row, &r) in rows[..len].iter_mut().zip(reach) {
+            row[lane] = r;
+        }
+    }
 }
 
 // Baseline of the engine's current opponent-terminal path.

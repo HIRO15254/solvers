@@ -39,6 +39,9 @@ pub(crate) struct RankedHands {
     pub hands: Vec<Hand>,
     // Rank and exclusive end offset; within a group, global combo order.
     pub groups: Vec<(HandRank, usize)>,
+    // Board-dead locals precomputed for CFR lane outputs. Non-CFR tables do
+    // not use this list. Clear only these entries, without a full output fill.
+    pub dead: Vec<u16>,
 }
 fn add(hands: &[Hand], reach: &[f32], total: &mut f64, card: &mut [f64; 52]) {
     for h in hands {
@@ -154,6 +157,44 @@ struct TerminalLaneBuffers {
     reach: Vec<f32>,
     values: Vec<f32>,
 }
+
+// Batch indices are increasing within their (table, kind) group. Fetch each
+// independent output slice once, splitting the reference slice safely, so
+// per-hand stores do not repeatedly reload pointers through `outs[indices]`.
+fn lane_outputs<'a, const LANES: usize>(
+    outs: &'a mut [&mut [f32]],
+    indices: &[usize],
+) -> [&'a mut [f32]; LANES] {
+    let mut tail = outs;
+    let mut first = 0;
+    std::array::from_fn(|lane| {
+        let previous = std::mem::take(&mut tail);
+        let (_, after) = previous.split_at_mut(indices[lane] - first);
+        let (row, rest) = after.split_first_mut().unwrap();
+        tail = rest;
+        first = indices[lane] + 1;
+        &mut **row
+    })
+}
+
+// Copy each column of eight consecutive local rows into a fixed-size output
+// block. This keeps the output pointer fixed and stores adjacent entries;
+// LLVM chooses scalar or vector instructions for each lane width.
+// Full chunks and tails use the same entry order; dead rows were cleared in
+// the interleaved buffer, so this overwrites every output, including +0.0s.
+fn store_lane_values<const LANES: usize>(values: &[[f32; LANES]], rows: [&mut [f32]; LANES]) {
+    let (blocks, tail) = values.as_chunks::<8>();
+    for (lane, row) in rows.into_iter().enumerate() {
+        let (out_blocks, out_tail) = row.as_chunks_mut::<8>();
+        for (block, dst) in blocks.iter().zip(out_blocks) {
+            *dst = std::array::from_fn(|h| block[h][lane]);
+        }
+        for (dst, value) in out_tail.iter_mut().zip(tail) {
+            *dst = value[lane];
+        }
+    }
+}
+
 thread_local! {
     // Retain the high-water lengths to avoid zeroing on alternating full and
     // partial batches. Each call touches only support_length * lane_count.
@@ -183,12 +224,13 @@ fn add_lane_hands<const LANES: usize>(
     }
 }
 
-/// Single-board f32 batch, including folds with equal win/tie/lose utilities.
+/// Single-board f32 showdown batch. River folds use the separate entry below.
 /// Reused worker buffers hold (opponent support + 1) * active lanes reaches
 /// and own support * active lanes values. After first use/growth there is no
-/// allocation or bulk buffer zeroing. Only the sentinel row is cleared.
-/// Stack arrays are 52 * active lanes card sums and a few lane vectors
-/// (less than 3 KiB at eight lanes). Dead own outputs are explicitly cleared.
+/// allocation or bulk buffer zeroing. Packing clears only the reach sentinel.
+/// Stack arrays are 52 * active lanes card sums and a few lane vectors.
+/// Dead value-buffer rows are cleared, then the blocked copy writes every
+/// output entry, including positive zero for board-dead own hands.
 /// Width specialization keeps even a one-lane call proportional to its width;
 /// every width uses the same per-terminal summation order.
 pub(crate) fn terminal_batch_kernel_f32(
@@ -200,10 +242,38 @@ pub(crate) fn terminal_batch_kernel_f32(
     outs: &mut [&mut [f32]],
     indices: &[usize],
 ) {
+    terminal_batch_kernel_f32_impl::<false>(own, opp, same, utilities, reaches, outs, indices);
+}
+
+/// River folds always use this lane kernel, regardless of caller grouping.
+/// It computes unweighted compatibility sums in rank-table hand order, then
+/// multiplies u_fold * (total - card[a] - card[b] + same), like the lone f32
+/// fold kernel. Applying the utility last avoids utility-scaled cancellation.
+pub(crate) fn fold_batch_kernel_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    terminal_batch_kernel_f32_impl::<true>(own, opp, same, utilities, reaches, outs, indices);
+}
+
+fn terminal_batch_kernel_f32_impl<const FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: &[[f32; 3]],
+    reaches: &[&[f32]],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
     TERMINAL_LANE_BUFFERS.with_borrow_mut(|scratch| {
         macro_rules! dispatch {
             ($lanes:literal) => {
-                terminal_batch_lanes_f32::<$lanes>(
+                terminal_batch_lanes_f32::<$lanes, FOLD>(
                     own, opp, same, utilities, reaches, outs, indices, scratch,
                 )
             };
@@ -226,7 +296,7 @@ pub(crate) fn terminal_batch_kernel_f32(
 // Keep the width-specific frames separate: inlining the dispatch otherwise
 // reserves the eight-lane frame even for a one-lane call.
 #[inline(never)]
-fn terminal_batch_lanes_f32<const LANES: usize>(
+fn terminal_batch_lanes_f32<const LANES: usize, const FOLD: bool>(
     own: &RankedHands,
     opp: &RankedHands,
     same: &[u16],
@@ -254,9 +324,12 @@ fn terminal_batch_lanes_f32<const LANES: usize>(
     let (buf, _) = scratch.reach[..reach_size].as_chunks_mut::<LANES>();
     let (values, _) = scratch.values[..value_size].as_chunks_mut::<LANES>();
     buf[opp_len].fill(0.0);
-    for &i in indices {
-        assert_eq!(outs[i].len(), own_len);
-        outs[i].fill(0.0);
+    let rows = lane_outputs::<LANES>(outs, indices);
+    for row in &rows {
+        assert_eq!(row.len(), own_len);
+    }
+    for &local in &own.dead {
+        values[local as usize].fill(0.0);
     }
     for (lane, &reach) in reaches.iter().enumerate() {
         assert_eq!(reach.len(), opp_len);
@@ -278,85 +351,96 @@ fn terminal_batch_lanes_f32<const LANES: usize>(
     let mut total = [0.0; LANES];
     let mut card = [[0.0; LANES]; 52];
     add_lane_hands(&opp.hands, buf, [1.0; LANES], &mut total, &mut card);
-    for (t, u) in total.iter_mut().zip(lose) {
-        *t *= u;
-    }
-    for row in &mut card {
-        for (c, u) in row.iter_mut().zip(lose) {
-            *c *= u;
-        }
-    }
-    let mut oi = 0;
-    let mut os = 0;
-    let mut start = 0;
-    for &(rank, end) in &own.groups {
-        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
-            let oe = opp.groups[oi].1;
-            add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
-            os = oe;
-            oi += 1;
-        }
-        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
-        let oe = if tied { opp.groups[oi].1 } else { os };
-        let mut group_total = [0.0; LANES];
-        for h in &opp.hands[os..oe] {
-            let r = buf[h.local as usize];
-            for (t, r) in group_total.iter_mut().zip(r) {
-                *t += r;
-            }
-            for &c in &h.cards {
-                for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
-                    *v += w * r;
-                }
-            }
-        }
-        for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
-            *t += w * g;
-        }
-        for h in &own.hands[start..end] {
+    if FOLD {
+        // One opponent pass above, one live-own pass here: no rank groups.
+        for h in &own.hands {
             let [a, b] = h.cards.map(usize::from);
             let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
             let row = &mut values[h.local as usize];
-            for (((((v, t), ca), cb), s), u) in row
+            for (((((v, t), ca), cb), r), u) in row
                 .iter_mut()
                 .zip(total)
                 .zip(card[a])
                 .zip(card[b])
                 .zip(identical)
-                .zip(tie)
+                .zip(win)
             {
-                *v = t - ca - cb + u * s;
+                *v = u * (t - ca - cb + r);
             }
         }
-        if tied {
-            // Re-read just the tied hands instead of resetting/merging a
-            // 52 x 8 group array for every own rank. Total retains the same
-            // group-wise addition order as the existing relaxed sweep.
-            for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
-                *t += w * g;
+    } else {
+        for (t, u) in total.iter_mut().zip(lose) {
+            *t *= u;
+        }
+        for row in &mut card {
+            for (c, u) in row.iter_mut().zip(lose) {
+                *c *= u;
             }
+        }
+        let mut oi = 0;
+        let mut os = 0;
+        let mut start = 0;
+        for &(rank, end) in &own.groups {
+            while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+                let oe = opp.groups[oi].1;
+                add_lane_hands(&opp.hands[os..oe], buf, win_lose, &mut total, &mut card);
+                os = oe;
+                oi += 1;
+            }
+            let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+            let oe = if tied { opp.groups[oi].1 } else { os };
+            let mut group_total = [0.0; LANES];
             for h in &opp.hands[os..oe] {
                 let r = buf[h.local as usize];
+                for (t, r) in group_total.iter_mut().zip(r) {
+                    *t += r;
+                }
                 for &c in &h.cards {
-                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
+                    for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(tie_lose) {
                         *v += w * r;
                     }
                 }
             }
-            os = oe;
-            oi += 1;
+            for ((t, g), w) in total.iter_mut().zip(group_total).zip(tie_lose) {
+                *t += w * g;
+            }
+            for h in &own.hands[start..end] {
+                let [a, b] = h.cards.map(usize::from);
+                let identical = buf[usize::from(same[h.local as usize]).min(opp_len)];
+                let row = &mut values[h.local as usize];
+                for (((((v, t), ca), cb), s), u) in row
+                    .iter_mut()
+                    .zip(total)
+                    .zip(card[a])
+                    .zip(card[b])
+                    .zip(identical)
+                    .zip(tie)
+                {
+                    *v = t - ca - cb + u * s;
+                }
+            }
+            if tied {
+                // Re-read just the tied hands instead of resetting/merging a
+                // 52 x 8 group array for every own rank. Total retains the same
+                // group-wise addition order as the existing relaxed sweep.
+                for ((t, g), w) in total.iter_mut().zip(group_total).zip(win_tie) {
+                    *t += w * g;
+                }
+                for h in &opp.hands[os..oe] {
+                    let r = buf[h.local as usize];
+                    for &c in &h.cards {
+                        for ((v, r), w) in card[c as usize].iter_mut().zip(r).zip(win_tie) {
+                            *v += w * r;
+                        }
+                    }
+                }
+                os = oe;
+                oi += 1;
+            }
+            start = end;
         }
-        start = end;
     }
-    // Only live rows were computed; unused worker-buffer rows are untouched.
-    // Outputs were cleared above so board-dead own entries stay positive zero.
-    for (lane, &index) in indices.iter().enumerate() {
-        let out = &mut outs[index];
-        for h in &own.hands {
-            let local = h.local as usize;
-            out[local] = values[local][lane];
-        }
-    }
+    store_lane_values(values, rows);
 }
 
 fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
@@ -818,7 +902,11 @@ mod tests {
                     groups.last_mut().unwrap().1 = i + 1;
                 }
             }
-            RankedHands { hands, groups }
+            RankedHands {
+                hands,
+                groups,
+                dead: Vec::new(),
+            }
         };
         let own = list(3);
         let opp = list(5);

@@ -97,7 +97,10 @@ showdownはloseの効用で重み付けしたtotal/card和から始め、相手g
 同順位groupの処理後、直下終端の融合経路は52枚のcard和merge、lane batch経路は同順位handの再走査でtieの重みをwinへ変換する。
 chanceを含まずaction並列化の閾値未満のsubtreeでは、f32のCFRを非再帰の3段階で処理する。
 上から戦略とreachを計算し、全0相手reachの終端をPRUNEで除いた後、subtree内の全終端を
-`eval_cfr_batch`へ1回で渡す。同一boardのshowdownとRiver foldは最大8 laneの順位走査を共有する。
+`eval_cfr_batch`へ1回で渡す。同一board内で種類別にまとめ、showdownは最大8 laneの順位走査、
+River foldは別の最大8 lane kernelで相手のtotal/card和と自handの互換reachだけを計算する。
+foldは常にこの専用経路を使い、効用は互換reachの計算後に掛けるため、同じcall内の終端の種類・lane位置で結果は変わらない。
+出力はlocal index順の8 hand blockで各終端の行へ転置し、board-dead自handは正の0に保つ。
 その後、下から子順に値を合成し、各更新nodeのregretとreach付き戦略を従来の順で更新する。
 全0相手reachの下でも更新playerのnodeを訪問する。arenaは席別supportに応じてworkerごとに再利用する。
 このsubtree経路の外では、次の直下終端の融合を使う。f64のCFRは従来の再帰経路を維持する。

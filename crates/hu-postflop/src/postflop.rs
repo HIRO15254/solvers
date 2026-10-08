@@ -485,7 +485,20 @@ impl TerminalEvaluator for PostflopEvaluator {
                     order.push(i);
                 }
             }
-            order.sort_unstable_by_key(|&i| self.batch_tables[terminals[i] as usize]);
+            // Preserve increasing caller indices within each table so output
+            // slices can be borrowed together once per lane-kernel call.
+            let is_fold = |i: usize| {
+                matches!(
+                    self.terminals[terminals[i] as usize].kind,
+                    TerminalKind::Fold { .. }
+                )
+            };
+            // Separate kinds for every call: a fold's arithmetic cannot depend
+            // on whether it happens to share the caller's batch with a showdown.
+            // CFR subtrees normally contain one table, so this is already an
+            // ascending run. Filtering each kind below avoids a kind sort and
+            // its repeated terminal/table lookups on these small hot calls.
+            order.sort_unstable_by_key(|&i| (self.batch_tables[terminals[i] as usize], i));
             let mut remaining = order.as_slice();
             while let Some(&first) = remaining.first() {
                 let table_id = self.batch_tables[terminals[first] as usize];
@@ -493,30 +506,59 @@ impl TerminalEvaluator for PostflopEvaluator {
                     .partition_point(|&i| self.batch_tables[terminals[i] as usize] == table_id);
                 let (group, tail) = remaining.split_at(end);
                 let table = &self.rank_tables[table_id as usize];
-                for indices in group.chunks(kernel::TERMINAL_LANES) {
-                    let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
-                    let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
-                    for ((reach, utility), &i) in
-                        reaches.iter_mut().zip(&mut utilities).zip(indices)
-                    {
-                        *reach = opp_reaches[i];
-                        let term = &self.terminals[terminals[i] as usize];
-                        let u = Self::cfr_utilities(term, p);
-                        *utility = if matches!(term.kind, TerminalKind::Fold { .. }) {
-                            [u[0] as f32; 3]
+                for fold in [false, true] {
+                    let mut selected = group.iter().copied().filter(|&i| is_fold(i) == fold);
+                    loop {
+                        let mut indices = [0; kernel::TERMINAL_LANES];
+                        let mut count = 0;
+                        for (i, dst) in selected
+                            .by_ref()
+                            .take(kernel::TERMINAL_LANES)
+                            .zip(&mut indices)
+                        {
+                            *dst = i;
+                            count += 1;
+                        }
+                        if count == 0 {
+                            break;
+                        }
+                        let indices = &indices[..count];
+                        let mut reaches = [&[][..]; kernel::TERMINAL_LANES];
+                        let mut utilities = [[0.0; 3]; kernel::TERMINAL_LANES];
+                        for ((reach, utility), &i) in
+                            reaches.iter_mut().zip(&mut utilities).zip(indices)
+                        {
+                            *reach = opp_reaches[i];
+                            let term = &self.terminals[terminals[i] as usize];
+                            let u = Self::cfr_utilities(term, p);
+                            *utility = if fold {
+                                [u[0] as f32; 3]
+                            } else {
+                                u.map(|v| v as f32)
+                            };
+                        }
+                        if fold {
+                            kernel::fold_batch_kernel_f32(
+                                &table[p],
+                                &table[p.opponent()],
+                                &self.hands.same[p],
+                                &utilities[..indices.len()],
+                                &reaches[..indices.len()],
+                                outs,
+                                indices,
+                            );
                         } else {
-                            u.map(|v| v as f32)
-                        };
+                            kernel::terminal_batch_kernel_f32(
+                                &table[p],
+                                &table[p.opponent()],
+                                &self.hands.same[p],
+                                &utilities[..indices.len()],
+                                &reaches[..indices.len()],
+                                outs,
+                                indices,
+                            );
+                        }
                     }
-                    kernel::terminal_batch_kernel_f32(
-                        &table[p],
-                        &table[p.opponent()],
-                        &self.hands.same[p],
-                        &utilities[..indices.len()],
-                        &reaches[..indices.len()],
-                        outs,
-                        indices,
-                    );
                 }
                 remaining = tail;
             }
@@ -1888,9 +1930,11 @@ impl Builder<'_> {
         let board_set: CardSet = board5.iter().copied().collect();
         let ranked = |p: Player| {
             let mut sorted = Vec::new();
+            let mut dead = Vec::new();
             for (local, &global) in self.hands.combos(p).iter().enumerate() {
                 let (a, b) = combo_cards(global as usize);
                 if board_set.contains(a) || board_set.contains(b) {
+                    dead.push(local as u16);
                     continue;
                 }
                 sorted.push((
@@ -1900,7 +1944,10 @@ impl Builder<'_> {
                 ));
             }
             sorted.sort_unstable();
-            let mut table = RankedHands::default();
+            let mut table = RankedHands {
+                dead,
+                ..Default::default()
+            };
             for (rank, global, local) in sorted {
                 if table.groups.last().is_none_or(|&(r, _)| r != rank) {
                     table.groups.push((rank, table.hands.len()));

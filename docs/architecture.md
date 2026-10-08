@@ -119,7 +119,8 @@ f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION
 node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
 不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
 sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
-既定batch hookは個別の`eval_cfr`、P1の同一board終端は最大8 laneの順位走査を使う。f64は従来の再帰passを維持する。
+既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。
+showdownは順位走査、River foldは専用の互換reach kernelを使う。f64は従来の再帰passを維持する。
 このsubtree経路の外では、以下の直下終端の処理を使う。
 f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
 action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
