@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\target\\new\\release\\solvers.exe",
+    "solve",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\experiments\\p1-efficiency-2026-10\\i16-kernels-20261009\\configs\\c_flop1_i16.toml",
+    "--out",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\runs\\i16-kernels\\f64-final\\solve_c_flop1_i16_new",
+    "--threads",
+    "8"
+  ],
+  "startUnix": 1791492028.1583655,
+  "wallSecs": 117.64897418022156,
+  "exitCode": 0
+}

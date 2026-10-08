@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "solve_c_turn2_i16_new",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "15cd80ecd65528fa3e8c2efd056829ed19bbc9b34d347efedf4f320ce5055ff4",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\runs\\i16-kernels\\f64-final\\solve_c_turn2_i16_new"
+  ],
+  "pid": 42008,
+  "createdUnixMs": 1791491801278,
+  "startedUnixMs": 1791491801278,
+  "finishedUnixMs": 1791491802669,
+  "failure": null,
+  "completion": "completed"
+}

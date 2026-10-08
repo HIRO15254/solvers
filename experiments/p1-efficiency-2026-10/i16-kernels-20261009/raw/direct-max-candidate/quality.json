@@ -1,0 +1,22 @@
+{
+  "accepted": false,
+  "reason": "Turn i16 +3.226%, exceeding +3%; remaining Flop comparison aborted",
+  "convergence": [
+    {
+      "case": "c_turn2",
+      "storage": "i16",
+      "old": 310,
+      "new": 320,
+      "ratio": 1.032258064516129
+    },
+    {
+      "case": "c_turn2",
+      "storage": "i16-f32avg",
+      "old": 250,
+      "new": 240,
+      "ratio": 0.96
+    }
+  ],
+  "sourcePatchSha256": "5e5413be5730b92bce03dd32d46fa50c5c978d3a6758460266d609ff5a792afb",
+  "cliSha256": "9f07c2e38f86c83b86bad864f5fa62ff047047c286483eced16a99549f77d638"
+}

@@ -7,6 +7,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
+| 性能・収束の受入 | [P1 i16 storage kernelの融合・vector化](p1-efficiency-2026-10/i16-kernels-20261009/README.md) | 2026-10-09。C1、8 threadsの新旧交互計測・中央値、Turn/Flopのi16・mixed改善、f32 control、0.1%到達反復数、linked AVX2 loopと必須検証 |
 | 性能・厳密一致の検証 | [P1 compact hand domain](p1-perf-2026-10/compact-hands-20261006/README.md) | 2026-10-06。f32新旧一致、i16の200/500反復progress、Turn速度・Flop storage見積り、format移行境界 |
 | 性能・厳密一致の検証 | [P1 engine評価pass統合](p1-perf-2026-10/engine-bitwise-20261006/README.md) | 2026-10-06。EV/BR統合走査・action並列・allocation削減が変更前・thread数間でbit一致 |
 | 性能の計測 | [P1 GCP新旧計測（T1＋T2）](p1-perf-2026-10/gcp-ab-20261006/README.md) | 2026-10-06。c2d-highcpu-32で1〜32 threads、Flop木5.3〜5.8倍・評価約10倍・peak 1/2.7、同梱Flop例が64 GB機で解ける |

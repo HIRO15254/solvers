@@ -1,0 +1,48 @@
+{
+  "sourceCommit": "4b3e49bb1e5878836b040717fb41823f323631e7",
+  "cargoFmt": {
+    "argv": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "exitCode": 0
+  },
+  "cargoClippy": {
+    "argv": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "buildJobs": 1,
+    "exitCode": 0,
+    "log": "clippy.log"
+  },
+  "cargoTest": {
+    "argv": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--",
+      "--test-threads=4"
+    ],
+    "buildJobs": 1,
+    "exitCode": 0,
+    "passed": 984,
+    "failed": 0,
+    "ignored": 40,
+    "log": "workspace-tests.log"
+  },
+  "checkDocs": {
+    "argv": [
+      "python",
+      "tools/check_docs.py"
+    ],
+    "exitCode": 0
+  }
+}

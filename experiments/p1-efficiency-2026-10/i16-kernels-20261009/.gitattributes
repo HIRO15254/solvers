@@ -1,0 +1,4 @@
+# Preserve measured bytes and their SHA-256 hashes across checkouts.
+* -text whitespace=cr-at-eol
+# Logs and patch context retain whitespace exactly as measured/generated.
+raw/** -whitespace
