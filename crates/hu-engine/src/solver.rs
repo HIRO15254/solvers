@@ -127,6 +127,29 @@ fn chance_rows<'a>(
         .collect()
 }
 
+/// `dst[h] = a[h] * b[h]`. Zipped equal-length slices keep the hot per-hand
+/// loops of `cfr_pass` free of bounds checks so they vectorize; elementwise
+/// products are exact, so results match the indexed loops bit for bit.
+#[inline]
+fn mul_into(dst: &mut [f32], a: &[f32], b: &[f32]) {
+    let (a, b) = (&a[..dst.len()], &b[..dst.len()]);
+    for ((d, &x), &y) in dst.iter_mut().zip(a).zip(b) {
+        *d = x * y;
+    }
+}
+
+/// `v.iter().all(|&x| x == 0.0)` (both signed zeros count, NaN does not),
+/// tested 16 lanes at a time by OR-ing the bits without the sign bit.
+fn all_zero(v: &[f32]) -> bool {
+    let mut chunks = v.chunks_exact(16);
+    for chunk in &mut chunks {
+        if chunk.iter().fold(0u32, |acc, &x| acc | (x.to_bits() << 1)) != 0 {
+            return false;
+        }
+    }
+    chunks.remainder().iter().all(|&x| x == 0.0)
+}
+
 fn chance_len(tree: &PublicTree, node: NodeId, p: Player, dim: usize) -> usize {
     let n = tree.node(node);
     (0..n.num_children as usize)
@@ -684,7 +707,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     let node = *ctx.tree.node(node_id);
     match node.kind {
         NodeKind::Terminal => {
-            if !PRUNE || !opp_reach.iter().all(|&x| x == 0.0) {
+            if !PRUNE || !all_zero(opp_reach) {
                 ctx.evaluator.eval_cfr(node.aux, ctx.p, opp_reach, out);
             }
         }
@@ -812,7 +835,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         }
         NodeKind::Action if node.player == ctx.p => {
             let sref = ctx.tree.storage_ref(&node);
-            let (num_actions, num_hands) = (sref.num_actions as usize, sref.num_hands as usize);
+            let num_hands = sref.num_hands as usize;
             debug_assert_eq!(num_hands, my_reach.len());
 
             // See `ActionViews`: this node's own regret/strategy update
@@ -845,7 +868,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             // before either sequential or parallel nonterminal recursion.
             // Stack batches of two avoid per-action-node heap allocations.
             let siblings = ctx.cfr_precision == CfrPrecision::F32;
-            if siblings && (!PRUNE || !opp_reach.iter().all(|&x| x == 0.0)) {
+            if siblings && (!PRUNE || !all_zero(opp_reach)) {
                 let mut pending = None;
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
                     let child = ctx.tree.node(child);
@@ -898,9 +921,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                         }
                         with_worker_scratch(|scratch| {
                             let mut reach = scratch.take(num_hands);
-                            for h in 0..num_hands {
-                                reach[h] = my_reach[h] * sigma[a * num_hands + h];
-                            }
+                            mul_into(&mut reach, my_reach, &sigma[a * num_hands..]);
                             cfr_pass::<_, _, PRUNE>(
                                 ctx,
                                 view,
@@ -919,10 +940,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     if siblings && ctx.tree.node(child).kind == NodeKind::Terminal {
                         continue;
                     }
-                    let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                    for h in 0..num_hands {
-                        my_next[h] = my_reach[h] * row[h];
-                    }
+                    mul_into(&mut my_next, my_reach, &sigma[a * num_hands..]);
                     let out_row = &mut cfvs[a * num_hands..(a + 1) * num_hands];
                     cfr_pass::<_, _, PRUNE>(
                         ctx,
@@ -937,17 +955,19 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 }
             }
 
-            for a in 0..num_actions {
-                let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                for h in 0..num_hands {
-                    node_cfv[h] += row[h] * cfvs[a * num_hands + h];
+            for (row, values) in sigma
+                .chunks_exact(num_hands.max(1))
+                .zip(cfvs.chunks_exact(num_hands.max(1)))
+            {
+                for ((cfv, &s), &v) in node_cfv.iter_mut().zip(row).zip(values) {
+                    *cfv += s * v;
                 }
             }
 
             // Instantaneous regret, computed in place.
-            for a in 0..num_actions {
-                for h in 0..num_hands {
-                    cfvs[a * num_hands + h] -= node_cfv[h];
+            for values in cfvs.chunks_exact_mut(num_hands.max(1)) {
+                for (v, &cfv) in values.iter_mut().zip(node_cfv.iter()) {
+                    *v -= cfv;
                 }
             }
             views
@@ -955,10 +975,11 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
-            for a in 0..num_actions {
-                for h in 0..num_hands {
-                    cfvs[a * num_hands + h] = my_reach[h] * sigma[a * num_hands + h];
-                }
+            for (weighted, row) in cfvs
+                .chunks_exact_mut(num_hands.max(1))
+                .zip(sigma.chunks_exact(num_hands.max(1)))
+            {
+                mul_into(weighted, my_reach, row);
             }
             views
                 .own()
@@ -981,7 +1002,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             let sref = ctx.tree.storage_ref(&node);
             let num_hands = sref.num_hands as usize;
             debug_assert_eq!(num_hands, opp_reach.len());
-            let zero_opp = PRUNE && opp_reach.iter().all(|&x| x == 0.0);
+            let zero_opp = PRUNE && all_zero(opp_reach);
             let mut sigma = scratch.take(if zero_opp { 0 } else { sref.len() });
             if !zero_opp {
                 storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
@@ -1017,9 +1038,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                                 );
                             } else {
                                 let mut reach = scratch.take(num_hands);
-                                for h in 0..num_hands {
-                                    reach[h] = opp_reach[h] * sigma[a * num_hands + h];
-                                }
+                                mul_into(&mut reach, opp_reach, &sigma[a * num_hands..]);
                                 cfr_pass::<_, _, PRUNE>(
                                     ctx,
                                     view,
@@ -1045,10 +1064,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             } else {
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
                     if !zero_opp {
-                        let row = &sigma[a * num_hands..(a + 1) * num_hands];
-                        for h in 0..num_hands {
-                            opp_next[h] = opp_reach[h] * row[h];
-                        }
+                        mul_into(&mut opp_next, opp_reach, &sigma[a * num_hands..]);
                     }
                     // See the Chance-node comment: reused accumulator targets
                     // must be reset before every use, not just the initial take.
@@ -1064,8 +1080,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                         par_budget,
                     );
                     if !zero_opp {
-                        for h in 0..out.len() {
-                            out[h] += child_out[h];
+                        for (dst, &v) in out.iter_mut().zip(child_out.iter()) {
+                            *dst += v;
                         }
                     }
                 }
@@ -1114,7 +1130,7 @@ fn value_pass<
 {
     // Recording walks retain the original arithmetic and visit every node.
     // This also preserves signed zeros in saved per-node values.
-    if !RECORD && opp_reach.iter().all(|&x| x == 0.0) {
+    if !RECORD && all_zero(opp_reach) {
         return;
     }
     let node = *ctx.tree.node(node_id);
@@ -1268,9 +1284,7 @@ fn value_pass<
                         );
                     } else {
                         let mut reach = scratch.take(hands);
-                        for h in 0..hands {
-                            reach[h] = opp_reach[h] * sigma[a * hands + h];
-                        }
+                        mul_into(&mut reach, opp_reach, &sigma[a * hands..]);
                         value_pass::<_, _, _, EV, BR, RECORD>(
                             ctx,
                             scratch,
@@ -1302,19 +1316,30 @@ fn value_pass<
                 for a in 0..actions {
                     let row = &mut flat[a * dim * channels..(a + 1) * dim * channels];
                     let (child_ev, child_br) = value_row::<EV, BR>(row, dim);
-                    for h in 0..dim {
-                        if EV {
-                            if own {
-                                ev[h] += sigma[a * hands + h] * child_ev[h];
-                            } else {
-                                ev[h] += child_ev[h];
+                    // EV and BR rows are independent, so separate zipped
+                    // loops keep the per-hand arithmetic exactly as before.
+                    if EV {
+                        let child_ev = &child_ev[..dim];
+                        if own {
+                            let row = &sigma[a * hands..a * hands + dim];
+                            for ((e, &s), &c) in ev[..dim].iter_mut().zip(row).zip(child_ev) {
+                                *e += s * c;
+                            }
+                        } else {
+                            for (e, &c) in ev[..dim].iter_mut().zip(child_ev) {
+                                *e += c;
                             }
                         }
-                        if BR {
-                            if own {
-                                br[h] = br[h].max(child_br[h]);
-                            } else {
-                                br[h] += child_br[h];
+                    }
+                    if BR {
+                        let child_br = &child_br[..dim];
+                        if own {
+                            for (b, &c) in br[..dim].iter_mut().zip(child_br) {
+                                *b = b.max(c);
+                            }
+                        } else {
+                            for (b, &c) in br[..dim].iter_mut().zip(child_br) {
+                                *b += c;
                             }
                         }
                     }
@@ -1324,20 +1349,20 @@ fn value_pass<
                 let mut reach = scratch.take(hands);
                 let mut flat = scratch.take(dim * channels);
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
-                    for h in 0..hands {
-                        reach[h] = opp_reach[h] * sigma[a * hands + h];
-                    }
+                    mul_into(&mut reach, opp_reach, &sigma[a * hands..]);
                     flat.fill(0.0);
                     let (child_ev, child_br) = value_row::<EV, BR>(&mut flat, dim);
                     value_pass::<_, _, _, EV, BR, RECORD>(
                         ctx, scratch, child, &reach, child_ev, child_br, record, par_budget,
                     );
-                    for h in 0..dim {
-                        if EV {
-                            ev[h] += child_ev[h];
+                    if EV {
+                        for (e, &c) in ev[..dim].iter_mut().zip(&child_ev[..dim]) {
+                            *e += c;
                         }
-                        if BR {
-                            br[h] += child_br[h];
+                    }
+                    if BR {
+                        for (b, &c) in br[..dim].iter_mut().zip(&child_br[..dim]) {
+                            *b += c;
                         }
                     }
                 }
@@ -1450,9 +1475,7 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
             let mut flat = scratch.take(dim * node.num_children as usize);
             let visit = |scratch: &mut Scratch, a: usize, row: &mut [f32]| {
                 let mut next = scratch.take(hands);
-                for h in 0..hands {
-                    next[h] = reach[node.player][h] * sigma[a * hands + h];
-                }
+                mul_into(&mut next, reach[node.player], &sigma[a * hands..]);
                 let r = if node.player == Player::P0 {
                     PerPlayer::new(next.as_slice(), reach[Player::P1])
                 } else {
@@ -1485,11 +1508,15 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
                 let row = &flat[a * dim..(a + 1) * dim];
                 let child = PerPlayer::new(&row[..dim0], &row[dim0..]);
                 for p in Player::BOTH {
-                    for h in 0..ev[p].len() {
-                        if node.player == p {
-                            ev[p][h] += sigma[a * hands + h] * child[p][h];
-                        } else {
-                            ev[p][h] += child[p][h];
+                    let len = ev[p].len();
+                    if node.player == p {
+                        let row = &sigma[a * hands..a * hands + len];
+                        for ((e, &s), &c) in ev[p].iter_mut().zip(row).zip(&child[p][..len]) {
+                            *e += s * c;
+                        }
+                    } else {
+                        for (e, &c) in ev[p].iter_mut().zip(&child[p][..len]) {
+                            *e += c;
                         }
                     }
                 }
@@ -1576,3 +1603,48 @@ mod dead_subtree_tests;
 #[cfg(test)]
 #[path = "solver/sibling_tests.rs"]
 mod sibling_tests;
+
+#[cfg(test)]
+mod loop_tests {
+    use super::{all_zero, mul_into};
+
+    #[test]
+    fn all_zero_matches_the_scalar_test() {
+        let special = [
+            0.0f32,
+            -0.0,
+            1e-45,
+            -1e-45,
+            f32::NAN,
+            f32::INFINITY,
+            1.0,
+            -2.5,
+        ];
+        for len in [0usize, 1, 15, 16, 17, 31, 32, 33, 100] {
+            for (i, &value) in special.iter().enumerate() {
+                for at in [0, len / 2, len.saturating_sub(1)] {
+                    let mut v = vec![if i % 2 == 0 { 0.0 } else { -0.0 }; len];
+                    if len > 0 {
+                        v[at] = value;
+                    }
+                    assert_eq!(
+                        all_zero(&v),
+                        v.iter().all(|&x| x == 0.0),
+                        "{len} {value} {at}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn mul_into_matches_indexed_products() {
+        let a: Vec<f32> = (0..37).map(|i| (i as f32 * 0.37).sin()).collect();
+        let b: Vec<f32> = (0..40).map(|i| (i as f32 * 1.3).cos() - 0.25).collect();
+        let mut dst = vec![f32::NAN; 37];
+        mul_into(&mut dst, &a, &b[3..]);
+        for h in 0..37 {
+            assert_eq!(dst[h].to_bits(), (a[h] * b[3 + h]).to_bits());
+        }
+    }
+}
