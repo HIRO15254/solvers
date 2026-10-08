@@ -97,6 +97,12 @@ showdownはloseの効用で重み付けしたtotal/card和から始め、相手g
 同順位groupの処理後は既存の52枚のcard和mergeでtieの重みをwinへ変換する。
 更新playerのactionで同じ相手reachを受ける同一boardのfold・showdown終端は、f32に限り1回のkernelで評価する。
 相手和と自handのloopを共有し、fold出力は全要素を0で初期化してからshowdown順位表の全live自handへ書き込む。
+相手playerのactionでも、f32に限り終端の子reach（相手reach×各actionの戦略）を先に計算し、
+全0 reachのpruningを維持して終端値を子順にnode値へ直接加算する。その後に非終端の値を子順で加算し、thread数に依存しない。
+同一boardのfold・showdownは異なるreachでも融合する。showdown順位表の相手handは全board-live supportを含み、
+dead相手handのreachは0なのでfoldの包除和にも同じ表を使える。
+showdown sweepの初期total/card和へfold効用×fold reach和を加え、自handで同一comboのfold補正とtie補正を戻す。
+単独fold・showdownも一時出力と別の加算passを使わず直接加算し、dead自handのnode値は変更しない。
 regret matchingは正部分をf32で合計し、その和のf32逆数を各正部分へ掛ける。和が0なら一様分布とする。
 Exploitability・EV・BR評価、平均戦略の正規化、`.sol`保存EVは両モードで従来の厳密なf64計算を使う。
 両モードで決定性とthread数による結果不変を保つ。旧版とのbit一致は`f64`だけで保証する。

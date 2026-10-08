@@ -215,6 +215,7 @@ fn bench_realistic(c: &mut Criterion) {
     solver.set_cfr_precision(CfrPrecision::F64);
     let mut sets = [Vec::new(), Vec::new()];
     let mut siblings = Vec::new();
+    let mut opponents = Vec::new();
     for iterations in [300, 50, 50] {
         solver.run(iterations);
         let game = solver.game();
@@ -225,6 +226,29 @@ fn bench_realistic(c: &mut Criterion) {
                 id,
                 |id, _, out| out.copy_from_slice(&solver.current_strategy_at(id)),
             );
+            let strategy = solver.current_strategy_at(id);
+            let node = game.tree.node(id);
+            let child_reach = |terminal| {
+                let a = game
+                    .tree
+                    .children(id)
+                    .position(|child| {
+                        let child = game.tree.node(child);
+                        child.kind == NodeKind::Terminal && child.aux == terminal
+                    })
+                    .unwrap();
+                reach[p]
+                    .iter()
+                    .zip(&strategy[a * reach[p].len()..(a + 1) * reach[p].len()])
+                    .map(|(&r, &s)| r * s)
+                    .collect::<Vec<_>>()
+            };
+            assert_eq!(node.player, p);
+            let fold_reach = child_reach(fold);
+            let call_reach = child_reach(showdown);
+            if fold_reach.iter().any(|&r| r != 0.0) && call_reach.iter().any(|&r| r != 0.0) {
+                opponents.push((p.opponent(), fold, showdown, fold_reach, call_reach));
+            }
             let opponent = &reach[p.opponent()];
             if opponent.iter().any(|&r| r != 0.0) {
                 siblings.push((p, fold, showdown, opponent.clone()));
@@ -267,6 +291,54 @@ fn bench_realistic(c: &mut Criterion) {
         "t20 realistic siblings: {} pairs, reach hash {hash:016x}",
         siblings.len()
     );
+    let opponent_hash = opponents
+        .iter()
+        .flat_map(|(_, _, _, f, s)| f.iter().chain(s))
+        .fold(0xcbf2_9ce4_8422_2325u64, |h, r| {
+            (h ^ u64::from(r.to_bits())).wrapping_mul(0x100_0000_01b3)
+        });
+    eprintln!(
+        "t21 realistic opponents: {} pairs, reach hash {opponent_hash:016x}",
+        opponents.len()
+    );
+    let mut tmp = out.clone();
+    for fused in [false, true] {
+        group.bench_function(
+            if fused {
+                "t21_opponent_add"
+            } else {
+                "t21_opponent_default"
+            },
+            |b| {
+                b.iter(|| {
+                    for (p, fold, showdown, fold_reach, call_reach) in &opponents {
+                        out[*p].fill(0.0);
+                        let terminals = [*fold, *showdown];
+                        let reaches = [fold_reach.as_slice(), call_reach.as_slice()];
+                        if fused {
+                            game.evaluator.add_cfr_opponent_terminals(
+                                black_box(&terminals),
+                                black_box(*p),
+                                black_box(&reaches),
+                                &mut out[*p],
+                                &mut tmp[*p],
+                            );
+                        } else {
+                            baseline_opponent_add(
+                                &game.evaluator,
+                                black_box(&terminals),
+                                black_box(*p),
+                                black_box(&reaches),
+                                &mut out[*p],
+                                &mut tmp[*p],
+                            );
+                        }
+                        black_box(&out[*p]);
+                    }
+                });
+            },
+        );
+    }
     let mut fold_out = out.clone();
     for fused in [false, true] {
         group.bench_function(
@@ -348,3 +420,21 @@ criterion_group! {
     targets = bench_kernels
 }
 criterion_main!(benches);
+
+// Baseline of the engine's current opponent-terminal path.
+fn baseline_opponent_add<E: TerminalEvaluator>(
+    evaluator: &E,
+    terminals: &[u32],
+    p: Player,
+    reaches: &[&[f32]],
+    out: &mut [f32],
+    tmp: &mut [f32],
+) {
+    for (&terminal, &reach) in terminals.iter().zip(reaches) {
+        tmp.fill(0.0);
+        evaluator.eval_cfr(terminal, p, reach, tmp);
+        for (dst, &v) in out.iter_mut().zip(tmp.iter()) {
+            *dst += v;
+        }
+    }
+}

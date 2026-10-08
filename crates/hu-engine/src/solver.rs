@@ -38,6 +38,31 @@ pub trait TerminalEvaluator: Send + Sync {
             self.eval_cfr(terminal, p, opp_reach, out);
         }
     }
+    /// Add CFR terminal children of an opponent node, each with its own
+    /// action-scaled opponent reach. The engine supplies stack batches in
+    /// child order, before nonterminal children, only for f32 CFR. `out`
+    /// already holds preceding contributions; `tmp` has the same dimension.
+    /// The default preserves zero/write/add behavior and order. Overrides
+    /// may fuse adjacent contributions with relaxed f32 rounding, and must
+    /// leave dead own-hand entries unchanged. Evaluation/EV/BR use `eval`.
+    fn add_cfr_opponent_terminals(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        reaches: &[&[f32]],
+        out: &mut [f32],
+        tmp: &mut [f32],
+    ) {
+        assert_eq!(terminals.len(), reaches.len());
+        assert_eq!(out.len(), tmp.len());
+        for (&terminal, &reach) in terminals.iter().zip(reaches) {
+            tmp.fill(0.0);
+            self.eval_cfr(terminal, p, reach, tmp);
+            for (dst, &v) in out.iter_mut().zip(tmp.iter()) {
+                *dst += v;
+            }
+        }
+    }
     /// Select the arithmetic of `eval_cfr`. Evaluators without a relaxed
     /// kernel ignore it; `Solver::set_cfr_precision` forwards here.
     fn set_cfr_precision(&mut self, _precision: CfrPrecision) {}
@@ -1014,6 +1039,50 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             // zero-reach case it is shared immutably by parallel children.
             let mut opp_next = scratch.take(num_hands);
             let mut child_out = scratch.take(my_reach.len());
+            let terminals = ctx.cfr_precision == CfrPrecision::F32 && !zero_opp;
+            if terminals {
+                // Terminal sigma rows are no longer needed for recursion:
+                // reuse them as action-scaled reaches. No new hand buffers
+                // or heap metadata; batches of two live on the stack.
+                let mut pending = None;
+                for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    let child = ctx.tree.node(child);
+                    if child.kind != NodeKind::Terminal {
+                        continue;
+                    }
+                    let row = &mut sigma[a * num_hands..(a + 1) * num_hands];
+                    for (r, &opp) in row.iter_mut().zip(opp_reach) {
+                        let scaled = opp * *r;
+                        *r = scaled;
+                    }
+                    if PRUNE && all_zero(row) {
+                        continue;
+                    }
+                    if let Some((previous, terminal)) = pending.take() {
+                        ctx.evaluator.add_cfr_opponent_terminals(
+                            &[terminal, child.aux],
+                            ctx.p,
+                            &[
+                                &sigma[previous * num_hands..(previous + 1) * num_hands],
+                                &sigma[a * num_hands..(a + 1) * num_hands],
+                            ],
+                            out,
+                            &mut child_out,
+                        );
+                    } else {
+                        pending = Some((a, child.aux));
+                    }
+                }
+                if let Some((a, terminal)) = pending {
+                    ctx.evaluator.add_cfr_opponent_terminals(
+                        &[terminal],
+                        ctx.p,
+                        &[&sigma[a * num_hands..(a + 1) * num_hands]],
+                        out,
+                        &mut child_out,
+                    );
+                }
+            }
             if !out.is_empty() && parallel_actions(ctx.tree, node_id) {
                 let mut flat = scratch.take(node.num_children as usize * out.len());
                 let ActionViews::Split { views, has_own } = &mut views else {
@@ -1024,6 +1093,11 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     .zip(flat.par_chunks_mut(out.len()))
                     .enumerate()
                     .for_each(|(a, (view, row))| {
+                        if terminals
+                            && ctx.tree.node(node.first_child + a as u32).kind == NodeKind::Terminal
+                        {
+                            return;
+                        }
                         with_worker_scratch(|scratch| {
                             if zero_opp {
                                 cfr_pass::<_, _, PRUNE>(
@@ -1054,7 +1128,12 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                         });
                     });
                 if !zero_opp {
-                    for row in flat.chunks(out.len()) {
+                    for (a, row) in flat.chunks(out.len()).enumerate() {
+                        if terminals
+                            && ctx.tree.node(node.first_child + a as u32).kind == NodeKind::Terminal
+                        {
+                            continue;
+                        }
                         for (dst, &v) in out.iter_mut().zip(row) {
                             *dst += v;
                         }
@@ -1063,6 +1142,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 scratch.put(flat);
             } else {
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
+                    if terminals && ctx.tree.node(child).kind == NodeKind::Terminal {
+                        continue;
+                    }
                     if !zero_opp {
                         mul_into(&mut opp_next, opp_reach, &sigma[a * num_hands..]);
                     }
@@ -1648,3 +1730,7 @@ mod loop_tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "solver/opponent_terminal_tests.rs"]
+mod opponent_terminal_tests;

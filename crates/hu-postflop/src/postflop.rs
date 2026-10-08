@@ -512,12 +512,109 @@ impl TerminalEvaluator for PostflopEvaluator {
             }
         }
     }
+    fn add_cfr_opponent_terminals(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        reaches: &[&[f32]],
+        out: &mut [f32],
+        tmp: &mut [f32],
+    ) {
+        assert_eq!(terminals.len(), reaches.len());
+        assert_eq!(out.len(), tmp.len());
+        debug_assert_eq!(out.len(), self.hands.len(p));
+        if self.cfr_precision != hu_engine::CfrPrecision::F32 {
+            for (&terminal, &reach) in terminals.iter().zip(reaches) {
+                tmp.fill(0.0);
+                self.eval_cfr(terminal, p, reach, tmp);
+                for (dst, &v) in out.iter_mut().zip(tmp.iter()) {
+                    *dst += v;
+                }
+            }
+            return;
+        }
+        let mut i = 0;
+        while i < terminals.len() {
+            // Fuse adjacent contributions only, preserving batch order even
+            // if a caller supplies more than the engine's two terminals.
+            if i + 1 < terminals.len() {
+                let a = &self.terminals[terminals[i] as usize];
+                let b = &self.terminals[terminals[i + 1] as usize];
+                let pair = match (a.kind, b.kind) {
+                    (TerminalKind::Fold { .. }, TerminalKind::Showdown) => Some((i, i + 1)),
+                    (TerminalKind::Showdown, TerminalKind::Fold { .. }) => Some((i + 1, i)),
+                    _ => None,
+                };
+                if let Some((f, s)) = pair.filter(|_| a.board_mask == b.board_mask) {
+                    let fold = &self.terminals[terminals[f] as usize];
+                    let show = &self.terminals[terminals[s] as usize];
+                    let [win, tie, lose] = Self::cfr_utilities(show, p);
+                    let [u_fold, _, _] = Self::cfr_utilities(fold, p);
+                    let table = &self.rank_tables[show.table as usize];
+                    debug_assert_eq!(reaches[f].len(), self.hands.len(p.opponent()));
+                    debug_assert_eq!(reaches[s].len(), self.hands.len(p.opponent()));
+                    kernel::add_showdown_fold_kernel_relaxed_f32(
+                        &table[p],
+                        &table[p.opponent()],
+                        &self.hands.same[p],
+                        [win, tie, lose, u_fold],
+                        reaches[s],
+                        reaches[f],
+                        out,
+                    );
+                    i += 2;
+                    continue;
+                }
+            }
+            let term = &self.terminals[terminals[i] as usize];
+            let utilities = Self::cfr_utilities(term, p);
+            debug_assert_eq!(reaches[i].len(), self.hands.len(p.opponent()));
+            match term.kind {
+                TerminalKind::Fold { .. } => kernel::add_fold_kernel_relaxed_f32(
+                    &self.fold_combos[p],
+                    &self.fold_combos[p.opponent()],
+                    &self.hands.same[p],
+                    utilities[0],
+                    term.board_mask,
+                    reaches[i],
+                    out,
+                ),
+                TerminalKind::Showdown => {
+                    let table = &self.rank_tables[term.table as usize];
+                    kernel::add_showdown_kernel_relaxed_f32(
+                        &table[p],
+                        &table[p.opponent()],
+                        &self.hands.same[p],
+                        utilities,
+                        reaches[i],
+                        out,
+                    );
+                }
+            }
+            i += 1;
+        }
+    }
     /// Set CFR terminal arithmetic; all evaluation calls remain f64.
     fn set_cfr_precision(&mut self, precision: hu_engine::CfrPrecision) {
         self.cfr_precision = precision;
     }
 }
 impl PostflopEvaluator {
+    // Fold win payoffs are baked identically for both rank orientations.
+    fn cfr_utilities(term: &PostflopTerminal, p: Player) -> [f64; 3] {
+        match p {
+            Player::P0 => [
+                term.payoffs.win_p0[p],
+                term.payoffs.tie[p],
+                term.payoffs.win_p1[p],
+            ],
+            Player::P1 => [
+                term.payoffs.win_p1[p],
+                term.payoffs.tie[p],
+                term.payoffs.win_p0[p],
+            ],
+        }
+    }
     fn eval_with_kernel(
         &self,
         terminal: u32,

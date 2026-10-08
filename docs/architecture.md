@@ -117,7 +117,14 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 f32のCFRでは更新playerのaction直下の終端を、共通の相手reachで`eval_cfr_siblings`へ子順の最大2件batchとして渡す。
 action-majorのCFV行を先に埋め、逐次・並列の子再帰ではその終端を飛ばす。行はscratchで0初期化し、
 全0相手reachのpruningと`ActionViews`のstorage分割を維持する。既定hookは個別の`eval_cfr`を呼ぶ。
-P1は同一boardのfold・showdownをf32 kernelで融合する。f64のCFR経路と`eval`は従来どおりである。
+P1は同一boardのfold・showdownをf32 kernelで融合する。
+相手playerのactionでは、f32かつ全0相手reachの省略経路でない場合に、終端の戦略行を
+`opp_reach * sigma`へ上書きし、最大2件のstack batchで`add_cfr_opponent_terminals`へ渡す。
+PRUNE時は全0の子reachを除く。終端を子順で先に`out`へ加算し、逐次・並列とも終端再帰と
+並列の終端行加算を飛ばした後、非終端の値を子順で加算する。`ActionViews`とscratchの
+取得・返却規律は維持する。既定hookはtmpを0初期化して`eval_cfr`、加算の順で処理する。
+P1の同一board fold・showdownは異なる子reachでも1回の自hand loopで直接加算し、
+単独終端も直接加算する。dead自handの値は変更しない。f64のCFR経路と`eval`は従来どおりである。
 
 `Solver<E,S>` は alternating update を行い、平均戦略を解として扱う。
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する

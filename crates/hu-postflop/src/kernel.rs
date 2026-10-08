@@ -18,7 +18,14 @@
 //! opponent sums and the own-hand loop for terminal siblings with the same
 //! board and opponent reach. It clears the fold output first and writes only
 //! live ranked own hands; the rank table must cover every board-live support
-//! entry. Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
+//! entry. Opponent-node add variants leave dead own entries untouched. For
+//! different fold/call reaches on one board, fold compat sums use the
+//! showdown opponent list: it covers every board-live support entry, and
+//! omitted dead entries have zero reach. The sweep starts at
+//! u_lose * call_total/card + u_fold * fold_total/card and restores both
+//! identical-combo corrections, adding both outcomes in one own-hand loop.
+//! Lone terminals also add directly, without a temporary or an add pass.
+//! Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
 
 use crate::hands::ABSENT;
 use nlh::HandRank;
@@ -172,7 +179,16 @@ pub(crate) fn showdown_kernel_relaxed_f32(
     out: &mut [f32],
 ) {
     let [win, tie, lose] = utilities;
-    showdown_relaxed_f32::<false>(own, opp, same, [win, tie, lose, 0.0], reach, out, &mut []);
+    showdown_relaxed_f32::<false, false, false>(
+        own,
+        opp,
+        same,
+        [win, tie, lose, 0.0],
+        reach,
+        out,
+        &mut [],
+        &[],
+    );
 }
 
 /// Utilities are [showdown win, tie, lose, fold]. The fold output is cleared
@@ -187,17 +203,74 @@ pub(crate) fn showdown_fold_kernel_relaxed_f32(
     out: &mut [f32],
     fold_out: &mut [f32],
 ) {
-    showdown_relaxed_f32::<true>(own, opp, same, utilities, reach, out, fold_out);
+    showdown_relaxed_f32::<true, false, false>(
+        own,
+        opp,
+        same,
+        utilities,
+        reach,
+        out,
+        fold_out,
+        &[],
+    );
 }
 
-fn showdown_relaxed_f32<const FOLD: bool>(
+/// Add a lone showdown directly; only live ranked own hands are visited.
+pub(crate) fn add_showdown_kernel_relaxed_f32(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same: &[u16],
+    utilities: [f64; 3],
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let [win, tie, lose] = utilities;
+    showdown_relaxed_f32::<false, true, false>(
+        own,
+        opp,
+        same,
+        [win, tie, lose, 0.0],
+        reach,
+        out,
+        &mut [],
+        &[],
+    );
+}
+
+/// Different action-scaled reaches, same board. Fold compatible mass is
+/// linear in total/card sums: seed the showdown sweep with both weighted
+/// masses and restore the identical-combo fold correction in the own loop.
+pub(crate) fn add_showdown_fold_kernel_relaxed_f32(
     own: &RankedHands,
     opp: &RankedHands,
     same: &[u16],
     utilities: [f64; 4],
+    call_reach: &[f32],
+    fold_reach: &[f32],
+    out: &mut [f32],
+) {
+    showdown_relaxed_f32::<false, true, true>(
+        own,
+        opp,
+        same,
+        utilities,
+        call_reach,
+        out,
+        &mut [],
+        fold_reach,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    same_indices: &[u16],
+    utilities: [f64; 4],
     reach: &[f32],
     out: &mut [f32],
     fold_out: &mut [f32],
+    fold_reach: &[f32],
 ) {
     let [u_win, u_tie, u_lose, u_fold] = utilities.map(|u| u as f32);
     if FOLD {
@@ -206,6 +279,15 @@ fn showdown_relaxed_f32<const FOLD: bool>(
     let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
     let mut total = u_lose * all_total;
     let mut card = all_card.map(|v| u_lose * v);
+    if OPP_FOLD {
+        // The rank table covers all board-live support hands; omitted dead
+        // hands have zero reach, so it supplies the fold compat sums too.
+        let (fold_total, fold_card) = compat_sums_relaxed_f32(&opp.hands, fold_reach);
+        total += u_fold * fold_total;
+        for (c, f) in card.iter_mut().zip(fold_card) {
+            *c += u_fold * f;
+        }
+    }
     let mut oi = 0;
     let mut os = 0;
     let mut start = 0;
@@ -240,8 +322,27 @@ fn showdown_relaxed_f32<const FOLD: bool>(
         // K - C[a] - C[b] + u_tie * same: two card loads per own hand.
         for &h in &own.hands[start..end] {
             let [a, b] = h.cards.map(usize::from);
-            let same = same_reach_relaxed_f32(same, h, reach);
-            out[h.local as usize] = total - card[a] - card[b] + u_tie * same;
+            // Reuse one identical-combo lookup and its existing ABSENT
+            // check for both reaches; no second data-dependent branch.
+            let (same, fold_same) = if OPP_FOLD {
+                let other = same_indices[h.local as usize];
+                if other == ABSENT {
+                    (0.0, 0.0)
+                } else {
+                    (reach[other as usize], fold_reach[other as usize])
+                }
+            } else {
+                (same_reach_relaxed_f32(same_indices, h, reach), 0.0)
+            };
+            let mut value = total - card[a] - card[b] + u_tie * same;
+            if OPP_FOLD {
+                value += u_fold * fold_same;
+            }
+            if ADD {
+                out[h.local as usize] += value;
+            } else {
+                out[h.local as usize] = value;
+            }
             if FOLD {
                 fold_out[h.local as usize] =
                     u_fold * (all_total - all_card[a] - all_card[b] + same);
@@ -321,16 +422,44 @@ pub(crate) fn fold_kernel_relaxed_f32(
     reach: &[f32],
     out: &mut [f32],
 ) {
+    fold_relaxed_f32::<false>(own, opp, same, u, board, reach, out);
+}
+pub(crate) fn add_fold_kernel_relaxed_f32(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    fold_relaxed_f32::<true>(own, opp, same, u, board, reach, out);
+}
+fn fold_relaxed_f32<const ADD: bool>(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    u: f64,
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
     let u = u as f32;
     let (total, card) = compat_sums_relaxed_f32(opp, reach);
     for &h in own {
         let [a, b] = h.cards.map(usize::from);
         if board & ((1u64 << a) | (1u64 << b)) != 0 {
-            out[h.local as usize] = 0.0;
+            if !ADD {
+                out[h.local as usize] = 0.0;
+            }
             continue;
         }
-        out[h.local as usize] =
-            u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+        let value = u * (total - card[a] - card[b] + same_reach_relaxed_f32(same, h, reach));
+        if ADD {
+            out[h.local as usize] += value;
+        } else {
+            out[h.local as usize] = value;
+        }
     }
 }
 

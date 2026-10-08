@@ -529,3 +529,6 @@ fn precision_all_backends_deterministic_and_saved_ev_exact() {
     deterministic::<I16Storage>();
     deterministic::<MixedStorage>();
 }
+
+#[path = "opponent_precision_tests.rs"]
+mod opponent_precision_tests;
