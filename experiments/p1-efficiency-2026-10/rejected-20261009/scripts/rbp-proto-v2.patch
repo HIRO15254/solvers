@@ -1,0 +1,279 @@
+diff --git a/crates/hu-engine/src/solver.rs b/crates/hu-engine/src/solver.rs
+index a10e49c..0bd4cec 100644
+--- a/crates/hu-engine/src/solver.rs
++++ b/crates/hu-engine/src/solver.rs
+@@ -11,6 +11,118 @@ use crate::tree::{NodeId, NodeKind, PublicTree};
+ 
+ mod batch;
+ 
++// PROTOTYPE (not for merge): regret-based pruning of the updater's own
++// actions whose current strategy is zero for every live hand. Enabled by
++// SOLVERS_P1_RBP=K. Every K-th iteration is a full pass that records the
++// all-zero actions; the following K-1 iterations skip their subtrees and
++// freeze their regrets; the next full pass adds K times their regret.
++const PHASE_OFF: u8 = 0;
++const PHASE_REFRESH: u8 = 1;
++const PHASE_SKIP: u8 = 2;
++static RBP_PHASE: std::sync::atomic::AtomicU8 = std::sync::atomic::AtomicU8::new(PHASE_OFF);
++// Sized at the first pruned step from the tree (runtime input); one solver
++// per process in this prototype.
++static RBP_MASKS: std::sync::OnceLock<Box<[std::sync::atomic::AtomicU64]>> =
++    std::sync::OnceLock::new();
++
++static RBP_PERIOD: std::sync::LazyLock<Option<u64>> = std::sync::LazyLock::new(|| {
++    std::env::var("SOLVERS_P1_RBP")
++        .ok()
++        .and_then(|v| v.parse().ok())
++        .filter(|&k| k > 0)
++});
++static RBP_CATCHUP: std::sync::LazyLock<bool> =
++    std::sync::LazyLock::new(|| std::env::var("SOLVERS_P1_RBP_NOCATCHUP").is_err());
++static RBP_WARMUP: std::sync::LazyLock<u64> = std::sync::LazyLock::new(|| {
++    std::env::var("SOLVERS_P1_RBP_WARMUP")
++        .ok()
++        .and_then(|v| v.parse().ok())
++        .unwrap_or(0)
++});
++
++fn rbp_period() -> Option<u64> {
++    *RBP_PERIOD
++}
++
++/// (skip mask, catch-up mask) for an own node after regret matching.
++fn rbp_masks(sigma: &[f32], sref: StorageRef) -> (u64, u64) {
++    let phase = RBP_PHASE.load(std::sync::atomic::Ordering::Relaxed);
++    if phase == PHASE_OFF {
++        return (0, 0);
++    }
++    let slot = &RBP_MASKS.get().expect("masks sized in step")[sref.index as usize];
++    if phase == PHASE_SKIP {
++        return (slot.load(std::sync::atomic::Ordering::Relaxed), 0);
++    }
++    let fresh = zero_rows(sigma, sref.num_actions as usize, sref.num_hands as usize);
++    let previous = slot.swap(fresh, std::sync::atomic::Ordering::Relaxed);
++    (0, if *RBP_CATCHUP { previous } else { 0 })
++}
++
++/// Freezes skipped rows (no discount, no add) and scales caught-up rows.
++fn rbp_adjust<V: crate::storage::StorageOps + ?Sized>(
++    storage: &V,
++    sref: StorageRef,
++    inst: &mut [f32],
++    skip: u64,
++    catchup: u64,
++    d: &Discounts,
++) {
++    let hands = sref.num_hands as usize;
++    if skip != 0 {
++        let mut regrets = vec![0.0; sref.len()];
++        storage.raw_regrets(sref, sref.index, &mut regrets);
++        let neg = d.neg as f32;
++        for a in 0..sref.num_actions as usize {
++            if skip >> a & 1 == 1 {
++                for (v, &r) in inst[a * hands..(a + 1) * hands]
++                    .iter_mut()
++                    .zip(&regrets[a * hands..(a + 1) * hands])
++                {
++                    *v = if r > 0.0 { r * (1.0 - d.pos as f32) } else { r * (1.0 - neg) };
++                }
++            }
++        }
++    }
++    if catchup != 0 {
++        let k = rbp_period().unwrap_or(1) as f32;
++        for a in 0..sref.num_actions as usize {
++            if catchup >> a & 1 == 1 {
++                for v in &mut inst[a * hands..(a + 1) * hands] {
++                    *v *= k;
++                }
++            }
++        }
++    }
++}
++
++/// Bit `a` set when every hand that is not in the exact uniform (zero
++/// positive regret) state has probability zero on action `a`.
++fn zero_rows(sigma: &[f32], num_actions: usize, num_hands: usize) -> u64 {
++    if num_actions > 64 || num_hands == 0 {
++        return 0;
++    }
++    let uniform = 1.0 / num_actions as f32;
++    let mut used = 0u64;
++    let mut any_live = false;
++    for h in 0..num_hands {
++        if (0..num_actions).all(|a| sigma[a * num_hands + h] == uniform) {
++            continue;
++        }
++        any_live = true;
++        for a in 0..num_actions {
++            if sigma[a * num_hands + h] != 0.0 {
++                used |= 1 << a;
++            }
++        }
++    }
++    if !any_live {
++        return 0;
++    }
++    let all = if num_actions == 64 { u64::MAX } else { (1u64 << num_actions) - 1 };
++    !used & all
++}
++
+ /// Variant-owned terminal evaluation — the only variant code on the hot
+ /// path, called per terminal or sibling batch per pass, amortized over all hands.
+ ///
+@@ -337,6 +449,18 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
+     // The unpruned instantiation is used only by differential unit tests.
+     fn step_impl<const PRUNE: bool>(&mut self) {
+         let t = self.iteration + 1;
++        if let Some(k) = rbp_period() {
++            let n = self.game.tree.storage_refs.len();
++            RBP_MASKS.get_or_init(|| (0..n).map(|_| std::sync::atomic::AtomicU64::new(0)).collect());
++            let phase = if t <= *RBP_WARMUP {
++                PHASE_OFF
++            } else if t % k == 0 {
++                PHASE_REFRESH
++            } else {
++                PHASE_SKIP
++            };
++            RBP_PHASE.store(phase, std::sync::atomic::Ordering::Relaxed);
++        }
+         let discounts = self.schedule.at(t, self.planned_iters);
+         for p in Player::BOTH {
+             let my_range = self.game.root_ranges[p].clone();
+@@ -915,6 +1039,8 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+             views
+                 .own()
+                 .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
++            let (pruned, catchup) = rbp_masks(&sigma, sref);
++            let is_pruned = |a: usize| pruned >> a & 1 == 1;
+ 
+             // One flat action-major buffer: action `a`'s row is that
+             // action's own `out` parameter, so its recursion writes
+@@ -929,7 +1055,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                 let mut pending = None;
+                 for (a, child) in ctx.tree.children(node_id).enumerate() {
+                     let child = ctx.tree.node(child);
+-                    if child.kind != NodeKind::Terminal {
++                    if child.kind != NodeKind::Terminal || is_pruned(a) {
+                         continue;
+                     }
+                     if let Some((previous, terminal)) = pending.take() {
+@@ -971,8 +1097,10 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                     .zip(cfvs.par_chunks_mut(num_hands))
+                     .enumerate()
+                     .for_each(|(a, (view, row))| {
+-                        if siblings
+-                            && ctx.tree.node(node.first_child + a as u32).kind == NodeKind::Terminal
++                        if is_pruned(a)
++                            || siblings
++                                && ctx.tree.node(node.first_child + a as u32).kind
++                                    == NodeKind::Terminal
+                         {
+                             return;
+                         }
+@@ -994,7 +1122,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                     });
+             } else {
+                 for (a, child) in ctx.tree.children(node_id).enumerate() {
+-                    if siblings && ctx.tree.node(child).kind == NodeKind::Terminal {
++                    if is_pruned(a) || siblings && ctx.tree.node(child).kind == NodeKind::Terminal {
+                         continue;
+                     }
+                     mul_into(&mut my_next, my_reach, &sigma[a * num_hands..]);
+@@ -1027,6 +1155,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                     *v -= cfv;
+                 }
+             }
++            if pruned | catchup != 0 {
++                rbp_adjust(views.own(), sref, &mut cfvs, pruned, catchup, ctx.discounts);
++            }
+             views
+                 .own()
+                 .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
+diff --git a/crates/hu-engine/src/solver/batch.rs b/crates/hu-engine/src/solver/batch.rs
+index 878cc51..3e08e0f 100644
+--- a/crates/hu-engine/src/solver/batch.rs
++++ b/crates/hu-engine/src/solver/batch.rs
+@@ -6,6 +6,10 @@ struct Reaches {
+     my: usize,
+     opp: usize,
+     zero_opp: bool,
++    // PROTOTYPE: subtree skipped by own-action pruning; mask of pruned actions.
++    pruned: bool,
++    mask: u64,
++    catchup: u64,
+ }
+ 
+ #[derive(Default)]
+@@ -114,6 +118,9 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+         my: usize::MAX,
+         opp: usize::MAX,
+         zero_opp: false,
++        pruned: false,
++        mask: 0,
++        catchup: 0,
+     };
+     let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
+ 
+@@ -127,6 +134,12 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+         let sref = tree.storage_ref(node);
+         let offset = sref.offset - span.start;
+         let parent = metadata.nodes[index];
++        if parent.pruned {
++            for child in tree.children(id) {
++                metadata.nodes[child as usize - first + 1] = parent;
++            }
++            continue;
++        }
+         let (previous, children) = scaled.split_at_mut(offset);
+         let my = reach(previous, my_reach, parent.my);
+         let opp = reach(previous, opp_reach, parent.opp);
+@@ -137,9 +150,19 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+             storage.regret_matching_cfr(sref, sref.index, strategy, CfrPrecision::F32);
+         }
+         let length = sref.num_hands as usize;
++        let (mask, catchup) = if node.player == ctx.p {
++            super::rbp_masks(strategy, sref)
++        } else {
++            (0, 0)
++        };
++        metadata.nodes[index].mask = mask;
++        metadata.nodes[index].catchup = catchup;
+         for (a, child) in tree.children(id).enumerate() {
+             let mut next = parent;
+             next.zero_opp = false;
++            next.mask = 0;
++            next.catchup = 0;
++            next.pruned = mask >> a & 1 == 1;
+             let start = a * length;
+             if !zero_opp {
+                 let row = &mut children[start..start + length];
+@@ -170,7 +193,7 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+         let node = tree.node(id);
+         if node.kind == NodeKind::Terminal {
+             let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
+-            if !PRUNE || !all_zero(opp) {
++            if !metadata.nodes[index].pruned && (!PRUNE || !all_zero(opp)) {
+                 metadata.terminals.push(node.aux);
+                 reaches.push(opp);
+                 outputs.push(row);
+@@ -191,7 +214,8 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+             id as usize - first + 1
+         };
+         let node = tree.node(id);
+-        if node.kind == NodeKind::Action {
++        if node.kind == NodeKind::Action && !metadata.nodes[index].pruned {
++            let (mask, catchup) = (metadata.nodes[index].mask, metadata.nodes[index].catchup);
+             let sref = tree.storage_ref(node);
+             let offset = sref.offset - span.start;
+             let strategy = &sigma[offset..offset + sref.len()];
+@@ -214,6 +238,9 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+                         *dst = v - cfv;
+                     }
+                 }
++                if mask | catchup != 0 {
++                    super::rbp_adjust(storage, sref, tmp, mask, catchup, ctx.discounts);
++                }
+                 storage.update_regrets(sref, sref.index, tmp, ctx.discounts);
+                 // Phase 1 already wrote my_reach * sigma for every action.
+                 // Reuse those exact rows for the average update, after regrets.
