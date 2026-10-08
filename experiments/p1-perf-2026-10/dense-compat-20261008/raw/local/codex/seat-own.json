@@ -1,0 +1,119 @@
+{
+  "affinity_mask": 1,
+  "args": [
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t24-bench-map-dense.exe",
+    "--bench",
+    "^(kernels(_wide)?/fold_f32|kernels_realistic/t18_fold)$",
+    "--noplot"
+  ],
+  "records": [
+    {
+      "variant": "map-scalar",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 283.47679525729404
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2855.6234185338662
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1157080.4807692308
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 299.8154196296288
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2222.901428001463
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 909675.1838235294
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 285.1751887243513
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2855.8770343580472
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1192955.876068376
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 314.5127449471068
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2217.8521346213774
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1886699.2045454546
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 630.5414876893656
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 5809.726990024636
+    },
+    {
+      "variant": "map-scalar",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 2343492.543859649
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 645.4594816572367
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 4695.724279178636
+    },
+    {
+      "variant": "map-dense",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 898753.5633484162
+    }
+  ]
+}

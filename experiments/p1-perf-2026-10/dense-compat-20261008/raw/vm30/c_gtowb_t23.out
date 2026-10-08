@@ -1,0 +1,14 @@
+tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)
+memory estimate: 20651.3 MiB (f32) / 10603.2 MiB (i16) / 15627.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.694e0 expl_p1=1.035e0 nash_conv=2.729e0
+iter=      50 expl_p0=3.916e-1 expl_p1=4.115e-1 nash_conv=8.031e-1
+iter=     100 expl_p0=6.207e-2 expl_p1=6.664e-2 nash_conv=1.287e-1
+iter=     150 expl_p0=2.489e-2 expl_p1=2.480e-2 nash_conv=4.968e-2
+iter=     200 expl_p0=1.515e-2 expl_p1=1.438e-2 nash_conv=2.953e-2
+iter=     250 expl_p0=9.345e-3 expl_p1=9.129e-3 nash_conv=1.847e-2
+iter=     300 expl_p0=6.008e-3 expl_p1=6.318e-3 nash_conv=1.233e-2
+iter=     313 expl_p0=5.370e-3 expl_p1=5.836e-3 nash_conv=1.121e-2
+iter=     316 expl_p0=5.333e-3 expl_p1=5.780e-3 nash_conv=1.111e-2
+iter=     319 expl_p0=5.064e-3 expl_p1=5.645e-3 nash_conv=1.071e-2
+done: iterations=319 wall=270.11s ev_p0=1.506761 ev_p1=3.323508 nash_conv=1.071e-2
+sol: wrote /home/PC_User/work_vm30/c_gtowb_t23/solution.sol (6492.88 MB, 2293609 blocks, mode=Full)

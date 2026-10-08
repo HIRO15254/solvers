@@ -1,0 +1,106 @@
+## <hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals
+
+Sorted summary for file /home/PC_User/prof_t24/release/examples/p1_bench
+----------------------------------------------
+
+   17.13 kernel.rs:426
+   15.74 kernel.rs:400
+    5.80 kernel.rs:402
+    5.76 non_null.rs:1714
+    5.30 kernel.rs:421
+    4.16 kernel.rs:423
+    2.91 kernel.rs:416
+    2.85 kernel.rs:0
+    2.72 kernel.rs:229
+    1.87 kernel.rs:403
+    1.52 kernel.rs:413
+    1.44 kernel.rs:401
+    1.15 kernel.rs:242
+    0.75 kernel.rs:412
+    0.72 postflop.rs:544
+    0.55 kernel.rs:575
+    0.52 kernel.rs:225
+    0.51 postflop.rs:0
+    0.51 kernel.rs:378
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (29613 samples, percent: local period)
+## hottest instructions
+    8.76 :   f590a:  vmovss %xmm8,0x2f0(%rsp,%r9,4) // kernel.rs:400
+    6.32 :   f5fbc:  vmovss %xmm8,0x2f0(%rsp,%r9,4) // kernel.rs:400
+    5.48 :   f5a90:  vmovss %xmm7,(%r8,%rcx,4)
+    4.34 :   f6122:  vmovss %xmm7,(%r8,%rcx,4)
+    3.92 :   f5a8a:  vaddss (%r8,%rcx,4),%xmm7,%xmm7 // kernel.rs:426
+    2.33 :   f5a67:  vmulss %xmm7,%xmm11,%xmm7 // kernel.rs:423
+    1.98 :   f6102:  add    $0x4,%rdx // non_null.rs:1714
+    1.97 :   f594e:  vmovss %xmm7,0xcc(%rsp,%r9,4)
+    1.82 :   f5a86:  vaddss %xmm7,%xmm8,%xmm7 // kernel.rs:423
+    1.61 :   f60af:  movzbl %r8b,%r9d
+    1.55 :   f611c:  vaddss (%r8,%rcx,4),%xmm7,%xmm7 // kernel.rs:426
+    1.52 :   f59e2:  je     f5a20 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x8c0> // kernel.rs:413
+    1.48 :   f5a6b:  add    $0x4,%rdx // non_null.rs:1714
+    1.42 :   f5944:  vaddss 0xcc(%rsp,%r9,4),%xmm8,%xmm7 // kernel.rs:402
+    1.39 :   f60fe:  vmulss %xmm0,%xmm7,%xmm7 // kernel.rs:421
+    1.35 :   f5a07:  vmovss (%rsi,%r9,1),%xmm7
+    1.29 :   f6000:  vmovss %xmm7,0xcc(%rsp,%r9,4)
+    1.16 :   f60ee:  jbe    f6bb8 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1a58> // kernel.rs:426
+    1.12 :   f5ff6:  vaddss 0xcc(%rsp,%r9,4),%xmm8,%xmm7 // kernel.rs:402
+    1.11 :   f60a2:  jbe    f6c2f <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1acf> // kernel.rs:229
+    1.11 :   f5a96:  cmp    %r10,%rdx // non_null.rs:1714
+    1.04 :   f5a11:  cmp    $0x33,%r9w // kernel.rs:421
+    0.90 :   f5a63:  vmulss %xmm0,%xmm8,%xmm8 // kernel.rs:421
+    0.82 :   f5a0d:  movzbl %r8b,%r9d
+    0.81 :   f58f9:  mov    %r8d,%r15d // kernel.rs:0
+    0.80 :   f593a:  vmovss %xmm7,0x2f0(%rsp,%r8,1) // kernel.rs:401
+    0.76 :   f5fab:  mov    %r8d,%r12d
+    0.75 :   f59db:  cmp    $0xffff,%r9 // kernel.rs:412
+    0.73 :   f59e7:  jbe    f6caa <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1b4a> // kernel.rs:416
+    0.72 :   f5a79:  mov    0x17e0(%rsp),%r8 // kernel.rs:421
+    0.72 :   f5316:  cmpb   $0x2,0x3c(%rdx) // postflop.rs:544
+    0.71 :   f5958:  vaddss 0xcc(%rsp,%r8,1),%xmm8,%xmm7 // kernel.rs:403
+    0.69 :   f58e4:  movzbl %r8b,%r9d // kernel.rs:0
+    0.68 :   f5a53:  jbe    f6bb8 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1a58> // kernel.rs:426
+    0.67 :   f58ed:  jae    f6ba0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1a40> // kernel.rs:400
+    0.66 :   f6128:  cmp    %r10,%rdx // non_null.rs:1714
+    0.66 :   f6110:  mov    0x17e0(%rsp),%r8 // kernel.rs:421
+    0.64 :   f5fec:  vmovss %xmm7,0x2f0(%rsp,%r8,1) // kernel.rs:401
+    0.61 :   f5e9c:  vmovss %xmm7,0xcc(%rsp,%r8,4) // kernel.rs:242
+    0.60 :   f5a16:  jbe    f5a38 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x8d8>
+    0.59 :   f600a:  vaddss 0xcc(%rsp,%r8,1),%xmm8,%xmm7 // kernel.rs:403
+    0.59 :   f5f95:  movzbl %r8b,%r9d // kernel.rs:0
+    0.57 :   f5962:  vmovss %xmm7,0xcc(%rsp,%r8,1)
+    0.55 :   f66ff:  vmovss %xmm0,(%r11,%rdi,4) // kernel.rs:575
+    0.54 :   f596c:  cmp    %rdx,%rcx // non_null.rs:1714
+    0.54 :   f57da:  vmovss %xmm7,0xcc(%rsp,%r8,4) // kernel.rs:242
+    0.52 :   f6096:  cmp    $0xffff,%r9 // kernel.rs:225
+    0.51 :   f5de5:  mov    %rdx,0x18(%rsp) // kernel.rs:378
+    0.51 :   f5ba4:  vmovsd (%rdx,%rax,1),%xmm3 // postflop.rs:0
+    0.50 :   f57d0:  vaddss 0xcc(%rsp,%r8,4),%xmm6,%xmm7
+    0.48 :   f5914:  cmp    $0x3400,%r15w
+    0.46 :   f5fc6:  cmp    $0x3400,%r12w
+    0.46 :   f58fc:  shr    $0x8,%r8d
+    0.46 :   f58e8:  cmp    $0x34,%r9w
+    0.43 :   f5928:  vaddss %xmm7,%xmm6,%xmm6
+    0.41 :   f6083:  cmp    %rcx,%r14
+    0.41 :   f6014:  vmovss %xmm7,0xcc(%rsp,%r8,1)
+    0.41 :   f5f86:  cmp    %r10,%rbx
+    0.40 :   f601e:  cmp    %rdx,%rcx
+    0.40 :   f5e92:  vaddss 0xcc(%rsp,%r8,4),%xmm6,%xmm7
+    0.39 :   f66f9:  vaddss (%r11,%rdi,4),%xmm0,%xmm0
+    0.39 :   f5f9e:  jae    f6ba0 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1a40>
+    0.35 :   f5720:  mov    %rax,0x38(%rsp)
+    0.33 :   f5f99:  cmp    $0x34,%r9w
+    0.32 :   f59c3:  cmp    %rcx,%r13
+    0.31 :   f59f2:  jbe    f6c92 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1b32>
+    0.28 :   f5fae:  shr    $0x8,%r8d
+    0.28 :   f5e31:  cmp    %r9w,%cx
+    0.27 :   f5fda:  vaddss %xmm7,%xmm6,%xmm6
+    0.27 :   f5889:  cmp    %rdi,%rax
+    0.26 :   f5b03:  vaddps 0x10c(%rsp),%ymm7,%ymm7
+    0.25 :   f5853:  vmovups %ymm10,0x390(%rsp)
+    0.24 :   f60c4:  movzbl %r8b,%r9d
+    0.23 :   f5ec1:  add    $0x4,%rcx
+    0.22 :   f6192:  vaddps 0x10c(%rsp),%ymm7,%ymm7
+    0.22 :   f58d5:  cmp    %r10,%rbp
+    0.21 :   f6180:  vmovups %ymm8,0xec(%rsp)
+    0.19 :   f591a:  jae    f6b88 <<hu_postflop::postflop::PostflopEvaluator as hu_engine::solver::TerminalEvaluator>::add_cfr_opponent_terminals+0x1a28>
+    0.18 :   f66bd:  bts    %rax,%rdx
+    0.18 :   f5f37:  vmovups %ymm10,0x310(%rsp)

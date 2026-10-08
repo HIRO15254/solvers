@@ -1,0 +1,299 @@
+{
+  "affinity_mask": 1,
+  "args": [
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t24-bench-new.exe",
+    "--bench",
+    "^(kernels(_wide)?/(fold|showdown)_f32|kernels_realistic/(t18_fold|t18_showdown|t20_siblings|t21_opponent_add))$",
+    "--noplot"
+  ],
+  "records": [
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 270.19944806823884
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 427.35724415762445
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3561.9416371905
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 5261.6124813153965
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1562102.0
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1296408.125
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1451157.6666666667
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2262495.0780312126
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 282.05698904175625
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 450.7912254239596
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2263.108816781383
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 5083.510054844606
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1390884.8333333335
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1200062.5
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 926647.0643939395
+    },
+    {
+      "variant": "new",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2068289.2857142857
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 269.83589227980997
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 405.83882688563773
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3631.423920211012
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 5257.675416371068
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1487292.5
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1224763.2936507936
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1412012.5
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2131807.1428571427
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 280.1048886287497
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 434.747052298903
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2231.1921737553703
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 4939.617519869098
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1341555.8441558443
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1195732.5657894737
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 920277.0833333333
+    },
+    {
+      "variant": "new",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2116457.9365079366
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 268.40021365881114
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 421.02973895839705
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3526.704715450995
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 5308.652844923763
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1489038.375
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1231198.6904761905
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1417293.9393939395
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2152237.321428572
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 283.43316805367704
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels/showdown_f32",
+      "median_ns": 431.84235452584267
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2219.207552268591
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_wide/showdown_f32",
+      "median_ns": 5036.207786826954
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t21_opponent_add",
+      "median_ns": 1365455.743801653
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t20_siblings",
+      "median_ns": 1187074.3055555555
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 929896.09375
+    },
+    {
+      "variant": "new",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_showdown",
+      "median_ns": 2071652.380952381
+    }
+  ]
+}

@@ -1,0 +1,731 @@
+diff --git a/crates/hu-postflop/src/kernel.rs b/crates/hu-postflop/src/kernel.rs
+index 60001bb..721e6f6 100644
+--- a/crates/hu-postflop/src/kernel.rs
++++ b/crates/hu-postflop/src/kernel.rs
+@@ -9,26 +9,39 @@
+ //! the inclusion-exclusion sums stay exact because dead hands contribute zero.
+ //! The f64 sums add the nonzero terms in the same order as the former dense
+ //! kernels (rank order, then global combo order), so results are bit-identical.
++//! The f32 initial compat sums use the per-seat PostflopHands::combos map
++//! to scatter into 1326 stack lanes, with absent/dead hands contributing zero.
++//! For each higher card hi in ascending order, its contiguous hi-lane segment
++//! supplies the higher-card sum and a vector add to cards 0..hi. Segment sums
++//! use fixed balanced eight-lane chunks and one running sum; total adds the
++//! segment sums in the same order, independent of reach values or threads.
++//! Lone f32 folds reuse that dense buffer for contiguous own-combo values,
++//! then gather the seat support. This also removes the identical-combo lookup.
++//! Board-dead own entries are zeroed on write and left untouched on add.
++//! Small lists retain the original f32 sums, and folds with two small supports
++//! retain the original own loop: the dense fixed cost outweighs vector work.
++//! This choice depends only on support length, outside the per-hand loops.
+ //! The f32 showdown sweep maintains one utility-weighted total/card array:
+ //! all hands start at lose, tied groups move to tie, then to win. Own hands
+ //! need two card loads plus the identical-combo tie correction. Opponent
+-//! additions are unconditional and follow fixed rank/hand order, independent
++//! sweep additions are unconditional and follow fixed rank/hand order, independent
+ //! of thread count. Only live ranked own entries are written; the caller
+ //! zeros the remaining entries. The fused f32 showdown/fold variant shares
+ //! opponent sums and the own-hand loop for terminal siblings with the same
+ //! board and opponent reach. It clears the fold output first and writes only
+ //! live ranked own hands; the rank table must cover every board-live support
+ //! entry. Opponent-node add variants leave dead own entries untouched. For
+-//! different fold/call reaches on one board, fold compat sums use the
+-//! showdown opponent list: it covers every board-live support entry, and
+-//! omitted dead entries have zero reach. The sweep starts at
++//! different fold/call reaches on one board, both initial compat sums use
++//! the same seat map (or ranked list for small supports). The ranked list
++//! covers every board-live support entry; omitted dead entries have zero
++//! reach. The sweep starts at
+ //! u_lose * call_total/card + u_fold * fold_total/card and restores both
+ //! identical-combo corrections, adding both outcomes in one own-hand loop.
+ //! Lone terminals also add directly, without a temporary or an add pass.
+ //! Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
+ 
+ use crate::hands::ABSENT;
+-use nlh::HandRank;
++use nlh::{HandRank, NUM_COMBOS};
+ #[derive(Clone, Copy, Debug)]
+ pub(crate) struct Hand {
+     pub local: u16,
+@@ -142,12 +155,72 @@ fn add_relaxed_f32(hands: &[Hand], reach: &[f32], total: &mut f32, card: &mut [f
+         card[h.cards[1] as usize] += r;
+     }
+ }
+-pub(crate) fn compat_sums_relaxed_f32(hands: &[Hand], reach: &[f32]) -> (f32, [f32; 52]) {
++// Fixed balanced reduction within each eight-lane chunk, with one running
++// segment sum. This is a summation order, not multiple loop accumulators.
++fn segment_sum_f32(segment: &[f32]) -> f32 {
++    let mut chunks = segment.chunks_exact(8);
++    let mut sum = 0.0;
++    for c in &mut chunks {
++        sum += ((c[0] + c[1]) + (c[2] + c[3])) + ((c[4] + c[5]) + (c[6] + c[7]));
++    }
++    for &r in chunks.remainder() {
++        sum += r;
++    }
++    sum
++}
++
++fn scatter_reach_f32(combos: &[u16], reach: &[f32], dense: &mut [f32; NUM_COMBOS]) {
++    dense.fill(0.0);
++    // The seat map is precomputed once in PostflopHands, in local reach order.
++    // It includes the full root support; chance masks zero board-dead reaches.
++    assert_eq!(combos.len(), reach.len());
++    for (&combo, &r) in combos.iter().zip(reach) {
++        dense[combo as usize] = r;
++    }
++}
++
++pub(crate) fn dense_compat_sums_f32(
++    combos: &[u16],
++    reach: &[f32],
++    dense: &mut [f32; NUM_COMBOS],
++) -> (f32, [f32; 52]) {
++    scatter_reach_f32(combos, reach, dense);
+     let mut total = 0.0;
+     let mut card = [0.0; 52];
+-    add_relaxed_f32(hands, reach, &mut total, &mut card);
++    let mut rest = dense.as_slice();
++    for hi in 1..52 {
++        let (segment, tail) = rest.split_at(hi);
++        let sum = segment_sum_f32(segment);
++        total += sum;
++        let (lower, higher) = card.split_at_mut(hi);
++        higher[0] += sum;
++        // Equal-length contiguous slices allow vector adds without a
++        // bounds check or scattered read-modify-write per opponent hand.
++        for (c, &r) in lower.iter_mut().zip(segment) {
++            *c += r;
++        }
++        rest = tail;
++    }
+     (total, card)
+ }
++
++pub(crate) fn compat_sums_relaxed_f32(
++    hands: &[Hand],
++    combos: &[u16],
++    reach: &[f32],
++) -> (f32, [f32; 52]) {
++    if hands.len() < DENSE_MIN_HANDS {
++        let mut total = 0.0;
++        let mut card = [0.0; 52];
++        add_relaxed_f32(hands, reach, &mut total, &mut card);
++        (total, card)
++    } else {
++        dense_compat_sums_f32(combos, reach, &mut [0.0; NUM_COMBOS])
++    }
++}
++// Conservatively separate the measured narrow and full-support workloads.
++// This is a support-size choice, never a branch on an individual reach.
++const DENSE_MIN_HANDS: usize = 256;
+ fn same_reach_relaxed_f32(same: &[u16], h: Hand, reach: &[f32]) -> f32 {
+     let other = same[h.local as usize];
+     if other == ABSENT {
+@@ -174,6 +247,7 @@ pub(crate) fn showdown_kernel_relaxed_f32(
+     own: &RankedHands,
+     opp: &RankedHands,
+     same: &[u16],
++    opp_combos: &[u16],
+     utilities: [f64; 3],
+     reach: &[f32],
+     out: &mut [f32],
+@@ -183,6 +257,7 @@ pub(crate) fn showdown_kernel_relaxed_f32(
+         own,
+         opp,
+         same,
++        opp_combos,
+         [win, tie, lose, 0.0],
+         reach,
+         out,
+@@ -194,10 +269,12 @@ pub(crate) fn showdown_kernel_relaxed_f32(
+ /// Utilities are [showdown win, tie, lose, fold]. The fold output is cleared
+ /// here, then written only for live ranked own hands. Both outcomes share all
+ /// opponent passes and the identical-combo lookup in one own-hand loop.
++#[allow(clippy::too_many_arguments)]
+ pub(crate) fn showdown_fold_kernel_relaxed_f32(
+     own: &RankedHands,
+     opp: &RankedHands,
+     same: &[u16],
++    opp_combos: &[u16],
+     utilities: [f64; 4],
+     reach: &[f32],
+     out: &mut [f32],
+@@ -207,6 +284,7 @@ pub(crate) fn showdown_fold_kernel_relaxed_f32(
+         own,
+         opp,
+         same,
++        opp_combos,
+         utilities,
+         reach,
+         out,
+@@ -220,6 +298,7 @@ pub(crate) fn add_showdown_kernel_relaxed_f32(
+     own: &RankedHands,
+     opp: &RankedHands,
+     same: &[u16],
++    opp_combos: &[u16],
+     utilities: [f64; 3],
+     reach: &[f32],
+     out: &mut [f32],
+@@ -229,6 +308,7 @@ pub(crate) fn add_showdown_kernel_relaxed_f32(
+         own,
+         opp,
+         same,
++        opp_combos,
+         [win, tie, lose, 0.0],
+         reach,
+         out,
+@@ -240,10 +320,12 @@ pub(crate) fn add_showdown_kernel_relaxed_f32(
+ /// Different action-scaled reaches, same board. Fold compatible mass is
+ /// linear in total/card sums: seed the showdown sweep with both weighted
+ /// masses and restore the identical-combo fold correction in the own loop.
++#[allow(clippy::too_many_arguments)]
+ pub(crate) fn add_showdown_fold_kernel_relaxed_f32(
+     own: &RankedHands,
+     opp: &RankedHands,
+     same: &[u16],
++    opp_combos: &[u16],
+     utilities: [f64; 4],
+     call_reach: &[f32],
+     fold_reach: &[f32],
+@@ -253,6 +335,7 @@ pub(crate) fn add_showdown_fold_kernel_relaxed_f32(
+         own,
+         opp,
+         same,
++        opp_combos,
+         utilities,
+         call_reach,
+         out,
+@@ -266,6 +349,7 @@ fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>
+     own: &RankedHands,
+     opp: &RankedHands,
+     same_indices: &[u16],
++    opp_combos: &[u16],
+     utilities: [f64; 4],
+     reach: &[f32],
+     out: &mut [f32],
+@@ -276,13 +360,13 @@ fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>
+     if FOLD {
+         fold_out.fill(0.0);
+     }
+-    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
++    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, opp_combos, reach);
+     let mut total = u_lose * all_total;
+     let mut card = all_card.map(|v| u_lose * v);
+     if OPP_FOLD {
+-        // The rank table covers all board-live support hands; omitted dead
+-        // hands have zero reach, so it supplies the fold compat sums too.
+-        let (fold_total, fold_card) = compat_sums_relaxed_f32(&opp.hands, fold_reach);
++        // The ranked live list and full seat map give the same compatible
++        // mass: chance masks zero the omitted board-dead reaches.
++        let (fold_total, fold_card) = compat_sums_relaxed_f32(&opp.hands, opp_combos, fold_reach);
+         total += u_fold * fold_total;
+         for (c, f) in card.iter_mut().zip(fold_card) {
+             *c += u_fold * f;
+@@ -372,7 +456,9 @@ pub(crate) fn head_showdown_kernel_relaxed_f32(
+     out: &mut [f32],
+ ) {
+     let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
+-    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
++    let mut all_total = 0.0;
++    let mut all_card = [0.0; 52];
++    add_relaxed_f32(&opp.hands, reach, &mut all_total, &mut all_card);
+     let mut below_total = 0.0;
+     let mut below_card = [0.0; 52];
+     let mut oi = 0;
+@@ -413,39 +499,100 @@ pub(crate) fn head_showdown_kernel_relaxed_f32(
+         start = end;
+     }
+ }
++#[allow(clippy::too_many_arguments)]
++/// Combo maps are [own seat, opponent seat], each in local reach order.
+ pub(crate) fn fold_kernel_relaxed_f32(
+     own: &[Hand],
+     opp: &[Hand],
+     same: &[u16],
++    combos: [&[u16]; 2],
+     u: f64,
+     board: u64,
+     reach: &[f32],
+     out: &mut [f32],
+ ) {
+-    fold_relaxed_f32::<false>(own, opp, same, u, board, reach, out);
++    fold_relaxed_f32::<false>(own, opp, same, combos, u, board, reach, out);
+ }
++#[allow(clippy::too_many_arguments)]
+ pub(crate) fn add_fold_kernel_relaxed_f32(
+     own: &[Hand],
+     opp: &[Hand],
+     same: &[u16],
++    combos: [&[u16]; 2],
+     u: f64,
+     board: u64,
+     reach: &[f32],
+     out: &mut [f32],
+ ) {
+-    fold_relaxed_f32::<true>(own, opp, same, u, board, reach, out);
++    fold_relaxed_f32::<true>(own, opp, same, combos, u, board, reach, out);
+ }
++#[allow(clippy::too_many_arguments)]
+ fn fold_relaxed_f32<const ADD: bool>(
+     own: &[Hand],
+     opp: &[Hand],
+     same: &[u16],
++    combos: [&[u16]; 2],
+     u: f64,
+     board: u64,
+     reach: &[f32],
+     out: &mut [f32],
+ ) {
++    if own.len() < DENSE_MIN_HANDS && opp.len() < DENSE_MIN_HANDS {
++        fold_sparse_relaxed_f32::<ADD>(own, opp, same, u, board, reach, out);
++        return;
++    }
+     let u = u as f32;
+-    let (total, card) = compat_sums_relaxed_f32(opp, reach);
++    let [own_combos, opp_combos] = combos;
++    let mut dense = [0.0; NUM_COMBOS];
++    let (total, card) = if opp.len() < DENSE_MIN_HANDS {
++        // Match the fused showdown/fold summation route even when only the
++        // own support is wide. Dense reaches still supply combo corrections.
++        scatter_reach_f32(opp_combos, reach, &mut dense);
++        compat_sums_relaxed_f32(opp, opp_combos, reach)
++    } else {
++        dense_compat_sums_f32(opp_combos, reach, &mut dense)
++    };
++    // Reuse the opponent buffer for dense own values once its sums are known.
++    let mut rest = dense.as_mut_slice();
++    for hi in 1..52 {
++        let (segment, tail) = rest.split_at_mut(hi);
++        let base = total - card[hi];
++        for (value, &lower_card) in segment.iter_mut().zip(&card[..hi]) {
++            *value = u * (base - lower_card + *value);
++        }
++        rest = tail;
++    }
++    for &h in own {
++        let [a, b] = h.cards.map(usize::from);
++        if board & ((1u64 << a) | (1u64 << b)) != 0 {
++            if !ADD {
++                out[h.local as usize] = 0.0;
++            }
++            continue;
++        }
++        let value = dense[own_combos[h.local as usize] as usize];
++        if ADD {
++            out[h.local as usize] += value;
++        } else {
++            out[h.local as usize] = value;
++        }
++    }
++}
++
++// Original small-support fold path; both write/add preserve board-dead behavior.
++fn fold_sparse_relaxed_f32<const ADD: bool>(
++    own: &[Hand],
++    opp: &[Hand],
++    same: &[u16],
++    u: f64,
++    board: u64,
++    reach: &[f32],
++    out: &mut [f32],
++) {
++    let u = u as f32;
++    let mut total = 0.0;
++    let mut card = [0.0; 52];
++    add_relaxed_f32(opp, reach, &mut total, &mut card);
+     for &h in own {
+         let [a, b] = h.cards.map(usize::from);
+         if board & ((1u64 << a) | (1u64 << b)) != 0 {
+@@ -611,6 +758,16 @@ mod tests {
+         };
+         let own = list(3);
+         let opp = list(5);
++        let combos = |table: &RankedHands| {
++            let mut combos = vec![0; table.hands.len()];
++            for h in &table.hands {
++                let [hi, lo] = h.cards.map(usize::from);
++                combos[h.local as usize] = (hi * (hi - 1) / 2 + lo) as u16;
++            }
++            combos
++        };
++        let own_combos = combos(&own);
++        let opp_combos = combos(&opp);
+         let mut same = vec![ABSENT; own.hands.len()];
+         for h in &own.hands {
+             if let Some(o) = opp.hands.iter().find(|o| o.cards == h.cards) {
+@@ -642,13 +799,21 @@ mod tests {
+                             &own,
+                             &opp,
+                             &same,
++                            &opp_combos,
+                             [1.25, -0.125, -1.75],
+                             &reach,
+                             &mut out,
+                         );
+                     } else {
+                         fold_kernel_relaxed_f32(
+-                            &own.hands, &opp.hands, &same, -1.25, 1, &reach, &mut out,
++                            &own.hands,
++                            &opp.hands,
++                            &same,
++                            [&own_combos, &opp_combos],
++                            -1.25,
++                            1,
++                            &reach,
++                            &mut out,
+                         );
+                     }
+                     let denom = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
+diff --git a/crates/hu-postflop/src/opponent_precision_tests.rs b/crates/hu-postflop/src/opponent_precision_tests.rs
+index 1d904b4..2b74b9e 100644
+--- a/crates/hu-postflop/src/opponent_precision_tests.rs
++++ b/crates/hu-postflop/src/opponent_precision_tests.rs
+@@ -2,6 +2,119 @@ use super::*;
+ use crate::kernel;
+ use crate::postflop::{PostflopEvaluator, TerminalKind};
+ 
++#[test]
++fn dense_compat_sums_match_f64_on_real_supports_and_rank_tables() {
++    let mut maximum = 0.0f64;
++    for support in 0..3 {
++        let mut config = config();
++        let range = |p: Player| {
++            let mut range = nlh::Range::default();
++            for combo in 0..nlh::NUM_COMBOS {
++                let sparse = support == 1 || (support == 2 && p == Player::P1);
++                if !sparse || (combo + p.index() * 3).is_multiple_of(17) {
++                    range.set_weight(combo, ((combo * 17 + p.index()) % 101 + 1) as f32 / 103.0);
++                }
++            }
++            range
++        };
++        config.ranges = PerPlayer::new(range(Player::P0), range(Player::P1));
++        let built = build_postflop_game(
++            &config,
++            PayoffPipeline {
++                rake: &NoRake,
++                utility: &ChipEv,
++            },
++        );
++        let e = &built.game.evaluator;
++        assert!(!e.rank_tables.is_empty());
++        for table in &e.rank_tables {
++            for p in Player::BOTH {
++                let mut live = vec![false; e.hands.len(p)];
++                for h in &table[p].hands {
++                    let (a, b) = combo_cards(e.hands.combos(p)[h.local as usize] as usize);
++                    assert_eq!(h.cards, [a.index() as u8, b.index() as u8]);
++                    live[h.local as usize] = true;
++                }
++                // Dense and sparse live reaches, all-zero, and negative zero;
++                // dead reaches stay zero, including in the full fold support.
++                for pattern in 0..4 {
++                    for scale in [0.001, 1.0, 100.0] {
++                        let reach: Vec<f32> = live
++                            .iter()
++                            .enumerate()
++                            .map(|(i, &live)| match pattern {
++                                3 => -0.0,
++                                2 => 0.0,
++                                _ if live && (pattern == 0 || i % 11 == 0) => {
++                                    ((i * 37 % 101 + 1) as f32 / 103.0) * scale
++                                }
++                                _ => 0.0,
++                            })
++                            .collect();
++                        for list in [&e.fold_combos[p], &table[p].hands] {
++                            let (exact_total, exact_card) = kernel::compat_sums(list, &reach);
++                            let mut dense = [0.0; nlh::NUM_COMBOS];
++                            // Force the dense routine even for sparse supports,
++                            // and also validate the production support-size route.
++                            for (total, card) in [
++                                kernel::dense_compat_sums_f32(
++                                    e.hands.combos(p),
++                                    &reach,
++                                    &mut dense,
++                                ),
++                                kernel::compat_sums_relaxed_f32(list, e.hands.combos(p), &reach),
++                            ] {
++                                for (exact, actual) in std::iter::once((exact_total, total))
++                                    .chain(exact_card.into_iter().zip(card))
++                                {
++                                    assert!(actual.is_finite());
++                                    if exact == 0.0 {
++                                        assert_eq!(actual.to_bits(), 0);
++                                    } else {
++                                        let relative =
++                                            (exact - f64::from(actual)).abs() / exact.abs();
++                                        maximum = maximum.max(relative);
++                                        assert!(relative <= 1e-6, "{p:?} {pattern} {relative:e}");
++                                    }
++                                }
++                            }
++                        }
++                        // Full/sparse asymmetric supports also exercise dense
++                        // own values with small-list opponent sums. The fold
++                        // route must agree bitwise with the fused fold output.
++                        let own = p.opponent();
++                        let mut fold = vec![0.0; e.hands.len(own)];
++                        let mut fused_fold = fold.clone();
++                        let mut show = fold.clone();
++                        kernel::fold_kernel_relaxed_f32(
++                            &table[own].hands,
++                            &table[p].hands,
++                            &e.hands.same[own],
++                            [e.hands.combos(own), e.hands.combos(p)],
++                            -1.5,
++                            0,
++                            &reach,
++                            &mut fold,
++                        );
++                        kernel::showdown_fold_kernel_relaxed_f32(
++                            &table[own],
++                            &table[p],
++                            &e.hands.same[own],
++                            e.hands.combos(p),
++                            [1.25, 0.5, -2.0, -1.5],
++                            &reach,
++                            &mut show,
++                            &mut fused_fold,
++                        );
++                        assert_eq!(bits(&fold), bits(&fused_fold));
++                    }
++                }
++            }
++        }
++    }
++    println!("dense compat sums maximum pointwise relative error: {maximum:e}");
++}
++
+ struct DefaultAdd<'a>(&'a PostflopEvaluator);
+ impl TerminalEvaluator for DefaultAdd<'_> {
+     fn eval(&self, id: u32, p: Player, reach: &[f32], out: &mut [f32]) {
+@@ -209,8 +322,16 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                     if pattern == 4 { 2 } else { pattern.min(2) },
+                     7,
+                 );
+-                let full = kernel::compat_sums_relaxed_f32(&e.fold_combos[p.opponent()], &fold);
+-                let ranked = kernel::compat_sums_relaxed_f32(&table[p.opponent()].hands, &fold);
++                let full = kernel::compat_sums_relaxed_f32(
++                    &e.fold_combos[p.opponent()],
++                    e.hands.combos(p.opponent()),
++                    &fold,
++                );
++                let ranked = kernel::compat_sums_relaxed_f32(
++                    &table[p.opponent()].hands,
++                    e.hands.combos(p.opponent()),
++                    &fold,
++                );
+                 assert!(relative_error(&[full.0], &[ranked.0]) < 1e-5);
+                 assert!(relative_error(&full.1, &ranked.1) < 1e-5);
+                 for utilities in [
+@@ -227,6 +348,7 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                             &table[p],
+                             &table[p.opponent()],
+                             &e.hands.same[p],
++                            e.hands.combos(p.opponent()),
+                             utilities,
+                             &call,
+                             &mut show,
+@@ -235,6 +357,7 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                             &e.fold_combos[p],
+                             &e.fold_combos[p.opponent()],
+                             &e.hands.same[p],
++                            [e.hands.combos(p), e.hands.combos(p.opponent())],
+                             u_fold,
+                             board,
+                             &fold,
+@@ -249,6 +372,7 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                                     &e.fold_combos[p],
+                                     &e.fold_combos[p.opponent()],
+                                     &e.hands.same[p],
++                                    [e.hands.combos(p), e.hands.combos(p.opponent())],
+                                     u_fold,
+                                     board,
+                                     &fold,
+@@ -259,6 +383,7 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                                     &table[p],
+                                     &table[p.opponent()],
+                                     &e.hands.same[p],
++                                    e.hands.combos(p.opponent()),
+                                     utilities,
+                                     &call,
+                                     &mut added,
+@@ -281,6 +406,7 @@ fn opponent_add_real_tables_utilities_and_rank_coverage() {
+                             &table[p],
+                             &table[p.opponent()],
+                             &e.hands.same[p],
++                            e.hands.combos(p.opponent()),
+                             [utilities[0], utilities[1], utilities[2], u_fold],
+                             &call,
+                             &fold,
+diff --git a/crates/hu-postflop/src/postflop.rs b/crates/hu-postflop/src/postflop.rs
+index 77e00c5..ad27b9f 100644
+--- a/crates/hu-postflop/src/postflop.rs
++++ b/crates/hu-postflop/src/postflop.rs
+@@ -500,6 +500,7 @@ impl TerminalEvaluator for PostflopEvaluator {
+                 &table[p],
+                 &table[p.opponent()],
+                 &self.hands.same[p],
++                self.hands.combos(p.opponent()),
+                 utilities,
+                 opp_reach,
+                 show_out,
+@@ -557,6 +558,7 @@ impl TerminalEvaluator for PostflopEvaluator {
+                         &table[p],
+                         &table[p.opponent()],
+                         &self.hands.same[p],
++                        self.hands.combos(p.opponent()),
+                         [win, tie, lose, u_fold],
+                         reaches[s],
+                         reaches[f],
+@@ -574,6 +576,7 @@ impl TerminalEvaluator for PostflopEvaluator {
+                     &self.fold_combos[p],
+                     &self.fold_combos[p.opponent()],
+                     &self.hands.same[p],
++                    [self.hands.combos(p), self.hands.combos(p.opponent())],
+                     utilities[0],
+                     term.board_mask,
+                     reaches[i],
+@@ -585,6 +588,7 @@ impl TerminalEvaluator for PostflopEvaluator {
+                         &table[p],
+                         &table[p.opponent()],
+                         &self.hands.same[p],
++                        self.hands.combos(p.opponent()),
+                         utilities,
+                         reaches[i],
+                         out,
+@@ -642,34 +646,51 @@ impl PostflopEvaluator {
+         };
+         match term.kind {
+             TerminalKind::Fold { .. } => {
+-                let kernel = match variant {
+-                    hu_engine::CfrPrecision::F64 => kernel::fold_kernel,
+-                    hu_engine::CfrPrecision::F32 => kernel::fold_kernel_relaxed_f32,
+-                };
+-                kernel(
+-                    &self.fold_combos[p],
+-                    &self.fold_combos[p.opponent()],
+-                    &self.hands.same[p],
+-                    u_win,
+-                    term.board_mask,
+-                    opp_reach,
+-                    out,
+-                );
++                if variant == hu_engine::CfrPrecision::F32 {
++                    kernel::fold_kernel_relaxed_f32(
++                        &self.fold_combos[p],
++                        &self.fold_combos[p.opponent()],
++                        &self.hands.same[p],
++                        [self.hands.combos(p), self.hands.combos(p.opponent())],
++                        u_win,
++                        term.board_mask,
++                        opp_reach,
++                        out,
++                    );
++                } else {
++                    kernel::fold_kernel(
++                        &self.fold_combos[p],
++                        &self.fold_combos[p.opponent()],
++                        &self.hands.same[p],
++                        u_win,
++                        term.board_mask,
++                        opp_reach,
++                        out,
++                    );
++                }
+             }
+             TerminalKind::Showdown => {
+                 out.fill(0.0);
+-                let kernel = match variant {
+-                    hu_engine::CfrPrecision::F64 => kernel::showdown_kernel,
+-                    hu_engine::CfrPrecision::F32 => kernel::showdown_kernel_relaxed_f32,
+-                };
+-                kernel(
+-                    &self.rank_tables[term.table as usize][p],
+-                    &self.rank_tables[term.table as usize][p.opponent()],
+-                    &self.hands.same[p],
+-                    [u_win, u_tie, u_lose],
+-                    opp_reach,
+-                    out,
+-                );
++                if variant == hu_engine::CfrPrecision::F32 {
++                    kernel::showdown_kernel_relaxed_f32(
++                        &self.rank_tables[term.table as usize][p],
++                        &self.rank_tables[term.table as usize][p.opponent()],
++                        &self.hands.same[p],
++                        self.hands.combos(p.opponent()),
++                        [u_win, u_tie, u_lose],
++                        opp_reach,
++                        out,
++                    );
++                } else {
++                    kernel::showdown_kernel(
++                        &self.rank_tables[term.table as usize][p],
++                        &self.rank_tables[term.table as usize][p.opponent()],
++                        &self.hands.same[p],
++                        [u_win, u_tie, u_lose],
++                        opp_reach,
++                        out,
++                    );
++                }
+             }
+         }
+     }
+diff --git a/crates/hu-postflop/src/precision_tests.rs b/crates/hu-postflop/src/precision_tests.rs
+index 5c06a19..2f65922 100644
+--- a/crates/hu-postflop/src/precision_tests.rs
++++ b/crates/hu-postflop/src/precision_tests.rs
+@@ -188,6 +188,7 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
+                         &table[p],
+                         &table[p.opponent()],
+                         &e.hands.same[p],
++                        e.hands.combos(p.opponent()),
+                         utilities,
+                         &reach,
+                         &mut out,
+@@ -200,6 +201,7 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
+                             &table[p].hands,
+                             &table[p.opponent()].hands,
+                             &e.hands.same[p],
++                            [e.hands.combos(p), e.hands.combos(p.opponent())],
+                             u_fold,
+                             0,
+                             &reach,
+@@ -211,6 +213,7 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
+                             &table[p],
+                             &table[p.opponent()],
+                             &e.hands.same[p],
++                            e.hands.combos(p.opponent()),
+                             [utilities[0], utilities[1], utilities[2], u_fold],
+                             &reach,
+                             &mut fused_show,
+diff --git a/docs/hu-postflop.jp.md b/docs/hu-postflop.jp.md
+index 6cb5634..a1f9ff7 100644
+--- a/docs/hu-postflop.jp.md
++++ b/docs/hu-postflop.jp.md
+@@ -92,6 +92,14 @@ live queryのtarget判定にも同じ評価方式を使う。
+ 
+ `[solver] cfr_precision`は`"f32"`（既定）と`"f64"`を選べる。対象はCFR passの終端kernelとcurrent strategyのregret matchingである。
+ f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
++初期の包除和は、`PostflopHands`がseatごとに構築時から保持するlocal→global combo mapで相手reachをstack上の1326要素へscatterする。
++support外は0、boardと衝突する相手handのreachはchance maskにより0である。
++global combo順の上位cardごとの連続segmentを使い、segment和を上位cardへ、要素ごとの和を下位cardへ加える。
++segment和は8要素ずつの固定した平衡加算と残り要素の順次加算、totalは上位card順のsegment和で求め、thread数やreach値に依存する順序変更を行わない。
++単独foldは同じdense bufferを自comboの値へ連続演算で上書きし、自supportへgatherする。同一comboの相手reachもdense indexで得る。
++boardと衝突する自handは書込みでは0、直接加算では元の値を保つ。呼出しごとのheap確保は行わない。
++小さいsupport（256hand未満）の包除和は従来のlist和を使い、単独foldで両seatが小さい場合も従来の自hand loopを使う。
++この選択はsupport長だけで決まり、reach値による分岐を内側のloopへ追加しない。
+ showdownはloseの効用で重み付けしたtotal/card和から始め、相手groupを順位順にtie、winの重みへ増分更新する。
+ 自handの値は共通totalから2枚のcard和を引き、同一comboのtie補正を加える。相手reachが0でも分岐せず加算する。
+ 同順位groupの処理後は既存の52枚のcard和mergeでtieの重みをwinへ変換する。
+@@ -100,7 +108,7 @@ showdownはloseの効用で重み付けしたtotal/card和から始め、相手g
+ 相手playerのactionでも、f32に限り終端の子reach（相手reach×各actionの戦略）を先に計算し、
+ 全0 reachのpruningを維持して終端値を子順にnode値へ直接加算する。その後に非終端の値を子順で加算し、thread数に依存しない。
+ 同一boardのfold・showdownは異なるreachでも融合する。showdown順位表の相手handは全board-live supportを含み、
+-dead相手handのreachは0なのでfoldの包除和にも同じ表を使える。
++dead相手handのreachは0なのでfoldの包除和にも同じseat map（小さいsupportでは同じ順位表）を使える。
+ showdown sweepの初期total/card和へfold効用×fold reach和を加え、自handで同一comboのfold補正とtie補正を戻す。
+ 単独fold・showdownも一時出力と別の加算passを使わず直接加算し、dead自handのnode値は変更しない。
+ regret matchingは正部分をf32で合計し、その和のf32逆数を各正部分へ掛ける。和が0なら一様分布とする。

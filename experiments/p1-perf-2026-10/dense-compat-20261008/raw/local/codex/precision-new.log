@@ -1,0 +1,21 @@
+   Compiling hu-postflop v0.1.0 (C:\Users\PC_User\orca\workspaces\solvers\cisco-t22\crates\hu-postflop)
+    Finished `release` profile [optimized] target(s) in 1m 08s
+     Running unittests src\lib.rs (target\release\deps\hu_postflop-20c2586146e2016c.exe)
+
+running 7 tests
+test postflop::precision_tests::f32_real_terminals_close_and_eval_stays_exact ... real terminal relative infinity errors: [0.0, 8.187703931397686e-7]; folds=98 showdowns=240
+ok
+test postflop::precision_tests::opponent_precision_tests::dense_compat_sums_match_f64_on_real_supports_and_rank_tables ... dense compat sums maximum pointwise relative error: 3.2977133433237053e-7
+ok
+test postflop::precision_tests::opponent_precision_tests::opponent_add_dispatch_matches_default_and_preserves_dead_hands ... T21 dispatch relative infinity error: 7.636809979505579e-7; pairs=96 dead checks=19300
+ok
+test postflop::precision_tests::opponent_precision_tests::opponent_add_real_tables_utilities_and_rank_coverage ... T21 fused relative infinity error [default f32, f64]: [9.325569711770378e-7, 8.463865894446113e-7]; dead checks=137520
+ok
+test postflop::precision_tests::precision_all_backends_deterministic_and_saved_ev_exact ... ok
+test postflop::precision_tests::siblings_match_separate_calls_cover_live_hands_and_zero_dead_entries ... T20 fused vs separate relative infinity error: 6.192494943827879e-7; pairs=96 dead entries=37392
+ok
+test postflop::precision_tests::weighted_showdown_matches_head_f32_and_f64_on_real_boards ... T20 weighted relative infinity errors [f64, HEAD f32]: [7.98666945002097e-7, 8.483688147683195e-7]
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 55 filtered out; finished in 0.60s
+

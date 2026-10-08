@@ -1,0 +1,119 @@
+{
+  "affinity_mask": 1,
+  "args": [
+    "C:\\Users\\PC_User\\AppData\\Local\\Temp\\claude\\C--Users-PC-User-orca-workspaces-solvers-cisco\\7b8f3bb9-2812-4052-b020-84dc5d1829b4\\scratchpad\\t24-bench-scalar.exe",
+    "--bench",
+    "^(kernels(_wide)?/fold_f32|kernels_realistic/t18_fold)$",
+    "--noplot"
+  ],
+  "records": [
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 269.9259140689207
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3570.635118651586
+    },
+    {
+      "variant": "base",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1447693.888888889
+    },
+    {
+      "variant": "scalar",
+      "repeat": 1,
+      "bench": "kernels/fold_f32",
+      "median_ns": 659.4224343396579
+    },
+    {
+      "variant": "scalar",
+      "repeat": 1,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2471.350747466819
+    },
+    {
+      "variant": "scalar",
+      "repeat": 1,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1042376.6369047619
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 284.16831791204686
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3637.741849986748
+    },
+    {
+      "variant": "base",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1436382.9166666665
+    },
+    {
+      "variant": "scalar",
+      "repeat": 2,
+      "bench": "kernels/fold_f32",
+      "median_ns": 722.4574864340482
+    },
+    {
+      "variant": "scalar",
+      "repeat": 2,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2403.4037739071036
+    },
+    {
+      "variant": "scalar",
+      "repeat": 2,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 982234.6666666667
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 270.06662341444195
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 3546.6998746867166
+    },
+    {
+      "variant": "base",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1457321.911764706
+    },
+    {
+      "variant": "scalar",
+      "repeat": 3,
+      "bench": "kernels/fold_f32",
+      "median_ns": 653.4617346938776
+    },
+    {
+      "variant": "scalar",
+      "repeat": 3,
+      "bench": "kernels_wide/fold_f32",
+      "median_ns": 2391.153821520068
+    },
+    {
+      "variant": "scalar",
+      "repeat": 3,
+      "bench": "kernels_realistic/t18_fold",
+      "median_ns": 1021653.0753968253
+    }
+  ]
+}

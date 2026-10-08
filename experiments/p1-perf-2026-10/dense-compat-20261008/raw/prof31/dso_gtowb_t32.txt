@@ -1,0 +1,19 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 158K of event 'cpu-clock'
+# Event count (approx.): 318414827112
+#
+# Overhead  Shared Object    
+# ........  .................
+#
+    90.15%  p1_bench         
+     6.06%  libc.so.6        
+     3.79%  [kernel.kallsyms]
+
+
+#
+# (Tip: To report cacheline events from previous recording: perf c2c report)
+#

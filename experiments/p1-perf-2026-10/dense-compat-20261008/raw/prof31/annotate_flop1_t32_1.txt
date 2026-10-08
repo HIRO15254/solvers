@@ -1,0 +1,99 @@
+## hu_postflop::kernel::dense_compat_sums_f32
+
+Sorted summary for file /home/PC_User/prof_t24/release/examples/p1_bench
+----------------------------------------------
+
+   30.83 zip.rs:304
+   21.48 kernel.rs:164
+    9.00 non_null.rs:656
+    5.34 kernel.rs:177
+    5.09 mod.rs:2155
+    4.84 const_ptr.rs:863
+    2.39 zip.rs:308
+    2.03 kernel.rs:178
+    1.84 kernel.rs:200
+    1.66 kernel.rs:196
+    1.57 macros.rs:180
+    1.08 kernel.rs:199
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (30014 samples, percent: local period)
+## hottest instructions
+   28.69 :   dedc2:  cmp    %rax,%r12 // zip.rs:304
+    9.00 :   defb5:  add    $0x4,%r11 // non_null.rs:656
+    5.34 :   deda6:  cmp    $0x52d,%rdi // kernel.rs:177
+    4.84 :   deeb2:  lea    0x20(%r15),%r15 // const_ptr.rs:863
+    3.95 :   deeba:  vmovshdup %xmm2,%xmm3
+    3.55 :   deec6:  jne    deea0 <hu_postflop::kernel::dense_compat_sums_f32+0x150> // mod.rs:2155
+    2.99 :   deec2:  vaddss %xmm2,%xmm1,%xmm1
+    2.78 :   deebe:  vaddss %xmm3,%xmm2,%xmm2
+    2.39 :   dedb9:  inc    %rax // zip.rs:308
+    2.03 :   dedad:  ja     df1b1 <hu_postflop::kernel::dense_compat_sums_f32+0x461> // kernel.rs:178
+    1.77 :   deeb6:  vhaddps %xmm2,%xmm2,%xmm2 // kernel.rs:164
+    1.66 :   df01e:  vmovss %xmm2,0x10(%rsp,%rdx,4) // kernel.rs:196
+    1.22 :   def02:  vhaddps 0x30(%r15,%r12,4),%xmm3,%xmm3 // kernel.rs:164
+    1.08 :   df066:  vmovups 0x20(%r14,%r15,4),%ymm3 // kernel.rs:199
+    1.06 :   df0f6:  vmovss %xmm2,0x10(%rsp,%r10,4)
+    1.02 :   def5b:  cmp    %r12,%r11 // mod.rs:2155
+    1.00 :   defd7:  jb     df018 <hu_postflop::kernel::dense_compat_sums_f32+0x2c8> // macros.rs:180
+    0.98 :   df024:  cmp    $0x4,%rdx // zip.rs:304
+    0.88 :   def4f:  vmovshdup %xmm2,%xmm3
+    0.83 :   def09:  vhaddps 0x50(%r15,%r12,4),%xmm4,%xmm4
+    0.81 :   def57:  vaddss %xmm2,%xmm1,%xmm1
+    0.79 :   def53:  vaddss %xmm3,%xmm2,%xmm2
+    0.79 :   def18:  vhaddps %xmm4,%xmm4,%xmm4
+    0.79 :   def10:  vhaddps %xmm2,%xmm2,%xmm2
+    0.78 :   df0c6:  vaddps 0x10(%rsp,%r11,4),%xmm2,%xmm2 // kernel.rs:200
+    0.78 :   def1c:  vmovshdup %xmm2,%xmm6
+    0.75 :   def14:  vhaddps %xmm3,%xmm3,%xmm3
+    0.67 :   def3c:  vhaddps 0x70(%r15,%r12,4),%xmm5,%xmm2
+    0.64 :   df095:  je     dee30 <hu_postflop::kernel::dense_compat_sums_f32+0xe0>
+    0.63 :   def28:  vmovshdup %xmm3,%xmm2
+    0.57 :   defa4:  je     defc0 <hu_postflop::kernel::dense_compat_sums_f32+0x270> // macros.rs:180
+    0.54 :   def47:  vaddss %xmm3,%xmm1,%xmm1 // kernel.rs:164
+    0.52 :   df090:  jne    df060 <hu_postflop::kernel::dense_compat_sums_f32+0x310> // zip.rs:304
+    0.52 :   def43:  add    $0x20,%r12 // mod.rs:2155
+    0.52 :   def20:  vaddss %xmm6,%xmm2,%xmm2
+    0.46 :   deea5:  add    $0xfffffffffffffff8,%r11
+    0.45 :   defa9:  and    $0x7,%r12d
+    0.44 :   df0fd:  inc    %r10
+    0.44 :   def38:  vaddss %xmm2,%xmm1,%xmm1
+    0.43 :   df0cd:  vmovups %xmm2,0x10(%rsp,%r11,4)
+    0.41 :   df10b:  vmovups 0x90(%rsp),%ymm2
+    0.37 :   deefb:  vhaddps 0x10(%r15,%r12,4),%xmm2,%xmm2
+    0.33 :   df0d8:  cmp    %r11,%r15
+    0.32 :   df0ef:  vaddss 0x10(%rsp,%r10,4),%xmm2,%xmm2
+    0.31 :   df0d4:  add    $0x4,%r11
+    0.30 :   df0e3:  je     dee30 <hu_postflop::kernel::dense_compat_sums_f32+0xe0>
+    0.29 :   df0e0:  cmp    %r10,%rdx
+    0.29 :   dee3d:  add    $0x4,%rdi
+    0.28 :   df100:  jmp    df0e0 <hu_postflop::kernel::dense_compat_sums_f32+0x390>
+    0.28 :   df060:  vmovups (%r14,%r15,4),%ymm2
+    0.26 :   df0ae:  and    %rdx,%r10
+    0.24 :   df0c0:  vmovups (%r14,%r11,4),%xmm2
+    0.20 :   df082:  vmovups %ymm3,0x30(%rsp,%r15,4)
+    0.20 :   dee8b:  mov    %r10,%r11
+    0.20 :   dee78:  je     deec8 <hu_postflop::kernel::dense_compat_sums_f32+0x178>
+    0.20 :   dee41:  cmp    $0x34,%rdx
+    0.18 :   dee87:  movzbl %r11b,%r13d
+    0.18 :   dee34:  add    %rdi,%r14
+    0.18 :   dedcb:  vmovups %ymm0,0xc0(%rsp)
+    0.17 :   df07b:  vmovups %ymm2,0x10(%rsp,%r15,4)
+    0.17 :   dee6f:  mov    %r12d,%ebp
+    0.17 :   dee37:  inc    %rdx
+    0.16 :   df074:  vaddps 0x30(%rsp,%r15,4),%ymm3,%ymm3
+    0.16 :   dee72:  not    %ebp
+    0.16 :   dee69:  mov    %r14,%r15
+    0.16 :   dee5b:  je     def80 <hu_postflop::kernel::dense_compat_sums_f32+0x230>
+    0.16 :   dee57:  and    $0x38,%r10d
+    0.16 :   dee4e:  jb     df17a <hu_postflop::kernel::dense_compat_sums_f32+0x42a>
+    0.15 :   def30:  vmovshdup %xmm4,%xmm3
+    0.15 :   def24:  vaddss %xmm2,%xmm1,%xmm1
+    0.15 :   dee6c:  mov    %r10,%r11
+    0.14 :   df089:  add    $0x10,%r15
+    0.14 :   deee6:  vmovups 0x20(%r15,%r12,4),%xmm3
+    0.14 :   deea0:  vmovups (%r15),%xmm2
+    0.14 :   dee92:  data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+    0.14 :   dee65:  vxorps %xmm1,%xmm1,%xmm1
+    0.14 :   dee45:  je     df102 <hu_postflop::kernel::dense_compat_sums_f32+0x3b2>
+    0.13 :   def4b:  vhaddps %xmm2,%xmm2,%xmm2
+    0.13 :   dee7d:  mov    %r14,%r15
+    0.13 :   dee74:  test   $0x18,%bpl

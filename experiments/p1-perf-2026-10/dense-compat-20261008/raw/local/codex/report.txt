@@ -1,0 +1,43 @@
+T24: f32 dense card-removal sums and fold kernel
+
+Changes are uncommitted on s3-p1-t21-on-t22, HEAD fadd0b027a3ea7a03bf1e9040db4b6df70cf9fe6.
+Files changed by T24:
+crates/hu-postflop/src/kernel.rs
+crates/hu-postflop/src/postflop.rs
+crates/hu-postflop/src/precision_tests.rs
+crates/hu-postflop/src/opponent_precision_tests.rs
+docs/hu-postflop.jp.md
+
+The layout reuses PostflopHands::combos, precomputed once per seat by PostflopHands::new. No new retained layout or changes to Hand are needed. Equal-length zipped slices scatter local reaches into 1326 stack lanes. Ascending hi segments use balanced eight-lane chunk reductions with one running segment sum and vector adds into lower-card sums. Total adds segment sums in fixed hi order. No per-call heap allocation, unsafe Rust, dependencies or format changes.
+
+F32 fold write/add uses dense opponent sums and overwrites the same buffer with dense own values before gathering the own support. Board-dead own values are zero on write and unchanged on add. Showdown all_total/all_card and OPP_FOLD sums use the same compat dispatcher; rank sweep and own showdown math are unchanged. Small opponent lists (<256 hands) retain scalar sums, and folds with both supports <256 retain the original own loop. Mixed wide-own/small-opponent folds scatter for corrections but use scalar initial sums, matching fused fold output.
+
+Final benchmark: direct executables, three alternating base/new runs, CPU affinity 0x1, RAYON_NUM_THREADS=1. Median of three Criterion median point estimates. CPU Intel i7-10700KF, rustc 1.97.0 / LLVM 22.1.6, target-cpu=native, CARGO_BUILD_JOBS=1, CARGO_INCREMENTAL=0. All timings below are ns; ratios new/base.
+kernels/fold_f32: 544.919 -> 560.831, ratio 1.02920
+kernels/showdown_f32: 861.815 -> 877.831, ratio 1.01858
+kernels_realistic/t18_fold: 2476013.510 -> 1856989.394, ratio 0.74999
+kernels_realistic/t18_showdown: 4446120.682 -> 4264784.375, ratio 0.95921
+kernels_realistic/t20_siblings: 2421582.540 -> 2361005.556, ratio 0.97498
+kernels_realistic/t21_opponent_add: 3017144.500 -> 2655570.202, ratio 0.88016
+kernels_wide/fold_f32: 6416.395 -> 4185.379, ratio 0.65229
+kernels_wide/showdown_f32: 9517.942 -> 9482.255, ratio 0.99625
+
+Variants tried:
+- Seat-map scalar own loop: wide fold 2855.877 ns, realistic fold 1192955.876 ns. Dense own loop: 2222.901 ns and 909675.184 ns; retained. Narrow measurements 285.175 vs 314.513 ns despite both using scalar fallback, reflecting codegen/measurement overhead.
+- Unconditional dense sums, cached combo entries: narrow baseline 270.067 ns, scalar own 659.422 ns; dense own 806.454 ns in the own comparison. Rejected for small supports; cutoff 256 added.
+- Cached combo in shared Hand (4 -> 6 bytes) was removed to keep f64/evaluation data layout unchanged. Earlier full-support wide fold median 2231.192 ns. Final uses existing seat maps instead.
+
+Linked executable audit: seat-final-symbols.txt and seat-final-eval.asm. Balanced reductions emit vhaddps; card add loop at 0x140147f50 uses 256-bit vaddps and contiguous loads/stores without per-lane bounds checks. Dense fold loop at 0x14013d060 uses 256-bit vsubps/vaddps/vmulps. Scalar tails and entry guards remain.
+
+F64 identity: a temporary probe around the existing deterministic full-turn solve captured storage arenas at iteration 12, iteration/EV/exploitability progress at 4/8/12 for 1 and 4 threads, and full decoded .sol payloads at 1 thread for F32Storage, I16Storage and MixedStorage. All 15 files match HEAD byte for byte (f64-identity.json). Export elapsed time was fixed to zero; wall timing is not an identity check. Hooks are removed. Original f64 add/compat/same/showdown/fold functions and TerminalEvaluator::eval are unchanged (f64-source-audit.txt). All four realistic replay reach hashes are identical across every final base/new run.
+
+Accuracy and determinism: workspace suite runs precision_all_backends_deterministic_and_saved_ev_exact for F32Storage, I16Storage and MixedStorage in both precision modes at 1/4 threads; state bytes and evaluation agree. Existing precision_tests.rs and opponent_precision_tests.rs tolerances pass. New real-rank-table test covers full, sparse, asymmetric full/sparse supports, both seats, dense/sparse/zero/-0.0 reaches, scales 0.001/1/100, production route and forced dense routine, plus bitwise separate/fused fold agreement. Maximum pointwise relative compat-sum error is 3.2977133433237053e-7 (<1e-6). Largest existing terminal/fused relative infinity error is 9.325569711770378e-7 (<1e-5).
+
+Verification:
+cargo fmt --all --check: PASS
+cargo clippy --workspace --all-targets -- -D warnings: PASS
+cargo test --workspace -- --test-threads=1 --nocapture: PASS, 927 passed, 0 failed, 31 ignored. Full output tests.log.
+python tools/check_docs.py: PASS, 23 Markdown files.
+git diff --check: PASS.
+
+Limits: substantial shared-machine interference occurred during final benchmarking (baseline as well as new slowed markedly). All runs are retained; no samples/runs were discarded. The 256-hand cutoff is conservative, not exhaustively tuned on intermediate supports or at 32 threads. End-to-end 32-thread Milan measurements remain for the reviewer. The observed unrelated hu-engine/src/solver.rs test annotation (0usize) is preserved, excluded from T24 source patch, and captured in preserved-unrelated.patch. No changes to experiments/, mw-preflop or cfr-ref; no commits, pushes, stashes, resets or branch switches.
