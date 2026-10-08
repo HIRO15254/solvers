@@ -16,7 +16,7 @@
   | 記号 | 内容 |
   |---|---|
   | base | `06ddca2`（T7） |
-  | e | 試作`5e7a4c1`。環境変数`SOLVERS_P1_KERNEL`（`exact`・`f64fold`・`f32`）と`SOLVERS_P1_NORM`（`exact`・`f32`）でCFR passだけを切り替える |
+  | e | 試作`5e7a4c1`（branch `s3-p1-fast-kernels`、差分は`scripts/fast-kernels-5e7a4c1.patch`。`06ddca2`に当てると同じtreeになる）。環境変数`SOLVERS_P1_KERNEL`（`exact`・`f64fold`・`f32`）と`SOLVERS_P1_NORM`（`exact`・`f32`）でCFR passだけを切り替える |
   | e2 | eに`scripts/patch_e2.py`でT8a候補4種を足したもの（計測専用、未commit） |
 
 - 変種の中身:

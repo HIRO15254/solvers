@@ -2,14 +2,14 @@
  "hash_note": "SHA-256 of LF-normalized bytes",
  "source": {
   "base": "06ddca2",
-  "e": "5e7a4c1",
+  "e": "5e7a4c1 (branch s3-p1-fast-kernels; scripts/fast-kernels-5e7a4c1.patch, applies to 06ddca2)",
   "e2": "5e7a4c1 + scripts/patch_e2.py"
  },
  "machine": "GCP c2d-highcpu-32 Spot europe-west4-a, VM p1perf-5, 2026-10-07T03:00Z..04:43Z, deleted after the run",
  "retained_elsewhere": "stdout/time logs and solve outputs under ignored runs/p1-perf/vm5/results (not Git-backed)",
  "reproduction_status": "verified",
  "files": {
-  "README.md": "2c90c8f6ff4cb98a6d130009e52787d2926943ca1670b47aa00025fc9ac3f4e0",
+  "README.md": "194fd1931a9d0ef5fbf1cd8f06ed24b3815a2c6ef5002847ae9ef8ff92e24139",
   "configs/c_flop1.toml": "e69682626cf4c633a25103c803e81aca7461da38fe2e94476cb29ddf35e34fa8",
   "configs/c_gtowb.toml": "a7af490855160c153637f1f7ad70baaf2d7d737ec5d9edbaafb04a085ed64d1c",
   "configs/c_turn.toml": "48fe9a75be75b6d3a1adfb1796d1e0a028cf72c9a8476f87444cd1b239e50592",
@@ -159,6 +159,7 @@
   "result.json": "716dd4753106ada8b0b3465b6fc7270b30d28d2a5a3bcc26604b262888abd17a",
   "scripts/analyze5.py": "0d182ba4ac56ef870b0b4795e1cf7aa85d2ae74f62ae1eab7a256fc0571255af",
   "scripts/build_record.py": "5f98f9a620affe9f3c578033f8f7275868603b0bf856fe77ca716f4f9d05ecda",
+  "scripts/fast-kernels-5e7a4c1.patch": "846b3d20f0a4db8b79bdf289eff8e398c30239f97293ba67668dc256e6880e81",
   "scripts/kbench_t8a.rs": "96bbb348a1a9a1046dbceb3462a18a53dc699ba0624ddd66378d4ab0a28eb2fc",
   "scripts/patch_e2.py": "f63dc173956b8edc3b7bb911101010e9f2d8ef7f7988cd1a16e2d1317b4a8407",
   "scripts/run10.sh": "7cca9e2c02d179ec00b7e7482a50d967dceaa3a5c8e939aae3d23d1ca9e62f6d",
