@@ -145,6 +145,11 @@ reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは 
 全 0 buffer を使い回す。更新 player の action と chance の演算、chance/action 並列、
 `ActionViews` の分割は通常の走査と同じ。全呼出し元が `out` を 0 で初期化することを
 不変条件とし、scratch の 0 初期化と再利用 child buffer の clear で維持する。
+記録不要の EV/BR は、chanceの無いaction部分木のstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
+戦略・相手reachの前準備、厳密終端batch、子順のEV/BR合成の3段で処理する。
+`eval_batch`の既定hookは個別の`eval`。P1は同一board・同種の終端を最大4 laneで評価する。
+foldはglobal combo順、showdownはrank順・group total順を保ち、各laneのf64演算は個別kernelとbit一致する。
+戦略正規化・reach乗算・EV加算・BRのmaxも元の順序を保つ。chance/action並列の上位分割は変更しない。
 記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
 `visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
 

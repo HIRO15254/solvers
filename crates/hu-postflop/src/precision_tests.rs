@@ -686,3 +686,62 @@ mod batch_precision_tests;
 
 #[path = "lane_precision_tests.rs"]
 mod lane_precision_tests;
+
+#[test]
+fn exact_terminal_batches_match_scalar_in_every_lane() {
+    let game = game();
+    let evaluator = &game.game.evaluator;
+    let ids: Vec<_> = (0..evaluator.terminals.len() as u32).collect();
+    for p in Player::BOTH {
+        for width in [1, 2, 3, 4, 5, 8, 11] {
+            for chunk in ids.chunks(width) {
+                // Vary lane placement and use mixed boards/kinds. Board-dead
+                // reaches are zero, as required by the terminal contract.
+                let ids: Vec<_> = chunk.iter().copied().rev().collect();
+                let reaches: Vec<Vec<f32>> = ids
+                    .iter()
+                    .enumerate()
+                    .map(|(lane, &id)| {
+                        let board = evaluator.terminals[id as usize].board_mask;
+                        evaluator
+                            .hands
+                            .combos(p.opponent())
+                            .iter()
+                            .enumerate()
+                            .map(|(h, &combo)| {
+                                let (a, b) = combo_cards(combo as usize);
+                                if board & ((1u64 << a.index()) | (1u64 << b.index())) != 0
+                                    || (h + lane) % 7 == 0
+                                {
+                                    if lane % 2 == 0 { 0.0 } else { -0.0 }
+                                } else {
+                                    // Widely varying magnitudes reveal sum reordering.
+                                    ((h * 71 + lane * 13) % 97 + 1) as f32
+                                        * 2.0f32.powi((h % 30) as i32 - 15)
+                                }
+                            })
+                            .collect()
+                    })
+                    .collect();
+                let mut expected = vec![vec![0.0; evaluator.hands.len(p)]; ids.len()];
+                let mut actual = expected.clone();
+                for ((&id, reach), out) in ids.iter().zip(&reaches).zip(&mut expected) {
+                    evaluator.eval(id, p, reach, out);
+                }
+                evaluator.eval_batch(
+                    &ids,
+                    p,
+                    &reaches.iter().map(Vec::as_slice).collect::<Vec<_>>(),
+                    &mut actual.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
+                );
+                for (expected, actual) in expected.iter().zip(&actual) {
+                    assert_eq!(
+                        bits(expected),
+                        bits(actual),
+                        "{p:?} width={width} ids={ids:?}"
+                    );
+                }
+            }
+        }
+    }
+}

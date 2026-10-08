@@ -421,3 +421,73 @@ fn zero_opponent_pass_keeps_parallel_updates() {
         check_parallel_updates::<I16Storage>(par);
     }
 }
+
+fn exact_flat_values<S: Storage>() {
+    for dim in [1, 17, 65] {
+        let mut solver = seeded::<S>(dim, Box::new(Dcfr::default()));
+        solver.run(3);
+        for p in Player::BOTH {
+            let ctx = ValueCtx {
+                tree: &solver.game.tree,
+                evaluator: &solver.game.evaluator,
+                storage: &solver.storage,
+                p,
+                par: solver.par,
+            };
+            for (ev_on, br_on) in [(true, true), (true, false), (false, true)] {
+                let mut old_ev = vec![0.0; dim];
+                let mut old_br = old_ev.clone();
+                let mut new_ev = old_ev.clone();
+                let mut new_br = old_ev.clone();
+                let mut scratch = Scratch::new();
+                macro_rules! check {
+                    ($ev:literal, $br:literal) => {{
+                        value_pass::<_, _, _, $ev, $br, true>(
+                            &ctx,
+                            &mut scratch,
+                            0,
+                            &solver.game.root_ranges[p.opponent()],
+                            &mut old_ev,
+                            &mut old_br,
+                            &no_record,
+                            solver.par.chance_depth,
+                        );
+                        value_pass::<_, _, _, $ev, $br, false>(
+                            &ctx,
+                            &mut scratch,
+                            0,
+                            &solver.game.root_ranges[p.opponent()],
+                            &mut new_ev,
+                            &mut new_br,
+                            &no_record,
+                            solver.par.chance_depth,
+                        );
+                    }};
+                }
+                match (ev_on, br_on) {
+                    (true, true) => check!(true, true),
+                    (true, false) => check!(true, false),
+                    (false, true) => check!(false, true),
+                    _ => unreachable!(),
+                }
+                for (old, new) in old_ev
+                    .iter()
+                    .chain(&old_br)
+                    .zip(new_ev.iter().chain(&new_br))
+                {
+                    assert_eq!(
+                        old.to_bits(),
+                        new.to_bits(),
+                        "{p:?} dim={dim} EV={ev_on} BR={br_on}"
+                    );
+                }
+            }
+        }
+    }
+}
+#[test]
+fn exact_flat_values_all_storage_channels() {
+    exact_flat_values::<F32Storage>();
+    exact_flat_values::<I16Storage>();
+    exact_flat_values::<crate::MixedStorage>();
+}
