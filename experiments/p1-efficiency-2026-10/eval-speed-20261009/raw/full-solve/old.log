@@ -1,0 +1,12 @@
+tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16) / 2017.5 MiB (i16-f32avg)
+memory estimate: 2824.3 MiB (f32) / 1482.7 MiB (i16) / 2153.5 MiB (i16-f32avg)
+iter=      25 expl_p0=8.207e-1 expl_p1=5.181e-1 nash_conv=1.339e0
+iter=      50 expl_p0=1.515e-1 expl_p1=7.961e-2 nash_conv=2.311e-1
+iter=      75 expl_p0=5.799e-2 expl_p1=2.742e-2 nash_conv=8.542e-2
+iter=     100 expl_p0=2.836e-2 expl_p1=1.395e-2 nash_conv=4.231e-2
+iter=     125 expl_p0=1.687e-2 expl_p1=8.772e-3 nash_conv=2.564e-2
+iter=     150 expl_p0=1.080e-2 expl_p1=6.699e-3 nash_conv=1.750e-2
+iter=     175 expl_p0=8.018e-3 expl_p1=5.131e-3 nash_conv=1.315e-2
+iter=     200 expl_p0=5.964e-3 expl_p1=3.935e-3 nash_conv=9.899e-3
+done: iterations=200 wall=144.11s ev_p0=1.527773 ev_p1=3.313850 nash_conv=9.899e-3
+sol: wrote C:\Users\PC_User\orca\workspaces\solvers\p1-eval-speed\runs\p1eff\full-solve-20261009-052651-old\solution.sol (893.74 MB, 335460 blocks, mode=Full)

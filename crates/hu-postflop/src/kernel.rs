@@ -25,7 +25,8 @@
 //! u_lose * call_total/card + u_fold * fold_total/card and restores both
 //! identical-combo corrections, adding both outcomes in one own-hand loop.
 //! Lone terminals also add directly, without a temporary or an add pass.
-//! Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
+//! Exact evaluation batches preserve the original f64 hand/group order.
+//! Recorded EVs and all f64 CFR calls retain the scalar kernels.
 
 use crate::hands::ABSENT;
 use nlh::HandRank;
@@ -135,6 +136,131 @@ pub(crate) fn fold_kernel(
         out[h.local as usize] =
             (u * (total - card[a] - card[b] + same_reach(same, h, reach))) as f32;
     }
+}
+
+// Exact lane sums follow the scalar hand order (and its per-group total
+// order). Packing only changes layout, never the arithmetic within a lane.
+fn add_exact_lanes<const L: usize>(
+    hands: &[Hand],
+    reach: &[[f32; L]],
+    total: &mut [f64; L],
+    card: &mut [[f64; L]; 52],
+) {
+    for h in hands {
+        let r = reach[h.local as usize];
+        for lane in 0..L {
+            let r = r[lane] as f64;
+            if r != 0.0 {
+                total[lane] += r;
+                card[h.cards[0] as usize][lane] += r;
+                card[h.cards[1] as usize][lane] += r;
+            }
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn exact_batch_kernel<const L: usize>(
+    own: &RankedHands,
+    opp: &RankedHands,
+    fold_hands: Option<(&[Hand], &[Hand], u64)>,
+    same: &[u16],
+    utilities: [[f64; 3]; L],
+    reaches: [&[f32]; L],
+    outs: &mut [&mut [f32]],
+    indices: &[usize],
+) {
+    TERMINAL_LANE_BUFFERS.with_borrow_mut(|buffers| {
+        let TerminalLaneBuffers { reach, values } = buffers;
+        reach.resize(reach.len().max(reaches[0].len() * L), 0.0);
+        values.resize(values.len().max(outs[indices[0]].len() * L), 0.0);
+        let reach = &mut reach[..reaches[0].len() * L];
+        let reach = reach.as_chunks_mut::<L>().0;
+        for (h, row) in reach.iter_mut().enumerate() {
+            *row = std::array::from_fn(|lane| reaches[lane][h]);
+        }
+        let values = &mut values[..outs[indices[0]].len() * L];
+        values.fill(0.0);
+        let values = values.as_chunks_mut::<L>().0;
+        let mut total = [0.0; L];
+        let mut card = [[0.0; L]; 52];
+        add_exact_lanes(
+            fold_hands.map_or(&opp.hands, |(_, opp, _)| opp),
+            reach,
+            &mut total,
+            &mut card,
+        );
+        let same_values = |h: Hand| {
+            let other = same[h.local as usize];
+            if other == ABSENT {
+                [0.0; L]
+            } else {
+                reach[other as usize].map(f64::from)
+            }
+        };
+        if let Some((own, _, board)) = fold_hands {
+            for &h in own {
+                let [a, b] = h.cards.map(usize::from);
+                if board & ((1u64 << a) | (1u64 << b)) != 0 {
+                    continue;
+                }
+                let same = same_values(h);
+                for lane in 0..L {
+                    values[h.local as usize][lane] = (utilities[lane][0]
+                        * (total[lane] - card[a][lane] - card[b][lane] + same[lane]))
+                        as f32;
+                }
+            }
+        } else {
+            let mut below_total = [0.0; L];
+            let mut below_card = [[0.0; L]; 52];
+            let mut oi = 0;
+            let mut os = 0;
+            let mut start = 0;
+            for &(rank, end) in &own.groups {
+                while oi < opp.groups.len() && opp.groups[oi].0 < rank {
+                    let oe = opp.groups[oi].1;
+                    let mut group_total = [0.0; L];
+                    add_exact_lanes(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
+                    for lane in 0..L {
+                        below_total[lane] += group_total[lane];
+                    }
+                    os = oe;
+                    oi += 1;
+                }
+                let mut group_total = [0.0; L];
+                let mut group_card = [[0.0; L]; 52];
+                let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
+                let oe = if tied { opp.groups[oi].1 } else { os };
+                add_exact_lanes(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
+                for &h in &own.hands[start..end] {
+                    let [a, b] = h.cards.map(usize::from);
+                    let same = same_values(h);
+                    for lane in 0..L {
+                        let win = below_total[lane] - below_card[a][lane] - below_card[b][lane];
+                        let tie = group_total[lane] - group_card[a][lane] - group_card[b][lane]
+                            + same[lane];
+                        let compat = total[lane] - card[a][lane] - card[b][lane] + same[lane];
+                        let lose = compat - win - tie;
+                        let [u_win, u_tie, u_lose] = utilities[lane];
+                        values[h.local as usize][lane] =
+                            (u_win * win + u_tie * tie + u_lose * lose) as f32;
+                    }
+                }
+                if tied {
+                    for lane in 0..L {
+                        below_total[lane] += group_total[lane];
+                    }
+                    let mut unused = [0.0; L];
+                    add_exact_lanes(&opp.hands[os..oe], reach, &mut unused, &mut below_card);
+                    os = oe;
+                    oi += 1;
+                }
+                start = end;
+            }
+        }
+        store_lane_values(values, lane_outputs::<L>(outs, indices));
+    });
 }
 
 fn add_relaxed_f32(hands: &[Hand], reach: &[f32], total: &mut f32, card: &mut [f32; 52]) {

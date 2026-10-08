@@ -1,0 +1,34 @@
+{
+  "checks": [
+    {
+      "command": "cargo fmt --all --check",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets -- -D warnings",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test --workspace",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test --release -p hu-postflop --test oracle_diff -- --ignored",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test -p hu-postflop --lib exact_terminal_batches --release",
+      "exitCode": 0
+    },
+    {
+      "command": "python tools/check_docs.py",
+      "exitCode": 0
+    }
+  ],
+  "cargoBuildJobs": 1,
+  "notes": [
+    "Workspace suite uses normal ignored-test selection; the relevant 200-iteration multistreet oracle acceptance was also run explicitly.",
+    "Initial parallel release build failed with LLVM out-of-memory; single-job release rebuild passed.",
+    "No source changes after passing fmt/clippy/workspace tests; experiment scripts and report are added subsequently."
+  ]
+}

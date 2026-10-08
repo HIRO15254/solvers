@@ -1,4 +1,4 @@
-//! Non-recursive f32 CFR for a chance-free subtree below the action split bound.
+//! Non-recursive CFR and exact EV/BR below the chance-free action split bound.
 use super::*;
 
 #[derive(Clone, Copy, Default)]
@@ -20,6 +20,18 @@ thread_local! {
     // Lease metadata just like worker scratch: no RefCell borrow crosses an
     // evaluator call, which may itself use Rayon or reenter on this worker.
     static METADATA: std::cell::RefCell<Vec<Metadata>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+struct MetadataLease(Metadata);
+impl Drop for MetadataLease {
+    fn drop(&mut self) {
+        METADATA.with(|pool| pool.borrow_mut().push(std::mem::take(&mut self.0)));
+    }
+}
+impl MetadataLease {
+    fn take() -> Self {
+        Self(METADATA.with(|pool| pool.borrow_mut().pop().unwrap_or_default()))
+    }
 }
 
 // Empty reference vectors contain no borrowed data. In-place collect recycles
@@ -69,13 +81,7 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     opp_reach: &[f32],
     out: &mut [f32],
 ) {
-    struct Lease(Metadata);
-    impl Drop for Lease {
-        fn drop(&mut self) {
-            METADATA.with(|pool| pool.borrow_mut().push(std::mem::take(&mut self.0)));
-        }
-    }
-    let mut lease = Lease(METADATA.with(|pool| pool.borrow_mut().pop().unwrap_or_default()));
+    let mut lease = MetadataLease::take();
     let metadata = &mut lease.0;
     let tree = ctx.tree;
     let node = tree.node(root);
@@ -236,6 +242,167 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     }
     out.copy_from_slice(&values[..own_len]);
     scratch.put(work);
+    scratch.put(values);
+    scratch.put(scaled);
+    scratch.put(sigma);
+}
+
+/// Exact EV/BR for a small chance-free subtree, reduced in original child order.
+/// Recording walks deliberately retain the recursive implementation.
+pub(super) fn values<E: TerminalEvaluator, S: Storage, const EV: bool, const BR: bool>(
+    ctx: &ValueCtx<'_, E, S>,
+    scratch: &mut Scratch,
+    root: NodeId,
+    opp_reach: &[f32],
+    ev: &mut [f32],
+    br: &mut [f32],
+) {
+    let tree = ctx.tree;
+    let node = tree.node(root);
+    let first = node.first_child as usize;
+    let mut end = first + node.num_children as usize;
+    let mut id = first;
+    while id < end {
+        let node = &tree.nodes[id];
+        if node.kind == NodeKind::Action {
+            end = end.max(node.first_child as usize + node.num_children as usize);
+        } else {
+            debug_assert_eq!(node.kind, NodeKind::Terminal);
+        }
+        id += 1;
+    }
+    let count = end - first + 1;
+    let span = tree.storage_spans[root as usize];
+    let sigma_len = span.end - span.start;
+    let dim = if EV { ev.len() } else { br.len() };
+    let channels = EV as usize + BR as usize;
+    let mut sigma = scratch.take_overwrite(sigma_len);
+    let mut scaled = scratch.take_overwrite(sigma_len);
+    let mut values = scratch.take(count * dim * channels);
+    let mut lease = MetadataLease::take();
+    let metadata = &mut lease.0;
+    metadata.nodes.resize(count, Reaches::default());
+    metadata.nodes[0].opp = usize::MAX;
+    let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
+    for (index, id) in walk().enumerate() {
+        let node = tree.node(id);
+        if node.kind == NodeKind::Terminal {
+            continue;
+        }
+        let sref = tree.storage_ref(node);
+        let offset = sref.offset - span.start;
+        let parent = metadata.nodes[index].opp;
+        let (previous, children) = scaled.split_at_mut(offset);
+        let opp = reach(previous, opp_reach, parent);
+        let zero = all_zero(opp);
+        metadata.nodes[index].zero_opp = zero;
+        if !zero && (EV || node.player != ctx.p) {
+            ctx.storage
+                .average_strategy(sref, sref.index, &mut sigma[offset..offset + sref.len()]);
+        }
+        let hands = sref.num_hands as usize;
+        for (a, child) in tree.children(id).enumerate() {
+            let next = if node.player == ctx.p {
+                parent
+            } else {
+                let row = &mut children[a * hands..(a + 1) * hands];
+                if zero {
+                    row.fill(0.0);
+                } else {
+                    mul_into(
+                        row,
+                        opp,
+                        &sigma[offset + a * hands..offset + (a + 1) * hands],
+                    );
+                }
+                offset + a * hands
+            };
+            metadata.nodes[child as usize - first + 1].opp = next;
+        }
+    }
+    metadata.terminals.clear();
+    let mut reaches = shared_rows(std::mem::take(&mut metadata.reaches));
+    let mut outputs = mutable_rows(std::mem::take(&mut metadata.outputs));
+    for ((index, id), row) in walk()
+        .enumerate()
+        .zip(values.chunks_exact_mut(dim * channels))
+    {
+        let node = tree.node(id);
+        if node.kind == NodeKind::Terminal {
+            let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
+            if !all_zero(opp) {
+                metadata.terminals.push(node.aux);
+                reaches.push(opp);
+                outputs.push(&mut row[..dim]);
+            }
+        }
+    }
+    ctx.evaluator
+        .eval_batch(&metadata.terminals, ctx.p, &reaches, &mut outputs);
+    metadata.outputs = mutable_rows(outputs);
+    metadata.reaches = shared_rows(reaches);
+    for id in walk().rev() {
+        let index = if id == root {
+            0
+        } else {
+            id as usize - first + 1
+        };
+        let node = tree.node(id);
+        let width = dim * channels;
+        let (parents, children) = values.split_at_mut((index + 1) * width);
+        let row = &mut parents[index * width..];
+        if node.kind == NodeKind::Terminal {
+            if EV && BR {
+                let (e, b) = row.split_at_mut(dim);
+                b.copy_from_slice(e);
+            }
+            continue;
+        }
+        if metadata.nodes[index].zero_opp {
+            continue;
+        }
+        let (e, b) = value_row::<EV, BR>(row, dim);
+        let own = node.player == ctx.p;
+        if own && BR {
+            b.fill(f32::NEG_INFINITY);
+        }
+        let sref = tree.storage_ref(node);
+        let offset = sref.offset - span.start;
+        for (a, child) in tree.children(id).enumerate() {
+            let start = (child as usize - first - index) * width;
+            let row = &children[start..start + width];
+            if EV {
+                if own {
+                    let strategy = &sigma[offset + a * dim..offset + (a + 1) * dim];
+                    for ((dst, &s), &v) in e.iter_mut().zip(strategy).zip(&row[..dim]) {
+                        *dst += s * v;
+                    }
+                } else {
+                    for (dst, &v) in e.iter_mut().zip(&row[..dim]) {
+                        *dst += v;
+                    }
+                }
+            }
+            if BR {
+                let child = &row[EV as usize * dim..];
+                if own {
+                    for (dst, &v) in b.iter_mut().zip(child) {
+                        *dst = dst.max(v);
+                    }
+                } else {
+                    for (dst, &v) in b.iter_mut().zip(child) {
+                        *dst += v;
+                    }
+                }
+            }
+        }
+    }
+    if EV {
+        ev.copy_from_slice(&values[..dim]);
+    }
+    if BR {
+        br.copy_from_slice(&values[EV as usize * dim..(EV as usize + 1) * dim]);
+    }
     scratch.put(values);
     scratch.put(scaled);
     scratch.put(sigma);

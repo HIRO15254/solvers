@@ -451,6 +451,87 @@ impl TerminalEvaluator for PostflopEvaluator {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
     }
+    fn eval_batch(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        reaches: &[&[f32]],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), reaches.len());
+        assert_eq!(terminals.len(), outs.len());
+        // Fold sums retain global-combo order, showdown sums retain rank order.
+        let key = |i: usize| {
+            let term = &self.terminals[terminals[i] as usize];
+            match term.kind {
+                TerminalKind::Fold { .. } => (true, term.board_mask),
+                TerminalKind::Showdown => (false, term.table as u64),
+            }
+        };
+        TERMINAL_BATCH_ORDER.with_borrow_mut(|order| {
+            order.clear();
+            order.extend(0..terminals.len());
+            order.sort_unstable_by_key(|&i| (key(i), i));
+            let mut remaining = order.as_slice();
+            while let Some(&first) = remaining.first() {
+                let end = remaining.partition_point(|&i| key(i) == key(first));
+                let (group, tail) = remaining.split_at(end);
+                for indices in group.chunks(4) {
+                    if indices.len() == 1 {
+                        let i = indices[0];
+                        self.eval(terminals[i], p, reaches[i], outs[i]);
+                        continue;
+                    }
+                    let term = &self.terminals[terminals[first] as usize];
+                    let fold = if key(first).0 {
+                        Some((
+                            self.fold_combos[p].as_slice(),
+                            self.fold_combos[p.opponent()].as_slice(),
+                            term.board_mask,
+                        ))
+                    } else {
+                        None
+                    };
+                    // Fold batches need no rank data, including fold-only games.
+                    let empty = PerPlayer::new(
+                        kernel::RankedHands::default(),
+                        kernel::RankedHands::default(),
+                    );
+                    let table = if fold.is_some() {
+                        &empty
+                    } else {
+                        &self.rank_tables[term.table as usize]
+                    };
+                    macro_rules! run {
+                        ($n:literal) => {
+                            kernel::exact_batch_kernel::<$n>(
+                                &table[p],
+                                &table[p.opponent()],
+                                fold,
+                                &self.hands.same[p],
+                                std::array::from_fn(|lane| {
+                                    Self::cfr_utilities(
+                                        &self.terminals[terminals[indices[lane]] as usize],
+                                        p,
+                                    )
+                                }),
+                                std::array::from_fn(|lane| reaches[indices[lane]]),
+                                outs,
+                                indices,
+                            )
+                        };
+                    }
+                    match indices.len() {
+                        2 => run!(2),
+                        3 => run!(3),
+                        4 => run!(4),
+                        _ => unreachable!(),
+                    }
+                }
+                remaining = tail;
+            }
+        });
+    }
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, self.cfr_precision);
     }
