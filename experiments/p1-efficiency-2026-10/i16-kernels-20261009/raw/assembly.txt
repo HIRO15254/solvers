@@ -1,0 +1,65 @@
+C:\Users\PC_User\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\llvm-objdump.exe
+-d
+--no-show-raw-insn
+C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\target\new\release\examples\p1_bench.exe
+sha256: 5c52b23a60a81c4467ef04cf033cc173045873d38c2da1170a7b41ebcc6ac7ea
+
+fused dequantize / discount / add / lane maxima
+14001c9b0:     	vpmovsxwd	-0x10(%rdi,%rbx), %ymm10
+14001c9b7:     	vcvtdq2ps	%ymm10, %ymm10
+14001c9bc:     	vmulps	%ymm2, %ymm10, %ymm10
+14001c9c0:     	vcmpltps	%ymm10, %ymm5, %ymm11
+14001c9c6:     	vblendvps	%ymm11, %ymm3, %ymm4, %ymm11
+14001c9cc:     	vmulps	%ymm11, %ymm10, %ymm10
+14001c9d1:     	vaddps	-0x20(%rbp,%rbx,2), %ymm10, %ymm10
+14001c9d7:     	vmaxps	%ymm10, %ymm5, %ymm10
+14001c9dc:     	vmovups	%ymm10, -0x20(%r12,%rbx,2)
+14001c9e3:     	vpmovsxwd	(%rdi,%rbx), %ymm11
+14001c9e9:     	vcvtdq2ps	%ymm11, %ymm11
+14001c9ee:     	vmulps	%ymm2, %ymm11, %ymm11
+14001c9f2:     	vcmpltps	%ymm11, %ymm5, %ymm12
+14001c9f8:     	vblendvps	%ymm12, %ymm3, %ymm4, %ymm12
+14001c9fe:     	vmulps	%ymm12, %ymm11, %ymm11
+14001ca03:     	vandps	%ymm9, %ymm10, %ymm10
+14001ca08:     	vaddps	(%rbp,%rbx,2), %ymm11, %ymm11
+14001ca0e:     	vmaxps	%ymm11, %ymm5, %ymm11
+14001ca13:     	vmovups	%ymm11, (%r12,%rbx,2)
+14001ca19:     	vmaxps	%ymm1, %ymm10, %ymm1
+14001ca1d:     	vandps	%ymm9, %ymm11, %ymm10
+14001ca22:     	vmaxps	%ymm1, %ymm10, %ymm1
+14001ca26:     	addq	$0x2, %r10
+14001ca2a:     	addq	$0x20, %rbx
+
+reciprocal multiply / round / packed conversion / narrowing
+14001d52b:     	vroundpd	$0x4, %ymm5, %ymm5
+14001d531:     	vroundpd	$0x4, %ymm6, %ymm6
+14001d537:     	vroundpd	$0x4, %ymm7, %ymm7
+14001d53d:     	vroundpd	$0x4, %ymm8, %ymm8
+14001d543:     	vcmpordpd	%ymm3, %ymm5, %ymm9
+14001d548:     	vcmpordpd	%ymm3, %ymm6, %ymm10
+14001d54d:     	vcmpordpd	%ymm3, %ymm7, %ymm11
+14001d552:     	vcmpordpd	%ymm3, %ymm8, %ymm12
+14001d557:     	vandpd	%ymm5, %ymm9, %ymm5
+14001d55b:     	vandpd	%ymm6, %ymm10, %ymm6
+14001d55f:     	vandpd	%ymm7, %ymm11, %ymm7
+14001d563:     	vandpd	%ymm8, %ymm12, %ymm8
+14001d568:     	vcvttpd2dq	%ymm5, %xmm5
+14001d56c:     	vcvttpd2dq	%ymm6, %xmm6
+14001d570:     	vcvttpd2dq	%ymm7, %xmm7
+14001d574:     	vcvttpd2dq	%ymm8, %xmm8
+14001d579:     	vinsertf128	$0x1, %xmm8, %ymm7, %ymm7
+14001d57f:     	vpshufb	%ymm4, %ymm7, %ymm7
+14001d584:     	vinsertf128	$0x1, %xmm6, %ymm5, %ymm5
+14001d58a:     	vpshufb	%ymm4, %ymm5, %ymm5
+14001d58f:     	vpunpcklqdq	%ymm7, %ymm5, %ymm5 # ymm5 = ymm5[0],ymm7[0],ymm5[2],ymm7[2]
+14001d593:     	vpermq	$0xd8, %ymm5, %ymm5     # ymm5 = ymm5[0,2,1,3]
+14001d599:     	vmovdqu	%ymm5, -0x18(%rcx,%rdx,2)
+14001d59f:     	addq	$0x10, %rdx
+14001d5a3:     	cmpq	%rdx, %rax
+14001d5a6:     	jne	0x14001d500 <.text+0x1c500>
+14001d5ac:     	cmpq	%rax, %rsi
+14001d5af:     	je	0x14001d15b <.text+0x1c15b>
+14001d5b5:     	testb	$0xc, %sil
+14001d5b9:     	je	0x14001d856 <.text+0x1c856>
+14001d5bf:     	movq	%rax, %rcx
+14001d5c2:     	movq	%rsi, %rax

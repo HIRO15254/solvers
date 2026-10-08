@@ -1,0 +1,23 @@
+tree: nodes=829242 terminals=492552 rank_tables=1176 storage=2688.3 MiB (f32) / 1346.7 MiB (i16) / 2017.5 MiB (i16-f32avg)
+memory estimate: 2824.3 MiB (f32) / 1482.7 MiB (i16) / 2153.5 MiB (i16-f32avg)
+iter=      10 expl_p0=5.981e0 expl_p1=2.460e0 nash_conv=8.441e0
+iter=      20 expl_p0=1.845e0 expl_p1=1.062e0 nash_conv=2.907e0
+iter=      30 expl_p0=5.215e-1 expl_p1=3.323e-1 nash_conv=8.538e-1
+iter=      40 expl_p0=2.458e-1 expl_p1=1.453e-1 nash_conv=3.911e-1
+iter=      50 expl_p0=1.520e-1 expl_p1=7.962e-2 nash_conv=2.317e-1
+iter=      60 expl_p0=9.835e-2 expl_p1=4.914e-2 nash_conv=1.475e-1
+iter=      70 expl_p0=1.225e-1 expl_p1=8.506e-2 nash_conv=2.076e-1
+iter=      80 expl_p0=5.738e-2 expl_p1=3.296e-2 nash_conv=9.035e-2
+iter=      90 expl_p0=3.811e-2 expl_p1=2.064e-2 nash_conv=5.876e-2
+iter=     100 expl_p0=2.816e-2 expl_p1=1.493e-2 nash_conv=4.309e-2
+iter=     110 expl_p0=2.204e-2 expl_p1=1.173e-2 nash_conv=3.377e-2
+iter=     120 expl_p0=1.773e-2 expl_p1=9.876e-3 nash_conv=2.761e-2
+iter=     130 expl_p0=1.447e-2 expl_p1=8.375e-3 nash_conv=2.285e-2
+iter=     140 expl_p0=1.212e-2 expl_p1=7.283e-3 nash_conv=1.940e-2
+iter=     150 expl_p0=1.037e-2 expl_p1=6.442e-3 nash_conv=1.681e-2
+iter=     160 expl_p0=9.167e-3 expl_p1=5.615e-3 nash_conv=1.478e-2
+iter=     170 expl_p0=8.136e-3 expl_p1=5.170e-3 nash_conv=1.331e-2
+iter=     180 expl_p0=7.214e-3 expl_p1=4.686e-3 nash_conv=1.190e-2
+iter=     190 expl_p0=6.484e-3 expl_p1=4.252e-3 nash_conv=1.074e-2
+done: iterations=190 wall=113.46s ev_p0=1.528024 ev_p1=3.314115 nash_conv=1.074e-2
+sol: wrote C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\runs\i16-kernels\f64-final\solve_c_flop1_i16_new\solution.sol (372.71 MB, 335460 blocks, mode=Full)

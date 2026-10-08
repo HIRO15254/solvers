@@ -1,0 +1,35 @@
+tree: nodes=22107 terminals=14280 rank_tables=48 storage=15.6 MiB (f32) / 7.9 MiB (i16) / 11.8 MiB (i16-f32avg)
+memory estimate: 163.6 MiB (f32) / 159.7 MiB (i16) / 163.6 MiB (i16-f32avg)
+iter=      10 expl_p0=7.773e0 expl_p1=5.942e0 nash_conv=1.371e1
+iter=      20 expl_p0=5.424e0 expl_p1=4.136e0 nash_conv=9.561e0
+iter=      30 expl_p0=2.118e0 expl_p1=1.615e0 nash_conv=3.733e0
+iter=      40 expl_p0=1.248e0 expl_p1=1.005e0 nash_conv=2.254e0
+iter=      50 expl_p0=7.115e-1 expl_p1=6.023e-1 nash_conv=1.314e0
+iter=      60 expl_p0=4.714e-1 expl_p1=4.046e-1 nash_conv=8.760e-1
+iter=      70 expl_p0=9.415e-1 expl_p1=7.767e-1 nash_conv=1.718e0
+iter=      80 expl_p0=4.277e-1 expl_p1=3.013e-1 nash_conv=7.291e-1
+iter=      90 expl_p0=2.597e-1 expl_p1=1.908e-1 nash_conv=4.505e-1
+iter=     100 expl_p0=2.229e-1 expl_p1=1.387e-1 nash_conv=3.616e-1
+iter=     110 expl_p0=1.834e-1 expl_p1=1.098e-1 nash_conv=2.932e-1
+iter=     120 expl_p0=1.248e-1 expl_p1=9.169e-2 nash_conv=2.165e-1
+iter=     130 expl_p0=1.216e-1 expl_p1=7.512e-2 nash_conv=1.967e-1
+iter=     140 expl_p0=1.047e-1 expl_p1=6.173e-2 nash_conv=1.664e-1
+iter=     150 expl_p0=9.735e-2 expl_p1=5.321e-2 nash_conv=1.506e-1
+iter=     160 expl_p0=7.828e-2 expl_p1=4.735e-2 nash_conv=1.256e-1
+iter=     170 expl_p0=6.423e-2 expl_p1=4.219e-2 nash_conv=1.064e-1
+iter=     180 expl_p0=5.317e-2 expl_p1=3.775e-2 nash_conv=9.091e-2
+iter=     190 expl_p0=5.064e-2 expl_p1=3.493e-2 nash_conv=8.557e-2
+iter=     200 expl_p0=4.478e-2 expl_p1=3.243e-2 nash_conv=7.721e-2
+iter=     210 expl_p0=4.200e-2 expl_p1=3.036e-2 nash_conv=7.235e-2
+iter=     220 expl_p0=3.866e-2 expl_p1=2.874e-2 nash_conv=6.740e-2
+iter=     230 expl_p0=3.626e-2 expl_p1=2.757e-2 nash_conv=6.383e-2
+iter=     240 expl_p0=3.291e-2 expl_p1=2.644e-2 nash_conv=5.935e-2
+iter=     250 expl_p0=3.006e-2 expl_p1=2.589e-2 nash_conv=5.594e-2
+iter=     260 expl_p0=1.421e-1 expl_p1=1.200e-1 nash_conv=2.621e-1
+iter=     270 expl_p0=6.102e-2 expl_p1=5.279e-2 nash_conv=1.138e-1
+iter=     280 expl_p0=3.942e-2 expl_p1=3.797e-2 nash_conv=7.738e-2
+iter=     290 expl_p0=3.091e-2 expl_p1=2.770e-2 nash_conv=5.861e-2
+iter=     300 expl_p0=2.597e-2 expl_p1=2.257e-2 nash_conv=4.855e-2
+iter=     310 expl_p0=2.211e-2 expl_p1=1.984e-2 nash_conv=4.195e-2
+done: iterations=310 wall=2.06s ev_p0=7.679910 ev_p1=12.799262 nash_conv=4.195e-2
+sol: wrote C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\runs\i16-kernels\solve_c_turn2_i16_old\solution.sol (2.13 MB, 7802 blocks, mode=Full)

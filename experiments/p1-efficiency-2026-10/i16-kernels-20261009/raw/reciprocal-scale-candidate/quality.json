@@ -1,0 +1,27 @@
+{
+  "accepted": false,
+  "reason": "Flop iterations +5.263%, exceeding +3%",
+  "convergence": [
+    {
+      "case": "c_turn2",
+      "storage": "i16",
+      "old": 310,
+      "new": 310,
+      "ratio": 1.0
+    },
+    {
+      "case": "c_turn2",
+      "storage": "i16-f32avg",
+      "old": 250,
+      "new": 250,
+      "ratio": 1.0
+    },
+    {
+      "case": "c_flop1",
+      "storage": "i16",
+      "old": 190,
+      "new": 200,
+      "ratio": 1.0526315789473684
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\target\\old\\release\\solvers.exe",
+    "solve",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\experiments\\p1-efficiency-2026-10\\i16-kernels-20261009\\configs\\c_turn2_i16-f32avg.toml",
+    "--out",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\runs\\i16-kernels\\final\\solve_c_turn2_i16-f32avg_old",
+    "--threads",
+    "8"
+  ],
+  "startUnix": 1791491610.36289,
+  "wallSecs": 1.2855336666107178,
+  "exitCode": 0
+}

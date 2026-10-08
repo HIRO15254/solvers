@@ -1,0 +1,41 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB r11, BTN c / BB x, BTN x"
+board = "Jh Th 8c 2s"
+
+[ranges]
+BTN = "JJ-55,AQs-A9s,A5s-A4s,KQs-KTs,QJs-QTs,JTs,T9s,98s,87s,76s,65s,AQo,KQo"
+BB = "QQ+,AKs,AQs,A5s-A3s,KQs,K9s,QJs,76s,65s,AKo,AQo"
+
+[tree]
+script = '''
+turn, river { replace bet [33, 75, 150, a] }
+turn, river when !unopened { replace raise [3x, a] }
+'''
+
+[solver]
+storage = "i16-f32avg"
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+target = "0.1%pot"
+max_iterations = 3000
+check_every = 10
+
+[run]
+final_checkpoint = false
+checkpoint_interval = "10h"

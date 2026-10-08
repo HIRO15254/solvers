@@ -1,0 +1,16 @@
+{
+  "cpu": "Intel(R) Core(TM) i7-10700KF CPU @ 3.80GHz",
+  "cores": 8,
+  "logicalProcessors": 16,
+  "ramBytes": 34275098624,
+  "os": "Microsoft Windows 11 Home",
+  "osVersion": "10.0.26200",
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)\r\nbinary: rustc\r\ncommit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3\r\ncommit-date: 2026-07-07\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.97.0\r\nLLVM version: 22.1.6",
+  "cargo": "cargo 1.97.0 (c980f4866 2026-06-30)",
+  "python": "Python 3.13.7",
+  "targetCpu": "native",
+  "lto": "thin",
+  "codegenUnits": 1,
+  "threads": 8,
+  "sharedMachine": true
+}

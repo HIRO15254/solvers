@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\target\\new\\release\\examples\\p1_bench.exe",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\cisco\\experiments\\p1-perf-2026-10\\lane-fold-20261008\\configs\\c_turn2.toml",
+    "--threads",
+    "8",
+    "--warmup",
+    "5",
+    "--iters",
+    "30",
+    "--evals",
+    "0",
+    "--storage",
+    "i16-f32avg",
+    "--json",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\experiments\\p1-efficiency-2026-10\\i16-kernels-20261009\\raw\\bench_c_turn2_i16-f32avg_9_new.json"
+  ],
+  "startUnix": 1791490841.576967,
+  "wallSecs": 0.15621590614318848,
+  "exitCode": 0
+}
