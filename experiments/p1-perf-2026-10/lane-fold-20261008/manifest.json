@@ -7,10 +7,10 @@
   "prof51": "the t26 tree built with CARGO_PROFILE_RELEASE_DEBUG=line-tables-only"
  },
  "machine": "GCP c2d-highcpu-32 Spot europe-west4-b, VM p1perf-10, 2026-10-08T07:14Z..07:43Z; local Windows i7-10700KF for kernel benches, local p1_bench and identity checks",
- "retained_elsewhere": "per-run .sol and checkpoints and perf.data files were deleted with the VM; Codex artifacts (bench executables, variant logs, f64 identity dumps, source snapshots) under runs/t26 in the cisco-t25 worktree and the session scratchpad, not Git-backed",
+ "retained_elsewhere": "per-run .sol and checkpoints and perf.data files were deleted with the VM; Codex artifacts (bench executables, variant logs, f64 identity dumps, source snapshots) under runs/p1-perf/codex/t26 in the cisco worktree (moved there before the cisco-t25 worktree was removed) and the session scratchpad, not Git-backed",
  "reproduction_status": "verified",
  "files": {
-  "README.md": "d1a44993bdb4aeba72ea183371ee0b4303481597292fd0015b768bb3f6f2daab",
+  "README.md": "600b0a895fd5a511e841ea09eae32f254a6e8c4533b3708dd37d0eada39f987a",
   "configs/c_flop1.toml": "e69682626cf4c633a25103c803e81aca7461da38fe2e94476cb29ddf35e34fa8",
   "configs/c_flop3.toml": "d62da5132b1d4e376cf064500a29e2fb26c42e5df48afef5a8129a68bc3f51e8",
   "configs/c_gtowb.toml": "a7af490855160c153637f1f7ad70baaf2d7d737ec5d9edbaafb04a085ed64d1c",

@@ -133,4 +133,4 @@ symbol別の割合（`report_*.txt`、%）:
   - 戦略和を早めに読み込む。
 
 保持物の識別は[manifest.json](manifest.json)。各runの`.sol`とcheckpoint、perf.dataはVMとともに削除した。
-Codexの作業物（bench実行file、f64一致のdump、source snapshot）は`cisco-t25` worktreeの`runs/t26`とsession scratchpadにあり、Gitには入れていない。
+Codexの作業物（bench実行file、f64一致のdump、source snapshot）は`cisco` worktreeの`runs/p1-perf/codex/t26`（worktree `cisco-t25`を消す前に移した）とsession scratchpadにあり、Gitには入れていない。

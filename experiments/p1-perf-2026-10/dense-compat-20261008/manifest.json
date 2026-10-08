@@ -8,7 +8,7 @@
   "prof31": "the t24 tree built with CARGO_PROFILE_RELEASE_DEBUG=line-tables-only"
  },
  "machine": "GCP c2d-highcpu-32 Spot europe-west4-b, VM p1perf-8, 2026-10-08T03:21Z..04:03Z; local Windows i7-10700KF for kernel benches and identity checks",
- "retained_elsewhere": "per-run .sol and checkpoints and perf.data files were deleted with the VM; Codex artifacts (bench executables, f64 identity dumps, source snapshots) under runs/t24 in the cisco-t22 worktree and the session scratchpad, not Git-backed",
+ "retained_elsewhere": "per-run .sol and checkpoints and perf.data files were deleted with the VM; Codex artifacts (bench executables, f64 identity dumps, source snapshots) under runs/p1-perf/codex/t24 in the cisco worktree (moved there before the cisco-t22 worktree was removed) and the session scratchpad, not Git-backed",
  "reproduction_status": "verified",
  "files": {
   "README.md": "28ba1cf0431df679e5384834b788ea3d90e8a56ef04fd75248264c5344f7a664",

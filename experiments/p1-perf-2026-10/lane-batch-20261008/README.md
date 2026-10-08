@@ -147,4 +147,4 @@ symbol別の割合（`report_*.txt`、%）:
   [内訳](../smt-breakdown-20261008/README.md)と同じ見積り（Flop1の1 iterationで約7 GB）では、T25の0.098秒あたり約72 GB/sで、上限の半分程度である。
 
 保持物の識別は[manifest.json](manifest.json)。各runの`.sol`とcheckpoint、perf.dataはVMとともに削除した。
-Codexの作業物（bench実行file、f64一致のdump、source snapshot）は`cisco-t25` worktreeの`runs/t25a`・`runs/t25b`とsession scratchpadにあり、Gitには入れていない。
+Codexの作業物（bench実行file、f64一致のdump、source snapshot）は`cisco` worktreeの`runs/p1-perf/codex/t25a`・`t25b`（worktree `cisco-t25`を消す前に移した）とsession scratchpadにあり、Gitには入れていない。
