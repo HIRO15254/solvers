@@ -1,0 +1,5 @@
+threads=1 read=4.6 rmw(2r+1w)=51.8 triad(2r+1w)=34.5 GB/s sink=4.86539e+08
+threads=4 read=18.5 rmw(2r+1w)=138.4 triad(2r+1w)=96.9 GB/s sink=1.94616e+09
+threads=8 read=37.0 rmw(2r+1w)=147.3 triad(2r+1w)=104.6 GB/s sink=3.89231e+09
+threads=16 read=73.7 rmw(2r+1w)=138.0 triad(2r+1w)=99.8 GB/s sink=5.25417e+09
+threads=32 read=129.7 rmw(2r+1w)=137.8 triad(2r+1w)=99.1 GB/s sink=5.15751e+09

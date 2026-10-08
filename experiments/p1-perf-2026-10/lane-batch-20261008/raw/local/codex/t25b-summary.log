@@ -1,0 +1,209 @@
+{
+  "step0": {
+    "btn_bb": {
+      "median_ns": {
+        "t25_lone": 2956715.0,
+        "t25_current": 2426165.1785714286,
+        "t25_batch": 1469331.625
+      },
+      "batch_current": 0.6056189570180749,
+      "batch_lone": 0.4969473300605571
+    },
+    "wide": {
+      "median_ns": {
+        "t25_lone": 7555445.721925134,
+        "t25_current": 5906324.696969697,
+        "t25_batch": 4082408.0882352944
+      },
+      "batch_current": 0.6911926278502463,
+      "batch_lone": 0.5403265721820437
+    }
+  },
+  "p1": {
+    "river": {
+      "median_secs_per_iter": {
+        "base": 0.0004469895,
+        "new": 0.000271213
+      },
+      "new_base": 0.6067547447982559,
+      "paired_ratios": [
+        0.5770940928142607,
+        0.7524606369718765,
+        0.568567005197988
+      ],
+      "maximum_peak_bytes": 7184384,
+      "threads": 1,
+      "warmup": 20,
+      "iters": 200
+    },
+    "turn2": {
+      "median_secs_per_iter": {
+        "base": 0.027093030000000004,
+        "new": 0.021118638000000002
+      },
+      "new_base": 0.7794860154069145,
+      "paired_ratios": [
+        0.7794860154069145,
+        0.7902736756087667,
+        0.7402781120622115
+      ],
+      "maximum_peak_bytes": 27533312,
+      "threads": 1,
+      "warmup": 5,
+      "iters": 50
+    },
+    "flop1": {
+      "median_secs_per_iter": {
+        "base": 1.0282165666666667,
+        "new": 0.8393837333333334
+      },
+      "new_base": 0.8163491627590647,
+      "paired_ratios": [
+        0.8370879771649145,
+        0.8163491627590647,
+        0.8292269595690449
+      ],
+      "maximum_peak_bytes": 3005984768,
+      "threads": 4,
+      "warmup": 2,
+      "iters": 6
+    }
+  },
+  "arenas": [
+    {
+      "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_river.toml",
+      "nodes": 99,
+      "reports": [
+        {
+          "entries": 5,
+          "maximum": {
+            "engineBytes": 264260,
+            "kernelActiveBytes": 27168,
+            "metadataBytes": 2388,
+            "nodes": 50,
+            "root": 1,
+            "scaledReachBytes": 83308,
+            "sigmaBytes": 83308,
+            "terminals": 33,
+            "valueBytes": 88200,
+            "workBytes": 7056
+          },
+          "player": "P0",
+          "requestedBytesSum": 520564
+        },
+        {
+          "entries": 5,
+          "maximum": {
+            "engineBytes": 258544,
+            "kernelActiveBytes": 27168,
+            "metadataBytes": 2388,
+            "nodes": 50,
+            "root": 1,
+            "scaledReachBytes": 83308,
+            "sigmaBytes": 83308,
+            "terminals": 33,
+            "valueBytes": 81400,
+            "workBytes": 8140
+          },
+          "player": "P1",
+          "requestedBytesSum": 509944
+        }
+      ],
+      "rootDims": [
+        441,
+        407
+      ],
+      "storageElements": 41552
+    },
+    {
+      "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_turn2.toml",
+      "nodes": 22107,
+      "reports": [
+        {
+          "entries": 624,
+          "maximum": {
+            "engineBytes": 87500,
+            "kernelActiveBytes": 6304,
+            "metadataBytes": 3564,
+            "nodes": 75,
+            "root": 58,
+            "scaledReachBytes": 29008,
+            "sigmaBytes": 29008,
+            "terminals": 49,
+            "valueBytes": 24300,
+            "workBytes": 1620
+          },
+          "player": "P0",
+          "requestedBytesSum": 24991296
+        },
+        {
+          "entries": 624,
+          "maximum": {
+            "engineBytes": 98380,
+            "kernelActiveBytes": 6304,
+            "metadataBytes": 3564,
+            "nodes": 75,
+            "root": 58,
+            "scaledReachBytes": 29008,
+            "sigmaBytes": 29008,
+            "terminals": 49,
+            "valueBytes": 34500,
+            "workBytes": 2300
+          },
+          "player": "P1",
+          "requestedBytesSum": 28203072
+        }
+      ],
+      "rootDims": [
+        81,
+        115
+      ],
+      "storageElements": 2048788
+    },
+    {
+      "config": "experiments/p1-perf-2026-10/scratch-overwrite-20261008/configs/c_flop1.toml",
+      "nodes": 829242,
+      "reports": [
+        {
+          "entries": 58800,
+          "maximum": {
+            "engineBytes": 86412,
+            "kernelActiveBytes": 29312,
+            "metadataBytes": 684,
+            "nodes": 15,
+            "root": 828135,
+            "scaledReachBytes": 25620,
+            "sigmaBytes": 25620,
+            "terminals": 9,
+            "valueBytes": 28740,
+            "workBytes": 5748
+          },
+          "player": "P0",
+          "requestedBytesSum": 4745536320
+        },
+        {
+          "entries": 58800,
+          "maximum": {
+            "engineBytes": 83316,
+            "kernelActiveBytes": 29312,
+            "metadataBytes": 684,
+            "nodes": 15,
+            "root": 828135,
+            "scaledReachBytes": 25620,
+            "sigmaBytes": 25620,
+            "terminals": 9,
+            "valueBytes": 26160,
+            "workBytes": 5232
+          },
+          "player": "P1",
+          "requestedBytesSum": 4574818752
+        }
+      ],
+      "rootDims": [
+        479,
+        436
+      ],
+      "storageElements": 352364670
+    }
+  ]
+}

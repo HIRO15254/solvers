@@ -1,0 +1,12 @@
+cost-1-step0-kernels-t25_one_lane_btn_bb affinity=0x1
+cost-1-step0-kernels-t25_zero_lane_btn_bb affinity=0x1
+cost-1-step0-kernels-t25_zero_eight_btn_bb affinity=0x1
+cost-1-step0-kernels-t25_one_lane_wide affinity=0x1
+cost-1-step0-kernels-t25_zero_lane_wide affinity=0x1
+cost-1-step0-kernels-t25_zero_eight_wide affinity=0x1
+step0-kernels t25_one_lane_btn_bb 4475.654689403167 [4475.654689403167]
+step0-kernels t25_zero_lane_btn_bb 4401.559532924962 [4401.559532924962]
+step0-kernels t25_zero_eight_btn_bb 10766.270260747006 [10766.270260747006]
+step0-kernels t25_one_lane_wide 11564.569560894335 [11564.569560894335]
+step0-kernels t25_zero_lane_wide 10689.854907898058 [10689.854907898058]
+step0-kernels t25_zero_eight_wide 28511.658086658084 [28511.658086658084]

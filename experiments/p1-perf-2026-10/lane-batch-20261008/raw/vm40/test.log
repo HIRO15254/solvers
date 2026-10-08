@@ -1,0 +1,437 @@
+   Compiling cfg-if v1.0.4
+   Compiling fastrand v2.4.1
+   Compiling quickdiv v0.1.1
+   Compiling once_cell v1.21.4
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.2
+   Compiling bitflags v2.13.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling cpufeatures v0.3.0
+   Compiling either v1.16.0
+   Compiling arrayref v0.3.9
+   Compiling arrayvec v0.7.8
+   Compiling constant_time_eq v0.4.2
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling libc v0.2.186
+   Compiling aya_base v0.1.0
+   Compiling winnow v0.7.15
+   Compiling toml_write v0.1.2
+   Compiling serde_core v1.0.228
+   Compiling zmij v1.0.21
+   Compiling crossbeam-utils v0.8.21
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-query v1.1.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling scopeguard v1.2.0
+   Compiling colorchoice v1.0.5
+   Compiling anstyle v1.0.14
+   Compiling byteorder v1.5.0
+   Compiling strsim v0.11.1
+   Compiling clap_lex v1.1.0
+   Compiling anyhow v1.0.103
+   Compiling stable_deref_trait v1.2.1
+   Compiling anstyle-parse v1.0.0
+   Compiling lock_api v0.4.14
+   Compiling zerocopy v0.8.52
+   Compiling thiserror v2.0.18
+   Compiling regex-syntax v0.8.11
+   Compiling plotters-backend v0.3.7
+   Compiling ciborium-io v0.2.2
+   Compiling same-file v1.0.6
+   Compiling miniphf v0.1.0
+   Compiling num-traits v0.2.19
+   Compiling cast v0.3.0
+   Compiling anes v0.1.6
+   Compiling oorandom v11.1.5
+   Compiling rustc-hash v2.1.3
+   Compiling cobs v0.3.0
+   Compiling itertools v0.10.5
+   Compiling cfr-ref v0.1.0 (/home/PC_User/t25/crates/cfr-ref)
+   Compiling untrusted v0.9.0
+   Compiling untrusted v0.7.1
+   Compiling anstream v1.0.0
+   Compiling hash32 v0.2.1
+   Compiling aya_codegen v0.1.0
+   Compiling walkdir v2.5.0
+   Compiling spin v0.5.2
+   Compiling log v0.4.33
+   Compiling base64 v0.13.1
+   Compiling chunked_transfer v1.5.0
+   Compiling zeroize v1.9.0
+   Compiling spin v0.9.8
+   Compiling rustix v1.1.4
+   Compiling ascii v1.1.0
+   Compiling httpdate v1.0.3
+   Compiling plotters-svg v0.3.7
+   Compiling crossbeam-epoch v0.9.18
+   Compiling clap_builder v4.6.0
+   Compiling rustls-pemfile v0.2.1
+   Compiling indexmap v2.14.0
+   Compiling aya_poker v0.1.0
+   Compiling crossbeam-deque v0.8.6
+   Compiling rayon-core v1.13.0
+   Compiling plotters v0.3.7
+   Compiling jobserver v0.1.34
+   Compiling getrandom v0.2.17
+   Compiling getrandom v0.4.3
+   Compiling is-terminal v0.4.17
+   Compiling rand_core v0.6.4
+   Compiling cc v1.2.65
+   Compiling rayon v1.12.0
+   Compiling regex-automata v0.4.14
+   Compiling criterion-plot v0.5.0
+   Compiling tempfile v3.27.0
+   Compiling serde v1.0.228
+   Compiling serde_json v1.0.150
+   Compiling blake3 v1.8.5
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling ring v0.17.14
+   Compiling ring v0.16.20
+   Compiling clap v4.6.1
+   Compiling regex v1.12.4
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling heapless v0.7.17
+   Compiling toml_edit v0.22.27
+   Compiling tinytemplate v1.2.1
+   Compiling runfiles v0.1.0 (/home/PC_User/t25/crates/runfiles)
+   Compiling postcard v1.1.3
+   Compiling protocol v0.1.0 (/home/PC_User/t25/crates/protocol)
+   Compiling ppv-lite86 v0.2.21
+   Compiling half v2.7.1
+   Compiling ciborium-ll v0.2.2
+   Compiling rand_chacha v0.3.1
+   Compiling ciborium v0.2.2
+   Compiling rand v0.8.6
+   Compiling criterion v0.5.1
+   Compiling toml v0.8.23
+   Compiling sct v0.7.1
+   Compiling webpki v0.22.4
+   Compiling rustls v0.20.9
+   Compiling zstd-safe v7.2.4
+   Compiling zstd v0.13.3
+   Compiling tiny_http v0.12.0
+   Compiling daemon v0.1.0 (/home/PC_User/t25/crates/daemon)
+   Compiling nlh v0.1.0 (/home/PC_User/t25/crates/nlh)
+   Compiling economics v0.1.0 (/home/PC_User/t25/crates/economics)
+   Compiling hu-engine v0.1.0 (/home/PC_User/t25/crates/hu-engine)
+   Compiling spot v0.1.0 (/home/PC_User/t25/crates/spot)
+   Compiling hu-postflop v0.1.0 (/home/PC_User/t25/crates/hu-postflop)
+   Compiling mw-preflop v0.1.0 (/home/PC_User/t25/crates/mw-preflop)
+   Compiling cli v0.1.0 (/home/PC_User/t25/crates/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.07s
+     Running unittests src/lib.rs (target/debug/deps/cfr_ref-de6511cc71749350)
+
+running 2 tests
+test games::tests::uniform_profile_is_exploitable ... ok
+test games::tests::oracle_cfr_solves_kuhn ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.29s
+
+     Running unittests src/lib.rs (target/debug/deps/cli-4090f3921db1a9e6)
+
+running 29 tests
+test resume::tests::a_checkpoint_file_path_is_passed_through ... ok
+test resume::tests::a_run_directory_without_a_checkpoint_is_rejected ... ok
+test resume::tests::a_heads_up_run_directory_resolves_to_its_ckpt ... ok
+test nlh_v1::p2::tests::product_diagnostics_keep_cli_exit_mapping ... ok
+test resume::tests::missing_p2_checkpoint_keeps_the_existing_diagnostic ... ok
+test run_dir::tests::a_populated_directory_is_refused ... ok
+test resume::tests::removed_family_run_directories_are_refused_before_loading_the_checkpoint ... ok
+test tests::policy_arena_allocation_failure_uses_the_resource_exit_code ... ok
+test tests::the_command_surface_has_no_experiment_namespace ... ok
+test config_new::tests::the_cli_reference_covers_every_command ... ok
+test config_new::tests::full_templates_preserve_the_minimal_spot ... ok
+test config_new::tests::full_templates_list_every_effective_key ... ok
+test config_new::tests::common_input_reference_covers_every_effective_key_and_literal ... ok
+test config_new::tests::all_templates_validate_and_normalize_idempotently ... ok
+test config_new::tests::minimal_p1_template_solves ... ok
+test run_dir::tests::a_finished_run_directory_is_not_adopted ... ok
+test runs::tests::an_abandoned_run_reports_interrupted_and_keeps_the_recorded_state ... ok
+test runs::tests::watching_a_finished_run_returns_immediately ... ok
+test runs::tests::status_reports_progress_and_an_events_offset ... ok
+test runs::tests::watching_from_an_offset_skips_what_was_already_read ... ok
+test runs::tests::a_canceled_run_with_a_checkpoint_is_resumable ... ok
+test runs::tests::hu_elapsed_time_uses_the_metrics_row_field ... ok
+test resume::tests::removed_family_multiway_checkpoint_is_refused ... ok
+test run_dir::tests::a_failed_run_records_the_error_and_returns_it ... ok
+test run_dir::tests::a_cancelled_run_closes_as_canceled ... ok
+test run_dir::tests::a_completed_run_closes_its_manifest_and_events ... ok
+test run_dir::tests::a_queued_run_directory_is_adopted_and_keeps_its_identity ... ok
+test runs::tests::listing_finds_run_directories_and_ignores_other_entries ... ok
+test resume::tests::removed_family_hu_checkpoints_are_refused_embedded_or_legacy ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running unittests src/main.rs (target/debug/deps/solvers-eef9f443b45a6ba7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_integration.rs (target/debug/deps/cli_integration-6f0edcc675fe42e3)
+
+running 31 tests
+test a_canceled_heads_up_solve_closes_as_canceled_and_resumes ... ignored, spawns and signals a solve; explicit release acceptance only
+test a_solve_records_a_complete_run_directory ... ignored, builds the full EHS2 tables; explicit release acceptance only
+test inspect_sol_river_navigation_smoke ... ignored, solves twice; CI runs it in release with --include-ignored
+test multiway_v1_u16_storage_writes_a_quantized_mwsol ... ignored, builds the full EHS2 tables; explicit release acceptance only
+test the_abstraction_cache_is_shared_across_runs ... ignored, builds the full EHS2 tables once; explicit release acceptance only
+test watch_rejects_a_directory_that_is_not_a_run ... ok
+test runs_ls_lists_run_directories_and_skips_everything_else ... ok
+test status_reports_an_abandoned_run_as_interrupted_and_resumable ... ok
+test status_reports_a_finished_run_as_json ... ok
+test the_retired_history_flag_is_refused ... ok
+test watch_replays_a_finished_run_and_resumes_from_an_offset ... ok
+test status_reports_a_canceled_heads_up_run_as_resumable ... ok
+test removed_family_schemas_are_refused_as_unsupported ... ok
+test old_run_monitoring_preserves_the_recorded_schema_and_game_kind ... ok
+test inspect_smoke ... ok
+test report_csv_header_is_the_union_of_boards_root_actions ... ok
+test report_prints_no_warning_for_a_rule_that_matches_on_some_boards ... ok
+test report_warns_once_about_a_rule_unmatched_on_every_board ... ok
+test solve_prints_no_warning_when_every_rule_matches ... ok
+test report_smoke ... ok
+test solve_checkpoint_and_metrics_smoke ... ok
+test solve_warns_about_a_tree_script_rule_that_matches_nothing ... ok
+test mixed_i16_storage_solve_converges_and_checkpoint_round_trips ... ok
+test i16_storage_solve_converges_and_checkpoint_round_trips ... ok
+test resume_tampered_config_errors ... ok
+test postflop_publishes_through_the_artifact ... ok
+test resume_equivalence_postflop ... ok
+test sol_export_and_inspect_smoke ... ok
+test validate_resources_sizes_the_default_surface_tree ... ok
+test postflop_compare_reports_zero_against_itself ... ok
+test validate_accepts_the_full_surface_fixture ... ok
+
+test result: ok. 26 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 6.36s
+
+     Running tests/gtow_limp_reference.rs (target/debug/deps/gtow_limp_reference-5777286c362e5432)
+
+running 2 tests
+test limp_fixture_jam_has_no_nonjam_iso_and_open_branch_is_unchanged ... ok
+test limp_fixture_has_bb_three_and_five_iso_menus_and_sb_responses ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/gtow_partial_reference.rs (target/debug/deps/gtow_partial_reference-fd88a79bfc0833bf)
+
+running 3 tests
+test tracked_fixture_keeps_four_raise_caps_and_256_postflop_buckets ... ok
+test jam_and_btn_blind_branches_retain_the_observed_calls ... ok
+test utg_open_hj_three_bet_has_the_observed_no_cold_call_menus ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/gtow_simple_partial_reference.rs (target/debug/deps/gtow_simple_partial_reference-3842aecd0d33670b)
+
+running 4 tests
+test sb_open_bb_three_bet_has_the_observed_sb_four_bet_menu ... ok
+test simple_fixture_has_requested_caps_buckets_and_five_unopened_menus ... ok
+test co_btn_and_sb_open_jams_keep_the_next_seats_call ... ok
+test simple_fixture_matches_all_fifteen_observed_no_caller_responses ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/nlh_derive.rs (target/debug/deps/nlh_derive-4ba106a8e9ede405)
+
+running 1 test
+test saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_inputs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.51s
+
+     Running tests/nlh_examples.rs (target/debug/deps/nlh_examples-065e91ab7157bbd6)
+
+running 4 tests
+test fold_rake_refunds_the_uncalled_bet_before_charging ... ok
+test small_p2_user_examples_solve_with_one_bucket_per_street ... ok
+test small_p1_user_examples_solve ... ok
+test every_user_example_validates_and_normalizes_idempotently ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.36s
+
+     Running tests/nlh_p2.rs (target/debug/deps/nlh_p2-be8c63e02994cb26)
+
+running 2 tests
+test fixed_seed_smoke_resume_and_inspect_lifecycle ... ignored, production EHS² cache build and repeated artifact evaluation; run explicitly with --release --ignored
+test p2_validation_effective_resources_types_and_preflight_before_directory ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/nlh_phase3.rs (target/debug/deps/nlh_phase3-843bd129cdc4a58f)
+
+running 15 tests
+test compatibility_hash_ignores_meta_and_run_only ... ok
+test progress_history_uses_last_row_and_falls_back_when_unavailable ... ok
+test false_without_periodic_checkpoint_still_exports_but_cannot_resume ... ok
+test rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run ... ok
+test explicit_legacy_check_every_25_resumes_with_fixed_evaluations ... ok
+test i16_saved_false_from_pf7_resumes_without_adopting_new_default ... ok
+test solve_resume_fork_effective_hashes_units_and_monitoring ... ok
+test periodic_checkpoint_and_cumulative_time_limit ... ok
+test fold_only_checkdown_nodes_solve_save_export_inspect_and_report ... ok
+test finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors ... ok
+test explicit_legacy_dcfr_saved_config_resumes_and_omitted_original_is_rejected ... ok
+test auto_target_resume_preserves_evaluation_schedule_and_state ... ok
+test preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn ... ok
+test omitted_final_checkpoint_resumes_periodic_state_with_crash_style_progress ... ok
+test spec_p1_example_validate_text_json_effective_and_resources ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.32s
+
+     Running tests/nlh_phase4.rs (target/debug/deps/nlh_phase4-e0ef5849f5cbcd12)
+
+running 3 tests
+test no_rivers_artifact_can_resolve_decimal_history_with_icm_and_asymmetric_stacks ... ok
+test exports_inspection_report_and_comparison_use_bb ... ok
+test spec_p1_example_human_output_is_readable_and_pinned ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.16s
+
+     Running tests/postflop_contract.rs (target/debug/deps/postflop_contract-8c0e8ba3c0bf5eae)
+
+running 10 tests
+test convergence_claim_depends_on_economics ... ok
+test inspect_equity_tracks_the_current_board_and_invalidates_cached_values ... ok
+test solution_uses_compact_format_version_2 ... ok
+test validate_and_solve_reject_the_same_invalid_inputs ... ok
+test report_honors_time_budget ... ok
+test checkpoint_events_do_not_repeat_the_final_iteration ... ok
+test mixed_resume_preserves_storage_streets_and_cumulative_time ... ok
+test resume_preserves_storage_streets_and_cumulative_time ... ok
+test resume_republishes_solution_and_summary_in_place_and_on_fork ... ok
+test saved_ev_keeps_original_baseline_and_utility_units ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.34s
+
+     Running unittests src/main.rs (target/debug/deps/solversd-f3b7787e83e95a2f)
+
+running 17 tests
+test api::tests::content_types_follow_the_file_kind ... ok
+test api::tests::a_validation_error_naming_a_missing_file_is_classified_as_not_self_contained ... ok
+test api::tests::only_contract_file_names_are_artifacts ... ok
+test jobs::tests::child_process_helper ... ignored, spawned explicitly by the queue test
+test http::tests::query_values_are_read_by_name ... ok
+test jobs::tests::cancelling_an_unknown_job_says_so ... ok
+test jobs::tests::cancelling_a_queued_job_removes_it_without_signalling ... ok
+test runs::tests::ids_that_escape_the_root_are_refused ... ok
+test tls::tests::a_public_bind_without_tls_is_refused ... ok
+test tests::generated_tokens_are_long_and_not_repeated ... ok
+test tls::tests::loopback_addresses_are_recognized ... ok
+test jobs::tests::submissions_past_the_limit_are_queued ... ok
+test runs::tests::allocate_refuses_an_existing_id_and_generates_a_free_one ... ok
+test runs::tests::an_abandoned_run_is_reported_as_interrupted ... ok
+test runs::tests::hu_elapsed_time_uses_the_metrics_row_field ... ok
+test runs::tests::listing_reports_each_run_directory_once ... ok
+test tls::tests::an_unresolvable_bind_is_an_error ... ok
+
+test result: ok. 16 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/http_api.rs (target/debug/deps/http_api-008084cdeaf4a01f)
+
+running 15 tests
+test unknown_runs_and_routes_report_not_found ... ok
+test a_request_without_the_token_is_refused ... ok
+test a_config_that_names_a_file_is_refused_as_not_self_contained ... ok
+test an_invalid_config_is_refused_before_a_run_directory_exists ... ok
+test a_run_past_the_limit_is_queued_and_visible ... ok
+test a_submitted_config_becomes_a_run_directory ... ok
+test cancelling_a_finished_run_is_a_conflict ... ok
+test a_missing_artifact_is_reported_as_unavailable ... ok
+test a_solution_view_of_a_run_without_one_is_unavailable ... ok
+test an_artifact_outside_the_contract_is_not_found ... ok
+test artifacts_are_listed_and_downloadable_by_contract_name ... ok
+test events_resume_from_the_offset_the_previous_page_reported ... ok
+test a_duplicate_run_id_is_a_conflict ... ok
+test a_restart_picks_up_a_run_that_was_still_queued ... ok
+test the_listing_reports_every_run_the_root_holds ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running unittests src/lib.rs (target/debug/deps/economics-6d7cf941795ba188)
+
+running 26 tests
+test icm::tests::cached_baseline_matches_direct_delta_and_outside_stack_matters ... ok
+test config::tests::icm_sample_minimum_applies_only_to_sampled_fields ... ok
+test icm::tests::exact_heads_up_matches_chip_fraction ... ok
+test icm::tests::exact_mode_does_not_require_monte_carlo_samples ... ok
+test icm::tests::exact_zero_stacks_split_remaining_places ... ok
+test icm::tests::field_above_ten_thousand_is_rejected ... ok
+test icm::tests::prepared_race_memory_matches_the_runtime_buffer_layout ... ok
+test icm::tests::sampled_mode_rejects_fewer_than_two_samples ... ok
+test icm::tests::simultaneous_busts_use_starting_stack_and_split_ties ... ok
+test icm::tests::exact_three_through_seven_match_finish_order_enumeration ... ok
+test icm::tests::outside_stack_compression_is_bounded_and_preserves_chip_mass ... ok
+test icm::tests::terminal_icm_handles_one_remaining_player ... ok
+test rake::tests::generic_rake_honors_main_first_allocation_and_rounding ... ok
+test rake::tests::a_unit_larger_than_the_pot_takes_at_most_the_pot ... ok
+test rake::tests::no_flop_no_drop_skips_rake ... ok
+test rake::tests::half_bb_units_round_then_cap_without_rounding_the_cap ... ok
+test rake::tests::rake_is_capped_and_conserved ... ok
+test icm::tests::oversized_prepared_race_memory_is_rejected_before_allocation ... ok
+test rake_condition::tests::boolean_and_integer_conditions_compile_to_a_truth_table ... ok
+test rake_condition::tests::is_never_detects_an_unsatisfiable_condition ... ok
+test icm::tests::ten_thousand_player_prepared_field_smoke_test ... ok
+test icm::tests::one_hundred_player_sample_smoke_test ... ok
+test icm::tests::exact_boundary_is_fifteen_players ... ok
+test icm::tests::prepared_large_field_reuses_identical_races_for_zero_delta ... ok
+test icm::tests::sampled_mode_is_deterministic_and_reports_error ... ok
+test icm::tests::prepared_large_field_is_deterministic_and_preserves_table_chip_effect ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src/lib.rs (target/debug/deps/hu_engine-41e4b50f2801f4f1)
+
+running 33 tests
+test reach::tests::pair_subtrees_identical_trees_pair_fully ... ok
+test reach::tests::pair_subtrees_extra_child_errs_with_useful_message ... ok
+test reach::tests::reach_at_root_is_root_ranges ... ok
+test reach::tests::parent_array_and_path_on_two_level_tree ... ok
+test reach::tests::reach_at_through_transition_deal_matches_apply_forward ... ok
+test reach::tests::reach_at_through_one_action_node_scales_acting_player_only ... ok
+test schedule::tests::cfr_plus_is_linear_weighting ... ok
+test reach::tests::reach_at_through_mask_deal_zeroes_masked_entries_for_both_players ... ok
+test schedule::tests::dcfr_default_parameters ... ok
+test schedule::tests::hs_dcfr_needs_budget ... ok
+test schedule::tests::power_of_4_reset ... ok
+test solver::loop_tests::mul_into_matches_indexed_products ... ok
+test solver::loop_tests::all_zero_matches_the_scalar_test ... ok
+test solver::dead_subtree_tests::nonzero_subnormal_opponent_reach_is_evaluated ... ok
+test storage::release_tests::release_returns_all_regret_capacity_including_empty_storage ... ok
+test storage::tests::bytes_for_i16_smaller_than_f32 ... ok
+test storage::tests::i16_quantization_round_trips_approximately ... ok
+test storage::tests::f32_scale_all_scales_arrays ... ok
+test storage::tests::i16_view_split_matches_direct_ops ... ok
+test storage::tests::i16_scale_all_scales_dequantized_values ... ok
+test storage::tests::i16_state_round_trip ... ok
+test storage::tests::mixed_view_split_matches_direct_ops ... ok
+test tree::tests::spans_tile_across_chance_subtree ... ok
+test storage::tests::view_split_matches_direct_ops ... ok
+test storage::precision_tests::f32_normalization_all_backends_and_views ... ok
+test storage::tests::prefault_keeps_arena_zero ... ok
+test solver::opponent_terminal_tests::opponent_terminal_batches_prune_zero_dimensions_and_action_parallelism ... FAILED
+test storage::tests::mixed_ops_match_i16_regrets_and_f32_sums_bitwise ... ok
+test solver::dead_subtree_tests::zero_opponent_pass_keeps_parallel_updates ... ok
+test solver::sibling_tests::sibling_rows_default_pruning_empty_dimensions_and_parallel_actions ... ok
+test solver::batch::tests::river_and_turn_values_and_updates_match_recursive_with_and_without_prune ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_f32_matches_full_walk ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_i16_matches_full_walk ... ok
+
+failures:
+
+---- solver::opponent_terminal_tests::opponent_terminal_batches_prune_zero_dimensions_and_action_parallelism stdout ----
+
+thread '<unnamed>' (23634) panicked at crates/hu-engine/src/solver/opponent_terminal_tests.rs:192:9:
+assertion `left == right` failed
+  left: []
+ right: [(1000, []), (1001, []), (1002, [])]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    solver::opponent_terminal_tests::opponent_terminal_batches_prune_zero_dimensions_and_action_parallelism
+
+test result: FAILED. 32 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.82s
+
+error: test failed, to rerun pass `-p hu-engine --lib`

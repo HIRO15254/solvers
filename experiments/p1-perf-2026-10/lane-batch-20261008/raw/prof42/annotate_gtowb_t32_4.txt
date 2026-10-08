@@ -1,0 +1,100 @@
+## hu_postflop::kernel::terminal_batch_lanes_f32::<7>
+
+Sorted summary for file /home/PC_User/prof_t25/release/examples/p1_bench
+----------------------------------------------
+
+   14.32 kernel.rs:357
+   11.59 kernel.rs:0
+    6.37 non_null.rs:1714
+    6.21 kernel.rs:309
+    5.88 kernel.rs:180
+    5.44 kernel.rs:342
+    1.81 kernel.rs:308
+    1.61 kernel.rs:324
+    1.26 kernel.rs:328
+    1.14 kernel.rs:341
+    0.75 kernel.rs:323
+    0.74 cmp.rs:1077
+    0.54 kernel.rs:319
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (5697 samples, percent: local period)
+## hottest instructions
+    6.95 :   cc8dc:  vmovsd 0x10(%r12,%rbx,1),%xmm0 // kernel.rs:0
+    2.18 :   cc08e:  vmovups %xmm3,0x218(%rsp,%rax,1) // kernel.rs:180
+    1.86 :   cc9ea:  vmovss 0x1c(%rsp),%xmm0 // kernel.rs:342
+    1.70 :   cc722:  vmovsd 0x10(%r12,%r14,1),%xmm9 // kernel.rs:0
+    1.69 :   cc74e:  vmovups %xmm1,0x218(%rsp,%r10,1) // kernel.rs:309
+    1.60 :   cccba:  vmovss %xmm0,(%rbx,%rdi,4)
+    1.58 :   ccb9a:  vmovss %xmm0,(%rbx,%rdi,4)
+    1.51 :   ccc7a:  vmovss %xmm0,(%r11,%rdi,4)
+    1.49 :   cca75:  vmovups %xmm1,0x218(%rsp,%r8,1)
+    1.42 :   cca0f:  vmovups %xmm5,0x218(%rsp,%r8,1) // kernel.rs:342
+    1.32 :   cc0f1:  vmovups %xmm2,0x218(%rsp,%rax,1)
+    1.25 :   cc741:  add    %r9,%r10
+    1.21 :   ccb5a:  vmovss %xmm0,(%r11,%rdi,4)
+    1.16 :   ccd12:  mov    %rcx,%rdx
+    1.16 :   cccbf:  cmp    %rdx,%r15 // non_null.rs:1714
+    1.14 :   ccd0a:  mov    (%r10),%rdx
+    1.14 :   cca02:  add    %rdi,%r8 // kernel.rs:341
+    1.14 :   cc767:  vmovsd 0x228(%rsp,%r10,1),%xmm1
+    1.14 :   cc070:  vmovsd 0x10(%r12,%rsi,1),%xmm1 // kernel.rs:0
+    1.09 :   ccb9f:  cmp    %rdx,%r15 // non_null.rs:1714
+    1.04 :   cc93d:  vmovsd 0x228(%rsp,%r11,1),%xmm6
+    0.98 :   ccc80:  cmp    %rdx,%r15 // non_null.rs:1714
+    0.98 :   ccbea:  vmovss %xmm0,(%r11,%rdi,4)
+    0.97 :   cc8fc:  add    %r14,%r9
+    0.90 :   ccc2a:  vmovss %xmm0,(%rbx,%rdi,4)
+    0.90 :   ccb60:  cmp    %rax,%r15 // non_null.rs:1714
+    0.86 :   ccbf0:  cmp    %rdx,%r15 // non_null.rs:1714
+    0.86 :   cc7d7:  vmovups %xmm0,0x218(%rsp,%r10,1)
+    0.84 :   ccc2f:  cmp    %rdx,%r15 // non_null.rs:1714
+    0.82 :   cc729:  vmovss 0x14(%r12,%r14,1),%xmm0
+    0.75 :   cc907:  add    %r11,%r14 // kernel.rs:323
+    0.74 :   cc87c:  cmp    %r14,%rbx // cmp.rs:1077
+    0.72 :   ccd02:  add    %rdi,%rdx // kernel.rs:357
+    0.72 :   ccb95:  vmovss (%rax,%rsi,1),%xmm0 // kernel.rs:357
+    0.70 :   cc77f:  vmulss 0x38(%rsp),%xmm5,%xmm1
+    0.70 :   cc758:  vinsertps $0x10,%xmm0,%xmm9,%xmm1
+    0.68 :   cc96d:  vmulss 0x20(%rsp),%xmm1,%xmm0
+    0.67 :   cccb5:  vmovss (%rax,%rsi,1),%xmm0 // kernel.rs:357
+    0.67 :   cca44:  vmovss %xmm2,0x230(%rsp,%r8,1)
+    0.67 :   cc110:  vaddss 0x230(%rsp,%rax,1),%xmm0,%xmm0
+    0.65 :   cc0ad:  vaddss 0x230(%rsp,%rax,1),%xmm0,%xmm3
+    0.58 :   cc951:  vaddps %xmm5,%xmm2,%xmm2 // kernel.rs:328
+    0.58 :   cc92c:  lea    (%r11,%r11,2),%r11 // kernel.rs:324
+    0.56 :   ccbe5:  vmovss (%rax,%rsi,1),%xmm0 // kernel.rs:357
+    0.56 :   cc7f9:  vaddss 0x230(%rsp,%r10,1),%xmm1,%xmm0
+    0.56 :   cc775:  vmovlps %xmm1,0x228(%rsp,%r10,1)
+    0.56 :   cc737:  lea    (%r10,%r10,2),%r10 // kernel.rs:308
+    0.54 :   ccb55:  vmovss (%rsi,%rdx,1),%xmm0 // kernel.rs:357
+    0.54 :   ccaab:  cmp    0x10(%rsp),%rcx // non_null.rs:1714
+    0.54 :   cc883:  cmp    %r9,0x28(%rsp) // kernel.rs:319
+    0.54 :   cc0a4:  vmovlps %xmm3,0x228(%rsp,%rax,1)
+    0.53 :   ccc25:  vmovss (%rax,%rsi,1),%xmm0 // kernel.rs:357
+    0.53 :   cc097:  vmovsd 0x228(%rsp,%rax,1),%xmm3
+    0.51 :   ccc75:  vmovss (%rax,%rsi,1),%xmm0 // kernel.rs:357
+    0.49 :   cc077:  vmovss 0x18(%r12,%rsi,1),%xmm0
+    0.47 :   cca19:  vmulps 0xa0(%rsp),%xmm2,%xmm5
+    0.47 :   cc95a:  vsubps %xmm8,%xmm11,%xmm2
+    0.47 :   cc7e1:  vmovsd 0x228(%rsp,%r10,1),%xmm0
+    0.46 :   cca3a:  vaddss 0x230(%rsp,%r8,1),%xmm0,%xmm2
+    0.46 :   cc0bf:  movzbl 0x3(%rdx),%edi
+    0.44 :   ccb8e:  lea    (%rsi,%rsi,2),%rsi
+    0.44 :   cca7f:  vmovsd 0x228(%rsp,%r8,1),%xmm1
+    0.44 :   cc8af:  jae    cd305 <hu_postflop::kernel::terminal_batch_lanes_f32::<7>+0x21d5>
+    0.42 :   cc0fa:  vmovsd 0x228(%rsp,%rax,1),%xmm2
+    0.40 :   cc89d:  ja     cd2ed <hu_postflop::kernel::terminal_batch_lanes_f32::<7>+0x21bd>
+    0.39 :   cca8d:  vmovlps %xmm1,0x228(%rsp,%r8,1)
+    0.39 :   cc955:  vmovups %xmm2,(%r9)
+    0.39 :   cc803:  vmovss %xmm0,0x230(%rsp,%r10,1)
+    0.39 :   cc7ef:  vmovlps %xmm0,0x228(%rsp,%r10,1)
+    0.39 :   cc0b6:  vmovss %xmm3,0x230(%rsp,%rax,1)
+    0.37 :   cc7b6:  vaddps %xmm7,%xmm15,%xmm15
+    0.37 :   cc122:  cmp    %rcx,%rdx
+    0.35 :   ccbde:  lea    (%rsi,%rsi,2),%rsi
+    0.35 :   cca97:  vaddss 0x230(%rsp,%r8,1),%xmm0,%xmm0
+    0.35 :   cc97d:  cmp    %rdi,%r15
+    0.35 :   cc8cd:  lea    (%r9,%r9,8),%r14
+    0.35 :   cc877:  movzwl (%r10,%r9,2),%r14d
+    0.35 :   cc799:  movzbl 0x3(%r11),%r9d
+    0.33 :   cca30:  vmovlps %xmm2,0x228(%rsp,%r8,1)
+    0.33 :   cc066:  lea    (%rdi,%rdi,8),%rax

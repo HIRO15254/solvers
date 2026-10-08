@@ -1,0 +1,105 @@
+## hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>
+
+Sorted summary for file /home/PC_User/prof_t25/release/examples/p1_bench
+----------------------------------------------
+
+   21.73 storage.rs:587
+   12.25 solver.rs:182
+    8.75 batch.rs:207
+    4.97 batch.rs:214
+    4.28 batch.rs:229
+    3.19 zip.rs:304
+    3.04 storage.rs:565
+    2.01 storage.rs:562
+    1.48 zip.rs:308
+    1.41 solver.rs:181
+    1.40 storage.rs:564
+    1.38 batch.rs:206
+    0.89 batch.rs:212
+    0.80 batch.rs:228
+    0.69 mod.rs:2155
+    0.62 solver.rs:191
+    0.61 storage.rs:569
+    0.60 batch.rs:91
+ Percent |	Source code & Disassembly of p1_bench for cpu-clock (15708 samples, percent: local period)
+## hottest instructions
+   10.12 :   146287: vmulps -0x40(%r8,%rcx,4),%ymm1,%ymm3 // storage.rs:587
+    3.93 :   146295: vmulps (%r8,%rcx,4),%ymm1,%ymm5
+    3.87 :   14629b: vaddps -0x60(%rdx,%rcx,4),%ymm2,%ymm2
+    3.81 :   14628e: vmulps -0x20(%r8,%rcx,4),%ymm1,%ymm4
+    2.86 :   145a74: vmulps (%r10,%r12,1),%ymm1,%ymm1
+    2.62 :   145a7a: vaddps -0x20(%rax,%r12,1),%ymm0,%ymm0
+    2.53 :   144964: vmulps (%r10,%rcx,1),%ymm1,%ymm1
+    2.29 :   144a2a: vmovups %ymm0,-0x20(%rsi,%rcx,1)
+    2.28 :   14496a: vmovups %ymm0,-0x20(%rsi,%rcx,1)
+    2.17 :   144a24: vmulps (%r10,%rcx,1),%ymm1,%ymm1
+    1.61 :   146091: vmulps %ymm7,%ymm5,%ymm5 // storage.rs:565
+    1.53 :   145db4: vsubps (%rbx,%r10,1),%ymm1,%ymm1
+    1.47 :   145a6d: vmulps -0x20(%r10,%r12,1),%ymm0,%ymm0 // batch.rs:207
+    1.43 :   146095: vaddps -0x20(%r8,%rsi,4),%ymm4,%ymm4
+    1.40 :   146066: vmovups (%rdx,%rsi,4),%ymm5 // storage.rs:564
+    1.39 :   145dba: vmovups %ymm0,-0x20(%r15,%r10,1)
+    1.38 :   145a67: vmovups (%r15,%r12,1),%ymm1 // batch.rs:206
+    1.29 :   14606b: vinsertf128 $0x1,%xmm2,%ymm2,%ymm8 // storage.rs:562
+    1.27 :   145dc1: vmovups %ymm1,(%r15,%r10,1)
+    1.17 :   1455f3: vaddps -0x20(%rbx,%rdi,1),%ymm2,%ymm2
+    1.10 :   145dc7: add    $0x40,%r10 // zip.rs:304
+    1.02 :   1455ed: vaddps -0x40(%rbx,%rdi,1),%ymm1,%ymm1
+    0.95 :   1460ad: add    $0x10,%rsi // zip.rs:308
+    0.94 :   145a81: vaddps (%rax,%r12,1),%ymm1,%ymm1
+    0.89 :   145da7: vmovups (%rax,%r10,1),%ymm1 // batch.rs:212
+    0.88 :   144a35: add    $0x40,%rcx // zip.rs:304
+    0.87 :   145a87: vmovups %ymm0,-0x20(%rax,%r12,1)
+    0.83 :   144a30: vmovups %ymm1,(%rsi,%rcx,1)
+    0.80 :   1455f9: vaddps (%rbx,%rdi,1),%ymm3,%ymm3
+    0.80 :   1455d6: vmovups -0x40(%rsi,%rdi,1),%ymm1 // batch.rs:228
+    0.78 :   1455fe: vmovups %ymm0,-0x60(%rbx,%rdi,1)
+    0.77 :   145dad: vsubps -0x20(%rbx,%r10,1),%ymm0,%ymm0 // batch.rs:214
+    0.77 :   144970: vmovups %ymm1,(%rsi,%rcx,1)
+    0.77 :   144956: vmovups 0x20(%r14,%rcx,1),%ymm1 // solver.rs:181
+    0.73 :   14495d: vmulps -0x20(%r10,%rcx,1),%ymm0,%ymm0 // solver.rs:182
+    0.72 :   146081: vblendvps %ymm6,%ymm8,%ymm9,%ymm6
+    0.69 :   144f20: cmp    %rdx,0xf8(%rsp) // mod.rs:2155
+    0.66 :   144a1d: vmulps -0x20(%r10,%rcx,1),%ymm0,%ymm0 // solver.rs:182
+    0.64 :   144a16: vmovups 0x20(%r15,%rcx,1),%ymm1 // solver.rs:181
+    0.62 :   144f2f: vpor   0x20(%rbx,%rdx,4),%ymm0,%ymm0 // solver.rs:191
+    0.61 :   1460a8: vmovups %ymm5,(%rdx,%rsi,4) // storage.rs:569
+    0.60 :   145a94: add    $0x40,%r12 // zip.rs:304
+    0.60 :   144975: add    $0x40,%rcx // zip.rs:304
+    0.60 :   1440f1: jne    1440d0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x3cd0> // batch.rs:91
+    0.53 :   1462cd: add    $0x20,%rcx // zip.rs:308
+    0.53 :   1455e7: vaddps -0x60(%rbx,%rdi,1),%ymm0,%ymm0 // batch.rs:229
+    0.48 :   1455e2: vmovups (%rsi,%rdi,1),%ymm3
+    0.48 :   145396: mov    0x8(%rax,%rcx,8),%edx
+    0.47 :   14607c: vcmpltps %ymm5,%ymm12,%ymm7
+    0.47 :   1455dc: vmovups -0x20(%rsi,%rdi,1),%ymm2
+    0.47 :   144f35: add    $0x10,%rdx
+    0.41 :   1462b2: vmovups %ymm2,-0x60(%r8,%rcx,4)
+    0.39 :   144f43: je     144f20 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x4b20>
+    0.38 :   1462a1: vaddps -0x40(%rdx,%rcx,4),%ymm3,%ymm3
+    0.38 :   145351: jne    1452d0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x4ed0>
+    0.37 :   14458f: mov    %r11,%r12
+    0.36 :   144538: je     1444e0 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x40e0>
+    0.35 :   1460a2: vmovups %ymm4,-0x20(%rdx,%rsi,4)
+    0.34 :   1462c7: vmovups %ymm5,(%r8,%rcx,4)
+    0.34 :   1462c0: vmovups %ymm4,-0x20(%r8,%rcx,4)
+    0.34 :   1462a7: vaddps -0x20(%rdx,%rcx,4),%ymm4,%ymm4
+    0.34 :   145615: sub    $0xffffffffffffff80,%rdi
+    0.34 :   14560a: vmovups %ymm2,-0x20(%rbx,%rdi,1)
+    0.33 :   145610: vmovups %ymm3,(%rbx,%rdi,1)
+    0.32 :   14609c: vaddps (%r8,%rsi,4),%ymm5,%ymm5
+    0.32 :   144130: mov    0x8(%r9,%r8,8),%r8d
+    0.31 :   145a8e: vmovups %ymm1,(%rax,%r12,1)
+    0.30 :   1462ad: vaddps (%rdx,%rcx,4),%ymm5,%ymm5
+    0.27 :   14565c: vmovups %xmm0,(%r8,%rdi,4)
+    0.25 :   1462b9: vmovups %ymm3,-0x40(%r8,%rcx,4)
+    0.25 :   144aeb: mov    %r13,0x8(%r11,%rdi,8)
+    0.25 :   1404ba: jne    140571 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x171>
+    0.24 :   145604: vmovups %ymm1,-0x40(%rbx,%rdi,1)
+    0.22 :   14608d: vmulps %ymm6,%ymm4,%ymm4
+    0.22 :   144760: movzwl 0x8(%rcx),%ecx
+    0.21 :   144f28: je     144f47 <hu_engine::solver::cfr_pass::<hu_postflop::postflop::PostflopEvaluator, hu_engine::storage::F32View, true>+0x4b47>
+    0.20 :   145662: add    $0x4,%rdi
+    0.20 :   144ecd: mov    0x50(%rsp),%rcx
+    0.18 :   146315: vaddps (%rsi,%rcx,4),%xmm2,%xmm2
+    0.18 :   144ff2: mov    %rdx,0x8(%rax,%rcx,1)
