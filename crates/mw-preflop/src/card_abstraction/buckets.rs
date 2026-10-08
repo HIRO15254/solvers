@@ -443,8 +443,112 @@ fn river_score_fn(board: &Board, sweep: &mut Sweep, hs: &mut [f64]) -> Vec<f32> 
 
 // --- percentile binning ------------------------------------------------
 
+const HISTOGRAM_BITS: u32 = 20;
+
+/// Preserve `partial_cmp` order, including equality of signed zeros.
+fn score_bin(score: f32) -> usize {
+    let bits = if score == 0.0 { 0 } else { score.to_bits() };
+    let key = if bits & 0x8000_0000 != 0 {
+        !bits
+    } else {
+        bits | 0x8000_0000
+    };
+    (key >> (32 - HISTOGRAM_BITS)) as usize
+}
+
+/// Find exact weighted percentile cuts while collecting only scores in
+/// histogram bins containing cuts. The board scores stay in their original
+/// storage; the first pass needs an 8 MiB histogram, not a global score copy.
+fn histogram_percentile_thresholds(scored: &[(Vec<u8>, Vec<f32>, u32)], k: u32) -> Vec<f64> {
+    assert!(k >= 1, "num_buckets must be at least 1");
+    if k == 1 {
+        return Vec::new();
+    }
+    let mut histogram = vec![0u64; 1 << HISTOGRAM_BITS];
+    let mut total_weight = 0u64;
+    let mut first_bin = None;
+    for (_, scores, weight) in scored {
+        for &score in scores {
+            if !score.is_nan() {
+                let bin = score_bin(score);
+                histogram[bin] += u64::from(*weight);
+                total_weight += u64::from(*weight);
+                first_bin = Some(first_bin.map_or(bin, |first: usize| first.min(bin)));
+            }
+        }
+    }
+    let Some(first_bin) = first_bin else {
+        return Vec::new();
+    };
+
+    // Each needed bin stores its index, cumulative weight before it, and
+    // the entries to sort. Several cuts can share one bin or one entry.
+    struct NeededBin {
+        index: usize,
+        before: u64,
+        entries: Vec<(f32, u32)>,
+    }
+    let mut needed = Vec::new();
+    let mut cum = 0u64;
+    let mut next_cut = 1u64;
+    for (bin, &weight) in histogram.iter().enumerate() {
+        let before = cum;
+        cum += weight;
+        // For all-zero weights the reference emits every cut at the first
+        // sorted entry, so select the first occupied bin in that case.
+        if (weight > 0 || (total_weight == 0 && bin == first_bin))
+            && cum * u64::from(k) >= total_weight * next_cut
+        {
+            needed.push(NeededBin {
+                index: bin,
+                before,
+                entries: Vec::new(),
+            });
+            while next_cut < u64::from(k) && cum * u64::from(k) >= total_weight * next_cut {
+                next_cut += 1;
+            }
+            if next_cut == u64::from(k) {
+                break;
+            }
+        }
+    }
+    drop(histogram);
+
+    for (_, scores, weight) in scored {
+        for &score in scores {
+            if !score.is_nan()
+                && let Ok(index) = needed.binary_search_by_key(&score_bin(score), |bin| bin.index)
+            {
+                needed[index].entries.push((score, *weight));
+            }
+        }
+    }
+
+    let mut thresholds = Vec::with_capacity((k - 1) as usize);
+    let mut next_cut = 1u64;
+    for NeededBin {
+        before,
+        mut entries,
+        ..
+    } in needed
+    {
+        entries.sort_unstable_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+        let mut cum = before;
+        for (score, weight) in entries {
+            cum += u64::from(weight);
+            while next_cut < u64::from(k) && cum * u64::from(k) >= total_weight * next_cut {
+                thresholds.push(score as f64);
+                next_cut += 1;
+            }
+        }
+    }
+    thresholds.resize((k - 1) as usize, f64::INFINITY);
+    thresholds
+}
+
 /// Cuts weighted scores into `k` equal-total-weight bins, returning the
 /// `k - 1` ascending cut thresholds (bin `i`'s upper edge).
+#[cfg(test)]
 fn percentile_thresholds(mut scored: Vec<(f32, u32)>, k: u32) -> Vec<f64> {
     assert!(k >= 1, "num_buckets must be at least 1");
     if k == 1 || scored.is_empty() {
@@ -496,22 +600,7 @@ fn build_table(
         )
         .collect();
 
-    // Sized up front, so growing it never holds two buffers at once.
-    let live = scored
-        .iter()
-        .map(|(_, scores, _)| scores.iter().filter(|s| !s.is_nan()).count())
-        .sum();
-    let mut global: Vec<(f32, u32)> = Vec::with_capacity(live);
-    for (_, scores, weight) in &scored {
-        global.extend(
-            scores
-                .iter()
-                .copied()
-                .filter(|s| !s.is_nan())
-                .map(|s| (s, *weight)),
-        );
-    }
-    let thresholds = percentile_thresholds(global, k);
+    let thresholds = histogram_percentile_thresholds(&scored, k);
 
     let mut boards_out = BTreeMap::new();
     for (key, scores, _weight) in scored {
@@ -887,6 +976,110 @@ mod tests {
                         assert_eq!(u32::from(bucket), abs.bucket(&board, h));
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn histogram_percentile_thresholds_match_sort_reference() {
+        use rand::{Rng, SeedableRng, seq::SliceRandom};
+        use rand_chacha::ChaCha8Rng;
+        let mut rng = ChaCha8Rng::seed_from_u64(29);
+        let ties: Vec<f32> = (0..7000)
+            .map(|_| rng.gen_range(0..7) as f32 / 7.0)
+            .collect();
+        let mut distinct: Vec<f32> = (0..7000).map(|i| i as f32 / 3500.0 - 1.0).collect();
+        distinct.shuffle(&mut rng);
+        let concentrated: Vec<f32> = (0..7000)
+            .map(|_| f32::from_bits(0.5f32.to_bits() + rng.gen_range(0..3)))
+            .collect();
+        assert!(concentrated.iter().all(|&s| score_bin(s) == score_bin(0.5)));
+        let mut with_nan = ties.clone();
+        for score in with_nan.iter_mut().step_by(5) {
+            *score = f32::NAN;
+        }
+        let zeros: Vec<f32> = (0..7000)
+            .map(|i| match i % 4 {
+                0 => -0.0,
+                1 => 0.0,
+                2 => -0.5,
+                _ => 0.5,
+            })
+            .collect();
+        assert_eq!(score_bin(-0.0), score_bin(0.0));
+        for (name, scores) in [
+            ("ties", ties),
+            ("distinct", distinct),
+            ("one bin", concentrated),
+            ("NaNs", with_nan),
+            ("signed zeros", zeros),
+            ("all equal", vec![0.25; 7000]),
+            (
+                "infinities",
+                vec![f32::NEG_INFINITY, -1.0, 0.0, f32::INFINITY],
+            ),
+        ] {
+            let boards: Vec<_> = scores
+                .chunks(137)
+                .enumerate()
+                .map(|(i, scores)| (vec![i as u8], scores.to_vec(), rng.gen_range(1..40)))
+                .collect();
+            let global: Vec<_> = boards
+                .iter()
+                .flat_map(|(_, scores, weight)| {
+                    scores
+                        .iter()
+                        .copied()
+                        .filter(|s| !s.is_nan())
+                        .map(|s| (s, *weight))
+                })
+                .collect();
+            for k in [1, 2, 3, 32, 128, 1000] {
+                let expected = percentile_thresholds(global.clone(), k);
+                let got = histogram_percentile_thresholds(&boards, k);
+                assert_eq!(got, expected, "{name}, k {k}");
+                // Signed zeros are equal under partial_cmp; all other cuts
+                // must also preserve the reference's exact representation.
+                for (&got, &expected) in got.iter().zip(&expected) {
+                    if got != 0.0 {
+                        assert_eq!(got.to_bits(), expected.to_bits(), "{name}, k {k}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn histogram_percentile_thresholds_handle_empty_and_zero_weight_boards() {
+        for boards in [
+            Vec::new(),
+            vec![(vec![0], Vec::new(), 24)],
+            vec![(vec![0], vec![f32::NAN; 10], 24)],
+            vec![
+                (vec![0], vec![0.75, f32::NAN, -0.25], 0),
+                (vec![1], vec![0.0, 0.5], 0),
+            ],
+            vec![
+                (vec![0], vec![-0.5, 0.25, 1.0], 0),
+                (vec![1], vec![0.5, 0.75], 3),
+            ],
+        ] {
+            let global: Vec<_> = boards
+                .iter()
+                .flat_map(|(_, scores, weight)| {
+                    scores
+                        .iter()
+                        .copied()
+                        .filter(|s| !s.is_nan())
+                        .map(|s| (s, *weight))
+                })
+                .collect();
+            for k in [1, 2, 3, 32, 128, 1000] {
+                assert_eq!(
+                    histogram_percentile_thresholds(&boards, k),
+                    percentile_thresholds(global.clone(), k),
+                    "k {k}"
+                );
             }
         }
     }
