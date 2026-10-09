@@ -1,0 +1,14 @@
+{
+  "configHash": "4c249b464b467673cefa821711b581615fefe4825948151c7bb8e85155e865d7",
+  "configSchema": "solvers.nlh/v1",
+  "evP0": 4.977543397072736,
+  "evP1": 40.559280118605244,
+  "explP0": 0.04873994359997269,
+  "explP1": 0.045781613762535756,
+  "gameKind": "hu-postflop",
+  "iterations": 99,
+  "kind": "hu-postflop",
+  "nashConv": 0.09452155736250845,
+  "utilityUnit": "BB",
+  "wallSecs": 1.421828047
+}

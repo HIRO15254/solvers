@@ -1,0 +1,31 @@
+{
+  "actionNodes": 335460,
+  "afterBuildBytes": 266231808,
+  "allocSecs": 0.1000078,
+  "buildSecs": 0.679023829,
+  "cfrPrecision": "f32",
+  "config": "/home/PC_User/cfg/c_flop1.toml",
+  "deals": 59045,
+  "estimateF32Bytes": 2818917360,
+  "estimateI16Bytes": 1412142360,
+  "estimateI16F32avgBytes": 2115529860,
+  "evalSecs": [
+    0.236578539,
+    0.23355848
+  ],
+  "iterSecs": 1.11230067,
+  "iters": 10,
+  "nashConv": 5.146140086771208,
+  "nodeInfo": 335461,
+  "nodes": 829242,
+  "peakBytes": 3226746880,
+  "prepareSecs": 0.065351711,
+  "secsPerIter": 0.111230067,
+  "storage": "f32",
+  "storageElements": 352364670,
+  "threads": 16,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 3,
+  "warmupSecs": 0.30889493
+}

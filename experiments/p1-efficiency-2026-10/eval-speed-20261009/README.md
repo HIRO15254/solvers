@@ -4,6 +4,8 @@
 関連: Linear SOL-32（全体Issueの一部）、[P1性能計画](../../../docs/plans/p1-performance.jp.md)、
 [T26後の提案](../../../docs/research/2026-10-08-p1-t26-improvements.jp.md)。
 
+再現状態: **verified**（script、config、全runの生の結果と[manifest](manifest.json)を保存）。
+
 ## 変更
 
 - chanceの無い小さいaction部分木を、平均戦略と相手reachの準備、終端評価、EV/BRの合成の3段で処理する。

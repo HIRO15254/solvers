@@ -5,6 +5,9 @@
 pfs（commit `9d1509fe`）と、それを使う計測harnessを外部binaryとして実行しただけである。pfsのcodeはこのrepositoryへ入れていない
 （[LICENSE-POLICY.md](../../../LICENSE-POLICY.md)）。
 
+再現状態: **partial**。P1側のconfigと集計結果、比較の詳細（[report.en.md](report.en.md)）は保存した。pfs側のharnessと
+pfsのcloneはGit管理外（`.cache/pfs-bench/`）でrepositoryに無いため、同じ手順の再実行にはharnessの再作成が要る。
+
 - P1: source `c09c0af`（main）、f32 storage、既定のDCFR（1.25 / 0.5 / 4、平均resetなし）。
 - 機械: ローカルPC（i7-10700KF 8C/16T、Windows、他の作業と共有。他processが平均1.9〜3.6 coreを使っていた）。両者8 thread、交互に実行し中央値。
 - 木: 6max 100bb `BTN r2.5, BB c`、Ks 7h 2d（turn 3c、river 8d）、rakeなしの零和。river・turn・flop開始の3木。

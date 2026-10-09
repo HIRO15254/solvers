@@ -38,6 +38,8 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 不採用の試作・計測 | [P1 RBP・MCCFR warm start・PGO](p1-efficiency-2026-10/rejected-20261009/README.md) | 2026-10-09。刈れる仕事は最大約25%で、RBPは全変種で目標到達が遅い。MC warm startは20,000反復でも7%pot。PGOは速くならない |
 | 性能・収束の受入 | [P1 i16 storage kernelの融合・vector化](p1-efficiency-2026-10/i16-kernels-20261009/README.md) | 2026-10-09。C1、8 threadsの新旧交互計測・中央値、Turn/Flopのi16・mixed改善、f32 control、0.1%到達反復数、linked AVX2 loopと必須検証 |
 | 性能・厳密一致の検証 | [P1 厳密EV/BRのf64 lane batch](p1-efficiency-2026-10/eval-speed-20261009/README.md) | 2026-10-09。C2、交互OLD/NEWの評価中央値、3 storageのbit一致、Full Flopのmetrics・全保存payload比較 |
+| 性能の受入 | [P1 C1・C2のGCP受入](p1-efficiency-2026-10/gcp-accept-20261009/README.md) | 2026-10-09。c2d-highcpu-32の16・32 threadで新旧交互。i16の0.1%potまで0.81〜0.83倍、評価1回0.80〜0.85倍、f32の1反復は不変 |
+| 既定値の判断 | [P1 木の雛形の資源と時間](p1-efficiency-2026-10/templates-20261009/README.md) | 2026-10-09。GTOWに倣ったSRP・3BP・4BPと従来の同梱例を16・32 threadで0.1%potまで。同梱flop_srpを置き換えた根拠（時間5.4分の1、peak 6.7分の1） |
 | S4の判断材料 | [P2方式の再設計](p2-method-2026-10/README.md) | 暫定方式のseed間の差（2026-10-06）と、その解の場所・hash。L0の表と評価器の検証、暫定方式の解のseat別利得と`NashConv`（S4-1b以降の比較の基準）。L0と入力のゲームの差（seatの値の誤差と、L0の最適応答が入力のゲームで得る利得）。入力のゲームでのclass単位の`NashConv`の下限と上振れした推定。trunkのDCFR solverのB1の結果、B3の1 iterationの時間、B3の解の入力のゲームでの`NashConv` |
 | 参照比較 | [HU Postflop参照調査](hu-postflop-reference/README.md) | 2026-07の2ケースと取得条件。Ks7h2d flopは2026-10-09に現行の木文法でGTOW Single Sizeのsizeを写して再測定し、EVが0.01 bb以内で一致（[記録](hu-postflop-reference/cases/ks7h2d-flop/README.md)）。P1の参照候補は[HU Postflop参照候補](../docs/plans/hu-postflop-validation/README.md)で選び直す |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |

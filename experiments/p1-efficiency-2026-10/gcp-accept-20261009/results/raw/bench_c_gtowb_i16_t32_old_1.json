@@ -1,0 +1,31 @@
+{
+  "actionNodes": 2293609,
+  "afterBuildBytes": 1769156608,
+  "allocSecs": 0.330363933,
+  "buildSecs": 4.563133441,
+  "cfrPrecision": "f32",
+  "config": "/home/PC_User/cfg/c_gtowb.toml",
+  "deals": 320656,
+  "estimateF32Bytes": 21109207896,
+  "estimateI16Bytes": 10572952820,
+  "estimateI16F32avgBytes": 15841080358,
+  "evalSecs": [
+    1.544998042,
+    1.545467233
+  ],
+  "iterSecs": 10.590185015,
+  "iters": 10,
+  "nashConv": 7.346744218763459,
+  "nodeInfo": 2293610,
+  "nodes": 6088200,
+  "peakBytes": 12759355392,
+  "prepareSecs": 0.488145954,
+  "secsPerIter": 1.0590185015,
+  "storage": "i16",
+  "storageElements": 2638650987,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 3,
+  "warmupSecs": 2.694698146
+}

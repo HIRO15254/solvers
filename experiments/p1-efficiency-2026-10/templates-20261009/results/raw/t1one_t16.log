@@ -1,0 +1,13 @@
+tree: nodes=309640 terminals=195610 rank_tables=1176 storage=990.0 MiB (f32) / 495.8 MiB (i16) / 742.9 MiB (i16-f32avg)
+memory estimate: 1254.0 MiB (f32) / 781.4 MiB (i16) / 1028.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.401e0 expl_p1=1.018e0 nash_conv=2.420e0
+iter=      50 expl_p0=3.812e-1 expl_p1=2.380e-1 nash_conv=6.192e-1
+iter=     100 expl_p0=8.060e-2 expl_p1=8.119e-2 nash_conv=1.618e-1
+iter=     150 expl_p0=3.066e-2 expl_p1=2.347e-2 nash_conv=5.413e-2
+iter=     200 expl_p0=1.562e-2 expl_p1=1.069e-2 nash_conv=2.631e-2
+iter=     250 expl_p0=9.626e-3 expl_p1=6.350e-3 nash_conv=1.598e-2
+iter=     287 expl_p0=7.204e-3 expl_p1=4.725e-3 nash_conv=1.193e-2
+iter=     296 expl_p0=6.753e-3 expl_p1=4.425e-3 nash_conv=1.118e-2
+iter=     299 expl_p0=6.611e-3 expl_p1=4.337e-3 nash_conv=1.095e-2
+done: iterations=299 wall=13.99s ev_p0=1.461422 ev_p1=3.426520 nash_conv=1.095e-2
+sol: wrote /home/PC_User/work/t1one_t16/solution.sol (310.02 MB, 113488 blocks, mode=Full)

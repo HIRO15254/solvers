@@ -1,0 +1,14 @@
+tree: nodes=2118358 terminals=1321836 rank_tables=1176 storage=6891.0 MiB (f32) / 3451.6 MiB (i16) / 5171.3 MiB (i16-f32avg)
+memory estimate: 7411.0 MiB (f32) / 3971.6 MiB (i16) / 5691.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.491e0 expl_p1=9.143e-1 nash_conv=2.405e0
+iter=      50 expl_p0=3.963e-1 expl_p1=3.063e-1 nash_conv=7.026e-1
+iter=     100 expl_p0=1.097e-1 expl_p1=7.377e-2 nash_conv=1.834e-1
+iter=     150 expl_p0=5.259e-2 expl_p1=2.708e-2 nash_conv=7.967e-2
+iter=     200 expl_p0=2.928e-2 expl_p1=1.515e-2 nash_conv=4.443e-2
+iter=     250 expl_p0=1.757e-2 expl_p1=9.356e-3 nash_conv=2.693e-2
+iter=     300 expl_p0=1.124e-2 expl_p1=6.361e-3 nash_conv=1.760e-2
+iter=     350 expl_p0=7.850e-3 expl_p1=4.693e-3 nash_conv=1.254e-2
+iter=     368 expl_p0=6.990e-3 expl_p1=4.207e-3 nash_conv=1.120e-2
+iter=     371 expl_p0=6.867e-3 expl_p1=4.095e-3 nash_conv=1.096e-2
+done: iterations=371 wall=90.52s ev_p0=1.531259 ev_p1=3.324573 nash_conv=1.096e-2
+sol: wrote /home/PC_User/work/srp_general_t32/solution.sol (2220.73 MB, 793520 blocks, mode=Full)

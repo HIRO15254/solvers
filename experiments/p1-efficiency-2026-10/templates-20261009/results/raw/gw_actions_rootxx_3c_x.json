@@ -1,0 +1,16 @@
+[
+  {
+    "history": "xx[3c]x",
+    "street": "turn",
+    "actor": "ip",
+    "action": "check",
+    "frequency": 0.626237159894036
+  },
+  {
+    "history": "xx[3c]x",
+    "street": "turn",
+    "actor": "ip",
+    "action": "bet 1.815",
+    "frequency": 0.37376283966897245
+  }
+]

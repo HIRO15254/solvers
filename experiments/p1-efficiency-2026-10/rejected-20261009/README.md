@@ -4,6 +4,9 @@
 source は `c09c0af`（main）に、下記の試作差分を当てた。計測はローカルPC（i7-10700KF 8C/16T、Windows、他の作業と共有）。
 反復数は機械に依存しないので、主判定は反復数で行った。
 
+再現状態: **partial**。試作の差分・使い捨てtool・計測scriptとRBPの集計は保存した。MC warm startとPGOは数値をこのREADMEに
+記すだけで、生の出力は残していない。
+
 ## 1. Regret-based pruning（RBP）
 
 ### 事前調査（census）

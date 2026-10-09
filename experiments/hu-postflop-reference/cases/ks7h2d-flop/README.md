@@ -91,7 +91,7 @@ EV 変換: `GW_EV_bb = (ev_chips + pot/2)/100`(リバー検証で確立した式
   rangeは2026-07-09と同じGTOWの値（weight付き）、rakeなし。flopはBB donk 116%、BTN stab 33%、check-raise 33%、
   3-bet 68%、4-bet 39%、以後all-in。turnは既定33%、donkの位置（前streetの攻撃者でない側が先に打つ）185%、cbetの位置67%、
   raise 185%。riverはBB 33%、BTN 125%、raise 100%。GTOWで観測していない線は同じ役割の観測sizeを流用した。
-- 木: 985,178 node、f32 storage 4.25 GB。source `df321c73`（branch `p1-efficiency-2026-10`）、ローカルPC 12 thread。
+- 木: 985,178 node、f32 storage 3.96 GiB（memory見積り4.25 GB）。source `df321c73`（branch `p1-efficiency-2026-10`）、ローカルPC 12 thread。
 - solve: 387 iteration、NashConv 0.005352（NashConv/2 = 0.049% pot）、230.7秒。0.3 / 0.1 / 0.05% potへは
   150 / 300 / 387 iteration（91 / 179 / 231秒、評価込み）で達した。progressは
   [`gw-check-2026-10-09-progress.jsonl`](gw-check-2026-10-09-progress.jsonl)、[`gw-check-2026-10-09-run.json`](gw-check-2026-10-09-run.json)。

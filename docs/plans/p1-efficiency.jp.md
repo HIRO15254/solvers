@@ -50,6 +50,13 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 | C2 | 厳密評価（EV・BR）の走査を速くする。結果は変更前とbit一致のまま。Codex | 必須検証。評価1回の時間が縮み、EV・Exploitability・`.sol`がbit一致 |
 | G1 | GTOWの公開情報に基づく木の雛形（SRP・3BP・4BP）を作り、各木の資源（node数・memory）と0.1%potまでの時間を16・32 threadで測る。同梱の`examples/hu-postflop/flop_srp.toml`（30.5 GB）を置き換える | 雛形の資源表。同梱例を変える場合は規範・CLI reference・利用ガイド・試験を同期 |
 | G2 | GTOW Single Size（cEV）のKs7h2d SRPを現在の木文法（donk・cbet・攻撃回数による条件）で再現し、GTOWの頻度と比べる | 2026-07-09の記録より近い木で、root・BTN stab・turn nodeの頻度・EVの差を報告 |
+| C3 | PF11: `[solver] storage = "auto"`を追加して既定にする。Codex | 必須検証。上限内ならf32、超えればi16-f32avgを選び、run成果物には選んだstorageを記録する。規範・CLI reference・利用ガイド・template・試験を同期 |
+
+利用者決定:
+
+| ID | 日付 | 決定 |
+|---|---|---|
+| PF11 | 2026-10-09 | P1の`[solver] storage`に`"auto"`を追加して既定にする。memory上限に収まればf32、収まらなければi16-f32avgを選び、どちらも収まらなければ従来どおり資源errorで止める。autoはi16を選ばない |
 
 ## 4. 計測
 
@@ -91,7 +98,43 @@ i16・i16-f32avgではturn・riverで0.68〜0.79倍。EV・NashConvは全storage
 ### G2: GTOW Single Sizeの再現（Ks7h2d、cEV）
 
 [記録](../../experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md)の2026-10-09節。
-GTOWで観測したsizeを`donk`・`cbet`・`aggressions`の条件で写した木（985,178 node、f32 4.25 GB）を0.049%potまで解いた。
+GTOWで観測したsizeを`donk`・`cbet`・`aggressions`の条件で写した木（985,178 node、f32 storage 3.96 GiB）を0.049%potまで解いた。
 EVはOOP/IP 1.978/3.522 bb（GTOW 1.97/3.53）、rootのcheck 100%（GTOW 100%）、BTN stab 79.4%（84.1%）、
 turn BBのbet 61.6%（53.1%）、river BBのbet 31.8%（38.3%）で、2026-07-09の記録よりGTOWに近い。
-ローカル12 threadで0.3 / 0.1 / 0.05%potへ91 / 179 / 231秒だった。
+ローカル12 threadで0.3 / 0.1 / 0.05%potへ91 / 179 / 231秒、GCP 32 threadで0.05%まで57.8秒だった。
+
+### C1・C2のGCP受入（c2d-highcpu-32、16・32 thread）
+
+[記録](../../experiments/p1-efficiency-2026-10/gcp-accept-20261009/README.md)。変更前`c09c0af`と変更後`df321c73`を同じVMで交互に測った。
+
+| 木・storage | thread | 1反復 | 評価1回 | 0.1%potまでのsolve |
+|---|---:|---:|---:|---:|
+| c_flop1 f32 | 32 / 16 | 0.987 / 0.994倍 | 0.831 / 0.797倍 | 0.983 / 0.990倍（192反復で同じ） |
+| c_flop1 i16 | 32 / 16 | 0.820 / 0.801倍 | 0.834 / 0.845倍 | 0.825 / 0.813倍（187→189反復） |
+| c_gtowb f32 | 32 / 16 | 0.986 / 0.997倍 | 0.831 / 0.804倍 | 0.986 / 0.982倍（316反復で同じ） |
+| c_gtowb i16 | 32 | 0.808倍 | 0.835倍 | 0.806倍（352→351反復） |
+
+f32のsolveは評価の短縮ぶん（約1.5%）だけ速い。`check_every = "auto"`では評価がsolveの数%しか占めないためである。
+i16は1反復の短縮がそのまま効き、0.1%potまでが約19%短い。peak RSSは変わらない。
+
+### G1: 木の雛形（GCP 32 thread、f32、0.1%pot）
+
+[記録](../../experiments/p1-efficiency-2026-10/templates-20261009/README.md)。
+
+| 木 | f32 storage | 反復 | 32 thread solve | peak | EV OOP / IP |
+|---|---:|---:|---:|---:|---|
+| 従来の同梱flop_srp（全street 33・75%、raise 3x） | 28.41 GiB | 311 | 288.3秒 | 31.43 GiB | 1.521 / 3.300 |
+| 新しい同梱flop_srp（flop 33%のみ、donk無し） | 3.70 GiB | 389 | 53.6秒 | 4.70 GiB | 1.516 / 3.331 |
+| 上にflop 75%を追加 | 6.73 GiB | 371 | 90.5秒 | 7.99 GiB | 1.531 / 3.325 |
+| flop_3bp（3BP、flop 20・56・122%） | 1.44 GiB | 260 | 17.8秒 | 2.18 GiB | 16.587 / 3.905 |
+| flop_4bp（4BP、flop 13・38・67%・all-in） | 0.10 GiB | 99 | 1.4秒 | 0.30 GiB | 4.978 / 40.559 |
+
+GTOWに倣って木を絞ると、0.1%potまでの時間は5.4分の1、peakは6.7分の1になり、OOPのEV差は0.005 BBだった。
+同梱例・規範第14節の例・利用ガイドをこの木へ更新した。
+
+### C3: storage auto（PF11）
+
+`[solver] storage`の既定を`"auto"`にした。準備段階でmemory見積りと上限からf32かi16-f32avgを選び、`run.toml`・checkpoint・
+`.sol`の実効configには選んだstorageを書く。正規化した入力（`validate --show-effective`）は`auto`のままである。
+同梱flop_srpを`--memory 3700MiB`で解くとi16-f32avgを選び、`run.toml`と`.sol`のmetaは`i16-f32avg`だった。`--memory 2GiB`は
+両方の必要量を示して終了code 75で止まった。

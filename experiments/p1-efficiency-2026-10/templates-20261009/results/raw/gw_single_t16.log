@@ -1,0 +1,15 @@
+tree: nodes=985178 terminals=606238 rank_tables=1176 storage=4057.5 MiB (f32) / 2031.6 MiB (i16) / 3044.5 MiB (i16-f32avg)
+memory estimate: 4321.5 MiB (f32) / 2295.7 MiB (i16) / 3308.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.304e0 expl_p1=7.500e-1 nash_conv=2.054e0
+iter=      50 expl_p0=2.529e-1 expl_p1=2.025e-1 nash_conv=4.554e-1
+iter=     100 expl_p0=4.227e-2 expl_p1=3.071e-2 nash_conv=7.298e-2
+iter=     150 expl_p0=1.709e-2 expl_p1=1.425e-2 nash_conv=3.135e-2
+iter=     200 expl_p0=9.549e-3 expl_p1=8.653e-3 nash_conv=1.820e-2
+iter=     250 expl_p0=6.148e-3 expl_p1=5.675e-3 nash_conv=1.182e-2
+iter=     300 expl_p0=4.558e-3 expl_p1=3.879e-3 nash_conv=8.437e-3
+iter=     350 expl_p0=3.293e-3 expl_p1=3.018e-3 nash_conv=6.311e-3
+iter=     372 expl_p0=2.933e-3 expl_p1=2.863e-3 nash_conv=5.796e-3
+iter=     384 expl_p0=2.830e-3 expl_p1=2.721e-3 nash_conv=5.551e-3
+iter=     387 expl_p0=2.716e-3 expl_p1=2.636e-3 nash_conv=5.352e-3
+done: iterations=387 wall=67.96s ev_p0=1.977875 ev_p1=3.522125 nash_conv=5.352e-3
+sol: wrote /home/PC_User/work/gw_single_t16/solution.sol (1247.53 MB, 376626 blocks, mode=Full)
