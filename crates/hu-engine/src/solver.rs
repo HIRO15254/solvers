@@ -201,13 +201,13 @@ fn mul_into(dst: &mut [f32], a: &[f32], b: &[f32]) {
 /// `v.iter().all(|&x| x == 0.0)` (both signed zeros count, NaN does not),
 /// tested 16 lanes at a time by OR-ing the bits without the sign bit.
 fn all_zero(v: &[f32]) -> bool {
-    let mut chunks = v.chunks_exact(16);
-    for chunk in &mut chunks {
+    let (chunks, remainder) = v.as_chunks::<16>();
+    for chunk in chunks {
         if chunk.iter().fold(0u32, |acc, &x| acc | (x.to_bits() << 1)) != 0 {
             return false;
         }
     }
-    chunks.remainder().iter().all(|&x| x == 0.0)
+    remainder.iter().all(|&x| x == 0.0)
 }
 
 fn chance_len(tree: &PublicTree, node: NodeId, p: Player, dim: usize) -> usize {

@@ -373,8 +373,10 @@ pub fn dequantize_values(bytes: &[u8], scale: f32, len: usize) -> Result<Vec<f32
         });
     }
     Ok(bytes
-        .chunks_exact(2)
-        .map(|chunk| i16::from_le_bytes([chunk[0], chunk[1]]) as f32 * scale)
+        .as_chunks::<2>()
+        .0
+        .iter()
+        .map(|&chunk| i16::from_le_bytes(chunk) as f32 * scale)
         .collect())
 }
 
@@ -415,8 +417,8 @@ pub fn dequantize_probs(
     }
 
     let mut q = vec![0u32; num_actions * num_hands];
-    for (i, chunk) in bytes.chunks_exact(2).enumerate() {
-        q[i] = u16::from_le_bytes([chunk[0], chunk[1]]) as u32;
+    for (i, &chunk) in bytes.as_chunks::<2>().0.iter().enumerate() {
+        q[i] = u16::from_le_bytes(chunk) as u32;
     }
 
     let mut out = vec![0f32; num_actions * num_hands];

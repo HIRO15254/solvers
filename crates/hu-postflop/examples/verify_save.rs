@@ -8,8 +8,8 @@ use std::time::Instant;
 fn hash_f32(hash: &mut blake3::Hasher, values: &[f32]) {
     let mut bytes = [0; 65536];
     for chunk in values.chunks(bytes.len() / 4) {
-        for (v, dst) in chunk.iter().zip(bytes.chunks_exact_mut(4)) {
-            dst.copy_from_slice(&v.to_le_bytes());
+        for (v, dst) in chunk.iter().zip(bytes.as_chunks_mut::<4>().0) {
+            *dst = v.to_le_bytes();
         }
         hash.update(&bytes[..chunk.len() * 4]);
     }
@@ -17,8 +17,8 @@ fn hash_f32(hash: &mut blake3::Hasher, values: &[f32]) {
 fn hash_i16(hash: &mut blake3::Hasher, values: &[i16]) {
     let mut bytes = [0; 65536];
     for chunk in values.chunks(bytes.len() / 2) {
-        for (v, dst) in chunk.iter().zip(bytes.chunks_exact_mut(2)) {
-            dst.copy_from_slice(&v.to_le_bytes());
+        for (v, dst) in chunk.iter().zip(bytes.as_chunks_mut::<2>().0) {
+            *dst = v.to_le_bytes();
         }
         hash.update(&bytes[..chunk.len() * 2]);
     }

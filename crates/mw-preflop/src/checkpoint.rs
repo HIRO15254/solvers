@@ -603,7 +603,9 @@ fn encode_chunk_table(chunks: &[ChunkEntry]) -> Vec<u8> {
 fn decode_chunk_table(bytes: &[u8]) -> Vec<ChunkEntry> {
     debug_assert_eq!(bytes.len() % CHUNK_ENTRY_LEN, 0);
     bytes
-        .chunks_exact(CHUNK_ENTRY_LEN)
+        .as_chunks::<CHUNK_ENTRY_LEN>()
+        .0
+        .iter()
         .map(|chunk| ChunkEntry {
             compressed_offset: u64::from_le_bytes(chunk[0..8].try_into().expect("eight bytes")),
             compressed_len: u64::from_le_bytes(chunk[8..16].try_into().expect("eight bytes")),

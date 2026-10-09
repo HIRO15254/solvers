@@ -787,7 +787,7 @@ impl Fenwick {
         let mut node = index + 1;
         while node < self.tree.len() {
             self.tree[node] += value;
-            node += node & node.wrapping_neg();
+            node += node.isolate_lowest_one();
         }
     }
 
@@ -795,7 +795,7 @@ impl Fenwick {
         let mut node = index + 1;
         while node < self.tree.len() {
             self.tree[node] -= value;
-            node += node & node.wrapping_neg();
+            node += node.isolate_lowest_one();
         }
         self.total -= value;
     }

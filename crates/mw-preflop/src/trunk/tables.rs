@@ -205,7 +205,9 @@ impl HuShowdownTable {
     pub fn load(path: &Path) -> Result<Self> {
         let (selection, complete_boards, payload) = read_cache(path, 2, 0, 0, 24)?;
         let w = payload
-            .chunks_exact(24)
+            .as_chunks::<24>()
+            .0
+            .iter()
             .map(|entry| {
                 std::array::from_fn(|i| {
                     u64::from_le_bytes(entry[i * 8..i * 8 + 8].try_into().expect("fixed chunk"))
@@ -388,7 +390,9 @@ impl ThreeWayTable {
         let (selection, complete, payload) = read_cache(path, 3, samples, seed, 52)?;
         ensure!(complete, "invalid T3 complete flag");
         let probabilities: Vec<[f32; 13]> = payload
-            .chunks_exact(52)
+            .as_chunks::<52>()
+            .0
+            .iter()
             .map(|entry| {
                 std::array::from_fn(|i| {
                     f32::from_le_bytes(entry[i * 4..i * 4 + 4].try_into().expect("fixed chunk"))

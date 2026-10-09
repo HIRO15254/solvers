@@ -763,7 +763,7 @@ fn enumerate_node<G: ExternalSamplingGame>(
     }
     if let Some(remaining) = parallel_nodes_remaining
         && remaining
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
                 count.checked_sub(1)
             })
             .is_err()
