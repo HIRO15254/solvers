@@ -1,0 +1,592 @@
+diff --git a/crates/hu-engine/src/solver.rs b/crates/hu-engine/src/solver.rs
+index a10e49c8..0ca1d58d 100644
+--- a/crates/hu-engine/src/solver.rs
++++ b/crates/hu-engine/src/solver.rs
+@@ -24 +24,16 @@ pub trait TerminalEvaluator: Send + Sync {
+-    /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
++    /// Exact terminal batch: zero-initialized outputs must match `eval` bit
++    /// for bit, independently of batch membership and lane position.
++    fn eval_batch(
++        &self,
++        terminals: &[u32],
++        p: Player,
++        opp_reaches: &[&[f32]],
++        outs: &mut [&mut [f32]],
++    ) {
++        assert_eq!(terminals.len(), opp_reaches.len());
++        assert_eq!(terminals.len(), outs.len());
++        for ((&terminal, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
++            self.eval(terminal, p, reach, out);
++        }
++    }
++    /// CFR-only terminal hook; exact evaluation uses `eval`/`eval_batch`.
+@@ -1259,0 +1275,9 @@ fn value_pass<
++    if !RECORD
++        && dim != 0
++        && node.kind == NodeKind::Action
++        && !ctx.tree.subtree_has_chance[node_id as usize]
++        && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
++    {
++        batch::values::<_, _, EV, BR>(ctx, scratch, node_id, opp_reach, ev, br);
++        return;
++    }
+diff --git a/crates/hu-engine/src/solver/batch.rs b/crates/hu-engine/src/solver/batch.rs
+index 878cc516..8ed83e48 100644
+--- a/crates/hu-engine/src/solver/batch.rs
++++ b/crates/hu-engine/src/solver/batch.rs
+@@ -1 +1 @@
+-//! Non-recursive f32 CFR for a chance-free subtree below the action split bound.
++//! Non-recursive CFR and exact EV/BR below the chance-free action split bound.
+@@ -24,0 +25,12 @@ thread_local! {
++struct MetadataLease(Metadata);
++impl Drop for MetadataLease {
++    fn drop(&mut self) {
++        METADATA.with(|pool| pool.borrow_mut().push(std::mem::take(&mut self.0)));
++    }
++}
++impl MetadataLease {
++    fn take() -> Self {
++        Self(METADATA.with(|pool| pool.borrow_mut().pop().unwrap_or_default()))
++    }
++}
++
+@@ -72,7 +84 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
+-    struct Lease(Metadata);
+-    impl Drop for Lease {
+-        fn drop(&mut self) {
+-            METADATA.with(|pool| pool.borrow_mut().push(std::mem::take(&mut self.0)));
+-        }
+-    }
+-    let mut lease = Lease(METADATA.with(|pool| pool.borrow_mut().pop().unwrap_or_default()));
++    let mut lease = MetadataLease::take();
+@@ -243,0 +250,161 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
++/// Exact EV/BR for a small chance-free subtree, reduced in original child order.
++/// Recording walks deliberately retain the recursive implementation.
++pub(super) fn values<E: TerminalEvaluator, S: Storage, const EV: bool, const BR: bool>(
++    ctx: &ValueCtx<'_, E, S>,
++    scratch: &mut Scratch,
++    root: NodeId,
++    opp_reach: &[f32],
++    ev: &mut [f32],
++    br: &mut [f32],
++) {
++    let tree = ctx.tree;
++    let node = tree.node(root);
++    let first = node.first_child as usize;
++    let mut end = first + node.num_children as usize;
++    let mut id = first;
++    while id < end {
++        let node = &tree.nodes[id];
++        if node.kind == NodeKind::Action {
++            end = end.max(node.first_child as usize + node.num_children as usize);
++        } else {
++            debug_assert_eq!(node.kind, NodeKind::Terminal);
++        }
++        id += 1;
++    }
++    let count = end - first + 1;
++    let span = tree.storage_spans[root as usize];
++    let sigma_len = span.end - span.start;
++    let dim = if EV { ev.len() } else { br.len() };
++    let channels = EV as usize + BR as usize;
++    let mut sigma = scratch.take_overwrite(sigma_len);
++    let mut scaled = scratch.take_overwrite(sigma_len);
++    let mut values = scratch.take(count * dim * channels);
++    let mut lease = MetadataLease::take();
++    let metadata = &mut lease.0;
++    metadata.nodes.resize(count, Reaches::default());
++    metadata.nodes[0].opp = usize::MAX;
++    let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
++    for (index, id) in walk().enumerate() {
++        let node = tree.node(id);
++        if node.kind == NodeKind::Terminal {
++            continue;
++        }
++        let sref = tree.storage_ref(node);
++        let offset = sref.offset - span.start;
++        let parent = metadata.nodes[index].opp;
++        let (previous, children) = scaled.split_at_mut(offset);
++        let opp = reach(previous, opp_reach, parent);
++        let zero = all_zero(opp);
++        metadata.nodes[index].zero_opp = zero;
++        if !zero && (EV || node.player != ctx.p) {
++            ctx.storage
++                .average_strategy(sref, sref.index, &mut sigma[offset..offset + sref.len()]);
++        }
++        let hands = sref.num_hands as usize;
++        for (a, child) in tree.children(id).enumerate() {
++            let next = if node.player == ctx.p {
++                parent
++            } else {
++                let row = &mut children[a * hands..(a + 1) * hands];
++                if zero {
++                    row.fill(0.0);
++                } else {
++                    mul_into(
++                        row,
++                        opp,
++                        &sigma[offset + a * hands..offset + (a + 1) * hands],
++                    );
++                }
++                offset + a * hands
++            };
++            metadata.nodes[child as usize - first + 1].opp = next;
++        }
++    }
++    metadata.terminals.clear();
++    let mut reaches = shared_rows(std::mem::take(&mut metadata.reaches));
++    let mut outputs = mutable_rows(std::mem::take(&mut metadata.outputs));
++    for ((index, id), row) in walk()
++        .enumerate()
++        .zip(values.chunks_exact_mut(dim * channels))
++    {
++        let node = tree.node(id);
++        if node.kind == NodeKind::Terminal {
++            let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
++            if !all_zero(opp) {
++                metadata.terminals.push(node.aux);
++                reaches.push(opp);
++                outputs.push(&mut row[..dim]);
++            }
++        }
++    }
++    ctx.evaluator
++        .eval_batch(&metadata.terminals, ctx.p, &reaches, &mut outputs);
++    metadata.outputs = mutable_rows(outputs);
++    metadata.reaches = shared_rows(reaches);
++    for id in walk().rev() {
++        let index = if id == root {
++            0
++        } else {
++            id as usize - first + 1
++        };
++        let node = tree.node(id);
++        let width = dim * channels;
++        let (parents, children) = values.split_at_mut((index + 1) * width);
++        let row = &mut parents[index * width..];
++        if node.kind == NodeKind::Terminal {
++            if EV && BR {
++                let (e, b) = row.split_at_mut(dim);
++                b.copy_from_slice(e);
++            }
++            continue;
++        }
++        if metadata.nodes[index].zero_opp {
++            continue;
++        }
++        let (e, b) = value_row::<EV, BR>(row, dim);
++        let own = node.player == ctx.p;
++        if own && BR {
++            b.fill(f32::NEG_INFINITY);
++        }
++        let sref = tree.storage_ref(node);
++        let offset = sref.offset - span.start;
++        for (a, child) in tree.children(id).enumerate() {
++            let start = (child as usize - first - index) * width;
++            let row = &children[start..start + width];
++            if EV {
++                if own {
++                    let strategy = &sigma[offset + a * dim..offset + (a + 1) * dim];
++                    for ((dst, &s), &v) in e.iter_mut().zip(strategy).zip(&row[..dim]) {
++                        *dst += s * v;
++                    }
++                } else {
++                    for (dst, &v) in e.iter_mut().zip(&row[..dim]) {
++                        *dst += v;
++                    }
++                }
++            }
++            if BR {
++                let child = &row[EV as usize * dim..];
++                if own {
++                    for (dst, &v) in b.iter_mut().zip(child) {
++                        *dst = dst.max(v);
++                    }
++                } else {
++                    for (dst, &v) in b.iter_mut().zip(child) {
++                        *dst += v;
++                    }
++                }
++            }
++        }
++    }
++    if EV {
++        ev.copy_from_slice(&values[..dim]);
++    }
++    if BR {
++        br.copy_from_slice(&values[EV as usize * dim..(EV as usize + 1) * dim]);
++    }
++    scratch.put(values);
++    scratch.put(scaled);
++    scratch.put(sigma);
++}
++
+diff --git a/crates/hu-engine/src/solver/dead_subtree_tests.rs b/crates/hu-engine/src/solver/dead_subtree_tests.rs
+index 65c7200e..4ccb64da 100644
+--- a/crates/hu-engine/src/solver/dead_subtree_tests.rs
++++ b/crates/hu-engine/src/solver/dead_subtree_tests.rs
+@@ -423,0 +424,70 @@ fn zero_opponent_pass_keeps_parallel_updates() {
++
++fn exact_flat_values<S: Storage>() {
++    for dim in [1, 17, 65] {
++        let mut solver = seeded::<S>(dim, Box::new(Dcfr::default()));
++        solver.run(3);
++        for p in Player::BOTH {
++            let ctx = ValueCtx {
++                tree: &solver.game.tree,
++                evaluator: &solver.game.evaluator,
++                storage: &solver.storage,
++                p,
++                par: solver.par,
++            };
++            for (ev_on, br_on) in [(true, true), (true, false), (false, true)] {
++                let mut old_ev = vec![0.0; dim];
++                let mut old_br = old_ev.clone();
++                let mut new_ev = old_ev.clone();
++                let mut new_br = old_ev.clone();
++                let mut scratch = Scratch::new();
++                macro_rules! check {
++                    ($ev:literal, $br:literal) => {{
++                        value_pass::<_, _, _, $ev, $br, true>(
++                            &ctx,
++                            &mut scratch,
++                            0,
++                            &solver.game.root_ranges[p.opponent()],
++                            &mut old_ev,
++                            &mut old_br,
++                            &no_record,
++                            solver.par.chance_depth,
++                        );
++                        value_pass::<_, _, _, $ev, $br, false>(
++                            &ctx,
++                            &mut scratch,
++                            0,
++                            &solver.game.root_ranges[p.opponent()],
++                            &mut new_ev,
++                            &mut new_br,
++                            &no_record,
++                            solver.par.chance_depth,
++                        );
++                    }};
++                }
++                match (ev_on, br_on) {
++                    (true, true) => check!(true, true),
++                    (true, false) => check!(true, false),
++                    (false, true) => check!(false, true),
++                    _ => unreachable!(),
++                }
++                for (old, new) in old_ev
++                    .iter()
++                    .chain(&old_br)
++                    .zip(new_ev.iter().chain(&new_br))
++                {
++                    assert_eq!(
++                        old.to_bits(),
++                        new.to_bits(),
++                        "{p:?} dim={dim} EV={ev_on} BR={br_on}"
++                    );
++                }
++            }
++        }
++    }
++}
++#[test]
++fn exact_flat_values_all_storage_channels() {
++    exact_flat_values::<F32Storage>();
++    exact_flat_values::<I16Storage>();
++    exact_flat_values::<crate::MixedStorage>();
++}
+diff --git a/crates/hu-postflop/src/kernel.rs b/crates/hu-postflop/src/kernel.rs
+index 61e4f400..82606ec4 100644
+--- a/crates/hu-postflop/src/kernel.rs
++++ b/crates/hu-postflop/src/kernel.rs
+@@ -28 +28,2 @@
+-//! Evaluation/EV/BR and all f64 CFR calls retain the original kernels.
++//! Exact evaluation batches preserve the original f64 hand/group order.
++//! Recorded EVs and all f64 CFR calls retain the scalar kernels.
+@@ -139,0 +141,125 @@ pub(crate) fn fold_kernel(
++// Exact lane sums follow the scalar hand order (and its per-group total
++// order). Packing only changes layout, never the arithmetic within a lane.
++fn add_exact_lanes<const L: usize>(
++    hands: &[Hand],
++    reach: &[[f32; L]],
++    total: &mut [f64; L],
++    card: &mut [[f64; L]; 52],
++) {
++    for h in hands {
++        let r = reach[h.local as usize];
++        for lane in 0..L {
++            let r = r[lane] as f64;
++            if r != 0.0 {
++                total[lane] += r;
++                card[h.cards[0] as usize][lane] += r;
++                card[h.cards[1] as usize][lane] += r;
++            }
++        }
++    }
++}
++
++#[allow(clippy::too_many_arguments)]
++pub(crate) fn exact_batch_kernel<const L: usize>(
++    own: &RankedHands,
++    opp: &RankedHands,
++    fold_hands: Option<(&[Hand], &[Hand], u64)>,
++    same: &[u16],
++    utilities: [[f64; 3]; L],
++    reaches: [&[f32]; L],
++    outs: &mut [&mut [f32]],
++    indices: &[usize],
++) {
++    TERMINAL_LANE_BUFFERS.with_borrow_mut(|buffers| {
++        let TerminalLaneBuffers { reach, values } = buffers;
++        reach.resize(reach.len().max(reaches[0].len() * L), 0.0);
++        values.resize(values.len().max(outs[indices[0]].len() * L), 0.0);
++        let reach = &mut reach[..reaches[0].len() * L];
++        let reach = reach.as_chunks_mut::<L>().0;
++        for (h, row) in reach.iter_mut().enumerate() {
++            *row = std::array::from_fn(|lane| reaches[lane][h]);
++        }
++        let values = &mut values[..outs[indices[0]].len() * L];
++        values.fill(0.0);
++        let values = values.as_chunks_mut::<L>().0;
++        let mut total = [0.0; L];
++        let mut card = [[0.0; L]; 52];
++        add_exact_lanes(
++            fold_hands.map_or(&opp.hands, |(_, opp, _)| opp),
++            reach,
++            &mut total,
++            &mut card,
++        );
++        let same_values = |h: Hand| {
++            let other = same[h.local as usize];
++            if other == ABSENT {
++                [0.0; L]
++            } else {
++                reach[other as usize].map(f64::from)
++            }
++        };
++        if let Some((own, _, board)) = fold_hands {
++            for &h in own {
++                let [a, b] = h.cards.map(usize::from);
++                if board & ((1u64 << a) | (1u64 << b)) != 0 {
++                    continue;
++                }
++                let same = same_values(h);
++                for lane in 0..L {
++                    values[h.local as usize][lane] = (utilities[lane][0]
++                        * (total[lane] - card[a][lane] - card[b][lane] + same[lane]))
++                        as f32;
++                }
++            }
++        } else {
++            let mut below_total = [0.0; L];
++            let mut below_card = [[0.0; L]; 52];
++            let mut oi = 0;
++            let mut os = 0;
++            let mut start = 0;
++            for &(rank, end) in &own.groups {
++                while oi < opp.groups.len() && opp.groups[oi].0 < rank {
++                    let oe = opp.groups[oi].1;
++                    let mut group_total = [0.0; L];
++                    add_exact_lanes(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
++                    for lane in 0..L {
++                        below_total[lane] += group_total[lane];
++                    }
++                    os = oe;
++                    oi += 1;
++                }
++                let mut group_total = [0.0; L];
++                let mut group_card = [[0.0; L]; 52];
++                let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
++                let oe = if tied { opp.groups[oi].1 } else { os };
++                add_exact_lanes(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
++                for &h in &own.hands[start..end] {
++                    let [a, b] = h.cards.map(usize::from);
++                    let same = same_values(h);
++                    for lane in 0..L {
++                        let win = below_total[lane] - below_card[a][lane] - below_card[b][lane];
++                        let tie = group_total[lane] - group_card[a][lane] - group_card[b][lane]
++                            + same[lane];
++                        let compat = total[lane] - card[a][lane] - card[b][lane] + same[lane];
++                        let lose = compat - win - tie;
++                        let [u_win, u_tie, u_lose] = utilities[lane];
++                        values[h.local as usize][lane] =
++                            (u_win * win + u_tie * tie + u_lose * lose) as f32;
++                    }
++                }
++                if tied {
++                    for lane in 0..L {
++                        below_total[lane] += group_total[lane];
++                    }
++                    let mut unused = [0.0; L];
++                    add_exact_lanes(&opp.hands[os..oe], reach, &mut unused, &mut below_card);
++                    os = oe;
++                    oi += 1;
++                }
++                start = end;
++            }
++        }
++        store_lane_values(values, lane_outputs::<L>(outs, indices));
++    });
++}
++
+diff --git a/crates/hu-postflop/src/postflop.rs b/crates/hu-postflop/src/postflop.rs
+index 30654037..55a6778c 100644
+--- a/crates/hu-postflop/src/postflop.rs
++++ b/crates/hu-postflop/src/postflop.rs
+@@ -453,0 +454,81 @@ impl TerminalEvaluator for PostflopEvaluator {
++    fn eval_batch(
++        &self,
++        terminals: &[u32],
++        p: Player,
++        reaches: &[&[f32]],
++        outs: &mut [&mut [f32]],
++    ) {
++        assert_eq!(terminals.len(), reaches.len());
++        assert_eq!(terminals.len(), outs.len());
++        // Fold sums retain global-combo order, showdown sums retain rank order.
++        let key = |i: usize| {
++            let term = &self.terminals[terminals[i] as usize];
++            match term.kind {
++                TerminalKind::Fold { .. } => (true, term.board_mask),
++                TerminalKind::Showdown => (false, term.table as u64),
++            }
++        };
++        TERMINAL_BATCH_ORDER.with_borrow_mut(|order| {
++            order.clear();
++            order.extend(0..terminals.len());
++            order.sort_unstable_by_key(|&i| (key(i), i));
++            let mut remaining = order.as_slice();
++            while let Some(&first) = remaining.first() {
++                let end = remaining.partition_point(|&i| key(i) == key(first));
++                let (group, tail) = remaining.split_at(end);
++                for indices in group.chunks(4) {
++                    if indices.len() == 1 {
++                        let i = indices[0];
++                        self.eval(terminals[i], p, reaches[i], outs[i]);
++                        continue;
++                    }
++                    let term = &self.terminals[terminals[first] as usize];
++                    let fold = if key(first).0 {
++                        Some((
++                            self.fold_combos[p].as_slice(),
++                            self.fold_combos[p.opponent()].as_slice(),
++                            term.board_mask,
++                        ))
++                    } else {
++                        None
++                    };
++                    // Fold batches need no rank data, including fold-only games.
++                    let empty = PerPlayer::new(
++                        kernel::RankedHands::default(),
++                        kernel::RankedHands::default(),
++                    );
++                    let table = if fold.is_some() {
++                        &empty
++                    } else {
++                        &self.rank_tables[term.table as usize]
++                    };
++                    macro_rules! run {
++                        ($n:literal) => {
++                            kernel::exact_batch_kernel::<$n>(
++                                &table[p],
++                                &table[p.opponent()],
++                                fold,
++                                &self.hands.same[p],
++                                std::array::from_fn(|lane| {
++                                    Self::cfr_utilities(
++                                        &self.terminals[terminals[indices[lane]] as usize],
++                                        p,
++                                    )
++                                }),
++                                std::array::from_fn(|lane| reaches[indices[lane]]),
++                                outs,
++                                indices,
++                            )
++                        };
++                    }
++                    match indices.len() {
++                        2 => run!(2),
++                        3 => run!(3),
++                        4 => run!(4),
++                        _ => unreachable!(),
++                    }
++                }
++                remaining = tail;
++            }
++        });
++    }
+diff --git a/crates/hu-postflop/src/precision_tests.rs b/crates/hu-postflop/src/precision_tests.rs
+index f39c6356..af91989a 100644
+--- a/crates/hu-postflop/src/precision_tests.rs
++++ b/crates/hu-postflop/src/precision_tests.rs
+@@ -688,0 +689,59 @@ mod lane_precision_tests;
++
++#[test]
++fn exact_terminal_batches_match_scalar_in_every_lane() {
++    let game = game();
++    let evaluator = &game.game.evaluator;
++    let ids: Vec<_> = (0..evaluator.terminals.len() as u32).collect();
++    for p in Player::BOTH {
++        for width in [1, 2, 3, 4, 5, 8, 11] {
++            for chunk in ids.chunks(width) {
++                // Vary lane placement and use mixed boards/kinds. Board-dead
++                // reaches are zero, as required by the terminal contract.
++                let ids: Vec<_> = chunk.iter().copied().rev().collect();
++                let reaches: Vec<Vec<f32>> = ids
++                    .iter()
++                    .enumerate()
++                    .map(|(lane, &id)| {
++                        let board = evaluator.terminals[id as usize].board_mask;
++                        evaluator
++                            .hands
++                            .combos(p.opponent())
++                            .iter()
++                            .enumerate()
++                            .map(|(h, &combo)| {
++                                let (a, b) = combo_cards(combo as usize);
++                                if board & ((1u64 << a.index()) | (1u64 << b.index())) != 0
++                                    || (h + lane) % 7 == 0
++                                {
++                                    if lane % 2 == 0 { 0.0 } else { -0.0 }
++                                } else {
++                                    // Widely varying magnitudes reveal sum reordering.
++                                    ((h * 71 + lane * 13) % 97 + 1) as f32
++                                        * 2.0f32.powi((h % 30) as i32 - 15)
++                                }
++                            })
++                            .collect()
++                    })
++                    .collect();
++                let mut expected = vec![vec![0.0; evaluator.hands.len(p)]; ids.len()];
++                let mut actual = expected.clone();
++                for ((&id, reach), out) in ids.iter().zip(&reaches).zip(&mut expected) {
++                    evaluator.eval(id, p, reach, out);
++                }
++                evaluator.eval_batch(
++                    &ids,
++                    p,
++                    &reaches.iter().map(Vec::as_slice).collect::<Vec<_>>(),
++                    &mut actual.iter_mut().map(Vec::as_mut_slice).collect::<Vec<_>>(),
++                );
++                for (expected, actual) in expected.iter().zip(&actual) {
++                    assert_eq!(
++                        bits(expected),
++                        bits(actual),
++                        "{p:?} width={width} ids={ids:?}"
++                    );
++                }
++            }
++        }
++    }
++}
+diff --git a/docs/architecture.md b/docs/architecture.md
+index 52f129bd..5012c4ba 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -147,0 +148,5 @@ reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは
++記録不要の EV/BR は、chanceの無いaction部分木のstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
++戦略・相手reachの前準備、厳密終端batch、子順のEV/BR合成の3段で処理する。
++`eval_batch`の既定hookは個別の`eval`。P1は同一board・同種の終端を最大4 laneで評価する。
++foldはglobal combo順、showdownはrank順・group total順を保ち、各laneのf64演算は個別kernelとbit一致する。
++戦略正規化・reach乗算・EV加算・BRのmaxも元の順序を保つ。chance/action並列の上位分割は変更しない。

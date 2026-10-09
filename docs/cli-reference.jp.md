@@ -32,7 +32,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 | `--out PATH` | stdout | templateの出力先 |
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。
-P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseで、明示値は常に優先する。full templateは既定storageのf32に対応する`pow4_reset = false`を明示するため、i16の既定resetを使う場合はこの行を削除するかtrueにする。
+P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"auto"`・`"f32"`・`"i16-f32avg"`ならfalseで、明示値は常に優先する。full templateは既定storageのautoに対応する`pow4_reset = false`を明示するため、i16の既定resetを使う場合はこの行を削除するかtrueにする。
 P1の`[solver.stop] check_every`は`"auto"`が既定で、full templateにも明示する。target有りは3〜50 iterationの適応評価、target無しは固定25である。正の整数は従来の固定間隔で、旧版と同じ停止を得るには`check_every = 25`を明示する。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
@@ -71,6 +71,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | resources field | 製品 | 意味 |
 |---|---|---|
 | `nodes` / `terminals` / `f32Bytes` / `i16Bytes` / `i16F32avgBytes` | P1 | 木のnode・terminal数とstorage別bytes |
+| `storage` | P1 | 解決済みstorage名。human表示はautoから選択したことも示す |
 | `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage, storage − regret + saveWorkspaceBytes) + compressionWorkspaceBytes`、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
@@ -81,6 +82,8 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
 未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
+validateの正規化出力（`--show-effective` / `--write-effective`）はautoを維持する。autoで両方式が超過した場合、resourcesはi16-f32avgの必要量と`withinLimit: false`を返す。
+
 P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`ならregretを保持してcheckpointと`.sol`を並行生成する。それ以外はcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`の順とする。solve開始の見積り式は変わらない。
 
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
@@ -117,7 +120,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
-P1 storageは`f32`（既定）・`i16`・`i16-f32avg`。`config new --product p1 --template full`にもこの選択肢を表示する。
+P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
 P1 `.sol`はversion 2、checkpointはversion 5だけを受理する。checkpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。

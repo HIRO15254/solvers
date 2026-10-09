@@ -1,0 +1,283 @@
+{
+  "decision": "adopt",
+  "benchmarks": [
+    {
+      "case": "c_turn2",
+      "storage": "f32",
+      "medianEvalSeconds": {
+        "old": 0.0061764,
+        "new": 0.0053387
+      },
+      "ratioNewOld": 0.8643708309047341,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0071486,
+          0.0053291,
+          0.0058733,
+          0.0119713,
+          0.0061764
+        ],
+        "new": [
+          0.00742,
+          0.0053149,
+          0.0051757,
+          0.0083903,
+          0.0053235
+        ]
+      },
+      "nashConv": 7.088108333947817,
+      "nashConvBits": "401c5a3912333e62"
+    },
+    {
+      "case": "c_flop1",
+      "storage": "f32",
+      "medianEvalSeconds": {
+        "old": 1.2192628,
+        "new": 1.0051968
+      },
+      "ratioNewOld": 0.8244299752276539,
+      "processMedianEvalSeconds": {
+        "old": [
+          1.3427912,
+          1.1889937,
+          1.3169359,
+          1.1569527,
+          1.2183082
+        ],
+        "new": [
+          0.9976634,
+          1.430575,
+          0.9411884,
+          1.0972408,
+          0.9583906
+        ]
+      },
+      "nashConv": 2.2752392294832364,
+      "nashConvBits": "400233b0a009a767"
+    },
+    {
+      "case": "c_river",
+      "storage": "f32",
+      "medianEvalSeconds": {
+        "old": 0.0005437,
+        "new": 0.0005598
+      },
+      "ratioNewOld": 1.0296119183373182,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0005278,
+          0.000461,
+          0.0007469,
+          0.0004202,
+          0.0007044
+        ],
+        "new": [
+          0.0006559,
+          0.0003631,
+          0.0007436,
+          0.000392,
+          0.0003714
+        ]
+      },
+      "nashConv": 1.3059107162593704,
+      "nashConvBits": "3ff4e502a29d4766"
+    },
+    {
+      "case": "c_turn2",
+      "storage": "i16",
+      "medianEvalSeconds": {
+        "old": 0.0089445,
+        "new": 0.0066907
+      },
+      "ratioNewOld": 0.748023925317234,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0096577,
+          0.0083176,
+          0.0068019
+        ],
+        "new": [
+          0.0103154,
+          0.0066651,
+          0.0066313
+        ]
+      },
+      "nashConv": 9.560665107130873,
+      "nashConvBits": "40231f0f7f364558"
+    },
+    {
+      "case": "c_river",
+      "storage": "i16",
+      "medianEvalSeconds": {
+        "old": 0.0007747,
+        "new": 0.0005968
+      },
+      "ratioNewOld": 0.7703627210533109,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0005095,
+          0.0008005,
+          0.0007891
+        ],
+        "new": [
+          0.0005968,
+          0.0003972,
+          0.0006587
+        ]
+      },
+      "nashConv": 1.9409441495333883,
+      "nashConvBits": "3fff0e1b73d9bc28"
+    },
+    {
+      "case": "c_turn2",
+      "storage": "i16-f32avg",
+      "medianEvalSeconds": {
+        "old": 0.0099141,
+        "new": 0.0067676
+      },
+      "ratioNewOld": 0.6826237379086352,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0070353,
+          0.0099141,
+          0.0106613
+        ],
+        "new": [
+          0.0066031,
+          0.0072361,
+          0.006495
+        ]
+      },
+      "nashConv": 6.948862742377856,
+      "nashConvBits": "401bcba2acbb9f81"
+    },
+    {
+      "case": "c_river",
+      "storage": "i16-f32avg",
+      "medianEvalSeconds": {
+        "old": 0.0007441,
+        "new": 0.0005901
+      },
+      "ratioNewOld": 0.7930385700846659,
+      "processMedianEvalSeconds": {
+        "old": [
+          0.0007579,
+          0.0007055,
+          0.0006919
+        ],
+        "new": [
+          0.0005867,
+          0.0005919,
+          0.0005545
+        ]
+      },
+      "nashConv": 1.3124656112090867,
+      "nashConvBits": "3ff4ffdbf0d44869"
+    }
+  ],
+  "solves": [
+    {
+      "label": "full-solve",
+      "iterations": 200,
+      "metrics": {
+        "evP0": 1.5277732492874008,
+        "evP1": 3.313849682450564,
+        "explP0": 0.005963752488974294,
+        "explP1": 0.003935076634010604,
+        "nashConv": 0.009898829122984898
+      },
+      "metricBits": {
+        "evP0": "3ff871c25cd649e6",
+        "evP1": "400a82c39f4fe19a",
+        "explP0": "3f786d729e6ce280",
+        "explP1": "3f701e3a17348c80",
+        "nashConv": "3f8445d65ad0b780"
+      },
+      "normalizedPayloadSha256": "a48839c3780cbd296bf41ee05769858f19a244dd79786a7f7256e40592847de4",
+      "cliExportSha256": {
+        "strategy": "50172c3f704dec355d0b33e7e90c0bb666c4ff529178b46ca2a7def7ea37bcf9",
+        "ev": "80e3bb3641b7f8fd51550adc679d408a52dd1c1315fc320aa3b06003e6ca681e"
+      }
+    },
+    {
+      "label": "full-c_river-i16",
+      "iterations": 360,
+      "metrics": {
+        "evP0": 1.9367715498992615,
+        "evP1": 3.160601750925044,
+        "explP0": 0.005703573349266633,
+        "explP1": 0.0049497497045761785,
+        "nashConv": 0.010653323053842811
+      },
+      "metricBits": {
+        "evP0": "3ffefd042a2a3fbc",
+        "evP1": "400948e9921f3a2b",
+        "explP0": "3f775ca150164580",
+        "explP1": "3f74463051ac3280",
+        "nashConv": "3f85d168d0e13c00"
+      },
+      "normalizedPayloadSha256": "cc94243991c2fc03f37f22bfa5cc86285648c743bfeaff572344d52263f68a5d",
+      "cliExportSha256": {
+        "strategy": "f7f4db9c2eaf59eea502ebd34fabc21a628c7aa8dc0001fe6e54352e6855dc30",
+        "ev": "9c67524cd53e39bdb5a43d24c0c49588bad143e813fd373e182fb80a10ceb220"
+      }
+    },
+    {
+      "label": "full-c_river-i16-f32avg",
+      "iterations": 340,
+      "metrics": {
+        "evP0": 1.936536261367611,
+        "evP1": 3.160437850013564,
+        "explP0": 0.005640343137327197,
+        "explP1": 0.005288576760771879,
+        "nashConv": 0.010928919898099076
+      },
+      "metricBits": {
+        "evP0": "3ffefc0d726178d2",
+        "evP1": "40094893a3b6ca5d",
+        "explP0": "3f771a5415023480",
+        "explP1": "3f75a97983adac80",
+        "nashConv": "3f8661e6cc57f080"
+      },
+      "normalizedPayloadSha256": "97bcecbced0583b99c7e8075142becc5a3a8d73fa286809f5632cd6e3ff894e9",
+      "cliExportSha256": {
+        "strategy": "1f53fb07646c69a7e84e0d9931bd65ea5a587b762c940f2777b682a5b98db272",
+        "ev": "b082a2852d9bc8e08d574ef4a8fee7dba934e6ad27be5696f219823fe5501035"
+      }
+    }
+  ],
+  "validation": {
+    "checks": [
+      {
+        "command": "cargo fmt --all --check",
+        "exitCode": 0
+      },
+      {
+        "command": "cargo clippy --workspace --all-targets -- -D warnings",
+        "exitCode": 0
+      },
+      {
+        "command": "cargo test --workspace",
+        "exitCode": 0
+      },
+      {
+        "command": "cargo test --release -p hu-postflop --test oracle_diff -- --ignored",
+        "exitCode": 0
+      },
+      {
+        "command": "cargo test -p hu-postflop --lib exact_terminal_batches --release",
+        "exitCode": 0
+      },
+      {
+        "command": "python tools/check_docs.py",
+        "exitCode": 0
+      }
+    ],
+    "cargoBuildJobs": 1,
+    "notes": [
+      "Workspace suite uses normal ignored-test selection; the relevant 200-iteration multistreet oracle acceptance was also run explicitly.",
+      "Initial parallel release build failed with LLVM out-of-memory; single-job release rebuild passed.",
+      "No source changes after passing fmt/clippy/workspace tests; experiment scripts and report are added subsequently."
+    ]
+  }
+}

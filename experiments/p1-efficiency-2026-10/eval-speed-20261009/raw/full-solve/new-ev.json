@@ -1,0 +1,6407 @@
+[
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2h2c",
+    "weight": 1.0,
+    "ev": 14.20339
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2s2c",
+    "weight": 1.0,
+    "ev": 14.256942
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 14.258376
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 0.73202014
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 0.7219794
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 0.7669238
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 0.7162418
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 0.7592737
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 0.7492329
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4c3c",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4d3d",
+    "weight": 1.0,
+    "ev": 0.065025955
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 0.80660874
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4h3h",
+    "weight": 1.0,
+    "ev": 0.07411047
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 0.80039304
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 0.84725
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s3s",
+    "weight": 1.0,
+    "ev": 0.05881024
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 0.7936992
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 0.8362529
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 0.8319498
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5c3c",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5c4c",
+    "weight": 1.0,
+    "ev": 0.047813203
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5d3d",
+    "weight": 1.0,
+    "ev": 0.057853978
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5d4d",
+    "weight": 1.0,
+    "ev": 0.15348038
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 0.9156229
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h3h",
+    "weight": 1.0,
+    "ev": 0.05881024
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h4h",
+    "weight": 1.0,
+    "ev": 0.17643073
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 0.905104
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 0.9337919
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s3s",
+    "weight": 1.0,
+    "ev": 0.056897715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s4s",
+    "weight": 1.0,
+    "ev": 0.16208677
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 0.89888823
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 0.9266199
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 0.9165791
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6c4c",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6c5c",
+    "weight": 1.0,
+    "ev": 0.0492476
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6d4d",
+    "weight": 1.0,
+    "ev": 0.056897715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6d5d",
+    "weight": 1.0,
+    "ev": 0.14104895
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 1.0743628
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h4h",
+    "weight": 1.0,
+    "ev": 0.06359156
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h5h",
+    "weight": 1.0,
+    "ev": 0.16543369
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 1.0633657
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 1.0982693
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s4s",
+    "weight": 1.0,
+    "ev": 0.056897715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s5s",
+    "weight": 1.0,
+    "ev": 0.15634918
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 1.0561937
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 1.0906192
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 1.0805784
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7c4c",
+    "weight": 1.0,
+    "ev": 2.060271
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7c5c",
+    "weight": 1.0,
+    "ev": 2.0067203
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7c6c",
+    "weight": 1.0,
+    "ev": 2.020108
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7d4d",
+    "weight": 1.0,
+    "ev": 2.618729
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7d5d",
+    "weight": 1.0,
+    "ev": 2.5756974
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7d6d",
+    "weight": 1.0,
+    "ev": 2.5905194
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7d7c",
+    "weight": 1.0,
+    "ev": 15.528295
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s4s",
+    "weight": 1.0,
+    "ev": 2.617773
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s5s",
+    "weight": 1.0,
+    "ev": 2.5776098
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s6s",
+    "weight": 1.0,
+    "ev": 2.5938663
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s7c",
+    "weight": 1.0,
+    "ev": 15.666953
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "7s7d",
+    "weight": 1.0,
+    "ev": 15.664562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8c5c",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8c6c",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8c7c",
+    "weight": 1.0,
+    "ev": 2.146813
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8d5d",
+    "weight": 1.0,
+    "ev": 0.06072277
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8d6d",
+    "weight": 1.0,
+    "ev": 0.22615646
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8d7d",
+    "weight": 1.0,
+    "ev": 2.7076619
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 1.9818573
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h5h",
+    "weight": 1.0,
+    "ev": 0.07936992
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h6h",
+    "weight": 1.0,
+    "ev": 0.25580063
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 2.0009825
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 2.0664866
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s5s",
+    "weight": 1.0,
+    "ev": 0.07363234
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s6s",
+    "weight": 1.0,
+    "ev": 0.2519756
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s7s",
+    "weight": 1.0,
+    "ev": 2.7133994
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 1.9579507
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 2.0263236
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 2.0454488
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c6c",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c7c",
+    "weight": 1.0,
+    "ev": 2.1085622
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c8c",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c8d",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c8h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9c8s",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d6d",
+    "weight": 1.0,
+    "ev": 0.05163826
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d7d",
+    "weight": 1.0,
+    "ev": 2.6459827
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d8c",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d8d",
+    "weight": 1.0,
+    "ev": 0.2519756
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d8h",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d8s",
+    "weight": 1.0,
+    "ev": 0.03968496
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 2.212317
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h6h",
+    "weight": 1.0,
+    "ev": 0.053072657
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h8c",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h8d",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h8h",
+    "weight": 1.0,
+    "ev": 0.27970725
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h8s",
+    "weight": 1.0,
+    "ev": 0.03968496
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h9c",
+    "weight": 1.0,
+    "ev": 2.2362235
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9h9d",
+    "weight": 1.0,
+    "ev": 2.278299
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s6s",
+    "weight": 1.0,
+    "ev": 0.056897715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s7s",
+    "weight": 1.0,
+    "ev": 2.6718018
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s8c",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s8d",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s8h",
+    "weight": 1.0,
+    "ev": 0.03968496
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s8s",
+    "weight": 1.0,
+    "ev": 0.2816198
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 2.197973
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 2.2400486
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "9s9h",
+    "weight": 1.0,
+    "ev": 2.2653897
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc6c",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc7c",
+    "weight": 1.0,
+    "ev": 2.2453082
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc8c",
+    "weight": 1.0,
+    "ev": 0.032512978
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc8d",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc8h",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc8s",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": 0.03442551
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc9d",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc9h",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Tc9s",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td6d",
+    "weight": 1.0,
+    "ev": 0.047335073
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td7d",
+    "weight": 1.0,
+    "ev": 2.7679064
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td8c",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td8d",
+    "weight": 1.0,
+    "ev": 0.15491478
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td8h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td8s",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td9c",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": 0.2667977
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td9h",
+    "weight": 1.0,
+    "ev": 0.038728695
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Td9s",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th6h",
+    "weight": 1.0,
+    "ev": 0.047335073
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th8c",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th8d",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th8h",
+    "weight": 1.0,
+    "ev": 0.17260566
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th8s",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th9c",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th9d",
+    "weight": 1.0,
+    "ev": 0.038728695
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th9h",
+    "weight": 1.0,
+    "ev": 0.29070428
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Th9s",
+    "weight": 1.0,
+    "ev": 0.038728695
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts6s",
+    "weight": 1.0,
+    "ev": 0.0492476
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts7s",
+    "weight": 1.0,
+    "ev": 2.7932475
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts8c",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts8d",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts8h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts8s",
+    "weight": 1.0,
+    "ev": 0.17929952
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts9c",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts9d",
+    "weight": 1.0,
+    "ev": 0.03920683
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts9h",
+    "weight": 1.0,
+    "ev": 0.038728695
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": 0.30696076
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc6c",
+    "weight": 1.0,
+    "ev": 0.032512978
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc7c",
+    "weight": 1.0,
+    "ev": 2.2759085
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc8c",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc9c",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc9d",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc9h",
+    "weight": 1.0,
+    "ev": 0.035859905
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jc9s",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JcTc",
+    "weight": 1.0,
+    "ev": 0.05163826
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JcTd",
+    "weight": 1.0,
+    "ev": 0.04637881
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JcTh",
+    "weight": 1.0,
+    "ev": 0.045900676
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JcTs",
+    "weight": 1.0,
+    "ev": 0.04637881
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd6d",
+    "weight": 1.0,
+    "ev": 0.048291337
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd7d",
+    "weight": 1.0,
+    "ev": 2.8037663
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd8d",
+    "weight": 1.0,
+    "ev": 0.05641958
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd9c",
+    "weight": 1.0,
+    "ev": 0.03442551
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd9d",
+    "weight": 1.0,
+    "ev": 0.14104895
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd9h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jd9s",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JdTc",
+    "weight": 1.0,
+    "ev": 0.04637881
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JdTd",
+    "weight": 1.0,
+    "ev": 0.3624241
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JdTh",
+    "weight": 1.0,
+    "ev": 0.04685694
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JdTs",
+    "weight": 1.0,
+    "ev": 0.047335073
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh6h",
+    "weight": 1.0,
+    "ev": 0.048291337
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh8h",
+    "weight": 1.0,
+    "ev": 0.058332108
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh9c",
+    "weight": 1.0,
+    "ev": 0.03442551
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh9d",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh9h",
+    "weight": 1.0,
+    "ev": 0.1491772
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Jh9s",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhTc",
+    "weight": 1.0,
+    "ev": 0.045900676
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhTd",
+    "weight": 1.0,
+    "ev": 0.04685694
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhTh",
+    "weight": 1.0,
+    "ev": 0.38011497
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JhTs",
+    "weight": 1.0,
+    "ev": 0.04685694
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js6s",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js7s",
+    "weight": 1.0,
+    "ev": 2.8319762
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js8s",
+    "weight": 1.0,
+    "ev": 0.06932915
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js9c",
+    "weight": 1.0,
+    "ev": 0.034903638
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js9d",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js9h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Js9s",
+    "weight": 1.0,
+    "ev": 0.17929952
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JsTc",
+    "weight": 1.0,
+    "ev": 0.045422543
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JsTd",
+    "weight": 1.0,
+    "ev": 0.047335073
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JsTh",
+    "weight": 1.0,
+    "ev": 0.04685694
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "JsTs",
+    "weight": 1.0,
+    "ev": 0.4073685
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc4c",
+    "weight": 1.0,
+    "ev": 0.03442551
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc5c",
+    "weight": 1.0,
+    "ev": 0.034903638
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc6c",
+    "weight": 1.0,
+    "ev": 0.03442551
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc7c",
+    "weight": 1.0,
+    "ev": 2.3696225
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc8c",
+    "weight": 1.0,
+    "ev": 0.032512978
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc9c",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc9d",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc9h",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qc9s",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcTc",
+    "weight": 1.0,
+    "ev": 0.04398815
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcTd",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcTh",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcTs",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 0.052594524
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcJd",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcJh",
+    "weight": 1.0,
+    "ev": 0.0492476
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QcJs",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd4d",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd5d",
+    "weight": 1.0,
+    "ev": 0.050203864
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd6d",
+    "weight": 1.0,
+    "ev": 0.050203864
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd7d",
+    "weight": 1.0,
+    "ev": 2.9314275
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd8d",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd9c",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd9d",
+    "weight": 1.0,
+    "ev": 0.093235746
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd9h",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qd9s",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdTc",
+    "weight": 1.0,
+    "ev": 0.04159749
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdTd",
+    "weight": 1.0,
+    "ev": 0.304092
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdTh",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdTs",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdJc",
+    "weight": 1.0,
+    "ev": 0.048291337
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 0.36003342
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdJh",
+    "weight": 1.0,
+    "ev": 0.04876947
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QdJs",
+    "weight": 1.0,
+    "ev": 0.04876947
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh4h",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh5h",
+    "weight": 1.0,
+    "ev": 0.050203864
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh6h",
+    "weight": 1.0,
+    "ev": 0.050203864
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh8h",
+    "weight": 1.0,
+    "ev": 0.050203864
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh9c",
+    "weight": 1.0,
+    "ev": 0.031556714
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh9d",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh9h",
+    "weight": 1.0,
+    "ev": 0.09132322
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qh9s",
+    "weight": 1.0,
+    "ev": 0.033469245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhTc",
+    "weight": 1.0,
+    "ev": 0.041119356
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhTd",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhTh",
+    "weight": 1.0,
+    "ev": 0.31413275
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhTs",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhJc",
+    "weight": 1.0,
+    "ev": 0.047813203
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhJd",
+    "weight": 1.0,
+    "ev": 0.04876947
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 0.37676805
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QhJs",
+    "weight": 1.0,
+    "ev": 0.04876947
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs4s",
+    "weight": 1.0,
+    "ev": 0.05163826
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs5s",
+    "weight": 1.0,
+    "ev": 0.052116394
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs6s",
+    "weight": 1.0,
+    "ev": 0.052116394
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs7s",
+    "weight": 1.0,
+    "ev": 2.9825878
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs8s",
+    "weight": 1.0,
+    "ev": 0.056897715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs9c",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs9d",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs9h",
+    "weight": 1.0,
+    "ev": 0.033947375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Qs9s",
+    "weight": 1.0,
+    "ev": 0.1491772
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsTc",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsTd",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsTh",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsTs",
+    "weight": 1.0,
+    "ev": 0.3686398
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsJc",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsJd",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsJh",
+    "weight": 1.0,
+    "ev": 0.049725734
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "QsJs",
+    "weight": 1.0,
+    "ev": 0.42266873
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc2c",
+    "weight": 1.0,
+    "ev": 9.899724
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc3c",
+    "weight": 1.0,
+    "ev": 4.953926
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc4c",
+    "weight": 1.0,
+    "ev": 4.935279
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc5c",
+    "weight": 1.0,
+    "ev": 4.914719
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc6c",
+    "weight": 1.0,
+    "ev": 4.9615765
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc7c",
+    "weight": 1.0,
+    "ev": 11.106529
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc8c",
+    "weight": 1.0,
+    "ev": 5.0199084
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc8d",
+    "weight": 1.0,
+    "ev": 5.1040597
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc8h",
+    "weight": 1.0,
+    "ev": 5.1074066
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc8s",
+    "weight": 1.0,
+    "ev": 5.076328
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc9c",
+    "weight": 1.0,
+    "ev": 5.167173
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc9d",
+    "weight": 1.0,
+    "ev": 5.2527585
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc9h",
+    "weight": 1.0,
+    "ev": 5.2518024
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kc9s",
+    "weight": 1.0,
+    "ev": 5.2379365
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTc",
+    "weight": 1.0,
+    "ev": 5.5721507
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTd",
+    "weight": 1.0,
+    "ev": 5.649608
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTh",
+    "weight": 1.0,
+    "ev": 5.6510425
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcTs",
+    "weight": 1.0,
+    "ev": 5.6410017
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJc",
+    "weight": 1.0,
+    "ev": 6.075624
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "ev": 6.1530814
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "ev": 6.1502123
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcJs",
+    "weight": 1.0,
+    "ev": 6.145431
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 6.8272476
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 6.832507
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KcQs",
+    "weight": 1.0,
+    "ev": 6.7550497
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd3d",
+    "weight": 1.0,
+    "ev": 5.440665
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd4d",
+    "weight": 1.0,
+    "ev": 5.424408
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd5d",
+    "weight": 1.0,
+    "ev": 5.421061
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd6d",
+    "weight": 1.0,
+    "ev": 5.4583554
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd7d",
+    "weight": 1.0,
+    "ev": 11.517244
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd8c",
+    "weight": 1.0,
+    "ev": 5.049074
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd8d",
+    "weight": 1.0,
+    "ev": 5.511428
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd8h",
+    "weight": 1.0,
+    "ev": 5.1298785
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd8s",
+    "weight": 1.0,
+    "ev": 5.0992785
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd9c",
+    "weight": 1.0,
+    "ev": 5.1896453
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd9d",
+    "weight": 1.0,
+    "ev": 5.671124
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd9h",
+    "weight": 1.0,
+    "ev": 5.275709
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kd9s",
+    "weight": 1.0,
+    "ev": 5.2589746
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTc",
+    "weight": 1.0,
+    "ev": 5.597014
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTd",
+    "weight": 1.0,
+    "ev": 6.060802
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTh",
+    "weight": 1.0,
+    "ev": 5.6763835
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdTs",
+    "weight": 1.0,
+    "ev": 5.6672993
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "ev": 6.1000085
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJd",
+    "weight": 1.0,
+    "ev": 6.560928
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "ev": 6.177466
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdJs",
+    "weight": 1.0,
+    "ev": 6.1726847
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 6.785172
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 6.868845
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KdQs",
+    "weight": 1.0,
+    "ev": 6.7923436
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh2h",
+    "weight": 1.0,
+    "ev": 10.198078
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh3h",
+    "weight": 1.0,
+    "ev": 5.4081516
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh4h",
+    "weight": 1.0,
+    "ev": 5.3928514
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh5h",
+    "weight": 1.0,
+    "ev": 5.4009795
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh6h",
+    "weight": 1.0,
+    "ev": 5.4411426
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh8c",
+    "weight": 1.0,
+    "ev": 5.0347304
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh8d",
+    "weight": 1.0,
+    "ev": 5.112666
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh8h",
+    "weight": 1.0,
+    "ev": 5.5205126
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh8s",
+    "weight": 1.0,
+    "ev": 5.084934
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh9c",
+    "weight": 1.0,
+    "ev": 5.173389
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh9d",
+    "weight": 1.0,
+    "ev": 5.2599306
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh9h",
+    "weight": 1.0,
+    "ev": 5.6792526
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Kh9s",
+    "weight": 1.0,
+    "ev": 5.2412834
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTc",
+    "weight": 1.0,
+    "ev": 5.580279
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTd",
+    "weight": 1.0,
+    "ev": 5.658693
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTh",
+    "weight": 1.0,
+    "ev": 6.0622363
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhTs",
+    "weight": 1.0,
+    "ev": 5.6505647
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJc",
+    "weight": 1.0,
+    "ev": 6.083274
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJd",
+    "weight": 1.0,
+    "ev": 6.163122
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJh",
+    "weight": 1.0,
+    "ev": 6.550409
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhJs",
+    "weight": 1.0,
+    "ev": 6.155472
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 6.77035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 6.847807
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "KhQs",
+    "weight": 1.0,
+    "ev": 6.777044
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac2c",
+    "weight": 1.0,
+    "ev": 1.4186177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac2h",
+    "weight": 1.0,
+    "ev": 1.4602152
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac2s",
+    "weight": 1.0,
+    "ev": 1.4296148
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac3d",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac3h",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac3s",
+    "weight": 1.0,
+    "ev": 0.03538177
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 0.035859905
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac4d",
+    "weight": 1.0,
+    "ev": 0.035859905
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac4h",
+    "weight": 1.0,
+    "ev": 0.035859905
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac4s",
+    "weight": 1.0,
+    "ev": 0.035859905
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac5d",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac5h",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac5s",
+    "weight": 1.0,
+    "ev": 0.036338035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac6c",
+    "weight": 1.0,
+    "ev": 0.032512978
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac6d",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac6h",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac6s",
+    "weight": 1.0,
+    "ev": 0.032034848
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": 2.5082808
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac7d",
+    "weight": 1.0,
+    "ev": 2.570916
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac7s",
+    "weight": 1.0,
+    "ev": 2.5407937
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac8c",
+    "weight": 1.0,
+    "ev": 0.03681617
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac8d",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac8h",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac8s",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "ev": 0.06885102
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac9d",
+    "weight": 1.0,
+    "ev": 0.06550409
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac9h",
+    "weight": 1.0,
+    "ev": 0.059288375
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ac9s",
+    "weight": 1.0,
+    "ev": 0.07028541
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcTc",
+    "weight": 1.0,
+    "ev": 0.33803937
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcTd",
+    "weight": 1.0,
+    "ev": 0.34425506
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcTh",
+    "weight": 1.0,
+    "ev": 0.33803937
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcTs",
+    "weight": 1.0,
+    "ev": 0.34664574
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcJc",
+    "weight": 1.0,
+    "ev": 0.57088965
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcJd",
+    "weight": 1.0,
+    "ev": 0.58618987
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcJh",
+    "weight": 1.0,
+    "ev": 0.5809304
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AcJs",
+    "weight": 1.0,
+    "ev": 0.586668
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad2c",
+    "weight": 1.0,
+    "ev": 1.4501745
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad2h",
+    "weight": 1.0,
+    "ev": 1.4908158
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad2s",
+    "weight": 1.0,
+    "ev": 1.4611715
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad3c",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 0.42171246
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad3h",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad3s",
+    "weight": 1.0,
+    "ev": 0.04159749
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad4c",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 0.43462202
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad4h",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad4s",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad5c",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 0.4040216
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad5h",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad5s",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad6c",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad6d",
+    "weight": 1.0,
+    "ev": 0.2687102
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad6h",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad6s",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad7c",
+    "weight": 1.0,
+    "ev": 2.538881
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad7d",
+    "weight": 1.0,
+    "ev": 3.2178288
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad7s",
+    "weight": 1.0,
+    "ev": 2.5718722
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad8c",
+    "weight": 1.0,
+    "ev": 0.040163092
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad8d",
+    "weight": 1.0,
+    "ev": 0.48530403
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad8h",
+    "weight": 1.0,
+    "ev": 0.044944413
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad8s",
+    "weight": 1.0,
+    "ev": 0.044944413
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad9c",
+    "weight": 1.0,
+    "ev": 0.09945147
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "ev": 0.56467396
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad9h",
+    "weight": 1.0,
+    "ev": 0.09036696
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ad9s",
+    "weight": 1.0,
+    "ev": 0.0999296
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdTc",
+    "weight": 1.0,
+    "ev": 0.3624241
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdTd",
+    "weight": 1.0,
+    "ev": 0.88789123
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdTh",
+    "weight": 1.0,
+    "ev": 0.36338034
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdTs",
+    "weight": 1.0,
+    "ev": 0.3715086
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdJc",
+    "weight": 1.0,
+    "ev": 0.5976651
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdJd",
+    "weight": 1.0,
+    "ev": 1.1264791
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdJh",
+    "weight": 1.0,
+    "ev": 0.6067496
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AdJs",
+    "weight": 1.0,
+    "ev": 0.61344343
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah2c",
+    "weight": 1.0,
+    "ev": 1.4444369
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 2.1501598
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah2s",
+    "weight": 1.0,
+    "ev": 1.4559121
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah3c",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah3d",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 0.4221906
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah3s",
+    "weight": 1.0,
+    "ev": 0.04159749
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah4c",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah4d",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 0.44370654
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah4s",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah5c",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah5d",
+    "weight": 1.0,
+    "ev": 0.04398815
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 0.41406235
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah5s",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah6c",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah6d",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah6h",
+    "weight": 1.0,
+    "ev": 0.2730134
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah6s",
+    "weight": 1.0,
+    "ev": 0.0372943
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah7c",
+    "weight": 1.0,
+    "ev": 2.5293186
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah7d",
+    "weight": 1.0,
+    "ev": 2.59291
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah7s",
+    "weight": 1.0,
+    "ev": 2.5603971
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah8c",
+    "weight": 1.0,
+    "ev": 0.040163092
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah8d",
+    "weight": 1.0,
+    "ev": 0.044944413
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah8h",
+    "weight": 1.0,
+    "ev": 0.5006043
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah8s",
+    "weight": 1.0,
+    "ev": 0.045422543
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah9c",
+    "weight": 1.0,
+    "ev": 0.0999296
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah9d",
+    "weight": 1.0,
+    "ev": 0.09610454
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah9h",
+    "weight": 1.0,
+    "ev": 0.5904931
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "Ah9s",
+    "weight": 1.0,
+    "ev": 0.10040773
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhTc",
+    "weight": 1.0,
+    "ev": 0.3643366
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhTd",
+    "weight": 1.0,
+    "ev": 0.3715086
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhTh",
+    "weight": 1.0,
+    "ev": 0.91514474
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhTs",
+    "weight": 1.0,
+    "ev": 0.37342113
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhJc",
+    "weight": 1.0,
+    "ev": 0.601012
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhJd",
+    "weight": 1.0,
+    "ev": 0.61679035
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhJh",
+    "weight": 1.0,
+    "ev": 1.1537327
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AhJs",
+    "weight": 1.0,
+    "ev": 0.61726844
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As2c",
+    "weight": 1.0,
+    "ev": 1.4425244
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As2h",
+    "weight": 1.0,
+    "ev": 1.4836438
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 2.0985215
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As3c",
+    "weight": 1.0,
+    "ev": 0.04207562
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As3d",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As3h",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 0.40784663
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As4c",
+    "weight": 1.0,
+    "ev": 0.042553753
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As4d",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As4h",
+    "weight": 1.0,
+    "ev": 0.043031882
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 0.42314687
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As5c",
+    "weight": 1.0,
+    "ev": 0.043510016
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As5d",
+    "weight": 1.0,
+    "ev": 0.04398815
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As5h",
+    "weight": 1.0,
+    "ev": 0.04398815
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 0.39541522
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As6c",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As6d",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As6h",
+    "weight": 1.0,
+    "ev": 0.037772432
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As6s",
+    "weight": 1.0,
+    "ev": 0.24958493
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As7c",
+    "weight": 1.0,
+    "ev": 2.5187995
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As7d",
+    "weight": 1.0,
+    "ev": 2.5838256
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": 3.1728842
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As8c",
+    "weight": 1.0,
+    "ev": 0.040641222
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As8d",
+    "weight": 1.0,
+    "ev": 0.044944413
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As8h",
+    "weight": 1.0,
+    "ev": 0.044944413
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As8s",
+    "weight": 1.0,
+    "ev": 0.48004457
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As9c",
+    "weight": 1.0,
+    "ev": 0.10279839
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As9d",
+    "weight": 1.0,
+    "ev": 0.098973334
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As9h",
+    "weight": 1.0,
+    "ev": 0.09467015
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "As9s",
+    "weight": 1.0,
+    "ev": 0.57901794
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsTc",
+    "weight": 1.0,
+    "ev": 0.3667273
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsTd",
+    "weight": 1.0,
+    "ev": 0.37342113
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsTh",
+    "weight": 1.0,
+    "ev": 0.36768353
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsTs",
+    "weight": 1.0,
+    "ev": 0.905104
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsJc",
+    "weight": 1.0,
+    "ev": 0.6029245
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsJd",
+    "weight": 1.0,
+    "ev": 0.6187029
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsJh",
+    "weight": 1.0,
+    "ev": 0.61248714
+  },
+  {
+    "history": "",
+    "seat": "oop",
+    "combo": "AsJs",
+    "weight": 1.0,
+    "ev": 1.1465607
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2h2c",
+    "weight": 1.0,
+    "ev": 11.195462
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2s2c",
+    "weight": 1.0,
+    "ev": 11.273397
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "2s2h",
+    "weight": 1.0,
+    "ev": 11.254272
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3d3c",
+    "weight": 1.0,
+    "ev": 2.33185
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3h3c",
+    "weight": 1.0,
+    "ev": 2.324678
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3h3d",
+    "weight": 1.0,
+    "ev": 2.3624504
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3c",
+    "weight": 1.0,
+    "ev": 2.3165498
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3d",
+    "weight": 1.0,
+    "ev": 2.350019
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "3s3h",
+    "weight": 1.0,
+    "ev": 2.3442814
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4d4c",
+    "weight": 1.0,
+    "ev": 2.432736
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4h4c",
+    "weight": 1.0,
+    "ev": 2.4198263
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4h4d",
+    "weight": 1.0,
+    "ev": 2.4685957
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4c",
+    "weight": 1.0,
+    "ev": 2.4174356
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4d",
+    "weight": 1.0,
+    "ev": 2.4633362
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "4s4h",
+    "weight": 1.0,
+    "ev": 2.4504268
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5c4c",
+    "weight": 1.0,
+    "ev": 1.7035844
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5d4d",
+    "weight": 1.0,
+    "ev": 1.9560382
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5d5c",
+    "weight": 1.0,
+    "ev": 2.5331435
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5h4h",
+    "weight": 1.0,
+    "ev": 1.9727728
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5h5c",
+    "weight": 1.0,
+    "ev": 2.5231028
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5h5d",
+    "weight": 1.0,
+    "ev": 2.5761755
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s4s",
+    "weight": 1.0,
+    "ev": 1.9330878
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5c",
+    "weight": 1.0,
+    "ev": 2.5183215
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5d",
+    "weight": 1.0,
+    "ev": 2.570916
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "5s5h",
+    "weight": 1.0,
+    "ev": 2.5594409
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6c5c",
+    "weight": 1.0,
+    "ev": 1.6844592
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6d5d",
+    "weight": 1.0,
+    "ev": 1.9412161
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6d6c",
+    "weight": 1.0,
+    "ev": 2.6421578
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6h5h",
+    "weight": 1.0,
+    "ev": 1.9751635
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6h6c",
+    "weight": 1.0,
+    "ev": 2.6316388
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6h6d",
+    "weight": 1.0,
+    "ev": 2.6780176
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6s5s",
+    "weight": 1.0,
+    "ev": 1.9388255
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6s6c",
+    "weight": 1.0,
+    "ev": 2.6273355
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6s6d",
+    "weight": 1.0,
+    "ev": 2.672758
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "6s6h",
+    "weight": 1.0,
+    "ev": 2.6622393
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7c5c",
+    "weight": 1.0,
+    "ev": 3.436813
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7c6c",
+    "weight": 1.0,
+    "ev": 3.4492445
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7d5d",
+    "weight": 1.0,
+    "ev": 3.7939777
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7d6d",
+    "weight": 1.0,
+    "ev": 3.8083217
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7d7c",
+    "weight": 1.0,
+    "ev": 12.3195505
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7s5s",
+    "weight": 1.0,
+    "ev": 3.8001935
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7s6s",
+    "weight": 1.0,
+    "ev": 3.8145375
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7s7c",
+    "weight": 1.0,
+    "ev": 12.495981
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "7s7d",
+    "weight": 1.0,
+    "ev": 12.486419
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8c6c",
+    "weight": 1.0,
+    "ev": 1.7188847
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8c7c",
+    "weight": 1.0,
+    "ev": 3.520008
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8d6d",
+    "weight": 1.0,
+    "ev": 2.0177171
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8d7d",
+    "weight": 1.0,
+    "ev": 3.878129
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8d8c",
+    "weight": 1.0,
+    "ev": 3.6295004
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8h6h",
+    "weight": 1.0,
+    "ev": 2.052621
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8h8c",
+    "weight": 1.0,
+    "ev": 3.6390631
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8h8d",
+    "weight": 1.0,
+    "ev": 3.6854417
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8s6s",
+    "weight": 1.0,
+    "ev": 2.0416238
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8s7s",
+    "weight": 1.0,
+    "ev": 3.8939073
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8s8c",
+    "weight": 1.0,
+    "ev": 3.620416
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8s8d",
+    "weight": 1.0,
+    "ev": 3.6658385
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "8s8h",
+    "weight": 1.0,
+    "ev": 3.6763573
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9c7c",
+    "weight": 1.0,
+    "ev": 3.5166612
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9c8c",
+    "weight": 1.0,
+    "ev": 1.7580916
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9d7d",
+    "weight": 1.0,
+    "ev": 3.8900824
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9d8d",
+    "weight": 1.0,
+    "ev": 2.1080842
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9d9c",
+    "weight": 1.0,
+    "ev": 3.8150156
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9h8h",
+    "weight": 1.0,
+    "ev": 2.1372502
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9h9c",
+    "weight": 1.0,
+    "ev": 3.8284032
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9h9d",
+    "weight": 1.0,
+    "ev": 3.8680882
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9s7s",
+    "weight": 1.0,
+    "ev": 3.90347
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9s8s",
+    "weight": 1.0,
+    "ev": 2.161157
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9s9c",
+    "weight": 1.0,
+    "ev": 3.7997153
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9s9d",
+    "weight": 1.0,
+    "ev": 3.8398786
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "9s9h",
+    "weight": 1.0,
+    "ev": 3.8537443
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc7c",
+    "weight": 1.0,
+    "ev": 3.5276582
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc8c",
+    "weight": 1.0,
+    "ev": 1.6533806
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc9c",
+    "weight": 1.0,
+    "ev": 1.65864
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc9d",
+    "weight": 1.0,
+    "ev": 1.7026283
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc9h",
+    "weight": 1.0,
+    "ev": 1.6973687
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Tc9s",
+    "weight": 1.0,
+    "ev": 1.7059752
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td7d",
+    "weight": 1.0,
+    "ev": 3.918292
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td8d",
+    "weight": 1.0,
+    "ev": 1.9541256
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td9c",
+    "weight": 1.0,
+    "ev": 1.6930655
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td9d",
+    "weight": 1.0,
+    "ev": 2.0703118
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td9h",
+    "weight": 1.0,
+    "ev": 1.7404007
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Td9s",
+    "weight": 1.0,
+    "ev": 1.7494851
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "TdTc",
+    "weight": 1.0,
+    "ev": 3.9823618
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Th8h",
+    "weight": 1.0,
+    "ev": 1.9708602
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Th9c",
+    "weight": 1.0,
+    "ev": 1.687328
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Th9d",
+    "weight": 1.0,
+    "ev": 1.7394444
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Th9h",
+    "weight": 1.0,
+    "ev": 2.0908713
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Th9s",
+    "weight": 1.0,
+    "ev": 1.7423131
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "ThTc",
+    "weight": 1.0,
+    "ev": 3.9938369
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "ThTd",
+    "weight": 1.0,
+    "ev": 4.0220466
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts7s",
+    "weight": 1.0,
+    "ev": 3.9316797
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts8s",
+    "weight": 1.0,
+    "ev": 2.0052857
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts9c",
+    "weight": 1.0,
+    "ev": 1.6921093
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts9d",
+    "weight": 1.0,
+    "ev": 1.7461382
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts9h",
+    "weight": 1.0,
+    "ev": 1.7399225
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ts9s",
+    "weight": 1.0,
+    "ev": 2.1377285
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "TsTc",
+    "weight": 1.0,
+    "ev": 3.968974
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "TsTd",
+    "weight": 1.0,
+    "ev": 3.99814
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "TsTh",
+    "weight": 1.0,
+    "ev": 4.008659
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc7c",
+    "weight": 1.0,
+    "ev": 3.5802526
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc8c",
+    "weight": 1.0,
+    "ev": 1.604133
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc9c",
+    "weight": 1.0,
+    "ev": 1.6007861
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc9d",
+    "weight": 1.0,
+    "ev": 1.6572057
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc9h",
+    "weight": 1.0,
+    "ev": 1.6505119
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jc9s",
+    "weight": 1.0,
+    "ev": 1.6605526
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JcTc",
+    "weight": 1.0,
+    "ev": 1.7217535
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JcTd",
+    "weight": 1.0,
+    "ev": 1.7571353
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JcTh",
+    "weight": 1.0,
+    "ev": 1.7509196
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JcTs",
+    "weight": 1.0,
+    "ev": 1.756179
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd7d",
+    "weight": 1.0,
+    "ev": 3.9780586
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd8d",
+    "weight": 1.0,
+    "ev": 1.8761902
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd9c",
+    "weight": 1.0,
+    "ev": 1.636646
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd9d",
+    "weight": 1.0,
+    "ev": 1.9598633
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd9h",
+    "weight": 1.0,
+    "ev": 1.6858935
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jd9s",
+    "weight": 1.0,
+    "ev": 1.6959344
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JdTc",
+    "weight": 1.0,
+    "ev": 1.7504414
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JdTd",
+    "weight": 1.0,
+    "ev": 2.1396408
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JdTh",
+    "weight": 1.0,
+    "ev": 1.7819982
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JdTs",
+    "weight": 1.0,
+    "ev": 1.788692
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JdJc",
+    "weight": 1.0,
+    "ev": 4.1128917
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jh8h",
+    "weight": 1.0,
+    "ev": 1.8742776
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jh9c",
+    "weight": 1.0,
+    "ev": 1.6304302
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jh9d",
+    "weight": 1.0,
+    "ev": 1.6863717
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jh9h",
+    "weight": 1.0,
+    "ev": 1.9713384
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Jh9s",
+    "weight": 1.0,
+    "ev": 1.6892406
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhTc",
+    "weight": 1.0,
+    "ev": 1.7461382
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhTd",
+    "weight": 1.0,
+    "ev": 1.7824763
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhTh",
+    "weight": 1.0,
+    "ev": 2.1487255
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhTs",
+    "weight": 1.0,
+    "ev": 1.7824763
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhJc",
+    "weight": 1.0,
+    "ev": 4.1229324
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JhJd",
+    "weight": 1.0,
+    "ev": 4.145405
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js7s",
+    "weight": 1.0,
+    "ev": 3.9924026
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js8s",
+    "weight": 1.0,
+    "ev": 1.9149189
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js9c",
+    "weight": 1.0,
+    "ev": 1.636646
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js9d",
+    "weight": 1.0,
+    "ev": 1.6930655
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js9h",
+    "weight": 1.0,
+    "ev": 1.6863717
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Js9s",
+    "weight": 1.0,
+    "ev": 2.0272799
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsTc",
+    "weight": 1.0,
+    "ev": 1.749007
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsTd",
+    "weight": 1.0,
+    "ev": 1.7891701
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsTh",
+    "weight": 1.0,
+    "ev": 1.7819982
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsTs",
+    "weight": 1.0,
+    "ev": 2.20897
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsJc",
+    "weight": 1.0,
+    "ev": 4.098548
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsJd",
+    "weight": 1.0,
+    "ev": 4.1210203
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "JsJh",
+    "weight": 1.0,
+    "ev": 4.1301045
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc5c",
+    "weight": 1.0,
+    "ev": 1.4659529
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc6c",
+    "weight": 1.0,
+    "ev": 1.462606
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc7c",
+    "weight": 1.0,
+    "ev": 3.617069
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc8c",
+    "weight": 1.0,
+    "ev": 1.517113
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc9c",
+    "weight": 1.0,
+    "ev": 1.5266756
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc9d",
+    "weight": 1.0,
+    "ev": 1.5821389
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc9h",
+    "weight": 1.0,
+    "ev": 1.5744889
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qc9s",
+    "weight": 1.0,
+    "ev": 1.5869203
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcTc",
+    "weight": 1.0,
+    "ev": 1.6332991
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcTd",
+    "weight": 1.0,
+    "ev": 1.6772872
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcTh",
+    "weight": 1.0,
+    "ev": 1.6686808
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcTs",
+    "weight": 1.0,
+    "ev": 1.6777654
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcJc",
+    "weight": 1.0,
+    "ev": 1.6777654
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcJd",
+    "weight": 1.0,
+    "ev": 1.7131472
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcJh",
+    "weight": 1.0,
+    "ev": 1.705497
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QcJs",
+    "weight": 1.0,
+    "ev": 1.7145815
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd5d",
+    "weight": 1.0,
+    "ev": 1.7437476
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd6d",
+    "weight": 1.0,
+    "ev": 1.741357
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd7d",
+    "weight": 1.0,
+    "ev": 4.027306
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd8d",
+    "weight": 1.0,
+    "ev": 1.8006452
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd9c",
+    "weight": 1.0,
+    "ev": 1.5544072
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd9d",
+    "weight": 1.0,
+    "ev": 1.8408084
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd9h",
+    "weight": 1.0,
+    "ev": 1.6022205
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qd9s",
+    "weight": 1.0,
+    "ev": 1.6141738
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdTc",
+    "weight": 1.0,
+    "ev": 1.6595963
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdTd",
+    "weight": 1.0,
+    "ev": 2.0272799
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdTh",
+    "weight": 1.0,
+    "ev": 1.6940218
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdTs",
+    "weight": 1.0,
+    "ev": 1.7021501
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdJc",
+    "weight": 1.0,
+    "ev": 1.701672
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdJd",
+    "weight": 1.0,
+    "ev": 2.0822651
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdJh",
+    "weight": 1.0,
+    "ev": 1.7294036
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdJs",
+    "weight": 1.0,
+    "ev": 1.7380099
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QdQc",
+    "weight": 1.0,
+    "ev": 4.212343
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh5h",
+    "weight": 1.0,
+    "ev": 1.7384881
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh6h",
+    "weight": 1.0,
+    "ev": 1.734663
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh8h",
+    "weight": 1.0,
+    "ev": 1.7968203
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh9c",
+    "weight": 1.0,
+    "ev": 1.5486697
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh9d",
+    "weight": 1.0,
+    "ev": 1.6031767
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh9h",
+    "weight": 1.0,
+    "ev": 1.8436772
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qh9s",
+    "weight": 1.0,
+    "ev": 1.6074799
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhTc",
+    "weight": 1.0,
+    "ev": 1.6543369
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhTd",
+    "weight": 1.0,
+    "ev": 1.6968906
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhTh",
+    "weight": 1.0,
+    "ev": 2.0272799
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhTs",
+    "weight": 1.0,
+    "ev": 1.6968906
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhJc",
+    "weight": 1.0,
+    "ev": 1.6949781
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhJd",
+    "weight": 1.0,
+    "ev": 1.7303599
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhJh",
+    "weight": 1.0,
+    "ev": 2.0803525
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhJs",
+    "weight": 1.0,
+    "ev": 1.7313161
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhQc",
+    "weight": 1.0,
+    "ev": 4.2204714
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QhQd",
+    "weight": 1.0,
+    "ev": 4.242944
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs5s",
+    "weight": 1.0,
+    "ev": 1.7810419
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs6s",
+    "weight": 1.0,
+    "ev": 1.777695
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs7s",
+    "weight": 1.0,
+    "ev": 4.076554
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs8s",
+    "weight": 1.0,
+    "ev": 1.8613681
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs9c",
+    "weight": 1.0,
+    "ev": 1.5744889
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs9d",
+    "weight": 1.0,
+    "ev": 1.629474
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs9h",
+    "weight": 1.0,
+    "ev": 1.622302
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Qs9s",
+    "weight": 1.0,
+    "ev": 1.9469537
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsTc",
+    "weight": 1.0,
+    "ev": 1.6782435
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsTd",
+    "weight": 1.0,
+    "ev": 1.7212753
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsTh",
+    "weight": 1.0,
+    "ev": 1.7131472
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsTs",
+    "weight": 1.0,
+    "ev": 2.1315126
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsJc",
+    "weight": 1.0,
+    "ev": 1.719841
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsJd",
+    "weight": 1.0,
+    "ev": 1.7557008
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsJh",
+    "weight": 1.0,
+    "ev": 1.7485288
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsJs",
+    "weight": 1.0,
+    "ev": 2.1850634
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsQc",
+    "weight": 1.0,
+    "ev": 4.225253
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsQd",
+    "weight": 1.0,
+    "ev": 4.2472467
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "QsQh",
+    "weight": 1.0,
+    "ev": 4.255853
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc2c",
+    "weight": 1.0,
+    "ev": 7.842322
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc3c",
+    "weight": 1.0,
+    "ev": 4.917588
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc4c",
+    "weight": 1.0,
+    "ev": 4.946276
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc5c",
+    "weight": 1.0,
+    "ev": 4.9663577
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc6c",
+    "weight": 1.0,
+    "ev": 4.9979143
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc7c",
+    "weight": 1.0,
+    "ev": 8.692441
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc8c",
+    "weight": 1.0,
+    "ev": 5.2527585
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc9c",
+    "weight": 1.0,
+    "ev": 5.47509
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc9d",
+    "weight": 1.0,
+    "ev": 5.456443
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc9h",
+    "weight": 1.0,
+    "ev": 5.467918
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kc9s",
+    "weight": 1.0,
+    "ev": 5.449749
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcTc",
+    "weight": 1.0,
+    "ev": 5.8246045
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcTd",
+    "weight": 1.0,
+    "ev": 5.8269954
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcTh",
+    "weight": 1.0,
+    "ev": 5.840383
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcTs",
+    "weight": 1.0,
+    "ev": 5.821736
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcJc",
+    "weight": 1.0,
+    "ev": 6.2530107
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcJd",
+    "weight": 1.0,
+    "ev": 6.260661
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcJh",
+    "weight": 1.0,
+    "ev": 6.272136
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcJs",
+    "weight": 1.0,
+    "ev": 6.254445
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQc",
+    "weight": 1.0,
+    "ev": 6.840157
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQd",
+    "weight": 1.0,
+    "ev": 6.839679
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQh",
+    "weight": 1.0,
+    "ev": 6.8525887
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KcQs",
+    "weight": 1.0,
+    "ev": 6.839679
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd3d",
+    "weight": 1.0,
+    "ev": 5.2780995
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd4d",
+    "weight": 1.0,
+    "ev": 5.2919655
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd5d",
+    "weight": 1.0,
+    "ev": 5.2986593
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd6d",
+    "weight": 1.0,
+    "ev": 5.3316503
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd7d",
+    "weight": 1.0,
+    "ev": 8.959717
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd8d",
+    "weight": 1.0,
+    "ev": 5.561632
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd9c",
+    "weight": 1.0,
+    "ev": 5.4985185
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd9d",
+    "weight": 1.0,
+    "ev": 5.769141
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd9h",
+    "weight": 1.0,
+    "ev": 5.489912
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kd9s",
+    "weight": 1.0,
+    "ev": 5.471743
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdTc",
+    "weight": 1.0,
+    "ev": 5.8475547
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdTd",
+    "weight": 1.0,
+    "ev": 6.1325216
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdTh",
+    "weight": 1.0,
+    "ev": 5.861899
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdTs",
+    "weight": 1.0,
+    "ev": 5.84373
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdJc",
+    "weight": 1.0,
+    "ev": 6.279786
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdJd",
+    "weight": 1.0,
+    "ev": 6.5590153
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdJh",
+    "weight": 1.0,
+    "ev": 6.2974772
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdJs",
+    "weight": 1.0,
+    "ev": 6.2802644
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQc",
+    "weight": 1.0,
+    "ev": 6.850676
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQd",
+    "weight": 1.0,
+    "ev": 7.1356425
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQh",
+    "weight": 1.0,
+    "ev": 6.8750606
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdQs",
+    "weight": 1.0,
+    "ev": 6.861673
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KdKc",
+    "weight": 1.0,
+    "ev": 11.817989
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh2h",
+    "weight": 1.0,
+    "ev": 8.0072775
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh3h",
+    "weight": 1.0,
+    "ev": 5.2312427
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh4h",
+    "weight": 1.0,
+    "ev": 5.2565837
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh5h",
+    "weight": 1.0,
+    "ev": 5.2704496
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh6h",
+    "weight": 1.0,
+    "ev": 5.3029623
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh8h",
+    "weight": 1.0,
+    "ev": 5.557807
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh9c",
+    "weight": 1.0,
+    "ev": 5.488956
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh9d",
+    "weight": 1.0,
+    "ev": 5.4688745
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh9h",
+    "weight": 1.0,
+    "ev": 5.7624474
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Kh9s",
+    "weight": 1.0,
+    "ev": 5.4631367
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhTc",
+    "weight": 1.0,
+    "ev": 5.837514
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhTd",
+    "weight": 1.0,
+    "ev": 5.8389487
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhTh",
+    "weight": 1.0,
+    "ev": 6.1248717
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhTs",
+    "weight": 1.0,
+    "ev": 5.834167
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhJc",
+    "weight": 1.0,
+    "ev": 6.2692676
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhJd",
+    "weight": 1.0,
+    "ev": 6.276439
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhJh",
+    "weight": 1.0,
+    "ev": 6.5456276
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhJs",
+    "weight": 1.0,
+    "ev": 6.2702236
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQc",
+    "weight": 1.0,
+    "ev": 6.840157
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQd",
+    "weight": 1.0,
+    "ev": 6.851632
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQh",
+    "weight": 1.0,
+    "ev": 7.121299
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhQs",
+    "weight": 1.0,
+    "ev": 6.851154
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhKc",
+    "weight": 1.0,
+    "ev": 11.878235
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "KhKd",
+    "weight": 1.0,
+    "ev": 11.990117
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac2c",
+    "weight": 1.0,
+    "ev": 2.9840221
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac3c",
+    "weight": 1.0,
+    "ev": 1.6246927
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac4c",
+    "weight": 1.0,
+    "ev": 1.6208676
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac5c",
+    "weight": 1.0,
+    "ev": 1.6046112
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac5d",
+    "weight": 1.0,
+    "ev": 1.6605526
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac5h",
+    "weight": 1.0,
+    "ev": 1.6605526
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac5s",
+    "weight": 1.0,
+    "ev": 1.65864
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac6c",
+    "weight": 1.0,
+    "ev": 1.5233287
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac6d",
+    "weight": 1.0,
+    "ev": 1.5759232
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac6h",
+    "weight": 1.0,
+    "ev": 1.5768795
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac6s",
+    "weight": 1.0,
+    "ev": 1.5744889
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac7c",
+    "weight": 1.0,
+    "ev": 3.9880993
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac7d",
+    "weight": 1.0,
+    "ev": 4.0349565
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac7s",
+    "weight": 1.0,
+    "ev": 4.0005307
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac8c",
+    "weight": 1.0,
+    "ev": 1.6036549
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac8d",
+    "weight": 1.0,
+    "ev": 1.6600745
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac8h",
+    "weight": 1.0,
+    "ev": 1.6552931
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac8s",
+    "weight": 1.0,
+    "ev": 1.6686808
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac9c",
+    "weight": 1.0,
+    "ev": 1.6667683
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac9d",
+    "weight": 1.0,
+    "ev": 1.7107564
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac9h",
+    "weight": 1.0,
+    "ev": 1.7050189
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ac9s",
+    "weight": 1.0,
+    "ev": 1.7121909
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcTc",
+    "weight": 1.0,
+    "ev": 1.9249597
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcTd",
+    "weight": 1.0,
+    "ev": 1.9641664
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcTh",
+    "weight": 1.0,
+    "ev": 1.9531695
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcTs",
+    "weight": 1.0,
+    "ev": 1.9617758
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcJc",
+    "weight": 1.0,
+    "ev": 2.1697633
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcJd",
+    "weight": 1.0,
+    "ev": 2.2041888
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcJh",
+    "weight": 1.0,
+    "ev": 2.1931918
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcJs",
+    "weight": 1.0,
+    "ev": 2.2037106
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcQc",
+    "weight": 1.0,
+    "ev": 2.2534363
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcQd",
+    "weight": 1.0,
+    "ev": 2.2768648
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcQh",
+    "weight": 1.0,
+    "ev": 2.2625208
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcQs",
+    "weight": 1.0,
+    "ev": 2.29599
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcKc",
+    "weight": 1.0,
+    "ev": 7.666847
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcKd",
+    "weight": 1.0,
+    "ev": 7.6788006
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AcKh",
+    "weight": 1.0,
+    "ev": 7.6649346
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad3d",
+    "weight": 1.0,
+    "ev": 2.0693555
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad4d",
+    "weight": 1.0,
+    "ev": 2.0789182
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad5c",
+    "weight": 1.0,
+    "ev": 1.6940218
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad5d",
+    "weight": 1.0,
+    "ev": 2.0765274
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad5h",
+    "weight": 1.0,
+    "ev": 1.7494851
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad5s",
+    "weight": 1.0,
+    "ev": 1.7475727
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad6c",
+    "weight": 1.0,
+    "ev": 1.6132175
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad6d",
+    "weight": 1.0,
+    "ev": 1.9216127
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad6h",
+    "weight": 1.0,
+    "ev": 1.6638995
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad6s",
+    "weight": 1.0,
+    "ev": 1.6615089
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad7c",
+    "weight": 1.0,
+    "ev": 3.9947932
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad7d",
+    "weight": 1.0,
+    "ev": 4.4518876
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad7s",
+    "weight": 1.0,
+    "ev": 4.006747
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad8c",
+    "weight": 1.0,
+    "ev": 1.6897186
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad8d",
+    "weight": 1.0,
+    "ev": 2.0937402
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad8h",
+    "weight": 1.0,
+    "ev": 1.7408788
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad8s",
+    "weight": 1.0,
+    "ev": 1.7537884
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad9c",
+    "weight": 1.0,
+    "ev": 1.734185
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad9d",
+    "weight": 1.0,
+    "ev": 2.1568537
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad9h",
+    "weight": 1.0,
+    "ev": 1.774348
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ad9s",
+    "weight": 1.0,
+    "ev": 1.7824763
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdTc",
+    "weight": 1.0,
+    "ev": 1.9675133
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdTd",
+    "weight": 1.0,
+    "ev": 2.4255638
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdTh",
+    "weight": 1.0,
+    "ev": 1.9995482
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdTs",
+    "weight": 1.0,
+    "ev": 2.0081546
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdJc",
+    "weight": 1.0,
+    "ev": 2.2099264
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdJd",
+    "weight": 1.0,
+    "ev": 2.657936
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdJh",
+    "weight": 1.0,
+    "ev": 2.2323985
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdJs",
+    "weight": 1.0,
+    "ev": 2.2424393
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdQc",
+    "weight": 1.0,
+    "ev": 2.2907307
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdQd",
+    "weight": 1.0,
+    "ev": 2.7439997
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdQh",
+    "weight": 1.0,
+    "ev": 2.3012495
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdQs",
+    "weight": 1.0,
+    "ev": 2.33185
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdKc",
+    "weight": 1.0,
+    "ev": 7.622859
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdKd",
+    "weight": 1.0,
+    "ev": 7.912607
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdKh",
+    "weight": 1.0,
+    "ev": 7.6233373
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AdAc",
+    "weight": 1.0,
+    "ev": 8.037399
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah2h",
+    "weight": 1.0,
+    "ev": 3.4841483
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah3h",
+    "weight": 1.0,
+    "ev": 2.0703118
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah4h",
+    "weight": 1.0,
+    "ev": 2.0793962
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah5c",
+    "weight": 1.0,
+    "ev": 1.6930655
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah5d",
+    "weight": 1.0,
+    "ev": 1.7494851
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah5h",
+    "weight": 1.0,
+    "ev": 2.077962
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah5s",
+    "weight": 1.0,
+    "ev": 1.7470945
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah6c",
+    "weight": 1.0,
+    "ev": 1.6122613
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah6d",
+    "weight": 1.0,
+    "ev": 1.6634214
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah6h",
+    "weight": 1.0,
+    "ev": 1.9244815
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah6s",
+    "weight": 1.0,
+    "ev": 1.6605526
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah7c",
+    "weight": 1.0,
+    "ev": 3.9780586
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah7d",
+    "weight": 1.0,
+    "ev": 4.022525
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah7s",
+    "weight": 1.0,
+    "ev": 3.9914463
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah8c",
+    "weight": 1.0,
+    "ev": 1.6882843
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah8d",
+    "weight": 1.0,
+    "ev": 1.7447039
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah8h",
+    "weight": 1.0,
+    "ev": 2.092784
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah8s",
+    "weight": 1.0,
+    "ev": 1.7537884
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah9c",
+    "weight": 1.0,
+    "ev": 1.7303599
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah9d",
+    "weight": 1.0,
+    "ev": 1.7767386
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah9h",
+    "weight": 1.0,
+    "ev": 2.1587663
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "Ah9s",
+    "weight": 1.0,
+    "ev": 1.7786512
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhTc",
+    "weight": 1.0,
+    "ev": 1.9622539
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhTd",
+    "weight": 1.0,
+    "ev": 2.0038514
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhTh",
+    "weight": 1.0,
+    "ev": 2.4231732
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhTs",
+    "weight": 1.0,
+    "ev": 2.002895
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhJc",
+    "weight": 1.0,
+    "ev": 2.201798
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhJd",
+    "weight": 1.0,
+    "ev": 2.2352674
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhJh",
+    "weight": 1.0,
+    "ev": 2.6526766
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhJs",
+    "weight": 1.0,
+    "ev": 2.2352674
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhQc",
+    "weight": 1.0,
+    "ev": 2.2797337
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhQd",
+    "weight": 1.0,
+    "ev": 2.3036401
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhQh",
+    "weight": 1.0,
+    "ev": 2.7349153
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhQs",
+    "weight": 1.0,
+    "ev": 2.321331
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhKc",
+    "weight": 1.0,
+    "ev": 7.6204686
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhKd",
+    "weight": 1.0,
+    "ev": 7.6343346
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhKh",
+    "weight": 1.0,
+    "ev": 7.8705316
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhAc",
+    "weight": 1.0,
+    "ev": 8.035487
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AhAd",
+    "weight": 1.0,
+    "ev": 7.994846
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As2s",
+    "weight": 1.0,
+    "ev": 3.4611979
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As3s",
+    "weight": 1.0,
+    "ev": 2.08609
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As4s",
+    "weight": 1.0,
+    "ev": 2.088959
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As5c",
+    "weight": 1.0,
+    "ev": 1.6954563
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As5d",
+    "weight": 1.0,
+    "ev": 1.7513977
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As5h",
+    "weight": 1.0,
+    "ev": 1.7509196
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As5s",
+    "weight": 1.0,
+    "ev": 2.08609
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As6c",
+    "weight": 1.0,
+    "ev": 1.6146519
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As6d",
+    "weight": 1.0,
+    "ev": 1.665812
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As6h",
+    "weight": 1.0,
+    "ev": 1.665812
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As6s",
+    "weight": 1.0,
+    "ev": 1.9378692
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As7c",
+    "weight": 1.0,
+    "ev": 3.9785368
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As7d",
+    "weight": 1.0,
+    "ev": 4.022525
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As7s",
+    "weight": 1.0,
+    "ev": 4.4447155
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As8c",
+    "weight": 1.0,
+    "ev": 1.6906749
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As8d",
+    "weight": 1.0,
+    "ev": 1.7461382
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As8h",
+    "weight": 1.0,
+    "ev": 1.7408788
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As8s",
+    "weight": 1.0,
+    "ev": 2.1157343
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As9c",
+    "weight": 1.0,
+    "ev": 1.7317942
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As9d",
+    "weight": 1.0,
+    "ev": 1.7781731
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As9h",
+    "weight": 1.0,
+    "ev": 1.7719574
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "As9s",
+    "weight": 1.0,
+    "ev": 2.1874542
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsTc",
+    "weight": 1.0,
+    "ev": 1.9636883
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsTd",
+    "weight": 1.0,
+    "ev": 2.005764
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsTh",
+    "weight": 1.0,
+    "ev": 1.9962013
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsTs",
+    "weight": 1.0,
+    "ev": 2.4532955
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsJc",
+    "weight": 1.0,
+    "ev": 2.2037106
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsJd",
+    "weight": 1.0,
+    "ev": 2.237658
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsJh",
+    "weight": 1.0,
+    "ev": 2.227139
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsJs",
+    "weight": 1.0,
+    "ev": 2.6832771
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsQc",
+    "weight": 1.0,
+    "ev": 2.2826023
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsQd",
+    "weight": 1.0,
+    "ev": 2.3055527
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsQh",
+    "weight": 1.0,
+    "ev": 2.292165
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsQs",
+    "weight": 1.0,
+    "ev": 2.7822504
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsKc",
+    "weight": 1.0,
+    "ev": 7.610428
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsKd",
+    "weight": 1.0,
+    "ev": 7.6238155
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsKh",
+    "weight": 1.0,
+    "ev": 7.610906
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsAc",
+    "weight": 1.0,
+    "ev": 8.031184
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsAd",
+    "weight": 1.0,
+    "ev": 7.9891086
+  },
+  {
+    "history": "",
+    "seat": "ip",
+    "combo": "AsAh",
+    "weight": 1.0,
+    "ev": 7.9862394
+  }
+]

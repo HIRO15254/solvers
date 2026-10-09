@@ -21,7 +21,22 @@ mod batch;
 /// into deal weights and the game normalizer at build time.
 pub trait TerminalEvaluator: Send + Sync {
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]);
-    /// CFR-only terminal hook; evaluation and saved EVs always call `eval`.
+    /// Exact terminal batch: zero-initialized outputs must match `eval` bit
+    /// for bit, independently of batch membership and lane position.
+    fn eval_batch(
+        &self,
+        terminals: &[u32],
+        p: Player,
+        opp_reaches: &[&[f32]],
+        outs: &mut [&mut [f32]],
+    ) {
+        assert_eq!(terminals.len(), opp_reaches.len());
+        assert_eq!(terminals.len(), outs.len());
+        for ((&terminal, &reach), out) in terminals.iter().zip(opp_reaches).zip(outs) {
+            self.eval(terminal, p, reach, out);
+        }
+    }
+    /// CFR-only terminal hook; exact evaluation uses `eval`/`eval_batch`.
     fn eval_cfr(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval(terminal, p, opp_reach, out);
     }
@@ -1257,6 +1272,15 @@ fn value_pass<
     let node = *ctx.tree.node(node_id);
     let dim = if EV { ev.len() } else { br.len() };
     let channels = EV as usize + BR as usize;
+    if !RECORD
+        && dim != 0
+        && node.kind == NodeKind::Action
+        && !ctx.tree.subtree_has_chance[node_id as usize]
+        && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
+    {
+        batch::values::<_, _, EV, BR>(ctx, scratch, node_id, opp_reach, ev, br);
+        return;
+    }
     match node.kind {
         NodeKind::Terminal => {
             if EV {

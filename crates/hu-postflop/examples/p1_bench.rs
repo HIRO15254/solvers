@@ -139,7 +139,7 @@ mod tests {
             let document = spot::Document::parse(&effective, path).unwrap();
             let settings =
                 Settings::parse(&document.spot, &document.solver, &document.output).unwrap();
-            assert_eq!(settings.solver.storage, storage);
+            assert_eq!(settings.solver.storage, storage.into());
             let Algorithm::Dcfr { pow4_reset, .. } = settings.solver.algorithm else {
                 panic!("expected dcfr");
             };

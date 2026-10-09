@@ -1,0 +1,49 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB c"
+board = "Ks 7h 2d"
+
+[ranges]
+BTN = "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o"
+BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o"
+
+[tree]
+script = '''
+flop {
+  when donk { remove bet }
+  replace bet [33, 75]
+  replace raise [50]
+  when aggressions >= 2 { replace raise [a] }
+}
+turn {
+  replace bet [50]
+  when cbet { replace bet [75] }
+  when donk { replace bet [33] }
+  replace raise [a]
+  when spr > 3 { replace raise [50] }
+}
+river {
+  replace bet [50, a]
+  when in_position { replace bet [75, a] }
+  replace raise [a]
+}
+'''
+allin_threshold = 0.67
+
+[solver.stop]
+target = "0.1%pot"
+
+[run]
+final_checkpoint = false

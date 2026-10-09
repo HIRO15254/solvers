@@ -1,0 +1,45 @@
+    Blocking waiting for file lock on build directory
+   Compiling hu-engine v0.1.0 (C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\crates\hu-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.30s
+     Running unittests src\lib.rs (target\debug\deps\hu_engine-593845973a910582.exe)
+
+running 36 tests
+test reach::tests::reach_at_through_transition_deal_matches_apply_forward ... ok
+test schedule::tests::cfr_plus_is_linear_weighting ... ok
+test reach::tests::reach_at_through_mask_deal_zeroes_masked_entries_for_both_players ... ok
+test reach::tests::reach_at_through_one_action_node_scales_acting_player_only ... ok
+test reach::tests::parent_array_and_path_on_two_level_tree ... ok
+test solver::dead_subtree_tests::nonzero_subnormal_opponent_reach_is_evaluated ... ok
+test reach::tests::reach_at_root_is_root_ranges ... ok
+test schedule::tests::power_of_4_reset ... ok
+test reach::tests::pair_subtrees_extra_child_errs_with_useful_message ... ok
+test reach::tests::pair_subtrees_identical_trees_pair_fully ... ok
+test schedule::tests::dcfr_default_parameters ... ok
+test schedule::tests::hs_dcfr_needs_budget ... ok
+test solver::loop_tests::all_zero_matches_the_scalar_test ... ok
+test storage::precision_tests::f32_normalization_all_backends_and_views ... ok
+test storage::tests::i16_scale_all_scales_dequantized_values ... ok
+test storage::tests::i16_state_round_trip ... ok
+test storage::tests::i16_fused_updates_preserve_discount_floor_reset_and_headroom ... ok
+test storage::release_tests::release_returns_all_regret_capacity_including_empty_storage ... ok
+test storage::tests::bytes_for_i16_smaller_than_f32 ... ok
+test storage::tests::f32_scale_all_scales_arrays ... ok
+test storage::tests::i16_bounded_conversion_handles_extreme_and_nonfinite_blocks ... ok
+test solver::loop_tests::mul_into_matches_indexed_products ... ok
+test storage::tests::i16_quantization_round_trips_approximately ... ok
+test solver::batch::tests::river_and_turn_values_and_updates_match_recursive_with_and_without_prune ... ok
+test storage::tests::i16_view_split_matches_direct_ops ... ok
+test storage::tests::prefault_keeps_arena_zero ... ok
+test solver::dead_subtree_tests::zero_opponent_pass_keeps_parallel_updates ... ok
+test storage::tests::view_split_matches_direct_ops ... ok
+test storage::tests::i16_zero_blocks_and_subnormal_quantization ... ok
+test storage::tests::mixed_view_split_matches_direct_ops ... ok
+test tree::tests::spans_tile_across_chance_subtree ... ok
+test storage::tests::mixed_ops_match_i16_regrets_and_f32_sums_bitwise ... ok
+test solver::sibling_tests::sibling_rows_default_pruning_empty_dimensions_and_parallel_actions ... ok
+test solver::opponent_terminal_tests::opponent_terminal_batches_prune_zero_dimensions_and_action_parallelism ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_f32_matches_full_walk ... ok
+test solver::dead_subtree_tests::zero_opponent_subtree_i16_matches_full_walk ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 40.52s
+

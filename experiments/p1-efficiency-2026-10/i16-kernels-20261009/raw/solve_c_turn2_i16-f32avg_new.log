@@ -1,0 +1,29 @@
+tree: nodes=22107 terminals=14280 rank_tables=48 storage=15.6 MiB (f32) / 7.9 MiB (i16) / 11.8 MiB (i16-f32avg)
+memory estimate: 163.6 MiB (f32) / 159.7 MiB (i16) / 163.6 MiB (i16-f32avg)
+iter=      10 expl_p0=7.771e0 expl_p1=5.911e0 nash_conv=1.368e1
+iter=      20 expl_p0=4.013e0 expl_p1=2.934e0 nash_conv=6.947e0
+iter=      30 expl_p0=2.041e0 expl_p1=1.541e0 nash_conv=3.583e0
+iter=      40 expl_p0=1.210e0 expl_p1=1.003e0 nash_conv=2.213e0
+iter=      50 expl_p0=6.963e-1 expl_p1=6.031e-1 nash_conv=1.299e0
+iter=      60 expl_p0=4.548e-1 expl_p1=3.940e-1 nash_conv=8.488e-1
+iter=      70 expl_p0=3.242e-1 expl_p1=2.737e-1 nash_conv=5.979e-1
+iter=      80 expl_p0=2.501e-1 expl_p1=2.094e-1 nash_conv=4.595e-1
+iter=      90 expl_p0=2.002e-1 expl_p1=1.723e-1 nash_conv=3.724e-1
+iter=     100 expl_p0=1.958e-1 expl_p1=1.296e-1 nash_conv=3.255e-1
+iter=     110 expl_p0=1.441e-1 expl_p1=1.121e-1 nash_conv=2.562e-1
+iter=     120 expl_p0=1.300e-1 expl_p1=8.971e-2 nash_conv=2.197e-1
+iter=     130 expl_p0=1.140e-1 expl_p1=7.942e-2 nash_conv=1.934e-1
+iter=     140 expl_p0=1.055e-1 expl_p1=6.361e-2 nash_conv=1.691e-1
+iter=     150 expl_p0=7.933e-2 expl_p1=5.577e-2 nash_conv=1.351e-1
+iter=     160 expl_p0=7.174e-2 expl_p1=4.690e-2 nash_conv=1.186e-1
+iter=     170 expl_p0=6.337e-2 expl_p1=4.058e-2 nash_conv=1.039e-1
+iter=     180 expl_p0=5.126e-2 expl_p1=3.439e-2 nash_conv=8.565e-2
+iter=     190 expl_p0=4.647e-2 expl_p1=3.071e-2 nash_conv=7.717e-2
+iter=     200 expl_p0=4.306e-2 expl_p1=2.747e-2 nash_conv=7.053e-2
+iter=     210 expl_p0=3.958e-2 expl_p1=2.424e-2 nash_conv=6.382e-2
+iter=     220 expl_p0=3.552e-2 expl_p1=2.265e-2 nash_conv=5.817e-2
+iter=     230 expl_p0=3.178e-2 expl_p1=1.986e-2 nash_conv=5.164e-2
+iter=     240 expl_p0=2.832e-2 expl_p1=1.812e-2 nash_conv=4.644e-2
+iter=     250 expl_p0=2.577e-2 expl_p1=1.698e-2 nash_conv=4.275e-2
+done: iterations=250 wall=1.35s ev_p0=7.680999 ev_p1=12.799421 nash_conv=4.275e-2
+sol: wrote C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\runs\i16-kernels\f64-final\solve_c_turn2_i16-f32avg_new\solution.sol (5.30 MB, 7802 blocks, mode=Full)

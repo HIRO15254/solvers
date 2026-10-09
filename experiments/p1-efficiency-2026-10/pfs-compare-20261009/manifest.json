@@ -1,0 +1,14 @@
+{
+ "reproduction": "partial",
+ "sourceCommit": "c09c0af76d7b2cf999f1082644d8080441654dd6",
+ "pfsCommit": "9d1509fe",
+ "external": ".cache/pfs-bench (ignored; AGPL clone and harness not retained)",
+ "sha256": {
+  "configs/flop.toml": "e4a9c608c6aa1a991531d388591887d8cf8a3acc8271c072ed1721e2c4a15ca9",
+  "configs/river.toml": "295d250b788b826f421c5972473597caf2e2d7863787ee2d23b4a6dc064c48aa",
+  "configs/turn.toml": "88b7b1924b561993368174b5da826f784302313c70d644f0dc7e16311c4975e7",
+  "README.md": "0121dc3d53537a713b7cfa0755e39dc3c88c2fca86106623ca6a7c97cab2f2bd",
+  "report.en.md": "a456a8b3477cf34f87a52d623ce48ae9b5305f66ccebfa90f10a93a3ee28c739",
+  "results/summary.json": "d4324dc98d1828f56d93e4fda068d99af5ec13e287b696ae3c8525b55ed372bd"
+ }
+}

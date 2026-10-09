@@ -1,0 +1,35 @@
+00:27:43 BUILT
+00:30:57 bench rep 1
+00:34:11 bench rep 2
+00:34:40 solve flop1_f32_t32 old
+00:35:08 solve flop1_f32_t32 new
+00:35:42 solve flop1_i16_t32 old
+00:36:11 solve flop1_i16_t32 new
+00:40:55 solve gtowb_f32_t32 old
+00:45:37 solve gtowb_f32_t32 new
+00:46:09 solve flop1_f32_t16 old
+00:46:40 solve flop1_f32_t16 new
+00:47:20 solve flop1_i16_t16 old
+00:47:53 solve flop1_i16_t16 new
+00:53:18 solve gtowb_f32_t16 old
+00:58:38 solve gtowb_f32_t16 new
+01:05:29 solve gtowb_i16_t32 old
+01:11:04 solve gtowb_i16_t32 new
+01:11:04 ACCEPT_DONE
+01:11:06 template t3_t32
+01:11:30 template t2_t32
+01:11:46 template t1one_t32
+01:12:53 template srp_single_t32
+01:14:48 template srp_general_t32
+01:16:00 template gw_single_t32
+01:24:56 template t1s_t32
+01:31:22 template flop_srp_t32
+01:31:24 template t3_t16
+01:31:53 template t2_t16
+01:32:10 template t1one_t16
+01:33:25 template srp_single_t16
+01:35:36 template srp_general_t16
+01:36:58 template gw_single_t16
+01:43:08 template t1s_t16
+01:50:21 template flop_srp_t16
+01:50:22 ALL_DONE

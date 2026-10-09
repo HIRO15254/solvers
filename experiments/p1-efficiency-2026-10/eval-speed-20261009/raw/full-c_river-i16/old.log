@@ -1,0 +1,40 @@
+tree: nodes=99 terminals=65 rank_tables=1 storage=0.3 MiB (f32) / 0.2 MiB (i16) / 0.2 MiB (i16-f32avg)
+memory estimate: 24.5 MiB (f32) / 24.5 MiB (i16) / 24.5 MiB (i16-f32avg)
+iter=      10 expl_p0=1.171e0 expl_p1=9.314e-1 nash_conv=2.102e0
+iter=      20 expl_p0=1.171e0 expl_p1=7.698e-1 nash_conv=1.941e0
+iter=      30 expl_p0=4.473e-1 expl_p1=6.227e-1 nash_conv=1.070e0
+iter=      40 expl_p0=2.522e-1 expl_p1=3.819e-1 nash_conv=6.341e-1
+iter=      50 expl_p0=1.640e-1 expl_p1=1.581e-1 nash_conv=3.221e-1
+iter=      60 expl_p0=1.227e-1 expl_p1=9.797e-2 nash_conv=2.206e-1
+iter=      70 expl_p0=5.121e-1 expl_p1=2.349e-1 nash_conv=7.471e-1
+iter=      80 expl_p0=1.387e-1 expl_p1=1.006e-1 nash_conv=2.393e-1
+iter=      90 expl_p0=7.959e-2 expl_p1=6.381e-2 nash_conv=1.434e-1
+iter=     100 expl_p0=5.959e-2 expl_p1=6.083e-2 nash_conv=1.204e-1
+iter=     110 expl_p0=5.253e-2 expl_p1=3.999e-2 nash_conv=9.252e-2
+iter=     120 expl_p0=5.412e-2 expl_p1=3.737e-2 nash_conv=9.150e-2
+iter=     130 expl_p0=3.794e-2 expl_p1=2.939e-2 nash_conv=6.733e-2
+iter=     140 expl_p0=3.362e-2 expl_p1=2.640e-2 nash_conv=6.002e-2
+iter=     150 expl_p0=2.667e-2 expl_p1=2.626e-2 nash_conv=5.293e-2
+iter=     160 expl_p0=2.481e-2 expl_p1=2.123e-2 nash_conv=4.604e-2
+iter=     170 expl_p0=2.151e-2 expl_p1=1.901e-2 nash_conv=4.052e-2
+iter=     180 expl_p0=1.801e-2 expl_p1=1.723e-2 nash_conv=3.524e-2
+iter=     190 expl_p0=1.638e-2 expl_p1=1.570e-2 nash_conv=3.207e-2
+iter=     200 expl_p0=1.256e-2 expl_p1=1.407e-2 nash_conv=2.662e-2
+iter=     210 expl_p0=1.207e-2 expl_p1=1.267e-2 nash_conv=2.474e-2
+iter=     220 expl_p0=1.132e-2 expl_p1=1.156e-2 nash_conv=2.287e-2
+iter=     230 expl_p0=9.512e-3 expl_p1=1.162e-2 nash_conv=2.113e-2
+iter=     240 expl_p0=9.555e-3 expl_p1=1.026e-2 nash_conv=1.981e-2
+iter=     250 expl_p0=9.068e-3 expl_p1=1.032e-2 nash_conv=1.939e-2
+iter=     260 expl_p0=4.547e-2 expl_p1=4.535e-2 nash_conv=9.082e-2
+iter=     270 expl_p0=1.779e-2 expl_p1=1.717e-2 nash_conv=3.496e-2
+iter=     280 expl_p0=1.083e-2 expl_p1=1.446e-2 nash_conv=2.529e-2
+iter=     290 expl_p0=8.558e-3 expl_p1=9.011e-3 nash_conv=1.757e-2
+iter=     300 expl_p0=9.057e-3 expl_p1=7.409e-3 nash_conv=1.647e-2
+iter=     310 expl_p0=8.030e-3 expl_p1=7.979e-3 nash_conv=1.601e-2
+iter=     320 expl_p0=6.908e-3 expl_p1=6.760e-3 nash_conv=1.367e-2
+iter=     330 expl_p0=6.786e-3 expl_p1=6.179e-3 nash_conv=1.297e-2
+iter=     340 expl_p0=6.179e-3 expl_p1=6.661e-3 nash_conv=1.284e-2
+iter=     350 expl_p0=5.931e-3 expl_p1=5.444e-3 nash_conv=1.137e-2
+iter=     360 expl_p0=5.704e-3 expl_p1=4.950e-3 nash_conv=1.065e-2
+done: iterations=360 wall=0.25s ev_p0=1.936772 ev_p1=3.160602 nash_conv=1.065e-2
+sol: wrote C:\Users\PC_User\orca\workspaces\solvers\p1-eval-speed\runs\p1eff\full-c_river-i16-20261009-053320-old\solution.sol (41.5 KB, 34 blocks, mode=Full)

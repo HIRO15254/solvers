@@ -1,0 +1,54 @@
+{
+  "baseRevision": "c09c0af76d7b2cf999f1082644d8080441654dd6",
+  "branch": "p1-eval-speed",
+  "measuredDirty": true,
+  "patch": "scripts/measured.patch",
+  "patchSha256": "6ec860d2ef56bb1df7962af286b0bed0d39c8c9c668e7dc459d95a9d4f26349d",
+  "sourceSha256": {
+    "crates/hu-engine/src/solver.rs": "3f388943d898d62c8435f60903a2fc95d760b0176624d883521cbea4257ade5e",
+    "crates/hu-engine/src/solver/batch.rs": "5d2aa5ffb710222f892c74c90c23f58ed8b66918a95dcf1a52664437d0b54c4b",
+    "crates/hu-engine/src/solver/dead_subtree_tests.rs": "65725e6bca5243b744af43684861757d2ea5ad97a0a4ee05fd97749c2c50a302",
+    "crates/hu-postflop/src/kernel.rs": "3275edfa08d12ef438f0d25aab17636151ee831e9ba04d36044c8bf1a3756c15",
+    "crates/hu-postflop/src/postflop.rs": "b2f56e4f0b98431f1a04779b98f1f61ff040314fc1615db6f0676fcc6f2e8ce4",
+    "crates/hu-postflop/src/precision_tests.rs": "ea478c11f8584ab3f6c2acdacded569c564d32b965c0193fd9809f5106f7cba1",
+    "docs/architecture.md": "ddf8003ab1cdfb227d6b496387d014144785fe190b8c6ab2b905c6f07993d93e"
+  },
+  "configSha256": {
+    "c_flop1-f32-solve.toml": "1de25e7326a5be54f5a875334519277e9b177ee3f12264317650230fe58b3699",
+    "c_flop1.toml": "e69682626cf4c633a25103c803e81aca7461da38fe2e94476cb29ddf35e34fa8",
+    "c_river-i16-f32avg-solve.toml": "cf66e9d67c99075fd090d8435acfb9b99f764a9f69b402e56af508389fd5d77d",
+    "c_river-i16-solve.toml": "4b6264886cfbe3092bbeffb0bb5966c2c4f4aef7c73132e68e1efb8485be4723",
+    "c_river.toml": "82fb75ac42179e4a0b352186f65ade4efa1744d8a3f52e0b50a583757c9cad0b",
+    "c_turn2.toml": "35409c151ef28d44ebde81a7527fb815a013702498203ae83af5cc29acdfd3ea"
+  },
+  "binaries": {
+    "oldBench": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\eval-old\\release\\examples\\p1_bench.exe",
+      "sha256": "fe78c665976bf968d978eaa0013496da146f16bbde9bdb2b2480d568ea103dca",
+      "bytes": 2656256
+    },
+    "newBench": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\release\\examples\\p1_bench.exe",
+      "sha256": "3b5149d15003738bd9108d67326cbafab0df98806f804bd6191889a451d494d2",
+      "bytes": 2727424
+    },
+    "oldCli": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\eval-old\\release\\solvers.exe",
+      "sha256": "e2041bdd32f69b0dfdd889143d90da7bc895b78f69b794f53fa411a16c380ecb",
+      "bytes": 8032256
+    },
+    "newCli": {
+      "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\release\\solvers.exe",
+      "sha256": "8d60a86c94458aa0346aa6feec51bbf49aee13584b14da6aae3571fe4b052a14",
+      "bytes": 8152576
+    }
+  },
+  "rustc": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "python": "3.13.7",
+  "os": "Windows-11-10.0.26200-SP0",
+  "cpu": "Intel Core i7-10700KF, 8 cores / 16 logical processors",
+  "physicalRamKiB": 33471776,
+  "threads": 8,
+  "cargoBuildJobsNew": 1,
+  "buildFlags": "release, thin LTO, codegen-units=1, target-cpu=native"
+}

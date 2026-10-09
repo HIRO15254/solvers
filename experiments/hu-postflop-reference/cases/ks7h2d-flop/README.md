@@ -80,3 +80,37 @@ EV 変換: `GW_EV_bb = (ev_chips + pot/2)/100`(リバー検証で確立した式
 - 収束: 100 iter(nash_conv 0.23% pot)では戦略がほぼ未分化(50/50 だらけ)だった。
   マルチストリート比較は **0.05% pot 以下**まで締めるべき(400 iter / 4.5 分で到達)。
 - REPL のアクション指定は `go check` / `go 3c`(`go x` は不可)。ラインは `history: xx[3c]x` 形式。
+
+## 2026-10-09 再測定: 現行の木文法でGTOW Single Sizeの木に近づける（SOL-32、G2）
+
+[P1資源効率計画](../../../../docs/plans/p1-efficiency.jp.md)のG2。2026-07-09の比較では、configがstreet×playerの
+固定size 1本しか書けず、donk・stab・check-raise・3-betのsizeをGTOWと揃えられなかった。現行の`solvers.nlh/v1`は
+`donk`・`cbet`・`aggressions`の条件でnode文脈ごとにsizeを書けるので、上表のGTOWの実測sizeをそのまま写した。
+
+- config: [`gw-check-2026-10-09-Ks7h2d-flop-single.toml`](gw-check-2026-10-09-Ks7h2d-flop-single.toml)。
+  rangeは2026-07-09と同じGTOWの値（weight付き）、rakeなし。flopはBB donk 116%、BTN stab 33%、check-raise 33%、
+  3-bet 68%、4-bet 39%、以後all-in。turnは既定33%、donkの位置（前streetの攻撃者でない側が先に打つ）185%、cbetの位置67%、
+  raise 185%。riverはBB 33%、BTN 125%、raise 100%。GTOWで観測していない線は同じ役割の観測sizeを流用した。
+- 木: 985,178 node、f32 storage 3.96 GiB（memory見積り4.25 GB）。source `df321c73`（branch `p1-efficiency-2026-10`）、ローカルPC 12 thread。
+- solve: 387 iteration、NashConv 0.005352（NashConv/2 = 0.049% pot）、230.7秒。0.3 / 0.1 / 0.05% potへは
+  150 / 300 / 387 iteration（91 / 179 / 231秒、評価込み）で達した。progressは
+  [`gw-check-2026-10-09-progress.jsonl`](gw-check-2026-10-09-progress.jsonl)、[`gw-check-2026-10-09-run.json`](gw-check-2026-10-09-run.json)。
+- 照会: `solvers export solution.sol actions|strategy --node <履歴>`。handのclass集計はcomboのweight付き平均。
+
+| 指標 | GW | 2026-07-09 | 2026-10-09 |
+|---|---|---|---|
+| EV OOP / IP | 1.97 / 3.53 bb | 2.07 / 3.43 bb | **1.978 / 3.522 bb**（差0.15% pot） |
+| flop root（BB）: check | 100% | 96.5% | **100.0%** |
+| flop BTN（x後）: bet | 84.1% | 84.4% | 79.4% |
+| flop BTN per-hand KJs / 88 / QJs bet | 96 / 98 / 97% | 100 / 100 / 100% | 100 / 86 / 90% |
+| flop BTN QJsの混合 | 4 comboのうち1つだけ48.5% | QcJcだけ54.2% | QcJcだけ58.8% |
+| flop BB vs stab: check-raise額 | 4.8 bb | （33%で代用） | 4.828 bb |
+| turn BB（x-x 3c）: bet | 53.1% | 69.3% | **61.6%** |
+| turn BB per-hand KJs / 77 / 65s bet | ~81 / 98.5 / ~94% | ~80 / ~44 / ~78% | 57.5 / 83.4 / 87.9% |
+| river BB（x-x/x-x 8d）: bet | 38.3% | 68.5%（非比較） | **31.8%** |
+
+判定: EVはGTOWと0.01 bb以内で一致し、rootのdonk 0%、BTN QJsの1 comboだけの混合、check-raise額も一致した。
+turn・riverの集計頻度は前回より大きくGTOWへ近づいた（turn 16.2→8.5 pt、river非比較→6.5 pt差）。
+残る差は、GTOWの未観測の線（BTNのraise、donk後のturn・river等）のsizeを推定で埋めたこと、
+GTOW AIのsolve（Single SizeはGTOW AIで作る）とNEの選び方の差、near-indifferentな手の混合の自由度で説明できる範囲である。
+bugを示す差は見つからなかった。

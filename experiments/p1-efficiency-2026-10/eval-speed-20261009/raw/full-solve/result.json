@@ -1,0 +1,99 @@
+{
+  "records": [
+    {
+      "version": "old",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\eval-old\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\configs\\c_flop1-f32-solve.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\runs\\p1eff\\full-solve-20261009-052651-old",
+        "--threads",
+        "8"
+      ],
+      "binarySha256": "e2041bdd32f69b0dfdd889143d90da7bc895b78f69b794f53fa411a16c380ecb",
+      "wallSeconds": 153.05804400000488,
+      "metrics": {
+        "configHash": "9675b79d741ce41f134fbfeca074758b0f74811bd673b217bb6e2953fb5e559f",
+        "configSchema": "solvers.nlh/v1",
+        "evP0": 1.5277732492874008,
+        "evP1": 3.313849682450564,
+        "explP0": 0.005963752488974294,
+        "explP1": 0.003935076634010604,
+        "gameKind": "hu-postflop",
+        "iterations": 200,
+        "kind": "hu-postflop",
+        "nashConv": 0.009898829122984898,
+        "utilityUnit": "BB",
+        "wallSecs": 144.1146397
+      },
+      "exports": {
+        "strategy": {
+          "sha256": "50172c3f704dec355d0b33e7e90c0bb666c4ff529178b46ca2a7def7ea37bcf9",
+          "bytes": 71916,
+          "retainedPath": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\raw\\full-solve\\old-strategy.json"
+        },
+        "ev": {
+          "sha256": "80e3bb3641b7f8fd51550adc679d408a52dd1c1315fc320aa3b06003e6ca681e",
+          "bytes": 97702,
+          "retainedPath": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\raw\\full-solve\\old-ev.json"
+        }
+      },
+      "solution": {
+        "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\runs\\p1eff\\full-solve-20261009-052651-old\\solution.sol",
+        "sha256": "d213390fed09b566f73b1d9e9c6e17bfcf940c1592b7931c747e3a0ce11c9a49",
+        "normalizedPayloadSha256": "a48839c3780cbd296bf41ee05769858f19a244dd79786a7f7256e40592847de4",
+        "bytes": 937149392
+      }
+    },
+    {
+      "version": "new",
+      "command": [
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\target\\release\\solvers.exe",
+        "solve",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\configs\\c_flop1-f32-solve.toml",
+        "--out",
+        "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\runs\\p1eff\\full-solve-20261009-052651-new",
+        "--threads",
+        "8"
+      ],
+      "binarySha256": "8d60a86c94458aa0346aa6feec51bbf49aee13584b14da6aae3571fe4b052a14",
+      "wallSeconds": 111.12043480001739,
+      "metrics": {
+        "configHash": "9675b79d741ce41f134fbfeca074758b0f74811bd673b217bb6e2953fb5e559f",
+        "configSchema": "solvers.nlh/v1",
+        "evP0": 1.5277732492874008,
+        "evP1": 3.313849682450564,
+        "explP0": 0.005963752488974294,
+        "explP1": 0.003935076634010604,
+        "gameKind": "hu-postflop",
+        "iterations": 200,
+        "kind": "hu-postflop",
+        "nashConv": 0.009898829122984898,
+        "utilityUnit": "BB",
+        "wallSecs": 102.7491882
+      },
+      "exports": {
+        "strategy": {
+          "sha256": "50172c3f704dec355d0b33e7e90c0bb666c4ff529178b46ca2a7def7ea37bcf9",
+          "bytes": 71916,
+          "retainedPath": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\raw\\full-solve\\new-strategy.json"
+        },
+        "ev": {
+          "sha256": "80e3bb3641b7f8fd51550adc679d408a52dd1c1315fc320aa3b06003e6ca681e",
+          "bytes": 97702,
+          "retainedPath": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\experiments\\p1-efficiency-2026-10\\eval-speed-20261009\\raw\\full-solve\\new-ev.json"
+        }
+      },
+      "solution": {
+        "path": "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-eval-speed\\runs\\p1eff\\full-solve-20261009-052651-new\\solution.sol",
+        "sha256": "c20875bd1be6f713fe657e210c8e2aabe0afdff80a7a33a792583b86c73aec22",
+        "normalizedPayloadSha256": "a48839c3780cbd296bf41ee05769858f19a244dd79786a7f7256e40592847de4",
+        "bytes": 937149392
+      }
+    }
+  ],
+  "identicalMetrics": true,
+  "identicalExports": true,
+  "identicalFullPayloadExceptWallSeconds": true
+}

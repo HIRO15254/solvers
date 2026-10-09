@@ -1,0 +1,158 @@
+{
+ "machine": "GCP c2d-highcpu-32 Spot (AMD EPYC 7B13), europe-west4-a",
+ "old": "c09c0af",
+ "new": "df321c73",
+ "bench": [
+  {
+   "config": "c_flop1",
+   "storage": "f32",
+   "threads": 16,
+   "secsPerIterOld": 0.1111698026,
+   "secsPerIterNew": 0.1105252256,
+   "evalSecsOld": 0.2320402615,
+   "evalSecsNew": 0.184965987
+  },
+  {
+   "config": "c_flop1",
+   "storage": "f32",
+   "threads": 32,
+   "secsPerIterOld": 0.0934501697,
+   "secsPerIterNew": 0.0922152437,
+   "evalSecsOld": 0.19792704425,
+   "evalSecsNew": 0.16441205675
+  },
+  {
+   "config": "c_flop1",
+   "storage": "i16",
+   "threads": 16,
+   "secsPerIterOld": 0.1827165158,
+   "secsPerIterNew": 0.1464460579,
+   "evalSecsOld": 0.25649262175,
+   "evalSecsNew": 0.21682471650000001
+  },
+  {
+   "config": "c_flop1",
+   "storage": "i16",
+   "threads": 32,
+   "secsPerIterOld": 0.15175197745000002,
+   "secsPerIterNew": 0.12444053359999999,
+   "evalSecsOld": 0.21640453675,
+   "evalSecsNew": 0.18051755949999998
+  },
+  {
+   "config": "c_gtowb",
+   "storage": "f32",
+   "threads": 16,
+   "secsPerIterOld": 0.77486261305,
+   "secsPerIterNew": 0.7723172464,
+   "evalSecsOld": 1.70004968725,
+   "evalSecsNew": 1.36653561275
+  },
+  {
+   "config": "c_gtowb",
+   "storage": "f32",
+   "threads": 32,
+   "secsPerIterOld": 0.6545797880499999,
+   "secsPerIterNew": 0.64547826555,
+   "evalSecsOld": 1.455385422,
+   "evalSecsNew": 1.2101438865
+  },
+  {
+   "config": "c_gtowb",
+   "storage": "i16",
+   "threads": 16,
+   "secsPerIterOld": 1.2854467787,
+   "secsPerIterNew": 1.0142694888,
+   "evalSecsOld": 1.83014888625,
+   "evalSecsNew": 1.55932219425
+  },
+  {
+   "config": "c_gtowb",
+   "storage": "i16",
+   "threads": 32,
+   "secsPerIterOld": 1.0602272363,
+   "secsPerIterNew": 0.85700356675,
+   "evalSecsOld": 1.5459974067500002,
+   "evalSecsNew": 1.2902624725
+  }
+ ],
+ "solves": [
+  {
+   "tag": "flop1_f32_t16",
+   "itOld": 192,
+   "itNew": 192,
+   "solveOld": 21.965493183,
+   "solveNew": 21.740100312,
+   "procOld": 31.82,
+   "procNew": 31.54,
+   "peakOld": 3282067456,
+   "peakNew": 3283959808
+  },
+  {
+   "tag": "flop1_f32_t32",
+   "itOld": 192,
+   "itNew": 192,
+   "solveOld": 18.504281697,
+   "solveNew": 18.198761943,
+   "procOld": 28.35,
+   "procNew": 28.05,
+   "peakOld": 3510050816,
+   "peakNew": 3512225792
+  },
+  {
+   "tag": "flop1_i16_t16",
+   "itOld": 187,
+   "itNew": 189,
+   "solveOld": 34.604229139,
+   "solveNew": 28.125302949,
+   "procOld": 39.59,
+   "procNew": 33.13,
+   "peakOld": 1907396608,
+   "peakNew": 1908498432
+  },
+  {
+   "tag": "flop1_i16_t32",
+   "itOld": 187,
+   "itNew": 189,
+   "solveOld": 28.812705135,
+   "solveNew": 23.784286083,
+   "procOld": 33.89,
+   "procNew": 28.92,
+   "peakOld": 2200326144,
+   "peakNew": 2193506304
+  },
+  {
+   "tag": "gtowb_f32_t16",
+   "itOld": 316,
+   "itNew": 316,
+   "solveOld": 254.774954371,
+   "solveNew": 250.155974329,
+   "procOld": 323.93,
+   "procNew": 319.13,
+   "peakOld": 23219200000,
+   "peakNew": 23218216960
+  },
+  {
+   "tag": "gtowb_f32_t32",
+   "itOld": 316,
+   "itNew": 316,
+   "solveOld": 214.62497918,
+   "solveNew": 211.535382474,
+   "procOld": 283.6,
+   "procNew": 280.97,
+   "peakOld": 23541284864,
+   "peakNew": 23522394112
+  },
+  {
+   "tag": "gtowb_i16_t32",
+   "itOld": 352,
+   "itNew": 351,
+   "solveOld": 379.854541851,
+   "solveNew": 306.310550831,
+   "procOld": 410.73,
+   "procNew": 334.71,
+   "peakOld": 13032534016,
+   "peakNew": 13024518144
+  }
+ ]
+}

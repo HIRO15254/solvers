@@ -1,0 +1,65 @@
+C:\Users\PC_User\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\bin\llvm-objdump.exe
+-d
+--no-show-raw-insn
+C:\Users\PC_User\orca\workspaces\solvers\p1-i16-kernels\target\new\release\examples\p1_bench.exe
+sha256: 5976ac6b5b4ac430f6d4d2ee3fae400279693f5f1aebc8b78a7f787bd5d8718f
+
+fused dequantize / discount / add / lane maxima
+14001c9b0:     	vpmovsxwd	-0x10(%rdi,%rbx), %ymm10
+14001c9b7:     	vcvtdq2ps	%ymm10, %ymm10
+14001c9bc:     	vmulps	%ymm2, %ymm10, %ymm10
+14001c9c0:     	vcmpltps	%ymm10, %ymm5, %ymm11
+14001c9c6:     	vblendvps	%ymm11, %ymm3, %ymm4, %ymm11
+14001c9cc:     	vmulps	%ymm11, %ymm10, %ymm10
+14001c9d1:     	vaddps	-0x20(%rbp,%rbx,2), %ymm10, %ymm10
+14001c9d7:     	vmaxps	%ymm10, %ymm5, %ymm10
+14001c9dc:     	vmovups	%ymm10, -0x20(%r12,%rbx,2)
+14001c9e3:     	vpmovsxwd	(%rdi,%rbx), %ymm11
+14001c9e9:     	vcvtdq2ps	%ymm11, %ymm11
+14001c9ee:     	vmulps	%ymm2, %ymm11, %ymm11
+14001c9f2:     	vcmpltps	%ymm11, %ymm5, %ymm12
+14001c9f8:     	vblendvps	%ymm12, %ymm3, %ymm4, %ymm12
+14001c9fe:     	vmulps	%ymm12, %ymm11, %ymm11
+14001ca03:     	vandps	%ymm9, %ymm10, %ymm10
+14001ca08:     	vaddps	(%rbp,%rbx,2), %ymm11, %ymm11
+14001ca0e:     	vmaxps	%ymm11, %ymm5, %ymm11
+14001ca13:     	vmovups	%ymm11, (%r12,%rbx,2)
+14001ca19:     	vmaxps	%ymm1, %ymm10, %ymm1
+14001ca1d:     	vandps	%ymm9, %ymm11, %ymm10
+14001ca22:     	vmaxps	%ymm1, %ymm10, %ymm1
+14001ca26:     	addq	$0x2, %r10
+14001ca2a:     	addq	$0x20, %rbx
+
+reciprocal multiply / round / packed conversion / narrowing
+14001d4db:     	vroundps	$0x4, %ymm5, %ymm5
+14001d4e1:     	vroundps	$0x4, %ymm6, %ymm6
+14001d4e7:     	vroundps	$0x4, %ymm7, %ymm7
+14001d4ed:     	vroundps	$0x4, %ymm8, %ymm8
+14001d4f3:     	vcmpordps	%ymm3, %ymm5, %ymm9
+14001d4f8:     	vcmpordps	%ymm3, %ymm6, %ymm10
+14001d4fd:     	vcmpordps	%ymm3, %ymm7, %ymm11
+14001d502:     	vcmpordps	%ymm3, %ymm8, %ymm12
+14001d507:     	vandps	%ymm5, %ymm9, %ymm5
+14001d50b:     	vandps	%ymm6, %ymm10, %ymm6
+14001d50f:     	vandps	%ymm7, %ymm11, %ymm7
+14001d513:     	vandps	%ymm8, %ymm12, %ymm8
+14001d518:     	vcvttps2dq	%ymm5, %ymm5
+14001d51c:     	vcvttps2dq	%ymm6, %ymm6
+14001d520:     	vcvttps2dq	%ymm7, %ymm7
+14001d524:     	vcvttps2dq	%ymm8, %ymm8
+14001d529:     	vpshufb	%ymm4, %ymm5, %ymm5
+14001d52e:     	vpermq	$0xe8, %ymm5, %ymm5     # ymm5 = ymm5[0,2,2,3]
+14001d534:     	vpshufb	%ymm4, %ymm6, %ymm6
+14001d539:     	vpermq	$0xe8, %ymm6, %ymm6     # ymm6 = ymm6[0,2,2,3]
+14001d53f:     	vpshufb	%ymm4, %ymm7, %ymm7
+14001d544:     	vpermq	$0xe8, %ymm7, %ymm7     # ymm7 = ymm7[0,2,2,3]
+14001d54a:     	vpshufb	%ymm4, %ymm8, %ymm8
+14001d54f:     	vpermq	$0xe8, %ymm8, %ymm8     # ymm8 = ymm8[0,2,2,3]
+14001d555:     	vmovdqu	%xmm5, -0x30(%rcx,%r8,2)
+14001d55c:     	vmovdqu	%xmm6, -0x20(%rcx,%r8,2)
+14001d563:     	vmovdqu	%xmm7, -0x10(%rcx,%r8,2)
+14001d56a:     	vmovdqu	%xmm8, (%rcx,%r8,2)
+14001d570:     	addq	$0x20, %r8
+14001d574:     	cmpq	%r8, %rdx
+14001d577:     	jne	0x14001d4c0 <.text+0x1c4c0>
+14001d57d:     	cmpq	%rdx, %rsi

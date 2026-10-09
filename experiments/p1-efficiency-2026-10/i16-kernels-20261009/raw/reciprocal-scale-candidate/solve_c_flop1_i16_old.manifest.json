@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "solve_c_flop1_i16_old",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "e0aabfbba080d4adac3f97bb5ae62dd121c775f5f116756f5b18b5543c049796",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "C:\\Users\\PC_User\\orca\\workspaces\\solvers\\p1-i16-kernels\\runs\\i16-kernels\\solve_c_flop1_i16_old"
+  ],
+  "pid": 36708,
+  "createdUnixMs": 1791491082390,
+  "startedUnixMs": 1791491082390,
+  "finishedUnixMs": 1791491244099,
+  "failure": null,
+  "completion": "completed"
+}

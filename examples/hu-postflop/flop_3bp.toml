@@ -1,0 +1,46 @@
+# BB 3-bet pot against the BTN open: the 3-bettor is out of position.
+# Three flop sizes as in GTO Wizard's 3-bet pot trees; about 1.4 GiB of f32 storage.
+schema = "solvers.nlh/v1"
+
+[meta]
+name = "6max NL50 BB vs BTN 3BP Ks7h2d"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB r11, BTN c"
+board = "Ks 7h 2d"
+
+[ranges]
+BTN = "JJ-55,AQs-A9s,A5s-A4s,KQs-KTs,QJs-QTs,JTs,T9s,98s,87s,76s,65s,AQo,KQo"
+BB = "QQ+,AKs,AQs,A5s-A3s,KQs,K9s,QJs,76s,65s,AKo,AQo"
+
+[tree]
+script = '''
+flop {
+  replace bet [20, 56, 122]
+  replace raise [50]
+}
+turn {
+  replace bet [33, 75]
+  replace raise [a]
+}
+river {
+  replace bet [33, 75, a]
+  replace raise [a]
+}
+flop, turn { when spr <= 1.5 { add bet [a] add raise [a] } }
+'''
+allin_threshold = 0.67
+
+[solver.stop]
+target = "0.1%pot"

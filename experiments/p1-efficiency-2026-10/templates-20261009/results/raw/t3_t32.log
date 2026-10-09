@@ -1,0 +1,8 @@
+tree: nodes=469808 terminals=295680 rank_tables=1176 storage=98.5 MiB (f32) / 50.6 MiB (i16) / 74.6 MiB (i16-f32avg)
+memory estimate: 680.2 MiB (f32) / 656.2 MiB (i16) / 680.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.288e0 expl_p1=1.217e0 nash_conv=2.505e0
+iter=      50 expl_p0=2.067e-1 expl_p1=2.197e-1 nash_conv=4.264e-1
+iter=      82 expl_p0=8.004e-2 expl_p1=7.331e-2 nash_conv=1.534e-1
+iter=      99 expl_p0=4.874e-2 expl_p1=4.578e-2 nash_conv=9.452e-2
+done: iterations=99 wall=1.43s ev_p0=4.977543 ev_p1=40.559280 nash_conv=9.452e-2
+sol: wrote /home/PC_User/work/t3_t32/solution.sol (19.67 MB, 171712 blocks, mode=Full)

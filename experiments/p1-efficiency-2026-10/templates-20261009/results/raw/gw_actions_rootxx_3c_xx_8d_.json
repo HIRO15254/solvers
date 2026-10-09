@@ -1,0 +1,16 @@
+[
+  {
+    "history": "xx[3c]xx[8d]",
+    "street": "river",
+    "actor": "oop",
+    "action": "check",
+    "frequency": 0.6824556457585961
+  },
+  {
+    "history": "xx[3c]xx[8d]",
+    "street": "river",
+    "actor": "oop",
+    "action": "bet 1.815",
+    "frequency": 0.31754435614533805
+  }
+]

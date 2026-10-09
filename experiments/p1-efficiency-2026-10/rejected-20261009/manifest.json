@@ -1,0 +1,15 @@
+{
+ "reproduction": "partial",
+ "sourceCommit": "c09c0af76d7b2cf999f1082644d8080441654dd6",
+ "sha256": {
+  "README.md": "24c1791b158ee77642146f225887a1b48da45ff3f936c408b9b433285cd63e9d",
+  "results/rbp_r1.json": "9553ca20c410bc3c7b5318c77af0dccbaac1a4ee4fea14d0b70f5aea7f4491f5",
+  "results/rbp_r2.json": "30972279d28cf43063e7c27964d60b991e91ef5d3f0d79fdd5cd2b16d6587776",
+  "scripts/ab.py": "92dc3ae1a7794d2c2e795c3adba8b84d32ef8206bf9f74c0077b73547d64ea44",
+  "scripts/measure.py": "54f77746c2dff51de2efc99c2053fba3869e945ddffe64321592d1a87b174f96",
+  "scripts/pgo.sh": "303919e63a4336a31f71032fbbda7145f598865acf4ea975b4f66062f900d175",
+  "scripts/prune_census.rs": "e1facefe4c8ee77ed58950b44cd3c8ce6226e1f717668c007540c0eac9515221",
+  "scripts/rbp-proto-v2.patch": "b9ce8d0452e0c7e50bdb5c82f0c29b750020efe4a5a6d5cafd81739708bba76f",
+  "scripts/warm_mc.rs": "9f19e9626020b3527b5ff49f4e3c4db83137df0db91b1d95eabb3217fe92e171"
+ }
+}

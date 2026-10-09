@@ -1,0 +1,12 @@
+tree: nodes=8704350 terminals=5513100 rank_tables=1176 storage=29091.0 MiB (f32) / 14569.8 MiB (i16) / 21830.4 MiB (i16-f32avg)
+memory estimate: 29355.0 MiB (f32) / 14833.8 MiB (i16) / 22094.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.415e0 expl_p1=1.022e0 nash_conv=2.437e0
+iter=      50 expl_p0=2.852e-1 expl_p1=2.929e-1 nash_conv=5.782e-1
+iter=     100 expl_p0=5.883e-2 expl_p1=7.201e-2 nash_conv=1.308e-1
+iter=     150 expl_p0=3.089e-2 expl_p1=3.705e-2 nash_conv=6.793e-2
+iter=     200 expl_p0=1.649e-2 expl_p1=1.650e-2 nash_conv=3.299e-2
+iter=     250 expl_p0=9.354e-3 expl_p1=9.150e-3 nash_conv=1.850e-2
+iter=     295 expl_p0=6.473e-3 expl_p1=6.254e-3 nash_conv=1.273e-2
+iter=     311 expl_p0=5.512e-3 expl_p1=5.441e-3 nash_conv=1.095e-2
+done: iterations=311 wall=336.69s ev_p0=1.521174 ev_p1=3.299736 nash_conv=1.095e-2
+sol: wrote /home/PC_User/work/flop_srp_t16/solution.sol (9183.40 MB, 3183544 blocks, mode=Full)

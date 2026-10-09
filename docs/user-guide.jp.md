@@ -38,6 +38,30 @@ P1ではPreflop専用のtree設定は効果を持たず、既定値以外を書�
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 旧configの自動変換は無いため、現行例から書き直す。
 
+### P1の木の大きさを決める
+
+P1のmemoryと時間は、行動の候補数の積でほぼ決まる。0.1% pot程度の解を少ない資源で得るには、
+GTO Wizard（GTOW）の公開情報と[雛形の計測](../experiments/p1-efficiency-2026-10/templates-20261009/README.md)から、次の順で木を絞る。
+
+- flopのbet sizeの数は木を最も大きくするが、EVへの影響は小さい。GTOWの比較では、flopのsize 1本と3本の差は
+  多くの盤面で0.01 bb以内だった。SRPのflopはまず1〜2 sizeにする。
+- flop戦略への影響はturnのsizeの方がriverより大きい。riverには小さいbetとall-inのように離れた2 sizeを置く。
+- donkは`when donk { remove bet }`で消す。raiseは`when aggressions >= 2 { replace raise [a] }`で2回目以降をall-inにする。
+  `allin_threshold = 0.67`は残りstackの大半を入れるbetをall-inへまとめる。
+- 3BP・4BPはSPRが低く木が小さいので、flopに3 sizeを置いても軽い。
+
+同梱の[flop_srp.toml](../examples/hu-postflop/flop_srp.toml)・[flop_3bp.toml](../examples/hu-postflop/flop_3bp.toml)・
+[flop_4bp.toml](../examples/hu-postflop/flop_4bp.toml)はこの方針の雛形である。8C/16T・12 threadのPCで0.1% potまでの目安は次の通り。
+
+| 例 | node数 | f32 storage | 0.1% potまでの反復 | 時間 |
+|---|---:|---:|---:|---:|
+| flop_srp | 1.16M | 3.7 GiB | 389 | 3.5分 |
+| flop_3bp | 2.22M | 1.4 GiB | 260 | 1分 |
+| flop_4bp | 0.47M | 0.1 GiB | 99 | 2.5秒 |
+
+flop_srpのflopに75%を足すとstorageは約1.8倍、時間は約1.7倍になり、OOPのEVは0.015 BB（0.27% pot）しか変わらなかった。
+全streetに33・75%と3x raiseを置く旧来の木は28 GiBを超える。
+
 ## 3. 検証して実効入力を保存する
 
 ```sh
@@ -61,7 +85,9 @@ solvers solve spot.toml --out runs/my-spot --threads 4 --memory 2GiB --max-time 
 
 毎回新しいrun directoryを指定する。overrideはrun.tomlへ保存する。
 P1の`[solver.stop] check_every`は`"auto"`が既定（PF10、2026-10-08）。targetがあると初回25 iteration、以降は評価値から到達を予測した3〜50 iterationの適応間隔で測り、`NashConv / 2 <= target`で止まる。target無しは固定25、整数の明示は従来の固定間隔である。target有りでは停止iterationが旧版と変わり得るため、旧版と同じ停止を得るには`check_every = 25`を明示する。実効configはautoか整数を必ず保存する。
-P1の`[solver] storage`は`f32`（既定、両arena f32）、`i16`（両arena i16、memory最小）、`i16-f32avg`（regret i16、戦略累積f32）を選べる。0.1% pot程度を目指し旧i16が頭打ちになる場合は`i16-f32avg`を使う。regretの量子化誤差は残る。storage bytesは順に8L、4L＋8N、6L＋4N（L=要素数、N=action node数）。
+P1の`[solver] storage`は`auto`（既定）、`f32`（両arena f32）、`i16`（両arena i16、memory最小）、`i16-f32avg`（regret i16、戦略累積f32）を選べる。0.1% pot程度を目指し旧i16が頭打ちになる場合は`i16-f32avg`を使う。regretの量子化誤差は残る。storage bytesは順に8L、4L＋8N、6L＋4N（L=要素数、N=action node数）。
+
+autoはmemory上限（`[run] memory` / `--memory`、未指定なら物理RAMの80%）にf32の必要量が収まればf32、次にi16-f32avgを選ぶ。i16は選ばず、両方超過なら両必要bytesと上限を示しexit 75となる。`validate --resources`は選択結果を表示し、両方超過ならi16-f32avgの必要量と`withinLimit: false`を返す。正規化はautoを維持し、solve表示とrun.toml・checkpoint・`.sol`のconfig / metadataは具体storageを保存する。既存runの明示storageは維持され、resume・照会は現在のmachine memoryで再選択しない。
 
 P1のmemory見積りは`max(storage, storage − regret + 保存作業領域) + 圧縮予算`。regret bytesはf32で4L、i16・i16-f32avgで2L＋4N。solve/resumeは最後のcheckpointを新たに書き、並行peak `S + W + 2C`（S=選択storage、W=保存作業領域、C=圧縮予算）が上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`生成の順とする。全停止理由に適用し、solve開始の見積り式は変わらない。反復中のcheckpointでは解放しない。保存作業領域は保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
 P1のmemory autoは物理RAMの80%、P2はarena予算6 GiBである。P2のmemoryはRSS全体の上限ではなく、
@@ -84,7 +110,7 @@ P1の`[run] final_checkpoint = false`は終了時の再開state保存を省く�
 autoの評価は時間・thread数に依存せず、progressは評価ごとに追記するためtarget有りでは不等間隔になる。中断・max_time・定期checkpointの判定はautoで25 iteration以下のsub-batchごと、整数で指定間隔ごとに行う。
 autoの再開はprogress.jsonlのcheckpoint iteration以下の行を使い、同じiterationの重複は最後の行を採用して次の評価を再計算する。同じconfigで一度に解いたrunと評価iteration・停止iteration・stateが一致する。progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25（max_iterationsで切る）から評価するため、評価iteration一致を保証しない。裸のcheckpointだけを移した場合も同様である。checkpoint形式は変わらず、旧run.tomlの`check_every = 25`は固定25で再開する。
 
-P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定である。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalseとなる（利用者決定PF8、2026-10-07）。明示したtrue・falseはどのstorageでも優先する。full templateはf32用の`pow4_reset = false`を明示しているため、storageをi16に変えて既定resetを使う場合はこの行を削除するかtrueにする。
+P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定である。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"auto"`・`"f32"`・`"i16-f32avg"`ならfalseとなる（利用者決定PF8、2026-10-07）。明示したtrue・falseはどのstorageでも優先する。full templateはauto用の`pow4_reset = false`を明示しているため、storageをi16に変えて既定resetを使う場合はこの行を削除するかtrueにする。
 保存された実効configは係数とresetを明示するため、旧係数1.5・0・3や旧既定reset=trueのrun・checkpoint・solutionは保存値で再開・照会できる。
 旧runの`run.toml`を係数や`pow4_reset`未指定の元configに戻すと、新既定との互換性hash不一致で再開を拒否する。
 P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。精度keyの無い旧runは新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。

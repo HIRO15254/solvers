@@ -126,13 +126,14 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 | `linear-cfr` | DCFRのalpha = beta = gamma = 1、平均reset無し |
 | `hs-dcfr` | 予算nに対してalpha = 1＋3t/n、beta = −1−2t/n、gamma = gamma0−5t/n、reset無し |
 
-初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存し、既存run・checkpoint・`.sol`は保存値で再開・照会する。
+初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、auto・f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存し、既存run・checkpoint・`.sol`は保存値で再開・照会する。
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
-`storage`は次の3値を受け付ける。既定は`f32`のままである。Lはstorage要素数、Nはaction node数。
+`storage`は次の4値を受け付ける。利用者決定PF11（2026-10-09）により既定は`auto`である。Lはstorage要素数、Nはaction node数。
 
 | 値 | 保持方式 | storage bytes | 精度の性質 |
 |---|---|---|---|
+| `auto` | memory上限に収まるf32、次にi16-f32avgを選択 | 解決先による | i16は選ばない |
 | `f32` | regret・戦略累積ともf32 | 8L | storageの整数量子化なし |
 | `i16` | regret・戦略累積ともnodeごとのf32 scale付きi16 | 4L＋8N | memory最小だが、木によってExploitabilityが開始potの0.1%前後で頭打ちになり得る |
 | `i16-f32avg` | regretは旧i16と同じ量子化、戦略累積はf32 | 6L＋4N | 戦略累積の量子化を避け、旧i16の精度床を改善する。regretの量子化誤差は残り、任意の木で0.1%到達を保証しない |
@@ -142,6 +143,8 @@ HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理�
 同じ木・schedule・反復数ではregret配列とregret scaleが旧i16とbit一致する。
 i16の量子化blockはnodeごとのactorの席別support次元であり、support外handの除去でblock scaleと反復結果が変わり得る。
 新旧layoutのbit一致をi16に要求せず、同じconfig・反復予算で収束品質を照合する。
+`auto`は木とmemory上限が揃ったprepareで、`required_bytes(f32) <= limit`ならf32、そうでなく`required_bytes(i16-f32avg) <= limit`ならi16-f32avgを選ぶ。両方超過なら両必要bytesと上限・auto指定を示してexit 75。明示storageの動作は維持する。正規化はautoを維持するが、run.toml・checkpoint・`.sol`のconfigとmetadataには具体storageを保存し、再開・照会を現在のmachine memoryから独立させる。既存実効configの明示storageはそのまま維持する。
+
 storageの量子化誤差と`.sol`の出力量子化を区別する。card/bucket近似は無いが浮動小数点の誤差はある。
 零和のCFR理論をrake・ICMを含む一般和へ拡張した収束保証は付けない。
 開始potのfolded dead moneyを含む設定でも、実装のutility判定が一般和経路を選ぶ場合がある。

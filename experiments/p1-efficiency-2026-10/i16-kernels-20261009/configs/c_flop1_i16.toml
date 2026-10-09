@@ -1,0 +1,47 @@
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB c"
+board = "Ks 7h 2d"
+
+[ranges]
+BTN = "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o"
+BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o"
+
+[tree]
+script = '''
+flop { replace bet [33] }
+turn, river { replace bet [75] }
+flop, turn, river { replace raise [3x] }
+'''
+
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+
+[solver]
+storage = "i16"
+
+[solver.algorithm]
+schedule = "dcfr"
+
+[solver.stop]
+target = "0.1%pot"
+max_iterations = 2000
+check_every = 10
+
+[run]
+final_checkpoint = false
+checkpoint_interval = "10h"

@@ -6,7 +6,9 @@ All inputs use `solvers.nlh/v1`. Validate first with `solvers validate FILE`; se
 |---|---|---|---|
 | [river_small.toml](hu-postflop/river_small.toml) | P1 | Small HU river, explicit ranges and BB bet | Seconds |
 | [turn_small.toml](hu-postflop/turn_small.toml) | P1 | Turn-to-river chance expansion | Seconds |
-| [flop_srp.toml](hu-postflop/flop_srp.toml) | P1 | Specification §14 BTN vs BB cash SRP with rake | Large; up to 1h |
+| [flop_srp.toml](hu-postflop/flop_srp.toml) | P1 | Specification §14 BTN vs BB cash SRP with rake; lean GTO Wizard-style tree | 4.3 GB; minutes |
+| [flop_3bp.toml](hu-postflop/flop_3bp.toml) | P1 | BB 3-bet pot, three flop sizes | 1.8 GB; about a minute |
+| [flop_4bp.toml](hu-postflop/flop_4bp.toml) | P1 | BTN 4-bet pot, low SPR | 0.4 GB; seconds |
 | [tournament_icm.toml](hu-postflop/tournament_icm.toml) | P1 | Tournament payouts and outside field | Seconds |
 | [river_script.toml](hu-postflop/river_script.toml) | P1 | External [river.tree](hu-postflop/river.tree) and tree parameters | Seconds |
 | [3max_smoke.toml](mw-preflop/3max_smoke.toml) | P2 | Small 3-max all-in tree | Seconds after cache preparation |

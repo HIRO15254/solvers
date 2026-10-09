@@ -141,7 +141,7 @@ pub(crate) fn query<S: Storage>(
     Solver<crate::PostflopEvaluator, S>,
     Vec<crate::PostflopNodeInfo>,
 )> {
-    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
+    crate::prepare::check_memory_limit(p)?;
     let iterations = iterations.unwrap_or(p.settings.solver.stop.max_iterations);
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
         bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
@@ -230,7 +230,7 @@ fn drive<S: Storage>(
         elapsed_before,
         cancel,
     } = request;
-    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
+    crate::prepare::check_memory_limit(p)?;
     diagnostics(Diagnostic::Memory(p.estimate.clone()));
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));

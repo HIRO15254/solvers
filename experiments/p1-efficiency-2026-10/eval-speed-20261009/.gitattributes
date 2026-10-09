@@ -1,0 +1,4 @@
+# Preserve the bytes used by export/payload evidence hashes on every checkout.
+raw/full-*/*-ev.json -text
+raw/full-*/*-strategy.json -text
+scripts/measured.patch -text

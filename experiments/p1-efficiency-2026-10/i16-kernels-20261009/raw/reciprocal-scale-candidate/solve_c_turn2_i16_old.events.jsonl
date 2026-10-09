@@ -1,0 +1,3 @@
+{"seq":0,"unixMs":1791491075294,"level":"info","kind":"state","state":"running"}
+{"seq":1,"unixMs":1791491077383,"level":"info","kind":"stop","reason":"target-reached"}
+{"seq":2,"unixMs":1791491077431,"level":"info","kind":"state","state":"completed"}

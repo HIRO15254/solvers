@@ -145,6 +145,11 @@ reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは 
 全 0 buffer を使い回す。更新 player の action と chance の演算、chance/action 並列、
 `ActionViews` の分割は通常の走査と同じ。全呼出し元が `out` を 0 で初期化することを
 不変条件とし、scratch の 0 初期化と再利用 child buffer の clear で維持する。
+記録不要の EV/BR は、chanceの無いaction部分木のstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
+戦略・相手reachの前準備、厳密終端batch、子順のEV/BR合成の3段で処理する。
+`eval_batch`の既定hookは個別の`eval`。P1は同一board・同種の終端を最大4 laneで評価する。
+foldはglobal combo順、showdownはrank順・group total順を保ち、各laneのf64演算は個別kernelとbit一致する。
+戦略正規化・reach乗算・EV加算・BRのmaxも元の順序を保つ。chance/action並列の上位分割は変更しない。
 記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
 `visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
 
@@ -179,7 +184,10 @@ local index・2枚のcard index・同順位group境界をbuild時に用意し、
 foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
 memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
 
-`prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
+`prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetとstorageのauto選択を解決する。
+入力の`Settings<StorageChoice>`から具体backendだけを持つ`Settings<Storage>`へ変換し、
+f32が上限に収まればf32、次にi16-f32avgを選ぶ（i16は自動選択しない）。
+validateの正規化は入力choiceを維持し、run用の実効configと成果物は具体storageを保存する。
 `run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。

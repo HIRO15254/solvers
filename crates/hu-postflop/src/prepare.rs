@@ -6,7 +6,9 @@ use std::path::Path;
 /// Parsed Spot IR, lowered P1 game, normalized settings and resource measurements.
 pub struct Prepared {
     pub document: spot::Document,
-    pub settings: Settings,
+    pub settings: Settings<input::Storage>,
+    /// Whether the input requested automatic backend selection.
+    pub storage_auto: bool,
     pub config: crate::PostflopConfig,
     pub payoff: NlhPayoff,
     pub effective: String,
@@ -42,14 +44,32 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         .run
         .threads
         .unwrap_or(std::thread::available_parallelism()?.get() as u64);
-    estimate.compression_bytes = compression_workspace(&estimate, threads, effective.len());
+    // Budget the longest possible concrete spelling for auto, so artifacts
+    // restored with i16-f32avg never need more codec workspace than preflight.
+    let config_len = effective.len()
+        + if settings.solver.storage == input::StorageChoice::Auto {
+            "i16-f32avg".len() - "auto".len()
+        } else {
+            0
+        };
+    estimate.compression_bytes = compression_workspace(&estimate, threads, config_len);
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
         0
     };
     let limit = input::resolve_memory_limit(document.spot.run.memory_bytes, physical);
+    let choice = settings.solver.storage;
+    let storage = resolve_storage(choice, &estimate, limit);
+    let storage_auto = choice == input::StorageChoice::Auto;
+    let settings = settings.with_storage(storage);
+    // Run identity and all saved artifacts use a concrete backend. Validation
+    // separately normalizes the document to preserve the user's input choice.
+    let mut effective: toml_edit::DocumentMut = effective.parse()?;
+    effective["solver"]["storage"] = toml_edit::value(storage.name());
+    let effective = effective.to_string();
     Ok(Prepared {
+        storage_auto,
         document,
         settings,
         config,
@@ -59,6 +79,48 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         limit,
         target,
     })
+}
+
+/// Select the fastest allowed backend. When neither fits, retain the mixed
+/// requirement for resource reporting; `check_memory_limit` rejects execution.
+pub fn resolve_storage(
+    choice: input::StorageChoice,
+    estimate: &crate::MemoryEstimate,
+    limit: u64,
+) -> input::Storage {
+    use input::{Storage, StorageChoice};
+    match choice {
+        StorageChoice::Auto if estimate.required_bytes(Storage::F32) <= limit => Storage::F32,
+        StorageChoice::Auto | StorageChoice::I16F32Avg => Storage::I16F32Avg,
+        StorageChoice::F32 => Storage::F32,
+        StorageChoice::I16 => Storage::I16,
+    }
+}
+
+/// Apply the prepared backend's memory limit, preserving auto failure context.
+pub fn check_memory_limit(p: &Prepared) -> Result<(), input::MemoryLimitError> {
+    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit).map_err(
+        |mut error| {
+            if p.storage_auto {
+                error.auto_f32_required = Some(p.estimate.required_bytes(input::Storage::F32));
+            }
+            error
+        },
+    )
+}
+
+/// Single-line human description of the resolved backend and selection reason.
+pub fn storage_description(p: &Prepared) -> String {
+    let name = p.settings.solver.storage.name();
+    if !p.storage_auto {
+        return name.into();
+    }
+    let f32 = p.estimate.required_bytes(input::Storage::F32);
+    format!(
+        "{name} (auto: f32 needs {f32} bytes {} limit {} bytes)",
+        if f32 <= p.limit { "<=" } else { ">" },
+        p.limit
+    )
 }
 
 fn compression_workspace(estimate: &crate::MemoryEstimate, threads: u64, config_len: usize) -> u64 {

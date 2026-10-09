@@ -526,7 +526,7 @@ P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomp
 ```toml
 [solver]
 iso_merging = true        # 既定true。Turn/Riverのsuit同型を厳密に併合
-storage = "f32"           # 既定f32。f32 | i16 | i16-f32avg
+storage = "auto"          # 既定auto。auto | f32 | i16 | i16-f32avg
 cfr_precision = "f32"     # 既定f32。f32 | f64（旧版とbit一致）
 
 [solver.algorithm]
@@ -577,7 +577,7 @@ max_iterationsまでの残りで切る。間隔は評価iterationと値だけで
 | `dcfr` | `alpha = 1.25`、`beta = 0.5`、`gamma = 4`。`pow4_reset`は`storage = "i16"`ならtrue、それ以外はfalse |
 | `hs-dcfr` | `gamma0 = 30` |
 | `dcfr.alpha` / `beta` / `gamma`、`hs-dcfr.gamma0` | 有限f64。負値もparserは受理する。regret正側・負側・平均重みのdiscountを指定する |
-| `dcfr.pow4_reset` | bool。未指定時は確定した`solver.storage`が`"i16"`ならtrue、`"f32"`・`"i16-f32avg"`ならfalse。明示したtrue・falseはstorageによらず優先する。trueなら4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
+| `dcfr.pow4_reset` | bool。未指定時は指定した`solver.storage`が`"i16"`ならtrue、`"auto"`・`"f32"`・`"i16-f32avg"`ならfalse。明示したtrue・falseはstorageによらず優先する。trueなら4の累乗iteration（4, 16, 64, …）で平均戦略をresetする |
 | `stop.max_iterations` | 正のu64。既定1,000,000。上限iteration |
 | `stop.check_every` | `"auto"`（既定）または正のu64。autoはtarget有りで3〜50 iterationの適応評価、target無しで固定25。整数は固定評価間隔 |
 | `parallel.chance_depth` | 非負u32。既定2。chance分岐を並列化する深さ |
@@ -591,9 +591,12 @@ GCP掃引で0.1% pot到達iterationが旧係数比でf32の10木では0.65〜1.0
 
 scheduleに属さないparamは`NLH002`である。targetの数値部は符号・指数無しの10進数、有限で正である。
 停止条件は厳密に`NashConv / 2 <= target`であり、等号で停止する。
-`storage`は`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の3値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小で、reset有り・CFR計算f32なら測定したTurn・Riverでも0.1% potに届く。ただし全ての木での到達を保証せず、以前の旧係数・reset有りの計測ではGTO Wizard風の大きい木gtow_bで最良0.292% potに留まった。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
+`storage`は`auto`（既定、自動選択）、`f32`（両arena f32、8L bytes）、`i16`（両arena i16＋各node scale、4L＋8N bytes）、`i16-f32avg`（regret i16＋node scale、戦略累積f32、6L＋4N bytes）の4値。Lはstorage要素数、Nはaction node数。旧i16はmemory最小で、reset有り・CFR計算f32なら測定したTurn・Riverでも0.1% potに届く。ただし全ての木での到達を保証せず、以前の旧係数・reset有りの計測ではGTO Wizard風の大きい木gtow_bで最良0.292% potに留まった。新方式は戦略累積の量子化を避けるがregretの量子化誤差は残る。
 
-利用者決定PF5・PF6（2026-10-07）により、1 iterationが約1割短縮したf32を既定とする。
+利用者決定PF5・PF6（2026-10-07）でf32を既定とした後、利用者決定PF11（2026-10-09）でstorageの既定を`auto`へ変更した。CFR計算精度の既定はf32を維持する。
+
+`auto`は木の見積りと解決済みmemory上限（`[run] memory`、CLIの`--memory`、未指定なら物理RAMの80%）が揃った時点で解決する。`MemoryEstimate::required_bytes(f32) <= limit`ならf32、そうでなく`required_bytes(i16-f32avg) <= limit`ならi16-f32avgを選ぶ。i16は選ばない。どちらも収まらなければstorageがautoであること、両方式の必要bytes、上限を示すresource error（exit 75）となる。明示した3方式の動作は変えない。
+正規化・validateの実効configは指定を維持し、未指定を`storage = "auto"`として保存する。一方run.toml、checkpointと`.sol`の埋込みconfig、storage metadataは解決済みの具体値を保存する。既存の実効configはstorageを明示保存しており、その値と互換性hashを維持する。
 `solver.cfr_precision`はgame定義にもstate形式にも影響しないため、resume・deriveの互換性hashから除外する。
 
 scheduleの更新式は[計算規範](hu-postflop.jp.md#4-計算停止storage)を参照する。
@@ -752,14 +755,29 @@ BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,
 
 [tree]
 script = '''
-flop, turn, river {
-  replace bet [33, 75]
-  replace raise [3x]
+flop {
+  when donk { remove bet }
+  replace bet [33]
+  replace raise [50]
+  when aggressions >= 2 { replace raise [a] }
+}
+turn {
+  when donk { remove bet }
+  replace bet [50]
+  when cbet { replace bet [75] }
+  replace raise [a]
+  when spr > 3 { replace raise [50] }
+}
+river {
+  replace bet [50, a]
+  when in_position { replace bet [75, a] }
+  replace raise [a]
 }
 '''
+allin_threshold = 0.67
 
 [solver.stop]
-target = "0.3%pot"
+target = "0.1%pot"
 
 [run]
 max_time = "1h"

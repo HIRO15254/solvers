@@ -363,7 +363,7 @@ pub struct LoadedSol {
     pub board: Vec<Card>,
     pub river_iterations: u64,
     pub river_target: Option<f64>,
-    pub nlh: (spot::Spot, crate::input::Settings),
+    pub nlh: (spot::Spot, crate::input::Settings<crate::input::Storage>),
 }
 
 /// Reads, verifies, and rebuilds a `.sol` artifact: `crate::sol::read_sol`
