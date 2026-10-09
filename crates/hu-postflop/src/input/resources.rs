@@ -7,12 +7,31 @@ pub fn resolve_memory_limit(explicit_bytes: Option<u64>, physical_bytes: u64) ->
     explicit_bytes.unwrap_or_else(|| physical_bytes / 5 * 4 + physical_bytes % 5 * 4 / 5)
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
-#[error("resource limit: P1 memory estimate {required} bytes exceeds memory limit {limit} bytes")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MemoryLimitError {
     pub required: u64,
     pub limit: u64,
+    pub auto_f32_required: Option<u64>,
 }
+
+impl std::fmt::Display for MemoryLimitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(f32) = self.auto_f32_required {
+            write!(
+                f,
+                "resource limit: P1 storage auto requires f32 {f32} bytes or i16-f32avg {} bytes, exceeding memory limit {} bytes",
+                self.required, self.limit
+            )
+        } else {
+            write!(
+                f,
+                "resource limit: P1 memory estimate {} bytes exceeds memory limit {} bytes",
+                self.required, self.limit
+            )
+        }
+    }
+}
+impl std::error::Error for MemoryLimitError {}
 
 /// Check the peak before/after regret release plus codec workspace before building a game.
 /// The CLI maps this resource error to exit code 75, as for P2.
@@ -23,7 +42,11 @@ pub fn check_memory_limit(
 ) -> Result<(), MemoryLimitError> {
     let required = estimate.required_bytes(storage);
     if required > limit {
-        Err(MemoryLimitError { required, limit })
+        Err(MemoryLimitError {
+            required,
+            limit,
+            auto_f32_required: None,
+        })
     } else {
         Ok(())
     }

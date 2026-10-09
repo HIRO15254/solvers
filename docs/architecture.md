@@ -184,7 +184,10 @@ local index・2枚のcard index・同順位group境界をbuild時に用意し、
 foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
 memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
 
-`prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetを解決する。
+`prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetとstorageのauto選択を解決する。
+入力の`Settings<StorageChoice>`から具体backendだけを持つ`Settings<Storage>`へ変換し、
+f32が上限に収まればf32、次にi16-f32avgを選ぶ（i16は自動選択しない）。
+validateの正規化は入力choiceを維持し、run用の実効configと成果物は具体storageを保存する。
 `run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。

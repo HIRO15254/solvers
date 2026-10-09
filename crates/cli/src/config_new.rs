@@ -113,7 +113,7 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         }
         if line.starts_with("storage =") {
             rendered.push_str(
-                "# f32 (default), i16 (smallest), i16-f32avg (i16 regrets, f32 average sums).\n",
+                "# auto (default: f32 if it fits, otherwise i16-f32avg), f32, i16 (smallest), i16-f32avg.\n",
             );
         }
         if line.starts_with("final_checkpoint =") {
@@ -123,7 +123,7 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         }
         if line.starts_with("pow4_reset =") {
             rendered.push_str(
-                "# Reset DCFR averages at iterations 4, 16, 64, ...; default false for f32/i16-f32avg.\n\
+                "# Reset DCFR averages at iterations 4, 16, 64, ...; default false for auto/f32/i16-f32avg.\n\
 # With storage = i16, omitting pow4_reset defaults to true; explicit values take priority.\n",
             );
         }
@@ -335,6 +335,7 @@ mod tests {
             "warnings",
             "effectiveConfig",
             "memoryLimitBytes",
+            "storage",
             "withinLimit",
             "configSchema",
             "gameKind",

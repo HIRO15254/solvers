@@ -1,6 +1,6 @@
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use hu_postflop::input::{
-    Algorithm, CheckEvery, P1Sections, Settings, SolutionStreets, Storage, lower,
+    Algorithm, CheckEvery, P1Sections, Settings, SolutionStreets, StorageChoice, lower,
 };
 use hu_postflop::{
     PostflopConfig, PostflopGame, StreetTree, TreeBuildError, build_postflop_game, memory_usage,
@@ -62,7 +62,7 @@ fn sections_defaults_order_and_idempotence() {
     let doc = parse(&standard(""));
     let s = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
     assert!(s.solver.iso_merging);
-    assert_eq!(s.solver.storage, Storage::F32);
+    assert_eq!(s.solver.storage, StorageChoice::Auto);
     assert_eq!(s.solver.cfr_precision, hu_postflop::CfrPrecision::F32);
     assert_eq!(s.output.solution_streets, SolutionStreets::Full);
     assert_eq!(s.solver.stop.max_iterations, 1_000_000);
@@ -250,6 +250,7 @@ fn cfr_precision_contract_and_legacy_checkpoint() {
 fn dcfr_reset_defaults_and_explicit_values_survive_all_input_paths() {
     for (section, reset) in [
         ("", false),
+        ("[solver]\nstorage = 'auto'", false),
         ("[solver]\nstorage = 'i16'", true),
         ("[solver]\nstorage = 'f32'", false),
         ("[solver]\nstorage = 'i16-f32avg'", false),
@@ -463,9 +464,10 @@ fn strict_sections_codes_and_other_product_diagnostics() {
 #[test]
 fn all_storage_literals_normalize_and_preserve_backend() {
     for (name, backend) in [
-        ("f32", Storage::F32),
-        ("i16", Storage::I16),
-        ("i16-f32avg", Storage::I16F32Avg),
+        ("auto", StorageChoice::Auto),
+        ("f32", StorageChoice::F32),
+        ("i16", StorageChoice::I16),
+        ("i16-f32avg", StorageChoice::I16F32Avg),
     ] {
         let doc = parse(&format!("{}\n[solver]\nstorage = '{name}'", standard("")));
         let effective = doc.normalize(&P1Sections).unwrap();
@@ -872,4 +874,88 @@ fn lowering_rejects_overflow_and_wrong_product() {
     s.product = spot::Product::MultiwayPreflop;
     assert_eq!(lower(&s, &settings).err().unwrap().code, Code::NLH005);
     assert!(Settings::parse(&s, &doc.solver, &doc.output).is_err());
+}
+
+#[test]
+fn auto_storage_resolves_at_memory_boundaries_and_reports_both_requirements() {
+    use hu_postflop::input::Storage;
+    use hu_postflop::{MemoryEstimate, prepare};
+    let mut p = prepare::prepare(
+        include_str!("../../../examples/hu-postflop/river_small.toml"),
+        Path::new("river.toml"),
+    )
+    .unwrap();
+    p.estimate = MemoryEstimate {
+        f32_bytes: 1000,
+        i16_f32avg_bytes: 750,
+        i16_bytes: 500,
+        ..Default::default()
+    };
+    for (limit, backend, fits) in [
+        (1000, Storage::F32, true),
+        (999, Storage::I16F32Avg, true),
+        (750, Storage::I16F32Avg, true),
+        (749, Storage::I16F32Avg, false),
+        (500, Storage::I16F32Avg, false),
+    ] {
+        p.limit = limit;
+        p.settings.solver.storage =
+            prepare::resolve_storage(StorageChoice::Auto, &p.estimate, limit);
+        assert_eq!(p.settings.solver.storage, backend);
+        let result = prepare::check_memory_limit(&p);
+        assert_eq!(result.is_ok(), fits);
+        if let Err(error) = result {
+            assert_eq!(error.required, 750);
+            assert_eq!(error.auto_f32_required, Some(1000));
+            assert_eq!(error.limit, limit);
+            let message = error.to_string();
+            for part in [
+                "auto",
+                "f32 1000",
+                "i16-f32avg 750",
+                &format!("limit {limit}"),
+            ] {
+                assert!(message.contains(part), "{message}");
+            }
+        }
+    }
+    for storage in [Storage::F32, Storage::I16, Storage::I16F32Avg] {
+        assert_eq!(
+            prepare::resolve_storage(storage.into(), &p.estimate, 1),
+            storage
+        );
+    }
+}
+
+#[test]
+fn historical_explicit_storage_normalization_and_compatibility_are_preserved() {
+    use hu_postflop::{checkpoint, prepare};
+    let raw = format!(
+        "{}\n[solver]\nstorage = 'f32'\n[solver.stop]\nmax_iterations = 4\n[run]\nthreads = 1\nmemory = '1GiB'",
+        text(
+            "",
+            "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+            "Ks 7h 2d 3c 9s",
+            ""
+        )
+    );
+    // All historical effective configs serialized Storage::F32 explicitly.
+    let historical = parse(&raw).normalize(&P1Sections).unwrap();
+    assert_eq!(parse(&historical).solver["storage"].as_str(), Some("f32"));
+    let prepared = prepare::prepare(&historical, Path::new("run.toml")).unwrap();
+    assert_eq!(prepared.effective, historical);
+    assert!(!prepared.storage_auto);
+    let hash = prepare::compatibility_hash(&historical).unwrap();
+    let game = game(&prepared.config);
+    let solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        game.game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(4),
+    );
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("checkpoint.ckpt");
+    checkpoint::write_storage_with_config(&path, hash, 0, solver.storage(), &historical, 0.0, 1)
+        .unwrap();
+    let restored = prepare::restore(&historical, &path).unwrap();
+    assert_eq!(restored.state.config_hash, hash);
 }

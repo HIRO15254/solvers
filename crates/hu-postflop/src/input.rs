@@ -24,6 +24,38 @@ pub enum Storage {
     I16F32Avg,
 }
 
+/// Input choice; automatic selection is resolved before backend dispatch.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum StorageChoice {
+    #[default]
+    Auto,
+    F32,
+    I16,
+    #[serde(rename = "i16-f32avg")]
+    I16F32Avg,
+}
+
+impl From<Storage> for StorageChoice {
+    fn from(storage: Storage) -> Self {
+        match storage {
+            Storage::F32 => Self::F32,
+            Storage::I16 => Self::I16,
+            Storage::I16F32Avg => Self::I16F32Avg,
+        }
+    }
+}
+
+impl Storage {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::F32 => "f32",
+            Self::I16 => "i16",
+            Self::I16F32Avg => "i16-f32avg",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum SolutionStreets {
@@ -32,7 +64,7 @@ pub enum SolutionStreets {
     NoRivers,
 }
 
-/// P1 schedule parameters. Standalone defaults assume f32 storage;
+/// P1 schedule parameters. Standalone defaults assume auto storage;
 /// `Settings::parse` resolves omitted DCFR resets using the final storage.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
@@ -173,9 +205,9 @@ impl Default for Parallel {
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(default, deny_unknown_fields)]
-pub struct Solver {
+pub struct Solver<S = StorageChoice> {
     pub iso_merging: bool,
-    pub storage: Storage,
+    pub storage: S,
     #[serde(default = "default_cfr_precision")]
     pub cfr_precision: CfrPrecision,
     pub algorithm: Algorithm,
@@ -185,11 +217,11 @@ pub struct Solver {
 fn default_cfr_precision() -> CfrPrecision {
     CfrPrecision::F32
 }
-impl Default for Solver {
+impl<S: Default> Default for Solver<S> {
     fn default() -> Self {
         Self {
             iso_merging: true,
-            storage: Storage::default(),
+            storage: S::default(),
             cfr_precision: default_cfr_precision(),
             algorithm: Algorithm::default(),
             stop: Stop::default(),
@@ -204,9 +236,25 @@ pub struct Output {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Settings {
-    pub solver: Solver,
+pub struct Settings<S = StorageChoice> {
+    pub solver: Solver<S>,
     pub output: Output,
+}
+
+impl Settings<StorageChoice> {
+    pub(crate) fn with_storage(self, storage: Storage) -> Settings<Storage> {
+        Settings {
+            solver: Solver {
+                iso_merging: self.solver.iso_merging,
+                storage,
+                cfr_precision: self.solver.cfr_precision,
+                algorithm: self.solver.algorithm,
+                stop: self.solver.stop,
+                parallel: self.solver.parallel,
+            },
+            output: self.output,
+        }
+    }
 }
 
 fn invalid(key: &str, message: impl Into<String>) -> SpotError {
@@ -367,7 +415,7 @@ impl Settings {
                 solver,
                 "storage",
                 "solver.storage",
-                Storage::default(),
+                StorageChoice::default(),
                 toml::Value::is_str,
             )?,
             cfr_precision: field(
@@ -380,7 +428,7 @@ impl Settings {
             ..Solver::default()
         };
         // Resolve only after storage is known, including an omitted algorithm section.
-        let default_reset = settings.storage == Storage::I16;
+        let default_reset = settings.storage == StorageChoice::I16;
         if let Algorithm::Dcfr { pow4_reset, .. } = &mut settings.algorithm {
             *pow4_reset = default_reset;
         }
@@ -566,7 +614,7 @@ pub struct NlhStreetRules {
 
 /// Lower the validated IR without I/O or allocating a game tree.
 /// The u32 builder boundary is checked for the largest possible terminal pot.
-pub fn lower(spot: &Spot, settings: &Settings) -> Result<PostflopConfig, SpotError> {
+pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, SpotError> {
     if spot.product != Product::HuPostflop {
         return Err(SpotError::new(
             Code::NLH005,

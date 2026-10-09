@@ -60,8 +60,10 @@ pub fn validate(
     value["gameKind"] = json!("hu-postflop");
     value["amountUnit"] = json!("BB");
     value["utilityUnit"] = json!(utility_unit(&p));
+    let normalized = p.document.normalize(&input::P1Sections)?;
     if resources {
         value["resources"] = json!({
+            "storage": p.settings.solver.storage.name(),
             "nodes": p.estimate.nodes, "terminals": p.estimate.terminals,
             "f32Bytes": p.estimate.f32_bytes, "i16Bytes": p.estimate.i16_bytes,
             "i16F32avgBytes": p.estimate.i16_f32avg_bytes,
@@ -72,10 +74,10 @@ pub fn validate(
     }
     if show {
         value["effectiveConfig"] =
-            serde_json::to_value(toml::from_str::<toml::Value>(&p.effective)?)?;
+            serde_json::to_value(toml::from_str::<toml::Value>(&normalized)?)?;
     }
     if let Some(path) = write {
-        std::fs::write(path, &p.effective)?;
+        std::fs::write(path, &normalized)?;
     }
     match format {
         crate::validate::ValidationFormat::Json => {
@@ -92,12 +94,18 @@ pub fn validate(
             }
             if resources {
                 println!("resources:");
+                println!(
+                    "  storage: {}",
+                    hu_postflop::prepare::storage_description(&p)
+                );
                 for (key, value) in value["resources"].as_object().expect("resources object") {
-                    println!("  {key}: {value}");
+                    if key != "storage" {
+                        println!("  {key}: {value}");
+                    }
                 }
             }
             if show {
-                println!("\n{}", p.effective);
+                println!("\n{}", normalized);
             }
         }
     }
@@ -278,7 +286,7 @@ pub fn solve(
 ) -> Result<()> {
     let raw = overrides(raw, threads, memory, max_time, None)?;
     let p = prepare(&raw, path)?;
-    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
+    hu_postflop::prepare::check_memory_limit(&p)?;
     crate::run_dir::create_or_adopt(out)?;
     execute(p, out, None, Vec::new(), Duration::ZERO, false)
 }
@@ -297,7 +305,7 @@ pub fn resume(
     let checkpoint = hu_postflop::prepare::restore(raw, checkpoint_path)?;
     let raw = overrides(raw, threads, memory, max_time, interval)?;
     let p = prepare(&raw, Path::new("run.toml"))?;
-    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit)?;
+    hu_postflop::prepare::check_memory_limit(&p)?;
     let progress = directory.join(runfiles::RUN_PROGRESS_FILE);
     let history = run::read_evaluation_history(&progress, checkpoint.state.iteration);
     let elapsed = match checkpoint.elapsed {
@@ -385,7 +393,10 @@ fn execute(
             Ok(())
         },
         &mut |diagnostic| match diagnostic {
-            run::Diagnostic::Memory(estimate) => print_memory_estimate(&estimate),
+            run::Diagnostic::Memory(estimate) => {
+                print_memory_estimate(&estimate);
+                println!("storage: {}", hu_postflop::prepare::storage_description(&p));
+            }
             run::Diagnostic::Warning(warning) => eprintln!("warning: {warning}"),
             run::Diagnostic::Done(summary) => print_done(&summary),
             run::Diagnostic::Artifact(diagnostic) => print_artifact(diagnostic),

@@ -1205,3 +1205,129 @@ fn fold_only_checkdown_nodes_solve_save_export_inspect_and_report() {
         text(&report),
     ]);
 }
+
+#[test]
+fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("auto.toml");
+    // Below the bounded export batch size, save workspace dominates and the
+    // f32 and mixed requirements coincide. A wide single-street tree gives
+    // a real gap without changing the production memory estimate formula.
+    let bets = (1..=20)
+        .map(|n| format!("{n}bb"))
+        .collect::<Vec<_>>()
+        .join(",");
+    let raw = RIVER
+        .replace("stack_bb = 5", "stack_bb = 10000")
+        .replace("AhAd,QhQd", "random")
+        .replace("JhJd,ThTd", "random")
+        .replace("replace bet [1bb]", &format!("replace bet [{bets}]"))
+        .replace("replace raise [a]", "replace raise [2x,3x,4x,5x,6x,7x]")
+        .replace(
+            "[solver.stop]",
+            "[tree.max_aggressive_actions]\nriver = 4\n[solver.stop]",
+        )
+        .replace("max_iterations = 16", "max_iterations = 1");
+    std::fs::write(&config, &raw).unwrap();
+    let resources = |path: &Path| -> serde_json::Value {
+        serde_json::from_slice(
+            &ok(&[
+                "validate",
+                text(path),
+                "--resources",
+                "--format",
+                "json",
+                "--show-effective",
+            ])
+            .stdout,
+        )
+        .unwrap()
+    };
+    let high = resources(&config);
+    assert_eq!(high["effectiveConfig"]["solver"]["storage"], "auto");
+    assert_eq!(high["resources"]["storage"], "f32");
+    let f32 = high["resources"]["memoryEstimateBytes"].as_u64().unwrap();
+    std::fs::write(&config, raw.replace("memory = \"1GiB\"", "memory = 1")).unwrap();
+    let low = resources(&config);
+    let mixed = low["resources"]["memoryEstimateBytes"].as_u64().unwrap();
+    assert_eq!(low["resources"]["storage"], "i16-f32avg");
+    assert_eq!(low["resources"]["withinLimit"], false);
+    assert!(
+        mixed < f32,
+        "river must have a real mixed-storage memory advantage"
+    );
+    let limit = mixed + (f32 - mixed) / 2;
+    std::fs::write(
+        &config,
+        raw.replace("memory = \"1GiB\"", &format!("memory = {limit}")),
+    )
+    .unwrap();
+    let mid = resources(&config);
+    assert_eq!(mid["resources"]["storage"], "i16-f32avg");
+    assert_eq!(mid["resources"]["withinLimit"], true);
+    let effective = temp.path().join("normalized.toml");
+    ok(&[
+        "validate",
+        text(&config),
+        "--write-effective",
+        text(&effective),
+    ]);
+    let normalized: toml::Value =
+        toml::from_str(&std::fs::read_to_string(effective).unwrap()).unwrap();
+    assert_eq!(normalized["solver"]["storage"].as_str(), Some("auto"));
+    for (name, extra) in [("mixed", vec![]), ("f32", vec!["--memory", "1GiB"])] {
+        let directory = temp.path().join(name);
+        let mut args = vec!["solve", text(&config), "--out", text(&directory)];
+        args.extend(extra);
+        ok(&args);
+        let backend = if name == "mixed" { "i16-f32avg" } else { "f32" };
+        let check = || {
+            let saved = std::fs::read_to_string(directory.join("run.toml")).unwrap();
+            let value: toml::Value = toml::from_str(&saved).unwrap();
+            assert_eq!(value["solver"]["storage"].as_str(), Some(backend));
+            let payload = hu_postflop::sol::read_sol(&directory.join("solution.sol")).unwrap();
+            assert_eq!(payload.meta.storage, backend);
+            let embedded: toml::Value = toml::from_str(&payload.config_toml).unwrap();
+            assert_eq!(embedded["solver"]["storage"].as_str(), Some(backend));
+            let checkpoint =
+                hu_postflop::checkpoint::CheckpointReader::open(&directory.join("checkpoint.ckpt"))
+                    .unwrap();
+            let embedded: toml::Value =
+                toml::from_str(checkpoint.config_toml.as_deref().unwrap()).unwrap();
+            assert_eq!(embedded["solver"]["storage"].as_str(), Some(backend));
+        };
+        check();
+        if name == "mixed" {
+            // More memory on resume must not reinterpret the saved backend.
+            ok(&["resume", text(&directory), "--memory", "1GiB"]);
+            check();
+        }
+    }
+}
+
+#[test]
+fn auto_storage_resource_failure_preserves_normalized_choice() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("auto.toml");
+    std::fs::write(&config, RIVER.replace("memory = \"1GiB\"", "memory = 1")).unwrap();
+    let result = ok(&[
+        "validate",
+        text(&config),
+        "--resources",
+        "--format",
+        "json",
+        "--show-effective",
+    ]);
+    let value: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(value["effectiveConfig"]["solver"]["storage"], "auto");
+    assert_eq!(
+        value["effectiveConfig"]["solver"]["algorithm"]["pow4_reset"],
+        false
+    );
+    assert_eq!(value["resources"]["storage"], "i16-f32avg");
+    assert_eq!(value["resources"]["withinLimit"], false);
+    let out = temp.path().join("rejected");
+    let result = cli(&["solve", text(&config), "--out", text(&out)]);
+    assert_eq!(result.status.code(), Some(75));
+    assert!(!out.exists());
+}
