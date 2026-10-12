@@ -219,24 +219,40 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 `[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
 
-最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。両encoderはlevel 1・1 MiB window・run threadsのzstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。solve開始のmemory見積り式・checkpoint v5・`.sol` v2は変わらない。
+最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 1 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式・checkpoint v5・`.sol` v3の形式は同じである。
 
-`.sol`は`SLVRSOLV` magic、u16 version 2、32-byte config hash、u64 iterationの50-byte headerを持つ。
-多byte値はlittle endian、payloadはzstd圧縮である。
+`.sol`はversion 3である（SOL-14、2026-10-12）。多byte値はlittle endianで、次の順に並ぶ。
 
-| payload | 意味 |
+| 部分 | 内容 |
+|---|---|
+| header（138 bytes） | `SLVRSOLV` magic、u16 version 3、32-byte config hash、u64 iteration、u64 metadata frame長、u64 directory offset、u64 directory frame長、metadata frameのBLAKE3、directory frameのBLAKE3 |
+| metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame（level 3） |
+| 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frame（level 1）の列 |
+| 値chunk列 | 同じnode集合の値blockをsref昇順に詰めたchunkのzstd frame（level 1）の列 |
+| directory frame | 戦略chunk列、値chunk列の順に、chunkごとの先頭sref（u32）、末尾sref（u32）、node数（u32）、file offset（u64）、圧縮長（u64）、展開長（u64）、圧縮frameのBLAKE3（32 bytes）を並べたpostcard bytesのzstd frame（level 3） |
+
+| metadata | 意味 |
 |---|---|
 | `config_toml` | 外部tree sourceをinline化した実効config全文。木を決定的に再構築する |
 | `meta` | iterations、expl[2]、ev[2]、nash_conv、storage（`f32` / `i16` / `i16-f32avg`の文字列）、wall_secs |
 | `mode` | full / no-rivers |
-| `blocks` | action nodeごとのactor support次元のu16戦略、sref昇順 |
-| `values` | 同じnode集合のOOP support、IP supportの値（席別次元）。block scale付きi16、sref昇順 |
+| `tree_nodes` | 埋込みconfigから再構築する木のnode数 |
+| `stored_nodes` | 保存するaction node数。戦略chunk列と値chunk列はそれぞれこの数のblockを持つ |
 
+chunkの展開内容はblockの連結である。戦略blockはu32 sref、u32 byte長、action nodeごとのactor support次元のu16戦略（action-major）である。
+値blockはu32 sref、f32 scale、u32 byte長、OOP support、IP supportの値（席別次元、block scale付きi16）である。
+chunkは展開bytesが1 MiB以上になったblockで閉じる。chunk内のsrefは昇順で、chunk間のsref範囲は重ならない。
+
+openはheader、metadata、directoryだけを読み、metadataとdirectoryのBLAKE3、config hash、headerとmetadataのiteration一致を検査する。
+さらにchunkがmetadata直後からdirectory直前まで隙間なく並ぶこと、sref範囲の昇順、各chunk列のnode数の和が`stored_nodes`であること、directoryがfile末尾で終わることを検査する。
+chunkは照会したnodeを含むものだけを読み、BLAKE3、展開長、block列とdirectoryの一致を検査する。破損したchunkはそのchunkを読む照会だけを失敗させる。
+`export summary`はmetadataだけで答え、木を再構築しない。他の照会は木を再構築し、`tree_nodes`とmodeから決まる保存node数を照合する。
+照会したnodeのblockが無い、またはnodeの形状と長さが合わなければ、artifactが木と一致しないerrorである。
 `.sol`のheader hashはblake3(config_toml全文)と一致しなければ読込みerrorである。
 `.sol`の戦略はsolve storageによらずu16である。値の分解能はblockのピークに対し約1/32767である。
 supportは埋込みconfigから再計算する。開始rangeのweight 0のhandには保存slotが無い。
 support内でもそのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
-version 1はversion errorで明示的に拒否する。現行configから再solveしてversion 2を作る。
+version 1と、単一zstd streamのversion 2はversion errorで明示的に拒否する。現行configから再solveしてversion 3を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
 共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5である。
@@ -256,17 +272,16 @@ storageの長さはcompact supportで決まる。P1 resumeはversion 5だけを�
 version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
 保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
-`.sol`もpostcardを逐次圧縮し、level 1・run threads数の並列圧縮を使う。v2 payload・量子化式・sref順序は変えない。
-圧縮bytesは以前のlevel 3・単一thread出力と異なるが、v2読み手で読める。
+`.sol`も同じ一時file・fsync・atomic置換を使う。chunkは16個ずつrun用Rayon poolで並列圧縮し、sref順に書く。出力bytesはthread数によらない。
+量子化式とsref順序はversion 2と同じであり、同じsolveからのexport出力は変わらない。
 
 `MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をCとして、表示とmemory上限判定は`max(S, S − R + W) + C`を使う。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
 P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
-戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化・postcard符号化をrun threadsのRayon poolで並列生成し、書き手がsref順に流す。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockを同じ形式（sref・scale・長さのheaderと量子化bytes）に符号化してslotに保持し、書き手がsref昇順に流す。
-`saveWorkspaceBytes`は値block bytes＋action node数×14（値block headerの上限）＋action node数×（`Mutex<Option<Result<Vec<u8>, postcard::Error>>>`（符号化済み値block bytes）と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
-戦略batch予算はB×8 bytes（f32平均戦略4＋u16量子化bytes 2＋postcard bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(StrategyBlock)＋size_of(Vec<f32>)＋15（sref・長さのvarint上界）。符号化Vecは2×node要素数＋15 bytesを事前確保し、成長時の余剰を作らない。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。`compressionWorkspaceBytes`は1 MiB windowのstreaming codec予算である。
-workerではsrefとbyte列長のheaderをpostcardで符号化し、量子化済みbyte列をまとめて連結する。既存StrategyBlockのpostcard bytesと同一の形式である。
-圧縮予算は最大payloadの2 MiB job数とrun threads数の小さい方×16 MiB＋共有8 MiB＋実効config長×3で見積もる。
-payloadの上界はf32 storage bytesと（保存作業領域＋全戦略のu16 bytes）の大きい方を使う。逐次出力する戦略も圧縮対象の量へ算入する。
+戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化をrun threadsのRayon poolで並列生成し、書き手がsref順にchunkへ詰める。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockをscaleと量子化bytesとしてslotに保持し、書き手がsref昇順にchunkへ詰める。
+`saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<(f32, Vec<u8>)>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
+戦略batch予算はB×6 bytes（f32平均戦略4＋u16量子化bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(Vec<f32>)。量子化Vecは2×node要素数bytesを事前確保する。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。
+`compressionWorkspaceBytes`は書き手の作業領域で、thread数によらない。P＝min（16、floor（payload bytes / 1 MiB）＋1）を同時に圧縮するchunk数として、（P＋2）×2×（1 MiB＋12＋最大block bytes）（封じたchunk P個と各列の書込み中chunk、その圧縮frame）＋P×4 MiB（圧縮context）＋保存action node数×4（値blockと照合するsref列）＋chunk数上界×3×directory entry size＋実効config長×2（metadata frame）である。
+payload bytesは全戦略要素数×2＋全値block bytes、最大block bytesは最大node要素数×2と値block bytesの大きい方、chunk数上界は2×（floor（payload bytes / 1 MiB）＋1）である。chunkは1 MiBに達して初めて封じるため、封じたchunkはpayloadが満たせる数を超えない。
 NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。
 
 P1のresume互換性hashは正規化configから`[run]`・`[meta]`・`solver.cfr_precision`を除いたTOMLのblake3である。
@@ -286,6 +301,9 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 | `strategy` | node × comboのweightとprobabilities |
 | `ev` | node × seat × comboのweightとev |
 | `range` | seat × comboのweight |
+
+`tree`・`actions`・`strategy`・`ev`は`--node`が指すnodeの行を出す。`--node`は繰り返せ、1回の読込みで各指定の行を指定順に連結する（SOL-14）。
+各行は`history`列を持つので、連結しても行の所属nodeを区別できる。`summary`と`range`は`--node`を使わない。
 
 pot・stack・action額はBB、EVとexplはutility単位である。
 nodeのweightは到達weightであり、root rangeのweightと区別する。frequencyは同じweightで加重する。

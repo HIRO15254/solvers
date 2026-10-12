@@ -2185,17 +2185,23 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         save_bytes: counting.action_nodes
                 * 2
                 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
-            + counting.action_nodes * crate::sol::VALUE_BLOCK_HEADER_BYTES as u64
             + counting.action_nodes
-                * (std::mem::size_of::<
-                    std::sync::Mutex<Option<Result<Vec<u8>, postcard::Error>>>,
-                >() + std::mem::size_of::<bool>()) as u64
+                * (std::mem::size_of::<parking_lot::Mutex<Option<(f32, Vec<u8>)>>>()
+                    + std::mem::size_of::<bool>()) as u64
             + counting.nodes * std::mem::size_of::<Street>() as u64
             // Conservatively add the batch to the value pass's retained slots.
             + crate::sol::strategy_batch_workspace(
                 counting.elements, counting.min_strategy_elements, counting.max_strategy_elements, counting.action_nodes,
             ),
-        compression_bytes: 24 * 1024 * 1024,
+        compression_bytes: crate::sol::compression_workspace(
+            (counting.max_strategy_elements * 2)
+                .max(2 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64),
+            counting.elements * 2
+                + counting.action_nodes
+                    * 2
+                    * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64,
+            counting.action_nodes,
+        ),
         nodes: counting.nodes,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,

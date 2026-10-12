@@ -21,13 +21,24 @@ fn tree_error(error: crate::TreeBuildError) -> spot::SpotError {
     spot::SpotError::new(spot::Code::NLH003, "tree", error.to_string())
 }
 
-/// Parse and lower a P1 input, measuring its tree and resolving the memory/stop limits.
-pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
+fn parse_p1(raw: &str, path: &Path) -> Result<(spot::Document, Settings<input::StorageChoice>)> {
     let document = spot::Document::parse(raw, path)?;
     if document.spot.product != spot::Product::HuPostflop {
         bail!("NLH005: this command requires a P1 (HU Postflop) spot");
     }
     let settings = Settings::parse(&document.spot, &document.solver, &document.output)?;
+    Ok((document, settings))
+}
+
+/// Parse and lower a P1 input without measuring its tree.
+pub fn lower_config(raw: &str, path: &Path) -> Result<crate::PostflopConfig> {
+    let (document, settings) = parse_p1(raw, path)?;
+    Ok(input::lower(&document.spot, &settings)?)
+}
+
+/// Parse and lower a P1 input, measuring its tree and resolving the memory/stop limits.
+pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
+    let (document, settings) = parse_p1(raw, path)?;
     let effective = document.normalize(&P1Sections)?;
     let config = input::lower(&document.spot, &settings)?;
     let payoff = NlhPayoff::new(&document.spot)?;
@@ -39,20 +50,16 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         .map(|target| input::resolve_target(&document.spot, target))
         .transpose()?;
     let mut estimate = crate::try_memory_usage(&config).map_err(tree_error)?;
-    let threads = document
-        .spot
-        .run
-        .threads
-        .unwrap_or(std::thread::available_parallelism()?.get() as u64);
-    // Budget the longest possible concrete spelling for auto, so artifacts
-    // restored with i16-f32avg never need more codec workspace than preflight.
+    // The metadata frame holds the effective config twice (encoded and
+    // compressed). Budget the longest possible concrete spelling for auto, so
+    // artifacts restored with i16-f32avg never need more than preflight.
     let config_len = effective.len()
         + if settings.solver.storage == input::StorageChoice::Auto {
             "i16-f32avg".len() - "auto".len()
         } else {
             0
         };
-    estimate.compression_bytes = compression_workspace(&estimate, threads, config_len);
+    estimate.compression_bytes += 2 * config_len as u64;
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
@@ -121,21 +128,6 @@ pub fn storage_description(p: &Prepared) -> String {
         if f32 <= p.limit { "<=" } else { ">" },
         p.limit
     )
-}
-
-fn compression_workspace(estimate: &crate::MemoryEstimate, threads: u64, config_len: usize) -> u64 {
-    // zstd uses a 1 MiB window and jobs of at least 2 MiB. Tiny payloads
-    // cannot occupy every requested worker. The streamed strategies are
-    // still in the payload, though no longer in save_bytes. Slot overhead
-    // conservatively covers both lists' per-block postcard headers. The
-    // parallel strategy batch is already fully budgeted in save_bytes,
-    // independent of threads; do not add per-worker strategy buffers here.
-    let solution = estimate.save_bytes.saturating_add(estimate.f32_bytes / 4);
-    let payload = estimate.f32_bytes.max(solution);
-    let jobs = threads.min(payload.div_ceil(2 * 1024 * 1024).max(1));
-    jobs.saturating_mul(16 * 1024 * 1024)
-        .saturating_add(8 * 1024 * 1024)
-        .saturating_add(config_len as u64 * 3)
 }
 
 /// Return warnings from the prepared tree and stop settings.
@@ -373,27 +365,4 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
         state: checkpoint,
         elapsed,
     })
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn compression_budget_counts_streamed_strategies_as_payload() {
-        const MIB: u64 = 1024 * 1024;
-        // Asymmetric supports can make the retained values dominate storage.
-        // Values alone fit one job, but values plus strategies require two.
-        let estimate = crate::MemoryEstimate {
-            f32_bytes: MIB,
-            save_bytes: 2 * MIB - 1,
-            ..Default::default()
-        };
-        assert_eq!(
-            super::compression_workspace(&estimate, 8, 100),
-            40 * MIB + 300
-        );
-        assert_eq!(
-            super::compression_workspace(&estimate, 1, 100),
-            24 * MIB + 300
-        );
-    }
 }

@@ -1206,6 +1206,59 @@ fn fold_only_checkdown_nodes_solve_save_export_inspect_and_report() {
     ]);
 }
 
+/// Repeated `--node` exports every named node from one load, in the given
+/// order, exactly as separate single-node exports would.
+#[test]
+fn repeated_node_exports_concatenate_single_node_rows_in_order() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("river.toml");
+    std::fs::write(&config, RIVER).unwrap();
+    let run = temp.path().join("run");
+    ok(&["solve", text(&config), "--out", text(&run)]);
+    let solution = run.join("solution.sol");
+    let tree: Vec<serde_json::Value> =
+        serde_json::from_slice(&ok(&["export", text(&solution), "tree", "--node", "all"]).stdout)
+            .unwrap();
+    let histories: Vec<&str> = tree
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .take(3)
+        .collect();
+    assert_eq!(histories.len(), 3, "fixture needs three stored nodes");
+    // Out of tree order, with a repeat, so neither order nor dedup is implied.
+    let nodes = [histories[2], histories[0], histories[2]];
+    for view in ["strategy", "ev", "actions", "tree"] {
+        let mut args = vec!["export", text(&solution), view, "--format", "csv"];
+        for node in nodes {
+            args.extend(["--node", node]);
+        }
+        let combined = String::from_utf8(ok(&args).stdout).unwrap();
+        let mut expected = String::new();
+        for (i, node) in nodes.iter().enumerate() {
+            let single = String::from_utf8(
+                ok(&[
+                    "export",
+                    text(&solution),
+                    view,
+                    "--format",
+                    "csv",
+                    "--node",
+                    node,
+                ])
+                .stdout,
+            )
+            .unwrap();
+            let (header, rows) = single.split_once('\n').unwrap();
+            if i == 0 {
+                expected.push_str(header);
+                expected.push('\n');
+            }
+            expected.push_str(rows);
+        }
+        assert_eq!(combined, expected, "{view}");
+    }
+}
+
 #[test]
 fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
     let temp = tempfile::tempdir().unwrap();

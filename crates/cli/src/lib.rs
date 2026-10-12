@@ -324,9 +324,10 @@ enum Command {
         format: multiway_artifact::ExportFormat,
         /// Postflop only: which node the per-node views cover. `root`, a
         /// betting-line history (`xr10c`), slash-separated action labels
-        /// (`check/bet 10`), or `all` for every stored node.
+        /// (`check/bet 10`), or `all` for every stored node. Repeat to
+        /// export several nodes from one load; rows follow the given order.
         #[arg(long, default_value = "root")]
-        node: String,
+        node: Vec<String>,
         #[arg(long)]
         output: Option<std::path::PathBuf>,
     },

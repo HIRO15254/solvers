@@ -27,7 +27,7 @@ pub fn require_artifact_config(raw: &str) -> Result<()> {
 /// Current artifacts continue to the command's normal reader.
 pub fn require_current_artifact(path: &Path) -> Result<()> {
     if path.extension().is_some_and(|e| e == "sol") {
-        require_artifact_config(&hu_postflop::sol::read_sol(path)?.config_toml)?;
+        require_artifact_config(&hu_postflop::sol::read_sol_config(path)?)?;
     } else if path.extension().is_some_and(|e| e == "mwsol") {
         let reader = mw_preflop::mwsol::MwSolReader::open(path)?;
         require_artifact_config(&reader.metadata().config_toml)?;

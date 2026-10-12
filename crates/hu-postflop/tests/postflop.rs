@@ -730,13 +730,7 @@ fn memory_usage_matches_allocated() {
         let slots: Vec<_> = tree
             .storage_refs
             .iter()
-            .map(|sref| {
-                // Encoded block: values plus the header reserve.
-                let _ = sref;
-                std::sync::Mutex::new(Some(Ok::<Vec<u8>, postcard::Error>(Vec::with_capacity(
-                    hands * 2 + 14,
-                ))))
-            })
+            .map(|_| parking_lot::Mutex::new(Some((0.0f32, Vec::<u8>::with_capacity(hands * 2)))))
             .collect();
         let max_elements = tree
             .storage_refs
@@ -747,15 +741,7 @@ fn memory_usage_matches_allocated() {
         let allocated = std::mem::size_of_val(slots.as_slice())
             + slots
                 .iter()
-                .map(|slot| {
-                    slot.lock()
-                        .unwrap()
-                        .as_ref()
-                        .unwrap()
-                        .as_ref()
-                        .unwrap()
-                        .capacity()
-                })
+                .map(|slot| slot.lock().as_ref().unwrap().1.capacity())
                 .sum::<usize>()
             + tree.storage_refs.len() * size_of::<bool>()
             + tree.nodes.len() * size_of::<Street>()
@@ -763,17 +749,14 @@ fn memory_usage_matches_allocated() {
                 let elements = tree
                     .storage_len
                     .min(hu_postflop::sol::STRATEGY_BATCH_ELEMENTS.max(max_elements));
-                let headers = size_of::<(hu_engine::StorageRef, Vec<u8>)>()
-                    + size_of::<hu_postflop::sol::StrategyBlock>()
-                    + size_of::<Vec<f32>>()
-                    + 15;
+                let headers = size_of::<(hu_engine::StorageRef, Vec<u8>)>() + size_of::<Vec<f32>>();
                 let min_elements = tree
                     .storage_refs
                     .iter()
                     .map(|sref| sref.len())
                     .min()
                     .unwrap();
-                elements * 8
+                elements * 6
                     + tree.storage_refs.len().min(elements / min_elements.max(1)) * headers
                     + size_of::<Vec<(hu_engine::StorageRef, Vec<u8>)>>()
             };

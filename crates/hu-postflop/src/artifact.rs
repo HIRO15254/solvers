@@ -2,14 +2,13 @@
 //! `sol` owns the codec. This module owns rebuilding the tree and the
 //! reach-weighted river solve; callers render the emitted diagnostics.
 
-use std::collections::{HashMap, HashSet};
-use std::io::Write;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use crate::sol::{
-    SolMeta, StrategyBlock, StreetsStored, ValueBlock, dequantize_probs, dequantize_values,
-    quantize_probs, quantize_values, read_sol, write_sol_stream,
+    SolFileWriter, SolMeta, SolMetadata, SolReader, SolStore, StreetsStored, quantize_probs,
+    quantize_values,
 };
 use crate::{
     PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
@@ -66,7 +65,7 @@ pub(crate) fn start_street_from_board_len(len: usize) -> Street {
 pub(crate) struct SolExportSpec {
     pub path: PathBuf,
     pub mode: SolStreets,
-    /// Raw config file text, byte-for-byte -- becomes `SolPayload::config_toml`
+    /// Raw config file text, byte-for-byte -- becomes `SolMetadata::config_toml`
     /// so the viewer can rebuild an identical tree later.
     pub config_toml: String,
     /// Informational only (`SolMeta::storage`): "f32", "i16", or "i16-f32avg".
@@ -211,13 +210,17 @@ pub(crate) fn export_sol<S: Storage>(
         storage: spec.storage_name.clone(),
         wall_secs: summary.wall.as_secs_f64(),
     };
-    write_sol_stream(&spec.path, &spec.config_toml, &meta, |writer| {
-        // Postcard structs concatenate fields; Vec is a varint length then
-        // its elements. Keep SolPayload's field order, without owning it.
-        postcard::to_io(&spec.config_toml, &mut *writer)?;
-        postcard::to_io(&meta, &mut *writer)?;
-        postcard::to_io(&StreetsStored::from(mode), &mut *writer)?;
-        postcard::to_io(&block_count, &mut *writer)?;
+    let write = || -> Result<(), crate::sol::SolError> {
+        let mut writer = SolFileWriter::create(
+            &spec.path,
+            &SolMetadata {
+                config_toml: spec.config_toml.clone(),
+                meta: meta.clone(),
+                mode: StreetsStored::from(mode),
+                tree_nodes: tree.nodes.len() as u64,
+                stored_nodes: block_count as u64,
+            },
+        )?;
         let mut start = 0;
         while start < stored.len() {
             let (end, count) = strategy_batch_end(
@@ -236,30 +239,22 @@ pub(crate) fn export_sol<S: Storage>(
                     .filter(|(_, keep)| **keep)
                     .map(|(sref, _)| (*sref, Vec::new())),
             );
-            batch.par_iter_mut().try_for_each(|(sref, bytes)| {
+            batch.par_iter_mut().for_each(|(sref, bytes)| {
                 let mut avg = vec![0.0; sref.len()];
                 solver
                     .storage()
                     .average_strategy(*sref, sref.index, &mut avg);
-                let block = StrategyBlock {
-                    sref: sref.index,
-                    probs: quantize_probs(&avg),
-                };
-                // u32 sref <= 5 varint bytes, usize length <= 10, raw u16 bytes.
-                // Reserve the upper bound to avoid postcard Vec growth slack.
-                *bytes = crate::sol::strategy_block_bytes(&block)?;
-                Ok::<_, crate::sol::SolError>(())
-            })?;
-            for (_, bytes) in batch {
-                // DeferredFlush keeps the codec's single payload flush boundary.
-                writer.write_all(&bytes)?;
+                *bytes = quantize_probs(&avg);
+            });
+            for (sref, bytes) in batch {
+                writer.strategy(sref.index, &bytes)?;
             }
             start = end;
         }
 
         // Only packed values survive this pass; reaches/values are path-local.
         let slots: Vec<_> = (0..tree.storage_refs.len())
-            .map(|_| std::sync::Mutex::new(None))
+            .map(|_| parking_lot::Mutex::new(None::<(f32, Vec<u8>)>))
             .collect();
         solver.visit_expected_values(|id, reach, per_hand, _avg| {
             if mode == SolStreets::NoRivers && streets[id as usize] == Street::River {
@@ -289,23 +284,16 @@ pub(crate) fn export_sol<S: Storage>(
                         }),
                 );
             }
-            let (scale, bytes) = quantize_values(&per_node);
-            *slots[node.aux as usize].lock().expect("artifact slot") =
-                Some(crate::sol::value_block_bytes(&ValueBlock {
-                    sref: node.aux,
-                    scale,
-                    values: bytes,
-                }));
+            *slots[node.aux as usize].lock() = Some(quantize_values(&per_node));
         });
-        postcard::to_io(&block_count, &mut *writer)?;
-        for slot in slots {
-            if let Some(encoded) = slot.into_inner().expect("artifact slot") {
-                writer.write_all(&encoded?)?;
+        for (sref, slot) in slots.into_iter().enumerate() {
+            if let Some((scale, bytes)) = slot.into_inner() {
+                writer.values(sref as u32, scale, &bytes)?;
             }
         }
-        Ok(())
-    })
-    .with_context(|| format!("writing {}", spec.path.display()))?;
+        writer.finish()
+    };
+    write().with_context(|| format!("writing {}", spec.path.display()))?;
 
     let size = std::fs::metadata(&spec.path).map(|m| m.len()).unwrap_or(0);
     diagnostics(Diagnostic::Written {
@@ -353,11 +341,11 @@ pub struct LoadedSol {
     pub config: PostflopConfig,
     pub meta: SolMeta,
     pub mode: StreetsStored,
-    /// Stored blocks keyed by `sref` (== the action node's `Node::aux`).
-    pub blocks: HashMap<u32, Vec<u8>>,
-    /// Stored per-hand values, same keys as `blocks`: OOP's hands then
-    /// IP's, on the subgame-start basis.
-    pub values: HashMap<u32, Vec<f32>>,
+    /// Stored blocks keyed by `sref` (== the action node's `Node::aux`),
+    /// read chunk by chunk on demand; strategies and per-hand values (OOP's
+    /// hands then IP's, on the subgame-start basis) are dequantized per
+    /// query.
+    pub store: SolStore,
     pub streets: Vec<Street>,
     pub parents: Vec<NodeId>,
     pub board: Vec<Card>,
@@ -366,25 +354,81 @@ pub struct LoadedSol {
     pub nlh: (spot::Spot, crate::input::Settings<crate::input::Storage>),
 }
 
-/// Reads, verifies, and rebuilds a `.sol` artifact: `crate::sol::read_sol`
-/// (which itself verifies the header hash against the embedded config text)
-/// -> parse the embedded common-input P1 spot ->
-/// rebuild the exact same tree the P1 run built -> verify the stored
-/// block set matches the mode-implied set of action-node `sref`s exactly.
-/// That last check is the artifact's only defense against a hand-edited or
-/// bit-rotted `.sol` file whose header hash still happens to match (e.g. a
-/// `crate::sol` version bump that changed `aux` assignment): without it, a
-/// mismatched node id would silently serve the wrong node's strategy.
+impl LoadedSol {
+    /// Whether the artifact's mode stores blocks for `node`.
+    pub fn is_stored(&self, node: NodeId) -> bool {
+        self.pf_game.game.tree.node(node).kind == NodeKind::Action
+            && (self.mode == StreetsStored::Full || self.streets[node as usize] != Street::River)
+    }
+
+    /// Dequantized strategy at an action node, `None` when the mode does not
+    /// store the node. A node the mode stores but the file lacks, or whose
+    /// block has another shape, means the file does not belong to this tree.
+    pub fn stored_strategy(&self, node: NodeId) -> Result<Option<Vec<f32>>> {
+        if !self.is_stored(node) {
+            return Ok(None);
+        }
+        let tree = &self.pf_game.game.tree;
+        let n = tree.node(node);
+        let sref = tree.storage_ref(n);
+        self.store
+            .strategy(n.aux, sref.num_actions as usize, sref.num_hands as usize)
+            .map_err(|e| mismatch(n.aux, e))?
+            .map(Some)
+            .ok_or_else(|| missing(n.aux))
+    }
+
+    /// Dequantized per-hand values at a stored action node (OOP's support
+    /// then IP's), `None` when the mode does not store the node.
+    pub fn stored_values(&self, node: NodeId) -> Result<Option<Vec<f32>>> {
+        if !self.is_stored(node) {
+            return Ok(None);
+        }
+        let hands = &self.pf_game.game.evaluator.hands;
+        let aux = self.pf_game.game.tree.node(node).aux;
+        self.store
+            .values(aux, hands.len(Player::P0) + hands.len(Player::P1))
+            .map_err(|e| mismatch(aux, e))?
+            .map(Some)
+            .ok_or_else(|| missing(aux))
+    }
+}
+
+fn missing(sref: u32) -> anyhow::Error {
+    anyhow!("artifact does not match the rebuilt tree: no stored block for sref {sref}")
+}
+
+fn mismatch(sref: u32, error: crate::sol::SolError) -> anyhow::Error {
+    match error {
+        crate::sol::SolError::Truncated { .. } => {
+            anyhow!("artifact block for sref {sref} does not match its node's shape")
+        }
+        other => other.into(),
+    }
+}
+
+/// Opens, verifies, and rebuilds a `.sol` artifact: `SolReader::open`
+/// verifies the header, metadata and directory (including the header hash
+/// against the embedded config text) -> parse the embedded common-input P1
+/// spot -> rebuild the exact same tree the P1 run built -> verify the tree
+/// size and the mode-implied stored node count against the metadata.
+/// Blocks are read on demand; each read checks its chunk hash, that the
+/// node is present and that the block matches the node's shape. Those
+/// checks are the artifact's defense against a file whose header hash
+/// still matches but whose `aux` assignment differs (e.g. a tree-builder
+/// change): without them, a mismatched node id would silently serve the
+/// wrong node's strategy.
 pub fn load_sol(
     path: &Path,
     river_iterations: u64,
     river_target: Option<f64>,
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<LoadedSol> {
-    let payload = read_sol(path).with_context(|| format!("reading {}", path.display()))?;
+    let reader = SolReader::open(path).with_context(|| format!("reading {}", path.display()))?;
+    let metadata = reader.metadata().clone();
 
-    crate::prepare::require_artifact_config(&payload.config_toml)?;
-    let p = crate::prepare::prepare(&payload.config_toml, Path::new("embedded.toml"))?;
+    crate::prepare::require_artifact_config(&metadata.config_toml)?;
+    let p = crate::prepare::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
     let pf_config = p.config;
     let payoff = p.payoff;
     let nlh = (p.document.spot, p.settings);
@@ -406,79 +450,34 @@ pub fn load_sol(
     let streets = node_streets(&pf_game.game.tree, start_street);
     let parents = parent_array(&pf_game.game.tree);
 
-    let expected: HashSet<u32> = pf_game
-        .game
-        .tree
+    let tree = &pf_game.game.tree;
+    let expected = tree
         .nodes
         .iter()
-        .enumerate()
-        .filter(|(id, node)| {
+        .zip(&streets)
+        .filter(|(node, street)| {
             node.kind == NodeKind::Action
-                && (payload.mode == StreetsStored::Full || streets[*id] != Street::River)
+                && (metadata.mode == StreetsStored::Full || **street != Street::River)
         })
-        .map(|(_, node)| node.aux)
-        .collect();
-
-    let stored_len = payload.blocks.len();
-    let got: HashSet<u32> = payload.blocks.iter().map(|b| b.sref).collect();
-    if got.len() != stored_len || got != expected {
-        return Err(anyhow!(
-            "artifact does not match the rebuilt tree: {stored_len} stored block(s) vs {} \
-             expected action node(s) for mode {:?}",
-            expected.len(),
-            payload.mode,
-        ));
-    }
-
-    for block in &payload.blocks {
-        let r = pf_game.game.tree.storage_refs[block.sref as usize];
-        dequantize_probs(&block.probs, r.num_actions as usize, r.num_hands as usize)?;
-    }
-    let value_set: HashSet<u32> = payload.values.iter().map(|b| b.sref).collect();
-    if value_set != expected || value_set.len() != payload.values.len() {
-        bail!("artifact value blocks do not match the rebuilt tree");
-    }
-    let value_len = Player::BOTH
-        .iter()
-        .map(|&p| pf_game.game.evaluator.hands.len(p))
-        .sum();
-    for block in &payload.values {
-        dequantize_values(&block.values, block.scale, value_len)?;
-    }
-    let blocks: HashMap<u32, Vec<u8>> = payload
-        .blocks
-        .into_iter()
-        .map(|b| (b.sref, b.probs))
-        .collect();
-    // Dequantized once at load: every reader wants chips, and the scale is
-    // per block, so leaving it packed would push that arithmetic into each
-    // of them.
-    let values: HashMap<u32, Vec<f32>> = payload
-        .values
-        .into_iter()
-        .map(|b| {
-            let len = b.values.len() / 2;
-            let restored = dequantize_values(&b.values, b.scale, len)
-                .with_context(|| format!("decoding stored values for sref {}", b.sref))?;
-            Ok((b.sref, restored))
-        })
-        .collect::<Result<_>>()?;
-    if values.len() != blocks.len() {
-        return Err(anyhow!(
-            "artifact stores {} strategy block(s) but {} value block(s); \
-             the two must cover the same nodes",
-            blocks.len(),
-            values.len(),
-        ));
+        .count();
+    if metadata.tree_nodes != tree.nodes.len() as u64 || metadata.stored_nodes != expected as u64 {
+        bail!(
+            "artifact does not match the rebuilt tree: {} node(s) with {} stored vs {} \
+             rebuilt node(s) with {} expected action node(s) for mode {:?}",
+            metadata.tree_nodes,
+            metadata.stored_nodes,
+            tree.nodes.len(),
+            expected,
+            metadata.mode,
+        );
     }
 
     Ok(LoadedSol {
         pf_game,
         config: pf_config,
-        meta: payload.meta,
-        mode: payload.mode,
-        blocks,
-        values,
+        meta: metadata.meta,
+        mode: metadata.mode,
+        store: reader.into_store(),
         streets,
         parents,
         board: board_cards,
@@ -634,21 +633,29 @@ impl<'a> SolProvider<'a> {
             root_ranges[Player::P0].as_slice(),
             root_ranges[Player::P1].as_slice(),
         );
+        let mut failure = None;
         let reach = reach_at(trunk_tree, root_slices, entry, |_id, sref, out| {
             // Every strict ancestor of a river-entry node is non-river by
             // construction, so its block is always present regardless of
-            // `loaded.mode` -- a missing entry here would mean `load_sol`'s
-            // own stored-set verification failed to catch a corrupt file.
-            let bytes = loaded.blocks.get(&sref.index).unwrap_or_else(|| {
-                panic!(
-                    "missing stored block for ancestor sref {} while computing river reach",
-                    sref.index
-                )
-            });
-            let probs = dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)
-                .unwrap_or_else(|e| panic!("corrupt stored block for sref {}: {e}", sref.index));
-            out.copy_from_slice(&probs);
+            // `loaded.mode`; `load_sol` verified the stored set.
+            match loaded.store.strategy(
+                sref.index,
+                sref.num_actions as usize,
+                sref.num_hands as usize,
+            ) {
+                Ok(Some(probs)) => out.copy_from_slice(&probs),
+                Ok(None) => {
+                    failure = Some(anyhow!(
+                        "missing stored block for ancestor sref {} while computing river reach",
+                        sref.index
+                    ))
+                }
+                Err(error) => failure = Some(anyhow!(error)),
+            }
         });
+        if let Some(error) = failure {
+            return Err(error);
+        }
 
         // A line the solved trunk (essentially) never takes gives one player
         // an all-zero reach vector; the fresh subgame builder would then
@@ -781,11 +788,10 @@ impl StrategyProvider for SolProvider<'_> {
         if n.kind != NodeKind::Action {
             bail!("node {node} is not an action node");
         }
-        let sref = tree.storage_ref(n);
-        if let Some(bytes) = loaded.blocks.get(&n.aux) {
-            return dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)
-                .map_err(Into::into);
+        if let Some(avg) = loaded.stored_strategy(node)? {
+            return Ok(avg);
         }
+        let sref = tree.storage_ref(n);
 
         if loaded.streets[node as usize] != Street::River {
             bail!(
@@ -836,7 +842,9 @@ mod tests {
     use super::*;
     use crate::PostflopNodeInfo;
     use crate::game::{PayoffPipeline, UtilityModel};
+    use crate::sol::{dequantize_values, read_sol};
     use hu_engine::I16Storage;
+    use std::collections::HashSet;
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
     fn load_sol(path: &Path, iterations: u64, target: Option<f64>) -> Result<LoadedSol> {
@@ -1114,7 +1122,7 @@ memory = "1GiB"
             let (solver, node_info, start_street, mut summary) = build_and_solve::<S>(raw, 3);
             summary.wall = std::time::Duration::ZERO;
             let tree = &solver.game().tree;
-            let reference = std::sync::Mutex::new(HashMap::new());
+            let reference = parking_lot::Mutex::new(HashMap::new());
             solver.visit_expected_values(|id, _, _, avg| {
                 let sref = tree.storage_ref(tree.node(id));
                 let mut direct = vec![0.0; sref.len()];
@@ -1125,12 +1133,9 @@ memory = "1GiB"
                     avg.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
                     direct.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
                 );
-                reference
-                    .lock()
-                    .unwrap()
-                    .insert(sref.index, quantize_probs(avg));
+                reference.lock().insert(sref.index, quantize_probs(avg));
             });
-            let reference = reference.into_inner().unwrap();
+            let reference = reference.into_inner();
             let mut outputs = Vec::new();
             for mode in [SolStreets::Full, SolStreets::NoRivers] {
                 let path = temp_path("streamed.sol");
@@ -1170,10 +1175,6 @@ memory = "1GiB"
                     assert_eq!(&block.probs, &reference[&block.sref]);
                 }
                 let bytes = std::fs::read(&path).unwrap();
-                assert_eq!(
-                    zstd::decode_all(&bytes[crate::sol::HEADER_LEN..]).unwrap(),
-                    postcard::to_allocvec(&payload).unwrap()
-                );
                 let whole_path = temp_path("whole.sol");
                 crate::sol::write_sol(&whole_path, &payload).unwrap();
                 assert_eq!(bytes, std::fs::read(&whole_path).unwrap());
@@ -1247,22 +1248,20 @@ memory = "1GiB"
             if node.kind != NodeKind::Action {
                 continue;
             }
+            let sref = tree.storage_ref(node);
+            let stored = loaded
+                .store
+                .strategy(node.aux, sref.num_actions as usize, sref.num_hands as usize)
+                .unwrap();
             if streets[id as usize] == Street::River {
                 assert!(
-                    !loaded.blocks.contains_key(&node.aux),
+                    stored.is_none(),
                     "river node {id} must have no stored block in NoRivers mode"
                 );
                 river_node.get_or_insert(id);
                 continue;
             }
-            let sref = tree.storage_ref(node);
-            let bytes = loaded
-                .blocks
-                .get(&node.aux)
-                .unwrap_or_else(|| panic!("missing block for non-river node {id}"));
-            let dequant =
-                dequantize_probs(bytes, sref.num_actions as usize, sref.num_hands as usize)
-                    .unwrap();
+            let dequant = stored.unwrap_or_else(|| panic!("missing block for non-river node {id}"));
             let live = solver.average_strategy_at(id);
             for (a, b) in dequant.iter().zip(live.iter()) {
                 assert!(
@@ -1335,13 +1334,16 @@ memory = "1GiB"
             if node.kind != NodeKind::Action {
                 continue;
             }
-            let Some(bytes) = loaded.blocks.get(&node.aux) else {
-                continue;
-            };
             let sref = tree.storage_ref(node);
             let num_hands = sref.num_hands as usize;
             let num_actions = sref.num_actions as usize;
-            let probs = dequantize_probs(bytes, num_actions, num_hands).unwrap();
+            let Some(probs) = loaded
+                .store
+                .strategy(node.aux, num_actions, num_hands)
+                .unwrap()
+            else {
+                continue;
+            };
             for h in 0..num_hands {
                 let sum: f32 = (0..num_actions).map(|a| probs[a * num_hands + h]).sum();
                 assert!((sum - 1.0).abs() < 1e-3, "hand {h} column sum {sum}");
@@ -1376,7 +1378,7 @@ memory = "1GiB"
             let node = tree.node(id);
             if node.kind == NodeKind::Action {
                 assert!(
-                    loaded.blocks.contains_key(&node.aux),
+                    loaded.stored_strategy(id).unwrap().is_some(),
                     "action node {id} must have a stored block in Full mode"
                 );
                 checked_any = true;

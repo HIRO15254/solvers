@@ -1,9 +1,8 @@
-//! Saved-state fingerprints, v2 block equivalence and streaming codec timing.
+//! Saved-state fingerprints and `.sol` block equivalence.
 use anyhow::{Result, bail};
 use hu_engine::StorageState;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::path::Path;
-use std::time::Instant;
 
 fn hash_f32(hash: &mut blake3::Hasher, values: &[f32]) {
     let mut bytes = [0; 65536];
@@ -21,17 +20,6 @@ fn hash_i16(hash: &mut blake3::Hasher, values: &[i16]) {
             *dst = v.to_le_bytes();
         }
         hash.update(&bytes[..chunk.len() * 2]);
-    }
-}
-#[derive(Default)]
-struct Count(u64);
-impl Write for Count {
-    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
-        self.0 += bytes.len() as u64;
-        Ok(bytes.len())
-    }
-    fn flush(&mut self) -> std::io::Result<()> {
-        Ok(())
     }
 }
 fn main() -> Result<()> {
@@ -52,7 +40,6 @@ fn main() -> Result<()> {
                 })
             );
         }
-        Some("solution-stream") => compare_solution_streams(&args[2], &args[3])?,
         Some("checkpoint-compare") => compare_checkpoints(&args[2], &args[3])?,
         Some("checkpoint") => {
             let checkpoint = hu_postflop::checkpoint::read_checkpoint(Path::new(&args[2]))?;
@@ -93,270 +80,112 @@ fn main() -> Result<()> {
                 hash.finalize()
             );
         }
-        Some("solution") => {
-            let mut a = hu_postflop::sol::read_sol(Path::new(&args[2]))?;
-            let mut b = hu_postflop::sol::read_sol(Path::new(&args[3]))?;
-            let mut payload_sizes = Vec::new();
-            for (path, payload) in [(&args[2], &a), (&args[3], &b)] {
-                let file = std::fs::read(path)?;
-                let raw = zstd::decode_all(&file[hu_postflop::sol::HEADER_LEN..])?;
-                if raw != postcard::to_allocvec(payload)? {
-                    bail!("noncanonical postcard stream in {path}");
-                }
-                payload_sizes.push(raw.len());
-            }
-            a.meta.wall_secs = 0.0;
-            b.meta.wall_secs = 0.0;
-            // Explicit opt-ins: the legacy/PF5 comparison drops the recorded
-            // precision, and thread-count comparisons drop the operational [run].
-            let flags = &args[4..];
-            for flag in flags {
-                if !matches!(
-                    flag.as_str(),
-                    "--ignore-cfr-precision" | "--ignore-run" | "--equivalent-auto-cadence"
-                ) {
-                    bail!("unknown solution flag {flag}");
-                }
-            }
-            let ignore_precision = flags.iter().any(|s| s == "--ignore-cfr-precision");
-            let ignore_run = flags.iter().any(|s| s == "--ignore-run");
-            let equivalent_auto = flags.iter().any(|s| s == "--equivalent-auto-cadence");
-            if ignore_precision || ignore_run || equivalent_auto {
-                for payload in [&mut a, &mut b] {
-                    let mut config: toml_edit::DocumentMut = payload.config_toml.parse()?;
-                    if ignore_precision
-                        && let Some(solver) = config
-                            .get_mut("solver")
-                            .and_then(toml_edit::Item::as_table_mut)
-                    {
-                        solver.remove("cfr_precision");
-                    }
-                    if ignore_run {
-                        config.remove("run");
-                    }
-                    if equivalent_auto {
-                        // PF10 records auto explicitly even though a targetless run
-                        // computes identically to legacy fixed 25. Reject any other
-                        // cadence or target rather than masking a solver difference.
-                        let stop = &mut config["solver"]["stop"];
-                        if stop.get("target").is_some()
-                            || !(stop["check_every"].as_str() == Some("auto")
-                                || stop["check_every"].as_integer() == Some(25))
-                        {
-                            bail!("auto cadence equivalence requires no target and auto or 25");
-                        }
-                        stop["check_every"] = toml_edit::value(25);
-                    }
-                    payload.config_toml = config.to_string();
-                }
-            }
-            let a_bytes = postcard::to_allocvec(&a)?;
-            let b_bytes = postcard::to_allocvec(&b)?;
-            if a_bytes != b_bytes {
-                bail!("v2 payloads differ (excluding wall_secs)");
-            }
-            println!(
-                "{}",
-                serde_json::json!({
-                    "payload_bit_equal_except_wall_secs": true,
-                    "config_precision_excluded": ignore_precision,
-                    "config_run_excluded": ignore_run,
-                    "targetless_auto_cadence_normalized": equivalent_auto,
-                    "canonical_postcard_streams": true,
-                    "payload_bytes": payload_sizes,
-                    "normalized_payload_blake3": blake3::hash(&a_bytes).to_hex().as_str(),
-                    "strategy_blocks": a.blocks.len(),
-                    "value_blocks": a.values.len(),
-                    "file_bytes_equal": std::fs::read(&args[2])? == std::fs::read(&args[3])?,
-                })
-            );
-        }
-        Some("compression") => {
-            let mut results = Vec::new();
-            for level in 1..=3 {
-                let start = Instant::now();
-                let mut file = std::fs::File::open(&args[2])?;
-                let mut header = [0; 50];
-                file.read_exact(&mut header)?;
-                let mut decoder = zstd::stream::read::Decoder::new(file)?;
-                let mut encoder = zstd::stream::write::Encoder::new(Count::default(), level)?;
-                encoder.window_log(20)?;
-                encoder.multithread(8)?;
-                encoder.include_checksum(true)?;
-                let input = std::io::copy(&mut decoder, &mut encoder)?;
-                let output = encoder.finish()?.0;
-                results.push(serde_json::json!({"level": level, "decode_compress_seconds": start.elapsed().as_secs_f64(), "input_bytes": input, "compressed_bytes": output}));
-            }
-            println!("{}", serde_json::to_string_pretty(&results)?);
-        }
-        Some("compression-sample") => {
-            let mut file = std::fs::File::open(&args[2])?;
-            let mut header = [0; 50];
-            file.read_exact(&mut header)?;
-            let mut decoder = zstd::stream::read::Decoder::new(file)?;
-            let mut sample = vec![0; 128 * 1024 * 1024];
-            decoder.read_exact(&mut sample)?;
-            let mut results = Vec::new();
-            for level in [1, 2, 3, 3, 2, 1] {
-                let start = Instant::now();
-                let mut encoder = zstd::stream::write::Encoder::new(Count::default(), level)?;
-                encoder.window_log(20)?;
-                encoder.multithread(8)?;
-                encoder.include_checksum(true)?;
-                encoder.write_all(&sample)?;
-                let output = encoder.finish()?.0;
-                results.push(serde_json::json!({"level": level, "compress_seconds": start.elapsed().as_secs_f64(), "input_bytes": sample.len(), "compressed_bytes": output}));
-            }
-            println!("{}", serde_json::to_string_pretty(&results)?);
-        }
+        Some("solution") => compare_solutions(&args[2], &args[3], &args[4..])?,
         _ => bail!(
-            "verify_save checkpoint PATH | checkpoint-compare OLD NEW | solution OLD NEW | solution-stream OLD NEW | compression PATH"
+            "verify_save checkpoint PATH | checkpoint-compare OLD NEW | solution OLD NEW [--ignore-cfr-precision] [--ignore-run] [--equivalent-auto-cadence] | finalization-memory CONFIG"
         ),
     }
     Ok(())
 }
 
-/// Compare the v2 field stream directly, without retaining decoded blocks or
-/// multi-GB postcard Vecs. Only wall_secs' eight bytes may differ.
-fn compare_solution_streams(old: &str, new: &str) -> Result<()> {
-    use anyhow::ensure;
-    let mut a = std::fs::File::open(old)?;
-    let mut b = std::fs::File::open(new)?;
-    let mut header_a = [0; hu_postflop::sol::HEADER_LEN];
-    let mut header_b = header_a;
-    a.read_exact(&mut header_a)?;
-    b.read_exact(&mut header_b)?;
-    ensure!(&header_a[..10] == b"SLVRSOLV\x02\x00", "expected .sol v2");
-    ensure!(header_a == header_b, "headers differ");
-    let mut pair = FieldStreams {
-        a: std::io::BufReader::new(zstd::stream::read::Decoder::new(a)?),
-        b: std::io::BufReader::new(zstd::stream::read::Decoder::new(b)?),
-        hash: blake3::Hasher::new(),
-        position: 0,
-        left: vec![0; 64 * 1024],
-        right: vec![0; 64 * 1024],
-    };
-    let config_len = pair.varint()?;
-    let mut config_hash = blake3::Hasher::new();
-    pair.equal(config_len, Some(&mut config_hash))?;
-    ensure!(
-        config_hash.finalize().as_bytes() == &header_a[10..42],
-        "config hash mismatch"
-    );
-    let iterations = pair.varint()?;
-    ensure!(
-        iterations == u64::from_le_bytes(header_a[42..50].try_into()?),
-        "iteration mismatch"
-    );
-    pair.equal(40, None)?; // expl[2], ev[2], nash_conv: five fixed f64s
-    let storage_len = pair.varint()?;
-    pair.equal(storage_len, None)?;
-    let mut wall_a = [0; 8];
-    let mut wall_b = [0; 8];
-    pair.a.read_exact(&mut wall_a)?;
-    pair.b.read_exact(&mut wall_b)?;
-    pair.hash.update(&[0; 8]);
-    pair.position += 8;
-    ensure!(pair.varint()? <= 1, "unsupported street mode");
-    let blocks = pair.varint()?;
-    let mut strategy_srefs = blake3::Hasher::new();
-    let mut previous = None;
-    for _ in 0..blocks {
-        let sref = u32::try_from(pair.varint()?)?;
-        ensure!(previous.is_none_or(|p| sref > p), "unordered strategy sref");
-        previous = Some(sref);
-        strategy_srefs.update(&sref.to_le_bytes());
-        let len = pair.varint()?;
-        ensure!(len % 2 == 0, "invalid u16 block length");
-        pair.equal(len, None)?;
+/// Compare two `.sol` files chunk by chunk without retaining decoded blocks.
+/// Only wall_secs, and the config sections the flags name, may differ.
+fn compare_solutions(old: &str, new: &str, flags: &[String]) -> Result<()> {
+    // Explicit opt-ins: the legacy/PF5 comparison drops the recorded
+    // precision, and thread-count comparisons drop the operational [run].
+    for flag in flags {
+        if !matches!(
+            flag.as_str(),
+            "--ignore-cfr-precision" | "--ignore-run" | "--equivalent-auto-cadence"
+        ) {
+            bail!("unknown solution flag {flag}");
+        }
     }
-    let values = pair.varint()?;
-    ensure!(values == blocks, "strategy/value count mismatch");
-    let mut value_srefs = blake3::Hasher::new();
-    previous = None;
-    for _ in 0..values {
-        let sref = u32::try_from(pair.varint()?)?;
-        ensure!(previous.is_none_or(|p| sref > p), "unordered value sref");
-        previous = Some(sref);
-        value_srefs.update(&sref.to_le_bytes());
-        pair.equal(4, None)?; // fixed f32 scale
-        let len = pair.varint()?;
-        ensure!(len % 2 == 0, "invalid i16 block length");
-        pair.equal(len, None)?;
+    let ignore_precision = flags.iter().any(|s| s == "--ignore-cfr-precision");
+    let ignore_run = flags.iter().any(|s| s == "--ignore-run");
+    let equivalent_auto = flags.iter().any(|s| s == "--equivalent-auto-cadence");
+    let mut metadata = Vec::new();
+    let mut digests = Vec::new();
+    let mut counts = Vec::new();
+    let mut walls = Vec::new();
+    for path in [old, new] {
+        let mut reader = hu_postflop::sol::SolReader::open(Path::new(path))?;
+        let mut normalized = reader.metadata().clone();
+        walls.push(normalized.meta.wall_secs);
+        normalized.meta.wall_secs = 0.0;
+        if ignore_precision || ignore_run || equivalent_auto {
+            let mut config: toml_edit::DocumentMut = normalized.config_toml.parse()?;
+            if ignore_precision
+                && let Some(solver) = config
+                    .get_mut("solver")
+                    .and_then(toml_edit::Item::as_table_mut)
+            {
+                solver.remove("cfr_precision");
+            }
+            if ignore_run {
+                config.remove("run");
+            }
+            if equivalent_auto {
+                // PF10 records auto explicitly even though a targetless run
+                // computes identically to legacy fixed 25. Reject any other
+                // cadence or target rather than masking a solver difference.
+                let stop = &mut config["solver"]["stop"];
+                if stop.get("target").is_some()
+                    || !(stop["check_every"].as_str() == Some("auto")
+                        || stop["check_every"].as_integer() == Some(25))
+                {
+                    bail!("auto cadence equivalence requires no target and auto or 25");
+                }
+                stop["check_every"] = toml_edit::value(25);
+            }
+            normalized.config_toml = config.to_string();
+        }
+        metadata.push(postcard::to_allocvec(&normalized)?);
+        let mut strategy = (blake3::Hasher::new(), 0u64);
+        let mut values = (blake3::Hasher::new(), 0u64);
+        reader.visit_blocks(
+            |sref, probs| {
+                strategy.0.update(&sref.to_le_bytes());
+                strategy.0.update(&(probs.len() as u64).to_le_bytes());
+                strategy.0.update(probs);
+                strategy.1 += 1;
+            },
+            |sref, scale, bytes| {
+                values.0.update(&sref.to_le_bytes());
+                values.0.update(&scale.to_le_bytes());
+                values.0.update(&(bytes.len() as u64).to_le_bytes());
+                values.0.update(bytes);
+                values.1 += 1;
+            },
+        )?;
+        let mut digest = blake3::Hasher::new();
+        digest.update(metadata.last().expect("pushed"));
+        digest.update(strategy.0.finalize().as_bytes());
+        digest.update(values.0.finalize().as_bytes());
+        digests.push(digest.finalize());
+        counts.push((strategy.1, values.1));
     }
-    ensure!(
-        strategy_srefs.finalize() == value_srefs.finalize(),
-        "sref sets differ"
-    );
-    ensure!(
-        pair.a.read(&mut wall_a[..1])? == 0 && pair.b.read(&mut wall_b[..1])? == 0,
-        "trailing payload"
-    );
+    if metadata[0] != metadata[1] {
+        bail!(".sol metadata differs (excluding wall_secs)");
+    }
+    if digests[0] != digests[1] {
+        bail!(".sol blocks differ");
+    }
     println!(
         "{}",
         serde_json::json!({
             "payload_bit_equal_except_wall_secs": true,
-            "comparison_method": "bounded v2 field-stream comparison, exact bytes",
-            "payload_bytes": [pair.position, pair.position],
-            "normalized_payload_blake3": pair.hash.finalize().to_hex().as_str(),
-            "strategy_blocks": blocks, "value_blocks": values,
-            "wall_secs": [f64::from_le_bytes(wall_a), f64::from_le_bytes(wall_b)],
+            "config_precision_excluded": ignore_precision,
+            "config_run_excluded": ignore_run,
+            "targetless_auto_cadence_normalized": equivalent_auto,
+            "normalized_payload_blake3": digests[0].to_hex().as_str(),
+            "strategy_blocks": counts[0].0,
+            "value_blocks": counts[0].1,
+            "wall_secs": walls,
             "file_bytes_equal": files_equal(old, new)?,
         })
     );
     Ok(())
-}
-
-struct FieldStreams<R> {
-    a: R,
-    b: R,
-    hash: blake3::Hasher,
-    position: u64,
-    left: Vec<u8>,
-    right: Vec<u8>,
-}
-
-impl<R: Read> FieldStreams<R> {
-    fn varint(&mut self) -> Result<u64> {
-        let mut value = 0;
-        for shift in (0..=63).step_by(7) {
-            let mut a = [0];
-            let mut b = [0];
-            self.a.read_exact(&mut a)?;
-            self.b.read_exact(&mut b)?;
-            anyhow::ensure!(a == b, "varint differs at byte {}", self.position);
-            let part = a[0] & 0x7f;
-            anyhow::ensure!(shift < 63 || part <= 1, "varint overflow");
-            self.hash.update(&a);
-            self.position += 1;
-            value |= (part as u64) << shift;
-            if a[0] < 0x80 {
-                anyhow::ensure!(shift == 0 || part != 0, "noncanonical varint");
-                return Ok(value);
-            }
-        }
-        bail!("unterminated varint")
-    }
-
-    fn equal(&mut self, mut len: u64, mut extra: Option<&mut blake3::Hasher>) -> Result<()> {
-        while len > 0 {
-            let count = len.min(self.left.len() as u64) as usize;
-            self.a.read_exact(&mut self.left[..count])?;
-            self.b.read_exact(&mut self.right[..count])?;
-            anyhow::ensure!(
-                self.left[..count] == self.right[..count],
-                "payload differs at byte {}",
-                self.position
-            );
-            self.hash.update(&self.left[..count]);
-            if let Some(hash) = extra.as_deref_mut() {
-                hash.update(&self.left[..count]);
-            }
-            self.position += count as u64;
-            len -= count as u64;
-        }
-        Ok(())
-    }
 }
 
 fn files_equal(a: &str, b: &str) -> Result<bool> {

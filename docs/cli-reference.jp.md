@@ -75,7 +75,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage, storage − regret + saveWorkspaceBytes) + compressionWorkspaceBytes`、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
-| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / run threadsに応じたstreaming圧縮予算 |
+| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / chunk圧縮・directory・metadataの書込み予算（thread数によらない） |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
 | `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
 
@@ -121,7 +121,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`はversion 2、checkpointはversion 5だけを受理する。checkpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
+P1 `.sol`はversion 3、checkpointはversion 5だけを受理する。`.sol` v1/2とcheckpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -237,7 +237,7 @@ CSV列とEVの基準は[P1第8節](hu-postflop.jp.md)を参照する。
 ## `solvers export`
 
 ```sh
-solvers export <SOLUTION> <VIEW> [--node NODE] [--format json|csv] [--output PATH]
+solvers export <SOLUTION> <VIEW> [--node NODE]... [--format json|csv] [--output PATH]
 ```
 
 VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
@@ -247,10 +247,11 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 |---|---|---|
 | `--format` | `json` | JSONまたはCSV |
 | `--output PATH` | stdout | 出力先 |
-| `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える |
+| `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える。繰り返すと1回の読込みで各nodeの行を指定順に連結する |
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
+P1の`summary`は`.sol`のmetadataだけを読み、木を再構築しない。他のviewは木を1回再構築し、照会nodeを含むchunkだけを展開する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
 ## `solvers compare`

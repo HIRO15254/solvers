@@ -1,0 +1,2 @@
+{"case": "c001", "view": "actions", "nodes": ["root", "x", "xr1.8", "r6.4"], "one_call_wall_s": 3.21, "one_call_peak_gb": 0.327, "separate_calls_wall_s": 12.8, "separate_peak_gb": 0.327, "rows_identical": true}
+{"case": "c013", "view": "actions", "nodes": ["root", "x", "xr5.45", "r5.45"], "one_call_wall_s": 38.65, "one_call_peak_gb": 2.761, "separate_calls_wall_s": 154.55, "separate_peak_gb": 2.761, "rows_identical": true}

@@ -8,7 +8,7 @@ pub fn export(
     path: &Path,
     view: ExportView,
     format: ExportFormat,
-    node: &str,
+    nodes: &[String],
     output: Option<&Path>,
 ) -> Result<()> {
     let view = match view {
@@ -19,7 +19,7 @@ pub fn export(
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Range => views::ExportView::Range,
     };
-    let data = views::export(path, view, node, &mut crate::nlh_v1::print_artifact)?;
+    let data = views::export(path, view, nodes, &mut crate::nlh_v1::print_artifact)?;
     let rendered = match format {
         ExportFormat::Json => to_json(&data)?,
         ExportFormat::Csv => match &data {

@@ -5,8 +5,8 @@
 use std::path::Path;
 
 use crate::PostflopNodeInfo;
-use crate::sol::{StreetsStored, dequantize_probs};
-use anyhow::{Result, anyhow, bail};
+use crate::sol::StreetsStored;
+use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{NodeId, NodeKind};
 use nlh::{PerPlayer, Player, Street, combo_cards};
 use serde::Serialize;
@@ -33,6 +33,7 @@ pub enum ExportData {
 }
 
 use crate::artifact::{Diagnostic, LoadedSol, load_sol};
+use crate::sol::{SolMetadata, SolReader};
 
 /// Which nodes a view covers.
 enum Selection {
@@ -42,21 +43,37 @@ enum Selection {
     All,
 }
 
-/// Read an artifact and return the selected view as typed data for caller-owned encoding.
+/// Read an artifact and return the selected view as typed data for
+/// caller-owned encoding. Node views cover every entry of `nodes` in order,
+/// from one load; `summary` and `range` ignore `nodes`. `summary` reads only
+/// the artifact's metadata and never rebuilds the tree.
 pub fn export(
     path: &Path,
     view: ExportView,
-    node: &str,
+    nodes: &[String],
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<ExportData> {
+    if let ExportView::Summary = view {
+        let metadata = SolReader::open(path)
+            .with_context(|| format!("reading {}", path.display()))?
+            .into_metadata();
+        return Ok(ExportData::Summary(summary(&metadata)?));
+    }
     let loaded = load_sol(path, 0, None, diagnostics)?;
-    let selection = resolve_selection(&loaded, node)?;
+    let selections = nodes
+        .iter()
+        .map(|node| resolve_selection(&loaded, node))
+        .collect::<Result<Vec<_>>>()?;
+    let mut ids = Vec::new();
+    for selection in &selections {
+        ids.extend(selected_action_nodes(&loaded, selection));
+    }
     Ok(match view {
-        ExportView::Summary => ExportData::Summary(summary(&loaded)),
-        ExportView::Tree => ExportData::Tree(tree_rows(&loaded, &selection)),
-        ExportView::Actions => ExportData::Actions(action_rows(&loaded, &selection)?),
-        ExportView::Strategy => ExportData::Strategy(strategy_rows(&loaded, &selection)?),
-        ExportView::Ev => ExportData::Ev(value_rows(&loaded, &selection)?),
+        ExportView::Summary => unreachable!("answered from metadata above"),
+        ExportView::Tree => ExportData::Tree(tree_rows(&loaded, &ids)),
+        ExportView::Actions => ExportData::Actions(action_rows(&loaded, &ids)?),
+        ExportView::Strategy => ExportData::Strategy(strategy_rows(&loaded, &ids)?),
+        ExportView::Ev => ExportData::Ev(value_rows(&loaded, &ids)?),
         ExportView::Range => ExportData::Range(range_rows(&loaded)),
     })
 }
@@ -108,14 +125,10 @@ fn resolve_selection(loaded: &LoadedSol, node: &str) -> Result<Selection> {
 
 /// The action nodes a selection covers, in tree order.
 fn selected_action_nodes(loaded: &LoadedSol, selection: &Selection) -> Vec<NodeId> {
-    let tree = &loaded.pf_game.game.tree;
     match selection {
         Selection::One(id) => vec![*id],
-        Selection::All => (0..tree.nodes.len() as NodeId)
-            .filter(|id| {
-                tree.node(*id).kind == NodeKind::Action
-                    && loaded.blocks.contains_key(&tree.node(*id).aux)
-            })
+        Selection::All => (0..loaded.pf_game.game.tree.nodes.len() as NodeId)
+            .filter(|&id| loaded.is_stored(id))
             .collect(),
     }
 }
@@ -165,35 +178,38 @@ pub struct Summary {
     pub stored_nodes: usize,
 }
 
-fn summary(loaded: &LoadedSol) -> Summary {
-    Summary {
-        board: loaded
+fn summary(metadata: &SolMetadata) -> Result<Summary> {
+    crate::prepare::require_artifact_config(&metadata.config_toml)?;
+    let config = crate::prepare::lower_config(&metadata.config_toml, Path::new("embedded.toml"))?;
+    let meta = &metadata.meta;
+    Ok(Summary {
+        board: config
             .board
             .iter()
             .map(nlh::Card::to_string)
             .collect::<Vec<_>>()
             .join(" "),
-        pot: amount(loaded, loaded.config.pot.0),
-        effective_stack: amount(loaded, loaded.config.effective_stack.0),
-        min_bet: amount(loaded, loaded.config.min_bet.0),
-        iterations: loaded.meta.iterations,
-        ev_oop: loaded.meta.ev[0],
-        ev_ip: loaded.meta.ev[1],
-        expl_oop: loaded.meta.expl[0],
-        expl_ip: loaded.meta.expl[1],
-        nash_conv: loaded.meta.nash_conv,
-        storage: loaded.meta.storage.clone(),
-        wall_secs: loaded.meta.wall_secs,
-        streets_stored: match loaded.mode {
+        pot: amount(config.pot.0),
+        effective_stack: amount(config.effective_stack.0),
+        min_bet: amount(config.min_bet.0),
+        iterations: meta.iterations,
+        ev_oop: meta.ev[0],
+        ev_ip: meta.ev[1],
+        expl_oop: meta.expl[0],
+        expl_ip: meta.expl[1],
+        nash_conv: meta.nash_conv,
+        storage: meta.storage.clone(),
+        wall_secs: meta.wall_secs,
+        streets_stored: match metadata.mode {
             StreetsStored::Full => "full".into(),
             StreetsStored::NoRivers => "no-rivers".into(),
         },
-        nodes: loaded.pf_game.game.tree.nodes.len(),
-        stored_nodes: loaded.blocks.len(),
-    }
+        nodes: metadata.tree_nodes as usize,
+        stored_nodes: metadata.stored_nodes as usize,
+    })
 }
 
-fn amount(_loaded: &LoadedSol, value: u32) -> serde_json::Number {
+fn amount(value: u32) -> serde_json::Number {
     crate::prepare::bb(value as u64).parse().expect("BB number")
 }
 
@@ -210,22 +226,18 @@ pub struct TreeRow {
     pub stored: bool,
 }
 
-fn tree_rows(loaded: &LoadedSol, selection: &Selection) -> Vec<TreeRow> {
-    selected_action_nodes(loaded, selection)
-        .into_iter()
-        .map(|id| {
+fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
+    ids.iter()
+        .map(|&id| {
             let node = loaded.pf_game.game.tree.node(id);
             let info = info_of(loaded, id);
             TreeRow {
                 history: info.history.clone(),
                 street: street_name(info.street).to_string(),
                 actor: seat_name(node.player).to_string(),
-                pot: amount(
-                    loaded,
-                    (info.contrib[Player::P0] + info.contrib[Player::P1]).0,
-                ),
+                pot: amount((info.contrib[Player::P0] + info.contrib[Player::P1]).0),
                 actions: info.actions.clone(),
-                stored: loaded.blocks.contains_key(&node.aux),
+                stored: loaded.is_stored(id),
             }
         })
         .collect()
@@ -242,7 +254,7 @@ struct StoredNode<'a> {
     num_actions: usize,
     num_hands: usize,
     strategy: Vec<f32>,
-    values: &'a [f32],
+    values: Vec<f32>,
 }
 
 fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> {
@@ -253,7 +265,7 @@ fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> 
     }
     let sref = tree.storage_ref(&node);
     let info = info_of(loaded, id);
-    let probs = loaded.blocks.get(&node.aux).ok_or_else(|| {
+    let strategy = loaded.stored_strategy(id)?.ok_or_else(|| {
         anyhow!(
             "this artifact stores no strategy for {:?}: it was written with \
              [output] solution_streets = \"no-rivers\", which drops river nodes. \
@@ -262,16 +274,15 @@ fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> 
         )
     })?;
     let values = loaded
-        .values
-        .get(&node.aux)
-        .expect("value blocks cover the same nodes as strategy blocks");
+        .stored_values(id)?
+        .expect("a node with a stored strategy has stored values");
     Ok(StoredNode {
         id,
         actor: node.player,
         info,
         num_actions: sref.num_actions as usize,
         num_hands: sref.num_hands as usize,
-        strategy: dequantize_probs(probs, sref.num_actions as usize, sref.num_hands as usize)?,
+        strategy,
         values,
     })
 }
@@ -282,20 +293,15 @@ fn reach_at(loaded: &LoadedSol, id: NodeId) -> Result<PerPlayer<Vec<f32>>> {
     let roots = &loaded.pf_game.game.root_ranges;
     let root_slices = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
     let mut failure = None;
-    let reach = hu_engine::reach_at(tree, root_slices, id, |node_id, sref, out| {
-        let aux = tree.node(node_id).aux;
-        match loaded.blocks.get(&aux) {
-            Some(probs) => {
-                match dequantize_probs(probs, sref.num_actions as usize, sref.num_hands as usize) {
-                    Ok(avg) => out.copy_from_slice(&avg),
-                    Err(error) => failure = Some(anyhow!(error)),
-                }
-            }
-            None => {
+    let reach = hu_engine::reach_at(tree, root_slices, id, |node_id, _sref, out| {
+        match loaded.stored_strategy(node_id) {
+            Ok(Some(avg)) => out.copy_from_slice(&avg),
+            Ok(None) => {
                 failure = Some(anyhow!(
                     "the path to this node crosses a river node the artifact does not store"
                 ))
             }
+            Err(error) => failure = Some(anyhow!(error)),
         }
     });
     match failure {
@@ -321,9 +327,9 @@ pub struct ActionRow {
     pub frequency: f64,
 }
 
-fn action_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ActionRow>> {
+fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
     let mut rows = Vec::new();
-    for id in selected_action_nodes(loaded, selection) {
+    for &id in ids {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
         let freqs = crate::prepare::action_frequencies(
@@ -357,9 +363,9 @@ pub struct StrategyRow {
     pub probabilities: Vec<f32>,
 }
 
-fn strategy_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<StrategyRow>> {
+fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>> {
     let mut rows = Vec::new();
-    for id in selected_action_nodes(loaded, selection) {
+    for &id in ids {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
         for hand in 0..node.num_hands {
@@ -397,9 +403,9 @@ pub struct ValueRow {
     pub ev: f32,
 }
 
-fn value_rows(loaded: &LoadedSol, selection: &Selection) -> Result<Vec<ValueRow>> {
+fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
     let mut rows = Vec::new();
-    for id in selected_action_nodes(loaded, selection) {
+    for &id in ids {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
         for seat in Player::BOTH {
@@ -470,20 +476,18 @@ pub fn compare(
 ) -> Result<ComparisonReport> {
     let left = load_sol(left_path, 0, None, diagnostics)?;
     let right = load_sol(right_path, 0, None, diagnostics)?;
-    let mut left_srefs: Vec<u32> = left.blocks.keys().copied().collect();
-    let mut right_srefs: Vec<u32> = right.blocks.keys().copied().collect();
-    left_srefs.sort_unstable();
-    right_srefs.sort_unstable();
+    let left_ids = selected_action_nodes(&left, &Selection::All);
+    let right_ids = selected_action_nodes(&right, &Selection::All);
     if left.pf_game.game.tree.nodes.len() != right.pf_game.game.tree.nodes.len()
-        || left_srefs != right_srefs
+        || left_ids != right_ids
     {
         bail!(
             "artifacts describe different trees ({} vs {} nodes, {} vs {} stored nodes); \
              only solves of the same tree can be compared node by node",
             left.pf_game.game.tree.nodes.len(),
             right.pf_game.game.tree.nodes.len(),
-            left.blocks.len(),
-            right.blocks.len(),
+            left_ids.len(),
+            right_ids.len(),
         );
     }
     if !cross_game
@@ -505,7 +509,7 @@ pub fn compare(
     let mut ev_max = 0.0f64;
     let mut worst_ev = String::new();
 
-    for id in selected_action_nodes(&left, &Selection::All) {
+    for id in left_ids {
         let a = stored_node(&left, id)?;
         let b = stored_node(&right, id)?;
         if a.strategy.len() != b.strategy.len() || a.values.len() != b.values.len() {
@@ -536,7 +540,7 @@ pub fn compare(
         let node_ev = a
             .values
             .iter()
-            .zip(b.values)
+            .zip(&b.values)
             .map(|(x, y)| (x - y).abs() as f64)
             .fold(0.0, f64::max);
         ev_total += node_ev;
