@@ -507,7 +507,7 @@ fn mixed_live_queries_and_report_match_direct_solver() {
     let expected = direct.average_strategy_at(0);
     queries::with_live(&prepared, None, None, &cancel, |live| {
         assert_eq!(live.summary.iterations, 8);
-        assert_eq!(live.game().tree.storage_len, direct.game().tree.storage_len);
+        assert_eq!(live.view().tree.storage_len, direct.game().tree.storage_len);
         assert_eq!(queries::LiveProvider(live).average_strategy(0)?, expected);
         Ok(())
     })

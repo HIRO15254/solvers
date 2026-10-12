@@ -1521,12 +1521,6 @@ fn postflop_publishes_through_the_artifact() {
                 !stdout.trim().is_empty(),
                 "export {view} --format {format} produced nothing"
             );
-            // Progress notices belong on stderr: a CSV a caller pipes into
-            // a file must be nothing but the table.
-            assert!(
-                !stdout.contains("rebuilding tree"),
-                "export {view} leaked a progress line into stdout: {stdout}"
-            );
         }
     }
 

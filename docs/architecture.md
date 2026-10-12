@@ -191,18 +191,22 @@ validateの正規化は入力choiceを維持し、run用の実効configと成果
 木の構築とmemory preflightの計数は最初のchance nodeのdealをRayonで並列に処理する。
 構築はdealごとのforkが作ったmask・transition・rank table・terminal・node tagを直列walkの初出順で再採番して連結するため、
 sref・node idは直列構築と一致し、checkpoint・`.sol`の互換性を保つ。
-保存済みartifactの読込み（`prepare_artifact`）は、埋込みconfigが具体storageを持てばmemory preflightを省く（runの実効configは常に具体storageを持つ）。`auto`だけは通常の`prepare`で解決する。
+保存済みartifactの読込み（`prepare_artifact`）は埋込みconfigを解析・lowerするだけで、木を構築せずmemory preflightもしない。`storage = "auto"`はmetadataの具体storageで解決する。
 `run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。
 
-`sol`と`checkpoint`はcodecである。`artifact`はsolution export、config検証、tree再構築、
+`index`は木の閲覧用index（`GameIndex`: action label・deal card・pot・street・parent・hand support・root range）とその符号化を持つ。
+liveのsolveは構築時のnode情報から`GameIndex`を作ってnode情報を捨て、`.sol`は木とindexを1つのframeへ保存する。
+読込みは`PublicTree::from_shape`で木の派生field（子配置・sref・storage範囲）を再計算し、configからhand supportとroot rangeを再計算する。
+`TreeView`はliveと`.sol`で共通のnavigation（history・action・pot・chance label・historyからのnode解決）を提供する。
+`sol`と`checkpoint`はcodecである。`artifact`はsolution export、config検証、
 stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのstrategy queryはreachを再構築し、
 同じ設定でRiverをlazy re-solveする。`viewer`はhistory replayとsubgame再構成を担当する。
 `queries`はlive inspection、reach・action frequency・class grid・equity・combo queryを返す。
 `views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。
 複数nodeの行と比較はnodeごとにRayonで並列に計算し、node順に連結・集計するため出力は直列計算と一致する。
-reachは読込み時のparent配列から根からのpathを辿る。compareは両artifactのconfig hashが同じなら再構築した木を共有する。
+reachはindexのparent配列から根からのpathを辿る。compareは両artifactのconfig hashが同じなら展開した木とindexを共有する。
 `report`は全boardを先に検証し、boardごとの数値とOR集約したrule-hit警告を返す。
 これらのmoduleはstdout/stderrやCLI引数を持たない。
 
@@ -256,7 +260,7 @@ P1 checkpoint v5はborrowしたstorage配列から64 KiB単位で逐次LE書込�
 solve/resumeの`drive`は、終了時に新たなcheckpointが必要で`S + W + 2C ≤ limit`ならrun用Rayon poolの`join`でcheckpointと`.sol`を並行生成し、regretを保持する。その他は最後のcheckpoint（P1の`run.final_checkpoint = true`、既定値、の場合）→ `Solver::release_regrets`でregret arenaとscaleを解放 → `.sol`の順とする。falseは全停止理由で最後のcheckpointだけを省く。反復中のcheckpointとcurrent strategyを提供するlive queryはregretを保持する。memory preflightは`max(storage, storage − regret + save_bytes) + compression_bytes`を使う。
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
 戦略はEV passに先立ってstorageからsref昇順に計算し、1 batch分ずつ量子化してchunk writerへ渡す。EV pass後の値slotもsref順にchunk writerへ渡し、block用Vecへ移し替えない。
-writerは約1 MiBのchunkを16個ずつ並列圧縮して順に書き、directoryとheaderを最後に書く。読み手（`SolReader` / `SolStore`）はmetadataとdirectoryだけを開き、照会nodeを含むchunkだけを展開・逆量子化する。
+writerはmetadataの後にindex frameを1つのzstd streamとして64 KiB bufferで逐次書き、次に約1 MiBのchunkをu16 byte shuffleして16個ずつ並列圧縮して順に書き、directoryとheaderを最後に書く。読み手（`SolReader` / `SolStore`）はmetadataとdirectoryだけを開く。node照会はindex frameを1回展開し、照会nodeを含むchunkだけを展開・逆量子化する。
 `SolStore`は複数threadから照会できる。file読込みとcache管理だけを直列化し、chunkの展開と逆量子化は並列に行う。同じchunkを要するthreadは1回の展開を待つ。
 checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
 CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。

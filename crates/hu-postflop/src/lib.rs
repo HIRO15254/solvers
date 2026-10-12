@@ -44,6 +44,7 @@ pub mod checkpoint;
 pub mod sol;
 
 pub mod artifact;
+pub mod index;
 pub mod prepare;
 pub mod queries;
 pub mod report;

@@ -1,11 +1,10 @@
 //! P1 live solve and read-only node queries for viewers.
 use crate::artifact::{EvSummary, StrategyProvider};
-use crate::{PostflopEvaluator, PostflopNodeInfo, class_average, class_weights, range_equity};
+use crate::index::{GameIndex, TreeView};
+use crate::{PostflopEvaluator, class_average, class_weights, range_equity};
 use crate::{prepare, run};
 use anyhow::Result;
-use hu_engine::{
-    CompiledGame, F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, ReachMap, Solver, Storage,
-};
+use hu_engine::{F32Storage, I16Storage, MixedStorage, NodeId, Solver, Storage};
 use nlh::{Card, PerPlayer, Player, combo_cards};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
@@ -14,20 +13,24 @@ enum LiveSolver {
     I16(Solver<PostflopEvaluator, I16Storage>),
     Mixed(Solver<PostflopEvaluator, MixedStorage>),
 }
-/// A live solve with its display metadata and root summary.
+/// A live solve with its viewer index and root summary.
 pub struct LiveSolution {
     solver: LiveSolver,
-    pub node_info: Vec<PostflopNodeInfo>,
+    index: GameIndex,
     pub board: Vec<Card>,
     pub summary: run::RunSummary,
 }
 impl LiveSolution {
-    /// Compiled tree and root ranges for read-only navigation.
-    pub fn game(&self) -> &CompiledGame<PostflopEvaluator> {
-        match &self.solver {
+    /// Compiled tree and its index for read-only navigation.
+    pub fn view(&self) -> TreeView<'_> {
+        let game = match &self.solver {
             LiveSolver::F32(s) => s.game(),
             LiveSolver::I16(s) => s.game(),
             LiveSolver::Mixed(s) => s.game(),
+        };
+        TreeView {
+            tree: &game.tree,
+            index: &self.index,
         }
     }
 }
@@ -63,7 +66,7 @@ fn live<S: Storage>(
     wrap: impl FnOnce(Solver<PostflopEvaluator, S>) -> LiveSolver,
 ) -> Result<LiveSolution> {
     let start = Instant::now();
-    let (solver, node_info) = run::query::<S>(p, iterations, target, cancel)?;
+    let (solver, index) = run::query::<S>(p, iterations, target, cancel)?;
     let summary = run::summarize(
         &solver,
         start.elapsed(),
@@ -71,7 +74,7 @@ fn live<S: Storage>(
     );
     Ok(LiveSolution {
         solver: wrap(solver),
-        node_info,
+        index,
         summary,
         board: p.config.board.clone(),
     })
@@ -99,17 +102,15 @@ impl StrategyProvider for LiveProvider<'_> {
 }
 /// Both players' reach at a node, using the selected strategy source.
 pub fn reach_here(
-    game: &CompiledGame<PostflopEvaluator>,
+    view: TreeView<'_>,
     provider: &mut dyn StrategyProvider,
     current: NodeId,
 ) -> Result<PerPlayer<Vec<f32>>> {
-    let tree = &game.tree;
-    let roots = PerPlayer::new(
-        game.root_ranges[Player::P0].as_slice(),
-        game.root_ranges[Player::P1].as_slice(),
-    );
+    let ranges = view.root_ranges();
+    let roots = PerPlayer::new(ranges[Player::P0].as_slice(), ranges[Player::P1].as_slice());
     let mut failure = None;
-    let reach = hu_engine::reach_at(tree, roots, current, |id, _, out| {
+    let path = hu_engine::path_from_root(&view.index.parents, current);
+    let reach = hu_engine::reach_on_path(view.tree, roots, &path, |id, _, out| {
         match provider.average_strategy(id) {
             Ok(avg) => out.copy_from_slice(&avg),
             Err(error) => failure = Some(error),
@@ -127,13 +128,13 @@ pub struct Grid {
 }
 /// Reach-weighted frequencies for every action at this node.
 pub fn action_frequencies(
-    game: &CompiledGame<PostflopEvaluator>,
+    view: TreeView<'_>,
     current: NodeId,
     avg: &[f32],
     reach: &PerPlayer<Vec<f32>>,
 ) -> Vec<f64> {
-    let node = game.tree.node(current);
-    let sref = game.tree.storage_ref(node);
+    let node = view.tree.node(current);
+    let sref = view.tree.storage_ref(node);
     prepare::action_frequencies(
         avg,
         &reach[node.player],
@@ -143,21 +144,17 @@ pub fn action_frequencies(
 }
 /// Class-averaged frequency grid for one action, using node reach.
 pub fn action_grid(
-    game: &CompiledGame<PostflopEvaluator>,
+    view: TreeView<'_>,
     current: NodeId,
     pos: usize,
     avg: &[f32],
     reach: &PerPlayer<Vec<f32>>,
 ) -> Grid {
-    let node = game.tree.node(current);
-    let hands = game.tree.storage_ref(node).num_hands as usize;
-    let weight = game
-        .evaluator
-        .hands
-        .expand(node.player, &reach[node.player]);
-    let value = game
-        .evaluator
-        .hands
+    let node = view.tree.node(current);
+    let hands = view.tree.storage_ref(node).num_hands as usize;
+    let weight = view.hands().expand(node.player, &reach[node.player]);
+    let value = view
+        .hands()
         .expand(node.player, &avg[pos * hands..(pos + 1) * hands]);
     Grid {
         weights: class_weights(&weight),
@@ -165,13 +162,8 @@ pub fn action_grid(
     }
 }
 /// Root-range weights as percentages of the largest hand-class weight.
-pub fn range_grid(game: &CompiledGame<PostflopEvaluator>, player: Player) -> Grid {
-    let weights = class_weights(
-        &game
-            .evaluator
-            .hands
-            .expand(player, &game.root_ranges[player]),
-    );
+pub fn range_grid(view: TreeView<'_>, player: Player) -> Grid {
+    let weights = class_weights(&view.hands().expand(player, &view.root_ranges()[player]));
     let max = weights.iter().cloned().fold(0.0, f64::max);
     let values = weights.map(|w| {
         if max > 0.0 && w > 0.0 {
@@ -184,7 +176,7 @@ pub fn range_grid(game: &CompiledGame<PostflopEvaluator>, player: Player) -> Gri
 }
 /// Current-node equity; the viewer may retain the result until navigation changes.
 pub fn equity(
-    game: &CompiledGame<PostflopEvaluator>,
+    view: TreeView<'_>,
     board: &[Card],
     history: &str,
     reach: &PerPlayer<Vec<f32>>,
@@ -195,7 +187,7 @@ pub fn equity(
             board.push(card);
         }
     }
-    let hands = &game.evaluator.hands;
+    let hands = view.hands();
     let global = PerPlayer::new(
         hands.expand(Player::P0, &reach[Player::P0]),
         hands.expand(Player::P1, &reach[Player::P1]),
@@ -204,11 +196,11 @@ pub fn equity(
 }
 /// Class-averaged OOP equity percentages against the current IP reach.
 pub fn equity_grid(
-    game: &CompiledGame<PostflopEvaluator>,
+    view: TreeView<'_>,
     reach: &PerPlayer<Vec<f32>>,
     equity: &PerPlayer<Vec<f32>>,
 ) -> Grid {
-    let weight = game.evaluator.hands.expand(Player::P0, &reach[Player::P0]);
+    let weight = view.hands().expand(Player::P0, &reach[Player::P0]);
     Grid {
         weights: class_weights(&weight),
         values: class_average(&weight, &equity[Player::P0]).map(|v| v * 100.0),
@@ -251,8 +243,8 @@ pub fn combo_rows(
         .collect()
 }
 /// Resolve a typed action label or numeric index.
-pub fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
-    if let Some(p) = actions.iter().position(|a| a == arg) {
+pub fn resolve_action(actions: &[&str], arg: &str) -> Result<usize, String> {
+    if let Some(p) = actions.iter().position(|a| *a == arg) {
         return Ok(p);
     }
     match arg.parse::<usize>() {
@@ -263,50 +255,6 @@ pub fn resolve_action(actions: &[String], arg: &str) -> Result<usize, String> {
         )),
         Err(_) => Err(format!("unknown action {arg:?}")),
     }
-}
-
-/// Label for a chance node's `pos`-th child: the dealt card. For a `Mask`
-/// deal (the common unmerged case) this comes straight from the card-removal
-/// builder metadata. For a `Transition` deal (an iso-merged class:
-/// several structurally-equivalent cards folded into one branch) there is no
-/// single mask to read a card from, so instead this reads the representative
-/// card straight out of the child action node's own recorded history -- its
-/// last bracketed `[Xy]` token is exactly the card the builder dealt to
-/// reach it -- and appends `*` to mark that the branch stands in for a whole
-/// merged class (see `cmd_help`'s iso-merging note). Falls back to a bare
-/// `dealN` when neither source applies (e.g. an `Identity` map, which this
-/// builder never uses at a chance node, or an untagged/non-action child).
-pub fn chance_child_label(
-    game: &CompiledGame<PostflopEvaluator>,
-    node_info: &[PostflopNodeInfo],
-    node_id: NodeId,
-    pos: usize,
-) -> String {
-    let tree = &game.tree;
-    let node = tree.node(node_id);
-    let deal = tree.deal(node, pos);
-    match deal.maps[Player::P0] {
-        ReachMap::Mask(m) => game.evaluator.mask_cards[m as usize].to_string(),
-        ReachMap::Transition(_) => tree
-            .children(node_id)
-            .nth(pos)
-            .filter(|&child_id| tree.node(child_id).kind == NodeKind::Action)
-            .and_then(|child_id| {
-                let tag = tree.tags[child_id as usize] as usize;
-                last_bracketed_card(&node_info[tag].history)
-            })
-            .map(|card| format!("{card}*"))
-            .unwrap_or_else(|| format!("deal{pos}")),
-        ReachMap::Identity => format!("deal{pos}"),
-    }
-}
-
-/// Extracts the card inside the last `[Xy]` token in a history string (e.g.
-/// `"xx[9d]"` -> `Some("9d")`), or `None` if there is no bracketed token.
-fn last_bracketed_card(history: &str) -> Option<&str> {
-    let start = history.rfind('[')?;
-    let end = history[start..].find(']')? + start;
-    Some(&history[start + 1..end])
 }
 
 /// Convert a displayed action label into its tree-history token.

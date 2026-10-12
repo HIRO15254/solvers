@@ -121,7 +121,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`はversion 3、checkpointはversion 5だけを受理する。`.sol` v1/2とcheckpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
+P1 `.sol`はversion 4、checkpointはversion 5だけを受理する。`.sol` v1/2/3とcheckpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -251,7 +251,7 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
-P1の`summary`は`.sol`のmetadataだけを読み、木を再構築しない。他のviewは木を1回再構築し、照会nodeを含むchunkだけを展開する。
+P1の`summary`は`.sol`のmetadataだけを読む。他のviewは保存済みの木とindexを1回展開し（木は再構築しない）、照会nodeを含むchunkだけを展開する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
 ## `solvers compare`
@@ -265,7 +265,7 @@ P1はtree形状と保存node集合、通常はboard・pot・effective stackの�
 `--cross-game`は後者だけを外す。`mean_strategy_l1` / `max_strategy_l1`は戦略差、
 `mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
 EV差はcashでBB、ICMで賞金単位である。
-P1は両solutionの埋込みconfigが同一（config hashが一致）なら木を1回だけ再構築して共有し、異なれば2回再構築する。
+P1は両solutionの埋込みconfigが同一（config hashが一致）なら保存済みの木とindexを1回だけ展開して共有し、異なればそれぞれ展開する。
 P2は通常game fingerprintの一致を要求する。`--cross-game`でもseat mappingとutility単位の一致は必要である。
 
 ## `solvers evaluate`

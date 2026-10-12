@@ -1581,14 +1581,7 @@ fn build_checked(
         return Err(error);
     }
     let hands = builder.hands.clone();
-    let range_vec = |p: Player| {
-        hands
-            .combos(p)
-            .iter()
-            .map(|&h| config.ranges[p].weight(h as usize))
-            .collect::<Vec<f32>>()
-    };
-    let ranges = PerPlayer::new(range_vec(Player::P0), range_vec(Player::P1));
+    let ranges = root_ranges(config, &hands);
     let fold = |p: Player| {
         hands
             .combos(p)
@@ -1685,6 +1678,18 @@ fn build_checked(
         node_info,
         rule_hits: hits,
     })
+}
+
+/// Each player's starting weight of every combo in their support.
+pub(crate) fn root_ranges(config: &PostflopConfig, hands: &PostflopHands) -> PerPlayer<Vec<f32>> {
+    let range = |p: Player| {
+        hands
+            .combos(p)
+            .iter()
+            .map(|&h| config.ranges[p].weight(h as usize))
+            .collect()
+    };
+    PerPlayer::new(range(Player::P0), range(Player::P1))
 }
 
 impl Builder<'_> {
@@ -2283,7 +2288,8 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 
 impl MemoryEstimate {
     /// Final checkpoint and solution peak, retaining all storage: S + W + 2C.
-    /// Both codecs use zstd level 1, window_log(20), and the run's worker count.
+    /// The checkpoint codec uses window_log(20) and the run's worker count;
+    /// the `.sol` writer's level-3 contexts are bounded per chunk in flight.
     /// C bounds either encoder (using the larger payload); W already includes
     /// the bounded Rayon strategy batch. No state snapshot is allocated.
     /// Overflow means the parallel peak cannot fit a u64 memory limit.

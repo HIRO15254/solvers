@@ -565,7 +565,13 @@ fn deterministic<S: Storage>() {
                 .build()
                 .unwrap()
                 .install(|| {
-                    let game = game().game;
+                    let built = game();
+                    let index = crate::index::GameIndex::from_game(
+                        &built.game,
+                        &built.node_info,
+                        nlh::Street::Turn,
+                    );
+                    let game = built.game;
                     assert!(game.tree.storage_len > 0);
                     // Exercise the T25b entry with every backend/thread count:
                     // chance-free action subtrees below the 2*16384 bound.
@@ -647,6 +653,7 @@ fn deterministic<S: Storage>() {
                             crate::artifact::export_sol(
                                 &spec,
                                 s,
+                                &index,
                                 PerPlayer::new(0.0, 0.0),
                                 nlh::Street::Turn,
                                 &summary,

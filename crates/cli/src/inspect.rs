@@ -7,10 +7,9 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 use hu_postflop::artifact::{SolProvider, StrategyProvider};
-use hu_postflop::queries::{self, LiveProvider, chance_child_label, history_token, resolve_action};
-use hu_postflop::{
-    Card, CompiledGame, NodeId, NodeKind, PerPlayer, Player, PostflopEvaluator, PostflopNodeInfo,
-};
+use hu_postflop::index::TreeView;
+use hu_postflop::queries::{self, LiveProvider, history_token, resolve_action};
+use hu_postflop::{Card, NodeId, NodeKind, PerPlayer, Player};
 
 const RANKS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
@@ -33,9 +32,8 @@ pub fn run(
             crate::nlh_v1::print_done(&solved.summary);
             let mut provider = LiveProvider(solved);
             let mut repl = Repl {
-                game: solved.game(),
+                view: solved.view(),
                 provider: &mut provider,
-                node_info: &solved.node_info,
                 board: solved.board.clone(),
                 stack: Vec::new(),
                 current: 0,
@@ -53,12 +51,7 @@ pub fn run(
 /// [`hu_postflop::artifact::SolProvider`] (dequantized stored blocks, with river
 /// subgames re-solved lazily) instead of a live solve.
 pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>) -> Result<()> {
-    let loaded = hu_postflop::artifact::load_sol(
-        sol_path,
-        river_iterations,
-        river_target,
-        &mut crate::nlh_v1::print_artifact,
-    )?;
+    let loaded = hu_postflop::artifact::load_sol(sol_path, river_iterations, river_target)?;
     println!(
         "loaded {} (mode={:?}, iterations={}, nash_conv={:.3e})",
         sol_path.display(),
@@ -69,13 +62,10 @@ pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>
 
     let no_color = std::env::var_os("NO_COLOR").is_some();
     let board = loaded.board.clone();
-    let node_info = &loaded.pf_game.node_info;
-    let game = &loaded.pf_game.game;
     let mut provider = SolProvider::new(&loaded, Box::new(crate::nlh_v1::print_artifact));
     let mut repl = Repl {
-        game,
+        view: loaded.view(),
         provider: &mut provider,
-        node_info,
         board,
         stack: Vec::new(),
         current: 0,
@@ -87,9 +77,8 @@ pub fn run_sol(sol_path: &Path, river_iterations: u64, river_target: Option<f64>
 }
 
 struct Repl<'a> {
-    game: &'a CompiledGame<PostflopEvaluator>,
+    view: TreeView<'a>,
     provider: &'a mut dyn StrategyProvider,
-    node_info: &'a [PostflopNodeInfo],
     board: Vec<Card>,
     /// Ancestors: (node id, that node's history string).
     stack: Vec<(NodeId, String)>,
@@ -108,7 +97,7 @@ impl<'a> Repl<'a> {
     /// range instead — which this used to do — answers a different
     /// question: it counts hands that could never have got here.
     fn reach_here(&mut self) -> Result<PerPlayer<Vec<f32>>> {
-        queries::reach_here(self.game, self.provider, self.current)
+        queries::reach_here(self.view, self.provider, self.current)
     }
 
     fn interact(&mut self) -> Result<()> {
@@ -206,17 +195,15 @@ impl<'a> Repl<'a> {
                 self.history.as_str()
             }
         );
-        let node_info = self.node_info;
-        let tree = &self.game.tree;
-        let node = *tree.node(self.current);
+        let view = self.view;
+        let node = *view.tree.node(self.current);
         match node.kind {
             NodeKind::Terminal => println!("kind: terminal"),
             NodeKind::Chance => {
-                let children: Vec<NodeId> = tree.children(self.current).collect();
-                println!("kind: chance ({} deals)", children.len());
-                for pos in 0..children.len() {
-                    let label = chance_child_label(self.game, node_info, self.current, pos);
-                    println!("  [{pos}] {label}");
+                let deals = view.tree.children(self.current).count();
+                println!("kind: chance ({deals} deals)");
+                for pos in 0..deals {
+                    println!("  [{pos}] {}", view.chance_label(self.current, pos));
                 }
             }
             NodeKind::Action => {
@@ -226,8 +213,6 @@ impl<'a> Repl<'a> {
                     "ip"
                 };
                 println!("kind: action ({side} to act)");
-                let tag = tree.tags[self.current as usize] as usize;
-                let info = &node_info[tag];
                 let avg = match self.provider.average_strategy(self.current) {
                     Ok(avg) => avg,
                     Err(e) => {
@@ -242,8 +227,9 @@ impl<'a> Repl<'a> {
                         return;
                     }
                 };
-                let freqs = queries::action_frequencies(self.game, self.current, &avg, &reach);
-                for (i, (label, freq)) in info.actions.iter().zip(freqs.iter()).enumerate() {
+                let freqs = queries::action_frequencies(view, self.current, &avg, &reach);
+                for (i, (label, freq)) in view.actions(self.current).iter().zip(&freqs).enumerate()
+                {
                     println!("  [{i}] {label}: {freq:.3}");
                 }
             }
@@ -251,34 +237,30 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_go(&mut self, arg: &str) {
-        let node_info = self.node_info;
-        let tree = &self.game.tree;
+        let view = self.view;
+        let tree = view.tree;
         let node = *tree.node(self.current);
         match node.kind {
             NodeKind::Terminal => {
                 println!("error: terminal node has no children");
             }
             NodeKind::Action => {
-                let tag = tree.tags[self.current as usize] as usize;
-                let info = &node_info[tag];
-                let pos = match resolve_action(&info.actions, arg) {
+                let actions = view.actions(self.current);
+                let pos = match resolve_action(&actions, arg) {
                     Ok(p) => p,
                     Err(e) => {
                         println!("error: {e}");
                         return;
                     }
                 };
-                let label = info.actions[pos].clone();
                 let Some(child_id) = tree.children(self.current).nth(pos) else {
                     println!("error: action index {pos} out of range");
                     return;
                 };
                 let new_history = if tree.node(child_id).kind == NodeKind::Action {
-                    node_info[tree.tags[child_id as usize] as usize]
-                        .history
-                        .clone()
+                    view.history(child_id)
                 } else {
-                    format!("{}{}", self.history, history_token(&label))
+                    format!("{}{}", self.history, history_token(actions[pos]))
                 };
                 self.stack.push((self.current, self.history.clone()));
                 self.current = child_id;
@@ -286,27 +268,21 @@ impl<'a> Repl<'a> {
             }
             NodeKind::Chance => {
                 let children: Vec<NodeId> = tree.children(self.current).collect();
-                let mut chosen: Option<(usize, String)> = None;
-                for pos in 0..children.len() {
-                    let label = chance_child_label(self.game, node_info, self.current, pos);
-                    // Accept the label with or without its trailing `*`
-                    // (see `chance_child_label`'s doc comment): an
-                    // iso-merged deal's representative card is still a
-                    // sensible thing to type without the marker.
-                    if label.eq_ignore_ascii_case(arg)
-                        || label.trim_end_matches('*').eq_ignore_ascii_case(arg)
-                    {
-                        chosen = Some((pos, label));
-                        break;
-                    }
-                }
+                // Accept the label with or without its trailing `*`: an
+                // iso-merged deal's representative card is still a sensible
+                // thing to type without the marker.
+                let chosen = (0..children.len())
+                    .map(|pos| (pos, view.chance_label(self.current, pos)))
+                    .find(|(_, label)| {
+                        label.eq_ignore_ascii_case(arg)
+                            || label.trim_end_matches('*').eq_ignore_ascii_case(arg)
+                    });
                 let (pos, label) = match chosen {
                     Some(c) => c,
                     None => match arg.parse::<usize>() {
-                        Ok(idx) if idx < children.len() => (
-                            idx,
-                            chance_child_label(self.game, node_info, self.current, idx),
-                        ),
+                        Ok(idx) if idx < children.len() => {
+                            (idx, view.chance_label(self.current, idx))
+                        }
                         Ok(idx) => {
                             println!(
                                 "error: deal index {idx} out of range (0..{})",
@@ -322,9 +298,7 @@ impl<'a> Repl<'a> {
                 };
                 let child_id = children[pos];
                 let new_history = if tree.node(child_id).kind == NodeKind::Action {
-                    node_info[tree.tags[child_id as usize] as usize]
-                        .history
-                        .clone()
+                    view.history(child_id)
                 } else {
                     format!("{}[{}]", self.history, label.trim_end_matches('*'))
                 };
@@ -352,16 +326,13 @@ impl<'a> Repl<'a> {
     }
 
     fn cmd_grid(&mut self, arg: &str) {
-        let node_info = self.node_info;
-        let tree = &self.game.tree;
-        let node = *tree.node(self.current);
-        if node.kind != NodeKind::Action {
+        let view = self.view;
+        if view.tree.node(self.current).kind != NodeKind::Action {
             println!("error: grid only works at an action node");
             return;
         }
-        let tag = tree.tags[self.current as usize] as usize;
-        let info = &node_info[tag];
-        let pos = match resolve_action(&info.actions, arg) {
+        let actions = view.actions(self.current);
+        let pos = match resolve_action(&actions, arg) {
             Ok(p) => p,
             Err(e) => {
                 println!("error: {e}");
@@ -382,9 +353,9 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let freqs = queries::action_frequencies(self.game, self.current, &avg, &reach);
-        let grid = queries::action_grid(self.game, self.current, pos, &avg, &reach);
-        println!("{} (overall freq {:.3})", info.actions[pos], freqs[pos]);
+        let freqs = queries::action_frequencies(view, self.current, &avg, &reach);
+        let grid = queries::action_grid(view, self.current, pos, &avg, &reach);
+        println!("{} (overall freq {:.3})", actions[pos], freqs[pos]);
         self.render_grid(&grid.weights, &grid.values);
     }
 
@@ -397,7 +368,7 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let grid = queries::range_grid(self.game, player);
+        let grid = queries::range_grid(self.view, player);
         println!("{arg} root range (% of max class weight)");
         self.render_grid(&grid.weights, &grid.values);
     }
@@ -417,18 +388,17 @@ impl<'a> Repl<'a> {
         {
             self.equity_cache = Some((
                 self.current,
-                queries::equity(self.game, &self.board, &self.history, &reach),
+                queries::equity(self.view, &self.board, &self.history, &reach),
             ));
         }
-        let grid = queries::equity_grid(self.game, &reach, &self.equity_cache.as_ref().unwrap().1);
+        let grid = queries::equity_grid(self.view, &reach, &self.equity_cache.as_ref().unwrap().1);
         println!("oop equity vs ip at current node (class-averaged, %)");
         self.render_grid(&grid.weights, &grid.values);
     }
 
     fn cmd_combos(&mut self, arg: &str) {
-        let node_info = self.node_info;
-        let tree = &self.game.tree;
-        let node = *tree.node(self.current);
+        let view = self.view;
+        let node = *view.tree.node(self.current);
         if node.kind != NodeKind::Action {
             println!("error: combos only works at an action node");
             return;
@@ -440,8 +410,7 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
-        let tag = tree.tags[self.current as usize] as usize;
-        let info = &node_info[tag];
+        let actions = view.actions(self.current);
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
             Err(e) => {
@@ -450,20 +419,13 @@ impl<'a> Repl<'a> {
             }
         };
         println!("combos {arg}:");
-        let rows = queries::combo_rows(
-            &class,
-            &self.game.evaluator.hands,
-            node.player,
-            info.actions.len(),
-            &avg,
-        );
+        let rows = queries::combo_rows(&class, view.hands(), node.player, actions.len(), &avg);
         if rows.is_empty() {
             println!("error: {arg} is not in the acting player range");
             return;
         }
         for row in rows {
-            let parts: Vec<String> = info
-                .actions
+            let parts: Vec<String> = actions
                 .iter()
                 .zip(row.probabilities)
                 .map(|(label, p)| format!("{label}={p:.3}"))

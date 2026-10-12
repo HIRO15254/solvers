@@ -502,10 +502,6 @@ pub(crate) fn print_artifact(diagnostic: hu_postflop::artifact::Diagnostic) {
                 mode
             );
         }
-        Diagnostic::Rebuilding => eprintln!("rebuilding tree from embedded config..."),
-        Diagnostic::Rebuilt { secs, nodes } => {
-            eprintln!("tree rebuilt in {secs:.2}s ({nodes} nodes)")
-        }
         Diagnostic::RiverStart {
             history,
             iterations,

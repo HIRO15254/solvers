@@ -158,8 +158,14 @@ fn compare_solutions(old: &str, new: &str, flags: &[String]) -> Result<()> {
                 values.1 += 1;
             },
         )?;
+        let index = reader.read_index(|stream| {
+            let mut hasher = blake3::Hasher::new();
+            std::io::copy(stream, &mut hasher)?;
+            Ok(hasher.finalize())
+        })?;
         let mut digest = blake3::Hasher::new();
         digest.update(metadata.last().expect("pushed"));
+        digest.update(index.as_bytes());
         digest.update(strategy.0.finalize().as_bytes());
         digest.update(values.0.finalize().as_bytes());
         digests.push(digest.finalize());
@@ -169,7 +175,7 @@ fn compare_solutions(old: &str, new: &str, flags: &[String]) -> Result<()> {
         bail!(".sol metadata differs (excluding wall_secs)");
     }
     if digests[0] != digests[1] {
-        bail!(".sol blocks differ");
+        bail!(".sol index or blocks differ");
     }
     println!(
         "{}",

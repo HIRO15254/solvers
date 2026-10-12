@@ -144,6 +144,50 @@ pub struct TreeSpec {
     pub root_dims: PerPlayer<u32>,
 }
 
+/// Layout from which [`PublicTree::from_shape`] derives every other field of
+/// a compiled tree. [`PublicTree::compile`] assigns child ranges, storage
+/// refs, deal offsets, spans and chance flags in one deterministic walk, so
+/// node kinds and child counts by id fix them all. Builder tags are not part
+/// of a shape.
+#[derive(Clone, Debug)]
+pub struct TreeShape {
+    /// Every node by id.
+    pub nodes: Vec<ShapeNode>,
+    /// `Node::aux` of the terminal nodes, ascending by node id.
+    pub terminal_ids: Vec<u32>,
+    /// Chance branches in [`PublicTree::deals`] order.
+    pub deals: Vec<Deal>,
+    pub masks: Vec<Vec<f32>>,
+    pub transitions: Vec<SparseTransition>,
+    pub root_dims: PerPlayer<u32>,
+}
+
+/// One node of a [`TreeShape`]. `player` is `P0` except at action nodes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ShapeNode {
+    pub kind: NodeKind,
+    pub player: Player,
+    pub num_children: u16,
+}
+
+/// Why a [`TreeShape`] describes no compiled tree.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ShapeError(pub &'static str);
+
+impl std::fmt::Display for ShapeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "inconsistent tree shape: {}", self.0)
+    }
+}
+
+impl std::error::Error for ShapeError {}
+
+/// Next unassigned node id and deal entry while placing a [`TreeShape`].
+struct ShapeCursor {
+    node: usize,
+    deal: usize,
+}
+
 impl PublicTree {
     pub fn compile(spec: TreeSpec) -> PublicTree {
         let mut tree = PublicTree {
@@ -165,6 +209,168 @@ impl PublicTree {
         let root_dims = tree.root_dims;
         tree.fill(0, &spec.root, root_dims);
         tree
+    }
+
+    /// Rebuilds the tree [`Self::compile`] produced from the same layout,
+    /// field for field, except that every tag is zero. Fails instead of
+    /// panicking on a shape no compile can produce: unreachable or missing
+    /// nodes, unused or missing deals, terminal ids that do not match the
+    /// terminals, or reach maps whose dimensions disagree.
+    pub fn from_shape(shape: TreeShape) -> Result<PublicTree, ShapeError> {
+        let count = shape.nodes.len();
+        if count == 0 {
+            return Err(ShapeError("a tree needs a root"));
+        }
+        for tr in &shape.transitions {
+            if tr
+                .entries
+                .iter()
+                .any(|&(i, j, _)| i >= tr.in_dim || j >= tr.out_dim)
+            {
+                return Err(ShapeError("a transition entry is outside its dimensions"));
+            }
+        }
+        let mut tree = PublicTree {
+            nodes: vec![placeholder_node(); count],
+            deals: shape.deals,
+            storage_refs: Vec::new(),
+            masks: shape.masks,
+            transitions: shape.transitions,
+            root_dims: shape.root_dims,
+            storage_len: 0,
+            tags: vec![0; count],
+            storage_spans: vec![StorageSpan::default(); count],
+            subtree_has_chance: vec![false; count],
+        };
+        let mut cursor = ShapeCursor { node: 1, deal: 0 };
+        tree.place(0, &shape.nodes, &mut cursor, shape.root_dims)?;
+        if cursor.node != count {
+            return Err(ShapeError("some nodes are unreachable from the root"));
+        }
+        if cursor.deal != tree.deals.len() {
+            return Err(ShapeError("some deals belong to no chance node"));
+        }
+        let mut ids = shape.terminal_ids.into_iter();
+        for node in &mut tree.nodes {
+            if node.kind == NodeKind::Terminal {
+                node.aux = ids
+                    .next()
+                    .ok_or(ShapeError("fewer terminal ids than terminals"))?;
+            }
+        }
+        if ids.next().is_some() {
+            return Err(ShapeError("more terminal ids than terminals"));
+        }
+        Ok(tree)
+    }
+
+    /// [`Self::fill`] for a [`TreeShape`]: the same walk, reading each
+    /// node's kind and child count instead of a [`TempNode`].
+    fn place(
+        &mut self,
+        slot: usize,
+        shape: &[ShapeNode],
+        cursor: &mut ShapeCursor,
+        dims: PerPlayer<u32>,
+    ) -> Result<(), ShapeError> {
+        let start = self.storage_len;
+        let sref_start = self.storage_refs.len() as u32;
+        let node = shape[slot];
+        let count = node.num_children as usize;
+        let mut has_chance = node.kind == NodeKind::Chance;
+        if node.kind == NodeKind::Terminal {
+            if count != 0 {
+                return Err(ShapeError("a terminal has children"));
+            }
+            self.nodes[slot] = Node {
+                kind: NodeKind::Terminal,
+                player: Player::P0,
+                num_children: 0,
+                first_child: 0,
+                aux: 0,
+            };
+        } else {
+            if count == 0 {
+                return Err(ShapeError("an action or chance node has no children"));
+            }
+            if shape.len() - cursor.node < count {
+                return Err(ShapeError("children run past the last node"));
+            }
+            let first_child = cursor.node;
+            cursor.node += count;
+            if node.kind == NodeKind::Action {
+                let num_hands = dims[node.player];
+                let aux = self.storage_refs.len() as u32;
+                self.storage_refs.push(StorageRef {
+                    offset: self.storage_len,
+                    num_actions: node.num_children,
+                    num_hands,
+                    index: aux,
+                });
+                self.storage_len += count * num_hands as usize;
+                self.nodes[slot] = Node {
+                    kind: NodeKind::Action,
+                    player: node.player,
+                    num_children: node.num_children,
+                    first_child: first_child as u32,
+                    aux,
+                };
+                for child in first_child..first_child + count {
+                    self.place(child, shape, cursor, dims)?;
+                    has_chance |= self.subtree_has_chance[child];
+                }
+            } else {
+                if self.deals.len() - cursor.deal < count {
+                    return Err(ShapeError("chance nodes need more deals than exist"));
+                }
+                let aux = cursor.deal;
+                cursor.deal += count;
+                self.nodes[slot] = Node {
+                    kind: NodeKind::Chance,
+                    player: Player::P0,
+                    num_children: node.num_children,
+                    first_child: first_child as u32,
+                    aux: aux as u32,
+                };
+                for pos in 0..count {
+                    let maps = self.deals[aux + pos].maps;
+                    let child_dims = PerPlayer::new(
+                        self.checked_mapped_dim(maps[Player::P0], dims[Player::P0])?,
+                        self.checked_mapped_dim(maps[Player::P1], dims[Player::P1])?,
+                    );
+                    self.place(first_child + pos, shape, cursor, child_dims)?;
+                }
+            }
+        }
+        self.storage_spans[slot] = StorageSpan {
+            start,
+            end: self.storage_len,
+            sref_start,
+            sref_end: self.storage_refs.len() as u32,
+        };
+        self.subtree_has_chance[slot] = has_chance;
+        Ok(())
+    }
+
+    /// [`Self::mapped_dim`] for untrusted maps.
+    fn checked_mapped_dim(&self, map: ReachMap, dim: u32) -> Result<u32, ShapeError> {
+        match map {
+            ReachMap::Identity => Ok(dim),
+            ReachMap::Mask(m) => match self.masks.get(m as usize) {
+                Some(mask) if mask.len() == dim as usize => Ok(dim),
+                Some(_) => Err(ShapeError(
+                    "a mask's length differs from the reach dimension",
+                )),
+                None => Err(ShapeError("a deal names a missing mask")),
+            },
+            ReachMap::Transition(t) => match self.transitions.get(t as usize) {
+                Some(tr) if tr.in_dim == dim => Ok(tr.out_dim),
+                Some(_) => Err(ShapeError(
+                    "a transition's input dimension differs from the reach dimension",
+                )),
+                None => Err(ShapeError("a deal names a missing transition")),
+            },
+        }
     }
 
     /// Recursively fills `slot` from `temp`, reserving contiguous child
@@ -472,5 +678,125 @@ mod tests {
         assert!(child_spans[0].sref_end <= child_spans[1].sref_start);
         assert_eq!(child_spans[0].sref_start, root_span.sref_start);
         assert_eq!(child_spans[1].sref_end, root_span.sref_end);
+    }
+
+    fn shape_of(tree: &PublicTree) -> TreeShape {
+        TreeShape {
+            nodes: tree
+                .nodes
+                .iter()
+                .map(|n| ShapeNode {
+                    kind: n.kind,
+                    player: n.player,
+                    num_children: n.num_children,
+                })
+                .collect(),
+            terminal_ids: tree
+                .nodes
+                .iter()
+                .filter(|n| n.kind == NodeKind::Terminal)
+                .map(|n| n.aux)
+                .collect(),
+            deals: tree.deals.clone(),
+            masks: tree.masks.clone(),
+            transitions: tree.transitions.clone(),
+            root_dims: tree.root_dims,
+        }
+    }
+
+    /// Action root over a chance node whose branches mask one player and
+    /// shrink the other through a transition, then act again.
+    fn mixed_tree() -> PublicTree {
+        let maps = |t| PerPlayer::new(ReachMap::Mask(0), ReachMap::Transition(t));
+        let after = |id| {
+            action(
+                Player::P1,
+                vec![terminal(id), action(Player::P0, vec![terminal(id + 1)])],
+            )
+        };
+        let root = action(
+            Player::P0,
+            vec![
+                terminal(7),
+                TempNode::Chance {
+                    deals: vec![(2.0, maps(0), after(10)), (1.0, maps(1), after(20))],
+                    tag: 5,
+                },
+            ],
+        );
+        PublicTree::compile(TreeSpec {
+            root,
+            masks: vec![vec![1.0, 0.0, 1.0]],
+            transitions: vec![
+                SparseTransition {
+                    in_dim: 2,
+                    out_dim: 1,
+                    entries: vec![(0, 0, 1.0), (1, 0, 0.5)],
+                },
+                SparseTransition {
+                    in_dim: 2,
+                    out_dim: 3,
+                    entries: vec![(1, 2, 1.0)],
+                },
+            ],
+            root_dims: PerPlayer::new(3, 2),
+        })
+    }
+
+    #[test]
+    fn from_shape_rebuilds_the_compiled_tree() {
+        let tree = mixed_tree();
+        let rebuilt = PublicTree::from_shape(shape_of(&tree)).unwrap();
+        let key = |n: &Node| (n.kind, n.player, n.num_children, n.first_child, n.aux);
+        assert_eq!(
+            tree.nodes.iter().map(key).collect::<Vec<_>>(),
+            rebuilt.nodes.iter().map(key).collect::<Vec<_>>()
+        );
+        let sref = |r: &StorageRef| (r.offset, r.num_actions, r.num_hands, r.index);
+        assert_eq!(
+            tree.storage_refs.iter().map(sref).collect::<Vec<_>>(),
+            rebuilt.storage_refs.iter().map(sref).collect::<Vec<_>>()
+        );
+        let span = |s: &StorageSpan| (s.start, s.end, s.sref_start, s.sref_end);
+        assert_eq!(
+            tree.storage_spans.iter().map(span).collect::<Vec<_>>(),
+            rebuilt.storage_spans.iter().map(span).collect::<Vec<_>>()
+        );
+        assert_eq!(tree.storage_len, rebuilt.storage_len);
+        assert_eq!(tree.subtree_has_chance, rebuilt.subtree_has_chance);
+        assert!(rebuilt.tags.iter().all(|&t| t == 0));
+        // The second branch's transition grows P1's dimension to 3.
+        let second = tree
+            .children(tree.children(0).nth(1).unwrap())
+            .nth(1)
+            .unwrap();
+        assert_eq!(rebuilt.storage_ref(rebuilt.node(second)).num_hands, 3);
+    }
+
+    #[test]
+    fn from_shape_rejects_inconsistent_shapes() {
+        let tree = mixed_tree();
+        let reject = |edit: &dyn Fn(&mut TreeShape)| {
+            let mut shape = shape_of(&tree);
+            edit(&mut shape);
+            assert!(PublicTree::from_shape(shape).is_err());
+        };
+        reject(&|s| s.nodes.push(s.nodes[1]));
+        reject(&|s| {
+            s.nodes.pop();
+        });
+        reject(&|s| {
+            s.deals.pop();
+        });
+        reject(&|s| s.deals.push(s.deals[0]));
+        reject(&|s| {
+            s.terminal_ids.pop();
+        });
+        reject(&|s| s.terminal_ids.push(0));
+        reject(&|s| s.masks[0].push(1.0));
+        reject(&|s| s.transitions[0].in_dim = 3);
+        reject(&|s| s.transitions[1].entries.push((2, 0, 1.0)));
+        reject(&|s| s.deals[0].maps[Player::P0] = ReachMap::Mask(4));
+        reject(&|s| s.nodes[0].num_children = 0);
     }
 }

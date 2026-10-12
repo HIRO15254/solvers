@@ -45,6 +45,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | SOL-8の参照fixture | [HU Postflop参照fixture（2026-10）](hu-postflop-reference/fixtures-2026-10/README.md) | Flop開始6件のGTOW取得データ・`solvers.nlh/v1` Input・取得と生成と比較のscript。2026-10-11の比較では、root EVは5件が開始potの0.5%以内（c001は0.72%）、主要Flop nodeの頻度5 point以内はc021だけ合格。差の大半はbet sizeの間の配分。利用者決定（2026-10-12）でこの結果のまま完了 |
 | 性能・一致の受入 | [P1 `.sol` v3の索引付きchunkと部分読込み（SOL-14）](p1-io-2026-10/sol-index-20261012/README.md) | 2026-10-12。c001/c013のexportを22→3.2秒・92→38.6秒、peakを4.3→0.33 GB・10.7→2.8 GBに縮めた。summaryはmetadataだけで0.04秒。export出力はbaseとbyte一致した。`--node`の繰り返しで4 nodeを1回の読込みで出せる |
 | 性能・一致の受入 | [P1 artifact読込みの木再構築・bulk export・compareの短縮](p1-io-2026-10/export-rebuild-20261012/README.md) | 2026-10-12。並列の木構築とpreflight省略で、c013の1 node exportを38.6→5.8秒にした。c001の`actions --node all`は837.6→3.3秒、c013のcompareは123.9→21.7秒。出力はbyte一致した。node索引（v4）と`.sol` size削減（5〜8%）は見送った |
+| 性能・一致の受入 | [P1 `.sol` v4: 木とindexの保存](p1-io-2026-10/sol-v4-20261013/README.md) | 2026-10-13。読込みで木を再構築しない。c013の1 node exportは5.8→0.41秒、peakは2.8→0.66 GB。c001は0.84→0.06秒。compare c013は21.7→17.8秒。`.sol`はc001で8.3%、c013で3.9%縮んだ（level 3＋u16 shuffle）。出力はbyte一致した。v3以前は再solveを案内して拒否する |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 

@@ -1,10 +1,11 @@
 //! P1 solve and read-only solve drivers. The caller owns cancellation and run lifecycle.
+use crate::index::GameIndex;
 use crate::input::{self, Algorithm, SolutionStreets};
-use crate::prepare::{self, Prepared, compatibility_hash, display_game, warnings};
+use crate::prepare::{self, Prepared, compatibility_hash, warnings};
 use anyhow::{Context, Result, bail};
 use hu_engine::{
-    DiscountSchedule, F32Storage, I16Storage, MixedStorage, ParConfig, Solver, Storage,
-    TerminalEvaluator,
+    CompiledGame, DiscountSchedule, F32Storage, I16Storage, MixedStorage, ParConfig, Solver,
+    Storage, TerminalEvaluator,
 };
 use nlh::{PerPlayer, Player};
 use std::path::Path;
@@ -137,20 +138,15 @@ pub(crate) fn query<S: Storage>(
     iterations: Option<u64>,
     target_nash_conv: Option<f64>,
     cancel: &AtomicBool,
-) -> Result<(
-    Solver<crate::PostflopEvaluator, S>,
-    Vec<crate::PostflopNodeInfo>,
-)> {
+) -> Result<(Solver<crate::PostflopEvaluator, S>, GameIndex)> {
     crate::prepare::check_memory_limit(p)?;
     let iterations = iterations.unwrap_or(p.settings.solver.stop.max_iterations);
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
         bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
     }
-    let mut game = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
-        .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
-    display_game(&mut game);
+    let (game, index) = build_indexed(p)?;
     let mut solver = Solver::<_, S>::new(
-        game.game,
+        game,
         schedule(&p.settings.solver.algorithm),
         Some(iterations),
     );
@@ -193,7 +189,19 @@ pub(crate) fn query<S: Storage>(
             );
         }
     }
-    Ok((solver, game.node_info))
+    Ok((solver, index))
+}
+
+/// Builds the game and its viewer index, releasing the builder's per-node
+/// strings before the solve allocates storage.
+fn build_indexed(p: &Prepared) -> Result<(CompiledGame<crate::PostflopEvaluator>, GameIndex)> {
+    let crate::PostflopGame {
+        game, node_info, ..
+    } = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
+        .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
+    let start = crate::artifact::start_street_from_board_len(p.config.board.len());
+    let index = GameIndex::from_game(&game, &node_info, start);
+    Ok((game, index))
 }
 
 pub fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
@@ -235,11 +243,10 @@ fn drive<S: Storage>(
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));
     }
-    let game = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
-        .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
+    let (game, index) = build_indexed(p)?;
     let stop = &p.settings.solver.stop;
     let mut solver = Solver::<_, S>::new(
-        game.game,
+        game,
         schedule(&p.settings.solver.algorithm),
         Some(stop.max_iterations),
     );
@@ -377,6 +384,7 @@ fn drive<S: Storage>(
                 crate::artifact::export_sol(
                     &spec,
                     &solver,
+                    &index,
                     offset,
                     p.document.spot.context.street,
                     &summary,
@@ -396,6 +404,7 @@ fn drive<S: Storage>(
         crate::artifact::export_sol(
             &spec,
             &solver,
+            &index,
             offset,
             p.document.spot.context.street,
             &summary,

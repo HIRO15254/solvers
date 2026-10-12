@@ -219,40 +219,60 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 `[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
 
-最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 1 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式・checkpoint v5・`.sol` v3の形式は同じである。
+最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式・checkpoint v5・`.sol` v4の形式は同じである。
 
-`.sol`はversion 3である（SOL-14、2026-10-12）。多byte値はlittle endianで、次の順に並ぶ。
+`.sol`はversion 4である（2026-10-13）。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
 
 | 部分 | 内容 |
 |---|---|
-| header（138 bytes） | `SLVRSOLV` magic、u16 version 3、32-byte config hash、u64 iteration、u64 metadata frame長、u64 directory offset、u64 directory frame長、metadata frameのBLAKE3、directory frameのBLAKE3 |
-| metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame（level 3） |
-| 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frame（level 1）の列 |
-| 値chunk列 | 同じnode集合の値blockをsref昇順に詰めたchunkのzstd frame（level 1）の列 |
-| directory frame | 戦略chunk列、値chunk列の順に、chunkごとの先頭sref（u32）、末尾sref（u32）、node数（u32）、file offset（u64）、圧縮長（u64）、展開長（u64）、圧縮frameのBLAKE3（32 bytes）を並べたpostcard bytesのzstd frame（level 3） |
+| header（178 bytes） | `SLVRSOLV` magic、u16 version 4、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
+| metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame |
+| index frame | 下表の木とindexの列を1つのzstd frameにしたもの |
+| 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frameの列 |
+| 値chunk列 | 同じnode集合の値blockをsref昇順に詰めたchunkのzstd frameの列 |
+| directory frame | 戦略chunk列、値chunk列の順に、chunkごとの先頭sref（u32）、末尾sref（u32）、node数（u32）、file offset（u64）、圧縮長（u64）、展開長（u64）、圧縮frameのBLAKE3（32 bytes）を並べたpostcard bytesのzstd frame |
 
 | metadata | 意味 |
 |---|---|
-| `config_toml` | 外部tree sourceをinline化した実効config全文。木を決定的に再構築する |
+| `config_toml` | 外部tree sourceをinline化した実効config全文。range・board・payoffと、River re-solveの設定を与える |
 | `meta` | iterations、expl[2]、ev[2]、nash_conv、storage（`f32` / `i16` / `i16-f32avg`の文字列）、wall_secs |
 | `mode` | full / no-rivers |
-| `tree_nodes` | 埋込みconfigから再構築する木のnode数 |
+| `tree_nodes` | 保存した木のnode数 |
 | `stored_nodes` | 保存するaction node数。戦略chunk列と値chunk列はそれぞれこの数のblockを持つ |
 
-chunkの展開内容はblockの連結である。戦略blockはu32 sref、u32 byte長、action nodeごとのactor support次元のu16戦略（action-major）である。
+index frameの展開内容は次の列の連結である。
+
+| 列 | 内容 |
+|---|---|
+| counts | u64 node数、u64 deal数、u32 mask数、u32 transition数、u32 label数、player別u32 root次元 |
+| kinds | nodeごとのu8（0 = P0 action、1 = P1 action、2 = chance、3 = terminal）、node id順 |
+| children | 非terminal nodeごとのu16子数 |
+| terminals | terminalごとのu32 terminal id差分（直前terminalのidからのwrapping差） |
+| deals | dealごとのf32 weight、次にdealとplayerごとのu32 reach map（bit 30–31: 0 identity、1 mask、2 transition、bit 0–29: 番号） |
+| deal cards | dealごとのu8 card番号。cardを記録しないdealは255 |
+| masks | maskごとのu32長とf32要素 |
+| transitions | transitionごとのu32 in次元、u32 out次元、u32要素数と（u32, u32, f32）要素 |
+| labels | labelごとのu32 byte長とUTF-8表示label（`check`、`bet 2.5`） |
+| edges | action nodeのid順に、子ごとのu32 label番号 |
+| pots | action nodeのsref順に、u32 pot（chips） |
+
+木の子配置・sref・storage範囲・chance有無はkinds・children・dealsから構築時と同じ規則で決まる。読込みはnode数と`tree_nodes`、root次元と埋込みconfigのsupport、map・transition・label番号の範囲、未使用dealや余剰bytesを検査し、不整合はartifactが木と一致しないerrorである。
+historyはedge labelのBB表記tokenとdeal cardから組み立てる。iso統合されたdealは代表card、cardの無いall-in runoutは`dealN`で表示する。streetとparentは木から、handとroot rangeは埋込みconfigから再計算する。
+
+chunkの展開内容はblockの連結を、偶数offset byte列・奇数offset byte列の順に並べ替えたもの（u16のbyte shuffle）である。戦略blockはu32 sref、u32 byte長、action nodeごとのactor support次元のu16戦略（action-major）である。
 値blockはu32 sref、f32 scale、u32 byte長、OOP support、IP supportの値（席別次元、block scale付きi16）である。
 chunkは展開bytesが1 MiB以上になったblockで閉じる。chunk内のsrefは昇順で、chunk間のsref範囲は重ならない。
 
-openはheader、metadata、directoryだけを読み、metadataとdirectoryのBLAKE3、config hash、headerとmetadataのiteration一致を検査する。
-さらにchunkがmetadata直後からdirectory直前まで隙間なく並ぶこと、sref範囲の昇順、各chunk列のnode数の和が`stored_nodes`であること、directoryがfile末尾で終わることを検査する。
+openはheaderのmagicとversionを先に検査し、header、metadata、directoryだけを読み、metadataとdirectoryのBLAKE3、config hash、headerとmetadataのiteration一致を検査する。
+さらにindex frameがmetadata直後に、chunkがindex frame直後からdirectory直前まで隙間なく並ぶこと、sref範囲の昇順、各chunk列のnode数の和が`stored_nodes`であること、directoryがfile末尾で終わることを検査する。
 chunkは照会したnodeを含むものだけを読み、BLAKE3、展開長、block列とdirectoryの一致を検査する。破損したchunkはそのchunkを読む照会だけを失敗させる。
-`export summary`はmetadataだけで答え、木を再構築しない。他の照会は木を再構築し、`tree_nodes`とmodeから決まる保存node数を照合する。
+`export summary`はmetadataだけで答え、index frameを展開しない。他の照会はindex frameを1回展開してBLAKE3を検査し、`tree_nodes`とmodeから決まる保存node数を照合する。
 照会したnodeのblockが無い、またはnodeの形状と長さが合わなければ、artifactが木と一致しないerrorである。
 `.sol`のheader hashはblake3(config_toml全文)と一致しなければ読込みerrorである。
 `.sol`の戦略はsolve storageによらずu16である。値の分解能はblockのピークに対し約1/32767である。
 supportは埋込みconfigから再計算する。開始rangeのweight 0のhandには保存slotが無い。
 support内でもそのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
-version 1と、単一zstd streamのversion 2はversion errorで明示的に拒否する。現行configから再solveしてversion 3を作る。
+version 1、単一zstd streamのversion 2、木を保存しないversion 3はversion errorで明示的に拒否する。変換は無く、現行configから再solveしてversion 4を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
 共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5である。

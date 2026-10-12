@@ -71,7 +71,7 @@ pub fn compute(
 }
 fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<BoardRow> {
     let start = Instant::now();
-    let (solver, info) = run::query::<S>(p, None, None, cancel)?;
+    let (solver, index) = run::query::<S>(p, None, None, cancel)?;
     let elapsed = start.elapsed();
     let tree = &solver.game().tree;
     let sref = tree.storage_ref(tree.node(0));
@@ -116,7 +116,14 @@ fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<B
         nash_conv: expl[Player::P0] + expl[Player::P1],
         ev: [ev[Player::P0], ev[Player::P1]],
         oop_equity: equity,
-        labels: info[tree.tags[0] as usize].actions.clone(),
+        labels: crate::index::TreeView {
+            tree,
+            index: &index,
+        }
+        .actions(0)
+        .into_iter()
+        .map(str::to_string)
+        .collect(),
         frequencies: freqs,
     })
 }

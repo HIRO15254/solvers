@@ -19,7 +19,7 @@ pub fn export(
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Range => views::ExportView::Range,
     };
-    let data = views::export(path, view, nodes, &mut crate::nlh_v1::print_artifact)?;
+    let data = views::export(path, view, nodes)?;
     let rendered = match format {
         ExportFormat::Json => to_json(&data)?,
         ExportFormat::Csv => match &data {
@@ -42,15 +42,7 @@ pub fn export(
     Ok(())
 }
 pub fn compare(left: &Path, right: &Path, cross_game: bool) -> Result<()> {
-    print!(
-        "{}",
-        to_json(&views::compare(
-            left,
-            right,
-            cross_game,
-            &mut crate::nlh_v1::print_artifact
-        )?)?
-    );
+    print!("{}", to_json(&views::compare(left, right, cross_game)?)?);
     Ok(())
 }
 fn to_json<T: Serialize>(value: &T) -> Result<String> {

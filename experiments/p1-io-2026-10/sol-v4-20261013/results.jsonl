@@ -1,0 +1,22 @@
+{"kind": "solve", "config": "c001.toml", "exit": 0, "wall_s": 265.64, "peak_wset_gb": 4.959, "save_phase_s": 7.508, "save_phase_max_wset_gb": 4.958, "solve_phase_max_wset_gb": 4.954, "sol_bytes": 1264552881}
+{"kind": "solve", "config": "c001-i60.toml", "exit": 0, "wall_s": 46.28, "peak_wset_gb": 4.869, "save_phase_s": 7.697, "save_phase_max_wset_gb": 4.867, "solve_phase_max_wset_gb": 4.851, "sol_bytes": 1318243321}
+{"kind": "solve", "config": "c013.toml", "exit": 0, "wall_s": 871.1, "peak_wset_gb": 12.433, "save_phase_s": 20.558, "save_phase_max_wset_gb": 12.433, "solve_phase_max_wset_gb": 12.433, "sol_bytes": 3368795512}
+{"kind": "sections", "case": "c001", "version": 3, "metadata": 7518, "index": 0, "chunks": 1378574951, "directory": 99775, "total": 1378682382}
+{"kind": "sections", "case": "c001", "version": 4, "metadata": 7514, "index": 13805, "chunks": 1264431624, "directory": 99760, "total": 1264552881}
+{"kind": "sections", "case": "c013", "version": 3, "metadata": 9395, "index": 0, "chunks": 3504665471, "directory": 248046, "total": 3504923050}
+{"kind": "sections", "case": "c013", "version": 4, "metadata": 9394, "index": 45232, "chunks": 3368490976, "directory": 249732, "total": 3368795512}
+{"kind": "export", "case": "c001", "call": "summary", "wall_s": 0.02, "peak_wset_gb": 0.002, "exit": 0, "stdout_sha": "59569e466ade33e3"}
+{"kind": "export", "case": "c001", "call": "actions --node root", "wall_s": 0.06, "peak_wset_gb": 0.074, "exit": 0, "stdout_sha": "5374c65a9be6d806"}
+{"kind": "export", "case": "c001", "call": "strategy --node root", "wall_s": 0.07, "peak_wset_gb": 0.074, "exit": 0, "stdout_sha": "4497bd9b9e392e78"}
+{"kind": "export", "case": "c001", "call": "ev --node root", "wall_s": 0.06, "peak_wset_gb": 0.074, "exit": 0, "stdout_sha": "46b6eac6c309f18b"}
+{"kind": "export", "case": "c001", "call": "actions --node all --format csv", "wall_s": 2.64, "peak_wset_gb": 0.289, "exit": 0, "stdout_sha": "52656fd1f807eab1"}
+{"kind": "export", "case": "c013", "call": "summary", "wall_s": 0.02, "peak_wset_gb": 0.002, "exit": 0, "stdout_sha": "2bf49851079959eb"}
+{"kind": "export", "case": "c013", "call": "actions --node root", "wall_s": 0.41, "peak_wset_gb": 0.657, "exit": 0, "stdout_sha": "aebd9b4f68da8325"}
+{"kind": "export", "case": "c013", "call": "strategy --node root", "wall_s": 0.41, "peak_wset_gb": 0.657, "exit": 0, "stdout_sha": "f617b1a34454fc0b"}
+{"kind": "export", "case": "c013", "call": "ev --node root", "wall_s": 0.41, "peak_wset_gb": 0.657, "exit": 0, "stdout_sha": "ebf3173150823dd6"}
+{"kind": "export", "case": "c013", "call": "actions --format csv --node root --node x --node xr5.45 --node r5.45", "wall_s": 0.41, "peak_wset_gb": 0.657, "exit": 0, "stdout_sha": "c03f4a4887d057e4"}
+{"kind": "export", "case": "c013", "call": "strategy --format csv --node root --node x --node xr5.45 --node r5.45", "wall_s": 0.41, "peak_wset_gb": 0.658, "exit": 0, "stdout_sha": "3800e8ed125478d2"}
+{"kind": "export", "case": "c013", "call": "ev --format csv --node root --node x --node xr5.45 --node r5.45", "wall_s": 0.43, "peak_wset_gb": 0.657, "exit": 0, "stdout_sha": "3c0f4b4dfd4229a1"}
+{"kind": "compare", "pair": "c001 self", "wall_s": 4.27, "peak_wset_gb": 0.173, "exit": 0, "stdout_sha": "202097bc6a8c90fe"}
+{"kind": "compare", "pair": "c001 vs c001-i60", "wall_s": 4.21, "peak_wset_gb": 0.233, "exit": 0, "stdout_sha": "3ab9c52cadb8b8ba"}
+{"kind": "compare", "pair": "c013 self", "wall_s": 17.83, "peak_wset_gb": 0.786, "exit": 0, "stdout_sha": "d9aa4118b8e2b770"}

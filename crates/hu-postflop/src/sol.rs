@@ -1,28 +1,31 @@
 //! `.sol` viewer-artifact codec: a compact, read-only export of a solved
 //! postflop game's *normalized average strategy*, quantized to 16-bit
-//! fixed point, plus the original config TOML and cached solve metadata.
+//! fixed point, plus the original config TOML, the compiled tree with its
+//! viewer index (see [`crate::index`]) and cached solve metadata.
 //!
 //! This is deliberately not a superset of `.ckpt`: `.ckpt` stores
 //! full-precision regrets and strategy sums so a solve can resume bit-for-
 //! bit, while `.sol` throws that away and keeps only what a viewer needs to
-//! render strategies — the game tree itself is never serialized because it
-//! is rebuilt deterministically from `config_toml` at load time. In
+//! render strategies. Readers never rebuild the tree: it is stored. In
 //! `NoRivers` mode river-street action nodes are omitted entirely (the
 //! viewer re-solves the river lazily on demand), which is what keeps these
 //! files small for deep trees.
 //!
-//! Format version 3 is indexed so a reader never decodes more than it asks
+//! Format version 4 is indexed so a reader never decodes more than it asks
 //! for. All integers are little-endian:
 //!
 //! ```text
-//! header | metadata frame | strategy chunks | value chunks | directory frame
+//! header | metadata frame | index frame | strategy chunks | value chunks | directory frame
 //! ```
 //!
 //! Every frame and chunk is an independent zstd frame whose BLAKE3 is
-//! recorded: the metadata and directory hashes in the header, each chunk's in
-//! its directory entry. Summary queries read the header, metadata and
-//! directory only; a node query decodes the one chunk holding that node.
-//! The file is written to a temp file and renamed into place.
+//! recorded: the metadata, index and directory hashes in the header, each
+//! chunk's in its directory entry. A chunk's decoded bytes are stored byte-
+//! shuffled (all even-offset bytes, then all odd-offset bytes), which puts
+//! the low and high bytes of its 16-bit values in separate planes. Summary
+//! queries read the header, metadata and directory only; a node query also
+//! decodes the index and the one chunk holding that node. The file is
+//! written to a temp file and renamed into place.
 
 use parking_lot::Mutex;
 use std::fs::File;
@@ -36,10 +39,11 @@ use serde::{Deserialize, Serialize};
 use runfiles::{config_hash, config_hash_hex};
 
 /// Fixed header: magic (8) + format version (u16) + config hash (32) +
-/// iteration (u64) + metadata frame length (u64) + directory offset (u64) +
-/// directory frame length (u64) + metadata BLAKE3 (32) + directory BLAKE3
-/// (32). The first 50 bytes keep the checkpoint header's identity layout.
-pub const HEADER_LEN: usize = 8 + 2 + 32 + 8 + 8 + 8 + 8 + 32 + 32;
+/// iteration (u64) + metadata frame length (u64) + index frame length
+/// (u64) + directory offset (u64) + directory frame length (u64) +
+/// metadata, index and directory BLAKE3 (32 each). The first 50 bytes keep
+/// the checkpoint header's identity layout.
+pub const HEADER_LEN: usize = 8 + 2 + 32 + 8 + 8 + 8 + 8 + 8 + 32 + 32 + 32;
 
 /// Maximum strategy elements generated together (one oversized node is allowed).
 pub const STRATEGY_BATCH_ELEMENTS: usize = 8 * 1024 * 1024;
@@ -61,17 +65,17 @@ pub(crate) fn strategy_batch_workspace(
 }
 
 const MAGIC: &[u8; 8] = b"SLVRSOLV";
-const FORMAT_VERSION: u16 = 3;
+const FORMAT_VERSION: u16 = 4;
 /// A chunk is sealed once its decoded bytes reach this size. Large enough
-/// that independent frames compress about as well as one stream with
-/// zstd's level-1 window, small enough that a single-node read stays cheap.
+/// that independent frames compress about as well as one stream, small
+/// enough that a single-node read stays cheap.
 pub const CHUNK_TARGET_BYTES: usize = 1 << 20;
 /// Sealed chunks compressed in parallel before they are written in order.
 const PARALLEL_CHUNKS: usize = 16;
-/// Upper bound of one level-1 compression context for a chunk.
-const COMPRESSION_CONTEXT_BYTES: u64 = 4 << 20;
-const ZSTD_LEVEL: i32 = 1;
-const METADATA_ZSTD_LEVEL: i32 = 3;
+/// Upper bound of one compression context at [`ZSTD_LEVEL`], for a chunk
+/// or for the streamed index frame.
+const COMPRESSION_CONTEXT_BYTES: u64 = 8 << 20;
+const ZSTD_LEVEL: i32 = 3;
 /// Largest byte blob one block may declare: far above any real node
 /// (`actions * 1326 * 2`), small enough that a corrupt length cannot request
 /// an absurd allocation.
@@ -90,12 +94,14 @@ const CACHED_CHUNKS: usize = 32;
 /// Memory the writer holds besides the blocks themselves: the sealed chunks
 /// in flight (at most [`PARALLEL_CHUNKS`], and no more than the payload can
 /// fill, since a chunk is sealed only once it reaches
-/// [`CHUNK_TARGET_BYTES`], plus the final partial one), their compressed
-/// copies and compression contexts, the open chunk of each section, the
-/// strategy `sref` list that value blocks are checked against, and the
-/// directory (entries, encoded and compressed). `max_block_bytes` is the
-/// largest strategy or value blob of the tree, `payload_bytes` bounds all
-/// blob bytes.
+/// [`CHUNK_TARGET_BYTES`], plus the final partial one), their shuffled and
+/// compressed copies and compression contexts, the open chunk of each
+/// section, the strategy `sref` list that value blocks are checked against,
+/// and the directory (entries, encoded and compressed). The index frame is
+/// streamed before any chunk through one context and a small buffer, which
+/// the chunk phase's contexts bound. `max_block_bytes` is the largest
+/// strategy or value blob of the tree, `payload_bytes` bounds all blob
+/// bytes.
 pub(crate) fn compression_workspace(
     max_block_bytes: u64,
     payload_bytes: u64,
@@ -105,7 +111,7 @@ pub(crate) fn compression_workspace(
     let full_chunks = payload_bytes / CHUNK_TARGET_BYTES as u64;
     let in_flight = (full_chunks + 1).min(PARALLEL_CHUNKS as u64);
     let chunks = 2 * (full_chunks + 1);
-    (in_flight + 2) * 2 * chunk
+    (3 * in_flight + 4) * chunk
         + in_flight * COMPRESSION_CONTEXT_BYTES
         + stored_nodes * 4
         + chunks * 3 * std::mem::size_of::<ChunkEntry>() as u64
@@ -165,15 +171,16 @@ pub enum StreetsStored {
 /// Everything except the blocks: the metadata frame.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SolMetadata {
-    /// Full original config TOML text, kept verbatim (not just its hash)
-    /// so the viewer can rebuild the exact same tree deterministically.
+    /// Full original config TOML text, kept verbatim (not just its hash):
+    /// ranges, board and payoff for the stored tree, and the settings a
+    /// river re-solve reuses.
     /// The header's config hash MUST equal `blake3(config_toml.as_bytes())`
     /// — the writer derives it from this field and the reader verifies it,
     /// so a `.sol` can never silently drift from the config it describes.
     pub config_toml: String,
     pub meta: SolMeta,
     pub mode: StreetsStored,
-    /// Node count of the tree the config rebuilds.
+    /// Node count of the stored tree.
     pub tree_nodes: u64,
     /// Stored action nodes; strategy and value chunks each hold this many
     /// blocks.
@@ -185,10 +192,8 @@ pub struct SolMetadata {
 /// fixed point.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StrategyBlock {
-    /// Index into the rebuilt tree's `storage_refs` (i.e. the action
-    /// node's `Node::aux`). Stable across a load because tree construction
-    /// from a given config is deterministic, so this never needs to be
-    /// resolved through any other indirection.
+    /// Index into the stored tree's `storage_refs` (i.e. the action node's
+    /// `Node::aux`).
     pub sref: u32,
     pub probs: Vec<u8>,
 }
@@ -240,6 +245,8 @@ pub struct SolPayload {
     /// `sref`. The two lists always cover the same node set: a reader that
     /// found a strategy for a node can always find its values too.
     pub values: Vec<ValueBlock>,
+    /// The decoded index stream (see [`crate::index`]).
+    pub index: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -247,13 +254,17 @@ struct SolHeader {
     config_hash: [u8; 32],
     iteration: u64,
     metadata_len: u64,
+    index_len: u64,
     directory_offset: u64,
     directory_len: u64,
     metadata_checksum: [u8; 32],
+    index_checksum: [u8; 32],
     directory_checksum: [u8; 32],
 }
 
-fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<SolHeader, SolError> {
+/// Checks the magic bytes and format version, which every version keeps at
+/// the start of the file.
+fn check_identity(buf: &[u8; 10]) -> Result<(), SolError> {
     if &buf[0..8] != MAGIC {
         return Err(SolError::BadMagic);
     }
@@ -264,17 +275,23 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<SolHeader, SolError> {
             expected: FORMAT_VERSION,
         });
     }
+    Ok(())
+}
+
+fn parse_header(buf: &[u8; HEADER_LEN]) -> SolHeader {
     let u64_at = |at: usize| u64::from_le_bytes(buf[at..at + 8].try_into().expect("8 bytes"));
     let hash_at = |at: usize| -> [u8; 32] { buf[at..at + 32].try_into().expect("32 bytes") };
-    Ok(SolHeader {
+    SolHeader {
         config_hash: hash_at(10),
         iteration: u64_at(42),
         metadata_len: u64_at(50),
-        directory_offset: u64_at(58),
-        directory_len: u64_at(66),
-        metadata_checksum: hash_at(74),
-        directory_checksum: hash_at(106),
-    })
+        index_len: u64_at(58),
+        directory_offset: u64_at(66),
+        directory_len: u64_at(74),
+        metadata_checksum: hash_at(82),
+        index_checksum: hash_at(114),
+        directory_checksum: hash_at(146),
+    }
 }
 
 fn build_header(header: &SolHeader) -> [u8; HEADER_LEN] {
@@ -284,10 +301,12 @@ fn build_header(header: &SolHeader) -> [u8; HEADER_LEN] {
     buf[10..42].copy_from_slice(&header.config_hash);
     buf[42..50].copy_from_slice(&header.iteration.to_le_bytes());
     buf[50..58].copy_from_slice(&header.metadata_len.to_le_bytes());
-    buf[58..66].copy_from_slice(&header.directory_offset.to_le_bytes());
-    buf[66..74].copy_from_slice(&header.directory_len.to_le_bytes());
-    buf[74..106].copy_from_slice(&header.metadata_checksum);
-    buf[106..138].copy_from_slice(&header.directory_checksum);
+    buf[58..66].copy_from_slice(&header.index_len.to_le_bytes());
+    buf[66..74].copy_from_slice(&header.directory_offset.to_le_bytes());
+    buf[74..82].copy_from_slice(&header.directory_len.to_le_bytes());
+    buf[82..114].copy_from_slice(&header.metadata_checksum);
+    buf[114..146].copy_from_slice(&header.index_checksum);
+    buf[146..178].copy_from_slice(&header.directory_checksum);
     buf
 }
 
@@ -411,17 +430,26 @@ fn decompress(compressed: &[u8], limit: usize, what: &'static str) -> Result<Vec
 }
 
 /// Random access to a `.sol` file: header, metadata and directory are read
-/// and verified at open; chunks are read, verified and decoded on demand.
+/// and verified at open; the index and chunks are read, verified and decoded
+/// on demand.
 pub struct SolReader {
     file: File,
     metadata: SolMetadata,
     directory: Directory,
+    index_offset: u64,
+    index_len: u64,
+    index_checksum: [u8; 32],
 }
 
 impl SolReader {
     pub fn open(path: &Path) -> Result<Self, SolError> {
         let mut file = File::open(path)?;
         let file_len = file.metadata()?.len();
+        let mut identity = [0u8; 10];
+        if file_len >= identity.len() as u64 {
+            file.read_exact(&mut identity)?;
+            check_identity(&identity)?;
+        }
         if file_len < HEADER_LEN as u64 {
             return Err(SolError::Truncated {
                 expected: HEADER_LEN,
@@ -429,13 +457,18 @@ impl SolReader {
             });
         }
         let mut header_buf = [0u8; HEADER_LEN];
+        file.seek(SeekFrom::Start(0))?;
         file.read_exact(&mut header_buf)?;
-        let header = parse_header(&header_buf)?;
+        let header = parse_header(&header_buf);
 
+        let index_offset = HEADER_LEN as u64 + header.metadata_len;
         let chunks_start = (HEADER_LEN as u64)
             .checked_add(header.metadata_len)
+            .and_then(|end| end.checked_add(header.index_len))
             .filter(|&end| end <= header.directory_offset)
-            .ok_or(SolError::Malformed("metadata frame overlaps the directory"))?;
+            .ok_or(SolError::Malformed(
+                "metadata or index frame overlaps the directory",
+            ))?;
         if header.directory_offset.checked_add(header.directory_len) != Some(file_len) {
             return Err(SolError::Malformed(
                 "directory frame does not end the file (truncated or extended)",
@@ -508,6 +541,9 @@ impl SolReader {
             file,
             metadata,
             directory,
+            index_offset,
+            index_len: header.index_len,
+            index_checksum: header.index_checksum,
         })
     }
 
@@ -517,6 +553,22 @@ impl SolReader {
 
     pub fn into_metadata(self) -> SolMetadata {
         self.metadata
+    }
+
+    /// Verifies the index frame and hands its decoded stream to `decode`,
+    /// which must consume all of it.
+    pub fn read_index<T>(
+        &mut self,
+        decode: impl FnOnce(&mut dyn Read) -> Result<T, SolError>,
+    ) -> Result<T, SolError> {
+        let frame = read_exact_at(&mut self.file, self.index_offset, self.index_len)?;
+        if *blake3::hash(&frame).as_bytes() != self.index_checksum {
+            return Err(SolError::Checksum("index"));
+        }
+        let mut decoder = zstd::stream::read::Decoder::with_buffer(frame.as_slice())
+            .map_err(|_| SolError::Malformed("index frame does not decompress"))?
+            .single_frame();
+        decode(&mut decoder)
     }
 
     fn entries(&self, section: Section) -> &[ChunkEntry] {
@@ -579,6 +631,11 @@ impl SolReader {
                 "strategy and value blocks cover different nodes",
             ));
         }
+        let index = self.read_index(|stream| {
+            let mut bytes = Vec::new();
+            stream.read_to_end(&mut bytes)?;
+            Ok(bytes)
+        })?;
         let metadata = self.metadata;
         Ok(SolPayload {
             config_toml: metadata.config_toml,
@@ -587,6 +644,7 @@ impl SolReader {
             tree_nodes: metadata.tree_nodes,
             blocks,
             values,
+            index,
         })
     }
 
@@ -608,15 +666,36 @@ fn decode_chunk(
     if *blake3::hash(compressed).as_bytes() != entry.checksum {
         return Err(SolError::Checksum("chunk"));
     }
-    let bytes = decompress(
+    let shuffled = decompress(
         compressed,
         entry.decoded_len as usize,
         "chunk does not decompress",
     )?;
-    if bytes.len() as u64 != entry.decoded_len {
+    if shuffled.len() as u64 != entry.decoded_len {
         return Err(SolError::Malformed("chunk decoded length differs"));
     }
-    Chunk::parse(section, entry, bytes)
+    Chunk::parse(section, entry, unshuffle(&shuffled))
+}
+
+/// Splits bytes into the even-offset plane followed by the odd-offset plane.
+fn shuffle(raw: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(raw.len());
+    out.extend(raw.iter().step_by(2));
+    out.extend(raw.iter().skip(1).step_by(2));
+    out
+}
+
+/// Inverse of [`shuffle`].
+fn unshuffle(planes: &[u8]) -> Vec<u8> {
+    let (even, odd) = planes.split_at(planes.len().div_ceil(2));
+    let mut out = vec![0u8; planes.len()];
+    for (slot, &byte) in out.iter_mut().step_by(2).zip(even) {
+        *slot = byte;
+    }
+    for (slot, &byte) in out.iter_mut().skip(1).step_by(2).zip(odd) {
+        *slot = byte;
+    }
+    out
 }
 
 fn read_exact_at(file: &mut File, offset: u64, len: u64) -> Result<Vec<u8>, SolError> {
@@ -731,6 +810,7 @@ pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
             tree_nodes: payload.tree_nodes,
             stored_nodes: payload.blocks.len() as u64,
         },
+        |out| out.write_all(&payload.index),
     )?;
     for block in &payload.blocks {
         writer.strategy(block.sref, &block.probs)?;
@@ -832,7 +912,7 @@ impl SectionWriter {
         let compressed = self
             .sealed
             .par_iter()
-            .map(|(raw, ..)| zstd::bulk::compress(raw, ZSTD_LEVEL))
+            .map(|(raw, ..)| zstd::bulk::compress(&shuffle(raw), ZSTD_LEVEL))
             .collect::<Result<Vec<_>, _>>()?;
         for ((raw, first_sref, last_sref, nodes), frame) in self.sealed.drain(..).zip(compressed) {
             file.write_all(&frame)?;
@@ -856,16 +936,53 @@ impl SectionWriter {
     }
 }
 
+/// Counts and hashes the bytes it passes to a file.
+struct HashingWriter<'a> {
+    file: &'a mut File,
+    hasher: blake3::Hasher,
+    len: u64,
+}
+
+impl Write for HashingWriter<'_> {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        let written = self.file.write(buf)?;
+        self.hasher.update(&buf[..written]);
+        self.len += written as u64;
+        Ok(written)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.file.flush()
+    }
+}
+
 impl SolFileWriter {
-    pub(crate) fn create(path: &Path, metadata: &SolMetadata) -> Result<Self, SolError> {
+    /// Starts a file with its metadata frame and the index frame that
+    /// `write_index` streams (see [`crate::index`]).
+    pub(crate) fn create(
+        path: &Path,
+        metadata: &SolMetadata,
+        write_index: impl FnOnce(&mut dyn Write) -> std::io::Result<()>,
+    ) -> Result<Self, SolError> {
         let dir = path
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or_else(|| Path::new("."));
         let mut file = tempfile::NamedTempFile::new_in(dir)?;
         file.write_all(&[0; HEADER_LEN])?;
-        let frame = zstd::bulk::compress(&postcard::to_allocvec(metadata)?, METADATA_ZSTD_LEVEL)?;
+        let frame = zstd::bulk::compress(&postcard::to_allocvec(metadata)?, ZSTD_LEVEL)?;
         file.write_all(&frame)?;
+        let mut encoder = zstd::stream::write::Encoder::new(
+            HashingWriter {
+                file: file.as_file_mut(),
+                hasher: blake3::Hasher::new(),
+                len: 0,
+            },
+            ZSTD_LEVEL,
+        )?;
+        write_index(&mut encoder)?;
+        let index = encoder.finish()?;
+        let (index_len, index_checksum) = (index.len, *index.hasher.finalize().as_bytes());
         Ok(Self {
             file,
             path: path.to_path_buf(),
@@ -873,13 +990,15 @@ impl SolFileWriter {
                 config_hash: config_hash(metadata.config_toml.as_bytes()),
                 iteration: metadata.meta.iterations,
                 metadata_len: frame.len() as u64,
+                index_len,
                 directory_offset: 0,
                 directory_len: 0,
                 metadata_checksum: *blake3::hash(&frame).as_bytes(),
+                index_checksum,
                 directory_checksum: [0; 32],
             },
             stored_nodes: metadata.stored_nodes,
-            offset: (HEADER_LEN + frame.len()) as u64,
+            offset: HEADER_LEN as u64 + frame.len() as u64 + index_len,
             strategy: SectionWriter::new(Section::Strategy),
             values: SectionWriter::new(Section::Values),
             strategy_srefs: Vec::with_capacity(metadata.stored_nodes.min(1 << 24) as usize),
@@ -936,7 +1055,7 @@ impl SolFileWriter {
             strategy: std::mem::take(&mut self.strategy.entries),
             values: std::mem::take(&mut self.values.entries),
         };
-        let frame = zstd::bulk::compress(&postcard::to_allocvec(&directory)?, METADATA_ZSTD_LEVEL)?;
+        let frame = zstd::bulk::compress(&postcard::to_allocvec(&directory)?, ZSTD_LEVEL)?;
         file.write_all(&frame)?;
         self.header.directory_offset = self.offset;
         self.header.directory_len = frame.len() as u64;
@@ -1111,6 +1230,8 @@ mod tests {
                 value_block(3, &[2.0, -1.0, 0.5, 0.0, -2.0, 1.0, -0.5, 0.0]),
                 value_block(9, &[7.5, -7.5, -7.5, 7.5]),
             ],
+            // The codec stores the index stream without interpreting it.
+            index: (0..5000u32).map(|i| (i % 7) as u8).collect(),
         }
     }
 
@@ -1261,13 +1382,13 @@ mod tests {
             stored_nodes: 2,
         };
         let path = temp_path("inconsistent.sol");
-        let mut writer = SolFileWriter::create(&path, &metadata).unwrap();
+        let mut writer = SolFileWriter::create(&path, &metadata, |_| Ok(())).unwrap();
         writer.strategy(3, &[0, 0]).unwrap();
         assert!(writer.strategy(3, &[0, 0]).is_err(), "repeated sref");
         writer.strategy(9, &[0, 0]).unwrap();
         assert!(writer.values(9, 1.0, &[0, 0]).is_err(), "value order");
 
-        let mut writer = SolFileWriter::create(&path, &metadata).unwrap();
+        let mut writer = SolFileWriter::create(&path, &metadata, |_| Ok(())).unwrap();
         writer.strategy(3, &[0, 0]).unwrap();
         writer.values(3, 1.0, &[0, 0]).unwrap();
         assert!(writer.finish().is_err(), "fewer blocks than declared");
@@ -1328,13 +1449,15 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
-    /// Version 2 (one zstd stream) and every other version are refused from
-    /// the header alone, before any frame is decoded.
+    /// Version 3 (no stored tree), version 2 (one zstd stream) and every
+    /// other version are refused from the identity bytes alone, before any
+    /// frame is decoded, even when the file is shorter than this version's
+    /// header.
     #[test]
     fn rejects_other_versions_before_decoding() {
-        for version in [1u16, 2, 99] {
+        for version in [1u16, 2, 3, 99] {
             let path = temp_path("old-format.sol");
-            let mut header = [0u8; HEADER_LEN];
+            let mut header = [0u8; 138];
             header[0..8].copy_from_slice(MAGIC);
             header[8..10].copy_from_slice(&version.to_le_bytes());
             std::fs::write(&path, header).unwrap();
@@ -1385,13 +1508,13 @@ mod tests {
     }
 
     /// Each frame is protected by its own hash: metadata and directory damage
-    /// fails at open, chunk damage fails exactly when that chunk is read
-    /// while the rest of the file stays readable.
+    /// fails at open, index and chunk damage fail exactly when that frame is
+    /// read while the rest of the file stays readable.
     #[test]
     fn detects_corruption_per_frame() {
         let payload = multi_chunk_payload();
         let (path, bytes) = written("corrupt.sol", &payload);
-        let header = parse_header(bytes[..HEADER_LEN].try_into().unwrap()).unwrap();
+        let header = parse_header(bytes[..HEADER_LEN].try_into().unwrap());
 
         let mut damaged = bytes.clone();
         damaged[HEADER_LEN] ^= 1;
@@ -1408,6 +1531,23 @@ mod tests {
             SolReader::open(&path),
             Err(SolError::Checksum("directory"))
         ));
+
+        let mut damaged = bytes.clone();
+        damaged[HEADER_LEN + header.metadata_len as usize + 2] ^= 1;
+        std::fs::write(&path, &damaged).unwrap();
+        let mut reader = SolReader::open(&path).unwrap();
+        assert!(matches!(
+            reader.read_index(|_| Ok(())),
+            Err(SolError::Checksum("index"))
+        ));
+        let first = &payload.blocks[0];
+        assert!(
+            reader
+                .into_store()
+                .strategy(first.sref, 1, first.probs.len() / 2)
+                .unwrap()
+                .is_some()
+        );
 
         let reader = SolReader::open(&written("intact.sol", &payload).0).unwrap();
         let second = reader.directory.strategy[1];
@@ -1430,6 +1570,60 @@ mod tests {
         let _ = std::fs::remove_file(&path);
     }
 
+    #[test]
+    fn shuffle_round_trips_odd_and_even_lengths() {
+        for len in [0usize, 1, 2, 7, 10] {
+            let raw: Vec<u8> = (0..len as u8).collect();
+            let planes = shuffle(&raw);
+            assert_eq!(unshuffle(&planes), raw);
+        }
+        assert_eq!(shuffle(&[1, 2, 3, 4, 5]), vec![1, 3, 5, 2, 4]);
+    }
+
+    /// The workspace estimate charges [`COMPRESSION_CONTEXT_BYTES`] per
+    /// context: a whole-buffer chunk compression and the streamed index
+    /// compression must both stay within it for inputs past zstd's largest
+    /// window at this level.
+    #[test]
+    fn compression_contexts_fit_the_workspace_bound() {
+        use zstd::zstd_safe::zstd_sys::ZSTD_EndDirective::{ZSTD_e_continue, ZSTD_e_end};
+        use zstd::zstd_safe::{CCtx, CParameter, InBuffer, OutBuffer};
+        let input: Vec<u8> = (0..16u32 << 20)
+            .map(|i| (i.wrapping_mul(2_654_435_761) >> 24) as u8)
+            .collect();
+
+        let mut bulk = CCtx::create();
+        bulk.set_parameter(CParameter::CompressionLevel(ZSTD_LEVEL))
+            .unwrap();
+        let mut out = Vec::with_capacity(zstd::zstd_safe::compress_bound(input.len()));
+        bulk.compress2(&mut out, &input).unwrap();
+        assert!(bulk.sizeof() as u64 <= COMPRESSION_CONTEXT_BYTES);
+
+        let mut stream = CCtx::create();
+        stream
+            .set_parameter(CParameter::CompressionLevel(ZSTD_LEVEL))
+            .unwrap();
+        let mut buffer = vec![0u8; 1 << 20];
+        for piece in input.chunks(1 << 16) {
+            let mut source = InBuffer::around(piece);
+            while source.pos() < piece.len() {
+                let mut sink = OutBuffer::around(buffer.as_mut_slice());
+                stream
+                    .compress_stream2(&mut sink, &mut source, ZSTD_e_continue)
+                    .unwrap();
+            }
+        }
+        loop {
+            let mut sink = OutBuffer::around(buffer.as_mut_slice());
+            let remaining = stream
+                .compress_stream2(&mut sink, &mut InBuffer::around(&[]), ZSTD_e_end)
+                .unwrap();
+            if remaining == 0 {
+                break;
+            }
+        }
+        assert!(stream.sizeof() as u64 <= COMPRESSION_CONTEXT_BYTES);
+    }
     #[test]
     fn dequantize_rejects_wrong_length() {
         let bytes = quantize_probs(&[0.5, 0.5]);

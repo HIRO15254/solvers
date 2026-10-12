@@ -399,12 +399,12 @@ fn mixed_resume_preserves_storage_streets_and_cumulative_time() {
 }
 
 #[test]
-fn solution_uses_indexed_format_version_3() {
+fn solution_uses_indexed_format_version_4() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(CONFIG, directory.path());
     let path = run.join("solution.sol");
     let bytes = std::fs::read(&path).unwrap();
-    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 3);
+    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 4);
     assert_eq!(
         hu_postflop::sol::read_sol(&path).unwrap().meta.iterations,
         20

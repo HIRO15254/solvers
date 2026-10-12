@@ -1,23 +1,24 @@
 //! P1 artifact export, verified loading and lazy river strategy queries.
-//! `sol` owns the codec. This module owns rebuilding the tree and the
-//! reach-weighted river solve; callers render the emitted diagnostics.
+//! `sol` owns the codec and `index` the stored tree. This module owns
+//! loading them and the reach-weighted river solve; callers render the
+//! emitted diagnostics.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
+use crate::index::{GameIndex, IndexedTree, TreeView};
 use crate::sol::{
     SolFileWriter, SolMeta, SolMetadata, SolReader, SolStore, StreetsStored, quantize_probs,
     quantize_values,
 };
 use crate::{
-    PostflopConfig, PostflopEvaluator, PostflopGame, build_postflop_game, node_streets,
-    river_entry_state, river_resolve_config,
+    PostflopConfig, PostflopEvaluator, build_postflop_game, river_entry_state, river_resolve_config,
 };
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
     F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, Solver, Storage, pair_subtrees,
-    parent_array, reach_on_path,
+    reach_on_path,
 };
 use nlh::{Card, PerPlayer, Player, Street};
 use rayon::prelude::*;
@@ -67,9 +68,10 @@ pub(crate) struct SolExportSpec {
     pub path: PathBuf,
     pub mode: SolStreets,
     /// Raw config file text, byte-for-byte -- becomes `SolMetadata::config_toml`
-    /// so the viewer can rebuild an identical tree later.
+    /// so the viewer can replay histories and re-solve rivers later.
     pub config_toml: String,
-    /// Informational only (`SolMeta::storage`): "f32", "i16", or "i16-f32avg".
+    /// The backend the solve ran with (`SolMeta::storage`): "f32", "i16", or
+    /// "i16-f32avg". Resolves `storage = "auto"` when the artifact is loaded.
     pub storage_name: String,
 }
 
@@ -171,16 +173,18 @@ fn walk_reaches<F>(
 /// `summary` supplies the iteration count and exploitability from the just-
 /// finished run. Both root EVs come from that same evaluation boundary;
 /// action-node values are produced by the streaming two-seat profile pass.
+/// `index` is the solved game's viewer index, stored with its tree.
 pub(crate) fn export_sol<S: Storage>(
     spec: &SolExportSpec,
     solver: &Solver<PostflopEvaluator, S>,
+    index: &GameIndex,
     ev_offset: PerPlayer<f64>,
     start_street: Street,
     summary: &RunSummary,
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<()> {
     let tree = &solver.game().tree;
-    let streets = node_streets(tree, start_street);
+    let streets = &index.streets;
 
     let mode = if start_street == Street::River {
         if spec.mode != SolStreets::Full {
@@ -221,6 +225,7 @@ pub(crate) fn export_sol<S: Storage>(
                 tree_nodes: tree.nodes.len() as u64,
                 stored_nodes: block_count as u64,
             },
+            |out| crate::index::write_index(out, tree, index),
         )?;
         let mut start = 0;
         while start < stored.len() {
@@ -333,14 +338,14 @@ fn strategy_batch_end(
 
 // --- load (`inspect --sol`) -------------------------------------------------
 
-/// A loaded `.sol` artifact: the rebuilt tree (deterministically, from the
-/// embedded config), the parsed config and payoff models it was built with
-/// (needed again for a river re-solve), the cached metadata, and everything
-/// [`SolProvider`] needs to answer strategy queries against it.
+/// A loaded `.sol` artifact: the stored tree and its viewer index, the
+/// parsed config and payoff models (needed again to replay a history and
+/// re-solve a river), the cached metadata, and everything [`SolProvider`]
+/// needs to answer strategy queries against it.
 pub struct LoadedSol {
-    /// Rebuilt tree, node streets and parents; shared by loads of artifacts
-    /// with the same embedded config (see [`load_sol_sharing`]).
-    pub pf_game: Arc<PostflopGame>,
+    /// Stored tree and index; shared by loads of artifacts with the same
+    /// embedded config (see [`load_sol_sharing`]).
+    pub game: Arc<IndexedTree>,
     pub config: PostflopConfig,
     /// `blake3` of the embedded config TOML (the `.sol` header hash).
     pub config_hash: [u8; 32],
@@ -351,8 +356,6 @@ pub struct LoadedSol {
     /// hands then IP's, on the subgame-start basis) are dequantized per
     /// query.
     pub store: SolStore,
-    pub streets: Arc<Vec<Street>>,
-    pub parents: Arc<Vec<NodeId>>,
     pub board: Vec<Card>,
     pub river_iterations: u64,
     pub river_target: Option<f64>,
@@ -360,20 +363,25 @@ pub struct LoadedSol {
 }
 
 impl LoadedSol {
+    pub fn view(&self) -> TreeView<'_> {
+        self.game.view()
+    }
+
     /// Whether the artifact's mode stores blocks for `node`.
     pub fn is_stored(&self, node: NodeId) -> bool {
-        self.pf_game.game.tree.node(node).kind == NodeKind::Action
-            && (self.mode == StreetsStored::Full || self.streets[node as usize] != Street::River)
+        self.game.tree.node(node).kind == NodeKind::Action
+            && (self.mode == StreetsStored::Full
+                || self.game.index.streets[node as usize] != Street::River)
     }
 
     /// Dequantized strategy at an action node, `None` when the mode does not
     /// store the node. A node the mode stores but the file lacks, or whose
-    /// block has another shape, means the file does not belong to this tree.
+    /// block has another shape, means the blocks do not belong to the tree.
     pub fn stored_strategy(&self, node: NodeId) -> Result<Option<Vec<f32>>> {
         if !self.is_stored(node) {
             return Ok(None);
         }
-        let tree = &self.pf_game.game.tree;
+        let tree = &self.game.tree;
         let n = tree.node(node);
         let sref = tree.storage_ref(n);
         self.store
@@ -389,8 +397,8 @@ impl LoadedSol {
         if !self.is_stored(node) {
             return Ok(None);
         }
-        let hands = &self.pf_game.game.evaluator.hands;
-        let aux = self.pf_game.game.tree.node(node).aux;
+        let hands = &self.game.index.hands;
+        let aux = self.game.tree.node(node).aux;
         self.store
             .values(aux, hands.len(Player::P0) + hands.len(Player::P1))
             .map_err(|e| mismatch(aux, e))?
@@ -400,7 +408,7 @@ impl LoadedSol {
 }
 
 fn missing(sref: u32) -> anyhow::Error {
-    anyhow!("artifact does not match the rebuilt tree: no stored block for sref {sref}")
+    anyhow!("artifact does not match its stored tree: no stored block for sref {sref}")
 }
 
 fn mismatch(sref: u32, error: crate::sol::SolError) -> anyhow::Error {
@@ -412,35 +420,26 @@ fn mismatch(sref: u32, error: crate::sol::SolError) -> anyhow::Error {
     }
 }
 
-/// Opens, verifies, and rebuilds a `.sol` artifact: `SolReader::open`
-/// verifies the header, metadata and directory (including the header hash
-/// against the embedded config text) -> parse the embedded common-input P1
-/// spot -> rebuild the exact same tree the P1 run built -> verify the tree
-/// size and the mode-implied stored node count against the metadata.
-/// Blocks are read on demand; each read checks its chunk hash, that the
-/// node is present and that the block matches the node's shape. Those
-/// checks are the artifact's defense against a file whose header hash
-/// still matches but whose `aux` assignment differs (e.g. a tree-builder
-/// change): without them, a mismatched node id would silently serve the
-/// wrong node's strategy.
+/// Opens and verifies a `.sol` artifact: `SolReader::open` verifies the
+/// header, metadata and directory (including the header hash against the
+/// embedded config text) -> parse the embedded common-input P1 spot ->
+/// decode the stored tree and index -> verify the tree size and the
+/// mode-implied stored node count against the metadata. Blocks are read on
+/// demand; each read checks its chunk hash, that the node is present and
+/// that the block matches the node's shape.
 pub fn load_sol(
     path: &Path,
     river_iterations: u64,
     river_target: Option<f64>,
-    diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<LoadedSol> {
-    load(path, river_iterations, river_target, None, diagnostics)
+    load(path, river_iterations, river_target, None)
 }
 
-/// [`load_sol`] without river re-solves that reuses `other`'s rebuilt tree
+/// [`load_sol`] without river re-solves that reuses `other`'s tree and index
 /// when both artifacts embed the same config (equal config hashes): the
 /// tree is a deterministic function of that config.
-pub fn load_sol_sharing(
-    path: &Path,
-    other: &LoadedSol,
-    diagnostics: &mut dyn FnMut(Diagnostic),
-) -> Result<LoadedSol> {
-    load(path, 0, None, Some(other), diagnostics)
+pub fn load_sol_sharing(path: &Path, other: &LoadedSol) -> Result<LoadedSol> {
+    load(path, 0, None, Some(other))
 }
 
 fn load(
@@ -448,49 +447,38 @@ fn load(
     river_iterations: u64,
     river_target: Option<f64>,
     share: Option<&LoadedSol>,
-    diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<LoadedSol> {
-    let reader = SolReader::open(path).with_context(|| format!("reading {}", path.display()))?;
+    let context = || format!("reading {}", path.display());
+    let mut reader = SolReader::open(path).with_context(context)?;
     let metadata = reader.metadata().clone();
 
     crate::prepare::require_artifact_config(&metadata.config_toml)?;
-    let p = crate::prepare::prepare_artifact(&metadata.config_toml, Path::new("embedded.toml"))?;
+    let p = crate::prepare::prepare_artifact(
+        &metadata.config_toml,
+        Path::new("embedded.toml"),
+        &metadata.meta.storage,
+    )?;
     let pf_config = p.config;
-    let payoff = p.payoff;
     let nlh = (p.spot, p.settings);
     let board_cards = pf_config.board.clone();
     let config_hash = runfiles::config_hash(metadata.config_toml.as_bytes());
 
-    let (pf_game, streets, parents) = match share.filter(|other| other.config_hash == config_hash) {
-        Some(other) => (
-            Arc::clone(&other.pf_game),
-            Arc::clone(&other.streets),
-            Arc::clone(&other.parents),
+    let game = match share.filter(|other| other.config_hash == config_hash) {
+        Some(other) => Arc::clone(&other.game),
+        None => Arc::new(
+            reader
+                .read_index(|stream| {
+                    crate::index::read_index(stream, &pf_config, metadata.tree_nodes)
+                })
+                .with_context(context)?,
         ),
-        None => {
-            // stderr, not stdout: `export` writes machine-readable data
-            // there, and a progress line in the middle of a CSV would
-            // corrupt it.
-            diagnostics(Diagnostic::Rebuilding);
-            let build_start = Instant::now();
-            let mut pf_game = build_postflop_game(&pf_config, payoff.pipeline());
-            crate::prepare::display_game(&mut pf_game);
-            diagnostics(Diagnostic::Rebuilt {
-                secs: build_start.elapsed().as_secs_f64(),
-                nodes: pf_game.game.tree.nodes.len(),
-            });
-            let start_street = start_street_from_board_len(pf_config.board.len());
-            let streets = node_streets(&pf_game.game.tree, start_street);
-            let parents = parent_array(&pf_game.game.tree);
-            (Arc::new(pf_game), Arc::new(streets), Arc::new(parents))
-        }
     };
 
-    let tree = &pf_game.game.tree;
+    let tree = &game.tree;
     let expected = tree
         .nodes
         .iter()
-        .zip(streets.iter())
+        .zip(&game.index.streets)
         .filter(|(node, street)| {
             node.kind == NodeKind::Action
                 && (metadata.mode == StreetsStored::Full || **street != Street::River)
@@ -498,8 +486,8 @@ fn load(
         .count();
     if metadata.tree_nodes != tree.nodes.len() as u64 || metadata.stored_nodes != expected as u64 {
         bail!(
-            "artifact does not match the rebuilt tree: {} node(s) with {} stored vs {} \
-             rebuilt node(s) with {} expected action node(s) for mode {:?}",
+            "artifact does not match its stored tree: {} node(s) with {} stored vs {} \
+             stored-tree node(s) with {} expected action node(s) for mode {:?}",
             metadata.tree_nodes,
             metadata.stored_nodes,
             tree.nodes.len(),
@@ -509,14 +497,12 @@ fn load(
     }
 
     Ok(LoadedSol {
-        pf_game,
+        game,
         config: pf_config,
         config_hash,
         meta: metadata.meta,
         mode: metadata.mode,
         store: reader.into_store(),
-        streets,
-        parents,
         board: board_cards,
         river_iterations,
         river_target,
@@ -532,11 +518,6 @@ pub enum Diagnostic {
         bytes: u64,
         blocks: usize,
         mode: SolStreets,
-    },
-    Rebuilding,
-    Rebuilt {
-        secs: f64,
-        nodes: usize,
     },
     RiverStart {
         history: String,
@@ -637,8 +618,8 @@ impl<'a> SolProvider<'a> {
     /// never actually taken -- the tree root). If `node` itself has no
     /// river-street parent, it IS the entry.
     fn river_entry_for(&self, node: NodeId) -> NodeId {
-        let streets = &self.loaded.streets;
-        let parents = &self.loaded.parents;
+        let streets = &self.loaded.game.index.streets;
+        let parents = &self.loaded.game.index.parents;
         let mut cur = node;
         loop {
             let parent = parents[cur as usize];
@@ -657,21 +638,19 @@ impl<'a> SolProvider<'a> {
     /// trunk's subtree so later queries can translate node ids.
     fn solve_river(&mut self, entry: NodeId) -> Result<()> {
         let loaded = self.loaded;
-        let trunk_tree = &loaded.pf_game.game.tree;
-        let tag = trunk_tree.tags[entry as usize];
-        let info = &loaded.pf_game.node_info[tag as usize];
-        if info.history.is_empty() || info.history == "<untagged>" {
-            bail!("river-entry node {entry} has no recorded history (untagged node)");
+        let trunk_tree = &loaded.game.tree;
+        if entry == 0 {
+            bail!("the river-entry node is the root, which a river-start artifact stores");
         }
-        let history = info.history.clone();
+        let history = loaded.view().history(entry);
 
-        let root_ranges = &loaded.pf_game.game.root_ranges;
+        let root_ranges = &loaded.game.index.root_ranges;
         let root_slices = PerPlayer::new(
             root_ranges[Player::P0].as_slice(),
             root_ranges[Player::P1].as_slice(),
         );
         let mut failure = None;
-        let path = hu_engine::path_from_root(&loaded.parents, entry);
+        let path = hu_engine::path_from_root(&loaded.game.index.parents, entry);
         let reach = reach_on_path(trunk_tree, root_slices, &path, |_id, sref, out| {
             // Every strict ancestor of a river-entry node is non-river by
             // construction, so its block is always present regardless of
@@ -714,7 +693,7 @@ impl<'a> SolProvider<'a> {
             }
         }
 
-        let internal_history = crate::prepare::convert_history(&history, true);
+        let internal_history = crate::prepare::internal_history(&history);
         let state = river_entry_state(&loaded.config, &internal_history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
@@ -807,7 +786,7 @@ fn resolve_river<S: Storage>(
     });
 
     let map: HashMap<NodeId, NodeId> =
-        pair_subtrees(&loaded.pf_game.game.tree, entry, &solver.game().tree, 0)
+        pair_subtrees(&loaded.game.tree, entry, &solver.game().tree, 0)
             .map_err(|e| anyhow!("river re-solve produced a structurally different subtree: {e}"))?
             .into_iter()
             .collect();
@@ -821,7 +800,7 @@ fn resolve_river<S: Storage>(
 impl StrategyProvider for SolProvider<'_> {
     fn average_strategy(&mut self, node: NodeId) -> Result<Vec<f32>> {
         let loaded = self.loaded;
-        let tree = &loaded.pf_game.game.tree;
+        let tree = &loaded.game.tree;
         let n = tree.node(node);
         if n.kind != NodeKind::Action {
             bail!("node {node} is not an action node");
@@ -831,9 +810,9 @@ impl StrategyProvider for SolProvider<'_> {
         }
         let sref = tree.storage_ref(n);
 
-        if loaded.streets[node as usize] != Street::River {
+        if loaded.game.index.streets[node as usize] != Street::River {
             bail!(
-                "artifact does not match the rebuilt tree: no stored block for non-river node {node}"
+                "artifact does not match its stored tree: no stored block for non-river node {node}"
             );
         }
 
@@ -847,7 +826,7 @@ impl StrategyProvider for SolProvider<'_> {
         })?;
         let sub_avg = rs.solver.average_strategy_at(sub_node);
         let sub_hands = &rs.solver.game().evaluator.hands;
-        let trunk_hands = &loaded.pf_game.game.evaluator.hands;
+        let trunk_hands = &loaded.game.index.hands;
         let mut avg = vec![
             1.0 / sref.num_actions as f32;
             sref.num_actions as usize * sref.num_hands as usize
@@ -878,16 +857,13 @@ impl StrategyProvider for SolProvider<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::PostflopNodeInfo;
     use crate::game::{PayoffPipeline, UtilityModel};
+    use crate::node_streets;
     use crate::sol::{dequantize_values, read_sol};
-    use hu_engine::I16Storage;
+    use hu_engine::{I16Storage, parent_array};
     use std::collections::HashSet;
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
-    fn load_sol(path: &Path, iterations: u64, target: Option<f64>) -> Result<LoadedSol> {
-        super::load_sol(path, iterations, target, &mut |_| {})
-    }
     static COUNTER: AtomicU64 = AtomicU64::new(0);
 
     #[test]
@@ -924,7 +900,7 @@ threads=1
 memory='1GiB'
 "#;
         let p = crate::prepare::prepare(raw, Path::new("test.toml")).unwrap();
-        let (solver, _) =
+        let (solver, index) =
             crate::run::query::<I16Storage>(&p, None, None, &AtomicBool::new(false)).unwrap();
         let offset = p.payoff.ev_offset();
         let expl = solver.exploitability();
@@ -947,6 +923,7 @@ memory='1GiB'
                 storage_name: "i16".into(),
             },
             &solver,
+            &index,
             offset,
             Street::Turn,
             &summary,
@@ -954,7 +931,7 @@ memory='1GiB'
         )
         .unwrap();
         let loaded = load_sol(&path, 8, None).unwrap();
-        let entry = loaded.pf_game.node_by_history("xr1.5c[9d]").unwrap();
+        let entry = loaded.view().node_by_history("xr1.5c[9d]").unwrap();
         let mut provider = SolProvider::new(&loaded, Box::new(|_| {}));
         provider.average_strategy(entry).unwrap();
         let resolved = &provider.river_solves[&entry];
@@ -970,9 +947,9 @@ memory='1GiB'
                 true
             }
         }
-        let root = &loaded.pf_game.game.root_ranges;
+        let root = &loaded.game.index.root_ranges;
         let reach = hu_engine::reach_at(
-            &loaded.pf_game.game.tree,
+            &loaded.game.tree,
             PerPlayer::new(root[Player::P0].as_slice(), root[Player::P1].as_slice()),
             entry,
             |id, _, out| out.copy_from_slice(&provider.average_strategy(id).unwrap()),
@@ -1006,7 +983,7 @@ memory='1GiB'
     fn export_sol<S: Storage>(
         spec: &SolExportSpec,
         solver: &Solver<PostflopEvaluator, S>,
-        _node_info: &[PostflopNodeInfo],
+        index: &GameIndex,
         start_street: Street,
         summary: &RunSummary,
     ) -> Result<()> {
@@ -1015,7 +992,15 @@ memory='1GiB'
             summary.ev[Player::P0] - internal[Player::P0],
             summary.ev[Player::P1] - internal[Player::P1],
         );
-        super::export_sol(spec, solver, offset, start_street, summary, &mut |_| {})
+        super::export_sol(
+            spec,
+            solver,
+            index,
+            offset,
+            start_street,
+            summary,
+            &mut |_| {},
+        )
     }
 
     fn temp_path(name: &str) -> PathBuf {
@@ -1095,19 +1080,13 @@ memory = "1GiB"
     fn build_and_solve<S: Storage>(
         raw: &str,
         iterations: u64,
-    ) -> (
-        Solver<PostflopEvaluator, S>,
-        Vec<PostflopNodeInfo>,
-        Street,
-        RunSummary,
-    ) {
+    ) -> (Solver<PostflopEvaluator, S>, GameIndex, Street, RunSummary) {
         let p = crate::prepare::prepare(raw, Path::new("test.toml"))
             .expect("parse common-input fixture");
         let start_street = p.document.spot.context.street;
         let ev_offset = p.payoff.ev_offset();
-        let mut pf_game = build_postflop_game(&p.config, p.payoff.pipeline());
-        crate::prepare::display_game(&mut pf_game);
-        let node_info = pf_game.node_info.clone();
+        let pf_game = build_postflop_game(&p.config, p.payoff.pipeline());
+        let index = GameIndex::from_game(&pf_game.game, &pf_game.node_info, start_street);
         let mut solver = Solver::<_, S>::new(
             pf_game.game,
             crate::run::schedule(&p.settings.solver.algorithm),
@@ -1131,7 +1110,7 @@ memory = "1GiB"
             expl_p1: expl[Player::P1],
             nash_conv,
         };
-        (solver, node_info, start_street, summary)
+        (solver, index, start_street, summary)
     }
 
     #[test]
@@ -1157,7 +1136,7 @@ memory = "1GiB"
     #[test]
     fn streamed_strategies_match_ev_pass_and_whole_payload_bits() {
         fn check<S: Storage>(raw: &str, storage_name: &str) -> Vec<Vec<u8>> {
-            let (solver, node_info, start_street, mut summary) = build_and_solve::<S>(raw, 3);
+            let (solver, index, start_street, mut summary) = build_and_solve::<S>(raw, 3);
             summary.wall = std::time::Duration::ZERO;
             let tree = &solver.game().tree;
             let reference = parking_lot::Mutex::new(HashMap::new());
@@ -1183,7 +1162,7 @@ memory = "1GiB"
                     config_toml: raw.to_string(),
                     storage_name: storage_name.to_string(),
                 };
-                export_sol(&spec, &solver, &node_info, start_street, &summary).unwrap();
+                export_sol(&spec, &solver, &index, start_street, &summary).unwrap();
                 let payload = read_sol(&path).unwrap();
                 let streets = node_streets(tree, start_street);
                 let expected: HashSet<_> = tree
@@ -1262,7 +1241,7 @@ memory = "1GiB"
 
     #[test]
     fn round_trip_and_sol_provider_no_rivers_f32() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<F32Storage>(TINY_TURN_TOML, 32);
         let path = temp_path("roundtrip.sol");
         let spec = SolExportSpec {
@@ -1271,7 +1250,7 @@ memory = "1GiB"
             config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
 
         let loaded = load_sol(&path, 64, None).expect("load");
         assert_eq!(loaded.mode, StreetsStored::NoRivers);
@@ -1353,7 +1332,7 @@ memory = "1GiB"
 
     #[test]
     fn i16_export_dequantizes_to_valid_distributions() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<I16Storage>(TINY_TURN_TOML, 32);
         let path = temp_path("i16.sol");
         let spec = SolExportSpec {
@@ -1362,7 +1341,7 @@ memory = "1GiB"
             config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "i16".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
 
         let loaded = load_sol(&path, 64, None).expect("load");
         let tree = &solver.game().tree;
@@ -1394,7 +1373,7 @@ memory = "1GiB"
 
     #[test]
     fn full_mode_forced_on_river_start_config() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<F32Storage>(TINY_RIVER_TOML, 16);
         assert_eq!(start_street, Street::River);
         let path = temp_path("river-full.sol");
@@ -1405,7 +1384,7 @@ memory = "1GiB"
             config_toml: TINY_RIVER_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
 
         let loaded = load_sol(&path, 10, None).expect("load");
         assert_eq!(loaded.mode, StreetsStored::Full);
@@ -1493,7 +1472,7 @@ memory = "1GiB"
     #[test]
     #[ignore = "slow unoptimized; CI runs it in release with --include-ignored"]
     fn river_resolve_accuracy() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<F32Storage>(TINY_TURN_TOML, 3000);
         let path = temp_path("river-accuracy.sol");
         let spec = SolExportSpec {
@@ -1502,7 +1481,7 @@ memory = "1GiB"
             config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
 
         let loaded = load_sol(&path, 2000, Some(0.002)).expect("load");
         let mut provider = SolProvider::new(&loaded, Box::new(|_| {}));
@@ -1650,7 +1629,7 @@ memory = "1GiB"
     /// unreachable hands inside that support carry zero at the node.
     #[test]
     fn unreachable_hands_are_stored_as_zero() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<F32Storage>(TINY_TURN_TOML, 64);
         let path = temp_path("value-sparsity.sol");
         let spec = SolExportSpec {
@@ -1659,7 +1638,7 @@ memory = "1GiB"
             config_toml: TINY_TURN_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
         let payload = read_sol(&path).expect("read");
         let _ = std::fs::remove_file(&path);
 
@@ -1708,7 +1687,7 @@ memory = "1GiB"
     /// chip amount, so putting it back is what re-forms the aggregate.
     #[test]
     fn stored_values_aggregate_to_the_reported_root_ev() {
-        let (solver, node_info, start_street, summary) =
+        let (solver, index, start_street, summary) =
             build_and_solve::<F32Storage>(TINY_RIVER_TOML, 256);
         let path = temp_path("value-aggregate.sol");
         let spec = SolExportSpec {
@@ -1717,7 +1696,7 @@ memory = "1GiB"
             config_toml: TINY_RIVER_TOML.to_string(),
             storage_name: "f32".to_string(),
         };
-        export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+        export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
         let payload = read_sol(&path).expect("read");
         let _ = std::fs::remove_file(&path);
 
@@ -1773,7 +1752,7 @@ memory = "1GiB"
     #[test]
     fn stored_values_cover_exactly_the_stored_strategy_nodes() {
         for mode in [SolStreets::NoRivers, SolStreets::Full] {
-            let (solver, node_info, start_street, summary) =
+            let (solver, index, start_street, summary) =
                 build_and_solve::<F32Storage>(TINY_TURN_TOML, 16);
             let path = temp_path("value-coverage.sol");
             let spec = SolExportSpec {
@@ -1782,7 +1761,7 @@ memory = "1GiB"
                 config_toml: TINY_TURN_TOML.to_string(),
                 storage_name: "f32".to_string(),
             };
-            export_sol(&spec, &solver, &node_info, start_street, &summary).expect("export");
+            export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
             let payload = read_sol(&path).expect("read");
             let _ = std::fs::remove_file(&path);
 
