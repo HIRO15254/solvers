@@ -74,7 +74,12 @@ c013の1 nodeで残る0.66 GBは、保存した木を展開したものである
 | `storage_refs` | 85 |
 | parent・tag・edge | 各39 |
 
-計画時の目安「0.5 GB未満」には届いていない。viewer用の木から`storage_spans`を外せば届くが、hu-engineの`PublicTree`の契約を変えることになるため、今回は入れていない。
+計画時の目安「0.5 GB未満」には届いていない。この目安は規範ではない。利用者決定（2026-10-13）により、0.66 GBのままで問題なしとした。
+
+将来、照会用の木を骨格（nodes・deals・storage_refs）とsolver専用の配列（`storage_spans`・`tags`・`subtree_has_chance`、計約280 MB）に分ければ、約0.4 GBまで下がる見込みである。これは`PublicTree`の型の変更であり、`.sol` v4の形式は変わらない。次の2案は採らない。
+
+- 読込み後に配列を空にする案: 中身の揃わない木がsolverへ渡る危険がある。
+- spanをu32へ縮める案: storage要素数が2³²を超える木で破綻する。
 
 ## 保存側とsize
 
