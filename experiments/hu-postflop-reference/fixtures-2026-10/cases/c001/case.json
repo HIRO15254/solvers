@@ -1,0 +1,16 @@
+{
+ "id": "c001",
+ "name": "SRP BTN vs BB 100bb Ks7h2d (cEV)",
+ "gametype": "Cash6mSimple_6mcEVR25",
+ "depth": 100,
+ "gtow_preflop": "F-F-F-R2.5-F-C",
+ "line": "BTN r2.5, BB c",
+ "board": "Ks7h2d",
+ "board_spaced": "Ks 7h 2d",
+ "oop": "BB",
+ "ip": "BTN",
+ "gtow_accuracy": "0.1-0.01%",
+ "target": "0.05%pot",
+ "turn": "3c",
+ "river": "8h"
+}

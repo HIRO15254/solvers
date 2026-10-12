@@ -1,0 +1,16 @@
+{
+ "id": "c008",
+ "name": "SRP BTN vs BB 20bb QsJsTd (cEV)",
+ "gametype": "Cash6mSimple_6mcEVR25",
+ "depth": 20,
+ "gtow_preflop": "F-F-F-R2.5-F-C",
+ "line": "BTN r2.5, BB c",
+ "board": "QsJsTd",
+ "board_spaced": "Qs Js Td",
+ "oop": "BB",
+ "ip": "BTN",
+ "gtow_accuracy": "0.1-0.01%",
+ "target": "0.05%pot",
+ "turn": "4c",
+ "river": "7h"
+}

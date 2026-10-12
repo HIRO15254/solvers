@@ -1,0 +1,26 @@
+{
+ "flop": {
+  "observed": 12,
+  "exact_rules": 12,
+  "conflicts": []
+ },
+ "turn": {
+  "observed": 27,
+  "exact_rules": 27,
+  "conflicts": []
+ },
+ "river": {
+  "observed": 36,
+  "exact_rules": 32,
+  "conflicts": [
+   [
+    "X-X/R1-C/root",
+    "X-R1-C/X-X/root"
+   ],
+   [
+    "X-R1-R3-C/X-X/root",
+    "X-R1-C/R2-C/root"
+   ]
+  ]
+ }
+}

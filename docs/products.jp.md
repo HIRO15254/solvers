@@ -95,7 +95,7 @@ chipEVでは全seatの和が `開始pot − E[rake]` になる。P2のPreflop ro
   補助表示の `NashConv / 2` は収束保証を伴わない。prize utilityをchip potで割った%は出さない。
 - 解いたものは指定した木・rangeの有限ゲームであり、木にないsizeへの逸脱は評価していない。
 - 正当性の根拠: 凍結した独立oracle（`cfr-ref`）との差分試験、保存後の値と保存前評価の一致、
-  GTO Wizard既存解との同条件比較。比較候補は[HU Postflop参照候補](plans/hu-postflop-validation/README.md)の24件。
+  GTO Wizard既存解との同条件比較。比較に使う参照は[HU Postflop参照候補](plans/hu-postflop-validation/README.md)の24件から選んだFlop開始の6件。
   条件（range・全後続menu・rake徴収条件・EV基準）の一致を確認するまで、外部との差を合否に使わない。
 
 ## 5. P2: NLH Multiway Preflop Solver
@@ -136,7 +136,7 @@ seat別最適応答利得`g_i`と`NashConv = Σ g_i`であり、S4-1で妥当性
 |---|---|
 | **S1 再構築** | 新workspaceで両製品が共通Inputからvalidate/solve/resume/export/監視でき、削除した機能を除き旧v1 familyの対応機能と同等。旧family schemaは移行先を示すerrorで拒否する。daemonが新Inputを受け付ける。手順は[再構築計画](plans/two-product-restructure.jp.md)のM0〜M7 |
 | **S2 製品間連携** | P2の解からderiveしたInputをP1で解ける。line・size・range・table条件の不一致を明示errorにする（計画のM8） |
-| **S3 P1の品質・性能** | 参照24件の条件照合とfixture化、Exploitabilityの閾値固定、メモリ・時間の改善。未マージの`codex/r1-hu-postflop`の成果（compact hand領域、action並列）は検証を経て移植可否を判断する |
+| **S3 P1の品質・性能** | 参照6件（Flop開始）の条件照合とfixture化、メモリ・時間の改善（Exploitabilityの目標は開始potの0.1%以下）。未マージの`codex/r1-hu-postflop`の成果（compact hand領域、action並列）は検証を経て移植可否を判断する |
 | **S4 P2の方式決定・品質・性能** | 網羅的な調査と比較実験で計算方式と出力品質の保証を決め（D5）、その方式で実装・検証する。`.mwsol`契約の整合、性能改善。段階S4-0〜S4-5と完了条件は[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
 | **S5 GUI** | daemon経由のWeb GUI（Setup・Runs・Results）を両製品で使える |
 

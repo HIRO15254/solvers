@@ -1,0 +1,17 @@
+{
+ "flop": {
+  "observed": 46,
+  "exact_rules": 46,
+  "conflicts": []
+ },
+ "turn": {
+  "observed": 119,
+  "exact_rules": 119,
+  "conflicts": []
+ },
+ "river": {
+  "observed": 52,
+  "exact_rules": 52,
+  "conflicts": []
+ }
+}

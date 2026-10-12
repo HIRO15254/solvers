@@ -7,6 +7,33 @@
 **状態: 候補のみ。** 開始spotと基本条件を画面で確認しただけで、range・全後続menu・頻度・EVの転記、
 fixture化、自作solverとの比較はまだ行っていない。外部比較の合否判定に使える件数は0件である。
 
+**利用者決定（2026-10-09）**: fixture化して比較に使う参照は、24件のうち下の6件に絞る（Linear SOL-8）。
+Turn・River開始は実務で稀なので、Flop開始に固定する。Preflopの経緯の多様性を取り、rakeなし（cEV）を含め、
+stackは100bb以上を複数含める（6件中5件）。残りの18件は候補として残すが、利用者が追加を決めるまで取得・照合しない。
+
+| case | stack | Preflopの経緯 | 参照ライブラリ（GTOW） | rake |
+|---|---|---|---|---|
+| HU-R0-001 | 100bb | SRP（BTN open、BB call） | `Cash6mSimple_6mcEVR25`（cEV Single Size） | なし |
+| HU-R0-013 | 100bb | IP側3bet（CO open、BTN 3bet、CO call） | `Cash6m50zSimple_SimpleIP` | NL50 5% cap 4bb |
+| HU-R0-018' | 100bb | OOP側3bet（CO open、BB 3bet 13.5、CO call） | `Cash6m500zSimple_SimpleIP` | NL500 5% cap 0.6bb |
+| HU-R0-021 | 100bb | 4bet（BTN open、BB 3bet、BTN 4bet、BB call） | `Cash6m50zSimple_SimpleIP` | NL50 5% cap 4bb |
+| HU-R0-023 | 100bb | limp（SB limp、BB check） | `Cash6mSimple_6mcEVR25` | なし |
+| HU-R0-008 | 20bb | SRP（BTN open、BB call） | `Cash6mSimple_6mcEVR25` | なし |
+
+**参照ライブラリの決定（2026-10-09、利用者）**: 台帳のGeneral（3〜6 size）は全木の再現にf32で約295 GBが要り、
+GTOWが一部の部分木を公開しない（HTTP 204）ため使わない。rakeありの3bet・4bet potはSimplified（IP側が1〜2 size、
+OOP側はnodeごとのGTOW AIのsize）、SRPとlimpはcEV Single Size（両者1 size）で取る。rakeありSRPは木が大きいので含めない。
+全nodeは取らず、木をほぼ完全に再現し、いくつかのnodeで照合する。HU-R0-018は75bbのSimplifiedが無い（HTTP 403）ので、
+同じboard（Ad8d3d）の100bb NL500 Simplifiedに置き換えた（018'）。limpはrakeありSimpleに無いのでcEVで取る。
+取得・fixture・比較の手順と結果は[SOL-8 fixture](../../../experiments/hu-postflop-reference/fixtures-2026-10/README.md)に置く。
+
+選定は、Flop開始のcaseのうち、Preflopの経緯（SRP・IP側3bet・OOP側3bet・4bet・limp）とrake（NL50・NL500・cEV）が
+重ならないように取った。台帳のsqueezeとisoはTurn・Riverの開始なので含まない。ブラインド同士のSRP（HU-R0-004）、150bb（HU-R0-012）も含まない。
+
+Ks7h2dの既存記録（[Flop](../../../experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md)、
+[River](../../../experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md)）は、GTOWのcEV Single Size 100bbの解を参照している。
+HU-R0-001の参照と同じライブラリだが、fixtureはSOL-8の取得から作り直す。
+
 ## 構成
 
 [cases.csv](cases.csv)の24件は、多様性の枠V1〜V8に3件ずつ割り当てた。`suite = daily+extended`の8件が

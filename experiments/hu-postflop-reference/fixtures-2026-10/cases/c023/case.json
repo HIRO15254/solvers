@@ -1,0 +1,16 @@
+{
+ "id": "c023",
+ "name": "Limped pot SB vs BB 100bb 7h6h2c (cEV)",
+ "gametype": "Cash6mSimple_6mcEVR25",
+ "depth": 100,
+ "gtow_preflop": "F-F-F-F-C-X",
+ "line": "SB c, BB x",
+ "board": "7h6h2c",
+ "board_spaced": "7h 6h 2c",
+ "oop": "SB",
+ "ip": "BB",
+ "gtow_accuracy": "0.1-0.01%",
+ "target": "0.05%pot",
+ "turn": "Kd",
+ "river": "3s"
+}

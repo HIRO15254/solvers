@@ -1,0 +1,21 @@
+{
+ "id": "c013",
+ "name": "IP 3bet BTN vs CO 100bb AhJd4c (NL50)",
+ "gametype": "Cash6m50zSimple_SimpleIP",
+ "depth": 100,
+ "gtow_preflop": "F-F-R2.3-R7.5-F-F-C",
+ "line": "CO r2.3, BTN r7.5, CO c",
+ "board": "AhJd4c",
+ "board_spaced": "Ah Jd 4c",
+ "oop": "CO",
+ "ip": "BTN",
+ "gtow_accuracy": "0.1-0.01%",
+ "rake": {
+  "rate": 0.05,
+  "cap_bb": 4,
+  "gtow_rake_text": "5% 4BB CAP (NL50)"
+ },
+ "target": "0.05%pot",
+ "turn": "6s",
+ "river": "9c"
+}

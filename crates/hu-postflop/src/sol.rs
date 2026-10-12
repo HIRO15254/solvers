@@ -16,7 +16,7 @@
 //! followed by a zstd-compressed postcard encoding of the payload, written
 //! atomically via temp-file-then-rename.
 
-use std::io::Write;
+use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -236,18 +236,26 @@ fn build_header(config_hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
 /// postcard-decoded `SolPayload`), verifying that the header hash matches
 /// `blake3` of the embedded config TOML.
 pub fn read_sol(path: &Path) -> Result<SolPayload, SolError> {
-    let bytes = std::fs::read(path)?;
-    if bytes.len() < HEADER_LEN {
+    let mut file = std::fs::File::open(path)?;
+    let file_len = usize::try_from(file.metadata()?.len()).unwrap_or(usize::MAX);
+    if file_len < HEADER_LEN {
         return Err(SolError::Truncated {
             expected: HEADER_LEN,
-            actual: bytes.len(),
+            actual: file_len,
         });
     }
-    let header_buf: [u8; HEADER_LEN] = bytes[..HEADER_LEN]
-        .try_into()
-        .expect("sliced to HEADER_LEN");
+    let mut header_buf = [0u8; HEADER_LEN];
+    file.read_exact(&mut header_buf)?;
     let header = parse_header(&header_buf)?;
-    let payload = zstd::decode_all(&bytes[HEADER_LEN..])?;
+    // The streamed zstd frame does not record its decoded size. Count it in a
+    // first pass so the multi-GB buffer is allocated once: growing it by
+    // doubling needs up to twice the payload plus the copy.
+    let decoded_len = std::io::copy(&mut zstd::Decoder::new(&mut file)?, &mut std::io::sink())?;
+    file.seek(SeekFrom::Start(HEADER_LEN as u64))?;
+    let decoded_len = usize::try_from(decoded_len)
+        .map_err(|_| std::io::Error::other(".sol payload exceeds the address space"))?;
+    let mut payload = vec![0u8; decoded_len];
+    zstd::Decoder::new(&mut file)?.read_exact(&mut payload)?;
     let payload: SolPayload = postcard::from_bytes(&payload)?;
 
     let computed = config_hash(payload.config_toml.as_bytes());

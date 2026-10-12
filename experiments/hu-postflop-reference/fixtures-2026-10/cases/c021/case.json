@@ -1,0 +1,21 @@
+{
+ "id": "c021",
+ "name": "4bet BTN vs BB 100bb 8c8d4h (NL50)",
+ "gametype": "Cash6m50zSimple_SimpleIP",
+ "depth": 100,
+ "gtow_preflop": "F-F-F-R2.5-F-R13-R27-C",
+ "line": "BTN r2.5, BB r13, BTN r27, BB c",
+ "board": "8c8d4h",
+ "board_spaced": "8c 8d 4h",
+ "oop": "BB",
+ "ip": "BTN",
+ "gtow_accuracy": "0.1-0.01%",
+ "rake": {
+  "rate": 0.05,
+  "cap_bb": 4,
+  "gtow_rake_text": "5% 4BB CAP (NL50)"
+ },
+ "target": "0.05%pot",
+ "turn": "Ks",
+ "river": "2d"
+}

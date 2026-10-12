@@ -1,0 +1,21 @@
+{
+ "id": "c018",
+ "name": "OOP 3bet BB vs CO 100bb Ad8d3d (NL500)",
+ "gametype": "Cash6m500zSimple_SimpleIP",
+ "depth": 100,
+ "gtow_preflop": "F-F-R2.3-F-F-R13.5-C",
+ "line": "CO r2.3, BB r13.5, CO c",
+ "board": "Ad8d3d",
+ "board_spaced": "Ad 8d 3d",
+ "oop": "BB",
+ "ip": "CO",
+ "gtow_accuracy": "0.1-0.01%",
+ "rake": {
+  "rate": 0.05,
+  "cap_bb": 0.6,
+  "gtow_rake_text": "5% 0.6BB CAP (NL500)"
+ },
+ "target": "0.05%pot",
+ "turn": "5c",
+ "river": "Kh"
+}

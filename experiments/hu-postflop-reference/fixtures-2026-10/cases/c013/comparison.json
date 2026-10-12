@@ -1,0 +1,679 @@
+{
+ "case": "c013",
+ "limits": {
+  "root_ev_pot_share": 0.005,
+  "key_node_freq": 0.05,
+  "key_node_reach": 0.1
+ },
+ "summary": {
+  "board": "Ah Jd 4c",
+  "pot": 16.5,
+  "effective_stack": 92.5,
+  "min_bet": 1,
+  "iterations": 618,
+  "ev_oop": 4.0497867666305165,
+  "ev_ip": 11.045419907784911,
+  "expl_oop": 0.010734056475442788,
+  "expl_ip": 0.004621466340400726,
+  "nash_conv": 0.015355522815843514,
+  "storage": "f32",
+  "wall_secs": 1051.7721463,
+  "streets_stored": "full",
+  "nodes": 9696683,
+  "stored_nodes": 3523207
+ },
+ "root_ev": {
+  "CO": {
+   "gtow": 4.02980506340576,
+   "ours": 4.0497867666305165,
+   "diff_bb": 0.01998170322475623,
+   "diff_pot_share": 0.0012110123166518929,
+   "pass": true
+  },
+  "BTN": {
+   "gtow": 11.074292390884024,
+   "ours": 11.045419907784911,
+   "diff_bb": -0.0288724830991125,
+   "diff_pot_share": -0.0017498474605522727,
+   "pass": true
+  }
+ },
+ "root_combo_ev": {
+  "CO": {
+   "weighted_mean_abs_diff_bb": 0.053580687317484776,
+   "max_abs_diff_bb": 0.21761435000000517
+  },
+  "BTN": {
+   "weighted_mean_abs_diff_bb": 0.07124405633653004,
+   "max_abs_diff_bb": 0.29273744999999707
+  }
+ },
+ "nodes": [
+  {
+   "gtow_seq": "root",
+   "history": "",
+   "actor": "CO",
+   "actor_mass": 1.0,
+   "line_reach": 1,
+   "frequencies": [
+    {
+     "gtow": "X",
+     "ours": "check",
+     "gtow_freq": 1,
+     "ours_freq": 0.9994522595160579,
+     "diff": -0.0005477404839421274
+    },
+    {
+     "gtow": "R5.45",
+     "ours": "bet 5.45",
+     "gtow_freq": 0,
+     "ours_freq": 0.0005477480295738046,
+     "diff": 0.0005477480295738046
+    },
+    {
+     "gtow": "RAI",
+     "ours": "bet 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 0.0,
+     "diff": 0.0
+    }
+   ],
+   "max_abs_freq_diff": 0.0005477480295738046,
+   "weighted_strategy_tv": 0.0005477445460994258,
+   "key_node": true,
+   "pass": true
+  },
+  {
+   "gtow_seq": "X",
+   "history": "x",
+   "actor": "BTN",
+   "actor_mass": 1.0,
+   "line_reach": 1,
+   "frequencies": [
+    {
+     "gtow": "X",
+     "ours": "check",
+     "gtow_freq": 0.3260455526723132,
+     "ours_freq": 0.3319322661342289,
+     "diff": 0.00588671346191566
+    },
+    {
+     "gtow": "R5.45",
+     "ours": "bet 5.45",
+     "gtow_freq": 0.6739544473276867,
+     "ours_freq": 0.6680677346010501,
+     "diff": -0.005886712726636656
+    },
+    {
+     "gtow": "RAI",
+     "ours": "bet 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 0.0,
+     "diff": 0.0
+    }
+   ],
+   "max_abs_freq_diff": 0.00588671346191566,
+   "weighted_strategy_tv": 0.04184881805871845,
+   "key_node": true,
+   "pass": true
+  },
+  {
+   "gtow_seq": "R5.45",
+   "history": "r5.45",
+   "actor": "BTN",
+   "actor_mass": 1.0,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "RAI",
+   "history": "r92.5",
+   "actor": "BTN",
+   "actor_mass": 1.0,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45",
+   "history": "xr5.45",
+   "actor": "CO",
+   "actor_mass": 1.0,
+   "line_reach": 0.6739544473276867,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.5712853250315658,
+     "ours_freq": 0.5821907092259467,
+     "diff": 0.010905384194380918
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.19420433643555143,
+     "ours_freq": 0.155990828267848,
+     "diff": -0.03821350816770344
+    },
+    {
+     "gtow": "R10.9",
+     "ours": "raise to 10.9",
+     "gtow_freq": 0.0016154881366650057,
+     "ours_freq": 0.0026241375252403793,
+     "diff": 0.0010086493885753736
+    },
+    {
+     "gtow": "R12.15",
+     "ours": "raise to 12.15",
+     "gtow_freq": 0.002750327662662234,
+     "ours_freq": 0.20233768638321017,
+     "diff": 0.19958735872054795
+    },
+    {
+     "gtow": "R14.3",
+     "ours": "raise to 14.3",
+     "gtow_freq": 0.13661367122580098,
+     "ours_freq": 0.009180431697474114,
+     "diff": -0.12743323952832686
+    },
+    {
+     "gtow": "R18.4",
+     "ours": "raise to 18.4",
+     "gtow_freq": 0.09353085150775449,
+     "ours_freq": 0.04731697174551363,
+     "diff": -0.04621387976224086
+    },
+    {
+     "gtow": "R28.9",
+     "ours": "raise to 28.9",
+     "gtow_freq": 0,
+     "ours_freq": 0.00035923648036782844,
+     "diff": 0.00035923648036782844
+    },
+    {
+     "gtow": "RAI",
+     "ours": "raise to 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 0.0,
+     "diff": 0.0
+    }
+   ],
+   "max_abs_freq_diff": 0.19958735872054795,
+   "weighted_strategy_tv": 0.21211362370769296,
+   "key_node": true,
+   "pass": false
+  },
+  {
+   "gtow_seq": "X-RAI",
+   "history": "xr92.5",
+   "actor": "CO",
+   "actor_mass": 1.0,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9",
+   "history": "xr5.45r10.9",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0.0010887654143104985,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15",
+   "history": "xr5.45r12.15",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0.0018535955598595743,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3",
+   "history": "xr5.45r14.3",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0.092071391288391,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.3046294152736664,
+     "ours_freq": 0.29674776476970754,
+     "diff": -0.007881650503958837
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.4953790605068207,
+     "ours_freq": 0.5184660713906845,
+     "diff": 0.02308701088386378
+    },
+    {
+     "gtow": "R28.9",
+     "ours": "raise to 28.9",
+     "gtow_freq": 0.19999152421951294,
+     "ours_freq": 0.18478586000039068,
+     "diff": -0.015205664219122256
+    },
+    {
+     "gtow": "RAI",
+     "ours": "raise to 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 3.026052389005346e-07,
+     "diff": 3.026052389005346e-07
+    }
+   ],
+   "max_abs_freq_diff": 0.02308701088386378,
+   "weighted_strategy_tv": 0.04189918716501758,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4",
+   "history": "xr5.45r18.4",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0.06303553333599661,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.4118147553773933,
+     "ours_freq": 0.4094121476734014,
+     "diff": -0.0024026077039919214
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.37221178967076224,
+     "ours_freq": 0.3858671931805226,
+     "diff": 0.013655403509760355
+    },
+    {
+     "gtow": "R33.25",
+     "ours": "raise to 33.25",
+     "gtow_freq": 0.21597345495184445,
+     "ours_freq": 0.20472065875833367,
+     "diff": -0.011252796193510772
+    },
+    {
+     "gtow": "RAI",
+     "ours": "raise to 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 0.0,
+     "diff": 0.0
+    }
+   ],
+   "max_abs_freq_diff": 0.013655403509760355,
+   "weighted_strategy_tv": 0.026604373982302847,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R5.45-R28.9",
+   "history": "xr5.45r28.9",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-RAI",
+   "history": "xr5.45r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.673954472622515,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05",
+   "history": "xr5.45r10.9r25.05",
+   "actor": "CO",
+   "actor_mass": 0.001615488161615216,
+   "line_reach": 0.00023380380803930033,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-RAI",
+   "history": "xr5.45r10.9r92.5",
+   "actor": "CO",
+   "actor_mass": 0.001615488161615216,
+   "line_reach": 2.1995459063980006e-06,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5",
+   "history": "xr5.45r12.15r26.5",
+   "actor": "CO",
+   "actor_mass": 0.0027503276934841966,
+   "line_reach": 0.00039219277663896053,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-RAI",
+   "history": "xr5.45r12.15r92.5",
+   "actor": "CO",
+   "actor_mass": 0.0027503276934841966,
+   "line_reach": 1.581136422589235e-06,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9",
+   "history": "xr5.45r14.3r28.9",
+   "actor": "CO",
+   "actor_mass": 0.1366136720984081,
+   "line_reach": 0.0184134978807765,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.30045023560523987,
+     "ours_freq": 0.33170856337948557,
+     "diff": 0.0312583277742457
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.4122319221496582,
+     "ours_freq": 0.3855115054856078,
+     "diff": -0.026720416664050395
+    },
+    {
+     "gtow": "R43.55",
+     "ours": "raise to 43.55",
+     "gtow_freq": 0.28731784224510193,
+     "ours_freq": 0.28259525896137044,
+     "diff": -0.004722583283731485
+    },
+    {
+     "gtow": "R52.95",
+     "ours": "raise to 52.95",
+     "gtow_freq": 0,
+     "ours_freq": 0.00018216192146880156,
+     "diff": 0.00018216192146880156
+    },
+    {
+     "gtow": "RAI",
+     "ours": "raise to 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 2.5022076326136746e-06,
+     "diff": 2.5022076326136746e-06
+    }
+   ],
+   "max_abs_freq_diff": 0.0312583277742457,
+   "weighted_strategy_tv": 0.06842844835971411,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-RAI",
+   "history": "xr5.45r14.3r92.5",
+   "actor": "CO",
+   "actor_mass": 0.1366136720984081,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25",
+   "history": "xr5.45r18.4r33.25",
+   "actor": "CO",
+   "actor_mass": 0.09353085217578354,
+   "line_reach": 0.013614001919307353,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.2717214524745941,
+     "ours_freq": 0.292311435404862,
+     "diff": 0.02058998293026787
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.43036535382270813,
+     "ours_freq": 0.39773633516038287,
+     "diff": -0.03262901866232526
+    },
+    {
+     "gtow": "R48.1",
+     "ours": "raise to 48.1",
+     "gtow_freq": 0.29791319370269775,
+     "ours_freq": 0.3099110642873584,
+     "diff": 0.01199787058466062
+    },
+    {
+     "gtow": "R56.4",
+     "ours": "raise to 56.4",
+     "gtow_freq": 0,
+     "ours_freq": 4.1165075934463385e-05,
+     "diff": 4.1165075934463385e-05
+    },
+    {
+     "gtow": "RAI",
+     "ours": "raise to 92.5",
+     "gtow_freq": 0,
+     "ours_freq": 0.0,
+     "diff": 0.0
+    }
+   ],
+   "max_abs_freq_diff": 0.03262901866232526,
+   "weighted_strategy_tv": 0.04280516696029349,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-RAI",
+   "history": "xr5.45r18.4r92.5",
+   "actor": "CO",
+   "actor_mass": 0.09353085217578354,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R39.9",
+   "history": "xr5.45r10.9r25.05r39.9",
+   "actor": "BTN",
+   "actor_mass": 0.14472642982012504,
+   "line_reach": 6.342008623222206e-05,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R49.65",
+   "history": "xr5.45r10.9r25.05r49.65",
+   "actor": "BTN",
+   "actor_mass": 0.14472642982012504,
+   "line_reach": 2.3998306315051525e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-RAI",
+   "history": "xr5.45r10.9r25.05r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.14472642982012504,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R41.3",
+   "history": "xr5.45r12.15r26.5r41.3",
+   "actor": "BTN",
+   "actor_mass": 0.1425985778045027,
+   "line_reach": 0.00010872871024835867,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R50.9",
+   "history": "xr5.45r12.15r26.5r50.9",
+   "actor": "BTN",
+   "actor_mass": 0.1425985778045027,
+   "line_reach": 8.992301657815914e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-RAI",
+   "history": "xr5.45r12.15r26.5r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.1425985778045027,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-R43.55",
+   "history": "xr5.45r14.3r28.9r43.55",
+   "actor": "BTN",
+   "actor_mass": 0.1347851843518008,
+   "line_reach": 0.005290526479289462,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-R52.95",
+   "history": "xr5.45r14.3r28.9r52.95",
+   "actor": "BTN",
+   "actor_mass": 0.1347851843518008,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-RAI",
+   "history": "xr5.45r14.3r28.9r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.1347851843518008,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-R48.1",
+   "history": "xr5.45r18.4r33.25r48.1",
+   "actor": "BTN",
+   "actor_mass": 0.1455562811437492,
+   "line_reach": 0.0040557907908555105,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-R56.4",
+   "history": "xr5.45r18.4r33.25r56.4",
+   "actor": "BTN",
+   "actor_mass": 0.1455562811437492,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-RAI",
+   "history": "xr5.45r18.4r33.25r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.1455562811437492,
+   "line_reach": 0,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R39.9-R54.75",
+   "history": "xr5.45r10.9r25.05r39.9r54.75",
+   "actor": "CO",
+   "actor_mass": 0.000438206729860785,
+   "line_reach": 2.052786161427528e-05,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R39.9-RAI",
+   "history": "xr5.45r10.9r25.05r39.9r92.5",
+   "actor": "CO",
+   "actor_mass": 0.000438206729860785,
+   "line_reach": 7.268463715786946e-06,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R49.65-RAI",
+   "history": "xr5.45r10.9r25.05r49.65r92.5",
+   "actor": "CO",
+   "actor_mass": 1.658184355697915e-07,
+   "line_reach": 1.1203701150413659e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R41.3-R56.1",
+   "history": "xr5.45r12.15r26.5r41.3r56.1",
+   "actor": "CO",
+   "actor_mass": 0.0007624811369955937,
+   "line_reach": 2.500342947153236e-05,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R41.3-RAI",
+   "history": "xr5.45r12.15r26.5r41.3r92.5",
+   "actor": "CO",
+   "actor_mass": 0.0007624811369955937,
+   "line_reach": 1.9539349245756366e-05,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R50.9-RAI",
+   "history": "xr5.45r12.15r26.5r50.9r92.5",
+   "actor": "CO",
+   "actor_mass": 6.287966472661303e-07,
+   "line_reach": 4.4177027569785674e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-R43.55-R58.2",
+   "history": "xr5.45r14.3r28.9r43.55r58.2",
+   "actor": "CO",
+   "actor_mass": 0.0392515465445096,
+   "line_reach": 0.0006485942079188894,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-R43.55-RAI",
+   "history": "xr5.45r14.3r28.9r43.55r92.5",
+   "actor": "CO",
+   "actor_mass": 0.0392515465445096,
+   "line_reach": 0.0014792456797312818,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-R48.1-R62.95",
+   "history": "xr5.45r18.4r33.25r48.1r62.95",
+   "actor": "CO",
+   "actor_mass": 0.02786407604913347,
+   "line_reach": 9.708824612964964e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-R48.1-RAI",
+   "history": "xr5.45r18.4r33.25r48.1r92.5",
+   "actor": "CO",
+   "actor_mass": 0.02786407604913347,
+   "line_reach": 0.001983409806897716,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R10.9-R25.05-R39.9-R54.75-RAI",
+   "history": "xr5.45r10.9r25.05r39.9r54.75r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.046845162822146104,
+   "line_reach": 5.329905094500874e-06,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R12.15-R26.5-R41.3-R56.1-RAI",
+   "history": "xr5.45r12.15r26.5r41.3r56.1r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.032792200110026024,
+   "line_reach": 5.9229775805096e-06,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R14.3-R28.9-R43.55-R58.2-RAI",
+   "history": "xr5.45r14.3r28.9r43.55r58.2r92.5",
+   "actor": "BTN",
+   "actor_mass": 0.01652404396261666,
+   "line_reach": 0.00012267138234553005,
+   "status": "skipped: line reach below --min-reach 0.01"
+  },
+  {
+   "gtow_seq": "X-R5.45-R18.4-R33.25-R48.1-R62.95-RAI",
+   "history": "xr5.45r18.4r33.25r48.1r62.95r92.5",
+   "actor": "BTN",
+   "actor_mass": 3.4843523862362395e-06,
+   "line_reach": 2.3378063442166292e-08,
+   "status": "skipped: line reach below --min-reach 0.01"
+  }
+ ],
+ "key_nodes": 3,
+ "unresolved_key_nodes": [],
+ "pass": false
+}

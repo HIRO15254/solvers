@@ -1,0 +1,428 @@
+{
+ "case": "c001",
+ "limits": {
+  "root_ev_pot_share": 0.005,
+  "key_node_freq": 0.05,
+  "key_node_reach": 0.1
+ },
+ "summary": {
+  "board": "Ks 7h 2d",
+  "pot": 5.5,
+  "effective_stack": 97.5,
+  "min_bet": 1,
+  "iterations": 428,
+  "ev_oop": 2.0366138818066486,
+  "ev_ip": 3.4633861378520603,
+  "expl_oop": 0.002644876628021986,
+  "expl_ip": 0.0021678155344990735,
+  "nash_conv": 0.0048126921625210595,
+  "storage": "f32",
+  "wall_secs": 294.4104134,
+  "streets_stored": "full",
+  "nodes": 998114,
+  "stored_nodes": 402890
+ },
+ "root_ev": {
+  "BB": {
+   "gtow": 1.9971790313720703,
+   "ours": 2.0366138818066486,
+   "diff_bb": 0.039434850434578284,
+   "diff_pot_share": 0.007169972806286961,
+   "pass": false
+  },
+  "BTN": {
+   "gtow": 3.5028209686279297,
+   "ours": 3.4633861378520603,
+   "diff_bb": -0.0394348307758694,
+   "diff_pot_share": -0.007169969231976255,
+   "pass": false
+  }
+ },
+ "root_combo_ev": {
+  "BB": {
+   "weighted_mean_abs_diff_bb": 0.07461616737540316,
+   "max_abs_diff_bb": 0.8945099205322258
+  },
+  "BTN": {
+   "weighted_mean_abs_diff_bb": 0.0962762309511416,
+   "max_abs_diff_bb": 2.083078923950195
+  }
+ },
+ "nodes": [
+  {
+   "gtow_seq": "root",
+   "history": "",
+   "actor": "BB",
+   "actor_mass": 1.0,
+   "line_reach": 1,
+   "frequencies": [
+    {
+     "gtow": "X",
+     "ours": "check",
+     "gtow_freq": 0.9994924290109551,
+     "ours_freq": 0.9999863346908473,
+     "diff": 0.0004939056798921593
+    },
+    {
+     "gtow": "R6.4",
+     "ours": "bet 6.4",
+     "gtow_freq": 0.0005075709890448807,
+     "ours_freq": 1.3665517595047545e-05,
+     "diff": -0.0004939054714498332
+    }
+   ],
+   "max_abs_freq_diff": 0.0004939056798921593,
+   "weighted_strategy_tv": 0.0004939060691577999,
+   "key_node": true,
+   "pass": true
+  },
+  {
+   "gtow_seq": "X",
+   "history": "x",
+   "actor": "BTN",
+   "actor_mass": 1.0,
+   "line_reach": 0.9994924290109551,
+   "frequencies": [
+    {
+     "gtow": "X",
+     "ours": "check",
+     "gtow_freq": 0.1766844391822815,
+     "ours_freq": 0.18337658219244887,
+     "diff": 0.0066921430101673784
+    },
+    {
+     "gtow": "R1.8",
+     "ours": "bet 1.8",
+     "gtow_freq": 0.8233155608177185,
+     "ours_freq": 0.8166234179130434,
+     "diff": -0.006692142904675125
+    }
+   ],
+   "max_abs_freq_diff": 0.0066921430101673784,
+   "weighted_strategy_tv": 0.07640134191823432,
+   "key_node": true,
+   "pass": true
+  },
+  {
+   "gtow_seq": "R6.4",
+   "history": "r6.4",
+   "actor": "BTN",
+   "actor_mass": 1.0,
+   "line_reach": 0.0005075709890448807,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.42674687032809566,
+     "ours_freq": 0.47139066241707506,
+     "diff": 0.044643792088979395
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.572650962695265,
+     "ours_freq": 0.48085533439147615,
+     "diff": -0.0917956283037889
+    },
+    {
+     "gtow": "R17.6",
+     "ours": "raise to 17.6",
+     "gtow_freq": 0.0006021669766393185,
+     "ours_freq": 0.04775400443360954,
+     "diff": 0.04715183745697022
+    }
+   ],
+   "max_abs_freq_diff": 0.0917956283037889,
+   "weighted_strategy_tv": 0.19339216057604036,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R1.8",
+   "history": "xr1.8",
+   "actor": "BB",
+   "actor_mass": 0.9994924277100312,
+   "line_reach": 0.8228976697242182,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.35789137545389865,
+     "ours_freq": 0.36227014119434153,
+     "diff": 0.00437876574044288
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.3999669194226426,
+     "ours_freq": 0.40996224001497106,
+     "diff": 0.009995320592328438
+    },
+    {
+     "gtow": "R4.8",
+     "ours": "raise to 4.8",
+     "gtow_freq": 0.24214170512345873,
+     "ours_freq": 0.22776761951171753,
+     "diff": -0.014374085611741194
+    }
+   ],
+   "max_abs_freq_diff": 0.014374085611741194,
+   "weighted_strategy_tv": 0.1367164049486207,
+   "key_node": true,
+   "pass": true
+  },
+  {
+   "gtow_seq": "R6.4-R17.6",
+   "history": "r6.4r17.6",
+   "actor": "BB",
+   "actor_mass": 0.0005075708113180862,
+   "line_reach": 3.0564248790298445e-07,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.5843229933405145,
+     "ours_freq": 0.5851164506440676,
+     "diff": 0.000793457303553069
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.11696206865431419,
+     "ours_freq": 0.04382683813265787,
+     "diff": -0.07313523052165632
+    },
+    {
+     "gtow": "R31.9",
+     "ours": "raise to 31.9",
+     "gtow_freq": 0.29871493800517124,
+     "ours_freq": 0.3710567091758005,
+     "diff": 0.07234177117062929
+    }
+   ],
+   "max_abs_freq_diff": 0.07313523052165632,
+   "weighted_strategy_tv": 0.19879401561238152,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R1.8-R4.8",
+   "history": "xr1.8r4.8",
+   "actor": "BTN",
+   "actor_mass": 0.8233155466064256,
+   "line_reach": 0.19925784488914297,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.26768825156173764,
+     "ours_freq": 0.23751660303661878,
+     "diff": -0.03017164852511886
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.6848901092791213,
+     "ours_freq": 0.7405645610541579,
+     "diff": 0.055674451775036604
+    },
+    {
+     "gtow": "R15.1",
+     "ours": "raise to 15.1",
+     "gtow_freq": 0.047421639159141014,
+     "ours_freq": 0.021918836203146295,
+     "diff": -0.02550280295599472
+    }
+   ],
+   "max_abs_freq_diff": 0.055674451775036604,
+   "weighted_strategy_tv": 0.07170337970176516,
+   "key_node": true,
+   "pass": false
+  },
+  {
+   "gtow_seq": "R6.4-R17.6-R31.9",
+   "history": "r6.4r17.6r31.9",
+   "actor": "BTN",
+   "actor_mass": 0.0006021664248337985,
+   "line_reach": 9.12999768256863e-08,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.43782955408096313,
+     "ours_freq": 0.45961060056226866,
+     "diff": 0.02178104648130552
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.3359494209289551,
+     "ours_freq": 0.19385708031929233,
+     "diff": -0.14209234060966275
+    },
+    {
+     "gtow": "R46.6",
+     "ours": "raise to 46.6",
+     "gtow_freq": 0.2262210249900818,
+     "ours_freq": 0.34653231753363023,
+     "diff": 0.12031129254354844
+    }
+   ],
+   "max_abs_freq_diff": 0.14209234060966275,
+   "weighted_strategy_tv": 0.19252098492338943,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R1.8-R4.8-R15.1",
+   "history": "xr1.8r4.8r15.1",
+   "actor": "BB",
+   "actor_mass": 0.24201879719345462,
+   "line_reach": 0.009449133619961029,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.452245834859057,
+     "ours_freq": 0.4711253434843311,
+     "diff": 0.0188795086252741
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.43571129765891503,
+     "ours_freq": 0.3088490068388444,
+     "diff": -0.1268622908200706
+    },
+    {
+     "gtow": "R29",
+     "ours": "raise to 29",
+     "gtow_freq": 0.11204286748202791,
+     "ours_freq": 0.22002564964597024,
+     "diff": 0.10798278216394233
+    }
+   ],
+   "max_abs_freq_diff": 0.1268622908200706,
+   "weighted_strategy_tv": 0.13875239548202004,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "R6.4-R17.6-R31.9-R46.6",
+   "history": "r6.4r17.6r31.9r46.6",
+   "actor": "BB",
+   "actor_mass": 0.00015160658921527714,
+   "line_reach": 2.065397433907747e-08,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.2223029169783431,
+     "ours_freq": 0.32076951619347194,
+     "diff": 0.09846659921512885
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.5532130681457083,
+     "ours_freq": 0.2015116760536021,
+     "diff": -0.35170139209210616
+    },
+    {
+     "gtow": "R97.5",
+     "ours": "raise to 97.5",
+     "gtow_freq": 0.22448401487594866,
+     "ours_freq": 0.4777188078901923,
+     "diff": 0.2532347930142436
+    }
+   ],
+   "max_abs_freq_diff": 0.35170139209210616,
+   "weighted_strategy_tv": 0.38791375067076395,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R1.8-R4.8-R15.1-R29",
+   "history": "xr1.8r4.8r15.1r29",
+   "actor": "BTN",
+   "actor_mass": 0.039042971401601796,
+   "line_reach": 0.0010587080260012682,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.3791656735663761,
+     "ours_freq": 0.3761183200583645,
+     "diff": -0.0030473535080116076
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.5372643390705535,
+     "ours_freq": 0.5726454643270102,
+     "diff": 0.03538112525645676
+    },
+    {
+     "gtow": "R97.5",
+     "ours": "raise to 97.5",
+     "gtow_freq": 0.08356998736307043,
+     "ours_freq": 0.051236215279204515,
+     "diff": -0.03233377208386592
+    }
+   ],
+   "max_abs_freq_diff": 0.03538112525645676,
+   "weighted_strategy_tv": 0.16943602042340491,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "R6.4-R17.6-R31.9-R46.6-R97.5",
+   "history": "r6.4r17.6r31.9r46.6r97.5",
+   "actor": "BTN",
+   "actor_mass": 0.0001362193849654628,
+   "line_reach": 4.6364870827809285e-09,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.2769921802578026,
+     "ours_freq": 0.3305510360927924,
+     "diff": 0.053558855834989816
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.7230078197421974,
+     "ours_freq": 0.6694489580992049,
+     "diff": -0.053558861642992506
+    }
+   ],
+   "max_abs_freq_diff": 0.053558861642992506,
+   "weighted_strategy_tv": 0.15064190526818302,
+   "key_node": false
+  },
+  {
+   "gtow_seq": "X-R1.8-R4.8-R15.1-R29-R97.5",
+   "history": "xr1.8r4.8r15.1r29r97.5",
+   "actor": "BB",
+   "actor_mass": 0.02711647615916886,
+   "line_reach": 8.847621635410722e-05,
+   "frequencies": [
+    {
+     "gtow": "F",
+     "ours": "fold",
+     "gtow_freq": 0.5650547742843628,
+     "ours_freq": 0.5825824067486878,
+     "diff": 0.017527632464324983
+    },
+    {
+     "gtow": "C",
+     "ours": "call",
+     "gtow_freq": 0.4349452257156372,
+     "ours_freq": 0.4174175930813098,
+     "diff": -0.017527632634327384
+    }
+   ],
+   "max_abs_freq_diff": 0.017527632634327384,
+   "weighted_strategy_tv": 0.0077979316616863924,
+   "key_node": false
+  }
+ ],
+ "key_nodes": 4,
+ "unresolved_key_nodes": [],
+ "pass": false
+}
