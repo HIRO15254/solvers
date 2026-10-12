@@ -127,11 +127,19 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     let first = subtree.first;
     let count = subtree.count();
     let span = tree.storage_spans[root as usize];
+    let actions = &tree.storage_nodes[span.sref_start as usize..span.sref_end as usize];
     let sigma_len = span.end - span.start;
     let own_len = my_reach.len();
     let mut sigma = scratch.take_overwrite(sigma_len);
     let mut scaled = scratch.take_overwrite(sigma_len);
-    let mut values = scratch.take_overwrite(count * own_len);
+    let mut values = scratch.take(count * own_len);
+    let work_len = actions
+        .iter()
+        .filter(|&&id| tree.node(id).player == ctx.p)
+        .map(|&id| tree.storage_ref(tree.node(id)).len())
+        .max()
+        .unwrap_or(0);
+    let mut work = scratch.take_overwrite(work_len);
     metadata.nodes.resize(count, Reaches::default());
     metadata.nodes[0] = Reaches {
         my: usize::MAX,
@@ -140,13 +148,12 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     };
     let walk = || subtree.walk();
 
-    // Phase 1: all strategies and action-scaled reaches, in parent-before-child
-    // order. Unchanged reaches are indices into ancestors (or the input rows).
-    for (index, id) in walk().enumerate() {
+    // Phase 1: storage preorder prepares each parent's strategies and scaled
+    // reaches before its children. Value/reach metadata stays node-id-indexed.
+    // Unchanged reaches are indices into ancestors (or the input rows).
+    for &id in actions {
+        let index = subtree.index(id);
         let node = tree.node(id);
-        if node.kind == NodeKind::Terminal {
-            continue;
-        }
         let sref = tree.storage_ref(node);
         let offset = sref.offset - span.start;
         let parent = metadata.nodes[index];
@@ -192,7 +199,6 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         };
         let node = tree.node(id);
         if node.kind == NodeKind::Terminal {
-            row.fill(0.0);
             let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
             if !PRUNE || !all_zero(opp) {
                 metadata.terminals.push(node.aux);
@@ -206,79 +212,53 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     metadata.outputs = mutable_rows(outputs);
     metadata.reaches = shared_rows(reaches);
 
-    // Phase 3: child-before-parent. Per-node action order and storage update
-    // arguments/order match recursion; every storage ref is independent.
-    for id in walk().rev() {
+    // Phase 3: reverse storage preorder is child-before-parent. Per-node
+    // action order and update arguments are unchanged; refs are independent.
+    for &id in actions.iter().rev() {
         let index = subtree.index(id);
         let node = tree.node(id);
-        if node.kind == NodeKind::Action {
-            let sref = tree.storage_ref(node);
-            let offset = sref.offset - span.start;
-            let strategy = &sigma[offset..offset + sref.len()];
-            let (parents, children) = values.split_at_mut((index + 1) * own_len);
-            let value = &mut parents[index * own_len..];
-            let child_row = |child: NodeId| {
-                let start = (child as usize - first - index) * own_len;
-                &children[start..start + own_len]
-            };
-            if node.player == ctx.p {
-                if node.num_children == 0 {
-                    value.fill(0.0);
+        let sref = tree.storage_ref(node);
+        let offset = sref.offset - span.start;
+        let strategy = &sigma[offset..offset + sref.len()];
+        let (parents, children) = values.split_at_mut((index + 1) * own_len);
+        let value = &mut parents[index * own_len..];
+        let child_row = |child: NodeId| {
+            let start = (child as usize - first - index) * own_len;
+            &children[start..start + own_len]
+        };
+        if node.player == ctx.p {
+            for (child, row) in tree.children(id).zip(strategy.chunks_exact(own_len.max(1))) {
+                for ((dst, &s), &v) in value.iter_mut().zip(row).zip(child_row(child)) {
+                    *dst += s * v;
                 }
-                for (a, (child, row)) in tree
-                    .children(id)
-                    .zip(strategy.chunks_exact(own_len.max(1)))
-                    .enumerate()
-                {
-                    for ((dst, &s), &v) in value.iter_mut().zip(row).zip(child_row(child)) {
-                        if a == 0 {
-                            *dst = s * v + 0.0;
-                        } else {
-                            *dst += s * v;
-                        }
-                    }
+            }
+            let tmp = &mut work[..sref.len()];
+            for (child, row) in tree.children(id).zip(tmp.chunks_exact_mut(own_len.max(1))) {
+                for ((dst, &v), &cfv) in row.iter_mut().zip(child_row(child)).zip(value.iter()) {
+                    *dst = v - cfv;
                 }
-                // PublicTree::children is a consecutive node-id range, hence
-                // the child value rows form one contiguous action-major block.
-                debug_assert_eq!(tree.children(id).len(), sref.num_actions as usize);
-                let start = if sref.is_empty() {
-                    0
-                } else {
-                    (node.first_child as usize - first - index) * own_len
-                };
-                storage.update_regrets_from_values(
-                    sref,
-                    sref.index,
-                    &children[start..start + sref.len()],
-                    value,
-                    ctx.discounts,
-                );
-                // Phase 1 already wrote my_reach * sigma for every action.
-                // Reuse those exact rows for the average update, after regrets.
-                storage.accumulate_strategy(
-                    sref,
-                    sref.index,
-                    &scaled[offset..offset + sref.len()],
-                    ctx.discounts,
-                );
-            } else if !metadata.nodes[index].zero_opp && node.num_children != 0 {
-                for (a, child) in tree.children(id).enumerate() {
-                    for (dst, &v) in value.iter_mut().zip(child_row(child)) {
-                        if a == 0 {
-                            *dst = v + 0.0;
-                        } else {
-                            *dst += v;
-                        }
-                    }
+            }
+            storage.update_regrets(sref, sref.index, tmp, ctx.discounts);
+            // Phase 1 already wrote my_reach * sigma for every action.
+            // Reuse those exact rows for the average update, after regrets.
+            storage.accumulate_strategy(
+                sref,
+                sref.index,
+                &scaled[offset..offset + sref.len()],
+                ctx.discounts,
+            );
+        } else if !metadata.nodes[index].zero_opp {
+            for child in tree.children(id) {
+                for (dst, &v) in value.iter_mut().zip(child_row(child)) {
+                    *dst += v;
                 }
-            } else {
-                value.fill(0.0);
             }
         }
         #[cfg(test)]
         record(id, &values[index * own_len..(index + 1) * own_len]);
     }
     out.copy_from_slice(&values[..own_len]);
+    scratch.put(work);
     scratch.put(values);
     scratch.put(scaled);
     scratch.put(sigma);

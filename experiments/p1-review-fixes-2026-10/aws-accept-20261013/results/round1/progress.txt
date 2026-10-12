@@ -1,0 +1,19 @@
+17:46:29 BUILT
+17:51:04 bench rep 1
+17:55:40 bench rep 2
+17:56:11 solve flop1_f32_t32 old
+17:56:45 solve flop1_f32_t32 new
+17:57:18 solve flop1_f32_t32 s5
+17:57:47 solve flop1_i16_t32 old
+17:58:23 solve flop1_i16_t32 new
+17:58:59 solve flop1_i16_t32 s5
+17:59:31 solve flop1_f32_t16 old
+18:00:10 solve flop1_f32_t16 new
+18:00:48 solve flop1_f32_t16 s5
+18:01:22 solve flop1_i16_t16 old
+18:02:02 solve flop1_i16_t16 new
+18:02:42 solve flop1_i16_t16 s5
+18:08:03 solve gtowb_f32_t32 old
+18:14:01 solve gtowb_f32_t32 new
+18:19:52 solve gtowb_f32_t32 s5
+18:19:52 ALL_DONE

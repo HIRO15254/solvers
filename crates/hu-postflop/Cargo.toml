@@ -35,7 +35,6 @@ windows-sys = { workspace = true, features = ["Win32_System_SystemInformation"] 
 windows-sys = { workspace = true, features = ["Win32_System_ProcessStatus", "Win32_System_Threading"] }
 
 [dev-dependencies]
-blake3 = { workspace = true }
 cfr-ref = { workspace = true }
 criterion = { workspace = true }
 # Integration tests, benches and examples see the test-support API; normal
@@ -46,6 +45,10 @@ hu-engine = { workspace = true, features = ["serde", "test-support"] }
 [features]
 # Toy games, legacy models and artifact helpers used only by tests.
 test-support = []
+
+[[example]]
+name = "p1_bench"
+test = true
 
 [[bench]]
 name = "kernels"

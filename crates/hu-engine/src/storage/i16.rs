@@ -52,22 +52,23 @@ fn quantize_value(value: f32, inverse: f64) -> i16 {
 /// allow SIMD without reassociating any of the per-element update math.
 fn update_i16_block(
     data: &mut [i16],
-    mut input: impl Iterator<Item = f32>,
+    input: &[f32],
     scratch: &mut Vec<f32>,
     update: impl Fn(i16, f32) -> f32,
 ) -> f32 {
     let len = data.len();
-    debug_assert_eq!(len, input.size_hint().0);
+    debug_assert_eq!(len, input.len());
     if scratch.len() < len {
         scratch.resize(len, 0.0);
     }
     let scratch = &mut scratch[..len];
     let (dst, dst_tail) = scratch.as_chunks_mut::<8>();
     let (src, src_tail) = data.as_chunks::<8>();
+    let (input, input_tail) = input.as_chunks::<8>();
     let mut maxima = [0.0f32; 8];
-    for (dst, src) in dst.iter_mut().zip(src) {
+    for ((dst, src), input) in dst.iter_mut().zip(src).zip(input) {
         for lane in 0..8 {
-            let value = update(src[lane], input.next().unwrap());
+            let value = update(src[lane], input[lane]);
             dst[lane] = value;
             let abs = value.abs();
             if abs > maxima[lane] {
@@ -76,8 +77,8 @@ fn update_i16_block(
         }
     }
     let mut max_abs = maxima.into_iter().fold(0.0f32, f32::max);
-    for (dst, &src) in dst_tail.iter_mut().zip(src_tail) {
-        let value = update(src, input.next().unwrap());
+    for ((dst, &src), &input) in dst_tail.iter_mut().zip(src_tail).zip(input_tail) {
+        let value = update(src, input);
         *dst = value;
         max_abs = max_abs.max(value.abs());
     }
@@ -103,14 +104,14 @@ pub(super) fn update_regrets_i16_impl(
     regrets: &mut [i16],
     offset: usize,
     r: StorageRef,
-    inst: impl Iterator<Item = f32>,
+    inst: &[f32],
     d: &Discounts,
     scale: &mut f32,
     scratch: &mut Vec<f32>,
 ) {
     let len = r.len();
     let slice = &mut regrets[offset..offset + len];
-    debug_assert_eq!(inst.size_hint().0, len);
+    debug_assert_eq!(inst.len(), len);
     let old_scale = *scale;
     let (pos, neg) = (d.pos as f32, d.neg as f32);
     let update = |raw: i16, delta| {
@@ -160,7 +161,7 @@ pub(super) fn accumulate_strategy_i16_impl(
             });
         *scale = quantize_block(weighted, max_abs, slice);
     } else {
-        *scale = update_i16_block(slice, weighted.iter().copied(), scratch, |raw, w| {
+        *scale = update_i16_block(slice, weighted, scratch, |raw, w| {
             (raw as f32 * old_scale) * avg + w
         });
     }
@@ -229,33 +230,7 @@ impl StorageOps for I16Storage {
             &mut self.regrets,
             r.offset,
             r,
-            inst.iter().copied(),
-            d,
-            &mut self.regret_scales[ref_idx as usize],
-            &mut scratch.0,
-        );
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        self.assert_regrets_available();
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        let mut scratch = QuantizedScratch::take();
-        update_regrets_i16_impl(
-            &mut self.regrets,
-            r.offset,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
+            inst,
             d,
             &mut self.regret_scales[ref_idx as usize],
             &mut scratch.0,
@@ -450,34 +425,7 @@ impl<'a> StorageOps for I16View<'a> {
             &mut *self.regrets,
             local,
             r,
-            inst.iter().copied(),
-            d,
-            &mut self.regret_scales[sidx],
-            &mut scratch.0,
-        );
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        let local = self.local_offset(r);
-        let sidx = self.local_ref(ref_idx);
-        let mut scratch = QuantizedScratch::take();
-        update_regrets_i16_impl(
-            &mut *self.regrets,
-            local,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
+            inst,
             d,
             &mut self.regret_scales[sidx],
             &mut scratch.0,

@@ -358,10 +358,12 @@ enum Command {
         #[arg(long)]
         output: Option<std::path::PathBuf>,
     },
-    /// Compare two formal `.mwsol` average profiles.
+    /// Compare two same-product solution average profiles.
     Compare {
         left: std::path::PathBuf,
         right: std::path::PathBuf,
+        /// Allow P1 spot, combo-list and sized-action differences; tree shape
+        /// and stored-node shapes must still match. P2 retains seat/unit checks.
         #[arg(long)]
         cross_game: bool,
     },

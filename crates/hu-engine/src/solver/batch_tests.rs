@@ -210,7 +210,13 @@ fn relative(exact: &[f32], actual: &[f32]) -> f64 {
         error / scale
     }
 }
-fn check<const PRUNE: bool>(tree: &PublicTree, e: &Evaluator, p: Player, zero: bool) -> f64 {
+fn check<const PRUNE: bool>(
+    tree: &PublicTree,
+    e: &Evaluator,
+    p: Player,
+    zero: bool,
+    bit_exact: bool,
+) -> f64 {
     let seed = Discounts {
         pos: 1.0,
         neg: 1.0,
@@ -309,6 +315,14 @@ fn check<const PRUNE: bool>(tree: &PublicTree, e: &Evaluator, p: Player, zero: b
         .enumerate()
         .filter(|(_, n)| n.kind == NodeKind::Action)
     {
+        if bit_exact {
+            let bits = |v: &[f32]| v.iter().map(|x| x.to_bits()).collect::<Vec<_>>();
+            assert_eq!(
+                bits(&expected_nodes[&(id as u32)]),
+                bits(&actual_nodes[&(id as u32)]),
+                "node {id}"
+            );
+        }
         maximum = maximum.max(relative(
             &expected_nodes[&(id as u32)],
             &actual_nodes[&(id as u32)],
@@ -322,6 +336,12 @@ fn check<const PRUNE: bool>(tree: &PublicTree, e: &Evaluator, p: Player, zero: b
             &aa[sref.offset..sref.offset + sref.len()],
             &ba[sref.offset..sref.offset + sref.len()],
         ));
+    }
+    if bit_exact {
+        let bits = |v: &[f32]| v.iter().map(|x| x.to_bits()).collect::<Vec<_>>();
+        assert_eq!(bits(&expected), bits(&out));
+        assert_eq!(bits(&ar), bits(&br), "regrets");
+        assert_eq!(bits(&aa), bits(&ba), "strategy sums");
     }
     assert!(
         maximum < 1e-5,
@@ -353,11 +373,59 @@ fn river_and_turn_values_and_updates_match_recursive_with_and_without_prune() {
                 let (tree, e) = fixture(turn);
                 for p in Player::BOTH {
                     for zero in [false, true] {
-                        maximum = maximum.max(check::<true>(&tree, &e, p, zero));
-                        maximum = maximum.max(check::<false>(&tree, &e, p, zero));
+                        maximum = maximum.max(check::<true>(&tree, &e, p, zero, false));
+                        maximum = maximum.max(check::<false>(&tree, &e, p, zero, false));
                     }
                 }
             }
             println!("T25b traversal maximum relative per-node difference={maximum:e}");
+        });
+}
+
+#[test]
+fn storage_preorder_matches_recursive_bits_when_node_order_differs() {
+    // Uniform-depth branches avoid the independent recursive optimization
+    // that adds direct opponent terminals before nonterminal children.
+    let (_, e) = fixture(false);
+    let leaf = |a, b| {
+        action(
+            Player::P0,
+            vec![
+                TempNode::Terminal { id: a, tag: 0 },
+                TempNode::Terminal { id: b, tag: 0 },
+            ],
+        )
+    };
+    let tree = PublicTree::compile(TreeSpec {
+        root: action(
+            Player::P0,
+            vec![
+                action(Player::P1, vec![leaf(0, 1), leaf(2, 3)]),
+                action(Player::P1, vec![leaf(4, 5), leaf(6, 0)]),
+            ],
+        ),
+        root_dims: e.hands.as_ref().map(|h| h.len() as u32),
+        masks: vec![],
+        transitions: vec![],
+    });
+    let id_order: Vec<_> = Subtree::new(&tree, 0)
+        .walk()
+        .filter(|&id| tree.node(id).kind == NodeKind::Action)
+        .collect();
+    assert_ne!(tree.storage_nodes, id_order);
+    for (index, &id) in tree.storage_nodes.iter().enumerate() {
+        assert_eq!(tree.node(id).aux as usize, index);
+    }
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap()
+        .install(|| {
+            for p in Player::BOTH {
+                for zero in [false, true] {
+                    check::<true>(&tree, &e, p, zero, true);
+                    check::<false>(&tree, &e, p, zero, true);
+                }
+            }
         });
 }

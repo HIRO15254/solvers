@@ -20,13 +20,13 @@ fn update_regrets_impl(
     regrets: &mut [f32],
     offset: usize,
     r: StorageRef,
-    inst: impl Iterator<Item = f32>,
+    inst: &[f32],
     d: &Discounts,
 ) {
     let slice = &mut regrets[offset..offset + r.len()];
-    debug_assert_eq!(inst.size_hint().0, slice.len());
+    debug_assert_eq!(inst.len(), slice.len());
     let (pos, neg) = (d.pos as f32, d.neg as f32);
-    for (regret, delta) in slice.iter_mut().zip(inst) {
+    for (regret, &delta) in slice.iter_mut().zip(inst) {
         let factor = if *regret > 0.0 { pos } else { neg };
         let mut updated = *regret * factor + delta;
         if d.floor_neg && updated < 0.0 {
@@ -87,30 +87,7 @@ impl StorageOps for F32Storage {
 
     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
         self.assert_regrets_available();
-        update_regrets_impl(&mut self.regrets, r.offset, r, inst.iter().copied(), d);
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        _ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        self.assert_regrets_available();
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        update_regrets_impl(
-            &mut self.regrets,
-            r.offset,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
-            d,
-        );
+        update_regrets_impl(&mut self.regrets, r.offset, r, inst, d);
     }
 
     fn accumulate_strategy(
@@ -249,30 +226,7 @@ impl<'a> StorageOps for F32View<'a> {
 
     fn update_regrets(&mut self, r: StorageRef, _ref_idx: u32, inst: &[f32], d: &Discounts) {
         let local = self.local_offset(r);
-        update_regrets_impl(&mut *self.regrets, local, r, inst.iter().copied(), d);
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        _ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        let local = self.local_offset(r);
-        update_regrets_impl(
-            &mut *self.regrets,
-            local,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
-            d,
-        );
+        update_regrets_impl(&mut *self.regrets, local, r, inst, d);
     }
 
     fn accumulate_strategy(

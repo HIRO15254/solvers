@@ -317,20 +317,6 @@ impl<V: StorageView> StorageOps for TrackingView<V> {
         self.inner.update_regrets(r, index, inst, d);
     }
 
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        index: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        assert!(values.iter().all(|&x| x == 0.0));
-        // This fixture's child and node values are all zero, so its ordinary
-        // update also records worker participation without building a delta.
-        self.update_regrets(r, index, children, d);
-    }
-
     fn accumulate_strategy(&mut self, r: StorageRef, index: u32, weighted: &[f32], d: &Discounts) {
         self.inner.accumulate_strategy(r, index, weighted, d);
     }

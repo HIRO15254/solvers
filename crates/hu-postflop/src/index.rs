@@ -105,7 +105,7 @@ fn last_bracketed_card(history: &str) -> Option<Card> {
 impl GameIndex {
     /// Index of a freshly built game. `node_info` is the builder's metadata
     /// (chip amounts, untranslated); `start` is the subgame's first street.
-    pub(crate) fn from_game(
+    pub fn from_game(
         game: &CompiledGame<PostflopEvaluator>,
         node_info: &[PostflopNodeInfo],
         start: Street,
@@ -227,10 +227,13 @@ impl<'a> TreeView<'a> {
 
     /// Display labels of an action node's actions, in child order.
     pub fn actions(&self, node: NodeId) -> Vec<&'a str> {
+        self.action_labels(node).collect()
+    }
+
+    pub(crate) fn action_labels(&self, node: NodeId) -> impl Iterator<Item = &'a str> + '_ {
         self.tree
             .children(node)
             .map(|child| self.index.labels[self.index.edges[child as usize] as usize].as_str())
-            .collect()
     }
 
     /// Pot in chips at an action node, the starting pot included.

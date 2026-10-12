@@ -26,7 +26,7 @@
   rustc 1.97.0 (2d8144b78 2026-07-07)、thin LTO、codegen-units 1、`-C target-cpu=native`。
 - 同じ機械を他のagentと共有。OLD→NEWを各repで交互に走らせ、中央値を主指標にする。
   [configs/](configs/)はmain checkoutのT26入力のcopy。solveだけ`final_checkpoint = false`を追加する。
-- p1_benchの計測対象は`exploitability()`。これらのrakeあり入力では`evaluate()`と同じ両seat EV/BRを計算する。
+- この保存実験で使ったp1_benchの計測対象は`exploitability()`（`evalSecs`）。これらのrakeあり入力では`evaluate()`と同じ両seat EV/BRを計算する。
   20反復warmup後、追加反復0、評価3回、8 threads。processごとに新しいheap・storageから始める。
   f32は5 process × 3評価の15標本、追加storageは3 process × 3評価の9標本の中央値（秒/評価）を使う。process内の中央値もJSONへ残す。
   JSONのNashConvはround-trip可能な全精度。`struct.pack('!d', value)`で比較し、hex bit列も保存する。
@@ -48,6 +48,9 @@ python experiments/p1-efficiency-2026-10/eval-speed-20261009/scripts/record_sour
 OLDのbuildは必ず上記baseへ戻したsourceで実行する。NEWをOLD targetへ上書きしない。
 source patchは0-contextで保存し、baseに`git apply --unidiff-zero scripts/measured.patch`で再現する。
 `.gitattributes`はroot exportとpatchのbytesをcheckout時の改行変換から保護する。
+
+現行p1_benchは`Solver::evaluate()`を`evaluateSecs`へ出力する。`buildSecs`はcount pass・木のbuild・`GameIndex`生成を含み、builderの`node_info`をsolver storage確保前に解放してindexを計測終了まで保持する。
+上記手順と`measure.py`は保存実験の旧`evalSecs`形式用であり、現行binaryの再計測手順ではない。保存済みの結果・script・source patchは変更せず、現行`evaluateSecs`と混ぜない。
 
 ## 結果
 

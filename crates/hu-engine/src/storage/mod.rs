@@ -218,18 +218,6 @@ pub trait StorageOps {
     /// Applies pre-add discounting to stored regrets, then adds `inst`.
     fn update_regrets(&mut self, r: StorageRef, ref_idx: u32, inst: &[f32], d: &Discounts);
 
-    /// Adds child counterfactual values minus the node value, applying the same
-    /// f32 subtraction and discounted update as `update_regrets`. Child values
-    /// are contiguous action-major rows; `values` contains one value per hand.
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    );
-
     /// Applies pre-add discounting (or reset) to the cumulative strategy,
     /// then adds the reach-weighted current strategy `weighted`.
     fn accumulate_strategy(&mut self, r: StorageRef, ref_idx: u32, weighted: &[f32], d: &Discounts);
@@ -476,113 +464,6 @@ impl Drop for QuantizedScratch {
 mod tests {
     use super::*;
 
-    fn storage_bits(storage: &impl Storage) -> Vec<u32> {
-        match storage.arrays() {
-            StorageArrays::F32 {
-                regrets,
-                strategy_sum,
-            } => regrets
-                .iter()
-                .chain(strategy_sum)
-                .map(|v| v.to_bits())
-                .collect(),
-            StorageArrays::I16 {
-                regrets,
-                strategy_sum,
-                regret_scales,
-                strategy_scales,
-            } => regrets
-                .iter()
-                .chain(strategy_sum)
-                .map(|&v| v as u32)
-                .chain(
-                    regret_scales
-                        .iter()
-                        .chain(strategy_scales)
-                        .map(|v| v.to_bits()),
-                )
-                .collect(),
-            StorageArrays::Mixed {
-                regrets,
-                strategy_sum,
-                regret_scales,
-            } => regrets
-                .iter()
-                .map(|&v| v as u32)
-                .chain(
-                    strategy_sum
-                        .iter()
-                        .chain(regret_scales)
-                        .map(|v| v.to_bits()),
-                )
-                .collect(),
-        }
-    }
-
-    fn check_regret_deltas<S: Storage>() {
-        for hands in [0, 1, 7, 8, 9, 257] {
-            let r = make_ref(3, 3, hands, 0);
-            let span = StorageSpan {
-                start: r.offset,
-                end: r.offset + r.len(),
-                sref_start: 0,
-                sref_end: 1,
-            };
-            let mut reference = S::new(r.offset + r.len() + 3, 1);
-            let mut actual = S::new(r.offset + r.len() + 3, 1);
-            let mut viewed = S::new(r.offset + r.len() + 3, 1);
-            for t in 0..12 {
-                let d = Discounts {
-                    pos: 0.75,
-                    neg: 0.25,
-                    avg: 0.5,
-                    floor_neg: t % 3 == 0,
-                    reset_avg: t % 4 == 0,
-                };
-                let values: Vec<_> = (0..hands)
-                    .map(|h| {
-                        if h % 3 == 0 {
-                            -0.0
-                        } else {
-                            (h % 11) as f32 - 5.0
-                        }
-                    })
-                    .collect();
-                let children: Vec<_> = (0..r.len())
-                    .map(|i| {
-                        if i % 7 == 0 {
-                            -0.0
-                        } else {
-                            ((i * 17 + t) % 61) as f32 - 30.0
-                        }
-                    })
-                    .collect();
-                let deltas: Vec<_> = children
-                    .iter()
-                    .zip(values.iter().cycle())
-                    .map(|(&v, &cfv)| v - cfv)
-                    .collect();
-                reference.update_regrets(r, 0, &deltas, &d);
-                actual.update_regrets_from_values(r, 0, &children, &values, &d);
-                viewed
-                    .view_mut()
-                    .split(&[span])
-                    .pop()
-                    .unwrap()
-                    .update_regrets_from_values(r, 0, &children, &values, &d);
-                assert_eq!(storage_bits(&actual), storage_bits(&reference));
-                assert_eq!(storage_bits(&viewed), storage_bits(&reference));
-            }
-        }
-    }
-
-    #[test]
-    fn regret_deltas_match_materialized_updates_bitwise_in_backends_and_views() {
-        check_regret_deltas::<F32Storage>();
-        check_regret_deltas::<I16Storage>();
-        check_regret_deltas::<MixedStorage>();
-    }
-
     #[test]
     fn i16_fused_updates_preserve_discount_floor_reset_and_headroom() {
         // Exercise full SIMD chunks, tails, empty nodes, rebased offsets,
@@ -638,7 +519,7 @@ mod tests {
                                 &mut arena,
                                 3,
                                 r,
-                                input.iter().copied(),
+                                &input,
                                 &d,
                                 &mut scale,
                                 &mut scratch,

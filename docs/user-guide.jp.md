@@ -179,7 +179,9 @@ evaluateは保存averageを復元し、deviation gainとCI、coverageを再測�
 未訪問columnと量子化前の値は復元できない。小さいgainをexploitability上界やNash保証として読まない。
 coverageは訪問内訳であり、全branchの学習率ではない。
 compareは通常同一gameを要求する。`--cross-game`でもseat mappingとutility単位は一致が必要である。
-P1のsolution同士もcompareできるが、treeと保存node集合の一致が必要である。
+P1のsolution同士もcompareできるが、tree形状と保存node集合の一致が必要である。
+通常はboard・pot・effective stack、seat別comboリスト、各nodeのaction label（size込み）も一致させる。
+rangeの重みやalgorithmだけの違いは許す。意図的に異なるspotを形状だけで対応付ける場合は`--cross-game`を付ける。
 P2のPreflop-only出力は未達で、現行artifactにPostflop blockが含まれうる。
 
 ### P2からP1の入力を作る（derive）

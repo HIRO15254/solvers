@@ -268,10 +268,10 @@ fn t25_batch_accuracy_and_bitwise_grouping() {
 }
 
 #[test]
-fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
+fn weighted_showdown_matches_f64_on_real_boards() {
     let game = game();
     let e = &game.game.evaluator;
-    let mut maxima = [0.0f64; 2];
+    let mut maximum = 0.0f64;
     let mut seed = 0x719c_b123u32;
     // All 48 river tables, both asymmetric seats, dense/sparse/zero reaches.
     for table in &e.rank_tables {
@@ -307,7 +307,6 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
                 ] {
                     let mut out = vec![0.0; e.hands.len(p)];
                     let mut exact = out.clone();
-                    let mut head = out.clone();
                     crate::kernel::showdown_kernel(
                         &table[p],
                         &table[p.opponent()],
@@ -315,14 +314,6 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
                         utilities,
                         &reach,
                         &mut exact,
-                    );
-                    crate::kernel::head_showdown_kernel_relaxed_f32(
-                        &table[p],
-                        &table[p.opponent()],
-                        &e.hands.same[p],
-                        utilities,
-                        &reach,
-                        &mut head,
                     );
                     crate::kernel::showdown_kernel_relaxed_f32(
                         &table[p],
@@ -332,8 +323,7 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
                         &reach,
                         &mut out,
                     );
-                    maxima[0] = maxima[0].max(relative_error(&exact, &out));
-                    maxima[1] = maxima[1].max(relative_error(&head, &out));
+                    maximum = maximum.max(relative_error(&exact, &out));
                     for u_fold in [-1.5, 0.0, 0.75] {
                         let mut expected_fold = vec![0.0; out.len()];
                         crate::kernel::fold_kernel_relaxed_f32(
@@ -363,8 +353,8 @@ fn weighted_showdown_matches_head_f32_and_f64_on_real_boards() {
             }
         }
     }
-    println!("T20 weighted relative infinity errors [f64, HEAD f32]: {maxima:?}");
-    assert!(maxima.iter().all(|&v| v < 1e-5), "{maxima:?}");
+    println!("T20 weighted relative infinity error vs f64: {maximum:e}");
+    assert!(maximum < 1e-5, "{maximum}");
 }
 
 #[test]
@@ -461,6 +451,15 @@ fn siblings_match_separate_calls_cover_live_hands_and_zero_dead_entries() {
                         let mut first = vec![f32::NAN; e.hands.len(p)];
                         let mut second = first.clone();
                         e.eval_cfr_siblings(&ids, p, &reach, &mut [&mut first, &mut second]);
+                        let first_bits = bits(&first);
+                        let second_bits = bits(&second);
+                        // Reuse populated outputs with zero reach, then restore
+                        // the original reach, preserving signed-zero results.
+                        let zero_reach = vec![-0.0; reach.len()];
+                        e.eval_cfr_siblings(&ids, p, &zero_reach, &mut [&mut first, &mut second]);
+                        e.eval_cfr_siblings(&ids, p, &reach, &mut [&mut first, &mut second]);
+                        assert_eq!(bits(&first), first_bits);
+                        assert_eq!(bits(&second), second_bits);
                         let actual = if reversed {
                             [second, first]
                         } else {
