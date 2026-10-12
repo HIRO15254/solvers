@@ -188,6 +188,10 @@ memory preflightもactorのsupport長を数える。global表記・class集計�
 入力の`Settings<StorageChoice>`から具体backendだけを持つ`Settings<Storage>`へ変換し、
 f32が上限に収まればf32、次にi16-f32avgを選ぶ（i16は自動選択しない）。
 validateの正規化は入力choiceを維持し、run用の実効configと成果物は具体storageを保存する。
+木の構築とmemory preflightの計数は最初のchance nodeのdealをRayonで並列に処理する。
+構築はdealごとのforkが作ったmask・transition・rank table・terminal・node tagを直列walkの初出順で再採番して連結するため、
+sref・node idは直列構築と一致し、checkpoint・`.sol`の互換性を保つ。
+保存済みartifactの読込み（`prepare_artifact`）は、埋込みconfigが具体storageを持てばmemory preflightを省く（runの実効configは常に具体storageを持つ）。`auto`だけは通常の`prepare`で解決する。
 `run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。
 callbackのprogress書込み失敗は呼出し元へ返す。CLIがrunを失敗として記録する。
@@ -197,6 +201,8 @@ stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのst
 同じ設定でRiverをlazy re-solveする。`viewer`はhistory replayとsubgame再構成を担当する。
 `queries`はlive inspection、reach・action frequency・class grid・equity・combo queryを返す。
 `views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。
+複数nodeの行と比較はnodeごとにRayonで並列に計算し、node順に連結・集計するため出力は直列計算と一致する。
+reachは読込み時のparent配列から根からのpathを辿る。compareは両artifactのconfig hashが同じなら再構築した木を共有する。
 `report`は全boardを先に検証し、boardごとの数値とOR集約したrule-hit警告を返す。
 これらのmoduleはstdout/stderrやCLI引数を持たない。
 
@@ -251,6 +257,7 @@ solve/resumeの`drive`は、終了時に新たなcheckpointが必要で`S + W + 
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
 戦略はEV passに先立ってstorageからsref昇順に計算し、1 batch分ずつ量子化してchunk writerへ渡す。EV pass後の値slotもsref順にchunk writerへ渡し、block用Vecへ移し替えない。
 writerは約1 MiBのchunkを16個ずつ並列圧縮して順に書き、directoryとheaderを最後に書く。読み手（`SolReader` / `SolStore`）はmetadataとdirectoryだけを開き、照会nodeを含むchunkだけを展開・逆量子化する。
+`SolStore`は複数threadから照会できる。file読込みとcache管理だけを直列化し、chunkの展開と逆量子化は並列に行う。同じchunkを要するthreadは1回の展開を待つ。
 checkpointは再開用、solutionは閲覧用である。保存時の値と未保存Riverの再計算を区別する。
 CLIはtyped viewをJSON/CSVへ符号化する。P1のREPL loop・navigation state・文字表示はCLIにある。
 artifact形式と公開操作の意味は製品規範と[CLI reference](cli-reference.jp.md)を参照する。

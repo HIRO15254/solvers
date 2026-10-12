@@ -1,0 +1,8 @@
+{"label": "f", "case": "c001", "call": "summary", "wall_s": 0.03, "peak_wset_gb": 0.002, "exit": 0, "stdout_sha": "871960d1fe44b846"}
+{"label": "f", "case": "c001", "call": "actions --node root", "wall_s": 0.84, "peak_wset_gb": 0.37, "exit": 0, "stdout_sha": "5374c65a9be6d806"}
+{"label": "f", "case": "c001", "call": "strategy --node root", "wall_s": 0.88, "peak_wset_gb": 0.371, "exit": 0, "stdout_sha": "4497bd9b9e392e78"}
+{"label": "f", "case": "c001", "call": "ev --node root", "wall_s": 0.84, "peak_wset_gb": 0.37, "exit": 0, "stdout_sha": "46b6eac6c309f18b"}
+{"label": "f", "case": "c013", "call": "summary", "wall_s": 0.02, "peak_wset_gb": 0.002, "exit": 0, "stdout_sha": "eb69c688e0ccd266"}
+{"label": "f", "case": "c013", "call": "actions --node root", "wall_s": 5.83, "peak_wset_gb": 2.806, "exit": 0, "stdout_sha": "aebd9b4f68da8325"}
+{"label": "f", "case": "c013", "call": "strategy --node root", "wall_s": 5.79, "peak_wset_gb": 2.805, "exit": 0, "stdout_sha": "f617b1a34454fc0b"}
+{"label": "f", "case": "c013", "call": "ev --node root", "wall_s": 5.85, "peak_wset_gb": 2.81, "exit": 0, "stdout_sha": "ebf3173150823dd6"}

@@ -94,14 +94,32 @@ pub fn reach_at<F>(
     tree: &PublicTree,
     root_ranges: PerPlayer<&[f32]>,
     target: NodeId,
-    mut avg_strategy: F,
+    avg_strategy: F,
 ) -> PerPlayer<Vec<f32>>
 where
     F: FnMut(NodeId, StorageRef, &mut [f32]),
 {
     let parents = parent_array(tree);
-    let path = path_from_root(&parents, target);
+    reach_on_path(
+        tree,
+        root_ranges,
+        &path_from_root(&parents, target),
+        avg_strategy,
+    )
+}
 
+/// [`reach_at`] along a precomputed root-to-target `path` (see
+/// [`path_from_root`]). Callers answering many queries keep one
+/// [`parent_array`] instead of rebuilding it, which is O(nodes), per query.
+pub fn reach_on_path<F>(
+    tree: &PublicTree,
+    root_ranges: PerPlayer<&[f32]>,
+    path: &[NodeId],
+    mut avg_strategy: F,
+) -> PerPlayer<Vec<f32>>
+where
+    F: FnMut(NodeId, StorageRef, &mut [f32]),
+{
     let mut reach: PerPlayer<Vec<f32>> = PerPlayer::new(
         root_ranges[Player::P0].to_vec(),
         root_ranges[Player::P1].to_vec(),

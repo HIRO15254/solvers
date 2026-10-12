@@ -56,30 +56,49 @@ class Solution:
         self.solvers = solvers
         self.sol = sol
 
-    def _run(self, view: str, node: str | None):
+    def _run(self, view: str, nodes: list[str] | None):
         cmd = [self.solvers, "export", str(self.sol), view, "--format", "json"]
-        if node is not None:
-            cmd += ["--node", node if node else "root"]
+        for node in nodes or []:
+            cmd += ["--node", node or "root"]
         return subprocess.run(cmd, capture_output=True, text=True)
 
-    def _export(self, view: str, node: str | None):
-        res = self._run(view, node)
+    def _export(self, view: str, nodes: list[str] | None):
+        res = self._run(view, nodes)
         res.check_returncode()
         return json.loads(res.stdout)
 
     def summary(self):
         return self._export("summary", None)
 
-    def node(self, history: str):
-        """Actions and strategy at a node, or None when the history is not in the tree."""
-        res = self._run("actions", history)
-        if res.returncode != 0 and "unknown action" in res.stderr:
-            return None
-        res.check_returncode()
-        return {"actions": json.loads(res.stdout), "strategy": self._export("strategy", history)}
+    def nodes(self, histories: list[str]) -> dict[str, dict | None]:
+        """Actions and strategy rows per history from one load per view; None when not in the tree.
+
+        A history missing from the tree fails the whole call, so it is dropped and the call
+        repeated; `export` names the failing history in its error.
+        """
+        wanted = list(dict.fromkeys(histories))
+        result: dict[str, dict | None] = {}
+        while wanted:
+            res = self._run("actions", wanted)
+            if res.returncode == 0:
+                break
+            missing = next((h for h in wanted if f'resolving "{h}"' in res.stderr), None)
+            if missing is None or "unknown action" not in res.stderr:
+                res.check_returncode()
+            result[missing] = None
+            wanted.remove(missing)
+        if not wanted:
+            return result
+        rows = {h: {"actions": [], "strategy": []} for h in wanted}
+        for row in json.loads(res.stdout):
+            rows[row["history"]]["actions"].append(row)
+        for row in self._export("strategy", wanted):
+            rows[row["history"]]["strategy"].append(row)
+        result.update(rows)
+        return result
 
     def root_ev(self):
-        return self._export("ev", "")
+        return self._export("ev", ["root"])
 
 
 def compare(case_dir: Path, run_dir: Path, solvers: str, min_reach: float) -> dict:
@@ -119,6 +138,11 @@ def compare(case_dir: Path, run_dir: Path, solvers: str, min_reach: float) -> di
     root_mass = {pos: sum(w for w in gt_root["ranges"][pos]["range"] if w) for pos in (oop, ip)}
     all_in = Decimal(str(summary["effective_stack"]))
     nodes = []
+
+    def compared(rec) -> bool:
+        return not (rec["weight"] < min_reach and rec["weight"] < KEY_NODE_REACH)
+
+    ours_by_history = sol.nodes([our_history(rec["seq"], all_in) for rec in flop["nodes"] if compared(rec)])
     for rec in flop["nodes"]:
         hist = our_history(rec["seq"], all_in)
         actor = rec["actor"]
@@ -126,11 +150,11 @@ def compare(case_dir: Path, run_dir: Path, solvers: str, min_reach: float) -> di
         mass = sum(w for w in reach if w) / root_mass[actor]
         row = {"gtow_seq": rec["seq"] or "root", "history": hist, "actor": actor, "actor_mass": mass,
                "line_reach": rec["weight"]}
-        if rec["weight"] < min_reach and rec["weight"] < KEY_NODE_REACH:
+        if not compared(rec):
             row["status"] = f"skipped: line reach below --min-reach {min_reach}"
             nodes.append(row)
             continue
-        ours = sol.node(hist)
+        ours = ours_by_history[hist]
         if ours is None:
             row["status"] = "not in solver tree"
             nodes.append(row)

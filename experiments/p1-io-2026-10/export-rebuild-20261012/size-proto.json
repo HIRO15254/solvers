@@ -1,0 +1,15 @@
+{
+ "sol": "runs/sol14/v3/c001/solution.sol",
+ "chunks": 2001,
+ "sample_every": 8,
+ "sampled_stored_bytes": 173300195,
+ "sampled_decoded_bytes": 263417560,
+ "variants": {
+  "l1": {"ratio_vs_stored": 1.0, "enc_mb_s": 299.8, "dec_mb_s": 766.1},
+  "l3": {"ratio_vs_stored": 0.9855, "enc_mb_s": 151.2, "dec_mb_s": 697.7},
+  "l1-shuffle": {"ratio_vs_stored": 0.9411, "enc_mb_s": 146.9, "dec_mb_s": 758.6},
+  "l3-shuffle": {"ratio_vs_stored": 0.9182, "enc_mb_s": 99.5, "dec_mb_s": 690.7},
+  "l9-shuffle": {"ratio_vs_stored": 0.8968, "enc_mb_s": 44.2, "dec_mb_s": 728.9},
+  "l19-shuffle": {"ratio_vs_stored": 0.8395, "enc_mb_s": 5.6, "dec_mb_s": 547.5}
+ }
+}

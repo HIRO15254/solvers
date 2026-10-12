@@ -248,13 +248,11 @@ fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
 /// A node whose stored blocks are present, with everything a per-hand view
 /// needs.
 struct StoredNode<'a> {
-    id: NodeId,
     actor: Player,
     info: &'a PostflopNodeInfo,
     num_actions: usize,
     num_hands: usize,
     strategy: Vec<f32>,
-    values: Vec<f32>,
 }
 
 fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> {
@@ -273,18 +271,20 @@ fn stored_node<'a>(loaded: &'a LoadedSol, id: NodeId) -> Result<StoredNode<'a>> 
             info.history
         )
     })?;
-    let values = loaded
-        .stored_values(id)?
-        .expect("a node with a stored strategy has stored values");
     Ok(StoredNode {
-        id,
         actor: node.player,
         info,
         num_actions: sref.num_actions as usize,
         num_hands: sref.num_hands as usize,
         strategy,
-        values,
     })
+}
+
+/// Stored per-hand values of a node [`stored_node`] accepted.
+fn node_values(loaded: &LoadedSol, id: NodeId) -> Result<Vec<f32>> {
+    Ok(loaded
+        .stored_values(id)?
+        .expect("a node with a stored strategy has stored values"))
 }
 
 /// Reach of both players at `id`, for weighting per-node aggregates.
@@ -293,8 +293,11 @@ fn reach_at(loaded: &LoadedSol, id: NodeId) -> Result<PerPlayer<Vec<f32>>> {
     let roots = &loaded.pf_game.game.root_ranges;
     let root_slices = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
     let mut failure = None;
-    let reach = hu_engine::reach_at(tree, root_slices, id, |node_id, _sref, out| {
-        match loaded.stored_strategy(node_id) {
+    let path = hu_engine::path_from_root(&loaded.parents, id);
+    let reach =
+        hu_engine::reach_on_path(tree, root_slices, &path, |node_id, _sref, out| match loaded
+            .stored_strategy(node_id)
+        {
             Ok(Some(avg)) => out.copy_from_slice(&avg),
             Ok(None) => {
                 failure = Some(anyhow!(
@@ -302,8 +305,7 @@ fn reach_at(loaded: &LoadedSol, id: NodeId) -> Result<PerPlayer<Vec<f32>>> {
                 ))
             }
             Err(error) => failure = Some(anyhow!(error)),
-        }
-    });
+        });
     match failure {
         Some(error) => Err(error),
         None => Ok(reach),
@@ -327,9 +329,27 @@ pub struct ActionRow {
     pub frequency: f64,
 }
 
-fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
+/// Builds every node's rows on the Rayon pool and concatenates them in `ids`
+/// order; the first failing node in that order decides the error. Batches
+/// bound the per-node vectors held besides the result.
+fn per_node_rows<R: Send>(
+    ids: &[NodeId],
+    rows_of: impl Fn(NodeId) -> Result<Vec<R>> + Sync,
+) -> Result<Vec<R>> {
+    use rayon::prelude::*;
+    const BATCH: usize = 4096;
     let mut rows = Vec::new();
-    for &id in ids {
+    for batch in ids.chunks(BATCH) {
+        let parts: Vec<Result<Vec<R>>> = batch.par_iter().map(|&id| rows_of(id)).collect();
+        for part in parts {
+            rows.extend(part?);
+        }
+    }
+    Ok(rows)
+}
+
+fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
+    per_node_rows(ids, |id| {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
         let freqs = crate::prepare::action_frequencies(
@@ -338,17 +358,20 @@ fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
             node.num_actions,
             node.num_hands,
         );
-        for (label, frequency) in node.info.actions.iter().zip(freqs) {
-            rows.push(ActionRow {
+        Ok(node
+            .info
+            .actions
+            .iter()
+            .zip(freqs)
+            .map(|(label, frequency)| ActionRow {
                 history: node.info.history.clone(),
                 street: street_name(node.info.street).to_string(),
                 actor: seat_name(node.actor).to_string(),
                 action: label.clone(),
                 frequency,
-            });
-        }
-    }
-    Ok(rows)
+            })
+            .collect())
+    })
 }
 
 // --- strategy ---------------------------------------------------------------
@@ -364,10 +387,10 @@ pub struct StrategyRow {
 }
 
 fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>> {
-    let mut rows = Vec::new();
-    for &id in ids {
+    per_node_rows(ids, |id| {
         let node = stored_node(loaded, id)?;
         let reach = reach_at(loaded, id)?;
+        let mut rows = Vec::new();
         for hand in 0..node.num_hands {
             let weight = reach[node.actor][hand];
             if weight <= 0.0 {
@@ -385,8 +408,8 @@ fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>>
                     .collect(),
             });
         }
-    }
-    Ok(rows)
+        Ok(rows)
+    })
 }
 
 // --- ev ---------------------------------------------------------------------
@@ -404,10 +427,11 @@ pub struct ValueRow {
 }
 
 fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
-    let mut rows = Vec::new();
-    for &id in ids {
+    per_node_rows(ids, |id| {
         let node = stored_node(loaded, id)?;
+        let values = node_values(loaded, id)?;
         let reach = reach_at(loaded, id)?;
+        let mut rows = Vec::new();
         for seat in Player::BOTH {
             let base = match seat {
                 Player::P0 => 0,
@@ -425,13 +449,12 @@ fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
                         loaded.pf_game.game.evaluator.hands.combos(seat)[hand] as usize,
                     ),
                     weight,
-                    ev: node.values[base + hand],
+                    ev: values[base + hand],
                 });
             }
         }
-        let _ = node.id;
-    }
-    Ok(rows)
+        Ok(rows)
+    })
 }
 
 // --- range ------------------------------------------------------------------
@@ -475,7 +498,7 @@ pub fn compare(
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<ComparisonReport> {
     let left = load_sol(left_path, 0, None, diagnostics)?;
-    let right = load_sol(right_path, 0, None, diagnostics)?;
+    let right = crate::artifact::load_sol_sharing(right_path, &left, diagnostics)?;
     let left_ids = selected_action_nodes(&left, &Selection::All);
     let right_ids = selected_action_nodes(&right, &Selection::All);
     if left.pf_game.game.tree.nodes.len() != right.pf_game.game.tree.nodes.len()
@@ -501,25 +524,18 @@ pub fn compare(
         );
     }
 
-    let mut nodes = 0usize;
-    let mut strategy_total = 0.0f64;
-    let mut strategy_max = 0.0f64;
-    let mut worst_strategy = String::new();
-    let mut ev_total = 0.0f64;
-    let mut ev_max = 0.0f64;
-    let mut worst_ev = String::new();
-
-    for id in left_ids {
+    // Per-node deltas run in parallel; the fold below stays in node order so
+    // sums and first-maximum ties match a serial walk.
+    let deltas = per_node_rows(&left_ids, |id| {
         let a = stored_node(&left, id)?;
         let b = stored_node(&right, id)?;
-        if a.strategy.len() != b.strategy.len() || a.values.len() != b.values.len() {
+        let (a_values, b_values) = (node_values(&left, id)?, node_values(&right, id)?);
+        if a.strategy.len() != b.strategy.len() || a_values.len() != b_values.len() {
             bail!(
                 "node {:?} has different shapes in the two artifacts",
                 a.info.history
             );
         }
-        nodes += 1;
-
         // Per-hand L1 over the action distribution, averaged over hands:
         // the usual "how differently does this node play" number, bounded
         // by 2 and independent of how many actions the node offers.
@@ -531,22 +547,31 @@ pub fn compare(
             }
         }
         let node_l1 = node_l1 / a.num_hands.max(1) as f64;
+        let node_ev = a_values
+            .iter()
+            .zip(&b_values)
+            .map(|(x, y)| (x - y).abs() as f64)
+            .fold(0.0, f64::max);
+        Ok(vec![(id, node_l1, node_ev)])
+    })?;
+
+    let nodes = deltas.len();
+    let mut strategy_total = 0.0f64;
+    let mut strategy_max = 0.0f64;
+    let mut worst_strategy = String::new();
+    let mut ev_total = 0.0f64;
+    let mut ev_max = 0.0f64;
+    let mut worst_ev = String::new();
+    for (id, node_l1, node_ev) in deltas {
         strategy_total += node_l1;
         if node_l1 > strategy_max {
             strategy_max = node_l1;
-            worst_strategy = a.info.history.clone();
+            worst_strategy = info_of(&left, id).history.clone();
         }
-
-        let node_ev = a
-            .values
-            .iter()
-            .zip(&b.values)
-            .map(|(x, y)| (x - y).abs() as f64)
-            .fold(0.0, f64::max);
         ev_total += node_ev;
         if node_ev > ev_max {
             ev_max = node_ev;
-            worst_ev = a.info.history.clone();
+            worst_ev = info_of(&left, id).history.clone();
         }
     }
 

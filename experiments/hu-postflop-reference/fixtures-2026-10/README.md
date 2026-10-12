@@ -85,6 +85,10 @@ along the line). The frequency and EV limits are unchanged.
 `--min-reach` skips diagnostic nodes below that line reach; key nodes are always compared.
 c013 used `--min-reach 0.01` (7 of 46 nodes) because one export of its 9.7M-node solution
 takes about 140 s; the other cases compared every node.
+Since SOL-14 (2026-10-12) `compare.py` reads every compared node with one repeated-`--node`
+export per view, so a case costs four exports regardless of the node count (c013 with
+`--min-reach 0.01`: 115 s on a `.sol` v3, which needs a re-solve of the stored runs). On
+c001 and c013 the batched script reproduced `comparison.json` except `summary.wall_secs`.
 
 ## Results (2026-10-11)
 

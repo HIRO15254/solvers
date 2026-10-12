@@ -28,6 +28,7 @@ use parking_lot::Mutex;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -308,6 +309,22 @@ struct Directory {
     values: Vec<ChunkEntry>,
 }
 
+impl Directory {
+    fn entries(&self, section: Section) -> &[ChunkEntry] {
+        match section {
+            Section::Strategy => &self.strategy,
+            Section::Values => &self.values,
+        }
+    }
+
+    /// Index of the chunk whose `sref` range covers `sref`.
+    fn chunk_of(&self, section: Section, sref: u32) -> Option<usize> {
+        let entries = self.entries(section);
+        let index = entries.partition_point(|e| e.last_sref < sref);
+        (index < entries.len() && entries[index].first_sref <= sref).then_some(index)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Section {
     Strategy,
@@ -503,34 +520,13 @@ impl SolReader {
     }
 
     fn entries(&self, section: Section) -> &[ChunkEntry] {
-        match section {
-            Section::Strategy => &self.directory.strategy,
-            Section::Values => &self.directory.values,
-        }
-    }
-
-    /// Index of the chunk whose `sref` range covers `sref`.
-    fn chunk_of(&self, section: Section, sref: u32) -> Option<usize> {
-        let entries = self.entries(section);
-        let index = entries.partition_point(|e| e.last_sref < sref);
-        (index < entries.len() && entries[index].first_sref <= sref).then_some(index)
+        self.directory.entries(section)
     }
 
     fn read_chunk(&mut self, section: Section, index: usize) -> Result<Chunk, SolError> {
         let entry = self.entries(section)[index];
         let compressed = read_exact_at(&mut self.file, entry.offset, entry.compressed_len)?;
-        if *blake3::hash(&compressed).as_bytes() != entry.checksum {
-            return Err(SolError::Checksum("chunk"));
-        }
-        let bytes = decompress(
-            &compressed,
-            entry.decoded_len as usize,
-            "chunk does not decompress",
-        )?;
-        if bytes.len() as u64 != entry.decoded_len {
-            return Err(SolError::Malformed("chunk decoded length differs"));
-        }
-        Chunk::parse(section, &entry, bytes)
+        decode_chunk(section, &entry, &compressed)
     }
 
     /// Decodes every chunk in order, strategies first, then values.
@@ -596,12 +592,31 @@ impl SolReader {
 
     pub fn into_store(self) -> SolStore {
         SolStore {
-            state: Mutex::new(StoreState {
-                reader: self,
-                cache: Vec::with_capacity(CACHED_CHUNKS),
-            }),
+            file: Mutex::new(self.file),
+            directory: self.directory,
+            cache: Mutex::new(Vec::with_capacity(CACHED_CHUNKS)),
         }
     }
+}
+
+/// Verifies and decodes one chunk frame read from `entry.offset`.
+fn decode_chunk(
+    section: Section,
+    entry: &ChunkEntry,
+    compressed: &[u8],
+) -> Result<Chunk, SolError> {
+    if *blake3::hash(compressed).as_bytes() != entry.checksum {
+        return Err(SolError::Checksum("chunk"));
+    }
+    let bytes = decompress(
+        compressed,
+        entry.decoded_len as usize,
+        "chunk does not decompress",
+    )?;
+    if bytes.len() as u64 != entry.decoded_len {
+        return Err(SolError::Malformed("chunk decoded length differs"));
+    }
+    Chunk::parse(section, entry, bytes)
 }
 
 fn read_exact_at(file: &mut File, offset: u64, len: u64) -> Result<Vec<u8>, SolError> {
@@ -613,46 +628,63 @@ fn read_exact_at(file: &mut File, offset: u64, len: u64) -> Result<Vec<u8>, SolE
 }
 
 /// Quantized blocks of a `.sol` file, decoded chunk by chunk as nodes are
-/// queried and dequantized per query. Shared by reference; reads serialize
-/// on an internal lock.
+/// queried and dequantized per query. Shared by reference and safe to query
+/// from many threads: only file reads and cache bookkeeping serialize; chunk
+/// decoding and dequantization run concurrently, and threads that need the
+/// same chunk wait for one decode instead of repeating it.
 pub struct SolStore {
-    state: Mutex<StoreState>,
+    file: Mutex<File>,
+    directory: Directory,
+    /// Most recently used last.
+    cache: Mutex<Vec<(Section, usize, Arc<ChunkSlot>)>>,
 }
 
-struct StoreState {
-    reader: SolReader,
-    /// Most recently used last.
-    cache: Vec<(Section, usize, Chunk)>,
-}
+/// One cached chunk; empty until its first decode succeeds.
+type ChunkSlot = Mutex<Option<Arc<Chunk>>>;
 
 impl SolStore {
+    fn chunk(&self, section: Section, index: usize) -> Result<Arc<Chunk>, SolError> {
+        let slot = {
+            let mut cache = self.cache.lock();
+            let slot = match cache
+                .iter()
+                .position(|(s, i, _)| *s == section && *i == index)
+            {
+                Some(position) => cache.remove(position).2,
+                None => {
+                    if cache.len() == CACHED_CHUNKS {
+                        cache.remove(0);
+                    }
+                    Arc::default()
+                }
+            };
+            cache.push((section, index, Arc::clone(&slot)));
+            slot
+        };
+        let mut decoded = slot.lock();
+        if let Some(chunk) = &*decoded {
+            return Ok(Arc::clone(chunk));
+        }
+        let entry = self.directory.entries(section)[index];
+        let compressed = read_exact_at(&mut self.file.lock(), entry.offset, entry.compressed_len)?;
+        let chunk = Arc::new(decode_chunk(section, &entry, &compressed)?);
+        *decoded = Some(Arc::clone(&chunk));
+        Ok(chunk)
+    }
+
     fn with_block<T>(
         &self,
         section: Section,
         sref: u32,
         read: impl FnOnce(f32, &[u8]) -> Result<T, SolError>,
     ) -> Result<Option<T>, SolError> {
-        let mut state = self.state.lock();
-        let Some(index) = state.reader.chunk_of(section, sref) else {
+        let Some(index) = self.directory.chunk_of(section, sref) else {
             return Ok(None);
         };
-        let position = state
-            .cache
-            .iter()
-            .position(|(s, i, _)| *s == section && *i == index);
-        let chunk = match position {
-            Some(position) => state.cache.remove(position).2,
-            None => state.reader.read_chunk(section, index)?,
-        };
-        let result = chunk
+        self.chunk(section, index)?
             .block(sref)
             .map(|(scale, bytes)| read(scale, bytes))
-            .transpose();
-        if state.cache.len() == CACHED_CHUNKS {
-            state.cache.remove(0);
-        }
-        state.cache.push((section, index, chunk));
-        result
+            .transpose()
     }
 
     /// Dequantized `num_actions * num_hands` action-major strategy, or `None`

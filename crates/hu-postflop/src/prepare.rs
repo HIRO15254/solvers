@@ -36,6 +36,45 @@ pub fn lower_config(raw: &str, path: &Path) -> Result<crate::PostflopConfig> {
     Ok(input::lower(&document.spot, &settings)?)
 }
 
+/// A saved artifact's embedded config, parsed and lowered with its payoff
+/// models. Run artifacts embed the effective config, which names a concrete
+/// storage; that run already passed preflight, so [`prepare_artifact`] does
+/// not measure the tree again.
+pub(crate) struct ArtifactInput {
+    pub spot: spot::Spot,
+    pub settings: Settings<input::Storage>,
+    pub config: crate::PostflopConfig,
+    pub payoff: NlhPayoff,
+}
+
+/// Prepares an embedded config. Only `storage = "auto"`, which needs the
+/// tree measurement to resolve, goes through the full [`prepare`].
+pub(crate) fn prepare_artifact(raw: &str, path: &Path) -> Result<ArtifactInput> {
+    let (document, settings) = parse_p1(raw, path)?;
+    let storage = match settings.solver.storage {
+        input::StorageChoice::F32 => input::Storage::F32,
+        input::StorageChoice::I16 => input::Storage::I16,
+        input::StorageChoice::I16F32Avg => input::Storage::I16F32Avg,
+        input::StorageChoice::Auto => {
+            let p = prepare(raw, path)?;
+            return Ok(ArtifactInput {
+                spot: p.document.spot,
+                settings: p.settings,
+                config: p.config,
+                payoff: p.payoff,
+            });
+        }
+    };
+    let config = input::lower(&document.spot, &settings)?;
+    let payoff = NlhPayoff::new(&document.spot)?;
+    Ok(ArtifactInput {
+        spot: document.spot,
+        settings: settings.with_storage(storage),
+        config,
+        payoff,
+    })
+}
+
 /// Parse and lower a P1 input, measuring its tree and resolving the memory/stop limits.
 pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     let (document, settings) = parse_p1(raw, path)?;
@@ -215,7 +254,9 @@ pub fn bb(amount: u64) -> String {
 }
 
 pub(crate) fn display_game(game: &mut crate::PostflopGame) {
-    for info in &mut game.node_info {
+    use rayon::prelude::*;
+    // Independent per node; large Flop trees hold millions of entries.
+    game.node_info.par_iter_mut().for_each(|info| {
         info.history = convert_history(&info.history, false);
         for label in &mut info.actions {
             for prefix in ["bet ", "raise to "] {
@@ -225,7 +266,7 @@ pub(crate) fn display_game(game: &mut crate::PostflopGame) {
                 }
             }
         }
-    }
+    });
 }
 
 pub(crate) fn convert_history(history: &str, to_internal: bool) -> String {

@@ -35,7 +35,7 @@ pub(crate) struct Hand {
     pub local: u16,
     pub cards: [u8; 2],
 }
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub(crate) struct RankedHands {
     pub hands: Vec<Hand>,
     // Rank and exclusive end offset; within a group, global combo order.

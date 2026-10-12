@@ -265,6 +265,7 @@ P1はtree形状と保存node集合、通常はboard・pot・effective stackの�
 `--cross-game`は後者だけを外す。`mean_strategy_l1` / `max_strategy_l1`は戦略差、
 `mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
 EV差はcashでBB、ICMで賞金単位である。
+P1は両solutionの埋込みconfigが同一（config hashが一致）なら木を1回だけ再構築して共有し、異なれば2回再構築する。
 P2は通常game fingerprintの一致を要求する。`--cross-game`でもseat mappingとutility単位の一致は必要である。
 
 ## `solvers evaluate`

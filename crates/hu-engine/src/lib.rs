@@ -21,6 +21,7 @@ mod tree;
 pub use mccfr::{McCfg, McSolver, McSolverState};
 pub use reach::{
     MismatchReason, SubtreeMismatch, pair_subtrees, parent_array, path_from_root, reach_at,
+    reach_on_path,
 };
 pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, linear_cfr};
 pub use scratch::Scratch;

@@ -1412,7 +1412,7 @@ pub fn try_build_postflop_game(
     pipeline: PayoffPipeline<'_>,
 ) -> Result<PostflopGame, TreeBuildError> {
     try_memory_usage(config)?;
-    build_checked(config, pipeline)
+    build_checked(config, pipeline, true)
 }
 
 /// Where one [`NodeAction`] leads from `state`. Carries the full state
@@ -1507,15 +1507,21 @@ struct Builder<'a> {
     /// Accumulated by every [`node_actions`] call this walk makes -- see
     /// [`RuleHits`].
     hits: RuleHits,
+    /// Build the deals of the first chance node level in parallel (see
+    /// [`Self::deal_chance`]); forked builders walk their subtree serially.
+    parallel: bool,
 }
 
 /// Builds a postflop subgame through the payoff pipeline.
 pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>) -> PostflopGame {
-    build_checked(config, pipeline).expect("postflop builder invariants")
+    build_checked(config, pipeline, true).expect("postflop builder invariants")
 }
+/// `parallel` builds the first chance level's deals concurrently; the
+/// result is identical either way.
 fn build_checked(
     config: &PostflopConfig,
     pipeline: PayoffPipeline<'_>,
+    parallel: bool,
 ) -> Result<PostflopGame, TreeBuildError> {
     let board_len = config.board.len();
     assert!(
@@ -1552,6 +1558,7 @@ fn build_checked(
             ..PostflopNodeInfo::default()
         }],
         hits: rule_hits_for(config),
+        parallel,
     };
     let root = builder.betting(LineState {
         street: start_street,
@@ -1795,6 +1802,11 @@ impl Builder<'_> {
         }
     }
 
+    /// Deals the next street. Sibling deals are independent subtrees: on the
+    /// first chance level each is built by a forked builder in parallel and
+    /// absorbed in deal order. Every interned id (mask, transition, rank
+    /// table, terminal, node tag) is assigned in the order a serial walk
+    /// first meets it, so the result is identical to the serial build.
     fn deal_chance(&mut self, state: LineState) -> TempNode {
         debug_assert_eq!(
             state.contrib[Player::P0],
@@ -1802,76 +1814,248 @@ impl Builder<'_> {
             "a chance node is only ever reached right after a call or a check-check, \
              both of which leave contributions equal"
         );
-        let next = next_street(state.street);
-        let denom = deal_denom(state.street);
         let groups = chance_groups(&state.board, self.config.iso_merging, &self.sym);
+        let deals = if self.parallel {
+            use rayon::prelude::*;
+            let built: Vec<_> = groups
+                .par_iter()
+                .map(|group| {
+                    let mut fork = self.fork();
+                    let deal = fork.deal(&state, group);
+                    (fork, deal)
+                })
+                .collect();
+            built
+                .into_iter()
+                .map(|(fork, deal)| self.absorb(fork, deal))
+                .collect()
+        } else {
+            groups
+                .iter()
+                .map(|group| self.deal(&state, group))
+                .collect()
+        };
+        TempNode::Chance { deals, tag: 0 }
+    }
 
-        let mut deals: Vec<(f32, PerPlayer<ReachMap>, TempNode)> = Vec::with_capacity(groups.len());
-        for group in &groups {
-            let weight = group.members.len() as f32 / denom;
-            // Singleton classes stay on the cheap shared card-removal mask.
-            // Merged classes must NOT be approximated as `k x rep-masked
-            // branch`: each member removes different combos and values
-            // relabel across members, so per-hand reaches and CFVs would be
-            // distorted (only range-aggregate values survive by symmetry).
-            // Instead a quotient transition averages the members' relabeled
-            // reaches (entry weight 1/k) — the rep branch then sees exactly
-            // one member's reach and solves identically to any original
-            // member branch — while the class multiplicity k stays in the
-            // deal weight, so the backward map reproduces `sum_i v_ci`
-            // exactly, per hand.
-            let maps = if group.members.len() == 1 {
-                let mask_id = self.card_mask(group.representative);
-                PerPlayer::new(
-                    ReachMap::Mask(mask_id[Player::P0]),
-                    ReachMap::Mask(mask_id[Player::P1]),
-                )
-            } else {
-                let id = self.quotient_transition(&state.board, group);
-                PerPlayer::new(
-                    ReachMap::Transition(id[Player::P0]),
-                    ReachMap::Transition(id[Player::P1]),
-                )
+    fn deal(
+        &mut self,
+        state: &LineState,
+        group: &DealGroup,
+    ) -> (f32, PerPlayer<ReachMap>, TempNode) {
+        let next = next_street(state.street);
+        let weight = group.members.len() as f32 / deal_denom(state.street);
+        // Singleton classes stay on the cheap shared card-removal mask.
+        // Merged classes must NOT be approximated as `k x rep-masked
+        // branch`: each member removes different combos and values
+        // relabel across members, so per-hand reaches and CFVs would be
+        // distorted (only range-aggregate values survive by symmetry).
+        // Instead a quotient transition averages the members' relabeled
+        // reaches (entry weight 1/k) — the rep branch then sees exactly
+        // one member's reach and solves identically to any original
+        // member branch — while the class multiplicity k stays in the
+        // deal weight, so the backward map reproduces `sum_i v_ci`
+        // exactly, per hand.
+        let maps = if group.members.len() == 1 {
+            let mask_id = self.card_mask(group.representative);
+            PerPlayer::new(
+                ReachMap::Mask(mask_id[Player::P0]),
+                ReachMap::Mask(mask_id[Player::P1]),
+            )
+        } else {
+            let id = self.quotient_transition(&state.board, group);
+            PerPlayer::new(
+                ReachMap::Transition(id[Player::P0]),
+                ReachMap::Transition(id[Player::P1]),
+            )
+        };
+
+        let mut board = state.board.clone();
+        board.push(group.representative);
+        let board_facts = BoardFacts::new(&board);
+        let history = self.extend_history(&state.history, || format!("[{}]", group.representative));
+
+        let child_state = LineState {
+            street: next,
+            board_facts,
+            board,
+            to_act: Player::P0,
+            contrib: state.contrib,
+            outstanding: Chips::ZERO,
+            raises_used: 0,
+            first_checked: false,
+            all_in: state.all_in,
+            history,
+            // A chance node is only ever reached right after a call or a
+            // check-check, both of which leave `contrib[P0] ==
+            // contrib[P1]` — that shared value is the new street's
+            // baseline. `state.street_aggressor` (this street's bettor,
+            // or `None` on a check-check) becomes the next street's
+            // `previous_aggressor`, the donk-menu signal.
+            street_start: state.contrib[Player::P0],
+            last_full_raise: Chips::ZERO,
+            previous_aggressor: state.street_aggressor,
+            street_aggressor: None,
+        };
+
+        let child = if state.all_in {
+            self.after_deal(child_state)
+        } else {
+            self.betting(child_state)
+        };
+        (weight, maps, child)
+    }
+
+    /// An empty serial builder for one subtree, sharing this one's inputs.
+    fn fork(&self) -> Self {
+        Builder {
+            hands: self.hands.clone(),
+            error: None,
+            config: self.config,
+            pipeline: PayoffPipeline {
+                rake: self.pipeline.rake,
+                utility: self.pipeline.utility,
+            },
+            sym: self.sym.clone(),
+            terminals: Vec::new(),
+            rank_tables: Vec::new(),
+            rank_table_ids: BTreeMap::new(),
+            masks: Vec::new(),
+            mask_cards: Vec::new(),
+            card_masks: [None; 52],
+            transitions: Vec::new(),
+            transition_ids: BTreeMap::new(),
+            node_info: Vec::new(),
+            hits: rule_hits_for(self.config),
+            parallel: false,
+        }
+    }
+
+    /// Appends a forked builder's output after everything built so far,
+    /// re-interning its masks, transitions and rank tables in the order the
+    /// fork created them and shifting its terminal ids and node tags.
+    fn absorb(
+        &mut self,
+        fork: Builder<'_>,
+        (weight, mut maps, mut node): (f32, PerPlayer<ReachMap>, TempNode),
+    ) -> (f32, PerPlayer<ReachMap>, TempNode) {
+        let Builder {
+            error,
+            terminals,
+            rank_tables,
+            rank_table_ids,
+            masks,
+            mask_cards,
+            transitions,
+            transition_ids,
+            node_info,
+            hits,
+            ..
+        } = fork;
+        if error.is_some() {
+            self.error = error;
+        }
+        crate::prepare::merge_rule_hits(&mut self.hits, &hits);
+
+        // Masks come in (P0, P1) pairs per card.
+        let mut mask_map = Vec::with_capacity(masks.len());
+        let mut masks = masks.into_iter();
+        for card in mask_cards.into_iter().step_by(2) {
+            let pair = [
+                masks.next().expect("mask pair"),
+                masks.next().expect("mask pair"),
+            ];
+            let ids = match self.card_masks[card.index()] {
+                Some(ids) => ids,
+                None => {
+                    let ids = PerPlayer::new(self.masks.len() as u32, self.masks.len() as u32 + 1);
+                    for mask in pair {
+                        self.masks.push(mask);
+                        self.mask_cards.push(card);
+                    }
+                    self.card_masks[card.index()] = Some(ids);
+                    ids
+                }
             };
-
-            let mut board = state.board.clone();
-            board.push(group.representative);
-            let board_facts = BoardFacts::new(&board);
-            let history =
-                self.extend_history(&state.history, || format!("[{}]", group.representative));
-
-            let child_state = LineState {
-                street: next,
-                board_facts,
-                board,
-                to_act: Player::P0,
-                contrib: state.contrib,
-                outstanding: Chips::ZERO,
-                raises_used: 0,
-                first_checked: false,
-                all_in: state.all_in,
-                history,
-                // A chance node is only ever reached right after a call or a
-                // check-check, both of which leave `contrib[P0] ==
-                // contrib[P1]` — that shared value is the new street's
-                // baseline. `state.street_aggressor` (this street's bettor,
-                // or `None` on a check-check) becomes the next street's
-                // `previous_aggressor`, the donk-menu signal.
-                street_start: state.contrib[Player::P0],
-                last_full_raise: Chips::ZERO,
-                previous_aggressor: state.street_aggressor,
-                street_aggressor: None,
-            };
-
-            let child = if state.all_in {
-                self.after_deal(child_state)
-            } else {
-                self.betting(child_state)
-            };
-            deals.push((weight, maps, child));
+            mask_map.extend([ids[Player::P0], ids[Player::P1]]);
         }
 
-        TempNode::Chance { deals, tag: 0 }
+        // Transitions also come in (P0, P1) pairs, one per interned key.
+        let mut keys: Vec<_> = transition_ids.into_iter().collect();
+        keys.sort_unstable_by_key(|(_, ids)| ids[Player::P0]);
+        let mut transition_map = Vec::with_capacity(transitions.len());
+        let mut transitions = transitions.into_iter();
+        for (key, _) in keys {
+            let pair = [
+                transitions.next().expect("transition pair"),
+                transitions.next().expect("transition pair"),
+            ];
+            let ids = match self.transition_ids.get(&key) {
+                Some(&ids) => ids,
+                None => {
+                    let base = self.transitions.len() as u32;
+                    self.transitions.extend(pair);
+                    let ids = PerPlayer::new(base, base + 1);
+                    self.transition_ids.insert(key, ids);
+                    ids
+                }
+            };
+            transition_map.extend([ids[Player::P0], ids[Player::P1]]);
+        }
+
+        let mut boards: Vec<_> = rank_table_ids.into_iter().collect();
+        boards.sort_unstable_by_key(|&(_, id)| id);
+        let mut table_map = Vec::with_capacity(rank_tables.len());
+        for ((key, _), table) in boards.into_iter().zip(rank_tables) {
+            let id = *self.rank_table_ids.entry(key).or_insert_with(|| {
+                self.rank_tables.push(table);
+                self.rank_tables.len() as u32 - 1
+            });
+            table_map.push(id);
+        }
+
+        let terminal_offset = self.terminals.len() as u32;
+        self.terminals
+            .extend(terminals.into_iter().map(|mut terminal| {
+                if terminal.table != u32::MAX {
+                    terminal.table = table_map[terminal.table as usize];
+                }
+                terminal
+            }));
+        let tag_offset = if self.config.track_node_info {
+            self.node_info.len() as u32
+        } else {
+            0
+        };
+        self.node_info.extend(node_info);
+
+        let remap = |map: &mut ReachMap| match map {
+            ReachMap::Mask(id) => *id = mask_map[*id as usize],
+            ReachMap::Transition(id) => *id = transition_map[*id as usize],
+            ReachMap::Identity => {}
+        };
+        for p in Player::BOTH {
+            remap(&mut maps[p]);
+        }
+        let mut stack = vec![&mut node];
+        while let Some(node) = stack.pop() {
+            match node {
+                TempNode::Action { children, tag, .. } => {
+                    *tag += tag_offset;
+                    stack.extend(children.iter_mut());
+                }
+                TempNode::Chance { deals, .. } => {
+                    for (_, maps, child) in deals.iter_mut() {
+                        for p in Player::BOTH {
+                            remap(&mut maps[p]);
+                        }
+                        stack.push(child);
+                    }
+                }
+                TempNode::Terminal { id, .. } => *id += terminal_offset,
+            }
+        }
+        (weight, maps, node)
     }
 
     /// After a chance deal on an all-in line: no more betting, just the
@@ -2134,6 +2318,12 @@ impl MemoryEstimate {
 
 /// Counting preflight with a typed error for a menu emptied by common rules.
 pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
+    count_tree(config, true)
+}
+
+/// `parallel` counts the first chance level's deals concurrently; the
+/// estimate is identical either way.
+fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate, TreeBuildError> {
     let board_len = config.board.len();
     let start_street = match board_len {
         3 => Street::Flop,
@@ -2155,6 +2345,7 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
         rank_table_keys: BTreeSet::new(),
         hits: rule_hits_for(config),
         error: None,
+        parallel,
     };
     counting.betting(LineState {
         street: start_street,
@@ -2227,6 +2418,8 @@ struct Counting<'a> {
     /// Accumulated by every [`node_actions`] call this dry run makes -- see
     /// [`RuleHits`].
     hits: RuleHits,
+    /// Count the first chance level's deals in parallel, like [`Builder`].
+    parallel: bool,
 }
 
 impl Counting<'_> {
@@ -2275,34 +2468,86 @@ impl Counting<'_> {
 
     fn deal_chance(&mut self, state: LineState) {
         self.nodes += 1;
-        let next = next_street(state.street);
         let groups = chance_groups(&state.board, self.config.iso_merging, &self.sym);
-        for group in &groups {
-            let mut board = state.board.clone();
-            board.push(group.representative);
-            let board_facts = BoardFacts::new(&board);
-            let child_state = LineState {
-                street: next,
-                board_facts,
-                board,
-                to_act: Player::P0,
-                contrib: state.contrib,
-                outstanding: Chips::ZERO,
-                raises_used: 0,
-                first_checked: false,
-                all_in: state.all_in,
-                history: String::new(),
-                street_start: state.contrib[Player::P0],
-                last_full_raise: Chips::ZERO,
-                previous_aggressor: state.street_aggressor,
-                street_aggressor: None,
-            };
-            if state.all_in {
-                self.after_deal(child_state);
-            } else {
-                self.betting(child_state);
+        if self.parallel {
+            use rayon::prelude::*;
+            let forks: Vec<_> = groups
+                .par_iter()
+                .map(|group| {
+                    let mut fork = self.fork();
+                    fork.deal(&state, group);
+                    fork
+                })
+                .collect();
+            for fork in forks {
+                self.absorb(fork);
+            }
+        } else {
+            for group in &groups {
+                self.deal(&state, group);
             }
         }
+    }
+
+    fn deal(&mut self, state: &LineState, group: &DealGroup) {
+        let mut board = state.board.clone();
+        board.push(group.representative);
+        let board_facts = BoardFacts::new(&board);
+        let child_state = LineState {
+            street: next_street(state.street),
+            board_facts,
+            board,
+            to_act: Player::P0,
+            contrib: state.contrib,
+            outstanding: Chips::ZERO,
+            raises_used: 0,
+            first_checked: false,
+            all_in: state.all_in,
+            history: String::new(),
+            street_start: state.contrib[Player::P0],
+            last_full_raise: Chips::ZERO,
+            previous_aggressor: state.street_aggressor,
+            street_aggressor: None,
+        };
+        if state.all_in {
+            self.after_deal(child_state);
+        } else {
+            self.betting(child_state);
+        }
+    }
+
+    fn fork(&self) -> Self {
+        Counting {
+            hands: self.hands.clone(),
+            error: None,
+            config: self.config,
+            sym: self.sym.clone(),
+            elements: 0,
+            max_strategy_elements: 0,
+            min_strategy_elements: u64::MAX,
+            nodes: 0,
+            terminals: 0,
+            action_nodes: 0,
+            rank_table_keys: BTreeSet::new(),
+            hits: rule_hits_for(self.config),
+            parallel: false,
+        }
+    }
+
+    /// Adds a fork's counts. The serial walk stops at its first error, so
+    /// the earliest fork's error wins and the counts no longer matter.
+    fn absorb(&mut self, fork: Counting<'_>) {
+        if self.error.is_none() {
+            self.error = fork.error;
+        }
+        self.elements += fork.elements;
+        self.max_strategy_elements = self.max_strategy_elements.max(fork.max_strategy_elements);
+        self.min_strategy_elements = self.min_strategy_elements.min(fork.min_strategy_elements);
+        self.nodes += fork.nodes;
+        self.terminals += fork.terminals;
+        self.action_nodes += fork.action_nodes;
+        self.rank_table_keys.extend(fork.rank_table_keys);
+        crate::prepare::merge_rule_hits(&mut self.hits, &fork.hits);
     }
 
     fn after_deal(&mut self, state: LineState) {
@@ -2411,6 +2656,105 @@ mod tests {
         assert!(
             merged_classes > 0,
             "the sweep saw no merged class, so it proved nothing about merging"
+        );
+    }
+
+    /// The parallel build forks a builder per first-level deal and re-interns
+    /// every mask, transition, rank table, terminal and node tag. Any
+    /// ordering slip would renumber storage refs, so saved `.sol` blocks
+    /// would land on the wrong nodes; the serial walk is the reference.
+    #[test]
+    fn parallel_build_matches_serial_build() {
+        use crate::game::{ChipEv, NoRake};
+        let street = StreetTree {
+            include_allin: true,
+            max_aggressive_actions: 1,
+            ..Default::default()
+        };
+        let mut merged = false;
+        for board_text in ["As Ks Qs", "2c 2d 9d", "Th 9h 8h 2c"] {
+            let config = PostflopConfig {
+                board: cards(board_text),
+                // Suit-symmetric ranges so deals merge into transitions.
+                ranges: PerPlayer::new(
+                    "AA,KQs,76s,T9s".parse::<Range>().unwrap(),
+                    "JTs,99,AKo,98s".parse::<Range>().unwrap(),
+                ),
+                pot: Chips(6),
+                effective_stack: Chips(9),
+                streets: PerStreet {
+                    flop: street.clone(),
+                    turn: street.clone(),
+                    river: street.clone(),
+                },
+                ..Default::default()
+            };
+            let build = |parallel| {
+                let pipeline = PayoffPipeline {
+                    rake: &NoRake,
+                    utility: &ChipEv,
+                };
+                build_checked(&config, pipeline, parallel).unwrap()
+            };
+            assert_eq!(
+                count_tree(&config, false).unwrap(),
+                count_tree(&config, true).unwrap(),
+                "{board_text}"
+            );
+            let (serial, parallel) = (build(false), build(true));
+            let (a, b) = (&serial.game.tree, &parallel.game.tree);
+            merged |= !a.transitions.is_empty();
+            assert_eq!(
+                format!("{:?}", a.nodes),
+                format!("{:?}", b.nodes),
+                "{board_text}"
+            );
+            assert_eq!(
+                format!("{:?}", a.deals),
+                format!("{:?}", b.deals),
+                "{board_text}"
+            );
+            assert_eq!(a.tags, b.tags, "{board_text}");
+            assert_eq!(a.masks, b.masks, "{board_text}");
+            assert_eq!(
+                format!("{:?}", a.transitions),
+                format!("{:?}", b.transitions),
+                "{board_text}"
+            );
+            assert_eq!(
+                format!("{:?}", serial.node_info),
+                format!("{:?}", parallel.node_info),
+                "{board_text}"
+            );
+            assert_eq!(serial.rule_hits, parallel.rule_hits, "{board_text}");
+            let (x, y) = (&serial.game.evaluator, &parallel.game.evaluator);
+            assert_eq!(x.mask_cards, y.mask_cards, "{board_text}");
+            assert_eq!(x.batch_tables, y.batch_tables, "{board_text}");
+            assert_eq!(x.terminals.len(), y.terminals.len(), "{board_text}");
+            for (s, p) in x.terminals.iter().zip(&y.terminals) {
+                assert_eq!(
+                    (
+                        s.board_mask,
+                        s.table,
+                        format!("{:?}{:?}", s.kind, s.payoffs)
+                    ),
+                    (
+                        p.board_mask,
+                        p.table,
+                        format!("{:?}{:?}", p.kind, p.payoffs)
+                    ),
+                    "{board_text}"
+                );
+            }
+            assert_eq!(
+                format!("{:?}", x.rank_tables),
+                format!("{:?}", y.rank_tables),
+                "{board_text}"
+            );
+        }
+        assert!(
+            merged,
+            "no board merged a deal class, so transitions went untested"
         );
     }
 }

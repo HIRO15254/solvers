@@ -17,10 +17,11 @@ use crate::{
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
     F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, Solver, Storage, pair_subtrees,
-    parent_array, reach_at,
+    parent_array, reach_on_path,
 };
 use nlh::{Card, PerPlayer, Player, Street};
 use rayon::prelude::*;
+use std::sync::Arc;
 
 use crate::run::RunSummary;
 
@@ -337,8 +338,12 @@ fn strategy_batch_end(
 /// (needed again for a river re-solve), the cached metadata, and everything
 /// [`SolProvider`] needs to answer strategy queries against it.
 pub struct LoadedSol {
-    pub pf_game: PostflopGame,
+    /// Rebuilt tree, node streets and parents; shared by loads of artifacts
+    /// with the same embedded config (see [`load_sol_sharing`]).
+    pub pf_game: Arc<PostflopGame>,
     pub config: PostflopConfig,
+    /// `blake3` of the embedded config TOML (the `.sol` header hash).
+    pub config_hash: [u8; 32],
     pub meta: SolMeta,
     pub mode: StreetsStored,
     /// Stored blocks keyed by `sref` (== the action node's `Node::aux`),
@@ -346,8 +351,8 @@ pub struct LoadedSol {
     /// hands then IP's, on the subgame-start basis) are dequantized per
     /// query.
     pub store: SolStore,
-    pub streets: Vec<Street>,
-    pub parents: Vec<NodeId>,
+    pub streets: Arc<Vec<Street>>,
+    pub parents: Arc<Vec<NodeId>>,
     pub board: Vec<Card>,
     pub river_iterations: u64,
     pub river_target: Option<f64>,
@@ -424,37 +429,68 @@ pub fn load_sol(
     river_target: Option<f64>,
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<LoadedSol> {
+    load(path, river_iterations, river_target, None, diagnostics)
+}
+
+/// [`load_sol`] without river re-solves that reuses `other`'s rebuilt tree
+/// when both artifacts embed the same config (equal config hashes): the
+/// tree is a deterministic function of that config.
+pub fn load_sol_sharing(
+    path: &Path,
+    other: &LoadedSol,
+    diagnostics: &mut dyn FnMut(Diagnostic),
+) -> Result<LoadedSol> {
+    load(path, 0, None, Some(other), diagnostics)
+}
+
+fn load(
+    path: &Path,
+    river_iterations: u64,
+    river_target: Option<f64>,
+    share: Option<&LoadedSol>,
+    diagnostics: &mut dyn FnMut(Diagnostic),
+) -> Result<LoadedSol> {
     let reader = SolReader::open(path).with_context(|| format!("reading {}", path.display()))?;
     let metadata = reader.metadata().clone();
 
     crate::prepare::require_artifact_config(&metadata.config_toml)?;
-    let p = crate::prepare::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
+    let p = crate::prepare::prepare_artifact(&metadata.config_toml, Path::new("embedded.toml"))?;
     let pf_config = p.config;
     let payoff = p.payoff;
-    let nlh = (p.document.spot, p.settings);
+    let nlh = (p.spot, p.settings);
     let board_cards = pf_config.board.clone();
+    let config_hash = runfiles::config_hash(metadata.config_toml.as_bytes());
 
-    // stderr, not stdout: `export` writes machine-readable data there, and
-    // a progress line in the middle of a CSV would corrupt it.
-    diagnostics(Diagnostic::Rebuilding);
-    let build_start = Instant::now();
-    let pipeline = payoff.pipeline();
-    let mut pf_game = build_postflop_game(&pf_config, pipeline);
-    crate::prepare::display_game(&mut pf_game);
-    diagnostics(Diagnostic::Rebuilt {
-        secs: build_start.elapsed().as_secs_f64(),
-        nodes: pf_game.game.tree.nodes.len(),
-    });
-
-    let start_street = start_street_from_board_len(pf_config.board.len());
-    let streets = node_streets(&pf_game.game.tree, start_street);
-    let parents = parent_array(&pf_game.game.tree);
+    let (pf_game, streets, parents) = match share.filter(|other| other.config_hash == config_hash) {
+        Some(other) => (
+            Arc::clone(&other.pf_game),
+            Arc::clone(&other.streets),
+            Arc::clone(&other.parents),
+        ),
+        None => {
+            // stderr, not stdout: `export` writes machine-readable data
+            // there, and a progress line in the middle of a CSV would
+            // corrupt it.
+            diagnostics(Diagnostic::Rebuilding);
+            let build_start = Instant::now();
+            let mut pf_game = build_postflop_game(&pf_config, payoff.pipeline());
+            crate::prepare::display_game(&mut pf_game);
+            diagnostics(Diagnostic::Rebuilt {
+                secs: build_start.elapsed().as_secs_f64(),
+                nodes: pf_game.game.tree.nodes.len(),
+            });
+            let start_street = start_street_from_board_len(pf_config.board.len());
+            let streets = node_streets(&pf_game.game.tree, start_street);
+            let parents = parent_array(&pf_game.game.tree);
+            (Arc::new(pf_game), Arc::new(streets), Arc::new(parents))
+        }
+    };
 
     let tree = &pf_game.game.tree;
     let expected = tree
         .nodes
         .iter()
-        .zip(&streets)
+        .zip(streets.iter())
         .filter(|(node, street)| {
             node.kind == NodeKind::Action
                 && (metadata.mode == StreetsStored::Full || **street != Street::River)
@@ -475,6 +511,7 @@ pub fn load_sol(
     Ok(LoadedSol {
         pf_game,
         config: pf_config,
+        config_hash,
         meta: metadata.meta,
         mode: metadata.mode,
         store: reader.into_store(),
@@ -634,7 +671,8 @@ impl<'a> SolProvider<'a> {
             root_ranges[Player::P1].as_slice(),
         );
         let mut failure = None;
-        let reach = reach_at(trunk_tree, root_slices, entry, |_id, sref, out| {
+        let path = hu_engine::path_from_root(&loaded.parents, entry);
+        let reach = reach_on_path(trunk_tree, root_slices, &path, |_id, sref, out| {
             // Every strict ancestor of a river-entry node is non-river by
             // construction, so its block is always present regardless of
             // `loaded.mode`; `load_sol` verified the stored set.
@@ -933,7 +971,7 @@ memory='1GiB'
             }
         }
         let root = &loaded.pf_game.game.root_ranges;
-        let reach = reach_at(
+        let reach = hu_engine::reach_at(
             &loaded.pf_game.game.tree,
             PerPlayer::new(root[Player::P0].as_slice(), root[Player::P1].as_slice()),
             entry,
@@ -1504,7 +1542,7 @@ memory = "1GiB"
             if parent == NodeId::MAX || tree.node(parent).kind != NodeKind::Chance {
                 continue;
             }
-            let reach = reach_at(tree, root_slices, id, |aid, _sref, out| {
+            let reach = hu_engine::reach_at(tree, root_slices, id, |aid, _sref, out| {
                 out.copy_from_slice(&solver.average_strategy_at(aid));
             });
             let acting_reach = reach[node.player].clone();
