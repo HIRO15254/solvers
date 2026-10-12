@@ -1,3 +1,4 @@
+#[cfg(any(test, feature = "test-support"))]
 use std::sync::Mutex;
 
 use nlh::{PerPlayer, Player};
@@ -354,8 +355,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         let t = self.iteration + 1;
         let discounts = self.schedule.at(t, self.planned_iters);
         for p in Player::BOTH {
-            let my_range = self.game.root_ranges[p].clone();
-            let opp_range = self.game.root_ranges[p.opponent()].clone();
+            let my_range = &self.game.root_ranges[p];
+            let opp_range = &self.game.root_ranges[p.opponent()];
             let mut view = self.storage.view_mut();
             let ctx = PassCtx {
                 tree: &self.game.tree,
@@ -371,8 +372,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 &mut view,
                 &mut self.scratch,
                 0,
-                &my_range,
-                &opp_range,
+                my_range,
+                opp_range,
                 &mut out,
                 self.par.chance_depth,
             );
@@ -410,6 +411,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         self.root_aggregate(p, &out)
     }
 
+    #[cfg(any(test, feature = "test-support"))]
     /// Per-hand counterfactual values of the average profile for `p` at
     /// `node`, given the reach vectors *at that node*.
     ///
@@ -433,6 +435,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         self.values_at(node, p, reach, ev_pass)
     }
 
+    #[cfg(any(test, feature = "test-support"))]
     /// Per-hand best-response values for `p` at `node` against the
     /// opponent's average strategy. Subtracting
     /// [`Self::expected_values_at`] gives per-hand regret at that node.
@@ -445,6 +448,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         self.values_at(node, p, reach, br_pass)
     }
 
+    #[cfg(any(test, feature = "test-support"))]
     fn values_at(
         &self,
         node: NodeId,
@@ -472,6 +476,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         out.to_vec()
     }
 
+    #[cfg(any(test, feature = "test-support"))]
     /// Per-hand values of the average profile for `p` at **every** action
     /// node, indexed by `StorageRef::index`, in one pass.
     ///
@@ -1036,15 +1041,13 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 }
             }
 
-            // Instantaneous regret, computed in place.
-            for values in cfvs.chunks_exact_mut(num_hands.max(1)) {
-                for (v, &cfv) in values.iter_mut().zip(node_cfv.iter()) {
-                    *v -= cfv;
-                }
-            }
-            views
-                .own()
-                .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
+            views.own().update_regrets_from_values(
+                sref,
+                sref.index,
+                &cfvs,
+                &node_cfv,
+                ctx.discounts,
+            );
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
             for (weighted, row) in cfvs
@@ -1230,10 +1233,6 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
 }
 
 /// Read-only context threaded through [`value_pass`].
-///
-/// `pub(crate)` so [`crate::mccfr::McSolver`] can reuse `ev_pass`/`br_pass`
-/// for exact evaluation of its average strategy instead of duplicating the
-/// walk.
 pub(crate) struct ValueCtx<'w, E, S> {
     pub(crate) tree: &'w PublicTree,
     pub(crate) evaluator: &'w E,
@@ -1309,7 +1308,7 @@ fn value_pass<
                                 .tree
                                 .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
                                 as usize;
-                            let mut opp_next = scratch.take(opp_dim);
+                            let mut opp_next = scratch.take_overwrite(opp_dim);
                             ctx.tree.map_reach_into(
                                 deal.maps[ctx.p.opponent()],
                                 opp_reach,
@@ -1364,7 +1363,7 @@ fn value_pass<
                         .mapped_dim(deal.maps[ctx.p.opponent()], opp_reach.len() as u32)
                         as usize;
                     let child_dim = ctx.tree.mapped_dim(deal.maps[ctx.p], dim as u32) as usize;
-                    let mut opp_next = scratch.take(opp_dim);
+                    let mut opp_next = scratch.take_overwrite(opp_dim);
                     ctx.tree
                         .map_reach_into(deal.maps[ctx.p.opponent()], opp_reach, &mut opp_next);
                     let mut flat = scratch.take(child_dim * channels);
@@ -1407,7 +1406,7 @@ fn value_pass<
             let hands = sref.num_hands as usize;
             let actions = sref.num_actions as usize;
             let own = node.player == ctx.p;
-            let mut sigma = scratch.take(if !own || EV { sref.len() } else { 0 });
+            let mut sigma = scratch.take_overwrite(if !own || EV { sref.len() } else { 0 });
             if !own || EV {
                 ctx.storage.average_strategy(sref, sref.index, &mut sigma);
             }
@@ -1428,7 +1427,7 @@ fn value_pass<
                             par_budget,
                         );
                     } else {
-                        let mut reach = scratch.take(hands);
+                        let mut reach = scratch.take_overwrite(hands);
                         mul_into(&mut reach, opp_reach, &sigma[a * hands..]);
                         value_pass::<_, _, _, EV, BR, RECORD>(
                             ctx,
@@ -1491,8 +1490,8 @@ fn value_pass<
                 }
                 scratch.put(flat);
             } else {
-                let mut reach = scratch.take(hands);
-                let mut flat = scratch.take(dim * channels);
+                let mut reach = scratch.take_overwrite(hands);
+                let mut flat = scratch.take_overwrite(dim * channels);
                 for (a, child) in ctx.tree.children(node_id).enumerate() {
                     mul_into(&mut reach, opp_reach, &sigma[a * hands..]);
                     flat.fill(0.0);
@@ -1563,8 +1562,8 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
             }
             let visit = |scratch: &mut Scratch, pos: usize, a: &mut [f32], b: &mut [f32]| {
                 let deal = *tree.deal(&node, pos);
-                let mut r0 = scratch.take(a.len());
-                let mut r1 = scratch.take(b.len());
+                let mut r0 = scratch.take_overwrite(a.len());
+                let mut r1 = scratch.take_overwrite(b.len());
                 tree.map_reach_into(deal.maps[Player::P0], reach[Player::P0], &mut r0);
                 tree.map_reach_into(deal.maps[Player::P1], reach[Player::P1], &mut r1);
                 profile_pass(
@@ -1613,13 +1612,13 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
         NodeKind::Action => {
             let sref = tree.storage_ref(&node);
             let hands = sref.num_hands as usize;
-            let mut sigma = scratch.take(sref.len());
+            let mut sigma = scratch.take_overwrite(sref.len());
             storage.average_strategy(sref, sref.index, &mut sigma);
             let dim0 = ev[Player::P0].len();
             let dim = dim0 + ev[Player::P1].len();
             let mut flat = scratch.take(dim * node.num_children as usize);
             let visit = |scratch: &mut Scratch, a: usize, row: &mut [f32]| {
-                let mut next = scratch.take(hands);
+                let mut next = scratch.take_overwrite(hands);
                 mul_into(&mut next, reach[node.player], &sigma[a * hands..]);
                 let r = if node.player == Player::P0 {
                     PerPlayer::new(next.as_slice(), reach[Player::P1])
@@ -1692,6 +1691,7 @@ fn value_row<const EV: bool, const BR: bool>(
 /// aggregate. Monomorphization compiles it away.
 fn no_record(_: NodeId, _: &[f32]) {}
 
+#[cfg(any(test, feature = "test-support"))]
 /// One walk of the tree that fills per-hand values: [`ev_pass`] for the
 /// average profile, [`br_pass`] for a best response. Named so
 /// [`Solver::values_at`] can take either without spelling the signature out.

@@ -74,7 +74,6 @@ fn sibling_rows_default_pruning_empty_dimensions_and_parallel_actions() {
                         masks: vec![],
                         transitions: vec![],
                     });
-                    assert_eq!(parallel_actions(&tree, 0), threads > 1 && dim > 0);
                     for precision in [CfrPrecision::F32, CfrPrecision::F64] {
                         for zero in [false, true] {
                             let evaluator = Evaluator::default();

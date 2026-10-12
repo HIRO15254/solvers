@@ -60,6 +60,45 @@ fn reach<'a>(rows: &'a [f32], root: &'a [f32], offset: usize) -> &'a [f32] {
     }
 }
 
+/// Siblings are reserved consecutively before their descendants are filled.
+/// A chance-free subtree is its root plus one descendant interval.
+struct Subtree {
+    root: NodeId,
+    first: usize,
+    end: usize,
+}
+impl Subtree {
+    fn new(tree: &PublicTree, root: NodeId) -> Self {
+        let node = tree.node(root);
+        let first = node.first_child as usize;
+        let mut end = first + node.num_children as usize;
+        let mut id = first;
+        while id < end {
+            let node = &tree.nodes[id];
+            if node.kind == NodeKind::Action {
+                end = end.max(node.first_child as usize + node.num_children as usize);
+            } else {
+                debug_assert_eq!(node.kind, NodeKind::Terminal);
+            }
+            id += 1;
+        }
+        Self { root, first, end }
+    }
+    fn walk(&self) -> impl DoubleEndedIterator<Item = NodeId> {
+        std::iter::once(self.root).chain(self.first as u32..self.end as u32)
+    }
+    fn index(&self, id: NodeId) -> usize {
+        if id == self.root {
+            0
+        } else {
+            id as usize - self.first + 1
+        }
+    }
+    fn count(&self) -> usize {
+        self.end - self.first + 1
+    }
+}
+
 pub(super) fn enabled() -> bool {
     #[cfg(test)]
     {
@@ -84,44 +123,22 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     let mut lease = MetadataLease::take();
     let metadata = &mut lease.0;
     let tree = ctx.tree;
-    let node = tree.node(root);
-    let first = node.first_child as usize;
-    let mut end = first + node.num_children as usize;
-    let mut id = first;
-    let mut work_len = 0;
-    // fill reserves siblings before filling them: descendants occupy one
-    // interval starting at first_child, excluding root's parent-block slot.
-    // Extend its bound from child blocks in this metadata-only sizing walk.
-    while id < end {
-        let node = &tree.nodes[id];
-        if node.kind == NodeKind::Action {
-            end = end.max(node.first_child as usize + node.num_children as usize);
-            if node.player == ctx.p {
-                work_len = work_len.max(tree.storage_ref(node).len());
-            }
-        } else {
-            debug_assert_eq!(node.kind, NodeKind::Terminal);
-        }
-        id += 1;
-    }
-    if node.player == ctx.p {
-        work_len = work_len.max(tree.storage_ref(node).len());
-    }
-    let count = end - first + 1;
+    let subtree = Subtree::new(tree, root);
+    let first = subtree.first;
+    let count = subtree.count();
     let span = tree.storage_spans[root as usize];
     let sigma_len = span.end - span.start;
     let own_len = my_reach.len();
     let mut sigma = scratch.take_overwrite(sigma_len);
     let mut scaled = scratch.take_overwrite(sigma_len);
-    let mut values = scratch.take(count * own_len);
-    let mut work = scratch.take_overwrite(work_len);
+    let mut values = scratch.take_overwrite(count * own_len);
     metadata.nodes.resize(count, Reaches::default());
     metadata.nodes[0] = Reaches {
         my: usize::MAX,
         opp: usize::MAX,
         zero_opp: false,
     };
-    let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
+    let walk = || subtree.walk();
 
     // Phase 1: all strategies and action-scaled reaches, in parent-before-child
     // order. Unchanged reaches are indices into ancestors (or the input rows).
@@ -161,8 +178,8 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         }
     }
 
-    // Phase 2: one call, separate zeroed terminal rows. PRUNE leaves excluded
-    // rows zero, without preventing updates at own nodes below a zero reach.
+    // Phase 2: the evaluator contract requires zero-initialized terminal rows,
+    // including hands an evaluator leaves untouched. Pruned rows stay zero.
     metadata.terminals.clear();
     let mut reaches = shared_rows(std::mem::take(&mut metadata.reaches));
     let mut outputs = mutable_rows(std::mem::take(&mut metadata.outputs));
@@ -175,6 +192,7 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         };
         let node = tree.node(id);
         if node.kind == NodeKind::Terminal {
+            row.fill(0.0);
             let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
             if !PRUNE || !all_zero(opp) {
                 metadata.terminals.push(node.aux);
@@ -191,11 +209,7 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     // Phase 3: child-before-parent. Per-node action order and storage update
     // arguments/order match recursion; every storage ref is independent.
     for id in walk().rev() {
-        let index = if id == root {
-            0
-        } else {
-            id as usize - first + 1
-        };
+        let index = subtree.index(id);
         let node = tree.node(id);
         if node.kind == NodeKind::Action {
             let sref = tree.storage_ref(node);
@@ -208,19 +222,37 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 &children[start..start + own_len]
             };
             if node.player == ctx.p {
-                for (child, row) in tree.children(id).zip(strategy.chunks_exact(own_len.max(1))) {
+                if node.num_children == 0 {
+                    value.fill(0.0);
+                }
+                for (a, (child, row)) in tree
+                    .children(id)
+                    .zip(strategy.chunks_exact(own_len.max(1)))
+                    .enumerate()
+                {
                     for ((dst, &s), &v) in value.iter_mut().zip(row).zip(child_row(child)) {
-                        *dst += s * v;
+                        if a == 0 {
+                            *dst = s * v + 0.0;
+                        } else {
+                            *dst += s * v;
+                        }
                     }
                 }
-                let tmp = &mut work[..sref.len()];
-                for (child, row) in tree.children(id).zip(tmp.chunks_exact_mut(own_len.max(1))) {
-                    for ((dst, &v), &cfv) in row.iter_mut().zip(child_row(child)).zip(value.iter())
-                    {
-                        *dst = v - cfv;
-                    }
-                }
-                storage.update_regrets(sref, sref.index, tmp, ctx.discounts);
+                // PublicTree::children is a consecutive node-id range, hence
+                // the child value rows form one contiguous action-major block.
+                debug_assert_eq!(tree.children(id).len(), sref.num_actions as usize);
+                let start = if sref.is_empty() {
+                    0
+                } else {
+                    (node.first_child as usize - first - index) * own_len
+                };
+                storage.update_regrets_from_values(
+                    sref,
+                    sref.index,
+                    &children[start..start + sref.len()],
+                    value,
+                    ctx.discounts,
+                );
                 // Phase 1 already wrote my_reach * sigma for every action.
                 // Reuse those exact rows for the average update, after regrets.
                 storage.accumulate_strategy(
@@ -229,19 +261,24 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     &scaled[offset..offset + sref.len()],
                     ctx.discounts,
                 );
-            } else if !metadata.nodes[index].zero_opp {
-                for child in tree.children(id) {
+            } else if !metadata.nodes[index].zero_opp && node.num_children != 0 {
+                for (a, child) in tree.children(id).enumerate() {
                     for (dst, &v) in value.iter_mut().zip(child_row(child)) {
-                        *dst += v;
+                        if a == 0 {
+                            *dst = v + 0.0;
+                        } else {
+                            *dst += v;
+                        }
                     }
                 }
+            } else {
+                value.fill(0.0);
             }
         }
         #[cfg(test)]
         record(id, &values[index * own_len..(index + 1) * own_len]);
     }
     out.copy_from_slice(&values[..own_len]);
-    scratch.put(work);
     scratch.put(values);
     scratch.put(scaled);
     scratch.put(sigma);
@@ -258,20 +295,9 @@ pub(super) fn values<E: TerminalEvaluator, S: Storage, const EV: bool, const BR:
     br: &mut [f32],
 ) {
     let tree = ctx.tree;
-    let node = tree.node(root);
-    let first = node.first_child as usize;
-    let mut end = first + node.num_children as usize;
-    let mut id = first;
-    while id < end {
-        let node = &tree.nodes[id];
-        if node.kind == NodeKind::Action {
-            end = end.max(node.first_child as usize + node.num_children as usize);
-        } else {
-            debug_assert_eq!(node.kind, NodeKind::Terminal);
-        }
-        id += 1;
-    }
-    let count = end - first + 1;
+    let subtree = Subtree::new(tree, root);
+    let first = subtree.first;
+    let count = subtree.count();
     let span = tree.storage_spans[root as usize];
     let sigma_len = span.end - span.start;
     let dim = if EV { ev.len() } else { br.len() };
@@ -283,7 +309,7 @@ pub(super) fn values<E: TerminalEvaluator, S: Storage, const EV: bool, const BR:
     let metadata = &mut lease.0;
     metadata.nodes.resize(count, Reaches::default());
     metadata.nodes[0].opp = usize::MAX;
-    let walk = || std::iter::once(root).chain((first as u32)..(end as u32));
+    let walk = || subtree.walk();
     for (index, id) in walk().enumerate() {
         let node = tree.node(id);
         if node.kind == NodeKind::Terminal {
@@ -342,11 +368,7 @@ pub(super) fn values<E: TerminalEvaluator, S: Storage, const EV: bool, const BR:
     metadata.outputs = mutable_rows(outputs);
     metadata.reaches = shared_rows(reaches);
     for id in walk().rev() {
-        let index = if id == root {
-            0
-        } else {
-            id as usize - first + 1
-        };
+        let index = subtree.index(id);
         let node = tree.node(id);
         let width = dim * channels;
         let (parents, children) = values.split_at_mut((index + 1) * width);

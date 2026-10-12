@@ -598,9 +598,8 @@ name = "hu-engine"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "hu-engine",
  "nlh",
- "rand",
- "rand_chacha",
  "rayon",
  "serde",
 ]
@@ -615,6 +614,7 @@ dependencies = [
  "criterion",
  "economics",
  "hu-engine",
+ "hu-postflop",
  "libc",
  "nlh",
  "parking_lot",
