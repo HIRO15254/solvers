@@ -15,9 +15,13 @@ serde = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion = { workspace = true }
+# Integration tests and benches see the test-support API; normal builds do not.
+hu-engine = { path = ".", features = ["test-support"] }
 
 [features]
 serde = ["dep:serde"]
+# Query APIs used only by tests (not part of the product surface).
+test-support = []
 
 [[bench]]
 name = "storage"
