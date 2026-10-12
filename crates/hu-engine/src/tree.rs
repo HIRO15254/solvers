@@ -90,6 +90,9 @@ pub struct PublicTree {
     /// One entry per chance-node child, indexed by `Node::aux + child_pos`.
     pub deals: Vec<Deal>,
     pub storage_refs: Vec<StorageRef>,
+    /// Action node ids in storage-ref order (DFS preorder). A subtree's
+    /// `StorageSpan::sref_start..sref_end` selects its action nodes.
+    pub(crate) storage_nodes: Vec<NodeId>,
     /// Shared card-removal masks referenced by [`ReachMap::Mask`].
     pub masks: Vec<Vec<f32>>,
     /// Private-state transitions referenced by [`ReachMap::Transition`].
@@ -194,6 +197,7 @@ impl PublicTree {
             nodes: Vec::new(),
             deals: Vec::new(),
             storage_refs: Vec::new(),
+            storage_nodes: Vec::new(),
             masks: spec.masks,
             transitions: spec.transitions,
             root_dims: spec.root_dims,
@@ -234,6 +238,7 @@ impl PublicTree {
             nodes: vec![placeholder_node(); count],
             deals: shape.deals,
             storage_refs: Vec::new(),
+            storage_nodes: Vec::new(),
             masks: shape.masks,
             transitions: shape.transitions,
             root_dims: shape.root_dims,
@@ -307,6 +312,7 @@ impl PublicTree {
                     num_hands,
                     index: aux,
                 });
+                self.storage_nodes.push(slot as NodeId);
                 self.storage_len += count * num_hands as usize;
                 self.nodes[slot] = Node {
                     kind: NodeKind::Action,
@@ -408,6 +414,7 @@ impl PublicTree {
                 };
                 self.storage_len += num_actions * num_hands;
                 self.storage_refs.push(storage_ref);
+                self.storage_nodes.push(slot as NodeId);
 
                 let first_child = self.reserve_children(num_actions);
                 self.nodes[slot] = Node {
@@ -745,6 +752,12 @@ mod tests {
             tree.storage_refs.iter().map(sref).collect::<Vec<_>>(),
             rebuilt.storage_refs.iter().map(sref).collect::<Vec<_>>()
         );
+        assert_eq!(tree.storage_nodes, rebuilt.storage_nodes);
+        for (index, &id) in tree.storage_nodes.iter().enumerate() {
+            let node = tree.node(id);
+            assert_eq!(node.kind, NodeKind::Action);
+            assert_eq!(node.aux as usize, index);
+        }
         let span = |s: &StorageSpan| (s.start, s.end, s.sref_start, s.sref_end);
         assert_eq!(
             tree.storage_spans.iter().map(span).collect::<Vec<_>>(),
