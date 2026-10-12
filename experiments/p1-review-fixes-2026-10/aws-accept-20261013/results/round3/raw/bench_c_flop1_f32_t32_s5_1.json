@@ -1,0 +1,31 @@
+{
+  "actionNodes": 335460,
+  "afterBuildBytes": 283455488,
+  "allocSecs": 0.071744863,
+  "buildSecs": 0.382065703,
+  "cfrPrecision": "f32",
+  "config": "/home/ubuntu/cfg/c_flop1.toml",
+  "deals": 59045,
+  "estimateF32Bytes": 2818917360,
+  "estimateI16Bytes": 1412142360,
+  "estimateI16F32avgBytes": 2115529860,
+  "evaluateSecs": [
+    0.166334239,
+    0.164940482
+  ],
+  "iterSecs": 1.104498808,
+  "iters": 10,
+  "nashConv": 5.146140086771208,
+  "nodeInfo": 335461,
+  "nodes": 829242,
+  "peakBytes": 3279745024,
+  "prepareSecs": 0.009999218,
+  "secsPerIter": 0.1104498808,
+  "storage": "f32",
+  "storageElements": 352364670,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 3,
+  "warmupSecs": 0.304350749
+}

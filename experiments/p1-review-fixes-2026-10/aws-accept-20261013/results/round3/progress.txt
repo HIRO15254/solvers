@@ -1,0 +1,9 @@
+20:00:55 BUILT
+20:01:09 bench done
+20:06:33 solve gtowb old 1
+20:11:55 solve gtowb s5 1
+20:17:18 solve gtowb s5 2
+20:22:40 solve gtowb old 2
+20:28:01 solve gtowb old 3
+20:33:20 solve gtowb s5 3
+20:33:20 ALL_DONE
