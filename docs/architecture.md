@@ -120,7 +120,7 @@ f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION
 最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
 storageのDFS前順にactionの戦略・子reachを用意し、全終端へ従来のnode id順で`eval_cfr_batch`を1回呼び、storageの逆順で子順の値合成・regret更新・戦略累積を行う。`PublicTree`はsref indexからaction node idへの表（4 bytes/action、Vecの余剰capacityを除く）をcompile・shape復元時に作る。部分木のsref spanをsliceし、node値とreach metadataの行はnode idで索引する。f64、EV/BR、終端batchの組分け、保存形式は変えない。
 不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
-sigma・scaled reach・node値をscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。action値の最初の加算は`x + 0.0`の代入とし、終端・書込みの無い行は明示的に0初期化する。regretは連続する子の値からnode値をf32で引いて直接更新する。
+sigma・scaled reach・node値をscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。node値は0初期化したarenaへ子順に加算する。regretは再利用するaction-major bufferへ子の値からnode値をf32で引いて書き、storage更新へ渡す。量子化更新もiteratorではなくsliceを8要素のlaneへ分け、従来の独立lane最大値と演算順を保つ。
 既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。
 showdownは順位走査、River foldは専用の互換reach kernelを使う。f64は従来の再帰passを維持する。
 このsubtree経路の外では、以下の直下終端の処理を使う。

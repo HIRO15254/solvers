@@ -37,33 +37,7 @@ impl StorageOps for MixedStorage {
             &mut self.regrets,
             r.offset,
             r,
-            inst.iter().copied(),
-            d,
-            &mut self.regret_scales[ref_idx as usize],
-            &mut scratch.0,
-        );
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        self.assert_regrets_available();
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        let mut scratch = QuantizedScratch::take();
-        update_regrets_i16_impl(
-            &mut self.regrets,
-            r.offset,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
+            inst,
             d,
             &mut self.regret_scales[ref_idx as usize],
             &mut scratch.0,
@@ -236,34 +210,7 @@ impl<'a> StorageOps for MixedView<'a> {
             &mut *self.regrets,
             local,
             r,
-            inst.iter().copied(),
-            d,
-            &mut self.regret_scales[sidx],
-            &mut scratch.0,
-        );
-    }
-
-    fn update_regrets_from_values(
-        &mut self,
-        r: StorageRef,
-        ref_idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &Discounts,
-    ) {
-        assert_eq!(children.len(), r.len());
-        assert_eq!(values.len(), r.num_hands as usize);
-        let local = self.local_offset(r);
-        let sidx = self.local_ref(ref_idx);
-        let mut scratch = QuantizedScratch::take();
-        update_regrets_i16_impl(
-            &mut *self.regrets,
-            local,
-            r,
-            children
-                .iter()
-                .zip(values.iter().cycle())
-                .map(|(&v, &cfv)| v - cfv),
+            inst,
             d,
             &mut self.regret_scales[sidx],
             &mut scratch.0,

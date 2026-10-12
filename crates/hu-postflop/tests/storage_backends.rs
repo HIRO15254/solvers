@@ -33,17 +33,7 @@ impl<A: hu_engine::StorageOps, B: hu_engine::StorageOps> hu_engine::StorageOps f
     ) {
         self.quantized.update_regrets(r, idx, inst, d);
     }
-    fn update_regrets_from_values(
-        &mut self,
-        r: hu_engine::StorageRef,
-        idx: u32,
-        children: &[f32],
-        values: &[f32],
-        d: &hu_engine::Discounts,
-    ) {
-        self.quantized
-            .update_regrets_from_values(r, idx, children, values, d);
-    }
+
     fn accumulate_strategy(
         &mut self,
         r: hu_engine::StorageRef,

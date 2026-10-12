@@ -132,7 +132,14 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
     let own_len = my_reach.len();
     let mut sigma = scratch.take_overwrite(sigma_len);
     let mut scaled = scratch.take_overwrite(sigma_len);
-    let mut values = scratch.take_overwrite(count * own_len);
+    let mut values = scratch.take(count * own_len);
+    let work_len = actions
+        .iter()
+        .filter(|&&id| tree.node(id).player == ctx.p)
+        .map(|&id| tree.storage_ref(tree.node(id)).len())
+        .max()
+        .unwrap_or(0);
+    let mut work = scratch.take_overwrite(work_len);
     metadata.nodes.resize(count, Reaches::default());
     metadata.nodes[0] = Reaches {
         my: usize::MAX,
@@ -192,7 +199,6 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         };
         let node = tree.node(id);
         if node.kind == NodeKind::Terminal {
-            row.fill(0.0);
             let opp = reach(&scaled, opp_reach, metadata.nodes[index].opp);
             if !PRUNE || !all_zero(opp) {
                 metadata.terminals.push(node.aux);
@@ -221,37 +227,18 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             &children[start..start + own_len]
         };
         if node.player == ctx.p {
-            if node.num_children == 0 {
-                value.fill(0.0);
-            }
-            for (a, (child, row)) in tree
-                .children(id)
-                .zip(strategy.chunks_exact(own_len.max(1)))
-                .enumerate()
-            {
+            for (child, row) in tree.children(id).zip(strategy.chunks_exact(own_len.max(1))) {
                 for ((dst, &s), &v) in value.iter_mut().zip(row).zip(child_row(child)) {
-                    if a == 0 {
-                        *dst = s * v + 0.0;
-                    } else {
-                        *dst += s * v;
-                    }
+                    *dst += s * v;
                 }
             }
-            // PublicTree::children is a consecutive node-id range, hence
-            // the child value rows form one contiguous action-major block.
-            debug_assert_eq!(tree.children(id).len(), sref.num_actions as usize);
-            let start = if sref.is_empty() {
-                0
-            } else {
-                (node.first_child as usize - first - index) * own_len
-            };
-            storage.update_regrets_from_values(
-                sref,
-                sref.index,
-                &children[start..start + sref.len()],
-                value,
-                ctx.discounts,
-            );
+            let tmp = &mut work[..sref.len()];
+            for (child, row) in tree.children(id).zip(tmp.chunks_exact_mut(own_len.max(1))) {
+                for ((dst, &v), &cfv) in row.iter_mut().zip(child_row(child)).zip(value.iter()) {
+                    *dst = v - cfv;
+                }
+            }
+            storage.update_regrets(sref, sref.index, tmp, ctx.discounts);
             // Phase 1 already wrote my_reach * sigma for every action.
             // Reuse those exact rows for the average update, after regrets.
             storage.accumulate_strategy(
@@ -260,23 +247,18 @@ pub(super) fn run<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 &scaled[offset..offset + sref.len()],
                 ctx.discounts,
             );
-        } else if !metadata.nodes[index].zero_opp && node.num_children != 0 {
-            for (a, child) in tree.children(id).enumerate() {
+        } else if !metadata.nodes[index].zero_opp {
+            for child in tree.children(id) {
                 for (dst, &v) in value.iter_mut().zip(child_row(child)) {
-                    if a == 0 {
-                        *dst = v + 0.0;
-                    } else {
-                        *dst += v;
-                    }
+                    *dst += v;
                 }
             }
-        } else {
-            value.fill(0.0);
         }
         #[cfg(test)]
         record(id, &values[index * own_len..(index + 1) * own_len]);
     }
     out.copy_from_slice(&values[..own_len]);
+    scratch.put(work);
     scratch.put(values);
     scratch.put(scaled);
     scratch.put(sigma);

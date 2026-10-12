@@ -1041,13 +1041,15 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                 }
             }
 
-            views.own().update_regrets_from_values(
-                sref,
-                sref.index,
-                &cfvs,
-                &node_cfv,
-                ctx.discounts,
-            );
+            // Instantaneous regret, computed in place.
+            for values in cfvs.chunks_exact_mut(num_hands.max(1)) {
+                for (v, &cfv) in values.iter_mut().zip(node_cfv.iter()) {
+                    *v -= cfv;
+                }
+            }
+            views
+                .own()
+                .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
             for (weighted, row) in cfvs
