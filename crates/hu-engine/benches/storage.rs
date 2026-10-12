@@ -13,8 +13,8 @@ use std::time::Duration;
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use hu_engine::{
-    Discounts, F32Storage, I16Storage, PublicTree, ReachMap, Scratch, SparseTransition, Storage,
-    StorageOps, StorageRef, TempNode, TreeSpec,
+    CfrPrecision, Discounts, F32Storage, I16Storage, MixedStorage, PublicTree, ReachMap, Scratch,
+    SparseTransition, Storage, StorageOps, StorageRef, TempNode, TreeSpec,
 };
 use nlh::{PerPlayer, Player};
 
@@ -148,6 +148,62 @@ fn bench_i16(c: &mut Criterion) {
     group.finish();
 }
 
+fn bench_shapes<S: Storage>(c: &mut Criterion, backend: &str) {
+    let mut group = c.benchmark_group(format!("{backend}_shapes"));
+    let d = discounts();
+    for actions in [2, 3, 5] {
+        for hands in [200, 600, 1000] {
+            let r = StorageRef {
+                offset: 0,
+                num_actions: actions,
+                num_hands: hands,
+                index: 0,
+            };
+            let inst = mixed_signal(r.len());
+            let weighted = weighted_signal(r.len());
+            let mut storage = S::new(r.len(), 1);
+            storage.update_regrets(r, 0, &inst, &d);
+            let mut out = vec![0.0; r.len()];
+            group.bench_function(format!("regret_matching_cfr_f32/{actions}x{hands}"), |b| {
+                b.iter(|| {
+                    storage.regret_matching_cfr(black_box(r), 0, &mut out, CfrPrecision::F32);
+                    black_box(&out);
+                });
+            });
+            // The mixed backend receives the complete per-node operation suite.
+            if backend == "mixed" {
+                group.bench_function(format!("update_regrets/{actions}x{hands}"), |b| {
+                    b.iter(|| storage.update_regrets(black_box(r), 0, black_box(&inst), &d));
+                });
+                group.bench_function(format!("regret_matching/{actions}x{hands}"), |b| {
+                    b.iter(|| {
+                        storage.regret_matching(black_box(r), 0, &mut out);
+                        black_box(&out);
+                    });
+                });
+                group.bench_function(format!("accumulate_strategy/{actions}x{hands}"), |b| {
+                    b.iter(|| {
+                        storage.accumulate_strategy(black_box(r), 0, black_box(&weighted), &d)
+                    });
+                });
+                group.bench_function(format!("average_strategy/{actions}x{hands}"), |b| {
+                    b.iter(|| {
+                        storage.average_strategy(black_box(r), 0, &mut out);
+                        black_box(&out);
+                    });
+                });
+            }
+        }
+    }
+    group.finish();
+}
+
+fn bench_cfr_shapes(c: &mut Criterion) {
+    bench_shapes::<F32Storage>(c, "f32");
+    bench_shapes::<I16Storage>(c, "i16");
+    bench_shapes::<MixedStorage>(c, "mixed");
+}
+
 /// A root chance node with a single `Mask` deal over 1,326 dims -- the same
 /// shape `PublicTree::compile` produces for a hold'em turn/river card deal
 /// (see `crates/hu-engine/src/reach.rs`'s tests for the fixture style this
@@ -264,6 +320,6 @@ criterion_group! {
     config = Criterion::default()
         .sample_size(20)
         .measurement_time(Duration::from_secs(3));
-    targets = bench_f32, bench_i16, bench_tree
+    targets = bench_f32, bench_i16, bench_cfr_shapes, bench_tree
 }
 criterion_main!(benches);

@@ -31,7 +31,7 @@
 | `nlh` | card・combo・range・役判定・suit同型・chip/seat型、NLH bettingと精算、tree scriptの汎用処理系 |
 | `economics` | 共通rake条件・控除・配分、ICM、utility設定 |
 | `spot` | 共通Inputのparse・正規化・line再生・製品判定、Spot IR、tree方言 |
-| `hu-engine` | HUのpublic tree、vector CFR/BR、storage、discount schedule、chance-sampled driver |
+| `hu-engine` | HUのpublic tree、vector CFR/BR、storage、discount schedule |
 | `hu-postflop` | P1のlower・木・payoff・資源preflight・solve/resume、checkpoint、`.sol`、typed queryとboard report。payoffを通すtoy gameも持つ |
 | `mw-preflop` | P2のlower・session・資源preflight・EHS²・dense arena・sampled solve・停止評価、checkpoint、`.mwsol`、typed query |
 | `runfiles` | run directoryの共通DTO・manifest・events・HU metrics・config hash |
@@ -84,7 +84,7 @@ P1の`prepare`で検証した正規化Inputだけを書き出す。
 ## 3. コア表現(hu-engine crate)
 
 実装入口は [tree.rs](../crates/hu-engine/src/tree.rs)、[solver.rs](../crates/hu-engine/src/solver.rs)、
-[storage.rs](../crates/hu-engine/src/storage.rs)、[schedule.rs](../crates/hu-engine/src/schedule.rs)。
+[storage/mod.rs](../crates/hu-engine/src/storage/mod.rs)、[schedule.rs](../crates/hu-engine/src/schedule.rs)。
 以下は責務の要約であり、Rust 型の定義を複製しない。
 
 `TreeSpec` / `TempNode` を `PublicTree::compile` が immutable な public tree へ変換する。
@@ -108,6 +108,8 @@ Storage は action-major の連続 arena を持つ `F32Storage` と、scale 付�
 `I16Storage`、regretだけ同じi16量子化・戦略累積をf32にする`MixedStorage`（`i16-f32avg`、6L＋4N bytes）。subtree の storage span を DFS 順に配置し、chance 子の並列処理へ互いに重ならない
 view を渡す。`ParConfig` が chance depth と fan-out を制御する。メモリ削減量・速度・精度は
 ゲームと設定に依存するので、採用条件は測定証拠とともに評価する。
+実装は`hu-engine/src/storage/`の`mod.rs`（契約・state）、`f32.rs`、`i16.rs`、`mixed.rs`に分け、
+共通の`normalize.rs`でf64の厳密正規化とCFR用f32正規化を提供する。量子化更新のscratchはworker-local poolからleaseし、pass・view分割を越えて再利用する。
 
 `DiscountSchedule::at(t, planned_iters)` は iteration ごとに正/負 regret と平均戦略への係数、
 regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr` と `linear_cfr`
@@ -118,7 +120,7 @@ f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION
 最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
 node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
 不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
-sigma・scaled reach・node値・更新用workをscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。
+sigma・scaled reach・node値をscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。action値の最初の加算は`x + 0.0`の代入とし、終端・書込みの無い行は明示的に0初期化する。regretは連続する子の値からnode値をf32で引いて直接更新する。
 既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。
 showdownは順位走査、River foldは専用の互換reach kernelを使う。f64は従来の再帰passを維持する。
 このsubtree経路の外では、以下の直下終端の処理を使う。
@@ -138,8 +140,8 @@ P1の同一board fold・showdownは異なる子reachでも1回の自hand loopで
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する
 未正規化 payoff を返す。EV と best response は同じ compiled tree / evaluator を使う一方、
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
-`expected_values_at` / `best_response_values_at` は指定 node、`expected_values_everywhere` は
-全 action node の値を 1 回の走査で計算する。
+test-support機能の`expected_values_at` / `best_response_values_at` は指定 node、
+`expected_values_everywhere` は全 action node の値を 1 回の走査で計算する。production保存は`visit_expected_values`を使う。
 CFR は相手 reach の全要素が厳密に 0 の終端評価と、相手 action の regret matching・
 reach と戦略の乗算・子 CFV 加算を省く。相手 action の子へは scratch で初期化した
 全 0 buffer を使い回す。更新 player の action と chance の演算、chance/action 並列、
@@ -153,9 +155,8 @@ foldはglobal combo順、showdownはrank順・group total順を保ち、各lane�
 記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
 `visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
 
-[McSolver](../crates/hu-engine/src/mccfr.rs) は chance node を sample し、両者の action node は
-vector のまま列挙する HU 用の別 driver である。batched discount、任意の negative-regret pruning、
-ChaCha の seed/word position を含む state を持つ。Multiway の external-sampling 経路とは分ける。
+HUのchance-sampled driverは未使用のため、2026-10-13の利用者決定で削除した。
+Multiwayのexternal-sampling MCCFR経路は変更しない。
 
 SIMD は compiler の自動 vectorization を基本とする。hot loop の変更は対象 hardware の
 linked binary と A/B 測定で検証する。
@@ -226,7 +227,7 @@ cacheのbuild/loadと互換性検証は製品側にある。CLIはcache rootを�
 testは計算層と利用者境界を分けて置く。
 
 - `nlh`・`economics`・`spot`: betting/精算、単位、rake/ICM、schema・normalizer・line再生。
-- `hu-engine`: storage、reach、chanceの次元変化、CFR/BRとstate復元。
+- `hu-engine`: storage、reach、chanceの次元変化、CFR/BRとstate復元。node単位の試験用評価APIは`test-support`で公開する。
 - `hu-postflop`: kernel、payoff、f32/i16/i16-f32avg、iso、保存coverageと値、River re-solve。
   [toy oracle差分](../crates/hu-postflop/tests/toy_oracle_diff.rs)と
   [postflop oracle差分](../crates/hu-postflop/tests/oracle_diff.rs)は凍結`cfr-ref`と独立に照合する。

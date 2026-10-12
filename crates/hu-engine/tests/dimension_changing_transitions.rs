@@ -11,8 +11,8 @@
 //! size in here").
 
 use hu_engine::{
-    CompiledGame, Dcfr, F32Storage, McCfg, McSolver, PublicTree, ReachMap, Solver,
-    SparseTransition, TempNode, TerminalEvaluator, TreeSpec,
+    CompiledGame, Dcfr, F32Storage, PublicTree, ReachMap, Solver, SparseTransition, TempNode,
+    TerminalEvaluator, TreeSpec,
 };
 use nlh::{PerPlayer, Player};
 
@@ -271,58 +271,6 @@ fn merge_split_differential_solver() {
     );
 }
 
-#[test]
-fn merge_split_differential_mcsolver() {
-    let (p0_range, p1_range) = root_ranges();
-    let game_a = build_game(4, class4, false, p0_range.clone(), p1_range.clone());
-    let game_b = build_game(2, class_identity, true, p0_range, p1_range);
-
-    // Chance sampling is trivial here (one deal, weight 1.0, always picked),
-    // so this exercises `mccfr_pass`'s dimension-changing chance branch
-    // without adding real sampling variance on top of the comparison.
-    let cfg = McCfg {
-        seed: 42,
-        ..McCfg::default()
-    };
-    let mut mc_a = McSolver::<_, F32Storage>::new(game_a, cfg);
-    let mut mc_b = McSolver::<_, F32Storage>::new(game_b, cfg);
-    mc_a.run(20_000);
-    mc_b.run(20_000);
-
-    // Looser tolerance than the full-traversal `Solver` test: MCCFR's own
-    // per-iteration regret updates are still exact vector-form at the
-    // action nodes (see `mccfr.rs`'s module doc), but the two solvers'
-    // `Scratch` pools take/put buffers in different sizes (4-dim vs 2-dim),
-    // which can shift discount-schedule floating-point rounding slightly
-    // over 20k iterations.
-    for p in Player::BOTH {
-        let ev_a = mc_a.expected_value(p);
-        let ev_b = mc_b.expected_value(p);
-        assert!(
-            (ev_a - ev_b).abs() < 1e-3,
-            "expected_value diverged for {p:?}: A={ev_a} B={ev_b}"
-        );
-    }
-
-    let expl_a = mc_a.exploitability();
-    let expl_b = mc_b.exploitability();
-    for p in Player::BOTH {
-        assert!(
-            (expl_a[p] - expl_b[p]).abs() < 1e-3,
-            "exploitability diverged for {p:?}: A={} B={}",
-            expl_a[p],
-            expl_b[p]
-        );
-    }
-
-    assert_strategies_agree(
-        &mc_a.average_strategy_at(P0_NODE),
-        &mc_b.average_strategy_at(P0_NODE),
-        2,
-        1e-2,
-    );
-}
-
 /// Terminal evaluator for the asymmetric-dimension game: P0's hand space has
 /// 2 entries (post-merge), P1's has 3 (untouched by any transition).
 /// Arbitrary, deliberately not zero-sum (general-sum accounting path).
@@ -412,18 +360,4 @@ fn asymmetric_dims_run_without_panicking_and_converge() {
         late_total < early_total,
         "exploitability should decrease with more iterations: early={early_total}, late={late_total}"
     );
-}
-
-#[test]
-fn asymmetric_dims_mcsolver_runs_without_panicking() {
-    let game = build_asymmetric_game();
-    let cfg = McCfg {
-        seed: 7,
-        ..McCfg::default()
-    };
-    let mut solver = McSolver::<_, F32Storage>::new(game, cfg);
-    solver.run(2_000);
-    let expl = solver.exploitability();
-    assert!(expl[Player::P0].is_finite());
-    assert!(expl[Player::P1].is_finite());
 }

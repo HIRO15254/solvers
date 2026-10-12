@@ -554,8 +554,6 @@ dependencies = [
  "criterion",
  "hu-engine",
  "nlh",
- "rand",
- "rand_chacha",
  "rayon",
  "serde",
 ]

@@ -473,7 +473,7 @@ impl PublicTree {
     /// [`ReachMap`]'s doc comment) — this is the single source of truth for
     /// that, used both at compile time (here, sizing each chance child's
     /// subtree) and by every solver walk that recurses across a chance node
-    /// (`crate::solver::cfr_pass`/`value_pass`, `crate::mccfr::mccfr_pass`),
+    /// (`crate::solver::cfr_pass`/`value_pass`),
     /// which must size their per-deal scratch buffers identically or trip
     /// `SparseTransition::apply_forward`'s dimension assertions.
     pub fn mapped_dim(&self, map: ReachMap, dim: u32) -> u32 {
@@ -510,18 +510,6 @@ impl PublicTree {
 
     pub fn storage_ref(&self, node: &Node) -> StorageRef {
         self.storage_refs[node.aux as usize]
-    }
-
-    /// Applies one player's reach map for a deal. Returns the child-space
-    /// reach vector (dimension may change under a transition).
-    pub fn map_reach(&self, map: ReachMap, reach: &[f32]) -> Vec<f32> {
-        let len = match map {
-            ReachMap::Identity | ReachMap::Mask(_) => reach.len(),
-            ReachMap::Transition(t) => self.transitions[t as usize].out_dim as usize,
-        };
-        let mut out = vec![0.0; len];
-        self.map_reach_into(map, reach, &mut out);
-        out
     }
 
     /// Applies one player's reach map for a deal into a caller-provided

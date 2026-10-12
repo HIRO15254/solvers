@@ -107,7 +107,7 @@ config・manifest・小さい結果・検証器はignored outputから分離す�
 
 ## Benchmarking
 
-Criterionは小さいhot pathのA/Bに使う。現行suiteはhu-engineのstorage/reach/transitionとhu-postflopのterminal kernel・turn solveを含む。
+Criterionは小さいhot pathのA/Bに使う。現行suiteはhu-engineのf32/i16/i16-f32avg storage（CFR用f32 regret matching、A=2/3/5 × H=200/600/1000を含む）・reach/transitionとhu-postflopのterminal kernel・turn solveを含む。
 
 ```text
 cargo bench -p hu-engine -p hu-postflop -- --save-baseline main

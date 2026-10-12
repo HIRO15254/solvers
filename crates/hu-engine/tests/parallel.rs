@@ -5,7 +5,7 @@
 //! equal.
 
 use hu_engine::{
-    CompiledGame, Dcfr, F32Storage, ParConfig, PublicTree, ReachMap, Solver, TempNode,
+    CompiledGame, Dcfr, F32Storage, ParConfig, PublicTree, ReachMap, Solver, Storage, TempNode,
     TerminalEvaluator, TreeSpec,
 };
 use nlh::{PerPlayer, Player};
@@ -153,8 +153,20 @@ fn parallel_chance_fanout_is_bitwise_deterministic() {
     let solver_par = solve(par_on, 50);
     let solver_seq = solve(par_off, 50);
 
-    let (regrets_par, strategy_par) = solver_par.storage().snapshot();
-    let (regrets_seq, strategy_seq) = solver_seq.storage().snapshot();
+    let hu_engine::StorageState::F32 {
+        regrets: regrets_par,
+        strategy_sum: strategy_par,
+    } = solver_par.storage().state()
+    else {
+        unreachable!()
+    };
+    let hu_engine::StorageState::F32 {
+        regrets: regrets_seq,
+        strategy_sum: strategy_seq,
+    } = solver_seq.storage().state()
+    else {
+        unreachable!()
+    };
 
     assert_eq!(regrets_par.len(), regrets_seq.len());
     assert_eq!(strategy_par.len(), strategy_seq.len());

@@ -9,8 +9,6 @@ description = "Hot core: public game tree, regret/strategy storage, discount sch
 [dependencies]
 nlh = { workspace = true }
 rayon = { workspace = true }
-rand = { workspace = true }
-rand_chacha = { workspace = true }
 serde = { workspace = true, optional = true }
 
 [dev-dependencies]

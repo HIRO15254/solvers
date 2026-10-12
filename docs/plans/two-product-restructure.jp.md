@@ -31,7 +31,7 @@ crateは`crates/`直下に平置きし、名前の接頭辞で所有者を示す
 | `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/Monte Carlo）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部（M3）。`cli::economics`はM4、`game::payoff`のrake・ICMはM5で載せ替える |
 | `spot` | 共通Input: TOML schema、parse/正規化、v1のtree方言（共通の条件変数・size literal）、line文法と再生、製品の決定、検証、Spot IR | 旧`cli`のconfig層（置換） |
 | `runfiles` | run directory契約（`run.toml`、manifest、events、progress、run.json）、config hash | `formats::{run, metrics, hash}` |
-| `hu-engine` | HU vector CFR/BR、storage、discount schedule、chance-sampled driver | `engine` |
+| `hu-engine` | HU vector CFR/BR、storage、discount schedule（未使用のHU chance-sampled driverは2026-10-13の利用者決定で削除） | `engine` |
 | `hu-postflop` | P1: NLH HU postflop木・showdown kernel・payoff焼込み・`.sol`・checkpoint・照会。payoff pipelineを通す試験用toy game（Kuhn・Leduc） | `holdem`、`game::{payoff, toy}`、`formats::{sol, checkpoint}`、`cli`のpostflop計算部 |
 | `cfr-ref` | 凍結した独立oracle（test専用、変更しない） | `cfr-ref` |
 | `mw-preflop` | P2: 暫定方式（External-Sampling MCCFR、public tree/arena、EHS²抽象化）、checkpoint、`.mwsol`、停止評価 | `multiway`（研究経路を除く）、`abstraction::{buckets, ehs}`、`formats::mwsol`、`cli`のmultiway計算部 |
