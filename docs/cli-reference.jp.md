@@ -77,7 +77,7 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
 | `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / chunk圧縮・directory・metadataの書込み予算（thread数によらない） |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
-| `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode・samples・seed・preparedBytes・preparedLimitBytes |
+| `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode（15人以下`exact`、16人以上`quadrature`）・quadratureNodes（exactはnull） |
 
 P1は通常validateでも木の見積りで未使用ruleを確認する。P2の通常validateは木を走査せず、
 未使用rule未検査の警告と`not-checked`を返す。`--resources`はarena count中にrule hitを測る。

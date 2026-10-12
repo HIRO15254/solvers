@@ -17,6 +17,7 @@ use crate::mwsol::{
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use crate::solver::{ProfileEvaluation, SolverConfig};
+use crate::types::MwChips;
 use crate::{ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
 use anyhow::{Context, Result, anyhow};
 use rayon::prelude::*;
@@ -97,17 +98,8 @@ pub enum ResourceLimit {
 pub struct MultiwayIcmPreflight {
     pub field_players: u64,
     pub paid_places: u64,
-    pub mode: IcmPreflightMode,
-    pub samples: Option<u64>,
-    pub seed: Option<u64>,
-    pub prepared_bytes: Option<u64>,
-    pub prepared_limit_bytes: Option<u64>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum IcmPreflightMode {
-    Exact,
-    Sampled,
+    /// Quadrature node count; `None` for exact fields through 15 players.
+    pub quadrature_nodes: Option<u64>,
 }
 
 struct ResourcePreflightAbstraction {
@@ -178,46 +170,33 @@ fn preflight_multiway_impl(
         MultiwayUtility::TournamentIcm {
             outside_field,
             payouts,
-            samples,
-            seed,
         } => {
-            let field_players = game_config
+            let mut total_chips = 0u128;
+            for stack_bb in game_config
                 .seats
-                .len()
-                .checked_add(outside_field.len())
-                .context("counting ICM field players")?;
+                .iter()
+                .map(|seat| seat.stack_bb)
+                .chain(outside_field.iter().map(|player| player.stack_bb))
+            {
+                total_chips += u128::from(
+                    MwChips::try_from_bb(stack_bb)
+                        .context("converting ICM field stacks")?
+                        .raw(),
+                );
+            }
+            let field_players = game_config.seats.len() + outside_field.len();
             let paid_places = payouts
                 .iter()
                 .rposition(|payout| *payout != 0.0)
                 .map_or(0, |place| place + 1);
-            if field_players <= crate::icm::EXACT_ICM_MAX_PLAYERS {
-                Some(MultiwayIcmPreflight {
-                    field_players: field_players as u64,
-                    paid_places: paid_places as u64,
-                    mode: IcmPreflightMode::Exact,
-                    samples: None,
-                    seed: None,
-                    prepared_bytes: None,
-                    prepared_limit_bytes: None,
-                })
-            } else {
-                let prepared_bytes = crate::icm::prepared_race_memory_bytes(
-                    game_config.seats.len(),
-                    outside_field.len(),
-                    paid_places,
-                    *samples,
-                )
-                .context("sizing sampled ICM preparation buffers")?;
-                Some(MultiwayIcmPreflight {
-                    field_players: field_players as u64,
-                    paid_places: paid_places as u64,
-                    mode: IcmPreflightMode::Sampled,
-                    samples: Some(*samples),
-                    seed: Some(*seed),
-                    prepared_bytes: Some(prepared_bytes as u64),
-                    prepared_limit_bytes: Some(crate::icm::MAX_PREPARED_RACE_BYTES as u64),
-                })
-            }
+            Some(MultiwayIcmPreflight {
+                field_players: field_players as u64,
+                paid_places: paid_places as u64,
+                quadrature_nodes: match economics::icm_mode(field_players, total_chips) {
+                    economics::IcmMode::Exact => None,
+                    economics::IcmMode::Quadrature { nodes } => Some(nodes as u64),
+                },
+            })
         }
     };
 

@@ -402,8 +402,6 @@ name = "economics"
 version = "0.1.0"
 dependencies = [
  "nlh",
- "rand",
- "rand_chacha",
  "serde",
  "thiserror",
 ]

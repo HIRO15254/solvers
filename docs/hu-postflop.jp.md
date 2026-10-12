@@ -46,9 +46,11 @@ P1のhand factsは`flop_dealt = true`、`players_dealt = table.players`、`playe
 
 tournament utilityは卓全員とoutside fieldの最終stackのICM equityである。
 foldした卓の席は最終stackを固定して含める。OOP/IPの実際のstackを使い、effective stackへ縮めない。
-卓＋fieldが15人以下はexact ICM、16〜10,000人はseed付き決定的Monte Carloである。
+卓＋fieldが15人以下はexact ICM、16〜10,000人はDE-ICM（[arXiv:2610.06028](https://arxiv.org/abs/2610.06028)）を
+固定field向けに適応した決定的求積である（[共通Input第6節](nlh-input-v1.jp.md)）。
 分配で0.0005 BBが生じる場合、ICMへ渡すstackは共通gridへ最近接丸めする。
 terminalのICM値はstack pairごとにmemoizeする。rakeとtournamentは同時指定できない。
+Monte Carlo ICM廃止（SOL-34）より前の16人以上のrunは、埋込みconfigに廃止key`samples`・`seed`を含むため読み込めず、再solveする。
 
 ## 3. EVの基準と単位
 
@@ -346,7 +348,7 @@ reportはroot nodeだけを集計する。
 ## 9. 品質と制限
 
 厳密BRは指定した有限betting treeとrangeに対する量であり、tree外のsizeに対する保証ではない。
-storageとartifactの量子化、浮動小数点、Monte Carlo ICMの誤差を分けて評価する。
+storageとartifactの量子化、浮動小数点、16人以上のICM求積の誤差を分けて評価する。
 非零和で小さいNashConvを得たことと、零和CFRの収束理論は区別する。
 ハンド固有のtree条件、multiway Postflop、任意street途中の開始は扱わない。
 

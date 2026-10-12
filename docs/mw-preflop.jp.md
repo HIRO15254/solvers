@@ -92,6 +92,9 @@ solve中にmappingを追加しない。cache pathはInputに書かない。
 retired rollout/full recallのfingerprintを現方式へaliasしない。
 abstraction fingerprintは検証済みcontent、bucket数、current-street domainを含む。
 game fingerprintとabstraction fingerprintは別である。
+game fingerprintはutility設定を含む。ICMのMonte Carlo廃止（SOL-34）より前のtournament runは
+checkpoint・`.mwsol`のgame fingerprintが現行と一致しない。16人以上のrunは埋込みconfigに廃止key
+`samples`・`seed`を含み読み込めない。いずれも現行で再solveする。互換aliasは置かない。
 
 ## 5. arenaと資源検査
 

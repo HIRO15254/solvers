@@ -1072,8 +1072,6 @@ stack_bb = 12
                 stack_bb: 100.0,
             }],
             payouts: vec![100.0, 60.0, 40.0, 0.0],
-            samples: 10_000,
-            seed: 7,
         };
         config
             .validate_economics(&utility, &RakeConfig::None)

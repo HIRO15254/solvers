@@ -3974,8 +3974,6 @@ fn vector_traverser_icm_smoke_test() {
             stack_bb: 40.0,
         }],
         payouts: vec![100.0, 60.0, 30.0, 0.0],
-        samples: 4_000,
-        seed: 11,
     };
 
     let game = HoldemGame::new(

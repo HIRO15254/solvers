@@ -263,8 +263,6 @@ probability_encoding = "f32"
     let huge_prizes = economics::UtilityConfig::TournamentIcm {
         outside_field: Vec::new(),
         payouts: vec![1e308, 9e307, 0.0],
-        samples: 100_000,
-        seed: 0,
     };
     assert!(input::resolve_target(&huge_prizes, &input::Target::default()).is_err());
 }

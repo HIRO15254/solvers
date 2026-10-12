@@ -43,8 +43,6 @@ struct RawEconomics {
     rake: Option<RawRake>,
     payouts: Option<Vec<f64>>,
     outside_field_bb: Option<Vec<f64>>,
-    samples: Option<i64>,
-    seed: Option<i64>,
 }
 
 #[derive(Default, Deserialize)]
@@ -155,8 +153,6 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             ("rake", "rake"),
             ("payouts", "array:number"),
             ("outside_field_bb", "array:number"),
-            ("samples", "integer"),
-            ("seed", "integer"),
         ],
         "rake" => &[
             ("rate", "number"),
@@ -655,8 +651,6 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
             for (name, set) in [
                 ("payouts", raw.payouts.is_some()),
                 ("outside_field_bb", raw.outside_field_bb.is_some()),
-                ("samples", raw.samples.is_some()),
-                ("seed", raw.seed.is_some()),
             ] {
                 if set {
                     return Err(SpotError::new(
@@ -738,20 +732,6 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
                     "field exceeds 10000 players",
                 ));
             }
-            if field <= economics::EXACT_ICM_MAX_PLAYERS {
-                if raw.samples.is_some() {
-                    return Err(value_error(
-                        "economics.samples",
-                        "samples apply only to fields of at least 16 players",
-                    ));
-                }
-                if raw.seed.is_some() {
-                    return Err(value_error(
-                        "economics.seed",
-                        "seed applies only to fields of at least 16 players",
-                    ));
-                }
-            }
             let outside_field = outside
                 .into_iter()
                 .enumerate()
@@ -781,19 +761,9 @@ fn economics(raw: RawEconomics, players: usize) -> Result<Economics, SpotError> 
                 }
             }
             payouts.resize(field, 0.0);
-            let samples = unsigned(raw.samples.unwrap_or(100_000), "economics.samples", false)?;
-            if field > economics::EXACT_ICM_MAX_PLAYERS && samples < 2 {
-                return Err(value_error(
-                    "economics.samples",
-                    "sampled ICM requires at least two samples",
-                ));
-            }
-            let seed = unsigned(raw.seed.unwrap_or(0), "economics.seed", true)?;
             let utility = UtilityConfig::TournamentIcm {
                 outside_field,
                 payouts,
-                samples,
-                seed,
             };
             utility
                 .validate(players)

@@ -163,15 +163,18 @@ P1では`flop_dealt = true`、`players_dealt = table.players`、`players_saw_flo
 kind = "tournament"
 payouts = [1000, 600, 400]   # 必須。順位順に非増加、非負、有限
 outside_field_bb = [18, 26]  # 既定[]。この卓にいない残存playerのstack
-samples = 100000             # 卓＋fieldが16人以上のときだけ指定可。既定100000
-seed = 0                     # 同上。既定0
 ```
 
-- 効用は卓の**全員**（そのhandでfoldした人を含む）とoutside fieldの最終stackから計算するICM equity。
-  卓＋fieldが15人以下ならexact、16人以上は決定的Monte Carlo。最大10,000人。
+- 効用は卓の**全員**（そのhandでfoldした人を含む）とoutside fieldの最終stackから計算するICM equity。最大10,000人。
+  卓＋fieldが15人以下は部分集合DPによるexact ICMである。
+  16人以上はDE-ICM（[arXiv:2610.06028](https://arxiv.org/abs/2610.06028)）を固定outside field向けに適応した
+  決定的な二重指数型求積であり、乱数を使わない。stackの総和で正規化した格子を1つ使い、
+  1 chip（0.001 BB）のstackまでを窓に含める。exact ICMとの相対差は試験で1e-12以内である。
+  そのhandで0になった席は残存者より下位で、開始stackが大きい順に上位とする。同じ開始stackならその順位の賞金を等分する。
 - `payouts`の省略順位には0を補う。卓＋fieldの人数を超える項目は`NLH003`である。
   補完後の全順位が同額なら`NLH003`である。賞金のある順位だけが同額のチケット型サテライトは書ける。
-- outside fieldのstackは正、0.001 BB gridである。Monte Carloの`samples`は2以上、`seed`は非負の整数である。
+- outside fieldのstackは正、0.001 BB gridである。
+- 旧版のMonte Carlo指定`samples`・`seed`は廃止した。指定すると未知keyの`NLH002`である。
 - rakeと同時に指定できない。
 
 ## 7. `[spot]`

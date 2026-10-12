@@ -478,18 +478,6 @@ invalid!(
     "economics.payouts.1"
 );
 invalid!(
-    tournament_exact_samples,
-    "[economics]\nkind = \"tournament\"\npayouts = [1]\nsamples = 100000",
-    NLH003,
-    "economics.samples"
-);
-invalid!(
-    tournament_exact_seed,
-    "[economics]\nkind = \"tournament\"\npayouts = [1]\nseed = 0",
-    NLH003,
-    "economics.seed"
-);
-invalid!(
     tournament_outside_zero,
     "[economics]\nkind = \"tournament\"\npayouts = [1]\noutside_field_bb = [0]",
     NLH003,
@@ -740,7 +728,7 @@ fn rake_defaults_and_variants() {
 }
 
 #[test]
-fn tournament_exact_and_sampled_defaults_and_explicit() {
+fn tournament_defaults_and_removed_sampling_keys() {
     let exact = format!(
         "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000,600,400]\noutside_field_bb = [18,26]"
     );
@@ -749,38 +737,33 @@ fn tournament_exact_and_sampled_defaults_and_explicit() {
         UtilityConfig::TournamentIcm {
             payouts,
             outside_field,
-            samples,
-            seed,
         } => {
             assert_eq!(payouts, &[1000.0, 600.0, 400.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
-            assert_eq!(*samples, 100000);
-            assert_eq!(*seed, 0);
             assert_eq!(outside_field[0].name, "outside-0");
             assert_eq!(outside_field[1].name, "outside-1");
         }
         _ => panic!(),
     }
-    let n = roundtrip(&exact);
-    assert!(!n.contains("samples ="));
-    assert!(!n.contains("seed ="));
+    roundtrip(&exact);
     let default_exact = roundtrip(&format!(
         "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000]"
     ));
     assert!(default_exact.contains("outside_field_bb = []"));
-    let sampled = format!(
+    let large = format!(
         "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000]\noutside_field_bb = [1,2,3,4,5,6,7,8,9,10]"
     );
-    let n = roundtrip(&sampled);
-    assert!(n.contains("samples = 100000"));
-    assert!(n.contains("seed = 0"));
-    roundtrip(&format!("{sampled}\nsamples = 2\nseed = 5"));
+    roundtrip(&large);
+    // Monte Carlo ICM was replaced by deterministic quadrature; its keys
+    // are rejected rather than ignored.
     for (tail, key) in [
-        ("samples = 1", "economics.samples"),
-        ("seed = -1", "economics.seed"),
+        ("samples = 100000", "economics.samples"),
+        ("seed = 0", "economics.seed"),
     ] {
-        let e = error(&format!("{sampled}\n{tail}"));
-        assert_eq!(e.code, Code::NLH003);
-        assert_eq!(e.key.as_deref(), Some(key));
+        for document in [&exact, &large] {
+            let e = error(&format!("{document}\n{tail}"));
+            assert_eq!(e.code, Code::NLH002);
+            assert_eq!(e.key.as_deref(), Some(key));
+        }
     }
 }
 
@@ -1054,8 +1037,6 @@ fn dotted_type_errors_for_every_common_shape() {
         ("economics", "rake"),
         ("economics", "payouts"),
         ("economics", "outside_field_bb"),
-        ("economics", "samples"),
-        ("economics", "seed"),
         ("economics.rake", "rate"),
         ("economics.rake", "cap_bb"),
         ("economics.rake", "when"),

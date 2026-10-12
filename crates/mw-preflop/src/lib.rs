@@ -12,7 +12,6 @@ pub mod card_abstraction;
 pub mod checkpoint;
 pub mod config;
 pub mod holdem;
-pub mod icm;
 pub mod input;
 pub mod rake_condition;
 pub mod sampler;
@@ -36,9 +35,6 @@ pub use checkpoint::{
 pub use config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
     RecallMode, SeatConfig, StreetBettingConfig,
-};
-pub use economics::icm::{
-    IcmDeltaEstimate, IcmError, IcmEstimate, IcmMode, estimate_icm, terminal_icm_delta,
 };
 pub use economics::rake_condition::{CompiledRakeCondition, RakeConditionContext};
 pub use economics::{RakeAllocation, RakeRounding, UtilityConfig};

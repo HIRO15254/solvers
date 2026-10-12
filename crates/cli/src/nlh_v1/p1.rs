@@ -213,7 +213,7 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
         writeln!(
             out,
             "economics: tournament ICM table players={table} field players={field} {}",
-            if field <= 15 { "exact" } else { "sampled" }
+            if field <= 15 { "exact" } else { "quadrature" }
         )
         .unwrap();
     }

@@ -419,7 +419,6 @@ mod tests {
             "rounding_unit_bb",
             "payouts",
             "outside_field_bb",
-            "samples",
             "seed",
             "spot",
             "ranges",

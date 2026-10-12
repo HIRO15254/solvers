@@ -85,8 +85,6 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             UtilityConfig::TournamentIcm {
                 outside_field,
                 payouts,
-                samples,
-                seed,
             } => {
                 let outside_field = outside_field
                     .iter()
@@ -100,8 +98,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                         .collect(),
                 )
                 .expect("validated seat count is supported");
-                let calculator =
-                    PreparedIcm::new(starting, outside_field, payouts.clone(), *samples, *seed)?;
+                let calculator = PreparedIcm::new(starting, outside_field, payouts.clone())?;
                 UtilityRuntime::TournamentIcm {
                     calculator: Arc::new(calculator),
                     terminal_cache: Arc::new(Mutex::new(FxHashMap::default())),
@@ -400,7 +397,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 if let Some(cached) = cached {
                     return Ok(cached);
                 }
-                let deltas = calculator.terminal_delta(&settlement.final_stacks)?.deltas;
+                let deltas = calculator.terminal_delta(&settlement.final_stacks)?;
                 let mut cache = terminal_cache
                     .lock()
                     .map_err(|_| HoldemGameError::IcmCachePoisoned)?;
@@ -1461,8 +1458,6 @@ mod tests {
                 &UtilityConfig::TournamentIcm {
                     outside_field: Vec::<FieldPlayerConfig>::new(),
                     payouts,
-                    samples: 8,
-                    seed: 3,
                 },
                 &RakeConfig::None,
                 FeatureHashAbstraction::default(),

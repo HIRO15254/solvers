@@ -28,7 +28,7 @@ crateは`crates/`直下に平置きし、名前の接頭辞で所有者を示す
 | crate | 責務 | 主な由来 |
 |---|---|---|
 | `nlh` | card、combo、range、役判定、盤面述語、suit同型、chip単位（0.001 BB）、position、2〜9人のNLHベッティング規則（forced bet、straddle、min-raise、all-in、side pot）、size literalの解決、tree script（条件式・param/define）の汎用処理系 | `cards`、`hand-index`、`multiway::{betting, settlement, types}` |
-| `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/Monte Carlo）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部（M3）。`cli::economics`はM4、`game::payoff`のrake・ICMはM5で載せ替える |
+| `economics` | rake（率・cap・条件・丸め・配分）、ICM（exact/DE-ICM求積。Monte Carloは2026-10のSOL-34で置換）、utility | `multiway::{icm, rake_condition}`、`multiway::config`のrake部（M3）。`cli::economics`はM4、`game::payoff`のrake・ICMはM5で載せ替える |
 | `spot` | 共通Input: TOML schema、parse/正規化、v1のtree方言（共通の条件変数・size literal）、line文法と再生、製品の決定、検証、Spot IR | 旧`cli`のconfig層（置換） |
 | `runfiles` | run directory契約（`run.toml`、manifest、events、progress、run.json）、config hash | `formats::{run, metrics, hash}` |
 | `hu-engine` | HU vector CFR/BR、storage、discount schedule（未使用のHU chance-sampled driverは2026-10-13の利用者決定で削除） | `engine` |

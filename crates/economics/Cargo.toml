@@ -8,7 +8,5 @@ description = "Shared NLH rake, ICM evaluation, and utility configuration"
 
 [dependencies]
 nlh = { workspace = true }
-rand = { workspace = true }
-rand_chacha = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }

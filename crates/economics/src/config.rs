@@ -18,15 +18,7 @@ pub enum UtilityConfig {
         /// One entry per remaining field player, best finish first.  Zero
         /// prizes must be present rather than omitted.
         payouts: Vec<f64>,
-        #[serde(default = "default_icm_samples")]
-        samples: u64,
-        #[serde(default)]
-        seed: u64,
     },
-}
-
-fn default_icm_samples() -> u64 {
-    100_000
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -121,8 +113,6 @@ impl UtilityConfig {
             UtilityConfig::TournamentIcm {
                 outside_field,
                 payouts,
-                samples,
-                ..
             } => {
                 let field = table_players + outside_field.len();
                 if !(2..=crate::icm::ICM_MAX_PLAYERS).contains(&field) {
@@ -133,9 +123,6 @@ impl UtilityConfig {
                         expected: field,
                         actual: payouts.len(),
                     });
-                }
-                if field > crate::icm::EXACT_ICM_MAX_PLAYERS && *samples < 2 {
-                    return Err(ConfigError::IcmSamples);
                 }
                 for (index, player) in outside_field.iter().enumerate() {
                     if player.name.trim().is_empty() {
@@ -268,8 +255,6 @@ pub enum ConfigError {
     IcmField(usize),
     #[error("ICM payouts length must be {expected}, got {actual}")]
     PayoutCount { expected: usize, actual: usize },
-    #[error("sampled ICM requires at least two samples")]
-    IcmSamples,
     #[error("outside-field player {0} has an empty name")]
     OutsideName(usize),
     #[error("payouts must be ordered highest to lowest")]
@@ -280,39 +265,4 @@ pub enum ConfigError {
     RakeCondition(String),
     #[error("rake rate must be from zero through one")]
     RakeRate,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn icm_sample_minimum_applies_only_to_sampled_fields() {
-        let table_players = 3;
-        let exact_players = table_players;
-        let exact = UtilityConfig::TournamentIcm {
-            outside_field: Vec::new(),
-            payouts: (0..exact_players).rev().map(|place| place as f64).collect(),
-            samples: 0,
-            seed: 1,
-        };
-        exact.validate(table_players).unwrap();
-
-        let outside_count = 16 - table_players;
-        let sampled = UtilityConfig::TournamentIcm {
-            outside_field: (0..outside_count)
-                .map(|index| FieldPlayerConfig {
-                    name: format!("outside-{index}"),
-                    stack_bb: 100.0,
-                })
-                .collect(),
-            payouts: (0..16).rev().map(|place| place as f64).collect(),
-            samples: 1,
-            seed: 1,
-        };
-        assert!(matches!(
-            sampled.validate(table_players),
-            Err(ConfigError::IcmSamples)
-        ));
-    }
 }

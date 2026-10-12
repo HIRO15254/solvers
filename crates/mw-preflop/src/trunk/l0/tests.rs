@@ -1816,8 +1816,6 @@ fn rejects_icm_postflop_and_zero_deal_and_warns_on_suits() {
     let icm = economics::UtilityConfig::TournamentIcm {
         outside_field: Vec::new(),
         payouts: vec![1.0, 0.0],
-        samples: 8,
-        seed: 0,
     };
     let icm_game = HoldemGame::new(
         &prepared.lowered.game,

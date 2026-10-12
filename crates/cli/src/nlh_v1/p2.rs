@@ -72,8 +72,8 @@ pub(crate) fn validate(
             "policySlots": r.policy_slots, "solverStateBytes": r.solver_state_bytes,
             "memoryLimitBytes": p.lowered.run.memory_bytes, "withinLimit": r.complete,
             "icm": r.icm.map(|i| json!({"fieldPlayers": i.field_players, "paidPlaces": i.paid_places,
-                "mode": if matches!(i.mode, mw_preflop::session::IcmPreflightMode::Exact) { "exact" } else { "sampled" },
-                "samples": i.samples, "seed": i.seed, "preparedBytes": i.prepared_bytes, "preparedLimitBytes": i.prepared_limit_bytes})),
+                "mode": if i.quadrature_nodes.is_some() { "quadrature" } else { "exact" },
+                "quadratureNodes": i.quadrature_nodes})),
         });
     }
     if show {

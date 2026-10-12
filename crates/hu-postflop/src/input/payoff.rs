@@ -2,9 +2,9 @@
 //! utilities are BB for cash and prize units for tournaments.
 use super::invalid;
 use crate::game::{PayoffPipeline, RakeModel, TerminalDescriptor, TerminalKind, UtilityModel};
-use economics::{CompiledRake, UtilityConfig, estimate_icm};
+use economics::{CompiledRake, PreparedIcm, UtilityConfig};
 use nlh::settlement::{PotKind, PotLayer, PotRake, RakeConditionContext};
-use nlh::{MwChips, PerPlayer, Player, SeatMask};
+use nlh::{MwChips, PerPlayer, Player, SeatMask, SeatVec};
 use spot::{Product, Spot, SpotError};
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -45,12 +45,15 @@ impl NlhPayoff {
             UtilityConfig::TournamentIcm {
                 outside_field,
                 payouts,
-                samples,
-                seed,
             } => {
-                // OOP/IP first, then folded table seats in table order, then the
-                // outside field. This also preserves legacy HU sampler ordering
-                // when folded stacks are supplied as its outside field.
+                // OOP/IP form the table; folded table seats keep their final
+                // stacks alongside the outside field.
+                let starting = SeatVec::new_unchecked(
+                    [seats[Player::P0], seats[Player::P1]]
+                        .iter()
+                        .map(|id| spot.context.seats[id.index()].starting_stack)
+                        .collect(),
+                );
                 let mut fixed: Vec<MwChips> = spot
                     .context
                     .seats
@@ -64,11 +67,13 @@ impl NlhPayoff {
                             .map_err(|e| invalid("economics.outside_field_bb", e.to_string()))?,
                     );
                 }
+                let zero_sum_field = fixed.is_empty();
                 Utility::Icm {
-                    fixed,
-                    payouts: payouts.clone(),
-                    samples: *samples,
-                    seed: *seed,
+                    prepared: Box::new(
+                        PreparedIcm::new(starting, fixed, payouts.clone())
+                            .map_err(|e| invalid("economics", e.to_string()))?,
+                    ),
+                    zero_sum_field,
                     memo: Mutex::new(HashMap::new()),
                 }
             }
@@ -78,7 +83,7 @@ impl NlhPayoff {
         let zero_sum = contributions[Player::P0] + contributions[Player::P1] == pot as f64
             && match &utility {
                 Utility::ChipEv => true,
-                Utility::Icm { fixed, .. } => fixed.is_empty(),
+                Utility::Icm { zero_sum_field, .. } => *zero_sum_field,
             };
         // Validate and cache the ICM baseline before tree allocation.
         utility.try_values(remaining)?;
@@ -164,10 +169,9 @@ impl RakeModel for NlhRake {
 enum Utility {
     ChipEv,
     Icm {
-        fixed: Vec<MwChips>,
-        payouts: Vec<f64>,
-        samples: u64,
-        seed: u64,
+        prepared: Box<PreparedIcm>,
+        /// No folded or off-table players: heads-up ICM is affine in chips.
+        zero_sum_field: bool,
         memo: Mutex<HashMap<(u64, u64), PerPlayer<f64>>>,
     },
 }
@@ -186,13 +190,7 @@ impl Utility {
     fn try_values(&self, actual: PerPlayer<f64>) -> Result<PerPlayer<f64>, SpotError> {
         match self {
             Utility::ChipEv => Ok(actual.map(|v| v / 1000.0)),
-            Utility::Icm {
-                fixed,
-                payouts,
-                samples,
-                seed,
-                memo,
-            } => {
+            Utility::Icm { prepared, memo, .. } => {
                 // Showdown ties can leave half a milli-BB. As in the legacy
                 // tournament adapter, round stacks to the shared ICM grid.
                 let pair = actual.map(|v| MwChips::try_from_bb(v / 1000.0));
@@ -206,11 +204,10 @@ impl Utility {
                 if let Some(value) = memo.lock().expect("ICM cache").get(&key) {
                     return Ok(*value);
                 }
-                let mut stacks = vec![*a, *b];
-                stacks.extend_from_slice(fixed);
-                let estimate = estimate_icm(&stacks, payouts, *samples, *seed)
+                let values = prepared
+                    .terminal_values(&SeatVec::new_unchecked(vec![*a, *b]))
                     .map_err(|e| invalid("economics", e.to_string()))?;
-                let value = PerPlayer::new(estimate.values[0], estimate.values[1]);
+                let value = PerPlayer::new(values.as_slice()[0], values.as_slice()[1]);
                 memo.lock().expect("ICM cache").insert(key, value);
                 Ok(value)
             }

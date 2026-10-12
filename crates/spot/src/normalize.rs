@@ -182,8 +182,6 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         UtilityConfig::TournamentIcm {
             outside_field,
             payouts,
-            samples,
-            seed,
         } => {
             insert(&mut economics, "kind", Value::String("tournament".into()));
             insert(
@@ -196,10 +194,6 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
                 "outside_field_bb",
                 Value::Array(outside_field.iter().map(|v| numeric(v.stack_bb)).collect()),
             );
-            if t.stacks.len() + outside_field.len() > economics::EXACT_ICM_MAX_PLAYERS {
-                insert(&mut economics, "samples", Value::Integer(*samples as i64));
-                insert(&mut economics, "seed", Value::Integer(*seed as i64));
-            }
         }
     }
     if let RakeConfig::Generic {
