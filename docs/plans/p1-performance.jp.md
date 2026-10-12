@@ -195,6 +195,8 @@ PF5のf32計算では、旧版とのbit一致の代わりに、同じbinary・�
 ## 4. 計測
 
 - 計時はrelease buildの`p1_bench`（build・iteration・評価を分けて計る）と、CLI全体の`/usr/bin/time -v`。
+  現行の`buildSecs`はcount pass・木のbuild・`GameIndex`生成を含む。builderの`node_info`を解放してからsolver storageを確保し、indexは計測終了まで保持する。
+  `evaluateSecs`（通常は評価ごとの配列、`iterationBands`内は各bandの秒数）は`Solver::evaluate()`による両seat EV/BRの計時であり、旧`exploitability()`の`evalSecs`とは混ぜない。
 - 比較は同じVM・同じbootで新旧binaryを交互に実行する。ローカルPCは他の計算と共有しているので参考値に留める。
 - GCPの使用はVMごとに機種・期間を記録し、計測後に削除する。累計上限20 USD。
 

@@ -23,8 +23,8 @@
 //!
 //! This equivalence licenses the standard "small save" viewer-artifact
 //! trick (see `docs/architecture.md` on compact viewer artifacts): a solved
-//! trunk's checkpoint can omit river regrets/strategies
-//! entirely and re-solve the river on demand when a viewer navigates there,
+//! trunk's `.sol` can omit river strategy/value blocks (the tree remains)
+//! and re-solve the river on demand when a viewer navigates there,
 //! using [`river_entry_state`] + [`river_resolve_config`] to reconstruct an
 //! equivalent subgame and running a fresh (short) solve on it. That said, a
 //! **reach-weighted fresh river re-solve is only an approximation of the

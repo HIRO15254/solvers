@@ -133,12 +133,18 @@ pub fn run(
     })
 }
 
+type QueryResult<S> = (
+    Solver<crate::PostflopEvaluator, S>,
+    GameIndex,
+    (PerPlayer<f64>, PerPlayer<f64>),
+);
+
 pub(crate) fn query<S: Storage>(
     p: &Prepared,
     iterations: Option<u64>,
     target_nash_conv: Option<f64>,
     cancel: &AtomicBool,
-) -> Result<(Solver<crate::PostflopEvaluator, S>, GameIndex)> {
+) -> Result<QueryResult<S>> {
     crate::prepare::check_memory_limit(p)?;
     let iterations = iterations.unwrap_or(p.settings.solver.stop.max_iterations);
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
@@ -159,6 +165,7 @@ pub(crate) fn query<S: Storage>(
     let target = target_nash_conv.map(|t| t / 2.0).or(p.target);
     let check_every = p.settings.solver.stop.check_every;
     let mut history = Vec::new();
+    let mut evaluated = None;
     let mut next_check = next_evaluation(&history, target, 0, iterations, check_every);
     while solver.iteration() < iterations {
         if cancel.load(std::sync::atomic::Ordering::SeqCst)
@@ -171,9 +178,11 @@ pub(crate) fn query<S: Storage>(
             break;
         }
         solver.run(batch_step(check_every, next_check - solver.iteration()));
+        evaluated = None;
         if solver.iteration() == next_check {
             if let Some(target) = target {
-                let expl = solver.exploitability();
+                let (ev, expl) = solver.evaluate();
+                evaluated = Some((ev, expl));
                 let value = (expl[Player::P0] + expl[Player::P1]) / 2.0;
                 history.push((solver.iteration(), value));
                 if value <= target {
@@ -189,7 +198,8 @@ pub(crate) fn query<S: Storage>(
             );
         }
     }
-    Ok((solver, index))
+    let evaluation = evaluated.unwrap_or_else(|| solver.evaluate());
+    Ok((solver, index, evaluation))
 }
 
 /// Builds the game and its viewer index, releasing the builder's per-node
@@ -468,6 +478,7 @@ pub(crate) fn subgame_ev(solver_ev: PerPlayer<f64>, offset: PerPlayer<f64>) -> P
     )
 }
 
+#[cfg(test)]
 pub(crate) fn solver_ev<E: TerminalEvaluator, S: Storage>(solver: &Solver<E, S>) -> PerPlayer<f64> {
     PerPlayer::new(
         solver.expected_value(Player::P0),
@@ -490,6 +501,7 @@ pub struct RunSummary {
     pub canceled: bool,
 }
 
+#[cfg(test)]
 pub(crate) fn summarize<E: TerminalEvaluator, S: Storage>(
     solver: &Solver<E, S>,
     elapsed: Duration,
@@ -499,7 +511,7 @@ pub(crate) fn summarize<E: TerminalEvaluator, S: Storage>(
     summary_from_evaluation(solver, elapsed, ev, expl)
 }
 
-fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
+pub(crate) fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
     solver: &Solver<E, S>,
     elapsed: Duration,
     ev: PerPlayer<f64>,

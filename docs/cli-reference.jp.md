@@ -261,11 +261,13 @@ solvers compare <LEFT> <RIGHT> [--cross-game]
 ```
 
 同じ製品のsolutionの平均profileを比較し、JSONを出す。
-P1はtree形状と保存node集合、通常はboard・pot・effective stackの一致も要求する。
-`--cross-game`は後者だけを外す。`mean_strategy_l1` / `max_strategy_l1`は戦略差、
+P1はtree形状と保存node集合、通常はboard・pot・effective stack、seat別comboリスト、
+各nodeのaction label（sizeを含む）の一致も要求する。rangeの重みだけの違いは許す。
+`--cross-game`は形状・保存node集合以外の一致条件を外す。最初の不一致をerrorで示す。
+`mean_strategy_l1` / `max_strategy_l1`は戦略差、
 `mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
 EV差はcashでBB、ICMで賞金単位である。
-P1は両solutionの埋込みconfigが同一（config hashが一致）なら保存済みの木とindexを1回だけ展開して共有し、異なればそれぞれ展開する。
+P1は保存index checksumとconfigから復元したseat別comboリスト・root range・開始streetが全て一致する場合だけ木とindexを共有する。異なれば右indexも通常どおり読込・検証する。共有時も右indexのchecksumを検証し、config hashの一致だけでは共有しない。
 P2は通常game fingerprintの一致を要求する。`--cross-game`でもseat mappingとutility単位の一致は必要である。
 
 ## `solvers evaluate`

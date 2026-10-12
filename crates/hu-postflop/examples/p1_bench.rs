@@ -1,7 +1,11 @@
-//! P1 throughput harness: times tree build, CFR iterations and the
-//! exploitability evaluation separately for one `solvers.nlh/v1` P1 config,
-//! and reports the process peak memory. One thread count per process, so
-//! every measurement starts from a fresh heap.
+//! P1 throughput harness: times count/build and GameIndex creation, CFR
+//! iterations and Solver::evaluate() separately for one `solvers.nlh/v1`
+//! P1 config, and reports the process peak memory. Builder node_info is
+//! released before solver storage allocation; the index stays alive through
+//! all measurements, matching the product. One thread count per process, so
+//! every measurement starts from a fresh heap. `buildSecs` includes count;
+//! `evaluateSecs` (including iteration bands) measures full EV/BR evaluation,
+//! not the historical exploitability-only `evalSecs`.
 //!
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
@@ -13,6 +17,7 @@ use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
 use hu_engine::{F32Storage, I16Storage, MixedStorage, ParConfig, Solver, Storage};
+use hu_postflop::index::GameIndex;
 use hu_postflop::input::Storage as StorageKind;
 use hu_postflop::{Player, prepare};
 
@@ -156,7 +161,6 @@ fn bench<S: Storage>(
 ) -> Result<()> {
     let t = Instant::now();
     let game = hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline())?;
-    let build_secs = t.elapsed().as_secs_f64();
     let tree = &game.game.tree;
     let nodes = tree.nodes.len();
     let action_nodes = tree.storage_refs.len();
@@ -165,6 +169,9 @@ fn bench<S: Storage>(
     let transitions = tree.transitions.len();
     let transition_entries: usize = tree.transitions.iter().map(|t| t.entries.len()).sum();
     let node_info = game.node_info.len();
+    let index = GameIndex::from_game(&game.game, &game.node_info, p.document.spot.context.street);
+    drop(game.node_info);
+    let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
 
     let t = Instant::now();
@@ -208,7 +215,7 @@ fn bench<S: Storage>(
                     "lastIteration": iteration, "samples": steps.len(),
                     "stepSecs": steps,
                     "secsPerIter": steps.iter().sum::<f64>() / steps.len() as f64,
-                    "evalSecs": eval_start.elapsed().as_secs_f64(),
+                    "evaluateSecs": eval_start.elapsed().as_secs_f64(),
                     "nashConv": expl[Player::P0] + expl[Player::P1],
                 }));
             }
@@ -220,12 +227,12 @@ fn bench<S: Storage>(
     // the per-band step times above exclude evaluation.
     let iter_secs = t.elapsed().as_secs_f64();
 
-    let mut eval_secs = Vec::new();
+    let mut evaluate_secs = Vec::new();
     let mut nash_conv = f64::NAN;
     for _ in 0..args.evals {
         let t = Instant::now();
-        let expl = solver.exploitability();
-        eval_secs.push(t.elapsed().as_secs_f64());
+        let (_, expl) = solver.evaluate();
+        evaluate_secs.push(t.elapsed().as_secs_f64());
         nash_conv = expl[Player::P0] + expl[Player::P1];
     }
     let peak = memory::peak_bytes();
@@ -257,7 +264,7 @@ fn bench<S: Storage>(
         "iters": args.iters,
         "iterSecs": iter_secs,
         "secsPerIter": per_iter,
-        "evalSecs": eval_secs,
+        "evaluateSecs": evaluate_secs,
         "nashConv": nash_conv,
         "afterBuildBytes": after_build_mem,
         "peakBytes": peak,
@@ -269,6 +276,7 @@ fn bench<S: Storage>(
     if let Some(path) = &args.json {
         std::fs::write(path, serde_json::to_string_pretty(&report)?)?;
     }
+    drop(index);
     Ok(())
 }
 

@@ -90,23 +90,23 @@ fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) 
         if reach == 0.0 {
             continue;
         }
-        let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
-        per_card[hi] += reach as f64;
-        per_card[lo] += reach as f64;
+        let (hi, lo) = nlh::combo_cards(combo as usize);
+        per_card[hi.index()] += reach as f64;
+        per_card[lo.index()] += reach as f64;
     }
     hands
         .combos(p)
         .iter()
         .enumerate()
         .map(|(i, &combo)| {
-            let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
+            let (hi, lo) = nlh::combo_cards(combo as usize);
             let same = hands.same[p][i];
             let r = if same == crate::hands::ABSENT {
                 0.0
             } else {
                 opp_reach[same as usize] as f64
             };
-            (total - per_card[hi] - per_card[lo] + r).max(0.0) as f32
+            (total - per_card[hi.index()] - per_card[lo.index()] + r).max(0.0) as f32
         })
         .collect()
 }
@@ -343,12 +343,11 @@ fn strategy_batch_end(
 /// re-solve a river), the cached metadata, and everything [`SolProvider`]
 /// needs to answer strategy queries against it.
 pub struct LoadedSol {
-    /// Stored tree and index; shared by loads of artifacts with the same
-    /// embedded config (see [`load_sol_sharing`]).
+    /// Stored tree and index; shared by loads with identical stored index
+    /// checksums (see [`load_sol_sharing`]).
     pub game: Arc<IndexedTree>,
     pub config: PostflopConfig,
-    /// `blake3` of the embedded config TOML (the `.sol` header hash).
-    pub config_hash: [u8; 32],
+    index_checksum: [u8; 32],
     pub meta: SolMeta,
     pub mode: StreetsStored,
     /// Stored blocks keyed by `sref` (== the action node's `Node::aux`),
@@ -436,8 +435,8 @@ pub fn load_sol(
 }
 
 /// [`load_sol`] without river re-solves that reuses `other`'s tree and index
-/// when both artifacts embed the same config (equal config hashes): the
-/// tree is a deterministic function of that config.
+/// when stored index checksums and config-derived supports, root ranges and
+/// starting street match. The right index frame is still verified.
 pub fn load_sol_sharing(path: &Path, other: &LoadedSol) -> Result<LoadedSol> {
     load(path, 0, None, Some(other))
 }
@@ -461,10 +460,24 @@ fn load(
     let pf_config = p.config;
     let nlh = (p.spot, p.settings);
     let board_cards = pf_config.board.clone();
-    let config_hash = runfiles::config_hash(metadata.config_toml.as_bytes());
+    let index_checksum = reader.index_checksum();
+    // The stream stores tree/viewer fields, but support and root ranges are
+    // reconstructed from config. Equal frame bytes alone cannot share those.
+    let hands = crate::PostflopHands::new(&pf_config.board, &pf_config.ranges);
+    let root_ranges = crate::postflop::root_ranges(&pf_config, &hands);
 
-    let game = match share.filter(|other| other.config_hash == config_hash) {
-        Some(other) => Arc::clone(&other.game),
+    let game = match share.filter(|other| {
+        other.index_checksum == index_checksum
+            && other.config.board.len() == pf_config.board.len()
+            && Player::BOTH.into_iter().all(|seat| {
+                other.game.index.hands.combos(seat) == hands.combos(seat)
+                    && other.game.index.root_ranges[seat] == root_ranges[seat]
+            })
+    }) {
+        Some(other) => {
+            reader.verify_index().with_context(context)?;
+            Arc::clone(&other.game)
+        }
         None => Arc::new(
             reader
                 .read_index(|stream| {
@@ -499,7 +512,7 @@ fn load(
     Ok(LoadedSol {
         game,
         config: pf_config,
-        config_hash,
+        index_checksum,
         meta: metadata.meta,
         mode: metadata.mode,
         store: reader.into_store(),
@@ -900,7 +913,7 @@ threads=1
 memory='1GiB'
 "#;
         let p = crate::prepare::prepare(raw, Path::new("test.toml")).unwrap();
-        let (solver, index) =
+        let (solver, index, _) =
             crate::run::query::<I16Storage>(&p, None, None, &AtomicBool::new(false)).unwrap();
         let offset = p.payoff.ev_offset();
         let expl = solver.exploitability();

@@ -205,8 +205,10 @@ stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのst
 同じ設定でRiverをlazy re-solveする。`viewer`はhistory replayとsubgame再構成を担当する。
 `queries`はlive inspection、reach・action frequency・class grid・equity・combo queryを返す。
 `views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。
-複数nodeの行と比較はnodeごとにRayonで並列に計算し、node順に連結・集計するため出力は直列計算と一致する。
-reachはindexのparent配列から根からのpathを辿る。compareは両artifactのconfig hashが同じなら展開した木とindexを共有する。
+bulk node exportは要求nodeと祖先だけを1回のforward passで辿り、path-local reachで行を計算して指定node順（重複も含む）に連結する。reachの乗算順は根からの個別path照会と一致する。
+compareはnode別deltaを再利用bufferでRayon並列計算し、node順に集計する。historyはerrorか最終最大差nodeの表示に必要な場合だけ生成する。
+木/index共有は保存index checksumとconfigから復元したsupport・root range・開始streetが全て一致する場合だけ行う。共有する右indexもchecksum検証し、異なれば通常読込する。
+live queryとboard reportは`Solver::evaluate()`のEV/BR同時評価を使い、最終iterationで既に評価済みなら再利用する。
 `report`は全boardを先に検証し、boardごとの数値とOR集約したrule-hit警告を返す。
 これらのmoduleはstdout/stderrやCLI引数を持たない。
 

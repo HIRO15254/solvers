@@ -56,6 +56,96 @@ fn path(path: &Path) -> &str {
 }
 
 #[test]
+fn comparison_requires_combo_and_action_identity_unless_cross_game() {
+    let temp = tempfile::tempdir().unwrap();
+    let solve = |name: &str, config: &str| {
+        let input = temp.path().join(format!("{name}.toml"));
+        let run = temp.path().join(name);
+        std::fs::write(&input, config).unwrap();
+        ok(&["solve", path(&input), "--out", path(&run)], "");
+        run.join("solution.sol")
+    };
+    let original = solve("original", RIVER);
+    let sizes = solve("sizes", &RIVER.replace("3.3bb", "3.4bb"));
+    let support = solve("support", &RIVER.replace("JhJd", "JcJs"));
+    let weights = solve("weights", &RIVER.replace("JhJd,ThTd", "JhJd:0.5,ThTd"));
+    for (other, mismatch) in [(&sizes, "action labels"), (&support, "hand lists")] {
+        let result = cli(&["compare", path(&original), path(other)], "");
+        assert!(!result.status.success());
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(error.contains(mismatch), "{error}");
+        assert!(error.contains("--cross-game"), "{error}");
+        ok(
+            &["compare", path(&original), path(other), "--cross-game"],
+            "",
+        );
+    }
+    ok(&["compare", path(&original), path(&weights)], "");
+    let left = hu_postflop::artifact::load_sol(&original, 0, None).unwrap();
+    for other in [&support, &weights] {
+        let bytes = std::fs::read(other).unwrap();
+        let original_bytes = std::fs::read(&original).unwrap();
+        assert_eq!(
+            &bytes[114..146],
+            &original_bytes[114..146],
+            "same stored index checksum"
+        );
+        let shared = hu_postflop::artifact::load_sol_sharing(other, &left).unwrap();
+        let independent = hu_postflop::artifact::load_sol(other, 0, None).unwrap();
+        assert!(!std::sync::Arc::ptr_eq(&shared.game, &left.game));
+        for seat in [nlh::Player::P0, nlh::Player::P1] {
+            assert_eq!(
+                shared.game.index.hands.combos(seat),
+                independent.game.index.hands.combos(seat)
+            );
+            assert_eq!(
+                shared.game.index.root_ranges[seat],
+                independent.game.index.root_ranges[seat]
+            );
+        }
+        assert_eq!(
+            shared.stored_values(0).unwrap(),
+            independent.stored_values(0).unwrap()
+        );
+    }
+    let range: serde_json::Value =
+        serde_json::from_str(&ok(&["export", path(&weights), "range"], "")).unwrap();
+    assert!(
+        range
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row["seat"] == "oop" && row["weight"] == 0.5)
+    );
+
+    // Same config with another stored index must decode that index, not silently
+    // substitute the left tree. A matching checksum also cannot hide corruption.
+    let malformed = temp.path().join("malformed.sol");
+    let mut payload = hu_postflop::sol::read_sol(&original).unwrap();
+    payload.index.push(0);
+    hu_postflop::sol::write_sol(&malformed, &payload).unwrap();
+    assert!(hu_postflop::artifact::load_sol_sharing(&malformed, &left).is_err());
+    let corrupted = temp.path().join("corrupted.sol");
+    let mut bytes = std::fs::read(&original).unwrap();
+    let index_start = hu_postflop::sol::HEADER_LEN
+        + u64::from_le_bytes(bytes[50..58].try_into().unwrap()) as usize;
+    bytes[index_start] ^= 1;
+    std::fs::write(&corrupted, bytes).unwrap();
+    let error = hu_postflop::artifact::load_sol_sharing(&corrupted, &left)
+        .err()
+        .unwrap();
+    assert!(format!("{error:#}").contains("index BLAKE3 checksum mismatch"));
+    let turn = solve(
+        "turn",
+        include_str!("../../../examples/hu-postflop/turn_small.toml"),
+    );
+    let compared: serde_json::Value =
+        serde_json::from_str(&ok(&["compare", path(&turn), path(&turn)], "")).unwrap();
+    assert_eq!(compared["max_strategy_l1"], 0.0);
+    assert_eq!(compared["max_ev_delta"], 0.0);
+}
+
+#[test]
 fn spec_p1_example_human_output_is_readable_and_pinned() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("spec.toml");

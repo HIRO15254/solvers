@@ -16,7 +16,7 @@
 //! of thread count. Only live ranked own entries are written; the caller
 //! zeros the remaining entries. The fused f32 showdown/fold variant shares
 //! opponent sums and the own-hand loop for terminal siblings with the same
-//! board and opponent reach. It clears the fold output first and writes only
+//! board and opponent reach. It clears only dead fold output entries and writes
 //! live ranked own hands; the rank table must cover every board-live support
 //! entry. Opponent-node add variants leave dead own entries untouched. For
 //! different fold/call reaches on one board, fold compat sums use the
@@ -26,7 +26,8 @@
 //! identical-combo corrections, adding both outcomes in one own-hand loop.
 //! Lone terminals also add directly, without a temporary or an add pass.
 //! Exact evaluation batches preserve the original f64 hand/group order.
-//! Recorded EVs and all f64 CFR calls retain the scalar kernels.
+//! Recorded EVs and f64 CFR batches use exact f64 lane kernels; lone calls
+//! retain the scalar kernels.
 
 use crate::hands::ABSENT;
 use nlh::HandRank;
@@ -40,8 +41,8 @@ pub(crate) struct RankedHands {
     pub hands: Vec<Hand>,
     // Rank and exclusive end offset; within a group, global combo order.
     pub groups: Vec<(HandRank, usize)>,
-    // Board-dead locals precomputed for CFR lane outputs. Non-CFR tables do
-    // not use this list. Clear only these entries, without a full output fill.
+    // Board-dead locals precomputed for scalar and lane outputs. Clear only
+    // these entries; every live entry is overwritten by its kernel.
     pub dead: Vec<u16>,
 }
 fn add(hands: &[Hand], reach: &[f32], total: &mut f64, card: &mut [f64; 52]) {
@@ -695,7 +696,9 @@ fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>
 ) {
     let [u_win, u_tie, u_lose, u_fold] = utilities.map(|u| u as f32);
     if FOLD {
-        fold_out.fill(0.0);
+        for &local in &own.dead {
+            fold_out[local as usize] = 0.0;
+        }
     }
     let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
     let mut total = u_lose * all_total;
@@ -782,58 +785,6 @@ fn showdown_relaxed_f32<const FOLD: bool, const ADD: bool, const OPP_FOLD: bool>
     }
 }
 
-// Frozen fdd3618 f32 implementation for accuracy regression tests.
-#[cfg(test)]
-pub(crate) fn head_showdown_kernel_relaxed_f32(
-    own: &RankedHands,
-    opp: &RankedHands,
-    same: &[u16],
-    utilities: [f64; 3],
-    reach: &[f32],
-    out: &mut [f32],
-) {
-    let [u_win, u_tie, u_lose] = utilities.map(|u| u as f32);
-    let (all_total, all_card) = compat_sums_relaxed_f32(&opp.hands, reach);
-    let mut below_total = 0.0;
-    let mut below_card = [0.0; 52];
-    let mut oi = 0;
-    let mut os = 0;
-    let mut start = 0;
-    for &(rank, end) in &own.groups {
-        while oi < opp.groups.len() && opp.groups[oi].0 < rank {
-            let oe = opp.groups[oi].1;
-            let mut group_total = 0.0;
-            // Total adds groups; strictly-below card sums add individual hands.
-            add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut below_card);
-            below_total += group_total;
-            os = oe;
-            oi += 1;
-        }
-        let mut group_total = 0.0;
-        let mut group_card = [0.0; 52];
-        let tied = oi < opp.groups.len() && opp.groups[oi].0 == rank;
-        let oe = if tied { opp.groups[oi].1 } else { os };
-        add_relaxed_f32(&opp.hands[os..oe], reach, &mut group_total, &mut group_card);
-        for &h in &own.hands[start..end] {
-            let [a, b] = h.cards.map(usize::from);
-            let same = same_reach_relaxed_f32(same, h, reach);
-            let win = below_total - below_card[a] - below_card[b];
-            let tie = group_total - group_card[a] - group_card[b] + same;
-            let compat = all_total - all_card[a] - all_card[b] + same;
-            let lose = compat - win - tie;
-            out[h.local as usize] = u_win * win + u_tie * tie + u_lose * lose;
-        }
-        if tied {
-            below_total += group_total;
-            for (below, group) in below_card.iter_mut().zip(group_card) {
-                *below += group;
-            }
-            os = oe;
-            oi += 1;
-        }
-        start = end;
-    }
-}
 pub(crate) fn fold_kernel_relaxed_f32(
     own: &[Hand],
     opp: &[Hand],

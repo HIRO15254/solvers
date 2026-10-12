@@ -696,8 +696,10 @@ impl TerminalEvaluator for PostflopEvaluator {
             debug_assert_eq!(opp_reach.len(), self.hands.len(p.opponent()));
             debug_assert_eq!(fold_out.len(), self.hands.len(p));
             debug_assert_eq!(show_out.len(), self.hands.len(p));
-            show_out.fill(0.0);
             let table = &self.rank_tables[show.table as usize];
+            for &local in &table[p].dead {
+                show_out[local as usize] = 0.0;
+            }
             kernel::showdown_fold_kernel_relaxed_f32(
                 &table[p],
                 &table[p.opponent()],
@@ -859,14 +861,17 @@ impl PostflopEvaluator {
                 );
             }
             TerminalKind::Showdown => {
-                out.fill(0.0);
+                let table = &self.rank_tables[term.table as usize];
+                for &local in &table[p].dead {
+                    out[local as usize] = 0.0;
+                }
                 let kernel = match variant {
                     hu_engine::CfrPrecision::F64 => kernel::showdown_kernel,
                     hu_engine::CfrPrecision::F32 => kernel::showdown_kernel_relaxed_f32,
                 };
                 kernel(
-                    &self.rank_tables[term.table as usize][p],
-                    &self.rank_tables[term.table as usize][p.opponent()],
+                    &table[p],
+                    &table[p.opponent()],
                     &self.hands.same[p],
                     [u_win, u_tie, u_lose],
                     opp_reach,
