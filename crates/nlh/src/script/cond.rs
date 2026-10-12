@@ -7,13 +7,8 @@
 //! be infallible: there is nothing left for it to get wrong at tree-build
 //! time, on the tree builder's hot path.
 //!
-//! `V` is what makes this reusable across families: postflop's [`PostflopVar`]
-//! and `multiway`'s own variable enum are both just implementations of
-//! [`Vars`], read through [`VarSource<V>`] -- postflop's [`RuleContext`]
-//! implements `VarSource<PostflopVar>` right here, since board/card concepts
-//! belong in `nlh`; `mw-preflop` implements `VarSource<spot::TreeVar>` for its
-//! own betting-state types, in its own crate, with no orphan-rule problem
-//! (multiway already depends on `nlh`).
+//! Product crates evaluate the common-input variable vocabulary through
+//! [`VarSource<V>`]. The internal test dialect exercises parsing independently.
 
 use std::fmt;
 
@@ -46,9 +41,7 @@ pub trait Vars: Copy + Eq + fmt::Debug + 'static {
     fn kind(self) -> VarKind;
 }
 
-/// One named variable postflop's tree script condition can read. The full
-/// set below is [`POSTFLOP`]'s; `multiway` exposes a different, narrower set
-/// through its own [`Vars`] implementation.
+/// Postflop values supplied by [`RuleContext`] to product variable adapters.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PostflopVar {
     Aggressions,
@@ -77,6 +70,7 @@ pub enum PostflopVar {
     LowCard,
 }
 
+#[cfg(test)]
 impl Vars for PostflopVar {
     fn name(self) -> &'static str {
         use PostflopVar::*;
@@ -120,35 +114,9 @@ impl Vars for PostflopVar {
     }
 }
 
-impl PostflopVar {
-    /// True for the twelve board-texture variables, i.e. the ones
-    /// [`Condition::specialize`] can fold once a board is known. Not part of
-    /// [`Vars`]: "board variable" is a postflop/`BoardFacts` concept with no
-    /// equivalent in another family's dialect.
-    fn is_board_var(self) -> bool {
-        use PostflopVar::*;
-        matches!(
-            self,
-            BoardCards
-                | BoardSuits
-                | BoardRanks
-                | StraightRanks
-                | Paired
-                | Monotone
-                | TwoTone
-                | Rainbow
-                | FlushPossible
-                | StraightPossible
-                | HighCard
-                | LowCard
-        )
-    }
-}
-
-/// The full set of [`PostflopVar`]s, in the order [`POSTFLOP`] exposes them
-/// -- used only to build that dialect table; iterate `Dialect::vars` for
-/// anything that should respect a narrower dialect.
-const ALL_POSTFLOP_VARS: &[PostflopVar] = &[
+/// Variables in the parser's independent test dialect.
+#[cfg(test)]
+const TEST_VARS: &[PostflopVar] = &[
     PostflopVar::Aggressions,
     PostflopVar::Raises,
     PostflopVar::Unopened,
@@ -208,11 +176,7 @@ impl ActionKind {
     }
 }
 
-/// Which names and street vocabulary one config family's tree script
-/// exposes. `nlh` has no notion of a family (that lives in `hu-postflop` /
-/// `multiway`), so a family builds its own `Dialect<V>` naming the `V`
-/// values, action words, and street keywords it wants; [`POSTFLOP`] is the
-/// one the postflop family uses today.
+/// A vocabulary of variables, actions, streets, and size literals.
 #[derive(Clone, Copy, Debug)]
 pub struct Dialect<V: Vars> {
     pub vars: &'static [V],
@@ -226,11 +190,10 @@ pub struct Dialect<V: Vars> {
 /// A family's optional size-literal grammar, used only during script compilation.
 pub type SizeParser = fn(&str) -> Result<crate::SizeSpec, crate::ParseSizeError>;
 
-/// The postflop tree script's dialect: every [`PostflopVar`], the three
-/// postflop streets, `bet`/`raise` (postflop's tree never adds or removes a
-/// fold/check/call candidate through a rule), and chip-denominated sizes.
-pub static POSTFLOP: Dialect<PostflopVar> = Dialect {
-    vars: ALL_POSTFLOP_VARS,
+/// Independent parser test vocabulary.
+#[cfg(test)]
+pub(crate) static TEST_DIALECT: Dialect<PostflopVar> = Dialect {
+    vars: TEST_VARS,
     streets: &[
         ("flop", Street::Flop),
         ("turn", Street::Turn),
@@ -302,14 +265,6 @@ pub struct RuleContext {
     pub to_call: f64,
     pub previous_aggressor: PreviousAggressor,
     pub board: BoardFacts,
-}
-
-/// The part of a [`RuleContext`] that is already fixed once a chance node
-/// has dealt the board -- everything [`Condition::specialize`] can use to
-/// fold a condition ahead of time.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct PartialContext {
-    pub board: Option<BoardFacts>,
 }
 
 /// A comparison operator between a variable and a literal.
@@ -465,78 +420,12 @@ impl<V: Vars> Condition<V> {
     }
 }
 
-impl Condition<PostflopVar> {
-    /// Replaces every board-derived variable with a constant once the board
-    /// is known, then folds `Not` / `And` / `Or` so a fully-determined
-    /// subtree collapses to `Const`. This lets the tree builder specialize
-    /// the rule list once per dealt board (a per-chance-node cost) instead
-    /// of re-testing board predicates at every decision node under it (a
-    /// per-node cost). Not wired into the builder yet. Postflop-only: "board
-    /// variable" and [`PartialContext`] are `BoardFacts` concepts with no
-    /// equivalent in another family's dialect.
-    pub fn specialize(&self, known: &PartialContext) -> Condition<PostflopVar> {
-        match self {
-            Condition::Const(value) => Condition::Const(*value),
-            Condition::Truth(var) => {
-                if var.is_board_var()
-                    && let Some(board) = known.board
-                {
-                    let Value::Bool(value) = board_value(*var, board) else {
-                        unreachable!("Truth is only constructed for boolean vars")
-                    };
-                    return Condition::Const(value);
-                }
-                Condition::Truth(*var)
-            }
-            Condition::Not(inner) => match inner.specialize(known) {
-                Condition::Const(value) => Condition::Const(!value),
-                other => Condition::Not(Box::new(other)),
-            },
-            Condition::And(left, right) => and(left.specialize(known), right.specialize(known)),
-            Condition::Or(left, right) => or(left.specialize(known), right.specialize(known)),
-            Condition::Compare { var, op, value } => {
-                if var.is_board_var()
-                    && let Some(board) = known.board
-                {
-                    return Condition::Const(compare(board_value(*var, board), *op, value));
-                }
-                Condition::Compare {
-                    var: *var,
-                    op: *op,
-                    value: value.clone(),
-                }
-            }
-            Condition::Member { var, values } => {
-                if var.is_board_var()
-                    && let Some(board) = known.board
-                {
-                    let actual = board_value(*var, board);
-                    return Condition::Const(values.iter().any(|literal| equals(actual, literal)));
-                }
-                Condition::Member {
-                    var: *var,
-                    values: values.clone(),
-                }
-            }
-        }
-    }
-}
-
 fn and<V>(left: Condition<V>, right: Condition<V>) -> Condition<V> {
     match (&left, &right) {
         (Condition::Const(false), _) | (_, Condition::Const(false)) => Condition::Const(false),
         (Condition::Const(true), _) => right,
         (_, Condition::Const(true)) => left,
         _ => Condition::And(Box::new(left), Box::new(right)),
-    }
-}
-
-fn or<V>(left: Condition<V>, right: Condition<V>) -> Condition<V> {
-    match (&left, &right) {
-        (Condition::Const(true), _) | (_, Condition::Const(true)) => Condition::Const(true),
-        (Condition::Const(false), _) => right,
-        (_, Condition::Const(false)) => left,
-        _ => Condition::Or(Box::new(left), Box::new(right)),
     }
 }
 
@@ -852,6 +741,7 @@ fn check_member_type<V: Vars>(
     }
 }
 
+#[cfg(test)]
 impl fmt::Display for PostflopVar {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.name())
@@ -885,10 +775,7 @@ impl<V: Vars> fmt::Display for Condition<V> {
 /// `parse_unary` < `parse_predicate`).
 fn render_condition_prec<V: Vars>(condition: &Condition<V>, min_prec: u8) -> String {
     let (text, prec) = match condition {
-        // `Const` has no script syntax of its own -- it only ever appears as
-        // the base of an unconditioned statement (`Const(true)`) or a folded
-        // board-only condition (`Condition::specialize`). Spelling it out
-        // beats inventing pseudo-code.
+        // Constants arise from unconditioned statements and boolean folding.
         Condition::Const(true) => ("always".to_string(), 2),
         Condition::Const(false) => ("never".to_string(), 2),
         Condition::Truth(var) => (var.name().to_string(), 2),
@@ -962,7 +849,7 @@ mod tests {
     use super::*;
 
     fn parse(source: &str) -> Result<Condition<PostflopVar>, ScriptError> {
-        Condition::parse(source, &POSTFLOP)
+        Condition::parse(source, &TEST_DIALECT)
     }
 
     fn ctx() -> RuleContext {
@@ -1108,40 +995,5 @@ mod tests {
             });
             assert_eq!(condition, reparsed, "rendered {rendered:?} from {source:?}");
         }
-    }
-
-    #[test]
-    fn specialize_folds_board_only_conditions() {
-        let unpaired = BoardFacts::new(&[
-            "Ah".parse().unwrap(),
-            "Kd".parse().unwrap(),
-            "2c".parse().unwrap(),
-        ]);
-        let paired_board = BoardFacts::new(&[
-            "Ah".parse().unwrap(),
-            "Ad".parse().unwrap(),
-            "2c".parse().unwrap(),
-        ]);
-        let condition = parse("paired && spr <= 3").unwrap();
-
-        let specialized = condition.specialize(&PartialContext {
-            board: Some(unpaired),
-        });
-        assert_eq!(specialized, Condition::Const(false));
-
-        let specialized = condition.specialize(&PartialContext {
-            board: Some(paired_board),
-        });
-        assert_eq!(
-            specialized,
-            Condition::Compare {
-                var: PostflopVar::Spr,
-                op: CmpOp::Le,
-                value: Literal::Number(3.0),
-            }
-        );
-
-        let unresolved = condition.specialize(&PartialContext { board: None });
-        assert_eq!(unresolved, condition);
     }
 }

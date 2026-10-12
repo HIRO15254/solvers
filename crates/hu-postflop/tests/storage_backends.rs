@@ -359,8 +359,8 @@ fn mixed_postflop_regrets_match_i16_and_threads_are_bitwise_equal() {
         effective_stack: Chips(5000),
         streets: PerStreet {
             flop: StreetTree::default(),
-            turn: StreetTree::pot_fractions(&[0.5], &[1.0], 1),
-            river: StreetTree::pot_fractions(&[0.5], &[1.0], 1),
+            turn: hu_postflop::test_support::pot_fractions(&[0.5], &[1.0], 1),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[1.0], 1),
         },
         iso_merging: false,
         ..Default::default()

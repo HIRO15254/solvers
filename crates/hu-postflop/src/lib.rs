@@ -5,8 +5,8 @@
 //! terminal kernels in [`kernel`] (sorted-rank O(n+m) showdown sweep, O(n)
 //! inclusion-exclusion fold kernel) are shared by every showdown/fold
 //! terminal in the tree; [`postflop`] adds chance nodes between streets
-//! with suit-isomorphism merging on top. [`river`] is a thin shim over
-//! [`postflop`] kept for its narrower, river-only config shape.
+//! with suit-isomorphism merging on top. River-only games use the same
+//! [`PostflopConfig`] and builder with a completed five-card board.
 //!
 //! [`aggregate`] and [`equity`] are reporting helpers: mapping combos to
 //! their 13x13 preflop class and computing range-vs-range showdown equity
@@ -17,6 +17,8 @@
 
 pub mod game;
 pub mod input;
+#[cfg(any(test, feature = "test-support"))]
+pub mod test_support;
 
 mod aggregate;
 mod equity;
@@ -25,7 +27,6 @@ pub use hands::PostflopHands;
 mod kernel;
 pub use hu_engine::CfrPrecision;
 mod postflop;
-mod river;
 mod viewer;
 
 pub use aggregate::{class_average, class_of_combo, class_weights};
@@ -35,7 +36,6 @@ pub use postflop::{
     RuleHits, StreetTree, TreeBuildError, build_postflop_game, memory_usage,
     try_build_postflop_game, try_memory_usage,
 };
-pub use river::{RiverConfig, RiverGame, RiverNodeInfo, build_river_game};
 pub use viewer::{
     ReplayError, RiverEntryState, node_streets, river_entry_state, river_resolve_config,
 };

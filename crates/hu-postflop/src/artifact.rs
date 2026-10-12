@@ -90,23 +90,23 @@ fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) 
         if reach == 0.0 {
             continue;
         }
-        let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
-        per_card[hi] += reach as f64;
-        per_card[lo] += reach as f64;
+        let (hi, lo) = nlh::combo_cards(combo as usize);
+        per_card[hi.index()] += reach as f64;
+        per_card[lo.index()] += reach as f64;
     }
     hands
         .combos(p)
         .iter()
         .enumerate()
         .map(|(i, &combo)| {
-            let [hi, lo] = crate::hands::combo_card_indices(combo as usize);
+            let (hi, lo) = nlh::combo_cards(combo as usize);
             let same = hands.same[p][i];
             let r = if same == crate::hands::ABSENT {
                 0.0
             } else {
                 opp_reach[same as usize] as f64
             };
-            (total - per_card[hi] - per_card[lo] + r).max(0.0) as f32
+            (total - per_card[hi.index()] - per_card[lo.index()] + r).max(0.0) as f32
         })
         .collect()
 }

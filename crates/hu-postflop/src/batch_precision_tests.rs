@@ -111,8 +111,11 @@ fn actual_river_and_turn_batches_match_recursive_per_terminal_f32() {
                     cfg.board.push("9s".parse().unwrap());
                     cfg.pot = Chips(20);
                     cfg.effective_stack = Chips(200);
-                    cfg.streets.river =
-                        StreetTree::pot_fractions(&[0.33, 0.75, 1.5], &[0.33, 0.75, 1.5], 3);
+                    cfg.streets.river = crate::test_support::pot_fractions(
+                        &[0.33, 0.75, 1.5],
+                        &[0.33, 0.75, 1.5],
+                        3,
+                    );
                 }
                 for p in Player::BOTH {
                     for zero in [None, Some(p.opponent())] {

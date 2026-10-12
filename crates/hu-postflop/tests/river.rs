@@ -4,7 +4,7 @@
 
 use hu_engine::{Dcfr, F32Storage, Solver, TerminalEvaluator};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::{RiverConfig, RiverGame, build_river_game};
+use hu_postflop::{PerStreet, PostflopConfig, PostflopGame, build_postflop_game};
 use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -19,15 +19,19 @@ fn board(s: &str) -> [Card; 5] {
     cards.try_into().unwrap()
 }
 
-fn check_check_game(board_str: &str) -> RiverGame {
-    build_river_game(
-        &RiverConfig {
-            board: board(board_str),
+fn check_check_game(board_str: &str) -> PostflopGame {
+    build_postflop_game(
+        &PostflopConfig {
+            board: board(board_str).to_vec(),
             ranges: PerPlayer::new(Range::full(), Range::full()),
             pot: Chips(2),
             effective_stack: Chips(100),
-            bet_fractions: PerPlayer::new(vec![], vec![]),
-            max_raises: 0,
+            streets: PerStreet {
+                river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+                ..Default::default()
+            },
+            min_bet: Chips(1),
+            ..Default::default()
         },
         chip_ev(),
     )
@@ -136,15 +140,19 @@ fn showdown_kernel_matches_naive_tie_heavy_board() {
 #[test]
 #[ignore = "20k iterations is slow unoptimized; CI runs it in release"]
 fn clairvoyance_game_matches_closed_form() {
-    let config = RiverConfig {
-        board: board("Ks Kh Kd 2c 2d"),
+    let config = PostflopConfig {
+        board: board("Ks Kh Kd 2c 2d").to_vec(),
         ranges: PerPlayer::new("AA,33".parse().unwrap(), "QQ".parse().unwrap()),
         pot: Chips(2),
         effective_stack: Chips(2),
-        bet_fractions: PerPlayer::new(vec![1.0], vec![]),
-        max_raises: 1,
+        streets: PerStreet {
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[], 1),
+            ..Default::default()
+        },
+        min_bet: Chips(1),
+        ..Default::default()
     };
-    let game = build_river_game(&config, chip_ev());
+    let game = build_postflop_game(&config, chip_ev());
     let root = game.node_by_history("").unwrap();
     let facing_bet = game.node_by_history("r2").unwrap();
     let node_info = game.node_info.clone();
@@ -223,18 +231,22 @@ fn clairvoyance_game_matches_closed_form() {
 
 #[test]
 fn river_solve_is_zero_sum() {
-    let config = RiverConfig {
-        board: board("2c 7d 9h Js Qs"),
+    let config = PostflopConfig {
+        board: board("2c 7d 9h Js Qs").to_vec(),
         ranges: PerPlayer::new(
             "22+,A2s+,KTo+".parse().unwrap(),
             "55-22,QJs,A5s-A2s,KQo,T9s".parse().unwrap(),
         ),
         pot: Chips(10),
         effective_stack: Chips(50),
-        bet_fractions: PerPlayer::new(vec![0.5], vec![0.5]),
-        max_raises: 2,
+        streets: PerStreet {
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 2),
+            ..Default::default()
+        },
+        min_bet: Chips(1),
+        ..Default::default()
     };
-    let game = build_river_game(&config, chip_ev());
+    let game = build_postflop_game(&config, chip_ev());
     let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(200));
     solver.run(200);
     let sum = solver.expected_value(Player::P0) + solver.expected_value(Player::P1);

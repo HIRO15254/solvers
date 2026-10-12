@@ -80,16 +80,16 @@ impl NlhPayoff {
                 Utility::ChipEv => true,
                 Utility::Icm { fixed, .. } => fixed.is_empty(),
             };
+        // Validate and cache the ICM baseline before tree allocation.
+        utility.try_values(remaining)?;
+        let baseline = utility.try_values(zip(remaining, contributions, |a, b| a + b))?;
         let utility = NlhUtility {
             remaining,
-            contributions,
+            baseline,
             effective,
             utility,
             zero_sum,
         };
-        // Validate all ICM baseline stack vectors before tree allocation.
-        utility.try_values(remaining)?;
-        utility.try_values(zip(remaining, contributions, |a, b| a + b))?;
         Ok(Self {
             rake: NlhRake {
                 compiled: spot.economics.compiled_rake,
@@ -109,11 +109,7 @@ impl NlhPayoff {
 
     /// Add this to solver EV (including hand EV) to report from subgame start.
     pub fn ev_offset(&self) -> PerPlayer<f64> {
-        let before = self.utility.values(zip(
-            self.utility.remaining,
-            self.utility.contributions,
-            |a, b| a + b,
-        ));
+        let before = self.utility.baseline;
         let behind = self.utility.values(self.utility.remaining);
         zip(before, behind, |a, b| a - b)
     }
@@ -181,14 +177,14 @@ enum Utility {
 /// players at their final stacks in every utility evaluation.
 pub struct NlhUtility {
     remaining: PerPlayer<f64>,
-    contributions: PerPlayer<f64>,
+    baseline: PerPlayer<f64>,
     effective: f64,
     utility: Utility,
     zero_sum: bool,
 }
-impl NlhUtility {
+impl Utility {
     fn try_values(&self, actual: PerPlayer<f64>) -> Result<PerPlayer<f64>, SpotError> {
-        match &self.utility {
+        match self {
             Utility::ChipEv => Ok(actual.map(|v| v / 1000.0)),
             Utility::Icm {
                 fixed,
@@ -220,8 +216,11 @@ impl NlhUtility {
             }
         }
     }
+}
+impl NlhUtility {
     fn values(&self, actual: PerPlayer<f64>) -> PerPlayer<f64> {
-        self.try_values(actual)
+        self.utility
+            .try_values(actual)
             .expect("validated P1 terminal stacks")
     }
 }
@@ -232,7 +231,7 @@ impl UtilityModel for NlhUtility {
         }))
     }
     fn baseline(&self, _t: &TerminalDescriptor) -> PerPlayer<f64> {
-        self.values(zip(self.remaining, self.contributions, |a, b| a + b))
+        self.baseline
     }
     fn is_zero_sum_affine(&self) -> bool {
         self.zero_sum

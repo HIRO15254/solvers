@@ -288,9 +288,168 @@ pub fn geometric_allin_target(
         .expect("geometric all-in target overflow")
 }
 
+/// Round a scaled chip amount on P1's `u32` grid before bounding it.
+pub fn scale_u32(amount: u32, factor: f64) -> u32 {
+    (f64::from(amount) * factor)
+        .round()
+        .clamp(0.0, u32::MAX as f64) as u32
+}
+
+/// Round a scaled chip amount on P2's `u64` grid before bounding it.
+pub fn scale_u64(amount: u64, factor: f64) -> u64 {
+    (amount as f64 * factor).round().clamp(0.0, u64::MAX as f64) as u64
+}
+
+/// Unit-free inputs for resolving one size to a legal street-relative target.
+///
+/// Engines supply their own effective-stack and minimum-full-raise policy.
+/// Resolution retains each product's chip-grid bounds: P1 saturates pot-size
+/// addition on `u32`; P2 checks addition on `u64`. Both round the increment
+/// before adding the called wager, then bump the minimum and clamp the stack.
+#[derive(Clone, Copy, Debug)]
+pub struct SizeContext {
+    pub big_blind: u64,
+    pub called_to: u64,
+    pub pot_after_call: u64,
+    pub previous_bet: u64,
+    pub minimum: u64,
+    pub maximum: u64,
+    pub effective_stack: u64,
+    pub streets_remaining: u8,
+}
+
+impl SizeContext {
+    /// Resolve on P1's raw chip grid, including chip and BB literals.
+    pub fn resolve_u32(self, size: SizeSpec) -> u32 {
+        self.resolve(size, u32::MAX as u64) as u32
+    }
+
+    /// Resolve on P2's milli-BB grid; chip literals are not valid in P2.
+    pub fn resolve_u64(self, size: SizeSpec) -> u64 {
+        self.resolve(size, u64::MAX)
+    }
+
+    fn resolve(self, size: SizeSpec, limit: u64) -> u64 {
+        let scale = |amount: u64, factor| {
+            if limit == u32::MAX as u64 {
+                u64::from(scale_u32(amount as u32, factor))
+            } else {
+                scale_u64(amount, factor)
+            }
+        };
+        let proposed = match size {
+            SizeSpec::ToBb { value } => scale(self.big_blind, value),
+            SizeSpec::ToChips { value } => {
+                assert_eq!(limit, u32::MAX as u64, "chip literals are P1-only");
+                value.round().clamp(0.0, u32::MAX as f64) as u64
+            }
+            SizeSpec::PotAfterCall { fraction } => {
+                let increment = scale(self.pot_after_call, fraction);
+                if limit == u32::MAX as u64 {
+                    self.called_to.saturating_add(increment).min(limit)
+                } else {
+                    self.called_to
+                        .checked_add(increment)
+                        .expect("multiway chip addition overflow")
+                }
+            }
+            SizeSpec::PreviousBetMultiple { factor } => scale(self.previous_bet, factor),
+            SizeSpec::MinRaise => self.minimum,
+            SizeSpec::AllIn => self.maximum,
+            SizeSpec::StackFraction { fraction } => scale(self.maximum, fraction),
+            SizeSpec::EffectiveStackFraction { fraction } => scale(self.effective_stack, fraction),
+            SizeSpec::GeometricAllIn { .. } | SizeSpec::GeometricAllInRemaining => {
+                let streets = match size {
+                    SizeSpec::GeometricAllIn { streets } => streets,
+                    _ => self.streets_remaining,
+                };
+                let target = geometric_allin_target(
+                    self.called_to,
+                    self.pot_after_call,
+                    self.maximum,
+                    streets,
+                );
+                if limit == u32::MAX as u64 {
+                    u64::from(target as u32)
+                } else {
+                    target
+                }
+            }
+        };
+        if proposed < self.minimum && self.maximum >= self.minimum {
+            self.minimum
+        } else {
+            proposed.min(self.maximum)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn scaling_preserves_grid_bounds_and_rounding() {
+        assert_eq!(scale_u32(3, 0.5), 2);
+        assert_eq!(scale_u64(3, 0.5), 2);
+        assert_eq!(scale_u32(u32::MAX, 2.0), u32::MAX);
+        assert_eq!(scale_u64(u64::MAX, 2.0), u64::MAX);
+        assert_eq!(scale_u32(3, -1.0), 0);
+        assert_eq!(scale_u64(3, -1.0), 0);
+    }
+
+    #[test]
+    fn size_resolution_rounds_before_adding_then_clamps() {
+        let context = SizeContext {
+            big_blind: 1,
+            called_to: 1,
+            pot_after_call: 3,
+            previous_bet: 1,
+            minimum: 1,
+            maximum: 10,
+            effective_stack: 6,
+            streets_remaining: 1,
+        };
+        let pot = SizeSpec::PotAfterCall { fraction: 0.5 };
+        assert_eq!(context.resolve_u32(pot), 3);
+        assert_eq!(context.resolve_u64(pot), 3);
+        let effective = SizeSpec::EffectiveStackFraction { fraction: 0.5 };
+        assert_eq!(context.resolve_u32(effective), 3);
+        assert_eq!(context.resolve_u64(effective), 3);
+        let saturated = SizeContext {
+            called_to: u32::MAX as u64 - 1,
+            pot_after_call: u32::MAX as u64,
+            maximum: u32::MAX as u64,
+            ..context
+        };
+        assert_eq!(saturated.resolve_u32(pot), u32::MAX);
+        let minimum = SizeContext {
+            minimum: 4,
+            ..context
+        };
+        assert_eq!(minimum.resolve_u64(pot), 4);
+        let capped = SizeContext {
+            maximum: 2,
+            ..minimum
+        };
+        assert_eq!(capped.resolve_u32(pot), 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "multiway chip addition overflow")]
+    fn multiway_pot_increment_remains_checked() {
+        SizeContext {
+            big_blind: 1,
+            called_to: u64::MAX,
+            pot_after_call: 2,
+            previous_bet: 1,
+            minimum: 1,
+            maximum: u64::MAX,
+            effective_stack: u64::MAX,
+            streets_remaining: 1,
+        }
+        .resolve_u64(SizeSpec::PotAfterCall { fraction: 1.0 });
+    }
 
     /// The serde JSON shape of every pre-existing variant must not change:
     /// multiway game fingerprints and checkpoints serialize `SizeSpec`.

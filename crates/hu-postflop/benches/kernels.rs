@@ -11,7 +11,7 @@ use std::{collections::BTreeSet, time::Duration};
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use hu_engine::{CfrPrecision, Dcfr, F32Storage, NodeKind, Solver, TerminalEvaluator, reach_at};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::{RiverConfig, RiverGame, build_river_game};
+use hu_postflop::{PerStreet, PostflopConfig, PostflopGame, build_postflop_game};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -28,23 +28,27 @@ fn parse_cards(s: &str) -> Vec<Card> {
 /// The original narrow, asymmetric single-bet river subgame. One bet size
 /// and `max_raises = 1` keep the tree tiny while still producing exactly
 /// the two terminal shapes this bench needs (see `terminal_ids`).
-fn river_config() -> RiverConfig {
-    RiverConfig {
-        board: parse_cards("Ks 7h 2d Jc 9s").try_into().unwrap(),
+fn river_config() -> PostflopConfig {
+    PostflopConfig {
+        board: parse_cards("Ks 7h 2d Jc 9s"),
         ranges: PerPlayer::new(
             "22+,A2s+,KTo+".parse::<Range>().unwrap(),
             "55-22,QJs,A5s-A2s,KQo,T9s".parse::<Range>().unwrap(),
         ),
         pot: Chips(20),
         effective_stack: Chips(80),
-        bet_fractions: PerPlayer::new(vec![0.75], vec![0.75]),
-        max_raises: 1,
+        streets: PerStreet {
+            river: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            ..Default::default()
+        },
+        min_bet: Chips(1),
+        ..Default::default()
     }
 }
 
 /// Full support with asymmetric fractional weights: 1,081 live combos per
 /// seat after the river board is removed from the 1,326-combo table.
-fn wide_river_config() -> RiverConfig {
+fn wide_river_config() -> PostflopConfig {
     let range = |offset| {
         let mut range = Range::full();
         for combo in 0..NUM_COMBOS {
@@ -52,8 +56,8 @@ fn wide_river_config() -> RiverConfig {
         }
         range
     };
-    RiverConfig {
-        board: parse_cards("2c 7d 9h Js Qs").try_into().unwrap(),
+    PostflopConfig {
+        board: parse_cards("2c 7d 9h Js Qs"),
         ranges: PerPlayer::new(range(3), range(11)),
         ..river_config()
     }
@@ -69,7 +73,7 @@ fn wide_river_config() -> RiverConfig {
 /// terminals in that same order -- this is the "distinguish two terminals
 /// from outside the crate" trick: `PostflopTerminal::kind` is private, but
 /// the tree shape around a bet-with-no-more-raises node isn't.
-fn terminal_ids(game: &RiverGame) -> (u32, u32) {
+fn terminal_ids(game: &PostflopGame) -> (u32, u32) {
     let info = game
         .node_info
         .iter()
@@ -98,8 +102,8 @@ fn bench_kernels(c: &mut Criterion) {
     bench_t26_nine(c);
 }
 
-fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
-    let mut built = build_river_game(&config, chip_ev());
+fn bench_case(c: &mut Criterion, name: &str, config: PostflopConfig) {
+    let mut built = build_postflop_game(&config, chip_ev());
     built.game.evaluator.set_cfr_precision(CfrPrecision::F32);
     let (fold_id, showdown_id) = terminal_ids(&built);
 
@@ -182,13 +186,19 @@ fn bench_case(c: &mut Criterion, name: &str, config: RiverConfig) {
 }
 
 fn bench_realistic(c: &mut Criterion) {
-    let config = RiverConfig {
-        bet_fractions: PerPlayer::new(vec![0.33, 0.75, 1.5], vec![0.33, 0.75, 1.5]),
-        max_raises: 3,
+    let config = PostflopConfig {
+        streets: PerStreet {
+            river: hu_postflop::test_support::pot_fractions(
+                &[0.33, 0.75, 1.5],
+                &[0.33, 0.75, 1.5],
+                3,
+            ),
+            ..Default::default()
+        },
         effective_stack: Chips(200),
         ..wide_river_config()
     };
-    let built = build_river_game(&config, chip_ev());
+    let built = build_postflop_game(&config, chip_ev());
     // On the river every terminal except a child labeled "fold" is showdown.
     let mut folds = BTreeSet::new();
     let mut sibling_nodes = Vec::new();
@@ -436,36 +446,35 @@ struct T25Call {
 
 // Primary T25 workload: the P1 test spot's actual BTN/BB preflop supports,
 // with the same betting menu, stack and f64 snapshot schedule as the wide case.
-// RiverConfig has no explicit include_allin option; its fractions are clamped
-// to the remaining stack by the existing river builder.
+// Fractions are clamped to the remaining stack by the common builder.
 fn bench_t25_btn_bb(c: &mut Criterion) {
     let config = t25_btn_bb_config();
-    let built = build_river_game(&config, chip_ev());
+    let built = build_postflop_game(&config, chip_ev());
     bench_t25_game(c, "btn_bb", built.game);
 }
 
-fn t25_btn_bb_config() -> RiverConfig {
-    RiverConfig {
-        board: parse_cards("Ks 7h 2d 3c 9s").try_into().unwrap(),
+fn t25_btn_bb_config() -> PostflopConfig {
+    PostflopConfig {
+        board: parse_cards("Ks 7h 2d 3c 9s"),
         ranges: PerPlayer::new(
             "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o".parse().unwrap(),
             "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o".parse().unwrap(),
         ),
-        bet_fractions: PerPlayer::new(vec![0.33, 0.75, 1.5], vec![0.33, 0.75, 1.5]),
-        max_raises: 3,
+        streets: PerStreet {
+            river: hu_postflop::test_support::pot_fractions(&[0.33, 0.75, 1.5], &[0.33, 0.75, 1.5], 3),
+            ..Default::default()
+        },
         effective_stack: Chips(200),
         ..river_config()
     }
 }
 
 // Match the common Flop1 river subtree: one bet75%, one raise3x, and two
-// aggressive actions, giving five showdowns and four folds. The river shim
-// cannot express a distinct raise menu, so use the same general builder.
+// aggressive actions, giving five showdowns and four folds.
 fn bench_t26_nine(c: &mut Criterion) {
-    use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
     let base = t25_btn_bb_config();
-    let mut river = StreetTree::pot_fractions(&[0.75], &[0.75], 2);
-    for rule in &mut river.rules {
+    let mut river = hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 2);
+    for rule in &mut river.nlh_rules.rules {
         if rule.action == Some(nlh::script::ActionKind::Raise) {
             rule.sizes = vec![nlh::SizeSpec::PreviousBetMultiple { factor: 3.0 }];
         }

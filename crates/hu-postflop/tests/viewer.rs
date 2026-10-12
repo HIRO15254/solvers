@@ -10,7 +10,7 @@
 use hu_engine::{Dcfr, F32Storage, NodeId, NodeKind, ParConfig, PublicTree, Solver};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use hu_postflop::{
-    PerStreet, PostflopConfig, StreetTree, build_postflop_game, node_streets, river_entry_state,
+    PerStreet, PostflopConfig, build_postflop_game, node_streets, river_entry_state,
     river_resolve_config,
 };
 use nlh::{Card, Chips, PerPlayer, Player, Range, Street};
@@ -56,9 +56,9 @@ fn small_turn_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -80,9 +80,9 @@ fn small_flop_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
-            turn: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
+            turn: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -323,9 +323,9 @@ fn fast_turn_config_for_solve() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[], &[], 0),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     }

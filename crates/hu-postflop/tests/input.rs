@@ -6,7 +6,7 @@ use hu_postflop::{
     PostflopConfig, PostflopGame, StreetTree, TreeBuildError, build_postflop_game, memory_usage,
     try_build_postflop_game, try_memory_usage,
 };
-use nlh::script::{POSTFLOP, Script, Vars};
+use nlh::script::{Script, Vars};
 use nlh::{Chips, Player, Street};
 use spot::{Code, Document, TreeVar};
 use std::path::Path;
@@ -542,7 +542,7 @@ fn spec_p1_example_lowering_and_sizes() {
     assert_eq!(c.effective_stack, Chips(97_500));
     assert_eq!(c.min_bet, Chips(1000));
     assert_eq!(c.preflop_aggressor, Some(Player::P1));
-    let r = c.streets.flop.nlh_rules.as_ref().unwrap();
+    let r = &c.streets.flop.nlh_rules;
     assert_eq!(r.players[Player::P0].position, "BB");
     assert_eq!(r.players[Player::P1].position, "BTN");
     assert_eq!(
@@ -571,7 +571,7 @@ fn turn_start_previous_aggressor_and_earlier_rules_skipped() {
     assert_eq!(c.pot, Chips(9100));
     assert_eq!(c.effective_stack, Chips(95_700));
     assert_eq!(c.preflop_aggressor, Some(Player::P0));
-    assert!(c.streets.flop.nlh_rules.as_ref().unwrap().rules.is_empty());
+    assert!(c.streets.flop.nlh_rules.rules.is_empty());
     let g = game(&c);
     assert_eq!(actions(&g, ""), ["x", "r1000"]);
     let estimate = memory_usage(&c);
@@ -831,7 +831,7 @@ fn p1_payoff_uses_the_common_rake_rounding_unit() {
 }
 
 #[test]
-fn v1_and_scaled_legacy_trees_are_identical() {
+fn lowered_and_hand_built_common_rule_trees_are_identical() {
     let c = config(&text(
         "",
         "BTN r2.5, BB c / BB x, BTN b1.8, BB c",
@@ -839,21 +839,33 @@ fn v1_and_scaled_legacy_trees_are_identical() {
         "turn, river { replace bet [33, 75, 2bb] replace raise [3x] }",
     ));
     let script = Script::compile(
-        "turn, river { replace bet [33, 75, 2000c] replace raise [3x] }",
+        "turn, river { replace bet [33, 75, 2bb] replace raise [3x] }",
         &Default::default(),
-        &POSTFLOP,
+        &spot::NLH_V1,
     )
     .unwrap();
-    let legacy = PostflopConfig {
+    let fixture = PostflopConfig {
         streets: hu_postflop::PerStreet {
             flop: StreetTree::default(),
-            turn: StreetTree::from_script(Street::Turn, &script.rules, 3, false, None),
-            river: StreetTree::from_script(Street::River, &script.rules, 3, false, None),
+            turn: hu_postflop::test_support::from_script(
+                Street::Turn,
+                &script.rules,
+                3,
+                false,
+                None,
+            ),
+            river: hu_postflop::test_support::from_script(
+                Street::River,
+                &script.rules,
+                3,
+                false,
+                None,
+            ),
         },
         ..c.clone()
     };
     let new = game(&c);
-    let old = build_postflop_game(&legacy, pipeline());
+    let old = build_postflop_game(&fixture, pipeline());
     assert_eq!(new.game.tree.nodes.len(), old.game.tree.nodes.len());
     assert_eq!(new.node_info.len(), old.node_info.len());
     for (a, b) in new.node_info.iter().zip(&old.node_info) {
@@ -861,7 +873,7 @@ fn v1_and_scaled_legacy_trees_are_identical() {
         assert_eq!(a.actions, b.actions);
         assert_eq!(a.contrib, b.contrib);
     }
-    assert_eq!(memory_usage(&c).nodes, memory_usage(&legacy).nodes);
+    assert_eq!(memory_usage(&c).nodes, memory_usage(&fixture).nodes);
 }
 
 #[test]

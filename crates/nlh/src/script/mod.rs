@@ -13,8 +13,8 @@
 //!
 //! Public syntax and vocabulary are defined in `docs/nlh-input-v1.jp.md`
 //! section 9. `spot` owns the common-input dialect; product tree builders
-//! evaluate its compiled conditions. The internal PostflopVar dialect is
-//! retained for HU game construction and independent oracle tests.
+//! evaluate its compiled conditions. An independent internal dialect exists
+//! only in frontend unit tests.
 //! Parsing produces a typed [`Condition`] tree once; [`Condition::eval`]
 //! never re-parses or fails.
 
@@ -26,8 +26,8 @@ mod token;
 
 pub use ast::{ActionKind, Effect, ParamKind, ParamSchema, Rule, Script};
 pub use cond::{
-    CmpOp, Condition, Dialect, Literal, POSTFLOP, PartialContext, PostflopVar, PreviousAggressor,
-    RuleContext, SizeParser, Value, VarKind, VarSource, Vars,
+    CmpOp, Condition, Dialect, Literal, PostflopVar, PreviousAggressor, RuleContext, SizeParser,
+    Value, VarKind, VarSource, Vars,
 };
 
 /// An error compiling a tree script. Every error -- tokenizing, `param` /

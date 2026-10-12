@@ -53,6 +53,7 @@ impl RakeModel for NoRake {
     }
 }
 
+#[cfg(any(test, feature = "test-support"))]
 /// Percentage rake with a cap, optionally waived when the hand ends
 /// preflop (no flop, no drop).
 pub struct PercentCapRake {
@@ -61,27 +62,10 @@ pub struct PercentCapRake {
     pub no_flop_no_drop: bool,
 }
 
+#[cfg(any(test, feature = "test-support"))]
 impl RakeModel for PercentCapRake {
     fn rake(&self, t: &TerminalDescriptor) -> f64 {
         if self.no_flop_no_drop && t.street == Street::Preflop {
-            return 0.0;
-        }
-        (t.pot.as_f64() * self.rate).min(self.cap)
-    }
-}
-
-/// GG-style preflop rake: charged even when the hand ends preflop, but only
-/// once the pot has been raised beyond the blinds.
-pub struct GgPreflopRake {
-    pub rate: f64,
-    pub cap: f64,
-    /// Pot size at or below which no rake is taken (e.g. a walk).
-    pub exempt_pot: Chips,
-}
-
-impl RakeModel for GgPreflopRake {
-    fn rake(&self, t: &TerminalDescriptor) -> f64 {
-        if t.pot <= self.exempt_pot {
             return 0.0;
         }
         (t.pot.as_f64() * self.rate).min(self.cap)
@@ -177,8 +161,8 @@ impl PayoffPipeline<'_> {
 
     pub fn bake(&self, t: &TerminalDescriptor) -> BakedPayoffs {
         let baseline = self.utility.baseline(t);
+        let net_pot = t.pot.as_f64() - self.rake.rake(t);
         let outcome_utility = |share: PerPlayer<f64>| -> PerPlayer<f64> {
-            let net_pot = t.pot.as_f64() - self.rake.rake(t);
             let stacks_after = PerPlayer::new(
                 t.stacks_before[Player::P0].as_f64() - t.contrib[Player::P0].as_f64()
                     + share[Player::P0] * net_pot,
@@ -224,6 +208,44 @@ mod tests {
             pot: Chips(pot),
             contrib: PerPlayer::new(Chips(contrib.0), Chips(contrib.1)),
             stacks_before: PerPlayer::new(Chips(100), Chips(100)),
+        }
+    }
+
+    #[test]
+    fn showdown_computes_rake_once_without_changing_payoff_bits() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        struct CountingRake(AtomicUsize);
+        impl RakeModel for CountingRake {
+            fn rake(&self, _t: &TerminalDescriptor) -> f64 {
+                self.0.fetch_add(1, Ordering::Relaxed);
+                0.7
+            }
+        }
+
+        let rake = CountingRake(AtomicUsize::new(0));
+        let terminal = showdown_terminal(21, (10, 11));
+        let pipeline = PayoffPipeline {
+            rake: &rake,
+            utility: &ChipEv,
+        };
+        let baked = pipeline.bake(&terminal);
+        assert_eq!(rake.0.load(Ordering::Relaxed), 1);
+        for (outcome, shares) in [
+            (Outcome::WinP0, PerPlayer::new(1.0, 0.0)),
+            (Outcome::Tie, PerPlayer::new(0.5, 0.5)),
+            (Outcome::WinP1, PerPlayer::new(0.0, 1.0)),
+        ] {
+            for player in Player::BOTH {
+                let expected = (terminal.stacks_before[player].as_f64()
+                    - terminal.contrib[player].as_f64()
+                    + shares[player] * (terminal.pot.as_f64() - 0.7))
+                    - terminal.stacks_before[player].as_f64();
+                assert_eq!(
+                    baked.for_outcome(outcome)[player].to_bits(),
+                    expected.to_bits()
+                );
+            }
         }
     }
 
@@ -283,11 +305,6 @@ mod tests {
         let icm = Icm {
             payouts: [100.0, 60.0],
         };
-        let gg = GgPreflopRake {
-            rate: 0.05,
-            cap: 3.0,
-            exempt_pot: Chips(4),
-        };
         let percent_cap = PercentCapRake {
             rate: 0.05,
             cap: 3.0,
@@ -318,31 +335,6 @@ mod tests {
             .is_zero_sum(),
             "HU ICM is affine, so an unraked ICM game is still zero-sum"
         );
-        assert!(
-            !PayoffPipeline {
-                rake: &gg,
-                utility: &ChipEv,
-            }
-            .is_zero_sum(),
-            "GG-style preflop rake is not free"
-        );
-    }
-
-    #[test]
-    fn gg_preflop_rake_semantics() {
-        let gg = GgPreflopRake {
-            rate: 0.1,
-            cap: 2.0,
-            exempt_pot: Chips(4),
-        };
-        // At or below the exempt pot (e.g. a walk): no rake, even though the
-        // hand ended preflop.
-        assert_eq!(gg.rake(&showdown_terminal(4, (2, 2))), 0.0);
-        // Above the exempt pot: min(rate * pot, cap).
-        let below_cap = showdown_terminal(10, (5, 5));
-        assert!((gg.rake(&below_cap) - 1.0).abs() < 1e-12); // 0.1 * 10 = 1.0
-        let above_cap = showdown_terminal(100, (50, 50));
-        assert_eq!(gg.rake(&above_cap), 2.0); // 0.1 * 100 = 10, capped at 2.0
     }
 
     #[test]

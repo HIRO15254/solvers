@@ -28,7 +28,9 @@ pub use range::{
     NUM_CLASSES, NUM_COMBOS, ParseRangeError, Range, class_index, combo_cards, combo_index,
 };
 pub use set::CardSet;
-pub use sizing::{ParseSizeError, SizeSpec, SizeUnit, geometric_allin_target};
+pub use sizing::{
+    ParseSizeError, SizeContext, SizeSpec, SizeUnit, geometric_allin_target, scale_u32, scale_u64,
+};
 pub use types::{Chips, PerPlayer, Player, Street};
 
 pub mod betting;

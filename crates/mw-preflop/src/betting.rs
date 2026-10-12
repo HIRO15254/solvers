@@ -121,7 +121,7 @@ impl BettingMenu for BettingState {
             // a brand-new all-in action.
             if street_config
                 .allin_threshold
-                .is_some_and(|threshold| target >= scale(maximum, threshold))
+                .is_some_and(|threshold| target.raw() >= nlh::scale_u64(maximum.raw(), threshold))
             {
                 target = maximum;
             }
@@ -284,11 +284,6 @@ fn action_sort_key(action: &Action) -> (u8, u64) {
         Action::BetTo { to, .. } => (3, to.raw()),
         Action::RaiseTo { to, .. } => (4, to.raw()),
     }
-}
-
-fn scale(amount: MwChips, factor: f64) -> MwChips {
-    let scaled = (amount.raw() as f64 * factor).round();
-    MwChips(scaled.clamp(0.0, u64::MAX as f64) as u64)
 }
 
 #[cfg(test)]
