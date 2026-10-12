@@ -118,7 +118,7 @@ regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr
 `CfrPrecision`をengineとP1 evaluatorで共有し、P1 driverが入力値を両方へ渡す。CFRは`eval_cfr`、評価と保存EVは厳密な`eval`を使い、平均戦略の正規化も精度選択から独立する。
 f32では、chanceを含まないaction subtreeのstorage要素数が`2 * ACTION_PAR_MIN_ELEMENTS`未満なら、
 最初に到達したrootで非再帰の3段階passへ入る。この条件は`ActionViews::split_for`のAmbient条件と一致し、内部で並列化しない。
-node id昇順で戦略・子reachを用意し、全終端へ`eval_cfr_batch`を1回呼び、降順で子順の値合成・regret更新・戦略累積を行う。
+storageのDFS前順にactionの戦略・子reachを用意し、全終端へ従来のnode id順で`eval_cfr_batch`を1回呼び、storageの逆順で子順の値合成・regret更新・戦略累積を行う。`PublicTree`はsref indexからaction node idへの表（4 bytes/action、Vecの余剰capacityを除く）をcompile・shape復元時に作る。部分木のsref spanをsliceし、node値とreach metadataの行はnode idで索引する。f64、EV/BR、終端batchの組分け、保存形式は変えない。
 不変reachは入力または祖先arenaのindexを共有し、全0相手reachのPRUNEでも下の更新nodeを訪問する。
 sigma・scaled reach・node値をscratchからLIFOで取得し、終端参照のmetadataもworkerごとに再利用する。action値の最初の加算は`x + 0.0`の代入とし、終端・書込みの無い行は明示的に0初期化する。regretは連続する子の値からnode値をf32で引いて直接更新する。
 既定batch hookは個別の`eval_cfr`、P1の同一board終端は種類別に最大8 laneで評価する。

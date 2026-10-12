@@ -1,0 +1,1512 @@
+{
+  "experiment": "S5 storage-order batched CFR traversal",
+  "date": "2026-10-13",
+  "relatedIssue": "SOL-32",
+  "question": "Does processing CFR action phases in storage preorder/reverse preorder preserve all bits and improve throughput?",
+  "scope": "Only batch::run phases 1 and 3; terminals, id-indexed value rows, f64 recursion, EV/BR and artifact formats are unchanged.",
+  "decision": "Local correctness acceptance passed. No performance acceptance or speed claim; integrator will measure AWS c6a.8xlarge at 16/32 threads.",
+  "source": {
+    "prechangeCommit": "e9e8d7166d173eadada4e07939fd1b638f2994c5",
+    "branch": "p1rf/s5-order",
+    "worktree": "E:/solvers-wt/s5-order",
+    "newSource": "Containing commit; measured code was uncommitted during verification.",
+    "files": {
+      "crates/hu-engine/src/tree.rs": "ef67166167405111b926154ed615d47d966cac3cd6322394b682674e8c5b14f2",
+      "crates/hu-engine/src/solver/batch.rs": "f9dfa04be86f4858e5c94f6877af69b66dc101853c0194e7a54fed94c2d17c4f",
+      "crates/hu-engine/src/solver/batch_tests.rs": "c19bd4597c0a57e93ba41fe3c0564e025e954d5fda7f9a13a1175f194983f5a5",
+      "crates/hu-postflop/examples/p1_bench.rs": "a515bc01d9165e43eb0441e24dda1ffb0c6f7f1464a888a999271cbdf5315a37"
+    },
+    "cargoLockSha256": "6bae12550c711a165896bb76ce107950f8e24a2eca09441b5c6e43cd15419f12"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "cpu": "Intel Core i7-10700KF @ 3.80 GHz",
+    "cores": 8,
+    "logicalProcessors": 16,
+    "physicalMemoryBytes": 34275098624,
+    "rustc": "1.97.0 (2d8144b78 2026-07-07)",
+    "cargo": "1.97.0 (c980f4866 2026-06-30)",
+    "host": "x86_64-pc-windows-msvc",
+    "llvm": "22.1.6",
+    "cargoEnvironment": {
+      "CARGO_TARGET_DIR": "E:/solvers-build/s5",
+      "CARGO_INCREMENTAL": "0",
+      "CARGO_PROFILE_DEV_DEBUG": "0"
+    },
+    "cpuFlags": "Repository .cargo/config.toml: target-cpu=native",
+    "noise": "Shared Windows development machine; alternating runs are informational only."
+  },
+  "binaries": {
+    "baseline": {
+      "path": "E:\\solvers-build\\baseline\\release\\examples\\p1_bench.exe",
+      "sha256": "3d5ce1da994c0dac2416df24af703fddb841c58675fff8bd1dc9b24825442952",
+      "buildCommand": null,
+      "source": "Provided main baseline; source revision not embedded in the binary and not independently recorded here."
+    },
+    "prechange": {
+      "path": "E:\\solvers-tmp\\s5\\p1_bench-pre.exe",
+      "sha256": "ae02ec5875e80b99c6c36fee9c8a2ba24481216c549d87f1a5fdee918e600e71",
+      "buildCommand": "cargo build --release -p hu-postflop --example p1_bench",
+      "source": "prechangeCommit"
+    },
+    "storage_order": {
+      "path": "E:\\solvers-build\\s5\\release\\examples\\p1_bench.exe",
+      "sha256": "ed610d7cc50db41e1bb6cadfec656ab066fd4414b4f92da1092c9dc092513a07",
+      "buildCommand": "cargo build --release -p hu-postflop --example p1_bench",
+      "source": "containing commit measured before commit"
+    }
+  },
+  "memory": {
+    "mapping": "Vec<NodeId>, one u32 per action node",
+    "payloadBytesPerAction": 4,
+    "vecHeaderBytesOnMeasuredHost": 24,
+    "capacitySlack": "Additional spare Vec capacity; actual capacity was not instrumented. No per-pass allocation or sort is added.",
+    "flopSrpActionNodes": 434540,
+    "flopSrpMappingPayloadBytes": 1738160
+  },
+  "verification": {
+    "commands": [
+      {
+        "command": "cargo fmt --all --check",
+        "result": "passed"
+      },
+      {
+        "command": "cargo clippy --workspace --all-targets -- -D warnings",
+        "result": "passed"
+      },
+      {
+        "command": "cargo clippy --workspace -- -D warnings",
+        "result": "passed"
+      },
+      {
+        "command": "cargo test --workspace",
+        "result": "passed"
+      },
+      {
+        "command": "cargo test --release -p hu-engine -p hu-postflop -- --include-ignored",
+        "result": "passed"
+      },
+      {
+        "command": "python tools/check_docs.py",
+        "result": "passed"
+      }
+    ],
+    "workspace": {
+      "passed": 1004,
+      "suites": 55,
+      "ignored": 38
+    },
+    "releaseEnginePostflopIncludingIgnored": {
+      "passed": 259,
+      "suites": 20
+    },
+    "newRegressionTest": "solver::batch::tests::storage_preorder_matches_recursive_bits_when_node_order_differs (passed debug and release; both players, prune/unpruned, zero/nonzero reaches, per-action CFV and full f32 regret/strategy sum bits)",
+    "existingCoverage": "Workspace and release suites retain vector_determinism, batch grouping/precision, and artifact/checkpoint tests.",
+    "log": {
+      "path": "E:\\solvers-tmp\\s5\\acceptance.log",
+      "sha256": "c04f134bc15109a28c975cbbef9f74304de09a52305fcb68cdbcc33d150cc56e",
+      "bytes": 115993
+    }
+  },
+  "reproduction": {
+    "configGeneration": "For each case read examples/hu-postflop/{case}.toml, append newline [solver] newline cfr_precision = \"{precision}\" newline, and write under E:/solvers-tmp/s5/.",
+    "identitySmallCommand": "{binary} {config} --storage {storage} --threads {threads} --warmup 0 --iters 30 --evals 1 --json {output}",
+    "identitySmallMatrix": {
+      "case": [
+        "river_small",
+        "turn_small"
+      ],
+      "precision": [
+        "f32",
+        "f64"
+      ],
+      "storage": [
+        "f32",
+        "i16",
+        "i16-f32avg"
+      ],
+      "threads": [
+        1,
+        8
+      ],
+      "binary": [
+        "baseline",
+        "prechange",
+        "storage_order"
+      ]
+    },
+    "identityFlopCommand": "{binary} E:/solvers-tmp/s5/flop_srp-f32.toml --storage i16 --threads 16 --warmup 0 --iters 2 --evals 1 --json {output}",
+    "timingCommand": "{binary} E:/solvers-tmp/s5/flop_srp-f32.toml --storage {f32|i16} --threads 16 --warmup 2 --iters 8 --evals 0 --json {output}",
+    "timingOrder": "For f32 then i16: prechange, storage_order repeated three times, sequentially after compilation and correctness checks finished.",
+    "bitComparison": "Parse report nashConv as IEEE-754 f64; compare all 64 bits (big-endian hex) across three binaries and thread counts.",
+    "configs": [
+      {
+        "path": "E:\\solvers-tmp\\s5\\river_small-f32.toml",
+        "sha256": "d7da81e0ddf688d1e6ff2f786db71c7c596cb2629bc8f5aa33e5245e650f757b",
+        "content": "# Small HU river with explicit ranges and a one-BB bet; suitable for a quick solve.\nschema = \"solvers.nlh/v1\"\n\n[table]\nplayers = 2\nstack_bb = 5\n\n[spot]\nline = \"BTN r2.5, BB c / BB x, BTN x / BB x, BTN x\"\nboard = \"Ks 7h 2d 3c 9s\"\n\n[ranges]\nBTN = \"AhAd,QhQd\"\nBB = \"JhJd,ThTd\"\n\n[tree]\nscript = '''river { replace bet [1bb] }\nriver when !unopened { replace raise [a] }'''\n\n# CFR arithmetic in [solver]: cfr_precision = \"f32\" (default) | \"f64\" (legacy bit-identical).\n# Storage choices in [solver]: auto (default: f32 if it fits, otherwise i16-f32avg), f32, i16, i16-f32avg.\n# DCFR defaults: alpha = 1.25, beta = 0.5, gamma = 4.\n# Omitted pow4_reset: true for i16, false for auto/f32/i16-f32avg; explicit values take priority.\n[solver.stop]\nmax_iterations = 16\ncheck_every = 4\n# Integer cadence stays fixed; default \"auto\" adapts with target, otherwise evaluates every 25.\n\n[run]\nthreads = 1\n\n[solver]\ncfr_precision = \"f32\"\n"
+      },
+      {
+        "path": "E:\\solvers-tmp\\s5\\river_small-f64.toml",
+        "sha256": "258a6f0f6f9b8cf202608dcc6f6810e2fc188aeb683cbcea74e7879538106ec9",
+        "content": "# Small HU river with explicit ranges and a one-BB bet; suitable for a quick solve.\nschema = \"solvers.nlh/v1\"\n\n[table]\nplayers = 2\nstack_bb = 5\n\n[spot]\nline = \"BTN r2.5, BB c / BB x, BTN x / BB x, BTN x\"\nboard = \"Ks 7h 2d 3c 9s\"\n\n[ranges]\nBTN = \"AhAd,QhQd\"\nBB = \"JhJd,ThTd\"\n\n[tree]\nscript = '''river { replace bet [1bb] }\nriver when !unopened { replace raise [a] }'''\n\n# CFR arithmetic in [solver]: cfr_precision = \"f32\" (default) | \"f64\" (legacy bit-identical).\n# Storage choices in [solver]: auto (default: f32 if it fits, otherwise i16-f32avg), f32, i16, i16-f32avg.\n# DCFR defaults: alpha = 1.25, beta = 0.5, gamma = 4.\n# Omitted pow4_reset: true for i16, false for auto/f32/i16-f32avg; explicit values take priority.\n[solver.stop]\nmax_iterations = 16\ncheck_every = 4\n# Integer cadence stays fixed; default \"auto\" adapts with target, otherwise evaluates every 25.\n\n[run]\nthreads = 1\n\n[solver]\ncfr_precision = \"f64\"\n"
+      },
+      {
+        "path": "E:\\solvers-tmp\\s5\\turn_small-f32.toml",
+        "sha256": "06c1e9bdf3231b1916be7b66791933ed6fae68aa5ea69070f6ed74469fb048de",
+        "content": "# HU turn with a shared turn/river menu and all-in raises; includes river chance expansion.\nschema = \"solvers.nlh/v1\"\n\n[table]\nplayers = 2\nstack_bb = 5\n\n[spot]\nline = \"BTN r2.5, BB c / BB x, BTN x\"\nboard = \"Ks 7h 2d 3c\"\n\n[ranges]\nBTN = \"AhAd,QhQd\"\nBB = \"JhJd,ThTd\"\n\n[tree]\nscript = '''turn, river { replace bet [1bb] }\nturn, river when !unopened { replace raise [a] }'''\n\n[solver.stop]\nmax_iterations = 16\ncheck_every = 4\n# Integer cadence stays fixed; default \"auto\" adapts with target, otherwise evaluates every 25.\n\n[run]\nthreads = 1\n\n[solver]\ncfr_precision = \"f32\"\n"
+      },
+      {
+        "path": "E:\\solvers-tmp\\s5\\turn_small-f64.toml",
+        "sha256": "42e6ddeeb72f9aa4adadd2d0c10860b7420addc522bc4d7824f10af46fae4f76",
+        "content": "# HU turn with a shared turn/river menu and all-in raises; includes river chance expansion.\nschema = \"solvers.nlh/v1\"\n\n[table]\nplayers = 2\nstack_bb = 5\n\n[spot]\nline = \"BTN r2.5, BB c / BB x, BTN x\"\nboard = \"Ks 7h 2d 3c\"\n\n[ranges]\nBTN = \"AhAd,QhQd\"\nBB = \"JhJd,ThTd\"\n\n[tree]\nscript = '''turn, river { replace bet [1bb] }\nturn, river when !unopened { replace raise [a] }'''\n\n[solver.stop]\nmax_iterations = 16\ncheck_every = 4\n# Integer cadence stays fixed; default \"auto\" adapts with target, otherwise evaluates every 25.\n\n[run]\nthreads = 1\n\n[solver]\ncfr_precision = \"f64\"\n"
+      },
+      {
+        "path": "E:\\solvers-tmp\\s5\\flop_srp-f32.toml",
+        "sha256": "71fc59a0af513f35f05d6495adad6c09002add1b733129c2b2c7bd9210b790d7",
+        "content": "# Specification section 14: six-max BTN vs BB single-raised flop pot with cash rake.\n# Lean GTO Wizard-style tree: one flop c-bet size, no donk bets, small raises then all-in.\n# About 3.7 GiB of f32 storage; see the user guide for adding sizes and their memory cost.\nschema = \"solvers.nlh/v1\"\n\n[meta]\nname = \"6max NL50 BTN vs BB SRP Ks7h2d\"\n\n[table]\nplayers = 6\nstack_bb = 100\n\n[economics]\nkind = \"cash\"\n\n[economics.rake]\nrate = 0.05\ncap_bb = 4\n\n[spot]\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n\n[ranges]\nBTN = \"22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o\"\nBB = \"99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o\"\n\n[tree]\nscript = '''\nflop {\n  when donk { remove bet }\n  replace bet [33]\n  replace raise [50]\n  when aggressions >= 2 { replace raise [a] }\n}\nturn {\n  when donk { remove bet }\n  replace bet [50]\n  when cbet { replace bet [75] }\n  replace raise [a]\n  when spr > 3 { replace raise [50] }\n}\nriver {\n  replace bet [50, a]\n  when in_position { replace bet [75, a] }\n  replace raise [a]\n}\n'''\nallin_threshold = 0.67\n\n[solver.stop]\ntarget = \"0.1%pot\"\n# Default check_every = \"auto\" adapts evaluation intervals from 3 to 50 iterations.\n\n[run]\nmax_time = \"1h\"\n\n[solver]\ncfr_precision = \"f32\"\n"
+      }
+    ]
+  },
+  "bitIdentity": {
+    "groups": 25,
+    "runs": 75,
+    "mismatches": 0,
+    "smallTable": [
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "nashConv": 0.0002346038818359375,
+        "nashConvBits": "3f2ec00000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "nashConv": 0.0018315315246582031,
+        "nashConvBits": "3f5e020000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "nashConv": 0.0018315315246582031,
+        "nashConvBits": "3f5e020000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "nashConv": 0.0,
+        "nashConvBits": "0000000000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      },
+      {
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "nashConv": 0.0018317699432373047,
+        "nashConvBits": "3f5e030000000000",
+        "baselinePrechangeNewIdentical": true
+      }
+    ],
+    "flopTable": [
+      {
+        "kind": "baseline",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "nashConv": 34.64012849360644,
+        "nashConvBits": "404151efbb00a382"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "nashConv": 34.64012849360644,
+        "nashConvBits": "404151efbb00a382"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "nashConv": 34.64012849360644,
+        "nashConvBits": "404151efbb00a382"
+      }
+    ]
+  },
+  "localTiming": {
+    "mediansSecsPerIter": {
+      "f32": {
+        "prechange": 0.5654101625,
+        "storage_order": 0.5683097375
+      },
+      "i16": {
+        "prechange": 0.706853475,
+        "storage_order": 0.679805125
+      }
+    },
+    "runs": [
+      {
+        "kind": "prechange",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.5583851625
+      },
+      {
+        "kind": "storage_order",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.5616684875
+      },
+      {
+        "kind": "prechange",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.5654101625
+      },
+      {
+        "kind": "storage_order",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.5683097375
+      },
+      {
+        "kind": "prechange",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.59685805
+      },
+      {
+        "kind": "storage_order",
+        "storage": "f32",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.5870943375
+      },
+      {
+        "kind": "prechange",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.7294200875
+      },
+      {
+        "kind": "storage_order",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.679805125
+      },
+      {
+        "kind": "prechange",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.706853475
+      },
+      {
+        "kind": "storage_order",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.7462543625
+      },
+      {
+        "kind": "prechange",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.6440482625
+      },
+      {
+        "kind": "storage_order",
+        "storage": "i16",
+        "threads": 16,
+        "warmup": 2,
+        "iters": 8,
+        "evals": 0,
+        "secsPerIter": 0.6400249625
+      }
+    ]
+  },
+  "retention": {
+    "availability": "Compact results and generated input contents are Git-backed in this file. Full raw JSON/log files and benchmark binaries are locally retained at the recorded Windows paths on the measurement date; not Git-backed or guaranteed available on another machine.",
+    "rawRuns": [
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-f32-1-identity.json",
+        "outputSha256": "4962b6584aeb0cf8864b6e8e6049a777f2c865642771b45631efec4b4369a41c",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-f32-1-identity.log",
+        "logSha256": "0ff9aa2ddab9150c106dad67cdf14af5a6fd4b93d68dc6783c4264e0a663931c"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-f32-1-identity.json",
+        "outputSha256": "51a50c432953b93fc32c680f65c4787b19f86edabaf66e2b8b496d3f78266717",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-f32-1-identity.log",
+        "logSha256": "26a02916616dc75aab6106f04f0bbaea87335edc9c189c2db3f42f80314fe646"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-f32-8-identity.json",
+        "outputSha256": "54e98daab6a96038268ddaa2c88bd2c6f704faeb2ba6d53ffa2eddf9b00417e3",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-f32-8-identity.log",
+        "logSha256": "5b6fac3202dc339b3fc68258cff24c4e5d24503e2bb87b392ee32a10a19394e2"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-f32-8-identity.json",
+        "outputSha256": "20a4864e761fc39572bddb6625cfbaeb70b1e7524ef8b5c7df0caee17e4b2647",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-f32-8-identity.log",
+        "logSha256": "c40285e9c7b54b830e9139340e012f6c02fa846e612e7c2889c413463241d5a9"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-1-identity.json",
+        "outputSha256": "b8f7414fe76c08835a4a9aa2e82fb780110b62a55d82f89f7c6c6ab79f0649ab",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-1-identity.log",
+        "logSha256": "d19b647160814bdd819331c16c986893274f9f17fed6677a979b893320989fbc"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-1-identity.json",
+        "outputSha256": "3db77add82dc455870fa444f8bc28f0e6d7e688a7e9b63a02c5f07233dfad658",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-1-identity.log",
+        "logSha256": "76acaa21ba70d28385c079e8825917bbcc58fa8ead52687a8694708f8dc9ed42"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-8-identity.json",
+        "outputSha256": "6b328de26e9e2a1d893864c1d20bb5aa3a01087f314c66fb35328b5a6f097482",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-8-identity.log",
+        "logSha256": "3a965b61f34e1d9c6ae9e8d9af9804217eef55fe135a57ac8f40bf132dddb3a1"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-8-identity.json",
+        "outputSha256": "ccd81af97d6d32d5c8ad96832636798d84063bb9cf921ecf1f7a5575e258580b",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-8-identity.log",
+        "logSha256": "1f200c54487e4ca0d8b9a1017104dc20ae4219e2d4fdfaf34827d74f3d9d7051"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "a9b138b2a530721010a3fda0e27bc0c06b7bcde14ca6f34b00633b62f452f7db",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "b7cddad9a165a53addc177f8ababd3dcd94ac8ea732c075d8239e6841f466844"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "6ad57fdbdd41d53a882616952ffb108f8cedbe2eca509eb51c5b7d240625c685",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "14754962250b9bd4bf94798914f98073ba26250d520d6d42b856fda7c0749407"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "3eccd6063cf7f31dd3ff09daeddf280997f68f860720818a9931d73ca23ed18b",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "5d4647070fd993176e73b1a80f51ee33ea4099f1eb92dd749e611d919626685d"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "19695cf9147da4a02632a9b67e522995092d7cd55009108baefd01a42145648c",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "1836d5ae8ad0a47da26dca8f72b3f3d682a1e29a2865fec27c86e12cdaf4eba6"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-f32-1-identity.json",
+        "outputSha256": "27417a58e161fff67c8fe6f24fd9fdfb9d88bbd8581ee785d46695803b15e6e3",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-f32-1-identity.log",
+        "logSha256": "882b14c26bccaaa4da2fc1286a44aebacbc0491d438bc954ad6d08f17c4001d9"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-f32-1-identity.json",
+        "outputSha256": "c858297ec2cb7864e3bd59c9384576d6a4a96bb2190bce32a6c501b8d6cc4cab",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-f32-1-identity.log",
+        "logSha256": "b8b0efba578d91fac481e15b17ab2fc4829bcd40a7aee247b0f4d98502de0773"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-f32-8-identity.json",
+        "outputSha256": "0c72cb4fcc9096cf4853420f68016845e754f9fdfdbeef080d0b42b0003cfba0",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-f32-8-identity.log",
+        "logSha256": "71e0f7e7cbcf92505418abd5f3c9726708a27f714bce46c3ae656baa058176ad"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-f32-8-identity.json",
+        "outputSha256": "f92d71839c0bcfd17bf565ed166024568ce5e0feb8622bcbb17c2a84c1f6b5c4",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-f32-8-identity.log",
+        "logSha256": "e390d09414b421d3f3a1dffc0a96f8e9d5e2258fbe996c25113c9433fb17bc50"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-1-identity.json",
+        "outputSha256": "1ce157259df19d1023b4048daa964b4b9737a5cc391be55f485a3cf954a361e8",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-1-identity.log",
+        "logSha256": "9acac0ea20a894daa7980004d72479757d9b17dee6bb2bb6471cd296e22c8b46"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-1-identity.json",
+        "outputSha256": "bdb08248530029200b118139454580e59418688a30d9e04c8d1b8d80000dd43e",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-1-identity.log",
+        "logSha256": "27110cb408646bc4778c79cc932ba09ce77aa150d274c7c0e8b8e6aad3d518c7"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-8-identity.json",
+        "outputSha256": "9e0d74b281772b99ddef925eb5040974abed32da0eb2f10ed8d8b488890d4198",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-8-identity.log",
+        "logSha256": "aa596a319939500922b972ac505c6423bd232a6ec7afa4a6439720b846cc80b1"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-8-identity.json",
+        "outputSha256": "c5d12071fd66371fbcde6cef206b66a4249e1448ed82db72756bd68f6677f0fd",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-8-identity.log",
+        "logSha256": "eb22c20cfe6bd9837f4c975d7bc141c63b5355874828da8b1f7a3fb67e20ddf4"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "f3abfd642c7bbe881f68145e1508c30a0ab12fba68ed9f56e8f2affd70b538d2",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "14d5ea7cdf760daa35c7a7a68acf1d90b374a12153ae2be74381d1873df15f16"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "a25a97a57040e73aa049930ad47b10c4881230a32dea8eb57c77ce8d595e4cf9",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "77807d3b730201d0a21bae8aa9652b31be21c3c3435da4f44e48be3b484e9b8e"
+      },
+      {
+        "kind": "baseline",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "606a7535b4ea8af3cf29d3d9f8271b0faf0df5446fb47558d68f6c094b14090c",
+        "log": "E:\\solvers-tmp\\s5\\baseline-river_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "1c86e41128003e65d8eea1f1a3664e9bbf45112a4d3fd569ec01d11e545e98ee"
+      },
+      {
+        "kind": "prechange",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "45364a4f6610158aa5f2ba556da42b3e2b6e1c8a0355761530c4414a1550e578",
+        "log": "E:\\solvers-tmp\\s5\\prechange-river_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "19c0b261e87f2b8744c6a9659e439003d97ea90db2a2b8477817d4bb9e6f3faa"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-f32-1-identity.json",
+        "outputSha256": "37455c6e9551caf78203917e4b1aca411c09791beb2c41b3142b7459ee707dd9",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-f32-1-identity.log",
+        "logSha256": "22f7523f8ea911037ab44933271378c956fb0bf3031bd24e02623b601944de60"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-f32-1-identity.json",
+        "outputSha256": "df645be117a918300606781b39368a193a76e702a16263d66a10f24e82251681",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-f32-1-identity.log",
+        "logSha256": "5b8cc1545e91bc2b6528b2ee055d15ea9f0c72698f4e9fa5388c892a59197851"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-f32-8-identity.json",
+        "outputSha256": "d37ca6a42e4ff424d1bb08b1296850bf9ad94d448c9b7e1c879b3e77edb82d36",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-f32-8-identity.log",
+        "logSha256": "c9a86d9dd79ca7850bfa724254c3c827bf4210cf7ffc7ed12c2fdca217cbc8b0"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-f32-8-identity.json",
+        "outputSha256": "82005b15cf614cae7ea18a0564152770bac1f922f6896094ffa4108f2f851286",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-f32-8-identity.log",
+        "logSha256": "a781a746b576df87ad8bbe7b9911e8511568ac08ba370c44d412610f15f90e54"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-1-identity.json",
+        "outputSha256": "3147290375e08dd189a120d1ec8b33a4a044409f27d854b5900c07828372e951",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-1-identity.log",
+        "logSha256": "50ba4e421eef4a610ddd5417499a2323c0f1c6a4bf5ac6bd731f13296e3ec08d"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-1-identity.json",
+        "outputSha256": "091230f311bf6ecbaa88f5d3922fd7dbfee2b57473c41d0200c20926ea0c4f44",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-1-identity.log",
+        "logSha256": "411b57f8041af0dfbc539e9c5e15e98badcdedf7031305f9b33c3496bc4c69df"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-8-identity.json",
+        "outputSha256": "3f7e111c1c573c108354a8c9d5a5b2fd2b0a4f933ccb16bee1c77cff8f78113f",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-8-identity.log",
+        "logSha256": "e5e0012f58f31b29f19b2e1356a272cc345f7fc8f2d86ac4ed3c632881f079ea"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-8-identity.json",
+        "outputSha256": "f625a7e2b1fa2c809ac4e8955cc30130e29b9fd7f6a33d7f595c2b074dc10df2",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-8-identity.log",
+        "logSha256": "1ae40e4acee4d3803bf84c8a94de0a75bd75d8d050c2d5bc39402b024bc8bfcc"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "49e1663b6a7332af35be1d8db2a70923fa4751777a678ecc24e429d6dca79e08",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "6c76eeb4f064c304fa5c011bd9118d1054045adbcca452d8b8a4c9e758fe51ca"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "7e78c7451e6ca9e2e73dfcdac10cf7b7b60b55dcd56b3fa30020bee75b5b9d00",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "d73927037a2964ac00c23487887c64e3f38f3e425b91013c8a2badeacec00319"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "48e1039388ae126375693134fea3184b186455dfe423e705bcc477188ddddce6",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "6315e3766cbec10fe88d9691fab15a631ac00c07b77f803d0567fc2cc0554d68"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "7fbe4b1a2036602003e5a59c161512e471c34175a95338c6b46817e8baec2d37",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "123275da87e176349d778aa7e18526c223ed5db52045039663e024c8b4bb2499"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-f32-1-identity.json",
+        "outputSha256": "e7fca202d0ecc67261eba56834ea0f2c340d851e92f6d7b56871345bc0eb138d",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-f32-1-identity.log",
+        "logSha256": "e8e4b8d66eb7962493a82cc5f0adf88497a64d5f8a68a2ed4e684baabb3ed9aa"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-f32-1-identity.json",
+        "outputSha256": "40567c3ed819e853c329099c55c40ea5bc4241c2bfbc54d5e97a02340affbadb",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-f32-1-identity.log",
+        "logSha256": "4fb886bd80ecafccac3677f03de0857c3e2ca4a707435e9f236b3b77aa432853"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-f32-8-identity.json",
+        "outputSha256": "e60c968864e653a3091147e57169ae802fe48cd6d6ed0b3504f4f8f231805493",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-f32-8-identity.log",
+        "logSha256": "39cd88651cfc982c2164b0d3858b0c73fadf2abeb03b403c7b1c5b6e88bdc0e4"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-f32-8-identity.json",
+        "outputSha256": "3beb53f78fc09a39a662abcf25c169c93ba877a4db8e5a9462d0be6c390ab91c",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-f32-8-identity.log",
+        "logSha256": "8dc375f1786b580d897e0601c8a4b5abdfe27b87f9138b1527776ac9d6cc8399"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-1-identity.json",
+        "outputSha256": "c66acc25e7f7484f6766d83464c6929801148972d69b00444a36f43b88991d00",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-1-identity.log",
+        "logSha256": "8e15dec4aeb99c863eb520dcf8f8e3037a19754bbb24923b72b0208ed71ac681"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-1-identity.json",
+        "outputSha256": "1fff5313d6148f71628a2faa7309c96731bffbbe0cd4cdc69f0f1272207060f9",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-1-identity.log",
+        "logSha256": "4021dca51f9c28316133ca6c79946d84069c6a416a431de758bb821705aa3d50"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-8-identity.json",
+        "outputSha256": "262aaafb15fcc6202c53692258393511e9e4cc9a84ae4595c9ea938ed897aff8",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-8-identity.log",
+        "logSha256": "e64b09f845e1af591d68f6cac4c101f8b0a4d09e1bbf4e4773079aace437be6a"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-8-identity.json",
+        "outputSha256": "e46f4b845f02199538427b4552fcc924c16239465aece408cae66b1657fb2810",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-8-identity.log",
+        "logSha256": "a902984048171b2d1a7b6a7549cfad6241ce6b1bc4e2254ee80c72f659501c83"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "da4fd75989e21509666057aa59f3d8507ec581a3383126bc88c71954f2c4a8ba",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "e753295b3f58f98d3ef29102b0b60fa6e5bd424966d03a02b4c450f9c24b815e"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "266d816d6b44bf50b515c300e2377ee25780d5b78d71bfcc1d4fa3e1a1743ca2",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "966dc23a344a3a709d1efa7583d37b8b053c8be488b4661c210819f5e6bdbda2"
+      },
+      {
+        "kind": "baseline",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "6e846337e34e6bdf8fb7f36fff327689a37f214e1b27e76dbb3ea1b16d3c4c82",
+        "log": "E:\\solvers-tmp\\s5\\baseline-turn_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "cbd1de23375dba8c21c45b2b8dfd4200b3c7f613320ce0251efa11b9f684301f"
+      },
+      {
+        "kind": "prechange",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "8eac4862b4c6acf4e267169b359eec0e657137b3194bdbe977af575a6d934a33",
+        "log": "E:\\solvers-tmp\\s5\\prechange-turn_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "443bf0a67467bd07edd778763d34d63e5020c57b049f9fba171bd8b4662f2d23"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-f32-1-identity.json",
+        "outputSha256": "ac676dae80419cfbe35f886668e9b283056098b0138eeecbde853be97beec680",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-f32-1-identity.log",
+        "logSha256": "7d2339b8aea05d97549db6b8813a5adbf36da5207baf1a79a874dbbf843316bc"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-f32-8-identity.json",
+        "outputSha256": "aea4888671b64c7a6b8aea23e68c87f12b3d63723de21e081e71ebfa52690d0f",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-f32-8-identity.log",
+        "logSha256": "4f46b09267cc9d89050a2d592a341d7f270781f19b1b96b5df5881b84e3ce339"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-1-identity.json",
+        "outputSha256": "8aa0b3f11e504194c5449144da87846837a3c7f769d31f2b48f5e3c71850a0fe",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-1-identity.log",
+        "logSha256": "f3e7a8639779b4aced8dfe9da9ccfd285ce3f7eca35702dc1024ea084a7896cc"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-8-identity.json",
+        "outputSha256": "4a01c65427633cf216634f871aa0671382d65c4ad50d694d35a9834a9a37817c",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-8-identity.log",
+        "logSha256": "b268963d95abcefc5586285e4857786b22440a1a2d141e4348c6a58b4bbf37bf"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "b5c61cc49f8f7758a4eb7d069a940d24edd981e6b5632d316423a11d7f6dfe39",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "27088df821a5888a89fbe00cab1f62155988dfe02a04ccf014eb2104c18741fd"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "bdc8c3a55cd4c5173d684ab4c4a8b47752e3e2295bf445853a78dd90bd11cff5",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "80fcd62f6d4dccaa1ac486961306e092ea48d618d65ae1072a89b4ceb5b7dc57"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-f32-1-identity.json",
+        "outputSha256": "7deb3f05049120175d1ad3202be6a2f86d5066e3a1fd66296f79fa9beb5798fb",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-f32-1-identity.log",
+        "logSha256": "2e4b9b4ab43c983939f3dc6431f54905321283f325c9f5e2be2fd756735a2eca"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-f32-8-identity.json",
+        "outputSha256": "04492567d99737fcd9e54b3db57e78a1eb6dce53f9081cca22c6a72a062f7e0d",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-f32-8-identity.log",
+        "logSha256": "9bc4c800aaf2bb87a3e2bea6ad9688ed6564a93cd78587155b8d5374c42c694e"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-1-identity.json",
+        "outputSha256": "0ec5ae01d90ef902decb999f6051ecb8d91af201fff9c940e1032a334a38d5df",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-1-identity.log",
+        "logSha256": "c6a3e240246798fee71c74cd5d7315dcb27e5e3fae2f204fdb4599e2f6153dd2"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-8-identity.json",
+        "outputSha256": "2ce2c13f4bcee96cb428175faa0349976e76eb178d346b954cef900dd3f0cd88",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-8-identity.log",
+        "logSha256": "b8cac58401664ef5902855d9873ef1d726aadbf210cdda2e61230cb40ad08076"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "c59f57d924b02cc58281da7ca60639025b481ed3d2918c262fd09864f7231a91",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "79729686b5b9608a61016368f37d0670ed420f5e1c1ef7d841a9c73b3e8e8df2"
+      },
+      {
+        "kind": "storage_order",
+        "case": "river_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "94d45414e2a694160bf0b61ab335403e614c2bdb0ac672c264d070ad272ff75a",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-river_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "0703beb7a59405fbbdcb7d487f4f69409fc84d31be72d7a72efc5e7429fb7ac4"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-f32-1-identity.json",
+        "outputSha256": "8073f32bde3343711e97fae7781abf0bc3a2449e7acc83a602ef13a620581d89",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-f32-1-identity.log",
+        "logSha256": "8b0aa4fffc936362d5506f35592ebadb27778ab0ecd62f46eb69b608282b656d"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-f32-8-identity.json",
+        "outputSha256": "2135ed799433b78e59e7f54970d33655aee49a3e494f2c6446604722068bf1ff",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-f32-8-identity.log",
+        "logSha256": "c98f1844ad67c5194895bd07b8014abddaf00cf4bd8eb73b4733e90207b8778b"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-1-identity.json",
+        "outputSha256": "91a63b619ac909d65bc94a1c3c2ae2842b3e3c75aacd4dca299d528ce2774d5b",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-1-identity.log",
+        "logSha256": "8305d7ee6077d0220fe1b9c96bbb6183a2df8929dd944152a20acb71aec07948"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-8-identity.json",
+        "outputSha256": "be79ccc92e2cd09e997e485412c387552909d51979f5d3f8f93d9b82ff24fb55",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-8-identity.log",
+        "logSha256": "398b16f4de5409e1d0cace9cebb7a99120f2ae24b5aa05b79c06f982ce42d28d"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-f32avg-1-identity.json",
+        "outputSha256": "e628d14b67b2c3247b0b637f463de86d67d39f920d458a17e8e7bef42f24b5f0",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-f32avg-1-identity.log",
+        "logSha256": "a2e937590fc64abf2f98b6dee2f69e5ccbc237bc1b7e9abf62f33ccd0d6ff49d"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f32",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-f32avg-8-identity.json",
+        "outputSha256": "e4c1eab384317ec6920a823dd462468f00e044207540c0aa0330fd582eb334f9",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f32-i16-f32avg-8-identity.log",
+        "logSha256": "b15242fd6799d114949b6cb689f40bf87366c66dc0d8a8cae919e2b16d1cbfcc"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-f32-1-identity.json",
+        "outputSha256": "e9ab0b098c779969c305c84268cf68fae794a630945df4b450f88d4c7477c066",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-f32-1-identity.log",
+        "logSha256": "710877cb6f211424ff498d92209903a4eaf27603d3b5633e27ae5d7d75483595"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "f32",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-f32-8-identity.json",
+        "outputSha256": "59755eca83790e23f3608c901f6a0895c60018905cc2b9480e01feefa2169677",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-f32-8-identity.log",
+        "logSha256": "62a224d41dc9cde9de3106b937824fdbf5ec823f096017c047834d8c79f3f333"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-1-identity.json",
+        "outputSha256": "58f0699025da19df7a02ccd574bb6e673df36b2c7824a71a3bf326b83bf2bec1",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-1-identity.log",
+        "logSha256": "29f4b07bd484d8f004812a925f2843ec706abdfa71645f6dd0064ebc5f977c73"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-8-identity.json",
+        "outputSha256": "99f48782a36e638934b096e3fdc4db4cc9984fe41fabd85262b5cc7bad3b50ca",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-8-identity.log",
+        "logSha256": "d63f3e4be7f98bbdd2de032086ae2ffd219748508d0d0df26857d8ce18b0bae4"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 1,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-f32avg-1-identity.json",
+        "outputSha256": "f2502df0d9eb98a25527ef036c29a0b8f02ad24d6b2db26807eda09623f92049",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-f32avg-1-identity.log",
+        "logSha256": "d7d9fe8f113e3a07625ae90cdfa90e5faa34e715a8b2a331ff82cc243a704461"
+      },
+      {
+        "kind": "storage_order",
+        "case": "turn_small",
+        "precision": "f64",
+        "storage": "i16-f32avg",
+        "threads": 8,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-f32avg-8-identity.json",
+        "outputSha256": "3bbbff0a5bf2508ec068b3fa9ef25088d7f0ecafe878f569165e8c356ada78e2",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-turn_small-f64-i16-f32avg-8-identity.log",
+        "logSha256": "1be1633eb6406bda33c89f4ceb3518edaf22f62c661a50f1ba3ae0c50d71273a"
+      },
+      {
+        "kind": "baseline",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\baseline-flop_srp-f32-i16-16-identity.json",
+        "outputSha256": "fe463c1bd065510c8e13b1e8dd670367b18097facd596493a0d64075e9e5726e",
+        "log": "E:\\solvers-tmp\\s5\\baseline-flop_srp-f32-i16-16-identity.log",
+        "logSha256": "32478124bedf55949c2cb2138c7623b486413d6e275d9ec653a4b651192dc81f"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-identity.json",
+        "outputSha256": "a931058bd26b8058d974c6690fd08dd988abb0371015ba652bf76618e153e8ad",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-identity.log",
+        "logSha256": "10e0823f83f274aa82166d4e7a50032acc5bf4825161cb72f8e745cc194b8121"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-identity.json",
+        "outputSha256": "d0e925deaeef187c06be7f0984ab89a4ef7f9eac13f2b8a0a464a68cea68fb8f",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-identity.log",
+        "logSha256": "91fa3c308a2339f07403466cee3f84ee29768611fde37c97abb41b0cf3a3b318"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-1.json",
+        "outputSha256": "50302bb2626c6f1ecc7685d56b23d9be791bf52534af15c8d258d4c9c91261c8",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-1.log",
+        "logSha256": "08df115ea7e571e31702a4d928f7b0c8af3b08882eacc07d08e6f1a1fb054cd7"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-1.json",
+        "outputSha256": "3463c01c218469721ea85c441e7cb9ae932b69936a97484e9e8734e0f74240d3",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-1.log",
+        "logSha256": "aa0ef3ae02112ebe486be443ecd81e9b82ad90be2d14978f7fd71c45af136594"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-2.json",
+        "outputSha256": "cc673dc0e128fb99fc787e332a03ef72acab9a38a63db6cd86dcd2a0b8b3265c",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-2.log",
+        "logSha256": "accf2959cb315f5c31cb3be726c07277cb421eac056644ce1c8abd4a6bb1da18"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-2.json",
+        "outputSha256": "a9e311a3aa344f662b79c0a9666a17fffa8be32d122e3b7261afb421daba5e93",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-2.log",
+        "logSha256": "08ee745e67fca0f54a6daf7018449f4a2377c76489175a3b64490a0d494ac4ef"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-3.json",
+        "outputSha256": "260fed5fe1576dc86730833693ad140eafa8bd067c2bc8f80adb29de0e115d5d",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-f32-16-timing-3.log",
+        "logSha256": "03c5bb51a1b77d6cec7425377ab60142da06dddaae624929c41b7f34f6000dd4"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "f32",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-3.json",
+        "outputSha256": "b2bb1b93e68bb29336a1efda55037553027ba9edd2a1bee97ee746758c9ed93b",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-f32-16-timing-3.log",
+        "logSha256": "376962f99f2d58bbd0c62a6dc813b5678fdcdd09be2e0c8e9b33905e550b3435"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-1.json",
+        "outputSha256": "08f023b0b73542ba00532ea9c3b4220f1aa373893176982104edddabec2024ff",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-1.log",
+        "logSha256": "dbc1cbd57cb8d0cd10be786ded5fb8de5fd81300be470cd81c3fc17d61657580"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-1.json",
+        "outputSha256": "b5f652242fb91ef52584cadc17647200c1e1b746c03edbee958e24e36dda762b",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-1.log",
+        "logSha256": "ec128aa463fec194e1b4ec370da94057b01bf1044620050310f38182ee23de4c"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-2.json",
+        "outputSha256": "0515b175fe9061eeaf43a302a57db091e634b54f61431125d56df13b67a44a3f",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-2.log",
+        "logSha256": "10cc4932ec102f30178864bfd74e7eb46d378aea308a2030b5515875f0b4ddf3"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-2.json",
+        "outputSha256": "2b0d168ca320f162a2f292e030cb6cdb8cb34f6626519085d8a77de2c502d685",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-2.log",
+        "logSha256": "ac00f9144e16b6399d14e5a2ba17dd158bd0daa7f59549b4bed097c1544a8a4c"
+      },
+      {
+        "kind": "prechange",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-3.json",
+        "outputSha256": "788dd68a39b5f6582ec2f97afdea434dcbeb8c9079d8fe7bc9735d7bc04f9631",
+        "log": "E:\\solvers-tmp\\s5\\prechange-flop_srp-f32-i16-16-timing-3.log",
+        "logSha256": "45fa017380d3e0633c4d1308da9e91fc71856d92c1d881dfa6abef6bc07642af"
+      },
+      {
+        "kind": "storage_order",
+        "case": "flop_srp",
+        "precision": "f32",
+        "storage": "i16",
+        "threads": 16,
+        "output": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-3.json",
+        "outputSha256": "ec96704da30bccc8de213f0a809b3080923e1b9fd1783922f20268b7e76b8245",
+        "log": "E:\\solvers-tmp\\s5\\storage_order-flop_srp-f32-i16-16-timing-3.log",
+        "logSha256": "238aa5efaf0444544884953de807406020938e0622da61bde0c5eaff355ea0fa"
+      }
+    ]
+  },
+  "risks": [
+    "Mapping increases resident tree metadata by 4 bytes/action plus Vec capacity slack and header.",
+    "Small river/turn configurations have only two combos per player; flop case, recursive bit regression, and existing suites add broader coverage.",
+    "Local medians are noisy and do not establish AWS 16/32-thread performance.",
+    "Optional storage-order EV/BR change deliberately not implemented, preserving a separately measurable scope."
+  ]
+}
