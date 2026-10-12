@@ -66,11 +66,12 @@ fn live<S: Storage>(
     wrap: impl FnOnce(Solver<PostflopEvaluator, S>) -> LiveSolver,
 ) -> Result<LiveSolution> {
     let start = Instant::now();
-    let (solver, index) = run::query::<S>(p, iterations, target, cancel)?;
-    let summary = run::summarize(
+    let (solver, index, (ev, expl)) = run::query::<S>(p, iterations, target, cancel)?;
+    let summary = run::summary_from_evaluation(
         &solver,
         start.elapsed(),
-        run::subgame_ev(run::solver_ev(&solver), p.payoff.ev_offset()),
+        run::subgame_ev(ev, p.payoff.ev_offset()),
+        expl,
     );
     Ok(LiveSolution {
         solver: wrap(solver),

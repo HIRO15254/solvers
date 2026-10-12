@@ -73,6 +73,10 @@ ICM EVの和をBBのpotと比較しない。
 P0はOOP、P1はIPである。ハンド別EVも元のspot開始基準であり、後続nodeまでの追加wagerは費用に含む。
 到達nodeのpotや投入額を足し戻さない。exploitabilityはbaselineの定数移動で変わらない。
 
+`compare`はtree形状・保存node集合・node別block長の一致を常に要求する。
+通常はboard・pot・effective stack、seat別comboリスト、node別action label（size込み）も一致を要求する。
+rangeの重みだけの違いは許す。`--cross-game`では通常のidentity条件を外し、形状だけで対応付ける。
+
 ## 4. 計算・停止・storage
 
 HU vector CFRが平均戦略を作り、同じ木の厳密best responseで評価する。

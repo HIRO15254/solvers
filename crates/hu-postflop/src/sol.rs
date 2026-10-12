@@ -7,9 +7,8 @@
 //! full-precision regrets and strategy sums so a solve can resume bit-for-
 //! bit, while `.sol` throws that away and keeps only what a viewer needs to
 //! render strategies. Readers never rebuild the tree: it is stored. In
-//! `NoRivers` mode river-street action nodes are omitted entirely (the
-//! viewer re-solves the river lazily on demand), which is what keeps these
-//! files small for deep trees.
+//! `NoRivers` mode retains the full tree/index but omits river strategy and
+//! value blocks; the viewer re-solves rivers lazily on demand.
 //!
 //! Format version 4 is indexed so a reader never decodes more than it asks
 //! for. All integers are little-endian:
@@ -159,9 +158,8 @@ pub struct SolMeta {
     pub wall_secs: f64,
 }
 
-/// Which streets have stored strategy blocks. `NoRivers` artifacts omit
-/// river action nodes entirely (see module docs); the viewer must re-solve
-/// those subtrees on demand rather than expect a block for every `sref`.
+/// Which streets have stored strategy/value blocks. `NoRivers` retains the
+/// full tree but omits river blocks; the viewer re-solves those subtrees.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum StreetsStored {
     Full,
@@ -233,6 +231,7 @@ pub struct ValueBlock {
 }
 
 /// The full decoded `.sol` contents, for tools that need every block.
+#[cfg(any(test, feature = "test-support"))]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SolPayload {
     pub config_toml: String,
@@ -551,6 +550,22 @@ impl SolReader {
         &self.metadata
     }
 
+    pub(crate) fn index_checksum(&self) -> [u8; 32] {
+        self.index_checksum
+    }
+
+    pub(crate) fn verify_index(&mut self) -> Result<(), SolError> {
+        self.index_frame().map(|_| ())
+    }
+
+    fn index_frame(&mut self) -> Result<Vec<u8>, SolError> {
+        let frame = read_exact_at(&mut self.file, self.index_offset, self.index_len)?;
+        if *blake3::hash(&frame).as_bytes() != self.index_checksum {
+            return Err(SolError::Checksum("index"));
+        }
+        Ok(frame)
+    }
+
     pub fn into_metadata(self) -> SolMetadata {
         self.metadata
     }
@@ -561,10 +576,7 @@ impl SolReader {
         &mut self,
         decode: impl FnOnce(&mut dyn Read) -> Result<T, SolError>,
     ) -> Result<T, SolError> {
-        let frame = read_exact_at(&mut self.file, self.index_offset, self.index_len)?;
-        if *blake3::hash(&frame).as_bytes() != self.index_checksum {
-            return Err(SolError::Checksum("index"));
-        }
+        let frame = self.index_frame()?;
         let mut decoder = zstd::stream::read::Decoder::with_buffer(frame.as_slice())
             .map_err(|_| SolError::Malformed("index frame does not decompress"))?
             .single_frame();
@@ -604,6 +616,7 @@ impl SolReader {
 
     /// Decodes the whole file. Verifies that strategy and value blocks cover
     /// the same nodes.
+    #[cfg(any(test, feature = "test-support"))]
     pub fn read_payload(mut self) -> Result<SolPayload, SolError> {
         let mut blocks = Vec::new();
         let mut values = Vec::new();
@@ -786,6 +799,29 @@ impl SolStore {
             dequantize_values(bytes, scale, len)
         })
     }
+
+    pub(crate) fn strategy_into(
+        &self,
+        sref: u32,
+        num_actions: usize,
+        num_hands: usize,
+        out: &mut Vec<f32>,
+    ) -> Result<Option<()>, SolError> {
+        self.with_block(Section::Strategy, sref, |_, bytes| {
+            dequantize_probs_into(bytes, num_actions, num_hands, out)
+        })
+    }
+
+    pub(crate) fn values_into(
+        &self,
+        sref: u32,
+        len: usize,
+        out: &mut Vec<f32>,
+    ) -> Result<Option<()>, SolError> {
+        self.with_block(Section::Values, sref, |scale, bytes| {
+            dequantize_values_into(bytes, scale, len, out)
+        })
+    }
 }
 
 /// Reads only the header, metadata and directory, returning the verified
@@ -795,11 +831,13 @@ pub fn read_sol_config(path: &Path) -> Result<String, SolError> {
 }
 
 /// Reads and fully decodes a `.sol` file.
+#[cfg(any(test, feature = "test-support"))]
 pub fn read_sol(path: &Path) -> Result<SolPayload, SolError> {
     SolReader::open(path)?.read_payload()
 }
 
 /// Writes a whole payload as a `.sol` file; see [`SolFileWriter`].
+#[cfg(any(test, feature = "test-support"))]
 pub fn write_sol(path: &Path, payload: &SolPayload) -> Result<(), SolError> {
     let mut writer = SolFileWriter::create(
         path,
@@ -1077,7 +1115,7 @@ impl SolFileWriter {
 /// Quantizes a value block to `i16` against a scale chosen from its own
 /// largest magnitude. Returns `(scale, bytes)`; `scale` is `0.0` when every
 /// value is zero, which `dequantize_values` reads back as all zeros.
-pub fn quantize_values(values: &[f32]) -> (f32, Vec<u8>) {
+pub(crate) fn quantize_values(values: &[f32]) -> (f32, Vec<u8>) {
     let peak = values.iter().fold(0.0f32, |peak, v| peak.max(v.abs()));
     let scale = if peak > 0.0 { peak / 32_767.0 } else { 0.0 };
     let mut bytes = Vec::with_capacity(values.len() * 2);
@@ -1095,7 +1133,22 @@ pub fn quantize_values(values: &[f32]) -> (f32, Vec<u8>) {
 /// Dequantizes a [`quantize_values`] blob. `bytes.len()` must be twice
 /// `len`; a mismatch is `SolError::Truncated` rather than a panic, for the
 /// same reason [`dequantize_probs`] reports it that way.
-pub fn dequantize_values(bytes: &[u8], scale: f32, len: usize) -> Result<Vec<f32>, SolError> {
+pub(crate) fn dequantize_values(
+    bytes: &[u8],
+    scale: f32,
+    len: usize,
+) -> Result<Vec<f32>, SolError> {
+    let mut out = Vec::new();
+    dequantize_values_into(bytes, scale, len, &mut out)?;
+    Ok(out)
+}
+
+fn dequantize_values_into(
+    bytes: &[u8],
+    scale: f32,
+    len: usize,
+    out: &mut Vec<f32>,
+) -> Result<(), SolError> {
     let expected = len * 2;
     if bytes.len() != expected {
         return Err(SolError::Truncated {
@@ -1103,12 +1156,15 @@ pub fn dequantize_values(bytes: &[u8], scale: f32, len: usize) -> Result<Vec<f32
             actual: bytes.len(),
         });
     }
-    Ok(bytes
-        .as_chunks::<2>()
-        .0
-        .iter()
-        .map(|&chunk| i16::from_le_bytes(chunk) as f32 * scale)
-        .collect())
+    out.clear();
+    out.extend(
+        bytes
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|&chunk| i16::from_le_bytes(chunk) as f32 * scale),
+    );
+    Ok(())
 }
 
 /// Quantizes an already-normalized probability slice (values in `[0, 1]`,
@@ -1116,7 +1172,7 @@ pub fn dequantize_values(bytes: &[u8], scale: f32, len: usize) -> Result<Vec<f32
 /// `q = round(p * 65535)`. Deliberately does not renormalize on the way in
 /// — `dequantize_probs` is responsible for restoring an exact per-hand sum
 /// of 1.0 after the rounding error introduced here.
-pub fn quantize_probs(probs: &[f32]) -> Vec<u8> {
+pub(crate) fn quantize_probs(probs: &[f32]) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(probs.len() * 2);
     for &p in probs {
         let q = (p * 65535.0).round().clamp(0.0, 65535.0) as u16;
@@ -1139,11 +1195,22 @@ pub fn quantize_probs(probs: &[f32]) -> Vec<u8> {
 /// rather than adding a dedicated one) instead of panicking, since `bytes`
 /// ultimately comes from a file on disk that could be corrupt or
 /// mismatched against a stale tree shape.
-pub fn dequantize_probs(
+fn dequantize_probs(
     bytes: &[u8],
     num_actions: usize,
     num_hands: usize,
 ) -> Result<Vec<f32>, SolError> {
+    let mut out = Vec::new();
+    dequantize_probs_into(bytes, num_actions, num_hands, &mut out)?;
+    Ok(out)
+}
+
+fn dequantize_probs_into(
+    bytes: &[u8],
+    num_actions: usize,
+    num_hands: usize,
+    out: &mut Vec<f32>,
+) -> Result<(), SolError> {
     let expected = num_actions * num_hands * 2;
     if bytes.len() != expected {
         return Err(SolError::Truncated {
@@ -1152,16 +1219,20 @@ pub fn dequantize_probs(
         });
     }
 
-    let mut q = vec![0u32; num_actions * num_hands];
-    for (i, &chunk) in bytes.as_chunks::<2>().0.iter().enumerate() {
-        q[i] = u16::from_le_bytes(chunk) as u32;
-    }
-
-    let mut out = vec![0f32; num_actions * num_hands];
+    // Decode directly into the reusable output. Every u16 fits exactly in
+    // f32, so converting back to u32 for the integer sum is lossless.
+    out.clear();
+    out.extend(
+        bytes
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|&chunk| u16::from_le_bytes(chunk) as f32),
+    );
     for h in 0..num_hands {
         let mut sum: u32 = 0;
         for a in 0..num_actions {
-            sum += q[a * num_hands + h];
+            sum += out[a * num_hands + h] as u32;
         }
         if sum == 0 {
             let uniform = 1.0 / num_actions as f32;
@@ -1170,11 +1241,11 @@ pub fn dequantize_probs(
             }
         } else {
             for a in 0..num_actions {
-                out[a * num_hands + h] = q[a * num_hands + h] as f32 / sum as f32;
+                out[a * num_hands + h] /= sum as f32;
             }
         }
     }
-    Ok(out)
+    Ok(())
 }
 
 #[cfg(test)]

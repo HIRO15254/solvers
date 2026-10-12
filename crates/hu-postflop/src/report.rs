@@ -71,7 +71,7 @@ pub fn compute(
 }
 fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<BoardRow> {
     let start = Instant::now();
-    let (solver, index) = run::query::<S>(p, None, None, cancel)?;
+    let (solver, index, (ev, expl)) = run::query::<S>(p, None, None, cancel)?;
     let elapsed = start.elapsed();
     let tree = &solver.game().tree;
     let sref = tree.storage_ref(tree.node(0));
@@ -100,8 +100,7 @@ fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<B
     } else {
         0.0
     };
-    let ev = run::subgame_ev(run::solver_ev(&solver), p.payoff.ev_offset());
-    let expl = solver.exploitability();
+    let ev = run::subgame_ev(ev, p.payoff.ev_offset());
     let board = p
         .config
         .board

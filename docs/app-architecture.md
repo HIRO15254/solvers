@@ -207,6 +207,8 @@ statusの`eventsOffset`も最後の改行までの完全record境界を返す。
 
 `config new` / `validate` が入力、`solve` / `resume` が計算、`status` / `watch` / `runs ls` が監視、
 `inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
+P1 compareは通常spot・seat別comboリスト・size込みaction labelのidentityも検証し、
+`--cross-game`で形状だけの対応付けを明示する。木/index共有は保存index checksumと復元support・root range・開始streetの一致時だけ行い、右index frameも検証する。
 `derive`はP2 runとPreflop line・Flop boardからP1の実効Inputを生成する。
 range計算は`mw_preflop::derive`、共通document組立ては`spot::derive`、
 P1検証は`hu_postflop::prepare`、入出力と表示はCLIにある。daemonにderive endpointは無い。

@@ -1,6 +1,8 @@
 //! Version 5 streaming checkpoints. Only bounded metadata is postcard;
 //! storage is raw little-endian arenas, protected by a BLAKE3 digest.
-use hu_engine::{SolverState, Storage, StorageArrays, StorageArraysMut, StorageState};
+#[cfg(any(test, feature = "test-support"))]
+use hu_engine::StorageState;
+use hu_engine::{SolverState, Storage, StorageArrays, StorageArraysMut};
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufReader, Read, Write};
@@ -278,6 +280,7 @@ impl Element for i16 {
         Self::from_le_bytes(bytes.try_into().unwrap())
     }
 }
+#[cfg(any(test, feature = "test-support"))]
 fn allocate<T: Default + Clone>(len: u64) -> Result<Vec<T>, CheckpointError> {
     let len =
         usize::try_from(len).map_err(|_| CheckpointError::Invalid("array length overflow"))?;
@@ -287,7 +290,8 @@ fn allocate<T: Default + Clone>(len: u64) -> Result<Vec<T>, CheckpointError> {
     out.resize(len, T::default());
     Ok(out)
 }
-/// Compatibility owned-state reader. Production resume uses `CheckpointReader`.
+/// Owned-state reader for artifact tests. Production resume uses `CheckpointReader`.
+#[cfg(any(test, feature = "test-support"))]
 pub fn read_checkpoint(path: &Path) -> Result<Checkpoint, CheckpointError> {
     let mut reader = CheckpointReader::open(path)?;
     let [a, b, c, d] = reader.lengths;
@@ -336,6 +340,7 @@ pub fn write_checkpoint(
         1,
     )
 }
+#[cfg(any(test, feature = "test-support"))]
 pub fn write_checkpoint_with_config(
     path: &Path,
     hash: [u8; 32],

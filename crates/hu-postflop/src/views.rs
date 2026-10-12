@@ -265,31 +265,103 @@ fn node_values(loaded: &LoadedSol, id: NodeId) -> Result<Vec<f32>> {
         .expect("a node with a stored strategy has stored values"))
 }
 
-/// Reach of both players at `id`, for weighting per-node aggregates.
-fn reach_at(loaded: &LoadedSol, id: NodeId) -> Result<PerPlayer<Vec<f32>>> {
-    let index = &loaded.game.index;
-    let roots = &index.root_ranges;
-    let root_slices = PerPlayer::new(roots[Player::P0].as_slice(), roots[Player::P1].as_slice());
-    let mut failure = None;
-    let path = hu_engine::path_from_root(&index.parents, id);
-    let reach = hu_engine::reach_on_path(
-        &loaded.game.tree,
-        root_slices,
-        &path,
-        |node_id, _sref, out| match loaded.stored_strategy(node_id) {
-            Ok(Some(avg)) => out.copy_from_slice(&avg),
-            Ok(None) => {
-                failure = Some(anyhow!(
-                    "the path to this node crosses a river node the artifact does not store"
-                ))
-            }
-            Err(error) => failure = Some(anyhow!(error)),
-        },
-    );
-    match failure {
-        Some(error) => Err(error),
-        None => Ok(reach),
+/// Visits the requested nodes in one forward reach pass. Ancestors are marked
+/// once; branches with no requested descendants are never decoded.
+fn reached_rows<R: Clone>(
+    loaded: &LoadedSol,
+    ids: &[NodeId],
+    rows_of: impl Fn(NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
+) -> Result<Vec<R>> {
+    let mut needed = vec![false; loaded.game.tree.nodes.len()];
+    let mut requested = vec![false; needed.len()];
+    let mut remaining = vec![0usize; needed.len()];
+    for &id in ids {
+        requested[id as usize] = true;
+        remaining[id as usize] += 1;
+        let mut current = id;
+        while current != NodeId::MAX && !needed[current as usize] {
+            needed[current as usize] = true;
+            current = loaded.game.index.parents[current as usize];
+        }
     }
+    let mut parts = std::collections::HashMap::new();
+    fn visit<R>(
+        loaded: &LoadedSol,
+        id: NodeId,
+        reach: &PerPlayer<Vec<f32>>,
+        needed: &[bool],
+        requested: &[bool],
+        rows_of: &impl Fn(NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
+        parts: &mut std::collections::HashMap<NodeId, Vec<R>>,
+    ) -> Result<()> {
+        if requested[id as usize] {
+            parts.insert(id, rows_of(id, reach)?);
+        }
+        let tree = &loaded.game.tree;
+        let node = *tree.node(id);
+        if !tree.children(id).any(|child| needed[child as usize]) {
+            return Ok(());
+        }
+        let strategy = if node.kind == NodeKind::Action {
+            Some(loaded.stored_strategy(id)?.ok_or_else(|| {
+                anyhow!("the path to this node crosses a river node the artifact does not store")
+            })?)
+        } else {
+            None
+        };
+        for child in tree.children(id).filter(|&child| needed[child as usize]) {
+            let position = (child - node.first_child) as usize;
+            let mut next = reach.clone();
+            match node.kind {
+                NodeKind::Action => {
+                    let hands = tree.storage_ref(&node).num_hands as usize;
+                    let column = &strategy.as_ref().expect("action strategy")
+                        [position * hands..(position + 1) * hands];
+                    for (r, &probability) in next[node.player].iter_mut().zip(column) {
+                        *r *= probability;
+                    }
+                }
+                NodeKind::Chance => {
+                    let deal = tree.deal(&node, position);
+                    for seat in Player::BOTH {
+                        let len = match deal.maps[seat] {
+                            hu_engine::ReachMap::Transition(t) => {
+                                tree.transitions[t as usize].out_dim as usize
+                            }
+                            _ => reach[seat].len(),
+                        };
+                        next[seat].resize(len, 0.0);
+                        tree.map_reach_into(deal.maps[seat], &reach[seat], &mut next[seat]);
+                    }
+                }
+                NodeKind::Terminal => unreachable!("terminal has no children"),
+            }
+            visit(loaded, child, &next, needed, requested, rows_of, parts)?;
+        }
+        Ok(())
+    }
+    if needed.first() == Some(&true) {
+        visit(
+            loaded,
+            0,
+            &loaded.game.index.root_ranges,
+            &needed,
+            &requested,
+            &rows_of,
+            &mut parts,
+        )?;
+    }
+    let mut rows = Vec::new();
+    // Repeated selections repeat rows, just like the original per-node export.
+    for &id in ids {
+        remaining[id as usize] -= 1;
+        if remaining[id as usize] == 0 {
+            rows.extend(parts.remove(&id).expect("requested node visited"));
+        } else {
+            rows.extend(parts[&id].iter().cloned());
+        }
+    }
+    Ok(rows)
 }
 
 fn combo_label(index: usize) -> String {
@@ -299,7 +371,7 @@ fn combo_label(index: usize) -> String {
 
 // --- actions ----------------------------------------------------------------
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 /// One reach-weighted action frequency.
 pub struct ActionRow {
     pub history: String,
@@ -309,30 +381,10 @@ pub struct ActionRow {
     pub frequency: f64,
 }
 
-/// Builds every node's rows on the Rayon pool and concatenates them in `ids`
-/// order; the first failing node in that order decides the error. Batches
-/// bound the per-node vectors held besides the result.
-fn per_node_rows<R: Send>(
-    ids: &[NodeId],
-    rows_of: impl Fn(NodeId) -> Result<Vec<R>> + Sync,
-) -> Result<Vec<R>> {
-    use rayon::prelude::*;
-    const BATCH: usize = 4096;
-    let mut rows = Vec::new();
-    for batch in ids.chunks(BATCH) {
-        let parts: Vec<Result<Vec<R>>> = batch.par_iter().map(|&id| rows_of(id)).collect();
-        for part in parts {
-            rows.extend(part?);
-        }
-    }
-    Ok(rows)
-}
-
 fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
     let view = loaded.view();
-    per_node_rows(ids, |id| {
+    reached_rows(loaded, ids, |id, reach| {
         let node = stored_node(loaded, id)?;
-        let reach = reach_at(loaded, id)?;
         let freqs = crate::prepare::action_frequencies(
             &node.strategy,
             &reach[node.actor],
@@ -357,7 +409,7 @@ fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
 
 // --- strategy ---------------------------------------------------------------
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 /// One reachable concrete combo and its action probabilities.
 pub struct StrategyRow {
     pub history: String,
@@ -369,9 +421,8 @@ pub struct StrategyRow {
 
 fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>> {
     let hands = &loaded.game.index.hands;
-    per_node_rows(ids, |id| {
+    reached_rows(loaded, ids, |id, reach| {
         let node = stored_node(loaded, id)?;
-        let reach = reach_at(loaded, id)?;
         let mut rows = Vec::new();
         for hand in 0..node.num_hands {
             let weight = reach[node.actor][hand];
@@ -394,7 +445,7 @@ fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>>
 
 // --- ev ---------------------------------------------------------------------
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 /// One reachable concrete combo and its stored utility.
 pub struct ValueRow {
     pub history: String,
@@ -408,10 +459,9 @@ pub struct ValueRow {
 
 fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
     let hands = &loaded.game.index.hands;
-    per_node_rows(ids, |id| {
+    reached_rows(loaded, ids, |id, reach| {
         let node = stored_node(loaded, id)?;
         let values = node_values(loaded, id)?;
-        let reach = reach_at(loaded, id)?;
         let mut rows = Vec::new();
         for seat in Player::BOTH {
             let base = match seat {
@@ -485,66 +535,133 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
             right_ids.len(),
         );
     }
-    if !cross_game
-        && (left.config.board != right.config.board
-            || left.config.pot != right.config.pot
-            || left.config.effective_stack != right.config.effective_stack)
-    {
-        bail!(
-            "artifacts share a tree shape but not a spot (board, pot, or stack differ); \
-             pass --cross-game to compare them anyway"
-        );
+    if !cross_game {
+        for (name, differs) in [
+            ("board", left.config.board != right.config.board),
+            ("pot", left.config.pot != right.config.pot),
+            (
+                "effective stack",
+                left.config.effective_stack != right.config.effective_stack,
+            ),
+        ] {
+            if differs {
+                bail!("artifacts have different {name}; pass --cross-game to compare them anyway");
+            }
+        }
+        for seat in Player::BOTH {
+            let a = left.game.index.hands.combos(seat);
+            let b = right.game.index.hands.combos(seat);
+            if a != b {
+                let hand = a
+                    .iter()
+                    .zip(b)
+                    .position(|(a, b)| a != b)
+                    .unwrap_or(a.len().min(b.len()));
+                bail!(
+                    "artifacts have different {} hand lists at combo {hand}; pass --cross-game to compare them anyway",
+                    seat_name(seat)
+                );
+            }
+        }
+        for id in 0..left.game.tree.nodes.len() as NodeId {
+            let a = left.game.tree.node(id).kind;
+            let b = right.game.tree.node(id).kind;
+            if (a == NodeKind::Action || b == NodeKind::Action)
+                && (a != b
+                    || !left
+                        .view()
+                        .action_labels(id)
+                        .eq(right.view().action_labels(id)))
+            {
+                bail!(
+                    "node {id} ({:?}) has different action labels (including sizes); pass --cross-game to compare them anyway",
+                    left.view().history(id)
+                );
+            }
+        }
     }
 
     // Per-node deltas run in parallel; the fold below stays in node order so
     // sums and first-maximum ties match a serial walk.
-    let deltas = per_node_rows(&left_ids, |id| {
-        let a = stored_node(&left, id)?;
-        let b = stored_node(&right, id)?;
-        let (a_values, b_values) = (node_values(&left, id)?, node_values(&right, id)?);
-        if a.strategy.len() != b.strategy.len() || a_values.len() != b_values.len() {
-            bail!(
-                "node {:?} has different shapes in the two artifacts",
-                a.history
-            );
-        }
-        // Per-hand L1 over the action distribution, averaged over hands:
-        // the usual "how differently does this node play" number, bounded
-        // by 2 and independent of how many actions the node offers.
-        let mut node_l1 = 0.0f64;
-        for hand in 0..a.num_hands {
-            for action in 0..a.num_actions {
-                let index = action * a.num_hands + hand;
-                node_l1 += (a.strategy[index] - b.strategy[index]).abs() as f64;
-            }
-        }
-        let node_l1 = node_l1 / a.num_hands.max(1) as f64;
-        let node_ev = a_values
-            .iter()
-            .zip(&b_values)
-            .map(|(x, y)| (x - y).abs() as f64)
-            .fold(0.0, f64::max);
-        Ok(vec![(id, node_l1, node_ev)])
-    })?;
+    use rayon::prelude::*;
+    let deltas: Vec<Result<_>> = left_ids
+        .par_iter()
+        .map_init(
+            || (Vec::new(), Vec::new(), Vec::new(), Vec::new()),
+            |(a_strategy, b_strategy, a_values, b_values), &id| {
+                let a_node = left.game.tree.node(id);
+                let b_node = right.game.tree.node(id);
+                let a = left.game.tree.storage_ref(a_node);
+                let b = right.game.tree.storage_ref(b_node);
+                let a_len =
+                    left.game.index.hands.len(Player::P0) + left.game.index.hands.len(Player::P1);
+                let b_len =
+                    right.game.index.hands.len(Player::P0) + right.game.index.hands.len(Player::P1);
+                if a.len() != b.len() || a_len != b_len {
+                    bail!(
+                        "node {:?} has different shapes in the two artifacts",
+                        left.view().history(id)
+                    );
+                }
+                for (loaded, sref, strategy, values, len) in [
+                    (&left, a, &mut *a_strategy, &mut *a_values, a_len),
+                    (&right, b, &mut *b_strategy, &mut *b_values, b_len),
+                ] {
+                    let aux = loaded.game.tree.node(id).aux;
+                    loaded
+                        .store
+                        .strategy_into(
+                            aux,
+                            sref.num_actions as usize,
+                            sref.num_hands as usize,
+                            strategy,
+                        )?
+                        .ok_or_else(|| anyhow!("artifact has no strategy for sref {aux}"))?;
+                    loaded
+                        .store
+                        .values_into(aux, len, values)?
+                        .ok_or_else(|| anyhow!("artifact has no values for sref {aux}"))?;
+                }
+                // Per-hand L1 over the action distribution, averaged over hands:
+                // the usual "how differently does this node play" number, bounded
+                // by 2 and independent of how many actions the node offers.
+                let mut node_l1 = 0.0f64;
+                for hand in 0..a.num_hands as usize {
+                    for action in 0..a.num_actions as usize {
+                        let index = action * a.num_hands as usize + hand;
+                        node_l1 += (a_strategy[index] - b_strategy[index]).abs() as f64;
+                    }
+                }
+                let node_l1 = node_l1 / a.num_hands.max(1) as f64;
+                let node_ev = a_values
+                    .iter()
+                    .zip(b_values.iter())
+                    .map(|(x, y)| (x - y).abs() as f64)
+                    .fold(0.0, f64::max);
+                Ok((id, node_l1, node_ev))
+            },
+        )
+        .collect();
 
     let view = left.view();
     let nodes = deltas.len();
     let mut strategy_total = 0.0f64;
     let mut strategy_max = 0.0f64;
-    let mut worst_strategy = String::new();
+    let mut worst_strategy = None;
     let mut ev_total = 0.0f64;
     let mut ev_max = 0.0f64;
-    let mut worst_ev = String::new();
-    for (id, node_l1, node_ev) in deltas {
+    let mut worst_ev = None;
+    for delta in deltas {
+        let (id, node_l1, node_ev) = delta?;
         strategy_total += node_l1;
         if node_l1 > strategy_max {
             strategy_max = node_l1;
-            worst_strategy = view.history(id);
+            worst_strategy = Some(id);
         }
         ev_total += node_ev;
         if node_ev > ev_max {
             ev_max = node_ev;
-            worst_ev = view.history(id);
+            worst_ev = Some(id);
         }
     }
 
@@ -552,10 +669,12 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
         nodes,
         mean_strategy_l1: strategy_total / nodes.max(1) as f64,
         max_strategy_l1: strategy_max,
-        max_strategy_node: worst_strategy,
+        max_strategy_node: worst_strategy
+            .map(|id| view.history(id))
+            .unwrap_or_default(),
         mean_max_ev_delta: ev_total / nodes.max(1) as f64,
         max_ev_delta: ev_max,
-        max_ev_node: worst_ev,
+        max_ev_node: worst_ev.map(|id| view.history(id)).unwrap_or_default(),
         ev_oop: [left.meta.ev[0], right.meta.ev[0]],
         ev_ip: [left.meta.ev[1], right.meta.ev[1]],
         nash_conv: [left.meta.nash_conv, right.meta.nash_conv],
