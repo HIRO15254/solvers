@@ -57,9 +57,11 @@ fn read_status(directory: &Path) -> Result<RunStatus> {
     let observed = manifest.observed_state();
     let progress = last_progress_row(directory)
         .with_context(|| format!("reading progress in {}", directory.display()))?;
-    let events_offset = std::fs::metadata(RunEventLog::path_in(directory))
-        .map(|metadata| metadata.len())
-        .unwrap_or(0);
+    let events_offset = match runfiles::complete_record_boundary(&RunEventLog::path_in(directory)) {
+        Ok(boundary) => boundary,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => 0,
+        Err(error) => return Err(error).context("reading the event record boundary"),
+    };
     // Either engine's checkpoint makes a stopped run resumable; which one
     // is present also says which engine produced the run.
     let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
@@ -292,6 +294,27 @@ mod tests {
         assert!(status.events_offset > 0);
         assert!(!status.resumable);
         assert!(status.recorded_state.is_none());
+    }
+
+    #[test]
+    fn status_offsets_and_progress_exclude_incomplete_tails() {
+        use std::io::Write;
+        let root = tempfile::tempdir().unwrap();
+        let run = root.path().join("partial");
+        finished_run(&run, RunState::Completed, false);
+        let boundary = std::fs::metadata(RunEventLog::path_in(&run)).unwrap().len();
+        for name in [runfiles::RUN_EVENTS_FILE, runfiles::RUN_PROGRESS_FILE] {
+            std::fs::OpenOptions::new()
+                .append(true)
+                .open(run.join(name))
+                .unwrap()
+                .write_all(b"{\"partial\":")
+                .unwrap();
+        }
+        let status = read_status(&run).unwrap();
+        assert_eq!(status.events_offset, boundary);
+        assert_eq!(status.sweeps, Some(42));
+        assert_eq!(status.elapsed_secs, Some(1.5));
     }
 
     #[test]

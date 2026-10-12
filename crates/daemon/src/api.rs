@@ -439,7 +439,7 @@ mod tests {
     fn only_contract_file_names_are_artifacts() {
         assert!(ARTIFACTS.contains(&"manifest.json"));
         assert!(ARTIFACTS.contains(&"solution.mwsol"));
-        for outside in ["../../etc/passwd", ".cache", "run.toml.bak", ""] {
+        for outside in ["../../etc/passwd", ".cache", "run.toml.bak", "run.lock", ""] {
             assert!(!ARTIFACTS.contains(&outside), "{outside:?} is reachable");
         }
     }

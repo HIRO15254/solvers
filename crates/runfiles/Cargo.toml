@@ -10,7 +10,11 @@ description = "Run-directory contracts, progress metrics, and config-file hashin
 serde = { workspace = true }
 serde_json = { workspace = true }
 blake3 = { workspace = true }
+[dev-dependencies]
 tempfile = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true, features = ["Win32_System_Threading"] }

@@ -87,7 +87,8 @@ pub fn next_evaluation(
 }
 
 /// Reconstruct the append-only progress history; the last row wins for duplicates.
-/// Missing, unreadable or invalid progress deliberately falls back to no history.
+/// Missing, unreadable or invalid complete records fall back to no history;
+/// an incomplete final record is ignored.
 pub fn read_evaluation_history(path: &Path, checkpoint_iteration: u64) -> Vec<(u64, f64)> {
     // The schedule must see the exact in-memory values, so NashConv is parsed
     // with Rust's correctly rounded f64 parser rather than serde_json's.
@@ -100,13 +101,18 @@ pub fn read_evaluation_history(path: &Path, checkpoint_iteration: u64) -> Vec<(u
     fn read(path: &Path, checkpoint_iteration: u64) -> Result<Vec<(u64, f64)>> {
         use std::io::BufRead;
         let mut rows = std::collections::BTreeMap::new();
-        for line in std::io::BufReader::new(std::fs::File::open(path)?).lines() {
-            let line = line?;
-            let row: Row<'_> = serde_json::from_str(&line)?;
+        let mut reader = std::io::BufReader::new(std::fs::File::open(path)?);
+        let mut line = Vec::new();
+        while reader.read_until(b'\n', &mut line)? != 0 {
+            if line.last() != Some(&b'\n') {
+                break;
+            }
+            let row: Row<'_> = serde_json::from_slice(&line)?;
             if row.iteration <= checkpoint_iteration {
                 let nash_conv: f64 = row.nash_conv.get().parse()?;
                 rows.insert(row.iteration, nash_conv / 2.0);
             }
+            line.clear();
         }
         Ok(rows.into_iter().collect())
     }

@@ -58,19 +58,39 @@ pub fn check_resources(p: &Prepared) -> Result<()> {
     ensure_resources(&r)
 }
 
-/// Reject an incomplete resource measurement with the matching input diagnostic.
-pub fn ensure_resources(r: &crate::session::MultiwayResourcePreflight) -> Result<()> {
-    if !r.complete {
-        return Err(spot::SpotError::new(
+/// A resource refusal is not invalid user input, even though its diagnostic
+/// retains the common-input NLH003 spelling.
+#[derive(Debug)]
+pub struct ResourceLimitError {
+    pub limit: crate::session::ResourceLimit,
+}
+
+impl std::fmt::Display for ResourceLimitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        spot::SpotError::new(
             spot::Code::NLH003,
             "run.memory",
-            match r.limit {
-                Some(crate::session::ResourceLimit::Node) => {
+            match self.limit {
+                crate::session::ResourceLimit::Node => {
                     "public tree/policy arena exceeds the node limit"
                 }
-                _ => "public tree/policy arena exceeds the memory budget",
+                crate::session::ResourceLimit::Memory => {
+                    "public tree/policy arena exceeds the memory budget"
+                }
             },
         )
+        .fmt(f)
+    }
+}
+
+impl std::error::Error for ResourceLimitError {}
+
+/// Reject an incomplete resource measurement with a typed resource diagnostic.
+pub fn ensure_resources(r: &crate::session::MultiwayResourcePreflight) -> Result<()> {
+    if !r.complete {
+        return Err(ResourceLimitError {
+            limit: r.limit.unwrap_or(crate::session::ResourceLimit::Memory),
+        }
         .into());
     }
     Ok(())
@@ -311,9 +331,10 @@ mod tests {
             let error = ensure_resources(&r).unwrap_err();
             assert!(error.to_string().contains(expected));
             assert_eq!(
-                error.downcast_ref::<spot::SpotError>().unwrap().code,
-                spot::Code::NLH003
+                error.downcast_ref::<ResourceLimitError>().unwrap().limit,
+                limit
             );
+            assert!(error.to_string().contains("NLH003"));
         }
     }
 }

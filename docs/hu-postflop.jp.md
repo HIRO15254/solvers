@@ -175,6 +175,7 @@ node selectorとaction labelによる指定はCLI referenceに従う。
 |---|---|
 | `run.toml` | 正規化した実効config。開始時に保存 |
 | `manifest.json` | identityとstate。状態遷移時にatomic置換 |
+| `run.lock` | file更新前に取得しprocess終了まで保持する排他OS lock。artifactではない |
 | `progress.jsonl` | iteration、累積elapsed_secs、expl_p0、expl_p1、nash_convを評価境界で追記 |
 | `events.jsonl` | state/checkpoint/stop/notice/failure。seqは0から単調増加 |
 | `run.json` | solve/resume区間終了のsummary |
@@ -184,9 +185,12 @@ node selectorとaction labelによる指定はCLI referenceに従う。
 manifestは`gameKind = "hu-postflop"`、`configSchema = "solvers.nlh/v1"`を記録する。
 書くstateはrunning / completed / failed / canceledである。
 runningのpidが存在しないinterruptedは読み手が同一hostで導出する。
+Windowsはprocess creation timeがrun開始時刻より1秒超遅ければpid再利用としてinterruptedを導出する（access deniedはalive扱い）。
 eventsのcheckpointの`sweeps`はP1ではiteration数である。
 stop reasonは`max-iterations` / `target-reached` / `time-limit` / `cancelled`である。
-JSONLの不完全な末尾は読み飛ばし、そのbytesは読取りoffsetに含めない。
+JSONLの不完全な末尾（最後の改行以降）だけを読み飛ばし、そのbytesはstatus/watchの読取りoffsetに含めない。再開writerはそのsuffixだけをtruncateして完全な行の続きへ追記する。評価履歴も不完全な最終行だけを無視し、改行済みの不正JSONは従来どおり履歴無しへ戻る。
+solve/resumeは出力directoryの`run.lock`を排他取得する。使用中directoryへのin-place resumeはdirectoryとmanifest pidを示しexit 1で拒否してrunfileを変更しない。`--out`は実行中sourceからもforkでき、sourceを書き換えない。process終了・crashでOS lockは解放され、file残存は再開を妨げない。
+recording開始後の失敗は`run.json`の書込み失敗も含めmanifestをfailedにし、failureへ診断を保存する。
 
 autoの評価ごとにprogressを追記するため、target有りでは行のiteration間隔が変わる。
 再開時は`progress.jsonl`のcheckpoint iteration以下の行から評価履歴を復元し、同じiterationの重複は最後の行を採用する。

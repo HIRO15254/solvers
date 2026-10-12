@@ -61,6 +61,7 @@ daemon は `solvers solve --out <run-dir>` や `resume` を起動し、自身で
 job id は run directory 名であり、再起動時は runs root から job を読み直す。
 manifest が `running` のまま owning process が消えた run は `interrupted` として報告する。
 pid の判定は実行 host で行う。中断した計算の再開は checkpoint と明示的な resume 要求を使う。
+Windowsはprocess終了とcreation timeも検査する。creationがrun開始時刻より1秒超遅い同じpidは再利用とみなす。access deniedはalive扱いである。
 
 ### R3. 監視は追記専用 event の offset で再開する
 
@@ -149,6 +150,7 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 ```text
 <runs-root>/<run-id>/
 ├── run.toml             # 実行した effective config
+├── run.lock             # process寿命の排他OS lock。artifactではない
 ├── manifest.json        # identity / state。atomic replacement
 ├── progress.jsonl       # 製品別の定期数値サンプル
 ├── events.jsonl         # state / notice / checkpoint / stop / failure。追記専用
@@ -163,6 +165,7 @@ queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdo
 これは製品別のファイルをまとめた図であり、すべての run が全ファイルを生成するわけではない。
 定数と DTO は [runfiles/src/run.rs](../crates/runfiles/src/run.rs)、lifecycle は
 [cli/src/run_dir.rs](../crates/cli/src/run_dir.rs) が所有する。
+solve/resumeはrunfileの更新前に専用`run.lock`の排他OS lockを取得し、process終了まで保持する。busyはdirectoryとmanifest pidを含む型付きerror（exit 1）で拒否する。`--out`のforkは出力先だけをlockしてsourceを書き換えない。残存file自体はlockの証拠ではなく、crash時もOSが自動解放する。`create_or_adopt`の非空判定から`run.lock`を除くため、queued adoptと空directoryの判定を変えない。
 進捗と event を分けることで、時系列 schema を保ち、読取り側に event の除外処理を要求しない。
 P1の`solver.stop.check_every`は`"auto"`が既定。target有りのprogressは初回25 iteration、以降3〜50 iterationの適応評価ごとに追記するため、GUIは等間隔を仮定しない。target無しのautoは固定25、整数は固定指定間隔である。
 autoでは中断・max_time・定期checkpointを25 iteration以下のsub-batch境界で判定する。整数は指定間隔で判定する。
@@ -179,6 +182,7 @@ queued ──spawn──▶ running ──正常終了──▶ completed
 
 `interrupted` は owning process が正常な終了状態を書けなかったことを reader が判断した状態。
 cancel は solver の協調停止を使い、checkpoint の存在と状態を確認して resumable を判断する。
+recording開始後の失敗は`run.json`の書込み失敗を含めてfailedとfailure textをmanifestへ記録する。
 
 ### 5.3 manifest.json
 
@@ -197,6 +201,7 @@ wire name と optional field を変更するときは `runfiles` / `protocol` �
 
 1 行 1 JSON、追記のみ、`seq` は 0 から単調増加する。resume は既存 event の続きへ書く。
 reader は byte offset を保持し、未完了の最終行を次回へ残す。
+statusの`eventsOffset`も最後の改行までの完全record境界を返す。events/progressの再開writerは最後の改行以降の不完全なsuffixだけをtruncateして追記し、完全行を保持する。readerは不完全な最終行だけを無視する。P1の評価履歴では改行済みの不正JSONは履歴全体を従来どおりfail-closedとする。
 
 ## 6. CLI 表面
 

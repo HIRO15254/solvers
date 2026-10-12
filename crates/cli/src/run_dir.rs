@@ -52,6 +52,16 @@ impl RunPaths {
     }
 }
 
+/// Keep ownership until process exit, including manifest finalization.
+pub(crate) fn lock_directory(directory: &Path) -> Result<()> {
+    static LOCKS: std::sync::Mutex<Vec<runfiles::RunLock>> = std::sync::Mutex::new(Vec::new());
+    std::fs::create_dir_all(directory)
+        .with_context(|| format!("creating {}", directory.display()))?;
+    let lock = runfiles::RunLock::acquire(directory)?;
+    LOCKS.lock().expect("run lock registry poisoned").push(lock);
+    Ok(())
+}
+
 /// Prepares `directory` to receive a run: absent, empty, or queued.
 ///
 /// A run directory is the run's identity, so a populated one is refused --
@@ -61,17 +71,12 @@ impl RunPaths {
 /// have to exist on disk, because that is the only place the daemon keeps
 /// state, and a daemon restart has to find them again.
 pub fn create_or_adopt(directory: &Path) -> Result<()> {
-    if !directory.exists() {
-        return std::fs::create_dir_all(directory)
-            .with_context(|| format!("creating {}", directory.display()));
-    }
-    if !directory.is_dir() {
-        anyhow::bail!("run output {} is not a directory", directory.display());
-    }
+    lock_directory(directory)?;
     let entries: Vec<String> = std::fs::read_dir(directory)
         .with_context(|| format!("reading {}", directory.display()))?
         .filter_map(Result::ok)
         .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .filter(|name| name != runfiles::RUN_LOCK_FILE)
         .collect();
     if entries.is_empty() {
         return Ok(());
@@ -154,6 +159,8 @@ impl RunRecorder {
         effective_config: &str,
         command: Vec<String>,
     ) -> Result<Self> {
+        std::fs::write(directory.join(RUN_CONFIG_FILE), effective_config)
+            .with_context(|| format!("writing {RUN_CONFIG_FILE} in {}", directory.display()))?;
         let Ok(previous) = RunManifest::read(directory) else {
             return Self::start(
                 directory,
@@ -294,6 +301,13 @@ mod tests {
         std::fs::write(run.join("stray.txt"), "x").unwrap();
         let error = create_or_adopt(&run).unwrap_err().to_string();
         assert!(error.contains("not empty"), "{error}");
+    }
+
+    #[test]
+    fn a_leftover_lock_file_does_not_populate_a_run_directory() {
+        let directory = tempfile::tempdir().unwrap();
+        std::fs::write(directory.path().join(runfiles::RUN_LOCK_FILE), "").unwrap();
+        create_or_adopt(directory.path()).unwrap();
     }
 
     /// A scheduler writes the manifest and config before a slot frees up,

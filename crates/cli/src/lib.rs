@@ -62,6 +62,33 @@ pub fn install_signal_handler() -> anyhow::Result<()> {
 }
 
 pub fn error_exit_code(error: &anyhow::Error) -> i32 {
+    if error
+        .chain()
+        .any(|cause| cause.is::<runfiles::RunLockError>())
+    {
+        return 1;
+    }
+    if error.chain().any(|cause| {
+        cause.is::<hu_postflop::input::MemoryLimitError>()
+            || cause.is::<mw_preflop::prepare::ResourceLimitError>()
+            || matches!(
+                cause.downcast_ref::<mw_preflop::TreeError>(),
+                Some(
+                    mw_preflop::TreeError::TooManyNodes { .. }
+                        | mw_preflop::TreeError::MemoryLimit { .. }
+                        | mw_preflop::TreeError::AllocationFailed { .. }
+                )
+            )
+            || matches!(
+                cause.downcast_ref::<mw_preflop::SolverError>(),
+                Some(mw_preflop::SolverError::ZeroMemoryLimit)
+            )
+    }) {
+        return 75;
+    }
+    if error.chain().any(|cause| cause.is::<spot::SpotError>()) {
+        return 2;
+    }
     if error.is::<derive::InputError>() {
         return 2;
     }
@@ -129,7 +156,6 @@ pub mod report;
 pub mod resume;
 pub mod run_dir;
 pub mod runs;
-pub mod session;
 pub mod solve;
 pub mod validate;
 
@@ -233,6 +259,7 @@ enum Command {
     },
     /// Continue a checkpointed solve to the configured solver stop ceiling.
     /// HU Postflop updates solution.sol and run.json and keeps the cumulative time budget.
+    /// Active in-place runs are rejected (exit 1); --out can fork an active source.
     Resume {
         /// Run directory from `solve --out`, or a bare self-contained
         /// `.mwckpt` that was moved out of one.
@@ -572,5 +599,41 @@ mod tests {
         let error =
             anyhow::anyhow!("memory allocation failed for the complete regret buffer (123 bytes)");
         assert_eq!(error_exit_code(&error), 75);
+    }
+
+    #[test]
+    fn typed_diagnostics_override_untrusted_context_text() {
+        for text in ["resource limit", "memory limit", "node limit", "bad magic"] {
+            let error = anyhow::Error::new(spot::SpotError::new(
+                spot::Code::NLH003,
+                "solver.storage",
+                text,
+            ))
+            .context("resource limit in config path");
+            assert_eq!(error_exit_code(&error), 2);
+        }
+        let error = anyhow::Error::new(hu_postflop::input::MemoryLimitError {
+            required: 2,
+            limit: 1,
+            auto_f32_required: None,
+        })
+        .context("NLH003: validating user config");
+        assert_eq!(error_exit_code(&error), 75);
+        for error in [
+            mw_preflop::TreeError::TooManyNodes { limit: 1 },
+            mw_preflop::TreeError::MemoryLimit {
+                node_count: 1,
+                total_columns: 1,
+                limit: 1,
+                needed: 2,
+            },
+            mw_preflop::TreeError::AllocationFailed {
+                buffer: "regret",
+                requested_bytes: 123,
+            },
+        ] {
+            let error = anyhow::Error::new(error).context("validating config");
+            assert_eq!(error_exit_code(&error), 75);
+        }
     }
 }

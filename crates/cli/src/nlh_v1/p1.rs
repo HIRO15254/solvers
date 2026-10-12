@@ -318,6 +318,8 @@ pub fn resume(
         if let Ok(progress) = std::fs::read(&progress) {
             std::fs::write(active.join(runfiles::RUN_PROGRESS_FILE), progress)?;
         }
+    } else {
+        crate::run_dir::lock_directory(active)?;
     }
     execute(p, active, Some(checkpoint.state), history, elapsed, true)
 }
@@ -337,7 +339,6 @@ fn execute(
         directory.display().to_string(),
     ];
     let mut recorder = if resumed {
-        std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), &p.effective)?;
         crate::run_dir::RunRecorder::reopen(
             directory,
             "hu-postflop",
@@ -402,32 +403,29 @@ fn execute(
             run::Diagnostic::Artifact(diagnostic) => print_artifact(diagnostic),
         },
     );
-    let completion = outcome
-        .as_ref()
-        .ok()
-        .map(|summary| -> Result<String> {
-            let result = json!({
-                "kind": "hu-postflop", "gameKind": "hu-postflop", "configSchema": SCHEMA,
-                "configHash": runfiles::config_hash_hex(&hash), "utilityUnit": utility_unit(&p),
-                "iterations": summary.iterations, "wallSecs": summary.wall.as_secs_f64(),
-                "evP0": summary.ev[Player::P0], "evP1": summary.ev[Player::P1],
-                "explP0": summary.expl_p0, "explP1": summary.expl_p1, "nashConv": summary.nash_conv,
-            });
-            std::fs::write(
-                &paths.result,
-                format!("{}\n", serde_json::to_string_pretty(&result)?),
-            )?;
-            if summary.canceled {
-                crate::CLI_EXIT_CODE.store(130, std::sync::atomic::Ordering::SeqCst);
-            }
-            Ok(if summary.canceled {
-                "cancelled"
-            } else {
-                "completed"
-            }
-            .into())
-        })
-        .transpose()?;
+    let outcome = outcome.and_then(|summary| -> Result<String> {
+        let result = json!({
+            "kind": "hu-postflop", "gameKind": "hu-postflop", "configSchema": SCHEMA,
+            "configHash": runfiles::config_hash_hex(&hash), "utilityUnit": utility_unit(&p),
+            "iterations": summary.iterations, "wallSecs": summary.wall.as_secs_f64(),
+            "evP0": summary.ev[Player::P0], "evP1": summary.ev[Player::P1],
+            "explP0": summary.expl_p0, "explP1": summary.expl_p1, "nashConv": summary.nash_conv,
+        });
+        std::fs::write(
+            &paths.result,
+            format!("{}\n", serde_json::to_string_pretty(&result)?),
+        )?;
+        if summary.canceled {
+            crate::CLI_EXIT_CODE.store(130, std::sync::atomic::Ordering::SeqCst);
+        }
+        Ok(if summary.canceled {
+            "cancelled"
+        } else {
+            "completed"
+        }
+        .into())
+    });
+    let completion = outcome.as_ref().ok().cloned();
     recorder.finish(outcome.map(|_| ()), completion)
 }
 
@@ -457,11 +455,17 @@ pub(crate) fn previous_elapsed(path: &Path) -> Result<Duration> {
         Err(error) => return Err(error.into()),
     };
     let mut elapsed = Duration::ZERO;
-    for line in std::io::BufReader::new(file).lines() {
-        if let Ok(row) = serde_json::from_str::<runfiles::MetricsRow>(&line?) {
+    let mut reader = std::io::BufReader::new(file);
+    let mut line = Vec::new();
+    while reader.read_until(b'\n', &mut line)? != 0 {
+        if line.last() != Some(&b'\n') {
+            break;
+        }
+        if let Ok(row) = serde_json::from_slice::<runfiles::MetricsRow>(&line) {
             elapsed = Duration::try_from_secs_f64(row.elapsed_secs)
                 .context("invalid recorded elapsed solve time")?;
         }
+        line.clear();
     }
     Ok(elapsed)
 }
