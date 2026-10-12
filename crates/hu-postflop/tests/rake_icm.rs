@@ -9,7 +9,7 @@
 
 use hu_engine::{Dcfr, F32Storage, ParConfig, Solver};
 use hu_postflop::game::{ChipEv, Icm, NoRake, PayoffPipeline, PercentCapRake};
-use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_postflop::{PerStreet, PostflopConfig, build_postflop_game};
 use nlh::{Card, Chips, NUM_COMBOS, PerPlayer, Player, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -47,9 +47,9 @@ fn small_turn_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     }
@@ -160,9 +160,9 @@ fn small_river_config() -> PostflopConfig {
         pot: Chips(10),
         effective_stack: Chips(50),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 2),
         },
         ..Default::default()
     }
@@ -246,9 +246,7 @@ fn raked_solve_leaks_exactly_the_rake_in_aggregate() {
 /// Clairvoyance spot from `river.rs`'s `clairvoyance_game_matches_closed_form`
 /// (P0 perfectly polarized: AA nuts, 33 air; P1 pure bluffcatcher: QQ; pot 2,
 /// stacks 2, one pot-sized bet, one raise cap, only P0 can bet), built via
-/// `build_postflop_game` on a completed 5-card board rather than
-/// `RiverConfig` — same tree either way, since `river::build_river_game` is
-/// a thin shim over the postflop builder.
+/// the unified `build_postflop_game` builder on a completed river board.
 fn clairvoyance_config() -> PostflopConfig {
     PostflopConfig {
         board: parse_cards("Ks Kh Kd 2c 2d"),
@@ -259,9 +257,9 @@ fn clairvoyance_config() -> PostflopConfig {
         pot: Chips(2),
         effective_stack: Chips(2),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[1.0], &[], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[], 1),
         },
         min_bet: Chips(1),
         iso_merging: false,

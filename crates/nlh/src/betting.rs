@@ -501,45 +501,30 @@ impl BettingState {
         let minimum = self.minimum_full_target();
         let pot_after_call = self.pot_size() + to_call.min(stack);
         let called_to = actor_wager + to_call.min(stack);
-        let proposed = match *size {
-            SizeSpec::ToBb { value } => scale(self.big_blind, value),
-            SizeSpec::PotAfterCall { fraction } => called_to + scale(pot_after_call, fraction),
-            SizeSpec::PreviousBetMultiple { factor } => scale(self.bet_to_match, factor),
-            SizeSpec::MinRaise => minimum,
-            SizeSpec::AllIn => maximum,
-            SizeSpec::EffectiveStackFraction { fraction } => {
-                let effective = self
-                    .seats
-                    .seats()
-                    .filter(|seat| *seat != actor && self.seats[*seat].status != SeatStatus::Folded)
-                    .map(|seat| self.current_wager(seat) + self.seats[seat].remaining)
-                    .max()
-                    .unwrap_or(maximum)
-                    .min(maximum);
-                scale(effective, fraction)
-            }
-            SizeSpec::GeometricAllIn { streets } => {
-                geometric_allin_target(called_to, pot_after_call, maximum, streets)
-            }
-            // Pio's bare `e`: divide the remaining stack across the
-            // streets still to be played, this one included.
-            SizeSpec::GeometricAllInRemaining => geometric_allin_target(
-                called_to,
-                pot_after_call,
-                maximum,
-                streets_remaining(self.street),
-            ),
-            SizeSpec::StackFraction { fraction } => scale(maximum, fraction),
-            SizeSpec::ToChips { .. } => unreachable!(
-                "ToChips is the postflop-family chip literal; the multiway config \
-                     parser (SizeUnit::Bb) never produces it"
-            ),
-        };
-        if proposed < minimum && maximum >= minimum {
-            minimum
+        let effective = if matches!(size, SizeSpec::EffectiveStackFraction { .. }) {
+            self.seats
+                .seats()
+                .filter(|seat| *seat != actor && self.seats[*seat].status != SeatStatus::Folded)
+                .map(|seat| self.current_wager(seat) + self.seats[seat].remaining)
+                .max()
+                .unwrap_or(maximum)
+                .min(maximum)
         } else {
-            proposed.min(maximum)
-        }
+            maximum
+        };
+        MwChips(
+            crate::sizing::SizeContext {
+                big_blind: self.big_blind.raw(),
+                called_to: called_to.raw(),
+                pot_after_call: pot_after_call.raw(),
+                previous_bet: self.bet_to_match.raw(),
+                minimum: minimum.raw(),
+                maximum: maximum.raw(),
+                effective_stack: effective.raw(),
+                streets_remaining: streets_remaining(self.street),
+            }
+            .resolve_u64(*size),
+        )
     }
 
     /// Build the aggressive action for a target no greater than the stack cap.
@@ -806,25 +791,6 @@ fn streets_remaining(street: Street) -> u8 {
         Street::Turn => 2,
         Street::River => 1,
     }
-}
-
-fn geometric_allin_target(
-    called_to: MwChips,
-    pot_after_call: MwChips,
-    maximum: MwChips,
-    streets: u8,
-) -> MwChips {
-    MwChips(crate::geometric_allin_target(
-        called_to.raw(),
-        pot_after_call.raw(),
-        maximum.raw(),
-        streets,
-    ))
-}
-
-fn scale(amount: MwChips, factor: f64) -> MwChips {
-    let scaled = (amount.raw() as f64 * factor).round();
-    MwChips(scaled.clamp(0.0, u64::MAX as f64) as u64)
 }
 
 #[derive(Debug, Error)]

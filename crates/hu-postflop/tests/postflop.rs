@@ -8,12 +8,13 @@ use std::time::Instant;
 use hu_engine::{Dcfr, F32Storage, I16Storage, NodeKind, ParConfig, Solver};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
 use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game, memory_usage};
-use nlh::script::{ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, Rule};
+use nlh::script::{ActionKind, CmpOp, Condition, Effect, Literal, Rule};
 use nlh::{
     ALL_CARDS, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec, Street,
     combo_cards, rank_of,
 };
 use rayon::prelude::*;
+use spot::TreeVar;
 
 fn chip_ev() -> PayoffPipeline<'static> {
     PayoffPipeline {
@@ -22,14 +23,8 @@ fn chip_ev() -> PayoffPipeline<'static> {
     }
 }
 
-/// The pre-script per-street menu shape `crates/hu-postflop/src/postflop.rs` used
-/// to expose as `StreetMenus`/`StreetTree::from_menus`, before the CLI's
-/// TOML surface moved onto tree scripts and that translation point was
-/// retired from the production module. It survives here, private to this
-/// test file, purely as a convenient way to build a `StreetTree` covering
-/// donk menus, per-level raises, `include_allin`, and `allin_threshold`
-/// together -- writing the equivalent script text for every such fixture
-/// would be far less readable than naming the menu directly.
+/// Readable common-rule fixtures for donk menus, per-level raises and all-in
+/// sizing. The helper is private to these behavior tests.
 #[derive(Clone, Debug)]
 struct StreetMenus {
     oop_bet: Vec<SizeSpec>,
@@ -45,8 +40,7 @@ struct StreetMenus {
 impl Default for StreetMenus {
     // Written by hand, not derived: `#[derive(Default)]` would give
     // `max_aggressive_actions: 0`, but several call sites write
-    // `..Default::default()` expecting `StreetTree::default()`'s old meaning
-    // (`max_aggressive_actions: 2`) -- see e.g.
+    // `..Default::default()` expecting the two-action cap -- see e.g.
     // `an_unset_raise_menu_reuses_the_bet_menu`, which needs raises to be
     // legal at all to exercise what it is testing.
     fn default() -> Self {
@@ -63,23 +57,21 @@ impl Default for StreetMenus {
     }
 }
 
-fn and(left: Condition<PostflopVar>, right: Condition<PostflopVar>) -> Condition<PostflopVar> {
+fn and(left: Condition<TreeVar>, right: Condition<TreeVar>) -> Condition<TreeVar> {
     Condition::And(Box::new(left), Box::new(right))
 }
 
-fn not(inner: Condition<PostflopVar>) -> Condition<PostflopVar> {
+fn not(inner: Condition<TreeVar>) -> Condition<TreeVar> {
     Condition::Not(Box::new(inner))
 }
 
-/// One raise menu's levels as `Add Raise` rules gated on `aggressions`,
-/// mirroring `hu_postflop::postflop`'s retired `raise_level_rules`: level `i`
-/// (`0`-based) applies when `i < levels.len() - 1` and `aggressions == i +
-/// 1`, and the last level applies when `aggressions >= levels.len()`.
+/// Raise levels gated on `aggressions`: all but the final level match one
+/// aggression count; the final level applies to all later raises.
 fn raise_level_rules(
     street: Street,
-    actor: Condition<PostflopVar>,
+    actor: Condition<TreeVar>,
     levels: &[Vec<SizeSpec>],
-) -> Vec<Rule<PostflopVar>> {
+) -> Vec<Rule<TreeVar>> {
     let len = levels.len();
     levels
         .iter()
@@ -87,13 +79,13 @@ fn raise_level_rules(
         .map(|(i, sizes)| {
             let aggression = if i + 1 < len {
                 Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number((i + 1) as f64),
                 }
             } else {
                 Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(len as f64),
                 }
@@ -109,15 +101,12 @@ fn raise_level_rules(
         .collect()
 }
 
-/// Translates [`StreetMenus`] into the equivalent tree-script rules, exactly
-/// as the retired `hu_postflop::postflop::StreetTree::from_menus` did: the donk
-/// menu (if any), the OOP opening menu, the IP opening menu, then OOP's
-/// raise levels, then IP's raise levels, all `Effect::Add`. An unset raise
-/// menu reuses that player's own bet menu as a single level.
+/// Build source-ordered common rules: donk, OOP bet, IP bet, then each
+/// player's raise levels. An unset raise menu reuses that player's bet menu.
 fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
-    let not_in_position = not(Condition::Truth(PostflopVar::InPosition));
-    let in_position = Condition::Truth(PostflopVar::InPosition);
-    let donk = Condition::Truth(PostflopVar::Donk);
+    let not_in_position = not(Condition::Truth(TreeVar::InPosition));
+    let in_position = Condition::Truth(TreeVar::InPosition);
+    let donk = Condition::Truth(TreeVar::Donk);
 
     let mut rules = Vec::new();
 
@@ -165,8 +154,7 @@ fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
     rules.extend(raise_level_rules(street, in_position, &ip_levels));
 
     StreetTree {
-        nlh_rules: None,
-        rules,
+        nlh_rules: hu_postflop::test_support::street_rules(rules),
         max_aggressive_actions: menus.max_aggressive_actions,
         include_allin: menus.include_allin,
         allin_threshold: menus.allin_threshold,
@@ -174,7 +162,7 @@ fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
 }
 
 /// A street whose bet menu and raise menu use different pot fractions —
-/// `StreetTree::pot_fractions` assumes they're shared, so the tests
+/// `pot_fractions` shares those fractions, so the tests
 /// exercising `oop_raise`/`ip_raise` independently of `oop_bet`/`ip_bet`
 /// build the `StreetTree` by hand instead, via `StreetMenus`/`from_menus`
 /// (unlike `pot_fractions`, this is a private test helper with only 4 call
@@ -539,9 +527,9 @@ fn iso_on_off_converge_to_same_value() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[], &[], 0),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -599,9 +587,9 @@ fn asymmetric_ranges_suppress_iso_merging() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[], &[], 0),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -664,9 +652,9 @@ fn flop_solve_is_zero_sum() {
         pot: Chips(4),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
         },
         ..Default::default()
     };
@@ -698,9 +686,9 @@ fn allin_runout_matches_direct_equity() {
         pot: Chips(2),
         effective_stack: Chips(1),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[5.0], &[5.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[5.0], &[5.0], 1),
         },
         ..Default::default()
     };
@@ -774,9 +762,9 @@ fn memory_usage_matches_allocated() {
         pot: Chips(4),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[0.5], &[0.5], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
         },
         ..Default::default()
     };
@@ -864,13 +852,12 @@ fn memory_usage_matches_allocated() {
     // fold/call branch is a genuinely new tree shape, and `Builder`'s real
     // recursion and `Counting`'s dry-run mirror must still agree on it.
     let force_river = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             // Opens the betting so there is a facing-bet node to force at.
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number(0.0),
                 },
@@ -883,15 +870,15 @@ fn memory_usage_matches_allocated() {
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: PostflopVar::Aggressions,
-                    op: CmpOp::Ge,
+                    var: TreeVar::Aggressions,
+                    op: CmpOp::Eq,
                     value: Literal::Number(1.0),
                 },
                 effect: Effect::Force,
                 action: Some(ActionKind::Raise),
                 sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
             },
-        ],
+        ]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -975,9 +962,9 @@ fn smoke_solve_3bet_pot() {
         pot: Chips(200),
         effective_stack: Chips(725),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
-            turn: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
-            river: StreetTree::pot_fractions(&[0.55], &[0.55], 2),
+            flop: hu_postflop::test_support::pot_fractions(&[0.55], &[0.55], 2),
+            turn: hu_postflop::test_support::pot_fractions(&[0.55], &[0.55], 2),
+            river: hu_postflop::test_support::pot_fractions(&[0.55], &[0.55], 2),
         },
         min_bet: Chips(1),
         iso_merging: true,
@@ -1050,9 +1037,9 @@ fn untracked_node_info_stays_empty() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[], &[], 0),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
         },
         min_bet: Chips(1),
         iso_merging: true,
@@ -1095,9 +1082,9 @@ fn iso_quotient_matches_full_tree_per_hand() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         ..Default::default()
     };
@@ -1163,9 +1150,9 @@ fn member_branch_matches_suit_permuted_rep_branch() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[], &[], 0),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         iso_merging: false,
         ..Default::default()
@@ -1235,9 +1222,9 @@ fn i16_storage_matches_f32_on_small_turn_spot() {
         pot: Chips(2),
         effective_stack: Chips(20),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[], &[], 0),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[], &[], 0),
         },
         ..Default::default()
     };
@@ -1399,9 +1386,8 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         "KK".parse::<Range>().unwrap(),
     );
     // Shared-size street: `oop_raise`/`ip_raise` reuse the same 0.5 pot
-    // fraction as `oop_bet`/`ip_bet` (what `StreetTree::pot_fractions`
-    // always builds).
-    let shared_river = StreetTree::pot_fractions(&[0.5], &[0.5], 2);
+    // fraction as `oop_bet`/`ip_bet` in the common-rule fixture.
+    let shared_river = hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 2);
     let shared_config = PostflopConfig {
         board: board.clone(),
         ranges: ranges.clone(),
@@ -1929,7 +1915,7 @@ fn history_round_trip_uses_r_tokens_through_river_entry_state() {
         effective_stack: Chips(20),
         streets: PerStreet {
             flop: StreetTree::default(),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 2),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 2),
             river: StreetTree::default(),
         },
         min_bet: Chips(1),
@@ -1987,7 +1973,7 @@ fn per_node_values_at_the_root_agree_with_the_root_expected_value() {
         pot: Chips(20),
         effective_stack: Chips(80),
         streets: PerStreet {
-            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 2),
             ..PerStreet::default()
         },
         ..PostflopConfig::default()
@@ -2053,7 +2039,7 @@ fn node_info_records_the_pot_contribution_at_each_node() {
         pot: Chips(20),
         effective_stack: Chips(80),
         streets: PerStreet {
-            river: StreetTree::pot_fractions(&[0.5], &[0.5], 2),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 2),
             ..PerStreet::default()
         },
         ..PostflopConfig::default()
@@ -2100,14 +2086,13 @@ fn node_info_records_the_pot_contribution_at_each_node() {
 #[test]
 fn tree_script_effect_add_appends_a_wager_candidate() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 5.0 }],
-        }],
+        }]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -2126,8 +2111,7 @@ fn tree_script_effect_add_appends_a_wager_candidate() {
 #[test]
 fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
@@ -2142,7 +2126,7 @@ fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
                 action: Some(ActionKind::Bet),
                 sizes: vec![],
             },
-        ],
+        ]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -2161,8 +2145,7 @@ fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
 #[test]
 fn tree_script_effect_replace_swaps_the_wager_menu() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
@@ -2177,7 +2160,7 @@ fn tree_script_effect_replace_swaps_the_wager_menu() {
                 action: Some(ActionKind::Bet),
                 sizes: vec![SizeSpec::ToChips { value: 8.0 }],
             },
-        ],
+        ]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -2196,14 +2179,13 @@ fn tree_script_effect_replace_swaps_the_wager_menu() {
 #[test]
 fn tree_script_effect_force_drops_fold_check_and_call_too() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
-            condition: Condition::Const(true),
+            condition: Condition::Truth(TreeVar::Unopened),
             effect: Effect::Force,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 8.0 }],
-        }],
+        }]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -2222,8 +2204,7 @@ fn tree_script_effect_force_drops_fold_check_and_call_too() {
 #[test]
 fn tree_script_effect_checkdown_keeps_only_check() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
@@ -2238,7 +2219,7 @@ fn tree_script_effect_checkdown_keeps_only_check() {
                 action: None,
                 sizes: vec![],
             },
-        ],
+        ]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
@@ -2254,24 +2235,23 @@ fn tree_script_effect_checkdown_keeps_only_check() {
     );
 }
 
-/// A `Raise`-kind rule at a `Bet`-kind node (no outstanding bet to face) --
-/// or vice versa -- does nothing at all, per the spec's inert-rule rule.
+/// Adding raise candidates at a node with no outstanding bet changes nothing.
 #[test]
 fn tree_script_rule_action_kind_mismatch_is_inert() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
-            effect: Effect::Force,
+            effect: Effect::Add,
             action: Some(ActionKind::Raise),
             sizes: vec![SizeSpec::ToChips { value: 9.0 }],
-        }],
+        }]),
         max_aggressive_actions: 2,
         include_allin: false,
         allin_threshold: None,
     };
-    let game = build_postflop_game(&river_only_config(river), chip_ev());
+    let mut config = river_only_config(river);
+    let game = build_postflop_game(&config, chip_ev());
     let root = game.node_by_history("").expect("root history");
     let tag = game.game.tree.tags[root as usize] as usize;
     assert_eq!(
@@ -2279,6 +2259,24 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
         vec!["check".to_string()],
         "a raise-kind rule must be inert at a bet-kind node: {:?}",
         game.node_info[tag].actions
+    );
+
+    // Force replaces the entire common-input menu even when that action has
+    // no legal candidates. Both walkers must reject the resulting empty node.
+    config.streets.river.nlh_rules.rules[0].effect = Effect::Force;
+    let build_error = hu_postflop::try_build_postflop_game(&config, chip_ev())
+        .err()
+        .expect("forcing unavailable raise candidates must reject construction");
+    assert_eq!(
+        build_error,
+        hu_postflop::TreeBuildError::EmptyMenu {
+            street: Street::River,
+            player: Player::P0,
+        }
+    );
+    assert_eq!(
+        hu_postflop::try_memory_usage(&config).unwrap_err(),
+        build_error
     );
 }
 
@@ -2289,14 +2287,13 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
 #[test]
 fn tree_script_include_allin_applies_before_rules() {
     let replace_river = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
             effect: Effect::Replace,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-        }],
+        }]),
         max_aggressive_actions: 1,
         include_allin: true,
         allin_threshold: None,
@@ -2313,14 +2310,13 @@ fn tree_script_include_allin_applies_before_rules() {
     );
 
     let force_river = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
-            condition: Condition::Const(true),
+            condition: Condition::Truth(TreeVar::Unopened),
             effect: Effect::Force,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-        }],
+        }]),
         max_aggressive_actions: 1,
         include_allin: true,
         allin_threshold: None,
@@ -2337,43 +2333,44 @@ fn tree_script_include_allin_applies_before_rules() {
     );
 }
 
-/// Emptying a node's action list -- however it happens -- falls back to the
-/// base actions rather than leaving the node with zero legal actions, which
-/// `hu_engine::tree`'s `assert!(num_actions >= 1)` would otherwise catch.
+/// Common-input rules reject empty menus instead of inventing fallback actions.
 #[test]
-fn tree_script_emptying_a_node_falls_back_to_base_actions() {
+fn tree_script_emptying_a_node_is_rejected() {
     // (a) `force` with no resolvable size: `max_aggressive_actions = 0`
     // makes `sized_targets` always return empty, so the forced action list
     // is empty from the start.
     let no_room = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::River,
             condition: Condition::Const(true),
             effect: Effect::Force,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 5.0 }],
-        }],
+        }]),
         max_aggressive_actions: 0,
         include_allin: false,
         allin_threshold: None,
     };
-    let game = build_postflop_game(&river_only_config(no_room), chip_ev());
-    let root = game.node_by_history("").expect("root history");
-    let tag = game.game.tree.tags[root as usize] as usize;
+    let config = river_only_config(no_room);
+    let build_error = hu_postflop::try_build_postflop_game(&config, chip_ev())
+        .err()
+        .expect("empty menu must reject construction");
     assert_eq!(
-        game.node_info[tag].actions,
-        vec!["check".to_string()],
-        "a force rule with no resolvable size must fall back to the base \
-         actions: {:?}",
-        game.node_info[tag].actions
+        build_error,
+        hu_postflop::TreeBuildError::EmptyMenu {
+            street: Street::River,
+            player: Player::P0,
+        }
+    );
+    assert_eq!(
+        hu_postflop::try_memory_usage(&config).unwrap_err(),
+        build_error
     );
 
     // (b) `remove`, after an earlier `force` already dropped check: nothing
     // is left at all once the forced wager is also removed.
     let force_then_remove = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
@@ -2388,27 +2385,30 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
                 action: Some(ActionKind::Bet),
                 sizes: vec![],
             },
-        ],
+        ]),
         max_aggressive_actions: 1,
         include_allin: false,
         allin_threshold: None,
     };
-    let game = build_postflop_game(&river_only_config(force_then_remove), chip_ev());
-    let root = game.node_by_history("").expect("root history");
-    let tag = game.game.tree.tags[root as usize] as usize;
+    let config = river_only_config(force_then_remove);
+    let build_error = hu_postflop::try_build_postflop_game(&config, chip_ev())
+        .err()
+        .expect("removing the forced menu must reject construction");
     assert_eq!(
-        game.node_info[tag].actions,
-        vec!["check".to_string()],
-        "removing the only action a force rule left behind must fall back \
-         to the base actions: {:?}",
-        game.node_info[tag].actions
+        build_error,
+        hu_postflop::TreeBuildError::EmptyMenu {
+            street: Street::River,
+            player: Player::P0,
+        }
+    );
+    assert_eq!(
+        hu_postflop::try_memory_usage(&config).unwrap_err(),
+        build_error
     );
 
-    // (c) `checkdown` at a node facing a bet: retaining only check leaves
-    // nothing, since a facing-bet node has no check to retain.
+    // (c) `checkdown` facing a bet selects fold.
     let bet_then_checkdown = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
@@ -2419,7 +2419,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
             Rule {
                 street: Street::River,
                 condition: Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Ge,
                     value: Literal::Number(1.0),
                 },
@@ -2427,7 +2427,7 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
                 action: None,
                 sizes: vec![],
             },
-        ],
+        ]),
         max_aggressive_actions: 1,
         include_allin: false,
         allin_threshold: None,
@@ -2437,8 +2437,8 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
     let tag = game.game.tree.tags[facing_bet as usize] as usize;
     assert_eq!(
         game.node_info[tag].actions,
-        vec!["fold".to_string(), "call".to_string()],
-        "checkdown emptying a facing-bet node must fall back to fold+call: {:?}",
+        vec!["fold".to_string()],
+        "checkdown facing a bet must select fold: {:?}",
         game.node_info[tag].actions
     );
 }
@@ -2450,23 +2450,22 @@ fn tree_script_emptying_a_node_falls_back_to_base_actions() {
 #[test]
 fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
     let river = StreetTree {
-        nlh_rules: None,
-        rules: vec![
+        nlh_rules: hu_postflop::test_support::street_rules(vec![
             Rule {
                 street: Street::River,
-                condition: Condition::Truth(PostflopVar::Cbet),
+                condition: Condition::Truth(TreeVar::Cbet),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
                 sizes: vec![SizeSpec::ToChips { value: 5.0 }],
             },
             Rule {
                 street: Street::River,
-                condition: Condition::Truth(PostflopVar::Donk),
+                condition: Condition::Truth(TreeVar::Donk),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
                 sizes: vec![SizeSpec::ToChips { value: 7.0 }],
             },
-        ],
+        ]),
         max_aggressive_actions: 1,
         include_allin: false,
         allin_threshold: None,
@@ -2529,14 +2528,13 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
 #[test]
 fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
     let turn = StreetTree {
-        nlh_rules: None,
-        rules: vec![Rule {
+        nlh_rules: hu_postflop::test_support::street_rules(vec![Rule {
             street: Street::Turn,
-            condition: Condition::Truth(PostflopVar::Paired),
+            condition: Condition::Truth(TreeVar::Paired),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 9.0 }],
-        }],
+        }]),
         max_aggressive_actions: 1,
         include_allin: false,
         allin_threshold: None,
@@ -2597,7 +2595,7 @@ fn rule_hits_fixture() -> PostflopConfig {
     let flop_rules = vec![
         Rule {
             street: Street::Flop,
-            condition: not(Condition::Truth(PostflopVar::InPosition)),
+            condition: not(Condition::Truth(TreeVar::InPosition)),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
@@ -2606,12 +2604,12 @@ fn rule_hits_fixture() -> PostflopConfig {
             street: Street::Flop,
             condition: and(
                 Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number(0.0),
                 },
                 Condition::Compare {
-                    var: PostflopVar::Aggressions,
+                    var: TreeVar::Aggressions,
                     op: CmpOp::Eq,
                     value: Literal::Number(1.0),
                 },
@@ -2638,15 +2636,13 @@ fn rule_hits_fixture() -> PostflopConfig {
         effective_stack: Chips(40),
         streets: PerStreet {
             flop: StreetTree {
-                nlh_rules: None,
-                rules: flop_rules,
+                nlh_rules: hu_postflop::test_support::street_rules(flop_rules),
                 max_aggressive_actions: 2,
                 include_allin: false,
                 allin_threshold: None,
             },
             turn: StreetTree {
-                nlh_rules: None,
-                rules: turn_rules,
+                nlh_rules: hu_postflop::test_support::street_rules(turn_rules),
                 max_aggressive_actions: 2,
                 include_allin: false,
                 allin_threshold: None,

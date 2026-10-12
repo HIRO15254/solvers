@@ -32,7 +32,7 @@
 | `economics` | 共通rake条件・控除・配分、ICM、utility設定 |
 | `spot` | 共通Inputのparse・正規化・line再生・製品判定、Spot IR、tree方言 |
 | `hu-engine` | HUのpublic tree、vector CFR/BR、storage、discount schedule、chance-sampled driver |
-| `hu-postflop` | P1のlower・木・payoff・資源preflight・solve/resume、checkpoint、`.sol`、typed queryとboard report。payoffを通すtoy gameも持つ |
+| `hu-postflop` | P1のlower・木・payoff・資源preflight・solve/resume、checkpoint、`.sol`、typed queryとboard report。payoffを通すtoy gameはunit testまたは`test-support` feature限定 |
 | `mw-preflop` | P2のlower・session・資源preflight・EHS²・dense arena・sampled solve・停止評価、checkpoint、`.mwsol`、typed query |
 | `runfiles` | run directoryの共通DTO・manifest・events・HU metrics・config hash |
 | `cli` | `solvers`の引数・dispatch・cache policy・signal、run lifecycle、符号化と表示、P1 REPL、exit code |
@@ -167,6 +167,8 @@ linked binary と A/B 測定で検証する。
 `game::PayoffPipeline`はterminalのfold/showdown・pot・contribution・stackから
 P0 win / tie / P1 winの両者のutilityを`BakedPayoffs`へ焼き込む。
 engineは定数を読む。反復中にrakeやICMを評価しない。
+terminalのnet potは一度だけ計算し、3 outcomeへ共有する。`NlhUtility`の開始時baselineは構築時に検証・キャッシュする。
+toy gameと試験用`PercentCapRake`は`cfg(any(test, feature = "test-support"))`でのみ公開し、製品rakeは共通`economics`を使う。
 
 木のeffective stackと、実際の卓stack・foldした席・outside fieldを区別する。
 `run::subgame_ev`とartifact writerは同じ開始時基準を使う。
@@ -174,6 +176,10 @@ blocker付きの相手reachでCFVを正規化してからutility offsetを加え
 単位とbaselineの正本は[P1規範](hu-postflop.jp.md)である。
 
 ## 5. Mode A: hu-postflop crate(exact postflop)
+
+`StreetTree`は共通Inputの`Rule<spot::TreeVar>`とactor履歴だけを保持し、source順で適用する。
+旧menu constructor・別rule方言・river専用shimは持たず、5-card開始も同じbuilderを使う。
+test/benchの共通rule fixtureは`test-support`限定で、`nlh`の独立parser方言もunit test限定である。
 
 `postflop`がFlop/Turn/River開始の木を作る。`PostflopHands`は席別の開始range supportを
 global combo昇順で保持し、global→local逆引きとexpand/compactを提供する。card abstractionは持たない。
@@ -183,6 +189,8 @@ suit同型の枝・確率・compact空間の席別商transitionはbuilderが決�
 local index・2枚のcard index・同順位group境界をbuild時に用意し、役順のmergeでshowdownをO(n_oop＋n_ip)で評価する。
 foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
 memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
+combo indexの逆変換は`nlh::range`の固定tableを共有する。整数size解決は`nlh::SizeContext`と
+`scale_u32`/`scale_u64`に集約し、P1のu32 chipとP2のu64 milli-BBの上限・丸め・加算規則を維持する。
 
 `prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetとstorageのauto選択を解決する。
 入力の`Settings<StorageChoice>`から具体backendだけを持つ`Settings<Storage>`へ変換し、
@@ -191,6 +199,11 @@ validateの正規化は入力choiceを維持し、run用の実効configと成果
 木の構築とmemory preflightの計数は最初のchance nodeのdealをRayonで並列に処理する。
 構築はdealごとのforkが作ったmask・transition・rank table・terminal・node tagを直列walkの初出順で再採番して連結するため、
 sref・node idは直列構築と一致し、checkpoint・`.sol`の互換性を保つ。
+rank tableの不変内容はfork間のboard単位once cacheで共有し、両seatのunionにあるcomboを1回ずつrankする。
+table IDは従来どおりlocal encounterとabsorb順で決まり、共有cacheの並行実行順には依存しない。
+betting stateのboardは固定長配列で、historyは構築walkerだけが持つ。root・street end・deal後の遷移は
+静的generic dispatchで構築と計数が共有し、計数にnode/label/rank処理を加えない。
+checked builderは空menuを構築中にtyped errorで拒否する。resource preflightは`prepare`で1回計数する。
 保存済みartifactの読込み（`prepare_artifact`）は埋込みconfigを解析・lowerするだけで、木を構築せずmemory preflightもしない。`storage = "auto"`はmetadataの具体storageで解決する。
 `run::run`はlocal poolでf32/i16/i16-f32avgのgeneric driverを呼び、solve/resume・checkpoint cadence・停止を扱う。
 `Observation`はprogress・checkpoint・stopを、`Diagnostic`は表示用の測定を渡す。

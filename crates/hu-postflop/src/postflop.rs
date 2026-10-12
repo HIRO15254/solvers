@@ -30,13 +30,10 @@ use nlh::iso::{
     Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with, orbit_perms, permute_combo,
     stabilizer,
 };
-use nlh::script::{
-    ActionKind, CmpOp, Condition, Effect, Literal, PostflopVar, PreviousAggressor, Rule,
-    RuleContext,
-};
+use nlh::script::{ActionKind, Effect, PreviousAggressor, RuleContext};
 use nlh::{
     ALL_CARDS, BoardFacts, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec,
-    Street, combo_cards, combo_index, geometric_allin_target, rank_of,
+    Street, combo_cards, combo_index, rank_of,
 };
 
 use crate::kernel;
@@ -74,25 +71,11 @@ impl<T> IndexMut<Street> for PerStreet<T> {
     }
 }
 
-/// One street's betting grammar: the tree-script rules that get replayed at
-/// every decision node on this street (see [`node_actions`]), plus the
-/// structural limits a script cannot express (`docs/nlh-input-v1.jp.md`'s
-/// section 9: `max_aggressive_actions` is a memory-preflight input,
-/// and `allin_threshold` is a size-resolution rule, not an action-list
-/// add/remove). `rules` used to come only from the five fixed-menu fields
-/// (`oop_bet`/`ip_bet`/`oop_raise`/`ip_raise`/`oop_donk`) a pre-script
-/// grammar had; [`StreetTree::from_script`] is what a compiled tree script
-/// (`nlh::script::Script`) builds this from now, and
-/// [`StreetTree::pot_fractions`] is the short constructor test/bench
-/// fixtures use for the common single-level pot-fraction case.
+/// One street's common-input betting rules and structural sizing limits.
 #[derive(Clone, Debug)]
 pub struct StreetTree {
-    /// Common-input rules and actor history. `None` selects the legacy dialect.
-    /// When present, `rules` must be empty.
-    pub nlh_rules: Option<Box<crate::input::NlhStreetRules>>,
-    /// This street's tree-script rules, in source order. Source order is
-    /// the entire priority model -- there is no priority field.
-    pub rules: Vec<Rule<PostflopVar>>,
+    /// Common-input rules in source order and actor history.
+    pub nlh_rules: Box<crate::input::NlhStreetRules>,
     /// Maximum bets plus raises on this street (multiway's name for what
     /// this used to call `max_raises`).
     pub max_aggressive_actions: u32,
@@ -107,160 +90,10 @@ pub struct StreetTree {
 impl Default for StreetTree {
     fn default() -> Self {
         StreetTree {
-            nlh_rules: None,
-            rules: Vec::new(),
+            nlh_rules: Box::default(),
             max_aggressive_actions: 2,
             include_allin: false,
             allin_threshold: None,
-        }
-    }
-}
-
-/// AND-combines two conditions without ever nesting `Const(true)`, matching
-/// `nlh::script::cond`'s own simplification convention -- not load-bearing
-/// here (the translated rules never actually combine two `Const`s), just
-/// keeping every hand-built `Condition` in the same normal form the script
-/// compiler would produce.
-fn and(left: Condition<PostflopVar>, right: Condition<PostflopVar>) -> Condition<PostflopVar> {
-    Condition::And(Box::new(left), Box::new(right))
-}
-
-fn not(inner: Condition<PostflopVar>) -> Condition<PostflopVar> {
-    Condition::Not(Box::new(inner))
-}
-
-/// One raise menu's levels as `Add Raise` rules gated on `aggressions`: level
-/// `i` (`0`-based) applies when `i < levels.len() - 1` and
-/// `aggressions == i + 1`, and the last level applies when
-/// `aggressions >= levels.len()` -- reproducing
-/// `raise_targets`'s old `level = (raises_used - 1).min(len - 1)` selection.
-/// An empty `levels` yields no rules at all ("never raise"). Used by
-/// [`StreetTree::pot_fractions`], the short constructor for the common
-/// single-level case.
-fn raise_level_rules(
-    street: Street,
-    actor: Condition<PostflopVar>,
-    levels: &[Vec<SizeSpec>],
-) -> Vec<Rule<PostflopVar>> {
-    let len = levels.len();
-    levels
-        .iter()
-        .enumerate()
-        .map(|(i, sizes)| {
-            let aggression = if i + 1 < len {
-                Condition::Compare {
-                    var: PostflopVar::Aggressions,
-                    op: CmpOp::Eq,
-                    value: Literal::Number((i + 1) as f64),
-                }
-            } else {
-                Condition::Compare {
-                    var: PostflopVar::Aggressions,
-                    op: CmpOp::Ge,
-                    value: Literal::Number(len as f64),
-                }
-            };
-            Rule {
-                street,
-                condition: and(actor.clone(), aggression),
-                effect: Effect::Add,
-                action: Some(ActionKind::Raise),
-                sizes: sizes.clone(),
-            }
-        })
-        .collect()
-}
-
-impl StreetTree {
-    /// A street whose bet and raise menus are the same pot fractions for
-    /// both players — the shape every config had before size literals, kept
-    /// as a short constructor for the test/bench fixtures that just want a
-    /// classic single-level pot-fraction tree. `oop`/`ip` become the opening
-    /// bet menus, and the raise menus reuse them as a single level (an
-    /// unraised street's `oop_raise`/`ip_raise` used to fall back to the
-    /// player's own bet menu; this constructor reproduces exactly that).
-    ///
-    /// Has no `street` parameter (63 call sites across tests, benches, and
-    /// `src/river.rs` depend on this exact signature), so the rules built
-    /// below are tagged with an arbitrary placeholder street (`Street::Flop`).
-    /// That's sound: `StreetTree`'s only consumer (`node_actions`) selects
-    /// which street's rules to run structurally, by indexing
-    /// `PerStreet<StreetTree>` with the node's own street -- it never reads
-    /// `Rule::street` back out of the rules it runs.
-    pub fn pot_fractions(oop: &[f64], ip: &[f64], max_aggressive_actions: u32) -> StreetTree {
-        let sizes = |fractions: &[f64]| -> Vec<SizeSpec> {
-            fractions
-                .iter()
-                .map(|&fraction| SizeSpec::PotAfterCall { fraction })
-                .collect()
-        };
-        let street = Street::Flop;
-        let not_in_position = not(Condition::Truth(PostflopVar::InPosition));
-        let in_position = Condition::Truth(PostflopVar::InPosition);
-        let oop_sizes = sizes(oop);
-        let ip_sizes = sizes(ip);
-
-        let mut rules = vec![
-            Rule {
-                street,
-                condition: not_in_position.clone(),
-                effect: Effect::Add,
-                action: Some(ActionKind::Bet),
-                sizes: oop_sizes.clone(),
-            },
-            Rule {
-                street,
-                condition: in_position.clone(),
-                effect: Effect::Add,
-                action: Some(ActionKind::Bet),
-                sizes: ip_sizes.clone(),
-            },
-        ];
-        rules.extend(raise_level_rules(
-            street,
-            not_in_position,
-            std::slice::from_ref(&oop_sizes),
-        ));
-        rules.extend(raise_level_rules(
-            street,
-            in_position,
-            std::slice::from_ref(&ip_sizes),
-        ));
-
-        StreetTree {
-            nlh_rules: None,
-            rules,
-            max_aggressive_actions,
-            include_allin: false,
-            allin_threshold: None,
-        }
-    }
-
-    /// Collects one street's rules out of a compiled tree script's flat rule
-    /// list (`nlh::script::Script::rules`), preserving source order --
-    /// source order is the script's entire priority model (see
-    /// `docs/nlh-input-v1.jp.md`'s tree script chapter), so this
-    /// must not reorder or resort what it filters. `rules` is the *whole*
-    /// script's rule list (every street's statements interleaved in source
-    /// order); this keeps only the ones tagged for `street`, exactly as
-    /// `node_actions` expects to run them.
-    pub fn from_script(
-        street: Street,
-        rules: &[Rule<PostflopVar>],
-        max_aggressive_actions: u32,
-        include_allin: bool,
-        allin_threshold: Option<f64>,
-    ) -> StreetTree {
-        StreetTree {
-            nlh_rules: None,
-            rules: rules
-                .iter()
-                .filter(|rule| rule.street == street)
-                .cloned()
-                .collect(),
-            max_aggressive_actions,
-            include_allin,
-            allin_threshold,
         }
     }
 }
@@ -298,9 +131,8 @@ pub struct PostflopConfig {
     /// and the minimum-full-raise bump (see `sized_targets`) are both
     /// anchored on this value.
     pub min_bet: Chips,
-    /// Merge turn/river deals into suit-isomorphism classes. The default
-    /// constructor sets this `true`; river-only subgames (via the
-    /// [`crate::river`] shim) never deal, so it has no effect there.
+    /// Merge turn/river deals into suit-isomorphism classes. River-only
+    /// subgames never deal, so this has no effect there.
     pub iso_merging: bool,
     /// Record per-node history/action-label metadata for
     /// [`PostflopGame::node_by_history`]. Costs a `String` + `Vec<String>`
@@ -882,10 +714,40 @@ impl PostflopEvaluator {
 /// (persists across streets), what's owed this street, and street-local
 /// bookkeeping (raise count, whether the street has seen a check, whether
 /// either player is already all-in).
+#[derive(Clone, Copy)]
+struct LineBoard {
+    cards: [Card; 5],
+    len: u8,
+}
+
+impl LineBoard {
+    fn new(board: &[Card]) -> Self {
+        let mut cards = [Card::from_index(0); 5];
+        cards[..board.len()].copy_from_slice(board);
+        Self {
+            cards,
+            len: board.len() as u8,
+        }
+    }
+
+    fn push(&mut self, card: Card) {
+        self.cards[self.len as usize] = card;
+        self.len += 1;
+    }
+}
+
+impl std::ops::Deref for LineBoard {
+    type Target = [Card];
+
+    fn deref(&self) -> &[Card] {
+        &self.cards[..self.len as usize]
+    }
+}
+
 #[derive(Clone)]
 struct LineState {
     street: Street,
-    board: Vec<Card>,
+    board: LineBoard,
     /// Suit-permutation-invariant summary of `board`, for the tree-script
     /// board predicates (`paired`, `two_tone`, ...). Computed once per
     /// chance branch -- at the root, and again in `deal_chance` each time a
@@ -900,7 +762,6 @@ struct LineState {
     raises_used: u32,
     first_checked: bool,
     all_in: bool,
-    history: String,
     /// Both players' equal cumulative contribution at the moment this
     /// street began. A street always starts right after a call or a
     /// check-check, both of which leave `contrib[P0] == contrib[P1]`, so one
@@ -920,6 +781,129 @@ struct LineState {
     /// someone does. Carried forward into the next street's
     /// `previous_aggressor` by `street_end`/`deal_chance`.
     street_aggressor: Option<Player>,
+}
+
+impl LineState {
+    fn root(config: &PostflopConfig) -> Self {
+        let street = match config.board.len() {
+            3 => Street::Flop,
+            4 => Street::Turn,
+            5 => Street::River,
+            _ => panic!("board must have 3 (flop), 4 (turn), or 5 (river) cards"),
+        };
+        Self {
+            street,
+            board: LineBoard::new(&config.board),
+            board_facts: BoardFacts::new(&config.board),
+            to_act: Player::P0,
+            contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
+            outstanding: Chips::ZERO,
+            raises_used: 0,
+            first_checked: false,
+            all_in: false,
+            street_start: Chips::ZERO,
+            last_full_raise: Chips::ZERO,
+            previous_aggressor: config.preflop_aggressor,
+            street_aggressor: None,
+        }
+    }
+
+    fn dealt(&self, card: Card) -> Self {
+        let mut board = self.board;
+        board.push(card);
+        Self {
+            street: next_street(self.street),
+            board_facts: BoardFacts::new(&board),
+            board,
+            to_act: Player::P0,
+            contrib: self.contrib,
+            outstanding: Chips::ZERO,
+            raises_used: 0,
+            first_checked: false,
+            all_in: self.all_in,
+            street_start: self.contrib[Player::P0],
+            last_full_raise: Chips::ZERO,
+            previous_aggressor: self.street_aggressor,
+            street_aggressor: None,
+        }
+    }
+}
+
+/// Static dispatch shares street transitions without adding builder work
+/// (temporary nodes, labels, histories, or ranks) to the counting walk.
+trait TreeWalker {
+    type Output;
+    fn config(&self) -> &PostflopConfig;
+    fn showdown(&mut self, state: &LineState) -> Self::Output;
+    fn chance(&mut self, state: LineState, history: &str) -> Self::Output;
+    fn decision(&mut self, state: LineState, history: &str) -> Self::Output;
+}
+
+fn walk_after_deal<W: TreeWalker>(walker: &mut W, state: LineState, history: &str) -> W::Output {
+    if state.street == Street::River {
+        walker.showdown(&state)
+    } else {
+        walker.chance(state, history)
+    }
+}
+
+fn walk_street_end<W: TreeWalker>(
+    walker: &mut W,
+    mut state: LineState,
+    history: &str,
+) -> W::Output {
+    if state.contrib[Player::P0] == walker.config().effective_stack
+        || state.contrib[Player::P1] == walker.config().effective_stack
+    {
+        state.all_in = true;
+    }
+    walk_after_deal(walker, state, history)
+}
+
+fn walk_dealt<W: TreeWalker>(
+    walker: &mut W,
+    state: &LineState,
+    card: Card,
+    history: &str,
+) -> W::Output {
+    let child = state.dealt(card);
+    if state.all_in {
+        walk_after_deal(walker, child, history)
+    } else {
+        walker.decision(child, history)
+    }
+}
+
+impl TreeWalker for Builder<'_> {
+    type Output = TempNode;
+    fn config(&self) -> &PostflopConfig {
+        self.config
+    }
+    fn showdown(&mut self, state: &LineState) -> TempNode {
+        self.terminal(state, TerminalKind::Showdown)
+    }
+    fn chance(&mut self, state: LineState, history: &str) -> TempNode {
+        self.deal_chance(state, history)
+    }
+    fn decision(&mut self, state: LineState, history: &str) -> TempNode {
+        self.betting(state, history)
+    }
+}
+
+impl TreeWalker for Counting<'_> {
+    type Output = ();
+    fn config(&self) -> &PostflopConfig {
+        self.config
+    }
+    fn showdown(&mut self, state: &LineState) {
+        self.terminal_showdown(&state.board);
+    }
+    fn chance(&mut self, state: LineState, _: &str) {
+        self.deal_chance(state);
+    }
+    fn decision(&mut self, state: LineState, _: &str) {
+        self.betting(state);
+    }
 }
 
 /// Betting streets left to play from `street`, inclusive — what Pio's bare
@@ -1000,14 +984,6 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
     }
 }
 
-/// `(amount * fraction).round()`, clamped into `Chips`' `u32` range. Matches
-/// `mw_preflop::betting::scale`'s rounding convention (same size-literal
-/// grammar, chip unit instead of bb).
-fn scale(amount: Chips, fraction: f64) -> Chips {
-    let scaled = (amount.as_f64() * fraction).round();
-    Chips(scaled.clamp(0.0, u32::MAX as f64) as u32)
-}
-
 /// Resolves an explicit size menu at `state` into additional-contribution
 /// wagers: every entry of `sizes` resolved to a raise-to target
 /// (street-relative, i.e. the actor's total contribution *this street*),
@@ -1021,13 +997,9 @@ fn scale(amount: Chips, fraction: f64) -> Chips {
 /// shape both `Builder::betting` and the counting mirror `Counting::betting`
 /// consume — so the two can never disagree about a node's action count.
 ///
-/// This is everything the old (pre-tree-script) `raise_targets` did *except*
-/// choosing which menu to resolve and appending the `include_allin` target —
-/// both now the caller's job (`node_actions`), since which menu applies is a
-/// tree-script rule's concern, not this function's. The two early returns
-/// below stay here rather than moving to the caller: they are structural
-/// limits (`max_aggressive_actions`, "no chips behind") that no script rule
-/// is allowed to override by naming its own sizes.
+/// Menu selection belongs to `node_actions`. Structural limits stay here:
+/// no script can override the aggressive-action cap or wager chips that
+/// are not behind.
 fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec]) -> Vec<Chips> {
     let street = &config.streets[state.street];
     if state.raises_used >= street.max_aggressive_actions {
@@ -1061,55 +1033,21 @@ fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec])
         (bet_to_match + config.min_bet).min(maximum)
     };
 
+    let sizing = nlh::SizeContext {
+        big_blind: 1000,
+        called_to: u64::from(called_to.0),
+        pot_after_call: u64::from(pot_after_call.0),
+        previous_bet: u64::from(bet_to_match.0),
+        minimum: u64::from(minimum.0),
+        maximum: u64::from(maximum.0),
+        effective_stack: u64::from(maximum.0),
+        streets_remaining: streets_remaining(state.street),
+    };
     let mut targets: Vec<Chips> = Vec::with_capacity(sizes.len());
     for &size in sizes {
-        let mut target = match size {
-            SizeSpec::ToBb { value } => {
-                assert!(
-                    street.nlh_rules.is_some(),
-                    "BB sizes require the v1 dialect"
-                );
-                scale(Chips(1000), value)
-            }
-            SizeSpec::PotAfterCall { fraction } => {
-                let increment = scale(pot_after_call, fraction);
-                if street.nlh_rules.is_some() {
-                    Chips(called_to.0.saturating_add(increment.0))
-                } else {
-                    called_to + increment
-                }
-            }
-            SizeSpec::PreviousBetMultiple { factor } => scale(bet_to_match, factor),
-            SizeSpec::MinRaise => minimum,
-            SizeSpec::AllIn => maximum,
-            // Postflop has a single shared `effective_stack`, so the
-            // effective stack IS the actor's maximum target — the two
-            // variants resolve identically here, unlike multiway's
-            // per-opponent `EffectiveStackFraction`.
-            SizeSpec::StackFraction { fraction }
-            | SizeSpec::EffectiveStackFraction { fraction } => scale(maximum, fraction),
-            // Pio's bare `e` splits the stack over the streets that are
-            // left, so a flop `e` is three bets and a river `e` is one.
-            SizeSpec::GeometricAllIn { streets: _ } | SizeSpec::GeometricAllInRemaining => {
-                let streets = match size {
-                    SizeSpec::GeometricAllIn { streets } => streets,
-                    _ => streets_remaining(state.street),
-                };
-                Chips(geometric_allin_target(
-                    called_to.0 as u64,
-                    pot_after_call.0 as u64,
-                    maximum.0 as u64,
-                    streets,
-                ) as u32)
-            }
-            SizeSpec::ToChips { value } => Chips(value.round().clamp(0.0, u32::MAX as f64) as u32),
-        };
-        if target < minimum && maximum >= minimum {
-            target = minimum;
-        }
-        target = target.min(maximum);
+        let mut target = Chips(sizing.resolve_u32(size));
         if let Some(threshold) = street.allin_threshold
-            && target >= scale(maximum, threshold)
+            && target.0 >= nlh::scale_u32(maximum.0, threshold)
         {
             target = maximum;
         }
@@ -1137,10 +1075,6 @@ enum NodeAction {
 
 /// The non-aggressive action(s) every node starts from before any wager is
 /// considered: `check` with no outstanding bet, `fold`+`call` facing one.
-/// Also the fallback `node_actions` returns when rules empty the list out
-/// entirely (see that function) — the only sound reading of `force` /
-/// `checkdown` / `remove` clearing every candidate, and what keeps
-/// `hu_engine::tree`'s `assert!(num_actions >= 1)` satisfied.
 fn base_actions(state: &LineState) -> Vec<NodeAction> {
     if state.outstanding == Chips::ZERO {
         vec![NodeAction::Check]
@@ -1164,9 +1098,7 @@ fn action_sort_key(action: NodeAction) -> (u8, u32) {
     }
 }
 
-/// This node's internal PostflopVar `RuleContext`, filled in from `state`/`config`.
-/// This dialect predates the public common vocabulary in `docs/nlh-input-v1.jp.md`.
-/// `actor` is
+/// This node's common postflop values, filled in from `state`/`config`.
 /// `state.to_act`: `in_position` and `previous_aggressor` are both read
 /// relative to whoever is on the move at this node, not either player fixed.
 fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
@@ -1195,8 +1127,7 @@ fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
 /// Whether each tree-script rule's *condition* ever evaluated true at some
 /// decision node during a build walk (`node_actions`) -- one `bool` per
 /// rule, indexed by that rule's position within its own street's
-/// `StreetTree::rules` (i.e. `StreetTree::from_script`'s per-street filter
-/// order), not by position in the whole script's flat rule list. This is
+/// `StreetTree::nlh_rules`, not the whole script's flat rule list. This is
 /// the empirical answer to "did any node satisfy this rule?" --
 /// deliberately *not* "did the rule change the action list", since a rule
 /// whose condition is true but whose `action` names the wager kind the node
@@ -1212,15 +1143,11 @@ fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
 pub type RuleHits = PerStreet<Vec<bool>>;
 
 /// A fresh, all-`false` [`RuleHits`] sized to `config`'s three
-/// `StreetTree::rules` lists -- the shape both [`Builder`] and [`Counting`]
+/// common-input rule lists -- the shape both [`Builder`] and [`Counting`]
 /// start their walk from, so they can never disagree about how many rules
 /// exist per street.
 fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
-    let len = |tree: &StreetTree| {
-        tree.nlh_rules
-            .as_ref()
-            .map_or(tree.rules.len(), |r| r.rules.len())
-    };
+    let len = |tree: &StreetTree| tree.nlh_rules.rules.len();
     PerStreet {
         flop: vec![false; len(&config.streets.flop)],
         turn: vec![false; len(&config.streets.turn)],
@@ -1232,11 +1159,8 @@ fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
 /// `include_allin` default (added before any rule runs, per
 /// `docs/nlh-input-v1.jp.md` section 9 -- a script can
 /// then edit it away), then this street's tree-script rules applied in
-/// source order. A rule whose `action` doesn't match the node's own wager
-/// kind (`Bet` with no outstanding bet, `Raise` facing one) is inert and
-/// skipped entirely. Shared between the real builder and the memory-usage
-/// dry run so the two can never disagree about a node's action count or
-/// order.
+/// source order with per-kind candidates. Shared by the real builder and the
+/// memory-usage dry run; an empty menu is rejected by both checked APIs.
 ///
 /// `hits` records, per rule, whether its condition was ever seen true (see
 /// [`RuleHits`]) -- threaded in as an accumulator rather than returned, so
@@ -1248,74 +1172,7 @@ fn node_actions(
     hits: &mut RuleHits,
 ) -> Vec<NodeAction> {
     let street = &config.streets[state.street];
-    if let Some(rules) = &street.nlh_rules {
-        return nlh_node_actions(state, config, rules, hits);
-    }
-    let mut actions = base_actions(state);
-
-    if street.include_allin {
-        actions.extend(
-            sized_targets(state, config, &[SizeSpec::AllIn])
-                .into_iter()
-                .map(NodeAction::Wager),
-        );
-    }
-
-    let ctx = rule_context(state, config);
-    let node_kind = if state.outstanding == Chips::ZERO {
-        ActionKind::Bet
-    } else {
-        ActionKind::Raise
-    };
-
-    for (index, rule) in street.rules.iter().enumerate() {
-        if !rule.condition.eval(&ctx) {
-            continue;
-        }
-        hits[state.street][index] = true;
-        if rule.effect == Effect::Checkdown {
-            actions.retain(|a| matches!(a, NodeAction::Check));
-        } else if rule.action == Some(node_kind) {
-            let sized = || {
-                sized_targets(state, config, &rule.sizes)
-                    .into_iter()
-                    .map(NodeAction::Wager)
-            };
-            match rule.effect {
-                Effect::Remove => actions.retain(|a| !matches!(a, NodeAction::Wager(_))),
-                Effect::Replace => {
-                    actions.retain(|a| !matches!(a, NodeAction::Wager(_)));
-                    actions.extend(sized());
-                }
-                Effect::Add => actions.extend(sized()),
-                Effect::Force => actions = sized().collect(),
-                Effect::Checkdown => unreachable!("checked above"),
-            }
-        } else {
-            // The rule names the other wager kind (`remove bet` facing a
-            // bet, `force raise [..]` with nothing to raise): inert here.
-            continue;
-        }
-        actions.sort_by_key(|&a| action_sort_key(a));
-        actions.dedup();
-    }
-
-    if actions.is_empty() {
-        base_actions(state)
-    } else {
-        actions
-    }
-}
-
-/// Common-input policy mirrors P2's per-kind candidates and source-order edits.
-/// An empty menu stays empty; the checked preflight/build APIs reject it.
-fn nlh_node_actions(
-    state: &LineState,
-    config: &PostflopConfig,
-    rules: &crate::input::NlhStreetRules,
-    hits: &mut RuleHits,
-) -> Vec<NodeAction> {
-    let street = &config.streets[state.street];
+    let rules = &street.nlh_rules;
     let mut actions = base_actions(state);
     if street.include_allin {
         actions.extend(
@@ -1406,12 +1263,11 @@ pub enum TreeBuildError {
     SupportNotClosed { player: Player, combo: usize },
 }
 
-/// Validate the action menus before allocating a compiled game.
+/// Builds a compiled game, rejecting any action menu emptied by tree rules.
 pub fn try_build_postflop_game(
     config: &PostflopConfig,
     pipeline: PayoffPipeline<'_>,
 ) -> Result<PostflopGame, TreeBuildError> {
-    try_memory_usage(config)?;
     build_checked(config, pipeline, true)
 }
 
@@ -1483,6 +1339,15 @@ fn child_step(state: &LineState, action: NodeAction) -> ChildStep {
     }
 }
 
+type SharedRankTables = std::sync::Arc<
+    parking_lot::Mutex<
+        BTreeMap<
+            [Card; 5],
+            std::sync::Arc<std::sync::OnceLock<std::sync::Arc<PerPlayer<RankedHands>>>>,
+        >,
+    >,
+>;
+
 struct Builder<'a> {
     hands: PostflopHands,
     error: Option<TreeBuildError>,
@@ -1492,8 +1357,11 @@ struct Builder<'a> {
     /// [`range_preserving_perms`]).
     sym: Vec<SuitPerm>,
     terminals: Vec<PostflopTerminal>,
-    rank_tables: Vec<PerPlayer<RankedHands>>,
+    rank_tables: Vec<std::sync::Arc<PerPlayer<RankedHands>>>,
     rank_table_ids: BTreeMap<[Card; 5], u32>,
+    /// Immutable board tables shared across parallel forks; IDs remain local
+    /// until absorb assigns them in serial encounter order.
+    shared_rank_tables: SharedRankTables,
     masks: Vec<Vec<f32>>,
     mask_cards: Vec<Card>,
     /// Per-card reach mask, built lazily and cached by card index (at most
@@ -1547,6 +1415,7 @@ fn build_checked(
         terminals: Vec::new(),
         rank_tables: Vec::new(),
         rank_table_ids: BTreeMap::new(),
+        shared_rank_tables: Default::default(),
         masks: Vec::new(),
         mask_cards: Vec::new(),
         card_masks: [None; 52],
@@ -1560,22 +1429,7 @@ fn build_checked(
         hits: rule_hits_for(config),
         parallel,
     };
-    let root = builder.betting(LineState {
-        street: start_street,
-        board_facts: BoardFacts::new(&config.board),
-        board: config.board.clone(),
-        to_act: Player::P0,
-        contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
-        outstanding: Chips::ZERO,
-        raises_used: 0,
-        first_checked: false,
-        all_in: false,
-        history: String::new(),
-        street_start: Chips::ZERO,
-        last_full_raise: Chips::ZERO,
-        previous_aggressor: config.preflop_aggressor,
-        street_aggressor: None,
-    });
+    let root = builder.betting(LineState::root(config), "");
 
     if let Some(error) = builder.error.take() {
         return Err(error);
@@ -1601,6 +1455,7 @@ fn build_checked(
     let Builder {
         terminals,
         rank_tables,
+        shared_rank_tables,
         masks,
         mask_cards,
         transitions,
@@ -1608,6 +1463,15 @@ fn build_checked(
         hits,
         ..
     } = builder;
+    drop(shared_rank_tables);
+    let rank_tables = rank_tables
+        .into_iter()
+        .map(|table| {
+            std::sync::Arc::try_unwrap(table).unwrap_or_else(|_| {
+                panic!("rank table must have one owner after builder cache release")
+            })
+        })
+        .collect();
 
     // Precompute only the new batch dispatch. Fold terminal metadata remains
     // unchanged so every existing CFR/evaluation path retains its behavior.
@@ -1716,11 +1580,17 @@ impl Builder<'_> {
         }
     }
 
-    fn betting(&mut self, state: LineState) -> TempNode {
+    fn betting(&mut self, state: LineState, history: &str) -> TempNode {
         let actor = state.to_act;
         let mut actions: Vec<(String, TempNode)> = Vec::new();
-
-        for action in node_actions(&state, self.config, &mut self.hits) {
+        let menu = node_actions(&state, self.config, &mut self.hits);
+        if menu.is_empty() && self.error.is_none() {
+            self.error = Some(TreeBuildError::EmptyMenu {
+                street: state.street,
+                player: actor,
+            });
+        }
+        for action in menu {
             // A wager's label and history token both name `to`, the
             // actor's new cumulative contribution. Recomputing it inside
             // each closure keeps both of them lazy: with
@@ -1739,27 +1609,21 @@ impl Builder<'_> {
                     }
                 }
             });
-            let history = self.extend_history(&state.history, || match action {
+            let child_history = self.extend_history(history, || match action {
                 NodeAction::Fold => "f".into(),
                 NodeAction::Check => "x".into(),
                 NodeAction::Call => "c".into(),
                 NodeAction::Wager(additional) => format!("r{}", wager_to(additional)),
             });
             let child = match child_step(&state, action) {
-                ChildStep::Fold => {
-                    let fold_state = LineState {
-                        history,
-                        ..state.clone()
-                    };
-                    self.terminal(&fold_state, TerminalKind::Fold { folder: actor })
-                }
-                ChildStep::StreetEnd(next) => self.street_end(LineState { history, ..next }),
-                ChildStep::Betting(next) => self.betting(LineState { history, ..next }),
+                ChildStep::Fold => self.terminal(&state, TerminalKind::Fold { folder: actor }),
+                ChildStep::StreetEnd(next) => self.street_end(next, &child_history),
+                ChildStep::Betting(next) => self.betting(next, &child_history),
             };
             actions.push((label, child));
         }
 
-        self.finish_action_node(actor, &state, state.history.clone(), actions)
+        self.finish_action_node(actor, &state, history.to_owned(), actions)
     }
 
     fn finish_action_node(
@@ -1794,17 +1658,8 @@ impl Builder<'_> {
     /// After a call or check-check: showdown at the river, otherwise deal
     /// the next street's chance node. Either way, first latch `all_in` if
     /// either player has committed their whole starting stack.
-    fn street_end(&mut self, mut state: LineState) -> TempNode {
-        if state.contrib[Player::P0] == self.config.effective_stack
-            || state.contrib[Player::P1] == self.config.effective_stack
-        {
-            state.all_in = true;
-        }
-        if state.street == Street::River {
-            self.terminal(&state, TerminalKind::Showdown)
-        } else {
-            self.deal_chance(state)
-        }
+    fn street_end(&mut self, state: LineState, history: &str) -> TempNode {
+        walk_street_end(self, state, history)
     }
 
     /// Deals the next street. Sibling deals are independent subtrees: on the
@@ -1812,7 +1667,7 @@ impl Builder<'_> {
     /// absorbed in deal order. Every interned id (mask, transition, rank
     /// table, terminal, node tag) is assigned in the order a serial walk
     /// first meets it, so the result is identical to the serial build.
-    fn deal_chance(&mut self, state: LineState) -> TempNode {
+    fn deal_chance(&mut self, state: LineState, history: &str) -> TempNode {
         debug_assert_eq!(
             state.contrib[Player::P0],
             state.contrib[Player::P1],
@@ -1826,7 +1681,7 @@ impl Builder<'_> {
                 .par_iter()
                 .map(|group| {
                     let mut fork = self.fork();
-                    let deal = fork.deal(&state, group);
+                    let deal = fork.deal(&state, group, history);
                     (fork, deal)
                 })
                 .collect();
@@ -1837,7 +1692,7 @@ impl Builder<'_> {
         } else {
             groups
                 .iter()
-                .map(|group| self.deal(&state, group))
+                .map(|group| self.deal(&state, group, history))
                 .collect()
         };
         TempNode::Chance { deals, tag: 0 }
@@ -1847,8 +1702,8 @@ impl Builder<'_> {
         &mut self,
         state: &LineState,
         group: &DealGroup,
+        history: &str,
     ) -> (f32, PerPlayer<ReachMap>, TempNode) {
-        let next = next_street(state.street);
         let weight = group.members.len() as f32 / deal_denom(state.street);
         // Singleton classes stay on the cheap shared card-removal mask.
         // Merged classes must NOT be approximated as `k x rep-masked
@@ -1875,39 +1730,8 @@ impl Builder<'_> {
             )
         };
 
-        let mut board = state.board.clone();
-        board.push(group.representative);
-        let board_facts = BoardFacts::new(&board);
-        let history = self.extend_history(&state.history, || format!("[{}]", group.representative));
-
-        let child_state = LineState {
-            street: next,
-            board_facts,
-            board,
-            to_act: Player::P0,
-            contrib: state.contrib,
-            outstanding: Chips::ZERO,
-            raises_used: 0,
-            first_checked: false,
-            all_in: state.all_in,
-            history,
-            // A chance node is only ever reached right after a call or a
-            // check-check, both of which leave `contrib[P0] ==
-            // contrib[P1]` — that shared value is the new street's
-            // baseline. `state.street_aggressor` (this street's bettor,
-            // or `None` on a check-check) becomes the next street's
-            // `previous_aggressor`, the donk-menu signal.
-            street_start: state.contrib[Player::P0],
-            last_full_raise: Chips::ZERO,
-            previous_aggressor: state.street_aggressor,
-            street_aggressor: None,
-        };
-
-        let child = if state.all_in {
-            self.after_deal(child_state)
-        } else {
-            self.betting(child_state)
-        };
+        let child_history = self.extend_history(history, || format!("[{}]", group.representative));
+        let child = walk_dealt(self, state, group.representative, &child_history);
         (weight, maps, child)
     }
 
@@ -1925,6 +1749,7 @@ impl Builder<'_> {
             terminals: Vec::new(),
             rank_tables: Vec::new(),
             rank_table_ids: BTreeMap::new(),
+            shared_rank_tables: self.shared_rank_tables.clone(),
             masks: Vec::new(),
             mask_cards: Vec::new(),
             card_masks: [None; 52],
@@ -1957,7 +1782,7 @@ impl Builder<'_> {
             hits,
             ..
         } = fork;
-        if error.is_some() {
+        if self.error.is_none() {
             self.error = error;
         }
         crate::prepare::merge_rule_hits(&mut self.hits, &hits);
@@ -2061,16 +1886,6 @@ impl Builder<'_> {
             }
         }
         (weight, maps, node)
-    }
-
-    /// After a chance deal on an all-in line: no more betting, just the
-    /// next chance node, or the showdown once the river is reached.
-    fn after_deal(&mut self, state: LineState) -> TempNode {
-        if state.street == Street::River {
-            self.terminal(&state, TerminalKind::Showdown)
-        } else {
-            self.deal_chance(state)
-        }
     }
 
     /// Quotient transition for a merged deal class (see the comment at the
@@ -2197,41 +2012,60 @@ impl Builder<'_> {
         if let Some(&id) = self.rank_table_ids.get(&key) {
             return id;
         }
-        let board_set: CardSet = board5.iter().copied().collect();
-        let ranked = |p: Player| {
-            let mut sorted = Vec::new();
-            let mut dead = Vec::new();
-            for (local, &global) in self.hands.combos(p).iter().enumerate() {
-                let (a, b) = combo_cards(global as usize);
-                if board_set.contains(a) || board_set.contains(b) {
-                    dead.push(local as u16);
-                    continue;
+        let cell = self
+            .shared_rank_tables
+            .lock()
+            .entry(key)
+            .or_default()
+            .clone();
+        let table = cell
+            .get_or_init(|| {
+                let board_set: CardSet = board5.iter().copied().collect();
+                // Rank every live combo in the union of both seats only once.
+                let mut ranks = [None; NUM_COMBOS];
+                for p in Player::BOTH {
+                    for &global in self.hands.combos(p) {
+                        let global = global as usize;
+                        if ranks[global].is_some() {
+                            continue;
+                        }
+                        let (a, b) = combo_cards(global);
+                        if !board_set.contains(a) && !board_set.contains(b) {
+                            ranks[global] = Some(rank_of(board5.iter().copied().chain([a, b])));
+                        }
+                    }
                 }
-                sorted.push((
-                    rank_of(board5.iter().copied().chain([a, b])),
-                    global,
-                    local as u16,
-                ));
-            }
-            sorted.sort_unstable();
-            let mut table = RankedHands {
-                dead,
-                ..Default::default()
-            };
-            for (rank, global, local) in sorted {
-                if table.groups.last().is_none_or(|&(r, _)| r != rank) {
-                    table.groups.push((rank, table.hands.len()));
-                }
-                let (a, b) = combo_cards(global as usize);
-                table.hands.push(Hand {
-                    local,
-                    cards: [a.index() as u8, b.index() as u8],
-                });
-                table.groups.last_mut().unwrap().1 = table.hands.len();
-            }
-            table
-        };
-        let table = PerPlayer::new(ranked(Player::P0), ranked(Player::P1));
+                let ranked = |p: Player| {
+                    let mut sorted = Vec::new();
+                    let mut dead = Vec::new();
+                    for (local, &global) in self.hands.combos(p).iter().enumerate() {
+                        if let Some(rank) = ranks[global as usize] {
+                            sorted.push((rank, global, local as u16));
+                        } else {
+                            dead.push(local as u16);
+                        }
+                    }
+                    sorted.sort_unstable();
+                    let mut table = RankedHands {
+                        dead,
+                        ..Default::default()
+                    };
+                    for (rank, global, local) in sorted {
+                        if table.groups.last().is_none_or(|&(r, _)| r != rank) {
+                            table.groups.push((rank, table.hands.len()));
+                        }
+                        let (a, b) = combo_cards(global as usize);
+                        table.hands.push(Hand {
+                            local,
+                            cards: [a.index() as u8, b.index() as u8],
+                        });
+                        table.groups.last_mut().unwrap().1 = table.hands.len();
+                    }
+                    table
+                };
+                std::sync::Arc::new(PerPlayer::new(ranked(Player::P0), ranked(Player::P1)))
+            })
+            .clone();
         let id = self.rank_tables.len() as u32;
         self.rank_tables.push(table);
         self.rank_table_ids.insert(key, id);
@@ -2241,11 +2075,6 @@ impl Builder<'_> {
 
 /// Storage/node/terminal/rank-table footprint of a [`PostflopConfig`],
 /// without actually building the tree.
-///
-/// No longer `Copy` once [`RuleHits`] joined the struct (a `Vec<bool>` per
-/// street isn't); every caller already used this by move or by field access,
-/// never relying on implicit duplication, so dropping `Copy` is not a
-/// breaking change in practice.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct MemoryEstimate {
     /// Bytes for an `F32Storage` backend (two `f32` arenas).
@@ -2330,14 +2159,6 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
 /// `parallel` counts the first chance level's deals concurrently; the
 /// estimate is identical either way.
 fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate, TreeBuildError> {
-    let board_len = config.board.len();
-    let start_street = match board_len {
-        3 => Street::Flop,
-        4 => Street::Turn,
-        5 => Street::River,
-        _ => panic!("board must have 3 (flop), 4 (turn), or 5 (river) cards"),
-    };
-
     let mut counting = Counting {
         config,
         sym: range_preserving_perms(&config.ranges),
@@ -2353,22 +2174,7 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         error: None,
         parallel,
     };
-    counting.betting(LineState {
-        street: start_street,
-        board_facts: BoardFacts::new(&config.board),
-        board: config.board.clone(),
-        to_act: Player::P0,
-        contrib: PerPlayer::new(Chips::ZERO, Chips::ZERO),
-        outstanding: Chips::ZERO,
-        raises_used: 0,
-        first_checked: false,
-        all_in: false,
-        history: String::new(),
-        street_start: Chips::ZERO,
-        last_full_raise: Chips::ZERO,
-        previous_aggressor: config.preflop_aggressor,
-        street_aggressor: None,
-    });
+    counting.betting(LineState::root(config));
 
     if let Some(error) = counting.error {
         return Err(error);
@@ -2459,17 +2265,8 @@ impl Counting<'_> {
         self.min_strategy_elements = self.min_strategy_elements.min(elements);
     }
 
-    fn street_end(&mut self, mut state: LineState) {
-        if state.contrib[Player::P0] == self.config.effective_stack
-            || state.contrib[Player::P1] == self.config.effective_stack
-        {
-            state.all_in = true;
-        }
-        if state.street == Street::River {
-            self.terminal_showdown(&state.board);
-        } else {
-            self.deal_chance(state);
-        }
+    fn street_end(&mut self, state: LineState) {
+        walk_street_end(self, state, "");
     }
 
     fn deal_chance(&mut self, state: LineState) {
@@ -2496,30 +2293,7 @@ impl Counting<'_> {
     }
 
     fn deal(&mut self, state: &LineState, group: &DealGroup) {
-        let mut board = state.board.clone();
-        board.push(group.representative);
-        let board_facts = BoardFacts::new(&board);
-        let child_state = LineState {
-            street: next_street(state.street),
-            board_facts,
-            board,
-            to_act: Player::P0,
-            contrib: state.contrib,
-            outstanding: Chips::ZERO,
-            raises_used: 0,
-            first_checked: false,
-            all_in: state.all_in,
-            history: String::new(),
-            street_start: state.contrib[Player::P0],
-            last_full_raise: Chips::ZERO,
-            previous_aggressor: state.street_aggressor,
-            street_aggressor: None,
-        };
-        if state.all_in {
-            self.after_deal(child_state);
-        } else {
-            self.betting(child_state);
-        }
+        walk_dealt(self, state, group.representative, "");
     }
 
     fn fork(&self) -> Self {
@@ -2554,14 +2328,6 @@ impl Counting<'_> {
         self.action_nodes += fork.action_nodes;
         self.rank_table_keys.extend(fork.rank_table_keys);
         crate::prepare::merge_rule_hits(&mut self.hits, &fork.hits);
-    }
-
-    fn after_deal(&mut self, state: LineState) {
-        if state.street == Street::River {
-            self.terminal_showdown(&state.board);
-        } else {
-            self.deal_chance(state);
-        }
     }
 
     fn terminal_fold(&mut self) {

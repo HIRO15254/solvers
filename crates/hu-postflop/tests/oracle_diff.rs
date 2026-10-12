@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use cfr_ref::{RefGame, best_response_value, expected_value};
 use hu_engine::{Dcfr, F32Storage, NodeKind, ParConfig, Solver};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_postflop::{PerStreet, PostflopConfig, build_postflop_game};
 use nlh::{Card, CardSet, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
 
 const BOARD: &str = "Ks Qs 7h 2d";
@@ -264,9 +264,9 @@ fn engine_game() -> hu_postflop::PostflopGame {
             pot: nlh::Chips(POT),
             effective_stack: nlh::Chips(STACK),
             streets: PerStreet {
-                flop: StreetTree::pot_fractions(&[], &[], 0),
-                turn: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
-                river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+                flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+                turn: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
+                river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
             },
             iso_merging: false,
             ..Default::default()

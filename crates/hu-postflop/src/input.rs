@@ -612,6 +612,28 @@ pub struct NlhStreetRules {
     pub players: PerPlayer<PostflopPlayer>,
 }
 
+impl Default for NlhStreetRules {
+    fn default() -> Self {
+        let player = |seat, position: &str| PostflopPlayer {
+            seat: nlh::SeatId(seat),
+            position: position.into(),
+            preflop: spot::PreflopFacts {
+                limpers: 0,
+                flats: 0,
+                squeeze: false,
+                open_cold_calls: 0,
+                preflop_participant: false,
+                in_position_to_last_aggressor: false,
+                last_preflop_aggressor_position: String::new(),
+            },
+        };
+        Self {
+            rules: Vec::new(),
+            players: PerPlayer::new(player(0, "BB"), player(1, "BTN")),
+        }
+    }
+}
+
 /// Lower the validated IR without I/O or allocating a game tree.
 /// The u32 builder boundary is checked for the largest possible terminal pot.
 pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, SpotError> {
@@ -650,7 +672,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
     }
     let street = |street, cap| -> Result<StreetTree, SpotError> {
         Ok(StreetTree {
-            nlh_rules: Some(Box::new(NlhStreetRules {
+            nlh_rules: Box::new(NlhStreetRules {
                 rules: spot
                     .tree
                     .compiled
@@ -660,8 +682,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
                     .cloned()
                     .collect(),
                 players: PerPlayer::new(oop.clone(), ip.clone()),
-            })),
-            rules: Vec::new(),
+            }),
             max_aggressive_actions: u32::try_from(cap)
                 .map_err(|_| invalid("tree.max_aggressive_actions", "exceeds the P1 u32 limit"))?,
             include_allin: spot.tree.include_allin,

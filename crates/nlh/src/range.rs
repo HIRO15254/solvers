@@ -18,13 +18,25 @@ pub fn combo_index(a: Card, b: Card) -> usize {
     hi * (hi - 1) / 2 + lo
 }
 
+/// Fixed inverse triangular index, shared by every combo-card lookup.
+const COMBO_CARDS: [[u8; 2]; NUM_COMBOS] = {
+    let mut table = [[0; 2]; NUM_COMBOS];
+    let mut hi = 1;
+    while hi < 52 {
+        let mut lo = 0;
+        while lo < hi {
+            table[hi * (hi - 1) / 2 + lo] = [hi as u8, lo as u8];
+            lo += 1;
+        }
+        hi += 1;
+    }
+    table
+};
+
 /// Inverse of [`combo_index`]: returns the pair with the higher card first.
 pub fn combo_cards(combo: usize) -> (Card, Card) {
-    debug_assert!(combo < NUM_COMBOS);
-    // hi is the largest h with h*(h-1)/2 <= combo
-    let hi = (1..52).rfind(|&h| h * (h - 1) / 2 <= combo).unwrap();
-    let lo = combo - hi * (hi - 1) / 2;
-    (Card::from_index(hi as u8), Card::from_index(lo as u8))
+    let [hi, lo] = COMBO_CARDS[combo];
+    (Card::from_index(hi), Card::from_index(lo))
 }
 
 /// 13x13 grid index of a hand class. Rows/cols run A (0) down to 2 (12);

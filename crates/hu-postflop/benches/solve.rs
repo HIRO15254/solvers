@@ -12,7 +12,7 @@ use std::time::Duration;
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use hu_engine::{Dcfr, F32Storage, ParConfig, Solver};
 use hu_postflop::game::{ChipEv, NoRake, PayoffPipeline};
-use hu_postflop::{PerStreet, PostflopConfig, StreetTree, build_postflop_game};
+use hu_postflop::{PerStreet, PostflopConfig, build_postflop_game};
 use nlh::{Card, Chips, PerPlayer, Range};
 
 fn chip_ev() -> PayoffPipeline<'static> {
@@ -59,9 +59,9 @@ fn turn_config() -> PostflopConfig {
         pot: Chips(20),
         effective_stack: Chips(80),
         streets: PerStreet {
-            flop: StreetTree::pot_fractions(&[], &[], 0),
-            turn: StreetTree::pot_fractions(&[0.75], &[0.75], 1),
-            river: StreetTree::pot_fractions(&[1.0], &[1.0], 1),
+            flop: hu_postflop::test_support::pot_fractions(&[], &[], 0),
+            turn: hu_postflop::test_support::pot_fractions(&[0.75], &[0.75], 1),
+            river: hu_postflop::test_support::pot_fractions(&[1.0], &[1.0], 1),
         },
         min_bet: Chips(1),
         iso_merging: true,

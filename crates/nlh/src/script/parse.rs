@@ -822,12 +822,12 @@ fn parse_size_list<V: Vars>(
 
 #[cfg(test)]
 mod tests {
-    use super::super::cond::{POSTFLOP, PostflopVar, PreviousAggressor, RuleContext};
+    use super::super::cond::{PostflopVar, PreviousAggressor, RuleContext, TEST_DIALECT};
     use super::*;
     use crate::BoardFacts;
 
     fn compile(source: &str) -> Result<Script<PostflopVar>, ScriptError> {
-        Script::compile(source, &BTreeMap::new(), &POSTFLOP)
+        Script::compile(source, &BTreeMap::new(), &TEST_DIALECT)
     }
 
     fn compile_with(
@@ -838,7 +838,7 @@ mod tests {
             .iter()
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect();
-        Script::compile(source, &overrides, &POSTFLOP)
+        Script::compile(source, &overrides, &TEST_DIALECT)
     }
 
     fn base_ctx() -> RuleContext {
