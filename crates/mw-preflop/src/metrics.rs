@@ -4,7 +4,7 @@
 //! games are sampled, general-sum profiles, so their diagnostics are arrays
 //! and intentionally avoid the `exploitability` / `nash_conv` vocabulary.
 
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
 
@@ -129,19 +129,20 @@ pub struct MultiwayMetricsWriter {
 
 impl MultiwayMetricsWriter {
     pub fn create_or_append(path: &Path) -> io::Result<Self> {
-        let next_sequence = if path.exists() {
-            BufReader::new(File::open(path)?)
-                .lines()
-                .map_while(Result::ok)
-                .filter_map(|line| serde_json::from_str::<serde_json::Value>(&line).ok())
-                .filter_map(|event| event.get("sequence")?.as_u64())
-                .max()
-                .map_or(0, |last| last.saturating_add(1))
-        } else {
-            0
-        };
+        let file = runfiles::open_jsonl_append(path)?;
+        let mut next_sequence = 0;
+        for line in BufReader::new(File::open(path)?).lines() {
+            let line = line?;
+            if line.trim().is_empty() {
+                continue;
+            }
+            let event: serde_json::Value = serde_json::from_str(&line).map_err(io::Error::other)?;
+            if let Some(sequence) = event.get("sequence").and_then(serde_json::Value::as_u64) {
+                next_sequence = next_sequence.max(sequence.saturating_add(1));
+            }
+        }
         Ok(Self {
-            file: OpenOptions::new().create(true).append(true).open(path)?,
+            file,
             next_sequence,
         })
     }
@@ -206,6 +207,16 @@ mod tests {
             writer.append(&row).unwrap();
             writer.append(&row).unwrap();
         }
+        std::fs::OpenOptions::new()
+            .append(true)
+            .open(&path)
+            .unwrap()
+            .write_all(b"{\"sequence\":900}")
+            .unwrap();
+        {
+            let mut writer = MultiwayMetricsWriter::create_or_append(&path).unwrap();
+            writer.append(&row).unwrap();
+        }
         let lines: Vec<serde_json::Value> = std::fs::read_to_string(path)
             .unwrap()
             .lines()
@@ -213,6 +224,17 @@ mod tests {
             .collect();
         assert_eq!(lines[0]["sequence"], 0);
         assert_eq!(lines[1]["sequence"], 1);
+        assert_eq!(lines.len(), 3);
+        assert_eq!(lines[2]["sequence"], 2);
         assert_eq!(lines[0]["event"], "sampling");
+    }
+
+    #[test]
+    fn malformed_complete_progress_records_are_not_ignored() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("progress.jsonl");
+        std::fs::write(&path, "invalid progress\n").unwrap();
+        assert!(MultiwayMetricsWriter::create_or_append(&path).is_err());
+        assert_eq!(std::fs::read_to_string(path).unwrap(), "invalid progress\n");
     }
 }

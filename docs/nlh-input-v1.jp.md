@@ -710,6 +710,8 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 | `NLH004` | lineの解析error（別表記、`f`の記述を含む）、違法な行動、未知position、street境界やboard枚数との不一致 |
 | `NLH005` | 対象外のspot（第3節） |
 
+CLIの型付き入力errorはexit 2であり、利用者由来のdiagnostic text（`resource limit`等）で終了codeを変更しない。実際のmemory/node資源上限は別のerror型でexit 75へ分類する。P2の資源事前検査は`NLH003`診断表記を保つが、入力errorとは区別する。
+
 実効configの節内keyは本書の順、positionは第5節の順である。等しいstackは`stack_bb`だけ、
 異なるstackは`[table.stacks_bb]`へ全positionを書く。時間とmemoryは割り切れる最大単位で書く。
 空tableは書かない。scriptはCRLFをLFへ揃えるが、paramsを展開した本文には置き換えない。

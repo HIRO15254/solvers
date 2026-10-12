@@ -64,6 +64,85 @@ fn progress_rows(directory: &Path) -> Vec<runfiles::MetricsRow> {
 }
 
 #[test]
+fn busy_resume_preserves_run_files_and_active_source_can_be_forked() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("river.toml");
+    std::fs::write(&config, RIVER).unwrap();
+    let source = temp.path().join("source");
+    ok(&["solve", text(&config), "--out", text(&source)]);
+    let mut manifest = runfiles::RunManifest::read(&source).unwrap();
+    manifest.state = runfiles::RunState::Running;
+    manifest.pid = std::process::id();
+    manifest.write_atomic(&source).unwrap();
+    let _lock = runfiles::RunLock::acquire(&source).unwrap();
+    let names = [
+        runfiles::RUN_CONFIG_FILE,
+        runfiles::RUN_MANIFEST_FILE,
+        runfiles::RUN_EVENTS_FILE,
+        runfiles::RUN_PROGRESS_FILE,
+        runfiles::RUN_HU_CHECKPOINT_FILE,
+    ];
+    let before: Vec<_> = names
+        .iter()
+        .map(|name| std::fs::read(source.join(name)).unwrap())
+        .collect();
+    let rejected = cli(&["resume", text(&source)]);
+    assert_eq!(rejected.status.code(), Some(1));
+    let diagnostic = String::from_utf8_lossy(&rejected.stderr);
+    assert!(diagnostic.contains(text(&source)), "{diagnostic}");
+    assert!(
+        diagnostic.contains(&format!("manifest pid {}", manifest.pid)),
+        "{diagnostic}"
+    );
+    let fork = temp.path().join("fork");
+    ok(&["resume", text(&source), "--out", text(&fork)]);
+    assert!(fork.join(runfiles::RUN_HU_SOLUTION_FILE).is_file());
+    for (name, expected) in names.iter().zip(before) {
+        assert_eq!(
+            std::fs::read(source.join(name)).unwrap(),
+            expected,
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn resume_result_write_failure_closes_manifest_as_failed() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("river.toml");
+    std::fs::write(&config, RIVER).unwrap();
+    let run = temp.path().join("run");
+    ok(&["solve", text(&config), "--out", text(&run)]);
+    std::fs::remove_file(run.join(runfiles::RUN_RESULT_FILE)).unwrap();
+    std::fs::create_dir(run.join(runfiles::RUN_RESULT_FILE)).unwrap();
+    let failed = cli(&["resume", text(&run)]);
+    assert!(!failed.status.success());
+    let manifest = runfiles::RunManifest::read(&run).unwrap();
+    assert_eq!(manifest.state, runfiles::RunState::Failed);
+    assert!(!manifest.failure.unwrap().is_empty());
+}
+
+#[test]
+fn user_controlled_resource_diagnostic_text_keeps_input_exit_code() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("invalid.toml");
+    for text_in_error in ["resource limit", "memory limit", "node limit"] {
+        let raw = RIVER.replace(
+            "[solver.stop]",
+            &format!("[solver]\nstorage = '{text_in_error}'\n[solver.stop]"),
+        );
+        std::fs::write(&config, raw).unwrap();
+        let invalid = cli(&["validate", text(&config)]);
+        assert_eq!(
+            invalid.status.code(),
+            Some(2),
+            "{}",
+            String::from_utf8_lossy(&invalid.stderr)
+        );
+    }
+}
+
+#[test]
 fn auto_target_resume_preserves_evaluation_schedule_and_state() {
     use hu_postflop::{checkpoint, prepare, run};
     use std::sync::atomic::{AtomicBool, Ordering};
@@ -298,6 +377,36 @@ fn progress_history_uses_last_row_and_falls_back_when_unavailable() {
     assert_eq!(
         run::read_evaluation_history(&path, 50),
         [(25, 2.0), (50, 0.5)]
+    );
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .append(true)
+        .open(&path)
+        .unwrap()
+        .write_all(b"{\"iteration\":100,\xff")
+        .unwrap();
+    assert_eq!(
+        run::read_evaluation_history(&path, 50),
+        [(25, 2.0), (50, 0.5)]
+    );
+    assert_eq!(
+        runfiles::last_progress_row(temp.path()).unwrap().unwrap()["iteration"],
+        75
+    );
+    let mut writer = runfiles::MetricsWriter::create_or_append(&path).unwrap();
+    writer
+        .append(&runfiles::MetricsRow {
+            iteration: 100,
+            elapsed_secs: 1.0,
+            expl_p0: 0.125,
+            expl_p1: 0.125,
+            nash_conv: 0.25,
+        })
+        .unwrap();
+    drop(writer);
+    assert_eq!(
+        run::read_evaluation_history(&path, 100),
+        [(25, 2.0), (50, 0.5), (75, 0.25), (100, 0.125)]
     );
     std::fs::write(&path, "invalid progress\n").unwrap();
     let history = run::read_evaluation_history(&path, 75);

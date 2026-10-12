@@ -99,6 +99,7 @@ P1はNashConv / 2の目標、P2は測定deviationの目標を検査する。
 反復・sweep・時間の上限で終わったことは品質目標の達成を意味しない。
 保存物はrun.toml、manifest.json、events.jsonl、progress.jsonl、run.jsonと、
 P1のcheckpoint.ckpt / solution.solまたはP2のcheckpoint.mwckpt / solution.mwsolである。
+`run.lock`は排他OS lock用の共通fileであり、artifactではない。process終了・crashでlockは自動解放され、fileが残っていても妨げにならない。
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。
 
 P1の保存streetは`[output] solution_streets`で設定する。
@@ -127,6 +128,8 @@ solvers resume runs/my-spot --out runs/my-spot-fork --threads 2
 statusのeventsOffsetからwatchを再開できる。watchのCtrl-Cは監視だけを止める。
 solveのCtrl-Cは境界で停止し、checkpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。P1は同じiterationの終了時再保存とcheckpoint eventを省く。2回目は即時終了する。
 同じdirectoryへのresumeは累積進捗を引き継ぐ。max_timeも再開前を含む累積時間である。
+実行中の同じdirectoryへのresumeはexit 1で拒否され、directoryとmanifestのpidが表示される。止まるまで待つか、`--out`で別directoryへforkする。forkは実行中sourceを書き換えない。
+events/progressは改行の無い不完全な末尾だけをreaderが無視し、再開writerがその末尾だけを切り捨てて追記する。statusのeventsOffsetも最後の完全recordまでである。P1の評価履歴では改行済みの不正JSONがあると履歴無しへ戻る。
 P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 `--max-sweeps`・`--stop-target`・`--evaluation-samples`・`--evaluation-cadence`を上書きする。
 裸の自己完結checkpointからの再開には`--out`で新directoryを指定できる。
@@ -245,7 +248,8 @@ endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する�
 | 非互換・破損 / 3 | embedded config、fingerprint、artifact version、fileの完全性を確認 |
 | 資源上限 / 75 | validate --resourcesで規模を確認し、treeやmemory予算を見直す |
 | 協調停止 / 130 | 保存checkpointからresume |
-| その他 / 1 | file path・権限・I/O診断を確認 |
+| その他 / 1 | 使用中runへのresumeなら停止を待つか別directoryへfork。その他はfile path・権限・I/O診断を確認 |
 
 未一致ruleのwarningはerrorではない。P2のnot-checked/incompleteは測定未完了を示す。
+型付き入力errorの診断に`resource limit`・`memory limit`・`node limit`等が含まれてもexit 2である。実際の資源上限errorだけがexit 75となる。
 P1の一般和設定やP2の暫定方式の品質制限は規範を読み、予算終了と収束を区別する。

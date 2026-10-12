@@ -114,6 +114,7 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 |---|---|
 | `run.toml` | 正規化・inline化した実効config |
 | `manifest.json` | run identity、state、pid、configSchema、gameKind |
+| `run.lock` | process終了まで保持する排他OS lock。artifactには含めない |
 | `events.jsonl` / `progress.jsonl` | 状態・checkpoint等のevent / 評価境界の進捗 |
 | `run.json` | 終了区間のsummary |
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
@@ -135,6 +136,7 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 
 `RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
 directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
+solveとresumeは出力directoryの`run.lock`をfile更新前に排他取得し、process終了まで保持する。元directoryが使用中のin-place resumeはdirectoryとmanifestのpidを示してexit 1で拒否し、config・manifest・eventを変更しない。`--out`は出力先だけをlockし、実行中sourceからもforkできる（sourceは書き換えない）。crash後のlock fileの残存自体は再開を妨げない。
 P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
 最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
 P1のautoはrun directoryの`progress.jsonl`からcheckpoint iteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。同じ方式で次の評価iterationを再計算する。progressが無い・読めない場合（裸のcheckpointを含む）は履歴無しでcheckpoint iteration＋25から評価し、max_iterationsで切る。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えず、旧run.tomlの`check_every = 25`は固定25で再開できる。
@@ -151,6 +153,7 @@ P1のautoはrun directoryの`progress.jsonl`からcheckpoint iteration以下の�
 
 P1へP2専用overrideを渡すと`NLH003`で拒否する。P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。その他の設定変更は互換性が必要である。
 同じdirectoryへの再開はmanifestのidentityを保ち、eventsのseqと進捗を追記する。
+events/progressのwriterは再開前に最後の改行以降の不完全な末尾だけを切り捨て、完全な行は保持する。P1の評価履歴も不完全な最終行だけを無視し、改行済みの不正JSONがあれば従来どおり履歴無しへ戻る。
 終了時にsolution、run.jsonを更新する。P1のcheckpointは`final_checkpoint = true`の場合だけ更新し、直前の保存と同じiterationの再保存・eventを省く。P2は終了時のcheckpointを更新する。P2は再構築中にrule hitも確認する。
 
 ## `solvers status` / `solvers watch` / `solvers runs ls`
@@ -169,7 +172,8 @@ solvers runs ls <ROOT> [--format human|json]
 
 statusはstate・進捗・completionと`eventsOffset`を返す。runningのpidが消えた場合は同一hostで
 `interrupted`を導出し、JSONの`recordedState`へ記録状態を残す。`resumable`は停止状態とcheckpointの存在による表示である。
-watchは停止時までeventを追い、不完全な末尾をoffsetに含めない。runs lsはROOT直下だけを列挙する。
+Windowsではprocessの終了とcreation timeを確認する。run開始時刻より1秒超遅く作成された同じpidは別processとみなし、access deniedは保守的にaliveとする。
+watchは停止時までeventを追い、不完全な末尾（最後の改行以降）をoffsetに含めない。statusの`eventsOffset`も同じ完全record境界であり、progressも不完全な最終行を無視する。runs lsはROOT直下だけを列挙する。
 これらはconfigをparseせず、旧run directoryも読める。JSONの`configSchema` / `gameKind`は記録値を保つ。
 旧runの`resumable`表示は現行CLIの再開互換性を保証しない。
 
@@ -335,11 +339,13 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | code | 意味 |
 |---|---|
 | `0` | 成功。予算到達は品質目標達成を意味しない |
-| `1` | I/O等のその他の失敗 |
+| `1` | I/O等のその他の失敗、使用中run directoryへの書込み・in-place resumeの拒否 |
 | `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005） |
 | `3` | 成果物の破損・非互換・削除済みconfig family |
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
+
+型付き入力errorは診断に利用者由来の`resource limit`等を含んでもexit 2であり、資源上限はerror型でexit 75へ分類する。P2の資源診断は`NLH003`の表記を保つが入力errorとは区別する。
 
 Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
 P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境界で判定する。2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。

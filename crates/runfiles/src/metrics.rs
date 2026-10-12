@@ -2,7 +2,7 @@
 //! immediately so a killed run's file is always valid up to its last
 //! completed row.
 
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::{self, Write};
 use std::path::Path;
 
@@ -32,7 +32,7 @@ impl MetricsWriter {
     /// Reused across `solve`/`resume`/`bench` runs against the same path:
     /// rows from an earlier (possibly killed) run stay in the file.
     pub fn create_or_append(path: &Path) -> io::Result<Self> {
-        let file = OpenOptions::new().create(true).append(true).open(path)?;
+        let file = crate::open_jsonl_append(path)?;
         Ok(MetricsWriter { file })
     }
 
@@ -48,6 +48,7 @@ impl MetricsWriter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs::OpenOptions;
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
@@ -87,6 +88,12 @@ mod tests {
             let mut w = MetricsWriter::create_or_append(&path).unwrap();
             w.append(&rows[0]).unwrap();
         }
+        OpenOptions::new()
+            .append(true)
+            .open(&path)
+            .unwrap()
+            .write_all(b"{\"iteration\":")
+            .unwrap();
         // Simulate a restarted run appending more rows to the same file.
         {
             let mut w = MetricsWriter::create_or_append(&path).unwrap();

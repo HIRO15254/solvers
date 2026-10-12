@@ -101,6 +101,7 @@ regretとstrategy-sumの2本のf32配列、touched bit、dense index tableのbyt
 Postflop decision nodeもarenaに含む。一般Postflop treeではbucket数もarena bytesに影響する。
 Preflopだけのdecision treeなら169 class × Preflop node × actionが支配する。
 設定memoryを厳密に超える最初のnode prefixで資源errorにする。固定50M node capは無い。
+資源上限errorは型でexit 75へ分類する。事前検査の`NLH003`診断表記は保つが、利用者の不正値による型付き入力error（exit 2）と区別する。
 
 `run.memory = "auto"`は6 GiB、`run.threads = "auto"`はmin(論理CPU数, players × batch_sweeps)である。
 事前検査後のtree materializationは解決済みthread数のprivate poolで行う。
@@ -121,7 +122,8 @@ checkpointだけの中断で予定外の品質評価を行わず、sample IDとm
 
 ## 6. checkpointと`.mwsol`
 
-run directoryは共通5 fileに`checkpoint.mwckpt`・`solution.mwsol`を加える。
+run directoryは共通5 fileと`run.lock`に`checkpoint.mwckpt`・`solution.mwsol`を加える。`run.lock`はartifactではなく、solve/resumeが更新前に排他取得してprocess終了まで保持する。使用中directoryへのin-place resumeはdirectoryとmanifest pidを示してexit 1で拒否し、fileを変更しない。`--out`は出力先だけをlockし実行中sourceも書き換えずforkできる。crash後の残存file自体は再開を妨げない。
+events/progressのreaderは改行の無い不完全な最終行だけを無視し、status/watchのoffsetは完全record境界を使う。再開writerはその不完全なsuffixだけを切り捨て、完全な行とsequenceを保持して追記する。
 run.tomlと成果物metadataには実効configを保存する。checkpointは再開用state、solutionは閲覧用profileである。
 container versionとsolver state versionを区別する。現行はcheckpoint container 7、solver state 4である。
 solver state 3以前を補正済み更新へ混ぜてresumeしない。

@@ -31,6 +31,63 @@ pub const RUN_EVENTS_FILE: &str = "events.jsonl";
 pub const RUN_PROGRESS_FILE: &str = "progress.jsonl";
 pub const RUN_RESULT_FILE: &str = "run.json";
 pub const RUN_CONFIG_FILE: &str = "run.toml";
+pub const RUN_LOCK_FILE: &str = "run.lock";
+
+/// Exclusive ownership of a run directory. A leftover file is harmless:
+/// only the operating-system lock, released when the handle closes, matters.
+#[derive(Debug)]
+pub struct RunLock {
+    _file: File,
+}
+
+#[derive(Debug)]
+pub enum RunLockError {
+    Busy { directory: PathBuf, pid: u32 },
+    Io(io::Error),
+}
+
+impl std::fmt::Display for RunLockError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Busy { directory, pid } => write!(
+                f,
+                "run directory {} is already locked (manifest pid {pid})",
+                directory.display()
+            ),
+            Self::Io(error) => error.fmt(f),
+        }
+    }
+}
+
+impl std::error::Error for RunLockError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Io(error) => Some(error),
+            Self::Busy { .. } => None,
+        }
+    }
+}
+
+impl RunLock {
+    /// Acquire before writing any run files; the directory must exist.
+    pub fn acquire(directory: &Path) -> Result<Self, RunLockError> {
+        let file = OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .read(true)
+            .write(true)
+            .open(directory.join(RUN_LOCK_FILE))
+            .map_err(RunLockError::Io)?;
+        match file.try_lock() {
+            Ok(()) => Ok(Self { _file: file }),
+            Err(std::fs::TryLockError::WouldBlock) => Err(RunLockError::Busy {
+                directory: directory.to_path_buf(),
+                pid: RunManifest::read(directory).map_or(0, |manifest| manifest.pid),
+            }),
+            Err(std::fs::TryLockError::Error(error)) => Err(RunLockError::Io(error)),
+        }
+    }
+}
 /// Multiway artifacts. The heads-up engine writes its own formats, so its
 /// two artifacts have distinct names inside the same directory layout.
 pub const RUN_CHECKPOINT_FILE: &str = "checkpoint.mwckpt";
@@ -176,7 +233,11 @@ impl RunManifest {
     /// machine says nothing here, so callers that read run directories over
     /// a network must not use this.
     pub fn is_stale(&self) -> bool {
-        self.state == RunState::Running && !process_is_alive(self.pid)
+        self.state == RunState::Running
+            && !process_is_alive(
+                self.pid,
+                self.started_unix_ms.unwrap_or(self.created_unix_ms),
+            )
     }
 
     /// [`Self::state`], resolved through [`Self::is_stale`].
@@ -248,7 +309,7 @@ impl RunEventLog {
             Err(error) => return Err(error),
         };
         Ok(Self {
-            file: OpenOptions::new().create(true).append(true).open(&path)?,
+            file: open_jsonl_append(&path)?,
             next_seq,
         })
     }
@@ -277,6 +338,43 @@ impl RunEventLog {
     }
 }
 
+/// Byte boundary after the last complete JSONL record, without parsing records.
+pub fn complete_record_boundary(path: &Path) -> io::Result<u64> {
+    file_record_boundary(&mut File::open(path)?)
+}
+
+fn file_record_boundary(file: &mut File) -> io::Result<u64> {
+    let mut end = file.metadata()?.len();
+    let mut buffer = [0u8; 8192];
+    while end != 0 {
+        let start = end.saturating_sub(buffer.len() as u64);
+        let length = (end - start) as usize;
+        file.seek(SeekFrom::Start(start))?;
+        file.read_exact(&mut buffer[..length])?;
+        if let Some(index) = buffer[..length].iter().rposition(|byte| *byte == b'\n') {
+            return Ok(start + index as u64 + 1);
+        }
+        end = start;
+    }
+    Ok(0)
+}
+
+/// Reopen a JSONL writer, removing only an unterminated final record.
+pub fn open_jsonl_append(path: &Path) -> io::Result<File> {
+    let mut file = OpenOptions::new()
+        .create(true)
+        .read(true)
+        .write(true)
+        .truncate(false)
+        .open(path)?;
+    let boundary = file_record_boundary(&mut file)?;
+    file.set_len(boundary)?;
+    // Windows append-only handles cannot truncate. Recover with a writable
+    // handle, then use native append semantics for the actual writer.
+    drop(file);
+    OpenOptions::new().append(true).open(path)
+}
+
 /// Reads `events.jsonl` from `from_offset` bytes, returning the events and
 /// the offset to resume from.
 ///
@@ -287,14 +385,13 @@ pub fn read_events(path: &Path, from_offset: u64) -> io::Result<(Vec<RunEvent>, 
     let mut file = File::open(path)?;
     let length = file.metadata()?.len();
     if from_offset >= length {
-        return Ok((Vec::new(), length));
+        return Ok((Vec::new(), file_record_boundary(&mut file)?));
     }
     file.seek(SeekFrom::Start(from_offset))?;
-    let mut buffer = String::new();
-    BufReader::new(&mut file).read_to_string(&mut buffer)?;
-
-    let complete = match buffer.rfind('\n') {
-        Some(index) => &buffer[..=index],
+    let mut buffer = Vec::new();
+    file.read_to_end(&mut buffer)?;
+    let complete = match buffer.iter().rposition(|byte| *byte == b'\n') {
+        Some(index) => std::str::from_utf8(&buffer[..=index]).map_err(io::Error::other)?,
         None => return Ok((Vec::new(), from_offset)),
     };
     let mut events = Vec::new();
@@ -315,13 +412,19 @@ pub fn last_progress_row(directory: &Path) -> io::Result<Option<serde_json::Valu
         Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
         Err(error) => return Err(error),
     };
-    let last = BufReader::new(file)
-        .lines()
-        .map_while(Result::ok)
-        .filter(|line| !line.trim().is_empty())
-        .last();
-    last.map(|line| serde_json::from_str(&line).map_err(io::Error::other))
-        .transpose()
+    let mut reader = BufReader::new(file);
+    let mut line = Vec::new();
+    let mut last = None;
+    while reader.read_until(b'\n', &mut line)? != 0 {
+        if line.last() != Some(&b'\n') {
+            break;
+        }
+        if !line.iter().all(u8::is_ascii_whitespace) {
+            last = Some(serde_json::from_slice(&line).map_err(io::Error::other)?);
+        }
+        line.clear();
+    }
+    Ok(last)
 }
 
 /// True when `directory` looks like a run directory.
@@ -337,7 +440,7 @@ pub fn unix_millis() -> u64 {
 }
 
 #[cfg(unix)]
-fn process_is_alive(pid: u32) -> bool {
+fn process_is_alive(pid: u32, _started_unix_ms: u64) -> bool {
     // `kill` treats pid 0 as "every process in my group", so it would report
     // alive for a manifest that never recorded a real pid. Rule it out first.
     if pid == 0 {
@@ -353,12 +456,54 @@ fn process_is_alive(pid: u32) -> bool {
     io::Error::last_os_error().raw_os_error() == Some(libc::EPERM)
 }
 
-#[cfg(not(unix))]
-fn process_is_alive(_pid: u32) -> bool {
-    // Without a portable liveness probe, assume the owner is alive. A stale
-    // `Running` manifest is then reported as running until something else
-    // rewrites it, which is the conservative direction: it never claims a
-    // live run died.
+#[cfg(windows)]
+fn process_is_alive(pid: u32, started_unix_ms: u64) -> bool {
+    use windows_sys::Win32::Foundation::{
+        CloseHandle, ERROR_ACCESS_DENIED, ERROR_INVALID_PARAMETER, FILETIME, GetLastError,
+        STILL_ACTIVE,
+    };
+    use windows_sys::Win32::System::Threading::{
+        GetExitCodeProcess, GetProcessTimes, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION,
+    };
+    if pid == 0 {
+        return false;
+    }
+    // A query handle cannot change the target process. Always close it after
+    // querying, even when the owner exits between OpenProcess and the query.
+    unsafe {
+        let handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid);
+        if handle.is_null() {
+            return match GetLastError() {
+                ERROR_INVALID_PARAMETER => false,
+                ERROR_ACCESS_DENIED => true,
+                _ => true,
+            };
+        }
+        let mut exit_code = 0;
+        let mut alive =
+            GetExitCodeProcess(handle, &mut exit_code) == 0 || exit_code == STILL_ACTIVE as u32;
+        if alive {
+            let mut creation: FILETIME = std::mem::zeroed();
+            let mut exit: FILETIME = std::mem::zeroed();
+            let mut kernel: FILETIME = std::mem::zeroed();
+            let mut user: FILETIME = std::mem::zeroed();
+            if GetProcessTimes(handle, &mut creation, &mut exit, &mut kernel, &mut user) != 0 {
+                // FILETIME counts 100ns ticks since 1601; the manifest uses
+                // Unix milliseconds. Allow one second for timestamp rounding.
+                let ticks =
+                    (u64::from(creation.dwHighDateTime) << 32) | u64::from(creation.dwLowDateTime);
+                let created_ms = (ticks / 10_000).saturating_sub(11_644_473_600_000);
+                alive = created_ms <= started_unix_ms.saturating_add(1_000);
+            }
+        }
+        CloseHandle(handle);
+        alive
+    }
+}
+
+#[cfg(not(any(unix, windows)))]
+fn process_is_alive(_pid: u32, _started_unix_ms: u64) -> bool {
+    // Other platforms have no liveness probe; conservatively keep running.
     true
 }
 
@@ -411,6 +556,57 @@ mod tests {
         assert_eq!(current.pid, std::process::id());
         assert!(!current.is_stale());
         assert_eq!(current.observed_state(), RunState::Running);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_liveness_current_process_is_alive() {
+        assert!(process_is_alive(std::process::id(), unix_millis()));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_liveness_killed_child_is_dead_and_run_is_interrupted() {
+        let mut child = std::process::Command::new("powershell.exe")
+            .args(["-NoProfile", "-Command", "Start-Sleep -Seconds 60"])
+            .spawn()
+            .unwrap();
+        let mut current = manifest();
+        current.pid = child.id();
+        assert!(process_is_alive(
+            current.pid,
+            current.started_unix_ms.unwrap()
+        ));
+        child.kill().unwrap();
+        child.wait().unwrap();
+        assert!(!process_is_alive(
+            current.pid,
+            current.started_unix_ms.unwrap()
+        ));
+        assert!(current.is_stale());
+        assert_eq!(current.observed_state(), RunState::Interrupted);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_liveness_reused_pid_is_not_the_run_owner() {
+        let mut current = manifest();
+        current.started_unix_ms = Some(1);
+        assert!(current.is_stale());
+        assert_eq!(current.observed_state(), RunState::Interrupted);
+    }
+
+    #[test]
+    fn run_lock_is_exclusive_and_a_stale_file_does_not_block() {
+        let directory = tempfile::tempdir().unwrap();
+        let current = manifest();
+        current.write_atomic(directory.path()).unwrap();
+        let lock = RunLock::acquire(directory.path()).unwrap();
+        let error = RunLock::acquire(directory.path()).unwrap_err();
+        assert!(matches!(error, RunLockError::Busy { pid, .. } if pid == current.pid));
+        drop(lock);
+        assert!(directory.path().join(RUN_LOCK_FILE).exists());
+        RunLock::acquire(directory.path()).unwrap();
     }
 
     /// A `Running` manifest whose process is gone is what `Interrupted`
@@ -478,6 +674,12 @@ mod tests {
             let mut log = RunEventLog::create_or_append(directory.path()).unwrap();
             log.state(RunState::Running).unwrap();
         }
+        OpenOptions::new()
+            .append(true)
+            .open(RunEventLog::path_in(directory.path()))
+            .unwrap()
+            .write_all(b"{\"seq\":1,\xff")
+            .unwrap();
         let mut resumed = RunEventLog::create_or_append(directory.path()).unwrap();
         resumed.state(RunState::Completed).unwrap();
 
@@ -501,6 +703,10 @@ mod tests {
 
         let (events, offset) = read_events(&path, 0).unwrap();
         assert_eq!(events.len(), 1);
+        assert_eq!(
+            complete_record_boundary(&path).unwrap(),
+            complete.len() as u64
+        );
         assert_eq!(offset, complete.len() as u64);
 
         std::fs::write(
@@ -511,5 +717,16 @@ mod tests {
         let (tail, _) = read_events(&path, offset).unwrap();
         assert_eq!(tail.len(), 1);
         assert_eq!(tail[0].seq, 1);
+    }
+
+    #[test]
+    fn malformed_complete_events_are_not_ignored_or_truncated() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = RunEventLog::path_in(directory.path());
+        let bytes = b"not json\n{\"partial\":";
+        std::fs::write(&path, bytes).unwrap();
+        assert!(read_events(&path, 0).is_err());
+        assert!(RunEventLog::create_or_append(directory.path()).is_err());
+        assert_eq!(std::fs::read(path).unwrap(), bytes);
     }
 }

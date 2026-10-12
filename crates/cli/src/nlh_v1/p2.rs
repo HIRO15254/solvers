@@ -198,6 +198,8 @@ pub(crate) fn resume(
     drop(session);
     if out.is_some() {
         crate::run_dir::create_or_adopt(directory)?;
+    } else {
+        crate::run_dir::lock_directory(directory)?;
     }
     let active_checkpoint = if out.is_some() {
         directory.join(runfiles::RUN_CHECKPOINT_FILE)
@@ -222,7 +224,6 @@ fn execute(p: Prepared, directory: &Path, checkpoint: Option<&Path>, reset: bool
         directory.display().to_string(),
     ];
     let mut recorder = if checkpoint.is_some() {
-        std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), &p.effective)?;
         crate::run_dir::RunRecorder::reopen(
             directory,
             "mw-preflop",
