@@ -210,7 +210,9 @@ pub(crate) fn query<S: Storage>(
 
 /// Builds the game and its viewer index, releasing the builder's per-node
 /// strings before the solve allocates storage.
-fn build_indexed(p: &Prepared) -> Result<(CompiledGame<crate::PostflopEvaluator>, GameIndex)> {
+pub(crate) fn build_indexed(
+    p: &Prepared,
+) -> Result<(CompiledGame<crate::PostflopEvaluator>, GameIndex)> {
     let crate::PostflopGame {
         game, node_info, ..
     } = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())

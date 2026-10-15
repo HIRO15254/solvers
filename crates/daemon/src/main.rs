@@ -9,6 +9,7 @@ mod api;
 mod http;
 mod jobs;
 mod runs;
+mod static_ui;
 mod tls;
 
 use std::path::PathBuf;
@@ -57,6 +58,9 @@ struct Cli {
     /// then to a fresh random one, which is printed at startup.
     #[arg(long)]
     token: Option<String>,
+    /// Directory of built SPA assets, served without a bearer token.
+    #[arg(long)]
+    ui: Option<PathBuf>,
 }
 
 fn main() {
@@ -78,6 +82,11 @@ fn run() -> Result<()> {
         _ => None,
     };
     tls::check_exposure(&cli.bind, tls.is_some())?;
+    let ui = cli
+        .ui
+        .as_deref()
+        .map(static_ui::StaticUi::new)
+        .transpose()?;
 
     Daemon {
         api: Api { runs, jobs, solver },
@@ -85,6 +94,7 @@ fn run() -> Result<()> {
             .token
             .or_else(|| std::env::var("SOLVERSD_TOKEN").ok())
             .unwrap_or_else(generate_token),
+        ui,
     }
     .serve(&cli.bind, tls)
 }

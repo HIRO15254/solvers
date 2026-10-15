@@ -5,8 +5,8 @@
 
 ## 環境準備
 
-Rust stableのedition 2024対応toolchain、rustfmt、clippy、Python 3.11以上を使う。
-Pythonの文書検査と共通testは標準ライブラリだけで動く。Rust依存はCargo.lockを使用し、意図しない更新を混ぜない。
+Rust stableのedition 2024対応toolchain、rustfmt、clippy、Python 3.11以上を使う。Web GUI（`web/`）を変更する場合はNode.js 22以上とnpmも使う。
+Pythonの文書検査と共通testは標準ライブラリだけで動く。Rust依存はCargo.lock、GUI依存は`web/package-lock.json`を使用し、意図しない更新を混ぜない。
 CIの正確なコマンドは[通常CI](../.github/workflows/ci.yml)と[重い受入](../.github/workflows/acceptance.yml)にある。
 再現性が必要な実行では`rustc -Vv`、`cargo -V`、OS、CPU/RAM、Cargo.lockとビルド設定を記録する。
 
@@ -49,6 +49,7 @@ cargo test --workspace
 | CFR/BR/カード意味論 | production toy、独立oracle、storage、次元遷移。多street等のignored試験は変更影響と受入範囲に応じ明示実行 |
 | checkpoint/solution | 保存→読込→再開、破損検出、version/identity、旧形式の明示拒否、保存後の値 |
 | CLI/daemon/OS処理 | CLI checkpoint/resume、daemon HTTP、対象OSの停止・子プロセス処理 |
+| Web GUI（`web/`） | `npm ci`、`npm run build`（型検査＋bundle）、`npm test`（range文字列等の単体試験）。`npm run dev`は`/v1`を`127.0.0.1:38127`（`SOLVERSD_URL`で変更）のdaemonへproxyする。画面の変更は実daemonへ接続したbrowserで確認する。部品・tokenは`web/vendor/cryst/`のCryst Design System（README.mdが規則）を使い、vendor内は編集せず正本からの複製で更新する |
 | 移動・改名・責務の移し替え | 変更前後のbinaryで固定seedのsolve成果物とCLI出力（text/JSON/CSV）を比べ、計時以外の一致を確認。hot pathの所在が変わるなら同時間帯の対計測 |
 | 品質・性能の主張 | [製品定義](products.jp.md)の品質節、対応する固定条件と基準測定 |
 

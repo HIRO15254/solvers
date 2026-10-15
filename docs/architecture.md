@@ -285,7 +285,7 @@ artifact形式と公開操作の意味は製品規範と[CLI reference](cli-refe
 ## 9. アプリケーション境界
 
 `solversd`はCLIを子processとして起動し、自身ではsolveしない。永続状態はrun directoryから読む。
-`protocol`と`daemon`はsolver crateへ依存しない。GUI実装はworkspaceに無い。
+`protocol`と`daemon`はsolver crateへ依存しない。Web GUIはCargo workspace外の`web/`（React + TypeScript）にあり、daemonのHTTP clientとして`solversd --ui`から配信する。
 CLIのviewer queryは製品APIを使う。HTTP・job・画面状態はdomainへ入れない。
 現行のHTTPとviewer境界は[app-architecture.md](app-architecture.md)に記す。
 

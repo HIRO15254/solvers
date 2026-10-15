@@ -229,6 +229,94 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
     Ok(())
 }
 
+/// Decode only the inputs needed by the interactive line builder.
+pub(crate) fn line_input(text: &str, read_line: bool) -> Result<(Table, String), SpotError> {
+    // A partially edited unrelated section must not disable the builder. Prefer
+    // parsing the original document (including quoted/dotted keys); if its TOML
+    // is incomplete, project the requested sections and parse those instead.
+    let value = match text.parse::<Value>() {
+        Ok(value) => value,
+        Err(_) => {
+            let projected = line_sections(text, read_line);
+            projected.parse::<Value>().map_err(toml_error)?
+        }
+    };
+    let raw_table = value
+        .get("table")
+        .ok_or_else(|| type_error("table", "required table"))?;
+    shape(raw_table, "table", "table")?;
+    let lexical: toml_edit::DocumentMut = match text.parse() {
+        Ok(document) => document,
+        Err(_) => line_sections(text, read_line)
+            .parse()
+            .map_err(|e: toml_edit::TomlError| {
+                SpotError::new(Code::NLH002, "table", e.to_string())
+            })?,
+    };
+    validate_bb_literals(&lexical["table"], "table")?;
+    let raw: RawTable = raw_table.clone().try_into().map_err(toml_error)?;
+    let line = if read_line {
+        match value.get("spot").and_then(|spot| spot.get("line")) {
+            Some(Value::String(line)) => line.clone(),
+            Some(_) => return Err(type_error("spot.line", "string")),
+            None => String::new(),
+        }
+    } else {
+        String::new()
+    };
+    Ok((table(raw)?, line))
+}
+
+fn toml_error(error: toml::de::Error) -> SpotError {
+    SpotError {
+        code: Code::NLH002,
+        key: None,
+        message: error.to_string(),
+    }
+}
+
+/// Recover table sections from a form containing incomplete TOML elsewhere.
+/// Valid documents take the normal parser path, so multiline strings and all
+/// TOML key spellings retain their usual meaning.
+fn line_sections(text: &str, read_line: bool) -> String {
+    let mut result = String::new();
+    let mut in_table = false;
+    let mut in_spot = false;
+    let mut in_line = false;
+    for line in text.lines() {
+        let trimmed = line.trim_start();
+        if trimmed.starts_with('[') {
+            if let Ok(header) = trimmed.parse::<Value>() {
+                in_table = header.get("table").is_some();
+                in_spot = read_line && header.get("spot").is_some();
+                in_line = false;
+                if in_table || in_spot {
+                    result.push_str(line);
+                    result.push('\n');
+                }
+                continue;
+            }
+            if !in_table {
+                in_spot = false;
+                in_line = false;
+            }
+        }
+        if in_spot && !in_line {
+            // Only line is relevant; an unfinished board is deliberately ignored.
+            let key = trimmed.split_once('=').map(|(key, _)| key.trim());
+            in_line = matches!(key, Some("line" | "\"line\"" | "'line'"));
+        }
+        if in_table || in_line {
+            result.push_str(line);
+            result.push('\n');
+            if in_line && result.parse::<Value>().is_ok() {
+                in_line = false;
+            }
+        }
+    }
+    result
+}
+
 pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotError> {
     let value: Value = text.parse().map_err(|e: toml::de::Error| SpotError {
         code: Code::NLH002,

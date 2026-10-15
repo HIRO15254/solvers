@@ -215,7 +215,7 @@ fn exports_inspection_report_and_comparison_use_bb() {
         "",
     );
     assert!(
-        csv.contains("r3.3,river,ip,8.8,true,fold|call|raise to 10.25"),
+        csv.contains("r3.3,action,river,ip,8.8,true,fold|call|raise to 10.25"),
         "{csv}"
     );
     let by_label = ok(

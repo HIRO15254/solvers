@@ -106,11 +106,13 @@ impl JobRunner {
 
     /// Asks a running job to stop.
     ///
-    /// SIGINT rather than SIGKILL: the CLI treats it as a cooperative
+    /// An interrupt rather than a kill: the CLI treats it as a cooperative
     /// cancel, finishing the current evaluation boundary and writing a
-    /// checkpoint, so the run stays resumable. A queued job is simply
-    /// dropped from the queue.
-    pub fn cancel(&self, run_id: &str) -> CancelOutcome {
+    /// checkpoint, so the run stays resumable. Unix sends SIGINT; Windows
+    /// sends Ctrl-Break to the child's own process group. A queued job is
+    /// simply dropped from the queue. A signal that cannot be delivered is
+    /// an error, never a silent no-op.
+    pub fn cancel(&self, run_id: &str) -> Result<CancelOutcome> {
         let mut state = self.state.lock().expect("job state");
         if let Some(index) = state
             .queue
@@ -118,17 +120,18 @@ impl JobRunner {
             .position(|queued| queued.run_id == run_id)
         {
             state.queue.remove(index);
-            return CancelOutcome::Dequeued;
+            return Ok(CancelOutcome::Dequeued);
         }
         let Some(running) = state
             .running
             .iter()
             .find(|running| running.run_id == run_id)
         else {
-            return CancelOutcome::NotRunning;
+            return Ok(CancelOutcome::NotRunning);
         };
-        signal_interrupt(running.child.id());
-        CancelOutcome::Signalled
+        signal_interrupt(running.child.id())
+            .with_context(|| format!("interrupting the solver of run {run_id:?}"))?;
+        Ok(CancelOutcome::Signalled)
     }
 
     /// Whether this daemon is running or holding that job.
@@ -156,6 +159,14 @@ impl JobRunner {
             JobCommand::Resume => {
                 process.arg("resume").arg(directory);
             }
+        }
+        // Its own process group is what lets `cancel` address Ctrl-Break to
+        // this child alone; it also keeps a Ctrl-C typed at the daemon's
+        // console from reaching the solve.
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            process.creation_flags(windows_sys::Win32::System::Threading::CREATE_NEW_PROCESS_GROUP);
         }
         // The child's own output is a debugging aid, not the run's record --
         // that is `events.jsonl`. Keeping it beside the run means a failure
@@ -203,16 +214,26 @@ pub enum CancelOutcome {
 }
 
 #[cfg(unix)]
-fn signal_interrupt(pid: u32) {
-    unsafe { libc::kill(pid as libc::pid_t, libc::SIGINT) };
+fn signal_interrupt(pid: u32) -> std::io::Result<()> {
+    let pid = libc::pid_t::try_from(pid).map_err(std::io::Error::other)?;
+    if unsafe { libc::kill(pid, libc::SIGINT) } == 0 {
+        Ok(())
+    } else {
+        Err(std::io::Error::last_os_error())
+    }
 }
 
-#[cfg(not(unix))]
-fn signal_interrupt(_pid: u32) {
-    // No portable cooperative interrupt; a Windows daemon would need a
-    // console control event or a shared cancel file. Cancelling there is
-    // reported as unsupported rather than silently killing the run and
-    // losing everything since the last checkpoint.
+/// The child leads its own process group (see `spawn`), whose id is its pid.
+/// Delivery needs the daemon to share a console with it; a daemon without a
+/// console gets the OS error instead of a cancel that never arrives.
+#[cfg(windows)]
+fn signal_interrupt(pid: u32) -> std::io::Result<()> {
+    use windows_sys::Win32::System::Console::{CTRL_BREAK_EVENT, GenerateConsoleCtrlEvent};
+    if unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pid) } != 0 {
+        Ok(())
+    } else {
+        Err(std::io::Error::last_os_error())
+    }
 }
 
 #[cfg(test)]
@@ -236,16 +257,23 @@ mod tests {
         }
     }
 
+    /// Like a solver, it leads its own process group, so cancelling it on
+    /// Windows reaches only this child.
     fn sleeping_child() -> Child {
-        Command::new(std::env::current_exe().unwrap())
+        let mut command = Command::new(std::env::current_exe().unwrap());
+        command
             .env("SOLVERS_QUEUE_TEST_CHILD", "1")
             .arg("--ignored")
             .arg("--exact")
             .arg("jobs::tests::child_process_helper")
             .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .unwrap()
+            .stderr(Stdio::null());
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            command.creation_flags(windows_sys::Win32::System::Threading::CREATE_NEW_PROCESS_GROUP);
+        }
+        command.spawn().unwrap()
     }
 
     fn run_dir(base: &Path, name: &str) -> PathBuf {
@@ -282,7 +310,7 @@ mod tests {
         assert!(runner.is_active("b"));
 
         // Releasing the slot lets the queue drain.
-        runner.cancel("hold");
+        runner.cancel("hold").unwrap();
         let mut state = runner.state.lock().unwrap();
         for running in &mut state.running {
             let _ = running.child.kill();
@@ -304,13 +332,13 @@ mod tests {
                 command: JobCommand::Solve,
             });
         }
-        assert_eq!(runner.cancel("waiting"), CancelOutcome::Dequeued);
+        assert_eq!(runner.cancel("waiting").unwrap(), CancelOutcome::Dequeued);
         assert!(!runner.is_active("waiting"));
     }
 
     #[test]
     fn cancelling_an_unknown_job_says_so() {
         let (_base, runner) = runner(1);
-        assert_eq!(runner.cancel("nobody"), CancelOutcome::NotRunning);
+        assert_eq!(runner.cancel("nobody").unwrap(), CancelOutcome::NotRunning);
     }
 }

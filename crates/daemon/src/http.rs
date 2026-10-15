@@ -7,16 +7,21 @@
 use std::sync::Arc;
 
 use anyhow::{Context, Result};
-use protocol::{CreateRunRequest, ErrorCode, ErrorResponse, SolutionView, ValidateRequest};
+use protocol::{
+    CreateRunRequest, ErrorCode, ErrorResponse, LineRequest, SolutionView, TreeRequest,
+    ValidateRequest,
+};
 use serde::Serialize;
 use tiny_http::{Header, Method, Request, Response, Server};
 
 use crate::api::Api;
+use crate::static_ui::StaticUi;
 use crate::tls::Tls;
 
 pub struct Daemon {
     pub api: Api,
     pub token: String,
+    pub ui: Option<StaticUi>,
 }
 
 impl Daemon {
@@ -39,6 +44,27 @@ impl Daemon {
         println!("solversd listening on {scheme}://{address} (port {port})");
         println!("runs root: {}", self.api.runs.path().display());
         println!("token: {}", self.token);
+        if self.ui.is_some() {
+            let host = server
+                .server_addr()
+                .to_ip()
+                .map(|address| {
+                    let ip = address.ip();
+                    if ip.is_unspecified() {
+                        if ip.is_ipv4() {
+                            "127.0.0.1".to_string()
+                        } else {
+                            "[::1]".to_string()
+                        }
+                    } else if ip.is_ipv6() {
+                        format!("[{ip}]")
+                    } else {
+                        ip.to_string()
+                    }
+                })
+                .unwrap_or_else(|| "127.0.0.1".to_string());
+            println!("gui: {scheme}://{host}:{port}/#token={}", self.token);
+        }
 
         let recovered = self.api.recover();
         if !recovered.requeued.is_empty() {
@@ -68,19 +94,25 @@ impl Daemon {
     }
 
     fn dispatch(&self, mut request: Request) -> Result<()> {
-        if !self.authorized(&request) {
-            return respond_error(
-                request,
-                ErrorResponse::new(ErrorCode::Unauthorized, "missing or invalid bearer token"),
-            );
-        }
-
         let url = request.url().to_string();
         let (path, query) = match url.split_once('?') {
             Some((path, query)) => (path.to_string(), query.to_string()),
             None => (url, String::new()),
         };
         let method = request.method().clone();
+        if path != "/v1"
+            && !path.starts_with("/v1/")
+            && let Some(ui) = &self.ui
+            && matches!(method, Method::Get | Method::Head)
+        {
+            return ui.serve(request, &path);
+        }
+        if !self.authorized(&request) {
+            return respond_error(
+                request,
+                ErrorResponse::new(ErrorCode::Unauthorized, "missing or invalid bearer token"),
+            );
+        }
         let segments: Vec<&str> = path.trim_matches('/').split('/').collect();
 
         match (&method, segments.as_slice()) {
@@ -91,6 +123,20 @@ impl Daemon {
                     Err(error) => return respond_error(request, error),
                 };
                 respond(request, self.api.validate(&body))
+            }
+            (Method::Post, ["v1", "line"]) => {
+                let body: LineRequest = match read_json(&mut request) {
+                    Ok(body) => body,
+                    Err(error) => return respond_error(request, error),
+                };
+                respond(request, self.api.line(&body))
+            }
+            (Method::Post, ["v1", "tree"]) => {
+                let body: TreeRequest = match read_json(&mut request) {
+                    Ok(body) => body,
+                    Err(error) => return respond_error(request, error),
+                };
+                respond(request, self.api.tree(&body))
             }
             (Method::Get, ["v1", "runs"]) => {
                 self.api.pump();
@@ -108,9 +154,12 @@ impl Daemon {
                 respond(request, self.api.run(id))
             }
             (Method::Get, ["v1", "runs", id, "events"]) => {
-                let from = query_value(&query, "from")
-                    .and_then(|value| value.parse::<u64>().ok())
-                    .unwrap_or(0);
+                let from = match query_value(&query, "from") {
+                    Ok(value) => value,
+                    Err(error) => return respond_error(request, error),
+                }
+                .and_then(|value| value.parse::<u64>().ok())
+                .unwrap_or(0);
                 respond(request, self.api.events(id, from))
             }
             (Method::Get, ["v1", "runs", id, "artifacts"]) => {
@@ -132,8 +181,15 @@ impl Daemon {
                         ),
                     );
                 };
-                let csv = query_value(&query, "format").as_deref() == Some("csv");
-                match self.api.solution_view(id, view, csv) {
+                let csv = match query_value(&query, "format") {
+                    Ok(value) => value.as_deref() == Some("csv"),
+                    Err(error) => return respond_error(request, error),
+                };
+                let nodes = match query_values(&query, "node") {
+                    Ok(nodes) => nodes,
+                    Err(error) => return respond_error(request, error),
+                };
+                match self.api.solution_view(id, view, csv, &nodes) {
                     Ok((bytes, content_type)) => send_bytes(request, 200, &bytes, content_type),
                     Err(error) => respond_error(request, error),
                 }
@@ -180,11 +236,43 @@ impl Daemon {
     }
 }
 
-fn query_value(query: &str, key: &str) -> Option<String> {
-    query.split('&').find_map(|pair| {
-        let (name, value) = pair.split_once('=')?;
-        (name == key).then(|| value.to_string())
-    })
+fn query_value(query: &str, key: &str) -> std::result::Result<Option<String>, ErrorResponse> {
+    Ok(query_values(query, key)?.into_iter().next())
+}
+
+fn query_values(query: &str, key: &str) -> std::result::Result<Vec<String>, ErrorResponse> {
+    let mut values = Vec::new();
+    for pair in query.split('&').filter(|pair| !pair.is_empty()) {
+        let (name, value) = pair.split_once('=').unwrap_or((pair, ""));
+        if decode_component(name, true)? == key {
+            values.push(decode_component(value, true)?);
+        }
+    }
+    Ok(values)
+}
+
+pub(crate) fn decode_component(
+    value: &str,
+    plus_is_space: bool,
+) -> std::result::Result<String, ErrorResponse> {
+    let invalid = || ErrorResponse::new(ErrorCode::InvalidRequest, "invalid URL encoding");
+    let mut bytes = Vec::with_capacity(value.len());
+    let mut input = value.bytes();
+    while let Some(byte) = input.next() {
+        match byte {
+            b'%' => {
+                let high = input.next().and_then(|b| (b as char).to_digit(16));
+                let low = input.next().and_then(|b| (b as char).to_digit(16));
+                let (Some(high), Some(low)) = (high, low) else {
+                    return Err(invalid());
+                };
+                bytes.push((high * 16 + low) as u8);
+            }
+            b'+' if plus_is_space => bytes.push(b' '),
+            other => bytes.push(other),
+        }
+    }
+    String::from_utf8(bytes).map_err(|_| invalid())
 }
 
 fn read_json<T: serde::de::DeserializeOwned>(
@@ -216,7 +304,7 @@ fn respond_ok<T: Serialize>(request: Request, value: &T) -> Result<()> {
     send(request, 200, &body)
 }
 
-fn respond_error(request: Request, error: ErrorResponse) -> Result<()> {
+pub(crate) fn respond_error(request: Request, error: ErrorResponse) -> Result<()> {
     let status = error.http_status();
     let body = serde_json::to_string(&error).context("serializing the error")?;
     send(request, status, &body)
@@ -247,9 +335,27 @@ mod tests {
 
     #[test]
     fn query_values_are_read_by_name() {
-        assert_eq!(query_value("from=42", "from").as_deref(), Some("42"));
-        assert_eq!(query_value("a=1&from=7&b=2", "from").as_deref(), Some("7"));
-        assert_eq!(query_value("a=1", "from"), None);
-        assert_eq!(query_value("", "from"), None);
+        assert_eq!(
+            query_value("from=42", "from").unwrap().as_deref(),
+            Some("42")
+        );
+        assert_eq!(
+            query_value("a=1&from=7&b=2", "from").unwrap().as_deref(),
+            Some("7")
+        );
+        assert_eq!(query_value("a=1", "from").unwrap(), None);
+        assert_eq!(query_value("", "from").unwrap(), None);
+    }
+
+    #[test]
+    fn query_decodes_repeatable_selectors_in_order() {
+        assert_eq!(
+            query_values("node=xx%5B2c%5D&node=bet+6.4%2Ffold&node=Ah%2A", "node").unwrap(),
+            ["xx[2c]", "bet 6.4/fold", "Ah*"]
+        );
+        assert_eq!(decode_component("/a+b.js", false).unwrap(), "/a+b.js");
+        for query in ["node=%", "node=%GG", "node=%FF"] {
+            assert!(query_values(query, "node").is_err());
+        }
     }
 }

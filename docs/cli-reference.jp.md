@@ -36,6 +36,73 @@ P1のDCFRは`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定。`pow4_reset`�
 P1の`[solver.stop] check_every`は`"auto"`が既定で、full templateにも明示する。target有りは3〜50 iterationの適応評価、target無しは固定25である。正の整数は従来の固定間隔で、旧版と同じ停止を得るには`check_every = 25`を明示する。
 書式の例は[examples索引](../examples/README.md)を参照する。
 
+## `solvers line`
+
+```sh
+solvers line <CONFIG> [--moves COMMA-LIST] [--format human|json]
+```
+
+卓の初期状態からline prefixをreplayし、次の手番と合法な入力候補を返す。
+solver・tree・range・board・economicsなど卓以外の設定は検証しないため、
+未完成のconfigでもlineを組み立てられる。TOML自体はparse可能である必要がある。
+`--moves`なしではconfigの`spot.line`を従来の厳密なline規則でreplayする。
+指定時はcomma区切りのtoken列で置換し、`--moves ""`は空prefixである。
+省略された途中のactionを補わず、prefix末尾から次の手番を返す。
+`--format`の既定は`human`。不正なmoveは`NLH004`で1-basedのmove indexを示しexit 2となる。
+
+JSONは次のobjectである。特記以外の金額はBB単位のnumber。
+
+| field | 型・意味 |
+|---|---|
+| `moves` | string[]。replayした明示token列 |
+| `line` | string。prefixのcanonical line表記 |
+| `actions` | replayしたaction object[]。各objectは`street`、`seat`、`position`、`action`、`implicit` |
+| `street` | `"preflop"` / `"flop"` / `"turn"` / `"river"`。cursorのstreet |
+| `pot` | 現在のengine stateのpot（terminal時の未call額refund適用前） |
+| `button` | buttonの固定seat ID（number） |
+| `seats` | 卓の時計回りの固定seat ID順のseat状態object[]（下記）。fold / all-inした席も含む |
+| `complete` | terminalでなく、active playerが2人以上で、現在streetのactionが無いpostflop開始状態ならtrue。solver入力全体が有効という意味ではない |
+| `boardCards` | postflop開始streetに必要な枚数（3 / 4 / 5）、それ以外はnull。実際のboardの検証結果ではない |
+| `players` | foldしていないplayer数（all-inを含む） |
+| `next` | 次の手番object、手番が無ければnull |
+| `terminal` | hand終了またはall-in runoutを含む、これ以上のbetting手番が無い状態 |
+
+`seats`の各objectは`seat`（固定ID）、`position`（position名）、
+`stack`（残りstack）、`wager`（現在streetへの投入額）、
+`committed`（ante・blindを含むhand全体への投入総額）、
+`status`（`"active"` / `"folded"` / `"allIn"`）を持つ。
+金額はすべてBB単位で、全席の`committed`の合計は`pot`となる。
+streetが閉じた直後は全席の`wager`が0になる。GUIはこれらの値を用い、
+blind・ante・stackやseat状態を独自に再計算しない。
+
+`next`の全fieldは`seat`（number）、`position`（string）、`street`（上記street）、
+`toCall`（callに必要な額）、`stack`（残りstack）、`wager`（現在streetの投入総額）、
+`options`（合法入力候補object[]）。seatは既存の固定IDでBTN=0、SB=1、BB=2、
+UTG=3、HJ=4、CO=5であり、現在の手番順の連番ではない。
+
+`options`は`kind`、`token`、必要な場合だけ`amount` / `min` / `max`を持つ。
+不要な金額fieldはnullではなく省略する。
+
+| `kind` | `token` | 金額 |
+|---|---|---|
+| `fold` | `f` | 無し |
+| `check` | `x` | 無し |
+| `call` | `c` | `amount`は実際のcall額（toCallと残りstackの小さい方）。all-in callも`call` / `c` |
+| `bet` | `b` | `min` / `max`は合法なbet-toの範囲 |
+| `raise` | `r` | `min` / `max`は合法なraise-toの範囲 |
+| `allIn` | `a` | `amount`はall-inのstreet投入総額。bet / raiseの場合だけ |
+
+bet / raiseの金額は追加投入額でなくstreet投入総額であり、
+候補の`b` / `r`に金額を付けて`b3` / `r9`のように送る。
+`a`はall-in bet / raise専用である。
+`actions`は既存replay形式を維持する。`street`は上記、`seat`は固定ID、
+`position`はposition名、`implicit`は暗黙foldならtrue。
+`action`はfold/checkなら`"fold"` / `"check"`、それ以外は
+`{"call":{"amount":1,"all_in":false}}`、
+`{"bet-to":{"to":3,"all_in":false,"full_raise":true}}`、
+`{"raise-to":{"to":9,"all_in":false,"full_raise":true}}`の形である。
+この`action`内の`amount` / `to`も`validate --format json`と同じBB単位である。
+
 ## `solvers validate`
 
 ```sh
@@ -91,6 +158,25 @@ rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警�
 P1では`tree.preflop_reraise_jam_above_stack`、既定4以外の`tree.max_aggressive_actions.preflop`、
 Preflop ruleがあれば、効果が無い設定を1つのwarningにまとめる。validateはhuman表示とJSONの`warnings`、
 solve/resumeはstderr、reportはboard集合に対して1回だけ表示する。正規化された既定値だけでは警告しない。
+
+## `solvers tree`
+
+```sh
+solvers tree <CONFIG> [--node NODE]... [--format human|json]
+```
+
+P1（`hu-postflop`）configのpublic treeをsolveせずに構築し、指定nodeの行を返す。
+P2（`mw-preflop`）は`NLH005`（exit 2）で明示的に拒否する。戦略・値・run directoryは作らない。
+`--node`の既定は`root`。履歴（`xr10c`、配牌を含む`xx[9d]`など）または
+slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。
+`all`は全action nodeを木順で返す。chance・terminalも明示selectorで選べる。
+未知nodeは入力error（exit 2）であり、無視したりrootへ戻したりしない。
+
+JSONは`export SOLUTION tree`と同じ意味の
+`history`、`kind`、`street`、`actor`、`pot`、`actions`、`children`、`child_kinds`だけを持つ行の配列で、
+成果物の保存状態を表す`stored`は含まない。potはBB、chance・terminalのactorとpotはnull。
+`children`の各履歴をそのまま次の`--node`へ渡せる。human形式（既定）は履歴・kind・street・actor・potと
+各actionから子履歴への対応を簡潔に表示する。配牌label・streetの意味は[P1第8節](hu-postflop.jp.md#8-exportとreportの値)に従う。
 
 ## `solvers solve`
 
@@ -251,10 +337,16 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 |---|---|---|
 | `--format` | `json` | JSONまたはCSV |
 | `--output PATH` | stdout | 出力先 |
-| `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action label`check/bet 3.3`、`all`も使える。繰り返すと1回の読込みで各nodeの行を指定順に連結する |
+| `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action/chance label path`check/check/Th`、`all`も使える。繰り返すと1回の読込みで各nodeの行を指定順に連結する |
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
-P1の未保存Riverはexportできない。P2ではnode selectorをinspectで指定する。
+P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会できる。chance labelはiso併合で代表cardに`*`が付き、実cardの無いrunoutでは`dealN`となる（履歴tokenは`[dealN]`）。
+`tree`の`children`（子履歴）・`child_kinds`（子kind）・`actions`は木の子順で対応し、子履歴を同じ`--node`へ渡して辿れる。
+`kind`は`action` / `chance` / `terminal`、`street`は行動street / 配牌するstreet / 終了streetである。
+`actor`・BB単位の`pot`はactionだけが持ち、他のkindではJSONのnull、CSVでは空セルとなる。terminalの3配列は空、配列のCSVセルは`|`結合である。
+`--node all`は保存済みaction nodeだけを木順で出す。chance・terminalは`stored = false`である。
+P1の未保存Riverの戦略・値はexportできないが、`tree`の照会はできる。P2ではnode selectorをinspectで指定する。
+P1で解決できない`--node`、または`actions` / `strategy` / `ev`へのchance・terminal指定は型付き入力error（exit 2）で拒否する。診断にはselectorの問題、またはaction nodeだけが戦略を持つ旨を示す。
 P1の`summary`は`.sol`のmetadataだけを読む。他のviewは保存済みの木とindexを1回展開し（木は再構築しない）、照会nodeを含むchunkだけを展開する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
@@ -342,12 +434,13 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 |---|---|
 | `0` | 成功。予算到達は品質目標達成を意味しない |
 | `1` | I/O等のその他の失敗、使用中run directoryへの書込み・in-place resumeの拒否 |
-| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005） |
+| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005）、P1 exportの不正node selector・非actionへの戦略/値照会 |
 | `3` | 成果物の破損・非互換・削除済みconfig family |
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
 
 型付き入力errorは診断に利用者由来の`resource limit`等を含んでもexit 2であり、資源上限はerror型でexit 75へ分類する。P2の資源診断は`NLH003`の表記を保つが入力errorとは区別する。
+P1 exportのnode selector入力errorは履歴・label pathを解決できない場合と、`actions` / `strategy` / `ev`へ非action nodeを指定した場合を含む。selector文字列に資源・成果物errorの語があってもexit 2であり、I/O等のexport失敗（exit 1）や破損・非互換（exit 3）と区別する。
 
 Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
 P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境界で判定する。2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
@@ -356,7 +449,7 @@ P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境�
 
 ```sh
 solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
-         [--solver PATH] [--cache-dir DIR] [--max-concurrent N] [--token TOKEN]
+         [--solver PATH] [--cache-dir DIR] [--max-concurrent N] [--token TOKEN] [--ui DIR]
 ```
 
 | flag | 既定 | 意味 |
@@ -368,27 +461,68 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `--cache-dir DIR` | 無し | 各runへ渡すmachine cache |
 | `--max-concurrent N` | `1` | 同時job数 |
 | `--token TOKEN` | 環境変数、次に生成値 | bearer token。起動時に表示 |
+| `--ui DIR` | 無し | build済みSPAの静的asset directory。API以外のGET/HEADは認証不要 |
 | `-h` / `--help`、`-V` / `--version` | — | help / version |
 
-全endpointはbearer tokenを要求する。
+`/v1`と`/v1/`配下はbearer tokenを要求する。`--ui`なしでは従来どおり全requestに要求する。
 
 | method | path | 内容 |
 |---|---|---|
 | `GET` | `/v1` | protocol/CLI versionと同時実行数 |
 | `POST` | `/v1/validate` | configTomlをCLIで検証・正規化 |
-| `GET` / `POST` | `/v1/runs` | 一覧 / configTomlからjob投入 |
-| `GET` | `/v1/runs/{id}` | state・進捗summary |
+| `POST` | `/v1/line` | 卓とline prefixをCLIでreplayし、次の合法手を返す |
+| `POST` | `/v1/tree` | P1 configのpublic treeをsolveせず構築し、指定nodeの行を返す |
+| `GET` / `POST` | `/v1/runs` | 一覧 / configTomlからjob投入。RunSummaryは最後のraw進捗行`lastProgress`を含む |
+| `GET` | `/v1/runs/{id}` | state・進捗summary。`progress`・`elapsedSecs`と製品固有の`lastProgress` |
 | `GET` | `/v1/runs/{id}/events?from=OFFSET` | event page。nextOffset・terminal付き |
 | `GET` | `/v1/runs/{id}/artifacts` | 契約上のartifact一覧 |
 | `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact本体 |
-| `GET` | `/v1/runs/{id}/solution/{view}` | P2の`.mwsol`をCLI exportで照会 |
-| `POST` | `/v1/runs/{id}/cancel` | 協調停止 |
+| `GET` | `/v1/runs/{id}/solution/{view}?format=csv&node=SELECTOR` | P1の`.sol` / P2の`.mwsol`をCLI exportで照会。`node`はP1のみ、繰り返し可 |
+| `POST` | `/v1/runs/{id}/cancel` | 協調停止（Unix: SIGINT、Windows: Ctrl-Break）。送れなければ`internal` |
 | `POST` | `/v1/runs/{id}/resume` | 再開 |
+| `GET` / `HEAD` | `/`とAPI以外のpath | `--ui DIR`指定時のみ、tokenなしで静的asset / SPA fallback |
+
+`lastProgress`は最後の`progress.jsonl`行であり、無ければ省略する。P1では
+`iteration`・`elapsed_secs`・`expl_p0`・`expl_p1`・`nash_conv`を保持するため、
+一覧から追加のartifact取得なしで`nash_conv / 2`（Exploitability）を表示できる。
+
+`POST /v1/line`のbodyは`{"configToml":"...","moves":["r3","c"]}`。
+`configToml`は必須string、`moves`は任意string[]であり、省略/nullならconfigの
+`spot.line`を厳密にreplay、`[]`なら空prefixである。daemonは一時fileへ本文を書き、
+`solvers line CONFIG --format json`へ委譲する。moves指定時はcommaで連結して
+`--moves`へ渡す。成功はHTTP 200で上記cursor JSONをwrapperなしで返す。
+CLIの拒否はHTTP 400 `invalid-config`でstderrを`message`に保持する。
+認証は他の`/v1`と同じbearer tokenであり、未認証は401、起動/I/O/JSON出力の失敗は
+`internal`。runは作らず、卓以外の設定やfile参照は読まない。
+
+`POST /v1/tree`のbodyは`{"configToml":"...","nodes":["root"]}`。
+`configToml`は必須string、`nodes`は任意string[]で、省略または`[]`ならrootだけを返す。
+daemonは一時fileへ本文を書き、`solvers tree CONFIG --format json`へ委譲する。
+`nodes`は指定順で繰り返しの`--node`に渡す。成功はHTTP 200で上記tree行のJSON配列をwrapperなしで返す。
+不正config・P2・未知nodeはHTTP 400 `invalid-config`でCLIのstderrを`message`に保持する。
+認証は他の`/v1`と同じbearer token、未認証は401、起動/I/O/JSON出力の失敗は`internal`である。
+外部sourceを使うconfigは、先に`validate --write-effective`でinline化してから送る。
+
+cancelはCLIの1回目のCtrl-C / SIGINTと同じ境界停止であり、checkpointを保存して`canceled`になる。
+Windowsのdaemonは子を別process groupで起動し、そのgroupへCtrl-Breakを送る。consoleを持たないdaemonでは
+送信できないため、成功を装わず`internal`を返す。daemonのconsoleへのCtrl-Cは子のsolveへ届かない。
 
 daemonは計算せず、CLIへ委譲する。入力は同じ`solvers.nlh/v1`である。
 外部tree sourceなどのfile参照は`ConfigNotSelfContained`で拒否するため、
 `validate --write-effective`でinline化してからconfigTomlを送る。
-HTTP solution viewはP2のみ。P1はartifactを取得してCLIで照会する。
+solution viewは`solution.sol`を優先し、無ければ`solution.mwsol`を使う。どちらも無ければ
+`unavailable`。既定はJSON、`format=csv`でCSV。P1の`node`はpercent decoding（`+`はspace）
+して指定順にCLIの`--node`へ渡し、省略時はCLIの既定と同じである。
+P2への`node`指定、不正なquery encoding、CLIの入力error（exit 2）はHTTP 400
+`invalid-request`となり、CLI errorではstderrをmessageに載せる。その他のexport失敗は
+`internal`。追加契約のためprotocol versionは`1`のまま。
+
+`--ui`では`/`は`index.html`、存在しない拡張子なしpathは`index.html`へfallback、
+存在しない拡張子ありpathは404となる。`index.html`は`Cache-Control: no-cache`。
+HTML・JS/MJS・CSS・SVG・PNG・ICO・JSON/MAP・WOFF2・TXTのContent-Typeを設定する。
+復号後の`..`・absolute・backslash・drive componentと、canonical pathがDIR外へ出る参照は拒否する。
+起動時の`token:`行の後に`gui: {scheme}://{host}:{port}/#token={token}`を表示する。
+unspecified bindのhostはIPv4なら`127.0.0.1`、IPv6なら`[::1]`として表示する。
 HTTP契約とviewer境界は[app-architecture.md](app-architecture.md)を参照する。
 
 ## 同期

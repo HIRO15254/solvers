@@ -1,0 +1,18 @@
+/* @font-face rules for the font files Cryst stores with the system
+   (tokens.json `type.fonts`). The generated tokens.css does not declare them;
+   Noto Sans JP comes from Google Fonts through bundle.css. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../../vendor/cryst/fonts/jetbrains-mono-variable-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "tabler-icons";
+  src: url("../../vendor/cryst/fonts/tabler-icons.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}

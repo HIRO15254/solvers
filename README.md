@@ -46,9 +46,9 @@ its game. The `solvers` CLI dispatches to them, owns the run directory, and
 renders the results.
 `solversd` manages CLI child processes locally or remotely. The exact HU
 postflop path can start on the flop, turn, or river; the sampled Multiway
-Preflop path is a separate engine. A Web GUI is a later stage (S5 in the
-product definition) and will be a client of the daemon — see
-[docs/app-architecture.md](docs/app-architecture.md) for the current boundaries.
+Preflop path is a separate engine. The Web GUI in `web/` (S5 in the product
+definition) is a client of the daemon — see
+[docs/app-architecture.md](docs/app-architecture.md) for the boundaries.
 
 ```
 crates/
@@ -65,6 +65,7 @@ crates/
 ├── mw-preflop  # P2 menu policy, external-sampling MCCFR, EHS² buckets, solve loop, .mwsol, views
 ├── runfiles    # run-directory contracts, progress metrics, config hashing
 └── hu-postflop # exact multi-street postflop, payoff pipeline, solve loop, .sol/checkpoint, views, report, toy games
+web/            # Web GUI (React + TypeScript, Vite): Setup / Runs / Results over solversd
 ```
 
 Current specifications and architecture live in `docs/`; actionable plans in
@@ -139,8 +140,8 @@ cargo run -p cli --release -- report examples/hu-postflop/river_small.toml \
 
 `solversd` accepts a config over HTTP, prepares a run directory, and spawns
 `solvers` into it. Durable job state lives in the run directory, so a restart
-finds every run by reading the runs root again. HTTP solution views currently
-read Multiway `.mwsol` artifacts; HU postflop views use the CLI `export` command.
+finds every run by reading the runs root again. HTTP solution views delegate
+to `solvers export` for both HU postflop `.sol` and Multiway `.mwsol` artifacts.
 
 ```bash
 cargo build --release -p cli -p daemon
@@ -160,6 +161,21 @@ curl -H "Authorization: Bearer $TOKEN" localhost:38127/v1/runs/$ID/solution/summ
 
 Runs it creates are ordinary run directories: `solvers status` and
 `solvers watch` read them too.
+
+### Web GUI
+
+The GUI edits a P1 input (Setup), follows runs and their convergence (Runs),
+and browses a finished HU postflop solution node by node (Results). Build it
+once with Node.js 22+, then let the daemon serve it:
+
+```bash
+(cd web && npm ci && npm run build)
+cargo run -p daemon --release -- --runs runs --ui web/dist
+```
+
+Open the `gui:` URL the daemon prints; it carries the token in the fragment,
+which the GUI stores for that origin. For GUI development, `npm run dev` in
+`web/` proxies `/v1` to a daemon on `127.0.0.1:38127` (`SOLVERSD_URL` overrides).
 
 Binding anything but loopback requires TLS -- the token travels in a header,
 so a clear connection hands it to anyone on the path:

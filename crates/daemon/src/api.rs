@@ -9,8 +9,8 @@ use std::process::Command;
 
 use protocol::{
     ArtifactEntry, ArtifactListResponse, CreateRunRequest, CreateRunResponse, ErrorCode,
-    ErrorResponse, EventPage, PROTOCOL_VERSION, RunListResponse, RunSummary, ServerInfo,
-    SolutionView, ValidateRequest, ValidateResponse,
+    ErrorResponse, EventPage, LineRequest, PROTOCOL_VERSION, RunListResponse, RunSummary,
+    ServerInfo, SolutionView, TreeRequest, ValidateRequest, ValidateResponse,
 };
 use runfiles::{RunEventLog, RunManifest, RunState, read_events};
 
@@ -77,6 +77,46 @@ impl Api {
             effective_config_toml,
             summary,
         })
+    }
+
+    /// Delegates table-only line replay to the CLI and passes its JSON through.
+    pub fn line(&self, request: &LineRequest) -> ApiResult<serde_json::Value> {
+        let scratch = tempfile::tempdir().map_err(internal)?;
+        let config = scratch.path().join("submitted.toml");
+        std::fs::write(&config, &request.config_toml).map_err(internal)?;
+        let mut command = Command::new(&self.solver);
+        command.arg("line").arg(&config).arg("--format").arg("json");
+        if let Some(moves) = &request.moves {
+            command.arg("--moves").arg(moves.join(","));
+        }
+        let output = command.output().map_err(internal)?;
+        if !output.status.success() {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidConfig,
+                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+            ));
+        }
+        serde_json::from_slice(&output.stdout).map_err(internal)
+    }
+
+    /// Builds a config's tree through the CLI and passes its JSON rows through.
+    pub fn tree(&self, request: &TreeRequest) -> ApiResult<serde_json::Value> {
+        let scratch = tempfile::tempdir().map_err(internal)?;
+        let config = scratch.path().join("submitted.toml");
+        std::fs::write(&config, &request.config_toml).map_err(internal)?;
+        let mut command = Command::new(&self.solver);
+        command.arg("tree").arg(&config).arg("--format").arg("json");
+        for node in &request.nodes {
+            command.arg("--node").arg(node);
+        }
+        let output = command.output().map_err(internal)?;
+        if !output.status.success() {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidConfig,
+                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+            ));
+        }
+        serde_json::from_slice(&output.stdout).map_err(internal)
     }
 
     pub fn list_runs(&self) -> ApiResult<RunListResponse> {
@@ -192,7 +232,11 @@ impl Api {
                 ),
             ));
         }
-        match self.jobs.cancel(run_id) {
+        let outcome = self
+            .jobs
+            .cancel(run_id)
+            .map_err(|error| internal(format!("{error:#}")))?;
+        match outcome {
             CancelOutcome::Signalled | CancelOutcome::Dequeued => self.run(run_id),
             CancelOutcome::NotRunning => Err(ErrorResponse::new(
                 ErrorCode::Conflict,
@@ -279,30 +323,47 @@ impl Api {
         run_id: &str,
         view: SolutionView,
         csv: bool,
+        nodes: &[String],
     ) -> ApiResult<(Vec<u8>, &'static str)> {
         let directory = self.run_directory(run_id)?;
-        let solution = directory.join(runfiles::RUN_SOLUTION_FILE);
-        if !solution.is_file() {
+        let postflop = directory.join("solution.sol");
+        let multiway = directory.join(runfiles::RUN_SOLUTION_FILE);
+        let (solution, is_postflop) = if postflop.is_file() {
+            (postflop, true)
+        } else if multiway.is_file() {
+            (multiway, false)
+        } else {
             return Err(ErrorResponse::new(
                 ErrorCode::Unavailable,
-                format!(
-                    "run {run_id:?} has no {}; only a finished multiway run has one",
-                    runfiles::RUN_SOLUTION_FILE
-                ),
+                format!("run {run_id:?} has no solution.sol or solution.mwsol"),
+            ));
+        };
+        if !is_postflop && !nodes.is_empty() {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidRequest,
+                "node selectors are supported only for postflop solution.sol artifacts",
             ));
         }
-        let output = Command::new(&self.solver)
+        let mut command = Command::new(&self.solver);
+        command
             .arg("export")
             .arg(&solution)
             .arg(view.as_str())
             .arg("--format")
-            .arg(if csv { "csv" } else { "json" })
-            .output()
-            .map_err(internal)?;
+            .arg(if csv { "csv" } else { "json" });
+        for node in nodes {
+            command.arg("--node").arg(node);
+        }
+        let output = command.output().map_err(internal)?;
+        let stderr = String::from_utf8_lossy(&output.stderr);
         if !output.status.success() {
             return Err(ErrorResponse::new(
-                ErrorCode::Internal,
-                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+                if output.status.code() == Some(2) {
+                    ErrorCode::InvalidRequest
+                } else {
+                    ErrorCode::Internal
+                },
+                stderr.trim().to_string(),
             ));
         }
         Ok((

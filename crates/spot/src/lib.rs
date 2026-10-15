@@ -1,5 +1,6 @@
 //! Strict `solvers.nlh/v1` document parsing and normalization.
 //! Product implementations own solver/output validation through `ProductSections`.
+mod cursor;
 pub mod derive;
 mod dialect;
 mod error;
@@ -9,6 +10,7 @@ mod parse;
 mod replay;
 mod summary;
 
+pub use cursor::{LineCursor, LineNext, LineOption, LineOptionKind, LineSeat, line_cursor};
 pub use dialect::{NLH_V1, TreeVar, parse_size_literal};
 pub use error::{Code, SpotError};
 pub use ir::*;

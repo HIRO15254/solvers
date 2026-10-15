@@ -160,7 +160,7 @@ storageの量子化誤差と`.sol`の出力量子化を区別する。card/bucke
 `[output] solution_streets = "full"`（既定）は全action nodeの戦略と値を席別supportのcompact次元で保存する。
 `"no-rivers"`はRiver action nodeの戦略と値を保存しない。
 River開始では保存対象が空にならないよう`full`へ強制する。
-未保存Riverへの`export`はerrorである。`inspect`の遅延再解決は新しい計算であり、保存時の値ではない。
+未保存Riverの戦略・値への`export`はerrorである。`tree`は未保存nodeも照会できる。`inspect`の遅延再解決は新しい計算であり、保存時の値ではない。
 
 node履歴はspotのlineとは別の文法である。actor positionとstreet区切りを持たず、tokenを連結する。
 
@@ -171,6 +171,7 @@ node履歴はspotのlineとは別の文法である。actor positionとstreet区
 | `c` | call |
 | `rN` | bet/raise。Nはactorのspot開始後の累計拠出（BB）。street内raise-toではない |
 | `[Th]` | chance nodeの配牌 |
+| `[dealN]` | 実cardを記録しないall-in runoutのchance branch。Nは0始まりの子位置であり、同じ親のbranchを一意に指す |
 
 例は`xr5c[Th]xx`である。decimalは0.001 BB gridの最短表記である。
 node selectorとaction labelによる指定はCLI referenceに従う。
@@ -326,7 +327,7 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 | export view | 内容 |
 |---|---|
 | `summary` | board、pot、effective_stack、min_bet、iterations、ev_oop/ip、expl_oop/ip、nash_conv、storage、wall_secs、streets_stored、nodes、stored_nodes |
-| `tree` | history、street、actor、pot、stored、actions |
+| `tree` | history、kind、street、actor、pot、stored、actions、children、child_kinds |
 | `actions` | node × actionのfrequency |
 | `strategy` | node × comboのweightとprobabilities |
 | `ev` | node × seat × comboのweightとev |
@@ -335,9 +336,25 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 `tree`・`actions`・`strategy`・`ev`は`--node`が指すnodeの行を出す。`--node`は繰り返せ、1回の読込みで各指定の行を指定順に連結する（SOL-14）。
 各行は`history`列を持つので、連結しても行の所属nodeを区別できる。`summary`と`range`は`--node`を使わない。
 
+`tree`の明示selectorはaction・chance・terminalの全kindを受理する。`kind`は`action` / `chance` / `terminal`である。
+`street`はactionでは行動street、chanceでは次に配るstreet、terminalでは終了したstreetを表す。
+`actor`（`oop` / `ip`）とBB単位の`pot`はactionだけが持ち、chance・terminalではJSONの`null`となる。
+`actions`はaction label、chanceでは配牌label（iso併合は代表cardに`*`、実cardが無ければ`dealN`）、terminalでは空配列である。
+`children`は子nodeの履歴、`child_kinds`はそのkindであり、両者と`actions`は同じ木の子順で対応する。
+全ての子履歴を同じnode selectorで再照会できる。terminalの3配列は空である。
+`stored`は保存済み戦略・値blockの有無を示し、chance・terminalではfalseとなる。
+`--node all`は従来どおり保存済みaction nodeだけを木順で出す。木の全kindを列挙する指定ではない。
+`actions` / `strategy` / `ev`にchance・terminalを指定すると、action nodeだけが戦略を持つ旨の入力error（exit 2）で拒否する。
+解決できない履歴・label pathも型付きnode selector入力error（exit 2）であり、成果物読込み・I/O errorとは区別する。
+
+solve前は`solvers tree CONFIG [--node NODE]... [--format human|json]`で同じpublic treeを構築して照会できる。
+JSONは上記`tree`行から`stored`だけを除いた8 fieldを持つ。木の構築・index・selectorと行の意味はexportと共有し、
+戦略・値・成果物は作らない。既定はrootだけ、`all`は保存範囲に関係なく全action nodeを木順で返す。
+configの不正と未知selectorは入力error（exit 2）であり、P2 configは`NLH005`で拒否する。
+
 pot・stack・action額はBB、EVとexplはutility単位である。
 nodeのweightは到達weightであり、root rangeのweightと区別する。frequencyは同じweightで加重する。
-CSVの配列列は`|`で結合する。公開combo表記はglobalの実card表記を維持する。
+CSVの配列列は`|`で結合する。`tree`の列順は`history,kind,street,actor,pot,stored,actions,children,child_kinds`で、`null`のセルは空文字となる。公開combo表記はglobalの実card表記を維持する。
 開始rangeのweight 0のhandはstrategy/EV/rangeに出力しない。
 support外のcombo照会は「rangeに無い」旨のerrorまたは空結果であり、値0を返さない。
 13×13 class集計はsupportをglobal combo領域へ展開して行う。

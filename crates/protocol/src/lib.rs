@@ -56,6 +56,29 @@ pub struct ValidateResponse {
     pub summary: serde_json::Value,
 }
 
+/// `POST /v1/line` -- replay a line prefix using only the table configuration.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LineRequest {
+    /// Submitted TOML text, never a client-selected filesystem path.
+    pub config_toml: String,
+    /// Explicit prefix; absent uses the config's strict `spot.line` replay.
+    /// An empty list explicitly starts at the initial table state.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub moves: Option<Vec<String>>,
+}
+
+/// `POST /v1/tree` -- inspect a P1 config's public tree without solving.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TreeRequest {
+    /// Submitted TOML text, never a client-selected filesystem path.
+    pub config_toml: String,
+    /// Node selectors in request order; absent or empty selects the root.
+    #[serde(default)]
+    pub nodes: Vec<String>,
+}
+
 /// `POST /v1/runs` -- create a run and start it (or queue it).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -100,6 +123,9 @@ pub struct RunSummary {
     pub progress: Option<u64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub elapsed_secs: Option<f64>,
+    /// The last raw product-specific progress row, when one has been written.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_progress: Option<serde_json::Value>,
     /// Byte offset to resume the event stream from.
     pub events_offset: u64,
     /// The run stopped with a checkpoint, so `POST /resume` would continue it.
@@ -200,6 +226,8 @@ pub enum ErrorCode {
     NotFound,
     /// The config did not parse, normalize, or validate.
     InvalidConfig,
+    /// A solution view or its node selectors are not valid for the artifact.
+    InvalidRequest,
     /// The config carries a path the daemon refuses to resolve (R10).
     ConfigNotSelfContained,
     /// The request was well-formed but not applicable -- cancelling a run
@@ -225,7 +253,9 @@ impl ErrorResponse {
         match self.code {
             ErrorCode::Unauthorized => 401,
             ErrorCode::NotFound => 404,
-            ErrorCode::InvalidConfig | ErrorCode::ConfigNotSelfContained => 400,
+            ErrorCode::InvalidConfig
+            | ErrorCode::InvalidRequest
+            | ErrorCode::ConfigNotSelfContained => 400,
             ErrorCode::Conflict => 409,
             ErrorCode::Unavailable => 409,
             ErrorCode::Internal => 500,
@@ -251,6 +281,7 @@ mod tests {
             failure: None,
             progress: Some(12),
             elapsed_secs: Some(1.5),
+            last_progress: Some(serde_json::json!({"sweeps": 12, "elapsed_secs": 1.5})),
             events_offset: 256,
             resumable: false,
         };
@@ -258,9 +289,18 @@ mod tests {
         assert_eq!(json["runId"], "run-1");
         assert_eq!(json["state"], "running");
         assert_eq!(json["eventsOffset"], 256);
+        assert_eq!(json["lastProgress"]["sweeps"], 12);
         // Absent rather than null, so a client can treat presence as meaning.
         assert!(json.get("completion").is_none());
         assert_eq!(serde_json::from_value::<RunSummary>(json).unwrap(), summary);
+        let mut old_json = serde_json::to_value(&summary).unwrap();
+        old_json.as_object_mut().unwrap().remove("lastProgress");
+        assert!(
+            serde_json::from_value::<RunSummary>(old_json)
+                .unwrap()
+                .last_progress
+                .is_none()
+        );
     }
 
     /// Adding an optional field must not break a client that never sends it.
@@ -277,6 +317,7 @@ mod tests {
             (ErrorCode::Unauthorized, 401),
             (ErrorCode::NotFound, 404),
             (ErrorCode::InvalidConfig, 400),
+            (ErrorCode::InvalidRequest, 400),
             (ErrorCode::ConfigNotSelfContained, 400),
             (ErrorCode::Conflict, 409),
             (ErrorCode::Unavailable, 409),
@@ -284,6 +325,18 @@ mod tests {
         ] {
             assert_eq!(ErrorResponse::new(code, "x").http_status(), status);
         }
+    }
+
+    #[test]
+    fn invalid_request_is_an_additive_version_one_error() {
+        assert_eq!(PROTOCOL_VERSION, 1);
+        let error = ErrorResponse::new(ErrorCode::InvalidRequest, "invalid node");
+        let json = serde_json::to_value(&error).unwrap();
+        assert_eq!(json["code"], "invalid-request");
+        assert_eq!(
+            serde_json::from_value::<ErrorResponse>(json).unwrap(),
+            error
+        );
     }
 
     /// The event page is the resumable half of the protocol; its two fields

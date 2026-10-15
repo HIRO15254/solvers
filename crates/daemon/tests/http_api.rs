@@ -1,9 +1,7 @@
-//! End-to-end tests over a real socket, against a stub solver.
+//! End-to-end tests over real sockets.
 //!
-//! The daemon's job is orchestration -- accept a config, prepare a run
-//! directory, spawn something into it, and serve what that directory says.
-//! A stub solver exercises all of that in milliseconds; the real CLI is
-//! covered by its own tests and by the ignored acceptance runs.
+//! A native stub covers process orchestration cheaply. The solution-view
+//! contract also uses the real CLI to solve and export a small P1 artifact.
 
 use std::io::{Read, Write};
 use std::net::TcpStream;
@@ -50,6 +48,23 @@ fn stub_solver() -> &'static Path {
         .executable
 }
 
+/// The real CLI is built by the workspace verification before these tests.
+/// An explicit override also supports testing an installed CLI.
+fn real_solver() -> PathBuf {
+    let executable = std::env::var_os("SOLVERS_TEST_SOLVER")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            Path::new(env!("CARGO_BIN_EXE_solversd"))
+                .with_file_name(format!("solvers{}", std::env::consts::EXE_SUFFIX))
+        });
+    assert!(
+        executable.is_file(),
+        "real CLI missing at {}; run cargo build -p cli first or set SOLVERS_TEST_SOLVER",
+        executable.display()
+    );
+    executable
+}
+
 struct Daemon {
     child: Child,
     port: u16,
@@ -78,7 +93,10 @@ impl Daemon {
 
     /// Starts a daemon over `home`. Restarting means calling this twice.
     fn start_in(home: &Path, max_concurrent: usize) -> Self {
-        let solver = stub_solver();
+        Self::start_with_solver(home, max_concurrent, stub_solver())
+    }
+
+    fn start_with_solver(home: &Path, max_concurrent: usize, solver: &Path) -> Self {
         let runs = home.join("runs");
 
         // Port 0 asks the OS for a free port, which the daemon prints.
@@ -194,6 +212,39 @@ fn parse(body: &str) -> serde_json::Value {
     serde_json::from_str(body).unwrap_or_else(|error| panic!("not JSON: {body:?} ({error})"))
 }
 
+#[test]
+fn config_tree_preview_delegates_to_real_cli() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_with_solver(home.path(), 1, &real_solver());
+    let config = include_str!("../../../examples/hu-postflop/river_small.toml");
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, rows) = daemon.post("/v1/tree", &body);
+    assert_eq!(status, 200, "{rows}");
+    assert_eq!(rows.as_array().unwrap().len(), 1);
+    assert_eq!(rows[0]["history"], "");
+    assert_eq!(rows[0]["kind"], "action");
+    assert_eq!(rows[0]["street"], "river");
+    assert_eq!(rows[0]["actor"], "oop");
+    assert!(rows[0]["pot"].as_f64().unwrap() > 0.0);
+    assert_eq!(rows[0].as_object().unwrap().len(), 8);
+    assert!(rows[0].get("stored").is_none());
+    let child = rows[0]["children"][0].as_str().unwrap();
+    let body = serde_json::json!({ "configToml": config, "nodes": [child] }).to_string();
+    let (status, selected) = daemon.post("/v1/tree", &body);
+    assert_eq!(status, 200, "{selected}");
+    assert_eq!(selected[0]["history"], child);
+    let (status, error) = daemon.post("/v1/tree", r#"{"configToml":"not valid TOML"}"#);
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "invalid-config");
+    assert!(error["message"].as_str().unwrap().contains("NLH"));
+    let body = serde_json::json!({ "configToml": config, "nodes": ["not-a-node"] }).to_string();
+    let (status, error) = daemon.post("/v1/tree", &body);
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "invalid-config");
+    assert!(error["message"].as_str().unwrap().contains("not-a-node"));
+    assert!(!daemon.runs.exists() || std::fs::read_dir(&daemon.runs).unwrap().next().is_none());
+}
+
 fn config(marker: &str) -> String {
     serde_json::json!({ "configToml": format!("schema = \"solvers.nlh/v1\"\n# {marker}\n") })
         .to_string()
@@ -211,6 +262,46 @@ fn a_request_without_the_token_is_refused() {
     assert_eq!(info["protocolVersion"], 1);
 }
 
+#[test]
+fn line_passes_cli_json_and_preserves_optional_prefixes() {
+    let daemon = Daemon::start(1);
+    for (moves, expected) in [
+        (None, serde_json::Value::Null),
+        (Some(vec![]), serde_json::json!("")),
+        (Some(vec!["r3", "c"]), serde_json::json!("r3,c")),
+    ] {
+        let mut body = serde_json::json!({"configToml": "# submitted table\n"});
+        if let Some(moves) = moves {
+            body["moves"] = serde_json::json!(moves);
+        }
+        let (status, cursor) = daemon.post("/v1/line", &body.to_string());
+        assert_eq!(status, 200, "{cursor}");
+        assert_eq!(cursor["receivedMoves"], expected);
+        assert_eq!(cursor["pot"], 1.5);
+        assert_eq!(cursor["complete"], false);
+        assert!(cursor.get("summary").is_none(), "JSON must not be wrapped");
+    }
+}
+
+#[test]
+fn line_invalid_config_preserves_cli_diagnostic() {
+    let daemon = Daemon::start(1);
+    let (status, error) = daemon.post("/v1/line", &config("REJECT"));
+    assert_eq!(status, 400);
+    assert_eq!(error["code"], "invalid-config");
+    assert_eq!(error["message"], "NLH004: illegal move at index 1");
+}
+
+#[test]
+fn line_requires_the_same_bearer_token_as_validate() {
+    let daemon = Daemon::start(1);
+    for token in [None, Some("wrong")] {
+        let (status, body) = daemon.request("POST", "/v1/line", token, Some(&config("auth")));
+        assert_eq!(status, 401);
+        assert_eq!(parse(&body)["code"], "unauthorized");
+    }
+}
+
 /// The whole point of the daemon: hand it a config, get a run directory
 /// that every other reader -- `solvers status`, a GUI -- can read too.
 #[test]
@@ -223,6 +314,18 @@ fn a_submitted_config_becomes_a_run_directory() {
     let finished = daemon.await_terminal(&run_id);
     assert_eq!(finished["state"], "completed");
     assert_eq!(finished["progress"], 42);
+    assert_eq!(
+        finished["lastProgress"],
+        serde_json::json!({"iteration": 42, "elapsedSecs": 0.5})
+    );
+    let (_, listed) = daemon.get("/v1/runs");
+    let listed_run = listed["runs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|run| run["runId"] == run_id)
+        .unwrap();
+    assert_eq!(listed_run["lastProgress"], finished["lastProgress"]);
 
     // The daemon holds no state of its own: everything it served is on disk.
     let directory = daemon.runs.join(&run_id);
@@ -462,6 +565,210 @@ fn a_solution_view_of_a_run_without_one_is_unavailable() {
 
     let (status, _) = daemon.get(&format!("/v1/runs/{run_id}/solution/nonsense"));
     assert_eq!(status, 404);
+}
+
+#[test]
+fn postflop_solution_views_use_real_cli_and_ordered_decoded_nodes() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_with_solver(home.path(), 1, &real_solver());
+    let config = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2c 7d 9h Js Qs"
+[ranges]
+BB = "AsAh"
+BTN = "KsKh"
+[tree]
+include_allin = false
+script = '''river when unopened { force bet [50] }'''
+[tree.max_aggressive_actions]
+flop = 2
+turn = 2
+river = 2
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 2
+check_every = 1
+[run]
+threads = 1
+"#;
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, created) = daemon.post("/v1/runs", &body);
+    assert_eq!(status, 200, "{created}");
+    let run_id = created["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(run_id);
+    assert_eq!(finished["state"], "completed", "{finished}");
+    let directory = daemon.runs.join(run_id);
+    assert!(directory.join("solution.sol").is_file());
+    let progress: serde_json::Value = std::fs::read_to_string(directory.join("progress.jsonl"))
+        .unwrap()
+        .lines()
+        .last()
+        .map(|row| serde_json::from_str(row).unwrap())
+        .unwrap();
+    assert_eq!(finished["lastProgress"], progress);
+    assert_eq!(finished["progress"], progress["iteration"]);
+    assert!(finished["lastProgress"]["nash_conv"].is_number());
+    // Even when both names exist, P1 takes precedence.
+    std::fs::write(directory.join("solution.mwsol"), b"not a multiway artifact").unwrap();
+
+    let base = format!("/v1/runs/{run_id}/solution");
+    let (status, tree) = daemon.get(&format!("{base}/tree?node=root"));
+    assert_eq!(status, 200, "{tree}");
+    let rows = tree.as_array().expect("tree rows");
+    assert_eq!(rows.len(), 1);
+    let root = &rows[0];
+    assert_eq!(root["kind"], "action");
+    assert_eq!(root["stored"], true);
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, preview) = daemon.post("/v1/tree", &body);
+    assert_eq!(status, 200, "{preview}");
+    let mut expected = root.clone();
+    expected.as_object_mut().unwrap().remove("stored");
+    assert_eq!(preview[0], expected);
+    assert!(root["pot"].as_f64().unwrap() > 0.0);
+    let actions = root["actions"].as_array().unwrap();
+    let children = root["children"].as_array().unwrap();
+    let child_kinds = root["child_kinds"].as_array().unwrap();
+    assert_eq!(children.len(), actions.len());
+    assert_eq!(child_kinds.len(), actions.len());
+    let bet = actions
+        .iter()
+        .position(|action| action == "bet 10")
+        .unwrap();
+    assert_eq!(child_kinds[bet], "action");
+
+    let (status, selected) = daemon.get(&format!("{base}/tree?node=%62et%2010"));
+    assert_eq!(status, 200, "{selected}");
+    assert_eq!(selected[0]["history"], children[bet]);
+
+    let (status, strategy) = daemon.get(&format!("{base}/strategy?node=root"));
+    assert_eq!(status, 200, "{strategy}");
+    let strategy_rows = strategy.as_array().expect("strategy rows");
+    assert!(!strategy_rows.is_empty());
+    assert!(
+        strategy_rows
+            .iter()
+            .all(|row| row["history"] == root["history"])
+    );
+
+    let (status, repeated) = daemon.get(&format!(
+        "{base}/tree?node=%62et%2010&node=%72oot&node=bet+10"
+    ));
+    assert_eq!(status, 200, "{repeated}");
+    assert_eq!(repeated.as_array().unwrap().len(), 3);
+    assert_eq!(repeated[0], selected[0]);
+    assert_eq!(repeated[1], *root);
+    assert_eq!(repeated[2], selected[0]);
+
+    let (status, error) = daemon.get(&format!("{base}/strategy?node=not-a-node"));
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "invalid-request");
+    assert!(!error["message"].as_str().unwrap().is_empty());
+
+    let (status, terminal) = daemon.get(&format!("{base}/tree?node=bet%2010%2Ffold"));
+    assert_eq!(status, 200, "{terminal}");
+    assert_eq!(terminal[0]["kind"], "terminal");
+    let (status, error) = daemon.get(&format!("{base}/strategy?node=bet%2010%2Ffold"));
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "invalid-request");
+    assert!(!error["message"].as_str().unwrap().is_empty());
+
+    for node in ["%ZZ", "%FF"] {
+        let (status, error) = daemon.get(&format!("{base}/tree?node={node}"));
+        assert_eq!(status, 400, "{error}");
+        assert_eq!(error["code"], "invalid-request");
+    }
+
+    // Artifact parse/IO failures are not client selector errors.
+    std::fs::write(directory.join("solution.sol"), b"not a postflop artifact").unwrap();
+    let (status, error) = daemon.get(&format!("{base}/tree"));
+    assert_eq!(status, 500, "{error}");
+    assert_eq!(error["code"], "internal");
+}
+
+/// Cancelling reaches the real solver on every platform: it stops at an
+/// evaluation boundary and records a resumable `canceled` run, rather than
+/// the request succeeding while the solve carries on.
+#[test]
+fn cancelling_a_running_postflop_solve_stops_it_resumably() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_with_solver(home.path(), 1, &real_solver());
+    let config = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2c 7d 9h Js Qs"
+[ranges]
+BB = "AsAh"
+BTN = "KsKh"
+[tree]
+include_allin = false
+script = '''river when unopened { force bet [50] }'''
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 1000000000
+check_every = 1000
+[run]
+threads = 1
+"#;
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, created) = daemon.post("/v1/runs", &body);
+    assert_eq!(status, 200, "{created}");
+    let run_id = created["runId"].as_str().unwrap();
+
+    // A first progress row means the solver is past start-up and its
+    // interrupt handler is installed.
+    let mut started = false;
+    for _ in 0..400 {
+        let (_, run) = daemon.get(&format!("/v1/runs/{run_id}"));
+        assert!(
+            run["state"] == "queued" || run["state"] == "running",
+            "{run}"
+        );
+        if run["lastProgress"].is_object() {
+            started = true;
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+    assert!(started, "the solve never reported progress");
+
+    let (status, cancelled) = daemon.post(&format!("/v1/runs/{run_id}/cancel"), "");
+    assert_eq!(status, 200, "{cancelled}");
+    let finished = daemon.await_terminal(run_id);
+    assert_eq!(finished["state"], "canceled", "{finished}");
+    assert_eq!(finished["resumable"], true, "{finished}");
+    assert!(finished["progress"].as_u64().unwrap() < 1_000_000_000);
+}
+
+#[test]
+fn node_selectors_are_rejected_for_multiway_artifacts_before_export() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("multiway-node"));
+    let run_id = created["runId"].as_str().unwrap();
+    daemon.await_terminal(run_id);
+    // No valid artifact is needed: the daemon rejects the P1-only option
+    // before invoking export.
+    std::fs::write(
+        daemon.runs.join(run_id).join("solution.mwsol"),
+        b"placeholder",
+    )
+    .unwrap();
+    let (status, error) = daemon.get(&format!("/v1/runs/{run_id}/solution/tree?node=root"));
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "invalid-request");
 }
 
 /// A queued run outlives the daemon that accepted it.

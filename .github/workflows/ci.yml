@@ -27,6 +27,24 @@ jobs:
       - name: Retained evidence validator tests
         run: python -B -m unittest discover -s experiments/multiway-2026-09/quality-evidence/tests -v
 
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Typecheck and build
+        run: npm run build
+      - name: Unit tests
+        run: npm test
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -52,5 +70,7 @@ jobs:
         run: cargo test -p cli --test cli_integration solve_checkpoint_and_metrics_smoke -- --exact
       - name: NLH v1 CLI resume equivalence
         run: cargo test -p cli --test cli_integration resume_equivalence_postflop -- --exact
+      - name: Build the CLI the daemon spawns
+        run: cargo build -p cli
       - name: Daemon HTTP and child-process smoke
         run: cargo test -p daemon --test http_api

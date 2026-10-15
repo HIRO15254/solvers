@@ -38,7 +38,7 @@ pub(crate) fn validate(
         Some(_) => "incomplete",
     };
     let mut value = serde_json::to_value(&summary)?;
-    super::p1::diagnostic_bb(&mut value);
+    crate::validate::diagnostic_bb(&mut value);
     value["status"] = json!("valid");
     value["ruleHitStatus"] = json!(rule_hit_status);
     value["schema"] = json!(SCHEMA);

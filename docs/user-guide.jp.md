@@ -77,6 +77,31 @@ P2の`--resources`はpublic treeのarena countとrule hit測定を行うため�
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
 withinLimitがfalseならmemoryまたはtreeを見直す。validateの成功はsolve可能なmemoryや品質を保証しない。
 
+lineを段階的に組み立てるときは、卓だけが有効な未完成configでも次の合法手を確認できる。
+
+```sh
+solvers line spot.toml --moves "" --format json
+solvers line spot.toml --moves "r3,c" --format human
+solvers line spot.toml --format json
+```
+
+`--moves`は明示prefixをcomma区切りで置換する。省略すると`spot.line`を厳密にreplayする。
+cursorの`next.options`から次のtokenを選び、bet / raiseはstreet投入総額を付ける。
+all-in callは`c`、all-in bet / raiseは`a`である。`complete`はpostflop開始状態を表し、
+config全体の検証成功ではないため、solve前には通常のvalidateを実行する。
+JSONの全fieldと単位は[CLI reference](cli-reference.jp.md#solvers-line)を参照する。
+
+P1のsolve前にはconfigからpublic treeを構築し、nodeの行動候補と子nodeを確認できる。
+
+```sh
+solvers tree spot.toml --format json
+solvers tree spot.toml --node check --format human
+```
+
+既定はrootだけを返す。JSONの`children`にある履歴をそのまま`--node`へ渡して辿れる。
+行の意味は`export SOLUTION tree`と同じだが、まだ保存状態が無いので`stored`は含まない。
+solveやrun directoryの作成は行わず、P2 configと未知nodeは明示的に拒否する。
+
 ## 4. solveする
 
 ```sh
@@ -148,6 +173,9 @@ solvers export runs/preflop/solution.mwsol strategy --format csv --output strate
 ```
 
 summary、tree、actions、strategy、range、evをJSON/CSVで読む。P1の`--node`は繰り返せ、1回の読込みで複数nodeの行を指定順に出す。
+P1のtreeはaction・chance・terminalを返し、`children`のhistoryを次の`--node`にそのまま使える。
+chanceの`actions`は配るcard（`*`はiso併合、cardなしは`dealN`）、terminalは空配列である。
+action以外の`actor`・`pot`はnull。不明なselectorやaction以外へのstrategy等の指定は入力error（exit 2）。
 P1の`.sol`はsolveした木を保存するため、読込みで木を再構築しない。`summary`はmetadataだけを読む。
 P1は開始rangeでweightが正、かつ開始boardと矛盾しないhandだけを計算・保存する。weight 0のhandは出力しない。
 P1のcash EVはspot開始potを基準としたBB、ICM EVは賞金単位である。
@@ -229,13 +257,112 @@ baseのtable・economicsがP2と違えばerrorとなり、spot・rangesは生成
 solversd --runs runs --max-concurrent 1
 ```
 
-表示されたbearer tokenを全HTTP requestのAuthorizationへ付ける。
+表示されたbearer tokenを全`/v1` API requestのAuthorizationへ付ける。
 POST /v1/validateまたはPOST /v1/runsへJSONのconfigTomlを送る。
+line-builderにはPOST /v1/lineへconfigTomlと任意のmoves配列を送り、CLIと同じcursor JSONを受け取る。
+P1のsolve前の木はPOST /v1/treeへconfigTomlと任意のnodes配列を送り、CLIと同じtree行のJSON配列を受け取る。
+nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ渡せる。storedは含まない。
 外部source参照は拒否されるため、先にvalidate --write-effectiveでinline化する。
 daemonは同じCLIを起動し、run directoryに状態を保存する。再起動後もrun rootから一覧を復元する。
+run一覧・詳細は`lastProgress`に最後のraw進捗行を含み、P1では`nash_conv / 2`を一覧のExploitabilityに使える。進捗行がまだ無ければこのfieldは省略される。
 非loopbackで公開するときはTLS証明書・秘密鍵を指定する。
-HTTPのsolution viewはP2のみ。P1はartifactを取得してCLI viewer/exportを使う。
-endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する。
+HTTPのsolution viewはP1・P2に対応する。P1では、例えば
+`GET /v1/runs/{id}/solution/tree?node=root`や
+`GET /v1/runs/{id}/solution/strategy?node=root&format=csv`で照会できる。
+`node`は繰り返せ、履歴中の`[`・`]`・`/`・space・`*`はURL encodingする（`+`もspaceとして復号）。
+P2では`node`を指定できない。不正selectorはHTTP 400 `invalid-request`としてCLIの診断を返す。
+cancelは1回目のCtrl-Cと同じく境界で止まりcheckpointを保存する。Windowsではdaemonを
+consoleのある端末から起動する（console無しではcancelが`internal` errorになる）。
+
+### Web GUI
+
+Web GUIは`web/`にあり、Node.js 22以上でbuildしてから同じdaemonで配信する。
+
+```sh
+cd web && npm ci && npm run build && cd ..
+solversd --runs runs --ui web/dist
+```
+
+起動時の`gui:` URL（tokenはfragmentに入る）をbrowserで開く。tokenはそのoriginに保存され、
+無効なら入力欄が出る。静的assetは認証不要だが`/v1` APIは引き続きbearer tokenが必要である。
+`/`と拡張子なしの未存在pathは`index.html`へ、未存在のassetは404となる。
+`--ui`を指定しないときは全requestの認証が必要である。endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する。
+
+GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付きの操作手順を示す。
+
+- Setup: P1入力をTable・Start・Range・Tree・Solverの5つのstepで編集する。step tabで行き来し、各stepの下の
+  「Next」で順に進む。TOMLの読込み・保存（Open TOML・Save TOML）もできる。step tabの右の「Load template」は
+  `examples/hu-postflop/`の例をdialogで選び、入力を置き換える（例の`meta.name`は外す）。stepとは別に、区切り線の右端の
+  「Edit TOML」で文書全体のTOMLを開き、もう一度押すと開く前のstepへ戻る。SolveはheaderとSolver stepの下にあり、
+  検証が通りTOMLが読めるときだけrunを投入する。cardは4色deck（♠文字色・♥赤・♦青・♣緑）で示す。
+  - 右列: 卓の図・検証・Treeを常に示す（狭い画面ではstepの下）。卓の図の上の名前は`meta.name`で、spot名・run名・TOMLの
+    保存名を兼ねる。空なら自動の名前（例: `6max BTN vs BB Ks7h2d`。spotに追従する）をplaceholderに示し、検証・Solve・
+    保存する文書の`meta.name`に書く。run名とTOMLのfile名は、名前の英数字・`.`・`_`・`-`以外（空白など）を`_`に置き換えたもの
+    （例: `6max_BTN_vs_BB_Ks7h2d`）で、既存のrunと重なれば`-2`などを付ける。
+    卓の図は`[table]`と`spot.line`をdaemonの`solvers line`でreplayした席・stack・street wager・fold・button・pot・board、
+    effective stack・SPR、手に残る2人のOOP / IPの印を描き、検証の結果は書かない。検証は編集のたびにdaemonの
+    `validate --resources`を呼び、node数・terminal数・storage・memory見積り・warningを示し、
+    実効config（既定値をすべて明示した正規化済みの文書）を保存できる（Save effective config）。errorが名指すkeyに入力欄があれば、その入力欄の直下に
+    理由を示し（サイズ表は`tree.script`のerrorの行を書いたcell、Rangeは席のtabにも印、席ごとのstack・blind・anteは該当する欄、
+    `meta.name`は名前の欄）、そのstepのtabに印を付けて「Fix in（step名）」でそのstepを開く。どのstepにも入力欄の無いkeyのerrorは
+    「Edit TOML」に印を付けてTOMLへ導き、TOMLの上に理由を示す。daemonは一度に1件のerrorを返す。
+    Treeは検証が通るとdaemonの`POST /v1/tree`（`solvers tree`と同じ行）でpublic treeを示す。子のactionを押すと下り、
+    pathのbadgeを押すとその節点へ戻る。chance nodeは来うるcardを並べる。節点にはstreet・手番（OOP / IPと席）・pot・terminalを示す。
+    lineを変えて今の節点が無くなればrootへ戻る。
+  - Table: 人数と、stack・blind・anteを「Same for all」か「Per seat」で書く。Same for allは全員のstackとante
+    （None・Everyone・BB ante）で、SBは0.5 BB固定である。Per seatはstack・blind（straddleを含む）・anteを全員分カンマ区切りで、
+    Preflopの行動順（6maxならUTG, HJ, CO, BTN, SB, BB）に書く。blindは最後の2席がSBとBB（BBは1）、
+    先頭の席から続く正の値がstraddleである。anteは全員同額か、BBだけ（BB ante）を書ける。
+    席ごとに異なるstack・0.5以外のSB・straddleがある文書はPer seatで開き、Same for allへ戻すとそれらを消して共通のstackにする。
+    経済条件はcash（rake率・cap・rakeの条件）かtournamentで、rakeはcashだけ、賞金・卓外fieldはtournamentだけに付く。
+    種類を切り替えると他方のkeyを外し、page内で戻すと外したkeyを戻す。tournamentの賞金は専用dialogで編集し、
+    preset（勝者総取り・65/35・50/30/20・40/30/20/10・9位まで・上位N人同額のサテライト）と賞金総額から埋めて行ごとに直せる。
+  - Start: 卓の図の席を押すとactive playerの選択・解除になり、2人を選ぶとその2人が手に残るpreflopの経緯
+    （2bet・3bet・4bet・5bet・squeeze vs open・squeeze vs call・limp・iso・limp-iso）が並ぶ。
+    squeezeやisoの3人目は、条件を満たす最も近い席である。経緯を選ぶとすぐ`spot.line`へ書き、
+    開始street・開始前のpostflopの進行（check-check・OOP check→IP bet→call・OOP bet→call）を変えても書き直す。
+    presetの額は固定（open 2.5・3bet 8・4bet 20・5bet 45・squeeze 12・iso 4 BB、postflopのbetはFlop 33%・Turn 75% pot）で、
+    他の額はlineを直接直す。lineを手で変えるとpresetの選択は外れる。preflopの行動順・postflopの先手・potはdaemonのreplayから得る。
+    lineのカンマと` / `の前後の空白はformが文法の形（`, `と` / `）に揃えて文書へ書き、lineの下にreplayの行動を
+    streetごとのbadgeで示す（lineに書かずに済むfoldは薄く示す）。今のstreetの行には、行動の後に続けて、そのstreetでまだ
+    手番が来る席のpositionだけを破線のbadgeで並べる（daemonのreplayで前の席がcheck、できなければfoldしたときに手番が回る席）。
+    badgeを押すとpopoverにその席の行動（fold・check・call 額・bet / raise 最小–最大・all-in 額）が出て、選ぶとその前の席を
+    check / foldで補ってlineへ足す。bet・raiseはそのstreetでの合計額を書いて足し、範囲外の額は足さずに理由を示す。
+    replayのbadgeを押すと、そのactionの前まで戻す。
+    組み立て途中のlineはfoldを含む明示の手順でreplayし続け、lineを手で書き換えるかpresetを選ぶと書いたlineのreplayへ戻る。
+    boardは文字で直すか「Choose」（flop・turn・riverの順に最大5枚）で選び、
+    作ったlineにboardが足りなければboard選択が開く。lineが配る枚数より多いboardは、先頭から必要な枚数だけを使い、
+    残りのcardは薄く破線で示して無視する（検証・Solve・TOMLの保存は必要な枚数のboardで行い、文書には残すので、
+    lineを伸ばせばそのcardを使う）。lineを再生できなければ卓の図にPreflop rootを示し、理由は検証がline欄の下に示す。
+    postflopのstreetの開始に届かなければ次の手番を示す。
+  - Range: lineが手に残す2人のrangeをOOP・IPのtabで編集し、「Swap OOP and IP」で中身を交換する。
+    lineの変更で手に残る2人が変わると`[ranges]`のkeyを付け替える。残る席はそのrangeのまま、新しい席はこの文書で
+    その席が前に使ったrange、無ければ同じ役（OOP・IP）だった席のrange、それも無ければ外れた唯一のrangeを受け取る。
+    移したrangeの中身は変えないため、その席のrangeに直す。付け替えた内容をRange stepに示し、TOMLを直接編集している間は付け替えない。
+  - Tree: bet sizeを「Size table」か「Script」のtabで書く。サイズ表はstreetごとにOOP・IPのbetとraiseのsize
+    （[size literal](nlh-input-v1.jp.md#size-literalと解決順序)。`33`はpotの33%、`a`はall-in。カンマか空白で区切り、
+    空ならそのactionを作らない）を並べ、`tree.script`を`in_position`・`donk`・`aggressions`の条件だけのscriptへ書き直す。
+    「No donk bets」は前のstreetで最後にbet・raiseした相手へOOPが先にbetしない木、
+    「Re-raises are all-in only」はbet・raiseに直面したraiseをall-inに限る木にする。開始streetより前のstreetの行は薄く示す。
+    サイズ表で書き戻せないscript（他の条件・`add`・`force`などを含む）はscriptのtabで開き、
+    サイズ表のtabはその旨と「Replace with the default size table」（Flop 33/50・Turn 75/a・River 75,a/a、OOP・IP同じ）を示す。
+    all-inへの併合（`allin_threshold`）・全nodeのall-in（`include_allin`）・streetごとの攻撃回数上限も同じstepで書く。
+  - Solver: Stopping（Target・Max iterations・Check every・Max time）、Resources and output（Threads・Memory limit・
+    Saved streets・Checkpoint interval・Checkpoint at the end）、Algorithm（Schedule・CFR precision・Storage）を書く。
+  - Edit TOML: stepではなく、文書全体を色分け付きで直接編集する。読めるTOMLになるたびに各stepへ反映し、各stepの変更はTOMLへ反映する。
+    読めない間はerrorを示し、他のstepと検証は直前に読めた内容のままでSolveできない。自分で書いたcommentや順序は、
+    TOMLを直接編集している間は保持し、stepで変更するとformの書式で書き直す。複数行の文字列（`tree.script`）は
+    `'''`の複数行literalで書く。どのstepにも入力欄の無いkeyは消さずに保持し、TOMLの下に一覧で示す。
+- Runs: run一覧、iteration・`nash_conv / 2`（cashは%pot、ICMは%prizes）・経過時間、収束chart、
+  event、artifact download、cancel・再開。cancel後は保存が終わるまで「Stopping (saving)」と表示する。
+- Results: 完了したP1 runをroot から節点ごとに辿る。action cardで手を選び、chance nodeではcardを選ぶ。
+  action cardは画面幅に収まらなければ次の行へ折り返し、狭い画面（1280px以下）では詰めて表示する。
+  13×13 gridは戦略・EV・Rangeをclassごとに到達weightで集計し、hand tabでcombo別の値を見る。戦略の色はセル幅いっぱいに
+  actionの割合で区切り線なしに塗り分ける。actionの色はGTO Wizardの既定に揃え、foldは青、check・callは緑、bet・raiseは
+  menuの小さい順に4段の赤（5つ以上は最も明るい赤から最も暗い赤までを等分）である。
+  エクスポートは現在節点の`strategy` CSVを保存する。未保存のRiver節点は`solvers inspect --sol`で見る。
+
+`npm run dev`（`web/`内）は`/v1`を`127.0.0.1:38127`のdaemonへproxyする開発用serverである。
 
 ## 8. errorから対処する
 

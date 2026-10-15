@@ -4,6 +4,7 @@
 
 use std::path::Path;
 
+use crate::index::TreeView;
 use crate::sol::StreetsStored;
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{NodeId, NodeKind};
@@ -34,6 +35,11 @@ pub enum ExportData {
 use crate::artifact::{LoadedSol, load_sol};
 use crate::sol::{SolMetadata, SolReader};
 
+/// A selector that cannot name a node accepted by the requested view.
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub struct NodeSelectionError(anyhow::Error);
+
 /// Which nodes a view covers.
 enum Selection {
     /// One node, named by history or by slash-separated action labels.
@@ -56,11 +62,13 @@ pub fn export(path: &Path, view: ExportView, nodes: &[String]) -> Result<ExportD
     let loaded = load_sol(path, 0, None)?;
     let selections = nodes
         .iter()
-        .map(|node| resolve_selection(&loaded, node))
+        .map(|node| {
+            resolve_selection(loaded.view(), node).map_err(|error| NodeSelectionError(error).into())
+        })
         .collect::<Result<Vec<_>>>()?;
     let mut ids = Vec::new();
     for selection in &selections {
-        ids.extend(selected_action_nodes(&loaded, selection));
+        ids.extend(selected_nodes(&loaded, selection));
     }
     Ok(match view {
         ExportView::Summary => unreachable!("answered from metadata above"),
@@ -74,15 +82,14 @@ pub fn export(path: &Path, view: ExportView, nodes: &[String]) -> Result<ExportD
 
 /// Resolves `--node`: `all`, `root`, a betting-line history (`xr10c`), or
 /// slash-separated action labels (`check/bet 10`).
-fn resolve_selection(loaded: &LoadedSol, node: &str) -> Result<Selection> {
+fn resolve_selection(view: TreeView<'_>, node: &str) -> Result<Selection> {
     if node == "all" {
         return Ok(Selection::All);
     }
     if node == "root" || node.is_empty() {
         return Ok(Selection::One(0));
     }
-    let view = loaded.view();
-    if let Some(id) = view.node_by_history(node) {
+    if let Some(id) = view.node_by_history_any(node) {
         return Ok(Selection::One(id));
     }
     // Fall back to the label path the REPL's `go` accepts, so a node the
@@ -110,8 +117,8 @@ fn resolve_selection(loaded: &LoadedSol, node: &str) -> Result<Selection> {
     Ok(Selection::One(current))
 }
 
-/// The action nodes a selection covers, in tree order.
-fn selected_action_nodes(loaded: &LoadedSol, selection: &Selection) -> Vec<NodeId> {
+/// The selected nodes; `all` retains stored action nodes in tree order.
+fn selected_nodes(loaded: &LoadedSol, selection: &Selection) -> Vec<NodeId> {
     match selection {
         Selection::One(id) => vec![*id],
         Selection::All => (0..loaded.game.tree.nodes.len() as NodeId)
@@ -198,28 +205,116 @@ fn amount(value: u32) -> serde_json::Number {
 // --- tree -------------------------------------------------------------------
 
 #[derive(Serialize)]
-/// One action node in tree order.
+/// One selected node, with its outgoing edges in tree order.
 pub struct TreeRow {
     pub history: String,
+    pub kind: String,
     pub street: String,
-    pub actor: String,
-    pub pot: serde_json::Number,
+    pub actor: Option<String>,
+    pub pot: Option<serde_json::Number>,
     pub actions: Vec<String>,
+    pub children: Vec<String>,
+    pub child_kinds: Vec<String>,
     pub stored: bool,
+}
+
+/// One selected node of a config's unsolved tree, without artifact storage state.
+#[derive(Serialize)]
+pub struct PreviewTreeRow {
+    pub history: String,
+    pub kind: String,
+    pub street: String,
+    pub actor: Option<String>,
+    pub pot: Option<serde_json::Number>,
+    pub actions: Vec<String>,
+    pub children: Vec<String>,
+    pub child_kinds: Vec<String>,
+}
+
+/// Build the same indexed public tree used by solving, without solver storage.
+/// Selectors have the artifact tree view's grammar; `all` selects every action node.
+pub fn preview_tree(raw: &str, path: &Path, nodes: &[String]) -> Result<Vec<PreviewTreeRow>> {
+    let prepared = crate::prepare::prepare(raw, path)?;
+    let (game, index) = crate::run::build_indexed(&prepared)?;
+    let view = TreeView {
+        tree: &game.tree,
+        index: &index,
+    };
+    let mut ids = Vec::new();
+    if nodes.is_empty() {
+        ids.push(0);
+    }
+    for node in nodes {
+        match resolve_selection(view, node).map_err(NodeSelectionError)? {
+            Selection::One(id) => ids.push(id),
+            Selection::All => ids.extend(
+                (0..game.tree.nodes.len() as NodeId)
+                    .filter(|&id| game.tree.node(id).kind == NodeKind::Action),
+            ),
+        }
+    }
+    Ok(ids.iter().map(|&id| tree_row(view, id)).collect())
 }
 
 fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
     let view = loaded.view();
     ids.iter()
-        .map(|&id| TreeRow {
-            history: view.history(id),
-            street: street_name(view.street(id)).to_string(),
-            actor: seat_name(view.tree.node(id).player).to_string(),
-            pot: amount(view.pot(id)),
-            actions: view.actions(id).into_iter().map(str::to_string).collect(),
-            stored: loaded.is_stored(id),
+        .map(|&id| {
+            let row = tree_row(view, id);
+            TreeRow {
+                history: row.history,
+                kind: row.kind,
+                street: row.street,
+                actor: row.actor,
+                pot: row.pot,
+                actions: row.actions,
+                children: row.children,
+                child_kinds: row.child_kinds,
+                stored: loaded.is_stored(id),
+            }
         })
         .collect()
+}
+
+fn tree_row(view: TreeView<'_>, id: NodeId) -> PreviewTreeRow {
+    let node = view.tree.node(id);
+    let street = match (node.kind, view.street(id)) {
+        (NodeKind::Chance, Street::Flop) => Street::Turn,
+        (NodeKind::Chance, Street::Turn) => Street::River,
+        (NodeKind::Chance, _) => unreachable!("chance only follows flop or turn"),
+        (_, street) => street,
+    };
+    let actions = match node.kind {
+        NodeKind::Action => view.actions(id).into_iter().map(str::to_string).collect(),
+        NodeKind::Chance => (0..node.num_children as usize)
+            .map(|pos| view.chance_label(id, pos))
+            .collect(),
+        NodeKind::Terminal => Vec::new(),
+    };
+    let mut children = Vec::with_capacity(node.num_children as usize);
+    let mut child_kinds = Vec::with_capacity(node.num_children as usize);
+    for child in view.tree.children(id) {
+        children.push(view.history(child));
+        child_kinds.push(kind_name(view.tree.node(child).kind).to_string());
+    }
+    PreviewTreeRow {
+        history: view.history(id),
+        kind: kind_name(node.kind).to_string(),
+        street: street_name(street).to_string(),
+        actor: (node.kind == NodeKind::Action).then(|| seat_name(node.player).to_string()),
+        pot: (node.kind == NodeKind::Action).then(|| amount(view.pot(id))),
+        actions,
+        children,
+        child_kinds,
+    }
+}
+
+fn kind_name(kind: NodeKind) -> &'static str {
+    match kind {
+        NodeKind::Action => "action",
+        NodeKind::Chance => "chance",
+        NodeKind::Terminal => "terminal",
+    }
 }
 
 // --- shared per-node lookup -------------------------------------------------
@@ -237,9 +332,6 @@ struct StoredNode {
 fn stored_node(loaded: &LoadedSol, id: NodeId) -> Result<StoredNode> {
     let view = loaded.view();
     let node = *view.tree.node(id);
-    if node.kind != NodeKind::Action {
-        bail!("node is not an action node; only action nodes carry strategies");
-    }
     let sref = view.tree.storage_ref(&node);
     let history = view.history(id);
     let strategy = loaded.stored_strategy(id)?.ok_or_else(|| {
@@ -272,6 +364,13 @@ fn reached_rows<R: Clone>(
     ids: &[NodeId],
     rows_of: impl Fn(NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
 ) -> Result<Vec<R>> {
+    for &id in ids {
+        if loaded.game.tree.node(id).kind != NodeKind::Action {
+            bail!(NodeSelectionError(anyhow!(
+                "node is not an action node; only action nodes carry strategies"
+            )));
+        }
+    }
     let mut needed = vec![false; loaded.game.tree.nodes.len()];
     let mut requested = vec![false; needed.len()];
     let mut remaining = vec![0usize; needed.len()];
@@ -523,8 +622,8 @@ fn range_rows(loaded: &LoadedSol) -> Vec<RangeRow> {
 pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<ComparisonReport> {
     let left = load_sol(left_path, 0, None)?;
     let right = crate::artifact::load_sol_sharing(right_path, &left)?;
-    let left_ids = selected_action_nodes(&left, &Selection::All);
-    let right_ids = selected_action_nodes(&right, &Selection::All);
+    let left_ids = selected_nodes(&left, &Selection::All);
+    let right_ids = selected_nodes(&right, &Selection::All);
     if left.game.tree.nodes.len() != right.game.tree.nodes.len() || left_ids != right_ids {
         bail!(
             "artifacts describe different trees ({} vs {} nodes, {} vs {} stored nodes); \

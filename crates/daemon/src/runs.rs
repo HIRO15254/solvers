@@ -102,6 +102,7 @@ impl RunsRoot {
                     .or_else(|| row.get("elapsedSecs"))?
                     .as_f64()
             }),
+            last_progress: progress_row,
             events_offset,
             resumable: checkpoint
                 && matches!(

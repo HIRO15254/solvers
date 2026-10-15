@@ -30,7 +30,7 @@ fn move_text(mv: Move) -> String {
     }
 }
 
-fn parse_move(text: &str) -> Result<Move, SpotError> {
+pub(crate) fn parse_move(text: &str) -> Result<Move, SpotError> {
     // Recognize common aliases only to explain their canonical spelling.
     let lower = text.to_ascii_lowercase();
     if lower != text
@@ -103,7 +103,7 @@ fn parse_move(text: &str) -> Result<Move, SpotError> {
     }
 }
 
-fn apply(
+pub(crate) fn apply(
     state: &mut BettingState,
     table: &Table,
     mv: Move,
@@ -139,7 +139,7 @@ fn apply(
         .map_err(|e| line_error(e.to_string()))
 }
 
-fn implicit_fold(
+pub(crate) fn implicit_fold(
     state: &mut BettingState,
     table: &Table,
     actions: &mut Vec<LineAction>,

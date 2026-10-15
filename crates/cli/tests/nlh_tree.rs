@@ -1,0 +1,99 @@
+//! Pre-solve tree selectors and wire rows share the artifact tree contract.
+use std::path::{Path, PathBuf};
+use std::process::{Command, Output};
+
+fn example(product: &str, name: &str) -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../examples")
+        .join(product)
+        .join(name)
+}
+
+fn cli(config: &Path, args: &[&str]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .arg("tree")
+        .arg(config)
+        .args(args)
+        .args(["--format", "json"])
+        .output()
+        .unwrap()
+}
+
+fn rows(config: &Path, args: &[&str]) -> serde_json::Value {
+    let output = cli(config, args);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    serde_json::from_slice(&output.stdout).unwrap()
+}
+
+#[test]
+fn flop_root_and_returned_child_selectors() {
+    let config = example("hu-postflop", "flop_srp.toml");
+    let root = rows(&config, &[]);
+    assert_eq!(root.as_array().unwrap().len(), 1);
+    assert_eq!(root[0]["history"], "");
+    assert_eq!(root[0]["kind"], "action");
+    assert_eq!(root[0]["street"], "flop");
+    assert_eq!(root[0]["actor"], "oop");
+    assert_eq!(root[0]["pot"], 5.5);
+    assert_eq!(
+        root[0]["actions"],
+        serde_json::json!(["check", "bet 1.815"])
+    );
+    assert_eq!(root[0].as_object().unwrap().len(), 8);
+    assert!(root[0].get("stored").is_none());
+    let child = root[0]["children"][0].as_str().unwrap();
+    let selected = rows(&config, &["--node", child, "--node", "root"]);
+    assert_eq!(selected.as_array().unwrap().len(), 2);
+    assert_eq!(selected[0]["history"], child);
+    assert_eq!(selected[0]["kind"], root[0]["child_kinds"][0]);
+    assert_eq!(selected[0]["actor"], "ip");
+    assert_eq!(selected[1], root[0]);
+    assert_eq!(rows(&config, &["--node", "check"])[0], selected[0]);
+}
+
+#[test]
+fn unknown_node_and_p2_are_explicit_input_errors() {
+    let unknown = cli(
+        &example("hu-postflop", "river_small.toml"),
+        &["--node", "not-a-node"],
+    );
+    assert_eq!(unknown.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&unknown.stderr).contains("not-a-node"));
+    let p2 = cli(&example("mw-preflop", "3max_smoke.toml"), &[]);
+    assert_eq!(p2.status.code(), Some(2));
+    let message = String::from_utf8_lossy(&p2.stderr);
+    assert!(message.contains("NLH005"), "{message}");
+    assert!(message.contains("P1"), "{message}");
+}
+
+#[test]
+fn terminal_rows_all_action_nodes_and_human_listing() {
+    let config = example("hu-postflop", "river_small.toml");
+    let terminal = rows(&config, &["--node", "bet 1/fold"]);
+    assert_eq!(terminal[0]["kind"], "terminal");
+    assert_eq!(terminal[0]["street"], "river");
+    assert!(terminal[0]["actor"].is_null());
+    assert!(terminal[0]["pot"].is_null());
+    for field in ["actions", "children", "child_kinds"] {
+        assert_eq!(terminal[0][field], serde_json::json!([]));
+    }
+    let history = terminal[0]["history"].as_str().unwrap();
+    assert_eq!(rows(&config, &["--node", history]), terminal);
+    let all = rows(&config, &["--node", "all"]);
+    let all = all.as_array().unwrap();
+    assert!(all.len() > 1);
+    assert!(all.iter().all(|row| row["kind"] == "action"));
+    let human = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .arg("tree")
+        .arg(config)
+        .output()
+        .unwrap();
+    assert!(human.status.success());
+    let text = String::from_utf8(human.stdout).unwrap();
+    assert!(text.contains("action river actor=oop pot=5 BB"), "{text}");
+    assert!(text.contains("bet 1 -> r1 (action)"), "{text}");
+}

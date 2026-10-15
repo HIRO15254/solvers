@@ -6,41 +6,9 @@ pub use hu_postflop::prepare::compatibility_hash;
 use hu_postflop::prepare::{bb, prepare, required_bytes, utility_unit, warnings};
 use hu_postflop::run::{self, RunSummary};
 use hu_postflop::{Player, Street};
-use serde_json::{Value, json};
+use serde_json::json;
 use std::path::Path;
 use std::time::Duration;
-
-pub(super) fn diagnostic_bb(value: &mut Value) {
-    match value {
-        Value::Object(fields) => {
-            for (key, value) in fields {
-                if matches!(
-                    key.as_str(),
-                    "pot"
-                        | "effective_stack"
-                        | "starting_stack"
-                        | "remaining_stack"
-                        | "total_contribution"
-                        | "refund"
-                        | "amount"
-                        | "to"
-                ) {
-                    if let Some(amount) = value.as_u64() {
-                        *value = if amount % 1000 == 0 {
-                            json!(amount / 1000)
-                        } else {
-                            json!(amount as f64 / 1000.0)
-                        };
-                    }
-                } else {
-                    diagnostic_bb(value);
-                }
-            }
-        }
-        Value::Array(values) => values.iter_mut().for_each(diagnostic_bb),
-        _ => {}
-    }
-}
 
 pub fn validate(
     raw: &str,
@@ -54,7 +22,7 @@ pub fn validate(
     let mut summary = p.document.summary();
     summary.warnings = warnings(&p);
     let mut value = serde_json::to_value(summary)?;
-    diagnostic_bb(&mut value);
+    crate::validate::diagnostic_bb(&mut value);
     value["status"] = json!("valid");
     value["schema"] = json!(SCHEMA);
     value["gameKind"] = json!("hu-postflop");

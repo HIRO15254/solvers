@@ -833,6 +833,178 @@ fn sol_export_and_inspect_smoke() {
     assert!(stdout.contains("kind: action"), "stdout: {stdout:?}");
 }
 
+#[test]
+fn postflop_tree_export_navigates_chance_and_terminal_nodes() {
+    let dir = temp_dir("postflop-tree-navigation");
+    let config = dir.join("turn.toml");
+    std::fs::write(
+        &config,
+        format!("{TINY_TURN_TOML}\n[output]\nsolution_streets = \"no-rivers\"\n"),
+    )
+    .unwrap();
+    let run = dir.join("run");
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let sol = run.join("solution.sol");
+    let sol_path = sol.to_str().unwrap();
+    let tree = |node: &str| -> serde_json::Value {
+        let output = run_solvers_ok(&["export", sol_path, "tree", "--node", node]);
+        serde_json::from_slice(&output.stdout).unwrap()
+    };
+
+    let root = tree("root");
+    assert_eq!(root[0]["history"], "");
+    assert_eq!(root[0]["kind"], "action");
+    assert_eq!(root[0]["street"], "turn");
+    assert_eq!(root[0]["actor"], "oop");
+    assert_eq!(root[0]["pot"], 2);
+    assert_eq!(root[0]["stored"], true);
+    assert_eq!(root[0]["children"][0], "x");
+    assert_eq!(root[0]["child_kinds"][0], "action");
+
+    let chance = tree("xx");
+    assert_eq!(chance, tree("check/check"));
+    let chance = &chance[0];
+    assert_eq!(chance["kind"], "chance");
+    assert_eq!(chance["street"], "river");
+    assert!(chance["actor"].is_null());
+    assert!(chance["pot"].is_null());
+    assert_eq!(chance["stored"], false);
+    let actions = chance["actions"].as_array().unwrap();
+    let children = chance["children"].as_array().unwrap();
+    let child_kinds = chance["child_kinds"].as_array().unwrap();
+    assert!(!children.is_empty());
+    assert_eq!(actions.len(), children.len());
+    assert_eq!(children.len(), child_kinds.len());
+    assert!(child_kinds.iter().all(|kind| kind == "action"));
+
+    let river_history = children[0].as_str().unwrap();
+    let river = tree(river_history);
+    assert_eq!(river[0]["kind"], "action");
+    assert_eq!(river[0]["street"], "river");
+    assert_eq!(river[0]["stored"], false);
+    let river_label_path = format!("check/check/{}", actions[0].as_str().unwrap());
+    assert_eq!(river, tree(&river_label_path));
+    let terminal_history = format!("{river_history}xx");
+    let terminal = tree(&terminal_history);
+    assert_eq!(terminal, tree(&format!("{river_label_path}/check/check")));
+    assert_eq!(terminal[0]["history"], terminal_history);
+    assert_eq!(terminal[0]["kind"], "terminal");
+    assert_eq!(terminal[0]["street"], "river");
+    assert!(terminal[0]["actor"].is_null());
+    assert!(terminal[0]["pot"].is_null());
+    assert_eq!(terminal[0]["stored"], false);
+    for field in ["actions", "children", "child_kinds"] {
+        assert!(terminal[0][field].as_array().unwrap().is_empty());
+    }
+    let bet_history = root[0]["children"][1].as_str().unwrap();
+    let fold = tree(&format!("{bet_history}f"));
+    assert_eq!(fold[0]["kind"], "terminal");
+    assert_eq!(fold[0]["street"], "turn");
+
+    // All still means stored action nodes, not the full topology.
+    let all = tree("all");
+    assert!(
+        all.as_array()
+            .unwrap()
+            .iter()
+            .all(|row| row["kind"] == "action" && row["stored"] == true)
+    );
+    let loaded = hu_postflop::artifact::load_sol(&sol, 0, None).unwrap();
+    let view = loaded.view();
+    let stored = (0..view.tree.nodes.len() as hu_engine::NodeId)
+        .filter(|&id| loaded.is_stored(id))
+        .count();
+    assert_eq!(all.as_array().unwrap().len(), stored);
+    let histories: Vec<String> = (0..view.tree.nodes.len() as hu_engine::NodeId)
+        .map(|id| view.history(id))
+        .collect();
+    let exported =
+        hu_postflop::views::export(&sol, hu_postflop::views::ExportView::Tree, &histories).unwrap();
+    let hu_postflop::views::ExportData::Tree(rows) = exported else {
+        panic!("expected tree rows");
+    };
+    for (id, row) in rows.iter().enumerate() {
+        assert_eq!(row.history, histories[id]);
+        assert_eq!(
+            view.node_by_history_any(&row.history),
+            Some(id as hu_engine::NodeId)
+        );
+        assert_eq!(row.actions.len(), row.children.len());
+        assert_eq!(row.children.len(), row.child_kinds.len());
+        for (child, (history, kind)) in view
+            .tree
+            .children(id as hu_engine::NodeId)
+            .zip(row.children.iter().zip(&row.child_kinds))
+        {
+            assert_eq!(view.node_by_history_any(history), Some(child));
+            assert_eq!(kind, &rows[child as usize].kind);
+            assert_eq!(history, &rows[child as usize].history);
+        }
+    }
+
+    let output = run_solvers_ok(&[
+        "export",
+        sol_path,
+        "tree",
+        "--node",
+        "xx",
+        "--node",
+        &terminal_history,
+        "--node",
+        "root",
+        "--format",
+        "csv",
+    ]);
+    let csv = String::from_utf8(output.stdout).unwrap();
+    let lines: Vec<&str> = csv.lines().collect();
+    assert_eq!(
+        lines[0],
+        "history,kind,street,actor,pot,stored,actions,children,child_kinds"
+    );
+    let cells: Vec<&str> = lines[1].split(',').collect();
+    assert_eq!(&cells[..6], &["xx", "chance", "river", "", "", "false"]);
+    for (column, field) in [(6, "actions"), (7, "children"), (8, "child_kinds")] {
+        let expected = chance[field]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| value.as_str().unwrap())
+            .collect::<Vec<_>>()
+            .join("|");
+        assert_eq!(cells[column], expected);
+    }
+    assert_eq!(
+        lines[2],
+        format!("{terminal_history},terminal,river,,,false,,,")
+    );
+    assert!(lines[3].starts_with(",action,turn,oop,2,true,"));
+
+    // Non-action queries are typed input errors with a clear reason,
+    // even when their path crosses an unstored river ancestor.
+    for node in ["xx", terminal_history.as_str(), "check/check"] {
+        for kind in ["actions", "strategy", "ev"] {
+            let output = run_solvers(&["export", sol_path, kind, "--node", node]);
+            assert_eq!(output.status.code(), Some(2));
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert!(stderr.contains("node is not an action node"), "{stderr}");
+        }
+    }
+    for selector in [
+        "bogus",
+        "memory limit",
+        "bad magic",
+        "check/check/invalid-card",
+    ] {
+        let output = run_solvers(&["export", sol_path, "tree", "--node", selector]);
+        assert_eq!(output.status.code(), Some(2));
+    }
+}
+
 /// Same shape as `TINY_TURN_TOML` above, but `iso_merging = false` (so the
 /// turn->river chance node's child labels are plain, unmerged cards --
 /// `inspect.rs`'s `chance_child_label` only appends a representative-card

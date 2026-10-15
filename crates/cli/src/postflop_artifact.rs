@@ -76,16 +76,23 @@ fn summary_csv(summary: &Summary) -> String {
 }
 
 fn tree_csv(rows: &[TreeRow]) -> String {
-    let mut out = String::from("history,street,actor,pot,stored,actions\n");
+    let mut out =
+        String::from("history,kind,street,actor,pot,stored,actions,children,child_kinds\n");
     for row in rows {
         out.push_str(&format!(
-            "{},{},{},{},{},{}\n",
+            "{},{},{},{},{},{},{},{},{}\n",
             row.history,
+            row.kind,
             row.street,
-            row.actor,
-            row.pot,
+            row.actor.as_deref().unwrap_or_default(),
+            row.pot
+                .as_ref()
+                .map(ToString::to_string)
+                .unwrap_or_default(),
             row.stored,
             row.actions.join("|"),
+            row.children.join("|"),
+            row.child_kinds.join("|"),
         ));
     }
     out

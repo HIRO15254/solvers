@@ -68,6 +68,12 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     {
         return 1;
     }
+    if error
+        .chain()
+        .any(|cause| cause.is::<hu_postflop::views::NodeSelectionError>())
+    {
+        return 2;
+    }
     if error.chain().any(|cause| {
         cause.is::<hu_postflop::input::MemoryLimitError>()
             || cause.is::<mw_preflop::prepare::ResourceLimitError>()
@@ -148,6 +154,7 @@ pub mod cache;
 pub mod config_new;
 pub mod derive;
 pub mod inspect;
+pub mod line;
 pub mod multiway_artifact;
 pub mod multiway_solve;
 pub mod nlh_v1;
@@ -157,6 +164,7 @@ pub mod resume;
 pub mod run_dir;
 pub mod runs;
 pub mod solve;
+mod tree;
 pub mod validate;
 
 use anyhow::Result;
@@ -215,6 +223,26 @@ enum Command {
         /// policy arena a real solve would need.
         #[arg(long)]
         resources: bool,
+    },
+    /// Build and inspect a P1 config's public tree without solving.
+    Tree {
+        config: std::path::PathBuf,
+        /// Node history or slash-separated action labels; repeat for multiple nodes.
+        /// `all` selects every action node.
+        #[arg(long = "node", default_value = "root")]
+        nodes: Vec<String>,
+        #[arg(long, value_enum, default_value = "human")]
+        format: validate::ValidationFormat,
+    },
+    /// Inspect or build an action line using only the config's table settings.
+    Line {
+        config: std::path::PathBuf,
+        /// Explicit moves in action order, separated by commas (for example f,r2.5,c).
+        /// An empty list inspects the root; omitted replays the config's spot.line.
+        #[arg(long)]
+        moves: Option<String>,
+        #[arg(long, value_enum, default_value = "human")]
+        format: validate::ValidationFormat,
     },
     /// Report what a run directory currently says about itself.
     Status {
@@ -350,9 +378,10 @@ enum Command {
         #[arg(long, value_enum, default_value = "json")]
         format: multiway_artifact::ExportFormat,
         /// Postflop only: which node the per-node views cover. `root`, a
-        /// betting-line history (`xr10c`), slash-separated action labels
-        /// (`check/bet 10`), or `all` for every stored node. Repeat to
-        /// export several nodes from one load; rows follow the given order.
+        /// betting-line history (`xr10c`), slash-separated action/chance labels
+        /// (`check/check/Th`), or `all` for every stored action node. Tree
+        /// accepts any node kind; other node views require action nodes.
+        /// Repeat to export nodes from one load in the given order.
         #[arg(long, default_value = "root")]
         node: Vec<String>,
         #[arg(long)]
@@ -462,6 +491,16 @@ pub fn main_impl() -> Result<()> {
             write_effective.as_deref(),
             resources,
         ),
+        Command::Tree {
+            config,
+            nodes,
+            format,
+        } => tree::run(&config, &nodes, format),
+        Command::Line {
+            config,
+            moves,
+            format,
+        } => line::run(&config, moves.as_deref(), format),
         Command::Solve {
             config,
             out,

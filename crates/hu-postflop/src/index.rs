@@ -267,9 +267,10 @@ impl<'a> TreeView<'a> {
             if p.kind == NodeKind::Action {
                 history.push_str(&self.index.tokens[self.index.edges[child as usize] as usize]);
             } else {
-                match self.deal_card(parent, (child - p.first_child) as usize) {
+                let pos = (child - p.first_child) as usize;
+                match self.deal_card(parent, pos) {
                     Some(card) => history.push_str(&format!("[{card}]")),
-                    None => history.push_str("[?]"),
+                    None => history.push_str(&format!("[deal{pos}]")),
                 }
             }
         }
@@ -278,6 +279,13 @@ impl<'a> TreeView<'a> {
 
     /// The action node a history names, walking from the root.
     pub fn node_by_history(&self, history: &str) -> Option<NodeId> {
+        self.node_by_history_any(history)
+            .filter(|&id| self.tree.node(id).kind == NodeKind::Action)
+    }
+
+    /// A node of any kind named by history, including chance and terminal nodes.
+    /// Cardless runout branches use `[dealN]`, where N is the child position.
+    pub fn node_by_history_any(&self, history: &str) -> Option<NodeId> {
         let mut current: NodeId = 0;
         let mut rest = history;
         while !rest.is_empty() {
@@ -299,17 +307,27 @@ impl<'a> TreeView<'a> {
                     self.index.tokens[self.index.edges[child as usize] as usize] == token
                 })?,
                 NodeKind::Chance => {
-                    let pos = (0..node.num_children as usize).find(|&pos| {
-                        self.deal_card(current, pos)
-                            .is_some_and(|card| token == format!("[{card}]"))
-                    })?;
+                    let dealt = token.strip_prefix('[')?.strip_suffix(']')?;
+                    let pos = if let Some(position) = dealt.strip_prefix("deal") {
+                        let pos: usize = position.parse().ok()?;
+                        if pos >= node.num_children as usize
+                            || self.deal_card(current, pos).is_some()
+                        {
+                            return None;
+                        }
+                        pos
+                    } else {
+                        let card: Card = dealt.parse().ok()?;
+                        (0..node.num_children as usize)
+                            .find(|&pos| self.deal_card(current, pos) == Some(card))?
+                    };
                     node.first_child + pos as NodeId
                 }
                 NodeKind::Terminal => return None,
             };
             rest = tail;
         }
-        (self.tree.node(current).kind == NodeKind::Action).then_some(current)
+        Some(current)
     }
 
     /// Label of a chance node's `pos`-th branch: its card, `*`-suffixed for
@@ -760,6 +778,15 @@ memory = "1GiB"
             let (mut merged, mut runouts) = (0, 0);
             for id in 0..a.nodes.len() as NodeId {
                 let n = a.node(id);
+                let history = view.history(id);
+                assert_eq!(view.node_by_history_any(&history), Some(id), "{history}");
+                if n.kind != NodeKind::Action {
+                    assert_eq!(view.node_by_history(&history), None, "{history}");
+                }
+                for child in a.children(id) {
+                    let history = view.history(child);
+                    assert_eq!(view.node_by_history_any(&history), Some(child), "{history}");
+                }
                 match n.kind {
                     NodeKind::Action => {
                         let info = &built.node_info[a.tags[id as usize] as usize];
@@ -807,6 +834,9 @@ memory = "1GiB"
             }
             assert_eq!(view.node_by_history("q"), None);
             assert_eq!(view.node_by_history("x[2c]"), None);
+            assert_eq!(view.node_by_history_any("q"), None);
+            assert_eq!(view.node_by_history_any("x[2c]"), None);
+            assert_eq!(view.node_by_history_any("xx[deal999999]"), None);
         }
     }
 }

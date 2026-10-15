@@ -14,6 +14,7 @@ fn main() {
     };
     match command {
         "validate" => validate(&args[1..]),
+        "line" => line(&args[1..]),
         "solve" | "resume" => solve_or_resume(command, &args[1..]),
         _ => {}
     }
@@ -37,6 +38,31 @@ fn validate(args: &[std::ffi::OsString]) {
         .expect("--write-effective path");
     std::fs::copy(config, effective).expect("write effective config");
     println!(r#"{{"status":"valid","schema":"solvers.nlh/v1"}}"#);
+}
+
+fn line(args: &[std::ffi::OsString]) {
+    let config = Path::new(args.first().expect("line config"));
+    let contents = std::fs::read_to_string(config).expect("read submitted config");
+    assert!(
+        args.windows(2)
+            .any(|pair| pair[0] == "--format" && pair[1] == "json")
+    );
+    if contents.contains("REJECT") {
+        eprintln!("NLH004: illegal move at index 1");
+        std::process::exit(2);
+    }
+    let moves = args
+        .windows(2)
+        .find(|pair| pair[0] == "--moves")
+        .map(|pair| pair[1].to_str().expect("UTF-8 moves"));
+    // Echo argument distinctions so socket tests cover missing and empty prefixes.
+    let moves_json = match moves {
+        None => "null".to_string(),
+        Some(moves) => format!("\"{moves}\""),
+    };
+    println!(
+        r#"{{"moves":[],"line":"","actions":[],"street":"preflop","pot":1.5,"complete":false,"boardCards":null,"players":2,"next":null,"terminal":false,"receivedMoves":{moves_json}}}"#
+    );
 }
 
 fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
