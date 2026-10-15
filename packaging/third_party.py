@@ -373,8 +373,10 @@ def render(root: Path, policy: dict, notices: list[dict]) -> str:
              "First-party code, including Cryst Design System, is covered by the root licenses.",
              "Rust target union: " + ", ".join(sorted(policy["targets"])),
              "No build timestamp or machine-local paths are included.", ""]
+    # Hash Git's LF form so Windows autocrlf checkouts and CI produce the same file.
     for name in ("Cargo.lock", "web/package-lock.json", "packaging/third-party.json"):
-        lines.append(f"SHA-256 {name}: {sha256((root / name).read_bytes())}")
+        data = (root / name).read_bytes().replace(b"\r\n", b"\n")
+        lines.append(f"SHA-256 {name}: {sha256(data)}")
     for notice in sorted(notices, key=lambda n: (n["ecosystem"], n["name"], n["version"], n.get("location", ""))):
         lines.extend(["", "=" * 78,
                       f"{notice['ecosystem']}: {notice['name']} {notice['version']}",

@@ -11,7 +11,7 @@ Rust target union: aarch64-apple-darwin, x86_64-apple-darwin, x86_64-pc-windows-
 No build timestamp or machine-local paths are included.
 
 SHA-256 Cargo.lock: 1bbc1d75453a5834f365cb9c14c711a22f250f660dda67ee0ed66653576c5a59
-SHA-256 web/package-lock.json: 29e4c4aa0560c25e09a7c0cdfdf384cf105f45492ba4061932b5cf31d9cefc62
+SHA-256 web/package-lock.json: 33635b9ad3f1d6e93c39d6b78e79155167bef5fec50c92f9aa295ae93892da3e
 SHA-256 packaging/third-party.json: 8b2932258ec8a6e6446d8b3ea01b2cce32d60a5ceda9653059abda2a1f61033a
 
 ==============================================================================
