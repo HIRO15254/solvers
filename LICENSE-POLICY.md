@@ -36,7 +36,7 @@ or in `docs/architecture.md`, and write the implementation from scratch.
 | Tabler Icons webfont (`web/vendor/cryst/fonts/tabler-icons.woff2`) | MIT (upstream) | vendored GUI asset |
 | JetBrains Mono (`web/vendor/cryst/fonts/jetbrains-mono-variable-latin.woff2`) | SIL OFL 1.1 (upstream) | vendored GUI asset |
 | Noto Sans JP (Google Fonts, fetched by the browser at runtime) | SIL OFL 1.1 | GUI font, not stored in the repository |
-| Cryst Design System (`web/vendor/cryst/`, copied 2026-10-13 from the canonical artifact `https://claude.ai/artifact/TXKBwjMEB9xMt52GBbERVs`) | owned by the repository owner, who confirmed its distribution here | vendored GUI design system |
+| Cryst Design System (`web/vendor/cryst/`, copied 2026-10-13 from the canonical artifact `https://claude.ai/artifact/TXKBwjMEB9xMt52GBbERVs`) | MIT OR Apache-2.0 (owned by the repository owner and licensed with this repository, decided 2026-10-15) | vendored GUI design system |
 
 ## Contribution rule
 
