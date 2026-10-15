@@ -1573,7 +1573,8 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
         std::thread::sleep(std::time::Duration::from_millis(50));
     }
     unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGINT) };
-    assert!(child.wait().expect("wait for solve").success());
+    // A cooperative stop exits 130 (cli-reference exit codes).
+    assert_eq!(child.wait().expect("wait for solve").code(), Some(130));
 
     let manifest: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
@@ -1589,7 +1590,7 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
         .expect("spawn resume");
     std::thread::sleep(std::time::Duration::from_millis(500));
     unsafe { libc::kill(resumed.id() as libc::pid_t, libc::SIGINT) };
-    assert!(resumed.wait().expect("wait for resume").success());
+    assert_eq!(resumed.wait().expect("wait for resume").code(), Some(130));
 
     let after = last_progress_iteration(&run);
     assert!(
