@@ -54,8 +54,13 @@ hu-postflop            → nlh, economics, spot, hu-engine, runfiles
 mw-preflop             → nlh, economics, spot, runfiles
 protocol               → runfiles
 daemon                 → runfiles, protocol
-cli                    → spot, hu-postflop, mw-preflop, runfiles
+cli                    → spot, hu-postflop, runfiles, mw-preflop (optional: p2)
 ```
+
+`cli`の`p2` featureは既定で有効で、optional dependencyの`mw-preflop`を含める。
+`cargo build --release -p cli -p daemon --no-default-features`はP1専用配布buildであり、
+P2とderiveの計算・codecをリンクしない。共通Input・runfilesとdaemonの監視は製品非依存のまま保つ。
+P2入力・成果物の拒否と移行案内はCLI境界で行う（[CLI reference](cli-reference.jp.md)）。
 
 製品crateは`cli`・`protocol`・`daemon`へ依存しない。CLIが公開APIで必要とする下位型は
 製品crateが個別にre-exportする。`Player`・`PerPlayer`はHU専用であり、P2のseat型へ一般化しない。

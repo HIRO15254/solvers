@@ -40,6 +40,13 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
+P1専用配布buildも通常CIで検証する。既定buildのP2試験は残し、次を追加する。
+
+```text
+cargo clippy -p cli -p daemon --no-default-features --all-targets -- -D warnings
+cargo test -p cli --no-default-features
+```
+
 | 変更 | 追加で確認すること |
 |---|---|
 | 文書・配置 | `python tools/check_docs.py`。説明を実装へ照合。移動した文書の参照を更新 |

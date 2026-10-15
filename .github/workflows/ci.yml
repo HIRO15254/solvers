@@ -59,6 +59,10 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test (debug)
         run: cargo test --workspace
+      - name: Clippy (P1-only distribution)
+        run: cargo clippy -p cli -p daemon --no-default-features --all-targets -- -D warnings
+      - name: Test (P1-only distribution)
+        run: cargo test -p cli --no-default-features
 
   windows-smoke:
     runs-on: windows-latest

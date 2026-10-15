@@ -1,32 +1,8 @@
 //! CLI arguments and byte-stable rendering of product-owned artifact views.
+use crate::artifact_args::{ExportFormat, ExportView, InspectView};
 use anyhow::{Context, Result};
 use mw_preflop::views;
 use std::path::Path;
-#[derive(Clone, Copy, Debug, clap::ValueEnum)]
-pub enum InspectView {
-    Node,
-    Summary,
-    Strategy,
-    Range,
-    Ev,
-}
-
-#[derive(Clone, Copy, Debug, clap::ValueEnum)]
-pub enum ExportView {
-    Strategy,
-    Actions,
-    Range,
-    Ev,
-    Tree,
-    Summary,
-}
-
-#[derive(Clone, Copy, Debug, clap::ValueEnum)]
-pub enum ExportFormat {
-    Json,
-    Csv,
-}
-
 impl From<InspectView> for views::InspectView {
     fn from(value: InspectView) -> Self {
         match value {

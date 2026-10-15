@@ -67,7 +67,15 @@ fn unknown_node_and_p2_are_explicit_input_errors() {
     assert_eq!(p2.status.code(), Some(2));
     let message = String::from_utf8_lossy(&p2.stderr);
     assert!(message.contains("NLH005"), "{message}");
+    #[cfg(feature = "p2")]
     assert!(message.contains("P1"), "{message}");
+    #[cfg(not(feature = "p2"))]
+    assert!(
+        message.contains(
+            "this build excludes P2 (Multiway Preflop); use a build with the `p2` feature"
+        ),
+        "{message}"
+    );
 }
 
 #[test]

@@ -10,10 +10,13 @@ P2の方式・品質は暫定であり、3人以上の結果にNash/GTO保証は
 Rust stable、Cargo、Gitを用意する。OS別の準備は[development.md](development.md)を参照する。
 
 ```sh
-cargo build --release -p cli -p daemon
+cargo build --release -p cli -p daemon --no-default-features
 ```
 
 binaryは`target/release/solvers`と`solversd`（Windowsでは`.exe`）である。
+これはP1専用配布buildで、P2とderiveは利用できない。拒否診断は`p2` feature付きbuildを案内する。
+P2も使う開発用buildは`--no-default-features`を外す（`cli`の`p2` featureは既定で有効）。
+以下のP2・deriveの手順は`p2` feature付きbuildを前提とする。
 以下はbinaryをPATHへ置いた場合の例である。
 
 ## 2. spotを書く
@@ -28,6 +31,8 @@ templateから始める場合は次を使う。
 solvers config new --product p1 --template minimal --out spot.toml
 solvers config new --product p2 --template full --out table-full.toml
 ```
+
+`config new`の既定は`p2`である。P1専用配布buildでは既定が`p1`になり、`--product p2`は`NLH005`（exit 2）になる。
 
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。

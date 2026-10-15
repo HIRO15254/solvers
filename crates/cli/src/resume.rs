@@ -15,6 +15,8 @@ pub fn run(
     evaluation_cadence: Option<u64>,
     checkpoint_interval: Option<&str>,
 ) -> Result<()> {
+    #[cfg(not(feature = "p2"))]
+    crate::product_support::require_artifact(run_directory)?;
     // Run config is also part of the artifact contract: an old directory
     // cannot become a common-input run by replacing just its checkpoint.
     if run_directory.is_dir() {
@@ -28,27 +30,33 @@ pub fn run(
         .extension()
         .is_some_and(|extension| extension == "mwckpt")
     {
-        let mut payload = mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(&checkpoint)
-            .with_context(|| format!("reading {}", checkpoint.display()))?;
-        let raw = payload.config_toml.take().ok_or_else(||
+        #[cfg(not(feature = "p2"))]
+        return Err(crate::product_support::artifact_error());
+        #[cfg(feature = "p2")]
+        {
+            let mut payload =
+                mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(&checkpoint)
+                    .with_context(|| format!("reading {}", checkpoint.display()))?;
+            let raw = payload.config_toml.take().ok_or_else(||
             anyhow!("removed config family solvers.multiway-preflop/v1 checkpoint without an embedded config; re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"))?;
-        // Drop the first decoded state before the typed P2 resume reloads it
-        // and commits the dense arena, avoiding duplicate checkpoint memory.
-        drop(payload);
-        crate::nlh_v1::require_artifact_config(&raw)?;
-        return crate::nlh_v1::p2::resume(
-            &raw,
-            &checkpoint,
-            out,
-            threads,
-            memory,
-            max_time,
-            max_sweeps,
-            stop_target,
-            evaluation_samples,
-            evaluation_cadence,
-            checkpoint_interval,
-        );
+            // Drop the first decoded state before the typed P2 resume reloads it
+            // and commits the dense arena, avoiding duplicate checkpoint memory.
+            drop(payload);
+            crate::nlh_v1::require_artifact_config(&raw)?;
+            return crate::nlh_v1::p2::resume(
+                &raw,
+                &checkpoint,
+                out,
+                threads,
+                memory,
+                max_time,
+                max_sweeps,
+                stop_target,
+                evaluation_samples,
+                evaluation_cadence,
+                checkpoint_interval,
+            );
+        }
     }
     let payload = hu_postflop::checkpoint::CheckpointReader::open(&checkpoint)
         .with_context(|| format!("reading {}", checkpoint.display()))?;
@@ -234,6 +242,7 @@ mod tests {
         refused(&checkpoint, family);
     }
 
+    #[cfg(feature = "p2")]
     #[test]
     fn removed_family_multiway_checkpoint_is_refused() {
         let directory = tempfile::tempdir().unwrap();

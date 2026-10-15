@@ -10,11 +10,15 @@ description = "solvers command-line interface"
 name = "solvers"
 path = "src/main.rs"
 
+[features]
+default = ["p2"]
+p2 = ["dep:mw-preflop"]
+
 [dependencies]
 runfiles = { workspace = true }
 hu-postflop = { workspace = true }
 spot = { workspace = true }
-mw-preflop = { workspace = true }
+mw-preflop = { workspace = true, optional = true }
 anyhow = { workspace = true }
 blake3 = { workspace = true }
 clap = { workspace = true }

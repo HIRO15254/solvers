@@ -13,6 +13,7 @@ use runfiles::{
     RunEventLog, RunEventPayload, RunManifest, RunState,
 };
 
+#[cfg(feature = "p2")]
 use crate::multiway_solve::MultiwayRunObservation;
 
 /// The artifact paths inside one run directory.
@@ -204,6 +205,7 @@ impl RunRecorder {
 
     /// Turns solver observations into run events. Live and quality samples
     /// are already in `progress.jsonl`, so only the discrete ones land here.
+    #[cfg(feature = "p2")]
     pub fn observe(&mut self, observation: &MultiwayRunObservation) {
         let payload = match observation {
             MultiwayRunObservation::Abstraction(abstraction) => Some(RunEventPayload::Notice {

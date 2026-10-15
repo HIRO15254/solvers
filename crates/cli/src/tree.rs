@@ -6,6 +6,8 @@ use crate::validate::ValidationFormat;
 pub fn run(path: &Path, nodes: &[String], format: ValidationFormat) -> Result<()> {
     let raw =
         std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+    #[cfg(not(feature = "p2"))]
+    crate::product_support::require_input(&raw, path)?;
     let rows = hu_postflop::views::preview_tree(&raw, path, nodes)?;
     match format {
         ValidationFormat::Json => println!("{}", serde_json::to_string_pretty(&rows)?),

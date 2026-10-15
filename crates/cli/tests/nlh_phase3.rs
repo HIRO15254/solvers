@@ -1109,8 +1109,18 @@ fn rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run() {
         "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 5\n",
     )
     .unwrap();
-    let result = ok(&["validate", text(&config)]);
-    assert!(String::from_utf8_lossy(&result.stdout).contains("P2 (Multiway Preflop)"));
+    #[cfg(feature = "p2")]
+    {
+        let result = ok(&["validate", text(&config)]);
+        assert!(String::from_utf8_lossy(&result.stdout).contains("P2 (Multiway Preflop)"));
+    }
+    #[cfg(not(feature = "p2"))]
+    {
+        let result = cli(&["validate", text(&config)]);
+        assert_eq!(result.status.code(), Some(2));
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(error.contains("NLH005") && error.contains("this build excludes P2"));
+    }
     std::fs::write(&config, RIVER.replace("replace bet [1bb]", "remove check")).unwrap();
     for args in [
         vec!["validate", text(&config)],

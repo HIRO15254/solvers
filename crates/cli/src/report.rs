@@ -9,6 +9,8 @@ pub fn run(
 ) -> Result<()> {
     let raw = std::fs::read_to_string(config_path)
         .with_context(|| format!("reading {}", config_path.display()))?;
+    #[cfg(not(feature = "p2"))]
+    crate::product_support::require_input(&raw, config_path)?;
     hu_postflop::prepare::prepare(&raw, config_path)?;
     let boards: Vec<_> = collect_board_tokens(boards_arg, boards_file)?
         .iter()

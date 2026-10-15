@@ -8,7 +8,11 @@ fn root() -> PathBuf {
 
 #[test]
 fn every_user_example_validates_and_normalizes_idempotently() {
-    for product in ["hu-postflop", "mw-preflop"] {
+    #[cfg(not(feature = "p2"))]
+    let products = ["hu-postflop"];
+    #[cfg(feature = "p2")]
+    let products = ["hu-postflop", "mw-preflop"];
+    for product in products {
         for entry in std::fs::read_dir(root().join("examples").join(product)).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().and_then(|s| s.to_str()) != Some("toml") {
@@ -26,12 +30,11 @@ fn every_user_example_validates_and_normalizes_idempotently() {
             );
             let raw = std::fs::read_to_string(&path).unwrap();
             let doc = spot::Document::parse(&raw, &path).unwrap();
-            let normalize = |doc: &spot::Document| {
-                if product == "hu-postflop" {
-                    doc.normalize(&hu_postflop::input::P1Sections).unwrap()
-                } else {
-                    doc.normalize(&mw_preflop::input::P2Sections).unwrap()
-                }
+            let normalize = |doc: &spot::Document| match product {
+                "hu-postflop" => doc.normalize(&hu_postflop::input::P1Sections).unwrap(),
+                #[cfg(feature = "p2")]
+                "mw-preflop" => doc.normalize(&mw_preflop::input::P2Sections).unwrap(),
+                _ => unreachable!("only enabled products are enumerated"),
             };
             let effective = normalize(&doc);
             assert_eq!(
@@ -73,6 +76,7 @@ fn small_p1_user_examples_solve() {
     }
 }
 
+#[cfg(feature = "p2")]
 #[test]
 fn small_p2_user_examples_solve_with_one_bucket_per_street() {
     use mw_preflop::abstraction::{FeatureHashAbstraction, FeatureHashParams};

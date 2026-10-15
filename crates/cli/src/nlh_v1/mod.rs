@@ -1,5 +1,6 @@
 //! Common-input dispatch; each product owns its CLI adapter.
 mod p1;
+#[cfg(feature = "p2")]
 pub(crate) mod p2;
 
 use anyhow::{Result, bail};
@@ -26,11 +27,16 @@ pub fn require_artifact_config(raw: &str) -> Result<()> {
 /// Check embedded input when a reader receives a checkpoint or run directory.
 /// Current artifacts continue to the command's normal reader.
 pub fn require_current_artifact(path: &Path) -> Result<()> {
+    #[cfg(not(feature = "p2"))]
+    crate::product_support::require_artifact(path)?;
     if path.extension().is_some_and(|e| e == "sol") {
         require_artifact_config(&hu_postflop::sol::read_sol_config(path)?)?;
     } else if path.extension().is_some_and(|e| e == "mwsol") {
-        let reader = mw_preflop::mwsol::MwSolReader::open(path)?;
-        require_artifact_config(&reader.metadata().config_toml)?;
+        #[cfg(feature = "p2")]
+        {
+            let reader = mw_preflop::mwsol::MwSolReader::open(path)?;
+            require_artifact_config(&reader.metadata().config_toml)?;
+        }
     } else if path.is_dir() {
         let config = path.join(runfiles::RUN_CONFIG_FILE);
         if config.is_file() {
@@ -43,11 +49,14 @@ pub fn require_current_artifact(path: &Path) -> Result<()> {
         ))?;
         require_artifact_config(raw)?;
     } else if path.extension().is_some_and(|e| e == "mwckpt") {
-        let checkpoint = mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(path)?;
-        let raw = checkpoint.config_toml.as_deref().ok_or_else(|| anyhow::anyhow!(
+        #[cfg(feature = "p2")]
+        {
+            let checkpoint = mw_preflop::checkpoint::MultiwayCheckpoint::load_unchecked(path)?;
+            let raw = checkpoint.config_toml.as_deref().ok_or_else(|| anyhow::anyhow!(
             "removed config family solvers.multiway-preflop/v1 checkpoint: re-solve from a solvers.nlh/v1 config (docs/nlh-input-v1.jp.md)"
         ))?;
-        require_artifact_config(raw)?;
+            require_artifact_config(raw)?;
+        }
     }
     Ok(())
 }
@@ -62,7 +71,10 @@ pub fn validate(
 ) -> Result<()> {
     match spot::Document::parse(raw, path)?.spot.product {
         spot::Product::HuPostflop => p1::validate(raw, path, format, show, write, resources),
+        #[cfg(feature = "p2")]
         spot::Product::MultiwayPreflop => p2::validate(raw, path, format, show, write, resources),
+        #[cfg(not(feature = "p2"))]
+        spot::Product::MultiwayPreflop => Err(crate::product_support::input_error()),
     }
 }
 
@@ -76,6 +88,9 @@ pub fn solve(
 ) -> Result<()> {
     match spot::Document::parse(raw, path)?.spot.product {
         spot::Product::HuPostflop => p1::solve(raw, path, out, threads, memory, max_time),
+        #[cfg(feature = "p2")]
         spot::Product::MultiwayPreflop => p2::solve(raw, path, out, threads, memory, max_time),
+        #[cfg(not(feature = "p2"))]
+        spot::Product::MultiwayPreflop => Err(crate::product_support::input_error()),
     }
 }

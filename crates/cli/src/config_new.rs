@@ -60,7 +60,10 @@ fn normalized(product: ConfigProduct, raw: &str) -> Result<String> {
     let document = spot::Document::parse(raw, Path::new("template.toml"))?;
     Ok(match product {
         ConfigProduct::P1 => document.normalize(&hu_postflop::input::P1Sections)?,
+        #[cfg(feature = "p2")]
         ConfigProduct::P2 => document.normalize(&mw_preflop::input::P2Sections)?,
+        #[cfg(not(feature = "p2"))]
+        ConfigProduct::P2 => return Err(crate::product_support::input_error()),
     })
 }
 
@@ -148,9 +151,15 @@ pub fn run(product: ConfigProduct, template: ConfigTemplate, out: Option<&Path>)
 mod tests {
     use super::*;
 
+    const PRODUCTS: &[ConfigProduct] = &[
+        ConfigProduct::P1,
+        #[cfg(feature = "p2")]
+        ConfigProduct::P2,
+    ];
+
     #[test]
     fn all_templates_validate_and_normalize_idempotently() {
-        for product in [ConfigProduct::P1, ConfigProduct::P2] {
+        for product in PRODUCTS.iter().copied() {
             for template in [ConfigTemplate::Minimal, ConfigTemplate::Full] {
                 let raw = render(product, template).unwrap();
                 let effective = normalized(product, &raw).unwrap();
@@ -190,6 +199,7 @@ mod tests {
                         );
                         hu_postflop::input::lower(&document.spot, &settings).unwrap();
                     }
+                    #[cfg(feature = "p2")]
                     ConfigProduct::P2 => {
                         assert!(!raw.contains("final_checkpoint"));
                         assert!(!effective.contains("final_checkpoint"));
@@ -201,6 +211,8 @@ mod tests {
                         .unwrap();
                         mw_preflop::input::lower(&document.spot, &settings).unwrap();
                     }
+                    #[cfg(not(feature = "p2"))]
+                    ConfigProduct::P2 => unreachable!("P2 templates are excluded from this build"),
                 }
             }
         }
@@ -208,7 +220,7 @@ mod tests {
 
     #[test]
     fn full_templates_preserve_the_minimal_spot() {
-        for product in [ConfigProduct::P1, ConfigProduct::P2] {
+        for product in PRODUCTS.iter().copied() {
             let minimal = render(product, ConfigTemplate::Minimal).unwrap();
             let effective: toml::Value =
                 toml::from_str(&normalized(product, &minimal).unwrap()).unwrap();
@@ -220,7 +232,7 @@ mod tests {
 
     #[test]
     fn full_templates_list_every_effective_key() {
-        for product in [ConfigProduct::P1, ConfigProduct::P2] {
+        for product in PRODUCTS.iter().copied() {
             let raw = render(product, ConfigTemplate::Full).unwrap();
             let full: toml::Value = toml::from_str(&raw).unwrap();
             let effective: toml::Value =
@@ -548,7 +560,7 @@ mod tests {
                 _ => {}
             }
         }
-        for product in [ConfigProduct::P1, ConfigProduct::P2] {
+        for product in PRODUCTS.iter().copied() {
             let raw = render(product, ConfigTemplate::Full).unwrap();
             check(&toml::from_str::<toml::Value>(&raw).unwrap(), reference);
         }

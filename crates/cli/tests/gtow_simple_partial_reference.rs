@@ -1,3 +1,5 @@
+#![cfg(feature = "p2")]
+
 use mw_preflop::betting::BettingMenu;
 use std::path::{Path, PathBuf};
 

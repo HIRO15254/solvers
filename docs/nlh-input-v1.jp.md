@@ -39,13 +39,16 @@ schema = "solvers.nlh/v1"   # 必須
 
 | `[spot]` | 製品・扱い |
 |---|---|
-| `board`なし、`line`なし（空文字列を含む） | **P2**（Preflop rootから解く） |
+| `board`なし、`line`なし（空文字列を含む） | **P2**（Preflop rootから解く）。P1専用配布buildでは`NLH005` |
 | `board`あり、`line`でPreflopが閉じて2人が残る | **P1**（`board`の枚数でFlop/Turn/River開始） |
 | `board`なし、`line`あり | v1では`NLH005`（Preflop途中からの開始は未対応） |
 | `board`あり、3人以上が残る | `NLH005`（Multiway Postflopは対象外） |
 | 残る判断がない（terminal、またはP1で行動可能なplayerが2人未満） | `NLH005` |
 
 `line`が空で`board`だけがある場合は、Preflopが閉じていないため枚数の不一致として`NLH004`である。
+
+P1専用配布build（`cli`の`p2` featureなし）は、P2入力を型付き`spot::SpotError`の`NLH005`（exit 2）で拒否する。
+診断はP2（Multiway Preflop）が含まれないことと、`p2` feature付きbuildを使うことを示す。入力形式自体は変更しない。
 
 ## 4. `[meta]`
 
@@ -711,7 +714,7 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 | `NLH002` | TOMLの構文・型error、未知key、決定した製品に適用されないkey |
 | `NLH003` | 値が範囲外・grid外、range/board/script/size literalの解析error、P2でのboard述語 |
 | `NLH004` | lineの解析error（別表記、`f`の記述を含む）、違法な行動、未知position、street境界やboard枚数との不一致 |
-| `NLH005` | 対象外のspot（第3節） |
+| `NLH005` | 対象外のspot（第3節）、P1専用配布buildへのP2入力 |
 
 CLIの型付き入力errorはexit 2であり、利用者由来のdiagnostic text（`resource limit`等）で終了codeを変更しない。実際のmemory/node資源上限は別のerror型でexit 75へ分類する。P2の資源事前検査は`NLH003`診断表記を保つが、入力errorとは区別する。
 
@@ -725,7 +728,7 @@ CLIの型付き入力errorはexit 2であり、利用者由来のdiagnostic text
 | `NLH002` | playersがstring、未知`table.foo`、P1へP2の`solver.kind`、source/script同時指定 |
 | `NLH003` | 0.0001 BB、重複board、全0 range、未知条件変数、`force raise []`で最終menuが空、P2のboard述語 |
 | `NLH004` | `BTN R2.5`、`BTN f`、`r2.50`、call額0で`c`、違法min-raise、lineが空でboard指定 |
-| `NLH005` | lineありboard無し、3人以上のPostflop、行動可能なP1 playerが2人未満 |
+| `NLH005` | lineありboard無し、3人以上のPostflop、行動可能なP1 playerが2人未満、`p2` featureなしでP2入力 |
 
 memory超過等は木構築・solve前の資源検査で検出する。終了codeはCLI referenceに従う。
 

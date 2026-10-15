@@ -74,9 +74,15 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     {
         return 2;
     }
+    if error
+        .chain()
+        .any(|cause| cause.is::<hu_postflop::input::MemoryLimitError>())
+    {
+        return 75;
+    }
+    #[cfg(feature = "p2")]
     if error.chain().any(|cause| {
-        cause.is::<hu_postflop::input::MemoryLimitError>()
-            || cause.is::<mw_preflop::prepare::ResourceLimitError>()
+        cause.is::<mw_preflop::prepare::ResourceLimitError>()
             || matches!(
                 cause.downcast_ref::<mw_preflop::TreeError>(),
                 Some(
@@ -95,23 +101,38 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     if error.chain().any(|cause| cause.is::<spot::SpotError>()) {
         return 2;
     }
+    #[cfg(feature = "p2")]
     if error.is::<derive::InputError>() {
         return 2;
     }
+    #[cfg(feature = "p2")]
     if let Some(error) = error.downcast_ref::<mw_preflop::derive::DeriveError>() {
         return match error {
             mw_preflop::derive::DeriveError::Artifact(_) => 3,
             _ => 2,
         };
     }
+    #[cfg(feature = "p2")]
     if error.is::<derive::ArtifactError>() {
         return 3;
     }
+    #[cfg(feature = "p2")]
     if error.chain().any(|cause| {
         cause.is::<mw_preflop::mwsol::MwSolError>()
-            || cause.is::<hu_postflop::sol::SolError>()
-            || cause.is::<hu_postflop::checkpoint::CheckpointError>()
             || cause.is::<mw_preflop::checkpoint::CheckpointError>()
+    }) {
+        return 3;
+    }
+    #[cfg(not(feature = "p2"))]
+    if error
+        .chain()
+        .any(|cause| cause.is::<product_support::ArtifactError>())
+    {
+        return 3;
+    }
+    if error.chain().any(|cause| {
+        cause.is::<hu_postflop::sol::SolError>()
+            || cause.is::<hu_postflop::checkpoint::CheckpointError>()
     }) {
         return 3;
     }
@@ -150,15 +171,21 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
         1
     }
 }
+pub mod artifact_args;
 pub mod cache;
 pub mod config_new;
+#[cfg(feature = "p2")]
 pub mod derive;
 pub mod inspect;
 pub mod line;
+#[cfg(feature = "p2")]
 pub mod multiway_artifact;
+#[cfg(feature = "p2")]
 pub mod multiway_solve;
 pub mod nlh_v1;
 mod postflop_artifact;
+#[cfg(not(feature = "p2"))]
+mod product_support;
 pub mod report;
 pub mod resume;
 pub mod run_dir;
@@ -173,6 +200,12 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command(name = "solvers", version)]
 #[command(about = "Poker solver")]
+#[cfg_attr(
+    not(feature = "p2"),
+    command(
+        long_about = "Poker solver\n\nP1-only build: P2 (Multiway Preflop) and derive are excluded; use a build with the `p2` feature to enable them. P2 inputs fail with NLH005 (exit 2); P2 artifacts fail with exit 3. Use config new --product p1. Product-agnostic line, status, watch and runs ls remain available."
+    )
+)]
 struct Cli {
     /// Directory for machine-scoped caches (abstraction tables). Defaults to
     /// `SOLVERS_CACHE_DIR`, then the platform's per-user cache directory.
@@ -330,7 +363,7 @@ enum Command {
         node: String,
         /// Artifact view to render.
         #[arg(long, value_enum, default_value = "node")]
-        view: multiway_artifact::InspectView,
+        view: artifact_args::InspectView,
         /// Override the acting seat used by the strategy grid.
         #[arg(long)]
         actor: Option<u8>,
@@ -374,9 +407,9 @@ enum Command {
     Export {
         solution: std::path::PathBuf,
         #[arg(value_enum)]
-        view: multiway_artifact::ExportView,
+        view: artifact_args::ExportView,
         #[arg(long, value_enum, default_value = "json")]
-        format: multiway_artifact::ExportFormat,
+        format: artifact_args::ExportFormat,
         /// Postflop only: which node the per-node views cover. `root`, a
         /// betting-line history (`xr10c`), slash-separated action/chance labels
         /// (`check/check/Th`), or `all` for every stored action node. Tree
@@ -432,7 +465,8 @@ enum ConfigCommand {
     /// Print or write a valid configuration template.
     New {
         /// Product to template (P1 DCFR: alpha=1.25, beta=0.5, gamma=4; pow4_reset defaults true only for i16).
-        #[arg(long, value_enum, default_value = "p2")]
+        #[cfg_attr(feature = "p2", arg(long, value_enum, default_value = "p2"))]
+        #[cfg_attr(not(feature = "p2"), arg(long, value_enum, default_value = "p1"))]
         product: config_new::ConfigProduct,
         #[arg(long, value_enum, default_value = "minimal")]
         template: config_new::ConfigTemplate,
@@ -448,6 +482,9 @@ pub fn main_impl() -> Result<()> {
         cache::set_root_override(root);
     }
     match cli.command {
+        #[cfg(not(feature = "p2"))]
+        Command::Derive { .. } => Err(product_support::derive_error()),
+        #[cfg(feature = "p2")]
         Command::Derive {
             run,
             line,
@@ -551,6 +588,8 @@ pub fn main_impl() -> Result<()> {
             river_iterations,
             river_target,
         } => {
+            #[cfg(not(feature = "p2"))]
+            let _ = (&node, view, actor, samples, seed, br_traversals);
             if let Some(path) = config.as_deref().or(sol.as_deref()) {
                 nlh_v1::require_current_artifact(path)?;
             }
@@ -558,15 +597,20 @@ pub fn main_impl() -> Result<()> {
                 (Some(config), None)
                     if config.extension().is_some_and(|value| value == "mwsol") =>
                 {
-                    multiway_artifact::inspect(
-                        &config,
-                        &node,
-                        view,
-                        actor,
-                        samples,
-                        seed,
-                        br_traversals,
-                    )
+                    #[cfg(feature = "p2")]
+                    {
+                        multiway_artifact::inspect(
+                            &config,
+                            &node,
+                            view,
+                            actor,
+                            samples,
+                            seed,
+                            br_traversals,
+                        )
+                    }
+                    #[cfg(not(feature = "p2"))]
+                    Err(product_support::artifact_error())
                 }
                 (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
                 (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
@@ -583,7 +627,15 @@ pub fn main_impl() -> Result<()> {
             br_traversals,
         } => {
             nlh_v1::require_current_artifact(&solution)?;
-            multiway_artifact::evaluate(&solution, samples, seed, br_traversals)
+            #[cfg(feature = "p2")]
+            {
+                multiway_artifact::evaluate(&solution, samples, seed, br_traversals)
+            }
+            #[cfg(not(feature = "p2"))]
+            {
+                let _ = (samples, seed, br_traversals);
+                Err(product_support::artifact_error())
+            }
         }
         Command::Export {
             solution,
@@ -594,7 +646,12 @@ pub fn main_impl() -> Result<()> {
         } => {
             nlh_v1::require_current_artifact(&solution)?;
             if solution.extension().is_some_and(|value| value == "mwsol") {
-                multiway_artifact::export(&solution, view, format, output.as_deref())
+                #[cfg(feature = "p2")]
+                {
+                    multiway_artifact::export(&solution, view, format, output.as_deref())
+                }
+                #[cfg(not(feature = "p2"))]
+                Err(product_support::artifact_error())
             } else {
                 postflop_artifact::export(&solution, view, format, &node, output.as_deref())
             }
@@ -604,10 +661,20 @@ pub fn main_impl() -> Result<()> {
             right,
             cross_game,
         } => {
+            #[cfg(not(feature = "p2"))]
+            {
+                product_support::require_artifact(&left)?;
+                product_support::require_artifact(&right)?;
+            }
             nlh_v1::require_current_artifact(&left)?;
             nlh_v1::require_current_artifact(&right)?;
             if left.extension().is_some_and(|value| value == "mwsol") {
-                multiway_artifact::compare(&left, &right, cross_game)
+                #[cfg(feature = "p2")]
+                {
+                    multiway_artifact::compare(&left, &right, cross_game)
+                }
+                #[cfg(not(feature = "p2"))]
+                Err(product_support::artifact_error())
             } else {
                 postflop_artifact::compare(&left, &right, cross_game)
             }
@@ -660,6 +727,7 @@ mod tests {
         })
         .context("NLH003: validating user config");
         assert_eq!(error_exit_code(&error), 75);
+        #[cfg(feature = "p2")]
         for error in [
             mw_preflop::TreeError::TooManyNodes { limit: 1 },
             mw_preflop::TreeError::MemoryLimit {

@@ -5,6 +5,29 @@ P2（Multiway Preflop）を決める。入力は[共通Input規範](nlh-input-v1
 計算・単位・成果物は[P1規範](hu-postflop.jp.md)・[P2暫定規範](mw-preflop.jp.md)を参照する。
 本書は`solvers`と`solversd`のコマンド、flag、終了code、HTTP APIを記す。
 
+## build featureと配布範囲
+
+`cli`の`p2` featureは既定で有効で、optional dependencyの`mw-preflop`とderiveを含む。
+既定buildの動作は変わらない。P1専用配布buildは次を使う。
+
+```sh
+cargo build --release -p cli -p daemon --no-default-features
+```
+
+`p2` featureなしでは次の境界を適用する。P1の操作は従来どおりである。
+
+| コマンド | P1専用配布buildでの扱い |
+|---|---|
+| `config new` | 製品の既定は`p1`。`--product p2`は`NLH005`（exit 2） |
+| `validate` / `solve` / `tree` / `inspect`（config）/ `report` | P2入力は型付き`spot::SpotError`の`NLH005`（exit 2） |
+| `derive` | helpに残すが実行はexit 2で拒否 |
+| `resume` / `inspect`（成果物、`--sol`を含む）/ `export` / `evaluate` / `compare` | P2の`.mwsol`・`.mwckpt`、またはmanifestのgame kindが`mw-preflop`のrunはexit 3で拒否。compareは左右とも対象 |
+| `line` | 製品のsolveに依存せず、P2卓のline再生も利用可能 |
+| `status` / `watch` / `runs ls` | 製品非依存。P2のrunも監視・一覧可能 |
+
+拒否診断はP2（Multiway Preflop）が含まれないことと、`p2` feature付きbuildを使うことを示す。
+daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同じ拒否となる。
+
 ## 共通のflagと環境変数
 
 | flag / 変数 | 意味 |
@@ -27,7 +50,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 
 | flag | 既定 | 意味 |
 |---|---|---|
-| `--product` | `p2` | 生成する製品。どちらもschemaは`solvers.nlh/v1` |
+| `--product` | `p2`（`p2` featureなしのbuildでは`p1`） | 生成する製品。どちらもschemaは`solvers.nlh/v1` |
 | `--template` | `minimal` | `minimal`は短い有効例、`full`は実効configの全section・key。既定の無い任意keyは省略 |
 | `--out PATH` | stdout | templateの出力先 |
 
@@ -434,8 +457,8 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 |---|---|
 | `0` | 成功。予算到達は品質目標達成を意味しない |
 | `1` | I/O等のその他の失敗、使用中run directoryへの書込み・in-place resumeの拒否 |
-| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005）、P1 exportの不正node selector・非actionへの戦略/値照会 |
-| `3` | 成果物の破損・非互換・削除済みconfig family |
+| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005）、P1 exportの不正node selector・非actionへの戦略/値照会、P1専用配布buildのP2入力・deriveの拒否 |
+| `3` | 成果物の破損・非互換・削除済みconfig family、P1専用配布buildのP2成果物・runの拒否 |
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
 

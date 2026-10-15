@@ -1,5 +1,5 @@
 //! CLI rendering of typed P1 artifact views.
-use crate::multiway_artifact::{ExportFormat, ExportView};
+use crate::artifact_args::{ExportFormat, ExportView};
 use anyhow::{Context, Result};
 use hu_postflop::views::{self, *};
 use serde::Serialize;

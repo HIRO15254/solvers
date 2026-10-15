@@ -1,4 +1,6 @@
 //! M8 CLI contract, including a real tiny P2 solve and a derived P1 solve.
+#![cfg(feature = "p2")]
+
 use std::path::Path;
 use std::process::{Command, Output};
 

@@ -1,5 +1,7 @@
 //! M6 CLI acceptance. Production solves are explicit release acceptance because
 //! a cold EHS² table build exceeds the ordinary workspace-test time budget.
+#![cfg(feature = "p2")]
+
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::time::Instant;

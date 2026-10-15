@@ -13,6 +13,7 @@ fn workspace_root() -> std::path::PathBuf {
         .to_path_buf()
 }
 
+#[cfg(feature = "p2")]
 /// Fully decodes an `.mwsol` file through the paged `MwSolReader` API
 /// (there is no longer a single-shot `read_mwsol` convenience wrapper).
 fn read_mwsol_full(path: &std::path::Path) -> mw_preflop::mwsol::MultiwaySolution {
@@ -634,6 +635,7 @@ fn resume_equivalence_postflop() {
     );
 }
 
+#[cfg(feature = "p2")]
 #[test]
 #[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn multiway_v1_u16_storage_writes_a_quantized_mwsol() {
@@ -1208,6 +1210,7 @@ fn mixed_i16_storage_solve_converges_and_checkpoint_round_trips() {
 /// Ported from the retired desktop backend: the canonical 6-max default
 /// surface must build a public tree and size a policy arena without
 /// allocating it. `--resources` is the CLI's only tree-preflight surface.
+#[cfg(feature = "p2")]
 #[test]
 fn validate_resources_sizes_the_default_surface_tree() {
     let config =
@@ -1244,6 +1247,7 @@ fn validate_resources_sizes_the_default_surface_tree() {
 
 /// Ported from the retired desktop backend: the full-option surface fixture
 /// must survive normalization with its non-default choices intact.
+#[cfg(feature = "p2")]
 #[test]
 fn validate_accepts_the_full_surface_fixture() {
     let config = workspace_root()
@@ -1432,6 +1436,7 @@ fn runs_ls_lists_run_directories_and_skips_everything_else() {
     assert_eq!(runs[1]["runId"], "run-b");
 }
 
+#[cfg(feature = "p2")]
 #[test]
 #[ignore = "builds the full EHS2 tables; explicit release acceptance only"]
 fn a_solve_records_a_complete_run_directory() {
@@ -1577,6 +1582,7 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
 /// A cold cache costs minutes; a warm one must cost nothing. The run also
 /// has to say which of the two happened, since a watcher otherwise sees an
 /// unexplained silence before the first progress row.
+#[cfg(feature = "p2")]
 #[test]
 #[ignore = "builds the full EHS2 tables once; explicit release acceptance only"]
 fn the_abstraction_cache_is_shared_across_runs() {
