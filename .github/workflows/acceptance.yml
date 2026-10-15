@@ -27,7 +27,7 @@ jobs:
           SKIP: ${{ inputs.skip }}
         run: |
           if [ -n "$SKIP" ]; then
-            cargo test --workspace --release -- --include-ignored --skip "$SKIP" --exact
+            cargo test --workspace --release --no-fail-fast -- --include-ignored --skip "$SKIP" --exact
           else
-            cargo test --workspace --release -- --include-ignored
+            cargo test --workspace --release --no-fail-fast -- --include-ignored
           fi

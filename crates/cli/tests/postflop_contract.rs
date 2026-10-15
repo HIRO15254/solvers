@@ -250,7 +250,8 @@ fn report_honors_time_budget() {
     let input = directory.path().join("config.toml");
     std::fs::write(
         &input,
-        CONFIG.replace("iterations = 20", "iterations = 1000000"),
+        // Far beyond what this one-combo river reaches in 1s, even in release builds.
+        CONFIG.replace("iterations = 20", "iterations = 1000000000"),
     )
     .unwrap();
     let input_raw = std::fs::read_to_string(&input)
@@ -269,7 +270,7 @@ fn report_honors_time_budget() {
         .unwrap()
         .parse()
         .unwrap();
-    assert!(iterations < 1000000);
+    assert!(iterations < 1_000_000_000);
 }
 
 #[test]

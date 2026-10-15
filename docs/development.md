@@ -70,6 +70,10 @@ Production EHS² table buildや大規模solve等のignored acceptanceは、対�
 cargo test --workspace --release -- --include-ignored
 ```
 
+同じ内容をGitHub Actionsの`Long-running acceptance`（`.github/workflows/acceptance.yml`、手動実行）でも実行できる。
+入力`skip`には、除外する試験を完全名で1件だけ指定する。除外するのは利用者が決めた場合に限る。
+除外した場合は、理由とLinear Issueを受入の証拠に記録する。
+
 P2の次のlibrary acceptanceはv1 public treeのnode数・整数状態・action順のhashを固定し、
 正規化前後の同一性を確認する。4件の大規模例は通常suiteではignoredとし、releaseで明示実行する
 （深さ・node数による打切りなし）。小規模例とfirst-actor上書きの明示拒否は通常suiteに含む。
