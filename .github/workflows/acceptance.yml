@@ -2,6 +2,11 @@ name: Long-running acceptance
 
 on:
   workflow_dispatch:
+    inputs:
+      skip:
+        description: "Exact test name to skip (record the decision and issue with the evidence)"
+        required: false
+        default: ""
 
 env:
   CARGO_TERM_COLOR: always
@@ -18,4 +23,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Test release profile, including long-running ignored tests
-        run: cargo test --workspace --release -- --include-ignored
+        env:
+          SKIP: ${{ inputs.skip }}
+        run: |
+          if [ -n "$SKIP" ]; then
+            cargo test --workspace --release -- --include-ignored --skip "$SKIP" --exact
+          else
+            cargo test --workspace --release -- --include-ignored
+          fi

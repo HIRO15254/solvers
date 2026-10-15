@@ -176,14 +176,21 @@ fn fixed_seed_smoke_resume_and_inspect_lifecycle() {
         "--threads",
         "1",
     ]);
+    // `solve` takes the sweep ceiling from the config; only `resume` overrides it.
+    let direct_config = dir.path().join("direct.toml");
+    let fixture = std::fs::read_to_string(&config).unwrap();
+    assert!(fixture.contains("max_sweeps = 2"));
+    std::fs::write(
+        &direct_config,
+        fixture.replace("max_sweeps = 2", "max_sweeps = 3"),
+    )
+    .unwrap();
     let direct = dir.path().join("direct");
     ok(&[
         "solve",
-        text(&config),
+        text(&direct_config),
         "--out",
         text(&direct),
-        "--max-sweeps",
-        "3",
         "--threads",
         "1",
     ]);
