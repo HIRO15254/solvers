@@ -18,6 +18,7 @@
 | P1の品質検証の参照候補 | [HU Postflop参照候補](plans/hu-postflop-validation/README.md) |
 | P1の速度・資源改善の段階と受入条件 | [P1性能計画](plans/p1-performance.jp.md)、[T26後の改善案](research/2026-10-08-p1-t26-improvements.jp.md)、[P1資源効率計画](plans/p1-efficiency.jp.md) |
 | P2の方式の再設計（決定・benchmark・段階） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)、[調査](research/2026-10-06-p2-method-survey.jp.md)、[S4-2b後の改善案](research/2026-10-08-p2-s4-2b-improvements.jp.md) |
+| P1の初回配布（v0.1.0）の範囲・成果物・手順 | [配布計画](plans/release-v0.1.jp.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |
 | 環境準備・変更手順・検証・引継ぎ | [development.md](development.md)、[作業票テンプレート](plans/task-template.md) |

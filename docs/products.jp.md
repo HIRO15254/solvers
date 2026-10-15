@@ -1,6 +1,6 @@
 # 製品定義: NLH HU Postflop Solver / NLH Multiway Preflop Solver
 
-更新: **2026-10-06**。本書は製品の目的・範囲・品質・到達段階の正本である。
+更新: **2026-10-15**。本書は製品の目的・範囲・品質・到達段階の正本である。
 
 2026-10-04の利用者決定により、旧ロードマップ（全variant対応・ML高速近似・Nodelock/相手profile、R0〜R7）を
 破棄し、本リポジトリを**共通のInput形式を共有する2製品**として再構築する。旧状態はgit tag
@@ -21,6 +21,7 @@
 | D4 | 旧目標のうち **ICM（トーナメント）** と **GUI/daemon** を引き継ぐ。Nodelock、相手profile、ML高速近似、他variant、Multiway Postflop、PKOは対象外 |
 | D5 | **P2の計算方式と出力品質の保証は未決定**とし、網羅的な調査と実験で決める |
 | D6 | 共通Inputの細部（停止目標・木の既定、lineの表記、straddle、旧configの変換、P1のメモリ上限）は[Input規範](nlh-input-v1.jp.md)付録Aの決定に従う |
+| D7 | （2026-10-13）最初の配布はP1だけをOSS（MIT OR Apache-2.0）としてGitHub Releaseで公開する。対象はWindows・Linux・macOSのビルド済みbinary（`solvers`・`solversd`・Web GUI）で、installerは作らない。P2とderiveは配布物に含めない。リポジトリからP2を削除するものではない。手順は[配布計画](plans/release-v0.1.jp.md) |
 
 対象外とした項目は、新しい利用者決定なしに設計・実装へ戻さない。
 
@@ -139,7 +140,9 @@ seat別最適応答利得`g_i`と`NashConv = Σ g_i`であり、S4-1で妥当性
 | **S3 P1の品質・性能** | 参照6件（Flop開始）の条件照合とfixture化、メモリ・時間の改善（Exploitabilityの目標は開始potの0.1%以下）。未マージの`codex/r1-hu-postflop`の成果（compact hand領域、action並列）は検証を経て移植可否を判断する |
 | **S4 P2の方式決定・品質・性能** | 網羅的な調査と比較実験で計算方式と出力品質の保証を決め（D5）、その方式で実装・検証する。`.mwsol`契約の整合、性能改善。段階S4-0〜S4-5と完了条件は[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
 | **S5 GUI** | daemon経由のWeb GUI（Setup・Runs・Results）を両製品で使える |
+| **配布v0.1.0** | P1（CLI・daemon・Web GUI）を、P2とderiveを含まない3 OS向け配布物として、ライセンス表記・利用者文書・受入証拠とともにGitHub Releaseで公開する（D7）。条件と手順は[配布計画](plans/release-v0.1.jp.md) |
 
 S3〜S5はS1の完了後、互いに独立に進められる。ただしS4の調査のうちコードに依存しない部分（既存研究・既存solverの
-調査）はS1と並行してよい。順序・担当・状態はLinearで管理し、本書へ転記しない。
+調査）はS1と並行してよい。配布v0.1.0はP1の範囲のS5（Web GUI）に依存し、S4には依存しない。
+順序・担当・状態はLinearで管理し、本書へ転記しない。
 目標・利用者決定・段階別の到達条件を変えるときは本書と再構築計画を同じ変更で更新する。
