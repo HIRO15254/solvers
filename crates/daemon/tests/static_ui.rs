@@ -132,3 +132,45 @@ fn without_ui_all_requests_still_require_bearer() {
     assert_eq!(daemon.request("GET", "/app.js", false).0, 401);
     assert_eq!(daemon.request("GET", "/", true).0, 404);
 }
+
+#[test]
+fn open_without_ui_fails_before_listening() {
+    let home = tempfile::tempdir().unwrap();
+    let executable = home
+        .path()
+        .join(format!("solversd{}", std::env::consts::EXE_SUFFIX));
+    std::fs::copy(env!("CARGO_BIN_EXE_solversd"), &executable).unwrap();
+    // A UI in cwd must not count as a UI beside the executable.
+    let cwd = home.path().join("other directory");
+    std::fs::create_dir_all(cwd.join("ui")).unwrap();
+    std::fs::write(cwd.join("ui/index.html"), "<html>wrong UI</html>").unwrap();
+    let runs = home.path().join("runs");
+    let mut child = Command::new(executable)
+        .current_dir(cwd)
+        .args(["--open", "--bind", "127.0.0.1:0", "--runs"])
+        .arg(&runs)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    loop {
+        if child.try_wait().unwrap().is_some() {
+            break;
+        }
+        if std::time::Instant::now() >= deadline {
+            let _ = child.kill();
+            let _ = child.wait();
+            panic!("--open without a UI did not fail before listening");
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("--open requires --ui DIR"));
+    assert!(output.stdout.is_empty());
+    assert!(
+        !runs.exists(),
+        "invalid startup must not create a runs root"
+    );
+}

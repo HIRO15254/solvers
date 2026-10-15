@@ -5,9 +5,110 @@ P1は2人が残ったFlop/Turn/Riverのstreet開始、P2は2〜9人のPreflop ro
 入力は[共通Input規範](nlh-input-v1.jp.md)、全flagは[CLI reference](cli-reference.jp.md)を参照する。
 P2の方式・品質は暫定であり、3人以上の結果にNash/GTO保証は無い。
 
-## 1. buildする
+現行versionは`0.1.0`。`solvers --version`（`-V`）は`solvers 0.1.0 (<git-hash>)`、
+P1専用buildでは`solvers 0.1.0 (<git-hash>), P1 only`と表示する。
+`solversd --version`は`solversd 0.1.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
+0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
+旧形式を拒否された場合は現行configから再solveする。詳細は[互換方針と変更履歴](../CHANGELOG.md)を参照する。
 
-Rust stable、Cargo、Gitを用意する。OS別の準備は[development.md](development.md)を参照する。
+## 1. インストールする
+
+### 配布物を使う
+
+開発環境は不要。[GitHub Releases](https://github.com/HIRO15254/solvers/releases)から
+対象versionのarchiveと`SHA256SUMS`をdownloadする。配布binaryは**P1（HU Postflop）専用**であり、
+P2とderiveは含まない。[P1専用buildのコマンド表](cli-reference.jp.md#build-featureと配布範囲)を参照する。
+
+archive名は`solvers-<version>-<target>[-compat]`である。
+
+| OS / CPU | target | 拡張子 / CPU基準 |
+|---|---|---|
+| Windows x86-64 | `x86_64-pc-windows-msvc` | `.zip`、通常v3 / `-compat`はv2 |
+| Linux x86-64 | `x86_64-unknown-linux-gnu` | `.tar.gz`、通常v3 / `-compat`はv2 |
+| macOS Apple Silicon | `aarch64-apple-darwin` | `.tar.gz`、apple-m1 |
+| macOS Intel | `x86_64-apple-darwin` | `.tar.gz`、v2のみ |
+
+Windows/Linuxの通常版は**x86-64-v3（AVX2必須）**。AVX2が無いCPUには拡張子直前に`-compat`が
+付くarchiveを選ぶ。compatも**x86-64-v2**が必要で、すべての64-bit CPUで動くわけではない。
+WindowsはMicrosoftの[Coreinfo](https://learn.microsoft.com/en-us/sysinternals/downloads/coreinfo)の
+`coreinfo -f`で`AVX2`が`*`か、Linuxは`lscpu`のflagsに`avx2`があるかを確認する。
+Intel macOSでは`sysctl -n machdep.cpu.leaf7_features`の`AVX2`で確認できるが、配布はv2の1種である。
+
+展開前に次のコマンドでhashを計算し、`SHA256SUMS`の**同じfilename**のSHA-256と一致することを確認する。
+不一致なら実行しない（checksum自体はcode署名ではない）。
+
+```powershell
+# Windows PowerShell（filenameは実際のdownloadに置換）
+Get-FileHash .\solvers-0.1.0-x86_64-pc-windows-msvc.zip -Algorithm SHA256
+```
+
+```sh
+# Linux
+sha256sum solvers-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+# macOS
+shasum -a 256 solvers-0.1.0-aarch64-apple-darwin.tar.gz
+```
+
+WindowsはExplorerの「すべて展開」、Linux/macOSは`tar -xzf <archive>`で全体を展開する。
+binaryと`ui/`、launcherの相対配置を保つ。Windowsは`start-gui.cmd`、
+Linux/macOSは展開先で`sh start-gui.sh`を実行する。browserが開き、Setup → validate → solve →
+Runs → Resultsで最初のP1を計算・閲覧できる。利用中はlauncherのterminalを閉じない。
+詳細は[Web GUI](#web-gui)を参照する。
+
+CLIだけなら展開先で以下を実行する。PowerShellでは`./solvers`を`.\solvers.exe`に置換する。
+
+```sh
+./solvers config new --product p1 --template minimal --out spot.toml
+./solvers validate spot.toml
+./solvers solve spot.toml --out runs/first
+./solvers export runs/first/solution.sol summary
+```
+
+PATHへの追加は任意。追加しなくても展開先の`./solvers`（Windowsは`.\solvers.exe`）で使える。
+常用する場合は展開先directoryをユーザーのPATHへ追加し、新しいterminalで`solvers --version`を確認する。
+以下の章ではPATHに追加した表記を使う。
+
+### 動作要件
+
+| 項目 | 要件・目安 |
+|---|---|
+| Windows | 64-bit Windows 10以降 |
+| macOS | Apple Silicon: macOS 11以降、Intel: macOS 10.12以降（Rust targetの下限） |
+| Linux | x86-64、glibc 2.35以降（Ubuntu 22.04 build）。musl版・Linux ARM版は配布しない |
+| CPU | 上表の基準。GPUは不要 |
+| memory | 木・range・storageに依存。solve前に見積りを表示する。`solvers validate spot.toml --resources`でも確認可能 |
+| disk | archiveと展開先に加え、runごとの`solution.sol`・checkpoint等の空き容量が必要。木・保存street・圧縮に依存し、一律の最小値は無い |
+| GUI | 現行のWeb browser。Rust・Cargo・Node.jsは配布物の実行には不要 |
+
+OS下限の根拠は[Rust platform support](https://doc.rust-lang.org/rustc/platform-support.html)。
+Linux配布物はRust自体のglibc 2.17下限ではなく、release workflowのUbuntu 22.04（glibc 2.35）を基準とする。
+これはtarget/build環境からの要件であり、各最古OSでの実機動作確認を意味しない。
+
+[CPU基準の計測](../experiments/release-2026-10/cpu-baseline-20261015/README.md)では
+`flop_4bp`が469,808 node、`flop_3bp`が2,222,550 nodeである。
+同梱例[flop_3bp](../examples/hu-postflop/flop_3bp.toml)のstorage見積りは
+f32で約1.44 GiB、i16で約0.73 GiB。これらは**storageだけの見積りでRSSではない**。
+木・rank table・thread scratch・保存作業領域等が別途必要なので、この値ぴったりのRAMでは足りない。
+大きい木では数GiB以上になるため、小さいP1 templateで始め、[memory設定](#4-solveする)と見積りを確認する。
+配布archiveの確定サイズ・runのdisk使用量はReleaseと実際の入力で確認する。
+
+### 未署名binaryを起動する
+
+v0.1.0はcode署名しない。信頼できるReleaseから取得し、上記checksumを確認したものだけに以下を行う。
+
+- Windows SmartScreenの「WindowsによってPCが保護されました」は **詳細情報（More info）→ 実行（Run anyway）**。
+  または展開先のPowerShellで`Get-ChildItem -Recurse | Unblock-File`を実行する。
+- macOS Gatekeeperで拒否された場合は`xattr -dr com.apple.quarantine <展開先directory>`でquarantine属性を除く。
+  または起動を試した後、**システム設定 → プライバシーとセキュリティ → このまま開く（Open Anyway）**を使う。
+  OS全体のGatekeeperを無効化しない。
+
+daemonは既定のloopbackで使う。非loopback bindには**TLSが必須**であり、bearer tokenを他人に渡さない。
+tokenを含むGUI URL・ログ・browser保存値も秘密情報として扱う。
+公開設定・tokenの指定方法は[daemonの章](#7-daemonから実行する)を参照する。
+
+### ソースからbuildする
+
+Rust stable、Cargo、Gitを用意し、repositoryを取得する。OS別の準備は[development.md](development.md)を参照する。
 
 ```sh
 cargo build --release -p cli -p daemon --no-default-features
@@ -281,17 +382,26 @@ consoleのある端末から起動する（console無しではcancelが`internal
 
 ### Web GUI
 
-Web GUIは`web/`にあり、Node.js 22以上でbuildしてから同じdaemonで配信する。
+配布archiveを展開した場合は、Windowsでは`start-gui.cmd`、Linux・macOSでは`sh start-gui.sh`で起動する。
+launcherは自身のdirectoryへ移動し、`solversd --open --runs runs`を実行する。
+同梱の`ui/index.html`は`solversd`の隣から自動検出され、既定browserでGUIが開く。
+runは展開先の`runs/`へ保存するため、書込み可能な場所へ展開する。
+
+sourceから使う場合は、Node.js 22以上で`web/`をbuildしてから同じdaemonで配信する。
 
 ```sh
 cd web && npm ci && npm run build && cd ..
-solversd --runs runs --ui web/dist
+solversd --runs runs --ui web/dist --open
 ```
 
-起動時の`gui:` URL（tokenはfragmentに入る）をbrowserで開く。tokenはそのoriginに保存され、
+`--open`はlisten後、起動時の`gui:` URL（tokenはfragmentに入る）を既定browserで開く。
+browserの起動に失敗してもdaemonは動き続け、stderrに警告を出すので、表示されたURLを手動で開く。
+`--open`を省略した場合もそのURLを手動で開ける。tokenはそのoriginに保存され、
 無効なら入力欄が出る。静的assetは認証不要だが`/v1` APIは引き続きbearer tokenが必要である。
 `/`と拡張子なしの未存在pathは`index.html`へ、未存在のassetは404となる。
-`--ui`を指定しないときは全requestの認証が必要である。endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する。
+明示`--ui DIR`は自動検出より優先する。`--ui`省略時は実行binaryの隣の`ui/index.html`を探し、
+無ければAPI専用となり全requestの認証が必要である（作業directoryの`ui/`は探さない）。
+UI無しで`--open`を指定すると起動errorになる。endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する。
 
 GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付きの操作手順を示す。
 

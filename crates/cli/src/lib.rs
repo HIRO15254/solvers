@@ -198,7 +198,14 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "solvers", version)]
+#[command(
+    name = "solvers",
+    version = if cfg!(feature = "p2") {
+        concat!(env!("CARGO_PKG_VERSION"), " (", env!("SOLVERS_GIT_HASH"), ")")
+    } else {
+        concat!(env!("CARGO_PKG_VERSION"), " (", env!("SOLVERS_GIT_HASH"), "), P1 only")
+    }
+)]
 #[command(about = "Poker solver")]
 #[cfg_attr(
     not(feature = "p2"),

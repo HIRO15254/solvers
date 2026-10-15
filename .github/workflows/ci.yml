@@ -78,3 +78,18 @@ jobs:
         run: cargo build -p cli
       - name: Daemon HTTP and child-process smoke
         run: cargo test -p daemon --test http_api
+
+  macos-smoke:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: NLH v1 CLI checkpoint and metrics
+        run: cargo test -p cli --test cli_integration solve_checkpoint_and_metrics_smoke -- --exact
+      - name: P1-only distribution
+        run: cargo test -p cli --no-default-features --test p1_only_build
+      - name: Build the CLI the daemon spawns
+        run: cargo build -p cli
+      - name: Daemon HTTP and child-process smoke
+        run: cargo test -p daemon --test http_api

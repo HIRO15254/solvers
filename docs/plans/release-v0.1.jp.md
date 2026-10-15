@@ -12,6 +12,8 @@
 | RD3 | 配布物はP1（HU Postflop）だけを含む。P2（Multiway Preflop）とP2の解を使うderiveは含めない。理由はP2の方式と品質保証が未決定であること（D5） |
 | RD4 | （2026-10-15）v0.1.0のbinaryには署名しない。Windows SmartScreenとmacOS Gatekeeperの回避手順を利用者文書に記す |
 | RD5 | （2026-10-15）Cryst Design System（`web/vendor/cryst/`）は利用者の自作物であり、リポジトリと同じMIT OR Apache-2.0で公開する |
+| RD6 | （2026-10-15）Windows・Linuxのx86-64は`x86-64-v3`（AVX2）を通常の配布物、`x86-64-v2`を`compat`配布物として2種を出す。Intel macOSは`x86-64-v2`、Apple Siliconは`apple-m1`。根拠は[CPU基準の計測](../../experiments/release-2026-10/cpu-baseline-20261015/README.md) |
+| RD7 | （2026-10-15）GTO Wizard由来のデータは研究用にローカルへ残し、追跡対象から外して配布しない。既存のGit履歴は書き換えない |
 
 RD3は配布物の範囲であり、リポジトリ・既定のworkspace build・CIからP2を外すものではない。
 
@@ -19,10 +21,10 @@ RD3は配布物の範囲であり、リポジトリ・既定のworkspace build�
 
 | 項目 | 内容 |
 |---|---|
-| target | `x86_64-pc-windows-msvc`、`x86_64-unknown-linux-gnu`、`aarch64-apple-darwin`、`x86_64-apple-darwin` |
+| target | `x86_64-pc-windows-msvc`・`x86_64-unknown-linux-gnu`（各v3と`compat`のv2）、`aarch64-apple-darwin`、`x86_64-apple-darwin`（v2） |
 | archive | `solvers`・`solversd`（Windowsは`.exe`）、build済みWeb GUI、LICENSE-MIT・LICENSE-APACHE、第三者ライセンス表記、利用者向けREADME |
 | 付随物 | SHA-256 checksum、CHANGELOG由来のリリースノート |
-| build | P2とderiveを外した配布設定、配布用CPU基準のRUSTFLAGS（`.cargo/config.toml`の`target-cpu=native`を使わない） |
+| build | P2とderiveを外した配布設定。RD6のCPU基準をRUSTFLAGSで常に明示する（`.cargo/config.toml`の`target-cpu=native`を使わない） |
 
 archive内の相対配置と`solversd`がUIを見つける規則は、手順4で決めてCLI referenceに記す。
 

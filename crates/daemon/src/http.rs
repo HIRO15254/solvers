@@ -26,7 +26,7 @@ pub struct Daemon {
 
 impl Daemon {
     /// Serves until the process is stopped.
-    pub fn serve(self, address: &str, tls: Option<Tls>) -> Result<()> {
+    pub fn serve(self, address: &str, tls: Option<Tls>, open: bool) -> Result<()> {
         let scheme = if tls.is_some() { "https" } else { "http" };
         let server = match tls {
             Some(tls) => Server::https(address, tls.into_config()),
@@ -63,7 +63,17 @@ impl Daemon {
                     }
                 })
                 .unwrap_or_else(|| "127.0.0.1".to_string());
-            println!("gui: {scheme}://{host}:{port}/#token={}", self.token);
+            let url = format!("{scheme}://{host}:{port}/#token={}", self.token);
+            println!("gui: {url}");
+            if open {
+                // Some browser launchers wait for the browser to close. Never
+                // hold up the request loop, and never pass the token to a shell.
+                std::thread::spawn(move || {
+                    if let Err(error) = open_browser(&url) {
+                        eprintln!("Warning: could not open the GUI in a browser: {error:#}");
+                    }
+                });
+            }
         }
 
         let recovered = self.api.recover();
@@ -234,6 +244,26 @@ impl Daemon {
             .fold(0u8, |difference, (a, b)| difference | (a ^ b))
             == 0
     }
+}
+
+fn open_browser(url: &str) -> Result<()> {
+    #[cfg(target_os = "windows")]
+    let mut command = {
+        let mut command = std::process::Command::new("rundll32");
+        command.arg("url.dll,FileProtocolHandler");
+        command
+    };
+    #[cfg(target_os = "macos")]
+    let mut command = std::process::Command::new("open");
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    let mut command = std::process::Command::new("xdg-open");
+    let status = command
+        .arg(url)
+        .stdin(std::process::Stdio::null())
+        .status()
+        .context("launching the default browser")?;
+    anyhow::ensure!(status.success(), "browser launcher exited with {status}");
+    Ok(())
 }
 
 fn query_value(query: &str, key: &str) -> std::result::Result<Option<String>, ErrorResponse> {

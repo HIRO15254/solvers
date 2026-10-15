@@ -26,3 +26,6 @@ experiments/multiway-2026-09/scripts/summarize_raised_opponent.py -text
 experiments/multiway-2026-09/scripts/summarize_whole_preflop_deviation.py -text
 experiments/multiway-2026-09/whole-preflop-deviation-20260910/result.json -text
 experiments/multiway-2026-09/whole-preflop-fit-calibration-20260910/result.json -text
+
+# Windows batch files must keep CRLF in checkouts and release archives.
+*.cmd text eol=crlf

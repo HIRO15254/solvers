@@ -6,6 +6,55 @@ Two No-Limit Hold'em solvers in Rust share the `solvers.nlh/v1` input:
 utility; it does not accept multiway postflop starting spots.
 For three or more players, results are regret-minimized approximations rather than certified Nash/GTO solutions.
 
+## Install
+
+Download an archive and `SHA256SUMS` from
+[GitHub Releases](https://github.com/HIRO15254/solvers/releases).
+Release binaries contain **only HU Postflop (P1)**, not P2 or `derive`;
+the source workspace below contains both products.
+
+Archives are named `solvers-<version>-<target>[-compat]`:
+
+| OS / CPU | Target and archive |
+|---|---|
+| Windows x86-64 | `x86_64-pc-windows-msvc.zip` |
+| Linux x86-64 | `x86_64-unknown-linux-gnu.tar.gz` |
+| macOS Apple Silicon | `aarch64-apple-darwin.tar.gz` |
+| macOS Intel | `x86_64-apple-darwin.tar.gz` |
+
+Windows/Linux default to **x86-64-v3 (AVX2)**. Choose `-compat` immediately
+before `.zip` / `.tar.gz` for a CPU without AVX2; it still requires
+**x86-64-v2**, not any old 64-bit CPU. Check Windows with Microsoft's
+[Coreinfo](https://learn.microsoft.com/en-us/sysinternals/downloads/coreinfo)
+(`coreinfo -f`, `AVX2` marked `*`), Linux with `lscpu` (look for `avx2`),
+or Intel macOS with `sysctl -n machdep.cpu.leaf7_features` (look for `AVX2`).
+Intel macOS has one v2 archive; Apple Silicon uses the native M1 baseline.
+
+Before extracting, compare the archive's hash with its exact filename's entry
+in `SHA256SUMS`: PowerShell `Get-FileHash .\solvers-<version>-<target>.zip -Algorithm SHA256`,
+Linux `sha256sum <archive>`, or macOS `shasum -a 256 <archive>`.
+Do not run a download whose hash differs. Extract the whole archive (Explorer
+**Extract All** on Windows, or `tar -xzf <archive>` on Linux/macOS), keeping
+`ui/` beside the binaries. No Rust or Node.js installation is needed.
+
+Run `start-gui.cmd` on Windows or `sh start-gui.sh` on Linux/macOS from the
+extracted directory. Keep its terminal open while using the GUI. For a first
+CLI solve, run these commands there (PowerShell: replace `./solvers` with
+`.\solvers.exe`):
+
+```sh
+./solvers config new --product p1 --template minimal --out spot.toml
+./solvers validate spot.toml
+./solvers solve spot.toml --out runs/first
+./solvers export runs/first/solution.sol summary
+```
+
+v0.1.0 binaries are **unsigned**. See the
+[installation guide](docs/user-guide.jp.md#1-インストールする) for OS/memory
+requirements, SmartScreen/Gatekeeper steps, optional PATH setup and daemon
+security. Only unblock binaries downloaded from the trusted release page
+after checking the checksum.
+
 ## Status
 
 The repository has been rebuilt as two products that share one input
@@ -75,7 +124,18 @@ caches in ignored cache directories, and Cargo output in `target/`.
 User inputs are indexed in [examples/README.md](examples/README.md); performance
 workloads live in `examples/bench/`, and regression fixtures with their tests.
 
-## Quick start
+## Build from source
+
+Install Rust stable, Cargo and Git; see [development setup](docs/development.md)
+for OS prerequisites. From a source checkout, build the CLI and daemon:
+
+```sh
+cargo build --release -p cli -p daemon
+```
+
+The binaries are in `target/release/` (`.exe` on Windows). The default source
+build includes provisional P2 and `derive`; add `--no-default-features` for
+the P1-only build used by releases. The commands below are developer examples.
 
 Every config declares `schema = "solvers.nlh/v1"`. Every solve writes one
 run directory. Create a template with `solvers config new --product p1|p2

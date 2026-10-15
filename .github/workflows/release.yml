@@ -1,0 +1,152 @@
+name: Release
+
+# Builds the P1-only distribution (docs/plans/release-v0.1.jp.md) for every
+# target, smoke-tests each archive's binaries, and attaches the archives and
+# SHA256SUMS to a draft GitHub Release. Publishing the draft stays manual.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+# CPU baselines (SOL-40, experiments/release-2026-10/cpu-baseline-20261015):
+# Windows and Linux ship x86-64-v3 (AVX2) as the default archive and
+# x86-64-v2 as the `compat` archive; Intel macOS ships v2 only; Apple Silicon
+# uses apple-m1, the target's own default. RUSTFLAGS replaces the local
+# target-cpu=native default from .cargo/config.toml.
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches the workspace version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: sh packaging/check-version.sh "${GITHUB_REF_NAME}"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Third-party notices match the locked dependencies
+        run: sh packaging/third-party.sh --check
+      - id: version
+        run: echo "version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> "$GITHUB_OUTPUT"
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ui
+          path: web/dist
+          if-no-files-found: error
+
+  build:
+    needs: [version, web]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-pc-windows-msvc, os: windows-latest, cpu: x86-64-v3, suffix: '' }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest, cpu: x86-64-v2, suffix: compat }
+          # The oldest available runner keeps the glibc requirement low.
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04, cpu: x86-64-v3, suffix: '' }
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-22.04, cpu: x86-64-v2, suffix: compat }
+          - { target: aarch64-apple-darwin, os: macos-14, cpu: apple-m1, suffix: '' }
+          # Built on Apple Silicon; smoke-tested under Rosetta 2.
+          - { target: x86_64-apple-darwin, os: macos-14, cpu: x86-64-v2, suffix: '' }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}-${{ matrix.cpu }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: ui
+          path: dist/ui
+      - name: Build the P1-only binaries
+        run: |
+          # Always set: an unset RUSTFLAGS would fall back to target-cpu=native.
+          export RUSTFLAGS="-C target-cpu=${{ matrix.cpu }}"
+          cargo build --release --locked --no-default-features \
+            -p cli -p daemon --target ${{ matrix.target }}
+      - name: Package
+        id: package
+        run: |
+          archive=$(sh packaging/package.sh "${{ needs.version.outputs.version }}" \
+            ${{ matrix.target }} target/${{ matrix.target }}/release dist/ui dist "${{ matrix.suffix }}")
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "stage=${archive%.zip}" | sed 's/\.tar\.gz$//' >> "$GITHUB_OUTPUT"
+      - name: Smoke-test the packaged binaries
+        run: |
+          stage="${{ steps.package.outputs.stage }}"
+          exe=; case "${{ matrix.target }}" in *windows*) exe=.exe ;; esac
+          "$stage/solvers$exe" --version
+          "$stage/solversd$exe" --version
+          "$stage/solvers$exe" validate examples/hu-postflop/river_small.toml
+          "$stage/solvers$exe" solve examples/hu-postflop/river_small.toml --out smoke-run
+          "$stage/solvers$exe" export smoke-run/solution.sol summary
+          set +e
+          "$stage/solvers$exe" validate examples/mw-preflop/3max_smoke.toml
+          code=$?
+          set -e
+          test "$code" -eq 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: archive-${{ matrix.target }}-${{ matrix.cpu }}
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+
+  release:
+    needs: [version, build]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: archive-*
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum solvers-* > SHA256SUMS && cat SHA256SUMS
+      - name: Release notes from CHANGELOG
+        run: |
+          awk -v v="${{ needs.version.outputs.version }}" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          test -s notes.md
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --draft --verify-tag --title "solvers ${GITHUB_REF_NAME}" --notes-file notes.md

@@ -263,12 +263,23 @@ clientは`nash_conv / 2`でExploitabilityを表示できる。
 認証 token は明示 `--token`、`SOLVERSD_TOKEN`、新規乱数の順で選び、起動時に表示する。
 自動的に client の設定 directory へ保存する動作は持たない。TLS と bind の条件は R7 に従う。
 
-`solversd --ui DIR`はbuild済みSPAを静的配信する。`/v1`と`/v1/`配下の認証は従来どおり必須で、
-それ以外のGET/HEADのみtokenなしでDIR内のfileを配信する。`/`は`index.html`、
+`solversd --ui DIR`はbuild済みSPAを静的配信する。`--ui`省略時は`current_exe`の隣の
+`ui/index.html`がfileとして存在すればその`ui/`を使う。明示`--ui DIR`が常に優先し、
+current working directoryは探索しない。自動検出できなければAPI専用となる。
+UI配信時も`/v1`と`/v1/`配下の認証は必須で、それ以外のGET/HEADのみtokenなしで
+UI directory内のfileを配信する。`/`は`index.html`、
 存在しない拡張子なしpathはSPA fallback、拡張子ありpathは404となる。復号後の`..`・absolute・
 backslash・drive指定を拒否し、canonical pathがDIR外へ出るfileも配信しない。
 `index.html`には`Cache-Control: no-cache`を付ける。起動時は従来の3行の後に
-`gui: {scheme}://{host}:{port}/#token={token}`を表示する。`--ui`なしでは全requestにtokenが必要である。
+`gui: {scheme}://{host}:{port}/#token={token}`を表示する。UIが無い場合は全requestにtokenが必要である。
+`--open`はlistenと`gui:`表示後、そのtoken付きURLを既定browserへshellを介さず渡す。
+Windowsは`rundll32 url.dll,FileProtocolHandler`、macOSは`open`、その他は`xdg-open`を使い、
+launcherの終了待ちは別threadに置く。browser起動失敗はstderr警告のみでdaemonを止めない。
+UI無しの`--open`はlisten前の引数error（exit 2）である。
+
+配布archiveは`solvers-<version>-<target>/`直下に`solvers`・`solversd`（Windowsは`.exe`）と
+`ui/index.html`を置く。`start-gui.cmd`（Windows）または`start-gui.sh`（POSIX sh）は自身のdirectoryへ移り、
+`solversd --open --runs runs`（Unixは`./solversd`）を実行する。run rootもその配布directory内の`runs/`となる。
 
 ## 8. viewer 境界
 

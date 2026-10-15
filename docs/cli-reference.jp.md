@@ -33,7 +33,7 @@ daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同
 | flag / 変数 | 意味 |
 |---|---|
 | `-h` / `--help` | helpを表示。各subcommandでも使える |
-| `-V` / `--version` | binaryのversionを表示 |
+| `-V` / `--version` | `solvers <version> (<git-hash>)`を表示。`p2` featureなしでは末尾に`, P1 only`を付ける |
 | `--cache-dir DIR` | machine cacheの場所。全subcommandで指定できる |
 | `SOLVERS_CACHE_DIR` | `--cache-dir`が無い場合のcache。未指定ならOSの利用者cache directory |
 | `NO_COLOR` | ANSI色を無効にする |
@@ -41,6 +41,11 @@ daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同
 
 cache pathはconfigに書かない。P2のEHS² tableは初回に構築し、以後は互換cacheを読む。
 cacheのbuild/load通知はstderrへ出す。
+
+versionはworkspaceのsemver（現行`0.1.0`）で、release tagは`v0.1.0`の形式にする。
+git-hashはbuild時の`git rev-parse --short=8 HEAD`の結果、Git情報が無ければ`unknown`である。
+`solversd --version` / `-V`は`solversd <version> (<git-hash>)`を表示する。
+`manifest.json`の`cliVersion`は表示用のhash・build種別を含めず、plain semverだけを保存する。
 
 ## `solvers config new`
 
@@ -234,6 +239,14 @@ P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決�
 P1 `.sol`はversion 4、checkpointはversion 5だけを受理する。`.sol` v1/2/3とcheckpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
+
+### 0.xの互換方針
+
+入力の互換性単位はschema `solvers.nlh/v1`であり、binaryのversionとは別に扱う。
+`.sol`とcheckpointの形式versionは0.xのminor releaseで変更し得るため、旧成果物の互換性は保証しない。
+未対応の旧形式は明示errorで拒否し、現行の`solvers.nlh/v1` configから再solveするよう案内する。
+変更点と配布物の制約は[CHANGELOG](../CHANGELOG.md)を参照する。
+
 
 ## `solvers resume`
 
@@ -472,7 +485,7 @@ P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境�
 
 ```sh
 solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
-         [--solver PATH] [--cache-dir DIR] [--max-concurrent N] [--token TOKEN] [--ui DIR]
+         [--solver PATH] [--cache-dir DIR] [--max-concurrent N] [--token TOKEN] [--ui DIR] [--open]
 ```
 
 | flag | 既定 | 意味 |
@@ -484,10 +497,12 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `--cache-dir DIR` | 無し | 各runへ渡すmachine cache |
 | `--max-concurrent N` | `1` | 同時job数 |
 | `--token TOKEN` | 環境変数、次に生成値 | bearer token。起動時に表示 |
-| `--ui DIR` | 無し | build済みSPAの静的asset directory。API以外のGET/HEADは認証不要 |
+| `--ui DIR` | executableの隣の`ui/`（`index.html`がある場合） | build済みSPAの静的asset directory。明示指定が優先。API以外のGET/HEADは認証不要 |
+| `--open` | 無効 | listenと`gui:`行の表示後、token付きURLを既定browserで開く。UIが無ければ起動error（exit 2）。browser起動失敗はstderrの警告のみ |
 | `-h` / `--help`、`-V` / `--version` | — | help / version |
 
-`/v1`と`/v1/`配下はbearer tokenを要求する。`--ui`なしでは従来どおり全requestに要求する。
+`/v1`と`/v1/`配下はbearer tokenを要求する。`--ui`省略時の探索基準はcurrent working directoryではなく
+`solversd`自身のdirectoryである。隣に`ui/index.html`が無ければAPI専用となり、全requestにtokenを要求する。
 
 | method | path | 内容 |
 |---|---|---|
@@ -503,7 +518,7 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `GET` | `/v1/runs/{id}/solution/{view}?format=csv&node=SELECTOR` | P1の`.sol` / P2の`.mwsol`をCLI exportで照会。`node`はP1のみ、繰り返し可 |
 | `POST` | `/v1/runs/{id}/cancel` | 協調停止（Unix: SIGINT、Windows: Ctrl-Break）。送れなければ`internal` |
 | `POST` | `/v1/runs/{id}/resume` | 再開 |
-| `GET` / `HEAD` | `/`とAPI以外のpath | `--ui DIR`指定時のみ、tokenなしで静的asset / SPA fallback |
+| `GET` / `HEAD` | `/`とAPI以外のpath | UIが明示指定または自動検出されたとき、tokenなしで静的asset / SPA fallback |
 
 `lastProgress`は最後の`progress.jsonl`行であり、無ければ省略する。P1では
 `iteration`・`elapsed_secs`・`expl_p0`・`expl_p1`・`nash_conv`を保持するため、
@@ -540,12 +555,14 @@ P2への`node`指定、不正なquery encoding、CLIの入力error（exit 2）�
 `invalid-request`となり、CLI errorではstderrをmessageに載せる。その他のexport失敗は
 `internal`。追加契約のためprotocol versionは`1`のまま。
 
-`--ui`では`/`は`index.html`、存在しない拡張子なしpathは`index.html`へfallback、
+UI配信時は`/`は`index.html`、存在しない拡張子なしpathは`index.html`へfallback、
 存在しない拡張子ありpathは404となる。`index.html`は`Cache-Control: no-cache`。
 HTML・JS/MJS・CSS・SVG・PNG・ICO・JSON/MAP・WOFF2・TXTのContent-Typeを設定する。
 復号後の`..`・absolute・backslash・drive componentと、canonical pathがDIR外へ出る参照は拒否する。
-起動時の`token:`行の後に`gui: {scheme}://{host}:{port}/#token={token}`を表示する。
+UI配信時は起動時の`token:`行の後に`gui: {scheme}://{host}:{port}/#token={token}`を表示する。
 unspecified bindのhostはIPv4なら`127.0.0.1`、IPv6なら`[::1]`として表示する。
+`--open`はこのURLをshellを介さず既定browserへ渡す（Windows: `rundll32 url.dll,FileProtocolHandler`、
+macOS: `open`、その他: `xdg-open`）。起動待ちはHTTP request処理を妨げない。
 HTTP契約とviewer境界は[app-architecture.md](app-architecture.md)を参照する。
 
 ## 同期
