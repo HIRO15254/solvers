@@ -32,7 +32,9 @@ jobs:
         run: sh packaging/check-version.sh "${GITHUB_REF_NAME}"
       - uses: dtolnay/rust-toolchain@stable
       - name: Third-party notices match the locked dependencies
-        run: sh packaging/third-party.sh --check
+        run: |
+          sh packaging/third-party.sh --output "$RUNNER_TEMP/THIRD-PARTY-LICENSES.txt"
+          diff -u packaging/THIRD-PARTY-LICENSES.txt "$RUNNER_TEMP/THIRD-PARTY-LICENSES.txt"
       - id: version
         run: echo "version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> "$GITHUB_OUTPUT"
 
