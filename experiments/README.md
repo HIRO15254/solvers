@@ -50,6 +50,7 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 | 性能・一致の受入 | [P1 artifact読込みの木再構築・bulk export・compareの短縮](p1-io-2026-10/export-rebuild-20261012/README.md) | 2026-10-12。並列の木構築とpreflight省略で、c013の1 node exportを38.6→5.8秒にした。c001の`actions --node all`は837.6→3.3秒、c013のcompareは123.9→21.7秒。出力はbyte一致した。node索引（v4）と`.sol` size削減（5〜8%）は見送った |
 | 性能・一致の受入 | [P1 `.sol` v4: 木とindexの保存](p1-io-2026-10/sol-v4-20261013/README.md) | 2026-10-13。読込みで木を再構築しない。c013の1 node exportは5.8→0.41秒、peakは2.8→0.66 GB。c001は0.84→0.06秒。compare c013は21.7→17.8秒。`.sol`はc001で8.3%、c013で3.9%縮んだ（level 3＋u16 shuffle）。出力はbyte一致した。v3以前は再solveを案内して拒否する |
 | 配布の判断（ローカル参考計時） | [配布バイナリのCPU基準（SOL-40）](release-2026-10/cpu-baseline-20261015/README.md) | 2026-10-15。i7-10700KFでx86-64・v2・v3・nativeを交互3回。NashConvは4種でbit一致。flop_3bp 16tでv3はx86-64の0.76〜0.83倍（native同等）、v2は0.81〜0.96倍。共有PCで雑音大。RD6（v3と`compat`のv2を配布）の根拠 |
+| 配布の受入 | [P1 v0.1.0の受入（SOL-46）](release-2026-10/v0.1.0-acceptance/README.md) | 2026-10-15。release workflowは6 buildとsmokeがsuccess。`--include-ignored`の受入は1071 pass（P2の1件はSOL-47として除外）。初めて実行したignored試験の不備を3件直した |
 | 過去評価では品質未認定 | [Multiway品質判断](multiway-2026-09/quality-decision.md) | 全Preflopの品質が未認定である理由、有限fitの限界、[保持証拠と検査](multiway-2026-09/quality-evidence/README.md) |
 | 過去の既定値判断 | [Multiway抽象化](multiway-abstraction-2026-07/README.md) | K128/current-street既定の由来と、K256のcash anchorを外挿しない理由 |
 
