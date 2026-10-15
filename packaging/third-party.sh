@@ -4,6 +4,8 @@
 # with lockfile integrity checks (cached under .cache/third-party/npm).
 # Usage: sh packaging/third-party.sh [--output PATH] [--offline] [--check]
 # PYTHON may name a Python executable; paths containing spaces are supported.
+# Generate on Windows: Cargo resolves build-dependencies for the host, and the
+# Windows host graph is the superset (release.yml checks it on windows-latest).
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 if [ -n "${PYTHON:-}" ]; then

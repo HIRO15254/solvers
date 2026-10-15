@@ -91,7 +91,10 @@ only explicitly reviewed permissive licenses and fails closed for unknown or
 copyleft licenses (including GPL, AGPL, LGPL and MPL). Font license files remain
 next to their bundled assets. Regenerate notices whenever dependencies or
 vendored assets change; development-only npm packages and P2-only crates do not
-belong to the P1 release.
+belong to the P1 release. Generate on Windows: Cargo resolves
+build-dependencies for the host, and the Windows host graph is the superset of
+the release hosts. The release workflow checks the committed file on
+`windows-latest`.
 
 ## Contribution rule
 

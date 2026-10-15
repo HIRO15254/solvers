@@ -30,13 +30,27 @@ jobs:
       - name: Tag matches the workspace version
         if: startsWith(github.ref, 'refs/tags/')
         run: sh packaging/check-version.sh "${GITHUB_REF_NAME}"
+      - id: version
+        run: echo "version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> "$GITHUB_OUTPUT"
+
+  notices:
+    # Cargo resolves build-dependencies for the host. The Windows host graph is
+    # the superset (jobserver pulls getrandom only there), so the committed
+    # notices are generated and checked on Windows.
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
       - name: Third-party notices match the locked dependencies
         run: |
           sh packaging/third-party.sh --output "$RUNNER_TEMP/THIRD-PARTY-LICENSES.txt"
-          diff -u packaging/THIRD-PARTY-LICENSES.txt "$RUNNER_TEMP/THIRD-PARTY-LICENSES.txt"
-      - id: version
-        run: echo "version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)" >> "$GITHUB_OUTPUT"
+          diff -u --strip-trailing-cr packaging/THIRD-PARTY-LICENSES.txt "$RUNNER_TEMP/THIRD-PARTY-LICENSES.txt"
 
   web:
     runs-on: ubuntu-latest
@@ -60,7 +74,7 @@ jobs:
           if-no-files-found: error
 
   build:
-    needs: [version, web]
+    needs: [version, notices, web]
     strategy:
       fail-fast: false
       matrix:
