@@ -25,7 +25,7 @@
 | A | `2df171b9e195a8bcb931e7c1d62e7195178d8812274bfc860f999e8df5b42857` |
 | B（最終） | `5745bc3c0956a9a263cd80abf1922dcc2a8907d5e2c037134dd84c05c20eb71f` |
 
-- 対象: [SOL-8 fixture](../../hu-postflop-reference/fixtures-2026-10/README.md)のc001・c013。
+- 対象: `experiments/hu-postflop-reference/fixtures-2026-10/README.md`（local-only、非配布）のc001・c013。
   - v2の`.sol`は、SOL-8のsolve（`runs/sol8/solve/<case>/`）が出したもの。
   - v3の`.sol`は、同じ`run.toml`を`[run] checkpoint_interval = "100h"`に変えてBで再solveしたもの。c013の定期checkpoint（8 GB）を避けるためである。`[run]`は互換性hashの対象外である。
 

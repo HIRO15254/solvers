@@ -97,10 +97,9 @@ i16・i16-f32avgではturn・riverで0.68〜0.79倍。EV・NashConvは全storage
 
 ### G2: GTOW Single Sizeの再現（Ks7h2d、cEV）
 
-[記録](../../experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md)の2026-10-09節。
-GTOWで観測したsizeを`donk`・`cbet`・`aggressions`の条件で写した木（985,178 node、f32 storage 3.96 GiB）を0.049%potまで解いた。
-EVはOOP/IP 1.978/3.522 bb（GTOW 1.97/3.53）、rootのcheck 100%（GTOW 100%）、BTN stab 79.4%（84.1%）、
-turn BBのbet 61.6%（53.1%）、river BBのbet 31.8%（38.3%）で、2026-07-09の記録よりGTOWに近い。
+GTOW由来のrange・頻度・EVを含む比較記録は
+`experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md`（local-only、配布対象外）に保持する。
+公開版には当方の性能測定だけを残す。
 ローカル12 threadで0.3 / 0.1 / 0.05%potへ91 / 179 / 231秒、GCP 32 threadで0.05%まで57.8秒だった。
 
 ### C1・C2のGCP受入（c2d-highcpu-32、16・32 thread）

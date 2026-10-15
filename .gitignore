@@ -14,3 +14,28 @@ __pycache__/
 *.pyc
 # Test-created temporary directories must not become repository inputs.
 /tmp*/
+
+# GTO Wizard copied/derived values: local research only, never distributed.
+/experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md
+/experiments/hu-postflop-reference/cases/ks7h2d-flop/gw-check-*.toml
+/experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md
+/experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/gw-check-*.toml
+/experiments/hu-postflop-reference/fixtures-2026-10/README.md
+/experiments/hu-postflop-reference/fixtures-2026-10/cases/c*/gtow-flop.json
+/experiments/hu-postflop-reference/fixtures-2026-10/cases/c*/gtow-menus.json
+/experiments/hu-postflop-reference/fixtures-2026-10/cases/c*/input.toml
+/experiments/hu-postflop-reference/fixtures-2026-10/cases/c*/comparison.json
+/experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-*.json
+/experiments/p1-efficiency-2026-10/templates-20261009/configs/gw_single.toml
+/experiments/multiway-2026-09/multiway-convergence-round4-20260909/README.md
+/experiments/multiway-2026-09/multiway-convergence-round4-20260909/result.json
+/experiments/multiway-2026-09/multiway-convergence-round5-20260909/README.md
+/experiments/multiway-2026-09/multiway-convergence-round5-20260909/simple-screen.md
+/experiments/multiway-2026-09/simple-depth-coverage-20260910/README.md
+/experiments/multiway-2026-09/simple-depth-coverage-20260910/reference.json
+/experiments/p2-method-2026-10/l1-6max/README.md
+/experiments/p2-method-2026-10/l1-6max/results/rfi.md
+/experiments/p2-method-2026-10/l1-6max/results/buckets/rfi-b128.md
+/experiments/p2-method-2026-10/l1-6max/results/summary.md
+/experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_range_x.csv
+/experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_*.csv

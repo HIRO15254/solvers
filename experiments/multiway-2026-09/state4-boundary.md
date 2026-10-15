@@ -69,7 +69,7 @@ GiB; local K32 batch8 and batch12 experiments are active.
 - [Corrected K32 24-thread audit](multiway-convergence-round4-20260909/output/cloud-state4-k32-pair/k32-t24/audit.stdout.json) — SHA-256 `f188a813a8fd01548b5ba45800a8b26c7ca45ef4b6d438f72af712ddb1149e54`.
 - [Corrected K256 audit](multiway-convergence-round4-20260909/output/cloud-state4-k256/k256-t24/audit.stdout.json) — SHA-256 `33a38bdd3e400001db64428d1b367d9ab5fcf1edef611f9e8f76aceffd382338`.
 - Cap2 census (`runs/gcp-convergence-20260909-control/research-state4/census-cap2.json`, 削除済み) — SHA-256 `44bebf7e6a77be8e9996f3b9b2ea9f15490085f1eaa86a7b48f2eddd82eba3f8` (UTF-8 BOM).
-- [GTOW preflop reference](multiway-convergence-round5-20260909/references/gtowizard-preflop-2026-09-08.json) and [boundary hand panel](multiway-convergence-round5-20260909/references/gtowizard-boundary-hands-2026-09-09.json).
+- GTOW preflop reference `multiway-convergence-round5-20260909/references/gtowizard-preflop-2026-09-08.json` and boundary hand panel `multiway-convergence-round5-20260909/references/gtowizard-boundary-hands-2026-09-09.json` (local-only research data; not distributed).
 
 The measured solver remains a partial tree with different abstraction and rake
 conventions from GTOW. Rounded UI references, finite samples, and fixed

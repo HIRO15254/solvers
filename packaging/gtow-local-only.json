@@ -1,0 +1,221 @@
+{
+  "policy": "Local research only; not distributed. Files retained on disk with git rm --cached. User decision 2026-10-15: preserve existing Git history as-is; no rewrite.",
+  "files": [
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/gw-check-2026-07-09-Ks7h2d-flop-oop116.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/gw-check-2026-07-09-Ks7h2d-flop-oop33.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/gw-check-2026-10-09-Ks7h2d-flop-single.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/gw-check-2026-07-09-Ks7h2d3c8d-river-raisesplit.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/gw-check-2026-07-09-Ks7h2d3c8d-river.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/README.md",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c001/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c001/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c001/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c001/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c008/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c008/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c008/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c008/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c013/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c013/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c013/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c013/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c018/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c018/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c018/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c018/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c021/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c021/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c021/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c021/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c023/comparison.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c023/gtow-flop.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c023/gtow-menus.json",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/hu-postflop-reference/fixtures-2026-10/cases/c023/input.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-boundary-hands-2026-09-09.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-preflop-2026-09-08.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-sb-limp-2026-09-09.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-simple-preflop-2026-09-09.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-target-2026-09-09.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/configs/gw_single.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/README.md",
+      "reason": "Embedded copied GTOW per-hand and node action frequencies."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round5-20260909/simple-screen.md",
+      "reason": "Copied GTOW weighted raise-combo totals and nonzero class counts."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round4-20260909/README.md",
+      "reason": "Embedded copied GTOW per-position raise and limp frequencies."
+    },
+    {
+      "path": "experiments/multiway-2026-09/multiway-convergence-round4-20260909/result.json",
+      "reason": "Reference object contains copied GTOW per-position action frequencies."
+    },
+    {
+      "path": "experiments/multiway-2026-09/simple-depth-coverage-20260910/reference.json",
+      "reason": "Copied GTOW deep-preflop node action frequencies and combo counts."
+    },
+    {
+      "path": "experiments/multiway-2026-09/simple-depth-coverage-20260910/README.md",
+      "reason": "Embedded copied GTOW deep-node action-frequency comparison table."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/rfi.md",
+      "reason": "Copied GTOW position and per-class opening frequencies."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/rfi-b128.md",
+      "reason": "Duplicate comparison table with copied GTOW opening frequencies."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/summary.md",
+      "reason": "Embedded copied GTOW per-position opening frequencies."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/README.md",
+      "reason": "Embedded copied GTOW position and per-class opening frequencies."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_range_x.csv",
+      "reason": "Copied GTOW BB and BTN per-combo range weights."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_root.csv",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_rootx.csv",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_rootxx_3c_.csv",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_rootxx_3c_x.csv",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_rootxx_3c_xx_8d_.csv",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    }
+  ]
+}

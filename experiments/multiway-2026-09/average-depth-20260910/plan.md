@@ -24,7 +24,7 @@ coverage alone is not the primary success metric.
 
 This is a plan, not evidence of strategy improvement. Current implementation
 and measurements are in the
-[coverage report](../simple-depth-coverage-20260910/README.md) and
+local-only `../simple-depth-coverage-20260910/README.md` (contains GTOW values; not distributed) and
 [checkpoint report](../checkpoint-streaming-20260910/README.md).
 
 ## Completed: coverage inside specified deep branches

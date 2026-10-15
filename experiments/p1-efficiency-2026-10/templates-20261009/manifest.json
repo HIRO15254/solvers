@@ -2,6 +2,8 @@
  "reproduction": "verified",
  "sourceCommit": "df321c73546a9c011d101b712e589509985c2efb",
  "vm": "shared with gcp-accept-20261009",
+ "distributionNote": "Historical evidence hashes below are not a tracked-file inventory. GTOW copied ranges and CSV weight columns are local-only, excluded from public source and releases; see packaging/gtow-local-only.json. The README has been edited to remove links to those private files.",
+ "localOnly": ["configs/gw_single.toml", "results/raw/gw_range_x.csv", "results/raw/gw_strategy_root.csv", "results/raw/gw_strategy_rootx.csv", "results/raw/gw_strategy_rootxx_3c_.csv", "results/raw/gw_strategy_rootxx_3c_x.csv", "results/raw/gw_strategy_rootxx_3c_xx_8d_.csv"],
  "sha256": {
   "configs/flop_srp.toml": "6d4a0dd312936748582931a8a4b1d99febca6294da0370adee39b4a3ecfd0a2e",
   "configs/gw_single.toml": "174dafcce53987ced251acb02bb811c2b7b105bc692553615341886afcdbefa1",

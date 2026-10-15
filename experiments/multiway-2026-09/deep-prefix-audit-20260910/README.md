@@ -5,7 +5,7 @@ evaluation values. New branch-specific counts also reveal river average use
 of only **77–79% after a 3bet call**, versus 94–95% globally. This does not
 change solver learning or establish an equilibrium guarantee. The retained
 1,024- and 32,768-sweep checkpoints from the
-[previous coverage study](../simple-depth-coverage-20260910/README.md) are reused.
+local-only `../simple-depth-coverage-20260910/README.md` (contains GTOW values; not distributed) are reused.
 
 ## Implementation
 

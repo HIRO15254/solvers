@@ -12,9 +12,9 @@
 
 | 領域 | 実験 | 確認する内容 |
 |---|---|---|
-| 旧条件とstate | [round 4](multiway-convergence-round4-20260909/README.md) | state 4への移行、C4性能、旧state 3との比較境界 |
-| 旧条件とstate | [round 5](multiway-convergence-round5-20260909/README.md) | K・batch・抽象化、Simple比較、並列走査、大型export |
-| 深い枝の評価 | [Simple深度とcoverage](simple-depth-coverage-20260910/README.md) | 参照局面、平均戦略coverage、後続実験のcheckpoint入力 |
+| 旧条件とstate | `multiway-convergence-round4-20260909/README.md`（local-only、非配布） | state 4への移行、C4性能、旧state 3との比較境界。GTOW比較値を含む |
+| 旧条件とstate | `multiway-convergence-round5-20260909/README.md`（local-only、非配布） | K・batch・抽象化、Simple比較、並列走査、大型export。GTOW比較値を含む |
+| 深い枝の評価 | `simple-depth-coverage-20260910/README.md`（local-only、非配布） | 参照局面、平均戦略coverage、後続実験のcheckpoint入力。GTOW比較値を含む |
 | 深い枝の評価 | [deep-prefix監査](deep-prefix-audit-20260910/README.md) | 深い枝の保存・監査範囲 |
 | 深い枝の評価 | [条件付き深度](conditional-depth-20260910/README.md) | 希少枝の到達と条件付き評価 |
 | 深い枝の評価 | [配札proposal](preflop-proposal-20260910/README.md) | 条件付き配札と補正、後続実験の共通設定 |

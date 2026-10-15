@@ -11,7 +11,7 @@ command、hash、成否は各run directoryとmachine-readable JSONを正とす�
 combo-bucket tableを誤再利用した。regretと平均戦略の両方に影響するため、v3で得た
 profile、頻度、candidate gainは現在の品質証拠として無効である。旧checkpointから
 state4へ継続もできない。境界の根拠は
-[round4](multiway-convergence-round4-20260909/README.md) と
+`multiway-convergence-round4-20260909/README.md`（GTOW比較値を含むlocal-only記録）と
 [state4再計測](state4-boundary.md) にある。
 
 v3でのwriter、sampler、評価器などの同一入力A/Bは、その処理の速度・bit identityの
@@ -39,11 +39,13 @@ K256・cap 4/4/4/4だが、state4の主要runは同じrule群からK32やmixed K
 
 | 参照 | 観測範囲 | 使用可能な比較 | 使用できない比較 |
 |---|---|---|---|
-| [General target](multiway-convergence-round5-20260909/references/gtowizard-target-2026-09-09.json) | Cash6m50zGeneral、100bb、NL50、5%/4bb、5 open、15 no-caller 3bet、一部4bet menu | action label/size、position別の大きな傾向 | 完全tree、rake engine、隠れたsolver精度、Nash誤差 |
-| [General aggregate](multiway-convergence-round5-20260909/references/gtowizard-preflop-2026-09-08.json) | 5 unopened nodeとSB open後BB。丸め済みActions表示 | 同じaction menuに揃えたposition頻度のplausibility | 自作node-frequency比との厳密な同一estimand。GTOW側の先行fold/card-removal分母は未取得 |
-| [General boundary hands](multiway-convergence-round5-20260909/references/gtowizard-boundary-hands-2026-09-09.json) | UTG/BTN/SBの選択10 hand | aggregateが近くてもhand選択が崩れていないかの診断 | range全体のMAE、代表性、収束証明 |
-| [General SB limp](multiway-convergence-round5-20260909/references/gtowizard-sb-limp-2026-09-09.json) | SB limp後のBB 3bb/5bbとSB応答 | limp fixture menuの境界確認 | 全limped potまたは因果的な品質改善の証明 |
-| [Simple reference](multiway-convergence-round5-20260909/references/gtowizard-simple-preflop-2026-09-09.json) | Cash6m50zSimpleの5 unopened class table（845 rows）、15 response menu、SB対BBの1 menu | Simple fixture内の169-class combo加重MAE/RMSE | Generalとの統合、未観測後続node、表示の0.2--0.3%を本solverの停止基準に転用 |
+| `multiway-convergence-round5-20260909/references/gtowizard-target-2026-09-09.json` (local-only) | Cash6m50zGeneral、100bb、NL50、5%/4bb、5 open、15 no-caller 3bet、一部4bet menu | action label/size、position別の大きな傾向 | 完全tree、rake engine、隠れたsolver精度、Nash誤差 |
+| `multiway-convergence-round5-20260909/references/gtowizard-preflop-2026-09-08.json` (local-only) | 5 unopened nodeとSB open後BB。丸め済みActions表示 | 同じaction menuに揃えたposition頻度のplausibility | 自作node-frequency比との厳密な同一estimand。GTOW側の先行fold/card-removal分母は未取得 |
+| `multiway-convergence-round5-20260909/references/gtowizard-boundary-hands-2026-09-09.json` (local-only) | UTG/BTN/SBの選択10 hand | aggregateが近くてもhand選択が崩れていないかの診断 | range全体のMAE、代表性、収束証明 |
+| `multiway-convergence-round5-20260909/references/gtowizard-sb-limp-2026-09-09.json` (local-only) | SB limp後のBB 3bb/5bbとSB応答 | limp fixture menuの境界確認 | 全limped potまたは因果的な品質改善の証明 |
+| `multiway-convergence-round5-20260909/references/gtowizard-simple-preflop-2026-09-09.json` (local-only) | Cash6m50zSimpleの5 unopened class table（845 rows）、15 response menu、SB対BBの1 menu | Simple fixture内の169-class combo加重MAE/RMSE | Generalとの統合、未観測後続node、表示の0.2--0.3%を本solverの停止基準に転用 |
+
+これらのGTOW由来資料はローカル研究専用で、公開リポジトリ・配布archiveには含めない。
 
 これらは学習入力ではなく、UIから得た有限精度の外部anchorである。checkpoint auditの
 node-frequencyはphysical joint world、先行policy、card removalを含む自己正規化比で、
@@ -57,7 +59,7 @@ Simple class表には使えるが、到達済みnodeの相手range条件付け�
 |---|---|---|---|---|
 | 初期2bb matrix | 3/6max、4,096--16,384 sweeps、range-vector/single-hand、batch/pruning/discount/thread比較 | v3。記録は第1回（Git履歴） | 小fixtureの再現手順、samplerや処理時間の履歴 | 現solverの品質順位、GTOW一致、v4へのresume |
 | 20bb round2 | seed 0または0/11/29、batch4、最大65,536 sweeps。writer/CRN/pruning/discount | v3。round2（Git履歴） | writerと評価器の同一profile A/B、tree規模（decision 5,466） | profile品質、pruning/discountの現在の既定値選定 |
-| General round3/旧round4 | base rulesをK32/K256、cap 4/1/1/1へ派生、4,096--65,536 sweeps | **v3、品質無効**。round3（Git履歴）、[旧round4](multiway-convergence-round4-20260909/README.md) | config生成事故、phase時間、資源境界の履歴 | 表示された戦略頻度やgainをstate4結果と連結 |
+| General round3/旧round4 | base rulesをK32/K256、cap 4/1/1/1へ派生、4,096--65,536 sweeps | **v3、品質無効**。round3（Git履歴）、`multiway-convergence-round4-20260909/README.md`（local-only） | config生成事故、phase時間、資源境界の履歴 | 表示された戦略頻度やgainをstate4結果と連結 |
 | state4 K32 thread pair | General部分tree、cap 4/1/1/1、K32、16,384 sweeps、batch4、8/24 threads | v4、fresh。arena 2,671,933 nodes / 1.526GB | 8/24 threadsの数値digest完全一致、同一machine内のtiming | 完全GTOW品質。24 threadsは8 threadsよりtraining 1.112xに留まる |
 | state4 K256延長 | 同じcap1 tree、K256、seed0、65,536→262,144 sweeps | v4、checkpoint/audit有効 | 同一game・algorithm streamのsweep進行。positionとhandの変化 | 複数seedの安定性。K32比較はsweepsも異なりK効果を分離しない |
 | mixed-K cap1/cap2 | K128/64/32、65,536 sweeps、batch4。postflop cap 1対2 | v4、両run完了 | tree-size/model感度。cap2は9,262,677 decision nodes、arena推定7.281GB | 異なるgameのcandidate gainによる直接順位、完全Multi Sizeの代用 |
@@ -72,8 +74,8 @@ Simple class表には使えるが、到達済みnodeの相手range条件付け�
 
 state4の主要数値とraw evidenceは
 [state4 report](state4-boundary.md)、
-[round5 report](multiway-convergence-round5-20260909/README.md)、
-[Simple screen](multiway-convergence-round5-20260909/simple-screen.md) に保存されている。
+`multiway-convergence-round5-20260909/README.md`、
+`multiway-convergence-round5-20260909/simple-screen.md`（GTOW比較値を含むlocal-only記録、非配布）に保存されている。
 
 派生configの生成・検証入口も固定する。
 

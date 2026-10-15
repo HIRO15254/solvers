@@ -1,8 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400..700&display=swap");
-
 /* ── styles.css ── */
 /* ── tokens/fonts.css ── */
-/* The two faces of the system. Noto Sans JP (400–700) comes from Google Fonts above, which serves it as ~120 unicode-range subsets — the right delivery for 5MB of Japanese glyphs. JetBrains Mono is stored with the system (fonts/jetbrains-mono-variable-latin.woff2) and declared by tokens.css. No other face belongs here. */
+/* The two text faces are Noto Sans JP and JetBrains Mono (400–700), both stored in fonts/ and declared by the app's src/cryst/fonts.css. No external font stylesheet is needed. */
 
 
 /* ── styles.css ── */

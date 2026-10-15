@@ -2,7 +2,7 @@
 
 状態: **提案（未採用）**。S4-2b（SOL-31）の初回の記録の後、2026-10-08に利用者の指示で作業を一旦止めた時点で、
 残っている改善案と測定を並べる。どれを行うかは再開するときに利用者と決める。方式・決定・段階は
-[P2方式の再設計計画](../plans/p2-method-redesign.jp.md)、数値の根拠は[S4-2bの記録](../../experiments/p2-method-2026-10/l1-6max/README.md)
+[P2方式の再設計計画](../plans/p2-method-redesign.jp.md)、数値の根拠は `experiments/p2-method-2026-10/l1-6max/README.md`（GTOW比較値を含むlocal-only記録、非配布）
 （以下「記録」）にある。速さは16 threadと32 threadで測って判断する（2026-10-08の利用者指示）。
 
 ## 1. 現状

@@ -8,8 +8,8 @@ acceptance criteria for the current
 
 | Case | Record and configuration | Scope |
 |---|---|---|
-| Ks7h2d flop | [record and configuration](cases/ks7h2d-flop/README.md) | BB vs BTN, 100bb chip EV, multistreet solve; two bet-size configurations |
-| Ks7h2d3c8d river | [record and configuration](cases/ks7h2d3c8d-river/README.md) | BB vs BTN, 100bb cash with rake, river-only solve; baseline and raise-split configurations |
+| Ks7h2d flop | `cases/ks7h2d-flop/README.md` (local-only, not distributed) | BB vs BTN, 100bb chip EV, multistreet solve; copied reference ranges and comparison values |
+| Ks7h2d3c8d river | `cases/ks7h2d3c8d-river/README.md` (local-only, not distributed) | BB vs BTN, 100bb cash with rake, river-only solve; copied reference ranges and comparison values |
 
 The original [cross-check procedure](procedure-2026-07.md) explains how these
 comparisons were made. Recheck its dated CLI and browser steps against the

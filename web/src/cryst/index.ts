@@ -1,7 +1,7 @@
 // Typed ES-module view of the vendored Cryst Design System (web/vendor/cryst).
 // The bundle assigns `window.Cryst`; prop types come from its per-component
 // .d.ts files. Styles: tokens.css (generated from tokens.json), bundle.css
-// (Noto Sans JP + the Tabler icon classes) and the font files; each component
+// (the Tabler icon classes) and fonts.css (the local font files); each component
 // injects its own CSS when the bundle loads.
 import "./react-global";
 import "../../vendor/cryst/components/bundle.js";

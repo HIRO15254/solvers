@@ -29,11 +29,50 @@ There is no logo. Wherever a mark would go, set "Cryst" in plain type (`title-ca
 ### Type
 
 - **Two faces, and no third.** Sans is **Noto Sans JP** (400–700) for the whole interface, Japanese and Latin alike; mono is **JetBrains Mono** (400–700) for IDs, shortcuts, timestamps, figures in tables and code. Never introduce another face — not for headings, not for numerals.
-- Weights in use: 400 body · 500 controls and labels · 600 headings and titles · 700 the mobile large title only.
-- Delivery: JetBrains Mono is stored with the system (`fonts/jetbrains-mono-variable-latin.woff2`, variable, Latin) and declared by `tokens.css`; Noto Sans JP is served from Google Fonts by the bundle stylesheet, which subsets its 5MB of Japanese glyphs by unicode-range. Both stacks fall back to the platform's own Japanese faces (Hiragino Sans, Yu Gothic UI), so text stays readable while a webfont loads or offline.
+- Weights in use: 400 body · 500 controls and labels · 600 headings and titles · 700 bold emphasis and the mobile large title.
+- Delivery: both text faces are local variable WOFF2 files in `fonts/`, declared by the app's `src/cryst/fonts.css`. Noto Sans JP (`noto-sans-jp-variable-jis1.woff2`) covers Latin, kana and JIS level-1 kanji; JetBrains Mono (`jetbrains-mono-variable-latin.woff2`) covers Latin. No Google Fonts/CDN request is made. Characters outside the bundled subsets fall back to platform fonts.
 - Desktop UI text is 13px (`ui-text`, `ui-label`). Long-form text steps up to 15px (`reading`). Meta is 11px (`meta`).
 - Headings are semibold with tight tracking (`tracking-heading`): `title-page` 32px, `title-section` 21px, `title-card` 15px. Overlines use `overline` in uppercase.
 - The 13px scale is desktop-only. Mobile surfaces use the `m-` styles: `m-large-title` 34px bold, `m-screen-title` 22px, `m-title` 16px semibold, `m-body` 15px, `m-secondary` 14px, `m-footnote` 12px, `m-tab` 10px. Keep line height at 1.3× or more; 11px is the absolute floor.
+
+#### Bundled font provenance and licenses
+
+The font licenses remain separate from the repository's source-code license.
+Original copyright notices and full license texts are stored beside the fonts:
+
+| Asset | Upstream source/version | License text | Bytes |
+|---|---|---|---:|
+| `fonts/noto-sans-jp-variable-jis1.woff2` | [Google Fonts Noto Sans JP 2.004](https://github.com/google/fonts/tree/66a36c8c94b1a5d992ee4e7f392fccfe4945767c/ofl/notosansjp), subset for this app | `fonts/OFL-NotoSansJP.txt` (SIL OFL 1.1) | 1,052,740 |
+| `fonts/jetbrains-mono-variable-latin.woff2` | [JetBrains Mono 2.211](https://github.com/JetBrains/JetBrainsMono); Latin subset supplied by the canonical Cryst artifact | `fonts/OFL-JetBrainsMono.txt` (SIL OFL 1.1) | 40,404 |
+| `fonts/tabler-icons.woff2` | [Tabler Icons 3.34.1](https://github.com/tabler/tabler-icons/tree/v3.34.1), supplied by the canonical Cryst artifact | `fonts/LICENSE-TablerIcons.txt` (MIT) | 829,244 |
+
+Noto was generated with FontTools 4.61.1 and Brotli 1.2.0 from the pinned
+upstream `NotoSansJP[wght].ttf` (9,589,900 bytes; SHA-256
+`c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f`).
+The upstream repository provides the complete variable font as TTF, so it was
+converted to WOFF2 during subsetting rather than assembled from the browser's
+many Google Fonts WOFF2 shards.
+
+The requested Unicode set is U+0020–024F (Latin), U+2000–206F (punctuation),
+U+20A0–20CF (currency), U+3000–30FF (Japanese punctuation, hiragana and katakana),
+U+31F0–31FF (katakana extensions), U+FF00–FFEF (half/full-width forms), plus all
+2,965 JIS X 0208 level-1 kanji. The latter are obtained by decoding the assigned
+cells of JIS rows 16–47 with Python's `euc_jp` codec (bytes `row + 0xA0`,
+`cell + 0xA0`, cells 1–94). Unassigned cells are omitted. Only codepoints present
+in the upstream font are retained: 3,739 codepoints and 4,894 glyphs, including
+all 2,965 level-1 kanji. JIS level-2 kanji and other characters outside this set
+use platform fallback; arbitrary Japanese names are not guaranteed by this subset.
+
+FontTools `subset.Options` retains all layout features (`layout_features=["*"]`)
+and names (`name_IDs=["*"]`, `name_legacy=True`, `name_languages=["*"]`), with
+other options at their defaults. After subsetting, `instantiateVariableFont`
+restricts `wght` to `(400, 400, 700)` (minimum, default, maximum); the result is
+saved with `font.flavor = "woff2"`. This preserves the actual UI weights
+400/500/600/700 and interpolation between them, rather than shipping four static
+faces or the unused 100–900 range.
+The output SHA-256 is
+`59d7c076eb42e316e223119a2977275c7181dc824f7d4fbbb5444001f2d72dc6`.
+
 
 ### Spacing and layout
 

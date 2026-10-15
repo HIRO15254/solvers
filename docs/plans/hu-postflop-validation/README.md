@@ -25,13 +25,13 @@ GTOWが一部の部分木を公開しない（HTTP 204）ため使わない。ra
 OOP側はnodeごとのGTOW AIのsize）、SRPとlimpはcEV Single Size（両者1 size）で取る。rakeありSRPは木が大きいので含めない。
 全nodeは取らず、木をほぼ完全に再現し、いくつかのnodeで照合する。HU-R0-018は75bbのSimplifiedが無い（HTTP 403）ので、
 同じboard（Ad8d3d）の100bb NL500 Simplifiedに置き換えた（018'）。limpはrakeありSimpleに無いのでcEVで取る。
-取得・fixture・比較の手順と結果は[SOL-8 fixture](../../../experiments/hu-postflop-reference/fixtures-2026-10/README.md)に置く。
+取得・fixture・比較の手順と結果は `experiments/hu-postflop-reference/fixtures-2026-10/README.md`（local-only、GTOW由来データを含むため非配布）に置く。
 
 選定は、Flop開始のcaseのうち、Preflopの経緯（SRP・IP側3bet・OOP側3bet・4bet・limp）とrake（NL50・NL500・cEV）が
 重ならないように取った。台帳のsqueezeとisoはTurn・Riverの開始なので含まない。ブラインド同士のSRP（HU-R0-004）、150bb（HU-R0-012）も含まない。
 
-Ks7h2dの既存記録（[Flop](../../../experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md)、
-[River](../../../experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md)）は、GTOWのcEV Single Size 100bbの解を参照している。
+Ks7h2dの既存記録（`experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md`、
+`experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md`、いずれもlocal-only・非配布）は、GTOWのcEV Single Size 100bbの解を参照している。
 HU-R0-001の参照と同じライブラリだが、fixtureはSOL-8の取得から作り直す。
 
 ## 構成

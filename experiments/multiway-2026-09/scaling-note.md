@@ -6,7 +6,7 @@
 | 確認したこと | 限界と参照 |
 |---|---|
 | state4の24対8 vCPU trainingは55.090対61.247秒、speedup 1.112 | この測定からcore数に比例する高速化を期待しない。[state4](state4-boundary.md) |
-| 12,297,431 blocks、2,171,445,586 bytesのsolutionを書き出した | metadataと先頭/末尾ページの検査であり全ページの再読込ではない。[round 5](multiway-convergence-round5-20260909/README.md) |
+| 12,297,431 blocks、2,171,445,586 bytesのsolutionを書き出した | metadataと先頭/末尾ページの検査であり全ページの再読込ではない。`multiway-convergence-round5-20260909/README.md`（GTOW比較値を含むlocal-only記録、非配布） |
 | regretとaverage traversalの並列化で同条件の数値・fingerprint一致 | 各条件1回の測定。stage間のsweep数が異なるため直接のthread scaling比較ではない。[詳細](multiway-convergence-round5-20260909/parallel-traversal.md) |
 | 初期化・復元・snapshot・出力が大きな時間/メモリを消費した | 後続で[production初期化](production-initialization-20260910/README.md)・[checkpoint writer](checkpoint-write-20260910/README.md)・[compact drift](strategy-drift-20260910/README.md)を測定した。旧「次の改善」を現行taskとしない |
 | Draw-aware/EHSはseed 0の限定比較で平均weighted MAE/RMSEが0.141068/0.268747対0.115510/0.241222 | candidateのtable準備57.722秒対control 0.973秒。cold cache/harnessを含む単一seedで、品質認定やtraining-onlyの速度比較ではない。追加実験は停止した |

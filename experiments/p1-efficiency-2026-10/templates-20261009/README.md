@@ -14,7 +14,7 @@
   VMは[gcp-accept](../gcp-accept-20261009/README.md)と共用（同じVMで続けて実行）。
 - spot: 6max NL50 cash（rake 5%、cap 4 BB）、board Ks7h2d。SRPはBTN r2.5・BB c（pot 5.5）、3BPはBB r11（pot 22.5）、
   4BPはBTN r24（pot 48.5）。rangeは[configs](configs/)のとおり。
-- 停止: NashConv/2 ≤ 0.1% pot（gw_singleだけ0.05% pot。GTOWとの比較用の[G2](../../hu-postflop-reference/cases/ks7h2d-flop/README.md)）。
+- 停止: NashConv/2 ≤ 0.1% pot（gw_singleだけ0.05% pot。比較記録は `experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md`、local-only・非配布）。
 - 時間: solveは`run.json`の`wallSecs`（木の構築後の反復と評価）、processは`/usr/bin/time`のwall（構築・`.sol`書出し込み）。
   peakはmax RSS。
 
@@ -27,7 +27,7 @@
 | flop_srp | [flop_srp.toml](configs/flop_srp.toml) | 従来の同梱例（全streetで33・75%、raise 3x）。targetだけ0.1%へ |
 | t2 | [t2.toml](configs/t2.toml) | 3BP。flop 20・56・122%（GTOW 2020年の3BPの木）。**新しい同梱`flop_3bp.toml`** |
 | t3 | [t3.toml](configs/t3.toml) | 4BP。flop 13・38・67%・all-in（GTOW 2020年の4BPの木）。**新しい同梱`flop_4bp.toml`** |
-| gw_single | [gw_single.toml](configs/gw_single.toml) | GTOW Single SizeのKs7h2dの木の再現（G2） |
+| gw_single | `configs/gw_single.toml`（local-only、非配布） | GTOWからコピーしたrangeを含むSingle SizeのKs7h2dの木（G2） |
 
 ## 結果
 

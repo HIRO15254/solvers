@@ -7,6 +7,8 @@
   "plan": "docs/plans/p2-method-redesign.jp.md",
   "reproducibility": "verified",
   "reproducibility_note": "Runs are deterministic for a given seed and do not depend on the thread count; times depend on the machine and its load (load.log). Changes A, B, D, E, G, H, I and J keep profiles and checkpoints bit-identical; C (plain sums) changes the rounding only. The saved B4 Simple solution reproduced the recorded profile bit for bit, the saved B6 solution the S4-2b B6 record of change C.",
+  "distribution_note": "Historical hashes below are not a tracked-file inventory. Copied GTOW reference frequencies and comparison tables are local-only, excluded from public source and releases; see packaging/gtow-local-only.json.",
+  "local_only": ["README.md", "results/rfi.md", "results/buckets/rfi-b128.md", "results/summary.md", "../../multiway-2026-09/multiway-convergence-round5-20260909/references/gtowizard-simple-preflop-2026-09-09.json"],
   "source": {
     "revisions": {
       "4cc17dcee01f140ab83a66838337e86f81fed39a": {
