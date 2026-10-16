@@ -154,11 +154,7 @@ jobs:
         run: sha256sum solvers-* > SHA256SUMS && cat SHA256SUMS
       - name: Release notes from CHANGELOG
         run: |
-          awk -v v="${{ needs.version.outputs.version }}" '
-            $0 ~ "^## \\[" v "\\]" { on = 1; next }
-            on && /^## \[/ { exit }
-            on { print }
-          ' CHANGELOG.md > notes.md
+          awk -v v="${{ needs.version.outputs.version }}" -f packaging/release-notes.awk CHANGELOG.md > notes.md
           test -s notes.md
       - name: Draft release
         env:
