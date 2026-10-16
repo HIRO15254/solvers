@@ -1,5 +1,7 @@
 # solvers — NLH HU Postflop Solver
 
+English | [日本語](README.jp.md)
+
 This archive is a prebuilt release of the **NLH HU Postflop Solver** (P1): it
 solves No-Limit Hold'em spots where two players see the flop, turn or river,
 exactly for the bet tree you give it (vector CFR, no card abstraction), and

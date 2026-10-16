@@ -104,6 +104,13 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
         std::thread::sleep(Duration::from_secs(30));
     }
 
+    // Like the real CLI, progress lands before the terminal manifest, so a
+    // reader that sees `completed` also sees the final progress row.
+    std::fs::write(
+        directory.join("progress.jsonl"),
+        "{\"iteration\":42,\"elapsedSecs\":0.5}\n",
+    )
+    .expect("write progress");
     let completed = format!(
         concat!(
             r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"hu-postflop","#,
@@ -125,9 +132,4 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
     events
         .write_all(completed_event.as_bytes())
         .expect("write completed event");
-    std::fs::write(
-        directory.join("progress.jsonl"),
-        "{\"iteration\":42,\"elapsedSecs\":0.5}\n",
-    )
-    .expect("write progress");
 }

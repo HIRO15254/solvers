@@ -1,5 +1,7 @@
 # solvers
 
+English | [日本語](README.jp.md)
+
 Two No-Limit Hold'em solvers in Rust share the `solvers.nlh/v1` input:
 **HU Postflop** (P1, exact vector CFR) and **2–9 player Multiway Preflop**
 (P2, provisional sampled MCCFR). P2 traverses postflop to estimate terminal

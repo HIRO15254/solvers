@@ -37,6 +37,7 @@ cp "$bin_dir/solvers$exe" "$bin_dir/solversd$exe" "$stage/"
 cp -R "$ui_dir/." "$stage/ui/"
 cp "$root/LICENSE-MIT" "$root/LICENSE-APACHE" "$root/CHANGELOG.md" "$stage/"
 cp "$root/packaging/README.md" "$stage/README.md"
+cp "$root/packaging/README.jp.md" "$stage/README.jp.md"
 cp "$root/packaging/THIRD-PARTY-LICENSES.txt" "$stage/"
 case "$target" in
     *windows*) cp "$root/packaging/start-gui.cmd" "$stage/" ;;

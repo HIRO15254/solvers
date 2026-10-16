@@ -22,7 +22,7 @@ RD3は配布物の範囲であり、リポジトリ・既定のworkspace build�
 | 項目 | 内容 |
 |---|---|
 | target | `x86_64-pc-windows-msvc`・`x86_64-unknown-linux-gnu`（各v3と`compat`のv2）、`aarch64-apple-darwin`、`x86_64-apple-darwin`（v2） |
-| archive | `solvers`・`solversd`（Windowsは`.exe`）、build済みWeb GUI、LICENSE-MIT・LICENSE-APACHE、第三者ライセンス表記、利用者向けREADME |
+| archive | `solvers`・`solversd`（Windowsは`.exe`）、build済みWeb GUI、LICENSE-MIT・LICENSE-APACHE、第三者ライセンス表記、利用者向けREADME（英語`README.md`・日本語`README.jp.md`） |
 | 付随物 | SHA-256 checksum、CHANGELOG由来のリリースノート |
 | build | P2とderiveを外した配布設定。RD6のCPU基準をRUSTFLAGSで常に明示する（`.cargo/config.toml`の`target-cpu=native`を使わない） |
 
