@@ -10,6 +10,7 @@
 | 通常CI | 各pushのCI（最後は[38835595264](https://github.com/HIRO15254/solvers/actions/runs/38835595264)） | `2f52c234`まで、受入後の修正を含む | success |
 | release workflow（Node 24 actions、日本語README同梱の後） | [38835599694](https://github.com/HIRO15254/solvers/actions/runs/38835599694) | 受入後の修正 | 6 buildすべてsuccess。Linux v3は、crates.ioの一時的な通信errorで一度落ちたが再実行で通った |
 | 実機（SOL-43） | 利用者のWindows・macOS | 試験build | 2026-10-16に利用者が確かめた。ブラウザーで取得した未署名archiveが、READMEの手順で起動した |
+| 公開 | tag `v0.1.0`の[38872609096](https://github.com/HIRO15254/solvers/actions/runs/38872609096) | `70dc0801` | 全jobがsuccess。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。Windows版の`--version`は`solvers 0.1.0 (70dc0801), P1 only`だった。2026-10-16に利用者の承認を得て[Release](https://github.com/HIRO15254/solvers/releases/tag/v0.1.0)を公開した |
 
 受入の後の変更は、試験（daemonの偽solverの書込み順）、workflow、文書だけである。製品コードは変えていない。
 
