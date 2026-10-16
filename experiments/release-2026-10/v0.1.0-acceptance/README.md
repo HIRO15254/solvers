@@ -7,7 +7,11 @@
 |---|---|---|---|
 | release workflow（手動実行、Releaseは作らない） | [38689090848](https://github.com/HIRO15254/solvers/actions/runs/38689090848) | `2ced5412` | 次のjobがすべてsuccess: version、notices（windows-latest）、web、6 build。各buildで`--version`、`validate`・`solve`・`export`（`river_small`）、P2入力の拒否（exit 2）を確かめた |
 | 受入 `cargo test --workspace --release --no-fail-fast -- --include-ignored` | [38695419244](https://github.com/HIRO15254/solvers/actions/runs/38695419244) | `2f52c234` | 1071 passed、0 failed。下の1件だけ除外した |
-| 通常CI | 各pushのCI | `2f52c234`まで | success |
+| 通常CI | 各pushのCI（最後は[38835595264](https://github.com/HIRO15254/solvers/actions/runs/38835595264)） | `2f52c234`まで、受入後の修正を含む | success |
+| release workflow（Node 24 actions、日本語README同梱の後） | [38835599694](https://github.com/HIRO15254/solvers/actions/runs/38835599694) | 受入後の修正 | 6 buildすべてsuccess。Linux v3は、crates.ioの一時的な通信errorで一度落ちたが再実行で通った |
+| 実機（SOL-43） | 利用者のWindows・macOS | 試験build | 2026-10-16に利用者が確かめた。ブラウザーで取得した未署名archiveが、READMEの手順で起動した |
+
+受入の後の変更は、試験（daemonの偽solverの書込み順）、workflow、文書だけである。製品コードは変えていない。
 
 ## 除外した試験
 

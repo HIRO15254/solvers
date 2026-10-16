@@ -14,7 +14,7 @@ Version 0.1.0 accepts only P1 `.sol` format 4 and checkpoint format 5.
 The human-readable `--version` includes a Git revision (`unknown` when unavailable);
 run manifests keep `cliVersion` as the plain workspace semantic version.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-10-16
 
 ### Added
 
