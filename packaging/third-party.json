@@ -50,9 +50,9 @@
   "fonts": [
     {
       "name": "JetBrains Mono",
-      "version": "2.211 (Cryst-bundled Latin variable subset)",
+      "version": "2.211 (Latin variable subset)",
       "license": "OFL-1.1",
-      "source": "https://github.com/JetBrains/JetBrainsMono (bundled asset from Cryst; OFL source pinned at 61cf0cedc2d9d29efcab968e97707d6899133e68)",
+      "source": "https://github.com/JetBrains/JetBrainsMono (OFL source pinned at 61cf0cedc2d9d29efcab968e97707d6899133e68)",
       "assets": ["web/vendor/cryst/fonts/jetbrains-mono-variable-latin.woff2"],
       "license_files": ["web/vendor/cryst/fonts/OFL-JetBrainsMono.txt"]
     },

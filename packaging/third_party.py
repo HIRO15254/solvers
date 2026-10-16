@@ -370,7 +370,7 @@ def render(root: Path, policy: dict, notices: list[dict]) -> str:
              "Scope: solvers (cli) and solversd (daemon), --no-default-features;",
              "normal/build dependencies (including proc macros/build tools), not dev-only packages;",
              "the Web GUI's production npm dependency closure and all bundled font assets.",
-             "First-party code, including Cryst Design System, is covered by the root licenses.",
+             "First-party code is covered by the root licenses.",
              "Rust target union: " + ", ".join(sorted(policy["targets"])),
              "No build timestamp or machine-local paths are included.", ""]
     # Hash Git's LF form so Windows autocrlf checkouts and CI produce the same file.
