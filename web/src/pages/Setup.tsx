@@ -48,7 +48,7 @@ type Step = "table" | "start" | "range" | "tree" | "solver" | "toml";
 /**
  * The steps of a spot, in the order GTO Wizard's custom-solution builder,
  * GTO+ and the step sidebar of b-inary/wasm-postflop ask for them (the idea
- * only: wasm-postflop is AGPL and no code of it is used, LICENSE-POLICY.md):
+ * only: wasm-postflop is AGPL and no code of it is used, see AGENTS.md):
  * table, history and board, ranges, bet sizes, solver.
  */
 const STEPS: { id: Step; label: string; icon: string }[] = [

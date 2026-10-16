@@ -64,4 +64,4 @@ GUIを使っている間は、起動したときに開いた黒いウィンド�
 
 ## ライセンス
 
-MIT OR Apache-2.0のどちらかを選べます。外部の参照物の扱いは[LICENSE-POLICY.md](LICENSE-POLICY.md)にあります。
+MIT OR Apache-2.0のどちらかを選べます。使っている第三者のソフトウェアとライセンスは[LICENSE-POLICY.md](LICENSE-POLICY.md)にあります。

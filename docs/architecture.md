@@ -22,7 +22,7 @@
 6. **再開用 state と閲覧用 artifact を分ける。** 平均戦略、保存時の値、未保存領域の再計算を区別し、
    config と実行 source の identity を検証証拠へ結び付ける。
 7. **oracle の独立性を守る。** `cfr-ref` は凍結し、hu-engine/hu-postflop と実装を共有しない。
-   ライセンスと外部実装の参照境界は [LICENSE-POLICY.md](../LICENSE-POLICY.md) に従う。
+   外部実装のcodeを流用しない規則は [AGENTS.md](../AGENTS.md)、第三者のライセンスは [LICENSE-POLICY.md](../LICENSE-POLICY.md) にある。
 
 ## 1. crateの責務
 

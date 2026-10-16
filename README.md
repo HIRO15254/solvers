@@ -71,5 +71,5 @@ closing it stops the solver. Your results stay in `runs/` inside the extracted f
 
 ## License
 
-MIT OR Apache-2.0, at your option. See [LICENSE-POLICY.md](LICENSE-POLICY.md)
-for how external references are handled.
+MIT OR Apache-2.0, at your option. Third-party components and their licenses
+are listed in [LICENSE-POLICY.md](LICENSE-POLICY.md).

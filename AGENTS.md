@@ -30,7 +30,7 @@ Read the relevant route rather than every long document for every change:
 | Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
 | Quality / measurement | Quality sections of `docs/products.jp.md`, `docs/plans/hu-postflop-validation/` |
 | Development / handoff | `docs/development.md` |
-| External references | `LICENSE-POLICY.md` |
+| Third-party components and licenses | `LICENSE-POLICY.md` |
 
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
   or share implementation code between it and `hu-engine`/`hu-postflop::game`.
@@ -111,3 +111,10 @@ wiki change.
   their campaign scripts; do not add new `tools/test_*.py` files.
 - Preserve existing unrelated working-tree changes. Coordinate edit ownership
   for parallel tasks; use isolated worktrees when those edits would conflict.
+- Do not copy, port or closely paraphrase code from AGPL-licensed or
+  unlicensed projects (for example b-inary/postflop-solver or
+  bupticybee/TexasSolver); reimplement ideas independently. Running such a
+  project as an external benchmark binary outside the repository is allowed.
+- GTO Wizard solutions and values copied from them stay local and git-ignored
+  (`packaging/gtow-local-only.json`, `.gitignore`); never commit or distribute
+  them. Existing Git history is kept as-is (user decision, 2026-10-15).

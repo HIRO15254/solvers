@@ -3,7 +3,7 @@
 目的: P1に既存の公開実装（[b-inary/postflop-solver](https://github.com/b-inary/postflop-solver)、以下pfs）に対する
 余地があるかを、同一の木・range・目標で測る。pfsはAGPLなので、`.cache/pfs-bench/`（Git管理外）へcloneした
 pfs（commit `9d1509fe`）と、それを使う計測harnessを外部binaryとして実行しただけである。pfsのcodeはこのrepositoryへ入れていない
-（[LICENSE-POLICY.md](../../../LICENSE-POLICY.md)）。
+（[AGENTS.md](../../../AGENTS.md)）。
 
 再現状態: **partial**。P1側のconfigと集計結果、比較の詳細（[report.en.md](report.en.md)）は保存した。pfs側のharnessと
 pfsのcloneはGit管理外（`.cache/pfs-bench/`）でrepositoryに無いため、同じ手順の再実行にはharnessの再作成が要る。

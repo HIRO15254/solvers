@@ -9,7 +9,7 @@
 
 | 確認すること | 正本・入口 |
 |---|---|
-| 共通ルール | [AGENTS.md](../AGENTS.md)、外部参照は[ライセンス方針](../LICENSE-POLICY.md) |
+| 共通ルール | [AGENTS.md](../AGENTS.md)、第三者のライセンスは[ライセンス方針](../LICENSE-POLICY.md) |
 | 製品の目的・範囲・品質・到達段階・利用者決定 | [製品定義](products.jp.md) |
 | 担当・進捗・依存・ブロッカー・次の一手 | [Linear管理先](status.jp.md)。Markdownへ状態を複製しない |
 | 目標構成・移行手順・完了条件 | [再構築計画](plans/two-product-restructure.jp.md) |
