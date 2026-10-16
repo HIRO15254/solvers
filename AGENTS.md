@@ -76,6 +76,20 @@ cargo test --workspace
 Expensive ignored tests run separately as described in `docs/development.md`
 and CI.
 
+## User wiki
+
+Information users need (release notes, usage, troubleshooting) is collected in
+the GitHub wiki: <https://github.com/HIRO15254/solvers/wiki>, edited through
+`https://github.com/HIRO15254/solvers.wiki.git`. Keep each page in Japanese
+(`-ja`) and English (`-en`) with links to each other.
+
+The wiki MUST NOT use development names (user decision, 2026-10-16). This
+includes product IDs (`P1`, `P2`), stage and step IDs (`S1`–`S5`, `M0`–`M8`),
+decision IDs (`D7`, `RD4`, `PF9`, ...), Linear IDs (`SOL-n`), and internal plan
+names. Use what users see instead, for example "heads-up postflop solver",
+"Preflop solver", or a GUI screen name. Scan for these IDs before pushing a
+wiki change.
+
 ## Workspace hygiene
 
 - `target/` is reserved for Cargo build output. Do not place research reports,
