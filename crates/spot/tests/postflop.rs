@@ -578,7 +578,7 @@ fn short_allin_reopen_is_enforced_during_line_replay() {
 }
 
 #[test]
-fn p1_accepts_every_board_variable_and_preserves_preflop_tree_settings() {
+fn p1_accepts_every_board_variable_and_preserves_preflop_rules() {
     for &var in TreeVar::ALL.iter().filter(|v| v.is_board_var()) {
         let condition = match var.kind() {
             VarKind::Bool => var.name().to_owned(),
@@ -586,21 +586,20 @@ fn p1_accepts_every_board_variable_and_preserves_preflop_tree_settings() {
             VarKind::Text => format!("{} == \"K\"", var.name()),
         };
         let text = format!(
-            "{}[tree]\nscript = '''preflop {{ replace raise [3bb] }}\nflop when {condition} {{ checkdown }}'''\npreflop_reraise_jam_above_stack = {{ numerator = 1, denominator = 3 }}\n[tree.max_aggressive_actions]\npreflop = 7\n",
+            "{}[tree]\nscript = '''preflop {{ replace raise [3bb] }}\nflop when {condition} {{ checkdown }}'''\n",
             standard("BTN r2.5, BB c", "Ks 7h 2d")
         );
         let d = parse(&text);
-        assert_eq!(d.spot.tree.max_aggressive_actions.preflop, 7);
         assert_eq!(d.spot.tree.compiled.rules[0].street, Street::Preflop);
         assert_eq!(d.spot.tree.compiled.rules.len(), 2);
-        assert!(roundtrip(&text).contains("preflop = 7"));
+        assert!(roundtrip(&text).contains("preflop { replace raise [3bb] }"));
     }
 }
 
 #[test]
 fn validate_summary_is_serializable_and_rules_recompile() {
     let text = format!(
-        "{}[tree]\nscript = '''param z = 3bb\nparam alpha = 33\npreflop {{ remove call }}\nflop {{ if paired {{ replace bet [alpha, e, 3e, min, 80%effective] }} else {{ replace raise [z, a] }} }}'''\n[tree.params]\nz = '4bb'\nalpha = 75",
+        "{}[tree]\nscript = '''param z = 3bb\nparam alpha = 33\npreflop {{ remove call }}\nflop {{ if paired {{ replace bet [alpha, e, 3e, min, 80%effective] }} else {{ replace raise [z, a] }} }}\nturn {{ jam raise > 85%stack merge bet within 12.5 merge raise within 0.5bb }}'''\n[tree.params]\nz = '4bb'\nalpha = 75",
         standard("BTN r2.5, BB c", "Ks 7h 2d")
     );
     let d = parse(&text);
@@ -630,7 +629,7 @@ fn validate_summary_is_serializable_and_rules_recompile() {
 #[test]
 fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
     let text = format!(
-        "{}[meta]\nname = 'name'\ndescription = 'description'\nderived_from = {{ board = 'Ks 7h 2d', line = 'BTN c', solution_hash = 'hash', run_id = 'id' }}\n[economics.rake]\nrate = 0.05\ncap_bb = 4\n[tree]\nscript = '''param z = 3bb\nparam alpha = true\nflop when unopened == alpha {{ replace bet [z] }}'''\nallin_threshold = 0.85\npreflop_reraise_jam_above_stack = {{ denominator = 3, numerator = 1 }}\n[tree.params]\nalpha = false\nz = '4bb'\n[run]\nthreads = 2\nmemory = '6GiB'\nmax_time = '12h'\ncheckpoint_interval = '15m'",
+        "{}[meta]\nname = 'name'\ndescription = 'description'\nderived_from = {{ board = 'Ks 7h 2d', line = 'BTN c', solution_hash = 'hash', run_id = 'id' }}\n[economics.rake]\nrate = 0.05\ncap_bb = 4\n[tree]\nscript = '''param z = 3bb\nparam alpha = true\nflop when unopened == alpha {{ replace bet [z] }}'''\n[tree.params]\nalpha = false\nz = '4bb'\n[run]\nthreads = 2\nmemory = '6GiB'\nmax_time = '12h'\ncheckpoint_interval = '15m'",
         config(6, "[table.stacks_bb]\nCO = 80", None, None, "")
     );
     let n = roundtrip(&text);
@@ -652,14 +651,7 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
             "rounding =",
             "rounding_unit_bb =",
         ],
-        vec![
-            "script =",
-            "include_allin =",
-            "allin_threshold =",
-            "preflop_reraise_jam_above_stack =",
-            "[tree.max_aggressive_actions]",
-            "[tree.params]",
-        ],
+        vec!["script =", "include_allin =", "[tree.params]"],
         vec![
             "threads =",
             "memory =",

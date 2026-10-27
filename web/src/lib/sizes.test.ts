@@ -17,6 +17,18 @@ describe("size table scripts", () => {
     expect(sizeScript(empty)).toBe("");
   });
 
+  it("ends every raising street with a round-trippable aggression cap", () => {
+    const table: SizeTable = { ...DEFAULT_SIZES, reraiseAllIn: false };
+    const script = sizeScript(table);
+    expect(script.match(/when aggressions >= 3 \{ remove raise \}/g)).toHaveLength(3);
+    for (const block of script.matchAll(/^(?:flop|turn|river) \{\n([\s\S]*?)^\}/gm)) {
+      expect(block[1]!.trimEnd().endsWith("when aggressions >= 3 { remove raise }")).toBe(true);
+    }
+    expect(readSizeScript(script)).toEqual(table);
+    expect(readSizeScript(script.replace("when aggressions >= 3", "when aggressions >= 4"))).toBeNull();
+    expect(readSizeScript(script.replace("  when aggressions >= 3 { remove raise }\n", ""))).toBeNull();
+  });
+
   it("leaves scripts it cannot write back as scripts", () => {
     const written = sizeScript(DEFAULT_SIZES);
     for (const script of [
@@ -34,8 +46,8 @@ describe("size table scripts", () => {
     const script = sizeScript(DEFAULT_SIZES);
     // Line 1 is the header; flop opens on line 2.
     expect(sizeCellAt(script, 3)).toEqual({ street: "flop", role: "oop", kind: "bet" });
-    expect(sizeCellAt(script, 11)).toEqual({ street: "turn", role: "ip", kind: "bet" });
-    expect(sizeCellAt(script, 19)).toEqual({ street: "river", role: "oop", kind: "raise" });
-    for (const line of [1, 2, 7, 8, 99]) expect(sizeCellAt(script, line)).toBeNull();
+    expect(sizeCellAt(script, 12)).toEqual({ street: "turn", role: "ip", kind: "bet" });
+    expect(sizeCellAt(script, 21)).toEqual({ street: "river", role: "oop", kind: "raise" });
+    for (const line of [1, 2, 7, 8, 9, 16, 24, 99]) expect(sizeCellAt(script, line)).toBeNull();
   });
 });

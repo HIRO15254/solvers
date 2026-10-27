@@ -45,8 +45,8 @@ river {
   when in_position { replace bet [75, a] }
   replace raise [a]
 }
+turn when aggressions >= 3 { remove raise }
 '''
-allin_threshold = 0.67
 
 [solver.stop]
 target = "0.1%pot"

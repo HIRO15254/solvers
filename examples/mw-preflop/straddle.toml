@@ -8,4 +8,5 @@ straddles_bb = [2]
 
 [tree]
 script = '''preflop { replace raise [a] }
-flop, turn, river { checkdown }'''
+flop, turn, river { checkdown }
+'''

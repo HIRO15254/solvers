@@ -892,10 +892,7 @@ board='2s 7s Ks 2h'
 BB='44,55'
 BTN='33,66'
 [tree]
-script='turn { replace bet [75] } river { replace bet [100] }'
-[tree.max_aggressive_actions]
-turn=1
-river=1
+script='turn { replace bet [75] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }'
 [solver]
 storage='i16'
 iso_merging=false
@@ -1027,7 +1024,7 @@ memory='1GiB'
     }
 
     /// Small turn-start config (board "2s 7s Ks 2h", ranges "44,55" vs
-    /// "33,66", pot 2, stack 20, turn [2bb], river [100], max_aggressive_actions 1/1),
+    /// "33,66", pot 2, stack 20, turn [2bb], river [100], no raises),
     /// copied from `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config`: a
     /// single chance node whose children are exactly the river-entry nodes,
     /// small enough to build/solve/re-solve fast even in a debug build.
@@ -1043,10 +1040,7 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "turn { replace bet [2bb] } river { replace bet [100] }"
-[tree.max_aggressive_actions]
-turn = 1
-river = 1
+script = "turn { replace bet [2bb] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
 [solver.stop]
 max_iterations = 32
 check_every = 32
@@ -1067,9 +1061,7 @@ board = "2s 7s Ks 2h 9d"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "river { replace bet [100] }"
-[tree.max_aggressive_actions]
-river = 1
+script = "river { replace bet [100] } river when aggressions >= 1 { remove raise }"
 [solver.stop]
 max_iterations = 16
 check_every = 16

@@ -15,9 +15,7 @@ BTN = 'AA,KK,QQ'
 SB = 'AA,KK,QQ'
 BB = 'AA,KK,QQ'
 [tree]
-script = 'preflop { replace raise [2x, 2.5x] } flop, turn, river { checkdown }'
-[tree.max_aggressive_actions]
-preflop = 1
+script = 'preflop { replace raise [2x, 2.5x] } flop, turn, river { checkdown } preflop when aggressions >= 1 { remove raise }'
 [solver.abstraction.buckets]
 flop = 1
 turn = 1

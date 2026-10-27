@@ -670,7 +670,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
             "pot plus twice the effective stack exceeds the P1 u32 milli-BB limit",
         ));
     }
-    let street = |street, cap| -> Result<StreetTree, SpotError> {
+    let street = |street| -> Result<StreetTree, SpotError> {
         Ok(StreetTree {
             nlh_rules: Box::new(NlhStreetRules {
                 rules: spot
@@ -683,10 +683,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
                     .collect(),
                 players: PerPlayer::new(oop.clone(), ip.clone()),
             }),
-            max_aggressive_actions: u32::try_from(cap)
-                .map_err(|_| invalid("tree.max_aggressive_actions", "exceeds the P1 u32 limit"))?,
             include_allin: spot.tree.include_allin,
-            allin_threshold: spot.tree.allin_threshold,
         })
     };
     Ok(PostflopConfig {
@@ -698,9 +695,9 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
         pot: Chips(pot as u32),
         effective_stack: Chips(stack as u32),
         streets: PerStreet {
-            flop: street(Street::Flop, spot.tree.max_aggressive_actions.flop)?,
-            turn: street(Street::Turn, spot.tree.max_aggressive_actions.turn)?,
-            river: street(Street::River, spot.tree.max_aggressive_actions.river)?,
+            flop: street(Street::Flop)?,
+            turn: street(Street::Turn)?,
+            river: street(Street::River)?,
         },
         min_bet: Chips(1000),
         iso_merging: settings.solver.iso_merging,

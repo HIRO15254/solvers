@@ -21,12 +21,10 @@ fn config() -> PostflopConfig {
         streets: PerStreet {
             turn: StreetTree {
                 include_allin: true,
-                max_aggressive_actions: 1,
                 ..Default::default()
             },
             river: StreetTree {
                 include_allin: true,
-                max_aggressive_actions: 1,
                 ..Default::default()
             },
             ..Default::default()

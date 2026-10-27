@@ -107,7 +107,9 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         };
 
         let mut hasher = blake3::Hasher::new();
-        hasher.update(b"solvers.multiway.holdem.v1");
+        // v2 removes structural aggression limits and size-to-all-in merging
+        // from the serialized betting policy; scripts now define those edits.
+        hasher.update(b"solvers.multiway.holdem.v2");
         let mut game_identity = config.clone();
         game_identity.abstraction = AbstractionConfig::default();
         hasher.update(&serde_json::to_vec(&game_identity)?);

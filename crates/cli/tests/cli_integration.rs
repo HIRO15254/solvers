@@ -185,10 +185,6 @@ script = '''river {
   }
 }
 '''
-[tree.max_aggressive_actions]
-flop = 2
-turn = 2
-river = 2
 [solver]
 storage = "f32"
 [solver.stop]
@@ -293,11 +289,8 @@ script = '''river {
     when aggressions == 1 { replace raise [75] }
   }
 }
-'''
-[tree.max_aggressive_actions]
-flop = 2
-turn = 2
-river = 2
+
+river when aggressions >= 2 { remove raise }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -504,11 +497,8 @@ script = '''river {
   replace bet [50]
   replace raise [50]
 }
-'''
-[tree.max_aggressive_actions]
-flop = 2
-turn = 2
-river = 2
+
+river when aggressions >= 2 { remove raise }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -765,10 +755,9 @@ BTN = "33,66"
 include_allin = false
 script = '''turn { replace bet [75] }
 river { replace bet [100] }
-'''
-[tree.max_aggressive_actions]
-turn = 1
-river = 1
+
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -1060,10 +1049,9 @@ BTN = "33,66"
 include_allin = false
 script = '''turn { replace bet [75] }
 river { replace bet [100] }
-'''
-[tree.max_aggressive_actions]
-turn = 1
-river = 1
+
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }'''
 [solver]
 iso_merging = false
 storage = "f32"

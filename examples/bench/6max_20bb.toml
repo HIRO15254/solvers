@@ -38,14 +38,11 @@ preflop when unopened { remove call }
 preflop when unopened { replace raise [2.5x, a] }
 preflop when aggressions >= 1 { replace raise [3x, a] }
 preflop when aggressions >= 3 { remove raise }
+flop when aggressions >= 1 { remove raise }
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }
 '''
 include_allin = true
-
-[tree.max_aggressive_actions]
-preflop = 3
-flop = 1
-turn = 1
-river = 1
 
 [solver]
 kind = "range-vector"

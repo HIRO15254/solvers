@@ -82,8 +82,7 @@ impl BettingMenu for BettingState {
         }
 
         let maximum = self.maximum_target(actor);
-        if !self.can_raise(actor) || self.aggressive_actions >= street_config.max_aggressive_actions
-        {
+        if !self.can_raise(actor) {
             return apply_tree_rules(self, config, actor, actions);
         }
 
@@ -99,32 +98,7 @@ impl BettingMenu for BettingState {
         };
         let mut targets = Vec::with_capacity(sizes.len() + 1);
         for size in sizes {
-            let mut target = self.resolve_size(actor, size);
-            if self.street == Street::Preflop
-                && self.aggressive_actions > 0
-                && !matches!(size, &SizeSpec::AllIn)
-                && street_config
-                    .reraise_jam_above_actor_starting_stack
-                    .is_some_and(|ratio| {
-                        u128::from(target.raw()) * u128::from(ratio.denominator)
-                            > u128::from(self.seats[actor].starting_stack.raw())
-                                * u128::from(ratio.numerator)
-                    })
-            {
-                target = maximum;
-            }
-            // Raise-cap merge (HRC-style): a target that already reaches the
-            // configured fraction of the effective stack collapses into the
-            // all-in target instead of standing as its own sized action. This
-            // merge applies even when `include_allin` is false, since it is
-            // folding an already-proposed size into all-in rather than adding
-            // a brand-new all-in action.
-            if street_config
-                .allin_threshold
-                .is_some_and(|threshold| target.raw() >= nlh::scale_u64(maximum.raw(), threshold))
-            {
-                target = maximum;
-            }
+            let target = self.resolve_size(actor, size);
             if target > self.bet_to_match {
                 targets.push(target);
             }
@@ -210,21 +184,88 @@ fn apply_tree_rules(
         }
         let action_kind = action
             .ok_or_else(|| BettingError::TreeRule("non-checkdown rule requires action".into()))?;
-        let candidates = rule_candidates(state, config, action_kind, sizes)?;
         match effect {
-            RuleEffect::Add => actions.extend(candidates),
-            RuleEffect::Remove => actions.retain(|action| !action_matches(action, action_kind)),
-            RuleEffect::Replace => {
-                actions.retain(|action| !action_matches(action, action_kind));
-                actions.extend(candidates);
+            RuleEffect::Jam(bound) => jam(state, actor, &mut actions, action_kind, bound, sizes)?,
+            RuleEffect::Merge => merge(state, actor, &mut actions, action_kind, sizes)?,
+            _ => {
+                let candidates = rule_candidates(state, config, action_kind, sizes)?;
+                match effect {
+                    RuleEffect::Add => actions.extend(candidates),
+                    RuleEffect::Remove => {
+                        actions.retain(|action| !action_matches(action, action_kind))
+                    }
+                    RuleEffect::Replace => {
+                        actions.retain(|action| !action_matches(action, action_kind));
+                        actions.extend(candidates);
+                    }
+                    RuleEffect::Force => actions = candidates,
+                    RuleEffect::Checkdown | RuleEffect::Jam(_) | RuleEffect::Merge => {
+                        unreachable!()
+                    }
+                }
             }
-            RuleEffect::Force => actions = candidates,
-            RuleEffect::Checkdown => unreachable!(),
         }
         actions.sort_by_key(action_sort_key);
         actions.dedup();
     }
     Ok(actions)
+}
+
+/// The `jam` effect: every current candidate of `action_kind` whose target
+/// passes `bound` against the threshold becomes the all-in target.
+fn jam(
+    state: &BettingState,
+    actor: SeatId,
+    actions: &mut [Action],
+    action_kind: RuleAction,
+    bound: nlh::script::JamBound,
+    sizes: &[SizeSpec],
+) -> Result<(), BettingError> {
+    let [threshold] = sizes else {
+        return Err(BettingError::TreeRule(
+            "jam requires exactly one threshold".into(),
+        ));
+    };
+    let threshold = state.jam_threshold(actor, threshold);
+    let all_in = state.maximum_target(actor);
+    for action in actions.iter_mut() {
+        if action_matches(action, action_kind)
+            && let Some(to) = action.amount()
+            && bound.holds(to, threshold)
+            && let Some(jammed) = state.action_for_target(actor, all_in)
+        {
+            *action = jammed;
+        }
+    }
+    Ok(())
+}
+
+/// The `merge` effect: walking the current `action_kind` candidates from the
+/// largest target down, drop each one within the width of the last kept one.
+fn merge(
+    state: &BettingState,
+    actor: SeatId,
+    actions: &mut Vec<Action>,
+    action_kind: RuleAction,
+    sizes: &[SizeSpec],
+) -> Result<(), BettingError> {
+    let [width] = sizes else {
+        return Err(BettingError::TreeRule(
+            "merge requires exactly one width".into(),
+        ));
+    };
+    let width = state.merge_width(actor, width).raw();
+    let mut kept: Vec<u64> = actions
+        .iter()
+        .filter(|action| action_matches(action, action_kind))
+        .filter_map(|action| action.amount().map(MwChips::raw))
+        .collect();
+    nlh::merge_targets(&mut kept, width);
+    actions.retain(|action| {
+        !action_matches(action, action_kind)
+            || action.amount().is_none_or(|to| kept.contains(&to.raw()))
+    });
+    Ok(())
 }
 
 fn rule_candidates(
@@ -313,6 +354,19 @@ mod tests {
         .unwrap();
         let betting = config.betting.clone();
         (BettingState::from_config(&config).unwrap(), betting)
+    }
+
+    fn with_script(betting: &mut BettingConfig, script: &str) {
+        betting.nlh_rules =
+            nlh::script::Script::compile(script, &Default::default(), &spot::NLH_V1)
+                .unwrap()
+                .rules
+                .into_iter()
+                .map(crate::tree_rules::NlhTreeRule::from_compiled)
+                .collect();
+        for rule in &betting.nlh_rules {
+            rule.validate().unwrap();
+        }
     }
 
     #[test]
@@ -454,56 +508,14 @@ mod tests {
     }
 
     #[test]
-    fn allin_threshold_merges_a_qualifying_size_into_a_deduplicated_all_in() {
-        let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
-        betting.preflop.raise_sizes =
-            vec![crate::config::SizeSpec::StackFraction { fraction: 0.9 }];
-        betting.preflop.include_allin = true;
-        betting.preflop.allin_threshold = Some(0.85);
-        let bb_state = state_with_bb_facing_a_raise(&mut betting);
-
-        // 0.9 * maximum (100_000) = 90_000 >= 0.85 * 100_000 = 85_000, so the
-        // stack-fraction size merges into the all-in target instead of
-        // standing on its own; `include_allin` would also propose the same
-        // all-in target, so the merged and native all-in entries must dedup
-        // to exactly one action.
-        let actions = bb_state.legal_actions(&betting).unwrap();
-        let all_in_raises = actions
-            .iter()
-            .filter(|action| {
-                matches!(
-                    action,
-                    Action::RaiseTo {
-                        to: MwChips(100_000),
-                        all_in: true,
-                        ..
-                    }
-                )
-            })
-            .count();
-        assert_eq!(all_in_raises, 1);
-        assert!(!actions.iter().any(|action| matches!(
-            action,
-            Action::RaiseTo {
-                to: MwChips(90_000),
-                ..
-            }
-        )));
-    }
-
-    #[test]
-    fn exact_reraise_jam_ratio_is_strict_at_one_third_and_deduplicates_all_in() {
-        let actions_for = |raise_to_bb: f64| {
+    fn jam_raise_above_a_third_of_the_stack_is_strict_and_deduplicates_all_in() {
+        let actions_for = |raise_to_bb: f64, script: &str| {
             let (mut state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
             betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 3.0 }];
             betting.preflop.raise_sizes =
                 vec![crate::config::SizeSpec::ToBb { value: raise_to_bb }];
             betting.preflop.include_allin = true;
-            betting.preflop.reraise_jam_above_actor_starting_stack =
-                Some(crate::config::StackRatio {
-                    numerator: 1,
-                    denominator: 3,
-                });
+            with_script(&mut betting, script);
 
             let open = state
                 .legal_actions(&betting)
@@ -530,113 +542,81 @@ mod tests {
             assert_eq!(state.to_act, Some(SeatId(2)));
             state.legal_actions(&betting).unwrap()
         };
-
-        for retained in [MwChips(32_999), MwChips(33_000)] {
-            let actions = actions_for(retained.as_bb());
-            assert!(actions.iter().any(|action| {
-                matches!(
-                    action,
-                    Action::RaiseTo {
-                        to,
-                        all_in: false,
-                        ..
-                    } if *to == retained
-                )
-            }));
-            assert_eq!(
-                actions
-                    .iter()
-                    .filter(|action| matches!(
-                        action,
-                        Action::RaiseTo {
-                            to: MwChips(99_000),
-                            all_in: true,
-                            ..
-                        }
-                    ))
-                    .count(),
-                1
-            );
-        }
-
-        let above = actions_for(33.001);
-        assert!(!above.iter().any(|action| matches!(
-            action,
-            Action::RaiseTo {
-                to: MwChips(33_001),
-                ..
-            }
-        )));
-        assert_eq!(
-            above
+        let raise_to = |actions: &[Action], to: MwChips, all_in: bool| {
+            actions
                 .iter()
-                .filter(|action| matches!(
-                    action,
-                    Action::RaiseTo {
-                        to: MwChips(99_000),
-                        all_in: true,
-                        ..
-                    }
-                ))
-                .count(),
-            1
-        );
+                .filter(|action| {
+                    matches!(
+                        action,
+                        Action::RaiseTo { to: found, all_in: found_all_in, .. }
+                            if *found == to && *found_all_in == all_in
+                    )
+                })
+                .count()
+        };
+        // BB's M is 99 BB, so `33.333%stack` resolves to exactly 33 BB.
+        let above = "preflop when aggressions >= 1 { jam raise > 33.333%stack }";
+        for retained in [MwChips(32_999), MwChips(33_000)] {
+            let actions = actions_for(retained.as_bb(), above);
+            assert_eq!(raise_to(&actions, retained, false), 1);
+            assert_eq!(raise_to(&actions, MwChips(99_000), true), 1);
+        }
+        let jammed = actions_for(33.001, above);
+        assert_eq!(raise_to(&jammed, MwChips(33_001), false), 0);
+        assert_eq!(raise_to(&jammed, MwChips(99_000), true), 1);
 
-        // The same threshold never changes an opening size, even when that
-        // open is above one third of the starting stack.
+        let at_least = "preflop when aggressions >= 1 { jam raise >= 33.333%stack }";
+        let jammed = actions_for(33.0, at_least);
+        assert_eq!(raise_to(&jammed, MwChips(33_000), false), 0);
+        assert_eq!(raise_to(&jammed, MwChips(99_000), true), 1);
+
+        // The condition keeps the threshold away from an opening size, even
+        // when that open is above one third of the stack.
         let (opening_state, mut opening_betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
         opening_betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 40.0 }];
         opening_betting.preflop.include_allin = false;
-        opening_betting
-            .preflop
-            .reraise_jam_above_actor_starting_stack = Some(crate::config::StackRatio {
-            numerator: 1,
-            denominator: 3,
-        });
-        assert!(
-            opening_state
-                .legal_actions(&opening_betting)
-                .unwrap()
-                .iter()
-                .any(|action| matches!(
-                    action,
-                    Action::RaiseTo {
-                        to: MwChips(40_000),
-                        all_in: false,
-                        ..
-                    }
-                ))
-        );
+        with_script(&mut opening_betting, above);
+        let opening = opening_state.legal_actions(&opening_betting).unwrap();
+        assert_eq!(raise_to(&opening, MwChips(40_000), false), 1);
     }
 
     #[test]
-    fn allin_threshold_absent_leaves_default_legal_actions_unchanged() {
-        // Regression guard: an unmodified default preflop config (no
-        // MinRaise/StackFraction sizes, no allin_threshold) must still
-        // produce exactly the historical action set at the opening node.
-        let (state, betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        assert!(betting.preflop.allin_threshold.is_none());
-        let mut actions = state.legal_actions(&betting).unwrap();
-        actions.sort_by_key(|action| action.amount().map(MwChips::raw));
+    fn merge_raise_keeps_the_larger_target_with_a_pot_or_bb_width() {
+        let raises_for = |script: &str| {
+            let (state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
+            betting.preflop.bet_sizes = [2.0, 2.5, 3.0]
+                .map(|value| crate::config::SizeSpec::ToBb { value })
+                .to_vec();
+            betting.preflop.include_allin = true;
+            with_script(&mut betting, script);
+            let actions = state.legal_actions(&betting).unwrap();
+            assert!(actions.contains(&Action::Fold));
+            actions
+                .iter()
+                .filter_map(|action| match action {
+                    Action::RaiseTo { to, .. } => Some(to.raw()),
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(raises_for(""), [2_000, 2_500, 3_000, 99_000]);
+        // 2.5 is within 0.5 BB of the kept 3 (inclusive); 2 is 1 BB below it.
         assert_eq!(
-            actions,
-            vec![
-                Action::Fold,
-                Action::Call {
-                    amount: MwChips(1_000),
-                    all_in: false,
-                },
-                Action::RaiseTo {
-                    to: MwChips(2_500),
-                    all_in: false,
-                    full_raise: true,
-                },
-                Action::RaiseTo {
-                    to: MwChips(20_000),
-                    all_in: true,
-                    full_raise: true,
-                },
-            ]
+            raises_for("preflop { merge raise within 0.5bb }"),
+            [2_000, 3_000, 99_000]
+        );
+        // The pot after the 1 BB call is 2.5 BB, so 20% of it is 0.5 BB.
+        assert_eq!(
+            raises_for("preflop { merge raise within 20 }"),
+            [2_000, 3_000, 99_000]
+        );
+        assert_eq!(
+            raises_for("preflop { merge raise within 100%stack }"),
+            [99_000]
+        );
+        assert_eq!(
+            raises_for("preflop { merge bet within 100%stack }"),
+            [2_000, 2_500, 3_000, 99_000]
         );
     }
 

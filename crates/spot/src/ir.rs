@@ -64,41 +64,11 @@ pub struct SeatRange {
     pub range: Range,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct Ratio {
-    pub numerator: u64,
-    pub denominator: u64,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct MaxAggressiveActions {
-    pub preflop: u64,
-    pub flop: u64,
-    pub turn: u64,
-    pub river: u64,
-}
-
-impl Default for MaxAggressiveActions {
-    fn default() -> Self {
-        Self {
-            preflop: 4,
-            flop: 3,
-            turn: 3,
-            river: 3,
-        }
-    }
-}
-
 #[derive(Clone, Debug)]
 pub struct Tree {
     pub script: String,
     pub compiled: Script<TreeVar>,
     pub include_allin: bool,
-    pub allin_threshold: Option<f64>,
-    pub preflop_reraise_jam_above_stack: Option<Ratio>,
-    pub max_aggressive_actions: MaxAggressiveActions,
     pub params: BTreeMap<String, toml::Value>,
 }
 

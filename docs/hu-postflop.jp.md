@@ -18,6 +18,18 @@ payoffには実際の残stack、Preflopからの各席の拠出、foldした席�
 最小betは1 BBである。内部の木のchip量は0.001 BB整数である。
 P1 lowerは開始pot＋2 × effective stackがu32の内部単位を超える場合を`NLH003`で拒否する。
 scriptによる最終空menuも`NLH003`である。
+攻撃回数の構造上限は無く、capはscriptの最後の`flop, turn, river when aggressions >= 3 { remove raise }`などで書く。
+cap ruleが無ければraise chainはeffective stackとNLHの合法性だけで制限され、木が大きくなりうる。
+`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は、それまでのmenuの候補のうち
+到達額がMの85%以上のものだけをall-inへ置き換える。MはactorのW＋残stackで、P1ではeffective-stackの木の到達額である。
+閾値は最小raiseへ引き上げずMでcapしない。`jam`は候補を追加しないのでsizeを足すruleの後へ置く
+（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。低SPRの切替は`turn, river when spr <= 1.5 { replace raise [a] }`でも書ける。
+近いsizeは`flop { merge bet within 10 }`のように、大きい候補から順に直前に残した候補とのpot 10%以内の差を削除してまとめる。
+幅は`0.5bb`や`5%stack`でも書け、all-inに近い候補はall-inへまとまる（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
+削除済みの`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は未知keyの`NLH002`となり、
+これらを埋込みconfigに含む`.sol`・checkpointも読み込めない。
+正規化・実効configにも出力しない。旧Preflop設定の移行は[共通Input第9節](nlh-input-v1.jp.md#9-tree)を参照する。
+P1ではPreflop ruleだけが「効果無し」のwarningの対象となる。
 
 ## 2. card、iso併合、payoff
 

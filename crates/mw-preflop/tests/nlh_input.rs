@@ -16,7 +16,7 @@ fn lower(text: &str) -> input::Lowered {
 }
 fn config(players: usize, straddles: &str, script: &str) -> String {
     format!(
-        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack_bb = 100\nstraddles_bb = {straddles}\n[tree]\nscript = '''{script}'''\n"
+        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack_bb = 100\nstraddles_bb = {straddles}\n[tree]\nscript = '''{script}\npreflop when aggressions >= 4 {{ remove raise }}\nflop, turn, river when aggressions >= 3 {{ remove raise }}\n'''\n"
     )
 }
 
@@ -35,16 +35,23 @@ fn default_rake_unit_preserves_fingerprints() {
     .unwrap();
     let configuration =
         configuration_fingerprint_for_setup(&game, &game.deal_sampler().unwrap(), lowered.solver);
-    // Captured from HEAD 3a9c4ff before adding the configurable unit.
+    let explicit = raw.replace("rate = 0.05", "rounding_unit_bb = 0.001\nrate = 0.05");
+    let explicit = lower(&explicit);
+    let explicit_game = mw_preflop::HoldemGame::new(
+        &explicit.game,
+        &explicit.utility,
+        &explicit.rake,
+        mw_preflop::FeatureHashAbstraction::default(),
+    )
+    .unwrap();
+    assert_eq!(game.game_fingerprint(), explicit_game.game_fingerprint());
     assert_eq!(
-        blake3::Hash::from(game.game_fingerprint())
-            .to_hex()
-            .as_str(),
-        "0aa026ee09bf133b09f903c402da02df5ab9b4c6f35a5617f224d51e0194c4e4"
-    );
-    assert_eq!(
-        blake3::Hash::from(configuration).to_hex().as_str(),
-        "6e14c2051bed8b5ad0683e4ca0e5953c079f0731709561aacc9aafbf79740efe"
+        configuration,
+        configuration_fingerprint_for_setup(
+            &explicit_game,
+            &explicit_game.deal_sampler().unwrap(),
+            explicit.solver,
+        )
     );
 }
 
@@ -592,9 +599,8 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
         }
     ));
 
-    let raw = config(3, "[]", "preflop { replace raise [5bb] }")
-        .replace("stack_bb = 100", "stack_bb = 10")
-        + "allin_threshold = 0.4\n";
+    let raw =
+        config(3, "[]", "preflop { replace raise [a] }").replace("stack_bb = 100", "stack_bb = 10");
     let lowered = lower(&raw);
     let state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
     assert!(
@@ -612,8 +618,8 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
             ))
     );
 
-    let raw = config(3, "[]", "preflop { when unopened { replace raise [2.5bb] } when !unopened { replace raise [10bb] } }")
-        .replace("stack_bb = 100", "stack_bb = 20") + "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }\n";
+    let raw = config(3, "[]", "preflop { when unopened { replace raise [2.5bb] } when !unopened { replace raise [10bb] } } preflop when aggressions >= 1 { jam raise > 33.333%stack }")
+        .replace("stack_bb = 100", "stack_bb = 20");
     let lowered = lower(&raw);
     let mut state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
     let open = state
@@ -645,20 +651,6 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
                 }
             ))
     );
-
-    for suffix in [
-        "[tree.max_aggressive_actions]\npreflop = 256\n",
-        "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 4294967296 }\n",
-    ] {
-        let doc = document(&(config(3, "[]", "") + suffix));
-        let settings = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();
-        assert!(
-            input::lower(&doc.spot, &settings)
-                .unwrap_err()
-                .to_string()
-                .contains("NLH003")
-        );
-    }
 
     let roundtrip: mw_preflop::MultiwayConfig =
         serde_json::from_str(&serde_json::to_string(&lowered.game).unwrap()).unwrap();

@@ -40,11 +40,21 @@ pub(crate) fn document(doc: &Document) -> ValidateSummary {
                         Effect::Replace => "replace",
                         Effect::Force => "force",
                         Effect::Checkdown => "checkdown",
+                        Effect::Jam(_) => "jam",
+                        Effect::Merge => "merge",
                     };
                     let mut body = effect.to_owned();
                     if let Some(action) = r.action {
                         body.push_str(&format!(" {}", action.name()));
-                        if !r.sizes.is_empty() {
+                        if let Effect::Jam(bound) = r.effect {
+                            body.push_str(&format!(
+                                " {} {}",
+                                bound.symbol(),
+                                r.sizes[0].render(SizeUnit::Bb)
+                            ));
+                        } else if r.effect == Effect::Merge {
+                            body.push_str(&format!(" within {}", r.sizes[0].render(SizeUnit::Bb)));
+                        } else if !r.sizes.is_empty() {
                             body.push_str(&format!(
                                 " [{}]",
                                 r.sizes

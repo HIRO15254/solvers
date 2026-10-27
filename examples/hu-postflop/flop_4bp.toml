@@ -41,7 +41,6 @@ river {
   replace raise [a]
 }
 '''
-allin_threshold = 0.67
 
 [solver.stop]
 target = "0.1%pot"

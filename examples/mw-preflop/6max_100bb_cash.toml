@@ -13,6 +13,7 @@ preflop {
   when aggressions >= 1 { replace raise [3x, a] }
 }
 flop, turn, river { checkdown }
+preflop when aggressions >= 4 { remove raise }
 '''
 
 [run]

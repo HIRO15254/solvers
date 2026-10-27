@@ -104,17 +104,6 @@ fn every_common_default_and_section_order() {
     assert_eq!(s.tree.script, "");
     assert!(s.tree.compiled.rules.is_empty());
     assert!(!s.tree.include_allin);
-    assert!(s.tree.allin_threshold.is_none());
-    assert!(s.tree.preflop_reraise_jam_above_stack.is_none());
-    assert_eq!(s.tree.max_aggressive_actions.preflop, 4);
-    assert_eq!(
-        (
-            s.tree.max_aggressive_actions.flop,
-            s.tree.max_aggressive_actions.turn,
-            s.tree.max_aggressive_actions.river
-        ),
-        (3, 3, 3)
-    );
     assert!(s.tree.params.is_empty());
     assert!(s.run.threads.is_none());
     assert!(s.run.memory_bytes.is_none());
@@ -137,7 +126,6 @@ fn every_common_default_and_section_order() {
         previous = at;
     }
     assert!(normalized.contains("script = '''\n'''"));
-    assert!(!normalized.contains("allin_threshold"));
     assert!(!normalized.contains("max_time"));
     assert!(!normalized.contains("[meta]"));
     assert!(!normalized.contains("[tree.params]"));
@@ -159,7 +147,7 @@ fn spec_p2_example_is_idempotent() {
 #[test]
 fn every_cash_key_explicit_and_idempotent() {
     let text = format!(
-        "{ROOT}sb_bb = 0.25\nante_bb = 0.125\nbb_ante_bb = 0\nstraddles_bb = [2, 4]\n[table.stacks_bb]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_bb = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit_bb = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\ninclude_allin = true\nallin_threshold = 1\npreflop_reraise_jam_above_stack = {{ numerator = 1, denominator = 3 }}\n[tree.max_aggressive_actions]\npreflop = 5\nflop = 2\nturn = 1\nriver = 0\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
+        "{ROOT}sb_bb = 0.25\nante_bb = 0.125\nbb_ante_bb = 0\nstraddles_bb = [2, 4]\n[table.stacks_bb]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_bb = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit_bb = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\ninclude_allin = true\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
     );
     let d = parse(&text);
     assert_eq!(
@@ -172,12 +160,10 @@ fn every_cash_key_explicit_and_idempotent() {
         d.spot.tree.compiled.rules[0].sizes,
         [SizeSpec::ToBb { value: 3.0 }]
     );
-    assert_eq!(d.spot.tree.max_aggressive_actions.river, 0);
     assert_eq!(d.spot.run.max_time_seconds, Some(1800.0));
     let n = roundtrip(&text);
     assert!(n.contains("CO = 80.123"));
     assert!(n.contains("cap_bb = 4.001"));
-    assert!(n.contains("preflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }"));
     assert_eq!(parse(&n).solver["opaque"].as_integer(), Some(5));
 }
 
@@ -259,8 +245,6 @@ fn unknown_keys_at_every_closed_level() {
         "economics.rake",
         "spot",
         "tree",
-        "tree.max_aggressive_actions",
-        "tree.preflop_reraise_jam_above_stack",
         "run",
     ] {
         let text = if section == "table" {
@@ -292,12 +276,13 @@ fn unknown_keys_at_every_closed_level() {
 }
 
 macro_rules! invalid {
-    ($name:ident, $tail:expr, $code:ident, $key:expr) => {
+    ($name:ident, $tail:expr, $code:ident, $key:expr $(, $message:expr)?) => {
         #[test]
         fn $name() {
             let e = error(&format!("{ROOT}{}", $tail));
             assert_eq!(e.code, Code::$code);
             assert_eq!(e.key.as_deref(), Some($key));
+            $(assert_eq!(e.message, $message);)?
         }
     };
 }
@@ -509,46 +494,25 @@ invalid!(
     "tree.source"
 );
 invalid!(
-    tree_threshold_low,
-    "[tree]\nallin_threshold = 0",
-    NLH003,
-    "tree.allin_threshold"
-);
-invalid!(
-    tree_threshold_high,
-    "[tree]\nallin_threshold = 1.01",
-    NLH003,
-    "tree.allin_threshold"
-);
-invalid!(
-    tree_threshold_inf,
-    "[tree]\nallin_threshold = inf",
-    NLH003,
-    "tree.allin_threshold"
-);
-invalid!(
-    tree_ratio_zero,
-    "[tree]\npreflop_reraise_jam_above_stack = { numerator = 0, denominator = 1 }",
-    NLH003,
-    "tree.preflop_reraise_jam_above_stack.numerator"
-);
-invalid!(
-    tree_ratio_den_negative,
-    "[tree]\npreflop_reraise_jam_above_stack = { numerator = 1, denominator = -1 }",
-    NLH003,
-    "tree.preflop_reraise_jam_above_stack.denominator"
-);
-invalid!(
-    tree_ratio_den_missing,
-    "[tree]\npreflop_reraise_jam_above_stack = { numerator = 1 }",
+    removed_tree_threshold,
+    "[tree]\nallin_threshold = 0.5",
     NLH002,
-    "tree.preflop_reraise_jam_above_stack.denominator"
+    "tree.allin_threshold",
+    "unknown key"
 );
 invalid!(
-    tree_limit_negative,
-    "[tree.max_aggressive_actions]\nflop = -1",
-    NLH003,
-    "tree.max_aggressive_actions.flop"
+    removed_tree_reraise_jam,
+    "[tree]\npreflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }",
+    NLH002,
+    "tree.preflop_reraise_jam_above_stack",
+    "unknown key"
+);
+invalid!(
+    removed_tree_aggression_limits,
+    "[tree.max_aggressive_actions]\nflop = 3",
+    NLH002,
+    "tree.max_aggressive_actions",
+    "unknown key"
 );
 invalid!(
     tree_param_array,
@@ -1048,16 +1012,7 @@ fn dotted_type_errors_for_every_common_shape() {
         ("tree", "script"),
         ("tree", "source"),
         ("tree", "include_allin"),
-        ("tree", "allin_threshold"),
-        ("tree", "preflop_reraise_jam_above_stack"),
-        ("tree", "max_aggressive_actions"),
         ("tree", "params"),
-        ("tree.max_aggressive_actions", "preflop"),
-        ("tree.max_aggressive_actions", "flop"),
-        ("tree.max_aggressive_actions", "turn"),
-        ("tree.max_aggressive_actions", "river"),
-        ("tree.preflop_reraise_jam_above_stack", "numerator"),
-        ("tree.preflop_reraise_jam_above_stack", "denominator"),
         ("run", "threads"),
         ("run", "memory"),
         ("run", "max_time"),

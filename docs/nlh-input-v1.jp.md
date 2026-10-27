@@ -277,21 +277,23 @@ BB = "random"
 [tree]
 script = '''
 preflop when unopened { replace raise [2.5bb, a] }
+preflop when aggressions >= 1 { jam raise > 33.333%stack }
 flop { replace bet [33, 75] }
 '''
 # source = "trees/6max.tree"   # scriptと排他。正規化でscriptへinline化
 include_allin = false           # 既定false。全nodeでall-inを候補に足す（scriptより先に効く）
-allin_threshold = 0.85          # 任意。解決した額が最大額のこの比率以上ならall-inへ併合
-# preflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }  # 任意。P2ではallin_thresholdと排他
-
-[tree.max_aggressive_actions]   # 既定 preflop 4、flop/turn/river 3
-preflop = 4
-flop = 3
-turn = 3
-river = 3
 
 [tree.params]                   # scriptのparam既定値を上書き
 ```
+
+`tree.allin_threshold`と`[tree.max_aggressive_actions]`は利用者決定（2026-10-16）で削除された。
+どちらも指定すると未知keyの`NLH002`であり、これらを埋込みconfigに含むartifact・checkpointも読み込めない。
+正規化・実効configにも出力しない。攻撃回数の制限とall-inへの切替はscriptの条件ruleで書く。
+`tree.preflop_reraise_jam_above_stack`も削除済みであり、指定は未知keyの`NLH002`となる。
+正規化・実効configには出力せず、これを埋込みconfigに含む`.sol`・`.mwsol`・checkpointも読み込めない。
+移行時は他のPreflop ruleの後へ`preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置く。
+旧keyのhand開始stackに対し、新しい閾値の分母Mはhand開始stackからanteを引いた額なので、anteがある場合だけ異なる。
+また、旧keyの正確な比率比較ではなく閾値を0.001 BB gridへ丸め、各literalの解決時ではなくruleのソース位置で作用する。
 
 ### scriptの構造
 
@@ -334,12 +336,38 @@ turn, river {
 | `remove ACTION` | その種別を全て削除する。size listは書けない |
 | `replace ACTION [sizes]` | その種別を削除して合法候補を追加する |
 | `force ACTION [sizes]` | menu全体をその種別の合法候補だけに置き換える |
+| `jam ACTION OP SIZE` | 現在のmenuのACTION候補のうち、解決済みraise-to target Tが`T OP 閾値`を満たすものをall-in target Mへ置き換える。適用後は他のeffectと同じく整列・dedupする |
+| `merge ACTION within DIFF` | 現在のmenuのACTION候補を大きいtarget順に見て、直前に残した候補との差がDIFF以下の候補を削除する。新しい額は作らない |
 | `checkdown` | menu全体をx/fの1つに置き換える。call額が0なら`check`、正なら`fold`である。actionとsize listは書けない |
 
 `add` / `replace` / `force`は`[]`を必ず書く。空listも許す。
 fold/check/callの候補はNLHの合法性から作り、size listの数値は候補に影響しない。
 例えば`force call []`は合法なcallだけにする。`remove call`で消したcallも`add call []`で戻せる。
 `remove`へのsize list、`checkdown`へのaction/list、未知actionは`NLH003`である。
+
+`jam`のACTIONは`bet` / `raise`だけ、OPは`>=` / `>`だけである。SIZEはsize listと同じ文法のliteralを
+1つだけ書き、`param`置換も使える。`[ ]`のlist、fold/check/call、他の比較演算子は`NLH003`である。
+閾値はsize literal解決順序の手順1（現streetの到達額への変換）だけで求め、最小full raiseへの引上げもMでのcapも行わない。
+例えば`85%stack`はround(M × 0.85)、`150`はpotの150%によるtarget、`a`はMである。
+一致nodeで、それまでに作られたmenuへソース順に作用する。該当候補が無ければ変化せず、
+対象種別が違法またはmenuに無い場合も変化しない。`jam`単独ではall-inを追加せず、`include_allin`にも依存しない。
+sizeを足すruleの後、慣例として最後の攻撃回数capの前か近くへ置く。後続ruleが足した候補には遡って作用しない。
+
+`merge`のACTIONも`bet` / `raise`だけで、`within`の後へ幅DIFFを1つだけ書く。DIFFはsize literalと同じ綴りで、`param`置換も使える。
+targetではなく額の差として読み、裸の`10`はround(P × 0.10)、`0.5bb`は0.5 BB、`5%stack`はround(M × 0.05)、
+`5%effective`は`%effective`と同じ基準の5%である。Pはsize literalと同じ現在pot＋Cである。
+`Nx`、`min`、`a`、`e`、`Ne`は幅を持たないため`NLH003`である。`within`の欠落、`[ ]`のlist、fold/check/callも`NLH003`である。
+対象候補をtargetの降順に並べ、最大のものを残す。以降の候補は、直前に**残した**候補との差がDIFF以下なら削除し、超えれば残す。
+比較相手は直前に見た候補ではないため、近い候補が連鎖しても全体が1つに潰れることはない。all-inは通常最大の候補なので、
+all-inに近い候補はall-inへまとまる。`jam`と同じく一致nodeでソース順に作用し、後続ruleが足した候補には遡って作用しない。
+対象種別が違法またはmenuに無い場合は変化しない。
+
+```text
+flop {
+  replace bet [25, 33, 50, 66, 75, 100, 150]
+  merge bet within 10   # 150, 100, 75, 50, 33が残り、66と25は削除される
+}
+```
 
 betはそのstreetに賭けが無い場合、raiseは賭けがある場合の候補である。Preflopのopenはraiseである。
 対象種別がそのnodeで合法でなければ候補は空である。`add`と`remove`は変化無し、
@@ -364,7 +392,7 @@ stringの中身も単一tokenでなければならない。未宣言keyや複数
 street blockは宣言を解決した後に展開する。正規化はscript本文とparamsを残し、展開済みruleに置き換えない。
 
 予約名は全条件変数、全street、`param`、`define`、`when`、`if`、`else`、`in`、
-`add`、`remove`、`replace`、`force`、`checkdown`、`fold`、`check`、`call`、`bet`、`raise`、
+`add`、`remove`、`replace`、`force`、`jam`、`merge`、`within`、`checkdown`、`fold`、`check`、`call`、`bet`、`raise`、
 `true`、`false`、`a`、`e`、`min`である。param/defineに使うと`NLH003`である。
 
 param schemaは名前、実効値、型、説明を持つ。説明は宣言直前の連続するコメント行である。
@@ -373,6 +401,7 @@ param schemaは名前、実効値、型、説明を持つ。説明は宣言直�
 `validate`の`tree.params`は`name` / `kind` / `value`（string）/ `description`（無ければnull）の配列である。
 `tree.rules`は実適用順の平坦化ruleをソース風stringで返す。
 無条件ruleは`when`を省き、常にfalseのruleは`when unopened && !unopened`と書く。
+`jam`も`turn { jam raise >= 85%stack }`、`merge`も`flop { merge bet within 10 }`のように表示する。
 診断は実効configのkeyではない。scriptが無いときも空配列を持つ。
 
 ### 条件文法
@@ -456,11 +485,11 @@ hole cardと任意historyは条件変数に含めない。
 
 sizeは引用符無しのtokenである。数値部は符号・指数表記無しの10進数、有限かつ正である。
 裸百分率は1以上、`Nx`はN > 1、`Ne`は整数1..255、`Nbb`は0.001 BB gridである。
-`%stack`と`%effective`のNに100の上限は無く、解決時にstack capを適用する。
+`%stack`と`%effective`のNに100の上限は無く、候補sizeの解決時にstack capを適用する（`jam`の閾値と`merge`の幅には適用しない）。
 旧綴り`20c` / `allin` / `50%pot` / `geometric(...)`は`NLH003`である。
 
 以下でWはactorの現street wager、Cは`min(to_call, 残stack)`、Pは現在pot＋C、TはW＋C、
-Mはactorの現street最大到達額（W＋残stack）である。
+Mはactorの現street最大到達額（W＋残stack）で、同じstreet内では一定である。Preflopではhand開始stackからanteを引いた額になる。
 
 | literal | raise-to target |
 |---|---|
@@ -486,28 +515,34 @@ menu構築は次の順である。
 4. 各effectの後でactionをfold、check、call、bet、raise、額の昇順へ整列し、同一actionをdedupする。
 5. 最終menuが空ならerrorにする。
 
-各literalは次の順で解決する。
+候補を追加する各literalは次の順で解決する（`jam`の閾値は手順1だけである）。
 
 1. 現streetの到達額へ変換する。
 2. 最小full bet/raiseを下回りstackがその最小額に届くなら引き上げる。
 3. stack上限Mで切る。full raiseに届かないstackでもMへのshort all-inは許す。
    P2では最小額未満でMにも届かない通常sizeを捨てる。P1では最小額自体をMで切って引き上げる。
-4. P2のPreflopでaggressionsが1以上なら、明示`a`以外のtargetについて
-   `target * denominator > actorのhand開始stack * numerator`でall-inへ置換する。
-5. `allin_threshold`があり、targetがround(M × threshold)以上ならMへ併合する。
-6. 同額targetをdedupし、現在最大wager以下のtargetを捨てる。
+4. 同額targetをdedupし、現在最大wager以下のtargetを捨てる。
 
-`allin_threshold`は有限、0 < 値 <= 1である。`include_allin = false`でも既存sizeの併合は行う。
-`preflop_reraise_jam_above_stack`のnumerator/denominatorは正の整数（P2 lowerではu32）である。
-等号では置換しない。P2のruntimeは0 < 比率 <= 1を要求する。共通parserだけでは比率上限を検証しない。
-P2では`preflop_reraise_jam_above_stack`と`allin_threshold`の同時指定をruntimeが`NLH003`で拒否する。
-P1ではこの設定、Preflop cap、Preflop ruleを受け付けて保持するが効果を持たない。
-この設定があるか、Preflop capが既定の4と異なるか、Preflop ruleがあれば、P1の`validate`と`solve`はwarningで効果が無いことを示す。
+P1ではPreflop ruleを受け付けて保持するが効果を持たない。
+Preflop ruleがあれば、P1の`validate`と`solve`はwarningで効果が無いことを示す。
 
-`max_aggressive_actions`はstreetのbet＋raise数の上限で、0も許す。
-P1の使用capはu32、P2はu8（0..255）へlowerできなければ`NLH003`である。
-cap到達時、残stackがcall額以下、P2でshort all-in後にraise権が再開していない時は、
-どのeffectでも攻撃候補を作れない。scriptはNLHの合法性と構造上限を破れない。
+残stackがcall額以下、またはP2でshort all-in後にraise権が再開していない時は、
+どのeffectでも攻撃候補を作れない。scriptはNLHの合法性を破れない。
+構造上の攻撃回数上限は無い。例えば大きい候補をall-inへ置き換え、低SPRでもraiseをall-inにし、streetの攻撃を3回までに制限するには次のように書く。
+
+```text
+turn, river {
+  jam bet >= 85%stack
+  jam raise >= 85%stack
+}
+turn, river when spr <= 1.5 { replace raise [a] }
+flop, turn, river when aggressions >= 3 { remove raise }
+```
+
+ruleの順序は意味を持つ。cap ruleはそのstreetの他のruleより後（最後）へ置けば、
+先行ruleがraiseを追加しても最後に削除され、先行ruleによって制限が取り消されることはない。
+N >= 1の上限は`when aggressions >= N { remove raise }`、上限0は`{ remove bet remove raise }`で表す。
+cap ruleを書かないscriptのraise chainはstackとNLHの合法性だけで制限され、木が大きくなりうる。
 
 ### 未使用ruleの警告
 
@@ -703,7 +738,7 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 `--show-effective` / `--write-effective PATH`は実効configを出力し、`--format json`は同じ内容を機械可読で返す。
 
 実効configは第2節の順に節を並べ、既定値を持つkeyはすべて書く。既定値の無い任意key（`cap_bb`、
-`allin_threshold`、`preflop_reraise_jam_above_stack`、`max_time`等）は指定したときだけ書く。BB量は整数なら
+`max_time`等）は指定したときだけ書く。BB量は整数なら
 整数、それ以外は最短の10進数で書く。`source`は`script`へinline化し、scriptは複数行literal文字列（`'''`）で
 書く。P2の`[ranges]`は全positionを書く（書かなかったpositionは`"random"`）。`[solver]`・`[output]`は
 決定した製品が解釈し、その既定値を明示して書く。
@@ -711,7 +746,7 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 | code | 意味 |
 |---|---|
 | `NLH001` | schemaが無い・未知。旧family schemaには移行先（本形式）を案内する |
-| `NLH002` | TOMLの構文・型error、未知key、決定した製品に適用されないkey |
+| `NLH002` | TOMLの構文・型error、未知key（第9節の削除済みtree keyを含む）、決定した製品に適用されないkey |
 | `NLH003` | 値が範囲外・grid外、range/board/script/size literalの解析error、P2でのboard述語 |
 | `NLH004` | lineの解析error（別表記、`f`の記述を含む）、違法な行動、未知position、street境界やboard枚数との不一致 |
 | `NLH005` | 対象外のspot（第3節）、P1専用配布buildへのP2入力 |
@@ -725,7 +760,7 @@ CLIの型付き入力errorはexit 2であり、利用者由来のdiagnostic text
 | code | 代表例 |
 |---|---|
 | `NLH001` | schema省略、未知schema、旧familyを共通parserへ渡す |
-| `NLH002` | playersがstring、未知`table.foo`、P1へP2の`solver.kind`、source/script同時指定 |
+| `NLH002` | playersがstring、未知`table.foo`、削除済みtree key（第9節）、P1へP2の`solver.kind`、source/script同時指定 |
 | `NLH003` | 0.0001 BB、重複board、全0 range、未知条件変数、`force raise []`で最終menuが空、P2のboard述語 |
 | `NLH004` | `BTN R2.5`、`BTN f`、`r2.50`、call額0で`c`、違法min-raise、lineが空でboard指定 |
 | `NLH005` | lineありboard無し、3人以上のPostflop、行動可能なP1 playerが2人未満、`p2` featureなしでP2入力 |
@@ -781,8 +816,8 @@ river {
   when in_position { replace bet [75, a] }
   replace raise [a]
 }
+flop, turn when aggressions >= 3 { remove raise }
 '''
-allin_threshold = 0.67
 
 [solver.stop]
 target = "0.1%pot"
@@ -806,6 +841,7 @@ preflop {
   when unopened { replace raise [2.5bb, a]  remove call }
   when aggressions >= 1 { replace raise [3x, a] }
 }
+preflop when aggressions >= 4 { remove raise }
 flop, turn, river { checkdown }
 '''
 
@@ -843,13 +879,13 @@ max_time = "12h"
 | # | 事項 | 決定 |
 |---|---|---|
 | Q1 | P1の既定停止目標 | 既定なし。`target`を書かなければ`max_iterations`か`max_time`まで回す（第10節） |
-| Q2 | `max_aggressive_actions`の既定 | Preflop 4、Flop・Turn・River各3（第9節） |
+| Q2 | 構造上の攻撃回数上限 | 利用者決定（2026-10-16）で削除。capはscript ruleで書く（第9節） |
 | Q3 | lineの表記 | `BTN r2.5, BB c`形式の1通りだけを受ける。foldは書かず、書けばerror。単語形、`;`区切り、大文字の動作記号、positionの無い形式は受けない（第7節） |
 | Q4 | v1に含める卓・spotの機能 | straddleを含める。Preflopで最初に行動する席から始まるlive straddleと、その後のre-straddleの連続を扱う（第5節）。それ以外の位置から始まるstraddle（BTN straddle等）、seatごとのblind・ante上書き、P2のPreflop途中からの開始はv1に含めない |
 | Q5 | 旧configの自動変換コマンド | 持たない。同梱の例と試験用configは移行時に書き換える |
 | Q6 | P1の`memory = "auto"` | 物理メモリの80%を上限とし、solve開始前の見積りが超えればerror。明示した値で上限を変えられる（第11節） |
 | Q7 | `checkdown`の意味 | 一致した手番のactorだけをx/f（call額0ならcheck、正ならfold）にする。両製品で共通（第9節） |
-| Q8 | P1でのPreflop専用のtree設定 | 受け付けて保持し、効果が無いことをwarningで示す（第9節） |
+| Q8 | P1でのPreflop rule | 受け付けて保持し、効果が無いことをwarningで示す（第9節）。削除済みtree keyは保持しない |
 | Q9 | `rounding_unit_bb` | 0.001の倍数の任意の正の単位を受ける（第6節） |
 | Q10 | 付録Bのその他の事項 | 記載の定めで確定する |
 | Q11 | 丸めたrakeがpotを超える場合 | potの額とする（第6節） |
@@ -873,7 +909,7 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | P1のrake条件（第6節） | `flop_dealt`はtrue、`players_dealt`は卓の人数、`players_saw_flop`は2、`showdown`と`won_without_showdown`はterminalごとに判定する | 第6節 |
 | 停止目標（第10節） | `NashConv / 2 ≤ target`に達した時点で止める | 第10節 |
 | `squeeze`・`in_position_to_last_aggressor`（第9節） | Postflopでは常にfalse。P1でlineから導出する値も同じ | 第9節・条件変数 |
-| P1でのPreflop専用のtree設定（第9節） | `preflop_reraise_jam_above_stack`、`max_aggressive_actions.preflop`、Preflopのruleを受け付け、効果を持たない。正規化でも残す。既定値以外ならwarningを出す（Q8） | 第9節・size literal |
+| P1でのPreflop rule（第9節） | Preflopのruleを受け付け、効果を持たない。正規化でも残す。Preflop ruleがあればwarningを出す（Q8） | 第9節・size literal |
 | `line`が空で`board`だけがある（第3節） | Preflopが閉じていないため、board枚数の不一致として`NLH004` | 第3節 |
 | 全順位が同額の`payouts`（第6節） | `NLH003` | 第6節 |
 | 実効configの書き方（第13節） | 節内のkeyは本書の記載順、positionは第5節の表の順。全員のstackが等しければ`stack_bb`だけを書き、異なれば`[table.stacks_bb]`に全positionを書く。時間とmemoryは割り切れる最大の単位（`12h`、`15m`、`6GiB`）。空の表は書かない | 第13節 |

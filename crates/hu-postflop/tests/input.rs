@@ -554,7 +554,7 @@ fn spec_p1_example_lowering_and_sizes() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
-        "river { replace bet [33, 75] replace raise [3x] }",
+        "river { replace bet [33, 75] replace raise [3x] } river when aggressions >= 3 { remove raise }",
     )));
     assert_eq!(actions(&g, ""), ["x", "r1815", "r4125"]);
     assert_eq!(actions(&g, "r1815"), ["f", "c", "r5445"]);
@@ -601,13 +601,6 @@ fn effective_stack_allin_and_size_resolution() {
         actions(&game(&c), ""),
         ["x", "r1000", "r1234", "r10500", "r17500"]
     );
-    let threshold = base.replace("script =", "allin_threshold = 0.6\nscript =");
-    assert_eq!(
-        actions(&game(&config(&threshold)), ""),
-        ["x", "r1000", "r1234", "r17500"]
-    );
-    let caps = base + "\n[tree.max_aggressive_actions]\nriver = 0";
-    assert_eq!(actions(&game(&config(&caps)), ""), ["x"]);
     let huge = config(&text(
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
@@ -706,6 +699,103 @@ fn spr_uses_both_remaining_stacks_and_amount_variables_use_bb() {
     let mut zero_pot = config(&standard("flop when spr > 1000000000 { remove call }"));
     zero_pot.pot = Chips::ZERO;
     assert_eq!(memory_usage(&zero_pot).rule_hits.flop, [true]);
+}
+
+#[test]
+fn jam_replaces_wagers_at_the_threshold_in_source_order() {
+    // Both players have 17.5 BB behind on the river, so `80%stack` is 14 BB.
+    let river = |script: &str, history: &str| {
+        actions(
+            &game(&config(&text(
+                "[table.stacks_bb]\nBB = 20",
+                "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+                "Ks 7h 2d Ac 9s",
+                script,
+            ))),
+            history,
+        )
+    };
+    assert_eq!(
+        river("river { add bet [3.5bb, 14bb] jam bet >= 80%stack }", ""),
+        ["x", "r3500", "r17500"]
+    );
+    assert_eq!(
+        river("river { add bet [3.5bb, 14bb] jam bet > 80%stack }", ""),
+        ["x", "r3500", "r14000"]
+    );
+    assert_eq!(
+        river("river { jam bet >= 80%stack add bet [15bb] }", ""),
+        ["x", "r15000"]
+    );
+    assert_eq!(
+        river(
+            "river when unopened { add bet [3.5bb] } river when aggressions == 1 { add raise [3x, 15bb] jam raise >= 80%stack jam bet >= 1bb }",
+            "r3500"
+        ),
+        ["f", "c", "r10500", "r17500"]
+    );
+}
+
+#[test]
+fn merge_keeps_the_larger_wager_against_the_last_kept_one() {
+    // Both players have 17.5 BB behind on the river and the pot is at least
+    // 5 BB, so a `10` (pot) width is at least 0.5 BB but below 1 BB.
+    let river = |script: &str, history: &str| {
+        actions(
+            &game(&config(&text(
+                "[table.stacks_bb]\nBB = 20",
+                "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+                "Ks 7h 2d Ac 9s",
+                script,
+            ))),
+            history,
+        )
+    };
+    // 2.4 is within 0.5 of the kept 2.8 (dropped); 2 is compared with 2.8,
+    // not with the dropped 2.4, so it stays.
+    assert_eq!(
+        river(
+            "river { add bet [2bb, 2.4bb, 2.8bb, 3.5bb] merge bet within 0.5bb }",
+            ""
+        ),
+        ["x", "r2000", "r2800", "r3500"]
+    );
+    assert_eq!(
+        river(
+            "river { add bet [2bb, 2.5bb, 3.5bb] merge bet within 10 }",
+            ""
+        ),
+        ["x", "r2500", "r3500"]
+    );
+    // All-in is the largest candidate, so a near-all-in size merges into it.
+    assert_eq!(
+        river("river { add bet [16bb, a] merge bet within 10%stack }", ""),
+        ["x", "r17500"]
+    );
+    // Source order: a later rule's candidates are not merged.
+    assert_eq!(
+        river(
+            "river { add bet [16bb] merge bet within 10%stack add bet [a] }",
+            ""
+        ),
+        ["x", "r16000", "r17500"]
+    );
+    // A raise merge leaves bet nodes alone and thins raise nodes; the width
+    // is inclusive (11 - 10.5 = 0.5).
+    assert_eq!(
+        river(
+            "river when unopened { add bet [3.5bb] merge raise within 5bb } river when aggressions == 1 { add raise [3x, 11bb] merge raise within 0.5bb }",
+            ""
+        ),
+        ["x", "r3500"]
+    );
+    assert_eq!(
+        river(
+            "river when unopened { add bet [3.5bb] } river when aggressions == 1 { add raise [3x, 11bb] merge raise within 0.5bb }",
+            "r3500"
+        ),
+        ["f", "c", "r11000"]
+    );
 }
 
 #[test]
@@ -836,7 +926,7 @@ fn lowered_and_hand_built_common_rule_trees_are_identical() {
         "",
         "BTN r2.5, BB c / BB x, BTN b1.8, BB c",
         "Ks 7h 2d Ac",
-        "turn, river { replace bet [33, 75, 2bb] replace raise [3x] }",
+        "turn, river { replace bet [33, 75, 2bb] replace raise [3x] } turn, river when aggressions >= 3 { remove raise }",
     ));
     let script = Script::compile(
         "turn, river { replace bet [33, 75, 2bb] replace raise [3x] }",
@@ -847,20 +937,8 @@ fn lowered_and_hand_built_common_rule_trees_are_identical() {
     let fixture = PostflopConfig {
         streets: hu_postflop::PerStreet {
             flop: StreetTree::default(),
-            turn: hu_postflop::test_support::from_script(
-                Street::Turn,
-                &script.rules,
-                3,
-                false,
-                None,
-            ),
-            river: hu_postflop::test_support::from_script(
-                Street::River,
-                &script.rules,
-                3,
-                false,
-                None,
-            ),
+            turn: hu_postflop::test_support::from_script(Street::Turn, &script.rules, 3, false),
+            river: hu_postflop::test_support::from_script(Street::River, &script.rules, 3, false),
         },
         ..c.clone()
     };

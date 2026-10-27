@@ -1,7 +1,7 @@
 //! Common-input tree fixtures for tests and benchmarks.
 use crate::StreetTree;
 use crate::input::NlhStreetRules;
-use nlh::script::{ActionKind, Condition, Effect, Rule};
+use nlh::script::{ActionKind, CmpOp, Condition, Effect, Literal, Rule};
 use nlh::{SizeSpec, Street};
 use spot::TreeVar;
 
@@ -12,28 +12,47 @@ pub fn street_rules(rules: Vec<Rule<TreeVar>>) -> Box<NlhStreetRules> {
     })
 }
 
-pub fn from_script(
-    street: Street,
-    rules: &[Rule<TreeVar>],
-    max_aggressive_actions: u32,
-    include_allin: bool,
-    allin_threshold: Option<f64>,
-) -> StreetTree {
-    StreetTree {
-        nlh_rules: street_rules(
-            rules
-                .iter()
-                .filter(|rule| rule.street == street)
-                .cloned()
-                .collect(),
-        ),
-        max_aggressive_actions,
-        include_allin,
-        allin_threshold,
+/// Append the fixture's explicit aggression-limiting script rules last.
+pub fn limit_aggressions(rules: &mut Vec<Rule<TreeVar>>, street: Street, limit: u32) {
+    let actions: &[ActionKind] = if limit == 0 {
+        &[ActionKind::Bet, ActionKind::Raise]
+    } else {
+        &[ActionKind::Raise]
+    };
+    for &action in actions {
+        rules.push(Rule {
+            street,
+            condition: Condition::Compare {
+                var: TreeVar::Aggressions,
+                op: CmpOp::Ge,
+                value: Literal::Number(f64::from(limit)),
+            },
+            effect: Effect::Remove,
+            action: Some(action),
+            sizes: Vec::new(),
+        });
     }
 }
 
-pub fn pot_fractions(oop: &[f64], ip: &[f64], max_aggressive_actions: u32) -> StreetTree {
+pub fn from_script(
+    street: Street,
+    rules: &[Rule<TreeVar>],
+    aggression_limit: u32,
+    include_allin: bool,
+) -> StreetTree {
+    let mut rules: Vec<_> = rules
+        .iter()
+        .filter(|rule| rule.street == street)
+        .cloned()
+        .collect();
+    limit_aggressions(&mut rules, street, aggression_limit);
+    StreetTree {
+        nlh_rules: street_rules(rules),
+        include_allin,
+    }
+}
+
+pub fn pot_fractions(oop: &[f64], ip: &[f64], aggression_limit: u32) -> StreetTree {
     let mut rules = Vec::new();
     for action in [ActionKind::Bet, ActionKind::Raise] {
         for (in_position, fractions) in [(false, oop), (true, ip)] {
@@ -64,10 +83,9 @@ pub fn pot_fractions(oop: &[f64], ip: &[f64], max_aggressive_actions: u32) -> St
             });
         }
     }
+    limit_aggressions(&mut rules, Street::Flop, aggression_limit);
     StreetTree {
         nlh_rules: street_rules(rules),
-        max_aggressive_actions,
         include_allin: false,
-        allin_threshold: None,
     }
 }

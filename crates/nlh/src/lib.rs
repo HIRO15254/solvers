@@ -29,7 +29,7 @@ pub use range::{
 };
 pub use set::CardSet;
 pub use sizing::{
-    ParseSizeError, SizeContext, SizeSpec, SizeUnit, geometric_allin_target, scale_u32, scale_u64,
+    ParseSizeError, SizeContext, SizeSpec, SizeUnit, geometric_allin_target, merge_targets,
 };
 pub use types::{Chips, PerPlayer, Player, Street};
 

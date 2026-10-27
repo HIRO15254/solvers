@@ -1,140 +1,145 @@
-import { Fragment, type ReactNode } from "react";
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
+import { bracketMatching, foldGutter, foldKeymap, indentOnInput } from "@codemirror/language";
+import { lintGutter, lintKeymap, setDiagnostics } from "@codemirror/lint";
+import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
+import { Annotation, EditorState, type Extension } from "@codemirror/state";
+import {
+  crosshairCursor,
+  drawSelection,
+  dropCursor,
+  EditorView,
+  highlightActiveLine,
+  highlightActiveLineGutter,
+  keymap,
+  lineNumbers,
+  rectangularSelection,
+} from "@codemirror/view";
+import { useEffect, useRef } from "react";
+import { scriptCompletionSource, scriptHover } from "../lib/editor/completion";
+import { type LineDiagnostic, toDiagnostics } from "../lib/editor/diagnostics";
+import { scriptSupport, tomlSupport } from "../lib/editor/languages";
+import { editorTheme } from "../lib/editor/theme";
 
-// Highlighting only colors tokens; the daemon parses and reports errors.
+export type EditorLanguage = "script" | "toml";
 
-/** A transparent textarea over its highlighted copy; `highlight` returns one node list per line. */
+/** Marks a transaction that mirrors the `value` prop, so it is not echoed to `onChange`. */
+const fromProps = Annotation.define<boolean>();
+
+function foldMarker(open: boolean): HTMLElement {
+  const icon = document.createElement("i");
+  icon.className = `ti ti-${open ? "chevron-down" : "chevron-right"}`;
+  icon.setAttribute("aria-hidden", "true");
+  return icon;
+}
+
+function extensions(language: EditorLanguage, label: string, id: string | undefined, onChange: (text: string) => void): Extension {
+  const embedded = language === "toml";
+  return [
+    lineNumbers(),
+    highlightActiveLineGutter(),
+    foldGutter({ markerDOM: foldMarker }),
+    lintGutter(),
+    history(),
+    drawSelection(),
+    dropCursor(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    bracketMatching(),
+    closeBrackets(),
+    autocompletion({ override: [scriptCompletionSource(embedded)], icons: false }),
+    rectangularSelection(),
+    crosshairCursor(),
+    highlightActiveLine(),
+    highlightSelectionMatches(),
+    search({ top: true }),
+    scriptHover(embedded),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+      indentWithTab,
+    ]),
+    EditorView.lineWrapping,
+    EditorView.contentAttributes.of({ "aria-label": label, ...(id ? { id } : {}) }),
+    embedded ? tomlSupport() : scriptSupport(),
+    editorTheme(),
+    EditorView.updateListener.of((update) => {
+      if (update.docChanged && !update.transactions.some((tr) => tr.annotation(fromProps))) {
+        onChange(update.state.doc.toString());
+      }
+    }),
+  ];
+}
+
+/** The smallest single replacement turning `before` into `after`, so the cursor outside it stays put. */
+function difference(before: string, after: string): { from: number; to: number; insert: string } {
+  let start = 0;
+  const limit = Math.min(before.length, after.length);
+  while (start < limit && before[start] === after[start]) start += 1;
+  let end = 0;
+  while (end < limit - start && before[before.length - 1 - end] === after[after.length - 1 - end]) end += 1;
+  return { from: start, to: before.length - end, insert: after.slice(start, after.length - end) };
+}
+
+/**
+ * A CodeMirror editor for the tree script or for TOML with an embedded
+ * script: highlighting, completion, hover docs, folding, search and the
+ * daemon's error on its line. The daemon remains the parser of record.
+ */
 export function CodeEditor({
   id,
+  label,
   value,
   onChange,
-  highlight,
+  language,
+  diagnostics,
   className,
 }: {
   id?: string;
+  /** The accessible name of the editing area. */
+  label: string;
   value: string;
   onChange: (value: string) => void;
-  highlight: (text: string) => ReactNode[][];
+  language: EditorLanguage;
+  /** Errors to mark, by 1-based line of `value`. */
+  diagnostics?: readonly LineDiagnostic[];
   className?: string;
 }) {
-  return (
-    <div className={`code-editor ${className ?? ""}`}>
-      <pre aria-hidden="true">
-        {highlight(value).map((line, i) => (
-          <Fragment key={i}>
-            {line}
-            {"\n"}
-          </Fragment>
-        ))}
-      </pre>
-      <textarea
-        id={id}
-        spellCheck={false}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key !== "Tab") return;
-          event.preventDefault();
-          const target = event.currentTarget;
-          const { selectionStart, selectionEnd } = target;
-          onChange(value.slice(0, selectionStart) + "  " + value.slice(selectionEnd));
-          requestAnimationFrame(() => target.setSelectionRange(selectionStart + 2, selectionStart + 2));
-        }}
-      />
-    </div>
-  );
-}
+  const host = useRef<HTMLDivElement>(null);
+  const view = useRef<EditorView | null>(null);
+  const changed = useRef(onChange);
+  changed.current = onChange;
 
-const token = (key: number, className: string, text: string): ReactNode =>
-  className ? (
-    <span key={key} className={className}>
-      {text}
-    </span>
-  ) : (
-    text
-  );
+  useEffect(() => {
+    const editor = new EditorView({
+      parent: host.current!,
+      state: EditorState.create({
+        doc: value,
+        extensions: extensions(language, label, id, (text) => changed.current(text)),
+      }),
+    });
+    view.current = editor;
+    return () => {
+      editor.destroy();
+      view.current = null;
+    };
+    // The editor is built once per language; `value` and `diagnostics` sync below.
+  }, [language, label, id]);
 
-// The `[tree] script` dialect (docs/nlh-input-v1.jp.md §9).
-const KEYWORD =
-  /^(?:preflop|flop|turn|river|when|if|else|param|define|add|remove|replace|force|checkdown|in)$/;
-const ACTION = /^(?:fold|check|call|bet|raise)$/;
-const NUMBER = /^\d+(?:\.\d+)?(?:%|x|e|bb|%pot|%stack|%effective)?$|^a$/;
-const SCRIPT_TOKEN = /(#.*$)|(\s+)|(&&|\|\||[<>=!]=?|[{}[\](),])|([^\s{}[\](),<>=!&|#]+)/g;
-
-export function highlightScript(text: string): ReactNode[][] {
-  return text.split("\n").map((line) =>
-    Array.from(line.matchAll(SCRIPT_TOKEN), (match) => {
-      const [text, comment, space, punct, word] = match;
-      if (space) return text;
-      const className = comment
-        ? "tok-com"
-        : punct
-          ? "tok-punct"
-          : word && KEYWORD.test(word)
-            ? "tok-kw"
-            : word && ACTION.test(word)
-              ? "tok-act"
-              : word && NUMBER.test(word)
-                ? "tok-num"
-                : "tok-var";
-      return token(match.index, className, text);
-    }),
-  );
-}
-
-// TOML 1.0: table headers, keys, strings (multi-line ones span lines), numbers,
-// booleans and dates, comments. Value rules are tried in order at each position.
-const TOML_HEADER = /^\s*\[\[?[^\]]*\]\]?/;
-const TOML_PART = String.raw`(?:[A-Za-z0-9_-]+|"(?:[^"\\]|\\.)*"|'[^']*')`;
-const TOML_KEY = new RegExp(String.raw`^\s*${TOML_PART}(?:\s*\.\s*${TOML_PART})*(?=\s*=)`);
-const TOML_RULES: [RegExp, string][] = [
-  [/#.*/y, "tok-com"],
-  [/"""|'''/y, "open"],
-  [/"(?:[^"\\]|\\.)*"?|'[^']*'?/y, "tok-str"],
-  [/\d{4}-\d{2}-\d{2}(?:[Tt ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:[Zz]|[+-]\d{2}:\d{2})?)?/y, "tok-num"],
-  [/[+-]?(?:inf|nan|0x[\da-fA-F_]+|0o[0-7_]+|0b[01_]+|\d[\d_]*(?:\.[\d_]+)?(?:[eE][+-]?\d+)?)(?![\w-])/y, "tok-num"],
-  [/(?:true|false)(?![\w-])/y, "tok-num"],
-  [/[A-Za-z0-9_-]+/y, "word"],
-  [/[=[\]{},.]/y, "tok-punct"],
-  [/\s+/y, ""],
-  [/./y, ""],
-];
-
-export function highlightToml(text: string): ReactNode[][] {
-  let open: string | null = null;
-  return text.split("\n").map((line) => {
-    const out: ReactNode[] = [];
-    let at = 0;
-    // A table header, or the (possibly dotted) key of a `key = value` line.
-    const lead = open === null ? (TOML_HEADER.exec(line) ?? TOML_KEY.exec(line)) : null;
-    if (lead) {
-      out.push(token(0, lead[0].trimStart().startsWith("[") ? "tok-kw" : "tok-var", lead[0]));
-      at = lead[0].length;
+  useEffect(() => {
+    const editor = view.current;
+    if (!editor) return;
+    const current = editor.state.doc.toString();
+    if (current !== value) {
+      editor.dispatch({ changes: difference(current, value), annotations: fromProps.of(true) });
     }
-    while (at < line.length) {
-      if (open !== null) {
-        const end = line.indexOf(open, at);
-        const stop = end === -1 ? line.length : end + 3;
-        out.push(token(at, "tok-str", line.slice(at, stop)));
-        if (end !== -1) open = null;
-        at = stop;
-        continue;
-      }
-      for (const [rule, className] of TOML_RULES) {
-        rule.lastIndex = at;
-        const match = rule.exec(line);
-        if (!match) continue;
-        if (className === "open") {
-          open = match[0];
-          out.push(token(at, "tok-str", open));
-        } else {
-          // Inside an inline table, a word before `=` is a key.
-          const key = className === "word" && /^\s*=/.test(line.slice(at + match[0].length));
-          out.push(token(at, key ? "tok-var" : className === "word" ? "" : className, match[0]));
-        }
-        at += match[0].length;
-        break;
-      }
-    }
-    return out;
-  });
+    editor.dispatch(setDiagnostics(editor.state, toDiagnostics(editor.state.doc, diagnostics ?? [])));
+  }, [value, diagnostics, language, label, id]);
+
+  return <div ref={host} className={`code-editor ${className ?? ""}`} />;
 }

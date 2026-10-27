@@ -14,6 +14,45 @@ Version 0.1.0 accepts only P1 `.sol` format 4 and checkpoint format 5.
 The human-readable `--version` includes a Git revision (`unknown` when unavailable);
 run manifests keep `cliVersion` as the plain workspace semantic version.
 
+## [Unreleased]
+
+### Removed
+
+- **Breaking:** removed `tree.allin_threshold` and `[tree.max_aggressive_actions]`
+  from `solvers.nlh/v1`. Both now produce unknown-key `NLH002` errors, including
+  when loading artifacts or checkpoints whose embedded configs contain them.
+  Express aggression caps and all-in switching as ordered tree-script rules.
+- **Breaking:** removed `tree.preflop_reraise_jam_above_stack`. It now produces
+  unknown-key `NLH002`, is omitted from normalized/effective configs, and prevents
+  loading `.sol`, `.mwsol`, or checkpoints whose embedded configs contain it.
+  Migrate to `preflop when aggressions >= 1 { jam raise > 33.333%stack }` after
+  the other preflop rules. Unlike the old exact ratio, the threshold uses the
+  actor's maximum reachable street amount (hand-start stack minus antes), is
+  rounded to the 0.001 BB grid, and applies at its source position.
+
+### Added
+
+- Tree-script `jam ACTION OP SIZE` effect for `bet` / `raise` with `>=` / `>`.
+  It replaces qualifying existing candidates with all-in, using only the size
+  literal's street-target conversion for the threshold (no minimum-raise bump
+  or stack cap). It runs in source order and never adds all-in on its own.
+- Tree-script `merge ACTION within DIFF` effect for `bet` / `raise`. Walking
+  the current candidates from the largest target down, it removes each one
+  within DIFF of the last kept candidate, so the larger size survives and
+  near-all-in sizes merge into all-in. DIFF reads a pot percentage, `bb`,
+  `%stack`, or `%effective` literal as an amount; `merge` and `within` are
+  reserved words.
+- GUI Tree-step inputs for script `param` declarations, persisted as
+  `[tree.params]` overrides. The size table writes its three-aggression
+  per-street cap as script rules rather than structural configuration.
+- GUI script and TOML editors built on CodeMirror 6: syntax highlighting
+  (the TOML editor highlights the `tree.script` string as script), line
+  numbers, bracket matching and auto-closing, `{ }` folding, search and
+  replace, multiple cursors, context-aware completion and snippets, hover
+  docs for variables, keywords, size literals and the script's own
+  `param` / `define` declarations, and the daemon's validation error (or a
+  TOML syntax error) marked on its line.
+
 ## [0.1.0] - 2026-10-16
 
 ### Added

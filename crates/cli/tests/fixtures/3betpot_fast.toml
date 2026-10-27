@@ -21,13 +21,11 @@ script = '''flop, turn, river {
   replace bet [75]
   replace raise [75]
 }
+flop when aggressions >= 2 { remove raise }
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }
 '''
 include_allin = false
-
-[tree.max_aggressive_actions]
-flop = 2
-turn = 1
-river = 1
 
 [solver.algorithm]
 schedule = "dcfr"

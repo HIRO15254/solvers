@@ -2,8 +2,9 @@
 // to `tree.script` in the script grammar (docs/nlh-input-v1.jp.md §9). The
 // layout follows the bet-size tables of PioSolver and GTO Wizard's custom
 // solutions (one row per street, OOP and IP columns). Cells hold the
-// grammar's size literals; the daemon's `validate` judges them. A script
-// the table cannot write back exactly reads as `null` and stays a script.
+// grammar's size literals; the daemon's `validate` judges them. Each street
+// with raises ends with an explicit three-aggression cap. A script the table
+// cannot write back exactly reads as `null` and stays a script.
 
 export type SizeStreet = "flop" | "turn" | "river";
 export type SizeRole = "oop" | "ip";
@@ -57,6 +58,7 @@ const WHEN: Record<SizeRole, string> = {
 };
 const NO_DONK = "!in_position && !donk";
 const RERAISE = "when aggressions >= 2 { replace raise [a] }";
+const CAP = "when aggressions >= 3 { remove raise }";
 const RULE = /^when (!in_position && !donk|!in_position|in_position) \{ replace (bet|raise) \[([^\]]*)\] \}$/;
 const STREET: Record<string, SizeStreet> = {
   flop: "flop",
@@ -83,8 +85,8 @@ export function anyOopBet(table: SizeTable): boolean {
 
 /**
  * The script for `table`: per street, each role's bets and raises, the
- * re-raise rule where a re-raise can happen. Without donk bets the OOP bet
- * rule also requires `!donk`, so a probe after a checked-through street
+ * re-raise rule where a re-raise can happen, then the three-aggression cap.
+ * Without donk bets the OOP bet rule also requires `!donk`, so a probe after a checked-through street
  * stays and no rule is left unmatched. An empty table is the empty script.
  */
 export function sizeScript(table: SizeTable): string {
@@ -97,6 +99,7 @@ export function sizeScript(table: SizeTable): string {
       }),
     );
     if (table.reraiseAllIn && reraises(street)) rules.push(`  ${RERAISE}`);
+    if (SIZE_ROLES.some((role) => street[role].raise.length > 0)) rules.push(`  ${CAP}`);
     return rules.length === 0 ? [] : [`${name} {`, ...rules, "}"];
   });
   return blocks.length === 0 ? "" : [HEADER, ...blocks, ""].join("\n");
@@ -160,6 +163,9 @@ export function readSizeScript(script: string): SizeTable | null {
       street = null;
     } else if (line === RERAISE) {
       reraise = true;
+    } else if (line === CAP) {
+      // The exact round-trip check below requires one final cap per raising street.
+      continue;
     } else {
       const [, when, kindName, list] = RULE.exec(line) ?? [];
       const kind = KIND[kindName ?? ""];

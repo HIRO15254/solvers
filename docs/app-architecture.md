@@ -303,6 +303,11 @@ Web GUI（React + TypeScript、Vite）はdaemon HTTPだけを使うclientであ�
 |Results|`/solution/{summary,tree,actions,strategy,ev,range}?node=`|`tree`の`children`で節点を辿り、chance nodeはlabelからcardを選ぶ。13×13 gridはcombo行を到達weightで重み付けしたclass集計であり、戦略・EVの計算はしない|
 |Guide|なし|各画面の操作手順と、このGUIから撮ったscreenshot（`web/public/guide/*.png`、buildで`dist/guide/`へ写す）を並べる静的な頁|
 
+SetupのTree stepはscriptの`param`宣言を入力欄として表示し、変更を`[tree.params]`へ書く。
+script本文の宣言既定値は変更せず、validateのparam診断と同じ宣言・overrideを扱う。
+サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を
+他のruleより後へ書く。構造上の攻撃回数上限やsizeのthreshold併合は持たない。
+
 Results画面はEquity・node比較・hand分類を持たない（対応するexport viewが無い）。未保存のRiver節点は
 `stored: false`を示し、戦略は`solvers inspect --sol`のlazy re-solveで見る。TypeScript型は手書きであり、
 protocol crateからの型生成とdesktop shellは持たない。
@@ -315,7 +320,7 @@ protocol crateからの型生成とdesktop shellは持たない。
 
 |例外|理由|
 |---|---|
-|range grid・action履歴card・Setupのlineのreplayと次のaction（streetごとのaction chip。replayのchipを押すとその前へ戻し、手番が来る席は破線枠の`primary`文字のchipで、押すとCrystのPopoverにその席のactionを出す）・収束図・script editor・TOML editor（textareaの下に色分けした写しを重ねる）|solverの表示であり、Crystに対応する部品が無い。色は`primary`（table見出し・script keyword・次のaction）・`success`（key）・`info`（文字列）・`warning`（数値）・`muted-foreground`（comment、lineに書かずに済むfold）|
+|range grid・action履歴card・Setupのlineのreplayと次のaction（streetごとのaction chip。replayのchipを押すとその前へ戻し、手番が来る席は破線枠の`primary`文字のchipで、押すとCrystのPopoverにその席のactionを出す）・収束図・script editor・TOML editor（CodeMirror 6。下記）|solverの表示であり、Crystに対応する部品が無い。色は`primary`（table見出し・script keyword・次のaction）・`success`（key）・`info`（文字列）・`warning`（数値）・`muted-foreground`（comment、lineに書かずに済むfold）|
 |4色deck（♠`foreground`・♥`destructive`・♦`info`・♣`success`）。lineが配らないboardのcardは破線枠・打ち消し線・不透明度0.4|suitを色で区別し、cardの読み違いを減らす。無視するcardは消さずに使わないことを示す|
 |Resultsのactionの色（fold `#3d7cb8`、check・call `#5ab966`、bet・raiseはmenuの小さい順に`#f03c3c`・`#ca3232`・`#a32929`・`#7d1f1f`、5つ以上はその間を等分）。gridのセルとmix barはactionごとの割合を幅の百分率で区切り線なしに並べる|GTO Wizardの既定の配色に揃え、他のsolverと見比べやすくする。色はthemeの意味（成功・警告）ではなくactionの種類を表すため、Cryst tokenではなく固定の値を`web/src/lib/actions.ts`に置く|
 |Resultsのaction履歴cardの折返しと、1280px以下での詰めた表示（cardの最小幅を外し、action行を20px・`text-xs`にする）|節点の列が横に溢れて見えなくならないよう、横scrollではなく折り返す。CrystにResponsiveな履歴部品が無い|
@@ -325,6 +330,15 @@ protocol crateからの型生成とdesktop shellは持たない。
 |Guideの目次（左の縦の項目button）とscreenshot（`border`枠・`radius-md`の`img`）|頁内の節へscrollする目次と画像をCrystが持たない。hash routeを壊さないよう目次は`scrollIntoView`のbuttonで、色は`muted-foreground`、hoverは`accent`塗り|
 |SetupのTreeのサイズ表（streetの行に、OOP・IPそれぞれのbet・raiseの入力欄を並べるgrid）|CrystのTableはrecordの行を表示する部品で、2段の列見出しの下に入力欄を揃える部品が無い。入力欄・checkbox・tabはCrystの部品で、開始streetより前の行の見出しは`muted-foreground`|
 |`Notice`（Alertを状態色のBadge tint 15%で塗る）|AlertはCardと同じ`card`塗りで、Card上では背景と区別できない。titleを必須にし、iconと文字の行を揃える|
+
+script editorとTOML editorは`web/src/components/CodeEditor.tsx`がCodeMirror 6（MIT）の部品を直に組み立てる。
+monacoはworkerと数十MBの配布物が要り、React wrapperが既定でCDNから読むため使わない。言語は`web/src/lib/editor/`の
+StreamLanguageの字句規則で、TOMLは`tree.script`の複数行文字列の中だけscriptとして色分けする。
+構文の正本はdaemonのparserのままで、editorは構文を解釈しない。補完・hover文書の語彙
+（`vocabulary.ts`）はRustの`crates/spot/src/dialect.rs`の変数と`crates/nlh/src/script/cond.rs`の予約語の写しで、
+`vocabulary.test.ts`が両者の一致を検査する。errorの印はdaemonの検証結果を行へ置く。scriptは`line N:`の行、
+TOMLはissueのkey pathを持つheader・keyの行（`tree.script`は文字列内の行）、TOMLの構文errorはsmol-tomlの行・列である。
+配色は`lib/editor/theme.ts`がCryst tokenで定め、fold・検索panelのiconはTabler webfontを使う。
 
 ## 9. 研究経路と test 基盤の扱い
 

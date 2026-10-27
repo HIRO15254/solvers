@@ -183,9 +183,21 @@ P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数�
 
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。
-P1では`tree.preflop_reraise_jam_above_stack`、既定4以外の`tree.max_aggressive_actions.preflop`、
-Preflop ruleがあれば、効果が無い設定を1つのwarningにまとめる。validateはhuman表示とJSONの`warnings`、
-solve/resumeはstderr、reportはboard集合に対して1回だけ表示する。正規化された既定値だけでは警告しない。
+P1ではPreflop ruleがあれば、
+効果が無いruleを1つのwarningにまとめる。validateはhuman表示とJSONの`warnings`、
+solve/resumeはstderr、reportはboard集合に対して1回だけ表示する。
+
+`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は削除済みであり、指定すると未知keyの`NLH002`となる。
+これらを埋込みconfigに含むartifact・checkpointも読み込めない。攻撃回数はscriptの最後の
+`flop, turn, river when aggressions >= 3 { remove raise }`などで制限する。
+正規化・実効configにも削除済みkeyは出力しない。旧Preflop設定は他のPreflop ruleの後の
+`preflop when aggressions >= 1 { jam raise > 33.333%stack }`へ移行する。
+閾値の分母M（hand開始stack − ante）、0.001 BB gridへの丸め、ソース位置での適用は旧keyと異なる。
+例えば`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は現在menuの大きい候補だけをall-inへ置き換える。
+`jam`は候補を追加しないのでsizeを足すruleの後へ置く。閾値はliteralの到達額変換だけで求め、
+最小raiseへの引上げやMでのcapはしない。`tree.rules`でも`turn { jam raise >= 85%stack }`のように表示する。
+近いsizeをまとめる`merge bet within 10`は、大きい候補から順に直前に残した候補との差が幅以下のものを削除する。
+`tree.rules`では`flop { merge bet within 10 }`のように表示する。
 
 ## `solvers tree`
 

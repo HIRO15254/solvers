@@ -156,12 +156,13 @@ fn three_bet_pot_fast() {
 fn postflop_pio_tree() {
     check(
         "postflop_pio_tree",
+        // The 2026-10-16 removal of `allin_threshold` (0.8 here) keeps near-all-in sizes distinct.
         Identity {
-            nodes: [108045, 436, 172695],
-            decisions: [54023, 54022],
-            infosets: [1836782, 1620660],
+            nodes: [109705, 436, 176015],
+            decisions: [54853, 54852],
+            infosets: [1865002, 1645560],
             root_actions: vec!["check".into()],
-            structure: "e17ced7199fdd8b8c807722a2227b0bf995ce3e7ad92d990714d7f693d2b72c4".into(),
+            structure: "b21019a929f55f06f5f9834477f5d7b35fc59b0c8c97b8ba5c10fd9d98dcf77c".into(),
         },
     );
 }
@@ -169,12 +170,13 @@ fn postflop_pio_tree() {
 fn postflop_pio_icm() {
     check(
         "postflop_pio_icm",
+        // Same tree as `postflop_pio_tree`; see the threshold note there.
         Identity {
-            nodes: [108045, 436, 172695],
-            decisions: [54023, 54022],
-            infosets: [1836782, 1620660],
+            nodes: [109705, 436, 176015],
+            decisions: [54853, 54852],
+            infosets: [1865002, 1645560],
             root_actions: vec!["check".into()],
-            structure: "e17ced7199fdd8b8c807722a2227b0bf995ce3e7ad92d990714d7f693d2b72c4".into(),
+            structure: "b21019a929f55f06f5f9834477f5d7b35fc59b0c8c97b8ba5c10fd9d98dcf77c".into(),
         },
     );
 }

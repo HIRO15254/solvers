@@ -37,20 +37,11 @@ river when !unopened { replace raise [75, a] }
 preflop when unopened { replace raise [2.5x, a] }
 preflop when limpers > 0 && aggressions == 0 { replace raise [2.5x, a] }
 preflop when aggressions >= 1 { replace raise [3x, a] }
+preflop when aggressions >= 1 { jam raise > 33.333%stack }
 preflop when aggressions >= 4 { remove raise }
 flop, turn, river when players >= 2 { checkdown }
 '''
 include_allin = true
-
-[tree.max_aggressive_actions]
-preflop = 6
-flop = 3
-turn = 2
-river = 1
-
-[tree.preflop_reraise_jam_above_stack]
-denominator = 3
-numerator = 1
 
 [solver]
 kind = "single-hand"

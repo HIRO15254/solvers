@@ -26,7 +26,9 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use super::ScriptError;
-use super::ast::{ActionKind, Effect, ParamKind, ParamSchema, Script, StmtAst, StreetBlockAst};
+use super::ast::{
+    ActionKind, Effect, JamBound, ParamKind, ParamSchema, Script, StmtAst, StreetBlockAst,
+};
 use super::cond::{self, Dialect, Vars, is_reserved};
 use super::lower;
 use super::token::{self, Token, TokenKind, expect_punct, is_punct, is_word, line_at, tokenize};
@@ -691,6 +693,81 @@ fn parse_stmt<V: Vars>(
             sizes: Vec::new(),
         });
     }
+    if is_word(tokens, *pos, "jam") {
+        *pos += 1;
+        let action_line = line_at(tokens, *pos);
+        let action = match peek_action_word(tokens, *pos, dialect) {
+            Some(action @ (ActionKind::Bet | ActionKind::Raise)) => action,
+            _ => {
+                return Err(ScriptError {
+                    line: action_line,
+                    message: "'jam' takes 'bet' or 'raise'".to_string(),
+                });
+            }
+        };
+        *pos += 1;
+        let bound = if is_punct(tokens, *pos, ">=") {
+            JamBound::AtLeast
+        } else if is_punct(tokens, *pos, ">") {
+            JamBound::Above
+        } else {
+            return Err(ScriptError {
+                line: line_at(tokens, *pos),
+                message: format!(
+                    "'jam {}' takes '>=' or '>' and one size literal, e.g. 'jam {} >= 85%stack'",
+                    action.name(),
+                    action.name()
+                ),
+            });
+        };
+        *pos += 1;
+        let threshold = parse_size(tokens, pos, dialect)?;
+        return Ok(StmtAst::Action {
+            effect: Effect::Jam(bound),
+            action: Some(action),
+            sizes: vec![threshold],
+        });
+    }
+    if is_word(tokens, *pos, "merge") {
+        *pos += 1;
+        let action_line = line_at(tokens, *pos);
+        let action = match peek_action_word(tokens, *pos, dialect) {
+            Some(action @ (ActionKind::Bet | ActionKind::Raise)) => action,
+            _ => {
+                return Err(ScriptError {
+                    line: action_line,
+                    message: "'merge' takes 'bet' or 'raise'".to_string(),
+                });
+            }
+        };
+        *pos += 1;
+        if !is_word(tokens, *pos, "within") {
+            return Err(ScriptError {
+                line: line_at(tokens, *pos),
+                message: format!(
+                    "'merge {}' takes 'within' and one width, e.g. 'merge {} within 10'",
+                    action.name(),
+                    action.name()
+                ),
+            });
+        }
+        *pos += 1;
+        let width_line = line_at(tokens, *pos);
+        let width = parse_size(tokens, pos, dialect)?;
+        if !width.is_merge_width() {
+            return Err(ScriptError {
+                line: width_line,
+                message: "a 'merge' width is a pot percentage, a 'bb' amount, or a '%stack' / \
+                     '%effective' fraction; 'x', 'min', 'a', and 'e' sizes have no width"
+                    .to_string(),
+            });
+        }
+        return Ok(StmtAst::Action {
+            effect: Effect::Merge,
+            action: Some(action),
+            sizes: vec![width],
+        });
+    }
 
     let effect = if is_word(tokens, *pos, "add") {
         Effect::Add
@@ -703,10 +780,9 @@ fn parse_stmt<V: Vars>(
     } else {
         return Err(ScriptError {
             line,
-            message:
-                "expected a statement ('add' / 'remove' / 'replace' / 'force' / 'checkdown'), \
-                 'when', or 'if'"
-                    .to_string(),
+            message: "expected a statement ('add' / 'remove' / 'replace' / 'force' / 'jam' / \
+                 'merge' / 'checkdown'), 'when', or 'if'"
+                .to_string(),
         });
     };
     *pos += 1;
@@ -789,26 +865,7 @@ fn parse_size_list<V: Vars>(
     let mut sizes = Vec::new();
     if !is_punct(tokens, *pos, "]") {
         loop {
-            let token_line = line_at(tokens, *pos);
-            let text = match tokens.get(*pos).map(|t| &t.kind) {
-                Some(TokenKind::Word(word)) => word.clone(),
-                _ => {
-                    return Err(ScriptError {
-                        line: token_line,
-                        message: "expected a size literal".to_string(),
-                    });
-                }
-            };
-            *pos += 1;
-            let spec = match dialect.size_parser {
-                Some(parse) => parse(&text),
-                None => SizeSpec::parse(&text, dialect.unit),
-            }
-            .map_err(|error| ScriptError {
-                line: token_line,
-                message: error.to_string(),
-            })?;
-            sizes.push(spec);
+            sizes.push(parse_size(tokens, pos, dialect)?);
             if is_punct(tokens, *pos, ",") {
                 *pos += 1;
                 continue;
@@ -818,6 +875,33 @@ fn parse_size_list<V: Vars>(
     }
     expect_punct(tokens, pos, "]")?;
     Ok(sizes)
+}
+
+/// One size literal at `pos`, parsed with the dialect's size grammar.
+fn parse_size<V: Vars>(
+    tokens: &[Token],
+    pos: &mut usize,
+    dialect: &Dialect<V>,
+) -> Result<SizeSpec, ScriptError> {
+    let token_line = line_at(tokens, *pos);
+    let text = match tokens.get(*pos).map(|t| &t.kind) {
+        Some(TokenKind::Word(word)) => word.clone(),
+        _ => {
+            return Err(ScriptError {
+                line: token_line,
+                message: "expected a size literal".to_string(),
+            });
+        }
+    };
+    *pos += 1;
+    match dialect.size_parser {
+        Some(parse) => parse(&text),
+        None => SizeSpec::parse(&text, dialect.unit),
+    }
+    .map_err(|error| ScriptError {
+        line: token_line,
+        message: error.to_string(),
+    })
 }
 
 #[cfg(test)]
@@ -945,6 +1029,70 @@ turn, river when monotone {
     fn param_override_replaces_the_effective_value() {
         let script = compile_with(SPEC_COMPLETE_TREE, &[("cb", "50")]).unwrap();
         assert_eq!(script.params[0].default, "50");
+    }
+
+    #[test]
+    fn jam_takes_a_wager_kind_a_lower_bound_and_one_threshold() {
+        let script = compile("param t = 85%stack\nturn { jam bet >= t jam raise > 150 }").unwrap();
+        assert_eq!(script.rules[0].effect, Effect::Jam(JamBound::AtLeast));
+        assert_eq!(script.rules[0].action, Some(ActionKind::Bet));
+        assert_eq!(
+            script.rules[0].sizes,
+            vec![SizeSpec::StackFraction { fraction: 0.85 }]
+        );
+        assert_eq!(script.rules[1].effect, Effect::Jam(JamBound::Above));
+        assert_eq!(script.rules[1].action, Some(ActionKind::Raise));
+        assert_eq!(
+            script.rules[1].sizes,
+            vec![SizeSpec::PotAfterCall { fraction: 1.5 }]
+        );
+        for bad in [
+            "turn { jam check >= 85%stack }",
+            "turn { jam raise <= 85%stack }",
+            "turn { jam raise == 85%stack }",
+            "turn { jam raise >= [85%stack] }",
+            "turn { jam raise 85%stack }",
+            "turn { jam >= 85%stack }",
+            "turn { jam raise >= 85%stack, 90%stack }",
+            "param jam = 33\nflop { replace bet [jam] }",
+        ] {
+            assert!(compile(bad).is_err(), "{bad}");
+        }
+    }
+
+    #[test]
+    fn merge_takes_a_wager_kind_within_and_one_width() {
+        let script =
+            compile("param w = 10\nflop { merge bet within w merge raise within 5%stack }")
+                .unwrap();
+        assert_eq!(script.rules[0].effect, Effect::Merge);
+        assert_eq!(script.rules[0].action, Some(ActionKind::Bet));
+        assert_eq!(
+            script.rules[0].sizes,
+            vec![SizeSpec::PotAfterCall { fraction: 0.1 }]
+        );
+        assert_eq!(script.rules[1].action, Some(ActionKind::Raise));
+        assert_eq!(
+            script.rules[1].sizes,
+            vec![SizeSpec::StackFraction { fraction: 0.05 }]
+        );
+        for bad in [
+            "flop { merge call within 10 }",
+            "flop { merge bet 10 }",
+            "flop { merge bet <= 10 }",
+            "flop { merge bet within [10] }",
+            "flop { merge bet within 10, 20 }",
+            "flop { merge within 10 }",
+            "flop { merge bet within 3x }",
+            "flop { merge bet within min }",
+            "flop { merge bet within a }",
+            "flop { merge bet within e }",
+            "flop { merge bet within 2e }",
+            "param within = 10\nflop { replace bet [within] }",
+            "param merge = 10\nflop { replace bet [merge] }",
+        ] {
+            assert!(compile(bad).is_err(), "{bad}");
+        }
     }
 
     #[test]

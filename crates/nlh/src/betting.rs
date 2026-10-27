@@ -494,6 +494,21 @@ impl BettingState {
 
     /// Resolve one size literal, clamping to the minimum full wager or stack cap.
     pub fn resolve_size(&self, actor: SeatId, size: &SizeSpec) -> MwChips {
+        MwChips(self.size_context(actor, size).resolve_u64(*size))
+    }
+
+    /// A `jam` threshold: the literal's street target without the minimum
+    /// bump or the stack cap.
+    pub fn jam_threshold(&self, actor: SeatId, size: &SizeSpec) -> MwChips {
+        MwChips(self.size_context(actor, size).threshold_u64(*size))
+    }
+
+    /// A `merge` width: the literal read as an amount rather than a target.
+    pub fn merge_width(&self, actor: SeatId, size: &SizeSpec) -> MwChips {
+        MwChips(self.size_context(actor, size).merge_width_u64(*size))
+    }
+
+    fn size_context(&self, actor: SeatId, size: &SizeSpec) -> crate::sizing::SizeContext {
         let stack = self.seats[actor].remaining;
         let actor_wager = self.current_wager(actor);
         let to_call = self.amount_to_call(actor);
@@ -512,19 +527,16 @@ impl BettingState {
         } else {
             maximum
         };
-        MwChips(
-            crate::sizing::SizeContext {
-                big_blind: self.big_blind.raw(),
-                called_to: called_to.raw(),
-                pot_after_call: pot_after_call.raw(),
-                previous_bet: self.bet_to_match.raw(),
-                minimum: minimum.raw(),
-                maximum: maximum.raw(),
-                effective_stack: effective.raw(),
-                streets_remaining: streets_remaining(self.street),
-            }
-            .resolve_u64(*size),
-        )
+        crate::sizing::SizeContext {
+            big_blind: self.big_blind.raw(),
+            called_to: called_to.raw(),
+            pot_after_call: pot_after_call.raw(),
+            previous_bet: self.bet_to_match.raw(),
+            minimum: minimum.raw(),
+            maximum: maximum.raw(),
+            effective_stack: effective.raw(),
+            streets_remaining: streets_remaining(self.street),
+        }
     }
 
     /// Build the aggressive action for a target no greater than the stack cap.

@@ -73,7 +73,7 @@ impl MicroHoldem {
     }
 
     /// Mirrors the builder's action menu order: [check(, bet)] or
-    /// [fold, call(, raise...)] — raises never fire here (max_raises 1).
+    /// [fold, call(, raise...)] — fixture rules remove raises here.
     fn actions(&self, s: &MicroState) -> Vec<char> {
         let behind = STACK - s.contrib[s.to_act];
         if s.outstanding == 0 {

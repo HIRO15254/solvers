@@ -1,4 +1,5 @@
 import { Fragment, useId, useMemo, useState } from "react";
+import type { TreeParam } from "../api/types";
 import { Button, Card, CardAction, CardContent, CardHeader, CardTitle, Checkbox, Tabs } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { fieldText, getAt } from "../lib/config";
@@ -19,9 +20,10 @@ import {
   type SizeStreet,
   type SizeTable,
 } from "../lib/sizes";
-import { CodeEditor, highlightScript } from "./CodeEditor";
+import { scriptIssueLine } from "../lib/editor/diagnostics";
+import { CodeEditor } from "./CodeEditor";
 import { DraftInput, Field, InfoHint, Notice } from "./common";
-import { DocText, FieldIssue, useDoc, useIssue } from "./DocFields";
+import { FieldIssue, useDoc, useIssue } from "./DocFields";
 
 const VIEWS = [
   { id: "sizes", label: "Size table", icon: "table" },
@@ -33,6 +35,9 @@ const ROLE_LABEL: Record<SizeRole, string> = { oop: "OOP", ip: "IP" };
 
 const SIZE_HELP =
   "33 is 33% of the pot, 2.5x is 2.5 times the largest wager on the street (for raises), e reaches all-in geometrically over the streets left, a is all-in, 3bb is a total of 3 BB, min is the minimum. Separate with commas or spaces; an empty cell leaves that action out.";
+
+const SCRIPT_HELP =
+  "The tree grammar in docs/nlh-input-v1.jp.md §9. Ctrl+Space completes keywords, variables and sizes; hover a word for its meaning. Ctrl+F searches, Ctrl+/ toggles a comment, Ctrl+[ / Ctrl+] indents, Ctrl+Shift+[ folds a block. Tab indents; press Esc, then Tab, to leave the editor.";
 
 function withSizes(table: SizeTable, street: SizeStreet, role: SizeRole, kind: SizeKind, list: string[]): SizeTable {
   const sizes = table.sizes[street];
@@ -53,10 +58,12 @@ function withSizes(table: SizeTable, street: SizeStreet, role: SizeRole, kind: S
 export function SetupTree({
   startStreet,
   roles,
+  params,
 }: {
   /** The street the spot starts on; earlier rows do not reach the tree. */
   startStreet: string | null;
   roles: Record<SizeRole, string> | null;
+  params: TreeParam[];
 }) {
   const { doc, update } = useDoc();
   const scriptId = useId();
@@ -68,9 +75,19 @@ export function SetupTree({
     startStreet !== null && STREET_ORDER.indexOf(street) < STREET_ORDER.indexOf(startStreet);
   // A script error names its line (`line 11: …`); in the table it goes under the cell that wrote that line.
   const scriptIssue = useIssue("tree.script");
-  const issueLine = Number(/^line (\d+): /.exec(scriptIssue?.message ?? "")?.[1] ?? 0);
+  const located = scriptIssue ? scriptIssueLine(scriptIssue.message) : null;
+  const issueLine = located?.line ?? 0;
   const issueCell = table && issueLine > 0 ? sizeCellAt(script, issueLine) : null;
-  const cellIssue = scriptIssue?.message.replace(/^line \d+: /, "");
+  const cellIssue = located?.message ?? scriptIssue?.message;
+  const scriptDiagnostics = useMemo(
+    () => (located ? [{ line: located.line, message: located.message, severity: "error" as const }] : []),
+    [located?.line, located?.message],
+  );
+  const overrides = getAt(doc, ["tree", "params"]);
+  const extraParams =
+    typeof overrides === "object" && overrides !== null && !Array.isArray(overrides)
+      ? Object.keys(overrides).filter((name) => !params.some((param) => param.name === name))
+      : [];
 
   return (
     <>
@@ -83,11 +100,13 @@ export function SetupTree({
         </CardHeader>
         <CardContent>
           {view === "script" ? (
-            <Field label="Script" hint="The tree grammar in docs/nlh-input-v1.jp.md §9" htmlFor={scriptId}>
+            <Field label="Script" hint={SCRIPT_HELP} htmlFor={scriptId}>
               <CodeEditor
                 id={scriptId}
+                label="Script"
+                language="script"
                 value={script}
-                highlight={highlightScript}
+                diagnostics={scriptDiagnostics}
                 onChange={(value) => update(["tree", "script"], value.trim() ? value : undefined)}
               />
               <FieldIssue keys={["tree.script"]} />
@@ -183,36 +202,91 @@ export function SetupTree({
         </CardContent>
       </Card>
 
-      <Card title="All-in and aggression limits">
-        <div className="form-sections">
-          <div className="stack" style={{ gap: 16 }}>
-            <div className="form-grid">
-              <DocText
-                label="All-in merge threshold"
-                path={["tree", "allin_threshold"]}
-                placeholder="none"
-                hint="Merge a size into all-in when it is at least this share of the largest amount (above 0, at most 1)"
-              />
-            </div>
-            <Checkbox
-              label="Add all-in at every node (include_allin)"
-              checked={getAt(doc, ["tree", "include_allin"]) === true}
-              onCheckedChange={(checked) => update(["tree", "include_allin"], checked === true || undefined)}
-            />
-            <FieldIssue keys={["tree.include_allin"]} />
-          </div>
+      {params.length > 0 && (
+        <Card title="Script parameters">
           <div className="form-grid">
-            {SIZE_STREETS.map((street) => (
-              <DocText
-                key={street}
-                label={`${STREET_LABEL[street]} limit`}
-                path={["tree", "max_aggressive_actions", street]}
-                placeholder="3"
-              />
+            {params.map((param) => (
+              <ScriptParam key={param.name} param={param} />
             ))}
           </div>
-        </div>
+        </Card>
+      )}
+      {extraParams.length > 0 && (
+        <Notice
+          variant="warning"
+          title="Other parameter overrides"
+          description="These overrides have no declaration in the last validated script. Remove unused overrides, or fix the script and validate again."
+        >
+          <div className="stack" style={{ gap: 8 }}>
+            {extraParams.map((name) => (
+              <div className="row" key={name}>
+                <span className="mono">{name} = {fieldText(getAt(doc, ["tree", "params", name]))}</span>
+                <Button size="sm" variant="outline" icon="trash" onClick={() => update(["tree", "params", name], undefined)}>
+                  Remove
+                </Button>
+                <FieldIssue keys={[`tree.params.${name}`]} />
+              </div>
+            ))}
+          </div>
+        </Notice>
+      )}
+      <FieldIssue keys={["tree.params"]} />
+
+      <Card title="All-in">
+        <Checkbox
+          label="Add all-in at every node (include_allin)"
+          checked={getAt(doc, ["tree", "include_allin"]) === true}
+          onCheckedChange={(checked) => update(["tree", "include_allin"], checked === true || undefined)}
+        />
+        <FieldIssue keys={["tree.include_allin"]} />
       </Card>
     </>
+  );
+}
+
+function ScriptParam({ param }: { param: TreeParam }) {
+  const { doc, update } = useDoc();
+  const id = useId();
+  const path = ["tree", "params", param.name];
+  const override = getAt(doc, path);
+  const issue = useIssue(path.join("."));
+  const value = (text: string) => {
+    if (text.trim() === "") return undefined;
+    return param.kind === "number" ? Number(text) : text;
+  };
+  return (
+    <div className="stack" style={{ gap: 8 }}>
+      <Field label={param.name} hint={param.description ?? `Script default: ${param.value}`} htmlFor={id}>
+        {param.kind === "bool" ? (
+          <Checkbox
+            id={id}
+            label={override === undefined ? `Default: ${param.value}` : fieldText(override)}
+            checked={override === undefined ? param.value === "true" : override === true}
+            onCheckedChange={(checked) => update(path, checked)}
+          />
+        ) : (
+          <DraftInput
+            id={id}
+            className="mono"
+            value={fieldText(override)}
+            placeholder={param.value}
+            spellCheck={false}
+            read={(text) => fieldText(value(text))}
+            issue={issue?.message}
+            onText={(text) => {
+              const next = value(text);
+              if (typeof next === "number" && !Number.isFinite(next)) return "Enter a number";
+              update(path, next);
+            }}
+          />
+        )}
+        {param.kind === "bool" && <FieldIssue keys={[path.join(".")]} />}
+      </Field>
+      {override !== undefined && (
+        <Button size="sm" variant="outline" onClick={() => update(path, undefined)}>
+          Use script default
+        </Button>
+      )}
+    </div>
   );
 }

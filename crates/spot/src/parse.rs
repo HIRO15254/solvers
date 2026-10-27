@@ -69,26 +69,7 @@ struct RawTree {
     script: Option<String>,
     source: Option<String>,
     include_allin: bool,
-    allin_threshold: Option<f64>,
-    preflop_reraise_jam_above_stack: Option<RawRatio>,
-    max_aggressive_actions: RawLimits,
     params: BTreeMap<String, Value>,
-}
-
-#[derive(Default, Deserialize)]
-#[serde(default, deny_unknown_fields)]
-struct RawRatio {
-    numerator: Option<i64>,
-    denominator: Option<i64>,
-}
-
-#[derive(Default, Deserialize)]
-#[serde(default, deny_unknown_fields)]
-struct RawLimits {
-    preflop: Option<i64>,
-    flop: Option<i64>,
-    turn: Option<i64>,
-    river: Option<i64>,
 }
 
 #[derive(Default, Deserialize)]
@@ -167,17 +148,7 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             ("script", "string"),
             ("source", "string"),
             ("include_allin", "bool"),
-            ("allin_threshold", "number"),
-            ("preflop_reraise_jam_above_stack", "ratio"),
-            ("max_aggressive_actions", "limits"),
             ("params", "map:scalar"),
-        ],
-        "ratio" => &[("numerator", "integer"), ("denominator", "integer")],
-        "limits" => &[
-            ("preflop", "integer"),
-            ("flop", "integer"),
-            ("turn", "integer"),
-            ("river", "integer"),
         ],
         "run" => &[
             ("threads", "auto_integer"),
@@ -598,16 +569,9 @@ fn toml_number_chips(text: &str, key: &str) -> Result<MwChips, SpotError> {
     Ok(MwChips(integer.parse().map_err(|_| invalid())?))
 }
 
-fn unsigned(number: i64, key: &str, zero: bool) -> Result<u64, SpotError> {
-    if number < 0 || (number == 0 && !zero) {
-        return Err(value_error(
-            key,
-            if zero {
-                "must be nonnegative"
-            } else {
-                "must be positive"
-            },
-        ));
+fn positive(number: i64, key: &str) -> Result<u64, SpotError> {
+    if number <= 0 {
+        return Err(value_error(key, "must be positive"));
     }
     Ok(number as u64)
 }
@@ -947,74 +911,10 @@ fn tree(raw: RawTree, config_path: &Path, product: Product) -> Result<Tree, Spot
             )
         })?;
     }
-    if raw
-        .allin_threshold
-        .is_some_and(|v| !v.is_finite() || v <= 0.0 || v > 1.0)
-    {
-        return Err(value_error(
-            "tree.allin_threshold",
-            "must satisfy 0 < threshold <= 1",
-        ));
-    }
-    let ratio = raw
-        .preflop_reraise_jam_above_stack
-        .map(|r| {
-            let numerator = r.numerator.ok_or_else(|| {
-                type_error(
-                    "tree.preflop_reraise_jam_above_stack.numerator",
-                    "required integer",
-                )
-            })?;
-            let denominator = r.denominator.ok_or_else(|| {
-                type_error(
-                    "tree.preflop_reraise_jam_above_stack.denominator",
-                    "required integer",
-                )
-            })?;
-            Ok(Ratio {
-                numerator: unsigned(
-                    numerator,
-                    "tree.preflop_reraise_jam_above_stack.numerator",
-                    false,
-                )?,
-                denominator: unsigned(
-                    denominator,
-                    "tree.preflop_reraise_jam_above_stack.denominator",
-                    false,
-                )?,
-            })
-        })
-        .transpose()?;
-    let l = raw.max_aggressive_actions;
-    let max_aggressive_actions = MaxAggressiveActions {
-        preflop: unsigned(
-            l.preflop.unwrap_or(4),
-            "tree.max_aggressive_actions.preflop",
-            true,
-        )?,
-        flop: unsigned(
-            l.flop.unwrap_or(3),
-            "tree.max_aggressive_actions.flop",
-            true,
-        )?,
-        turn: unsigned(
-            l.turn.unwrap_or(3),
-            "tree.max_aggressive_actions.turn",
-            true,
-        )?,
-        river: unsigned(
-            l.river.unwrap_or(3),
-            "tree.max_aggressive_actions.river",
-            true,
-        )?,
-    };
     Ok(Tree {
         script,
         compiled,
         include_allin: raw.include_allin,
-        allin_threshold: raw.allin_threshold,
-        preflop_reraise_jam_above_stack: ratio,
-        max_aggressive_actions,
         params: raw.params,
     })
 }
@@ -1048,7 +948,7 @@ fn run(raw: RawRun, product: Product) -> Result<Run, SpotError> {
     let threads = match raw.threads {
         None => None,
         Some(Value::String(s)) if s == "auto" => None,
-        Some(Value::Integer(i)) => Some(unsigned(i, "run.threads", false)?),
+        Some(Value::Integer(i)) => Some(positive(i, "run.threads")?),
         _ => {
             return Err(value_error(
                 "run.threads",
@@ -1059,7 +959,7 @@ fn run(raw: RawRun, product: Product) -> Result<Run, SpotError> {
     let memory_bytes = match raw.memory {
         None => None,
         Some(Value::String(s)) if s == "auto" => None,
-        Some(Value::Integer(i)) => Some(unsigned(i, "run.memory", false)?),
+        Some(Value::Integer(i)) => Some(positive(i, "run.memory")?),
         Some(Value::String(s)) => {
             let (number, scale) = [
                 ("KiB", 1024u64),

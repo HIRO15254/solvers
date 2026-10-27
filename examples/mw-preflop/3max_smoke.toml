@@ -7,10 +7,9 @@ stack_bb = 2
 
 [tree]
 script = '''preflop { replace raise [a] }
-flop, turn, river { checkdown }'''
-
-[tree.max_aggressive_actions]
-preflop = 1
+flop, turn, river { checkdown }
+preflop when aggressions >= 1 { remove raise }
+'''
 
 [solver.abstraction.buckets]
 flop = 1

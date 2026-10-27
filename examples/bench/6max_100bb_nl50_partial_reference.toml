@@ -75,18 +75,13 @@ preflop when aggressions == 2 && limpers == 0 && open_cold_calls == 0 && last_pr
 preflop when aggressions == 2 && limpers == 0 && players == 2 && position == "SB" && last_preflop_aggressor_position == "BB" { replace raise [21bb, a] }
 flop, turn, river when players >= 2 { replace bet [50, a] }
 flop, turn, river when players >= 2 { replace raise [2.5x, a] }
+preflop when aggressions >= 1 { jam raise > 33.333%stack }
+preflop when aggressions >= 4 { remove raise }
+flop when aggressions >= 4 { remove raise }
+turn when aggressions >= 4 { remove raise }
+river when aggressions >= 4 { remove raise }
 '''
 include_allin = true
-
-[tree.max_aggressive_actions]
-preflop = 4
-flop = 4
-turn = 4
-river = 4
-
-[tree.preflop_reraise_jam_above_stack]
-denominator = 3
-numerator = 1
 
 [solver]
 kind = "range-vector"

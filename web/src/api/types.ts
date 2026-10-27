@@ -165,6 +165,13 @@ export interface HuResources {
   withinLimit: boolean;
 }
 
+export interface TreeParam {
+  name: string;
+  kind: "number" | "bool" | "token";
+  value: string;
+  description: string | null;
+}
+
 export interface ValidateSummary {
   status: string;
   schema: string;
@@ -175,7 +182,7 @@ export interface ValidateSummary {
   start?: StartState;
   actions?: LineStep[];
   effective_stack?: number | null;
-  tree?: { params: unknown[]; rules: string[] };
+  tree?: { params: TreeParam[]; rules: string[] };
   warnings: string[];
   resources?: HuResources;
 }

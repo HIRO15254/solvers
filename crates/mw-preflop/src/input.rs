@@ -1,7 +1,7 @@
 //! P2-owned common-input settings and typed lowering. No method choices live in `spot`.
 use crate::config::{
     AbstractionConfig, AbstractionKind, AnteConfig, BettingConfig, BlindConfig, ForcedBetConfig,
-    MultiwayConfig, RecallMode, SeatConfig, StackRatio, StreetBettingConfig,
+    MultiwayConfig, RecallMode, SeatConfig, StreetBettingConfig,
 };
 use crate::solver::{DEFAULT_PRUNE_SKIP_PROBABILITY, DEFAULT_PRUNE_THRESHOLD, SolverConfig};
 use economics::{RakeConfig, UtilityConfig};
@@ -469,26 +469,19 @@ pub struct Lowered {
 /// Pure lowering; session construction accepts this typed result directly.
 pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
     settings.validate(spot)?;
-    let street = |cap| -> Result<StreetBettingConfig, SpotError> {
-        Ok(StreetBettingConfig {
-            bet_sizes: Vec::new(),
-            isolate_sizes: None,
-            raise_sizes: Vec::new(),
-            max_aggressive_actions: u8::try_from(cap)
-                .map_err(|_| invalid("tree.max_aggressive_actions", "exceeds the P2 u8 limit"))?,
-            include_allin: spot.tree.include_allin,
-            allin_threshold: spot.tree.allin_threshold,
-            reraise_jam_above_actor_starting_stack: None,
-            max_betting_players: None,
-        })
+    let street = || StreetBettingConfig {
+        bet_sizes: Vec::new(),
+        isolate_sizes: None,
+        raise_sizes: Vec::new(),
+        include_allin: spot.tree.include_allin,
+        max_betting_players: None,
     };
-    let caps = &spot.tree.max_aggressive_actions;
-    let mut betting = BettingConfig {
+    let betting = BettingConfig {
         allow_limp: true,
-        preflop: street(caps.preflop)?,
-        flop: street(caps.flop)?,
-        turn: street(caps.turn)?,
-        river: street(caps.river)?,
+        preflop: street(),
+        flop: street(),
+        turn: street(),
+        river: street(),
         nlh_rules: spot
             .tree
             .compiled
@@ -498,27 +491,6 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             .map(crate::tree_rules::NlhTreeRule::from_compiled)
             .collect(),
     };
-    betting.preflop.reraise_jam_above_actor_starting_stack = spot
-        .tree
-        .preflop_reraise_jam_above_stack
-        .as_ref()
-        .map(|r| {
-            Ok(StackRatio {
-                numerator: u32::try_from(r.numerator).map_err(|_| {
-                    invalid(
-                        "tree.preflop_reraise_jam_above_stack",
-                        "exceeds the P2 u32 limit",
-                    )
-                })?,
-                denominator: u32::try_from(r.denominator).map_err(|_| {
-                    invalid(
-                        "tree.preflop_reraise_jam_above_stack",
-                        "exceeds the P2 u32 limit",
-                    )
-                })?,
-            })
-        })
-        .transpose()?;
     let buckets = &settings.solver.abstraction.buckets;
     let setup = &spot.table.setup;
     let game = MultiwayConfig {

@@ -41,12 +41,6 @@ flop, turn, river when players >= 2 { checkdown }
 '''
 include_allin = true
 
-[tree.max_aggressive_actions]
-preflop = 4
-flop = 3
-turn = 3
-river = 3
-
 [solver]
 kind = "range-vector"
 seed = 0

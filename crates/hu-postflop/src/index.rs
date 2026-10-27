@@ -725,10 +725,7 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "turn { replace bet [2bb] } river { replace bet [100] }"
-[tree.max_aggressive_actions]
-turn = 1
-river = 1
+script = "turn { replace bet [2bb] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
 [solver]
 iso_merging = false
 [run]

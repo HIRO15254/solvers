@@ -241,28 +241,6 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         ("script", Value::String(tree.script.clone())),
         ("include_allin", Value::Boolean(tree.include_allin)),
     ]);
-    if let Some(threshold) = tree.allin_threshold {
-        insert(&mut tree_fields, "allin_threshold", numeric(threshold));
-    }
-    if let Some(r) = &tree.preflop_reraise_jam_above_stack {
-        tree_fields.insert(
-            "preflop_reraise_jam_above_stack",
-            Item::Value(inline(fields([
-                ("numerator", Value::Integer(r.numerator as i64)),
-                ("denominator", Value::Integer(r.denominator as i64)),
-            ]))),
-        );
-    }
-    let l = &tree.max_aggressive_actions;
-    tree_fields.insert(
-        "max_aggressive_actions",
-        Item::Table(fields([
-            ("preflop", Value::Integer(l.preflop as i64)),
-            ("flop", Value::Integer(l.flop as i64)),
-            ("turn", Value::Integer(l.turn as i64)),
-            ("river", Value::Integer(l.river as i64)),
-        ])),
-    );
     let mut params = Table::new();
     for p in &tree.compiled.params {
         if let Some(v) = tree.params.get(&p.name) {

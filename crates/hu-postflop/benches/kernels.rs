@@ -26,7 +26,7 @@ fn parse_cards(s: &str) -> Vec<Card> {
 }
 
 /// The original narrow, asymmetric single-bet river subgame. One bet size
-/// and `max_raises = 1` keep the tree tiny while still producing exactly
+/// and an explicit remove-raise rule keep the tree tiny while still producing exactly
 /// the two terminal shapes this bench needs (see `terminal_ids`).
 fn river_config() -> PostflopConfig {
     PostflopConfig {
@@ -64,7 +64,7 @@ fn wide_river_config() -> PostflopConfig {
 }
 
 /// Locates the fold-terminal and showdown-terminal ids reached after the
-/// river's single bet. `max_raises = 1` means the facing player's node
+/// river's single bet. Its remove-raise rule means the facing player's node
 /// (after that one bet) has no further raise available, so its `node_info`
 /// entry is exactly the two-action `["fold", "call"]` shape; on the river,
 /// `call` resolves straight to a showdown terminal (never a chance node).

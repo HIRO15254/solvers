@@ -356,9 +356,8 @@ select.mono,
   overflow-wrap: anywhere;
 }
 
-/* Tree script: a transparent textarea over its highlighted copy. */
+/* Code editors (CodeMirror): the frame and sizes; colors live in lib/editor/theme.ts. */
 .code-editor {
-  position: relative;
   overflow: hidden;
   border: 1px solid var(--input);
   border-radius: var(--radius-md);
@@ -373,68 +372,20 @@ select.mono,
   box-shadow: 0 0 0 3px var(--selection);
 }
 
-.code-editor > pre,
-.code-editor > textarea {
-  box-sizing: border-box;
-  margin: 0;
-  padding: var(--space-2) 10px;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-  letter-spacing: 0;
-  font-variant-ligatures: none;
-  /* Both wrap the same way, so long values (ranges) stay under the caret. */
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  tab-size: 2;
+.code-editor .cm-content,
+.code-editor .cm-gutter {
+  min-height: 160px;
 }
 
-.code-editor > pre {
-  min-height: 72px;
-  color: var(--foreground);
-}
-
-.toml-editor > pre {
+.toml-editor .cm-content,
+.toml-editor .cm-gutter {
   min-height: 480px;
 }
 
-.code-editor > textarea {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  outline: none;
-  resize: none;
-  overflow: hidden;
-  background: transparent;
-  color: transparent;
-  caret-color: var(--foreground);
-}
-
-.tok-kw {
-  color: var(--primary);
-}
-
-.tok-act {
-  color: var(--warning);
-}
-
-.tok-var {
-  color: var(--success);
-}
-
-.tok-num {
-  color: var(--warning);
-}
-
-.tok-str {
-  color: var(--info);
-}
-
-.tok-com,
-.tok-punct {
-  color: var(--muted-foreground);
+/* Tabler glyphs instead of the editor's own symbols. */
+.code-editor .cm-foldGutter .ti {
+  font-size: 12px;
+  line-height: inherit;
 }
 
 /* ── cards and hands ── */

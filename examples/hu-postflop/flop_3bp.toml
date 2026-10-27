@@ -39,8 +39,8 @@ river {
   replace raise [a]
 }
 flop, turn { when spr <= 1.5 { add bet [a] add raise [a] } }
+flop when aggressions >= 3 { remove raise }
 '''
-allin_threshold = 0.67
 
 [solver.stop]
 target = "0.1%pot"

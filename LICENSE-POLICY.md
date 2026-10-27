@@ -12,6 +12,7 @@ This repository is licensed under **MIT OR Apache-2.0** (dual license, at your o
 | Tabler Icons 3.34.1 (`web/vendor/cryst/fonts/tabler-icons.woff2`) | MIT (`LICENSE-TablerIcons.txt` beside font) | vendored GUI asset |
 | JetBrains Mono 2.211 (`web/vendor/cryst/fonts/jetbrains-mono-variable-latin.woff2`) | SIL OFL 1.1 (`OFL-JetBrainsMono.txt` beside font) | vendored GUI asset |
 | Noto Sans JP 2.004 (`web/vendor/cryst/fonts/noto-sans-jp-variable-jis1.woff2`) | SIL OFL 1.1 (`OFL-NotoSansJP.txt` beside font) | offline GUI font, variable weights 400–700; Latin, kana and JIS level-1 kanji for Japanese user text |
+| CodeMirror 6 (`@codemirror/*`), Lezer (`@lezer/*`) and their npm dependencies `style-mod`, `w3c-keyname`, `crelt`, `@marijn/find-cluster-break` | MIT | GUI script and TOML editor, bundled into the built Web GUI |
 
 ## Distribution notices
 

@@ -12,6 +12,19 @@ Postflopはterminal utilityを求めるために走査する。multiway Postflop
 card abstractionはEHS² percentile、recallはcurrent-street固定である。
 3人以上の結果はregret最小化の近似であり、Nash/GTO保証は無い。
 抽象化、有限betting tree、samplingの誤差は停止評価のCIだけでは測れない。
+攻撃回数の構造上限は無い。capは他のruleの後へ`preflop when aggressions >= 4 { remove raise }`などと書く。
+cap ruleが無ければraise chainはstackとNLHの合法性だけで制限される。short all-inでraise権が再開しない時はscriptでもraiseを作れない。
+`jam raise > 33.333%stack`は、それまでのmenuのraise候補のうち到達額が閾値を超えるものだけをall-inへ置き換える。
+閾値はround(M × 0.33333)、MはactorのW＋残stack（Preflopではhand開始stack − ante）である。
+最小raiseへの引上げもMでのcapも行わず、候補自体は追加しないのでsizeを足すruleの後へ置く。
+近いraise sizeは`preflop { merge raise within 0.5bb }`のように、大きい候補から順に直前に残した候補との差が幅以下のものを削除してまとめる。
+幅は裸のpot%（Pは現在pot＋call額）、`Nbb`、`%stack`、`%effective`で書く（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
+削除済みの`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は未知keyの`NLH002`となり、
+これらを埋込みconfigに含む`.mwsol`・checkpointも読み込めない。
+正規化・実効configにも出力しない。旧Preflop設定からの移行は、他のPreflop ruleの後へ
+`preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置く。
+旧keyとはanteのある場合の分母、0.001 BB gridでの閾値丸め、ソース位置での適用が異なる
+（[共通Input第9節](nlh-input-v1.jp.md#size-literalと解決順序)）。
 
 
 ## 2. External-Sampling MCCFRと平均

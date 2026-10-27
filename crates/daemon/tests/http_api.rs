@@ -586,10 +586,6 @@ BTN = "KsKh"
 [tree]
 include_allin = false
 script = '''river when unopened { force bet [50] }'''
-[tree.max_aggressive_actions]
-flop = 2
-turn = 2
-river = 2
 [solver]
 storage = "f32"
 [solver.stop]

@@ -30,7 +30,7 @@ use nlh::iso::{
     Board, DealGroup, SuitPerm, all_suit_perms, deal_groups_with, orbit_perms, permute_combo,
     stabilizer,
 };
-use nlh::script::{ActionKind, Effect, PreviousAggressor, RuleContext};
+use nlh::script::{ActionKind, Effect, JamBound, PreviousAggressor, RuleContext};
 use nlh::{
     ALL_CARDS, BoardFacts, Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, SizeSpec,
     Street, combo_cards, combo_index, rank_of,
@@ -71,31 +71,14 @@ impl<T> IndexMut<Street> for PerStreet<T> {
     }
 }
 
-/// One street's common-input betting rules and structural sizing limits.
-#[derive(Clone, Debug)]
+/// One street's common-input betting rules and all-in menu default.
+#[derive(Clone, Debug, Default)]
 pub struct StreetTree {
     /// Common-input rules in source order and actor history.
     pub nlh_rules: Box<crate::input::NlhStreetRules>,
-    /// Maximum bets plus raises on this street (multiway's name for what
-    /// this used to call `max_raises`).
-    pub max_aggressive_actions: u32,
     /// Always offer the all-in target in addition to whatever the rules
     /// produce. Applied before any rule runs (see [`node_actions`]).
     pub include_allin: bool,
-    /// Targets at or above this fraction of the actor's maximum target
-    /// collapse into the all-in target. Finite and in `(0.0, 1.0]`.
-    pub allin_threshold: Option<f64>,
-}
-
-impl Default for StreetTree {
-    fn default() -> Self {
-        StreetTree {
-            nlh_rules: Box::default(),
-            max_aggressive_actions: 2,
-            include_allin: false,
-            allin_threshold: None,
-        }
-    }
 }
 
 /// A postflop subgame: starting board (3, 4, or 5 cards fixes the starting
@@ -123,8 +106,7 @@ pub struct PostflopConfig {
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
     /// Betting grammar per street: the tree-script rules that build each
-    /// node's action menu, plus the structural limits a script cannot
-    /// override (the aggressive-action cap and all-in handling).
+    /// node's action menu, plus the optional all-in default.
     pub streets: PerStreet<StreetTree>,
     /// Smallest legal opening bet and smallest legal raise increment — the
     /// big blind's role in a game that has no blinds. `SizeSpec::MinRaise`
@@ -992,9 +974,8 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
 /// Resolves an explicit size menu at `state` into additional-contribution
 /// wagers: every entry of `sizes` resolved to a raise-to target
 /// (street-relative, i.e. the actor's total contribution *this street*),
-/// bumped up to the minimum full raise, clamped to all-in, merged into
-/// all-in past `allin_threshold`, sorted, deduped, and filtered down to
-/// targets that actually raise the bet faced — the resolution order fixed by
+/// bumped up to the minimum full raise, clamped to all-in, sorted, deduped,
+/// and filtered down to targets that actually raise the bet faced — the resolution order fixed by
 /// `docs/nlh-input-v1.jp.md`'s `[tree]` size-literal table
 /// (identical to `mw_preflop::betting::BettingState::legal_actions`'s size
 /// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
@@ -1002,14 +983,37 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
 /// shape both `Builder::betting` and the counting mirror `Counting::betting`
 /// consume — so the two can never disagree about a node's action count.
 ///
-/// Menu selection belongs to `node_actions`. Structural limits stay here:
-/// no script can override the aggressive-action cap or wager chips that
-/// are not behind.
+/// Menu selection belongs to `node_actions`. Only stack and wager legality
+/// constrain the resolved targets here.
 fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec]) -> Vec<Chips> {
-    let street = &config.streets[state.street];
-    if state.raises_used >= street.max_aggressive_actions {
+    let Some(sizing) = sizing(state, config) else {
         return Vec::new();
+    };
+    let mut targets: Vec<Chips> = Vec::with_capacity(sizes.len());
+    for &size in sizes {
+        let target = Chips(sizing.context.resolve_u32(size));
+        targets.push(target);
     }
+    targets.sort_unstable();
+    targets.dedup();
+    targets.retain(|&target| target > sizing.bet_to_match);
+    targets
+        .into_iter()
+        .map(|target| target - sizing.actor_wager)
+        .collect()
+}
+
+/// Street-relative inputs for resolving sizes at one decision node.
+struct Sizing {
+    context: nlh::SizeContext,
+    actor_wager: Chips,
+    bet_to_match: Chips,
+    maximum: Chips,
+}
+
+/// The sizing inputs at `state`, or `None` when the actor cannot wager
+/// beyond a call.
+fn sizing(state: &LineState, config: &PostflopConfig) -> Option<Sizing> {
     let actor = state.to_act;
     let opponent = actor.opponent();
     // Street-relative wagers: `contrib` is cumulative across the whole
@@ -1020,7 +1024,7 @@ fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec])
     let maximum = config.effective_stack - state.street_start;
     let behind = maximum - actor_wager;
     if behind <= state.outstanding {
-        return Vec::new();
+        return None;
     }
 
     let to_call = state.outstanding.min(behind);
@@ -1038,33 +1042,72 @@ fn sized_targets(state: &LineState, config: &PostflopConfig, sizes: &[SizeSpec])
         (bet_to_match + config.min_bet).min(maximum)
     };
 
-    let sizing = nlh::SizeContext {
-        big_blind: 1000,
-        called_to: u64::from(called_to.0),
-        pot_after_call: u64::from(pot_after_call.0),
-        previous_bet: u64::from(bet_to_match.0),
-        minimum: u64::from(minimum.0),
-        maximum: u64::from(maximum.0),
-        effective_stack: u64::from(maximum.0),
-        streets_remaining: streets_remaining(state.street),
+    Some(Sizing {
+        context: nlh::SizeContext {
+            big_blind: 1000,
+            called_to: u64::from(called_to.0),
+            pot_after_call: u64::from(pot_after_call.0),
+            previous_bet: u64::from(bet_to_match.0),
+            minimum: u64::from(minimum.0),
+            maximum: u64::from(maximum.0),
+            effective_stack: u64::from(maximum.0),
+            streets_remaining: streets_remaining(state.street),
+        },
+        actor_wager,
+        bet_to_match,
+        maximum,
+    })
+}
+
+/// The `jam` effect: every wager in `actions` whose street target passes
+/// `bound` against `threshold`'s street target becomes the all-in wager.
+fn jam(
+    state: &LineState,
+    config: &PostflopConfig,
+    actions: &mut [NodeAction],
+    bound: JamBound,
+    threshold: SizeSpec,
+) {
+    let Some(sizing) = sizing(state, config) else {
+        return;
     };
-    let mut targets: Vec<Chips> = Vec::with_capacity(sizes.len());
-    for &size in sizes {
-        let mut target = Chips(sizing.resolve_u32(size));
-        if let Some(threshold) = street.allin_threshold
-            && target.0 >= nlh::scale_u32(maximum.0, threshold)
+    let threshold = Chips(sizing.context.threshold_u32(threshold));
+    let all_in = sizing.maximum - sizing.actor_wager;
+    for action in actions {
+        if let NodeAction::Wager(add) = *action
+            && bound.holds(sizing.actor_wager + add, threshold)
         {
-            target = maximum;
+            *action = NodeAction::Wager(all_in);
         }
-        targets.push(target);
     }
-    targets.sort_unstable();
-    targets.dedup();
-    targets.retain(|&target| target > bet_to_match);
-    targets
-        .into_iter()
-        .map(|target| target - actor_wager)
-        .collect()
+}
+
+/// The `merge` effect: walking the wagers in `actions` from the largest
+/// down, drop each one within `width` of the last kept wager. Every wager
+/// shares the actor's street wager, so comparing the added chips compares
+/// the street targets.
+fn merge(
+    state: &LineState,
+    config: &PostflopConfig,
+    actions: &mut Vec<NodeAction>,
+    width: SizeSpec,
+) {
+    let Some(sizing) = sizing(state, config) else {
+        return;
+    };
+    let width = u64::from(sizing.context.merge_width_u32(width));
+    let mut kept: Vec<u64> = actions
+        .iter()
+        .filter_map(|action| match *action {
+            NodeAction::Wager(add) => Some(u64::from(add.0)),
+            _ => None,
+        })
+        .collect();
+    nlh::merge_targets(&mut kept, width);
+    actions.retain(|action| match *action {
+        NodeAction::Wager(add) => kept.contains(&u64::from(add.0)),
+        _ => true,
+    });
 }
 
 /// One legal action at a decision node. `Wager` carries the *additional*
@@ -1226,30 +1269,40 @@ fn node_actions(
             let kind = rule
                 .action
                 .expect("compiled non-checkdown rule has an action");
-            let candidates = if matches!(kind, ActionKind::Bet | ActionKind::Raise) {
+            if let Effect::Jam(bound) = rule.effect {
                 if kind == wager_kind {
-                    sized_targets(state, config, &rule.sizes)
-                        .into_iter()
-                        .map(NodeAction::Wager)
-                        .collect()
-                } else {
-                    Vec::new()
+                    jam(state, config, &mut actions, bound, rule.sizes[0]);
+                }
+            } else if rule.effect == Effect::Merge {
+                if kind == wager_kind {
+                    merge(state, config, &mut actions, rule.sizes[0]);
                 }
             } else {
-                base_actions(state)
-                    .into_iter()
-                    .filter(|a| matches(a, kind))
-                    .collect()
-            };
-            match rule.effect {
-                Effect::Add => actions.extend(candidates),
-                Effect::Remove => actions.retain(|a| !matches(a, kind)),
-                Effect::Replace => {
-                    actions.retain(|a| !matches(a, kind));
-                    actions.extend(candidates);
+                let candidates = if matches!(kind, ActionKind::Bet | ActionKind::Raise) {
+                    if kind == wager_kind {
+                        sized_targets(state, config, &rule.sizes)
+                            .into_iter()
+                            .map(NodeAction::Wager)
+                            .collect()
+                    } else {
+                        Vec::new()
+                    }
+                } else {
+                    base_actions(state)
+                        .into_iter()
+                        .filter(|a| matches(a, kind))
+                        .collect()
+                };
+                match rule.effect {
+                    Effect::Add => actions.extend(candidates),
+                    Effect::Remove => actions.retain(|a| !matches(a, kind)),
+                    Effect::Replace => {
+                        actions.retain(|a| !matches(a, kind));
+                        actions.extend(candidates);
+                    }
+                    Effect::Force => actions = candidates,
+                    Effect::Checkdown | Effect::Jam(_) | Effect::Merge => unreachable!(),
                 }
-                Effect::Force => actions = candidates,
-                Effect::Checkdown => unreachable!(),
             }
         }
         actions.sort_by_key(|&a| action_sort_key(a));
@@ -2445,7 +2498,6 @@ mod tests {
         use crate::game::{ChipEv, NoRake};
         let street = StreetTree {
             include_allin: true,
-            max_aggressive_actions: 1,
             ..Default::default()
         };
         let mut merged = false;

@@ -58,9 +58,7 @@ fn config(players: usize, checkdown: bool) -> String {
     if checkdown {
         raw.push_str("flop, turn, river when players >= 2 { checkdown }\n");
     }
-    raw.push_str(
-        "'''\n[tree.max_aggressive_actions]\npreflop = 1\nflop = 1\nturn = 1\nriver = 1\n",
-    );
+    raw.push_str("preflop when aggressions >= 1 { remove raise }\n'''\n");
     raw
 }
 

@@ -70,10 +70,12 @@ fn apply(state: &mut BettingState, betting: &BettingConfig, action: Action) {
 #[test]
 fn tracked_fixture_keeps_four_raise_caps_and_256_postflop_buckets() {
     let (config, _) = fixture();
-    assert_eq!(config.betting.preflop.max_aggressive_actions, 4);
-    assert_eq!(config.betting.flop.max_aggressive_actions, 4);
-    assert_eq!(config.betting.turn.max_aggressive_actions, 4);
-    assert_eq!(config.betting.river.max_aggressive_actions, 4);
+    let raw = std::fs::read_to_string(fixture_path()).unwrap();
+    for street in ["preflop", "flop", "turn", "river"] {
+        assert!(raw.contains(&format!(
+            "{street} when aggressions >= 4 {{ remove raise }}"
+        )));
+    }
     assert_eq!(config.abstraction.flop_buckets, 256);
     assert_eq!(config.abstraction.turn_buckets, 256);
     assert_eq!(config.abstraction.river_buckets, 256);

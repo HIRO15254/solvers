@@ -96,6 +96,21 @@ impl NlhTreeRule {
             }
         } else if self.action.is_none() {
             return Err(invalid("tree rule requires an action"));
+        } else if matches!(self.effect, nlh::script::Effect::Jam(_))
+            && (!matches!(self.action, Some(ActionKind::Bet | ActionKind::Raise))
+                || self.sizes.len() != 1)
+        {
+            return Err(invalid(
+                "jam requires bet or raise and exactly one threshold",
+            ));
+        }
+        if self.effect == nlh::script::Effect::Merge
+            && (!matches!(self.action, Some(ActionKind::Bet | ActionKind::Raise))
+                || !matches!(self.sizes.as_slice(), [width] if width.is_merge_width()))
+        {
+            return Err(invalid(
+                "merge requires bet or raise and exactly one pot, bb, or stack width",
+            ));
         }
         for size in &self.sizes {
             crate::config::validate_size_spec(size)?;

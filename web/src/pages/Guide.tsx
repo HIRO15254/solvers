@@ -52,8 +52,8 @@ const SECTIONS: Section[] = [
     alt: "The Tree step with the bet size table",
     steps: [
       "The size table sets bet and raise sizes per street for OOP and IP. The info button explains the size notation.",
-      "The Script tab shows the tree script the table writes; a script the table cannot hold is edited there.",
-      "Below, set the all-in merge threshold and the per-street aggression limits.",
+      "The Script tab edits the tree script the table writes; a script the table cannot hold is edited there. Ctrl+Space completes keywords, variables and sizes, hovering a word explains it, and the daemon's error is marked on its line.",
+      "Below the table, No donk bets and Re-raises are all-in only reshape the tree; All-in adds an all-in at every node, and each script param gets a field.",
     ],
   },
   {
@@ -84,7 +84,7 @@ const SECTIONS: Section[] = [
     image: "setup-toml.png",
     alt: "The Edit TOML view",
     steps: [
-      "Edit TOML writes the whole document as TOML. Each readable edit updates the steps, and step edits rewrite it.",
+      "Edit TOML writes the whole document as TOML. Each readable edit updates the steps, and step edits rewrite it. The script inside it gets the same completion and hover, and errors are marked on their line.",
       "Open TOML and Save TOML read and write the document as a file. Load template starts from a template.",
       "Solve creates a run named after the spot and opens it on Runs.",
     ],

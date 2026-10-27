@@ -45,11 +45,9 @@ BB = "AA,KK"
 # Keep this tutorial tree and its solve small.
 [tree]
 script = '''river { replace bet [50] replace raise [50] }
+river when aggressions >= 2 { remove raise }
 '''
 include_allin = false
-
-[tree.max_aggressive_actions]
-river = 2
 
 [solver.stop]
 # check_every defaults to "auto": adaptive with target, otherwise every 25 iterations.
@@ -89,7 +87,6 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
                 "spot" => "Action line and board select the starting spot.",
                 "ranges" => "Starting ranges keyed by fixed table position.",
                 "tree" => "Betting menus and source-order script rules.",
-                "tree.max_aggressive_actions" => "Per-street aggressive-action limits.",
                 "solver" => "Product solver settings.",
                 "solver.algorithm" => "Regret-discount schedule.",
                 "solver.discount" => "Periodic regret-discount cadence.",
@@ -444,11 +441,6 @@ mod tests {
             "source",
             "params",
             "include_allin",
-            "allin_threshold",
-            "preflop_reraise_jam_above_stack",
-            "numerator",
-            "denominator",
-            "max_aggressive_actions",
             "preflop",
             "flop",
             "turn",
@@ -523,6 +515,9 @@ mod tests {
             "remove",
             "replace",
             "force",
+            "jam",
+            "merge",
+            "within",
             "checkdown",
             "bet",
             "raise",

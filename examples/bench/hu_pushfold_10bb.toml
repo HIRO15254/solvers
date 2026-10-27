@@ -24,9 +24,6 @@ preflop {
 }
 '''
 
-[tree.max_aggressive_actions]
-preflop = 1
-
 [solver]
 kind = "range-vector"
 seed = 0

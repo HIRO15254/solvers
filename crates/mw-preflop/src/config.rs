@@ -166,6 +166,8 @@ fn default_true() -> bool {
     true
 }
 
+/// Base size menus and street policy. Aggression limits and all-in
+/// replacement are expressed with ordered tree-script rules, not fields.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StreetBettingConfig {
@@ -180,31 +182,8 @@ pub struct StreetBettingConfig {
     pub isolate_sizes: Option<Vec<SizeSpec>>,
     #[serde(default)]
     pub raise_sizes: Vec<SizeSpec>,
-    #[serde(default = "default_max_aggressive_actions")]
-    pub max_aggressive_actions: u8,
     #[serde(default = "default_true")]
     pub include_allin: bool,
-    /// Raise-cap merge threshold (HRC-style). After a target is resolved
-    /// (including the minimum-full-raise bump and the maximum-stack cap), a
-    /// target `>= scale(maximum, allin_threshold)` is replaced by `maximum`
-    /// and marked all-in. This is a *merge*, not an addition: it applies even
-    /// when `include_allin` is `false`, since it collapses an
-    /// already-proposed sized target into the all-in rather than adding a new
-    /// action. `None` disables the merge entirely (default, unchanged
-    /// behavior). Must be finite and in `(0.0, 1.0]` when present.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub allin_threshold: Option<f64>,
-    /// Exact preflop re-raise jam threshold. After a normal raise target has
-    /// been resolved against the minimum raise and the actor's stack cap,
-    /// targets strictly above this fraction of the actor's starting stack
-    /// collapse to all-in. Equality deliberately keeps both the normal size
-    /// and any explicitly configured all-in. This applies only after an open
-    /// (`aggressive_actions > 0`); it never changes an opening size.
-    ///
-    /// This exact-rational threshold and the legacy floating-point
-    /// `allin_threshold` are mutually exclusive.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub reraise_jam_above_actor_starting_stack: Option<StackRatio>,
     /// HRC-style check-down threshold (flop/turn/river only). When the
     /// non-folded seat count at this street's start (all-in seats included)
     /// exceeds this value, the street has no betting at all: no decision
@@ -219,26 +198,12 @@ pub struct StreetBettingConfig {
     pub max_betting_players: Option<u8>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct StackRatio {
-    pub numerator: u32,
-    pub denominator: u32,
-}
-
-fn default_max_aggressive_actions() -> u8 {
-    4
-}
-
 fn default_preflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
         bet_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
         isolate_sizes: None,
         raise_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
-        max_aggressive_actions: 4,
         include_allin: true,
-        allin_threshold: None,
-        reraise_jam_above_actor_starting_stack: None,
         max_betting_players: None,
     }
 }
@@ -248,10 +213,7 @@ fn default_postflop_betting() -> StreetBettingConfig {
         bet_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
         isolate_sizes: None,
         raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }],
-        max_aggressive_actions: 3,
         include_allin: true,
-        allin_threshold: None,
-        reraise_jam_above_actor_starting_stack: None,
         max_betting_players: None,
     }
 }
@@ -832,27 +794,6 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
                 validate_size_spec(size)?;
             }
         }
-        if let Some(threshold) = section.allin_threshold {
-            finite("allin_threshold", threshold)?;
-            if !(threshold > 0.0 && threshold <= 1.0) {
-                return Err(ConfigError::AllinThreshold(threshold));
-            }
-        }
-        if let Some(ratio) = section.reraise_jam_above_actor_starting_stack {
-            if ratio.numerator == 0 || ratio.denominator == 0 || ratio.numerator > ratio.denominator
-            {
-                return Err(ConfigError::ReraiseJamRatio {
-                    numerator: ratio.numerator,
-                    denominator: ratio.denominator,
-                });
-            }
-            if section.allin_threshold.is_some() {
-                return Err(ConfigError::ConflictingAllinThresholds(street));
-            }
-            if street != Street::Preflop {
-                return Err(ConfigError::PostflopReraiseJamRatio(street));
-            }
-        }
         if street == Street::Preflop {
             if section.max_betting_players.is_some() {
                 return Err(ConfigError::PreflopMaxBettingPlayers);
@@ -942,20 +883,6 @@ pub enum ConfigError {
     Ehs2TableOpponentBuckets,
     #[error("per-hand rake and tournament ICM cannot be combined")]
     IcmWithRake,
-    #[error("allin_threshold must be finite and within (0.0, 1.0], got {0}")]
-    AllinThreshold(f64),
-    #[error(
-        "reraise_jam_above_actor_starting_stack must be an exact ratio within (0, 1], got {numerator}/{denominator}"
-    )]
-    ReraiseJamRatio { numerator: u32, denominator: u32 },
-    #[error(
-        "{0:?} cannot configure both allin_threshold and reraise_jam_above_actor_starting_stack"
-    )]
-    ConflictingAllinThresholds(Street),
-    #[error(
-        "{0:?}.reraise_jam_above_actor_starting_stack is not supported; the threshold applies only to preflop re-raises"
-    )]
-    PostflopReraiseJamRatio(Street),
     #[error(
         "preflop.max_betting_players is not supported; check-down thresholds apply only to flop, turn, and river"
     )]
@@ -1098,19 +1025,17 @@ stack_bb = 12
             SizeSpec::StackFraction { fraction: 0.25 },
             SizeSpec::StackFraction { fraction: 0.5 },
         ];
-        config.betting.preflop.allin_threshold = Some(0.85);
         config.validate().unwrap();
 
         let encoded = toml::to_string(&config).unwrap();
         assert!(encoded.contains("min-raise"));
         assert!(encoded.contains("stack-fraction"));
-        assert!(encoded.contains("allin_threshold"));
         let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
         decoded.validate().unwrap();
         assert_eq!(decoded.betting.preflop.bet_sizes, vec![SizeSpec::MinRaise]);
         assert_eq!(
-            decoded.betting.preflop.allin_threshold,
-            config.betting.preflop.allin_threshold
+            decoded.betting.preflop.raise_sizes,
+            config.betting.preflop.raise_sizes
         );
     }
 
@@ -1124,89 +1049,6 @@ stack_bb = 12
                 "fraction {bad} should be rejected"
             );
         }
-    }
-
-    #[test]
-    fn allin_threshold_validation_rejects_zero_above_one_and_nan() {
-        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        for bad in [0.0, 1.5, f64::NAN] {
-            config.betting.preflop.allin_threshold = Some(bad);
-            let result = config.validate();
-            assert!(result.is_err(), "threshold {bad} should be rejected");
-        }
-        config.betting.preflop.allin_threshold = Some(1.0);
-        config.validate().unwrap();
-        config.betting.preflop.allin_threshold = Some(0.85);
-        config.validate().unwrap();
-    }
-
-    #[test]
-    fn exact_reraise_jam_ratio_validates_round_trips_and_conflicts_are_rejected() {
-        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        config
-            .betting
-            .preflop
-            .reraise_jam_above_actor_starting_stack = Some(StackRatio {
-            numerator: 1,
-            denominator: 3,
-        });
-        config.validate().unwrap();
-
-        let encoded = toml::to_string(&config).unwrap();
-        assert!(encoded.contains("reraise_jam_above_actor_starting_stack"));
-        let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
-        assert_eq!(
-            decoded
-                .betting
-                .preflop
-                .reraise_jam_above_actor_starting_stack,
-            Some(StackRatio {
-                numerator: 1,
-                denominator: 3,
-            })
-        );
-        decoded.validate().unwrap();
-
-        for ratio in [
-            StackRatio {
-                numerator: 0,
-                denominator: 3,
-            },
-            StackRatio {
-                numerator: 1,
-                denominator: 0,
-            },
-            StackRatio {
-                numerator: 4,
-                denominator: 3,
-            },
-        ] {
-            let mut invalid: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-            invalid
-                .betting
-                .preflop
-                .reraise_jam_above_actor_starting_stack = Some(ratio);
-            assert!(matches!(
-                invalid.validate(),
-                Err(ConfigError::ReraiseJamRatio { .. })
-            ));
-        }
-
-        config.betting.preflop.allin_threshold = Some(0.85);
-        assert!(matches!(
-            config.validate(),
-            Err(ConfigError::ConflictingAllinThresholds(Street::Preflop))
-        ));
-
-        let mut postflop: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        postflop.betting.flop.reraise_jam_above_actor_starting_stack = Some(StackRatio {
-            numerator: 1,
-            denominator: 3,
-        });
-        assert!(matches!(
-            postflop.validate(),
-            Err(ConfigError::PostflopReraiseJamRatio(Street::Flop))
-        ));
     }
 
     #[test]
@@ -1335,22 +1177,10 @@ stack_bb = 12
 
     #[test]
     fn default_config_toml_and_behavior_are_unchanged_by_new_size_variants() {
-        // Regression guard: a config predating MinRaise/StackFraction/
-        // allin_threshold must still validate, and its serialized form must
-        // not gain the new field since it is None by default.
+        // New size variants remain opt-in and do not alter default menus.
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         config.validate().unwrap();
-        assert!(config.betting.preflop.allin_threshold.is_none());
-        assert!(
-            config
-                .betting
-                .preflop
-                .reraise_jam_above_actor_starting_stack
-                .is_none()
-        );
         let encoded = toml::to_string(&config).unwrap();
-        assert!(!encoded.contains("allin_threshold"));
-        assert!(!encoded.contains("reraise_jam_above_actor_starting_stack"));
         assert!(!encoded.contains("min-raise"));
         assert!(!encoded.contains("stack-fraction"));
     }

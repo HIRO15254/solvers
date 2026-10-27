@@ -28,14 +28,12 @@ turn when unopened { replace bet [50, a] }
 turn when !unopened { replace raise [75, a] }
 river when unopened { replace bet [50, a] }
 river when !unopened { replace raise [75, a] }
+preflop when aggressions >= 3 { remove raise }
+flop when aggressions >= 1 { remove raise }
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }
 '''
 include_allin = true
-
-[tree.max_aggressive_actions]
-preflop = 3
-flop = 1
-turn = 1
-river = 1
 
 [solver]
 kind = "range-vector"

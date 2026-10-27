@@ -244,6 +244,20 @@ impl SizeSpec {
             SizeSpec::GeometricAllInRemaining => "e".into(),
         }
     }
+
+    /// Whether a `merge` statement can read this literal as a width: an
+    /// amount of the pot after call, BB, chips, or the stack. Literals that
+    /// only name a target (`3x`, `min`, `a`, `e`, `3e`) have no width.
+    pub fn is_merge_width(self) -> bool {
+        matches!(
+            self,
+            SizeSpec::PotAfterCall { .. }
+                | SizeSpec::ToBb { .. }
+                | SizeSpec::ToChips { .. }
+                | SizeSpec::StackFraction { .. }
+                | SizeSpec::EffectiveStackFraction { .. }
+        )
+    }
 }
 
 /// Renders a fraction as a percentage, shortest first.
@@ -289,15 +303,41 @@ pub fn geometric_allin_target(
 }
 
 /// Round a scaled chip amount on P1's `u32` grid before bounding it.
-pub fn scale_u32(amount: u32, factor: f64) -> u32 {
+fn scale_u32(amount: u32, factor: f64) -> u32 {
     (f64::from(amount) * factor)
         .round()
         .clamp(0.0, u32::MAX as f64) as u32
 }
 
 /// Round a scaled chip amount on P2's `u64` grid before bounding it.
-pub fn scale_u64(amount: u64, factor: f64) -> u64 {
+fn scale_u64(amount: u64, factor: f64) -> u64 {
     (amount as f64 * factor).round().clamp(0.0, u64::MAX as f64) as u64
+}
+
+/// Round a scaled chip amount on the grid `limit` names: P1's `u32` grid
+/// (`limit == u32::MAX`) or P2's `u64` grid.
+fn scale_on(limit: u64, amount: u64, factor: f64) -> u64 {
+    if limit == u32::MAX as u64 {
+        u64::from(scale_u32(amount as u32, factor))
+    } else {
+        scale_u64(amount, factor)
+    }
+}
+
+/// The `merge` effect's rule on a candidate target list: walking from the
+/// largest target down, keep a target only when it is more than `width`
+/// below the last kept one. Leaves the kept targets in descending order.
+pub fn merge_targets(targets: &mut Vec<u64>, width: u64) {
+    targets.sort_unstable_by(|a, b| b.cmp(a));
+    targets.dedup();
+    let mut kept = 0;
+    for index in 0..targets.len() {
+        if kept == 0 || targets[kept - 1] - targets[index] > width {
+            targets[kept] = targets[index];
+            kept += 1;
+        }
+    }
+    targets.truncate(kept);
 }
 
 /// Unit-free inputs for resolving one size to a legal street-relative target.
@@ -321,23 +361,58 @@ pub struct SizeContext {
 impl SizeContext {
     /// Resolve on P1's raw chip grid, including chip and BB literals.
     pub fn resolve_u32(self, size: SizeSpec) -> u32 {
-        self.resolve(size, u32::MAX as u64) as u32
+        self.bound(self.propose(size, u32::MAX as u64)) as u32
     }
 
     /// Resolve on P2's milli-BB grid; chip literals are not valid in P2.
     pub fn resolve_u64(self, size: SizeSpec) -> u64 {
-        self.resolve(size, u64::MAX)
+        self.bound(self.propose(size, u64::MAX))
     }
 
-    fn resolve(self, size: SizeSpec, limit: u64) -> u64 {
-        let scale = |amount: u64, factor| {
-            if limit == u32::MAX as u64 {
-                u64::from(scale_u32(amount as u32, factor))
-            } else {
-                scale_u64(amount, factor)
-            }
-        };
-        let proposed = match size {
+    /// A `jam` threshold on P1's raw chip grid: the literal's street target,
+    /// neither bumped to the minimum nor capped at the stack.
+    pub fn threshold_u32(self, size: SizeSpec) -> u32 {
+        self.propose(size, u32::MAX as u64) as u32
+    }
+
+    /// A `jam` threshold on P2's milli-BB grid; see [`Self::threshold_u32`].
+    pub fn threshold_u64(self, size: SizeSpec) -> u64 {
+        self.propose(size, u64::MAX)
+    }
+
+    /// A `merge` width on P1's raw chip grid: the literal read as an amount
+    /// rather than a target. Panics unless [`SizeSpec::is_merge_width`].
+    pub fn merge_width_u32(self, size: SizeSpec) -> u32 {
+        self.width(size, u32::MAX as u64) as u32
+    }
+
+    /// A `merge` width on P2's milli-BB grid; see [`Self::merge_width_u32`].
+    pub fn merge_width_u64(self, size: SizeSpec) -> u64 {
+        self.width(size, u64::MAX)
+    }
+
+    fn width(self, size: SizeSpec, limit: u64) -> u64 {
+        match size {
+            SizeSpec::PotAfterCall { fraction } => scale_on(limit, self.pot_after_call, fraction),
+            SizeSpec::ToBb { .. }
+            | SizeSpec::ToChips { .. }
+            | SizeSpec::StackFraction { .. }
+            | SizeSpec::EffectiveStackFraction { .. } => self.propose(size, limit),
+            _ => panic!("{size:?} is not a merge width"),
+        }
+    }
+
+    fn bound(self, proposed: u64) -> u64 {
+        if proposed < self.minimum && self.maximum >= self.minimum {
+            self.minimum
+        } else {
+            proposed.min(self.maximum)
+        }
+    }
+
+    fn propose(self, size: SizeSpec, limit: u64) -> u64 {
+        let scale = |amount: u64, factor| scale_on(limit, amount, factor);
+        match size {
             SizeSpec::ToBb { value } => scale(self.big_blind, value),
             SizeSpec::ToChips { value } => {
                 assert_eq!(limit, u32::MAX as u64, "chip literals are P1-only");
@@ -375,11 +450,6 @@ impl SizeContext {
                     target
                 }
             }
-        };
-        if proposed < self.minimum && self.maximum >= self.minimum {
-            self.minimum
-        } else {
-            proposed.min(self.maximum)
         }
     }
 }
@@ -396,6 +466,20 @@ mod tests {
         assert_eq!(scale_u64(u64::MAX, 2.0), u64::MAX);
         assert_eq!(scale_u32(3, -1.0), 0);
         assert_eq!(scale_u64(3, -1.0), 0);
+    }
+
+    #[test]
+    fn merge_compares_with_the_last_kept_target_and_keeps_the_larger() {
+        // 1500 - 1000 > 90 keeps 1000; 925 is within 90 of 1000 (drop),
+        // 850 is 150 below the kept 1000 (keep) even though only 75 below
+        // the dropped 925, so a chain of close sizes never collapses whole.
+        let mut targets = vec![850, 1000, 1500, 925, 750, 1000];
+        merge_targets(&mut targets, 90);
+        assert_eq!(targets, [1500, 1000, 850, 750]);
+        // The width is inclusive: a gap of exactly 90 merges.
+        let mut targets = vec![100, 190, 280];
+        merge_targets(&mut targets, 90);
+        assert_eq!(targets, [280, 100]);
     }
 
     #[test]

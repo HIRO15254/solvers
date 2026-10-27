@@ -15,8 +15,6 @@ BTN = "AhAd,QhQd"
 BB = "JhJd,ThTd"
 [tree]
 script = '''river { replace bet [3.3bb] replace raise [a] }'''
-[tree.max_aggressive_actions]
-river = 2
 [solver.stop]
 max_iterations = 8
 check_every = 4
@@ -182,6 +180,8 @@ fn spec_p1_example_human_output_is_readable_and_pinned() {
             "tree rule: river { replace bet [50, a] }\n",
             "tree rule: river when in_position { replace bet [75, a] }\n",
             "tree rule: river { replace raise [a] }\n",
+            "tree rule: flop when aggressions >= 3 { remove raise }\n",
+            "tree rule: turn when aggressions >= 3 { remove raise }\n",
         )
     );
 }

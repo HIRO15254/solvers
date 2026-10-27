@@ -138,11 +138,17 @@ solvers config new --product p2 --template full --out table-full.toml
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。
 金額はBB、内部gridは0.001 BBである。P1のrange指定やline文法は規範の例に従う。
-P1ではPreflop専用のtree設定は効果を持たず、既定値以外を書くと警告が出る。
+P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
 `checkdown`は一致した手番をcheck、賭けに直面していればfoldにする。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 旧configの自動変換は無いため、現行例から書き直す。
+`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は削除済みで、指定は未知keyの`NLH002`となる。
+これらを埋込みconfigに含むartifact・checkpointも読み込めない。
+正規化・実効configにも出力しない。旧Preflop設定は他のPreflop ruleの後へ
+`preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置いて移行する。
+旧keyとはanteのある場合の分母、0.001 BB gridでの閾値丸め、ソース位置での適用が異なる
+（[共通Input第9節](nlh-input-v1.jp.md#size-literalと解決順序)）。
 
 ### P1の木の大きさを決める
 
@@ -153,7 +159,14 @@ GTO Wizard（GTOW）の公開情報と[雛形の計測](../experiments/p1-effici
   多くの盤面で0.01 bb以内だった。SRPのflopはまず1〜2 sizeにする。
 - flop戦略への影響はturnのsizeの方がriverより大きい。riverには小さいbetとall-inのように離れた2 sizeを置く。
 - donkは`when donk { remove bet }`で消す。raiseは`when aggressions >= 2 { replace raise [a] }`で2回目以降をall-inにする。
-  `allin_threshold = 0.67`は残りstackの大半を入れるbetをall-inへまとめる。
+  大きい候補だけをall-inにするには、sizeを足すruleの後へ`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`を置く。
+  `jam`は現在menuの到達額を閾値と比べ、該当候補だけをMへ置き換える。MはW＋残stack（P1ではeffective-stackの木の到達額）である。
+  閾値は到達額への変換だけで求め、最小raiseへ引き上げずMでcapしない。候補自体は追加せず、後続ruleが追加した候補には作用しない。
+  低SPRでは`turn, river when spr <= 1.5 { replace raise [a] }`でraiseをall-inにできる。
+- 近いsizeをまとめるには、sizeを足すruleの後へ`flop { merge bet within 10 }`を置く。大きい候補から順に見て、
+  直前に残した候補とのpot 10%以内の差の候補を削除する。幅は`0.5bb`や`5%stack`でも書け、all-inに近い候補はall-inへまとまる。
+- 攻撃を3回までに制限するにはscriptの最後へ`flop, turn, river when aggressions >= 3 { remove raise }`を置く。
+  ruleはソース順に適用するため、最後のcapは先行ruleに取り消されない。cap ruleが無ければraise chainはstackとNLHの合法性だけで制限され、木が大きくなりうる。
 - 3BP・4BPはSPRが低く木が小さいので、flopに3 sizeを置いても軽い。
 
 同梱の[flop_srp.toml](../examples/hu-postflop/flop_srp.toml)・[flop_3bp.toml](../examples/hu-postflop/flop_3bp.toml)・
@@ -461,13 +474,24 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     「Re-raises are all-in only」はbet・raiseに直面したraiseをall-inに限る木にする。開始streetより前のstreetの行は薄く示す。
     サイズ表で書き戻せないscript（他の条件・`add`・`force`などを含む）はscriptのtabで開き、
     サイズ表のtabはその旨と「Replace with the default size table」（Flop 33/50・Turn 75/a・River 75,a/a、OOP・IP同じ）を示す。
-    all-inへの併合（`allin_threshold`）・全nodeのall-in（`include_allin`）・streetごとの攻撃回数上限も同じstepで書く。
+    サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を他のruleの後へ書く。
+    全nodeのall-in（`include_allin`）も同じstepで書く。
+    scriptの`param`宣言は入力欄として表示し、変更を`[tree.params]`の同名keyへ書く（script本文の既定値は変えない）。
+    Scriptのtabとscriptの編集欄は下の「script・TOMLの編集欄」の機能を持つ。
   - Solver: Stopping（Target・Max iterations・Check every・Max time）、Resources and output（Threads・Memory limit・
     Saved streets・Checkpoint interval・Checkpoint at the end）、Algorithm（Schedule・CFR precision・Storage）を書く。
   - Edit TOML: stepではなく、文書全体を色分け付きで直接編集する。読めるTOMLになるたびに各stepへ反映し、各stepの変更はTOMLへ反映する。
-    読めない間はerrorを示し、他のstepと検証は直前に読めた内容のままでSolveできない。自分で書いたcommentや順序は、
+    読めない間はerrorを示し、構文errorの行・列に印を付ける。他のstepと検証は直前に読めた内容のままでSolveできない。自分で書いたcommentや順序は、
     TOMLを直接編集している間は保持し、stepで変更するとformの書式で書き直す。複数行の文字列（`tree.script`）は
-    `'''`の複数行literalで書く。どのstepにも入力欄の無いkeyは消さずに保持し、TOMLの下に一覧で示す。
+    `'''`の複数行literalで書き、その中はscriptとして色分け・補完する。どのstepにも入力欄の無いkeyは消さずに保持し、TOMLの下に一覧で示す。
+  - script・TOMLの編集欄: 行番号・現在行の強調・括弧の対応と自動の閉じ括弧・`{ }`の折りたたみ・折り返しを持つ。
+    補完はCtrl+Spaceか入力中に、文脈に合う語（topではstreet・`param`・`define`、block内ではeffect・`when`・`if`、
+    `jam`・`merge`の後はaction・`>=`/`>`・`within`、条件では変数と`define`名、`position ==`の後は席名、`[`の中はsize literalと`param`名）と
+    blockの雛形を出す。語にpointerを置くと、変数の型と意味・予約語の説明・size literalの解釈・`param`/`define`の宣言と直前のcommentを示す。
+    daemonの検証errorは該当行に波線と行頭の印で示す（scriptは`line N`の行、TOMLはkeyの行）。検証の警告は行が分からないため印を付けない。
+    主なkey: Ctrl+F 検索・置換、Ctrl+G 次を検索、Alt+G 行へ移動、Ctrl+D 次の同じ語を選択、Ctrl+クリック 複数cursor、Alt+ドラッグ 矩形選択、
+    Ctrl+/ comment切替、Ctrl+[ / Ctrl+] indent、Ctrl+Shift+[ / Ctrl+Shift+] 折りたたみ・展開、Alt+↑/↓ 行の移動、Ctrl+Z / Ctrl+Y 取消・やり直し。
+    Tabはindentで、編集欄から出るにはEscの後にTabを押す。
 - Runs: run一覧、iteration・`nash_conv / 2`（cashは%pot、ICMは%prizes）・経過時間、収束chart、
   event、artifact download、cancel・再開。cancel後は保存が終わるまで「Stopping (saving)」と表示する。
 - Results: 完了したP1 runをroot から節点ごとに辿る。action cardで手を選び、chance nodeではcardを選ぶ。

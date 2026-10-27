@@ -15,7 +15,7 @@ use crate::{SizeSpec, Street};
 /// `Serialize`/`Deserialize` are here for the same reason as on
 /// [`ActionKind`]: `mw_preflop::config::RuleEffect` is a type alias for this
 /// enum, so its typed `[[..rules]]` TOML surface needs no second copy of the
-/// same five spellings.
+/// same spellings.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Effect {
@@ -32,6 +32,44 @@ pub enum Effect {
     /// Removes every action except check. Takes neither `action` nor
     /// `sizes`.
     Checkdown,
+    /// Replaces every current candidate of `action`'s kind whose raise-to
+    /// target passes the bound against the single threshold in `sizes` with
+    /// the all-in target. The threshold is converted to a street target but
+    /// neither bumped to the minimum raise nor capped at the stack.
+    Jam(JamBound),
+    /// Thins the current candidates of `action`'s kind: walking from the
+    /// largest target down, a candidate within the single width in `sizes`
+    /// of the last one kept is removed. The width is a pot, BB, or stack
+    /// literal read as an amount, not a target; see
+    /// [`SizeSpec::is_merge_width`](crate::SizeSpec::is_merge_width).
+    Merge,
+}
+
+/// The comparison a `jam` statement applies between a candidate's target
+/// and its threshold: `>=` or `>`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum JamBound {
+    AtLeast,
+    Above,
+}
+
+impl JamBound {
+    /// Whether `target` is jammed against `threshold`.
+    pub fn holds<T: Ord>(self, target: T, threshold: T) -> bool {
+        match self {
+            Self::AtLeast => target >= threshold,
+            Self::Above => target > threshold,
+        }
+    }
+
+    /// The script spelling of the bound.
+    pub fn symbol(self) -> &'static str {
+        match self {
+            Self::AtLeast => ">=",
+            Self::Above => ">",
+        }
+    }
 }
 
 /// One flattened tree-script rule: applied to the base action list at every
@@ -85,7 +123,8 @@ pub struct Script<V> {
 /// needs to combine conditions and assign streets, not parse anything.
 #[derive(Clone, Debug)]
 pub(crate) enum StmtAst<V: Vars> {
-    /// A bare statement: `<effect> <action> [sizes...]` or `checkdown`.
+    /// A bare statement: `<effect> <action> [sizes...]`, `jam <action> <op>
+    /// <size>`, or `checkdown`.
     Action {
         effect: Effect,
         action: Option<ActionKind>,

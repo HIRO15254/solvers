@@ -43,7 +43,7 @@ fn sequential() -> ParConfig {
 /// Small turn-start config, copied locally from
 /// `crates/hu-postflop/tests/rake_icm.rs`'s `small_turn_config` (board "2s 7s Ks
 /// 2h", ranges "44,55" vs "33,66", pot 2, stack 20, turn 0.75 / river 1.0,
-/// max_raises 1/1): a single chance node (turn -> river) whose children are
+/// raise-removal rules on both streets): a single chance node (turn -> river) whose children are
 /// exactly the river-entry nodes the guard test needs, and small enough to
 /// build/replay/re-solve fast.
 fn small_turn_config() -> PostflopConfig {
@@ -300,7 +300,7 @@ fn river_trunk_matches_fresh_river_resolve_at_every_entry_node() {
 // --- reach consistency at the hu-postflop level -----------------------------
 
 /// Same turn-start board/ranges/turn-bet-menu as `small_turn_config`, but
-/// with the river bet menu emptied out (`max_raises.river = 0`, no river
+/// with the river bet menu emptied out (no river
 /// fractions). `small_turn_config` itself is deliberately *not* reused for
 /// an actual CFR solve here: `rake_icm.rs`'s own
 /// `pure_hu_icm_postflop_solve_matches_chip_ev` marks even a 64-iteration

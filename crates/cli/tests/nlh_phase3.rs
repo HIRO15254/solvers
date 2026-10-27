@@ -1173,24 +1173,12 @@ fn p1_ignored_warning(text: &str) -> usize {
 }
 
 #[test]
-fn preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn() {
+fn preflop_rules_warn_once_and_normalized_defaults_do_not_warn() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("input.toml");
     let base = RIVER.replace("preflop { replace raise [2.5bb] }\n", "");
-    for (raw, expected) in [
-        (RIVER.to_owned(), "Preflop tree rules"),
-        (
-            base.replace(
-                "script =",
-                "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 2 }\nscript =",
-            ),
-            "tree.preflop_reraise_jam_above_stack",
-        ),
-        (
-            base.clone() + "[tree.max_aggressive_actions]\npreflop = 5\n",
-            "tree.max_aggressive_actions.preflop",
-        ),
-    ] {
+    {
+        let raw = RIVER.to_owned();
         std::fs::write(&config, raw).unwrap();
         let result = ok(&["validate", text(&config), "--format", "json"]);
         let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
@@ -1202,7 +1190,7 @@ fn preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn() {
             .filter(|w| w.contains("have no effect in P1"))
             .collect();
         assert_eq!(warnings.len(), 1);
-        assert!(warnings[0].contains(expected));
+        assert!(warnings[0].contains("Preflop tree rules"));
         let result = ok(&["validate", text(&config)]);
         assert_eq!(
             p1_ignored_warning(&String::from_utf8_lossy(&result.stdout)),
@@ -1232,12 +1220,8 @@ fn preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn() {
         0
     );
 
-    // All three triggers share one warning through solve, resume and report.
-    let raw = RIVER.replace(
-        "script =",
-        "preflop_reraise_jam_above_stack = { numerator = 1, denominator = 2 }\nscript =",
-    ) + "[tree.max_aggressive_actions]\npreflop = 5\n";
-    std::fs::write(&config, raw).unwrap();
+    // The warning stays single through solve, resume and report.
+    std::fs::write(&config, RIVER).unwrap();
     let run = temp.path().join("run");
     for args in [
         vec!["solve", text(&config), "--out", text(&run)],
@@ -1246,13 +1230,7 @@ fn preflop_only_settings_warn_once_and_normalized_defaults_do_not_warn() {
         let result = ok(&args);
         let stderr = String::from_utf8_lossy(&result.stderr);
         assert_eq!(p1_ignored_warning(&stderr), 1, "{stderr}");
-        for name in [
-            "Preflop tree rules",
-            "tree.preflop_reraise_jam_above_stack",
-            "tree.max_aggressive_actions.preflop",
-        ] {
-            assert!(stderr.contains(name));
-        }
+        assert!(stderr.contains("Preflop tree rules"));
     }
     let report = temp.path().join("report.csv");
     let result = ok(&[
@@ -1396,8 +1374,8 @@ fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
         .replace("replace bet [1bb]", &format!("replace bet [{bets}]"))
         .replace("replace raise [a]", "replace raise [2x,3x,4x,5x,6x,7x]")
         .replace(
-            "[solver.stop]",
-            "[tree.max_aggressive_actions]\nriver = 4\n[solver.stop]",
+            "replace raise [2x,3x,4x,5x,6x,7x] }",
+            "replace raise [2x,3x,4x,5x,6x,7x] }\nriver when aggressions >= 4 { remove raise }",
         )
         .replace("max_iterations = 16", "max_iterations = 1");
     std::fs::write(&config, &raw).unwrap();

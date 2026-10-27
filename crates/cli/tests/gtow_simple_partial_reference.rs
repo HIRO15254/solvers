@@ -116,10 +116,12 @@ fn simple_fixture_has_requested_caps_buckets_and_five_unopened_menus() {
             .any(|rule| rule.action == Some(nlh::script::ActionKind::Call)
                 && rule.effect == nlh::script::Effect::Remove)
     );
-    assert_eq!(betting.preflop.max_aggressive_actions, 4);
-    assert_eq!(betting.flop.max_aggressive_actions, 1);
-    assert_eq!(betting.turn.max_aggressive_actions, 1);
-    assert_eq!(betting.river.max_aggressive_actions, 1);
+    let raw = std::fs::read_to_string(fixture_path()).unwrap();
+    for (street, limit) in [("preflop", 4), ("flop", 1), ("turn", 1), ("river", 1)] {
+        assert!(raw.contains(&format!(
+            "{street} when aggressions >= {limit} {{ remove raise }}"
+        )));
+    }
     assert_eq!(config.abstraction.flop_buckets, 32);
     assert_eq!(config.abstraction.turn_buckets, 32);
     assert_eq!(config.abstraction.river_buckets, 32);

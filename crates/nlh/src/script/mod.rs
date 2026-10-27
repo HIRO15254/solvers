@@ -24,7 +24,7 @@ mod lower;
 mod parse;
 mod token;
 
-pub use ast::{ActionKind, Effect, ParamKind, ParamSchema, Rule, Script};
+pub use ast::{ActionKind, Effect, JamBound, ParamKind, ParamSchema, Rule, Script};
 pub use cond::{
     CmpOp, Condition, Dialect, Literal, PostflopVar, PreviousAggressor, RuleContext, SizeParser,
     Value, VarKind, VarSource, Vars,

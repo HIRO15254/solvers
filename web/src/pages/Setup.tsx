@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TomlError } from "smol-toml";
 import { api, saveBlob } from "../api/client";
-import type { LineCursor } from "../api/types";
+import type { LineCursor, TreeParam } from "../api/types";
 import { BoardDialog } from "../components/BoardDialog";
-import { CodeEditor, highlightToml } from "../components/CodeEditor";
+import { CodeEditor } from "../components/CodeEditor";
 import { Notice } from "../components/common";
 import {
   DocContext,
@@ -37,6 +38,7 @@ import {
 } from "../cryst";
 import { parseBoard } from "../lib/cards";
 import { TEMPLATES, fieldText, getAt, readDoc, setAt, writeDoc, type Doc } from "../lib/config";
+import { type LineDiagnostic, tomlIssueLine } from "../lib/editor/diagnostics";
 import type { SizeRole } from "../lib/sizes";
 import { navigate } from "../route";
 
@@ -95,11 +97,8 @@ const FORM_KEYS = new Set([
   "spot.line",
   "spot.board",
   "tree.script",
-  "tree.allin_threshold",
   "tree.include_allin",
-  "tree.max_aggressive_actions.flop",
-  "tree.max_aggressive_actions.turn",
-  "tree.max_aggressive_actions.river",
+  "tree.params",
   "solver.storage",
   "solver.cfr_precision",
   "solver.algorithm.schedule",
@@ -276,10 +275,12 @@ export function SetupPage() {
   const [validation, setValidation] = useState<Validation>({
     state: "pending",
   });
+  // Keep parameter controls available while validation is pending or an override is invalid.
+  const [treeParams, setTreeParams] = useState<{ script: string; params: TreeParam[] } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [tomlText, setTomlText] = useState<string | null>(null);
-  const [tomlError, setTomlError] = useState<string | null>(null);
+  const [tomlError, setTomlError] = useState<Error | null>(null);
   const [picked, setPicked] = useState<string[] | null>(null);
   const [rangeNote, setRangeNote] = useState<string | null>(null);
   // The last settled validation's key-bound error; a pending validation keeps it, so fields do not flicker.
@@ -301,6 +302,10 @@ export function SetupPage() {
       const response = await api.validate(text, true);
       if (id !== sequence.current) return;
       setValidation({ state: "ok", response });
+      setTreeParams({
+        script: fieldText(getAt(readDoc(text), ["tree", "script"])),
+        params: response.summary.tree?.params ?? [],
+      });
       setIssue(null);
     } catch (error) {
       if (id !== sequence.current) return;
@@ -409,6 +414,7 @@ export function SetupPage() {
 
   // A new document starts its range history afresh.
   const replace = (next: Doc) => {
+    setTreeParams(null);
     setDoc(next);
     setRangeNote(null);
     rangeMemory.current.clear();
@@ -452,7 +458,7 @@ export function SetupPage() {
       setDoc(readDoc(value));
       setTomlError(null);
     } catch (error) {
-      setTomlError((error as Error).message);
+      setTomlError(error as Error);
     }
   };
 
@@ -561,7 +567,11 @@ export function SetupPage() {
             <RangeStep roles={roles} board={board} note={rangeNote} />
           </section>
           <section className="setup-step" hidden={step !== "tree"}>
-            <SetupTree startStreet={start?.street ?? (lineRoles ? (cursor?.street ?? null) : null)} roles={roles} />
+            <SetupTree
+              startStreet={start?.street ?? (lineRoles ? (cursor?.street ?? null) : null)}
+              roles={roles}
+              params={treeParams?.script === fieldText(getAt(doc, ["tree", "script"])) ? treeParams.params : []}
+            />
           </section>
           <section className="setup-step" hidden={step !== "solver"}>
             <SolverStep />
@@ -570,7 +580,9 @@ export function SetupPage() {
             <TomlStep
               text={tomlText ?? toml}
               error={tomlError}
-              unmodeled={leafPaths(doc).filter((path) => !FORM_KEYS.has(path) && !path.startsWith("table.stacks_bb."))}
+              unmodeled={leafPaths(doc).filter(
+                (path) => !FORM_KEYS.has(path) && !path.startsWith("table.stacks_bb.") && !path.startsWith("tree.params."),
+              )}
               onChange={editToml}
             />
           )}
@@ -803,11 +815,21 @@ function TomlStep({
   onChange,
 }: {
   text: string;
-  error: string | null;
+  error: Error | null;
   /** Keys no step has a field for; they are kept as written. */
   unmodeled: string[];
   onChange: (text: string) => void;
 }) {
+  const { issue } = useDoc();
+  // A parse error marks its own position; otherwise the daemon's error marks the key (or script line) it names.
+  const diagnostics = useMemo((): LineDiagnostic[] => {
+    if (error instanceof TomlError) {
+      return [{ line: error.line, column: error.column, message: error.message.split("\n")[0]!, severity: "error" }];
+    }
+    if (error || !issue) return [];
+    const line = tomlIssueLine(text, issue.path, issue.message);
+    return line === null ? [] : [{ line, message: `${issue.path}: ${issue.message}`, severity: "error" }];
+  }, [text, error, issue]);
   return (
     <Card
       title="Edit TOML"
@@ -818,10 +840,10 @@ function TomlStep({
           <Notice
             variant="destructive"
             title="Not readable as TOML"
-            description={`The steps and validation keep the last readable document. ${error}`}
+            description={`The steps and validation keep the last readable document. ${error.message}`}
           />
         )}
-        <CodeEditor className="toml-editor" value={text} highlight={highlightToml} onChange={onChange} />
+        <CodeEditor className="toml-editor" label="TOML" language="toml" value={text} diagnostics={diagnostics} onChange={onChange} />
         {unmodeled.length > 0 && (
           <p className="muted meta" style={{ margin: 0 }}>
             Keys no step has a field for (kept as written): <span className="mono">{unmodeled.join(", ")}</span>
