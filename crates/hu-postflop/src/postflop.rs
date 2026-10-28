@@ -231,10 +231,18 @@ struct PostflopTerminal {
     table: u32,
 }
 
+struct CompactTerminal {
+    board_mask: u64,
+    kind: TerminalKind,
+    payoff: u32,
+    table: u32,
+}
+
 /// Exact terminal evaluation over fixed seat-specific compact vectors, generalized
 /// from the river-only evaluator to runouts at any street.
 pub struct PostflopEvaluator {
-    terminals: Vec<PostflopTerminal>,
+    terminals: Vec<CompactTerminal>,
+    payoffs: Vec<BakedPayoffs>,
     cfr_precision: hu_engine::CfrPrecision,
     /// Showdown rank tables, deduped by completed 5-card board (see
     /// [`Builder::rank_table_id`]).
@@ -341,7 +349,7 @@ impl TerminalEvaluator for PostflopEvaluator {
                                 fold,
                                 &self.hands.same[p],
                                 std::array::from_fn(|lane| {
-                                    Self::cfr_utilities(
+                                    self.cfr_utilities(
                                         &self.terminals[terminals[indices[lane]] as usize],
                                         p,
                                     )
@@ -442,7 +450,7 @@ impl TerminalEvaluator for PostflopEvaluator {
                         {
                             *reach = opp_reaches[i];
                             let term = &self.terminals[terminals[i] as usize];
-                            let u = Self::cfr_utilities(term, p);
+                            let u = self.cfr_utilities(term, p);
                             *utility = if fold {
                                 [u[0] as f32; 3]
                             } else {
@@ -503,18 +511,20 @@ impl TerminalEvaluator for PostflopEvaluator {
         if let Some((f, s)) = pair {
             let fold = &self.terminals[terminals[f] as usize];
             let show = &self.terminals[terminals[s] as usize];
+            let show_payoff = &self.payoffs[show.payoff as usize];
+            let fold_payoff = &self.payoffs[fold.payoff as usize];
             let utilities = match p {
                 Player::P0 => [
-                    show.payoffs.win_p0[p],
-                    show.payoffs.tie[p],
-                    show.payoffs.win_p1[p],
-                    fold.payoffs.win_p0[p],
+                    show_payoff.win_p0[p],
+                    show_payoff.tie[p],
+                    show_payoff.win_p1[p],
+                    fold_payoff.win_p0[p],
                 ],
                 Player::P1 => [
-                    show.payoffs.win_p1[p],
-                    show.payoffs.tie[p],
-                    show.payoffs.win_p0[p],
-                    fold.payoffs.win_p1[p],
+                    show_payoff.win_p1[p],
+                    show_payoff.tie[p],
+                    show_payoff.win_p0[p],
+                    fold_payoff.win_p1[p],
                 ],
             };
             let (fold_out, show_out) = if f < s {
@@ -583,8 +593,8 @@ impl TerminalEvaluator for PostflopEvaluator {
                 if let Some((f, s)) = pair.filter(|_| a.board_mask == b.board_mask) {
                     let fold = &self.terminals[terminals[f] as usize];
                     let show = &self.terminals[terminals[s] as usize];
-                    let [win, tie, lose] = Self::cfr_utilities(show, p);
-                    let [u_fold, _, _] = Self::cfr_utilities(fold, p);
+                    let [win, tie, lose] = self.cfr_utilities(show, p);
+                    let [u_fold, _, _] = self.cfr_utilities(fold, p);
                     let table = &self.rank_tables[show.table as usize];
                     debug_assert_eq!(reaches[f].len(), self.hands.len(p.opponent()));
                     debug_assert_eq!(reaches[s].len(), self.hands.len(p.opponent()));
@@ -602,7 +612,7 @@ impl TerminalEvaluator for PostflopEvaluator {
                 }
             }
             let term = &self.terminals[terminals[i] as usize];
-            let utilities = Self::cfr_utilities(term, p);
+            let utilities = self.cfr_utilities(term, p);
             debug_assert_eq!(reaches[i].len(), self.hands.len(p.opponent()));
             match term.kind {
                 TerminalKind::Fold { .. } => kernel::add_fold_kernel_relaxed_f32(
@@ -654,18 +664,11 @@ impl PostflopEvaluator {
     }
 
     // Fold win payoffs are baked identically for both rank orientations.
-    fn cfr_utilities(term: &PostflopTerminal, p: Player) -> [f64; 3] {
+    fn cfr_utilities(&self, term: &CompactTerminal, p: Player) -> [f64; 3] {
+        let payoffs = &self.payoffs[term.payoff as usize];
         match p {
-            Player::P0 => [
-                term.payoffs.win_p0[p],
-                term.payoffs.tie[p],
-                term.payoffs.win_p1[p],
-            ],
-            Player::P1 => [
-                term.payoffs.win_p1[p],
-                term.payoffs.tie[p],
-                term.payoffs.win_p0[p],
-            ],
+            Player::P0 => [payoffs.win_p0[p], payoffs.tie[p], payoffs.win_p1[p]],
+            Player::P1 => [payoffs.win_p1[p], payoffs.tie[p], payoffs.win_p0[p]],
         }
     }
     fn eval_with_kernel(
@@ -681,18 +684,7 @@ impl PostflopEvaluator {
         let term = &self.terminals[terminal as usize];
         // Orient payoff constants to the traversing player: `u_win` is p's
         // utility when p's hand wins, etc.
-        let (u_win, u_tie, u_lose) = match p {
-            Player::P0 => (
-                term.payoffs.win_p0[Player::P0],
-                term.payoffs.tie[Player::P0],
-                term.payoffs.win_p1[Player::P0],
-            ),
-            Player::P1 => (
-                term.payoffs.win_p1[Player::P1],
-                term.payoffs.tie[Player::P1],
-                term.payoffs.win_p0[Player::P1],
-            ),
-        };
+        let [u_win, u_tie, u_lose] = self.cfr_utilities(term, p);
         match term.kind {
             TerminalKind::Fold { .. } => {
                 let kernel = match variant {
@@ -1583,9 +1575,39 @@ fn build_checked(
             }
         })
         .collect();
+    let mut payoff_ids = BTreeMap::new();
+    let mut payoffs = Vec::new();
+    let mut terminals: Vec<CompactTerminal> = terminals
+        .into_iter()
+        .map(|term| {
+            let p = term.payoffs;
+            let key = [
+                p.win_p0[Player::P0].to_bits(),
+                p.win_p0[Player::P1].to_bits(),
+                p.tie[Player::P0].to_bits(),
+                p.tie[Player::P1].to_bits(),
+                p.win_p1[Player::P0].to_bits(),
+                p.win_p1[Player::P1].to_bits(),
+            ];
+            let payoff = *payoff_ids.entry(key).or_insert_with(|| {
+                let id = payoffs.len() as u32;
+                payoffs.push(p);
+                id
+            });
+            CompactTerminal {
+                board_mask: term.board_mask,
+                kind: term.kind,
+                payoff,
+                table: term.table,
+            }
+        })
+        .collect();
+    // `collect` can reuse the larger builder allocation in place.
+    terminals.shrink_to_fit();
     let evaluator = PostflopEvaluator {
         cfr_precision: hu_engine::CfrPrecision::F64,
         terminals,
+        payoffs,
         rank_tables,
         batch_tables,
         fold_combos,
@@ -2601,12 +2623,12 @@ mod tests {
                     (
                         s.board_mask,
                         s.table,
-                        format!("{:?}{:?}", s.kind, s.payoffs)
+                        format!("{:?}{:?}", s.kind, x.payoffs[s.payoff as usize])
                     ),
                     (
                         p.board_mask,
                         p.table,
-                        format!("{:?}{:?}", p.kind, p.payoffs)
+                        format!("{:?}{:?}", p.kind, y.payoffs[p.payoff as usize])
                     ),
                     "{board_text}"
                 );
