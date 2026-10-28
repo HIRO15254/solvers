@@ -430,3 +430,74 @@ fn storage_preorder_matches_recursive_bits_when_node_order_differs() {
             }
         });
 }
+
+#[test]
+fn profiled_sibling_batches_and_matches_recursive() {
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap()
+        .install(|| {
+            let make = || {
+                let (tree, evaluator) = fixture(false);
+                let child = tree.node(0).first_child;
+                let locked = tree.storage_ref(tree.node(child));
+                let mut locks = vec![None; tree.storage_refs.len()];
+                let hands = locked.num_hands as usize;
+                let mut fixed = vec![f32::NAN; locked.len()];
+                fixed[..hands].fill(0.25);
+                locks[locked.index as usize] = Some(crate::NodeLock {
+                    fixed,
+                    confidence: vec![1.0; hands],
+                });
+                let profile = crate::Profile {
+                    incentives: vec![None; locks.len()],
+                    locks,
+                };
+                let dims = tree.root_dims;
+                let game = CompiledGame {
+                    tree,
+                    evaluator,
+                    root_ranges: dims.map(|n| vec![1.0; n as usize]),
+                    normalizer: 1.0,
+                    zero_sum: true,
+                };
+                let mut solver = Solver::<_, F32Storage>::new(game, Box::new(crate::Vanilla), None);
+                solver.set_cfr_precision(CfrPrecision::F32);
+                solver.set_profile(profile).unwrap();
+                solver
+            };
+            let mut reference = make();
+            let mut actual = make();
+            RECURSIVE.set(true);
+            reference.run(3);
+            RECURSIVE.set(false);
+            actual.run(3);
+            assert!(
+                actual
+                    .game
+                    .evaluator
+                    .batches
+                    .load(std::sync::atomic::Ordering::Relaxed)
+                    > 0
+            );
+            for node in 0..actual.game.tree.nodes.len() as u32 {
+                if actual.game.tree.node(node).kind == NodeKind::Action {
+                    assert!(
+                        relative(
+                            &reference.average_strategy_at(node),
+                            &actual.average_strategy_at(node)
+                        ) < 1e-5
+                    );
+                }
+            }
+            RECURSIVE.set(true);
+            let recursive = actual.evaluate();
+            RECURSIVE.set(false);
+            let batched = actual.evaluate();
+            for p in Player::BOTH {
+                assert_eq!(recursive.0[p].to_bits(), batched.0[p].to_bits());
+                assert_eq!(recursive.1[p].to_bits(), batched.1[p].to_bits());
+            }
+        });
+}

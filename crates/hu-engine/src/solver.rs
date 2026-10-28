@@ -235,6 +235,30 @@ pub struct SolverState {
     pub storage: StorageState,
 }
 
+struct InstalledProfile {
+    profile: crate::Profile,
+    lock_prefix: Vec<usize>,
+    feature_prefix: Vec<usize>,
+}
+
+impl std::ops::Deref for InstalledProfile {
+    type Target = crate::Profile;
+    fn deref(&self) -> &Self::Target {
+        &self.profile
+    }
+}
+
+impl InstalledProfile {
+    fn clear_subtree(&self, span: StorageSpan, incentives: bool) -> bool {
+        let prefix = if incentives {
+            &self.feature_prefix
+        } else {
+            &self.lock_prefix
+        };
+        prefix[span.sref_start as usize] == prefix[span.sref_end as usize]
+    }
+}
+
 /// Vector-form CFR solver with alternating updates.
 pub struct Solver<E, S> {
     game: CompiledGame<E>,
@@ -248,7 +272,7 @@ pub struct Solver<E, S> {
     iteration: u64,
     par: ParConfig,
     cfr_precision: CfrPrecision,
-    profile: Option<crate::Profile>,
+    profile: Option<InstalledProfile>,
 }
 
 impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
@@ -348,16 +372,29 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 }
             }
         }
-        self.profile = Some(profile);
+        let mut lock_prefix = vec![0];
+        let mut feature_prefix = vec![0];
+        for (lock, incentive) in profile.locks.iter().zip(&profile.incentives) {
+            lock_prefix.push(lock_prefix.last().unwrap() + usize::from(lock.is_some()));
+            feature_prefix.push(
+                feature_prefix.last().unwrap() + usize::from(lock.is_some() || incentive.is_some()),
+            );
+        }
+        self.profile = Some(InstalledProfile {
+            profile,
+            lock_prefix,
+            feature_prefix,
+        });
         Ok(())
     }
     /// Current solve profile, if one is installed.
     pub fn profile(&self) -> Option<&crate::Profile> {
-        self.profile.as_ref()
+        self.profile.as_ref().map(|p| &p.profile)
     }
-    /// Mutably access the profile; callers may change only incentive bonus values.
+    /// Mutably access incentive bonus values. Locks, incentive presence, spaces,
+    /// and vector dimensions must not change; reinstall the profile instead.
     pub fn profile_mut(&mut self) -> Option<&mut crate::Profile> {
-        self.profile.as_mut()
+        self.profile.as_mut().map(|p| &mut p.profile)
     }
     /// Remove the active profile.
     pub fn clear_profile(&mut self) {
@@ -856,7 +893,7 @@ struct PassCtx<'w, E> {
     discounts: &'w Discounts,
     cfr_precision: CfrPrecision,
     par: ParConfig,
-    profile: Option<&'w crate::Profile>,
+    profile: Option<&'w InstalledProfile>,
 }
 
 /// Storage access for an action node's own storage ref (when split with
@@ -965,7 +1002,9 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         && node.kind == NodeKind::Action
         && !ctx.tree.subtree_has_chance[node_id as usize]
         && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
-        && ctx.profile.is_none()
+        && ctx
+            .profile
+            .is_none_or(|p| p.clear_subtree(ctx.tree.storage_spans[node_id as usize], true))
         && batch::enabled()
     {
         batch::run::<_, _, PRUNE>(ctx, storage, scratch, node_id, my_reach, opp_reach, out);
@@ -1519,7 +1558,7 @@ pub(crate) struct ValueCtx<'w, E, S> {
     pub(crate) storage: &'w S,
     pub(crate) p: Player,
     pub(crate) par: ParConfig,
-    pub(crate) profile: Option<&'w crate::Profile>,
+    profile: Option<&'w InstalledProfile>,
     pub(crate) incentives: bool,
 }
 
@@ -1558,7 +1597,10 @@ fn value_pass<
         && node.kind == NodeKind::Action
         && !ctx.tree.subtree_has_chance[node_id as usize]
         && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
-        && ctx.profile.is_none()
+        && ctx.profile.is_none_or(|p| {
+            p.clear_subtree(ctx.tree.storage_spans[node_id as usize], ctx.incentives)
+        })
+        && batch::enabled()
     {
         batch::values::<_, _, EV, BR>(ctx, scratch, node_id, opp_reach, ev, br);
         return;
@@ -1872,7 +1914,7 @@ fn value_pass<
 fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
     game: &CompiledGame<E>,
     storage: &S,
-    profile: Option<&crate::Profile>,
+    profile: Option<&InstalledProfile>,
     par: ParConfig,
     scratch: &mut Scratch,
     id: NodeId,

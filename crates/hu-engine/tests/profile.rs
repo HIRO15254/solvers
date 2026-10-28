@@ -65,6 +65,19 @@ fn profile(lock: Option<NodeLock>, incentive: Option<NodeIncentive>) -> Profile 
         incentives: vec![incentive],
     }
 }
+
+#[test]
+fn empty_profile_matches_unprofiled() {
+    let mut plain = solver(false);
+    let mut empty = solver(false);
+    plain.set_cfr_precision(CfrPrecision::F32);
+    empty.set_cfr_precision(CfrPrecision::F32);
+    empty.set_profile(profile(None, None)).unwrap();
+    plain.run(20);
+    empty.run(20);
+    assert_eq!(plain.state(), empty.state());
+    assert_eq!(plain.evaluate(), empty.evaluate());
+}
 #[test]
 fn partial_and_soft_lock_best_response() {
     let mut s = solver(false);
@@ -128,6 +141,33 @@ fn incentive_matches_modified_game_and_true_ev() {
             .abs()
             < 1e-6
     );
+}
+
+#[test]
+fn changing_incentive_values_updates_evaluation() {
+    let mut s = solver(false);
+    s.set_profile(profile(
+        None,
+        Some(NodeIncentive {
+            bonus: vec![0.0; 3],
+            space: 0,
+        }),
+    ))
+    .unwrap();
+    let zero = s.exploitability();
+    s.profile_mut().unwrap().incentives[0]
+        .as_mut()
+        .unwrap()
+        .bonus[0] = 2.0;
+    let active = s.exploitability();
+    let mut reference = solver(true);
+    reference.run(0);
+    assert_eq!(active, reference.exploitability());
+    s.profile_mut().unwrap().incentives[0]
+        .as_mut()
+        .unwrap()
+        .bonus[0] = 0.0;
+    assert_eq!(s.exploitability(), zero);
 }
 
 #[test]

@@ -162,11 +162,11 @@ fn bench<S: Storage>(
     let t = Instant::now();
     let (game, index, resolved, node_info) = if p.document.spot.profile.is_some() {
         let (game, index, resolved) = hu_postflop::run::build_profiled(p)?;
-        let node_info = game.tree.nodes.len();
+        let node_info = None;
         (game, index, resolved, node_info)
     } else {
         let built = hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline())?;
-        let node_info = built.node_info.len();
+        let node_info = Some(built.node_info.len());
         let index = GameIndex::from_game(
             &built.game,
             &built.node_info,
