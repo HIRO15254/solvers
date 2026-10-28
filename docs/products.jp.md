@@ -1,6 +1,6 @@
 # 製品定義: NLH HU Postflop Solver / NLH Multiway Preflop Solver
 
-更新: **2026-10-15**。本書は製品の目的・範囲・品質・到達段階の正本である。
+更新: **2026-10-28**。本書は製品の目的・範囲・品質・到達段階の正本である。
 
 2026-10-04の利用者決定により、旧ロードマップ（全variant対応・ML高速近似・Nodelock/相手profile、R0〜R7）を
 破棄し、本リポジトリを**共通のInput形式を共有する2製品**として再構築する。旧状態はgit tag
@@ -18,10 +18,11 @@
 | D1 | 製品は **P1: NLH HU Postflop Solver** と **P2: NLH Multiway Preflop Solver** の2つ。共通のInput形式を共有し、それぞれ独立に品質・性能を高める |
 | D2 | 既存コードは2製品を前提とした新構成へ再構築する。検証済みの部品だけをレビューして移植し、それ以外はmainから削除する。旧状態はgit tagで残す |
 | D3 | 共通Inputは、卓構成（人数・position・stack・blind/ante）、経済条件（rake/ICM）、range、ベット木の文法、単位（BB）を共有するゲーム記述とする。P1の開始局面はPreflop lineとboardで指定し、pot・stack・aggressorを導出する。P2の解からP1の入力を生成する製品間連携を持つ |
-| D4 | 旧目標のうち **ICM（トーナメント）** と **GUI/daemon** を引き継ぐ。Nodelock、相手profile、ML高速近似、他variant、Multiway Postflop、PKOは対象外 |
+| D4 | 旧目標のうち **ICM（トーナメント）** と **GUI/daemon** を引き継ぐ。Nodelock、相手profile、ML高速近似、他variant、Multiway Postflop、PKOは対象外（Nodelockと相手profileはD8でP1に限り対象へ戻した） |
 | D5 | **P2の計算方式と出力品質の保証は未決定**とし、網羅的な調査と実験で決める |
 | D6 | 共通Inputの細部（停止目標・木の既定、lineの表記、straddle、旧configの変換、P1のメモリ上限）は[Input規範](nlh-input-v1.jp.md)付録Aの決定に従う |
 | D7 | （2026-10-13）最初の配布はP1だけをOSS（MIT OR Apache-2.0）としてGitHub Releaseで公開する。対象はWindows・Linux・macOSのビルド済みbinary（`solvers`・`solversd`・Web GUI）で、installerは作らない。P2とderiveは配布物に含めない。リポジトリからP2を削除するものではない。手順は[配布計画](plans/release-v0.1.jp.md) |
+| D8 | （2026-10-28）P1に限り **Nodelock** と **相手profile** を対象へ戻す。combo単位・hand category単位のlock（全体・部分・ソフト）、action価値へのincentive、集計頻度の目標を提供する。配布v0.1.0には含めず、後の配布で含める。決定と段階は[P1 Nodelock・相手profile計画](plans/p1-nodelock.jp.md) |
 
 対象外とした項目は、新しい利用者決定なしに設計・実装へ戻さない。
 
@@ -85,7 +86,8 @@ chipEVでは全seatの和が `開始pot − E[rake]` になる。P2のPreflop ro
 | 経済 | cash chipEV（rakeあり/なし）、tournament ICM（卓の全員のstack＋卓外field） |
 | 入力 | 共通Input。spotはline＋board（Flop/Turn/River開始）。手に残る2人のrangeは必須 |
 | 出力 | 全action nodeの平均戦略とhand別EV、Exploitability、node照会（戦略・EV・range・equity）、複数board集計、2解の比較 |
-| 対象外 | 3人以上のPostflop、lossyなcard/bet抽象化、Nodelock、ML近似、street途中からの開始（v1） |
+| 利用者モデル | Nodelock（combo・hand category、全体・部分・ソフト）、incentive、集計頻度の目標（D8、段階S6） |
+| 対象外 | 3人以上のPostflop、lossyなcard/bet抽象化、ML近似、street途中からの開始（v1） |
 
 ### 品質
 
@@ -140,9 +142,10 @@ seat別最適応答利得`g_i`と`NashConv = Σ g_i`であり、S4-1で妥当性
 | **S3 P1の品質・性能** | 参照6件（Flop開始）の条件照合とfixture化、メモリ・時間の改善（Exploitabilityの目標は開始potの0.1%以下）。未マージの`codex/r1-hu-postflop`の成果（compact hand領域、action並列）は検証を経て移植可否を判断する |
 | **S4 P2の方式決定・品質・性能** | 網羅的な調査と比較実験で計算方式と出力品質の保証を決め（D5）、その方式で実装・検証する。`.mwsol`契約の整合、性能改善。段階S4-0〜S4-5と完了条件は[P2方式の再設計計画](plans/p2-method-redesign.jp.md) |
 | **S5 GUI** | daemon経由のWeb GUI（Setup・Runs・Results）を両製品で使える |
+| **S6 P1 Nodelock・相手profile** | lock・incentive・頻度目標をP1の厳密vector CFRに加え、入力・成果物・GUIで使える（D8）。段階N0〜N5と完了条件は[P1 Nodelock・相手profile計画](plans/p1-nodelock.jp.md) |
 | **配布v0.1.0** | P1（CLI・daemon・Web GUI）を、P2とderiveを含まない3 OS向け配布物として、ライセンス表記・利用者文書・受入証拠とともにGitHub Releaseで公開する（D7）。条件と手順は[配布計画](plans/release-v0.1.jp.md) |
 
-S3〜S5はS1の完了後、互いに独立に進められる。ただしS4の調査のうちコードに依存しない部分（既存研究・既存solverの
-調査）はS1と並行してよい。配布v0.1.0はP1の範囲のS5（Web GUI）に依存し、S4には依存しない。
+S3〜S6はS1の完了後、互いに独立に進められる。ただしS4の調査のうちコードに依存しない部分（既存研究・既存solverの
+調査）はS1と並行してよい。配布v0.1.0はP1の範囲のS5（Web GUI）に依存し、S4・S6には依存しない。
 順序・担当・状態はLinearで管理し、本書へ転記しない。
 目標・利用者決定・段階別の到達条件を変えるときは本書と再構築計画を同じ変更で更新する。

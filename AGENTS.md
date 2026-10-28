@@ -17,8 +17,9 @@ the NLH HU Postflop Solver (P1) and the NLH Multiway Preflop Solver (P2).
 defines the target architecture and the ordered migration steps M0-M8 on
 branch `restructure/two-products`. The pre-restructure state is the tag
 `archive/pre-two-products-2026-10-04`. Do not reintroduce features the product
-definition excludes (Nodelock, opponent profiles, ML approximation, other
-variants, multiway postflop, PKO) without a new user decision.
+definition excludes (ML approximation, other variants, multiway postflop, PKO)
+without a new user decision. Nodelock and opponent profiles are in scope for P1
+only (decision D8); follow `docs/plans/p1-nodelock.jp.md`.
 
 Read the relevant route rather than every long document for every change:
 

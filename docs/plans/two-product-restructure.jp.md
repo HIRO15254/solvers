@@ -123,7 +123,7 @@ mainへ戻すかは、調査の計画を立てる時点で判断する。
 | **M8 derive** | P2の完了runとline・boardからP1のInputを生成するCLI | 生成したInputがP1で解ける。P2の木にないsize、3人以上が残るline、boardの衝突、table条件の不一致を明示errorにする試験 |
 
 M1〜M8はこの順に依存する。M4はM3と並行して設計できるが、統合はM3の後に行う。
-S3〜S5（[製品定義](../products.jp.md)第6節）はM7の完了後に、Linearの別課題として進める。
+S3〜S6（[製品定義](../products.jp.md)第6節）はM7の完了後に、Linearの別課題として進める。
 S4の調査のうちコードに依存しない部分は、M2〜M8と並行してよい。
 P1の初回配布（製品定義D7）の手順は[配布計画](release-v0.1.jp.md)に置く。
 

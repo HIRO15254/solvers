@@ -15,7 +15,7 @@
   （[AI benchmarks](https://blog.gtowizard.com/gto-wizard-ai-benchmarks/)、
   [status](https://blog.gtowizard.com/status-and-info-about-our-solutions/)）。0.1%potはこれと同等以上に厳しい。
 - 「あらゆる手段」には算法の変更も含む。ただし有限木の厳密BRで測るExploitabilityの意味は変えない。
-  card・betの非可逆な抽象化、ML近似、nodelockは[製品定義](../products.jp.md)が除外しているので使わない。
+  card・betの非可逆な抽象化とML近似は[製品定義](../products.jp.md)が除外しているので使わない。nodelockはゲーム自体を変えるので高速化の手段にしない。
 - 規範・既定値を変える場合は[AGENTS.md](../../AGENTS.md)の同期規則に従う。
 
 ## 2. 現状の位置（2026-10-09）
