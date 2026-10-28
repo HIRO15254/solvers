@@ -1,4 +1,4 @@
-//! Version 5 streaming checkpoints. Only bounded metadata is postcard;
+//! Version 5 and 6 streaming checkpoints. Only bounded metadata is postcard;
 //! storage is raw little-endian arenas, protected by a BLAKE3 digest.
 #[cfg(any(test, feature = "test-support"))]
 use hu_engine::StorageState;
@@ -19,7 +19,7 @@ pub enum CheckpointError {
     #[error("not a solvers checkpoint file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported checkpoint format version {found} (expected {expected}); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
+        "unsupported checkpoint format version {found} (expected {expected} or 6); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
     #[error("checkpoint file truncated: expected at least {expected} bytes, got {actual}")]
@@ -36,6 +36,7 @@ pub enum CheckpointError {
 pub(crate) struct CheckpointHeader {
     pub config_hash: [u8; 32],
     pub iteration: u64,
+    pub version: u16,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Checkpoint {
@@ -67,7 +68,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes(buf[8..10].try_into().unwrap());
-    if version != FORMAT_VERSION {
+    if version != FORMAT_VERSION && version != 6 {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -76,12 +77,13 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
     Ok(CheckpointHeader {
         config_hash: buf[10..42].try_into().unwrap(),
         iteration: u64::from_le_bytes(buf[42..50].try_into().unwrap()),
+        version,
     })
 }
-fn build_header(hash: [u8; 32], iteration: u64) -> [u8; HEADER_LEN] {
+fn build_header(hash: [u8; 32], iteration: u64, version: u16) -> [u8; HEADER_LEN] {
     let mut buf = [0; HEADER_LEN];
     buf[..8].copy_from_slice(MAGIC);
-    buf[8..10].copy_from_slice(&FORMAT_VERSION.to_le_bytes());
+    buf[8..10].copy_from_slice(&version.to_le_bytes());
     buf[10..42].copy_from_slice(&hash);
     buf[42..].copy_from_slice(&iteration.to_le_bytes());
     buf
@@ -132,6 +134,7 @@ pub struct CheckpointReader {
     pub iteration: u64,
     pub config_toml: Option<String>,
     pub elapsed_secs: Option<f64>,
+    pub frequency_lambdas: Vec<f64>,
     backend: Backend,
     lengths: [u64; 4],
     decoder: zstd::stream::read::Decoder<'static, BufReader<File>>,
@@ -160,7 +163,16 @@ impl CheckpointReader {
         }
         let mut bytes = vec![0; len];
         decoder.read_exact(&mut bytes)?;
-        let metadata: Metadata = postcard::from_bytes(&bytes)?;
+        let (metadata, frequency_lambdas): (Metadata, Vec<f64>) = if parsed.version == 6 {
+            postcard::from_bytes(&bytes)?
+        } else {
+            (postcard::from_bytes(&bytes)?, Vec::new())
+        };
+        if frequency_lambdas.iter().any(|x| !x.is_finite()) {
+            return Err(CheckpointError::Invalid(
+                "invalid frequency controller state",
+            ));
+        }
         if metadata.iteration != parsed.iteration {
             return Err(CheckpointError::Invalid(
                 "header/payload iteration mismatch",
@@ -187,6 +199,7 @@ impl CheckpointReader {
             iteration: parsed.iteration,
             config_toml: metadata.config_toml,
             elapsed_secs: metadata.elapsed_secs,
+            frequency_lambdas,
             backend: metadata.backend,
             lengths: metadata.lengths,
             decoder,
@@ -338,6 +351,7 @@ pub fn write_checkpoint(
         None,
         1,
         1,
+        None,
     )
 }
 #[cfg(any(test, feature = "test-support"))]
@@ -357,6 +371,7 @@ pub fn write_checkpoint_with_config(
         Some(elapsed),
         1,
         1,
+        None,
     )
 }
 /// Production writer: borrowed arenas, bounded conversion buffer, threaded zstd.
@@ -378,6 +393,32 @@ pub fn write_storage_with_config(
         Some(elapsed),
         threads,
         1,
+        None,
+    )
+}
+
+/// Writes a checkpoint containing the frequency controller's durable state.
+#[allow(clippy::too_many_arguments)]
+pub fn write_storage_with_frequency(
+    path: &Path,
+    hash: [u8; 32],
+    iteration: u64,
+    storage: &impl Storage,
+    config: &str,
+    elapsed: f64,
+    threads: usize,
+    lambdas: &[f64],
+) -> Result<(), CheckpointError> {
+    write_arrays(
+        path,
+        hash,
+        iteration,
+        storage.arrays(),
+        Some(config),
+        Some(elapsed),
+        threads,
+        1,
+        Some(lambdas),
     )
 }
 #[allow(clippy::too_many_arguments)]
@@ -390,19 +431,28 @@ fn write_arrays(
     elapsed: Option<f64>,
     threads: usize,
     level: i32,
+    lambdas: Option<&[f64]>,
 ) -> Result<(), CheckpointError> {
     let (backend, lengths) = shape(&arrays);
-    let metadata = postcard::to_allocvec(&Metadata {
+    let metadata = Metadata {
         config_toml: config.map(str::to_owned),
         elapsed_secs: elapsed,
         iteration,
         backend,
         lengths,
-    })?;
+    };
+    let metadata = match lambdas {
+        Some(values) => postcard::to_allocvec(&(metadata, values))?,
+        None => postcard::to_allocvec(&metadata)?,
+    };
     if metadata.len() > MAX_METADATA {
         return Err(CheckpointError::Invalid("metadata too large"));
     }
-    let header = build_header(hash, iteration);
+    let header = build_header(
+        hash,
+        iteration,
+        if lambdas.is_some() { 6 } else { FORMAT_VERSION },
+    );
     let dir = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
@@ -508,6 +558,28 @@ mod tests {
                 strategy_sum: vec![0.1, 0.2, 0.3],
             },
         }
+    }
+
+    #[test]
+    fn frequency_state_round_trips_with_checkpoint() {
+        let state = sample_state_f32();
+        let path = temp_path("frequency.ckpt");
+        write_arrays(
+            &path,
+            [7; 32],
+            state.iteration,
+            state.storage.arrays(),
+            Some("config"),
+            Some(1.0),
+            1,
+            1,
+            Some(&[0.25, -0.5]),
+        )
+        .unwrap();
+        let reader = CheckpointReader::open(&path).unwrap();
+        assert_eq!(reader.frequency_lambdas, vec![0.25, -0.5]);
+        assert_eq!(reader.iteration, state.iteration);
+        let _ = std::fs::remove_file(path);
     }
 
     fn sample_state_i16() -> SolverState {
@@ -764,7 +836,7 @@ mod tests {
     fn rejects_pre_compact_versions_before_decoding() {
         for version in [1u16, 2, 3, 4] {
             let path = temp_path("old-format.checkpoint");
-            let mut header = build_header([0; 32], 0);
+            let mut header = build_header([0; 32], 0, FORMAT_VERSION);
             header[8..10].copy_from_slice(&version.to_le_bytes());
             std::fs::write(&path, header).unwrap();
             assert!(

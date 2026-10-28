@@ -378,6 +378,7 @@ pub fn river_resolve_config(
         },
         min_bet: trunk.min_bet,
         iso_merging: false,
+        profile_suit_perms: None,
         track_node_info: true,
         preflop_aggressor: entry.previous_aggressor,
     }

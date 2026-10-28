@@ -163,6 +163,7 @@ export function RunsPage({ runId, maxConcurrent }: { runId?: string; maxConcurre
                       <TableCell numeric>{run.progress !== undefined ? integer(run.progress) : ""}</TableCell>
                       <TableCell numeric>
                         {nashConv !== undefined && run.gameKind === "hu-postflop" ? exploitability(nashConv, meta) : ""}
+                        {nashConv !== undefined && meta?.generalSum && <span> · general-sum, incl. incentives</span>}
                       </TableCell>
                       <TableCell numeric>{run.elapsedSecs !== undefined ? seconds(run.elapsedSecs) : ""}</TableCell>
                     </TableRow>
@@ -286,7 +287,7 @@ function RunDetail({ run, meta, onChanged }: { run: RunSummary; meta?: RunMeta; 
   );
   const hasSolution = artifacts.some((a) => a.name === "solution.sol");
   const chartUnit = exploitabilityPercent(1, meta) !== null ? "%" : "";
-  const title = `NashConv / 2${chartUnit ? `（% ${meta?.utilityUnit === "prizes" ? "prizes" : "pot"}）` : ""}`;
+  const title = `NashConv / 2${meta?.generalSum ? " (general-sum, incl. incentives)" : ""}${chartUnit ? `（% ${meta?.utilityUnit === "prizes" ? "prizes" : "pot"}）` : ""}`;
   // With a normalizer the chart title carries the unit, so the stat shows only the figure.
   const lastPercent = last ? exploitabilityPercent(last.nash_conv, meta) : null;
   // A stop event after the latest start means the solver is past its last
@@ -343,7 +344,7 @@ function RunDetail({ run, meta, onChanged }: { run: RunSummary; meta?: RunMeta; 
         <Stat label="Iterations">{run.progress !== undefined ? integer(run.progress) : "—"}</Stat>
         <Stat label="Elapsed">{run.elapsedSecs !== undefined ? seconds(run.elapsedSecs) : "—"}</Stat>
         {hu && (
-          <Stat label="NashConv / 2">
+          <Stat label={meta?.generalSum ? "NashConv / 2 (general-sum, incl. incentives)" : "NashConv / 2"}>
             {last
               ? lastPercent !== null
                 ? `${significant(lastPercent)}%`

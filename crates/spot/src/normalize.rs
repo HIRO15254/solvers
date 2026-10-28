@@ -280,5 +280,9 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     }
     write_table(&mut text, "run", &run_fields);
     write_product(&mut text, "output", output);
+    if let Some(profile) = &spot.profile {
+        text.push('\n');
+        text.push_str(&crate::profile::normalize(profile));
+    }
     Ok(text)
 }

@@ -30,7 +30,8 @@ nodelockとして扱わず、上流nodeのlockで表す。Restricted Nash Respon
 
 ## 3. 設計方針
 
-以下は調査と既存実装から導いた方針であり、各段階で規範へ移すときに確定させる。
+以下の実装済みの既定・計算意味は確定し、[P1規範](../hu-postflop.jp.md#4-計算停止storage)と
+[共通Input規範](../nlh-input-v1.jp.md)を正本とする。未実装の方針は引き続き草案である。
 利用者決定と矛盾する変更は新たな利用者決定を要する。
 
 ### 3.1 3つの仕組み
@@ -50,7 +51,7 @@ nodelockとして扱わず、上流nodeのlockで表す。Restricted Nash Respon
   瞬時regretは固定していないaction集合の値を基準にする（regret matchingは全actionへの定数加算で結果が変わるため）。
 - 固定しないhandは通常どおり最適化する（各社の部分lockと同じ意味）。
 - ソフトlock: nodeの戦略を `p·σ_lock + (1−p)·σ_free` とする。`σ_free`はそのnodeの通常のregret matchingで、
-  regretは同じaction価値から計算する。平均戦略と保存値は混合後の戦略である。
+  regretは同じaction価値から計算する。戦略累積は自由成分を保存し、平均戦略の読取り時に混合する（[規範](../hu-postflop.jp.md#4-計算停止storage)）。
 - 入力の戦略は確率の合計が1（部分lockでは1以下）であることを要求し、黙って正規化しない。
 
 **incentive**
@@ -66,8 +67,8 @@ nodelockとして扱わず、上流nodeのlockで表す。Restricted Nash Respon
 - 頻度はexportの`actions`と同じく、node到達weightで加重した選択頻度とする（[P1規範](../hu-postflop.jp.md)第8節）。
 - 集計の単位は既定でrunoutごと（NL3）。iso併合した代表nodeは、その類の各runoutを表す。
   runoutを束ねた集計は別optionとし、需要を確認してから実装する。
-- 目標ごとに加点λを持ち、評価の区切りで達成頻度との差に応じてλを更新する（双対上昇）。
-  更新規則・刻み・収束判定は段階N4の実験で決め、達成頻度と最終λを成果物に記録する。
+- 目標ごとに加点λを持ち、評価の区切りで現在戦略の達成頻度との差に応じてλを更新する（双対上昇）。
+  更新規則と報告値は[規範](../hu-postflop.jp.md#4-計算停止storage)で確定。
 
 ### 3.2 指定方法
 

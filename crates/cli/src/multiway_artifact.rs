@@ -112,6 +112,9 @@ pub fn export(
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Tree => views::ExportView::Tree,
         ExportView::Summary => views::ExportView::Summary,
+        ExportView::Lock => {
+            anyhow::bail!("export lock: the solution must be a postflop .sol artifact")
+        }
         ExportView::Decision => {
             anyhow::bail!("export decision: the solution must be a postflop .sol artifact")
         }

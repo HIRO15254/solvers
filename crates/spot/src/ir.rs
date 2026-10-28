@@ -170,6 +170,63 @@ fn serialize_board<S: serde::Serializer>(board: &[Card], serializer: S) -> Resul
         .serialize(serializer)
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProfileIr {
+    pub locks: Vec<LockIr>,
+    pub incentives: Vec<IncentiveIr>,
+    pub frequencies: Vec<FrequencyIr>,
+    pub freeze_upstream: Option<FreezeIr>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum HandSelector {
+    All,
+    Range(String),
+    Category(String),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct LockIr {
+    pub node: String,
+    pub hands: HandSelector,
+    pub strategy: LockStrategy,
+    pub confidence: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum LockStrategy {
+    Uniform(Vec<(String, f64)>),
+    PerCombo(Vec<(String, Vec<(String, f64)>)>),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct IncentiveIr {
+    pub node: String,
+    pub hands: HandSelector,
+    pub action: String,
+    pub amount: IncentiveAmount,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum IncentiveAmount {
+    PotFraction(f64),
+    Bb(f64),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FrequencyIr {
+    pub node: String,
+    pub hands: HandSelector,
+    pub action: String,
+    pub target: f64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FreezeIr {
+    pub solution: String,
+    pub sha256: Option<String>,
+}
+
 /// Validated game context passed to a product, at a preflop or postflop street root.
 #[derive(Clone)]
 pub struct Spot {
@@ -184,5 +241,6 @@ pub struct Spot {
     pub ranges: SeatVec<SeatRange>,
     pub tree: Tree,
     pub run: Run,
+    pub profile: Option<ProfileIr>,
     pub product: Product,
 }

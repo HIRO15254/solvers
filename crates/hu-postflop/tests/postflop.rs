@@ -230,6 +230,7 @@ fn river_only_config(river: StreetTree) -> PostflopConfig {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     }
 }
 
@@ -854,6 +855,7 @@ fn memory_usage_matches_allocated() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let rich_estimate = memory_usage(&rich_config);
     let rich_game = build_postflop_game(&rich_config, chip_ev());
@@ -925,6 +927,7 @@ fn memory_usage_matches_allocated() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let force_estimate = memory_usage(&force_config);
     let force_game = build_postflop_game(&force_config, chip_ev());
@@ -995,6 +998,7 @@ fn smoke_solve_3bet_pot() {
         iso_merging: true,
         track_node_info: false,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
 
     let estimate = memory_usage(&config);
@@ -1070,6 +1074,7 @@ fn untracked_node_info_stays_empty() {
         iso_merging: true,
         track_node_info: false,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     assert_eq!(
@@ -1317,6 +1322,7 @@ fn raise_fractions_size_independently_of_bet_fractions() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1427,6 +1433,7 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let shared_game = build_postflop_game(&shared_config, chip_ev());
 
@@ -1446,6 +1453,7 @@ fn matching_raise_and_bet_fractions_reproduce_shared_size_tree() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let distinct_game = build_postflop_game(&distinct_config, chip_ev());
 
@@ -1511,6 +1519,7 @@ fn raise_levels_apply_distinct_multiples_per_level() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1591,6 +1600,7 @@ fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -1670,6 +1680,7 @@ fn allin_rule_adds_one_action_without_duplicating_an_already_allin_size() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game_a = build_postflop_game(&config_a, chip_ev());
     let root_a = game_a.node_by_history("").expect("root history");
@@ -1708,6 +1719,7 @@ fn allin_rule_adds_one_action_without_duplicating_an_already_allin_size() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game_b = build_postflop_game(&config_b, chip_ev());
     let root_b = game_b.node_by_history("").expect("root history");
@@ -1758,6 +1770,7 @@ fn sub_minimum_raise_is_bumped_to_the_minimum_full_raise() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     let facing_bet = game.node_by_history("r2").expect("facing-bet history");
@@ -1810,6 +1823,7 @@ fn min_bet_refuses_to_open_below_its_own_value() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -1854,6 +1868,7 @@ fn odd_pot_terminal_payoffs_match_the_neighboring_even_pots() {
             iso_merging: true,
             track_node_info: true,
             preflop_aggressor: None,
+            profile_suit_perms: None,
         };
         let game = build_postflop_game(&config, chip_ev());
         let mut solver = Solver::<_, F32Storage>::new(game.game, Box::<Dcfr>::default(), Some(1));
@@ -1902,6 +1917,7 @@ fn history_round_trip_uses_r_tokens_through_river_entry_state() {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -2448,6 +2464,7 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
         iso_merging: false,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     };
     let game = build_postflop_game(&config, chip_ev());
 
@@ -2539,6 +2556,7 @@ fn rule_hits_fixture() -> PostflopConfig {
         iso_merging: true,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     }
 }
 

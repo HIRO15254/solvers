@@ -265,6 +265,7 @@ fn clairvoyance_config() -> PostflopConfig {
         iso_merging: false,
         track_node_info: true,
         preflop_aggressor: None,
+        profile_suit_perms: None,
     }
 }
 

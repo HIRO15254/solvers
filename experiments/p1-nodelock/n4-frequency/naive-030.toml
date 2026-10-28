@@ -1,0 +1,24 @@
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2s 7s Ks 4h 3d"
+[ranges]
+BB = "AK,KQ,AA,QQ,JJ"
+BTN = "AK,KQ,AA,QQ,JJ"
+[tree]
+script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 4000
+check_every = 25
+[run]
+memory = "1GiB"
+threads = 1
+
+[[profile.lock]]
+node = "root"
+combos = { "JdJc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "JhJc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "JhJd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "JsJc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "JsJd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "JsJh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "QdQc" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "QhQc" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "QhQd" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "QsQc" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "QsQd" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "QsQh" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KcQc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "KcQd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "KcQh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "KcQs" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "KdQc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "KdQd" = { "check" = 0.600000000, "bet 1" = 0.400000000 }, "KdQh" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KdQs" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KhQc" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KhQd" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KhQh" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "KhQs" = { "check" = 1.000000000, "bet 1" = 0.000000000 }, "AcKc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AcKd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AcKh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AdKc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AdKd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AdKh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AdAc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AhKc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AhKd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AhKh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AhAc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AhAd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsKc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsKd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsKh" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsAc" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsAd" = { "check" = 0.000000000, "bet 1" = 1.000000000 }, "AsAh" = { "check" = 0.000000000, "bet 1" = 1.000000000 } }

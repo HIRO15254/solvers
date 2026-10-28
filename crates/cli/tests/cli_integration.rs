@@ -764,6 +764,36 @@ threads = 1
 "#;
 
 #[test]
+fn profile_river_no_rivers_and_asymmetric_freeze_are_input_errors() {
+    let dir = temp_dir("profile-turn-boundaries");
+    let config = dir.join("turn.toml");
+    let run = dir.join("run");
+    std::fs::write(&config, TINY_TURN_TOML).unwrap();
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+
+    let no_rivers = format!(
+        "{TINY_TURN_TOML}\n[output]\nsolution_streets = 'no-rivers'\n[[profile.lock]]\nnode = 'xx[?]'\nstrategy = {{ check = 1.0 }}\n"
+    );
+    std::fs::write(&config, no_rivers).unwrap();
+    let output = run_solvers(&["validate", config.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("no-rivers"));
+
+    let freeze = format!(
+        "{TINY_TURN_TOML}\n[profile]\nfreeze_upstream = {{ solution = 'run/solution.sol' }}\n[[profile.lock]]\nnode = 'xx[?]'\nhands = '4c4h'\nstrategy = {{ check = 1.0 }}\n"
+    );
+    std::fs::write(&config, freeze).unwrap();
+    let output = run_solvers(&["validate", config.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("suit-isomorphism restriction"));
+}
+
+#[test]
 fn sol_export_and_inspect_smoke() {
     let dir = temp_dir("sol-smoke");
     let config = dir.join("turn.toml");

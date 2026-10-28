@@ -33,7 +33,11 @@ fn parse_p1(raw: &str, path: &Path) -> Result<(spot::Document, Settings<input::S
 /// Parse and lower a P1 input without measuring its tree.
 pub fn lower_config(raw: &str, path: &Path) -> Result<crate::PostflopConfig> {
     let (document, settings) = parse_p1(raw, path)?;
-    Ok(input::lower(&document.spot, &settings)?)
+    let mut config = input::lower(&document.spot, &settings)?;
+    if let Some(profile) = &document.spot.profile {
+        crate::profile::restrict_iso(&mut config, profile)?;
+    }
+    Ok(config)
 }
 
 /// A saved artifact's embedded config, parsed and lowered. The run that
@@ -48,7 +52,11 @@ pub(crate) struct ArtifactInput {
 /// Prepares an embedded config. `storage = "auto"` resolves to `ran_with`,
 /// the backend the artifact's metadata records.
 pub(crate) fn prepare_artifact(raw: &str, path: &Path, ran_with: &str) -> Result<ArtifactInput> {
-    let (document, settings) = parse_p1(raw, path)?;
+    let document = spot::Document::parse_embedded(raw, path)?;
+    if document.spot.product != spot::Product::HuPostflop {
+        bail!("NLH005: this command requires a P1 (HU Postflop) spot");
+    }
+    let settings = Settings::parse(&document.spot, &document.solver, &document.output)?;
     let storage = match settings.solver.storage {
         input::StorageChoice::F32 => input::Storage::F32,
         input::StorageChoice::I16 => input::Storage::I16,
@@ -60,7 +68,10 @@ pub(crate) fn prepare_artifact(raw: &str, path: &Path, ran_with: &str) -> Result
             other => bail!("artifact metadata names unknown storage {other:?}"),
         },
     };
-    let config = input::lower(&document.spot, &settings)?;
+    let mut config = input::lower(&document.spot, &settings)?;
+    if let Some(profile) = &document.spot.profile {
+        crate::profile::restrict_iso(&mut config, profile)?;
+    }
     Ok(ArtifactInput {
         spot: document.spot,
         settings: settings.with_storage(storage),
@@ -72,7 +83,10 @@ pub(crate) fn prepare_artifact(raw: &str, path: &Path, ran_with: &str) -> Result
 pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     let (document, settings) = parse_p1(raw, path)?;
     let effective = document.normalize(&P1Sections)?;
-    let config = input::lower(&document.spot, &settings)?;
+    let mut config = input::lower(&document.spot, &settings)?;
+    if let Some(profile) = &document.spot.profile {
+        crate::profile::restrict_iso(&mut config, profile)?;
+    }
     let payoff = NlhPayoff::new(&document.spot)?;
     let target = settings
         .solver

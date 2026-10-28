@@ -308,6 +308,14 @@ Web GUI（React + TypeScript、Vite）はdaemon HTTPだけを使うclientであ�
 |Results|`/solution/{summary,tree,decision}?node=`（未保存River節点は`&resolve=rivers`）、Exportは`/solution/strategy?format=csv`|`tree`の`children`で節点を辿り、chance nodeはlabelからcardを選ぶ。action nodeの頻度・戦略・EVは`decision`の1 requestで得る。13×13 gridはcombo行を到達weightで重み付けしたclass集計であり、戦略・EVの計算はしない|
 |Guide|なし|各画面の操作手順と、このGUIから撮ったscreenshot（`web/public/guide/*.png`、buildで`dist/guide/`へ写す）を並べる静的な頁|
 
+P1のprofileはSetupでlock・incentive・frequencyを追加・編集・削除し、同じInput文書に保存する。
+hand selector、action label、confidenceや目標の妥当性はCLIの検証に委ねる。
+`freeze_upstream.solution`はhostのfile pathを必要とするため、daemonはself-contained境界で拒否する。
+GUIは設定を保持して制約を示し、上流固定のsolveはCLIで行う。
+Resultsはsolutionに記録されたprofileを表示し、lock対象と上流固定を通常の戦略表示と区別する。
+incentiveを含む一般和のrunでは、表示EVにincentive加点を含まないことを示す。頻度目標には
+達成頻度・誤差・λを併記する。profileの無いsolutionの表示と既存responseは変えない。
+
 SetupのTree stepはscriptの`param`宣言を入力欄として表示し、変更を`[tree.params]`へ書く。
 script本文の宣言既定値は変更せず、validateのparam診断と同じ宣言・overrideを扱う。
 サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を

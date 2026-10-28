@@ -251,6 +251,45 @@ P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とb
 P1の保存streetは`[output] solution_streets`で設定する。
 no-riversはRiverの戦略と値を省く。省いたRiverはviewer・`export --resolve-rivers`・Web GUIのResultsが開いた時にその場で再solveする。
 
+### P1のnodelockと相手profile
+
+`solvers tree spot.toml --node root`で実際のaction labelを確認し、configに`[profile]`を追加する。
+例えばboardが`2c 7d 9h Js Qs`、BB rangeに`AsAh`を含み、rootにcheckがある場合:
+
+```toml
+[[profile.lock]]
+node = "root"
+combos = { AsAh = { check = 1.0 } }
+```
+
+comboごとの固定のほか、`combos`の代わりに`hands = "AA,KK"`または
+`category = "toppair & !flushdraw"`と`strategy = { check = 0.5 }`を使える。
+部分lockでは残りの確率を未指定actionで最適化する。`confidence = 0.5`のsoft lockは
+固定戦略50%と自由戦略50%を混ぜるため、全actionの確率を指定し合計1にする。
+categoryの名称と式は[P1規範](hu-postflop.jp.md#hand-category)を参照する。
+
+相手の判断を偏らせるには別の`[[profile.incentive]]`で`node`、`action`、任意の
+`hands`または`category`と、pot比の`pot = 0.03`（またはBB単位の`bb = 0.5`）を指定する。
+加点は上流へ伝播し、incentiveのある計算は一般和となる。集計頻度を目標にするには
+`[[profile.frequency]]`に`node`、`action`、任意のhand指定と`target = 0.5`を書く。
+頻度は到達weightで加重しrunoutごとに測る。solveの表示と`run.json`で達成値・差・λを確認する。
+combo単位の固定と集計頻度目標は異なり、同じnodeの同じhandに重複するとerrorになる。
+
+上流を基準解に固定する場合は`[profile]`に
+`freeze_upstream = { solution = "runs/base/solution.sol" }`を指定する。基準解は同じ木と
+hand supportを持つ必要があり、実効configにpathとSHA-256が保存される。
+基準fileのhashはvalidate・solve時に照合し、大文字・小文字を区別しない。
+freeze由来の`.sol`を読み込む、exportする、比較する際は基準fileを再読込・再hashしない。
+既存解の戦略からlockを作るには次を使い、出力をconfigに貼り付けて編集する:
+
+```sh
+solvers export runs/base/solution.sol lock --node root --output lock.toml
+solvers validate spot.toml
+```
+
+選択nodeに到達するcomboだけを出す。入力の詳細・wildcard・制約は
+[共通Input規範](nlh-input-v1.jp.md)を参照する。profileはP1専用である。
+
 ## 5. 監視・停止・再開する
 
 P1の`[run] final_checkpoint = false`は終了時の再開state保存を省く設定で、既定はtrue（PF9、2026-10-08）。目標到達・iteration上限・時間上限・cancelの全てに適用し、定期checkpointと`.sol`は従来どおり保存する。保存した`run.toml`を編集してresumeにも適用できる。P2では指定不可（`NLH002`）。省いたrunは最終状態から再開できず、最後の定期checkpointから続ける。定期checkpointも無ければ`run.toml`から再solveする。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残るためiterationが重複し得る。
@@ -531,6 +570,8 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
 | 資源上限 / 75 | validate --resourcesで規模を確認し、treeやmemory予算を見直す |
 | 協調停止 / 130 | 保存checkpointからresume |
 | その他 / 1 | 使用中runへのresumeなら停止を待つか別directoryへfork。その他はfile path・権限・I/O診断を確認 |
+| `freeze_upstream`のsuit-isomorphism restriction / 2 | suit対称のrange・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする |
+| `no-rivers cannot be used with river profile or frozen nodes` / 2 | Riverに解決されるlock・incentive・frequencyまたは固定祖先があるため、`solution_streets`を`no-rivers`以外にする |
 
 未一致ruleのwarningはerrorではない。P2のnot-checked/incompleteは測定未完了を示す。
 型付き入力errorの診断に`resource limit`・`memory limit`・`node limit`等が含まれてもexit 2である。実際の資源上限errorだけがexit 75となる。

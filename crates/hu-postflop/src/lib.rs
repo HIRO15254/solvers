@@ -46,6 +46,7 @@ pub mod sol;
 pub mod artifact;
 pub mod index;
 pub mod prepare;
+pub mod profile;
 pub mod queries;
 pub mod report;
 pub mod run;

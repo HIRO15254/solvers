@@ -10,6 +10,7 @@
 //! The engine is intentionally heads-up only (`PerPlayer<T>` is a pair);
 //! generalizing to N players is an explicit non-goal.
 
+mod profile;
 mod reach;
 mod schedule;
 mod scratch;
@@ -17,6 +18,7 @@ mod solver;
 mod storage;
 mod tree;
 
+pub use profile::{NodeIncentive, NodeLock, Profile, ProfileError};
 pub use reach::{
     MismatchReason, SubtreeMismatch, pair_subtrees, parent_array, path_from_root, reach_at,
     reach_on_path,

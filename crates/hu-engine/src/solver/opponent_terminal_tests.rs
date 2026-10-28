@@ -130,6 +130,7 @@ fn run<const PRUNE: bool>(
         cfr_precision: precision,
         discounts: &discounts,
         par,
+        profile: None,
     };
     let old = PassCtx {
         tree: &tree,
@@ -138,6 +139,7 @@ fn run<const PRUNE: bool>(
         cfr_precision: precision,
         discounts: &discounts,
         par,
+        profile: None,
     };
     let own = vec![0.75; own_dim as usize];
     let reach: Vec<_> = (0..opp_dim)

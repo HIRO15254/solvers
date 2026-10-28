@@ -43,6 +43,25 @@ fn internal(error: impl std::fmt::Display) -> ErrorResponse {
     ErrorResponse::new(ErrorCode::Internal, error.to_string())
 }
 
+/// Reject client-selected upstream files before invoking any CLI parser.
+fn reject_external_profile(config: &str) -> ApiResult<()> {
+    let Ok(document) = config.parse::<toml::Value>() else {
+        // The CLI reports malformed TOML; it cannot resolve a path from it.
+        return Ok(());
+    };
+    if document
+        .get("profile")
+        .and_then(|profile| profile.get("freeze_upstream"))
+        .is_some()
+    {
+        return Err(ErrorResponse::new(
+            ErrorCode::ConfigNotSelfContained,
+            "profile.freeze_upstream refers to a file on the daemon host",
+        ));
+    }
+    Ok(())
+}
+
 impl Api {
     pub fn info(&self) -> ServerInfo {
         ServerInfo {
@@ -55,10 +74,9 @@ impl Api {
     /// Normalizes a config by running `solvers validate` over a temporary
     /// copy of the submitted text.
     ///
-    /// The temporary file is the daemon's own, never a path the client
-    /// named, so this cannot be turned into a way to read the daemon's
-    /// filesystem.
+    /// Reject external profile paths before the CLI can resolve them.
     pub fn validate(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
+        reject_external_profile(&request.config_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
         std::fs::write(&config, &request.config_toml).map_err(internal)?;
@@ -92,6 +110,7 @@ impl Api {
 
     /// Delegates table-only line replay to the CLI and passes its JSON through.
     pub fn line(&self, request: &LineRequest) -> ApiResult<serde_json::Value> {
+        reject_external_profile(&request.config_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
         std::fs::write(&config, &request.config_toml).map_err(internal)?;
@@ -112,6 +131,7 @@ impl Api {
 
     /// Builds a config's tree through the CLI and passes its JSON rows through.
     pub fn tree(&self, request: &TreeRequest) -> ApiResult<serde_json::Value> {
+        reject_external_profile(&request.config_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
         std::fs::write(&config, &request.config_toml).map_err(internal)?;
@@ -151,10 +171,8 @@ impl Api {
     /// Creates a run directory, writes the config into it, and submits the
     /// job.
     ///
-    /// The config is normalized first, which is also what enforces R10: a
-    /// config carrying an mwtree `source` cannot normalize without the file
-    /// it names, so it is refused here rather than resolved against the
-    /// daemon's filesystem.
+    /// The config is normalized first; external profile paths are rejected
+    /// before the CLI is started.
     pub fn create_run(&self, request: &CreateRunRequest) -> ApiResult<CreateRunResponse> {
         let effective = self
             .validate(&ValidateRequest {

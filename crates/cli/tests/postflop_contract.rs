@@ -53,6 +53,111 @@ fn solve(config: &str, directory: &Path) -> std::path::PathBuf {
     ]);
     run
 }
+#[test]
+fn profile_validation_report_and_lock_export() {
+    let directory = tempfile::tempdir().unwrap();
+    let profile = r#"
+[[profile.lock]]
+node = "root"
+combos = { AsAh = { check = 1.0 } }
+
+[[profile.frequency]]
+node = "x"
+action = "check"
+target = 0.5
+"#;
+    let config = CONFIG.replace("force bet", "replace bet");
+    let run = solve(&format!("{config}{profile}"), directory.path());
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(run.join("run.json")).unwrap()).unwrap();
+    assert_eq!(
+        report["profile"]["summary"]["selectors"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
+    let keys: Vec<_> = report
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(String::as_str)
+        .collect();
+    assert_eq!(
+        keys,
+        [
+            "configHash",
+            "configSchema",
+            "evP0",
+            "evP1",
+            "explP0",
+            "explP1",
+            "gameKind",
+            "iterations",
+            "kind",
+            "nashConv",
+            "profile",
+            "utilityUnit",
+            "wallSecs"
+        ]
+    );
+    assert_eq!(report["profile"]["frequencies"][0]["target"], 0.5);
+    assert!(report["profile"]["frozen_nodes"].is_array());
+    assert!(report["profile"]["general_sum"].is_boolean());
+    let input = directory.path().join("config.toml");
+    let validated = ok(&["validate", input.to_str().unwrap(), "--format", "json"]);
+    let value: serde_json::Value = serde_json::from_slice(&validated.stdout).unwrap();
+    assert_eq!(value["profile"]["selectors"].as_array().unwrap().len(), 2);
+
+    let output = ok(&[
+        "export",
+        run.join("solution.sol").to_str().unwrap(),
+        "lock",
+        "--node",
+        "root",
+    ]);
+    let fragment = String::from_utf8(output.stdout).unwrap();
+    let parsed: toml::Value = toml::from_str(&fragment).unwrap();
+    assert!(
+        parsed["profile"]["lock"][0]["combos"]["AsAh"]["check"]
+            .as_float()
+            .unwrap()
+            > 0.99
+    );
+    std::fs::write(&input, format!("{config}\n{fragment}")).unwrap();
+    ok(&["validate", input.to_str().unwrap()]);
+}
+
+#[test]
+fn invalid_profile_selector_is_an_input_error() {
+    let directory = tempfile::tempdir().unwrap();
+    let input = directory.path().join("invalid.toml");
+    std::fs::write(
+        &input,
+        format!(
+            "{CONFIG}\n[[profile.lock]]\nnode = \"not-a-node\"\nstrategy = {{ check = 1.0 }}\n"
+        ),
+    )
+    .unwrap();
+    for command in ["validate", "solve"] {
+        let output = if command == "solve" {
+            invoke(&[
+                command,
+                input.to_str().unwrap(),
+                "--out",
+                directory.path().join("run").to_str().unwrap(),
+            ])
+        } else {
+            invoke(&[command, input.to_str().unwrap()])
+        };
+        assert_eq!(
+            output.status.code(),
+            Some(2),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}
 
 #[test]
 fn checkpoint_events_do_not_repeat_the_final_iteration() {
@@ -73,6 +178,29 @@ fn checkpoint_events_do_not_repeat_the_final_iteration() {
     let saved = hu_postflop::checkpoint::read_checkpoint(&run.join("checkpoint.ckpt")).unwrap();
     let summary: serde_json::Value =
         serde_json::from_slice(&std::fs::read(run.join("run.json")).unwrap()).unwrap();
+    let keys: Vec<_> = summary
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(String::as_str)
+        .collect();
+    assert_eq!(
+        keys,
+        [
+            "configHash",
+            "configSchema",
+            "evP0",
+            "evP1",
+            "explP0",
+            "explP1",
+            "gameKind",
+            "iterations",
+            "kind",
+            "nashConv",
+            "utilityUnit",
+            "wallSecs"
+        ]
+    );
     assert_eq!(saved.iteration, summary["iterations"].as_u64().unwrap());
 }
 

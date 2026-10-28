@@ -42,6 +42,19 @@ pub struct ToyEvaluator {
 }
 
 impl TerminalEvaluator for ToyEvaluator {
+    fn supports_compat_mass(&self) -> bool {
+        true
+    }
+    fn compat_mass(&self, _space: u32, _p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        for (h, value) in out.iter_mut().enumerate() {
+            *value = opp_reach
+                .iter()
+                .enumerate()
+                .filter(|(o, _)| *o != h)
+                .map(|(_, r)| *r)
+                .sum();
+        }
+    }
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         let matrix = &self.terminals[terminal as usize][p];
         let h_count = self.num_hands;
@@ -421,4 +434,42 @@ pub fn leduc(pipeline: PayoffPipeline<'_>) -> ToyGame {
         }),
     };
     build_toy_game(&spec, pipeline)
+}
+
+#[cfg(test)]
+mod profile_tests {
+    use super::*;
+    use crate::game::{ChipEv, NoRake};
+    use hu_engine::{Dcfr, F32Storage, NodeKind, NodeLock, Profile, Solver};
+
+    #[test]
+    fn fully_locked_kuhn_opponent_converges_to_best_response() {
+        let toy = kuhn(PayoffPipeline {
+            rake: &NoRake,
+            utility: &ChipEv,
+        });
+        let tree = &toy.game.tree;
+        let mut locks = vec![None; tree.storage_refs.len()];
+        for node in &tree.nodes {
+            if node.kind == NodeKind::Action && node.player == Player::P0 {
+                let sref = tree.storage_ref(node);
+                locks[sref.index as usize] = Some(NodeLock {
+                    fixed: vec![1.0 / sref.num_actions as f32; sref.len()],
+                    confidence: vec![1.0; sref.num_hands as usize],
+                });
+            }
+        }
+        let profile = Profile {
+            incentives: vec![None; locks.len()],
+            locks,
+        };
+        let mut solver = Solver::<_, F32Storage>::new(toy.game, Box::new(Dcfr::default()), None);
+        solver.set_profile(profile).unwrap();
+        solver.run(10_000);
+        assert!(
+            (solver.expected_value(Player::P1) - solver.best_response_value(Player::P1)).abs()
+                < 1e-3
+        );
+        assert!(solver.exploitability()[Player::P1].abs() < 1e-3);
+    }
 }

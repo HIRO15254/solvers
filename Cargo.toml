@@ -49,6 +49,7 @@ tempfile = "3"
 tiny_http = { version = "0.12", features = ["ssl-rustls"] }
 criterion = "0.5"
 blake3 = "1"
+sha2 = "0.10"
 postcard = { version = "1", default-features = false, features = ["alloc", "use-std"] }
 zstd = "0.13"
 rustc-hash = "2"

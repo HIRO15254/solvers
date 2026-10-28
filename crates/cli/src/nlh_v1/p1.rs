@@ -19,6 +19,11 @@ pub fn validate(
     resources: bool,
 ) -> Result<()> {
     let p = prepare(raw, path)?;
+    let profile = if p.document.spot.profile.is_some() {
+        run::validate_profile(&p)?
+    } else {
+        None
+    };
     let mut summary = p.document.summary();
     summary.warnings = warnings(&p);
     let mut value = serde_json::to_value(summary)?;
@@ -28,6 +33,9 @@ pub fn validate(
     value["gameKind"] = json!("hu-postflop");
     value["amountUnit"] = json!("BB");
     value["utilityUnit"] = json!(utility_unit(&p));
+    if let Some(profile) = &profile {
+        value["profile"] = serde_json::to_value(profile)?;
+    }
     let normalized = p.document.normalize(&input::P1Sections)?;
     if resources {
         value["resources"] = json!({
@@ -57,6 +65,21 @@ pub fn validate(
                 utility_unit(&p)
             );
             print!("{}", human_summary(&p));
+            if let Some(profile) = &profile {
+                println!(
+                    "profile: matched_nodes={} matched_hands={} iso_restricted={}",
+                    profile.matched_nodes, profile.matched_hands, profile.iso_restricted
+                );
+                for selector in &profile.selectors {
+                    println!(
+                        "  {} {}: nodes={} hands={}",
+                        selector.kind,
+                        selector.node,
+                        selector.matched_nodes,
+                        selector.matched_hands
+                    );
+                }
+            }
             for warning in warnings(&p) {
                 println!("warning: {warning}");
             }
@@ -348,6 +371,17 @@ fn execute(
                     );
                     metrics.as_mut().expect("progress opened").append(&row)?;
                 }
+                run::Observation::ProfileProgress {
+                    iteration,
+                    frequencies,
+                } => {
+                    for frequency in frequencies {
+                        println!(
+                            "iter={iteration:>8} frequency={}",
+                            serde_json::to_string(&frequency)?
+                        );
+                    }
+                }
                 run::Observation::Checkpoint { iterations } => {
                     let _ = recorder
                         .events_mut()
@@ -372,13 +406,16 @@ fn execute(
         },
     );
     let outcome = outcome.and_then(|summary| -> Result<String> {
-        let result = json!({
+        let mut result = json!({
             "kind": "hu-postflop", "gameKind": "hu-postflop", "configSchema": SCHEMA,
             "configHash": runfiles::config_hash_hex(&hash), "utilityUnit": utility_unit(&p),
             "iterations": summary.iterations, "wallSecs": summary.wall.as_secs_f64(),
             "evP0": summary.ev[Player::P0], "evP1": summary.ev[Player::P1],
             "explP0": summary.expl_p0, "explP1": summary.expl_p1, "nashConv": summary.nash_conv,
         });
+        if let Some(profile) = &summary.profile {
+            result["profile"] = serde_json::to_value(profile)?;
+        }
         std::fs::write(
             &paths.result,
             format!("{}\n", serde_json::to_string_pretty(&result)?),

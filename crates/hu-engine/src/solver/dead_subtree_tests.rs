@@ -124,6 +124,8 @@ fn unpruned_values<S: Storage>(solver: &Solver<Evaluator, S>, p: Player) -> (f64
         storage: &solver.storage,
         p,
         par: solver.par,
+        profile: None,
+        incentives: false,
     };
     let mut scratch = Scratch::new();
     let mut ev = vec![0.0; ctx.tree.root_dims[p] as usize];
@@ -249,6 +251,7 @@ fn nonzero_subnormal_opponent_reach_is_evaluated() {
         p: Player::P0,
         discounts: &discounts,
         par: solver.par,
+        profile: None,
     };
     let mut storage = F32Storage::new(0, 0);
     let mut view = storage.view_mut();
@@ -354,6 +357,7 @@ fn check_parallel_updates<S: Storage>(par: ParConfig) {
                 p: Player::P0,
                 discounts: &discounts,
                 par,
+                profile: None,
             };
             let zeros = vec![0.0; 257];
             let mut old = S::new(g.tree.storage_len, g.tree.storage_refs.len());
@@ -429,6 +433,8 @@ fn exact_flat_values<S: Storage>() {
                 storage: &solver.storage,
                 p,
                 par: solver.par,
+                profile: None,
+                incentives: false,
             };
             for (ev_on, br_on) in [(true, true), (true, false), (false, true)] {
                 let mut old_ev = vec![0.0; dim];

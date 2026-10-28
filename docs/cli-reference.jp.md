@@ -147,6 +147,14 @@ solvers validate <CONFIG> [--format human|json] [--show-effective]
 
 human表示は製品、開始状態、lineの行動、treeのparam・展開済みrule、警告を示す。
 P1のline表示の`*`は暗黙foldである。金額はBB、utilityはcashでBB、ICMで賞金単位である。
+P1のprofile指定時は実際の木へselectorを解決し、humanでは一致node・hand数と各selectorの内訳、
+JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。
+不正なselectorやactionは入力errorである。profileが無い場合はfieldを追加しない。
+profileの`node`にはrootを示す`root`または空文字列も使える。lockとfrequencyの同一node・同一handへの重複はerror。
+`freeze_upstream`でsuit非対称selectorによるiso grouping制限が基準解と異なる木を生む場合はerror。
+suit対称range・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする。
+`output.solution_streets = "no-rivers"`は、解決済みのlock・incentive・frequencyまたは固定祖先がRiverにある場合はerror。
+基準fileのSHA-256はvalidate・solve時に大文字・小文字を区別せず照合するが、freeze由来の`.sol`の読込・export・比較時には再読込・再hashしない。
 JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLIの追加fieldはcamelCaseである。
 
 | field | 内容 |
@@ -248,10 +256,15 @@ P1は構築前の見積り、P2はpublic tree構築でrule hitを確認し、未
 | `run.json` | 終了区間のsummary |
 | `checkpoint.ckpt` / `solution.sol` | P1の再開state / 閲覧用戦略・値 |
 | `checkpoint.mwckpt` / `solution.mwsol` | P2の再開state / 閲覧用平均profile |
+P1のprofile付き`run.json`には`profile`を追加する。`summary`は一致node・hand数、
+iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`general_sum`は一般和の有無、
+`frequencies`は各目標の`entry`・`node`・`target`・`achieved`・`error`・`lambda`である。
+到達weightが無い場合の`achieved`と`error`はnull。評価時の頻度はstdoutにも表示し、
+既存の`progress.jsonl`形式は変えない。profile無しでは`profile`自体を出さない。
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`はversion 4、checkpointはversion 5だけを受理する。`.sol` v1/2/3とcheckpoint v1/2/3/4は明示拒否する。旧形式は現行configから再solveする。
+P1 `.sol`は通常version 4、profile付きversion 5、checkpointは通常version 5、頻度目標付きversion 6を受理する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -382,9 +395,13 @@ solvers export <SOLUTION> <VIEW> [--node NODE]... [--rest-of-street] [--format j
                [--resolve-rivers [--river-iterations N] [--river-target X]]
 ```
 
-VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary` / `decision`である。
+VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary` / `decision` / `lock`である。
 `decision`はP1専用・JSON専用で、同じnodeの`actions`・`strategy`・`ev`の行を同名keyに持つ1つのobjectを1回の読込みで返す。
 各keyの行は同名viewの出力と同じであり、`--resolve-rivers`の再解決も3つで共有する。`--format csv`とP2の`.mwsol`は値を読む前に入力error（exit 2）で拒否する。
+`lock`はP1の単一action nodeの到達可能comboごとの平均戦略をaction label付き
+`[[profile.lock]]` TOMLとして出す。`--node`は1つだけ指定し、`all`・`--rest-of-street`・
+CSV・P2は使えない。既定のformat指定のままTOMLを出力する。必要なら`--resolve-rivers`を使える。
+生成断片をconfigに貼り付けて編集する。確率は保存時の量子化精度に従い、和を1に正規化する。
 `.sol`はP1、`.mwsol`はP2のreaderで読む。
 
 | flag | 既定 | 意味 |
@@ -424,6 +441,8 @@ P1はtree形状と保存node集合、通常はboard・pot・effective stack、se
 `mean_strategy_l1` / `max_strategy_l1`は戦略差、
 `mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
 EV差はcashでBB、ICMで賞金単位である。
+P1では両解のどちらかにprofileがある場合、`profile_conditions`に左右の正規化profile TOML
+（無い側はnull）を表示し、異なる場合は`profile_changed: true`を付ける。
 P1は保存index checksumとconfigから復元したseat別comboリスト・root range・開始streetが全て一致する場合だけ木とindexを共有する。異なれば右indexも通常どおり読込・検証する。共有時も右indexのchecksumを検証し、config hashの一致だけでは共有しない。
 P2は通常game fingerprintの一致を要求する。`--cross-game`でもseat mappingとutility単位の一致は必要である。
 
@@ -501,6 +520,8 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `130` | solve/resumeの協調停止 |
 
 型付き入力errorは診断に利用者由来の`resource limit`等を含んでもexit 2であり、資源上限はerror型でexit 75へ分類する。P2の資源診断は`NLH003`の表記を保つが入力errorとは区別する。
+profileのselector解決errorと`freeze_upstream`のSHA-256不一致は入力error（exit 2）である。
+基準solution自体が破損・非互換なら通常の成果物error（exit 3）である。
 P1 exportのnode selector入力errorは履歴・label pathを解決できない場合と、`actions` / `strategy` / `ev` / `decision`へ非action nodeを指定した場合を含む。selector文字列に資源・成果物errorの語があってもexit 2であり、I/O等のexport失敗（exit 1）や破損・非互換（exit 3）と区別する。
 
 Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。

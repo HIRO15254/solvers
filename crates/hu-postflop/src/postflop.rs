@@ -113,6 +113,8 @@ pub struct PostflopConfig {
     /// Merge turn/river deals into suit-isomorphism classes. River-only
     /// subgames never deal, so this has no effect there.
     pub iso_merging: bool,
+    /// Optional suit permutations preserved by profile selectors.
+    pub profile_suit_perms: Option<Vec<SuitPerm>>,
     /// Record per-node history/action-label metadata for
     /// [`PostflopGame::node_by_history`]. Costs a `String` + `Vec<String>`
     /// per action node, so large flop trees may want this off.
@@ -161,6 +163,7 @@ impl Default for PostflopConfig {
             streets: PerStreet::default(),
             min_bet: Chips(1),
             iso_merging: true,
+            profile_suit_perms: None,
             track_node_info: true,
             preflop_aggressor: None,
         }
@@ -246,6 +249,8 @@ pub struct PostflopEvaluator {
     fold_combos: PerPlayer<Vec<Hand>>,
     pub hands: PostflopHands,
     pub(crate) mask_cards: Vec<Card>,
+    /// Board masks indexed by profile incentive space.
+    profile_boards: Vec<u64>,
 }
 
 #[cfg(test)]
@@ -259,6 +264,21 @@ thread_local! {
 }
 
 impl TerminalEvaluator for PostflopEvaluator {
+    fn supports_compat_mass(&self) -> bool {
+        true
+    }
+
+    fn compat_mass(&self, space: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        kernel::board_compat_mass(
+            &self.fold_combos[p],
+            &self.fold_combos[p.opponent()],
+            &self.hands.same[p],
+            self.profile_boards[space as usize],
+            opp_reach,
+            out,
+        );
+    }
+
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
         self.eval_with_kernel(terminal, p, opp_reach, out, hu_engine::CfrPrecision::F64);
     }
@@ -615,6 +635,24 @@ impl TerminalEvaluator for PostflopEvaluator {
     }
 }
 impl PostflopEvaluator {
+    /// Register the board of an incentive node and return its compatibility
+    /// space key. Keys remain valid for the lifetime of this evaluator.
+    pub fn register_profile_board(&mut self, board: &[Card]) -> u32 {
+        let mask = board
+            .iter()
+            .fold(0u64, |mask, card| mask | (1u64 << card.index()));
+        if let Some(index) = self
+            .profile_boards
+            .iter()
+            .position(|&existing| existing == mask)
+        {
+            return index as u32;
+        }
+        let index = self.profile_boards.len() as u32;
+        self.profile_boards.push(mask);
+        index
+    }
+
     // Fold win payoffs are baked identically for both rank orientations.
     fn cfr_utilities(term: &PostflopTerminal, p: Player) -> [f64; 3] {
         match p {
@@ -945,6 +983,14 @@ fn range_preserving_perms(ranges: &PerPlayer<Range>) -> Vec<SuitPerm> {
             })
         })
         .collect()
+}
+
+fn game_preserving_perms(config: &PostflopConfig) -> Vec<SuitPerm> {
+    let mut perms = range_preserving_perms(&config.ranges);
+    if let Some(allowed) = &config.profile_suit_perms {
+        perms.retain(|p| allowed.contains(p));
+    }
+    perms
 }
 
 /// The next street's candidate cards, grouped into suit-isomorphism classes
@@ -1458,7 +1504,7 @@ fn build_checked(
         error: None,
         config,
         pipeline,
-        sym: range_preserving_perms(&config.ranges),
+        sym: game_preserving_perms(config),
         terminals: Vec::new(),
         rank_tables: Vec::new(),
         rank_table_ids: BTreeMap::new(),
@@ -1545,6 +1591,7 @@ fn build_checked(
         fold_combos,
         hands,
         mask_cards,
+        profile_boards: Vec::new(),
     };
 
     // Joint compatible weight, via the same inclusion-exclusion the fold
@@ -2208,7 +2255,7 @@ pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeB
 fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate, TreeBuildError> {
     let mut counting = Counting {
         config,
-        sym: range_preserving_perms(&config.ranges),
+        sym: game_preserving_perms(config),
         hands: PostflopHands::new(&config.board, &config.ranges),
         elements: 0,
         max_strategy_elements: 0,

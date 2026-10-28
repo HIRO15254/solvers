@@ -88,10 +88,12 @@ pub fn export(
     rivers: Option<RiverResolve>,
 ) -> Result<ExportData> {
     if let ExportView::Summary = view {
-        let metadata = SolReader::open(path)
-            .with_context(|| format!("reading {}", path.display()))?
-            .into_metadata();
-        return Ok(ExportData::Summary(summary(&metadata)?));
+        let reader =
+            SolReader::open(path).with_context(|| format!("reading {}", path.display()))?;
+        return Ok(ExportData::Summary(summary(
+            reader.metadata(),
+            reader.profile(),
+        )?));
     }
     let loaded = match rivers {
         Some(rivers) => load_sol(path, rivers.iterations, rivers.target)?,
@@ -257,12 +259,28 @@ pub struct Summary {
     pub streets_stored: String,
     pub nodes: usize,
     pub stored_nodes: usize,
+    /// Resolved profile metadata; absent for profile-free solutions.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile: Option<Box<crate::run::ProfileReport>>,
+    /// Normalized profile input from the solution's embedded configuration.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile_config: Option<Box<toml::Value>>,
 }
 
-fn summary(metadata: &SolMetadata) -> Result<Summary> {
+fn summary(metadata: &SolMetadata, profile: Option<&crate::run::ProfileReport>) -> Result<Summary> {
     crate::prepare::require_artifact_config(&metadata.config_toml)?;
     let config = crate::prepare::lower_config(&metadata.config_toml, Path::new("embedded.toml"))?;
     let meta = &metadata.meta;
+    let profile_config = if profile.is_some() {
+        metadata
+            .config_toml
+            .parse::<toml::Value>()?
+            .get("profile")
+            .cloned()
+            .map(Box::new)
+    } else {
+        None
+    };
     Ok(Summary {
         board: config
             .board
@@ -287,6 +305,8 @@ fn summary(metadata: &SolMetadata) -> Result<Summary> {
         },
         nodes: metadata.tree_nodes as usize,
         stored_nodes: metadata.stored_nodes as usize,
+        profile: profile.cloned().map(Box::new),
+        profile_config,
     })
 }
 
@@ -888,6 +908,9 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
         ev_oop: [left.meta.ev[0], right.meta.ev[0]],
         ev_ip: [left.meta.ev[1], right.meta.ev[1]],
         nash_conv: [left.meta.nash_conv, right.meta.nash_conv],
+        profile_conditions: (left.profile_toml.is_some() || right.profile_toml.is_some())
+            .then(|| [left.profile_toml.clone(), right.profile_toml.clone()]),
+        profile_changed: left.nlh.0.profile != right.nlh.0.profile,
     };
     Ok(report)
 }
@@ -909,4 +932,14 @@ pub struct ComparisonReport {
     pub ev_oop: [f64; 2],
     pub ev_ip: [f64; 2],
     pub nash_conv: [f64; 2],
+    /// Whether normalized profile conditions differ.
+    #[serde(skip_serializing_if = "is_false")]
+    pub profile_changed: bool,
+    /// Both normalized profile sections, with None for an unprofiled side.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub profile_conditions: Option<[Option<String>; 2]>,
+}
+
+fn is_false(value: &bool) -> bool {
+    !value
 }

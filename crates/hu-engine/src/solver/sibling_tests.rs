@@ -91,6 +91,7 @@ fn sibling_rows_default_pruning_empty_dimensions_and_parallel_actions() {
                                 cfr_precision: precision,
                                 discounts: &discounts,
                                 par,
+                                profile: None,
                             };
                             let old = PassCtx {
                                 tree: &tree,
@@ -99,6 +100,7 @@ fn sibling_rows_default_pruning_empty_dimensions_and_parallel_actions() {
                                 cfr_precision: precision,
                                 discounts: &discounts,
                                 par,
+                                profile: None,
                             };
                             let mut out = vec![0.0; dim as usize];
                             let mut expected = out.clone();

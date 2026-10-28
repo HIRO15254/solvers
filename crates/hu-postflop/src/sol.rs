@@ -10,7 +10,7 @@
 //! `NoRivers` mode retains the full tree/index but omits river strategy and
 //! value blocks; the viewer re-solves rivers lazily on demand.
 //!
-//! Format version 4 is indexed so a reader never decodes more than it asks
+//! Format versions 4 and 5 are indexed so a reader never decodes more than it asks
 //! for. All integers are little-endian:
 //!
 //! ```text
@@ -122,7 +122,7 @@ pub enum SolError {
     #[error("not a solvers .sol file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported .sol format version {found} (expected {expected}); re-solve to write the current format (docs/hu-postflop.jp.md)"
+        "unsupported .sol format version {found} (expected {expected} or 5); re-solve to write the current format (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
     #[error(".sol file truncated: expected at least {expected} bytes, got {actual}")]
@@ -250,6 +250,7 @@ pub struct SolPayload {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct SolHeader {
+    version: u16,
     config_hash: [u8; 32],
     iteration: u64,
     metadata_len: u64,
@@ -268,7 +269,7 @@ fn check_identity(buf: &[u8; 10]) -> Result<(), SolError> {
         return Err(SolError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION {
+    if version != FORMAT_VERSION && version != 5 {
         return Err(SolError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -281,6 +282,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> SolHeader {
     let u64_at = |at: usize| u64::from_le_bytes(buf[at..at + 8].try_into().expect("8 bytes"));
     let hash_at = |at: usize| -> [u8; 32] { buf[at..at + 32].try_into().expect("32 bytes") };
     SolHeader {
+        version: u16::from_le_bytes([buf[8], buf[9]]),
         config_hash: hash_at(10),
         iteration: u64_at(42),
         metadata_len: u64_at(50),
@@ -296,7 +298,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> SolHeader {
 fn build_header(header: &SolHeader) -> [u8; HEADER_LEN] {
     let mut buf = [0u8; HEADER_LEN];
     buf[0..8].copy_from_slice(MAGIC);
-    buf[8..10].copy_from_slice(&FORMAT_VERSION.to_le_bytes());
+    buf[8..10].copy_from_slice(&header.version.to_le_bytes());
     buf[10..42].copy_from_slice(&header.config_hash);
     buf[42..50].copy_from_slice(&header.iteration.to_le_bytes());
     buf[50..58].copy_from_slice(&header.metadata_len.to_le_bytes());
@@ -434,6 +436,7 @@ fn decompress(compressed: &[u8], limit: usize, what: &'static str) -> Result<Vec
 pub struct SolReader {
     file: File,
     metadata: SolMetadata,
+    profile: Option<crate::run::ProfileReport>,
     directory: Directory,
     index_offset: u64,
     index_len: u64,
@@ -477,11 +480,18 @@ impl SolReader {
         if *blake3::hash(&metadata_frame).as_bytes() != header.metadata_checksum {
             return Err(SolError::Checksum("metadata"));
         }
-        let metadata: SolMetadata = postcard::from_bytes(&decompress(
+        let decoded = decompress(
             &metadata_frame,
             MAX_METADATA_BYTES,
             "metadata frame does not decompress",
-        )?)?;
+        )?;
+        let (metadata, profile): (SolMetadata, Option<crate::run::ProfileReport>) =
+            if header.version == 5 {
+                let (metadata, profile) = postcard::from_bytes(&decoded)?;
+                (metadata, Some(profile))
+            } else {
+                (postcard::from_bytes(&decoded)?, None)
+            };
         let computed = config_hash(metadata.config_toml.as_bytes());
         if computed != header.config_hash {
             return Err(SolError::HashMismatch {
@@ -539,6 +549,7 @@ impl SolReader {
         Ok(Self {
             file,
             metadata,
+            profile,
             directory,
             index_offset,
             index_len: header.index_len,
@@ -548,6 +559,11 @@ impl SolReader {
 
     pub fn metadata(&self) -> &SolMetadata {
         &self.metadata
+    }
+
+    /// Profile diagnostics, present in profile-bearing version 5 artifacts.
+    pub fn profile(&self) -> Option<&crate::run::ProfileReport> {
+        self.profile.as_ref()
     }
 
     pub(crate) fn index_checksum(&self) -> [u8; 32] {
@@ -997,9 +1013,19 @@ impl Write for HashingWriter<'_> {
 impl SolFileWriter {
     /// Starts a file with its metadata frame and the index frame that
     /// `write_index` streams (see [`crate::index`]).
+    #[cfg(any(test, feature = "test-support"))]
     pub(crate) fn create(
         path: &Path,
         metadata: &SolMetadata,
+        write_index: impl FnOnce(&mut dyn Write) -> std::io::Result<()>,
+    ) -> Result<Self, SolError> {
+        Self::create_with_profile(path, metadata, None, write_index)
+    }
+
+    pub(crate) fn create_with_profile(
+        path: &Path,
+        metadata: &SolMetadata,
+        profile: Option<&crate::run::ProfileReport>,
         write_index: impl FnOnce(&mut dyn Write) -> std::io::Result<()>,
     ) -> Result<Self, SolError> {
         let dir = path
@@ -1008,7 +1034,11 @@ impl SolFileWriter {
             .unwrap_or_else(|| Path::new("."));
         let mut file = tempfile::NamedTempFile::new_in(dir)?;
         file.write_all(&[0; HEADER_LEN])?;
-        let frame = zstd::bulk::compress(&postcard::to_allocvec(metadata)?, ZSTD_LEVEL)?;
+        let bytes = match profile {
+            Some(profile) => postcard::to_allocvec(&(metadata, profile))?,
+            None => postcard::to_allocvec(metadata)?,
+        };
+        let frame = zstd::bulk::compress(&bytes, ZSTD_LEVEL)?;
         file.write_all(&frame)?;
         let mut encoder = zstd::stream::write::Encoder::new(
             HashingWriter {
@@ -1025,6 +1055,7 @@ impl SolFileWriter {
             file,
             path: path.to_path_buf(),
             header: SolHeader {
+                version: if profile.is_some() { 5 } else { FORMAT_VERSION },
                 config_hash: config_hash(metadata.config_toml.as_bytes()),
                 iteration: metadata.meta.iterations,
                 metadata_len: frame.len() as u64,

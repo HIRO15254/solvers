@@ -253,6 +253,7 @@ fn check<const PRUNE: bool>(
         discounts: &discounts,
         cfr_precision: CfrPrecision::F32,
         par: ParConfig::default(),
+        profile: None,
     };
     let my = vec![0.75; e.hands[p].len()];
     let opp: Vec<_> = (0..e.hands[p.opponent()].len())

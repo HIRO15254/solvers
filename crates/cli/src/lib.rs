@@ -98,7 +98,9 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     }) {
         return 75;
     }
-    if error.chain().any(|cause| cause.is::<spot::SpotError>()) {
+    if error.chain().any(|cause| {
+        cause.is::<spot::SpotError>() || cause.is::<hu_postflop::profile::ProfileResolveError>()
+    }) {
         return 2;
     }
     #[cfg(feature = "p2")]
@@ -414,12 +416,13 @@ enum Command {
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
     },
-    /// Export a stable JSON or CSV view from a `.sol` or `.mwsol` artifact.
+    /// Export a JSON/CSV view, or a P1 lock TOML fragment, from an artifact.
     Export {
         solution: std::path::PathBuf,
         /// The view. `decision` (postflop, JSON only) holds `actions`,
         /// `strategy` and `ev` of the selected nodes from one load, so a
         /// `--resolve-rivers` re-solve serves all three.
+        /// `lock` (postflop only) emits a TOML profile for one action node.
         #[arg(value_enum)]
         view: artifact_args::ExportView,
         #[arg(long, value_enum, default_value = "json")]

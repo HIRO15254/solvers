@@ -39,6 +39,18 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ### Added
 
+- Heads-up postflop solver: opponent profile `[profile]` in `solvers.nlh/v1`
+  (P2 rejects it). `[[profile.lock]]` fixes strategies per combo, hand range or
+  hand-category expression, fully, partially or softly (`confidence`);
+  `[[profile.incentive]]` adds an EV bonus to an action (fraction of pot or BB,
+  excluded from reported EVs; runs become general-sum); `[[profile.frequency]]`
+  targets an action frequency per runout; `freeze_upstream` fixes ancestor
+  nodes to a base solution's average strategy. Node selectors accept `?`/`[?]`
+  runout wildcards. New `export <sol> lock --node` view emits editable lock
+  TOML from a solution. Profile-bearing `.sol` files use metadata version 5 and
+  frequency-target checkpoints use version 6; runs without a profile keep the
+  previous formats byte-for-byte apart from timing fields. The GUI shows and
+  edits profiles.
 - Tree-script `jam ACTION OP SIZE` effect for `bet` / `raise` with `>=` / `>`.
   It replaces qualifying existing candidates with all-in, using only the size
   literal's street-target conversion for the threshold (no minimum-raise bump

@@ -13,6 +13,24 @@ pub fn export(
     rivers: Option<RiverResolve>,
     output: Option<&Path>,
 ) -> Result<()> {
+    if matches!(view, ExportView::Lock) {
+        if nodes.len() != 1 || nodes[0] == "all" || rest_of_street {
+            anyhow::bail!("export lock node must be exactly one action node");
+        }
+        if matches!(format, ExportFormat::Csv) {
+            anyhow::bail!("export lock format must be TOML (omit --format csv)");
+        }
+        let rendered = lock_toml(path, nodes, rivers)?;
+        match output {
+            Some(path) => {
+                std::fs::write(path, rendered)
+                    .with_context(|| format!("writing {}", path.display()))?;
+                println!("wrote {}", path.display());
+            }
+            None => print!("{rendered}"),
+        }
+        return Ok(());
+    }
     let view = match view {
         ExportView::Summary => views::ExportView::Summary,
         ExportView::Tree => views::ExportView::Tree,
@@ -20,6 +38,7 @@ pub fn export(
         ExportView::Strategy => views::ExportView::Strategy,
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Range => views::ExportView::Range,
+        ExportView::Lock => unreachable!("handled above"),
         ExportView::Decision => {
             // Refused before loading: a river re-solve would be wasted.
             if let ExportFormat::Csv = format {
@@ -55,6 +74,51 @@ pub fn compare(left: &Path, right: &Path, cross_game: bool) -> Result<()> {
     print!("{}", to_json(&views::compare(left, right, cross_game)?)?);
     Ok(())
 }
+fn lock_toml(path: &Path, nodes: &[String], rivers: Option<RiverResolve>) -> Result<String> {
+    let ExportData::Actions(actions) =
+        views::export(path, views::ExportView::Actions, nodes, false, rivers)?
+    else {
+        unreachable!()
+    };
+    let ExportData::Strategy(rows) =
+        views::export(path, views::ExportView::Strategy, nodes, false, rivers)?
+    else {
+        unreachable!()
+    };
+    if actions.is_empty() || rows.is_empty() {
+        anyhow::bail!("export lock node must be an action node with reachable combos");
+    }
+    let mut combos = toml::map::Map::new();
+    for row in rows {
+        let total: f64 = row.probabilities.iter().map(|&p| f64::from(p)).sum();
+        if total <= 0.0 {
+            anyhow::bail!(
+                "export lock encountered an empty strategy for {}",
+                row.combo
+            );
+        }
+        let mut strategy = toml::map::Map::new();
+        for (action, probability) in actions.iter().zip(row.probabilities) {
+            strategy.insert(
+                action.action.clone(),
+                toml::Value::Float(f64::from(probability) / total),
+            );
+        }
+        combos.insert(row.combo, toml::Value::Table(strategy));
+    }
+    let mut lock = toml::map::Map::new();
+    lock.insert("node".into(), toml::Value::String(nodes[0].clone()));
+    lock.insert("combos".into(), toml::Value::Table(combos));
+    let mut profile = toml::map::Map::new();
+    profile.insert(
+        "lock".into(),
+        toml::Value::Array(vec![toml::Value::Table(lock)]),
+    );
+    let mut document = toml::map::Map::new();
+    document.insert("profile".into(), toml::Value::Table(profile));
+    Ok(toml::to_string(&toml::Value::Table(document))?)
+}
+
 fn to_json<T: Serialize>(value: &T) -> Result<String> {
     Ok(serde_json::to_string_pretty(value)? + "\n")
 }

@@ -238,6 +238,36 @@ export interface DecisionRows {
   ev: ValueRow[];
 }
 
+/** Profile diagnostics stored in a P1 solution. Entries index the corresponding config arrays. */
+export interface ProfileNode {
+  node: number;
+  history: string;
+  kind: "lock" | "incentive" | "frequency" | "frozen";
+  entry: number | null;
+  confidence: number | null;
+  partial: boolean | null;
+}
+
+export interface ProfileReport {
+  summary: {
+    matched_nodes: number;
+    matched_hands: number;
+    iso_restricted: boolean;
+    selectors: { kind: string; node: string; matched_nodes: number; matched_hands: number }[];
+    resolved_nodes: ProfileNode[];
+  };
+  frozen_nodes: number[];
+  general_sum: boolean;
+  frequencies: {
+    entry: number;
+    node: number;
+    target: number;
+    achieved: number | null;
+    error: number | null;
+    lambda: number;
+  }[];
+}
+
 export interface SolSummary {
   board: string;
   pot: number;
@@ -254,6 +284,8 @@ export interface SolSummary {
   streets_stored: string;
   nodes: number;
   stored_nodes: number;
+  profile?: ProfileReport | null;
+  profile_config?: Record<string, unknown>;
 }
 
 /** One `progress.jsonl` row of a P1 run (docs/hu-postflop.jp.md §6). */

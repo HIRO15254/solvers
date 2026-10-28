@@ -41,6 +41,8 @@ foldしたplayerのhole card removalは計算しない。
 `solver.iso_merging = true`（既定）はTurn/Riverのsuit同型dealを厳密な商として併合する。
 rangeとboardに対して同型な枝だけを併合し、確率とcomboの写像を保持する。
 board条件はsuit置換不変の述語だけである。`false`では併合しない。
+profileの指定がsuit非対称な場合、rangeとboardに加えその指定も保つ置換に併合を制限する。
+category式はsuit置換不変である。
 `inspect`のmember表示には代表cardに`*`を付ける制限がある。memberの表示remapと計算上の併合を区別する。
 
 terminal payoffは次の順に作る。
@@ -107,6 +109,77 @@ target有りの停止iterationは旧版と変わり得る。旧版と同じ停�
 autoでは評価の間を25 iteration以下のsub-batchに分け、各境界で中断・max_time・定期checkpointを判定する。
 整数では従来どおり指定間隔で判定する。sub-batchの区切りはCFRの結果を変えない。
 live queryのtarget判定にも同じ評価方式を使う。
+
+### profile、制約付き応答と頻度
+
+入力の`[profile]`の構文・検証は[共通Input規範](nlh-input-v1.jp.md)を参照する。
+lockはnodeとhandごとに適用する。固定確率を`f`、その和を`S`、confidenceを`p`、
+自由action上でregret matchingした分布を`q`とすると、実際の戦略は
+`σ = p·f + (1−p·S)·q`である。未指定actionの`f`は0とする。
+`p = 1`の部分lockでは未固定actionだけで`q`を作り、正のregretが無ければその集合で一様にする。
+自由actionの瞬時regretはそのaction価値から`q`で重み付けした自由actionの平均価値を引いたものとし、
+固定actionのregretは更新しない。`p = 1, S = 1`の完全lockではregret・戦略累積を更新しない。
+`p < 1`のソフトlockは全actionの確率を指定し合計1を要求し、`q`は全actionで最適化する。
+戦略累積は到達重み付きの`q`を蓄積し、平均戦略を読む際に同じ式で固定部分と混合する。
+
+incentiveは対象actionの利得にnode potの指定割合または指定BB額を加える。vector CFRでは
+加点に対象handと両立する相手reachの質量を掛け、対象playerのaction価値へ加える。
+加点を含む値を親へ返すため、上流の判断にも影響する。incentiveと頻度目標はchip EVに限る。
+表示・保存するEVとnode別の値は加点を除く真のEVである。
+
+各席の逸脱利得`g_i`（`explP0` / `explP1`）は、その席の利得で測った制約付きbest responseと
+平均戦略の値の差である。対象席のincentiveは両方に含める。lockを持つhandのbest responseは
+`p·Σ_a f_a v_a + (1−p·S)·max_{a∈A} v_a`で、`A`は`p = 1`なら未固定action、
+それ以外は全actionである。完全lockでは固定部分だけを使う。
+incentiveを含むゲームは一般和として両席を個別に評価し、`g_0 + g_1`をNashConvとして報告する。
+零和ゲームのexploitabilityと同一視しない。lockだけのrakeなしchip EVは零和のままである。
+
+頻度目標は各runoutの対象nodeごとに、指定handのactor到達weightで加重したaction頻度である。
+到達weightの合計が0なら達成頻度と差は未定義となる。評価境界で目標ごとのλを
+`λ ← λ + 0.1·(target − achieved)·node_pot`と更新し、対象actionのincentiveに加える。
+更新には現在戦略の頻度を使い、経路の到達weightと報告する頻度には平均戦略を使う。
+報告する差は`|achieved − target|`であり、目標への到達を保証する停止条件ではない。
+
+`freeze_upstream`は指定された基準`.sol`の平均戦略で、profile対象nodeの真の祖先にあるaction nodeを
+固定する。ただし別の明示profile entryの対象nodeは固定しない。handが選択されないnodeにはlockを作らず、
+entryの全対象nodeでhandが空なら入力エラーとする。
+基準解のboard、pot、stack、tree、action label、hand supportを照合し、
+必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で基準解と木が異なる場合、
+現在はfreezeを拒否する。実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
+保存済み成果物の読み込み時には基準fileを再読込しない。
+`solution_streets = "no-rivers"`はprofileまたは固定祖先がRiverにある場合は拒否する。
+profileを変更したcheckpointのresumeは互換性hashの不一致として拒否する。
+profileの無いrunは追加演算を行わず、f32/f64と全storage backendで従来の結果・成果物をbit一致させる。
+
+### hand category
+
+<a id="hand-category"></a>
+
+boardは3〜5枚、holeを含め全cardは相異なる。made handは次の優先順で各comboを一つに分類する。
+Riverではboardだけのbest fiveとholeを含むbest fiveの役の強さが同じなら`boardplay`を最優先する。
+hole cardが同rankのboard cardの代わりになれる場合も含む。
+
+| 名前 | 定義 |
+|---|---|
+| `boardplay` | Riverのbest fiveがboard単独と同じ強さ |
+| `straightflush`、`quads`、`fullhouse`、`flush`、`straight` | best handが対応する通常の役 |
+| `set` | pocket pairとboardのrankによるthree of a kind |
+| `trips` | それ以外のthree of a kind。より良いkickerを持つboard tripsを含む |
+| `twopair` | best handがtwo pair。両pairがboardだけにある場合も含む |
+| `overpair` | 全board rankより上のpocket pair |
+| `underpair` | 全board rankより下のpocket pair |
+| `toppair`、`secondpair`、`thirdpair` | hole cardを含むpairのrankがそれぞれ異なるboard rankの最高、2番目、それ以下に対応。board rankの間のpocket pairも同じrank順 |
+| `highcard` | pair以上が無い場合、およびone pairがboardだけにある場合。ace-highを含む |
+
+drawは独立flagで複数同時に成立する。`flushdraw`は同suitがちょうど4枚でholeに1枚以上、
+`oesd`はstraightを完成する異なるrankが2つ以上、`gutshot`はちょうど1つ必要である。
+既にstraightがある場合と、outを加えたboard単独のstraightがhandのbest straight以上となるoutは除く。`backdoorflush`はFlopのみ、
+同suitが3枚でholeに1枚以上。`backdoorstraight`はFlopのみ、5 rankのstraight windowで
+欠けるrankがちょうど2つであり、board単独では完成できないものを要する。
+drawは勝つhandを保証しない。`nodraw`はflag無し、`draw`は何らかのflag、
+`combodraw`はflush drawといずれかのstraight drawを意味する。Riverでは全draw flagがfalse。
+`pair`は全one-pair分類を、`twopairplus`はtwo pair以上をまとめるが`boardplay`を除く。
+式は名前と`!`、`&`、`|`を使い、この順に優先する。括弧で順序を変更できる。
 
 `[solver] cfr_precision`は`"f32"`（既定）と`"f64"`を選べる。対象はCFR passの終端kernelとcurrent strategyのregret matchingである。
 f32ではshowdown・foldのreach和、cardごとの和、効用とその演算をf32で計算する。
@@ -217,7 +290,7 @@ autoの評価ごとにprogressを追記するため、target有りでは行のit
 再開時は`progress.jsonl`のcheckpoint iteration以下の行から評価履歴を復元し、同じiterationの重複は最後の行を採用する。
 次の評価を同じ方式で再計算し、同じconfigの一度に解いたrunと評価iteration・停止iteration・stateを揃える。
 progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25から評価する（max_iterationsで切る）。
-この場合は評価iterationの一致を保証しない。評価履歴はcheckpointには追加せず、形式version 5を維持する。
+この場合は評価iterationの一致を保証しない。評価履歴はcheckpointには追加しない。
 
 `run.json`は次のfieldを持つ。
 
@@ -231,26 +304,37 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 | `wallSecs` | 累積solve経過秒。木の準備を除く。最後の成果物出力前に計測する |
 | `evP0` / `evP1` | OOP / IPの第3節のEV |
 | `explP0` / `explP1` / `nashConv` | 最終平均profileの逸脱利得とその和 |
+| `profile` | profile指定時だけのobject。無指定ではfield自体を省く |
+
+`profile.summary`は`matched_nodes`、`matched_hands`、`iso_restricted`、`selectors`、`resolved_nodes`を持つ。
+各selectorは`kind`、入力の`node`、`matched_nodes`、`matched_hands`を持つ。
+`resolved_nodes`の各要素は解決されたnode IDの`node`、`history`、`kind`（`lock` / `incentive` /
+`frequency` / `frozen`）、入力entry番号の`entry`、lockの`confidence`、`partial`を持つ。
+`entry`・`confidence`・`partial`は該当しない場合nullであり、`partial`はlockがboard上でliveなhandの一部だけを選ぶことを示す。
+`profile.frozen_nodes`は固定したnode IDの配列、`general_sum`は一般和評価を示すbool、
+`frequencies`は目標nodeごとの配列である。各要素の`entry`は入力目標のindex、
+`node`はnode ID、`target`は目標、`achieved`は平均戦略の達成頻度、
+`error`は絶対差、`lambda`は最終加点である。到達weightが0なら`achieved`と`error`はnull。
 
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
 solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + 2C`がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
 
-checkpointは第7節のversion 5で保存し、backend種別と配列長をmetadataへ記録する。
+checkpointは第7節のversion 5または6で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
 
 `[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
 
-最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式・checkpoint v5・`.sol` v4の形式は同じである。
+最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
 
-`.sol`はversion 4である（2026-10-13）。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
+`.sol`はprofile無しではversion 4、profile有りではversion 5である。version 5はmetadata frameをversion 4のmetadataと第6節の`ProfileReport`のpostcard tupleに置き換え、他のframeは同じである。version 4と5を読める。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
 
 | 部分 | 内容 |
 |---|---|
-| header（178 bytes） | `SLVRSOLV` magic、u16 version 4、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
+| header（178 bytes） | `SLVRSOLV` magic、u16 version 4または5、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
 | metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame |
 | index frame | 下表の木とindexの列を1つのzstd frameにしたもの |
 | 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frameの列 |
@@ -300,7 +384,7 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1、単一zstd streamのversion 2、木を保存しないversion 3はversion errorで明示的に拒否する。変換は無く、現行configから再solveしてversion 4を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5または6である。頻度目標がある場合だけversion 6を使い、version 5のmetadataとλのf64 vectorをpostcard tupleにする。生配列とdigestは同じ形式である。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 
@@ -313,7 +397,7 @@ header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮�
 header/payloadのiteration一致、backendと全配列長、digest、frame終端、末尾余剰bytesを検査する。
 切詰め・破損はerrorであり、読込み失敗した部分的storageからsolveを再開しない。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-storageの長さはcompact supportで決まる。P1 resumeはversion 5だけを受理し、埋込みconfigを必須とする。
+storageの長さはcompact supportで決まる。P1 resumeはversion 5と6を受理し、埋込みconfigを必須とする。
 version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
 保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
@@ -347,6 +431,13 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 | `ev` | node × seat × comboのweightとev |
 | `range` | seat × comboのweight |
 | `decision` | 同じnodeの`actions`・`strategy`・`ev`の行を`actions`・`strategy`・`ev` keyに持つJSON object。CSVは無い |
+
+profile付きsolutionの`summary`は第6節の`profile`に加え、埋込み実効configの正規化済み
+`[profile]`をobjectとして`profile_config`に含む。profile無しでは両fieldを省く。
+`compare`は正規化profile条件が異なる場合だけ`profile_changed: true`を含む。
+どちらか一方にprofileがある場合は`profile_conditions`を含み、左・右の順に
+正規化された`[profile]`のTOML文字列またはprofile無しを表すnullを置く。
+両方にprofileが無い場合は`profile_conditions`を省く。
 
 `tree`・`actions`・`strategy`・`ev`・`decision`は`--node`が指すnodeの行を出す。`--node`は繰り返せ、1回の読込みで各指定の行を指定順に連結する（SOL-14）。
 各行は`history`列を持つので、連結しても行の所属nodeを区別できる。`summary`と`range`は`--node`を使わない。

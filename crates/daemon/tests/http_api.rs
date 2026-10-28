@@ -384,6 +384,26 @@ fn a_config_that_names_a_file_is_refused_as_not_self_contained() {
 }
 
 #[test]
+fn upstream_profile_paths_are_rejected_before_any_config_endpoint_invokes_cli() {
+    let daemon = Daemon::start(1);
+    for config in [
+        "[profile]\nfreeze_upstream = { solution = '/host/secret.sol' }\n",
+        "profile.freeze_upstream.solution = '/host/secret.sol'\n",
+        "[profile.'freeze_upstream']\nsolution = '/host/secret.sol'\n",
+    ] {
+        let body = serde_json::json!({ "configToml": config }).to_string();
+        for endpoint in ["/v1/validate", "/v1/line", "/v1/tree", "/v1/runs"] {
+            let (status, error) = daemon.post(endpoint, &body);
+            assert_eq!(status, 400, "{endpoint}: {error}");
+            assert_eq!(
+                error["code"], "config-not-self-contained",
+                "{endpoint}: {error}"
+            );
+        }
+    }
+}
+
+#[test]
 fn an_invalid_config_is_refused_before_a_run_directory_exists() {
     let daemon = Daemon::start(1);
     let body =
@@ -624,6 +644,10 @@ threads = 1
     std::fs::write(directory.join("solution.mwsol"), b"not a multiway artifact").unwrap();
 
     let base = format!("/v1/runs/{run_id}/solution");
+    let (status, summary) = daemon.get(&format!("{base}/summary"));
+    assert_eq!(status, 200, "{summary}");
+    assert!(summary.get("profile").is_none());
+    assert!(summary.get("profile_config").is_none());
     let (status, tree) = daemon.get(&format!("{base}/tree?node=root"));
     assert_eq!(status, 200, "{tree}");
     let rows = tree.as_array().expect("tree rows");
@@ -696,6 +720,81 @@ threads = 1
     let (status, error) = daemon.get(&format!("{base}/tree"));
     assert_eq!(status, 500, "{error}");
     assert_eq!(error["code"], "internal");
+}
+
+#[test]
+fn postflop_profile_solution_views_preserve_locked_strategy() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_with_solver(home.path(), 1, &real_solver());
+    let config = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2c 7d 9h Js Qs"
+[ranges]
+BB = "AsAh"
+BTN = "KsKh"
+[tree]
+script = '''river when unopened { force bet [50] }'''
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 2
+check_every = 1
+[run]
+threads = 1
+[[profile.lock]]
+node = "root"
+strategy = { "bet 10" = 1.0 }
+"#;
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, created) = daemon.post("/v1/runs", &body);
+    assert_eq!(status, 200, "{created}");
+    let run_id = created["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(run_id);
+    assert_eq!(finished["state"], "completed", "{finished}");
+    let base = format!("/v1/runs/{run_id}/solution");
+    let (status, tree) = daemon.get(&format!("{base}/tree?node=root"));
+    assert_eq!(status, 200, "{tree}");
+    let (status, summary) = daemon.get(&format!("{base}/summary"));
+    assert_eq!(status, 200, "{summary}");
+    let resolved = summary["profile"]["summary"]["resolved_nodes"]
+        .as_array()
+        .unwrap();
+    let lock = resolved
+        .iter()
+        .find(|entry| entry["kind"] == "lock")
+        .unwrap();
+    assert_eq!(lock["history"], tree[0]["history"]);
+    assert_eq!(lock["node"], 0);
+    assert_eq!(lock["entry"], 0);
+    assert_eq!(
+        summary["profile_config"]["lock"][0]["strategy"]["bet 10"],
+        1.0
+    );
+    let actions = tree[0]["actions"].as_array().unwrap();
+    let bet = actions
+        .iter()
+        .position(|action| action == "bet 10")
+        .unwrap();
+    let (status, strategy) = daemon.get(&format!("{base}/strategy?node=root"));
+    assert_eq!(status, 200, "{strategy}");
+    let rows = strategy.as_array().unwrap();
+    assert!(!rows.is_empty());
+    for row in rows {
+        let probabilities = row["probabilities"].as_array().unwrap();
+        assert_eq!(probabilities[bet], 1.0);
+        assert!(
+            probabilities
+                .iter()
+                .enumerate()
+                .all(|(i, p)| i == bet || p == 0.0)
+        );
+    }
 }
 
 /// Cancelling reaches the real solver on every platform: it stops at an

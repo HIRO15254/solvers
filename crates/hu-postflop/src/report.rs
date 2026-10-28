@@ -71,7 +71,7 @@ pub fn compute(
 }
 fn board_row<S: Storage>(p: &prepare::Prepared, cancel: &AtomicBool) -> Result<BoardRow> {
     let start = Instant::now();
-    let (solver, index, (ev, expl)) = run::query::<S>(p, None, None, cancel)?;
+    let (solver, index, (ev, expl), _) = run::query::<S>(p, None, None, cancel)?;
     let elapsed = start.elapsed();
     let tree = &solver.game().tree;
     let sref = tree.storage_ref(tree.node(0));

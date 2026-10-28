@@ -21,6 +21,13 @@ mod batch;
 /// entirely inside implementations; chance-probability constants are baked
 /// into deal weights and the game normalizer at build time.
 pub trait TerminalEvaluator: Send + Sync {
+    /// Write compatible opponent reach mass for each own hand.
+    fn compat_mass(&self, _space: u32, _p: Player, _opp_reach: &[f32], _out: &mut [f32]) {
+        panic!("terminal evaluator does not support compatible reach mass");
+    }
+    fn supports_compat_mass(&self) -> bool {
+        false
+    }
     fn eval(&self, terminal: u32, p: Player, opp_reach: &[f32], out: &mut [f32]);
     /// Exact terminal batch: zero-initialized outputs must match `eval` bit
     /// for bit, independently of batch membership and lane position.
@@ -241,6 +248,7 @@ pub struct Solver<E, S> {
     iteration: u64,
     par: ParConfig,
     cfr_precision: CfrPrecision,
+    profile: Option<crate::Profile>,
 }
 
 impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
@@ -274,7 +282,93 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             iteration: 0,
             par: ParConfig::default(),
             cfr_precision: CfrPrecision::F64,
+            profile: None,
         }
+    }
+    /// Validate and install a solve profile; profiles are not checkpointed.
+    pub fn set_profile(&mut self, profile: crate::Profile) -> Result<(), crate::ProfileError> {
+        if profile.locks.len() != self.game.tree.storage_refs.len()
+            || profile.incentives.len() != self.game.tree.storage_refs.len()
+        {
+            return Err(crate::ProfileError(
+                "profile storage-ref dimensions differ".into(),
+            ));
+        }
+        for (i, sref) in self.game.tree.storage_refs.iter().enumerate() {
+            let hands = sref.num_hands as usize;
+            let actions = sref.num_actions as usize;
+            if let Some(lock) = &profile.locks[i] {
+                if lock.fixed.len() != actions * hands || lock.confidence.len() != hands {
+                    return Err(crate::ProfileError(format!("lock {i}: dimension mismatch")));
+                }
+                for h in 0..hands {
+                    let p = lock.confidence[h];
+                    if !p.is_finite() || !(0.0..=1.0).contains(&p) {
+                        return Err(crate::ProfileError(format!("lock {i}: invalid confidence")));
+                    }
+                    if p == 0.0 {
+                        continue;
+                    }
+                    let mut sum = 0.0;
+                    let mut free = 0;
+                    for a in 0..actions {
+                        let f = lock.fixed[a * hands + h];
+                        if f.is_nan() {
+                            free += 1;
+                        } else if !f.is_finite() || !(0.0..=1.0).contains(&f) {
+                            return Err(crate::ProfileError(format!(
+                                "lock {i}: invalid probability"
+                            )));
+                        } else {
+                            sum += f;
+                        }
+                    }
+                    if sum > 1.0 + 1e-6
+                        || (p < 1.0 && (free != 0 || (sum - 1.0_f32).abs() > 1e-6))
+                        || (p == 1.0 && sum < 1.0 - 1e-6 && free == 0)
+                    {
+                        return Err(crate::ProfileError(format!(
+                            "lock {i}: invalid probability sum"
+                        )));
+                    }
+                }
+            }
+            if let Some(incentive) = &profile.incentives[i] {
+                if incentive.bonus.len() != actions * hands
+                    || incentive.bonus.iter().any(|v| !v.is_finite())
+                {
+                    return Err(crate::ProfileError(format!(
+                        "incentive {i}: invalid dimensions or values"
+                    )));
+                }
+                if !self.game.evaluator.supports_compat_mass() {
+                    return Err(crate::ProfileError(
+                        "terminal evaluator does not support compatible reach mass".into(),
+                    ));
+                }
+            }
+        }
+        self.profile = Some(profile);
+        Ok(())
+    }
+    /// Current solve profile, if one is installed.
+    pub fn profile(&self) -> Option<&crate::Profile> {
+        self.profile.as_ref()
+    }
+    /// Mutably access the profile; callers may change only incentive bonus values.
+    pub fn profile_mut(&mut self) -> Option<&mut crate::Profile> {
+        self.profile.as_mut()
+    }
+    /// Remove the active profile.
+    pub fn clear_profile(&mut self) {
+        self.profile = None;
+    }
+    /// Root average-profile values excluding incentive bonuses.
+    pub fn true_expected_values(&self) -> PerPlayer<f64> {
+        PerPlayer::new(
+            self.expected_value(Player::P0),
+            self.expected_value(Player::P1),
+        )
     }
 
     /// Overrides the chance-node parallelism thresholds (default:
@@ -365,6 +459,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 discounts: &discounts,
                 cfr_precision: self.cfr_precision,
                 par: self.par,
+                profile: self.profile.as_ref(),
             };
             let mut out = self.scratch.take(self.game.tree.root_dims[p] as usize);
             cfr_pass::<_, _, PRUNE>(
@@ -397,6 +492,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             storage: &self.storage,
             p,
             par: self.par,
+            profile: self.profile.as_ref(),
+            incentives: false,
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
@@ -462,6 +559,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             storage: &self.storage,
             p,
             par: self.par,
+            profile: self.profile.as_ref(),
+            incentives: false,
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(reach[p].len());
@@ -495,6 +594,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             storage: &self.storage,
             p,
             par: self.par,
+            profile: self.profile.as_ref(),
+            incentives: false,
         };
         let record = |node: NodeId, values: &[f32]| {
             let sref = ctx.tree.storage_ref(ctx.tree.node(node));
@@ -531,6 +632,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         profile_pass(
             &self.game,
             &self.storage,
+            self.profile.as_ref(),
             self.par,
             &mut scratch,
             0,
@@ -552,6 +654,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             storage: &self.storage,
             p,
             par: self.par,
+            profile: self.profile.as_ref(),
+            incentives: true,
         };
         let mut scratch = Scratch::new();
         let mut out = scratch.take(self.game.tree.root_dims[p] as usize);
@@ -572,7 +676,7 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// is the conventional exploitability.
     pub fn exploitability(&self) -> PerPlayer<f64> {
         let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
-        let (ev1, br1) = if self.game.zero_sum {
+        let (ev1, br1) = if self.game.zero_sum && !self.has_incentives() {
             let (_, br1) = self.ev_and_br::<false>(Player::P1);
             (-ev0, br1)
         } else {
@@ -589,8 +693,24 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         let (ev1, br1) = self.ev_and_br::<true>(Player::P1);
         (
             PerPlayer::new(ev0, ev1),
-            PerPlayer::new(br0 - ev0, br1 - if self.game.zero_sum { -ev0 } else { ev1 }),
+            PerPlayer::new(
+                br0 - ev0,
+                br1 - if self.game.zero_sum && !self.has_incentives() {
+                    -ev0
+                } else {
+                    ev1
+                },
+            ),
         )
+    }
+
+    fn has_incentives(&self) -> bool {
+        self.profile.as_ref().is_some_and(|p| {
+            p.incentives
+                .iter()
+                .flatten()
+                .any(|i| i.bonus.iter().any(|&b| b != 0.0))
+        })
     }
 
     fn ev_and_br<const EV: bool>(&self, p: Player) -> (f64, f64) {
@@ -600,6 +720,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             storage: &self.storage,
             p,
             par: self.par,
+            profile: self.profile.as_ref(),
+            incentives: true,
         };
         with_worker_scratch(|scratch| {
             let dim = self.game.tree.root_dims[p] as usize;
@@ -646,6 +768,14 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         let sref = self.game.tree.storage_ref(n);
         let mut out = vec![0.0; sref.len()];
         f(sref, &mut out);
+        if let Some(lock) = self
+            .profile
+            .as_ref()
+            .and_then(|p| p.locks[sref.index as usize].as_ref())
+        {
+            restrict_strategy(lock, sref.num_hands as usize, &mut out);
+            compose_strategy(lock, sref.num_hands as usize, &mut out);
+        }
         out
     }
 
@@ -660,6 +790,63 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     }
 }
 
+fn restrict_strategy(lock: &crate::NodeLock, hands: usize, sigma: &mut [f32]) {
+    if hands == 0 {
+        return;
+    }
+    let actions = sigma.len() / hands;
+    for h in 0..hands {
+        if lock.confidence[h] != 1.0 {
+            continue;
+        }
+        let mut total = 0.0;
+        let mut count = 0;
+        for a in 0..actions {
+            let i = a * hands + h;
+            if lock.fixed[i].is_nan() {
+                total += sigma[i];
+                count += 1;
+            } else {
+                sigma[i] = 0.0;
+            }
+        }
+        if count != 0 {
+            for a in 0..actions {
+                let i = a * hands + h;
+                if lock.fixed[i].is_nan() {
+                    sigma[i] = if total > 0.0 {
+                        sigma[i] / total
+                    } else {
+                        1.0 / count as f32
+                    };
+                }
+            }
+        }
+    }
+}
+
+fn compose_strategy(lock: &crate::NodeLock, hands: usize, sigma: &mut [f32]) {
+    if hands == 0 {
+        return;
+    }
+    let actions = sigma.len() / hands;
+    for h in 0..hands {
+        let p = lock.confidence[h];
+        if p == 0.0 {
+            continue;
+        }
+        let sum: f32 = (0..actions)
+            .map(|a| lock.fixed[a * hands + h])
+            .filter(|v| !v.is_nan())
+            .sum();
+        for a in 0..actions {
+            let i = a * hands + h;
+            let f = lock.fixed[i];
+            sigma[i] = p * if f.is_nan() { 0.0 } else { f } + (1.0 - p * sum).max(0.0) * sigma[i];
+        }
+    }
+}
+
 /// Read-only context threaded through [`cfr_pass`]: everything about the
 /// walk that doesn't change across a single pass.
 struct PassCtx<'w, E> {
@@ -669,6 +856,7 @@ struct PassCtx<'w, E> {
     discounts: &'w Discounts,
     cfr_precision: CfrPrecision,
     par: ParConfig,
+    profile: Option<&'w crate::Profile>,
 }
 
 /// Storage access for an action node's own storage ref (when split with
@@ -777,6 +965,7 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
         && node.kind == NodeKind::Action
         && !ctx.tree.subtree_has_chance[node_id as usize]
         && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
+        && ctx.profile.is_none()
         && batch::enabled()
     {
         batch::run::<_, _, PRUNE>(ctx, storage, scratch, node_id, my_reach, opp_reach, out);
@@ -935,6 +1124,21 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             views
                 .own()
                 .regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
+            let lock = ctx
+                .profile
+                .and_then(|p| p.locks[sref.index as usize].as_ref());
+            if let Some(lock) = lock {
+                restrict_strategy(lock, num_hands, &mut sigma);
+            }
+            let mut free_sigma = if lock.is_some() {
+                scratch.take_overwrite(sref.len())
+            } else {
+                Vec::new()
+            };
+            if let Some(lock) = lock {
+                free_sigma.copy_from_slice(&sigma);
+                compose_strategy(lock, num_hands, &mut sigma);
+            }
 
             // One flat action-major buffer: action `a`'s row is that
             // action's own `out` parameter, so its recursion writes
@@ -1031,6 +1235,20 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
                     );
                 }
             }
+            if let Some(incentive) = ctx
+                .profile
+                .and_then(|p| p.incentives[sref.index as usize].as_ref())
+            {
+                let mut mass = scratch.take_overwrite(num_hands);
+                ctx.evaluator
+                    .compat_mass(incentive.space, ctx.p, opp_reach, &mut mass);
+                for a in 0..sref.num_actions as usize {
+                    for h in 0..num_hands {
+                        cfvs[a * num_hands + h] += incentive.bonus[a * num_hands + h] * mass[h];
+                    }
+                }
+                scratch.put(mass);
+            }
 
             for (row, values) in sigma
                 .chunks_exact(num_hands.max(1))
@@ -1042,31 +1260,84 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             }
 
             // Instantaneous regret, computed in place.
-            for values in cfvs.chunks_exact_mut(num_hands.max(1)) {
-                for (v, &cfv) in values.iter_mut().zip(node_cfv.iter()) {
-                    *v -= cfv;
+            if let Some(lock) = lock {
+                for h in 0..num_hands {
+                    let mut baseline = 0.0;
+                    for a in 0..sref.num_actions as usize {
+                        baseline += free_sigma[a * num_hands + h] * cfvs[a * num_hands + h];
+                    }
+                    let p = lock.confidence[h];
+                    let sum: f32 = (0..sref.num_actions as usize)
+                        .map(|a| lock.fixed[a * num_hands + h])
+                        .filter(|v| !v.is_nan())
+                        .sum();
+                    for a in 0..sref.num_actions as usize {
+                        let i = a * num_hands + h;
+                        if p == 1.0 && (sum >= 1.0 || !lock.fixed[i].is_nan()) {
+                            cfvs[i] = 0.0;
+                        } else {
+                            cfvs[i] -= baseline;
+                        }
+                    }
+                }
+            } else {
+                for values in cfvs.chunks_exact_mut(num_hands.max(1)) {
+                    for (v, &cfv) in values.iter_mut().zip(node_cfv.iter()) {
+                        *v -= cfv;
+                    }
                 }
             }
-            views
-                .own()
-                .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
+            let fully_locked = lock.is_some_and(|lock| {
+                (0..num_hands).all(|h| {
+                    lock.confidence[h] == 1.0
+                        && (0..sref.num_actions as usize)
+                            .map(|a| lock.fixed[a * num_hands + h])
+                            .filter(|v| !v.is_nan())
+                            .sum::<f32>()
+                            >= 1.0
+                })
+            });
+            if !fully_locked {
+                views
+                    .own()
+                    .update_regrets(sref, sref.index, &cfvs, ctx.discounts);
+            }
 
             // Overwrite `cfvs` again as the reach-weighted strategy buffer.
-            for (weighted, row) in cfvs
-                .chunks_exact_mut(num_hands.max(1))
-                .zip(sigma.chunks_exact(num_hands.max(1)))
-            {
+            for (weighted, row) in cfvs.chunks_exact_mut(num_hands.max(1)).zip(
+                if lock.is_some() { &free_sigma } else { &sigma }.chunks_exact(num_hands.max(1)),
+            ) {
                 mul_into(weighted, my_reach, row);
             }
-            views
-                .own()
-                .accumulate_strategy(sref, sref.index, &cfvs, ctx.discounts);
+            if let Some(lock) = lock {
+                for h in 0..num_hands {
+                    if lock.confidence[h] == 1.0
+                        && (0..sref.num_actions as usize)
+                            .map(|a| lock.fixed[a * num_hands + h])
+                            .filter(|v| !v.is_nan())
+                            .sum::<f32>()
+                            >= 1.0
+                    {
+                        for a in 0..sref.num_actions as usize {
+                            cfvs[a * num_hands + h] = 0.0;
+                        }
+                    }
+                }
+            }
+            if !fully_locked {
+                views
+                    .own()
+                    .accumulate_strategy(sref, sref.index, &cfvs, ctx.discounts);
+            }
 
             out.copy_from_slice(&node_cfv);
 
             scratch.put(my_next);
             scratch.put(node_cfv);
             scratch.put(cfvs);
+            if lock.is_some() {
+                scratch.put(free_sigma);
+            }
             scratch.put(sigma);
         }
         NodeKind::Action => {
@@ -1083,6 +1354,13 @@ fn cfr_pass<E: TerminalEvaluator, V: StorageView, const PRUNE: bool>(
             let mut sigma = scratch.take_overwrite(if zero_opp { 0 } else { sref.len() });
             if !zero_opp {
                 storage.regret_matching_cfr(sref, sref.index, &mut sigma, ctx.cfr_precision);
+                if let Some(lock) = ctx
+                    .profile
+                    .and_then(|p| p.locks[sref.index as usize].as_ref())
+                {
+                    restrict_strategy(lock, num_hands, &mut sigma);
+                    compose_strategy(lock, num_hands, &mut sigma);
+                }
             }
 
             let mut views = ActionViews::split_for(storage, ctx.tree, node_id, None, par_budget);
@@ -1241,6 +1519,8 @@ pub(crate) struct ValueCtx<'w, E, S> {
     pub(crate) storage: &'w S,
     pub(crate) p: Player,
     pub(crate) par: ParConfig,
+    pub(crate) profile: Option<&'w crate::Profile>,
+    pub(crate) incentives: bool,
 }
 
 /// EV and BR share opponent reach and terminal evaluation. Each channel keeps
@@ -1278,6 +1558,7 @@ fn value_pass<
         && node.kind == NodeKind::Action
         && !ctx.tree.subtree_has_chance[node_id as usize]
         && subtree_elements(ctx.tree, node_id) < 2 * ACTION_PAR_MIN_ELEMENTS
+        && ctx.profile.is_none()
     {
         batch::values::<_, _, EV, BR>(ctx, scratch, node_id, opp_reach, ev, br);
         return;
@@ -1411,6 +1692,13 @@ fn value_pass<
             let mut sigma = scratch.take_overwrite(if !own || EV { sref.len() } else { 0 });
             if !own || EV {
                 ctx.storage.average_strategy(sref, sref.index, &mut sigma);
+                if let Some(lock) = ctx
+                    .profile
+                    .and_then(|p| p.locks[sref.index as usize].as_ref())
+                {
+                    restrict_strategy(lock, hands, &mut sigma);
+                    compose_strategy(lock, hands, &mut sigma);
+                }
             }
             let parallel = dim != 0 && parallel_actions(ctx.tree, node_id);
             if own || parallel {
@@ -1456,6 +1744,30 @@ fn value_pass<
                         visit(scratch, a, row);
                     }
                 }
+                if own
+                    && ctx.incentives
+                    && let Some(incentive) = ctx
+                        .profile
+                        .and_then(|p| p.incentives[sref.index as usize].as_ref())
+                {
+                    let mut mass = scratch.take_overwrite(dim);
+                    ctx.evaluator
+                        .compat_mass(incentive.space, ctx.p, opp_reach, &mut mass);
+                    for a in 0..actions {
+                        let row = &mut flat[a * dim * channels..(a + 1) * dim * channels];
+                        let (child_ev, child_br) = value_row::<EV, BR>(row, dim);
+                        for h in 0..dim {
+                            let bonus = incentive.bonus[a * hands + h] * mass[h];
+                            if EV {
+                                child_ev[h] += bonus;
+                            }
+                            if BR {
+                                child_br[h] += bonus;
+                            }
+                        }
+                    }
+                    scratch.put(mass);
+                }
                 if own && BR {
                     br.fill(f32::NEG_INFINITY);
                 }
@@ -1488,6 +1800,40 @@ fn value_pass<
                                 *b += c;
                             }
                         }
+                    }
+                }
+                if own
+                    && BR
+                    && let Some(lock) = ctx
+                        .profile
+                        .and_then(|p| p.locks[sref.index as usize].as_ref())
+                {
+                    for h in 0..hands {
+                        let p = lock.confidence[h];
+                        if p == 0.0 {
+                            continue;
+                        }
+                        let mut fixed_value = 0.0;
+                        let mut sum = 0.0;
+                        let mut best = f32::NEG_INFINITY;
+                        for a in 0..actions {
+                            let f = lock.fixed[a * hands + h];
+                            let value = flat[a * dim * channels + if EV { dim } else { 0 } + h];
+                            if !f.is_nan() {
+                                sum += f;
+                                fixed_value += f * value;
+                            }
+                            if p < 1.0 || f.is_nan() {
+                                best = best.max(value);
+                            }
+                        }
+                        let remaining = (1.0 - p * sum).max(0.0);
+                        br[h] = p * fixed_value
+                            + if remaining == 0.0 || best == f32::NEG_INFINITY {
+                                0.0
+                            } else {
+                                remaining * best
+                            };
                     }
                 }
                 scratch.put(flat);
@@ -1526,6 +1872,7 @@ fn value_pass<
 fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
     game: &CompiledGame<E>,
     storage: &S,
+    profile: Option<&crate::Profile>,
     par: ParConfig,
     scratch: &mut Scratch,
     id: NodeId,
@@ -1571,6 +1918,7 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
                 profile_pass(
                     game,
                     storage,
+                    profile,
                     par,
                     scratch,
                     node.first_child + pos as u32,
@@ -1616,6 +1964,10 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
             let hands = sref.num_hands as usize;
             let mut sigma = scratch.take_overwrite(sref.len());
             storage.average_strategy(sref, sref.index, &mut sigma);
+            if let Some(lock) = profile.and_then(|p| p.locks[sref.index as usize].as_ref()) {
+                restrict_strategy(lock, hands, &mut sigma);
+                compose_strategy(lock, hands, &mut sigma);
+            }
             let dim0 = ev[Player::P0].len();
             let dim = dim0 + ev[Player::P1].len();
             let mut flat = scratch.take(dim * node.num_children as usize);
@@ -1631,6 +1983,7 @@ fn profile_pass<E: TerminalEvaluator, S: Storage, R>(
                 profile_pass(
                     game,
                     storage,
+                    profile,
                     par,
                     scratch,
                     node.first_child + a as u32,

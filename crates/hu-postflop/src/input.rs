@@ -700,6 +700,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
         },
         min_bet: Chips(1000),
         iso_merging: settings.solver.iso_merging,
+        profile_suit_perms: None,
         track_node_info: true,
         preflop_aggressor: spot.context.previous_street_aggressor.and_then(|s| {
             if s == oop.seat {

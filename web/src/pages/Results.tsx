@@ -3,6 +3,7 @@ import { api, saveBlob } from "../api/client";
 import {
   isTerminal,
   type DecisionRows,
+  type ProfileReport,
   type RunSummary,
   type Seat,
   type SolSummary,
@@ -247,6 +248,21 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
     saveBlob(blob, `${run.runId}-${name}-strategy${resolved ? "-resolved" : ""}.csv`);
   };
 
+  const editProfile = async () => {
+    try {
+      const toml = await api.artifactText(run.runId, "run.toml");
+      const combos = node?.strategy && Object.fromEntries(node.strategy.map((row) => {
+        const sum = row.probabilities.reduce((total, probability) => total + probability, 0);
+        if (sum <= 0) throw new Error(`Strategy for ${row.combo} has zero probability`);
+        return [row.combo, Object.fromEntries(node.row.actions.map((action, index) => [action, (row.probabilities[index] ?? 0) / sum]))];
+      }));
+      sessionStorage.setItem("solvers.setup.profilePrefill", JSON.stringify({ toml, node: selector(current), combos }));
+      navigate({ page: "setup" });
+    } catch (e) {
+      setError(`Cannot prefill profile: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+
   return (
     <>
       <header className="page-header">
@@ -270,6 +286,10 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
           </span>
         )}
         <span className="grow" />
+        <Button variant="outline" disabled={node?.row.kind !== "action"} onClick={editProfile}>
+          Edit profile at node
+        </Button>
+        <InfoHint label="Edit profile at node" text="Opens this run's configuration and node in Setup. When available, the current strategy can be imported explicitly; imported combo probabilities are normalized to sum to one." />
         <Button
           variant="outline"
           icon="download"
@@ -281,6 +301,11 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
       </header>
       <main className="page-body padded stack" style={{ gap: 16 }}>
         {error && <Notice variant="destructive" title="Cannot load solution" description={error} />}
+        {summary?.profile?.general_sum && (
+          <Notice variant="info" title="General-sum profile"
+            description="Incentives change the acting player's utility. Displayed EVs exclude incentives and are true EVs; convergence measures are not zero-sum exploitability." />
+        )}
+        {summary?.profile && <ProfileDetails profile={summary.profile} config={summary.profile_config ?? null} history={current} />}
         <nav className="history" aria-label="Action history">
           <div className="history-card start">
             <div className="history-head">
@@ -339,6 +364,11 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
                   <span>{position(row.actor)}</span>
                   <span className="mono meta muted">pot {row.pot !== null ? bb(row.pot) : ""} BB</span>
                 </div>
+                {summary?.profile?.summary.resolved_nodes?.some((item) => item.history === history) && (
+                  <div className="meta" aria-label="Profile constraints">
+                    {[...new Set(summary.profile.summary.resolved_nodes.filter((item) => item.history === history).map((item) => item.kind))].join(" · ")}
+                  </div>
+                )}
                 <div className="stack" style={{ gap: 2 }}>
                   {row.actions.map((label, a) => {
                     const child = row.children[a]!;
@@ -444,6 +474,94 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
         )}
       </main>
     </>
+  );
+}
+
+function profileTable(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown> : null;
+}
+
+function profileStrategy(value: unknown): string {
+  const strategy = profileTable(value);
+  if (!strategy) return "unavailable";
+  const actions = Object.entries(strategy).map(([action, probability]) =>
+    `${action}: ${typeof probability === "number" ? percent(probability) : "unavailable"}`);
+  return actions.length ? actions.join(", ") : "none";
+}
+
+function ProfileEntryDetails({ kind, value }: { kind: string; value: unknown }) {
+  const entry = profileTable(value);
+  if (!entry) return null;
+  const combos = profileTable(entry.combos);
+  return <>
+    {combos ? <> · combos {Object.entries(combos).map(([combo, strategy]) =>
+      `${combo} (${profileStrategy(strategy)})`).join(", ") || "none"}</>
+      : typeof entry.hands === "string" ? <> · hands {entry.hands}</>
+      : typeof entry.category === "string" ? <> · category {entry.category}</>
+      : <> · all hands</>}
+    {kind === "lock" && !combos && <> · strategy {profileStrategy(entry.strategy)}</>}
+    {kind !== "lock" && typeof entry.action === "string" && <> · action {entry.action}</>}
+    {kind === "incentive" && typeof entry.pot === "number" && <> · bonus {percent(entry.pot)} of pot</>}
+    {kind === "incentive" && typeof entry.bb === "number" && <> · bonus {entry.bb} BB</>}
+    {kind === "frequency" && typeof entry.target === "number" && <> · target {percent(entry.target)}</>}
+  </>;
+}
+
+export function ProfileDetails({ profile, config, history }: {
+  profile: ProfileReport;
+  config: Record<string, unknown> | null;
+  history: string;
+}) {
+  const resolved = profile.summary.resolved_nodes ?? [];
+  const current = resolved.filter((item) => item.history === history);
+  const entry = (kind: string, index: number | null): unknown => {
+    const entries = config?.[kind];
+    return index !== null && Array.isArray(entries) ? entries[index] : undefined;
+  };
+  return (
+    <Card>
+      <CardContent className="stack" style={{ gap: 8 }}>
+        <strong>Opponent profile</strong>
+        <span>
+          {integer(profile.summary.matched_nodes)} matched nodes · {integer(profile.summary.matched_hands)} matched hands
+          {profile.summary.iso_restricted ? " · suit isomorphism restricted" : ""}
+        </span>
+        {config?.freeze_upstream != null && (
+          <div>Freeze upstream: <code>{JSON.stringify(config.freeze_upstream)}</code></div>
+        )}
+        <div>
+          Frozen nodes: {profile.frozen_nodes.length}
+          {resolved.some((item) => item.kind === "frozen") && <> · {resolved.filter((item) => item.kind === "frozen").map((item) => selector(item.history)).join(", ")}</>}
+        </div>
+        {profile.summary.selectors.map((item, index) => (
+          <div key={index} className="meta">
+            {item.kind}: <code>{item.node || "root"}</code> · {item.matched_nodes} nodes · {item.matched_hands} hands
+          </div>
+        ))}
+        {profile.frequencies.length > 0 && <strong>Frequency targets (per runout)</strong>}
+        {profile.frequencies.map((metric, index) => {
+          const match = resolved.find((item) => item.kind === "frequency" && item.node === metric.node && item.entry === metric.entry);
+          return (
+            <div key={index} className="meta">
+              {match ? selector(match.history) : `Node ${metric.node}`} · target {percent(metric.target)} · achieved{" "}
+              {metric.achieved == null ? "unavailable" : percent(metric.achieved)} · error{" "}
+              {metric.error == null ? "unavailable" : percent(metric.error)} · λ {Number(metric.lambda.toPrecision(4))}
+            </div>
+          );
+        })}
+        {current.length > 0 && <strong>At {selector(history)}</strong>}
+        {current.map((item, index) => (
+          <div key={`${item.kind}-${item.entry}-${index}`}>
+            <strong>{item.kind}</strong>
+            {item.confidence != null && <> · confidence {percent(item.confidence)}</>}
+            {item.partial != null && <> · {item.partial ? "selected hands" : "all supported hands"}</>}
+            <ProfileEntryDetails kind={item.kind} value={entry(item.kind, item.entry)} />
+          </div>
+        ))}
+        {!config && <span className="muted">Profile configuration is unavailable.</span>}
+      </CardContent>
+    </Card>
   );
 }
 

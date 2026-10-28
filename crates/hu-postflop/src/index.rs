@@ -330,6 +330,161 @@ impl<'a> TreeView<'a> {
         Some(current)
     }
 
+    /// Resolve a profile selector to action nodes. `[?]` in a history, or
+    /// `?` in a slash-separated label path, expands every chance branch.
+    pub fn profile_nodes(&self, selector: &str) -> Result<Vec<NodeId>, spot::SpotError> {
+        let error = || {
+            spot::SpotError::new(
+                spot::Code::NLH003,
+                "profile.node",
+                format!("unknown or non-action node selector {selector:?}"),
+            )
+        };
+        if selector.is_empty() || selector == "root" {
+            return (self.tree.node(0).kind == NodeKind::Action)
+                .then_some(vec![0])
+                .ok_or_else(error);
+        }
+        let history = selector.contains("[?]") || self.node_by_history_any(selector).is_some();
+        let mut steps = Vec::new();
+        if history {
+            let mut rest = selector;
+            while !rest.is_empty() {
+                let len = match rest.as_bytes()[0] {
+                    b'x' | b'c' | b'f' => 1,
+                    b'r' => {
+                        1 + rest[1..]
+                            .bytes()
+                            .take_while(|b| b.is_ascii_digit() || *b == b'.')
+                            .count()
+                    }
+                    b'[' => rest.find(']').map(|i| i + 1).ok_or_else(error)?,
+                    _ => return Err(error()),
+                };
+                let (step, tail) = rest.split_at(len);
+                steps.push(step);
+                rest = tail;
+            }
+        } else {
+            steps.extend(selector.split('/').map(str::trim).filter(|s| !s.is_empty()));
+        }
+        let mut current = vec![0];
+        for step in steps {
+            let mut next = Vec::new();
+            for id in current {
+                let node = self.tree.node(id);
+                match node.kind {
+                    NodeKind::Action => {
+                        if history {
+                            next.extend(self.tree.children(id).filter(|&child| {
+                                self.index.tokens[self.index.edges[child as usize] as usize] == step
+                            }));
+                        } else if let Ok(pos) =
+                            crate::queries::resolve_action(&self.actions(id), step)
+                        {
+                            next.push(node.first_child + pos as NodeId);
+                        }
+                    }
+                    NodeKind::Chance => {
+                        for pos in 0..node.num_children as usize {
+                            let label = self.chance_label(id, pos);
+                            let wanted = if history {
+                                step.strip_prefix('[')
+                                    .and_then(|s| s.strip_suffix(']'))
+                                    .unwrap_or(step)
+                            } else {
+                                step
+                            };
+                            if wanted == "?"
+                                || label
+                                    .trim_end_matches('*')
+                                    .eq_ignore_ascii_case(wanted.trim_end_matches('*'))
+                            {
+                                next.push(node.first_child + pos as NodeId);
+                            }
+                        }
+                    }
+                    NodeKind::Terminal => {}
+                }
+            }
+            if next.is_empty() {
+                return Err(error());
+            }
+            current = next;
+        }
+        if current.is_empty()
+            || current
+                .iter()
+                .any(|&id| self.tree.node(id).kind != NodeKind::Action)
+        {
+            return Err(error());
+        }
+        Ok(current)
+    }
+
+    /// The board represented by this node, including representative runout
+    /// cards on iso-merged branches.
+    pub fn profile_board(&self, node: NodeId, starting_board: &[Card]) -> Vec<Card> {
+        let mut board = starting_board.to_vec();
+        let mut current = node;
+        let mut dealt = Vec::new();
+        loop {
+            let parent = self.index.parents[current as usize];
+            if parent == NodeId::MAX {
+                break;
+            }
+            let p = self.tree.node(parent);
+            if p.kind == NodeKind::Chance
+                && let Some(card) = self.deal_card(parent, (current - p.first_child) as usize)
+            {
+                dealt.push(card);
+            }
+            current = parent;
+        }
+        board.extend(dealt.into_iter().rev());
+        board
+    }
+
+    /// Select board-live hands in the acting player's compact support.
+    pub fn profile_hand_mask(
+        &self,
+        node: NodeId,
+        starting_board: &[Card],
+        selector: &spot::HandSelector,
+    ) -> Result<Vec<bool>, spot::SpotError> {
+        let error =
+            |message: String| spot::SpotError::new(spot::Code::NLH003, "profile.hands", message);
+        let board = self.profile_board(node, starting_board);
+        let range = match selector {
+            spot::HandSelector::Range(text) => Some(
+                text.parse::<nlh::Range>()
+                    .map_err(|e| error(e.to_string()))?,
+            ),
+            _ => None,
+        };
+        let category = match selector {
+            spot::HandSelector::Category(text) => {
+                Some(nlh::category::CategoryExpr::parse(text).map_err(|e| error(e.to_string()))?)
+            }
+            _ => None,
+        };
+        let actor = self.tree.node(node).player;
+        Ok(self
+            .hands()
+            .combos(actor)
+            .iter()
+            .map(|&combo| {
+                let (a, b) = nlh::combo_cards(combo as usize);
+                !board.contains(&a)
+                    && !board.contains(&b)
+                    && range
+                        .as_ref()
+                        .is_none_or(|r| r.weight(combo as usize) > 0.0)
+                    && category.as_ref().is_none_or(|c| c.matches(&board, [a, b]))
+            })
+            .collect())
+    }
+
     /// Label of a chance node's `pos`-th branch: its card, `*`-suffixed for
     /// an iso-merged class, or `dealN` when no card is recorded.
     pub fn chance_label(&self, node: NodeId, pos: usize) -> String {
@@ -731,6 +886,25 @@ iso_merging = false
 [run]
 memory = "1GiB"
 "#;
+
+    #[test]
+    fn profile_wildcard_matches_enumerated_runouts() {
+        let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+        let start = crate::artifact::start_street_from_board_len(p.config.board.len());
+        let index = GameIndex::from_game(&built.game, &built.node_info, start);
+        let view = TreeView {
+            tree: &built.game.tree,
+            index: &index,
+        };
+        let selected = view.profile_nodes("xx[?]").unwrap();
+        let chance = view.node_by_history_any("xx").unwrap();
+        let enumerated: Vec<_> = view.tree.children(chance).collect();
+        assert_eq!(selected, enumerated);
+        assert_eq!(view.profile_nodes("check/check/?").unwrap(), enumerated);
+        assert!(view.profile_nodes("xx").is_err());
+        assert!(view.profile_nodes("xx[?]invalid").is_err());
+    }
 
     /// The index a run stores reproduces, from the stream alone, the tree it
     /// solved and every label, history, pot, street and dealt card the

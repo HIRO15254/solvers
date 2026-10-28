@@ -20,6 +20,8 @@ export interface RunMeta {
   threads: string;
   resources: HuResources | null;
   economics: string;
+  /** Profile incentives and frequency controllers make P1 a general-sum game. */
+  generalSum: boolean;
 }
 
 const cache = new Map<string, Promise<RunMeta>>();
@@ -55,6 +57,10 @@ async function load(run: RunSummary): Promise<RunMeta> {
     target: (getAt(doc, ["solver", "stop", "target"]) as string | undefined) ?? null,
     threads: String(getAt(doc, ["run", "threads"]) ?? "auto"),
     resources: validated?.summary.resources ?? null,
+    generalSum: hu && ["incentive", "frequency"].some((key) => {
+      const entries = getAt(doc, ["profile", key]);
+      return Array.isArray(entries) && entries.length > 0;
+    }),
     economics: [
       stack !== undefined ? `${stack}bb` : null,
       kind === "tournament" ? "ICM" : rate !== undefined ? `rake ${bb(Number(rate) * 100)}%` : "No rake",

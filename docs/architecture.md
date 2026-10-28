@@ -28,7 +28,7 @@
 
 | crate | 現行の責務 |
 |---|---|
-| `nlh` | card・combo・range・役判定・suit同型・chip/seat型、NLH bettingと精算、tree scriptの汎用処理系 |
+| `nlh` | card・combo・range・役判定・hand category式・suit同型・chip/seat型、NLH bettingと精算、tree scriptの汎用処理系 |
 | `economics` | 共通rake条件・控除・配分、ICM、utility設定 |
 | `spot` | 共通Inputのparse・正規化・line再生・製品判定、Spot IR、tree方言 |
 | `hu-engine` | HUのpublic tree、vector CFR/BR、storage、discount schedule |
@@ -145,6 +145,13 @@ P1の同一board fold・showdownは異なる子reachでも1回の自hand loopで
 `TerminalEvaluator::eval(terminal, player, opp_reach, out)` が compatible opponent hand に関する
 未正規化 payoff を返す。EV と best response は同じ compiled tree / evaluator を使う一方、
 その正しさは独立 oracle で照合する。非 zero-sum では両者を個別に計算する。
+
+`profile`はaction nodeのstorage参照でlockとincentiveを索引する。CFRとBRは自由actionに最適化を制限し、
+完全lockの更新を省く。戦略累積は自由成分を保存し、読取り時に固定確率とconfidenceを合成する。
+incentiveは`TerminalEvaluator::compat_mass`の相手互換reachで重み付けし、所有playerの値へ加えて祖先へ伝える。
+収束評価は加点を含み、真のEVとnode別の値は加点を除く。profile付きの走査はflat batch経路を使わない。
+profile自体はengine stateに含めず、製品側がconfigから再構築する。
+
 test-support機能の`expected_values_at` / `best_response_values_at` は指定 node、
 `expected_values_everywhere` は全 action node の値を 1 回の走査で計算する。production保存は`visit_expected_values`を使う。
 CFR は相手 reach の全要素が厳密に 0 の終端評価と、相手 action の regret matching・
@@ -195,6 +202,12 @@ suit同型の枝・確率・compact空間の席別商transitionはbuilderが決�
 local index・2枚のcard index・同順位group境界をbuild時に用意し、役順のmergeでshowdownをO(n_oop＋n_ip)で評価する。
 foldは開始supportの包除原理と席間の同一combo対応表を使う。f64累積は役順、同順位内のglobal combo順を保つ。
 memory preflightもactorのsupport長を数える。global表記・class集計・equityとの変換はquery/report境界で行う。
+`nlh::category`はboardとholeからmade handと独立draw flagを分類し、category式を解析・照合する。
+分類の定義は[P1規範](hu-postflop.jp.md#hand-category)に置く。
+`profile`はSpot IRのnode・action・hand selectorを木とsupportに解決し、
+engineのlock/incentiveと頻度目標を作る。基準解の上流固定とsuit同型制限も製品側で扱う。
+`run`は頻度controllerのλを更新・checkpointへ保存し、profileのsummaryをsolutionに渡す。
+
 combo indexの逆変換は`nlh::range`の固定tableを共有する。整数size解決は`nlh::SizeContext`と
 `scale_u32`/`scale_u64`に集約し、P1のu32 chipとP2のu64 milli-BBの上限・丸め・加算規則を維持する。
 
@@ -277,7 +290,7 @@ operational overrideは互換identityから分ける。P2はsessionのgame/abstr
 | `.mwsol` | `mw_preflop::mwsol`、`session`、`views` | 正式平均profileとidentity、保存coverage、評価data |
 | run記録 | `runfiles`とCLI | manifest、progress、event、結果summary |
 
-P1 checkpoint v5はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。metadataのbackendは3種類のenumで、Mixedの配列順はregrets（i16）、strategy_sum（f32）、regret_scales（f32）。backendと配列長は書込み前に検査し、v1〜4は再solveを案内して拒否する。
+P1 checkpoint v5/v6はborrowしたstorage配列から64 KiB単位で逐次LE書込み・並列圧縮し、resumeは最終arenaへ直接展開する。頻度目標付きv6はcontrollerのλも保存する。metadataのbackendは3種類のenumで、Mixedの配列順はregrets（i16）、strategy_sum（f32）、regret_scales（f32）。backendと配列長は書込み前に検査し、v1〜4は再solveを案内して拒否する。
 solve/resumeの`drive`は、終了時に新たなcheckpointが必要で`S + W + 2C ≤ limit`ならrun用Rayon poolの`join`でcheckpointと`.sol`を並行生成し、regretを保持する。その他は最後のcheckpoint（P1の`run.final_checkpoint = true`、既定値、の場合）→ `Solver::release_regrets`でregret arenaとscaleを解放 → `.sol`の順とする。falseは全停止理由で最後のcheckpointだけを省く。反復中のcheckpointとcurrent strategyを提供するlive queryはregretを保持する。memory preflightは`max(storage, storage − regret + save_bytes) + compression_bytes`を使う。
 `.sol`は両seatのEV pass中にpath-local reachで値を量子化してsref slotへ置き、全nodeのf32値やreachを保持しない。
 戦略はEV passに先立ってstorageからsref昇順に計算し、1 batch分ずつ量子化してchunk writerへ渡す。EV pass後の値slotもsref順にchunk writerへ渡し、block用Vecへ移し替えない。

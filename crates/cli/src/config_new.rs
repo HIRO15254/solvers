@@ -129,6 +129,30 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         rendered.push_str(line);
         rendered.push('\n');
     }
+    if matches!(product, ConfigProduct::P1) {
+        rendered.push_str(
+            "\n# Optional opponent profile (action labels are shown by solvers tree).\n\
+# [profile]\n\
+# freeze_upstream = { solution = \"runs/base/solution.sol\" }\n\
+# [[profile.lock]]\n\
+# node = \"x\"\n\
+# hands = \"AA,KK\"\n\
+# strategy = { check = 0.5, \"bet 3.3\" = 0.5 }\n\
+# confidence = 1.0\n\
+# [[profile.lock]]\n\
+# node = \"x\"\n\
+# combos = { AsKs = { check = 1.0 } }\n\
+# [[profile.incentive]]\n\
+# node = \"x\"\n\
+# category = \"toppair\"\n\
+# action = \"check\"\n\
+# pot = 0.03\n\
+# [[profile.frequency]]\n\
+# node = \"x\"\n\
+# action = \"check\"\n\
+# target = 0.5\n",
+        );
+    }
     Ok(rendered)
 }
 
@@ -502,6 +526,22 @@ mod tests {
             "probability_encoding",
             "u16",
             "solution_streets",
+            "profile",
+            "lock",
+            "incentive",
+            "frequency",
+            "freeze_upstream",
+            "solution",
+            "sha256",
+            "node",
+            "hands",
+            "category",
+            "strategy",
+            "combos",
+            "confidence",
+            "action",
+            "pot",
+            "bb",
             "full",
             "no-rivers",
             "param",

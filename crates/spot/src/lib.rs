@@ -7,6 +7,7 @@ mod error;
 mod ir;
 mod normalize;
 mod parse;
+mod profile;
 mod replay;
 mod summary;
 
@@ -51,6 +52,10 @@ impl Document {
     /// Resolve tree source paths relative to this config file (no environment expansion).
     pub fn parse(text: &str, config_path: &Path) -> Result<Self, SpotError> {
         parse::document(text, config_path)
+    }
+    /// Parse a previously validated artifact config without accessing its base solution.
+    pub fn parse_embedded(text: &str, config_path: &Path) -> Result<Self, SpotError> {
+        parse::document_with_mode(text, config_path, true)
     }
 
     /// Deterministic self-contained TOML; product defaults are supplied by the hook.

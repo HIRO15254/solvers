@@ -345,6 +345,21 @@ mod tests {
         );
     }
 
+    #[test]
+    fn external_profile_paths_have_a_stable_client_error() {
+        let error = ErrorResponse::new(
+            ErrorCode::ConfigNotSelfContained,
+            "profile.freeze_upstream refers to a file on the daemon host",
+        );
+        let json = serde_json::to_value(&error).unwrap();
+        assert_eq!(json["code"], "config-not-self-contained");
+        assert_eq!(error.http_status(), 400);
+        assert_eq!(
+            serde_json::from_value::<ErrorResponse>(json).unwrap(),
+            error
+        );
+    }
+
     /// The event page is the resumable half of the protocol; its two fields
     /// are what makes a disconnect recoverable.
     /// The view names are the client's vocabulary and must match the CLI's.

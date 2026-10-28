@@ -8,6 +8,8 @@ use hu_engine::{
     Storage, TerminalEvaluator,
 };
 use nlh::{PerPlayer, Player};
+use sha2::{Digest, Sha256};
+use std::io::Read;
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
@@ -16,8 +18,17 @@ use std::time::{Duration, Instant};
 pub enum Observation {
     ProgressOpened,
     Progress(runfiles::MetricsRow),
-    Checkpoint { iterations: u64 },
-    Stop { reason: &'static str },
+    /// Frequency-target diagnostics at the same evaluation boundary as Progress.
+    ProfileProgress {
+        iteration: u64,
+        frequencies: Vec<FrequencyMetric>,
+    },
+    Checkpoint {
+        iterations: u64,
+    },
+    Stop {
+        reason: &'static str,
+    },
 }
 /// Display diagnostics emitted at their original computation boundaries.
 pub enum Diagnostic {
@@ -143,6 +154,7 @@ type QueryResult<S> = (
     Solver<crate::PostflopEvaluator, S>,
     GameIndex,
     (PerPlayer<f64>, PerPlayer<f64>),
+    Option<ProfileReport>,
 );
 
 pub(crate) fn query<S: Storage>(
@@ -156,13 +168,14 @@ pub(crate) fn query<S: Storage>(
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
         bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
     }
-    let (game, index) = build_indexed(p)?;
+    let (game, index, resolved) = build_profiled(p)?;
     let mut solver = Solver::<_, S>::new(
         game,
         schedule(&p.settings.solver.algorithm),
         Some(iterations),
     );
     solver.set_cfr_precision(p.settings.solver.cfr_precision);
+    let mut controller = install_profile(&mut solver, resolved, None)?;
     solver.set_par(ParConfig {
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
@@ -186,6 +199,7 @@ pub(crate) fn query<S: Storage>(
         solver.run(batch_step(check_every, next_check - solver.iteration()));
         evaluated = None;
         if solver.iteration() == next_check {
+            controller.update(&mut solver)?;
             if let Some(target) = target {
                 let (ev, expl) = solver.evaluate();
                 evaluated = Some((ev, expl));
@@ -204,8 +218,14 @@ pub(crate) fn query<S: Storage>(
             );
         }
     }
-    let evaluation = evaluated.unwrap_or_else(|| solver.evaluate());
-    Ok((solver, index, evaluation))
+    let (ev, expl) = evaluated.unwrap_or_else(|| solver.evaluate());
+    let evaluation = if solver.profile().is_some() {
+        (solver.true_expected_values(), expl)
+    } else {
+        (ev, expl)
+    };
+    let report = controller.report(&solver, p);
+    Ok((solver, index, evaluation, report))
 }
 
 /// Builds the game and its viewer index, releasing the builder's per-node
@@ -213,13 +233,297 @@ pub(crate) fn query<S: Storage>(
 pub(crate) fn build_indexed(
     p: &Prepared,
 ) -> Result<(CompiledGame<crate::PostflopEvaluator>, GameIndex)> {
-    let crate::PostflopGame {
-        game, node_info, ..
-    } = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
+    let (game, index, _) = build_profiled(p)?;
+    Ok((game, index))
+}
+/// Resolve profile selectors against the actual tree for validation.
+pub fn validate_profile(p: &Prepared) -> Result<Option<crate::profile::ProfileSummary>> {
+    Ok(build_profiled(p)?.2.map(|profile| profile.summary))
+}
+
+fn build_profiled(
+    p: &Prepared,
+) -> Result<(
+    CompiledGame<crate::PostflopEvaluator>,
+    GameIndex,
+    Option<crate::profile::ResolvedProfile>,
+)> {
+    let mut built = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
         .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
     let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-    let index = GameIndex::from_game(&game, &node_info, start);
-    Ok((game, index))
+    let index = GameIndex::from_game(&built.game, &built.node_info, start);
+    let resolved = if let Some(ir) = &p.document.spot.profile {
+        if !matches!(
+            p.document.spot.economics.utility,
+            economics::UtilityConfig::ChipEv
+        ) && (!ir.incentives.is_empty() || !ir.frequencies.is_empty())
+        {
+            return Err(spot::SpotError::new(
+                spot::Code::NLH003,
+                "profile",
+                "incentives and frequency targets require chip EV",
+            )
+            .into());
+        }
+        let mut base_strategies = Vec::new();
+        if let Some(freeze) = &ir.freeze_upstream {
+            let mut input = std::fs::File::open(&freeze.solution)?;
+            let mut hash = Sha256::new();
+            let mut buffer = [0u8; 64 * 1024];
+            loop {
+                let n = input.read(&mut buffer)?;
+                if n == 0 {
+                    break;
+                }
+                hash.update(&buffer[..n]);
+            }
+            let actual = format!("{:x}", hash.finalize());
+            if freeze.sha256.as_deref() != Some(actual.as_str()) {
+                return Err(spot::SpotError::new(
+                    spot::Code::NLH003,
+                    "profile.freeze_upstream",
+                    "base solution SHA-256 changed",
+                )
+                .into());
+            }
+            let base = crate::artifact::load_sol(Path::new(&freeze.solution), 0, None)?;
+            let tree = &built.game.tree;
+            if base.game.tree.nodes.len() != tree.nodes.len()
+                && p.config
+                    .profile_suit_perms
+                    .as_ref()
+                    .is_some_and(|perms| perms.len() < 24)
+            {
+                return Err(spot::SpotError::new(
+                    spot::Code::NLH003,
+                    "profile.freeze_upstream",
+                    "base tree differs from the profiled tree; suit-isomorphism restriction from profile selectors cannot be combined with freeze_upstream",
+                ).into());
+            }
+            if base.config.board != p.config.board
+                || base.config.pot != p.config.pot
+                || base.config.effective_stack != p.config.effective_stack
+                || base.game.tree.nodes.len() != tree.nodes.len()
+                || Player::BOTH
+                    .into_iter()
+                    .any(|seat| base.game.index.hands.combos(seat) != index.hands.combos(seat))
+            {
+                bail!("NLH003: freeze_upstream solution does not match tree or hand support");
+            }
+            let view = crate::index::TreeView {
+                tree,
+                index: &index,
+            };
+            for (id, node) in tree.nodes.iter().enumerate() {
+                let other = base.game.tree.node(id as u32);
+                if node.kind != other.kind
+                    || node.player != other.player
+                    || node.num_children != other.num_children
+                    || (node.kind == hu_engine::NodeKind::Action
+                        && !view
+                            .action_labels(id as u32)
+                            .eq(base.view().action_labels(id as u32)))
+                {
+                    bail!("NLH003: freeze_upstream solution has a different tree");
+                }
+                base_strategies.push(if node.kind == hu_engine::NodeKind::Action {
+                    base.stored_strategy(id as u32)?
+                } else {
+                    None
+                });
+            }
+        }
+        let provider = |id: u32| base_strategies.get(id as usize).cloned().flatten();
+        let resolved = crate::profile::resolve_profile(
+            &mut built,
+            &p.config,
+            ir,
+            ir.freeze_upstream
+                .as_ref()
+                .map(|_| &provider as &dyn Fn(u32) -> Option<Vec<f32>>),
+        )?;
+        if p.settings.output.solution_streets == SolutionStreets::NoRivers
+            && resolved
+                .summary
+                .resolved_nodes
+                .iter()
+                .any(|node| index.streets[node.node as usize] == nlh::Street::River)
+        {
+            return Err(spot::SpotError::new(
+                spot::Code::NLH003,
+                "output.solution_streets",
+                "no-rivers cannot be used with river profile or frozen nodes",
+            )
+            .into());
+        }
+        Some(resolved)
+    } else {
+        None
+    };
+    Ok((built.game, index, resolved))
+}
+
+struct FrequencyController {
+    targets: Vec<crate::profile::FrequencyTarget>,
+    lambdas: Vec<f64>,
+    base_bonuses: Vec<Option<Vec<f32>>>,
+    summary: Option<crate::profile::ProfileSummary>,
+    frozen_nodes: Vec<hu_engine::NodeId>,
+}
+
+fn install_profile<E: TerminalEvaluator, S: Storage>(
+    solver: &mut Solver<E, S>,
+    resolved: Option<crate::profile::ResolvedProfile>,
+    saved: Option<&[f64]>,
+) -> Result<FrequencyController> {
+    let Some(resolved) = resolved else {
+        if saved.is_some_and(|v| !v.is_empty()) {
+            bail!("checkpoint has unexpected frequency state");
+        }
+        return Ok(FrequencyController {
+            targets: Vec::new(),
+            lambdas: Vec::new(),
+            base_bonuses: Vec::new(),
+            summary: None,
+            frozen_nodes: Vec::new(),
+        });
+    };
+    let lambdas = saved.unwrap_or(&[]).to_vec();
+    if saved.is_some() && lambdas.len() != resolved.targets.len() {
+        bail!("checkpoint frequency controller shape mismatch");
+    }
+    let lambdas = if lambdas.is_empty() {
+        vec![0.0; resolved.targets.len()]
+    } else {
+        lambdas
+    };
+    let base_bonuses = resolved
+        .engine
+        .incentives
+        .iter()
+        .map(|entry| entry.as_ref().map(|e| e.bonus.clone()))
+        .collect();
+    solver
+        .set_profile(resolved.engine)
+        .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "profile", e.to_string()))?;
+    let controller = FrequencyController {
+        targets: resolved.targets,
+        lambdas,
+        base_bonuses,
+        summary: Some(resolved.summary),
+        frozen_nodes: resolved.frozen_nodes,
+    };
+    controller.sync(solver);
+    Ok(controller)
+}
+
+impl FrequencyController {
+    fn report<S: Storage>(
+        &self,
+        solver: &Solver<crate::PostflopEvaluator, S>,
+        p: &Prepared,
+    ) -> Option<ProfileReport> {
+        self.summary.clone().map(|summary| ProfileReport {
+            summary,
+            frozen_nodes: self.frozen_nodes.clone(),
+            general_sum: p
+                .document
+                .spot
+                .profile
+                .as_ref()
+                .is_some_and(|ir| !ir.incentives.is_empty() || !ir.frequencies.is_empty()),
+            frequencies: self.metrics(solver, false),
+        })
+    }
+
+    fn sync<E: TerminalEvaluator, S: Storage>(&self, solver: &mut Solver<E, S>) {
+        let sizes: Vec<_> = solver
+            .game()
+            .tree
+            .storage_refs
+            .iter()
+            .map(|r| r.num_hands as usize)
+            .collect();
+        let profile = solver.profile_mut().unwrap();
+        for (entry, base) in profile.incentives.iter_mut().zip(&self.base_bonuses) {
+            if let (Some(entry), Some(base)) = (entry, base) {
+                entry.bonus.copy_from_slice(base);
+            }
+        }
+        for (target, &lambda) in self.targets.iter().zip(&self.lambdas) {
+            let incentive = profile.incentives[target.storage_ref as usize]
+                .as_mut()
+                .unwrap();
+            for &h in &target.hands {
+                incentive.bonus[target.action * sizes[target.storage_ref as usize] + h as usize] +=
+                    lambda as f32;
+            }
+        }
+    }
+
+    fn metrics<E: TerminalEvaluator, S: Storage>(
+        &self,
+        solver: &Solver<E, S>,
+        current: bool,
+    ) -> Vec<FrequencyMetric> {
+        if self.targets.is_empty() {
+            return Vec::new();
+        }
+        let parents = hu_engine::parent_array(&solver.game().tree);
+        self.targets
+            .iter()
+            .zip(&self.lambdas)
+            .map(|(target, &lambda)| {
+                let game = solver.game();
+                let node = game.tree.node(target.node);
+                let root = PerPlayer::new(
+                    game.root_ranges[Player::P0].as_slice(),
+                    game.root_ranges[Player::P1].as_slice(),
+                );
+                let path = hu_engine::path_from_root(&parents, target.node);
+                let reach = hu_engine::reach_on_path(&game.tree, root, &path, |id, _, out| {
+                    out.copy_from_slice(&solver.average_strategy_at(id))
+                });
+                let strategy = if current {
+                    solver.current_strategy_at(target.node)
+                } else {
+                    solver.average_strategy_at(target.node)
+                };
+                let hands = game.tree.storage_ref(node).num_hands as usize;
+                let (mut numerator, mut denominator) = (0.0, 0.0);
+                for &hand in &target.hands {
+                    let h = hand as usize;
+                    let weight = f64::from(reach[node.player][h]);
+                    denominator += weight;
+                    numerator += weight * f64::from(strategy[target.action * hands + h]);
+                }
+                let achieved = (denominator > 0.0).then(|| numerator / denominator);
+                FrequencyMetric {
+                    entry: target.entry,
+                    node: target.node,
+                    target: target.target,
+                    achieved,
+                    error: achieved.map(|f| (f - target.target).abs()),
+                    lambda,
+                }
+            })
+            .collect()
+    }
+
+    fn update<E: TerminalEvaluator, S: Storage>(
+        &mut self,
+        solver: &mut Solver<E, S>,
+    ) -> Result<()> {
+        for (i, metric) in self.metrics(solver, true).iter().enumerate() {
+            if let Some(achieved) = metric.achieved {
+                self.lambdas[i] += 0.1 * (metric.target - achieved) * self.targets[i].pot_utility;
+            }
+        }
+        if !self.targets.is_empty() {
+            self.sync(solver);
+        }
+        Ok(())
+    }
 }
 
 pub fn schedule(algorithm: &Algorithm) -> Box<dyn DiscountSchedule> {
@@ -261,7 +565,7 @@ fn drive<S: Storage>(
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));
     }
-    let (game, index) = build_indexed(p)?;
+    let (game, index, resolved) = build_profiled(p)?;
     let stop = &p.settings.solver.stop;
     let mut solver = Solver::<_, S>::new(
         game,
@@ -273,6 +577,8 @@ fn drive<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
+    let saved_lambdas = state.as_ref().map(|s| s.frequency_lambdas.as_slice());
+    let mut controller = install_profile(&mut solver, resolved, saved_lambdas)?;
     if let Some(state) = state {
         let iteration = state.iteration;
         solver
@@ -321,6 +627,7 @@ fn drive<S: Storage>(
         evaluated = None;
         let mut target_reached = false;
         if solver.iteration() == next_check {
+            controller.update(&mut solver)?;
             let (ev, expl) = solver.evaluate();
             evaluated = Some((ev, expl));
             let nash_conv = expl[Player::P0] + expl[Player::P1];
@@ -331,6 +638,12 @@ fn drive<S: Storage>(
                 expl_p1: expl[Player::P1],
                 nash_conv,
             }))?;
+            if !controller.targets.is_empty() {
+                observer(Observation::ProfileProgress {
+                    iteration: solver.iteration(),
+                    frequencies: controller.metrics(&solver, false),
+                })?;
+            }
             history.push((solver.iteration(), nash_conv / 2.0));
             target_reached = p.target.is_some_and(|target| nash_conv / 2.0 <= target);
             next_check = next_evaluation(
@@ -343,7 +656,14 @@ fn drive<S: Storage>(
         }
         let elapsed_secs = (elapsed_before + start.elapsed()).as_secs_f64();
         if last_checkpoint.elapsed() >= interval {
-            save(&solver, p, checkpoint, elapsed_secs, observer)?;
+            save(
+                &solver,
+                p,
+                checkpoint,
+                elapsed_secs,
+                observer,
+                &controller.lambdas,
+            )?;
             last_checkpoint = Instant::now();
             saved_iteration = Some(solver.iteration());
         }
@@ -368,7 +688,16 @@ fn drive<S: Storage>(
     observer(Observation::Stop { reason })?;
     let offset = p.payoff.ev_offset();
     let (ev, expl) = evaluated.unwrap_or_else(|| solver.evaluate());
+    let ev = if solver.profile().is_some() {
+        solver.true_expected_values()
+    } else {
+        ev
+    };
     let mut summary = summary_from_evaluation(&solver, elapsed, subgame_ev(ev, offset), expl);
+    summary.profile = controller.report(&solver, p);
+    if let Some(profile) = &summary.profile {
+        summary.frequencies.clone_from(&profile.frequencies);
+    }
     diagnostics(Diagnostic::Done(summary.clone()));
     summary.canceled = canceled;
     let final_checkpoint =
@@ -397,7 +726,16 @@ fn drive<S: Storage>(
         // save's current_num_threads and the solution's strategy batches must
         // never fall back to the global pool. Each closure only borrows solver.
         let (checkpoint_result, solution_result) = rayon::join(
-            || save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer),
+            || {
+                save(
+                    &solver,
+                    p,
+                    checkpoint,
+                    elapsed.as_secs_f64(),
+                    observer,
+                    &controller.lambdas,
+                )
+            },
             || {
                 crate::artifact::export_sol(
                     &spec,
@@ -416,7 +754,14 @@ fn drive<S: Storage>(
         solution_result?;
     } else {
         if final_checkpoint {
-            save(&solver, p, checkpoint, elapsed.as_secs_f64(), observer)?;
+            save(
+                &solver,
+                p,
+                checkpoint,
+                elapsed.as_secs_f64(),
+                observer,
+                &controller.lambdas,
+            )?;
         }
         solver.release_regrets();
         crate::artifact::export_sol(
@@ -450,16 +795,30 @@ fn save<S: Storage>(
     checkpoint: &Path,
     elapsed: f64,
     observer: &mut Observer<'_>,
+    lambdas: &[f64],
 ) -> Result<()> {
-    crate::checkpoint::write_storage_with_config(
-        checkpoint,
-        compatibility_hash(&p.effective)?,
-        solver.iteration(),
-        solver.storage(),
-        &p.effective,
-        elapsed,
-        rayon::current_num_threads(),
-    )?;
+    if lambdas.is_empty() {
+        crate::checkpoint::write_storage_with_config(
+            checkpoint,
+            compatibility_hash(&p.effective)?,
+            solver.iteration(),
+            solver.storage(),
+            &p.effective,
+            elapsed,
+            rayon::current_num_threads(),
+        )?;
+    } else {
+        crate::checkpoint::write_storage_with_frequency(
+            checkpoint,
+            compatibility_hash(&p.effective)?,
+            solver.iteration(),
+            solver.storage(),
+            &p.effective,
+            elapsed,
+            rayon::current_num_threads(),
+            lambdas,
+        )?;
+    }
     observer(Observation::Checkpoint {
         iterations: solver.iteration(),
     })?;
@@ -494,6 +853,26 @@ pub(crate) fn solver_ev<E: TerminalEvaluator, S: Storage>(solver: &Solver<E, S>)
     )
 }
 
+/// Achieved reach-weighted frequency for one selector/runout target.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct FrequencyMetric {
+    pub entry: usize,
+    pub node: hu_engine::NodeId,
+    pub target: f64,
+    pub achieved: Option<f64>,
+    pub error: Option<f64>,
+    pub lambda: f64,
+}
+
+/// Profile diagnostics retained with an exported solution.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProfileReport {
+    pub summary: crate::profile::ProfileSummary,
+    pub frozen_nodes: Vec<hu_engine::NodeId>,
+    pub general_sum: bool,
+    pub frequencies: Vec<FrequencyMetric>,
+}
+
 /// Final convergence and cancellation data, on the subgame-start reporting basis.
 #[derive(Clone)]
 pub struct RunSummary {
@@ -504,6 +883,8 @@ pub struct RunSummary {
     pub expl_p0: f64,
     pub expl_p1: f64,
     pub nash_conv: f64,
+    pub frequencies: Vec<FrequencyMetric>,
+    pub profile: Option<ProfileReport>,
     /// The run stopped on request at a checkpoint boundary, not because it
     /// reached its budget or its convergence target.
     pub canceled: bool,
@@ -534,12 +915,440 @@ pub(crate) fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
         expl_p0: expl[Player::P0],
         expl_p1: expl[Player::P1],
         nash_conv,
+        frequencies: Vec::new(),
+        profile: None,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn toy_frequency_controller_converges_for_two_targets() {
+        use crate::game::{ChipEv, NoRake, PayoffPipeline, kuhn};
+        use crate::profile::{FrequencyTarget, ProfileSummary, ResolvedProfile};
+        use hu_engine::{Dcfr, F32Storage, NodeIncentive, Profile};
+
+        let toy = kuhn(PayoffPipeline {
+            rake: &NoRake,
+            utility: &ChipEv,
+        });
+        let tree = &toy.game.tree;
+        let root = tree.node(0);
+        let s = root.aux as usize;
+        let hands = tree.storage_ref(root).num_hands as usize;
+        let mut incentives = vec![None; tree.storage_refs.len()];
+        incentives[s] = Some(NodeIncentive {
+            bonus: vec![0.0; root.num_children as usize * hands],
+            space: 0,
+        });
+        let targets = [0.25, 0.75]
+            .into_iter()
+            .enumerate()
+            .map(|(entry, target)| FrequencyTarget {
+                entry,
+                node: 0,
+                storage_ref: s as u32,
+                action: 0,
+                hands: vec![(entry * 2) as u32],
+                target,
+                pot_utility: 2.0,
+            })
+            .collect();
+        let resolved = ResolvedProfile {
+            engine: Profile {
+                locks: vec![None; tree.storage_refs.len()],
+                incentives,
+            },
+            targets,
+            summary: ProfileSummary::default(),
+            frozen_nodes: Vec::new(),
+        };
+        let mut solver =
+            Solver::<_, F32Storage>::new(toy.game, Box::<Dcfr>::default(), Some(100_000));
+        let mut controller = install_profile(&mut solver, Some(resolved), None).unwrap();
+        for _ in 0..4000 {
+            solver.run(25);
+            controller.update(&mut solver).unwrap();
+        }
+        let metrics = controller.metrics(&solver, false);
+        assert_eq!(metrics.len(), 2);
+        for metric in metrics {
+            assert!(metric.error.unwrap() < 0.01, "{metric:?}");
+        }
+    }
+
+    const RIVER_PROFILE: &str = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2s 7s Ks 4h 3d"
+[ranges]
+BB = "AK,KQ,AA"
+BTN = "QQ,JJ"
+[tree]
+script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 4000
+check_every = 25
+[run]
+memory = "1GiB"
+threads = 1
+[[profile.frequency]]
+node = "root"
+action = "check"
+target = 0.5
+"#;
+
+    #[test]
+    fn river_frequency_target_is_reported_and_persisted() {
+        let dir = tempfile::tempdir().unwrap();
+        let p = crate::prepare::prepare(RIVER_PROFILE, &dir.path().join("spot.toml")).unwrap();
+        let checkpoint = dir.path().join("checkpoint.ckpt");
+        let solution = dir.path().join("solution.sol");
+        let summary = run(
+            RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let metric = &summary.frequencies[0];
+        assert!(metric.error.unwrap() < 0.01, "frequency: {metric:?}");
+        let artifact = crate::artifact::load_sol(&solution, 0, None).unwrap();
+        let nodes = &artifact.profile.as_ref().unwrap().summary.resolved_nodes;
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(nodes[0].node, 0);
+        assert_eq!(nodes[0].history, "");
+        assert_eq!(nodes[0].entry, Some(0));
+        let exported = crate::views::export(
+            &solution,
+            crate::views::ExportView::Summary,
+            &[],
+            false,
+            None,
+        )
+        .unwrap();
+        let json = serde_json::to_value(exported).unwrap();
+        assert_eq!(
+            json["profile"]["summary"]["resolved_nodes"][0]["kind"],
+            "frequency"
+        );
+        assert_eq!(json["profile_config"]["frequency"][0]["target"], 0.5);
+        let stored = &artifact.profile.unwrap().frequencies[0];
+        assert_eq!(stored.lambda, metric.lambda);
+        assert_eq!(stored.achieved, metric.achieved);
+        assert_eq!(
+            crate::checkpoint::CheckpointReader::open(&checkpoint)
+                .unwrap()
+                .frequency_lambdas,
+            vec![metric.lambda]
+        );
+    }
+
+    #[test]
+    fn frequency_resume_preserves_state_and_rejects_changed_profile() {
+        use std::sync::atomic::Ordering;
+        let dir = tempfile::tempdir().unwrap();
+        let p = crate::prepare::prepare(RIVER_PROFILE, &dir.path().join("spot.toml")).unwrap();
+        let full_ckpt = dir.path().join("full.ckpt");
+        let full_sol = dir.path().join("full.sol");
+        let partial_ckpt = dir.path().join("partial.ckpt");
+        let partial_sol = dir.path().join("partial.sol");
+        let cancel = AtomicBool::new(false);
+        fn request<'a>(
+            p: &'a Prepared,
+            cancel: &'a AtomicBool,
+            checkpoint: &'a Path,
+            solution: &'a Path,
+            state: Option<crate::checkpoint::CheckpointReader>,
+            history: Vec<(u64, f64)>,
+        ) -> RunRequest<'a> {
+            RunRequest {
+                prepared: p,
+                checkpoint,
+                solution,
+                state,
+                evaluation_history: history,
+                elapsed_before: Duration::ZERO,
+                cancel,
+            }
+        }
+        let full = run(
+            request(&p, &cancel, &full_ckpt, &full_sol, None, Vec::new()),
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let mut history = Vec::new();
+        let partial = run(
+            request(&p, &cancel, &partial_ckpt, &partial_sol, None, Vec::new()),
+            &mut |event| {
+                if let Observation::Progress(row) = event {
+                    history.push((row.iteration, row.nash_conv / 2.0));
+                    if row.iteration == 2000 {
+                        cancel.store(true, Ordering::SeqCst);
+                    }
+                }
+                Ok(())
+            },
+            &mut |_| {},
+        )
+        .unwrap();
+        assert!(partial.canceled);
+        cancel.store(false, Ordering::SeqCst);
+        let changed = p.effective.replace("target = 0.5", "target = 0.6");
+        assert!(crate::prepare::restore(&changed, &partial_ckpt).is_err());
+        let state = crate::checkpoint::CheckpointReader::open(&partial_ckpt).unwrap();
+        let resumed = run(
+            request(
+                &p,
+                &cancel,
+                &partial_ckpt,
+                &partial_sol,
+                Some(state),
+                history,
+            ),
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(
+            full.frequencies[0].lambda.to_bits(),
+            resumed.frequencies[0].lambda.to_bits()
+        );
+        assert_eq!(
+            full.frequencies[0].achieved.unwrap().to_bits(),
+            resumed.frequencies[0].achieved.unwrap().to_bits()
+        );
+        assert_eq!(
+            crate::checkpoint::read_checkpoint(&full_ckpt)
+                .unwrap()
+                .state,
+            crate::checkpoint::read_checkpoint(&partial_ckpt)
+                .unwrap()
+                .state
+        );
+        let a = crate::artifact::load_sol(&full_sol, 0, None).unwrap();
+        let b = crate::artifact::load_sol(&partial_sol, 0, None).unwrap();
+        for id in 0..a.game.tree.nodes.len() as hu_engine::NodeId {
+            if a.game.tree.node(id).kind == hu_engine::NodeKind::Action {
+                assert_eq!(
+                    a.stored_strategy(id).unwrap(),
+                    b.stored_strategy(id).unwrap()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn frozen_ancestors_follow_base_solution_and_changed_base_is_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let raw = RIVER_PROFILE.split("[[profile.frequency]]").next().unwrap();
+        let path = dir.path().join("spot.toml");
+        let base = crate::prepare::prepare(raw, &path).unwrap();
+        let base_ckpt = dir.path().join("base.ckpt");
+        let base_sol = dir.path().join("base.sol");
+        let cancel = AtomicBool::new(false);
+        let execute = |p: &Prepared, ckpt: &Path, sol: &Path| {
+            run(
+                RunRequest {
+                    prepared: p,
+                    checkpoint: ckpt,
+                    solution: sol,
+                    state: None,
+                    evaluation_history: Vec::new(),
+                    elapsed_before: Duration::ZERO,
+                    cancel: &cancel,
+                },
+                &mut |_| Ok(()),
+                &mut |_| {},
+            )
+        };
+        execute(&base, &base_ckpt, &base_sol).unwrap();
+        let path_text = base_sol.to_string_lossy().replace('\\', "/");
+        let frozen_input = format!(
+            "{raw}\n[profile]\nfreeze_upstream = {{ solution = '{path_text}' }}\n[[profile.lock]]\nnode = 'x'\nstrategy = {{ check = 1.0 }}\n"
+        );
+        let p = crate::prepare::prepare(&frozen_input, &path).unwrap();
+        let frozen_ckpt = dir.path().join("frozen.ckpt");
+        let frozen_sol = dir.path().join("frozen.sol");
+        let summary = execute(&p, &frozen_ckpt, &frozen_sol).unwrap();
+        assert!(summary.profile.unwrap().frozen_nodes.contains(&0));
+        let base = crate::artifact::load_sol(&base_sol, 0, None).unwrap();
+        let frozen = crate::artifact::load_sol(&frozen_sol, 0, None).unwrap();
+        assert_eq!(
+            base.stored_strategy(0).unwrap(),
+            frozen.stored_strategy(0).unwrap()
+        );
+        let comparison = crate::views::compare(&base_sol, &frozen_sol, false).unwrap();
+        assert!(comparison.profile_changed);
+        let conditions = comparison.profile_conditions.unwrap();
+        assert!(conditions[0].is_none());
+        assert!(conditions[1].as_ref().unwrap().contains("freeze_upstream"));
+        drop(base);
+        let mut bytes = std::fs::read(&base_sol).unwrap();
+        bytes.push(0);
+        std::fs::write(&base_sol, bytes).unwrap();
+        assert!(execute(&p, &frozen_ckpt, &frozen_sol).is_err());
+        drop(frozen);
+        std::fs::remove_file(&base_sol).unwrap();
+        assert!(crate::artifact::load_sol(&frozen_sol, 0, None).is_ok());
+    }
+
+    #[test]
+    fn incentive_changes_play_but_solution_ev_excludes_bonus() {
+        let dir = tempfile::tempdir().unwrap();
+        let raw = RIVER_PROFILE.split("[[profile.frequency]]").next().unwrap();
+        let path = dir.path().join("spot.toml");
+        let base = crate::prepare::prepare(raw, &path).unwrap();
+        let cancel = AtomicBool::new(false);
+        let (base_solver, index, _, _) = query::<F32Storage>(&base, None, None, &cancel).unwrap();
+        let view = crate::index::TreeView {
+            tree: &base_solver.game().tree,
+            index: &index,
+        };
+        let actions = view.actions(0);
+        let bet = actions.iter().position(|a| a.starts_with("bet ")).unwrap();
+        let input = format!(
+            "{raw}\n[[profile.incentive]]\nnode = 'root'\naction = '{}'\nbb = 10.0\n",
+            actions[bet]
+        );
+        let p = crate::prepare::prepare(&input, &path).unwrap();
+        let (solver, _, _, _) = query::<F32Storage>(&p, None, None, &cancel).unwrap();
+        let hands = solver
+            .game()
+            .tree
+            .storage_ref(solver.game().tree.node(0))
+            .num_hands as usize;
+        let frequency = |solver: &Solver<crate::PostflopEvaluator, F32Storage>| {
+            prepare::action_frequencies(
+                &solver.average_strategy_at(0),
+                &solver.game().root_ranges[Player::P0],
+                actions.len(),
+                hands,
+            )[bet]
+        };
+        assert!(frequency(&solver) > frequency(&base_solver) + 0.1);
+        let true_ev = solver.true_expected_values();
+        assert!(solver.evaluate().0[Player::P0] > true_ev[Player::P0] + 0.1);
+        let solution = dir.path().join("incentive.sol");
+        let summary = run(
+            RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("incentive.ckpt"),
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &cancel,
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        assert!(summary.profile.as_ref().unwrap().general_sum);
+        let stored = crate::artifact::load_sol(&solution, 0, None).unwrap();
+        assert_eq!(stored.meta.ev[0], summary.ev[Player::P0]);
+        assert!(
+            (summary.ev[Player::P0] - subgame_ev(true_ev, p.payoff.ev_offset())[Player::P0]).abs()
+                < 1e-6
+        );
+    }
+
+    #[test]
+    fn category_lock_survives_solution_quantization() {
+        let dir = tempfile::tempdir().unwrap();
+        let raw = RIVER_PROFILE.split("[[profile.frequency]]").next().unwrap();
+        let input = format!(
+            "{raw}\n[[profile.lock]]\nnode = 'root'\ncategory = 'toppair'\nstrategy = {{ check = 0.5 }}\n"
+        );
+        let p = crate::prepare::prepare(&input, &dir.path().join("spot.toml")).unwrap();
+        let path = dir.path().join("lock.sol");
+        run(
+            RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("lock.ckpt"),
+                solution: &path,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let loaded = crate::artifact::load_sol(&path, 0, None).unwrap();
+        let strategy = loaded.stored_strategy(0).unwrap().unwrap();
+        let category = nlh::category::CategoryExpr::parse("toppair").unwrap();
+        let actor = loaded.game.tree.node(0).player;
+        let mut matched = 0;
+        for (h, &global) in loaded.game.index.hands.combos(actor).iter().enumerate() {
+            let (a, b) = nlh::combo_cards(global as usize);
+            if category.matches(&p.config.board, [a, b]) {
+                assert_eq!(strategy[h], 0.5);
+                matched += 1;
+            }
+        }
+        assert!(matched > 0);
+    }
+
+    #[test]
+    fn opponent_full_lock_leaves_other_seat_near_best_response() {
+        let dir = tempfile::tempdir().unwrap();
+        let raw = RIVER_PROFILE.split("[[profile.frequency]]").next().unwrap();
+        let path = dir.path().join("spot.toml");
+        let p = crate::prepare::prepare(raw, &path).unwrap();
+        let (game, index) = build_indexed(&p).unwrap();
+        let view = crate::index::TreeView {
+            tree: &game.tree,
+            index: &index,
+        };
+        let mut input = raw.to_owned();
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind == hu_engine::NodeKind::Action && node.player == Player::P1 {
+                let id = id as hu_engine::NodeId;
+                input.push_str(&format!(
+                    "\n[[profile.lock]]\nnode = '{}'\nstrategy = {{ '{}' = 1.0 }}\n",
+                    view.history(id),
+                    view.actions(id)[0]
+                ));
+            }
+        }
+        let p = crate::prepare::prepare(&input, &path).unwrap();
+        let summary = run(
+            RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("full.ckpt"),
+                solution: &dir.path().join("full.sol"),
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        assert!(
+            summary.expl_p0.abs() < 0.01,
+            "other-seat deviation gain: {}",
+            summary.expl_p0
+        );
+    }
 
     #[test]
     fn progress_values_round_trip_without_changing_schedule_inputs() {

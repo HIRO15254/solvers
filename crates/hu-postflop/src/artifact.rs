@@ -198,11 +198,19 @@ pub(crate) fn export_sol<S: Storage>(
     // Node ids need not be ordered by sref. Index the mode selection instead
     // of sorting/retaining packed strategies or a node-id list.
     let mut stored = vec![false; tree.storage_refs.len()];
+    let mut profile_nodes = if solver.profile().is_some() {
+        vec![0; tree.storage_refs.len()]
+    } else {
+        Vec::new()
+    };
     for (id, node) in tree.nodes.iter().enumerate() {
         if node.kind == NodeKind::Action
             && (mode == SolStreets::Full || streets[id] != Street::River)
         {
             stored[node.aux as usize] = true;
+        }
+        if node.kind == NodeKind::Action && !profile_nodes.is_empty() {
+            profile_nodes[node.aux as usize] = id as NodeId;
         }
     }
     let block_count = stored.iter().filter(|&&keep| keep).count();
@@ -216,7 +224,7 @@ pub(crate) fn export_sol<S: Storage>(
         wall_secs: summary.wall.as_secs_f64(),
     };
     let write = || -> Result<(), crate::sol::SolError> {
-        let mut writer = SolFileWriter::create(
+        let mut writer = SolFileWriter::create_with_profile(
             &spec.path,
             &SolMetadata {
                 config_toml: spec.config_toml.clone(),
@@ -225,6 +233,7 @@ pub(crate) fn export_sol<S: Storage>(
                 tree_nodes: tree.nodes.len() as u64,
                 stored_nodes: block_count as u64,
             },
+            summary.profile.as_ref(),
             |out| crate::index::write_index(out, tree, index),
         )?;
         let mut start = 0;
@@ -246,10 +255,15 @@ pub(crate) fn export_sol<S: Storage>(
                     .map(|(sref, _)| (*sref, Vec::new())),
             );
             batch.par_iter_mut().for_each(|(sref, bytes)| {
-                let mut avg = vec![0.0; sref.len()];
-                solver
-                    .storage()
-                    .average_strategy(*sref, sref.index, &mut avg);
+                let avg = if profile_nodes.is_empty() {
+                    let mut avg = vec![0.0; sref.len()];
+                    solver
+                        .storage()
+                        .average_strategy(*sref, sref.index, &mut avg);
+                    avg
+                } else {
+                    solver.average_strategy_at(profile_nodes[sref.index as usize])
+                };
                 *bytes = quantize_probs(&avg);
             });
             for (sref, bytes) in batch {
@@ -349,6 +363,9 @@ pub struct LoadedSol {
     pub config: PostflopConfig,
     index_checksum: [u8; 32],
     pub meta: SolMeta,
+    pub profile: Option<crate::run::ProfileReport>,
+    /// Normalized profile section from the artifact's identity config.
+    pub profile_toml: Option<String>,
     pub mode: StreetsStored,
     /// Stored blocks keyed by `sref` (== the action node's `Node::aux`),
     /// read chunk by chunk on demand; strategies and per-hand values (OOP's
@@ -459,8 +476,21 @@ fn load(
     )?;
     let pf_config = p.config;
     let nlh = (p.spot, p.settings);
+    let profile_toml = if nlh.0.profile.is_some() {
+        let mut document: toml_edit::DocumentMut = metadata.config_toml.parse()?;
+        let keys: Vec<_> = document.iter().map(|(key, _)| key.to_owned()).collect();
+        for key in keys {
+            if key != "profile" {
+                document.remove(&key);
+            }
+        }
+        Some(document.to_string())
+    } else {
+        None
+    };
     let board_cards = pf_config.board.clone();
     let index_checksum = reader.index_checksum();
+    let profile = reader.profile().cloned();
     // The stream stores tree/viewer fields, but support and root ranges are
     // reconstructed from config. Equal frame bytes alone cannot share those.
     let hands = crate::PostflopHands::new(&pf_config.board, &pf_config.ranges);
@@ -514,6 +544,8 @@ fn load(
         config: pf_config,
         index_checksum,
         meta: metadata.meta,
+        profile,
+        profile_toml,
         mode: metadata.mode,
         store: reader.into_store(),
         board: board_cards,
@@ -985,7 +1017,7 @@ threads=1
 memory='1GiB'
 "#;
         let p = crate::prepare::prepare(raw, Path::new("test.toml")).unwrap();
-        let (solver, index, _) =
+        let (solver, index, _, _) =
             crate::run::query::<I16Storage>(&p, None, None, &AtomicBool::new(false)).unwrap();
         let offset = p.payoff.ev_offset();
         let expl = solver.exploitability();
@@ -997,6 +1029,8 @@ memory='1GiB'
             expl_p0: expl[Player::P0],
             expl_p1: expl[Player::P1],
             nash_conv: expl[Player::P0] + expl[Player::P1],
+            frequencies: Vec::new(),
+            profile: None,
         };
         let temp = tempfile::tempdir().unwrap();
         let path = temp.path().join("test.sol");
@@ -1189,6 +1223,8 @@ memory = "1GiB"
             expl_p0: expl[Player::P0],
             expl_p1: expl[Player::P1],
             nash_conv,
+            frequencies: Vec::new(),
+            profile: None,
         };
         (solver, index, start_street, summary)
     }

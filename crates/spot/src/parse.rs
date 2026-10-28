@@ -22,6 +22,7 @@ struct RawDocument {
     solver: toml::Table,
     run: RawRun,
     output: toml::Table,
+    profile: Option<toml::Table>,
 }
 
 #[derive(Default, Deserialize)]
@@ -107,6 +108,7 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             ("solver", "raw"),
             ("run", "run"),
             ("output", "raw"),
+            ("profile", "profile"),
         ],
         "meta" => &[
             ("name", "string"),
@@ -155,6 +157,36 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             ("checkpoint_interval", "string"),
             ("final_checkpoint", "bool"),
         ],
+        "profile" => &[
+            ("lock", "array:profile_lock"),
+            ("incentive", "array:profile_incentive"),
+            ("frequency", "array:profile_frequency"),
+            ("freeze_upstream", "profile_freeze"),
+        ],
+        "profile_lock" => &[
+            ("node", "string"),
+            ("hands", "string"),
+            ("category", "string"),
+            ("strategy", "map:number"),
+            ("combos", "map:map:number"),
+            ("confidence", "number"),
+        ],
+        "profile_incentive" => &[
+            ("node", "string"),
+            ("hands", "string"),
+            ("category", "string"),
+            ("action", "string"),
+            ("pot", "number"),
+            ("bb", "number"),
+        ],
+        "profile_frequency" => &[
+            ("node", "string"),
+            ("hands", "string"),
+            ("category", "string"),
+            ("action", "string"),
+            ("target", "number"),
+        ],
+        "profile_freeze" => &[("solution", "string"), ("sha256", "string")],
         primitive => {
             let valid = match primitive {
                 "string" => value.is_str(),
@@ -287,6 +319,14 @@ fn line_sections(text: &str, read_line: bool) -> String {
 }
 
 pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotError> {
+    document_with_mode(text, config_path, false)
+}
+
+pub(crate) fn document_with_mode(
+    text: &str,
+    config_path: &Path,
+    embedded: bool,
+) -> Result<Document, SpotError> {
     let value: Value = text.parse().map_err(|e: toml::de::Error| SpotError {
         code: Code::NLH002,
         key: None,
@@ -410,6 +450,20 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
         }
     }
     let tree = tree(raw.tree, config_path, product)?;
+    let profile = match raw.profile {
+        Some(_) if product != Product::HuPostflop => {
+            return Err(SpotError::new(
+                Code::NLH002,
+                "profile",
+                format!(
+                    "this spot is solved by {}; this key belongs to the other product",
+                    product.name()
+                ),
+            ));
+        }
+        Some(profile) => Some(crate::profile::parse(&profile, config_path, embedded)?),
+        None => None,
+    };
     let run = run(raw.run, product)?;
     Ok(Document {
         spot: Spot {
@@ -423,6 +477,7 @@ pub(crate) fn document(text: &str, config_path: &Path) -> Result<Document, SpotE
             ranges,
             tree,
             run,
+            profile,
             product,
         },
         solver: raw.solver,

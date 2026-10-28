@@ -16,7 +16,9 @@
   string enum、position名、line、boardは大小文字を区別する。
 - **正規化は冪等。** 既定値をすべて明示し、script本文をinline化した実効configを`run.toml`へ保存する。
   実効configを再び正規化すると同じbytesになる。
-- **自己完結。** 外部file（tree script）は正規化で本文へ置き換える。cache pathやmachine固有の値は書かない。
+- **自己完結。** tree scriptは正規化で本文へ置き換える。例外として`profile.freeze_upstream`は
+  外部solutionの絶対pathとSHA-256を記録し、利用者configの再読込・solve時にfileとhashの一致を要求する。
+  成果物に埋め込まれたconfigの読込時には基準fileを開き直さない。
 - config内の相対pathはconfig fileのdirectory基準。環境変数、`~`、include/extendsは展開しない。
 
 ## 2. 全体構造
@@ -33,7 +35,46 @@ schema = "solvers.nlh/v1"   # 必須
 [solver]     # 任意。決定した製品のkeyだけを書ける
 [run]        # 任意。共通の運用設定
 [output]     # 任意。決定した製品のkeyだけを書ける
+[profile]    # 任意。P1専用のlock・incentive・頻度目標
 ```
+
+## `[profile]`（P1のみ）
+
+P2に指定すると製品不一致の`NLH002`となる。省略時は制約も加点もない。
+
+次は`x`の判断nodeに`check`と`bet 3.3`がある木での例である。
+
+```toml
+[[profile.lock]]
+node = "x"
+hands = "AA,KK,AKs"
+strategy = { check = 0.5, "bet 3.3" = 0.5 }
+confidence = 1.0
+```
+
+- `node`は`solvers tree --node`と同じhistoryまたはlabel path。`root`と空文字列はrootを選ぶ。
+  historyの`[?]`、label pathの`?`は全runoutに一致するwildcard。
+  `action`は空にできず、`solvers tree`に表示されるlabelを使う。
+- `hands`は第8節のrange文字列で、明示weightはすべて1でなければならない。
+  `category`は[hand category](hu-postflop.jp.md#hand-category)の式で、`hands`と排他。
+  両方省略するとそのnodeのactorの全handが対象。
+- lockは`strategy`（actionから確率へのmap）または`combos`（2枚の異なるcardから
+  action確率mapへのmap）のどちらかを必須とする。`combos`は`hands`・`category`と排他。
+  確率は有限の0..1、各戦略の和は1以下（許容誤差1e-9）。部分指定の残りは自由に最適化する。
+  `confidence`は既定1、範囲は(0,1]。1未満なら全actionを指定し和を1にする。
+  `confidence = 1`で全actionを固定する場合も和は1でなければならない。和が1未満なら未指定の自由actionが必要。
+- incentiveは`action`と、pot比の`pot`またはBB単位の`bb`のどちらか一方を必須とする。
+  額は有限で、負の加点も指定できる。frequencyは`action`と0..1の`target`が必須。
+  frequencyの対象頻度はrunoutごとに数える。
+  lockとfrequencyが同一nodeの同一handに重複するとerror。
+  `output.solution_streets = "no-rivers"`は、解決されたprofile対象nodeまたは固定される祖先nodeが
+  Riverにある場合は拒否する。遅延River再solveでは制約を保持できないためである。
+- `freeze_upstream.solution`は基準`.sol`のpath。相対pathはconfig基準。
+  正規化は基準fileのSHA-256を小文字の`sha256`として記録し、利用者configの再読込時に照合する。
+  指定するhashは大文字も受け付け、小文字に正規化する。成果物に埋め込まれたconfigの読込時には再照合しない。
+  木への解決、上流固定、lock・incentive・頻度目標の計算上の意味は[P1規範](hu-postflop.jp.md)に従う。
+  suit非対称のselectorがiso groupingを制限し、基準解とprofileの木が異なる場合は拒否する。
+  suit対称のrange・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする。
 
 ## 3. 製品の決定
 

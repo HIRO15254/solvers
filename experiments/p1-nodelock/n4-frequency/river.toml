@@ -1,0 +1,20 @@
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2s 7s Ks 4h 3d"
+[ranges]
+BB = "AK,KQ,AA,QQ,JJ"
+BTN = "AK,KQ,AA,QQ,JJ"
+[tree]
+script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 4000
+check_every = 25
+[run]
+memory = "1GiB"
+threads = 1

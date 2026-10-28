@@ -16,6 +16,7 @@ import {
   type Issue,
 } from "../components/DocFields";
 import { RangeEditor } from "../components/RangeEditor";
+import { SetupProfile } from "../components/SetupProfile";
 import { SetupStart } from "../components/SetupStart";
 import { SpotCard, ValidationCard, type Validation } from "../components/SetupSummary";
 import { SetupTable } from "../components/SetupTable";
@@ -46,7 +47,7 @@ import { navigate } from "../route";
 const DRAFT_KEY = "solvers.setup.draft";
 const DEFAULT_TEMPLATE = "flop_srp";
 
-type Step = "table" | "start" | "range" | "tree" | "solver" | "toml";
+type Step = "table" | "start" | "range" | "tree" | "profile" | "solver" | "toml";
 
 /**
  * The steps of a spot, in the order GTO Wizard's custom-solution builder,
@@ -59,6 +60,7 @@ const STEPS: { id: Step; label: string; icon: string }[] = [
   { id: "start", label: "Start", icon: "route" },
   { id: "range", label: "Range", icon: "grid-dots" },
   { id: "tree", label: "Tree", icon: "binary-tree" },
+  { id: "profile", label: "Profile", icon: "lock" },
   { id: "solver", label: "Solver", icon: "cpu" },
 ];
 
@@ -74,6 +76,7 @@ const KEY_STEP: Record<string, Step> = {
   spot: "start",
   ranges: "range",
   tree: "tree",
+  profile: "profile",
   solver: "solver",
   run: "solver",
   output: "solver",
@@ -117,6 +120,7 @@ function leafPaths(table: Doc, prefix = ""): string[] {
   return Object.entries(table).flatMap(([key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key;
     if (prefix === "ranges") return [];
+    if (path === "profile") return [];
     return typeof value === "object" && value !== null && !Array.isArray(value)
       ? leafPaths(value as Doc, path)
       : [path];
@@ -129,6 +133,9 @@ function leafPaths(table: Doc, prefix = ""): string[] {
  * The name sits over the table on every step, so it leads nowhere.
  */
 function issueStep(issue: Issue): { step: Step; onField: boolean } | undefined {
+  if (issue.path === "profile" || issue.path.startsWith("profile.") || issue.path.startsWith("profile[")) {
+    return { step: "profile", onField: false };
+  }
   if (issue.path === "meta.name") return undefined;
   const step = KEY_STEP[issue.path.split(".")[0]!];
   if (step === undefined) return undefined;
@@ -270,6 +277,22 @@ function followRanges(
 export function SetupPage() {
   const [doc, setDoc] = useState<Doc>(initialDoc);
   const [step, setStep] = useState<Step>("table");
+  const [profilePrefill, setProfilePrefill] = useState<{ node: string; combos?: Record<string, Record<string, number>> } | null>(null);
+  useEffect(() => {
+    const text = sessionStorage.getItem("solvers.setup.profilePrefill");
+    if (!text) return;
+    sessionStorage.removeItem("solvers.setup.profilePrefill");
+    try {
+      const prefill = JSON.parse(text) as { toml: string; node: string; combos?: Record<string, Record<string, number>> };
+      if (typeof prefill.toml !== "string" || typeof prefill.node !== "string") return;
+      const loaded = readDoc(prefill.toml);
+      setDoc(loaded);
+      setProfilePrefill({ node: prefill.node, combos: prefill.combos });
+      setStep("profile");
+    } catch {
+      // Keep the existing draft if the transferred config cannot be read.
+    }
+  }, []);
   const [templateDialog, setTemplateDialog] = useState(false);
   const [boardDialog, setBoardDialog] = useState(false);
   const [validation, setValidation] = useState<Validation>({
@@ -572,6 +595,9 @@ export function SetupPage() {
               roles={roles}
               params={treeParams?.script === fieldText(getAt(doc, ["tree", "script"])) ? treeParams.params : []}
             />
+          </section>
+          <section className="setup-step" hidden={step !== "profile"}>
+            <SetupProfile prefill={profilePrefill} />
           </section>
           <section className="setup-step" hidden={step !== "solver"}>
             <SolverStep />

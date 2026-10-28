@@ -139,6 +139,37 @@ pub(crate) fn fold_kernel(
     }
 }
 
+/// Compatible opponent mass on a board, including when the caller's reach
+/// has not already been masked for the board.
+pub(crate) fn board_compat_mass(
+    own: &[Hand],
+    opp: &[Hand],
+    same: &[u16],
+    board: u64,
+    reach: &[f32],
+    out: &mut [f32],
+) {
+    let mut total = 0.0;
+    let mut card = [0.0; 52];
+    for h in opp {
+        let [a, b] = h.cards.map(usize::from);
+        if board & ((1u64 << a) | (1u64 << b)) == 0 {
+            let r = f64::from(reach[h.local as usize]);
+            total += r;
+            card[a] += r;
+            card[b] += r;
+        }
+    }
+    for &h in own {
+        let [a, b] = h.cards.map(usize::from);
+        out[h.local as usize] = if board & ((1u64 << a) | (1u64 << b)) != 0 {
+            0.0
+        } else {
+            (total - card[a] - card[b] + same_reach(same, h, reach)) as f32
+        };
+    }
+}
+
 // Exact lane sums follow the scalar hand order (and its per-group total
 // order). Packing only changes layout, never the arithmetic within a lane.
 fn add_exact_lanes<const L: usize>(
@@ -951,6 +982,60 @@ mod tests {
     use crate::{PostflopConfig, PostflopHands, build_postflop_game};
     use hu_engine::TerminalEvaluator;
     use nlh::{Card, CardSet, Chips, NUM_COMBOS, PerPlayer, Player, Range, combo_cards, rank_of};
+
+    #[test]
+    fn board_compat_mass_matches_pair_enumeration() {
+        let own = vec![
+            Hand {
+                local: 0,
+                cards: [0, 1],
+            },
+            Hand {
+                local: 1,
+                cards: [2, 3],
+            },
+            Hand {
+                local: 2,
+                cards: [4, 5],
+            },
+        ];
+        let opp = vec![
+            Hand {
+                local: 0,
+                cards: [0, 1],
+            },
+            Hand {
+                local: 1,
+                cards: [1, 2],
+            },
+            Hand {
+                local: 2,
+                cards: [6, 7],
+            },
+            Hand {
+                local: 3,
+                cards: [4, 8],
+            },
+        ];
+        let same = [0, ABSENT, ABSENT];
+        let reach = [0.2, 0.3, 0.4, 0.5];
+        for board in [1u64 << 8, (1u64 << 8) | (1u64 << 3)] {
+            let mut out = [f32::NAN; 3];
+            board_compat_mass(&own, &opp, &same, board, &reach, &mut out);
+            for h in &own {
+                let mask = (1u64 << h.cards[0]) | (1u64 << h.cards[1]);
+                let expected: f32 = opp
+                    .iter()
+                    .filter(|o| {
+                        let other = (1u64 << o.cards[0]) | (1u64 << o.cards[1]);
+                        mask & board == 0 && other & board == 0 && mask & other == 0
+                    })
+                    .map(|o| reach[o.local as usize])
+                    .sum();
+                assert!((out[h.local as usize] - expected).abs() < 1e-6);
+            }
+        }
+    }
 
     #[test]
     fn f32_synthetic_kernels_close() {
