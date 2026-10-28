@@ -70,24 +70,66 @@ pub(super) fn normalize_columns_f32<T: Positive>(data: &[T], r: StorageRef, out:
                 *total += value.positive_f32();
             }
         }
-        let mut inverses = [0.0f32; BLOCK];
-        for (inverse, &total) in inverses[..len].iter_mut().zip(&totals[..len]) {
-            *inverse = if total > 0.0 { total.recip() } else { 0.0 };
+        // Reuse totals: positive totals have nonnegative reciprocals (including
+        // zero for infinity); -1 marks a uniform column.
+        for total in &mut totals[..len] {
+            *total = if *total > 0.0 { total.recip() } else { -1.0 };
         }
         for a in 0..num_actions {
             let row = &data[a * num_hands + first..a * num_hands + first + len];
             let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
-            for (((dst, &value), &total), &inverse) in dst
-                .iter_mut()
-                .zip(row)
-                .zip(&totals[..len])
-                .zip(&inverses[..len])
-            {
-                *dst = if total > 0.0 {
+            for ((dst, &value), &inverse) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                *dst = if inverse >= 0.0 {
                     value.positive_f32() * inverse
                 } else {
                     uniform
                 };
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn f32_normalization_preserves_extreme_column_bits() {
+        let r = StorageRef {
+            offset: 0,
+            num_actions: 2,
+            num_hands: 5,
+            index: 0,
+        };
+        let data = [
+            0.0,
+            -0.0,
+            f32::INFINITY,
+            f32::from_bits(1),
+            f32::NAN,
+            -1.0,
+            0.0,
+            1.0,
+            0.0,
+            2.0,
+        ];
+        let mut out = [0.0; 10];
+        normalize_columns_f32(&data, r, &mut out);
+        for hand in 0..5 {
+            let total = 0.0 + data[hand].max(0.0) + data[5 + hand].max(0.0);
+            let inverse = if total > 0.0 { total.recip() } else { 0.0 };
+            for action in 0..2 {
+                let expected = if total > 0.0 {
+                    data[action * 5 + hand].max(0.0) * inverse
+                } else {
+                    0.5
+                };
+                let actual = out[action * 5 + hand];
+                if expected.is_nan() {
+                    assert!(actual.is_nan());
+                } else {
+                    assert_eq!(actual.to_bits(), expected.to_bits());
+                }
             }
         }
     }
