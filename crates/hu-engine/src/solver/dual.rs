@@ -51,6 +51,7 @@ pub(super) fn evaluate<E: TerminalEvaluator, S: Storage>(
             PerPlayer::new(&game.root_ranges[Player::P0], &game.root_ranges[Player::P1]),
             &mut values,
             par.chance_depth,
+            false,
         );
         let aggregate = |p: Player, row: &[f32]| -> f64 {
             game.root_ranges[p]
@@ -77,6 +78,7 @@ pub(super) fn evaluate<E: TerminalEvaluator, S: Storage>(
 
 // A seat can be pruned only when its opponent's reach is zero. The other seat
 // may still need the subtree, even if its own reach is zero.
+#[allow(clippy::too_many_arguments)]
 fn pass<E: TerminalEvaluator, S: Storage>(
     ctx: &Ctx<'_, E, S>,
     scratch: &mut Scratch,
@@ -84,6 +86,7 @@ fn pass<E: TerminalEvaluator, S: Storage>(
     reach: PerPlayer<&[f32]>,
     out: &mut [f32],
     budget: u32,
+    parallel_ancestor: bool,
 ) {
     let tree = &ctx.game.tree;
     let d0 = reach[Player::P0].len();
@@ -121,6 +124,12 @@ fn pass<E: TerminalEvaluator, S: Storage>(
         }
         NodeKind::Chance => {
             let n = node.num_children as usize;
+            if parallel_ancestor {
+                serial_chance(ctx, scratch, id, reach, out, budget);
+                return;
+            }
+            let parallel =
+                rayon::current_num_threads() > 1 && budget > 0 && n >= ctx.par.min_children;
             let mut rows = Vec::with_capacity(n);
             let total =
                 2 * (chance_len(tree, id, Player::P0, d0) + chance_len(tree, id, Player::P1, d1));
@@ -149,11 +158,12 @@ fn pass<E: TerminalEvaluator, S: Storage>(
                     PerPlayer::new(&r0, &r1),
                     row,
                     budget.saturating_sub(1),
+                    parallel,
                 );
                 scratch.put(r1);
                 scratch.put(r0);
             };
-            if rayon::current_num_threads() > 1 && budget > 0 && n >= ctx.par.min_children {
+            if parallel {
                 rows.into_par_iter()
                     .enumerate()
                     .for_each(|(i, row)| with_worker_scratch(|s| visit(s, i, row)));
@@ -198,7 +208,15 @@ fn pass<E: TerminalEvaluator, S: Storage>(
                 } else {
                     PerPlayer::new(reach[Player::P0], next.as_slice())
                 };
-                pass(ctx, scratch, node.first_child + a as u32, r, row, budget);
+                pass(
+                    ctx,
+                    scratch,
+                    node.first_child + a as u32,
+                    r,
+                    row,
+                    budget,
+                    parallel_ancestor,
+                );
                 scratch.put(next);
             };
             if width != 0 && parallel_actions(tree, id) {
@@ -214,6 +232,62 @@ fn pass<E: TerminalEvaluator, S: Storage>(
             scratch.put(flat);
             scratch.put(sigma);
         }
+    }
+}
+
+// Outer chance fan-out already keeps workers busy. Stream each inner chance
+// child instead of retaining four channels for every child on every worker.
+fn serial_chance<E: TerminalEvaluator, S: Storage>(
+    ctx: &Ctx<'_, E, S>,
+    scratch: &mut Scratch,
+    id: NodeId,
+    reach: PerPlayer<&[f32]>,
+    out: &mut [f32],
+    budget: u32,
+) {
+    let tree = &ctx.game.tree;
+    let node = tree.node(id);
+    let d0 = reach[Player::P0].len();
+    let d1 = reach[Player::P1].len();
+    for pos in 0..node.num_children as usize {
+        let deal = *tree.deal(node, pos);
+        let a = tree.mapped_dim(deal.maps[Player::P0], d0 as u32) as usize;
+        let b = tree.mapped_dim(deal.maps[Player::P1], d1 as u32) as usize;
+        let mut r0 = scratch.take_overwrite(a);
+        let mut r1 = scratch.take_overwrite(b);
+        tree.map_reach_into(deal.maps[Player::P0], reach[Player::P0], &mut r0);
+        tree.map_reach_into(deal.maps[Player::P1], reach[Player::P1], &mut r1);
+        let mut row = scratch.take(2 * (a + b));
+        pass(
+            ctx,
+            scratch,
+            node.first_child + pos as u32,
+            PerPlayer::new(&r0, &r1),
+            &mut row,
+            budget.saturating_sub(1),
+            true,
+        );
+        let mut offset = 0;
+        for p in Player::BOTH {
+            let (dim, len, start) = if p == Player::P0 {
+                (d0, a, 0)
+            } else {
+                (d1, b, 2 * d0)
+            };
+            for channel in 0..2 {
+                tree.accumulate_values_with_scratch(
+                    deal.maps[p],
+                    deal.weight,
+                    &row[offset..offset + len],
+                    &mut out[start + channel * dim..start + (channel + 1) * dim],
+                    scratch,
+                );
+                offset += len;
+            }
+        }
+        scratch.put(row);
+        scratch.put(r1);
+        scratch.put(r0);
     }
 }
 
@@ -299,10 +373,11 @@ fn batch<E: TerminalEvaluator, S: Storage>(
     let len = span.end - span.start;
     let d0 = reach0[Player::P0].len();
     let d1 = reach0[Player::P1].len();
-    let width = 2 * (d0 + d1);
     let mut sigma = scratch.take_overwrite(len);
     let mut scaled = scratch.take_overwrite(len);
-    let mut values = scratch.take(count * width);
+    // Share the node-value arena between the seats. Strategies and both
+    // reaches remain available for both reverse reductions.
+    let mut values = scratch.take(count * 2 * d0.max(d1));
     let mut lease = MetadataLease::take();
     let metadata = &mut lease.0;
     metadata.offsets.resize(count, (usize::MAX, usize::MAX));
@@ -367,6 +442,11 @@ fn batch<E: TerminalEvaluator, S: Storage>(
         } else {
             (d1, 2 * d0)
         };
+        let width = 2 * dim;
+        let values = &mut values[..count * width];
+        if p == Player::P1 {
+            values.fill(0.0);
+        }
         for ((idx, id), row) in walk().enumerate().zip(values.chunks_exact_mut(width)) {
             let node = tree.node(id);
             if node.kind != NodeKind::Terminal {
@@ -385,7 +465,7 @@ fn batch<E: TerminalEvaluator, S: Storage>(
             if !all_zero(r) {
                 metadata.terminals.push(node.aux);
                 reaches.push(r);
-                outputs.push(&mut row[start..start + dim]);
+                outputs.push(&mut row[..dim]);
             }
         }
         ctx.game
@@ -393,43 +473,56 @@ fn batch<E: TerminalEvaluator, S: Storage>(
             .eval_batch(&metadata.terminals, p, &reaches, &mut outputs);
         metadata.outputs = batch::mutable_rows(outputs);
         metadata.reaches = batch::shared_rows(reaches);
-    }
-    for id in walk().rev() {
-        let idx = index(id);
-        let node = tree.node(id);
-        let (parents, children) = values.split_at_mut((idx + 1) * width);
-        let row = &mut parents[idx * width..];
-        if node.kind == NodeKind::Terminal {
-            let (ev, br) = row[..2 * d0].split_at_mut(d0);
-            br.copy_from_slice(ev);
-            let (ev, br) = row[2 * d0..].split_at_mut(d1);
-            br.copy_from_slice(ev);
-            continue;
+        for id in walk().rev() {
+            let idx = index(id);
+            let node = tree.node(id);
+            let (parents, children) = values.split_at_mut((idx + 1) * width);
+            let row = &mut parents[idx * width..];
+            if node.kind == NodeKind::Terminal {
+                let (ev, br) = row.split_at_mut(dim);
+                br.copy_from_slice(ev);
+                continue;
+            }
+            let (o0, o1) = offsets[idx];
+            let opp_offset = if p == Player::P0 { o1 } else { o0 };
+            let opp = if opp_offset == usize::MAX {
+                reach0[p.opponent()]
+            } else {
+                &scaled[opp_offset..opp_offset + reach0[p.opponent()].len()]
+            };
+            if all_zero(opp) {
+                continue;
+            }
+            let sref = tree.storage_ref(node);
+            let offset = sref.offset - span.start;
+            let first_child = (node.first_child as usize - first - idx) * width;
+            let children = &children[first_child..];
+            let (ev, br) = row.split_at_mut(dim);
+            if node.player == p {
+                br.fill(f32::NEG_INFINITY);
+            }
+            for a in 0..node.num_children as usize {
+                let child = &children[a * width..(a + 1) * width];
+                if node.player == p {
+                    let strategy = &sigma[offset + a * dim..offset + (a + 1) * dim];
+                    for ((v, &s), &c) in ev.iter_mut().zip(strategy).zip(&child[..dim]) {
+                        *v += s * c;
+                    }
+                    for (v, &c) in br.iter_mut().zip(&child[dim..]) {
+                        *v = v.max(c);
+                    }
+                } else {
+                    for (v, &c) in ev.iter_mut().zip(&child[..dim]) {
+                        *v += c;
+                    }
+                    for (v, &c) in br.iter_mut().zip(&child[dim..]) {
+                        *v += c;
+                    }
+                }
+            }
         }
-        let sref = tree.storage_ref(node);
-        let offset = sref.offset - span.start;
-        let (o0, o1) = offsets[idx];
-        let r0 = if o0 == usize::MAX {
-            reach0[Player::P0]
-        } else {
-            &scaled[o0..o0 + d0]
-        };
-        let r1 = if o1 == usize::MAX {
-            reach0[Player::P1]
-        } else {
-            &scaled[o1..o1 + d1]
-        };
-        let first_child = (node.first_child as usize - first - idx) * width;
-        reduce(
-            node.player,
-            PerPlayer::new(r0, r1),
-            &sigma[offset..offset + sref.len()],
-            &children[first_child..first_child + node.num_children as usize * width],
-            row,
-            node.num_children as usize,
-        );
+        out[start..start + width].copy_from_slice(&values[..width]);
     }
-    out.copy_from_slice(&values[..width]);
     scratch.put(values);
     scratch.put(scaled);
     scratch.put(sigma);
