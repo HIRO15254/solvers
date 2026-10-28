@@ -9,6 +9,8 @@ pub fn export(
     view: ExportView,
     format: ExportFormat,
     nodes: &[String],
+    rest_of_street: bool,
+    rivers: Option<RiverResolve>,
     output: Option<&Path>,
 ) -> Result<()> {
     let view = match view {
@@ -18,8 +20,15 @@ pub fn export(
         ExportView::Strategy => views::ExportView::Strategy,
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Range => views::ExportView::Range,
+        ExportView::Decision => {
+            // Refused before loading: a river re-solve would be wasted.
+            if let ExportFormat::Csv = format {
+                anyhow::bail!("export decision has no CSV form: --format must be json");
+            }
+            views::ExportView::Decision
+        }
     };
-    let data = views::export(path, view, nodes)?;
+    let data = views::export(path, view, nodes, rest_of_street, rivers)?;
     let rendered = match format {
         ExportFormat::Json => to_json(&data)?,
         ExportFormat::Csv => match &data {
@@ -29,6 +38,7 @@ pub fn export(
             ExportData::Strategy(data) => strategy_csv(data),
             ExportData::Ev(data) => value_csv(data),
             ExportData::Range(data) => range_csv(data),
+            ExportData::Decision(_) => unreachable!("decision is refused as CSV above"),
         },
     };
     match output {

@@ -172,7 +172,9 @@ storageの量子化誤差と`.sol`の出力量子化を区別する。card/bucke
 `[output] solution_streets = "full"`（既定）は全action nodeの戦略と値を席別supportのcompact次元で保存する。
 `"no-rivers"`はRiver action nodeの戦略と値を保存しない。
 River開始では保存対象が空にならないよう`full`へ強制する。
-未保存Riverの戦略・値への`export`はerrorである。`tree`は未保存nodeも照会できる。`inspect`の遅延再解決は新しい計算であり、保存時の値ではない。
+未保存Riverの戦略・値への`export`は既定でerrorである。`tree`は未保存nodeも照会できる。
+`inspect --sol`の遅延再解決と`export --resolve-rivers`（daemonの`resolve=rivers`）は同じ再解決であり、新しい計算で保存時の値ではない。
+`decision`は`actions`・`strategy`・`ev`を1回の読込みで返すため、未保存Riverの再解決も1回で済む。
 
 node履歴はspotのlineとは別の文法である。actor positionとstreet区切りを持たず、tokenを連結する。
 
@@ -344,9 +346,14 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 | `strategy` | node × comboのweightとprobabilities |
 | `ev` | node × seat × comboのweightとev |
 | `range` | seat × comboのweight |
+| `decision` | 同じnodeの`actions`・`strategy`・`ev`の行を`actions`・`strategy`・`ev` keyに持つJSON object。CSVは無い |
 
-`tree`・`actions`・`strategy`・`ev`は`--node`が指すnodeの行を出す。`--node`は繰り返せ、1回の読込みで各指定の行を指定順に連結する（SOL-14）。
+`tree`・`actions`・`strategy`・`ev`・`decision`は`--node`が指すnodeの行を出す。`--node`は繰り返せ、1回の読込みで各指定の行を指定順に連結する（SOL-14）。
 各行は`history`列を持つので、連結しても行の所属nodeを区別できる。`summary`と`range`は`--node`を使わない。
+`decision`の各keyの行は同名viewの出力と同じであり、`--format csv`は値を読む前に入力error（exit 2）で拒否する。
+`--rest-of-street`はこれらのnode viewで、各指定nodeの後にそのstreetで続くaction nodeを前順で足す（chance・terminalで止まる）。
+展開は`solvers tree --rest-of-street`と同じである。未保存Riverの入口に`decision --rest-of-street --resolve-rivers`を使うと、
+1回の再解決でそのRiver部分木の全action nodeの行が得られる。
 
 `tree`の明示selectorはaction・chance・terminalの全kindを受理する。`kind`は`action` / `chance` / `terminal`である。
 `street`はactionでは行動street、chanceでは次に配るstreet、terminalでは終了したstreetを表す。
@@ -356,12 +363,13 @@ resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
 全ての子履歴を同じnode selectorで再照会できる。terminalの3配列は空である。
 `stored`は保存済み戦略・値blockの有無を示し、chance・terminalではfalseとなる。
 `--node all`は従来どおり保存済みaction nodeだけを木順で出す。木の全kindを列挙する指定ではない。
-`actions` / `strategy` / `ev`にchance・terminalを指定すると、action nodeだけが戦略を持つ旨の入力error（exit 2）で拒否する。
+`actions` / `strategy` / `ev` / `decision`にchance・terminalを指定すると、action nodeだけが戦略を持つ旨の入力error（exit 2）で拒否する。
 解決できない履歴・label pathも型付きnode selector入力error（exit 2）であり、成果物読込み・I/O errorとは区別する。
 
-solve前は`solvers tree CONFIG [--node NODE]... [--format human|json]`で同じpublic treeを構築して照会できる。
+solve前は`solvers tree CONFIG [--node NODE]... [--rest-of-street] [--format human|json]`で同じpublic treeを構築して照会できる。
 JSONは上記`tree`行から`stored`だけを除いた8 fieldを持つ。木の構築・index・selectorと行の意味はexportと共有し、
 戦略・値・成果物は作らない。既定はrootだけ、`all`は保存範囲に関係なく全action nodeを木順で返す。
+`--rest-of-street`は各選択nodeの後に、同じstreetの後続action nodeを先行順で続ける（chance・terminalで止まる）。
 configの不正と未知selectorは入力error（exit 2）であり、P2 configは`NLH005`で拒否する。
 
 pot・stack・action額はBB、EVとexplはutility単位である。
@@ -371,6 +379,9 @@ CSVの配列列は`|`で結合する。`tree`の列順は`history,kind,street,ac
 support外のcombo照会は「rangeに無い」旨のerrorまたは空結果であり、値0を返さない。
 13×13 class集計はsupportをglobal combo領域へ展開して行う。
 未保存Riverの再解決ではnode reachを新しいrangeとし、親子のsupportをglobal comboで対応付ける。
+再解決はRiver配牌直後のnodeから下の部分木を1つのsubgameとして解き、同じ読込みの照会では再利用する。
+部分木内の節点の到達weightはtrunkの保存戦略と再解決した戦略の積である。再解決のEVは同じpayoff基準（trunkの開始時点へのoffset込み）で、
+保存値と同じsubgame開始基準の値となる。一方の席の到達が全handで0の線は再解決せずerrorとする。
 
 reportの先頭7列は`board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity`で固定である。
 続く`freq_*`列は入力board順で初めて現れたroot action labelの和集合である。

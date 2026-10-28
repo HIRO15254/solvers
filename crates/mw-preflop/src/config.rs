@@ -177,13 +177,11 @@ pub struct StreetBettingConfig {
     pub bet_sizes: Vec<SizeSpec>,
     /// Preflop raise-to sizes after one or more limps. None preserves the
     /// historical behavior of reusing bet_sizes; Some(empty) disables sized
-    /// isolations while still allowing an all-in when configured.
+    /// isolations.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub isolate_sizes: Option<Vec<SizeSpec>>,
     #[serde(default)]
     pub raise_sizes: Vec<SizeSpec>,
-    #[serde(default = "default_true")]
-    pub include_allin: bool,
     /// HRC-style check-down threshold (flop/turn/river only). When the
     /// non-folded seat count at this street's start (all-in seats included)
     /// exceeds this value, the street has no betting at all: no decision
@@ -200,20 +198,24 @@ pub struct StreetBettingConfig {
 
 fn default_preflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
-        bet_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
+        bet_sizes: vec![
+            SizeSpec::PreviousBetMultiple { factor: 2.5 },
+            SizeSpec::AllIn,
+        ],
         isolate_sizes: None,
-        raise_sizes: vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
-        include_allin: true,
+        raise_sizes: vec![
+            SizeSpec::PreviousBetMultiple { factor: 3.0 },
+            SizeSpec::AllIn,
+        ],
         max_betting_players: None,
     }
 }
 
 fn default_postflop_betting() -> StreetBettingConfig {
     StreetBettingConfig {
-        bet_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
+        bet_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }, SizeSpec::AllIn],
         isolate_sizes: None,
-        raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }],
-        include_allin: true,
+        raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }, SizeSpec::AllIn],
         max_betting_players: None,
     }
 }

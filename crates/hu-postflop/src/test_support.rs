@@ -34,12 +34,22 @@ pub fn limit_aggressions(rules: &mut Vec<Rule<TreeVar>>, street: Street, limit: 
     }
 }
 
-pub fn from_script(
-    street: Street,
-    rules: &[Rule<TreeVar>],
-    aggression_limit: u32,
-    include_allin: bool,
-) -> StreetTree {
+/// `add bet [a]` and `add raise [a]` on `street`. Placed first, every menu
+/// starts with the all-in that later rules may keep or remove.
+pub fn allin_rules(street: Street) -> Vec<Rule<TreeVar>> {
+    [ActionKind::Bet, ActionKind::Raise]
+        .into_iter()
+        .map(|action| Rule {
+            street,
+            condition: Condition::Const(true),
+            effect: Effect::Add,
+            action: Some(action),
+            sizes: vec![SizeSpec::AllIn],
+        })
+        .collect()
+}
+
+pub fn from_script(street: Street, rules: &[Rule<TreeVar>], aggression_limit: u32) -> StreetTree {
     let mut rules: Vec<_> = rules
         .iter()
         .filter(|rule| rule.street == street)
@@ -48,7 +58,6 @@ pub fn from_script(
     limit_aggressions(&mut rules, street, aggression_limit);
     StreetTree {
         nlh_rules: street_rules(rules),
-        include_allin,
     }
 }
 
@@ -86,6 +95,5 @@ pub fn pot_fractions(oop: &[f64], ip: &[f64], aggression_limit: u32) -> StreetTr
     limit_aggressions(&mut rules, Street::Flop, aggression_limit);
     StreetTree {
         nlh_rules: street_rules(rules),
-        include_allin: false,
     }
 }

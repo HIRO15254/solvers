@@ -16,6 +16,7 @@ pub enum ExportView {
     Ev,
     Tree,
     Summary,
+    Decision,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]

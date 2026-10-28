@@ -68,7 +68,6 @@ pub struct SeatRange {
 pub struct Tree {
     pub script: String,
     pub compiled: Script<TreeVar>,
-    pub include_allin: bool,
     pub params: BTreeMap<String, toml::Value>,
 }
 

@@ -651,7 +651,7 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
             "rounding =",
             "rounding_unit_bb =",
         ],
-        vec!["script =", "include_allin =", "[tree.params]"],
+        vec!["script =", "[tree.params]"],
         vec![
             "threads =",
             "memory =",

@@ -233,6 +233,16 @@ fn config_tree_preview_delegates_to_real_cli() {
     let (status, selected) = daemon.post("/v1/tree", &body);
     assert_eq!(status, 200, "{selected}");
     assert_eq!(selected[0]["history"], child);
+    let body = serde_json::json!({ "configToml": config, "restOfStreet": true }).to_string();
+    let (status, street) = daemon.post("/v1/tree", &body);
+    assert_eq!(status, 200, "{street}");
+    let histories: Vec<&str> = street
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    assert_eq!(histories, ["", "x", "xr1", "xr1r2.5", "r1", "r1r2.5"]);
     let (status, error) = daemon.post("/v1/tree", r#"{"configToml":"not valid TOML"}"#);
     assert_eq!(status, 400, "{error}");
     assert_eq!(error["code"], "invalid-config");
@@ -584,7 +594,6 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-include_allin = false
 script = '''river when unopened { force bet [50] }'''
 [solver]
 storage = "f32"
@@ -709,7 +718,6 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-include_allin = false
 script = '''river when unopened { force bet [50] }'''
 [solver]
 storage = "f32"
@@ -762,9 +770,123 @@ fn node_selectors_are_rejected_for_multiway_artifacts_before_export() {
         b"placeholder",
     )
     .unwrap();
-    let (status, error) = daemon.get(&format!("/v1/runs/{run_id}/solution/tree?node=root"));
-    assert_eq!(status, 400, "{error}");
-    assert_eq!(error["code"], "invalid-request");
+    for path in [
+        "tree?node=root",
+        "tree?resolve=rivers",
+        "tree?restOfStreet=true",
+        "decision",
+    ] {
+        let (status, error) = daemon.get(&format!("/v1/runs/{run_id}/solution/{path}"));
+        assert_eq!(status, 400, "{path}: {error}");
+        assert_eq!(error["code"], "invalid-request");
+    }
+}
+
+/// `resolve=rivers` lets the views answer river nodes a no-rivers run did
+/// not store; without it they stay an export failure.
+#[test]
+fn postflop_solution_views_resolve_unstored_rivers_on_request() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_with_solver(home.path(), 1, &real_solver());
+    let config = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 90
+ante_bb = 9
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
+board = "2c 7d 9h Js"
+[ranges]
+BB = "AsAh"
+BTN = "KsKh"
+[tree]
+script = '''turn, river { replace bet [50] replace raise [] }'''
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 2
+check_every = 1
+[run]
+threads = 1
+[output]
+solution_streets = "no-rivers"
+"#;
+    let body = serde_json::json!({ "configToml": config }).to_string();
+    let (status, created) = daemon.post("/v1/runs", &body);
+    assert_eq!(status, 200, "{created}");
+    let run_id = created["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(run_id);
+    assert_eq!(finished["state"], "completed", "{finished}");
+
+    let base = format!("/v1/runs/{run_id}/solution");
+    let (status, chance) = daemon.get(&format!("{base}/tree?node=xx"));
+    assert_eq!(status, 200, "{chance}");
+    let river = chance[0]["children"][0].as_str().unwrap();
+    // The first dealt river card, by label path.
+    let selector = format!("check/check/{}", chance[0]["actions"][0].as_str().unwrap());
+    let (status, row) = daemon.get(&format!("{base}/tree?node={selector}"));
+    assert_eq!(status, 200, "{row}");
+    assert_eq!(row[0]["history"], river);
+    assert_eq!(row[0]["stored"], false);
+
+    let (status, error) = daemon.get(&format!("{base}/strategy?node={selector}"));
+    assert_eq!(status, 500, "{error}");
+    assert!(
+        error["message"].as_str().unwrap().contains("no-rivers"),
+        "{error}"
+    );
+    let (status, decision) = daemon.get(&format!("{base}/decision?node={selector}&resolve=rivers"));
+    assert_eq!(status, 200, "{decision}");
+    let rows = decision["strategy"].as_array().expect("strategy rows");
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0]["history"], river);
+    assert_eq!(rows[0]["combo"], "AsAh");
+    assert_eq!(
+        decision["actions"].as_array().expect("action rows").len(),
+        row[0]["actions"].as_array().unwrap().len()
+    );
+    let seats: Vec<_> = decision["ev"]
+        .as_array()
+        .expect("ev rows")
+        .iter()
+        .map(|value| {
+            (
+                value["seat"].as_str().unwrap(),
+                value["combo"].as_str().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(seats, [("oop", "AsAh"), ("ip", "KsKh")]);
+
+    // restOfStreet: one re-solve also answers every river action node below.
+    let (status, street) = daemon.get(&format!("{base}/tree?node={selector}&restOfStreet=true"));
+    assert_eq!(status, 200, "{street}");
+    let histories: Vec<&str> = street
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    assert!(histories.len() > 1, "{street}");
+    let (status, subgame) = daemon.get(&format!(
+        "{base}/decision?node={selector}&restOfStreet=true&resolve=rivers"
+    ));
+    assert_eq!(status, 200, "{subgame}");
+    let mut covered: Vec<&str> = subgame["actions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    covered.dedup();
+    assert_eq!(covered, histories);
+
+    for query in ["resolve=turns", "restOfStreet=yes"] {
+        let (status, error) = daemon.get(&format!("{base}/strategy?node={selector}&{query}"));
+        assert_eq!(status, 400, "{query}: {error}");
+        assert_eq!(error["code"], "invalid-request");
+    }
 }
 
 /// A queued run outlives the daemon that accepted it.

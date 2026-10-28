@@ -14,7 +14,7 @@ use protocol::{
 use serde::Serialize;
 use tiny_http::{Header, Method, Request, Response, Server};
 
-use crate::api::Api;
+use crate::api::{Api, SolutionQuery};
 use crate::static_ui::StaticUi;
 use crate::tls::Tls;
 
@@ -199,7 +199,42 @@ impl Daemon {
                     Ok(nodes) => nodes,
                     Err(error) => return respond_error(request, error),
                 };
-                match self.api.solution_view(id, view, csv, &nodes) {
+                let resolve_rivers = match query_value(&query, "resolve") {
+                    Ok(None) => false,
+                    Ok(Some(value)) if value == "rivers" => true,
+                    Ok(Some(value)) => {
+                        return respond_error(
+                            request,
+                            ErrorResponse::new(
+                                ErrorCode::InvalidRequest,
+                                format!("resolve={value:?} is not supported; use resolve=rivers"),
+                            ),
+                        );
+                    }
+                    Err(error) => return respond_error(request, error),
+                };
+                let rest_of_street = match query_value(&query, "restOfStreet") {
+                    Ok(None) => false,
+                    Ok(Some(value)) if value == "true" => true,
+                    Ok(Some(value)) if value == "false" => false,
+                    Ok(Some(value)) => {
+                        return respond_error(
+                            request,
+                            ErrorResponse::new(
+                                ErrorCode::InvalidRequest,
+                                format!("restOfStreet={value:?} must be true or false"),
+                            ),
+                        );
+                    }
+                    Err(error) => return respond_error(request, error),
+                };
+                let options = SolutionQuery {
+                    csv,
+                    nodes,
+                    resolve_rivers,
+                    rest_of_street,
+                };
+                match self.api.solution_view(id, view, &options) {
                     Ok((bytes, content_type)) => send_bytes(request, 200, &bytes, content_type),
                     Err(error) => respond_error(request, error),
                 }

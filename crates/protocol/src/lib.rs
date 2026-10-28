@@ -77,6 +77,9 @@ pub struct TreeRequest {
     /// Node selectors in request order; absent or empty selects the root.
     #[serde(default)]
     pub nodes: Vec<String>,
+    /// Follow each selected node with the action nodes after it on its street.
+    #[serde(default)]
+    pub rest_of_street: bool,
 }
 
 /// `POST /v1/runs` -- create a run and start it (or queue it).
@@ -182,6 +185,7 @@ pub enum SolutionView {
     Ev,
     Tree,
     Summary,
+    Decision,
 }
 
 impl SolutionView {
@@ -193,6 +197,7 @@ impl SolutionView {
             "ev" => Self::Ev,
             "tree" => Self::Tree,
             "summary" => Self::Summary,
+            "decision" => Self::Decision,
             _ => return None,
         })
     }
@@ -205,6 +210,7 @@ impl SolutionView {
             Self::Ev => "ev",
             Self::Tree => "tree",
             Self::Summary => "summary",
+            Self::Decision => "decision",
         }
     }
 }
@@ -351,6 +357,7 @@ mod tests {
             SolutionView::Ev,
             SolutionView::Tree,
             SolutionView::Summary,
+            SolutionView::Decision,
         ] {
             assert_eq!(SolutionView::parse(view.as_str()), Some(view));
         }

@@ -17,6 +17,13 @@ param barrel = 66
 
 define wet = flush_possible || straight_possible
 
+# Every bet and raise menu starts with all-in; the rules below keep or
+# replace it.
+flop, turn, river {
+  add bet [a]
+  add raise [a]
+}
+
 flop {
   # BB does not donk into BTN's preflop raise.
   when donk {

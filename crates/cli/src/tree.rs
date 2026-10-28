@@ -3,12 +3,17 @@ use std::path::Path;
 
 use crate::validate::ValidationFormat;
 
-pub fn run(path: &Path, nodes: &[String], format: ValidationFormat) -> Result<()> {
+pub fn run(
+    path: &Path,
+    nodes: &[String],
+    rest_of_street: bool,
+    format: ValidationFormat,
+) -> Result<()> {
     let raw =
         std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
     #[cfg(not(feature = "p2"))]
     crate::product_support::require_input(&raw, path)?;
-    let rows = hu_postflop::views::preview_tree(&raw, path, nodes)?;
+    let rows = hu_postflop::views::preview_tree(&raw, path, nodes, rest_of_street)?;
     match format {
         ValidationFormat::Json => println!("{}", serde_json::to_string_pretty(&rows)?),
         ValidationFormat::Human => {

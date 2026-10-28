@@ -14,18 +14,6 @@ impl From<InspectView> for views::InspectView {
         }
     }
 }
-impl From<ExportView> for views::ExportView {
-    fn from(value: ExportView) -> Self {
-        match value {
-            ExportView::Strategy => Self::Strategy,
-            ExportView::Actions => Self::Actions,
-            ExportView::Range => Self::Range,
-            ExportView::Ev => Self::Ev,
-            ExportView::Tree => Self::Tree,
-            ExportView::Summary => Self::Summary,
-        }
-    }
-}
 
 fn key_hex(key: [u8; 16]) -> String {
     key.iter().map(|byte| format!("{byte:02x}")).collect()
@@ -117,13 +105,24 @@ pub fn export(
     format: ExportFormat,
     output: Option<&Path>,
 ) -> Result<()> {
+    let view = match view {
+        ExportView::Strategy => views::ExportView::Strategy,
+        ExportView::Actions => views::ExportView::Actions,
+        ExportView::Range => views::ExportView::Range,
+        ExportView::Ev => views::ExportView::Ev,
+        ExportView::Tree => views::ExportView::Tree,
+        ExportView::Summary => views::ExportView::Summary,
+        ExportView::Decision => {
+            anyhow::bail!("export decision: the solution must be a postflop .sol artifact")
+        }
+    };
     let views::ExportData {
         metadata,
         strategies,
         ranges,
-    } = views::export(path, view.into())?;
+    } = views::export(path, view)?;
     let rendered = match (view, format) {
-        (ExportView::Summary, ExportFormat::Json) => {
+        (views::ExportView::Summary, ExportFormat::Json) => {
             serde_json::to_string_pretty(&serde_json::json!({
                 "schemaVersion": metadata.schema_version,
                 "sweeps": metadata.sweeps,
@@ -132,16 +131,20 @@ pub fn export(
                 "seats": metadata.seats,
             }))?
         }
-        (ExportView::Tree, ExportFormat::Json) => {
+        (views::ExportView::Tree, ExportFormat::Json) => {
             serde_json::to_string_pretty(&serde_json::json!({
                 "states": metadata.public_states,
                 "edges": metadata.histories,
             }))?
         }
-        (ExportView::Strategy, ExportFormat::Json) => serde_json::to_string_pretty(&strategies)?,
-        (ExportView::Ev, ExportFormat::Json) => serde_json::to_string_pretty(&metadata.seats)?,
-        (ExportView::Range, ExportFormat::Json) => export_ranges_json(&ranges)?,
-        (ExportView::Actions, ExportFormat::Json) => {
+        (views::ExportView::Strategy, ExportFormat::Json) => {
+            serde_json::to_string_pretty(&strategies)?
+        }
+        (views::ExportView::Ev, ExportFormat::Json) => {
+            serde_json::to_string_pretty(&metadata.seats)?
+        }
+        (views::ExportView::Range, ExportFormat::Json) => export_ranges_json(&ranges)?,
+        (views::ExportView::Actions, ExportFormat::Json) => {
             let rows: Vec<_> = metadata
                 .public_states
                 .iter()
@@ -157,7 +160,7 @@ pub fn export(
                 .collect();
             serde_json::to_string_pretty(&rows)?
         }
-        (ExportView::Strategy, ExportFormat::Csv) => {
+        (views::ExportView::Strategy, ExportFormat::Csv) => {
             let mut csv = String::from(
                 "history,actor,street,active_opponents,bucket_path,action,probability\n",
             );
@@ -177,7 +180,7 @@ pub fn export(
             }
             csv
         }
-        (ExportView::Actions, ExportFormat::Csv) => {
+        (views::ExportView::Actions, ExportFormat::Csv) => {
             let mut csv = String::from(
                 "history,actor,street,action_index,kind,amount_millibb,all_in,full_raise,label\n",
             );
@@ -202,7 +205,7 @@ pub fn export(
             }
             csv
         }
-        (ExportView::Tree, ExportFormat::Csv) => {
+        (views::ExportView::Tree, ExportFormat::Csv) => {
             let mut csv = String::from("history,parent,actor,action_index,action\n");
             for node in &metadata.histories {
                 csv.push_str(&format!(
@@ -216,7 +219,7 @@ pub fn export(
             }
             csv
         }
-        (ExportView::Summary, ExportFormat::Csv) => {
+        (views::ExportView::Summary, ExportFormat::Csv) => {
             format!(
                 "schema_version,sweeps,approximate_profile,visited_infosets\n{},{},{},{}\n",
                 metadata.schema_version,
@@ -225,8 +228,8 @@ pub fn export(
                 strategies.len()
             )
         }
-        (ExportView::Range, ExportFormat::Csv) => export_ranges_csv(&ranges)?,
-        (ExportView::Ev, ExportFormat::Csv) => export_ev_csv(&metadata.seats),
+        (views::ExportView::Range, ExportFormat::Csv) => export_ranges_csv(&ranges)?,
+        (views::ExportView::Ev, ExportFormat::Csv) => export_ev_csv(&metadata.seats),
     };
     if let Some(output) = output {
         std::fs::write(output, rendered)

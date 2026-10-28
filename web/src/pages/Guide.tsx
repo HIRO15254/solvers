@@ -53,18 +53,18 @@ const SECTIONS: Section[] = [
     steps: [
       "The size table sets bet and raise sizes per street for OOP and IP. The info button explains the size notation.",
       "The Script tab edits the tree script the table writes; a script the table cannot hold is edited there. Ctrl+Space completes keywords, variables and sizes, hovering a word explains it, and the daemon's error is marked on its line.",
-      "Below the table, No donk bets and Re-raises are all-in only reshape the tree; All-in adds an all-in at every node, and each script param gets a field.",
+      "Below the table, No donk bets and Re-raises are all-in only reshape the tree, and each script param gets a field. For an all-in at every node, start the script with add bet [a] and add raise [a].",
     ],
   },
   {
     id: "viewer",
     title: "Tree viewer",
     image: "tree-viewer.png",
-    alt: "The Tree card beside the steps, at a node with its child actions",
+    alt: "The Tree card beside the steps, listing the flop's decisions",
     steps: [
-      "Once validation passes, the Tree card shows the game tree the daemon builds for the spot.",
-      "Press a child action to go down; press a node in the path to go back. Chance nodes list the cards that can come.",
-      "Each node shows the street, who acts and the pot.",
+      "Once validation passes, the Tree card lists every decision on a street: who acts and the pot, then each action with its size in BB and as a share of the pot (raises also as a multiple of the bet faced).",
+      "Press an action, or use the arrow keys, to open or close the decision after it; the buttons at the top right open or close them all.",
+      "Deal turn and Deal river pick the next card and show that street; the streets walked stay above as cards to go back to.",
     ],
   },
   {
@@ -107,6 +107,7 @@ const SECTIONS: Section[] = [
     steps: [
       "Results walks a finished run's tree: press an action card to go down, and pick a card at a chance node.",
       "The 13×13 grid shows the strategy, EV or range per hand class; the Hands tab lists the combos. Export saves the node's strategy as CSV.",
+      "A run saved with Saved streets = no-rivers keeps no River strategies. Opening a River node solves that River on the spot from the stored reach, which can take a few seconds; moving within the same River then needs no wait, and picking a River card again solves it anew. The notice above the grid marks those strategies and EVs as recomputed, not the original solve's.",
     ],
   },
 ];

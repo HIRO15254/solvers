@@ -17,9 +17,10 @@ import {
 } from "../components/DocFields";
 import { RangeEditor } from "../components/RangeEditor";
 import { SetupStart } from "../components/SetupStart";
-import { SpotCard, TreeCard, ValidationCard, type Validation } from "../components/SetupSummary";
+import { SpotCard, ValidationCard, type Validation } from "../components/SetupSummary";
 import { SetupTable } from "../components/SetupTable";
 import { SetupTree } from "../components/SetupTree";
+import { TreeCard } from "../components/TreePreview";
 import { TemplateDialog } from "../components/TemplateDialog";
 import {
   Badge,
@@ -97,7 +98,6 @@ const FORM_KEYS = new Set([
   "spot.line",
   "spot.board",
   "tree.script",
-  "tree.include_allin",
   "tree.params",
   "solver.storage",
   "solver.cfr_precision",
@@ -627,7 +627,7 @@ export function SetupPage() {
             }
             onRevalidate={() => void validate(spotToml)}
           />
-          <TreeCard toml={spotToml} ready={validation.state === "ok"} roles={lineRoles} />
+          <TreeCard toml={spotToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} />
         </aside>
       </main>
 

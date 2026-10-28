@@ -19,6 +19,17 @@ use crate::runs::RunsRoot;
 
 pub type ApiResult<T> = std::result::Result<T, ErrorResponse>;
 
+/// What a solution view request asks of `solvers export` beyond the view.
+pub struct SolutionQuery {
+    pub csv: bool,
+    /// P1 node selectors, in request order.
+    pub nodes: Vec<String>,
+    /// P1: re-solve the river nodes a `no-rivers` artifact does not store.
+    pub resolve_rivers: bool,
+    /// P1: follow each selected node with the rest of its street's action nodes.
+    pub rest_of_street: bool,
+}
+
 pub struct Api {
     pub runs: RunsRoot,
     pub jobs: JobRunner,
@@ -108,6 +119,9 @@ impl Api {
         command.arg("tree").arg(&config).arg("--format").arg("json");
         for node in &request.nodes {
             command.arg("--node").arg(node);
+        }
+        if request.rest_of_street {
+            command.arg("--rest-of-street");
         }
         let output = command.output().map_err(internal)?;
         if !output.status.success() {
@@ -317,13 +331,14 @@ impl Api {
     ///
     /// Shelling out to `solvers export` keeps one implementation of what a
     /// view means, so the daemon and the CLI cannot drift into showing
-    /// different numbers for the same solve (R4, R5).
+    /// different numbers for the same solve (R4, R5). `resolve_rivers`
+    /// re-solves the river nodes a `no-rivers` P1 artifact does not store,
+    /// with the CLI's default budget, in that one export process.
     pub fn solution_view(
         &self,
         run_id: &str,
         view: SolutionView,
-        csv: bool,
-        nodes: &[String],
+        query: &SolutionQuery,
     ) -> ApiResult<(Vec<u8>, &'static str)> {
         let directory = self.run_directory(run_id)?;
         let postflop = directory.join("solution.sol");
@@ -338,10 +353,15 @@ impl Api {
                 format!("run {run_id:?} has no solution.sol or solution.mwsol"),
             ));
         };
-        if !is_postflop && !nodes.is_empty() {
+        let postflop_only = !query.nodes.is_empty()
+            || query.resolve_rivers
+            || query.rest_of_street
+            || view == SolutionView::Decision;
+        if !is_postflop && postflop_only {
             return Err(ErrorResponse::new(
                 ErrorCode::InvalidRequest,
-                "node selectors are supported only for postflop solution.sol artifacts",
+                "node selectors, restOfStreet, river re-solves and the decision view are \
+                 supported only for postflop solution.sol artifacts",
             ));
         }
         let mut command = Command::new(&self.solver);
@@ -350,9 +370,15 @@ impl Api {
             .arg(&solution)
             .arg(view.as_str())
             .arg("--format")
-            .arg(if csv { "csv" } else { "json" });
-        for node in nodes {
+            .arg(if query.csv { "csv" } else { "json" });
+        for node in &query.nodes {
             command.arg("--node").arg(node);
+        }
+        if query.rest_of_street {
+            command.arg("--rest-of-street");
+        }
+        if query.resolve_rivers {
+            command.arg("--resolve-rivers");
         }
         let output = command.output().map_err(internal)?;
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -368,7 +394,11 @@ impl Api {
         }
         Ok((
             output.stdout,
-            if csv { "text/csv" } else { "application/json" },
+            if query.csv {
+                "text/csv"
+            } else {
+                "application/json"
+            },
         ))
     }
 

@@ -975,7 +975,6 @@ mod tests {
         let mut config = config();
         let mut seat_profile = BettingConfig::default();
         seat_profile.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 7.0 }];
-        seat_profile.preflop.include_allin = false;
         config.seats[0].betting = Some(seat_profile);
         let game = HoldemGame::new(
             &config,

@@ -211,10 +211,12 @@ config全体の検証成功ではないため、solve前には通常のvalidate�
 JSONの全fieldと単位は[CLI reference](cli-reference.jp.md#solvers-line)を参照する。
 
 P1のsolve前にはconfigからpublic treeを構築し、nodeの行動候補と子nodeを確認できる。
+`--rest-of-street`を付けると、選んだnodeからそのstreetの終わりまでのaction nodeをまとめて返す。
 
 ```sh
 solvers tree spot.toml --format json
 solvers tree spot.toml --node check --format human
+solvers tree spot.toml --rest-of-street --format json
 ```
 
 既定はrootだけを返す。JSONの`children`にある履歴をそのまま`--node`へ渡して辿れる。
@@ -247,7 +249,7 @@ P1のcheckpoint.ckpt / solution.solまたはP2のcheckpoint.mwckpt / solution.mw
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。
 
 P1の保存streetは`[output] solution_streets`で設定する。
-no-riversはRiverの戦略と値を省く。
+no-riversはRiverの戦略と値を省く。省いたRiverはviewer・`export --resolve-rivers`・Web GUIのResultsが開いた時にその場で再solveする。
 
 ## 5. 監視・停止・再開する
 
@@ -311,7 +313,9 @@ solvers report examples/hu-postflop/river_small.toml --boards "2c7d9hJsQs,2c7d9h
 
 REPLのshowでactionを確認し、goで子へ進み、grid・combosで戦略、eqで到達rangeのequityを見る。
 up/rootで戻り、quitで終える。evはroot summaryで、hand別EVはexport evを使う。
-no-riversの未保存Riverをviewerで開くと再solveする。再計算値を保存時の値と同一視しない。
+no-riversの未保存Riverをviewerで開くと再solveする。`export`も`--resolve-rivers`を付けると未保存Riverの`actions`・`strategy`・`ev`を同じ再solveで出す
+（反復予算は`--river-iterations`、既定500）。3つとも要るなら`export SOL decision --node NODE --resolve-rivers`の1回でJSONにまとめて受け取ると再solveも1回で済む。
+再計算値を保存時の値と同一視しない。
 reportはlineに合うboardを指定し、board別root集計をCSVにする。
 
 ### P2の照会・再評価・比較
@@ -380,7 +384,7 @@ solversd --runs runs --max-concurrent 1
 POST /v1/validateまたはPOST /v1/runsへJSONのconfigTomlを送る。
 line-builderにはPOST /v1/lineへconfigTomlと任意のmoves配列を送り、CLIと同じcursor JSONを受け取る。
 P1のsolve前の木はPOST /v1/treeへconfigTomlと任意のnodes配列を送り、CLIと同じtree行のJSON配列を受け取る。
-nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ渡せる。storedは含まない。
+nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ渡せる。storedは含まない。restOfStreet: trueで各nodeのstreetの残りも返す。
 外部source参照は拒否されるため、先にvalidate --write-effectiveでinline化する。
 daemonは同じCLIを起動し、run directoryに状態を保存する。再起動後もrun rootから一覧を復元する。
 run一覧・詳細は`lastProgress`に最後のraw進捗行を含み、P1では`nash_conv / 2`を一覧のExploitabilityに使える。進捗行がまだ無ければこのfieldは省略される。
@@ -390,6 +394,9 @@ HTTPのsolution viewはP1・P2に対応する。P1では、例えば
 `GET /v1/runs/{id}/solution/strategy?node=root&format=csv`で照会できる。
 `node`は繰り返せ、履歴中の`[`・`]`・`/`・space・`*`はURL encodingする（`+`もspaceとして復号）。
 P2では`node`を指定できない。不正selectorはHTTP 400 `invalid-request`としてCLIの診断を返す。
+P1の`resolve=rivers`はno-riversで未保存のRiver節点を`export --resolve-rivers`で再solveして返す（requestごとにRiverを解く）。
+同じnodeの`actions`・`strategy`・`ev`は`GET /v1/runs/{id}/solution/decision?node=...`の1 requestにまとめられる（P1のみ、JSONのみ）。
+`restOfStreet=true`を付けると各nodeの後にそのstreetの残りのaction nodeも返す。Riverの入口に付ければ1回の再solveでそのRiverの全action nodeが得られる。
 cancelは1回目のCtrl-Cと同じく境界で止まりcheckpointを保存する。Windowsではdaemonを
 consoleのある端末から起動する（console無しではcancelが`internal` errorになる）。
 
@@ -434,9 +441,13 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     理由を示し（サイズ表は`tree.script`のerrorの行を書いたcell、Rangeは席のtabにも印、席ごとのstack・blind・anteは該当する欄、
     `meta.name`は名前の欄）、そのstepのtabに印を付けて「Fix in（step名）」でそのstepを開く。どのstepにも入力欄の無いkeyのerrorは
     「Edit TOML」に印を付けてTOMLへ導き、TOMLの上に理由を示す。daemonは一度に1件のerrorを返す。
-    Treeは検証が通るとdaemonの`POST /v1/tree`（`solvers tree`と同じ行）でpublic treeを示す。子のactionを押すと下り、
-    pathのbadgeを押すとその節点へ戻る。chance nodeは来うるcardを並べる。節点にはstreet・手番（OOP / IPと席）・pot・terminalを示す。
-    lineを変えて今の節点が無くなればrootへ戻る。
+    Treeは検証が通るとdaemonの`POST /v1/tree`（`solvers tree --rest-of-street`と同じ行）で、1 streetの全decisionを字下げで示す。
+    各decisionは手番（席とOOP / IP）とpot、その下に各actionを並べる。actionはResultsと同じ色の印、額（BB）、
+    betはpotに対する%、raiseはcall後のpotに対する%と直面額の倍率（scriptのsize literalと同じ読み方）、全stackならAll-inを示す。
+    次のdecisionがあるactionは押すと開閉し、最初の2段は開いている。右上のbuttonで全て開く・閉じる。
+    矢印key（上下で移動、左右で閉じる・開く、Enterで実行）でも操作できる。streetを閉じるaction（「Deal turn」「Deal river」）を
+    押すとcard選択を出し、選んだcardで次のstreetを示す。all-inのrunoutは続けてcardを選び、Showdownで終わる。
+    歩いたstreetは上にcardで並び、押すとそのstreetへ戻る。lineやscriptを変えると同じstreetを読み直し、無くなれば最初のstreetへ戻る。
   - Table: 人数と、stack・blind・anteを「Same for all」か「Per seat」で書く。Same for allは全員のstackとante
     （None・Everyone・BB ante）で、SBは0.5 BB固定である。Per seatはstack・blind（straddleを含む）・anteを全員分カンマ区切りで、
     Preflopの行動順（6maxならUTG, HJ, CO, BTN, SB, BB）に書く。blindは最後の2席がSBとBB（BBは1）、
@@ -475,7 +486,7 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     サイズ表で書き戻せないscript（他の条件・`add`・`force`などを含む）はscriptのtabで開き、
     サイズ表のtabはその旨と「Replace with the default size table」（Flop 33/50・Turn 75/a・River 75,a/a、OOP・IP同じ）を示す。
     サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を他のruleの後へ書く。
-    全nodeのall-in（`include_allin`）も同じstepで書く。
+    全nodeでall-inを候補にするには、Scriptのtabでscriptの先頭へ`add bet [a]`と`add raise [a]`を書く。
     scriptの`param`宣言は入力欄として表示し、変更を`[tree.params]`の同名keyへ書く（script本文の既定値は変えない）。
     Scriptのtabとscriptの編集欄は下の「script・TOMLの編集欄」の機能を持つ。
   - Solver: Stopping（Target・Max iterations・Check every・Max time）、Resources and output（Threads・Memory limit・
@@ -499,7 +510,10 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
   13×13 gridは戦略・EV・Rangeをclassごとに到達weightで集計し、hand tabでcombo別の値を見る。戦略の色はセル幅いっぱいに
   actionの割合で区切り線なしに塗り分ける。actionの色はGTO Wizardの既定に揃え、foldは青、check・callは緑、bet・raiseは
   menuの小さい順に4段の赤（5つ以上は最も明るい赤から最も暗い赤までを等分）である。
-  エクスポートは現在節点の`strategy` CSVを保存する。未保存のRiver節点は`solvers inspect --sol`で見る。
+  エクスポートは現在節点の`strategy` CSVを保存する。no-riversのrunで未保存のRiver節点を開くと、そのRiverの部分木を
+  保存済みの到達rangeからその場で再solveして表示し（数秒かかり得る）、gridの上に再計算値である旨を示す。
+  1回の再solveでそのRiverの全節点を得るため、同じRiverの中の移動は待たない。River cardを選び直すと（同じcardでも）
+  再solveの結果を捨てて解き直す。到達しない等で再solveできない節点は理由を示す。
 
 `npm run dev`（`web/`内）は`/v1`を`127.0.0.1:38127`のdaemonへproxyする開発用serverである。
 

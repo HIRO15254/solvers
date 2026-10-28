@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, saveBlob } from "../api/client";
 import {
   isTerminal,
+  type DecisionRows,
   type RunSummary,
   type Seat,
   type SolSummary,
@@ -9,10 +10,11 @@ import {
   type TreeRow,
   type ValueRow,
 } from "../api/types";
+import { CardGrid } from "../components/CardGrid";
 import { Board, InfoHint, KeyValue, Notice, PlayingCard } from "../components/common";
 import { Button, Card, CardContent, EmptyState, Icon, Select, Tabs } from "../cryst";
 import { actionColors } from "../lib/actions";
-import { RANKS, STREET_LABEL, SUITS } from "../lib/cards";
+import { STREET_LABEL } from "../lib/cards";
 import { bb, integer, percent } from "../lib/format";
 import { ALL_CLASSES, classCombos, classOf } from "../lib/range";
 import { runMeta, type RunMeta } from "../lib/runMeta";
@@ -21,6 +23,12 @@ import { navigate } from "../route";
 /** What the GUI knows about one node of a solution. */
 interface NodeData {
   row: TreeRow;
+  /** The run did not store this River node; its strategy and EV come from an on-demand re-solve. */
+  resolved?: boolean;
+  /** The re-solve is running. */
+  resolving?: boolean;
+  /** Why the re-solve failed. */
+  resolveError?: string;
   /** Reach-weighted action frequencies (`export actions`). */
   frequencies?: number[];
   strategy?: StrategyRow[];
@@ -29,16 +37,47 @@ interface NodeData {
 
 const selector = (history: string) => history || "root";
 
-async function loadNode(runId: string, history: string): Promise<NodeData> {
-  const [row] = await api.solution<TreeRow[]>(runId, "tree", [selector(history)]);
-  if (!row) throw new Error(`Node ${selector(history)} not found`);
-  if (row.kind !== "action" || !row.stored) return { row };
-  const [actions, strategy, ev] = await Promise.all([
-    api.solution<{ action: string; frequency: number }[]>(runId, "actions", [selector(history)]),
-    api.solution<StrategyRow[]>(runId, "strategy", [selector(history)]),
-    api.solution<ValueRow[]>(runId, "ev", [selector(history)]),
-  ]);
-  return { row, frequencies: actions.map((a) => a.frequency), strategy, ev };
+/** Node data by history. */
+type Nodes = Record<string, NodeData>;
+
+/**
+ * Loads a node into `update`. An unstored River node reports its tree row first, then one re-solve answers it and
+ * every action node below it, so moving down that River asks for nothing more.
+ */
+async function loadNode(runId: string, history: string, update: (nodes: Nodes) => void) {
+  const node = [selector(history)];
+  const [row] = await api.solution<TreeRow[]>(runId, "tree", node);
+  if (!row) throw new Error(`Node ${node[0]} not found`);
+  if (row.kind !== "action") return update({ [history]: { row } });
+  if (row.stored) {
+    const { actions, strategy, ev } = await api.solution<DecisionRows>(runId, "decision", node);
+    return update({ [history]: { row, frequencies: actions.map((a) => a.frequency), strategy, ev } });
+  }
+  // Only no-rivers runs leave action nodes unstored, and only on the River. It is the last street, so the rest of
+  // the street is every action node below this one.
+  update({ [history]: { row, resolved: true, resolving: true } });
+  try {
+    const [rows, decision] = await Promise.all([
+      api.solution<TreeRow[]>(runId, "tree", node, { restOfStreet: true }),
+      api.solution<DecisionRows>(runId, "decision", node, { restOfStreet: true, resolveRivers: true }),
+    ]);
+    update(
+      Object.fromEntries(
+        rows.map((r) => [
+          r.history,
+          {
+            row: r,
+            resolved: true,
+            frequencies: decision.actions.filter((a) => a.history === r.history).map((a) => a.frequency),
+            strategy: decision.strategy.filter((s) => s.history === r.history),
+            ev: decision.ev.filter((v) => v.history === r.history),
+          },
+        ]),
+      ),
+    );
+  } catch (error) {
+    update({ [history]: { row, resolved: true, resolveError: error instanceof Error ? error.message : String(error) } });
+  }
 }
 
 /** Per-class aggregates of a node's combo rows. */
@@ -147,7 +186,9 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   const [meta, setMeta] = useState<RunMeta | null>(null);
   const [summary, setSummary] = useState<SolSummary | null>(null);
   const [path, setPath] = useState<string[]>([""]);
-  const [nodes, setNodes] = useState<Record<string, NodeData>>({});
+  const [nodes, setNodes] = useState<Nodes>({});
+  /** Counts River card picks; a load started before the latest pick must not bring back the re-solves it dropped. */
+  const riverPicks = useRef(0);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("strategy");
   const [rangeSeat, setRangeSeat] = useState<Seat>("oop");
@@ -167,10 +208,14 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   const current = path.at(-1)!;
   useEffect(() => {
     for (const history of path) {
+      // A River re-solve in flight also answers the nodes below it.
+      if (nodes[history]?.resolving) break;
       if (nodes[history]) continue;
-      loadNode(run.runId, history)
-        .then((data) => setNodes((all) => ({ ...all, [history]: data })))
-        .catch((e) => setError((e as Error).message));
+      const pick = riverPicks.current;
+      loadNode(run.runId, history, (loaded) => {
+        if (pick !== riverPicks.current && Object.values(loaded).some((data) => data.resolved)) return;
+        setNodes((all) => ({ ...all, ...loaded }));
+      }).catch((e) => setError((e as Error).message));
     }
   }, [path, nodes, run.runId]);
 
@@ -186,9 +231,20 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
     setSelectedClass(null);
   };
 
+  /** Picking a River card, even the same one again, drops every River re-solve kept so far. */
+  const pickCard = (child: string) => {
+    if (node?.row.street === "river") {
+      riverPicks.current += 1;
+      setNodes((all) => Object.fromEntries(Object.entries(all).filter(([, data]) => !data.resolved)));
+    }
+    go(path.length - 1, child);
+  };
+
   const exportCsv = async () => {
-    const blob = await api.solutionCsv(run.runId, "strategy", [selector(current)]);
-    saveBlob(blob, `${run.runId}-${selector(current).replace(/[^\w.-]+/g, "_")}-strategy.csv`);
+    const resolved = node?.resolved ?? false;
+    const blob = await api.solutionCsv(run.runId, "strategy", [selector(current)], { resolveRivers: resolved });
+    const name = selector(current).replace(/[^\w.-]+/g, "_");
+    saveBlob(blob, `${run.runId}-${name}-strategy${resolved ? "-resolved" : ""}.csv`);
   };
 
   return (
@@ -217,7 +273,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
         <Button
           variant="outline"
           icon="download"
-          disabled={node?.row.kind !== "action" || !node.row.stored}
+          disabled={node?.row.kind !== "action" || !node.strategy}
           onClick={exportCsv}
         >
           Export
@@ -309,24 +365,35 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
           })}
         </nav>
 
-        {node?.row.kind === "chance" && <CardPicker row={node.row} onPick={(child) => go(path.length - 1, child)} />}
+        {node?.row.kind === "chance" && <CardPicker row={node.row} onPick={pickCard} />}
         {node?.row.kind === "terminal" && (
           <Card>
             <EmptyState size="sm" icon="flag" title="Terminal node (hand ended). Select an earlier node to go back." />
           </Card>
         )}
-        {node?.row.kind === "action" && !node.row.stored && (
-          <Notice
-            variant="info"
-            title="Strategy is not stored for this node"
-            description={
-              <>
-                This run uses solution_streets = no-rivers. The CLI command{" "}
-                <span className="mono">solvers inspect --sol</span> can re-solve and display unstored River nodes.
-              </>
-            }
-          />
-        )}
+        {node?.row.kind === "action" &&
+          node.resolved &&
+          (node.resolveError ? (
+            <Notice variant="warning" title="Cannot re-solve this River node" description={node.resolveError} />
+          ) : node.resolving ? (
+            <Notice
+              variant="info"
+              icon={null}
+              title={
+                <span className="row" style={{ gap: 8 }}>
+                  <Icon name="loader-2" className="spin" />
+                  Re-solving this River subgame
+                </span>
+              }
+              description="This run did not store River nodes (solution_streets = no-rivers). It can take a few seconds."
+            />
+          ) : (
+            <Notice
+              variant="info"
+              title="River re-solved on demand"
+              description="This run did not store River nodes, so this subgame was solved now from the stored reach. Strategy and EV are recomputed values, not the original solve's."
+            />
+          ))}
         {node?.row.kind === "action" && node.strategy && node.ev && (
           <div className="row wrap" style={{ alignItems: "flex-start", gap: 16 }}>
             <Card className="matrix-card" aria-label="Hand matrix">
@@ -381,36 +448,9 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
 }
 
 function CardPicker({ row, onPick }: { row: TreeRow; onPick: (child: string) => void }) {
-  // label → child, with iso-merged representatives marked `*`.
-  const children = new Map(row.actions.map((label, i) => [label.replace("*", ""), { label, child: row.children[i]! }]));
   return (
     <Card title={`${STREET_LABEL[row.street] ?? row.street} card`}>
-      <div className="stack" style={{ gap: 4 }}>
-        {SUITS.split("").map((suit) => (
-          <div key={suit} className="card-row">
-            {RANKS.split("").map((rank) => {
-              const entry = children.get(rank + suit);
-              return (
-                <button
-                  key={rank}
-                  type="button"
-                  className="card-pick"
-                  disabled={!entry}
-                  title={entry?.label.endsWith("*") ? "Representative card for a suit-isomorphic group" : undefined}
-                  onClick={() => entry && onPick(entry.child)}
-                >
-                  <PlayingCard card={rank + suit} small />
-                  {entry?.label.endsWith("*") && <span className="muted">*</span>}
-                </button>
-              );
-            })}
-          </div>
-        ))}
-        <p className="muted meta" style={{ margin: "8px 0 0" }}>
-          * marks a representative card after suit-isomorphic merging. Faded cards are unavailable or merged into
-          another equivalent card.
-        </p>
-      </div>
+      <CardGrid row={row} onPick={onPick} />
     </Card>
   );
 }

@@ -1,6 +1,7 @@
 //! Typed P1 artifact views and node-by-node comparisons.
-//! Stored strategy and value blocks are read without solving. Missing river
-//! blocks remain explicit errors; the interactive provider owns lazy re-solves.
+//! Stored strategy and value blocks are read without solving. A missing river
+//! block is an explicit error unless the caller opts into [`RiverResolve`],
+//! which re-solves the river subgame through the artifact's provider.
 
 use std::path::Path;
 
@@ -18,6 +19,8 @@ pub enum ExportView {
     Actions,
     Strategy,
     Ev,
+    /// `actions`, `strategy` and `ev` together.
+    Decision,
     Range,
 }
 /// Typed data for a selected artifact view.
@@ -29,11 +32,32 @@ pub enum ExportData {
     Actions(Vec<ActionRow>),
     Strategy(Vec<StrategyRow>),
     Ev(Vec<ValueRow>),
+    Decision(DecisionRows),
     Range(Vec<RangeRow>),
 }
 
-use crate::artifact::{LoadedSol, load_sol};
+/// The `actions`, `strategy` and `ev` rows of the same selected nodes, read
+/// from one load so a river re-solve serves all three.
+#[derive(Serialize)]
+pub struct DecisionRows {
+    pub actions: Vec<ActionRow>,
+    pub strategy: Vec<StrategyRow>,
+    pub ev: Vec<ValueRow>,
+}
+
+use crate::artifact::{LoadedSol, SolProvider, StrategyProvider, load_sol};
 use crate::sol::{SolMetadata, SolReader};
+
+/// Opt-in re-solve of the river nodes a `no-rivers` artifact does not store,
+/// for the per-node views. Each river subgame below one river deal is solved
+/// once per export, from the reach the stored strategies give it.
+#[derive(Clone, Copy, Debug)]
+pub struct RiverResolve {
+    /// Iteration budget of each river subgame.
+    pub iterations: u64,
+    /// Stop a subgame early once its NashConv drops below this.
+    pub target: Option<f64>,
+}
 
 /// A selector that cannot name a node accepted by the requested view.
 #[derive(Debug, thiserror::Error)]
@@ -50,16 +74,29 @@ enum Selection {
 
 /// Read an artifact and return the selected view as typed data for
 /// caller-owned encoding. Node views cover every entry of `nodes` in order,
-/// from one load; `summary` and `range` ignore `nodes`. `summary` reads only
-/// the artifact's metadata, never its stored tree.
-pub fn export(path: &Path, view: ExportView, nodes: &[String]) -> Result<ExportData> {
+/// from one load; `summary` and `range` ignore `nodes`. With
+/// `rest_of_street`, each selected node is followed by the action nodes after
+/// it on its street, as [`preview_tree`] does. `summary` reads only the
+/// artifact's metadata, never its stored tree. With `rivers`, `actions`,
+/// `strategy`, `ev` and `decision` answer unstored river nodes from a
+/// re-solve instead of failing; other views ignore it.
+pub fn export(
+    path: &Path,
+    view: ExportView,
+    nodes: &[String],
+    rest_of_street: bool,
+    rivers: Option<RiverResolve>,
+) -> Result<ExportData> {
     if let ExportView::Summary = view {
         let metadata = SolReader::open(path)
             .with_context(|| format!("reading {}", path.display()))?
             .into_metadata();
         return Ok(ExportData::Summary(summary(&metadata)?));
     }
-    let loaded = load_sol(path, 0, None)?;
+    let loaded = match rivers {
+        Some(rivers) => load_sol(path, rivers.iterations, rivers.target)?,
+        None => load_sol(path, 0, None)?,
+    };
     let selections = nodes
         .iter()
         .map(|node| {
@@ -70,14 +107,69 @@ pub fn export(path: &Path, view: ExportView, nodes: &[String]) -> Result<ExportD
     for selection in &selections {
         ids.extend(selected_nodes(&loaded, selection));
     }
+    if rest_of_street {
+        ids = ids
+            .into_iter()
+            .flat_map(|id| street_action_nodes(loaded.view(), id))
+            .collect();
+    }
+    let mut blocks = Blocks {
+        loaded: &loaded,
+        resolver: rivers.map(|_| SolProvider::new(&loaded, Box::new(|_| {}))),
+    };
     Ok(match view {
         ExportView::Summary => unreachable!("answered from metadata above"),
         ExportView::Tree => ExportData::Tree(tree_rows(&loaded, &ids)),
-        ExportView::Actions => ExportData::Actions(action_rows(&loaded, &ids)?),
-        ExportView::Strategy => ExportData::Strategy(strategy_rows(&loaded, &ids)?),
-        ExportView::Ev => ExportData::Ev(value_rows(&loaded, &ids)?),
+        ExportView::Actions => ExportData::Actions(action_rows(&mut blocks, &ids)?),
+        ExportView::Strategy => ExportData::Strategy(strategy_rows(&mut blocks, &ids)?),
+        ExportView::Ev => ExportData::Ev(value_rows(&mut blocks, &ids)?),
+        ExportView::Decision => ExportData::Decision(DecisionRows {
+            actions: action_rows(&mut blocks, &ids)?,
+            strategy: strategy_rows(&mut blocks, &ids)?,
+            ev: value_rows(&mut blocks, &ids)?,
+        }),
         ExportView::Range => ExportData::Range(range_rows(&loaded)),
     })
+}
+
+/// Where the node views read strategy and value blocks: the stored blocks,
+/// and with a resolver also the re-solved blocks of unstored river nodes.
+struct Blocks<'a> {
+    loaded: &'a LoadedSol,
+    resolver: Option<SolProvider<'a>>,
+}
+
+impl Blocks<'_> {
+    fn strategy(&mut self, id: NodeId) -> Result<Vec<f32>> {
+        match &mut self.resolver {
+            Some(resolver) => resolver.average_strategy(id),
+            None => self
+                .loaded
+                .stored_strategy(id)?
+                .ok_or_else(|| unstored(self.loaded, id)),
+        }
+    }
+
+    /// Per-hand values, OOP's support then IP's.
+    fn values(&mut self, id: NodeId) -> Result<Vec<f32>> {
+        match &mut self.resolver {
+            Some(resolver) => resolver.values(id),
+            None => self
+                .loaded
+                .stored_values(id)?
+                .ok_or_else(|| unstored(self.loaded, id)),
+        }
+    }
+}
+
+fn unstored(loaded: &LoadedSol, id: NodeId) -> anyhow::Error {
+    anyhow!(
+        "this artifact stores no strategy or values for {:?}: it was written with \
+         [output] solution_streets = \"no-rivers\", which drops river nodes. \
+         Re-solve them on demand (export --resolve-rivers) or solve with \
+         solution_streets = \"full\" to read river nodes from the artifact",
+        loaded.view().history(id)
+    )
 }
 
 /// Resolves `--node`: `all`, `root`, a betting-line history (`xr10c`), or
@@ -233,7 +325,14 @@ pub struct PreviewTreeRow {
 
 /// Build the same indexed public tree used by solving, without solver storage.
 /// Selectors have the artifact tree view's grammar; `all` selects every action node.
-pub fn preview_tree(raw: &str, path: &Path, nodes: &[String]) -> Result<Vec<PreviewTreeRow>> {
+/// With `rest_of_street`, each selected node is followed by the action nodes
+/// after it on its street, in tree order, stopping at chance and terminal nodes.
+pub fn preview_tree(
+    raw: &str,
+    path: &Path,
+    nodes: &[String],
+    rest_of_street: bool,
+) -> Result<Vec<PreviewTreeRow>> {
     let prepared = crate::prepare::prepare(raw, path)?;
     let (game, index) = crate::run::build_indexed(&prepared)?;
     let view = TreeView {
@@ -253,7 +352,33 @@ pub fn preview_tree(raw: &str, path: &Path, nodes: &[String]) -> Result<Vec<Prev
             ),
         }
     }
+    if rest_of_street {
+        ids = ids
+            .into_iter()
+            .flat_map(|id| street_action_nodes(view, id))
+            .collect();
+    }
     Ok(ids.iter().map(|&id| tree_row(view, id)).collect())
+}
+
+/// `id`, then the action nodes below it before the next chance or terminal node, in preorder.
+fn street_action_nodes(view: TreeView<'_>, id: NodeId) -> Vec<NodeId> {
+    let mut out = vec![id];
+    if view.tree.node(id).kind != NodeKind::Action {
+        return out;
+    }
+    let mut stack: Vec<NodeId> = view.tree.children(id).collect();
+    stack.reverse();
+    while let Some(next) = stack.pop() {
+        if view.tree.node(next).kind != NodeKind::Action {
+            continue;
+        }
+        out.push(next);
+        let start = stack.len();
+        stack.extend(view.tree.children(next));
+        stack[start..].reverse();
+    }
+    out
 }
 
 fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
@@ -319,51 +444,34 @@ fn kind_name(kind: NodeKind) -> &'static str {
 
 // --- shared per-node lookup -------------------------------------------------
 
-/// A node whose stored blocks are present, with everything a per-hand view
-/// needs.
-struct StoredNode {
+/// An action node's acting seat, history and strategy shape.
+struct ActionNode {
     actor: Player,
     history: String,
     num_actions: usize,
     num_hands: usize,
-    strategy: Vec<f32>,
 }
 
-fn stored_node(loaded: &LoadedSol, id: NodeId) -> Result<StoredNode> {
+fn action_node(loaded: &LoadedSol, id: NodeId) -> ActionNode {
     let view = loaded.view();
     let node = *view.tree.node(id);
     let sref = view.tree.storage_ref(&node);
-    let history = view.history(id);
-    let strategy = loaded.stored_strategy(id)?.ok_or_else(|| {
-        anyhow!(
-            "this artifact stores no strategy for {history:?}: it was written with \
-             [output] solution_streets = \"no-rivers\", which drops river nodes. \
-             Re-solve with solution_streets = \"full\" to read river nodes from the artifact"
-        )
-    })?;
-    Ok(StoredNode {
+    ActionNode {
         actor: node.player,
-        history,
+        history: view.history(id),
         num_actions: sref.num_actions as usize,
         num_hands: sref.num_hands as usize,
-        strategy,
-    })
-}
-
-/// Stored per-hand values of a node [`stored_node`] accepted.
-fn node_values(loaded: &LoadedSol, id: NodeId) -> Result<Vec<f32>> {
-    Ok(loaded
-        .stored_values(id)?
-        .expect("a node with a stored strategy has stored values"))
+    }
 }
 
 /// Visits the requested nodes in one forward reach pass. Ancestors are marked
 /// once; branches with no requested descendants are never decoded.
-fn reached_rows<R: Clone>(
-    loaded: &LoadedSol,
+fn reached_rows<'a, R: Clone>(
+    blocks: &mut Blocks<'a>,
     ids: &[NodeId],
-    rows_of: impl Fn(NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
+    rows_of: impl Fn(&mut Blocks<'a>, NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
 ) -> Result<Vec<R>> {
+    let loaded = blocks.loaded;
     for &id in ids {
         if loaded.game.tree.node(id).kind != NodeKind::Action {
             bail!(NodeSelectionError(anyhow!(
@@ -384,27 +492,26 @@ fn reached_rows<R: Clone>(
         }
     }
     let mut parts = std::collections::HashMap::new();
-    fn visit<R>(
-        loaded: &LoadedSol,
+    fn visit<'a, R>(
+        blocks: &mut Blocks<'a>,
         id: NodeId,
         reach: &PerPlayer<Vec<f32>>,
         needed: &[bool],
         requested: &[bool],
-        rows_of: &impl Fn(NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
+        rows_of: &impl Fn(&mut Blocks<'a>, NodeId, &PerPlayer<Vec<f32>>) -> Result<Vec<R>>,
         parts: &mut std::collections::HashMap<NodeId, Vec<R>>,
     ) -> Result<()> {
         if requested[id as usize] {
-            parts.insert(id, rows_of(id, reach)?);
+            parts.insert(id, rows_of(blocks, id, reach)?);
         }
+        let loaded = blocks.loaded;
         let tree = &loaded.game.tree;
         let node = *tree.node(id);
         if !tree.children(id).any(|child| needed[child as usize]) {
             return Ok(());
         }
         let strategy = if node.kind == NodeKind::Action {
-            Some(loaded.stored_strategy(id)?.ok_or_else(|| {
-                anyhow!("the path to this node crosses a river node the artifact does not store")
-            })?)
+            Some(blocks.strategy(id)?)
         } else {
             None
         };
@@ -435,13 +542,13 @@ fn reached_rows<R: Clone>(
                 }
                 NodeKind::Terminal => unreachable!("terminal has no children"),
             }
-            visit(loaded, child, &next, needed, requested, rows_of, parts)?;
+            visit(blocks, child, &next, needed, requested, rows_of, parts)?;
         }
         Ok(())
     }
     if needed.first() == Some(&true) {
         visit(
-            loaded,
+            blocks,
             0,
             &loaded.game.index.root_ranges,
             &needed,
@@ -480,12 +587,13 @@ pub struct ActionRow {
     pub frequency: f64,
 }
 
-fn action_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
+fn action_rows(blocks: &mut Blocks<'_>, ids: &[NodeId]) -> Result<Vec<ActionRow>> {
+    let loaded = blocks.loaded;
     let view = loaded.view();
-    reached_rows(loaded, ids, |id, reach| {
-        let node = stored_node(loaded, id)?;
+    reached_rows(blocks, ids, |blocks, id, reach| {
+        let node = action_node(loaded, id);
         let freqs = crate::prepare::action_frequencies(
-            &node.strategy,
+            &blocks.strategy(id)?,
             &reach[node.actor],
             node.num_actions,
             node.num_hands,
@@ -518,10 +626,12 @@ pub struct StrategyRow {
     pub probabilities: Vec<f32>,
 }
 
-fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>> {
+fn strategy_rows(blocks: &mut Blocks<'_>, ids: &[NodeId]) -> Result<Vec<StrategyRow>> {
+    let loaded = blocks.loaded;
     let hands = &loaded.game.index.hands;
-    reached_rows(loaded, ids, |id, reach| {
-        let node = stored_node(loaded, id)?;
+    reached_rows(blocks, ids, |blocks, id, reach| {
+        let node = action_node(loaded, id);
+        let strategy = blocks.strategy(id)?;
         let mut rows = Vec::new();
         for hand in 0..node.num_hands {
             let weight = reach[node.actor][hand];
@@ -534,7 +644,7 @@ fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>>
                 combo: combo_label(hands.combos(node.actor)[hand] as usize),
                 weight,
                 probabilities: (0..node.num_actions)
-                    .map(|a| node.strategy[a * node.num_hands + hand])
+                    .map(|a| strategy[a * node.num_hands + hand])
                     .collect(),
             });
         }
@@ -545,7 +655,7 @@ fn strategy_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<StrategyRow>>
 // --- ev ---------------------------------------------------------------------
 
 #[derive(Clone, Serialize)]
-/// One reachable concrete combo and its stored utility.
+/// One reachable concrete combo and its utility.
 pub struct ValueRow {
     pub history: String,
     pub seat: String,
@@ -556,11 +666,12 @@ pub struct ValueRow {
     pub ev: f32,
 }
 
-fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
+fn value_rows(blocks: &mut Blocks<'_>, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
+    let loaded = blocks.loaded;
     let hands = &loaded.game.index.hands;
-    reached_rows(loaded, ids, |id, reach| {
-        let node = stored_node(loaded, id)?;
-        let values = node_values(loaded, id)?;
+    reached_rows(blocks, ids, |blocks, id, reach| {
+        let history = loaded.view().history(id);
+        let values = blocks.values(id)?;
         let mut rows = Vec::new();
         for seat in Player::BOTH {
             let base = match seat {
@@ -573,7 +684,7 @@ fn value_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Result<Vec<ValueRow>> {
                     continue;
                 }
                 rows.push(ValueRow {
-                    history: node.history.clone(),
+                    history: history.clone(),
                     seat: seat_name(seat).to_string(),
                     combo: combo_label(hands.combos(seat)[hand] as usize),
                     weight,

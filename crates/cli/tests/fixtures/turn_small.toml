@@ -19,7 +19,6 @@ BTN = "KK,TT,AQs,KQs"
 [tree]
 script = '''turn, river { replace bet [100] }
 '''
-include_allin = false
 
 [solver.algorithm]
 schedule = "dcfr"

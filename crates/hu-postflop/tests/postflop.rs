@@ -33,7 +33,8 @@ struct StreetMenus {
     ip_raise: Option<Vec<Vec<SizeSpec>>>,
     oop_donk: Option<Vec<SizeSpec>>,
     aggression_limit: u32,
-    include_allin: bool,
+    /// Start the rules with `add bet [a]` and `add raise [a]`.
+    allin_first: bool,
 }
 
 impl Default for StreetMenus {
@@ -46,7 +47,7 @@ impl Default for StreetMenus {
             ip_raise: None,
             oop_donk: None,
             aggression_limit: 2,
-            include_allin: false,
+            allin_first: false,
         }
     }
 }
@@ -95,14 +96,19 @@ fn raise_level_rules(
         .collect()
 }
 
-/// Build source-ordered common rules: donk, OOP bet, IP bet, then each
-/// player's raise levels. An unset raise menu reuses that player's bet menu.
+/// Build source-ordered common rules: the leading all-in, donk, OOP bet, IP
+/// bet, then each player's raise levels. An unset raise menu reuses that
+/// player's bet menu.
 fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
     let not_in_position = not(Condition::Truth(TreeVar::InPosition));
     let in_position = Condition::Truth(TreeVar::InPosition);
     let donk = Condition::Truth(TreeVar::Donk);
 
-    let mut rules = Vec::new();
+    let mut rules = if menus.allin_first {
+        hu_postflop::test_support::allin_rules(street)
+    } else {
+        Vec::new()
+    };
 
     if let Some(donk_sizes) = &menus.oop_donk {
         rules.push(Rule {
@@ -150,7 +156,6 @@ fn from_menus(street: Street, menus: StreetMenus) -> StreetTree {
 
     StreetTree {
         nlh_rules: hu_postflop::test_support::street_rules(rules),
-        include_allin: menus.include_allin,
     }
 }
 
@@ -236,7 +241,6 @@ fn raises_continue_to_the_stack_unless_a_script_rule_stops_them() {
             nlh::script::Script::compile(&source, &Default::default(), &spot::NLH_V1).unwrap();
         let river = StreetTree {
             nlh_rules: hu_postflop::test_support::street_rules(script.rules),
-            include_allin: false,
         };
         build_postflop_game(&river_only_config(river), chip_ev())
     };
@@ -804,7 +808,7 @@ fn memory_usage_matches_allocated() {
     assert_eq!(estimate.nodes, game.game.tree.nodes.len() as u64);
 
     // Extend the cross-check to a tree that actually exercises donk menus,
-    // per-level raises and `include_allin` together
+    // per-level raises and leading all-in rules together
     // (flop -> turn, an IP bet OOP can only call sets up the turn's donk
     // spot), so `memory_usage`'s `Counting` mirror and the real `Builder`
     // can never disagree about any of these features' fan-out. Single-combo
@@ -829,7 +833,7 @@ fn memory_usage_matches_allocated() {
                 vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
             ]),
             aggression_limit: 3,
-            include_allin: true,
+            allin_first: true,
             ..Default::default()
         },
     );
@@ -903,7 +907,6 @@ fn memory_usage_matches_allocated() {
                 sizes: vec![SizeSpec::PreviousBetMultiple { factor: 2.0 }],
             },
         ]),
-        include_allin: false,
     };
     let force_config = PostflopConfig {
         board: parse_cards("2c 7d 9h Js Qs"),
@@ -1634,11 +1637,11 @@ fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
     );
 }
 
-/// `include_allin` adds exactly one extra all-in action alongside a sized
-/// menu that has room below the maximum, but does not duplicate the all-in
-/// target when a sized entry already resolves to it.
+/// A leading `add bet [a]` adds exactly one extra all-in action alongside a
+/// sized menu that has room below the maximum, but does not duplicate the
+/// all-in target when a sized entry already resolves to it.
 #[test]
-fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
+fn allin_rule_adds_one_action_without_duplicating_an_already_allin_size() {
     let board = parse_cards("2c 7d 9h Js Qs");
     let ranges = PerPlayer::new(
         "AA".parse::<Range>().unwrap(),
@@ -1648,7 +1651,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         Street::River,
         StreetMenus {
             oop_bet: vec![SizeSpec::StackFraction { fraction: 0.5 }],
-            include_allin: true,
+            allin_first: true,
             aggression_limit: 1,
             ..Default::default()
         },
@@ -1678,7 +1681,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
             "bet 5".to_string(),
             "bet 10".to_string(),
         ],
-        "include_allin should add exactly one extra all-in action: {:?}",
+        "the all-in rule should add exactly one extra all-in action: {:?}",
         game_a.node_info[tag_a].actions
     );
 
@@ -1686,7 +1689,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
         Street::River,
         StreetMenus {
             oop_bet: vec![SizeSpec::StackFraction { fraction: 1.0 }],
-            include_allin: true,
+            allin_first: true,
             aggression_limit: 1,
             ..Default::default()
         },
@@ -1712,7 +1715,7 @@ fn include_allin_adds_one_action_without_duplicating_an_already_allin_size() {
     assert_eq!(
         game_b.node_info[tag_b].actions,
         vec!["check".to_string(), "bet 10".to_string()],
-        "an already-all-in size must not be duplicated by include_allin: {:?}",
+        "an already-all-in size must not be duplicated by the all-in rule: {:?}",
         game_b.node_info[tag_b].actions
     );
 }
@@ -2070,7 +2073,6 @@ fn tree_script_effect_add_appends_a_wager_candidate() {
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 5.0 }],
         }]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -2102,7 +2104,6 @@ fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
                 sizes: vec![],
             },
         ]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -2134,7 +2135,6 @@ fn tree_script_effect_replace_swaps_the_wager_menu() {
                 sizes: vec![SizeSpec::ToChips { value: 8.0 }],
             },
         ]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -2157,7 +2157,6 @@ fn tree_script_effect_force_drops_fold_check_and_call_too() {
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 8.0 }],
         }]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -2189,7 +2188,6 @@ fn tree_script_effect_checkdown_keeps_only_check() {
                 sizes: vec![],
             },
         ]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
     let root = game.node_by_history("").expect("root history");
@@ -2213,7 +2211,6 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
             action: Some(ActionKind::Raise),
             sizes: vec![SizeSpec::ToChips { value: 9.0 }],
         }]),
-        include_allin: false,
     };
     let mut config = river_only_config(river);
     let game = build_postflop_game(&config, chip_ev());
@@ -2245,63 +2242,6 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
     );
 }
 
-/// `include_allin` is applied before any rule runs, so the all-in it added
-/// survives only if a rule re-adds it -- `replace`/`force` both drop it
-/// (along with everything else of their kind) exactly like any other rule
-/// edit would. `replace` still leaves `check` standing; `force` does not.
-#[test]
-fn tree_script_include_allin_applies_before_rules() {
-    let replace_river = StreetTree {
-        nlh_rules: {
-            let mut rules = vec![Rule {
-                street: Street::River,
-                condition: Condition::Const(true),
-                effect: Effect::Replace,
-                action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-            }];
-            hu_postflop::test_support::limit_aggressions(&mut rules, Street::River, 1);
-            hu_postflop::test_support::street_rules(rules)
-        },
-        include_allin: true,
-    };
-    let game = build_postflop_game(&river_only_config(replace_river), chip_ev());
-    let root = game.node_by_history("").expect("root history");
-    let tag = game.game.tree.tags[root as usize] as usize;
-    assert_eq!(
-        game.node_info[tag].actions,
-        vec!["check".to_string(), "bet 2".to_string()],
-        "replace must drop include_allin's default all-in unless it re-adds \
-         one, while still leaving check standing: {:?}",
-        game.node_info[tag].actions
-    );
-
-    let force_river = StreetTree {
-        nlh_rules: {
-            let mut rules = vec![Rule {
-                street: Street::River,
-                condition: Condition::Truth(TreeVar::Unopened),
-                effect: Effect::Force,
-                action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }],
-            }];
-            hu_postflop::test_support::limit_aggressions(&mut rules, Street::River, 1);
-            hu_postflop::test_support::street_rules(rules)
-        },
-        include_allin: true,
-    };
-    let game = build_postflop_game(&river_only_config(force_river), chip_ev());
-    let root = game.node_by_history("").expect("root history");
-    let tag = game.game.tree.tags[root as usize] as usize;
-    assert_eq!(
-        game.node_info[tag].actions,
-        vec!["bet 2".to_string()],
-        "force must drop include_allin's default all-in exactly like replace \
-         does, but check does not survive force either: {:?}",
-        game.node_info[tag].actions
-    );
-}
-
 /// Common-input rules reject empty menus instead of inventing fallback actions.
 #[test]
 fn tree_script_emptying_a_node_is_rejected() {
@@ -2314,7 +2254,6 @@ fn tree_script_emptying_a_node_is_rejected() {
             action: Some(ActionKind::Bet),
             sizes: vec![],
         }]),
-        include_allin: false,
     };
     let config = river_only_config(no_room);
     let build_error = hu_postflop::try_build_postflop_game(&config, chip_ev())
@@ -2351,7 +2290,6 @@ fn tree_script_emptying_a_node_is_rejected() {
                 sizes: vec![],
             },
         ]),
-        include_allin: false,
     };
     let config = river_only_config(force_then_remove);
     let build_error = hu_postflop::try_build_postflop_game(&config, chip_ev())
@@ -2391,7 +2329,6 @@ fn tree_script_emptying_a_node_is_rejected() {
                 sizes: vec![],
             },
         ]),
-        include_allin: false,
     };
     let game = build_postflop_game(&river_only_config(bet_then_checkdown), chip_ev());
     let facing_bet = game.node_by_history("r5").expect("facing-bet history");
@@ -2427,7 +2364,6 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
                 sizes: vec![SizeSpec::ToChips { value: 7.0 }],
             },
         ]),
-        include_allin: false,
     };
     let build = |preflop_aggressor: Option<Player>| {
         let mut config = river_only_config(river.clone());
@@ -2494,7 +2430,6 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
             action: Some(ActionKind::Bet),
             sizes: vec![SizeSpec::ToChips { value: 9.0 }],
         }]),
-        include_allin: false,
     };
     let config = PostflopConfig {
         board: parse_cards("2c 7d 9h"),
@@ -2594,11 +2529,9 @@ fn rule_hits_fixture() -> PostflopConfig {
         streets: PerStreet {
             flop: StreetTree {
                 nlh_rules: hu_postflop::test_support::street_rules(flop_rules),
-                include_allin: false,
             },
             turn: StreetTree {
                 nlh_rules: hu_postflop::test_support::street_rules(turn_rules),
-                include_allin: false,
             },
             river: StreetTree::default(),
         },

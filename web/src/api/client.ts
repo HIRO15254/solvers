@@ -88,9 +88,12 @@ export const api = {
   info: () => json<ServerInfo>("/v1"),
   validate: (configToml: string, resources: boolean) =>
     post<ValidateResponse>("/v1/validate", { configToml, resources }),
-  /** Rows of the tree the config defines, before solving (`POST /v1/tree`); `nodes` are selectors, default the root. */
-  tree: (configToml: string, nodes?: string[]) =>
-    post<PreviewTreeRow[]>("/v1/tree", nodes === undefined ? { configToml } : { configToml, nodes }),
+  /**
+   * Rows of the tree the config defines, before solving (`POST /v1/tree`); `nodes` are selectors, default the root.
+   * `restOfStreet` follows each selected node with the action nodes after it on its street.
+   */
+  tree: (configToml: string, nodes: string[] = [], restOfStreet = false) =>
+    post<PreviewTreeRow[]>("/v1/tree", { configToml, nodes, restOfStreet }),
   /** Replays `moves` (or, without them, the config's `spot.line`) and reports the next legal moves. */
   line: (configToml: string, moves?: string[]) =>
     post<LineCursor>("/v1/line", moves === undefined ? { configToml } : { configToml, moves }),
@@ -107,16 +110,25 @@ export const api = {
   artifactBlob: async (id: string, name: string) =>
     (await request(`${run(id)}/artifacts/${encodeURIComponent(name)}`)).blob(),
   /** A solution view rendered by `solvers export` on the daemon's host. */
-  solution: <T>(id: string, view: string, nodes: string[] = []) =>
-    json<T>(`${run(id)}/solution/${view}${nodeQuery(nodes)}`),
-  solutionCsv: async (id: string, view: string, nodes: string[] = []) => {
-    const query = nodeQuery(nodes);
-    return (await request(`${run(id)}/solution/${view}${query}${query ? "&" : "?"}format=csv`)).blob();
-  },
+  solution: <T>(id: string, view: string, nodes: string[] = [], options: SolutionOptions = {}) =>
+    json<T>(`${run(id)}/solution/${view}${solutionQuery(nodes, options, false)}`),
+  solutionCsv: async (id: string, view: string, nodes: string[] = [], options: SolutionOptions = {}) =>
+    (await request(`${run(id)}/solution/${view}${solutionQuery(nodes, options, true)}`)).blob(),
 };
 
-function nodeQuery(nodes: string[]): string {
-  return nodes.length === 0 ? "" : "?" + nodes.map((n) => `node=${encodeURIComponent(n)}`).join("&");
+interface SolutionOptions {
+  /** Re-solve the River nodes a `no-rivers` run did not store (`resolve=rivers`): one River solve per request. */
+  resolveRivers?: boolean;
+  /** Follow each node with the action nodes after it on its street (`restOfStreet=true`). */
+  restOfStreet?: boolean;
+}
+
+function solutionQuery(nodes: string[], options: SolutionOptions, csv: boolean): string {
+  const params = nodes.map((n) => `node=${encodeURIComponent(n)}`);
+  if (options.resolveRivers) params.push("resolve=rivers");
+  if (options.restOfStreet) params.push("restOfStreet=true");
+  if (csv) params.push("format=csv");
+  return params.length === 0 ? "" : `?${params.join("&")}`;
 }
 
 /** Saves a blob through the browser's download prompt. */

@@ -188,6 +188,7 @@ export function StateBadge({ state }: { state: RunState }) {
  */
 export function Notice({
   variant,
+  icon,
   title,
   description,
   actions,
@@ -195,6 +196,8 @@ export function Notice({
   className,
 }: {
   variant: "info" | "success" | "warning" | "destructive";
+  /** Overrides the variant icon; null for none (a title that carries its own). */
+  icon?: string | null;
   title: ReactNode;
   description?: ReactNode;
   /** Buttons under the text. */
@@ -205,6 +208,7 @@ export function Notice({
   return (
     <Alert
       variant={variant}
+      icon={icon}
       title={title}
       description={description}
       actions={actions}

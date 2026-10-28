@@ -683,7 +683,6 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
                     .collect(),
                 players: PerPlayer::new(oop.clone(), ip.clone()),
             }),
-            include_allin: spot.tree.include_allin,
         })
     };
     Ok(PostflopConfig {

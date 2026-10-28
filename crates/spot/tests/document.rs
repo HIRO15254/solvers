@@ -103,7 +103,6 @@ fn every_common_default_and_section_order() {
     );
     assert_eq!(s.tree.script, "");
     assert!(s.tree.compiled.rules.is_empty());
-    assert!(!s.tree.include_allin);
     assert!(s.tree.params.is_empty());
     assert!(s.run.threads.is_none());
     assert!(s.run.memory_bytes.is_none());
@@ -147,7 +146,7 @@ fn spec_p2_example_is_idempotent() {
 #[test]
 fn every_cash_key_explicit_and_idempotent() {
     let text = format!(
-        "{ROOT}sb_bb = 0.25\nante_bb = 0.125\nbb_ante_bb = 0\nstraddles_bb = [2, 4]\n[table.stacks_bb]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_bb = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit_bb = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\ninclude_allin = true\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
+        "{ROOT}sb_bb = 0.25\nante_bb = 0.125\nbb_ante_bb = 0\nstraddles_bb = [2, 4]\n[table.stacks_bb]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_bb = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit_bb = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
     );
     let d = parse(&text);
     assert_eq!(
@@ -505,6 +504,13 @@ invalid!(
     "[tree]\npreflop_reraise_jam_above_stack = { numerator = 1, denominator = 3 }",
     NLH002,
     "tree.preflop_reraise_jam_above_stack",
+    "unknown key"
+);
+invalid!(
+    removed_tree_include_allin,
+    "[tree]\ninclude_allin = true",
+    NLH002,
+    "tree.include_allin",
     "unknown key"
 );
 invalid!(
@@ -1011,7 +1017,6 @@ fn dotted_type_errors_for_every_common_shape() {
         ("spot", "board"),
         ("tree", "script"),
         ("tree", "source"),
-        ("tree", "include_allin"),
         ("tree", "params"),
         ("run", "threads"),
         ("run", "memory"),

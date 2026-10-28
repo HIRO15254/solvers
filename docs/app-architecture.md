@@ -242,8 +242,8 @@ CLI `line --format json`のcursor JSONをそのまま返す。moves省略時は`
 `invalid-config`でstderrを保持する。認証は他の`/v1` APIと同じ。
 field・単位・合法tokenは[CLI reference](cli-reference.jp.md#solvers-line)を正本とする。
 
-`POST /v1/tree`は`configToml`と任意の`nodes: string[]`を受け、
-CLI `tree --format json`の行配列をそのまま返す。省略・空配列はrootだけを選択する。
+`POST /v1/tree`は`configToml`と任意の`nodes: string[]`・`restOfStreet: bool`を受け、
+CLI `tree --format json`（`restOfStreet`なら`--rest-of-street`付き）の行配列をそのまま返す。省略・空配列はrootだけを選択する。
 P1の製品APIがsolveと共通の木/indexを構築し、exportと同じselectorと行生成を使うが`stored`は返さない。
 不正config・P2・未知nodeはHTTP 400 `invalid-config`でCLIのstderrを保持し、runは作らない。
 認証は他の`/v1` APIと同じである。
@@ -252,7 +252,12 @@ artifact の名前は run directory 契約の allow-list に限る。任意の d
 file share として公開しない。solution view は `solution.sol` があればP1、それ以外では
 `solution.mwsol` があればP2をCLI `export`へ渡し、どちらも無ければ`unavailable`を返す。
 `format=csv`でCSVを選べる（既定JSON）。P1のみ`node=SELECTOR`を繰り返せ、percent encodingと
-`+`をspaceへ復号して指定順で`--node`へ渡す。P2への`node`指定と不正selectorは
+`+`をspaceへ復号して指定順で`--node`へ渡す。P1のみ`resolve=rivers`で`--resolve-rivers`を付け、
+no-riversで未保存のRiverを1 requestごとのCLI processで再solveする（request間のcacheは持たない）。
+P1のみの`decision` viewは`actions`・`strategy`・`ev`を1つのJSON objectで返し、再solveを1回に抑える。
+P1のみ`restOfStreet=true`で`--rest-of-street`を付け、各nodeの後にそのstreetの残りのaction nodeを返す。
+P2への`node`・`restOfStreet`・`resolve`・`decision`指定、`rivers`以外の`resolve`値、`true` / `false`以外の
+`restOfStreet`値と不正selectorは
 HTTP 400 `invalid-request`、その他のexport失敗は`internal`である。追加契約のためprotocol versionは1を保つ。
 event は SSE ではなく `nextOffset` と `terminal` を持つ page として返す。
 run一覧と詳細の`RunSummary.lastProgress`は最後の`progress.jsonl`行を製品固有のkeyのまま返す
@@ -287,7 +292,7 @@ viewerはP1の対話`inspect`、両製品のartifact query、`web/`のWeb GUIで
 `cli::inspect`はstdin/stdoutのREPL loop、navigation state、command errorとgridの描画を持つ。
 live solve、reach・equity・combo・action gridは`hu_postflop::queries`からtyped dataを受け取る。
 保存済み戦略は`artifact::SolProvider`を使う。未保存Riverは同じproviderがlazy re-solveする。
-保存時のEVと再solveした戦略を混同しない。
+P1の`views`も`RiverResolve`指定時は同じproviderで未保存Riverの戦略と値を出す。保存時のEVと再solveした値を混同しない。
 
 P1の`views`とP2の`views`は表示用dataを返す。CLIのadapterがJSON/CSVを符号化する。
 daemonのHTTP solution viewは両製品のCLI `export`へ委譲する。
@@ -300,7 +305,7 @@ Web GUI（React + TypeScript、Vite）はdaemon HTTPだけを使うclientであ�
 |---|---|---|
 |Setup|`POST /v1/line`、`POST /v1/validate`（`resources`付き）、`POST /v1/tree`、`GET /v1/runs`、`POST /v1/runs`|P1入力の1つの文書を卓・開始状況・Range・Tree・Solverのstepで編集し、文書全体のTOML直接編集はstepの列から区切った右端のbuttonで開く。spot名・run名・TOMLの保存名は右列の卓の図の上の1つの名前（`meta.name`）で、空なら卓の行動順・line APIが手に残す2人・boardから綴った自動の名前をplaceholderに示し、検証・run投入・保存する文書の`meta.name`へ書く。run名とTOMLのfile名は名前の英数字・`.`・`_`・`-`以外を`_`に置き換え（daemonはURL pathのrun idをpercent-decodeしない）、`GET /v1/runs`の既存runと重なれば`-n`を付ける。右列の卓の図は文書の`[table]`と`spot.line`をline APIでreplayした席・wager・pot・boardと、`seats`の2人のstackの小さい方をeffective、それをpotで割ったSPR、手に残る2人のOOP / IPの印を描き、席の押下で2人のactive playerを選ぶ。卓の図に検証の結果は書かない。右列の検証はvalidate結果のtreeと資源の見積り・warningを示し、error文（`NLHnnn: key: 理由`）が名指すkeyの入力欄の直下に理由を示し、その入力欄を持つstep（無ければTOML、`meta.name`は名前の欄）を開く。右列のTreeは検証が通った文書をtree APIへ渡し、返る行（節点のstreet・手番・pot・terminal・子のaction、chance nodeのcard）を描くだけで、選んだ節点のpathを次の`nodes`として送る。`tree.script`のerrorの行番号はサイズ表が書いた行からcellへ戻すだけで、理由は書き換えない。卓の席ごと入力はstack・blind・anteの全員分の列を`[table]`のkeyへ写すだけで、列の順はline APIのroot（straddle無しの卓）の行動順から得る。lineは文字（カンマと` / `の空白だけを文法の形へ揃える）、その2人が残る経緯（2bet〜5bet・squeeze・limp・iso、固定額、postflopの進行）、またはbadgeから書く。badgeは今のstreetの行動の後に、そのstreetで手番が来る席のpositionだけを並べる。その席は、line APIのreplayで次の手番から順に`next.options`のcheck（無ければfold）を足していき、streetが閉じるまでに`next`になった席であり、GUIは手番の順を持たない。badgeのpopoverはその席の手番での`next.options`を示し、選ぶと補ったcheck / foldに続けて手順（`moves`）に足す。組み立て途中のlineはstrictなline文法では別の意味（残りの暗黙fold）になるため、GUIは押して作った`moves`を、それが綴った`line`が文書に残る間だけ保持してreplayする。bet・raiseの額は`min`〜`max`に入るかだけを見てline APIへ渡す。presetはpreflopの行動順・postflopの先手・potをline APIから受けてline文字列を綴るだけで、GUIでbetting規則を再実装しない。`[ranges]`のkeyはline APIのreplayが手に残す2人（次の手番がOOP）へ付け替え、rangeの中身は変えない。Treeのサイズ表はstreet×OOP/IP×bet/raiseのsize literalを`in_position`・`donk`・`aggressions`の条件だけの`tree.script`へ書き、rule単位で書き戻せるscriptだけを表で開く。sizeの解釈・合法性・未一致ruleはvalidate結果に任せる。line APIのreplayがpostflopのstreetを始めるとき、`boardCards`より多いboardは先頭の`boardCards`枚だけを使い、残りは文書に残したまま薄く示して、検証・run投入・TOMLの保存へは除いたboardを渡す。賞金はpresetから埋める専用dialogで編集する。TOML直接編集は読めた文書をstepと共有し、読めない文書は渡さない。複数行の文字列は`'''`の複数行literalで書く。stepに無いkeyは文書のまま保持し、既定値・検証・正規化はvalidate結果を表示する。templateは`examples/hu-postflop/`をbuild時に取り込み、`meta.name`を外して読む|
 |Runs|`GET /v1/runs`、`/events`、`/artifacts`、`cancel`、`resume`|一覧の`lastProgress`と`progress.jsonl`から`nash_conv / 2`を描く。%pot換算はvalidate結果の開始pot、%prizes換算はconfigのpayout合計を使う。stop eventから終了stateまでを保存中として示す|
-|Results|`/solution/{summary,tree,actions,strategy,ev,range}?node=`|`tree`の`children`で節点を辿り、chance nodeはlabelからcardを選ぶ。13×13 gridはcombo行を到達weightで重み付けしたclass集計であり、戦略・EVの計算はしない|
+|Results|`/solution/{summary,tree,decision}?node=`（未保存River節点は`&resolve=rivers`）、Exportは`/solution/strategy?format=csv`|`tree`の`children`で節点を辿り、chance nodeはlabelからcardを選ぶ。action nodeの頻度・戦略・EVは`decision`の1 requestで得る。13×13 gridはcombo行を到達weightで重み付けしたclass集計であり、戦略・EVの計算はしない|
 |Guide|なし|各画面の操作手順と、このGUIから撮ったscreenshot（`web/public/guide/*.png`、buildで`dist/guide/`へ写す）を並べる静的な頁|
 
 SetupのTree stepはscriptの`param`宣言を入力欄として表示し、変更を`[tree.params]`へ書く。
@@ -308,8 +313,12 @@ script本文の宣言既定値は変更せず、validateのparam診断と同じ�
 サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を
 他のruleより後へ書く。構造上の攻撃回数上限やsizeのthreshold併合は持たない。
 
-Results画面はEquity・node比較・hand分類を持たない（対応するexport viewが無い）。未保存のRiver節点は
-`stored: false`を示し、戦略は`solvers inspect --sol`のlazy re-solveで見る。TypeScript型は手書きであり、
+Results画面はEquity・node比較・hand分類を持たない（対応するexport viewが無い）。未保存のRiver節点（`stored: false`のaction）は
+tree行を先に表示し、その節点に`restOfStreet=true&resolve=rivers`の`tree`と`decision`を1回ずつ要求する。
+Riverは最後のstreetなので、1回の再solveでその節点より下の全action nodeの行が得られ、GUIはそれを節点ごとに分けて保持する。
+そのRiverの中のaction nodeへの移動は保持した行を表示し、再solveしない。取得中は再solve中、取得後は再計算値である旨を示す。
+River cardを選び直すと（同じcardでも）保持した再solveの行を全て捨て、選んだRiverを解き直す。daemonもCLIも再solveの結果を保存しない。
+再solveの失敗はその節点だけの警告とする。TypeScript型は手書きであり、
 protocol crateからの型生成とdesktop shellは持たない。
 
 画面はCryst Design Systemで組む。tokens.css・bundle（`window.Cryst`のReact component）・font fileは
@@ -326,7 +335,7 @@ protocol crateからの型生成とdesktop shellは持たない。
 |Resultsのaction履歴cardの折返しと、1280px以下での詰めた表示（cardの最小幅を外し、action行を20px・`text-xs`にする）|節点の列が横に溢れて見えなくならないよう、横scrollではなく折り返す。CrystにResponsiveな履歴部品が無い|
 |board選択dialogのdeck（13×4のcard button）|52枚から順序付きで選ぶ部品がCrystに無い。選択は`primary`枠と`selection`塗り|
 |Setupの右列の卓の図（楕円のfeltと席、street wager、button、pot・effective・SPR・board、席名の横のOOP / IPの印）とtemplate選択dialogの行|卓の状態を席の配置で示し、席の押下でactive playerを選ぶ部品、例を中身付きで並べる部品がCrystに無い。選んだ席は`primary`枠と`selection`の外光。OOP / IPの印は`selection`塗りに`primary`文字。席の値はすべて`solvers line`の`seats`から受け取る。template・賞金のDialogは560px幅|
-|Setupの右列のTree（節点のpathをaction chipのbuttonで並べ、子のactionをchip、chance nodeの子をboard選択と同じcard buttonで並べる）|事前のpublic treeを1節点ずつ辿る部品がCrystに無い。chipとcard buttonは上のlineのreplay・board選択の表示を使い回す|
+|Setupの右列のTree（歩いたstreetをResultsのaction履歴と同じcardで並べ、表示中のstreetの全decisionを字下げのoutlineで示す。各actionはResultsと同じ色の印・BB額・pot比（raiseは倍率も）・行き先（Deal turn/river・Showdown）を持ち、streetを閉じるactionは下のcard選択で次のstreetへ進む）|事前のpublic treeを1 streetずつ一覧する部品がCrystに無い。outlineはWAI-ARIAのtree pattern（矢印keyでの移動・開閉）で、ライブラリを使わない。streetごとに`restOfStreet`の1要求で取り、street内の開閉は要求しない。card選択はResultsと同じ`CardGrid`|
 |Guideの目次（左の縦の項目button）とscreenshot（`border`枠・`radius-md`の`img`）|頁内の節へscrollする目次と画像をCrystが持たない。hash routeを壊さないよう目次は`scrollIntoView`のbuttonで、色は`muted-foreground`、hoverは`accent`塗り|
 |SetupのTreeのサイズ表（streetの行に、OOP・IPそれぞれのbet・raiseの入力欄を並べるgrid）|CrystのTableはrecordの行を表示する部品で、2段の列見出しの下に入力欄を揃える部品が無い。入力欄・checkbox・tabはCrystの部品で、開始streetより前の行の見出しは`muted-foreground`|
 |`Notice`（Alertを状態色のBadge tint 15%で塗る）|AlertはCardと同じ`card`塗りで、Card上では背景と区別できない。titleを必須にし、iconと文字の行を揃える|

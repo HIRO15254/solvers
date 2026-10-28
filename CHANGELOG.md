@@ -29,6 +29,13 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   the other preflop rules. Unlike the old exact ratio, the threshold uses the
   actor's maximum reachable street amount (hand-start stack minus antes), is
   rounded to the 0.001 BB grid, and applies at its source position.
+- **Breaking:** removed `tree.include_allin`. It now produces unknown-key
+  `NLH002`, is omitted from normalized/effective configs, and prevents loading
+  `.sol`, `.mwsol`, or checkpoints whose embedded configs contain it. Migrate
+  `include_allin = true` by starting the script with
+  `preflop, flop, turn, river { add bet [a] add raise [a] }` (listing only the
+  streets the spot plays), which builds the same tree. The GUI Tree step's
+  "Add all-in at every node" checkbox is gone.
 
 ### Added
 
@@ -52,6 +59,36 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   docs for variables, keywords, size literals and the script's own
   `param` / `define` declarations, and the daemon's validation error (or a
   TOML syntax error) marked on its line.
+- `solvers tree --rest-of-street` (and `restOfStreet` on `POST /v1/tree`):
+  each selected node is followed by the action nodes after it on its street,
+  in preorder, stopping at chance and terminal nodes.
+- GUI Tree preview redesigned as a per-street outline: every decision on the
+  street with each action's BB amount, pot percentage (raises also as a
+  multiple of the bet faced) and all-in, opened and closed by click or arrow
+  keys; actions that close the street deal the next card, and the streets
+  walked stay above. One request per street replaces one request per node.
+- `solvers export --resolve-rivers` (with `--river-iterations`, default 500,
+  and `--river-target`) and `resolve=rivers` on the daemon's P1 solution
+  views: `actions` / `strategy` / `ev` at River nodes a `no-rivers` run did
+  not store are answered by re-solving their River subgame from the stored
+  reach, the same re-solve `inspect --sol` uses. Values share the stored
+  subgame-start basis but are recomputed, not the original solve's.
+- P1 export view `decision` (CLI `export SOL decision`, daemon
+  `/solution/decision`): the `actions`, `strategy` and `ev` rows of the
+  selected nodes as one JSON object from one load, so a `--resolve-rivers`
+  re-solve runs once for all three. JSON only; P2 artifacts refuse it.
+- `solvers export --rest-of-street` (and `restOfStreet=true` on the daemon's
+  P1 solution views): each selected node is followed by the action nodes
+  after it on its street, as in `solvers tree --rest-of-street`. At an
+  unstored River entry, one `decision` export re-solves the River once for
+  every action node below it.
+- GUI Results re-solves the River nodes of a `no-rivers` run on the spot and
+  shows their strategy and EV, marked as recomputed; it previously only
+  pointed to `solvers inspect --sol`. One re-solve answers every action node
+  of that River, so moving within it re-solves nothing; picking a River card
+  again (even the same one) discards the re-solved River. Each action node
+  now loads with one `decision` request instead of separate `actions` /
+  `strategy` / `ev` requests.
 
 ## [0.1.0] - 2026-10-16
 

@@ -271,6 +271,10 @@ enum Command {
         /// `all` selects every action node.
         #[arg(long = "node", default_value = "root")]
         nodes: Vec<String>,
+        /// Follow each selected node with the action nodes after it on its
+        /// street, in tree order, stopping at chance and terminal nodes.
+        #[arg(long)]
+        rest_of_street: bool,
         #[arg(long, value_enum, default_value = "human")]
         format: validate::ValidationFormat,
     },
@@ -413,6 +417,9 @@ enum Command {
     /// Export a stable JSON or CSV view from a `.sol` or `.mwsol` artifact.
     Export {
         solution: std::path::PathBuf,
+        /// The view. `decision` (postflop, JSON only) holds `actions`,
+        /// `strategy` and `ev` of the selected nodes from one load, so a
+        /// `--resolve-rivers` re-solve serves all three.
         #[arg(value_enum)]
         view: artifact_args::ExportView,
         #[arg(long, value_enum, default_value = "json")]
@@ -424,8 +431,30 @@ enum Command {
         /// Repeat to export nodes from one load in the given order.
         #[arg(long, default_value = "root")]
         node: Vec<String>,
+        /// Postflop only: follow each selected node with the action nodes
+        /// after it on its street, in preorder, stopping at chance and
+        /// terminal nodes (as `solvers tree --rest-of-street`).
+        #[arg(long = "rest-of-street")]
+        rest_of_street: bool,
         #[arg(long)]
         output: Option<std::path::PathBuf>,
+        /// Postflop only: answer `actions` / `strategy` / `ev` / `decision`
+        /// at river nodes a `no-rivers` artifact does not store by
+        /// re-solving their river subgame from the stored reach (recomputed
+        /// values, not the solve's own). Other views ignore it.
+        #[arg(long = "resolve-rivers")]
+        resolve_rivers: bool,
+        /// Iteration budget of each river re-solve (`--resolve-rivers`).
+        #[arg(
+            long = "river-iterations",
+            default_value_t = 500,
+            requires = "resolve_rivers"
+        )]
+        river_iterations: u64,
+        /// Stop a river re-solve early once its subgame's `nash_conv` drops
+        /// below this (`--resolve-rivers`).
+        #[arg(long = "river-target", requires = "resolve_rivers")]
+        river_target: Option<f64>,
     },
     /// Compare two same-product solution average profiles.
     Compare {
@@ -538,8 +567,9 @@ pub fn main_impl() -> Result<()> {
         Command::Tree {
             config,
             nodes,
+            rest_of_street,
             format,
-        } => tree::run(&config, &nodes, format),
+        } => tree::run(&config, &nodes, rest_of_street, format),
         Command::Line {
             config,
             moves,
@@ -649,10 +679,20 @@ pub fn main_impl() -> Result<()> {
             view,
             format,
             node,
+            rest_of_street,
             output,
+            resolve_rivers,
+            river_iterations,
+            river_target,
         } => {
             nlh_v1::require_current_artifact(&solution)?;
             if solution.extension().is_some_and(|value| value == "mwsol") {
+                if resolve_rivers || rest_of_street {
+                    anyhow::bail!(
+                        "--resolve-rivers and --rest-of-street: the solution must be a postflop \
+                         .sol artifact"
+                    );
+                }
                 #[cfg(feature = "p2")]
                 {
                     multiway_artifact::export(&solution, view, format, output.as_deref())
@@ -660,7 +700,19 @@ pub fn main_impl() -> Result<()> {
                 #[cfg(not(feature = "p2"))]
                 Err(product_support::artifact_error())
             } else {
-                postflop_artifact::export(&solution, view, format, &node, output.as_deref())
+                let rivers = resolve_rivers.then_some(hu_postflop::views::RiverResolve {
+                    iterations: river_iterations,
+                    target: river_target,
+                });
+                postflop_artifact::export(
+                    &solution,
+                    view,
+                    format,
+                    &node,
+                    rest_of_street,
+                    rivers,
+                    output.as_deref(),
+                )
             }
         }
         Command::Compare {

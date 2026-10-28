@@ -202,7 +202,7 @@ solve/resumeはstderr、reportはboard集合に対して1回だけ表示する�
 ## `solvers tree`
 
 ```sh
-solvers tree <CONFIG> [--node NODE]... [--format human|json]
+solvers tree <CONFIG> [--node NODE]... [--rest-of-street] [--format human|json]
 ```
 
 P1（`hu-postflop`）configのpublic treeをsolveせずに構築し、指定nodeの行を返す。
@@ -211,6 +211,9 @@ P2（`mw-preflop`）は`NLH005`（exit 2）で明示的に拒否する。戦略�
 slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。
 `all`は全action nodeを木順で返す。chance・terminalも明示selectorで選べる。
 未知nodeは入力error（exit 2）であり、無視したりrootへ戻したりしない。
+`--rest-of-street`は選択した各nodeの行の直後に、同じstreetでそのnodeより後のaction nodeの行を木の先行順で続ける。
+chance・terminal nodeで止まり、それらの行は含めない（選択したnode自身がchance・terminalならその行だけ）。
+複数の選択は指定順にそれぞれ展開し、重なる選択の行は重複する。
 
 JSONは`export SOLUTION tree`と同じ意味の
 `history`、`kind`、`street`、`actor`、`pot`、`actions`、`children`、`child_kinds`だけを持つ行の配列で、
@@ -352,7 +355,7 @@ P1のREPLは次を使う。
 | `help` / `quit` / `exit` | help / 終了 |
 
 iso併合dealは代表cardに`*`を付ける。member表示のremapは未対応である。
-未保存Riverの戦略・値は再計算値であり、保存時の値ではない。
+未保存Riverの戦略・値は再計算値であり、保存時の値ではない。`export --resolve-rivers`も同じ再解決を使う。
 
 ## `solvers report`
 
@@ -375,10 +378,13 @@ CSV列とEVの基準は[P1第8節](hu-postflop.jp.md)を参照する。
 ## `solvers export`
 
 ```sh
-solvers export <SOLUTION> <VIEW> [--node NODE]... [--format json|csv] [--output PATH]
+solvers export <SOLUTION> <VIEW> [--node NODE]... [--rest-of-street] [--format json|csv] [--output PATH]
+               [--resolve-rivers [--river-iterations N] [--river-target X]]
 ```
 
-VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
+VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary` / `decision`である。
+`decision`はP1専用・JSON専用で、同じnodeの`actions`・`strategy`・`ev`の行を同名keyに持つ1つのobjectを1回の読込みで返す。
+各keyの行は同名viewの出力と同じであり、`--resolve-rivers`の再解決も3つで共有する。`--format csv`とP2の`.mwsol`は値を読む前に入力error（exit 2）で拒否する。
 `.sol`はP1、`.mwsol`はP2のreaderで読む。
 
 | flag | 既定 | 意味 |
@@ -386,6 +392,10 @@ VIEWは`strategy` / `actions` / `range` / `ev` / `tree` / `summary`である。
 | `--format` | `json` | JSONまたはCSV |
 | `--output PATH` | stdout | 出力先 |
 | `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action/chance label path`check/check/Th`、`all`も使える。繰り返すと1回の読込みで各nodeの行を指定順に連結する |
+| `--rest-of-street` | 無し | P1のper-node view。各指定nodeの後にそのstreetで続くaction nodeを前順で足す（chance・terminalで止まる、`solvers tree --rest-of-street`と同じ）。P2の`.mwsol`では入力error（exit 2） |
+| `--resolve-rivers` | 無し | P1。no-riversで未保存のRiver節点の`actions` / `strategy` / `ev` / `decision`を再解決して出す。他のviewでは無視する。P2の`.mwsol`では入力error（exit 2） |
+| `--river-iterations N` | `500` | その再解決の反復予算（`--resolve-rivers`が必要） |
+| `--river-target X` | 無し | その再解決のNashConv上限（`--resolve-rivers`が必要） |
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会できる。chance labelはiso併合で代表cardに`*`が付き、実cardの無いrunoutでは`dealN`となる（履歴tokenは`[dealN]`）。
@@ -393,8 +403,11 @@ P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会で
 `kind`は`action` / `chance` / `terminal`、`street`は行動street / 配牌するstreet / 終了streetである。
 `actor`・BB単位の`pot`はactionだけが持ち、他のkindではJSONのnull、CSVでは空セルとなる。terminalの3配列は空、配列のCSVセルは`|`結合である。
 `--node all`は保存済みaction nodeだけを木順で出す。chance・terminalは`stored = false`である。
-P1の未保存Riverの戦略・値はexportできないが、`tree`の照会はできる。P2ではnode selectorをinspectで指定する。
-P1で解決できない`--node`、または`actions` / `strategy` / `ev`へのchance・terminal指定は型付き入力error（exit 2）で拒否する。診断にはselectorの問題、またはaction nodeだけが戦略を持つ旨を示す。
+P1の未保存Riverの戦略・値は既定ではexportできず（exit 1、`--resolve-rivers`を案内する）、`tree`の照会はできる。P2ではnode selectorをinspectで指定する。
+`--resolve-rivers`は照会nodeを含むRiver部分木（River配牌直後のnodeから下）を、`inspect --sol`と同じ方法で1回の読込みにつき部分木ごとに1回だけ再解決する。
+行の列と単位は保存値と同じで、EVも保存値と同じsubgame開始基準だが再計算値である。保存済みnodeの行は変わらず、`--node all`は従来どおり保存済みnodeだけを選ぶ。
+一方の席の到達が全handで0の線は再解決できずexit 1となる。
+P1で解決できない`--node`、または`actions` / `strategy` / `ev` / `decision`へのchance・terminal指定は型付き入力error（exit 2）で拒否する。診断にはselectorの問題、またはaction nodeだけが戦略を持つ旨を示す。
 P1の`summary`は`.sol`のmetadataだけを読む。他のviewは保存済みの木とindexを1回展開し（木は再構築しない）、照会nodeを含むchunkだけを展開する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
 
@@ -488,7 +501,7 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `130` | solve/resumeの協調停止 |
 
 型付き入力errorは診断に利用者由来の`resource limit`等を含んでもexit 2であり、資源上限はerror型でexit 75へ分類する。P2の資源診断は`NLH003`の表記を保つが入力errorとは区別する。
-P1 exportのnode selector入力errorは履歴・label pathを解決できない場合と、`actions` / `strategy` / `ev`へ非action nodeを指定した場合を含む。selector文字列に資源・成果物errorの語があってもexit 2であり、I/O等のexport失敗（exit 1）や破損・非互換（exit 3）と区別する。
+P1 exportのnode selector入力errorは履歴・label pathを解決できない場合と、`actions` / `strategy` / `ev` / `decision`へ非action nodeを指定した場合を含む。selector文字列に資源・成果物errorの語があってもexit 2であり、I/O等のexport失敗（exit 1）や破損・非互換（exit 3）と区別する。
 
 Ctrl-C / SIGINT（WindowsではCtrl-Breakも対応）の1回目は境界で停止してcheckpointを保存する（P1で`final_checkpoint = false`なら終了時の保存を省く）。
 P1のautoは25 iteration以下のsub-batch境界、整数は指定間隔の境界で判定する。2回目は即時終了する。P2は最大1 batch分遅れる。watchの停止はsolveを停止しない。
@@ -527,7 +540,7 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `GET` | `/v1/runs/{id}/events?from=OFFSET` | event page。nextOffset・terminal付き |
 | `GET` | `/v1/runs/{id}/artifacts` | 契約上のartifact一覧 |
 | `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact本体 |
-| `GET` | `/v1/runs/{id}/solution/{view}?format=csv&node=SELECTOR` | P1の`.sol` / P2の`.mwsol`をCLI exportで照会。`node`はP1のみ、繰り返し可 |
+| `GET` | `/v1/runs/{id}/solution/{view}?format=csv&node=SELECTOR&restOfStreet=true&resolve=rivers` | P1の`.sol` / P2の`.mwsol`をCLI exportで照会。`node`・`restOfStreet`・`resolve=rivers`・`decision` viewはP1のみ、`node`は繰り返し可 |
 | `POST` | `/v1/runs/{id}/cancel` | 協調停止（Unix: SIGINT、Windows: Ctrl-Break）。送れなければ`internal` |
 | `POST` | `/v1/runs/{id}/resume` | 再開 |
 | `GET` / `HEAD` | `/`とAPI以外のpath | UIが明示指定または自動検出されたとき、tokenなしで静的asset / SPA fallback |
@@ -545,8 +558,9 @@ CLIの拒否はHTTP 400 `invalid-config`でstderrを`message`に保持する。
 認証は他の`/v1`と同じbearer tokenであり、未認証は401、起動/I/O/JSON出力の失敗は
 `internal`。runは作らず、卓以外の設定やfile参照は読まない。
 
-`POST /v1/tree`のbodyは`{"configToml":"...","nodes":["root"]}`。
+`POST /v1/tree`のbodyは`{"configToml":"...","nodes":["root"],"restOfStreet":false}`。
 `configToml`は必須string、`nodes`は任意string[]で、省略または`[]`ならrootだけを返す。
+`restOfStreet`は任意boolean（既定false）で、trueなら`--rest-of-street`と同じく各選択のstreetの残りのaction nodeを続ける。
 daemonは一時fileへ本文を書き、`solvers tree CONFIG --format json`へ委譲する。
 `nodes`は指定順で繰り返しの`--node`に渡す。成功はHTTP 200で上記tree行のJSON配列をwrapperなしで返す。
 不正config・P2・未知nodeはHTTP 400 `invalid-config`でCLIのstderrを`message`に保持する。
@@ -562,10 +576,14 @@ daemonは計算せず、CLIへ委譲する。入力は同じ`solvers.nlh/v1`で�
 `validate --write-effective`でinline化してからconfigTomlを送る。
 solution viewは`solution.sol`を優先し、無ければ`solution.mwsol`を使う。どちらも無ければ
 `unavailable`。既定はJSON、`format=csv`でCSV。P1の`node`はpercent decoding（`+`はspace）
-して指定順にCLIの`--node`へ渡し、省略時はCLIの既定と同じである。
-P2への`node`指定、不正なquery encoding、CLIの入力error（exit 2）はHTTP 400
-`invalid-request`となり、CLI errorではstderrをmessageに載せる。その他のexport失敗は
-`internal`。追加契約のためprotocol versionは`1`のまま。
+して指定順にCLIの`--node`へ渡し、省略時はCLIの既定と同じである。`restOfStreet=true`は`--rest-of-street`を付ける（`false`は省略と同じ）。
+P1の`resolve=rivers`はCLIの`--resolve-rivers`（既定の反復予算）を付け、未保存Riverを再解決する。
+再解決は1 requestごとのCLI processで行い、request間でcacheしない。`actions`・`strategy`・`ev`を同じnodeで要るclientは
+`decision`の1 requestにまとめ、River部分木の複数nodeが要るなら入口nodeに`restOfStreet=true`を付けると再解決が1回で済む。
+P2への`node`・`restOfStreet`・`resolve`・`decision`指定、`rivers`以外の`resolve`値、`true` / `false`以外の`restOfStreet`値、
+不正なquery encoding、CLIの入力error（exit 2）はHTTP 400
+`invalid-request`となり、CLI errorではstderrをmessageに載せる。その他のexport失敗（`resolve=rivers`無しの未保存River照会、
+再解決できない線を含む）は`internal`。追加契約のためprotocol versionは`1`のまま。
 
 UI配信時は`/`は`index.html`、存在しない拡張子なしpathは`index.html`へfallback、
 存在しない拡張子ありpathは404となる。`index.html`は`Cache-Control: no-cache`。

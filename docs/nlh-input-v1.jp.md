@@ -281,7 +281,6 @@ preflop when aggressions >= 1 { jam raise > 33.333%stack }
 flop { replace bet [33, 75] }
 '''
 # source = "trees/6max.tree"   # scriptと排他。正規化でscriptへinline化
-include_allin = false           # 既定false。全nodeでall-inを候補に足す（scriptより先に効く）
 
 [tree.params]                   # scriptのparam既定値を上書き
 ```
@@ -294,6 +293,11 @@ include_allin = false           # 既定false。全nodeでall-inを候補に足�
 移行時は他のPreflop ruleの後へ`preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置く。
 旧keyのhand開始stackに対し、新しい閾値の分母Mはhand開始stackからanteを引いた額なので、anteがある場合だけ異なる。
 また、旧keyの正確な比率比較ではなく閾値を0.001 BB gridへ丸め、各literalの解決時ではなくruleのソース位置で作用する。
+`tree.include_allin`も利用者決定（2026-10-27）で削除された。指定は未知keyの`NLH002`であり、
+正規化・実効configには出力せず、これを埋込みconfigに含む`.sol`・`.mwsol`・checkpointも読み込めない。
+移行時は旧keyが`true`のconfigのscriptの先頭へ、spotにあるstreetを並べた
+`preflop, flop, turn, river { add bet [a] add raise [a] }`（P1は開始street以降だけ）を置く。
+旧keyと同じく他のruleより先に全nodeのmenuへall-inを足すので、同じ木になる。
 
 ### scriptの構造
 
@@ -328,7 +332,7 @@ turn, river {
 ### effectと合法性
 
 各nodeで、call額が0なら`check`、正なら`fold`と`call`を土台にする。
-不足stackのcallも`call`である。bet/raiseはscriptか`include_allin`が足す。
+不足stackのcallも`call`である。bet/raiseはscriptが足す。
 
 | 文 | menuへの作用 |
 |---|---|
@@ -350,7 +354,7 @@ fold/check/callの候補はNLHの合法性から作り、size listの数値は�
 閾値はsize literal解決順序の手順1（現streetの到達額への変換）だけで求め、最小full raiseへの引上げもMでのcapも行わない。
 例えば`85%stack`はround(M × 0.85)、`150`はpotの150%によるtarget、`a`はMである。
 一致nodeで、それまでに作られたmenuへソース順に作用する。該当候補が無ければ変化せず、
-対象種別が違法またはmenuに無い場合も変化しない。`jam`単独ではall-inを追加せず、`include_allin`にも依存しない。
+対象種別が違法またはmenuに無い場合も変化しない。`jam`単独ではall-inを追加しない。
 sizeを足すruleの後、慣例として最後の攻撃回数capの前か近くへ置く。後続ruleが足した候補には遡って作用しない。
 
 `merge`のACTIONも`bet` / `raise`だけで、`within`の後へ幅DIFFを1つだけ書く。DIFFはsize literalと同じ綴りで、`param`置換も使える。
@@ -510,10 +514,9 @@ P1のMはeffective stackで作った木の到達額であり、`%stack`と`%effe
 menu構築は次の順である。
 
 1. 合法なfold/check/callを作る。
-2. `include_allin = true`なら構造上可能なall-inを足す。
-3. 現streetの一致ruleをソース順に適用する。
-4. 各effectの後でactionをfold、check、call、bet、raise、額の昇順へ整列し、同一actionをdedupする。
-5. 最終menuが空ならerrorにする。
+2. 現streetの一致ruleをソース順に適用する。
+3. 各effectの後でactionをfold、check、call、bet、raise、額の昇順へ整列し、同一actionをdedupする。
+4. 最終menuが空ならerrorにする。
 
 候補を追加する各literalは次の順で解決する（`jam`の閾値は手順1だけである）。
 

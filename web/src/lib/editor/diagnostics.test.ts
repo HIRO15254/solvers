@@ -23,7 +23,8 @@ describe("tomlIssueLine", () => {
     "  replace bet [33]", // 9
     "}", // 10
     "'''", // 11
-    "include_allin = false", // 12
+    "[tree.params]", // 12
+    "cb = 40", // 13
   ].join("\n");
 
   it("puts a script error on its line inside the multi-line string", () => {
@@ -38,7 +39,7 @@ describe("tomlIssueLine", () => {
     expect(tomlIssueLine(toml, "ranges.BTN", "invalid range")).toBe(5);
     expect(tomlIssueLine(toml, "table.stacks_bb.CO", "must be positive")).toBe(3);
     expect(tomlIssueLine(toml, "tree.allin_threshold", "unknown key")).toBe(6);
-    expect(tomlIssueLine(toml, "tree.include_allin", "expected a bool")).toBe(12);
+    expect(tomlIssueLine(toml, "tree.params.cb", "override does not name a declared param")).toBe(13);
     expect(tomlIssueLine(toml, "spot.board", "missing")).toBeNull();
   });
 

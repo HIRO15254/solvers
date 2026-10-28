@@ -231,15 +231,6 @@ export function SetupTree({
         </Notice>
       )}
       <FieldIssue keys={["tree.params"]} />
-
-      <Card title="All-in">
-        <Checkbox
-          label="Add all-in at every node (include_allin)"
-          checked={getAt(doc, ["tree", "include_allin"]) === true}
-          onCheckedChange={(checked) => update(["tree", "include_allin"], checked === true || undefined)}
-        />
-        <FieldIssue keys={["tree.include_allin"]} />
-      </Card>
     </>
   );
 }

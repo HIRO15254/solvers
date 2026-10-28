@@ -14,7 +14,6 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-include_allin = false
 script = '''river when unopened { force bet [50] }'''
 [solver]
 storage = "f32"

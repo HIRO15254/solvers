@@ -71,14 +71,11 @@ impl<T> IndexMut<Street> for PerStreet<T> {
     }
 }
 
-/// One street's common-input betting rules and all-in menu default.
+/// One street's common-input betting rules.
 #[derive(Clone, Debug, Default)]
 pub struct StreetTree {
     /// Common-input rules in source order and actor history.
     pub nlh_rules: Box<crate::input::NlhStreetRules>,
-    /// Always offer the all-in target in addition to whatever the rules
-    /// produce. Applied before any rule runs (see [`node_actions`]).
-    pub include_allin: bool,
 }
 
 /// A postflop subgame: starting board (3, 4, or 5 cards fixes the starting
@@ -1203,12 +1200,11 @@ fn rule_hits_for(config: &PostflopConfig) -> RuleHits {
     }
 }
 
-/// Every legal action at `state`: the base non-aggressive action(s), the
-/// `include_allin` default (added before any rule runs, per
-/// `docs/nlh-input-v1.jp.md` section 9 -- a script can
-/// then edit it away), then this street's tree-script rules applied in
-/// source order with per-kind candidates. Shared by the real builder and the
-/// memory-usage dry run; an empty menu is rejected by both checked APIs.
+/// Every legal action at `state`: the base non-aggressive action(s), then
+/// this street's tree-script rules applied in source order with per-kind
+/// candidates (`docs/nlh-input-v1.jp.md` section 9). Shared by the real
+/// builder and the memory-usage dry run; an empty menu is rejected by both
+/// checked APIs.
 ///
 /// `hits` records, per rule, whether its condition was ever seen true (see
 /// [`RuleHits`]) -- threaded in as an accumulator rather than returned, so
@@ -1222,13 +1218,6 @@ fn node_actions(
     let street = &config.streets[state.street];
     let rules = &street.nlh_rules;
     let mut actions = base_actions(state);
-    if street.include_allin {
-        actions.extend(
-            sized_targets(state, config, &[SizeSpec::AllIn])
-                .into_iter()
-                .map(NodeAction::Wager),
-        );
-    }
     let mut common = rule_context(state, config);
     let remaining = (config.effective_stack - state.contrib[Player::P0])
         .min(config.effective_stack - state.contrib[Player::P1]);
@@ -2496,9 +2485,9 @@ mod tests {
     #[test]
     fn parallel_build_matches_serial_build() {
         use crate::game::{ChipEv, NoRake};
-        let street = StreetTree {
-            include_allin: true,
-            ..Default::default()
+        // Every menu starts with all-in, so short stacks reach all-in runouts.
+        let street = |street| StreetTree {
+            nlh_rules: crate::test_support::street_rules(crate::test_support::allin_rules(street)),
         };
         let mut merged = false;
         for board_text in ["As Ks Qs", "2c 2d 9d", "Th 9h 8h 2c"] {
@@ -2512,9 +2501,9 @@ mod tests {
                 pot: Chips(6),
                 effective_stack: Chips(9),
                 streets: PerStreet {
-                    flop: street.clone(),
-                    turn: street.clone(),
-                    river: street.clone(),
+                    flop: street(Street::Flop),
+                    turn: street(Street::Turn),
+                    river: street(Street::River),
                 },
                 ..Default::default()
             };

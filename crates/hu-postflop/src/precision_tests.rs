@@ -18,14 +18,17 @@ fn config() -> PostflopConfig {
         ),
         pot: Chips(6),
         effective_stack: Chips(9),
+        // Every turn and river menu starts with all-in.
         streets: PerStreet {
             turn: StreetTree {
-                include_allin: true,
-                ..Default::default()
+                nlh_rules: crate::test_support::street_rules(crate::test_support::allin_rules(
+                    Street::Turn,
+                )),
             },
             river: StreetTree {
-                include_allin: true,
-                ..Default::default()
+                nlh_rules: crate::test_support::street_rules(crate::test_support::allin_rules(
+                    Street::River,
+                )),
             },
             ..Default::default()
         },

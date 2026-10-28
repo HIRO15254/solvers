@@ -116,7 +116,7 @@ describe("braceBlock", () => {
 });
 
 describe("scriptRegion", () => {
-  const toml = "[tree]\nscript = '''\nflop { checkdown }\n'''\ninclude_allin = false";
+  const toml = "[tree]\nscript = '''\nflop { checkdown }\n'''\n[tree.params]\ncb = 40";
 
   it("covers the script text between the delimiters, after the opening newline", () => {
     const at = toml.indexOf("checkdown");
@@ -125,6 +125,6 @@ describe("scriptRegion", () => {
   });
 
   it("is null outside the script", () => {
-    expect(scriptRegion(toml, toml.indexOf("include_allin"))).toBeNull();
+    expect(scriptRegion(toml, toml.indexOf("cb = 40"))).toBeNull();
   });
 });

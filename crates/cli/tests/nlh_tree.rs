@@ -105,3 +105,57 @@ fn terminal_rows_all_action_nodes_and_human_listing() {
     assert!(text.contains("action river actor=oop pot=5 BB"), "{text}");
     assert!(text.contains("bet 1 -> r1 (action)"), "{text}");
 }
+
+fn histories(rows: &serde_json::Value) -> Vec<&str> {
+    rows.as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect()
+}
+
+#[test]
+fn rest_of_street_follows_each_node_with_its_streets_action_nodes_in_preorder() {
+    let river = example("hu-postflop", "river_small.toml");
+    let street = rows(&river, &["--rest-of-street"]);
+    assert_eq!(
+        histories(&street),
+        ["", "x", "xr1", "xr1r2.5", "r1", "r1r2.5"]
+    );
+    // Each selection expands on its own, in request order; terminals stay single rows.
+    let selected = rows(
+        &river,
+        &["--node", "r1", "--node", "bet 1/fold", "--rest-of-street"],
+    );
+    assert_eq!(histories(&selected), ["r1", "r1r2.5", "r1f"]);
+
+    // On the flop it stops at the turn deal: only flop action nodes, each action child included.
+    let flop = example("hu-postflop", "flop_srp.toml");
+    let street = rows(&flop, &["--rest-of-street"]);
+    let street = street.as_array().unwrap();
+    let returned: Vec<&str> = street
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    for row in street {
+        assert_eq!(
+            (row["kind"].as_str(), row["street"].as_str()),
+            (Some("action"), Some("flop"))
+        );
+        for (child, kind) in row["children"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .zip(row["child_kinds"].as_array().unwrap())
+        {
+            assert_eq!(
+                kind == "action",
+                returned.contains(&child.as_str().unwrap()),
+                "{child}"
+            );
+        }
+    }
+    let deal = rows(&flop, &["--node", "xx", "--rest-of-street"]);
+    assert_eq!(histories(&deal), ["xx"]);
+    assert_eq!(deal[0]["kind"], "chance");
+}

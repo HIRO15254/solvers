@@ -473,7 +473,6 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
         bet_sizes: Vec::new(),
         isolate_sizes: None,
         raise_sizes: Vec::new(),
-        include_allin: spot.tree.include_allin,
         max_betting_players: None,
     };
     let betting = BettingConfig {

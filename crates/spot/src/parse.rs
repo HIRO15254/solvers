@@ -68,7 +68,6 @@ struct RawSpot {
 struct RawTree {
     script: Option<String>,
     source: Option<String>,
-    include_allin: bool,
     params: BTreeMap<String, Value>,
 }
 
@@ -147,7 +146,6 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
         "tree" => &[
             ("script", "string"),
             ("source", "string"),
-            ("include_allin", "bool"),
             ("params", "map:scalar"),
         ],
         "run" => &[
@@ -914,7 +912,6 @@ fn tree(raw: RawTree, config_path: &Path, product: Product) -> Result<Tree, Spot
     Ok(Tree {
         script,
         compiled,
-        include_allin: raw.include_allin,
         params: raw.params,
     })
 }

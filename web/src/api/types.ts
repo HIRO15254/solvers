@@ -223,6 +223,21 @@ export interface ValueRow {
   ev: number;
 }
 
+export interface ActionRow {
+  history: string;
+  street: string;
+  actor: Seat;
+  action: string;
+  frequency: number;
+}
+
+/** The `actions`, `strategy` and `ev` views of the same nodes from one export (`/solution/decision`). */
+export interface DecisionRows {
+  actions: ActionRow[];
+  strategy: StrategyRow[];
+  ev: ValueRow[];
+}
+
 export interface SolSummary {
   board: string;
   pot: number;

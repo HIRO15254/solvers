@@ -175,7 +175,6 @@ board = "2c 7d 9h Js Qs"
 BB = "22+,A2s+,KTo+"
 BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
-include_allin = false
 script = '''river {
   when paired {
     replace bet [100]
@@ -281,7 +280,6 @@ board = "2c 7d 9h Js Qs"
 BB = "22+,A2s+,KTo+"
 BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
-include_allin = false
 script = '''river {
   replace bet [50]
   replace raise [50]
@@ -492,7 +490,6 @@ board = "2c 7d 9h Js Qs"
 BB = "22+,A2s+,KTo+"
 BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
-include_allin = false
 script = '''river {
   replace bet [50]
   replace raise [50]
@@ -752,7 +749,6 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-include_allin = false
 script = '''turn { replace bet [75] }
 river { replace bet [100] }
 
@@ -945,8 +941,14 @@ fn postflop_tree_export_navigates_chance_and_terminal_nodes() {
     let histories: Vec<String> = (0..view.tree.nodes.len() as hu_engine::NodeId)
         .map(|id| view.history(id))
         .collect();
-    let exported =
-        hu_postflop::views::export(&sol, hu_postflop::views::ExportView::Tree, &histories).unwrap();
+    let exported = hu_postflop::views::export(
+        &sol,
+        hu_postflop::views::ExportView::Tree,
+        &histories,
+        false,
+        None,
+    )
+    .unwrap();
     let hu_postflop::views::ExportData::Tree(rows) = exported else {
         panic!("expected tree rows");
     };
@@ -1027,6 +1029,194 @@ fn postflop_tree_export_navigates_chance_and_terminal_nodes() {
     }
 }
 
+/// `--resolve-rivers` answers the river nodes a no-rivers artifact drops.
+/// With `--rest-of-street`, one `decision` export covers the river entry and
+/// every river action node below it; its parts agree on one re-solve, a node
+/// below the entry is reached through re-solved strategies, and stored nodes
+/// are unchanged by the flag.
+#[test]
+fn export_resolves_unstored_river_nodes_on_request() {
+    let dir = temp_dir("postflop-resolve-rivers");
+    let config = dir.join("turn.toml");
+    std::fs::write(
+        &config,
+        format!("{TINY_TURN_TOML}\n[output]\nsolution_streets = \"no-rivers\"\n"),
+    )
+    .unwrap();
+    let run = dir.join("run");
+    run_solvers_ok(&[
+        "solve",
+        config.to_str().unwrap(),
+        "--out",
+        run.to_str().unwrap(),
+    ]);
+    let sol = run.join("solution.sol");
+    let sol_path = sol.to_str().unwrap();
+    let json = |output: std::process::Output| -> Vec<serde_json::Value> {
+        serde_json::from_slice::<serde_json::Value>(&output.stdout)
+            .unwrap()
+            .as_array()
+            .unwrap()
+            .clone()
+    };
+    let resolved = |view: &str, node: &str| -> serde_json::Value {
+        serde_json::from_slice(
+            &run_solvers_ok(&[
+                "export",
+                sol_path,
+                view,
+                "--node",
+                node,
+                "--resolve-rivers",
+                "--river-iterations",
+                "200",
+            ])
+            .stdout,
+        )
+        .unwrap()
+    };
+    let chance = json(run_solvers_ok(&[
+        "export", sol_path, "tree", "--node", "xx",
+    ]));
+    let entry = chance[0]["children"][0].as_str().unwrap().to_string();
+
+    let output = run_solvers(&["export", sol_path, "strategy", "--node", &entry]);
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("--resolve-rivers"), "{stderr}");
+
+    // One re-solve answers the entry and every river action node below it.
+    let street = json(run_solvers_ok(&[
+        "export",
+        sol_path,
+        "tree",
+        "--node",
+        &entry,
+        "--rest-of-street",
+    ]));
+    let subgame: serde_json::Value = serde_json::from_slice(
+        &run_solvers_ok(&[
+            "export",
+            sol_path,
+            "decision",
+            "--node",
+            &entry,
+            "--rest-of-street",
+            "--resolve-rivers",
+            "--river-iterations",
+            "200",
+        ])
+        .stdout,
+    )
+    .unwrap();
+    let histories: Vec<&str> = street
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    assert!(
+        histories.contains(&format!("{entry}x").as_str()),
+        "{histories:?}"
+    );
+    let mut covered: Vec<&str> = subgame["actions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["history"].as_str().unwrap())
+        .collect();
+    covered.dedup();
+    assert_eq!(covered, histories);
+    let rows_of = |part: &str, node: &str| -> Vec<serde_json::Value> {
+        subgame[part]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| row["history"] == node)
+            .cloned()
+            .collect()
+    };
+
+    for node in [entry.clone(), format!("{entry}x")] {
+        let tree = json(run_solvers_ok(&[
+            "export", sol_path, "tree", "--node", &node,
+        ]));
+        assert_eq!(tree[0]["kind"], "action");
+        assert_eq!(tree[0]["street"], "river");
+        assert_eq!(tree[0]["stored"], false);
+        let actions = rows_of("actions", &node);
+        let strategy = rows_of("strategy", &node);
+        let ev = rows_of("ev", &node);
+        assert_eq!(actions.len(), tree[0]["actions"].as_array().unwrap().len());
+        assert!(!strategy.is_empty(), "{node}: no reachable combos");
+        let total: f64 = strategy
+            .iter()
+            .map(|row| row["weight"].as_f64().unwrap())
+            .sum();
+        for (a, action) in actions.iter().enumerate() {
+            let mass: f64 = strategy
+                .iter()
+                .map(|row| {
+                    row["weight"].as_f64().unwrap() * row["probabilities"][a].as_f64().unwrap()
+                })
+                .sum();
+            let frequency = action["frequency"].as_f64().unwrap();
+            assert!(
+                (frequency - mass / total).abs() < 1e-4,
+                "{node} action {a}: frequency {frequency} vs strategy rows {}",
+                mass / total
+            );
+        }
+        for row in &strategy {
+            let sum: f64 = row["probabilities"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| p.as_f64().unwrap())
+                .sum();
+            assert!((sum - 1.0).abs() < 1e-3, "{node}: {row}");
+        }
+        let actor = &strategy[0]["actor"];
+        let acting: Vec<_> = ev
+            .iter()
+            .filter(|row| &row["seat"] == actor)
+            .map(|row| (row["combo"].clone(), row["weight"].clone()))
+            .collect();
+        let reached: Vec<_> = strategy
+            .iter()
+            .map(|row| (row["combo"].clone(), row["weight"].clone()))
+            .collect();
+        assert_eq!(acting, reached, "{node}: ev and strategy reach differ");
+    }
+
+    assert_eq!(
+        resolved("strategy", "root"),
+        serde_json::Value::Array(json(run_solvers_ok(&[
+            "export", sol_path, "strategy", "--node", "root"
+        ])))
+    );
+    // The three tables of `decision` have no CSV form; refused before solving.
+    let output = run_solvers(&[
+        "export",
+        sol_path,
+        "decision",
+        "--node",
+        &entry,
+        "--format",
+        "csv",
+        "--resolve-rivers",
+    ]);
+    assert_eq!(output.status.code(), Some(2));
+    let output = run_solvers(&[
+        "export",
+        sol_path,
+        "strategy",
+        "--node",
+        &entry,
+        "--river-iterations",
+        "10",
+    ]);
+    assert_eq!(output.status.code(), Some(2));
+}
+
 /// Same shape as `TINY_TURN_TOML` above, but `iso_merging = false` (so the
 /// turn->river chance node's child labels are plain, unmerged cards --
 /// `inspect.rs`'s `chance_child_label` only appends a representative-card
@@ -1046,7 +1236,6 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-include_allin = false
 script = '''turn { replace bet [75] }
 river { replace bet [100] }
 

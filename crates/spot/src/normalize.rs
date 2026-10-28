@@ -237,10 +237,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     }
     write_table(&mut text, "ranges", &ranges);
     let tree = &spot.tree;
-    let mut tree_fields = fields([
-        ("script", Value::String(tree.script.clone())),
-        ("include_allin", Value::Boolean(tree.include_allin)),
-    ]);
+    let mut tree_fields = fields([("script", Value::String(tree.script.clone()))]);
     let mut params = Table::new();
     for p in &tree.compiled.params {
         if let Some(v) = tree.params.get(&p.name) {

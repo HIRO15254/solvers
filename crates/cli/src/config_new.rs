@@ -47,7 +47,6 @@ BB = "AA,KK"
 script = '''river { replace bet [50] replace raise [50] }
 river when aggressions >= 2 { remove raise }
 '''
-include_allin = false
 
 [solver.stop]
 # check_every defaults to "auto": adaptive with target, otherwise every 25 iterations.
@@ -440,7 +439,6 @@ mod tests {
             "script",
             "source",
             "params",
-            "include_allin",
             "preflop",
             "flop",
             "turn",

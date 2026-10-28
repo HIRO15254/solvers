@@ -26,6 +26,10 @@ CO = "random"
 
 [tree]
 script = '''
+preflop, flop, turn, river {
+  add bet [a]
+  add raise [a]
+}
 preflop when unopened { replace raise [2.5x, a] }
 preflop when !unopened { replace raise [3x, a] }
 flop when unopened { replace bet [50, a] }
@@ -40,7 +44,6 @@ preflop when aggressions >= 1 { replace raise [3x, a] }
 preflop when aggressions >= 3 { remove raise }
 flop, turn, river when players >= 2 { checkdown }
 '''
-include_allin = true
 
 [solver]
 kind = "range-vector"

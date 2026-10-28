@@ -858,16 +858,6 @@ fn fold_check_call_rules_source_order_and_no_script() {
         ),
         ["x"]
     );
-    let included = text(
-        "",
-        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
-        "Ks 7h 2d Ac 9s",
-        "river { remove raise }",
-    )
-    .replace("script =", "include_allin = true\nscript =");
-    let g = game(&config(&included));
-    assert_eq!(actions(&g, ""), ["x", "r97500"]);
-    assert_eq!(actions(&g, "r97500"), ["f", "c"]);
 }
 
 #[test]
@@ -937,8 +927,8 @@ fn lowered_and_hand_built_common_rule_trees_are_identical() {
     let fixture = PostflopConfig {
         streets: hu_postflop::PerStreet {
             flop: StreetTree::default(),
-            turn: hu_postflop::test_support::from_script(Street::Turn, &script.rules, 3, false),
-            river: hu_postflop::test_support::from_script(Street::River, &script.rules, 3, false),
+            turn: hu_postflop::test_support::from_script(Street::Turn, &script.rules, 3),
+            river: hu_postflop::test_support::from_script(Street::River, &script.rules, 3),
         },
         ..c.clone()
     };

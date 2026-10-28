@@ -81,7 +81,6 @@ impl BettingMenu for BettingState {
             }
         }
 
-        let maximum = self.maximum_target(actor);
         if !self.can_raise(actor) {
             return apply_tree_rules(self, config, actor, actions);
         }
@@ -96,15 +95,12 @@ impl BettingMenu for BettingState {
         } else {
             &street_config.bet_sizes
         };
-        let mut targets = Vec::with_capacity(sizes.len() + 1);
+        let mut targets = Vec::with_capacity(sizes.len());
         for size in sizes {
             let target = self.resolve_size(actor, size);
             if target > self.bet_to_match {
                 targets.push(target);
             }
-        }
-        if street_config.include_allin {
-            targets.push(maximum);
         }
         targets.sort_unstable();
         targets.dedup();
@@ -292,7 +288,6 @@ fn rule_candidates(
         Street::Turn => &mut scoped.turn,
         Street::River => &mut scoped.river,
     };
-    street.include_allin = false;
     if state.aggressive_actions == 0 {
         street.bet_sizes = sizes.to_vec();
         street.isolate_sizes = Some(sizes.to_vec());
@@ -374,7 +369,6 @@ mod tests {
         let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
         betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 2.5 }];
         betting.preflop.isolate_sizes = Some(vec![crate::config::SizeSpec::ToBb { value: 4.0 }]);
-        betting.preflop.include_allin = false;
 
         let opening_actions = state.legal_actions(&betting).unwrap();
         assert!(opening_actions.iter().any(|action| {
@@ -453,7 +447,6 @@ mod tests {
             crate::config::SizeSpec::MinRaise,
             crate::config::SizeSpec::PreviousBetMultiple { factor: 3.0 },
         ];
-        betting.preflop.include_allin = false;
         let bb_state = state_with_bb_facing_a_raise(&mut betting);
 
         // bet_to_match = 3bb, last_full_raise = 2bb, so the minimum full
@@ -484,7 +477,6 @@ mod tests {
             crate::config::SizeSpec::StackFraction { fraction: 0.25 },
             crate::config::SizeSpec::StackFraction { fraction: 0.5 },
         ];
-        betting.preflop.include_allin = false;
         let bb_state = state_with_bb_facing_a_raise(&mut betting);
 
         // BB's maximum = actor_wager (1bb already posted) + remaining stack
@@ -511,10 +503,14 @@ mod tests {
     fn jam_raise_above_a_third_of_the_stack_is_strict_and_deduplicates_all_in() {
         let actions_for = |raise_to_bb: f64, script: &str| {
             let (mut state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
-            betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 3.0 }];
-            betting.preflop.raise_sizes =
-                vec![crate::config::SizeSpec::ToBb { value: raise_to_bb }];
-            betting.preflop.include_allin = true;
+            betting.preflop.bet_sizes = vec![
+                crate::config::SizeSpec::ToBb { value: 3.0 },
+                crate::config::SizeSpec::AllIn,
+            ];
+            betting.preflop.raise_sizes = vec![
+                crate::config::SizeSpec::ToBb { value: raise_to_bb },
+                crate::config::SizeSpec::AllIn,
+            ];
             with_script(&mut betting, script);
 
             let open = state
@@ -574,7 +570,6 @@ mod tests {
         // when that open is above one third of the stack.
         let (opening_state, mut opening_betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
         opening_betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 40.0 }];
-        opening_betting.preflop.include_allin = false;
         with_script(&mut opening_betting, above);
         let opening = opening_state.legal_actions(&opening_betting).unwrap();
         assert_eq!(raise_to(&opening, MwChips(40_000), false), 1);
@@ -586,8 +581,9 @@ mod tests {
             let (state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
             betting.preflop.bet_sizes = [2.0, 2.5, 3.0]
                 .map(|value| crate::config::SizeSpec::ToBb { value })
-                .to_vec();
-            betting.preflop.include_allin = true;
+                .into_iter()
+                .chain([crate::config::SizeSpec::AllIn])
+                .collect();
             with_script(&mut betting, script);
             let actions = state.legal_actions(&betting).unwrap();
             assert!(actions.contains(&Action::Fold));

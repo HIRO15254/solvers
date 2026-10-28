@@ -595,6 +595,16 @@ impl RiverSolver {
             Self::Mixed(solver) => solver.average_strategy_at(node),
         }
     }
+    fn visit_expected_values<R>(&self, record: R)
+    where
+        R: Fn(NodeId, PerPlayer<&[f32]>, PerPlayer<&[f32]>, &[f32]) + Sync,
+    {
+        match self {
+            Self::F32(solver) => solver.visit_expected_values(record),
+            Self::I16(solver) => solver.visit_expected_values(record),
+            Self::Mixed(solver) => solver.visit_expected_values(record),
+        }
+    }
 }
 
 /// Serves strategies from a loaded `.sol` artifact: a stored block is
@@ -759,6 +769,85 @@ impl<'a> SolProvider<'a> {
         self.river_solves.insert(entry, rs);
         Ok(())
     }
+
+    /// The cached re-solve of an unstored river node's subtree, solving it on
+    /// first use, and the node's id in that subgame.
+    fn river_subgame(&mut self, node: NodeId) -> Result<(&RiverSolve, NodeId)> {
+        if self.loaded.game.index.streets[node as usize] != Street::River {
+            bail!(
+                "artifact does not match its stored tree: no stored block for non-river node {node}"
+            );
+        }
+        let entry = self.river_entry_for(node);
+        if !self.river_solves.contains_key(&entry) {
+            self.solve_river(entry)?;
+        }
+        let rs = &self.river_solves[&entry];
+        let sub_node = *rs.map.get(&node).ok_or_else(|| {
+            anyhow!("node {node} not found in the re-solved river subtree for entry {entry}")
+        })?;
+        Ok((rs, sub_node))
+    }
+
+    /// Per-hand values at an action node, OOP's support then IP's, on the
+    /// subgame-start basis of the stored blocks: the stored block, or for an
+    /// unstored river node the values of its re-solved river subgame. Hands
+    /// the re-solve does not reach are zero, as in a stored block.
+    pub fn values(&mut self, node: NodeId) -> Result<Vec<f32>> {
+        let loaded = self.loaded;
+        if loaded.game.tree.node(node).kind != NodeKind::Action {
+            bail!("node {node} is not an action node");
+        }
+        if let Some(values) = loaded.stored_values(node)? {
+            return Ok(values);
+        }
+        // The re-solve's payoff keeps the trunk's baseline, so its values
+        // differ from the trunk's only by the trunk's offset to the start.
+        let offset = crate::input::NlhPayoff::new(&loaded.nlh.0)?.ev_offset();
+        let (rs, sub_node) = self.river_subgame(node)?;
+        let sub_hands = &rs.solver.game().evaluator.hands;
+        let found = parking_lot::Mutex::new(None);
+        rs.solver
+            .visit_expected_values(|id, reach, per_hand, _avg| {
+                if id != sub_node {
+                    return;
+                }
+                let values = PerPlayer::new(Player::P0, Player::P1).map(|player| {
+                    let facing = compatible_reach(sub_hands, player, reach[player.opponent()]);
+                    per_hand[player]
+                        .iter()
+                        .zip(&facing)
+                        .zip(reach[player])
+                        .map(|((&value, &facing), &here)| {
+                            if here > 0.0 && facing > 0.0 {
+                                value / facing + offset[player] as f32
+                            } else {
+                                0.0
+                            }
+                        })
+                        .collect::<Vec<f32>>()
+                });
+                *found.lock() = Some(values);
+            });
+        let sub_values = found
+            .into_inner()
+            .ok_or_else(|| anyhow!("the river re-solve produced no values for node {node}"))?;
+        let trunk_hands = &loaded.game.index.hands;
+        let mut values = vec![0.0; trunk_hands.len(Player::P0) + trunk_hands.len(Player::P1)];
+        for player in Player::BOTH {
+            let base = match player {
+                Player::P0 => 0,
+                Player::P1 => trunk_hands.len(Player::P0),
+            };
+            for (&global, &value) in sub_hands.combos(player).iter().zip(&sub_values[player]) {
+                let local = trunk_hands
+                    .local(player, global as usize)
+                    .ok_or_else(|| anyhow!("river support is outside parent range"))?;
+                values[base + local] = value;
+            }
+        }
+        Ok(values)
+    }
 }
 
 fn resolve_river<S: Storage>(
@@ -822,21 +911,7 @@ impl StrategyProvider for SolProvider<'_> {
             return Ok(avg);
         }
         let sref = tree.storage_ref(n);
-
-        if loaded.game.index.streets[node as usize] != Street::River {
-            bail!(
-                "artifact does not match its stored tree: no stored block for non-river node {node}"
-            );
-        }
-
-        let entry = self.river_entry_for(node);
-        if !self.river_solves.contains_key(&entry) {
-            self.solve_river(entry)?;
-        }
-        let rs = &self.river_solves[&entry];
-        let sub_node = *rs.map.get(&node).ok_or_else(|| {
-            anyhow!("node {node} not found in the re-solved river subtree for entry {entry}")
-        })?;
+        let (rs, sub_node) = self.river_subgame(node)?;
         let sub_avg = rs.solver.average_strategy_at(sub_node);
         let sub_hands = &rs.solver.game().evaluator.hands;
         let trunk_hands = &loaded.game.index.hands;
@@ -1487,9 +1562,19 @@ memory = "1GiB"
             storage_name: "f32".to_string(),
         };
         export_sol(&spec, &solver, &index, start_street, &summary).expect("export");
+        // The same solve stored in full: what the river re-solve approximates.
+        let full_path = temp_path("river-accuracy-full.sol");
+        let full_spec = SolExportSpec {
+            path: full_path.clone(),
+            mode: SolStreets::Full,
+            ..spec
+        };
+        export_sol(&full_spec, &solver, &index, start_street, &summary).expect("full export");
+        let full = load_sol(&full_path, 0, None).expect("load full");
 
         let loaded = load_sol(&path, 2000, Some(0.002)).expect("load");
         let mut provider = SolProvider::new(&loaded, Box::new(|_| {}));
+        let hands = &loaded.game.index.hands;
 
         let tree = &solver.game().tree;
         let streets = node_streets(tree, start_street);
@@ -1516,7 +1601,7 @@ memory = "1GiB"
         // identical probability, root's own check decision being pure) vs.
         // the "bet-call" line's ~0.013 spread (a genuinely hand-dependent
         // call/fold split upstream).
-        let mut candidates: Vec<(NodeId, Vec<f32>, f64)> = Vec::new();
+        let mut candidates: Vec<(NodeId, PerPlayer<Vec<f32>>, f64)> = Vec::new();
         for id in 0..tree.nodes.len() as NodeId {
             let node = *tree.node(id);
             if node.kind != NodeKind::Action || streets[id as usize] != Street::River {
@@ -1529,7 +1614,7 @@ memory = "1GiB"
             let reach = hu_engine::reach_at(tree, root_slices, id, |aid, _sref, out| {
                 out.copy_from_slice(&solver.average_strategy_at(aid));
             });
-            let acting_reach = reach[node.player].clone();
+            let acting_reach = &reach[node.player];
             let reach_sum: f64 = acting_reach.iter().map(|&r| f64::from(r)).sum();
             let root_full = root_slices[node.player];
             let mut min = f64::INFINITY;
@@ -1545,7 +1630,7 @@ memory = "1GiB"
             if max - min <= 0.005 {
                 continue;
             }
-            candidates.push((id, acting_reach, reach_sum));
+            candidates.push((id, reach, reach_sum));
         }
         assert!(
             candidates.len() >= 3,
@@ -1565,10 +1650,12 @@ memory = "1GiB"
 
         let mut max_per_action_diff = 0.0f32;
         let mut max_aggregate_diff = 0.0f32;
+        let mut max_value_diff = 0.0f64;
 
         for &idx in &sample_idx {
-            let (entry, ref acting_reach, reach_sum) = candidates[idx];
+            let (entry, ref reach, reach_sum) = candidates[idx];
             let node = *tree.node(entry);
+            let acting_reach = &reach[node.player];
             let sref = tree.storage_ref(&node);
             let num_actions = sref.num_actions as usize;
             let num_hands = sref.num_hands as usize;
@@ -1618,16 +1705,48 @@ memory = "1GiB"
                     "entry {entry} action {a}: reach-weighted diff {diff:.4} exceeds 0.03"
                 );
             }
+
+            // Re-solved values share the stored values' subgame-start basis:
+            // each seat's reach-weighted mean matches the full export's.
+            let resolved = provider
+                .values(entry)
+                .expect("provider river re-solve values");
+            let stored = full
+                .stored_values(entry)
+                .expect("full values")
+                .expect("a full export stores river values");
+            assert_eq!(resolved.len(), stored.len());
+            for seat in Player::BOTH {
+                let base = match seat {
+                    Player::P0 => 0,
+                    Player::P1 => hands.len(Player::P0),
+                };
+                let mut weight = 0.0f64;
+                let mut diff = 0.0f64;
+                for h in 0..hands.len(seat) {
+                    let r = f64::from(reach[seat][h]);
+                    weight += r;
+                    diff += r * f64::from(resolved[base + h] - stored[base + h]);
+                }
+                let diff = (diff / weight).abs();
+                max_value_diff = max_value_diff.max(diff);
+                assert!(
+                    diff <= 0.02,
+                    "entry {entry} seat {seat:?}: reach-weighted value diff {diff:.4} exceeds 0.02"
+                );
+            }
         }
 
         eprintln!(
             "river_resolve_accuracy: sampled {} of {} candidate entries, \
-             max_per_action_diff={max_per_action_diff:.8}, max_aggregate_diff={max_aggregate_diff:.8}",
+             max_per_action_diff={max_per_action_diff:.8}, max_aggregate_diff={max_aggregate_diff:.8}, \
+             max_value_diff={max_value_diff:.8}",
             sample_idx.len(),
             candidates.len(),
         );
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&full_path);
     }
 
     /// Value slots exist only for root support. Runout-blocked or otherwise

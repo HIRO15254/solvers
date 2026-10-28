@@ -223,7 +223,7 @@ liveのsolveは構築時のnode情報から`GameIndex`を作ってnode情報を�
 stored block coverageの検証と`SolProvider`を持つ。未保存Riverへのstrategy queryはreachを再構築し、
 同じ設定でRiverをlazy re-solveする。`viewer`はhistory replayとsubgame再構成を担当する。
 `queries`はlive inspection、reach・action frequency・class grid・equity・combo queryを返す。
-`views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。
+`views`は保存済みのsummary/tree/actions/strategy/EV/rangeと比較dataを返す。`RiverResolve`指定時だけ、未保存Riverの戦略と値を`SolProvider`の再解決で返す。
 bulk node exportは要求nodeと祖先だけを1回のforward passで辿り、path-local reachで行を計算して指定node順（重複も含む）に連結する。reachの乗算順は根からの個別path照会と一致する。
 compareはnode別deltaを再利用bufferでRayon並列計算し、node順に集計する。historyはerrorか最終最大差nodeの表示に必要な場合だけ生成する。
 木/index共有は保存index checksumとconfigから復元したsupport・root range・開始streetが全て一致する場合だけ行う。共有する右indexもchecksum検証し、異なれば通常読込する。

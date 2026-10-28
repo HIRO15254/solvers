@@ -19,7 +19,6 @@ BTN = "JJ-99,AQs-ATs,KQs,QJs"
 
 [tree]
 source = "trees/pio.tree"
-include_allin = true
 
 [tree.params]
 cb = 40
