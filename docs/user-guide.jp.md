@@ -280,15 +280,35 @@ combo単位の固定と集計頻度目標は異なり、同じnodeの同じhand�
 hand supportを持つ必要があり、実効configにpathとSHA-256が保存される。
 基準fileのhashはvalidate・solve時に照合し、大文字・小文字を区別しない。
 freeze由来の`.sol`を読み込む、exportする、比較する際は基準fileを再読込・再hashしない。
-既存解の戦略からlockを作るには次を使い、出力をconfigに貼り付けて編集する:
+既存解の戦略を出発点にするには、lockをexportして編集し、`relock`で追加して再solveする:
 
 ```sh
 solvers export runs/base/solution.sol lock --node root --output lock.toml
-solvers validate spot.toml
+# lock.tomlの確率や対象を編集する
+solvers relock runs/base --add lock.toml --print-config
+solvers relock runs/base --add lock.toml --out runs/relocked
 ```
 
-選択nodeに到達するcomboだけを出す。入力の詳細・wildcard・制約は
-[共通Input規範](nlh-input-v1.jp.md)を参照する。profileはP1専用である。
+exportは選択nodeに到達するcomboだけを出す。SOURCEにはrun directoryのほか、
+埋込みconfigを持つP1 `.sol`も指定できる。`--add`は繰り返せ、`--add -`はstdinから
+`[[profile.lock]]`、`[[profile.incentive]]`、`[[profile.frequency]]`のTOML断片を読む。
+既存profileへの追記が既存lock等と重複する場合は検証errorになる。同じ種類・同じ`node`文字列の
+既存entryを置き換えるには`--replace`、元のprofile全体を消してから追加するには
+`--clear-profile`を使う。後者は既存の上流固定も消す。
+
+1件だけなら断片を作らずに指定できる（action labelは実際の木に合わせる）:
+
+```sh
+solvers relock runs/base --node root --hands "AA,KK" \
+  --strategy "check=0.25,bet 1=0.75" --out runs/quick-lock
+```
+
+`--hands`の代わりに`--category EXPR`を使え、どちらも省略すると全handが対象。
+soft lockには`--confidence P`を指定する。既定では上流も自由に木全体を再solveする。
+上流を元のsolutionに固定するには`--freeze-upstream`を追加する。
+`--print-config`はsolveせず実効configを表示し、`--out`とは同時に使えない。
+入力の詳細・wildcard・制約は[共通Input規範](nlh-input-v1.jp.md)、
+全flagは[CLI reference](cli-reference.jp.md#solvers-relock)を参照する。profileはP1専用である。
 
 ## 5. 監視・停止・再開する
 
@@ -427,6 +447,11 @@ nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ�
 外部source参照は拒否されるため、先にvalidate --write-effectiveでinline化する。
 daemonは同じCLIを起動し、run directoryに状態を保存する。再起動後もrun rootから一覧を復元する。
 run一覧・詳細は`lastProgress`に最後のraw進捗行を含み、P1では`nash_conv / 2`を一覧のExploitabilityに使える。進捗行がまだ無ければこのfieldは省略される。
+停止済みP1 solutionからは`POST /v1/runs/{id}/relock`へ
+`{"profileToml":"...", "replace":true, "clearProfile":false, "freezeUpstream":false}`を送り、
+新しいrunを投入できる。`profileToml`は`[[profile.lock]]`等のTOML fragmentである。
+`freezeUpstream`をtrueにすると元runのsolutionより上流を固定する。
+返る`runId`で新runを追跡でき、一覧・詳細の`relockedFrom`から元runへ戻れる。
 非loopbackで公開するときはTLS証明書・秘密鍵を指定する。
 HTTPのsolution viewはP1・P2に対応する。P1では、例えば
 `GET /v1/runs/{id}/solution/tree?node=root`や

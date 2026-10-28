@@ -86,6 +86,7 @@ impl RunsRoot {
 
         Ok(RunSummary {
             run_id: manifest.run_id,
+            relocked_from: manifest.relocked_from,
             state: observed,
             game_kind: manifest.game_kind,
             config_schema: manifest.config_schema,

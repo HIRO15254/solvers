@@ -39,6 +39,15 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ### Added
 
+- P1 `solvers relock` re-solves an existing run or `.sol` with profile
+  fragments (`--add`, repeatable, including stdin) or a quick
+  `--node` / `--hands` or `--category` / `--strategy` lock with optional
+  `--confidence`. `--replace` replaces matching kinds and node strings,
+  `--clear-profile` removes the source profile, and `--freeze-upstream`
+  fixes ancestors to the source solution; by default the whole tree is free
+  to re-solve. Use `--print-config` to inspect the merged config or `--out`
+  to create a normal solve run.
+
 - Heads-up postflop solver: opponent profile `[profile]` in `solvers.nlh/v1`
   (P2 rejects it). `[[profile.lock]]` fixes strategies per combo, hand range or
   hand-category expression, fully, partially or softly (`confidence`);

@@ -132,6 +132,7 @@ impl RunRecorder {
             && queued.state == RunState::Queued
         {
             manifest.created_unix_ms = queued.created_unix_ms;
+            manifest.relocked_from = queued.relocked_from;
         }
         manifest
             .write_atomic(directory)
@@ -180,6 +181,7 @@ impl RunRecorder {
             command,
         );
         manifest.created_unix_ms = previous.created_unix_ms;
+        manifest.relocked_from = previous.relocked_from;
         manifest
             .write_atomic(directory)
             .with_context(|| format!("writing the run manifest in {}", directory.display()))?;

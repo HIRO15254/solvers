@@ -8,6 +8,7 @@ mod ir;
 mod normalize;
 mod parse;
 mod profile;
+mod relock;
 mod replay;
 mod summary;
 
@@ -15,6 +16,7 @@ pub use cursor::{LineCursor, LineNext, LineOption, LineOptionKind, LineSeat, lin
 pub use dialect::{NLH_V1, TreeVar, parse_size_literal};
 pub use error::{Code, SpotError};
 pub use ir::*;
+pub use relock::{RelockEdits, relock_config};
 use std::path::Path;
 
 /// Parsed common IR plus uninterpreted product-owned tables.

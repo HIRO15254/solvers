@@ -18,6 +18,7 @@ export interface ServerInfo {
 export interface RunSummary {
   runId: string;
   state: RunState;
+  relockedFrom?: string;
   gameKind: string;
   configSchema?: string;
   configHash: string;
@@ -53,6 +54,13 @@ export interface ArtifactEntry {
 export interface CreateRunResponse {
   runId: string;
   state: RunState;
+}
+
+export interface RelockRequest {
+  profileToml: string;
+  replace: boolean;
+  freezeUpstream: boolean;
+  clearProfile: boolean;
 }
 
 export interface ValidateResponse {

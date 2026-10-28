@@ -98,6 +98,9 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     }) {
         return 75;
     }
+    if error.chain().any(|cause| cause.is::<relock::InputError>()) {
+        return 2;
+    }
     if error.chain().any(|cause| {
         cause.is::<spot::SpotError>() || cause.is::<hu_postflop::profile::ProfileResolveError>()
     }) {
@@ -188,6 +191,7 @@ pub mod nlh_v1;
 mod postflop_artifact;
 #[cfg(not(feature = "p2"))]
 mod product_support;
+mod relock;
 pub mod report;
 pub mod resume;
 pub mod run_dir;
@@ -313,6 +317,48 @@ enum Command {
     Runs {
         #[command(subcommand)]
         command: RunsCommand,
+    },
+    /// Merge profile edits into a solved P1 input and optionally solve it.
+    Relock {
+        /// P1 run directory or .sol artifact.
+        source: std::path::PathBuf,
+        /// New run directory.
+        #[arg(
+            long,
+            conflicts_with = "print_config",
+            required_unless_present = "print_config"
+        )]
+        out: Option<std::path::PathBuf>,
+        /// Print the merged config without solving.
+        #[arg(long)]
+        print_config: bool,
+        /// Profile TOML fragment; '-' reads stdin. Repeatable.
+        #[arg(long)]
+        add: Vec<std::path::PathBuf>,
+        /// Node selector for a quick lock.
+        #[arg(long, requires = "strategy")]
+        node: Option<String>,
+        /// Hand range for a quick lock.
+        #[arg(long, requires = "node", conflicts_with = "category")]
+        hands: Option<String>,
+        /// Category expression for a quick lock.
+        #[arg(long, requires = "node")]
+        category: Option<String>,
+        /// Comma-separated action=probability pairs.
+        #[arg(long, requires = "node")]
+        strategy: Option<String>,
+        /// Lock confidence.
+        #[arg(long, requires = "node")]
+        confidence: Option<f64>,
+        /// Replace entries of the same kind at the same node.
+        #[arg(long)]
+        replace: bool,
+        /// Remove the existing profile before applying edits.
+        #[arg(long)]
+        clear_profile: bool,
+        /// Freeze upstream actions to the source solution.
+        #[arg(long)]
+        freeze_upstream: bool,
     },
     /// Solve the game described by a TOML config file.
     Solve {
@@ -578,6 +624,33 @@ pub fn main_impl() -> Result<()> {
             moves,
             format,
         } => line::run(&config, moves.as_deref(), format),
+        Command::Relock {
+            source,
+            out,
+            print_config,
+            add,
+            node,
+            hands,
+            category,
+            strategy,
+            confidence,
+            replace,
+            clear_profile,
+            freeze_upstream,
+        } => relock::run(relock::Args {
+            source,
+            out,
+            print_config,
+            add,
+            node,
+            hands,
+            category,
+            strategy,
+            confidence,
+            replace,
+            clear_profile,
+            freeze_upstream,
+        }),
         Command::Solve {
             config,
             out,

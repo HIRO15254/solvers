@@ -54,6 +54,101 @@ fn solve(config: &str, directory: &Path) -> std::path::PathBuf {
     run
 }
 #[test]
+fn relock_round_trip_and_input_errors() {
+    let directory = tempfile::tempdir().unwrap();
+    let run = solve(
+        &CONFIG.replace("force bet", "replace bet"),
+        directory.path(),
+    );
+    let source = run.to_str().unwrap();
+    let quick = ["--node", "x", "--strategy", "check=1"];
+    let mut print_args = vec!["relock", source, "--print-config"];
+    print_args.extend(quick);
+    let printed = ok(&print_args);
+    let config = String::from_utf8(printed.stdout).unwrap();
+    let parsed = spot::Document::parse(&config, &run.join("run.toml")).unwrap();
+    assert!(parsed.spot.profile.is_some());
+
+    let out = directory.path().join("relocked");
+    let mut args = vec![
+        "relock",
+        source,
+        "--out",
+        out.to_str().unwrap(),
+        "--freeze-upstream",
+    ];
+    args.extend(quick);
+    ok(&args);
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(out.join("run.json")).unwrap()).unwrap();
+    assert!(report["profile"].is_object());
+    let sol = out.join("solution.sol");
+    let fragment = ok(&["export", sol.to_str().unwrap(), "lock", "--node", "x"]);
+    let parsed: toml::Value =
+        toml::from_str(std::str::from_utf8(&fragment.stdout).unwrap()).unwrap();
+    assert!(
+        parsed["profile"]["lock"][0]["combos"]["KsKh"]["check"]
+            .as_float()
+            .unwrap()
+            > 0.99
+    );
+
+    let bad = invoke(&[
+        "relock",
+        source,
+        "--print-config",
+        "--node",
+        "x",
+        "--strategy",
+        "check",
+    ]);
+    assert_eq!(bad.status.code(), Some(2));
+    let missing = invoke(&[
+        "relock",
+        directory.path().join("missing.sol").to_str().unwrap(),
+        "--print-config",
+    ]);
+    assert_eq!(missing.status.code(), Some(2));
+    let bad_fragment = directory.path().join("bad.toml");
+    std::fs::write(
+        &bad_fragment,
+        "[profile]\nfreeze_upstream = { solution = 'other.sol' }\n",
+    )
+    .unwrap();
+    let bad = invoke(&[
+        "relock",
+        source,
+        "--print-config",
+        "--add",
+        bad_fragment.to_str().unwrap(),
+    ]);
+    assert_eq!(bad.status.code(), Some(2));
+    let invalid_node_out = directory.path().join("invalid-node");
+    let bad = invoke(&[
+        "relock",
+        source,
+        "--out",
+        invalid_node_out.to_str().unwrap(),
+        "--node",
+        "invalid",
+        "--strategy",
+        "check=1",
+    ]);
+    assert_eq!(bad.status.code(), Some(2));
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    std::fs::copy(
+        root.join("examples/mw-preflop/3max_smoke.toml"),
+        run.join("run.toml"),
+    )
+    .unwrap();
+    let p2 = invoke(&["relock", source, "--print-config"]);
+    assert_eq!(p2.status.code(), Some(2));
+}
+#[test]
 fn profile_validation_report_and_lock_export() {
     let directory = tempfile::tempdir().unwrap();
     let profile = r#"

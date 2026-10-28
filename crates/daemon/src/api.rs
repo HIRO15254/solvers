@@ -9,8 +9,8 @@ use std::process::Command;
 
 use protocol::{
     ArtifactEntry, ArtifactListResponse, CreateRunRequest, CreateRunResponse, ErrorCode,
-    ErrorResponse, EventPage, LineRequest, PROTOCOL_VERSION, RunListResponse, RunSummary,
-    ServerInfo, SolutionView, TreeRequest, ValidateRequest, ValidateResponse,
+    ErrorResponse, EventPage, LineRequest, PROTOCOL_VERSION, RelockRequest, RunListResponse,
+    RunSummary, ServerInfo, SolutionView, TreeRequest, ValidateRequest, ValidateResponse,
 };
 use runfiles::{RunEventLog, RunManifest, RunState, read_events};
 
@@ -191,16 +191,84 @@ impl Api {
                 _ => error,
             })?;
 
+        self.submit_config(
+            &effective.effective_config_toml,
+            request.run_id.as_deref(),
+            None,
+        )
+    }
+
+    /// Merge through the CLI; only this endpoint may introduce a host path,
+    /// and that path is selected by the CLI from the source run itself.
+    pub fn relock(&self, run_id: &str, request: &RelockRequest) -> ApiResult<CreateRunResponse> {
+        let summary = self.run(run_id)?;
+        let source = self.runs.directory(run_id).map_err(internal)?;
+        if !matches!(
+            summary.state,
+            RunState::Completed | RunState::Canceled | RunState::Interrupted
+        ) || summary.game_kind != "hu-postflop"
+            || !source.join(runfiles::RUN_HU_SOLUTION_FILE).is_file()
+        {
+            return Err(ErrorResponse::new(
+                ErrorCode::Conflict,
+                "source must be a stopped P1 run with a solution",
+            ));
+        }
+        let root = self.runs.path().canonicalize().map_err(internal)?;
+        let source = source.canonicalize().map_err(internal)?;
+        let solution = source
+            .join(runfiles::RUN_HU_SOLUTION_FILE)
+            .canonicalize()
+            .map_err(internal)?;
+        if !source.starts_with(&root) || !solution.starts_with(&source) {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidRequest,
+                "source solution is outside the runs root",
+            ));
+        }
+        reject_external_profile(&request.profile_toml)?;
+        let scratch = tempfile::tempdir().map_err(internal)?;
+        let fragment = scratch.path().join("profile.toml");
+        std::fs::write(&fragment, &request.profile_toml).map_err(internal)?;
+        let mut command = Command::new(&self.solver);
+        command
+            .arg("relock")
+            .arg(&source)
+            .arg("--add")
+            .arg(&fragment)
+            .arg("--print-config");
+        if request.replace {
+            command.arg("--replace");
+        }
+        if request.clear_profile {
+            command.arg("--clear-profile");
+        }
+        if request.freeze_upstream {
+            command.arg("--freeze-upstream");
+        }
+        let output = command.output().map_err(internal)?;
+        if !output.status.success() {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidConfig,
+                String::from_utf8_lossy(&output.stderr).trim().to_string(),
+            ));
+        }
+        let config = String::from_utf8(output.stdout).map_err(internal)?;
+        self.submit_config(&config, None, Some(run_id))
+    }
+
+    fn submit_config(
+        &self,
+        config: &str,
+        requested_id: Option<&str>,
+        relocked_from: Option<&str>,
+    ) -> ApiResult<CreateRunResponse> {
         let directory = self
             .runs
-            .allocate(request.run_id.as_deref(), runfiles::unix_millis())
+            .allocate(requested_id, runfiles::unix_millis())
             .map_err(|error| ErrorResponse::new(ErrorCode::Conflict, error.to_string()))?;
         std::fs::create_dir_all(&directory).map_err(internal)?;
-        std::fs::write(
-            directory.join(runfiles::RUN_CONFIG_FILE),
-            &effective.effective_config_toml,
-        )
-        .map_err(internal)?;
+        std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), config).map_err(internal)?;
 
         let run_id = directory
             .file_name()
@@ -217,6 +285,7 @@ impl Api {
             vec!["solve".to_string(), run_id.clone()],
         );
         manifest.state = RunState::Queued;
+        manifest.relocked_from = relocked_from.map(str::to_owned);
         manifest.started_unix_ms = None;
         manifest.write_atomic(&directory).map_err(internal)?;
 

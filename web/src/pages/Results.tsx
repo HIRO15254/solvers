@@ -12,6 +12,7 @@ import {
   type ValueRow,
 } from "../api/types";
 import { CardGrid } from "../components/CardGrid";
+import { RelockPanel } from "../components/RelockPanel";
 import { Board, InfoHint, KeyValue, Notice, PlayingCard } from "../components/common";
 import { Button, Card, CardContent, EmptyState, Icon, Select, Tabs } from "../cryst";
 import { actionColors } from "../lib/actions";
@@ -195,6 +196,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   const [rangeSeat, setRangeSeat] = useState<Seat>("oop");
   const [side, setSide] = useState<Side>("overview");
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [showRelock, setShowRelock] = useState(false);
 
   useEffect(() => {
     runMeta(run)
@@ -248,20 +250,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
     saveBlob(blob, `${run.runId}-${name}-strategy${resolved ? "-resolved" : ""}.csv`);
   };
 
-  const editProfile = async () => {
-    try {
-      const toml = await api.artifactText(run.runId, "run.toml");
-      const combos = node?.strategy && Object.fromEntries(node.strategy.map((row) => {
-        const sum = row.probabilities.reduce((total, probability) => total + probability, 0);
-        if (sum <= 0) throw new Error(`Strategy for ${row.combo} has zero probability`);
-        return [row.combo, Object.fromEntries(node.row.actions.map((action, index) => [action, (row.probabilities[index] ?? 0) / sum]))];
-      }));
-      sessionStorage.setItem("solvers.setup.profilePrefill", JSON.stringify({ toml, node: selector(current), combos }));
-      navigate({ page: "setup" });
-    } catch (e) {
-      setError(`Cannot prefill profile: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  };
+
 
   return (
     <>
@@ -286,10 +275,9 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
           </span>
         )}
         <span className="grow" />
-        <Button variant="outline" disabled={node?.row.kind !== "action"} onClick={editProfile}>
-          Edit profile at node
+        <Button variant="outline" onClick={() => setShowRelock((open) => !open)}>
+          {showRelock ? "Hide lock & re-solve" : "Lock & re-solve"}
         </Button>
-        <InfoHint label="Edit profile at node" text="Opens this run's configuration and node in Setup. When available, the current strategy can be imported explicitly; imported combo probabilities are normalized to sum to one." />
         <Button
           variant="outline"
           icon="download"
@@ -301,6 +289,8 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
       </header>
       <main className="page-body padded stack" style={{ gap: 16 }}>
         {error && <Notice variant="destructive" title="Cannot load solution" description={error} />}
+        {run.relockedFrom && <div>Relocked from <a href={`#/results/${encodeURIComponent(run.relockedFrom)}`}>{run.relockedFrom}</a></div>}
+        <div hidden={!showRelock}><RelockPanel runId={run.runId} history={current} row={node?.row} strategy={node?.strategy} profile={summary?.profile ?? undefined} config={summary?.profile_config ?? null} /></div>
         {summary?.profile?.general_sum && (
           <Notice variant="info" title="General-sum profile"
             description="Incentives change the acting player's utility. Displayed EVs exclude incentives and are true EVs; convergence measures are not zero-sum exploitability." />

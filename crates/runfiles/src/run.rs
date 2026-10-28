@@ -143,6 +143,9 @@ pub struct RunManifest {
     /// The run directory's own name. Kept in the file too so a manifest
     /// stays self-describing after being copied somewhere else.
     pub run_id: String,
+    /// Source run identifier for a daemon-created relock.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relocked_from: Option<String>,
     pub state: RunState,
     pub game_kind: String,
     /// The config's `schema` value, or `None` for a config family that does
@@ -175,6 +178,7 @@ impl RunManifest {
         Self {
             schema_version: RUN_MANIFEST_VERSION,
             run_id: run_id.into(),
+            relocked_from: None,
             state: RunState::Running,
             game_kind: game_kind.into(),
             config_schema,
@@ -528,6 +532,24 @@ mod tests {
         original.write_atomic(directory.path()).unwrap();
         assert_eq!(RunManifest::read(directory.path()).unwrap(), original);
         assert!(is_run_directory(directory.path()));
+    }
+
+    #[test]
+    fn relock_provenance_is_optional_and_round_trips() {
+        let mut original = manifest();
+        let old = serde_json::to_value(&original).unwrap();
+        assert!(old.get("relockedFrom").is_none());
+        assert_eq!(
+            serde_json::from_value::<RunManifest>(old).unwrap(),
+            original
+        );
+        original.relocked_from = Some("source".into());
+        let json = serde_json::to_value(&original).unwrap();
+        assert_eq!(json["relockedFrom"], "source");
+        assert_eq!(
+            serde_json::from_value::<RunManifest>(json).unwrap(),
+            original
+        );
     }
 
     #[test]

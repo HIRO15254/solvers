@@ -132,6 +132,10 @@ local `validate --write-effective` は config file の directory を基準に sc
 daemon は config text を受け取り、path を含む入力を解決せず拒否する。
 client は source を解決した effective config を送る。`POST /v1/validate` は受信 host の
 任意ファイルを読み込む API ではない。cache path も config に埋め込まず、machine 設定として渡す。
+例外は`POST /v1/runs/{id}/relock`であり、daemon管理下の停止済みP1 runの
+`solution.sol`のみをupstream固定に使う。clientが任意pathを指定することはできない。
+profileのmergeは`solvers relock --print-config`、solveは通常のjobへ委譲する。
+新runのmanifestと一覧・詳細には元run IDを`relockedFrom`として記録する。
 
 ### R11. queued run もディスク上に存在する
 
@@ -228,6 +232,7 @@ POST /v1/tree                          P1 config の solve 前 public tree 照�
 POST /v1/runs                          run の作成・投入
 GET  /v1/runs                          run 一覧
 GET  /v1/runs/{id}                     state と進捗の要約
+POST /v1/runs/{id}/relock              P1 solutionからprofileを変更して新run投入
 GET  /v1/runs/{id}/events?from=OFFSET   event page
 POST /v1/runs/{id}/cancel              協調停止
 POST /v1/runs/{id}/resume              明示的な再開

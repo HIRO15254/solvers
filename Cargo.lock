@@ -423,6 +423,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tiny_http",
+ "toml",
  "windows-sys 0.61.2",
 ]
 
@@ -624,6 +625,7 @@ dependencies = [
  "runfiles",
  "serde",
  "serde_json",
+ "sha2",
  "spot",
  "tempfile",
  "thiserror",

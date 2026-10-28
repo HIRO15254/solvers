@@ -5,6 +5,7 @@ import type {
   EventPage,
   LineCursor,
   PreviewTreeRow,
+  RelockRequest,
   RunSummary,
   ServerInfo,
   ValidateResponse,
@@ -101,6 +102,8 @@ export const api = {
   run: (id: string) => json<RunSummary>(run(id)),
   createRun: (configToml: string, runId?: string) =>
     post<CreateRunResponse>("/v1/runs", runId ? { configToml, runId } : { configToml }),
+  relock: (id: string, body: RelockRequest) =>
+    post<CreateRunResponse>(`${run(id)}/relock`, body),
   events: (id: string, from: number) => json<EventPage>(`${run(id)}/events?from=${from}`),
   cancel: (id: string) => post<RunSummary>(`${run(id)}/cancel`),
   resume: (id: string) => post<CreateRunResponse>(`${run(id)}/resume`),

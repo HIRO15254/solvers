@@ -96,6 +96,19 @@ pub struct CreateRunRequest {
     pub run_id: Option<String>,
 }
 
+/// `POST /v1/runs/{id}/relock` -- derive a run from a P1 solution.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RelockRequest {
+    pub profile_toml: String,
+    #[serde(default)]
+    pub replace: bool,
+    #[serde(default)]
+    pub freeze_upstream: bool,
+    #[serde(default)]
+    pub clear_profile: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateRunResponse {
@@ -112,6 +125,8 @@ pub struct CreateRunResponse {
 #[serde(rename_all = "camelCase")]
 pub struct RunSummary {
     pub run_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relocked_from: Option<String>,
     pub state: RunState,
     pub game_kind: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -279,6 +294,7 @@ mod tests {
     fn a_run_summary_uses_stable_camel_case_names() {
         let summary = RunSummary {
             run_id: "run-1".into(),
+            relocked_from: Some("source".into()),
             state: RunState::Running,
             game_kind: "mw-preflop".into(),
             config_schema: Some("solvers.nlh/v1".into()),
@@ -293,6 +309,7 @@ mod tests {
         };
         let json = serde_json::to_value(&summary).unwrap();
         assert_eq!(json["runId"], "run-1");
+        assert_eq!(json["relockedFrom"], "source");
         assert_eq!(json["state"], "running");
         assert_eq!(json["eventsOffset"], 256);
         assert_eq!(json["lastProgress"]["sweeps"], 12);
@@ -315,6 +332,17 @@ mod tests {
         let request: CreateRunRequest =
             serde_json::from_str(r#"{"configToml":"schema = \"x\"\n"}"#).unwrap();
         assert!(request.run_id.is_none());
+    }
+
+    #[test]
+    fn relock_request_defaults_to_whole_tree_and_append() {
+        let request: RelockRequest = serde_json::from_str(r#"{"profileToml":""}"#).unwrap();
+        assert!(!request.replace);
+        assert!(!request.clear_profile);
+        assert!(!request.freeze_upstream);
+        let json = serde_json::to_value(request).unwrap();
+        assert_eq!(json["profileToml"], "");
+        assert_eq!(json["freezeUpstream"], false);
     }
 
     #[test]

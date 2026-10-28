@@ -276,6 +276,37 @@ checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや�
 変更点と配布物の制約は[CHANGELOG](../CHANGELOG.md)を参照する。
 
 
+## `solvers relock`
+
+```sh
+solvers relock <SOURCE> (--out DIR | --print-config)
+    [--add FILE|-]... [--node SEL [--hands RANGE | --category EXPR]
+    --strategy "check=0.25,bet 1=0.75" [--confidence P]]
+    [--replace] [--clear-profile] [--freeze-upstream]
+```
+
+P1の既存解を基にprofileを編集して再solveする。`SOURCE`は`run.toml`と
+`solution.sol`を持つrun directory、またはconfigを埋め込んだP1 `.sol`である。
+P2は対象外。既定では上流も自由にして木全体を再solveする。
+
+| flag | 意味 |
+|---|---|
+| `--out DIR` | 実効`run.toml`を書き、`solvers solve <config> --out DIR`と同じ成果物・進捗・終了codeでsolveする |
+| `--print-config` | merge後の実効configをstdoutに出し、solveしない。`--out`とどちらか一方を指定 |
+| `--add FILE|-` | `[[profile.lock]]` / `[[profile.incentive]]` / `[[profile.frequency]]`のTOML断片を追加。繰り返し指定でき、`-`はstdin |
+| `--node SEL` | 1件のlockを簡単に追加するnode selector。`--strategy`と併用 |
+| `--hands RANGE` / `--category EXPR` | quick lockの対象hand rangeまたはcategory式。省略時は全hand |
+| `--strategy` | quick lockのaction labelと確率をカンマ区切りで指定 |
+| `--confidence P` | quick lockのconfidence |
+| `--replace` | 追加するentryと同じ種類・同じ`node`文字列の既存entryを追加前に除去 |
+| `--clear-profile` | 追加前に元の`[profile]`全体を削除（既存の`freeze_upstream`も含む） |
+| `--freeze-upstream` | 追加したprofileの上流をSOURCEのsolutionに固定する |
+
+通常は既存profileに追記する。重複は通常のprofile検証で拒否される。
+`--clear-profile`は最初に適用し、`--freeze-upstream`はSOURCEのsolutionを新たな基準として設定する。
+不正なSOURCE、P2、断片、strategy構文、profile selectorの解決errorはexit 2。
+`export <sol> lock`で得た断片も`--add`に使える。
+
 ## `solvers resume`
 
 ```sh
@@ -558,6 +589,7 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `POST` | `/v1/tree` | P1 configのpublic treeをsolveせず構築し、指定nodeの行を返す |
 | `GET` / `POST` | `/v1/runs` | 一覧 / configTomlからjob投入。RunSummaryは最後のraw進捗行`lastProgress`を含む |
 | `GET` | `/v1/runs/{id}` | state・進捗summary。`progress`・`elapsedSecs`と製品固有の`lastProgress` |
+| `POST` | `/v1/runs/{id}/relock` | 停止済みP1 solutionのprofileを変更し新runを投入 |
 | `GET` | `/v1/runs/{id}/events?from=OFFSET` | event page。nextOffset・terminal付き |
 | `GET` | `/v1/runs/{id}/artifacts` | 契約上のartifact一覧 |
 | `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact本体 |
@@ -565,6 +597,13 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `POST` | `/v1/runs/{id}/cancel` | 協調停止（Unix: SIGINT、Windows: Ctrl-Break）。送れなければ`internal` |
 | `POST` | `/v1/runs/{id}/resume` | 再開 |
 | `GET` / `HEAD` | `/`とAPI以外のpath | UIが明示指定または自動検出されたとき、tokenなしで静的asset / SPA fallback |
+
+`relock`のJSONは`profileToml`（profile配列のTOML fragment、必須）と
+`replace`、`clearProfile`、`freezeUpstream`（boolean、省略時false）を受け取り、
+`{runId, state}`を返す。元runは完了または停止済みで`solution.sol`が必要。
+`freezeUpstream`はその元solutionだけを参照し、任意のhost pathは受け付けない。
+新runの一覧・詳細には元IDが`relockedFrom`として現れる。未知runは404、
+条件を満たさないrunは409、不正profileは400である。
 
 `lastProgress`は最後の`progress.jsonl`行であり、無ければ省略する。P1では
 `iteration`・`elapsed_secs`・`expl_p0`・`expl_p1`・`nash_conv`を保持するため、

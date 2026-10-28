@@ -404,6 +404,18 @@ fn upstream_profile_paths_are_rejected_before_any_config_endpoint_invokes_cli() 
 }
 
 #[test]
+fn relock_rejects_runs_without_a_p1_solution() {
+    let daemon = Daemon::start(1);
+    let (_, created) = daemon.post("/v1/runs", &config("no-solution"));
+    let run_id = created["runId"].as_str().unwrap();
+    daemon.await_terminal(run_id);
+    let body = serde_json::json!({"profileToml": ""}).to_string();
+    let (status, error) = daemon.post(&format!("/v1/runs/{run_id}/relock"), &body);
+    assert_eq!(status, 409, "{error}");
+    assert_eq!(error["code"], "conflict");
+}
+
+#[test]
 fn an_invalid_config_is_refused_before_a_run_directory_exists() {
     let daemon = Daemon::start(1);
     let body =
@@ -795,6 +807,41 @@ strategy = { "bet 10" = 1.0 }
                 .all(|(i, p)| i == bet || p == 0.0)
         );
     }
+
+    let fragment =
+        "[[profile.lock]]\nnode = \"root\"\nstrategy = { \"bet 10\" = 1.0 }\nconfidence = 0.5\n";
+    let request = serde_json::json!({
+        "profileToml": fragment,
+        "replace": true,
+        "freezeUpstream": true,
+        "clearProfile": false
+    })
+    .to_string();
+    let (status, created) = daemon.post(&format!("/v1/runs/{run_id}/relock"), &request);
+    assert_eq!(status, 200, "{created}");
+    let derived = created["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(derived);
+    assert_eq!(finished["state"], "completed", "{finished}");
+    assert_eq!(finished["relockedFrom"], run_id);
+    let (_, list) = daemon.get("/v1/runs");
+    assert!(
+        list["runs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|run| run["runId"] == derived && run["relockedFrom"] == run_id)
+    );
+    let effective = std::fs::read_to_string(daemon.runs.join(derived).join("run.toml")).unwrap();
+    assert!(effective.contains("freeze_upstream"));
+    let (status, summary) = daemon.get(&format!("/v1/runs/{derived}/solution/summary"));
+    assert_eq!(status, 200, "{summary}");
+    assert_eq!(summary["profile_config"]["lock"][0]["confidence"], 0.5);
+    let (status, error) = daemon.post("/v1/runs/missing/relock", &request);
+    assert_eq!(status, 404, "{error}");
+    let bad = serde_json::json!({"profileToml": "[profile]\nfreeze_upstream = { solution = '/host/secret' }\n"}).to_string();
+    let (status, error) = daemon.post(&format!("/v1/runs/{run_id}/relock"), &bad);
+    assert_eq!(status, 400, "{error}");
+    assert_eq!(error["code"], "config-not-self-contained");
 }
 
 /// Cancelling reaches the real solver on every platform: it stops at an

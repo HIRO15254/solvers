@@ -8,8 +8,8 @@ use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use protocol::{
-    CreateRunRequest, ErrorCode, ErrorResponse, LineRequest, SolutionView, TreeRequest,
-    ValidateRequest,
+    CreateRunRequest, ErrorCode, ErrorResponse, LineRequest, RelockRequest, SolutionView,
+    TreeRequest, ValidateRequest,
 };
 use serde::Serialize;
 use tiny_http::{Header, Method, Request, Response, Server};
@@ -158,6 +158,13 @@ impl Daemon {
                     Err(error) => return respond_error(request, error),
                 };
                 respond(request, self.api.create_run(&body))
+            }
+            (Method::Post, ["v1", "runs", id, "relock"]) => {
+                let body: RelockRequest = match read_json(&mut request) {
+                    Ok(body) => body,
+                    Err(error) => return respond_error(request, error),
+                };
+                respond(request, self.api.relock(id, &body))
             }
             (Method::Get, ["v1", "runs", id]) => {
                 self.api.pump();
