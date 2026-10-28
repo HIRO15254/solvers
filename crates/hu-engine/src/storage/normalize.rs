@@ -1,10 +1,13 @@
 use super::StorageRef;
 
 pub(super) trait Positive: Copy {
+    const CACHE_POSITIVE: bool;
     fn positive_f64(self) -> f64;
     fn positive_f32(self) -> f32;
 }
 impl Positive for f32 {
+    const CACHE_POSITIVE: bool = false;
+
     #[inline]
     fn positive_f64(self) -> f64 {
         self.max(0.0) as f64
@@ -15,6 +18,8 @@ impl Positive for f32 {
     }
 }
 impl Positive for i16 {
+    const CACHE_POSITIVE: bool = true;
+
     #[inline]
     fn positive_f64(self) -> f64 {
         self.max(0) as f64
@@ -59,6 +64,8 @@ pub(super) fn normalize_columns_f32<T: Positive>(data: &[T], r: StorageRef, out:
     let (num_actions, num_hands) = (r.num_actions as usize, r.num_hands as usize);
     debug_assert_eq!(out.len(), r.len());
     // CFR f32: f32 positive sums, then one reciprocal per hand.
+    // i16 conversion is expensive in both passes; cache positive values in
+    // the output block. For f32, the extra writes are slower than reloading.
     const BLOCK: usize = 256;
     let uniform = 1.0 / num_actions as f32;
     for first in (0..num_hands).step_by(BLOCK) {
@@ -66,8 +73,17 @@ pub(super) fn normalize_columns_f32<T: Positive>(data: &[T], r: StorageRef, out:
         let mut totals = [0.0f32; BLOCK];
         for a in 0..num_actions {
             let row = &data[a * num_hands + first..a * num_hands + first + len];
-            for (total, &value) in totals[..len].iter_mut().zip(row) {
-                *total += value.positive_f32();
+            if T::CACHE_POSITIVE {
+                let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
+                for ((total, dst), &value) in totals[..len].iter_mut().zip(dst).zip(row) {
+                    let positive = value.positive_f32();
+                    *dst = positive;
+                    *total += positive;
+                }
+            } else {
+                for (total, &value) in totals[..len].iter_mut().zip(row) {
+                    *total += value.positive_f32();
+                }
             }
         }
         // Reuse totals: positive totals have nonnegative reciprocals (including
@@ -76,14 +92,24 @@ pub(super) fn normalize_columns_f32<T: Positive>(data: &[T], r: StorageRef, out:
             *total = if *total > 0.0 { total.recip() } else { -1.0 };
         }
         for a in 0..num_actions {
-            let row = &data[a * num_hands + first..a * num_hands + first + len];
             let dst = &mut out[a * num_hands + first..a * num_hands + first + len];
-            for ((dst, &value), &inverse) in dst.iter_mut().zip(row).zip(&totals[..len]) {
-                *dst = if inverse >= 0.0 {
-                    value.positive_f32() * inverse
-                } else {
-                    uniform
-                };
+            if T::CACHE_POSITIVE {
+                for (dst, &inverse) in dst.iter_mut().zip(&totals[..len]) {
+                    *dst = if inverse >= 0.0 {
+                        *dst * inverse
+                    } else {
+                        uniform
+                    };
+                }
+            } else {
+                let row = &data[a * num_hands + first..a * num_hands + first + len];
+                for ((dst, &value), &inverse) in dst.iter_mut().zip(row).zip(&totals[..len]) {
+                    *dst = if inverse >= 0.0 {
+                        value.positive_f32() * inverse
+                    } else {
+                        uniform
+                    };
+                }
             }
         }
     }
