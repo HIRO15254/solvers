@@ -160,27 +160,38 @@ fn bench<S: Storage>(
     storage_name: &str,
 ) -> Result<()> {
     let t = Instant::now();
-    let game = hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline())?;
-    let tree = &game.game.tree;
+    let (game, index, resolved, node_info) = if p.document.spot.profile.is_some() {
+        let (game, index, resolved) = hu_postflop::run::build_profiled(p)?;
+        let node_info = game.tree.nodes.len();
+        (game, index, resolved, node_info)
+    } else {
+        let built = hu_postflop::try_build_postflop_game(&p.config, p.payoff.pipeline())?;
+        let node_info = built.node_info.len();
+        let index = GameIndex::from_game(
+            &built.game,
+            &built.node_info,
+            p.document.spot.context.street,
+        );
+        (built.game, index, None, node_info)
+    };
+    let tree = &game.tree;
     let nodes = tree.nodes.len();
     let action_nodes = tree.storage_refs.len();
     let storage_elements = tree.storage_len;
     let deals = tree.deals.len();
     let transitions = tree.transitions.len();
     let transition_entries: usize = tree.transitions.iter().map(|t| t.entries.len()).sum();
-    let node_info = game.node_info.len();
-    let index = GameIndex::from_game(&game.game, &game.node_info, p.document.spot.context.street);
-    drop(game.node_info);
     let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
 
     let t = Instant::now();
     let mut solver = Solver::<_, S>::new(
-        game.game,
+        game,
         hu_postflop::run::schedule(&p.settings.solver.algorithm),
         Some(p.settings.solver.stop.max_iterations),
     );
     solver.set_cfr_precision(p.settings.solver.cfr_precision);
+    let _controller = hu_postflop::run::install_profile(&mut solver, resolved, None)?;
     solver.set_par(ParConfig {
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,

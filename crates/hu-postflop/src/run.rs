@@ -241,7 +241,8 @@ pub fn validate_profile(p: &Prepared) -> Result<Option<crate::profile::ProfileSu
     Ok(build_profiled(p)?.2.map(|profile| profile.summary))
 }
 
-fn build_profiled(
+/// Build the game and resolve any configured profile against its tree.
+pub fn build_profiled(
     p: &Prepared,
 ) -> Result<(
     CompiledGame<crate::PostflopEvaluator>,
@@ -363,7 +364,8 @@ fn build_profiled(
     Ok((built.game, index, resolved))
 }
 
-struct FrequencyController {
+/// State for the frequency targets installed with a profile.
+pub struct FrequencyController {
     targets: Vec<crate::profile::FrequencyTarget>,
     lambdas: Vec<f64>,
     base_bonuses: Vec<Option<Vec<f32>>>,
@@ -371,7 +373,8 @@ struct FrequencyController {
     frozen_nodes: Vec<hu_engine::NodeId>,
 }
 
-fn install_profile<E: TerminalEvaluator, S: Storage>(
+/// Install a resolved profile and initialize its frequency controller.
+pub fn install_profile<E: TerminalEvaluator, S: Storage>(
     solver: &mut Solver<E, S>,
     resolved: Option<crate::profile::ResolvedProfile>,
     saved: Option<&[f64]>,
