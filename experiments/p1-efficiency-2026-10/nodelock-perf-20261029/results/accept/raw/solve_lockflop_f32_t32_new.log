@@ -1,0 +1,15 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 3974.0 MiB (f32) / 2081.6 MiB (i16) / 3027.8 MiB (i16-f32avg)
+storage: f32
+iter=      25 expl_p0=1.409e0 expl_p1=8.870e-1 nash_conv=2.296e0
+iter=      50 expl_p0=4.470e-1 expl_p1=3.051e-1 nash_conv=7.522e-1
+iter=     100 expl_p0=1.099e-1 expl_p1=7.986e-2 nash_conv=1.898e-1
+iter=     150 expl_p0=4.610e-2 expl_p1=2.903e-2 nash_conv=7.513e-2
+iter=     200 expl_p0=2.445e-2 expl_p1=1.504e-2 nash_conv=3.949e-2
+iter=     250 expl_p0=1.493e-2 expl_p1=9.372e-3 nash_conv=2.430e-2
+iter=     300 expl_p0=1.011e-2 expl_p1=6.578e-3 nash_conv=1.669e-2
+iter=     350 expl_p0=7.341e-3 expl_p1=4.924e-3 nash_conv=1.226e-2
+iter=     366 expl_p0=6.653e-3 expl_p1=4.530e-3 nash_conv=1.118e-2
+iter=     369 expl_p0=6.526e-3 expl_p1=4.428e-3 nash_conv=1.095e-2
+done: iterations=369 wall=60.53s ev_p0=1.566746 ev_p1=3.316694 nash_conv=1.095e-2
+sol: wrote /home/ubuntu/work/lockflop_f32_t32_new/solution.sol (1107.80 MB, 434540 blocks, mode=Full)

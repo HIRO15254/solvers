@@ -149,7 +149,10 @@ P1の同一board fold・showdownは異なる子reachでも1回の自hand loopで
 `profile`はaction nodeのstorage参照でlockとincentiveを索引する。CFRとBRは自由actionに最適化を制限し、
 完全lockの更新を省く。戦略累積は自由成分を保存し、読取り時に固定確率とconfidenceを合成する。
 incentiveは`TerminalEvaluator::compat_mass`の相手互換reachで重み付けし、所有playerの値へ加えて祖先へ伝える。
-収束評価は加点を含み、真のEVとnode別の値は加点を除く。profile付きの走査はflat batch経路を使わない。
+収束評価は加点を含み、真のEVとnode別の値は加点を除く。flat batch経路はprofileの影響を受けない部分木だけで使う。
+`Solver::set_profile`がsref前順のlock数とlock・incentive数の累積表を作り、部分木のsref spanで1回の比較で判定する。
+CFRはlockもincentiveも無い部分木、EV/BRはlockの無い部分木（加点を含む評価ではincentiveも無い部分木）でbatchを使う。
+`profile_mut`で変えてよいのはincentiveの加点値だけで、lock・incentiveの有無や次元を変えるときはprofileを入れ直す。
 profile自体はengine stateに含めず、製品側がconfigから再構築する。
 
 test-support機能の`expected_values_at` / `best_response_values_at` は指定 node、
@@ -166,6 +169,10 @@ foldはglobal combo順、showdownはrank順・group total順を保ち、各lane�
 戦略正規化・reach乗算・EV加算・BRのmaxも元の順序を保つ。chance/action並列の上位分割は変更しない。
 記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
 `visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
+profileの無い`Solver::evaluate()`は、両seatのEV/BRを`solver/dual.rs`の1回の走査で求め、各nodeの平均戦略の
+storage読込みと正規化を両seatで共有する。各channelのf64演算順は個別の走査と同じでbit一致し、chanceの無い小さい部分木は
+同じ3段のbatchを両seatで共有する。外側のchance分割が並列のとき、内側のchance子は逐次に処理してworker scratchの保持を抑える。
+profile付きの評価と、zero-sumの`exploitability()`の近道は従来のseat別の走査を使う。
 
 HUのchance-sampled driverは未使用のため、2026-10-13の利用者決定で削除した。
 Multiwayのexternal-sampling MCCFR経路は変更しない。
@@ -220,6 +227,8 @@ validateの正規化は入力choiceを維持し、run用の実効configと成果
 sref・node idは直列構築と一致し、checkpoint・`.sol`の互換性を保つ。
 rank tableの不変内容はfork間のboard単位once cacheで共有し、両seatのunionにあるcomboを1回ずつrankする。
 table IDは従来どおりlocal encounterとabsorb順で決まり、共有cacheの並行実行順には依存しない。
+終端の配当（`BakedPayoffs`）は構築後にf64のbit列が同じものを共有表へまとめ、終端は表のindexを持つ。
+Linux（glibc）では`run::build_profiled`の最後に`malloc_trim`で構築中に解放したheapをOSへ返し、solver storageの確保前のRSSを下げる。
 betting stateのboardは固定長配列で、historyは構築walkerだけが持つ。root・street end・deal後の遷移は
 静的generic dispatchで構築と計数が共有し、計数にnode/label/rank処理を加えない。
 checked builderは空menuを構築中にtyped errorで拒否する。resource preflightは`prepare`で1回計数する。

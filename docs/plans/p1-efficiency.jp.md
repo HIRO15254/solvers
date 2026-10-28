@@ -51,6 +51,7 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 | G1 | GTOWの公開情報に基づく木の雛形（SRP・3BP・4BP）を作り、各木の資源（node数・memory）と0.1%potまでの時間を16・32 threadで測る。同梱の`examples/hu-postflop/flop_srp.toml`（30.5 GB）を置き換える | 雛形の資源表。同梱例を変える場合は規範・CLI reference・利用ガイド・試験を同期 |
 | G2 | GTOW Single Size（cEV）のKs7h2d SRPを現在の木文法（donk・cbet・攻撃回数による条件）で再現し、GTOWの頻度と比べる | 2026-07-09の記録より近い木で、root・BTN stab・turn nodeの頻度・EVの差を報告 |
 | C3 | PF11: `[solver] storage = "auto"`を追加して既定にする。Codex | 必須検証。上限内ならf32、超えればi16-f32avgを選び、run成果物には選んだstorageを記録する。規範・CLI reference・利用ガイド・template・試験を同期 |
+| C4 | nodelock・lock & re-solve後の点検（profileの無いrunの回帰）と、速度・memoryの改善候補の並列試作（2026-10-29の利用者指示） | 必須検証とrelease受入。profileの無いrunの出力はbit一致。採る変更は16・32 threadの交互計測で速くなるかmemoryが減り、他の条件を遅くしない |
 
 利用者決定:
 
@@ -60,8 +61,9 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 
 ## 4. 計測
 
-- 反復数は機械に依存しないので、候補の判定はまずローカルで反復数を測る。時間の受入はGCP c2d-highcpu-32 Spotで
-  16・32 threadの対を同じVMで交互に測る（GCP projectのvCPU quotaは全体で32なので、他の作業とVMを順番に使う）。
+- 反復数は機械に依存しないので、候補の判定はまずローカルで反復数を測る。時間の受入は16・32 threadの対を同じVMで交互に測る。
+  2026-10-09はGCP c2d-highcpu-32 Spot、2026-10-13からはAWS c6a.8xlarge（AMD EPYC 7R13）を使う。
+  利用者決定（2026-10-29）: Spot以外のinstanceは使わない。
 - ローカルPCは他の計算と共有しているので、時間は交互実行の中央値を参考値とする。
 
 ## 5. 結果
@@ -137,3 +139,30 @@ GTOWに倣って木を絞ると、0.1%potまでの時間は5.4分の1、peakは6
 `.sol`の実効configには選んだstorageを書く。正規化した入力（`validate --show-effective`）は`auto`のままである。
 同梱flop_srpを`--memory 3700MiB`で解くとi16-f32avgを選び、`run.toml`と`.sol`のmetaは`i16-f32avg`だった。`--memory 2GiB`は
 両方の必要量を示して終了code 75で止まった。
+
+### C4: nodelock後の点検と改善（AWS c6a.8xlarge Spot、16・32 thread）
+
+[記録](../../experiments/p1-efficiency-2026-10/nodelock-perf-20261029/README.md)。nodelock前`7b6492b3`と後`2b80338d`では、
+profileの無いrunの1反復・afterBuild・peak・0.1%potまでの反復数は変わらず、出力はbit一致した
+（評価1回だけ32 threadで1.010〜1.017倍）。改善候補を4系統で並列に試し、次の8 commitを採った。
+
+- CFRの戦略正規化: 列の合計bufferの再利用と、i16の正のregretの1回だけの復号。
+- profile付きのrunで、lockとincentiveの無い部分木をflat batch経路で処理する。
+- buildの後に`node_info`を解放してheapをOSへ返し（Linux）、同じ終端の配当表を共有する。
+- profileの無い評価で両seatのEV/BRを1回の走査で求め、入れ子のchanceの展開を抑えてpeakを増やさない。
+
+`2b80338d`→採用後（`a9e30065`）を同じVMで交互に測った（flop_srp・flop_3bp・c_gtowb、f32・i16、16・32 thread）。
+
+| 項目 | 新/旧 |
+|---|---|
+| i16の1反復 | 0.770〜0.834 |
+| f32の1反復 | 0.972〜0.994 |
+| 評価1回 | 0.844〜0.905 |
+| afterBuild | 0.30〜0.41（flop_srp 351→143 MiB、flop_3bp 836→308 MiB、c_gtowb 1,665→535 MiB、32 thread） |
+| peak | f32 0.821〜0.965、i16 0.725〜0.933 |
+| 0.1%potまでの時間 | profile無しのf32 0.988〜0.993、i16 0.797（反復数は同じ）、lock付き0.847〜0.866 |
+| 0.1%potまでのmax RSS | profile無し0.851〜0.960（c_gtowb i16は別VMの組で0.942）、lock付き0.988〜0.994 |
+
+profileの無いrunの出力はbit一致した（bench・solveの`NashConv`、`bitcheck.sh`）。profile付きのrunは、部分木のCFRが
+f32で再帰経路と異なる順に演算するため軌跡がわずかに変わる（反復数368→369、375→373）。lock付きのrunは評価が従来の
+seat別の走査のままなのでpeakがほとんど減らず、両seat同時の走査へlockとincentiveを入れることが次の候補である。

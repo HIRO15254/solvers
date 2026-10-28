@@ -1,0 +1,16 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 3974.0 MiB (f32) / 2081.6 MiB (i16) / 3027.8 MiB (i16-f32avg)
+storage: f32
+iter=      25 expl_p0=1.426e0 expl_p1=6.940e-1 nash_conv=2.120e0
+iter=      50 expl_p0=4.195e-1 expl_p1=2.619e-1 nash_conv=6.814e-1
+iter=     100 expl_p0=1.193e-1 expl_p1=8.302e-2 nash_conv=2.023e-1
+iter=     150 expl_p0=4.865e-2 expl_p1=3.505e-2 nash_conv=8.370e-2
+iter=     200 expl_p0=2.572e-2 expl_p1=1.861e-2 nash_conv=4.433e-2
+iter=     250 expl_p0=1.543e-2 expl_p1=1.123e-2 nash_conv=2.666e-2
+iter=     300 expl_p0=1.018e-2 expl_p1=7.474e-3 nash_conv=1.765e-2
+iter=     350 expl_p0=7.220e-3 expl_p1=5.334e-3 nash_conv=1.255e-2
+iter=     368 expl_p0=6.467e-3 expl_p1=4.794e-3 nash_conv=1.126e-2
+iter=     372 expl_p0=6.345e-3 expl_p1=4.697e-3 nash_conv=1.104e-2
+iter=     375 expl_p0=6.217e-3 expl_p1=4.630e-3 nash_conv=1.085e-2
+done: iterations=375 wall=72.80s ev_p0=1.530735 ev_p1=3.388638 nash_conv=1.085e-2
+sol: wrote /home/ubuntu/work/lockturn_f32_t32_head/solution.sol (952.43 MB, 434540 blocks, mode=Full)

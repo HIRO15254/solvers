@@ -1,0 +1,7 @@
+16:25:48 BUILT
+16:29:10 bench rep 1
+16:32:33 bench rep 2
+16:33:49 solve srp_f32_t32_r1 base
+16:35:07 solve srp_f32_t32_r1 head
+16:36:24 solve srp_f32_t32_r2 head
+16:37:42 solve srp_f32_t32_r2 base

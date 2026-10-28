@@ -1,0 +1,2090 @@
+{
+ "regression": {
+  "old": "base",
+  "new": "head",
+  "bench": [
+   {
+    "config": "c_gtowb",
+    "storage": "f32",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      0.8860793445,
+      0.8881181362999999
+     ],
+     "evaluateSecs": [
+      1.385809855,
+      1.402310232,
+      1.380837678,
+      1.382903271
+     ],
+     "afterBuildMiB": [
+      1656.9,
+      1659.2
+     ],
+     "peakMiB": [
+      21789.8,
+      21792.1
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.8859926018,
+      0.8897208696
+     ],
+     "evaluateSecs": [
+      1.386154414,
+      1.424958525,
+      1.395527232,
+      1.398606675
+     ],
+     "afterBuildMiB": [
+      1671.5,
+      1657.1
+     ],
+     "peakMiB": [
+      21804.4,
+      21790.1
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.8870987403999999,
+      "new": 0.8878567357,
+      "ratio": 1.0009
+     },
+     "evaluateSecs": {
+      "old": 1.3843565629999999,
+      "new": 1.3970669535,
+      "ratio": 1.0092
+     },
+     "afterBuildMiB": {
+      "old": 1658.0500000000002,
+      "new": 1664.3,
+      "ratio": 1.0038
+     },
+     "peakMiB": {
+      "old": 21790.949999999997,
+      "new": 21797.25,
+      "ratio": 1.0003
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "f32",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.7936205083,
+      0.7996793208999999
+     ],
+     "evaluateSecs": [
+      1.203280972,
+      1.204084354,
+      1.210556513,
+      1.216657217
+     ],
+     "afterBuildMiB": [
+      1664.4,
+      1665.3
+     ],
+     "peakMiB": [
+      21798.6,
+      21799.4
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.7895922417,
+      0.7962085453000001
+     ],
+     "evaluateSecs": [
+      1.230059032,
+      1.226158036,
+      1.226157529,
+      1.232384859
+     ],
+     "afterBuildMiB": [
+      1664.7,
+      1661.7
+     ],
+     "peakMiB": [
+      21799.1,
+      21795.9
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.7966499145999999,
+      "new": 0.7929003935000001,
+      "ratio": 0.9953
+     },
+     "evaluateSecs": {
+      "old": 1.2073204335,
+      "new": 1.228108534,
+      "ratio": 1.0172
+     },
+     "afterBuildMiB": {
+      "old": 1664.85,
+      "new": 1663.2,
+      "ratio": 0.999
+     },
+     "peakMiB": {
+      "old": 21799.0,
+      "new": 21797.5,
+      "ratio": 0.9999
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      1.0102619997,
+      1.0129935678000002
+     ],
+     "evaluateSecs": [
+      1.5592580790000001,
+      1.5592900809999999,
+      1.559329352,
+      1.55322704
+     ],
+     "afterBuildMiB": [
+      1672.2,
+      1657.0
+     ],
+     "peakMiB": [
+      11739.4,
+      11724.4
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      1.0179789066,
+      1.0220759905999999
+     ],
+     "evaluateSecs": [
+      1.573479268,
+      1.569898886,
+      1.569326845,
+      1.5939631319999998
+     ],
+     "afterBuildMiB": [
+      1657.2,
+      1657.1
+     ],
+     "peakMiB": [
+      11741.9,
+      11724.4
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 1.01162778375,
+      "new": 1.0200274486,
+      "ratio": 1.0083
+     },
+     "evaluateSecs": {
+      "old": 1.55927408,
+      "new": 1.571689077,
+      "ratio": 1.008
+     },
+     "afterBuildMiB": {
+      "old": 1664.6,
+      "new": 1657.15,
+      "ratio": 0.9955
+     },
+     "peakMiB": {
+      "old": 11731.9,
+      "new": 11733.15,
+      "ratio": 1.0001
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.85341811,
+      0.8538210436
+     ],
+     "evaluateSecs": [
+      1.267168065,
+      1.272102136,
+      1.2621529040000001,
+      1.266528108
+     ],
+     "afterBuildMiB": [
+      1661.5,
+      1661.5
+     ],
+     "peakMiB": [
+      11742.5,
+      11742.7
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.8564567787999999,
+      0.8522255062999999
+     ],
+     "evaluateSecs": [
+      1.286763669,
+      1.289572425,
+      1.286065288,
+      1.284067034
+     ],
+     "afterBuildMiB": [
+      1664.7,
+      1664.7
+     ],
+     "peakMiB": [
+      11746.8,
+      11746.8
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.8536195768,
+      "new": 0.8543411425499999,
+      "ratio": 1.0008
+     },
+     "evaluateSecs": {
+      "old": 1.2668480865,
+      "new": 1.2864144785,
+      "ratio": 1.0154
+     },
+     "afterBuildMiB": {
+      "old": 1661.5,
+      "new": 1664.7,
+      "ratio": 1.0019
+     },
+     "peakMiB": {
+      "old": 11742.6,
+      "new": 11746.8,
+      "ratio": 1.0004
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      0.11489154900000001,
+      0.1148206979
+     ],
+     "evaluateSecs": [
+      0.174509152,
+      0.178178477,
+      0.174809718,
+      0.178618072
+     ],
+     "afterBuildMiB": [
+      834.4,
+      829.9
+     ],
+     "peakMiB": [
+      2905.4,
+      2900.7
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.1137318521,
+      0.11516970959999999
+     ],
+     "evaluateSecs": [
+      0.174060067,
+      0.177860169,
+      0.174783936,
+      0.178337326
+     ],
+     "afterBuildMiB": [
+      831.2,
+      834.9
+     ],
+     "peakMiB": [
+      2902.0,
+      2905.6
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.11485612345000001,
+      "new": 0.11445078084999999,
+      "ratio": 0.9965
+     },
+     "evaluateSecs": {
+      "old": 0.1764940975,
+      "new": 0.1763220525,
+      "ratio": 0.999
+     },
+     "afterBuildMiB": {
+      "old": 832.15,
+      "new": 833.05,
+      "ratio": 1.0011
+     },
+     "peakMiB": {
+      "old": 2903.05,
+      "new": 2903.8,
+      "ratio": 1.0003
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.0982123823,
+      0.0998353741
+     ],
+     "evaluateSecs": [
+      0.154359628,
+      0.154634685,
+      0.155855464,
+      0.155074898
+     ],
+     "afterBuildMiB": [
+      835.9,
+      837.8
+     ],
+     "peakMiB": [
+      2907.6,
+      2909.5
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.0972116782,
+      0.0984598186
+     ],
+     "evaluateSecs": [
+      0.155955141,
+      0.156230487,
+      0.156994482,
+      0.156451899
+     ],
+     "afterBuildMiB": [
+      836.1,
+      836.1
+     ],
+     "peakMiB": [
+      2907.6,
+      2907.7
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.0990238782,
+      "new": 0.0978357484,
+      "ratio": 0.988
+     },
+     "evaluateSecs": {
+      "old": 0.15485479149999998,
+      "new": 0.156341193,
+      "ratio": 1.0096
+     },
+     "afterBuildMiB": {
+      "old": 836.8499999999999,
+      "new": 836.1,
+      "ratio": 0.9991
+     },
+     "peakMiB": {
+      "old": 2908.55,
+      "new": 2907.6499999999996,
+      "ratio": 0.9997
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "i16",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      0.13920787159999998,
+      0.1389902636
+     ],
+     "evaluateSecs": [
+      0.198656891,
+      0.197575609,
+      0.201324532,
+      0.194302602
+     ],
+     "afterBuildMiB": [
+      829.8,
+      828.9
+     ],
+     "peakMiB": [
+      1874.1,
+      1873.1
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.1401373111,
+      0.1401943176
+     ],
+     "evaluateSecs": [
+      0.198487072,
+      0.194404875,
+      0.198592488,
+      0.193961472
+     ],
+     "afterBuildMiB": [
+      837.2,
+      836.9
+     ],
+     "peakMiB": [
+      1881.4,
+      1881.1
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.1390990676,
+      "new": 0.14016581435,
+      "ratio": 1.0077
+     },
+     "evaluateSecs": {
+      "old": 0.19811625,
+      "new": 0.19644597349999998,
+      "ratio": 0.9916
+     },
+     "afterBuildMiB": {
+      "old": 829.3499999999999,
+      "new": 837.05,
+      "ratio": 1.0093
+     },
+     "peakMiB": {
+      "old": 1873.6,
+      "new": 1881.25,
+      "ratio": 1.0041
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "i16",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.1160091741,
+      0.11664047159999999
+     ],
+     "evaluateSecs": [
+      0.160867406,
+      0.16110437,
+      0.161859169,
+      0.161600644
+     ],
+     "afterBuildMiB": [
+      836.0,
+      838.1
+     ],
+     "peakMiB": [
+      1880.8,
+      1883.0
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.1170287816,
+      0.1166380306
+     ],
+     "evaluateSecs": [
+      0.162969269,
+      0.163407744,
+      0.162838438,
+      0.162803026
+     ],
+     "afterBuildMiB": [
+      835.0,
+      834.7
+     ],
+     "peakMiB": [
+      1879.9,
+      1877.7
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.11632482285,
+      "new": 0.11683340610000001,
+      "ratio": 1.0044
+     },
+     "evaluateSecs": {
+      "old": 0.16135250699999998,
+      "new": 0.1629038535,
+      "ratio": 1.0096
+     },
+     "afterBuildMiB": {
+      "old": 837.05,
+      "new": 834.85,
+      "ratio": 0.9974
+     },
+     "peakMiB": {
+      "old": 1881.9,
+      "new": 1878.8000000000002,
+      "ratio": 0.9984
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      0.18230778139999998,
+      0.18503637280000002
+     ],
+     "evaluateSecs": [
+      0.276428652,
+      0.28894001,
+      0.276875031,
+      0.284929256
+     ],
+     "afterBuildMiB": [
+      346.8,
+      346.9
+     ],
+     "peakMiB": [
+      4185.7,
+      4192.9
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.1818825787,
+      0.1820687588
+     ],
+     "evaluateSecs": [
+      0.277238849,
+      0.287553499,
+      0.276345539,
+      0.288680717
+     ],
+     "afterBuildMiB": [
+      347.0,
+      347.1
+     ],
+     "peakMiB": [
+      4200.1,
+      4188.4
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.1836720771,
+      "new": 0.18197566874999999,
+      "ratio": 0.9908
+     },
+     "evaluateSecs": {
+      "old": 0.2809021435,
+      "new": 0.282396174,
+      "ratio": 1.0053
+     },
+     "afterBuildMiB": {
+      "old": 346.85,
+      "new": 347.05,
+      "ratio": 1.0006
+     },
+     "peakMiB": {
+      "old": 4189.299999999999,
+      "new": 4194.25,
+      "ratio": 1.0012
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.1637605452,
+      0.16391578010000002
+     ],
+     "evaluateSecs": [
+      0.247679852,
+      0.243485207,
+      0.244571235,
+      0.244449538
+     ],
+     "afterBuildMiB": [
+      353.1,
+      350.8
+     ],
+     "peakMiB": [
+      4431.6,
+      4417.5
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.166278926,
+      0.1647509111
+     ],
+     "evaluateSecs": [
+      0.248357251,
+      0.246595549,
+      0.248551119,
+      0.245165496
+     ],
+     "afterBuildMiB": [
+      351.2,
+      353.3
+     ],
+     "peakMiB": [
+      4411.3,
+      4405.1
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.16383816265,
+      "new": 0.16551491855,
+      "ratio": 1.0102
+     },
+     "evaluateSecs": {
+      "old": 0.2445103865,
+      "new": 0.24747639999999999,
+      "ratio": 1.0121
+     },
+     "afterBuildMiB": {
+      "old": 351.95000000000005,
+      "new": 352.25,
+      "ratio": 1.0009
+     },
+     "peakMiB": {
+      "old": 4424.55,
+      "new": 4408.200000000001,
+      "ratio": 0.9963
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 16,
+    "base": {
+     "secsPerIter": [
+      0.2080329221,
+      0.20717046309999998
+     ],
+     "evaluateSecs": [
+      0.329644353,
+      0.322167388,
+      0.320187431,
+      0.3254144
+     ],
+     "afterBuildMiB": [
+      346.8,
+      346.7
+     ],
+     "peakMiB": [
+      2298.7,
+      2296.3
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.2077716219,
+      0.2108362789
+     ],
+     "evaluateSecs": [
+      0.33061694,
+      0.317305886,
+      0.330377802,
+      0.31826919
+     ],
+     "afterBuildMiB": [
+      347.1,
+      348.1
+     ],
+     "peakMiB": [
+      2306.1,
+      2297.5
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.2076016926,
+      "new": 0.2093039504,
+      "ratio": 1.0082
+     },
+     "evaluateSecs": {
+      "old": 0.323790894,
+      "new": 0.324323496,
+      "ratio": 1.0016
+     },
+     "afterBuildMiB": {
+      "old": 346.75,
+      "new": 347.6,
+      "ratio": 1.0025
+     },
+     "peakMiB": {
+      "old": 2297.5,
+      "new": 2301.8,
+      "ratio": 1.0019
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 32,
+    "base": {
+     "secsPerIter": [
+      0.1783816002,
+      0.1817806103
+     ],
+     "evaluateSecs": [
+      0.262030566,
+      0.261559969,
+      0.264197603,
+      0.261960821
+     ],
+     "afterBuildMiB": [
+      351.2,
+      351.2
+     ],
+     "peakMiB": [
+      2528.3,
+      2530.9
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "head": {
+     "secsPerIter": [
+      0.17822320409999998,
+      0.1802530171
+     ],
+     "evaluateSecs": [
+      0.264975448,
+      0.26501582,
+      0.266734895,
+      0.265414746
+     ],
+     "afterBuildMiB": [
+      351.3,
+      351.3
+     ],
+     "peakMiB": [
+      2542.6,
+      2527.3
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.18008110524999998,
+      "new": 0.1792381106,
+      "ratio": 0.9953
+     },
+     "evaluateSecs": {
+      "old": 0.2619956935,
+      "new": 0.26521528299999997,
+      "ratio": 1.0123
+     },
+     "afterBuildMiB": {
+      "old": 351.2,
+      "new": 351.3,
+      "ratio": 1.0003
+     },
+     "peakMiB": {
+      "old": 2529.6000000000004,
+      "new": 2534.95,
+      "ratio": 1.0021
+     }
+    },
+    "nashConvIdentical": true
+   }
+  ],
+  "solve": [
+   {
+    "tag": "srp_f32_t32_r1",
+    "base": {
+     "iterations": 389,
+     "wallSecs": 64.62,
+     "elapsedSecs": 76.74,
+     "maxRssMiB": 4637.6,
+     "nashConv": 0.010859778763689931
+    },
+    "head": {
+     "iterations": 389,
+     "wallSecs": 64.86,
+     "elapsedSecs": 77.09,
+     "maxRssMiB": 4667.6,
+     "nashConv": 0.010859778763689931
+    },
+    "wallRatio": 1.0037,
+    "maxRssRatio": 1.0065,
+    "nashConvIdentical": true
+   },
+   {
+    "tag": "srp_f32_t32_r2",
+    "base": {
+     "iterations": 389,
+     "wallSecs": 65.54,
+     "elapsedSecs": 77.95,
+     "maxRssMiB": 4669.1,
+     "nashConv": 0.010859778763689931
+    },
+    "head": {
+     "iterations": 389,
+     "wallSecs": 64.73,
+     "elapsedSecs": 76.94,
+     "maxRssMiB": 4677.2,
+     "nashConv": 0.010859778763689931
+    },
+    "wallRatio": 0.9876,
+    "maxRssRatio": 1.0017,
+    "nashConvIdentical": true
+   }
+  ],
+  "diagnostic": []
+ },
+ "accept": {
+  "old": "head",
+  "new": "new",
+  "bench": [
+   {
+    "config": "c_gtowb",
+    "storage": "f32",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      0.9040498923,
+      0.8970649157
+     ],
+     "evaluateSecs": [
+      1.424618643,
+      1.383634651,
+      1.392003828,
+      1.399728345
+     ],
+     "afterBuildMiB": [
+      1665.4,
+      1665.4
+     ],
+     "peakMiB": [
+      21798.5,
+      21798.4
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.8680261201,
+      0.8927495657
+     ],
+     "evaluateSecs": [
+      1.2154365839999999,
+      1.213768405,
+      1.231076435,
+      1.227422198
+     ],
+     "afterBuildMiB": [
+      503.1,
+      509.6
+     ],
+     "peakMiB": [
+      20776.5,
+      20779.1
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.900557404,
+      "new": 0.8803878429,
+      "ratio": 0.9776
+     },
+     "evaluateSecs": {
+      "old": 1.3958660864999999,
+      "new": 1.221429391,
+      "ratio": 0.875
+     },
+     "afterBuildMiB": {
+      "old": 1665.4,
+      "new": 506.35,
+      "ratio": 0.304
+     },
+     "peakMiB": {
+      "old": 21798.45,
+      "new": 20777.8,
+      "ratio": 0.9532
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "f32",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.7898017908,
+      0.8098827029000001
+     ],
+     "evaluateSecs": [
+      1.220072497,
+      1.219926853,
+      1.2404343,
+      1.244757836
+     ],
+     "afterBuildMiB": [
+      1664.6,
+      1664.7
+     ],
+     "peakMiB": [
+      21798.8,
+      21800.4
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.7820573917,
+      0.7890948695
+     ],
+     "evaluateSecs": [
+      1.088094878,
+      1.090747553,
+      1.097396562,
+      1.104443938
+     ],
+     "afterBuildMiB": [
+      536.3,
+      533.9
+     ],
+     "peakMiB": [
+      20946.5,
+      20959.2
+     ],
+     "nashConv": [
+      7.311805890578997
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.79984224685,
+      "new": 0.7855761306,
+      "ratio": 0.9822
+     },
+     "evaluateSecs": {
+      "old": 1.2302533985,
+      "new": 1.0940720575,
+      "ratio": 0.8893
+     },
+     "afterBuildMiB": {
+      "old": 1664.65,
+      "new": 535.0999999999999,
+      "ratio": 0.3214
+     },
+     "peakMiB": {
+      "old": 21799.6,
+      "new": 20952.85,
+      "ratio": 0.9612
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      1.014932629,
+      1.0198239554000001
+     ],
+     "evaluateSecs": [
+      1.565112939,
+      1.568024404,
+      1.5978055690000001,
+      1.5938047
+     ],
+     "afterBuildMiB": [
+      1665.5,
+      1659.3
+     ],
+     "peakMiB": [
+      11741.7,
+      11744.1
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.7850494287,
+      0.7838217710000001
+     ],
+     "evaluateSecs": [
+      1.328775303,
+      1.3355327510000001,
+      1.3335842119999999,
+      1.333413008
+     ],
+     "afterBuildMiB": [
+      515.7,
+      508.2
+     ],
+     "peakMiB": [
+      10748.6,
+      10735.0
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 1.0173782922,
+      "new": 0.7844355998500001,
+      "ratio": 0.771
+     },
+     "evaluateSecs": {
+      "old": 1.5809145519999999,
+      "new": 1.33349861,
+      "ratio": 0.8435
+     },
+     "afterBuildMiB": {
+      "old": 1662.4,
+      "new": 511.95000000000005,
+      "ratio": 0.308
+     },
+     "peakMiB": {
+      "old": 11742.900000000001,
+      "new": 10741.8,
+      "ratio": 0.9147
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.8504664015,
+      0.8513414027999999
+     ],
+     "evaluateSecs": [
+      1.287635968,
+      1.283739494,
+      1.2980149810000001,
+      1.302647061
+     ],
+     "afterBuildMiB": [
+      1667.7,
+      1664.6
+     ],
+     "peakMiB": [
+      11744.4,
+      11746.9
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.6517990879,
+      0.6581342216
+     ],
+     "evaluateSecs": [
+      1.108569001,
+      1.110782859,
+      1.10953165,
+      1.113219761
+     ],
+     "afterBuildMiB": [
+      533.9,
+      536.1
+     ],
+     "peakMiB": [
+      10889.7,
+      10888.7
+     ],
+     "nashConv": [
+      7.3467377852004425
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.85090390215,
+      "new": 0.6549666547499999,
+      "ratio": 0.7697
+     },
+     "evaluateSecs": {
+      "old": 1.2928254745,
+      "new": 1.1101572545,
+      "ratio": 0.8587
+     },
+     "afterBuildMiB": {
+      "old": 1666.15,
+      "new": 535.0,
+      "ratio": 0.3211
+     },
+     "peakMiB": {
+      "old": 11745.65,
+      "new": 10889.2,
+      "ratio": 0.9271
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      0.1158845306,
+      0.11442982800000001
+     ],
+     "evaluateSecs": [
+      0.175755542,
+      0.179446508,
+      0.174673981,
+      0.174244418
+     ],
+     "afterBuildMiB": [
+      838.2,
+      832.1
+     ],
+     "peakMiB": [
+      2909.1,
+      2903.1
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.1127265266,
+      0.11104229080000001
+     ],
+     "evaluateSecs": [
+      0.159533305,
+      0.156334022,
+      0.159030743,
+      0.156792628
+     ],
+     "afterBuildMiB": [
+      284.7,
+      284.8
+     ],
+     "peakMiB": [
+      2385.7,
+      2388.3
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.1151571793,
+      "new": 0.11188440870000001,
+      "ratio": 0.9716
+     },
+     "evaluateSecs": {
+      "old": 0.17521476149999998,
+      "new": 0.1579116855,
+      "ratio": 0.9012
+     },
+     "afterBuildMiB": {
+      "old": 835.1500000000001,
+      "new": 284.75,
+      "ratio": 0.341
+     },
+     "peakMiB": {
+      "old": 2906.1,
+      "new": 2387.0,
+      "ratio": 0.8214
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.09872927249999999,
+      0.09612202239999999
+     ],
+     "evaluateSecs": [
+      0.156038164,
+      0.156233929,
+      0.156129898,
+      0.156267122
+     ],
+     "afterBuildMiB": [
+      836.4,
+      835.2
+     ],
+     "peakMiB": [
+      2908.0,
+      2906.7
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.09767981719999999,
+      0.0960498942
+     ],
+     "evaluateSecs": [
+      0.142044221,
+      0.141507895,
+      0.140912993,
+      0.141221772
+     ],
+     "afterBuildMiB": [
+      309.6,
+      306.4
+     ],
+     "peakMiB": [
+      2441.9,
+      2440.3
+     ],
+     "nashConv": [
+      11.10237166270294
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.09742564744999999,
+      "new": 0.0968648557,
+      "ratio": 0.9942
+     },
+     "evaluateSecs": {
+      "old": 0.1561819135,
+      "new": 0.1413648335,
+      "ratio": 0.9051
+     },
+     "afterBuildMiB": {
+      "old": 835.8,
+      "new": 308.0,
+      "ratio": 0.3685
+     },
+     "peakMiB": {
+      "old": 2907.35,
+      "new": 2441.1000000000004,
+      "ratio": 0.8396
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "i16",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      0.1396500529,
+      0.1403830505
+     ],
+     "evaluateSecs": [
+      0.197314757,
+      0.193829567,
+      0.195146526,
+      0.193866338
+     ],
+     "afterBuildMiB": [
+      832.8,
+      838.0
+     ],
+     "peakMiB": [
+      1877.2,
+      1876.8
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.11656311459999999,
+      0.11684014220000001
+     ],
+     "evaluateSecs": [
+      0.170414282,
+      0.169554217,
+      0.168001682,
+      0.170044071
+     ],
+     "afterBuildMiB": [
+      284.2,
+      284.5
+     ],
+     "peakMiB": [
+      1360.2,
+      1360.0
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.1400165517,
+      "new": 0.11670162840000001,
+      "ratio": 0.8335
+     },
+     "evaluateSecs": {
+      "old": 0.194506432,
+      "new": 0.169799144,
+      "ratio": 0.873
+     },
+     "afterBuildMiB": {
+      "old": 835.4,
+      "new": 284.35,
+      "ratio": 0.3404
+     },
+     "peakMiB": {
+      "old": 1877.0,
+      "new": 1360.1,
+      "ratio": 0.7246
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_3bp",
+    "storage": "i16",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.1167409822,
+      0.1172121711
+     ],
+     "evaluateSecs": [
+      0.162878611,
+      0.163039595,
+      0.167769165,
+      0.163030507
+     ],
+     "afterBuildMiB": [
+      835.1,
+      835.1
+     ],
+     "peakMiB": [
+      1879.1,
+      1879.2
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.0955824428,
+      0.0960453242
+     ],
+     "evaluateSecs": [
+      0.143096004,
+      0.142885688,
+      0.142851287,
+      0.142923729
+     ],
+     "afterBuildMiB": [
+      309.4,
+      306.7
+     ],
+     "peakMiB": [
+      1413.3,
+      1407.5
+     ],
+     "nashConv": [
+      11.154531879006171
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.11697657665,
+      "new": 0.0958138835,
+      "ratio": 0.8191
+     },
+     "evaluateSecs": {
+      "old": 0.163035051,
+      "new": 0.1429047085,
+      "ratio": 0.8765
+     },
+     "afterBuildMiB": {
+      "old": 835.1,
+      "new": 308.04999999999995,
+      "ratio": 0.3689
+     },
+     "peakMiB": {
+      "old": 1879.15,
+      "new": 1410.4,
+      "ratio": 0.7506
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      0.18309783419999998,
+      0.1806544084
+     ],
+     "evaluateSecs": [
+      0.276666614,
+      0.286893349,
+      0.27555713,
+      0.288900879
+     ],
+     "afterBuildMiB": [
+      347.1,
+      347.0
+     ],
+     "peakMiB": [
+      4189.7,
+      4184.8
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.1815736161,
+      0.1778713019
+     ],
+     "evaluateSecs": [
+      0.242478058,
+      0.261250888,
+      0.242900368,
+      0.243106594
+     ],
+     "afterBuildMiB": [
+      127.0,
+      127.3
+     ],
+     "peakMiB": [
+      4037.4,
+      4041.1
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.18187612129999997,
+      "new": 0.179722459,
+      "ratio": 0.9882
+     },
+     "evaluateSecs": {
+      "old": 0.2817799815,
+      "new": 0.24300348100000002,
+      "ratio": 0.8624
+     },
+     "afterBuildMiB": {
+      "old": 347.05,
+      "new": 127.15,
+      "ratio": 0.3664
+     },
+     "peakMiB": {
+      "old": 4187.25,
+      "new": 4039.25,
+      "ratio": 0.9647
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.1620040391,
+      0.1620374086
+     ],
+     "evaluateSecs": [
+      0.249466349,
+      0.245796614,
+      0.248897413,
+      0.24843422
+     ],
+     "afterBuildMiB": [
+      351.4,
+      351.2
+     ],
+     "peakMiB": [
+      4441.5,
+      4461.5
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.1610419214,
+      0.16032830260000003
+     ],
+     "evaluateSecs": [
+      0.218932009,
+      0.219535807,
+      0.218173575,
+      0.217676939
+     ],
+     "afterBuildMiB": [
+      143.2,
+      143.5
+     ],
+     "peakMiB": [
+      4193.8,
+      4200.3
+     ],
+     "nashConv": [
+      7.2087826557558135
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.16202072385,
+      "new": 0.16068511200000002,
+      "ratio": 0.9918
+     },
+     "evaluateSecs": {
+      "old": 0.24866581650000003,
+      "new": 0.218552792,
+      "ratio": 0.8789
+     },
+     "afterBuildMiB": {
+      "old": 351.29999999999995,
+      "new": 143.35,
+      "ratio": 0.4081
+     },
+     "peakMiB": {
+      "old": 4451.5,
+      "new": 4197.05,
+      "ratio": 0.9428
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 16,
+    "head": {
+     "secsPerIter": [
+      0.2086199681,
+      0.20826774879999999
+     ],
+     "evaluateSecs": [
+      0.318956884,
+      0.31882339,
+      0.329221312,
+      0.321202298
+     ],
+     "afterBuildMiB": [
+      347.0,
+      347.0
+     ],
+     "peakMiB": [
+      2303.9,
+      2301.9
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.1650451955,
+      0.1634126808
+     ],
+     "evaluateSecs": [
+      0.270497679,
+      0.270098867,
+      0.273399137,
+      0.270015648
+     ],
+     "afterBuildMiB": [
+      127.0,
+      127.0
+     ],
+     "peakMiB": [
+      2146.2,
+      2150.1
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.20844385845,
+      "new": 0.16422893815,
+      "ratio": 0.7879
+     },
+     "evaluateSecs": {
+      "old": 0.320079591,
+      "new": 0.270298273,
+      "ratio": 0.8445
+     },
+     "afterBuildMiB": {
+      "old": 347.0,
+      "new": 127.0,
+      "ratio": 0.366
+     },
+     "peakMiB": {
+      "old": 2302.9,
+      "new": 2148.1499999999996,
+      "ratio": 0.9328
+     }
+    },
+    "nashConvIdentical": true
+   },
+   {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 32,
+    "head": {
+     "secsPerIter": [
+      0.1778770179,
+      0.1794021509
+     ],
+     "evaluateSecs": [
+      0.264999741,
+      0.263194678,
+      0.266224747,
+      0.264254309
+     ],
+     "afterBuildMiB": [
+      353.3,
+      351.2
+     ],
+     "peakMiB": [
+      2531.4,
+      2524.7
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "new": {
+     "secsPerIter": [
+      0.1424697364,
+      0.140863481
+     ],
+     "evaluateSecs": [
+      0.225922905,
+      0.225913745,
+      0.225196509,
+      0.226105756
+     ],
+     "afterBuildMiB": [
+      143.2,
+      142.5
+     ],
+     "peakMiB": [
+      2278.4,
+      2287.3
+     ],
+     "nashConv": [
+      7.142849391139373
+     ]
+    },
+    "median": {
+     "secsPerIter": {
+      "old": 0.1786395844,
+      "new": 0.1416666087,
+      "ratio": 0.793
+     },
+     "evaluateSecs": {
+      "old": 0.264627025,
+      "new": 0.225918325,
+      "ratio": 0.8537
+     },
+     "afterBuildMiB": {
+      "old": 352.25,
+      "new": 142.85,
+      "ratio": 0.4055
+     },
+     "peakMiB": {
+      "old": 2528.05,
+      "new": 2282.8500000000004,
+      "ratio": 0.903
+     }
+    },
+    "nashConvIdentical": true
+   }
+  ],
+  "solve": [
+   {
+    "tag": "3bp_f32_t32",
+    "head": {
+     "iterations": 288,
+     "wallSecs": 28.4,
+     "elapsedSecs": 36.19,
+     "maxRssMiB": 2906.5,
+     "nashConv": 0.0442043368736007
+    },
+    "new": {
+     "iterations": 288,
+     "wallSecs": 28.05,
+     "elapsedSecs": 36.03,
+     "maxRssMiB": 2472.9,
+     "nashConv": 0.0442043368736007
+    },
+    "wallRatio": 0.9877,
+    "maxRssRatio": 0.8508,
+    "nashConvIdentical": true
+   },
+   {
+    "tag": "lockflop_f32_t32",
+    "head": {
+     "iterations": 368,
+     "wallSecs": 69.91,
+     "elapsedSecs": 82.97,
+     "maxRssMiB": 4664.2,
+     "nashConv": 0.010992488208179885
+    },
+    "new": {
+     "iterations": 369,
+     "wallSecs": 60.53,
+     "elapsedSecs": 72.78999999999999,
+     "maxRssMiB": 4638.0,
+     "nashConv": 0.010953669669989008
+    },
+    "wallRatio": 0.8658,
+    "maxRssRatio": 0.9944,
+    "nashConvIdentical": false
+   },
+   {
+    "tag": "lockturn_f32_t32",
+    "new": {
+     "iterations": 373,
+     "wallSecs": 60.97,
+     "elapsedSecs": 71.9,
+     "maxRssMiB": 4625.3,
+     "nashConv": 0.010813609325160844
+    }
+   },
+   {
+    "tag": "srp_f32_t16",
+    "head": {
+     "iterations": 389,
+     "wallSecs": 70.07,
+     "elapsedSecs": 82.07,
+     "maxRssMiB": 4298.7,
+     "nashConv": 0.010859778763689931
+    },
+    "new": {
+     "iterations": 389,
+     "wallSecs": 69.39,
+     "elapsedSecs": 81.7,
+     "maxRssMiB": 4128.6,
+     "nashConv": 0.010859778763689931
+    },
+    "wallRatio": 0.9903,
+    "maxRssRatio": 0.9604,
+    "nashConvIdentical": true
+   },
+   {
+    "tag": "srp_f32_t32",
+    "head": {
+     "iterations": 389,
+     "wallSecs": 63.84,
+     "elapsedSecs": 76.11,
+     "maxRssMiB": 4667.9,
+     "nashConv": 0.010859778763689931
+    },
+    "new": {
+     "iterations": 389,
+     "wallSecs": 63.39,
+     "elapsedSecs": 75.49,
+     "maxRssMiB": 4362.8,
+     "nashConv": 0.010859778763689931
+    },
+    "wallRatio": 0.993,
+    "maxRssRatio": 0.9346,
+    "nashConvIdentical": true
+   },
+   {
+    "tag": "srp_i16_t32",
+    "head": {
+     "iterations": 400,
+     "wallSecs": 70.2,
+     "elapsedSecs": 76.66,
+     "maxRssMiB": 2803.2,
+     "nashConv": 0.010643234835465698
+    },
+    "new": {
+     "iterations": 400,
+     "wallSecs": 55.93,
+     "elapsedSecs": 62.12,
+     "maxRssMiB": 2478.2,
+     "nashConv": 0.010643234835465698
+    },
+    "wallRatio": 0.7967,
+    "maxRssRatio": 0.8841,
+    "nashConvIdentical": true
+   }
+  ],
+  "diagnostic": []
+ },
+ "accept2": {
+  "old": "head",
+  "new": "new",
+  "bench": [],
+  "solve": [
+   {
+    "tag": "gtowb_i16_t32",
+    "head": {
+     "iterations": 351,
+     "wallSecs": 304.83,
+     "elapsedSecs": 333.52,
+     "maxRssMiB": 11784.7,
+     "nashConv": 0.010880424836600011
+    }
+   },
+   {
+    "tag": "lockturn_f32_t32",
+    "head": {
+     "iterations": 375,
+     "wallSecs": 72.8,
+     "elapsedSecs": 84.08,
+     "maxRssMiB": 4659.3,
+     "nashConv": 0.010847185780674007
+    },
+    "new": {
+     "iterations": 373,
+     "wallSecs": 61.63,
+     "elapsedSecs": 73.03,
+     "maxRssMiB": 4601.7,
+     "nashConv": 0.010813609325160844
+    },
+    "wallRatio": 0.8466,
+    "maxRssRatio": 0.9876,
+    "nashConvIdentical": false
+   }
+  ],
+  "diagnostic": []
+ },
+ "accept3": {
+  "old": "head",
+  "new": "new",
+  "bench": [],
+  "solve": [
+   {
+    "tag": "gtowb_i16_t32",
+    "new": {
+     "iterations": 351,
+     "wallSecs": 235.4,
+     "elapsedSecs": 264.26,
+     "maxRssMiB": 11106.3,
+     "nashConv": 0.010880424836600011
+    }
+   }
+  ],
+  "diagnostic": [
+   {
+    "config": "srp",
+    "variant": "head",
+    "evals": 0,
+    "afterBuildMiB": 351.4,
+    "peakMiB": 4228.2,
+    "secsPerIter": 0.1623239361,
+    "evaluateSecs": []
+   },
+   {
+    "config": "srp",
+    "variant": "head",
+    "evals": 2,
+    "afterBuildMiB": 351.5,
+    "peakMiB": 4450.8,
+    "secsPerIter": 0.1625604012,
+    "evaluateSecs": [
+     0.250045999,
+     0.247792301
+    ]
+   },
+   {
+    "config": "srp_lock_flop",
+    "variant": "new",
+    "evals": 0,
+    "afterBuildMiB": 186.6,
+    "peakMiB": 4205.6,
+    "secsPerIter": 0.1613313907,
+    "evaluateSecs": []
+   },
+   {
+    "config": "srp_lock_flop",
+    "variant": "new",
+    "evals": 2,
+    "afterBuildMiB": 186.9,
+    "peakMiB": 4419.7,
+    "secsPerIter": 0.1640269373,
+    "evaluateSecs": [
+     0.251215902,
+     0.247468785
+    ]
+   },
+   {
+    "config": "srp",
+    "variant": "new",
+    "evals": 0,
+    "afterBuildMiB": 143.4,
+    "peakMiB": 4158.4,
+    "secsPerIter": 0.160732826,
+    "evaluateSecs": []
+   },
+   {
+    "config": "srp",
+    "variant": "new",
+    "evals": 2,
+    "afterBuildMiB": 143.3,
+    "peakMiB": 4184.8,
+    "secsPerIter": 0.1619142096,
+    "evaluateSecs": [
+     0.219182084,
+     0.219566954
+    ]
+   }
+  ]
+ },
+ "crossVm": [
+  {
+   "tag": "gtowb_i16_t32",
+   "old": {
+    "vm": "accept2",
+    "iterations": 351,
+    "wallSecs": 304.83,
+    "elapsedSecs": 333.52,
+    "maxRssMiB": 11784.7,
+    "nashConv": 0.010880424836600011
+   },
+   "new": {
+    "vm": "accept3",
+    "iterations": 351,
+    "wallSecs": 235.4,
+    "elapsedSecs": 264.26,
+    "maxRssMiB": 11106.3,
+    "nashConv": 0.010880424836600011
+   },
+   "wallRatio": 0.7722,
+   "maxRssRatio": 0.9424,
+   "nashConvIdentical": true
+  }
+ ]
+}

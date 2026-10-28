@@ -1,0 +1,6 @@
+
+# Appended to flop_srp.toml: one partially locked flop node (BTN after BB checks).
+[[profile.lock]]
+node = "x"
+hands = "AA,KK,AKs,AKo"
+strategy = { check = 0.5 }

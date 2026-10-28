@@ -1,0 +1,17 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 3974.0 MiB (f32) / 2081.6 MiB (i16) / 3027.8 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=1.803e0 expl_p1=9.565e-1 nash_conv=2.760e0
+iter=      50 expl_p0=5.028e-1 expl_p1=3.015e-1 nash_conv=8.044e-1
+iter=     100 expl_p0=1.335e-1 expl_p1=7.684e-2 nash_conv=2.104e-1
+iter=     150 expl_p0=5.296e-2 expl_p1=2.573e-2 nash_conv=7.869e-2
+iter=     200 expl_p0=2.895e-2 expl_p1=1.412e-2 nash_conv=4.306e-2
+iter=     250 expl_p0=1.840e-2 expl_p1=1.080e-2 nash_conv=2.920e-2
+iter=     300 expl_p0=1.364e-2 expl_p1=8.694e-3 nash_conv=2.234e-2
+iter=     350 expl_p0=8.089e-3 expl_p1=5.595e-3 nash_conv=1.368e-2
+iter=     370 expl_p0=7.141e-3 expl_p1=5.079e-3 nash_conv=1.222e-2
+iter=     386 expl_p0=6.518e-3 expl_p1=4.820e-3 nash_conv=1.134e-2
+iter=     392 expl_p0=6.441e-3 expl_p1=4.763e-3 nash_conv=1.120e-2
+iter=     400 expl_p0=6.100e-3 expl_p1=4.543e-3 nash_conv=1.064e-2
+done: iterations=400 wall=70.20s ev_p0=1.516169 ev_p1=3.330413 nash_conv=1.064e-2
+sol: wrote /home/ubuntu/work/srp_i16_t32_head/solution.sol (495.34 MB, 434540 blocks, mode=Full)

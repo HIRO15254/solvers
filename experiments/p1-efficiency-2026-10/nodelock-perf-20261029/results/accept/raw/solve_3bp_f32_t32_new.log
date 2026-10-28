@@ -1,0 +1,14 @@
+tree: nodes=3087614 terminals=1973744 rank_tables=1176 storage=2070.2 MiB (f32) / 1043.5 MiB (i16) / 1556.8 MiB (i16-f32avg)
+memory estimate: 2254.8 MiB (f32) / 1228.2 MiB (i16) / 1741.5 MiB (i16-f32avg)
+storage: f32
+iter=      25 expl_p0=2.093e0 expl_p1=3.056e0 nash_conv=5.150e0
+iter=      50 expl_p0=6.786e-1 expl_p1=6.952e-1 nash_conv=1.374e0
+iter=     100 expl_p0=2.756e-1 expl_p1=2.931e-1 nash_conv=5.686e-1
+iter=     150 expl_p0=1.033e-1 expl_p1=1.197e-1 nash_conv=2.230e-1
+iter=     200 expl_p0=5.301e-2 expl_p1=5.484e-2 nash_conv=1.079e-1
+iter=     250 expl_p0=3.152e-2 expl_p1=3.025e-2 nash_conv=6.177e-2
+iter=     278 expl_p0=2.497e-2 expl_p1=2.306e-2 nash_conv=4.804e-2
+iter=     285 expl_p0=2.353e-2 expl_p1=2.158e-2 nash_conv=4.511e-2
+iter=     288 expl_p0=2.312e-2 expl_p1=2.109e-2 nash_conv=4.420e-2
+done: iterations=288 wall=28.05s ev_p0=16.586184 ev_p1=3.904091 nash_conv=4.420e-2
+sol: wrote /home/ubuntu/work/3bp_f32_t32_new/solution.sol (641.64 MB, 1107524 blocks, mode=Full)

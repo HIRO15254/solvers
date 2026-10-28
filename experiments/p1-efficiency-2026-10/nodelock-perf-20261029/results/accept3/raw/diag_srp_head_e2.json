@@ -1,0 +1,31 @@
+{
+  "actionNodes": 434540,
+  "afterBuildBytes": 368549888,
+  "allocSecs": 0.099025515,
+  "buildSecs": 0.519220013,
+  "cfrPrecision": "f32",
+  "config": "/home/ubuntu/work/srp.toml",
+  "deals": 77959,
+  "estimateF32Bytes": 3975682320,
+  "estimateI16Bytes": 1991317480,
+  "estimateI16F32avgBytes": 2983499900,
+  "evaluateSecs": [
+    0.250045999,
+    0.247792301
+  ],
+  "iterSecs": 1.6256040120000002,
+  "iters": 10,
+  "nashConv": 7.2087826557558135,
+  "nodeInfo": 434541,
+  "nodes": 1164212,
+  "peakBytes": 4666994688,
+  "prepareSecs": 0.013090088,
+  "secsPerIter": 0.1625604012,
+  "storage": "f32",
+  "storageElements": 496960290,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 3,
+  "warmupSecs": 0.447061011
+}

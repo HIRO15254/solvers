@@ -1,0 +1,426 @@
+{
+  "configHash": "58a572f0b7bae65a8b24e3e5c6deef9453673c149de3c3f9cddbeb4089ea9b4c",
+  "configSchema": "solvers.nlh/v1",
+  "evP0": 1.5307379462387853,
+  "evP1": 3.388668802728637,
+  "explP0": 0.006254351724667373,
+  "explP1": 0.0045592576004934715,
+  "gameKind": "hu-postflop",
+  "iterations": 373,
+  "kind": "hu-postflop",
+  "nashConv": 0.010813609325160844,
+  "profile": {
+    "frequencies": [],
+    "frozen_nodes": [],
+    "general_sum": false,
+    "summary": {
+      "iso_restricted": false,
+      "matched_hands": 22513,
+      "matched_nodes": 49,
+      "resolved_nodes": [
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[2c]",
+          "kind": "lock",
+          "node": 5,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[2h]",
+          "kind": "lock",
+          "node": 6,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[2s]",
+          "kind": "lock",
+          "node": 7,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[3c]",
+          "kind": "lock",
+          "node": 8,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[3d]",
+          "kind": "lock",
+          "node": 9,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[3h]",
+          "kind": "lock",
+          "node": 10,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[3s]",
+          "kind": "lock",
+          "node": 11,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[4c]",
+          "kind": "lock",
+          "node": 12,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[4d]",
+          "kind": "lock",
+          "node": 13,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[4h]",
+          "kind": "lock",
+          "node": 14,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[4s]",
+          "kind": "lock",
+          "node": 15,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[5c]",
+          "kind": "lock",
+          "node": 16,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[5d]",
+          "kind": "lock",
+          "node": 17,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[5h]",
+          "kind": "lock",
+          "node": 18,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[5s]",
+          "kind": "lock",
+          "node": 19,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[6c]",
+          "kind": "lock",
+          "node": 20,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[6d]",
+          "kind": "lock",
+          "node": 21,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[6h]",
+          "kind": "lock",
+          "node": 22,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[6s]",
+          "kind": "lock",
+          "node": 23,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[7c]",
+          "kind": "lock",
+          "node": 24,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[7d]",
+          "kind": "lock",
+          "node": 25,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[7s]",
+          "kind": "lock",
+          "node": 26,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[8c]",
+          "kind": "lock",
+          "node": 27,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[8d]",
+          "kind": "lock",
+          "node": 28,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[8h]",
+          "kind": "lock",
+          "node": 29,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[8s]",
+          "kind": "lock",
+          "node": 30,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[9c]",
+          "kind": "lock",
+          "node": 31,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[9d]",
+          "kind": "lock",
+          "node": 32,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[9h]",
+          "kind": "lock",
+          "node": 33,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[9s]",
+          "kind": "lock",
+          "node": 34,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Tc]",
+          "kind": "lock",
+          "node": 35,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Td]",
+          "kind": "lock",
+          "node": 36,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Th]",
+          "kind": "lock",
+          "node": 37,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Ts]",
+          "kind": "lock",
+          "node": 38,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Jc]",
+          "kind": "lock",
+          "node": 39,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Jd]",
+          "kind": "lock",
+          "node": 40,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Jh]",
+          "kind": "lock",
+          "node": 41,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Js]",
+          "kind": "lock",
+          "node": 42,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Qc]",
+          "kind": "lock",
+          "node": 43,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Qd]",
+          "kind": "lock",
+          "node": 44,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Qh]",
+          "kind": "lock",
+          "node": 45,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Qs]",
+          "kind": "lock",
+          "node": 46,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Kc]",
+          "kind": "lock",
+          "node": 47,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Kd]",
+          "kind": "lock",
+          "node": 48,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Kh]",
+          "kind": "lock",
+          "node": 49,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Ac]",
+          "kind": "lock",
+          "node": 50,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Ad]",
+          "kind": "lock",
+          "node": 51,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[Ah]",
+          "kind": "lock",
+          "node": 52,
+          "partial": false
+        },
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "xx[As]",
+          "kind": "lock",
+          "node": 53,
+          "partial": false
+        }
+      ],
+      "selectors": [
+        {
+          "kind": "lock",
+          "matched_hands": 22513,
+          "matched_nodes": 49,
+          "node": "xx[?]"
+        }
+      ]
+    }
+  },
+  "utilityUnit": "BB",
+  "wallSecs": 60.966631844
+}

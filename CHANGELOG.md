@@ -111,6 +111,19 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   now loads with one `decision` request instead of separate `actions` /
   `strategy` / `ev` requests.
 
+### Changed
+
+- Heads-up postflop solver speed and memory. Iterations with `i16` storage
+  are about 17–23% faster. Runs without a `[profile]` evaluate EV and best
+  response for both seats in one pass, about 10–16% faster, and their results
+  are unchanged bit for bit. Runs with a `[profile]` batch the subtrees that
+  no lock or incentive reaches, so they reached the stop target about 13–15%
+  sooner in the measured lock cases; their `f32` results differ slightly from
+  before. Identical terminal payoff tables are shared and, on Linux, the
+  memory used to build the tree is returned to the system before solving:
+  memory after the build is about 60–70% lower and peak memory about 4–28%
+  lower in the measured flop trees.
+
 ## [0.1.0] - 2026-10-16
 
 ### Added

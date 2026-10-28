@@ -1,0 +1,31 @@
+{
+  "actionNodes": 2293609,
+  "afterBuildBytes": 1745506304,
+  "allocSecs": 0.267605223,
+  "buildSecs": 2.439301067,
+  "cfrPrecision": "f32",
+  "config": "/home/ubuntu/cfg/c_gtowb.toml",
+  "deals": 320656,
+  "estimateF32Bytes": 21109207896,
+  "estimateI16Bytes": 10572952820,
+  "estimateI16F32avgBytes": 15841080358,
+  "evaluateSecs": [
+    1.2980149810000001,
+    1.302647061
+  ],
+  "iterSecs": 8.513414028,
+  "iters": 10,
+  "nashConv": 7.3467377852004425,
+  "nodeInfo": 2293610,
+  "nodes": 6088200,
+  "peakBytes": 12317544448,
+  "prepareSecs": 0.05291636,
+  "secsPerIter": 0.8513414027999999,
+  "storage": "i16",
+  "storageElements": 2638650987,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 3,
+  "warmupSecs": 2.1920513
+}

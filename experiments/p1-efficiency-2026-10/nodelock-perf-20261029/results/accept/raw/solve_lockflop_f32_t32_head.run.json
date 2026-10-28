@@ -1,0 +1,42 @@
+{
+  "configHash": "7b1a459422616071cf88eff1b97231513191f4b7335a6f3b75a9fce53931a1d1",
+  "configSchema": "solvers.nlh/v1",
+  "evP0": 1.5667357874716998,
+  "evP1": 3.316694625524481,
+  "explP0": 0.006520016234826009,
+  "explP1": 0.004472471973353875,
+  "gameKind": "hu-postflop",
+  "iterations": 368,
+  "kind": "hu-postflop",
+  "nashConv": 0.010992488208179885,
+  "profile": {
+    "frequencies": [],
+    "frozen_nodes": [],
+    "general_sum": false,
+    "summary": {
+      "iso_restricted": false,
+      "matched_hands": 21,
+      "matched_nodes": 1,
+      "resolved_nodes": [
+        {
+          "confidence": 1.0,
+          "entry": 0,
+          "history": "x",
+          "kind": "lock",
+          "node": 1,
+          "partial": true
+        }
+      ],
+      "selectors": [
+        {
+          "kind": "lock",
+          "matched_hands": 21,
+          "matched_nodes": 1,
+          "node": "x"
+        }
+      ]
+    }
+  },
+  "utilityUnit": "BB",
+  "wallSecs": 69.90568678
+}
