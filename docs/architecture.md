@@ -23,6 +23,10 @@
    config と実行 source の identity を検証証拠へ結び付ける。
 7. **oracle の独立性を守る。** `cfr-ref` は凍結し、hu-engine/hu-postflop と実装を共有しない。
    外部実装のcodeを流用しない規則は [AGENTS.md](../AGENTS.md)、第三者のライセンスは [LICENSE-POLICY.md](../LICENSE-POLICY.md) にある。
+8. **SIMDはLLVMの自動vectorizationを基本にする。** 手書きSIMDは実測で必要と分かった箇所だけ検討する。
+   thin LTOでは単一crateのpre-LTO assemblyから最終binaryのvectorizationを断定しない。監査は対象CPUの
+   linked binaryで行い、scalar命令の存在だけで最適化課題とせず、hot pathの寄与とA/B差を確認する。
+9. **module分割は責務と編集範囲で決める。** ファイル行数だけを理由に公開APIや形式versionを変えない。
 
 ## 1. crateの責務
 
@@ -257,6 +261,10 @@ testは計算層と利用者境界を分けて置く。
 
 整数構造の回帰pinは[P1 tree identity](../crates/hu-postflop/tests/tree_identity.rs)と
 [P2 tree identity](../crates/mw-preflop/tests/nlh_tree_identity.rs)にある。
+P2 tree identityはv1 public treeのnode数・整数状態・action順のhashを固定し、正規化前後の同一性を確認する。
+小規模例とfirst-actor上書きの明示拒否は通常suiteに含む。multi-million nodeの4件はignoredで、
+深さ・node数で打ち切らずにreleaseで明示実行する。木の入力は性能用と共用の`examples/bench/`、
+その他のP2 fixtureは`crates/mw-preflop/tests/fixtures/`にある。
 P2のabstraction identityは`crates/mw-preflop/tests/fixtures/tree_abstractions.json`で固定する。
 浮動小数点の戦略・EVはhashで固定しない。移動の検証では保存済みbaselineと同条件の実行を比較する。
 必須checkとexpensive ignored testは[development.md](development.md)、品質基準は

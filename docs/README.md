@@ -21,7 +21,7 @@
 | P1の初回配布（v0.1.0）の範囲・成果物・手順 | [配布計画](plans/release-v0.1.jp.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |
-| 環境準備・変更手順・検証・引継ぎ | [development.md](development.md)、[作業票テンプレート](plans/task-template.md) |
+| 環境準備・作業手順・検証・引継ぎ・性能計測・リリース | [development.md](development.md)、[作業票テンプレート](plans/task-template.md) |
 | 利用方法・結果の読み方 | [user-guide.jp.md](user-guide.jp.md) |
 
 ## 公開契約の正本

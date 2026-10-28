@@ -29,7 +29,8 @@ Read the relevant route rather than every long document for every change:
 | Config / CLI / artifacts | Common input `docs/nlh-input-v1.jp.md`, product specifications below, CLI reference and fixtures |
 | Daemon / viewer | `docs/app-architecture.md`, protocol and daemon tests |
 | Quality / measurement | Quality sections of `docs/products.jp.md`, `docs/plans/hu-postflop-validation/` |
-| Development / handoff | `docs/development.md` |
+| Development / handoff / verification | `docs/development.md` |
+| Performance measurement / cloud machines | `docs/development.md` §5 |
 | Third-party components and licenses | `LICENSE-POLICY.md` |
 
 - `crates/cfr-ref` is a frozen differential-testing oracle. Do not optimize it
@@ -65,7 +66,8 @@ removed legacy option.
 
 ## Required verification
 
-Before finishing a normal code change, run at minimum:
+Before finishing a normal code change, run at minimum the required checks of
+`docs/development.md` §3.1:
 
 ```text
 cargo fmt --all --check
@@ -73,8 +75,9 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-Expensive ignored tests run separately as described in `docs/development.md`
-and CI.
+Changes to `cli`, `daemon`, Cargo features or dependencies also need the
+P1-only distribution checks listed there. Per-change checks and expensive
+ignored tests are in §3.2-§3.4 and CI.
 
 ## User wiki
 
@@ -118,3 +121,11 @@ wiki change.
 - GTO Wizard solutions and values copied from them stay local and git-ignored
   (`packaging/gtow-local-only.json`, `.gitignore`); never commit or distribute
   them. Existing Git history is kept as-is (user decision, 2026-10-15).
+
+## Cloud compute
+
+Measure acceptance timing on the acceptance machine and launch AWS machines
+as `docs/development.md` §5.4-§5.5 specify (user decisions, 2026-10-28 and
+2026-10-29): choose the region by Spot placement score right before launching,
+launch with `create-fleet` over several instance types and every AZ subnet,
+and fix the instance type only for measurements that need it.
