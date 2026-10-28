@@ -11,6 +11,7 @@ use crate::storage::{StateMismatch, Storage, StorageRef, StorageSpan, StorageSta
 use crate::tree::{NodeId, NodeKind, PublicTree};
 
 mod batch;
+mod dual;
 
 /// Variant-owned terminal evaluation — the only variant code on the hot
 /// path, called per terminal or sibling batch per pass, amortized over all hands.
@@ -712,6 +713,9 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// asymmetric; for zero-sum games the sum is NashConv and half the sum
     /// is the conventional exploitability.
     pub fn exploitability(&self) -> PerPlayer<f64> {
+        if self.profile.is_none() && !self.game.zero_sum {
+            return self.evaluate().1;
+        }
         let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
         let (ev1, br1) = if self.game.zero_sum && !self.has_incentives() {
             let (_, br1) = self.ev_and_br::<false>(Player::P1);
@@ -726,8 +730,16 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// convention (including zero-sum accounting) is identical to
     /// `exploitability`; actual EVs are returned for both seats.
     pub fn evaluate(&self) -> (PerPlayer<f64>, PerPlayer<f64>) {
-        let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
-        let (ev1, br1) = self.ev_and_br::<true>(Player::P1);
+        let (ev0, br0, ev1, br1) = if self.profile.is_none() {
+            let values = dual::evaluate(&self.game, &self.storage, self.par);
+            let (ev0, br0) = values[Player::P0];
+            let (ev1, br1) = values[Player::P1];
+            (ev0, br0, ev1, br1)
+        } else {
+            let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
+            let (ev1, br1) = self.ev_and_br::<true>(Player::P1);
+            (ev0, br0, ev1, br1)
+        };
         (
             PerPlayer::new(ev0, ev1),
             PerPlayer::new(

@@ -37,14 +37,14 @@ impl MetadataLease {
 // Empty reference vectors contain no borrowed data. In-place collect recycles
 // their allocation across lifetimes; the standard library keeps the same layout.
 // Debug checks verify reuse, including after evaluator calls and size changes.
-fn shared_rows<'b>(mut rows: Vec<&[f32]>) -> Vec<&'b [f32]> {
+pub(super) fn shared_rows<'b>(mut rows: Vec<&[f32]>) -> Vec<&'b [f32]> {
     rows.clear();
     let allocation = rows.as_ptr();
     let result: Vec<_> = rows.into_iter().map(|_| unreachable!()).collect();
     debug_assert_eq!(allocation, result.as_ptr());
     result
 }
-fn mutable_rows<'b>(mut rows: Vec<&mut [f32]>) -> Vec<&'b mut [f32]> {
+pub(super) fn mutable_rows<'b>(mut rows: Vec<&mut [f32]>) -> Vec<&'b mut [f32]> {
     rows.clear();
     let allocation = rows.as_ptr();
     let result: Vec<_> = rows.into_iter().map(|_| unreachable!()).collect();

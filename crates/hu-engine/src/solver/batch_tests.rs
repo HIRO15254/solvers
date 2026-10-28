@@ -363,6 +363,96 @@ fn check<const PRUNE: bool>(
     maximum
 }
 #[test]
+fn dual_values_match_separate_passes_with_zero_reaches_and_chance() {
+    for threads in [1, 4] {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+            .install(|| {
+                for turn in [false, true] {
+                    for zero in [None, Some(Player::P0), Some(Player::P1)] {
+                        let (tree, evaluator) = fixture(turn);
+                        let ranges = PerPlayer::new(Player::P0, Player::P1).map(|p| {
+                            (0..evaluator.hands[p].len())
+                                .map(|h| {
+                                    if zero == Some(p) || h % 5 == 0 {
+                                        0.0
+                                    } else {
+                                        (h + 1) as f32 / 31.0
+                                    }
+                                })
+                                .collect()
+                        });
+                        let game = CompiledGame {
+                            tree,
+                            evaluator,
+                            root_ranges: ranges,
+                            normalizer: 1.0,
+                            zero_sum: false,
+                        };
+                        let mut storage =
+                            F32Storage::new(game.tree.storage_len, game.tree.storage_refs.len());
+                        let discounts = Discounts {
+                            pos: 1.0,
+                            neg: 1.0,
+                            avg: 1.0,
+                            floor_neg: false,
+                            reset_avg: false,
+                        };
+                        for node in game
+                            .tree
+                            .nodes
+                            .iter()
+                            .filter(|n| n.kind == NodeKind::Action)
+                        {
+                            let sref = game.tree.storage_ref(node);
+                            let weights: Vec<_> = (0..sref.len())
+                                .map(|i| if i % 3 == 0 { 0.0 } else { (i % 7 + 1) as f32 })
+                                .collect();
+                            storage.accumulate_strategy(sref, sref.index, &weights, &discounts);
+                        }
+                        let par = ParConfig::default();
+                        let actual = super::super::dual::evaluate(&game, &storage, par);
+                        for p in Player::BOTH {
+                            let ctx = ValueCtx {
+                                tree: &game.tree,
+                                evaluator: &game.evaluator,
+                                storage: &storage,
+                                p,
+                                par,
+                                profile: None,
+                                incentives: true,
+                            };
+                            let mut ev = vec![0.0; game.root_ranges[p].len()];
+                            let mut br = ev.clone();
+                            value_pass::<_, _, _, true, true, false>(
+                                &ctx,
+                                &mut Scratch::new(),
+                                0,
+                                &game.root_ranges[p.opponent()],
+                                &mut ev,
+                                &mut br,
+                                &no_record,
+                                par.chance_depth,
+                            );
+                            let aggregate = |values: &[f32]| {
+                                game.root_ranges[p]
+                                    .iter()
+                                    .zip(values)
+                                    .map(|(&r, &v)| r as f64 * v as f64)
+                                    .sum::<f64>()
+                            };
+                            assert_eq!(actual[p].0.to_bits(), aggregate(&ev).to_bits());
+                            assert_eq!(actual[p].1.to_bits(), aggregate(&br).to_bits());
+                        }
+                    }
+                }
+            });
+    }
+}
+
+#[test]
 fn river_and_turn_values_and_updates_match_recursive_with_and_without_prune() {
     rayon::ThreadPoolBuilder::new()
         .num_threads(1)
