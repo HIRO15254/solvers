@@ -181,6 +181,7 @@ fn bench<S: Storage>(
     let deals = tree.deals.len();
     let transitions = tree.transitions.len();
     let transition_entries: usize = tree.transitions.iter().map(|t| t.entries.len()).sum();
+    hu_postflop::run::trim_builder_heap();
     let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
 

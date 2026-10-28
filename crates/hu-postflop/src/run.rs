@@ -361,7 +361,19 @@ pub fn build_profiled(
     } else {
         None
     };
+    drop(built.node_info);
+    trim_builder_heap();
     Ok((built.game, index, resolved))
+}
+
+/// Return freed builder pages to the system when using glibc's allocator.
+/// Other platforms and allocators need no explicit trimming.
+pub fn trim_builder_heap() {
+    #[cfg(all(target_os = "linux", target_env = "gnu"))]
+    {
+        // SAFETY: malloc_trim accepts a padding value and accesses no Rust data.
+        unsafe { libc::malloc_trim(0) };
+    }
 }
 
 /// State for the frequency targets installed with a profile.
