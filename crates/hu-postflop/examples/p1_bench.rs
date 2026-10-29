@@ -34,6 +34,7 @@ struct Args {
     bands: bool,
     experiment_base: Option<PathBuf>,
     experiment_mode: Option<String>,
+    experiment_timing: Option<Vec<u64>>,
 }
 
 fn parse_args() -> Result<Args> {
@@ -49,6 +50,7 @@ fn parse_args() -> Result<Args> {
         bands: false,
         experiment_base: None,
         experiment_mode: None,
+        experiment_timing: None,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -69,6 +71,14 @@ fn parse_args() -> Result<Args> {
             "--bands" => parsed.bands = true,
             "--experiment-base" => parsed.experiment_base = Some(value()?.into()),
             "--experiment-mode" => parsed.experiment_mode = Some(value()?),
+            "--experiment-timing" => {
+                parsed.experiment_timing = Some(
+                    value()?
+                        .split(',')
+                        .map(str::parse)
+                        .collect::<Result<_, _>>()?,
+                );
+            }
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
             other => config = Some(PathBuf::from(other)),
@@ -442,9 +452,27 @@ fn warm_experiment<S: Storage>(
     let started = Instant::now();
     let mut hits = Vec::new();
     let mut next = target;
+    if let Some(points) = &args.experiment_timing
+        && (points.len() != 2 || points[0] > points[1] || points[1] > args.iters)
+    {
+        bail!("--experiment-timing requires two ordered iteration counts within --iters");
+    }
     for added in 0..=args.iters {
+        if args
+            .experiment_timing
+            .as_ref()
+            .is_some_and(|points| !points.contains(&added))
+        {
+            if added < args.iters {
+                solver.step();
+            }
+            continue;
+        }
         let (ev, expl) = solver.evaluate();
         let nash = expl[Player::P0] + expl[Player::P1];
+        if args.experiment_timing.is_some() && nash / 2.0 > next {
+            bail!("lab-derived target was not met at iteration {added}");
+        }
         if nash / 2.0 <= next {
             let true_ev = solver.true_expected_values();
             hits.push(serde_json::json!({
