@@ -21,7 +21,7 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
 
-## [0.2.0] - 2026-10-29
+## [0.2.0] - 2026-10-30
 
 ### Removed
 
@@ -195,9 +195,10 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   resubmits it. A run canceled before it started has no checkpoint and is not
   resumable; submit a new run instead.
 - The P1-only distribution's `--help` lists only the commands and options that
-  build supports (no `derive`, `evaluate` or preflop-only flags), uses
-  user-facing solver names, and `resume --help` describes heads-up `.ckpt`
-  checkpoints.
+  build supports (no `derive`, `evaluate`, `--cache-dir` or preflop-only
+  flags), uses user-facing solver names, and `resume --help` describes
+  heads-up `.ckpt` checkpoints. Its `--version` suffix is now
+  `heads-up postflop only` (was `P1 only`).
 
 ## [0.1.0] - 2026-10-16
 

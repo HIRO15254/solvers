@@ -83,6 +83,7 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 |---|---|---|
 | RD6 CPU基準 | [配布バイナリのCPU基準（SOL-40）](release-2026-10/cpu-baseline-20261015/README.md) | 2026-10-15。i7-10700KFでx86-64・v2・v3・nativeを交互3回。NashConvは4種でbit一致。flop_3bp 16tでv3はx86-64の0.76〜0.83倍（native同等）、v2は0.81〜0.96倍。共有PCで雑音大。RD6（v3と`compat`のv2を配布）の根拠 |
 | D7・RD1–RD6 v0.1.0受入 | [P1 v0.1.0の受入（SOL-46）](release-2026-10/v0.1.0-acceptance/README.md) | 2026-10-15。release workflowは6 buildとsmokeがsuccess。`--include-ignored`の受入は1071 pass（P2の1件はSOL-47として除外）。初めて実行したignored試験の不備を3件直した |
+| RV1–RV3 v0.2.0受入 | [P1 v0.2.0の受入（SOL-58）](release-2026-10/v0.2.0-acceptance/README.md) | 2026-10-29〜30。release workflowは6 buildとnoticesがsuccess（第三者表記を再生成）。`--include-ignored`の受入はP2の1件（SOL-47）を除外。配布archiveのGUIで、profile編集・Lock & re-solve・上流固定・River再solve・待機中runのcancelと再起動を確認 |
 
 ### 品質・参照
 
