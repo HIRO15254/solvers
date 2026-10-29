@@ -76,10 +76,60 @@ impl Api {
     ///
     /// Reject external profile paths before the CLI can resolve them.
     pub fn validate(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
+        let mut response = self.validate_config(request)?;
+        if request.freeze_base_run_id.is_some() {
+            let mut config: toml::Value =
+                response.effective_config_toml.parse().map_err(internal)?;
+            if let Some(profile) = config
+                .get_mut("profile")
+                .and_then(toml::Value::as_table_mut)
+            {
+                profile.remove("freeze_upstream");
+            }
+            response.effective_config_toml = toml::to_string(&config).map_err(internal)?;
+        }
+        Ok(response)
+    }
+
+    fn validate_config(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
         reject_external_profile(&request.config_toml)?;
+        let config_text = if let Some(run_id) = request.freeze_base_run_id.as_deref() {
+            let (_, solution) = self.freeze_source(run_id)?;
+            let mut config: toml::Value =
+                request
+                    .config_toml
+                    .parse()
+                    .map_err(|error: toml::de::Error| {
+                        ErrorResponse::new(ErrorCode::InvalidConfig, error.to_string())
+                    })?;
+            let table = config.as_table_mut().ok_or_else(|| {
+                ErrorResponse::new(ErrorCode::InvalidConfig, "config must be a table")
+            })?;
+            let profile = table
+                .entry("profile")
+                .or_insert_with(|| toml::Value::Table(Default::default()));
+            let profile = profile.as_table_mut().ok_or_else(|| {
+                ErrorResponse::new(ErrorCode::InvalidConfig, "profile must be a table")
+            })?;
+            let mut freeze = toml::map::Map::new();
+            let path = solution.to_str().ok_or_else(|| {
+                ErrorResponse::new(
+                    ErrorCode::InvalidRequest,
+                    "source solution path is not valid UTF-8",
+                )
+            })?;
+            freeze.insert(
+                "solution".to_string(),
+                toml::Value::String(path.to_string()),
+            );
+            profile.insert("freeze_upstream".to_string(), toml::Value::Table(freeze));
+            toml::to_string(&config).map_err(internal)?
+        } else {
+            request.config_toml.clone()
+        };
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
-        std::fs::write(&config, &request.config_toml).map_err(internal)?;
+        std::fs::write(&config, &config_text).map_err(internal)?;
         let effective = scratch.path().join("effective.toml");
 
         let mut command = Command::new(&self.solver);
@@ -175,9 +225,10 @@ impl Api {
     /// before the CLI is started.
     pub fn create_run(&self, request: &CreateRunRequest) -> ApiResult<CreateRunResponse> {
         let effective = self
-            .validate(&ValidateRequest {
+            .validate_config(&ValidateRequest {
                 config_toml: request.config_toml.clone(),
                 resources: false,
+                freeze_base_run_id: request.freeze_base_run_id.clone(),
             })
             .map_err(|error| match error.code {
                 ErrorCode::InvalidConfig if mentions_a_path(&error.message) => ErrorResponse::new(
@@ -194,38 +245,58 @@ impl Api {
         self.submit_config(
             &effective.effective_config_toml,
             request.run_id.as_deref(),
-            None,
+            request.freeze_base_run_id.as_deref(),
         )
     }
 
-    /// Merge through the CLI; only this endpoint may introduce a host path,
-    /// and that path is selected by the CLI from the source run itself.
-    pub fn relock(&self, run_id: &str, request: &RelockRequest) -> ApiResult<CreateRunResponse> {
+    fn freeze_source(&self, run_id: &str) -> ApiResult<(std::path::PathBuf, std::path::PathBuf)> {
+        let directory = self
+            .runs
+            .directory(run_id)
+            .map_err(|error| ErrorResponse::new(ErrorCode::InvalidRequest, error.to_string()))?;
+        let root = self.runs.path().canonicalize().map_err(internal)?;
+        let source = match directory.canonicalize() {
+            Ok(path) => path,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return Err(ErrorResponse::new(
+                    ErrorCode::NotFound,
+                    format!("no run {run_id:?}"),
+                ));
+            }
+            Err(error) => return Err(internal(error)),
+        };
+        if !source.starts_with(&root) {
+            return Err(ErrorResponse::new(
+                ErrorCode::InvalidRequest,
+                "source is outside the runs root",
+            ));
+        }
         let summary = self.run(run_id)?;
-        let source = self.runs.directory(run_id).map_err(internal)?;
+        let solution_path = source.join(runfiles::RUN_HU_SOLUTION_FILE);
         if !matches!(
             summary.state,
             RunState::Completed | RunState::Canceled | RunState::Interrupted
         ) || summary.game_kind != "hu-postflop"
-            || !source.join(runfiles::RUN_HU_SOLUTION_FILE).is_file()
+            || !solution_path.is_file()
         {
             return Err(ErrorResponse::new(
                 ErrorCode::Conflict,
                 "source must be a stopped P1 run with a solution",
             ));
         }
-        let root = self.runs.path().canonicalize().map_err(internal)?;
-        let source = source.canonicalize().map_err(internal)?;
-        let solution = source
-            .join(runfiles::RUN_HU_SOLUTION_FILE)
-            .canonicalize()
-            .map_err(internal)?;
-        if !source.starts_with(&root) || !solution.starts_with(&source) {
+        let solution = solution_path.canonicalize().map_err(internal)?;
+        if !solution.starts_with(&source) {
             return Err(ErrorResponse::new(
                 ErrorCode::InvalidRequest,
-                "source solution is outside the runs root",
+                "source solution is outside the run directory",
             ));
         }
+        Ok((source, solution))
+    }
+
+    /// Merge through the CLI using a daemon-managed source.
+    pub fn relock(&self, run_id: &str, request: &RelockRequest) -> ApiResult<CreateRunResponse> {
+        let (source, _) = self.freeze_source(run_id)?;
         reject_external_profile(&request.profile_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let fragment = scratch.path().join("profile.toml");

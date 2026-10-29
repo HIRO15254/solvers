@@ -413,6 +413,36 @@ fn relock_rejects_runs_without_a_p1_solution() {
     let (status, error) = daemon.post(&format!("/v1/runs/{run_id}/relock"), &body);
     assert_eq!(status, 409, "{error}");
     assert_eq!(error["code"], "conflict");
+    let request = serde_json::json!({
+        "configToml": "schema = \"solvers.nlh/v1\"\n",
+        "freezeBaseRunId": run_id
+    })
+    .to_string();
+    for endpoint in ["/v1/validate", "/v1/runs"] {
+        let (status, error) = daemon.post(endpoint, &request);
+        assert_eq!(status, 409, "{error}");
+        assert_eq!(error["code"], "conflict");
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn freeze_rejects_symlinked_source_outside_runs_root() {
+    use std::os::unix::fs::symlink;
+
+    let daemon = Daemon::start(1);
+    let outside = tempfile::tempdir().unwrap();
+    symlink(outside.path(), daemon.runs.join("outside")).unwrap();
+    let request = serde_json::json!({
+        "configToml": "schema = \"solvers.nlh/v1\"\n",
+        "freezeBaseRunId": "outside"
+    })
+    .to_string();
+    for endpoint in ["/v1/validate", "/v1/runs"] {
+        let (status, error) = daemon.post(endpoint, &request);
+        assert_eq!(status, 400, "{error}");
+        assert_eq!(error["code"], "invalid-request");
+    }
 }
 
 #[test]
@@ -806,6 +836,44 @@ strategy = { "bet 10" = 1.0 }
                 .enumerate()
                 .all(|(i, p)| i == bet || p == 0.0)
         );
+    }
+
+    let freeze_request = serde_json::json!({
+        "configToml": config,
+        "freezeBaseRunId": run_id
+    })
+    .to_string();
+    let (status, validated) = daemon.post("/v1/validate", &freeze_request);
+    assert_eq!(status, 200, "{validated}");
+    let effective = validated["effectiveConfigToml"].as_str().unwrap();
+    assert!(!effective.contains("freeze_upstream"), "{effective}");
+    let submit = serde_json::json!({
+        "configToml": effective,
+        "freezeBaseRunId": run_id
+    })
+    .to_string();
+    let (status, frozen) = daemon.post("/v1/runs", &submit);
+    assert_eq!(status, 200, "{frozen}");
+    let frozen_id = frozen["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(frozen_id);
+    assert_eq!(finished["state"], "completed", "{finished}");
+    assert_eq!(finished["relockedFrom"], run_id);
+    let frozen_config =
+        std::fs::read_to_string(daemon.runs.join(frozen_id).join("run.toml")).unwrap();
+    assert!(frozen_config.contains("freeze_upstream"));
+    let missing =
+        serde_json::json!({"configToml": config, "freezeBaseRunId": "missing"}).to_string();
+    for endpoint in ["/v1/validate", "/v1/runs"] {
+        let (status, error) = daemon.post(endpoint, &missing);
+        assert_eq!(status, 404, "{error}");
+        let traversal =
+            serde_json::json!({"configToml": config, "freezeBaseRunId": "../outside"}).to_string();
+        let (status, error) = daemon.post(endpoint, &traversal);
+        assert_eq!(status, 400, "{error}");
+        let injected = serde_json::json!({"configToml": "[profile]\nfreeze_upstream = { solution = '/host/secret' }\n", "freezeBaseRunId": run_id}).to_string();
+        let (status, error) = daemon.post(endpoint, &injected);
+        assert_eq!(status, 400, "{error}");
+        assert_eq!(error["code"], "config-not-self-contained");
     }
 
     let fragment =

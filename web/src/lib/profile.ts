@@ -12,6 +12,50 @@ export interface PendingLock {
   confidence?: number;
 }
 
+export interface PendingIncentive {
+  node: string;
+  hands?: string;
+  category?: string;
+  action: string;
+  pot?: number;
+  bb?: number;
+}
+
+export interface PendingFrequency {
+  node: string;
+  hands?: string;
+  category?: string;
+  action: string;
+  target: number;
+}
+
+export type PendingEntry =
+  | { kind: "lock"; value: PendingLock }
+  | { kind: "incentive"; value: PendingIncentive }
+  | { kind: "frequency"; value: PendingFrequency };
+
+export function queuedProfile(entries: PendingEntry[]): { lock?: PendingLock[]; incentive?: PendingIncentive[]; frequency?: PendingFrequency[] } {
+  const profile: { lock?: PendingLock[]; incentive?: PendingIncentive[]; frequency?: PendingFrequency[] } = {};
+  for (const entry of entries) {
+    if (entry.kind === "lock") (profile.lock ??= []).push(entry.value);
+    else if (entry.kind === "incentive") (profile.incentive ??= []).push(entry.value);
+    else (profile.frequency ??= []).push(entry.value);
+  }
+  return profile;
+}
+/** Validate and construct an action-based entry from the editor's current values. */
+export function actionProfileEntry(kind: "incentive" | "frequency", node: string, selector: { hands?: string; category?: string }, actions: string[], action: string, amount: string, unit: string): PendingEntry {
+  if (!actions.includes(action)) throw new Error("Select an available action.");
+  const number = amount.trim() === "" ? NaN : Number(amount);
+  if (!Number.isFinite(number)) throw new Error(kind === "frequency" ? "Enter a target frequency between 0 and 1." : "Enter a finite bonus.");
+  if (kind === "frequency") {
+    if (number < 0 || number > 1) throw new Error("Enter a target frequency between 0 and 1.");
+    return { kind, value: { node, ...selector, action, target: number } };
+  }
+  return { kind, value: { node, ...selector, action, ...(unit === "pot" ? { pot: number } : { bb: number }) } };
+}
+
+
 export function classesToRange(classes: Iterable<string>): string {
   const selected = new Set(classes);
   return ALL_CLASSES.filter((name) => selected.has(name)).join(",");
@@ -40,9 +84,9 @@ export function roundedStrategy(probabilities: number[]): string[] {
   });
 }
 
-export function relockPayload(locks: PendingLock[], replace: boolean, freezeUpstream: boolean): RelockRequest {
+export function relockPayload(entries: PendingEntry[], replace: boolean, freezeUpstream: boolean): RelockRequest {
   return {
-    profileToml: stringify({ profile: { lock: locks } }),
+    profileToml: stringify({ profile: queuedProfile(entries) }),
     replace,
     freezeUpstream,
     clearProfile: false,

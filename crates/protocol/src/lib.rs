@@ -43,6 +43,9 @@ pub struct ValidateRequest {
     /// a tree walk, so it is opt-in.
     #[serde(default)]
     pub resources: bool,
+    /// Daemon-managed stopped P1 run whose solution freezes upstream play.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub freeze_base_run_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -94,6 +97,9 @@ pub struct CreateRunRequest {
     /// absent, and rejects a name that is not a single path component.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<String>,
+    /// Daemon-managed stopped P1 run whose solution freezes upstream play.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub freeze_base_run_id: Option<String>,
 }
 
 /// `POST /v1/runs/{id}/relock` -- derive a run from a P1 solution.
