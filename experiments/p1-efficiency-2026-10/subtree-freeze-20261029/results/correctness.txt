@@ -1,0 +1,7 @@
+lab r6a.8xlarge, f32 storage and CFR precision, 16 threads; BLAKE3 of f32 regret and strategy-sum bits and exact JSON comparison of per-root EV/BR:
+lock_flop 50 IDENTICAL
+lock_flop 200 IDENTICAL
+lock_turn 50 IDENTICAL
+lock_turn 200 IDENTICAL
+lock_deep 50 IDENTICAL
+lock_deep 200 IDENTICAL

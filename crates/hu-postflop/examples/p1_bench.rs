@@ -11,7 +11,8 @@
 //!
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
-//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16|i16-f32avg] [--json PATH] [--bands]
+//!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16|i16-f32avg] [--json PATH] [--bands] \
+//!     [--subtree-only] [--subtree-target NASH_CONV_BB] [--hash-subtree] [--combined-base]
 //! ```
 
 use std::path::{Path, PathBuf};
@@ -32,6 +33,10 @@ struct Args {
     storage: Option<StorageKind>,
     json: Option<PathBuf>,
     bands: bool,
+    subtree_only: bool,
+    subtree_target: Option<f64>,
+    hash_subtree: bool,
+    combined_base: bool,
 }
 
 fn parse_args() -> Result<Args> {
@@ -45,6 +50,10 @@ fn parse_args() -> Result<Args> {
         storage: None,
         json: None,
         bands: false,
+        subtree_only: false,
+        subtree_target: None,
+        hash_subtree: false,
+        combined_base: false,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -62,6 +71,10 @@ fn parse_args() -> Result<Args> {
                     other => bail!("unknown storage {other}"),
                 })
             }
+            "--subtree-only" => parsed.subtree_only = true,
+            "--subtree-target" => parsed.subtree_target = Some(value()?.parse()?),
+            "--hash-subtree" => parsed.hash_subtree = true,
+            "--combined-base" => parsed.combined_base = true,
             "--bands" => parsed.bands = true,
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
@@ -192,6 +205,36 @@ fn bench<S: Storage>(
         game.evaluator.hands.len(Player::P0),
         game.evaluator.hands.len(Player::P1),
     ];
+    let targets = if let Some(profile) = &resolved {
+        if p.document
+            .spot
+            .profile
+            .as_ref()
+            .is_some_and(|p| p.freeze_upstream.is_some())
+        {
+            if !profile.targets.is_empty()
+                && (args.subtree_only || args.subtree_target.is_some() || args.hash_subtree)
+            {
+                bail!("subtree experiment does not support frequency controllers");
+            }
+            profile
+                .summary
+                .resolved_nodes
+                .iter()
+                .filter(|n| !matches!(n.kind, hu_postflop::profile::ResolvedNodeKind::Frozen))
+                .map(|n| n.node)
+                .collect::<std::collections::BTreeSet<_>>()
+        } else {
+            Default::default()
+        }
+    } else {
+        Default::default()
+    };
+    if (args.subtree_only || args.subtree_target.is_some() || args.hash_subtree)
+        && targets.is_empty()
+    {
+        bail!("subtree experiment requires freeze_upstream and profile targets");
+    }
     hu_postflop::run::trim_builder_heap();
     let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
@@ -208,10 +251,24 @@ fn bench<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
+    let roots = subtree_roots(&solver, &index, &targets);
+    let subtree_elements: usize = roots
+        .iter()
+        .map(|r| {
+            let span = solver.game().tree.storage_spans[r.node as usize];
+            span.end - span.start
+        })
+        .sum();
     let alloc_secs = t.elapsed().as_secs_f64();
 
     let t = Instant::now();
-    solver.run(args.warmup);
+    for _ in 0..args.warmup {
+        if args.subtree_only {
+            solver.step_subtrees(&roots);
+        } else {
+            solver.step();
+        }
+    }
     let warmup_secs = t.elapsed().as_secs_f64();
 
     let t = Instant::now();
@@ -220,7 +277,11 @@ fn bench<S: Storage>(
     if args.bands {
         for _ in 0..args.iters {
             let step_start = Instant::now();
-            solver.step();
+            if args.subtree_only {
+                solver.step_subtrees(&roots);
+            } else {
+                solver.step();
+            }
             let seconds = step_start.elapsed().as_secs_f64();
             let iteration = solver.iteration();
             if iteration <= 50 {
@@ -244,11 +305,97 @@ fn bench<S: Storage>(
             }
         }
     } else {
-        solver.run(args.iters);
+        for _ in 0..args.iters {
+            if args.subtree_only {
+                solver.step_subtrees(&roots);
+            } else {
+                solver.step();
+            }
+            if let Some(target) = args.subtree_target
+                && solver.iteration().is_multiple_of(10)
+            {
+                let gain = solver.evaluate_subtrees(&roots);
+                if gain[Player::P0] + gain[Player::P1] <= target {
+                    break;
+                }
+            }
+        }
     }
     // With --bands this wall interval includes the two sampled evaluations;
     // the per-band step times above exclude evaluation.
     let iter_secs = t.elapsed().as_secs_f64();
+    let subtree_hash = if args.hash_subtree {
+        let hu_engine::StorageArrays::F32 {
+            regrets,
+            strategy_sum,
+        } = solver.storage().arrays()
+        else {
+            bail!("subtree hash requires f32 storage");
+        };
+        let mut hash = blake3::Hasher::new();
+        for root in &roots {
+            let span = solver.game().tree.storage_spans[root.node as usize];
+            for values in [
+                &regrets[span.start..span.end],
+                &strategy_sum[span.start..span.end],
+            ] {
+                for chunk in values.chunks(1024) {
+                    let mut bytes = [0u8; 4096];
+                    for (value, out) in chunk.iter().zip(bytes.chunks_exact_mut(4)) {
+                        out.copy_from_slice(&value.to_bits().to_le_bytes());
+                    }
+                    hash.update(&bytes[..chunk.len() * 4]);
+                }
+            }
+        }
+        Some(hash.finalize().to_hex().to_string())
+    } else {
+        None
+    };
+    if args.combined_base {
+        if !args.subtree_only {
+            bail!("--combined-base requires --subtree-only");
+        }
+        let freeze = p
+            .document
+            .spot
+            .profile
+            .as_ref()
+            .and_then(|profile| profile.freeze_upstream.as_ref())
+            .context("--combined-base requires freeze_upstream")?;
+        let base = hu_postflop::artifact::load_sol(Path::new(&freeze.solution), 0, None)?;
+        let tree = &solver.game().tree;
+        let spans: Vec<_> = roots
+            .iter()
+            .map(|r| tree.storage_spans[r.node as usize])
+            .collect();
+        let outside: Vec<_> = tree
+            .nodes
+            .iter()
+            .enumerate()
+            .filter(|(_, n)| n.kind == hu_engine::NodeKind::Action)
+            .filter_map(|(id, n)| {
+                let r = tree.storage_ref(n);
+                (!spans
+                    .iter()
+                    .any(|s| s.sref_start <= r.index && r.index < s.sref_end))
+                .then_some((id as hu_engine::NodeId, r))
+            })
+            .collect();
+        let iteration = solver.iteration();
+        solver.restore_stream(iteration, |storage| -> Result<()> {
+            let hu_engine::StorageArraysMut::F32 { strategy_sum, .. } = storage.arrays_mut() else {
+                bail!("--combined-base requires f32 storage");
+            };
+            for (id, r) in outside {
+                let strategy = base
+                    .stored_strategy(id)?
+                    .with_context(|| format!("base lacks node {id}"))?;
+                strategy_sum[r.offset..r.offset + r.len()].copy_from_slice(&strategy);
+            }
+            Ok(())
+        })?;
+    }
 
     let mut evaluate_secs = Vec::new();
     let mut nash_conv = f64::NAN;
@@ -258,9 +405,17 @@ fn bench<S: Storage>(
         evaluate_secs.push(t.elapsed().as_secs_f64());
         nash_conv = expl[Player::P0] + expl[Player::P1];
     }
+    let mut subtree_evaluate_secs = Vec::new();
+    let mut subtree_gain = nlh::PerPlayer::new(0.0, 0.0);
+    for _ in 0..args.evals.max(1) {
+        let t = Instant::now();
+        subtree_gain = solver.evaluate_subtrees(&roots);
+        subtree_evaluate_secs.push(t.elapsed().as_secs_f64());
+    }
+    let completed_iters = solver.iteration() - args.warmup;
     let peak = memory::peak_bytes();
-    let per_iter = if args.iters > 0 {
-        iter_secs / args.iters as f64
+    let per_iter = if completed_iters > 0 {
+        iter_secs / completed_iters as f64
     } else {
         f64::NAN
     };
@@ -299,7 +454,7 @@ fn bench<S: Storage>(
         "allocSecs": alloc_secs,
         "warmupIters": args.warmup,
         "warmupSecs": warmup_secs,
-        "iters": args.iters,
+        "iters": completed_iters,
         "iterSecs": iter_secs,
         "secsPerIter": per_iter,
         "evaluateSecs": evaluate_secs,
@@ -307,6 +462,27 @@ fn bench<S: Storage>(
         "afterBuildBytes": after_build_mem,
         "peakBytes": peak,
     });
+    report["subtreeStorageElements"] = serde_json::json!(subtree_elements);
+    report["subtreeRoots"] = serde_json::json!(roots.len());
+    report["subtreeOnly"] = serde_json::json!(args.subtree_only);
+    report["combinedBase"] = serde_json::json!(args.combined_base);
+    report["subtreeNashConv"] =
+        serde_json::json!(subtree_gain[Player::P0] + subtree_gain[Player::P1]);
+    report["subtreeHash"] = serde_json::json!(subtree_hash);
+    report["subtreeEvaluateSecs"] = serde_json::json!(subtree_evaluate_secs);
+    if args.hash_subtree {
+        let values: Vec<_> = solver
+            .subtree_values(&roots)
+            .iter()
+            .map(|v| {
+                [
+                    [v[Player::P0].0, v[Player::P0].1],
+                    [v[Player::P1].0, v[Player::P1].1],
+                ]
+            })
+            .collect();
+        report["subtreeValues"] = serde_json::json!(values);
+    }
     if args.bands {
         report["iterationBands"] = serde_json::json!(bands);
     }
@@ -316,6 +492,51 @@ fn bench<S: Storage>(
     }
     drop(index);
     Ok(())
+}
+
+fn subtree_roots<S: Storage>(
+    solver: &Solver<hu_postflop::PostflopEvaluator, S>,
+    index: &GameIndex,
+    targets: &std::collections::BTreeSet<hu_engine::NodeId>,
+) -> Vec<hu_engine::SubtreeRoot> {
+    let game = solver.game();
+    let tree = &game.tree;
+    targets
+        .iter()
+        .filter_map(|&node| {
+            let path = hu_engine::path_from_root(&index.parents, node);
+            if path[..path.len() - 1].iter().any(|id| targets.contains(id)) {
+                return None;
+            }
+            let reach = hu_engine::reach_on_path(
+                tree,
+                nlh::PerPlayer::new(
+                    game.root_ranges[Player::P0].as_slice(),
+                    game.root_ranges[Player::P1].as_slice(),
+                ),
+                &path,
+                |id, _, out| out.copy_from_slice(&solver.average_strategy_at(id)),
+            );
+            let mut chance_weight = 1.0;
+            let mut chance_depth = 0;
+            for hop in path.windows(2) {
+                let parent = tree.node(hop[0]);
+                if parent.kind == hu_engine::NodeKind::Chance {
+                    chance_depth += 1;
+                    chance_weight *= f64::from(
+                        tree.deal(parent, (hop[1] - parent.first_child) as usize)
+                            .weight,
+                    );
+                }
+            }
+            Some(hu_engine::SubtreeRoot {
+                node,
+                reach,
+                chance_weight,
+                chance_depth,
+            })
+        })
+        .collect()
 }
 
 mod memory {

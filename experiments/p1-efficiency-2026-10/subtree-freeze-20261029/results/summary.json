@@ -1,0 +1,158 @@
+{
+  "lock_deep/16": {
+    "subtree": {
+      "fullEvaluateSecs": 0.247151978,
+      "peakBytes": 4222775296,
+      "secsPerIter": 0.00119347315,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.001635454,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 3083550,
+      "targetFixedWorkSecs": 0.014530366,
+      "targetIterations": 10,
+      "targetSubtreeNashConv": 0.004155003215254424
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.244620431,
+      "peakBytes": 4311764992,
+      "secsPerIter": 0.17766018749999998,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.001545218,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 3083550,
+      "targetFixedWorkSecs": 1.728197881,
+      "targetIterations": 10,
+      "targetSubtreeNashConv": 0.004155003215254424
+    }
+  },
+  "lock_deep/32": {
+    "subtree": {
+      "fullEvaluateSecs": 0.218466621,
+      "peakBytes": 4283015168,
+      "secsPerIter": 0.00106813225,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.001676807,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 3083550,
+      "targetFixedWorkSecs": 0.013879963,
+      "targetIterations": 10,
+      "targetSubtreeNashConv": 0.004155003215254424
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.219848198,
+      "peakBytes": 4470665216,
+      "secsPerIter": 0.15887454855,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.001626674,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 3083550,
+      "targetFixedWorkSecs": 1.5545255359999999,
+      "targetIterations": 10,
+      "targetSubtreeNashConv": 0.004155003215254424
+    }
+  },
+  "lock_flop/16": {
+    "subtree": {
+      "fullEvaluateSecs": 0.243926763,
+      "peakBytes": 4312068096,
+      "secsPerIter": 0.11657675215,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.157699617,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 324027120,
+      "targetFixedWorkSecs": 47.850497499,
+      "targetIterations": 370,
+      "targetSubtreeNashConv": 0.0109406869524582
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.244037479,
+      "peakBytes": 4312928256,
+      "secsPerIter": 0.177801924,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.157479734,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 324027120,
+      "targetFixedWorkSecs": 70.384006665,
+      "targetIterations": 370,
+      "targetSubtreeNashConv": 0.0109406869524582
+    }
+  },
+  "lock_flop/32": {
+    "subtree": {
+      "fullEvaluateSecs": 0.218702179,
+      "peakBytes": 4479197184,
+      "secsPerIter": 0.10437994660000001,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.143210643,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 324027120,
+      "targetFixedWorkSecs": 43.159866929,
+      "targetIterations": 370,
+      "targetSubtreeNashConv": 0.0109406869524582
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.21847344,
+      "peakBytes": 4466114560,
+      "secsPerIter": 0.1584021646,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.142642487,
+      "subtreeRoots": 1,
+      "subtreeStorageElements": 324027120,
+      "targetFixedWorkSecs": 63.126849491,
+      "targetIterations": 370,
+      "targetSubtreeNashConv": 0.0109406869524582
+    }
+  },
+  "lock_turn/16": {
+    "subtree": {
+      "fullEvaluateSecs": 0.235008003,
+      "peakBytes": 4252659712,
+      "secsPerIter": 0.059793888149999995,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.076700946,
+      "subtreeRoots": 49,
+      "subtreeStorageElements": 151093950,
+      "targetFixedWorkSecs": 6.039152285,
+      "targetIterations": 90,
+      "targetSubtreeNashConv": 0.010135411774451764
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.233727552,
+      "peakBytes": 4334374912,
+      "secsPerIter": 0.17360322165,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.077048364,
+      "subtreeRoots": 49,
+      "subtreeStorageElements": 151093950,
+      "targetFixedWorkSecs": 16.232565726,
+      "targetIterations": 90,
+      "targetSubtreeNashConv": 0.010135411774451764
+    }
+  },
+  "lock_turn/32": {
+    "subtree": {
+      "fullEvaluateSecs": 0.208057191,
+      "peakBytes": 4337258496,
+      "secsPerIter": 0.05930379695,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.077989864,
+      "subtreeRoots": 49,
+      "subtreeStorageElements": 151093950,
+      "targetFixedWorkSecs": 5.918038033,
+      "targetIterations": 90,
+      "targetSubtreeNashConv": 0.010135411774451764
+    },
+    "whole": {
+      "fullEvaluateSecs": 0.208874871,
+      "peakBytes": 4512522240,
+      "secsPerIter": 0.15507659565,
+      "storageElements": 496960290,
+      "subtreeEvaluateSecs": 0.078860633,
+      "subtreeRoots": 49,
+      "subtreeStorageElements": 151093950,
+      "targetFixedWorkSecs": 14.67374416,
+      "targetIterations": 90,
+      "targetSubtreeNashConv": 0.010135411774451764
+    }
+  }
+}

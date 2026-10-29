@@ -1,0 +1,5 @@
+lab r6a.8xlarge, 32 threads, flop_srp.toml, storage auto selected f32, target 0.1% pot.
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32)
+iter=389 expl_p0=6.698e-3 expl_p1=4.162e-3 nash_conv=1.086e-2
+done: iterations=389 wall=153.31s ev_p0=1.516387 ev_p1=3.331021 nash_conv=1.086e-2
+sol: wrote /work/subtree-base/solution.sol (1111.91 MB, 434540 blocks, mode=Full)

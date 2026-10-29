@@ -84,6 +84,54 @@ pub(super) fn evaluate<E: TerminalEvaluator, S: Storage>(
     })
 }
 
+pub(super) fn evaluate_subtrees<E: TerminalEvaluator, S: Storage>(
+    game: &CompiledGame<E>,
+    storage: &S,
+    profile: Option<&InstalledProfile>,
+    par: ParConfig,
+    roots: &[SubtreeRoot],
+) -> Vec<PerPlayer<(f64, f64)>> {
+    let ctx = Ctx {
+        game,
+        storage,
+        profile,
+        par,
+    };
+    let mut results = Vec::with_capacity(roots.len());
+    for root in roots {
+        let mut result = PerPlayer::new((0.0, 0.0), (0.0, 0.0));
+        with_worker_scratch(|scratch| {
+            let d0 = root.reach[Player::P0].len();
+            let d1 = root.reach[Player::P1].len();
+            let mut values = scratch.take(2 * (d0 + d1));
+            pass(
+                &ctx,
+                scratch,
+                root.node,
+                PerPlayer::new(&root.reach[Player::P0], &root.reach[Player::P1]),
+                &mut values,
+                par.chance_depth.saturating_sub(root.chance_depth),
+                false,
+            );
+            for (p, start, dim) in [(Player::P0, 0, d0), (Player::P1, 2 * d0, d1)] {
+                let mut ev = 0.0;
+                let mut br = 0.0;
+                for (h, &reach) in root.reach[p].iter().enumerate() {
+                    ev += f64::from(reach) * f64::from(values[start + h]);
+                    br += f64::from(reach) * f64::from(values[start + dim + h]);
+                }
+                result[p] = (
+                    root.chance_weight * ev / game.normalizer,
+                    root.chance_weight * br / game.normalizer,
+                );
+            }
+            scratch.put(values);
+        });
+        results.push(result);
+    }
+    results
+}
+
 // A seat can be pruned only when its opponent's reach is zero. The other seat
 // may still need the subtree, even if its own reach is zero.
 #[allow(clippy::too_many_arguments)]

@@ -1,0 +1,52 @@
+{
+  "actionNodes": 434540,
+  "afterBuildBytes": 182337536,
+  "allocSecs": 0.121643181,
+  "buildSecs": 5.809035237,
+  "cfrPrecision": "f32",
+  "combinedBase": false,
+  "config": "/work/bin-SubtreeFreeze/frozen_lock_turn.toml",
+  "deals": 77959,
+  "estimateCheckpointBytes": 461373440,
+  "estimateF32Bytes": 3975682320,
+  "estimateGameBytes": 114741595,
+  "estimateI16Bytes": 1991317480,
+  "estimateI16F32avgBytes": 2983499900,
+  "estimateProfileBytes": 104289600,
+  "estimateRequiredBytes": 5087448256,
+  "estimateResidentBytes": 650392496,
+  "estimateThreadBytes": 12207360,
+  "evaluateSecs": [
+    0.210422278
+  ],
+  "gameHeapBytes": 100658835,
+  "hands": [
+    479,
+    436
+  ],
+  "iterSecs": 5.918038033,
+  "iters": 90,
+  "maxDeals": 49,
+  "maxDepth": 13,
+  "nashConv": 23.124155416962086,
+  "nodeInfo": null,
+  "nodes": 1164212,
+  "peakBytes": 4313055232,
+  "prepareSecs": 1.511971272,
+  "secsPerIter": 0.06575597814444445,
+  "storage": "f32",
+  "storageElements": 496960290,
+  "subtreeEvaluateSecs": [
+    0.077435864
+  ],
+  "subtreeHash": null,
+  "subtreeNashConv": 0.010135411774451764,
+  "subtreeOnly": true,
+  "subtreeRoots": 49,
+  "subtreeStorageElements": 151093950,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 0,
+  "warmupSecs": 2.7e-7
+}
