@@ -21,6 +21,7 @@ pub mod input;
 pub mod test_support;
 
 mod aggregate;
+mod base_map;
 mod equity;
 mod hands;
 pub use hands::PostflopHands;
