@@ -193,7 +193,7 @@ C4で次の候補とした2点を実装した（利用者指示「現在判明�
 | [AVX-512 build](../../experiments/p1-efficiency-2026-10/avx512-20261029/README.md) | Zen 4・Sapphire Rapidsでv3・v4・nativeを比較。i16の評価はv4で最大約14%短いが、1反復はZen 4で全条件v3より遅く、5%以上の一貫した改善なし | 不採用（RD6のまま） |
 | [i16の精度床とauto](../../experiments/p1-efficiency-2026-10/storage-floor-20261029/README.md) | i16は後半に0.02〜0.09% pot付近で停滞・悪化、i16-f32avgは0.005〜0.03% pot付近まで下がる。32 threadの1反復はi16-f32avgがi16とほぼ同じ（flop_srp 0.137 / 0.135秒、f32 0.156秒）。floorを事前に予測する規則は得られない | PF11を維持 |
 | [freeze_upstream時の部分木solve](../../experiments/p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 固定祖先の下の最大対象部分木だけを走査（`p1_bench --subtree-only`、engineの部分木pass）。全木走査とbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。全木storageのまま。部分木の停止時点で全木NashConvは基準解の残差を含め0.011〜0.018 BB | 利用者判断で案Aを採用（PF12、C7で実装） |
-| [relock warm start](../../experiments/p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増える。regret保持・sum消去は4 profileとも0.91〜0.98倍の反復。対象nodeの戦略差が残る | 自動では採らない。opt-inにするかは利用者判断（試作は`3f153de6`に残す） |
+| [relock warm start](../../experiments/p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増える。regret保持・sum消去は4 profileとも0.91〜0.98倍の反復。対象nodeの戦略差が残る | 追加調査（C7）の後、利用者決定で見送り（試作は`3f153de6`に残す） |
 
 実験索引は[`experiments/README.md`](../../experiments/README.md)を「現在の実装を支える実験」と「詳細・履歴」に分けた。
 dev・labのSpotは06:04（UTC）、代わりのlabは06:56に回収され、c_gtowbの深い曲線とwarm startの一部の重みは未測定のまま残る。
@@ -220,4 +220,4 @@ dev・labのSpotは06:04（UTC）、代わりのlabは06:56に回収され、c_g
   checkpoint引継ぎとcoldの差が精度とともに縮み、0.01% potで真EV差−0.00019 / −0.00038 BB、到達重み付き戦略差0.018（cold自身の
   0.05%→0.01%の変化は0.040）。永続的な偏りの証拠は無いが、同一極限の証明でもない。反復の削減はturnの小さいincentive
   （+1%・+5% pot）で0.1% potまで304〜368反復あり、+20% potでは16反復、flop incentive・lock併用では逆に増える。checkpointは3.03 GBで
-  setupが約6.8秒増える。製品化は利用者判断待ち。
+  setupが約6.8秒増える。利用者決定（2026-10-29）により製品化は見送る（試作は`b0bc637b`に残す）。

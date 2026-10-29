@@ -113,10 +113,10 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 
 ## 詳細・履歴
 
-以下は不採用・利用者判断待ち・後継に置換・過去の診断・local-onlyの記録。記載された判断は当時の条件に限る。
+以下は不採用・後継に置換・過去の診断・local-onlyの記録。記載された判断は当時の条件に限る。
 各報告の「次」「active」「完了」は当時の記述で、現在の開発優先順位や実行許可ではない。
 
-### P1の不採用・判断待ち・過去の比較
+### P1の不採用・過去の比較
 
 | 状態 | 記録 | 内容 |
 |---|---|---|
@@ -128,8 +128,8 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 | 不採用 RBP・MCCFR・PGO | [P1 RBP・MCCFR warm start・PGO](p1-efficiency-2026-10/rejected-20261009/README.md) | 2026-10-09。刈れる仕事は最大約25%で、RBPは全変種で目標到達が遅い。MC warm startは20,000反復でも7%pot。PGOは速くならない |
 | v4に置換 | [P1 `.sol` v3の索引付きchunkと部分読込み（SOL-14）](p1-io-2026-10/sol-index-20261012/README.md) | 2026-10-12。c001/c013のexportを22→3.2秒・92→38.6秒、peakを4.3→0.33 GB・10.7→2.8 GBに縮めた。summaryはmetadataだけで0.04秒。export出力はbaseとbyte一致した。`--node`の繰り返しで4 nodeを1回の読込みで出せる |
 | 不採用 C6 AVX-512 | [AVX-512 CPU基準の比較](p1-efficiency-2026-10/avx512-20261029/README.md) | 2026-10-29。Zen 4（c7a）とSapphire Rapids（c7i）でx86-64-v3・v4・nativeを交互3回。i16の評価はv4で最大約14%短いが、1反復はAMDで全条件v3より遅く、5%以上の一貫した改善なし。NashConvは全variantでbit一致。v4配布は追加しない |
-| 利用者判断待ち C6 relock warm start | [relock warm startの実験](p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | 2026-10-29。checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増え、対象nodeの戦略差が残る。regret保持・sum消去・反復番号0は4 profileとも0.91〜0.98倍の反復。warm開始の初期化はlock_flopで約8秒（bench）。試作sourceは`3f153de6` |
-| 利用者判断待ち C7 warm startの収束差 | [relock warm start: 収束差と適用範囲](p1-efficiency-2026-10/relock-warm-start-bias-20261029/README.md) | 2026-10-29。turn incentive（+5% pot）でwarm・coldの差は0.01% potまでに真EV −0.00019 / −0.00038 BB、到達重み付き戦略差0.018へ縮み、cold自身の0.05%→0.01%の変化（0.040）より小さい。残る差は接戦hand。効果はturnの小さいincentiveだけで、+20% pot・flop incentive・lock併用では無いか遅い。checkpointは3.03 GB、setupが約6.8秒増える。試作sourceは`b0bc637b` |
+| 不採用 C6 relock warm start | [relock warm startの実験](p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | 2026-10-29。checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増え、対象nodeの戦略差が残る。regret保持・sum消去・反復番号0は4 profileとも0.91〜0.98倍の反復。warm開始の初期化はlock_flopで約8秒（bench）。試作sourceは`3f153de6`。利用者決定（2026-10-29）で見送り |
+| 不採用 C7 warm startの収束差 | [relock warm start: 収束差と適用範囲](p1-efficiency-2026-10/relock-warm-start-bias-20261029/README.md) | 2026-10-29。turn incentive（+5% pot）でwarm・coldの差は0.01% potまでに真EV −0.00019 / −0.00038 BB、到達重み付き戦略差0.018へ縮み、cold自身の0.05%→0.01%の変化（0.040）より小さい。残る差は接戦hand。効果はturnの小さいincentiveだけで、+20% pot・flop incentive・lock併用では無いか遅い。checkpointは3.03 GB、setupが約6.8秒増える。試作sourceは`b0bc637b`。利用者決定（2026-10-29）で見送り |
 
 ### 旧Multiway・参照
 

@@ -48,6 +48,8 @@ incentive_turn、追加反復数とcheckpoint−cold差（真EVはP0/P1、目的
 
 明示opt-inの候補としては、同一の木・range・payoff・algorithm・storageと検証されたf32 checkpointから、incentive変更後に新規runを作り、変更後objectiveの実NashConvで停止する場合に限って検討できる。turnの小変更は0.1%で304〜368反復、0.05%で300〜375反復削減したが、0.20では効果は小さく、flopやlock併用ではcheckpointが遅い。個々のhand戦略への厳しい一致を必要とする場合は、より深く解きcold等と比較すべき。自動採用、速度保証、i16への一般化、GUI lockへの一般化は推奨しない。checkpoint欠落やidentity不一致は明示拒否し、由来と方式を記録する必要がある。製品optionの実装・安全性検証は今回の対象外。
 
+利用者決定（2026-10-29）: 効果がturnの小さいincentive変更に限られ、GUIのLock & re-solve（lockだけを追加する）では得にならないため、製品化を見送る。
+
 ## 正しさ
 
 各閾値の実NashConvを再評価。0.1/0.05%の反復数は前回のincentive_turnと一致する。到達重みは片側の実現重みでありjoint distributionではない。action EVは対象nodeでのみ記録し、将来incentiveのある一般profileにはそのまま適用しない。異thread数比較、全node比較、複数spot、flop checkpointの0.05%到達、および単独checkpoint load計時は未実施。devで`cargo fmt --all --check`、`cargo clippy --workspace --all-targets -- -D warnings`、`cargo test --workspace`を実行し成功。labは08:42 UTCにterminate要求、Spotのみ使用。
