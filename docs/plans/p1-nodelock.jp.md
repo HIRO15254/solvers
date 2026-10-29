@@ -26,7 +26,7 @@ nodelockとして扱わず、上流nodeのlockで表す。Restricted Nash Respon
 | NL2 | incentive（action価値への加点）は利得への加点として扱い、上流の判断にも伝わる。上流を動かしたくない場合は「上流の固定」を別optionで指定する |
 | NL3 | 「Top pairのcheck 50%」は、combo単位（各comboが50%）のlockと、集計頻度（category全体で50%、どのcomboかはsolverが選ぶ）の目標の両方を提供する。集計頻度は既定でrunoutごとに数える |
 | NL4 | ソフトlock（確率pでlock戦略、1−pで自由に最適化）を入れる |
-| NL5 | 配布v0.1.0（D7）には含めない。後の配布で含める |
+| NL5 | 配布v0.1.0（D7）には含めない。後の配布で含める（配布v0.2.0、[計画](release-v0.2.jp.md)） |
 | NL6 | （2026-10-29）上流固定の部分木solveは自動で使う（PF12、[資源効率計画](p1-efficiency.jp.md)）。relockのwarm startは採らない |
 | NL7 | （2026-10-29）N0〜N5の後に残った制限を解除する: GUIのLock & re-solveでincentive・頻度目標、GUIのSetupからdaemon管理下のrunを基準にした上流固定、頻度目標と上流固定の部分木solve、suit非対称selectorと上流固定、no-riversとRiver上のprofile。あわせて上流固定runのmemory見積りを実測に合わせる |
 

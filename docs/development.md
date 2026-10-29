@@ -307,4 +307,4 @@ sh packaging/third-party.sh --check    # 書き込まずに照合する
 `v*` tagをpushすると[Release](../.github/workflows/release.yml)が動く。tagとworkspace versionの一致（`packaging/check-version.sh`）、
 第三者表記の照合、Web GUIのbuild、4 targetのP1専用archive（Windows・Linuxはx86-64-v3の既定とx86-64-v2の`compat`）のbuildとsmoke、
 `SHA256SUMS`と`CHANGELOG.md`から作るnoteを付けたdraft Releaseの作成までを行う。公開は手動である。
-v0.1.0の範囲と手順は[配布計画](plans/release-v0.1.jp.md)、利用者向けwikiの規則は[AGENTS.md](../AGENTS.md)にある。
+v0.1.0の範囲と手順は[配布計画](plans/release-v0.1.jp.md)、v0.2.0は[v0.2.0の配布計画](plans/release-v0.2.jp.md)、利用者向けwikiの規則は[AGENTS.md](../AGENTS.md)にある。

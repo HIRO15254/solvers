@@ -21,6 +21,7 @@
 | S4 | [P2: NLH Multiway Preflop Solver](https://linear.app/sapphire2/project/p2-nlh-multiway-preflop-solver-e08558d9acd9) | P2の方式決定（製品定義D5）・品質・性能 |
 | S5 | [GUI](https://linear.app/sapphire2/project/gui-98f3f562437d) | daemon経由のWeb GUI |
 | 配布 | 親Issue [SOL-35](https://linear.app/sapphire2/issue/SOL-35)（Project「P1: NLH HU Postflop Solver」。GUIの子SOL-38は「GUI」） | 製品定義D7。P1 v0.1.0のGitHub Release |
+| 配布v0.2.0 | 親Issue [SOL-58](https://linear.app/sapphire2/issue/SOL-58)（Project「P1: NLH HU Postflop Solver」） | 製品定義D8・NL5。P1 v0.2.0のGitHub Release |
 | S6 | 親Issue [SOL-50](https://linear.app/sapphire2/issue/SOL-50)（Project「P1: NLH HU Postflop Solver」） | 製品定義D8。P1のNodelock・相手profile |
 | 旧R0 | [対象・精度・資源を具体化](https://linear.app/sapphire2/project/r0-対象精度資源を具体化-85e7cbef4a16) | 全Issue完了。旧手順書はtagに残る |
 | 旧R1 | [HU検証と汎用ゲーム境界](https://linear.app/sapphire2/project/r1-hu検証と汎用ゲーム境界-078f73df767b) | SOL-9・SOL-10は対象外の完了記録として残し、SOL-11はCanceled |
@@ -38,7 +39,8 @@
 | S4-1a、S4-1b | SOL-26、SOL-27（SOL-25の子Issue） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)第5節 |
 | P1速度・資源改善（T1〜T26、S5） | SOL-15（T1〜T26）、SOL-32（S5以降の継続） | [P1性能計画](plans/p1-performance.jp.md)第3節、[P1資源効率計画](plans/p1-efficiency.jp.md) |
 | 配布 手順1〜11 | SOL-36〜SOL-46（SOL-35の子Issue。手順との対応は計画の表） | [配布計画](plans/release-v0.1.jp.md)第3節 |
-| Nodelock N0〜N5 | SOL-51〜SOL-56（SOL-50の子Issue、N0=SOL-51から番号順） | [P1 Nodelock・相手profile計画](plans/p1-nodelock.jp.md)第5節 |
+| 配布v0.2.0 手順1〜7 | SOL-59、SOL-49、SOL-48、SOL-60〜SOL-63（SOL-58の子Issue。手順との対応は計画の表） | [v0.2.0の配布計画](plans/release-v0.2.jp.md)第3節 |
+| Nodelock N0〜N6 | SOL-51〜SOL-57（SOL-50の子Issue、N0=SOL-51から番号順） | [P1 Nodelock・相手profile計画](plans/p1-nodelock.jp.md)第5節 |
 
 設計・受入上の必須前提はGitの計画で定義する。Linearのblocked-byは実行時の待ち関係を表す。
 必須前提が変わった場合は計画を更新し、その影響をLinearの待ち関係へ反映する。
