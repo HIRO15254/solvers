@@ -6,9 +6,10 @@ BASE=${2:?base run directory}
 OUT=${3:?output directory}
 HERE=$(cd "$(dirname "$0")" && pwd)
 mkdir -p "$OUT"
-date -u +%FT%TZ > "$OUT/start.txt"
+test -f "$OUT/start.txt" || date -u +%FT%TZ > "$OUT/start.txt"
 for profile in lock_flop lock_turn incentive_turn strong_lock; do
   for mode in cold checkpoint reset-restart reset-continue strategy-0.1 strategy-1 strategy-10; do
+    test -s "$OUT/$profile-$mode.json" && continue
     echo "$(date -u +%FT%TZ) $profile $mode" >&2
     "$BIN" "$HERE/configs/$profile.toml" --storage f32 --threads 32 --iters 1200 \
       --experiment-base "$BASE" --experiment-mode "$mode" --json "$OUT/$profile-$mode.json" \

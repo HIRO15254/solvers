@@ -405,7 +405,12 @@ fn warm_experiment<S: Storage>(
                 bail!("strategy weight must be positive and finite");
             }
             let refs = tree.storage_refs.clone();
-            let nodes = tree.nodes.clone();
+            let mut node_for_ref = vec![0; refs.len()];
+            for (id, node) in tree.nodes.iter().enumerate() {
+                if node.kind == NodeKind::Action {
+                    node_for_ref[node.aux as usize] = id as u32;
+                }
+            }
             solver.restore_stream(0, |storage| {
                 let StorageArraysMut::F32 {
                     regrets,
@@ -414,13 +419,9 @@ fn warm_experiment<S: Storage>(
                 else {
                     bail!("experiment supports f32 only");
                 };
-                for (id, node) in nodes.iter().enumerate() {
-                    if node.kind != NodeKind::Action {
-                        continue;
-                    }
-                    let r = refs[node.aux as usize];
+                for (r, node) in refs.iter().zip(node_for_ref) {
                     let strategy = sol
-                        .stored_strategy(id as u32)?
+                        .stored_strategy(node)?
                         .context("solution must contain all streets")?;
                     for (slot, probability) in regrets[r.offset..r.offset + strategy.len()]
                         .iter_mut()
