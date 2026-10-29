@@ -1130,3 +1130,43 @@ fn a_restart_picks_up_a_run_that_was_still_queued() {
     let recovered = restarted.await_terminal(&waiting_id);
     assert_eq!(recovered["state"], "completed");
 }
+
+#[test]
+fn cancelling_a_queued_run_survives_restart() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_in(home.path(), 1);
+    let (_, blocking) = daemon.post("/v1/runs", &config("BLOCK"));
+    assert_eq!(blocking["state"], "running");
+    let (_, waiting) = daemon.post("/v1/runs", &config("cancel-queued"));
+    assert_eq!(waiting["state"], "queued");
+    let id = waiting["runId"].as_str().unwrap().to_string();
+    let (status, canceled) = daemon.post(&format!("/v1/runs/{id}/cancel"), "");
+    assert_eq!(status, 200);
+    assert_eq!(canceled["state"], "canceled");
+    assert_eq!(canceled["resumable"], false);
+    let manifest_path = daemon.runs.join(&id).join("manifest.json");
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&manifest_path).unwrap()).unwrap();
+    assert_eq!(manifest["state"], "canceled");
+    assert!(manifest["finishedUnixMs"].is_number());
+    let (_, summary) = daemon.get(&format!("/v1/runs/{id}"));
+    assert_eq!(summary["state"], "canceled");
+    let (_, list) = daemon.get("/v1/runs");
+    assert!(
+        list["runs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|run| run["runId"] == id
+                && run["state"] == "canceled"
+                && run["resumable"] == false)
+    );
+    drop(daemon);
+    let restarted = Daemon::start_in(home.path(), 1);
+    let (_, summary) = restarted.get(&format!("/v1/runs/{id}"));
+    assert_eq!(summary["state"], "canceled");
+    assert_eq!(summary["resumable"], false);
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(manifest_path).unwrap()).unwrap();
+    assert_eq!(manifest["state"], "canceled");
+}

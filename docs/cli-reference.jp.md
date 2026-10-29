@@ -603,7 +603,7 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 | `GET` | `/v1/runs/{id}/artifacts` | 契約上のartifact一覧 |
 | `GET` | `/v1/runs/{id}/artifacts/{name}` | artifact本体 |
 | `GET` | `/v1/runs/{id}/solution/{view}?format=csv&node=SELECTOR&restOfStreet=true&resolve=rivers` | P1の`.sol` / P2の`.mwsol`をCLI exportで照会。`node`・`restOfStreet`・`resolve=rivers`・`decision` viewはP1のみ、`node`は繰り返し可 |
-| `POST` | `/v1/runs/{id}/cancel` | 協調停止（Unix: SIGINT、Windows: Ctrl-Break）。送れなければ`internal` |
+| `POST` | `/v1/runs/{id}/cancel` | queue中は保存して取り消し、実行中は協調停止（Unix: SIGINT、Windows: Ctrl-Break）。保存・送信に失敗すると`internal` |
 | `POST` | `/v1/runs/{id}/resume` | 再開 |
 | `GET` / `HEAD` | `/`とAPI以外のpath | UIが明示指定または自動検出されたとき、tokenなしで静的asset / SPA fallback |
 
@@ -636,7 +636,9 @@ daemonは一時fileへ本文を書き、`solvers tree CONFIG --format json`へ�
 認証は他の`/v1`と同じbearer token、未認証は401、起動/I/O/JSON出力の失敗は`internal`である。
 外部sourceを使うconfigは、先に`validate --write-effective`でinline化してから送る。
 
-cancelはCLIの1回目のCtrl-C / SIGINTと同じ境界停止であり、checkpointを保存して`canceled`になる。
+queue中のcancelは`canceled`をmanifestへ保存し、再起動後も再投入しない。未開始runにはcheckpointが無く
+`resumable: false`であり、再計算には新規runを投入する。実行中のcancelはCLIの1回目のCtrl-C / SIGINTと
+同じ境界停止であり、checkpointの存在により再開可能かが決まる。
 Windowsのdaemonは子を別process groupで起動し、そのgroupへCtrl-Breakを送る。consoleを持たないdaemonでは
 送信できないため、成功を装わず`internal`を返す。daemonのconsoleへのCtrl-Cは子のsolveへ届かない。
 

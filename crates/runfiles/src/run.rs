@@ -110,7 +110,7 @@ pub enum RunState {
     Running,
     Completed,
     Failed,
-    /// Stopped on request, with a checkpoint written first.
+    /// Stopped on request, either before starting or during execution.
     Canceled,
     /// The owning process died without recording an outcome.
     Interrupted,

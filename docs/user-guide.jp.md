@@ -477,8 +477,10 @@ P1の`resolve=rivers`はno-riversで未保存のRiver節点を`export --resolve-
 Riverのlock・incentive・固定祖先は再solveにも適用され、frequencyは元runの最終λを固定して使う。基準`.sol`は閲覧に不要で、再solveの値は元runの保存値ではない。
 同じnodeの`actions`・`strategy`・`ev`は`GET /v1/runs/{id}/solution/decision?node=...`の1 requestにまとめられる（P1のみ、JSONのみ）。
 `restOfStreet=true`を付けると各nodeの後にそのstreetの残りのaction nodeも返す。Riverの入口に付ければ1回の再solveでそのRiverの全action nodeが得られる。
-cancelは1回目のCtrl-Cと同じく境界で止まりcheckpointを保存する。Windowsではdaemonを
-consoleのある端末から起動する（console無しではcancelが`internal` errorになる）。
+queue中のcancelは`canceled`として保存され、daemonを再起動しても実行されない。未開始runにはcheckpointが無く
+resumeできないため、再計算には新規runを投入する。実行中のcancelは1回目のCtrl-Cと同じく境界で止まり、
+checkpointがあればresumeできる。Windowsではdaemonをconsoleのある端末から起動する
+（console無しでは実行中runのcancelが`internal` errorになる）。
 
 ### Web GUI
 

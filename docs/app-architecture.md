@@ -141,7 +141,10 @@ relockのprofile mergeは`solvers relock --print-config`、solveは通常のjob�
 ### R11. queued run もディスク上に存在する
 
 job 受理時に `run.toml` と `queued` manifest を書く。起動時は queued run を再投入するが、
-interrupted run を自動 resume しない。計算の再実行は明示要求を受けて行う。
+interrupted run を自動 resume しない。queue中の cancel は manifest を atomic に `canceled` に
+更新してから dequeue し、再起動時も再投入しない。未開始なら checkpoint が無いため
+`resumable: false` であり、再計算には新規 run を投入する。
+計算の再実行は明示要求を受けて行う。
 
 CLI の `create_or_adopt` は absent/empty directory と、引き取り可能な queued directory を受け付ける。
 queued の場合は manifest の状態と、`manifest.json` / `run.toml` / `stdout.log` に限定された内容を確認し、
@@ -180,13 +183,14 @@ auto再開は`progress.jsonl`のcheckpoint iteration以下の評価行を使い�
 
 ```text
 queued ──spawn──▶ running ──正常終了──▶ completed
-                     ├── 失敗 ──────▶ failed
-                     ├── cancel ────▶ canceled
-                     └── pid 消滅 ──▶ interrupted
+   │                 ├── 失敗 ──────▶ failed
+   │                 ├── cancel ────▶ canceled
+   │                 └── pid 消滅 ──▶ interrupted
+   └── cancel ──▶ canceled
 ```
 
 `interrupted` は owning process が正常な終了状態を書けなかったことを reader が判断した状態。
-cancel は solver の協調停止を使い、checkpoint の存在と状態を確認して resumable を判断する。
+実行中の cancel は solver の協調停止を使い、checkpoint の存在と状態を確認して resumable を判断する。
 recording開始後の失敗は`run.json`の書込み失敗を含めてfailedとfailure textをmanifestへ記録する。
 
 ### 5.3 manifest.json
