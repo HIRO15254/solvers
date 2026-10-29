@@ -828,6 +828,18 @@ impl SolStore {
         })
     }
 
+    pub(crate) fn strategy_into_slice(
+        &self,
+        sref: u32,
+        num_actions: usize,
+        num_hands: usize,
+        out: &mut [f32],
+    ) -> Result<Option<()>, SolError> {
+        self.with_block(Section::Strategy, sref, |_, bytes| {
+            dequantize_probs_into_slice(bytes, num_actions, num_hands, out)
+        })
+    }
+
     pub(crate) fn values_into(
         &self,
         sref: u32,
@@ -1242,6 +1254,16 @@ fn dequantize_probs_into(
     num_hands: usize,
     out: &mut Vec<f32>,
 ) -> Result<(), SolError> {
+    out.resize(num_actions * num_hands, 0.0);
+    dequantize_probs_into_slice(bytes, num_actions, num_hands, out)
+}
+
+fn dequantize_probs_into_slice(
+    bytes: &[u8],
+    num_actions: usize,
+    num_hands: usize,
+    out: &mut [f32],
+) -> Result<(), SolError> {
     let expected = num_actions * num_hands * 2;
     if bytes.len() != expected {
         return Err(SolError::Truncated {
@@ -1250,16 +1272,16 @@ fn dequantize_probs_into(
         });
     }
 
-    // Decode directly into the reusable output. Every u16 fits exactly in
-    // f32, so converting back to u32 for the integer sum is lossless.
-    out.clear();
-    out.extend(
-        bytes
-            .as_chunks::<2>()
-            .0
-            .iter()
-            .map(|&chunk| u16::from_le_bytes(chunk) as f32),
-    );
+    if out.len() != num_actions * num_hands {
+        return Err(SolError::Truncated {
+            expected: num_actions * num_hands,
+            actual: out.len(),
+        });
+    }
+    // Every u16 fits exactly in f32, so the integer sum remains lossless.
+    for (slot, &chunk) in out.iter_mut().zip(bytes.as_chunks::<2>().0) {
+        *slot = u16::from_le_bytes(chunk) as f32;
+    }
     for h in 0..num_hands {
         let mut sum: u32 = 0;
         for a in 0..num_actions {

@@ -163,7 +163,7 @@ fn ancestor_freeze_and_selector_errors_are_explicit() {
         solution: "base.sol".into(),
         sha256: None,
     });
-    let base = |id| (id == 0).then(|| vec![1.0 / actions as f32; size]);
+    let base = |id| Ok((id == 0).then(|| vec![1.0 / actions as f32; size]));
     let resolved = resolve_profile(&mut game, &p.config, &profile, Some(&base)).unwrap();
     assert!(resolved.summary.resolved_nodes.iter().any(|entry| matches!(
         entry.kind,
@@ -221,7 +221,7 @@ fn explicit_ancestor_is_not_frozen() {
         solution: "base.sol".into(),
         sha256: None,
     });
-    let resolved = resolve_profile(&mut game, &p.config, &profile, Some(&|_| None)).unwrap();
+    let resolved = resolve_profile(&mut game, &p.config, &profile, Some(&|_| Ok(None))).unwrap();
     assert!(resolved.frozen_nodes.is_empty());
     assert_eq!(resolved.summary.matched_nodes, 2);
 }

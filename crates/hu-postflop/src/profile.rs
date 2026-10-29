@@ -193,7 +193,7 @@ pub fn resolve_profile(
     game: &mut PostflopGame,
     config: &PostflopConfig,
     ir: &ProfileIr,
-    base: Option<&dyn Fn(NodeId) -> Option<Vec<f32>>>,
+    base: Option<&dyn Fn(NodeId) -> anyhow::Result<Option<Vec<f32>>>>,
 ) -> Result<ResolvedProfile, ProfileResolveError> {
     let start = crate::artifact::start_street_from_board_len(config.board.len());
     let index = GameIndex::from_game(&game.game, &game.node_info, start);
@@ -463,6 +463,7 @@ pub fn resolve_profile(
             let s = node.aux as usize;
             let hands = tree.storage_ref(node).num_hands as usize;
             let fixed = base(id)
+                .map_err(|e| error(format!("base solution strategy: {e:#}")))?
                 .ok_or_else(|| error(format!("base solution lacks node {:?}", view.history(id))))?;
             if fixed.len() != hands * node.num_children as usize {
                 return Err(error("base solution strategy shape mismatch"));

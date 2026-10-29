@@ -276,8 +276,10 @@ categoryの名称と式は[P1規範](hu-postflop.jp.md#hand-category)を参照�
 combo単位の固定と集計頻度目標は異なり、同じnodeの同じhandに重複するとerrorになる。
 
 上流を基準解に固定する場合は`[profile]`に
-`freeze_upstream = { solution = "runs/base/solution.sol" }`を指定する。基準解は同じ木と
-hand supportを持つ必要があり、実効configにpathとSHA-256が保存される。
+`freeze_upstream = { solution = "runs/base/solution.sol" }`を指定する。基準解は同じboard・pot・stack・
+betting treeとrangeを持つ必要があり、suit非対称selectorにより基準解より細かく展開された木は対応付ける。
+基準解のgroupingがより細かく対応付けられない場合は、profileと同じか、より粗い基準解を使う。
+実効configにpathとSHA-256が保存される。
 基準fileのhashはvalidate・solve時に照合し、大文字・小文字を区別しない。
 freeze由来の`.sol`を読み込む、exportする、比較する際は基準fileを再読込・再hashしない。
 solveはprofile対象の最大部分木を自動的に選び、外側には基準解の平均戦略をコピーする。
@@ -611,7 +613,6 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
 | 資源上限 / 75 | validate --resourcesで規模を確認し、treeやmemory予算を見直す |
 | 協調停止 / 130 | 保存checkpointからresume |
 | その他 / 1 | 使用中runへのresumeなら停止を待つか別directoryへfork。その他はfile path・権限・I/O診断を確認 |
-| `freeze_upstream`のsuit-isomorphism restriction / 2 | suit対称のrange・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする |
 | `no-rivers cannot be used with river profile or frozen nodes` / 2 | Riverに解決されるlock・incentive・frequencyまたは固定祖先があるため、`solution_streets`を`no-rivers`以外にする |
 
 未一致ruleのwarningはerrorではない。P2のnot-checked/incompleteは測定未完了を示す。

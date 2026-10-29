@@ -151,8 +151,8 @@ P1のprofile指定時は実際の木へselectorを解決し、humanでは一致n
 JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。
 不正なselectorやactionは入力errorである。profileが無い場合はfieldを追加しない。
 profileの`node`にはrootを示す`root`または空文字列も使える。lockとfrequencyの同一node・同一handへの重複はerror。
-`freeze_upstream`でsuit非対称selectorによるiso grouping制限が基準解と異なる木を生む場合はerror。
-suit対称range・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする。
+`freeze_upstream`はsuit非対称selectorで基準解より細かく展開された木にも対応し、基準戦略をsuit置換して利用する。
+基準解側のgroupingがより細かく代表を対応付けられない場合はerror。
 `output.solution_streets = "no-rivers"`は、解決済みのlock・incentive・frequencyまたは固定祖先がRiverにある場合はerror。
 基準fileのSHA-256はvalidate・solve時に大文字・小文字を区別せず照合するが、freeze由来の`.sol`の読込・export・比較時には再読込・再hashしない。
 `freeze_upstream`のsolveはprofile対象の最大部分木を自動選択して反復し、外側に基準解の平均戦略をコピーする。
