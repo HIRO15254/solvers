@@ -26,7 +26,7 @@
 //! decodes the index and the one chunk holding that node. The file is
 //! written to a temp file and renamed into place.
 
-use parking_lot::Mutex;
+use parking_lot::{Mutex, RwLock};
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
@@ -682,6 +682,7 @@ impl SolReader {
             file: Mutex::new(self.file),
             directory: self.directory,
             cache: Mutex::new(Vec::with_capacity(CACHED_CHUNKS)),
+            pinned_strategies: RwLock::new(None),
         }
     }
 }
@@ -745,13 +746,34 @@ pub struct SolStore {
     directory: Directory,
     /// Most recently used last.
     cache: Mutex<Vec<(Section, usize, Arc<ChunkSlot>)>>,
+    pinned_strategies: RwLock<Option<Vec<Arc<Chunk>>>>,
 }
 
 /// One cached chunk; empty until its first decode succeeds.
 type ChunkSlot = Mutex<Option<Arc<Chunk>>>;
 
 impl SolStore {
+    /// Decode the strategy section once for parallel whole-tree passes.
+    /// Callers release it while only subtree iterations are running.
+    pub(crate) fn pin_strategies(&self) -> Result<(), SolError> {
+        let mut chunks = Vec::with_capacity(self.directory.strategy.len());
+        for index in 0..self.directory.strategy.len() {
+            chunks.push(self.chunk(Section::Strategy, index)?);
+        }
+        *self.pinned_strategies.write() = Some(chunks);
+        Ok(())
+    }
+
+    pub(crate) fn unpin_strategies(&self) {
+        *self.pinned_strategies.write() = None;
+    }
+
     fn chunk(&self, section: Section, index: usize) -> Result<Arc<Chunk>, SolError> {
+        if section == Section::Strategy
+            && let Some(chunks) = self.pinned_strategies.read().as_ref()
+        {
+            return Ok(Arc::clone(&chunks[index]));
+        }
         let slot = {
             let mut cache = self.cache.lock();
             let slot = match cache
@@ -1476,6 +1498,42 @@ mod tests {
         assert_eq!(store.strategy(0, 1, 1).unwrap(), None);
         assert_eq!(store.values(u32::MAX, 1).unwrap(), None);
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn pinned_strategy_chunks_match_streamed_reads() {
+        let payload = multi_chunk_payload();
+        let path = temp_path("pinned.sol");
+        write_sol(&path, &payload).unwrap();
+        let store = SolReader::open(&path).unwrap().into_store();
+        let expected: Vec<_> = payload
+            .blocks
+            .iter()
+            .map(|block| {
+                store
+                    .strategy(block.sref, 1, block.probs.len() / 2)
+                    .unwrap()
+            })
+            .collect();
+        store.pin_strategies().unwrap();
+        for (block, expected) in payload.blocks.iter().zip(&expected).rev() {
+            assert_eq!(
+                &store
+                    .strategy(block.sref, 1, block.probs.len() / 2)
+                    .unwrap(),
+                expected
+            );
+        }
+        store.unpin_strategies();
+        for (block, expected) in payload.blocks.iter().zip(&expected) {
+            assert_eq!(
+                &store
+                    .strategy(block.sref, 1, block.probs.len() / 2)
+                    .unwrap(),
+                expected
+            );
+        }
+        let _ = std::fs::remove_file(path);
     }
 
     #[test]

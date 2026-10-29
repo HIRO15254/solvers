@@ -597,6 +597,7 @@ fn drive<S: Storage>(
             }
         }
         let base = std::sync::Arc::new(base.expect("selected scope requires a base"));
+        base.0.store.pin_strategies()?;
         let errors = std::sync::Arc::new(std::sync::Mutex::new(None::<String>));
         let provider_base = base.clone();
         let provider_errors = errors.clone();
@@ -634,6 +635,8 @@ fn drive<S: Storage>(
             p.target,
         );
         check_base_error(&errors)?;
+        base.0.store.unpin_strategies();
+        trim_builder_heap();
         if let Some(subtree) = subtree {
             let scope = crate::subtree::SolveScope {
                 scope: "subtree",
@@ -650,6 +653,7 @@ fn drive<S: Storage>(
                 Some(subtree),
                 Some(scope),
                 Some(errors),
+                Some(base),
             );
         }
         let (game, profile) = solver.into_game_and_profile();
@@ -682,6 +686,7 @@ fn drive<S: Storage>(
             None,
             Some(scope),
             None,
+            None,
         );
     }
     let mut solver = Solver::<_, S>::new(
@@ -711,6 +716,7 @@ fn drive<S: Storage>(
         None,
         scope,
         None,
+        None,
     )
 }
 
@@ -732,6 +738,7 @@ fn drive_ready<S: Storage>(
     subtree: Option<crate::subtree::SubtreeSolve>,
     solve_scope: Option<crate::subtree::SolveScope>,
     base_errors: Option<std::sync::Arc<std::sync::Mutex<Option<String>>>>,
+    base_cache: Option<std::sync::Arc<(crate::artifact::LoadedSol, crate::base_map::BaseMap)>>,
 ) -> Result<RunSummary> {
     let RunRequest {
         prepared: p,
@@ -880,6 +887,9 @@ fn drive_ready<S: Storage>(
     }
     let elapsed = elapsed_before + start.elapsed();
     observer(Observation::Stop { reason })?;
+    if let Some(base) = &base_cache {
+        base.0.store.pin_strategies()?;
+    }
     let offset = p.payoff.ev_offset();
     let (ev, expl) = if subtree.is_some() {
         solver.evaluate()

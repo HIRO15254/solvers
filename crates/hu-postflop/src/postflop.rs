@@ -2413,8 +2413,11 @@ impl MemoryEstimate {
                 + 2 * std::mem::size_of::<f64>() as u64,
         );
         self.game_bytes
-            // The base provider reads one block at a time; retained lock
-            // values cover explicit locks and frozen ancestors only.
+            // Pinned u16 strategy chunks and their headers/indexes during
+            // whole-tree passes; locks cover targets and frozen ancestors.
+            .saturating_add(self.f32_regret_bytes / 2)
+            .saturating_add(self.action_nodes.saturating_mul(32))
+            .saturating_add(4 * 1024 * 1024)
             .saturating_add(lock_values)
             .saturating_add(lock_nodes.saturating_mul(widest * 4))
             .saturating_add(self.max_strategy_elements.saturating_mul(8))

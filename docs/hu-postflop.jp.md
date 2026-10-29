@@ -159,6 +159,7 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 上流固定に必要な戦略が無い場合の拒否は変わらない。
 停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
 部分木modeでは反復stateを対象部分木に限ってcompactに保存し、外側の戦略は基準解から保持して全木の評価とsolution出力に用いる。
+全木の初期評価と最終評価・出力の間は基準解の量子化戦略chunkを一時的に展開して保持し、部分木反復中は解放する。見積りにはこの保持量を含める。
 checkpointの再開では計算modeと部分木のidentityも照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
 `solution_streets = "no-rivers"`はprofileまたは固定祖先がRiverにある場合は拒否する。
 profileを変更したcheckpointのresumeは互換性hashの不一致として拒否する。
