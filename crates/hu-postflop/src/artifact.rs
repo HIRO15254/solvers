@@ -1121,15 +1121,15 @@ stack_bb = 21
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 4s"
 [ranges]
-BB = "AK,KQ,AA"
-BTN = "QQ,JJ,TT"
+BB = "AcKd,AhAd"
+BTN = "QhQd,JhJd,ThTd"
 [tree]
 script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
 [solver]
 storage = "f32"
 iso_merging = true
 [solver.stop]
-max_iterations = 500
+max_iterations = 5000
 check_every = 100
 [run]
 memory = "1GiB"
@@ -1174,18 +1174,28 @@ confidence = 0.5
 node = 'xx[?]x'
 category = 'secondpair'
 action = 'check'
-bb = 0.1
+bb = -2.0
 [[profile.frequency]]
 node = 'xx[?]x'
 hands = 'TT'
 action = 'check'
-target = 0.5
+target = 1.0
 "#,
             base_path.to_string_lossy().replace('\\', "/")
         );
         let (full_path, full_summary) = execute(&input, "full");
         let small_input = format!("{input}\n[output]\nsolution_streets='no-rivers'\n");
         let (small_path, small_summary) = execute(&small_input, "small");
+        let incentive_input = input.split("[[profile.frequency]]").next().unwrap();
+        let neutral_input = input.split("[[profile.incentive]]").next().unwrap();
+        let (incentive_path, _) = execute(
+            &format!("{incentive_input}\n[output]\nsolution_streets='no-rivers'\n"),
+            "incentive",
+        );
+        let (neutral_path, _) = execute(
+            &format!("{neutral_input}\n[output]\nsolution_streets='no-rivers'\n"),
+            "neutral",
+        );
         let prepared = crate::prepare::prepare(&small_input, &path).unwrap();
         let checkpoint = dir.path().join("small.ckpt");
         let resumed_path = dir.path().join("resumed.sol");
@@ -1213,10 +1223,24 @@ target = 0.5
             full_summary.frequencies.len(),
             small_summary.frequencies.len()
         );
-        let base = load_sol(&base_path, 500, None).unwrap();
-        let full = load_sol(&full_path, 500, None).unwrap();
-        let small = load_sol(&small_path, 500, None).unwrap();
-        let resumed = load_sol(&resumed_path, 500, None).unwrap();
+        assert!(
+            full_summary.nash_conv < 0.0001,
+            "full NashConv: {}",
+            full_summary.nash_conv
+        );
+        assert!(
+            small_summary.nash_conv < 0.0001,
+            "no-rivers NashConv: {}",
+            small_summary.nash_conv
+        );
+        let base = load_sol(&base_path, 5000, None).unwrap();
+        let full = load_sol(&full_path, 5000, None).unwrap();
+        let small = load_sol(&small_path, 5000, None).unwrap();
+        let resumed = load_sol(&resumed_path, 5000, None).unwrap();
+        let incentive = load_sol(&incentive_path, 5000, None).unwrap();
+        let neutral = load_sol(&neutral_path, 5000, None).unwrap();
+        let mut incentive_provider = SolProvider::new(&incentive, Box::new(|_| {}));
+        let mut neutral_provider = SolProvider::new(&neutral, Box::new(|_| {}));
         let mut resumed_provider = SolProvider::new(&resumed, Box::new(|_| {}));
         let entry = small.view().node_by_history("xx[3c]").unwrap();
         let child = small.view().node_by_history("xx[3c]x").unwrap();
@@ -1224,16 +1248,26 @@ target = 0.5
         drop(base);
         std::fs::remove_file(&base_path).unwrap();
         let resumed_avg = resumed_provider.average_strategy(child).unwrap();
-        assert!(
-            small_summary
-                .frequencies
-                .iter()
-                .any(|metric| metric.node == child && metric.achieved.is_some())
-        );
+        let incentive_avg = incentive_provider.average_strategy(child).unwrap();
+        let neutral_avg = neutral_provider.average_strategy(child).unwrap();
+        let metric = small_summary
+            .frequencies
+            .iter()
+            .find(|metric| metric.node == child)
+            .unwrap();
+        let achieved = metric.achieved.unwrap();
+        assert!((achieved - 1.0).abs() < 0.02);
+        assert!(metric.lambda > 1.0);
         let mut provider = SolProvider::new(&small, Box::new(|_| {}));
         assert_eq!(provider.average_strategy(child).unwrap(), resumed_avg);
         let frozen = provider.average_strategy(entry).unwrap();
         let sub = &provider.river_solves[&entry];
+        let RiverSolver::F32(solver) = &sub.solver else {
+            panic!("expected f32 solver")
+        };
+        let expl = solver.exploitability();
+        let river_nash = expl[Player::P0] + expl[Player::P1];
+        assert!(river_nash < 0.005, "river NashConv: {river_nash}");
         let player = small.game.tree.node(entry).player;
         for &global in sub.solver.game().evaluator.hands.combos(player) {
             let h = small
@@ -1258,6 +1292,7 @@ target = 0.5
         let mut frequency_count = 0;
         let sub = &provider.river_solves[&entry];
         let mut checked = 0;
+        let mut checked_soft = 0;
         for &global in sub.solver.game().evaluator.hands.combos(node.player) {
             let h = small
                 .game
@@ -1271,18 +1306,24 @@ target = 0.5
             }
             if jj.weight(global as usize) > 0.0 {
                 assert!((0.2..=0.7).contains(&avg[h]));
+                assert!(neutral_avg[h] - incentive_avg[h] > 0.45);
+                assert!((avg[h] - incentive_avg[h]).abs() < 0.02);
+                checked_soft += 1;
             }
             if tt.weight(global as usize) > 0.0 {
                 frequency_sum += avg[h];
                 frequency_count += 1;
+                assert!(avg[h] - incentive_avg[h] > 0.95);
+                assert!((avg[h] - achieved as f32).abs() < 0.02);
             }
             for a in 0..node.num_children as usize {
-                assert!((avg[a * hand_count + h] - full_avg[a * hand_count + h]).abs() < 0.35);
+                assert!((avg[a * hand_count + h] - full_avg[a * hand_count + h]).abs() < 0.02);
             }
         }
         assert!(checked > 0);
+        assert!(checked_soft > 0);
         assert!(frequency_count > 0);
-        assert!((frequency_sum / frequency_count as f32 - 0.5).abs() < 0.35);
+        assert!((frequency_sum / frequency_count as f32 - 1.0).abs() < 0.02);
     }
 
     #[test]
