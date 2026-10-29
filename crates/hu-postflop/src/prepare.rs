@@ -110,6 +110,22 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     if document.spot.profile.is_some() {
         estimate.profile_bytes = estimate.profile_slot_bytes();
     }
+    if document
+        .spot
+        .profile
+        .as_ref()
+        .is_some_and(|p| p.freeze_upstream.is_some())
+    {
+        // Upper bound: every action node is an entry, with both full 1326-hand
+        // reaches. The second game/index belongs to the streamed base reader.
+        estimate.profile_bytes = estimate
+            .profile_bytes
+            .saturating_add(estimate.game_bytes)
+            .saturating_add(estimate.action_nodes.saturating_mul(
+                (2 * nlh::NUM_COMBOS * std::mem::size_of::<f32>()
+                    + std::mem::size_of::<hu_engine::SubtreeRoot>()) as u64,
+            ));
+    }
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {

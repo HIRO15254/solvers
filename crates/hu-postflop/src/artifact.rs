@@ -1031,6 +1031,7 @@ memory='1GiB'
             nash_conv: expl[Player::P0] + expl[Player::P1],
             frequencies: Vec::new(),
             profile: None,
+            solve_scope: None,
         };
         let temp = tempfile::tempdir().unwrap();
         let path = temp.path().join("test.sol");
@@ -1225,6 +1226,7 @@ memory = "1GiB"
             nash_conv,
             frequencies: Vec::new(),
             profile: None,
+            solve_scope: None,
         };
         (solver, index, start_street, summary)
     }

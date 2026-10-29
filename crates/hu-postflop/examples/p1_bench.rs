@@ -12,7 +12,7 @@
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
 //!     [--threads N] [--warmup N] [--iters N] [--evals N] [--storage f32|i16|i16-f32avg] [--json PATH] [--bands] \
-//!     [--subtree-only] [--subtree-target NASH_CONV_BB] [--hash-subtree] [--combined-base]
+//!     [--subtree-only] [--subtree-target NASH_CONV_BB] [--hash-subtree] [--combined-base] [--checkpoint PATH]
 //! ```
 
 use std::path::{Path, PathBuf};
@@ -37,6 +37,7 @@ struct Args {
     subtree_target: Option<f64>,
     hash_subtree: bool,
     combined_base: bool,
+    checkpoint: Option<PathBuf>,
 }
 
 fn parse_args() -> Result<Args> {
@@ -54,6 +55,7 @@ fn parse_args() -> Result<Args> {
         subtree_target: None,
         hash_subtree: false,
         combined_base: false,
+        checkpoint: None,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -75,6 +77,7 @@ fn parse_args() -> Result<Args> {
             "--subtree-target" => parsed.subtree_target = Some(value()?.parse()?),
             "--hash-subtree" => parsed.hash_subtree = true,
             "--combined-base" => parsed.combined_base = true,
+            "--checkpoint" => parsed.checkpoint = Some(value()?.into()),
             "--bands" => parsed.bands = true,
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
@@ -251,7 +254,16 @@ fn bench<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
-    let roots = subtree_roots(&solver, &index, &targets);
+    if let Some(path) = &args.checkpoint {
+        let state = hu_postflop::checkpoint::CheckpointReader::open(path)?;
+        if state.config_hash != hu_postflop::prepare::compatibility_hash(&p.effective)? {
+            bail!("checkpoint config does not match benchmark config");
+        }
+        let iteration = state.iteration;
+        solver.restore_stream(iteration, |storage| state.read_storage(storage))?;
+    }
+    let initial_iteration = solver.iteration();
+    let roots = hu_postflop::subtree::roots(&solver, &index, &targets);
     let subtree_elements: usize = roots
         .iter()
         .map(|r| {
@@ -412,7 +424,7 @@ fn bench<S: Storage>(
         subtree_gain = solver.evaluate_subtrees(&roots);
         subtree_evaluate_secs.push(t.elapsed().as_secs_f64());
     }
-    let completed_iters = solver.iteration() - args.warmup;
+    let completed_iters = solver.iteration() - initial_iteration - args.warmup;
     let peak = memory::peak_bytes();
     let per_iter = if completed_iters > 0 {
         iter_secs / completed_iters as f64
@@ -492,51 +504,6 @@ fn bench<S: Storage>(
     }
     drop(index);
     Ok(())
-}
-
-fn subtree_roots<S: Storage>(
-    solver: &Solver<hu_postflop::PostflopEvaluator, S>,
-    index: &GameIndex,
-    targets: &std::collections::BTreeSet<hu_engine::NodeId>,
-) -> Vec<hu_engine::SubtreeRoot> {
-    let game = solver.game();
-    let tree = &game.tree;
-    targets
-        .iter()
-        .filter_map(|&node| {
-            let path = hu_engine::path_from_root(&index.parents, node);
-            if path[..path.len() - 1].iter().any(|id| targets.contains(id)) {
-                return None;
-            }
-            let reach = hu_engine::reach_on_path(
-                tree,
-                nlh::PerPlayer::new(
-                    game.root_ranges[Player::P0].as_slice(),
-                    game.root_ranges[Player::P1].as_slice(),
-                ),
-                &path,
-                |id, _, out| out.copy_from_slice(&solver.average_strategy_at(id)),
-            );
-            let mut chance_weight = 1.0;
-            let mut chance_depth = 0;
-            for hop in path.windows(2) {
-                let parent = tree.node(hop[0]);
-                if parent.kind == hu_engine::NodeKind::Chance {
-                    chance_depth += 1;
-                    chance_weight *= f64::from(
-                        tree.deal(parent, (hop[1] - parent.first_child) as usize)
-                            .weight,
-                    );
-                }
-            }
-            Some(hu_engine::SubtreeRoot {
-                node,
-                reach,
-                chance_weight,
-                chance_depth,
-            })
-        })
-        .collect()
 }
 
 mod memory {

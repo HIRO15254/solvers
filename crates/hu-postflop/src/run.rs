@@ -180,6 +180,13 @@ pub(crate) fn query<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
+    let (subtree, _) = crate::subtree::prepare(
+        p,
+        &mut solver,
+        &index,
+        controller.summary.as_ref(),
+        !controller.targets.is_empty(),
+    )?;
     let start = Instant::now();
     let target = target_nash_conv.map(|t| t / 2.0).or(p.target);
     let check_every = p.settings.solver.stop.check_every;
@@ -196,12 +203,19 @@ pub(crate) fn query<S: Storage>(
         {
             break;
         }
-        solver.run(batch_step(check_every, next_check - solver.iteration()));
+        let steps = batch_step(check_every, next_check - solver.iteration());
+        if let Some(subtree) = &subtree {
+            subtree.step(&mut solver, steps);
+        } else {
+            solver.run(steps);
+        }
         evaluated = None;
         if solver.iteration() == next_check {
             controller.update(&mut solver)?;
             if let Some(target) = target {
-                let (ev, expl) = solver.evaluate();
+                let (ev, expl) = subtree
+                    .as_ref()
+                    .map_or_else(|| solver.evaluate(), |s| s.evaluate(&solver));
                 evaluated = Some((ev, expl));
                 let value = (expl[Player::P0] + expl[Player::P1]) / 2.0;
                 history.push((solver.iteration(), value));
@@ -218,7 +232,11 @@ pub(crate) fn query<S: Storage>(
             );
         }
     }
-    let (ev, expl) = evaluated.unwrap_or_else(|| solver.evaluate());
+    let (ev, expl) = if subtree.is_some() {
+        solver.evaluate()
+    } else {
+        evaluated.unwrap_or_else(|| solver.evaluate())
+    };
     let evaluation = if solver.profile().is_some() {
         (solver.true_expected_values(), expl)
     } else {
@@ -594,7 +612,33 @@ fn drive<S: Storage>(
     });
     let saved_lambdas = state.as_ref().map(|s| s.frequency_lambdas.as_slice());
     let mut controller = install_profile(&mut solver, resolved, saved_lambdas)?;
+    let (subtree, solve_scope) = crate::subtree::prepare(
+        p,
+        &mut solver,
+        &index,
+        controller.summary.as_ref(),
+        !controller.targets.is_empty(),
+    )?;
+    let mode = if subtree.is_some() {
+        crate::checkpoint::CheckpointMode::Subtree
+    } else {
+        crate::checkpoint::CheckpointMode::WholeTree
+    };
+    if let Some(scope) = &solve_scope {
+        diagnostics(Diagnostic::Warning(format!(
+            "freeze_upstream solve scope: {}{}",
+            scope.scope,
+            scope
+                .fallback_reason
+                .map_or(String::new(), |reason| format!(" (fallback: {reason})"))
+        )));
+    }
     if let Some(state) = state {
+        if state.mode != mode {
+            bail!(
+                "checkpoint solve mode differs from this run; restart the solve rather than resuming an old whole-tree freeze checkpoint"
+            );
+        }
         let iteration = state.iteration;
         solver
             .restore_stream(iteration, |storage| state.read_storage(storage))
@@ -634,16 +678,20 @@ fn drive<S: Storage>(
             reason = "cancelled";
             break;
         }
-        solver.run(batch_step(
-            stop.check_every,
-            next_check - solver.iteration(),
-        ));
+        let steps = batch_step(stop.check_every, next_check - solver.iteration());
+        if let Some(subtree) = &subtree {
+            subtree.step(&mut solver, steps);
+        } else {
+            solver.run(steps);
+        }
         // A stop between evaluations must summarize the actual checkpoint state.
         evaluated = None;
         let mut target_reached = false;
         if solver.iteration() == next_check {
             controller.update(&mut solver)?;
-            let (ev, expl) = solver.evaluate();
+            let (ev, expl) = subtree
+                .as_ref()
+                .map_or_else(|| solver.evaluate(), |s| s.evaluate(&solver));
             evaluated = Some((ev, expl));
             let nash_conv = expl[Player::P0] + expl[Player::P1];
             observer(Observation::Progress(runfiles::MetricsRow {
@@ -678,6 +726,7 @@ fn drive<S: Storage>(
                 elapsed_secs,
                 observer,
                 &controller.lambdas,
+                mode,
             )?;
             last_checkpoint = Instant::now();
             saved_iteration = Some(solver.iteration());
@@ -702,7 +751,11 @@ fn drive<S: Storage>(
     let elapsed = elapsed_before + start.elapsed();
     observer(Observation::Stop { reason })?;
     let offset = p.payoff.ev_offset();
-    let (ev, expl) = evaluated.unwrap_or_else(|| solver.evaluate());
+    let (ev, expl) = if subtree.is_some() {
+        solver.evaluate()
+    } else {
+        evaluated.unwrap_or_else(|| solver.evaluate())
+    };
     let ev = if solver.profile().is_some() {
         solver.true_expected_values()
     } else {
@@ -710,6 +763,7 @@ fn drive<S: Storage>(
     };
     let mut summary = summary_from_evaluation(&solver, elapsed, subgame_ev(ev, offset), expl);
     summary.profile = controller.report(&solver, p);
+    summary.solve_scope = solve_scope;
     if let Some(profile) = &summary.profile {
         summary.frequencies.clone_from(&profile.frequencies);
     }
@@ -749,6 +803,7 @@ fn drive<S: Storage>(
                     elapsed.as_secs_f64(),
                     observer,
                     &controller.lambdas,
+                    mode,
                 )
             },
             || {
@@ -776,6 +831,7 @@ fn drive<S: Storage>(
                 elapsed.as_secs_f64(),
                 observer,
                 &controller.lambdas,
+                mode,
             )?;
         }
         solver.release_regrets();
@@ -811,8 +867,21 @@ fn save<S: Storage>(
     elapsed: f64,
     observer: &mut Observer<'_>,
     lambdas: &[f64],
+    mode: crate::checkpoint::CheckpointMode,
 ) -> Result<()> {
-    if lambdas.is_empty() {
+    if mode == crate::checkpoint::CheckpointMode::Subtree {
+        crate::checkpoint::write_storage_with_mode(
+            checkpoint,
+            compatibility_hash(&p.effective)?,
+            solver.iteration(),
+            solver.storage(),
+            &p.effective,
+            elapsed,
+            rayon::current_num_threads(),
+            mode,
+            (!lambdas.is_empty()).then_some(lambdas),
+        )?;
+    } else if lambdas.is_empty() {
         crate::checkpoint::write_storage_with_config(
             checkpoint,
             compatibility_hash(&p.effective)?,
@@ -900,6 +969,7 @@ pub struct RunSummary {
     pub nash_conv: f64,
     pub frequencies: Vec<FrequencyMetric>,
     pub profile: Option<ProfileReport>,
+    pub solve_scope: Option<crate::subtree::SolveScope>,
     /// The run stopped on request at a checkpoint boundary, not because it
     /// reached its budget or its convergence target.
     pub canceled: bool,
@@ -931,6 +1001,7 @@ pub(crate) fn summary_from_evaluation<E: TerminalEvaluator, S: Storage>(
         expl_p1: expl[Player::P1],
         nash_conv,
         frequencies: Vec::new(),
+        solve_scope: None,
         profile: None,
     }
 }

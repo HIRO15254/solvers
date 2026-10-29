@@ -280,6 +280,15 @@ combo単位の固定と集計頻度目標は異なり、同じnodeの同じhand�
 hand supportを持つ必要があり、実効configにpathとSHA-256が保存される。
 基準fileのhashはvalidate・solve時に照合し、大文字・小文字を区別しない。
 freeze由来の`.sol`を読み込む、exportする、比較する際は基準fileを再読込・再hashしない。
+solveはprofile対象の最大部分木を自動的に選び、外側には基準解の平均戦略をコピーする。
+外側の戦略が基準解に無い場合、頻度目標がある場合、対象が空またはrootを含む場合は木全体を反復する。
+上流固定に必要な戦略が無い場合はerrorとなる。停止判定・進捗・結果は木全体で評価し、
+storageや保存成果物も木全体を扱うため、部分木化によるmemory削減は期待しない。
+`run.json`の`profile`で`solve_scope`（`subtree` / `whole-tree`）、`subtree_roots`、
+任意の`fallback_reason`を確認できる。理由は`frequency-targets`、`no-targets`、`root-target`、
+`missing-base-strategy`である。
+再開時は計算modeと部分木identityを照合する。新modeを選んだ場合、旧whole-tree modeのcheckpointは再開できないので現行configから再solveする。
+
 既存解の戦略を出発点にするには、lockをexportして編集し、`relock`で追加して再solveする:
 
 ```sh

@@ -155,6 +155,13 @@ incentiveは`TerminalEvaluator::compat_mass`の相手互換reachで重み付け�
 CFRはlockもincentiveも無い部分木、EV/BRはlockの無い部分木（加点を含む評価ではincentiveも無い部分木）でbatchを使う。
 `profile_mut`で変えてよいのはincentiveの加点値だけで、lock・incentiveの有無や次元を変えるときはprofileを入れ直す。
 profile自体はengine stateに含めず、製品側がconfigから再構築する。
+P1の`freeze_upstream`はprofile対象のうち別の対象の子孫ではないnodeを根とする最大部分木を選ぶ。
+部分木外の戦略は基準solutionの平均戦略からコピーし、その戦略で部分木へのreachを計算して各部分木を反復する。
+外側の戦略が欠ける場合、frequency目標がある場合、対象が空またはrootを含む場合は木全体の反復へfallbackする。
+上流固定に必要な戦略が無い場合は従来どおり拒否する。停止・報告の評価は木全体で行い、
+storageとcheckpoint・solutionも木全体を保持する。checkpointには計算modeと部分木identityを結び付け、
+新modeを選んだ再開時は旧whole-tree modeのcheckpointを拒否する。
+
 
 test-support機能の`expected_values_at` / `best_response_values_at` は指定 node、
 `expected_values_everywhere` は全 action node の値を 1 回の走査で計算する。production保存は`visit_expected_values`を使う。

@@ -420,6 +420,11 @@ fn execute(
         if let Some(profile) = &summary.profile {
             result["profile"] = serde_json::to_value(profile)?;
         }
+        if let Some(scope) = &summary.solve_scope {
+            result["profile"]["solve_scope"] = json!(scope.scope);
+            result["profile"]["subtree_roots"] = json!(scope.subtree_roots);
+            result["profile"]["fallback_reason"] = json!(scope.fallback_reason);
+        }
         std::fs::write(
             &paths.result,
             format!("{}\n", serde_json::to_string_pretty(&result)?),
@@ -493,6 +498,14 @@ pub(crate) fn print_done(summary: &RunSummary) {
         summary.ev[Player::P1],
         summary.nash_conv
     );
+    if let Some(scope) = &summary.solve_scope {
+        println!(
+            "freeze_upstream scope={} roots={} fallback={}",
+            scope.scope,
+            scope.subtree_roots,
+            scope.fallback_reason.unwrap_or("none")
+        );
+    }
 }
 pub(crate) fn print_artifact(diagnostic: hu_postflop::artifact::Diagnostic) {
     use hu_postflop::artifact::Diagnostic;

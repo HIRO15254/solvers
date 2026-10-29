@@ -27,6 +27,7 @@ pub use hands::PostflopHands;
 mod kernel;
 pub use hu_engine::CfrPrecision;
 mod postflop;
+pub mod subtree;
 mod viewer;
 
 pub use aggregate::{class_average, class_of_combo, class_weights};

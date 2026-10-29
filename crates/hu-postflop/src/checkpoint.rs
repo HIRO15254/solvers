@@ -1,4 +1,4 @@
-//! Version 5 and 6 streaming checkpoints. Only bounded metadata is postcard;
+//! Version 5, 6, and 7 streaming checkpoints. Only bounded metadata is postcard;
 //! storage is raw little-endian arenas, protected by a BLAKE3 digest.
 #[cfg(any(test, feature = "test-support"))]
 use hu_engine::StorageState;
@@ -19,7 +19,7 @@ pub enum CheckpointError {
     #[error("not a solvers checkpoint file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported checkpoint format version {found} (expected {expected} or 6); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
+        "unsupported checkpoint format version {found} (expected {expected}, 6, or 7); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
     #[error("checkpoint file truncated: expected at least {expected} bytes, got {actual}")]
@@ -47,6 +47,13 @@ pub struct Checkpoint {
     pub elapsed_secs: Option<f64>,
 }
 
+/// Identifies the scope of the solver state stored in a checkpoint.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CheckpointMode {
+    WholeTree,
+    Subtree,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 enum Backend {
     F32,
@@ -68,7 +75,7 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes(buf[8..10].try_into().unwrap());
-    if version != FORMAT_VERSION && version != 6 {
+    if version != FORMAT_VERSION && version != 6 && version != 7 {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -134,6 +141,7 @@ pub struct CheckpointReader {
     pub iteration: u64,
     pub config_toml: Option<String>,
     pub elapsed_secs: Option<f64>,
+    pub mode: CheckpointMode,
     pub frequency_lambdas: Vec<f64>,
     backend: Backend,
     lengths: [u64; 4],
@@ -163,11 +171,19 @@ impl CheckpointReader {
         }
         let mut bytes = vec![0; len];
         decoder.read_exact(&mut bytes)?;
-        let (metadata, frequency_lambdas): (Metadata, Vec<f64>) = if parsed.version == 6 {
-            postcard::from_bytes(&bytes)?
-        } else {
-            (postcard::from_bytes(&bytes)?, Vec::new())
-        };
+        let (metadata, frequency_lambdas, mode): (Metadata, Vec<f64>, CheckpointMode) =
+            match parsed.version {
+                7 => postcard::from_bytes(&bytes)?,
+                6 => {
+                    let (metadata, lambdas) = postcard::from_bytes(&bytes)?;
+                    (metadata, lambdas, CheckpointMode::WholeTree)
+                }
+                _ => (
+                    postcard::from_bytes(&bytes)?,
+                    Vec::new(),
+                    CheckpointMode::WholeTree,
+                ),
+            };
         if frequency_lambdas.iter().any(|x| !x.is_finite()) {
             return Err(CheckpointError::Invalid(
                 "invalid frequency controller state",
@@ -199,6 +215,7 @@ impl CheckpointReader {
             iteration: parsed.iteration,
             config_toml: metadata.config_toml,
             elapsed_secs: metadata.elapsed_secs,
+            mode,
             frequency_lambdas,
             backend: metadata.backend,
             lengths: metadata.lengths,
@@ -352,6 +369,7 @@ pub fn write_checkpoint(
         1,
         1,
         None,
+        CheckpointMode::WholeTree,
     )
 }
 #[cfg(any(test, feature = "test-support"))]
@@ -372,6 +390,7 @@ pub fn write_checkpoint_with_config(
         1,
         1,
         None,
+        CheckpointMode::WholeTree,
     )
 }
 /// Production writer: borrowed arenas, bounded conversion buffer, threaded zstd.
@@ -394,6 +413,7 @@ pub fn write_storage_with_config(
         threads,
         1,
         None,
+        CheckpointMode::WholeTree,
     )
 }
 
@@ -419,6 +439,35 @@ pub fn write_storage_with_frequency(
         threads,
         1,
         Some(lambdas),
+        CheckpointMode::WholeTree,
+    )
+}
+
+/// Writes storage with an explicit solver scope and optional frequency state.
+/// Whole-tree checkpoints retain the version 5/6 encoding; subtree uses version 7.
+#[allow(clippy::too_many_arguments)]
+pub fn write_storage_with_mode(
+    path: &Path,
+    hash: [u8; 32],
+    iteration: u64,
+    storage: &impl Storage,
+    config: &str,
+    elapsed: f64,
+    threads: usize,
+    mode: CheckpointMode,
+    lambdas: Option<&[f64]>,
+) -> Result<(), CheckpointError> {
+    write_arrays(
+        path,
+        hash,
+        iteration,
+        storage.arrays(),
+        Some(config),
+        Some(elapsed),
+        threads,
+        1,
+        lambdas,
+        mode,
     )
 }
 /// Memory bound of [`write_arrays`]' encoder. With several workers zstd cuts
@@ -449,6 +498,7 @@ fn write_arrays(
     threads: usize,
     level: i32,
     lambdas: Option<&[f64]>,
+    mode: CheckpointMode,
 ) -> Result<(), CheckpointError> {
     let (backend, lengths) = shape(&arrays);
     let metadata = Metadata {
@@ -458,9 +508,12 @@ fn write_arrays(
         backend,
         lengths,
     };
-    let metadata = match lambdas {
-        Some(values) => postcard::to_allocvec(&(metadata, values))?,
-        None => postcard::to_allocvec(&metadata)?,
+    let metadata = match (mode, lambdas) {
+        (CheckpointMode::Subtree, values) => {
+            postcard::to_allocvec(&(metadata, values.unwrap_or(&[]), mode))?
+        }
+        (CheckpointMode::WholeTree, Some(values)) => postcard::to_allocvec(&(metadata, values))?,
+        (CheckpointMode::WholeTree, None) => postcard::to_allocvec(&metadata)?,
     };
     if metadata.len() > MAX_METADATA {
         return Err(CheckpointError::Invalid("metadata too large"));
@@ -468,7 +521,13 @@ fn write_arrays(
     let header = build_header(
         hash,
         iteration,
-        if lambdas.is_some() { 6 } else { FORMAT_VERSION },
+        if mode == CheckpointMode::Subtree {
+            7
+        } else if lambdas.is_some() {
+            6
+        } else {
+            FORMAT_VERSION
+        },
     );
     let dir = path
         .parent()
@@ -591,12 +650,49 @@ mod tests {
             1,
             1,
             Some(&[0.25, -0.5]),
+            CheckpointMode::WholeTree,
         )
         .unwrap();
         let reader = CheckpointReader::open(&path).unwrap();
         assert_eq!(reader.frequency_lambdas, vec![0.25, -0.5]);
         assert_eq!(reader.iteration, state.iteration);
         let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn checkpoint_modes_round_trip_and_legacy_versions_are_whole_tree() {
+        let state = sample_state_f32();
+        let path = temp_path("modes.ckpt");
+        for (mode, lambdas, version) in [
+            (CheckpointMode::WholeTree, None, 5u16),
+            (CheckpointMode::WholeTree, Some(&[0.25, -0.5][..]), 6),
+            (CheckpointMode::Subtree, None, 7),
+            (CheckpointMode::Subtree, Some(&[0.25, -0.5][..]), 7),
+        ] {
+            write_arrays(
+                &path,
+                [7; 32],
+                state.iteration,
+                state.storage.arrays(),
+                Some("config"),
+                Some(1.0),
+                1,
+                1,
+                lambdas,
+                mode,
+            )
+            .unwrap();
+            let bytes = std::fs::read(&path).unwrap();
+            assert_eq!(
+                u16::from_le_bytes(bytes[8..10].try_into().unwrap()),
+                version
+            );
+            let reader = CheckpointReader::open(&path).unwrap();
+            assert_eq!(reader.mode, mode);
+            assert_eq!(reader.frequency_lambdas, lambdas.unwrap_or(&[]));
+            assert_eq!(read_checkpoint(&path).unwrap().state, state);
+        }
+        std::fs::remove_file(path).unwrap();
     }
 
     fn sample_state_i16() -> SolverState {

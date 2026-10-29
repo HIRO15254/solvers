@@ -259,6 +259,27 @@ pub trait StorageOps {
     /// then adds the reach-weighted current strategy `weighted`.
     fn accumulate_strategy(&mut self, r: StorageRef, ref_idx: u32, weighted: &[f32], d: &Discounts);
 
+    /// Replaces one node's strategy sums with action-major probabilities.
+    /// Each hand's entries should be finite, nonnegative and sum to one.
+    /// Regrets and other nodes are unchanged; quantized storage preserves the
+    /// resulting normalized strategy up to its per-node storage precision.
+    /// Panics if the slice length differs from the node's storage length.
+    fn seed_strategy(&mut self, r: StorageRef, ref_idx: u32, probabilities: &[f32]) {
+        assert_eq!(probabilities.len(), r.len());
+        self.accumulate_strategy(
+            r,
+            ref_idx,
+            probabilities,
+            &Discounts {
+                pos: 1.0,
+                neg: 1.0,
+                avg: 1.0,
+                floor_neg: false,
+                reset_avg: true,
+            },
+        );
+    }
+
     /// Writes the normalized average strategy into `out`. Hands never
     /// reached get the uniform strategy.
     fn average_strategy(&self, r: StorageRef, ref_idx: u32, out: &mut [f32]);
@@ -500,6 +521,43 @@ impl Drop for QuantizedScratch {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn check_seed_strategy<S: Storage>() {
+        let other = make_ref(0, 2, 2, 0);
+        let node = make_ref(4, 3, 2, 1);
+        let mut storage = S::new(10, 2);
+        storage.seed_strategy(other, 0, &[0.2, 0.7, 0.8, 0.3]);
+        storage.seed_strategy(node, 1, &[1.0, 1.0, 0.0, 0.0, 0.0, 0.0]);
+        storage.update_regrets(node, 1, &[1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &discounts());
+        let mut other_before = [0.0; 4];
+        let mut regrets_before = [0.0; 6];
+        storage.average_strategy(other, 0, &mut other_before);
+        storage.regret_matching(node, 1, &mut regrets_before);
+
+        let probabilities = [0.125, 0.01, 0.375, 0.19, 0.5, 0.8];
+        storage.view_mut().seed_strategy(node, 1, &probabilities);
+        let mut actual = [0.0; 6];
+        storage.average_strategy(node, 1, &mut actual);
+        for (actual, expected) in actual.iter().zip(probabilities) {
+            assert!(
+                (actual - expected).abs() < 0.00005,
+                "{actual} != {expected}"
+            );
+        }
+        let mut other_after = [0.0; 4];
+        let mut regrets_after = [0.0; 6];
+        storage.average_strategy(other, 0, &mut other_after);
+        storage.regret_matching(node, 1, &mut regrets_after);
+        assert_eq!(other_before, other_after);
+        assert_eq!(regrets_before, regrets_after);
+    }
+
+    #[test]
+    fn seed_strategy_replaces_sums_for_all_backends() {
+        check_seed_strategy::<F32Storage>();
+        check_seed_strategy::<I16Storage>();
+        check_seed_strategy::<MixedStorage>();
+    }
 
     #[test]
     fn i16_fused_updates_preserve_discount_floor_reset_and_headroom() {

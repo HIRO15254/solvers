@@ -147,6 +147,15 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で基準解と木が異なる場合、
 現在はfreezeを拒否する。実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
 保存済み成果物の読み込み時には基準fileを再読込しない。
+`freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
+部分木を自動的に選び、各iterationでそれらを解く。部分木の外側には基準解の平均戦略をコピーし、
+部分木への到達をその戦略から求める。部分木内のprofileは従来どおり適用する。
+外側の戦略が基準解に保存されていない場合、頻度目標がある場合、対象が空の場合、
+または対象にrootが含まれる場合は、従来の木全体の反復へfallbackする。
+上流固定に必要な戦略が無い場合の拒否は変わらない。
+停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
+storage、checkpoint、solutionも木全体を対象とし、部分木化によるstorage削減は前提としない。
+checkpointの再開では計算modeと部分木のidentityも照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
 `solution_streets = "no-rivers"`はprofileまたは固定祖先がRiverにある場合は拒否する。
 profileを変更したcheckpointのresumeは互換性hashの不一致として拒否する。
 profileの無いrunは追加演算を行わず、f32/f64と全storage backendで従来の結果・成果物をbit一致させる。
@@ -311,6 +320,9 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 `resolved_nodes`の各要素は解決されたnode IDの`node`、`history`、`kind`（`lock` / `incentive` /
 `frequency` / `frozen`）、入力entry番号の`entry`、lockの`confidence`、`partial`を持つ。
 `entry`・`confidence`・`partial`は該当しない場合nullであり、`partial`はlockがboard上でliveなhandの一部だけを選ぶことを示す。
+`freeze_upstream`を使う`run.json`の`profile`には計算範囲`solve_scope`（`subtree` / `whole-tree`）、部分木根の数`subtree_roots`、
+`fallback_reason`（適用時以外はnull）も記録する。fallback理由は`frequency-targets`、`no-targets`、`root-target`、
+`missing-base-strategy`である。これらはrun summaryのfieldであり、`.sol`のprofileには追加しない。
 `profile.frozen_nodes`は固定したnode IDの配列、`general_sum`は一般和評価を示すbool、
 `frequencies`は目標nodeごとの配列である。各要素の`entry`は入力目標のindex、
 `node`はnode ID、`target`は目標、`achieved`は平均戦略の達成頻度、
