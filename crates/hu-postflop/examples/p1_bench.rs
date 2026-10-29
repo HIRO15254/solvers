@@ -468,6 +468,12 @@ fn warm_experiment<S: Storage>(
             }
             continue;
         }
+        if args.experiment_timing.is_none() && hits.len() >= 2 && added % 10 != 0 {
+            if added < args.iters {
+                solver.step();
+            }
+            continue;
+        }
         let (ev, expl) = solver.evaluate();
         let nash = expl[Player::P0] + expl[Player::P1];
         if args.experiment_timing.is_some() && nash / 2.0 > next {
@@ -475,6 +481,59 @@ fn warm_experiment<S: Storage>(
         }
         if nash / 2.0 <= next {
             let true_ev = solver.true_expected_values();
+            let target_detail = target_node.map(|node| {
+                use hu_engine::TerminalEvaluator;
+                let game = solver.game();
+                let tree_node = game.tree.node(node);
+                let player = tree_node.player;
+                let reach = hu_engine::reach_at(
+                    &game.tree,
+                    nlh::PerPlayer::new(
+                        game.root_ranges[Player::P0].as_slice(),
+                        game.root_ranges[Player::P1].as_slice(),
+                    ),
+                    node,
+                    |id, _, out| out.copy_from_slice(&solver.average_strategy_at(id)),
+                );
+                let incentive = solver
+                    .profile()
+                    .and_then(|profile| profile.incentives[tree_node.aux as usize].as_ref());
+                let action_ev = incentive.map(|bonus| {
+                    let mut mass = vec![0.0; reach[player].len()];
+                    game.evaluator.compat_mass(
+                        bonus.space,
+                        player,
+                        &reach[player.opponent()],
+                        &mut mass,
+                    );
+                    let mut values = Vec::new();
+                    for (a, child) in game.tree.children(node).enumerate() {
+                        let raw = solver.expected_values_at(
+                            child,
+                            player,
+                            nlh::PerPlayer::new(
+                                reach[Player::P0].as_slice(),
+                                reach[Player::P1].as_slice(),
+                            ),
+                        );
+                        values.push(
+                            raw.iter()
+                                .zip(&mass)
+                                .enumerate()
+                                .map(|(h, (&value, &m))| {
+                                    if m > 0.0 {
+                                        Some(value / m + bonus.bonus[a * mass.len() + h])
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .collect::<Vec<_>>(),
+                        );
+                    }
+                    values
+                });
+                serde_json::json!({"reach": reach[player], "actionEv": action_ev})
+            });
             hits.push(serde_json::json!({
                 "addedIterations": added, "iteration": solver.iteration(),
                 "elapsedSecsLab": started.elapsed().as_secs_f64(),
@@ -484,11 +543,20 @@ fn warm_experiment<S: Storage>(
                 "rootStrategy": solver.average_strategy_at(0),
                 "targetNode": target_node,
                 "targetStrategy": target_node.map(|node| solver.average_strategy_at(node)),
+                "targetDetail": target_detail,
             }));
-            if hits.len() == 2 {
+            if let Some(path) = &args.json {
+                let partial = serde_json::json!({
+                    "mode": mode, "startIteration": start_iteration, "hits": hits,
+                    "maxAddedIterations": args.iters, "targetExploitability": target,
+                    "setupSecs": setup_secs,
+                });
+                std::fs::write(path, serde_json::to_string_pretty(&partial)?)?;
+            }
+            if hits.len() == 4 {
                 break;
             }
-            next = target / 2.0;
+            next = target * [0.5, 0.2, 0.1][hits.len() - 1];
         }
         if added < args.iters {
             solver.step();

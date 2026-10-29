@@ -1,0 +1,19 @@
+{
+  "reproduction": "partial: flop checkpoint 0.05% not reached within 650 added iterations",
+  "sourceBaseRevision": "3f153de6",
+  "experimentExamplePath": "crates/hu-postflop/examples/p1_bench.rs",
+  "experimentExampleSha256": "e49faedb7e3a03344775cb757285990489572aeff00ac92b4e2478058ba9b699",
+  "rust": "1.97.0",
+  "buildFlags": "-C target-cpu=znver3",
+  "machines": [
+    {"role": "dev", "instance": "i-0f3f38cbb7215e1b4", "type": "r6a.8xlarge", "market": "spot", "use": "release builds and workspace checks; shared; not terminated here"},
+    {"role": "lab", "instance": "i-09e22c6515d3d2375", "type": "r6a.8xlarge", "market": "spot", "launchUtc": "2026-10-29T07:33:07Z", "baseStartUtc": "2026-10-29T07:41:13Z", "measurementStartUtc": "2026-10-29T07:43:11Z", "measurementEndUtc": "2026-10-29T08:41:19Z", "terminationRequestedUtc": "2026-10-29T08:42Z", "use": "base solve and convergence; an initial unoptimized-for-zen3 release example was also built here but not used in measurements"}
+  ],
+  "solverSha256": "08f4fc46f8e322e98b75edb7cf6769997bda486b96f6fa147c86f1b7db8dcee4",
+  "p1BenchSha256": "e925ef91000427e2063553c8c864a9afbff477115a6c6bfb95b76fb29bab3f44",
+  "base": {"iterations": 389, "solutionSha256": "c62b6ca84b7c3c68f70f151a7f448c5b0ceaea06bfba81497e4028360ef56e64", "checkpointSha256": "11439303447fc9419e2dc45e5387b9c0435fade31115fe41144ecf3189b75d5f", "checkpointBytes": 3031282037, "availability": "temporary lab disk; regenerate using original base.toml"},
+  "rawResultsSha256": "daa29d4421512744b5e4daf6b42fa31282e0d2235b8cd15a4954aa8c2ee5f35e",
+  "checks": ["cargo fmt --all --check", "cargo clippy --workspace --all-targets -- -D warnings", "cargo test --workspace"],
+  "checksLocation": "dev, after final example code change",
+  "results": "results/summary.json and results.tar.gz"
+}
