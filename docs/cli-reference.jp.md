@@ -156,9 +156,9 @@ suit対称range・categoryや`?` runoutを使うか、同じprofile selector（`
 `output.solution_streets = "no-rivers"`は、解決済みのlock・incentive・frequencyまたは固定祖先がRiverにある場合はerror。
 基準fileのSHA-256はvalidate・solve時に大文字・小文字を区別せず照合するが、freeze由来の`.sol`の読込・export・比較時には再読込・再hashしない。
 `freeze_upstream`のsolveはprofile対象の最大部分木を自動選択して反復し、外側に基準解の平均戦略をコピーする。
-外側の戦略が保存されていない場合、frequency目標がある場合、対象が空またはrootを含む場合は木全体の反復に戻る。
-上流固定に必要な戦略の欠落は従来どおりerror。停止・進捗・結果の評価は木全体で行い、
-storageと保存成果物も木全体を扱う。再開時はmodeと部分木identityを照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
+外側の戦略が保存されていない場合、対象が空またはrootを含む場合、または部分木外の残差が停止目標以上の場合は木全体の反復に戻る。frequency目標自体はfallbackの理由にならない。
+上流固定に必要な戦略の欠落は従来どおりerror。停止・進捗・結果の評価は木全体で行う。
+部分木modeの反復stateはcompactに保持し、外側の戦略は基準解から用いて全木のsolutionを保存する。再開時はmodeと部分木identityを照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
 JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLIの追加fieldはcamelCaseである。
 
 | field | 内容 |
@@ -268,12 +268,12 @@ iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`ge
 到達weightが無い場合の`achieved`と`error`はnull。評価時の頻度はstdoutにも表示し、
 既存の`progress.jsonl`形式は変えない。profile無しでは`profile`自体を出さない。
 `freeze_upstream`指定時の`profile.solve_scope`は`subtree`または`whole-tree`、`subtree_roots`は部分木根の数、
-`fallback_reason`は非fallback時null、fallback時は`frequency-targets` / `no-targets` / `root-target` / `missing-base-strategy` / `outside-residual`である。`outside-residual`は部分木外のNashConvの半分が停止目標以上の場合に選ぶ。
+`fallback_reason`は非fallback時null、fallback時は`no-targets` / `root-target` / `missing-base-strategy` / `outside-residual`である。`outside-residual`は部分木外のNashConvの半分が停止目標以上の場合に選ぶ。
 これらはrun summaryに追加し、`.sol`のprofileには追加しない。
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`は通常version 4、profile付きversion 5、checkpointは通常version 5、頻度目標付きversion 6を受理する。旧形式は現行configから再solveする。
+P1 `.sol`は通常version 4、profile付きversion 5、checkpointは通常version 5、木全体で頻度目標付きならversion 6、部分木modeならversion 8を受理する。旧部分木形式のversion 7を含む未対応の旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 

@@ -185,7 +185,6 @@ pub(crate) fn query<S: Storage>(
         &mut solver,
         &index,
         controller.summary.as_ref(),
-        !controller.targets.is_empty(),
         base.as_ref(),
         target,
     )?;
@@ -563,22 +562,123 @@ fn drive<S: Storage>(
     observer: &mut Observer<'_>,
     diagnostics: &mut Diagnostics<'_>,
 ) -> Result<RunSummary> {
-    let RunRequest {
-        prepared: p,
-        checkpoint,
-        solution,
-        state,
-        evaluation_history: mut history,
-        elapsed_before,
-        cancel,
-    } = request;
+    let p = request.prepared;
     crate::prepare::check_memory_limit(p)?;
     diagnostics(Diagnostic::Memory(p.estimate.clone()));
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));
     }
     let (game, index, resolved, base) = build_profiled_with_base(p)?;
+    let selected = match (&base, &resolved) {
+        (Some((base, map)), Some(profile)) => Some(crate::subtree::select_roots(
+            &game.tree,
+            &index,
+            &profile.summary,
+            base,
+            map,
+        )),
+        _ => None,
+    };
     let stop = &p.settings.solver.stop;
+    let saved_lambdas = request
+        .state
+        .as_ref()
+        .map(|s| s.frequency_lambdas.as_slice());
+    if let Some(Ok(roots)) = selected.as_ref() {
+        let mut node_for_ref = vec![0; game.tree.storage_refs.len()];
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind == hu_engine::NodeKind::Action {
+                node_for_ref[game.tree.storage_ref(node).index as usize] = id as u32;
+            }
+        }
+        let base = std::sync::Arc::new(base.expect("selected scope requires a base"));
+        let errors = std::sync::Arc::new(std::sync::Mutex::new(None::<String>));
+        let provider_base = base.clone();
+        let provider_errors = errors.clone();
+        let mut solver = Solver::<_, hu_engine::CompactStorage<S>>::new_subtrees(
+            game,
+            schedule(&p.settings.solver.algorithm),
+            Some(stop.max_iterations),
+            roots,
+        );
+        solver.set_external_strategy_provider(std::sync::Arc::new(move |sref, out| {
+            let id = node_for_ref[sref.index as usize];
+            match provider_base.1.strategy(&provider_base.0, id) {
+                Ok(Some(strategy)) if strategy.len() == out.len() => out.copy_from_slice(&strategy),
+                Ok(_) => {
+                    *provider_errors.lock().unwrap() =
+                        Some(format!("missing base strategy for node {id}"));
+                    out.fill(0.0);
+                }
+                Err(error) => {
+                    *provider_errors.lock().unwrap() = Some(error.to_string());
+                    out.fill(0.0);
+                }
+            }
+        }));
+        solver.set_cfr_precision(p.settings.solver.cfr_precision);
+        solver.set_par(ParConfig {
+            chance_depth: p.settings.solver.parallel.chance_depth,
+            min_children: p.settings.solver.parallel.min_children,
+        });
+        let controller = install_profile(&mut solver, resolved, saved_lambdas)?;
+        let subtree = crate::subtree::prepare_compact(
+            &solver,
+            &index,
+            controller.summary.as_ref().unwrap(),
+            p.target,
+        );
+        check_base_error(&errors)?;
+        if let Some(subtree) = subtree {
+            let scope = crate::subtree::SolveScope {
+                scope: "subtree",
+                subtree_roots: roots.len(),
+                fallback_reason: None,
+            };
+            return drive_ready(
+                request,
+                observer,
+                diagnostics,
+                solver,
+                index,
+                controller,
+                Some(subtree),
+                Some(scope),
+                Some(errors),
+            );
+        }
+        let (game, profile) = solver.into_game_and_profile();
+        drop(base);
+        let mut solver = Solver::<_, S>::new(
+            game,
+            schedule(&p.settings.solver.algorithm),
+            Some(stop.max_iterations),
+        );
+        solver.set_cfr_precision(p.settings.solver.cfr_precision);
+        solver.set_par(ParConfig {
+            chance_depth: p.settings.solver.parallel.chance_depth,
+            min_children: p.settings.solver.parallel.min_children,
+        });
+        if let Some(profile) = profile {
+            solver.set_profile(profile)?;
+        }
+        let scope = crate::subtree::SolveScope {
+            scope: "whole-tree",
+            subtree_roots: 0,
+            fallback_reason: Some("outside-residual"),
+        };
+        return drive_ready(
+            request,
+            observer,
+            diagnostics,
+            solver,
+            index,
+            controller,
+            None,
+            Some(scope),
+            None,
+        );
+    }
     let mut solver = Solver::<_, S>::new(
         game,
         schedule(&p.settings.solver.algorithm),
@@ -589,16 +689,55 @@ fn drive<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
-    let saved_lambdas = state.as_ref().map(|s| s.frequency_lambdas.as_slice());
-    let mut controller = install_profile(&mut solver, resolved, saved_lambdas)?;
-    let (subtree, solve_scope) = crate::subtree::prepare(
-        &mut solver,
-        &index,
-        controller.summary.as_ref(),
-        base.as_ref(),
-        p.target,
-    )?;
+    let controller = install_profile(&mut solver, resolved, saved_lambdas)?;
+    let scope = selected.map(|result| crate::subtree::SolveScope {
+        scope: "whole-tree",
+        subtree_roots: 0,
+        fallback_reason: result.err(),
+    });
     drop(base);
+    drive_ready(
+        request,
+        observer,
+        diagnostics,
+        solver,
+        index,
+        controller,
+        None,
+        scope,
+        None,
+    )
+}
+
+fn check_base_error(errors: &std::sync::Mutex<Option<String>>) -> Result<()> {
+    if let Some(error) = errors.lock().unwrap().take() {
+        bail!("reading frozen base strategy: {error}");
+    }
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+fn drive_ready<S: Storage>(
+    request: RunRequest<'_>,
+    observer: &mut Observer<'_>,
+    diagnostics: &mut Diagnostics<'_>,
+    mut solver: Solver<crate::PostflopEvaluator, S>,
+    index: GameIndex,
+    mut controller: FrequencyController,
+    subtree: Option<crate::subtree::SubtreeSolve>,
+    solve_scope: Option<crate::subtree::SolveScope>,
+    base_errors: Option<std::sync::Arc<std::sync::Mutex<Option<String>>>>,
+) -> Result<RunSummary> {
+    let RunRequest {
+        prepared: p,
+        checkpoint,
+        solution,
+        state,
+        evaluation_history: mut history,
+        elapsed_before,
+        cancel,
+    } = request;
+    let stop = &p.settings.solver.stop;
     let mode = if subtree.is_some() {
         crate::checkpoint::CheckpointMode::Subtree
     } else {
@@ -672,6 +811,9 @@ fn drive<S: Storage>(
             let (ev, expl) = subtree
                 .as_ref()
                 .map_or_else(|| solver.evaluate(), |s| s.evaluate(&solver));
+            if let Some(errors) = &base_errors {
+                check_base_error(errors)?;
+            }
             evaluated = Some((ev, expl));
             let nash_conv = expl[Player::P0] + expl[Player::P1];
             observer(Observation::Progress(runfiles::MetricsRow {
@@ -686,6 +828,9 @@ fn drive<S: Storage>(
                     iteration: solver.iteration(),
                     frequencies: controller.metrics(&solver, false),
                 })?;
+            }
+            if let Some(errors) = &base_errors {
+                check_base_error(errors)?;
             }
             history.push((solver.iteration(), nash_conv / 2.0));
             target_reached = p.target.is_some_and(|target| nash_conv / 2.0 <= target);
@@ -743,6 +888,9 @@ fn drive<S: Storage>(
     };
     let mut summary = summary_from_evaluation(&solver, elapsed, subgame_ev(ev, offset), expl);
     summary.profile = controller.report(&solver, p);
+    if let Some(errors) = &base_errors {
+        check_base_error(errors)?;
+    }
     summary.solve_scope = solve_scope;
     if let Some(profile) = &summary.profile {
         summary.frequencies.clone_from(&profile.frequencies);
@@ -824,6 +972,9 @@ fn drive<S: Storage>(
             &summary,
             &mut |d| diagnostics(Diagnostic::Artifact(d)),
         )?;
+    }
+    if let Some(errors) = &base_errors {
+        check_base_error(errors)?;
     }
     Ok(summary)
 }

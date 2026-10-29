@@ -150,11 +150,12 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 `freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
 部分木を自動的に選び、各iterationでそれらを解く。部分木の外側には基準解の平均戦略をコピーし、
 部分木への到達をその戦略から求める。部分木内のprofileは従来どおり適用する。
-外側の戦略が基準解に保存されていない場合、頻度目標がある場合、対象が空の場合、
-対象にrootが含まれる場合、または部分木外の制約付きNashConvの半分が停止目標以上の場合は、従来の木全体の反復へfallbackする（停止目標がない場合は残差によるfallbackを行わない）。
+外側の戦略が基準解に保存されていない場合、対象が空の場合、対象にrootが含まれる場合、
+または部分木外の制約付きNashConvの半分が停止目標以上の場合は、従来の木全体の反復へfallbackする（停止目標がない場合は残差によるfallbackを行わない）。
+頻度目標があっても、それ自体はfallbackの理由にならず、部分木内で更新する。
 上流固定に必要な戦略が無い場合の拒否は変わらない。
 停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
-storage、checkpoint、solutionも木全体を対象とし、部分木化によるstorage削減は前提としない。
+部分木modeでは反復stateを対象部分木に限ってcompactに保存し、外側の戦略は基準解から保持して全木の評価とsolution出力に用いる。
 checkpointの再開では計算modeと部分木のidentityも照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
 `solution_streets = "no-rivers"`はprofileまたは固定祖先がRiverにある場合は拒否する。
 profileを変更したcheckpointのresumeは互換性hashの不一致として拒否する。
@@ -333,7 +334,7 @@ checkpoint eventは実際にatomic置換したときだけ記録する。終了�
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
 solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + C + E + M`（第7節）がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
 
-checkpointは第7節のversion 5または6で保存し、backend種別と配列長をmetadataへ記録する。
+checkpointは第7節のversion 5、6または8で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
@@ -396,7 +397,7 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1、単一zstd streamのversion 2、木を保存しないversion 3はversion errorで明示的に拒否する。変換は無く、現行configから再solveしてversion 4を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5または6である。頻度目標がある場合だけversion 6を使い、version 5のmetadataとλのf64 vectorをpostcard tupleにする。生配列とdigestは同じ形式である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateと部分木identityを持つversion 8を使う。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 
@@ -409,8 +410,8 @@ header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮�
 header/payloadのiteration一致、backendと全配列長、digest、frame終端、末尾余剰bytesを検査する。
 切詰め・破損はerrorであり、読込み失敗した部分的storageからsolveを再開しない。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-storageの長さはcompact supportで決まる。P1 resumeはversion 5と6を受理し、埋込みconfigを必須とする。
-version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
+storageの長さはcompact supportと計算modeで決まる。P1 resumeはversion 5、6、8を受理し、埋込みconfigを必須とする。
+version 1〜4と旧部分木形式のversion 7はversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
 保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
 `.sol`も同じ一時file・fsync・atomic置換を使う。chunkは16個ずつrun用Rayon poolで並列圧縮し、sref順に書く。出力bytesはthread数によらない。

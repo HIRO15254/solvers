@@ -2251,6 +2251,13 @@ pub(crate) fn vec_bytes<T>(v: &Vec<T>) -> u64 {
     (v.capacity() * std::mem::size_of::<T>()) as u64
 }
 
+// Each wildcard can expand at most one chance node's maximum fan-out.
+fn selector_match_bound(selector: &str, max_deals: u64, action_nodes: u64) -> u64 {
+    (0..selector.bytes().filter(|&b| b == b'?').count())
+        .fold(1u64, |n, _| n.saturating_mul(max_deals))
+        .min(action_nodes)
+}
+
 /// Storage/node/terminal/rank-table footprint of a [`PostflopConfig`],
 /// without actually building the tree.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -2324,6 +2331,62 @@ impl MemoryEstimate {
     /// Profile slots and resolution residue for this tree's action nodes.
     pub fn profile_slot_bytes(&self) -> u64 {
         self.action_nodes.saturating_mul(PROFILE_SLOT_BYTES)
+    }
+
+    /// Freeze-specific upper bound, including both compact and whole-tree
+    /// fallback allocations. Selectors are bounded by their possible chance
+    /// expansions; their actual matches and fallback reason are known only
+    /// after the game and base solution have been loaded.
+    pub(crate) fn freeze_bytes(&self, config: &PostflopConfig, profile: &spot::ProfileIr) -> u64 {
+        let matches =
+            |selector: &str| selector_match_bound(selector, self.max_deals, self.action_nodes);
+        let target_bound = profile
+            .locks
+            .iter()
+            .map(|x| matches(&x.node))
+            .chain(profile.incentives.iter().map(|x| matches(&x.node)))
+            .chain(profile.frequencies.iter().map(|x| matches(&x.node)))
+            .fold(0u64, u64::saturating_add)
+            .min(self.action_nodes);
+        let frequency_bound = profile
+            .frequencies
+            .iter()
+            .map(|x| matches(&x.node))
+            .fold(0u64, u64::saturating_add);
+        let hands = PostflopHands::new(&config.board, &config.ranges);
+        let total_hands = (hands.len(Player::P0) + hands.len(Player::P1)) as u64;
+        let widest = hands.len(Player::P0).max(hands.len(Player::P1)) as u64;
+        let root_bytes = target_bound.saturating_mul(
+            std::mem::size_of::<hu_engine::SubtreeRoot>() as u64
+                + total_hands * std::mem::size_of::<f32>() as u64,
+        );
+        let frequency_bytes = frequency_bound.saturating_mul(
+            std::mem::size_of::<crate::profile::FrequencyTarget>() as u64
+                + widest * std::mem::size_of::<u32>() as u64
+                + 2 * std::mem::size_of::<f64>() as u64,
+        );
+        self.game_bytes
+            // Base strategy provider and installed locks can coexist.
+            .saturating_add(self.f32_regret_bytes.saturating_mul(2))
+            .saturating_add(self.action_nodes.saturating_mul(widest * 4))
+            .saturating_add(
+                self.nodes
+                    .saturating_mul(2 * std::mem::size_of::<Option<Vec<f32>>>() as u64),
+            )
+            // Incentives and the controller's copy of their base values.
+            .saturating_add(
+                if profile.incentives.is_empty() && profile.frequencies.is_empty() {
+                    0
+                } else {
+                    self.f32_regret_bytes.saturating_mul(2)
+                },
+            )
+            .saturating_add(frequency_bytes.saturating_mul(2))
+            .saturating_add(root_bytes.saturating_mul(2))
+            // Compact ref map; non-identity base node and suit maps.
+            .saturating_add(self.action_nodes.saturating_mul(16))
+            .saturating_add(self.nodes.saturating_mul(16))
+            .saturating_add(24 * 2 * nlh::NUM_COMBOS as u64 * 2)
     }
 
     /// The checkpoint's zstd encoder with the run's worker count, needed
@@ -2712,6 +2775,67 @@ impl Counting<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn selector_bounds_cover_wildcards_and_saturate() {
+        assert_eq!(selector_match_bound("x", 45, 1000), 1);
+        assert_eq!(selector_match_bound("xx[?]", 45, 1000), 45);
+        assert_eq!(
+            selector_match_bound("check/check/?/check/check/?", 45, 1000),
+            1000
+        );
+        assert_eq!(selector_match_bound("[?][?][?]", u64::MAX, 99), 99);
+        assert_eq!(selector_match_bound("root", 0, 0), 0);
+    }
+
+    #[test]
+    fn freeze_budget_covers_fallback_frequency_and_auto_selection() {
+        let config = PostflopConfig {
+            board: cards("As Kd Qh"),
+            ..Default::default()
+        };
+        let mut profile = spot::ProfileIr {
+            locks: Vec::new(),
+            incentives: Vec::new(),
+            frequencies: Vec::new(),
+            freeze_upstream: Some(spot::FreezeIr {
+                solution: "base.sol".into(),
+                sha256: None,
+            }),
+        };
+        let mut estimate = MemoryEstimate {
+            game_bytes: 1000,
+            nodes: 100,
+            action_nodes: 40,
+            max_deals: 20,
+            f32_bytes: 8000,
+            i16_f32avg_bytes: 6000,
+            f32_regret_bytes: 4000,
+            i16_regret_bytes: 2000,
+            ..Default::default()
+        };
+        let fallback = estimate.freeze_bytes(&config, &profile);
+        profile.frequencies.push(spot::FrequencyIr {
+            node: "xx[?]".into(),
+            hands: spot::HandSelector::All,
+            action: "check".into(),
+            target: 0.5,
+        });
+        let frequency = estimate.freeze_bytes(&config, &profile);
+        assert!(frequency > fallback);
+        estimate.profile_bytes = frequency;
+        let f32 = estimate.required_bytes(crate::input::Storage::F32);
+        let mixed = estimate.required_bytes(crate::input::Storage::I16F32Avg);
+        assert!(f32 > mixed);
+        assert_eq!(
+            crate::prepare::resolve_storage(crate::input::StorageChoice::Auto, &estimate, f32),
+            crate::input::Storage::F32
+        );
+        assert_eq!(
+            crate::prepare::resolve_storage(crate::input::StorageChoice::Auto, &estimate, f32 - 1),
+            crate::input::Storage::I16F32Avg
+        );
+    }
 
     fn cards(text: &str) -> Vec<Card> {
         text.split_whitespace()
