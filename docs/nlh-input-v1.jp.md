@@ -74,8 +74,7 @@ confidence = 1.0
   指定するhashは大文字も受け付け、小文字に正規化する。成果物に埋め込まれたconfigの読込時には再照合しない。
   木への解決、上流固定、lock・incentive・頻度目標の計算上の意味は[P1規範](hu-postflop.jp.md)に従う。
   頻度目標があっても上流固定の部分木solveを使える。部分木modeは反復stateをcompactに保持し、外側の戦略は基準解から用いる。
-  suit非対称のselectorがiso groupingを制限し、基準解とprofileの木が異なる場合は拒否する。
-  suit対称のrange・categoryや`?` runoutを使うか、同じprofile selector（`freeze_upstream`を除く）で基準解をsolveする。
+  suit非対称のselectorでiso groupingが基準解より細かくなる場合も、対応する基準戦略をsuit置換して利用する。
 
 ## 3. 製品の決定
 
