@@ -11,7 +11,7 @@ const solution = [{ name: "solution.sol", bytes: 10 }];
 
 describe("Setup freeze base choices", () => {
   it("omits the CLI path only from requests using a daemon base", () => {
-    const doc = readDoc('[profile.freeze_upstream]\nsolution = "local.sol"\nsha256 = "abc"\n[[profile.lock]]\nnode = "x"\nstrategy = { check = 1 }\n');
+    const doc = readDoc('schema = "solvers.nlh/v1"\n[profile.freeze_upstream]\nsolution = "local.sol"\nsha256 = "abc"\n[[profile.lock]]\nnode = "x"\nstrategy = { check = 1 }\n');
     const request = freezeRequestDoc(doc, "base");
     expect(request.profile).toEqual({ lock: [{ node: "x", strategy: { check: 1 } }] });
     expect(readDoc(writeDoc(doc))).toEqual(doc);

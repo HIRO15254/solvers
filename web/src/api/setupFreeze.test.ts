@@ -12,9 +12,9 @@ describe("Setup freeze base requests", () => {
     await api.createRun("config", "new", "base");
     await api.validate("config", true);
     await api.createRun("config", "new");
-    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ configToml: "config", resources: true, freezeBaseRunId: "base" });
-    expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ configToml: "config", runId: "new", freezeBaseRunId: "base" });
-    expect(JSON.parse(fetch.mock.calls[2][1].body)).toEqual({ configToml: "config", resources: true });
-    expect(JSON.parse(fetch.mock.calls[3][1].body)).toEqual({ configToml: "config", runId: "new" });
+    expect(JSON.parse(fetch.mock.calls[0]![1].body)).toEqual({ configToml: "config", resources: true, freezeBaseRunId: "base" });
+    expect(JSON.parse(fetch.mock.calls[1]![1].body)).toEqual({ configToml: "config", runId: "new", freezeBaseRunId: "base" });
+    expect(JSON.parse(fetch.mock.calls[2]![1].body)).toEqual({ configToml: "config", resources: true });
+    expect(JSON.parse(fetch.mock.calls[3]![1].body)).toEqual({ configToml: "config", runId: "new" });
   });
 });
