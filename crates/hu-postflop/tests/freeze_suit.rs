@@ -26,7 +26,7 @@ memory = "1GiB"
 threads = 1
 "#;
 
-fn solve(p: &prepare::Prepared, ckpt: &std::path::Path, sol: &std::path::Path) {
+fn solve(p: &prepare::Prepared, ckpt: &std::path::Path, sol: &std::path::Path) -> run::RunSummary {
     run::run(
         run::RunRequest {
             prepared: p,
@@ -40,7 +40,7 @@ fn solve(p: &prepare::Prepared, ckpt: &std::path::Path, sol: &std::path::Path) {
         &mut |_| Ok(()),
         &mut |_| {},
     )
-    .unwrap();
+    .unwrap()
 }
 
 #[test]
@@ -72,5 +72,47 @@ fn asymmetrical_frozen_river_against_merged_base() {
             &dir.path().join("freeze.ckpt"),
             &dir.path().join("freeze.sol"),
         );
+    }
+}
+
+#[test]
+fn frozen_relock_agrees_with_equivalently_restricted_base() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("input.toml");
+    let plain = prepare::prepare(TURN, &path).unwrap();
+    let merged_sol = dir.path().join("merged.sol");
+    let merged_base = solve(&plain, &dir.path().join("merged.ckpt"), &merged_sol);
+    // A zero incentive restricts the base grouping without changing its payoff.
+    let restricted_input = format!(
+        "{TURN}\n[profile]\n[[profile.incentive]]\nnode = 'xx[?]x'\nhands = '4c4h'\naction = 'check'\npot = 0.0\n"
+    );
+    let restricted = prepare::prepare(&restricted_input, &path).unwrap();
+    let restricted_sol = dir.path().join("restricted.sol");
+    let restricted_base = solve(
+        &restricted,
+        &dir.path().join("restricted.ckpt"),
+        &restricted_sol,
+    );
+    let mut results = Vec::new();
+    for (i, base) in [&merged_sol, &restricted_sol].into_iter().enumerate() {
+        let input = format!(
+            "{TURN}\n[profile]\nfreeze_upstream = {{ solution = '{}' }}\n[[profile.lock]]\nnode = 'xx[?]x'\nhands = '4c4h'\nstrategy = {{ check = 1.0 }}\n",
+            base.display()
+        );
+        let p = prepare::prepare(&input, &path).unwrap();
+        let output = dir.path().join(format!("result{i}.sol"));
+        let summary = solve(&p, &dir.path().join(format!("result{i}.ckpt")), &output);
+        results.push((summary, artifact::load_sol(&output, 0, None).unwrap()));
+    }
+    // Each base is only approximately converged; use their combined NashConv
+    // as a conservative tolerance on the resulting root EV.
+    let tolerance = merged_base.nash_conv + restricted_base.nash_conv + 1e-5;
+    for seat in nlh::Player::BOTH {
+        assert!((results[0].0.ev[seat] - results[1].0.ev[seat]).abs() <= tolerance);
+    }
+    let a = results[0].1.stored_strategy(0).unwrap().unwrap();
+    let b = results[1].1.stored_strategy(0).unwrap().unwrap();
+    for (x, y) in a.iter().zip(b) {
+        assert!((x - y).abs() <= tolerance as f32);
     }
 }

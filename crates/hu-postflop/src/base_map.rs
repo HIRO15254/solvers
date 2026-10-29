@@ -107,26 +107,68 @@ impl BaseMap {
         node: u32,
     ) -> Result<Option<Vec<f32>>> {
         let base_node = self.base_node(node);
-        let Some(strategy) = base.stored_strategy(base_node)? else {
+        if !base.is_stored(base_node) {
             return Ok(None);
-        };
+        }
+        let n = base.game.tree.node(base_node);
+        let s = base.game.tree.storage_ref(n);
+        let mut result = vec![0.0; s.num_actions as usize * s.num_hands as usize];
+        if self.strategy_into(base, node, &mut result)? {
+            Ok(Some(result))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Decode directly into the caller's profiled-order buffer without heap scratch.
+    pub fn strategy_into(
+        &self,
+        base: &crate::artifact::LoadedSol,
+        node: u32,
+        out: &mut [f32],
+    ) -> Result<bool> {
+        let base_node = self.base_node(node);
+        if !base.stored_strategy_into(base_node, out)? {
+            return Ok(false);
+        }
         if self.entries.is_empty() || self.entries[node as usize].perm == 0 {
-            return Ok(Some(strategy));
+            return Ok(true);
         }
         let perm = all_suit_perms()[self.entries[node as usize].perm as usize];
         let actor = base.game.tree.node(base_node).player;
         let hands = &base.game.index.hands;
         let combos = hands.combos(actor);
-        let mut result = vec![0.0; strategy.len()];
-        for (i, &combo) in combos.iter().enumerate() {
-            let j = hands
-                .local(actor, permute_combo(&perm, combo as usize))
-                .expect("base symmetry preserves hand support");
-            for a in 0..strategy.len() / combos.len() {
-                result[a * combos.len() + i] = strategy[a * combos.len() + j];
+        let next = |i: usize| {
+            hands
+                .local(actor, permute_combo(&perm, combos[i] as usize))
+                .expect("base symmetry preserves hand support")
+        };
+        // Each combo permutation is a short cycle. Rotate only its lowest
+        // index, avoiding a visited bitmap or shared mutable scratch.
+        for i in 0..combos.len() {
+            let mut j = next(i);
+            while j > i {
+                j = next(j);
+            }
+            if j != i {
+                continue;
+            }
+            for action in 0..out.len() / combos.len() {
+                let row = &mut out[action * combos.len()..(action + 1) * combos.len()];
+                let first = row[i];
+                let mut current = i;
+                loop {
+                    let following = next(current);
+                    if following == i {
+                        row[current] = first;
+                        break;
+                    }
+                    row[current] = row[following];
+                    current = following;
+                }
             }
         }
-        Ok(Some(result))
+        Ok(true)
     }
 }
 
@@ -231,5 +273,108 @@ impl Walker<'_> {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::AtomicBool;
+    use std::time::Duration;
+
+    const TURN: &str = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
+board = "2s 7s Ks 4s"
+[ranges]
+BB = "AK,44"
+BTN = "AK,44"
+[tree]
+script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver]
+storage = "f32"
+[solver.stop]
+max_iterations = 20
+check_every = 20
+[run]
+memory = "1GiB"
+threads = 1
+"#;
+
+    #[test]
+    fn every_mapped_action_reindexes_the_base_strategy() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spot.toml");
+        let sol = dir.path().join("base.sol");
+        let p = crate::prepare::prepare(TURN, &path).unwrap();
+        crate::run::run(
+            crate::run::RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("base.ckpt"),
+                solution: &sol,
+                state: None,
+                evaluation_history: vec![],
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let base = crate::artifact::load_sol(&sol, 0, None).unwrap();
+        let input = format!(
+            "{TURN}\n[profile]\nfreeze_upstream = {{ solution = '{}' }}\n[[profile.lock]]\nnode = 'xx[?]x'\nhands = '4c4h'\nstrategy = {{ check = 1.0 }}\n",
+            sol.display()
+        );
+        let p = crate::prepare::prepare(&input, &path).unwrap();
+        let (game, index, _) = crate::run::build_profiled(&p).unwrap();
+        let map = BaseMap::new(&base, &game.tree, &index, &p.config).unwrap();
+        assert_eq!(std::mem::size_of::<Entry>(), 8);
+        assert!(map.entries.iter().any(|entry| entry.perm != 0));
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind != NodeKind::Action {
+                continue;
+            }
+            let entry = map.entries[id];
+            let source = base.stored_strategy(entry.node).unwrap().unwrap();
+            let actual = map.strategy(&base, id as u32).unwrap().unwrap();
+            let hands = &index.hands;
+            let combos = hands.combos(node.player);
+            let perm = all_suit_perms()[entry.perm as usize];
+            for (i, &combo) in combos.iter().enumerate() {
+                let j = hands
+                    .local(node.player, permute_combo(&perm, combo as usize))
+                    .unwrap();
+                for action in 0..node.num_children as usize {
+                    assert_eq!(
+                        actual[action * combos.len() + i],
+                        source[action * combos.len() + j]
+                    );
+                }
+            }
+        }
+        let mut checked = 0;
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind != NodeKind::Chance {
+                continue;
+            }
+            let other = base.game.tree.node(map.entries[id].node);
+            let mut weights = vec![0.0f32; other.num_children as usize];
+            for pos in 0..node.num_children as usize {
+                let child = node.first_child + pos as u32;
+                assert_eq!(game.tree.node(child).kind, NodeKind::Action);
+                let mapped = map.entries[child as usize].node;
+                weights[(mapped - other.first_child) as usize] += game.tree.deal(node, pos).weight;
+            }
+            for (pos, weight) in weights.into_iter().enumerate() {
+                assert!((weight - base.game.tree.deal(other, pos).weight).abs() < 1e-6);
+                checked += 1;
+            }
+        }
+        assert!(checked > 0);
     }
 }
