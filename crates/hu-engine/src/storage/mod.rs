@@ -1,10 +1,12 @@
 use crate::CfrPrecision;
 use crate::schedule::Discounts;
 use rayon::prelude::*;
+mod compact;
 mod f32;
 mod i16;
 mod mixed;
 mod normalize;
+pub use compact::{CompactStorage, CompactView, ExternalStrategyProvider};
 pub use f32::{F32Storage, F32View};
 use f32::{accumulate_strategy_impl, average_strategy_impl};
 pub use i16::{I16Storage, I16View};

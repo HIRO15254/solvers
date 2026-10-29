@@ -596,3 +596,56 @@ fn frozen_subtrees_match_full_walk() {
         }
     }
 }
+
+fn compact_subtrees_match_full<S: Storage>() {
+    let initial_game = game(4);
+    let nodes: Vec<_> = initial_game.tree.children(0).collect();
+    let selected = [nodes[0], nodes[2]];
+    let roots: Vec<_> = selected
+        .iter()
+        .map(|&node| SubtreeRoot {
+            node,
+            reach: PerPlayer::new(vec![0.75; 4], vec![0.5; 4]),
+            chance_weight: 1.0,
+            chance_depth: 0,
+        })
+        .collect();
+    let mut full = Solver::<_, S>::new(initial_game, Box::<Dcfr>::default(), Some(64));
+    let mut compact = Solver::<_, crate::CompactStorage<S>>::new_subtrees(
+        game(4),
+        Box::<Dcfr>::default(),
+        Some(64),
+        &selected,
+    );
+    for _ in 0..5 {
+        full.step_subtrees(&roots);
+        compact.step_subtrees(&roots);
+    }
+    for &node in &selected {
+        let span = full.game.tree.storage_spans[node as usize];
+        for r in &full.game.tree.storage_refs[span.sref_start as usize..span.sref_end as usize] {
+            let mut a = vec![0.0; r.len()];
+            let mut b = a.clone();
+            full.storage.average_strategy(*r, r.index, &mut a);
+            compact.storage.average_strategy(*r, r.index, &mut b);
+            assert_eq!(a, b);
+        }
+    }
+    for (a, b) in full
+        .subtree_values(&roots)
+        .iter()
+        .zip(compact.subtree_values(&roots))
+    {
+        for p in Player::BOTH {
+            assert_eq!(a[p].0.to_bits(), b[p].0.to_bits());
+            assert_eq!(a[p].1.to_bits(), b[p].1.to_bits());
+        }
+    }
+}
+
+#[test]
+fn compact_subtree_walks_match_full_storage() {
+    compact_subtrees_match_full::<crate::F32Storage>();
+    compact_subtrees_match_full::<crate::I16Storage>();
+    compact_subtrees_match_full::<crate::MixedStorage>();
+}
