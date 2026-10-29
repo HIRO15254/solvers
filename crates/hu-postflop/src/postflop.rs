@@ -2251,6 +2251,13 @@ pub(crate) fn vec_bytes<T>(v: &Vec<T>) -> u64 {
     (v.capacity() * std::mem::size_of::<T>()) as u64
 }
 
+// Each wildcard can expand at most one chance node's maximum fan-out.
+fn selector_match_bound(selector: &str, max_deals: u64, action_nodes: u64) -> u64 {
+    (0..selector.bytes().filter(|&b| b == b'?').count())
+        .fold(1u64, |n, _| n.saturating_mul(max_deals))
+        .min(action_nodes)
+}
+
 /// Storage/node/terminal/rank-table footprint of a [`PostflopConfig`],
 /// without actually building the tree.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -2285,6 +2292,8 @@ pub struct MemoryEstimate {
     pub profile_bytes: u64,
     pub nodes: u64,
     pub action_nodes: u64,
+    /// Largest action-node strategy, in f32 elements.
+    pub max_strategy_elements: u64,
     /// Most action and chance nodes on one root-to-leaf path.
     pub max_depth: u64,
     /// Most deals of one chance node.
@@ -2324,6 +2333,112 @@ impl MemoryEstimate {
     /// Profile slots and resolution residue for this tree's action nodes.
     pub fn profile_slot_bytes(&self) -> u64 {
         self.action_nodes.saturating_mul(PROFILE_SLOT_BYTES)
+    }
+
+    /// Reserved for a future third `.sol` stream in frozen saves. Its writer
+    /// is not present yet, so current saves require no additional workspace.
+    pub(crate) fn freeze_third_stream_workspace(&self) -> u64 {
+        0
+    }
+
+    /// Compact-subtree peak for disjoint selected storage spans, including
+    /// both serial and parallel save peaks and the full resident budget.
+    pub fn subtree_required_bytes(
+        &self,
+        backend: crate::input::Storage,
+        spans: &[hu_engine::StorageSpan],
+    ) -> u64 {
+        let (elements, refs) = spans.iter().fold((0u64, 0u64), |(elements, refs), span| {
+            (
+                elements.saturating_add(span.end.saturating_sub(span.start) as u64),
+                refs.saturating_add(span.sref_end.saturating_sub(span.sref_start) as u64),
+            )
+        });
+        let mut compact = self.clone();
+        compact.f32_bytes = elements.saturating_mul(8);
+        compact.i16_bytes = elements
+            .saturating_mul(4)
+            .saturating_add(refs.saturating_mul(8));
+        compact.i16_f32avg_bytes = elements
+            .saturating_mul(6)
+            .saturating_add(refs.saturating_mul(4));
+        compact.f32_regret_bytes = elements.saturating_mul(4);
+        compact.i16_regret_bytes = elements
+            .saturating_mul(2)
+            .saturating_add(refs.saturating_mul(4));
+        compact
+            .required_bytes(backend)
+            .max(compact.parallel_save_bytes(backend).unwrap_or(u64::MAX))
+    }
+
+    /// Freeze-specific upper bound, including both compact and whole-tree
+    /// fallback allocations. Selectors are bounded by their possible chance
+    /// expansions; their actual matches and fallback reason are known only
+    /// after the game and base solution have been loaded.
+    pub(crate) fn freeze_bytes(&self, config: &PostflopConfig, profile: &spot::ProfileIr) -> u64 {
+        let matches =
+            |selector: &str| selector_match_bound(selector, self.max_deals, self.action_nodes);
+        let target_bound = profile
+            .locks
+            .iter()
+            .map(|x| matches(&x.node))
+            .chain(profile.incentives.iter().map(|x| matches(&x.node)))
+            .chain(profile.frequencies.iter().map(|x| matches(&x.node)))
+            .fold(0u64, u64::saturating_add)
+            .min(self.action_nodes);
+        let frequency_bound = profile
+            .frequencies
+            .iter()
+            .map(|x| matches(&x.node))
+            .fold(0u64, u64::saturating_add);
+        let hands = PostflopHands::new(&config.board, &config.ranges);
+        let total_hands = (hands.len(Player::P0) + hands.len(Player::P1)) as u64;
+        let widest = hands.len(Player::P0).max(hands.len(Player::P1)) as u64;
+        // Frozen ancestors and explicitly locked targets are disjoint action
+        // nodes. Each target has at most max_depth ancestors.
+        let lock_nodes = target_bound
+            .saturating_mul(self.max_depth.saturating_add(1))
+            .min(self.action_nodes);
+        let lock_values = lock_nodes
+            .saturating_mul(self.max_strategy_elements)
+            .saturating_mul(std::mem::size_of::<f32>() as u64)
+            .min(self.f32_regret_bytes);
+        let root_bytes = target_bound.saturating_mul(
+            std::mem::size_of::<hu_engine::SubtreeRoot>() as u64
+                + total_hands * std::mem::size_of::<f32>() as u64,
+        );
+        let frequency_bytes = frequency_bound.saturating_mul(
+            std::mem::size_of::<crate::profile::FrequencyTarget>() as u64
+                + widest * std::mem::size_of::<u32>() as u64
+                + 2 * std::mem::size_of::<f64>() as u64,
+        );
+        self.game_bytes
+            // Pinned u16 strategy chunks and their headers/indexes during
+            // whole-tree passes; locks cover targets and frozen ancestors.
+            .saturating_add(self.f32_regret_bytes / 2)
+            .saturating_add(self.action_nodes.saturating_mul(80))
+            .saturating_add(4 * 1024 * 1024)
+            .saturating_add(lock_values)
+            .saturating_add(lock_nodes.saturating_mul(widest * 4))
+            .saturating_add(self.max_strategy_elements.saturating_mul(8))
+            // Incentives and the controller's copy of their base values.
+            .saturating_add(
+                if profile.incentives.is_empty() && profile.frequencies.is_empty() {
+                    0
+                } else {
+                    target_bound
+                        .saturating_mul(self.max_strategy_elements)
+                        .saturating_mul(std::mem::size_of::<f32>() as u64)
+                        .min(self.f32_regret_bytes)
+                        .saturating_mul(2)
+                },
+            )
+            .saturating_add(frequency_bytes.saturating_mul(2))
+            .saturating_add(root_bytes.saturating_mul(2))
+            // Compact ref map; non-identity base node and suit maps.
+            .saturating_add(self.action_nodes.saturating_mul(16))
+            .saturating_add(self.nodes.saturating_mul(16))
+            .saturating_add(24 * 2 * nlh::NUM_COMBOS as u64 * 2)
     }
 
     /// The checkpoint's zstd encoder with the run's worker count, needed
@@ -2375,10 +2490,64 @@ impl MemoryEstimate {
 pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
     count_tree(config, true)
 }
+/// Count the subtree reached by the root check, without constructing a tree.
+pub(crate) fn root_check_span(config: &PostflopConfig) -> Option<hu_engine::StorageSpan> {
+    let root = LineState::root(config);
+    let mut hits = rule_hits_for(config);
+    if !node_actions(&root, config, &mut hits)
+        .iter()
+        .any(|a| matches!(a, NodeAction::Check))
+    {
+        return None;
+    }
+    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
+        return None;
+    };
+    let estimate = count_tree_from(config, true, next).ok()?;
+    Some(hu_engine::StorageSpan {
+        start: 0,
+        end: usize::try_from(estimate.f32_regret_bytes / 4).ok()?,
+        sref_start: 0,
+        sref_end: u32::try_from(estimate.action_nodes).ok()?,
+    })
+}
+
+/// Whether a root-check selector matches a board-live hand in the actor's support.
+pub(crate) fn root_check_has_hands(config: &PostflopConfig, selector: &spot::HandSelector) -> bool {
+    let root = LineState::root(config);
+    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
+        return false;
+    };
+    let selected = match selector {
+        spot::HandSelector::All => None,
+        spot::HandSelector::Range(text) => match text.parse::<Range>() {
+            Ok(range) => Some(range),
+            Err(_) => return false,
+        },
+        spot::HandSelector::Category(_) => return false,
+    };
+    (0..nlh::NUM_COMBOS).any(|combo| {
+        let (a, b) = nlh::combo_cards(combo);
+        !config.board.contains(&a)
+            && !config.board.contains(&b)
+            && config.ranges[next.to_act].weight(combo) > 0.0
+            && selected
+                .as_ref()
+                .is_none_or(|range| range.weight(combo) > 0.0)
+    })
+}
 
 /// `parallel` counts the first chance level's deals concurrently; the
 /// estimate is identical either way.
 fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate, TreeBuildError> {
+    count_tree_from(config, parallel, LineState::root(config))
+}
+
+fn count_tree_from(
+    config: &PostflopConfig,
+    parallel: bool,
+    start: LineState,
+) -> Result<MemoryEstimate, TreeBuildError> {
     let mut counting = Counting {
         config,
         sym: game_preserving_perms(config),
@@ -2401,7 +2570,7 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         error: None,
         parallel,
     };
-    counting.betting(LineState::root(config));
+    counting.betting(start);
 
     if let Some(error) = counting.error {
         return Err(error);
@@ -2437,6 +2606,7 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         profile_bytes: 0,
         nodes: counting.nodes,
         action_nodes: counting.action_nodes,
+        max_strategy_elements: counting.max_strategy_elements,
         max_depth: counting.max_depth,
         max_deals: counting.max_deals,
         terminals: counting.terminals,
@@ -2712,6 +2882,117 @@ impl Counting<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn selector_bounds_cover_wildcards_and_saturate() {
+        assert_eq!(selector_match_bound("x", 45, 1000), 1);
+        assert_eq!(selector_match_bound("xx[?]", 45, 1000), 45);
+        assert_eq!(
+            selector_match_bound("check/check/?/check/check/?", 45, 1000),
+            1000
+        );
+        assert_eq!(selector_match_bound("[?][?][?]", u64::MAX, 99), 99);
+        assert_eq!(selector_match_bound("root", 0, 0), 0);
+    }
+
+    #[test]
+    fn compact_peak_uses_selected_spans_for_each_backend() {
+        let estimate = MemoryEstimate {
+            f32_bytes: 8000,
+            i16_bytes: 4800,
+            i16_f32avg_bytes: 6400,
+            f32_regret_bytes: 4000,
+            i16_regret_bytes: 2400,
+            ..Default::default()
+        };
+        let spans = [
+            hu_engine::StorageSpan {
+                start: 0,
+                end: 100,
+                sref_start: 0,
+                sref_end: 2,
+            },
+            hu_engine::StorageSpan {
+                start: 500,
+                end: 600,
+                sref_start: 10,
+                sref_end: 13,
+            },
+        ];
+        for (backend, bytes) in [
+            (crate::input::Storage::F32, 1600),
+            (crate::input::Storage::I16, 840),
+            (crate::input::Storage::I16F32Avg, 1220),
+        ] {
+            assert_eq!(
+                estimate.subtree_required_bytes(backend, &spans),
+                estimate.resident_bytes() + estimate.checkpoint_bytes() + bytes,
+            );
+            assert!(
+                estimate.subtree_required_bytes(backend, &spans) < estimate.required_bytes(backend)
+            );
+        }
+    }
+
+    #[test]
+    fn freeze_budget_covers_fallback_frequency_and_auto_selection() {
+        let config = PostflopConfig {
+            board: cards("As Kd Qh"),
+            ..Default::default()
+        };
+        let mut profile = spot::ProfileIr {
+            locks: Vec::new(),
+            incentives: Vec::new(),
+            frequencies: Vec::new(),
+            freeze_upstream: Some(spot::FreezeIr {
+                solution: "base.sol".into(),
+                sha256: None,
+            }),
+        };
+        let mut estimate = MemoryEstimate {
+            game_bytes: 1000,
+            nodes: 100,
+            action_nodes: 40,
+            max_deals: 20,
+            max_depth: 5,
+            max_strategy_elements: 100,
+            f32_bytes: 8000,
+            i16_f32avg_bytes: 6000,
+            f32_regret_bytes: 4000,
+            i16_regret_bytes: 2000,
+            ..Default::default()
+        };
+        let fallback = estimate.freeze_bytes(&config, &profile);
+        profile.locks.push(spot::LockIr {
+            node: "x".into(),
+            hands: spot::HandSelector::All,
+            strategy: spot::LockStrategy::Uniform(vec![("check".into(), 1.0)]),
+            confidence: 1.0,
+        });
+        let locked = estimate.freeze_bytes(&config, &profile);
+        assert!(locked >= fallback + 6 * 100 * 4);
+        profile.locks.clear();
+        profile.frequencies.push(spot::FrequencyIr {
+            node: "xx[?]".into(),
+            hands: spot::HandSelector::All,
+            action: "check".into(),
+            target: 0.5,
+        });
+        let frequency = estimate.freeze_bytes(&config, &profile);
+        assert!(frequency > fallback);
+        estimate.profile_bytes = frequency;
+        let f32 = estimate.required_bytes(crate::input::Storage::F32);
+        let mixed = estimate.required_bytes(crate::input::Storage::I16F32Avg);
+        assert!(f32 > mixed);
+        assert_eq!(
+            crate::prepare::resolve_storage(crate::input::StorageChoice::Auto, &estimate, f32),
+            crate::input::Storage::F32
+        );
+        assert_eq!(
+            crate::prepare::resolve_storage(crate::input::StorageChoice::Auto, &estimate, f32 - 1),
+            crate::input::Storage::I16F32Avg
+        );
+    }
 
     fn cards(text: &str) -> Vec<Card> {
         text.split_whitespace()

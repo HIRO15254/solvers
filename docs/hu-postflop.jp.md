@@ -152,11 +152,14 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 `freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
 部分木を自動的に選び、各iterationでそれらを解く。部分木の外側には基準解の平均戦略をコピーし、
 部分木への到達をその戦略から求める。部分木内のprofileは従来どおり適用する。
-外側の戦略が基準解に保存されていない場合、頻度目標がある場合、対象が空の場合、
-対象にrootが含まれる場合、または部分木外の制約付きNashConvの半分が停止目標以上の場合は、従来の木全体の反復へfallbackする（停止目標がない場合は残差によるfallbackを行わない）。
+外側の戦略が基準解に保存されていない場合、対象が空の場合、対象にrootが含まれる場合、
+または部分木外の制約付きNashConvの半分が停止目標以上の場合は、従来の木全体の反復へfallbackする（停止目標がない場合は残差によるfallbackを行わない）。
+頻度目標があっても、それ自体はfallbackの理由にならず、部分木内で更新する。
+頻度目標付きの部分木solveと木全体solveの比較では、演算と量子化による差を考慮し、λとaction確率の絶対許容差をそれぞれ`1e-5`とする。
 上流固定に必要な戦略が無い場合の拒否は変わらない。
 停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
-storage、checkpoint、solutionも木全体を対象とし、部分木化によるstorage削減は前提としない。
+部分木modeでは反復stateを対象部分木に限ってcompactに保存し、外側の戦略は基準解から保持して全木の評価とsolution出力に用いる。
+全木の初期評価と最終評価・出力の間は基準解の量子化戦略chunkを一時的に展開して保持し、部分木反復中は解放する。見積りにはこの保持量を含める。
 checkpointの再開では計算modeと部分木のidentityも照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
 `solution_streets = "no-rivers"`でもRiverのprofileと固定祖先を保存し、遅延再solveに適用する。frequencyは元runの最終λを反映したincentiveを固定して用い、再solve中はλを更新しない。再solveの戦略・値は新しい計算であり、元runの保存値ではない。
 回帰検証の小規模turn開始例ではfullと再solveを各5000反復し、fullのNashConvを0.0001未満、再solveのNashConvを0.005未満とした上で、到達handの各action確率を絶対差0.02未満で照合する。同例の再solveではfrequency対象handの平均check頻度と目標1.0の差も0.02未満とする。これは当該有限反復fixtureの許容差であり、任意のspotの収束保証ではない。frequencyの元runの達成頻度はprofile reportに記録する。
@@ -324,7 +327,7 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 `frequency` / `frozen`）、入力entry番号の`entry`、lockの`confidence`、`partial`を持つ。
 `entry`・`confidence`・`partial`は該当しない場合nullであり、`partial`はlockがboard上でliveなhandの一部だけを選ぶことを示す。
 `freeze_upstream`を使う`run.json`の`profile`には計算範囲`solve_scope`（`subtree` / `whole-tree`）、部分木根の数`subtree_roots`、
-`fallback_reason`（適用時以外はnull）も記録する。fallback理由は`frequency-targets`、`no-targets`、`root-target`、
+`fallback_reason`（適用時以外はnull）も記録する。fallback理由は`no-targets`、`root-target`、
 `missing-base-strategy`、`outside-residual`である。これらはrun summaryのfieldであり、`.sol`のprofileには追加しない。
 `profile.frozen_nodes`は固定したnode IDの配列、`general_sum`は一般和評価を示すbool、
 `frequencies`は目標nodeごとの配列である。各要素の`entry`は入力目標のindex、
@@ -336,7 +339,7 @@ checkpoint eventは実際にatomic置換したときだけ記録する。終了�
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
 solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + C + E + M`（第7節）がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
 
-checkpointは第7節のversion 5または6で保存し、backend種別と配列長をmetadataへ記録する。
+checkpointは第7節のversion 5、6または8で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
 
 ## 7. `.sol`とcheckpoint
@@ -400,7 +403,7 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1、単一zstd streamのversion 2、木を保存しないversion 3はversion errorで明示的に拒否する。変換は無く、現行configから再solveしてversion 4を作る。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte header、container version 5または6である。頻度目標がある場合だけversion 6を使い、version 5のmetadataとλのf64 vectorをpostcard tupleにする。生配列とdigestは同じ形式である。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateと部分木identityを持つversion 8を使う。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 
@@ -413,8 +416,8 @@ header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮�
 header/payloadのiteration一致、backendと全配列長、digest、frame終端、末尾余剰bytesを検査する。
 切詰め・破損はerrorであり、読込み失敗した部分的storageからsolveを再開しない。
 scheduleは埋込み実効configから再構築する。solverにRNGなどの隠れた再開stateは無い。
-storageの長さはcompact supportで決まる。P1 resumeはversion 5と6を受理し、埋込みconfigを必須とする。
-version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
+storageの長さはcompact supportと計算modeで決まる。P1 resumeはversion 5、6、8を受理し、埋込みconfigを必須とする。
+version 1〜4と旧部分木形式のversion 7はversion errorで拒否する。現行`solvers.nlh/v1` configから再solveする。
 書込みはstorageを不変借用し、64 KiB bufferで一時fileへ逐次圧縮する。resumeは展開しながら最終storage配列へ直接書く。
 保存は同directoryのtemporary fileをfsync後にatomic置換する（Unixではdirectoryもfsync）。
 `.sol`も同じ一時file・fsync・atomic置換を使う。chunkは16個ずつrun用Rayon poolで並列圧縮し、sref順に書く。出力bytesはthread数によらない。
@@ -422,6 +425,9 @@ version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solver
 
 `MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をC、`checkpoint_bytes()`をE、`resident_bytes()`をMとして、表示とmemory上限判定は`max(S + E, S − R + W + C) + M`を使う。前者は全storageを保持した反復とcheckpoint、後者はregret解放後の`.sol`保存の最大量である。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
 P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、`.sol`の圧縮作業予算、checkpointのencoder、常駐量を含む。
+`freeze_upstream`では、基準解metadataのNashConv / 2が新しいstop targetより厳密に小さく、基準profileの各entryが正規化後に等しいentryとして新profileにも存在し、frequency targetがなく、対象が空でもrootでもなく、部分木外の戦略がすべて基準解に保存されていることを静的に確認できる場合に限り、上限判定と`auto`選択に部分木のstorage量の見積りを使う。事前判定では木や基準解のindexを構築せずmetadataだけを読み、full保存とroot check (`x`) の対象およびそのhandの存在を確認し、同じ木生成規則によるcounting dry-runで部分木のstorageを数える。それ以外のselectorなど証明できない場合は全木storageの保守的な見積りを使う。保存と常駐の予算は全木の保守値を維持し、直列・並列保存の大きい方を含める。実行時に予期せずfallbackする場合は、全木の見積りを再度上限と比較してから全木storageを確保する。freezeの常駐予算には基準解の木、固定祖先の戦略とconfidence、部分木rootのreach、頻度制御、compact参照mapおよびBaseMapを含める。
+基準解自体が`freeze_upstream`を使った場合は、その固定条件の継承を静的に証明できないため全木の見積りとする。
+出力の`memoryEstimateBytes`と各backendの必要量表示はこの経路別の上限判定値である。一方、storage byte各fieldは木全体の構造上の見積りのままとする。証明された部分木の必要量には並列finalizationのピークも含む。
 戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化をrun threadsのRayon poolで並列生成し、書き手がsref順にchunkへ詰める。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockをscaleと量子化bytesとしてslotに保持し、書き手がsref昇順にchunkへ詰める。
 `saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<(f32, Vec<u8>)>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
 戦略batch予算はB×6 bytes（f32平均戦略4＋u16量子化bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(Vec<f32>)。量子化Vecは2×node要素数bytesを事前確保する。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。

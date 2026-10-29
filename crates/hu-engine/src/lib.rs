@@ -27,9 +27,9 @@ pub use schedule::{CfrPlus, Dcfr, DiscountSchedule, Discounts, HsDcfr, Vanilla, 
 pub use scratch::Scratch;
 pub use solver::{CompiledGame, ParConfig, Solver, SolverState, SubtreeRoot, TerminalEvaluator};
 pub use storage::{
-    F32Storage, F32View, I16Storage, I16View, MixedStorage, MixedView, StateMismatch, Storage,
-    StorageArrays, StorageArraysMut, StorageOps, StorageRef, StorageSpan, StorageState,
-    StorageView,
+    CompactStorage, CompactView, ExternalStrategyProvider, F32Storage, F32View, I16Storage,
+    I16View, MixedStorage, MixedView, StateMismatch, Storage, StorageArrays, StorageArraysMut,
+    StorageOps, StorageRef, StorageSpan, StorageState, StorageView,
 };
 pub use tree::{
     Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, ShapeError, ShapeNode, SparseTransition,

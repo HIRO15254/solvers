@@ -1,4 +1,4 @@
-//! Version 5, 6, and 7 streaming checkpoints. Only bounded metadata is postcard;
+//! Version 5, 6, and 8 streaming checkpoints. Only bounded metadata is postcard;
 //! storage is raw little-endian arenas, protected by a BLAKE3 digest.
 #[cfg(any(test, feature = "test-support"))]
 use hu_engine::StorageState;
@@ -19,9 +19,13 @@ pub enum CheckpointError {
     #[error("not a solvers checkpoint file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported checkpoint format version {found} (expected {expected}, 6, or 7); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
+        "unsupported checkpoint format version {found} (expected {expected}, 6, or 8); re-solve from solvers.nlh/v1 to create a streaming checkpoint (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
+    #[error(
+        "legacy subtree checkpoint format version 7 is not supported; re-solve to create a compact subtree checkpoint"
+    )]
+    LegacySubtree,
     #[error("checkpoint file truncated: expected at least {expected} bytes, got {actual}")]
     Truncated { expected: usize, actual: usize },
     #[error("invalid checkpoint: {0}")]
@@ -75,7 +79,10 @@ fn parse_header(buf: &[u8; HEADER_LEN]) -> Result<CheckpointHeader, CheckpointEr
         return Err(CheckpointError::BadMagic);
     }
     let version = u16::from_le_bytes(buf[8..10].try_into().unwrap());
-    if version != FORMAT_VERSION && version != 6 && version != 7 {
+    if version == 7 {
+        return Err(CheckpointError::LegacySubtree);
+    }
+    if version != FORMAT_VERSION && version != 6 && version != 8 {
         return Err(CheckpointError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -173,7 +180,7 @@ impl CheckpointReader {
         decoder.read_exact(&mut bytes)?;
         let (metadata, frequency_lambdas, mode): (Metadata, Vec<f64>, CheckpointMode) =
             match parsed.version {
-                7 => postcard::from_bytes(&bytes)?,
+                8 => postcard::from_bytes(&bytes)?,
                 6 => {
                     let (metadata, lambdas) = postcard::from_bytes(&bytes)?;
                     (metadata, lambdas, CheckpointMode::WholeTree)
@@ -184,6 +191,11 @@ impl CheckpointReader {
                     CheckpointMode::WholeTree,
                 ),
             };
+        if parsed.version == 8 && mode != CheckpointMode::Subtree {
+            return Err(CheckpointError::Invalid(
+                "invalid compact subtree checkpoint mode",
+            ));
+        }
         if frequency_lambdas.iter().any(|x| !x.is_finite()) {
             return Err(CheckpointError::Invalid(
                 "invalid frequency controller state",
@@ -444,7 +456,7 @@ pub fn write_storage_with_frequency(
 }
 
 /// Writes storage with an explicit solver scope and optional frequency state.
-/// Whole-tree checkpoints retain the version 5/6 encoding; subtree uses version 7.
+/// Whole-tree checkpoints retain the version 5/6 encoding; compact subtree uses version 8.
 #[allow(clippy::too_many_arguments)]
 pub fn write_storage_with_mode(
     path: &Path,
@@ -522,7 +534,7 @@ fn write_arrays(
         hash,
         iteration,
         if mode == CheckpointMode::Subtree {
-            7
+            8
         } else if lambdas.is_some() {
             6
         } else {
@@ -666,8 +678,8 @@ mod tests {
         for (mode, lambdas, version) in [
             (CheckpointMode::WholeTree, None, 5u16),
             (CheckpointMode::WholeTree, Some(&[0.25, -0.5][..]), 6),
-            (CheckpointMode::Subtree, None, 7),
-            (CheckpointMode::Subtree, Some(&[0.25, -0.5][..]), 7),
+            (CheckpointMode::Subtree, None, 8),
+            (CheckpointMode::Subtree, Some(&[0.25, -0.5][..]), 8),
         ] {
             write_arrays(
                 &path,
@@ -693,6 +705,149 @@ mod tests {
             assert_eq!(read_checkpoint(&path).unwrap().state, state);
         }
         std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn compact_subtree_arrays_round_trip_all_backends() {
+        let path = temp_path("compact-subtree.ckpt");
+        let states = [
+            StorageState::F32 {
+                regrets: vec![1.0, -2.0, 3.0, 4.0],
+                strategy_sum: vec![0.25, 0.75, 0.5, 0.5],
+            },
+            StorageState::I16 {
+                regrets: vec![1, -2, 3, 4],
+                strategy_sum: vec![5, 6, 7, 8],
+                regret_scales: vec![0.25],
+                strategy_scales: vec![0.5],
+            },
+            StorageState::Mixed {
+                regrets: vec![1, -2, 3, 4],
+                strategy_sum: vec![0.25, 0.75, 0.5, 0.5],
+                regret_scales: vec![0.25],
+            },
+        ];
+        for storage in states {
+            let state = SolverState {
+                iteration: 17,
+                storage,
+            };
+            write_arrays(
+                &path,
+                [3; 32],
+                state.iteration,
+                state.storage.arrays(),
+                Some("subtree"),
+                Some(2.0),
+                1,
+                1,
+                Some(&[0.125]),
+                CheckpointMode::Subtree,
+            )
+            .unwrap();
+            let reader = CheckpointReader::open(&path).unwrap();
+            assert_eq!(reader.mode, CheckpointMode::Subtree);
+            assert_eq!(reader.frequency_lambdas, [0.125]);
+            assert_eq!(reader.lengths[0], 4);
+            assert_eq!(reader.lengths[1], 4);
+            assert_eq!(read_checkpoint(&path).unwrap().state, state);
+            let bytes = std::fs::read(&path).unwrap();
+            let mut raw = zstd::decode_all(&bytes[HEADER_LEN..]).unwrap();
+            let last_array_byte = raw.len() - 33;
+            raw[last_array_byte] ^= 1;
+            let mut corrupt = bytes[..HEADER_LEN].to_vec();
+            corrupt.extend(zstd::encode_all(raw.as_slice(), 1).unwrap());
+            std::fs::write(&path, corrupt).unwrap();
+            assert!(matches!(
+                read_checkpoint(&path),
+                Err(CheckpointError::Invalid("checksum mismatch"))
+            ));
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn legacy_subtree_version_is_rejected_before_payload_decoding() {
+        let path = temp_path("legacy-subtree.ckpt");
+        std::fs::write(&path, build_header([0; 32], 0, 7)).unwrap();
+        assert!(matches!(
+            CheckpointReader::open(&path),
+            Err(CheckpointError::LegacySubtree)
+        ));
+        std::fs::remove_file(path).unwrap();
+    }
+
+    fn compact_subtree_resume<S: hu_engine::Storage>() {
+        use crate::game::{ChipEv, NoRake, PayoffPipeline, kuhn};
+        use hu_engine::{CompactStorage, Dcfr, NodeKind, Solver, SubtreeRoot};
+        use nlh::PerPlayer;
+
+        let make = || {
+            let game = kuhn(PayoffPipeline {
+                rake: &NoRake,
+                utility: &ChipEv,
+            })
+            .game;
+            let node = game
+                .tree
+                .nodes
+                .iter()
+                .enumerate()
+                .find(|(id, node)| *id != 0 && node.kind == NodeKind::Action)
+                .unwrap()
+                .0 as u32;
+            let full_len = game.tree.storage_len;
+            let solver = Solver::<_, CompactStorage<S>>::new_subtrees(
+                game,
+                Box::new(Dcfr::default()),
+                Some(10),
+                &[node],
+            );
+            let root = SubtreeRoot {
+                node,
+                reach: PerPlayer::new(vec![1.0; 3], vec![1.0; 3]),
+                chance_weight: 1.0,
+                chance_depth: 0,
+            };
+            (solver, root, full_len)
+        };
+        let (mut original, root, full_len) = make();
+        for _ in 0..4 {
+            original.step_subtrees(std::slice::from_ref(&root));
+        }
+        assert!(shape(&original.storage().arrays()).1[0] < full_len as u64);
+        let path = temp_path("compact-resume.ckpt");
+        write_storage_with_mode(
+            &path,
+            [4; 32],
+            original.iteration(),
+            original.storage(),
+            "config",
+            1.0,
+            1,
+            CheckpointMode::Subtree,
+            None,
+        )
+        .unwrap();
+        let reader = CheckpointReader::open(&path).unwrap();
+        let (mut resumed, resumed_root, _) = make();
+        resumed
+            .restore_stream(reader.iteration, |storage| reader.read_storage(storage))
+            .unwrap();
+        assert_eq!(original.state(), resumed.state());
+        for _ in 0..3 {
+            original.step_subtrees(std::slice::from_ref(&root));
+            resumed.step_subtrees(std::slice::from_ref(&resumed_root));
+        }
+        assert_eq!(original.state(), resumed.state());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn compact_subtree_save_load_resume_all_backends() {
+        compact_subtree_resume::<hu_engine::F32Storage>();
+        compact_subtree_resume::<hu_engine::I16Storage>();
+        compact_subtree_resume::<hu_engine::MixedStorage>();
     }
 
     fn sample_state_i16() -> SolverState {

@@ -72,6 +72,7 @@ confidence = 1.0
   正規化は基準fileのSHA-256を小文字の`sha256`として記録し、利用者configの再読込時に照合する。
   指定するhashは大文字も受け付け、小文字に正規化する。成果物に埋め込まれたconfigの読込時には再照合しない。
   木への解決、上流固定、lock・incentive・頻度目標の計算上の意味は[P1規範](hu-postflop.jp.md)に従う。
+  頻度目標があっても上流固定の部分木solveを使える。部分木modeは反復stateをcompactに保持し、外側の戦略は基準解から用いる。
   suit非対称のselectorでiso groupingが基準解より細かくなる場合も、対応する基準戦略をsuit置換して利用する。
   基準解のgroupingがprofile側より細かく、代表を対応付けられない場合は拒否する。
 
@@ -762,7 +763,7 @@ final_checkpoint = true      # P1のみ。既定true。falseは終了時の再�
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。
-- P1 checkpointはversion 5。metadataはbackend種別（`f32` / `i16` / `i16-f32avg`）と配列長を保持する。version 1〜4は移行先を示すerrorで拒否し、現行configから再solveする。[P1第7節](hu-postflop.jp.md#7-solとcheckpoint)を参照。
+- P1 checkpointは木全体ではversion 5、頻度目標付きではversion 6、部分木modeではversion 8。metadataはbackend種別（`f32` / `i16` / `i16-f32avg`）と配列長を保持する。version 1〜4と旧部分木形式のversion 7は拒否し、現行configから再solveする。[P1第7節](hu-postflop.jp.md#7-solとcheckpoint)を参照。
 - 中断・`max_time`・checkpointの判定は計算batchの境界で行う。P1の`check_every = "auto"`は評価間を25 iteration以下のsub-batchに分け、その完了境界で判定する。整数は従来どおり指定iteration間隔、P2は
   `batch_sweeps`の完了境界である。sub-batchの区切りは計算結果を変えない。I/Oや最終出力を中断するhard deadlineではない。
 - P1のauto再開はrun directoryの`progress.jsonl`からcheckpointのiteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。次の評価iterationは同じ方式で再計算する。progressが無い・読めない場合は履歴無しとし、checkpointのiteration＋25（max_iterationsで切る）を最初の評価とする。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えない。

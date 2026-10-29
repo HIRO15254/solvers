@@ -107,6 +107,92 @@ impl SubtreeSolve {
         )
     }
 }
+/// Select maximal targeted subtrees before allocating CFR storage.
+pub(crate) fn select_roots(
+    tree: &hu_engine::PublicTree,
+    index: &GameIndex,
+    summary: &crate::profile::ProfileSummary,
+    base: &crate::artifact::LoadedSol,
+    map: &crate::base_map::BaseMap,
+) -> std::result::Result<Vec<u32>, &'static str> {
+    let targets: BTreeSet<_> = summary
+        .resolved_nodes
+        .iter()
+        .filter(|n| !matches!(n.kind, crate::profile::ResolvedNodeKind::Frozen))
+        .map(|n| n.node)
+        .collect();
+    if targets.is_empty() {
+        return Err("no-targets");
+    }
+    if targets.contains(&0) {
+        return Err("root-target");
+    }
+    let roots: Vec<_> = targets
+        .iter()
+        .copied()
+        .filter(|&node| {
+            let path = hu_engine::path_from_root(&index.parents, node);
+            !path[..path.len() - 1].iter().any(|id| targets.contains(id))
+        })
+        .collect();
+    let mut spans: Vec<_> = roots
+        .iter()
+        .map(|&node| {
+            let span = tree.storage_spans[node as usize];
+            (span.sref_start, span.sref_end)
+        })
+        .collect();
+    spans.sort_unstable();
+    for (id, node) in tree.nodes.iter().enumerate() {
+        if node.kind != NodeKind::Action {
+            continue;
+        }
+        let s = tree.storage_ref(node).index;
+        let i = spans.partition_point(|&(start, _)| start <= s);
+        let inside = i != 0 && s < spans[i - 1].1;
+        if !inside && !map.is_stored(base, id as u32) {
+            return Err("missing-base-strategy");
+        }
+    }
+    Ok(roots)
+}
+
+/// Calculate the frozen residual using a solver with streamed outside averages.
+pub(crate) fn prepare_compact<S: Storage>(
+    solver: &Solver<crate::PostflopEvaluator, S>,
+    index: &GameIndex,
+    summary: &crate::profile::ProfileSummary,
+    target: Option<f64>,
+) -> Option<SubtreeSolve> {
+    let targets = summary
+        .resolved_nodes
+        .iter()
+        .filter(|n| !matches!(n.kind, crate::profile::ResolvedNodeKind::Frozen))
+        .map(|n| n.node)
+        .collect();
+    let roots = roots(solver, index, &targets);
+    let (full_ev, full_gain) = solver.evaluate();
+    let (part_ev, part_gain) = subtree_values(solver, &roots);
+    let outside_ev = PerPlayer::new(
+        full_ev[Player::P0] - part_ev[Player::P0],
+        full_ev[Player::P1] - part_ev[Player::P1],
+    );
+    let outside_gain = PerPlayer::new(
+        full_gain[Player::P0] - part_gain[Player::P0],
+        full_gain[Player::P1] - part_gain[Player::P1],
+    );
+    if target
+        .is_some_and(|target| (outside_gain[Player::P0] + outside_gain[Player::P1]) / 2.0 >= target)
+    {
+        None
+    } else {
+        Some(SubtreeSolve {
+            roots,
+            outside_ev,
+            outside_gain,
+        })
+    }
+}
 
 /// Initialize outside averages before calculating a deterministic baseline. This
 /// also runs before checkpoint restoration, so resume gets the same constant.
@@ -114,7 +200,6 @@ pub(crate) fn prepare<S: Storage>(
     solver: &mut Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,
     summary: Option<&crate::profile::ProfileSummary>,
-    has_frequency: bool,
     base: Option<&(crate::artifact::LoadedSol, crate::base_map::BaseMap)>,
     target: Option<f64>,
 ) -> Result<(Option<SubtreeSolve>, Option<SolveScope>)> {
@@ -132,9 +217,6 @@ pub(crate) fn prepare<S: Storage>(
             }),
         ))
     };
-    if has_frequency {
-        return fallback("frequency-targets");
-    }
     let targets: BTreeSet<_> = summary
         .resolved_nodes
         .iter()

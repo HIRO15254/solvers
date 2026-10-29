@@ -284,11 +284,40 @@ pub struct Solver<E, S> {
     profile: Option<InstalledProfile>,
 }
 
+impl<E: TerminalEvaluator, S: Storage> Solver<E, crate::CompactStorage<S>> {
+    /// Construct a solver whose CFR arenas cover only the union of `roots`.
+    /// Full-tree evaluation additionally requires an external strategy provider.
+    pub fn new_subtrees(
+        game: CompiledGame<E>,
+        schedule: Box<dyn DiscountSchedule>,
+        planned_iters: Option<u64>,
+        roots: &[NodeId],
+    ) -> Self {
+        let storage = crate::CompactStorage::for_subtrees(&game.tree, roots);
+        Self::with_storage(game, schedule, planned_iters, storage)
+    }
+
+    /// Install the average strategy source for action nodes outside the scope.
+    pub fn set_external_strategy_provider(&mut self, provider: crate::ExternalStrategyProvider) {
+        self.storage.set_external_strategy_provider(provider);
+    }
+}
+
 impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     pub fn new(
         game: CompiledGame<E>,
         schedule: Box<dyn DiscountSchedule>,
         planned_iters: Option<u64>,
+    ) -> Self {
+        let storage = S::new(game.tree.storage_len, game.tree.storage_refs.len());
+        Self::with_storage(game, schedule, planned_iters, storage)
+    }
+
+    fn with_storage(
+        game: CompiledGame<E>,
+        schedule: Box<dyn DiscountSchedule>,
+        planned_iters: Option<u64>,
+        storage: S,
     ) -> Self {
         assert!(
             !schedule.requires_planned_iters() || planned_iters.is_some(),
@@ -305,7 +334,6 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
                 "root range length must match root dims"
             );
         }
-        let storage = S::new(game.tree.storage_len, game.tree.storage_refs.len());
         Solver {
             game,
             storage,
@@ -437,6 +465,16 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 
     pub fn game(&self) -> &CompiledGame<E> {
         &self.game
+    }
+
+    /// Consume the solver and recover its compiled game without rebuilding it.
+    pub fn into_game(self) -> CompiledGame<E> {
+        self.game
+    }
+
+    /// Consume the solver and recover its game and installed profile.
+    pub fn into_game_and_profile(self) -> (CompiledGame<E>, Option<crate::Profile>) {
+        (self.game, self.profile.map(|installed| installed.profile))
     }
 
     /// Permanently frees regrets after the final checkpoint. Average strategy,
