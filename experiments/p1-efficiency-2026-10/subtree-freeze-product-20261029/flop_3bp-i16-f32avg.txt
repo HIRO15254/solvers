@@ -1,0 +1,2 @@
+last progress row (old): {"iteration":20,"elapsed_secs":2.377907239,"expl_p0":2.5636503390808034,"expl_p1":4.305950161872529,"nash_conv":6.869600500953332}
+IDENTICAL (13500 bytes strategy export)

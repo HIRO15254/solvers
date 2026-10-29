@@ -1,0 +1,151 @@
+{
+  "threads": 32,
+  "runs": [
+    {
+      "target": "lock_flop",
+      "round": 1,
+      "variant": "old",
+      "iterations": 370,
+      "solve_wall_s": 60.224820456,
+      "process_elapsed_s": 100.92,
+      "max_rss_kib": 5807260,
+      "nash_conv_bb": 0.010941375003186149,
+      "subtree_nash_conv_bb": 0.0109406869524582
+    },
+    {
+      "target": "lock_flop",
+      "round": 1,
+      "variant": "new",
+      "iterations": 373,
+      "solve_wall_s": 40.146762189,
+      "process_elapsed_s": 77.67,
+      "max_rss_kib": 5935812,
+      "nash_conv_bb": 0.010822962342549203,
+      "subtree_nash_conv_bb": 0.010753293621613924
+    },
+    {
+      "target": "lock_flop",
+      "round": 2,
+      "variant": "old",
+      "iterations": 370,
+      "solve_wall_s": 60.582385781,
+      "process_elapsed_s": 101.19,
+      "max_rss_kib": 5812144,
+      "nash_conv_bb": 0.010941375003186149,
+      "subtree_nash_conv_bb": 0.0109406869524582
+    },
+    {
+      "target": "lock_flop",
+      "round": 2,
+      "variant": "new",
+      "iterations": 373,
+      "solve_wall_s": 40.265083629,
+      "process_elapsed_s": 77.32,
+      "max_rss_kib": 5926164,
+      "nash_conv_bb": 0.010822962342549203,
+      "subtree_nash_conv_bb": 0.010753293621613924
+    },
+    {
+      "target": "lock_turn",
+      "round": 1,
+      "variant": "old",
+      "iterations": 325,
+      "solve_wall_s": 52.160262767,
+      "process_elapsed_s": 88.51,
+      "max_rss_kib": 5819152,
+      "nash_conv_bb": 0.010982284516435015,
+      "subtree_nash_conv_bb": 0.0007283898662240806
+    },
+    {
+      "target": "lock_turn",
+      "round": 1,
+      "variant": "new",
+      "iterations": 148,
+      "solve_wall_s": 9.360862433,
+      "process_elapsed_s": 38.37,
+      "max_rss_kib": 5659200,
+      "nash_conv_bb": 0.010982206245906956,
+      "subtree_nash_conv_bb": 0.003333470122794087
+    },
+    {
+      "target": "lock_turn",
+      "round": 2,
+      "variant": "old",
+      "iterations": 325,
+      "solve_wall_s": 51.991411632,
+      "process_elapsed_s": 88.22,
+      "max_rss_kib": 5805872,
+      "nash_conv_bb": 0.010982284516435015,
+      "subtree_nash_conv_bb": 0.0007283898662240806
+    },
+    {
+      "target": "lock_turn",
+      "round": 2,
+      "variant": "new",
+      "iterations": 148,
+      "solve_wall_s": 8.967627326,
+      "process_elapsed_s": 38.56,
+      "max_rss_kib": 5648948,
+      "nash_conv_bb": 0.010982206245906956,
+      "subtree_nash_conv_bb": 0.003333470122794087
+    },
+    {
+      "target": "lock_deep",
+      "round": 1,
+      "variant": "old",
+      "iterations": 330,
+      "solve_wall_s": 54.272417294,
+      "process_elapsed_s": 94.88,
+      "max_rss_kib": 5812760,
+      "nash_conv_bb": 0.01084572953170726,
+      "subtree_nash_conv_bb": 1.1219455063587455e-05
+    },
+    {
+      "target": "lock_deep",
+      "round": 1,
+      "variant": "new",
+      "iterations": 50,
+      "solve_wall_s": 0.05723057,
+      "process_elapsed_s": 28.48,
+      "max_rss_kib": 5518840,
+      "nash_conv_bb": 0.010204726076709858,
+      "subtree_nash_conv_bb": 0.0006787078130681071
+    },
+    {
+      "target": "lock_deep",
+      "round": 2,
+      "variant": "old",
+      "iterations": 330,
+      "solve_wall_s": 54.195776517,
+      "process_elapsed_s": 94.87,
+      "max_rss_kib": 5815208,
+      "nash_conv_bb": 0.01084572953170726,
+      "subtree_nash_conv_bb": 1.1219455063587455e-05
+    },
+    {
+      "target": "lock_deep",
+      "round": 2,
+      "variant": "new",
+      "iterations": 50,
+      "solve_wall_s": 0.056518085,
+      "process_elapsed_s": 28.55,
+      "max_rss_kib": 5494648,
+      "nash_conv_bb": 0.010204726076709858,
+      "subtree_nash_conv_bb": 0.0006787078130681071
+    }
+  ],
+  "base": {
+    "configHash": "c0c805fcf5d30995208a8df0853abbe20adb234794647ca3c77ce0b6a345c6c5",
+    "configSchema": "solvers.nlh/v1",
+    "evP0": 1.5163871810121643,
+    "evP1": 3.331020970924751,
+    "explP0": 0.006697997993618032,
+    "explP1": 0.004161780770071899,
+    "gameKind": "hu-postflop",
+    "iterations": 389,
+    "kind": "hu-postflop",
+    "nashConv": 0.010859778763689931,
+    "utilityUnit": "BB",
+    "wallSecs": 62.380707659
+  }
+}

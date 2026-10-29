@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-29",
+  "source": {
+    "old": "90b2f856f2d80811753df1445fd5380aaa39d3f6",
+    "new": "0a919728230e3002b07c6faa2e7f5ee06f06bea7",
+    "new_note": "Release binary built from this production source before the test-only daemon contract commit."
+  },
+  "dev": {
+    "instance": "i-0f3f38cbb7215e1b4",
+    "type": "r6a.8xlarge",
+    "availability_zone": "us-east-1c",
+    "market": "spot",
+    "use": "build, workspace checks, non-freeze bitcheck"
+  },
+  "bench": {
+    "instance": "i-02fde11cf3acfbd15",
+    "type": "c6a.8xlarge",
+    "availability_zone": "us-east-1b",
+    "market": "spot",
+    "launch_utc": "2026-10-29T07:47:09Z",
+    "termination_requested_utc": "2026-10-29T08:09:16Z"
+  },
+  "toolchain": "Rust 1.97.0, release, RUSTFLAGS=-C target-cpu=znver3",
+  "sha256": {
+    "solvers_old": "0d45a337bd7de196ced4f6e79eb066671303d56f5d18c63f7a95a708cc1492f6",
+    "solvers_new": "70a82652258a03a840ea927e329a0aa2912de7ed87a7dc22b1d404feea32045c",
+    "p1_bench_new": "4d503f05f1b532618103dc68b8095da7d06e7d14c57e5328f28c9e1e92dd178d",
+    "base_solution": "d33fd52f46d961ce66cb348e123b360613ed56173192e8c5301141f1d18790c1"
+  },
+  "base_solution_availability": "Generated on bench; not retained after instance termination. Re-solve configs/flop_srp.toml to reproduce, then regenerate frozen configs and hashes."
+}

@@ -2,7 +2,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use hu_engine::{F32Storage, NodeKind, NodeLock, Solver};
+use hu_engine::{F32Storage, NodeKind, NodeLock, Solver, Storage, StorageArrays};
 use hu_postflop::{artifact, checkpoint, prepare, run};
 use nlh::Player;
 
@@ -144,6 +144,33 @@ fn subtree_preserves_outside_strategy_and_full_tree_metrics() {
     let iteration = reader.iteration;
     full.restore_stream(iteration, |storage| reader.read_storage(storage))
         .unwrap();
+    let StorageArrays::F32 {
+        regrets: whole_regrets,
+        strategy_sum: whole_sum,
+    } = whole.storage().arrays()
+    else {
+        unreachable!()
+    };
+    let StorageArrays::F32 {
+        regrets: sub_regrets,
+        strategy_sum: sub_sum,
+    } = full.storage().arrays()
+    else {
+        unreachable!()
+    };
+    let span = whole.game().tree.storage_spans[target as usize];
+    for (a, b) in [
+        (
+            &whole_regrets[span.start..span.end],
+            &sub_regrets[span.start..span.end],
+        ),
+        (
+            &whole_sum[span.start..span.end],
+            &sub_sum[span.start..span.end],
+        ),
+    ] {
+        assert!(a.iter().zip(b).all(|(x, y)| x.to_bits() == y.to_bits()));
+    }
     let (_, expl) = full.evaluate();
     let ev = full.true_expected_values();
     let offset = p.payoff.ev_offset();
