@@ -22,6 +22,7 @@ for case in ("lock_flop", "lock_turn", "lock_deep", "frequency"):
             for part in elapsed.group(1).split(":"):
                 seconds = 60 * seconds + float(part)
             log = (out / f"{label}.log").read_text()
+            subtree_estimate = re.search(r"subtree memory estimate: (\d+) bytes", log)
             stages = {name: float(value) for name, value in re.findall(
                 r"(?m)^TIMING\s+(\S+)\s+([0-9.eE+-]+)\s*$", log)}
             sizes = {pathlib.Path(path).name: int(size) for path, size in
@@ -33,6 +34,7 @@ for case in ("lock_flop", "lock_turn", "lock_deep", "frequency"):
                          "nash_conv_bb": run["nashConv"], "solve_scope": profile.get("solve_scope"),
                          "fallback_reason": profile.get("fallback_reason"),
                          "frequencies": profile.get("frequencies"), "resources": resources,
-                         "artifact_sizes_bytes": sizes, "stage_timings_s": stages})
+                         "artifact_sizes_bytes": sizes, "stage_timings_s": stages,
+                         "subtree_estimate_bytes": int(subtree_estimate.group(1)) if subtree_estimate else None})
 summary = {"threads": 32, "stage_timings_note": "Only TIMING diagnostics actually emitted by the binaries are included; solve and process wall times are separate. Concurrent stages must not be summed.", "runs": rows}
 (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")

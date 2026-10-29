@@ -608,9 +608,9 @@ fn drive<S: Storage>(
         );
         solver.set_external_strategy_provider(std::sync::Arc::new(move |sref, out| {
             let id = node_for_ref[sref.index as usize];
-            match provider_base.1.strategy(&provider_base.0, id) {
-                Ok(Some(strategy)) if strategy.len() == out.len() => out.copy_from_slice(&strategy),
-                Ok(_) => {
+            match provider_base.1.strategy_into(&provider_base.0, id, out) {
+                Ok(true) => {}
+                Ok(false) => {
                     *provider_errors.lock().unwrap() =
                         Some(format!("missing base strategy for node {id}"));
                     out.fill(0.0);
