@@ -143,6 +143,21 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   default `madvise` system setting, iterations were about 1.5–7% faster in the
   measured flop trees; results and peak memory are unchanged. Systems with
   transparent huge pages disabled behave as before.
+- Heads-up postflop runs with `freeze_upstream` (including `relock
+  --freeze-upstream` and the GUI's "Freeze upstream to this solution") now
+  iterate only the subtrees under the profile targets and keep the base
+  solution's strategies everywhere else, because those parts are the same game
+  as in the base solve. The stop target, progress and results are still the
+  whole-tree values. On a flop SRP tree the solve to 0.1% pot took 0.66× the
+  time for a flop lock, 0.17–0.18× for a turn lock and about 0.001× for a single
+  deep node; whole-process time was 0.30–0.77×, now dominated by loading the
+  base and saving. Peak memory is about the same (the whole tree is still
+  allocated). Results of frozen runs differ from before. Runs fall back to the
+  whole tree when there are frequency targets, a root or no target, a base
+  without stored strategies outside the subtrees (`no-rivers`), or a base whose
+  remaining error alone reaches the stop target; `run.json` reports
+  `profile.solve_scope` and `fallback_reason`. Resuming a frozen run's
+  checkpoint from an earlier build is rejected.
 
 ## [0.1.0] - 2026-10-16
 

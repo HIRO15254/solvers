@@ -54,12 +54,14 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 | C4 | nodelock・lock & re-solve後の点検（profileの無いrunの回帰）と、速度・memoryの改善候補の並列試作（2026-10-29の利用者指示） | 必須検証とrelease受入。profileの無いrunの出力はbit一致。採る変更は16・32 threadの交互計測で速くなるかmemoryが減り、他の条件を遅くしない |
 | C5 | C4で判明した2点（2026-10-29の利用者指示）: profile付きrunの評価を両seat同時の走査にする。`MemoryEstimate`がstorage以外を数えない不足を直す | 必須検証。profile付きの評価値はbit一致し、16・32 threadの交互計測で評価が遅くならない。見積りが測ったsolveのmax RSS以上になり、規範・CLI reference・利用ガイド・試験を同期 |
 | C6 | 次の改善案5件の並列試作（2026-10-29の利用者指示「どれも良さそうなので試してください」）: freeze_upstream時の部分木solve、relock warm start、i16の精度床を踏まえたauto、Linuxのhuge page、AVX-512 build。あわせて実験索引を現行の根拠と履歴に分ける | 採る変更は必須検証と出力のbit一致、16・32 threadの交互計測で遅い条件が無いこと。契約・既定・配布を変える案は利用者判断へ回す |
+| C7 | PF12の実装と、relock warm startの追加調査（偏りか均衡の多重性か、incentiveの大きさ・lockとの組合せ） | PF12: 必須検証、`freeze_upstream`の無いrunの出力はbit一致、報告値が全木評価と一致、旧版との通しの時間を記録。規範・CLI reference・利用ガイド・試験を同期。warm start: 利用者判断の材料を記録 |
 
 利用者決定:
 
 | ID | 日付 | 決定 |
 |---|---|---|
 | PF11 | 2026-10-09 | P1の`[solver] storage`に`"auto"`を追加して既定にする。memory上限に収まればf32、収まらなければi16-f32avgを選び、どちらも収まらなければ従来どおり資源errorで止める。autoはi16を選ばない |
+| PF12 | 2026-10-29 | `freeze_upstream`のrunは、profile対象の最大部分木だけをCFRで反復し、部分木の外は基準`.sol`の平均戦略のままにする。停止判定と報告するExploitability・EVは従来どおり全木の値（案A）。storageを部分木の分だけ確保する省memory化は後の段階 |
 
 ## 4. 計測
 
@@ -190,7 +192,7 @@ C4で次の候補とした2点を実装した（利用者指示「現在判明�
 | [Linuxのhuge page](../../experiments/p1-efficiency-2026-10/huge-pages-20261029/README.md) | 64 MiB以上のregret・戦略arenaへprefault前に`MADV_HUGEPAGE`。THP既定`madvise`のc6a.8xlargeで1反復が8条件とも1.5〜6.8%短い（平均3.6%）。peakは最大6 MiB差、出力はbit一致 | 採用 |
 | [AVX-512 build](../../experiments/p1-efficiency-2026-10/avx512-20261029/README.md) | Zen 4・Sapphire Rapidsでv3・v4・nativeを比較。i16の評価はv4で最大約14%短いが、1反復はZen 4で全条件v3より遅く、5%以上の一貫した改善なし | 不採用（RD6のまま） |
 | [i16の精度床とauto](../../experiments/p1-efficiency-2026-10/storage-floor-20261029/README.md) | i16は後半に0.02〜0.09% pot付近で停滞・悪化、i16-f32avgは0.005〜0.03% pot付近まで下がる。32 threadの1反復はi16-f32avgがi16とほぼ同じ（flop_srp 0.137 / 0.135秒、f32 0.156秒）。floorを事前に予測する規則は得られない | PF11を維持 |
-| [freeze_upstream時の部分木solve](../../experiments/p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 固定祖先の下の最大対象部分木だけを走査（`p1_bench --subtree-only`、engineの部分木pass）。全木走査とbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。全木storageのまま。部分木の停止時点で全木NashConvは基準解の残差を含め0.011〜0.018 BB | 利用者判断（有効化方式・停止量・成果物の意味） |
+| [freeze_upstream時の部分木solve](../../experiments/p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 固定祖先の下の最大対象部分木だけを走査（`p1_bench --subtree-only`、engineの部分木pass）。全木走査とbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。全木storageのまま。部分木の停止時点で全木NashConvは基準解の残差を含め0.011〜0.018 BB | 利用者判断で案Aを採用（PF12、C7で実装） |
 | [relock warm start](../../experiments/p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増える。regret保持・sum消去は4 profileとも0.91〜0.98倍の反復。対象nodeの戦略差が残る | 自動では採らない。opt-inにするかは利用者判断（試作は`3f153de6`に残す） |
 
 実験索引は[`experiments/README.md`](../../experiments/README.md)を「現在の実装を支える実験」と「詳細・履歴」に分けた。

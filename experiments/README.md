@@ -62,6 +62,8 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 |---|---|---|
 | D8・NL3 頻度目標 | [P1 N4 River頻度とEV loss順lock](p1-nodelock/n4-frequency/README.md) | 2026-10-28。3目標の頻度誤差、素朴なcombo lockとのseat別BR利得・真のEV比較。未commit作業木のため再現状態partial |
 | C5 profile付き両seat評価 | [P1 profile付きrunの両seat同時評価](p1-efficiency-2026-10/profiled-dual-eval-20261029/README.md) | 2026-10-29。lock・incentive付きrunの評価を両seat同時の走査に。16・32 threadの交互計測で評価1回0.87〜0.91倍、評価が足すpeak 112〜259 → 18〜42 MiB、評価値とsolveの出力はbit一致。c6a.8xlarge Spot |
+| PF12 部分木solveの根拠 | [freeze_upstream部分木の実験](p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 2026-10-29。固定祖先の下の最大対象部分木だけを走査する試作（`p1_bench --subtree-only`、`1530db00`）。全木走査と50・200反復でbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。全木NashConvが部分木分と基準解の残差の和になることと製品化の論点 |
+| PF12 部分木solve | [freeze_upstream部分木の製品経路](p1-efficiency-2026-10/subtree-freeze-product-20261029/README.md) | 2026-10-29。全木0.1% potまでのsolveが旧全木freeze比でflop lock 0.66倍、turn lock 0.17〜0.18倍、深い1 node 約0.001倍、process全体0.30〜0.77倍（c6a.8xlarge Spot、32 thread）。報告値と独立した全木評価の差は最大1.2e-8 BB。freezeの無いrunはbit一致。残る時間はcheckpoint・`.sol`保存と基準戦略の読出し |
 
 ### artifact・I/O
 
@@ -126,7 +128,6 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 | 不採用 RBP・MCCFR・PGO | [P1 RBP・MCCFR warm start・PGO](p1-efficiency-2026-10/rejected-20261009/README.md) | 2026-10-09。刈れる仕事は最大約25%で、RBPは全変種で目標到達が遅い。MC warm startは20,000反復でも7%pot。PGOは速くならない |
 | v4に置換 | [P1 `.sol` v3の索引付きchunkと部分読込み（SOL-14）](p1-io-2026-10/sol-index-20261012/README.md) | 2026-10-12。c001/c013のexportを22→3.2秒・92→38.6秒、peakを4.3→0.33 GB・10.7→2.8 GBに縮めた。summaryはmetadataだけで0.04秒。export出力はbaseとbyte一致した。`--node`の繰り返しで4 nodeを1回の読込みで出せる |
 | 不採用 C6 AVX-512 | [AVX-512 CPU基準の比較](p1-efficiency-2026-10/avx512-20261029/README.md) | 2026-10-29。Zen 4（c7a）とSapphire Rapids（c7i）でx86-64-v3・v4・nativeを交互3回。i16の評価はv4で最大約14%短いが、1反復はAMDで全条件v3より遅く、5%以上の一貫した改善なし。NashConvは全variantでbit一致。v4配布は追加しない |
-| 利用者判断待ち C6 部分木solve | [freeze_upstream部分木の実験](p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 2026-10-29。固定祖先の下の最大対象部分木だけを走査する`p1_bench --subtree-only`。全木走査と50・200反復でbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。storage削減は未実装。停止量（部分木か全木か）と成果物の意味は利用者判断 |
 | 利用者判断待ち C6 relock warm start | [relock warm startの実験](p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | 2026-10-29。checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増え、対象nodeの戦略差が残る。regret保持・sum消去・反復番号0は4 profileとも0.91〜0.98倍の反復。warm開始の初期化はlock_flopで約8秒（bench）。試作sourceは`3f153de6` |
 
 ### 旧Multiway・参照
