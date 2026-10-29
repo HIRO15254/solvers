@@ -212,7 +212,40 @@ impl PublicTree {
         tree.subtree_has_chance.push(false);
         let root_dims = tree.root_dims;
         tree.fill(0, &spec.root, root_dims);
+        // Release push-growth slack: a solve keeps this tree resident and the
+        // product memory estimate counts exactly its elements.
+        tree.nodes.shrink_to_fit();
+        tree.deals.shrink_to_fit();
+        tree.storage_refs.shrink_to_fit();
+        tree.storage_nodes.shrink_to_fit();
+        tree.tags.shrink_to_fit();
+        tree.storage_spans.shrink_to_fit();
+        tree.subtree_has_chance.shrink_to_fit();
+        tree.masks.shrink_to_fit();
+        tree.transitions.shrink_to_fit();
         tree
+    }
+
+    /// Heap bytes allocated by this tree's vectors, by capacity.
+    pub fn heap_bytes(&self) -> u64 {
+        fn bytes<T>(v: &Vec<T>) -> u64 {
+            (v.capacity() * std::mem::size_of::<T>()) as u64
+        }
+        bytes(&self.nodes)
+            + bytes(&self.deals)
+            + bytes(&self.storage_refs)
+            + bytes(&self.storage_nodes)
+            + bytes(&self.masks)
+            + self.masks.iter().map(bytes).sum::<u64>()
+            + bytes(&self.transitions)
+            + self
+                .transitions
+                .iter()
+                .map(|t| bytes(&t.entries))
+                .sum::<u64>()
+            + bytes(&self.tags)
+            + bytes(&self.storage_spans)
+            + bytes(&self.subtree_has_chance)
     }
 
     /// Rebuilds the tree [`Self::compile`] produced from the same layout,

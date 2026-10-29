@@ -5,7 +5,9 @@
 //! all measurements, matching the product. One thread count per process, so
 //! every measurement starts from a fresh heap. `buildSecs` includes count;
 //! `evaluateSecs` (including iteration bands) measures full EV/BR evaluation,
-//! not the historical exploitability-only `evalSecs`.
+//! not the historical exploitability-only `evalSecs`. The memory estimate's
+//! resident components (for `--threads`) sit beside `gameHeapBytes`, the
+//! compiled tree, evaluator and index measured after the build.
 //!
 //! ```text
 //! cargo run --release -p hu-postflop --example p1_bench -- CONFIG \
@@ -88,6 +90,10 @@ fn main() -> Result<()> {
             "estimateI16F32avgBytes": prepared.estimate.i16_f32avg_bytes,
             "storageElements": prepared.estimate.f32_bytes / 8,
             "nodes": prepared.estimate.nodes,
+            "maxDepth": prepared.estimate.max_depth,
+            "maxDeals": prepared.estimate.max_deals,
+            "estimateGameBytes": prepared.estimate.game_bytes,
+            "estimateThreadBytes": prepared.estimate.thread_bytes,
             "prepareSecs": prepare_secs,
         });
         println!("{}", serde_json::to_string(&report)?);
@@ -181,6 +187,11 @@ fn bench<S: Storage>(
     let deals = tree.deals.len();
     let transitions = tree.transitions.len();
     let transition_entries: usize = tree.transitions.iter().map(|t| t.entries.len()).sum();
+    let game_heap_bytes = tree.heap_bytes() + game.evaluator.heap_bytes() + index.heap_bytes();
+    let hands = [
+        game.evaluator.hands.len(Player::P0),
+        game.evaluator.hands.len(Player::P1),
+    ];
     hu_postflop::run::trim_builder_heap();
     let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
@@ -253,6 +264,11 @@ fn bench<S: Storage>(
     } else {
         f64::NAN
     };
+    // The estimate for this process's worker count rather than the config's.
+    let estimate = hu_postflop::MemoryEstimate {
+        threads: args.threads as u64,
+        ..p.estimate.clone()
+    };
     let mut report = serde_json::json!({
         "config": args.config.display().to_string(),
         "threads": args.threads,
@@ -265,9 +281,19 @@ fn bench<S: Storage>(
         "transitions": transitions,
         "transitionEntries": transition_entries,
         "nodeInfo": node_info,
+        "hands": hands,
+        "maxDepth": p.estimate.max_depth,
+        "maxDeals": p.estimate.max_deals,
         "estimateF32Bytes": p.estimate.f32_bytes,
         "estimateI16Bytes": p.estimate.i16_bytes,
         "estimateI16F32avgBytes": p.estimate.i16_f32avg_bytes,
+        "estimateGameBytes": p.estimate.game_bytes,
+        "estimateThreadBytes": p.estimate.thread_bytes,
+        "estimateProfileBytes": p.estimate.profile_bytes,
+        "estimateResidentBytes": estimate.resident_bytes(),
+        "estimateCheckpointBytes": estimate.checkpoint_bytes(),
+        "estimateRequiredBytes": estimate.required_bytes(p.settings.solver.storage),
+        "gameHeapBytes": game_heap_bytes,
         "prepareSecs": prepare_secs,
         "buildSecs": build_secs,
         "allocSecs": alloc_secs,

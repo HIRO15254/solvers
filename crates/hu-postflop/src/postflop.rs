@@ -645,6 +645,27 @@ impl TerminalEvaluator for PostflopEvaluator {
     }
 }
 impl PostflopEvaluator {
+    /// Heap bytes allocated by the evaluator's tables, by capacity.
+    pub fn heap_bytes(&self) -> u64 {
+        vec_bytes(&self.terminals)
+            + vec_bytes(&self.payoffs)
+            + vec_bytes(&self.rank_tables)
+            + self
+                .rank_tables
+                .iter()
+                .flat_map(|table| [&table[Player::P0], &table[Player::P1]])
+                .map(|ranked| {
+                    vec_bytes(&ranked.hands) + vec_bytes(&ranked.groups) + vec_bytes(&ranked.dead)
+                })
+                .sum::<u64>()
+            + vec_bytes(&self.batch_tables)
+            + vec_bytes(&self.fold_combos[Player::P0])
+            + vec_bytes(&self.fold_combos[Player::P1])
+            + self.hands.heap_bytes()
+            + vec_bytes(&self.mask_cards)
+            + vec_bytes(&self.profile_boards)
+    }
+
     /// Register the board of an incentive node and return its compatibility
     /// space key. Keys remain valid for the lifetime of this evaluator.
     pub fn register_profile_board(&mut self, board: &[Card]) -> u32 {
@@ -910,7 +931,7 @@ impl TreeWalker for Counting<'_> {
         self.config
     }
     fn showdown(&mut self, state: &LineState) {
-        self.terminal_showdown(&state.board);
+        self.terminal(state, TerminalKind::Showdown);
     }
     fn chance(&mut self, state: LineState, _: &str) {
         self.deal_chance(state);
@@ -1602,8 +1623,13 @@ fn build_checked(
             }
         })
         .collect();
-    // `collect` can reuse the larger builder allocation in place.
+    // `collect` can reuse the larger builder allocation in place. Every
+    // evaluator table is then held at its exact length: the solve keeps it
+    // resident and the memory estimate counts its elements.
     terminals.shrink_to_fit();
+    payoffs.shrink_to_fit();
+    let mut mask_cards = mask_cards;
+    mask_cards.shrink_to_fit();
     let evaluator = PostflopEvaluator {
         cfr_precision: hu_engine::CfrPrecision::F64,
         terminals,
@@ -2162,9 +2188,13 @@ impl Builder<'_> {
                         }
                     }
                     sorted.sort_unstable();
+                    // Exact capacities: every table stays resident through the
+                    // solve and the memory estimate counts its elements.
+                    dead.shrink_to_fit();
                     let mut table = RankedHands {
+                        hands: Vec::with_capacity(sorted.len()),
+                        groups: Vec::new(),
                         dead,
-                        ..Default::default()
                     };
                     for (rank, global, local) in sorted {
                         if table.groups.last().is_none_or(|&(r, _)| r != rank) {
@@ -2177,6 +2207,7 @@ impl Builder<'_> {
                         });
                         table.groups.last_mut().unwrap().1 = table.hands.len();
                     }
+                    table.groups.shrink_to_fit();
                     table
                 };
                 std::sync::Arc::new(PerPlayer::new(ranked(Player::P0), ranked(Player::P1)))
@@ -2187,6 +2218,37 @@ impl Builder<'_> {
         self.rank_table_ids.insert(key, id);
         id
     }
+}
+
+/// Process image (binary, libraries, runtime and allocator state) resident
+/// beside the counted structures; the CLI measured 7-9 MiB.
+pub(crate) const PROCESS_BYTES: u64 = 32 << 20;
+/// The allocator keeps part of the build's freed temporaries resident. With
+/// [`PROCESS_BYTES`], this share of the game covers what a one-thread build's
+/// RSS holds beyond the game (5-17 MiB in the calibrated trees).
+const BUILD_RESIDUE_DIVISOR: u64 = 16;
+/// Engine scratch one worker thread retains once it has run CFR and
+/// evaluation passes: a fixed part plus buffers per tree level and hand of
+/// the wider range. At least 1.5x the per-worker need measured on flop, turn
+/// and river trees (experiments/p1-efficiency-2026-10/memory-estimate-20261029).
+const THREAD_FIXED_BYTES: u64 = 1 << 20;
+const THREAD_LEVEL_HAND_BYTES: u64 = 1792;
+/// Viewer-index action labels and history tokens, interned per distinct size.
+const LABEL_BYTES: u64 = 256 << 10;
+/// Per action node, an installed profile holds a lock and an incentive slot,
+/// two subtree prefix sums and the frequency controller's base incentive
+/// slot. Lock and incentive values are not counted. The slots are counted
+/// twice: resolution's freed temporaries stay in the allocator, and a
+/// one-thread lock run measured 1.0-1.5x the slots.
+const PROFILE_SLOT_BYTES: u64 = 2
+    * (std::mem::size_of::<Option<hu_engine::NodeLock>>()
+        + std::mem::size_of::<Option<hu_engine::NodeIncentive>>()
+        + 2 * std::mem::size_of::<usize>()
+        + std::mem::size_of::<Option<Vec<f32>>>()) as u64;
+
+/// Heap bytes of a vector's allocation.
+pub(crate) fn vec_bytes<T>(v: &Vec<T>) -> u64 {
+    (v.capacity() * std::mem::size_of::<T>()) as u64
 }
 
 /// Storage/node/terminal/rank-table footprint of a [`PostflopConfig`],
@@ -2208,9 +2270,25 @@ pub struct MemoryEstimate {
     /// Packed value slots, mode/street metadata and one bounded parallel
     /// strategy batch for a full `.sol` export.
     pub save_bytes: u64,
-    /// Bounded streaming codec budget (updated for the run's thread count).
+    /// The `.sol` writer's bounded streaming codec budget, including the
+    /// run's config frames. The checkpoint encoder is [`Self::checkpoint_bytes`].
     pub compression_bytes: u64,
+    /// Compiled game resident from build through save: public tree, terminal
+    /// evaluator (rank tables, payoffs, masks, transitions) and viewer index.
+    pub game_bytes: u64,
+    /// Engine scratch one worker thread retains.
+    pub thread_bytes: u64,
+    /// Worker threads: one from [`memory_usage`]; `prepare` sets the run's count.
+    pub threads: u64,
+    /// Installed solve profile with its resolution residue: zero from
+    /// [`memory_usage`]; `prepare` sets it when the input has a profile.
+    pub profile_bytes: u64,
     pub nodes: u64,
+    pub action_nodes: u64,
+    /// Most action and chance nodes on one root-to-leaf path.
+    pub max_depth: u64,
+    /// Most deals of one chance node.
+    pub max_deals: u64,
     pub terminals: u64,
     pub rank_tables: u64,
     /// Which tree-script rules' conditions were ever true during this dry
@@ -2232,12 +2310,33 @@ pub fn memory_usage(config: &PostflopConfig) -> MemoryEstimate {
 }
 
 impl MemoryEstimate {
-    /// Final checkpoint and solution peak, retaining all storage: S + W + 2C.
-    /// The checkpoint codec uses window_log(20) and the run's worker count;
-    /// the `.sol` writer's level-3 contexts are bounded per chunk in flight.
-    /// C bounds either encoder (using the larger payload); W already includes
-    /// the bounded Rayon strategy batch. No state snapshot is allocated.
-    /// Overflow means the parallel peak cannot fit a u64 memory limit.
+    /// Memory resident beside storage from build through save: process
+    /// image, compiled game and its build residue, profile slots and every
+    /// worker's scratch.
+    pub fn resident_bytes(&self) -> u64 {
+        PROCESS_BYTES
+            .saturating_add(self.game_bytes)
+            .saturating_add(self.game_bytes / BUILD_RESIDUE_DIVISOR)
+            .saturating_add(self.profile_bytes)
+            .saturating_add(self.thread_bytes.saturating_mul(self.threads))
+    }
+
+    /// Profile slots and resolution residue for this tree's action nodes.
+    pub fn profile_slot_bytes(&self) -> u64 {
+        self.action_nodes.saturating_mul(PROFILE_SLOT_BYTES)
+    }
+
+    /// The checkpoint's zstd encoder with the run's worker count, needed
+    /// beside all storage by every periodic and final checkpoint.
+    pub fn checkpoint_bytes(&self) -> u64 {
+        crate::checkpoint::encoder_workspace(self.threads)
+    }
+
+    /// Final checkpoint and solution written concurrently, retaining all
+    /// storage: S + W + C + E plus the resident memory, where C is the `.sol`
+    /// writer's budget and E the checkpoint encoder's. W already includes the
+    /// bounded Rayon strategy batch. No state snapshot is allocated. Overflow
+    /// means the parallel peak cannot fit a u64 memory limit.
     pub fn parallel_save_bytes(&self, backend: crate::input::Storage) -> Option<u64> {
         let storage = match backend {
             crate::input::Storage::F32 => self.f32_bytes,
@@ -2246,11 +2345,14 @@ impl MemoryEstimate {
         };
         storage
             .checked_add(self.save_bytes)?
-            .checked_add(self.compression_bytes.checked_mul(2)?)
+            .checked_add(self.compression_bytes)?
+            .checked_add(self.checkpoint_bytes())?
+            .checked_add(self.resident_bytes())
     }
 
-    /// Peak of solving/checkpointing and saving after regret release, plus
-    /// the conservative streaming compression budget. Arithmetic saturates.
+    /// Peak of solving and checkpointing with all storage (S + E) or saving
+    /// after regret release (S - R + W + C), plus the resident memory.
+    /// Arithmetic saturates.
     pub fn required_bytes(&self, backend: crate::input::Storage) -> u64 {
         let (storage, regrets) = match backend {
             crate::input::Storage::F32 => (self.f32_bytes, self.f32_regret_bytes),
@@ -2258,12 +2360,14 @@ impl MemoryEstimate {
             crate::input::Storage::I16F32Avg => (self.i16_f32avg_bytes, self.i16_regret_bytes),
         };
         storage
+            .saturating_add(self.checkpoint_bytes())
             .max(
                 storage
                     .saturating_sub(regrets)
-                    .saturating_add(self.save_bytes),
+                    .saturating_add(self.save_bytes)
+                    .saturating_add(self.compression_bytes),
             )
-            .saturating_add(self.compression_bytes)
+            .saturating_add(self.resident_bytes())
     }
 }
 
@@ -2285,6 +2389,13 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         nodes: 0,
         terminals: 0,
         action_nodes: 0,
+        deals: 0,
+        depth: 0,
+        max_depth: 0,
+        max_deals: 0,
+        mask_cards: 0,
+        transition_keys: BTreeSet::new(),
+        payoff_keys: BTreeSet::new(),
         rank_table_keys: BTreeSet::new(),
         hits: rule_hits_for(config),
         error: None,
@@ -2295,15 +2406,18 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
     if let Some(error) = counting.error {
         return Err(error);
     }
+    let hands = (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64;
+    let widest = counting
+        .hands
+        .len(Player::P0)
+        .max(counting.hands.len(Player::P1)) as u64;
     Ok(MemoryEstimate {
         f32_bytes: counting.elements * 2 * 4,
         i16_bytes: counting.elements * 2 * 2 + counting.action_nodes * 2 * 4,
         i16_f32avg_bytes: counting.elements * 6 + counting.action_nodes * 4,
         f32_regret_bytes: counting.elements * 4,
         i16_regret_bytes: counting.elements * 2 + counting.action_nodes * 4,
-        save_bytes: counting.action_nodes
-                * 2
-                * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64
+        save_bytes: counting.action_nodes * 2 * hands
             + counting.action_nodes
                 * (std::mem::size_of::<parking_lot::Mutex<Option<(f32, Vec<u8>)>>>()
                     + std::mem::size_of::<bool>()) as u64
@@ -2313,15 +2427,18 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
                 counting.elements, counting.min_strategy_elements, counting.max_strategy_elements, counting.action_nodes,
             ),
         compression_bytes: crate::sol::compression_workspace(
-            (counting.max_strategy_elements * 2)
-                .max(2 * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64),
-            counting.elements * 2
-                + counting.action_nodes
-                    * 2
-                    * (counting.hands.len(Player::P0) + counting.hands.len(Player::P1)) as u64,
+            (counting.max_strategy_elements * 2).max(2 * hands),
+            counting.elements * 2 + counting.action_nodes * 2 * hands,
             counting.action_nodes,
         ),
+        game_bytes: counting.game_bytes(),
+        thread_bytes: THREAD_FIXED_BYTES + THREAD_LEVEL_HAND_BYTES * widest * counting.max_depth,
+        threads: 1,
+        profile_bytes: 0,
         nodes: counting.nodes,
+        action_nodes: counting.action_nodes,
+        max_depth: counting.max_depth,
+        max_deals: counting.max_deals,
         terminals: counting.terminals,
         rank_tables: counting.rank_table_keys.len() as u64,
         rule_hits: counting.hits,
@@ -2342,6 +2459,19 @@ struct Counting<'a> {
     nodes: u64,
     terminals: u64,
     action_nodes: u64,
+    deals: u64,
+    /// Action and chance nodes above the node being counted, inclusive.
+    depth: u64,
+    max_depth: u64,
+    max_deals: u64,
+    /// Cards dealt as singleton classes; each has one card-removal mask per seat.
+    mask_cards: u64,
+    /// Merged deal classes by (board, members); each has one quotient
+    /// transition per seat (see [`Builder::quotient_transition`]).
+    transition_keys: BTreeSet<(Vec<Card>, Vec<Card>)>,
+    /// Everything [`Builder::terminal`] bakes payoffs from; the builder
+    /// interns the baked payoffs, so this bounds their count.
+    payoff_keys: BTreeSet<(u8, Street, Chips, Chips)>,
     rank_table_keys: BTreeSet<[Card; 5]>,
     /// Accumulated by every [`node_actions`] call this dry run makes -- see
     /// [`RuleHits`].
@@ -2357,6 +2487,8 @@ impl Counting<'_> {
         }
         self.nodes += 1;
         self.action_nodes += 1;
+        self.depth += 1;
+        self.max_depth = self.max_depth.max(self.depth);
 
         let actions = node_actions(&state, self.config, &mut self.hits);
         if actions.is_empty() {
@@ -2369,7 +2501,12 @@ impl Counting<'_> {
         let num_actions = actions.len() as u64;
         for action in actions {
             match child_step(&state, action) {
-                ChildStep::Fold => self.terminal_fold(),
+                ChildStep::Fold => self.terminal(
+                    &state,
+                    TerminalKind::Fold {
+                        folder: state.to_act,
+                    },
+                ),
                 ChildStep::StreetEnd(next) => self.street_end(next),
                 ChildStep::Betting(next) => self.betting(next),
             }
@@ -2379,6 +2516,7 @@ impl Counting<'_> {
         self.elements += elements;
         self.max_strategy_elements = self.max_strategy_elements.max(elements);
         self.min_strategy_elements = self.min_strategy_elements.min(elements);
+        self.depth -= 1;
     }
 
     fn street_end(&mut self, state: LineState) {
@@ -2387,7 +2525,11 @@ impl Counting<'_> {
 
     fn deal_chance(&mut self, state: LineState) {
         self.nodes += 1;
+        self.depth += 1;
+        self.max_depth = self.max_depth.max(self.depth);
         let groups = chance_groups(&state.board, self.config.iso_merging, &self.sym);
+        self.deals += groups.len() as u64;
+        self.max_deals = self.max_deals.max(groups.len() as u64);
         if self.parallel {
             use rayon::prelude::*;
             let forks: Vec<_> = groups
@@ -2406,9 +2548,17 @@ impl Counting<'_> {
                 self.deal(&state, group);
             }
         }
+        self.depth -= 1;
     }
 
     fn deal(&mut self, state: &LineState, group: &DealGroup) {
+        // The same reach-map choice as `Builder::deal`.
+        if group.members.len() == 1 {
+            self.mask_cards |= 1 << group.representative.index();
+        } else {
+            self.transition_keys
+                .insert((state.board.to_vec(), group.members.clone()));
+        }
         walk_dealt(self, state, group.representative, "");
     }
 
@@ -2424,6 +2574,13 @@ impl Counting<'_> {
             nodes: 0,
             terminals: 0,
             action_nodes: 0,
+            deals: 0,
+            depth: self.depth,
+            max_depth: 0,
+            max_deals: 0,
+            mask_cards: 0,
+            transition_keys: BTreeSet::new(),
+            payoff_keys: BTreeSet::new(),
             rank_table_keys: BTreeSet::new(),
             hits: rule_hits_for(self.config),
             parallel: false,
@@ -2442,24 +2599,113 @@ impl Counting<'_> {
         self.nodes += fork.nodes;
         self.terminals += fork.terminals;
         self.action_nodes += fork.action_nodes;
+        self.deals += fork.deals;
+        self.max_depth = self.max_depth.max(fork.max_depth);
+        self.max_deals = self.max_deals.max(fork.max_deals);
+        self.mask_cards |= fork.mask_cards;
+        self.transition_keys.extend(fork.transition_keys);
+        self.payoff_keys.extend(fork.payoff_keys);
         self.rank_table_keys.extend(fork.rank_table_keys);
         crate::prepare::merge_rule_hits(&mut self.hits, &fork.hits);
     }
 
-    fn terminal_fold(&mut self) {
+    fn terminal(&mut self, state: &LineState, kind: TerminalKind) {
         self.nodes += 1;
         self.terminals += 1;
+        let kind_key = match kind {
+            TerminalKind::Fold { folder: Player::P0 } => 0,
+            TerminalKind::Fold { folder: Player::P1 } => 1,
+            TerminalKind::Showdown => 2,
+        };
+        self.payoff_keys.insert((
+            kind_key,
+            state.street,
+            state.contrib[Player::P0],
+            state.contrib[Player::P1],
+        ));
+        if kind == TerminalKind::Showdown {
+            let board5: [Card; 5] = state.board[..]
+                .try_into()
+                .expect("showdown requires a completed 5-card board");
+            let mut key = board5;
+            key.sort_unstable();
+            self.rank_table_keys.insert(key);
+        }
     }
 
-    fn terminal_showdown(&mut self, board: &[Card]) {
-        self.nodes += 1;
-        self.terminals += 1;
-        let board5: [Card; 5] = board
-            .try_into()
-            .expect("showdown requires a completed 5-card board");
-        let mut key = board5;
-        key.sort_unstable();
-        self.rank_table_keys.insert(key);
+    /// Heap bytes of the compiled game at the builder's exact capacities:
+    /// every per-node, per-action-node, per-terminal and per-deal array of
+    /// the tree, evaluator and viewer index, the masks, quotient transitions,
+    /// interned payoffs and rank tables (at most one rank group per live
+    /// hand), the hand maps and ranges, and an allowance for labels.
+    fn game_bytes(&self) -> u64 {
+        use hu_engine::{Deal, Node, StorageRef, StorageSpan};
+        use std::mem::size_of;
+        let seat = |p: Player| self.hands.len(p) as u64;
+        let hands = seat(Player::P0) + seat(Player::P1);
+        // Tree nodes, tags, spans and chance flags; index edges, streets and parents.
+        let per_node = size_of::<Node>()
+            + size_of::<u32>()
+            + size_of::<StorageSpan>()
+            + size_of::<bool>()
+            + size_of::<u32>()
+            + size_of::<Street>()
+            + size_of::<NodeId>();
+        // Storage refs and their node ids; index pots.
+        let per_action = size_of::<StorageRef>() + size_of::<NodeId>() + size_of::<u32>();
+        // Compact terminals and batch tables.
+        let per_terminal = size_of::<CompactTerminal>() + size_of::<u32>();
+        // Tree deals; index deal cards.
+        let per_deal = size_of::<Deal>() + size_of::<u8>();
+        // Per card: one mask per seat and both `mask_cards` entries.
+        let masks = self.mask_cards.count_ones() as u64
+            * (2 * (size_of::<Vec<f32>>() + size_of::<Card>()) as u64
+                + hands * size_of::<f32>() as u64);
+        let transitions = self
+            .transition_keys
+            .iter()
+            .map(|(_, members)| {
+                (2 * size_of::<SparseTransition>()) as u64
+                    + members.len() as u64 * hands * size_of::<(u32, u32, f32)>() as u64
+            })
+            .sum::<u64>();
+        let payoffs = self.payoff_keys.len() as u64 * size_of::<BakedPayoffs>() as u64;
+        let rank_tables = self
+            .rank_table_keys
+            .iter()
+            .map(|board| {
+                let board: CardSet = board.iter().copied().collect();
+                let ranked = |p: Player| {
+                    let live = self
+                        .hands
+                        .combos(p)
+                        .iter()
+                        .filter(|&&global| {
+                            let (a, b) = combo_cards(global as usize);
+                            !board.contains(a) && !board.contains(b)
+                        })
+                        .count() as u64;
+                    live * (size_of::<Hand>() + size_of::<(nlh::HandRank, usize)>()) as u64
+                        + (seat(p) - live) * size_of::<u16>() as u64
+                };
+                size_of::<PerPlayer<RankedHands>>() as u64 + ranked(Player::P0) + ranked(Player::P1)
+            })
+            .sum::<u64>();
+        // Support, same-combo and inverse maps in the evaluator and the index.
+        let hand_maps = 2 * (2 * hands + 2 * NUM_COMBOS as u64) * size_of::<u16>() as u64;
+        // Fold combos; root ranges in the game and the index.
+        let per_hand = size_of::<Hand>() + 2 * size_of::<f32>();
+        self.nodes * per_node as u64
+            + self.action_nodes * per_action as u64
+            + self.terminals * per_terminal as u64
+            + self.deals * per_deal as u64
+            + masks
+            + transitions
+            + payoffs
+            + rank_tables
+            + hand_maps
+            + hands * per_hand as u64
+            + LABEL_BYTES
     }
 }
 

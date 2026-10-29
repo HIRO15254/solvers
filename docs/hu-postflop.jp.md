@@ -319,7 +319,7 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
-solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + 2C`がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
+solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + C + E + M`（第7節）がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
 
 checkpointは第7節のversion 5または6で保存し、backend種別と配列長をmetadataへ記録する。
 checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値をprocess全体の壁時計と同一視しない。
@@ -328,7 +328,7 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 `[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
 
-最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、Cを各encoderに計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
+最後のcheckpointを新たに書き、`S + W + C + E + M ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、`.sol`の書き手にC、checkpointのencoderにEを計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
 
 `.sol`はprofile無しではversion 4、profile有りではversion 5である。version 5はmetadata frameをversion 4のmetadataと第6節の`ProfileReport`のpostcard tupleに置き換え、他のframeは同じである。version 4と5を読める。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
 
@@ -404,14 +404,20 @@ version 1/2/3/4は移行先を示すversion errorで拒否する。現行`solver
 `.sol`も同じ一時file・fsync・atomic置換を使う。chunkは16個ずつrun用Rayon poolで並列圧縮し、sref順に書く。出力bytesはthread数によらない。
 量子化式とsref順序はversion 2と同じであり、同じsolveからのexport出力は変わらない。
 
-`MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をCとして、表示とmemory上限判定は`max(S, S − R + W) + C`を使う。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
-P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。
+`MemoryEstimate`は`f32_bytes`・`i16_bytes`・`i16_f32avg_bytes`と、解放するregret arenaの`f32_regret_bytes`・`i16_regret_bytes`を返す。選択したstorageをS、regretをR、`save_bytes`をW、`compression_bytes`をC、`checkpoint_bytes()`をE、`resident_bytes()`をMとして、表示とmemory上限判定は`max(S + E, S − R + W + C) + M`を使う。前者は全storageを保持した反復とcheckpoint、後者はregret解放後の`.sol`保存の最大量である。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。
+P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、保存対象・street配列、上限付き1 batch分の並列戦略作業領域、`.sol`の圧縮作業予算、checkpointのencoder、常駐量を含む。
 戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化をrun threadsのRayon poolで並列生成し、書き手がsref順にchunkへ詰める。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockをscaleと量子化bytesとしてslotに保持し、書き手がsref昇順にchunkへ詰める。
 `saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<(f32, Vec<u8>)>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
 戦略batch予算はB×6 bytes（f32平均戦略4＋u16量子化bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(Vec<f32>)。量子化Vecは2×node要素数bytesを事前確保する。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。
-`compressionWorkspaceBytes`は書き手の作業領域で、thread数によらない。P＝min（16、floor（payload bytes / 1 MiB）＋1）を同時に圧縮するchunk数として、（P＋2）×2×（1 MiB＋12＋最大block bytes）（封じたchunk P個と各列の書込み中chunk、その圧縮frame）＋P×4 MiB（圧縮context）＋保存action node数×4（値blockと照合するsref列）＋chunk数上界×3×directory entry size＋実効config長×2（metadata frame）である。
+`compressionWorkspaceBytes`は`.sol`の書き手の作業領域で、thread数によらない。P＝min（16、floor（payload bytes / 1 MiB）＋1）を同時に圧縮するchunk数として、（P＋2）×2×（1 MiB＋12＋最大block bytes）（封じたchunk P個と各列の書込み中chunk、その圧縮frame）＋P×4 MiB（圧縮context）＋保存action node数×4（値blockと照合するsref列）＋chunk数上界×3×directory entry size＋実効config長×2（metadata frame）である。
 payload bytesは全戦略要素数×2＋全値block bytes、最大block bytesは最大node要素数×2と値block bytesの大きい方、chunk数上界は2×（floor（payload bytes / 1 MiB）＋1）である。chunkは1 MiBに達して初めて封じるため、封じたchunkはpayloadが満たせる数を超えない。
-NoRiversもfull出力の保守的な見積りを使う。木本体・rank table・構築中の一時領域・engine thread scratch・allocator/OSは別途必要で、RSS上限ではない。
+Eはcheckpointのzstd encoderである。run threads数Tが2以上なら、zstdは4 MiB（window_log 20＋2）のjobを（T＋3）job分の入力ringから切り出し、1 jobの圧縮上限長の出力bufferを最大2T＋3個poolし、workerごとにlevel 1 contextを持つため、E＝（3T＋6）×4 MiB＋T×1 MiBとする。T＝1では4 MiBである。
+常駐量Mは構築から保存まで残るstorage以外のmemoryで、process領域32 MiB＋G＋G/16＋P＋T×Xである。
+Gは`game_bytes`で、dry-runの数え上げから公開木（node・tag・storage span・部分木chance有無・edge・street・親）、action・terminal・deal配列、card除去mask、iso変換表、payoff表、rank table（live hand数を同順位群数の上限とする）、hand map、viewer索引の配列と、label予算256 KiBを数える。構築した配列は容量を詰めて保持し、Gは実際の確保量以上である（`memory_usage_matches_allocated`）。同順位群数の上限、共有前のpayoff key、label予算の分だけ確保量を上回り、広いrangeの小さい木ほど比が大きい。G/16は構築の一時領域のうちallocatorが保持し続ける分である。
+Pは`[profile]`がある場合だけ数え、action node数×（lock slot＋incentive slot＋部分木prefix 2個＋頻度制御の基準incentive slot）の2倍である。lock・incentiveの値は数えない。2倍目はprofile解決の一時領域のうちallocatorに残る分で、1 threadのlock runで測ったprofileの増分はslotの1.0〜1.5倍だった。
+Xは1 workerが保持するengine scratchで、1 MiB＋1792 bytes×広い方のrangeのhand数×1経路上の最大node数（actionとchance）とする。
+process領域・G/16・Xはflop・turn・riverの木で測ったRSSから較正し、Xは各木で測った1 workerあたりの保持量の1.5倍以上である。較正と完全なsolveの最大RSSとの照合は[測定記録](../experiments/p1-efficiency-2026-10/memory-estimate-20261029/README.md)にある。
+NoRiversもfull出力の保守的な見積りを使う。Mは測定から較正した見積りであり、RSSの上限保証ではない。
 
 P1のresume互換性hashは正規化configから`[run]`・`[meta]`・`solver.cfr_precision`を除いたTOMLのblake3である。
 運用thread・memory・時間・checkpoint間隔と名前・説明は変えられるが、`solver.cfr_precision`以外のsolver/outputを変えるとhashは変わる。

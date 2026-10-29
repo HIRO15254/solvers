@@ -371,17 +371,19 @@ fn memory_auto_explicit_boundary_and_overflow() {
         i16_f32avg_bytes: 90,
         ..Default::default()
     };
-    check_memory_limit(&estimate, Storage::F32, 100).unwrap();
-    check_memory_limit(&estimate, Storage::I16, 60).unwrap();
-    check_memory_limit(&estimate, Storage::I16F32Avg, 90).unwrap();
+    // Without save or codec budgets, checkpointing with all storage peaks.
+    let fixed = estimate.checkpoint_bytes() + estimate.resident_bytes();
+    check_memory_limit(&estimate, Storage::F32, 100 + fixed).unwrap();
+    check_memory_limit(&estimate, Storage::I16, 60 + fixed).unwrap();
+    check_memory_limit(&estimate, Storage::I16F32Avg, 90 + fixed).unwrap();
     assert_eq!(
-        check_memory_limit(&estimate, Storage::I16F32Avg, 89)
+        check_memory_limit(&estimate, Storage::I16F32Avg, 89 + fixed)
             .unwrap_err()
             .required,
-        90
+        90 + fixed
     );
-    let error = check_memory_limit(&estimate, Storage::F32, 99).unwrap_err();
-    assert_eq!((error.required, error.limit), (100, 99));
+    let error = check_memory_limit(&estimate, Storage::F32, 99 + fixed).unwrap_err();
+    assert_eq!((error.required, error.limit), (100 + fixed, 99 + fixed));
     assert!(error.to_string().contains("resource limit"));
     let doc = document(&source("", ""));
     let config = lower(&doc.spot, &settings(&doc)).unwrap();
@@ -407,32 +409,49 @@ fn physical_ram_query_returns_positive_bytes() {
 
 #[test]
 fn memory_peak_before_and_after_release_all_backends() {
+    // A codec budget just above the one-worker checkpoint encoder: one worker
+    // peaks saving after the release, 32 workers checkpointing all storage.
+    let single = MemoryEstimate {
+        threads: 1,
+        ..Default::default()
+    }
+    .checkpoint_bytes();
+    let codec = single + 30;
     // L=100, N=10: f32 regret=400, i16 regret=240.
     for (backend, storage, regrets) in [
         (Storage::F32, 800, 400),
         (Storage::I16, 480, 240),
         (Storage::I16F32Avg, 640, 240),
     ] {
-        for save in [regrets - 1, regrets, regrets + 1] {
-            let estimate = MemoryEstimate {
-                f32_bytes: 800,
-                i16_bytes: 480,
-                i16_f32avg_bytes: 640,
-                f32_regret_bytes: 400,
-                i16_regret_bytes: 240,
-                save_bytes: save,
-                compression_bytes: 30,
-                ..Default::default()
-            };
-            let expected = storage + save.saturating_sub(regrets) + 30;
-            assert_eq!(estimate.required_bytes(backend), expected);
-            check_memory_limit(&estimate, backend, expected).unwrap();
-            assert_eq!(
-                check_memory_limit(&estimate, backend, expected - 1)
-                    .unwrap_err()
-                    .required,
-                expected
-            );
+        for threads in [1, 32] {
+            for save in [regrets - 1, regrets, regrets + 1] {
+                let estimate = MemoryEstimate {
+                    f32_bytes: 800,
+                    i16_bytes: 480,
+                    i16_f32avg_bytes: 640,
+                    f32_regret_bytes: 400,
+                    i16_regret_bytes: 240,
+                    save_bytes: save,
+                    compression_bytes: codec,
+                    threads,
+                    ..Default::default()
+                };
+                let peak = if threads == 1 {
+                    storage - regrets + save + codec
+                } else {
+                    assert!(estimate.checkpoint_bytes() > codec + 1);
+                    storage + estimate.checkpoint_bytes()
+                };
+                let expected = peak + estimate.resident_bytes();
+                assert_eq!(estimate.required_bytes(backend), expected);
+                check_memory_limit(&estimate, backend, expected).unwrap();
+                assert_eq!(
+                    check_memory_limit(&estimate, backend, expected - 1)
+                        .unwrap_err()
+                        .required,
+                    expected
+                );
+            }
         }
     }
     let estimate = MemoryEstimate {

@@ -87,8 +87,8 @@ Linux配布物はRust自体のglibc 2.17下限ではなく、release workflowの
 [CPU基準の計測](../experiments/release-2026-10/cpu-baseline-20261015/README.md)では
 `flop_4bp`が469,808 node、`flop_3bp`が2,222,550 nodeである。
 同梱例[flop_3bp](../examples/hu-postflop/flop_3bp.toml)のstorage見積りは
-f32で約1.44 GiB、i16で約0.73 GiB。これらは**storageだけの見積りでRSSではない**。
-木・rank table・thread scratch・保存作業領域等が別途必要なので、この値ぴったりのRAMでは足りない。
+f32で約1.44 GiB、i16で約0.73 GiB。これらは**storageだけの値でRSSではない**。
+solve前に表示するmemory見積りは、これに木・rank table・thread scratch・保存作業領域・checkpoint圧縮等を加えた量で、thread数とともに増える。
 大きい木では数GiB以上になるため、小さいP1 templateで始め、[memory設定](#4-solveする)と見積りを確認する。
 配布archiveの確定サイズ・runのdisk使用量はReleaseと実際の入力で確認する。
 
@@ -235,7 +235,7 @@ P1の`[solver] storage`は`auto`（既定）、`f32`（両arena f32）、`i16`�
 
 autoはmemory上限（`[run] memory` / `--memory`、未指定なら物理RAMの80%）にf32の必要量が収まればf32、次にi16-f32avgを選ぶ。i16は選ばず、両方超過なら両必要bytesと上限を示しexit 75となる。`validate --resources`は選択結果を表示し、両方超過ならi16-f32avgの必要量と`withinLimit: false`を返す。正規化はautoを維持し、solve表示とrun.toml・checkpoint・`.sol`のconfig / metadataは具体storageを保存する。既存runの明示storageは維持され、resume・照会は現在のmachine memoryで再選択しない。
 
-P1のmemory見積りは`max(storage, storage − regret + 保存作業領域) + 圧縮予算`。regret bytesはf32で4L、i16・i16-f32avgで2L＋4N。solve/resumeは最後のcheckpointを新たに書き、並行peak `S + W + 2C`（S=選択storage、W=保存作業領域、C=圧縮予算）が上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`生成の順とする。全停止理由に適用し、solve開始の見積り式は変わらない。反復中のcheckpointでは解放しない。保存作業領域は保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域、圧縮作業予算を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。木・rank table・thread scratch等は別途必要でRSS上限ではない。
+P1のmemory見積りは`max(storage + checkpoint encoder, storage − regret + 保存作業領域 + 圧縮予算) + 常駐量`。regret bytesはf32で4L、i16・i16-f32avgで2L＋4N。checkpoint encoderはrun threads数に比例するzstdの作業領域、常駐量はprocess・compiled木・rank table・profile slot・thread数分のengine作業領域で、`validate --format json --resources`の`checkpointWorkspaceBytes`・`residentBytes`に出る。solve/resumeは最後のcheckpointを新たに書き、並行peak `S + W + C + E + M`（S=選択storage、W=保存作業領域、C=圧縮予算、E=checkpoint encoder、M=常駐量）が上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`生成の順とする。全停止理由に適用し、solve開始の見積り式は変わらない。反復中のcheckpointでは解放しない。保存作業領域は保存用packed値block・sref slot・保存対象/street配列、上限付き1 batch分の並列戦略作業領域を含む。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。NoRiversもfullの保守的な見積りを使う。常駐量とcheckpoint encoderは測定から較正した値で、RSSの上限保証ではない。threadsを減らすと見積りも減る。
 P1のmemory autoは物理RAMの80%、P2はarena予算6 GiBである。P2のmemoryはRSS全体の上限ではなく、
 tree・cache・thread scratch・評価・checkpoint用の追加memoryが必要である。
 P2のEHS² tableは初回に構築し、以後はmachine cacheを利用する。

@@ -103,6 +103,23 @@ fn last_bracketed_card(history: &str) -> Option<Card> {
 }
 
 impl GameIndex {
+    /// Heap bytes allocated by the index, by capacity.
+    pub fn heap_bytes(&self) -> u64 {
+        use crate::postflop::vec_bytes;
+        let strings =
+            |v: &Vec<String>| vec_bytes(v) + v.iter().map(|s| s.capacity() as u64).sum::<u64>();
+        strings(&self.labels)
+            + strings(&self.tokens)
+            + vec_bytes(&self.edges)
+            + vec_bytes(&self.deal_cards)
+            + vec_bytes(&self.pots)
+            + vec_bytes(&self.streets)
+            + vec_bytes(&self.parents)
+            + self.hands.heap_bytes()
+            + vec_bytes(&self.root_ranges[Player::P0])
+            + vec_bytes(&self.root_ranges[Player::P1])
+    }
+
     /// Index of a freshly built game. `node_info` is the builder's metadata
     /// (chip amounts, untranslated); `start` is the subgame's first street.
     pub fn from_game(

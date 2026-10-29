@@ -50,6 +50,16 @@ impl PostflopHands {
     pub fn is_empty(&self, p: Player) -> bool {
         self.combos[p].is_empty()
     }
+    /// Heap bytes allocated by the support lists and maps, by capacity.
+    pub fn heap_bytes(&self) -> u64 {
+        use crate::postflop::vec_bytes;
+        Player::BOTH
+            .into_iter()
+            .map(|p| {
+                vec_bytes(&self.combos[p]) + vec_bytes(&self.local[p]) + vec_bytes(&self.same[p])
+            })
+            .sum()
+    }
     pub fn local(&self, p: Player, global: usize) -> Option<usize> {
         self.local[p]
             .get(global)

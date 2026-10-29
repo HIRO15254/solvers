@@ -175,10 +175,12 @@ JSONの主要fieldは次のとおり。共通診断IRのfieldはsnake_case、CLI
 |---|---|---|
 | `nodes` / `terminals` / `f32Bytes` / `i16Bytes` / `i16F32avgBytes` | P1 | 木のnode・terminal数とstorage別bytes |
 | `storage` | P1 | 解決済みstorage名。human表示はautoから選択したことも示す |
-| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage, storage − regret + saveWorkspaceBytes) + compressionWorkspaceBytes`、解決済み上限、上限内か |
+| `memoryEstimateBytes` / `memoryLimitBytes` / `withinLimit` | P1 | `max(storage + checkpointWorkspaceBytes, storage − regret + saveWorkspaceBytes + compressionWorkspaceBytes) + residentBytes`、解決済み上限、上限内か |
 | `complete` / `recall` | P2 | count完了か、`current-street` |
 | `decisionNodes` / `terminalEdges` / `policyColumns` / `policySlots` | P2 | arena count |
-| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / chunk圧縮・directory・metadataの書込み予算（thread数によらない） |
+| `saveWorkspaceBytes` / `compressionWorkspaceBytes` | P1 | full `.sol`のpacked値block・sref slot・保存対象/street配列＋上限付き1 batch分の並列戦略作業領域 / `.sol`のchunk圧縮・directory・metadataの書込み予算（thread数によらない） |
+| `checkpointWorkspaceBytes` | P1 | `threads`個のworkerで圧縮するcheckpointのzstd encoder |
+| `residentBytes` / `gameBytes` / `profileBytes` / `threads` / `threadWorkspaceBytes` | P1 | storage以外の常駐量（process領域32 MiB＋`gameBytes`×17/16＋`profileBytes`＋`threads`×`threadWorkspaceBytes`）、compiled game（公開木・終端評価器・viewer索引）、`[profile]`のnode slotと解決の残り、見積りに使うrun threads数、1 workerのengine作業領域。式は[P1規範第7節](hu-postflop.jp.md#7-solとcheckpoint) |
 | `solverStateBytes` / `memoryLimitBytes` / `withinLimit` | P2 | arena bytes、上限、countが上限内で完了したか |
 | `icm` | P2 | cashならnull。ICMのfieldPlayers・paidPlaces・mode（15人以下`exact`、16人以上`quadrature`）・quadratureNodes（exactはnull） |
 
@@ -187,7 +189,7 @@ P1は通常validateでも木の見積りで未使用ruleを確認する。P2の�
 完了時だけ未一致ruleを警告し、上限による打切りは`incomplete`として未一致警告を出さない。
 validateの正規化出力（`--show-effective` / `--write-effective`）はautoを維持する。autoで両方式が超過した場合、resourcesはi16-f32avgの必要量と`withinLimit: false`を返す。
 
-P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpointを新たに書き、`S + W + 2C ≤ memory上限`ならregretを保持してcheckpointと`.sol`を並行生成する。それ以外はcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`の順とする。solve開始の見積り式は変わらない。
+P1のregret bytesはf32で4L、i16・i16-f32avgで2L＋4N（L=storage要素数、N=action node数）。solve/resumeは最後のcheckpointを新たに書き、`storage + saveWorkspaceBytes + compressionWorkspaceBytes + checkpointWorkspaceBytes + residentBytes ≤ memory上限`ならregretを保持してcheckpointと`.sol`を並行生成する。それ以外はcheckpoint（指定時）→ regret配列とscaleの解放 → `.sol`の順とする。solve開始の見積り式は変わらない。
 
 validateはmemory超過を表示し、solve/resumeは確保前に拒否する。
 rule hitの定義は[共通Input第9節](nlh-input-v1.jp.md#未使用ruleの警告)を参照する。

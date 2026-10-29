@@ -421,6 +421,23 @@ pub fn write_storage_with_frequency(
         Some(lambdas),
     )
 }
+/// Memory bound of [`write_arrays`]' encoder. With several workers zstd cuts
+/// 4 MiB jobs (window_log(20) + 2) from an input ring of workers + 3 jobs,
+/// pools up to 2 x workers + 3 output buffers of one job's bound and keeps a
+/// level-1 context per worker. One worker streams through a single context,
+/// the window and its block buffers.
+pub(crate) fn encoder_workspace(threads: u64) -> u64 {
+    const JOB: u64 = 4 << 20;
+    const CONTEXT: u64 = 1 << 20;
+    if threads <= 1 {
+        return JOB;
+    }
+    threads
+        .saturating_mul(3)
+        .saturating_add(6)
+        .saturating_mul(JOB)
+        .saturating_add(threads.saturating_mul(CONTEXT))
+}
 #[allow(clippy::too_many_arguments)]
 fn write_arrays(
     path: &Path,

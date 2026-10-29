@@ -1361,8 +1361,9 @@ fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("auto.toml");
     // Below the bounded export batch size, save workspace dominates and the
-    // f32 and mixed requirements coincide. A wide single-street tree gives
-    // a real gap without changing the production memory estimate formula.
+    // f32 and mixed requirements coincide. A wide single-street tree gives a
+    // real storage gap, and the checkpoint encoder of 16 threads makes the
+    // all-storage phase, not the save after regret release, the peak.
     let bets = (1..=20)
         .map(|n| format!("{n}bb"))
         .collect::<Vec<_>>()
@@ -1377,7 +1378,8 @@ fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
             "replace raise [2x,3x,4x,5x,6x,7x] }",
             "replace raise [2x,3x,4x,5x,6x,7x] }\nriver when aggressions >= 4 { remove raise }",
         )
-        .replace("max_iterations = 16", "max_iterations = 1");
+        .replace("max_iterations = 16", "max_iterations = 1")
+        .replace("threads = 1\n", "threads = 16\n");
     std::fs::write(&config, &raw).unwrap();
     let resources = |path: &Path| -> serde_json::Value {
         serde_json::from_slice(

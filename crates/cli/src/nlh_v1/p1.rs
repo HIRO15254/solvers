@@ -44,6 +44,10 @@ pub fn validate(
             "f32Bytes": p.estimate.f32_bytes, "i16Bytes": p.estimate.i16_bytes,
             "i16F32avgBytes": p.estimate.i16_f32avg_bytes,
             "saveWorkspaceBytes": p.estimate.save_bytes, "compressionWorkspaceBytes": p.estimate.compression_bytes,
+            "checkpointWorkspaceBytes": p.estimate.checkpoint_bytes(),
+            "residentBytes": p.estimate.resident_bytes(), "gameBytes": p.estimate.game_bytes,
+            "profileBytes": p.estimate.profile_bytes, "threads": p.estimate.threads,
+            "threadWorkspaceBytes": p.estimate.thread_bytes,
             "memoryEstimateBytes": required_bytes(&p), "memoryLimitBytes": p.limit,
             "withinLimit": required_bytes(&p) <= p.limit,
         });
@@ -445,10 +449,15 @@ pub(crate) fn print_memory_estimate(estimate: &hu_postflop::MemoryEstimate) {
         estimate.i16_f32avg_bytes as f64 / (1024.0 * 1024.0),
     );
     println!(
-        "memory estimate: {:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg)",
+        "memory estimate: {:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg); resident {:.1} MiB (game {:.1} MiB, {} threads x {:.1} MiB), checkpoint encoder {:.1} MiB",
         estimate.required_bytes(input::Storage::F32) as f64 / (1024.0 * 1024.0),
         estimate.required_bytes(input::Storage::I16) as f64 / (1024.0 * 1024.0),
         estimate.required_bytes(input::Storage::I16F32Avg) as f64 / (1024.0 * 1024.0),
+        estimate.resident_bytes() as f64 / (1024.0 * 1024.0),
+        estimate.game_bytes as f64 / (1024.0 * 1024.0),
+        estimate.threads,
+        estimate.thread_bytes as f64 / (1024.0 * 1024.0),
+        estimate.checkpoint_bytes() as f64 / (1024.0 * 1024.0),
     );
 }
 

@@ -971,6 +971,9 @@ fn auto_storage_resolves_at_memory_boundaries_and_reports_both_requirements() {
         i16_bytes: 500,
         ..Default::default()
     };
+    // Every backend's requirement includes the same checkpoint encoder and
+    // resident memory.
+    let resident = p.estimate.checkpoint_bytes() + p.estimate.resident_bytes();
     for (limit, backend, fits) in [
         (1000, Storage::F32, true),
         (999, Storage::I16F32Avg, true),
@@ -978,6 +981,7 @@ fn auto_storage_resolves_at_memory_boundaries_and_reports_both_requirements() {
         (749, Storage::I16F32Avg, false),
         (500, Storage::I16F32Avg, false),
     ] {
+        let limit = limit + resident;
         p.limit = limit;
         p.settings.solver.storage =
             prepare::resolve_storage(StorageChoice::Auto, &p.estimate, limit);
@@ -985,14 +989,14 @@ fn auto_storage_resolves_at_memory_boundaries_and_reports_both_requirements() {
         let result = prepare::check_memory_limit(&p);
         assert_eq!(result.is_ok(), fits);
         if let Err(error) = result {
-            assert_eq!(error.required, 750);
-            assert_eq!(error.auto_f32_required, Some(1000));
+            assert_eq!(error.required, 750 + resident);
+            assert_eq!(error.auto_f32_required, Some(1000 + resident));
             assert_eq!(error.limit, limit);
             let message = error.to_string();
             for part in [
                 "auto",
-                "f32 1000",
-                "i16-f32avg 750",
+                &format!("f32 {}", 1000 + resident),
+                &format!("i16-f32avg {}", 750 + resident),
                 &format!("limit {limit}"),
             ] {
                 assert!(message.contains(part), "{message}");

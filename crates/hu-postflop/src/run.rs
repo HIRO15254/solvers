@@ -1439,24 +1439,38 @@ target = 0.5
             i16_f32avg_bytes: 80,
             save_bytes: 40,
             compression_bytes: 10,
+            game_bytes: 7,
+            profile_bytes: 5,
+            thread_bytes: 3,
+            threads: 4,
             ..Default::default()
         };
-        for (backend, peak) in [
-            (input::Storage::F32, 160),
-            (input::Storage::I16, 120),
-            (input::Storage::I16F32Avg, 140),
+        let resident = crate::postflop::PROCESS_BYTES + 7 + 5 + 3 * 4;
+        assert_eq!(estimate.resident_bytes(), resident);
+        // The .sol writer's budget and the four-worker checkpoint encoder.
+        let codecs = 10 + crate::checkpoint::encoder_workspace(4);
+        for (backend, storage) in [
+            (input::Storage::F32, 100),
+            (input::Storage::I16, 60),
+            (input::Storage::I16F32Avg, 80),
         ] {
+            let peak = storage + 40 + codecs + resident;
             assert_eq!(estimate.parallel_save_bytes(backend), Some(peak));
             assert!(!parallel_finalize(true, &estimate, backend, peak - 1));
             assert!(parallel_finalize(true, &estimate, backend, peak));
             assert!(parallel_finalize(true, &estimate, backend, peak + 1));
             assert!(!parallel_finalize(false, &estimate, backend, u64::MAX));
         }
-        for (storage, workspace, codec) in [(u64::MAX, 1, 0), (0, 0, u64::MAX)] {
+        for (storage, workspace, codec, game) in [
+            (u64::MAX, 1, 0, 0),
+            (0, 0, u64::MAX, 0),
+            (0, 0, 0, u64::MAX),
+        ] {
             let overflow = crate::MemoryEstimate {
                 f32_bytes: storage,
                 save_bytes: workspace,
                 compression_bytes: codec,
+                game_bytes: game,
                 ..Default::default()
             };
             assert!(!parallel_finalize(

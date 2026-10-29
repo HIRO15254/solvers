@@ -757,9 +757,9 @@ final_checkpoint = true      # P1のみ。既定true。falseは終了時の再�
 
 - `threads = "auto"`: P1は論理CPU数、P2は`min(論理CPU数, players × batch_sweeps)`。
 - `final_checkpoint`: P1のみのbool、既定true。falseではtarget到達・max_iterations・time-limit・cancelの全停止理由で最後のcheckpointを省く。定期checkpointは従来どおり保存し、`.sol`も生成する。省いたrunは最終状態から再開できず、定期checkpointがあればその保存iterationから再開する。checkpointが一つも無ければ再solveが必要。P2で明示すると`NLH002`。利用者決定PF9（2026-10-08）のA＋Bに従う。
-- `memory`: P1は選択したstorageのbytes（`f32_bytes` / `i16_bytes` / `i16_f32avg_bytes`）をS、解放するregret arenaをR、保存作業領域をW、圧縮予算をCとして、`max(S, S − R + W) + C`でsolve開始前に見積もる。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。最後のcheckpointを新たに書く場合、並行peak `S + W + 2C`が上限以下ならregretを解放せずcheckpointと`.sol`を並行生成する。両方のzstd encoderにCを計上する。余裕が無ければ最後のcheckpoint（指定時）→ regretとそのscaleの解放 → `.sol`生成の順とする。solve開始の見積り式と可否判定は変えない。保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域）と圧縮予算を含み、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
+- `memory`: P1は選択したstorageのbytes（`f32_bytes` / `i16_bytes` / `i16_f32avg_bytes`）をS、解放するregret arenaをR、保存作業領域をW、`.sol`の圧縮予算をC、checkpointのencoderをE、常駐量をMとして、`max(S + E, S − R + W + C) + M`でsolve開始前に見積もる。Rはf32で4L、i16・i16-f32avgで2L＋4N bytes（L=storage要素数、N=action node数）。Eはrun threads数に比例するzstdの並列encoder、Mはprocess領域、compiled game（公開木・終端評価器・viewer索引）とその構築残り、`[profile]`のnode slot、run threads数分のengine作業領域の合計で、式は[P1規範第7節](hu-postflop.jp.md#7-solとcheckpoint)に従う。最後のcheckpointを新たに書く場合、並行peak `S + W + C + E + M`が上限以下ならregretを解放せずcheckpointと`.sol`を並行生成する。余裕が無ければ最後のcheckpoint（指定時）→ regretとそのscaleの解放 → `.sol`生成の順とする。solve開始の見積り式と可否判定は変えない。保存作業領域（full出力のpacked値block・sref slot・保存対象/street配列・上限付き1 batch分のf32平均戦略・u16量子化bytes・postcard bytes・Vec管理領域）と圧縮予算を含み、`auto`は物理メモリの80%。戦略blockは合計8,388,608要素以下のsref連続区間ごとにrun threadsで並列生成し、sref順に出力する。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全node分は保持しない。見積りが上限を
   超えればsolveを始めずにerrorとする。明示した値はそのまま上限になる。P2はpolicy arenaの上限
-  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1の木・rank table・構築一時領域・thread scratch等は別途必要である。
+  （`auto`は6 GiB。暫定方式の設定）。どちらもprocess RSSの上限ではない。P1のMとEは測定から較正した見積りである。
 - durationは正の有限10進数＋小文字`s` / `m` / `h`である。`0.5s`も許す。符号・指数・空白は不可。
 - memoryの単位は1024進である。整数＋`KiB` / `MiB` / `GiB`だけを受け、空白、小数、`GB`は不可。
   bytesは1..i64::MAX、threadsは正のTOML整数である。

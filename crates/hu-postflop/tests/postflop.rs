@@ -740,7 +740,13 @@ fn allin_runout_matches_direct_equity() {
 
 #[test]
 fn memory_usage_matches_allocated() {
-    fn check_save_workspace(config: &PostflopConfig, game: &hu_postflop::PostflopGame) {
+    /// `percent` bounds the counted game above by that share of the
+    /// allocation plus the label allowance.
+    fn check_save_workspace(
+        config: &PostflopConfig,
+        game: &hu_postflop::PostflopGame,
+        percent: u64,
+    ) {
         use std::mem::size_of;
         let tree = &game.game.tree;
         let hands =
@@ -785,6 +791,22 @@ fn memory_usage_matches_allocated() {
             estimate.i16_regret_bytes,
             tree.storage_len as u64 * 2 + tree.storage_refs.len() as u64 * 4
         );
+        // The counted game bounds what the build allocates. Only the rank
+        // group bound (one group per live hand, though wide ranges tie many
+        // hands), unmerged payoff keys and the label allowance exceed it.
+        let start = match config.board.len() {
+            3 => Street::Flop,
+            4 => Street::Turn,
+            _ => Street::River,
+        };
+        let index = hu_postflop::index::GameIndex::from_game(&game.game, &game.node_info, start);
+        let allocated = tree.heap_bytes() + game.game.evaluator.heap_bytes() + index.heap_bytes();
+        assert!(
+            allocated <= estimate.game_bytes
+                && estimate.game_bytes <= allocated * percent / 100 + (256 << 10),
+            "game estimate {} for {allocated} allocated bytes",
+            estimate.game_bytes
+        );
     }
     let config = PostflopConfig {
         board: merged_flop(),
@@ -800,7 +822,33 @@ fn memory_usage_matches_allocated() {
     };
     let estimate = memory_usage(&config);
     let game = build_postflop_game(&config, chip_ev());
-    check_save_workspace(&config, &game);
+    check_save_workspace(&config, &game, 125);
+
+    // Wide ranges over a full river deal make the per-element arrays and
+    // rank tables dominate the label allowance. The rank group bound counts
+    // about twice the evaluator here.
+    let wide_config = PostflopConfig {
+        board: parse_cards("Ks 7h 2d 3c"),
+        ranges: PerPlayer::new(
+            "22+,A2s+,K9s+,ATo+".parse().unwrap(),
+            "22+,A2s+,A2o+,K5s+,K9o+,Q8s+,QTo+,J8s+,T8s+,98s"
+                .parse()
+                .unwrap(),
+        ),
+        pot: Chips(10),
+        effective_stack: Chips(100),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
+            river: hu_postflop::test_support::pot_fractions(&[0.5], &[0.5], 1),
+        },
+        ..Default::default()
+    };
+    check_save_workspace(
+        &wide_config,
+        &build_postflop_game(&wide_config, chip_ev()),
+        225,
+    );
 
     assert_eq!(
         estimate.f32_bytes,
@@ -859,7 +907,7 @@ fn memory_usage_matches_allocated() {
     };
     let rich_estimate = memory_usage(&rich_config);
     let rich_game = build_postflop_game(&rich_config, chip_ev());
-    check_save_workspace(&rich_config, &rich_game);
+    check_save_workspace(&rich_config, &rich_game, 125);
     let real_terminals = rich_game
         .game
         .tree
@@ -931,7 +979,7 @@ fn memory_usage_matches_allocated() {
     };
     let force_estimate = memory_usage(&force_config);
     let force_game = build_postflop_game(&force_config, chip_ev());
-    check_save_workspace(&force_config, &force_game);
+    check_save_workspace(&force_config, &force_game, 125);
     let force_real_terminals = force_game
         .game
         .tree

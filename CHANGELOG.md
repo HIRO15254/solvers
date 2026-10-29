@@ -125,6 +125,19 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   to build the tree is returned to the system before solving: memory after
   the build is about 60–70% lower and peak memory about 4–28% lower in the
   measured flop trees.
+- The heads-up postflop solver's memory estimate (shown before solving, in
+  `validate --resources`, and used by the `[run] memory` check and
+  `storage = "auto"`) now counts what a run holds besides storage: the
+  compiled tree, terminal evaluator and viewer index, `[profile]` slots,
+  each thread's engine scratch and the checkpoint's multi-threaded
+  compressor. The previous estimate was up to 5 GiB below the measured peak;
+  the new one was about 1–16% above it for the measured flop trees of
+  3–15 GiB and grows with the thread count. A `memory` limit that admitted a
+  run before may now reject it or make `storage = "auto"` choose
+  `i16-f32avg`; fewer `threads` lower the estimate.
+  `validate --format json --resources` adds `checkpointWorkspaceBytes`,
+  `residentBytes`, `gameBytes`, `profileBytes`, `threads` and
+  `threadWorkspaceBytes`.
 
 ## [0.1.0] - 2026-10-16
 

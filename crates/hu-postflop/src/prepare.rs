@@ -106,6 +106,10 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
             0
         };
     estimate.compression_bytes += 2 * config_len as u64;
+    estimate.threads = run_threads(&document.spot.run)? as u64;
+    if document.spot.profile.is_some() {
+        estimate.profile_bytes = estimate.profile_slot_bytes();
+    }
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
     } else {
@@ -212,15 +216,16 @@ pub fn required_bytes(p: &Prepared) -> u64 {
 }
 
 pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
-    Ok(Some(
-        p.document
-            .spot
-            .run
-            .threads
-            .map(usize::try_from)
-            .transpose()?
-            .unwrap_or(std::thread::available_parallelism()?.get()),
-    ))
+    Ok(Some(run_threads(&p.document.spot.run)?))
+}
+
+/// Configured worker threads, or every available core.
+fn run_threads(run: &spot::Run) -> Result<usize> {
+    Ok(run
+        .threads
+        .map(usize::try_from)
+        .transpose()?
+        .unwrap_or(std::thread::available_parallelism()?.get()))
 }
 
 /// Reporting unit of the prepared cash or tournament utility.
