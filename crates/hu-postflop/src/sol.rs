@@ -769,11 +769,6 @@ impl SolStore {
     }
 
     fn chunk(&self, section: Section, index: usize) -> Result<Arc<Chunk>, SolError> {
-        if section == Section::Strategy
-            && let Some(chunks) = self.pinned_strategies.read().as_ref()
-        {
-            return Ok(Arc::clone(&chunks[index]));
-        }
         let slot = {
             let mut cache = self.cache.lock();
             let slot = match cache
@@ -811,6 +806,14 @@ impl SolStore {
         let Some(index) = self.directory.chunk_of(section, sref) else {
             return Ok(None);
         };
+        if section == Section::Strategy
+            && let Some(chunks) = self.pinned_strategies.read().as_ref()
+        {
+            return chunks[index]
+                .block(sref)
+                .map(|(scale, bytes)| read(scale, bytes))
+                .transpose();
+        }
         self.chunk(section, index)?
             .block(sref)
             .map(|(scale, bytes)| read(scale, bytes))

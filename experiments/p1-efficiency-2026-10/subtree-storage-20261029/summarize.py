@@ -7,7 +7,7 @@ import sys
 
 out = pathlib.Path(sys.argv[1])
 rows = []
-for case in ("lock_flop", "lock_turn", "lock_deep", "frequency"):
+for case in ("lock_flop", "lock_turn", "lock_deep", "frequency", "fallback"):
     for round_number in (1, 2):
         for variant in (("old", "new") if round_number == 1 else ("new", "old")):
             label = f"{case}-{round_number}-{variant}"

@@ -24,9 +24,36 @@ for name in lock_flop lock_turn lock_deep frequency; do
   "$D/solvers-new" relock "$WORK/base" --add "$OUT/$name.toml" --freeze-upstream \
     --print-config > "$OUT/frozen_$name.toml"
 done
+# Frequency control is measured at a fixed iteration budget rather than
+# waiting for a general-sum target that may not be attainable.
+python3 - "$OUT/frozen_frequency.toml" <<'PY'
+import pathlib, re, sys
+p = pathlib.Path(sys.argv[1])
+text = p.read_text()
+section = re.search(r'(?ms)^\[solver\.stop\]\s*\n.*?(?=^\[|\Z)', text)
+if section is None:
+    raise SystemExit("missing solver.stop")
+body = re.sub(r'(?m)^target\s*=.*\n', '', section.group())
+body, count = re.subn(r'(?m)^max_iterations\s*=.*$', 'max_iterations = 50', body)
+if count != 1:
+    raise SystemExit("missing max_iterations")
+p.write_text(text[:section.start()] + body + text[section.end():])
+PY
+python3 - "$OUT/frozen_lock_deep.toml" "$OUT/frozen_fallback.toml" <<'PY'
+import pathlib, re, sys
+text = pathlib.Path(sys.argv[1]).read_text()
+section = re.search(r'(?ms)^\[solver\.stop\]\s*\n.*?(?=^\[|\Z)', text)
+if section is None:
+    raise SystemExit("missing solver.stop")
+body, targets = re.subn(r'(?m)^target\s*=.*$', 'target = "0.000000000001bb"', section.group())
+body, limits = re.subn(r'(?m)^max_iterations\s*=.*$', 'max_iterations = 2', body)
+if targets != 1 or limits != 1:
+    raise SystemExit("missing target or max_iterations")
+pathlib.Path(sys.argv[2]).write_text(text[:section.start()] + body + text[section.end():])
+PY
 for round in 1 2; do
   if (( round == 1 )); then order=(old new); else order=(new old); fi
-  for name in lock_flop lock_turn lock_deep frequency; do
+  for name in lock_flop lock_turn lock_deep frequency fallback; do
     for variant in "${order[@]}"; do
       label="$name-$round-$variant"
       echo "$label" >&2
