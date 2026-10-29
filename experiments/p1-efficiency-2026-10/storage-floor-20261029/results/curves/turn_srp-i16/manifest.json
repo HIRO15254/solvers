@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "turn_srp-i16",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "e62a51acd2921806188ec98725286ffc630b840b0351a197ae72efd813f193f6",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/turn_srp-i16"
+  ],
+  "pid": 4581,
+  "createdUnixMs": 1793247737689,
+  "startedUnixMs": 1793247737689,
+  "finishedUnixMs": 1793247752237,
+  "failure": null,
+  "completion": "completed"
+}

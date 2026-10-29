@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "river_srp-i16-f32avg",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "87e945af1e2ef647347198d14055cdafbfbbc24072e0da9904bea3647ef0d022",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/river_srp-i16-f32avg"
+  ],
+  "pid": 4432,
+  "createdUnixMs": 1793247699704,
+  "startedUnixMs": 1793247699704,
+  "finishedUnixMs": 1793247702120,
+  "failure": null,
+  "completion": "completed"
+}

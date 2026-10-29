@@ -1,0 +1,47 @@
+# c_gtowb from the 2026-10-13 AWS acceptance, migrated to the current tree script:
+# include_allin and [tree.max_aggressive_actions] were removed (CHANGELOG Unreleased),
+# so all-in candidates and aggression caps are written as script rules.
+# Not node-identical to the historical tree; used only for old/new pairs on one VM.
+schema = "solvers.nlh/v1"
+
+[table]
+players = 6
+stack_bb = 100
+
+[economics]
+kind = "cash"
+
+[economics.rake]
+rate = 0.05
+cap_bb = 4
+
+[spot]
+line = "BTN r2.5, BB c"
+board = "Ks 7h 2d"
+
+[ranges]
+BTN = "22+,A2s+,K2s+,Q5s+,J7s+,T7s+,97s+,86s+,75s+,65s,54s,A5o+,K9o+,Q9o+,J9o+,T9o"
+BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,K8o+,Q9o+,J9o+,T8o+,98o"
+
+[tree]
+script = '''
+flop, turn, river { add bet [a] add raise [a] }
+flop when in_position { replace bet [33, 50, 75, 125] }
+flop when !in_position { replace bet [33] }
+turn, river { replace bet [50, 100] }
+flop, turn, river when !unopened { replace raise [3x] }
+flop when aggressions >= 3 { remove raise }
+turn, river when aggressions >= 2 { remove raise }
+'''
+
+[solver]
+storage = "i16-f32avg"
+
+[solver.stop]
+max_iterations = 10000
+check_every = 25
+
+[run]
+max_time = "360s"
+final_checkpoint = false
+checkpoint_interval = "10h"

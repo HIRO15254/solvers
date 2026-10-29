@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "turn_srp-f32",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "b22317ca1f7454cb0295b1e82981d2778504204f045cad742a716f0553952ee3",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/turn_srp-f32"
+  ],
+  "pid": 4483,
+  "createdUnixMs": 1793247707232,
+  "startedUnixMs": 1793247707232,
+  "finishedUnixMs": 1793247722900,
+  "failure": null,
+  "completion": "completed"
+}

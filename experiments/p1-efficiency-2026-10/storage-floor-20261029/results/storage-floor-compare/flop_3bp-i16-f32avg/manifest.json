@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_3bp-i16-f32avg",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "7a84ce2db10d75c791543162c7f6761d96c6b92bc838210f4c606e4c5bfdd3ac",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-compare/flop_3bp-i16-f32avg"
+  ],
+  "pid": 6809,
+  "createdUnixMs": 1793254362330,
+  "startedUnixMs": 1793254362330,
+  "finishedUnixMs": 1793254505743,
+  "failure": null,
+  "completion": "completed"
+}

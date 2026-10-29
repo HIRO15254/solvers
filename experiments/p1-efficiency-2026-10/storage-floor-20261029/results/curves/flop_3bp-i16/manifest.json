@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_3bp-i16",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "0e6557ad72f5a7acfbd0b52cdbe5fc64dcabc6dc793315f8e953287118afa748",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/flop_3bp-i16"
+  ],
+  "pid": 11197,
+  "createdUnixMs": 1793249372677,
+  "startedUnixMs": 1793249372677,
+  "finishedUnixMs": 1793249739222,
+  "failure": null,
+  "completion": "completed"
+}

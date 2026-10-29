@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "river_srp-i16",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "eb7ad162fe25e201a7155aed9ebac2a398ca15f5e2a86aafa63d92fd6218818e",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-compare/river_srp-i16"
+  ],
+  "pid": 6230,
+  "createdUnixMs": 1793254225186,
+  "startedUnixMs": 1793254225186,
+  "finishedUnixMs": 1793254225954,
+  "failure": null,
+  "completion": "completed"
+}

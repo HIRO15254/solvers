@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_srp-i16-f32avg",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "84a4bea5876e80d0f26d3ff5b05c8ba386a463d0e1ee894a5c7daf7d1db243f0",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/flop_srp-i16-f32avg"
+  ],
+  "pid": 13159,
+  "createdUnixMs": 1793250121363,
+  "startedUnixMs": 1793250121363,
+  "finishedUnixMs": 1793250509937,
+  "failure": null,
+  "completion": "completed"
+}

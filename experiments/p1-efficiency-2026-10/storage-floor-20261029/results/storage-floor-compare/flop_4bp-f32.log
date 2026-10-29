@@ -1,0 +1,10 @@
+tree: nodes=565064 terminals=352520 rank_tables=1176 storage=119.8 MiB (f32) / 61.5 MiB (i16) / 90.7 MiB (i16-f32avg)
+memory estimate: 432.2 MiB (f32) / 403.1 MiB (i16) / 432.2 MiB (i16-f32avg); resident 96.5 MiB (game 47.4 MiB, 8 threads x 1.8 MiB), checkpoint encoder 128.0 MiB
+storage: f32
+iter=      25 expl_p0=1.192e0 expl_p1=1.399e0 nash_conv=2.590e0
+iter=      50 expl_p0=1.711e-1 expl_p1=2.599e-1 nash_conv=4.310e-1
+iter=      75 expl_p0=9.755e-2 expl_p1=1.076e-1 nash_conv=2.051e-1
+iter=     100 expl_p0=5.490e-2 expl_p1=5.336e-2 nash_conv=1.083e-1
+iter=     125 expl_p0=3.324e-2 expl_p1=3.373e-2 nash_conv=6.698e-2
+done: iterations=125 wall=3.56s ev_p0=4.978846 ev_p1=40.557447 nash_conv=6.698e-2
+sol: wrote /work/storage-floor-compare/flop_4bp-f32/solution.sol (20.66 MB, 209736 blocks, mode=Full)

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_srp-f32",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "9abe47ec22e46ff592241a3a1e162bd956646086d523cf95ea00115573115bb2",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-compare/flop_srp-f32"
+  ],
+  "pid": 7034,
+  "createdUnixMs": 1793254720112,
+  "startedUnixMs": 1793254720112,
+  "finishedUnixMs": 1793254957869,
+  "failure": null,
+  "completion": "completed"
+}

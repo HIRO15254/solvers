@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_4bp-i16",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "8a5bc699b10ccb35d4afa11f11abf567e0185bd5c601967a220128a05563c253",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/flop_4bp-i16"
+  ],
+  "pid": 7827,
+  "createdUnixMs": 1793248312172,
+  "startedUnixMs": 1793248312172,
+  "finishedUnixMs": 1793248621424,
+  "failure": null,
+  "completion": "completed"
+}
