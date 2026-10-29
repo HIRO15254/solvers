@@ -104,23 +104,14 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
         std::thread::sleep(Duration::from_secs(30));
     }
 
-    // Like the real CLI, progress lands before the terminal manifest, so a
-    // reader that sees `completed` also sees the final progress row.
+    // Like the real CLI (`RunDir::finish`), progress and the terminal event
+    // land before the terminal manifest, so a reader that sees `completed`
+    // also sees the final progress row and the terminal event.
     std::fs::write(
         directory.join("progress.jsonl"),
         "{\"iteration\":42,\"elapsedSecs\":0.5}\n",
     )
     .expect("write progress");
-    let completed = format!(
-        concat!(
-            r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"hu-postflop","#,
-            r#""configSchema":"solvers.nlh/v1","configHash":"aa","cliVersion":"stub","#,
-            r#""command":["solve"],"pid":1,"createdUnixMs":{},"startedUnixMs":{},"#,
-            r#""finishedUnixMs":{},"failure":null,"completion":"completed"}}"#,
-        ),
-        run_id, NOW, NOW, NOW,
-    );
-    std::fs::write(directory.join("manifest.json"), completed).expect("write completed manifest");
     let completed_event = format!(
         "{{\"seq\":1,\"unixMs\":{NOW},\"level\":\"info\",\"kind\":\"state\",\"state\":\"completed\"}}\n"
     );
@@ -132,4 +123,14 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
     events
         .write_all(completed_event.as_bytes())
         .expect("write completed event");
+    let completed = format!(
+        concat!(
+            r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"hu-postflop","#,
+            r#""configSchema":"solvers.nlh/v1","configHash":"aa","cliVersion":"stub","#,
+            r#""command":["solve"],"pid":1,"createdUnixMs":{},"startedUnixMs":{},"#,
+            r#""finishedUnixMs":{},"failure":null,"completion":"completed"}}"#,
+        ),
+        run_id, NOW, NOW, NOW,
+    );
+    std::fs::write(directory.join("manifest.json"), completed).expect("write completed manifest");
 }
