@@ -1,0 +1,45 @@
+{
+  "source": "00483eaf",
+  "machines": [
+    {
+      "role": "avxa",
+      "instance": "i-01deb35d64ae559e4",
+      "type": "c7a.4xlarge",
+      "az": "us-east-1d",
+      "market": "spot",
+      "launchTime": "2026-10-29T04:13:16Z",
+      "terminationRequestedBy": "2026-10-29T04:33:37Z"
+    },
+    {
+      "role": "avxi",
+      "instance": "i-0f6b6e46fd05f1f17",
+      "type": "c7i.4xlarge",
+      "az": "us-east-1a",
+      "market": "spot",
+      "launchTime": "2026-10-29T04:13:43Z",
+      "terminationRequestedBy": "2026-10-29T04:33:37Z"
+    }
+  ],
+  "filesSha256": {
+    "amd-bitcheck.txt": "fb164b6e5adccfbc8fd1bfa3d4cc9bba542e30d2a257c1cd91ade5c6a3cbcdfe",
+    "amd-machine.txt": "0c4761edf1bf6a0eb5e9185acb9ee1ed7451df6035ec97571887305e71cbfa78",
+    "amd-native.cfg": "e15165615247a60c996490aae5c420e91913d1543e48977c12b5cbd3a556b085",
+    "amd-results.json": "68189db6f09ae971b8bba3142e7249e1fa8cc75f901a7771c82f834357484abd",
+    "amd-x86-64-v3.cfg": "05c111af58b4ef436231bc3b0fb141d1e5c3bf12d9801879f03b3680822de588",
+    "amd-x86-64-v4.cfg": "14e1ad2d099483ca95f28e03e405528a37df2c369728c83f540bbba1c898ea83",
+    "intel-bitcheck.txt": "30c5a1b7f4bdac07c32fae79ffc46be103830a04c71f75957683442a58f467a8",
+    "intel-machine.txt": "da104c7ff8b553ca55e046d696935f7d888ac1bba2b82699a7a0abc935c32dbe",
+    "intel-native.cfg": "a83333b8b29756edc6e47b4efb794b85c2a38264d62aead10e2b27284d147a6a",
+    "intel-results.json": "927e91f731be7b2ec2c84b86dd4a4c5bf7fb6b6a6439eb036b916539ef9ff8b2",
+    "intel-x86-64-v3.cfg": "05c111af58b4ef436231bc3b0fb141d1e5c3bf12d9801879f03b3680822de588",
+    "intel-x86-64-v4.cfg": "14e1ad2d099483ca95f28e03e405528a37df2c369728c83f540bbba1c898ea83",
+    "README.md": "8084ab3584e3ebc468a9ea1bf992d9938b06769c3c7503bebb4f6fb60953910b",
+    "run.py": "1393986be8262a5c6dfb54cbd9a66c2e52d3cd67c4e71f6ec424978897a8d1f8",
+    "summarize.py": "43ab569ea9611dde7bf908153d3618a49379814dd2d05149443e82363a2effd3"
+  },
+  "configSha256": {
+    "flop_srp": "befe572f1e7e3135055d95baf956288e7f4eb33fbabb28f26369d092570b061b",
+    "flop_3bp": "a7b07ca1cee83aa54656cec81dee0642d2d7761631f08c7379bd6cd7dcaa578c",
+    "c_gtowb": "120545aaf4778ca44a28259aace2ca0785a2230c48005337daff2d6b739219fd"
+  }
+}
