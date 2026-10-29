@@ -1,0 +1,60 @@
+{
+  "reproduction": "verified",
+  "sourceCommit": "00483eaff5d77a81bcec8f944d7e112858a22af3",
+  "binarySha256": "f9a40775a7112cd5bfae5a48bf7efc83f51d4a692bea19821628c53fcf8897f8",
+  "build": "RUSTFLAGS=-C target-cpu=znver3 cargo build --release -p hu-postflop --example p1_bench",
+  "toolchain": "Rust 1.97.0",
+  "machines": [
+    {
+      "role": "dev",
+      "type": "r6a.8xlarge",
+      "market": "spot",
+      "instance": "i-0b8b19bb9a5ffc436",
+      "az": "us-east-1c",
+      "use": "build",
+      "utc": "2026-10-29T04:17:35Z..2026-10-29T04:20:44Z"
+    },
+    {
+      "role": "bench",
+      "type": "c6a.8xlarge",
+      "cpu": "AMD EPYC 7R13, 32 vCPU",
+      "market": "spot",
+      "instance": "i-082131af851753bb3",
+      "az": "us-east-1b",
+      "kernel": "7.0.0-1014-aws",
+      "use": "timing and THP measurement",
+      "utc": "2026-10-29T04:18:13Z..2026-10-29T04:36:11Z"
+    }
+  ],
+  "measurement": {
+    "initialUtc": "2026-10-29T04:20:44Z..04:27:10Z",
+    "sampledUtc": "2026-10-29T04:29:38Z..04:36:11Z",
+    "rounds": 3,
+    "command": "bash measure.sh ROUND OUT (each under rc.py --bench lock)",
+    "args": "--warmup 2 --iters 6 --evals 2",
+    "defrag": "madvise throughout",
+    "enabledRestored": "madvise",
+    "sampling": "initial pass lacks smaps due to trailing-space parsing; sampled pass corrects it",
+    "results": "summary.json and results.tar.gz"
+  },
+  "selective": {
+    "source": "00483eaf plus Linux storage MADV_HUGEPAGE change",
+    "benchUtc": [
+      "2026-10-29T04:59:39Z..05:01:25Z",
+      "2026-10-29T05:10:11Z..05:11:59Z",
+      "2026-10-29T05:16:38Z..05:18:26Z",
+      "2026-10-29T05:28:05Z..05:29:52Z",
+      "2026-10-29T05:36:01Z..05:37:48Z"
+    ],
+    "solveUtc": "2026-10-29T06:01:40Z..06:04:08Z",
+    "rounds": 5,
+    "binarySha256": {
+      "oldSolvers": "b657cc2bbcdaa56927cb30a19ef99225325b9d285aada45fe838aa9525d3aa1b",
+      "newSolvers": "5e99055f991c3380476bb61da01aa5c19f14d446a7083562f031960360aa694c",
+      "oldBench": "f9a40775a7112cd5bfae5a48bf7efc83f51d4a692bea19821628c53fcf8897f8",
+      "newBench": "2f830eef43b16047b8abc0ffbd52238e88a7620d2169c0f1d878de1d2e76365c"
+    },
+    "checks": "bitcheck.txt",
+    "summary": "selective-summary.json"
+  }
+}

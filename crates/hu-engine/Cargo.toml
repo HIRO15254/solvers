@@ -11,6 +11,9 @@ nlh = { workspace = true }
 rayon = { workspace = true }
 serde = { workspace = true, optional = true }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = { workspace = true }
+
 [dev-dependencies]
 criterion = { workspace = true }
 # Integration tests and benches see the test-support API; normal builds do not.

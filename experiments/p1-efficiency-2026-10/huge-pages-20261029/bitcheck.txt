@@ -1,0 +1,9 @@
+dev r6a.8xlarge, 2026-10-29, 20 iterations, 16 threads, old 00483eaf vs selective MADV_HUGEPAGE
+flop_3bp f32: IDENTICAL (13514 bytes strategy export)
+flop_3bp i16: IDENTICAL (13436 bytes strategy export)
+flop_3bp i16-f32avg: IDENTICAL (13500 bytes strategy export)
+flop_srp f32: IDENTICAL (72417 bytes strategy export)
+progress (timing stripped), strategy and EV exports compared by profiled-dual-eval-20261029/bitcheck.sh.
+cargo fmt --all --check: passed
+cargo clippy --workspace --all-targets -- -D warnings: passed
+cargo test --workspace: passed (ignored tests remained ignored)
