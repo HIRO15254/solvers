@@ -13,6 +13,7 @@
 | release workflow（手動実行、Releaseは作らない） | [40900567571](https://github.com/HIRO15254/solvers/actions/runs/40900567571) | `ff5206e7` | version、notices、web、6 buildがすべてsuccess |
 | 受入 `cargo test --workspace --release --no-fail-fast -- --include-ignored` | [40904820045](https://github.com/HIRO15254/solvers/actions/runs/40904820045) | `2ba039e5` | 1156 passed、0 failed、除外1件。リリースcommitの製品コードで実行した |
 | 通常CI（PR #9） | [40904815789](https://github.com/HIRO15254/solvers/actions/runs/40904815789) | `2ba039e5` | success（test・web・documentation・Windows/macOS smoke） |
+| tag `v0.2.0`のrelease workflow | [40912966213](https://github.com/HIRO15254/solvers/actions/runs/40912966213) | `4fbc5578` | 1回目はApple Silicon buildがrunnerを得られずcancelled（stepは未実行）。失敗jobだけを再実行した2回目で全jobがsuccessになり、draft Releaseができた。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。6 buildのsmokeで`--version`は`solvers 0.2.0 (4fbc5578), heads-up postflop only`だった |
 
 `ff5206e7`より後のcommitは、CHANGELOG・文書・この記録だけを変えた。GUI受入に使ったbuildと製品コードは同じである。
 
