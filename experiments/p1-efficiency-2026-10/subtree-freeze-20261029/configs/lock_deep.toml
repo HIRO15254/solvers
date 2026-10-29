@@ -1,0 +1,4 @@
+# BB at the Ac turn after flop check-check.
+[[profile.lock]]
+node = "xx[Ac]"
+strategy = { check = 1.0 }

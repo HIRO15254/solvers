@@ -1,0 +1,29 @@
+{
+  "baselineRevision": "00483eaf",
+  "prototypeRevision": "1530db000db6ba26299296186f67e07aff13268a",
+  "rust": "1.97.0 (2d8144b78 2026-07-07)",
+  "releaseRustflags": "-C target-cpu=znver3",
+  "binarySha256": {
+    "baselineSolvers": "08f4fc46f8e322e98b75edb7cf6769997bda486b96f6fa147c86f1b7db8dcee4",
+    "baseSolveIntermediateSolvers": "dd019bf186eb5059404138ce0abf0b6109471c8e163a32dad5d69f30c7ee62f3",
+    "prototypeSolvers": "46ea926d0ab53f222ddb5bffdea7cbec97f348f41682de08af7911e79d65f7d9",
+    "prototypeP1Bench": "d7e5766ff06fc46fae00093c8a8eb9a48fd6141e49200b7a09d72fa4089f1486"
+  },
+  "region": "us-east-1",
+  "machines": {
+    "dev": {"instance": "i-0b8b19bb9a5ffc436", "type": "r6a.8xlarge", "az": "us-east-1c", "market": "spot", "launchTime": "2026-10-29T04:13:08+00:00"},
+    "lab": {"instance": "i-033f44ee877c2f755", "type": "r6a.8xlarge", "az": "us-east-1c", "market": "spot", "launchTime": "2026-10-29T04:13:07+00:00"},
+    "bench": {"instance": "i-082131af851753bb3", "type": "c6a.8xlarge", "az": "us-east-1b", "market": "spot", "launchTime": "2026-10-29T04:13:08+00:00"}
+  },
+  "baseSolution": {
+    "sha256": "e364074322946f5f8531b225717bba0fa2c08dffabb6abbd58deaab3238f3f8b",
+    "location": "C:/Users/PC_User/.solvers-remote/artifacts/subtree-freeze-20261029/solution.sol; local, not Git-backed; checksum verified",
+    "configuration": "configs/flop_srp.toml",
+    "storage": "f32",
+    "iterations": 389,
+    "potBB": 5.5,
+    "stopTarget": "0.1%pot",
+    "streets": "full"
+  },
+  "subtreeStop": {"nashConvBB": 0.011, "checkEveryIterations": 10}
+}

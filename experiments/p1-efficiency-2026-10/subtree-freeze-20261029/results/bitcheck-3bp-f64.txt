@@ -1,0 +1,3 @@
+flop_3bp, 20 iterations, f32 storage, f64 CFR, 16 threads, baseline 00483eaf vs final prototype release binary:
+last progress row (old): {"iteration":20,"elapsed_secs":4.519773997,"expl_p0":2.563862479256658,"expl_p1":4.301151570796479,"nash_conv":6.865014050053137}
+IDENTICAL (13509 bytes strategy export)

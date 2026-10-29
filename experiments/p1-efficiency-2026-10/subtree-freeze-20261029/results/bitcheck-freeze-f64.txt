@@ -1,0 +1,3 @@
+flop_srp + lock_flop + freeze_upstream, 20 iterations, f32 storage, f64 CFR, 16 threads, baseline 00483eaf vs final prototype release binary:
+last progress row (old): {"iteration":20,"elapsed_secs":20.473965732,"expl_p0":1.6357358546898482,"expl_p1":0.8501097947679284,"nash_conv":2.4858456494577768}
+IDENTICAL (71407 bytes strategy export)
