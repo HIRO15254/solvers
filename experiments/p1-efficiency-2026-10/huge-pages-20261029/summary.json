@@ -1,0 +1,1130 @@
+[
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.731249806,
+      "evaluateSecs": 1.2178215895000002,
+      "peakBytes": 11243237376,
+      "anonHugePeakKiB": 10549248,
+      "minorFaults": 410105,
+      "majorFaults": 0,
+      "systemSecs": 6.19
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.7274779828333333,
+        "evaluateSecs": 1.220858184,
+        "peakBytes": 11243237376,
+        "anonHugePeakKiB": 10577920,
+        "minorFaults": 410105,
+        "majorFaults": 0,
+        "systemSecs": 6.19
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.7521133885000001,
+        "evaluateSecs": 1.2178215895000002,
+        "peakBytes": 11242897408,
+        "anonHugePeakKiB": 10549248,
+        "minorFaults": 419850,
+        "majorFaults": 0,
+        "systemSecs": 6.4
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.731249806,
+        "evaluateSecs": 1.2137787085,
+        "peakBytes": 11243548672,
+        "anonHugePeakKiB": 10524672,
+        "minorFaults": 402110,
+        "majorFaults": 0,
+        "systemSecs": 5.96
+      }
+    ]
+  },
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.7569272885,
+      "evaluateSecs": 1.2314515005,
+      "peakBytes": 11235045376,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 3282429,
+      "majorFaults": 0,
+      "systemSecs": 8.68
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.7520972428333333,
+        "evaluateSecs": 1.2296671505,
+        "peakBytes": 11233882112,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3282429,
+        "majorFaults": 0,
+        "systemSecs": 8.52
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.7589504598333333,
+        "evaluateSecs": 1.2383559695000002,
+        "peakBytes": 11248168960,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3377778,
+        "majorFaults": 0,
+        "systemSecs": 8.94
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.7569272885,
+        "evaluateSecs": 1.2314515005,
+        "peakBytes": 11235045376,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3279870,
+        "majorFaults": 0,
+        "systemSecs": 8.68
+      }
+    ]
+  },
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.7617725613333333,
+      "evaluateSecs": 1.2292162885,
+      "peakBytes": 11244290048,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 3313975,
+      "majorFaults": 0,
+      "systemSecs": 8.71
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.7497597644999999,
+        "evaluateSecs": 1.2292162885,
+        "peakBytes": 11236036608,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3297499,
+        "majorFaults": 0,
+        "systemSecs": 8.61
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.7617725613333333,
+        "evaluateSecs": 1.241164843,
+        "peakBytes": 11244290048,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3803292,
+        "majorFaults": 0,
+        "systemSecs": 9.57
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.7646672025,
+        "evaluateSecs": 1.2259943435,
+        "peakBytes": 11244961792,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3313975,
+        "majorFaults": 0,
+        "systemSecs": 8.71
+      }
+    ]
+  },
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.614346214,
+      "evaluateSecs": 1.0219343205,
+      "peakBytes": 11394605056,
+      "anonHugePeakKiB": 10502144,
+      "minorFaults": 467896,
+      "majorFaults": 0,
+      "systemSecs": 12.96
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.6305603894999999,
+        "evaluateSecs": 1.024564758,
+        "peakBytes": 11390525440,
+        "anonHugePeakKiB": 10498048,
+        "minorFaults": 467896,
+        "majorFaults": 0,
+        "systemSecs": 14.15
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.6005382061666666,
+        "evaluateSecs": 1.0170751025,
+        "peakBytes": 11394605056,
+        "anonHugePeakKiB": 10551296,
+        "minorFaults": 473840,
+        "majorFaults": 0,
+        "systemSecs": 12.96
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.614346214,
+        "evaluateSecs": 1.0219343205,
+        "peakBytes": 11406385152,
+        "anonHugePeakKiB": 10502144,
+        "minorFaults": 464125,
+        "majorFaults": 0,
+        "systemSecs": 12.81
+      }
+    ]
+  },
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.6367579170000001,
+      "evaluateSecs": 1.0314864665,
+      "peakBytes": 11398959104,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 3368730,
+      "majorFaults": 0,
+      "systemSecs": 14.53
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.6282525695,
+        "evaluateSecs": 1.023130122,
+        "peakBytes": 11398959104,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3368730,
+        "majorFaults": 0,
+        "systemSecs": 14.52
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.6367579170000001,
+        "evaluateSecs": 1.0341828965,
+        "peakBytes": 11399299072,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3350747,
+        "majorFaults": 0,
+        "systemSecs": 14.53
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.6378800253333333,
+        "evaluateSecs": 1.0314864665,
+        "peakBytes": 11397652480,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3375853,
+        "majorFaults": 0,
+        "systemSecs": 14.62
+      }
+    ]
+  },
+  {
+    "config": "c_gtowb",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.6379377736666667,
+      "evaluateSecs": 1.029840773,
+      "peakBytes": 11406438400,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 3365661,
+      "majorFaults": 0,
+      "systemSecs": 14.37
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.6258085006666666,
+        "evaluateSecs": 1.029840773,
+        "peakBytes": 11408248832,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3365661,
+        "majorFaults": 0,
+        "systemSecs": 14.19
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.6379377736666667,
+        "evaluateSecs": 1.0280123534999999,
+        "peakBytes": 11406438400,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3377152,
+        "majorFaults": 0,
+        "systemSecs": 14.47
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.6400960995,
+        "evaluateSecs": 1.0319013584999999,
+        "peakBytes": 11397799936,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 3345018,
+        "majorFaults": 0,
+        "systemSecs": 14.37
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.1055827345,
+      "evaluateSecs": 0.1526845155,
+      "peakBytes": 2497232896,
+      "anonHugePeakKiB": 2197504,
+      "minorFaults": 183949,
+      "majorFaults": 0,
+      "systemSecs": 2.09
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.10383128733333334,
+        "evaluateSecs": 0.15288401699999998,
+        "peakBytes": 2497232896,
+        "anonHugePeakKiB": 2197504,
+        "minorFaults": 189024,
+        "majorFaults": 0,
+        "systemSecs": 2.09
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.10890313283333335,
+        "evaluateSecs": 0.1526167025,
+        "peakBytes": 2503024640,
+        "anonHugePeakKiB": 2197504,
+        "minorFaults": 179447,
+        "majorFaults": 0,
+        "systemSecs": 2.21
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.1055827345,
+        "evaluateSecs": 0.1526845155,
+        "peakBytes": 2496278528,
+        "anonHugePeakKiB": 2199552,
+        "minorFaults": 183949,
+        "majorFaults": 0,
+        "systemSecs": 2.08
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.10880033066666667,
+      "evaluateSecs": 0.15542541799999998,
+      "peakBytes": 2500943872,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 843019,
+      "majorFaults": 0,
+      "systemSecs": 2.7
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.10676259850000001,
+        "evaluateSecs": 0.15542541799999998,
+        "peakBytes": 2496299008,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 843019,
+        "majorFaults": 0,
+        "systemSecs": 2.72
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.10880033066666667,
+        "evaluateSecs": 0.1553116525,
+        "peakBytes": 2500943872,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 838779,
+        "majorFaults": 0,
+        "systemSecs": 2.65
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.10935589266666666,
+        "evaluateSecs": 0.1558220825,
+        "peakBytes": 2502217728,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 846315,
+        "majorFaults": 0,
+        "systemSecs": 2.7
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.11066024516666667,
+      "evaluateSecs": 0.1556895975,
+      "peakBytes": 2497413120,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 850192,
+      "majorFaults": 0,
+      "systemSecs": 2.78
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.11066024516666667,
+        "evaluateSecs": 0.155311702,
+        "peakBytes": 2493763584,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 851388,
+        "majorFaults": 0,
+        "systemSecs": 2.83
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.11087092283333333,
+        "evaluateSecs": 0.1556895975,
+        "peakBytes": 2498985984,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 850192,
+        "majorFaults": 0,
+        "systemSecs": 2.78
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.10868299633333334,
+        "evaluateSecs": 0.1558679475,
+        "peakBytes": 2497413120,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 847129,
+        "majorFaults": 0,
+        "systemSecs": 2.69
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.09040205600000001,
+      "evaluateSecs": 0.138829449,
+      "peakBytes": 2550472704,
+      "anonHugePeakKiB": 2195456,
+      "minorFaults": 187483,
+      "majorFaults": 0,
+      "systemSecs": 4.14
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.09010088216666667,
+        "evaluateSecs": 0.13871864750000001,
+        "peakBytes": 2548043776,
+        "anonHugePeakKiB": 2195456,
+        "minorFaults": 186443,
+        "majorFaults": 0,
+        "systemSecs": 4.04
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.09040205600000001,
+        "evaluateSecs": 0.138829449,
+        "peakBytes": 2550472704,
+        "anonHugePeakKiB": 2195456,
+        "minorFaults": 187483,
+        "majorFaults": 0,
+        "systemSecs": 4.14
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.09213826200000001,
+        "evaluateSecs": 0.139175377,
+        "peakBytes": 2551238656,
+        "anonHugePeakKiB": 2201600,
+        "minorFaults": 188898,
+        "majorFaults": 0,
+        "systemSecs": 4.27
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.09352287966666667,
+      "evaluateSecs": 0.1414724715,
+      "peakBytes": 2544578560,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 865039,
+      "majorFaults": 0,
+      "systemSecs": 4.75
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.09186858566666667,
+        "evaluateSecs": 0.1414724715,
+        "peakBytes": 2552061952,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 865039,
+        "majorFaults": 0,
+        "systemSecs": 4.75
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.09352287966666667,
+        "evaluateSecs": 0.1404037875,
+        "peakBytes": 2543955968,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 846138,
+        "majorFaults": 0,
+        "systemSecs": 4.58
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.09502478933333335,
+        "evaluateSecs": 0.1428606045,
+        "peakBytes": 2544578560,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 895191,
+        "majorFaults": 0,
+        "systemSecs": 4.97
+      }
+    ]
+  },
+  {
+    "config": "flop_3bp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.09379791083333333,
+      "evaluateSecs": 0.1409407245,
+      "peakBytes": 2551930880,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 846038,
+      "majorFaults": 0,
+      "systemSecs": 4.43
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.09320607683333333,
+        "evaluateSecs": 0.14313613149999999,
+        "peakBytes": 2552463360,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 892239,
+        "majorFaults": 0,
+        "systemSecs": 4.93
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.09389164750000001,
+        "evaluateSecs": 0.140478301,
+        "peakBytes": 2551418880,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 846038,
+        "majorFaults": 0,
+        "systemSecs": 4.43
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.09379791083333333,
+        "evaluateSecs": 0.1409407245,
+        "peakBytes": 2551930880,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 842897,
+        "majorFaults": 0,
+        "systemSecs": 4.43
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.17516512516666669,
+      "evaluateSecs": 0.24141810800000002,
+      "peakBytes": 4226969600,
+      "anonHugePeakKiB": 3903488,
+      "minorFaults": 110139,
+      "majorFaults": 0,
+      "systemSecs": 2.35
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.17200696466666665,
+        "evaluateSecs": 0.2424019025,
+        "peakBytes": 4226969600,
+        "anonHugePeakKiB": 3901440,
+        "minorFaults": 110139,
+        "majorFaults": 0,
+        "systemSecs": 2.25
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.19320801899999998,
+        "evaluateSecs": 0.24115362,
+        "peakBytes": 4224892928,
+        "anonHugePeakKiB": 3903488,
+        "minorFaults": 109143,
+        "majorFaults": 0,
+        "systemSecs": 2.47
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.17516512516666669,
+        "evaluateSecs": 0.24141810800000002,
+        "peakBytes": 4228476928,
+        "anonHugePeakKiB": 3903488,
+        "minorFaults": 110721,
+        "majorFaults": 0,
+        "systemSecs": 2.35
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.17792303016666666,
+      "evaluateSecs": 0.250201781,
+      "peakBytes": 4228423680,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 1269783,
+      "majorFaults": 0,
+      "systemSecs": 3.47
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.17987712050000002,
+        "evaluateSecs": 0.25347009200000004,
+        "peakBytes": 4225060864,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1410317,
+        "majorFaults": 0,
+        "systemSecs": 3.76
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.17716574416666667,
+        "evaluateSecs": 0.250201781,
+        "peakBytes": 4232671232,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1269783,
+        "majorFaults": 0,
+        "systemSecs": 3.36
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.17792303016666666,
+        "evaluateSecs": 0.249665863,
+        "peakBytes": 4228423680,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1256144,
+        "majorFaults": 0,
+        "systemSecs": 3.47
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 16,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.17700146416666665,
+      "evaluateSecs": 0.2505393365,
+      "peakBytes": 4219076608,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 1261956,
+      "majorFaults": 0,
+      "systemSecs": 3.43
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.17625616983333334,
+        "evaluateSecs": 0.248967,
+        "peakBytes": 4223971328,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1265622,
+        "majorFaults": 0,
+        "systemSecs": 3.5
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.17786072216666668,
+        "evaluateSecs": 0.2505393365,
+        "peakBytes": 4217565184,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1261956,
+        "majorFaults": 0,
+        "systemSecs": 3.43
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.17700146416666665,
+        "evaluateSecs": 0.250891953,
+        "peakBytes": 4219076608,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1251568,
+        "majorFaults": 0,
+        "systemSecs": 3.35
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.16098248416666666,
+      "evaluateSecs": 0.21509909049999998,
+      "peakBytes": 4360118272,
+      "anonHugePeakKiB": 3907584,
+      "minorFaults": 137458,
+      "majorFaults": 0,
+      "systemSecs": 4.69
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.1560222835,
+        "evaluateSecs": 0.214674686,
+        "peakBytes": 4358160384,
+        "anonHugePeakKiB": 3907584,
+        "minorFaults": 136952,
+        "majorFaults": 0,
+        "systemSecs": 4.69
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.18122556233333334,
+        "evaluateSecs": 0.21684353,
+        "peakBytes": 4362711040,
+        "anonHugePeakKiB": 3903488,
+        "minorFaults": 140669,
+        "majorFaults": 0,
+        "systemSecs": 4.94
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.16098248416666666,
+        "evaluateSecs": 0.21509909049999998,
+        "peakBytes": 4360118272,
+        "anonHugePeakKiB": 3907584,
+        "minorFaults": 137458,
+        "majorFaults": 0,
+        "systemSecs": 4.57
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.15869727533333333,
+      "evaluateSecs": 0.22595743299999999,
+      "peakBytes": 4352495616,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 1230214,
+      "majorFaults": 0,
+      "systemSecs": 5.31
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.1576939585,
+        "evaluateSecs": 0.240096241,
+        "peakBytes": 4363280384,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1416631,
+        "majorFaults": 0,
+        "systemSecs": 5.98
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.160225649,
+        "evaluateSecs": 0.22222710550000002,
+        "peakBytes": 4352495616,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1217572,
+        "majorFaults": 0,
+        "systemSecs": 5.26
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.15869727533333333,
+        "evaluateSecs": 0.22595743299999999,
+        "peakBytes": 4351311872,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1230214,
+        "majorFaults": 0,
+        "systemSecs": 5.31
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "f32",
+    "threads": 32,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.15972721433333334,
+      "evaluateSecs": 0.2310717355,
+      "peakBytes": 4364513280,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 1315395,
+      "majorFaults": 0,
+      "systemSecs": 5.78
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.15742724266666666,
+        "evaluateSecs": 0.23324458,
+        "peakBytes": 4358889472,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1341571,
+        "majorFaults": 0,
+        "systemSecs": 5.8
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.15972721433333334,
+        "evaluateSecs": 0.2304863335,
+        "peakBytes": 4364513280,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1199661,
+        "majorFaults": 0,
+        "systemSecs": 5.03
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.16042729549999998,
+        "evaluateSecs": 0.2310717355,
+        "peakBytes": 4371673088,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 1315395,
+        "majorFaults": 0,
+        "systemSecs": 5.78
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.15338816666666666,
+      "evaluateSecs": 0.258186236,
+      "peakBytes": 2244820992,
+      "anonHugePeakKiB": 1964032,
+      "minorFaults": 108550,
+      "majorFaults": 0,
+      "systemSecs": 1.68
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.1529160755,
+        "evaluateSecs": 0.258186236,
+        "peakBytes": 2244820992,
+        "anonHugePeakKiB": 1964032,
+        "minorFaults": 108550,
+        "majorFaults": 0,
+        "systemSecs": 1.68
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.15765951266666667,
+        "evaluateSecs": 0.2600366315,
+        "peakBytes": 2240368640,
+        "anonHugePeakKiB": 1964032,
+        "minorFaults": 106901,
+        "majorFaults": 0,
+        "systemSecs": 1.73
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.15338816666666666,
+        "evaluateSecs": 0.2575684335,
+        "peakBytes": 2245398528,
+        "anonHugePeakKiB": 1966080,
+        "minorFaults": 110338,
+        "majorFaults": 0,
+        "systemSecs": 1.64
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.16078160166666666,
+      "evaluateSecs": 0.26443202,
+      "peakBytes": 2244149248,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 746309,
+      "majorFaults": 0,
+      "systemSecs": 2.37
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.159780177,
+        "evaluateSecs": 0.264752004,
+        "peakBytes": 2239676416,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 771641,
+        "majorFaults": 0,
+        "systemSecs": 2.37
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.16078160166666666,
+        "evaluateSecs": 0.26443202,
+        "peakBytes": 2253938688,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 746309,
+        "majorFaults": 0,
+        "systemSecs": 2.39
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.16106039516666668,
+        "evaluateSecs": 0.261935782,
+        "peakBytes": 2244149248,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 745063,
+        "majorFaults": 0,
+        "systemSecs": 2.36
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 16,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.16088392066666665,
+      "evaluateSecs": 0.26598645,
+      "peakBytes": 2243518464,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 773096,
+      "majorFaults": 0,
+      "systemSecs": 2.38
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.15949334,
+        "evaluateSecs": 0.26598645,
+        "peakBytes": 2244571136,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 773096,
+        "majorFaults": 0,
+        "systemSecs": 2.37
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.16088392066666665,
+        "evaluateSecs": 0.263458757,
+        "peakBytes": 2234998784,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 748869,
+        "majorFaults": 0,
+        "systemSecs": 2.41
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.16149832933333333,
+        "evaluateSecs": 0.26599705399999996,
+        "peakBytes": 2243518464,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 779117,
+        "majorFaults": 0,
+        "systemSecs": 2.38
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "always",
+    "median": {
+      "secsPerIter": 0.13217076216666665,
+      "evaluateSecs": 0.216186327,
+      "peakBytes": 2375503872,
+      "anonHugePeakKiB": 1968128,
+      "minorFaults": 136651,
+      "majorFaults": 0,
+      "systemSecs": 3.46
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.12939496083333332,
+        "evaluateSecs": 0.216186327,
+        "peakBytes": 2375503872,
+        "anonHugePeakKiB": 1970176,
+        "minorFaults": 136651,
+        "majorFaults": 0,
+        "systemSecs": 3.46
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.13565785266666666,
+        "evaluateSecs": 0.21556552950000002,
+        "peakBytes": 2370740224,
+        "anonHugePeakKiB": 1968128,
+        "minorFaults": 135386,
+        "majorFaults": 0,
+        "systemSecs": 3.68
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.13217076216666665,
+        "evaluateSecs": 0.216578445,
+        "peakBytes": 2386137088,
+        "anonHugePeakKiB": 1957888,
+        "minorFaults": 140257,
+        "majorFaults": 0,
+        "systemSecs": 3.27
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "madvise",
+    "median": {
+      "secsPerIter": 0.13837807300000002,
+      "evaluateSecs": 0.21871802299999998,
+      "peakBytes": 2378043392,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 672575,
+      "majorFaults": 0,
+      "systemSecs": 3.6
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.13839484100000002,
+        "evaluateSecs": 0.21871802299999998,
+        "peakBytes": 2369789952,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 654428,
+        "majorFaults": 0,
+        "systemSecs": 3.45
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.13828177916666667,
+        "evaluateSecs": 0.220856549,
+        "peakBytes": 2379669504,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 672575,
+        "majorFaults": 0,
+        "systemSecs": 3.74
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.13837807300000002,
+        "evaluateSecs": 0.217260815,
+        "peakBytes": 2378043392,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 743097,
+        "majorFaults": 0,
+        "systemSecs": 3.6
+      }
+    ]
+  },
+  {
+    "config": "flop_srp",
+    "storage": "i16",
+    "threads": 32,
+    "mode": "never",
+    "median": {
+      "secsPerIter": 0.13863633449999999,
+      "evaluateSecs": 0.22136355349999998,
+      "peakBytes": 2377875456,
+      "anonHugePeakKiB": 0,
+      "minorFaults": 653067,
+      "majorFaults": 0,
+      "systemSecs": 3.44
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "secsPerIter": 0.13868414083333333,
+        "evaluateSecs": 0.22193839999999998,
+        "peakBytes": 2382471168,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 653067,
+        "majorFaults": 0,
+        "systemSecs": 3.45
+      },
+      {
+        "round": 2,
+        "secsPerIter": 0.13852909766666668,
+        "evaluateSecs": 0.218678078,
+        "peakBytes": 2377875456,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 648689,
+        "majorFaults": 0,
+        "systemSecs": 3.4
+      },
+      {
+        "round": 3,
+        "secsPerIter": 0.13863633449999999,
+        "evaluateSecs": 0.22136355349999998,
+        "peakBytes": 2363097088,
+        "anonHugePeakKiB": 0,
+        "minorFaults": 664647,
+        "majorFaults": 0,
+        "systemSecs": 3.44
+      }
+    ]
+  }
+]
