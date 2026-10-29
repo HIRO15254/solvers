@@ -114,7 +114,6 @@ pub(crate) fn prepare<S: Storage>(
     solver: &mut Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,
     summary: Option<&crate::profile::ProfileSummary>,
-    has_frequency: bool,
     base: Option<&crate::artifact::LoadedSol>,
     target: Option<f64>,
 ) -> Result<(Option<SubtreeSolve>, Option<SolveScope>)> {
@@ -132,9 +131,6 @@ pub(crate) fn prepare<S: Storage>(
             }),
         ))
     };
-    if has_frequency {
-        return fallback("frequency-targets");
-    }
     let targets: BTreeSet<_> = summary
         .resolved_nodes
         .iter()

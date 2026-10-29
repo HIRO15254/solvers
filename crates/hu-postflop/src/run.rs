@@ -632,7 +632,6 @@ fn drive<S: Storage>(
         &mut solver,
         &index,
         controller.summary.as_ref(),
-        !controller.targets.is_empty(),
         base.as_ref(),
         p.target,
     )?;
