@@ -259,6 +259,7 @@ file share として公開しない。solution view は `solution.sol` があれ
 `format=csv`でCSVを選べる（既定JSON）。P1のみ`node=SELECTOR`を繰り返せ、percent encodingと
 `+`をspaceへ復号して指定順で`--node`へ渡す。P1のみ`resolve=rivers`で`--resolve-rivers`を付け、
 no-riversで未保存のRiverを1 requestごとのCLI processで再solveする（request間のcacheは持たない）。
+Riverのprofileと固定祖先はsolutionに含まれる制約で再現し、frequencyには元runの最終λを固定する。基準solutionへのアクセスは不要で、返す値は再計算値である。
 P1のみの`decision` viewは`actions`・`strategy`・`ev`を1つのJSON objectで返し、再solveを1回に抑える。
 P1のみ`restOfStreet=true`で`--rest-of-street`を付け、各nodeの後にそのstreetの残りのaction nodeを返す。
 P2への`node`・`restOfStreet`・`resolve`・`decision`指定、`rivers`以外の`resolve`値、`true` / `false`以外の
