@@ -75,6 +75,7 @@ confidence = 1.0
   木への解決、上流固定、lock・incentive・頻度目標の計算上の意味は[P1規範](hu-postflop.jp.md)に従う。
   頻度目標があっても上流固定の部分木solveを使える。部分木modeは反復stateをcompactに保持し、外側の戦略は基準解から用いる。
   suit非対称のselectorでiso groupingが基準解より細かくなる場合も、対応する基準戦略をsuit置換して利用する。
+  基準解のgroupingがprofile側より細かく、代表を対応付けられない場合は拒否する。
 
 ## 3. 製品の決定
 

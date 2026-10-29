@@ -277,7 +277,8 @@ combo単位の固定と集計頻度目標は異なり、同じnodeの同じhand�
 
 上流を基準解に固定する場合は`[profile]`に
 `freeze_upstream = { solution = "runs/base/solution.sol" }`を指定する。基準解は同じboard・pot・stack・
-betting treeとrangeを持つ必要があり、suit非対称selectorによるiso groupingの違いは対応付ける。
+betting treeとrangeを持つ必要があり、suit非対称selectorにより基準解より細かく展開された木は対応付ける。
+基準解のgroupingがより細かく対応付けられない場合は、profileと同じか、より粗い基準解を使う。
 実効configにpathとSHA-256が保存される。
 基準fileのhashはvalidate・solve時に照合し、大文字・小文字を区別しない。
 freeze由来の`.sol`を読み込む、exportする、比較する際は基準fileを再読込・再hashしない。
