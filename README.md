@@ -57,6 +57,10 @@ If it doesn't start, use the `-compat` build. It is for older CPUs without AVX2.
 3. Watch the progress in **Runs** and wait until the solve finishes.
 4. Open **Results** to see the strategy and EVs.
 
+In v0.2.0, use the profile panel for locks, incentives and frequency targets;
+**Lock & re-solve** in Results applies them to an existing solution. Setup can
+also freeze upstream strategies to a saved run.
+
 Keep the terminal window that opened at startup open while you use the GUI;
 closing it stops the solver. Your results stay in `runs/` inside the extracted folder.
 

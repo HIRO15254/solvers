@@ -39,6 +39,9 @@ sh start-gui.sh
 3. **Runs**で進み具合を確かめます。終わるまで待ちます。
 4. **Results**で戦略とEVを見ます。
 
+profileパネルではlock・incentive・frequency targetを設定できます。Resultsの
+**Lock & re-solve**で再solveでき、Setupでは保存済みrunの上流戦略を固定できます。
+
 GUIを使っている間は、起動したときに開いた黒いウィンドウ（ターミナル）を閉じないでください。
 閉じると終了します。結果はこのフォルダーの`runs/`に残ります。
 

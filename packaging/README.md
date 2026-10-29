@@ -42,6 +42,9 @@ build. It is for older CPUs without AVX2.
 3. Watch the progress in **Runs** and wait until the solve finishes.
 4. Open **Results** to see the strategy and EVs.
 
+The profile panel supports locks, incentives and frequency targets. Results
+offers **Lock & re-solve**; Setup can freeze upstream to a saved run.
+
 Keep the terminal window that opened at startup open while you use the GUI;
 closing it stops the solver. Your results stay in `runs/` inside this folder.
 
