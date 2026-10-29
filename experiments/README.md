@@ -33,6 +33,7 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 | engine回帰修正 | [P1 engine hot-loop regression](p1-perf-2026-10/engine-regression-20261013/results.json) | 2026-10-13。16 threads、各variant交互3回。fused regret deltaと量子化iteratorを戻し、action値の0初期化と子順加算を復元。main比中央値f32 0.976倍、i16 0.990倍、mixed 1.002倍。25条件NashConv一致・必須検証合格。AWSでの確認はAWS受入 |
 | review修正受入 | [P1 review修正のAWS受入](p1-review-fixes-2026-10/aws-accept-20261013/README.md) | 2026-10-13。c6a.8xlargeの16・32 threadで新旧交互。engine sliceの1.13〜1.33倍の回帰を見つけて戻した。最終の1反復は旧の0.96〜0.99倍、S5は約0.98倍、c_gtowbの0.1% potまでは0.994倍。反復数・NashConvはbit一致 |
 | C4 nodelock後の性能 | [P1 nodelock後の点検と高速化・省メモリ化](p1-efficiency-2026-10/nodelock-perf-20261029/README.md) | 2026-10-29。nodelock前後でprofileの無いrunの1反復・peak・反復数は不変で出力はbit一致（評価だけ32 threadで1.01〜1.02倍）。採った8 commitをc6a.8xlarge Spotの16・32 threadで交互に測り、i16の1反復0.77〜0.83倍、評価0.84〜0.91倍、build後memory 0.30〜0.41倍、peak 0.73〜0.97倍、lock付きrunの0.1% potまで0.85〜0.87倍。不採用7件と、On-demand・Spot回収を含む機械の記録 |
+| C6 THP助言 | [P1 Transparent Huge Pagesの検討](p1-efficiency-2026-10/huge-pages-20261029/README.md) | 2026-10-29。Linuxで64 MiB以上のregret・戦略arenaへ`MADV_HUGEPAGE`。THP既定`madvise`のc6a.8xlargeで交互5回、1反復が8条件とも1.5〜6.8%短く、peakは不変、出力はbit一致。全体設定never/madvise/alwaysの比較も記録 |
 
 ### storage・memory
 
@@ -41,6 +42,7 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 | PF2・PF3 精度床の判断 | [P1 i16 precision](p1-perf-2026-10/i16-precision-20261007/README.md) | 2026-10-07。V0〜V4、River 3000 / Turn 1500、確率的丸めとhand列指数の比較。PF2・PF3の根拠。試作sourceは削除済み |
 | PF2・PF3 mixed storage | [P1 i16-f32avg storage](p1-perf-2026-10/mixed-storage-20261007/README.md) | 2026-10-07。T6、regretの旧i16 bit一致、checkpoint v5、旧f32/i16のv2 payload比較、Turn 3000反復と3 backendの資源見積り |
 | C5 memory見積り | [P1 memory見積りの較正](p1-efficiency-2026-10/memory-estimate-20261029/README.md) | 2026-10-29。常駐量（process・compiled game・profile slot・thread scratch）とcheckpoint encoderを数えた見積りの較正（p1_bench 80 run）と、31件のsolveのmax RSSとの照合。新しい見積りは全件でmax RSS以上（flopの大きい木で1.01〜1.16倍）、変更前は最大5.1 GiB不足。c6a.8xlarge Spot |
+| PF11 autoがi16を選ばない | [P1 storageの収束と計算量](p1-efficiency-2026-10/storage-floor-20261029/README.md) | 2026-10-29。f32・i16-f32avg・i16の長い収束曲線と0.2〜0.01% potへの到達、32 threadの1反復（flop_srp 0.156 / 0.137 / 0.135秒、c_gtowb 0.744 / 0.632 / 0.613秒）。i16は後半に0.02〜0.09% pot付近で停滞・悪化し、i16-f32avgは0.005〜0.03% pot付近まで下がる。floorを事前に予測する規則は得られずPF11を維持。c_gtowbの深い曲線はSpot回収で未完 |
 
 ### 収束・既定値
 
@@ -109,10 +111,10 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 
 ## 詳細・履歴
 
-以下は不採用・後継に置換・過去の診断・local-onlyの記録。記載された判断は当時の条件に限る。
+以下は不採用・利用者判断待ち・後継に置換・過去の診断・local-onlyの記録。記載された判断は当時の条件に限る。
 各報告の「次」「active」「完了」は当時の記述で、現在の開発優先順位や実行許可ではない。
 
-### P1の不採用・過去の比較
+### P1の不採用・判断待ち・過去の比較
 
 | 状態 | 記録 | 内容 |
 |---|---|---|
@@ -123,6 +125,9 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 | 不採用 T24 | [P1 combo順の密配置でf32の包除和とfold kernelをvector化する（T24）](p1-perf-2026-10/dense-compat-20261008/README.md) | 2026-10-08。kernel単体は全supportのrangeで0.52〜0.89倍だが、実際の木で32 threadsの1 iterationが1.12〜1.14倍、目標到達1.14〜1.16倍に遅く不採用。kernel benchは実際のrangeでも測る |
 | 不採用 RBP・MCCFR・PGO | [P1 RBP・MCCFR warm start・PGO](p1-efficiency-2026-10/rejected-20261009/README.md) | 2026-10-09。刈れる仕事は最大約25%で、RBPは全変種で目標到達が遅い。MC warm startは20,000反復でも7%pot。PGOは速くならない |
 | v4に置換 | [P1 `.sol` v3の索引付きchunkと部分読込み（SOL-14）](p1-io-2026-10/sol-index-20261012/README.md) | 2026-10-12。c001/c013のexportを22→3.2秒・92→38.6秒、peakを4.3→0.33 GB・10.7→2.8 GBに縮めた。summaryはmetadataだけで0.04秒。export出力はbaseとbyte一致した。`--node`の繰り返しで4 nodeを1回の読込みで出せる |
+| 不採用 C6 AVX-512 | [AVX-512 CPU基準の比較](p1-efficiency-2026-10/avx512-20261029/README.md) | 2026-10-29。Zen 4（c7a）とSapphire Rapids（c7i）でx86-64-v3・v4・nativeを交互3回。i16の評価はv4で最大約14%短いが、1反復はAMDで全条件v3より遅く、5%以上の一貫した改善なし。NashConvは全variantでbit一致。v4配布は追加しない |
+| 利用者判断待ち C6 部分木solve | [freeze_upstream部分木の実験](p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 2026-10-29。固定祖先の下の最大対象部分木だけを走査する`p1_bench --subtree-only`。全木走査と50・200反復でbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。storage削減は未実装。停止量（部分木か全木か）と成果物の意味は利用者判断 |
+| 利用者判断待ち C6 relock warm start | [relock warm startの実験](p1-efficiency-2026-10/relock-warm-start-20261029/README.md) | 2026-10-29。checkpoint全引継ぎはincentive_turnで0.1% potまで385→81反復だが、lock 3種では増え、対象nodeの戦略差が残る。regret保持・sum消去・反復番号0は4 profileとも0.91〜0.98倍の反復。warm開始の初期化はlock_flopで約8秒（bench）。試作sourceは`3f153de6` |
 
 ### 旧Multiway・参照
 

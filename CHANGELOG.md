@@ -138,6 +138,11 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   `validate --format json --resources` adds `checkpointWorkspaceBytes`,
   `residentBytes`, `gameBytes`, `profileBytes`, `threads` and
   `threadWorkspaceBytes`.
+- On Linux, the heads-up postflop solver asks the kernel for transparent huge
+  pages for its large regret and strategy arrays (64 MiB or more). With the
+  default `madvise` system setting, iterations were about 1.5–7% faster in the
+  measured flop trees; results and peak memory are unchanged. Systems with
+  transparent huge pages disabled behave as before.
 
 ## [0.1.0] - 2026-10-16
 
