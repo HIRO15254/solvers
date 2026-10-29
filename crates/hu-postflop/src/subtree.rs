@@ -114,10 +114,10 @@ pub(crate) fn prepare<S: Storage>(
     solver: &mut Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,
     summary: Option<&crate::profile::ProfileSummary>,
-    base: Option<&crate::artifact::LoadedSol>,
+    base: Option<&(crate::artifact::LoadedSol, crate::base_map::BaseMap)>,
     target: Option<f64>,
 ) -> Result<(Option<SubtreeSolve>, Option<SolveScope>)> {
-    let Some(base) = base else {
+    let Some((base, map)) = base else {
         return Ok((None, None));
     };
     let summary = summary.expect("freeze has a resolved profile");
@@ -164,7 +164,7 @@ pub(crate) fn prepare<S: Storage>(
         !inside(s)
     };
     for (id, node) in solver.game().tree.nodes.iter().enumerate() {
-        if node.kind == NodeKind::Action && outside(id as u32) && !base.is_stored(id as u32) {
+        if node.kind == NodeKind::Action && outside(id as u32) && !map.is_stored(base, id as u32) {
             return fallback("missing-base-strategy");
         }
     }
@@ -178,8 +178,8 @@ pub(crate) fn prepare<S: Storage>(
         if inside(r.index) {
             continue;
         }
-        let strategy = base
-            .stored_strategy(id as u32)?
+        let strategy = map
+            .strategy(base, id as u32)?
             .expect("stored node checked above");
         solver.restore_stream(0, |storage| -> Result<()> {
             storage.seed_strategy(r, r.index, &strategy);

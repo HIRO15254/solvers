@@ -277,7 +277,7 @@ type ProfiledWithBase = (
     CompiledGame<crate::PostflopEvaluator>,
     GameIndex,
     Option<crate::profile::ResolvedProfile>,
-    Option<crate::artifact::LoadedSol>,
+    Option<(crate::artifact::LoadedSol, crate::base_map::BaseMap)>,
 );
 
 fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
@@ -321,52 +321,15 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
                 .into());
             }
             let base = crate::artifact::load_sol(Path::new(&freeze.solution), 0, None)?;
-            let tree = &built.game.tree;
-            if base.game.tree.nodes.len() != tree.nodes.len()
-                && p.config
-                    .profile_suit_perms
-                    .as_ref()
-                    .is_some_and(|perms| perms.len() < 24)
-            {
-                return Err(spot::SpotError::new(
-                    spot::Code::NLH003,
-                    "profile.freeze_upstream",
-                    "base tree differs from the profiled tree; suit-isomorphism restriction from profile selectors cannot be combined with freeze_upstream",
-                ).into());
-            }
-            if base.config.board != p.config.board
-                || base.config.pot != p.config.pot
-                || base.config.effective_stack != p.config.effective_stack
-                || base.game.tree.nodes.len() != tree.nodes.len()
-                || Player::BOTH
-                    .into_iter()
-                    .any(|seat| base.game.index.hands.combos(seat) != index.hands.combos(seat))
-            {
-                bail!("NLH003: freeze_upstream solution does not match tree or hand support");
-            }
-            let view = crate::index::TreeView {
-                tree,
-                index: &index,
-            };
-            for (id, node) in tree.nodes.iter().enumerate() {
-                let other = base.game.tree.node(id as u32);
-                if node.kind != other.kind
-                    || node.player != other.player
-                    || node.num_children != other.num_children
-                    || (node.kind == hu_engine::NodeKind::Action
-                        && !view
-                            .action_labels(id as u32)
-                            .eq(base.view().action_labels(id as u32)))
-                {
-                    bail!("NLH003: freeze_upstream solution has a different tree");
-                }
+            let map = crate::base_map::BaseMap::new(&base, &built.game.tree, &index, &p.config)?;
+            for (id, node) in built.game.tree.nodes.iter().enumerate() {
                 base_strategies.push(if node.kind == hu_engine::NodeKind::Action {
-                    base.stored_strategy(id as u32)?
+                    map.strategy(&base, id as u32)?
                 } else {
                     None
                 });
             }
-            loaded_base = Some(base);
+            loaded_base = Some((base, map));
         }
         let provider = |id: u32| base_strategies.get(id as usize).cloned().flatten();
         let resolved = crate::profile::resolve_profile(
