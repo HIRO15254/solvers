@@ -833,6 +833,11 @@ strategy = { "bet 10" = 1.0 }
     );
     let effective = std::fs::read_to_string(daemon.runs.join(derived).join("run.toml")).unwrap();
     assert!(effective.contains("freeze_upstream"));
+    let result: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(daemon.runs.join(derived).join("run.json")).unwrap())
+            .unwrap();
+    assert_eq!(result["profile"]["solve_scope"], "whole-tree");
+    assert_eq!(result["profile"]["fallback_reason"], "root-target");
     let (status, summary) = daemon.get(&format!("/v1/runs/{derived}/solution/summary"));
     assert_eq!(status, 200, "{summary}");
     assert_eq!(summary["profile_config"]["lock"][0]["confidence"], 0.5);
