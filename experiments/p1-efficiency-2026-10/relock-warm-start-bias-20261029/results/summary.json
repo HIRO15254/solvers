@@ -1,0 +1,950 @@
+{
+  "runs": {
+    "combined-checkpoint": {
+      "setupSecs": 7.84450475,
+      "hits": [
+        {
+          "addedIterations": 416,
+          "iteration": 805,
+          "nashConv": 0.010984930541593774,
+          "trueEv": [
+            -0.9270729686670924,
+            0.828492579780749
+          ],
+          "objectiveEv": [
+            -0.8674444104602512,
+            0.828492579780749
+          ],
+          "targetNode": 1
+        },
+        {
+          "addedIterations": 584,
+          "iteration": 973,
+          "nashConv": 0.005486388691293698,
+          "trueEv": [
+            -0.9263663057489128,
+            0.8295060411590632
+          ],
+          "objectiveEv": [
+            -0.8652250386462962,
+            0.8295060411590632
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "combined-cold": {
+      "setupSecs": 0.9501037170000001,
+      "hits": [
+        {
+          "addedIterations": 372,
+          "iteration": 372,
+          "nashConv": 0.010933235830139387,
+          "trueEv": [
+            -0.9265397555930027,
+            0.8308309224479571
+          ],
+          "objectiveEv": [
+            -0.8646868093285541,
+            0.8308309224479571
+          ],
+          "targetNode": 1
+        },
+        {
+          "addedIterations": 534,
+          "iteration": 534,
+          "nashConv": 0.005491621877982578,
+          "trueEv": [
+            -0.9261668144734587,
+            0.8305440201560106
+          ],
+          "objectiveEv": [
+            -0.8640875606987626,
+            0.8305440201560106
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "combined-reset-continue": {
+      "setupSecs": 8.156570101,
+      "hits": [
+        {
+          "addedIterations": 352,
+          "iteration": 741,
+          "nashConv": 0.01095507589373057,
+          "trueEv": [
+            -0.9265682714432534,
+            0.8287824703241703
+          ],
+          "objectiveEv": [
+            -0.8658943494621653,
+            0.8287824703241703
+          ],
+          "targetNode": 1
+        },
+        {
+          "addedIterations": 536,
+          "iteration": 925,
+          "nashConv": 0.005494841574829046,
+          "trueEv": [
+            -0.9261353147953647,
+            0.8296698868756254
+          ],
+          "objectiveEv": [
+            -0.8645264555490081,
+            0.8296698868756254
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "flop_005-checkpoint": {
+      "setupSecs": 7.865571212,
+      "hits": [
+        {
+          "addedIterations": 496,
+          "iteration": 885,
+          "nashConv": 0.010990665058519644,
+          "trueEv": [
+            -0.8471182009038696,
+            0.798214219486746
+          ],
+          "objectiveEv": [
+            -0.8471182009038696,
+            0.9508192734701566
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "flop_005-cold": {
+      "setupSecs": 0.948988306,
+      "hits": [
+        {
+          "addedIterations": 431,
+          "iteration": 431,
+          "nashConv": 0.010983728609116228,
+          "trueEv": [
+            -0.8447173289329213,
+            0.7972005973269416
+          ],
+          "objectiveEv": [
+            -0.8447173289329213,
+            0.9512991023637488
+          ],
+          "targetNode": 1
+        },
+        {
+          "addedIterations": 626,
+          "iteration": 626,
+          "nashConv": 0.005455591991073705,
+          "trueEv": [
+            -0.8411513496811607,
+            0.795614374248266
+          ],
+          "objectiveEv": [
+            -0.8411513496811607,
+            0.9527178051844029
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "flop_005-reset-continue": {
+      "setupSecs": 8.01241903,
+      "hits": [
+        {
+          "addedIterations": 430,
+          "iteration": 819,
+          "nashConv": 0.010972389148732664,
+          "trueEv": [
+            -0.8454858769882312,
+            0.7971196559114603
+          ],
+          "objectiveEv": [
+            -0.8454858769882312,
+            0.9506070887511778
+          ],
+          "targetNode": 1
+        },
+        {
+          "addedIterations": 642,
+          "iteration": 1031,
+          "nashConv": 0.00549250198652651,
+          "trueEv": [
+            -0.8414612552904024,
+            0.795500952907578
+          ],
+          "objectiveEv": [
+            -0.8414612552904024,
+            0.9523261364146894
+          ],
+          "targetNode": 1
+        }
+      ]
+    },
+    "incentive_turn-checkpoint": {
+      "setupSecs": 7.767410515,
+      "hits": [
+        {
+          "addedIterations": 81,
+          "iteration": 470,
+          "nashConv": 0.010907588478315522,
+          "trueEv": [
+            -0.9831002902562411,
+            0.8309630018358324
+          ],
+          "objectiveEv": [
+            -0.9719306565286845,
+            0.8309630018358324
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 253,
+          "iteration": 642,
+          "nashConv": 0.0054908539267362055,
+          "trueEv": [
+            -0.9823109655048861,
+            0.8316301729154486
+          ],
+          "objectiveEv": [
+            -0.9702734139541435,
+            0.8316301729154486
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 640,
+          "iteration": 1029,
+          "nashConv": 0.0021660902765145984,
+          "trueEv": [
+            -0.9818945146513426,
+            0.8321381651505082
+          ],
+          "objectiveEv": [
+            -0.9691001039603763,
+            0.8321381651505082
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 1090,
+          "iteration": 1479,
+          "nashConv": 0.001096114902111811,
+          "trueEv": [
+            -0.9818089166127842,
+            0.8322281807088683
+          ],
+          "objectiveEv": [
+            -0.9688270685000492,
+            0.8322281807088683
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "incentive_turn-cold": {
+      "setupSecs": 0.936561571,
+      "hits": [
+        {
+          "addedIterations": 385,
+          "iteration": 385,
+          "nashConv": 0.010978103189000388,
+          "trueEv": [
+            -0.9806198748756949,
+            0.8361403596520055
+          ],
+          "objectiveEv": [
+            -0.9653528903583685,
+            0.8361403596520055
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 553,
+          "iteration": 553,
+          "nashConv": 0.005468878425225365,
+          "trueEv": [
+            -0.9810682822781908,
+            0.8342650623625077
+          ],
+          "objectiveEv": [
+            -0.9667559208334175,
+            0.8342650623625077
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 930,
+          "iteration": 930,
+          "nashConv": 0.0021897792573165598,
+          "trueEv": [
+            -0.9814679595616668,
+            0.8330255655046569
+          ],
+          "objectiveEv": [
+            -0.9678655596131057,
+            0.8330255655046569
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 1400,
+          "iteration": 1400,
+          "nashConv": 0.0010984945620732267,
+          "trueEv": [
+            -0.9816165924365887,
+            0.8326075633369434
+          ],
+          "objectiveEv": [
+            -0.9682705480614421,
+            0.8326075633369434
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "incentive_turn-reset-continue": {
+      "setupSecs": 8.038828559999999,
+      "hits": [
+        {
+          "addedIterations": 105,
+          "iteration": 494,
+          "nashConv": 0.01089251118076806,
+          "trueEv": [
+            -0.9827549276035931,
+            0.8311779880474702
+          ],
+          "objectiveEv": [
+            -0.9714942493963797,
+            0.8311779880474702
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 259,
+          "iteration": 648,
+          "nashConv": 0.00549821238531123,
+          "trueEv": [
+            -0.9822279704359884,
+            0.8317392845000594
+          ],
+          "objectiveEv": [
+            -0.9701036051653096,
+            0.8317392845000594
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 640,
+          "iteration": 1029,
+          "nashConv": 0.0021750041789526664,
+          "trueEv": [
+            -0.98188759115208,
+            0.8321536584347516
+          ],
+          "objectiveEv": [
+            -0.9690814474123067,
+            0.8321536584347516
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 1090,
+          "iteration": 1479,
+          "nashConv": 0.0010979500121248709,
+          "trueEv": [
+            -0.9818077994087007,
+            0.832230898763188
+          ],
+          "objectiveEv": [
+            -0.96882379791483,
+            0.832230898763188
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_001-checkpoint": {
+      "setupSecs": 7.857692563,
+      "hits": [
+        {
+          "addedIterations": 13,
+          "iteration": 402,
+          "nashConv": 0.010975955723336761,
+          "trueEv": [
+            -0.9836824030059638,
+            0.830818033969145
+          ],
+          "objectiveEv": [
+            -0.9814533287922159,
+            0.830818033969145
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 177,
+          "iteration": 566,
+          "nashConv": 0.005499711192706869,
+          "trueEv": [
+            -0.9839438574504288,
+            0.8295569293173047
+          ],
+          "objectiveEv": [
+            -0.9818577721058912,
+            0.8295569293173047
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 550,
+          "iteration": 939,
+          "nashConv": 0.002165541234908197,
+          "trueEv": [
+            -0.9842601498285707,
+            0.8286965264772966
+          ],
+          "objectiveEv": [
+            -0.9822587098506399,
+            0.8286965264772966
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_001-cold": {
+      "setupSecs": 0.987103346,
+      "hits": [
+        {
+          "addedIterations": 381,
+          "iteration": 381,
+          "nashConv": 0.010898268806963984,
+          "trueEv": [
+            -0.9832077673803823,
+            0.8318117852157387
+          ],
+          "objectiveEv": [
+            -0.9808307670020354,
+            0.8318117852157387
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 552,
+          "iteration": 552,
+          "nashConv": 0.005490869274500487,
+          "trueEv": [
+            -0.9837630374193346,
+            0.8299864980716343
+          ],
+          "objectiveEv": [
+            -0.9815848388918518,
+            0.8299864980716343
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_001-reset-continue": {
+      "setupSecs": 8.252066641,
+      "hits": [
+        {
+          "addedIterations": 62,
+          "iteration": 451,
+          "nashConv": 0.010793910587115318,
+          "trueEv": [
+            -0.9839133124338288,
+            0.829695859896847
+          ],
+          "objectiveEv": [
+            -0.9818092779375065,
+            0.829695859896847
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 188,
+          "iteration": 577,
+          "nashConv": 0.0054484167532952155,
+          "trueEv": [
+            -0.9840390455144298,
+            0.8292851873633879
+          ],
+          "objectiveEv": [
+            -0.9819871673065994,
+            0.8292851873633879
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 550,
+          "iteration": 939,
+          "nashConv": 0.0021625786617580633,
+          "trueEv": [
+            -0.9842711264740527,
+            0.8286705189592802
+          ],
+          "objectiveEv": [
+            -0.9822729702082721,
+            0.8286705189592802
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_020-checkpoint": {
+      "setupSecs": 7.904944967,
+      "hits": [
+        {
+          "addedIterations": 365,
+          "iteration": 754,
+          "nashConv": 0.010992425272997264,
+          "trueEv": [
+            -0.9687012283100453,
+            0.8829250894068856
+          ],
+          "objectiveEv": [
+            -0.7683502911025251,
+            0.8829250894068856
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 545,
+          "iteration": 934,
+          "nashConv": 0.005484727946112988,
+          "trueEv": [
+            -0.96892125149828,
+            0.88565249756597
+          ],
+          "objectiveEv": [
+            -0.7619304591964753,
+            0.88565249756597
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_020-cold": {
+      "setupSecs": 0.9404783329999999,
+      "hits": [
+        {
+          "addedIterations": 381,
+          "iteration": 381,
+          "nashConv": 0.010935377028332582,
+          "trueEv": [
+            -0.9690492051096091,
+            0.8889116598329078
+          ],
+          "objectiveEv": [
+            -0.7534556977413749,
+            0.8889116598329078
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 544,
+          "iteration": 544,
+          "nashConv": 0.0054832786788966414,
+          "trueEv": [
+            -0.969200203918927,
+            0.8877910689884599
+          ],
+          "objectiveEv": [
+            -0.7573576817145763,
+            0.8877910689884599
+          ],
+          "targetNode": 5
+        }
+      ]
+    },
+    "turn_020-reset-continue": {
+      "setupSecs": 8.037397133,
+      "hits": [
+        {
+          "addedIterations": 338,
+          "iteration": 727,
+          "nashConv": 0.010967257509397088,
+          "trueEv": [
+            -0.9689141817701705,
+            0.8854222273441473
+          ],
+          "objectiveEv": [
+            -0.7615631166006499,
+            0.8854222273441473
+          ],
+          "targetNode": 5
+        },
+        {
+          "addedIterations": 514,
+          "iteration": 903,
+          "nashConv": 0.005488732398215013,
+          "trueEv": [
+            -0.9689962472113859,
+            0.8865667609110608
+          ],
+          "objectiveEv": [
+            -0.759421903700979,
+            0.8865667609110608
+          ],
+          "targetNode": 5
+        }
+      ]
+    }
+  },
+  "comparisons": {
+    "incentive_turn-checkpoint-vs-cold-hit0": {
+      "trueEvDelta": [
+        -0.0024804153805462192,
+        -0.005177357816173123
+      ],
+      "objectiveEvDelta": [
+        -0.006577766170316024,
+        -0.005177357816173123
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.12320489369988073,
+      "unweightedMeanAbsStrategyDelta": 0.12140259923437484,
+      "maxAbsStrategyDelta": 0.6685108542442322,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.08703231454059958,
+          "reachWeight": 127.99295407533646
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.13666429583382284,
+          "reachWeight": 343.9852095246315
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.13386493245709877,
+          "reachWeight": 98.99743455648422
+        }
+      }
+    },
+    "incentive_turn-checkpoint-vs-cold-hit1": {
+      "trueEvDelta": [
+        -0.0012426832266952959,
+        -0.002634889447059141
+      ],
+      "objectiveEvDelta": [
+        -0.003517493120725912,
+        -0.002634889447059141
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.06471481317651383,
+      "unweightedMeanAbsStrategyDelta": 0.06376897533866509,
+      "maxAbsStrategyDelta": 0.5064512901008129,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.06489173826947268,
+          "reachWeight": 175.99800491333008
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.06460961471865885,
+          "reachWeight": 295.9973369836807
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0314844827036855,
+          "reachWeight": 91.9995351433754
+        }
+      }
+    },
+    "incentive_turn-checkpoint-vs-cold-hit2": {
+      "trueEvDelta": [
+        -0.00042655508967581746,
+        -0.000887400354148693
+      ],
+      "objectiveEvDelta": [
+        -0.0012345443472705497,
+        -0.000887400354148693
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.027705834693797535,
+      "unweightedMeanAbsStrategyDelta": 0.027300951839484434,
+      "maxAbsStrategyDelta": 0.32591164112091064,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.03500590474223907,
+          "reachWeight": 270.9997126162052
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.017863450274963975,
+          "reachWeight": 200.99975788593292
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.002770626244608294,
+          "reachWeight": 86.99996674060822
+        }
+      }
+    },
+    "incentive_turn-checkpoint-vs-cold-hit3": {
+      "trueEvDelta": [
+        -0.0001923241761955241,
+        -0.0003793826280751311
+      ],
+      "objectiveEvDelta": [
+        -0.0005565204386070999,
+        -0.0003793826280751311
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.018215501232513042,
+      "unweightedMeanAbsStrategyDelta": 0.017949304400472092,
+      "maxAbsStrategyDelta": 0.098073810338974,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.02289533360749128,
+          "reachWeight": 319.99992391467094
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.008363224207064411,
+          "reachWeight": 151.99998944997787
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0005138068111499956,
+          "reachWeight": 89.99999517202377
+        }
+      }
+    },
+    "incentive_turn-cold-vs-cold-hit0": {
+      "trueEvDelta": [
+        0.0,
+        0.0
+      ],
+      "objectiveEvDelta": [
+        0.0,
+        0.0
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.0,
+      "unweightedMeanAbsStrategyDelta": 0.0,
+      "maxAbsStrategyDelta": 0.0,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 127.9894905090332
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 343.9780190587044
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 98.9964410662651
+        }
+      }
+    },
+    "incentive_turn-cold-vs-cold-hit1": {
+      "trueEvDelta": [
+        0.0,
+        0.0
+      ],
+      "objectiveEvDelta": [
+        0.0,
+        0.0
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.0,
+      "unweightedMeanAbsStrategyDelta": 0.0,
+      "maxAbsStrategyDelta": 0.0,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 175.99709808826447
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 295.99613159894943
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 91.9993907213211
+        }
+      }
+    },
+    "incentive_turn-cold-vs-cold-hit2": {
+      "trueEvDelta": [
+        0.0,
+        0.0
+      ],
+      "objectiveEvDelta": [
+        0.0,
+        0.0
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.0,
+      "unweightedMeanAbsStrategyDelta": 0.0,
+      "maxAbsStrategyDelta": 0.0,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 270.99957823753357
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 200.9996195435524
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 86.99996149539948
+        }
+      }
+    },
+    "incentive_turn-cold-vs-cold-hit3": {
+      "trueEvDelta": [
+        0.0,
+        0.0
+      ],
+      "objectiveEvDelta": [
+        0.0,
+        0.0
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.0,
+      "unweightedMeanAbsStrategyDelta": 0.0,
+      "maxAbsStrategyDelta": 0.0,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 319.9998809695244
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 151.99998658895493
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0,
+          "reachWeight": 89.99999463558197
+        }
+      }
+    },
+    "incentive_turn-reset-continue-vs-cold-hit0": {
+      "trueEvDelta": [
+        -0.002135052727898157,
+        -0.004962371604535276
+      ],
+      "objectiveEvDelta": [
+        -0.006141359038011274,
+        -0.004962371604535276
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.09482062073492664,
+      "unweightedMeanAbsStrategyDelta": 0.09343405320936889,
+      "maxAbsStrategyDelta": 0.6148854792118073,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.07775383556132298,
+          "reachWeight": 127.99473336338997
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.10117099448836624,
+          "reachWeight": 343.98898434638977
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.06447317245909134,
+          "reachWeight": 98.99822053313255
+        }
+      }
+    },
+    "incentive_turn-reset-continue-vs-cold-hit1": {
+      "trueEvDelta": [
+        -0.0011596881577976559,
+        -0.002525777862448342
+      ],
+      "objectiveEvDelta": [
+        -0.0033476843318920313,
+        -0.002525777862448342
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.05689844632743747,
+      "unweightedMeanAbsStrategyDelta": 0.0560668937248775,
+      "maxAbsStrategyDelta": 0.47743409872055054,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.06287148054462725,
+          "reachWeight": 175.99850657582283
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.05334691866033483,
+          "reachWeight": 295.9980043768883
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.015146534950770636,
+          "reachWeight": 91.99969536066055
+        }
+      }
+    },
+    "incentive_turn-reset-continue-vs-cold-hit2": {
+      "trueEvDelta": [
+        -0.0004196315904132497,
+        -0.0008719070699052534
+      ],
+      "objectiveEvDelta": [
+        -0.0012158877992010098,
+        -0.0008719070699052534
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.026955861037294884,
+      "unweightedMeanAbsStrategyDelta": 0.026561938329433307,
+      "maxAbsStrategyDelta": 0.32205930352211,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.03470456021334346,
+          "reachWeight": 270.9997723400593
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0165086087597485,
+          "reachWeight": 200.99980902671814
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0011712889129932454,
+          "reachWeight": 86.99998074769974
+        }
+      }
+    },
+    "incentive_turn-reset-continue-vs-cold-hit3": {
+      "trueEvDelta": [
+        -0.00019120697211194582,
+        -0.0003766645737554031
+      ],
+      "objectiveEvDelta": [
+        -0.0005532498533878938,
+        -0.0003766645737554031
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.01811218143181443,
+      "unweightedMeanAbsStrategyDelta": 0.017847494450245978,
+      "maxAbsStrategyDelta": 0.09697283804416656,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.02285432257896602,
+          "reachWeight": 319.9999376833439
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.008128727886972763,
+          "reachWeight": 151.99999326467514
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0002476603130769864,
+          "reachWeight": 89.99999731779099
+        }
+      }
+    },
+    "cold-hit1-vs-cold-hit3": {
+      "trueEvDelta": [
+        0.0005483101583979577,
+        0.0016574990255643351
+      ],
+      "objectiveEvDelta": [
+        0.0015146272280245343,
+        0.0016574990255643351
+      ],
+      "reachWeightedMeanAbsStrategyDelta": 0.040355855685740634,
+      "unweightedMeanAbsStrategyDelta": 0.03976624700400172,
+      "maxAbsStrategyDelta": 0.49025484174489975,
+      "gapGroups": {
+        "gap_le_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.04609689754019961,
+          "reachWeight": 319.9971187710762
+        },
+        "gap_gt_0.01_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.02826951527010496,
+          "reachWeight": 151.9994298517704
+        },
+        "gap_gt_0.1_bb": {
+          "reachWeightedMeanAbsStrategyDelta": 0.0013896661394004956,
+          "reachWeight": 89.9996939599514
+        }
+      }
+    }
+  }
+}
