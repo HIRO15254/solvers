@@ -289,8 +289,10 @@ fn exports_inspection_report_and_comparison_use_bb() {
     for args in [
         vec!["compare", path(&sol), path(&old_sol), "--cross-game"],
         vec!["export", path(&old_sol), "summary"],
+        #[cfg(feature = "p2")]
         vec!["inspect", path(&old_sol), "--view", "summary"],
         vec!["inspect", "--sol", path(&old_sol)],
+        #[cfg(feature = "p2")]
         vec!["evaluate", path(&old_sol)],
     ] {
         let refused = cli(&args, "");

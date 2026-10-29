@@ -30,7 +30,7 @@ v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含め�
 | 手順 | Linear | 内容 | 完了条件 |
 |---|---|---|---|
 | 1 方針の記録 | SOL-59 | 本計画、製品定義の到達段階、status対応表 | `tools/check_docs.py`が通り、3文書の記述が一致する |
-| 2 配布版のhelp | SOL-49 | P1専用buildの`--help`と各commandのhelpから、使えないcommand・flag（`derive`・`evaluate`、Preflop専用flag）と開発用の呼び名を除く。`resume`の説明にP1の`.ckpt`を含める | P1専用buildのhelpに使えないcommand・flagと開発用語が出ないことを確かめる試験がある。既定buildのhelpは変わらない |
+| 2 配布版のhelp | SOL-49 | P1専用buildの`--help`と各commandのhelpから、使えないcommand・flag（`derive`・`evaluate`、Preflop専用flag）と開発用の呼び名を除く。`resume`の説明にP1の`.ckpt`を含める | P1専用buildのhelpに使えないcommand・flagと開発用語が出ないことを確かめる試験がある。既定buildはすべてのcommand・flagを維持する |
 | 3 待機中runのcancel | SOL-48 | daemonで待機中のrunをcancelしたとき、run directoryへcanceledを保存する | 待機中runをcancelしてdaemonを再起動しても再投入されない試験がある |
 | 4 GUI受入 | SOL-60 | P1専用buildのdaemonとGUIで、validate → solve → 進捗 → 結果閲覧、profile（lock・incentive・頻度目標）の編集、Lock & re-solve、Setupでの基準runによる上流固定、`no-rivers`のRiver再solveを確かめる | 配布するGUIでの各操作をブラウザで確認した証拠がある |
 | 5 version・互換 | SOL-61 | workspace versionを上げる。CHANGELOGの互換節に、v0.2.0が読む成果物（P1 `.sol` 4〜6、checkpoint 5・6・8）と、`solvers.nlh/v1`の入力から削除したkeyの扱いを書く。`[Unreleased]`を版と日付にする | `--version`とtagが一致し、CHANGELOGからリリースノート案ができる |

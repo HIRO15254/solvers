@@ -9,15 +9,6 @@ pub(crate) fn input_error() -> anyhow::Error {
     spot::SpotError::new(spot::Code::NLH005, "spot", EXCLUDED).into()
 }
 
-pub(crate) fn derive_error() -> anyhow::Error {
-    spot::SpotError::new(
-        spot::Code::NLH005,
-        "derive",
-        format!("derive requires P2; {EXCLUDED}"),
-    )
-    .into()
-}
-
 #[derive(Debug)]
 pub(crate) struct ArtifactError;
 

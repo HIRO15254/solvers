@@ -1,4 +1,4 @@
-//! A P1-only binary keeps the CLI surface but rejects unavailable P2 work.
+//! A heads-up postflop binary exposes its supported CLI and rejects preflop work.
 #![cfg(not(feature = "p2"))]
 
 use std::path::{Path, PathBuf};
@@ -119,31 +119,73 @@ fn p2_templates_are_typed_input_errors() {
 }
 
 #[test]
-fn derive_remains_discoverable_but_rejects_valid_arguments() {
-    let help = cli(&["--help"]);
-    assert!(help.status.success());
-    assert!(String::from_utf8_lossy(&help.stdout).contains("derive"));
-    let help = cli(&["derive", "--help"]);
-    assert!(help.status.success());
-    let directory = tempfile::tempdir().unwrap();
-    let run = directory.path().join("p2-run");
-    manifest_only_run(&run);
-    let out = directory.path().join("derived.toml");
-    let stderr = rejects(
-        &[
-            "derive",
-            text(&run),
-            "--line",
-            "BTN c, BB x",
-            "--board",
-            "Ks 7h 2d",
-            "--out",
-            text(&out),
-        ],
-        2,
-    );
-    assert!(stderr.contains("derive requires P2"), "{stderr}");
-    assert!(!out.exists());
+fn help_surfaces_only_supported_commands_and_options() {
+    let commands: &[&[&str]] = &[
+        &[],
+        &["config"],
+        &["config", "new"],
+        &["validate"],
+        &["tree"],
+        &["line"],
+        &["status"],
+        &["watch"],
+        &["runs"],
+        &["runs", "ls"],
+        &["relock"],
+        &["solve"],
+        &["resume"],
+        &["inspect"],
+        &["export"],
+        &["compare"],
+        &["report"],
+    ];
+    for command in commands {
+        for flag in ["--help", "-h"] {
+            let mut args = command.to_vec();
+            args.push(flag);
+            let output = cli(&args);
+            assert!(output.status.success(), "{args:?}");
+            let help = String::from_utf8(output.stdout).unwrap();
+            for token in ["P1", "P2"] {
+                assert!(!help.contains(token), "{args:?}: {help}");
+            }
+            assert!(!help.contains("--cache-dir"), "{args:?}: {help}");
+        }
+    }
+    let help = String::from_utf8(cli(&["--help"]).stdout).unwrap();
+    for command in ["derive", "evaluate"] {
+        assert!(
+            !help
+                .lines()
+                .any(|line| line.trim_start().starts_with(&format!("{command} "))),
+            "{help}"
+        );
+        assert!(!cli(&[command, "--help"]).status.success());
+    }
+    let resume = String::from_utf8(cli(&["resume", "--help"]).stdout).unwrap();
+    assert!(resume.contains(".ckpt"), "{resume}");
+    assert!(!resume.contains(".mwckpt"), "{resume}");
+    for flag in [
+        "--max-sweeps",
+        "--stop-target",
+        "--evaluation-samples",
+        "--evaluation-cadence",
+    ] {
+        assert!(!resume.contains(flag), "{resume}");
+    }
+    let inspect = String::from_utf8(cli(&["inspect", "--help"]).stdout).unwrap();
+    for flag in [
+        "--node",
+        "--view",
+        "--actor",
+        "--samples",
+        "--seed",
+        "--br-traversals",
+    ] {
+        assert!(!inspect.contains(flag), "{inspect}");
+    }
+    let config = String::from_utf8(cli(&["config", "new", "--help"]).stdout).unwrap();
+    assert!(!config.contains("--product"), "{config}");
 }
 
 #[test]
@@ -157,7 +199,6 @@ fn p2_artifact_extensions_reject_before_decoding_fake_payloads() {
     }
     for args in [
         vec!["export", text(&solution), "summary"],
-        vec!["evaluate", text(&solution)],
         vec!["resume", text(&checkpoint)],
         vec!["compare", text(&solution), text(&solution)],
         vec!["compare", text(&solution), text(&p1)],
@@ -175,7 +216,6 @@ fn p2_manifest_rejects_artifact_commands_without_payloads_or_config() {
     manifest_only_run(&run);
     for args in [
         vec!["export", text(&run), "summary"],
-        vec!["evaluate", text(&run)],
         vec!["resume", text(&run)],
         vec!["compare", text(&run), text(&run)],
         vec!["inspect", "--sol", text(&run)],
