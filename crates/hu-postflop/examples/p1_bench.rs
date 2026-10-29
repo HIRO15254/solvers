@@ -181,6 +181,22 @@ fn bench<S: Storage>(
     prepare_secs: f64,
     storage_name: &str,
 ) -> Result<()> {
+    let checkpoint = args
+        .checkpoint
+        .as_ref()
+        .map(|path| -> Result<_> {
+            let state = hu_postflop::checkpoint::CheckpointReader::open(path)?;
+            if state.mode == hu_postflop::checkpoint::CheckpointMode::Subtree {
+                bail!(
+                    "compact subtree checkpoint cannot be loaded by p1_bench; use `solvers resume`"
+                );
+            }
+            if state.config_hash != hu_postflop::prepare::compatibility_hash(&p.effective)? {
+                bail!("checkpoint config does not match benchmark config");
+            }
+            Ok(state)
+        })
+        .transpose()?;
     let t = Instant::now();
     let (game, index, resolved, node_info) = if p.document.spot.profile.is_some() {
         let (game, index, resolved) = hu_postflop::run::build_profiled(p)?;
@@ -254,11 +270,7 @@ fn bench<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
-    if let Some(path) = &args.checkpoint {
-        let state = hu_postflop::checkpoint::CheckpointReader::open(path)?;
-        if state.config_hash != hu_postflop::prepare::compatibility_hash(&p.effective)? {
-            bail!("checkpoint config does not match benchmark config");
-        }
+    if let Some(state) = checkpoint {
         let iteration = state.iteration;
         solver.restore_stream(iteration, |storage| state.read_storage(storage))?;
     }
