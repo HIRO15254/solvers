@@ -28,6 +28,13 @@ for case in ("lock_flop", "lock_turn", "lock_deep", "frequency", "fallback"):
             sizes = {pathlib.Path(path).name: int(size) for path, size in
                      (line.rsplit(" ", 1) for line in (out / f"{label}.sizes").read_text().splitlines())}
             profile = run.get("profile") or {}
+            storage_key = {"f32": "f32Bytes", "i16": "i16Bytes",
+                           "i16-f32avg": "i16F32avgBytes"}[resources["storage"]]
+            parallel_estimate = sum(resources[key] for key in (
+                storage_key, "saveWorkspaceBytes", "compressionWorkspaceBytes",
+                "checkpointWorkspaceBytes", "residentBytes"))
+            required = resources["memoryEstimateBytes"]
+            budgeted_peak = parallel_estimate if parallel_estimate <= resources["memoryLimitBytes"] else required
             rows.append({"case": case, "round": round_number, "variant": variant,
                          "iterations": run["iterations"], "solve_wall_s": run["wallSecs"],
                          "process_elapsed_s": seconds, "max_rss_kib": int(rss.group(1)),
@@ -35,6 +42,7 @@ for case in ("lock_flop", "lock_turn", "lock_deep", "frequency", "fallback"):
                          "fallback_reason": profile.get("fallback_reason"),
                          "frequencies": profile.get("frequencies"), "resources": resources,
                          "artifact_sizes_bytes": sizes, "stage_timings_s": stages,
+                         "budgeted_peak_bytes": budgeted_peak,
                          "subtree_estimate_bytes": int(subtree_estimate.group(1)) if subtree_estimate else None})
 summary = {"threads": 32, "stage_timings_note": "Only TIMING diagnostics actually emitted by the binaries are included; solve and process wall times are separate. Concurrent stages must not be summed.", "runs": rows}
 (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
