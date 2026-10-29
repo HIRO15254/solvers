@@ -1,0 +1,5 @@
+# Frequency target at BTN's flop decision after BB checks; freeze upstream.
+[[profile.frequency]]
+node = "x"
+action = "check"
+target = 0.5
