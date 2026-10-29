@@ -56,10 +56,26 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   targets an action frequency per runout; `freeze_upstream` fixes ancestor
   nodes to a base solution's average strategy. Node selectors accept `?`/`[?]`
   runout wildcards. New `export <sol> lock --node` view emits editable lock
-  TOML from a solution. Profile-bearing `.sol` files use metadata version 5 and
-  frequency-target checkpoints use version 6; runs without a profile keep the
-  previous formats byte-for-byte apart from timing fields. The GUI shows and
-  edits profiles.
+  TOML from a solution. Profile-bearing `.sol` files use version 5, and
+  `no-rivers` solutions with River constraints version 6 (below);
+  frequency-target checkpoints use version 6 and frozen-subtree checkpoints
+  version 8. Runs without a profile keep the previous formats byte-for-byte
+  apart from timing fields. The GUI shows and edits profiles.
+- GUI Results "Lock & re-solve" queues incentives and frequency targets as well
+  as locks before re-solving. GUI Setup can freeze upstream to a saved run the
+  daemon manages: the client sends the run's ID (`freezeBaseRunId` on validate
+  and create-run requests), never a host path, and the new run records
+  `relockedFrom`.
+- `freeze_upstream` accepts suit-asymmetric profile selectors (a specific card,
+  suit or combo) against a base solved with suit-isomorphism merging; the base's
+  strategies are mapped into the profiled tree's hand order. A base grouped more
+  finely than the profiled tree, so that no unique representative exists, is
+  still rejected.
+- `no-rivers` solutions keep their River profile: the `.sol` stores River locks,
+  incentives, the final frequency-target λ and frozen strategies, and the lazy
+  River re-solve (viewer, `inspect --sol`, `export --resolve-rivers`) applies
+  them without the base `.sol`. Frequency targets are held at the original run's
+  final λ during the re-solve.
 - Tree-script `jam ACTION OP SIZE` effect for `bet` / `raise` with `>=` / `>`.
   It replaces qualifying existing candidates with all-in, using only the size
   literal's street-target conversion for the threshold (no minimum-raise bump
@@ -150,14 +166,21 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   as in the base solve. The stop target, progress and results are still the
   whole-tree values. On a flop SRP tree the solve to 0.1% pot took 0.66× the
   time for a flop lock, 0.17–0.18× for a turn lock and about 0.001× for a single
-  deep node; whole-process time was 0.30–0.77×, now dominated by loading the
-  base and saving. Peak memory is about the same (the whole tree is still
-  allocated). Results of frozen runs differ from before. Runs fall back to the
-  whole tree when there are frequency targets, a root or no target, a base
-  without stored strategies outside the subtrees (`no-rivers`), or a base whose
-  remaining error alone reaches the stop target; `run.json` reports
-  `profile.solve_scope` and `fallback_reason`. Resuming a frozen run's
-  checkpoint from an earlier build is rejected.
+  deep node. The solver state and checkpoint hold only the subtrees, so
+  whole-process time was 0.64–0.95× and peak memory 0.44–0.94× of the first
+  subtree version in the measured cases (turn lock 0.66×, deep node 0.44×).
+  Frequency targets are now updated inside the subtrees instead of forcing the
+  whole tree. Results of frozen runs differ from before. Runs fall back to the
+  whole tree for a root or no target, a base without stored strategies outside
+  the subtrees (`no-rivers`), or a base whose remaining error alone reaches the
+  stop target; `run.json` reports `profile.solve_scope` and `fallback_reason`.
+  Resuming a frozen run's checkpoint from an earlier build is rejected.
+- The memory estimate of `freeze_upstream` runs counts the subtree storage when
+  the base's metadata and a dry run over the resolved selectors prove the
+  subtree solve, and the whole tree otherwise; it was 1.07–1.37× the measured
+  peak in the measured cases (an earlier estimate reported 9384 MiB for a run
+  that peaked at 5797 MiB). Profiled `no-rivers` runs also count the
+  River-constraint stream's workspace.
 
 ## [0.1.0] - 2026-10-16
 

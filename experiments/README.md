@@ -60,10 +60,11 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 
 | 機能・判断 | 実験 | 確立したこと |
 |---|---|---|
-| D8・NL3 頻度目標 | [P1 N4 River頻度とEV loss順lock](p1-nodelock/n4-frequency/README.md) | 2026-10-28。3目標の頻度誤差、素朴なcombo lockとのseat別BR利得・真のEV比較。未commit作業木のため再現状態partial |
+| D8・NL3 頻度目標 | [P1 N4 River頻度とEV loss順lock](p1-nodelock/n4-frequency/README.md) | 2026-10-28、2026-10-29にcommit済み`853a46c0`から再実行。3目標の頻度誤差（全て絶対0.01以内）、素朴なcombo lockとのseat別BR利得・真のEV比較。旧partial実行とはbit一致せず、最大差は頻度0.0028、真EV 0.00037 BB、λ 0.012（旧作業木が残らず原因は特定不能） |
 | C5 profile付き両seat評価 | [P1 profile付きrunの両seat同時評価](p1-efficiency-2026-10/profiled-dual-eval-20261029/README.md) | 2026-10-29。lock・incentive付きrunの評価を両seat同時の走査に。16・32 threadの交互計測で評価1回0.87〜0.91倍、評価が足すpeak 112〜259 → 18〜42 MiB、評価値とsolveの出力はbit一致。c6a.8xlarge Spot |
 | PF12 部分木solveの根拠 | [freeze_upstream部分木の実験](p1-efficiency-2026-10/subtree-freeze-20261029/README.md) | 2026-10-29。固定祖先の下の最大対象部分木だけを走査する試作（`p1_bench --subtree-only`、`1530db00`）。全木走査と50・200反復でbit一致。1反復はlock_flop 0.66倍、lock_turn 0.34〜0.38倍、深い1 node 0.007倍。全木NashConvが部分木分と基準解の残差の和になることと製品化の論点 |
 | PF12 部分木solve | [freeze_upstream部分木の製品経路](p1-efficiency-2026-10/subtree-freeze-product-20261029/README.md) | 2026-10-29。全木0.1% potまでのsolveが旧全木freeze比でflop lock 0.66倍、turn lock 0.17〜0.18倍、深い1 node 約0.001倍、process全体0.30〜0.77倍（c6a.8xlarge Spot、32 thread）。報告値と独立した全木評価の差は最大1.2e-8 BB。freezeの無いrunはbit一致。残る時間はcheckpoint・`.sol`保存と基準戦略の読出し |
+| C8 部分木storageと見積り | [freeze_upstreamのcompact storage](p1-efficiency-2026-10/subtree-storage-20261029/README.md) | 2026-10-29。部分木modeの反復stateを部分木の分だけに（checkpoint v8）。旧`853a46c0`→新`b74962db`の交互2回でprocess時間はflop 0.94〜0.95倍、turn 0.76倍、深い1 node 0.64倍、頻度目標0.79倍、max RSSはそれぞれ0.91、0.66、0.44、0.94倍。頻度目標は部分木で更新し達成頻度・λが旧全木と一致。selectorを解決する見積り（`214df3a9`）は全件max RSS以上で1.07〜1.37倍。c6a.8xlarge Spot、32 thread |
 
 ### artifact・I/O
 

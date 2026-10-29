@@ -55,6 +55,7 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 | C5 | C4で判明した2点（2026-10-29の利用者指示）: profile付きrunの評価を両seat同時の走査にする。`MemoryEstimate`がstorage以外を数えない不足を直す | 必須検証。profile付きの評価値はbit一致し、16・32 threadの交互計測で評価が遅くならない。見積りが測ったsolveのmax RSS以上になり、規範・CLI reference・利用ガイド・試験を同期 |
 | C6 | 次の改善案5件の並列試作（2026-10-29の利用者指示「どれも良さそうなので試してください」）: freeze_upstream時の部分木solve、relock warm start、i16の精度床を踏まえたauto、Linuxのhuge page、AVX-512 build。あわせて実験索引を現行の根拠と履歴に分ける | 採る変更は必須検証と出力のbit一致、16・32 threadの交互計測で遅い条件が無いこと。契約・既定・配布を変える案は利用者判断へ回す |
 | C7 | PF12の実装と、relock warm startの追加調査（偏りか均衡の多重性か、incentiveの大きさ・lockとの組合せ） | PF12: 必須検証、`freeze_upstream`の無いrunの出力はbit一致、報告値が全木評価と一致、旧版との通しの時間を記録。規範・CLI reference・利用ガイド・試験を同期。warm start: 利用者判断の材料を記録 |
+| C8 | PF12の第2段階（反復stateを部分木の分だけ持つ）と上流固定runのmemory見積りの較正。あわせて頻度目標を部分木solveで扱う（2026-10-29の利用者指示、[nodelock計画](p1-nodelock.jp.md)のNL7） | 必須検証、`freeze_upstream`の無いrunの出力はbit一致。見積りが測ったmax RSS以上。旧版との通しの時間・max RSSを交互に記録。規範・CLI reference・利用ガイド・試験を同期 |
 
 利用者決定:
 
@@ -221,3 +222,24 @@ dev・labのSpotは06:04（UTC）、代わりのlabは06:56に回収され、c_g
   0.05%→0.01%の変化は0.040）。永続的な偏りの証拠は無いが、同一極限の証明でもない。反復の削減はturnの小さいincentive
   （+1%・+5% pot）で0.1% potまで304〜368反復あり、+20% potでは16反復、flop incentive・lock併用では逆に増える。checkpointは3.03 GBで
   setupが約6.8秒増える。利用者決定（2026-10-29）により製品化は見送る（試作は`b0bc637b`に残す）。
+
+### C8: PF12の第2段階と上流固定runの見積り（AWS Spot、2026-10-29）
+
+利用者指示（2026-10-29）: 上流固定runのmemory見積りが過大（見積り9384 MiBに対し測ったRSS 5797 MiB）なのを直し、PF12の後段（部分木だけのstorage、深いlockの保存時間短縮）も行う。
+
+[記録](../../experiments/p1-efficiency-2026-10/subtree-storage-20261029/README.md)。部分木modeは反復stateを対象部分木の分だけcompactに持ち、
+外側は基準解の量子化戦略を参照する。checkpointは部分木分だけのv8（v7は拒否）で、頻度目標も部分木で更新する
+（強制全木との頻度・λの差は`1e-5`以内）。c6a.8xlarge 32 thread、旧`853a46c0`→新`b74962db`、各2回の交互:
+
+| 対象 | process 秒 旧→新 | max RSS GiB 旧→新 |
+|---|---|---|
+| BB check後のBTN（flop） | 77.5〜77.8 → 72.8〜73.8 | 5.64〜5.66 → 5.12〜5.15 |
+| xx後の全turnのBB | 38.5 → 29.1〜29.4 | 5.38〜5.41 → 3.56〜3.58 |
+| xx後のAc turnのBB | 28.7 → 18.3〜18.4 | 5.22〜5.25 → 2.28〜2.30 |
+| 頻度目標＋上流固定 | 50.3〜50.4 → 39.5〜39.6 | 5.53 → 5.20〜5.21 |
+
+頻度目標の達成頻度0.27394・λ 0.30449は新旧で一致した。見積りは基準解のmetadataと、selectorを解決するcounting dry-runで
+部分木を証明できる場合だけ部分木のstorageで数え（`214df3a9`）、証明できなければ全木で数える。見積り / max RSSはflop 1.07〜1.08、
+turn 1.18〜1.19、深い1 node 1.36〜1.37、頻度目標（全木で予算化）1.12、外側の残差による全木fallback 1.08で、全件RSS以上。
+深いnodeが1.2を超えるのは、32 workerのcheckpoint encoderと`.sol`の作業領域の同時確保を安全側に数えるためで、encoderの実行時動作は変えていない。
+profile付き`no-rivers`ではRiver制約を保存する第3 chunk streamの作業領域も数える。freezeの無いrunの出力はbit一致した。

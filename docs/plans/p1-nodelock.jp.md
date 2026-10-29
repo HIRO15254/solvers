@@ -27,6 +27,8 @@ nodelockとして扱わず、上流nodeのlockで表す。Restricted Nash Respon
 | NL3 | 「Top pairのcheck 50%」は、combo単位（各comboが50%）のlockと、集計頻度（category全体で50%、どのcomboかはsolverが選ぶ）の目標の両方を提供する。集計頻度は既定でrunoutごとに数える |
 | NL4 | ソフトlock（確率pでlock戦略、1−pで自由に最適化）を入れる |
 | NL5 | 配布v0.1.0（D7）には含めない。後の配布で含める |
+| NL6 | （2026-10-29）上流固定の部分木solveは自動で使う（PF12、[資源効率計画](p1-efficiency.jp.md)）。relockのwarm startは採らない |
+| NL7 | （2026-10-29）N0〜N5の後に残った制限を解除する: GUIのLock & re-solveでincentive・頻度目標、GUIのSetupからdaemon管理下のrunを基準にした上流固定、頻度目標と上流固定の部分木solve、suit非対称selectorと上流固定、no-riversとRiver上のprofile。あわせて上流固定runのmemory見積りを実測に合わせる |
 
 ## 3. 設計方針
 
@@ -117,8 +119,15 @@ incentiveを含むrunは一般和の報告規則（[製品定義](../products.jp
 | N3 | hand category分類器とcategory式（lock・incentiveの両方） | 分類がsuit置換で不変で、各分類軸で全comboを分割する。式で指定した結果がcomboを列挙した結果と一致する |
 | N4 | 頻度目標（runoutごと） | toyゲームと小さなRiver木で、目標との差が許容内に収まる。EV loss順にcomboを動かす素朴な方式と、lock下の`g_i`を比べた結果を`experiments/`に記録する |
 | N5 | GUI/daemon: lock・incentive・頻度目標の表示、その後に編集 | 対象画面で表示と操作を確認する |
+| N6 | NL7の制限解除 | 各制限の拒否・fallbackが無くなり、規範・CLI reference・利用者guide・testから制限の記述が消える。頻度目標の部分木solveが全木solveと一致する。suit非対称selectorの上流固定が同じselectorで解いた基準解の結果と収束誤差内で一致する。no-riversの再solveがlock・固定nodeを守る。GUIの2機能を実daemonで確認する |
 
 N1→N2→N3の順に依存する。N4はN1・N3、N5はN2に依存する。配布物への組込みは別の配布計画で扱う（NL5）。
+
+N6の結果（2026-10-29）: GUIのLock & re-solveはlock・incentive・頻度目標を積んで再solveし、Setupはdaemonが管理するrunを基準解に選べる
+（clientはhost pathでなくrun IDを送る）。両方を実daemonとbrowserで確認した。頻度目標は部分木solveで更新し、強制全木との頻度・λの差は`1e-5`以内。
+suit非対称selectorは基準解の手順をprofile木へ写して上流固定する。基準解のgroupingがprofile木より細かく代表が一意に決まらない場合の拒否は残す
+（[P1規範](../hu-postflop.jp.md)）。`no-rivers`の`.sol`はRiverの制約（lock・incentive・頻度目標の最終λ・固定戦略）を保存し、
+遅延再solveに適用する（`.sol` v6）。上流固定runの見積りと時間は[資源効率計画](p1-efficiency.jp.md)のC8に記録した。
 
 ## 6. 制約
 
