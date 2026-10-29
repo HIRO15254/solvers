@@ -33,6 +33,7 @@ for pi, profile in enumerate(profiles):
                 f"--experiment-base /work/warm-base --experiment-mode {variant} "
                 f"--experiment-timing {counts[variant]} --json {out} > /dev/null; fi"
             )
-        command = "set -e; mkdir -p /work/warm-bench-fixed; date -u; " + "; ".join(commands) + "; date -u"
+        command = ("set -e; if [[ $(date -u +%H%M) > 0730 ]]; then exit 1; fi; "
+                   "mkdir -p /work/warm-bench-fixed; date -u; " + "; ".join(commands) + "; date -u")
         print(profile, mode, datetime.datetime.now(datetime.timezone.utc).isoformat(), flush=True)
         subprocess.run([sys.executable, rc, "--bench", "RelockWarmStart", command], check=True)

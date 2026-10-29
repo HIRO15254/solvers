@@ -1,0 +1,668 @@
+{
+  "lock_flop": {
+    "cold": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 369,
+          "iteration": 369,
+          "elapsedSecsLab": 300.491094918,
+          "nashConv": 0.010953669669989008,
+          "trueEv": [
+            -0.9332535409257606,
+            0.8166937958055006
+          ],
+          "objectiveEv": [
+            -0.9332535409257606,
+            0.8166937958055006
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0,
+            0.0
+          ],
+          "objectiveEvDelta": [
+            0.0,
+            0.0
+          ],
+          "rootStrategyMeanAbsDelta": 0.0,
+          "rootStrategyMaxAbsDelta": 0.0,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 521,
+          "iteration": 521,
+          "elapsedSecsLab": 398.683311776,
+          "nashConv": 0.005492299693585334,
+          "trueEv": [
+            -0.932879164381635,
+            0.8160469503220259
+          ],
+          "objectiveEv": [
+            -0.932879164381635,
+            0.8160469503220259
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0,
+            0.0
+          ],
+          "objectiveEvDelta": [
+            0.0,
+            0.0
+          ],
+          "rootStrategyMeanAbsDelta": 0.0,
+          "rootStrategyMaxAbsDelta": 0.0,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    },
+    "checkpoint": {
+      "startIteration": 389,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 398,
+          "iteration": 787,
+          "elapsedSecsLab": 325.35914133,
+          "nashConv": 0.010982698406228897,
+          "trueEv": [
+            -0.9340460385975636,
+            0.8154165645578846
+          ],
+          "objectiveEv": [
+            -0.9340460385975636,
+            0.8154165645578846
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.0007924976718030052,
+            -0.0012772312476160286
+          ],
+          "objectiveEvDelta": [
+            -0.0007924976718030052,
+            -0.0012772312476160286
+          ],
+          "rootStrategyMeanAbsDelta": 3.068724758703134e-05,
+          "rootStrategyMaxAbsDelta": 0.0005137956723046955,
+          "targetStrategyMeanAbsDelta": 0.009980594286733424,
+          "targetStrategyMaxAbsDelta": 0.1115119457244873
+        },
+        {
+          "addedIterations": 556,
+          "iteration": 945,
+          "elapsedSecsLab": 486.292280801,
+          "nashConv": 0.005498335417699174,
+          "trueEv": [
+            -0.9332208681440183,
+            0.8155651395858601
+          ],
+          "objectiveEv": [
+            -0.9332208681440183,
+            0.8155651395858601
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.00034170376238329414,
+            -0.00048181073616582193
+          ],
+          "objectiveEvDelta": [
+            -0.00034170376238329414,
+            -0.00048181073616582193
+          ],
+          "rootStrategyMeanAbsDelta": 1.1421599580037178e-05,
+          "rootStrategyMaxAbsDelta": 0.00022584709950024262,
+          "targetStrategyMeanAbsDelta": 0.004813631354605431,
+          "targetStrategyMaxAbsDelta": 0.07939541339874268
+        }
+      ]
+    },
+    "reset-restart": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 358,
+          "iteration": 358,
+          "elapsedSecsLab": 342.145925157,
+          "nashConv": 0.010919471396364733,
+          "trueEv": [
+            -0.932929781131214,
+            0.8165966136958921
+          ],
+          "objectiveEv": [
+            -0.932929781131214,
+            0.8165966136958921
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0003237597945465742,
+            -9.718210960851792e-05
+          ],
+          "objectiveEvDelta": [
+            0.0003237597945465742,
+            -9.718210960851792e-05
+          ],
+          "rootStrategyMeanAbsDelta": 6.422736575602079e-05,
+          "rootStrategyMaxAbsDelta": 0.000722536351531744,
+          "targetStrategyMeanAbsDelta": 0.0052537104326750616,
+          "targetStrategyMaxAbsDelta": 0.059822261333465576
+        },
+        {
+          "addedIterations": 510,
+          "iteration": 510,
+          "elapsedSecsLab": 509.167296821,
+          "nashConv": 0.005493637766002202,
+          "trueEv": [
+            -0.9327640505705044,
+            0.815995734053159
+          ],
+          "objectiveEv": [
+            -0.9327640505705044,
+            0.815995734053159
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.00011511381113060715,
+            -5.12162688669493e-05
+          ],
+          "objectiveEvDelta": [
+            0.00011511381113060715,
+            -5.12162688669493e-05
+          ],
+          "rootStrategyMeanAbsDelta": 1.5721338930566488e-05,
+          "rootStrategyMaxAbsDelta": 0.00020749962277477607,
+          "targetStrategyMeanAbsDelta": 0.0029936769258595425,
+          "targetStrategyMaxAbsDelta": 0.044014543294906616
+        }
+      ]
+    },
+    "reset-continue": {
+      "startIteration": 389,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 321,
+          "iteration": 710,
+          "elapsedSecsLab": 301.2179607,
+          "nashConv": 0.01096479334402678,
+          "trueEv": [
+            -0.9335486407725008,
+            0.8154486266214893
+          ],
+          "objectiveEv": [
+            -0.9335486407725008,
+            0.8154486266214893
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.00029509984674014333,
+            -0.0012451691840112966
+          ],
+          "objectiveEvDelta": [
+            -0.00029509984674014333,
+            -0.0012451691840112966
+          ],
+          "rootStrategyMeanAbsDelta": 3.734519513898991e-05,
+          "rootStrategyMaxAbsDelta": 0.0006521406030515209,
+          "targetStrategyMeanAbsDelta": 0.007712797038982862,
+          "targetStrategyMaxAbsDelta": 0.11651450395584106
+        },
+        {
+          "addedIterations": 497,
+          "iteration": 886,
+          "elapsedSecsLab": 473.081303024,
+          "nashConv": 0.005487313793621107,
+          "trueEv": [
+            -0.9329680493748423,
+            0.8156089948168341
+          ],
+          "objectiveEv": [
+            -0.9329680493748423,
+            0.8156089948168341
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -8.888499320736098e-05,
+            -0.0004379555051917672
+          ],
+          "objectiveEvDelta": [
+            -8.888499320736098e-05,
+            -0.0004379555051917672
+          ],
+          "rootStrategyMeanAbsDelta": 1.3072937983347531e-05,
+          "rootStrategyMaxAbsDelta": 0.0002295374870300293,
+          "targetStrategyMeanAbsDelta": 0.004099900300139018,
+          "targetStrategyMaxAbsDelta": 0.08173435926437378
+        }
+      ]
+    },
+    "strategy-0.1": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 414,
+          "iteration": 414,
+          "elapsedSecsLab": 393.962317193,
+          "nashConv": 0.010942734127798226,
+          "trueEv": [
+            -0.9330880235549142,
+            0.8165597549976048
+          ],
+          "objectiveEv": [
+            -0.9330880235549142,
+            0.8165597549976048
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.00016551737084646856,
+            -0.00013404080789580775
+          ],
+          "objectiveEvDelta": [
+            0.00016551737084646856,
+            -0.00013404080789580775
+          ],
+          "rootStrategyMeanAbsDelta": 3.3243637697336146e-05,
+          "rootStrategyMaxAbsDelta": 0.0005865097045898438,
+          "targetStrategyMeanAbsDelta": 0.0045954273205182075,
+          "targetStrategyMaxAbsDelta": 0.042600661516189575
+        },
+        {
+          "addedIterations": 584,
+          "iteration": 584,
+          "elapsedSecsLab": 614.110009129,
+          "nashConv": 0.005482599495325369,
+          "trueEv": [
+            -0.9328032311155825,
+            0.8160766147167179
+          ],
+          "objectiveEv": [
+            -0.9328032311155825,
+            0.8160766147167179
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            7.593326605248585e-05,
+            2.9664394691986118e-05
+          ],
+          "objectiveEvDelta": [
+            7.593326605248585e-05,
+            2.9664394691986118e-05
+          ],
+          "rootStrategyMeanAbsDelta": 2.3581172708860715e-05,
+          "rootStrategyMaxAbsDelta": 0.000274658203125,
+          "targetStrategyMeanAbsDelta": 0.0030260773593288317,
+          "targetStrategyMaxAbsDelta": 0.041120290756225586
+        }
+      ]
+    },
+    "strategy-1": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 404,
+          "iteration": 404,
+          "elapsedSecsLab": 517.663302865,
+          "nashConv": 0.010960246037105992,
+          "trueEv": [
+            -0.9330874054602343,
+            0.8165073569923479
+          ],
+          "objectiveEv": [
+            -0.9330874054602343,
+            0.8165073569923479
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0001661354655263514,
+            -0.00018643881315272282
+          ],
+          "objectiveEvDelta": [
+            0.0001661354655263514,
+            -0.00018643881315272282
+          ],
+          "rootStrategyMeanAbsDelta": 6.285623248645506e-05,
+          "rootStrategyMaxAbsDelta": 0.0011000633239746094,
+          "targetStrategyMeanAbsDelta": 0.004660555205003803,
+          "targetStrategyMaxAbsDelta": 0.051875680685043335
+        },
+        {
+          "addedIterations": 568,
+          "iteration": 568,
+          "elapsedSecsLab": 701.541968264,
+          "nashConv": 0.005498958109083074,
+          "trueEv": [
+            -0.9328296919202431,
+            0.8160141927379304
+          ],
+          "objectiveEv": [
+            -0.9328296919202431,
+            0.8160141927379304
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            4.947246139186401e-05,
+            -3.275758409548857e-05
+          ],
+          "objectiveEvDelta": [
+            4.947246139186401e-05,
+            -3.275758409548857e-05
+          ],
+          "rootStrategyMeanAbsDelta": 1.7746223524334854e-05,
+          "rootStrategyMaxAbsDelta": 0.0003848704009214998,
+          "targetStrategyMeanAbsDelta": 0.003005218055989322,
+          "targetStrategyMaxAbsDelta": 0.047398388385772705
+        }
+      ]
+    }
+  },
+  "lock_turn": {},
+  "incentive_turn": {},
+  "strong_lock": {
+    "cold": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 376,
+          "iteration": 376,
+          "elapsedSecsLab": 141.538946135,
+          "nashConv": 0.010962027930652596,
+          "trueEv": [
+            -0.6772247936491453,
+            0.6588485216307464
+          ],
+          "objectiveEv": [
+            -0.6772247936491453,
+            0.6588485216307464
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0,
+            0.0
+          ],
+          "objectiveEvDelta": [
+            0.0,
+            0.0
+          ],
+          "rootStrategyMeanAbsDelta": 0.0,
+          "rootStrategyMaxAbsDelta": 0.0,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 543,
+          "iteration": 543,
+          "elapsedSecsLab": 203.738890232,
+          "nashConv": 0.0054783873198560595,
+          "trueEv": [
+            -0.6766614449815082,
+            0.6589889027817184
+          ],
+          "objectiveEv": [
+            -0.6766614449815082,
+            0.6589889027817184
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            0.0,
+            0.0
+          ],
+          "objectiveEvDelta": [
+            0.0,
+            0.0
+          ],
+          "rootStrategyMeanAbsDelta": 0.0,
+          "rootStrategyMaxAbsDelta": 0.0,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    },
+    "checkpoint": {
+      "startIteration": 389,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 556,
+          "iteration": 945,
+          "elapsedSecsLab": 205.820211077,
+          "nashConv": 0.010992789825109872,
+          "trueEv": [
+            -0.6780554136470703,
+            0.659444466434644
+          ],
+          "objectiveEv": [
+            -0.6780554136470703,
+            0.659444466434644
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.0008306199979249973,
+            0.0005959448038976856
+          ],
+          "objectiveEvDelta": [
+            -0.0008306199979249973,
+            0.0005959448038976856
+          ],
+          "rootStrategyMeanAbsDelta": 0.0040056904806350475,
+          "rootStrategyMaxAbsDelta": 0.04704016447067261,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 759,
+          "iteration": 1148,
+          "elapsedSecsLab": 280.193854017,
+          "nashConv": 0.005498974951851809,
+          "trueEv": [
+            -0.6770633152370042,
+            0.6591160986823451
+          ],
+          "objectiveEv": [
+            -0.6770633152370042,
+            0.6591160986823451
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.0004018702554960951,
+            0.0001271959006267087
+          ],
+          "objectiveEvDelta": [
+            -0.0004018702554960951,
+            0.0001271959006267087
+          ],
+          "rootStrategyMeanAbsDelta": 0.001757977387881141,
+          "rootStrategyMaxAbsDelta": 0.015025138854980469,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    },
+    "reset-restart": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 368,
+          "iteration": 368,
+          "elapsedSecsLab": 140.117980938,
+          "nashConv": 0.010981243509806449,
+          "trueEv": [
+            -0.6771701583653125,
+            0.659130088841873
+          ],
+          "objectiveEv": [
+            -0.6771701583653125,
+            0.659130088841873
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            5.4635283832871195e-05,
+            0.00028156721112659877
+          ],
+          "objectiveEvDelta": [
+            5.4635283832871195e-05,
+            0.00028156721112659877
+          ],
+          "rootStrategyMeanAbsDelta": 0.00226193777171805,
+          "rootStrategyMaxAbsDelta": 0.025087475776672363,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 536,
+          "iteration": 536,
+          "elapsedSecsLab": 203.284140174,
+          "nashConv": 0.005487385567761183,
+          "trueEv": [
+            -0.6767107777572688,
+            0.6590312961165637
+          ],
+          "objectiveEv": [
+            -0.6767107777572688,
+            0.6590312961165637
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -4.933277576069095e-05,
+            4.2393334845347574e-05
+          ],
+          "objectiveEvDelta": [
+            -4.933277576069095e-05,
+            4.2393334845347574e-05
+          ],
+          "rootStrategyMeanAbsDelta": 0.0012299880039831812,
+          "rootStrategyMaxAbsDelta": 0.014485836029052734,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    },
+    "reset-continue": {
+      "startIteration": 389,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 480,
+          "iteration": 869,
+          "elapsedSecsLab": 180.493270195,
+          "nashConv": 0.010995344542035546,
+          "trueEv": [
+            -0.6772149449021709,
+            0.658894071807701
+          ],
+          "objectiveEv": [
+            -0.6772149449021709,
+            0.658894071807701
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            9.848746974405742e-06,
+            4.5550176954622934e-05
+          ],
+          "objectiveEvDelta": [
+            9.848746974405742e-06,
+            4.5550176954622934e-05
+          ],
+          "rootStrategyMeanAbsDelta": 0.003046052661836887,
+          "rootStrategyMaxAbsDelta": 0.03415554761886597,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 685,
+          "iteration": 1074,
+          "elapsedSecsLab": 256.767863963,
+          "nashConv": 0.0054965556453189235,
+          "trueEv": [
+            -0.6767271942196343,
+            0.6589062060935801
+          ],
+          "objectiveEv": [
+            -0.6767271942196343,
+            0.6589062060935801
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -6.574923812618927e-05,
+            -8.269668813831732e-05
+          ],
+          "objectiveEvDelta": [
+            -6.574923812618927e-05,
+            -8.269668813831732e-05
+          ],
+          "rootStrategyMeanAbsDelta": 0.0015511763233411367,
+          "rootStrategyMaxAbsDelta": 0.01302182674407959,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    },
+    "strategy-0.1": {
+      "startIteration": 0,
+      "maxAddedIterations": 1200,
+      "hits": [
+        {
+          "addedIterations": 419,
+          "iteration": 419,
+          "elapsedSecsLab": 166.66716949,
+          "nashConv": 0.010977800948123395,
+          "trueEv": [
+            -0.677311284308882,
+            0.6587634095265675
+          ],
+          "objectiveEv": [
+            -0.677311284308882,
+            0.6587634095265675
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -8.649065973664882e-05,
+            -8.511210417883053e-05
+          ],
+          "objectiveEvDelta": [
+            -8.649065973664882e-05,
+            -8.511210417883053e-05
+          ],
+          "rootStrategyMeanAbsDelta": 0.002097994682620369,
+          "rootStrategyMaxAbsDelta": 0.02509710192680359,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        },
+        {
+          "addedIterations": 608,
+          "iteration": 608,
+          "elapsedSecsLab": 240.903152624,
+          "nashConv": 0.005497551150653646,
+          "trueEv": [
+            -0.6768135407311908,
+            0.6588123675823652
+          ],
+          "objectiveEv": [
+            -0.6768135407311908,
+            0.6588123675823652
+          ],
+          "targetNode": 1,
+          "trueEvDelta": [
+            -0.00015209574968266804,
+            -0.0001765351993532338
+          ],
+          "objectiveEvDelta": [
+            -0.00015209574968266804,
+            -0.0001765351993532338
+          ],
+          "rootStrategyMeanAbsDelta": 0.0017963416641564316,
+          "rootStrategyMaxAbsDelta": 0.01907503604888916,
+          "targetStrategyMeanAbsDelta": 0.0,
+          "targetStrategyMaxAbsDelta": 0.0
+        }
+      ]
+    }
+  }
+}
