@@ -1,11 +1,9 @@
 //! Frozen-profile subtree traversal with whole-tree reporting.
 use crate::index::GameIndex;
-use crate::prepare::Prepared;
 use anyhow::Result;
 use hu_engine::{NodeKind, Solver, Storage, SubtreeRoot};
 use nlh::{PerPlayer, Player};
 use std::collections::BTreeSet;
-use std::path::Path;
 
 /// The selected execution scope, retained in run.json but not in legacy .sol metadata.
 #[derive(Clone, Debug)]
@@ -113,19 +111,14 @@ impl SubtreeSolve {
 /// Initialize outside averages before calculating a deterministic baseline. This
 /// also runs before checkpoint restoration, so resume gets the same constant.
 pub(crate) fn prepare<S: Storage>(
-    p: &Prepared,
     solver: &mut Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,
     summary: Option<&crate::profile::ProfileSummary>,
     has_frequency: bool,
+    base: Option<&crate::artifact::LoadedSol>,
+    target: Option<f64>,
 ) -> Result<(Option<SubtreeSolve>, Option<SolveScope>)> {
-    let Some(freeze) = p
-        .document
-        .spot
-        .profile
-        .as_ref()
-        .and_then(|p| p.freeze_upstream.as_ref())
-    else {
+    let Some(base) = base else {
         return Ok((None, None));
     };
     let summary = summary.expect("freeze has a resolved profile");
@@ -167,7 +160,7 @@ pub(crate) fn prepare<S: Storage>(
         let i = spans.partition_point(|&(start, _)| start <= s);
         i != 0 && s < spans[i - 1].1
     };
-    let base = crate::artifact::load_sol(Path::new(&freeze.solution), 0, None)?;
+    // Reuse the already hash-checked and tree-validated base reader.
     let outside = |id: u32| {
         let tree = &solver.game().tree;
         let node = tree.node(id);
@@ -207,6 +200,28 @@ pub(crate) fn prepare<S: Storage>(
         full_gain[Player::P0] - part_gain[Player::P0],
         full_gain[Player::P1] - part_gain[Player::P1],
     );
+    if target
+        .is_some_and(|target| (outside_gain[Player::P0] + outside_gain[Player::P1]) / 2.0 >= target)
+    {
+        // A whole-tree fallback must start from exactly the original zero state,
+        // not the base averages installed for the residual calculation.
+        solver.restore_stream(0, |storage| -> Result<()> {
+            match storage.arrays_mut() {
+                hu_engine::StorageArraysMut::F32 { strategy_sum, .. }
+                | hu_engine::StorageArraysMut::Mixed { strategy_sum, .. } => strategy_sum.fill(0.0),
+                hu_engine::StorageArraysMut::I16 {
+                    strategy_sum,
+                    strategy_scales,
+                    ..
+                } => {
+                    strategy_sum.fill(0);
+                    strategy_scales.fill(1.0);
+                }
+            }
+            Ok(())
+        })?;
+        return fallback("outside-residual");
+    }
     let scope = SolveScope {
         scope: "subtree",
         subtree_roots: roots.len(),

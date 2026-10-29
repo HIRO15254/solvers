@@ -1,0 +1,21 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 9383.8 MiB (f32) / 7491.3 MiB (i16) / 8437.6 MiB (i16-f32avg); resident 5152.3 MiB (game 109.4 MiB, 32 threads x 11.6 MiB), checkpoint encoder 440.0 MiB
+storage: f32
+TIMING tree_index 0.469870
+TIMING base_sha256 0.763169
+TIMING base_load 0.062133
+TIMING tree_compare_base_strategies 3.906360
+TIMING outside_seed 2.997007
+TIMING initial_full_subtree_eval 0.231016
+TIMING allocate_install_prepare 3.350684
+TIMING drive_pre_solve 9.182351
+warning: freeze_upstream solve scope: subtree
+iter=      25 expl_p0=7.610e-3 expl_p1=3.713e-3 nash_conv=1.132e-2
+iter=      50 expl_p0=7.062e-3 expl_p1=3.143e-3 nash_conv=1.020e-2
+TIMING final_evaluation 0.439169
+done: iterations=50 wall=0.06s ev_p0=1.516304 ev_p1=3.331124 nash_conv=1.020e-2
+freeze_upstream scope=subtree roots=1 fallback=none
+sol: wrote /work/subtree-timing-result/new_deep/solution.sol (962.63 MB, 434540 blocks, mode=Full)
+TIMING solution_export 15.737577
+TIMING checkpoint_write 17.450872
+TIMING finalization_total 17.450925

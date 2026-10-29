@@ -268,7 +268,7 @@ iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`ge
 到達weightが無い場合の`achieved`と`error`はnull。評価時の頻度はstdoutにも表示し、
 既存の`progress.jsonl`形式は変えない。profile無しでは`profile`自体を出さない。
 `freeze_upstream`指定時の`profile.solve_scope`は`subtree`または`whole-tree`、`subtree_roots`は部分木根の数、
-`fallback_reason`は非fallback時null、fallback時は`frequency-targets` / `no-targets` / `root-target` / `missing-base-strategy`である。
+`fallback_reason`は非fallback時null、fallback時は`frequency-targets` / `no-targets` / `root-target` / `missing-base-strategy` / `outside-residual`である。`outside-residual`は部分木外のNashConvの半分が停止目標以上の場合に選ぶ。
 これらはrun summaryに追加し、`.sol`のprofileには追加しない。
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。

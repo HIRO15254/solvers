@@ -151,7 +151,7 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 部分木を自動的に選び、各iterationでそれらを解く。部分木の外側には基準解の平均戦略をコピーし、
 部分木への到達をその戦略から求める。部分木内のprofileは従来どおり適用する。
 外側の戦略が基準解に保存されていない場合、頻度目標がある場合、対象が空の場合、
-または対象にrootが含まれる場合は、従来の木全体の反復へfallbackする。
+対象にrootが含まれる場合、または部分木外の制約付きNashConvの半分が停止目標以上の場合は、従来の木全体の反復へfallbackする（停止目標がない場合は残差によるfallbackを行わない）。
 上流固定に必要な戦略が無い場合の拒否は変わらない。
 停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
 storage、checkpoint、solutionも木全体を対象とし、部分木化によるstorage削減は前提としない。
@@ -322,7 +322,7 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 `entry`・`confidence`・`partial`は該当しない場合nullであり、`partial`はlockがboard上でliveなhandの一部だけを選ぶことを示す。
 `freeze_upstream`を使う`run.json`の`profile`には計算範囲`solve_scope`（`subtree` / `whole-tree`）、部分木根の数`subtree_roots`、
 `fallback_reason`（適用時以外はnull）も記録する。fallback理由は`frequency-targets`、`no-targets`、`root-target`、
-`missing-base-strategy`である。これらはrun summaryのfieldであり、`.sol`のprofileには追加しない。
+`missing-base-strategy`、`outside-residual`である。これらはrun summaryのfieldであり、`.sol`のprofileには追加しない。
 `profile.frozen_nodes`は固定したnode IDの配列、`general_sum`は一般和評価を示すbool、
 `frequencies`は目標nodeごとの配列である。各要素の`entry`は入力目標のindex、
 `node`はnode ID、`target`は目標、`achieved`は平均戦略の達成頻度、

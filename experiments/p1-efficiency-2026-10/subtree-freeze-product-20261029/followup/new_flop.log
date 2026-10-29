@@ -1,0 +1,30 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 9383.8 MiB (f32) / 7491.3 MiB (i16) / 8437.6 MiB (i16-f32avg); resident 5152.3 MiB (game 109.4 MiB, 32 threads x 11.6 MiB), checkpoint encoder 440.0 MiB
+storage: f32
+TIMING tree_index 0.471365
+TIMING base_sha256 0.765491
+TIMING base_load 0.067230
+TIMING tree_compare_base_strategies 3.908594
+TIMING outside_seed 1.085768
+TIMING initial_full_subtree_eval 0.361182
+TIMING allocate_install_prepare 1.573151
+TIMING drive_pre_solve 7.424430
+warning: freeze_upstream solve scope: subtree
+iter=      25 expl_p0=1.230e0 expl_p1=6.624e-1 nash_conv=1.892e0
+iter=      50 expl_p0=3.647e-1 expl_p1=3.745e-1 nash_conv=7.393e-1
+iter=     100 expl_p0=9.050e-2 expl_p1=9.131e-2 nash_conv=1.818e-1
+iter=     150 expl_p0=3.840e-2 expl_p1=3.402e-2 nash_conv=7.242e-2
+iter=     200 expl_p0=2.055e-2 expl_p1=1.763e-2 nash_conv=3.818e-2
+iter=     250 expl_p0=1.254e-2 expl_p1=1.117e-2 nash_conv=2.372e-2
+iter=     300 expl_p0=8.454e-3 expl_p1=7.836e-3 nash_conv=1.629e-2
+iter=     350 expl_p0=6.209e-3 expl_p1=6.019e-3 nash_conv=1.223e-2
+iter=     367 expl_p0=5.614e-3 expl_p1=5.565e-3 nash_conv=1.118e-2
+iter=     370 expl_p0=5.522e-3 expl_p1=5.489e-3 nash_conv=1.101e-2
+iter=     373 expl_p0=5.440e-3 expl_p1=5.383e-3 nash_conv=1.082e-2
+TIMING final_evaluation 0.428822
+done: iterations=373 wall=41.52s ev_p0=1.567006 ev_p1=3.316095 nash_conv=1.082e-2
+freeze_upstream scope=subtree roots=1 fallback=none
+sol: wrote /work/subtree-timing-result/new_flop/solution.sol (1064.44 MB, 434540 blocks, mode=Full)
+TIMING solution_export 14.618762
+TIMING checkpoint_write 28.094231
+TIMING finalization_total 28.094289

@@ -157,7 +157,7 @@ CFRはlockもincentiveも無い部分木、EV/BRはlockの無い部分木（加�
 profile自体はengine stateに含めず、製品側がconfigから再構築する。
 P1の`freeze_upstream`はprofile対象のうち別の対象の子孫ではないnodeを根とする最大部分木を選ぶ。
 部分木外の戦略は基準solutionの平均戦略からコピーし、その戦略で部分木へのreachを計算して各部分木を反復する。
-外側の戦略が欠ける場合、frequency目標がある場合、対象が空またはrootを含む場合は木全体の反復へfallbackする。
+外側の戦略が欠ける場合、frequency目標がある場合、対象が空またはrootを含む場合、外側のNashConv/2が停止目標以上の場合は木全体の反復へfallbackする。
 上流固定に必要な戦略が無い場合は従来どおり拒否する。停止・報告の評価は木全体で行い、
 storageとcheckpoint・solutionも木全体を保持する。checkpointには計算modeと部分木identityを結び付け、
 新modeを選んだ再開時は旧whole-tree modeのcheckpointを拒否する。

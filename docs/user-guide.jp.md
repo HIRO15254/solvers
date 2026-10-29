@@ -286,7 +286,7 @@ solveはprofile対象の最大部分木を自動的に選び、外側には基�
 storageや保存成果物も木全体を扱うため、部分木化によるmemory削減は期待しない。
 `run.json`の`profile`で`solve_scope`（`subtree` / `whole-tree`）、`subtree_roots`、
 任意の`fallback_reason`を確認できる。理由は`frequency-targets`、`no-targets`、`root-target`、
-`missing-base-strategy`である。
+`missing-base-strategy`、`outside-residual`である。後者は対象外の残差だけで停止目標以上となる場合に全木を再solveする。
 再開時は計算modeと部分木identityを照合する。新modeを選んだ場合、旧whole-tree modeのcheckpointは再開できないので現行configから再solveする。
 
 既存解の戦略を出発点にするには、lockをexportして編集し、`relock`で追加して再solveする:

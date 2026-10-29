@@ -168,7 +168,7 @@ pub(crate) fn query<S: Storage>(
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
         bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
     }
-    let (game, index, resolved) = build_profiled(p)?;
+    let (game, index, resolved, base) = build_profiled_with_base(p)?;
     let mut solver = Solver::<_, S>::new(
         game,
         schedule(&p.settings.solver.algorithm),
@@ -180,15 +180,17 @@ pub(crate) fn query<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
+    let target = target_nash_conv.map(|t| t / 2.0).or(p.target);
     let (subtree, _) = crate::subtree::prepare(
-        p,
         &mut solver,
         &index,
         controller.summary.as_ref(),
         !controller.targets.is_empty(),
+        base.as_ref(),
+        target,
     )?;
     let start = Instant::now();
-    let target = target_nash_conv.map(|t| t / 2.0).or(p.target);
+    drop(base);
     let check_every = p.settings.solver.stop.check_every;
     let mut history = Vec::new();
     let mut evaluated = None;
@@ -267,10 +269,23 @@ pub fn build_profiled(
     GameIndex,
     Option<crate::profile::ResolvedProfile>,
 )> {
+    let (game, index, profile, _) = build_profiled_with_base(p)?;
+    Ok((game, index, profile))
+}
+
+type ProfiledWithBase = (
+    CompiledGame<crate::PostflopEvaluator>,
+    GameIndex,
+    Option<crate::profile::ResolvedProfile>,
+    Option<crate::artifact::LoadedSol>,
+);
+
+fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
     let mut built = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
         .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
     let start = crate::artifact::start_street_from_board_len(p.config.board.len());
     let index = GameIndex::from_game(&built.game, &built.node_info, start);
+    let mut loaded_base = None;
     let resolved = if let Some(ir) = &p.document.spot.profile {
         if !matches!(
             p.document.spot.economics.utility,
@@ -351,6 +366,7 @@ pub fn build_profiled(
                     None
                 });
             }
+            loaded_base = Some(base);
         }
         let provider = |id: u32| base_strategies.get(id as usize).cloned().flatten();
         let resolved = crate::profile::resolve_profile(
@@ -381,7 +397,7 @@ pub fn build_profiled(
     };
     drop(built.node_info);
     trim_builder_heap();
-    Ok((built.game, index, resolved))
+    Ok((built.game, index, resolved, loaded_base))
 }
 
 /// Return freed builder pages to the system when using glibc's allocator.
@@ -598,7 +614,7 @@ fn drive<S: Storage>(
     for warning in warnings(p) {
         diagnostics(Diagnostic::Warning(warning));
     }
-    let (game, index, resolved) = build_profiled(p)?;
+    let (game, index, resolved, base) = build_profiled_with_base(p)?;
     let stop = &p.settings.solver.stop;
     let mut solver = Solver::<_, S>::new(
         game,
@@ -613,12 +629,14 @@ fn drive<S: Storage>(
     let saved_lambdas = state.as_ref().map(|s| s.frequency_lambdas.as_slice());
     let mut controller = install_profile(&mut solver, resolved, saved_lambdas)?;
     let (subtree, solve_scope) = crate::subtree::prepare(
-        p,
         &mut solver,
         &index,
         controller.summary.as_ref(),
         !controller.targets.is_empty(),
+        base.as_ref(),
+        p.target,
     )?;
+    drop(base);
     let mode = if subtree.is_some() {
         crate::checkpoint::CheckpointMode::Subtree
     } else {

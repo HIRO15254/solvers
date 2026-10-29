@@ -1,0 +1,15 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 4851.8 MiB (f32) / 2959.3 MiB (i16) / 3905.5 MiB (i16-f32avg); resident 620.3 MiB (game 109.4 MiB, 32 threads x 11.6 MiB), checkpoint encoder 440.0 MiB
+storage: f32
+iter=      25 expl_p0=1.230e0 expl_p1=6.624e-1 nash_conv=1.892e0
+iter=      50 expl_p0=3.648e-1 expl_p1=3.745e-1 nash_conv=7.393e-1
+iter=     100 expl_p0=9.050e-2 expl_p1=9.125e-2 nash_conv=1.818e-1
+iter=     150 expl_p0=3.840e-2 expl_p1=3.396e-2 nash_conv=7.236e-2
+iter=     200 expl_p0=2.054e-2 expl_p1=1.757e-2 nash_conv=3.812e-2
+iter=     250 expl_p0=1.254e-2 expl_p1=1.111e-2 nash_conv=2.365e-2
+iter=     300 expl_p0=8.449e-3 expl_p1=7.773e-3 nash_conv=1.622e-2
+iter=     350 expl_p0=6.203e-3 expl_p1=5.956e-3 nash_conv=1.216e-2
+iter=     366 expl_p0=5.641e-3 expl_p1=5.589e-3 nash_conv=1.123e-2
+iter=     370 expl_p0=5.516e-3 expl_p1=5.426e-3 nash_conv=1.094e-2
+done: iterations=370 wall=62.02s ev_p0=1.566970 ev_p1=3.316122 nash_conv=1.094e-2
+sol: wrote /work/subtree-timing-result/old_flop/solution.sol (1049.39 MB, 434540 blocks, mode=Full)
