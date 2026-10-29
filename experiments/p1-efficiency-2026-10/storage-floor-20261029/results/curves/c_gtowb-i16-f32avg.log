@@ -1,0 +1,16 @@
+tree: nodes=6088200 terminals=3787911 rank_tables=1176 storage=20131.3 MiB (f32) / 10083.2 MiB (i16) / 15107.2 MiB (i16-f32avg)
+memory estimate: 21112.7 MiB (f32) / 11064.5 MiB (i16) / 16088.6 MiB (i16-f32avg); resident 749.4 MiB (game 487.5 MiB, 16 threads x 12.5 MiB), checkpoint encoder 232.0 MiB
+storage: i16-f32avg
+warning: no stop target: runs until max_iterations or max_time
+iter=      25 expl_p0=1.623e0 expl_p1=1.307e0 nash_conv=2.930e0
+iter=      50 expl_p0=3.656e-1 expl_p1=3.305e-1 nash_conv=6.961e-1
+iter=      75 expl_p0=1.252e-1 expl_p1=1.096e-1 nash_conv=2.348e-1
+iter=     100 expl_p0=5.893e-2 expl_p1=5.224e-2 nash_conv=1.112e-1
+iter=     125 expl_p0=3.578e-2 expl_p1=3.226e-2 nash_conv=6.804e-2
+iter=     150 expl_p0=2.434e-2 expl_p1=2.289e-2 nash_conv=4.723e-2
+iter=     175 expl_p0=1.896e-2 expl_p1=1.872e-2 nash_conv=3.768e-2
+iter=     200 expl_p0=1.652e-2 expl_p1=1.476e-2 nash_conv=3.128e-2
+iter=     225 expl_p0=1.319e-2 expl_p1=1.072e-2 nash_conv=2.391e-2
+iter=     250 expl_p0=9.902e-3 expl_p1=8.601e-3 nash_conv=1.850e-2
+done: iterations=250 wall=360.23s ev_p0=1.509576 ev_p1=3.325094 nash_conv=1.850e-2
+sol: wrote /work/storage-floor-curves/c_gtowb-i16-f32avg/solution.sol (6006.46 MB, 2293609 blocks, mode=Full)

@@ -1,0 +1,34 @@
+tree: nodes=1164212 terminals=728048 rank_tables=1176 storage=3791.5 MiB (f32) / 1899.1 MiB (i16) / 2845.3 MiB (i16-f32avg)
+memory estimate: 4358.0 MiB (f32) / 2465.6 MiB (i16) / 3411.8 MiB (i16-f32avg); resident 334.5 MiB (game 109.4 MiB, 16 threads x 11.6 MiB), checkpoint encoder 232.0 MiB
+storage: i16
+warning: no stop target: runs until max_iterations or max_time
+iter=      25 expl_p0=1.803e0 expl_p1=9.565e-1 nash_conv=2.760e0
+iter=      50 expl_p0=5.028e-1 expl_p1=3.015e-1 nash_conv=8.044e-1
+iter=      75 expl_p0=3.584e-1 expl_p1=2.378e-1 nash_conv=5.962e-1
+iter=     100 expl_p0=1.335e-1 expl_p1=7.684e-2 nash_conv=2.104e-1
+iter=     125 expl_p0=7.967e-2 expl_p1=4.107e-2 nash_conv=1.207e-1
+iter=     150 expl_p0=5.296e-2 expl_p1=2.573e-2 nash_conv=7.869e-2
+iter=     175 expl_p0=3.826e-2 expl_p1=1.814e-2 nash_conv=5.640e-2
+iter=     200 expl_p0=2.895e-2 expl_p1=1.412e-2 nash_conv=4.306e-2
+iter=     225 expl_p0=2.236e-2 expl_p1=1.223e-2 nash_conv=3.459e-2
+iter=     250 expl_p0=1.840e-2 expl_p1=1.080e-2 nash_conv=2.920e-2
+iter=     275 expl_p0=2.808e-2 expl_p1=1.761e-2 nash_conv=4.569e-2
+iter=     300 expl_p0=1.364e-2 expl_p1=8.694e-3 nash_conv=2.234e-2
+iter=     325 expl_p0=9.856e-3 expl_p1=6.887e-3 nash_conv=1.674e-2
+iter=     350 expl_p0=8.089e-3 expl_p1=5.595e-3 nash_conv=1.368e-2
+iter=     375 expl_p0=6.967e-3 expl_p1=4.996e-3 nash_conv=1.196e-2
+iter=     400 expl_p0=6.100e-3 expl_p1=4.543e-3 nash_conv=1.064e-2
+iter=     425 expl_p0=5.441e-3 expl_p1=4.311e-3 nash_conv=9.752e-3
+iter=     450 expl_p0=4.959e-3 expl_p1=4.259e-3 nash_conv=9.218e-3
+iter=     475 expl_p0=4.573e-3 expl_p1=4.290e-3 nash_conv=8.863e-3
+iter=     500 expl_p0=4.246e-3 expl_p1=4.329e-3 nash_conv=8.575e-3
+iter=     525 expl_p0=4.010e-3 expl_p1=4.450e-3 nash_conv=8.459e-3
+iter=     550 expl_p0=3.786e-3 expl_p1=4.573e-3 nash_conv=8.359e-3
+iter=     575 expl_p0=3.648e-3 expl_p1=4.878e-3 nash_conv=8.526e-3
+iter=     600 expl_p0=3.528e-3 expl_p1=5.013e-3 nash_conv=8.541e-3
+iter=     625 expl_p0=3.452e-3 expl_p1=5.252e-3 nash_conv=8.704e-3
+iter=     650 expl_p0=3.423e-3 expl_p1=5.607e-3 nash_conv=9.030e-3
+iter=     675 expl_p0=3.391e-3 expl_p1=5.889e-3 nash_conv=9.280e-3
+iter=     700 expl_p0=3.404e-3 expl_p1=6.211e-3 nash_conv=9.616e-3
+done: iterations=700 wall=373.01s ev_p0=1.515521 ev_p1=3.328650 nash_conv=9.616e-3
+sol: wrote /work/storage-floor-curves/flop_srp-i16/solution.sol (504.33 MB, 434540 blocks, mode=Full)

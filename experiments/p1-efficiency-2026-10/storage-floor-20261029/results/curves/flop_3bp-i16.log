@@ -1,0 +1,74 @@
+tree: nodes=3087614 terminals=1973744 rank_tables=1176 storage=2070.2 MiB (f32) / 1043.5 MiB (i16) / 1556.8 MiB (i16-f32avg)
+memory estimate: 2653.5 MiB (f32) / 1626.9 MiB (i16) / 2140.2 MiB (i16-f32avg); resident 351.4 MiB (game 244.4 MiB, 16 threads x 3.7 MiB), checkpoint encoder 232.0 MiB
+storage: i16
+warning: no stop target: runs until max_iterations or max_time
+iter=      25 expl_p0=2.388e0 expl_p1=3.361e0 nash_conv=5.749e0
+iter=      50 expl_p0=8.371e-1 expl_p1=7.792e-1 nash_conv=1.616e0
+iter=      75 expl_p0=8.680e-1 expl_p1=5.989e-1 nash_conv=1.467e0
+iter=     100 expl_p0=1.982e-1 expl_p1=2.106e-1 nash_conv=4.088e-1
+iter=     125 expl_p0=5.086e-1 expl_p1=2.748e-1 nash_conv=7.833e-1
+iter=     150 expl_p0=3.896e-1 expl_p1=2.000e-1 nash_conv=5.896e-1
+iter=     175 expl_p0=2.291e-1 expl_p1=1.266e-1 nash_conv=3.557e-1
+iter=     200 expl_p0=1.520e-1 expl_p1=8.582e-2 nash_conv=2.378e-1
+iter=     225 expl_p0=1.075e-1 expl_p1=6.008e-2 nash_conv=1.676e-1
+iter=     250 expl_p0=8.018e-2 expl_p1=4.366e-2 nash_conv=1.238e-1
+iter=     275 expl_p0=8.339e-2 expl_p1=5.862e-2 nash_conv=1.420e-1
+iter=     300 expl_p0=5.605e-2 expl_p1=2.944e-2 nash_conv=8.549e-2
+iter=     325 expl_p0=4.429e-2 expl_p1=2.118e-2 nash_conv=6.547e-2
+iter=     350 expl_p0=3.474e-2 expl_p1=1.700e-2 nash_conv=5.173e-2
+iter=     375 expl_p0=3.043e-2 expl_p1=1.447e-2 nash_conv=4.490e-2
+iter=     400 expl_p0=2.695e-2 expl_p1=1.275e-2 nash_conv=3.970e-2
+iter=     425 expl_p0=2.399e-2 expl_p1=1.150e-2 nash_conv=3.549e-2
+iter=     450 expl_p0=2.117e-2 expl_p1=1.098e-2 nash_conv=3.215e-2
+iter=     475 expl_p0=1.936e-2 expl_p1=1.049e-2 nash_conv=2.984e-2
+iter=     500 expl_p0=1.843e-2 expl_p1=1.015e-2 nash_conv=2.858e-2
+iter=     525 expl_p0=1.782e-2 expl_p1=9.933e-3 nash_conv=2.775e-2
+iter=     550 expl_p0=1.721e-2 expl_p1=9.657e-3 nash_conv=2.687e-2
+iter=     575 expl_p0=1.707e-2 expl_p1=9.529e-3 nash_conv=2.659e-2
+iter=     600 expl_p0=1.676e-2 expl_p1=9.818e-3 nash_conv=2.658e-2
+iter=     625 expl_p0=1.594e-2 expl_p1=1.005e-2 nash_conv=2.599e-2
+iter=     650 expl_p0=1.555e-2 expl_p1=1.013e-2 nash_conv=2.568e-2
+iter=     675 expl_p0=1.536e-2 expl_p1=1.023e-2 nash_conv=2.560e-2
+iter=     700 expl_p0=1.518e-2 expl_p1=1.025e-2 nash_conv=2.543e-2
+iter=     725 expl_p0=1.512e-2 expl_p1=1.036e-2 nash_conv=2.548e-2
+iter=     750 expl_p0=1.514e-2 expl_p1=1.051e-2 nash_conv=2.565e-2
+iter=     775 expl_p0=1.521e-2 expl_p1=1.055e-2 nash_conv=2.576e-2
+iter=     800 expl_p0=1.529e-2 expl_p1=1.069e-2 nash_conv=2.598e-2
+iter=     825 expl_p0=1.532e-2 expl_p1=1.091e-2 nash_conv=2.622e-2
+iter=     850 expl_p0=1.535e-2 expl_p1=1.111e-2 nash_conv=2.646e-2
+iter=     875 expl_p0=1.536e-2 expl_p1=1.136e-2 nash_conv=2.672e-2
+iter=     900 expl_p0=1.539e-2 expl_p1=1.159e-2 nash_conv=2.698e-2
+iter=     925 expl_p0=1.542e-2 expl_p1=1.183e-2 nash_conv=2.725e-2
+iter=     950 expl_p0=1.546e-2 expl_p1=1.207e-2 nash_conv=2.753e-2
+iter=     975 expl_p0=1.550e-2 expl_p1=1.232e-2 nash_conv=2.782e-2
+iter=    1000 expl_p0=1.554e-2 expl_p1=1.257e-2 nash_conv=2.811e-2
+iter=    1025 expl_p0=6.397e-2 expl_p1=8.273e-2 nash_conv=1.467e-1
+iter=    1050 expl_p0=6.930e-3 expl_p1=9.638e-3 nash_conv=1.657e-2
+iter=    1075 expl_p0=3.933e-3 expl_p1=6.066e-3 nash_conv=9.999e-3
+iter=    1100 expl_p0=2.859e-3 expl_p1=4.844e-3 nash_conv=7.703e-3
+iter=    1125 expl_p0=2.310e-3 expl_p1=4.340e-3 nash_conv=6.649e-3
+iter=    1150 expl_p0=2.027e-3 expl_p1=4.125e-3 nash_conv=6.152e-3
+iter=    1175 expl_p0=1.855e-3 expl_p1=3.982e-3 nash_conv=5.837e-3
+iter=    1200 expl_p0=1.775e-3 expl_p1=3.959e-3 nash_conv=5.734e-3
+iter=    1225 expl_p0=1.735e-3 expl_p1=3.955e-3 nash_conv=5.690e-3
+iter=    1250 expl_p0=1.725e-3 expl_p1=3.993e-3 nash_conv=5.718e-3
+iter=    1275 expl_p0=1.749e-3 expl_p1=4.030e-3 nash_conv=5.779e-3
+iter=    1300 expl_p0=1.798e-3 expl_p1=4.127e-3 nash_conv=5.925e-3
+iter=    1325 expl_p0=1.866e-3 expl_p1=4.239e-3 nash_conv=6.105e-3
+iter=    1350 expl_p0=1.941e-3 expl_p1=4.354e-3 nash_conv=6.295e-3
+iter=    1375 expl_p0=2.028e-3 expl_p1=4.473e-3 nash_conv=6.501e-3
+iter=    1400 expl_p0=2.122e-3 expl_p1=4.641e-3 nash_conv=6.763e-3
+iter=    1425 expl_p0=2.234e-3 expl_p1=4.801e-3 nash_conv=7.035e-3
+iter=    1450 expl_p0=2.347e-3 expl_p1=4.939e-3 nash_conv=7.286e-3
+iter=    1475 expl_p0=2.459e-3 expl_p1=5.092e-3 nash_conv=7.550e-3
+iter=    1500 expl_p0=2.567e-3 expl_p1=5.234e-3 nash_conv=7.801e-3
+iter=    1525 expl_p0=2.688e-3 expl_p1=5.374e-3 nash_conv=8.062e-3
+iter=    1550 expl_p0=2.821e-3 expl_p1=5.528e-3 nash_conv=8.349e-3
+iter=    1575 expl_p0=2.955e-3 expl_p1=5.681e-3 nash_conv=8.636e-3
+iter=    1600 expl_p0=3.089e-3 expl_p1=5.841e-3 nash_conv=8.930e-3
+iter=    1625 expl_p0=3.226e-3 expl_p1=5.991e-3 nash_conv=9.216e-3
+iter=    1650 expl_p0=3.342e-3 expl_p1=6.159e-3 nash_conv=9.501e-3
+iter=    1675 expl_p0=3.478e-3 expl_p1=6.306e-3 nash_conv=9.784e-3
+iter=    1700 expl_p0=3.604e-3 expl_p1=6.471e-3 nash_conv=1.007e-2
+done: iterations=1700 wall=360.05s ev_p0=16.586716 ev_p1=3.901574 nash_conv=1.007e-2
+sol: wrote /work/storage-floor-curves/flop_3bp-i16/solution.sol (167.01 MB, 1107524 blocks, mode=Full)

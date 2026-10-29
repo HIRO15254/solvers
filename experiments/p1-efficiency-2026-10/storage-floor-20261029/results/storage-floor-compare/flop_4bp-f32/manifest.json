@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "flop_4bp-f32",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "eb978a38dc2dd8755c7ca25c61fd1beec92e87222b86eac4e100424f77dc71c0",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-compare/flop_4bp-f32"
+  ],
+  "pid": 6494,
+  "createdUnixMs": 1793254232186,
+  "startedUnixMs": 1793254232186,
+  "finishedUnixMs": 1793254236913,
+  "failure": null,
+  "completion": "completed"
+}

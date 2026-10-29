@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "c_gtowb-i16-f32avg",
+  "state": "completed",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "016a5870e3ccab53a74d0e610b318b9a263a6a50dfd27b45767a1f7f78c8a968",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-curves/c_gtowb-i16-f32avg"
+  ],
+  "pid": 15077,
+  "createdUnixMs": 1793251759063,
+  "startedUnixMs": 1793251759063,
+  "finishedUnixMs": 1793252231092,
+  "failure": null,
+  "completion": "completed"
+}

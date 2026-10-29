@@ -1,0 +1,19 @@
+{
+  "reproduction": "partial; see README for finite time budgets and interrupted runs",
+  "sourceCommit": "00483eaff5d77a81bcec8f944d7e112858a22af3",
+  "toolchain": "Rust 1.97.0; RUSTFLAGS=-C target-cpu=znver3",
+  "binaries": {
+    "initialSolversSha256": "08f4fc46f8e322e98b75edb7cf6769997bda486b96f6fa147c86f1b7db8dcee4",
+    "p1BenchSha256": "5ae48d20f83d5bc6c58b79a7701af9784cd41c152d844a5670c82eaf65e8dd5d",
+    "replacementSolversSha256": "b657cc2bbcdaa56927cb30a19ef99225325b9d285aada45fe838aa9525d3aa1b"
+  },
+  "machines": [
+    {"role": "dev", "instance": "i-0b8b19bb9a5ffc436", "type": "r6a.8xlarge", "az": "us-east-1c", "market": "spot", "usage": "release build 04:17–04:20 UTC; later Spot-reclaimed"},
+    {"role": "bench", "instance": "i-082131af851753bb3", "type": "c6a.8xlarge", "az": "us-east-1b", "market": "spot", "usage": "six locked timing groups 04:27:10–05:16:38 UTC, including waits"},
+    {"role": "lab", "instance": "i-033f44ee877c2f755", "type": "r6a.8xlarge", "az": "us-east-1c", "market": "spot", "usage": "curves 04:21:37–05:44:40 UTC; comparison and extension interrupted by Spot reclaim around 06:05; incomplete results on that instance lost"},
+    {"role": "replacement lab", "instance": "i-045a698a636ea87fd", "type": "c6a.8xlarge", "az": "us-east-1b", "market": "spot", "usage": "rebuild and rerun 06:08:48–06:56 UTC; Spot-reclaimed; comparison snapshot captured 06:38; large-tree partial snapshot only"}
+  ],
+  "results": {"curves": "results/curves/", "timing": "results/timing/", "timingConfigs": "results/timing-configs/", "summary": "results/summary.json", "comparisons": "results/storage-floor-compare/", "interruptedExtension": "results/storage-floor-large/"},
+  "commands": {"curves": "python3 convergence.py SOLVERS CONFIG_DIR OUT", "timing": "bash timing.sh TREE THREADS (under rc.py --bench lock)", "matchedTargets": "python3 compare.py SOLVERS CONFIG_DIR OUT", "large": "python3 large.py SOLVERS CONFIG_DIR OUT", "summary": "python summarize.py"},
+  "artifacts": "Progress and small summaries are retained; .sol files and binaries were remote scratch and are not Git-backed. Both labs were Spot-reclaimed. The first lab's comparison and extension, and the second lab's completed large-tree results after the 06:38 snapshot, were lost."
+}

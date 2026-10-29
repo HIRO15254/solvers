@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "runId": "c_gtowb-f32",
+  "state": "running",
+  "gameKind": "hu-postflop",
+  "configSchema": "solvers.nlh/v1",
+  "configHash": "050425f8995af554c257333b2bab52644049456ea31c19afea3f2dbdbc368df3",
+  "cliVersion": "0.1.0",
+  "command": [
+    "solve",
+    "/work/storage-floor-large/c_gtowb-f32"
+  ],
+  "pid": 7523,
+  "createdUnixMs": 1793255562816,
+  "startedUnixMs": 1793255562816,
+  "finishedUnixMs": null,
+  "failure": null,
+  "completion": null
+}

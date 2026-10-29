@@ -1,0 +1,20 @@
+tree: nodes=3087614 terminals=1973744 rank_tables=1176 storage=2070.2 MiB (f32) / 1043.5 MiB (i16) / 1556.8 MiB (i16-f32avg)
+memory estimate: 2519.7 MiB (f32) / 1538.1 MiB (i16) / 2051.4 MiB (i16-f32avg); resident 321.5 MiB (game 244.4 MiB, 8 threads x 3.7 MiB), checkpoint encoder 128.0 MiB
+storage: i16
+iter=      25 expl_p0=2.388e0 expl_p1=3.361e0 nash_conv=5.749e0
+iter=      50 expl_p0=8.371e-1 expl_p1=7.792e-1 nash_conv=1.616e0
+iter=      75 expl_p0=8.680e-1 expl_p1=5.989e-1 nash_conv=1.467e0
+iter=     100 expl_p0=1.982e-1 expl_p1=2.106e-1 nash_conv=4.088e-1
+iter=     125 expl_p0=5.086e-1 expl_p1=2.748e-1 nash_conv=7.833e-1
+iter=     150 expl_p0=3.896e-1 expl_p1=2.000e-1 nash_conv=5.896e-1
+iter=     175 expl_p0=2.291e-1 expl_p1=1.266e-1 nash_conv=3.557e-1
+iter=     200 expl_p0=1.520e-1 expl_p1=8.582e-2 nash_conv=2.378e-1
+iter=     225 expl_p0=1.075e-1 expl_p1=6.008e-2 nash_conv=1.676e-1
+iter=     250 expl_p0=8.018e-2 expl_p1=4.366e-2 nash_conv=1.238e-1
+iter=     275 expl_p0=8.339e-2 expl_p1=5.862e-2 nash_conv=1.420e-1
+iter=     300 expl_p0=5.605e-2 expl_p1=2.944e-2 nash_conv=8.549e-2
+iter=     325 expl_p0=4.429e-2 expl_p1=2.118e-2 nash_conv=6.547e-2
+iter=     350 expl_p0=3.474e-2 expl_p1=1.700e-2 nash_conv=5.173e-2
+iter=     375 expl_p0=3.043e-2 expl_p1=1.447e-2 nash_conv=4.490e-2
+done: iterations=375 wall=139.46s ev_p0=16.585998 ev_p1=3.902193 nash_conv=4.490e-2
+sol: wrote /work/storage-floor-compare/flop_3bp-i16/solution.sol (262.20 MB, 1107524 blocks, mode=Full)
