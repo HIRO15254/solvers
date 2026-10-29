@@ -110,8 +110,8 @@ impl JobRunner {
     /// cancel, finishing the current evaluation boundary and writing a
     /// checkpoint, so the run stays resumable. Unix sends SIGINT; Windows
     /// sends Ctrl-Break to the child's own process group. A queued job is
-    /// simply dropped from the queue. A signal that cannot be delivered is
-    /// an error, never a silent no-op.
+    /// persisted as canceled before it is removed from the queue. A signal
+    /// or manifest write that fails is an error, never a silent no-op.
     pub fn cancel(&self, run_id: &str) -> Result<CancelOutcome> {
         let mut state = self.state.lock().expect("job state");
         if let Some(index) = state
@@ -119,6 +119,14 @@ impl JobRunner {
             .iter()
             .position(|queued| queued.run_id == run_id)
         {
+            let directory = &state.queue[index].directory;
+            let mut manifest = runfiles::RunManifest::read(directory)
+                .with_context(|| format!("reading manifest for queued run {run_id:?}"))?;
+            manifest.state = runfiles::RunState::Canceled;
+            manifest.finished_unix_ms = Some(runfiles::unix_millis());
+            manifest
+                .write_atomic(directory)
+                .with_context(|| format!("canceling queued run {run_id:?}"))?;
             state.queue.remove(index);
             return Ok(CancelOutcome::Dequeued);
         }
@@ -324,6 +332,9 @@ mod tests {
     fn cancelling_a_queued_job_removes_it_without_signalling() {
         let (base, runner) = runner(1);
         let held = run_dir(base.path(), "held");
+        let mut manifest = runfiles::RunManifest::new("waiting", "test", None, "", vec![]);
+        manifest.state = runfiles::RunState::Queued;
+        manifest.write_atomic(&held).unwrap();
         {
             let mut state = runner.state.lock().unwrap();
             state.queue.push_back(Queued {
