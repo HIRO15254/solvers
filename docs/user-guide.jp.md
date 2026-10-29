@@ -6,7 +6,7 @@ P1は2人が残ったFlop/Turn/Riverのstreet開始、P2は2〜9人のPreflop ro
 P2の方式・品質は暫定であり、3人以上の結果にNash/GTO保証は無い。
 
 現行versionは`0.2.0`。`solvers --version`（`-V`）は`solvers 0.2.0 (<git-hash>)`、
-P1専用buildでは`solvers 0.2.0 (<git-hash>), P1 only`と表示する。
+P1専用buildでは`solvers 0.2.0 (<git-hash>), heads-up postflop only`と表示する。
 `solversd --version`は`solversd 0.2.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
 0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
 minor releaseで`solvers.nlh/v1`のkeyを削除することがあり、削除したkeyはunknown-key errorになる（移行方法は変更履歴に記す）。
@@ -116,7 +116,7 @@ cargo build --release -p cli -p daemon --no-default-features
 ```
 
 binaryは`target/release/solvers`と`solversd`（Windowsでは`.exe`）である。
-これはP1専用配布buildで、P2とderiveは利用できない。拒否診断は`p2` feature付きbuildを案内する。
+これはP1専用配布buildで、P2とderiveは利用できない。P2入力の拒否診断は`p2` feature付きbuildを案内する。
 P2も使う開発用buildは`--no-default-features`を外す（`cli`の`p2` featureは既定で有効）。
 以下のP2・deriveの手順は`p2` feature付きbuildを前提とする。
 以下はbinaryをPATHへ置いた場合の例である。

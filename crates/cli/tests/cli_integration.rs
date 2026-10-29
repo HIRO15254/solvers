@@ -55,7 +55,7 @@ fn version_includes_revision_and_build_scope() {
     let suffix = if cfg!(feature = "p2") {
         ")"
     } else {
-        "), P1 only"
+        "), heads-up postflop only"
     };
     for flag in ["--version", "-V"] {
         let output = run_solvers_ok(&[flag]);

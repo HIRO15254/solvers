@@ -209,14 +209,14 @@ use clap::{Parser, Subcommand};
     version = if cfg!(feature = "p2") {
         concat!(env!("CARGO_PKG_VERSION"), " (", env!("SOLVERS_GIT_HASH"), ")")
     } else {
-        concat!(env!("CARGO_PKG_VERSION"), " (", env!("SOLVERS_GIT_HASH"), "), P1 only")
+        concat!(env!("CARGO_PKG_VERSION"), " (", env!("SOLVERS_GIT_HASH"), "), heads-up postflop only")
     }
 )]
 #[command(about = "Poker solver")]
 #[cfg_attr(
     not(feature = "p2"),
     command(
-        long_about = "Poker solver\n\nP1-only build: P2 (Multiway Preflop) and derive are excluded; use a build with the `p2` feature to enable them. P2 inputs fail with NLH005 (exit 2); P2 artifacts fail with exit 3. Use config new --product p1. Product-agnostic line, status, watch and runs ls remain available."
+        long_about = "Poker solver\n\nThis build supports heads-up postflop. Preflop solving is not included."
     )
 )]
 struct Cli {
@@ -232,9 +232,10 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Generate a P1 flop input from a P2 run's saved preflop average strategy.
+    /// Generate a heads-up postflop input from a saved preflop average strategy.
+    #[cfg(feature = "p2")]
     Derive {
-        /// P2 run directory containing solution.mwsol.
+        /// Preflop run directory containing solution.mwsol.
         run: std::path::PathBuf,
         /// Preflop-only line in common-input notation (implicit folds included).
         #[arg(long)]
@@ -242,7 +243,7 @@ enum Command {
         /// Three distinct flop cards, for example "Ks 7h 2d".
         #[arg(long)]
         board: String,
-        /// P1 tree, solver, output and run settings (solvers.nlh/v1 TOML).
+        /// Heads-up postflop tree, solver, output and run settings (solvers.nlh/v1 TOML).
         #[arg(long)]
         base: Option<std::path::PathBuf>,
         /// Write effective input here; defaults to stdout. Warnings go to stderr.
@@ -270,7 +271,7 @@ enum Command {
         #[arg(long)]
         resources: bool,
     },
-    /// Build and inspect a P1 config's public tree without solving.
+    /// Build and inspect a heads-up postflop config's public tree without solving.
     Tree {
         config: std::path::PathBuf,
         /// Node history or slash-separated action labels; repeat for multiple nodes.
@@ -318,9 +319,9 @@ enum Command {
         #[command(subcommand)]
         command: RunsCommand,
     },
-    /// Merge profile edits into a solved P1 input and optionally solve it.
+    /// Merge profile edits into a solved heads-up postflop input and optionally solve it.
     Relock {
-        /// P1 run directory or .sol artifact.
+        /// Heads-up postflop run directory or .sol artifact.
         source: std::path::PathBuf,
         /// New run directory.
         #[arg(
@@ -367,10 +368,16 @@ enum Command {
         /// Run directory to create. Every artifact of the run lands here.
         #[arg(long)]
         out: std::path::PathBuf,
-        /// Override v1 worker threads, including Multiway tree construction.
+        /// Override worker threads.
         #[arg(long)]
         threads: Option<usize>,
-        /// Override v1 memory (P1 auto: 80% physical RAM; P2 auto: 6GiB).
+        /// Override memory (heads-up postflop auto: 80% physical RAM).
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                help = "Override memory (heads-up postflop auto: 80% physical RAM; preflop auto: 6GiB)."
+            )
+        )]
         #[arg(long)]
         memory: Option<String>,
         /// Override the v1 cumulative solve-time limit.
@@ -378,16 +385,21 @@ enum Command {
         max_time: Option<String>,
     },
     /// Continue a checkpointed solve to the configured solver stop ceiling.
-    /// HU Postflop updates solution.sol and run.json and keeps the cumulative time budget.
+    /// Heads-up postflop updates solution.sol and run.json and keeps the cumulative time budget.
     /// Active in-place runs are rejected (exit 1); --out can fork an active source.
     Resume {
-        /// Run directory from `solve --out`, or a bare self-contained
-        /// `.mwckpt` that was moved out of one.
+        /// Run directory from `solve --out`, or a bare heads-up postflop `.ckpt`.
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                help = "Run directory from `solve --out`, a bare heads-up postflop `.ckpt`, or a self-contained preflop `.mwckpt`."
+            )
+        )]
         run: std::path::PathBuf,
         /// Fork the resumed run into a new, empty directory.
         #[arg(long)]
         out: Option<std::path::PathBuf>,
-        /// Override worker threads, including Multiway tree reconstruction.
+        /// Override worker threads.
         #[arg(long)]
         threads: Option<usize>,
         /// Override the memory budget for this resume segment.
@@ -397,40 +409,58 @@ enum Command {
         #[arg(long)]
         max_time: Option<String>,
         /// Override the total sweep ceiling.
+        #[cfg(feature = "p2")]
         #[arg(long)]
         max_sweeps: Option<u64>,
         /// Override the measured-deviation stop target.
+        #[cfg(feature = "p2")]
         #[arg(long)]
         stop_target: Option<f64>,
         /// Override samples per stopping evaluation.
+        #[cfg(feature = "p2")]
         #[arg(long)]
         evaluation_samples: Option<u64>,
         /// Override evaluation and progress cadence in sweeps.
+        #[cfg(feature = "p2")]
         #[arg(long)]
         evaluation_cadence: Option<u64>,
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
     },
-    /// Inspect a formal .mwsol artifact, or open the HU postflop explorer.
+    /// Open the heads-up postflop explorer.
+    #[cfg_attr(
+        feature = "p2",
+        command(about = "Open the heads-up postflop explorer or inspect a preflop artifact.")
+    )]
     Inspect {
-        /// Path to a .mwsol artifact or P1 config.
+        /// Path to a heads-up postflop config.
+        #[cfg_attr(
+            feature = "p2",
+            arg(help = "Path to a heads-up postflop config or a preflop .mwsol artifact.")
+        )]
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
+        #[cfg(feature = "p2")]
         /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
         #[arg(long, default_value = "root")]
         node: String,
+        #[cfg(feature = "p2")]
         /// Artifact view to render.
         #[arg(long, value_enum, default_value = "node")]
         view: artifact_args::InspectView,
+        #[cfg(feature = "p2")]
         /// Override the acting seat used by the strategy grid.
         #[arg(long)]
         actor: Option<u8>,
+        #[cfg(feature = "p2")]
         /// Samples for on-demand EV/CI evaluation.
         #[arg(long, default_value_t = 4096)]
         samples: u64,
+        #[cfg(feature = "p2")]
         #[arg(long, default_value_t = 1)]
         seed: u64,
+        #[cfg(feature = "p2")]
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
         /// Overrides the config's iteration limit (live solve only).
@@ -452,6 +482,7 @@ enum Command {
         #[arg(long = "river-target")]
         river_target: Option<f64>,
     },
+    #[cfg(feature = "p2")]
     /// Re-evaluate a formal `.mwsol` average profile with trained deviations.
     Evaluate {
         solution: std::path::PathBuf,
@@ -462,7 +493,7 @@ enum Command {
         #[arg(long = "br-traversals", default_value_t = 20_000)]
         br_traversals: u64,
     },
-    /// Export a JSON/CSV view, or a P1 lock TOML fragment, from an artifact.
+    /// Export a JSON/CSV view, or a heads-up postflop lock TOML fragment, from an artifact.
     Export {
         solution: std::path::PathBuf,
         /// The view. `decision` (postflop, JSON only) holds `actions`,
@@ -511,8 +542,14 @@ enum Command {
     Compare {
         left: std::path::PathBuf,
         right: std::path::PathBuf,
-        /// Allow P1 spot, combo-list and sized-action differences; tree shape
-        /// and stored-node shapes must still match. P2 retains seat/unit checks.
+        /// Allow heads-up postflop spot, combo-list and sized-action differences; tree shape
+        /// and stored-node shapes must still match.
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                long_help = "Allow heads-up postflop spot, combo-list and sized-action differences; tree shape and stored-node shapes must still match. Preflop retains seat/unit checks."
+            )
+        )]
         #[arg(long)]
         cross_game: bool,
     },
@@ -520,7 +557,7 @@ enum Command {
     /// CSV report (one row per board). Uses the configured storage, threads,
     /// and parallel settings; max_time applies separately to each board.
     Report {
-        /// P1 config; replaces its board with --boards/--boards-file.
+        /// Heads-up postflop config; replaces its board with --boards/--boards-file.
         /// For solvers.nlh/v1, each replacement must fit the spot line.
         config: std::path::PathBuf,
         /// Comma-separated boards, each 3/4/5 cards (e.g.
@@ -551,9 +588,21 @@ enum RunsCommand {
 enum ConfigCommand {
     /// Print or write a valid configuration template.
     New {
-        /// Product to template (P1 DCFR: alpha=1.25, beta=0.5, gamma=4; pow4_reset defaults true only for i16).
-        #[cfg_attr(feature = "p2", arg(long, value_enum, default_value = "p2"))]
-        #[cfg_attr(not(feature = "p2"), arg(long, value_enum, default_value = "p1"))]
+        /// Product to template (heads-up postflop DCFR: alpha=1.25, beta=0.5, gamma=4; pow4_reset defaults true only for i16).
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                long,
+                value_enum,
+                default_value = "p2",
+                hide_possible_values = true,
+                hide_default_value = true
+            )
+        )]
+        #[cfg_attr(
+            not(feature = "p2"),
+            arg(long, value_enum, default_value = "p1", hide = true)
+        )]
         product: config_new::ConfigProduct,
         #[arg(long, value_enum, default_value = "minimal")]
         template: config_new::ConfigTemplate,
@@ -569,8 +618,6 @@ pub fn main_impl() -> Result<()> {
         cache::set_root_override(root);
     }
     match cli.command {
-        #[cfg(not(feature = "p2"))]
-        Command::Derive { .. } => Err(product_support::derive_error()),
         #[cfg(feature = "p2")]
         Command::Derive {
             run,
@@ -672,9 +719,13 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory,
             max_time,
+            #[cfg(feature = "p2")]
             max_sweeps,
+            #[cfg(feature = "p2")]
             stop_target,
+            #[cfg(feature = "p2")]
             evaluation_samples,
+            #[cfg(feature = "p2")]
             evaluation_cadence,
             checkpoint_interval,
         } => resume::run(
@@ -683,19 +734,61 @@ pub fn main_impl() -> Result<()> {
             threads,
             memory.as_deref(),
             max_time.as_deref(),
-            max_sweeps,
-            stop_target,
-            evaluation_samples,
-            evaluation_cadence,
+            {
+                #[cfg(feature = "p2")]
+                {
+                    max_sweeps
+                }
+                #[cfg(not(feature = "p2"))]
+                {
+                    None
+                }
+            },
+            {
+                #[cfg(feature = "p2")]
+                {
+                    stop_target
+                }
+                #[cfg(not(feature = "p2"))]
+                {
+                    None
+                }
+            },
+            {
+                #[cfg(feature = "p2")]
+                {
+                    evaluation_samples
+                }
+                #[cfg(not(feature = "p2"))]
+                {
+                    None
+                }
+            },
+            {
+                #[cfg(feature = "p2")]
+                {
+                    evaluation_cadence
+                }
+                #[cfg(not(feature = "p2"))]
+                {
+                    None
+                }
+            },
             checkpoint_interval.as_deref(),
         ),
         Command::Inspect {
             config,
+            #[cfg(feature = "p2")]
             node,
+            #[cfg(feature = "p2")]
             view,
+            #[cfg(feature = "p2")]
             actor,
+            #[cfg(feature = "p2")]
             samples,
+            #[cfg(feature = "p2")]
             seed,
+            #[cfg(feature = "p2")]
             br_traversals,
             iterations,
             target_nash_conv,
@@ -703,8 +796,6 @@ pub fn main_impl() -> Result<()> {
             river_iterations,
             river_target,
         } => {
-            #[cfg(not(feature = "p2"))]
-            let _ = (&node, view, actor, samples, seed, br_traversals);
             if let Some(path) = config.as_deref().or(sol.as_deref()) {
                 nlh_v1::require_current_artifact(path)?;
             }
@@ -735,6 +826,7 @@ pub fn main_impl() -> Result<()> {
                 }
             }
         }
+        #[cfg(feature = "p2")]
         Command::Evaluate {
             solution,
             samples,
@@ -742,15 +834,7 @@ pub fn main_impl() -> Result<()> {
             br_traversals,
         } => {
             nlh_v1::require_current_artifact(&solution)?;
-            #[cfg(feature = "p2")]
-            {
-                multiway_artifact::evaluate(&solution, samples, seed, br_traversals)
-            }
-            #[cfg(not(feature = "p2"))]
-            {
-                let _ = (samples, seed, br_traversals);
-                Err(product_support::artifact_error())
-            }
+            multiway_artifact::evaluate(&solution, samples, seed, br_traversals)
         }
         Command::Export {
             solution,

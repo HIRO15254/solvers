@@ -8,7 +8,7 @@ P2（Multiway Preflop）を決める。入力は[共通Input規範](nlh-input-v1
 ## build featureと配布範囲
 
 `cli`の`p2` featureは既定で有効で、optional dependencyの`mw-preflop`とderiveを含む。
-既定buildの動作は変わらない。P1専用配布buildは次を使う。
+既定buildはすべてのcommandとflagを維持する。P1専用配布buildは次を使う。
 
 ```sh
 cargo build --release -p cli -p daemon --no-default-features
@@ -18,12 +18,14 @@ cargo build --release -p cli -p daemon --no-default-features
 
 | コマンド | P1専用配布buildでの扱い |
 |---|---|
-| `config new` | 製品の既定は`p1`。`--product p2`は`NLH005`（exit 2） |
+| `config new` | 製品の既定は`p1`。`--product`はhelpに表示しないが、`--product p2`は`NLH005`（exit 2） |
 | `validate` / `solve` / `tree` / `inspect`（config）/ `report` | P2入力は型付き`spot::SpotError`の`NLH005`（exit 2） |
-| `derive` | helpに残すが実行はexit 2で拒否 |
-| `resume` / `inspect`（成果物、`--sol`を含む）/ `export` / `evaluate` / `compare` | P2の`.mwsol`・`.mwckpt`、またはmanifestのgame kindが`mw-preflop`のrunはexit 3で拒否。compareは左右とも対象 |
+| `derive` / `evaluate` | 含まれず、helpにも表示しない |
+| `resume` / `inspect`（成果物、`--sol`を含む）/ `export` / `compare` | P2の`.mwsol`・`.mwckpt`、またはmanifestのgame kindが`mw-preflop`のrunはexit 3で拒否。compareは左右とも対象 |
 | `line` | 製品のsolveに依存せず、P2卓のline再生も利用可能 |
 | `status` / `watch` / `runs ls` | 製品非依存。P2のrunも監視・一覧可能 |
+
+配布buildの`resume`はPreflop専用の`--max-sweeps`・`--stop-target`・`--evaluation-samples`・`--evaluation-cadence`を受け付けず、`inspect`はPreflop成果物専用の`--node`・`--view`・`--actor`・`--samples`・`--seed`・`--br-traversals`を受け付けない。`resume --help`は裸の`.ckpt`を案内し、既定buildでは`.mwckpt`も案内する。
 
 拒否診断はP2（Multiway Preflop）が含まれないことと、`p2` feature付きbuildを使うことを示す。
 daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同じ拒否となる。
@@ -33,7 +35,7 @@ daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同
 | flag / 変数 | 意味 |
 |---|---|
 | `-h` / `--help` | helpを表示。各subcommandでも使える |
-| `-V` / `--version` | `solvers <version> (<git-hash>)`を表示。`p2` featureなしでは末尾に`, P1 only`を付ける |
+| `-V` / `--version` | `solvers <version> (<git-hash>)`を表示。`p2` featureなしでは末尾に`, heads-up postflop only`を付ける |
 | `--cache-dir DIR` | machine cacheの場所。全subcommandで指定できる |
 | `SOLVERS_CACHE_DIR` | `--cache-dir`が無い場合のcache。未指定ならOSの利用者cache directory |
 | `NO_COLOR` | ANSI色を無効にする |
@@ -554,7 +556,7 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 |---|---|
 | `0` | 成功。予算到達は品質目標達成を意味しない |
 | `1` | I/O等のその他の失敗、使用中run directoryへの書込み・in-place resumeの拒否 |
-| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005）、P1 exportの不正node selector・非actionへの戦略/値照会、P1専用配布buildのP2入力・deriveの拒否 |
+| `2` | 入力・CLI・tree・lineのerror（NLH001〜NLH005）、P1 exportの不正node selector・非actionへの戦略/値照会、P1専用配布buildのP2入力の拒否 |
 | `3` | 成果物の破損・非互換・削除済みconfig family、P1専用配布buildのP2成果物・runの拒否 |
 | `75` | memory・node等の資源上限 |
 | `130` | solve/resumeの協調停止 |
