@@ -197,3 +197,27 @@ C4で次の候補とした2点を実装した（利用者指示「現在判明�
 
 実験索引は[`experiments/README.md`](../../experiments/README.md)を「現在の実装を支える実験」と「詳細・履歴」に分けた。
 dev・labのSpotは06:04（UTC）、代わりのlabは06:56に回収され、c_gtowbの深い曲線とwarm startの一部の重みは未測定のまま残る。
+
+### C7: PF12の実装とwarm startの追加調査（AWS Spot、2026-10-29）
+
+利用者決定（2026-10-29）: 部分木solveは案A（PF12）。warm startは追加調査の結果で判断する。
+
+- [PF12](../../experiments/p1-efficiency-2026-10/subtree-freeze-product-20261029/README.md): `freeze_upstream`のsolve・resumeは
+  最大対象部分木だけを反復し、外側のstrategy累積を基準解の平均戦略で初期化する。評価は部分木の値に開始時の外側の定数を足し、
+  最終値は全木で評価する（独立した全木評価との差は最大1.2e-8 BB）。頻度目標、rootまたは空の対象、外側の戦略が基準解に無い場合、
+  外側の残差だけで停止目標に届く場合は全木へfallbackし、`run.json`の`profile.solve_scope`・`fallback_reason`に記録する。
+  旧版のfreeze checkpointからの再開は拒否する。flop_srp f32、c6a.8xlarge 32 threadで全木0.1% potまで:
+
+| 対象 | 反復 旧→新 | solve 秒 旧→新 | process 秒 旧→新 |
+|---|---|---|---|
+| BB check後のBTN（flop） | 370 → 373 | 60.2〜60.6 → 40.1〜40.3 | 100.9〜101.2 → 77.3〜77.7 |
+| xx後の全turnのBB | 325 → 148 | 52.0〜52.2 → 9.0〜9.4 | 88.2〜88.5 → 38.4〜38.6 |
+| xx後のAc turnのBB | 330 → 50 | 54.2〜54.3 → 0.057 | 94.9 → 28.5〜28.6 |
+
+  max RSSは5.5〜5.9 GBでほぼ同じ。残る時間はcheckpoint・`.sol`の保存（dev追試で17〜33秒）と基準戦略の読出し・外側の初期化（約5〜7秒）で、
+  storageを部分木の分だけにする段階と合わせて次の候補である。freezeの無いrunの出力はbit一致した。
+- [warm startの収束差](../../experiments/p1-efficiency-2026-10/relock-warm-start-bias-20261029/README.md): turn incentive（+5% pot）では
+  checkpoint引継ぎとcoldの差が精度とともに縮み、0.01% potで真EV差−0.00019 / −0.00038 BB、到達重み付き戦略差0.018（cold自身の
+  0.05%→0.01%の変化は0.040）。永続的な偏りの証拠は無いが、同一極限の証明でもない。反復の削減はturnの小さいincentive
+  （+1%・+5% pot）で0.1% potまで304〜368反復あり、+20% potでは16反復、flop incentive・lock併用では逆に増える。checkpointは3.03 GBで
+  setupが約6.8秒増える。製品化は利用者判断待ち。
