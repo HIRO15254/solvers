@@ -6,15 +6,22 @@ Release tags use `v` followed by the workspace version, for example `v0.1.0`.
 
 ## Compatibility during 0.x
 
-The input schema, `solvers.nlh/v1`, is the compatibility unit. Binary artifact
-formats (`.sol` solutions and checkpoints) may change in any 0.x minor release;
-compatibility with older artifacts is not guaranteed. Unsupported older formats
-are rejected with guidance to re-solve from a current `solvers.nlh/v1` config.
+The input schema, `solvers.nlh/v1`, is the compatibility unit. A 0.x minor
+release may remove `solvers.nlh/v1` keys: a removed key fails with the
+unknown-key error `NLH002`, and this changelog gives its migration. Binary
+artifact formats (`.sol` solutions and checkpoints) may change in any 0.x minor
+release; compatibility with older artifacts is not guaranteed. Unsupported
+older formats are rejected with guidance to re-solve from a current
+`solvers.nlh/v1` config.
 Version 0.1.0 accepts only P1 `.sol` format 4 and checkpoint format 5.
+Version 0.2.0 reads P1 `.sol` formats 4–6 and resumes checkpoint formats 5, 6
+and 8; artifacts whose embedded config uses a removed key are rejected.
 The human-readable `--version` includes a Git revision (`unknown` when unavailable);
 run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-10-29
 
 ### Removed
 

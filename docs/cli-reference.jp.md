@@ -42,7 +42,7 @@ daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同
 cache pathはconfigに書かない。P2のEHS² tableは初回に構築し、以後は互換cacheを読む。
 cacheのbuild/load通知はstderrへ出す。
 
-versionはworkspaceのsemver（現行`0.1.0`）で、release tagは`v0.1.0`の形式にする。
+versionはworkspaceのsemver（現行`0.2.0`）で、release tagは`v0.2.0`の形式にする。
 git-hashはbuild時の`git rev-parse --short=8 HEAD`の結果、Git情報が無ければ`unknown`である。
 `solversd --version` / `-V`は`solversd <version> (<git-hash>)`を表示する。
 `manifest.json`の`cliVersion`は表示用のhash・build種別を含めず、plain semverだけを保存する。

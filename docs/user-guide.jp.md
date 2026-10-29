@@ -5,10 +5,11 @@ P1は2人が残ったFlop/Turn/Riverのstreet開始、P2は2〜9人のPreflop ro
 入力は[共通Input規範](nlh-input-v1.jp.md)、全flagは[CLI reference](cli-reference.jp.md)を参照する。
 P2の方式・品質は暫定であり、3人以上の結果にNash/GTO保証は無い。
 
-現行versionは`0.1.0`。`solvers --version`（`-V`）は`solvers 0.1.0 (<git-hash>)`、
-P1専用buildでは`solvers 0.1.0 (<git-hash>), P1 only`と表示する。
-`solversd --version`は`solversd 0.1.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
+現行versionは`0.2.0`。`solvers --version`（`-V`）は`solvers 0.2.0 (<git-hash>)`、
+P1専用buildでは`solvers 0.2.0 (<git-hash>), P1 only`と表示する。
+`solversd --version`は`solversd 0.2.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
 0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
+minor releaseで`solvers.nlh/v1`のkeyを削除することがあり、削除したkeyはunknown-key errorになる（移行方法は変更履歴に記す）。
 旧形式を拒否された場合は現行configから再solveする。詳細は[互換方針と変更履歴](../CHANGELOG.md)を参照する。
 
 ## 1. インストールする
@@ -39,14 +40,14 @@ Intel macOSでは`sysctl -n machdep.cpu.leaf7_features`の`AVX2`で確認でき�
 
 ```powershell
 # Windows PowerShell（filenameは実際のdownloadに置換）
-Get-FileHash .\solvers-0.1.0-x86_64-pc-windows-msvc.zip -Algorithm SHA256
+Get-FileHash .\solvers-0.2.0-x86_64-pc-windows-msvc.zip -Algorithm SHA256
 ```
 
 ```sh
 # Linux
-sha256sum solvers-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+sha256sum solvers-0.2.0-x86_64-unknown-linux-gnu.tar.gz
 # macOS
-shasum -a 256 solvers-0.1.0-aarch64-apple-darwin.tar.gz
+shasum -a 256 solvers-0.2.0-aarch64-apple-darwin.tar.gz
 ```
 
 WindowsはExplorerの「すべて展開」、Linux/macOSは`tar -xzf <archive>`で全体を展開する。
@@ -94,7 +95,7 @@ solve前に表示するmemory見積りは、これに木・rank table・thread s
 
 ### 未署名binaryを起動する
 
-v0.1.0はcode署名しない。信頼できるReleaseから取得し、上記checksumを確認したものだけに以下を行う。
+配布物はcode署名しない。信頼できるReleaseから取得し、上記checksumを確認したものだけに以下を行う。
 
 - Windows SmartScreenの「WindowsによってPCが保護されました」は **詳細情報（More info）→ 実行（Run anyway）**。
   または展開先のPowerShellで`Get-ChildItem -Recurse | Unblock-File`を実行する。
