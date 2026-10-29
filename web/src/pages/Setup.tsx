@@ -41,6 +41,7 @@ import {
 import { parseBoard } from "../lib/cards";
 import { TEMPLATES, fieldText, getAt, readDoc, setAt, writeDoc, type Doc } from "../lib/config";
 import { type LineDiagnostic, tomlIssueLine } from "../lib/editor/diagnostics";
+import { freezeRequestDoc, loadFreezeBases } from "../lib/setupFreeze";
 import type { SizeRole } from "../lib/sizes";
 import { navigate } from "../route";
 
@@ -277,6 +278,16 @@ function followRanges(
 export function SetupPage() {
   const [doc, setDoc] = useState<Doc>(initialDoc);
   const [step, setStep] = useState<Step>("table");
+  const [freezeBaseRunId, setFreezeBaseRunId] = useState("");
+  const [freezeBases, setFreezeBases] = useState<string[]>([]);
+  const [freezeBaseError, setFreezeBaseError] = useState<string | null>(null);
+  const refreshFreezeBases = () => {
+    setFreezeBaseError(null);
+    void loadFreezeBases(api.runs, api.artifacts)
+      .then((runs) => setFreezeBases(runs.map((run) => run.runId)))
+      .catch((error) => setFreezeBaseError((error as Error).message));
+  };
+  useEffect(refreshFreezeBases, []);
   const [profilePrefill, setProfilePrefill] = useState<{ node: string; combos?: Record<string, Record<string, number>> } | null>(null);
   useEffect(() => {
     const text = sessionStorage.getItem("solvers.setup.profilePrefill");
@@ -322,7 +333,7 @@ export function SetupPage() {
     const id = ++sequence.current;
     setValidation({ state: "pending" });
     try {
-      const response = await api.validate(text, true);
+      const response = await api.validate(text, true, freezeBaseRunId || undefined);
       if (id !== sequence.current) return;
       setValidation({ state: "ok", response });
       setTreeParams({
@@ -363,7 +374,8 @@ export function SetupPage() {
   const line = fieldText(getAt(doc, ["spot", "line"]));
   // The built moves stand for the line until the line changes some other way.
   const draftMoves = draft && draft.line === line ? draft.moves : null;
-  const cursor = useLineCursor(toml, JSON.stringify(getAt(doc, ["table"]) ?? null), line, draftMoves);
+  const cursorToml = useMemo(() => freezeBaseRunId ? writeDoc(freezeRequestDoc(doc, freezeBaseRunId)) : toml, [doc, toml, freezeBaseRunId]);
+  const cursor = useLineCursor(cursorToml, JSON.stringify(getAt(doc, ["table"]) ?? null), line, draftMoves);
   const boardText = fieldText(getAt(doc, ["spot", "board"]));
   const fullBoard = useMemo(() => parseBoard(boardText) ?? [], [boardText]);
   // Cards past those the line deals are kept in the document, for a longer
@@ -411,12 +423,17 @@ export function SetupPage() {
     if (!writtenName.trim()) sent = setAt(sent, ["meta", "name"], autoName);
     return sent === doc ? toml : writeDoc(sent);
   }, [toml, board, ignored.length, writtenName, autoName]);
+  const requestToml = useMemo(() => {
+    if (!freezeBaseRunId) return spotToml;
+    return writeDoc(freezeRequestDoc(readDoc(spotToml), freezeBaseRunId));
+  }, [spotToml, freezeBaseRunId]);
+
 
   // Validate shortly after the last edit; the daemon answers from the CLI.
   useEffect(() => {
-    const timer = setTimeout(() => void validate(spotToml), 700);
+    const timer = setTimeout(() => void validate(requestToml), 700);
     return () => clearTimeout(timer);
-  }, [spotToml]);
+  }, [requestToml, freezeBaseRunId]);
 
   const summary = validation.state === "ok" ? validation.response.summary : null;
   const start = summary?.start;
@@ -438,6 +455,7 @@ export function SetupPage() {
   // A new document starts its range history afresh.
   const replace = (next: Doc) => {
     setTreeParams(null);
+    setFreezeBaseRunId("");
     setDoc(next);
     setRangeNote(null);
     rangeMemory.current.clear();
@@ -452,7 +470,7 @@ export function SetupPage() {
       const taken = new Set((await api.runs()).map((run) => run.runId));
       let runId = base;
       for (let n = 2; taken.has(runId); n++) runId = `${base}-${n}`;
-      const created = await api.createRun(spotToml, runId);
+      const created = await api.createRun(requestToml, runId, freezeBaseRunId || undefined);
       navigate({ page: "runs", runId: created.runId });
     } catch (error) {
       setSubmitError((error as Error).message);
@@ -573,7 +591,7 @@ export function SetupPage() {
           </section>
           <section className="setup-step" hidden={step !== "start"}>
             <SetupStart
-              toml={toml}
+              toml={cursorToml}
               cursor={cursor}
               building={draftMoves !== null}
               selected={selected}
@@ -597,7 +615,11 @@ export function SetupPage() {
             />
           </section>
           <section className="setup-step" hidden={step !== "profile"}>
-            <SetupProfile prefill={profilePrefill} />
+            <SetupProfile prefill={profilePrefill} freezeBases={freezeBases} freezeBaseRunId={freezeBaseRunId} freezeBaseError={freezeBaseError} onRefreshFreezeBases={refreshFreezeBases} onFreezeBaseChange={(id) => {
+              ++sequence.current;
+              setValidation({ state: "pending" });
+              setFreezeBaseRunId(id);
+            }} />
           </section>
           <section className="setup-step" hidden={step !== "solver"}>
             <SolverStep />
@@ -651,9 +673,9 @@ export function SetupPage() {
             errorStep={
               errorStep && errorStep.id !== step ? { label: errorStep.label, open: () => openStep(errorStep.id) } : null
             }
-            onRevalidate={() => void validate(spotToml)}
+            onRevalidate={() => void validate(requestToml)}
           />
-          <TreeCard toml={spotToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} />
+          <TreeCard toml={requestToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} />
         </aside>
       </main>
 

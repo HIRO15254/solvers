@@ -83,7 +83,14 @@ function ComboStrategies({ value, onChange }: { value: unknown; onChange: (value
   </div>;
 }
 
-export function SetupProfile({ prefill = null }: { prefill?: { node: string; combos?: Record<string, Record<string, number>> } | null }) {
+export function SetupProfile({ prefill = null, freezeBases, freezeBaseRunId, freezeBaseError, onRefreshFreezeBases, onFreezeBaseChange }: {
+  prefill?: { node: string; combos?: Record<string, Record<string, number>> } | null;
+  freezeBases: string[];
+  freezeBaseRunId: string;
+  freezeBaseError: string | null;
+  onRefreshFreezeBases: () => void;
+  onFreezeBaseChange: (id: string) => void;
+}) {
   const { doc, setDoc } = useDoc();
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [imported, setImported] = useState(false);
@@ -109,8 +116,16 @@ export function SetupProfile({ prefill = null }: { prefill?: { node: string; com
       }}>Lock current strategy</Button>}
     </Card>}
     <Card title="Opponent profile" description="Locks constrain individual hands; incentives change action utility; frequency targets apply to the reach-weighted hand selection per runout.">
-      <Input label="Freeze upstream from solution (optional)" value={fieldText(getAt(doc, ["profile", "freeze_upstream", "solution"]))} onChange={(e) => setDoc((d) => setAt(d, ["profile", "freeze_upstream", "solution"], e.target.value || undefined))} />
-      <p className="muted meta">The daemon cannot submit a config with an upstream solution path. Remove this setting to solve in the GUI; it can be saved for CLI use.</p>
+      <Select label="Freeze upstream from a saved run" value={freezeBaseRunId} options={[
+        { value: "", label: "No base run" },
+        ...(!freezeBases.includes(freezeBaseRunId) && freezeBaseRunId ? [{ value: freezeBaseRunId, label: `${freezeBaseRunId} (not available)` }] : []),
+        ...freezeBases.map((id) => ({ value: id, label: id })),
+      ]} onValueChange={onFreezeBaseChange} />
+      <p className="muted meta">Choose a stopped heads-up postflop run with a saved solution. The daemon checks that its solution matches this setup. The selection is not stored in the TOML.</p>
+      <Button variant="outline" onClick={onRefreshFreezeBases}>Refresh base runs</Button>
+      {freezeBaseError && <p role="alert">Cannot load base runs: {freezeBaseError}</p>}
+      <Input label="CLI-only upstream solution path (optional)" value={fieldText(getAt(doc, ["profile", "freeze_upstream", "solution"]))} onChange={(e) => setDoc((d) => setAt(d, ["profile", "freeze_upstream", "solution"], e.target.value || undefined))} />
+      <p className="muted meta">Host paths are for CLI use only. With a base run selected, the path remains in the saved TOML but is omitted from daemon requests; without a base run, remove the path before solving in the GUI.</p>
     </Card>
     {(["lock", "incentive", "frequency"] as const).map((kind) => {
       const value = getAt(doc, ["profile", kind]); const entries = Array.isArray(value) ? value : [];

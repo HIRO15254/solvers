@@ -450,6 +450,9 @@ solversd --runs runs --max-concurrent 1
 
 表示されたbearer tokenを全`/v1` API requestのAuthorizationへ付ける。
 POST /v1/validateまたはPOST /v1/runsへJSONのconfigTomlを送る。
+上流固定には任意の`freezeBaseRunId`を同じJSONに指定できる。daemon管理下の停止済みP1 runの
+`solution.sol`をdaemonが選び、pathとSHA-256を実効configへ入れる。clientからpathは送れない。
+投入したrunの`relockedFrom`に基準run IDが残る。
 line-builderにはPOST /v1/lineへconfigTomlと任意のmoves配列を送り、CLIと同じcursor JSONを受け取る。
 P1のsolve前の木はPOST /v1/treeへconfigTomlと任意のnodes配列を送り、CLIと同じtree行のJSON配列を受け取る。
 nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ渡せる。storedは含まない。restOfStreet: trueで各nodeのstreetの残りも返す。
@@ -564,6 +567,8 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     Scriptのtabとscriptの編集欄は下の「script・TOMLの編集欄」の機能を持つ。
   - Solver: Stopping（Target・Max iterations・Check every・Max time）、Resources and output（Threads・Memory limit・
     Saved streets・Checkpoint interval・Checkpoint at the end）、Algorithm（Schedule・CFR precision・Storage）を書く。
+    Profileではlock・incentive・頻度目標を編集できる。上流固定のCLI用pathはTOMLの保存用であり、
+    daemonでは停止済みP1のsolutionを持つrunを別に選ぶ。選択中はCLI用pathを保存文書に残しつつ検証・solveの送信から除く。
   - Edit TOML: stepではなく、文書全体を色分け付きで直接編集する。読めるTOMLになるたびに各stepへ反映し、各stepの変更はTOMLへ反映する。
     読めない間はerrorを示し、構文errorの行・列に印を付ける。他のstepと検証は直前に読めた内容のままでSolveできない。自分で書いたcommentや順序は、
     TOMLを直接編集している間は保持し、stepで変更するとformの書式で書き直す。複数行の文字列（`tree.script`）は
@@ -583,6 +588,8 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
   13×13 gridは戦略・EV・Rangeをclassごとに到達weightで集計し、hand tabでcombo別の値を見る。戦略の色はセル幅いっぱいに
   actionの割合で区切り線なしに塗り分ける。actionの色はGTO Wizardの既定に揃え、foldは青、check・callは緑、bet・raiseは
   menuの小さい順に4段の赤（5つ以上は最も明るい赤から最も暗い赤までを等分）である。
+  「Lock & re-solve」では現在の節点にlock・incentive・頻度目標を追加し、不要なentryを取り除いてから
+  再solveできる。replaceと上流固定の選択はまとめて送るprofileに適用される。
   エクスポートは現在節点の`strategy` CSVを保存する。no-riversのrunで未保存のRiver節点を開くと、そのRiverの部分木を
   保存済みの到達rangeからその場で再solveして表示し（数秒かかり得る）、gridの上に再計算値である旨を示す。
   1回の再solveでそのRiverの全節点を得るため、同じRiverの中の移動は待たない。River cardを選び直すと（同じcardでも）

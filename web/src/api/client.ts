@@ -87,8 +87,8 @@ const run = (id: string) => `/v1/runs/${encodeURIComponent(id)}`;
 
 export const api = {
   info: () => json<ServerInfo>("/v1"),
-  validate: (configToml: string, resources: boolean) =>
-    post<ValidateResponse>("/v1/validate", { configToml, resources }),
+  validate: (configToml: string, resources: boolean, freezeBaseRunId?: string) =>
+    post<ValidateResponse>("/v1/validate", { configToml, resources, freezeBaseRunId }),
   /**
    * Rows of the tree the config defines, before solving (`POST /v1/tree`); `nodes` are selectors, default the root.
    * `restOfStreet` follows each selected node with the action nodes after it on its street.
@@ -100,8 +100,8 @@ export const api = {
     post<LineCursor>("/v1/line", moves === undefined ? { configToml } : { configToml, moves }),
   runs: async () => (await json<{ runs: RunSummary[] }>("/v1/runs")).runs,
   run: (id: string) => json<RunSummary>(run(id)),
-  createRun: (configToml: string, runId?: string) =>
-    post<CreateRunResponse>("/v1/runs", runId ? { configToml, runId } : { configToml }),
+  createRun: (configToml: string, runId?: string, freezeBaseRunId?: string) =>
+    post<CreateRunResponse>("/v1/runs", { configToml, runId, freezeBaseRunId }),
   relock: (id: string, body: RelockRequest) =>
     post<CreateRunResponse>(`${run(id)}/relock`, body),
   events: (id: string, from: number) => json<EventPage>(`${run(id)}/events?from=${from}`),

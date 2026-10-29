@@ -1,19 +1,56 @@
 import { describe, expect, it } from "vitest";
 import { parse } from "smol-toml";
-import { classesToRange, relockPayload, roundedStrategy, selectionStrategy } from "./profile";
+import { actionProfileEntry, classesToRange, relockPayload, roundedStrategy, selectionStrategy } from "./profile";
 import type { StrategyRow } from "../api/types";
 
 describe("relock", () => {
   it("writes queued locks as parseable profile fragments and payload flags", () => {
     const payload = relockPayload([
-      { node: "root", hands: "AA,AKs", strategy: { check: 0.25, "bet 3.3": 0.75 }, confidence: 0.8 },
-      { node: "x", category: "toppair & !flushdraw", strategy: { check: 1 } },
+      { kind: "lock", value: { node: "root", hands: "AA,AKs", strategy: { check: 0.25, "bet 3.3": 0.75 }, confidence: 0.8 } },
+      { kind: "lock", value: { node: "x", category: "toppair & !flushdraw", strategy: { check: 1 } } },
     ], true, true);
     expect(payload).toMatchObject({ replace: true, freezeUpstream: true, clearProfile: false });
     expect(parse(payload.profileToml)).toEqual({ profile: { lock: [
       { node: "root", hands: "AA,AKs", strategy: { check: 0.25, "bet 3.3": 0.75 }, confidence: 0.8 },
       { node: "x", category: "toppair & !flushdraw", strategy: { check: 1 } },
     ] } });
+  });
+  it("serializes mixed entries and preserves removal and selector distinctions", () => {
+    const entries = [
+      { kind: "incentive", value: { node: "x", hands: "AA,AKs", action: "bet 3.3", pot: -0.03 } },
+      { kind: "frequency", value: { node: "x", category: "toppair", action: "check", target: 0.5 } },
+      { kind: "incentive", value: { node: "root", action: "check", bb: 2 } },
+      { kind: "lock", value: { node: "root", strategy: { check: 1 } } },
+    ] as const;
+    const payload = relockPayload(entries.filter((_, index) => index !== 2), false, true);
+    expect(payload).toMatchObject({ replace: false, freezeUpstream: true, clearProfile: false });
+    expect(parse(payload.profileToml)).toEqual({ profile: {
+      incentive: [{ node: "x", hands: "AA,AKs", action: "bet 3.3", pot: -0.03 }],
+      frequency: [{ node: "x", category: "toppair", action: "check", target: 0.5 }],
+      lock: [{ node: "root", strategy: { check: 1 } }],
+    } });
+    expect(parse(relockPayload([entries[2]], false, false).profileToml)).toEqual({ profile: {
+      incentive: [{ node: "root", action: "check", bb: 2 }],
+    } });
+  });
+  it("validates action entries before queueing and retains the chosen units", () => {
+    const actions = ["check", "bet 3.3"];
+    expect(actionProfileEntry("incentive", "x", { hands: "AA" }, actions, "bet 3.3", "-0.1", "pot")).toEqual({
+      kind: "incentive", value: { node: "x", hands: "AA", action: "bet 3.3", pot: -0.1 },
+    });
+    expect(actionProfileEntry("incentive", "x", {}, actions, "check", "2", "bb")).toEqual({
+      kind: "incentive", value: { node: "x", action: "check", bb: 2 },
+    });
+    for (const target of ["", "-0.1", "1.1", "Infinity"]) {
+      expect(() => actionProfileEntry("frequency", "x", {}, actions, "check", target, "pot")).toThrow("target frequency");
+    }
+    expect(() => actionProfileEntry("incentive", "x", {}, actions, "fold", "1", "pot")).toThrow("available action");
+    expect(() => actionProfileEntry("incentive", "x", {}, actions, "check", "", "pot")).toThrow("finite bonus");
+    for (const target of ["0", "1"]) {
+      expect(actionProfileEntry("frequency", "x", { category: "toppair" }, actions, "check", target, "pot").value).toEqual({
+        node: "x", category: "toppair", action: "check", target: Number(target),
+      });
+    }
   });
   it("converts grid selection into deterministic range syntax", () => {
     expect(classesToRange(new Set(["AKo", "AA", "AKs"]))).toBe("AA,AKs,AKo");
@@ -23,7 +60,7 @@ describe("relock", () => {
     const values = roundedStrategy([0.46029698848724365, 0.2698, 0.26990301151275635]);
     expect(values).toEqual(["0.460", "0.270", "0.270"]);
     const strategy = Object.fromEntries(["check", "bet", "raise"].map((action, i) => [action, Number(values[i])]));
-    const payload = relockPayload([{ node: "root", strategy }], false, false);
+    const payload = relockPayload([{ kind: "lock", value: { node: "root", strategy } }], false, false);
     expect(parse(payload.profileToml)).toEqual({ profile: { lock: [{ node: "root", strategy }] } });
     expect(roundedStrategy([0.5006, 0.4996, 0])).toEqual(["0.501", "0.499", "0.000"]);
     expect(roundedStrategy([0, 0])).toEqual(["0", "0"]);
