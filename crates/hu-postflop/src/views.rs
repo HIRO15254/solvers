@@ -51,6 +51,8 @@ use crate::sol::{SolMetadata, SolReader};
 /// Opt-in re-solve of the river nodes a `no-rivers` artifact does not store,
 /// for the per-node views. Each river subgame below one river deal is solved
 /// once per export, from the reach the stored strategies give it.
+/// River constraints are embedded in the artifact; frequency incentives use
+/// the original run's final multipliers. Results are newly computed values.
 #[derive(Clone, Copy, Debug)]
 pub struct RiverResolve {
     /// Iteration budget of each river subgame.

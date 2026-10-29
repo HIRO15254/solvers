@@ -122,7 +122,7 @@ pub enum SolError {
     #[error("not a solvers .sol file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported .sol format version {found} (expected {expected} or 5); re-solve to write the current format (docs/hu-postflop.jp.md)"
+        "unsupported .sol format version {found} (expected {expected}, 5 or 6); re-solve to write the current format (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
     #[error(".sol file truncated: expected at least {expected} bytes, got {actual}")]
@@ -269,7 +269,7 @@ fn check_identity(buf: &[u8; 10]) -> Result<(), SolError> {
         return Err(SolError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION && version != 5 {
+    if version != FORMAT_VERSION && version != 5 && version != 6 {
         return Err(SolError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -323,10 +323,25 @@ struct ChunkEntry {
     checksum: [u8; 32],
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct RiverConstraint {
+    pub fixed: Option<Vec<f32>>,
+    pub confidence: Option<Vec<f32>>,
+    pub bonus: Option<Vec<f32>>,
+}
+#[derive(Serialize)]
+pub(crate) struct RiverConstraintRef<'a> {
+    pub fixed: Option<&'a [f32]>,
+    pub confidence: Option<&'a [f32]>,
+    pub bonus: Option<&'a [f32]>,
+}
+
 #[derive(Debug, Default, Serialize, Deserialize)]
 struct Directory {
     strategy: Vec<ChunkEntry>,
     values: Vec<ChunkEntry>,
+    #[serde(skip)]
+    constraints: Vec<ChunkEntry>,
 }
 
 impl Directory {
@@ -334,6 +349,7 @@ impl Directory {
         match section {
             Section::Strategy => &self.strategy,
             Section::Values => &self.values,
+            Section::Constraints => &self.constraints,
         }
     }
 
@@ -349,12 +365,13 @@ impl Directory {
 enum Section {
     Strategy,
     Values,
+    Constraints,
 }
 
 impl Section {
     fn entry_bytes(self) -> usize {
         match self {
-            Section::Strategy => STRATEGY_ENTRY_BYTES,
+            Section::Strategy | Section::Constraints => STRATEGY_ENTRY_BYTES,
             Section::Values => VALUE_ENTRY_BYTES,
         }
     }
@@ -384,7 +401,7 @@ impl Chunk {
             }
             let sref = word(at);
             let (scale, len) = match section {
-                Section::Strategy => (0.0, word(at + 4)),
+                Section::Strategy | Section::Constraints => (0.0, word(at + 4)),
                 Section::Values => (f32::from_bits(word(at + 4)), word(at + 8)),
             };
             let start = at + section.entry_bytes();
@@ -486,7 +503,7 @@ impl SolReader {
             "metadata frame does not decompress",
         )?;
         let (metadata, profile): (SolMetadata, Option<crate::run::ProfileReport>) =
-            if header.version == 5 {
+            if header.version == 5 || header.version == 6 {
                 let (metadata, profile) = postcard::from_bytes(&decoded)?;
                 (metadata, Some(profile))
             } else {
@@ -510,13 +527,25 @@ impl SolReader {
         if *blake3::hash(&directory_frame).as_bytes() != header.directory_checksum {
             return Err(SolError::Checksum("directory"));
         }
-        let directory: Directory = postcard::from_bytes(&decompress(
+        let decoded_directory = decompress(
             &directory_frame,
             MAX_DIRECTORY_BYTES,
             "directory frame does not decompress",
-        )?)?;
+        )?;
+        let directory: Directory = if header.version == 6 {
+            let (mut directory, constraints): (Directory, Vec<ChunkEntry>) =
+                postcard::from_bytes(&decoded_directory)?;
+            directory.constraints = constraints;
+            directory
+        } else {
+            postcard::from_bytes(&decoded_directory)?
+        };
         let mut offset = chunks_start;
-        for entries in [&directory.strategy, &directory.values] {
+        for (entries, expected_count) in [
+            (&directory.strategy, true),
+            (&directory.values, true),
+            (&directory.constraints, false),
+        ] {
             let mut nodes = 0u64;
             let mut previous: Option<u32> = None;
             for entry in entries {
@@ -535,7 +564,7 @@ impl SolReader {
                     .checked_add(entry.compressed_len)
                     .ok_or(SolError::Malformed("inconsistent chunk directory"))?;
             }
-            if nodes != metadata.stored_nodes {
+            if expected_count && nodes != metadata.stored_nodes {
                 return Err(SolError::Malformed(
                     "chunk directory and metadata disagree on the stored node count",
                 ));
@@ -815,6 +844,11 @@ impl SolStore {
             dequantize_values(bytes, scale, len)
         })
     }
+    pub(crate) fn river_constraint(&self, sref: u32) -> Result<Option<RiverConstraint>, SolError> {
+        self.with_block(Section::Constraints, sref, |_, bytes| {
+            Ok(postcard::from_bytes(bytes)?)
+        })
+    }
 
     pub(crate) fn strategy_into(
         &self,
@@ -889,6 +923,8 @@ pub(crate) struct SolFileWriter {
     offset: u64,
     strategy: SectionWriter,
     values: SectionWriter,
+    constraints: SectionWriter,
+    last_constraint: Option<u32>,
     strategy_srefs: Vec<u32>,
     values_written: usize,
 }
@@ -1070,6 +1106,8 @@ impl SolFileWriter {
             offset: HEADER_LEN as u64 + frame.len() as u64 + index_len,
             strategy: SectionWriter::new(Section::Strategy),
             values: SectionWriter::new(Section::Values),
+            constraints: SectionWriter::new(Section::Constraints),
+            last_constraint: None,
             strategy_srefs: Vec::with_capacity(metadata.stored_nodes.min(1 << 24) as usize),
             values_written: 0,
         })
@@ -1108,11 +1146,38 @@ impl SolFileWriter {
             values,
         )
     }
+    pub(crate) fn river_constraint(
+        &mut self,
+        sref: u32,
+        constraint: &impl Serialize,
+    ) -> Result<(), SolError> {
+        if self.values_written as u64 != self.stored_nodes {
+            return Err(SolError::Malformed("river constraint before values"));
+        }
+        if self.last_constraint.is_none() {
+            self.values
+                .finish(self.file.as_file_mut(), &mut self.offset)?;
+            self.header.version = 6;
+        }
+        if self.last_constraint.is_some_and(|last| sref <= last) {
+            return Err(SolError::Malformed("river constraints are not ascending"));
+        }
+        self.last_constraint = Some(sref);
+        let bytes = postcard::to_allocvec(constraint)?;
+        self.constraints.push(
+            self.file.as_file_mut(),
+            &mut self.offset,
+            sref,
+            None,
+            &bytes,
+        )
+    }
 
     pub(crate) fn finish(mut self) -> Result<(), SolError> {
         let file = self.file.as_file_mut();
         self.strategy.finish(file, &mut self.offset)?;
         self.values.finish(file, &mut self.offset)?;
+        self.constraints.finish(file, &mut self.offset)?;
         if self.strategy_srefs.len() as u64 != self.stored_nodes
             || self.values_written as u64 != self.stored_nodes
         {
@@ -1123,8 +1188,14 @@ impl SolFileWriter {
         let directory = Directory {
             strategy: std::mem::take(&mut self.strategy.entries),
             values: std::mem::take(&mut self.values.entries),
+            constraints: std::mem::take(&mut self.constraints.entries),
         };
-        let frame = zstd::bulk::compress(&postcard::to_allocvec(&directory)?, ZSTD_LEVEL)?;
+        let encoded = if self.header.version == 6 {
+            postcard::to_allocvec(&(&directory, &directory.constraints))?
+        } else {
+            postcard::to_allocvec(&directory)?
+        };
+        let frame = zstd::bulk::compress(&encoded, ZSTD_LEVEL)?;
         file.write_all(&frame)?;
         self.header.directory_offset = self.offset;
         self.header.directory_len = frame.len() as u64;
@@ -1406,6 +1477,64 @@ mod tests {
             assert_eq!(read_sol(&path).unwrap(), payload);
             let _ = std::fs::remove_file(&path);
         }
+    }
+    #[test]
+    fn river_constraints_round_trip_and_detect_corruption_lazily() {
+        let payload = sample_payload();
+        let metadata = SolMetadata {
+            config_toml: payload.config_toml.clone(),
+            meta: payload.meta.clone(),
+            mode: payload.mode,
+            tree_nodes: payload.tree_nodes,
+            stored_nodes: payload.blocks.len() as u64,
+        };
+        let report = crate::run::ProfileReport {
+            summary: Default::default(),
+            frozen_nodes: vec![],
+            general_sum: true,
+            frequencies: vec![],
+        };
+        let path = temp_path("river-constraints.sol");
+        let mut writer =
+            SolFileWriter::create_with_profile(&path, &metadata, Some(&report), |out| {
+                out.write_all(&payload.index)
+            })
+            .unwrap();
+        for block in &payload.blocks {
+            writer.strategy(block.sref, &block.probs).unwrap();
+        }
+        for block in &payload.values {
+            writer
+                .values(block.sref, block.scale, &block.values)
+                .unwrap();
+        }
+        let constraint = RiverConstraint {
+            fixed: Some(vec![0.3, f32::NAN]),
+            confidence: Some(vec![1.0]),
+            bonus: Some(vec![0.125, -0.5]),
+        };
+        writer.river_constraint(42, &constraint).unwrap();
+        writer.finish().unwrap();
+        let reader = SolReader::open(&path).unwrap();
+        assert_eq!(reader.directory.constraints.len(), 1);
+        let offset = reader.directory.constraints[0].offset as usize;
+        let store = reader.into_store();
+        let decoded = store.river_constraint(42).unwrap().unwrap();
+        assert_eq!(decoded.fixed.unwrap()[0], 0.3);
+        assert_eq!(decoded.confidence.unwrap(), vec![1.0]);
+        assert_eq!(decoded.bonus.unwrap(), vec![0.125, -0.5]);
+        assert!(store.river_constraint(41).unwrap().is_none());
+        drop(store);
+        let mut bytes = std::fs::read(&path).unwrap();
+        bytes[offset] ^= 1;
+        std::fs::write(&path, bytes).unwrap();
+        let store = SolReader::open(&path).unwrap().into_store();
+        assert!(matches!(
+            store.river_constraint(42),
+            Err(SolError::Checksum("chunk"))
+        ));
+        drop(store);
+        let _ = std::fs::remove_file(path);
     }
 
     #[test]

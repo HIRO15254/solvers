@@ -311,6 +311,28 @@ pub(crate) fn export_sol<S: Storage>(
                 writer.values(sref as u32, scale, &bytes)?;
             }
         }
+        if mode == SolStreets::NoRivers
+            && let Some(profile) = solver.profile()
+        {
+            for (sref, &node_id) in profile_nodes.iter().enumerate() {
+                if streets[node_id as usize] != Street::River {
+                    continue;
+                }
+                let lock = &profile.locks[sref];
+                let incentive = &profile.incentives[sref];
+                if lock.is_none() && incentive.is_none() {
+                    continue;
+                }
+                writer.river_constraint(
+                    sref as u32,
+                    &crate::sol::RiverConstraintRef {
+                        fixed: lock.as_ref().map(|lock| lock.fixed.as_slice()),
+                        confidence: lock.as_ref().map(|lock| lock.confidence.as_slice()),
+                        bonus: incentive.as_ref().map(|entry| entry.bonus.as_slice()),
+                    },
+                )?;
+            }
+        }
         writer.finish()
     };
     write().with_context(|| format!("writing {}", spec.path.display()))?;
@@ -776,6 +798,7 @@ impl<'a> SolProvider<'a> {
             crate::input::Storage::F32 => resolve_river::<F32Storage>(
                 loaded,
                 sub_game.game,
+                &sub_cfg.board,
                 entry,
                 start,
                 RiverSolver::F32,
@@ -784,6 +807,7 @@ impl<'a> SolProvider<'a> {
             crate::input::Storage::I16 => resolve_river::<I16Storage>(
                 loaded,
                 sub_game.game,
+                &sub_cfg.board,
                 entry,
                 start,
                 RiverSolver::I16,
@@ -792,6 +816,7 @@ impl<'a> SolProvider<'a> {
             crate::input::Storage::I16F32Avg => resolve_river::<MixedStorage>(
                 loaded,
                 sub_game.game,
+                &sub_cfg.board,
                 entry,
                 start,
                 RiverSolver::Mixed,
@@ -884,16 +909,84 @@ impl<'a> SolProvider<'a> {
 
 fn resolve_river<S: Storage>(
     loaded: &LoadedSol,
-    game: hu_engine::CompiledGame<PostflopEvaluator>,
+    mut game: hu_engine::CompiledGame<PostflopEvaluator>,
+    board: &[nlh::Card],
     entry: NodeId,
     start: Instant,
     wrap: impl FnOnce(Solver<PostflopEvaluator, S>) -> RiverSolver,
     diagnostics: &mut dyn FnMut(Diagnostic),
 ) -> Result<RiverSolve> {
+    let map: HashMap<NodeId, NodeId> = pair_subtrees(&loaded.game.tree, entry, &game.tree, 0)
+        .map_err(|e| anyhow!("river re-solve produced a structurally different subtree: {e}"))?
+        .into_iter()
+        .collect();
+    let mut profile = None;
+    let mut space = None;
+    for (&parent_id, &sub_id) in &map {
+        let parent_node = loaded.game.tree.node(parent_id);
+        if parent_node.kind != NodeKind::Action {
+            continue;
+        }
+        let Some(saved) = loaded.store.river_constraint(parent_node.aux)? else {
+            continue;
+        };
+        let profile = profile.get_or_insert_with(|| hu_engine::Profile {
+            locks: vec![None; game.tree.storage_refs.len()],
+            incentives: vec![None; game.tree.storage_refs.len()],
+        });
+        let space = *space.get_or_insert_with(|| game.evaluator.register_profile_board(board));
+        let sub_node = game.tree.node(sub_id);
+        let parent_hands = &loaded.game.index.hands;
+        let sub_hands = &game.evaluator.hands;
+        let player = parent_node.player;
+        let parent_len = parent_hands.len(player);
+        let sub_len = sub_hands.len(player);
+        let actions = parent_node.num_children as usize;
+        let hand_map: Vec<usize> = sub_hands
+            .combos(player)
+            .iter()
+            .map(|&global| {
+                parent_hands
+                    .local(player, global as usize)
+                    .ok_or_else(|| anyhow!("river support is outside parent range"))
+            })
+            .collect::<Result<_>>()?;
+        let remap = |values: &[f32], rows: usize| -> Result<Vec<f32>> {
+            if values.len() != rows * parent_len {
+                bail!("river constraint has invalid dimensions");
+            }
+            let mut result = Vec::with_capacity(rows * sub_len);
+            for a in 0..rows {
+                result.extend(hand_map.iter().map(|&h| values[a * parent_len + h]));
+            }
+            Ok(result)
+        };
+        match (saved.fixed, saved.confidence) {
+            (Some(fixed), Some(confidence)) => {
+                profile.locks[sub_node.aux as usize] = Some(hu_engine::NodeLock {
+                    fixed: remap(&fixed, actions)?,
+                    confidence: remap(&confidence, 1)?,
+                });
+            }
+            (None, None) => {}
+            _ => bail!("river constraint has incomplete lock"),
+        }
+        if let Some(bonus) = saved.bonus {
+            profile.incentives[sub_node.aux as usize] = Some(hu_engine::NodeIncentive {
+                bonus: remap(&bonus, actions)?,
+                space,
+            });
+        }
+    }
     let settings = &loaded.nlh.1;
     let schedule = crate::run::schedule(&settings.solver.algorithm);
     let mut solver =
         Solver::<PostflopEvaluator, S>::new(game, schedule, Some(loaded.river_iterations));
+    if let Some(profile) = profile {
+        solver
+            .set_profile(profile)
+            .map_err(|e| anyhow!("invalid river constraint: {e}"))?;
+    }
     solver.set_cfr_precision(settings.solver.cfr_precision);
     solver.set_par(hu_engine::ParConfig {
         chance_depth: settings.solver.parallel.chance_depth,
@@ -918,12 +1011,6 @@ fn resolve_river<S: Storage>(
         secs: start.elapsed().as_secs_f64(),
         nash_conv,
     });
-
-    let map: HashMap<NodeId, NodeId> =
-        pair_subtrees(&loaded.game.tree, entry, &solver.game().tree, 0)
-            .map_err(|e| anyhow!("river re-solve produced a structurally different subtree: {e}"))?
-            .into_iter()
-            .collect();
 
     Ok(RiverSolve {
         solver: wrap(solver),
@@ -951,6 +1038,40 @@ impl StrategyProvider for SolProvider<'_> {
             1.0 / sref.num_actions as f32;
             sref.num_actions as usize * sref.num_hands as usize
         ];
+        // A hand absent from the river support still has a defined hard lock.
+        // Fill that fallback before overriding reachable hands from the solve.
+        if let Some(saved) = loaded.store.river_constraint(n.aux)?
+            && let (Some(fixed), Some(confidence)) = (saved.fixed, saved.confidence)
+        {
+            let hands = sref.num_hands as usize;
+            let actions = sref.num_actions as usize;
+            if fixed.len() != actions * hands || confidence.len() != hands {
+                bail!("river constraint has invalid dimensions");
+            }
+            for (h, &c) in confidence.iter().enumerate() {
+                if c != 1.0 {
+                    continue;
+                }
+                let mut sum = 0.0;
+                let mut free = 0;
+                for a in 0..actions {
+                    let value = fixed[a * hands + h];
+                    if value.is_nan() {
+                        free += 1;
+                    } else {
+                        sum += value;
+                    }
+                }
+                for a in 0..actions {
+                    let value = fixed[a * hands + h];
+                    avg[a * hands + h] = if value.is_nan() {
+                        (1.0 - sum).max(0.0) / free as f32
+                    } else {
+                        value
+                    };
+                }
+            }
+        }
         for (i, &global) in sub_hands.combos(n.player).iter().enumerate() {
             let j = trunk_hands
                 .local(n.player, global as usize)
@@ -985,6 +1106,184 @@ mod tests {
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
     static COUNTER: AtomicU64 = AtomicU64::new(0);
+    #[test]
+    fn no_rivers_replays_profile_and_frozen_ancestors_without_base_file() {
+        use crate::run::{RunRequest, run};
+        use std::time::Duration;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spot.toml");
+        let raw = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
+board = "2s 7s Ks 4s"
+[ranges]
+BB = "AK,KQ,AA"
+BTN = "QQ,JJ,TT"
+[tree]
+script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver]
+storage = "f32"
+iso_merging = true
+[solver.stop]
+max_iterations = 500
+check_every = 100
+[run]
+memory = "1GiB"
+threads = 1
+"#;
+        let cancel = AtomicBool::new(false);
+        let execute = |input: &str, name: &str| {
+            let p = crate::prepare::prepare(input, &path).unwrap();
+            let checkpoint = dir.path().join(format!("{name}.ckpt"));
+            let solution = dir.path().join(format!("{name}.sol"));
+            let summary = run(
+                RunRequest {
+                    prepared: &p,
+                    checkpoint: &checkpoint,
+                    solution: &solution,
+                    state: None,
+                    evaluation_history: Vec::new(),
+                    elapsed_before: Duration::ZERO,
+                    cancel: &cancel,
+                },
+                &mut |_| Ok(()),
+                &mut |_| {},
+            )
+            .unwrap();
+            (solution, summary)
+        };
+        let (base_path, _) = execute(raw, "base");
+        let input = format!(
+            r#"{raw}
+[profile]
+freeze_upstream = {{ solution = '{}' }}
+[[profile.lock]]
+node = 'xx[?]x'
+hands = 'QQ'
+strategy = {{ check = 0.3 }}
+[[profile.lock]]
+node = 'xx[?]x'
+hands = 'JJ'
+strategy = {{ check = 0.4, '1' = 0.6 }}
+confidence = 0.5
+[[profile.incentive]]
+node = 'xx[?]x'
+category = 'secondpair'
+action = 'check'
+bb = 0.1
+[[profile.frequency]]
+node = 'xx[?]x'
+hands = 'TT'
+action = 'check'
+target = 0.5
+"#,
+            base_path.to_string_lossy().replace('\\', "/")
+        );
+        let (full_path, full_summary) = execute(&input, "full");
+        let small_input = format!("{input}\n[output]\nsolution_streets='no-rivers'\n");
+        let (small_path, small_summary) = execute(&small_input, "small");
+        let prepared = crate::prepare::prepare(&small_input, &path).unwrap();
+        let checkpoint = dir.path().join("small.ckpt");
+        let resumed_path = dir.path().join("resumed.sol");
+        let state = crate::checkpoint::CheckpointReader::open(&checkpoint).unwrap();
+        let resumed = run(
+            RunRequest {
+                prepared: &prepared,
+                checkpoint: &checkpoint,
+                solution: &resumed_path,
+                state: Some(state),
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &cancel,
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        assert_eq!(
+            small_summary.frequencies[0].lambda,
+            resumed.frequencies[0].lambda
+        );
+        assert!(!small_summary.frequencies.is_empty());
+        assert_eq!(
+            full_summary.frequencies.len(),
+            small_summary.frequencies.len()
+        );
+        let base = load_sol(&base_path, 500, None).unwrap();
+        let full = load_sol(&full_path, 500, None).unwrap();
+        let small = load_sol(&small_path, 500, None).unwrap();
+        let resumed = load_sol(&resumed_path, 500, None).unwrap();
+        let mut resumed_provider = SolProvider::new(&resumed, Box::new(|_| {}));
+        let entry = small.view().node_by_history("xx[3c]").unwrap();
+        let child = small.view().node_by_history("xx[3c]x").unwrap();
+        let base_avg = base.stored_strategy(entry).unwrap().unwrap();
+        drop(base);
+        std::fs::remove_file(&base_path).unwrap();
+        let resumed_avg = resumed_provider.average_strategy(child).unwrap();
+        assert!(
+            small_summary
+                .frequencies
+                .iter()
+                .any(|metric| metric.node == child && metric.achieved.is_some())
+        );
+        let mut provider = SolProvider::new(&small, Box::new(|_| {}));
+        assert_eq!(provider.average_strategy(child).unwrap(), resumed_avg);
+        let frozen = provider.average_strategy(entry).unwrap();
+        let sub = &provider.river_solves[&entry];
+        let player = small.game.tree.node(entry).player;
+        for &global in sub.solver.game().evaluator.hands.combos(player) {
+            let h = small
+                .game
+                .index
+                .hands
+                .local(player, global as usize)
+                .unwrap();
+            let hands = small.game.index.hands.len(player);
+            for a in 0..small.game.tree.node(entry).num_children as usize {
+                assert!((frozen[a * hands + h] - base_avg[a * hands + h]).abs() < 1e-5);
+            }
+        }
+        let avg = provider.average_strategy(child).unwrap();
+        let full_avg = full.stored_strategy(child).unwrap().unwrap();
+        let node = small.game.tree.node(child);
+        let hand_count = small.game.index.hands.len(node.player);
+        let qq: nlh::Range = "QQ".parse().unwrap();
+        let jj: nlh::Range = "JJ".parse().unwrap();
+        let tt: nlh::Range = "TT".parse().unwrap();
+        let mut frequency_sum = 0.0;
+        let mut frequency_count = 0;
+        let sub = &provider.river_solves[&entry];
+        let mut checked = 0;
+        for &global in sub.solver.game().evaluator.hands.combos(node.player) {
+            let h = small
+                .game
+                .index
+                .hands
+                .local(node.player, global as usize)
+                .unwrap();
+            if qq.weight(global as usize) > 0.0 {
+                assert!((avg[h] - 0.3).abs() < 1e-6);
+                checked += 1;
+            }
+            if jj.weight(global as usize) > 0.0 {
+                assert!((0.2..=0.7).contains(&avg[h]));
+            }
+            if tt.weight(global as usize) > 0.0 {
+                frequency_sum += avg[h];
+                frequency_count += 1;
+            }
+            for a in 0..node.num_children as usize {
+                assert!((avg[a * hand_count + h] - full_avg[a * hand_count + h]).abs() < 0.35);
+            }
+        }
+        assert!(checked > 0);
+        assert!(frequency_count > 0);
+        assert!((frequency_sum / frequency_count as f32 - 0.5).abs() < 0.35);
+    }
 
     #[test]
     fn v1_river_resolve_uses_embedded_vanilla_and_i16() {

@@ -67,8 +67,7 @@ confidence = 1.0
   額は有限で、負の加点も指定できる。frequencyは`action`と0..1の`target`が必須。
   frequencyの対象頻度はrunoutごとに数える。
   lockとfrequencyが同一nodeの同一handに重複するとerror。
-  `output.solution_streets = "no-rivers"`は、解決されたprofile対象nodeまたは固定される祖先nodeが
-  Riverにある場合は拒否する。遅延River再solveでは制約を保持できないためである。
+  `output.solution_streets = "no-rivers"`でもRiverのprofileと固定祖先は遅延River再solveで適用される。frequencyは元runの最終λを固定して再利用する。
 - `freeze_upstream.solution`は基準`.sol`のpath。相対pathはconfig基準。
   正規化は基準fileのSHA-256を小文字の`sha256`として記録し、利用者configの再読込時に照合する。
   指定するhashは大文字も受け付け、小文字に正規化する。成果物に埋め込まれたconfigの読込時には再照合しない。

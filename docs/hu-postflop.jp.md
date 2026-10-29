@@ -156,7 +156,8 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 停止判定・進捗・報告の評価は部分木だけでなく木全体について行う。
 storage、checkpoint、solutionも木全体を対象とし、部分木化によるstorage削減は前提としない。
 checkpointの再開では計算modeと部分木のidentityも照合し、新modeを選んだ場合は旧whole-tree modeのcheckpointを拒否する。
-`solution_streets = "no-rivers"`はprofileまたは固定祖先がRiverにある場合は拒否する。
+`solution_streets = "no-rivers"`でもRiverのprofileと固定祖先を保存し、遅延再solveに適用する。frequencyは元runの最終λを反映したincentiveを固定して用い、再solve中はλを更新しない。再solveの戦略・値は新しい計算であり、元runの保存値ではない。
+回帰検証の小規模turn開始例ではfullと再solveを各500反復し、到達handの各action確率を絶対差0.35未満で照合する。同例の再solveではfrequency対象handの平均check頻度と目標0.5の差も0.35未満とする。これは当該有限反復fixtureの許容差であり、任意のspotの収束保証ではない。frequencyの元runの達成頻度はprofile reportに記録する。
 profileを変更したcheckpointのresumeは互換性hashの不一致として拒否する。
 profileの無いrunは追加演算を行わず、f32/f64と全storage backendで従来の結果・成果物をbit一致させる。
 
@@ -342,16 +343,17 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 最後のcheckpointを新たに書き、`S + W + C + E + M ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、`.sol`の書き手にC、checkpointのencoderにEを計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
 
-`.sol`はprofile無しではversion 4、profile有りではversion 5である。version 5はmetadata frameをversion 4のmetadataと第6節の`ProfileReport`のpostcard tupleに置き換え、他のframeは同じである。version 4と5を読める。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
+`.sol`はprofile無しではversion 4、profile有りではversion 5、no-riversでRiverに制約がある場合はversion 6である。version 5と6のmetadata frameはversion 4のmetadataと第6節の`ProfileReport`のpostcard tupleである。version 4、5、6を読める。旧versionのno-riversにはRiver制約がない。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
 
 | 部分 | 内容 |
 |---|---|
-| header（178 bytes） | `SLVRSOLV` magic、u16 version 4または5、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
+| header（178 bytes） | `SLVRSOLV` magic、u16 version 4、5または6、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
 | metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame |
 | index frame | 下表の木とindexの列を1つのzstd frameにしたもの |
 | 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frameの列 |
 | 値chunk列 | 同じnode集合の値blockをsref昇順に詰めたchunkのzstd frameの列 |
-| directory frame | 戦略chunk列、値chunk列の順に、chunkごとの先頭sref（u32）、末尾sref（u32）、node数（u32）、file offset（u64）、圧縮長（u64）、展開長（u64）、圧縮frameのBLAKE3（32 bytes）を並べたpostcard bytesのzstd frame |
+| River制約chunk列 | version 6のみ。River action nodeのsref順に、f32のlock確率・confidenceと最終λを含むincentiveをpostcard blockとして保存する。固定祖先の基準戦略もここに入り、閲覧時に基準`.sol`は不要 |
+| directory frame | 戦略chunk列、値chunk列のdirectory。version 6ではこれとRiver制約chunk列のdirectoryをpostcard tupleにする。各entryは先頭・末尾sref、node数、file offset、圧縮長、展開長、圧縮frameのBLAKE3 |
 
 | metadata | 意味 |
 |---|---|
@@ -385,7 +387,7 @@ chunkの展開内容はblockの連結を、偶数offset byte列・奇数offset b
 chunkは展開bytesが1 MiB以上になったblockで閉じる。chunk内のsrefは昇順で、chunk間のsref範囲は重ならない。
 
 openはheaderのmagicとversionを先に検査し、header、metadata、directoryだけを読み、metadataとdirectoryのBLAKE3、config hash、headerとmetadataのiteration一致を検査する。
-さらにindex frameがmetadata直後に、chunkがindex frame直後からdirectory直前まで隙間なく並ぶこと、sref範囲の昇順、各chunk列のnode数の和が`stored_nodes`であること、directoryがfile末尾で終わることを検査する。
+さらにindex frameがmetadata直後に、chunkがindex frame直後からdirectory直前まで隙間なく並ぶこと、sref範囲の昇順、戦略・値chunk列のnode数の和が`stored_nodes`であること、directoryがfile末尾で終わることを検査する。
 chunkは照会したnodeを含むものだけを読み、BLAKE3、展開長、block列とdirectoryの一致を検査する。破損したchunkはそのchunkを読む照会だけを失敗させる。
 `export summary`はmetadataだけで答え、index frameを展開しない。他の照会はindex frameを1回展開してBLAKE3を検査し、`tree_nodes`とmodeから決まる保存node数を照合する。
 照会したnodeのblockが無い、またはnodeの形状と長さが合わなければ、artifactが木と一致しないerrorである。
