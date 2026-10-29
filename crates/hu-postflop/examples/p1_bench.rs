@@ -32,6 +32,9 @@ struct Args {
     storage: Option<StorageKind>,
     json: Option<PathBuf>,
     bands: bool,
+    subtree_only: bool,
+    subtree_target: Option<f64>,
+    hash_subtree: bool,
 }
 
 fn parse_args() -> Result<Args> {
@@ -45,6 +48,9 @@ fn parse_args() -> Result<Args> {
         storage: None,
         json: None,
         bands: false,
+        subtree_only: false,
+        subtree_target: None,
+        hash_subtree: false,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -62,6 +68,9 @@ fn parse_args() -> Result<Args> {
                     other => bail!("unknown storage {other}"),
                 })
             }
+            "--subtree-only" => parsed.subtree_only = true,
+            "--subtree-target" => parsed.subtree_target = Some(value()?.parse()?),
+            "--hash-subtree" => parsed.hash_subtree = true,
             "--bands" => parsed.bands = true,
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
@@ -192,6 +201,36 @@ fn bench<S: Storage>(
         game.evaluator.hands.len(Player::P0),
         game.evaluator.hands.len(Player::P1),
     ];
+    let targets = if let Some(profile) = &resolved {
+        if p.document
+            .spot
+            .profile
+            .as_ref()
+            .is_some_and(|p| p.freeze_upstream.is_some())
+        {
+            if !profile.targets.is_empty()
+                && (args.subtree_only || args.subtree_target.is_some() || args.hash_subtree)
+            {
+                bail!("subtree experiment does not support frequency controllers");
+            }
+            profile
+                .summary
+                .resolved_nodes
+                .iter()
+                .filter(|n| !matches!(n.kind, hu_postflop::profile::ResolvedNodeKind::Frozen))
+                .map(|n| n.node)
+                .collect::<std::collections::BTreeSet<_>>()
+        } else {
+            Default::default()
+        }
+    } else {
+        Default::default()
+    };
+    if (args.subtree_only || args.subtree_target.is_some() || args.hash_subtree)
+        && targets.is_empty()
+    {
+        bail!("subtree experiment requires freeze_upstream and profile targets");
+    }
     hu_postflop::run::trim_builder_heap();
     let build_secs = t.elapsed().as_secs_f64();
     let after_build_mem = memory::current_bytes();
@@ -208,10 +247,24 @@ fn bench<S: Storage>(
         chance_depth: p.settings.solver.parallel.chance_depth,
         min_children: p.settings.solver.parallel.min_children,
     });
+    let roots = subtree_roots(&solver, &index, &targets);
+    let subtree_elements: usize = roots
+        .iter()
+        .map(|r| {
+            let span = solver.game().tree.storage_spans[r.node as usize];
+            span.end - span.start
+        })
+        .sum();
     let alloc_secs = t.elapsed().as_secs_f64();
 
     let t = Instant::now();
-    solver.run(args.warmup);
+    for _ in 0..args.warmup {
+        if args.subtree_only {
+            solver.step_subtrees(&roots);
+        } else {
+            solver.step();
+        }
+    }
     let warmup_secs = t.elapsed().as_secs_f64();
 
     let t = Instant::now();
@@ -220,7 +273,11 @@ fn bench<S: Storage>(
     if args.bands {
         for _ in 0..args.iters {
             let step_start = Instant::now();
-            solver.step();
+            if args.subtree_only {
+                solver.step_subtrees(&roots);
+            } else {
+                solver.step();
+            }
             let seconds = step_start.elapsed().as_secs_f64();
             let iteration = solver.iteration();
             if iteration <= 50 {
@@ -244,11 +301,47 @@ fn bench<S: Storage>(
             }
         }
     } else {
-        solver.run(args.iters);
+        for _ in 0..args.iters {
+            if args.subtree_only {
+                solver.step_subtrees(&roots);
+            } else {
+                solver.step();
+            }
+            if let Some(target) = args.subtree_target {
+                if solver.iteration().is_multiple_of(10) {
+                    let gain = solver.evaluate_subtrees(&roots);
+                    if gain[Player::P0] + gain[Player::P1] <= target {
+                        break;
+                    }
+                }
+            }
+        }
     }
     // With --bands this wall interval includes the two sampled evaluations;
     // the per-band step times above exclude evaluation.
     let iter_secs = t.elapsed().as_secs_f64();
+    let subtree_hash = if args.hash_subtree {
+        let hu_engine::StorageArrays::F32 {
+            regrets,
+            strategy_sum,
+        } = solver.storage().arrays()
+        else {
+            bail!("subtree hash requires f32 storage");
+        };
+        let mut hash = blake3::Hasher::new();
+        for root in &roots {
+            let span = solver.game().tree.storage_spans[root.node as usize];
+            for value in regrets[span.start..span.end]
+                .iter()
+                .chain(&strategy_sum[span.start..span.end])
+            {
+                hash.update(&value.to_bits().to_le_bytes());
+            }
+        }
+        Some(hash.finalize().to_hex().to_string())
+    } else {
+        None
+    };
 
     let mut evaluate_secs = Vec::new();
     let mut nash_conv = f64::NAN;
@@ -258,9 +351,13 @@ fn bench<S: Storage>(
         evaluate_secs.push(t.elapsed().as_secs_f64());
         nash_conv = expl[Player::P0] + expl[Player::P1];
     }
+    let t = Instant::now();
+    let subtree_gain = solver.evaluate_subtrees(&roots);
+    let subtree_evaluate_secs = t.elapsed().as_secs_f64();
+    let completed_iters = solver.iteration() - args.warmup;
     let peak = memory::peak_bytes();
-    let per_iter = if args.iters > 0 {
-        iter_secs / args.iters as f64
+    let per_iter = if completed_iters > 0 {
+        iter_secs / completed_iters as f64
     } else {
         f64::NAN
     };
@@ -277,6 +374,12 @@ fn bench<S: Storage>(
         "nodes": nodes,
         "actionNodes": action_nodes,
         "storageElements": storage_elements,
+        "subtreeStorageElements": subtree_elements,
+        "subtreeRoots": roots.len(),
+        "subtreeOnly": args.subtree_only,
+        "subtreeNashConv": subtree_gain[Player::P0] + subtree_gain[Player::P1],
+        "subtreeHash": subtree_hash,
+        "subtreeEvaluateSecs": subtree_evaluate_secs,
         "deals": deals,
         "transitions": transitions,
         "transitionEntries": transition_entries,
@@ -299,7 +402,7 @@ fn bench<S: Storage>(
         "allocSecs": alloc_secs,
         "warmupIters": args.warmup,
         "warmupSecs": warmup_secs,
-        "iters": args.iters,
+        "iters": completed_iters,
         "iterSecs": iter_secs,
         "secsPerIter": per_iter,
         "evaluateSecs": evaluate_secs,
@@ -316,6 +419,51 @@ fn bench<S: Storage>(
     }
     drop(index);
     Ok(())
+}
+
+fn subtree_roots<S: Storage>(
+    solver: &Solver<hu_postflop::PostflopEvaluator, S>,
+    index: &GameIndex,
+    targets: &std::collections::BTreeSet<hu_engine::NodeId>,
+) -> Vec<hu_engine::SubtreeRoot> {
+    let game = solver.game();
+    let tree = &game.tree;
+    targets
+        .iter()
+        .filter_map(|&node| {
+            let path = hu_engine::path_from_root(&index.parents, node);
+            if path[..path.len() - 1].iter().any(|id| targets.contains(id)) {
+                return None;
+            }
+            let reach = hu_engine::reach_on_path(
+                tree,
+                nlh::PerPlayer::new(
+                    game.root_ranges[Player::P0].as_slice(),
+                    game.root_ranges[Player::P1].as_slice(),
+                ),
+                &path,
+                |id, _, out| out.copy_from_slice(&solver.average_strategy_at(id)),
+            );
+            let mut chance_weight = 1.0;
+            let mut chance_depth = 0;
+            for hop in path.windows(2) {
+                let parent = tree.node(hop[0]);
+                if parent.kind == hu_engine::NodeKind::Chance {
+                    chance_depth += 1;
+                    chance_weight *= f64::from(
+                        tree.deal(parent, (hop[1] - parent.first_child) as usize)
+                            .weight,
+                    );
+                }
+            }
+            Some(hu_engine::SubtreeRoot {
+                node,
+                reach,
+                chance_weight,
+                chance_depth,
+            })
+        })
+        .collect()
 }
 
 mod memory {

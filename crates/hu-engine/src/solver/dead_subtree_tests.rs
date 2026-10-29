@@ -493,3 +493,87 @@ fn exact_flat_values_all_storage_channels() {
     exact_flat_values::<I16Storage>();
     exact_flat_values::<crate::MixedStorage>();
 }
+
+#[test]
+fn frozen_subtrees_match_full_walk() {
+    fn make() -> Solver<Evaluator, F32Storage> {
+        let mut solver = Solver::new(game(8), Box::<Dcfr>::default(), Some(200));
+        let n = solver.game.tree.storage_refs.len();
+        let mut locks = vec![None; n];
+        locks[0] = Some(crate::NodeLock {
+            fixed: [vec![0.25; 8], vec![0.25; 8], vec![0.5; 8]].concat(),
+            confidence: vec![1.0; 8],
+        });
+        solver
+            .set_profile(crate::Profile {
+                locks,
+                incentives: vec![None; n],
+            })
+            .unwrap();
+        solver
+    }
+    let mut whole = make();
+    let mut sub = make();
+    let chance = whole.game.tree.node(0).first_child;
+    let roots: Vec<_> = whole
+        .game
+        .tree
+        .children(chance)
+        .take(2)
+        .map(|node| {
+            let tree = &whole.game.tree;
+            let path = crate::path_from_root(&crate::parent_array(tree), node);
+            let reach = crate::reach_on_path(
+                tree,
+                PerPlayer::new(
+                    whole.game.root_ranges[Player::P0].as_slice(),
+                    whole.game.root_ranges[Player::P1].as_slice(),
+                ),
+                &path,
+                |id, _, out| out.copy_from_slice(&whole.average_strategy_at(id)),
+            );
+            SubtreeRoot {
+                node,
+                reach,
+                chance_weight: f64::from(
+                    tree.deal(
+                        tree.node(chance),
+                        (node - tree.node(chance).first_child) as usize,
+                    )
+                    .weight,
+                ),
+                chance_depth: 1,
+            }
+        })
+        .collect();
+    for count in [50, 150] {
+        for _ in 0..count {
+            whole.step();
+            sub.step_subtrees(&roots);
+        }
+        let crate::StorageArrays::F32 {
+            regrets: wr,
+            strategy_sum: ws,
+        } = whole.storage.arrays()
+        else {
+            unreachable!()
+        };
+        let crate::StorageArrays::F32 {
+            regrets: sr,
+            strategy_sum: ss,
+        } = sub.storage.arrays()
+        else {
+            unreachable!()
+        };
+        for root in &roots {
+            let span = whole.game.tree.storage_spans[root.node as usize];
+            assert_eq!(&wr[span.start..span.end], &sr[span.start..span.end]);
+            assert_eq!(&ws[span.start..span.end], &ss[span.start..span.end]);
+        }
+        let a = whole.evaluate_subtrees(&roots);
+        let b = sub.evaluate_subtrees(&roots);
+        for p in Player::BOTH {
+            assert_eq!(a[p].to_bits(), b[p].to_bits());
+        }
+    }
+}

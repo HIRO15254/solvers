@@ -260,6 +260,14 @@ impl InstalledProfile {
     }
 }
 
+/// A fixed-reach entry used by the experimental frozen-subtree traversal.
+pub struct SubtreeRoot {
+    pub node: NodeId,
+    pub reach: PerPlayer<Vec<f32>>,
+    pub chance_weight: f64,
+    pub chance_depth: u32,
+}
+
 /// Vector-form CFR solver with alternating updates.
 pub struct Solver<E, S> {
     game: CompiledGame<E>,
@@ -513,6 +521,53 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
             self.scratch.put(out);
         }
         self.iteration = t;
+    }
+
+    /// Run one iteration over disjoint fixed-reach subtrees. The caller must
+    /// ensure that the entries are maximal, disjoint and have frozen ancestors.
+    pub fn step_subtrees(&mut self, roots: &[SubtreeRoot]) {
+        self.storage.assert_regrets_available();
+        let t = self.iteration + 1;
+        let discounts = self.schedule.at(t, self.planned_iters);
+        for p in Player::BOTH {
+            let ctx = PassCtx {
+                tree: &self.game.tree,
+                evaluator: &self.game.evaluator,
+                p,
+                discounts: &discounts,
+                cfr_precision: self.cfr_precision,
+                par: self.par,
+                profile: self.profile.as_ref(),
+            };
+            for root in roots {
+                let mut view = self.storage.view_mut();
+                let mut out = self.scratch.take(root.reach[p].len());
+                cfr_pass::<_, _, true>(
+                    &ctx,
+                    &mut view,
+                    &mut self.scratch,
+                    root.node,
+                    &root.reach[p],
+                    &root.reach[p.opponent()],
+                    &mut out,
+                    self.par.chance_depth.saturating_sub(root.chance_depth),
+                );
+                self.scratch.put(out);
+            }
+        }
+        self.iteration = t;
+    }
+
+    /// BR gain from deviations within the disjoint entries, weighted in
+    /// full-game units. The rest of the tree contributes no deviation gain.
+    pub fn evaluate_subtrees(&self, roots: &[SubtreeRoot]) -> PerPlayer<f64> {
+        dual::evaluate_subtrees(
+            &self.game,
+            &self.storage,
+            self.profile.as_ref(),
+            self.par,
+            roots,
+        )
     }
 
     pub fn run(&mut self, iterations: u64) {
