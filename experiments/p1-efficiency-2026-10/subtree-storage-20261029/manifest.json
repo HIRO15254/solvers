@@ -1,9 +1,22 @@
 {
   "date": "2026-10-29",
-  "status": "partial",
-  "source": {"old": "853a46c0", "new": "9788fdad"},
-  "bench": {"instance": "i-0a5bf56531e3ab819", "type": "c6a.8xlarge", "market": "spot", "threads": 32, "termination_requested": true},
+  "status": "measured",
+  "source": {
+    "old_timing": "853a46c0",
+    "new_timing": "b74962db",
+    "final_preflight": "8b79c116",
+    "note": "The later changes add path-sensitive preflight and fallback guarding, CLI resource reporting, tests and documentation; benchmark runs fix f32 and have sufficient memory for parallel finalization. Preflight may add metadata and dry-count work."
+  },
+  "bench": {
+    "instance": "i-08a0aea980fbc853b",
+    "type": "c6a.8xlarge",
+    "market": "spot",
+    "threads": 32,
+    "rounds": 2,
+    "order": ["old,new", "new,old"],
+    "terminated": true
+  },
   "build": "release; RUSTFLAGS=-C target-cpu=znver3",
-  "artifacts": "partial-results.tar.gz; generated base solution not retained",
-  "missing": ["new process timing and RSS", "turn and deep runs", "frequency runs", "fallback and auto calibration", "stage breakdown"]
+  "artifacts": ["results.tar.gz", "summary.json", "proxy-results.tar.gz", "final-resources.tar.gz"],
+  "limitations": ["generated base solution not retained", "stage times use separately instrumented binaries on shared dev box"]
 }
