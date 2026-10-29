@@ -116,6 +116,9 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         estimate.profile_bytes = estimate
             .profile_bytes
             .saturating_add(estimate.freeze_bytes(&config, profile));
+        estimate.save_bytes = estimate
+            .save_bytes
+            .saturating_add(estimate.freeze_third_stream_workspace());
     }
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?

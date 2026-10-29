@@ -580,6 +580,16 @@ fn drive<S: Storage>(
         .as_ref()
         .map(|s| s.frequency_lambdas.as_slice());
     if let Some(Ok(roots)) = selected.as_ref() {
+        let spans: Vec<_> = roots
+            .iter()
+            .map(|&node| game.tree.storage_spans[node as usize])
+            .collect();
+        let subtree_peak = p
+            .estimate
+            .subtree_required_bytes(p.settings.solver.storage, &spans);
+        diagnostics(Diagnostic::Warning(format!(
+            "freeze_upstream subtree memory estimate: {subtree_peak} bytes (preflight also budgets whole-tree fallback)"
+        )));
         let mut node_for_ref = vec![0; game.tree.storage_refs.len()];
         for (id, node) in game.tree.nodes.iter().enumerate() {
             if node.kind == hu_engine::NodeKind::Action {

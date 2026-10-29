@@ -2335,6 +2335,40 @@ impl MemoryEstimate {
         self.action_nodes.saturating_mul(PROFILE_SLOT_BYTES)
     }
 
+    /// Reserved for a future third `.sol` stream in frozen saves. Its writer
+    /// is not present yet, so current saves require no additional workspace.
+    pub(crate) fn freeze_third_stream_workspace(&self) -> u64 {
+        0
+    }
+
+    /// Informational compact-subtree peak for disjoint selected storage spans.
+    /// The preflight requirement remains the larger whole-tree fallback bound.
+    pub fn subtree_required_bytes(
+        &self,
+        backend: crate::input::Storage,
+        spans: &[hu_engine::StorageSpan],
+    ) -> u64 {
+        let (elements, refs) = spans.iter().fold((0u64, 0u64), |(elements, refs), span| {
+            (
+                elements.saturating_add(span.end.saturating_sub(span.start) as u64),
+                refs.saturating_add(span.sref_end.saturating_sub(span.sref_start) as u64),
+            )
+        });
+        let mut compact = self.clone();
+        compact.f32_bytes = elements.saturating_mul(8);
+        compact.i16_bytes = elements
+            .saturating_mul(4)
+            .saturating_add(refs.saturating_mul(8));
+        compact.i16_f32avg_bytes = elements
+            .saturating_mul(6)
+            .saturating_add(refs.saturating_mul(4));
+        compact.f32_regret_bytes = elements.saturating_mul(4);
+        compact.i16_regret_bytes = elements
+            .saturating_mul(2)
+            .saturating_add(refs.saturating_mul(4));
+        compact.required_bytes(backend)
+    }
+
     /// Freeze-specific upper bound, including both compact and whole-tree
     /// fallback allocations. Selectors are bounded by their possible chance
     /// expansions; their actual matches and fallback reason are known only
@@ -2800,6 +2834,45 @@ mod tests {
         );
         assert_eq!(selector_match_bound("[?][?][?]", u64::MAX, 99), 99);
         assert_eq!(selector_match_bound("root", 0, 0), 0);
+    }
+
+    #[test]
+    fn compact_peak_uses_selected_spans_for_each_backend() {
+        let estimate = MemoryEstimate {
+            f32_bytes: 8000,
+            i16_bytes: 4800,
+            i16_f32avg_bytes: 6400,
+            f32_regret_bytes: 4000,
+            i16_regret_bytes: 2400,
+            ..Default::default()
+        };
+        let spans = [
+            hu_engine::StorageSpan {
+                start: 0,
+                end: 100,
+                sref_start: 0,
+                sref_end: 2,
+            },
+            hu_engine::StorageSpan {
+                start: 500,
+                end: 600,
+                sref_start: 10,
+                sref_end: 13,
+            },
+        ];
+        for (backend, bytes) in [
+            (crate::input::Storage::F32, 1600),
+            (crate::input::Storage::I16, 840),
+            (crate::input::Storage::I16F32Avg, 1220),
+        ] {
+            assert_eq!(
+                estimate.subtree_required_bytes(backend, &spans),
+                estimate.resident_bytes() + estimate.checkpoint_bytes() + bytes,
+            );
+            assert!(
+                estimate.subtree_required_bytes(backend, &spans) < estimate.required_bytes(backend)
+            );
+        }
     }
 
     #[test]
