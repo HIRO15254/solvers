@@ -2,7 +2,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use hu_engine::{F32Storage, NodeKind, NodeLock, Solver};
+use hu_engine::{F32Storage, NodeKind, NodeLock, Solver, StorageOps};
 use hu_postflop::{artifact, checkpoint, prepare, run};
 use nlh::{PerPlayer, Player};
 
@@ -134,6 +134,22 @@ fn subtree_preserves_outside_strategy_and_full_tree_metrics() {
             }
         }
     }
+    for id in 0..whole.game().tree.nodes.len() as u32 {
+        let node = whole.game().tree.node(id);
+        if node.kind == NodeKind::Action && !inside[id as usize] {
+            let sref = whole.game().tree.storage_ref(node);
+            let strategy = base.stored_strategy(id).unwrap().unwrap();
+            whole
+                .restore_stream(50, |storage| {
+                    storage.seed_strategy(sref, sref.index, &strategy);
+                    Ok::<_, std::convert::Infallible>(())
+                })
+                .unwrap();
+        }
+    }
+    whole.set_profile(resolved.engine).unwrap();
+    let (_, gain) = whole.evaluate();
+    assert!((summary.nash_conv - gain[Player::P0] - gain[Player::P1]).abs() < 1e-6);
     assert!((summary.nash_conv - summary.expl_p0 - summary.expl_p1).abs() < 1e-8);
 }
 
@@ -237,8 +253,7 @@ fn frequency_freeze_subtree_matches_whole_tree_and_resume() {
     let base_path = dir.path().join("base.sol");
     let base = prepare::prepare(RIVER, &path).unwrap();
     execute(&base, &cancel, &dir.path().join("base.ckpt"), &base_path);
-    let entries = "[[profile.lock]]\nnode = 'x'\nhands = 'QQ'\nstrategy = { check = 1.0 }\n\
-                   [[profile.frequency]]\nnode = 'x'\naction = 'check'\ntarget = 0.5";
+    let entries = "[[profile.frequency]]\nnode = 'x'\naction = 'check'\ntarget = 0.5";
     let p = prepare::prepare(&frozen_input(&base_path, entries), &path).unwrap();
     let full_ckpt = dir.path().join("full.ckpt");
     let full_sol = dir.path().join("full.sol");
@@ -364,6 +379,30 @@ fn frequency_freeze_subtree_matches_whole_tree_and_resume() {
         }
     }
     assert!((lambda - full.frequencies[0].lambda).abs() < 1e-5);
+    let game = whole.game();
+    let node = game.tree.node(target.node);
+    let parents = hu_engine::parent_array(&game.tree);
+    let path = hu_engine::path_from_root(&parents, target.node);
+    let reach = hu_engine::reach_on_path(
+        &game.tree,
+        PerPlayer::new(
+            game.root_ranges[Player::P0].as_slice(),
+            game.root_ranges[Player::P1].as_slice(),
+        ),
+        &path,
+        |id, _, out| out.copy_from_slice(&whole.average_strategy_at(id)),
+    );
+    let strategy = whole.average_strategy_at(target.node);
+    let hands = game.tree.storage_ref(node).num_hands as usize;
+    let mut numerator = 0.0;
+    let mut denominator = 0.0;
+    for &hand in &target.hands {
+        let h = hand as usize;
+        let weight = f64::from(reach[node.player][h]);
+        denominator += weight;
+        numerator += weight * f64::from(strategy[target.action * hands + h]);
+    }
+    assert!((numerator / denominator - full.frequencies[0].achieved.unwrap()).abs() < 1e-5);
     for id in 0..whole.game().tree.nodes.len() as u32 {
         if inside[id as usize] && whole.game().tree.node(id).kind == NodeKind::Action {
             let expected = whole.average_strategy_at(id);
