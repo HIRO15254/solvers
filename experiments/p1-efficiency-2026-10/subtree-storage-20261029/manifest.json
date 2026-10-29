@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-29",
+  "status": "partial",
+  "source": {"old": "853a46c0", "new": "9788fdad"},
+  "bench": {"instance": "i-0a5bf56531e3ab819", "type": "c6a.8xlarge", "market": "spot", "threads": 32, "termination_requested": true},
+  "build": "release; RUSTFLAGS=-C target-cpu=znver3",
+  "artifacts": "partial-results.tar.gz; generated base solution not retained",
+  "missing": ["new process timing and RSS", "turn and deep runs", "frequency runs", "fallback and auto calibration", "stage breakdown"]
+}
