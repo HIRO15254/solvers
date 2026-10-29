@@ -567,13 +567,32 @@ fn frozen_subtrees_match_full_walk() {
         };
         for root in &roots {
             let span = whole.game.tree.storage_spans[root.node as usize];
-            assert_eq!(&wr[span.start..span.end], &sr[span.start..span.end]);
-            assert_eq!(&ws[span.start..span.end], &ss[span.start..span.end]);
+            for (a, b) in wr[span.start..span.end]
+                .iter()
+                .chain(&ws[span.start..span.end])
+                .zip(
+                    sr[span.start..span.end]
+                        .iter()
+                        .chain(&ss[span.start..span.end]),
+                )
+            {
+                assert_eq!(a.to_bits(), b.to_bits());
+            }
         }
         let a = whole.evaluate_subtrees(&roots);
         let b = sub.evaluate_subtrees(&roots);
         for p in Player::BOTH {
             assert_eq!(a[p].to_bits(), b[p].to_bits());
+        }
+        for (a, b) in whole
+            .subtree_values(&roots)
+            .iter()
+            .zip(sub.subtree_values(&roots))
+        {
+            for p in Player::BOTH {
+                assert_eq!(a[p].0.to_bits(), b[p].0.to_bits());
+                assert_eq!(a[p].1.to_bits(), b[p].1.to_bits());
+            }
         }
     }
 }

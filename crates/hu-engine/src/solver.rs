@@ -561,6 +561,17 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// BR gain from deviations within the disjoint entries, weighted in
     /// full-game units. The rest of the tree contributes no deviation gain.
     pub fn evaluate_subtrees(&self, roots: &[SubtreeRoot]) -> PerPlayer<f64> {
+        let mut gains = PerPlayer::new(0.0, 0.0);
+        for values in self.subtree_values(roots) {
+            for p in Player::BOTH {
+                gains[p] += values[p].1 - values[p].0;
+            }
+        }
+        gains
+    }
+
+    /// Per-entry EV and BR in full-game units.
+    pub fn subtree_values(&self, roots: &[SubtreeRoot]) -> Vec<PerPlayer<(f64, f64)>> {
         dual::evaluate_subtrees(
             &self.game,
             &self.storage,
