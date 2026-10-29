@@ -146,6 +146,7 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 基準解のboard、pot、stack、tree、action label、rangeとhand supportを照合し、
 必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で木が展開された場合は、
 基準解のchance代表へsuit置換で対応付け、各handの戦略をprofile側の順序に変換する。
+逆に基準解のgroupingがprofile側より細かく、対応する代表が一意に得られない場合は拒否する。
 実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
 保存済み成果物の読み込み時には基準fileを再読込しない。
 `freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
