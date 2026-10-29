@@ -181,13 +181,23 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   whole tree for a root or no target, a base without stored strategies outside
   the subtrees (`no-rivers`), or a base whose remaining error alone reaches the
   stop target; `run.json` reports `profile.solve_scope` and `fallback_reason`.
-  Resuming a frozen run's checkpoint from an earlier build is rejected.
 - The memory estimate of `freeze_upstream` runs counts the subtree storage when
   the base's metadata and a dry run over the resolved selectors prove the
   subtree solve, and the whole tree otherwise; it was 1.07–1.37× the measured
   peak in the measured cases (an earlier estimate reported 9384 MiB for a run
   that peaked at 5797 MiB). Profiled `no-rivers` runs also count the
   River-constraint stream's workspace.
+
+### Fixed
+
+- `solversd`: canceling a queued run now records it as `canceled` in the run
+  directory before it leaves the queue, so a daemon restart no longer
+  resubmits it. A run canceled before it started has no checkpoint and is not
+  resumable; submit a new run instead.
+- The P1-only distribution's `--help` lists only the commands and options that
+  build supports (no `derive`, `evaluate` or preflop-only flags), uses
+  user-facing solver names, and `resume --help` describes heads-up `.ckpt`
+  checkpoints.
 
 ## [0.1.0] - 2026-10-16
 
