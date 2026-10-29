@@ -365,8 +365,8 @@ fn bench<S: Storage>(
             ] {
                 for chunk in values.chunks(1024) {
                     let mut bytes = [0u8; 4096];
-                    for (value, out) in chunk.iter().zip(bytes.chunks_exact_mut(4)) {
-                        out.copy_from_slice(&value.to_bits().to_le_bytes());
+                    for (value, out) in chunk.iter().zip(bytes.as_chunks_mut::<4>().0) {
+                        *out = value.to_bits().to_le_bytes();
                     }
                     hash.update(&bytes[..chunk.len() * 4]);
                 }
