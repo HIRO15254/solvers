@@ -11,6 +11,10 @@
 | 通常CI（PR #9） | [40898424189](https://github.com/HIRO15254/solvers/actions/runs/40898424189) | `abd5629c` | success（test・web・documentation・Windows/macOS smoke） |
 | release workflow（手動実行、Releaseは作らない） | [40898430276](https://github.com/HIRO15254/solvers/actions/runs/40898430276) | `abd5629c` | notices jobがfailure。依存に加わった`sha2`系の第三者表記が未生成だった。`packaging/third-party.sh`で再生成した（`ff5206e7`） |
 | release workflow（手動実行、Releaseは作らない） | [40900567571](https://github.com/HIRO15254/solvers/actions/runs/40900567571) | `ff5206e7` | version、notices、web、6 buildがすべてsuccess |
+| 受入 `cargo test --workspace --release --no-fail-fast -- --include-ignored` | [40904820045](https://github.com/HIRO15254/solvers/actions/runs/40904820045) | `2ba039e5` | 1156 passed、0 failed、除外1件。リリースcommitの製品コードで実行した |
+| 通常CI（PR #9） | [40904815789](https://github.com/HIRO15254/solvers/actions/runs/40904815789) | `2ba039e5` | success（test・web・documentation・Windows/macOS smoke） |
+
+`ff5206e7`より後のcommitは、CHANGELOG・文書・この記録だけを変えた。GUI受入に使ったbuildと製品コードは同じである。
 
 ## 除外した試験
 
