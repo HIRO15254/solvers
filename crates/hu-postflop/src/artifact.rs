@@ -407,6 +407,27 @@ impl LoadedSol {
             .ok_or_else(|| missing(n.aux))
     }
 
+    /// Decode a stored strategy into caller-owned storage without allocating.
+    /// Returns false for nodes omitted by the artifact's street mode.
+    pub(crate) fn stored_strategy_into(&self, node: NodeId, out: &mut [f32]) -> Result<bool> {
+        if !self.is_stored(node) {
+            return Ok(false);
+        }
+        let tree = &self.game.tree;
+        let n = tree.node(node);
+        let sref = tree.storage_ref(n);
+        self.store
+            .strategy_into_slice(
+                n.aux,
+                sref.num_actions as usize,
+                sref.num_hands as usize,
+                out,
+            )
+            .map_err(|e| mismatch(n.aux, e))?
+            .map(|_| true)
+            .ok_or_else(|| missing(n.aux))
+    }
+
     /// Dequantized per-hand values at a stored action node (OOP's support
     /// then IP's), `None` when the mode does not store the node.
     pub fn stored_values(&self, node: NodeId) -> Result<Option<Vec<f32>>> {
