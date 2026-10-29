@@ -1,0 +1,16 @@
+instance-id: i-0a5a4c007cb4e1468
+instance-type: c6a.8xlarge
+placement/availability-zone: us-east-1b
+instance-life-cycle: spot
+CPU(s):                                  32
+Model name:                              AMD EPYC 7R13 Processor
+Mem:     66030739456  1517617152 52015054848     2969600 13179826176 64513122304
+Linux 7.0.0-1014-aws x86_64
+rustc 1.97.0 (2d8144b78 2026-07-07)
+cargo 1.97.0 (c980f4866 2026-06-30)
+fff69a36f943e7abc24c626f07653ac98f1c34120a563104d67e08ac7b33e1a7  /work/bin-head/solvers
+2edfcb2cccdf1814a3778f4929069a2524c13757625d6f923252e02f98edbdf2  /work/bin-head/p1_bench
+4e503f7ed5bde29773d4e958446108b0ebea1e17867da02a29e37f84306c9e56  /work/bin-final2/solvers
+01dddf03ec0143d6feebe3e7e0e1091eb70d774aa758f6d622dc9b6ae531659d  /work/bin-final2/p1_bench
+start: 2026-10-29T02:49:02Z
+end: 2026-10-29T03:24:11Z

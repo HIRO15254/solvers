@@ -1,0 +1,12 @@
+== flop_srp + lock_flop
+last progress row (old): {"iteration":20,"elapsed_secs":3.845628118,"expl_p0":2.111533999382938,"expl_p1":1.2365818805526303,"nash_conv":3.348115879935568}
+IDENTICAL (72376 bytes strategy export)
+== flop_srp + lock_turn
+last progress row (old): {"iteration":20,"elapsed_secs":3.72050944,"expl_p0":1.8881771203353825,"expl_p1":0.9819986099353486,"nash_conv":2.870175730270731}
+IDENTICAL (72398 bytes strategy export)
+== flop_srp + incentive_turn
+last progress row (old): {"iteration":20,"elapsed_secs":3.83706153,"expl_p0":2.428232013220528,"expl_p1":1.0548402381441189,"nash_conv":3.4830722513646473}
+IDENTICAL (72455 bytes strategy export)
+== flop_3bp + none
+last progress row (old): {"iteration":20,"elapsed_secs":2.379076864,"expl_p0":2.52221707060583,"expl_p1":4.307745408476069,"nash_conv":6.829962479081899}
+IDENTICAL (13514 bytes strategy export)

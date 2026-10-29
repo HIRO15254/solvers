@@ -1,0 +1,6 @@
+
+# Appended to flop_srp.toml: BB gains 5% of the pot for checking every turn after flop check-check.
+[[profile.incentive]]
+node = "xx[?]"
+action = "check"
+pot = 0.05

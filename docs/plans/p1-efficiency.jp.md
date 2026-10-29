@@ -52,6 +52,7 @@ P1は0.05%potまでの時間が0.28〜0.48倍で、反復数（0.36〜0.74倍）
 | G2 | GTOW Single Size（cEV）のKs7h2d SRPを現在の木文法（donk・cbet・攻撃回数による条件）で再現し、GTOWの頻度と比べる | 2026-07-09の記録より近い木で、root・BTN stab・turn nodeの頻度・EVの差を報告 |
 | C3 | PF11: `[solver] storage = "auto"`を追加して既定にする。Codex | 必須検証。上限内ならf32、超えればi16-f32avgを選び、run成果物には選んだstorageを記録する。規範・CLI reference・利用ガイド・template・試験を同期 |
 | C4 | nodelock・lock & re-solve後の点検（profileの無いrunの回帰）と、速度・memoryの改善候補の並列試作（2026-10-29の利用者指示） | 必須検証とrelease受入。profileの無いrunの出力はbit一致。採る変更は16・32 threadの交互計測で速くなるかmemoryが減り、他の条件を遅くしない |
+| C5 | C4で判明した2点（2026-10-29の利用者指示）: profile付きrunの評価を両seat同時の走査にする。`MemoryEstimate`がstorage以外を数えない不足を直す | 必須検証。profile付きの評価値はbit一致し、16・32 threadの交互計測で評価が遅くならない。見積りが測ったsolveのmax RSS以上になり、規範・CLI reference・利用ガイド・試験を同期 |
 
 利用者決定:
 
@@ -166,3 +167,15 @@ profileの無いrunの1反復・afterBuild・peak・0.1%potまでの反復数は
 profileの無いrunの出力はbit一致した（bench・solveの`NashConv`、`bitcheck.sh`）。profile付きのrunは、部分木のCFRが
 f32で再帰経路と異なる順に演算するため軌跡がわずかに変わる（反復数368→369、375→373）。lock付きのrunは評価が従来の
 seat別の走査のままなのでpeakがほとんど減らず、両seat同時の走査へlockとincentiveを入れることが次の候補である。
+
+### C5: profile付きrunの両seat同時評価とmemory見積り（AWS c6a.8xlarge Spot）
+
+C4で次の候補とした2点を実装した（利用者指示「現在判明している2点に関しては実装を行ってください」、2026-10-29）。
+
+- [両seat同時評価](../../experiments/p1-efficiency-2026-10/profiled-dual-eval-20261029/README.md): lock・incentive付きのrunも
+  `dual::evaluate`で評価する。flop_srpにlock_flop・lock_turn・incentive_turnを足した木の16・32 threadで、評価1回が0.866〜0.905倍、
+  評価がpeakへ足す量が112〜259 MiBから18〜42 MiBになり、peakは0.950〜0.977倍だった。benchの`nashConv`とsolveの出力はbit一致した。
+- [memory見積り](../../experiments/p1-efficiency-2026-10/memory-estimate-20261029/README.md): 常駐量M（process領域・compiled game・
+  profile slot・thread数分のengine scratch）とcheckpoint encoderのEを数え、見積りを`max(S + E, S − R + W + C) + M`にした。
+  変更前の見積りはsolveのmax RSSを最大5.1 GiB下回っていた。新しい見積りは31件のsolveの全てでmax RSS以上で、
+  flop_srp・flop_3bp・c_gtowbでは1.01〜1.16倍だった。

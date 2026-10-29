@@ -1,0 +1,32 @@
+{
+  "actionNodes": 434540,
+  "afterBuildBytes": 198246400,
+  "allocSecs": 0.113966734,
+  "buildSecs": 0.751448099,
+  "cfrPrecision": "f32",
+  "config": "/work/ev/ab/incentive_turn.toml",
+  "deals": 77959,
+  "estimateF32Bytes": 3975682320,
+  "estimateI16Bytes": 1991317480,
+  "estimateI16F32avgBytes": 2983499900,
+  "evaluateSecs": [
+    0.248983274,
+    0.244223635,
+    0.243687438
+  ],
+  "iterSecs": 0.619289611,
+  "iters": 4,
+  "nashConv": 17.404618648405894,
+  "nodeInfo": null,
+  "nodes": 1164212,
+  "peakBytes": 4623532032,
+  "prepareSecs": 0.012764621,
+  "secsPerIter": 0.15482240275,
+  "storage": "f32",
+  "storageElements": 496960290,
+  "threads": 32,
+  "transitionEntries": 0,
+  "transitions": 0,
+  "warmupIters": 2,
+  "warmupSecs": 0.291531041
+}

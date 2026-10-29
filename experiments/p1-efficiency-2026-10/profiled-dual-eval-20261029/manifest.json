@@ -1,0 +1,54 @@
+{
+ "reproduction": "verified",
+ "instruction": "2026-10-29: implement the two items found by the post-nodelock check (this record: profiled runs evaluated in the two-seat pass)",
+ "commits": {
+  "old": "3c2b53e75f5b9e5ed71d896f42d01cae32dfbaae",
+  "change": "32f0a02696d15b6eabe8dc332173d1c782976fc4",
+  "new": "3c3319b1f68e678e75928f6c819eabff32f8857f"
+ },
+ "newNote": "new also contains the memory-estimate commit, which does not change evaluation; peaks without evaluation match old within 12 MiB",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+ "machines": [
+  {
+   "use": "build, tests and every retained measurement",
+   "type": "c6a.8xlarge",
+   "cpu": "AMD EPYC 7R13, 32 vCPU, 64 GB",
+   "az": "us-east-1b",
+   "market": "spot",
+   "instance": "i-0a5a4c007cb4e1468",
+   "utc": "2026-10-29T01:37:34Z..03:32:51Z",
+   "end": "terminate-instances (User initiated, 03:32:51Z)"
+  },
+  {
+   "use": "development builds; no retained results (Spot interruption)",
+   "type": "c6a.8xlarge",
+   "az": "us-east-1b",
+   "market": "spot",
+   "instance": "i-029296ccbcce07543",
+   "utc": "2026-10-29T01:10:52Z..01:36:33Z",
+   "end": "Spot interruption"
+  }
+ ],
+ "binarySha256": {
+  "old (3c2b53e7)": {
+   "solvers": "fff69a36f943e7abc24c626f07653ac98f1c34120a563104d67e08ac7b33e1a7",
+   "p1_bench": "2edfcb2cccdf1814a3778f4929069a2524c13757625d6f923252e02f98edbdf2"
+  },
+  "new (3c3319b1)": {
+   "solvers": "4e503f7ed5bde29773d4e958446108b0ebea1e17867da02a29e37f84306c9e56",
+   "p1_bench": "01dddf03ec0143d6feebe3e7e0e1091eb70d774aa758f6d622dc9b6ae531659d"
+  }
+ },
+ "measuredUtc": "2026-10-29T02:49:02Z..03:24:11Z (results/machine.txt)",
+ "commands": {
+  "ab": "bash ab_eval.sh BIN_OLD BIN_NEW OUT && python summarize.py OUT",
+  "bitcheck": "bash bitcheck.sh OLD/solvers NEW/solvers configs/flop_srp.toml 20 f32 16 configs/{lock_flop,lock_turn,incentive_turn}.toml; bash bitcheck.sh OLD/solvers NEW/solvers configs/flop_3bp.toml 20 f32 16"
+ },
+ "results": {
+  "summary": "results/ab.json",
+  "raw": "results/raw/ (96 p1_bench JSON)",
+  "bitcheck": "results/bitcheck.txt",
+  "machine": "results/machine.txt"
+ },
+ "binaryCheck": "a fresh release build of 3c3319b1 on the same VM reproduced both new sha256 values"
+}

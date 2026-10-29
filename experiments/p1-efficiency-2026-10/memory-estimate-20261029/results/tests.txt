@@ -1,0 +1,179 @@
+== cargo fmt --all --check: ok; cargo clippy --workspace --all-targets -- -D warnings: exit 0
+== cargo test --workspace --no-fail-fast
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/cfr_ref-de6511cc71749350)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.28s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/cli-204712ef5616752d)
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running unittests src/main.rs (/work/target-Mem-dbg/debug/deps/solvers-89ad700dd759a256)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/cli_integration.rs (/work/target-Mem-dbg/debug/deps/cli_integration-848bffd74a67aa88)
+test result: ok. 30 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 12.39s
+     Running tests/gtow_limp_reference.rs (/work/target-Mem-dbg/debug/deps/gtow_limp_reference-4dd4b5834932c9e3)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/gtow_partial_reference.rs (/work/target-Mem-dbg/debug/deps/gtow_partial_reference-5896e453b4b2d40a)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/gtow_simple_partial_reference.rs (/work/target-Mem-dbg/debug/deps/gtow_simple_partial_reference-ebde31108f4501b0)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/nlh_derive.rs (/work/target-Mem-dbg/debug/deps/nlh_derive-049e679f2155554a)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.05s
+     Running tests/nlh_examples.rs (/work/target-Mem-dbg/debug/deps/nlh_examples-950f57efdcd431c5)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+     Running tests/nlh_line.rs (/work/target-Mem-dbg/debug/deps/nlh_line-cf202270dd060930)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/nlh_p2.rs (/work/target-Mem-dbg/debug/deps/nlh_p2-746e8c551531c373)
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.09s
+     Running tests/nlh_phase3.rs (/work/target-Mem-dbg/debug/deps/nlh_phase3-daf0ac9f50bafb1f)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.02s
+     Running tests/nlh_phase4.rs (/work/target-Mem-dbg/debug/deps/nlh_phase4-58077367a04d81c9)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+     Running tests/nlh_tree.rs (/work/target-Mem-dbg/debug/deps/nlh_tree-67e9e2fd583edf78)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.78s
+     Running tests/p1_only_build.rs (/work/target-Mem-dbg/debug/deps/p1_only_build-3a1d4e7766568804)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/postflop_contract.rs (/work/target-Mem-dbg/debug/deps/postflop_contract-2ee3ae5bdef0b647)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.04s
+     Running unittests src/main.rs (/work/target-Mem-dbg/debug/deps/solversd-d56d9a8c0084d4c6)
+test result: ok. 22 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/http_api.rs (/work/target-Mem-dbg/debug/deps/http_api-47445cca70756d01)
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+     Running tests/static_ui.rs (/work/target-Mem-dbg/debug/deps/static_ui-f74e1252d0909954)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/version.rs (/work/target-Mem-dbg/debug/deps/version-d4787f79c1833e2d)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/economics-8c9133e6beeebe0d)
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/hu_engine-658d5050d7055749)
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.02s
+     Running tests/dimension_changing_transitions.rs (/work/target-Mem-dbg/debug/deps/dimension_changing_transitions-1fb74e2404568122)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/parallel.rs (/work/target-Mem-dbg/debug/deps/parallel-212088f38489e117)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/profile.rs (/work/target-Mem-dbg/debug/deps/profile-19e79628d99e0097)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/vector_determinism.rs (/work/target-Mem-dbg/debug/deps/vector_determinism-3057089115bb5779)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.72s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/hu_postflop-c22e4791fe4b81a5)
+test result: ok. 78 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 23.27s
+     Running tests/aggregate.rs (/work/target-Mem-dbg/debug/deps/aggregate-bb19c332269ae1ec)
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/compact.rs (/work/target-Mem-dbg/debug/deps/compact-a0f0b6bfb9352717)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/input.rs (/work/target-Mem-dbg/debug/deps/input-cbcaf71bb028f80f)
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+     Running tests/input_economics.rs (/work/target-Mem-dbg/debug/deps/input_economics-cddc8e088f7631c3)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/oracle_diff.rs (/work/target-Mem-dbg/debug/deps/oracle_diff-3c7fdd2751350b8d)
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.09s
+     Running tests/postflop.rs (/work/target-Mem-dbg/debug/deps/postflop-4bf05bc1997460b0)
+test result: ok. 28 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.34s
+     Running tests/profile_resolution.rs (/work/target-Mem-dbg/debug/deps/profile_resolution-80005b1c22177c74)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+     Running tests/rake_icm.rs (/work/target-Mem-dbg/debug/deps/rake_icm-b071e33868d3b5bb)
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.23s
+     Running tests/river.rs (/work/target-Mem-dbg/debug/deps/river-fc58871e081d876c)
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.06s
+     Running tests/storage_backends.rs (/work/target-Mem-dbg/debug/deps/storage_backends-e4f5730776189415)
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.84s
+     Running tests/toy_oracle_diff.rs (/work/target-Mem-dbg/debug/deps/toy_oracle_diff-1b576f703bf72726)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+     Running tests/toys.rs (/work/target-Mem-dbg/debug/deps/toys-9c6b1c4d27718a3e)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.36s
+     Running tests/tree_identity.rs (/work/target-Mem-dbg/debug/deps/tree_identity-0fb7b24e31046261)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.26s
+     Running tests/viewer.rs (/work/target-Mem-dbg/debug/deps/viewer-0544994a7d9a5b7f)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.65s
+     Running unittests examples/p1_bench.rs (/work/target-Mem-dbg/debug/examples/p1_bench-d33207c12d74a475)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/mw_preflop-4c07f85345822d76)
+test result: ok. 310 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 11.09s
+     Running tests/extreme_k.rs (/work/target-Mem-dbg/debug/deps/extreme_k-caa173bcdd50fd1c)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.23s
+     Running tests/nlh_input.rs (/work/target-Mem-dbg/debug/deps/nlh_input-6adb312e367ae1f1)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.97s
+     Running tests/nlh_tree_identity.rs (/work/target-Mem-dbg/debug/deps/nlh_tree_identity-324005f0d735c3ed)
+test result: ok. 8 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 3.68s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/nlh-ae43a452f8437b84)
+test result: ok. 126 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.88s
+     Running tests/plain_betting.rs (/work/target-Mem-dbg/debug/deps/plain_betting-34b534728971139b)
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/protocol-9c375e0d2c744ca2)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/runfiles-a62f20c7d857e36c)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/lib.rs (/work/target-Mem-dbg/debug/deps/spot-c004df4419c44b47)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/document.rs (/work/target-Mem-dbg/debug/deps/document-3701e3e432e5f49b)
+test result: ok. 76 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/postflop.rs (/work/target-Mem-dbg/debug/deps/postflop-8df5b132f9d6ef6f)
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/profile.rs (/work/target-Mem-dbg/debug/deps/profile-8354bbc30f16b306)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/relock.rs (/work/target-Mem-dbg/debug/deps/relock-7f7582c0e06102e0)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+   Doc-tests cfr_ref
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests cli
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests economics
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests hu_engine
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests hu_postflop
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests mw_preflop
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests nlh
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests protocol
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests runfiles
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests spot
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== cargo test --release -p hu-engine -p hu-postflop --no-fail-fast -- --include-ignored
+     Running unittests src/lib.rs (/work/target-Mem/release/deps/hu_engine-7e993e5c41f73121)
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s
+     Running tests/dimension_changing_transitions.rs (/work/target-Mem/release/deps/dimension_changing_transitions-eb3ec5e6cf7299fd)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/parallel.rs (/work/target-Mem/release/deps/parallel-ef307eb00068d983)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/profile.rs (/work/target-Mem/release/deps/profile-ef041b48e3e3b726)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/vector_determinism.rs (/work/target-Mem/release/deps/vector_determinism-dd4cac274cb9177d)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.35s
+     Running unittests src/lib.rs (/work/target-Mem/release/deps/hu_postflop-725736b92d971dc2)
+test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.99s
+     Running tests/aggregate.rs (/work/target-Mem/release/deps/aggregate-6c83df2f5d83baad)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+     Running tests/compact.rs (/work/target-Mem/release/deps/compact-5f7bb385a8101afb)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/input.rs (/work/target-Mem/release/deps/input-4b4e429267ed3a23)
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running tests/input_economics.rs (/work/target-Mem/release/deps/input_economics-3a1c20a8b7611cb4)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/oracle_diff.rs (/work/target-Mem/release/deps/oracle_diff-14707b1314bf3a2c)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/postflop.rs (/work/target-Mem/release/deps/postflop-bcb48d552e42803f)
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.38s
+     Running tests/profile_resolution.rs (/work/target-Mem/release/deps/profile_resolution-00f7477f476af868)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running tests/rake_icm.rs (/work/target-Mem/release/deps/rake_icm-fc058cce6b5eb654)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/river.rs (/work/target-Mem/release/deps/river-2001a5af31d7f101)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/storage_backends.rs (/work/target-Mem/release/deps/storage_backends-c8b9ad3b13c0d761)
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+     Running tests/toy_oracle_diff.rs (/work/target-Mem/release/deps/toy_oracle_diff-6c1c056bba9e1783)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/toys.rs (/work/target-Mem/release/deps/toys-6596d6ccf0e0600d)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+     Running tests/tree_identity.rs (/work/target-Mem/release/deps/tree_identity-556901b6679e1534)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+     Running tests/viewer.rs (/work/target-Mem/release/deps/viewer-b8cfc02928e153f8)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running unittests examples/p1_bench.rs (/work/target-Mem/release/examples/p1_bench-48c0c78d1e71a5aa)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests hu_engine
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests hu_postflop
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

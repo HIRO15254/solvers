@@ -1,0 +1,5 @@
+
+# Appended to flop_srp.toml: BB fully locked to check at every turn node after flop check-check.
+[[profile.lock]]
+node = "xx[?]"
+strategy = { check = 1.0 }

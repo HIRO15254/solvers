@@ -7,6 +7,8 @@ R0工程の証拠（SOL-2資産棚卸し、readiness）は再構築で削除し�
 
 | 状態 | 対象 | 保持する理由 |
 |---|---|---|
+| memory見積りの較正と照合 | [P1 memory見積りの較正](p1-efficiency-2026-10/memory-estimate-20261029/README.md) | 2026-10-29。常駐量（process・compiled game・profile slot・thread scratch）とcheckpoint encoderを数えた見積りの較正（p1_bench 80 run）と、31件のsolveのmax RSSとの照合。新しい見積りは全件でmax RSS以上（flopの大きい木で1.01〜1.16倍）、変更前は最大5.1 GiB不足。c6a.8xlarge Spot |
+| 性能・厳密一致の検証 | [P1 profile付きrunの両seat同時評価](p1-efficiency-2026-10/profiled-dual-eval-20261029/README.md) | 2026-10-29。lock・incentive付きrunの評価を両seat同時の走査に。16・32 threadの交互計測で評価1回0.87〜0.91倍、評価が足すpeak 112〜259 → 18〜42 MiB、評価値とsolveの出力はbit一致。c6a.8xlarge Spot |
 | 性能・memoryの点検と受入 | [P1 nodelock後の点検と高速化・省メモリ化](p1-efficiency-2026-10/nodelock-perf-20261029/README.md) | 2026-10-29。nodelock前後でprofileの無いrunの1反復・peak・反復数は不変で出力はbit一致（評価だけ32 threadで1.01〜1.02倍）。採った8 commitをc6a.8xlarge Spotの16・32 threadで交互に測り、i16の1反復0.77〜0.83倍、評価0.84〜0.91倍、build後memory 0.30〜0.41倍、peak 0.73〜0.97倍、lock付きrunの0.1% potまで0.85〜0.87倍。不採用7件と、On-demand・Spot回収を含む機械の記録 |
 | 頻度目標の検証 | [P1 N4 River頻度とEV loss順lock](p1-nodelock/n4-frequency/README.md) | 2026-10-28。3目標の頻度誤差、素朴なcombo lockとのseat別BR利得・真のEV比較。未commit作業木のため再現状態partial |
 | 性能・厳密一致の検証 | [P1 compact hand domain](p1-perf-2026-10/compact-hands-20261006/README.md) | 2026-10-06。f32新旧一致、i16の200/500反復progress、Turn速度・Flop storage見積り、format移行境界 |
