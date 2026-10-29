@@ -2292,6 +2292,8 @@ pub struct MemoryEstimate {
     pub profile_bytes: u64,
     pub nodes: u64,
     pub action_nodes: u64,
+    /// Largest action-node strategy, in f32 elements.
+    pub max_strategy_elements: u64,
     /// Most action and chance nodes on one root-to-leaf path.
     pub max_depth: u64,
     /// Most deals of one chance node.
@@ -2356,6 +2358,15 @@ impl MemoryEstimate {
         let hands = PostflopHands::new(&config.board, &config.ranges);
         let total_hands = (hands.len(Player::P0) + hands.len(Player::P1)) as u64;
         let widest = hands.len(Player::P0).max(hands.len(Player::P1)) as u64;
+        // Frozen ancestors and explicitly locked targets are disjoint action
+        // nodes. Each target has at most max_depth ancestors.
+        let lock_nodes = target_bound
+            .saturating_mul(self.max_depth.saturating_add(1))
+            .min(self.action_nodes);
+        let lock_values = lock_nodes
+            .saturating_mul(self.max_strategy_elements)
+            .saturating_mul(std::mem::size_of::<f32>() as u64)
+            .min(self.f32_regret_bytes);
         let root_bytes = target_bound.saturating_mul(
             std::mem::size_of::<hu_engine::SubtreeRoot>() as u64
                 + total_hands * std::mem::size_of::<f32>() as u64,
@@ -2366,19 +2377,21 @@ impl MemoryEstimate {
                 + 2 * std::mem::size_of::<f64>() as u64,
         );
         self.game_bytes
-            // Base strategy provider and installed locks can coexist.
-            .saturating_add(self.f32_regret_bytes.saturating_mul(2))
-            .saturating_add(self.action_nodes.saturating_mul(widest * 4))
-            .saturating_add(
-                self.nodes
-                    .saturating_mul(2 * std::mem::size_of::<Option<Vec<f32>>>() as u64),
-            )
+            // The base provider reads one block at a time; retained lock
+            // values cover explicit locks and frozen ancestors only.
+            .saturating_add(lock_values)
+            .saturating_add(lock_nodes.saturating_mul(widest * 4))
+            .saturating_add(self.max_strategy_elements.saturating_mul(8))
             // Incentives and the controller's copy of their base values.
             .saturating_add(
                 if profile.incentives.is_empty() && profile.frequencies.is_empty() {
                     0
                 } else {
-                    self.f32_regret_bytes.saturating_mul(2)
+                    target_bound
+                        .saturating_mul(self.max_strategy_elements)
+                        .saturating_mul(std::mem::size_of::<f32>() as u64)
+                        .min(self.f32_regret_bytes)
+                        .saturating_mul(2)
                 },
             )
             .saturating_add(frequency_bytes.saturating_mul(2))
@@ -2500,6 +2513,7 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         profile_bytes: 0,
         nodes: counting.nodes,
         action_nodes: counting.action_nodes,
+        max_strategy_elements: counting.max_strategy_elements,
         max_depth: counting.max_depth,
         max_deals: counting.max_deals,
         terminals: counting.terminals,
@@ -2808,6 +2822,8 @@ mod tests {
             nodes: 100,
             action_nodes: 40,
             max_deals: 20,
+            max_depth: 5,
+            max_strategy_elements: 100,
             f32_bytes: 8000,
             i16_f32avg_bytes: 6000,
             f32_regret_bytes: 4000,
@@ -2815,6 +2831,15 @@ mod tests {
             ..Default::default()
         };
         let fallback = estimate.freeze_bytes(&config, &profile);
+        profile.locks.push(spot::LockIr {
+            node: "x".into(),
+            hands: spot::HandSelector::All,
+            strategy: spot::LockStrategy::Uniform(vec![("check".into(), 1.0)]),
+            confidence: 1.0,
+        });
+        let locked = estimate.freeze_bytes(&config, &profile);
+        assert!(locked >= fallback + 6 * 100 * 4);
+        profile.locks.clear();
         profile.frequencies.push(spot::FrequencyIr {
             node: "xx[?]".into(),
             hands: spot::HandSelector::All,
