@@ -260,7 +260,7 @@ impl<'a> TreeView<'a> {
 
     /// Card a chance node's `pos`-th branch deals; `None` for a branch into
     /// an all-in runout that merges several cards.
-    fn deal_card(&self, node: NodeId, pos: usize) -> Option<Card> {
+    pub(crate) fn deal_card(&self, node: NodeId, pos: usize) -> Option<Card> {
         let card = self.index.deal_cards[self.tree.node(node).aux as usize + pos];
         (card != NO_CARD).then(|| Card::from_index(card))
     }

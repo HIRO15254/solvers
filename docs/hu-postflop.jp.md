@@ -143,9 +143,10 @@ incentiveを含むゲームは一般和として両席を個別に評価し、`g
 `freeze_upstream`は指定された基準`.sol`の平均戦略で、profile対象nodeの真の祖先にあるaction nodeを
 固定する。ただし別の明示profile entryの対象nodeは固定しない。handが選択されないnodeにはlockを作らず、
 entryの全対象nodeでhandが空なら入力エラーとする。
-基準解のboard、pot、stack、tree、action label、hand supportを照合し、
-必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で基準解と木が異なる場合、
-現在はfreezeを拒否する。実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
+基準解のboard、pot、stack、tree、action label、rangeとhand supportを照合し、
+必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で木が展開された場合は、
+基準解のchance代表へsuit置換で対応付け、各handの戦略をprofile側の順序に変換する。
+実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
 保存済み成果物の読み込み時には基準fileを再読込しない。
 `freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
 部分木を自動的に選び、各iterationでそれらを解く。部分木の外側には基準解の平均戦略をコピーし、
