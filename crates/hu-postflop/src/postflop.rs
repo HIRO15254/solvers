@@ -2366,7 +2366,9 @@ impl MemoryEstimate {
         compact.i16_regret_bytes = elements
             .saturating_mul(2)
             .saturating_add(refs.saturating_mul(4));
-        compact.required_bytes(backend)
+        compact
+            .required_bytes(backend)
+            .max(compact.parallel_save_bytes(backend).unwrap_or(u64::MAX))
     }
 
     /// Freeze-specific upper bound, including both compact and whole-tree
