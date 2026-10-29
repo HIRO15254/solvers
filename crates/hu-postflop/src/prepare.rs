@@ -13,6 +13,10 @@ pub struct Prepared {
     pub payoff: NlhPayoff,
     pub effective: String,
     pub estimate: crate::MemoryEstimate,
+    /// Whole-tree bound retained to guard an unexpected runtime fallback.
+    pub fallback_estimate: Option<crate::MemoryEstimate>,
+    /// Disjoint compact storage spans when preflight proves the subtree path.
+    pub subtree_spans: Option<Vec<hu_engine::StorageSpan>>,
     pub limit: u64,
     pub target: Option<f64>,
 }
@@ -78,6 +82,58 @@ pub(crate) fn prepare_artifact(raw: &str, path: &Path, ran_with: &str) -> Result
         config,
     })
 }
+// A failed or incomplete proof never changes the whole-tree budget.
+fn proven_subtree_spans(
+    document: &spot::Document,
+    config: &crate::PostflopConfig,
+    target: Option<f64>,
+) -> Option<Vec<hu_engine::StorageSpan>> {
+    let profile = document.spot.profile.as_ref()?;
+    let freeze = profile.freeze_upstream.as_ref()?;
+    if !profile.frequencies.is_empty()
+        || (profile.locks.is_empty() && profile.incentives.is_empty())
+        || profile.locks.iter().any(|e| e.node != "x")
+        || profile.incentives.iter().any(|e| e.node != "x")
+        || !profile
+            .locks
+            .iter()
+            .map(|e| &e.hands)
+            .chain(profile.incentives.iter().map(|e| &e.hands))
+            .any(|hands| crate::postflop::root_check_has_hands(config, hands))
+    {
+        return None;
+    }
+    let target = target?;
+    let reader = crate::sol::SolReader::open(Path::new(&freeze.solution)).ok()?;
+    let metadata = reader.metadata();
+    if metadata.mode != crate::sol::StreetsStored::Full
+        || !metadata.meta.nash_conv.is_finite()
+        || metadata.meta.nash_conv / 2.0 >= target
+    {
+        return None;
+    }
+    let old_document =
+        spot::Document::parse_embedded(&metadata.config_toml, Path::new(&freeze.solution)).ok()?;
+    if let Some(old) = &old_document.spot.profile
+        && (old.freeze_upstream.is_some()
+            || !old.locks.iter().all(|entry| profile.locks.contains(entry))
+            || !old
+                .incentives
+                .iter()
+                .all(|entry| profile.incentives.contains(entry))
+            || !old
+                .frequencies
+                .iter()
+                .all(|entry| profile.frequencies.contains(entry)))
+    {
+        return None;
+    }
+    let span = crate::postflop::root_check_span(config)?;
+    if span.end == 0 || span.sref_end == 0 {
+        return None;
+    }
+    Some(vec![span])
+}
 
 /// Parse and lower a P1 input, measuring its tree and resolving the memory/stop limits.
 pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
@@ -126,8 +182,10 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         0
     };
     let limit = input::resolve_memory_limit(document.spot.run.memory_bytes, physical);
+    let subtree_spans = proven_subtree_spans(&document, &config, target);
+    let fallback_estimate = subtree_spans.as_ref().map(|_| estimate.clone());
     let choice = settings.solver.storage;
-    let storage = resolve_storage(choice, &estimate, limit);
+    let storage = resolve_storage_for_spans(choice, &estimate, subtree_spans.as_deref(), limit);
     let storage_auto = choice == input::StorageChoice::Auto;
     let settings = settings.with_storage(storage);
     // Run identity and all saved artifacts use a concrete backend. Validation
@@ -143,6 +201,8 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         payoff,
         effective,
         estimate,
+        fallback_estimate,
+        subtree_spans,
         limit,
         target,
     })
@@ -155,9 +215,31 @@ pub fn resolve_storage(
     estimate: &crate::MemoryEstimate,
     limit: u64,
 ) -> input::Storage {
+    resolve_storage_for_spans(choice, estimate, None, limit)
+}
+
+fn estimate_required(
+    estimate: &crate::MemoryEstimate,
+    spans: Option<&[hu_engine::StorageSpan]>,
+    storage: input::Storage,
+) -> u64 {
+    match spans {
+        Some(spans) => estimate.subtree_required_bytes(storage, spans),
+        None => estimate.required_bytes(storage),
+    }
+}
+
+fn resolve_storage_for_spans(
+    choice: input::StorageChoice,
+    estimate: &crate::MemoryEstimate,
+    spans: Option<&[hu_engine::StorageSpan]>,
+    limit: u64,
+) -> input::Storage {
     use input::{Storage, StorageChoice};
     match choice {
-        StorageChoice::Auto if estimate.required_bytes(Storage::F32) <= limit => Storage::F32,
+        StorageChoice::Auto if estimate_required(estimate, spans, Storage::F32) <= limit => {
+            Storage::F32
+        }
         StorageChoice::Auto | StorageChoice::I16F32Avg => Storage::I16F32Avg,
         StorageChoice::F32 => Storage::F32,
         StorageChoice::I16 => Storage::I16,
@@ -166,14 +248,18 @@ pub fn resolve_storage(
 
 /// Apply the prepared backend's memory limit, preserving auto failure context.
 pub fn check_memory_limit(p: &Prepared) -> Result<(), input::MemoryLimitError> {
-    input::check_memory_limit(&p.estimate, p.settings.solver.storage, p.limit).map_err(
-        |mut error| {
-            if p.storage_auto {
-                error.auto_f32_required = Some(p.estimate.required_bytes(input::Storage::F32));
-            }
-            error
-        },
-    )
+    let required = required_bytes(p);
+    if required <= p.limit {
+        Ok(())
+    } else {
+        Err(input::MemoryLimitError {
+            required,
+            limit: p.limit,
+            auto_f32_required: p.storage_auto.then(|| {
+                estimate_required(&p.estimate, p.subtree_spans.as_deref(), input::Storage::F32)
+            }),
+        })
+    }
 }
 
 /// Single-line human description of the resolved backend and selection reason.
@@ -182,7 +268,7 @@ pub fn storage_description(p: &Prepared) -> String {
     if !p.storage_auto {
         return name.into();
     }
-    let f32 = p.estimate.required_bytes(input::Storage::F32);
+    let f32 = estimate_required(&p.estimate, p.subtree_spans.as_deref(), input::Storage::F32);
     format!(
         "{name} (auto: f32 needs {f32} bytes {} limit {} bytes)",
         if f32 <= p.limit { "<=" } else { ">" },
@@ -222,7 +308,12 @@ pub fn warnings_for_hits(p: &Prepared, hits: &crate::RuleHits) -> Vec<String> {
 
 /// Required storage and save workspace bytes for the selected P1 backend.
 pub fn required_bytes(p: &Prepared) -> u64 {
-    p.estimate.required_bytes(p.settings.solver.storage)
+    required_bytes_for(p, p.settings.solver.storage)
+}
+
+/// Preflight requirement for a candidate backend, including the proved scope.
+pub fn required_bytes_for(p: &Prepared, storage: input::Storage) -> u64 {
+    estimate_required(&p.estimate, p.subtree_spans.as_deref(), storage)
 }
 
 pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
@@ -396,4 +487,110 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
         state: checkpoint,
         elapsed,
     })
+}
+
+#[cfg(test)]
+mod budget_tests {
+    use super::*;
+    use std::sync::atomic::AtomicBool;
+    use std::time::Duration;
+
+    const CONFIG: &str = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+[spot]
+line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
+board = "2s 7s Ks 4h 3d"
+[ranges]
+BB = "AK,KQ,AA"
+BTN = "QQ,JJ"
+[tree]
+script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+[solver.stop]
+max_iterations = 2
+check_every = 2
+[run]
+memory = "1GiB"
+threads = 1
+"#;
+
+    #[test]
+    fn freeze_preflight_uses_proved_spans_and_tighter_target_uses_full_tree() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("input.toml");
+        let base_path = dir.path().join("base.sol");
+        let base = prepare(CONFIG, &path).unwrap();
+        crate::run::run(
+            crate::run::RunRequest {
+                prepared: &base,
+                checkpoint: &dir.path().join("base.ckpt"),
+                solution: &base_path,
+                state: None,
+                evaluation_history: vec![],
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let frozen = |target: &str| {
+            format!(
+                "{}\n[solver]\nstorage = 'auto'\n[profile]\nfreeze_upstream = {{ solution = '{}' }}\n[[profile.lock]]\nnode = 'x'\nstrategy = {{ check = 1.0 }}\n",
+                CONFIG.replace(
+                    "max_iterations = 2",
+                    &format!("max_iterations = 2\ntarget = '{target}'")
+                ),
+                base_path.to_string_lossy().replace('\\', "/"),
+            )
+        };
+        let mut proved = prepare(&frozen("10000bb"), &path).unwrap();
+        let spans = proved.subtree_spans.as_ref().expect("subtree proof");
+        let compact = proved
+            .estimate
+            .subtree_required_bytes(input::Storage::F32, spans);
+        let (game, _, resolved) = crate::run::build_profiled(&proved).unwrap();
+        let node = resolved
+            .unwrap()
+            .summary
+            .resolved_nodes
+            .into_iter()
+            .find(|node| matches!(node.kind, crate::profile::ResolvedNodeKind::Lock))
+            .unwrap()
+            .node;
+        let actual = game.tree.storage_spans[node as usize];
+        assert_eq!(spans[0].end, actual.end - actual.start);
+        assert_eq!(spans[0].sref_end, actual.sref_end - actual.sref_start);
+        let partial = frozen("10000bb").replace("node = 'x'", "node = 'x'\nhands = 'QQ'");
+        assert!(prepare(&partial, &path).unwrap().subtree_spans.is_some());
+        let unknown = frozen("10000bb").replace("node = 'x'", "node = 'root'");
+        assert!(prepare(&unknown, &path).unwrap().subtree_spans.is_none());
+        let mut estimate = proved.estimate.clone();
+        // Make the full arena dominate fixed overhead in this tiny fixture.
+        estimate.f32_bytes = compact.saturating_add(1_000_000_000);
+        estimate.f32_regret_bytes = 0;
+        assert_eq!(required_bytes(&proved), compact);
+        assert_eq!(
+            resolve_storage_for_spans(input::StorageChoice::Auto, &estimate, Some(spans), compact),
+            input::Storage::F32
+        );
+        assert_eq!(
+            resolve_storage_for_spans(input::StorageChoice::Auto, &estimate, None, compact),
+            input::Storage::I16F32Avg
+        );
+        proved.limit = compact;
+        assert!(check_memory_limit(&proved).is_ok());
+        proved.limit = compact - 1;
+        assert_eq!(check_memory_limit(&proved).unwrap_err().required, compact);
+
+        let tight = prepare(&frozen("0.0000001%pot"), &path).unwrap();
+        assert!(tight.subtree_spans.is_none());
+        assert!(tight.fallback_estimate.is_none());
+        assert_eq!(
+            required_bytes(&tight),
+            tight.estimate.required_bytes(tight.settings.solver.storage)
+        );
+    }
 }

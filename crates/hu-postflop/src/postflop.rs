@@ -2341,8 +2341,8 @@ impl MemoryEstimate {
         0
     }
 
-    /// Informational compact-subtree peak for disjoint selected storage spans.
-    /// The preflight requirement remains the larger whole-tree fallback bound.
+    /// Compact-subtree peak for disjoint selected storage spans, including
+    /// both serial and parallel save peaks and the full resident budget.
     pub fn subtree_required_bytes(
         &self,
         backend: crate::input::Storage,
@@ -2490,10 +2490,64 @@ impl MemoryEstimate {
 pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
     count_tree(config, true)
 }
+/// Count the subtree reached by the root check, without constructing a tree.
+pub(crate) fn root_check_span(config: &PostflopConfig) -> Option<hu_engine::StorageSpan> {
+    let root = LineState::root(config);
+    let mut hits = rule_hits_for(config);
+    if !node_actions(&root, config, &mut hits)
+        .iter()
+        .any(|a| matches!(a, NodeAction::Check))
+    {
+        return None;
+    }
+    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
+        return None;
+    };
+    let estimate = count_tree_from(config, true, next).ok()?;
+    Some(hu_engine::StorageSpan {
+        start: 0,
+        end: usize::try_from(estimate.f32_regret_bytes / 4).ok()?,
+        sref_start: 0,
+        sref_end: u32::try_from(estimate.action_nodes).ok()?,
+    })
+}
+
+/// Whether a root-check selector matches a board-live hand in the actor's support.
+pub(crate) fn root_check_has_hands(config: &PostflopConfig, selector: &spot::HandSelector) -> bool {
+    let root = LineState::root(config);
+    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
+        return false;
+    };
+    let selected = match selector {
+        spot::HandSelector::All => None,
+        spot::HandSelector::Range(text) => match text.parse::<Range>() {
+            Ok(range) => Some(range),
+            Err(_) => return false,
+        },
+        spot::HandSelector::Category(_) => return false,
+    };
+    (0..nlh::NUM_COMBOS).any(|combo| {
+        let (a, b) = nlh::combo_cards(combo);
+        !config.board.contains(&a)
+            && !config.board.contains(&b)
+            && config.ranges[next.to_act].weight(combo) > 0.0
+            && selected
+                .as_ref()
+                .is_none_or(|range| range.weight(combo) > 0.0)
+    })
+}
 
 /// `parallel` counts the first chance level's deals concurrently; the
 /// estimate is identical either way.
 fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate, TreeBuildError> {
+    count_tree_from(config, parallel, LineState::root(config))
+}
+
+fn count_tree_from(
+    config: &PostflopConfig,
+    parallel: bool,
+    start: LineState,
+) -> Result<MemoryEstimate, TreeBuildError> {
     let mut counting = Counting {
         config,
         sym: game_preserving_perms(config),
@@ -2516,7 +2570,7 @@ fn count_tree(config: &PostflopConfig, parallel: bool) -> Result<MemoryEstimate,
         error: None,
         parallel,
     };
-    counting.betting(LineState::root(config));
+    counting.betting(start);
 
     if let Some(error) = counting.error {
         return Err(error);

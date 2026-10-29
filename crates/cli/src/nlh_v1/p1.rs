@@ -400,8 +400,8 @@ fn execute(
             Ok(())
         },
         &mut |diagnostic| match diagnostic {
-            run::Diagnostic::Memory(estimate) => {
-                print_memory_estimate(&estimate);
+            run::Diagnostic::Memory(_) => {
+                print_memory_estimate(&p);
                 println!("storage: {}", hu_postflop::prepare::storage_description(&p));
             }
             run::Diagnostic::Warning(warning) => eprintln!("warning: {warning}"),
@@ -443,7 +443,8 @@ fn execute(
     recorder.finish(outcome.map(|_| ()), completion)
 }
 
-pub(crate) fn print_memory_estimate(estimate: &hu_postflop::MemoryEstimate) {
+pub(crate) fn print_memory_estimate(p: &hu_postflop::prepare::Prepared) {
+    let estimate = &p.estimate;
     println!(
         "tree: nodes={} terminals={} rank_tables={} storage={:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg)",
         estimate.nodes,
@@ -455,9 +456,10 @@ pub(crate) fn print_memory_estimate(estimate: &hu_postflop::MemoryEstimate) {
     );
     println!(
         "memory estimate: {:.1} MiB (f32) / {:.1} MiB (i16) / {:.1} MiB (i16-f32avg); resident {:.1} MiB (game {:.1} MiB, {} threads x {:.1} MiB), checkpoint encoder {:.1} MiB",
-        estimate.required_bytes(input::Storage::F32) as f64 / (1024.0 * 1024.0),
-        estimate.required_bytes(input::Storage::I16) as f64 / (1024.0 * 1024.0),
-        estimate.required_bytes(input::Storage::I16F32Avg) as f64 / (1024.0 * 1024.0),
+        hu_postflop::prepare::required_bytes_for(p, input::Storage::F32) as f64 / (1024.0 * 1024.0),
+        hu_postflop::prepare::required_bytes_for(p, input::Storage::I16) as f64 / (1024.0 * 1024.0),
+        hu_postflop::prepare::required_bytes_for(p, input::Storage::I16F32Avg) as f64
+            / (1024.0 * 1024.0),
         estimate.resident_bytes() as f64 / (1024.0 * 1024.0),
         estimate.game_bytes as f64 / (1024.0 * 1024.0),
         estimate.threads,

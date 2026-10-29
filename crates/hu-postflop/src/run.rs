@@ -656,6 +656,7 @@ fn drive<S: Storage>(
                 Some(base),
             );
         }
+        check_fallback_memory(p, "outside-residual")?;
         let (game, profile) = solver.into_game_and_profile();
         drop(base);
         let mut solver = Solver::<_, S>::new(
@@ -689,6 +690,9 @@ fn drive<S: Storage>(
             None,
         );
     }
+    if let Some(Err(reason)) = selected.as_ref() {
+        check_fallback_memory(p, reason)?;
+    }
     let mut solver = Solver::<_, S>::new(
         game,
         schedule(&p.settings.solver.algorithm),
@@ -718,6 +722,14 @@ fn drive<S: Storage>(
         None,
         None,
     )
+}
+
+fn check_fallback_memory(p: &Prepared, reason: &str) -> Result<()> {
+    if let Some(estimate) = &p.fallback_estimate {
+        input::check_memory_limit(estimate, p.settings.solver.storage, p.limit)
+            .with_context(|| format!("NLH resource limit for freeze_upstream fallback {reason}"))?;
+    }
+    Ok(())
 }
 
 fn check_base_error(errors: &std::sync::Mutex<Option<String>>) -> Result<()> {
@@ -928,12 +940,17 @@ fn drive_ready<S: Storage>(
         }
         .into(),
     };
-    if parallel_finalize(
-        final_checkpoint,
-        &p.estimate,
-        p.settings.solver.storage,
-        p.limit,
-    ) {
+    if (final_checkpoint
+        && subtree.is_some()
+        && p.subtree_spans.is_some()
+        && crate::prepare::required_bytes(p) <= p.limit)
+        || parallel_finalize(
+            final_checkpoint,
+            &p.estimate,
+            p.settings.solver.storage,
+            p.limit,
+        )
+    {
         // join inherits the installed run pool for BOTH closures. In particular,
         // save's current_num_threads and the solution's strategy batches must
         // never fall back to the global pool. Each closure only borrows solver.
