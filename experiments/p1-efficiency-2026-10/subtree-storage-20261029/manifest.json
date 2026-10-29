@@ -4,8 +4,8 @@
   "source": {
     "old_timing": "853a46c0",
     "new_timing": "b74962db",
-    "final_preflight": "8b79c116",
-    "note": "The later changes add path-sensitive preflight and fallback guarding, CLI resource reporting, tests and documentation; benchmark runs fix f32 and have sufficient memory for parallel finalization. Preflight may add metadata and dry-count work."
+    "final_preflight": "214df3a9",
+    "note": "Later changes add selector-aware preflight, fallback guarding, CLI reporting, tests and documentation; integration includes suit mapping, no-rivers constraints and GUI. The benchmark runs use full output and fixed f32 with sufficient memory for parallel finalization. Final preflight adds metadata and dry-count work not included in timings."
   },
   "bench": {
     "instance": "i-08a0aea980fbc853b",

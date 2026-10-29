@@ -32,16 +32,16 @@ frequency の旧実装は全木 fallback、新実装は部分木。双方の ach
 
 ## preflight の較正
 
-下表の estimate は最終実装 `8b79c116` を dev box で `solvers validate --resources --format json` により再計算した `memoryEstimateBytes`。同じケースの 2 回の専用 box RSS と比較する（比率は estimate / RSS bytes の範囲）。[final-resources.tar.gz](final-resources.tar.gz) に JSON を保存。基準ファイルの path 長と物理 RAM が専用 box と異なるため config 圧縮余地および auto memory limit は僅かに異なる。比較の storage は全て f32。
+下表の estimate は最終実装 `214df3a9` を dev box で `solvers validate --resources --format json` により再計算した `memoryEstimateBytes`。同じケースの 2 回の専用 box RSS と比較する（比率は estimate / RSS bytes の範囲）。[final-resources.tar.gz](final-resources.tar.gz) に JSON を保存。基準ファイルの path 長と物理 RAM が専用 box と異なるため config 圧縮余地および auto memory limit は僅かに異なる。比較の storage は全て f32。
 
 | ケース | 実際の解決 scope | preflight が予算化する scope | estimate bytes | estimate / RSS |
 |---|---|---|---:|---:|
-| flop | subtree | 証明された root-check subtree | 5,934,021,695 | 1.073–1.080 |
-| turn | subtree | 保守的に全木 | 6,266,409,215 | 1.630–1.641 |
-| deep | subtree | 保守的に全木 | 6,260,901,503 | 2.531–2.556 |
+| flop | subtree | 証明された subtree | 5,934,021,695 | 1.073–1.080 |
+| turn | subtree | 証明された subtree | 4,556,064,007 | 1.185–1.193 |
+| deep | subtree | 証明された subtree | 3,366,473,097 | 1.361–1.374 |
 | frequency | subtree | 保守的に全木 | 6,260,916,991 | 1.118–1.122 |
 | outside-residual | 全木 fallback | 全木 | 6,260,901,503 | 1.080–1.083 |
 
-各測定で estimate は RSS 以上。turn / deep は未知の selector を全木予算にする安全側の境界のため、実際の部分木に対する 1.2 倍目標は未達。既知の root-check のみ metadata と counting dry-run で部分木を証明し、その他・frequency・no-rivers・不明条件では全木を予算化する。予想外の fallback 時は全木確保前に再度 limit を検査する。上記の全木 preflight は serial finalization の必要量で、並列 finalization は別途その peak が limit 以下の時のみ選ばれる。`auto` は選ばれた preflight 予算を使用する。
+各測定で estimate は RSS 以上。deep の 1.2 倍目標は未達で、主因は compact checkpoint が小さくても32 workerのzstd encoder上限と全木 `.sol` 出力作業領域の同時確保を安全側に見込むことである。metadata と selector-aware counting dry-run で部分木を証明できない場合（frequency、no-rivers基準解、root、その他不明条件など）は全木を予算化する。予想外の fallback 時は全木確保前に再度 limit を検査する。上記の全木 preflight は serial finalization の必要量で、並列 finalization は別途その peak が limit 以下の時のみ選ばれる。`auto` は選ばれた preflight 予算を使用する。
 
-速度・RSS の binary `b74962db` から `8b79c116` への差は metadata と追加 counting dry-run による preflight、fallback 確保前 guard、backend 別の CLI 表示、関連テスト・spec、および `p1_bench` の compact checkpoint 拒否である。明示 f32・十分な memory の上記 solve/finalization path は同じだが、最終実装の追加 preflight 時間は上表の process 秒に含まれていない。
+速度・RSS の binary `b74962db` から `214df3a9` の間には metadata と selector-aware counting dry-run による preflight、fallback 確保前 guard、backend 別の CLI 表示、テスト・spec、`p1_bench` の compact checkpoint 拒否に加え、統合 branch の suit map、no-rivers制約保存、GUI の変更がある。これらの full 出力・明示 f32・十分な memory の計測ケースでは、追加 preflight と適用されない機能を除き solve/finalization path は同じだが、最終実装の追加 preflight 時間は上表の process 秒に含まれていない。
