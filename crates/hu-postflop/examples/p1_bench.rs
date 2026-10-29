@@ -32,6 +32,8 @@ struct Args {
     storage: Option<StorageKind>,
     json: Option<PathBuf>,
     bands: bool,
+    experiment_base: Option<PathBuf>,
+    experiment_mode: Option<String>,
 }
 
 fn parse_args() -> Result<Args> {
@@ -45,6 +47,8 @@ fn parse_args() -> Result<Args> {
         storage: None,
         json: None,
         bands: false,
+        experiment_base: None,
+        experiment_mode: None,
     };
     let mut config = None;
     while let Some(arg) = args.next() {
@@ -63,6 +67,8 @@ fn parse_args() -> Result<Args> {
                 })
             }
             "--bands" => parsed.bands = true,
+            "--experiment-base" => parsed.experiment_base = Some(value()?.into()),
+            "--experiment-mode" => parsed.experiment_mode = Some(value()?),
             "--json" => parsed.json = Some(value()?.into()),
             other if other.starts_with("--") => bail!("unknown flag {other}"),
             other => config = Some(PathBuf::from(other)),
@@ -165,6 +171,7 @@ fn bench<S: Storage>(
     prepare_secs: f64,
     storage_name: &str,
 ) -> Result<()> {
+    let experiment_started = Instant::now();
     let t = Instant::now();
     let (game, index, resolved, node_info) = if p.document.spot.profile.is_some() {
         let (game, index, resolved) = hu_postflop::run::build_profiled(p)?;
@@ -209,6 +216,9 @@ fn bench<S: Storage>(
         min_children: p.settings.solver.parallel.min_children,
     });
     let alloc_secs = t.elapsed().as_secs_f64();
+    if let Some(mode) = &args.experiment_mode {
+        return warm_experiment(args, p, solver, mode, experiment_started, prepare_secs);
+    }
 
     let t = Instant::now();
     solver.run(args.warmup);
@@ -315,6 +325,154 @@ fn bench<S: Storage>(
         std::fs::write(path, serde_json::to_string_pretty(&report)?)?;
     }
     drop(index);
+    Ok(())
+}
+
+// Experiment only: this does not alter relock/resume semantics.
+fn warm_experiment<S: Storage>(
+    args: &Args,
+    p: &prepare::Prepared,
+    mut solver: Solver<hu_postflop::PostflopEvaluator, S>,
+    mode: &str,
+    experiment_started: Instant,
+    prepare_secs: f64,
+) -> Result<()> {
+    use hu_engine::{NodeKind, StorageArraysMut};
+    let base = args
+        .experiment_base
+        .as_ref()
+        .context("--experiment-base is required")?;
+    let sol = hu_postflop::artifact::load_sol(&base.join("solution.sol"), 0, None)?;
+    let tree = &solver.game().tree;
+    let old = &sol.game.tree;
+    if sol.config.board != p.config.board
+        || sol.config.pot != p.config.pot
+        || sol.config.effective_stack != p.config.effective_stack
+        || old.nodes.len() != tree.nodes.len()
+        || old.nodes.iter().zip(&tree.nodes).any(|(a, b)| {
+            (a.kind, a.player, a.num_children, a.first_child, a.aux)
+                != (b.kind, b.player, b.num_children, b.first_child, b.aux)
+        })
+        || old.storage_refs.len() != tree.storage_refs.len()
+        || old.deals.len() != tree.deals.len()
+        || old
+            .storage_refs
+            .iter()
+            .zip(&tree.storage_refs)
+            .any(|(a, b)| {
+                (a.offset, a.num_actions, a.num_hands) != (b.offset, b.num_actions, b.num_hands)
+            })
+        || old
+            .deals
+            .iter()
+            .zip(&tree.deals)
+            .any(|(a, b)| a.weight.to_bits() != b.weight.to_bits() || a.maps != b.maps)
+    {
+        bail!("base and profile trees differ; warm transfer is not supported");
+    }
+    let target_node = tree.nodes.iter().enumerate().find_map(|(id, node)| {
+        (node.kind == NodeKind::Action
+            && solver.profile().is_some_and(|profile| {
+                profile.locks[node.aux as usize].is_some()
+                    || profile.incentives[node.aux as usize].is_some()
+            }))
+        .then_some(id as u32)
+    });
+    match mode {
+        "cold" => {}
+        "checkpoint" | "reset-restart" | "reset-continue" => {
+            let reader =
+                hu_postflop::checkpoint::CheckpointReader::open(&base.join("checkpoint.ckpt"))?;
+            let iteration = if mode == "reset-restart" {
+                0
+            } else {
+                reader.iteration
+            };
+            solver.restore_stream(iteration, |storage| {
+                reader.read_storage(storage)?;
+                if mode != "checkpoint" {
+                    match storage.arrays_mut() {
+                        StorageArraysMut::F32 { strategy_sum, .. } => strategy_sum.fill(0.0),
+                        _ => bail!("experiment supports f32 only"),
+                    }
+                }
+                Ok::<_, anyhow::Error>(())
+            })?;
+        }
+        _ if mode.starts_with("strategy-") => {
+            let weight: f32 = mode["strategy-".len()..].parse()?;
+            if !weight.is_finite() || weight <= 0.0 {
+                bail!("strategy weight must be positive and finite");
+            }
+            let refs = tree.storage_refs.clone();
+            let nodes = tree.nodes.clone();
+            solver.restore_stream(0, |storage| {
+                let StorageArraysMut::F32 {
+                    regrets,
+                    strategy_sum,
+                } = storage.arrays_mut()
+                else {
+                    bail!("experiment supports f32 only");
+                };
+                for (id, node) in nodes.iter().enumerate() {
+                    if node.kind != NodeKind::Action {
+                        continue;
+                    }
+                    let r = refs[node.aux as usize];
+                    let strategy = sol
+                        .stored_strategy(id as u32)?
+                        .context("solution must contain all streets")?;
+                    for (slot, probability) in regrets[r.offset..r.offset + strategy.len()]
+                        .iter_mut()
+                        .zip(strategy)
+                    {
+                        *slot = probability * weight;
+                    }
+                }
+                strategy_sum.fill(0.0);
+                Ok::<_, anyhow::Error>(())
+            })?;
+        }
+        _ => bail!("unknown experiment mode {mode}"),
+    }
+    let target = p.target.context("experiment requires a 0.1% pot target")?;
+    let start_iteration = solver.iteration();
+    let setup_secs = prepare_secs + experiment_started.elapsed().as_secs_f64();
+    let started = Instant::now();
+    let mut hits = Vec::new();
+    let mut next = target;
+    for added in 0..=args.iters {
+        let (ev, expl) = solver.evaluate();
+        let nash = expl[Player::P0] + expl[Player::P1];
+        if nash / 2.0 <= next {
+            let true_ev = solver.true_expected_values();
+            hits.push(serde_json::json!({
+                "addedIterations": added, "iteration": solver.iteration(),
+                "elapsedSecsLab": started.elapsed().as_secs_f64(),
+                "totalSecs": prepare_secs + experiment_started.elapsed().as_secs_f64(),
+                "nashConv": nash, "objectiveEv": [ev[Player::P0], ev[Player::P1]],
+                "trueEv": [true_ev[Player::P0], true_ev[Player::P1]],
+                "rootStrategy": solver.average_strategy_at(0),
+                "targetNode": target_node,
+                "targetStrategy": target_node.map(|node| solver.average_strategy_at(node)),
+            }));
+            if hits.len() == 2 {
+                break;
+            }
+            next = target / 2.0;
+        }
+        if added < args.iters {
+            solver.step();
+        }
+    }
+    let report = serde_json::json!({
+        "mode": mode, "startIteration": start_iteration, "hits": hits,
+        "maxAddedIterations": args.iters, "targetExploitability": target, "setupSecs": setup_secs,
+    });
+    println!("{}", serde_json::to_string(&report)?);
+    if let Some(path) = &args.json {
+        std::fs::write(path, serde_json::to_string_pretty(&report)?)?;
+    }
     Ok(())
 }
 
