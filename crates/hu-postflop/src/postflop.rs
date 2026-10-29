@@ -2335,10 +2335,16 @@ impl MemoryEstimate {
         self.action_nodes.saturating_mul(PROFILE_SLOT_BYTES)
     }
 
-    /// Reserved for a future third `.sol` stream in frozen saves. Its writer
-    /// is not present yet, so current saves require no additional workspace.
-    pub(crate) fn freeze_third_stream_workspace(&self) -> u64 {
-        0
+    /// Workspace for the river-constraint stream in a no-rivers profile save.
+    pub(crate) fn river_constraint_workspace(&self, config: &PostflopConfig) -> u64 {
+        let hands = PostflopHands::new(&config.board, &config.ranges);
+        let widest = hands.len(Player::P0).max(hands.len(Player::P1)) as u64;
+        crate::sol::river_constraint_workspace(
+            self.max_strategy_elements,
+            self.f32_regret_bytes / 4,
+            widest,
+            self.action_nodes,
+        )
     }
 
     /// Compact-subtree peak for disjoint selected storage spans, including
@@ -2490,51 +2496,292 @@ impl MemoryEstimate {
 pub fn try_memory_usage(config: &PostflopConfig) -> Result<MemoryEstimate, TreeBuildError> {
     count_tree(config, true)
 }
-/// Count the subtree reached by the root check, without constructing a tree.
-pub(crate) fn root_check_span(config: &PostflopConfig) -> Option<hu_engine::StorageSpan> {
-    let root = LineState::root(config);
-    let mut hits = rule_hits_for(config);
-    if !node_actions(&root, config, &mut hits)
-        .iter()
-        .any(|a| matches!(a, NodeAction::Check))
-    {
-        return None;
-    }
-    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
-        return None;
-    };
-    let estimate = count_tree_from(config, true, next).ok()?;
-    Some(hu_engine::StorageSpan {
-        start: 0,
-        end: usize::try_from(estimate.f32_regret_bytes / 4).ok()?,
-        sref_start: 0,
-        sref_end: u32::try_from(estimate.action_nodes).ok()?,
-    })
+/// A selector walk retains only its frontier, never tree nodes or storage.
+#[derive(Clone)]
+enum SelectorNode {
+    Action(LineState),
+    Chance(LineState),
+    Terminal,
 }
 
-/// Whether a root-check selector matches a board-live hand in the actor's support.
-pub(crate) fn root_check_has_hands(config: &PostflopConfig, selector: &spot::HandSelector) -> bool {
-    let root = LineState::root(config);
-    let ChildStep::Betting(next) = child_step(&root, NodeAction::Check) else {
-        return false;
+#[derive(Clone)]
+struct SelectorTarget {
+    path: Vec<usize>,
+    node: SelectorNode,
+}
+
+fn selector_history_steps(selector: &str) -> Option<Vec<&str>> {
+    let mut rest = selector;
+    let mut steps = Vec::new();
+    while !rest.is_empty() {
+        let len = match rest.as_bytes()[0] {
+            b'x' | b'c' | b'f' => 1,
+            b'r' => {
+                1 + rest[1..]
+                    .bytes()
+                    .take_while(|b| b.is_ascii_digit() || *b == b'.')
+                    .count()
+            }
+            b'[' => rest.find(']')? + 1,
+            _ => return None,
+        };
+        let (step, tail) = rest.split_at(len);
+        steps.push(step);
+        rest = tail;
+    }
+    Some(steps)
+}
+
+fn selector_walk(
+    config: &PostflopConfig,
+    steps: &[&str],
+    history: bool,
+    lookup: bool,
+) -> Option<Vec<SelectorTarget>> {
+    let sym = game_preserving_perms(config);
+    let mut current = vec![SelectorTarget {
+        path: Vec::new(),
+        node: SelectorNode::Action(LineState::root(config)),
+    }];
+    let mut hits = rule_hits_for(config);
+    for &step in steps {
+        let mut next = Vec::new();
+        for target in current {
+            match target.node {
+                SelectorNode::Action(state) => {
+                    let actions = node_actions(&state, config, &mut hits);
+                    let labels: Vec<String> = actions
+                        .iter()
+                        .map(|action| match action {
+                            NodeAction::Fold => "fold".into(),
+                            NodeAction::Check => "check".into(),
+                            NodeAction::Call => "call".into(),
+                            NodeAction::Wager(additional) => {
+                                let to = state.contrib[state.to_act] + *additional;
+                                let to = crate::prepare::bb(to.0 as u64);
+                                if state.outstanding == Chips::ZERO {
+                                    format!("bet {to}")
+                                } else {
+                                    format!("raise to {to}")
+                                }
+                            }
+                        })
+                        .collect();
+                    let selected = if history {
+                        labels
+                            .iter()
+                            .position(|label| crate::queries::history_token(label) == step)
+                    } else {
+                        let refs: Vec<&str> = labels.iter().map(String::as_str).collect();
+                        crate::queries::resolve_action(&refs, step).ok()
+                    };
+                    if let Some(pos) = selected {
+                        let node = match child_step(&state, actions[pos]) {
+                            ChildStep::Fold => SelectorNode::Terminal,
+                            ChildStep::Betting(child) => SelectorNode::Action(child),
+                            ChildStep::StreetEnd(mut child) => {
+                                if child.contrib[Player::P0] == config.effective_stack
+                                    || child.contrib[Player::P1] == config.effective_stack
+                                {
+                                    child.all_in = true;
+                                }
+                                if child.street == Street::River {
+                                    SelectorNode::Terminal
+                                } else {
+                                    SelectorNode::Chance(child)
+                                }
+                            }
+                        };
+                        let mut path = target.path;
+                        path.push(pos);
+                        next.push(SelectorTarget { path, node });
+                    }
+                }
+                SelectorNode::Chance(state) => {
+                    let wanted = if history {
+                        step.strip_prefix('[')
+                            .and_then(|s| s.strip_suffix(']'))
+                            .unwrap_or(step)
+                    } else {
+                        step
+                    };
+                    for (pos, group) in chance_groups(&state.board, config.iso_merging, &sym)
+                        .iter()
+                        .enumerate()
+                    {
+                        let cardless = state.all_in && group.members.len() > 1;
+                        let label = if cardless {
+                            format!("deal{pos}")
+                        } else {
+                            group.representative.to_string()
+                        };
+                        let matches = if lookup {
+                            if cardless {
+                                wanted == label
+                            } else {
+                                wanted.parse::<Card>().ok() == Some(group.representative)
+                            }
+                        } else {
+                            wanted == "?"
+                                || label.eq_ignore_ascii_case(wanted.trim_end_matches('*'))
+                        };
+                        if !matches {
+                            continue;
+                        }
+                        let child = state.dealt(group.representative);
+                        let node = if state.all_in {
+                            if child.street == Street::River {
+                                SelectorNode::Terminal
+                            } else {
+                                SelectorNode::Chance(child)
+                            }
+                        } else {
+                            SelectorNode::Action(child)
+                        };
+                        let mut path = target.path.clone();
+                        path.push(pos);
+                        next.push(SelectorTarget { path, node });
+                    }
+                }
+                SelectorNode::Terminal => {}
+            }
+        }
+        if next.is_empty() {
+            return None;
+        }
+        current = next;
+    }
+    Some(current)
+}
+
+fn selector_targets(config: &PostflopConfig, selector: &str) -> Option<Vec<SelectorTarget>> {
+    if selector.is_empty() || selector == "root" {
+        return selector_walk(config, &[], false, false);
+    }
+    let history_steps = selector_history_steps(selector);
+    // profile_nodes chooses history if it contains a wildcard or names any
+    // actual node; otherwise it interprets the input as a slash path.
+    let history = history_steps
+        .as_ref()
+        .and_then(|steps| selector_walk(config, steps, true, !selector.contains("[?]")));
+    let targets = if selector.contains("[?]") {
+        history?
+    } else if let Some(targets) = history {
+        targets
+    } else {
+        let steps: Vec<_> = selector
+            .split('/')
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .collect();
+        selector_walk(config, &steps, false, false)?
     };
-    let selected = match selector {
-        spot::HandSelector::All => None,
-        spot::HandSelector::Range(text) => match text.parse::<Range>() {
-            Ok(range) => Some(range),
-            Err(_) => return false,
-        },
-        spot::HandSelector::Category(_) => return false,
+    targets
+        .iter()
+        .all(|t| matches!(t.node, SelectorNode::Action(_)))
+        .then_some(targets)
+}
+
+fn selector_has_hands(
+    config: &PostflopConfig,
+    state: &LineState,
+    selector: &spot::HandSelector,
+) -> Option<bool> {
+    let range = match selector {
+        spot::HandSelector::Range(text) => Some(text.parse::<Range>().ok()?),
+        _ => None,
     };
-    (0..nlh::NUM_COMBOS).any(|combo| {
+    let category = match selector {
+        spot::HandSelector::Category(text) => Some(nlh::category::CategoryExpr::parse(text).ok()?),
+        _ => None,
+    };
+    Some((0..nlh::NUM_COMBOS).any(|combo| {
         let (a, b) = nlh::combo_cards(combo);
-        !config.board.contains(&a)
-            && !config.board.contains(&b)
-            && config.ranges[next.to_act].weight(combo) > 0.0
-            && selected
+        !state.board.contains(&a)
+            && !state.board.contains(&b)
+            && config.ranges[state.to_act].weight(combo) > 0.0
+            && range.as_ref().is_none_or(|r| r.weight(combo) > 0.0)
+            && category
                 .as_ref()
-                .is_none_or(|range| range.weight(combo) > 0.0)
-    })
+                .is_none_or(|c| c.matches(&state.board, [a, b]))
+    }))
+}
+
+/// Count maximal matched target subtrees. Spans are synthetic disjoint
+/// intervals: the budget consumes only their lengths, not tree offsets.
+pub(crate) fn selector_subtree_spans(
+    config: &PostflopConfig,
+    profile: &spot::ProfileIr,
+) -> Option<Vec<hu_engine::StorageSpan>> {
+    let mut selected = Vec::new();
+    for lock in &profile.locks {
+        for target in selector_targets(config, &lock.node)? {
+            let SelectorNode::Action(state) = &target.node else {
+                return None;
+            };
+            let has_hands = match &lock.strategy {
+                spot::LockStrategy::Uniform(_) => selector_has_hands(config, state, &lock.hands)?,
+                // The per-combo strategy ignores the entry's hand selector.
+                spot::LockStrategy::PerCombo(entries) => {
+                    let mut found = false;
+                    for (text, _) in entries {
+                        found |= selector_has_hands(
+                            config,
+                            state,
+                            &spot::HandSelector::Range(text.clone()),
+                        )?;
+                    }
+                    found
+                }
+            };
+            if has_hands {
+                selected.push(target);
+            }
+        }
+    }
+    for incentive in &profile.incentives {
+        for target in selector_targets(config, &incentive.node)? {
+            let SelectorNode::Action(state) = &target.node else {
+                return None;
+            };
+            if selector_has_hands(config, state, &incentive.hands)? {
+                selected.push(target);
+            }
+        }
+    }
+    selected.sort_by(|a, b| a.path.cmp(&b.path));
+    let mut maximal: Vec<SelectorTarget> = Vec::new();
+    for target in selected {
+        if !maximal
+            .last()
+            .is_some_and(|parent| target.path.starts_with(&parent.path))
+        {
+            maximal.push(target);
+        }
+    }
+    if maximal.is_empty() || maximal[0].path.is_empty() {
+        return None;
+    }
+    let mut spans = Vec::new();
+    let mut end = 0usize;
+    let mut sref_end = 0u32;
+    for target in maximal {
+        let SelectorNode::Action(state) = target.node else {
+            return None;
+        };
+        let estimate = count_tree_from(config, false, state).ok()?;
+        let next = end.checked_add(usize::try_from(estimate.f32_regret_bytes / 4).ok()?)?;
+        let next_ref = sref_end.checked_add(u32::try_from(estimate.action_nodes).ok()?)?;
+        spans.push(hu_engine::StorageSpan {
+            start: end,
+            end: next,
+            sref_start: sref_end,
+            sref_end: next_ref,
+        });
+        end = next;
+        sref_end = next_ref;
+    }
+    Some(spans)
 }
 
 /// `parallel` counts the first chance level's deals concurrently; the
@@ -2882,6 +3129,157 @@ impl Counting<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn selector_count_excludes_runouts_blocking_selected_hands() {
+        use crate::game::{ChipEv, NoRake};
+        use crate::index::{GameIndex, TreeView};
+
+        let mut config = PostflopConfig {
+            board: cards("As Ks Qs 2c"),
+            ranges: PerPlayer::new("AhAd".parse().unwrap(), "JTs,99".parse().unwrap()),
+            pot: Chips(6),
+            effective_stack: Chips(9),
+            ..Default::default()
+        };
+        let hands = spot::HandSelector::Range("AhAd".into());
+        let profile = spot::ProfileIr {
+            locks: vec![spot::LockIr {
+                node: "xx[?]".into(),
+                hands: hands.clone(),
+                strategy: spot::LockStrategy::Uniform(vec![("check".into(), 1.0)]),
+                confidence: 1.0,
+            }],
+            incentives: Vec::new(),
+            frequencies: Vec::new(),
+            freeze_upstream: None,
+        };
+        crate::profile::restrict_iso(&mut config, &profile).unwrap();
+        let counted = selector_subtree_spans(&config, &profile).unwrap();
+        let game = build_postflop_game(
+            &config,
+            PayoffPipeline {
+                rake: &NoRake,
+                utility: &ChipEv,
+            },
+        );
+        let index = GameIndex::from_game(&game.game, &game.node_info, Street::Turn);
+        let tree = &game.game.tree;
+        let view = TreeView {
+            tree,
+            index: &index,
+        };
+        let nodes = view.profile_nodes("xx[?]").unwrap();
+        let mut actual = Vec::new();
+        let mut blocked = 0;
+        for id in nodes {
+            if view
+                .profile_hand_mask(id, &config.board, &hands)
+                .unwrap()
+                .iter()
+                .any(|&selected| selected)
+            {
+                let span = tree.storage_spans[id as usize];
+                actual.push((span.end - span.start, span.sref_end - span.sref_start));
+            } else {
+                blocked += 1;
+            }
+        }
+        assert!(blocked > 0);
+        let mut measured: Vec<_> = counted
+            .iter()
+            .map(|s| (s.end - s.start, s.sref_end - s.sref_start))
+            .collect();
+        actual.sort_unstable();
+        measured.sort_unstable();
+        assert_eq!(measured, actual);
+    }
+
+    #[test]
+    fn selector_count_matches_compiled_maximal_subtrees() {
+        use crate::game::{ChipEv, NoRake};
+        use crate::index::{GameIndex, TreeView};
+
+        for selectors in [
+            vec!["check/check/2d"],
+            vec!["xx[?]"],
+            vec!["x", "xx[?]", "check/check/?/check"],
+            vec!["check/check/2d", "xx[?]xx[?]"],
+        ] {
+            let mut config = PostflopConfig {
+                board: cards("As Ks Qs"),
+                ranges: PerPlayer::new(
+                    "AA,KQs,76s".parse().unwrap(),
+                    "JTs,99,AKo".parse().unwrap(),
+                ),
+                pot: Chips(6),
+                effective_stack: Chips(9),
+                ..Default::default()
+            };
+            let profile = spot::ProfileIr {
+                locks: selectors
+                    .iter()
+                    .map(|node| spot::LockIr {
+                        node: (*node).into(),
+                        hands: spot::HandSelector::All,
+                        strategy: spot::LockStrategy::Uniform(vec![("check".into(), 1.0)]),
+                        confidence: 1.0,
+                    })
+                    .collect(),
+                incentives: Vec::new(),
+                frequencies: Vec::new(),
+                freeze_upstream: None,
+            };
+            crate::profile::restrict_iso(&mut config, &profile).unwrap();
+            let counted = selector_subtree_spans(&config, &profile).unwrap();
+            let game = build_postflop_game(
+                &config,
+                PayoffPipeline {
+                    rake: &NoRake,
+                    utility: &ChipEv,
+                },
+            );
+            let index = GameIndex::from_game(&game.game, &game.node_info, Street::Flop);
+            let tree = &game.game.tree;
+            let view = TreeView {
+                tree,
+                index: &index,
+            };
+            let targets: BTreeSet<_> = selectors
+                .iter()
+                .flat_map(|selector| view.profile_nodes(selector).unwrap())
+                .collect();
+            let mut actual = Vec::new();
+            for &id in &targets {
+                let mut parent = index.parents[id as usize];
+                let mut nested = false;
+                while parent != NodeId::MAX {
+                    nested |= targets.contains(&parent);
+                    parent = index.parents[parent as usize];
+                }
+                if !nested {
+                    let span = tree.storage_spans[id as usize];
+                    actual.push((span.end - span.start, span.sref_end - span.sref_start));
+                }
+            }
+            let mut measured: Vec<_> = counted
+                .iter()
+                .map(|s| (s.end - s.start, s.sref_end - s.sref_start))
+                .collect();
+            actual.sort_unstable();
+            measured.sort_unstable();
+            assert_eq!(measured, actual, "{selectors:?}");
+            assert_eq!(
+                measured
+                    .iter()
+                    .fold((0usize, 0u32), |(e, r), &(a, b)| (e + a, r + b)),
+                actual
+                    .iter()
+                    .fold((0usize, 0u32), |(e, r), &(a, b)| (e + a, r + b)),
+                "{selectors:?}"
+            );
+        }
+    }
 
     #[test]
     fn selector_bounds_cover_wildcards_and_saturate() {

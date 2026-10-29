@@ -116,6 +116,25 @@ pub(crate) fn compression_workspace(
         + chunks * 3 * std::mem::size_of::<ChunkEntry>() as u64
 }
 
+/// Additional workspace for the optional no-rivers profile constraint stream.
+/// Every node can contain fixed and bonus arrays (one f32 per action/hand),
+/// confidence (one f32 per hand), postcard headers, and a chunk entry.
+pub(crate) fn river_constraint_workspace(
+    max_strategy_elements: u64,
+    strategy_elements: u64,
+    widest_hands: u64,
+    action_nodes: u64,
+) -> u64 {
+    let block = max_strategy_elements
+        .saturating_mul(8)
+        .saturating_add(widest_hands.saturating_mul(4))
+        .saturating_add(64);
+    let payload = strategy_elements.saturating_mul(8).saturating_add(
+        action_nodes.saturating_mul(widest_hands.saturating_mul(4).saturating_add(72)),
+    );
+    compression_workspace(block, payload, action_nodes).saturating_add(block.saturating_mul(2))
+}
+
 /// Errors from reading or writing a `.sol` file.
 #[derive(Debug, thiserror::Error)]
 pub enum SolError {
@@ -1892,6 +1911,52 @@ mod tests {
             assert_eq!(unshuffle(&planes), raw);
         }
         assert_eq!(shuffle(&[1, 2, 3, 4, 5]), vec![1, 3, 5, 2, 4]);
+    }
+
+    #[test]
+    fn constraint_stream_workspace_bounds_buffered_blocks() {
+        let hands = 128usize;
+        let elements = hands * 4;
+        let nodes = 4096usize;
+        let fixed = vec![0.25; elements];
+        let bonus = vec![0.5; elements];
+        let confidence = vec![1.0; hands];
+        let block = postcard::to_allocvec(&RiverConstraintRef {
+            fixed: Some(&fixed),
+            confidence: Some(&confidence),
+            bonus: Some(&bonus),
+        })
+        .unwrap();
+        let bound = river_constraint_workspace(
+            elements as u64,
+            (elements * nodes) as u64,
+            hands as u64,
+            nodes as u64,
+        );
+        let mut file = tempfile::tempfile().unwrap();
+        let mut section = SectionWriter::new(Section::Constraints);
+        let mut offset = 0;
+        for sref in 0..nodes as u32 {
+            section
+                .push(&mut file, &mut offset, sref, None, &block)
+                .unwrap();
+            let held = section.raw.capacity()
+                + section
+                    .sealed
+                    .iter()
+                    .map(|(raw, ..)| raw.capacity())
+                    .sum::<usize>()
+                + block.capacity()
+                + section.entries.capacity() * std::mem::size_of::<ChunkEntry>();
+            // Each in-flight raw chunk also requires a shuffled buffer, a
+            // compressed buffer, and a separately bounded zstd context.
+            let parallel = section
+                .sealed
+                .iter()
+                .map(|(raw, ..)| 2 * raw.capacity() + COMPRESSION_CONTEXT_BYTES as usize)
+                .sum::<usize>();
+            assert!((held + parallel) as u64 <= bound);
+        }
     }
 
     /// The workspace estimate charges [`COMPRESSION_CONTEXT_BYTES`] per

@@ -92,14 +92,6 @@ fn proven_subtree_spans(
     let freeze = profile.freeze_upstream.as_ref()?;
     if !profile.frequencies.is_empty()
         || (profile.locks.is_empty() && profile.incentives.is_empty())
-        || profile.locks.iter().any(|e| e.node != "x")
-        || profile.incentives.iter().any(|e| e.node != "x")
-        || !profile
-            .locks
-            .iter()
-            .map(|e| &e.hands)
-            .chain(profile.incentives.iter().map(|e| &e.hands))
-            .any(|hands| crate::postflop::root_check_has_hands(config, hands))
     {
         return None;
     }
@@ -128,11 +120,7 @@ fn proven_subtree_spans(
     {
         return None;
     }
-    let span = crate::postflop::root_check_span(config)?;
-    if span.end == 0 || span.sref_end == 0 {
-        return None;
-    }
-    Some(vec![span])
+    crate::postflop::selector_subtree_spans(config, profile)
 }
 
 /// Parse and lower a P1 input, measuring its tree and resolving the memory/stop limits.
@@ -165,6 +153,11 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
     estimate.threads = run_threads(&document.spot.run)? as u64;
     if document.spot.profile.is_some() {
         estimate.profile_bytes = estimate.profile_slot_bytes();
+        if settings.output.solution_streets == input::SolutionStreets::NoRivers {
+            estimate.save_bytes = estimate
+                .save_bytes
+                .saturating_add(estimate.river_constraint_workspace(&config));
+        }
     }
     if let Some(profile) = &document.spot.profile
         && profile.freeze_upstream.is_some()
@@ -172,9 +165,6 @@ pub fn prepare(raw: &str, path: &Path) -> Result<Prepared> {
         estimate.profile_bytes = estimate
             .profile_bytes
             .saturating_add(estimate.freeze_bytes(&config, profile));
-        estimate.save_bytes = estimate
-            .save_bytes
-            .saturating_add(estimate.freeze_third_stream_workspace());
     }
     let physical = if document.spot.run.memory_bytes.is_none() {
         input::physical_memory_bytes().context("querying physical RAM")?
@@ -515,6 +505,31 @@ check_every = 2
 memory = "1GiB"
 threads = 1
 "#;
+
+    #[test]
+    fn no_rivers_profile_budgets_constraint_stream_without_freeze() {
+        let path = Path::new("input.toml");
+        let profile = "\n[[profile.lock]]\nnode = 'x'\nstrategy = { check = 1.0 }\n";
+        let full = prepare(&format!("{CONFIG}{profile}"), path).unwrap();
+        let no_rivers = prepare(
+            &format!("{CONFIG}\n[output]\nsolution_streets = 'no-rivers'\n{profile}"),
+            path,
+        )
+        .unwrap();
+        let plain = prepare(
+            &format!("{CONFIG}\n[output]\nsolution_streets = 'no-rivers'\n"),
+            path,
+        )
+        .unwrap();
+        assert_eq!(
+            no_rivers.estimate.save_bytes,
+            full.estimate.save_bytes
+                + no_rivers
+                    .estimate
+                    .river_constraint_workspace(&no_rivers.config)
+        );
+        assert_eq!(plain.estimate.save_bytes, full.estimate.save_bytes);
+    }
 
     #[test]
     fn freeze_preflight_uses_proved_spans_and_tighter_target_uses_full_tree() {
