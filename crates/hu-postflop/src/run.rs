@@ -298,7 +298,6 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
             )
             .into());
         }
-        let mut base_strategies = Vec::new();
         if let Some(freeze) = &ir.freeze_upstream {
             let mut input = std::fs::File::open(&freeze.solution)?;
             let mut hash = Sha256::new();
@@ -321,23 +320,19 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
             }
             let base = crate::artifact::load_sol(Path::new(&freeze.solution), 0, None)?;
             let map = crate::base_map::BaseMap::new(&base, &built.game.tree, &index, &p.config)?;
-            for (id, node) in built.game.tree.nodes.iter().enumerate() {
-                base_strategies.push(if node.kind == hu_engine::NodeKind::Action {
-                    map.strategy(&base, id as u32)?
-                } else {
-                    None
-                });
-            }
             loaded_base = Some((base, map));
         }
-        let provider = |id: u32| base_strategies.get(id as usize).cloned().flatten();
+        let provider = |id: u32| match loaded_base.as_ref() {
+            Some((base, map)) => map.strategy(base, id),
+            None => Ok(None),
+        };
         let resolved = crate::profile::resolve_profile(
             &mut built,
             &p.config,
             ir,
             ir.freeze_upstream
                 .as_ref()
-                .map(|_| &provider as &dyn Fn(u32) -> Option<Vec<f32>>),
+                .map(|_| &provider as &dyn Fn(u32) -> anyhow::Result<Option<Vec<f32>>>),
         )?;
         if p.settings.output.solution_streets == SolutionStreets::NoRivers
             && resolved
