@@ -169,10 +169,12 @@ foldはglobal combo順、showdownはrank順・group total順を保ち、各lane�
 戦略正規化・reach乗算・EV加算・BRのmaxも元の順序を保つ。chance/action並列の上位分割は変更しない。
 記録不要の EV/BR は全 0 部分木を省く。全 node の値記録と `.sol` 用
 `visit_expected_values` は元の走査・演算を維持し、符号付き 0 を含む保存値を保つ。
-profileの無い`Solver::evaluate()`は、両seatのEV/BRを`solver/dual.rs`の1回の走査で求め、各nodeの平均戦略の
+`Solver::evaluate()`は、両seatのEV/BRを`solver/dual.rs`の1回の走査で求め、各nodeの平均戦略の
 storage読込みと正規化を両seatで共有する。各channelのf64演算順は個別の走査と同じでbit一致し、chanceの無い小さい部分木は
 同じ3段のbatchを両seatで共有する。外側のchance分割が並列のとき、内側のchance子は逐次に処理してworker scratchの保持を抑える。
-profile付きの評価と、zero-sumの`exploitability()`の近道は従来のseat別の走査を使う。
+profile付きでも同じ走査を使う。lockは共有した戦略へ合成し、incentiveは各seatのEV/BR行へ加え、lockを持つhandのBRは
+`locked_best_response`で個別走査と同じ式・順序で求める。lockもincentiveも無い部分木だけをbatchで処理する。
+`exploitability()`はprofile付きまたはzero-sumのとき、従来のseat別の走査（`ev_and_br`）を使う。
 
 HUのchance-sampled driverは未使用のため、2026-10-13の利用者決定で削除した。
 Multiwayのexternal-sampling MCCFR経路は変更しない。

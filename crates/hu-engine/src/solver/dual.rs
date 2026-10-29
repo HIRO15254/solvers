@@ -1,4 +1,5 @@
-//! Exact no-profile EV/BR for both seats with a single strategy read per node.
+//! Exact EV/BR for both seats with a single strategy read per node, under the
+//! installed profile's locks and incentives (the `incentives: true` value pass).
 //! Each output row is [EV0, BR0, EV1, BR1]; reductions preserve child order.
 
 use super::*;
@@ -31,15 +32,22 @@ impl Drop for MetadataLease {
 struct Ctx<'a, E, S> {
     game: &'a CompiledGame<E>,
     storage: &'a S,
+    profile: Option<&'a InstalledProfile>,
     par: ParConfig,
 }
 
 pub(super) fn evaluate<E: TerminalEvaluator, S: Storage>(
     game: &CompiledGame<E>,
     storage: &S,
+    profile: Option<&InstalledProfile>,
     par: ParConfig,
 ) -> PerPlayer<(f64, f64)> {
-    let ctx = Ctx { game, storage, par };
+    let ctx = Ctx {
+        game,
+        storage,
+        profile,
+        par,
+    };
     with_worker_scratch(|scratch| {
         let d0 = game.tree.root_dims[Player::P0] as usize;
         let d1 = game.tree.root_dims[Player::P1] as usize;
@@ -96,11 +104,17 @@ fn pass<E: TerminalEvaluator, S: Storage>(
         return;
     }
     let node = *tree.node(id);
+    // Locks and incentives apply only on the recursive path; a batched
+    // subtree must contain neither (the value pass's `incentives: true` gate).
     if node.kind == NodeKind::Action
         && d0 != 0
         && d1 != 0
         && !tree.subtree_has_chance[id as usize]
         && subtree_elements(tree, id) < 2 * ACTION_PAR_MIN_ELEMENTS
+        && ctx
+            .profile
+            .is_none_or(|p| p.clear_subtree(tree.storage_spans[id as usize], true))
+        && batch::enabled()
     {
         batch(ctx, scratch, id, reach, out);
         return;
@@ -199,6 +213,13 @@ fn pass<E: TerminalEvaluator, S: Storage>(
             let n = node.num_children as usize;
             let mut sigma = scratch.take_overwrite(sref.len());
             ctx.storage.average_strategy(sref, sref.index, &mut sigma);
+            let lock = ctx
+                .profile
+                .and_then(|p| p.locks[sref.index as usize].as_ref());
+            if let Some(lock) = lock {
+                restrict_strategy(lock, hands, &mut sigma);
+                compose_strategy(lock, hands, &mut sigma);
+            }
             let mut flat = scratch.take(width * n);
             let visit = |scratch: &mut Scratch, a: usize, row: &mut [f32]| {
                 let mut next = scratch.take_overwrite(hands);
@@ -228,7 +249,44 @@ fn pass<E: TerminalEvaluator, S: Storage>(
                     visit(scratch, a, row);
                 }
             }
-            reduce(node.player, reach, &sigma, &flat, out, n);
+            // The acting seat's rows start at `seat`. Its separate value pass
+            // never enters a node its opponent cannot reach; `reduce` skips
+            // that seat likewise, so the profile terms are skipped too.
+            let own = node.player;
+            let seat = if own == Player::P0 { 0 } else { 2 * d0 };
+            let reached = !all_zero(reach[own.opponent()]);
+            if reached
+                && let Some(incentive) = ctx
+                    .profile
+                    .and_then(|p| p.incentives[sref.index as usize].as_ref())
+            {
+                let mut mass = scratch.take_overwrite(hands);
+                ctx.game.evaluator.compat_mass(
+                    incentive.space,
+                    own,
+                    reach[own.opponent()],
+                    &mut mass,
+                );
+                for (a, row) in flat.chunks_exact_mut(width).enumerate() {
+                    let (ev, br) = row[seat..seat + 2 * hands].split_at_mut(hands);
+                    for h in 0..hands {
+                        let bonus = incentive.bonus[a * hands + h] * mass[h];
+                        ev[h] += bonus;
+                        br[h] += bonus;
+                    }
+                }
+                scratch.put(mass);
+            }
+            reduce(own, reach, &sigma, &flat, out, n);
+            if reached && let Some(lock) = lock {
+                locked_best_response(
+                    lock,
+                    &flat[seat + hands..],
+                    width,
+                    n,
+                    &mut out[seat + hands..seat + 2 * hands],
+                );
+            }
             scratch.put(flat);
             scratch.put(sigma);
         }

@@ -730,16 +730,9 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     /// convention (including zero-sum accounting) is identical to
     /// `exploitability`; actual EVs are returned for both seats.
     pub fn evaluate(&self) -> (PerPlayer<f64>, PerPlayer<f64>) {
-        let (ev0, br0, ev1, br1) = if self.profile.is_none() {
-            let values = dual::evaluate(&self.game, &self.storage, self.par);
-            let (ev0, br0) = values[Player::P0];
-            let (ev1, br1) = values[Player::P1];
-            (ev0, br0, ev1, br1)
-        } else {
-            let (ev0, br0) = self.ev_and_br::<true>(Player::P0);
-            let (ev1, br1) = self.ev_and_br::<true>(Player::P1);
-            (ev0, br0, ev1, br1)
-        };
+        let values = dual::evaluate(&self.game, &self.storage, self.profile.as_ref(), self.par);
+        let (ev0, br0) = values[Player::P0];
+        let (ev1, br1) = values[Player::P1];
         (
             PerPlayer::new(ev0, ev1),
             PerPlayer::new(
@@ -893,6 +886,47 @@ fn compose_strategy(lock: &crate::NodeLock, hands: usize, sigma: &mut [f32]) {
             let f = lock.fixed[i];
             sigma[i] = p * if f.is_nan() { 0.0 } else { f } + (1.0 - p * sum).max(0.0) * sigma[i];
         }
+    }
+}
+
+/// Best response of the acting seat at a locked node. `children[a * stride + h]`
+/// is the BR value of action `a` for hand `h`; hands with zero confidence keep
+/// the unrestricted maximum already in `br`. The locked share plays its fixed
+/// actions and the remainder takes the best action it may still choose.
+fn locked_best_response(
+    lock: &crate::NodeLock,
+    children: &[f32],
+    stride: usize,
+    actions: usize,
+    br: &mut [f32],
+) {
+    let hands = br.len();
+    for h in 0..hands {
+        let p = lock.confidence[h];
+        if p == 0.0 {
+            continue;
+        }
+        let mut fixed_value = 0.0;
+        let mut sum = 0.0;
+        let mut best = f32::NEG_INFINITY;
+        for a in 0..actions {
+            let f = lock.fixed[a * hands + h];
+            let value = children[a * stride + h];
+            if !f.is_nan() {
+                sum += f;
+                fixed_value += f * value;
+            }
+            if p < 1.0 || f.is_nan() {
+                best = best.max(value);
+            }
+        }
+        let remaining = (1.0 - p * sum).max(0.0);
+        br[h] = p * fixed_value
+            + if remaining == 0.0 || best == f32::NEG_INFINITY {
+                0.0
+            } else {
+                remaining * best
+            };
     }
 }
 
@@ -1862,33 +1896,13 @@ fn value_pass<
                         .profile
                         .and_then(|p| p.locks[sref.index as usize].as_ref())
                 {
-                    for h in 0..hands {
-                        let p = lock.confidence[h];
-                        if p == 0.0 {
-                            continue;
-                        }
-                        let mut fixed_value = 0.0;
-                        let mut sum = 0.0;
-                        let mut best = f32::NEG_INFINITY;
-                        for a in 0..actions {
-                            let f = lock.fixed[a * hands + h];
-                            let value = flat[a * dim * channels + if EV { dim } else { 0 } + h];
-                            if !f.is_nan() {
-                                sum += f;
-                                fixed_value += f * value;
-                            }
-                            if p < 1.0 || f.is_nan() {
-                                best = best.max(value);
-                            }
-                        }
-                        let remaining = (1.0 - p * sum).max(0.0);
-                        br[h] = p * fixed_value
-                            + if remaining == 0.0 || best == f32::NEG_INFINITY {
-                                0.0
-                            } else {
-                                remaining * best
-                            };
-                    }
+                    locked_best_response(
+                        lock,
+                        &flat[if EV { dim } else { 0 }..],
+                        dim * channels,
+                        actions,
+                        &mut br[..hands],
+                    );
                 }
                 scratch.put(flat);
             } else {

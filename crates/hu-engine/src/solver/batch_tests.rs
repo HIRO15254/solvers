@@ -53,6 +53,19 @@ impl TerminalEvaluator for Evaluator {
             self.eval_cfr(id, p, r, out);
         }
     }
+    fn compat_mass(&self, _space: u32, p: Player, opp_reach: &[f32], out: &mut [f32]) {
+        for (dst, &own) in out.iter_mut().zip(&self.hands[p]) {
+            *dst = self.hands[p.opponent()]
+                .iter()
+                .zip(opp_reach)
+                .filter(|&(&opp, _)| mask(opp) & mask(own) == 0)
+                .map(|(_, &r)| r)
+                .sum();
+        }
+    }
+    fn supports_compat_mass(&self) -> bool {
+        true
+    }
 }
 fn mask(cards: impl IntoIterator<Item = Card>) -> u64 {
     cards.into_iter().fold(0, |m, c| m | (1 << c.index()))
@@ -362,94 +375,158 @@ fn check<const PRUNE: bool>(
     );
     maximum
 }
+/// Full, partial, soft and zero-confidence lock rows plus incentives, some on
+/// the same storage refs.
+fn mixed_profile(tree: &PublicTree) -> crate::Profile {
+    let n = tree.storage_refs.len();
+    let mut profile = crate::Profile {
+        locks: vec![None; n],
+        incentives: vec![None; n],
+    };
+    for (i, sref) in tree.storage_refs.iter().enumerate() {
+        let hands = sref.num_hands as usize;
+        let actions = sref.num_actions as usize;
+        if i % 3 == 1 {
+            let mut fixed = vec![f32::NAN; actions * hands];
+            let mut confidence = vec![0.0; hands];
+            for h in 0..hands {
+                let mut set = |a: usize, v: f32| fixed[a * hands + h] = v;
+                match h % 4 {
+                    0 => {
+                        confidence[h] = 1.0;
+                        (0..actions).for_each(|a| set(a, 0.0));
+                        set(0, 0.25);
+                        set(actions - 1, 0.75);
+                    }
+                    1 => {
+                        confidence[h] = 1.0;
+                        set(0, 0.5);
+                    }
+                    2 => {
+                        confidence[h] = 0.5;
+                        (0..actions).for_each(|a| set(a, 0.0));
+                        set(actions - 1, 1.0);
+                    }
+                    _ => {}
+                }
+            }
+            profile.locks[i] = Some(crate::NodeLock { fixed, confidence });
+        }
+        if i % 2 == 1 {
+            let bonus = (0..actions * hands)
+                .map(|i| (i % 5) as f32 * 0.25 - 0.5)
+                .collect();
+            profile.incentives[i] = Some(crate::NodeIncentive { bonus, space: 0 });
+        }
+    }
+    profile
+}
 #[test]
-fn dual_values_match_separate_passes_with_zero_reaches_and_chance() {
+fn dual_values_match_separate_passes_with_zero_reaches_chance_and_profiles() {
     for threads in [1, 4] {
         rayon::ThreadPoolBuilder::new()
             .num_threads(threads)
             .build()
             .unwrap()
             .install(|| {
-                for turn in [false, true] {
-                    for zero in [None, Some(Player::P0), Some(Player::P1)] {
-                        let (tree, evaluator) = fixture(turn);
-                        let ranges = PerPlayer::new(Player::P0, Player::P1).map(|p| {
-                            (0..evaluator.hands[p].len())
-                                .map(|h| {
-                                    if zero == Some(p) || h % 5 == 0 {
-                                        0.0
-                                    } else {
-                                        (h + 1) as f32 / 31.0
-                                    }
-                                })
-                                .collect()
-                        });
-                        let game = CompiledGame {
-                            tree,
-                            evaluator,
-                            root_ranges: ranges,
-                            normalizer: 1.0,
-                            zero_sum: false,
-                        };
-                        let mut storage =
-                            F32Storage::new(game.tree.storage_len, game.tree.storage_refs.len());
-                        let discounts = Discounts {
-                            pos: 1.0,
-                            neg: 1.0,
-                            avg: 1.0,
-                            floor_neg: false,
-                            reset_avg: false,
-                        };
-                        for node in game
-                            .tree
-                            .nodes
-                            .iter()
-                            .filter(|n| n.kind == NodeKind::Action)
-                        {
-                            let sref = game.tree.storage_ref(node);
-                            let weights: Vec<_> = (0..sref.len())
-                                .map(|i| if i % 3 == 0 { 0.0 } else { (i % 7 + 1) as f32 })
-                                .collect();
-                            storage.accumulate_strategy(sref, sref.index, &weights, &discounts);
-                        }
-                        let par = ParConfig::default();
-                        let actual = super::super::dual::evaluate(&game, &storage, par);
-                        for p in Player::BOTH {
-                            let ctx = ValueCtx {
-                                tree: &game.tree,
-                                evaluator: &game.evaluator,
-                                storage: &storage,
-                                p,
-                                par,
-                                profile: None,
-                                incentives: true,
-                            };
-                            let mut ev = vec![0.0; game.root_ranges[p].len()];
-                            let mut br = ev.clone();
-                            value_pass::<_, _, _, true, true, false>(
-                                &ctx,
-                                &mut Scratch::new(),
-                                0,
-                                &game.root_ranges[p.opponent()],
-                                &mut ev,
-                                &mut br,
-                                &no_record,
-                                par.chance_depth,
-                            );
-                            let aggregate = |values: &[f32]| {
-                                game.root_ranges[p]
-                                    .iter()
-                                    .zip(values)
-                                    .map(|(&r, &v)| r as f64 * v as f64)
-                                    .sum::<f64>()
-                            };
-                            assert_eq!(actual[p].0.to_bits(), aggregate(&ev).to_bits());
-                            assert_eq!(actual[p].1.to_bits(), aggregate(&br).to_bits());
+                // RECURSIVE is per thread; only a single worker takes one path.
+                let modes: &[bool] = if threads == 1 {
+                    &[false, true]
+                } else {
+                    &[false]
+                };
+                for &recursive in modes {
+                    for turn in [false, true] {
+                        for zero in [None, Some(Player::P0), Some(Player::P1)] {
+                            for profiled in [false, true] {
+                                check_dual(turn, zero, profiled, recursive);
+                            }
                         }
                     }
                 }
             });
     }
+}
+fn check_dual(turn: bool, zero: Option<Player>, profiled: bool, recursive: bool) {
+    let (tree, evaluator) = fixture(turn);
+    let ranges = PerPlayer::new(Player::P0, Player::P1).map(|p| {
+        (0..evaluator.hands[p].len())
+            .map(|h| {
+                if zero == Some(p) || h % 5 == 0 {
+                    0.0
+                } else {
+                    (h + 1) as f32 / 31.0
+                }
+            })
+            .collect()
+    });
+    let game = CompiledGame {
+        tree,
+        evaluator,
+        root_ranges: ranges,
+        normalizer: 1.0,
+        zero_sum: false,
+    };
+    let mut solver = Solver::<_, F32Storage>::new(game, Box::new(crate::Vanilla), None);
+    if profiled {
+        let profile = mixed_profile(&solver.game.tree);
+        solver.set_profile(profile).unwrap();
+    }
+    let discounts = Discounts {
+        pos: 1.0,
+        neg: 1.0,
+        avg: 1.0,
+        floor_neg: false,
+        reset_avg: false,
+    };
+    for &sref in &solver.game.tree.storage_refs {
+        let weights: Vec<_> = (0..sref.len())
+            .map(|i| if i % 3 == 0 { 0.0 } else { (i % 7 + 1) as f32 })
+            .collect();
+        solver
+            .storage
+            .accumulate_strategy(sref, sref.index, &weights, &discounts);
+    }
+    let game = &solver.game;
+    let profile = solver.profile.as_ref();
+    let par = ParConfig::default();
+    RECURSIVE.set(recursive);
+    let actual = super::super::dual::evaluate(game, &solver.storage, profile, par);
+    for p in Player::BOTH {
+        let ctx = ValueCtx {
+            tree: &game.tree,
+            evaluator: &game.evaluator,
+            storage: &solver.storage,
+            p,
+            par,
+            profile,
+            incentives: true,
+        };
+        let mut ev = vec![0.0; game.root_ranges[p].len()];
+        let mut br = ev.clone();
+        value_pass::<_, _, _, true, true, false>(
+            &ctx,
+            &mut Scratch::new(),
+            0,
+            &game.root_ranges[p.opponent()],
+            &mut ev,
+            &mut br,
+            &no_record,
+            par.chance_depth,
+        );
+        let aggregate = |values: &[f32]| {
+            game.root_ranges[p]
+                .iter()
+                .zip(values)
+                .map(|(&r, &v)| r as f64 * v as f64)
+                .sum::<f64>()
+        };
+        let case =
+            format!("turn={turn} zero={zero:?} profiled={profiled} recursive={recursive} {p:?}");
+        assert_eq!(actual[p].0.to_bits(), aggregate(&ev).to_bits(), "EV {case}");
+        assert_eq!(actual[p].1.to_bits(), aggregate(&br).to_bits(), "BR {case}");
+    }
+    RECURSIVE.set(false);
 }
 
 #[test]
