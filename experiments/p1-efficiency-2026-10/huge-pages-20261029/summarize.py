@@ -6,6 +6,7 @@ import statistics
 import sys
 
 raw = pathlib.Path(sys.argv[1])
+expected_rounds = int(sys.argv[3]) if len(sys.argv) > 3 else 3
 groups = {}
 for path in sorted(raw.glob('*.json')):
     name = path.stem
@@ -23,7 +24,7 @@ for path in sorted(raw.glob('*.json')):
     groups.setdefault((config, storage, threads, mode), []).append(row)
 summary = []
 for (config, storage, threads, mode), rows in sorted(groups.items()):
-    if len(rows) != 3:
+    if len(rows) != expected_rounds:
         raise ValueError(f'{config} {storage} {threads} {mode}: {len(rows)} rounds')
     medians = {key: statistics.median(row[key] for row in rows) for key in rows[0] if key != 'round'}
     summary.append({'config': config, 'storage': storage, 'threads': int(threads[1:]),

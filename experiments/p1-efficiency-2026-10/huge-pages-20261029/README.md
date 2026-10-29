@@ -4,7 +4,7 @@
 
 ## 変更
 
-solverの変更はなし。LinuxのTHP全体設定を一時的に切り替え、既定の`madvise`と比較した。
+まず既存solverでLinuxのTHP全体設定を一時的に切り替え、既定の`madvise`と比較した。その後、storageへの選択的な助言を実装し、同じ既定設定で再比較した。
 
 ## 方法
 
@@ -50,14 +50,53 @@ smaps読取は並行するため、時間に観測負荷を含む。入力は[co
 
 ## 判断
 
-**不採用**。alwaysはc_gtowb i16の反復をmadvise比で16/32 threadそれぞれ3.4%/3.5%、
-flop_srp i16では4.6%/4.5%短縮した。一方flop_srp f32では16 threadで1.6%短縮、32 threadで1.4%増加し、
-全条件で3%以上の一貫した改善という実装条件を満たさない。flop_3bp f32では約3.0%/3.3%短縮した。
-大きな配列への明示的な`MADV_HUGEPAGE`を追加せず、memory見積りも変更しない。
-全体設定alwaysの結果は選択的なstorage adviceと同一ではないため、上記はその採用を示す直接検証ではない。
+alwaysはc_gtowb i16の反復をmadvise比で16/32 threadそれぞれ3.4%/3.5%、flop_srp i16では4.6%/4.5%短縮した。
+一方flop_srp f32では16 threadで1.6%短縮、32 threadで1.4%増加した。全体設定の結果は選択的なstorage adviceとは異なるため、
+次節で選択的な実装を直接比較した。各木・storage・threadのsampled 9 runで報告されたNashConvは同じだった（JSON値の比較）。
+最後のround後の`enabled`は`madvise`と確認した。
+
+## 選択的なstorage助言
+
+`f32`・`i16`・`i16-f32avg`のregretとstrategy arenaについて、64 MiB以上の場合に2 MiB境界に収まる内部領域へ
+`MADV_HUGEPAGE`をprefault前に出す。助言の失敗は通常pageで継続し、他OSは変更しない。
+worker scratchは個々のbufferが小さく再確保もあるため対象外とした。allocationの整列変更はなく、端の部分pageも変更しない。
+`madvise`設定のまま、旧・新binaryを[selective.sh](selective.sh)で交互に5 round（各条件ごとに旧→新／新→旧）、
+warmup 2、計測10反復、評価2回。以下は5回の中央値で、評価列は各runの2回の平均の中央値。
+smaps sample・time・生JSONは[selective-results.tar.gz](selective-results.tar.gz)、集計は[selective-summary.json](selective-summary.json)。
+
+| 木 | storage | thread | binary | 秒/反復 | 秒/評価 | peak MiB | AnonHuge最大 MiB | minor faults |
+|---|---|---:|---|---:|---:|---:|---:|---:|
+| c_gtowb | i16 | 16 | old | 0.7761 | 1.3273 | 10728 | 0 | 3,316,137 |
+| c_gtowb | i16 | 16 | new | 0.7485 | 1.3175 | 10731 | 10060 | 736,885 |
+| c_gtowb | i16 | 32 | old | 0.6445 | 1.1032 | 10886 | 0 | 3,379,904 |
+| c_gtowb | i16 | 32 | new | 0.6184 | 1.0993 | 10892 | 10060 | 828,087 |
+| flop_3bp | f32 | 16 | old | 0.1089 | 0.1568 | 2387 | 0 | 847,269 |
+| flop_3bp | f32 | 16 | new | 0.1062 | 0.1536 | 2385 | 2066 | 319,196 |
+| flop_3bp | f32 | 32 | old | 0.0932 | 0.1402 | 2438 | 0 | 870,582 |
+| flop_3bp | f32 | 32 | new | 0.0919 | 0.1397 | 2437 | 2066 | 336,174 |
+| flop_srp | f32 | 16 | old | 0.1775 | 0.2441 | 4037 | 0 | 1,286,901 |
+| flop_srp | f32 | 16 | new | 0.1742 | 0.2420 | 4040 | 3788 | 138,678 |
+| flop_srp | f32 | 32 | old | 0.1651 | 0.2222 | 4179 | 0 | 1,666,339 |
+| flop_srp | f32 | 32 | new | 0.1584 | 0.2161 | 4183 | 3788 | 172,313 |
+| flop_srp | i16 | 16 | old | 0.1632 | 0.2708 | 2144 | 0 | 817,024 |
+| flop_srp | i16 | 16 | new | 0.1562 | 0.2692 | 2148 | 1892 | 138,289 |
+| flop_srp | i16 | 32 | old | 0.1427 | 0.2241 | 2284 | 0 | 751,472 |
+| flop_srp | i16 | 32 | new | 0.1331 | 0.2242 | 2287 | 1892 | 171,242 |
+
+反復は全8条件で旧より1.5〜6.8%短く、各条件の中央値に基づく短縮率の算術平均は3.6%。
+評価は7条件で短縮し、flop_srp i16 32 threadのみ0.0001秒増加（丸め後）。peakの差は最大6 MiBで、見積り変更は不要。
+採用する。短時間計測とsamplerの観測負荷には注意する。
+
+### 0.1% pot solve
+
+[solve.sh](solve.sh)でflop_srp f32、32 thread、final checkpoint無しを旧→新の順に各1回実行。
+旧は389反復、solver wall 62.516秒、process elapsed 74.65秒、max RSS 4,467,456 KiB。
+新は389反復、solver wall 62.238秒、process elapsed 74.14秒、max RSS 4,459,364 KiB。
+一組のみのため速度差の再現性は未確定。最終NashConvは両方0.010859778763689931。
+config・progress・run・timeは[solve-results](solve-results/)に保存した。
 
 ## 正しさ
 
-各木・storage・threadのsampled 9 runで報告されたNashConvは同じだった（JSON値の比較）。
-実装の変更がないためbitcheck・workspace testsは実施していない。最後のround後の`enabled`は`madvise`と確認した。
-測定は短時間のthroughputであり、収束時間の検証ではない。
+devで`cargo fmt --all --check`、`cargo clippy --workspace --all-targets -- -D warnings`、
+`cargo test --workspace`は成功（ignored testは未実行）。20反復16 threadの旧新bitcheckでflop_3bp f32・i16・
+i16-f32avgとflop_srp f32は全てIDENTICAL。[bitcheck.txt](bitcheck.txt)に結果を記録した。

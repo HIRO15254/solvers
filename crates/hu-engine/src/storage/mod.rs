@@ -19,6 +19,40 @@ const PREFAULT_MIN_BYTES: usize = 64 << 20;
 const PREFAULT_PAGE_BYTES: usize = 4096;
 const PREFAULT_CHUNK_BYTES: usize = 1 << 20;
 
+/// Request THP only for complete 2 MiB pages wholly inside a large arena.
+/// The allocator retains ownership; failure merely leaves ordinary pages.
+#[cfg(target_os = "linux")]
+fn advise_huge_pages<T>(arena: &mut [T]) {
+    const HUGE_PAGE: usize = 2 << 20;
+    let start = arena.as_mut_ptr().addr();
+    let Some(end) = start.checked_add(std::mem::size_of_val(arena)) else {
+        return;
+    };
+    let Some(aligned_start) = start
+        .checked_add(HUGE_PAGE - 1)
+        .map(|x| x & !(HUGE_PAGE - 1))
+    else {
+        return;
+    };
+    let aligned_end = end & !(HUGE_PAGE - 1);
+    if aligned_start >= aligned_end {
+        return;
+    }
+    let offset = aligned_start - start;
+    // SAFETY: both endpoints lie within the arena and are page-aligned.
+    // madvise is advisory and does not change ownership or contents.
+    unsafe {
+        libc::madvise(
+            arena.as_mut_ptr().cast::<u8>().add(offset).cast(),
+            aligned_end - aligned_start,
+            libc::MADV_HUGEPAGE,
+        );
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn advise_huge_pages<T>(_arena: &mut [T]) {}
+
 /// Touches every page of a freshly allocated, all-zero arena by writing zero,
 /// in parallel on the current rayon pool.
 ///
@@ -28,6 +62,9 @@ const PREFAULT_CHUNK_BYTES: usize = 1 << 20;
 /// shootdown to every CPU of the process. Writing first, without reading,
 /// avoids that. Only for arenas that are all zero (`T::default()`).
 fn prefault_zeroed<T: Copy + Default + Send>(arena: &mut [T]) {
+    if std::mem::size_of_val(arena) >= PREFAULT_MIN_BYTES {
+        advise_huge_pages(arena);
+    }
     prefault_zeroed_above(arena, PREFAULT_MIN_BYTES);
 }
 

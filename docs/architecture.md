@@ -115,6 +115,7 @@ view を渡す。`ParConfig` が chance depth と fan-out を制御する。メ�
 ゲームと設定に依存するので、採用条件は測定証拠とともに評価する。
 実装は`hu-engine/src/storage/`の`mod.rs`（契約・state）、`f32.rs`、`i16.rs`、`mixed.rs`に分け、
 共通の`normalize.rs`でf64の厳密正規化とCFR用f32正規化を提供する。量子化更新のscratchはworker-local poolからleaseし、pass・view分割を越えて再利用する。
+Linuxでは64 MiB以上のregret・戦略累積arenaの内部に収まる2 MiB境界の領域へ、zero pageのparallel prefault前に`MADV_HUGEPAGE`を要求する。これはOSへの助言であり失敗時も通常pageで動作する。他OSとscratch poolは変更しない。
 
 `DiscountSchedule::at(t, planned_iters)` は iteration ごとに正/負 regret と平均戦略への係数、
 regret floor、平均 reset を返す。`Vanilla`、`CfrPlus`、`Dcfr`、`HsDcfr` と `linear_cfr`
