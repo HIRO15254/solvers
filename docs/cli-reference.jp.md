@@ -36,8 +36,8 @@ daemonはこの`solvers`を子processとして使い、P2のvalidate/solveも同
 |---|---|
 | `-h` / `--help` | helpを表示。各subcommandでも使える |
 | `-V` / `--version` | `solvers <version> (<git-hash>)`を表示。`p2` featureなしでは末尾に`, heads-up postflop only`を付ける |
-| `--cache-dir DIR` | machine cacheの場所。全subcommandで指定できる |
-| `SOLVERS_CACHE_DIR` | `--cache-dir`が無い場合のcache。未指定ならOSの利用者cache directory |
+| `--cache-dir DIR` | machine cacheの場所。全subcommandで指定できる。P1専用配布buildではhelpに表示せず、solveには使用しない |
+| `SOLVERS_CACHE_DIR` | `--cache-dir`が無い場合のcache。未指定ならOSの利用者cache directory。P1専用配布buildでは使用しない |
 | `NO_COLOR` | ANSI色を無効にする |
 | `SOLVERSD_TOKEN` | daemonのbearer token。`--token`を優先する |
 

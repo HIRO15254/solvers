@@ -149,6 +149,7 @@ fn help_surfaces_only_supported_commands_and_options() {
             for token in ["P1", "P2"] {
                 assert!(!help.contains(token), "{args:?}: {help}");
             }
+            assert!(!help.contains("--cache-dir"), "{args:?}: {help}");
         }
     }
     let help = String::from_utf8(cli(&["--help"]).stdout).unwrap();

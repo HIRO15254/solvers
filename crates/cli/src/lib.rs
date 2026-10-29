@@ -224,6 +224,7 @@ struct Cli {
     /// `SOLVERS_CACHE_DIR`, then the platform's per-user cache directory.
     /// Never write this into a config: a config naming a local path cannot
     /// be sent to another host.
+    #[cfg_attr(not(feature = "p2"), arg(hide = true))]
     #[arg(long, global = true)]
     cache_dir: Option<std::path::PathBuf>,
     #[command(subcommand)]
@@ -538,7 +539,7 @@ enum Command {
         #[arg(long = "river-target", requires = "resolve_rivers")]
         river_target: Option<f64>,
     },
-    /// Compare two same-product solution average profiles.
+    /// Compare two solutions from the same solver.
     Compare {
         left: std::path::PathBuf,
         right: std::path::PathBuf,
