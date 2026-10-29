@@ -153,7 +153,7 @@ JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`se
 profileの`node`にはrootを示す`root`または空文字列も使える。lockとfrequencyの同一node・同一handへの重複はerror。
 `freeze_upstream`はsuit非対称selectorで基準解より細かく展開された木にも対応し、基準戦略をsuit置換して利用する。
 基準解側のgroupingがより細かく代表を対応付けられない場合はerror。
-`output.solution_streets = "no-rivers"`は、解決済みのlock・incentive・frequencyまたは固定祖先がRiverにある場合はerror。
+`output.solution_streets = "no-rivers"`でもRiverのprofileと固定祖先を保存し、遅延再solveに適用する。
 基準fileのSHA-256はvalidate・solve時に大文字・小文字を区別せず照合するが、freeze由来の`.sol`の読込・export・比較時には再読込・再hashしない。
 `freeze_upstream`のsolveはprofile対象の最大部分木を自動選択して反復し、外側に基準解の平均戦略をコピーする。
 外側の戦略が保存されていない場合、frequency目標がある場合、対象が空またはrootを含む場合は木全体の反復に戻る。
@@ -273,7 +273,7 @@ iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`ge
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`は通常version 4、profile付きversion 5、checkpointは通常version 5、頻度目標付きversion 6を受理する。旧形式は現行configから再solveする。
+P1 `.sol`は通常version 4、profile付きversion 5、no-riversのRiver制約付きversion 6、checkpointは通常version 5、頻度目標付きversion 6を受理する。旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -450,7 +450,7 @@ CSV・P2は使えない。既定のformat指定のままTOMLを出力する。�
 | `--output PATH` | stdout | 出力先 |
 | `--node NODE` | `root` | P1のper-node view。履歴`xr3.3c`、action/chance label path`check/check/Th`、`all`も使える。繰り返すと1回の読込みで各nodeの行を指定順に連結する |
 | `--rest-of-street` | 無し | P1のper-node view。各指定nodeの後にそのstreetで続くaction nodeを前順で足す（chance・terminalで止まる、`solvers tree --rest-of-street`と同じ）。P2の`.mwsol`では入力error（exit 2） |
-| `--resolve-rivers` | 無し | P1。no-riversで未保存のRiver節点の`actions` / `strategy` / `ev` / `decision`を再解決して出す。他のviewでは無視する。P2の`.mwsol`では入力error（exit 2） |
+| `--resolve-rivers` | 無し | P1。no-riversで未保存のRiver節点の`actions` / `strategy` / `ev` / `decision`を再解決して出す。Riverのprofileと固定祖先を適用し、frequencyは元runの最終λを固定する。基準`.sol`は不要。値は再計算である。他のviewでは無視する。P2の`.mwsol`では入力error（exit 2） |
 | `--river-iterations N` | `500` | その再解決の反復予算（`--resolve-rivers`が必要） |
 | `--river-target X` | 無し | その再解決のNashConv上限（`--resolve-rivers`が必要） |
 

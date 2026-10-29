@@ -490,7 +490,9 @@ enum Command {
         /// Postflop only: answer `actions` / `strategy` / `ev` / `decision`
         /// at river nodes a `no-rivers` artifact does not store by
         /// re-solving their river subgame from the stored reach (recomputed
-        /// values, not the solve's own). Other views ignore it.
+        /// values, not the solve's own). River profiles and frozen strategies
+        /// are applied; frequency incentives use the run's final multipliers.
+        /// Other views ignore it.
         #[arg(long = "resolve-rivers")]
         resolve_rivers: bool,
         /// Iteration budget of each river re-solve (`--resolve-rivers`).

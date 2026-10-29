@@ -335,20 +335,6 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
                 .as_ref()
                 .map(|_| &provider as &dyn Fn(u32) -> anyhow::Result<Option<Vec<f32>>>),
         )?;
-        if p.settings.output.solution_streets == SolutionStreets::NoRivers
-            && resolved
-                .summary
-                .resolved_nodes
-                .iter()
-                .any(|node| index.streets[node.node as usize] == nlh::Street::River)
-        {
-            return Err(spot::SpotError::new(
-                spot::Code::NLH003,
-                "output.solution_streets",
-                "no-rivers cannot be used with river profile or frozen nodes",
-            )
-            .into());
-        }
         Some(resolved)
     } else {
         None

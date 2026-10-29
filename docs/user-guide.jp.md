@@ -473,6 +473,7 @@ HTTPのsolution viewはP1・P2に対応する。P1では、例えば
 `node`は繰り返せ、履歴中の`[`・`]`・`/`・space・`*`はURL encodingする（`+`もspaceとして復号）。
 P2では`node`を指定できない。不正selectorはHTTP 400 `invalid-request`としてCLIの診断を返す。
 P1の`resolve=rivers`はno-riversで未保存のRiver節点を`export --resolve-rivers`で再solveして返す（requestごとにRiverを解く）。
+Riverのlock・incentive・固定祖先は再solveにも適用され、frequencyは元runの最終λを固定して使う。基準`.sol`は閲覧に不要で、再solveの値は元runの保存値ではない。
 同じnodeの`actions`・`strategy`・`ev`は`GET /v1/runs/{id}/solution/decision?node=...`の1 requestにまとめられる（P1のみ、JSONのみ）。
 `restOfStreet=true`を付けると各nodeの後にそのstreetの残りのaction nodeも返す。Riverの入口に付ければ1回の再solveでそのRiverの全action nodeが得られる。
 cancelは1回目のCtrl-Cと同じく境界で止まりcheckpointを保存する。Windowsではdaemonを
@@ -613,7 +614,6 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
 | 資源上限 / 75 | validate --resourcesで規模を確認し、treeやmemory予算を見直す |
 | 協調停止 / 130 | 保存checkpointからresume |
 | その他 / 1 | 使用中runへのresumeなら停止を待つか別directoryへfork。その他はfile path・権限・I/O診断を確認 |
-| `no-rivers cannot be used with river profile or frozen nodes` / 2 | Riverに解決されるlock・incentive・frequencyまたは固定祖先があるため、`solution_streets`を`no-rivers`以外にする |
 
 未一致ruleのwarningはerrorではない。P2のnot-checked/incompleteは測定未完了を示す。
 型付き入力errorの診断に`resource limit`・`memory limit`・`node limit`等が含まれてもexit 2である。実際の資源上限errorだけがexit 75となる。
