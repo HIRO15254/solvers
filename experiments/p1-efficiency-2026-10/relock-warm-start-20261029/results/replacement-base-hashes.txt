@@ -1,0 +1,2 @@
+ba8dafbf7f5197e608cfcdd6146bc64f44bef9b59bcfd86636e71ff066c4b718  /work/warm-base/solution.sol
+24e4e783a445a39f7d59a17e578af6d447675d373e71bfe76c42667dec2c92cb  /work/warm-base/checkpoint.ckpt

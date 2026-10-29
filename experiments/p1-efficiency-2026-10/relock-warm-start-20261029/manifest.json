@@ -1,0 +1,20 @@
+{
+  "reproduction": "partial",
+  "baseCommit": "00483eaf",
+  "experimentCommit": "f31a4f5f239475f5a1f3137d1cc63c2c8869c9b3",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "machines": [
+    {"role": "dev", "instance": "i-0b8b19bb9a5ffc436", "type": "r6a.8xlarge", "market": "spot", "az": "us-east-1c", "usageUtc": "2026-10-29T04:19..05:29Z", "use": "build, checks, strong_lock iteration counts"},
+    {"role": "lab", "instance": "i-033f44ee877c2f755", "type": "r6a.8xlarge", "market": "spot", "az": "us-east-1c", "usageUtc": "2026-10-29T04:19..06:05Z", "use": "base solve and initial iteration counts", "end": "Spot interruption"},
+    {"role": "lab-replacement", "instance": "i-045a698a636ea87fd", "type": "c6a.8xlarge", "market": "spot", "az": "us-east-1b", "launchUtc": "2026-10-29T06:05:36Z", "usageUtc": "2026-10-29T06:09..06:43Z", "use": "rerun base and finish deeper-profile iteration counts"},
+    {"role": "bench", "instance": "i-082131af851753bb3", "type": "c6a.8xlarge", "market": "spot", "az": "us-east-1b", "usageUtc": "2026-10-29T04:27..05:29Z", "use": "base solve and paired timings under bench.lock"}
+  ],
+  "labBase": {"iterations": 389, "solutionSha256": "932dec8e0c7f0937cbdb2cc4f848572cff35ae4775d0b02c6fdc700aa02b7b3d", "checkpointSha256": "e8343269ea24ee0fd6dd847652a9b5a3b08860523d4196dd6b4dfb77b6dae67f", "availability": "lost when the original lab Spot was reclaimed; regenerate from base config"},
+  "replacementLabBase": {"iterations": 389, "solutionSha256": "ba8dafbf7f5197e608cfcdd6146bc64f44bef9b59bcfd86636e71ff066c4b718", "checkpointSha256": "24e4e783a445a39f7d59a17e578af6d447675d373e71bfe76c42667dec2c92cb", "availability": "temporary /work/warm-base on replacement lab, not retained in git"},
+  "devBase": {"iterations": 389, "solutionSha256": "4252d0f284597e7e77715d9df5c91a31adc3b9c8adf299b3183d569da4bc7788", "checkpointSha256": "38ac181fac8a94cc88e0363691219fc2b16f0d075d9028654edb778a6be9e805", "availability": "lost when dev Spot was reclaimed; regenerate from base config"},
+  "baselineSolverSha256": "08f4fc46f8e322e98b75edb7cf6769997bda486b96f6fa147c86f1b7db8dcee4",
+  "finalBenchSha256": "251c8df56c7de6a56ca83ddefe808bb609afecf9f3aa97b764f8b0b20e2120f9",
+  "checks": ["cargo fmt --all --check", "cargo clippy --workspace --all-targets -- -D warnings", "cargo test --workspace"],
+  "results": "results/summary.json and per-run JSON",
+  "incomplete": "Additional strategy weights on deeper profiles and most timing pairs were not measured; convergence of the discrepant incentive target strategies beyond 0.05% remains unverified."
+}
