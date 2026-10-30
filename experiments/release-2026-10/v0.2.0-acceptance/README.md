@@ -15,6 +15,7 @@
 | 通常CI（PR #9） | [40904815789](https://github.com/HIRO15254/solvers/actions/runs/40904815789) | `2ba039e5` | success（test・web・documentation・Windows/macOS smoke） |
 | tag `v0.2.0`のrelease workflow（最初のtag） | [40912966213](https://github.com/HIRO15254/solvers/actions/runs/40912966213) | `4fbc5578` | 1回目はApple Siliconのbuild jobが、stepを1つも実行しないまま15分後にcancelledになった。失敗jobだけを再実行した2回目で全jobがsuccessになり、draft Releaseができた。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。6 buildのsmokeで`--version`は`solvers 0.2.0 (4fbc5578), heads-up postflop only`だった。下のGUI修正のため、このdraftとtagは公開前に削除した |
 | release workflow（手動実行、Releaseは作らない） | [40988597745](https://github.com/HIRO15254/solvers/actions/runs/40988597745) | `a2c9e7e2` | version、notices、web、6 buildがすべてsuccess |
+| tag `v0.2.0`のrelease workflow（付け直したtag） | [40990237326](https://github.com/HIRO15254/solvers/actions/runs/40990237326) | `0ac236c4` | 全jobがsuccessで、draft Releaseができた。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。6 buildのsmokeで`--version`は`solvers 0.2.0 (0ac236c4), heads-up postflop only`だった。6 archiveの同梱`ui/`はGUI修正を含む |
 
 `ff5206e7`より後のRustのコードは変わっていない。`a2c9e7e2`はweb（GUI）だけを変えた。
 受入40904820045はRustの製品コードを、下のGUI再確認は`a2c9e7e2`のbuildを対象にしている。
