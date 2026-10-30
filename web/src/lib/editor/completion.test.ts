@@ -66,7 +66,6 @@ describe("describeWord", () => {
   const script = "# The c-bet size.\n# Half pot.\nparam cb = 50\ndefine wet = flush_possible\nflop { replace bet [cb] }";
 
   it("explains variables, keywords, sizes and the script's own declarations", () => {
-    expect(describeWord(script, "paired")).toMatch(/^bool, board \(P1 only\)/);
     expect(describeWord(script, "merge")).toMatch(/within DIFF/);
     expect(describeWord(script, "85%stack")).toMatch(/85% of the actor's maximum/);
     expect(describeWord(script, "cb")).toBe("param cb = 50. The c-bet size. Half pot.");

@@ -4,9 +4,10 @@
 
 import { api } from "../api/client";
 import type { HuResources, RunSummary, StartState } from "../api/types";
-import { getAt, readDoc } from "./config";
+import { getAt, readDoc, setAt, writeDoc } from "./config";
 import { parseBoard } from "./cards";
 import { bb, significant } from "./format";
+import { freezeBaseRun } from "./setupFreeze";
 
 export interface RunMeta {
   name: string | null;
@@ -42,7 +43,15 @@ async function load(run: RunSummary): Promise<RunMeta> {
   const hu = run.gameKind === "hu-postflop";
   // Resources build the P1 tree estimate (fractions of a second); the P2
   // arena count can take far longer, so it is not requested here.
-  const validated = await api.validate(text, hu).catch(() => null);
+  // The daemon refuses `profile.freeze_upstream` (a host path), so a frozen
+  // run is validated against its base run, or without the freeze when the
+  // base is gone; the start state does not depend on it.
+  const freeze = getAt(doc, ["profile", "freeze_upstream"]);
+  const request = freeze === undefined ? text : writeDoc(setAt(doc, ["profile", "freeze_upstream"], undefined));
+  const base = freezeBaseRun(freeze);
+  const validated =
+    (base ? await api.validate(request, hu, base).catch(() => null) : null) ??
+    (await api.validate(request, hu).catch(() => null));
   const payouts = getAt(doc, ["economics", "payouts"]);
   const kind = String(getAt(doc, ["economics", "kind"]) ?? "cash");
   const rate = getAt(doc, ["economics", "rake", "rate"]);

@@ -8,7 +8,7 @@ export type VariableKind = "bool" | "number" | "text";
 export interface Variable {
   name: string;
   kind: VariableKind;
-  /** A board predicate: P1 only. */
+  /** A board predicate: heads-up postflop only. */
   board: boolean;
   doc: string;
 }
@@ -93,7 +93,7 @@ export const KEYWORD_DOCS: Readonly<Record<string, string>> = {
   else: "else: the branch taken when no earlier if / else if matched.",
   in: "VARIABLE in [a, b]: true when the variable equals one of the literals.",
   within: "merge ACTION within DIFF: the width two kept sizes must exceed.",
-  preflop: "Rules for preflop decisions. P1 (HU Postflop) keeps them but they have no effect there.",
+  preflop: "Rules for preflop decisions. The heads-up postflop solver keeps them but they have no effect there.",
   flop: "Rules for flop decisions.",
   turn: "Rules for turn decisions.",
   river: "Rules for river decisions.",

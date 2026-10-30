@@ -20,6 +20,7 @@ import { STREET_LABEL } from "../lib/cards";
 import { bb, integer, percent } from "../lib/format";
 import { ALL_CLASSES, classCombos, classOf } from "../lib/range";
 import { runMeta, type RunMeta } from "../lib/runMeta";
+import { freezeBaseRun } from "../lib/setupFreeze";
 import { navigate } from "../route";
 
 /** What the GUI knows about one node of a solution. */
@@ -295,7 +296,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
           <Notice variant="info" title="General-sum profile"
             description="Incentives change the acting player's utility. Displayed EVs exclude incentives and are true EVs; convergence measures are not zero-sum exploitability." />
         )}
-        {summary?.profile && <ProfileDetails profile={summary.profile} config={summary.profile_config ?? null} history={current} />}
+        {summary?.profile && <ProfileDetails profile={summary.profile} config={summary.profile_config ?? null} history={current} runIds={runs.map((r) => r.runId)} />}
         <nav className="history" aria-label="Action history">
           <div className="history-card start">
             <div className="history-head">
@@ -498,10 +499,12 @@ function ProfileEntryDetails({ kind, value }: { kind: string; value: unknown }) 
   </>;
 }
 
-export function ProfileDetails({ profile, config, history }: {
+export function ProfileDetails({ profile, config, history, runIds = [] }: {
   profile: ProfileReport;
   config: Record<string, unknown> | null;
   history: string;
+  /** Finished runs Results can open, to link an upstream freeze's base run. */
+  runIds?: string[];
 }) {
   const resolved = profile.summary.resolved_nodes ?? [];
   const current = resolved.filter((item) => item.history === history);
@@ -517,9 +520,7 @@ export function ProfileDetails({ profile, config, history }: {
           {integer(profile.summary.matched_nodes)} matched nodes · {integer(profile.summary.matched_hands)} matched hands
           {profile.summary.iso_restricted ? " · suit isomorphism restricted" : ""}
         </span>
-        {config?.freeze_upstream != null && (
-          <div>Freeze upstream: <code>{JSON.stringify(config.freeze_upstream)}</code></div>
-        )}
+        {config?.freeze_upstream != null && <FreezeUpstream freeze={config.freeze_upstream} runIds={runIds} />}
         <div>
           Frozen nodes: {profile.frozen_nodes.length}
           {resolved.some((item) => item.kind === "frozen") && <> · {resolved.filter((item) => item.kind === "frozen").map((item) => selector(item.history)).join(", ")}</>}
@@ -552,6 +553,32 @@ export function ProfileDetails({ profile, config, history }: {
         {!config && <span className="muted">Profile configuration is unavailable.</span>}
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * The base solution of an upstream freeze: the run it came from, else the
+ * file name. The recorded host path is never shown.
+ */
+function FreezeUpstream({ freeze, runIds }: { freeze: unknown; runIds: string[] }) {
+  const fields = typeof freeze === "object" && freeze !== null ? (freeze as Record<string, unknown>) : {};
+  const base = freezeBaseRun(freeze);
+  const file = typeof fields.solution === "string" ? fields.solution.split(/[\\/]/).at(-1) : undefined;
+  const sha256 = typeof fields.sha256 === "string" ? fields.sha256 : undefined;
+  return (
+    <div>
+      Upstream frozen to{" "}
+      {base && runIds.includes(base) ? (
+        <>run <a href={`#/results/${encodeURIComponent(base)}`}>{base}</a></>
+      ) : base ? (
+        <>run <code>{base}</code></>
+      ) : file ? (
+        <code>{file}</code>
+      ) : (
+        "a saved solution"
+      )}
+      {sha256 && <> · SHA-256 <code title={sha256}>{sha256.slice(0, 12)}…</code></>}
+    </div>
   );
 }
 

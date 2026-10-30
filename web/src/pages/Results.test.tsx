@@ -46,6 +46,17 @@ describe("profile details", () => {
     expect(html).not.toContain("selected hands");
   });
 
+  it("names an upstream freeze by its base run, never by the host path", () => {
+    const freeze = { freeze_upstream: { solution: "/srv/runs/base/solution.sol", sha256: "654e23c7aea568155706a690" } };
+    const linked = renderToStaticMarkup(<ProfileDetails profile={profile} config={freeze} history="" runIds={["base"]} />).replaceAll("<!-- -->", "");
+    expect(linked).toContain('href="#/results/base"');
+    expect(linked).toContain("654e23c7aea5");
+    expect(linked).not.toContain("/srv/runs");
+    const missing = renderToStaticMarkup(<ProfileDetails profile={profile} config={freeze} history="" />);
+    expect(missing).not.toContain("href=");
+    expect(missing).not.toContain("/srv/runs");
+  });
+
   it("describes hand and category selections, strategies and targets without JSON", () => {
     const report: ProfileReport = {
       ...profile,

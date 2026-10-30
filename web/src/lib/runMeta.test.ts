@@ -19,4 +19,29 @@ describe("run profile metadata", () => {
       expect((await runMeta(run)).generalSum).toBe(expected);
     }
   });
+
+  const frozenToml =
+    "schema = 'solvers.nlh/v1'\n[profile.freeze_upstream]\nsolution = '/runs/base/solution.sol'\nsha256 = 'ab'\n[[profile.lock]]\nnode = 'x'\n";
+  const validated = { summary: { start: { pot: 2 }, utilityUnit: "BB" } } as never;
+
+  it("validates a frozen run against the run its solution path names, not its relock source", async () => {
+    vi.mocked(api.validate).mockReset().mockResolvedValueOnce(validated);
+    vi.mocked(api.artifactText).mockResolvedValueOnce(frozenToml);
+    const run = { runId: "frozen", configHash: "frozen", gameKind: "hu-postflop", relockedFrom: "parent" } as RunSummary;
+    const meta = await runMeta(run);
+    const [toml, , base] = vi.mocked(api.validate).mock.calls[0]!;
+    expect(toml).not.toContain("freeze_upstream");
+    expect(toml).toContain("[[profile.lock]]");
+    expect(base).toBe("base");
+    expect(meta.start?.pot).toBe(2);
+  });
+
+  it("keeps the start state of a frozen run whose base run is gone", async () => {
+    vi.mocked(api.validate).mockReset().mockRejectedValueOnce(new Error("unknown run")).mockResolvedValueOnce(validated);
+    vi.mocked(api.artifactText).mockResolvedValueOnce(frozenToml);
+    const run = { runId: "orphan", configHash: "orphan", gameKind: "hu-postflop" } as RunSummary;
+    const meta = await runMeta(run);
+    expect(vi.mocked(api.validate).mock.calls.map((call) => call[2])).toEqual(["base", undefined]);
+    expect(meta.start?.pot).toBe(2);
+  });
 });

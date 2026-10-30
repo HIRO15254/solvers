@@ -58,7 +58,7 @@ const action = (label: string): Completion => ({ label, type: "keyword", detail:
 const variable = (entry: Variable): Completion => ({
   label: entry.name,
   type: "variable",
-  detail: entry.board ? `${entry.kind} · board, P1 only` : entry.kind,
+  detail: entry.board ? `${entry.kind} · board, heads-up postflop only` : entry.kind,
   info: entry.doc,
   boost: entry.kind === "bool" ? 1 : 0,
 });
@@ -199,7 +199,7 @@ export function scriptCompletionSource(embedded: boolean) {
 /** The hover text for `word` in `script`, or null. */
 export function describeWord(script: string, word: string): string | null {
   const known = VARIABLE_BY_NAME.get(word);
-  if (known) return `${known.kind}${known.board ? ", board (P1 only)" : ""}. ${known.doc}`;
+  if (known) return `${known.kind}${known.board ? ", board (heads-up postflop only)" : ""}. ${known.doc}`;
   if (word in KEYWORD_DOCS) return KEYWORD_DOCS[word] ?? null;
   const size = describeSize(word);
   if (size) return size;

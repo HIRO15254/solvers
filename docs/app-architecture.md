@@ -324,6 +324,9 @@ hand selector、action label、confidenceや目標の妥当性はCLIの検証に
 `freeze_upstream.solution`のhost pathはdaemonのself-contained境界で拒否する。SetupではCLI用TOMLの
 pathとは別にdaemon管理runを基準として選べる。検証・solveにはpathではなくrun IDを送る。
 Resultsはsolutionに記録されたprofileを表示し、lock対象と上流固定を通常の戦略表示と区別する。
+上流固定の基準は、記録されたpath `<runs root>/<run ID>/solution.sol`のrun IDとSHA-256の先頭で示し、host pathは表示しない。
+Runs・Resultsが上流固定runの`run.toml`を検証するときは、`freeze_upstream`を除き、そのrun IDを`freezeBaseRunId`として送る。
+基準runが無ければ`freeze_upstream`を除いて検証する。開始状態（席名、%pot換算の分母）は上流固定に依らない。
 incentiveを含む一般和のrunでは、表示EVにincentive加点を含まないことを示す。頻度目標には
 達成頻度・誤差・λを併記する。profileの無いsolutionの表示と既存responseは変えない。
 

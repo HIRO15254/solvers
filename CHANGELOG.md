@@ -72,7 +72,8 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   as locks before re-solving. GUI Setup can freeze upstream to a saved run the
   daemon manages: the client sends the run's ID (`freezeBaseRunId` on validate
   and create-run requests), never a host path, and the new run records
-  `relockedFrom`.
+  `relockedFrom`. Results names a frozen run's base run and solution hash,
+  never its host path.
 - `freeze_upstream` accepts suit-asymmetric profile selectors (a specific card,
   suit or combo) against a base solved with suit-isomorphism merging; the base's
   strategies are mapped into the profiled tree's hand order. A base grouped more
