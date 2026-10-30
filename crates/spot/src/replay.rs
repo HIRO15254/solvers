@@ -18,8 +18,7 @@ fn move_text(mv: Move, scale: ChipScale) -> String {
     }
 }
 
-/// A line amount after its `b`/`r` prefix: chips with a `c` suffix (`10c`)
-/// or a BB decimal (`2.5`), each in its shortest spelling.
+/// A line amount in shortest chip or decimal BB spelling.
 fn line_amount(prefix: &str, number: &str, scale: ChipScale) -> Result<MwChips, SpotError> {
     if let Some(digits) = number.strip_suffix('c') {
         let chips = Some(digits)

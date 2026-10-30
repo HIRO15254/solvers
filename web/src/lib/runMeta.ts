@@ -56,6 +56,7 @@ async function load(run: RunSummary): Promise<RunMeta> {
   const kind = String(getAt(doc, ["economics", "kind"]) ?? "cash");
   const rate = getAt(doc, ["economics", "rake", "rate"]);
   const stack = getAt(doc, ["table", "stack_bb"]);
+  const stackChips = getAt(doc, ["table", "stack_chips"]);
   return {
     name: (getAt(doc, ["meta", "name"]) as string | undefined) ?? null,
     line: String(getAt(doc, ["spot", "line"]) ?? ""),
@@ -71,7 +72,7 @@ async function load(run: RunSummary): Promise<RunMeta> {
       return Array.isArray(entries) && entries.length > 0;
     }),
     economics: [
-      stack !== undefined ? `${stack}bb` : null,
+      stack !== undefined ? `${stack}bb` : stackChips !== undefined ? `${stackChips}c` : null,
       kind === "tournament" ? "ICM" : rate !== undefined ? `rake ${bb(Number(rate) * 100)}%` : "No rake",
     ]
       .filter(Boolean)

@@ -34,8 +34,8 @@ struct RawTable {
     bb_chips: Option<i64>,
     stack_bb: Option<f64>,
     stack_chips: Option<i64>,
-    stacks_bb: BTreeMap<String, f64>,
-    stacks_chips: BTreeMap<String, i64>,
+    stacks_bb: Option<BTreeMap<String, f64>>,
+    stacks_chips: Option<BTreeMap<String, i64>>,
     sb_bb: Option<f64>,
     sb_chips: Option<i64>,
     ante_bb: Option<f64>,
@@ -410,6 +410,7 @@ pub(crate) fn document_with_mode(
     let line = raw.spot.line.unwrap_or_default();
     let board = crate::replay::board(raw.spot.board.as_deref())?;
     let (start, actions) = crate::replay::line(&table, &line)?;
+    let line = crate::cursor::line_text(&actions, table.setup.scale());
     let product = crate::replay::product(&start, &line, &board)?;
     let context = crate::replay::context(&table, &start, board.clone(), actions)?;
     let mut ranges = raw.ranges;
@@ -790,22 +791,24 @@ fn table(raw: RawTable) -> Result<Table, SpotError> {
         raw.chip_rounding.as_deref().unwrap_or("nearest"),
         "table.chip_rounding",
     )?;
-    check_positions(raw.stacks_bb.keys(), &positions, "table.stacks_bb")?;
-    check_positions(raw.stacks_chips.keys(), &positions, "table.stacks_chips")?;
-    if !raw.stacks_bb.is_empty() && !raw.stacks_chips.is_empty() {
+    if raw.stacks_bb.is_some() && raw.stacks_chips.is_some() {
         return Err(value_error(
             "table.stacks_chips",
             "cannot combine table.stacks_bb and table.stacks_chips",
         ));
     }
+    let stacks_bb = raw.stacks_bb.unwrap_or_default();
+    let stacks_chips = raw.stacks_chips.unwrap_or_default();
+    check_positions(stacks_bb.keys(), &positions, "table.stacks_bb")?;
+    check_positions(stacks_chips.keys(), &positions, "table.stacks_chips")?;
     let default = either(scale, raw.stack_bb, raw.stack_chips, "table.stack", false)?;
     let stacks = SeatVec::new_unchecked(
         positions
             .iter()
             .map(|name| {
-                if let Some(v) = raw.stacks_bb.get(name) {
+                if let Some(v) = stacks_bb.get(name) {
                     bb_amount(*v, &format!("table.stacks_bb.{name}"), false, scale)
-                } else if let Some(n) = raw.stacks_chips.get(name) {
+                } else if let Some(n) = stacks_chips.get(name) {
                     chip_count(*n, &format!("table.stacks_chips.{name}"), false)
                 } else {
                     default.ok_or_else(|| {

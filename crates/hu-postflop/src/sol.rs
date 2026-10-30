@@ -37,9 +37,6 @@ use serde::{Deserialize, Serialize};
 
 use runfiles::{config_hash, config_hash_hex};
 
-mod upgrade;
-pub use upgrade::upgrade_sol;
-
 /// Fixed header: magic (8) + format version (u16) + config hash (32) +
 /// iteration (u64) + metadata frame length (u64) + index frame length
 /// (u64) + directory offset (u64) + directory frame length (u64) +
@@ -143,12 +140,12 @@ pub(crate) fn river_constraint_workspace(
 pub enum SolError {
     #[error("not a solvers .sol file (bad magic bytes)")]
     BadMagic,
-    #[error(
-        "unsupported .sol format version {found} (expected {expected}, 8 or 9); use solvers upgrade for versions 4–6; versions 1–3 require a re-solve (docs/hu-postflop.jp.md)"
-    )]
+    #[error("unsupported .sol format version {found} (expected {expected}, 8 or 9)")]
     BadVersion { found: u16, expected: u16 },
-    #[error(".sol file is already current")]
-    AlreadyCurrent,
+    #[error(
+        ".sol format version {found} was written by an older version; re-solve from a current solvers.nlh/v1 config (docs/hu-postflop.jp.md)"
+    )]
+    LegacyVersion { found: u16 },
     #[error("invalid embedded .sol config: {0}")]
     Config(String),
     #[error(".sol file truncated: expected at least {expected} bytes, got {actual}")]
@@ -295,6 +292,9 @@ fn check_identity(buf: &[u8; 10]) -> Result<(), SolError> {
         return Err(SolError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
+    if (1..=6).contains(&version) {
+        return Err(SolError::LegacyVersion { found: version });
+    }
     if version != FORMAT_VERSION && version != 8 && version != 9 {
         return Err(SolError::BadVersion {
             found: version,
@@ -1801,9 +1801,14 @@ mod tests {
             header[0..8].copy_from_slice(MAGIC);
             header[8..10].copy_from_slice(&version.to_le_bytes());
             std::fs::write(&path, header).unwrap();
-            assert!(
-                matches!(read_sol_config(&path), Err(SolError::BadVersion { found, expected }) if found == version && expected == FORMAT_VERSION)
-            );
+            let error = read_sol_config(&path).unwrap_err();
+            if version <= 6 {
+                assert!(matches!(error, SolError::LegacyVersion { found } if found == version));
+            } else {
+                assert!(
+                    matches!(error, SolError::BadVersion { found, expected } if found == version && expected == FORMAT_VERSION)
+                );
+            }
             let _ = std::fs::remove_file(path);
         }
     }

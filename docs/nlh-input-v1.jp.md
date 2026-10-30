@@ -12,8 +12,8 @@
 - **製品はspotから決まる**（第3節）。利用者は製品名を書かない。`validate`が決定した製品を表示する。
 - **chip量は整数chip。** `table.bb_chips`で1 BBあたりのchip数を定める。BBで書いた額も整数chipに一致しなければerror（第5節）。
 - **strict。** 未知key、決定した製品に適用されないkey、旧形式のkeyはerrorとし、黙って無視・近似しない。
-- **lineとboardの表記は1通り**（第7節）。同じ行動列・盤面を別の綴りで書けない。
-  string enum、position名、line、boardは大小文字を区別する。
+- **lineの行動とboardの表記は厳密**（第7節）。lineの額にはBBの10進数とchip表記の両方を使え、
+  実効configでは正規表記に揃える。string enum、position名、line、boardは大小文字を区別する。
 - **正規化は冪等。** 既定値をすべて明示し、script本文をinline化した実効configを`run.toml`へ保存する。
   実効configを再び正規化すると同じbytesになる。
 - **自己完結。** tree scriptは正規化で本文へ置き換える。例外として`profile.freeze_upstream`は
@@ -107,12 +107,12 @@ derived_from = { run_id = "...", solution_hash = "...", line = "...", board = ".
 ```toml
 [table]
 players = 6          # 必須。2..9
+bb_chips = 1000      # 既定1000。1 BBあたりのchip数（1..1000000）
 stack_bb = 100       # 必須（stacks_bbで全positionを指定する場合は省略可）。正
 sb_bb = 0.5          # 既定0.5。0 < sb_bb <= 1
 ante_bb = 0          # 既定0。全員が払うante
 bb_ante_bb = 0       # 既定0。BBだけが払うdead ante。ante_bbとの同時指定（ともに正）はerror
 straddles_bb = []    # 既定[]。live straddleの額（下記「straddle」）
-bb_chips = 1000            # 既定1000。1 BBあたりのchip数（1..1000000）
 chip_rounding = "nearest"  # 既定。down | nearest | up。計算したsizeを整数chipへ丸める
 
 [table.stacks_bb]    # 任意。positionごとの開始stack
@@ -264,7 +264,7 @@ board = "Ks 7h 2d"        # P1で必須。P2では書けない
 
 ### line文法
 
-lineはforced bet（ante・blind・straddle）投入後からspot開始までの行動列で、次の1通りの表記だけを受け付ける。
+lineはforced bet（ante・blind・straddle）投入後からspot開始までの行動列で、次の文法を受け付ける。
 空文字列はPreflop root。
 
 ```text
@@ -282,12 +282,16 @@ move   = "x" | "c" | "b" amount | "r" amount | "a"
 | `r<額>` | raise | 賭けに直面しているとき。Preflopの最初のraise（open）も`r` |
 | `a` | all-in | stack全額でのbetまたはraise（min-raiseに届かないall-inを含む） |
 
-- 額はそのstreetでのactorの到達額（raise-to）。整数chipに一致するBBの10進数か、正の整数chipを`10c`のように書く。
-  数値は最短表記とする（`2.5`、`3`、`12.25`、`10c`。`2.50`、`3.0`、`03`、`+3`は不可）。
-  正規表記は`bb_chips`の素因数が2と5だけの卓ではBBの10進数、それ以外は`Nc`である。
+- 額はそのstreetでのactorの到達額（raise-to）で、整数chipに一致するBBの10進数または整数chipに`c`を付けた`Nc`で書く。
+  数値は最短表記とする（`2.5`、`3`、`10c`。`2.50`、`3.0`、`03`、`03c`、`+3`は不可）。
+  `spot.line`と`solvers line --moves`のどちらでも両形式を混在できる。例えば`bb_chips = 1000`では
+  `r2.5`と`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
+  実効configの`spot.line`は額を`scale.amount_text(amount)`に正規化する。
+  `bb_chips`の素因数が2と5だけの卓では最短のBB10進数、それ以外の卓では`Nc`である。
+  不正な額やchip gridに合わない額は`NLH004`。tree scriptのsize literalの規則は変わらない。
 - positionは`[table]`の人数で決まる名前（大文字）で、常に書く。positionの無い形式（GTO Wizardの
   `F-F-F-R2.5-F-C`）、単語形（`raise 2.5`）、大文字の動作記号、`;`区切り、余分な空白は受けない。
-- 1つの行動の書き方は1通り。stack全額になるbet/raiseを`b`/`r`で書く、call額以下のall-inを`a`で書く、
+- 額の単位を除き、1つの行動の書き方は1通り。stack全額になるbet/raiseを`b`/`r`で書く、call額以下のall-inを`a`で書く、
   Preflopで`b`を書く、といった別表記は`NLH004`とし、正しい表記をerrorに示す。
 - **foldは書かない。** `f`を書くと`NLH004`。Preflopでは、名指したactorより前に行動すべきplayerはfoldした
   とみなす。Preflopの終わり（最初の` / `、無ければlineの終わり）でまだ行動すべきplayerが残っていれば、

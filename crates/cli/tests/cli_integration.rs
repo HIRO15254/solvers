@@ -725,8 +725,8 @@ fn resume_tampered_config_errors() {
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stderr.to_lowercase().contains("hash"),
-        "expected a hash-mismatch message, got: {stderr}"
+        stderr.contains("checkpoint config hash does not match run.toml; refusing to resume. Checkpoints written by earlier builds cannot be resumed; re-solve from the config"),
+        "expected a hash-mismatch message with migration guidance, got: {stderr}"
     );
 }
 

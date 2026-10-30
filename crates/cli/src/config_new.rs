@@ -304,8 +304,8 @@ mod tests {
             // solvers subcommands
             "config new",
             "validate",
-            "line CONFIG",
-            "tree CONFIG",
+            "solvers line <CONFIG>",
+            "solvers tree <CONFIG>",
             "solve",
             "resume",
             "status",
@@ -317,6 +317,7 @@ mod tests {
             "compare",
             "evaluate",
             "derive",
+            "relock",
             // global and generated help
             "--help",
             "--version",
@@ -351,6 +352,7 @@ mod tests {
             "--river-iterations",
             "--river-target",
             "--node",
+            "--rest-of-street",
             "--view",
             "--actor",
             "--samples",

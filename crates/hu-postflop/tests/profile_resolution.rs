@@ -274,6 +274,43 @@ fn empty_hand_selections_are_errors_for_each_kind() {
 }
 
 #[test]
+fn unmatched_profile_node_selector_is_an_error() {
+    let p = hu_postflop::prepare::prepare(RIVER, std::path::Path::new("test.toml")).unwrap();
+    let mut game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
+    let mut profile = ir(HandSelector::All);
+    profile.locks[0].node = "not-a-node".into();
+    let error = resolve_profile(&mut game, &p.config, &profile, None)
+        .err()
+        .unwrap()
+        .to_string();
+    assert!(
+        error.contains("unknown or non-action node selector"),
+        "{error}"
+    );
+    assert!(error.contains("not-a-node"), "{error}");
+}
+
+#[test]
+fn profile_history_accepts_equivalent_bb_and_chip_amounts() {
+    for (scale, bb, chips, canonical) in [(1000, "r1", "r1000c", "r1"), (6, "r1", "r6c", "r6c")] {
+        let input = RIVER.replace("players = 2", &format!("players = 2\nbb_chips = {scale}"));
+        let p = hu_postflop::prepare::prepare(&input, std::path::Path::new("test.toml")).unwrap();
+        let mut ids = Vec::new();
+        for selector in [bb, chips] {
+            let mut game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
+            let mut profile = ir(HandSelector::All);
+            profile.locks[0].node = selector.into();
+            profile.locks[0].strategy = LockStrategy::Uniform(vec![("call".into(), 1.0)]);
+            let resolved = resolve_profile(&mut game, &p.config, &profile, None).unwrap();
+            let entry = &resolved.summary.resolved_nodes[0];
+            assert_eq!(entry.history, canonical);
+            ids.push(entry.node);
+        }
+        assert_eq!(ids[0], ids[1]);
+    }
+}
+
+#[test]
 fn label_path_accepts_iso_marker() {
     let p = hu_postflop::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
     let game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());

@@ -14,8 +14,10 @@ release; compatibility with older artifacts is not guaranteed. Unsupported
 older formats are rejected with guidance to re-solve from a current
 `solvers.nlh/v1` config.
 Version 0.1.0 accepts only P1 `.sol` format 4 and checkpoint format 5.
-Version 0.2.0 reads P1 `.sol` formats 4–6 and resumes checkpoint formats 5, 6
-and 8; artifacts whose embedded config uses a removed key are rejected.
+Version 0.2.0 reads P1 `.sol` formats 7–9 and resumes checkpoint formats 5, 6
+and 8 written by 0.2.0. It rejects every `.sol` written by 0.1.0 and cannot
+resume checkpoints written by 0.1.0, whose compatibility hash differs; re-solve
+those runs from a current config.
 The human-readable `--version` includes a Git revision (`unknown` when unavailable);
 run manifests keep `cliVersion` as the plain workspace semantic version.
 
@@ -35,7 +37,8 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   Migrate to `preflop when aggressions >= 1 { jam raise > 33.333%stack }` after
   the other preflop rules. Unlike the old exact ratio, the threshold uses the
   actor's maximum reachable street amount (hand-start stack minus antes), is
-  rounded to the 0.001 BB grid, and applies at its source position.
+  rounded to whole chips (`table.chip_rounding`), and applies at its source
+  position.
 - **Breaking:** removed `tree.include_allin`. It now produces unknown-key
   `NLH002`, is omitted from normalized/effective configs, and prevents loading
   `.sol`, `.mwsol`, or checkpoints whose embedded configs contain it. Migrate
@@ -63,11 +66,11 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   targets an action frequency per runout; `freeze_upstream` fixes ancestor
   nodes to a base solution's average strategy. Node selectors accept `?`/`[?]`
   runout wildcards. New `export <sol> lock --node` view emits editable lock
-  TOML from a solution. Profile-bearing `.sol` files use version 5, and
-  `no-rivers` solutions with River constraints version 6 (below);
+  TOML from a solution. Profile-bearing `.sol` files use version 8, and
+  `no-rivers` solutions with River constraints version 9 (below);
   frequency-target checkpoints use version 6 and frozen-subtree checkpoints
-  version 8. Runs without a profile keep the previous formats byte-for-byte
-  apart from timing fields. The GUI shows and edits profiles.
+  version 8. Runs without a profile keep the other formats (`.sol` version 7,
+  checkpoint version 5). The GUI shows and edits profiles.
 - GUI Results "Lock & re-solve" queues incentives and frequency targets as well
   as locks before re-solving. GUI Setup can freeze upstream to a saved run the
   daemon manages: the client sends the run's ID (`freezeBaseRunId` on validate
@@ -134,9 +137,45 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   again (even the same one) discards the re-solved River. Each action node
   now loads with one `decision` request instead of separate `actions` /
   `strategy` / `ev` requests.
+- Chip denomination: `table.bb_chips` (chips per BB, 1–1,000,000, default
+  1000) and `table.chip_rounding` (`down`, `nearest` or `up`, default
+  `nearest`) for computed sizes. One internal unit is one chip. Every amount
+  key in BB has a whole-chip twin (`stack_chips`, `[table.stacks_chips]`,
+  `sb_chips`, `ante_chips`, `bb_ante_chips`, `straddles_chips`,
+  `outside_field_chips`, `cap_chips`, `rounding_unit_chips`); writing both
+  of a pair is `NLH003`. Amounts in BB must be whole chips, so a table with an
+  odd `bb_chips` sets `sb_bb` or `sb_chips` explicitly. Size literals accept
+  `Nc` chips. Line amounts and node selectors accept a whole-chip BB decimal
+  or `Nc`, mixed freely; the effective config stores the line in the table's
+  canonical spelling (BB decimals when `bb_chips` has no prime factors other
+  than 2 and 5, `Nc` otherwise), so both spellings give the same config. With
+  the default denomination every existing config builds the same tree as
+  before. The GUI Setup table step sets both keys.
 
 ### Changed
 
+- **Breaking:** heads-up postflop node histories and action labels give
+  bet/raise amounts as the actor's raise-to amount on that street, as
+  `spot.line` does, instead of the actor's total contribution since the spot
+  started. After a 2 BB turn bet and call, a 2 BB river bet was `r2c[Th]r4`
+  and `bet 4`; it is now `r2c[Th]r2` and `bet 2`. An old string can name a
+  different node instead of failing, so rewrite `--node` selectors, profile
+  `node` selectors and lock strategy keys written for 0.1.0 from the output of
+  `solvers tree`.
+- **Breaking:** heads-up postflop `.sol` files are format 7 (8 with a profile,
+  9 for `no-rivers` with River constraints). Formats 1–6 are rejected; re-solve
+  from a current config. Checkpoint formats are unchanged, but checkpoints
+  written before this release cannot be resumed because the effective config,
+  and with it the compatibility hash, now records `bb_chips` and
+  `chip_rounding`.
+- Showdown ties split the pot into whole chips, and an odd chip goes to OOP.
+  With rake or odd dead money, tied payoffs can differ by one chip from the
+  previous half-chip split.
+- Preflop solver (not in the downloads): `.mwsol` format 5 records `bb_chips`,
+  action amounts as `amount_chips` and states as `pot_chips` /
+  `remaining_stacks_chips`; formats 2–4 still load as `bb_chips = 1000`. The
+  actions CSV has `amount_chips` and `bb_chips` columns, and inspect JSON uses
+  `bbChips`, `potChips` and `remainingStacksChips`.
 - Heads-up postflop solver speed and memory. Iterations with `i16` storage
   are about 17–23% faster. Evaluation computes EV and best response for both
   seats in one pass, about 10–16% faster without a `[profile]` and 10–13%

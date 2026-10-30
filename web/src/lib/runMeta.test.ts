@@ -6,6 +6,21 @@ import { runMeta } from "./runMeta";
 vi.mock("../api/client", () => ({ api: { artifactText: vi.fn(), validate: vi.fn() } }));
 
 describe("run profile metadata", () => {
+  it("shows BB and chip-denominated common stacks in the economics badge", async () => {
+    vi.mocked(api.validate).mockRejectedValue(new Error("no validation"));
+    for (const [hash, table, economics, expected] of [
+      ["stack-bb", "stack_bb = 100", "", "100bb · No rake"],
+      ["stack-chips", "stack_chips = 301\nbb_chips = 3", "", "301c · No rake"],
+      ["stack-chips-rake", "stack_chips = 50000", "[economics.rake]\nrate = 0.05", "50000c · rake 5%"],
+      ["stack-chips-icm", "stack_chips = 50000", "[economics]\nkind = 'tournament'", "50000c · ICM"],
+      ["no-common-stack", "", "", "No rake"],
+    ] as const) {
+      vi.mocked(api.artifactText).mockResolvedValueOnce(`schema = 'solvers.nlh/v1'\n[table]\n${table}\n${economics}\n`);
+      const run = { runId: hash, configHash: hash, gameKind: "hu-postflop" } as RunSummary;
+      expect((await runMeta(run)).economics).toBe(expected);
+    }
+  });
+
   it("marks incentive and frequency runs as general-sum, but not lock-only runs", async () => {
     vi.mocked(api.validate).mockRejectedValue(new Error("no validation"));
     for (const [hash, profile, expected] of [

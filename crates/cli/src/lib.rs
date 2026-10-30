@@ -272,7 +272,7 @@ enum Command {
         #[arg(long)]
         resources: bool,
     },
-    /// Build and inspect a heads-up postflop config's public tree without solving.
+    /// Build and inspect a heads-up postflop config's public tree without solving; preflop configs are rejected.
     Tree {
         config: std::path::PathBuf,
         /// Node history or slash-separated action labels; repeat for multiple nodes.
@@ -539,14 +539,6 @@ enum Command {
         /// below this (`--resolve-rivers`).
         #[arg(long = "river-target", requires = "resolve_rivers")]
         river_target: Option<f64>,
-    },
-    /// Upgrade an older heads-up postflop .sol artifact to the current format.
-    Upgrade {
-        /// Old .sol artifact.
-        input: std::path::PathBuf,
-        /// New .sol artifact; must not already exist.
-        #[arg(long)]
-        out: std::path::PathBuf,
     },
     /// Compare two solutions from the same solver.
     Compare {
@@ -886,10 +878,6 @@ pub fn main_impl() -> Result<()> {
                     output.as_deref(),
                 )
             }
-        }
-        Command::Upgrade { input, out } => {
-            hu_postflop::sol::upgrade_sol(&input, &out)?;
-            Ok(())
         }
         Command::Compare {
             left,

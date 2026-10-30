@@ -32,6 +32,7 @@ use hu_engine::{
 };
 use nlh::{Card, PerPlayer, Player, Street};
 
+use crate::queries::history_token_matches;
 use crate::sol::SolError;
 use crate::{PostflopConfig, PostflopEvaluator, PostflopHands, PostflopNodeInfo, node_streets};
 
@@ -48,6 +49,8 @@ pub struct GameIndex {
     labels: Vec<String>,
     /// History token of each label (`x`, `r2.5`).
     tokens: Vec<String>,
+    /// Table scale used to compare equivalent selector amounts.
+    scale: nlh::ChipScale,
     /// Label of the action leading into each node; [`NO_LABEL`] at the root
     /// and below chance nodes.
     edges: Vec<u32>,
@@ -177,6 +180,7 @@ impl GameIndex {
             start,
             game.evaluator.hands.clone(),
             game.root_ranges.clone(),
+            scale,
         )
     }
 
@@ -190,8 +194,10 @@ impl GameIndex {
         start: Street,
         hands: PostflopHands,
         root_ranges: PerPlayer<Vec<f32>>,
+        scale: nlh::ChipScale,
     ) -> Self {
         GameIndex {
+            scale,
             tokens: labels
                 .iter()
                 .map(|l| crate::queries::history_token(l))
@@ -221,74 +227,6 @@ impl IndexedTree {
             index: &self.index,
         }
     }
-}
-/// Convert legacy cumulative wager labels to street-relative targets.
-pub(crate) fn upgrade_labels(game: &mut IndexedTree) -> Result<(), SolError> {
-    let scale = nlh::ChipScale::DEFAULT;
-    let mut labels = Vec::<String>::new();
-    let mut interned = HashMap::<String, u32>::new();
-    let mut stack = vec![(0, [0u64; 2], [0u64; 2])];
-    while let Some((id, contrib, start)) = stack.pop() {
-        let node = game.tree.node(id);
-        for child in game.tree.children(id) {
-            let mut next = contrib;
-            let mut next_start = start;
-            if node.kind == NodeKind::Chance {
-                next_start = contrib;
-            } else if node.kind == NodeKind::Action {
-                let actor = node.player.index();
-                let old = &game.index.labels[game.index.edges[child as usize] as usize];
-                let label = if old == "check" || old == "fold" {
-                    old.clone()
-                } else if old == "call" {
-                    next[actor] = contrib[1 - actor];
-                    if next[actor] < contrib[actor] {
-                        return Err(SolError::Malformed(
-                            "legacy call makes contribution negative",
-                        ));
-                    }
-                    old.clone()
-                } else {
-                    let (prefix, amount) = old
-                        .strip_prefix("bet ")
-                        .map(|s| ("bet ", s))
-                        .or_else(|| old.strip_prefix("raise to ").map(|s| ("raise to ", s)))
-                        .ok_or(SolError::Malformed("unrecognized legacy action label"))?;
-                    let to = scale
-                        .parse_bb(amount)
-                        .map_err(|_| SolError::Malformed("invalid legacy wager amount"))?
-                        .0;
-                    if to < contrib[actor] {
-                        return Err(SolError::Malformed(
-                            "legacy wager makes contribution negative",
-                        ));
-                    }
-                    let relative = to.checked_sub(start[actor]).ok_or(SolError::Malformed(
-                        "legacy wager precedes street contribution",
-                    ))?;
-                    next[actor] = to;
-                    format!("{prefix}{}", scale.amount_text(nlh::MwChips(relative)))
-                };
-                let label_id = if let Some(&existing) = interned.get(&label) {
-                    existing
-                } else {
-                    let id = u32::try_from(labels.len())
-                        .map_err(|_| SolError::Malformed("too many action labels"))?;
-                    interned.insert(label.clone(), id);
-                    labels.push(label);
-                    id
-                };
-                game.index.edges[child as usize] = label_id;
-            }
-            stack.push((child, next, next_start));
-        }
-    }
-    game.index.tokens = labels
-        .iter()
-        .map(|l| crate::queries::history_token(l))
-        .collect();
-    game.index.labels = labels;
-    Ok(())
 }
 
 /// Read-only navigation of a tree and its index.
@@ -372,33 +310,22 @@ impl<'a> TreeView<'a> {
     /// A node of any kind named by history, including chance and terminal nodes.
     /// Cardless runout branches use `[dealN]`, where N is the child position.
     pub fn node_by_history_any(&self, history: &str) -> Option<NodeId> {
+        crate::queries::selector_history_steps(history, self.index.scale)
+            .iter()
+            .find_map(|steps| self.walk_history(steps))
+    }
+
+    fn walk_history(&self, steps: &[&str]) -> Option<NodeId> {
         let mut current: NodeId = 0;
-        let mut rest = history;
-        while !rest.is_empty() {
-            let len = match rest.as_bytes()[0] {
-                b'x' | b'c' | b'f' => 1,
-                b'r' => {
-                    let digits = rest[1..]
-                        .bytes()
-                        .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                        .count();
-                    let end = 1 + digits;
-                    let chip_token = rest.as_bytes().get(end) == Some(&b'c')
-                        && self.tree.node(current).kind == NodeKind::Action
-                        && self.tree.children(current).any(|child| {
-                            self.index.tokens[self.index.edges[child as usize] as usize]
-                                == rest[..end + 1]
-                        });
-                    end + usize::from(chip_token)
-                }
-                b'[' => rest.find(']')? + 1,
-                _ => return None,
-            };
-            let (token, tail) = rest.split_at(len);
+        for &token in steps {
             let node = self.tree.node(current);
             current = match node.kind {
                 NodeKind::Action => self.tree.children(current).find(|&child| {
-                    self.index.tokens[self.index.edges[child as usize] as usize] == token
+                    history_token_matches(
+                        &self.index.tokens[self.index.edges[child as usize] as usize],
+                        token,
+                        self.index.scale,
+                    )
                 })?,
                 NodeKind::Chance => {
                     let dealt = token.strip_prefix('[')?.strip_suffix(']')?;
@@ -419,7 +346,6 @@ impl<'a> TreeView<'a> {
                 }
                 NodeKind::Terminal => return None,
             };
-            rest = tail;
         }
         Some(current)
     }
@@ -440,37 +366,23 @@ impl<'a> TreeView<'a> {
                 .ok_or_else(error);
         }
         let history = selector.contains("[?]") || self.node_by_history_any(selector).is_some();
-        let mut steps = Vec::new();
         if history {
-            let mut rest = selector;
-            while !rest.is_empty() {
-                let len = match rest.as_bytes()[0] {
-                    b'x' | b'c' | b'f' => 1,
-                    b'r' => {
-                        let end = 1 + rest[1..]
-                            .bytes()
-                            .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                            .count();
-                        let chip_token = rest.as_bytes().get(end) == Some(&b'c')
-                            && self
-                                .index
-                                .tokens
-                                .iter()
-                                .any(|token| token == &rest[..end + 1]);
-                        end + usize::from(chip_token)
-                    }
-                    b'[' => rest.find(']').map(|i| i + 1).ok_or_else(error)?,
-                    _ => return Err(error()),
-                };
-                let (step, tail) = rest.split_at(len);
-                steps.push(step);
-                rest = tail;
-            }
-        } else {
-            steps.extend(selector.split('/').map(str::trim).filter(|s| !s.is_empty()));
+            return crate::queries::selector_history_steps(selector, self.index.scale)
+                .iter()
+                .find_map(|steps| self.walk_profile(steps, true))
+                .ok_or_else(error);
         }
+        let steps: Vec<_> = selector
+            .split('/')
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .collect();
+        self.walk_profile(&steps, false).ok_or_else(error)
+    }
+
+    fn walk_profile(&self, steps: &[&str], history: bool) -> Option<Vec<NodeId>> {
         let mut current = vec![0];
-        for step in steps {
+        for &step in steps {
             let mut next = Vec::new();
             for id in current {
                 let node = self.tree.node(id);
@@ -478,7 +390,11 @@ impl<'a> TreeView<'a> {
                     NodeKind::Action => {
                         if history {
                             next.extend(self.tree.children(id).filter(|&child| {
-                                self.index.tokens[self.index.edges[child as usize] as usize] == step
+                                history_token_matches(
+                                    &self.index.tokens[self.index.edges[child as usize] as usize],
+                                    step,
+                                    self.index.scale,
+                                )
                             }));
                         } else if let Ok(pos) =
                             crate::queries::resolve_action(&self.actions(id), step)
@@ -509,7 +425,7 @@ impl<'a> TreeView<'a> {
                 }
             }
             if next.is_empty() {
-                return Err(error());
+                return None;
             }
             current = next;
         }
@@ -518,9 +434,9 @@ impl<'a> TreeView<'a> {
                 .iter()
                 .any(|&id| self.tree.node(id).kind != NodeKind::Action)
         {
-            return Err(error());
+            return None;
         }
-        Ok(current)
+        Some(current)
     }
 
     /// The board represented by this node, including representative runout
@@ -940,6 +856,7 @@ pub(crate) fn read_index(
         start,
         hands,
         root_ranges,
+        config.scale,
     );
     Ok(IndexedTree { tree, index })
 }
@@ -1018,6 +935,36 @@ memory = "1GiB"
             assert_eq!(view.history(child), history);
             assert_eq!(view.node_by_history(&history), Some(child));
             assert_eq!(view.profile_nodes(&history).unwrap(), [child]);
+        }
+    }
+
+    #[test]
+    fn equivalent_histories_resolve_after_call_and_across_wildcards() {
+        for (scale, bb, chips) in [(1000, "r2", "r2000c"), (6, "r2", "r12c")] {
+            let raw = TURN.replace("players = 2", &format!("players = 2\nbb_chips = {scale}"));
+            let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
+            let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+            let index =
+                GameIndex::from_game(&built.game, &built.node_info, Street::Turn, p.config.scale);
+            let view = TreeView {
+                tree: &built.game.tree,
+                index: &index,
+            };
+            assert!(view.node_by_history(bb).is_some());
+            assert_eq!(view.node_by_history(bb), view.node_by_history(chips));
+            let bb_call = format!("{bb}c");
+            let chip_call = format!("{chips}c");
+            assert!(view.node_by_history_any(&bb_call).is_some());
+            assert_eq!(
+                view.node_by_history_any(&bb_call),
+                view.node_by_history_any(&chip_call)
+            );
+            let bb_wild = format!("{bb_call}[?]");
+            let chip_wild = format!("{chip_call}[?]");
+            assert_eq!(
+                view.profile_nodes(&bb_wild).unwrap(),
+                view.profile_nodes(&chip_wild).unwrap()
+            );
         }
     }
 

@@ -250,6 +250,30 @@ fn heads_up_limp_and_shortest_grid_amount() {
 }
 
 #[test]
+fn equivalent_line_amount_spellings_normalize_identically() {
+    for (table, decimal, chips, canonical, chip_bet) in [
+        ("bb_chips = 10", "r2.5", "r25c", "r2.5", "b10c"),
+        ("bb_chips = 3\nsb_chips = 1", "r2", "r6c", "r6c", "b3c"),
+    ] {
+        let make = |raise: &str, bet: &str| {
+            config(
+                2,
+                table,
+                Some(&format!("BTN {raise}, BB c / BB {bet}, BTN c")),
+                Some("Ks 7h 2d Ac"),
+                "BTN = 'random'\nBB = 'random'",
+            )
+        };
+        let normalized = roundtrip(&make(decimal, chip_bet));
+        assert_eq!(normalized, roundtrip(&make(chips, "b1")));
+        assert!(
+            normalized.contains(&format!("BTN {canonical}")),
+            "{normalized}"
+        );
+    }
+}
+
+#[test]
 fn every_preflop_fact_matches_legacy_postflop_definitions() {
     for (line, names, limpers, flats, cold, last, participants) in [
         (

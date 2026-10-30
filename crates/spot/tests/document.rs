@@ -556,6 +556,18 @@ fn bb_amounts_must_be_whole_chips_and_pairs_are_exclusive() {
             "table.stacks_chips",
         ),
         (
+            "stack_bb = 100\n[table.stacks_bb]\n[table.stacks_chips]\nBTN = 240\n",
+            "table.stacks_chips",
+        ),
+        (
+            "stack_bb = 100\n[table.stacks_bb]\nCO = 80\n[table.stacks_chips]\n",
+            "table.stacks_chips",
+        ),
+        (
+            "stack_bb = 100\n[table.stacks_bb]\n[table.stacks_chips]\n",
+            "table.stacks_chips",
+        ),
+        (
             "stack_bb = 100\n[economics.rake]\nrate = 0.05\ncap_bb = 1\ncap_chips = 3\n",
             "economics.rake.cap_chips",
         ),

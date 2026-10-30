@@ -53,51 +53,24 @@ fn solve(config: &str, directory: &Path) -> std::path::PathBuf {
     ]);
     run
 }
+
 #[test]
-fn upgrade_rejects_current_invalid_and_existing_output() {
+fn legacy_solution_versions_are_rejected_with_resolve_guidance() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(CONFIG, directory.path());
-    let current = run.join("solution.sol");
-    let output = directory.path().join("upgraded.sol");
-
-    let result = invoke(&[
-        "upgrade",
-        current.to_str().unwrap(),
-        "--out",
-        output.to_str().unwrap(),
-    ]);
-    assert_eq!(result.status.code(), Some(3));
-    assert!(
-        String::from_utf8_lossy(&result.stderr).contains("already current"),
-        "{}",
-        String::from_utf8_lossy(&result.stderr)
-    );
-    assert!(!output.exists());
-
-    let invalid = directory.path().join("invalid.sol");
-    std::fs::write(&invalid, b"not a solution").unwrap();
-    let result = invoke(&[
-        "upgrade",
-        invalid.to_str().unwrap(),
-        "--out",
-        output.to_str().unwrap(),
-    ]);
-    assert_eq!(result.status.code(), Some(3));
-    assert!(!output.exists());
-
-    let legacy = directory.path().join("legacy.sol");
-    let mut bytes = std::fs::read(&current).unwrap();
-    bytes[8..10].copy_from_slice(&4u16.to_le_bytes());
-    std::fs::write(&legacy, bytes).unwrap();
-    std::fs::write(&output, b"do not overwrite").unwrap();
-    let result = invoke(&[
-        "upgrade",
-        legacy.to_str().unwrap(),
-        "--out",
-        output.to_str().unwrap(),
-    ]);
-    assert!(!result.status.success());
-    assert_eq!(std::fs::read(&output).unwrap(), b"do not overwrite");
+    let bytes = std::fs::read(run.join("solution.sol")).unwrap();
+    for version in [4u16, 5, 6] {
+        let path = directory.path().join(format!("v{version}.sol"));
+        let mut legacy = bytes.clone();
+        legacy[8..10].copy_from_slice(&version.to_le_bytes());
+        std::fs::write(&path, legacy).unwrap();
+        let output = invoke(&["export", path.to_str().unwrap(), "summary"]);
+        assert!(!output.status.success());
+        let error = String::from_utf8_lossy(&output.stderr);
+        assert!(error.contains("re-solve"), "{error}");
+    }
+    let output = invoke(&["upgrade", "--help"]);
+    assert!(!output.status.success());
 }
 
 #[test]
@@ -355,6 +328,42 @@ fn export(run: &Path, view: &str, node: &str) -> serde_json::Value {
         node,
     ]);
     serde_json::from_slice(&output.stdout).unwrap()
+}
+
+#[test]
+fn node_and_relock_histories_accept_bb_and_chip_spellings() {
+    for (scale, bb, chips) in [(1000, "r2", "r2000c"), (6, "r2", "r12c")] {
+        let directory = tempfile::tempdir().unwrap();
+        let config = CONFIG
+            .replace("players = 2", &format!("players = 2\nbb_chips = {scale}"))
+            .replace("force bet [50]", "replace bet [2bb]");
+        let run = solve(&config, directory.path());
+        assert_eq!(export(&run, "ev", bb), export(&run, "ev", chips));
+        let source = run.to_str().unwrap();
+        let mut locks = Vec::new();
+        for (i, selector) in [bb, chips].into_iter().enumerate() {
+            let out = directory.path().join(format!("relock{i}"));
+            ok(&[
+                "relock",
+                source,
+                "--out",
+                out.to_str().unwrap(),
+                "--node",
+                selector,
+                "--strategy",
+                "call=1",
+            ]);
+            let fragment = ok(&[
+                "export",
+                out.join("solution.sol").to_str().unwrap(),
+                "lock",
+                "--node",
+                bb,
+            ]);
+            locks.push(String::from_utf8(fragment.stdout).unwrap());
+        }
+        assert_eq!(locks[0], locks[1]);
+    }
 }
 
 #[test]

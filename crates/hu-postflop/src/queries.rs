@@ -274,3 +274,65 @@ pub fn history_token(label: &str) -> String {
         }
     }
 }
+
+/// Compare history actions by exact chip amount, regardless of spelling.
+pub(crate) fn history_token_matches(actual: &str, wanted: &str, scale: nlh::ChipScale) -> bool {
+    if actual == wanted {
+        return true;
+    }
+    fn amount(token: &str, scale: nlh::ChipScale) -> Option<nlh::MwChips> {
+        let text = token.strip_prefix('r')?;
+        if let Some(chips) = text.strip_suffix('c') {
+            chips.parse::<u64>().ok().map(nlh::MwChips)
+        } else {
+            scale.parse_bb(text).ok()
+        }
+    }
+    match (amount(actual, scale), amount(wanted, scale)) {
+        (Some(a), Some(b)) => a == b,
+        _ => false,
+    }
+}
+
+/// Parse ambiguous `rNc` as either a chip amount or a BB amount followed by
+/// a call, preferring the table's canonical spelling.
+pub(crate) fn selector_history_steps(selector: &str, scale: nlh::ChipScale) -> Vec<Vec<&str>> {
+    fn parse<'a>(
+        rest: &'a str,
+        chips_first: bool,
+        steps: &mut Vec<&'a str>,
+        out: &mut Vec<Vec<&'a str>>,
+    ) {
+        if rest.is_empty() {
+            out.push(steps.clone());
+            return;
+        }
+        let len = match rest.as_bytes()[0] {
+            b'x' | b'c' | b'f' => 1,
+            b'r' => {
+                1 + rest[1..]
+                    .bytes()
+                    .take_while(|b| b.is_ascii_digit() || *b == b'.')
+                    .count()
+            }
+            b'[' => match rest.find(']') {
+                Some(end) => end + 1,
+                None => return,
+            },
+            _ => return,
+        };
+        let ambiguous = rest.starts_with('r') && rest.as_bytes().get(len) == Some(&b'c');
+        for suffix in [chips_first, !chips_first] {
+            if suffix && !ambiguous {
+                continue;
+            }
+            let end = len + usize::from(suffix);
+            steps.push(&rest[..end]);
+            parse(&rest[end..], chips_first, steps, out);
+            steps.pop();
+        }
+    }
+    let mut out = Vec::new();
+    parse(selector, !scale.is_decimal(), &mut Vec::new(), &mut out);
+    out
+}

@@ -79,6 +79,11 @@ solver・tree・range・board・economicsなど卓以外の設定は検証しな
 指定時はcomma区切りのtoken列で置換し、`--moves ""`は空prefixである。
 省略された途中のactionを補わず、prefix末尾から次の手番を返す。
 `--format`の既定は`human`。不正なmoveは`NLH004`で1-basedのmove indexを示しexit 2となる。
+`spot.line`と`--moves`のbet / raise額は、整数chipに一致するBB10進数と整数chipの`Nc`表記を混在できる。
+数値は各単位で最短表記とする。例えば`bb_chips = 1000`では`r2.5`と`r2500c`が同額で、
+`r2.50`は`NLH004`。`bb_chips = 3`では`r1`と`r3c`が同額である。
+実効configの`spot.line`は、`bb_chips`の素因数が2と5だけなら最短のBB10進数、
+それ以外なら`Nc`へ正規化する。tree scriptのsize literalの規則は変わらない。
 
 JSONは次のobjectである。特記以外の金額はBB単位のnumber。
 
@@ -149,7 +154,9 @@ solvers validate <CONFIG> [--format human|json] [--show-effective]
 | `--resources` | 無効 | P1の木・storage見積り、P2のpublic tree・policy arena countを表示 |
 
 human表示は製品、開始状態、lineの行動、treeのparam・展開済みrule、警告を示す。
-P1のline表示の`*`は暗黙foldである。金額はBB、utilityはcashでBB、ICMで賞金単位である。
+P1のline表示の`*`は暗黙foldである。P1の金額は全chipを有限小数のBBで表せる卓ではBB、
+それ以外ではchip数に`c`を付けて表示し、headerの`amounts`もそれぞれ`BB` / `chips`とする。
+P2の金額はBB、utilityはcashでBB、ICMで賞金単位である。
 P1のprofile指定時は実際の木へselectorを解決し、humanでは一致node・hand数と各selectorの内訳、
 JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。
 不正なselectorやactionは入力errorである。profileが無い場合はfieldを追加しない。
@@ -278,7 +285,7 @@ iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`ge
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`は通常version 7、profile付きversion 8、no-riversのRiver制約付きversion 9、checkpointは通常version 5、木全体で頻度目標付きならversion 6、部分木modeならversion 8を受理する。旧`.sol` version 4〜6は`solvers upgrade`で変換できる。version 1〜3と旧部分木形式のcheckpoint version 7を含む未対応の旧形式は現行configから再solveする。
+P1 `.sol`は通常version 7、profile付きversion 8、no-riversのRiver制約付きversion 9、checkpointは通常version 5、木全体で頻度目標付きならversion 6、部分木modeならversion 8を受理する。旧`.sol`と旧buildのcheckpointはconfigを現行形式へ移行して再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -286,7 +293,7 @@ checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや�
 
 入力の互換性単位はschema `solvers.nlh/v1`であり、binaryのversionとは別に扱う。
 `.sol`とcheckpointの形式versionは0.xのminor releaseで変更し得るため、旧成果物の互換性は保証しない。
-未対応の旧形式は明示errorで拒否する。P1 `.sol` version 4〜6は`solvers upgrade`で変換でき、それ以外の未対応形式は現行の`solvers.nlh/v1` configから再solveする。
+未対応の旧形式は明示errorで拒否する。旧solutionと旧buildのcheckpointはconfigを現行の`solvers.nlh/v1`へ移行して再solveする。v0.1.0のconfigに含まれる削除済みkeyの移行は変更履歴を参照する。
 変更点と配布物の制約は[CHANGELOG](../CHANGELOG.md)を参照する。
 
 
@@ -320,15 +327,6 @@ P2は対象外。既定では上流も自由にして木全体を再solveする�
 `--clear-profile`は最初に適用し、`--freeze-upstream`はSOURCEのsolutionを新たな基準として設定する。
 不正なSOURCE、P2、断片、strategy構文、profile selectorの解決errorはexit 2。
 `export <sol> lock`で得た断片も`--add`に使える。
-
-## `solvers upgrade`
-
-```sh
-solvers upgrade <OLD.sol> --out <NEW.sol>
-```
-
-P1の`.sol` version 4〜6を現行のversion 7〜9へ変換する。元fileは変更せず、出力はatomicに作成する。出力先が既に存在する場合は拒否する。version 1〜3は非対応であり、現行configから再solveする。
-これは閲覧用solutionの変換でありcheckpointは変換しない。旧checkpointは互換性hashが異なるためresumeできず、現行configから再solveする。
 
 ## `solvers resume`
 

@@ -97,11 +97,31 @@ fn line_actions_report_bb_at_nondefault_chip_scale() {
         TABLE.replace("players = 6", "players = 6\nbb_chips = 10"),
     )
     .unwrap();
-    let cursor = json(&config, &["--moves", "f,f,f,r25c,f,c"]);
+    let cursor = json(&config, &["--moves", "f,f,f,r2.5,f,c"]);
     assert_eq!(cursor["bbChips"], 10);
     assert_eq!(cursor["pot"], 5.5);
     assert_eq!(cursor["actions"][3]["action"]["raise-to"]["to"], 2.5);
     assert_eq!(cursor["actions"][5]["action"]["call"]["amount"], 1.5);
+}
+
+#[test]
+fn moves_accept_both_amount_spellings() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("amounts.toml");
+    for (table, decimal, chips, canonical) in [
+        ("bb_chips = 10", "r2.5", "r25c", "r2.5"),
+        ("bb_chips = 3\nsb_chips = 1", "r2", "r6c", "r6c"),
+    ] {
+        std::fs::write(
+            &config,
+            TABLE.replace("players = 6", &format!("players = 6\n{table}")),
+        )
+        .unwrap();
+        for spelling in [decimal, chips] {
+            let moves = format!("f,f,f,{spelling}");
+            assert_eq!(json(&config, &["--moves", &moves])["moves"][3], canonical);
+        }
+    }
 }
 
 #[test]

@@ -122,7 +122,7 @@ pub struct PostflopPlayer {
     pub preflop: PreflopFacts,
 }
 
-/// All monetary values use the shared 0.001 BB chip unit, before rake.
+/// All monetary values are integer chips at the table's chip scale, before rake.
 #[derive(Clone, Debug, Serialize)]
 pub struct StartState {
     pub street: Street,
@@ -234,7 +234,7 @@ pub struct Spot {
     pub table: Table,
     pub economics: Economics,
     pub start: BettingState,
-    /// Canonical user spelling, unchanged by normalization.
+    /// Effective line with amounts rendered in the table's canonical spelling.
     pub line: String,
     pub board_text: Option<String>,
     pub context: StartState,

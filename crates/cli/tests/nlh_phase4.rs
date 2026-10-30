@@ -187,6 +187,35 @@ fn spec_p1_example_human_output_is_readable_and_pinned() {
 }
 
 #[test]
+fn human_validation_handles_chip_denominated_economics() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("chip-economics.toml");
+    let tournament = include_str!("../../../examples/hu-postflop/tournament_icm.toml")
+        .replace("players = 2", "players = 2\nbb_chips = 3\nsb_chips = 1")
+        .replace("BTN r2.5", "BTN r2")
+        .replace("outside_field_bb = [10]", "outside_field_chips = [31]");
+    std::fs::write(&config, &tournament).unwrap();
+    let human = ok(&["validate", path(&config)], "");
+    assert!(human.contains("amounts=chips utility="), "{human}");
+    assert!(
+        human.contains("table players=2 field players=3 exact"),
+        "{human}"
+    );
+    let json: serde_json::Value =
+        serde_json::from_str(&ok(&["validate", path(&config), "--format", "json"], "")).unwrap();
+    assert_eq!(json["amountUnit"], "BB");
+
+    let cash = tournament.replace(
+        "[economics]\nkind = \"tournament\"\npayouts = [100, 60, 0]\noutside_field_chips = [31]",
+        "[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_chips = 7",
+    );
+    std::fs::write(&config, cash).unwrap();
+    let human = ok(&["validate", path(&config)], "");
+    assert!(human.contains("amounts=chips utility=BB"), "{human}");
+    assert!(human.contains("cap=7c"), "{human}");
+}
+
+#[test]
 fn exports_inspection_report_and_comparison_use_bb() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("river.toml");

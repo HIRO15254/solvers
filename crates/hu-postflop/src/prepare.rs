@@ -454,7 +454,9 @@ pub fn restore(raw: &str, checkpoint_path: &Path) -> Result<ResumeState> {
     }
     let expected = compatibility_hash(&historical.effective)?;
     if checkpoint.config_hash != expected {
-        bail!("checkpoint config hash does not match run.toml; refusing to resume");
+        bail!(
+            "checkpoint config hash does not match run.toml; refusing to resume. Checkpoints written by earlier builds cannot be resumed; re-solve from the config"
+        );
     }
     let embedded = checkpoint
         .config_toml

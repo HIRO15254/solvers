@@ -2515,29 +2515,6 @@ struct SelectorTarget {
     node: SelectorNode,
 }
 
-fn selector_history_steps(selector: &str, scale: nlh::ChipScale) -> Option<Vec<&str>> {
-    let mut rest = selector;
-    let mut steps = Vec::new();
-    while !rest.is_empty() {
-        let len = match rest.as_bytes()[0] {
-            b'x' | b'c' | b'f' => 1,
-            b'r' => {
-                let end = 1 + rest[1..]
-                    .bytes()
-                    .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                    .count();
-                end + usize::from(!scale.is_decimal() && rest.as_bytes().get(end) == Some(&b'c'))
-            }
-            b'[' => rest.find(']')? + 1,
-            _ => return None,
-        };
-        let (step, tail) = rest.split_at(len);
-        steps.push(step);
-        rest = tail;
-    }
-    Some(steps)
-}
-
 fn selector_walk(
     config: &PostflopConfig,
     steps: &[&str],
@@ -2575,9 +2552,13 @@ fn selector_walk(
                         })
                         .collect();
                     let selected = if history {
-                        labels
-                            .iter()
-                            .position(|label| crate::queries::history_token(label) == step)
+                        labels.iter().position(|label| {
+                            crate::queries::history_token_matches(
+                                &crate::queries::history_token(label),
+                                step,
+                                config.scale,
+                            )
+                        })
                     } else {
                         let refs: Vec<&str> = labels.iter().map(String::as_str).collect();
                         crate::queries::resolve_action(&refs, step).ok()
@@ -2665,12 +2646,15 @@ fn selector_targets(config: &PostflopConfig, selector: &str) -> Option<Vec<Selec
     if selector.is_empty() || selector == "root" {
         return selector_walk(config, &[], false, false);
     }
-    let history_steps = selector_history_steps(selector, config.scale);
-    // profile_nodes chooses history if it contains a wildcard or names any
-    // actual node; otherwise it interprets the input as a slash path.
-    let history = history_steps
-        .as_ref()
-        .and_then(|steps| selector_walk(config, steps, true, !selector.contains("[?]")));
+    let history_steps = crate::queries::selector_history_steps(selector, config.scale);
+    // Try canonical tokenization first, then other equivalent spellings.
+    let history = history_steps.iter().find_map(|steps| {
+        let targets = selector_walk(config, steps, true, !selector.contains("[?]"))?;
+        targets
+            .iter()
+            .all(|t| matches!(t.node, SelectorNode::Action(_)))
+            .then_some(targets)
+    });
     let targets = if selector.contains("[?]") {
         history?
     } else if let Some(targets) = history {
@@ -3200,6 +3184,38 @@ mod tests {
         actual.sort_unstable();
         measured.sort_unstable();
         assert_eq!(measured, actual);
+    }
+
+    #[test]
+    fn selector_preflight_accepts_equivalent_history_amounts() {
+        let input = r#"
+schema = "solvers.nlh/v1"
+[table]
+players = 2
+stack_bb = 21
+bb_chips = 6
+[spot]
+line = "BTN c, BB x / BB x, BTN x"
+board = "2s 7s Ks 4h"
+[ranges]
+BB = "AK,44"
+BTN = "AK,44"
+[tree]
+script = "turn { replace bet [2bb] } river { checkdown } turn when aggressions >= 1 { remove raise }"
+[run]
+memory = "1GiB"
+"#;
+        let p = crate::prepare::prepare(input, std::path::Path::new("test.toml")).unwrap();
+        for (bb, chips) in [("r2", "r12c"), ("r2c[?]", "r12cc[?]")] {
+            let paths = |selector| {
+                selector_targets(&p.config, selector)
+                    .unwrap()
+                    .into_iter()
+                    .map(|target| target.path)
+                    .collect::<Vec<_>>()
+            };
+            assert_eq!(paths(bb), paths(chips));
+        }
     }
 
     #[test]

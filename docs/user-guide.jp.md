@@ -10,7 +10,7 @@ P1専用buildでは`solvers 0.2.0 (<git-hash>), heads-up postflop only`と表示
 `solversd --version`は`solversd 0.2.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
 0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
 minor releaseで`solvers.nlh/v1`のkeyを削除することがあり、削除したkeyはunknown-key errorになる（移行方法は変更履歴に記す）。
-P1の旧`.sol` version 4〜6は`solvers upgrade`で変換できる。その他の未対応形式は現行configから再solveする。詳細は[互換方針と変更履歴](../CHANGELOG.md)を参照する。
+P1の旧`.sol`と旧buildのcheckpointはconfigを現行形式へ移行して再solveする。特にv0.1.0のconfigには削除済みkeyが含まれるため、[変更履歴](../CHANGELOG.md)に従って移行する。
 
 ## 1. インストールする
 
@@ -213,6 +213,11 @@ solvers line spot.toml --format json
 
 `--moves`は明示prefixをcomma区切りで置換する。省略すると`spot.line`を厳密にreplayする。
 cursorの`next.options`から次のtokenを選び、bet / raiseはstreet投入総額を付ける。
+`spot.line`でも`--moves`でも、整数chipに一致するBB10進数と整数chipの`Nc`表記を混在できる。
+例えば`bb_chips = 1000`では`r2.5`と`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
+数値は各単位で最短表記とし、`r2.50`などは`NLH004`（exit 2）となる。
+実効configの`spot.line`は`bb_chips`の素因数が2と5だけなら最短のBB10進数、それ以外なら`Nc`へ揃える。
+tree scriptのsize literalの規則は変わらない。
 all-in callは`c`、all-in bet / raiseは`a`である。`complete`はpostflop開始状態を表し、
 config全体の検証成功ではないため、solve前には通常のvalidateを実行する。
 JSONの全fieldと単位は[CLI reference](cli-reference.jp.md#solvers-line)を参照する。
@@ -359,13 +364,7 @@ P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 
 旧runのstatus・watch・runs lsも利用でき、JSONのconfigSchema / gameKindは記録値のままである。
 旧runのresumable表示はcheckpointの存在を示すだけで、現行CLIでは再開できない。
-P1の`.sol` version 1〜6は通常の読込みでは拒否する。version 4〜6は次のように変換できる:
-
-```sh
-solvers upgrade old.sol --out upgraded.sol
-```
-
-version 7〜9のsolutionを新たにatomicに作成し、元fileは変更しない。出力先が既にあれば拒否する。version 1〜3は変換できないため、現行configから再solveする。upgradeはcheckpointを変換せず、旧checkpointは互換性hashが異なるためresumeできない。再開したい場合も現行configから再solveする。
+P1の`.sol`はversion 7〜9を受理し、version 1〜6は拒否する。旧solutionと旧buildのcheckpointは現行configから再solveする。
 
 ## 6. 結果を読む
 

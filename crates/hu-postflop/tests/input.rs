@@ -93,6 +93,34 @@ fn non_decimal_chip_scale_survives_parsing_tree_and_payoff() {
 }
 
 #[test]
+fn mixed_line_spellings_produce_identical_effective_hashes() {
+    let make = |line| {
+        text(
+            "bb_chips = 3\nsb_chips = 1",
+            line,
+            "Ks 7h 2d Ac",
+            "turn { checkdown }",
+        )
+    };
+    let a = hu_postflop::prepare::prepare(
+        &make("BTN r2, BB c / BB b3c, BTN c"),
+        Path::new("input.toml"),
+    )
+    .unwrap();
+    let b = hu_postflop::prepare::prepare(
+        &make("BTN r6c, BB c / BB b1, BTN c"),
+        Path::new("input.toml"),
+    )
+    .unwrap();
+    assert_eq!(a.effective, b.effective);
+    assert_eq!(
+        runfiles::config_hash(a.effective.as_bytes()),
+        runfiles::config_hash(b.effective.as_bytes())
+    );
+    assert!(a.effective.contains("BTN r6c, BB c / BB b3c, BTN c"));
+}
+
+#[test]
 fn sections_defaults_order_and_idempotence() {
     let doc = parse(&standard(""));
     let s = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();

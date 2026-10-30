@@ -80,7 +80,7 @@ fn token(action: &Action, scale: ChipScale) -> String {
     }
 }
 
-fn line_text(actions: &[LineAction], scale: ChipScale) -> String {
+pub(crate) fn line_text(actions: &[LineAction], scale: ChipScale) -> String {
     let mut text = String::new();
     let mut previous = None;
     for action in actions {

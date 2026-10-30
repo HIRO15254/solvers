@@ -30,6 +30,18 @@ fn rows(config: &Path, args: &[&str]) -> serde_json::Value {
 }
 
 #[test]
+fn tree_help_describes_product_boundary() {
+    let output = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args(["tree", "--help"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let help = String::from_utf8(output.stdout).unwrap();
+    assert!(help.contains("heads-up postflop"), "{help}");
+    assert!(help.contains("preflop configs are rejected"), "{help}");
+}
+
+#[test]
 fn flop_root_and_returned_child_selectors() {
     let config = example("hu-postflop", "flop_srp.toml");
     let root = rows(&config, &[]);

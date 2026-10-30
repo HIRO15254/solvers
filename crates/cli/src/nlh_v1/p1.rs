@@ -65,7 +65,12 @@ pub fn validate(
         }
         crate::validate::ValidationFormat::Human => {
             println!(
-                "valid: schema={SCHEMA} product=P1 (HU Postflop) amounts=BB utility={}",
+                "valid: schema={SCHEMA} product=P1 (HU Postflop) amounts={} utility={}",
+                if p.config.scale.is_decimal() {
+                    "BB"
+                } else {
+                    "chips"
+                },
                 utility_unit(&p)
             );
             print!("{}", human_summary(&p));
@@ -200,6 +205,10 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
                 number(&rake["rate"]),
                 rake.get("cap_bb")
                     .map(|v| format!("{} BB", number(v)))
+                    .or_else(|| {
+                        rake.get("cap_chips")
+                            .map(|v| monetary(v.as_integer().expect("chip cap") as u64))
+                    })
                     .unwrap_or_else(|| "none".into()),
                 rake["when"].as_str().unwrap()
             )
@@ -210,8 +219,10 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
     } else {
         let table = spot.table.positions.len();
         let field = table
-            + economics["outside_field_bb"]
-                .as_array()
+            + economics
+                .get("outside_field_bb")
+                .or_else(|| economics.get("outside_field_chips"))
+                .and_then(toml::Value::as_array)
                 .expect("ICM field")
                 .len();
         writeln!(

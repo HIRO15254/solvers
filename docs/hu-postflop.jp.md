@@ -277,7 +277,8 @@ node履歴はspotのlineとは別の文法である。actor positionとstreet区
 | `[Th]` | chance nodeの配牌 |
 | `[dealN]` | 実cardを記録しないall-in runoutのchance branch。Nは0始まりの子位置であり、同じ親のbranchを一意に指す |
 
-例は`xr5c[Th]xx`である。額の表記は卓のchip尺度に従う。例えばTurnで2 BBをbet・callした後のRiverで2 BBをbetすると`r2c[Th]r2`となり、Riverのlabelは`bet 2`である。
+例は`xr5c[Th]xx`である。出力する額は卓のchip尺度に従い、`bb_chips`の素因数が2と5だけなら最短のBB 10進数、それ以外なら整数chip数に`c`を付けた`Nc`を使う。例えばTurnで2 BBをbet・callした後のRiverで2 BBをbetすると、10進の卓では`r2c[Th]r2`、Riverのlabelは`bet 2`である。`bb_chips = 3`なら同じ額は6 chipsなので履歴は`r6cc[Th]r6c`、Riverのlabelは`bet 6c`である（最初の`c`はchip単位、次の`c`はcall）。
+history selectorには整数chipに一致するBB 10進数と`Nc`の両形式を使え、同額なら同じnodeに一致する。例えば`bb_chips = 3`では`r2c[Th]r2`も`r6cc[Th]r6c`と同じnodeを指す。
 node selectorとaction labelによる指定はCLI referenceに従う。
 
 ## 6. run directoryと`run.json`
@@ -404,11 +405,11 @@ chunkは照会したnodeを含むものだけを読み、BLAKE3、展開長、bl
 `.sol`の戦略はsolve storageによらずu16である。値の分解能はblockのピークに対し約1/32767である。
 supportは埋込みconfigから再計算する。開始rangeのweight 0のhandには保存slotが無い。
 support内でもそのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
-version 1〜6は通常の読込みではversion errorで明示的に拒否する。version 4〜6は`solvers upgrade <OLD.sol> --out <NEW.sol>`でversion 7〜9へ変換できる。旧形式の累計拠出を表すedge labelを現行のstreet内raise-toへ変換する。元fileは変更せず、既存の出力先は拒否し、出力はatomicに作成する。version 1〜3はupgrade非対応で、現行configから再solveする。
+version 1〜6はversion errorで明示的に拒否する。旧solutionは現行configから再solveする。v0.1.0のconfigは削除済みの`tree.include_allin`と`[tree.max_aggressive_actions]`を含むため、[変更履歴](../CHANGELOG.md)に従って移行する。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
 共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateと部分木identityを持つversion 8を使う。
-旧checkpointは互換性hashが異なるためresumeできない。`.sol`のupgradeはcheckpointを変換せず、再開したい場合は現行configから再solveする。
+旧buildのcheckpointは互換性hashが異なるためresumeできない。再開したい場合は現行configから再solveする。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 
