@@ -1,10 +1,10 @@
-//! Build-time adapters for the common input. Builder amounts are milli-BB;
+//! Build-time adapters for the common input. Builder amounts are chips;
 //! utilities are BB for cash and prize units for tournaments.
 use super::invalid;
 use crate::game::{PayoffPipeline, RakeModel, TerminalDescriptor, TerminalKind, UtilityModel};
 use economics::{CompiledRake, PreparedIcm, UtilityConfig};
 use nlh::settlement::{PotKind, PotLayer, PotRake, RakeConditionContext};
-use nlh::{MwChips, PerPlayer, Player, SeatMask, SeatVec};
+use nlh::{ChipScale, MwChips, PerPlayer, Player, SeatMask, SeatVec, split_pot};
 use spot::{Product, Spot, SpotError};
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -30,6 +30,7 @@ impl NlhPayoff {
             .as_ref()
             .ok_or_else(|| invalid("spot", "missing IP"))?;
         let seats = PerPlayer::new(oop.seat, ip.seat);
+        let scale = spot.table.setup.scale();
         let remaining = seats.map(|id| spot.context.seats[id.index()].remaining_stack.0 as f64);
         let contributions =
             seats.map(|id| spot.context.seats[id.index()].total_contribution.0 as f64);
@@ -41,7 +42,7 @@ impl NlhPayoff {
             .ok_or_else(|| invalid("spot", "missing effective stack"))?
             .0 as f64;
         let utility = match &spot.economics.utility {
-            UtilityConfig::ChipEv => Utility::ChipEv,
+            UtilityConfig::ChipEv => Utility::ChipEv(scale),
             UtilityConfig::TournamentIcm {
                 outside_field,
                 payouts,
@@ -63,7 +64,8 @@ impl NlhPayoff {
                     .collect();
                 for player in outside_field {
                     fixed.push(
-                        MwChips::try_from_bb(player.stack_bb)
+                        scale
+                            .from_bb(player.stack_bb)
                             .map_err(|e| invalid("economics.outside_field_bb", e.to_string()))?,
                     );
                 }
@@ -82,7 +84,7 @@ impl NlhPayoff {
         // money. In that case even free affine utilities are general-sum.
         let zero_sum = contributions[Player::P0] + contributions[Player::P1] == pot as f64
             && match &utility {
-                Utility::ChipEv => true,
+                Utility::ChipEv(_) => true,
                 Utility::Icm { zero_sum_field, .. } => *zero_sum_field,
             };
         // Validate and cache the ICM baseline before tree allocation.
@@ -120,7 +122,8 @@ impl NlhPayoff {
     }
 }
 
-/// Shared economics rake on the matched pot, rounded on the 0.001 BB grid.
+/// Shared economics rake on the matched pot, rounded on its own unit; tied
+/// pots split into whole chips.
 pub struct NlhRake {
     compiled: CompiledRake,
     shares: PerPlayer<u64>,
@@ -158,6 +161,12 @@ impl RakeModel for NlhRake {
             .expect("validated rake on the matched P1 pot")
             .0 as f64
     }
+    /// OOP (P0) is the first player clockwise from the button, so an odd
+    /// unit goes to OOP.
+    fn tie_split(&self, net_pot: f64) -> PerPlayer<f64> {
+        let split = split_pot(MwChips(net_pot as u64), 2);
+        PerPlayer::new(split.award(0).0 as f64, split.award(1).0 as f64)
+    }
     fn is_free(&self) -> bool {
         matches!(
             self.compiled,
@@ -167,7 +176,7 @@ impl RakeModel for NlhRake {
 }
 
 enum Utility {
-    ChipEv,
+    ChipEv(ChipScale),
     Icm {
         prepared: Box<PreparedIcm>,
         /// No folded or off-table players: heads-up ICM is affine in chips.
@@ -189,11 +198,19 @@ pub struct NlhUtility {
 impl Utility {
     fn try_values(&self, actual: PerPlayer<f64>) -> Result<PerPlayer<f64>, SpotError> {
         match self {
-            Utility::ChipEv => Ok(actual.map(|v| v / 1000.0)),
+            Utility::ChipEv(scale) => Ok(actual.map(|v| v / scale.chips_per_bb() as f64)),
             Utility::Icm { prepared, memo, .. } => {
-                // Showdown ties can leave half a milli-BB. As in the legacy
-                // tournament adapter, round stacks to the shared ICM grid.
-                let pair = actual.map(|v| MwChips::try_from_bb(v / 1000.0));
+                // Stacks are whole chips: rake and tied-pot awards are integral.
+                let pair = actual.map(|v| {
+                    if !v.is_finite() || v < 0.0 || v.fract() != 0.0 || v >= 2.0_f64.powi(64) {
+                        Err(invalid(
+                            "economics",
+                            "terminal stack must be a whole number of chips",
+                        ))
+                    } else {
+                        Ok(MwChips(v as u64))
+                    }
+                });
                 let a = pair[Player::P0]
                     .as_ref()
                     .map_err(|e| invalid("economics", e.to_string()))?;

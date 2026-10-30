@@ -88,6 +88,8 @@ const FORM_KEYS = new Set([
   "schema",
   "meta.name",
   "table.players",
+  "table.bb_chips",
+  "table.chip_rounding",
   "table.stack_bb",
   "table.sb_bb",
   "table.ante_bb",
@@ -675,7 +677,7 @@ export function SetupPage() {
             }
             onRevalidate={() => void validate(requestToml)}
           />
-          <TreeCard toml={requestToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} />
+          <TreeCard toml={requestToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} bbChips={cursor?.bbChips || 1000} />
         </aside>
       </main>
 

@@ -38,7 +38,7 @@ pub(crate) fn validate(
         Some(_) => "incomplete",
     };
     let mut value = serde_json::to_value(&summary)?;
-    crate::validate::diagnostic_bb(&mut value);
+    crate::validate::diagnostic_bb(&mut value, p.document.spot.table.setup.scale());
     value["status"] = json!("valid");
     value["ruleHitStatus"] = json!(rule_hit_status);
     value["schema"] = json!(SCHEMA);
@@ -100,7 +100,12 @@ pub(crate) fn validate(
                 println!(
                     "{}: stack {} BB range {}",
                     p.document.spot.table.positions[seat],
-                    p.document.spot.table.stacks[seat].as_bb(),
+                    p.document
+                        .spot
+                        .table
+                        .setup
+                        .scale()
+                        .to_bb(p.document.spot.table.stacks[seat]),
                     p.document.spot.ranges[seat].text
                 );
             }

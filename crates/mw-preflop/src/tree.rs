@@ -1235,6 +1235,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 

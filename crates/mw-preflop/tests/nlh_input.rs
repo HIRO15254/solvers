@@ -56,6 +56,53 @@ fn default_rake_unit_preserves_fingerprints() {
 }
 
 #[test]
+fn chip_scale_and_rounding_are_part_of_the_game_fingerprint() {
+    use mw_preflop::solver::ExternalSamplingGame;
+    let fingerprint = |raw: &str| {
+        let lowered = lower(raw);
+        mw_preflop::HoldemGame::new(
+            &lowered.game,
+            &lowered.utility,
+            &lowered.rake,
+            mw_preflop::FeatureHashAbstraction::default(),
+        )
+        .unwrap()
+        .game_fingerprint()
+    };
+    let raw = config(3, "[]", "flop, turn, river { checkdown }");
+    let default = fingerprint(&raw);
+    let explicit = raw.replace(
+        "stack_bb = 100\n",
+        "stack_bb = 100\nbb_chips = 1000\nchip_rounding = \"nearest\"\n",
+    );
+    assert_eq!(fingerprint(&explicit), default);
+    for grid in ["bb_chips = 2000\n", "chip_rounding = \"down\"\n"] {
+        let coarse = raw.replace("stack_bb = 100\n", &format!("stack_bb = 100\n{grid}"));
+        assert_ne!(fingerprint(&coarse), default, "{grid}");
+    }
+}
+
+#[test]
+fn odd_chip_denomination_reports_tree_pot_in_bb() {
+    let raw = config(3, "[]", "flop, turn, river { checkdown }").replace(
+        "stack_bb = 100\n",
+        "stack_bb = 100\nbb_chips = 3\nsb_chips = 1\n",
+    );
+    let lowered = lower(&raw);
+    let state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
+    let actor = state.to_act.unwrap();
+    assert_eq!(state.pot_size(), MwChips(4));
+    assert_eq!(
+        NlhContext {
+            state: &state,
+            actor
+        }
+        .value(TreeVar::Pot),
+        Value::Number(4.0 / 3.0)
+    );
+}
+
+#[test]
 fn spec_p2_example_defaults_normalize_idempotently_and_lower() {
     let raw = config(
         6,
@@ -434,11 +481,11 @@ fn random_preflop_lines_agree_with_spot_facts_and_replay() {
             assert_eq!(ctx.value(TreeVar::Donk), Value::Bool(false));
             assert_eq!(
                 ctx.value(TreeVar::Pot),
-                Value::Number(state.pot_size().as_bb())
+                Value::Number(state.scale().to_bb(state.pot_size()))
             );
             assert_eq!(
                 ctx.value(TreeVar::ToCall),
-                Value::Number(state.amount_to_call(actor).as_bb())
+                Value::Number(state.scale().to_bb(state.amount_to_call(actor)))
             );
             let actions = state.legal_actions(&lowered.game.betting).unwrap();
             let action = actions[rng.gen_range(0..actions.len())].clone();
@@ -446,7 +493,7 @@ fn random_preflop_lines_agree_with_spot_facts_and_replay() {
                 Action::Fold => None,
                 Action::Check => Some("x".into()),
                 Action::Call { .. } => Some("c".into()),
-                Action::RaiseTo { to, .. } => Some(format!("r{}", to.as_bb())),
+                Action::RaiseTo { to, .. } => Some(format!("r{}", state.scale().amount_text(to))),
                 _ => unreachable!(),
             };
             if let Some(spelling) = spelling {

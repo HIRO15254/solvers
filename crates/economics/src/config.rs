@@ -1,6 +1,6 @@
 //! Shared rake and utility configuration with byte-compatible serde shapes.
 
-use nlh::MwChips;
+use nlh::{ChipScale, MwChips, Rounding};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -36,15 +36,6 @@ pub enum RakeAllocation {
     Proportional,
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum RakeRounding {
-    #[default]
-    Down,
-    Nearest,
-    Up,
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum RakeConfig {
@@ -61,7 +52,7 @@ pub enum RakeConfig {
         cap_bb: Option<f64>,
         when: String,
         allocation: RakeAllocation,
-        rounding: RakeRounding,
+        rounding: Rounding,
         #[serde(
             default = "default_rounding_unit",
             skip_serializing_if = "is_default_rounding_unit"
@@ -88,7 +79,7 @@ pub enum CompiledRake {
         cap: Option<MwChips>,
         when: CompiledRakeCondition,
         allocation: RakeAllocation,
-        rounding: RakeRounding,
+        rounding: Rounding,
         rounding_unit: MwChips,
     },
     GgPreflop {
@@ -146,7 +137,13 @@ impl UtilityConfig {
 }
 
 impl RakeConfig {
-    pub fn compile(&self) -> Result<CompiledRake, ConfigError> {
+    /// Compile BB amounts onto whole chips of `scale`.
+    pub fn compile(&self, scale: ChipScale) -> Result<CompiledRake, ConfigError> {
+        let chips = |field: &str, bb: f64| {
+            scale
+                .from_bb(bb)
+                .map_err(|_| ConfigError::Number(field.into()))
+        };
         match *self {
             RakeConfig::None => Ok(CompiledRake::None),
             RakeConfig::PercentCap {
@@ -158,8 +155,7 @@ impl RakeConfig {
                 nonnegative_finite("rake.cap_bb", cap_bb)?;
                 Ok(CompiledRake::PercentCap {
                     rate,
-                    cap: MwChips::try_from_bb(cap_bb)
-                        .map_err(|_| ConfigError::Number("rake.cap_bb".into()))?,
+                    cap: chips("rake.cap_bb", cap_bb)?,
                     no_flop_no_drop,
                 })
             }
@@ -178,8 +174,7 @@ impl RakeConfig {
                 let cap = cap_bb
                     .map(|cap_bb| {
                         nonnegative_finite("rake.cap_bb", cap_bb)?;
-                        MwChips::try_from_bb(cap_bb)
-                            .map_err(|_| ConfigError::Number("rake.cap_bb".into()))
+                        chips("rake.cap_bb", cap_bb)
                     })
                     .transpose()?;
                 let when = compile_rake_condition(when).map_err(ConfigError::RakeCondition)?;
@@ -202,10 +197,8 @@ impl RakeConfig {
                 nonnegative_finite("rake.exempt_pot_bb", exempt_pot_bb)?;
                 Ok(CompiledRake::GgPreflop {
                     rate,
-                    cap: MwChips::try_from_bb(cap_bb)
-                        .map_err(|_| ConfigError::Number("rake.cap_bb".into()))?,
-                    exempt_pot: MwChips::try_from_bb(exempt_pot_bb)
-                        .map_err(|_| ConfigError::Number("rake.exempt_pot_bb".into()))?,
+                    cap: chips("rake.cap_bb", cap_bb)?,
+                    exempt_pot: chips("rake.exempt_pot_bb", exempt_pot_bb)?,
                 })
             }
         }

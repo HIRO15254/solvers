@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::betting::{BettingState, HandPhase, SeatStatus};
-use crate::{MwChips, SeatId, SeatMask, SeatVec};
+use crate::{MwChips, SeatId, SeatMask, SeatVec, split_pot};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -338,29 +338,26 @@ impl PotRake for NoRake {
     }
 }
 
+/// Ties split evenly; odd chips go one at a time to the winners clockwise
+/// from the button.
 fn award_split(
     awards: &mut SeatVec<MwChips>,
     amount: MwChips,
     winners: SeatMask,
     button: SeatId,
 ) -> Result<(), SettlementError> {
-    let count = winners.len() as u64;
-    if count == 0 {
+    if winners.is_empty() {
         return Err(SettlementError::NoEligiblePlayer);
     }
-    let share = amount.raw() / count;
-    let odd = (amount.raw() % count) as usize;
-    for seat in winners {
-        awards[seat] = awards[seat]
-            .checked_add(MwChips(share))
-            .ok_or(SettlementError::ChipInvariant)?;
-    }
+    let split = split_pot(amount, winners.len());
     let num_seats = awards.len();
     let ordered = (1..=num_seats)
         .map(|step| button.advance(step, num_seats))
         .filter(|seat| winners.contains(*seat));
-    for seat in ordered.take(odd) {
-        awards[seat] += MwChips(1);
+    for (order, seat) in ordered.enumerate() {
+        awards[seat] = awards[seat]
+            .checked_add(split.award(order))
+            .ok_or(SettlementError::ChipInvariant)?;
     }
     Ok(())
 }
@@ -460,6 +457,7 @@ mod tests {
             previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
+            chip_rounding: crate::Rounding::Nearest,
         }
     }
 

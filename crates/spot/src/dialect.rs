@@ -103,6 +103,7 @@ pub(crate) fn plain_decimal(text: &str) -> bool {
 }
 
 /// Parse only the v1 spellings; legacy aliases never reach `SizeSpec::parse`.
+/// Whole-chip checks need the table and happen after compilation.
 pub fn parse_size_literal(text: &str) -> Result<SizeSpec, ParseSizeError> {
     match text {
         "a" => return Ok(SizeSpec::AllIn),
@@ -110,21 +111,30 @@ pub fn parse_size_literal(text: &str) -> Result<SizeSpec, ParseSizeError> {
         "min" => return Ok(SizeSpec::MinRaise),
         _ => {}
     }
-    let (number, suffix) = ["%effective", "%stack", "bb", "x", "e", ""]
+    let (number, suffix) = ["%effective", "%stack", "bb", "x", "e", "c", ""]
         .into_iter()
         .find_map(|s| text.strip_suffix(s).map(|n| (n, s)))
         .unwrap();
     let invalid = || ParseSizeError(format!("invalid v1 size literal {text:?}"));
-    if !plain_decimal(number) || (suffix == "e" && number.contains('.')) {
+    if !plain_decimal(number) || (matches!(suffix, "e" | "c") && number.contains('.')) {
         return Err(invalid());
     }
+    if suffix == "c" {
+        return match number.parse::<u64>() {
+            Ok(chips) if chips > 0 => Ok(SizeSpec::ToChips {
+                value: chips as f64,
+            }),
+            _ => Err(invalid()),
+        };
+    }
     if suffix == "bb" {
-        let exact =
-            crate::parse::decimal_chips(number, "tree.script", false).map_err(|_| invalid())?;
+        // The decoded f64 must spell the written decimal exactly so the
+        // table's whole-chip check sees the written amount.
         let value = number.parse::<f64>().map_err(|_| invalid())?;
-        if crate::parse::decimal_chips(&value.to_string(), "tree.script", false)
-            .map_err(|_| invalid())?
-            != exact
+        let exact = crate::parse::exact_decimal(number);
+        if value <= 0.0
+            || exact.is_none()
+            || crate::parse::exact_decimal(&value.to_string()) != exact
         {
             return Err(invalid());
         }

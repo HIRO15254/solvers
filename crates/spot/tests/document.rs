@@ -1,6 +1,6 @@
-use economics::{CompiledRake, RakeAllocation, RakeConfig, RakeRounding, UtilityConfig};
+use economics::{CompiledRake, RakeAllocation, RakeConfig, UtilityConfig};
 use nlh::script::{Condition, Script, VarKind, Vars};
-use nlh::{MwChips, SeatId, SizeSpec, Street};
+use nlh::{ChipScale, MwChips, Rounding, SeatId, SizeSpec, Street};
 use spot::{
     Code, Document, NLH_V1, Product, ProductSections, Spot, SpotError, TreeVar, other_product_key,
     parse_size_literal,
@@ -91,7 +91,7 @@ fn every_common_default_and_section_order() {
     assert!(s.table.setup.straddles.is_empty());
     assert_eq!(s.table.setup.button, SeatId(0));
     assert_eq!(s.table.setup.preflop_first_to_act, SeatId(3));
-    assert_eq!(s.table.setup.nominal_big_blind, MwChips::ONE_BB);
+    assert_eq!(s.table.setup.nominal_big_blind, ChipScale::DEFAULT.bb());
     assert!(matches!(s.economics.rake, RakeConfig::None));
     assert!(matches!(s.economics.utility, UtilityConfig::ChipEv));
     assert_eq!(s.economics.compiled_rake, CompiledRake::None);
@@ -431,6 +431,146 @@ fn arbitrary_positive_milli_bb_rake_units_normalize_and_invalid_units_fail() {
         assert_eq!(err.key.as_deref(), Some("economics.rake.rounding_unit_bb"));
     }
 }
+
+#[test]
+fn chip_denomination_defaults_normalize_and_reject_bad_values() {
+    let setup = parse(ROOT).spot.table.setup;
+    assert_eq!(setup.scale(), ChipScale::DEFAULT);
+    assert_eq!(setup.chip_rounding, Rounding::Nearest);
+    assert!(roundtrip(ROOT).contains("players = 6\nbb_chips = 1000\n"));
+    for (chips, rounding, mode) in [
+        (100, "down", Rounding::Down),
+        (4, "up", Rounding::Up),
+        (2, "nearest", Rounding::Nearest),
+    ] {
+        let raw = format!("{ROOT}bb_chips = {chips}\nchip_rounding = \"{rounding}\"\n");
+        let normalized = roundtrip(&raw);
+        assert!(normalized.contains(&format!("chip_rounding = \"{rounding}\"\n")));
+        let setup = parse(&normalized).spot.table.setup;
+        assert_eq!(setup.nominal_big_blind, MwChips(chips));
+        assert_eq!(setup.chip_rounding, mode);
+    }
+    for value in ["0", "-3", "1000001"] {
+        let e = error(&format!("{ROOT}bb_chips = {value}\n"));
+        assert_eq!(e.code, Code::NLH003, "{value}: {e}");
+        assert_eq!(e.key.as_deref(), Some("table.bb_chips"));
+    }
+    let e = error(&format!("{ROOT}bb_chips = 2.5\n"));
+    assert_eq!(e.code, Code::NLH002);
+    assert_eq!(e.key.as_deref(), Some("table.bb_chips"));
+    let e = error(&format!("{ROOT}chip_rounding = \"floor\"\n"));
+    assert_eq!(e.code, Code::NLH003);
+    assert_eq!(e.key.as_deref(), Some("table.chip_rounding"));
+    let e = error(&format!("{ROOT}chip_rounding = 1\n"));
+    assert_eq!(e.code, Code::NLH002);
+    assert_eq!(e.key.as_deref(), Some("table.chip_rounding"));
+}
+
+/// A 1-3 game with $1 chips: 1 BB = 3 chips, so the SB is one chip and many
+/// BB decimals are not whole chips.
+const ONE_THREE: &str =
+    "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nsb_chips = 1\n";
+
+#[test]
+fn chip_keys_express_non_decimal_denominations() {
+    let raw = format!(
+        "{ONE_THREE}stack_bb = 100\nstraddles_chips = [6]\n[table.stacks_chips]\nCO = 250\n[tree]\nscript = \"preflop {{ add raise [40c, 20bb] }}\"\n"
+    );
+    let doc = parse(&raw);
+    let table = &doc.spot.table;
+    assert_eq!(table.sb, MwChips(1));
+    assert_eq!(table.setup.forced_blinds[SeatId(2)], MwChips(3));
+    assert_eq!(table.stacks[SeatId(0)], MwChips(300));
+    assert_eq!(table.stacks[SeatId(5)], MwChips(250));
+    assert_eq!(table.setup.straddles[0].1, MwChips(6));
+    let normalized = roundtrip(&raw);
+    // Non-decimal tables spell every amount group in chips.
+    for expected in [
+        "bb_chips = 3\n",
+        "sb_chips = 1\n",
+        "straddles_chips = [6]\n",
+        "[table.stacks_chips]\n",
+    ] {
+        assert!(normalized.contains(expected), "{expected}\n{normalized}");
+    }
+    assert!(!normalized.contains("_bb ="), "{normalized}");
+    assert_eq!(
+        parse_size_literal("40c"),
+        Ok(SizeSpec::ToChips { value: 40.0 })
+    );
+    for literal in ["0c", "1.5c", "c"] {
+        assert!(parse_size_literal(literal).is_err(), "{literal}");
+    }
+}
+
+#[test]
+fn bb_amounts_must_be_whole_chips_and_pairs_are_exclusive() {
+    for (tail, code, key) in [
+        ("stack_bb = 100.5\n", Code::NLH003, "table.stack_bb"),
+        (
+            "stack_bb = 100\n[table.stacks_bb]\nCO = 80.5\n",
+            Code::NLH003,
+            "table.stacks_bb.CO",
+        ),
+        (
+            "stack_bb = 100\nante_bb = 0.5\n",
+            Code::NLH003,
+            "table.ante_bb",
+        ),
+        (
+            "stack_bb = 100\nstraddles_bb = [2.5]\n",
+            Code::NLH003,
+            "table.straddles_bb.0",
+        ),
+        (
+            "stack_bb = 100\n[economics]\nkind = \"tournament\"\npayouts = [1, 0]\noutside_field_bb = [20.5]\n",
+            Code::NLH003,
+            "economics.outside_field_bb.0",
+        ),
+        (
+            "stack_bb = 100\n[economics.rake]\nrate = 0.05\ncap_bb = 0.5\n",
+            Code::NLH003,
+            "economics.rake.cap_bb",
+        ),
+        (
+            "stack_bb = 100\n[spot]\nline = \"UTG r2.5\"\n",
+            Code::NLH004,
+            "spot.line",
+        ),
+        (
+            "stack_bb = 100\n[tree]\nscript = \"preflop { add raise [2.5bb] }\"\n",
+            Code::NLH003,
+            "tree.script",
+        ),
+    ] {
+        let e = error(&format!("{ONE_THREE}{tail}"));
+        assert_eq!(e.code, code, "{tail}: {e}");
+        assert_eq!(e.key.as_deref(), Some(key), "{tail}: {e}");
+        assert!(e.message.contains("table.bb_chips = 3"), "{e}");
+    }
+    for (tail, key) in [
+        ("stack_bb = 100\nstack_chips = 300\n", "table.stack_chips"),
+        ("stack_bb = 100\nsb_bb = 1\n", "table.sb_chips"),
+        (
+            "stack_bb = 100\n[table.stacks_bb]\nCO = 80\n[table.stacks_chips]\nBTN = 240\n",
+            "table.stacks_chips",
+        ),
+        (
+            "stack_bb = 100\n[economics.rake]\nrate = 0.05\ncap_bb = 1\ncap_chips = 3\n",
+            "economics.rake.cap_chips",
+        ),
+    ] {
+        let e = error(&format!("{ONE_THREE}{tail}"));
+        assert_eq!(e.code, Code::NLH003, "{tail}: {e}");
+        assert_eq!(e.key.as_deref(), Some(key), "{tail}: {e}");
+        assert!(e.message.contains("cannot combine"), "{e}");
+    }
+    // The default SB of 0.5 BB is 1.5 chips here.
+    let e =
+        error("schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nstack_bb = 100\n");
+    assert_eq!(e.key.as_deref(), Some("table.sb_bb"));
+    assert!(e.message.contains("table.sb_chips"), "{e}");
+}
 invalid!(
     rake_allocation_bad,
     "[economics.rake]\nrate = 0.05\nallocation = \"main_first\"",
@@ -685,7 +825,7 @@ fn table_required_grid_and_incomplete_paths() {
 fn rake_defaults_and_variants() {
     let d = parse(&format!("{ROOT}[economics.rake]\nrate = 0.05"));
     assert!(
-        matches!(d.spot.economics.rake, RakeConfig::Generic { cap_bb: None, ref when, allocation: RakeAllocation::MainFirst, rounding: RakeRounding::Down, .. } if when == "flop_dealt")
+        matches!(d.spot.economics.rake, RakeConfig::Generic { cap_bb: None, ref when, allocation: RakeAllocation::MainFirst, rounding: Rounding::Down, .. } if when == "flop_dealt")
     );
     let n = roundtrip(&format!("{ROOT}[economics.rake]\nrate = 0.05"));
     assert!(!n.contains("cap_bb"));
@@ -809,14 +949,14 @@ fn strict_size_literal_accept_reject_and_variants() {
         "allin",
         "50%pot",
         "geometric(allin,streets=2)",
-        "20c",
+        "0c",
+        "2.5c",
         "-2bb",
         "+2bb",
         "1e3",
         "1E3bb",
         ".5bb",
         "2.bb",
-        "2.0001bb",
         "0",
         "0.99",
         "0bb",
@@ -1039,6 +1179,12 @@ fn dotted_type_errors_for_every_common_shape() {
         "bb_ante_bb",
         "stacks_bb",
         "straddles_bb",
+        "bb_chips",
+        "stack_chips",
+        "stacks_chips",
+        "sb_chips",
+        "straddles_chips",
+        "chip_rounding",
     ] {
         let mut value: toml::Value = ROOT.parse().unwrap();
         value["table"]

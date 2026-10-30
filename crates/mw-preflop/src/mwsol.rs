@@ -21,11 +21,11 @@ use crate::metrics::{Estimate, MULTIWAY_SCHEMA_VERSION};
 use runfiles::{config_hash, config_hash_hex};
 
 pub const MWSOL_HEADER_LEN: usize = 8 + 2 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 32 + 32;
-pub const MWSOL_FORMAT_VERSION: u16 = 4;
+pub const MWSOL_FORMAT_VERSION: u16 = 5;
 /// Oldest on-disk version this reader still accepts during the real-data
 /// migration gate. Version 2 frames are plain postcard blocks, version 3
-/// introduces the framed F32/I16 representation, and version 4 adds the
-/// unsigned U16 representation used by the v1 contract.
+/// introduces the framed F32/I16 representation, version 4 adds U16, and
+/// version 5 records chip amounts and chips per big blind.
 pub const MWSOL_MIN_FORMAT_VERSION: u16 = 2;
 pub const MWSOL_MAX_PAGE_LIMIT: usize = 4096;
 /// Denominator used by unsigned v4 probability quantization.
@@ -81,16 +81,16 @@ pub enum MultiwayPublicAction {
     Fold,
     Check,
     Call {
-        amount_millibb: u64,
+        amount_chips: u64,
         all_in: bool,
     },
     BetTo {
-        amount_millibb: u64,
+        amount_chips: u64,
         all_in: bool,
         full_raise: bool,
     },
     RaiseTo {
-        amount_millibb: u64,
+        amount_chips: u64,
         all_in: bool,
         full_raise: bool,
     },
@@ -102,26 +102,26 @@ impl MultiwayPublicAction {
             Self::Fold => "fold".into(),
             Self::Check => "check".into(),
             Self::Call {
-                amount_millibb,
+                amount_chips,
                 all_in,
             } => format!(
-                "call:{amount_millibb}{}",
+                "call:{amount_chips}{}",
                 if *all_in { ":all-in" } else { "" }
             ),
             Self::BetTo {
-                amount_millibb,
+                amount_chips,
                 all_in,
                 ..
             } => format!(
-                "bet-to:{amount_millibb}{}",
+                "bet-to:{amount_chips}{}",
                 if *all_in { ":all-in" } else { "" }
             ),
             Self::RaiseTo {
-                amount_millibb,
+                amount_chips,
                 all_in,
                 ..
             } => format!(
-                "raise-to:{amount_millibb}{}",
+                "raise-to:{amount_chips}{}",
                 if *all_in { ":all-in" } else { "" }
             ),
         }
@@ -133,8 +133,8 @@ pub struct MultiwayPublicState {
     pub history: [u8; 16],
     pub street: u8,
     pub actor: Option<u8>,
-    pub pot_millibb: u64,
-    pub remaining_stacks_millibb: Vec<u64>,
+    pub pot_chips: u64,
+    pub remaining_stacks_chips: Vec<u64>,
     pub legal_actions: Vec<MultiwayPublicAction>,
 }
 
@@ -389,7 +389,7 @@ pub struct MultiwaySolutionMetadata {
     pub abstraction_fingerprint: [u8; 32],
     pub configuration_fingerprint: [u8; 32],
     pub stop_status: String,
-    pub chip_unit_bb: f64,
+    pub bb_chips: u64,
     pub sweeps: u64,
     pub approximate_profile: bool,
     pub seats: Vec<MultiwaySeatResult>,
@@ -399,7 +399,7 @@ pub struct MultiwaySolutionMetadata {
     pub strategy_weights: Vec<MultiwayStrategyWeight>,
 }
 
-/// Serialization-only view of v4 metadata. Serde encodes borrowed strings
+/// Serialization-only view of current metadata. Serde encodes borrowed strings
 /// and slices identically to their owned counterparts, while this view lets
 /// the writer avoid cloning three potentially very large record vectors.
 #[derive(Serialize)]
@@ -412,7 +412,7 @@ struct MultiwaySolutionMetadataRef<'a> {
     abstraction_fingerprint: [u8; 32],
     configuration_fingerprint: [u8; 32],
     stop_status: &'a str,
-    chip_unit_bb: f64,
+    bb_chips: u64,
     sweeps: u64,
     approximate_profile: bool,
     seats: &'a [MultiwaySeatResult],
@@ -432,7 +432,7 @@ impl<'a> From<&'a MultiwaySolution> for MultiwaySolutionMetadataRef<'a> {
             abstraction_fingerprint: solution.abstraction_fingerprint,
             configuration_fingerprint: solution.configuration_fingerprint,
             stop_status: &solution.stop_status,
-            chip_unit_bb: solution.chip_unit_bb,
+            bb_chips: solution.bb_chips,
             sweeps: solution.sweeps,
             approximate_profile: solution.approximate_profile,
             seats: &solution.seats,
@@ -453,7 +453,7 @@ pub struct MultiwaySolution {
     pub abstraction_fingerprint: [u8; 32],
     pub configuration_fingerprint: [u8; 32],
     pub stop_status: String,
-    pub chip_unit_bb: f64,
+    pub bb_chips: u64,
     pub sweeps: u64,
     pub approximate_profile: bool,
     pub seats: Vec<MultiwaySeatResult>,
@@ -463,6 +463,53 @@ pub struct MultiwaySolution {
     pub strategy_weights: Vec<MultiwayStrategyWeight>,
     /// Must be strictly sorted by `key`.
     pub strategies: Vec<MultiwayStrategyBlock>,
+}
+
+// V4 stored one internal unit as 0.001 BB, regardless of chip rounding.
+#[derive(Deserialize, Serialize)]
+struct V4MultiwaySolutionMetadata {
+    schema_version: u16,
+    config_toml: String,
+    config_fingerprint: [u8; 32],
+    game_fingerprint: [u8; 32],
+    algorithm_fingerprint: [u8; 32],
+    abstraction_fingerprint: [u8; 32],
+    configuration_fingerprint: [u8; 32],
+    stop_status: String,
+    chip_unit_bb: f64,
+    sweeps: u64,
+    approximate_profile: bool,
+    seats: Vec<MultiwaySeatResult>,
+    histories: Vec<MultiwayHistoryNode>,
+    public_states: Vec<MultiwayPublicState>,
+    strategy_weights: Vec<MultiwayStrategyWeight>,
+}
+
+impl TryFrom<V4MultiwaySolutionMetadata> for MultiwaySolutionMetadata {
+    type Error = MwSolError;
+
+    fn try_from(value: V4MultiwaySolutionMetadata) -> Result<Self, Self::Error> {
+        if value.chip_unit_bb.to_bits() != 0.001_f64.to_bits() {
+            return Err(MwSolError::InvalidSolutionMetadata);
+        }
+        Ok(Self {
+            schema_version: value.schema_version,
+            config_toml: value.config_toml,
+            config_fingerprint: value.config_fingerprint,
+            game_fingerprint: value.game_fingerprint,
+            algorithm_fingerprint: value.algorithm_fingerprint,
+            abstraction_fingerprint: value.abstraction_fingerprint,
+            configuration_fingerprint: value.configuration_fingerprint,
+            stop_status: value.stop_status,
+            bb_chips: 1000,
+            sweeps: value.sweeps,
+            approximate_profile: value.approximate_profile,
+            seats: value.seats,
+            histories: value.histories,
+            public_states: value.public_states,
+            strategy_weights: value.strategy_weights,
+        })
+    }
 }
 
 #[derive(Deserialize, Serialize)]
@@ -488,7 +535,7 @@ impl From<LegacyMultiwaySolutionMetadata> for MultiwaySolutionMetadata {
             abstraction_fingerprint: value.abstraction_fingerprint,
             configuration_fingerprint: [0; 32],
             stop_status: "legacy".into(),
-            chip_unit_bb: 0.001,
+            bb_chips: 1000,
             sweeps: value.sweeps,
             approximate_profile: value.approximate_profile,
             seats: value.seats,
@@ -511,7 +558,7 @@ impl MultiwaySolutionMetadata {
             abstraction_fingerprint: solution.abstraction_fingerprint,
             configuration_fingerprint: solution.configuration_fingerprint,
             stop_status: solution.stop_status.clone(),
-            chip_unit_bb: solution.chip_unit_bb,
+            bb_chips: solution.bb_chips,
             sweeps: solution.sweeps,
             approximate_profile: solution.approximate_profile,
             seats: solution.seats.clone(),
@@ -547,7 +594,7 @@ impl MultiwaySolutionMetadata {
                 algorithm_fingerprint: self.algorithm_fingerprint,
                 configuration_fingerprint: self.configuration_fingerprint,
                 stop_status: &self.stop_status,
-                chip_unit_bb: self.chip_unit_bb,
+                bb_chips: self.bb_chips,
             },
             !self.public_states.is_empty() || !self.strategy_weights.is_empty(),
         )?;
@@ -592,7 +639,7 @@ impl MultiwaySolution {
                 algorithm_fingerprint: self.algorithm_fingerprint,
                 configuration_fingerprint: self.configuration_fingerprint,
                 stop_status: &self.stop_status,
-                chip_unit_bb: self.chip_unit_bb,
+                bb_chips: self.bb_chips,
             },
             !self.public_states.is_empty() || !self.strategy_weights.is_empty(),
         )?;
@@ -642,10 +689,13 @@ struct V4Identity<'a> {
     algorithm_fingerprint: [u8; 32],
     configuration_fingerprint: [u8; 32],
     stop_status: &'a str,
-    chip_unit_bb: f64,
+    bb_chips: u64,
 }
 
 fn validate_v4_identity(identity: V4Identity<'_>, has_v4_content: bool) -> Result<(), MwSolError> {
+    if nlh::ChipScale::new(identity.bb_chips).is_none() {
+        return Err(MwSolError::InvalidSolutionMetadata);
+    }
     if !has_v4_content {
         return Ok(());
     }
@@ -653,7 +703,6 @@ fn validate_v4_identity(identity: V4Identity<'_>, has_v4_content: bool) -> Resul
         || identity.game_fingerprint == [0; 32]
         || identity.algorithm_fingerprint == [0; 32]
         || identity.configuration_fingerprint == [0; 32]
-        || identity.chip_unit_bb.to_bits() != 0.001_f64.to_bits()
         || !matches!(
             identity.stop_status,
             "completed" | "sweep-limit" | "target-reached" | "time-limit" | "converged"
@@ -681,7 +730,7 @@ fn validate_v4_metadata(
                 && histories
                     .binary_search_by_key(&state.history, |entry| entry.key)
                     .is_err())
-                || state.remaining_stacks_millibb.is_empty()
+                || state.remaining_stacks_chips.is_empty()
                 || (state.actor.is_some() && state.legal_actions.is_empty())
         })
     {
@@ -1202,8 +1251,10 @@ impl MwSolReader {
             header.metadata_uncompressed_len,
             MAX_METADATA_UNCOMPRESSED_BYTES,
         )?;
-        let metadata: MultiwaySolutionMetadata = if format_version >= 4 {
+        let metadata: MultiwaySolutionMetadata = if format_version >= 5 {
             postcard::from_bytes(&metadata_raw)?
+        } else if format_version == 4 {
+            postcard::from_bytes::<V4MultiwaySolutionMetadata>(&metadata_raw)?.try_into()?
         } else {
             postcard::from_bytes::<LegacyMultiwaySolutionMetadata>(&metadata_raw)?.into()
         };
@@ -1671,7 +1722,7 @@ mod tests {
             abstraction_fingerprint: metadata.abstraction_fingerprint,
             configuration_fingerprint: metadata.configuration_fingerprint,
             stop_status: metadata.stop_status,
-            chip_unit_bb: metadata.chip_unit_bb,
+            bb_chips: metadata.bb_chips,
             sweeps: metadata.sweeps,
             approximate_profile: metadata.approximate_profile,
             seats: metadata.seats,
@@ -1722,7 +1773,7 @@ mod tests {
             abstraction_fingerprint: [7; 32],
             configuration_fingerprint: [8; 32],
             stop_status: "completed".into(),
-            chip_unit_bb: 0.001,
+            bb_chips: 1000,
             sweeps: 99,
             approximate_profile: true,
             seats: Vec::new(),
@@ -1731,12 +1782,12 @@ mod tests {
                 history: [0; 16],
                 street: 0,
                 actor: Some(0),
-                pot_millibb: 1_500,
-                remaining_stacks_millibb: vec![99_500, 99_000],
+                pot_chips: 1_500,
+                remaining_stacks_chips: vec![99_500, 99_000],
                 legal_actions: vec![
                     MultiwayPublicAction::Fold,
                     MultiwayPublicAction::Call {
-                        amount_millibb: 500,
+                        amount_chips: 500,
                         all_in: false,
                     },
                 ],
@@ -1832,6 +1883,54 @@ mod tests {
         file.seek(SeekFrom::Start(offset)).unwrap();
         file.write_all(&[byte[0] ^ 0x80]).unwrap();
         file.sync_all().unwrap();
+    }
+
+    #[test]
+    fn v4_artifact_reads_millibb_as_chips() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("legacy-v4.mwsol");
+        let expected = solution();
+        write_mwsol_with(&path, &expected, MwsolStorage::F32).unwrap();
+        let original = std::fs::read(&path).unwrap();
+        let mut header = peek_header(&path).unwrap();
+        let index_offset = MWSOL_HEADER_LEN + header.metadata_compressed_len as usize;
+        let legacy = V4MultiwaySolutionMetadata {
+            schema_version: expected.schema_version,
+            config_toml: expected.config_toml.clone(),
+            config_fingerprint: expected.config_fingerprint,
+            game_fingerprint: expected.game_fingerprint,
+            algorithm_fingerprint: expected.algorithm_fingerprint,
+            abstraction_fingerprint: expected.abstraction_fingerprint,
+            configuration_fingerprint: expected.configuration_fingerprint,
+            stop_status: expected.stop_status.clone(),
+            chip_unit_bb: 0.001,
+            sweeps: expected.sweeps,
+            approximate_profile: expected.approximate_profile,
+            seats: expected.seats.clone(),
+            histories: expected.histories.clone(),
+            public_states: expected.public_states.clone(),
+            strategy_weights: expected.strategy_weights.clone(),
+        };
+        let raw = postcard::to_allocvec(&legacy).unwrap();
+        let compressed = zstd::stream::encode_all(raw.as_slice(), 3).unwrap();
+        header.metadata_uncompressed_len = raw.len() as u64;
+        header.metadata_compressed_len = compressed.len() as u64;
+        header.metadata_checksum = *blake3::hash(&compressed).as_bytes();
+        let mut bytes = encode_header(header, 4).to_vec();
+        bytes.extend_from_slice(&compressed);
+        bytes.extend_from_slice(&original[index_offset..]);
+        std::fs::write(&path, bytes).unwrap();
+        assert_eq!(decode_via_reader(&path).unwrap(), expected);
+    }
+
+    #[test]
+    fn nondefault_chip_scale_round_trips() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("chips.mwsol");
+        let mut expected = solution();
+        expected.bb_chips = 3;
+        write_mwsol_with(&path, &expected, MwsolStorage::F32).unwrap();
+        assert_eq!(decode_via_reader(&path).unwrap(), expected);
     }
 
     #[test]
@@ -2384,7 +2483,7 @@ mod tests {
         write_mwsol_with(&path, &expected, MwsolStorage::U16).unwrap();
 
         let reader = MwSolReader::open(&path).unwrap();
-        assert_eq!(reader.format_version(), 4);
+        assert_eq!(reader.format_version(), MWSOL_FORMAT_VERSION);
         let decoded = decode_via_reader(&path).unwrap();
         for (got, want) in decoded.strategies.iter().zip(&expected.strategies) {
             assert_eq!(got.actions, want.actions);
@@ -2405,30 +2504,30 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         let v2_path = directory.path().join("v2.mwsol");
         let v3_path = directory.path().join("v3.mwsol");
-        let v4_path = directory.path().join("v4.mwsol");
+        let current_path = directory.path().join("current.mwsol");
         let expected = solution();
 
         write_legacy_v2(&v2_path, &expected).unwrap();
         write_legacy_v3(&v3_path, &expected).unwrap();
-        write_mwsol_with(&v4_path, &expected, MwsolStorage::F32).unwrap();
+        write_mwsol_with(&current_path, &expected, MwsolStorage::F32).unwrap();
 
         let mut v2_reader = MwSolReader::open(&v2_path).unwrap();
         let mut v3_reader = MwSolReader::open(&v3_path).unwrap();
-        let v4_reader = MwSolReader::open(&v4_path).unwrap();
+        let current_reader = MwSolReader::open(&current_path).unwrap();
         assert_eq!(v2_reader.format_version(), 2);
         assert_eq!(v3_reader.format_version(), 3);
-        assert_eq!(v4_reader.format_version(), 4);
+        assert_eq!(current_reader.format_version(), MWSOL_FORMAT_VERSION);
 
         let v2_decoded = decode_via_reader(&v2_path).unwrap();
         let v3_decoded = decode_via_reader(&v3_path).unwrap();
-        let v4_decoded = decode_via_reader(&v4_path).unwrap();
+        let current_decoded = decode_via_reader(&current_path).unwrap();
         assert!(v2_decoded.public_states.is_empty());
         assert!(v2_decoded.strategy_weights.is_empty());
         assert!(v3_decoded.public_states.is_empty());
         assert!(v3_decoded.strategy_weights.is_empty());
         assert_eq!(v2_decoded.strategies, expected.strategies);
         assert_eq!(v3_decoded.strategies, expected.strategies);
-        assert_eq!(v4_decoded, expected);
+        assert_eq!(current_decoded, expected);
 
         let v2_page = v2_reader.read_strategy_page(0, 2).unwrap();
         let v3_page = v3_reader.read_strategy_page(0, 2).unwrap();

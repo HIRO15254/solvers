@@ -1,6 +1,38 @@
-/** BB amounts at the input's 0.001 BB grid, without trailing zeros. */
+import type { LineStep } from "../api/types";
+
+/** Rounded BB display; never use this spelling for a line token. */
 export function bb(value: number): string {
-  return String(Number(value.toFixed(3)));
+  return String(Number(value.toFixed(6)));
+}
+
+/** Canonical line amount, matching ChipScale::amount_text. */
+export function lineAmount(value: number, bbChips: number): string {
+  const chips = Math.round(value * bbChips);
+  let denominator = bbChips;
+  let twos = 0;
+  let fives = 0;
+  while (denominator % 2 === 0) { denominator /= 2; twos++; }
+  while (denominator % 5 === 0) { denominator /= 5; fives++; }
+  if (denominator !== 1) return `${chips}c`;
+  const digits = Math.max(twos, fives);
+  const scaled = BigInt(chips) * 10n ** BigInt(digits) / BigInt(bbChips);
+  if (digits === 0) return String(scaled);
+  const text = scaled.toString().padStart(digits + 1, "0");
+  const whole = text.slice(0, -digits);
+  const fraction = text.slice(-digits).replace(/0+$/, "");
+  return fraction ? `${whole}.${fraction}` : whole;
+}
+
+/** One replayed action as the line grammar spells it. */
+export function lineToken(step: LineStep, bbChips: number): string {
+  const action = step.action;
+  if (action === "fold") return "f";
+  if (action === "check") return "x";
+  if (typeof action !== "object") return String(action);
+  const [kind, detail] = Object.entries(action)[0] as [string, { to?: number; all_in?: boolean }];
+  if (detail.all_in && kind !== "call") return "a";
+  if (kind === "call") return "c";
+  return `${kind === "bet-to" ? "b" : "r"}${lineAmount(detail.to ?? 0, bbChips)}`;
 }
 
 export function integer(value: number): string {

@@ -10,7 +10,7 @@ P1専用buildでは`solvers 0.2.0 (<git-hash>), heads-up postflop only`と表示
 `solversd --version`は`solversd 0.2.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
 0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
 minor releaseで`solvers.nlh/v1`のkeyを削除することがあり、削除したkeyはunknown-key errorになる（移行方法は変更履歴に記す）。
-旧形式を拒否された場合は現行configから再solveする。詳細は[互換方針と変更履歴](../CHANGELOG.md)を参照する。
+P1の旧`.sol` version 4〜6は`solvers upgrade`で変換できる。その他の未対応形式は現行configから再solveする。詳細は[互換方針と変更履歴](../CHANGELOG.md)を参照する。
 
 ## 1. インストールする
 
@@ -138,7 +138,13 @@ solvers config new --product p2 --template full --out table-full.toml
 
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。
-金額はBB、内部gridは0.001 BBである。P1のrange指定やline文法は規範の例に従う。
+1 BBあたりのchip数は`table.bb_chips`（既定1000）で指定し、内部の額は整数chipで扱う。
+例えば$1 chipの1-3 gameでは`bb_chips = 3`、`sb_chips = 1`と書く。1 chipは1/3 BBである。
+stack・blindなどは`_bb`または整数の`_chips`で書き、同じ項目に両方は指定しない。BB値も整数chipに一致させる。
+`bb_chips`が奇数の場合、既定SBの0.5 BBは整数chipにならないので`sb_bb`または`sb_chips`を明示する。
+計算したsizeは`table.chip_rounding`（`down` / `nearest` / `up`、既定`nearest`）で整数chipへ丸める。
+rakeの丸めは`economics.rake.rounding_unit_bb`または`rounding_unit_chips`（既定1 chip）と
+`economics.rake.rounding`で別に指定する。P1のrange指定やline文法は規範の例に従う。
 P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
 `checkdown`は一致した手番をcheck、賭けに直面していればfoldにする。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
@@ -148,7 +154,7 @@ P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
 これらを埋込みconfigに含むartifact・checkpointも読み込めない。
 正規化・実効configにも出力しない。旧Preflop設定は他のPreflop ruleの後へ
 `preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置いて移行する。
-旧keyとはanteのある場合の分母、0.001 BB gridでの閾値丸め、ソース位置での適用が異なる
+旧keyとはanteのある場合の分母、整数chipへの閾値丸め、ソース位置での適用が異なる
 （[共通Input第9節](nlh-input-v1.jp.md#size-literalと解決順序)）。
 
 ### P1の木の大きさを決める
@@ -329,9 +335,9 @@ autoの評価は時間・thread数に依存せず、progressは評価ごとに�
 autoの再開はprogress.jsonlのcheckpoint iteration以下の行を使い、同じiterationの重複は最後の行を採用して次の評価を再計算する。同じconfigで一度に解いたrunと評価iteration・停止iteration・stateが一致する。progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25（max_iterationsで切る）から評価するため、評価iteration一致を保証しない。裸のcheckpointだけを移した場合も同様である。checkpoint形式は変わらず、旧run.tomlの`check_every = 25`は固定25で再開する。
 
 P1のDCFRは`[solver.algorithm]`の`alpha = 1.25`、`beta = 0.5`、`gamma = 4`が既定である。`pow4_reset`未指定時は`[solver] storage = "i16"`ならtrue、`"auto"`・`"f32"`・`"i16-f32avg"`ならfalseとなる（利用者決定PF8、2026-10-07）。明示したtrue・falseはどのstorageでも優先する。full templateはauto用の`pow4_reset = false`を明示しているため、storageをi16に変えて既定resetを使う場合はこの行を削除するかtrueにする。
-保存された実効configは係数とresetを明示するため、旧係数1.5・0・3や旧既定reset=trueのrun・checkpoint・solutionは保存値で再開・照会できる。
-旧runの`run.toml`を係数や`pow4_reset`未指定の元configに戻すと、新既定との互換性hash不一致で再開を拒否する。
-P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。精度keyの無い旧runは新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。
+保存された実効configは係数とresetを明示する。互換性hashが一致するrunは保存値を使うが、旧checkpointはhashが異なるためresumeできず、現行configから再solveする。
+`run.toml`を係数や`pow4_reset`未指定の元configに戻すと、新既定との互換性hash不一致で再開を拒否する。
+P1の互換性hashは`[run]`・`[meta]`・`solver.cfr_precision`を除外する。互換性hashが一致するrunで精度keyが無い場合は新既定f32で再開する。旧版と同じ計算には`cfr_precision = "f64"`を明示する。
 旧係数で再solveして比較する場合は`alpha = 1.5`、`beta = 0.0`、`gamma = 3.0`を明示する。旧i16のreset無し条件を再現するには`pow4_reset = false`を明示する。reset有り条件は`pow4_reset = true`を明示する。`compare`はalgorithmの差を拒否しない。
 
 ```sh
@@ -353,7 +359,13 @@ P1ではrun設定とmeta以外を変更できない。P2では必要に応じて
 
 旧runのstatus・watch・runs lsも利用でき、JSONのconfigSchema / gameKindは記録値のままである。
 旧runのresumable表示はcheckpointの存在を示すだけで、現行CLIでは再開できない。
-`.sol` version 1/2/3とcheckpoint version 1/2/3/4は読めない。現行configから再solveして`.sol` version 4・checkpoint version 5を作る。
+P1の`.sol` version 1〜6は通常の読込みでは拒否する。version 4〜6は次のように変換できる:
+
+```sh
+solvers upgrade old.sol --out upgraded.sol
+```
+
+version 7〜9のsolutionを新たにatomicに作成し、元fileは変更しない。出力先が既にあれば拒否する。version 1〜3は変換できないため、現行configから再solveする。upgradeはcheckpointを変換せず、旧checkpointは互換性hashが異なるためresumeできない。再開したい場合も現行configから再solveする。
 
 ## 6. 結果を読む
 

@@ -72,6 +72,7 @@ struct Showdown {
 pub(super) struct Prepared {
     ends: Vec<usize>,
     showdowns: Vec<Option<Showdown>>,
+    bb_chips: u64,
 }
 
 impl Prepared {
@@ -109,14 +110,13 @@ impl Prepared {
                         if winners & !eligible != 0 {
                             continue;
                         }
-                        let count = winners.count_ones() as u64;
-                        let share = pot.net.raw() / count;
-                        let mut odd = pot.net.raw() % count;
+                        let split = nlh::split_pot(pot.net, winners.count_ones() as usize);
+                        let mut order = 0;
                         for step in 1..=tree.seats {
                             let i = (t.state.button.index() + step) % tree.seats;
                             if winners & (1 << i) != 0 {
-                                awards[i] = share + u64::from(odd > 0);
-                                odd = odd.saturating_sub(1);
+                                awards[i] = split.award(order).raw();
+                                order += 1;
                             }
                         }
                     }
@@ -129,7 +129,11 @@ impl Prepared {
                 pots,
             }));
         }
-        Ok(Self { ends, showdowns })
+        Ok(Self {
+            ends,
+            showdowns,
+            bb_chips: game.config().nominal_big_blind.raw(),
+        })
     }
 }
 
@@ -210,8 +214,8 @@ impl Deal {
                     }
                 }
                 for i in 0..tree.seats {
-                    utility[i] = (chips[i] as f64 - showdown.starting[i] as f64)
-                        / crate::types::CHIPS_PER_BB as f64;
+                    utility[i] =
+                        (chips[i] as f64 - showdown.starting[i] as f64) / prepared.bb_chips as f64;
                 }
                 &utility[..tree.seats]
             }

@@ -14,9 +14,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::types::{MAX_SEATS, MIN_SEATS, MwChips, SeatId, SeatVec, Street};
-pub use economics::{
-    CompiledRake, FieldPlayerConfig, RakeAllocation, RakeConfig, RakeRounding, UtilityConfig,
-};
+pub use economics::{CompiledRake, FieldPlayerConfig, RakeAllocation, RakeConfig, UtilityConfig};
+use nlh::{ChipScale, Rounding};
 
 const DEFAULT_RANGE: &str = "";
 
@@ -35,6 +34,21 @@ pub struct MultiwayConfig {
     pub forced_bets: Option<ForcedBetConfig>,
     #[serde(default)]
     pub abstraction: AbstractionConfig,
+    /// Chip denomination and rounding; defaults are omitted to preserve fingerprints.
+    #[serde(
+        default = "default_bb_chips",
+        skip_serializing_if = "is_default_bb_chips"
+    )]
+    pub bb_chips: u64,
+    #[serde(default, skip_serializing_if = "Rounding::is_nearest")]
+    pub chip_rounding: Rounding,
+}
+
+fn default_bb_chips() -> u64 {
+    ChipScale::DEFAULT.chips_per_bb()
+}
+fn is_default_bb_chips(value: &u64) -> bool {
+    *value == default_bb_chips()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -406,6 +420,7 @@ pub struct ValidatedMultiwayConfig {
     pub preflop_first_to_act: SeatId,
     pub straddles: Vec<(SeatId, MwChips)>,
     pub abstraction: AbstractionConfig,
+    pub chip_rounding: Rounding,
 }
 
 #[derive(Clone)]
@@ -443,10 +458,13 @@ impl MultiwayConfig {
                 num_seats,
             });
         }
+        let scale =
+            ChipScale::new(self.bb_chips).ok_or_else(|| ConfigError::Number("bb_chips".into()))?;
 
         for (index, seat) in self.seats.iter().enumerate() {
             positive_finite(&format!("seats[{index}].stack_bb"), seat.stack_bb)?;
-            let chips = MwChips::try_from_bb(seat.stack_bb)
+            let chips = scale
+                .from_bb(seat.stack_bb)
                 .map_err(|_| ConfigError::Number(format!("seats[{index}].stack_bb")))?;
             if chips == MwChips::ZERO {
                 return Err(ConfigError::Number(format!("seats[{index}].stack_bb")));
@@ -478,11 +496,13 @@ impl MultiwayConfig {
 
         finite("blinds.small_bb", self.blinds.small_bb)?;
         positive_finite("blinds.big_bb", self.blinds.big_bb)?;
-        let small = MwChips::try_from_bb(self.blinds.small_bb)
+        let small = scale
+            .from_bb(self.blinds.small_bb)
             .map_err(|_| ConfigError::Number("blinds.small_bb".into()))?;
-        let big = MwChips::try_from_bb(self.blinds.big_bb)
+        let big = scale
+            .from_bb(self.blinds.big_bb)
             .map_err(|_| ConfigError::Number("blinds.big_bb".into()))?;
-        if small >= big || big == MwChips::ZERO {
+        if small > big || big == MwChips::ZERO {
             return Err(ConfigError::Blinds);
         }
 
@@ -532,9 +552,10 @@ impl MultiwayConfig {
             }
             for &(seat, amount) in &forced.straddles {
                 nonnegative_finite("forced_bets.straddles amount", amount)?;
-                let chips = MwChips::try_from_bb(amount)
+                let chips = scale
+                    .from_bb(amount)
                     .map_err(|_| ConfigError::Number("forced_bets.straddles amount".into()))?;
-                if chips.as_bb() != amount {
+                if scale.to_bb(chips) != amount {
                     return Err(ConfigError::Number("forced_bets.straddles grid".into()));
                 }
                 if seat != expected
@@ -622,6 +643,7 @@ impl MultiwayConfig {
 
     pub fn validated(&self) -> Result<ValidatedMultiwayConfig, ConfigError> {
         self.validate()?;
+        let scale = ChipScale::new(self.bb_chips).expect("validated chip scale");
         let ranges = self.compile_ranges()?;
         let seats = self
             .seats
@@ -629,7 +651,8 @@ impl MultiwayConfig {
             .zip(ranges)
             .map(|(seat, range)| ValidatedSeat {
                 name: seat.name.clone(),
-                starting_stack: MwChips::try_from_bb(seat.stack_bb)
+                starting_stack: scale
+                    .from_bb(seat.stack_bb)
                     .expect("validated finite stack must convert"),
                 range,
                 betting: seat.betting.clone(),
@@ -638,10 +661,14 @@ impl MultiwayConfig {
         let ante = match self.ante {
             AnteConfig::None => ValidatedAnte::None,
             AnteConfig::Each { amount_bb } => ValidatedAnte::Each(
-                MwChips::try_from_bb(amount_bb).expect("validated ante must convert"),
+                scale
+                    .from_bb(amount_bb)
+                    .expect("validated ante must convert"),
             ),
             AnteConfig::BigBlind { amount_bb } => ValidatedAnte::BigBlind(
-                MwChips::try_from_bb(amount_bb).expect("validated ante must convert"),
+                scale
+                    .from_bb(amount_bb)
+                    .expect("validated ante must convert"),
             ),
         };
         let num_seats = self.seats.len();
@@ -652,10 +679,12 @@ impl MultiwayConfig {
         };
         let big_blind_seat = small_blind_seat.next(num_seats);
         let mut forced_blinds = vec![MwChips::ZERO; num_seats];
-        forced_blinds[small_blind_seat.index()] =
-            MwChips::try_from_bb(self.blinds.small_bb).expect("validated blind must convert");
-        forced_blinds[big_blind_seat.index()] =
-            MwChips::try_from_bb(self.blinds.big_bb).expect("validated blind must convert");
+        forced_blinds[small_blind_seat.index()] = scale
+            .from_bb(self.blinds.small_bb)
+            .expect("validated blind must convert");
+        forced_blinds[big_blind_seat.index()] = scale
+            .from_bb(self.blinds.big_bb)
+            .expect("validated blind must convert");
         let mut forced_antes = vec![MwChips::ZERO; num_seats];
         let mut common_ante = MwChips::ZERO;
         match ante {
@@ -663,33 +692,33 @@ impl MultiwayConfig {
             ValidatedAnte::Each(amount) => forced_antes.fill(amount),
             ValidatedAnte::BigBlind(amount) => common_ante = amount,
         }
-        let mut nominal_big_blind =
-            MwChips::try_from_bb(self.blinds.big_bb).expect("validated blind must convert");
+        let nominal_big_blind = scale.bb();
         let mut preflop_first_to_act = big_blind_seat.next(num_seats);
         if let Some(forced) = &self.forced_bets {
             forced_blinds = forced
                 .blinds_bb
                 .iter()
-                .map(|&value| MwChips::try_from_bb(value).expect("validated blind must convert"))
+                .map(|&value| scale.from_bb(value).expect("validated blind must convert"))
                 .collect();
             forced_antes = forced
                 .antes_bb
                 .iter()
-                .map(|&value| MwChips::try_from_bb(value).expect("validated ante must convert"))
+                .map(|&value| scale.from_bb(value).expect("validated ante must convert"))
                 .collect();
-            common_ante = MwChips::try_from_bb(forced.common_ante_bb)
+            common_ante = scale
+                .from_bb(forced.common_ante_bb)
                 .expect("validated common ante must convert");
-            nominal_big_blind = MwChips::try_from_bb(forced.nominal_big_blind_bb)
-                .expect("validated nominal blind must convert");
             preflop_first_to_act = forced.first_to_act;
         }
         Ok(ValidatedMultiwayConfig {
             seats: SeatVec::new_unchecked(seats),
             button: self.button,
             blinds: ValidatedBlinds {
-                small: MwChips::try_from_bb(self.blinds.small_bb)
+                small: scale
+                    .from_bb(self.blinds.small_bb)
                     .expect("validated blind must convert"),
-                big: MwChips::try_from_bb(self.blinds.big_bb)
+                big: scale
+                    .from_bb(self.blinds.big_bb)
                     .expect("validated blind must convert"),
             },
             ante,
@@ -706,12 +735,15 @@ impl MultiwayConfig {
                     .map(|&(seat, amount)| {
                         (
                             seat,
-                            MwChips::try_from_bb(amount).expect("validated straddle must convert"),
+                            scale
+                                .from_bb(amount)
+                                .expect("validated straddle must convert"),
                         )
                     })
                     .collect()
             }),
             abstraction: self.abstraction.clone(),
+            chip_rounding: self.chip_rounding,
         })
     }
 
@@ -722,7 +754,7 @@ impl MultiwayConfig {
     ) -> Result<(), ConfigError> {
         self.validate()?;
         utility.validate(self.seats.len())?;
-        rake.compile()?;
+        rake.compile(ChipScale::new(self.bb_chips).expect("validated chip scale"))?;
         if matches!(utility, UtilityConfig::TournamentIcm { .. })
             && !matches!(rake, RakeConfig::None)
         {
@@ -845,7 +877,7 @@ pub enum ConfigError {
     Number(String),
     #[error("seat {0} has an empty name")]
     EmptyName(usize),
-    #[error("small blind must be non-negative and less than a positive big blind")]
+    #[error("small blind must be non-negative and no greater than a positive big blind")]
     Blinds,
     #[error(
         "forced bet vectors must each contain {expected} seats (blinds={blinds}, antes={antes})"

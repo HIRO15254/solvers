@@ -16,6 +16,8 @@ pub use cursor::{LineCursor, LineNext, LineOption, LineOptionKind, LineSeat, lin
 pub use dialect::{NLH_V1, TreeVar, parse_size_literal};
 pub use error::{Code, SpotError};
 pub use ir::*;
+/// The table chip denomination, so `cli` reaches it without depending on `nlh`.
+pub use nlh::ChipScale;
 pub use relock::{RelockEdits, relock_config};
 use std::path::Path;
 

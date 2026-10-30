@@ -47,6 +47,7 @@ struct MicroState {
     river: Option<Card>,
     to_act: usize,
     contrib: [u32; 2],
+    street_start: u32,
     outstanding: u32,
     raises_used: u32,
     first_checked: bool,
@@ -109,7 +110,8 @@ impl MicroHoldem {
                 next.outstanding = extra;
                 next.raises_used += 1;
                 next.to_act = 1 - actor;
-                next.history.push_str(&format!("r{}", next.contrib[actor]));
+                next.history
+                    .push_str(&format!("r{}", next.contrib[actor] - next.street_start));
             }
             'f' => {
                 next.history.push('f');
@@ -154,6 +156,7 @@ impl RefGame for MicroHoldem {
                         river: None,
                         to_act: 0,
                         contrib: [0, 0],
+                        street_start: 0,
                         outstanding: 0,
                         raises_used: 0,
                         first_checked: false,
@@ -225,6 +228,7 @@ impl RefGame for MicroHoldem {
                 next.river = Some(card);
                 next.awaiting_river = false;
                 next.street = 1;
+                next.street_start = next.contrib[0];
                 next.first_checked = false;
                 next.to_act = 0;
                 next.outstanding = 0;

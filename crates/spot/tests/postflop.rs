@@ -637,10 +637,12 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
         vec!["name =", "description =", "derived_from ="],
         vec![
             "players =",
+            "bb_chips =",
             "sb_bb =",
             "ante_bb =",
             "bb_ante_bb =",
             "straddles_bb =",
+            "chip_rounding =",
             "[table.stacks_bb]",
         ],
         vec![
@@ -648,7 +650,7 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
             "cap_bb =",
             "when =",
             "allocation =",
-            "rounding =",
+            "\nrounding =",
             "rounding_unit_bb =",
         ],
         vec!["script =", "[tree.params]"],

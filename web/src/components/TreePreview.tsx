@@ -68,6 +68,7 @@ export function TreeCard({
   ready,
   roles,
   start,
+  bbChips,
 }: {
   /** The document as validated. */
   toml: string;
@@ -76,6 +77,7 @@ export function TreeCard({
   roles: Record<SizeRole, string> | null;
   /** The validated start, for the stacks behind (all-in labels). */
   start: StartState | null;
+  bbChips: number;
 }) {
   const [streets, setStreets] = useState<StreetStep[]>([{ root: "", cards: [], via: [] }]);
   const [rows, setRows] = useState<PreviewTreeRow[][] | null>(null);
@@ -237,7 +239,7 @@ export function TreeCard({
           <span className="mono muted">{pot}</span>
         </div>
         {row.children.map((child, index) => {
-          const info = describeAction(row, index, stacks);
+          const info = describeAction(row, index, stacks, bbChips);
           const where = outcome(row, index);
           const next = where === "decision" ? byHistory.get(child) : undefined;
           const expanded = next ? isOpen(child, depth) : undefined;

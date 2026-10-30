@@ -1,7 +1,7 @@
 //! Interactive hand-line replay and legal moves, backed exclusively by NLH state.
 use crate::{Code, LineAction, SpotError, Table, parse, replay};
 use nlh::betting::{Action, BettingState, Move, SeatStatus};
-use nlh::{MwChips, NoStreetPolicy, SeatId, Street};
+use nlh::{ChipScale, MwChips, NoStreetPolicy, SeatId, Street};
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize)]
@@ -11,6 +11,8 @@ pub struct LineCursor {
     pub line: String,
     pub actions: Vec<LineAction>,
     pub street: Street,
+    /// Chips per BB; amounts below are BB, so `amount × bb_chips` is chips.
+    pub bb_chips: u64,
     pub pot: f64,
     pub button: SeatId,
     pub seats: Vec<LineSeat>,
@@ -67,22 +69,18 @@ pub struct LineOption {
     pub max: Option<f64>,
 }
 
-fn bb(chips: MwChips) -> f64 {
-    chips.0 as f64 / 1000.0
-}
-
-fn token(action: &Action) -> String {
+fn token(action: &Action, scale: ChipScale) -> String {
     match action {
         Action::Fold => "f".into(),
         Action::Check => "x".into(),
         Action::Call { .. } => "c".into(),
         Action::BetTo { all_in: true, .. } | Action::RaiseTo { all_in: true, .. } => "a".into(),
-        Action::BetTo { to, .. } => format!("b{}", replay::amount_text(*to)),
-        Action::RaiseTo { to, .. } => format!("r{}", replay::amount_text(*to)),
+        Action::BetTo { to, .. } => format!("b{}", scale.amount_text(*to)),
+        Action::RaiseTo { to, .. } => format!("r{}", scale.amount_text(*to)),
     }
 }
 
-fn line_text(actions: &[LineAction]) -> String {
+fn line_text(actions: &[LineAction], scale: ChipScale) -> String {
     let mut text = String::new();
     let mut previous = None;
     for action in actions {
@@ -94,7 +92,7 @@ fn line_text(actions: &[LineAction]) -> String {
         }
         text.push_str(&action.position);
         text.push(' ');
-        text.push_str(&token(&action.action));
+        text.push_str(&token(&action.action, scale));
         previous = Some(action.street);
     }
     text
@@ -113,6 +111,8 @@ fn indexed(index: usize, error: SpotError) -> SpotError {
 /// All-in calls use `c`, just as the strict line grammar does; `a` is aggressive.
 pub fn line_cursor(text: &str, moves: Option<&[String]>) -> Result<LineCursor, SpotError> {
     let (table, line) = parse::line_input(text, moves.is_none())?;
+    let scale = table.setup.scale();
+    let bb = |chips| scale.to_bb(chips);
     let (state, actions) = if let Some(moves) = moves {
         let mut state = BettingState::new(&table.setup, &NoStreetPolicy)
             .map_err(|error| crate::error::value_error("table", error.to_string()))?;
@@ -129,7 +129,7 @@ pub fn line_cursor(text: &str, moves: Option<&[String]>) -> Result<LineCursor, S
                     replay::implicit_fold(&mut state, &table, &mut actions)
                 }
             } else {
-                replay::parse_move(spelling)
+                replay::parse_move(spelling, scale)
                     .and_then(|mv| replay::apply(&mut state, &table, mv, false, &mut actions))
             };
             result.map_err(|error| indexed(index + 1, error))?;
@@ -151,10 +151,14 @@ pub fn line_cursor(text: &str, moves: Option<&[String]>) -> Result<LineCursor, S
         state.actor().ok().map(|seat| next(&state, &table, seat))
     };
     Ok(LineCursor {
-        moves: actions.iter().map(|action| token(&action.action)).collect(),
-        line: line_text(&actions),
+        moves: actions
+            .iter()
+            .map(|action| token(&action.action, scale))
+            .collect(),
+        line: line_text(&actions, scale),
         actions,
         street: state.street,
+        bb_chips: scale.chips_per_bb(),
         pot: bb(state.pot_size()),
         button: state.button,
         seats: state
@@ -182,6 +186,8 @@ pub fn line_cursor(text: &str, moves: Option<&[String]>) -> Result<LineCursor, S
 }
 
 fn next(state: &BettingState, table: &Table, seat: SeatId) -> LineNext {
+    let scale = table.setup.scale();
+    let bb = |chips| scale.to_bb(chips);
     let mut options = Vec::with_capacity(4);
     let mut add = |kind, token, amount, min, max| {
         options.push(LineOption {
@@ -309,6 +315,21 @@ mod tests {
         assert_eq!(next.options[2].min, Some(2.0));
         assert_eq!(next.options[2].max, Some(99.999));
         assert_eq!(next.options[3].amount, Some(100.0));
+    }
+
+    #[test]
+    fn chip_tables_spell_non_decimal_amounts_in_chips() {
+        // A 1-3 game with $1 chips: 1 BB = 3 chips, the SB is 1 chip.
+        let config = "[table]\nplayers = 6\nbb_chips = 3\nsb_chips = 1\nstack_bb = 100\n";
+        let root = explicit(config, "");
+        assert_eq!(root.bb_chips, 3);
+        let next = root.next.unwrap();
+        assert_eq!(next.options[2].min, Some(2.0));
+        assert_eq!(next.options[2].max, Some(299.0 / 3.0));
+        let cursor = explicit(config, "f,f,f,r10c,f,r10");
+        assert_eq!(cursor.line, "BTN r10c, BB r30c");
+        let error = line_cursor(config, Some(&["r2.5".into()])).unwrap_err();
+        assert!(error.message.contains("whole number of chips"), "{error}");
     }
 
     #[test]

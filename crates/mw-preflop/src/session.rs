@@ -17,7 +17,6 @@ use crate::mwsol::{
     MultiwaySolution, MultiwayStrategyBlock, MultiwayStrategyKey, MultiwayStrategyWeight,
 };
 use crate::solver::{ProfileEvaluation, SolverConfig};
-use crate::types::MwChips;
 use crate::{ExternalSamplingGame, HoldemGame, MultiwaySolver, Street};
 use anyhow::{Context, Result, anyhow};
 use rayon::prelude::*;
@@ -179,7 +178,9 @@ fn preflight_multiway_impl(
                 .chain(outside_field.iter().map(|player| player.stack_bb))
             {
                 total_chips += u128::from(
-                    MwChips::try_from_bb(stack_bb)
+                    nlh::ChipScale::new(game_config.bb_chips)
+                        .expect("validated chip scale")
+                        .from_bb(stack_bb)
                         .context("converting ICM field stacks")?
                         .raw(),
                 );
@@ -680,7 +681,7 @@ fn public_action(action: &crate::Action) -> MultiwayPublicAction {
         crate::Action::Fold => MultiwayPublicAction::Fold,
         crate::Action::Check => MultiwayPublicAction::Check,
         crate::Action::Call { amount, all_in } => MultiwayPublicAction::Call {
-            amount_millibb: amount.raw(),
+            amount_chips: amount.raw(),
             all_in: *all_in,
         },
         crate::Action::BetTo {
@@ -688,7 +689,7 @@ fn public_action(action: &crate::Action) -> MultiwayPublicAction {
             all_in,
             full_raise,
         } => MultiwayPublicAction::BetTo {
-            amount_millibb: to.raw(),
+            amount_chips: to.raw(),
             all_in: *all_in,
             full_raise: *full_raise,
         },
@@ -697,7 +698,7 @@ fn public_action(action: &crate::Action) -> MultiwayPublicAction {
             all_in,
             full_raise,
         } => MultiwayPublicAction::RaiseTo {
-            amount_millibb: to.raw(),
+            amount_chips: to.raw(),
             all_in: *all_in,
             full_raise: *full_raise,
         },
@@ -719,8 +720,8 @@ fn make_public_tree(
             history: history.0,
             street: state.street.index() as u8,
             actor,
-            pot_millibb: state.pot_size().raw(),
-            remaining_stacks_millibb: state
+            pot_chips: state.pot_size().raw(),
+            remaining_stacks_chips: state
                 .seats
                 .iter()
                 .map(|seat| seat.remaining.raw())
@@ -858,7 +859,7 @@ pub(crate) fn make_solution(
         abstraction_fingerprint,
         configuration_fingerprint,
         stop_status: row.phase.clone(),
-        chip_unit_bb: 0.001,
+        bb_chips: game.config().nominal_big_blind.raw(),
         sweeps: row.sweeps,
         approximate_profile: true,
         histories,

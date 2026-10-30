@@ -10,7 +10,7 @@
 //! `NoRivers` mode retains the full tree/index but omits river strategy and
 //! value blocks; the viewer re-solves rivers lazily on demand.
 //!
-//! Format versions 4 and 5 are indexed so a reader never decodes more than it asks
+//! Format versions 7, 8 and 9 are indexed so a reader never decodes more than it asks
 //! for. All integers are little-endian:
 //!
 //! ```text
@@ -36,6 +36,9 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use runfiles::{config_hash, config_hash_hex};
+
+mod upgrade;
+pub use upgrade::upgrade_sol;
 
 /// Fixed header: magic (8) + format version (u16) + config hash (32) +
 /// iteration (u64) + metadata frame length (u64) + index frame length
@@ -64,7 +67,7 @@ pub(crate) fn strategy_batch_workspace(
 }
 
 const MAGIC: &[u8; 8] = b"SLVRSOLV";
-const FORMAT_VERSION: u16 = 4;
+const FORMAT_VERSION: u16 = 7;
 /// A chunk is sealed once its decoded bytes reach this size. Large enough
 /// that independent frames compress about as well as one stream, small
 /// enough that a single-node read stays cheap.
@@ -141,9 +144,13 @@ pub enum SolError {
     #[error("not a solvers .sol file (bad magic bytes)")]
     BadMagic,
     #[error(
-        "unsupported .sol format version {found} (expected {expected}, 5 or 6); re-solve to write the current format (docs/hu-postflop.jp.md)"
+        "unsupported .sol format version {found} (expected {expected}, 8 or 9); use solvers upgrade for versions 4–6; versions 1–3 require a re-solve (docs/hu-postflop.jp.md)"
     )]
     BadVersion { found: u16, expected: u16 },
+    #[error(".sol file is already current")]
+    AlreadyCurrent,
+    #[error("invalid embedded .sol config: {0}")]
+    Config(String),
     #[error(".sol file truncated: expected at least {expected} bytes, got {actual}")]
     Truncated { expected: usize, actual: usize },
     #[error(".sol header hash {header_hash} does not match blake3(config_toml) {computed_hash}")]
@@ -288,7 +295,7 @@ fn check_identity(buf: &[u8; 10]) -> Result<(), SolError> {
         return Err(SolError::BadMagic);
     }
     let version = u16::from_le_bytes([buf[8], buf[9]]);
-    if version != FORMAT_VERSION && version != 5 && version != 6 {
+    if version != FORMAT_VERSION && version != 8 && version != 9 {
         return Err(SolError::BadVersion {
             found: version,
             expected: FORMAT_VERSION,
@@ -522,7 +529,7 @@ impl SolReader {
             "metadata frame does not decompress",
         )?;
         let (metadata, profile): (SolMetadata, Option<crate::run::ProfileReport>) =
-            if header.version == 5 || header.version == 6 {
+            if header.version == 8 || header.version == 9 {
                 let (metadata, profile) = postcard::from_bytes(&decoded)?;
                 (metadata, Some(profile))
             } else {
@@ -551,7 +558,7 @@ impl SolReader {
             MAX_DIRECTORY_BYTES,
             "directory frame does not decompress",
         )?;
-        let directory: Directory = if header.version == 6 {
+        let directory: Directory = if header.version == 9 {
             let (mut directory, constraints): (Directory, Vec<ChunkEntry>) =
                 postcard::from_bytes(&decoded_directory)?;
             directory.constraints = constraints;
@@ -609,7 +616,7 @@ impl SolReader {
         &self.metadata
     }
 
-    /// Profile diagnostics, present in profile-bearing version 5 artifacts.
+    /// Profile diagnostics, present in profile-bearing version 8 and 9 artifacts.
     pub fn profile(&self) -> Option<&crate::run::ProfileReport> {
         self.profile.as_ref()
     }
@@ -1147,7 +1154,7 @@ impl SolFileWriter {
             file,
             path: path.to_path_buf(),
             header: SolHeader {
-                version: if profile.is_some() { 5 } else { FORMAT_VERSION },
+                version: if profile.is_some() { 8 } else { FORMAT_VERSION },
                 config_hash: config_hash(metadata.config_toml.as_bytes()),
                 iteration: metadata.meta.iterations,
                 metadata_len: frame.len() as u64,
@@ -1213,7 +1220,7 @@ impl SolFileWriter {
         if self.last_constraint.is_none() {
             self.values
                 .finish(self.file.as_file_mut(), &mut self.offset)?;
-            self.header.version = 6;
+            self.header.version = 9;
         }
         if self.last_constraint.is_some_and(|last| sref <= last) {
             return Err(SolError::Malformed("river constraints are not ascending"));
@@ -1246,7 +1253,7 @@ impl SolFileWriter {
             values: std::mem::take(&mut self.values.entries),
             constraints: std::mem::take(&mut self.constraints.entries),
         };
-        let encoded = if self.header.version == 6 {
+        let encoded = if self.header.version == 9 {
             postcard::to_allocvec(&(&directory, &directory.constraints))?
         } else {
             postcard::to_allocvec(&directory)?
@@ -1788,7 +1795,7 @@ mod tests {
     /// header.
     #[test]
     fn rejects_other_versions_before_decoding() {
-        for version in [1u16, 2, 3, 99] {
+        for version in [1u16, 2, 3, 4, 5, 6, 99] {
             let path = temp_path("old-format.sol");
             let mut header = [0u8; 138];
             header[0..8].copy_from_slice(MAGIC);

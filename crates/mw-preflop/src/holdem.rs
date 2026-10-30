@@ -17,7 +17,7 @@ use crate::settlement::{
 };
 use crate::solver::{ExternalSamplingGame, PrivateInfo};
 use crate::tree::DenseNodeContext;
-use crate::types::{CHIPS_PER_BB, MAX_SEATS, MwChips, SeatId, SeatMask, SeatVec, Street};
+use crate::types::{MAX_SEATS, MwChips, SeatId, SeatMask, SeatVec, Street};
 use economics::icm::PreparedIcm;
 use economics::{CompiledRake, RakeConfig, UtilityConfig};
 
@@ -79,7 +79,10 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         config.validate_economics(utility, rake)?;
         let validated = config.validated()?;
         let root = BettingState::from_config(&validated)?;
-        let compiled_rake = rake.compile().map_err(crate::config::ConfigError::from)?;
+        let scale = nlh::ChipScale::new(config.bb_chips).expect("validated chip scale");
+        let compiled_rake = rake
+            .compile(scale)
+            .map_err(crate::config::ConfigError::from)?;
         let utility_runtime = match utility {
             UtilityConfig::ChipEv => UtilityRuntime::ChipEv,
             UtilityConfig::TournamentIcm {
@@ -88,7 +91,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             } => {
                 let outside_field = outside_field
                     .iter()
-                    .map(|player| MwChips::try_from_bb(player.stack_bb))
+                    .map(|player| scale.from_bb(player.stack_bb))
                     .collect::<Result<Vec<_>, _>>()?;
                 let starting = SeatVec::try_new(
                     validated
@@ -377,7 +380,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                     .map(|seat| {
                         (settlement.final_stacks[seat].raw() as f64
                             - self.config.seats[seat].starting_stack.raw() as f64)
-                            / crate::types::CHIPS_PER_BB as f64
+                            / self.config.nominal_big_blind.raw() as f64
                     })
                     .collect(),
             )
@@ -512,13 +515,7 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                 return;
             }
         };
-        let views = hero_pot_views(
-            &shape.pots,
-            &base_ranks,
-            traverser_seat,
-            state.num_seats(),
-            state.button,
-        );
+        let views = hero_pot_views(&shape.pots, &base_ranks, traverser_seat, state);
 
         match &self.utility {
             UtilityRuntime::ChipEv => {
@@ -543,7 +540,10 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
                             },
                         }
                     }
-                    out.push((chips as f64 - starting as f64) / CHIPS_PER_BB as f64);
+                    out.push(
+                        (chips as f64 - starting as f64)
+                            / self.config.nominal_big_blind.raw() as f64,
+                    );
                 }
             }
             UtilityRuntime::TournamentIcm { .. } => {
@@ -653,8 +653,8 @@ struct HeroPotView {
     /// happened" thanks to `hero_eligible`.
     best_opp_rank: Option<u16>,
     /// The traverser's exact share of `net` in the event the traverser ties
-    /// `best_opp_rank` (floor share plus the traverser's odd chip, if any,
-    /// following the same clockwise-from-button assignment
+    /// `best_opp_rank` (the grid share plus the traverser's odd units, if
+    /// any, following the same clockwise-from-button assignment
     /// [`crate::settlement`]'s `award_split` uses). The winner set for a tie
     /// is `{eligible non-traverser seats at best_opp_rank} union {traverser}`
     /// -- fixed regardless of which combo achieves the tie -- so this is
@@ -666,9 +666,9 @@ fn hero_pot_views(
     pots: &[PotLayer],
     base_ranks: &[Option<u16>],
     traverser_seat: SeatId,
-    num_seats: usize,
-    button: SeatId,
+    state: &BettingState,
 ) -> Vec<HeroPotView> {
+    let num_seats = state.num_seats();
     pots.iter()
         .map(|pot| {
             if !pot.eligible.contains(traverser_seat) {
@@ -694,15 +694,12 @@ fn hero_pot_views(
                         mask
                     });
                     let winners = tying.union(SeatMask::from_seat(traverser_seat));
-                    let count = winners.len() as u64;
-                    let share = pot.net.raw() / count;
-                    let odd = (pot.net.raw() % count) as usize;
-                    let hero_gets_extra = (1..=num_seats)
-                        .map(|step| button.advance(step, num_seats))
+                    let order = (1..=num_seats)
+                        .map(|step| state.button.advance(step, num_seats))
                         .filter(|seat| winners.contains(*seat))
-                        .take(odd)
-                        .any(|seat| seat == traverser_seat);
-                    MwChips(share + u64::from(hero_gets_extra))
+                        .position(|seat| seat == traverser_seat)
+                        .expect("the traverser is a winner");
+                    nlh::split_pot(pot.net, winners.len()).award(order)
                 }
             };
             HeroPotView {
@@ -933,6 +930,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 
@@ -1120,6 +1119,7 @@ mod tests {
             previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 
@@ -1307,6 +1307,7 @@ mod tests {
             flop_dealt: true,
             phase: HandPhase::Showdown,
             preflop_voluntary_call_seen: false,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 
@@ -1327,6 +1328,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 

@@ -1,5 +1,5 @@
 //! P1-owned sections and pure lowering of the common Spot IR.
-//! Amounts in the lowered tree are milli-BB; economics and reporting are separate.
+//! Amounts in the lowered tree are chips; economics and reporting are separate.
 use crate::{PerStreet, PostflopConfig, StreetTree};
 pub use hu_engine::CfrPrecision;
 use nlh::script::{Rule, Value, VarSource};
@@ -558,7 +558,7 @@ pub fn resolve_target(spot: &Spot, target: &str) -> Result<f64, SpotError> {
     } else {
         target
             .strip_suffix("%pot")
-            .map(|s| (s, spot.context.pot.as_bb() / 100.0))
+            .map(|s| (s, spot.table.setup.scale().to_bb(spot.context.pot) / 100.0))
             .or_else(|| target.strip_suffix("bb").map(|s| (s, 1.0)))
     };
     if let Some((s, basis)) = amount_and_basis {
@@ -667,7 +667,7 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
     {
         return Err(invalid(
             "spot",
-            "pot plus twice the effective stack exceeds the P1 u32 milli-BB limit",
+            "pot plus twice the effective stack exceeds the P1 u32 chip limit",
         ));
     }
     let street = |street| -> Result<StreetTree, SpotError> {
@@ -698,7 +698,9 @@ pub fn lower<S>(spot: &Spot, settings: &Settings<S>) -> Result<PostflopConfig, S
             turn: street(Street::Turn)?,
             river: street(Street::River)?,
         },
-        min_bet: Chips(1000),
+        min_bet: Chips(spot.table.setup.nominal_big_blind.0 as u32),
+        chip_rounding: spot.table.setup.chip_rounding,
+        scale: spot.table.setup.scale(),
         iso_merging: settings.solver.iso_merging,
         profile_suit_perms: None,
         track_node_info: true,

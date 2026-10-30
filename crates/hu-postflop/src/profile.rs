@@ -196,7 +196,7 @@ pub fn resolve_profile(
     base: Option<&dyn Fn(NodeId) -> anyhow::Result<Option<Vec<f32>>>>,
 ) -> Result<ResolvedProfile, ProfileResolveError> {
     let start = crate::artifact::start_street_from_board_len(config.board.len());
-    let index = GameIndex::from_game(&game.game, &game.node_info, start);
+    let index = GameIndex::from_game(&game.game, &game.node_info, start, config.scale);
     let tree = &game.game.tree;
     let view = TreeView {
         tree,
@@ -341,7 +341,7 @@ pub fn resolve_profile(
             }
             matched.insert(id);
             let a = action(view, id, &incentive.action)?;
-            let pot = f64::from(view.pot(id)) / 1000.0;
+            let pot = config.scale.to_bb(nlh::MwChips(u64::from(view.pot(id))));
             let value = match incentive.amount {
                 spot::IncentiveAmount::PotFraction(v) => v * pot,
                 spot::IncentiveAmount::Bb(v) => v,
@@ -434,7 +434,7 @@ pub fn resolve_profile(
                 action: a,
                 hands: selected_hands,
                 target: frequency.target,
-                pot_utility: f64::from(view.pot(id)) / 1000.0,
+                pot_utility: config.scale.to_bb(nlh::MwChips(u64::from(view.pot(id)))),
             });
         }
         if summary.matched_hands == before.1 {

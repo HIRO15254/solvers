@@ -86,6 +86,7 @@ JSONは次のobjectである。特記以外の金額はBB単位のnumber。
 |---|---|
 | `moves` | string[]。replayした明示token列 |
 | `line` | string。prefixのcanonical line表記 |
+| `bbChips` | number。1 BBあたりのchip数 |
 | `actions` | replayしたaction object[]。各objectは`street`、`seat`、`position`、`action`、`implicit` |
 | `street` | `"preflop"` / `"flop"` / `"turn"` / `"river"`。cursorのstreet |
 | `pot` | 現在のengine stateのpot（terminal時の未call額refund適用前） |
@@ -208,7 +209,9 @@ solve/resumeはstderr、reportはboard集合に対して1回だけ表示する�
 `flop, turn, river when aggressions >= 3 { remove raise }`などで制限する。
 正規化・実効configにも削除済みkeyは出力しない。旧Preflop設定は他のPreflop ruleの後の
 `preflop when aggressions >= 1 { jam raise > 33.333%stack }`へ移行する。
-閾値の分母M（hand開始stack − ante）、0.001 BB gridへの丸め、ソース位置での適用は旧keyと異なる。
+閾値の分母M（hand開始stack − ante）、整数chipへの丸め（`table.chip_rounding`）、ソース位置での適用は旧keyと異なる。
+卓の額面は`table.bb_chips`（既定1000）、計算sizeの丸めは`table.chip_rounding`で指定する。
+BB額の各keyには整数chipの`_chips`表記があり、同じ額の両表記は排他である（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 例えば`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は現在menuの大きい候補だけをall-inへ置き換える。
 `jam`は候補を追加しないのでsizeを足すruleの後へ置く。閾値はliteralの到達額変換だけで求め、
 最小raiseへの引上げやMでのcapはしない。`tree.rules`でも`turn { jam raise >= 85%stack }`のように表示する。
@@ -224,7 +227,7 @@ solvers tree <CONFIG> [--node NODE]... [--rest-of-street] [--format human|json]
 P1（`hu-postflop`）configのpublic treeをsolveせずに構築し、指定nodeの行を返す。
 P2（`mw-preflop`）は`NLH005`（exit 2）で明示的に拒否する。戦略・値・run directoryは作らない。
 `--node`の既定は`root`。履歴（`xr10c`、配牌を含む`xx[9d]`など）または
-slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。
+slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。履歴のbet/raise額は各streetの到達額であり、前streetの投入額を含まない。
 `all`は全action nodeを木順で返す。chance・terminalも明示selectorで選べる。
 未知nodeは入力error（exit 2）であり、無視したりrootへ戻したりしない。
 `--rest-of-street`は選択した各nodeの行の直後に、同じstreetでそのnodeより後のaction nodeの行を木の先行順で続ける。
@@ -275,7 +278,7 @@ iso制限とselector内訳、`frozen_nodes`は上流固定node IDの配列、`ge
 
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。full templateと実効configに明示する。
 P1 storageは`auto`（既定）・`f32`・`i16`・`i16-f32avg`。autoは解決済みmemory上限にf32の必要量が収まればf32、次にi16-f32avgを選び、i16は選ばない。両方超過なら両必要bytesと上限を示しexit 75。solve表示は具体backendと自動選択の理由を1行で示す。run.toml・checkpoint・`.sol`は具体値を保存する。`config new --product p1 --template full`にもこの選択肢を表示する。
-P1 `.sol`は通常version 4、profile付きversion 5、no-riversのRiver制約付きversion 6、checkpointは通常version 5、木全体で頻度目標付きならversion 6、部分木modeならversion 8を受理する。旧部分木形式のversion 7を含む未対応の旧形式は現行configから再solveする。
+P1 `.sol`は通常version 7、profile付きversion 8、no-riversのRiver制約付きversion 9、checkpointは通常version 5、木全体で頻度目標付きならversion 6、部分木modeならversion 8を受理する。旧`.sol` version 4〜6は`solvers upgrade`で変換できる。version 1〜3と旧部分木形式のcheckpoint version 7を含む未対応の旧形式は現行configから再solveする。
 成果物の内容・version・互換性hashは[P1第6〜7節](hu-postflop.jp.md)・[P2第6節](mw-preflop.jp.md)を参照する。
 checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや量子化前の完全stateを復元できない。
 
@@ -283,7 +286,7 @@ checkpointとsolutionは用途が異なる。P2のsolutionは未保存columnや�
 
 入力の互換性単位はschema `solvers.nlh/v1`であり、binaryのversionとは別に扱う。
 `.sol`とcheckpointの形式versionは0.xのminor releaseで変更し得るため、旧成果物の互換性は保証しない。
-未対応の旧形式は明示errorで拒否し、現行の`solvers.nlh/v1` configから再solveするよう案内する。
+未対応の旧形式は明示errorで拒否する。P1 `.sol` version 4〜6は`solvers upgrade`で変換でき、それ以外の未対応形式は現行の`solvers.nlh/v1` configから再solveする。
 変更点と配布物の制約は[CHANGELOG](../CHANGELOG.md)を参照する。
 
 
@@ -318,6 +321,15 @@ P2は対象外。既定では上流も自由にして木全体を再solveする�
 不正なSOURCE、P2、断片、strategy構文、profile selectorの解決errorはexit 2。
 `export <sol> lock`で得た断片も`--add`に使える。
 
+## `solvers upgrade`
+
+```sh
+solvers upgrade <OLD.sol> --out <NEW.sol>
+```
+
+P1の`.sol` version 4〜6を現行のversion 7〜9へ変換する。元fileは変更せず、出力はatomicに作成する。出力先が既に存在する場合は拒否する。version 1〜3は非対応であり、現行configから再solveする。
+これは閲覧用solutionの変換でありcheckpointは変換しない。旧checkpointは互換性hashが異なるためresumeできず、現行configから再solveする。
+
 ## `solvers resume`
 
 ```sh
@@ -327,7 +339,7 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 ```
 
 `RUN`はrun directoryまたは自己完結した`.ckpt` / `.mwckpt`である。
-directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。P1の精度keyの無い旧runは新既定f32で再開する。
+directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。互換性hashが一致するP1 runで精度keyが無い場合は新既定f32で再開する。旧checkpointは互換性hashが異なるため再開できず、現行configから再solveする。
 solveとresumeは出力directoryの`run.lock`をfile更新前に排他取得し、process終了まで保持する。元directoryが使用中のin-place resumeはdirectoryとmanifestのpidを示してexit 1で拒否し、config・manifest・eventを変更しない。`--out`は出力先だけをlockし、実行中sourceからもforkできる（sourceは書き換えない）。crash後のlock fileの残存自体は再開を妨げない。
 P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
 最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
@@ -456,6 +468,9 @@ CSV・P2は使えない。既定のformat指定のままTOMLを出力する。�
 | `--river-iterations N` | `500` | その再解決の反復予算（`--resolve-rivers`が必要） |
 | `--river-target X` | 無し | その再解決のNashConv上限（`--resolve-rivers`が必要） |
 
+P2のactions CSVは額を`amount_chips`、1 BBあたりのchip数を`bb_chips`列に出す。
+P2のinspect JSONでは`bbChips`・`potChips`・`remainingStacksChips`を使う。
+
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
 P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会できる。chance labelはiso併合で代表cardに`*`が付き、実cardの無いrunoutでは`dealN`となる（履歴tokenは`[dealN]`）。
 `tree`の`children`（子履歴）・`child_kinds`（子kind）・`actions`は木の子順で対応し、子履歴を同じ`--node`へ渡して辿れる。
@@ -522,7 +537,7 @@ manifestの状態がcompleted以外でもsolutionがあれば使い、その状�
 
 lineはP2の卓で再生する。暗黙のfoldを含む全actionがP2のpublic treeに無ければならない。
 P2の`checkdown`がdecision nodeなしで適用したcheck・foldは、lineの同じaction（暗黙のfoldを含む）と一致する。
-sizeは0.001 BBで完全に一致させ、近似しない。木に無いactionはexit 2で、actorと木にあるactionを示す。
+sizeは整数chipで完全に一致させ、近似しない。木に無いactionはexit 2で、actorと木にあるactionを示す。
 Postflopのactionを含むline、Preflopが閉じないline、3人以上が残るlineはexit 2である。
 P2はPostflop戦略を提供しないため、生成するspotはFlop開始だけである。boardの検査は共通Inputと同じである。
 

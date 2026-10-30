@@ -224,6 +224,16 @@ export function SetupTable() {
               />
               <FieldIssue keys={["table.players"]} />
             </div>
+            <DocText label="Chips per BB" path={["table", "bb_chips"]} placeholder="1000" />
+            <div className="field">
+              <Select
+                label="Chip rounding"
+                options={["down", "nearest", "up"]}
+                value={fieldText(table("chip_rounding") ?? "nearest")}
+                onValueChange={(value) => update(["table", "chip_rounding"], value)}
+              />
+              <FieldIssue keys={["table.chip_rounding"]} />
+            </div>
             {tableMode === "normal" && (
               <>
                 <DocText

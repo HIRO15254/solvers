@@ -167,13 +167,7 @@ enum Token {
     Check,
     Fold,
     Call,
-    /// `to`: the acting player's new total contribution this subgame,
-    /// *cumulative from the subgame's start* (not a per-street increment —
-    /// see [`river_entry_state`]'s doc comment on why this reading is the
-    /// one that makes the replay arithmetic work: `postflop::Builder::betting`
-    /// sets this history token from `contrib[actor]` *after* adding the
-    /// action's chip amount, and `contrib` is explicitly never reset between
-    /// streets).
+    /// The acting player's wager on the current street after the action.
     Bet(u32),
     Chance(Card),
 }
@@ -224,16 +218,9 @@ fn tokenize(history: &str) -> Result<Vec<Token>, ReplayError> {
 /// against `config` (the trunk [`PostflopConfig`]) up to a river-entry node,
 /// returning that node's board/pot/effective-stack/aggressor state.
 ///
-/// The replay does not need to track "outstanding" (the amount owed to
-/// call) as a separate quantity, because of an invariant in
-/// `crate::postflop::Builder::betting`/`sized_targets`: `r{to}` already
-/// encodes the acting player's new *absolute* contribution `to`, and every
-/// bet/raise leaves `outstanding == |contrib[P0] - contrib[P1]|` (the raise
-/// size is layered on top of whatever the actor already owed). So a `c`
-/// (call) token can simply set the caller's contribution equal to the
-/// opponent's, and a chance token is only ever reached once contributions
-/// are already equal (the invariant this function's `UnequalContribution`
-/// error defends).
+/// `r{to}` encodes the acting player's street-relative wager. Adding the
+/// contribution at the street start recovers the cumulative contribution.
+/// A call matches the opponent, and chance follows equal contributions.
 ///
 /// `street_aggressor`/`previous_aggressor` mirror
 /// `crate::postflop::LineState`'s own fields exactly: a `Token::Bet` records
@@ -251,6 +238,7 @@ pub fn river_entry_state(
 
     let mut board = config.board.clone();
     let mut contrib = PerPlayer::new(Chips::ZERO, Chips::ZERO);
+    let mut street_start = Chips::ZERO;
     let mut to_act = Player::P0;
     let mut first_checked = false;
     let mut street_aggressor: Option<Player> = None;
@@ -278,7 +266,7 @@ pub fn river_entry_state(
                 first_checked = false;
             }
             Token::Bet(to) => {
-                contrib[to_act] = Chips(to);
+                contrib[to_act] = street_start + Chips(to);
                 street_aggressor = Some(to_act);
                 to_act = to_act.opponent();
             }
@@ -287,6 +275,7 @@ pub fn river_entry_state(
                     return Err(ReplayError::BoardOverflow);
                 }
                 board.push(card);
+                street_start = contrib[Player::P0];
                 to_act = Player::P0;
                 first_checked = false;
                 previous_aggressor = street_aggressor;
@@ -377,6 +366,8 @@ pub fn river_resolve_config(
             river: trunk.streets.river.clone(),
         },
         min_bet: trunk.min_bet,
+        scale: trunk.scale,
+        chip_rounding: trunk.chip_rounding,
         iso_merging: false,
         profile_suit_perms: None,
         track_node_info: true,

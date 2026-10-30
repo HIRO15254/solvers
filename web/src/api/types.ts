@@ -126,6 +126,8 @@ export interface LineSeat {
 }
 
 export interface LineCursor {
+  /** Number of table chips per big blind. */
+  bbChips: number;
   /** Explicit moves in acting order, folds included. */
   moves: string[];
   /** Canonical `spot.line` text for `moves` (folds omitted). */

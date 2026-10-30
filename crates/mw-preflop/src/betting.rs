@@ -150,6 +150,7 @@ pub(crate) fn from_config_with_policy<P: StreetPolicy>(
         straddles: config.straddles.clone(),
         nominal_big_blind: config.nominal_big_blind,
         preflop_first_to_act: config.preflop_first_to_act,
+        chip_rounding: config.chip_rounding,
     };
     BettingState::new(&setup, policy)
 }
@@ -344,6 +345,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         }
         .validated()
         .unwrap();
@@ -553,7 +556,7 @@ mod tests {
         // BB's M is 99 BB, so `33.333%stack` resolves to exactly 33 BB.
         let above = "preflop when aggressions >= 1 { jam raise > 33.333%stack }";
         for retained in [MwChips(32_999), MwChips(33_000)] {
-            let actions = actions_for(retained.as_bb(), above);
+            let actions = actions_for(nlh::ChipScale::DEFAULT.to_bb(retained), above);
             assert_eq!(raise_to(&actions, retained, false), 1);
             assert_eq!(raise_to(&actions, MwChips(99_000), true), 1);
         }

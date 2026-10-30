@@ -37,7 +37,7 @@ pub use config::{
     RecallMode, SeatConfig, StreetBettingConfig,
 };
 pub use economics::rake_condition::{CompiledRakeCondition, RakeConditionContext};
-pub use economics::{RakeAllocation, RakeRounding, UtilityConfig};
+pub use economics::{RakeAllocation, UtilityConfig};
 pub use holdem::{HoldemGame, HoldemGameError};
 pub use sampler::{CountedSample, DealSampler, SampleError, SampledWorld, SamplingDiagnostics};
 pub use settlement::{PotLayer, Settlement};

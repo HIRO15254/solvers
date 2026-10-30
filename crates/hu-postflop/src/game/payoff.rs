@@ -28,11 +28,18 @@ pub enum Outcome {
     WinP1,
 }
 
-/// Rake taken from the pot at a terminal. Build-time only.
+/// Rake taken from the pot at a terminal, and how the rest of a tied pot is
+/// divided. Build-time only.
 pub trait RakeModel: Send + Sync {
     /// Rake in fractional chips (cap rules produce fractions of a chip when
     /// pots are expressed in small units).
     fn rake(&self, t: &TerminalDescriptor) -> f64;
+
+    /// Chips each player takes from `net_pot` on a tied showdown. The
+    /// default halves it exactly; table models split on their chip grid.
+    fn tie_split(&self, net_pot: f64) -> PerPlayer<f64> {
+        PerPlayer::new(0.5 * net_pot, 0.5 * net_pot)
+    }
 
     /// True when this model never takes anything (enables the zero-sum
     /// fast path together with UtilityModel::is_zero_sum_affine).
@@ -162,12 +169,12 @@ impl PayoffPipeline<'_> {
     pub fn bake(&self, t: &TerminalDescriptor) -> BakedPayoffs {
         let baseline = self.utility.baseline(t);
         let net_pot = t.pot.as_f64() - self.rake.rake(t);
-        let outcome_utility = |share: PerPlayer<f64>| -> PerPlayer<f64> {
+        let outcome_utility = |won: PerPlayer<f64>| -> PerPlayer<f64> {
             let stacks_after = PerPlayer::new(
                 t.stacks_before[Player::P0].as_f64() - t.contrib[Player::P0].as_f64()
-                    + share[Player::P0] * net_pot,
+                    + won[Player::P0],
                 t.stacks_before[Player::P1].as_f64() - t.contrib[Player::P1].as_f64()
-                    + share[Player::P1] * net_pot,
+                    + won[Player::P1],
             );
             let u = self.utility.utility(&stacks_after);
             PerPlayer::new(
@@ -175,13 +182,14 @@ impl PayoffPipeline<'_> {
                 u[Player::P1] - baseline[Player::P1],
             )
         };
+        let p0_wins = PerPlayer::new(net_pot, 0.0);
+        let p1_wins = PerPlayer::new(0.0, net_pot);
         match t.kind {
             TerminalKind::Fold { folder } => {
-                let share = match folder {
-                    Player::P0 => PerPlayer::new(0.0, 1.0),
-                    Player::P1 => PerPlayer::new(1.0, 0.0),
-                };
-                let u = outcome_utility(share);
+                let u = outcome_utility(match folder {
+                    Player::P0 => p1_wins,
+                    Player::P1 => p0_wins,
+                });
                 BakedPayoffs {
                     win_p0: u,
                     tie: u,
@@ -189,9 +197,9 @@ impl PayoffPipeline<'_> {
                 }
             }
             TerminalKind::Showdown => BakedPayoffs {
-                win_p0: outcome_utility(PerPlayer::new(1.0, 0.0)),
-                tie: outcome_utility(PerPlayer::new(0.5, 0.5)),
-                win_p1: outcome_utility(PerPlayer::new(0.0, 1.0)),
+                win_p0: outcome_utility(p0_wins),
+                tie: outcome_utility(self.rake.tie_split(net_pot)),
+                win_p1: outcome_utility(p1_wins),
             },
         }
     }

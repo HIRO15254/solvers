@@ -71,24 +71,24 @@ struct Labels<'a> {
 }
 
 impl<'a> Labels<'a> {
-    fn intern(&mut self, raw: &'a str) -> u32 {
+    fn intern(&mut self, raw: &'a str, scale: nlh::ChipScale) -> u32 {
         if let Some(&id) = self.ids.get(raw) {
             return id;
         }
         let id = self.labels.len() as u32;
-        self.labels.push(display_label(raw));
+        self.labels.push(display_label(raw, scale));
         self.ids.insert(raw, id);
         id
     }
 }
 
-/// Builder labels name chip amounts; displays name big blinds.
-fn display_label(raw: &str) -> String {
+/// Builder labels name chip amounts; displays use the table's canonical spelling.
+fn display_label(raw: &str, scale: nlh::ChipScale) -> String {
     for prefix in ["bet ", "raise to "] {
         if let Some(amount) = raw.strip_prefix(prefix) {
             return format!(
                 "{prefix}{}",
-                crate::prepare::bb(amount.parse().expect("builder amount"))
+                crate::prepare::bb(amount.parse().expect("builder amount"), scale)
             );
         }
     }
@@ -126,6 +126,7 @@ impl GameIndex {
         game: &CompiledGame<PostflopEvaluator>,
         node_info: &[PostflopNodeInfo],
         start: Street,
+        scale: nlh::ChipScale,
     ) -> Self {
         let tree = &game.tree;
         let mut labels = Labels::default();
@@ -145,7 +146,7 @@ impl GameIndex {
                     pots[node.aux as usize] =
                         (info.contrib[Player::P0] + info.contrib[Player::P1]).0;
                     for (child, label) in tree.children(id).zip(&info.actions) {
-                        edges[child as usize] = labels.intern(label);
+                        edges[child as usize] = labels.intern(label, scale);
                     }
                 }
                 NodeKind::Chance => {
@@ -221,6 +222,74 @@ impl IndexedTree {
         }
     }
 }
+/// Convert legacy cumulative wager labels to street-relative targets.
+pub(crate) fn upgrade_labels(game: &mut IndexedTree) -> Result<(), SolError> {
+    let scale = nlh::ChipScale::DEFAULT;
+    let mut labels = Vec::<String>::new();
+    let mut interned = HashMap::<String, u32>::new();
+    let mut stack = vec![(0, [0u64; 2], [0u64; 2])];
+    while let Some((id, contrib, start)) = stack.pop() {
+        let node = game.tree.node(id);
+        for child in game.tree.children(id) {
+            let mut next = contrib;
+            let mut next_start = start;
+            if node.kind == NodeKind::Chance {
+                next_start = contrib;
+            } else if node.kind == NodeKind::Action {
+                let actor = node.player.index();
+                let old = &game.index.labels[game.index.edges[child as usize] as usize];
+                let label = if old == "check" || old == "fold" {
+                    old.clone()
+                } else if old == "call" {
+                    next[actor] = contrib[1 - actor];
+                    if next[actor] < contrib[actor] {
+                        return Err(SolError::Malformed(
+                            "legacy call makes contribution negative",
+                        ));
+                    }
+                    old.clone()
+                } else {
+                    let (prefix, amount) = old
+                        .strip_prefix("bet ")
+                        .map(|s| ("bet ", s))
+                        .or_else(|| old.strip_prefix("raise to ").map(|s| ("raise to ", s)))
+                        .ok_or(SolError::Malformed("unrecognized legacy action label"))?;
+                    let to = scale
+                        .parse_bb(amount)
+                        .map_err(|_| SolError::Malformed("invalid legacy wager amount"))?
+                        .0;
+                    if to < contrib[actor] {
+                        return Err(SolError::Malformed(
+                            "legacy wager makes contribution negative",
+                        ));
+                    }
+                    let relative = to.checked_sub(start[actor]).ok_or(SolError::Malformed(
+                        "legacy wager precedes street contribution",
+                    ))?;
+                    next[actor] = to;
+                    format!("{prefix}{}", scale.amount_text(nlh::MwChips(relative)))
+                };
+                let label_id = if let Some(&existing) = interned.get(&label) {
+                    existing
+                } else {
+                    let id = u32::try_from(labels.len())
+                        .map_err(|_| SolError::Malformed("too many action labels"))?;
+                    interned.insert(label.clone(), id);
+                    labels.push(label);
+                    id
+                };
+                game.index.edges[child as usize] = label_id;
+            }
+            stack.push((child, next, next_start));
+        }
+    }
+    game.index.tokens = labels
+        .iter()
+        .map(|l| crate::queries::history_token(l))
+        .collect();
+    game.index.labels = labels;
+    Ok(())
+}
 
 /// Read-only navigation of a tree and its index.
 #[derive(Clone, Copy)]
@@ -265,8 +334,8 @@ impl<'a> TreeView<'a> {
         (card != NO_CARD).then(|| Card::from_index(card))
     }
 
-    /// Betting-line history of a node in big blinds (`xr2.5c[9d]`); the root
-    /// is the empty string.
+    /// Betting-line history using the table's canonical amount spelling; the
+    /// root is the empty string.
     pub fn history(&self, node: NodeId) -> String {
         let mut steps = Vec::new();
         let mut current = node;
@@ -309,10 +378,18 @@ impl<'a> TreeView<'a> {
             let len = match rest.as_bytes()[0] {
                 b'x' | b'c' | b'f' => 1,
                 b'r' => {
-                    1 + rest[1..]
+                    let digits = rest[1..]
                         .bytes()
                         .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                        .count()
+                        .count();
+                    let end = 1 + digits;
+                    let chip_token = rest.as_bytes().get(end) == Some(&b'c')
+                        && self.tree.node(current).kind == NodeKind::Action
+                        && self.tree.children(current).any(|child| {
+                            self.index.tokens[self.index.edges[child as usize] as usize]
+                                == rest[..end + 1]
+                        });
+                    end + usize::from(chip_token)
                 }
                 b'[' => rest.find(']')? + 1,
                 _ => return None,
@@ -370,10 +447,17 @@ impl<'a> TreeView<'a> {
                 let len = match rest.as_bytes()[0] {
                     b'x' | b'c' | b'f' => 1,
                     b'r' => {
-                        1 + rest[1..]
+                        let end = 1 + rest[1..]
                             .bytes()
                             .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                            .count()
+                            .count();
+                        let chip_token = rest.as_bytes().get(end) == Some(&b'c')
+                            && self
+                                .index
+                                .tokens
+                                .iter()
+                                .any(|token| token == &rest[..end + 1]);
+                        end + usize::from(chip_token)
                     }
                     b'[' => rest.find(']').map(|i| i + 1).ok_or_else(error)?,
                     _ => return Err(error()),
@@ -905,11 +989,86 @@ memory = "1GiB"
 "#;
 
     #[test]
+    fn second_street_wager_history_uses_street_target() {
+        for (bb_chips, bet, token) in [(1000, "2", "r2"), (6, "12c", "r12c")] {
+            let raw = TURN
+                .replace(
+                    "players = 2",
+                    &format!("players = 2\nbb_chips = {bb_chips}"),
+                )
+                .replace("river { replace bet [100] }", "river { replace bet [2bb] }");
+            let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
+            let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+            let start = crate::artifact::start_street_from_board_len(p.config.board.len());
+            let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+            let view = TreeView {
+                tree: &built.game.tree,
+                index: &index,
+            };
+            let chance = view.node_by_history_any(&format!("{token}c")).unwrap();
+            let river = view.tree.children(chance).next().unwrap();
+            let river_history = view.history(river);
+            let labels = view.actions(river);
+            let pos = labels
+                .iter()
+                .position(|label| *label == format!("bet {bet}"))
+                .unwrap();
+            let child = view.tree.children(river).nth(pos).unwrap();
+            let history = format!("{river_history}{token}");
+            assert_eq!(view.history(child), history);
+            assert_eq!(view.node_by_history(&history), Some(child));
+            assert_eq!(view.profile_nodes(&history).unwrap(), [child]);
+        }
+    }
+
+    #[test]
+    fn nondecimal_histories_round_trip_chip_suffix_and_call() {
+        let raw = TURN.replace("players = 2", "players = 2\nbb_chips = 6");
+        let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
+        let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+        let start = crate::artifact::start_street_from_board_len(p.config.board.len());
+        let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+        let view = TreeView {
+            tree: &built.game.tree,
+            index: &index,
+        };
+        let mut saw_chip_call = false;
+        let mut saw_chip_wildcard = false;
+        for id in 0..built.game.tree.nodes.len() as NodeId {
+            let history = view.history(id);
+            assert_eq!(view.node_by_history_any(&history), Some(id), "{history}");
+            if history.contains("r12cc") {
+                saw_chip_call = true;
+                assert!(internal_history(&history, p.config.scale).contains("r12c"));
+            }
+            match view.tree.node(id).kind {
+                // Profile selectors tokenize chip amounts the same way.
+                NodeKind::Action => {
+                    assert_eq!(view.profile_nodes(&history).unwrap(), [id], "{history}")
+                }
+                NodeKind::Chance if history.contains("12c") => {
+                    saw_chip_wildcard = true;
+                    let enumerated: Vec<_> = view.tree.children(id).collect();
+                    let selector = format!("{history}[?]");
+                    assert_eq!(
+                        view.profile_nodes(&selector).unwrap(),
+                        enumerated,
+                        "{selector}"
+                    );
+                }
+                _ => {}
+            }
+        }
+        assert!(saw_chip_call);
+        assert!(saw_chip_wildcard);
+    }
+
+    #[test]
     fn profile_wildcard_matches_enumerated_runouts() {
         let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
         let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
         let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-        let index = GameIndex::from_game(&built.game, &built.node_info, start);
+        let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
         let view = TreeView {
             tree: &built.game.tree,
             index: &index,
@@ -932,7 +1091,7 @@ memory = "1GiB"
             let p = crate::prepare::prepare(raw, std::path::Path::new("test.toml")).unwrap();
             let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
             let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-            let index = GameIndex::from_game(&built.game, &built.node_info, start);
+            let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
             let mut stream = Vec::new();
             write_index(&mut stream, &built.game.tree, &index).unwrap();
             let nodes = built.game.tree.nodes.len() as u64;
@@ -979,10 +1138,13 @@ memory = "1GiB"
                     NodeKind::Action => {
                         let info = &built.node_info[a.tags[id as usize] as usize];
                         let history = view.history(id);
-                        assert_eq!(internal_history(&history), info.history);
+                        assert_eq!(internal_history(&history, p.config.scale), info.history);
                         assert_eq!(view.node_by_history(&history), Some(id));
-                        let labels: Vec<String> =
-                            info.actions.iter().map(|l| display_label(l)).collect();
+                        let labels: Vec<String> = info
+                            .actions
+                            .iter()
+                            .map(|l| display_label(l, p.config.scale))
+                            .collect();
                         assert_eq!(view.actions(id), labels);
                         assert_eq!(
                             view.pot(id),

@@ -209,6 +209,7 @@ fn bench<S: Storage>(
             &built.game,
             &built.node_info,
             p.document.spot.context.street,
+            p.config.scale,
         );
         (built.game, index, None, node_info)
     };

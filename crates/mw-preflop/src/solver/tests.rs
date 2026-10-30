@@ -3424,6 +3424,8 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
         betting: BettingConfig::default(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     config.abstraction.flop_buckets = 4;
     config.abstraction.turn_buckets = 4;
@@ -3596,6 +3598,8 @@ fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
         betting: BettingConfig::default(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     config.abstraction.recall = RecallMode::Street;
     let game = HoldemGame::new(
@@ -3786,6 +3790,8 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
         betting: BettingConfig::default(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     config.abstraction.flop_buckets = 2;
     config.abstraction.turn_buckets = 2;
@@ -3868,6 +3874,8 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
         betting: BettingConfig::default(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     config.abstraction.flop_buckets = 4;
     config.abstraction.turn_buckets = 4;
@@ -3962,6 +3970,8 @@ fn vector_traverser_icm_smoke_test() {
         betting: BettingConfig::default(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     config.abstraction.flop_buckets = 3;
     config.abstraction.turn_buckets = 3;
@@ -4081,6 +4091,8 @@ pub(super) fn initialization_holdem_fixture() -> (
             recall: RecallMode::Street,
             ..AbstractionConfig::default()
         },
+        bb_chips: 1000,
+        chip_rounding: nlh::Rounding::Nearest,
     };
     let game = crate::holdem::HoldemGame::new(
         &game_config,

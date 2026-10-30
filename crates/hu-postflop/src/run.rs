@@ -283,7 +283,7 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
     let mut built = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
         .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
     let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-    let index = GameIndex::from_game(&built.game, &built.node_info, start);
+    let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
     let mut loaded_base = None;
     let resolved = if let Some(ir) = &p.document.spot.profile {
         if !matches!(

@@ -1,44 +1,63 @@
 //! Strict hand-line spelling and menu-independent replay through the NLH rules.
 use crate::*;
 use nlh::betting::{BettingState, IllegalMove, Move, SeatStatus};
-use nlh::{Card, MwChips, NoStreetPolicy, SeatId, Street};
+use nlh::{Card, ChipScale, MwChips, NoStreetPolicy, SeatId, Street};
 
 fn line_error(message: impl Into<String>) -> SpotError {
     SpotError::new(Code::NLH004, "spot.line", message)
 }
 
-pub(crate) fn amount_text(amount: MwChips) -> String {
-    let whole = amount.0 / 1000;
-    let fraction = amount.0 % 1000;
-    if fraction == 0 {
-        whole.to_string()
-    } else {
-        format!("{whole}.{fraction:03}")
-            .trim_end_matches('0')
-            .to_owned()
-    }
-}
-
-fn move_text(mv: Move) -> String {
+fn move_text(mv: Move, scale: ChipScale) -> String {
     match mv {
         Move::Fold => "implicit fold (omit this player)".into(),
         Move::Check => "x".into(),
         Move::Call => "c".into(),
-        Move::BetTo(v) => format!("b{}", amount_text(v)),
-        Move::RaiseTo(v) => format!("r{}", amount_text(v)),
+        Move::BetTo(v) => format!("b{}", scale.amount_text(v)),
+        Move::RaiseTo(v) => format!("r{}", scale.amount_text(v)),
         Move::AllIn => "a".into(),
     }
 }
 
-pub(crate) fn parse_move(text: &str) -> Result<Move, SpotError> {
+/// A line amount after its `b`/`r` prefix: chips with a `c` suffix (`10c`)
+/// or a BB decimal (`2.5`), each in its shortest spelling.
+fn line_amount(prefix: &str, number: &str, scale: ChipScale) -> Result<MwChips, SpotError> {
+    if let Some(digits) = number.strip_suffix('c') {
+        let chips = Some(digits)
+            .filter(|d| !d.is_empty() && d.bytes().all(|b| b.is_ascii_digit()))
+            .and_then(|d| d.parse::<u64>().ok())
+            .filter(|&chips| chips > 0)
+            .ok_or_else(|| {
+                line_error(format!(
+                    "{prefix}{number}: chip amounts are positive integers such as {prefix}10c"
+                ))
+            })?;
+        if digits != chips.to_string() {
+            return Err(line_error(format!(
+                "use {prefix}{chips}c, the shortest chip spelling"
+            )));
+        }
+        return Ok(MwChips(chips));
+    }
+    let amount = crate::parse::decimal_amount(number, "spot.line", false, scale)
+        .map_err(|e| line_error(format!("{prefix}{number}: {}", e.message)))?;
+    let canonical = scale.bb_text(amount).expect("whole chips of a decimal");
+    if number != canonical {
+        return Err(line_error(format!(
+            "use {prefix}{canonical}, the shortest decimal BB spelling"
+        )));
+    }
+    Ok(amount)
+}
+
+pub(crate) fn parse_move(text: &str, scale: ChipScale) -> Result<Move, SpotError> {
     // Recognize common aliases only to explain their canonical spelling.
     let lower = text.to_ascii_lowercase();
     if lower != text
-        && let Ok(mv) = parse_move(&lower)
+        && let Ok(mv) = parse_move(&lower, scale)
     {
         return Err(line_error(format!(
             "use {} (lowercase move symbols)",
-            move_text(mv)
+            move_text(mv, scale)
         )));
     }
     let alias = match text {
@@ -50,7 +69,7 @@ pub(crate) fn parse_move(text: &str) -> Result<Move, SpotError> {
             .into_iter()
             .find_map(|(prefix, bet)| {
                 let number = text.strip_prefix(prefix)?;
-                let amount = crate::parse::decimal_chips(number, "spot.line", false).ok()?;
+                let amount = line_amount("", number, scale).ok()?;
                 Some(if bet {
                     Move::BetTo(amount)
                 } else {
@@ -61,7 +80,7 @@ pub(crate) fn parse_move(text: &str) -> Result<Move, SpotError> {
     if let Some(mv) = alias {
         return Err(line_error(format!(
             "use {} instead of a word form",
-            move_text(mv)
+            move_text(mv, scale)
         )));
     }
     match text {
@@ -79,21 +98,13 @@ pub(crate) fn parse_move(text: &str) -> Result<Move, SpotError> {
                 ));
             }
             if let Some(unsigned) = number.strip_prefix('+')
-                && let Ok(amount) = crate::parse::decimal_chips(unsigned, "spot.line", false)
+                && line_amount(prefix, unsigned, scale).is_ok()
             {
                 return Err(line_error(format!(
-                    "use {prefix}{}, without a sign",
-                    amount_text(amount)
+                    "use {prefix}{unsigned}, without a sign"
                 )));
             }
-            let amount = crate::parse::decimal_chips(number, "spot.line", false)
-                .map_err(|e| line_error(e.message))?;
-            let canonical = amount_text(amount);
-            if number != canonical {
-                return Err(line_error(format!(
-                    "use {prefix}{canonical}, the shortest decimal BB spelling"
-                )));
-            }
+            let amount = line_amount(prefix, number, scale)?;
             Ok(if prefix == "b" {
                 Move::BetTo(amount)
             } else {
@@ -111,6 +122,7 @@ pub(crate) fn apply(
     actions: &mut Vec<LineAction>,
 ) -> Result<(), SpotError> {
     let seat = state.actor().map_err(|e| line_error(e.to_string()))?;
+    let scale = table.setup.scale();
     let action = state.resolve_move(mv).map_err(|e| {
         let correct = match &e {
             IllegalMove::WrongMove {
@@ -119,7 +131,7 @@ pub(crate) fn apply(
             } if *to == state.maximum_target(seat) => Some("a".into()),
             IllegalMove::WrongMove { correct, .. }
             | IllegalMove::MustBeAllIn { correct, .. }
-            | IllegalMove::AllInIsCall { correct, .. } => Some(move_text(*correct)),
+            | IllegalMove::AllInIsCall { correct, .. } => Some(move_text(*correct, scale)),
             _ => None,
         };
         line_error(match correct {
@@ -204,7 +216,7 @@ pub(crate) fn line(
                     };
                     line_error(format!("unknown position {position:?}; {correct}"))
                 })?;
-            let mv = parse_move(spelling)?;
+            let mv = parse_move(spelling, table.setup.scale())?;
             if state.street != expected || state.phase.is_terminal() {
                 return Err(line_error(
                     "street is closed; write ' / ' before the next street's action",

@@ -499,7 +499,7 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             .seats()
             .map(|seat| SeatConfig {
                 name: None,
-                stack_bb: spot.table.stacks[seat].as_bb(),
+                stack_bb: setup.scale().to_bb(spot.table.stacks[seat]),
                 range: if spot.ranges[seat].text == "random" {
                     String::new()
                 } else {
@@ -510,19 +510,30 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             .collect(),
         // The forced-bet vector is authoritative, as in the old-family adapter.
         button: setup.button,
-        blinds: BlindConfig::default(),
+        blinds: BlindConfig {
+            small_bb: setup.scale().to_bb(spot.table.sb),
+            big_bb: 1.0,
+        },
         ante: AnteConfig::None,
         betting,
         forced_bets: Some(ForcedBetConfig {
-            blinds_bb: setup.forced_blinds.iter().map(|v| v.as_bb()).collect(),
-            antes_bb: setup.forced_antes.iter().map(|v| v.as_bb()).collect(),
-            common_ante_bb: setup.common_ante.as_bb(),
+            blinds_bb: setup
+                .forced_blinds
+                .iter()
+                .map(|&v| setup.scale().to_bb(v))
+                .collect(),
+            antes_bb: setup
+                .forced_antes
+                .iter()
+                .map(|&v| setup.scale().to_bb(v))
+                .collect(),
+            common_ante_bb: setup.scale().to_bb(setup.common_ante),
             nominal_big_blind_bb: 1.0,
             first_to_act: setup.preflop_first_to_act,
             straddles: setup
                 .straddles
                 .iter()
-                .map(|&(seat, amount)| (seat, amount.as_bb()))
+                .map(|&(seat, amount)| (seat, setup.scale().to_bb(amount)))
                 .collect(),
         }),
         abstraction: AbstractionConfig {
@@ -538,6 +549,8 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             active_opponent_buckets: Vec::new(),
             artifact_cache: None,
         },
+        bb_chips: setup.scale().chips_per_bb(),
+        chip_rounding: setup.chip_rounding,
     };
     game.validate_economics(&spot.economics.utility, &spot.economics.rake)
         .map_err(|e| invalid("tree", e.to_string()))?;

@@ -159,8 +159,8 @@ impl VarSource<spot::TreeVar> for NlhContext<'_> {
                     && state.preflop_flats > 0,
             ),
             Spr => Value::Number(spr(state, actor)),
-            Pot => Value::Number(state.pot_size().as_bb()),
-            ToCall => Value::Number(state.amount_to_call(actor).as_bb()),
+            Pot => Value::Number(state.scale().to_bb(state.pot_size())),
+            ToCall => Value::Number(state.scale().to_bb(state.amount_to_call(actor))),
             FacingPct => Value::Number(if state.pot_size().raw() == 0 {
                 0.0
             } else {
@@ -283,6 +283,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         };
         let state = BettingState::from_config(&config.validated().unwrap()).unwrap();
         let raise_rule = rule(
@@ -318,6 +320,8 @@ mod tests {
             betting: BettingConfig::default(),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
+            bb_chips: 1000,
+            chip_rounding: nlh::Rounding::Nearest,
         };
         let mut state = BettingState::from_config(&config.validated().unwrap()).unwrap();
 

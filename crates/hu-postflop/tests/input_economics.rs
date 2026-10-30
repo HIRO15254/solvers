@@ -248,6 +248,25 @@ fn rake_rounds_before_capping_on_milli_bb_grid() {
 }
 
 #[test]
+fn tied_pots_split_whole_chips_with_the_odd_chip_to_oop() {
+    // At 100 chips/BB, the 5.5 BB pot is 550 chips. Rake is
+    // floor(550 * 0.0101) = 5 chips, leaving 545: OOP gets 273, IP 272.
+    let doc = document(
+        &source("[economics.rake]\nrate = 0.0101", "")
+            .replace("players = 6\n", "players = 6\nbb_chips = 100\n"),
+    );
+    let models = NlhPayoff::new(&doc.spot).unwrap();
+    let t = terminal(&doc, (0, 0), TerminalKind::Showdown);
+    let net = t.pot.as_f64() - models.rake.rake(&t);
+    close(net, 545.0);
+    let split = models.rake.tie_split(net);
+    close(split[Player::P0], 273.0);
+    close(split[Player::P1], 272.0);
+    let baked = models.pipeline().bake(&t);
+    close(baked.tie[Player::P0] - baked.tie[Player::P1], 0.01);
+}
+
+#[test]
 fn actual_contributions_and_dead_money_cancel_from_reported_chip_ev() {
     let doc = document(&source("", ""));
     let models = NlhPayoff::new(&doc.spot).unwrap();

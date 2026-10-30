@@ -1,16 +1,45 @@
 //! Documentation-ordered, self-contained effective TOML without global preserve_order.
 use crate::*;
 use economics::{RakeConfig, UtilityConfig};
-use nlh::{MwChips, SeatId};
+use nlh::{ChipScale, MwChips, SeatId};
 use toml::Value;
 use toml_edit::{InlineTable, Item, Table};
 
-fn bb(chips: MwChips) -> Value {
-    if chips.0.is_multiple_of(1000) {
-        Value::Integer((chips.0 / 1000) as i64)
-    } else {
-        Value::Float(chips.as_bb())
+/// The exact BB value of `chips`, when a TOML number spells it exactly.
+fn bb(scale: ChipScale, chips: MwChips) -> Option<Value> {
+    let text = scale.bb_text(chips)?;
+    if !text.contains('.') {
+        return text.parse().ok().map(Value::Integer);
     }
+    let value: f64 = text.parse().ok()?;
+    (crate::parse::exact_decimal(&value.to_string()) == crate::parse::exact_decimal(&text))
+        .then_some(Value::Float(value))
+}
+
+/// Spell a group of amounts as `{base}_bb` on decimal tables when every value
+/// is an exact BB number, otherwise as `{base}_chips` integers.
+fn amounts(scale: ChipScale, base: &str, chips: &[MwChips]) -> (String, Vec<Value>) {
+    let exact = scale
+        .is_decimal()
+        .then(|| {
+            chips
+                .iter()
+                .map(|c| bb(scale, *c))
+                .collect::<Option<Vec<_>>>()
+        })
+        .flatten();
+    match exact {
+        Some(values) => (format!("{base}_bb"), values),
+        None => (
+            format!("{base}_chips"),
+            chips.iter().map(|c| Value::Integer(c.0 as i64)).collect(),
+        ),
+    }
+}
+
+fn insert_amount(table: &mut Table, scale: ChipScale, base: &str, chips: MwChips) {
+    let (key, mut values) = amounts(scale, base, &[chips]);
+    insert(table, &key, values.pop().unwrap());
 }
 
 fn numeric(n: f64) -> Value {
@@ -151,29 +180,35 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     }
     write_table(&mut text, "meta", &meta);
     let t = &spot.table;
-    let mut table = fields([("players", Value::Integer(t.stacks.len() as i64))]);
+    let scale = t.setup.scale();
+    let mut table = fields([
+        ("players", Value::Integer(t.stacks.len() as i64)),
+        ("bb_chips", Value::Integer(scale.chips_per_bb() as i64)),
+    ]);
     let same_stack = t.stacks.iter().all(|s| *s == t.stacks[SeatId(0)]);
     if same_stack {
-        insert(&mut table, "stack_bb", bb(t.stacks[SeatId(0)]));
+        insert_amount(&mut table, scale, "stack", t.stacks[SeatId(0)]);
     }
-    for (key, v) in [
-        ("sb_bb", t.sb),
-        ("ante_bb", t.ante),
-        ("bb_ante_bb", t.bb_ante),
-    ] {
-        insert(&mut table, key, bb(v));
+    for (base, v) in [("sb", t.sb), ("ante", t.ante), ("bb_ante", t.bb_ante)] {
+        insert_amount(&mut table, scale, base, v);
     }
+    let straddles: Vec<MwChips> = t.setup.straddles.iter().map(|(_, v)| *v).collect();
+    let (key, values) = amounts(scale, "straddles", &straddles);
+    insert(&mut table, &key, Value::Array(values));
     insert(
         &mut table,
-        "straddles_bb",
-        Value::Array(t.setup.straddles.iter().map(|(_, v)| bb(*v)).collect()),
+        "chip_rounding",
+        Value::try_from(t.setup.chip_rounding).unwrap(),
     );
     if !same_stack {
+        let seats = positions(t);
+        let chips: Vec<MwChips> = seats.iter().map(|seat| t.stacks[*seat]).collect();
+        let (key, values) = amounts(scale, "stacks", &chips);
         let mut stacks = Table::new();
-        for seat in positions(t) {
-            insert(&mut stacks, &t.positions[seat], bb(t.stacks[seat]));
+        for (seat, value) in seats.into_iter().zip(values) {
+            insert(&mut stacks, &t.positions[seat], value);
         }
-        table.insert("stacks_bb", Item::Table(stacks));
+        table.insert(&key, Item::Table(stacks));
     }
     write_table(&mut text, "table", &table);
     let mut economics = Table::new();
@@ -189,11 +224,12 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
                 "payouts",
                 Value::Array(payouts.iter().map(|v| numeric(*v)).collect()),
             );
-            insert(
-                &mut economics,
-                "outside_field_bb",
-                Value::Array(outside_field.iter().map(|v| numeric(v.stack_bb)).collect()),
-            );
+            let stacks: Vec<MwChips> = outside_field
+                .iter()
+                .map(|v| scale.from_bb(v.stack_bb).expect("parsed from whole chips"))
+                .collect();
+            let (key, values) = amounts(scale, "outside_field", &stacks);
+            insert(&mut economics, &key, Value::Array(values));
         }
     }
     if let RakeConfig::Generic {
@@ -207,16 +243,17 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     {
         let mut rake = fields([("rate", numeric(*rate))]);
         if let Some(cap) = cap_bb {
-            insert(&mut rake, "cap_bb", numeric(*cap));
+            let cap = scale.from_bb(*cap).expect("parsed from whole chips");
+            insert_amount(&mut rake, scale, "cap", cap);
         }
         for (key, v) in [
             ("when", Value::String(when.clone())),
             ("allocation", Value::try_from(allocation).unwrap()),
             ("rounding", Value::try_from(rounding).unwrap()),
-            ("rounding_unit_bb", numeric(rounding_unit.as_bb())),
         ] {
             insert(&mut rake, key, v);
         }
+        insert_amount(&mut rake, scale, "rounding_unit", *rounding_unit);
         economics.insert("rake", Item::Table(rake));
     }
     write_table(&mut text, "economics", &economics);

@@ -26,6 +26,7 @@ pub struct RangeRow {
 pub struct InspectSummary {
     pub format_version: u16,
     pub schema_version: u16,
+    pub bb_chips: u64,
     pub sweeps: u64,
     pub profile_type: String,
     pub visited_infosets: usize,
@@ -43,9 +44,9 @@ pub struct NodeView {
     pub path: Option<Vec<crate::mwsol::MultiwayHistoryAction>>,
     pub street: u8,
     pub actor: Option<u8>,
-    pub pot_milli_bb: u64,
+    pub pot_chips: u64,
     pub pot_bb: f64,
-    pub remaining_stacks_milli_bb: Vec<u64>,
+    pub remaining_stacks_chips: Vec<u64>,
     pub legal_actions: Vec<crate::mwsol::MultiwayPublicAction>,
     pub children: Vec<NodeChild>,
 }
@@ -447,6 +448,7 @@ pub fn inspect(
     let summary = serde_json::json!({
         "formatVersion": crate::mwsol::MWSOL_FORMAT_VERSION,
         "schemaVersion": metadata.schema_version,
+        "bbChips": metadata.bb_chips,
         "sweeps": metadata.sweeps,
         "profileType": "approximate-average",
         "visitedInfosets": strategies.len(),
@@ -460,9 +462,9 @@ pub fn inspect(
         "path": metadata.resolve_history(history),
         "street": state.street,
         "actor": state.actor,
-        "potMilliBb": state.pot_millibb,
-        "potBb": state.pot_millibb as f64 / 1000.0,
-        "remainingStacksMilliBb": state.remaining_stacks_millibb,
+        "potChips": state.pot_chips,
+        "potBb": state.pot_chips as f64 / metadata.bb_chips as f64,
+        "remainingStacksChips": state.remaining_stacks_chips,
         "legalActions": state.legal_actions,
         "children": metadata.histories.iter()
             .filter(|edge| edge.parent == history)

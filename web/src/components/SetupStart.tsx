@@ -4,7 +4,7 @@ import type { LineCursor, LineOption, LineStep } from "../api/types";
 import { Button, Card, Input, Popover, PopoverContent, PopoverTrigger } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { fieldText, getAt } from "../lib/config";
-import { bb } from "../lib/format";
+import { bb, lineAmount, lineToken } from "../lib/format";
 import { Board } from "./common";
 import { DocText, useDoc } from "./DocFields";
 import { LinePresets } from "./LinePresets";
@@ -33,17 +33,6 @@ const lineText = (text: string) =>
     .replace(/ ?\/ ?/g, " / ")
     .trim();
 
-/** One replayed action as the line grammar spells it, folds as `f`. */
-function lineToken(step: LineStep): string {
-  const action = step.action;
-  if (action === "fold") return "f";
-  if (action === "check") return "x";
-  if (typeof action !== "object") return String(action);
-  const [kind, detail] = Object.entries(action)[0] as [string, { to?: number; all_in?: boolean }];
-  if (detail.all_in && kind !== "call") return "a";
-  if (kind === "call") return "c";
-  return `${kind === "bet-to" ? "b" : "r"}${bb(detail.to ?? 0)}`;
-}
 
 /** A player who can still act on the street, with the replay at their turn and the passes that lead to it. */
 interface Turn {
@@ -96,11 +85,12 @@ function TurnPicker({
   const sized = () => {
     const value = Number(amount);
     if (!sizing) return;
-    if (!amount.trim() || !Number.isFinite(value) || value < sizing.min || value > sizing.max) {
+    const chips = Math.round(value * turn.cursor.bbChips);
+    if (!amount.trim() || !Number.isFinite(value) || chips < Math.round(sizing.min * turn.cursor.bbChips) || chips > Math.round(sizing.max * turn.cursor.bbChips)) {
       setError(`Write the street total, ${bb(sizing.min)} to ${bb(sizing.max)} BB`);
       return;
     }
-    onPick([...moves, `${sizing.token}${value}`]);
+    onPick([...moves, `${sizing.token}${lineAmount(value, turn.cursor.bbChips)}`]);
   };
   return (
     <Popover
@@ -163,6 +153,10 @@ function TurnPicker({
               autoFocus
               aria-label={`${OPTION_LABEL[sizing.kind]} amount (BB, street total)`}
               placeholder={`${bb(sizing.min)}–${bb(sizing.max)}`}
+              type="number"
+              min={sizing.min}
+              max={sizing.max}
+              step={1 / turn.cursor.bbChips}
               inputMode="decimal"
               value={amount}
               spellCheck={false}
@@ -284,7 +278,7 @@ export function SetupStart({
               hint="The actions from the forced bets to the spot. Folds are not written. Spaces around commas and / are normalized. Example: BTN r2.5, BB c / BB x, BTN b1.8, BB c"
               normalize={lineText}
             />
-            {streets.length > 0 && (
+            {cursor && streets.length > 0 && (
               <div className="line-streets" aria-label="Line replay and next actions">
                 {streets.map(([street, steps]) => (
                   <div key={street} className="line-street">
@@ -299,7 +293,7 @@ export function SetupStart({
                           title={`${step.implicit ? "An implicit fold the line leaves out. " : ""}Press to go back to before this action`}
                           onClick={() => void build(moves.slice(0, index))}
                         >
-                          {step.position} {lineToken(step)}
+                          {step.position} {lineToken(step, cursor.bbChips)}
                         </button>
                       ))}
                       {street === nextStreet &&

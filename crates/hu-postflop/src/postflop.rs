@@ -110,6 +110,10 @@ pub struct PostflopConfig {
     /// and the minimum-full-raise bump (see `sized_targets`) are both
     /// anchored on this value.
     pub min_bet: Chips,
+    /// Rounding used when resolving computed bet sizes to chips.
+    pub chip_rounding: nlh::Rounding,
+    /// Number of chips per big blind.
+    pub scale: nlh::ChipScale,
     /// Merge turn/river deals into suit-isomorphism classes. River-only
     /// subgames never deal, so this has no effect there.
     pub iso_merging: bool,
@@ -162,6 +166,8 @@ impl Default for PostflopConfig {
             effective_stack: Chips::ZERO,
             streets: PerStreet::default(),
             min_bet: Chips(1),
+            chip_rounding: nlh::Rounding::Nearest,
+            scale: nlh::ChipScale::DEFAULT,
             iso_merging: true,
             profile_suit_perms: None,
             track_node_info: true,
@@ -1100,7 +1106,7 @@ fn sizing(state: &LineState, config: &PostflopConfig) -> Option<Sizing> {
 
     Some(Sizing {
         context: nlh::SizeContext {
-            big_blind: 1000,
+            big_blind: config.scale.chips_per_bb(),
             called_to: u64::from(called_to.0),
             pot_after_call: u64::from(pot_after_call.0),
             previous_bet: u64::from(bet_to_match.0),
@@ -1108,6 +1114,7 @@ fn sizing(state: &LineState, config: &PostflopConfig) -> Option<Sizing> {
             maximum: u64::from(maximum.0),
             effective_stack: u64::from(maximum.0),
             streets_remaining: streets_remaining(state.street),
+            rounding: config.chip_rounding,
         },
         actor_wager,
         bet_to_match,
@@ -1285,8 +1292,8 @@ fn node_actions(
     } else {
         remaining.as_f64() / common.pot
     };
-    common.pot /= 1000.0;
-    common.to_call /= 1000.0;
+    common.pot /= config.scale.chips_per_bb() as f64;
+    common.to_call /= config.scale.chips_per_bb() as f64;
     let ctx = crate::input::NlhContext {
         common,
         player: &rules.players[state.to_act],
@@ -1733,11 +1740,9 @@ impl Builder<'_> {
             });
         }
         for action in menu {
-            // A wager's label and history token both name `to`, the
-            // actor's new cumulative contribution. Recomputing it inside
-            // each closure keeps both of them lazy: with
-            // `track_node_info = false` neither closure runs at all.
-            let wager_to = |additional| state.contrib[actor] + additional;
+            // Labels and histories name the actor's street-relative target.
+            // Keep both computations lazy when node information is disabled.
+            let wager_to = |additional| state.contrib[actor] + additional - state.street_start;
             let label = self.action_label(|| match action {
                 NodeAction::Fold => "fold".into(),
                 NodeAction::Check => "check".into(),
@@ -2510,17 +2515,18 @@ struct SelectorTarget {
     node: SelectorNode,
 }
 
-fn selector_history_steps(selector: &str) -> Option<Vec<&str>> {
+fn selector_history_steps(selector: &str, scale: nlh::ChipScale) -> Option<Vec<&str>> {
     let mut rest = selector;
     let mut steps = Vec::new();
     while !rest.is_empty() {
         let len = match rest.as_bytes()[0] {
             b'x' | b'c' | b'f' => 1,
             b'r' => {
-                1 + rest[1..]
+                let end = 1 + rest[1..]
                     .bytes()
                     .take_while(|b| b.is_ascii_digit() || *b == b'.')
-                    .count()
+                    .count();
+                end + usize::from(!scale.is_decimal() && rest.as_bytes().get(end) == Some(&b'c'))
             }
             b'[' => rest.find(']')? + 1,
             _ => return None,
@@ -2557,8 +2563,9 @@ fn selector_walk(
                             NodeAction::Check => "check".into(),
                             NodeAction::Call => "call".into(),
                             NodeAction::Wager(additional) => {
-                                let to = state.contrib[state.to_act] + *additional;
-                                let to = crate::prepare::bb(to.0 as u64);
+                                let to =
+                                    state.contrib[state.to_act] + *additional - state.street_start;
+                                let to = config.scale.amount_text(nlh::MwChips(to.0 as u64));
                                 if state.outstanding == Chips::ZERO {
                                     format!("bet {to}")
                                 } else {
@@ -2658,7 +2665,7 @@ fn selector_targets(config: &PostflopConfig, selector: &str) -> Option<Vec<Selec
     if selector.is_empty() || selector == "root" {
         return selector_walk(config, &[], false, false);
     }
-    let history_steps = selector_history_steps(selector);
+    let history_steps = selector_history_steps(selector, config.scale);
     // profile_nodes chooses history if it contains a wildcard or names any
     // actual node; otherwise it interprets the input as a slash path.
     let history = history_steps
@@ -3163,7 +3170,7 @@ mod tests {
                 utility: &ChipEv,
             },
         );
-        let index = GameIndex::from_game(&game.game, &game.node_info, Street::Turn);
+        let index = GameIndex::from_game(&game.game, &game.node_info, Street::Turn, config.scale);
         let tree = &game.game.tree;
         let view = TreeView {
             tree,
@@ -3239,7 +3246,8 @@ mod tests {
                     utility: &ChipEv,
                 },
             );
-            let index = GameIndex::from_game(&game.game, &game.node_info, Street::Flop);
+            let index =
+                GameIndex::from_game(&game.game, &game.node_info, Street::Flop, config.scale);
             let tree = &game.game.tree;
             let view = TreeView {
                 tree,

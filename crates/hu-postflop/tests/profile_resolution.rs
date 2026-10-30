@@ -194,8 +194,12 @@ fn ancestor_freeze_and_selector_errors_are_explicit() {
     profile.locks[0].strategy =
         LockStrategy::PerCombo(vec![("9c9d".into(), vec![("check".into(), 1.0)])]);
     assert!(resolve_profile(&mut game, &p.config, &profile, None).is_err());
-    let index =
-        hu_postflop::index::GameIndex::from_game(&game.game, &game.node_info, nlh::Street::River);
+    let index = hu_postflop::index::GameIndex::from_game(
+        &game.game,
+        &game.node_info,
+        nlh::Street::River,
+        p.config.scale,
+    );
     let view = hu_postflop::index::TreeView {
         tree: &game.game.tree,
         index: &index,
@@ -273,8 +277,12 @@ fn empty_hand_selections_are_errors_for_each_kind() {
 fn label_path_accepts_iso_marker() {
     let p = hu_postflop::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
     let game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
-    let index =
-        hu_postflop::index::GameIndex::from_game(&game.game, &game.node_info, nlh::Street::Turn);
+    let index = hu_postflop::index::GameIndex::from_game(
+        &game.game,
+        &game.node_info,
+        nlh::Street::Turn,
+        p.config.scale,
+    );
     let view = hu_postflop::index::TreeView {
         tree: &game.game.tree,
         index: &index,

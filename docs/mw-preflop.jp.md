@@ -23,7 +23,7 @@ cap ruleが無ければraise chainはstackとNLHの合法性だけで制限さ�
 これらを埋込みconfigに含む`.mwsol`・checkpointも読み込めない。
 正規化・実効configにも出力しない。旧Preflop設定からの移行は、他のPreflop ruleの後へ
 `preflop when aggressions >= 1 { jam raise > 33.333%stack }`を置く。
-旧keyとはanteのある場合の分母、0.001 BB gridでの閾値丸め、ソース位置での適用が異なる
+旧keyとはanteのある場合の分母、整数chipへの閾値丸め（`table.chip_rounding`）、ソース位置での適用が異なる
 （[共通Input第9節](nlh-input-v1.jp.md#size-literalと解決順序)）。
 
 
@@ -152,8 +152,10 @@ production checkpointはlive policyを借用してatomic保存し、全policyの
 祖先index・node整列・chunk stagingはarena予算外である。
 loaderは検証済みchunkからowned stateへ直接decodeし、全展開payloadと同サイズの追加bufferを避ける。
 
-`.mwsol`はformat version 4であり、config本文・fingerprint・table/ranges・public tree/history・
+`.mwsol`はformat version 5であり、config本文・fingerprint・table/ranges・public tree/history・
 strategy weight・平均strategy block・記録metricsを持つ。
+metadataに`bb_chips`、public actionに`amount_chips`、stateに`pot_chips`・`remaining_stacks_chips`を記録する。
+旧version 2〜4も`bb_chips = 1000`として読み込む。
 algorithm fingerprintはalgorithm設定にsolver-state versionを加えて計算する。
 正の平均質量のあるpolicyを保存し、未訪問・平均質量0のpolicy、raw regretは保存しない。
 閲覧用の完全なper-hand EVや全state snapshotではない。

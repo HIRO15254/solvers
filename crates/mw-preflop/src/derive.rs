@@ -78,7 +78,7 @@ fn public_action(action: &Action) -> MultiwayPublicAction {
         Action::Fold => MultiwayPublicAction::Fold,
         Action::Check => MultiwayPublicAction::Check,
         Action::Call { amount, all_in } => MultiwayPublicAction::Call {
-            amount_millibb: amount.0,
+            amount_chips: amount.0,
             all_in,
         },
         Action::BetTo {
@@ -86,7 +86,7 @@ fn public_action(action: &Action) -> MultiwayPublicAction {
             all_in,
             full_raise,
         } => MultiwayPublicAction::BetTo {
-            amount_millibb: to.0,
+            amount_chips: to.0,
             all_in,
             full_raise,
         },
@@ -95,7 +95,7 @@ fn public_action(action: &Action) -> MultiwayPublicAction {
             all_in,
             full_raise,
         } => MultiwayPublicAction::RaiseTo {
-            amount_millibb: to.0,
+            amount_chips: to.0,
             all_in,
             full_raise,
         },

@@ -331,21 +331,13 @@ pub fn utility_unit(p: &Prepared) -> &'static str {
     }
 }
 
-/// Exact shortest decimal on the milli-BB grid for query labels and monetary displays.
-pub fn bb(amount: u64) -> String {
-    let fraction = amount % 1000;
-    if fraction == 0 {
-        (amount / 1000).to_string()
-    } else {
-        format!("{}.{fraction:03}", amount / 1000)
-            .trim_end_matches('0')
-            .into()
-    }
+/// Canonical display spelling for a chip amount on the given table.
+pub fn bb(amount: u64, scale: nlh::ChipScale) -> String {
+    scale.amount_text(nlh::MwChips(amount))
 }
 
-/// Translates a displayed history (amounts in big blinds) into the builder's
-/// spelling (amounts in chips).
-pub(crate) fn internal_history(history: &str) -> String {
+/// Translates a canonical displayed history into the builder's chip spelling.
+pub(crate) fn internal_history(history: &str, scale: nlh::ChipScale) -> String {
     let mut chars = history.chars().peekable();
     let mut result = String::new();
     while let Some(c) = chars.next() {
@@ -365,8 +357,12 @@ pub(crate) fn internal_history(history: &str) -> String {
             {
                 amount.push(chars.next().unwrap());
             }
-            let amount = nlh::MwChips::try_from_bb(amount.parse().expect("display history amount"))
-                .expect("BB history grid");
+            let amount = if !scale.is_decimal() && chars.peek() == Some(&'c') {
+                chars.next();
+                nlh::MwChips(amount.parse().expect("display chip amount"))
+            } else {
+                scale.parse_bb(&amount).expect("display history BB amount")
+            };
             result.push_str(&amount.0.to_string());
         }
     }

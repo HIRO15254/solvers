@@ -89,6 +89,22 @@ fn root_reports_cursor_and_legal_options_without_moves() {
 }
 
 #[test]
+fn line_actions_report_bb_at_nondefault_chip_scale() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("chips.toml");
+    std::fs::write(
+        &config,
+        TABLE.replace("players = 6", "players = 6\nbb_chips = 10"),
+    )
+    .unwrap();
+    let cursor = json(&config, &["--moves", "f,f,f,r25c,f,c"]);
+    assert_eq!(cursor["bbChips"], 10);
+    assert_eq!(cursor["pot"], 5.5);
+    assert_eq!(cursor["actions"][3]["action"]["raise-to"]["to"], 2.5);
+    assert_eq!(cursor["actions"][5]["action"]["call"]["amount"], 1.5);
+}
+
+#[test]
 fn explicit_moves_build_partial_cursor_then_close_preflop() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("moves.toml");

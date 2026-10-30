@@ -4,7 +4,7 @@ import type { LineCursor } from "../api/types";
 import { Button, Label, SegmentedControl, Select } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { getAt, setAt, writeDoc, type Doc } from "../lib/config";
-import { bb } from "../lib/format";
+import { lineAmount } from "../lib/format";
 import { Notice } from "./common";
 
 type Flow = "xx" | "ip" | "oop";
@@ -139,14 +139,15 @@ export function LinePresets({
     setError(null);
     const replay = (text: string) => api.line(writeDoc(setAt(doc, ["spot", "line"], text)));
     try {
-      let text = preset.line;
+      if (!root) throw new Error("Table is not ready");
+      let text = preset.line.replace(/\br(\d+(?:\.\d+)?)/g, (_, value: string) => `r${lineAmount(Number(value), root.bbChips)}`);
       for (const street of PLAYED[next.start]) {
         const cursor = await replay(text);
         const oop = cursor.next?.position;
         const ip = cursor.seats.find((seat) => seat.status !== "folded" && seat.position !== oop)?.position;
         if (!oop || !ip) throw new Error(`No two players can act on the ${STREET_LABEL[street]}`);
         const flow = next.flows[street];
-        const bet = bb((cursor.pot * BET_PCT[street]) / 100);
+        const bet = lineAmount((cursor.pot * BET_PCT[street]) / 100, cursor.bbChips);
         text +=
           " / " +
           (flow === "xx"

@@ -18,7 +18,7 @@ struct Identity {
     // PF1 (2026-10-06): pins now count seat-specific positive root support,
     // excluding starting-board conflicts. Public topology/hash pins are unchanged.
     infosets: [u64; 2],
-    /// Builder action labels use integer milli-BB amounts.
+    /// Builder action labels use integer chip amounts.
     root_actions: Vec<String>,
     structure: String,
 }
@@ -69,6 +69,7 @@ fn identity(game: &PostflopGame) -> Identity {
             hash.update(&info.contrib[player].0.to_le_bytes());
         }
         // Histories include chance card identities; action labels include every integer amount.
+        // Later-street amounts are street-relative; these hashes include that spelling.
         text(&mut hash, &info.history);
         hash.update(&(info.actions.len() as u64).to_le_bytes());
         for action in &info.actions {
@@ -122,7 +123,7 @@ fn turn_small() {
             decisions: [290, 290],
             infosets: [5510, 5800],
             root_actions: vec!["check".into(), "bet 20000".into()],
-            structure: "3da11a7eeda55c11a1fa19e0ebed6beae60c32a1c5214e2d00d5c57efa24301f".into(),
+            structure: "4871cf42934bf8e3e0f58135bf05aabe790f4e1012adac721e108a265b9094c6".into(),
         },
     );
 }
@@ -135,7 +136,7 @@ fn postflop_srp20() {
             decisions: [26218, 26218],
             infosets: [7839182, 10801816],
             root_actions: vec!["check".into(), "bet 50000".into()],
-            structure: "49cf040541382b2cc52e806e01a88b08e56cdd500938f1aadd9624e0ee29cda9".into(),
+            structure: "38812e44876a0534f2ccee8cf633d208b9279bab1f662e25160dcdb04f6224ac".into(),
         },
     );
 }
@@ -148,7 +149,7 @@ fn three_bet_pot_fast() {
             decisions: [31801, 31801],
             infosets: [2003463, 5088160],
             root_actions: vec!["check".into(), "bet 150000".into()],
-            structure: "d6907929912e16d8a8969f20b16a60f88de290384065c21d5db3d5dd8b53853e".into(),
+            structure: "a6373c082e47693f949454532644d4b4e3f74587e389f7f96cf688d5d0ffaad2".into(),
         },
     );
 }
@@ -162,7 +163,7 @@ fn postflop_pio_tree() {
             decisions: [54853, 54852],
             infosets: [1865002, 1645560],
             root_actions: vec!["check".into()],
-            structure: "b21019a929f55f06f5f9834477f5d7b35fc59b0c8c97b8ba5c10fd9d98dcf77c".into(),
+            structure: "85afb840bddc8c7feae28a59a279369fa25c3af43fa9e7ea7152ba5215250f6e".into(),
         },
     );
 }
@@ -176,7 +177,7 @@ fn postflop_pio_icm() {
             decisions: [54853, 54852],
             infosets: [1865002, 1645560],
             root_actions: vec!["check".into()],
-            structure: "b21019a929f55f06f5f9834477f5d7b35fc59b0c8c97b8ba5c10fd9d98dcf77c".into(),
+            structure: "85afb840bddc8c7feae28a59a279369fa25c3af43fa9e7ea7152ba5215250f6e".into(),
         },
     );
 }

@@ -1,8 +1,8 @@
 //! Table-sized primitives shared by the NLH products.
 //!
-//! The heads-up crates use a deliberately coarse chip grid.  Multiway uses
-//! one thousand integral units per big blind so antes, odd chips, short
-//! all-ins, and rake can all be settled without floating-point money.
+//! Amounts are integral table chips; [`crate::ChipScale`] says how many make
+//! one big blind, so antes, odd chips, short all-ins and rake settle without
+//! floating-point money.
 
 use std::fmt;
 use std::ops::{Add, AddAssign, Index, IndexMut, Sub, SubAssign};
@@ -11,11 +11,10 @@ use serde::de::Error as _;
 use serde::{Deserialize, Deserializer, Serialize};
 use thiserror::Error;
 
-pub const CHIPS_PER_BB: u64 = 1_000;
 pub const MIN_SEATS: usize = 2;
 pub const MAX_SEATS: usize = 9;
 
-/// Integral chip amount on the multiway solver's 0.001bb grid.
+/// Integral number of table chips.
 #[derive(
     Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Serialize, Deserialize,
 )]
@@ -24,7 +23,6 @@ pub struct MwChips(pub u64);
 
 impl MwChips {
     pub const ZERO: Self = Self(0);
-    pub const ONE_BB: Self = Self(CHIPS_PER_BB);
 
     pub const fn new(raw: u64) -> Self {
         Self(raw)
@@ -32,27 +30,6 @@ impl MwChips {
 
     pub const fn raw(self) -> u64 {
         self.0
-    }
-
-    pub fn as_bb(self) -> f64 {
-        self.0 as f64 / CHIPS_PER_BB as f64
-    }
-
-    /// Converts a UI/config big-blind amount to the integral 0.001bb grid.
-    /// Half-grid values round away from zero (all accepted values are
-    /// non-negative).
-    pub fn try_from_bb(bb: f64) -> Result<Self, ChipAmountError> {
-        if !bb.is_finite() {
-            return Err(ChipAmountError::NotFinite);
-        }
-        if bb < 0.0 {
-            return Err(ChipAmountError::Negative);
-        }
-        let scaled = bb * CHIPS_PER_BB as f64;
-        if scaled > u64::MAX as f64 {
-            return Err(ChipAmountError::Overflow);
-        }
-        Ok(Self(scaled.round() as u64))
     }
 
     pub fn checked_add(self, rhs: Self) -> Option<Self> {
@@ -120,6 +97,10 @@ pub enum ChipAmountError {
     Negative,
     #[error("chip amount is too large")]
     Overflow,
+    #[error("chip amount is not a whole number of chips")]
+    Fractional,
+    #[error("chip amount must be a plain decimal")]
+    Syntax,
 }
 
 /// Stable table index.  Seats are stored clockwise and never renumbered
@@ -435,15 +416,6 @@ pub fn position_name(actor: SeatId, button: SeatId, seats: usize) -> &'static st
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn bb_conversion_uses_thousand_chip_grid() {
-        assert_eq!(MwChips::try_from_bb(1.0).unwrap(), MwChips(1_000));
-        assert_eq!(MwChips::try_from_bb(0.1254).unwrap(), MwChips(125));
-        assert_eq!(MwChips(2_500).as_bb(), 2.5);
-        assert!(MwChips::try_from_bb(f64::NAN).is_err());
-        assert!(MwChips::try_from_bb(-0.1).is_err());
-    }
 
     #[test]
     fn seat_masks_iterate_in_table_order() {

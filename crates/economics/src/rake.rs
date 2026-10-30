@@ -1,7 +1,7 @@
 //! Rake application, rounding, and allocation over shared NLH pot layers.
-use crate::config::{CompiledRake, RakeAllocation, RakeRounding};
-use nlh::MwChips;
+use crate::config::{CompiledRake, RakeAllocation};
 use nlh::settlement::{PotLayer, PotRake, RakeConditionContext, SettlementError};
+use nlh::{MwChips, Rounding};
 
 impl PotRake for CompiledRake {
     fn apply(
@@ -112,14 +112,14 @@ fn percentage(amount: MwChips, rate: f64) -> MwChips {
 fn percentage_with_rounding(
     amount: MwChips,
     rate: f64,
-    rounding: RakeRounding,
+    rounding: Rounding,
     unit: MwChips,
 ) -> MwChips {
     let exact = amount.raw() as f64 * rate / unit.raw() as f64;
     let rounded = match rounding {
-        RakeRounding::Down => exact.floor(),
-        RakeRounding::Nearest => exact.round(),
-        RakeRounding::Up => exact.ceil(),
+        Rounding::Down => exact.floor(),
+        Rounding::Nearest => exact.round(),
+        Rounding::Up => exact.ceil(),
     };
     MwChips((rounded as u64).saturating_mul(unit.raw()))
 }
@@ -178,6 +178,7 @@ mod tests {
             previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
+            chip_rounding: nlh::Rounding::Nearest,
         }
     }
 
@@ -209,7 +210,7 @@ mod tests {
                 cap: None,
                 when: crate::rake_condition::compile("true").unwrap(),
                 allocation: RakeAllocation::MainFirst,
-                rounding: RakeRounding::Down,
+                rounding: Rounding::Down,
                 rounding_unit: MwChips(1),
             },
         )
@@ -218,11 +219,11 @@ mod tests {
         assert_eq!(rated.pots[0].rake, MwChips(12));
         assert!(rated.pots[1..].iter().all(|pot| pot.rake == MwChips::ZERO));
         assert_eq!(
-            percentage_with_rounding(MwChips(15), 0.1, RakeRounding::Nearest, MwChips(1)),
+            percentage_with_rounding(MwChips(15), 0.1, Rounding::Nearest, MwChips(1)),
             MwChips(2)
         );
         assert_eq!(
-            percentage_with_rounding(MwChips(11), 0.1, RakeRounding::Up, MwChips(1)),
+            percentage_with_rounding(MwChips(11), 0.1, Rounding::Up, MwChips(1)),
             MwChips(2)
         );
     }
@@ -253,7 +254,7 @@ mod tests {
             (7500, [500, 1000, 1000]),
             (10000, [1000, 1000, 1000]),
         ] {
-            for (mode, expected) in [RakeRounding::Down, RakeRounding::Nearest, RakeRounding::Up]
+            for (mode, expected) in [Rounding::Down, Rounding::Nearest, Rounding::Up]
                 .into_iter()
                 .zip(expected)
             {
@@ -271,7 +272,7 @@ mod tests {
                 cap: Some(MwChips(725)),
                 when: crate::rake_condition::compile("true").unwrap(),
                 allocation: RakeAllocation::MainFirst,
-                rounding: RakeRounding::Up,
+                rounding: Rounding::Up,
                 rounding_unit: MwChips(500),
             },
         )
@@ -290,7 +291,7 @@ mod tests {
                 cap: None,
                 when: crate::rake_condition::compile("true").unwrap(),
                 allocation: RakeAllocation::MainFirst,
-                rounding: RakeRounding::Up,
+                rounding: Rounding::Up,
                 rounding_unit: MwChips(10_000),
             },
         )

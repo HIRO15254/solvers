@@ -54,6 +54,53 @@ fn solve(config: &str, directory: &Path) -> std::path::PathBuf {
     run
 }
 #[test]
+fn upgrade_rejects_current_invalid_and_existing_output() {
+    let directory = tempfile::tempdir().unwrap();
+    let run = solve(CONFIG, directory.path());
+    let current = run.join("solution.sol");
+    let output = directory.path().join("upgraded.sol");
+
+    let result = invoke(&[
+        "upgrade",
+        current.to_str().unwrap(),
+        "--out",
+        output.to_str().unwrap(),
+    ]);
+    assert_eq!(result.status.code(), Some(3));
+    assert!(
+        String::from_utf8_lossy(&result.stderr).contains("already current"),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(!output.exists());
+
+    let invalid = directory.path().join("invalid.sol");
+    std::fs::write(&invalid, b"not a solution").unwrap();
+    let result = invoke(&[
+        "upgrade",
+        invalid.to_str().unwrap(),
+        "--out",
+        output.to_str().unwrap(),
+    ]);
+    assert_eq!(result.status.code(), Some(3));
+    assert!(!output.exists());
+
+    let legacy = directory.path().join("legacy.sol");
+    let mut bytes = std::fs::read(&current).unwrap();
+    bytes[8..10].copy_from_slice(&4u16.to_le_bytes());
+    std::fs::write(&legacy, bytes).unwrap();
+    std::fs::write(&output, b"do not overwrite").unwrap();
+    let result = invoke(&[
+        "upgrade",
+        legacy.to_str().unwrap(),
+        "--out",
+        output.to_str().unwrap(),
+    ]);
+    assert!(!result.status.success());
+    assert_eq!(std::fs::read(&output).unwrap(), b"do not overwrite");
+}
+
+#[test]
 fn relock_round_trip_and_input_errors() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(
@@ -618,12 +665,12 @@ fn mixed_resume_preserves_storage_streets_and_cumulative_time() {
 }
 
 #[test]
-fn solution_uses_indexed_format_version_4() {
+fn solution_uses_indexed_format_version_7() {
     let directory = tempfile::tempdir().unwrap();
     let run = solve(CONFIG, directory.path());
     let path = run.join("solution.sol");
     let bytes = std::fs::read(&path).unwrap();
-    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 4);
+    assert_eq!(u16::from_le_bytes(bytes[8..10].try_into().unwrap()), 7);
     assert_eq!(
         hu_postflop::sol::read_sol(&path).unwrap().meta.iterations,
         20

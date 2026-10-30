@@ -506,8 +506,9 @@ enum Command {
         #[arg(long, value_enum, default_value = "json")]
         format: artifact_args::ExportFormat,
         /// Postflop only: which node the per-node views cover. `root`, a
-        /// betting-line history (`xr10c`), slash-separated action/chance labels
-        /// (`check/check/Th`), or `all` for every stored action node. Tree
+        /// betting-line history (`xr10c`; wager amounts are street raise-to targets),
+        /// slash-separated action/chance labels (`check/check/Th`), or `all`
+        /// for every stored action node. Tree
         /// accepts any node kind; other node views require action nodes.
         /// Repeat to export nodes from one load in the given order.
         #[arg(long, default_value = "root")]
@@ -538,6 +539,14 @@ enum Command {
         /// below this (`--resolve-rivers`).
         #[arg(long = "river-target", requires = "resolve_rivers")]
         river_target: Option<f64>,
+    },
+    /// Upgrade an older heads-up postflop .sol artifact to the current format.
+    Upgrade {
+        /// Old .sol artifact.
+        input: std::path::PathBuf,
+        /// New .sol artifact; must not already exist.
+        #[arg(long)]
+        out: std::path::PathBuf,
     },
     /// Compare two solutions from the same solver.
     Compare {
@@ -877,6 +886,10 @@ pub fn main_impl() -> Result<()> {
                     output.as_deref(),
                 )
             }
+        }
+        Command::Upgrade { input, out } => {
+            hu_postflop::sol::upgrade_sol(&input, &out)?;
+            Ok(())
         }
         Command::Compare {
             left,

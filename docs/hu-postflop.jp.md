@@ -15,7 +15,8 @@ OOPは残る2人の固定Postflop行動順が先の席、IPは後の席である
 超過stackは返却されるだけでHUの合法な選択肢を増やさない。
 payoffには実際の残stack、Preflopからの各席の拠出、foldした席の最終stackを使う。
 `a`は木のeffective stackまでのall-inであり、`%stack`と`%effective`は同じである。
-最小betは1 BBである。内部の木のchip量は0.001 BB整数である。
+最小betは1 BBである。内部の木の額は整数chipであり、1 BBあたりのchip数は`table.bb_chips`で決まる。
+size literalは`table.chip_rounding`で整数chipへ丸める（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 P1 lowerは開始pot＋2 × effective stackがu32の内部単位を超える場合を`NLH003`で拒否する。
 scriptによる最終空menuも`NLH003`である。
 攻撃回数の構造上限は無く、capはscriptの最後の`flop, turn, river when aggressions >= 3 { remove raise }`などで書く。
@@ -53,16 +54,17 @@ terminal payoffは次の順に作る。
 4. 木のeffective stack上の分配を実際のstackへ写し、utilityを計算する。
 5. utility baselineを引き、solver payoffへ焼き込む。
 
-rakeは全matched potに率を掛け、`rounding_unit_bb`の倍数へ丸め、capを適用する。
+rakeは全matched potに率を掛け、指定の整数chip単位（既定1 chip）へ丸め、capを適用する。
 P1のhand factsは`flop_dealt = true`、`players_dealt = table.players`、`players_saw_flop = 2`である。
 `showdown`と`won_without_showdown`はterminalで決まる。
 単一potであるため`allocation`による結果差は無い。条件文法と丸めは共通Input第6節に従う。
+showdownの引分けではrake後のpotを整数chipで等分し、余った1 chipはOOPが受け取る（共通Input第5節）。
 
 tournament utilityは卓全員とoutside fieldの最終stackのICM equityである。
 foldした卓の席は最終stackを固定して含める。OOP/IPの実際のstackを使い、effective stackへ縮めない。
 卓＋fieldが15人以下はexact ICM、16〜10,000人はDE-ICM（[arXiv:2610.06028](https://arxiv.org/abs/2610.06028)）を
 固定field向けに適応した決定的求積である（[共通Input第6節](nlh-input-v1.jp.md)）。
-分配で0.0005 BBが生じる場合、ICMへ渡すstackは共通gridへ最近接丸めする。
+ICMへ渡すstackは引分けを含め整数chipである。
 terminalのICM値はstack pairごとにmemoizeする。rakeとtournamentは同時指定できない。
 Monte Carlo ICM廃止（SOL-34）より前の16人以上のrunは、埋込みconfigに廃止key`samples`・`seed`を含むため読み込めず、再solveする。
 
@@ -232,7 +234,7 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 | `linear-cfr` | DCFRのalpha = beta = gamma = 1、平均reset無し |
 | `hs-dcfr` | 予算nに対してalpha = 1＋3t/n、beta = −1−2t/n、gamma = gamma0−5t/n、reset無し |
 
-初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、auto・f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存し、既存run・checkpoint・`.sol`は保存値で再開・照会する。
+初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、auto・f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存する。互換性hashが異なる旧checkpointは再開できず、現行configから再solveする。
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
 `storage`は次の4値を受け付ける。利用者決定PF11（2026-10-09）により既定は`auto`である。Lはstorage要素数、Nはaction node数。
@@ -271,14 +273,16 @@ node履歴はspotのlineとは別の文法である。actor positionとstreet区
 | `x` | check |
 | `f` | fold |
 | `c` | call |
-| `rN` | bet/raise。Nはactorのspot開始後の累計拠出（BB）。street内raise-toではない |
+| `rN` | bet/raise。Nはそのstreetでのactorのraise-to到達額（`spot.line`と同じ意味） |
 | `[Th]` | chance nodeの配牌 |
 | `[dealN]` | 実cardを記録しないall-in runoutのchance branch。Nは0始まりの子位置であり、同じ親のbranchを一意に指す |
 
-例は`xr5c[Th]xx`である。decimalは0.001 BB gridの最短表記である。
+例は`xr5c[Th]xx`である。額の表記は卓のchip尺度に従う。例えばTurnで2 BBをbet・callした後のRiverで2 BBをbetすると`r2c[Th]r2`となり、Riverのlabelは`bet 2`である。
 node selectorとaction labelによる指定はCLI referenceに従う。
 
 ## 6. run directoryと`run.json`
+
+chip額面の変更より前のP1 checkpointは互換性hashが異なるため再開できず、再solveする。
 
 | file | 内容・書込み |
 |---|---|
@@ -348,17 +352,17 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 最後のcheckpointを新たに書き、`S + W + C + E + M ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、`.sol`の書き手にC、checkpointのencoderにEを計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
 
-`.sol`はprofile無しではversion 4、profile有りではversion 5、no-riversでRiverに制約がある場合はversion 6である。version 5と6のmetadata frameはversion 4のmetadataと第6節の`ProfileReport`のpostcard tupleである。version 4、5、6を読める。旧versionのno-riversにはRiver制約がない。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
+`.sol`はprofile無しではversion 7、profile有りではversion 8、no-riversでRiverに制約がある場合はversion 9である。version 8と9のmetadata frameはversion 7のmetadataと第6節の`ProfileReport`のpostcard tupleである。version 7、8、9を読める。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
 
 | 部分 | 内容 |
 |---|---|
-| header（178 bytes） | `SLVRSOLV` magic、u16 version 4、5または6、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
+| header（178 bytes） | `SLVRSOLV` magic、u16 version 7、8または9、32-byte config hash、u64 iteration、u64 metadata frame長、u64 index frame長、u64 directory offset、u64 directory frame長、metadata・index・directory frameのBLAKE3 |
 | metadata frame | 下表のmetadataのpostcard bytesを圧縮したzstd frame |
 | index frame | 下表の木とindexの列を1つのzstd frameにしたもの |
 | 戦略chunk列 | 戦略blockをsref昇順に詰めたchunkのzstd frameの列 |
 | 値chunk列 | 同じnode集合の値blockをsref昇順に詰めたchunkのzstd frameの列 |
-| River制約chunk列 | version 6のみ。River action nodeのsref順に、f32のlock確率・confidenceと最終λを含むincentiveをpostcard blockとして保存する。固定祖先の基準戦略もここに入り、閲覧時に基準`.sol`は不要 |
-| directory frame | 戦略chunk列、値chunk列のdirectory。version 6ではこれとRiver制約chunk列のdirectoryをpostcard tupleにする。各entryは先頭・末尾sref、node数、file offset、圧縮長、展開長、圧縮frameのBLAKE3 |
+| River制約chunk列 | version 9のみ。River action nodeのsref順に、f32のlock確率・confidenceと最終λを含むincentiveをpostcard blockとして保存する。固定祖先の基準戦略もここに入り、閲覧時に基準`.sol`は不要 |
+| directory frame | 戦略chunk列、値chunk列のdirectory。version 9ではこれとRiver制約chunk列のdirectoryをpostcard tupleにする。各entryは先頭・末尾sref、node数、file offset、圧縮長、展開長、圧縮frameのBLAKE3 |
 
 | metadata | 意味 |
 |---|---|
@@ -385,7 +389,7 @@ index frameの展開内容は次の列の連結である。
 | pots | action nodeのsref順に、u32 pot（chips） |
 
 木の子配置・sref・storage範囲・chance有無はkinds・children・dealsから構築時と同じ規則で決まる。読込みはnode数と`tree_nodes`、root次元と埋込みconfigのsupport、map・transition・label番号の範囲、未使用dealや余剰bytesを検査し、不整合はartifactが木と一致しないerrorである。
-historyはedge labelのBB表記tokenとdeal cardから組み立てる。iso統合されたdealは代表card、cardの無いall-in runoutは`dealN`で表示する。streetとparentは木から、handとroot rangeは埋込みconfigから再計算する。
+historyはstreet内raise-toを表すedge labelのtokenとdeal cardから組み立てる。iso統合されたdealは代表card、cardの無いall-in runoutは`dealN`で表示する。streetとparentは木から、handとroot rangeは埋込みconfigから再計算する。
 
 chunkの展開内容はblockの連結を、偶数offset byte列・奇数offset byte列の順に並べ替えたもの（u16のbyte shuffle）である。戦略blockはu32 sref、u32 byte長、action nodeごとのactor support次元のu16戦略（action-major）である。
 値blockはu32 sref、f32 scale、u32 byte長、OOP support、IP supportの値（席別次元、block scale付きi16）である。
@@ -400,10 +404,11 @@ chunkは照会したnodeを含むものだけを読み、BLAKE3、展開長、bl
 `.sol`の戦略はsolve storageによらずu16である。値の分解能はblockのピークに対し約1/32767である。
 supportは埋込みconfigから再計算する。開始rangeのweight 0のhandには保存slotが無い。
 support内でもそのnodeで持ち得ないhandの値は0として保存する。戦略と値は同じnode集合を覆う。
-version 1、単一zstd streamのversion 2、木を保存しないversion 3はversion errorで明示的に拒否する。変換は無く、現行configから再solveしてversion 4を作る。
+version 1〜6は通常の読込みではversion errorで明示的に拒否する。version 4〜6は`solvers upgrade <OLD.sol> --out <NEW.sol>`でversion 7〜9へ変換できる。旧形式の累計拠出を表すedge labelを現行のstreet内raise-toへ変換する。元fileは変更せず、既存の出力先は拒否し、出力はatomicに作成する。version 1〜3はupgrade非対応で、現行configから再solveする。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
 共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateと部分木identityを持つversion 8を使う。
+旧checkpointは互換性hashが異なるためresumeできない。`.sol`のupgradeはcheckpointを変換せず、再開したい場合は現行configから再solveする。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。
 

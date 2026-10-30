@@ -570,6 +570,7 @@ fn deterministic<S: Storage>() {
                         &built.game,
                         &built.node_info,
                         nlh::Street::Turn,
+                        nlh::ChipScale::DEFAULT,
                     );
                     let game = built.game;
                     assert!(game.tree.storage_len > 0);

@@ -9,6 +9,8 @@ mod board;
 mod card;
 mod eval;
 mod range;
+mod rounding;
+mod scale;
 mod set;
 mod sizing;
 mod types;
@@ -28,6 +30,8 @@ pub use eval::{HandRank, rank_of};
 pub use range::{
     NUM_CLASSES, NUM_COMBOS, ParseRangeError, Range, class_index, combo_cards, combo_index,
 };
+pub use rounding::{PotSplit, Rounding, split_pot};
+pub use scale::ChipScale;
 pub use set::CardSet;
 pub use sizing::{
     ParseSizeError, SizeContext, SizeSpec, SizeUnit, geometric_allin_target, merge_targets,
@@ -40,6 +44,6 @@ pub mod table;
 pub use betting::{NoStreetPolicy, StreetPolicy, TableSetup};
 pub use settlement::PotRake;
 pub use table::{
-    CHIPS_PER_BB, ChipAmountError, MAX_SEATS, MIN_SEATS, MwChips, SeatError, SeatId, SeatMask,
-    SeatVec, position_name, validate_seat_count,
+    ChipAmountError, MAX_SEATS, MIN_SEATS, MwChips, SeatError, SeatId, SeatMask, SeatVec,
+    position_name, validate_seat_count,
 };

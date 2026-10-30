@@ -1692,7 +1692,7 @@ fn mwsol_paged_import_without_running_solver() {
         abstraction_fingerprint: [2; 32],
         configuration_fingerprint: [3; 32],
         stop_status: "completed".into(),
-        chip_unit_bb: 0.001,
+        bb_chips: 1000,
         sweeps: 0,
         approximate_profile: true,
         seats: Vec::new(),
@@ -1701,8 +1701,8 @@ fn mwsol_paged_import_without_running_solver() {
             history: root.history.0,
             street: 0,
             actor: Some(actor as u8),
-            pot_millibb: 1500,
-            remaining_stacks_millibb: vec![2500, 1000],
+            pot_chips: 1500,
+            remaining_stacks_chips: vec![2500, 1000],
             legal_actions: game
                 .node_actions(&game.root_state())
                 .iter()
@@ -1713,7 +1713,7 @@ fn mwsol_paged_import_without_running_solver() {
                         all_in,
                         full_raise,
                     } => MultiwayPublicAction::RaiseTo {
-                        amount_millibb: to.raw(),
+                        amount_chips: to.raw(),
                         all_in: *all_in,
                         full_raise: *full_raise,
                     },

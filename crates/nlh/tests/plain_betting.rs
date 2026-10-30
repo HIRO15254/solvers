@@ -1,9 +1,12 @@
 //! Plain-NLH hand replay contracts, independent of any product menu.
 use nlh::betting::{Action, BettingState, HandPhase, IllegalMove, Move, SeatStatus};
-use nlh::{MwChips, NoStreetPolicy, SeatId, SeatVec, SizeSpec, Street, TableSetup, position_name};
+use nlh::{
+    ChipScale, MwChips, NoStreetPolicy, Rounding, SeatId, SeatVec, SizeSpec, Street, TableSetup,
+    position_name,
+};
 
 fn chips(bb: f64) -> MwChips {
-    MwChips::try_from_bb(bb).unwrap()
+    ChipScale::DEFAULT.from_bb(bb).unwrap()
 }
 
 fn setup(stacks: &[f64]) -> TableSetup {
@@ -22,6 +25,7 @@ fn setup(stacks: &[f64]) -> TableSetup {
         straddles: Vec::new(),
         nominal_big_blind: chips(1.0),
         preflop_first_to_act: SeatId(((bb + 1) % n) as u8),
+        chip_rounding: Rounding::Nearest,
     }
 }
 

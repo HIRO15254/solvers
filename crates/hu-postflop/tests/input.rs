@@ -58,6 +58,41 @@ fn actions(game: &PostflopGame, history: &str) -> Vec<String> {
 }
 
 #[test]
+fn non_decimal_chip_scale_survives_parsing_tree_and_payoff() {
+    use hu_postflop::game::{TerminalDescriptor, TerminalKind};
+    use nlh::PerPlayer;
+
+    let raw = text(
+        "bb_chips = 3\nsb_chips = 1",
+        "BTN r6c, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d Ac 9s",
+        "river { add bet [10c] }",
+    );
+    let doc = parse(&raw);
+    let c = lower(
+        &doc.spot,
+        &Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(c.pot, Chips(13));
+    assert_eq!(c.min_bet, Chips(3));
+    assert_eq!(actions(&game(&c), ""), ["x", "r10"]);
+    let rows = hu_postflop::views::preview_tree(&raw, Path::new("input.toml"), &[], false).unwrap();
+    assert_eq!(rows[0].pot.as_ref().unwrap().as_f64().unwrap(), 13.0 / 3.0);
+    let shares = PerPlayer::new(c.starting_share(Player::P0), c.starting_share(Player::P1));
+    let terminal = TerminalDescriptor {
+        kind: TerminalKind::Fold { folder: Player::P1 },
+        street: Street::River,
+        pot: c.pot,
+        contrib: shares,
+        stacks_before: shares.map(|s| c.effective_stack + s),
+    };
+    let payoff = hu_postflop::input::NlhPayoff::new(&doc.spot).unwrap();
+    let ev = payoff.pipeline().bake(&terminal).win_p0;
+    assert!((ev[Player::P0] + payoff.ev_offset()[Player::P0] - 13.0 / 3.0).abs() < 1e-10);
+}
+
+#[test]
 fn sections_defaults_order_and_idempotence() {
     let doc = parse(&standard(""));
     let s = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap();

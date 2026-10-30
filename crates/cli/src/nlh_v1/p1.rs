@@ -27,7 +27,7 @@ pub fn validate(
     let mut summary = p.document.summary();
     summary.warnings = warnings(&p);
     let mut value = serde_json::to_value(summary)?;
-    crate::validate::diagnostic_bb(&mut value);
+    crate::validate::diagnostic_bb(&mut value, p.config.scale);
     value["status"] = json!("valid");
     value["schema"] = json!(SCHEMA);
     value["gameKind"] = json!("hu-postflop");
@@ -111,25 +111,34 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
     use std::fmt::Write;
     let spot = &p.document.spot;
     let start = &spot.context;
+    let scale = p.config.scale;
+    let monetary = |amount| {
+        let text = bb(amount, scale);
+        if scale.is_decimal() {
+            format!("{text} BB")
+        } else {
+            text
+        }
+    };
     let mut out = String::new();
     writeln!(out, "street: {:?}", start.street).unwrap();
     writeln!(out, "board: {}", spot.board_text.as_deref().unwrap_or("")).unwrap();
-    writeln!(out, "starting pot: {} BB", bb(start.pot.0)).unwrap();
+    writeln!(out, "starting pot: {}", monetary(start.pot.0)).unwrap();
     for (role, player) in [("OOP", &start.oop), ("IP", &start.ip)] {
         let player = player.as_ref().expect("P1 player");
         let seat = &start.seats[player.seat.index()];
         writeln!(
             out,
-            "{role}: {} remaining stack {} BB",
+            "{role}: {} remaining stack {}",
             player.position,
-            bb(seat.remaining_stack.0)
+            monetary(seat.remaining_stack.0)
         )
         .unwrap();
     }
     writeln!(
         out,
-        "effective stack: {} BB",
-        bb(start.effective_stack.expect("P1 stack").0)
+        "effective stack: {}",
+        monetary(start.effective_stack.expect("P1 stack").0)
     )
     .unwrap();
     let folded: Vec<_> = start
@@ -161,8 +170,8 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
             hu_postflop::BettingAction::Call { .. } => "c".into(),
             hu_postflop::BettingAction::BetTo { all_in: true, .. }
             | hu_postflop::BettingAction::RaiseTo { all_in: true, .. } => "a".into(),
-            hu_postflop::BettingAction::BetTo { to, .. } => format!("b{}", bb(to.0)),
-            hu_postflop::BettingAction::RaiseTo { to, .. } => format!("r{}", bb(to.0)),
+            hu_postflop::BettingAction::BetTo { to, .. } => format!("b{}", bb(to.0, scale)),
+            hu_postflop::BettingAction::RaiseTo { to, .. } => format!("r{}", bb(to.0, scale)),
         };
         write!(
             line,

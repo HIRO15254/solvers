@@ -83,19 +83,19 @@ fn action_fields(
         mw_preflop::mwsol::MultiwayPublicAction::Fold => ("fold", None, false, false),
         mw_preflop::mwsol::MultiwayPublicAction::Check => ("check", None, false, false),
         mw_preflop::mwsol::MultiwayPublicAction::Call {
-            amount_millibb,
+            amount_chips,
             all_in,
-        } => ("call", Some(*amount_millibb), *all_in, false),
+        } => ("call", Some(*amount_chips), *all_in, false),
         mw_preflop::mwsol::MultiwayPublicAction::BetTo {
-            amount_millibb,
+            amount_chips,
             all_in,
             full_raise,
-        } => ("bet-to", Some(*amount_millibb), *all_in, *full_raise),
+        } => ("bet-to", Some(*amount_chips), *all_in, *full_raise),
         mw_preflop::mwsol::MultiwayPublicAction::RaiseTo {
-            amount_millibb,
+            amount_chips,
             all_in,
             full_raise,
-        } => ("raise-to", Some(*amount_millibb), *all_in, *full_raise),
+        } => ("raise-to", Some(*amount_chips), *all_in, *full_raise),
     }
 }
 
@@ -128,6 +128,7 @@ pub fn export(
         (views::ExportView::Summary, ExportFormat::Json) => {
             serde_json::to_string_pretty(&serde_json::json!({
                 "schemaVersion": metadata.schema_version,
+                "bbChips": metadata.bb_chips,
                 "sweeps": metadata.sweeps,
                 "approximateProfile": metadata.approximate_profile,
                 "visitedInfosets": strategies.len(),
@@ -136,6 +137,7 @@ pub fn export(
         }
         (views::ExportView::Tree, ExportFormat::Json) => {
             serde_json::to_string_pretty(&serde_json::json!({
+                "bbChips": metadata.bb_chips,
                 "states": metadata.public_states,
                 "edges": metadata.histories,
             }))?
@@ -157,6 +159,7 @@ pub fn export(
                         "history": key_hex(state.history),
                         "actor": state.actor,
                         "street": state.street,
+                        "bbChips": metadata.bb_chips,
                         "actions": state.legal_actions,
                     })
                 })
@@ -185,13 +188,13 @@ pub fn export(
         }
         (views::ExportView::Actions, ExportFormat::Csv) => {
             let mut csv = String::from(
-                "history,actor,street,action_index,kind,amount_millibb,all_in,full_raise,label\n",
+                "history,actor,street,action_index,kind,amount_chips,bb_chips,all_in,full_raise,label\n",
             );
             for state in &metadata.public_states {
                 for (index, action) in state.legal_actions.iter().enumerate() {
                     let (kind, amount, all_in, full_raise) = action_fields(action);
                     csv.push_str(&format!(
-                        "{},{},{},{},{},{},{},{},{}\n",
+                        "{},{},{},{},{},{},{},{},{},{}\n",
                         key_hex(state.history),
                         state
                             .actor
@@ -200,6 +203,7 @@ pub fn export(
                         index,
                         kind,
                         amount.map_or_else(String::new, |amount| amount.to_string()),
+                        metadata.bb_chips,
                         all_in,
                         full_raise,
                         action.label(),
@@ -224,8 +228,9 @@ pub fn export(
         }
         (views::ExportView::Summary, ExportFormat::Csv) => {
             format!(
-                "schema_version,sweeps,approximate_profile,visited_infosets\n{},{},{},{}\n",
+                "schema_version,bb_chips,sweeps,approximate_profile,visited_infosets\n{},{},{},{},{}\n",
                 metadata.schema_version,
+                metadata.bb_chips,
                 metadata.sweeps,
                 metadata.approximate_profile,
                 strategies.len()

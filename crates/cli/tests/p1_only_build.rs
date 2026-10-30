@@ -136,6 +136,7 @@ fn help_surfaces_only_supported_commands_and_options() {
         &["resume"],
         &["inspect"],
         &["export"],
+        &["upgrade"],
         &["compare"],
         &["report"],
     ];

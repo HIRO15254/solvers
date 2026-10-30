@@ -290,9 +290,9 @@ fn summary(metadata: &SolMetadata, profile: Option<&crate::run::ProfileReport>) 
             .map(nlh::Card::to_string)
             .collect::<Vec<_>>()
             .join(" "),
-        pot: amount(config.pot.0),
-        effective_stack: amount(config.effective_stack.0),
-        min_bet: amount(config.min_bet.0),
+        pot: amount(config.pot.0, config.scale),
+        effective_stack: amount(config.effective_stack.0, config.scale),
+        min_bet: amount(config.min_bet.0, config.scale),
         iterations: meta.iterations,
         ev_oop: meta.ev[0],
         ev_ip: meta.ev[1],
@@ -312,8 +312,14 @@ fn summary(metadata: &SolMetadata, profile: Option<&crate::run::ProfileReport>) 
     })
 }
 
-fn amount(value: u32) -> serde_json::Number {
-    crate::prepare::bb(value as u64).parse().expect("BB number")
+/// BB number for JSON: the exact decimal when one exists (`2`, `2.5`),
+/// otherwise the nearest `f64` (non-decimal tables such as 1/3 BB chips).
+fn amount(value: u32, scale: nlh::ChipScale) -> serde_json::Number {
+    let chips = nlh::MwChips(value as u64);
+    match scale.bb_text(chips) {
+        Some(text) => text.parse().expect("BB number"),
+        None => serde_json::Number::from_f64(scale.to_bb(chips)).expect("finite BB number"),
+    }
 }
 
 // --- tree -------------------------------------------------------------------
@@ -380,7 +386,10 @@ pub fn preview_tree(
             .flat_map(|id| street_action_nodes(view, id))
             .collect();
     }
-    Ok(ids.iter().map(|&id| tree_row(view, id)).collect())
+    Ok(ids
+        .iter()
+        .map(|&id| tree_row(view, id, prepared.config.scale))
+        .collect())
 }
 
 /// `id`, then the action nodes below it before the next chance or terminal node, in preorder.
@@ -407,7 +416,7 @@ fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
     let view = loaded.view();
     ids.iter()
         .map(|&id| {
-            let row = tree_row(view, id);
+            let row = tree_row(view, id, loaded.config.scale);
             TreeRow {
                 history: row.history,
                 kind: row.kind,
@@ -423,7 +432,7 @@ fn tree_rows(loaded: &LoadedSol, ids: &[NodeId]) -> Vec<TreeRow> {
         .collect()
 }
 
-fn tree_row(view: TreeView<'_>, id: NodeId) -> PreviewTreeRow {
+fn tree_row(view: TreeView<'_>, id: NodeId, scale: nlh::ChipScale) -> PreviewTreeRow {
     let node = view.tree.node(id);
     let street = match (node.kind, view.street(id)) {
         (NodeKind::Chance, Street::Flop) => Street::Turn,
@@ -449,7 +458,7 @@ fn tree_row(view: TreeView<'_>, id: NodeId) -> PreviewTreeRow {
         kind: kind_name(node.kind).to_string(),
         street: street_name(street).to_string(),
         actor: (node.kind == NodeKind::Action).then(|| seat_name(node.player).to_string()),
-        pot: (node.kind == NodeKind::Action).then(|| amount(view.pot(id))),
+        pot: (node.kind == NodeKind::Action).then(|| amount(view.pot(id), scale)),
         actions,
         children,
         child_kinds,

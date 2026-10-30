@@ -17,7 +17,10 @@ pub fn run(path: &Path, moves: Option<&str>, format: ValidationFormat) -> Result
     match format {
         ValidationFormat::Json => {
             let mut value = serde_json::to_value(&cursor)?;
-            crate::validate::diagnostic_bb(&mut value["actions"]);
+            crate::validate::diagnostic_bb(
+                &mut value["actions"],
+                spot::ChipScale::new(cursor.bb_chips).expect("validated table scale"),
+            );
             println!("{}", serde_json::to_string_pretty(&value)?);
         }
         ValidationFormat::Human => print_human(&cursor),
@@ -26,6 +29,16 @@ pub fn run(path: &Path, moves: Option<&str>, format: ValidationFormat) -> Result
 }
 
 fn print_human(cursor: &spot::LineCursor) {
+    let scale = spot::ChipScale::new(cursor.bb_chips).expect("validated table scale");
+    // Decimal tables print exact BB; others print exact chips with rounded BB.
+    let amount = |bb: f64| {
+        if scale.is_decimal() {
+            format!("{bb} BB")
+        } else {
+            let chips = (bb * cursor.bb_chips as f64).round();
+            format!("{chips}c ({bb:.2} BB)")
+        }
+    };
     println!(
         "line: {}",
         if cursor.line.is_empty() {
@@ -35,13 +48,17 @@ fn print_human(cursor: &spot::LineCursor) {
         }
     );
     println!("street: {:?}", cursor.street);
-    println!("pot: {} BB", cursor.pot);
+    println!("pot: {}", amount(cursor.pot));
     println!("players: {}", cursor.players);
     println!("button: {:?}", cursor.button);
     for seat in &cursor.seats {
         println!(
-            "  {}: stack={} BB; wager={} BB; committed={} BB; {}",
-            seat.position, seat.stack, seat.wager, seat.committed, seat.status
+            "  {}: stack={}; wager={}; committed={}; {}",
+            seat.position,
+            amount(seat.stack),
+            amount(seat.wager),
+            amount(seat.committed),
+            seat.status
         );
     }
     println!("complete: {}", cursor.complete);
@@ -59,20 +76,22 @@ fn print_human(cursor: &spot::LineCursor) {
     if let Some(next) = &cursor.next {
         println!("next: {} ({:?})", next.position, next.street);
         println!(
-            "  to call: {} BB; stack: {} BB; wager: {} BB",
-            next.to_call, next.stack, next.wager
+            "  to call: {}; stack: {}; wager: {}",
+            amount(next.to_call),
+            amount(next.stack),
+            amount(next.wager)
         );
         println!("options:");
         for option in &next.options {
             print!("  {:?} ({})", option.kind, option.token);
-            if let Some(amount) = option.amount {
-                print!(" {amount} BB");
+            if let Some(value) = option.amount {
+                print!(" {}", amount(value));
             }
             if let Some(min) = option.min {
-                print!(" min={min} BB");
+                print!(" min={}", amount(min));
             }
             if let Some(max) = option.max {
-                print!(" max={max} BB");
+                print!(" max={}", amount(max));
             }
             println!();
         }

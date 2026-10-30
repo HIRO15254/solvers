@@ -81,7 +81,7 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         if line.starts_with('[') && line.ends_with(']') {
             let section = &line[1..line.len() - 1];
             let description = match section {
-                "table" => "Table size, stacks and forced contributions in BB.",
+                "table" => "Table size, chip denomination, stacks and forced contributions.",
                 "economics" => "Cash or tournament utility.",
                 "spot" => "Action line and board select the starting spot.",
                 "ranges" => "Starting ranges keyed by fixed table position.",
@@ -101,6 +101,11 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
             rendered.push_str("# ");
             rendered.push_str(description);
             rendered.push('\n');
+        }
+        if line.starts_with("bb_chips =") {
+            rendered.push_str(
+                "# Chips per BB; computed sizes snap to whole chips using chip_rounding: down | nearest | up.\n# Amounts may use their _chips twin instead of a _bb key; specify only one.\n",
+            );
         }
         if line.starts_with("cfr_precision =") {
             rendered.push_str("# CFR arithmetic: f32 (default) | f64 (legacy bit-identical); evaluation stays f64.\n");
@@ -438,23 +443,34 @@ mod tests {
             "table",
             "players",
             "stack_bb",
+            "stack_chips",
             "stacks_bb",
+            "stacks_chips",
             "sb_bb",
+            "sb_chips",
             "ante_bb",
+            "ante_chips",
             "bb_ante_bb",
+            "bb_ante_chips",
             "straddles_bb",
+            "straddles_chips",
+            "bb_chips",
+            "chip_rounding",
             "economics",
             "cash",
             "tournament",
             "rake",
             "rate",
             "cap_bb",
+            "cap_chips",
             "when",
             "allocation",
             "rounding",
             "rounding_unit_bb",
+            "rounding_unit_chips",
             "payouts",
             "outside_field_bb",
+            "outside_field_chips",
             "seed",
             "spot",
             "ranges",

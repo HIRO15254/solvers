@@ -791,7 +791,7 @@ impl<'a> SolProvider<'a> {
             }
         }
 
-        let internal_history = crate::prepare::internal_history(&history);
+        let internal_history = crate::prepare::internal_history(&history, loaded.config.scale);
         let state = river_entry_state(&loaded.config, &internal_history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
@@ -1422,7 +1422,7 @@ memory='1GiB'
         struct BbUtility;
         impl UtilityModel for BbUtility {
             fn utility(&self, s: &PerPlayer<f64>) -> PerPlayer<f64> {
-                s.map(|v| v / 1000.0)
+                s.map(|v| v / nlh::ChipScale::DEFAULT.chips_per_bb() as f64)
             }
             fn is_zero_sum_affine(&self) -> bool {
                 true
@@ -1562,7 +1562,12 @@ memory = "1GiB"
         let start_street = p.document.spot.context.street;
         let ev_offset = p.payoff.ev_offset();
         let pf_game = build_postflop_game(&p.config, p.payoff.pipeline());
-        let index = GameIndex::from_game(&pf_game.game, &pf_game.node_info, start_street);
+        let index = GameIndex::from_game(
+            &pf_game.game,
+            &pf_game.node_info,
+            start_street,
+            p.config.scale,
+        );
         let mut solver = Solver::<_, S>::new(
             pf_game.game,
             crate::run::schedule(&p.settings.solver.algorithm),

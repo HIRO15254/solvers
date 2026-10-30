@@ -22,6 +22,7 @@
 //! formula shared by every engine that resolves a geometric size against a
 //! concrete chip stack.
 
+use crate::Rounding;
 use serde::{Deserialize, Serialize};
 
 /// A single configured bet/raise size, before it is resolved against a
@@ -213,23 +214,17 @@ impl SizeSpec {
 
     /// Inverse of `parse`; `parse(&spec.render(unit), unit) == Ok(spec)`.
     ///
-    /// `unit` must match `self`'s family for `ToBb`/`ToChips` (debug-checked
-    /// below); the other variants render the same literal regardless of
-    /// `unit`.
+    /// `ToBb` renders only under [`SizeUnit::Bb`] (debug-checked below).
+    /// `ToChips` renders `Nc` in both families: v1 accepts chip literals
+    /// through its own size parser. Other variants render the same literal
+    /// regardless of `unit`.
     pub fn render(self, unit: SizeUnit) -> String {
         match self {
             SizeSpec::ToBb { value } => {
                 debug_assert_eq!(unit, SizeUnit::Bb, "ToBb only renders under SizeUnit::Bb");
                 format!("{value}bb")
             }
-            SizeSpec::ToChips { value } => {
-                debug_assert_eq!(
-                    unit,
-                    SizeUnit::Chips,
-                    "ToChips only renders under SizeUnit::Chips"
-                );
-                format!("{value}c")
-            }
+            SizeSpec::ToChips { value } => format!("{value}c"),
             SizeSpec::PotAfterCall { fraction } => render_percent(fraction),
             SizeSpec::PreviousBetMultiple { factor } => format!("{factor}x"),
             SizeSpec::MinRaise => "min".into(),
@@ -279,15 +274,15 @@ fn render_percent(fraction: f64) -> String {
 }
 
 /// Target wager that reaches `maximum` in `streets` equal geometric raises,
-/// on whatever integral chip grid the caller uses (multiway's 0.001bb grid,
-/// postflop's raw chip grid, ...). `called_to` is the amount already put in
-/// by the acting seat if this raise is called; `pot_after_call` is the pot
-/// size once that call is made.
+/// with the increment snapped to a whole chip by `rounding`. `called_to` is
+/// the amount already put in by the acting seat if this raise is called;
+/// `pot_after_call` is the pot size once that call is made.
 pub fn geometric_allin_target(
     called_to: u64,
     pot_after_call: u64,
     maximum: u64,
     streets: u8,
+    rounding: Rounding,
 ) -> u64 {
     let remaining = maximum.saturating_sub(called_to);
     if remaining == 0 || pot_after_call == 0 {
@@ -296,32 +291,9 @@ pub fn geometric_allin_target(
     let steps = f64::from(streets.max(1));
     let growth = 1.0 + 2.0 * remaining as f64 / pot_after_call as f64;
     let fraction = (growth.powf(1.0 / steps) - 1.0) / 2.0;
-    let scaled = (pot_after_call as f64 * fraction).round();
     called_to
-        .checked_add(scaled.clamp(0.0, u64::MAX as f64) as u64)
+        .checked_add(rounding.snap(pot_after_call as f64 * fraction))
         .expect("geometric all-in target overflow")
-}
-
-/// Round a scaled chip amount on P1's `u32` grid before bounding it.
-fn scale_u32(amount: u32, factor: f64) -> u32 {
-    (f64::from(amount) * factor)
-        .round()
-        .clamp(0.0, u32::MAX as f64) as u32
-}
-
-/// Round a scaled chip amount on P2's `u64` grid before bounding it.
-fn scale_u64(amount: u64, factor: f64) -> u64 {
-    (amount as f64 * factor).round().clamp(0.0, u64::MAX as f64) as u64
-}
-
-/// Round a scaled chip amount on the grid `limit` names: P1's `u32` grid
-/// (`limit == u32::MAX`) or P2's `u64` grid.
-fn scale_on(limit: u64, amount: u64, factor: f64) -> u64 {
-    if limit == u32::MAX as u64 {
-        u64::from(scale_u32(amount as u32, factor))
-    } else {
-        scale_u64(amount, factor)
-    }
 }
 
 /// The `merge` effect's rule on a candidate target list: walking from the
@@ -342,10 +314,12 @@ pub fn merge_targets(targets: &mut Vec<u64>, width: u64) {
 
 /// Unit-free inputs for resolving one size to a legal street-relative target.
 ///
+/// Amounts are table chips; `big_blind` is the table's chips per BB.
 /// Engines supply their own effective-stack and minimum-full-raise policy.
-/// Resolution retains each product's chip-grid bounds: P1 saturates pot-size
-/// addition on `u32`; P2 checks addition on `u64`. Both round the increment
-/// before adding the called wager, then bump the minimum and clamp the stack.
+/// Resolution retains each product's bounds: P1 saturates pot-size addition
+/// on `u32`; P2 checks addition on `u64`. Both snap the increment to a whole
+/// chip with `rounding` before adding the called wager, then bump the minimum
+/// and clamp the stack.
 #[derive(Clone, Copy, Debug)]
 pub struct SizeContext {
     pub big_blind: u64,
@@ -356,44 +330,44 @@ pub struct SizeContext {
     pub maximum: u64,
     pub effective_stack: u64,
     pub streets_remaining: u8,
+    pub rounding: Rounding,
 }
-
 impl SizeContext {
-    /// Resolve on P1's raw chip grid, including chip and BB literals.
+    /// Resolve within P1's `u32` chip range.
     pub fn resolve_u32(self, size: SizeSpec) -> u32 {
         self.bound(self.propose(size, u32::MAX as u64)) as u32
     }
 
-    /// Resolve on P2's milli-BB grid; chip literals are not valid in P2.
+    /// Resolve within P2's `u64` chip range.
     pub fn resolve_u64(self, size: SizeSpec) -> u64 {
         self.bound(self.propose(size, u64::MAX))
     }
 
-    /// A `jam` threshold on P1's raw chip grid: the literal's street target,
+    /// A `jam` threshold within P1's `u32` range: the literal's street target,
     /// neither bumped to the minimum nor capped at the stack.
     pub fn threshold_u32(self, size: SizeSpec) -> u32 {
         self.propose(size, u32::MAX as u64) as u32
     }
 
-    /// A `jam` threshold on P2's milli-BB grid; see [`Self::threshold_u32`].
+    /// A `jam` threshold within P2's `u64` range; see [`Self::threshold_u32`].
     pub fn threshold_u64(self, size: SizeSpec) -> u64 {
         self.propose(size, u64::MAX)
     }
 
-    /// A `merge` width on P1's raw chip grid: the literal read as an amount
+    /// A `merge` width within P1's `u32` range: the literal read as an amount
     /// rather than a target. Panics unless [`SizeSpec::is_merge_width`].
     pub fn merge_width_u32(self, size: SizeSpec) -> u32 {
         self.width(size, u32::MAX as u64) as u32
     }
 
-    /// A `merge` width on P2's milli-BB grid; see [`Self::merge_width_u32`].
+    /// A `merge` width within P2's `u64` range; see [`Self::merge_width_u32`].
     pub fn merge_width_u64(self, size: SizeSpec) -> u64 {
         self.width(size, u64::MAX)
     }
 
     fn width(self, size: SizeSpec, limit: u64) -> u64 {
         match size {
-            SizeSpec::PotAfterCall { fraction } => scale_on(limit, self.pot_after_call, fraction),
+            SizeSpec::PotAfterCall { fraction } => self.scale(limit, self.pot_after_call, fraction),
             SizeSpec::ToBb { .. }
             | SizeSpec::ToChips { .. }
             | SizeSpec::StackFraction { .. }
@@ -410,14 +384,17 @@ impl SizeContext {
         }
     }
 
+    /// Snap a scaled chip amount to a whole chip, capped at `limit`: P1's
+    /// `u32` range (`limit == u32::MAX`) or P2's `u64` range.
+    fn scale(self, limit: u64, amount: u64, factor: f64) -> u64 {
+        self.rounding.snap(amount as f64 * factor).min(limit)
+    }
+
     fn propose(self, size: SizeSpec, limit: u64) -> u64 {
-        let scale = |amount: u64, factor| scale_on(limit, amount, factor);
+        let scale = |amount: u64, factor| self.scale(limit, amount, factor);
         match size {
             SizeSpec::ToBb { value } => scale(self.big_blind, value),
-            SizeSpec::ToChips { value } => {
-                assert_eq!(limit, u32::MAX as u64, "chip literals are P1-only");
-                value.round().clamp(0.0, u32::MAX as f64) as u64
-            }
+            SizeSpec::ToChips { value } => self.rounding.snap(value).min(limit),
             SizeSpec::PotAfterCall { fraction } => {
                 let increment = scale(self.pot_after_call, fraction);
                 if limit == u32::MAX as u64 {
@@ -443,6 +420,7 @@ impl SizeContext {
                     self.pot_after_call,
                     self.maximum,
                     streets,
+                    self.rounding,
                 );
                 if limit == u32::MAX as u64 {
                     u64::from(target as u32)
@@ -460,12 +438,71 @@ mod tests {
 
     #[test]
     fn scaling_preserves_grid_bounds_and_rounding() {
-        assert_eq!(scale_u32(3, 0.5), 2);
-        assert_eq!(scale_u64(3, 0.5), 2);
-        assert_eq!(scale_u32(u32::MAX, 2.0), u32::MAX);
-        assert_eq!(scale_u64(u64::MAX, 2.0), u64::MAX);
-        assert_eq!(scale_u32(3, -1.0), 0);
-        assert_eq!(scale_u64(3, -1.0), 0);
+        let context = |limit_maximum| SizeContext {
+            big_blind: 1,
+            called_to: 0,
+            pot_after_call: 3,
+            previous_bet: 1,
+            minimum: 0,
+            maximum: limit_maximum,
+            effective_stack: 3,
+            streets_remaining: 1,
+            rounding: Rounding::Nearest,
+        };
+        let half = SizeSpec::StackFraction { fraction: 0.5 };
+        assert_eq!(context(3).resolve_u32(half), 2);
+        assert_eq!(context(3).resolve_u64(half), 2);
+        let double = SizeSpec::StackFraction { fraction: 2.0 };
+        assert_eq!(context(u32::MAX as u64).threshold_u32(double), u32::MAX);
+        assert_eq!(context(u64::MAX).threshold_u64(double), u64::MAX);
+    }
+
+    #[test]
+    fn coarse_chips_snap_each_literal_with_its_mode() {
+        // Ten chips per BB; pot after call 3.3 BB, facing nothing, 50 BB behind.
+        let context = |rounding| SizeContext {
+            big_blind: 10,
+            called_to: 0,
+            pot_after_call: 33,
+            previous_bet: 0,
+            minimum: 10,
+            maximum: 500,
+            effective_stack: 500,
+            streets_remaining: 3,
+            rounding,
+        };
+        let third = SizeSpec::PotAfterCall { fraction: 0.33 };
+        let geometric = SizeSpec::GeometricAllInRemaining;
+        let stack = SizeSpec::StackFraction { fraction: 0.333 };
+        let chips = SizeSpec::ToChips { value: 7.0 };
+        let bb = SizeSpec::ToBb { value: 2.5 };
+        for (rounding, expected) in [
+            (Rounding::Down, [10, 10, 35, 166, 10, 25]),
+            (Rounding::Nearest, [11, 11, 36, 167, 10, 25]),
+            (Rounding::Up, [11, 11, 36, 167, 10, 25]),
+        ] {
+            let context = context(rounding);
+            assert_eq!(
+                [
+                    context.resolve_u64(third),
+                    context.threshold_u64(third),
+                    context.resolve_u64(geometric),
+                    context.resolve_u64(stack),
+                    context.resolve_u64(chips),
+                    context.resolve_u64(bb),
+                ],
+                expected,
+                "{rounding:?}"
+            );
+        }
+        // An exact chip stays put whatever the mode.
+        let exact = SizeSpec::PotAfterCall { fraction: 0.29 };
+        let context = SizeContext {
+            pot_after_call: 100,
+            ..context(Rounding::Down)
+        };
+        assert_eq!(context.resolve_u64(exact), 29);
+        assert_eq!(context.threshold_u64(chips), 7);
     }
 
     #[test]
@@ -493,6 +530,7 @@ mod tests {
             maximum: 10,
             effective_stack: 6,
             streets_remaining: 1,
+            rounding: Rounding::Nearest,
         };
         let pot = SizeSpec::PotAfterCall { fraction: 0.5 };
         assert_eq!(context.resolve_u32(pot), 3);
@@ -531,6 +569,7 @@ mod tests {
             maximum: u64::MAX,
             effective_stack: u64::MAX,
             streets_remaining: 1,
+            rounding: Rounding::Nearest,
         }
         .resolve_u64(SizeSpec::PotAfterCall { fraction: 1.0 });
     }
@@ -716,10 +755,11 @@ mod tests {
     #[test]
     fn geometric_all_in_matches_hand_computed_target() {
         // Doubling the pot exactly once should land on the maximum.
-        let target = geometric_allin_target(1_000, 2_000, 5_000, 1);
+        let grid = Rounding::Nearest;
+        let target = geometric_allin_target(1_000, 2_000, 5_000, 1, grid);
         assert_eq!(target, 5_000);
         // Zero remaining or zero pot short-circuits to `maximum`.
-        assert_eq!(geometric_allin_target(5_000, 2_000, 5_000, 3), 5_000);
-        assert_eq!(geometric_allin_target(1_000, 0, 5_000, 3), 5_000);
+        assert_eq!(geometric_allin_target(5_000, 2_000, 5_000, 3, grid), 5_000);
+        assert_eq!(geometric_allin_target(1_000, 0, 5_000, 3, grid), 5_000);
     }
 }

@@ -262,6 +262,8 @@ fn clairvoyance_config() -> PostflopConfig {
             river: hu_postflop::test_support::pot_fractions(&[1.0], &[], 1),
         },
         min_bet: Chips(1),
+        chip_rounding: nlh::Rounding::Nearest,
+        scale: nlh::ChipScale::DEFAULT,
         iso_merging: false,
         track_node_info: true,
         preflop_aggressor: None,

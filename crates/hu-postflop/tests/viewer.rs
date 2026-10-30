@@ -201,13 +201,13 @@ fn river_entry_state_accumulates_contribution_across_two_streets() {
     //
     // Turn: pot_now = 2+1+1=4, pot_after_call = 4+0=4,
     // raw = round(0.5*4) = 2, extra = min(max(2,1), (20-1)-0=19) = 2,
-    // additional = 0+2 = 2 => contrib[P0] = 1+2 = 3, token "r3".
+    // additional = 0+2 = 2 => contrib[P0] = 1+2 = 3, token "r2".
     // P1 calls: contrib[P1] = 3, token "c". Chance deals river card "9d"
     // (board becomes 2s 7s Ks 2c 9d).
     //
     // c = 3 chips, accumulated across both streets' bets (1 then +2), so
     // pot' = trunk.pot(2) + 2*3 = 8, eff' = trunk.stack(20) - 3 = 17.
-    let state = river_entry_state(&config, "r1c[2c]r3c[9d]")
+    let state = river_entry_state(&config, "r1c[2c]r2c[9d]")
         .expect("valid two-street bet-call-deal history");
     assert_eq!(state.board, parse_board5("2s 7s Ks 2c 9d"));
     assert_eq!(state.pot, Chips(8));

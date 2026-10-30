@@ -22,17 +22,23 @@ export interface ActionInfo {
 /** Where an action leads. */
 export type Outcome = "decision" | "deal" | "showdown" | "fold";
 
-const TOKEN = /x|c|f|r(\d+(?:\.\d+)?)|\[[^\]]*\]/g;
-/** Amounts sit on a 0.001 BB grid. */
-const EPSILON = 0.0005;
+const TOKEN = /x|c|f|[br](\d+(?:\.\d+)?c?)|\[[^\]]*\]/g;
+const DECIMAL_TOKEN = /x|c|f|[br](\d+(?:\.\d+)?)|\[[^\]]*\]/g;
+
+function amount(text: string, bbChips: number): number {
+  return text.endsWith("c") ? Number(text.slice(0, -1)) / bbChips : Number(text);
+}
 
 /** Street wagers and chips put in on earlier streets at the node a history reaches; the tree starts a street. */
-export function wagersAt(history: string): { wager: Record<Seat, number>; earlier: Record<Seat, number> } {
+export function wagersAt(history: string, bbChips: number): { wager: Record<Seat, number>; earlier: Record<Seat, number> } {
   const wager = { oop: 0, ip: 0 };
   const earlier = { oop: 0, ip: 0 };
   let actor: Seat = "oop";
   const other = (seat: Seat): Seat => (seat === "oop" ? "ip" : "oop");
-  for (const [token, to] of history.matchAll(TOKEN)) {
+  let denominator = bbChips;
+  while (denominator % 2 === 0) denominator /= 2;
+  while (denominator % 5 === 0) denominator /= 5;
+  for (const [token, to] of history.matchAll(denominator === 1 ? DECIMAL_TOKEN : TOKEN)) {
     if (token.startsWith("[")) {
       earlier.oop += wager.oop;
       earlier.ip += wager.ip;
@@ -42,7 +48,7 @@ export function wagersAt(history: string): { wager: Record<Seat, number>; earlie
       continue;
     }
     if (token === "c") wager[actor] = Math.max(wager.oop, wager.ip);
-    else if (to !== undefined) wager[actor] = Number(to);
+    else if (to !== undefined) wager[actor] = amount(to, bbChips);
     actor = other(actor);
   }
   return { wager, earlier };
@@ -57,17 +63,18 @@ export function rootStacks(start: StartState | null | undefined): Record<Seat, n
 }
 
 /** The action at `index` of an action row, sized against the node's pot and wagers. */
-export function describeAction(row: PreviewTreeRow, index: number, stacks: Record<Seat, number> | null): ActionInfo {
+export function describeAction(row: PreviewTreeRow, index: number, stacks: Record<Seat, number> | null, bbChips: number): ActionInfo {
   const label = row.actions[index] ?? "";
   const actor = row.actor ?? "oop";
-  const { wager, earlier } = wagersAt(row.history);
+  const { wager, earlier } = wagersAt(row.history, bbChips);
   const faced = Math.max(wager.oop, wager.ip);
   const own = wager[actor];
   const behind = stacks ? stacks[actor] - earlier[actor] : null;
-  const allInAt = (to: number) => behind !== null && Math.abs(to - behind) < EPSILON;
-  const wagered = /^(bet|raise to) (\d+(?:\.\d+)?)$/.exec(label);
+  const chips = (value: number) => Math.round(value * bbChips);
+  const allInAt = (to: number) => behind !== null && chips(to) === chips(behind);
+  const wagered = /^(bet|raise to) (\d+(?:\.\d+)?c?)$/.exec(label);
   if (wagered) {
-    const to = Number(wagered[2]);
+    const to = amount(wagered[2]!, bbChips);
     const pot = (row.pot ?? 0) + faced - own;
     return {
       kind: wagered[1] === "bet" ? "bet" : "raise",
@@ -78,7 +85,7 @@ export function describeAction(row: PreviewTreeRow, index: number, stacks: Recor
     };
   }
   if (label === "call") {
-    const allIn = behind !== null && faced >= behind - EPSILON;
+    const allIn = behind !== null && chips(faced) >= chips(behind);
     return { kind: "call", amount: faced - own, potPercent: null, times: null, allIn };
   }
   return { kind: label === "fold" ? "fold" : "check", amount: null, potPercent: null, times: null, allIn: false };

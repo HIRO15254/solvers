@@ -38,7 +38,7 @@ fn read_mwsol_full(path: &std::path::Path) -> mw_preflop::mwsol::MultiwaySolutio
         abstraction_fingerprint: metadata.abstraction_fingerprint,
         configuration_fingerprint: metadata.configuration_fingerprint,
         stop_status: metadata.stop_status,
-        chip_unit_bb: metadata.chip_unit_bb,
+        bb_chips: metadata.bb_chips,
         sweeps: metadata.sweeps,
         approximate_profile: metadata.approximate_profile,
         seats: metadata.seats,

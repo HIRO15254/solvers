@@ -9,7 +9,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{MwChips, SeatId, SeatMask, SeatVec, SizeSpec, Street};
+use crate::{ChipScale, MwChips, Rounding, SeatId, SeatMask, SeatVec, SizeSpec, Street};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -202,6 +202,16 @@ pub struct BettingState {
     /// any re-raise. Big-blind defense is deliberately outside this cap.
     #[serde(default)]
     pub preflop_open_cold_calls: u8,
+    /// How size literals snap to whole chips.
+    #[serde(default, skip_serializing_if = "Rounding::is_nearest")]
+    pub chip_rounding: Rounding,
+}
+
+impl BettingState {
+    /// Chips per big blind of this table.
+    pub fn scale(&self) -> ChipScale {
+        ChipScale::new(self.big_blind.raw()).expect("validated table big blind")
+    }
 }
 
 /// Forced contributions and starting stacks for a fixed NLH table.
@@ -218,8 +228,18 @@ pub struct TableSetup {
     /// after blinds. The caller validates seats, amounts and posting order,
     /// and selects the first actor after the last straddler.
     pub straddles: Vec<(SeatId, MwChips)>,
+    /// One big blind in chips (the table's [`ChipScale`]).
     pub nominal_big_blind: MwChips,
     pub preflop_first_to_act: SeatId,
+    /// How size literals snap to whole chips.
+    pub chip_rounding: Rounding,
+}
+
+impl TableSetup {
+    /// Chips per big blind of this table.
+    pub fn scale(&self) -> ChipScale {
+        ChipScale::new(self.nominal_big_blind.raw()).expect("validated table big blind")
+    }
 }
 
 /// Product policy gates for otherwise shared NLH street transitions.
@@ -327,6 +347,7 @@ impl BettingState {
             previous_street_aggressor: None,
             preflop_participants: SeatMask::EMPTY,
             preflop_open_cold_calls: 0,
+            chip_rounding: config.chip_rounding,
         };
         state.pending = state.active_mask();
         let before_first = config
@@ -536,6 +557,7 @@ impl BettingState {
             maximum: maximum.raw(),
             effective_stack: effective.raw(),
             streets_remaining: streets_remaining(self.street),
+            rounding: self.chip_rounding,
         }
     }
 
@@ -845,19 +867,22 @@ mod tests {
             starting_stacks: SeatVec::try_new(
                 stacks
                     .iter()
-                    .map(|&bb| MwChips::try_from_bb(bb).unwrap())
+                    .map(|&bb| ChipScale::DEFAULT.from_bb(bb).unwrap())
                     .collect(),
             )
             .unwrap(),
             forced_antes: SeatVec::try_new(vec![MwChips::ZERO; num_seats]).unwrap(),
             common_ante: match ante {
                 AnteConfig::None => MwChips::ZERO,
-                AnteConfig::BigBlind { amount_bb } => MwChips::try_from_bb(amount_bb).unwrap(),
+                AnteConfig::BigBlind { amount_bb } => {
+                    ChipScale::DEFAULT.from_bb(amount_bb).unwrap()
+                }
             },
             forced_blinds: SeatVec::try_new(forced_blinds).unwrap(),
             straddles: Vec::new(),
             nominal_big_blind: MwChips(1000),
             preflop_first_to_act: big_blind.next(num_seats),
+            chip_rounding: Rounding::Nearest,
         };
         (
             BettingState::new(&setup, &NoStreetPolicy).unwrap(),
@@ -868,7 +893,8 @@ mod tests {
     fn raise_to(state: &BettingState, to: MwChips) -> Action {
         let actor = state.actor().unwrap();
         assert!(state.can_raise(actor));
-        let target = state.resolve_size(actor, &SizeSpec::ToBb { value: to.as_bb() });
+        let value = state.scale().to_bb(to);
+        let target = state.resolve_size(actor, &SizeSpec::ToBb { value });
         assert_eq!(target, to);
         state.action_for_target(actor, target).unwrap()
     }
