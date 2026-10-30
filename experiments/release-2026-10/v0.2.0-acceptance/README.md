@@ -17,8 +17,9 @@
 | release workflow（手動実行、Releaseは作らない） | [40988597745](https://github.com/HIRO15254/solvers/actions/runs/40988597745) | `a2c9e7e2` | version、notices、web、6 buildがすべてsuccess |
 | tag `v0.2.0`のrelease workflow（付け直したtag） | [40990237326](https://github.com/HIRO15254/solvers/actions/runs/40990237326) | `0ac236c4` | 全jobがsuccessで、draft Releaseができた。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。6 buildのsmokeで`--version`は`solvers 0.2.0 (0ac236c4), heads-up postflop only`だった。6 archiveの同梱`ui/`はGUI修正を含む |
 
-`ff5206e7`より後のRustのコードは変わっていない。`a2c9e7e2`はweb（GUI）だけを変えた。
+`ff5206e7`より後のRustのコードは`0ac236c4`まで変わっていない。`a2c9e7e2`はweb（GUI）だけを変えた。
 受入40904820045はRustの製品コードを、下のGUI再確認は`a2c9e7e2`のbuildを対象にしている。
+その後mainに入った`7cbc129c`はRustとGUIを大きく変えたため、末尾の節で受入をやり直した。
 
 ## 除外した試験
 
@@ -66,3 +67,43 @@ release workflow `40988597745`のLinux x86-64-v3 archiveを、同じ種類のAWS
 
 TOML editor（Setup → Tree → Script）で`pair`を補完すると、`paired`の候補に「bool · board, heads-up postflop only」が表示された。
 webの単体試験は63件passed。追加した3件は、修正前のコードで失敗することを確かめた。
+
+## `7cbc129c`の取り込みと再受入
+
+draft作成後、mainに`7cbc129c`（chip額面`table.bb_chips`・`table.chip_rounding`、`_chips` key、
+P1履歴のstreet内raise-to表記、`.sol` 7〜9、`solvers upgrade`）が直接入った。v0.2.0はこれを含めて作り直した。
+2つのreviewで見つけた点と扱いは次のとおり。修正は`6d95d59b`（PR #11）。
+
+| 見つけた点 | 扱い |
+|---|---|
+| CHANGELOGが旧形式（`.sol` 4〜6、0.001 BB grid）のままで、chip・履歴・形式の変更が無い | 互換節、Added（chip額面）、Changed（履歴表記・`.sol`形式・checkpoint・引分けのchip分配・Preflopの`.mwsol` 5）を書いた |
+| `solvers upgrade`はv0.1.0の`.sol`を変換できない（削除済みkeyを埋め込むため`NLH002`）。profile付きの5・6は古い履歴を残す | 利用者決定RV4で`upgrade`を削除した。`.sol` 1〜6は再solveを案内するerrorになる |
+| 同じ行動を`r2.5`と`r2500c`の2通りに書け、実効configとhashが変わる | 利用者決定RV5: 両表記と混在を認め、実効configで卓の正規表記へ書き換える。node selectorも両表記で同じnodeを選ぶ |
+| 整数でない`bb_chips`の大会設定で`solvers validate`（人向け表示）がpanicする | 修正し、`bb_chips = 3`の大会の試験を加えた |
+| `cap_chips`で書いたrake capが`cap=none`と表示される。header `amounts=BB` | chip表記を表示するよう直した |
+| 旧checkpointのresumeがhash不一致の理由を示さない | 旧buildのcheckpointは再solveが必要と案内する |
+| 空の`stacks_bb`と`stacks_chips`の同時指定が排他にならない、GUIのRuns表示が`stack_chips`を読まない、help・文書・コメントの旧表記 | すべて直した |
+
+検査は次のとおり。
+
+| 検査 | run | commit | 結果 |
+|---|---|---|---|
+| 通常CI（push） | [41017662632](https://github.com/HIRO15254/solvers/actions/runs/41017662632) | `7cbc129c` | success |
+| 受入 | [41018237853](https://github.com/HIRO15254/solvers/actions/runs/41018237853) | `7cbc129c` | success。除外1件 |
+| release workflow（手動実行、Releaseは作らない） | [41018259997](https://github.com/HIRO15254/solvers/actions/runs/41018259997) | `7cbc129c` | success |
+| 開発機（AWS m6i.4xlarge）の`cargo fmt --check`・clippy（既定とP1専用）・`cargo test --workspace`・P1専用`cli`の試験・web build・web試験 | — | `6d95d59b`の作業tree | すべてpass。workspace 1147 passed・39 ignored、P1専用`cli` 123 passed、web 65 passed |
+| 通常CI（PR #11） | [41023991515](https://github.com/HIRO15254/solvers/actions/runs/41023991515) | `6d95d59b` | success |
+| 受入 | [41023989717](https://github.com/HIRO15254/solvers/actions/runs/41023989717) | `6d95d59b` | 1185 passed、0 failed、除外1件 |
+| release workflow（手動実行、Releaseは作らない） | [41023993226](https://github.com/HIRO15254/solvers/actions/runs/41023993226) | `6d95d59b` | version、notices、web、6 buildがすべてsuccess |
+
+GUIは、release workflow `41023993226`のLinux x86-64-v3 archiveを新しいAWS Spot（m6i.4xlarge）で展開して再受入した。
+`solvers --version`は`solvers 0.2.0 (6d95d59b), heads-up postflop only`、`solvers upgrade`は`unrecognized subcommand`だった。
+
+| 操作 | 確認した結果 |
+|---|---|
+| chip額面の卓（`bb_chips = 3`、`sb_chips = 1`、`stack_chips = 60`） | lineを`BTN r2, … BTN b9c, …`と書いた。`solvers validate`とGUIのreplayは`BTN r6c, … BTN b9c, …`と正規表記で示し、`r6c`と書いたconfigと`validate --format json`の出力がbyte単位で一致した。Setupに「Chips per BB」と「Chip rounding」が表示された。solve後、Runsの経済条件は`60c · No rake`、Resultsのactionは`bet 15c` |
+| chip卓のLock & re-solve（上流固定） | BTNのcall/foldにlock（fold 0.8）を置き、「Freeze upstream to this solution」で再solveした。node欄は`r15c`、Resultsは「lock: r15c · 1 nodes · 42 hands」「Frozen nodes: 1 · root」「Upstream frozen to run …」 |
+| validate → solve → 結果閲覧・profile | 以前と同じRiver開始のspot（lock・incentive・頻度目標）で、検証valid（9 node、48.51 MiB）、頻度目標50.0%に対し達成49.9% |
+| Setupでの上流固定 | 上のrunを基準に選ぶと見積りが52.90 MiBになり、Resultsに「Upstream frozen to run …-2 · SHA-256 2debde811c83…」が出た |
+| `no-rivers`のRiver再solveと履歴表記 | Turnで BB check・BTN bet 1・BB call の後、River Ahを選ぶと「River re-solved on demand」と戦略が出た。RiverのBB betは`bet 1`、node欄は`xr1c[Ah]r1`で、street内のraise-to額になった |
+| 進捗とcancel | 1,164,212 nodeのflop spotを2本投入し、待機中の2本目をcancelすると`canceled`になった。実行中の1本目はcancel後にcheckpoint（iteration 100）を書いて`canceled`になった。Resumeすると続きから再開し、iteration 150まで進んだ |
