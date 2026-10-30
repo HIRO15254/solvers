@@ -140,7 +140,7 @@ checkpointだけの中断で予定外の品質評価を行わず、sample IDとm
 
 run directoryは共通5 fileと`run.lock`に`checkpoint.mwckpt`・`solution.mwsol`を加える。`run.lock`はartifactではなく、solve/resumeが更新前に排他取得してprocess終了まで保持する。使用中directoryへのin-place resumeはdirectoryとmanifest pidを示してexit 1で拒否し、fileを変更しない。`--out`は出力先だけをlockし実行中sourceも書き換えずforkできる。crash後の残存file自体は再開を妨げない。
 events/progressのreaderは改行の無い不完全な最終行だけを無視し、status/watchのoffsetは完全record境界を使う。再開writerはその不完全なsuffixだけを切り捨て、完全な行とsequenceを保持して追記する。
-run.tomlと成果物metadataには実効configを保存する。額のkeyとlineの額は正確な`Nc`、tree script本文はそのまま保持し、再正規化しても同じbytesとなり丸めのwarningは出ない。checkpointは再開用state、solutionは閲覧用profileである。
+run.tomlと成果物metadataには実効configを保存する。額のkeyとlineの額は正確な`Nc`、tree script本文はそのまま保持し、再正規化しても同じbytesとなる。keyとlineの額の丸めwarningは再読込で出ないが、丸めで変わるscriptのBB sizeは再読込でも警告する。checkpointは再開用state、solutionは閲覧用profileである。
 container versionとsolver state versionを区別する。現行はcheckpoint container 7、solver state 4である。
 solver state 3以前を補正済み更新へ混ぜてresumeしない。
 checkpointはregret・平均累積、sweep/sample進捗、config/game/abstractionのidentity、評価sequenceと累積run情報を持つ。

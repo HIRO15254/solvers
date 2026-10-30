@@ -306,7 +306,7 @@ P2のabstraction identityは`crates/mw-preflop/tests/fixtures/tree_abstractions.
 
 `spot::Document`が共通Inputをparse・正規化する。製品の`input`が自分のsettingsを解釈する。
 `run.toml`は実行したeffective configであり、config hashがartifactと計算identityを結ぶ。
-額のkeyとlineの額は全卓で`Nc`に正規化し、tree scriptは本文を保持する。実効configの再正規化は同じbytesとなり、額の丸めwarningは生じない。人向けhistory・action labelは卓の尺度に応じた表示表記を使う（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
+額のkeyとlineの額は全卓で`Nc`に正規化し、tree scriptは本文を保持する。実効configの再正規化は同じbytesとなり、keyとlineの額の丸めwarningは生じない（丸めで変わるscriptのBB sizeは再読込でも警告する）。人向けhistory・action labelは卓の尺度に応じた表示表記を使う（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 HU resumeはhistorical/embedded configとcheckpointの互換hashを検証する。
 operational overrideは互換identityから分ける。P2はsessionのgame/abstraction/algorithm identityも検査する。
 

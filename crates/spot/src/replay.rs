@@ -64,7 +64,7 @@ fn line_amount(
         )
     };
     let canonical = canonical.trim_end_matches('.');
-    if number != canonical && !(number == "0" && canonical.is_empty()) {
+    if number != canonical && !number.bytes().all(|b| matches!(b, b'0' | b'.')) {
         return Err(line_error(format!(
             "use {prefix}{canonical}, the shortest decimal BB spelling"
         )));

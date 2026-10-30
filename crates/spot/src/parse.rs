@@ -713,6 +713,11 @@ fn preserve_amount_value(value: &mut Value, source: &toml_edit::Value, path: &st
         };
         if let Some(spelling) = spelling {
             *value = Value::String(format!("\0{spelling}"));
+        } else if matches!(source, toml_edit::Value::String(v) if v.value().starts_with('\0')) {
+            // Escape user strings so they cannot impersonate preserved numeric spellings.
+            if let Value::String(s) = value {
+                s.insert(0, '\0');
+            }
         }
     }
 }
@@ -1242,10 +1247,8 @@ fn round_tree_bb(
             let bare_size = in_sizes
                 || before.ends_with("within")
                 || ((before.ends_with('>') || before.ends_with(">="))
-                    && before
-                        .rsplit(['\n', '{', '}'])
-                        .next()
-                        .is_some_and(|s| s.split_whitespace().any(|w| w == "jam")));
+                    && previous_word == "jam"
+                    && matches!(last_word, "bet" | "raise"));
             let param = params.iter().find(|param| param.name == word);
             previous_word = last_word;
             last_word = word;

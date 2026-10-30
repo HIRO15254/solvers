@@ -155,7 +155,7 @@ solvers validate <CONFIG> [--format human|json] [--show-effective]
 human表示は製品、開始状態、lineの行動、treeのparam・展開済みrule、警告を示す。
 BB指定値が丸めで変わった場合は、key、lineのaction、script位置または既定SBの位置、指定BB値、結果のchip数と丸め方式を警告に表示する。
 実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列とし、既定値を明示する。stackが異なる場合は全positionを`[table.stacks]`に書く。tree script本文はそのまま保持する。
-`--show-effective`・`--write-effective`、`run.toml`、`--print-config`、solutionとcheckpointに埋め込むconfigはこの形式である。再正規化は同じbytesになり、丸め警告を繰り返さない。
+`--show-effective`・`--write-effective`、`run.toml`、`--print-config`、solutionとcheckpointに埋め込むconfigはこの形式である。再正規化は同じbytesになり、keyとlineの額の丸め警告を繰り返さない（tree scriptは書いたまま残すため、丸めで変わるscriptのBB sizeは再読込でも警告する）。
 人が見る額（validate、node history、action label、tree、export、inspect、GUI）は、`bb_chips`の素因数が2と5だけなら最短の接尾辞なしBB10進数、それ以外なら`Nc`で表示する。P1のline表示の`*`は暗黙foldである。utilityはcashでBB、ICMで賞金単位である。
 P1のprofile指定時は実際の木へselectorを解決し、humanでは一致node・hand数と各selectorの内訳、
 JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。

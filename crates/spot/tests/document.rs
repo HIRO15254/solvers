@@ -1340,3 +1340,46 @@ fn tree_diagnostics_display_absolute_sizes_in_table_units() {
         assert_eq!(json["tree"]["rules"], serde_json::json!(expected));
     }
 }
+
+#[test]
+fn jam_threshold_does_not_capture_later_condition_numbers() {
+    let text = format!(
+        "{ROOT}[tree]\nscript = 'river {{ jam bet >= 80%stack when aggressions >= 3 {{ remove raise }} }}'\n"
+    );
+    parse(&text);
+}
+
+#[test]
+fn multiline_jam_threshold_rounds_and_warns() {
+    let text = format!(
+        "{ONE_THREE}stack = 100\nchip_rounding = 'up'\n[tree]\nscript = '''\npreflop {{ jam\nraise >= 1.5bb }}\n'''\n"
+    );
+    let doc = parse(&text);
+    assert_eq!(
+        doc.spot.tree.compiled.rules[0].sizes,
+        vec![SizeSpec::ToChips { value: 5 }]
+    );
+    assert!(
+        doc.warnings
+            .iter()
+            .any(|w| w.contains("tree.script") && w.contains("1.5") && w.contains("5 chips"))
+    );
+}
+
+#[test]
+fn nul_prefixed_amount_strings_are_invalid() {
+    for value in [r"\u0000100", r"\u00000x10", r"\u00001e2"] {
+        let e = error(&format!("{ONE_THREE}stack = \"{value}\"\n"));
+        assert_eq!(e.code, Code::NLH003, "{value}: {e}");
+        assert_eq!(e.key.as_deref(), Some("table.stack"));
+    }
+}
+
+#[test]
+fn zero_line_decimals_report_positive_amount() {
+    for amount in ["0", "00", "0.0"] {
+        let e = error(&format!("{ROOT}[spot]\nline = 'BTN r{amount}'\n"));
+        assert_eq!(e.code, Code::NLH004, "{amount}: {e}");
+        assert!(e.message.contains("must be positive"), "{amount}: {e}");
+    }
+}

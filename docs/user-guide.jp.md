@@ -199,7 +199,7 @@ solvers validate spot.toml --resources
 ```
 
 製品・開始状態・暗黙fold・tree ruleを確認する。実効入力は既定値を展開し、外部scriptをinline化する。
-実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列にし、stackが異なる場合は全positionを`[table.stacks]`に書く。script本文はそのまま保持する。`--show-effective`・`--write-effective`、`run.toml`、relockの`--print-config`、solution・checkpointに埋め込まれるconfigはこの形式である。再正規化は同じbytesになり、丸め警告は繰り返さない。
+実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列にし、stackが異なる場合は全positionを`[table.stacks]`に書く。script本文はそのまま保持する。`--show-effective`・`--write-effective`、`run.toml`、relockの`--print-config`、solution・checkpointに埋め込まれるconfigはこの形式である。再正規化は同じbytesになり、keyとlineの額の丸め警告は繰り返さない。scriptは書いたまま残るため、丸めで変わるscriptのBB sizeは再読込でも警告する。
 P1は木と3種類のstorage bytes（JSON: `f32Bytes`・`i16Bytes`・`i16F32avgBytes`）を見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
 P2の`--resources`はpublic treeのarena countとrule hit測定を行うため、大きい木では時間が掛かる。
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
@@ -574,12 +574,12 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     その席が前に使ったrange、無ければ同じ役（OOP・IP）だった席のrange、それも無ければ外れた唯一のrangeを受け取る。
     移したrangeの中身は変えないため、その席のrangeに直す。付け替えた内容をRange stepに示し、TOMLを直接編集している間は付け替えない。
   - Tree: bet sizeを「Size table」か「Script」のtabで書く。サイズ表はstreetごとにOOP・IPのbetとraiseのsize
-    （[size literal](nlh-input-v1.jp.md#size-literalと解決順序)。`33`はpotの33%、`a`はall-in。カンマか空白で区切り、
+    （[size literal](nlh-input-v1.jp.md#size-literalと解決順序)。`33%`はpotの33%、`3`・`3bb`は3 BB、`300c`は300 chip、`a`はall-in。カンマか空白で区切り、
     空ならそのactionを作らない）を並べ、`tree.script`を`in_position`・`donk`・`aggressions`の条件だけのscriptへ書き直す。
     「No donk bets」は前のstreetで最後にbet・raiseした相手へOOPが先にbetしない木、
     「Re-raises are all-in only」はbet・raiseに直面したraiseをall-inに限る木にする。開始streetより前のstreetの行は薄く示す。
     サイズ表で書き戻せないscript（他の条件・`add`・`force`などを含む）はscriptのtabで開き、
-    サイズ表のtabはその旨と「Replace with the default size table」（Flop 33/50・Turn 75/a・River 75,a/a、OOP・IP同じ）を示す。
+    サイズ表のtabはその旨と「Replace with the default size table」（Flop 33%/50%・Turn 75%/a・River 75%,a/a、OOP・IP同じ）を示す。
     サイズ表は各streetの攻撃回数を3回までにする`when aggressions >= 3 { remove raise }`を他のruleの後へ書く。
     全nodeでall-inを候補にするには、Scriptのtabでscriptの先頭へ`add bet [a]`と`add raise [a]`を書く。
     scriptの`param`宣言は入力欄として表示し、変更を`[tree.params]`の同名keyへ書く（script本文の既定値は変えない）。
