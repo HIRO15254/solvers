@@ -5,8 +5,8 @@ const CONFIG: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -14,7 +14,7 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-script = '''river when unopened { force bet [50] }'''
+script = '''river when unopened { force bet [50%] }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -336,7 +336,7 @@ fn node_and_relock_histories_accept_bb_and_chip_spellings() {
         let directory = tempfile::tempdir().unwrap();
         let config = CONFIG
             .replace("players = 2", &format!("players = 2\nbb_chips = {scale}"))
-            .replace("force bet [50]", "replace bet [2bb]");
+            .replace("force bet [50%]", "replace bet [2bb]");
         let run = solve(&config, directory.path());
         assert_eq!(export(&run, "ev", bb), export(&run, "ev", chips));
         let source = run.to_str().unwrap();
@@ -370,7 +370,7 @@ fn node_and_relock_histories_accept_bb_and_chip_spellings() {
 fn saved_ev_keeps_original_baseline_and_utility_units() {
     for utility in [
         "",
-        "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field_bb = [200.0]\n",
+        "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field = [200.0]\n",
     ] {
         let directory = tempfile::tempdir().unwrap();
         let run = solve(&format!("{CONFIG}{utility}"), directory.path());
@@ -495,9 +495,9 @@ fn convergence_claim_depends_on_economics() {
     let directory = tempfile::tempdir().unwrap();
     for (economics, general_sum) in [
         ("", false),
-        ("\n[economics.rake]\nrate = 0.05\ncap_bb = 5.0\n", true),
+        ("\n[economics.rake]\nrate = 0.05\ncap = 5.0\n", true),
         (
-            "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field_bb = [200.0]\n",
+            "\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field = [200.0]\n",
             true,
         ),
     ] {
@@ -696,7 +696,7 @@ fn inspect_equity_tracks_the_current_board_and_invalidates_cached_values() {
         .replace("2c 7d 9h Js Qs", "2c 7d 9h Js")
         .replace(" / BB x, BTN x / BB x, BTN x", " / BB x, BTN x")
         .replace(
-            "script = '''river when unopened { force bet [50] }'''",
+            "script = '''river when unopened { force bet [50%] }'''",
             "script = '''turn, river { replace bet [] replace raise [] }'''",
         )
         .replace("storage = \"f32\"", "storage = \"i16\"");

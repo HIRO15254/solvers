@@ -41,6 +41,7 @@ import {
 import { parseBoard } from "../lib/cards";
 import { TEMPLATES, fieldText, getAt, readDoc, setAt, writeDoc, type Doc } from "../lib/config";
 import { type LineDiagnostic, tomlIssueLine } from "../lib/editor/diagnostics";
+import { replayedLine } from "../lib/format";
 import { freezeRequestDoc, loadFreezeBases } from "../lib/setupFreeze";
 import type { SizeRole } from "../lib/sizes";
 import { navigate } from "../route";
@@ -90,17 +91,18 @@ const FORM_KEYS = new Set([
   "table.players",
   "table.bb_chips",
   "table.chip_rounding",
-  "table.stack_bb",
-  "table.sb_bb",
-  "table.ante_bb",
-  "table.bb_ante_bb",
-  "table.straddles_bb",
+  "table.stack",
+  "table.sb",
+  "table.ante",
+  "table.bb_ante",
+  "table.straddles",
   "economics.kind",
   "economics.rake.rate",
-  "economics.rake.cap_bb",
+  "economics.rake.cap",
+  "economics.rake.rounding_unit",
   "economics.rake.when",
   "economics.payouts",
-  "economics.outside_field_bb",
+  "economics.outside_field",
   "spot.line",
   "spot.board",
   "tree.script",
@@ -145,7 +147,7 @@ function issueStep(issue: Issue): { step: Step; onField: boolean } | undefined {
   const onField =
     step !== "toml" &&
     (issue.path.startsWith("ranges.") ||
-      issue.path.startsWith("table.stacks_bb.") ||
+      issue.path.startsWith("table.stacks.") ||
       [...FORM_KEYS].some((key) => issue.path === key || issue.path.startsWith(`${key}.`)));
   const below = [...FORM_KEYS].some((key) => key.startsWith(`${issue.path}.`));
   return { step: onField || below ? step : "toml", onField };
@@ -206,7 +208,7 @@ function useLineCursor(toml: string, tableKey: string, line: string, draft: stri
       for (const moves of [draft ?? undefined, []]) {
         try {
           const next = await api.line(toml, moves);
-          if (id === sequence.current) setCursor(next);
+          if (id === sequence.current) setCursor({ ...next, line: replayedLine(next.line, line, moves === undefined || moves === draft) });
           return;
         } catch {
           // Try the next replay; with none left the table is not drawn.
@@ -214,7 +216,7 @@ function useLineCursor(toml: string, tableKey: string, line: string, draft: stri
       }
       if (id === sequence.current) setCursor(null);
     }, 250);
-    return () => clearTimeout(timer);
+    return () => { clearTimeout(timer); sequence.current++; };
     // The line API reads only `[table]` and `spot.line`.
   }, [tableKey, line, draft?.join(",")]);
   return cursor;
@@ -631,7 +633,7 @@ export function SetupPage() {
               text={tomlText ?? toml}
               error={tomlError}
               unmodeled={leafPaths(doc).filter(
-                (path) => !FORM_KEYS.has(path) && !path.startsWith("table.stacks_bb.") && !path.startsWith("tree.params."),
+                (path) => !FORM_KEYS.has(path) && !path.startsWith("table.stacks.") && !path.startsWith("tree.params."),
               )}
               onChange={editToml}
             />

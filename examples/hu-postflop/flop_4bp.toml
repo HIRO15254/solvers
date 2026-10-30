@@ -7,14 +7,14 @@ name = "6max NL50 BTN vs BB 4BP Ks7h2d"
 
 [table]
 players = 6
-stack_bb = 100
+stack = 100
 
 [economics]
 kind = "cash"
 
 [economics.rake]
 rate = 0.05
-cap_bb = 4
+cap = 4
 
 [spot]
 line = "BTN r2.5, BB r11, BTN r24, BB c"
@@ -28,16 +28,16 @@ BB = "QQ-TT,AKs-AQs,A5s,KQs,AKo"
 script = '''
 flop {
   when donk { remove bet }
-  replace bet [13, 38, 67, a]
+  replace bet [13%, 38%, 67%, a]
   replace raise [a]
 }
 turn {
-  replace bet [33, a]
+  replace bet [33%, a]
   replace raise [a]
 }
 river {
   replace bet [a]
-  when spr > 1.5 { add bet [33] }
+  when spr > 1.5 { add bet [33%] }
   replace raise [a]
 }
 '''

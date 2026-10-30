@@ -30,14 +30,9 @@ pub fn run(path: &Path, moves: Option<&str>, format: ValidationFormat) -> Result
 
 fn print_human(cursor: &spot::LineCursor) {
     let scale = spot::ChipScale::new(cursor.bb_chips).expect("validated table scale");
-    // Decimal tables print exact BB; others print exact chips with rounded BB.
     let amount = |bb: f64| {
-        if scale.is_decimal() {
-            format!("{bb} BB")
-        } else {
-            let chips = (bb * cursor.bb_chips as f64).round();
-            format!("{chips}c ({bb:.2} BB)")
-        }
+        let chips = (bb * cursor.bb_chips as f64).round() as u64;
+        hu_postflop::prepare::bb(chips, scale)
     };
     println!(
         "line: {}",

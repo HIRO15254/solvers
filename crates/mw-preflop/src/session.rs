@@ -170,18 +170,16 @@ fn preflight_multiway_impl(
             outside_field,
             payouts,
         } => {
-            let mut total_chips = 0u128;
-            for stack_bb in game_config
-                .seats
+            let scale = nlh::ChipScale::new(game_config.bb_chips).expect("validated chip scale");
+            let mut total_chips = outside_field
                 .iter()
-                .map(|seat| seat.stack_bb)
-                .chain(outside_field.iter().map(|player| player.stack_bb))
-            {
+                .map(|player| u128::from(player.stack_chips))
+                .sum::<u128>();
+            for seat in &game_config.seats {
                 total_chips += u128::from(
-                    nlh::ChipScale::new(game_config.bb_chips)
-                        .expect("validated chip scale")
-                        .from_bb(stack_bb)
-                        .context("converting ICM field stacks")?
+                    scale
+                        .from_bb(seat.stack_bb)
+                        .context("converting ICM table stacks")?
                         .raw(),
                 );
             }

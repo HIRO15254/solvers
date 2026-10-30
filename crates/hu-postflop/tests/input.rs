@@ -13,7 +13,7 @@ use std::path::Path;
 
 fn text(table: &str, line: &str, board: &str, script: &str) -> String {
     format!(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack_bb = 100\n{table}\n[spot]\nline = '{line}'\nboard = '{board}'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n[tree]\nscript = '''{script}'''\n"
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack = 100\n{table}\n[spot]\nline = '{line}'\nboard = '{board}'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n[tree]\nscript = '''{script}'''\n"
     )
 }
 fn standard(script: &str) -> String {
@@ -63,7 +63,7 @@ fn non_decimal_chip_scale_survives_parsing_tree_and_payoff() {
     use nlh::PerPlayer;
 
     let raw = text(
-        "bb_chips = 3\nsb_chips = 1",
+        "bb_chips = 3\nsb = '1c'",
         "BTN r6c, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
         "river { add bet [10c] }",
@@ -96,7 +96,7 @@ fn non_decimal_chip_scale_survives_parsing_tree_and_payoff() {
 fn mixed_line_spellings_produce_identical_effective_hashes() {
     let make = |line| {
         text(
-            "bb_chips = 3\nsb_chips = 1",
+            "bb_chips = 3\nsb = '1c'",
             line,
             "Ks 7h 2d Ac",
             "turn { checkdown }",
@@ -231,7 +231,7 @@ fn cfr_precision_contract_and_legacy_checkpoint() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d 3c 8d",
-        "river { replace bet [50] }",
+        "river { replace bet [50%] }",
     );
     for (section, precision) in [
         ("", CfrPrecision::F32),
@@ -554,7 +554,7 @@ fn mixed_live_queries_and_report_match_direct_solver() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d 3c 8d",
-        "river { replace bet [50] replace raise [a] }",
+        "river { replace bet [50%] replace raise [a] }",
     ) + "\n[solver]\nstorage='i16-f32avg'\n[solver.stop]\nmax_iterations=8\ncheck_every=4\n[run]\nthreads=2\n";
     let path = Path::new("mixed.toml");
     let prepared = prepare::prepare(&raw, path).unwrap();
@@ -617,7 +617,7 @@ fn spec_p1_example_lowering_and_sizes() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
-        "river { replace bet [33, 75] replace raise [3x] } river when aggressions >= 3 { remove raise }",
+        "river { replace bet [33%, 75%] replace raise [3x] } river when aggressions >= 3 { remove raise }",
     )));
     assert_eq!(actions(&g, ""), ["x", "r1815", "r4125"]);
     assert_eq!(actions(&g, "r1815"), ["f", "c", "r5445"]);
@@ -653,7 +653,7 @@ fn turn_start_previous_aggressor_and_earlier_rules_skipped() {
 #[test]
 fn effective_stack_allin_and_size_resolution() {
     let base = text(
-        "[table.stacks_bb]\nBB = 20",
+        "[table.stacks]\nBB = 20",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
         "river { add bet [60%stack, 60%effective, a, 0.001bb, 1.234bb] }",
@@ -668,7 +668,7 @@ fn effective_stack_allin_and_size_resolution() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
-        "river { add bet [1bb] add raise [1000000000000] }",
+        "river { add bet [1bb] add raise [1000000000000%] }",
     ));
     let g = game(&huge);
     assert_eq!(actions(&g, "r1000"), ["f", "c", "r97500"]);
@@ -678,7 +678,7 @@ fn effective_stack_allin_and_size_resolution() {
         "",
         "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
         "Ks 7h 2d Ac 9s",
-        "river { add bet [1bb] } river when aggressions == 1 { add raise [2x] } river when aggressions == 2 { add raise [1000000000000] }",
+        "river { add bet [1bb] } river when aggressions == 1 { add raise [2x] } river when aggressions == 2 { add raise [1000000000000%] }",
     ));
     assert_eq!(actions(&game(&huge), "r1000r2000"), ["f", "c", "r97500"]);
 }
@@ -686,9 +686,9 @@ fn effective_stack_allin_and_size_resolution() {
 #[test]
 fn antes_bb_ante_and_straddles_are_in_the_starting_pot() {
     for (table, line, pot, stack) in [
-        ("ante_bb = 0.1", "BTN r2.5, BB c", 6100, 97400),
-        ("bb_ante_bb = 1", "BTN r2.5, BB c", 6500, 96500),
-        ("straddles_bb = [2, 4]", "BTN r10, HJ c", 23500, 90000),
+        ("ante = 0.1", "BTN r2.5, BB c", 6100, 97400),
+        ("bb_ante = 1", "BTN r2.5, BB c", 6500, 96500),
+        ("straddles = [2, 4]", "BTN r10, HJ c", 23500, 90000),
     ] {
         let raw = text(table, line, "Ks 7h 2d", "").replace(
             "BB = 'KK'",
@@ -770,7 +770,7 @@ fn jam_replaces_wagers_at_the_threshold_in_source_order() {
     let river = |script: &str, history: &str| {
         actions(
             &game(&config(&text(
-                "[table.stacks_bb]\nBB = 20",
+                "[table.stacks]\nBB = 20",
                 "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
                 "Ks 7h 2d Ac 9s",
                 script,
@@ -806,7 +806,7 @@ fn merge_keeps_the_larger_wager_against_the_last_kept_one() {
     let river = |script: &str, history: &str| {
         actions(
             &game(&config(&text(
-                "[table.stacks_bb]\nBB = 20",
+                "[table.stacks]\nBB = 20",
                 "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
                 "Ks 7h 2d Ac 9s",
                 script,
@@ -825,7 +825,7 @@ fn merge_keeps_the_larger_wager_against_the_last_kept_one() {
     );
     assert_eq!(
         river(
-            "river { add bet [2bb, 2.5bb, 3.5bb] merge bet within 10 }",
+            "river { add bet [2bb, 2.5bb, 3.5bb] merge bet within 10% }",
             ""
         ),
         ["x", "r2500", "r3500"]
@@ -965,7 +965,7 @@ fn p1_payoff_uses_the_common_rake_rounding_unit() {
         .unwrap()
         .pipeline()
         .bake(&terminal);
-    let coarse = NlhPayoff::new(&parse(&(raw + "rounding_unit_bb = 0.5\n")).spot)
+    let coarse = NlhPayoff::new(&parse(&(raw + "rounding_unit = 0.5\n")).spot)
         .unwrap()
         .pipeline()
         .bake(&terminal);
@@ -979,10 +979,10 @@ fn lowered_and_hand_built_common_rule_trees_are_identical() {
         "",
         "BTN r2.5, BB c / BB x, BTN b1.8, BB c",
         "Ks 7h 2d Ac",
-        "turn, river { replace bet [33, 75, 2bb] replace raise [3x] } turn, river when aggressions >= 3 { remove raise }",
+        "turn, river { replace bet [33%, 75%, 2bb] replace raise [3x] } turn, river when aggressions >= 3 { remove raise }",
     ));
     let script = Script::compile(
-        "turn, river { replace bet [33, 75, 2bb] replace raise [3x] }",
+        "turn, river { replace bet [33%, 75%, 2bb] replace raise [3x] }",
         &Default::default(),
         &spot::NLH_V1,
     )

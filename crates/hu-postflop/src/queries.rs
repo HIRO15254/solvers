@@ -262,6 +262,32 @@ pub fn resolve_action(actions: &[&str], arg: &str) -> Result<usize, String> {
     }
 }
 
+/// Resolve labels by their rounded chip amount, preserving action kind.
+pub(crate) fn resolve_scaled_action(
+    actions: &[&str],
+    arg: &str,
+    scale: nlh::ChipScale,
+    rounding: nlh::Rounding,
+) -> Result<usize, String> {
+    for prefix in ["bet ", "raise to "] {
+        if let Some(wanted) = arg.strip_prefix(prefix)
+            && let Some(pos) = actions.iter().position(|label| {
+                label.strip_prefix(prefix).is_some_and(|actual| {
+                    history_token_matches(
+                        &format!("r{actual}"),
+                        &format!("r{wanted}"),
+                        scale,
+                        rounding,
+                    )
+                })
+            })
+        {
+            return Ok(pos);
+        }
+    }
+    resolve_action(actions, arg)
+}
+
 /// Convert a displayed action label into its tree-history token.
 pub fn history_token(label: &str) -> String {
     match label {
@@ -275,20 +301,31 @@ pub fn history_token(label: &str) -> String {
     }
 }
 
-/// Compare history actions by exact chip amount, regardless of spelling.
-pub(crate) fn history_token_matches(actual: &str, wanted: &str, scale: nlh::ChipScale) -> bool {
+/// Compare history actions by chip amount, rounding user-written BB amounts.
+pub(crate) fn history_token_matches(
+    actual: &str,
+    wanted: &str,
+    scale: nlh::ChipScale,
+    rounding: nlh::Rounding,
+) -> bool {
     if actual == wanted {
         return true;
     }
-    fn amount(token: &str, scale: nlh::ChipScale) -> Option<nlh::MwChips> {
+    fn amount(token: &str, scale: nlh::ChipScale, rounding: nlh::Rounding) -> Option<nlh::MwChips> {
         let text = token.strip_prefix('r')?;
         if let Some(chips) = text.strip_suffix('c') {
             chips.parse::<u64>().ok().map(nlh::MwChips)
         } else {
-            scale.parse_bb(text).ok()
+            scale
+                .parse_bb_rounded(text.strip_suffix("bb").unwrap_or(text), rounding)
+                .ok()
+                .map(|(chips, _)| chips)
         }
     }
-    match (amount(actual, scale), amount(wanted, scale)) {
+    match (
+        amount(actual, scale, rounding),
+        amount(wanted, scale, rounding),
+    ) {
         (Some(a), Some(b)) => a == b,
         _ => false,
     }
@@ -320,6 +357,11 @@ pub(crate) fn selector_history_steps(selector: &str, scale: nlh::ChipScale) -> V
                 None => return,
             },
             _ => return,
+        };
+        let len = if rest.starts_with('r') && rest[len..].starts_with("bb") {
+            len + 2
+        } else {
+            len
         };
         let ambiguous = rest.starts_with('r') && rest.as_bytes().get(len) == Some(&b'c');
         for suffix in [chips_first, !chips_first] {

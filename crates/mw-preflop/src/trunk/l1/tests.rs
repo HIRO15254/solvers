@@ -45,7 +45,7 @@ impl BucketSource for Buckets {
 
 fn config(players: usize, checkdown: bool) -> String {
     let mut raw = format!(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\n[table.stacks_bb]\nBTN = 3\nBB = 3\n"
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\n[table.stacks]\nBTN = 3\nBB = 3\n"
     );
     if players == 3 {
         raw.push_str("SB = 3\n");

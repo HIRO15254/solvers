@@ -149,7 +149,7 @@ pub fn restrict_iso(
 }
 
 fn action(view: TreeView<'_>, node: NodeId, label: &str) -> Result<usize, ProfileResolveError> {
-    crate::queries::resolve_action(&view.actions(node), label)
+    view.resolve_action(node, label)
         .map_err(|e| error(format!("at {:?}: {e}", view.history(node))))
 }
 fn nodes(view: TreeView<'_>, selector: &str) -> Result<Vec<NodeId>, ProfileResolveError> {
@@ -196,7 +196,13 @@ pub fn resolve_profile(
     base: Option<&dyn Fn(NodeId) -> anyhow::Result<Option<Vec<f32>>>>,
 ) -> Result<ResolvedProfile, ProfileResolveError> {
     let start = crate::artifact::start_street_from_board_len(config.board.len());
-    let index = GameIndex::from_game(&game.game, &game.node_info, start, config.scale);
+    let index = GameIndex::from_game(
+        &game.game,
+        &game.node_info,
+        start,
+        config.scale,
+        config.chip_rounding,
+    );
     let tree = &game.game.tree;
     let view = TreeView {
         tree,

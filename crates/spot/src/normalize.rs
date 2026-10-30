@@ -5,36 +5,15 @@ use nlh::{ChipScale, MwChips, SeatId};
 use toml::Value;
 use toml_edit::{InlineTable, Item, Table};
 
-/// The exact BB value of `chips`, when a TOML number spells it exactly.
-fn bb(scale: ChipScale, chips: MwChips) -> Option<Value> {
-    let text = scale.bb_text(chips)?;
-    if !text.contains('.') {
-        return text.parse().ok().map(Value::Integer);
-    }
-    let value: f64 = text.parse().ok()?;
-    (crate::parse::exact_decimal(&value.to_string()) == crate::parse::exact_decimal(&text))
-        .then_some(Value::Float(value))
-}
-
-/// Spell a group of amounts as `{base}_bb` on decimal tables when every value
-/// is an exact BB number, otherwise as `{base}_chips` integers.
-fn amounts(scale: ChipScale, base: &str, chips: &[MwChips]) -> (String, Vec<Value>) {
-    let exact = scale
-        .is_decimal()
-        .then(|| {
-            chips
-                .iter()
-                .map(|c| bb(scale, *c))
-                .collect::<Option<Vec<_>>>()
-        })
-        .flatten();
-    match exact {
-        Some(values) => (format!("{base}_bb"), values),
-        None => (
-            format!("{base}_chips"),
-            chips.iter().map(|c| Value::Integer(c.0 as i64)).collect(),
-        ),
-    }
+/// Effective amounts are always exact chip strings.
+fn amounts(_scale: ChipScale, base: &str, chips: &[MwChips]) -> (String, Vec<Value>) {
+    (
+        base.to_owned(),
+        chips
+            .iter()
+            .map(|c| Value::String(format!("{}c", c.0)))
+            .collect(),
+    )
 }
 
 fn insert_amount(table: &mut Table, scale: ChipScale, base: &str, chips: MwChips) {
@@ -226,7 +205,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
             );
             let stacks: Vec<MwChips> = outside_field
                 .iter()
-                .map(|v| scale.from_bb(v.stack_bb).expect("parsed from whole chips"))
+                .map(|v| MwChips(v.stack_chips))
                 .collect();
             let (key, values) = amounts(scale, "outside_field", &stacks);
             insert(&mut economics, &key, Value::Array(values));
@@ -234,7 +213,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     }
     if let RakeConfig::Generic {
         rate,
-        cap_bb,
+        cap_chips,
         when,
         allocation,
         rounding,
@@ -242,9 +221,8 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     } = &spot.economics.rake
     {
         let mut rake = fields([("rate", numeric(*rate))]);
-        if let Some(cap) = cap_bb {
-            let cap = scale.from_bb(*cap).expect("parsed from whole chips");
-            insert_amount(&mut rake, scale, "cap", cap);
+        if let Some(cap) = cap_chips {
+            insert_amount(&mut rake, scale, "cap", MwChips(*cap));
         }
         for (key, v) in [
             ("when", Value::String(when.clone())),
@@ -257,7 +235,10 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         economics.insert("rake", Item::Table(rake));
     }
     write_table(&mut text, "economics", &economics);
-    let mut start = fields([("line", Value::String(spot.line.clone()))]);
+    let mut start = fields([(
+        "line",
+        Value::String(crate::cursor::effective_line_text(&spot.context.actions)),
+    )]);
     if let Some(board) = &spot.board_text {
         insert(&mut start, "board", Value::String(board.clone()));
     }

@@ -18,7 +18,7 @@ cap ruleが無ければraise chainはstackとNLHの合法性だけで制限さ�
 閾値はround(M × 0.33333)、MはactorのW＋残stack（Preflopではhand開始stack − ante）である。
 最小raiseへの引上げもMでのcapも行わず、候補自体は追加しないのでsizeを足すruleの後へ置く。
 近いraise sizeは`preflop { merge raise within 0.5bb }`のように、大きい候補から順に直前に残した候補との差が幅以下のものを削除してまとめる。
-幅は裸のpot%（Pは現在pot＋call額）、`Nbb`、`%stack`、`%effective`で書く（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
+幅は`N%`のpot比（Pは現在pot＋call額）、接尾辞なしまたは`Nbb`のBB、`Nc`、`%stack`、`%effective`で書く。BBと計算した幅は`table.chip_rounding`で整数chipへ丸める（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
 削除済みの`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は未知keyの`NLH002`となり、
 これらを埋込みconfigに含む`.mwsol`・checkpointも読み込めない。
 正規化・実効configにも出力しない。旧Preflop設定からの移行は、他のPreflop ruleの後へ
@@ -140,7 +140,7 @@ checkpointだけの中断で予定外の品質評価を行わず、sample IDとm
 
 run directoryは共通5 fileと`run.lock`に`checkpoint.mwckpt`・`solution.mwsol`を加える。`run.lock`はartifactではなく、solve/resumeが更新前に排他取得してprocess終了まで保持する。使用中directoryへのin-place resumeはdirectoryとmanifest pidを示してexit 1で拒否し、fileを変更しない。`--out`は出力先だけをlockし実行中sourceも書き換えずforkできる。crash後の残存file自体は再開を妨げない。
 events/progressのreaderは改行の無い不完全な最終行だけを無視し、status/watchのoffsetは完全record境界を使う。再開writerはその不完全なsuffixだけを切り捨て、完全な行とsequenceを保持して追記する。
-run.tomlと成果物metadataには実効configを保存する。checkpointは再開用state、solutionは閲覧用profileである。
+run.tomlと成果物metadataには実効configを保存する。額のkeyとlineの額は正確な`Nc`、tree script本文はそのまま保持し、再正規化しても同じbytesとなり丸めのwarningは出ない。checkpointは再開用state、solutionは閲覧用profileである。
 container versionとsolver state versionを区別する。現行はcheckpoint container 7、solver state 4である。
 solver state 3以前を補正済み更新へ混ぜてresumeしない。
 checkpointはregret・平均累積、sweep/sample進捗、config/game/abstractionのidentity、評価sequenceと累積run情報を持つ。
@@ -176,7 +176,7 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 | surface | 報告内容・単位 |
 |---|---|
 | `export summary` | schemaVersion、sweeps、approximateProfile、visitedInfosets（保存block数）、seat別の記録評価 |
-| `export tree` | public node/history/action。額はBB |
+| `export tree` | public node/history/action。数値の額はBB、historyとaction labelは表示表記 |
 | `export strategy` / `range` | 保存bucket/classの平均確率 / 開始range weight。確率は0..1 |
 | `export actions` | public stateのhistory、actor、street、legal action list |
 | `export ev` | 保存している評価結果。cashはBB/hand、ICMは賞金単位。全nodeのper-hand EVではない |
@@ -189,6 +189,7 @@ ICMはhand開始ICMを基準とした賞金単位の増減である。potはunca
 ICMはfoldした卓の席とoutside fieldも含める。
 strategy_weightsは第2節の相対重みであり、nodeの実到達量ではない。
 actionのtree外sizeは近似して照合しない。
+historyとaction labelの額は、`bb_chips`の素因数が2と5だけなら最短の接尾辞なしBB 10進数、それ以外なら整数chipの`Nc`で表示する。selectorは表示表記のほかBB（接尾辞なしまたは`Nbb`）と`Nc`を受け、BBは卓の丸め方式でchipにして照合する（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 `derive`はPreflopのstrategy blockからP1用のrangeを作る。line上の各席のactionの平均確率をclassごとに掛け、
 未訪問のnode×classはweight 0とする。手順と生成物は[CLI reference](cli-reference.jp.md#solvers-derive)に従う。
 

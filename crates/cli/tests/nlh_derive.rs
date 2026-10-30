@@ -9,7 +9,7 @@ const BOARD: &str = "Ks 7h 2d";
 const P2: &str = r#"schema = 'solvers.nlh/v1'
 [table]
 players = 3
-stack_bb = 3
+stack = 3
 [ranges]
 BTN = 'AA,KK,QQ'
 SB = 'AA,KK,QQ'
@@ -219,7 +219,7 @@ fn saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_in
         (
             LINE,
             BOARD,
-            "[table]\nplayers = 3\nstack_bb = 4\n",
+            "[table]\nplayers = 3\nstack = 4\n",
             "base [table] does not match",
         ),
         (

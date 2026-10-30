@@ -3,8 +3,8 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 6
-stack_bb = 100
-straddles_bb = [2]
+stack = 100
+straddles = [2]
 
 [tree]
 script = '''preflop { replace raise [a] }

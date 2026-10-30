@@ -91,8 +91,8 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
             } => {
                 let outside_field = outside_field
                     .iter()
-                    .map(|player| scale.from_bb(player.stack_bb))
-                    .collect::<Result<Vec<_>, _>>()?;
+                    .map(|player| MwChips(player.stack_chips))
+                    .collect();
                 let starting = SeatVec::try_new(
                     validated
                         .seats
@@ -1125,7 +1125,7 @@ mod tests {
 
     #[test]
     fn p2_settlement_uses_the_common_rake_rounding_unit() {
-        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 5\n[economics.rake]\nrate = 0.1\n";
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 5\n[economics.rake]\nrate = 0.1\n";
         let settle = |raw: &str| {
             let prepared = crate::prepare::prepare(raw, std::path::Path::new("unit.toml")).unwrap();
             let game = HoldemGame::new(
@@ -1146,7 +1146,7 @@ mod tests {
                 .unwrap()
         };
         let fine = settle(raw);
-        let coarse = settle(&(raw.to_owned() + "rounding_unit_bb = 0.5\n"));
+        let coarse = settle(&(raw.to_owned() + "rounding_unit = 0.5\n"));
         assert_eq!(fine.total_rake, MwChips(700));
         assert_eq!(coarse.total_rake, MwChips(500));
         assert_eq!(

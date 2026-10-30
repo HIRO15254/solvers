@@ -197,7 +197,8 @@ fn resolve_selection(view: TreeView<'_>, node: &str) -> Result<Selection> {
         let n = *tree.node(current);
         let children: Vec<NodeId> = tree.children(current).collect();
         let position = match n.kind {
-            NodeKind::Action => crate::queries::resolve_action(&view.actions(current), step)
+            NodeKind::Action => view
+                .resolve_action(current, step)
                 .map_err(|e| anyhow!("resolving {node:?} at {:?}: {e}", view.history(current)))?,
             NodeKind::Chance => (0..children.len())
                 .find(|&pos| {
@@ -346,6 +347,9 @@ pub struct PreviewTreeRow {
     pub street: String,
     pub actor: Option<String>,
     pub pot: Option<serde_json::Number>,
+    /// Human-readable amount with its unit, kept separate from the JSON BB number.
+    #[serde(skip)]
+    pub pot_text: Option<String>,
     pub actions: Vec<String>,
     pub children: Vec<String>,
     pub child_kinds: Vec<String>,
@@ -459,6 +463,14 @@ fn tree_row(view: TreeView<'_>, id: NodeId, scale: nlh::ChipScale) -> PreviewTre
         street: street_name(street).to_string(),
         actor: (node.kind == NodeKind::Action).then(|| seat_name(node.player).to_string()),
         pot: (node.kind == NodeKind::Action).then(|| amount(view.pot(id), scale)),
+        pot_text: (node.kind == NodeKind::Action).then(|| {
+            let text = scale.amount_text(nlh::MwChips(view.pot(id) as u64));
+            if scale.is_decimal() {
+                format!("{text} BB")
+            } else {
+                text
+            }
+        }),
         actions,
         children,
         child_kinds,

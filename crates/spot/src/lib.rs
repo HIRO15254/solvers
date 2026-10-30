@@ -26,6 +26,7 @@ pub struct Document {
     pub spot: Spot,
     pub solver: toml::Table,
     pub output: toml::Table,
+    pub warnings: Vec<String>,
 }
 
 /// Product-owned validation returns insertion-ordered tables with every default explicit.

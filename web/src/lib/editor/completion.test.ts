@@ -24,8 +24,8 @@ describe("scriptCompletions", () => {
     expect(labels("flop { jam raise |")).toEqual([">=", ">"]);
     expect(labels("param t = 85%stack\nflop { jam raise >= |")).toEqual(expect.arrayContaining(["85%stack", "a", "t"]));
     expect(labels("flop { merge bet |")).toEqual(["within"]);
-    expect(labels("flop { merge bet within |")).toEqual(["10", "0.5bb", "5%stack", "5%effective"]);
-    expect(labels("param cb = 33\nflop { replace bet [50, |")).toEqual(expect.arrayContaining(["33", "e", "min", "cb"]));
+    expect(labels("flop { merge bet within |")).toEqual(["10%", "0.5bb", "5%stack", "5%effective"]);
+    expect(labels("param cb = 33%\nflop { replace bet [50%, |")).toEqual(expect.arrayContaining(["33%", "300c", "e", "min", "cb"]));
   });
 
   it("offers variables and defines in conditions, and values after a comparison", () => {
@@ -63,12 +63,15 @@ describe("scriptCompletionSource in TOML", () => {
 });
 
 describe("describeWord", () => {
-  const script = "# The c-bet size.\n# Half pot.\nparam cb = 50\ndefine wet = flush_possible\nflop { replace bet [cb] }";
+  const script = "# The c-bet size.\n# Half pot.\nparam cb = 50%\ndefine wet = flush_possible\nflop { replace bet [cb] }";
 
   it("explains variables, keywords, sizes and the script's own declarations", () => {
     expect(describeWord(script, "merge")).toMatch(/within DIFF/);
     expect(describeWord(script, "85%stack")).toMatch(/85% of the actor's maximum/);
-    expect(describeWord(script, "cb")).toBe("param cb = 50. The c-bet size. Half pot.");
+    expect(describeWord(script, "33%")).toMatch(/33% of the pot/);
+    expect(describeWord(script, "33")).toMatch(/33 BB/);
+    expect(describeWord(script, "300c")).toMatch(/300 chips/);
+    expect(describeWord(script, "cb")).toBe("param cb = 50%. The c-bet size. Half pot.");
     expect(describeWord(script, "wet")).toBe("define wet = flush_possible");
     expect(describeWord(script, "unknown")).toBeNull();
   });

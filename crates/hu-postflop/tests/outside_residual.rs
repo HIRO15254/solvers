@@ -8,7 +8,7 @@ const CONFIG: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2s 7s Ks 4h 3d"
@@ -16,7 +16,7 @@ board = "2s 7s Ks 4h 3d"
 BB = "AK,KQ,AA"
 BTN = "QQ,JJ"
 [tree]
-script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [solver.stop]
 max_iterations = 2
 check_every = 2

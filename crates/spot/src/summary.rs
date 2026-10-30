@@ -1,7 +1,14 @@
 //! Serializable common validation evidence, independent of product algorithms.
 use crate::*;
-use nlh::SizeUnit;
 use nlh::script::{Condition, Effect, ParamKind};
+use nlh::{ChipScale, MwChips, SizeSpec, SizeUnit};
+
+fn size_text(size: SizeSpec, scale: ChipScale) -> String {
+    match size {
+        SizeSpec::ToChips { value } => scale.amount_text(MwChips(value)),
+        _ => size.render(SizeUnit::Bb),
+    }
+}
 
 pub(crate) fn document(doc: &Document) -> ValidateSummary {
     let spot = &doc.spot;
@@ -50,16 +57,19 @@ pub(crate) fn document(doc: &Document) -> ValidateSummary {
                             body.push_str(&format!(
                                 " {} {}",
                                 bound.symbol(),
-                                r.sizes[0].render(SizeUnit::Bb)
+                                size_text(r.sizes[0], spot.table.setup.scale())
                             ));
                         } else if r.effect == Effect::Merge {
-                            body.push_str(&format!(" within {}", r.sizes[0].render(SizeUnit::Bb)));
+                            body.push_str(&format!(
+                                " within {}",
+                                size_text(r.sizes[0], spot.table.setup.scale())
+                            ));
                         } else if !r.sizes.is_empty() {
                             body.push_str(&format!(
                                 " [{}]",
                                 r.sizes
                                     .iter()
-                                    .map(|s| s.render(SizeUnit::Bb))
+                                    .map(|s| size_text(*s, spot.table.setup.scale()))
                                     .collect::<Vec<_>>()
                                     .join(", ")
                             ));
@@ -77,7 +87,6 @@ pub(crate) fn document(doc: &Document) -> ValidateSummary {
                 })
                 .collect(),
         },
-        // Unmatched-rule and solver-stop warnings require the product's built tree/settings.
-        warnings: Vec::new(),
+        warnings: doc.warnings.clone(),
     }
 }

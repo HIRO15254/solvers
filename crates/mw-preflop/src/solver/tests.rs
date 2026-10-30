@@ -3981,7 +3981,7 @@ fn vector_traverser_icm_smoke_test() {
     let utility = UtilityConfig::TournamentIcm {
         outside_field: vec![FieldPlayerConfig {
             name: "field".into(),
-            stack_bb: 40.0,
+            stack_chips: 40_000,
         }],
         payouts: vec![100.0, 60.0, 30.0, 0.0],
     };

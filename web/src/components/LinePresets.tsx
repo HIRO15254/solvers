@@ -4,7 +4,7 @@ import type { LineCursor } from "../api/types";
 import { Button, Label, SegmentedControl, Select } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { getAt, setAt, writeDoc, type Doc } from "../lib/config";
-import { lineAmount } from "../lib/format";
+import { chipDisplay } from "../lib/format";
 import { Notice } from "./common";
 
 type Flow = "xx" | "ip" | "oop";
@@ -22,6 +22,13 @@ const SIZE = { open: 2.5, three: 8, four: 20, five: 45, squeeze: 12, iso: 4 };
 
 /** A postflop bet a preset writes, as % of the pot at the start of the street. */
 const BET_PCT: Record<"flop" | "turn", number> = { flop: 33, turn: 75 };
+
+/** Apply the table's chip rounding to preset BB amounts before spelling a line token. */
+function presetAmount(value: number, bbChips: number, mode: unknown): string {
+  const chips = value * bbChips;
+  const rounded = mode === "down" ? Math.floor(chips) : mode === "up" ? Math.ceil(chips) : Math.round(chips);
+  return chipDisplay(BigInt(rounded), bbChips);
+}
 
 const START_OPTIONS: { value: Street; label: string }[] = [
   { value: "flop", label: "Flop" },
@@ -140,14 +147,15 @@ export function LinePresets({
     const replay = (text: string) => api.line(writeDoc(setAt(doc, ["spot", "line"], text)));
     try {
       if (!root) throw new Error("Table is not ready");
-      let text = preset.line.replace(/\br(\d+(?:\.\d+)?)/g, (_, value: string) => `r${lineAmount(Number(value), root.bbChips)}`);
+      const amount = (value: number) => presetAmount(value, root.bbChips, getAt(doc, ["table", "chip_rounding"]));
+      let text = preset.line.replace(/\br(\d+(?:\.\d+)?)/g, (_, value: string) => `r${amount(Number(value))}`);
       for (const street of PLAYED[next.start]) {
         const cursor = await replay(text);
         const oop = cursor.next?.position;
         const ip = cursor.seats.find((seat) => seat.status !== "folded" && seat.position !== oop)?.position;
         if (!oop || !ip) throw new Error(`No two players can act on the ${STREET_LABEL[street]}`);
         const flow = next.flows[street];
-        const bet = lineAmount((cursor.pot * BET_PCT[street]) / 100, cursor.bbChips);
+        const bet = amount((cursor.pot * BET_PCT[street]) / 100);
         text +=
           " / " +
           (flow === "xx"

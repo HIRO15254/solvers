@@ -17,6 +17,17 @@ describe("size table scripts", () => {
     expect(sizeScript(empty)).toBe("");
   });
 
+  it("writes pot percentages explicitly and preserves BB and chip sizes", () => {
+    const script = sizeScript(DEFAULT_SIZES);
+    expect(script).toContain("replace bet [33%]");
+    expect(script).toContain("replace raise [50%]");
+    const mixed: SizeTable = {
+      ...DEFAULT_SIZES,
+      sizes: { ...DEFAULT_SIZES.sizes, flop: { oop: { bet: ["33%", "2.5", "300c"], raise: ["0.5bb"] }, ip: { bet: [], raise: [] } } },
+    };
+    expect(readSizeScript(sizeScript(mixed))).toEqual(mixed);
+  });
+
   it("ends every raising street with a round-trippable aggression cap", () => {
     const table: SizeTable = { ...DEFAULT_SIZES, reraiseAllIn: false };
     const script = sizeScript(table);
@@ -33,8 +44,8 @@ describe("size table scripts", () => {
     const written = sizeScript(DEFAULT_SIZES);
     for (const script of [
       "flop {\n  when donk { remove bet }\n  replace bet [33]\n}\n",
-      written.replace("}\nturn {", "  when spr > 3 { replace raise [50] }\n}\nturn {"),
-      written.replace("replace raise [50] }", "replace raise [] }"),
+      written.replace("}\nturn {", "  when spr > 3 { replace raise [50%] }\n}\nturn {"),
+      written.replace("replace raise [50%] }", "replace raise [] }"),
       written.replace("turn {", "flop {"),
       written.slice(0, written.lastIndexOf("}")),
     ]) {

@@ -74,9 +74,9 @@ const STATEMENT_SNIPPETS: readonly Completion[] = [
     info: KEYWORD_DOCS.if,
   }),
   // Numbered fields: CodeMirror reads a bare `${10}` as field number 10, not as the text "10".
-  snippetCompletion("replace ${1:bet} [${2:33, 75}]", { label: "replace … [ ]", type: "keyword", detail: "statement", info: KEYWORD_DOCS.replace }),
+  snippetCompletion("replace ${1:bet} [${2:33%, 75%}]", { label: "replace … [ ]", type: "keyword", detail: "statement", info: KEYWORD_DOCS.replace }),
   snippetCompletion("jam ${1:raise} >= ${2:85%stack}", { label: "jam … >= …", type: "keyword", detail: "statement", info: KEYWORD_DOCS.jam }),
-  snippetCompletion("merge ${1:bet} within ${2:10}", { label: "merge … within …", type: "keyword", detail: "statement", info: KEYWORD_DOCS.merge }),
+  snippetCompletion("merge ${1:bet} within ${2:10%}", { label: "merge … within …", type: "keyword", detail: "statement", info: KEYWORD_DOCS.merge }),
 ];
 
 const TOP_SNIPPETS: readonly Completion[] = [

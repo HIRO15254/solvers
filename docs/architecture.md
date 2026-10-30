@@ -230,7 +230,7 @@ engineのlock/incentiveと頻度目標を作る。基準解の上流固定とsui
 `run`は頻度controllerのλを更新・checkpointへ保存し、profileのsummaryをsolutionに渡す。
 
 combo indexの逆変換は`nlh::range`の固定tableを共有する。整数size解決は`nlh::SizeContext`と
-`scale_u32`/`scale_u64`に集約し、P1のu32 chipとP2のu64 milli-BBの上限・丸め・加算規則を維持する。
+`scale_u32`/`scale_u64`に集約し、P1のu32 chipとP2のu64 chipの上限・丸め・加算規則を維持する。BB指定は`table.bb_chips`と`table.chip_rounding`で整数chipへ変換し、`Nc`は正確に扱う。
 
 `prepare`はSpot IRをlowerし、tree/rule-hit測定、memory limit、stop targetとstorageのauto選択を解決する。
 入力の`Settings<StorageChoice>`から具体backendだけを持つ`Settings<Storage>`へ変換し、
@@ -306,6 +306,7 @@ P2のabstraction identityは`crates/mw-preflop/tests/fixtures/tree_abstractions.
 
 `spot::Document`が共通Inputをparse・正規化する。製品の`input`が自分のsettingsを解釈する。
 `run.toml`は実行したeffective configであり、config hashがartifactと計算identityを結ぶ。
+額のkeyとlineの額は全卓で`Nc`に正規化し、tree scriptは本文を保持する。実効configの再正規化は同じbytesとなり、額の丸めwarningは生じない。人向けhistory・action labelは卓の尺度に応じた表示表記を使う（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 HU resumeはhistorical/embedded configとcheckpointの互換hashを検証する。
 operational overrideは互換identityから分ける。P2はsessionのgame/abstraction/algorithm identityも検査する。
 

@@ -23,7 +23,7 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 6
-stack_bb = 100
+stack = 100
 "#;
 
 const P1_MINIMAL: &str = r#"# A small heads-up river spot; the line derives the pot and remaining stacks.
@@ -31,8 +31,8 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 10
-ante_bb = 1
+stack = 10
+ante = 1
 
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
@@ -44,7 +44,7 @@ BB = "AA,KK"
 
 # Keep this tutorial tree and its solve small.
 [tree]
-script = '''river { replace bet [50] replace raise [50] }
+script = '''river { replace bet [50%] replace raise [50%] }
 river when aggressions >= 2 { remove raise }
 '''
 
@@ -104,7 +104,7 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         }
         if line.starts_with("bb_chips =") {
             rendered.push_str(
-                "# Chips per BB; computed sizes snap to whole chips using chip_rounding: down | nearest | up.\n# Amounts may use their _chips twin instead of a _bb key; specify only one.\n",
+                "# Chips per BB; BB amounts and computed sizes round using chip_rounding: down | nearest | up.\n# Amounts accept BB numbers or strings (2.5, \"2.5bb\"), or exact chips (\"2500c\").\n# Tree sizes use BB without a suffix; use N% for a pot fraction.\n",
             );
         }
         if line.starts_with("cfr_precision =") {
@@ -444,18 +444,12 @@ mod tests {
             "board",
             "table",
             "players",
-            "stack_bb",
-            "stack_chips",
-            "stacks_bb",
-            "stacks_chips",
-            "sb_bb",
-            "sb_chips",
-            "ante_bb",
-            "ante_chips",
-            "bb_ante_bb",
-            "bb_ante_chips",
-            "straddles_bb",
-            "straddles_chips",
+            "stack",
+            "stacks",
+            "sb",
+            "ante",
+            "bb_ante",
+            "straddles",
             "bb_chips",
             "chip_rounding",
             "economics",
@@ -463,16 +457,13 @@ mod tests {
             "tournament",
             "rake",
             "rate",
-            "cap_bb",
-            "cap_chips",
+            "cap",
             "when",
             "allocation",
             "rounding",
-            "rounding_unit_bb",
-            "rounding_unit_chips",
+            "rounding_unit",
             "payouts",
-            "outside_field_bb",
-            "outside_field_chips",
+            "outside_field",
             "seed",
             "spot",
             "ranges",
@@ -601,6 +592,16 @@ mod tests {
                             check(value, reference);
                         }
                     }
+                }
+                toml::Value::String(literal)
+                    if literal.strip_suffix('c').is_some_and(|digits| {
+                        !digits.is_empty() && digits.bytes().all(|b| b.is_ascii_digit())
+                    }) =>
+                {
+                    assert!(
+                        reference.contains("\"Nc\""),
+                        "common input reference is missing chip amount syntax"
+                    );
                 }
                 toml::Value::String(literal) => {
                     assert!(

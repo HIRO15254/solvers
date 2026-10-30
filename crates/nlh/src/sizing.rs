@@ -1,26 +1,9 @@
 //! Bet-size literal grammar shared by every config family that lowers bet
 //! and raise trees.
 //!
-//! The spelling follows PioSOLVER's, so a size string copied out of Pio
-//! reads the same here: a bare number is a percentage of the pot (`50`),
-//! `c` is an absolute chip count (`20c`), `x` is a multiple of the wager
-//! being faced (`3x`, and `2x` is the minimum legal raise), `a` is all-in,
-//! and `e` is the geometric size that splits the remaining stack into equal
-//! pot-fraction bets — bare `e` over the streets that are left, `3e` over
-//! exactly three.
-//!
-//! Three literals have no Pio counterpart and keep an explicit spelling:
-//! `min`, `80%effective`, `60%stack`. One is family-specific: `2.5bb`, for
-//! the big-blind-denominated Multiway Preflop family, where Pio's chip
-//! `c` does not apply.
-//!
-//! [`SizeSpec`] is the serialized/config representation of one sizing rule;
-//! [`SizeSpec::parse`] and [`SizeSpec::render`] convert it to and from that
-//! literal syntax. Pre-Pio spellings (`"allin"`, `"50%pot"`,
-//! `"geometric(allin,streets=2)"`) are still accepted as input and
-//! normalize to the Pio form. [`geometric_allin_target`] is the unit-free
-//! formula shared by every engine that resolves a geometric size against a
-//! concrete chip stack.
+//! Bare decimals and `bb` denote big blinds, `c` denotes chips, and `%`
+//! denotes a pot fraction. Other suffixes express stack fractions, multiples
+//! of the wager faced, or geometric sizes.
 
 use crate::Rounding;
 use serde::{Deserialize, Serialize};
@@ -63,9 +46,9 @@ pub enum SizeSpec {
     GeometricAllIn {
         streets: u8,
     },
-    /// Absolute target expressed in the config's chip unit (postflop family).
+    /// Exact absolute target in chips.
     ToChips {
-        value: f64,
+        value: u64,
     },
     /// Pio's bare `e`: geometric over however many betting streets are left
     /// from the one being resolved (three on the flop, two on the turn, one
@@ -76,10 +59,8 @@ pub enum SizeSpec {
     GeometricAllInRemaining,
 }
 
-/// Which absolute-chip literal (`bb` or `c`) a config family accepts.
-/// `SizeSpec::parse`/`render` reject the other family's literal so a
-/// misplaced `"2.5bb"` in a chip-denominated config fails loudly instead of
-/// silently misinterpreting the number.
+/// Historical caller unit, retained in the API; both absolute units are
+/// accepted regardless of the caller.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum SizeUnit {
     Bb,
@@ -101,49 +82,51 @@ impl std::fmt::Display for ParseSizeError {
 impl std::error::Error for ParseSizeError {}
 
 impl SizeSpec {
-    /// Parses a bet-size literal: `"50"`, `"20c"`, `"3x"`, `"a"`, `"e"`,
-    /// `"3e"`, `"min"`, `"2.5bb"`, `"80%effective"`, or `"60%stack"`. The
-    /// pre-Pio spellings `"allin"`, `"50%pot"`, and
-    /// `"geometric(allin,streets=2)"` are accepted too and normalize to the
-    /// Pio form.
-    ///
-    /// `unit` selects which absolute-chip suffix (`bb` or `c`) is valid for
-    /// the caller's config family; a literal using the other suffix is
-    /// rejected.
-    pub fn parse(source: &str, unit: SizeUnit) -> Result<SizeSpec, ParseSizeError> {
+    /// Parses a size literal. Bare decimals and `bb` are BB, `c` is chips,
+    /// and `%` is a percentage of the pot.
+    pub fn parse(source: &str, _unit: SizeUnit) -> Result<SizeSpec, ParseSizeError> {
         let source = source.trim();
         if source == "min" {
             return Ok(SizeSpec::MinRaise);
         }
-        // `allin` is the pre-Pio spelling, kept so old configs still read.
-        if source == "a" || source == "allin" {
+        if source == "a" {
             return Ok(SizeSpec::AllIn);
         }
         if source == "e" {
             return Ok(SizeSpec::GeometricAllInRemaining);
         }
-        if let Some(inner) = source
-            .strip_prefix("geometric(allin,")
-            .and_then(|value| value.strip_suffix(')'))
-        {
-            let inner = inner.trim();
-            let inner = inner.strip_prefix("streets=").unwrap_or(inner);
-            let streets = inner.parse::<u8>().map_err(|_| {
-                ParseSizeError(format!("invalid geometric street count in {source:?}"))
-            })?;
-            if streets == 0 {
-                return Err(ParseSizeError(
-                    "geometric street count must be positive".to_string(),
-                ));
-            }
-            return Ok(SizeSpec::GeometricAllIn { streets });
-        }
-        // A bare number is Pio's percentage of the pot. It is matched last,
-        // as the empty suffix, so every suffixed form wins first.
-        let (number, kind) = ["%effective", "%stack", "%pot", "bb", "c", "x", "e", ""]
+        let (number, kind) = ["%effective", "%stack", "%", "bb", "c", "x", "e", ""]
             .into_iter()
             .find_map(|suffix| source.strip_suffix(suffix).map(|number| (number, suffix)))
             .ok_or_else(|| ParseSizeError(format!("invalid tree size literal {source:?}")))?;
+        let (whole, fraction) = number.split_once('.').unwrap_or((number, ""));
+        if whole.is_empty()
+            || (number.contains('.') && fraction.is_empty())
+            || !whole
+                .bytes()
+                .chain(fraction.bytes())
+                .all(|b| b.is_ascii_digit())
+        {
+            return Err(ParseSizeError(format!(
+                "invalid number in tree size {source:?}"
+            )));
+        }
+        if kind == "c" {
+            if number.contains('.') || (number.len() > 1 && number.starts_with('0')) {
+                return Err(ParseSizeError(format!(
+                    "chip size must be an integer: {source:?}"
+                )));
+            }
+            let value = number
+                .parse::<u64>()
+                .map_err(|_| ParseSizeError(format!("chip size is out of range: {source:?}")))?;
+            if value == 0 {
+                return Err(ParseSizeError(format!(
+                    "tree size must be positive: {source:?}"
+                )));
+            }
+            return Ok(SizeSpec::ToChips { value });
+        }
         let value = number.parse::<f64>().map_err(|_| {
             // With the empty suffix nothing was recognized at all, so say
             // that rather than blaming a number the author never wrote.
@@ -158,35 +141,21 @@ impl SizeSpec {
                 "tree size must be finite and positive: {source:?}"
             )));
         }
-        // A bare number below one is almost always a pot *fraction* written
-        // by someone used to the pre-Pio spelling, where `0.33` meant a
-        // third of the pot and now means a third of a percent. Say so
-        // rather than silently building a one-chip bet.
-        if kind.is_empty() && value < 1.0 {
-            return Err(ParseSizeError(format!(
-                "bet size {source} is {source}% of the pot; sizes are percentages, so write \
-                 {} for {}% of the pot, or \"{source}%pot\" if you really mean {source}%",
-                value * 100.0,
-                value * 100.0,
-            )));
-        }
         Ok(match kind {
-            "bb" if unit == SizeUnit::Bb => SizeSpec::ToBb { value },
-            "bb" => {
-                return Err(ParseSizeError(format!(
-                    "the bb unit is not valid for this family: {source:?}"
-                )));
-            }
-            "c" if unit == SizeUnit::Chips => SizeSpec::ToChips { value },
-            "c" => {
-                return Err(ParseSizeError(format!(
-                    "the c (chips) unit is not valid for this family: {source:?}"
-                )));
-            }
-            "%pot" | "" => SizeSpec::PotAfterCall {
+            "bb" | "" => SizeSpec::ToBb { value },
+            "%" if value >= 1.0 => SizeSpec::PotAfterCall {
                 fraction: value / 100.0,
             },
-            "e" if value >= 1.0 && value.fract() == 0.0 && value <= f64::from(u8::MAX) => {
+            "%" => {
+                return Err(ParseSizeError(format!(
+                    "pot percentage must be at least one: {source:?}"
+                )));
+            }
+            "e" if !number.contains('.')
+                && value >= 1.0
+                && value.fract() == 0.0
+                && value <= f64::from(u8::MAX) =>
+            {
                 SizeSpec::GeometricAllIn {
                     streets: value as u8,
                 }
@@ -212,20 +181,14 @@ impl SizeSpec {
         })
     }
 
-    /// Inverse of `parse`; `parse(&spec.render(unit), unit) == Ok(spec)`.
-    ///
-    /// `ToBb` renders only under [`SizeUnit::Bb`] (debug-checked below).
-    /// `ToChips` renders `Nc` in both families: v1 accepts chip literals
-    /// through its own size parser. Other variants render the same literal
-    /// regardless of `unit`.
-    pub fn render(self, unit: SizeUnit) -> String {
+    /// Renders a size in the literal grammar.
+    pub fn render(self, _unit: SizeUnit) -> String {
         match self {
             SizeSpec::ToBb { value } => {
-                debug_assert_eq!(unit, SizeUnit::Bb, "ToBb only renders under SizeUnit::Bb");
                 format!("{value}bb")
             }
             SizeSpec::ToChips { value } => format!("{value}c"),
-            SizeSpec::PotAfterCall { fraction } => render_percent(fraction),
+            SizeSpec::PotAfterCall { fraction } => format!("{}%", render_percent(fraction)),
             SizeSpec::PreviousBetMultiple { factor } => format!("{factor}x"),
             SizeSpec::MinRaise => "min".into(),
             SizeSpec::AllIn => "a".into(),
@@ -394,7 +357,7 @@ impl SizeContext {
         let scale = |amount: u64, factor| self.scale(limit, amount, factor);
         match size {
             SizeSpec::ToBb { value } => scale(self.big_blind, value),
-            SizeSpec::ToChips { value } => self.rounding.snap(value).min(limit),
+            SizeSpec::ToChips { value } => value.min(limit),
             SizeSpec::PotAfterCall { fraction } => {
                 let increment = scale(self.pot_after_call, fraction);
                 if limit == u32::MAX as u64 {
@@ -474,7 +437,7 @@ mod tests {
         let third = SizeSpec::PotAfterCall { fraction: 0.33 };
         let geometric = SizeSpec::GeometricAllInRemaining;
         let stack = SizeSpec::StackFraction { fraction: 0.333 };
-        let chips = SizeSpec::ToChips { value: 7.0 };
+        let chips = SizeSpec::ToChips { value: 7 };
         let bb = SizeSpec::ToBb { value: 2.5 };
         for (rounding, expected) in [
             (Rounding::Down, [10, 10, 35, 166, 10, 25]),
@@ -574,8 +537,7 @@ mod tests {
         .resolve_u64(SizeSpec::PotAfterCall { fraction: 1.0 });
     }
 
-    /// The serde JSON shape of every pre-existing variant must not change:
-    /// multiway game fingerprints and checkpoints serialize `SizeSpec`.
+    /// Size variants retain their tagged serde representation.
     #[test]
     fn serde_json_shape_is_unchanged() {
         assert_eq!(
@@ -611,8 +573,8 @@ mod tests {
             r#"{"kind":"geometric-all-in","streets":2}"#
         );
         assert_eq!(
-            serde_json::to_string(&SizeSpec::ToChips { value: 40.0 }).unwrap(),
-            r#"{"kind":"to-chips","value":40.0}"#
+            serde_json::to_string(&SizeSpec::ToChips { value: 40 }).unwrap(),
+            r#"{"kind":"to-chips","value":40}"#
         );
     }
 
@@ -632,7 +594,7 @@ mod tests {
 
     fn chips_specs() -> Vec<SizeSpec> {
         vec![
-            SizeSpec::ToChips { value: 40.0 },
+            SizeSpec::ToChips { value: 40 },
             SizeSpec::PotAfterCall { fraction: 0.5 },
             SizeSpec::PreviousBetMultiple { factor: 3.0 },
             SizeSpec::MinRaise,
@@ -652,17 +614,15 @@ mod tests {
         }
     }
 
-    /// Pot percentages are the common case, so they must render as Pio's
-    /// bare number and must not leak binary artifacts (`0.29 * 100.0` is
-    /// `28.999999999999996`).
+    /// Percentages render without binary floating-point artifacts.
     #[test]
     fn percentages_render_short_and_exact() {
         for (fraction, expected) in [
-            (0.29, "29"),
-            (0.33, "33"),
-            (0.075, "7.5"),
-            (1.0, "100"),
-            (0.6666, "66.66"),
+            (0.29, "29%"),
+            (0.33, "33%"),
+            (0.075, "7.5%"),
+            (1.0, "100%"),
+            (0.6666, "66.66%"),
         ] {
             let spec = SizeSpec::PotAfterCall { fraction };
             let rendered = spec.render(SizeUnit::Chips);
@@ -683,6 +643,11 @@ mod tests {
     fn rejects_bad_literals() {
         for source in [
             "0%pot",
+            "50%pot",
+            "allin",
+            "0.5%",
+            "2.5c",
+            "1e3",
             "0",
             "1x",
             "-2bb",
@@ -697,18 +662,17 @@ mod tests {
                 "expected {source:?} to be rejected"
             );
         }
-        assert!(SizeSpec::parse("2.5bb", SizeUnit::Chips).is_err());
-        assert!(SizeSpec::parse("40c", SizeUnit::Bb).is_err());
     }
 
-    /// The literals a Pio user already has in their fingers.
     #[test]
-    fn the_pio_spellings_parse() {
+    fn size_spellings_parse() {
         for (source, expected) in [
-            ("33", SizeSpec::PotAfterCall { fraction: 0.33 }),
-            ("75", SizeSpec::PotAfterCall { fraction: 0.75 }),
-            ("150", SizeSpec::PotAfterCall { fraction: 1.5 }),
-            ("20c", SizeSpec::ToChips { value: 20.0 }),
+            ("33%", SizeSpec::PotAfterCall { fraction: 0.33 }),
+            ("75%", SizeSpec::PotAfterCall { fraction: 0.75 }),
+            ("150%", SizeSpec::PotAfterCall { fraction: 1.5 }),
+            ("0.33", SizeSpec::ToBb { value: 0.33 }),
+            ("2.5bb", SizeSpec::ToBb { value: 2.5 }),
+            ("20c", SizeSpec::ToChips { value: 20 }),
             ("2x", SizeSpec::PreviousBetMultiple { factor: 2.0 }),
             ("a", SizeSpec::AllIn),
             ("e", SizeSpec::GeometricAllInRemaining),
@@ -723,33 +687,17 @@ mod tests {
         }
     }
 
-    /// The spellings this grammar used before it followed Pio still read,
-    /// and normalize to the Pio form.
     #[test]
-    fn the_pre_pio_spellings_still_parse_and_normalize() {
-        for (old, new) in [
-            ("allin", "a"),
-            ("50%pot", "50"),
-            ("geometric(allin,2)", "2e"),
-            ("geometric(allin,streets=2)", "2e"),
-        ] {
-            let spec = SizeSpec::parse(old, SizeUnit::Chips).expect(old);
-            assert_eq!(spec.render(SizeUnit::Chips), new, "{old:?}");
-        }
-    }
-
-    /// A bare number below one is the pre-Pio pot *fraction*, off by 100x.
-    /// It must name the fix rather than build a one-chip bet.
-    #[test]
-    fn a_bare_fraction_says_sizes_are_percentages() {
-        let error = SizeSpec::parse("0.33", SizeUnit::Chips).unwrap_err().0;
-        assert!(error.contains("percentages"), "{error}");
-        assert!(error.contains("33"), "{error}");
-        // Spelled out explicitly, a sub-one-percent size is still legal.
+    fn chip_literals_preserve_full_u64_precision() {
+        let size = SizeSpec::parse("9007199254740993c", SizeUnit::Bb).unwrap();
         assert_eq!(
-            SizeSpec::parse("0.33%pot", SizeUnit::Chips),
-            Ok(SizeSpec::PotAfterCall { fraction: 0.0033 })
+            size,
+            SizeSpec::ToChips {
+                value: 9_007_199_254_740_993
+            }
         );
+        assert_eq!(size.render(SizeUnit::Chips), "9007199254740993c");
+        assert!(SizeSpec::parse("18446744073709551616c", SizeUnit::Bb).is_err());
     }
 
     #[test]

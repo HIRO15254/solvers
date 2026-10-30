@@ -19,7 +19,13 @@ fn move_text(mv: Move, scale: ChipScale) -> String {
 }
 
 /// A line amount in shortest chip or decimal BB spelling.
-fn line_amount(prefix: &str, number: &str, scale: ChipScale) -> Result<MwChips, SpotError> {
+fn line_amount(
+    prefix: &str,
+    number: &str,
+    scale: ChipScale,
+    rounding: nlh::Rounding,
+    warnings: &mut Vec<String>,
+) -> Result<MwChips, SpotError> {
     if let Some(digits) = number.strip_suffix('c') {
         let chips = Some(digits)
             .filter(|d| !d.is_empty() && d.bytes().all(|b| b.is_ascii_digit()))
@@ -37,22 +43,56 @@ fn line_amount(prefix: &str, number: &str, scale: ChipScale) -> Result<MwChips, 
         }
         return Ok(MwChips(chips));
     }
-    let amount = crate::parse::decimal_amount(number, "spot.line", false, scale)
-        .map_err(|e| line_error(format!("{prefix}{number}: {}", e.message)))?;
-    let canonical = scale.bb_text(amount).expect("whole chips of a decimal");
-    if number != canonical {
+    let number = number.strip_suffix("bb").unwrap_or(number);
+    if !crate::dialect::plain_decimal(number) {
+        return Err(line_error(format!(
+            "{prefix}{number}: expected a decimal BB amount or integer chip amount"
+        )));
+    }
+    let (whole, fraction) = number.split_once('.').unwrap_or((number, ""));
+    let canonical = if fraction.is_empty() {
+        whole.trim_start_matches('0').to_owned()
+    } else {
+        format!(
+            "{}.{}",
+            if whole.trim_start_matches('0').is_empty() {
+                "0"
+            } else {
+                whole.trim_start_matches('0')
+            },
+            fraction.trim_end_matches('0')
+        )
+    };
+    let canonical = canonical.trim_end_matches('.');
+    if number != canonical && !(number == "0" && canonical.is_empty()) {
         return Err(line_error(format!(
             "use {prefix}{canonical}, the shortest decimal BB spelling"
         )));
     }
+    let amount =
+        crate::parse::decimal_amount(number, "spot.line", false, scale, rounding, warnings)
+            .map_err(|e| line_error(format!("{prefix}{number}: {}", e.message)))?;
     Ok(amount)
 }
 
-pub(crate) fn parse_move(text: &str, scale: ChipScale) -> Result<Move, SpotError> {
+pub(crate) fn parse_move(
+    text: &str,
+    scale: ChipScale,
+    rounding: nlh::Rounding,
+) -> Result<Move, SpotError> {
+    parse_move_with_warnings(text, scale, rounding, &mut Vec::new())
+}
+
+fn parse_move_with_warnings(
+    text: &str,
+    scale: ChipScale,
+    rounding: nlh::Rounding,
+    warnings: &mut Vec<String>,
+) -> Result<Move, SpotError> {
     // Recognize common aliases only to explain their canonical spelling.
     let lower = text.to_ascii_lowercase();
     if lower != text
-        && let Ok(mv) = parse_move(&lower, scale)
+        && let Ok(mv) = parse_move(&lower, scale, rounding)
     {
         return Err(line_error(format!(
             "use {} (lowercase move symbols)",
@@ -68,7 +108,7 @@ pub(crate) fn parse_move(text: &str, scale: ChipScale) -> Result<Move, SpotError
             .into_iter()
             .find_map(|(prefix, bet)| {
                 let number = text.strip_prefix(prefix)?;
-                let amount = line_amount("", number, scale).ok()?;
+                let amount = line_amount("", number, scale, rounding, &mut Vec::new()).ok()?;
                 Some(if bet {
                     Move::BetTo(amount)
                 } else {
@@ -97,13 +137,13 @@ pub(crate) fn parse_move(text: &str, scale: ChipScale) -> Result<Move, SpotError
                 ));
             }
             if let Some(unsigned) = number.strip_prefix('+')
-                && line_amount(prefix, unsigned, scale).is_ok()
+                && line_amount(prefix, unsigned, scale, rounding, &mut Vec::new()).is_ok()
             {
                 return Err(line_error(format!(
                     "use {prefix}{unsigned}, without a sign"
                 )));
             }
-            let amount = line_amount(prefix, number, scale)?;
+            let amount = line_amount(prefix, number, scale, rounding, warnings)?;
             Ok(if prefix == "b" {
                 Move::BetTo(amount)
             } else {
@@ -169,6 +209,14 @@ pub(crate) fn line(
     table: &Table,
     text: &str,
 ) -> Result<(BettingState, Vec<LineAction>), SpotError> {
+    line_with_warnings(table, text, &mut Vec::new())
+}
+
+pub(crate) fn line_with_warnings(
+    table: &Table,
+    text: &str,
+    warnings: &mut Vec<String>,
+) -> Result<(BettingState, Vec<LineAction>), SpotError> {
     let mut state = BettingState::new(&table.setup, &NoStreetPolicy)
         .map_err(|e| crate::error::value_error("table", e.to_string()))?;
     let mut actions = Vec::new();
@@ -215,7 +263,16 @@ pub(crate) fn line(
                     };
                     line_error(format!("unknown position {position:?}; {correct}"))
                 })?;
-            let mv = parse_move(spelling, table.setup.scale())?;
+            let warning_start = warnings.len();
+            let mv = parse_move_with_warnings(
+                spelling,
+                table.setup.scale(),
+                table.setup.chip_rounding,
+                warnings,
+            )?;
+            for warning in &mut warnings[warning_start..] {
+                *warning = warning.replacen("spot.line:", &format!("spot.line {token}:"), 1);
+            }
             if state.street != expected || state.phase.is_terminal() {
                 return Err(line_error(
                     "street is closed; write ' / ' before the next street's action",
@@ -395,8 +452,31 @@ mod tests {
     use super::*;
     use nlh::betting::Action;
     #[test]
+    fn line_amounts_accept_both_units_and_reject_malformed_decimals() {
+        let scale = ChipScale::new(3).unwrap();
+        let mut warnings = Vec::new();
+        assert_eq!(
+            line_amount("r", "2.5bb", scale, nlh::Rounding::Nearest, &mut warnings).unwrap(),
+            MwChips(8)
+        );
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(
+            line_amount("r", "8c", scale, nlh::Rounding::Nearest, &mut Vec::new()).unwrap(),
+            MwChips(8)
+        );
+        for bad in ["2.", ".5", "2..5", "2.50", "03c"] {
+            assert_eq!(
+                line_amount("r", bad, scale, nlh::Rounding::Nearest, &mut Vec::new())
+                    .unwrap_err()
+                    .code,
+                Code::NLH004
+            );
+        }
+    }
+    #[test]
     fn short_allin_call_refunds_uncalled_wager() {
-        let text = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 100\n[table.stacks_bb]\nBB = 10";
+        let text =
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 100\n[table.stacks]\nBB = 10";
         let doc = Document::parse(text, std::path::Path::new("config.toml")).unwrap();
         let (state, actions) = line(&doc.spot.table, "BTN r20, BB c").unwrap();
         assert!(matches!(

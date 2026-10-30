@@ -32,18 +32,12 @@ struct RawDocument {
 struct RawTable {
     players: Option<i64>,
     bb_chips: Option<i64>,
-    stack_bb: Option<f64>,
-    stack_chips: Option<i64>,
-    stacks_bb: Option<BTreeMap<String, f64>>,
-    stacks_chips: Option<BTreeMap<String, i64>>,
-    sb_bb: Option<f64>,
-    sb_chips: Option<i64>,
-    ante_bb: Option<f64>,
-    ante_chips: Option<i64>,
-    bb_ante_bb: Option<f64>,
-    bb_ante_chips: Option<i64>,
-    straddles_bb: Option<Vec<f64>>,
-    straddles_chips: Option<Vec<i64>>,
+    stack: Option<Value>,
+    stacks: Option<BTreeMap<String, Value>>,
+    sb: Option<Value>,
+    ante: Option<Value>,
+    bb_ante: Option<Value>,
+    straddles: Option<Vec<Value>>,
     chip_rounding: Option<String>,
 }
 
@@ -53,21 +47,18 @@ struct RawEconomics {
     kind: Option<String>,
     rake: Option<RawRake>,
     payouts: Option<Vec<f64>>,
-    outside_field_bb: Option<Vec<f64>>,
-    outside_field_chips: Option<Vec<i64>>,
+    outside_field: Option<Vec<Value>>,
 }
 
 #[derive(Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 struct RawRake {
     rate: Option<f64>,
-    cap_bb: Option<f64>,
-    cap_chips: Option<i64>,
+    cap: Option<Value>,
     when: Option<String>,
     allocation: Option<String>,
     rounding: Option<String>,
-    rounding_unit_bb: Option<f64>,
-    rounding_unit_chips: Option<i64>,
+    rounding_unit: Option<Value>,
 }
 
 #[derive(Default, Deserialize)]
@@ -137,36 +128,27 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
         "table" => &[
             ("players", "integer"),
             ("bb_chips", "integer"),
-            ("stack_bb", "number"),
-            ("stack_chips", "integer"),
-            ("stacks_bb", "map:number"),
-            ("stacks_chips", "map:integer"),
-            ("sb_bb", "number"),
-            ("sb_chips", "integer"),
-            ("ante_bb", "number"),
-            ("ante_chips", "integer"),
-            ("bb_ante_bb", "number"),
-            ("bb_ante_chips", "integer"),
-            ("straddles_bb", "array:number"),
-            ("straddles_chips", "array:integer"),
+            ("stack", "amount"),
+            ("stacks", "map:amount"),
+            ("sb", "amount"),
+            ("ante", "amount"),
+            ("bb_ante", "amount"),
+            ("straddles", "array:amount"),
             ("chip_rounding", "string"),
         ],
         "economics" => &[
             ("kind", "string"),
             ("rake", "rake"),
             ("payouts", "array:number"),
-            ("outside_field_bb", "array:number"),
-            ("outside_field_chips", "array:integer"),
+            ("outside_field", "array:amount"),
         ],
         "rake" => &[
             ("rate", "number"),
-            ("cap_bb", "number"),
-            ("cap_chips", "integer"),
+            ("cap", "amount"),
             ("when", "string"),
             ("allocation", "string"),
             ("rounding", "string"),
-            ("rounding_unit_bb", "number"),
-            ("rounding_unit_chips", "integer"),
+            ("rounding_unit", "amount"),
         ],
         "spot" => &[("line", "string"), ("board", "string")],
         "tree" => &[
@@ -216,6 +198,7 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
                 "string" => value.is_str(),
                 "integer" => value.is_integer(),
                 "number" => value.is_integer() || value.is_float(),
+                "amount" => value.is_integer() || value.is_float() || value.is_str(),
                 "bool" => value.is_bool(),
                 "auto_integer" => value.is_str() || value.is_integer(),
                 "scalar" => {
@@ -248,7 +231,16 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
         let (_, kind) = fields
             .iter()
             .find(|(name, _)| *name == key)
-            .ok_or_else(|| SpotError::new(Code::NLH002, &full, "unknown key"))?;
+            .ok_or_else(|| {
+                let replacement = key.strip_suffix("_bb").or_else(|| key.strip_suffix("_chips"));
+                if matches!(kind, "table" | "economics" | "rake")
+                    && replacement.is_some_and(|name| fields.iter().any(|(field, _)| *field == name))
+                {
+                    SpotError::new(Code::NLH002, &full, format!("use {path}.{} instead; tree script bare sizes are now BB, write pot percentages as N%", replacement.unwrap()))
+                } else {
+                    SpotError::new(Code::NLH002, &full, "unknown key")
+                }
+            })?;
         shape(v, &full, kind)?;
     }
     Ok(())
@@ -278,8 +270,9 @@ pub(crate) fn line_input(text: &str, read_line: bool) -> Result<(Table, String),
                 SpotError::new(Code::NLH002, "table", e.to_string())
             })?,
     };
-    validate_bb_literals(&lexical["table"], "table")?;
-    let raw: RawTable = raw_table.clone().try_into().map_err(toml_error)?;
+    let mut table_value = raw_table.clone();
+    preserve_amount_spellings(&mut table_value, &lexical["table"], "table");
+    let raw: RawTable = table_value.try_into().map_err(toml_error)?;
     let line = if read_line {
         match value.get("spot").and_then(|spot| spot.get("line")) {
             Some(Value::String(line)) => line.clone(),
@@ -289,7 +282,7 @@ pub(crate) fn line_input(text: &str, read_line: bool) -> Result<(Table, String),
     } else {
         String::new()
     };
-    Ok((table(raw)?, line))
+    Ok((table(raw, &mut Vec::new())?, line))
 }
 
 fn toml_error(error: toml::de::Error) -> SpotError {
@@ -351,7 +344,7 @@ pub(crate) fn document_with_mode(
     config_path: &Path,
     embedded: bool,
 ) -> Result<Document, SpotError> {
-    let value: Value = text.parse().map_err(|e: toml::de::Error| SpotError {
+    let mut value: Value = text.parse().map_err(|e: toml::de::Error| SpotError {
         code: Code::NLH002,
         key: None,
         message: e.to_string(),
@@ -395,7 +388,7 @@ pub(crate) fn document_with_mode(
             key: None,
             message: e.to_string(),
         })?;
-    validate_bb_literals(lexical.as_item(), "")?;
+    preserve_amount_spellings(&mut value, lexical.as_item(), "");
     if value.get("table").is_none() {
         return Err(type_error("table", "required table"));
     }
@@ -405,11 +398,12 @@ pub(crate) fn document_with_mode(
         message: e.to_string(),
     })?;
     debug_assert_eq!(raw.schema, "solvers.nlh/v1");
-    let table = table(raw.table)?;
-    let economics = economics(raw.economics, &table)?;
+    let mut warnings = Vec::new();
+    let table = table(raw.table, &mut warnings)?;
+    let economics = economics(raw.economics, &table, &mut warnings)?;
     let line = raw.spot.line.unwrap_or_default();
     let board = crate::replay::board(raw.spot.board.as_deref())?;
-    let (start, actions) = crate::replay::line(&table, &line)?;
+    let (start, actions) = crate::replay::line_with_warnings(&table, &line, &mut warnings)?;
     let line = crate::cursor::line_text(&actions, table.setup.scale());
     let product = crate::replay::product(&start, &line, &board)?;
     let context = crate::replay::context(&table, &start, board.clone(), actions)?;
@@ -474,7 +468,14 @@ pub(crate) fn document_with_mode(
             ));
         }
     }
-    let tree = tree(raw.tree, config_path, product, table.setup.scale())?;
+    let tree = tree(
+        raw.tree,
+        config_path,
+        product,
+        table.setup.scale(),
+        table.setup.chip_rounding,
+        &mut warnings,
+    )?;
     let profile = match raw.profile {
         Some(_) if product != Product::HuPostflop => {
             return Err(SpotError::new(
@@ -490,6 +491,7 @@ pub(crate) fn document_with_mode(
         None => None,
     };
     let run = run(raw.run, product)?;
+    restore_warning_spellings(lexical.as_item(), "", &mut warnings);
     Ok(Document {
         spot: Spot {
             meta: raw.meta,
@@ -507,6 +509,7 @@ pub(crate) fn document_with_mode(
         },
         solver: raw.solver,
         output: raw.output,
+        warnings,
     })
 }
 
@@ -543,11 +546,7 @@ pub(crate) fn exact_decimal(text: &str) -> Option<(u128, i32)> {
 pub(crate) fn amount_error(error: ChipAmountError, key: &str, scale: ChipScale) -> SpotError {
     match error {
         ChipAmountError::Fractional => {
-            let hint = if key.contains("_bb") {
-                format!("; write {} instead", key.replacen("_bb", "_chips", 1))
-            } else {
-                "; write the amount in chips with a c suffix".into()
-            };
+            let hint = "; write the amount in chips with a c suffix";
             value_error(
                 key,
                 format!(
@@ -577,152 +576,266 @@ pub(crate) fn decimal_amount(
     key: &str,
     zero: bool,
     scale: ChipScale,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
 ) -> Result<MwChips, SpotError> {
     if !crate::dialect::plain_decimal(text) {
         return Err(value_error(key, "must be a plain decimal BB amount"));
     }
-    let amount = scale
-        .parse_bb(text)
+    let (amount, changed) = scale
+        .parse_bb_rounded(text, rounding)
         .map_err(|e| amount_error(e, key, scale))?;
+    if changed {
+        warnings.push(format!(
+            "{key}: {text} BB rounded to {} chips using {}",
+            amount.raw(),
+            format!("{rounding:?}").to_ascii_lowercase()
+        ));
+    }
     nonzero(amount, key, zero)
 }
 
 /// Whole chips of a decoded BB key; [`validate_bb_literals`] already proved
 /// the shortest `f64` spelling is the written decimal.
-fn bb_amount(number: f64, key: &str, zero: bool, scale: ChipScale) -> Result<MwChips, SpotError> {
-    let (mantissa, exponent) = exact_decimal(&number.to_string()).ok_or_else(|| {
+fn bb_amount(
+    number: f64,
+    key: &str,
+    zero: bool,
+    scale: ChipScale,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
+) -> Result<MwChips, SpotError> {
+    let text = number.to_string();
+    let (mantissa, exponent) = exact_decimal(&text).ok_or_else(|| {
         value_error(
             key,
             "must be a finite non-negative BB amount within chip capacity",
         )
     })?;
-    let amount = scale
-        .from_decimal(mantissa, exponent)
+    let (amount, changed) = scale
+        .from_decimal_rounded(mantissa, exponent, rounding)
         .map_err(|e| amount_error(e, key, scale))?;
+    if changed {
+        warnings.push(format!(
+            "{key}: {text} BB rounded to {} chips using {}",
+            amount.raw(),
+            format!("{rounding:?}").to_ascii_lowercase()
+        ));
+    }
     nonzero(amount, key, zero)
 }
 
-fn chip_count(number: i64, key: &str, zero: bool) -> Result<MwChips, SpotError> {
-    let amount = u64::try_from(number)
-        .map(MwChips)
-        .map_err(|_| value_error(key, "must not be negative"))?;
-    nonzero(amount, key, zero)
+fn numeric_decimal(text: &str) -> Option<String> {
+    let cleaned = text.replace('_', "");
+    let cleaned = cleaned.strip_prefix('+').unwrap_or(&cleaned);
+    if cleaned.starts_with('-') {
+        return None;
+    }
+    for (prefix, radix) in [("0x", 16), ("0o", 8), ("0b", 2)] {
+        if let Some(digits) = cleaned.strip_prefix(prefix) {
+            return u64::from_str_radix(digits, radix)
+                .ok()
+                .map(|n| n.to_string());
+        }
+    }
+    let (mantissa, exponent) = match cleaned.split_once(['e', 'E']) {
+        Some((m, e)) => (m, e.parse::<i32>().ok()?),
+        None => (cleaned, 0),
+    };
+    if !crate::dialect::plain_decimal(mantissa) {
+        return None;
+    }
+    let (whole, fraction) = mantissa.split_once('.').unwrap_or((mantissa, ""));
+    let digits = format!("{whole}{fraction}");
+    let point = i64::try_from(whole.len())
+        .ok()?
+        .checked_add(i64::from(exponent))?;
+    if !(-10000..=10000).contains(&point) {
+        return None;
+    }
+    if point <= 0 {
+        Some(format!("0.{}{digits}", "0".repeat((-point) as usize)))
+    } else if point as usize >= digits.len() {
+        Some(format!(
+            "{digits}{}",
+            "0".repeat(point as usize - digits.len())
+        ))
+    } else {
+        Some(format!(
+            "{}.{}",
+            &digits[..point as usize],
+            &digits[point as usize..]
+        ))
+    }
 }
 
-/// One amount written either in BB (`{key}_bb`) or in chips (`{key}_chips`),
-/// never both.
+fn is_amount_path(path: &str) -> bool {
+    matches!(
+        path,
+        "table.stack"
+            | "table.sb"
+            | "table.ante"
+            | "table.bb_ante"
+            | "economics.rake.cap"
+            | "economics.rake.rounding_unit"
+    ) || path.starts_with("table.stacks.")
+        || path.starts_with("table.straddles.")
+        || path.starts_with("economics.outside_field.")
+}
+
+fn preserve_amount_spellings(value: &mut Value, item: &toml_edit::Item, path: &str) {
+    if let (Some(table), Some(source)) = (value.as_table_mut(), item.as_table_like()) {
+        for (key, value) in table {
+            if let Some(item) = source.get(key) {
+                let child = if path.is_empty() {
+                    key.clone()
+                } else {
+                    format!("{path}.{key}")
+                };
+                preserve_amount_spellings(value, item, &child);
+            }
+        }
+    } else if let Some(source) = item.as_value() {
+        preserve_amount_value(value, source, path);
+    }
+}
+
+fn preserve_amount_value(value: &mut Value, source: &toml_edit::Value, path: &str) {
+    if let (Some(values), Some(array)) = (value.as_array_mut(), source.as_array()) {
+        for (i, (value, source)) in values.iter_mut().zip(array.iter()).enumerate() {
+            preserve_amount_value(value, source, &format!("{path}.{i}"));
+        }
+    } else if is_amount_path(path) {
+        let spelling = match source {
+            toml_edit::Value::Integer(v) => Some(v.display_repr().into_owned()),
+            toml_edit::Value::Float(v) => Some(v.display_repr().into_owned()),
+            _ => None,
+        };
+        if let Some(spelling) = spelling {
+            *value = Value::String(format!("\0{spelling}"));
+        }
+    }
+}
+
+fn amount(
+    value: &Value,
+    key: &str,
+    zero: bool,
+    scale: ChipScale,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
+) -> Result<MwChips, SpotError> {
+    match value {
+        Value::Integer(n) => bb_amount(*n as f64, key, zero, scale, rounding, warnings),
+        Value::Float(n) => bb_amount(*n, key, zero, scale, rounding, warnings),
+        Value::String(s) => {
+            if let Some(numeric) = s.strip_prefix('\0') {
+                let text = numeric_decimal(numeric).ok_or_else(|| {
+                    value_error(
+                        key,
+                        "must be a finite non-negative BB amount within chip capacity",
+                    )
+                })?;
+                return decimal_amount(&text, key, zero, scale, rounding, warnings);
+            }
+            if let Some(digits) = s.strip_suffix('c') {
+                if digits.is_empty()
+                    || !digits.bytes().all(|b| b.is_ascii_digit())
+                    || (digits.len() > 1 && digits.starts_with('0'))
+                {
+                    return Err(value_error(
+                        key,
+                        "expected an integer chip amount such as 100c",
+                    ));
+                }
+                let n = digits
+                    .parse::<u64>()
+                    .map_err(|_| value_error(key, "chip amount exceeds capacity"))?;
+                nonzero(MwChips(n), key, zero)
+            } else {
+                decimal_amount(
+                    s.strip_suffix("bb").unwrap_or(s),
+                    key,
+                    zero,
+                    scale,
+                    rounding,
+                    warnings,
+                )
+            }
+        }
+        _ => Err(type_error(key, "amount")),
+    }
+}
+
 fn either(
     scale: ChipScale,
-    bb: Option<f64>,
-    chips: Option<i64>,
+    value: Option<Value>,
     key: &str,
     zero: bool,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
 ) -> Result<Option<MwChips>, SpotError> {
-    let bb_key = format!("{key}_bb");
-    let chips_key = format!("{key}_chips");
-    match (bb, chips) {
-        (Some(_), Some(_)) => Err(value_error(
-            &chips_key,
-            format!("cannot combine {bb_key} and {chips_key}"),
-        )),
-        (Some(v), None) => bb_amount(v, &bb_key, zero, scale).map(Some),
-        (None, Some(n)) => chip_count(n, &chips_key, zero).map(Some),
-        (None, None) => Ok(None),
-    }
+    value
+        .as_ref()
+        .map(|v| amount(v, key, zero, scale, rounding, warnings))
+        .transpose()
 }
 
-/// A list written either in BB or in chips, with the key that was used.
 fn either_list(
     scale: ChipScale,
-    bb: Option<Vec<f64>>,
-    chips: Option<Vec<i64>>,
+    values: Option<Vec<Value>>,
     key: &str,
     zero: bool,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
 ) -> Result<Option<(String, Vec<MwChips>)>, SpotError> {
-    let bb_key = format!("{key}_bb");
-    let chips_key = format!("{key}_chips");
-    match (bb, chips) {
-        (Some(_), Some(_)) => Err(value_error(
-            &chips_key,
-            format!("cannot combine {bb_key} and {chips_key}"),
-        )),
-        (Some(values), None) => {
+    values
+        .map(|values| {
             let amounts = values
                 .iter()
                 .enumerate()
-                .map(|(i, v)| bb_amount(*v, &format!("{bb_key}.{i}"), zero, scale))
+                .map(|(i, v)| amount(v, &format!("{key}.{i}"), zero, scale, rounding, warnings))
                 .collect::<Result<_, _>>()?;
-            Ok(Some((bb_key, amounts)))
-        }
-        (None, Some(values)) => {
-            let amounts = values
-                .iter()
-                .enumerate()
-                .map(|(i, n)| chip_count(*n, &format!("{chips_key}.{i}"), zero))
-                .collect::<Result<_, _>>()?;
-            Ok(Some((chips_key, amounts)))
-        }
-        (None, None) => Ok(None),
-    }
+            Ok((key.to_owned(), amounts))
+        })
+        .transpose()
 }
 
-pub(crate) fn validate_bb_literals(item: &toml_edit::Item, path: &str) -> Result<(), SpotError> {
+fn restore_warning_spellings(item: &toml_edit::Item, path: &str, warnings: &mut [String]) {
     if let Some(table) = item.as_table_like() {
-        for (key, value) in table.iter() {
-            let child = if path.is_empty() {
+        for (key, child) in table.iter() {
+            let path = if path.is_empty() {
                 key.to_owned()
             } else {
                 format!("{path}.{key}")
             };
-            validate_bb_literals(value, &child)?;
+            restore_warning_spellings(child, &path, warnings);
         }
     } else if let Some(value) = item.as_value() {
-        validate_bb_value(value, path)?;
+        restore_value_spellings(value, path, warnings);
     }
-    Ok(())
 }
 
-/// Reject BB numbers whose decoded `f64` is not exactly the written decimal,
-/// so a sub-chip tail cannot be erased before the chip conversion.
-fn validate_bb_value(value: &toml_edit::Value, path: &str) -> Result<(), SpotError> {
+fn restore_value_spellings(value: &toml_edit::Value, path: &str, warnings: &mut [String]) {
     if let Some(array) = value.as_array() {
         for (i, value) in array.iter().enumerate() {
-            validate_bb_value(value, &format!("{path}.{i}"))?;
+            restore_value_spellings(value, &format!("{path}.{i}"), warnings);
         }
-        return Ok(());
+        return;
     }
-    let is_bb = matches!(
-        path,
-        "table.stack_bb"
-            | "table.sb_bb"
-            | "table.ante_bb"
-            | "table.bb_ante_bb"
-            | "economics.rake.cap_bb"
-            | "economics.rake.rounding_unit_bb"
-    ) || path.starts_with("table.stacks_bb.")
-        || path.starts_with("table.straddles_bb.")
-        || path.starts_with("economics.outside_field_bb.");
-    if !is_bb {
-        return Ok(());
-    }
-    let (spelling, decoded) = match value {
-        toml_edit::Value::Integer(i) => (i.value().to_string(), *i.value() as f64),
-        toml_edit::Value::Float(f) => (f.display_repr().into_owned(), *f.value()),
-        _ => unreachable!("numeric shapes were checked"),
+    let spelling = match value {
+        toml_edit::Value::Integer(v) => v.display_repr().into_owned(),
+        toml_edit::Value::Float(v) => v.display_repr().into_owned(),
+        _ => return,
     };
-    let exact = exact_decimal(&spelling).ok_or_else(|| {
-        value_error(
-            path,
-            "must be a finite non-negative BB amount within chip capacity",
-        )
-    })?;
-    if exact_decimal(&decoded.to_string()) != Some(exact) {
-        return Err(value_error(
-            path,
-            "BB amount cannot be represented without changing its value",
-        ));
+    let prefix = format!("{path}: ");
+    for warning in warnings.iter_mut() {
+        if let Some(rest) = warning.strip_prefix(&prefix)
+            && let Some((_, suffix)) = rest.split_once(" BB rounded to ")
+        {
+            *warning = format!("{prefix}{spelling} BB rounded to {suffix}");
+        }
     }
-    Ok(())
 }
 
 fn positive(number: i64, key: &str) -> Result<u64, SpotError> {
@@ -772,7 +885,7 @@ fn chip_scale(raw: &RawTable) -> Result<ChipScale, SpotError> {
     }
 }
 
-fn table(raw: RawTable) -> Result<Table, SpotError> {
+fn table(raw: RawTable, warnings: &mut Vec<String>) -> Result<Table, SpotError> {
     let players = raw
         .players
         .ok_or_else(|| type_error("table.players", "required integer"))?;
@@ -791,30 +904,34 @@ fn table(raw: RawTable) -> Result<Table, SpotError> {
         raw.chip_rounding.as_deref().unwrap_or("nearest"),
         "table.chip_rounding",
     )?;
-    if raw.stacks_bb.is_some() && raw.stacks_chips.is_some() {
-        return Err(value_error(
-            "table.stacks_chips",
-            "cannot combine table.stacks_bb and table.stacks_chips",
-        ));
-    }
-    let stacks_bb = raw.stacks_bb.unwrap_or_default();
-    let stacks_chips = raw.stacks_chips.unwrap_or_default();
-    check_positions(stacks_bb.keys(), &positions, "table.stacks_bb")?;
-    check_positions(stacks_chips.keys(), &positions, "table.stacks_chips")?;
-    let default = either(scale, raw.stack_bb, raw.stack_chips, "table.stack", false)?;
+    let stacks_by_position = raw.stacks.unwrap_or_default();
+    check_positions(stacks_by_position.keys(), &positions, "table.stacks")?;
+    let default = either(
+        scale,
+        raw.stack,
+        "table.stack",
+        false,
+        chip_rounding,
+        warnings,
+    )?;
     let stacks = SeatVec::new_unchecked(
         positions
             .iter()
             .map(|name| {
-                if let Some(v) = stacks_bb.get(name) {
-                    bb_amount(*v, &format!("table.stacks_bb.{name}"), false, scale)
-                } else if let Some(n) = stacks_chips.get(name) {
-                    chip_count(*n, &format!("table.stacks_chips.{name}"), false)
+                if let Some(v) = stacks_by_position.get(name) {
+                    amount(
+                        v,
+                        &format!("table.stacks.{name}"),
+                        false,
+                        scale,
+                        chip_rounding,
+                        warnings,
+                    )
                 } else {
                     default.ok_or_else(|| {
                         value_error(
-                            format!("table.stacks_bb.{name}"),
-                            "missing stack; specify stack_bb, stack_chips, or every position",
+                            format!("table.stacks.{name}"),
+                            "missing stack; specify stack or every position",
                         )
                     })
                 }
@@ -825,46 +942,56 @@ fn table(raw: RawTable) -> Result<Table, SpotError> {
     stacks
         .iter()
         .try_fold(0u64, |a, b| a.checked_add(b.0))
-        .ok_or_else(|| value_error("table.stacks_bb", "total stacks exceed chip capacity"))?;
-    let sb = match either(scale, raw.sb_bb, raw.sb_chips, "table.sb", false)? {
+        .ok_or_else(|| value_error("table.stacks", "total stacks exceed chip capacity"))?;
+    let sb = match either(scale, raw.sb, "table.sb", false, chip_rounding, warnings)? {
         Some(sb) => sb,
-        None if bb.raw().is_multiple_of(2) => MwChips(bb.raw() / 2),
-        None => {
-            return Err(value_error(
-                "table.sb_bb",
+        None => decimal_amount(
+            "0.5",
+            "table.sb (default)",
+            false,
+            scale,
+            chip_rounding,
+            warnings,
+        )
+        .map_err(|e| {
+            value_error(
+                "table.sb",
                 format!(
-                    "the default 0.5 BB is not a whole number of chips (table.bb_chips = {}); set table.sb_bb or table.sb_chips",
-                    scale.chips_per_bb()
+                    "default 0.5 BB rounds to zero; specify a positive sb such as \"1c\" ({})",
+                    e.message
                 ),
-            ));
-        }
+            )
+        })?,
     };
     if sb > bb {
-        return Err(value_error("table.sb_bb", "must be at most 1 BB"));
+        return Err(value_error("table.sb", "must be at most 1 BB"));
     }
-    let ante = either(scale, raw.ante_bb, raw.ante_chips, "table.ante", true)?.unwrap_or_default();
+    let ante =
+        either(scale, raw.ante, "table.ante", true, chip_rounding, warnings)?.unwrap_or_default();
     let bb_ante = either(
         scale,
-        raw.bb_ante_bb,
-        raw.bb_ante_chips,
+        raw.bb_ante,
         "table.bb_ante",
         true,
+        chip_rounding,
+        warnings,
     )?
     .unwrap_or_default();
     if ante.0 > 0 && bb_ante.0 > 0 {
         return Err(value_error(
-            "table.bb_ante_bb",
+            "table.bb_ante",
             "cannot combine a positive ante and bb_ante",
         ));
     }
     let (straddle_key, posts) = either_list(
         scale,
-        raw.straddles_bb,
-        raw.straddles_chips,
+        raw.straddles,
         "table.straddles",
         false,
+        chip_rounding,
+        warnings,
     )?
-    .unwrap_or_else(|| ("table.straddles_bb".into(), Vec::new()));
+    .unwrap_or_else(|| ("table.straddles".into(), Vec::new()));
     if posts.len() > players - 2 {
         return Err(value_error(
             &straddle_key,
@@ -921,15 +1048,19 @@ fn table(raw: RawTable) -> Result<Table, SpotError> {
     })
 }
 
-fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
+fn economics(
+    raw: RawEconomics,
+    table: &Table,
+    warnings: &mut Vec<String>,
+) -> Result<Economics, SpotError> {
     let players = table.stacks.len();
     let scale = table.setup.scale();
+    let chip_rounding = table.setup.chip_rounding;
     let (rake, utility) = match raw.kind.as_deref().unwrap_or("cash") {
         "cash" => {
             for (name, set) in [
                 ("payouts", raw.payouts.is_some()),
-                ("outside_field_bb", raw.outside_field_bb.is_some()),
-                ("outside_field_chips", raw.outside_field_chips.is_some()),
+                ("outside_field", raw.outside_field.is_some()),
             ] {
                 if set {
                     return Err(SpotError::new(
@@ -951,14 +1082,22 @@ fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
                             "must be finite and between 0 and 1",
                         ));
                     }
-                    let cap_bb = either(scale, r.cap_bb, r.cap_chips, "economics.rake.cap", true)?
-                        .map(|cap| scale.to_bb(cap));
+                    let cap_chips = either(
+                        scale,
+                        r.cap,
+                        "economics.rake.cap",
+                        true,
+                        chip_rounding,
+                        warnings,
+                    )?
+                    .map(|cap| cap.0);
                     let rounding_unit = either(
                         scale,
-                        r.rounding_unit_bb,
-                        r.rounding_unit_chips,
+                        r.rounding_unit,
                         "economics.rake.rounding_unit",
                         false,
+                        chip_rounding,
+                        warnings,
                     )?
                     .unwrap_or(MwChips(1));
                     let allocation = match r.allocation.as_deref().unwrap_or("main-first") {
@@ -980,7 +1119,7 @@ fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
                         .map_err(|e| value_error("economics.rake.when", e))?;
                     RakeConfig::Generic {
                         rate,
-                        cap_bb,
+                        cap_chips,
                         when,
                         allocation,
                         rounding,
@@ -999,12 +1138,13 @@ fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
             }
             let (field_key, outside) = either_list(
                 scale,
-                raw.outside_field_bb,
-                raw.outside_field_chips,
+                raw.outside_field,
                 "economics.outside_field",
                 false,
+                chip_rounding,
+                warnings,
             )?
-            .unwrap_or_else(|| ("economics.outside_field_bb".into(), Vec::new()));
+            .unwrap_or_else(|| ("economics.outside_field".into(), Vec::new()));
             let field = players + outside.len();
             if field > economics::ICM_MAX_PLAYERS {
                 return Err(value_error(&field_key, "field exceeds 10000 players"));
@@ -1014,7 +1154,7 @@ fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
                 .enumerate()
                 .map(|(i, stack)| FieldPlayerConfig {
                     name: format!("outside-{i}"),
-                    stack_bb: scale.to_bb(stack),
+                    stack_chips: stack.0,
                 })
                 .collect();
             let mut payouts = raw
@@ -1059,11 +1199,130 @@ fn economics(raw: RawEconomics, table: &Table) -> Result<Economics, SpotError> {
     })
 }
 
+/// Report rounded BB literals without rewriting the source.
+fn round_tree_bb(
+    source: &str,
+    params: &[nlh::script::ParamSchema],
+    overrides: &BTreeMap<String, String>,
+    scale: ChipScale,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
+    probe: bool,
+) -> Result<String, SpotError> {
+    let key = "tree.script";
+    let mut transformed = String::new();
+    let mut copied = 0;
+    let mut chars = source.char_indices().peekable();
+    let mut in_sizes = false;
+    let mut last_word = "";
+    let mut previous_word = "";
+    while let Some((start, c)) = chars.next() {
+        if c == '#' || c == '"' {
+            let end_char = if c == '#' { '\n' } else { '"' };
+            while let Some(&(_, next)) = chars.peek() {
+                if next == end_char {
+                    if c == '"' {
+                        chars.next();
+                    }
+                    break;
+                }
+                chars.next();
+            }
+        } else if c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '%' | '-') {
+            let mut end = start + c.len_utf8();
+            while let Some(&(i, next)) = chars.peek() {
+                if !(next.is_ascii_alphanumeric() || matches!(next, '_' | '.' | '%' | '-')) {
+                    break;
+                }
+                chars.next();
+                end = i + next.len_utf8();
+            }
+            let word = &source[start..end];
+            let before = source[..start].trim_end();
+            let bare_size = in_sizes
+                || before.ends_with("within")
+                || ((before.ends_with('>') || before.ends_with(">="))
+                    && before
+                        .rsplit(['\n', '{', '}'])
+                        .next()
+                        .is_some_and(|s| s.split_whitespace().any(|w| w == "jam")));
+            let param = params.iter().find(|param| param.name == word);
+            previous_word = last_word;
+            last_word = word;
+            let literal = param.map_or(word, |param| param.default.as_str());
+            if bare_size
+                && probe
+                && (crate::dialect::plain_decimal(literal.strip_suffix("bb").unwrap_or(literal))
+                    || (word
+                        .bytes()
+                        .next()
+                        .is_some_and(|b| b.is_ascii_alphabetic() || b == b'_')
+                        && crate::dialect::parse_size_literal(word).is_err()))
+            {
+                transformed.push_str(&source[copied..start]);
+                transformed.push_str("1c");
+                copied = end;
+                continue;
+            }
+            let line = source[..start].bytes().filter(|b| *b == b'\n').count() + 1;
+            if bare_size && !probe && literal == "0c" {
+                return Err(value_error(
+                    key,
+                    format!("line {line}: chip size must be positive"),
+                ));
+            }
+            if let Some(number) = bare_size
+                .then(|| literal.strip_suffix("bb").unwrap_or(literal))
+                .filter(|n| crate::dialect::plain_decimal(n))
+            {
+                if number.bytes().all(|b| b == b'0' || b == b'.') {
+                    return Err(value_error(
+                        key,
+                        format!("line {line}: tree size must be positive"),
+                    ));
+                }
+                let (amount, changed) = scale.parse_bb_rounded(number, rounding).map_err(|e| {
+                    let error = amount_error(e, key, scale);
+                    value_error(key, format!("line {line}: {}", error.message))
+                })?;
+                transformed.push_str(&source[copied..start]);
+                transformed.push_str(&format!("{}c", amount.raw()));
+                copied = end;
+                if changed {
+                    let column = source[..start].rsplit('\n').next().unwrap().chars().count() + 1;
+                    let location = if param.is_some() && overrides.contains_key(word) {
+                        format!("tree.params.{word} (used at tree.script:{line}:{column})")
+                    } else {
+                        format!("tree.script:{line}:{column}")
+                    };
+                    warnings.push(format!(
+                        "{location}: {number} BB rounded to {} chips using {}",
+                        amount.raw(),
+                        format!("{rounding:?}").to_ascii_lowercase()
+                    ));
+                }
+            }
+        } else {
+            if c == '[' {
+                in_sizes = matches!(previous_word, "add" | "replace" | "force")
+                    && matches!(last_word, "fold" | "check" | "call" | "bet" | "raise");
+            }
+            if c == ']' {
+                in_sizes = false;
+            }
+        }
+    }
+    transformed.push_str(&source[copied..]);
+    Ok(transformed)
+}
+
 fn tree(
     raw: RawTree,
     config_path: &Path,
     product: Product,
     scale: ChipScale,
+    rounding: Rounding,
+    warnings: &mut Vec<String>,
 ) -> Result<Tree, SpotError> {
     if raw.script.is_some() && raw.source.is_some() {
         return Err(value_error(
@@ -1113,7 +1372,16 @@ fn tree(
         };
         overrides.insert(key.clone(), text);
     }
-    let compiled = Script::compile(&script, &overrides, &NLH_V1).map_err(|e| {
+    let probe = round_tree_bb(
+        &script,
+        &[],
+        &overrides,
+        scale,
+        rounding,
+        &mut Vec::new(),
+        true,
+    )?;
+    let schema = Script::compile(&probe, &overrides, &NLH_V1).map_err(|e| {
         if e.line == 0 {
             for key in overrides.keys() {
                 if e.message == format!("override {key:?} does not name a declared param") {
@@ -1126,23 +1394,27 @@ fn tree(
         }
         value_error("tree.script", e.to_string())
     })?;
-    for size in compiled.rules.iter().flat_map(|rule| &rule.sizes) {
-        if let nlh::SizeSpec::ToBb { value } = *size
-            && let Err(error) = scale.parse_bb(&value.to_string())
-        {
-            let error = amount_error(error, "tree.script", scale);
-            return Err(value_error(
-                "tree.script",
-                format!("size {} {}", size.render(nlh::SizeUnit::Bb), error.message),
-            ));
-        }
-    }
-    let preflop_dialect = nlh::script::Dialect {
-        vars: crate::dialect::PREFLOP_VARS,
+    let transformed = round_tree_bb(
+        &script,
+        &schema.params,
+        &overrides,
+        scale,
+        rounding,
+        warnings,
+        false,
+    )?;
+    let compiled_dialect = nlh::script::Dialect {
+        size_parser: Some(crate::dialect::parse_compiled_size_literal),
         ..NLH_V1
     };
+    let compiled = Script::compile(&transformed, &overrides, &compiled_dialect)
+        .map_err(|e| value_error("tree.script", e.to_string()))?;
+    let preflop_dialect = nlh::script::Dialect {
+        vars: crate::dialect::PREFLOP_VARS,
+        ..compiled_dialect
+    };
     if product == Product::MultiwayPreflop {
-        Script::compile(&script, &overrides, &preflop_dialect).map_err(|e| {
+        Script::compile(&transformed, &overrides, &preflop_dialect).map_err(|e| {
             value_error(
                 "tree.script",
                 format!("P2 (Multiway Preflop) cannot read board variables: {e}"),
@@ -1245,4 +1517,94 @@ fn run(raw: RawRun, product: Product) -> Result<Run, SpotError> {
         )?,
         final_checkpoint: raw.final_checkpoint.unwrap_or(true),
     })
+}
+
+#[cfg(test)]
+mod rounding_warning_tests {
+    use super::*;
+
+    #[test]
+    fn warnings_follow_effective_size_uses_not_parameter_declarations() {
+        let source = "param threshold = 2.5\nparam size = 2.5\nparam unused = 2.5bb\nflop when spr > threshold { replace bet [size] }";
+        let overrides = BTreeMap::from([("size".to_owned(), "3.5".to_owned())]);
+        let compiled = Script::compile(source, &overrides, &NLH_V1).unwrap();
+        let mut warnings = Vec::new();
+        round_tree_bb(
+            source,
+            &compiled.params,
+            &overrides,
+            ChipScale::new(3).unwrap(),
+            Rounding::Nearest,
+            &mut warnings,
+            false,
+        )
+        .unwrap();
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].contains("tree.params.size"));
+        assert!(warnings[0].contains("3.5 BB"));
+    }
+
+    #[test]
+    fn compiled_sizes_preserve_exact_chips_and_rounded_zero() {
+        let source = "preflop { replace raise [9007199254740993c, 0.0000000000000000000000000000000000000001] }";
+        let raw = RawTree {
+            script: Some(source.into()),
+            ..Default::default()
+        };
+        let mut warnings = Vec::new();
+        let tree = tree(
+            raw,
+            Path::new("config.toml"),
+            Product::MultiwayPreflop,
+            ChipScale::new(3).unwrap(),
+            Rounding::Down,
+            &mut warnings,
+        )
+        .unwrap();
+        assert_eq!(tree.script, source);
+        assert_eq!(
+            tree.compiled.rules[0].sizes[0],
+            nlh::SizeSpec::ToChips {
+                value: 9007199254740993
+            }
+        );
+        assert_eq!(
+            tree.compiled.rules[0].sizes[1],
+            nlh::SizeSpec::ToChips { value: 0 }
+        );
+        assert_eq!(warnings.len(), 1);
+    }
+
+    #[test]
+    fn condition_lists_are_not_rewritten_and_size_errors_include_line() {
+        let source = "\npreflop when pot in [0, 1e999] { remove bet }";
+        let raw = RawTree {
+            script: Some(source.into()),
+            ..Default::default()
+        };
+        let error = tree(
+            raw,
+            Path::new("config.toml"),
+            Product::MultiwayPreflop,
+            ChipScale::DEFAULT,
+            Rounding::Nearest,
+            &mut Vec::new(),
+        )
+        .unwrap_err();
+        assert!(error.message.contains("finite") && error.message.contains("line 2"));
+        let raw = RawTree {
+            script: Some("preflop { replace raise [0] }".into()),
+            ..Default::default()
+        };
+        let error = tree(
+            raw,
+            Path::new("config.toml"),
+            Product::MultiwayPreflop,
+            ChipScale::DEFAULT,
+            Rounding::Nearest,
+            &mut Vec::new(),
+        )
+        .unwrap_err();
+        assert!(error.message.contains("line 1"));
+    }
 }

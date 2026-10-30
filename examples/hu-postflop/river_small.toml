@@ -3,7 +3,7 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 5
+stack = 5
 
 [spot]
 line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"

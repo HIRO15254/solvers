@@ -210,6 +210,7 @@ fn bench<S: Storage>(
             &built.node_info,
             p.document.spot.context.street,
             p.config.scale,
+            p.config.chip_rounding,
         );
         (built.game, index, None, node_info)
     };

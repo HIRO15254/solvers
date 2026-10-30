@@ -421,7 +421,7 @@ fn trunk_solver_meets_b1_target() {
 
 fn config(players: usize, rake: bool, limp: bool) -> String {
     let mut raw = format!(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\n[table.stacks_bb]\nBTN = 3\n"
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\n[table.stacks]\nBTN = 3\n"
     );
     if players == 2 {
         raw.push_str("BB = 2\n");

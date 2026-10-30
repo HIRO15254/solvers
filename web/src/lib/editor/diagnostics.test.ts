@@ -13,7 +13,7 @@ describe("scriptIssueLine", () => {
 describe("tomlIssueLine", () => {
   const toml = [
     "schema = 'solvers.nlh/v1'", // 1
-    "[table.stacks_bb]", // 2
+    "[table.stacks]", // 2
     "CO = 80", // 3
     "[ranges]", // 4
     "BTN = 'AA'", // 5
@@ -37,7 +37,7 @@ describe("tomlIssueLine", () => {
 
   it("finds keys under tables and falls back to the deepest key on the path", () => {
     expect(tomlIssueLine(toml, "ranges.BTN", "invalid range")).toBe(5);
-    expect(tomlIssueLine(toml, "table.stacks_bb.CO", "must be positive")).toBe(3);
+    expect(tomlIssueLine(toml, "table.stacks.CO", "must be positive")).toBe(3);
     expect(tomlIssueLine(toml, "tree.allin_threshold", "unknown key")).toBe(6);
     expect(tomlIssueLine(toml, "tree.params.cb", "override does not name a declared param")).toBe(13);
     expect(tomlIssueLine(toml, "spot.board", "missing")).toBeNull();

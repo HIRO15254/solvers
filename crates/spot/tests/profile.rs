@@ -1,7 +1,7 @@
 use spot::{Code, Document, ProductSections, Spot, SpotError};
 use std::path::Path;
 
-const BASE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n";
+const BASE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n";
 struct Hook;
 impl ProductSections for Hook {
     fn normalize(
@@ -194,7 +194,7 @@ fn invalid_profiles_are_diagnosed() {
         assert!(e.message.contains(message), "{profile}: {e}");
     }
     let e = match Document::parse(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 100\n[profile]\n",
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 100\n[profile]\n",
         Path::new("config.toml"),
     ) {
         Ok(_) => panic!("accepted P2"),

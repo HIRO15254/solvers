@@ -87,8 +87,10 @@ pub(crate) fn validate(
             println!("{}", serde_json::to_string_pretty(&value)?)
         }
         crate::validate::ValidationFormat::Human => {
+            let scale = p.document.spot.table.setup.scale();
             println!(
-                "valid: schema={SCHEMA} product=P2 (Multiway Preflop) amounts=BB utility={}",
+                "valid: schema={SCHEMA} product=P2 (Multiway Preflop) amounts={} utility={}",
+                if scale.is_decimal() { "BB" } else { "chips" },
                 utility_unit(&p)
             );
             println!(
@@ -98,18 +100,38 @@ pub(crate) fn validate(
             );
             for seat in p.document.spot.table.positions.seats() {
                 println!(
-                    "{}: stack {} BB range {}",
+                    "{}: stack {} range {}",
                     p.document.spot.table.positions[seat],
-                    p.document
-                        .spot
-                        .table
-                        .setup
-                        .scale()
-                        .to_bb(p.document.spot.table.stacks[seat]),
+                    hu_postflop::prepare::bb(p.document.spot.table.stacks[seat].raw(), scale),
                     p.document.spot.ranges[seat].text
                 );
             }
-            println!("economics: {}", value["economics"]);
+            let mut economics = value["economics"].clone();
+            let display = |amount: &mut serde_json::Value| {
+                let chips = amount
+                    .as_str()
+                    .expect("normalized chip amount")
+                    .trim_end_matches('c')
+                    .parse()
+                    .expect("normalized chip amount");
+                *amount = json!(hu_postflop::prepare::bb(chips, scale));
+            };
+            if let Some(rake) = economics.get_mut("rake") {
+                for key in ["cap", "rounding_unit"] {
+                    if let Some(amount) = rake.get_mut(key) {
+                        display(amount);
+                    }
+                }
+            }
+            if let Some(field) = economics
+                .get_mut("outside_field")
+                .and_then(|v| v.as_array_mut())
+            {
+                for amount in field {
+                    display(amount);
+                }
+            }
+            println!("economics: {economics}");
             println!("rule hits: {rule_hit_status}");
             for rule in &summary.tree.rules {
                 println!("tree rule: {rule}");

@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { TomlPrimitive } from "smol-toml";
 import { api } from "../api/client";
 import { Button, Card, Label, SegmentedControl, Select } from "../cryst";
-import { fieldText, fieldValue, getAt, SCHEMA, setAt, writeDoc } from "../lib/config";
-import { bb } from "../lib/format";
-import { DraftInput } from "./common";
+import { fieldText, fieldValue, getAt, listValue, SCHEMA, setAt, writeDoc, type Path } from "../lib/config";
+import { amountChips, amountDisplay, amountInput, bb, chipDisplay } from "../lib/format";
+import { DraftInput, Field } from "./common";
 import { DocText, FieldIssue, useDoc, useIssue } from "./DocFields";
 import { PayoutsDialog } from "./PayoutsDialog";
 
@@ -20,7 +20,7 @@ const ECONOMICS_OPTIONS: {
 /** The economics keys only one kind has: rake exists only in cash. */
 const KIND_KEYS: Record<EconomicsKind, string[]> = {
   cash: ["rake"],
-  tournament: ["payouts", "outside_field_bb"],
+  tournament: ["payouts", "outside_field"],
 };
 
 type AnteKind = "none" | "all" | "bb";
@@ -30,8 +30,8 @@ const ANTE_OPTIONS: { value: AnteKind; label: string }[] = [
   { value: "bb", label: "BB ante" },
 ];
 const ANTE_KEY: Record<Exclude<AnteKind, "none">, string> = {
-  all: "ante_bb",
-  bb: "bb_ante_bb",
+  all: "ante",
+  bb: "bb_ante",
 };
 
 type TableMode = "normal" | "detail";
@@ -40,11 +40,30 @@ const TABLE_MODES: { value: TableMode; label: string }[] = [
   { value: "detail", label: "Per seat" },
 ];
 
-/** Reads a comma-separated list of non-negative numbers; null when any item is not one. */
-const numbers = (text: string): number[] | null => {
-  const items = text.split(",").map((item) => item.trim());
-  return items.every((item) => /^\d+(\.\d+)?$/.test(item)) ? items.map(Number) : null;
+/** Read amounts without losing their unit; the daemon validates their ranges. */
+const amounts = (text: string): (number | string)[] | null => {
+  const values = text.split(",").map((item) => amountInput(item.trim()));
+  return values.every((value) => value !== undefined) ? values as (number | string)[] : null;
 };
+
+/** Keep the written value in the document while showing the table's display form. */
+function AmountText({ label, path, hint, placeholder, list = false }: {
+  label: string; path: Path; hint?: string; placeholder?: string; list?: boolean;
+}) {
+  const { doc, update } = useDoc();
+  const issue = useIssue(path.join("."));
+  const id = useId();
+  const bbChips = Number(getAt(doc, ["table", "bb_chips"]) ?? 1000);
+  const rounding = fieldText(getAt(doc, ["table", "chip_rounding"]) ?? "nearest");
+  const display = (value: unknown): string => Array.isArray(value)
+    ? value.map(display).join(", ")
+    : amountDisplay(value, bbChips, rounding) || fieldText(value);
+  const parse = (text: string) => list ? listValue(text) : fieldValue(text);
+  const control = <DraftInput id={id} className="mono" label={hint ? undefined : label}
+    value={display(getAt(doc, path))} read={(text) => display(parse(text))}
+    onText={(text) => update(path, parse(text))} placeholder={placeholder} spellCheck={false} issue={issue?.message} />;
+  return hint ? <Field label={label} hint={hint} htmlFor={id}>{control}</Field> : control;
+}
 
 /**
  * The Table step: players, stacks, blinds, antes and the economics. The
@@ -88,7 +107,7 @@ export function SetupTable() {
       .line(
         writeDoc({
           schema: SCHEMA,
-          table: { players: Number(players), stack_bb: 100 },
+          table: { players: Number(players), stack: 100 },
         }),
         [],
       )
@@ -108,8 +127,11 @@ export function SetupTable() {
     };
   }, [players]);
 
-  const positive = (key: string) => Number(table(key) ?? 0) > 0;
-  const anteKind: AnteKind = positive("bb_ante_bb") ? "bb" : positive("ante_bb") ? "all" : anteChoice;
+  const bbChips = Number(table("bb_chips") ?? 1000);
+  const rounding = fieldText(table("chip_rounding") ?? "nearest");
+  const chips = (value: unknown) => amountChips(value ?? 0, bbChips, rounding);
+  const positive = (key: string) => (chips(table(key)) ?? 0n) > 0n;
+  const anteKind: AnteKind = positive("bb_ante") ? "bb" : positive("ante") ? "all" : anteChoice;
   const setAnteKind = (kind: AnteKind) => {
     setAnteChoice(kind);
     setDoc((d) => {
@@ -117,77 +139,81 @@ export function SetupTable() {
         TomlPrimitive | undefined;
       const moved = kind === "none" ? undefined : value;
       return setAt(
-        setAt(d, ["table", "ante_bb"], kind === "all" ? moved : undefined),
-        ["table", "bb_ante_bb"],
+        setAt(d, ["table", "ante"], kind === "all" ? moved : undefined),
+        ["table", "bb_ante"],
         kind === "bb" ? moved : undefined,
       );
     });
   };
 
   // A document that already needs per-seat values opens there; same-for-all drops what it cannot show.
-  const straddles = (table("straddles_bb") as number[] | undefined) ?? [];
-  const detailed = table("stacks_bb") !== undefined || (table("sb_bb") ?? 0.5) !== 0.5 || straddles.length > 0;
+  const straddles = (table("straddles") as (number | string)[] | undefined) ?? [];
+  const detailed = table("stacks") !== undefined || chips(table("sb") ?? 0.5) !== chips(0.5) || straddles.length > 0;
   const tableMode: TableMode = detailed ? "detail" : modeChoice;
   const setTableMode = (mode: TableMode) => {
     setModeChoice(mode);
     if (mode === "normal")
       setDoc((d) => {
-        const first = order[0] === undefined ? undefined : getAt(d, ["table", "stacks_bb", order[0]]);
-        const stack = (getAt(d, ["table", "stack_bb"]) ?? first) as TomlPrimitive | undefined;
-        const cleared = ["stacks_bb", "sb_bb", "straddles_bb"].reduce(
+        const first = order[0] === undefined ? undefined : getAt(d, ["table", "stacks", order[0]]);
+        const stack = (getAt(d, ["table", "stack"]) ?? first) as TomlPrimitive | undefined;
+        const cleared = ["stacks", "sb", "straddles"].reduce(
           (next, key) => setAt(next, ["table", key], undefined),
           d,
         );
-        return setAt(cleared, ["table", "stack_bb"], stack);
+        return setAt(cleared, ["table", "stack"], stack);
       });
   };
 
   const n = order.length;
-  const amount = (value: unknown, fallback: number) => bb(typeof value === "number" ? value : fallback);
-  const stacksText = order.map((p) => fieldText(getAt(doc, ["table", "stacks_bb", p]) ?? table("stack_bb"))).join(", ");
+  const amount = (value: unknown) => amountDisplay(value, bbChips, rounding) || fieldText(value);
+  const stacksText = order.map((p) => amount(getAt(doc, ["table", "stacks", p]) ?? table("stack"))).join(", ");
   const blindsText = order
-    .map((_, i) => (i === n - 1 ? "1" : i === n - 2 ? amount(table("sb_bb"), 0.5) : amount(straddles[i], 0)))
+    .map((_, i) => amount(i === n - 1 ? 1 : i === n - 2 ? table("sb") ?? 0.5 : straddles[i] ?? 0))
     .join(", ");
   const antesText = order
-    .map((_, i) => amount(Number(table("ante_bb") ?? 0) + (i === n - 1 ? Number(table("bb_ante_bb") ?? 0) : 0), 0))
+    .map((_, i) => {
+      const ante = chips(table("ante"));
+      const bbAnte = i === n - 1 ? chips(table("bb_ante")) : 0n;
+      return ante !== undefined && bbAnte !== undefined ? chipDisplay(ante + bbAnte, bbChips) : fieldText(table("ante"));
+    })
     .join(", ");
 
-  const commitStacks = (values: number[]) => {
+  const commitStacks = (values: (number | string)[]) => {
     const equal = values.every((v) => v === values[0]);
     setDoc((d) =>
       order.reduce(
-        (next, p, i) => (equal ? next : setAt(next, ["table", "stacks_bb", p], values[i])),
-        setAt(setAt(d, ["table", "stacks_bb"], undefined), ["table", "stack_bb"], equal ? values[0] : undefined),
+        (next, p, i) => (equal ? next : setAt(next, ["table", "stacks", p], values[i])),
+        setAt(setAt(d, ["table", "stacks"], undefined), ["table", "stack"], equal ? values[0] : undefined),
       ),
     );
     return null;
   };
   // The last two seats post SB and BB; the seats from the first actor on
   // that post more are the straddlers. The daemon judges the amounts.
-  const commitBlinds = (values: number[]) => {
-    if (values[n - 1] !== 1) return "The BB seat is 1 (amounts are in BB)";
+  const commitBlinds = (values: (number | string)[]) => {
+    if (!Number.isSafeInteger(bbChips) || bbChips <= 0 || chips(values[n - 1]) !== BigInt(bbChips)) return "The BB seat must be 1 BB";
     const before = values.slice(0, n - 2);
-    const gap = before.indexOf(0);
+    const gap = before.findIndex((v) => chips(v) === 0n);
     const placed = gap < 0 ? before : before.slice(0, gap);
-    if (before.slice(placed.length).some((v) => v !== 0)) return `Place straddles in a row from ${order[0]}`;
+    if (before.slice(placed.length).some((v) => chips(v) !== 0n)) return `Place straddles in a row from ${order[0]}`;
     const sb = values[n - 2];
     setDoc((d) =>
       setAt(
-        setAt(d, ["table", "sb_bb"], sb === 0.5 ? undefined : sb),
-        ["table", "straddles_bb"],
+        setAt(d, ["table", "sb"], sb),
+        ["table", "straddles"],
         placed.length > 0 ? placed : undefined,
       ),
     );
     return null;
   };
-  const commitAntes = (values: number[]) => {
-    const all = values.every((v) => v === values[0]);
-    const bbOnly = values.slice(0, n - 1).every((v) => v === 0);
+  const commitAntes = (values: (number | string)[]) => {
+    const all = values.every((v) => chips(v) === chips(values[0]));
+    const bbOnly = values.slice(0, n - 1).every((v) => chips(v) === 0n);
     if (!all && !bbOnly) return "Antes are the same for everyone, or the BB's only (BB ante)";
     setDoc((d) =>
       setAt(
-        setAt(d, ["table", "ante_bb"], all && values[0]! > 0 ? values[0] : undefined),
-        ["table", "bb_ante_bb"],
+        setAt(d, ["table", "ante"], all && (chips(values[0]) ?? 0n) > 0n ? values[0] : undefined),
+        ["table", "bb_ante"],
         !all && bbOnly ? values[n - 1] : undefined,
       ),
     );
@@ -195,9 +221,9 @@ export function SetupTable() {
   };
 
   const playersIssue = useIssue("table.players");
-  const stacksIssue = useIssue("table.stacks_bb", "table.stack_bb");
-  const blindsIssue = useIssue("table.sb_bb", "table.straddles_bb");
-  const antesIssue = useIssue("table.ante_bb", "table.bb_ante_bb");
+  const stacksIssue = useIssue("table.stacks", "table.stack");
+  const blindsIssue = useIssue("table.sb", "table.straddles");
+  const antesIssue = useIssue("table.ante", "table.bb_ante");
 
   return (
     <>
@@ -236,10 +262,10 @@ export function SetupTable() {
             </div>
             {tableMode === "normal" && (
               <>
-                <DocText
-                  label="Stack (BB)"
-                  path={["table", "stack_bb"]}
-                  hint="Everyone's starting stack. The SB is 0.5 BB"
+                <AmountText
+                  label="Stack"
+                  path={["table", "stack"]}
+                  hint="Everyone's starting stack. Enter BB (e.g. 100 or 100bb) or chips (e.g. 100000c). The SB is 0.5 BB"
                 />
                 <div className="field span-2">
                   <Label>Ante</Label>
@@ -251,8 +277,8 @@ export function SetupTable() {
                   />
                 </div>
                 {anteKind !== "none" && (
-                  <DocText
-                    label={anteKind === "all" ? "Ante (BB, everyone)" : "BB ante (BB)"}
+                  <AmountText
+                    label={anteKind === "all" ? "Ante (everyone)" : "BB ante"}
                     path={["table", ANTE_KEY[anteKind]]}
                     placeholder="0"
                   />
@@ -264,23 +290,23 @@ export function SetupTable() {
             <div className="stack" style={{ gap: 16 }}>
               {(
                 [
-                  ["Stacks (BB)", stacksText, commitStacks, stacksIssue],
-                  ["Blinds and straddles (BB)", blindsText, commitBlinds, blindsIssue],
-                  ["Antes (BB)", antesText, commitAntes, antesIssue],
+                  ["Stacks", stacksText, commitStacks, stacksIssue],
+                  ["Blinds and straddles", blindsText, commitBlinds, blindsIssue],
+                  ["Antes", antesText, commitAntes, antesIssue],
                 ] as const
               ).map(([label, value, commit, issue]) => (
                 <DraftInput
                   key={label}
                   className="mono"
                   label={label}
-                  hint={order.length > 0 ? `In the order ${order.join(", ")}` : undefined}
+                  hint={order.length > 0 ? `In the order ${order.join(", ")}. Use BB or chips (e.g. 2bb or 2000c)` : undefined}
                   value={value}
                   spellCheck={false}
                   issue={issue?.message}
-                  read={(text) => numbers(text)?.map(bb).join(", ") ?? ""}
+                  read={(text) => amounts(text)?.map(amount).join(", ") ?? ""}
                   onText={(text) => {
-                    const values = numbers(text);
-                    if (!values) return "Separate non-negative numbers with commas";
+                    const values = amounts(text);
+                    if (!values) return "Separate BB or chip amounts with commas";
                     if (values.length !== order.length)
                       return `Write one per player: ${order.length} (now ${values.length})`;
                     return commit(values);
@@ -326,11 +352,11 @@ export function SetupTable() {
                   </div>
                   <FieldIssue keys={["economics.payouts"]} />
                 </div>
-                <DocText
-                  label="Field off the table (BB)"
-                  path={["economics", "outside_field_bb"]}
+                <AmountText
+                  label="Field off the table"
+                  path={["economics", "outside_field"]}
                   placeholder="none"
-                  hint="Stacks of the players left who are not at this table. Comma-separated"
+                  hint="Stacks of the players left who are not at this table. Comma-separated BB or chip amounts"
                   list
                 />
               </>
@@ -342,7 +368,8 @@ export function SetupTable() {
                   placeholder="no rake"
                   hint="0 to 1. For example, 0.05 is 5%"
                 />
-                <DocText label="Rake cap (BB)" path={["economics", "rake", "cap_bb"]} placeholder="no cap" />
+                <AmountText label="Rake cap" path={["economics", "rake", "cap"]} placeholder="no cap" hint="BB or chips (e.g. 2bb or 2000c)" />
+                <AmountText label="Rake rounding unit" path={["economics", "rake", "rounding_unit"]} placeholder="1c" hint="BB or chips; defaults to one chip" />
                 <div className="span-2">
                   <DocText
                     label="Rake condition"

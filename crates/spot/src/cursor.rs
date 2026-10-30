@@ -98,6 +98,35 @@ pub(crate) fn line_text(actions: &[LineAction], scale: ChipScale) -> String {
     text
 }
 
+pub(crate) fn effective_line_text(actions: &[LineAction]) -> String {
+    let mut text = String::new();
+    let mut previous = None;
+    for action in actions {
+        if matches!(action.action, Action::Fold) {
+            continue;
+        }
+        if let Some(street) = previous {
+            text.push_str(if street == action.street { ", " } else { " / " });
+        }
+        text.push_str(&action.position);
+        text.push(' ');
+        match &action.action {
+            Action::BetTo {
+                all_in: false, to, ..
+            } => text.push_str(&format!("b{}c", to.0)),
+            Action::RaiseTo {
+                all_in: false, to, ..
+            } => text.push_str(&format!("r{}c", to.0)),
+            Action::BetTo { .. } | Action::RaiseTo { .. } => text.push('a'),
+            Action::Check => text.push('x'),
+            Action::Call { .. } => text.push('c'),
+            Action::Fold => unreachable!(),
+        }
+        previous = Some(action.street);
+    }
+    text
+}
+
 fn indexed(index: usize, error: SpotError) -> SpotError {
     SpotError::new(
         Code::NLH004,
@@ -129,7 +158,7 @@ pub fn line_cursor(text: &str, moves: Option<&[String]>) -> Result<LineCursor, S
                     replay::implicit_fold(&mut state, &table, &mut actions)
                 }
             } else {
-                replay::parse_move(spelling, scale)
+                replay::parse_move(spelling, scale, table.setup.chip_rounding)
                     .and_then(|mv| replay::apply(&mut state, &table, mv, false, &mut actions))
             };
             result.map_err(|error| indexed(index + 1, error))?;
@@ -255,7 +284,7 @@ fn next(state: &BettingState, table: &Table, seat: SeatId) -> LineNext {
 mod tests {
     use super::*;
 
-    const CONFIG: &str = "[table]\nplayers = 6\nstack_bb = 100\n[spot]\nline = 'BTN r2.5, BB c'\n";
+    const CONFIG: &str = "[table]\nplayers = 6\nstack = 100\n[spot]\nline = 'BTN r2.5, BB c'\n";
 
     fn explicit(config: &str, moves: &str) -> LineCursor {
         let tokens: Vec<String> = if moves.is_empty() {
@@ -320,7 +349,7 @@ mod tests {
     #[test]
     fn chip_tables_spell_non_decimal_amounts_in_chips() {
         // A 1-3 game with $1 chips: 1 BB = 3 chips, the SB is 1 chip.
-        let config = "[table]\nplayers = 6\nbb_chips = 3\nsb_chips = 1\nstack_bb = 100\n";
+        let config = "[table]\nplayers = 6\nbb_chips = 3\nsb = '1c'\nstack = 100\n";
         let root = explicit(config, "");
         assert_eq!(root.bb_chips, 3);
         let next = root.next.unwrap();
@@ -328,8 +357,8 @@ mod tests {
         assert_eq!(next.options[2].max, Some(299.0 / 3.0));
         let cursor = explicit(config, "f,f,f,r10c,f,r10");
         assert_eq!(cursor.line, "BTN r10c, BB r30c");
-        let error = line_cursor(config, Some(&["r2.5".into()])).unwrap_err();
-        assert!(error.message.contains("whole number of chips"), "{error}");
+        let cursor = explicit(config, "r2.5");
+        assert_eq!(cursor.line, "UTG r8c");
     }
 
     #[test]
@@ -417,7 +446,7 @@ mod tests {
 
     #[test]
     fn all_in_call_uses_c_and_terminal_has_no_next() {
-        let config = "[table]\nplayers = 2\nstack_bb = 100\n[table.stacks_bb]\nBB = 10\n";
+        let config = "[table]\nplayers = 2\nstack = 100\n[table.stacks]\nBB = 10\n";
         let cursor = explicit(config, "r20");
         let next = cursor.next.unwrap();
         assert_eq!(next.to_call, 19.0);
@@ -447,7 +476,7 @@ mod tests {
 
     #[test]
     fn seat_commitments_include_antes_and_blinds() {
-        let config = CONFIG.replace("stack_bb = 100", "stack_bb = 100\nante_bb = 0.125");
+        let config = CONFIG.replace("stack = 100", "stack = 100\nante = 0.125");
         let cursor = explicit(&config, "");
         assert_eq!(cursor.seats[0].committed, 0.125);
         assert_eq!(cursor.seats[0].wager, 0.0);
@@ -474,11 +503,10 @@ mod tests {
         assert!(line_cursor(&unfinished, None).unwrap().complete);
         for (suffix, code, key) in [
             ("unknown = 1", Code::NLH002, "table.unknown"),
-            ("sb_bb = 2", Code::NLH003, "table.sb_bb"),
-            ("ante_bb = 0.0001", Code::NLH003, "table.ante_bb"),
+            ("sb = 2", Code::NLH003, "table.sb"),
         ] {
             let error = line_cursor(
-                &format!("[table]\nplayers = 6\nstack_bb = 100\n{suffix}"),
+                &format!("[table]\nplayers = 6\nstack = 100\n{suffix}"),
                 Some(&[]),
             )
             .unwrap_err();

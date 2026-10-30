@@ -806,6 +806,7 @@ fn memory_usage_matches_allocated() {
             &game.node_info,
             start,
             config.scale,
+            config.chip_rounding,
         );
         let allocated = tree.heap_bytes() + game.game.evaluator.heap_bytes() + index.heap_bytes();
         assert!(
@@ -881,8 +882,8 @@ fn memory_usage_matches_allocated() {
     let turn = from_menus(
         Street::Turn,
         StreetMenus {
-            oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
-            oop_donk: Some(vec![SizeSpec::ToChips { value: 3.0 }]),
+            oop_bet: vec![SizeSpec::ToChips { value: 5 }],
+            oop_donk: Some(vec![SizeSpec::ToChips { value: 3 }]),
             oop_raise: Some(vec![vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }]]),
             ip_raise: Some(vec![
                 vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
@@ -1561,7 +1562,7 @@ fn raise_levels_apply_distinct_multiples_per_level() {
     let river = from_menus(
         Street::River,
         StreetMenus {
-            oop_bet: vec![SizeSpec::ToChips { value: 10.0 }],
+            oop_bet: vec![SizeSpec::ToChips { value: 10 }],
             oop_raise: Some(vec![
                 vec![SizeSpec::PreviousBetMultiple { factor: 3.0 }],
                 vec![SizeSpec::PreviousBetMultiple { factor: 2.5 }],
@@ -1651,7 +1652,7 @@ fn donk_menu_controls_oop_opening_action_after_a_called_ip_bet() {
     let turn = from_menus(
         Street::Turn,
         StreetMenus {
-            oop_bet: vec![SizeSpec::ToChips { value: 5.0 }],
+            oop_bet: vec![SizeSpec::ToChips { value: 5 }],
             oop_donk: Some(Vec::new()),
             aggression_limit: 1,
             ..Default::default()
@@ -1827,7 +1828,7 @@ fn sub_minimum_raise_is_bumped_to_the_minimum_full_raise() {
     let river = from_menus(
         Street::River,
         StreetMenus {
-            oop_bet: vec![SizeSpec::ToChips { value: 2.0 }],
+            oop_bet: vec![SizeSpec::ToChips { value: 2 }],
             ip_raise: Some(vec![vec![SizeSpec::PotAfterCall { fraction: 0.2 }]]),
             aggression_limit: 2,
             ..Default::default()
@@ -1883,7 +1884,7 @@ fn min_bet_refuses_to_open_below_its_own_value() {
     let river = from_menus(
         Street::River,
         StreetMenus {
-            oop_bet: vec![SizeSpec::ToChips { value: 3.0 }],
+            oop_bet: vec![SizeSpec::ToChips { value: 3 }],
             aggression_limit: 1,
             ..Default::default()
         },
@@ -2172,7 +2173,7 @@ fn tree_script_effect_add_appends_a_wager_candidate() {
             condition: Condition::Const(true),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
-            sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+            sizes: vec![SizeSpec::ToChips { value: 5 }],
         }]),
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
@@ -2195,7 +2196,7 @@ fn tree_script_effect_remove_strips_every_wager_of_that_kind() {
                 condition: Condition::Const(true),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
@@ -2226,14 +2227,14 @@ fn tree_script_effect_replace_swaps_the_wager_menu() {
                 condition: Condition::Const(true),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
                 condition: Condition::Const(true),
                 effect: Effect::Replace,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 8.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 8 }],
             },
         ]),
     };
@@ -2256,7 +2257,7 @@ fn tree_script_effect_force_drops_fold_check_and_call_too() {
             condition: Condition::Truth(TreeVar::Unopened),
             effect: Effect::Force,
             action: Some(ActionKind::Bet),
-            sizes: vec![SizeSpec::ToChips { value: 8.0 }],
+            sizes: vec![SizeSpec::ToChips { value: 8 }],
         }]),
     };
     let game = build_postflop_game(&river_only_config(river), chip_ev());
@@ -2279,7 +2280,7 @@ fn tree_script_effect_checkdown_keeps_only_check() {
                 condition: Condition::Const(true),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
@@ -2310,7 +2311,7 @@ fn tree_script_rule_action_kind_mismatch_is_inert() {
             condition: Condition::Const(true),
             effect: Effect::Add,
             action: Some(ActionKind::Raise),
-            sizes: vec![SizeSpec::ToChips { value: 9.0 }],
+            sizes: vec![SizeSpec::ToChips { value: 9 }],
         }]),
     };
     let mut config = river_only_config(river);
@@ -2381,7 +2382,7 @@ fn tree_script_emptying_a_node_is_rejected() {
                 condition: Condition::Const(true),
                 effect: Effect::Force,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
@@ -2416,7 +2417,7 @@ fn tree_script_emptying_a_node_is_rejected() {
                 condition: Condition::Const(true),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
@@ -2455,14 +2456,14 @@ fn tree_script_preflop_aggressor_drives_cbet_and_donk() {
                 condition: Condition::Truth(TreeVar::Cbet),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 5.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 5 }],
             },
             Rule {
                 street: Street::River,
                 condition: Condition::Truth(TreeVar::Donk),
                 effect: Effect::Add,
                 action: Some(ActionKind::Bet),
-                sizes: vec![SizeSpec::ToChips { value: 7.0 }],
+                sizes: vec![SizeSpec::ToChips { value: 7 }],
             },
         ]),
     };
@@ -2529,7 +2530,7 @@ fn tree_script_board_predicate_selects_different_menus_on_different_runouts() {
             condition: Condition::Truth(TreeVar::Paired),
             effect: Effect::Add,
             action: Some(ActionKind::Bet),
-            sizes: vec![SizeSpec::ToChips { value: 9.0 }],
+            sizes: vec![SizeSpec::ToChips { value: 9 }],
         }]),
     };
     let config = PostflopConfig {

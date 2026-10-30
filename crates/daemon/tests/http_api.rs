@@ -647,8 +647,8 @@ fn postflop_solution_views_use_real_cli_and_ordered_decoded_nodes() {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -656,7 +656,7 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-script = '''river when unopened { force bet [50] }'''
+script = '''river when unopened { force bet [50%] }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -772,8 +772,8 @@ fn postflop_profile_solution_views_preserve_locked_strategy() {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -781,7 +781,7 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-script = '''river when unopened { force bet [50] }'''
+script = '''river when unopened { force bet [50%] }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -928,8 +928,8 @@ fn cancelling_a_running_postflop_solve_stops_it_resumably() {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -937,7 +937,7 @@ board = "2c 7d 9h Js Qs"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-script = '''river when unopened { force bet [50] }'''
+script = '''river when unopened { force bet [50%] }'''
 [solver]
 storage = "f32"
 [solver.stop]
@@ -1011,8 +1011,8 @@ fn postflop_solution_views_resolve_unstored_rivers_on_request() {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2c 7d 9h Js"
@@ -1020,7 +1020,7 @@ board = "2c 7d 9h Js"
 BB = "AsAh"
 BTN = "KsKh"
 [tree]
-script = '''turn, river { replace bet [50] replace raise [] }'''
+script = '''turn, river { replace bet [50%] replace raise [] }'''
 [solver]
 storage = "f32"
 [solver.stop]

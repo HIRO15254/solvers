@@ -139,16 +139,17 @@ solvers config new --product p2 --template full --out table-full.toml
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。
 1 BBあたりのchip数は`table.bb_chips`（既定1000）で指定し、内部の額は整数chipで扱う。
-例えば$1 chipの1-3 gameでは`bb_chips = 3`、`sb_chips = 1`と書く。1 chipは1/3 BBである。
-stack・blindなどは`_bb`または整数の`_chips`で書き、同じ項目に両方は指定しない。BB値も整数chipに一致させる。
-`bb_chips`が奇数の場合、既定SBの0.5 BBは整数chipにならないので`sb_bb`または`sb_chips`を明示する。
-計算したsizeは`table.chip_rounding`（`down` / `nearest` / `up`、既定`nearest`）で整数chipへ丸める。
-rakeの丸めは`economics.rake.rounding_unit_bb`または`rounding_unit_chips`（既定1 chip）と
-`economics.rake.rounding`で別に指定する。P1のrange指定やline文法は規範の例に従う。
+例えば$1 chipの1-3 gameでは`bb_chips = 3`、`sb = "1c"`と書く。1 chipは1/3 BBである。
+stack・blindなどは1つのkeyに単位を値で書く。例えば`stack = 100`、`stack = "100bb"`は100 BB、`stack = "300c"`は300 chipである。文字列のBBは符号・指数なしの10進数、chipは符号・先頭0なしの整数とする。旧`stack_bb`・`stack_chips`などのkeyは`NLH002`となる。
+BB額と計算したsizeは`table.chip_rounding`（`down` / `nearest` / `up`、既定`nearest`）で整数chipへ丸める。`nearest`の中間値は切り上げ、`Nc`は正確に扱う。
+例えば`bb_chips = 3`の既定SB 0.5 BBは`nearest`なら2 chipsになる。1 chipのSBが必要なら`sb = "1c"`と書く。
+丸めで変わったBB値はvalidateの警告に位置（key、line action、script位置または既定SB）、元のBB値、結果のchip数と丸め方式が表示される。構文と丸め後の合法性は引き続き検査する。
+rakeの丸めは`economics.rake.rounding_unit`（既定`"1c"`）と`economics.rake.rounding`で別に指定する。P1のrange指定やline文法は規範の例に従う。
 P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
 `checkdown`は一致した手番をcheck、賭けに直面していればfoldにする。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
+tree scriptのsizeは接尾辞なし数値と`Nbb`がBB、`Nc`がchip、`N%`がpot比である。例えばpot 33%は`33%`で、`33`は33 BBである。`[tree.params]`の数値overrideもBBなので、pot比は`cb = "33%"`とする。`Nx`、`Ne`、`N%stack`、`N%effective`、`a`、`min`も使える。旧`50%pot`などは使えない。
 旧configの自動変換は無いため、現行例から書き直す。
 `tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は削除済みで、指定は未知keyの`NLH002`となる。
 これらを埋込みconfigに含むartifact・checkpointも読み込めない。
@@ -170,8 +171,8 @@ GTO Wizard（GTOW）の公開情報と[雛形の計測](../experiments/p1-effici
   `jam`は現在menuの到達額を閾値と比べ、該当候補だけをMへ置き換える。MはW＋残stack（P1ではeffective-stackの木の到達額）である。
   閾値は到達額への変換だけで求め、最小raiseへ引き上げずMでcapしない。候補自体は追加せず、後続ruleが追加した候補には作用しない。
   低SPRでは`turn, river when spr <= 1.5 { replace raise [a] }`でraiseをall-inにできる。
-- 近いsizeをまとめるには、sizeを足すruleの後へ`flop { merge bet within 10 }`を置く。大きい候補から順に見て、
-  直前に残した候補とのpot 10%以内の差の候補を削除する。幅は`0.5bb`や`5%stack`でも書け、all-inに近い候補はall-inへまとまる。
+- 近いsizeをまとめるには、sizeを足すruleの後へ`flop { merge bet within 10% }`を置く。大きい候補から順に見て、
+  直前に残した候補とのpot 10%以内の差の候補を削除する。`10`は10 BBであり、幅は`0.5bb`、`5c`や`5%stack`でも書ける。all-inに近い候補はall-inへまとまる。
 - 攻撃を3回までに制限するにはscriptの最後へ`flop, turn, river when aggressions >= 3 { remove raise }`を置く。
   ruleはソース順に適用するため、最後のcapは先行ruleに取り消されない。cap ruleが無ければraise chainはstackとNLHの合法性だけで制限され、木が大きくなりうる。
 - 3BP・4BPはSPRが低く木が小さいので、flopに3 sizeを置いても軽い。
@@ -198,6 +199,7 @@ solvers validate spot.toml --resources
 ```
 
 製品・開始状態・暗黙fold・tree ruleを確認する。実効入力は既定値を展開し、外部scriptをinline化する。
+実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列にし、stackが異なる場合は全positionを`[table.stacks]`に書く。script本文はそのまま保持する。`--show-effective`・`--write-effective`、`run.toml`、relockの`--print-config`、solution・checkpointに埋め込まれるconfigはこの形式である。再正規化は同じbytesになり、丸め警告は繰り返さない。
 P1は木と3種類のstorage bytes（JSON: `f32Bytes`・`i16Bytes`・`i16F32avgBytes`）を見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
 P2の`--resources`はpublic treeのarena countとrule hit測定を行うため、大きい木では時間が掛かる。
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
@@ -213,11 +215,10 @@ solvers line spot.toml --format json
 
 `--moves`は明示prefixをcomma区切りで置換する。省略すると`spot.line`を厳密にreplayする。
 cursorの`next.options`から次のtokenを選び、bet / raiseはstreet投入総額を付ける。
-`spot.line`でも`--moves`でも、整数chipに一致するBB10進数と整数chipの`Nc`表記を混在できる。
-例えば`bb_chips = 1000`では`r2.5`と`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
+`spot.line`でも`--moves`でも、接尾辞なし・`bb`付きのBBと整数chipの`Nc`表記を混在できる。BB額は卓の丸め方式で整数chipへ丸め、`Nc`は正確に扱う。
+例えば`bb_chips = 1000`では`r2.5`、`r2.5bb`と`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
 数値は各単位で最短表記とし、`r2.50`などは`NLH004`（exit 2）となる。
-実効configの`spot.line`は`bb_chips`の素因数が2と5だけなら最短のBB10進数、それ以外なら`Nc`へ揃える。
-tree scriptのsize literalの規則は変わらない。
+人が見る額は`bb_chips`の素因数が2と5だけなら最短の接尾辞なしBB10進数、それ以外なら`Nc`で表示する。node history、action label、tree、export、GUIも同じ表示表記を使う。実効configのlineは常に`Nc`である。
 all-in callは`c`、all-in bet / raiseは`a`である。`complete`はpostflop開始状態を表し、
 config全体の検証成功ではないため、solve前には通常のvalidateを実行する。
 JSONの全fieldと単位は[CLI reference](cli-reference.jp.md#solvers-line)を参照する。
@@ -232,6 +233,7 @@ solvers tree spot.toml --rest-of-street --format json
 ```
 
 既定はrootだけを返す。JSONの`children`にある履歴をそのまま`--node`へ渡して辿れる。
+`--node`やprofile・relockのselector、action labelは表示表記のほか、BB（接尾辞なしまたは`bb`付き）と`Nc`を受け付け、丸め後のchip額で照合する。
 行の意味は`export SOLUTION tree`と同じだが、まだ保存状態が無いので`stored`は含まない。
 solveやrun directoryの作成は行わず、P2 configと未知nodeは明示的に拒否する。
 
@@ -535,7 +537,7 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     `meta.name`は名前の欄）、そのstepのtabに印を付けて「Fix in（step名）」でそのstepを開く。どのstepにも入力欄の無いkeyのerrorは
     「Edit TOML」に印を付けてTOMLへ導き、TOMLの上に理由を示す。daemonは一度に1件のerrorを返す。
     Treeは検証が通るとdaemonの`POST /v1/tree`（`solvers tree --rest-of-street`と同じ行）で、1 streetの全decisionを字下げで示す。
-    各decisionは手番（席とOOP / IP）とpot、その下に各actionを並べる。actionはResultsと同じ色の印、額（BB）、
+    各decisionは手番（席とOOP / IP）とpot、その下に各actionを並べる。actionはResultsと同じ色の印、表示表記の額、
     betはpotに対する%、raiseはcall後のpotに対する%と直面額の倍率（scriptのsize literalと同じ読み方）、全stackならAll-inを示す。
     次のdecisionがあるactionは押すと開閉し、最初の2段は開いている。右上のbuttonで全て開く・閉じる。
     矢印key（上下で移動、左右で閉じる・開く、Enterで実行）でも操作できる。streetを閉じるaction（「Deal turn」「Deal river」）を

@@ -25,7 +25,7 @@ pub enum UtilityConfig {
 #[serde(deny_unknown_fields)]
 pub struct FieldPlayerConfig {
     pub name: String,
-    pub stack_bb: f64,
+    pub stack_chips: u64,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -49,7 +49,7 @@ pub enum RakeConfig {
     },
     Generic {
         rate: f64,
-        cap_bb: Option<f64>,
+        cap_chips: Option<u64>,
         when: String,
         allocation: RakeAllocation,
         rounding: Rounding,
@@ -119,7 +119,11 @@ impl UtilityConfig {
                     if player.name.trim().is_empty() {
                         return Err(ConfigError::OutsideName(index));
                     }
-                    positive_finite(&format!("outside_field[{index}].stack_bb"), player.stack_bb)?;
+                    if player.stack_chips == 0 {
+                        return Err(ConfigError::Number(format!(
+                            "outside_field[{index}].stack_chips"
+                        )));
+                    }
                 }
                 for (index, &payout) in payouts.iter().enumerate() {
                     nonnegative_finite(&format!("payouts[{index}]"), payout)?;
@@ -161,7 +165,7 @@ impl RakeConfig {
             }
             RakeConfig::Generic {
                 rate,
-                cap_bb,
+                cap_chips,
                 ref when,
                 allocation,
                 rounding,
@@ -171,12 +175,7 @@ impl RakeConfig {
                 if rounding_unit == MwChips::ZERO {
                     return Err(ConfigError::Number("rake.rounding_unit".into()));
                 }
-                let cap = cap_bb
-                    .map(|cap_bb| {
-                        nonnegative_finite("rake.cap_bb", cap_bb)?;
-                        chips("rake.cap_bb", cap_bb)
-                    })
-                    .transpose()?;
+                let cap = cap_chips.map(MwChips);
                 let when = compile_rake_condition(when).map_err(ConfigError::RakeCondition)?;
                 Ok(CompiledRake::Generic {
                     rate,
@@ -207,15 +206,6 @@ impl RakeConfig {
 
 fn finite(field: &str, value: f64) -> Result<(), ConfigError> {
     if value.is_finite() {
-        Ok(())
-    } else {
-        Err(ConfigError::Number(field.into()))
-    }
-}
-
-fn positive_finite(field: &str, value: f64) -> Result<(), ConfigError> {
-    finite(field, value)?;
-    if value > 0.0 {
         Ok(())
     } else {
         Err(ConfigError::Number(field.into()))
@@ -258,4 +248,62 @@ pub enum ConfigError {
     RakeCondition(String),
     #[error("rake rate must be from zero through one")]
     RakeRate,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generic_rake_cap_preserves_exact_chips() {
+        let json = r#"{"kind":"generic","rate":0.05,"cap_chips":18446744073709551615,"when":"true","allocation":"main-first","rounding":"down"}"#;
+        let config: RakeConfig = serde_json::from_str(json).unwrap();
+        assert!(
+            serde_json::to_string(&config)
+                .unwrap()
+                .contains(r#""cap_chips":18446744073709551615"#)
+        );
+        assert!(matches!(
+            config.compile(ChipScale::DEFAULT).unwrap(),
+            CompiledRake::Generic {
+                cap: Some(MwChips(u64::MAX)),
+                ..
+            }
+        ));
+        assert!(serde_json::from_str::<RakeConfig>(
+            r#"{"kind":"generic","rate":0.05,"cap_chips":1.5,"when":"true","allocation":"main-first","rounding":"down"}"#
+        ).is_err());
+        assert!(serde_json::from_str::<RakeConfig>(
+            r#"{"kind":"generic","rate":0.05,"cap_bb":1.0,"when":"true","allocation":"main-first","rounding":"down"}"#
+        ).is_err());
+    }
+
+    #[test]
+    fn outside_field_chips_are_exact_and_positive() {
+        let json = r#"{"kind":"tournament-icm","outside_field":[{"name":"Field","stack_chips":18446744073709551615}],"payouts":[100.0,0.0]}"#;
+        let config: UtilityConfig = serde_json::from_str(json).unwrap();
+        config.validate(1).unwrap();
+        let encoded = serde_json::to_string(&config).unwrap();
+        assert!(encoded.contains(r#""stack_chips":18446744073709551615"#));
+
+        let zero: UtilityConfig = serde_json::from_str(
+            r#"{"kind":"tournament-icm","outside_field":[{"name":"Field","stack_chips":0}],"payouts":[100.0,0.0]}"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            zero.validate(1),
+            Err(ConfigError::Number(field)) if field == "outside_field[0].stack_chips"
+        ));
+    }
+
+    #[test]
+    fn outside_field_rejects_non_integer_and_legacy_stacks() {
+        for player in [
+            r#"{"name":"Field","stack_chips":1.5}"#,
+            r#"{"name":"Field","stack_chips":-1}"#,
+            r#"{"name":"Field","stack_bb":10.0}"#,
+        ] {
+            assert!(serde_json::from_str::<FieldPlayerConfig>(player).is_err());
+        }
+    }
 }

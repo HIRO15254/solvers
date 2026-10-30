@@ -1,13 +1,13 @@
 use economics::{CompiledRake, RakeAllocation, RakeConfig, UtilityConfig};
 use nlh::script::{Condition, Script, VarKind, Vars};
-use nlh::{ChipScale, MwChips, Rounding, SeatId, SizeSpec, Street};
+use nlh::{ChipScale, MwChips, Rounding, SeatId, SizeContext, SizeSpec, Street};
 use spot::{
     Code, Document, NLH_V1, Product, ProductSections, Spot, SpotError, TreeVar, other_product_key,
     parse_size_literal,
 };
 use std::path::Path;
 
-const ROOT: &str = "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nstack_bb = 100\n";
+const ROOT: &str = "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nstack = 100\n";
 
 // Test-only product hook. Product keys remain opaque to the common crate.
 struct Stub;
@@ -128,8 +128,8 @@ fn every_common_default_and_section_order() {
     assert!(!normalized.contains("max_time"));
     assert!(!normalized.contains("[meta]"));
     assert!(!normalized.contains("[tree.params]"));
-    assert!(!normalized.contains("[table.stacks_bb]"));
-    assert!(normalized.contains("stack_bb = 100"));
+    assert!(!normalized.contains("[table.stacks]"));
+    assert!(normalized.contains("stack = \"100000c\""));
     assert_eq!(
         parse(&normalized).solver["test_default"].as_bool(),
         Some(true)
@@ -146,7 +146,7 @@ fn spec_p2_example_is_idempotent() {
 #[test]
 fn every_cash_key_explicit_and_idempotent() {
     let text = format!(
-        "{ROOT}sb_bb = 0.25\nante_bb = 0.125\nbb_ante_bb = 0\nstraddles_bb = [2, 4]\n[table.stacks_bb]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_bb = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit_bb = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
+        "{ROOT}sb = 0.25\nante = 0.125\nbb_ante = 0\nstraddles = [2, 4]\n[table.stacks]\nCO = 80.123\n[meta]\nname = \"six\"\ndescription = \"description\"\n[meta.derived_from]\nrun_id = \"id\"\nsolution_hash = \"hash\"\nline = \"BTN r2.5, BB c\"\nboard = \"Ks 7h 2d\"\n[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap = 4.001\nwhen = \"flop_dealt && players_dealt >= 2\"\nallocation = \"proportional\"\nrounding = \"nearest\"\nrounding_unit = 0.001\n[spot]\nline = \"\"\n[ranges]\nBTN = \"AA:0.5,KK\"\nBB = \"random\"\n[tree]\nscript = '''\nparam size = 2.5bb\nparam yes = true\nparam count = 1\nparam threshold = 2.5\npreflop when unopened == yes && aggressions < count && spr > threshold {{ replace raise [size] }}\n'''\n[tree.params]\nsize = \"3bb\"\nyes = false\ncount = 2\nthreshold = 3.5\n[solver]\nopaque = 5\n[solver.nested]\nkey = true\n[run]\nthreads = 2\nmemory = 2048\nmax_time = \"0.5h\"\ncheckpoint_interval = \"10s\"\n[output]\nopaque = \"kept\"\n"
     );
     let d = parse(&text);
     assert_eq!(
@@ -157,12 +157,12 @@ fn every_cash_key_explicit_and_idempotent() {
     assert_eq!(d.spot.tree.compiled.params[0].default, "3bb");
     assert_eq!(
         d.spot.tree.compiled.rules[0].sizes,
-        [SizeSpec::ToBb { value: 3.0 }]
+        [SizeSpec::ToChips { value: 3000 }]
     );
     assert_eq!(d.spot.run.max_time_seconds, Some(1800.0));
     let n = roundtrip(&text);
-    assert!(n.contains("CO = 80.123"));
-    assert!(n.contains("cap_bb = 4.001"));
+    assert!(n.contains("CO = \"80123c\""));
+    assert!(n.contains("cap = \"4001c\""));
     assert_eq!(parse(&n).solver["opaque"].as_integer(), Some(5));
 }
 
@@ -264,8 +264,8 @@ fn unknown_keys_at_every_closed_level() {
     for (text, key) in [
         (format!("{ROOT}[ranges]\nbtn = \"random\""), "ranges.btn"),
         (
-            format!("{ROOT}[table.stacks_bb]\nUTG2 = 5"),
-            "table.stacks_bb.UTG2",
+            format!("{ROOT}[table.stacks]\nUTG2 = 5"),
+            "table.stacks.UTG2",
         ),
     ] {
         let e = error(&text);
@@ -287,73 +287,60 @@ macro_rules! invalid {
 }
 invalid!(
     players_wrong_type,
-    "[table.stacks_bb]\nBTN = true",
+    "[table.stacks]\nBTN = true",
     NLH002,
-    "table.stacks_bb.BTN"
+    "table.stacks.BTN"
 );
-invalid!(sb_zero, "sb_bb = 0", NLH003, "table.sb_bb");
-invalid!(sb_too_big, "sb_bb = 1.001", NLH003, "table.sb_bb");
-invalid!(sb_off_grid, "sb_bb = 0.5001", NLH003, "table.sb_bb");
-invalid!(ante_negative, "ante_bb = -1", NLH003, "table.ante_bb");
-invalid!(
-    bbante_off_grid,
-    "bb_ante_bb = 0.0001",
-    NLH003,
-    "table.bb_ante_bb"
-);
+invalid!(sb_zero, "sb = 0", NLH003, "table.sb");
+invalid!(sb_too_big, "sb = 1.001", NLH003, "table.sb");
+invalid!(ante_negative, "ante = -1", NLH003, "table.ante");
 invalid!(
     antes_exclusive,
-    "ante_bb = 1\nbb_ante_bb = 1",
+    "ante = 1\nbb_ante = 1",
     NLH003,
-    "table.bb_ante_bb"
+    "table.bb_ante"
 );
 invalid!(
     straddle_too_small,
-    "straddles_bb = [1.999]",
+    "straddles = [1.999]",
     NLH003,
-    "table.straddles_bb.0"
+    "table.straddles.0"
 );
 invalid!(
     restraddle_too_small,
-    "straddles_bb = [2,3.999]",
+    "straddles = [2,3.999]",
     NLH003,
-    "table.straddles_bb.1"
-);
-invalid!(
-    straddle_off_grid,
-    "straddles_bb = [2.0001]",
-    NLH003,
-    "table.straddles_bb.0"
+    "table.straddles.1"
 );
 invalid!(
     too_many_straddles,
-    "straddles_bb = [2,4,8,16,32]",
+    "straddles = [2,4,8,16,32]",
     NLH003,
-    "table.straddles_bb"
+    "table.straddles"
 );
 invalid!(
     straddle_no_chips_left,
-    "straddles_bb = [100]",
+    "straddles = [100]",
     NLH003,
-    "table.straddles_bb.0"
+    "table.straddles.0"
 );
 invalid!(
     straddle_ante_no_chips_left,
-    "straddles_bb = [99]\nante_bb = 1",
+    "straddles = [99]\nante = 1",
     NLH003,
-    "table.straddles_bb.0"
+    "table.straddles.0"
 );
 invalid!(
     straddle_bad_type,
-    "straddles_bb = [\"2\"]",
+    "straddles = [true]",
     NLH002,
-    "table.straddles_bb.0"
+    "table.straddles.0"
 );
 invalid!(
     bad_stack_override,
-    "[table.stacks_bb]\nBTN = 0",
+    "[table.stacks]\nBTN = 0",
     NLH003,
-    "table.stacks_bb.BTN"
+    "table.stacks.BTN"
 );
 invalid!(bad_range, "[ranges]\nBTN = \"XX\"", NLH003, "ranges.BTN");
 invalid!(
@@ -377,7 +364,7 @@ invalid!(
 );
 invalid!(
     missing_rake_rate,
-    "[economics.rake]\ncap_bb = 1",
+    "[economics.rake]\ncap = 1",
     NLH002,
     "economics.rake.rate"
 );
@@ -394,28 +381,16 @@ invalid!(
     "economics.rake.rate"
 );
 invalid!(
-    rake_cap_grid,
-    "[economics.rake]\nrate = 0.05\ncap_bb = 4.0001",
-    NLH003,
-    "economics.rake.cap_bb"
-);
-invalid!(
     rake_when_bad,
     "[economics.rake]\nrate = 0.05\nwhen = \"players\"",
     NLH003,
     "economics.rake.when"
 );
-invalid!(
-    rake_rounding_unit,
-    "[economics.rake]\nrate = 0.05\nrounding_unit_bb = 0.0015",
-    NLH003,
-    "economics.rake.rounding_unit_bb"
-);
 
 #[test]
 fn arbitrary_positive_milli_bb_rake_units_normalize_and_invalid_units_fail() {
     for unit in ["0.001", "0.01", "0.5", "1", "2.501"] {
-        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit_bb = {unit}\n");
+        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit = {unit}\n");
         let doc = Document::parse(&raw, Path::new("unit.toml")).unwrap();
         let normalized = doc.normalize(&Stub).unwrap();
         let reparsed = Document::parse(&normalized, Path::new("unit.toml")).unwrap();
@@ -424,11 +399,11 @@ fn arbitrary_positive_milli_bb_rake_units_normalize_and_invalid_units_fail() {
             reparsed.spot.economics.compiled_rake
         );
     }
-    for unit in ["0", "-0.001", "0.0015", "nan", "inf", "-inf"] {
-        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit_bb = {unit}\n");
+    for unit in ["0", "-0.001", "nan", "inf", "-inf"] {
+        let raw = format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit = {unit}\n");
         let err = Document::parse(&raw, Path::new("unit.toml")).err().unwrap();
         assert_eq!(err.code, Code::NLH003, "{unit}: {err}");
-        assert_eq!(err.key.as_deref(), Some("economics.rake.rounding_unit_bb"));
+        assert_eq!(err.key.as_deref(), Some("economics.rake.rounding_unit"));
     }
 }
 
@@ -469,12 +444,12 @@ fn chip_denomination_defaults_normalize_and_reject_bad_values() {
 /// A 1-3 game with $1 chips: 1 BB = 3 chips, so the SB is one chip and many
 /// BB decimals are not whole chips.
 const ONE_THREE: &str =
-    "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nsb_chips = 1\n";
+    "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nsb = '1c'\n";
 
 #[test]
 fn chip_keys_express_non_decimal_denominations() {
     let raw = format!(
-        "{ONE_THREE}stack_bb = 100\nstraddles_chips = [6]\n[table.stacks_chips]\nCO = 250\n[tree]\nscript = \"preflop {{ add raise [40c, 20bb] }}\"\n"
+        "{ONE_THREE}stack = 100\nstraddles = ['6c']\n[table.stacks]\nCO = '250c'\n[tree]\nscript = \"preflop {{ add raise [40c, 20bb] }}\"\n"
     );
     let doc = parse(&raw);
     let table = &doc.spot.table;
@@ -487,16 +462,16 @@ fn chip_keys_express_non_decimal_denominations() {
     // Non-decimal tables spell every amount group in chips.
     for expected in [
         "bb_chips = 3\n",
-        "sb_chips = 1\n",
-        "straddles_chips = [6]\n",
-        "[table.stacks_chips]\n",
+        "sb = \"1c\"\n",
+        "straddles = [\"6c\"]\n",
+        "[table.stacks]\n",
     ] {
         assert!(normalized.contains(expected), "{expected}\n{normalized}");
     }
     assert!(!normalized.contains("_bb ="), "{normalized}");
     assert_eq!(
         parse_size_literal("40c"),
-        Ok(SizeSpec::ToChips { value: 40.0 })
+        Ok(SizeSpec::ToChips { value: 40 })
     );
     for literal in ["0c", "1.5c", "c"] {
         assert!(parse_size_literal(literal).is_err(), "{literal}");
@@ -504,84 +479,124 @@ fn chip_keys_express_non_decimal_denominations() {
 }
 
 #[test]
-fn bb_amounts_must_be_whole_chips_and_pairs_are_exclusive() {
-    for (tail, code, key) in [
-        ("stack_bb = 100.5\n", Code::NLH003, "table.stack_bb"),
-        (
-            "stack_bb = 100\n[table.stacks_bb]\nCO = 80.5\n",
-            Code::NLH003,
-            "table.stacks_bb.CO",
-        ),
-        (
-            "stack_bb = 100\nante_bb = 0.5\n",
-            Code::NLH003,
-            "table.ante_bb",
-        ),
-        (
-            "stack_bb = 100\nstraddles_bb = [2.5]\n",
-            Code::NLH003,
-            "table.straddles_bb.0",
-        ),
-        (
-            "stack_bb = 100\n[economics]\nkind = \"tournament\"\npayouts = [1, 0]\noutside_field_bb = [20.5]\n",
-            Code::NLH003,
-            "economics.outside_field_bb.0",
-        ),
-        (
-            "stack_bb = 100\n[economics.rake]\nrate = 0.05\ncap_bb = 0.5\n",
-            Code::NLH003,
-            "economics.rake.cap_bb",
-        ),
-        (
-            "stack_bb = 100\n[spot]\nline = \"UTG r2.5\"\n",
-            Code::NLH004,
-            "spot.line",
-        ),
-        (
-            "stack_bb = 100\n[tree]\nscript = \"preflop { add raise [2.5bb] }\"\n",
-            Code::NLH003,
-            "tree.script",
-        ),
-    ] {
-        let e = error(&format!("{ONE_THREE}{tail}"));
-        assert_eq!(e.code, code, "{tail}: {e}");
-        assert_eq!(e.key.as_deref(), Some(key), "{tail}: {e}");
-        assert!(e.message.contains("table.bb_chips = 3"), "{e}");
+fn amount_values_accept_bb_and_exact_chips_and_reject_bad_spellings() {
+    for value in ["100", "'100'", "'100bb'", "'300c'"] {
+        let doc = parse(&format!("{ONE_THREE}stack = {value}\n"));
+        assert_eq!(doc.spot.table.stacks[SeatId(0)], MwChips(300), "{value}");
+        assert!(doc.warnings.is_empty(), "{value}");
+        assert!(roundtrip(&format!("{ONE_THREE}stack = {value}\n")).contains("stack = \"300c\""));
     }
-    for (tail, key) in [
-        ("stack_bb = 100\nstack_chips = 300\n", "table.stack_chips"),
-        ("stack_bb = 100\nsb_bb = 1\n", "table.sb_chips"),
+    for value in ["'2.5c'", "'01c'", "'100BB'", "'-1bb'", "'1e2'"] {
+        let e = error(&format!("{ONE_THREE}stack = {value}\n"));
+        assert_eq!(e.code, Code::NLH003, "{value}: {e}");
+        assert_eq!(e.key.as_deref(), Some("table.stack"));
+    }
+    let e = error(&format!("{ONE_THREE}stack = true\n"));
+    assert_eq!(e.code, Code::NLH002);
+    assert_eq!(e.key.as_deref(), Some("table.stack"));
+}
+
+#[test]
+fn bb_amounts_round_and_legacy_keys_are_rejected() {
+    for (mode, expected) in [("down", 301), ("nearest", 302), ("up", 302)] {
+        let raw = format!("{ONE_THREE}stack = 100.5\nchip_rounding = '{mode}'\n");
+        let doc = parse(&raw);
+        assert_eq!(doc.spot.table.stacks[SeatId(0)], MwChips(expected));
+        assert!(doc.warnings.iter().any(|w| w.contains("table.stack")
+            && w.contains("100.5")
+            && w.contains(&expected.to_string())
+            && w.contains(mode)));
+        let effective = doc.normalize(&Stub).unwrap();
+        assert!(parse(&effective).warnings.is_empty());
+    }
+    for (tail, key, replacement) in [
+        ("stack_bb = 100", "table.stack_bb", "table.stack"),
+        ("stack_chips = 300", "table.stack_chips", "table.stack"),
         (
-            "stack_bb = 100\n[table.stacks_bb]\nCO = 80\n[table.stacks_chips]\nBTN = 240\n",
-            "table.stacks_chips",
+            "[table.stacks_bb]\nCO = 80",
+            "table.stacks_bb",
+            "table.stacks",
         ),
         (
-            "stack_bb = 100\n[table.stacks_bb]\n[table.stacks_chips]\nBTN = 240\n",
-            "table.stacks_chips",
-        ),
-        (
-            "stack_bb = 100\n[table.stacks_bb]\nCO = 80\n[table.stacks_chips]\n",
-            "table.stacks_chips",
-        ),
-        (
-            "stack_bb = 100\n[table.stacks_bb]\n[table.stacks_chips]\n",
-            "table.stacks_chips",
-        ),
-        (
-            "stack_bb = 100\n[economics.rake]\nrate = 0.05\ncap_bb = 1\ncap_chips = 3\n",
+            "[economics.rake]\nrate = 0.05\ncap_chips = 3",
             "economics.rake.cap_chips",
+            "economics.rake.cap",
         ),
     ] {
         let e = error(&format!("{ONE_THREE}{tail}"));
-        assert_eq!(e.code, Code::NLH003, "{tail}: {e}");
+        assert_eq!(e.code, Code::NLH002, "{tail}: {e}");
         assert_eq!(e.key.as_deref(), Some(key), "{tail}: {e}");
-        assert!(e.message.contains("cannot combine"), "{e}");
+        assert!(
+            e.message.contains(&format!("use {replacement} instead")),
+            "{tail}: {e}"
+        );
     }
-    // The default SB of 0.5 BB is 1.5 chips here.
-    let e =
-        error("schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nstack_bb = 100\n");
-    assert_eq!(e.key.as_deref(), Some("table.sb_bb"));
-    assert!(e.message.contains("table.sb_chips"), "{e}");
+    let doc =
+        parse("schema = \"solvers.nlh/v1\"\n[table]\nplayers = 6\nbb_chips = 3\nstack = 100\n");
+    assert_eq!(doc.spot.table.sb, MwChips(2));
+    assert!(
+        doc.warnings
+            .iter()
+            .any(|w| w.contains("table.sb") && w.contains("0.5") && w.contains("2 chips"))
+    );
+}
+
+#[test]
+fn rounded_inputs_warn_and_effective_config_is_idempotent() {
+    let raw = format!(
+        "{ONE_THREE}stack = 100.5\nante = 0.5\nstraddles = [2.5]\n[table.stacks]\nCO = 80.5\n[economics.rake]\nrate = 0.05\ncap = 0.5\nrounding_unit = 0.5\n"
+    );
+    let doc = parse(&raw);
+    for key in [
+        "table.stack",
+        "table.ante",
+        "table.straddles.0",
+        "table.stacks.CO",
+        "economics.rake.cap",
+        "economics.rake.rounding_unit",
+    ] {
+        assert!(
+            doc.warnings
+                .iter()
+                .any(|warning| warning.contains(key) && warning.contains("nearest")),
+            "{key}: {:?}",
+            doc.warnings
+        );
+    }
+    let normalized = doc.normalize(&Stub).unwrap();
+    let effective = parse(&normalized);
+    assert!(effective.warnings.is_empty(), "{:?}", effective.warnings);
+    assert_eq!(normalized, effective.normalize(&Stub).unwrap());
+}
+
+#[test]
+fn tournament_and_big_blind_ante_round_with_original_spelling() {
+    let raw = format!(
+        "{ONE_THREE}stack = 100\nbb_ante = 5e-1\n[economics]\nkind = 'tournament'\npayouts = [1]\noutside_field = [20.5]\n"
+    );
+    let doc = parse(&raw);
+    assert!(
+        doc.warnings
+            .iter()
+            .any(|w| w.contains("table.bb_ante: 5e-1") && w.contains("2 chips"))
+    );
+    assert!(
+        doc.warnings
+            .iter()
+            .any(|w| w.contains("economics.outside_field.0") && w.contains("62 chips"))
+    );
+    let effective = doc.normalize(&Stub).unwrap();
+    assert!(parse(&effective).warnings.is_empty());
+}
+
+#[test]
+fn rounded_zero_and_post_round_limits_are_checked() {
+    let zero = format!("{ONE_THREE}stack = 100\nsb = 0.1\nchip_rounding = 'down'\n");
+    // Replace the explicit small blind before testing rounding to zero.
+    let zero = zero.replace("sb = '1c'\n", "");
+    assert_eq!(error(&zero).key.as_deref(), Some("table.sb"));
+    let straddle = format!("{ONE_THREE}stack = 100\nstraddles = [1.8]\nchip_rounding = 'down'\n");
+    assert_eq!(error(&straddle).key.as_deref(), Some("table.straddles.0"));
 }
 invalid!(
     rake_allocation_bad,
@@ -615,9 +630,9 @@ invalid!(
 );
 invalid!(
     tournament_outside_zero,
-    "[economics]\nkind = \"tournament\"\npayouts = [1]\noutside_field_bb = [0]",
+    "[economics]\nkind = \"tournament\"\npayouts = [1]\noutside_field = [0]",
     NLH003,
-    "economics.outside_field_bb.0"
+    "economics.outside_field.0"
 );
 invalid!(
     tournament_too_many_prizes,
@@ -741,7 +756,7 @@ invalid!(solver_wrong_type, "solver = 1", NLH002, "table.solver");
 fn table_sizes_heads_up_positions_and_forced_posts() {
     for players in 2..=9 {
         let d = parse(&format!(
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack_bb = 100\nsb_bb = 1\nbb_ante_bb = 0.2\n"
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack = 100\nsb = 1\nbb_ante = 0.2\n"
         ));
         let table = &d.spot.table;
         assert_eq!(table.positions.len(), players);
@@ -752,7 +767,7 @@ fn table_sizes_heads_up_positions_and_forced_posts() {
         assert_eq!(table.setup.common_ante, MwChips(200));
         assert!(table.setup.forced_antes.iter().all(|v| *v == MwChips::ZERO));
     }
-    let d = parse(&format!("{ROOT}ante_bb = 0.125\n"));
+    let d = parse(&format!("{ROOT}ante = 0.125\n"));
     assert!(
         d.spot
             .start
@@ -760,16 +775,15 @@ fn table_sizes_heads_up_positions_and_forced_posts() {
             .iter()
             .all(|s| s.dead_committed == MwChips(125))
     );
-    let d = parse(&format!("{ROOT}straddles_bb = [2,4]\n"));
+    let d = parse(&format!("{ROOT}straddles = [2,4]\n"));
     assert_eq!(
         d.spot.table.setup.straddles,
         [(SeatId(3), MwChips(2000)), (SeatId(4), MwChips(4000))]
     );
     assert_eq!(d.spot.table.setup.preflop_first_to_act, SeatId(5));
     assert_eq!(d.spot.start.minimum_full_target(), MwChips(8000));
-    let d = parse(
-        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 3\nstack_bb = 100\nstraddles_bb = [2]",
-    );
+    let d =
+        parse("schema = \"solvers.nlh/v1\"\n[table]\nplayers = 3\nstack = 100\nstraddles = [2]");
     assert_eq!(d.spot.table.setup.straddles, [(SeatId(0), MwChips(2000))]);
     assert_eq!(d.spot.table.setup.preflop_first_to_act, SeatId(1));
 }
@@ -779,7 +793,7 @@ fn table_required_grid_and_incomplete_paths() {
     for (text, key, code) in [
         ("schema = \"solvers.nlh/v1\"", "table", Code::NLH002),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nstack_bb = 100",
+            "schema = \"solvers.nlh/v1\"\n[table]\nstack = 100",
             "table.players",
             Code::NLH002,
         ),
@@ -794,33 +808,28 @@ fn table_required_grid_and_incomplete_paths() {
             Code::NLH003,
         ),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = nan",
-            "table.stack_bb",
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack = nan",
+            "table.stack",
             Code::NLH003,
         ),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 100.00000000000001",
-            "table.stack_bb",
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack = 0",
+            "table.stack",
             Code::NLH003,
         ),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 0",
-            "table.stack_bb",
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstraddles = [2]",
+            "table.stacks.BTN",
             Code::NLH003,
         ),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstraddles_bb = [2]",
-            "table.stacks_bb.BTN",
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack = 100\nstraddles = [2]",
+            "table.straddles",
             Code::NLH003,
         ),
         (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 100\nstraddles_bb = [2]",
-            "table.straddles_bb",
-            Code::NLH003,
-        ),
-        (
-            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\n[table.stacks_bb]\nBTN = 10",
-            "table.stacks_bb.BB",
+            "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\n[table.stacks]\nBTN = 10",
+            "table.stacks.BB",
             Code::NLH003,
         ),
     ] {
@@ -829,7 +838,7 @@ fn table_required_grid_and_incomplete_paths() {
         assert_eq!(e.key.as_deref(), Some(key));
     }
     roundtrip(
-        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\n[table.stacks_bb]\nBTN = 10.125\nBB = 20",
+        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\n[table.stacks]\nBTN = 10.125\nBB = 20",
     );
 }
 
@@ -837,14 +846,14 @@ fn table_required_grid_and_incomplete_paths() {
 fn rake_defaults_and_variants() {
     let d = parse(&format!("{ROOT}[economics.rake]\nrate = 0.05"));
     assert!(
-        matches!(d.spot.economics.rake, RakeConfig::Generic { cap_bb: None, ref when, allocation: RakeAllocation::MainFirst, rounding: Rounding::Down, .. } if when == "flop_dealt")
+        matches!(d.spot.economics.rake, RakeConfig::Generic { cap_chips: None, ref when, allocation: RakeAllocation::MainFirst, rounding: Rounding::Down, .. } if when == "flop_dealt")
     );
     let n = roundtrip(&format!("{ROOT}[economics.rake]\nrate = 0.05"));
-    assert!(!n.contains("cap_bb"));
-    assert!(n.contains("rounding_unit_bb = 0.001"));
+    assert!(!n.contains("cap"));
+    assert!(n.contains("rounding_unit = \"1c\""));
     for rounding in ["down", "nearest", "up"] {
         roundtrip(&format!(
-            "{ROOT}[economics.rake]\nrate = 1\ncap_bb = 0\nwhen = \"true\"\nrounding = \"{rounding}\""
+            "{ROOT}[economics.rake]\nrate = 1\ncap = 0\nwhen = \"true\"\nrounding = \"{rounding}\""
         ));
     }
 }
@@ -852,7 +861,7 @@ fn rake_defaults_and_variants() {
 #[test]
 fn tournament_defaults_and_removed_sampling_keys() {
     let exact = format!(
-        "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000,600,400]\noutside_field_bb = [18,26]"
+        "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000,600,400]\noutside_field = [18,26]"
     );
     let d = parse(&exact);
     match &d.spot.economics.utility {
@@ -870,9 +879,9 @@ fn tournament_defaults_and_removed_sampling_keys() {
     let default_exact = roundtrip(&format!(
         "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000]"
     ));
-    assert!(default_exact.contains("outside_field_bb = []"));
+    assert!(default_exact.contains("outside_field = []"));
     let large = format!(
-        "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000]\noutside_field_bb = [1,2,3,4,5,6,7,8,9,10]"
+        "{ROOT}[economics]\nkind = \"tournament\"\npayouts = [1000]\noutside_field = [1,2,3,4,5,6,7,8,9,10]"
     );
     roundtrip(&large);
     // Monte Carlo ICM was replaced by deterministic quadrature; its keys
@@ -926,13 +935,14 @@ fn product_sections_are_raw_until_hook_validation() {
 #[test]
 fn strict_size_literal_accept_reject_and_variants() {
     for (text, spec) in [
-        ("1", SizeSpec::PotAfterCall { fraction: 0.01 }),
+        ("1%", SizeSpec::PotAfterCall { fraction: 0.01 }),
         (
-            "33.3",
+            "33.3%",
             SizeSpec::PotAfterCall {
                 fraction: 33.3 / 100.0,
             },
         ),
+        ("0.99", SizeSpec::ToBb { value: 0.99 }),
         ("2.501bb", SizeSpec::ToBb { value: 2.501 }),
         ("3x", SizeSpec::PreviousBetMultiple { factor: 3.0 }),
         ("a", SizeSpec::AllIn),
@@ -970,7 +980,7 @@ fn strict_size_literal_accept_reject_and_variants() {
         ".5bb",
         "2.bb",
         "0",
-        "0.99",
+        "0.99%",
         "0bb",
         "1x",
         "0e",
@@ -1120,30 +1130,10 @@ fn script_diagnostics_and_literal_delimiter() {
 }
 
 #[test]
-fn original_toml_bb_precision_is_never_rounded() {
-    for number in [
-        "0.00100000000000000001",
-        "0.99999999999999999999",
-        "0.10000000000000000001",
-        "1.00000000000000000001e0",
-        "9.999999999999999999e-4",
-        "9007199254741.001",
-    ] {
-        let e = error(&format!("{ROOT}ante_bb = {number}"));
-        assert_eq!(e.code, Code::NLH003, "{number}");
-        assert_eq!(e.key.as_deref(), Some("table.ante_bb"));
-    }
-    for number in [
-        "1e-3", "+0.001", "0.00_1", "1.000e-3", "-0.0", "0x0", "0o1", "0b1",
-    ] {
-        roundtrip(&format!("{ROOT}ante_bb = {number}"));
-    }
-    let text =
-        format!("{ROOT}[economics.rake]\nrate = 0.05\nrounding_unit_bb = 0.00100000000000000001");
-    assert_eq!(
-        error(&text).key.as_deref(),
-        Some("economics.rake.rounding_unit_bb")
-    );
+fn original_toml_bb_precision_is_rounded() {
+    let doc = parse(&format!("{ROOT}ante = 0.0014"));
+    assert_eq!(doc.spot.table.ante, MwChips(1));
+    assert!(doc.warnings.iter().any(|w| w.contains("table.ante")));
 }
 
 #[test]
@@ -1158,13 +1148,13 @@ fn dotted_type_errors_for_every_common_shape() {
         ("economics", "kind"),
         ("economics", "rake"),
         ("economics", "payouts"),
-        ("economics", "outside_field_bb"),
+        ("economics", "outside_field"),
         ("economics.rake", "rate"),
-        ("economics.rake", "cap_bb"),
+        ("economics.rake", "cap"),
         ("economics.rake", "when"),
         ("economics.rake", "allocation"),
         ("economics.rake", "rounding"),
-        ("economics.rake", "rounding_unit_bb"),
+        ("economics.rake", "rounding_unit"),
         ("spot", "line"),
         ("spot", "board"),
         ("tree", "script"),
@@ -1177,7 +1167,7 @@ fn dotted_type_errors_for_every_common_shape() {
     ] {
         let e = error(&format!("{ROOT}[{section}]\n{key} = []"));
         // Payout/field arrays are valid, so use a boolean for those two keys.
-        if key == "payouts" || key == "outside_field_bb" {
+        if key == "payouts" || key == "outside_field" {
             continue;
         }
         assert_eq!(e.code, Code::NLH002, "{section}.{key}");
@@ -1185,17 +1175,13 @@ fn dotted_type_errors_for_every_common_shape() {
     }
     for key in [
         "players",
-        "stack_bb",
-        "sb_bb",
-        "ante_bb",
-        "bb_ante_bb",
-        "stacks_bb",
-        "straddles_bb",
+        "stack",
+        "sb",
+        "ante",
+        "bb_ante",
+        "stacks",
+        "straddles",
         "bb_chips",
-        "stack_chips",
-        "stacks_chips",
-        "sb_chips",
-        "straddles_chips",
         "chip_rounding",
     ] {
         let mut value: toml::Value = ROOT.parse().unwrap();
@@ -1209,7 +1195,7 @@ fn dotted_type_errors_for_every_common_shape() {
     }
     for key in ["solver", "output"] {
         let text = format!(
-            "schema = \"solvers.nlh/v1\"\n{key} = false\n[table]\nplayers = 2\nstack_bb = 100"
+            "schema = \"solvers.nlh/v1\"\n{key} = false\n[table]\nplayers = 2\nstack = 100"
         );
         assert_eq!(error(&text).key.as_deref(), Some(key));
     }
@@ -1234,5 +1220,123 @@ fn literal_script_comments_strings_and_initial_newlines_roundtrip() {
             .insert("tree".into(), toml::Value::Table(tree));
         let n = roundtrip(&toml::to_string(&value).unwrap());
         assert_eq!(parse(&n).spot.tree.script, script);
+    }
+}
+
+#[test]
+fn tree_bb_literals_round_in_sizes_and_thresholds_and_effective_config_is_stable() {
+    for (mode, chips) in [("down", 4), ("nearest", 5), ("up", 5)] {
+        let text = format!(
+            "{ONE_THREE}stack = 100\nchip_rounding = '{mode}'\n\
+             [tree]\nscript = '''\n# 1.5bb remains a comment\n\
+             param sizing = 1.5bb\n\
+             preflop when position == \"1.5bb\" {{ add raise [sizing, 2bb] merge raise within 1.5bb jam raise >= 1.5bb }}\n'''\n"
+        );
+        let doc = parse(&text);
+        let rules = &doc.spot.tree.compiled.rules;
+        assert_eq!(rules.len(), 3);
+        assert_eq!(
+            rules[0].sizes,
+            vec![
+                SizeSpec::ToChips { value: chips },
+                SizeSpec::ToChips { value: 6 }
+            ]
+        );
+        assert_eq!(rules[1].sizes, vec![SizeSpec::ToChips { value: chips }]);
+        assert_eq!(rules[2].sizes, vec![SizeSpec::ToChips { value: chips }]);
+        let context = SizeContext {
+            big_blind: 3,
+            called_to: 0,
+            pot_after_call: 6,
+            previous_bet: 3,
+            minimum: 0,
+            maximum: 300,
+            effective_stack: 300,
+            streets_remaining: 3,
+            rounding: doc.spot.table.setup.chip_rounding,
+        };
+        assert_eq!(context.resolve_u64(rules[0].sizes[0]), chips);
+        assert_eq!(context.merge_width_u64(rules[1].sizes[0]), chips);
+        assert_eq!(context.threshold_u64(rules[2].sizes[0]), chips);
+        assert!(doc.spot.tree.script.contains("# 1.5bb remains a comment"));
+        assert!(doc.spot.tree.script.contains("\"1.5bb\""));
+        assert_eq!(
+            doc.warnings
+                .iter()
+                .filter(|w| w.contains("tree.script")
+                    && w.contains("1.5")
+                    && w.contains(&format!("{chips} chips")))
+                .count(),
+            3
+        );
+        let effective = doc.normalize(&Stub).unwrap();
+        let reread = parse(&effective);
+        assert!(reread.warnings.iter().any(|w| w.contains("tree.script")));
+        assert_eq!(reread.spot.tree.compiled.rules, *rules);
+        assert_eq!(effective, reread.normalize(&Stub).unwrap());
+    }
+}
+
+#[test]
+fn tree_bb_parameter_overrides_round_and_warn_again_on_replay() {
+    let text = format!(
+        "{ONE_THREE}stack = 100\nchip_rounding = 'up'\n[tree]\nscript = 'param size = 2bb preflop {{ add raise [size] }}'\n[tree.params]\nsize = '1.5bb'\n"
+    );
+    let doc = parse(&text);
+    assert_eq!(
+        doc.spot.tree.compiled.rules[0].sizes,
+        vec![SizeSpec::ToChips { value: 5 }]
+    );
+    let context = SizeContext {
+        big_blind: 3,
+        called_to: 0,
+        pot_after_call: 6,
+        previous_bet: 3,
+        minimum: 0,
+        maximum: 300,
+        effective_stack: 300,
+        streets_remaining: 3,
+        rounding: doc.spot.table.setup.chip_rounding,
+    };
+    assert_eq!(
+        context.resolve_u64(doc.spot.tree.compiled.rules[0].sizes[0]),
+        5
+    );
+    assert!(
+        doc.warnings
+            .iter()
+            .any(|w| w.contains("tree.params.size") && w.contains("1.5") && w.contains("5 chips"))
+    );
+    let effective = doc.normalize(&Stub).unwrap();
+    let reread = parse(&effective);
+    assert!(
+        reread
+            .warnings
+            .iter()
+            .any(|w| w.contains("tree.params.size"))
+    );
+    assert_eq!(
+        reread.spot.tree.compiled.rules,
+        doc.spot.tree.compiled.rules
+    );
+}
+
+#[test]
+fn tree_diagnostics_display_absolute_sizes_in_table_units() {
+    for (bb_chips, add, merge, jam) in [(1000, "2.5", "0.001", "3"), (3, "2500c", "1c", "3000c")] {
+        let text = format!(
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nbb_chips = {bb_chips}\nstack = 10000\n\
+             [tree]\nscript = '''\npreflop {{ add raise [2500c, 50%, 2x, a] \
+             merge raise within 1c jam raise >= 3000c }}\n'''\n"
+        );
+        let summary = parse(&text).summary();
+        let expected = vec![
+            format!("preflop {{ add raise [{add}, 50%, 2x, a] }}"),
+            format!("preflop {{ merge raise within {merge} }}"),
+            format!("preflop {{ jam raise >= {jam} }}"),
+        ];
+        assert_eq!(summary.tree.rules, expected);
+        let json = serde_json::to_value(&summary).unwrap();
+        assert_eq!(json["tree"]["rules"], serde_json::json!(expected));
     }
 }

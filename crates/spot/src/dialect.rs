@@ -111,38 +111,33 @@ pub fn parse_size_literal(text: &str) -> Result<SizeSpec, ParseSizeError> {
         "min" => return Ok(SizeSpec::MinRaise),
         _ => {}
     }
-    let (number, suffix) = ["%effective", "%stack", "bb", "x", "e", "c", ""]
+    let (number, suffix) = ["%effective", "%stack", "bb", "%", "x", "e", "c", ""]
         .into_iter()
         .find_map(|s| text.strip_suffix(s).map(|n| (n, s)))
         .unwrap();
     let invalid = || ParseSizeError(format!("invalid v1 size literal {text:?}"));
-    if !plain_decimal(number) || (matches!(suffix, "e" | "c") && number.contains('.')) {
+    if !plain_decimal(number)
+        || (matches!(suffix, "e" | "c") && number.contains('.'))
+        || (suffix == "c" && number.len() > 1 && number.starts_with('0'))
+    {
         return Err(invalid());
     }
     if suffix == "c" {
         return match number.parse::<u64>() {
-            Ok(chips) if chips > 0 => Ok(SizeSpec::ToChips {
-                value: chips as f64,
-            }),
+            Ok(chips) if chips > 0 => Ok(SizeSpec::ToChips { value: chips }),
             _ => Err(invalid()),
         };
     }
-    if suffix == "bb" {
-        // The decoded f64 must spell the written decimal exactly so the
-        // table's whole-chip check sees the written amount.
-        let value = number.parse::<f64>().map_err(|_| invalid())?;
-        let exact = crate::parse::exact_decimal(number);
-        if value <= 0.0
-            || exact.is_none()
-            || crate::parse::exact_decimal(&value.to_string()) != exact
-        {
-            return Err(invalid());
-        }
-    }
-    if suffix.is_empty() && number.parse::<f64>().unwrap_or(0.0) < 1.0 {
-        return Err(ParseSizeError(
-            "bare pot percentages must be at least 1; use a percentage of at least 1".into(),
-        ));
+    if suffix == "%" && number.parse::<f64>().unwrap_or(0.0) < 1.0 {
+        return Err(ParseSizeError("pot percentages must be at least 1".into()));
     }
     SizeSpec::parse(text, SizeUnit::Bb)
+}
+
+pub(crate) fn parse_compiled_size_literal(text: &str) -> Result<SizeSpec, ParseSizeError> {
+    if text == "0c" {
+        Ok(SizeSpec::ToChips { value: 0 })
+    } else {
+        parse_size_literal(text)
+    }
 }

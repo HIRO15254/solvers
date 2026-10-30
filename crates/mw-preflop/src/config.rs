@@ -788,12 +788,9 @@ pub(crate) fn validate_size_spec(size: &SizeSpec) -> Result<(), ConfigError> {
         // Bare `e` carries no street count to validate: the engine reads it
         // off the street being resolved.
         SizeSpec::GeometricAllInRemaining => Ok(()),
-        // `to-chips` is the postflop family's absolute chip literal; the
-        // `SizeSpec` enum is shared with `nlh::sizing` (see the type
-        // there), but multiway seats are configured in bb, so a config that
-        // spells `kind = "to-chips"` for a multiway size is rejected here
-        // rather than silently accepted.
-        SizeSpec::ToChips { .. } => Err(ConfigError::UnsupportedSizeKind("to-chips")),
+        // A positive BB literal may round down to zero before the minimum
+        // legal target is applied.
+        SizeSpec::ToChips { .. } => Ok(()),
     }
 }
 
@@ -929,10 +926,6 @@ pub enum ConfigError {
     SeatMaxBettingPlayersMismatch { seat: usize, street: Street },
     #[error("invalid tree rule: {0}")]
     TreeRule(String),
-    #[error(
-        "size.kind {0:?} is a postflop-only bet-size literal and is not supported by multiway preflop"
-    )]
-    UnsupportedSizeKind(&'static str),
 }
 #[cfg(test)]
 mod tests {
@@ -1030,7 +1023,7 @@ stack_bb = 12
         let utility = UtilityConfig::TournamentIcm {
             outside_field: vec![FieldPlayerConfig {
                 name: "off-table".into(),
-                stack_bb: 100.0,
+                stack_chips: 100_000,
             }],
             payouts: vec![100.0, 60.0, 40.0, 0.0],
         };

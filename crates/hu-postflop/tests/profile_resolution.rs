@@ -5,7 +5,7 @@ const RIVER: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2s 7s Ks 4h 3d"
@@ -13,7 +13,7 @@ board = "2s 7s Ks 4h 3d"
 BB = "AK,KQ,AA"
 BTN = "QQ,JJ"
 [tree]
-script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [run]
 memory = "1GiB"
 "#;
@@ -22,7 +22,7 @@ const TURN: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 4s"
@@ -30,7 +30,7 @@ board = "2s 7s Ks 4s"
 BB = "AK,KQ,AA"
 BTN = "QQ,JJ"
 [tree]
-script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "turn { checkdown } river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [run]
 memory = "1GiB"
 "#;
@@ -199,6 +199,7 @@ fn ancestor_freeze_and_selector_errors_are_explicit() {
         &game.node_info,
         nlh::Street::River,
         p.config.scale,
+        p.config.chip_rounding,
     );
     let view = hu_postflop::index::TreeView {
         tree: &game.game.tree,
@@ -311,6 +312,30 @@ fn profile_history_accepts_equivalent_bb_and_chip_amounts() {
 }
 
 #[test]
+fn profile_history_rounds_bb_using_table_mode() {
+    for (rounding, chips) in [("down", "r6c"), ("nearest", "r7c"), ("up", "r7c")] {
+        let input = RIVER
+            .replace(
+                "players = 2",
+                &format!("players = 2\nbb_chips = 3\nchip_rounding = \"{rounding}\""),
+            )
+            .replace("replace bet [50%]", "replace bet [6c, 7c]");
+        let p = hu_postflop::prepare::prepare(&input, std::path::Path::new("test.toml")).unwrap();
+        let mut ids = Vec::new();
+        for selector in ["r2.333", chips] {
+            let mut game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
+            let mut profile = ir(HandSelector::All);
+            profile.locks[0].node = selector.into();
+            profile.locks[0].strategy = LockStrategy::Uniform(vec![("call".into(), 1.0)]);
+            let resolved = resolve_profile(&mut game, &p.config, &profile, None).unwrap();
+            assert_eq!(resolved.summary.resolved_nodes[0].history, chips);
+            ids.push(resolved.summary.resolved_nodes[0].node);
+        }
+        assert_eq!(ids[0], ids[1]);
+    }
+}
+
+#[test]
 fn label_path_accepts_iso_marker() {
     let p = hu_postflop::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
     let game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
@@ -319,6 +344,7 @@ fn label_path_accepts_iso_marker() {
         &game.node_info,
         nlh::Street::Turn,
         p.config.scale,
+        p.config.chip_rounding,
     );
     let view = hu_postflop::index::TreeView {
         tree: &game.game.tree,

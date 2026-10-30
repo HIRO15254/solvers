@@ -62,13 +62,11 @@ impl NlhPayoff {
                     .filter(|seat| seat.folded)
                     .map(|seat| seat.starting_stack - seat.total_contribution)
                     .collect();
-                for player in outside_field {
-                    fixed.push(
-                        scale
-                            .from_bb(player.stack_bb)
-                            .map_err(|e| invalid("economics.outside_field_bb", e.to_string()))?,
-                    );
-                }
+                fixed.extend(
+                    outside_field
+                        .iter()
+                        .map(|player| MwChips(player.stack_chips)),
+                );
                 let zero_sum_field = fixed.is_empty();
                 Utility::Icm {
                     prepared: Box::new(

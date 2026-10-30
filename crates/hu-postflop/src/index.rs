@@ -51,6 +51,8 @@ pub struct GameIndex {
     tokens: Vec<String>,
     /// Table scale used to compare equivalent selector amounts.
     scale: nlh::ChipScale,
+    /// Table rounding mode for BB selector amounts.
+    rounding: nlh::Rounding,
     /// Label of the action leading into each node; [`NO_LABEL`] at the root
     /// and below chance nodes.
     edges: Vec<u32>,
@@ -130,6 +132,7 @@ impl GameIndex {
         node_info: &[PostflopNodeInfo],
         start: Street,
         scale: nlh::ChipScale,
+        rounding: nlh::Rounding,
     ) -> Self {
         let tree = &game.tree;
         let mut labels = Labels::default();
@@ -181,6 +184,7 @@ impl GameIndex {
             game.evaluator.hands.clone(),
             game.root_ranges.clone(),
             scale,
+            rounding,
         )
     }
 
@@ -195,9 +199,11 @@ impl GameIndex {
         hands: PostflopHands,
         root_ranges: PerPlayer<Vec<f32>>,
         scale: nlh::ChipScale,
+        rounding: nlh::Rounding,
     ) -> Self {
         GameIndex {
             scale,
+            rounding,
             tokens: labels
                 .iter()
                 .map(|l| crate::queries::history_token(l))
@@ -252,6 +258,15 @@ impl<'a> TreeView<'a> {
     /// Display labels of an action node's actions, in child order.
     pub fn actions(&self, node: NodeId) -> Vec<&'a str> {
         self.action_labels(node).collect()
+    }
+
+    pub(crate) fn resolve_action(&self, node: NodeId, label: &str) -> Result<usize, String> {
+        crate::queries::resolve_scaled_action(
+            &self.actions(node),
+            label,
+            self.index.scale,
+            self.index.rounding,
+        )
     }
 
     pub(crate) fn action_labels(&self, node: NodeId) -> impl Iterator<Item = &'a str> + '_ {
@@ -325,6 +340,7 @@ impl<'a> TreeView<'a> {
                         &self.index.tokens[self.index.edges[child as usize] as usize],
                         token,
                         self.index.scale,
+                        self.index.rounding,
                     )
                 })?,
                 NodeKind::Chance => {
@@ -394,11 +410,10 @@ impl<'a> TreeView<'a> {
                                     &self.index.tokens[self.index.edges[child as usize] as usize],
                                     step,
                                     self.index.scale,
+                                    self.index.rounding,
                                 )
                             }));
-                        } else if let Ok(pos) =
-                            crate::queries::resolve_action(&self.actions(id), step)
-                        {
+                        } else if let Ok(pos) = self.resolve_action(id, step) {
                             next.push(node.first_child + pos as NodeId);
                         }
                     }
@@ -857,6 +872,7 @@ pub(crate) fn read_index(
         hands,
         root_ranges,
         config.scale,
+        config.chip_rounding,
     );
     Ok(IndexedTree { tree, index })
 }
@@ -873,7 +889,7 @@ mod tests {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x"
 board = "Ks 7s 2s"
@@ -881,7 +897,7 @@ board = "Ks 7s 2s"
 BB = "AA,QQ"
 BTN = "JJ,TT"
 [tree]
-script = "flop { replace bet [a] } turn { replace bet [50] } river { checkdown }"
+script = "flop { replace bet [a] } turn { replace bet [50%] } river { checkdown }"
 [run]
 memory = "1GiB"
 "#;
@@ -890,7 +906,7 @@ memory = "1GiB"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
@@ -898,7 +914,7 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "turn { replace bet [2bb] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
+script = "turn { replace bet [2bb] } river { replace bet [100%] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
 [solver]
 iso_merging = false
 [run]
@@ -913,11 +929,20 @@ memory = "1GiB"
                     "players = 2",
                     &format!("players = 2\nbb_chips = {bb_chips}"),
                 )
-                .replace("river { replace bet [100] }", "river { replace bet [2bb] }");
+                .replace(
+                    "river { replace bet [100%] }",
+                    "river { replace bet [2bb] }",
+                );
             let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
             let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
             let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-            let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+            let index = GameIndex::from_game(
+                &built.game,
+                &built.node_info,
+                start,
+                p.config.scale,
+                p.config.chip_rounding,
+            );
             let view = TreeView {
                 tree: &built.game.tree,
                 index: &index,
@@ -944,8 +969,13 @@ memory = "1GiB"
             let raw = TURN.replace("players = 2", &format!("players = 2\nbb_chips = {scale}"));
             let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
             let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
-            let index =
-                GameIndex::from_game(&built.game, &built.node_info, Street::Turn, p.config.scale);
+            let index = GameIndex::from_game(
+                &built.game,
+                &built.node_info,
+                Street::Turn,
+                p.config.scale,
+                p.config.chip_rounding,
+            );
             let view = TreeView {
                 tree: &built.game.tree,
                 index: &index,
@@ -969,12 +999,77 @@ memory = "1GiB"
     }
 
     #[test]
+    fn selector_bb_amounts_use_table_rounding() {
+        for (rounding, chips) in [("down", "r6c"), ("nearest", "r7c"), ("up", "r7c")] {
+            let raw = TURN
+                .replace(
+                    "players = 2",
+                    &format!("players = 2\nbb_chips = 3\nchip_rounding = \"{rounding}\""),
+                )
+                .replace(
+                    "turn { replace bet [2bb] }",
+                    "turn { replace bet [6c, 7c] }",
+                );
+            let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
+            let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+            let index = GameIndex::from_game(
+                &built.game,
+                &built.node_info,
+                Street::Turn,
+                p.config.scale,
+                p.config.chip_rounding,
+            );
+            let view = TreeView {
+                tree: &built.game.tree,
+                index: &index,
+            };
+            let expected = view.node_by_history(chips).unwrap();
+            assert_eq!(view.node_by_history("r2.333"), Some(expected));
+            assert_eq!(view.profile_nodes("r2.333").unwrap(), [expected]);
+            assert_eq!(view.node_by_history("r2.333bb"), Some(expected));
+            assert_eq!(view.profile_nodes("bet 2.333bb").unwrap(), [expected]);
+            assert_eq!(
+                view.profile_nodes(&format!("bet {}", &chips[1..])).unwrap(),
+                [expected]
+            );
+            assert_eq!(
+                view.resolve_action(0, "bet 2.333").unwrap(),
+                view.resolve_action(0, &format!("bet {}", &chips[1..]))
+                    .unwrap()
+            );
+            assert_eq!(
+                view.profile_nodes("r2.333c[?]").unwrap(),
+                view.profile_nodes(&format!("{chips}c[?]")).unwrap(),
+            );
+            let mut stream = Vec::new();
+            write_index(&mut stream, &built.game.tree, &index).unwrap();
+            let stored = read_index(
+                &mut stream.as_slice(),
+                &p.config,
+                built.game.tree.nodes.len() as u64,
+            )
+            .unwrap();
+            let stored_view = TreeView {
+                tree: &stored.tree,
+                index: &stored.index,
+            };
+            assert_eq!(stored_view.node_by_history("r2.333"), Some(expected));
+        }
+    }
+
+    #[test]
     fn nondecimal_histories_round_trip_chip_suffix_and_call() {
         let raw = TURN.replace("players = 2", "players = 2\nbb_chips = 6");
         let p = crate::prepare::prepare(&raw, std::path::Path::new("test.toml")).unwrap();
         let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
         let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-        let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+        let index = GameIndex::from_game(
+            &built.game,
+            &built.node_info,
+            start,
+            p.config.scale,
+            p.config.chip_rounding,
+        );
         let view = TreeView {
             tree: &built.game.tree,
             index: &index,
@@ -1015,7 +1110,13 @@ memory = "1GiB"
         let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
         let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
         let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-        let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+        let index = GameIndex::from_game(
+            &built.game,
+            &built.node_info,
+            start,
+            p.config.scale,
+            p.config.chip_rounding,
+        );
         let view = TreeView {
             tree: &built.game.tree,
             index: &index,
@@ -1038,7 +1139,13 @@ memory = "1GiB"
             let p = crate::prepare::prepare(raw, std::path::Path::new("test.toml")).unwrap();
             let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
             let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-            let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+            let index = GameIndex::from_game(
+                &built.game,
+                &built.node_info,
+                start,
+                p.config.scale,
+                p.config.chip_rounding,
+            );
             let mut stream = Vec::new();
             write_index(&mut stream, &built.game.tree, &index).unwrap();
             let nodes = built.game.tree.nodes.len() as u64;

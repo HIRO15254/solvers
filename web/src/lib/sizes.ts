@@ -27,16 +27,16 @@ export interface SizeTable {
 export const DEFAULT_SIZES: SizeTable = {
   sizes: {
     flop: {
-      oop: { bet: ["33"], raise: ["50"] },
-      ip: { bet: ["33"], raise: ["50"] },
+      oop: { bet: ["33%"], raise: ["50%"] },
+      ip: { bet: ["33%"], raise: ["50%"] },
     },
     turn: {
-      oop: { bet: ["75"], raise: ["a"] },
-      ip: { bet: ["75"], raise: ["a"] },
+      oop: { bet: ["75%"], raise: ["a"] },
+      ip: { bet: ["75%"], raise: ["a"] },
     },
     river: {
-      oop: { bet: ["75", "a"], raise: ["a"] },
-      ip: { bet: ["75", "a"], raise: ["a"] },
+      oop: { bet: ["75%", "a"], raise: ["a"] },
+      ip: { bet: ["75%", "a"], raise: ["a"] },
     },
   },
   noDonk: true,

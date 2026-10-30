@@ -7,7 +7,7 @@ const TURN: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 4s"
@@ -15,7 +15,7 @@ board = "2s 7s Ks 4s"
 BB = "AK,44"
 BTN = "AK,44"
 [tree]
-script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "turn { checkdown } river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [solver]
 storage = "f32"
 [solver.stop]

@@ -166,8 +166,8 @@ const REPORT_UNION_TOML: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 55
-ante_bb = 4
+stack = 55
+ante = 4
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -177,10 +177,10 @@ BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
 script = '''river {
   when paired {
-    replace bet [100]
+    replace bet [100%]
   }
   when !paired {
-    replace bet [50]
+    replace bet [50%]
   }
 }
 '''
@@ -271,8 +271,8 @@ const RIVER_WITH_DEAD_RULE_TOML: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 55
-ante_bb = 4
+stack = 55
+ante = 4
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -281,10 +281,10 @@ BB = "22+,A2s+,KTo+"
 BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
 script = '''river {
-  replace bet [50]
-  replace raise [50]
+  replace bet [50%]
+  replace raise [50%]
   when aggressions == 0 {
-    when aggressions == 1 { replace raise [75] }
+    when aggressions == 1 { replace raise [75%] }
   }
 }
 
@@ -393,8 +393,8 @@ fn report_warns_once_about_a_rule_unmatched_on_every_board() {
     std::fs::write(
         &config,
         REPORT_UNION_TOML.replace(
-            "  when !paired {\n    replace bet [50]\n  }\n",
-            "  when !paired {\n    replace bet [50]\n  }\n  when spr < 0 { replace raise [200] }\n",
+            "  when !paired {\n    replace bet [50%]\n  }\n",
+            "  when !paired {\n    replace bet [50%]\n  }\n  when spr < 0 { replace raise [200%] }\n",
         ),
     )
     .unwrap();
@@ -481,8 +481,8 @@ const RIVER_NO_EARLY_STOP: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 55
-ante_bb = 4
+stack = 55
+ante = 4
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2c 7d 9h Js Qs"
@@ -491,8 +491,8 @@ BB = "22+,A2s+,KTo+"
 BTN = "55-22,QJs,A5s-A2s,KQo,T9s"
 [tree]
 script = '''river {
-  replace bet [50]
-  replace raise [50]
+  replace bet [50%]
+  replace raise [50%]
 }
 
 river when aggressions >= 2 { remove raise }'''
@@ -718,7 +718,7 @@ fn resume_tampered_config_errors() {
     // Tamper with the run directory's copy of the config after the
     // checkpoint was stamped against it.
     let mut tampered = RIVER_NO_EARLY_STOP.to_string();
-    tampered = tampered.replace("stack_bb = 55", "stack_bb = 56");
+    tampered = tampered.replace("stack = 55", "stack = 56");
     std::fs::write(run.join("run.toml"), tampered).unwrap();
 
     let output = run_solvers(&["resume", run.to_str().unwrap()]);
@@ -741,7 +741,7 @@ const TINY_TURN_TOML: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
@@ -749,8 +749,8 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = '''turn { replace bet [75] }
-river { replace bet [100] }
+script = '''turn { replace bet [75%] }
+river { replace bet [100%] }
 
 turn when aggressions >= 1 { remove raise }
 river when aggressions >= 1 { remove raise }'''
@@ -1228,7 +1228,7 @@ const TINY_TURN_TOML_NO_ISO: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
@@ -1236,8 +1236,8 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = '''turn { replace bet [75] }
-river { replace bet [100] }
+script = '''turn { replace bet [75%] }
+river { replace bet [100%] }
 
 turn when aggressions >= 1 { remove raise }
 river when aggressions >= 1 { remove raise }'''

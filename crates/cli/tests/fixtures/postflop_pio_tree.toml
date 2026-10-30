@@ -2,7 +2,7 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 205.5
+stack = 205.5
 
 [economics]
 kind = "cash"
@@ -10,11 +10,11 @@ kind = "cash"
 # v1 separates cash rake and tournament ICM. Rounding uses the 0.001 BB grid.
 [economics.rake]
 rate = 0.05
-cap_bb = 6
+cap = 6
 when = "flop_dealt"
 allocation = "main-first"
 rounding = "down"
-rounding_unit_bb = 0.001
+rounding_unit = 0.001
 
 [spot]
 line = "BTN r10.5, BB c"
@@ -28,7 +28,7 @@ BTN = "JJ-99,AQs-ATs,KQs,QJs"
 source = "trees/pio.tree"
 
 [tree.params]
-cb = 40
+cb = "40%"
 
 [solver.algorithm]
 schedule = "dcfr"

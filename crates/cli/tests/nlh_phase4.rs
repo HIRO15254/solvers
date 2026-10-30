@@ -6,7 +6,7 @@ use std::process::{Command, Output, Stdio};
 const RIVER: &str = r#"schema = "solvers.nlh/v1"
 [table]
 players = 6
-stack_bb = 12.75
+stack = 12.75
 [spot]
 line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"
 board = "Ks 7h 2d 3c 9s"
@@ -163,22 +163,22 @@ fn spec_p1_example_human_output_is_readable_and_pinned() {
         ok(&["validate", path(&config)], ""),
         concat!(
             "valid: schema=solvers.nlh/v1 product=P1 (HU Postflop) amounts=BB utility=BB\n",
-            "street: Flop\nboard: Ks 7h 2d\nstarting pot: 5.5 BB\n",
-            "OOP: BB remaining stack 97.5 BB\nIP: BTN remaining stack 97.5 BB\n",
-            "effective stack: 97.5 BB\nfolded: SB, UTG, HJ, CO\n",
+            "street: Flop\nboard: Ks 7h 2d\nstarting pot: 5.5\n",
+            "OOP: BB remaining stack 97.5\nIP: BTN remaining stack 97.5\n",
+            "effective stack: 97.5\nfolded: SB, UTG, HJ, CO\n",
             "line: UTG f*, HJ f*, CO f*, BTN r2.5, SB f*, BB c\n* marks an implied fold\n",
-            "economics: cash with rake rate=0.05 cap=4 BB when=flop_dealt\n",
+            "economics: cash with rake rate=0.05 cap=4 when=flop_dealt\n",
             "tree rule: flop when donk { remove bet }\n",
-            "tree rule: flop { replace bet [33] }\n",
-            "tree rule: flop { replace raise [50] }\n",
+            "tree rule: flop { replace bet [33%] }\n",
+            "tree rule: flop { replace raise [50%] }\n",
             "tree rule: flop when aggressions >= 2 { replace raise [a] }\n",
             "tree rule: turn when donk { remove bet }\n",
-            "tree rule: turn { replace bet [50] }\n",
-            "tree rule: turn when cbet { replace bet [75] }\n",
+            "tree rule: turn { replace bet [50%] }\n",
+            "tree rule: turn when cbet { replace bet [75%] }\n",
             "tree rule: turn { replace raise [a] }\n",
-            "tree rule: turn when spr > 3 { replace raise [50] }\n",
-            "tree rule: river { replace bet [50, a] }\n",
-            "tree rule: river when in_position { replace bet [75, a] }\n",
+            "tree rule: turn when spr > 3 { replace raise [50%] }\n",
+            "tree rule: river { replace bet [50%, a] }\n",
+            "tree rule: river when in_position { replace bet [75%, a] }\n",
             "tree rule: river { replace raise [a] }\n",
             "tree rule: flop when aggressions >= 3 { remove raise }\n",
             "tree rule: turn when aggressions >= 3 { remove raise }\n",
@@ -191,9 +191,9 @@ fn human_validation_handles_chip_denominated_economics() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("chip-economics.toml");
     let tournament = include_str!("../../../examples/hu-postflop/tournament_icm.toml")
-        .replace("players = 2", "players = 2\nbb_chips = 3\nsb_chips = 1")
+        .replace("players = 2", "players = 2\nbb_chips = 3\nsb = '1c'")
         .replace("BTN r2.5", "BTN r2")
-        .replace("outside_field_bb = [10]", "outside_field_chips = [31]");
+        .replace("outside_field = [10]", "outside_field = ['31c']");
     std::fs::write(&config, &tournament).unwrap();
     let human = ok(&["validate", path(&config)], "");
     assert!(human.contains("amounts=chips utility="), "{human}");
@@ -206,8 +206,8 @@ fn human_validation_handles_chip_denominated_economics() {
     assert_eq!(json["amountUnit"], "BB");
 
     let cash = tournament.replace(
-        "[economics]\nkind = \"tournament\"\npayouts = [100, 60, 0]\noutside_field_chips = [31]",
-        "[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap_chips = 7",
+        "[economics]\nkind = \"tournament\"\npayouts = [100, 60, 0]\noutside_field = ['31c']",
+        "[economics]\nkind = \"cash\"\n[economics.rake]\nrate = 0.05\ncap = '7c'",
     );
     std::fs::write(&config, cash).unwrap();
     let human = ok(&["validate", path(&config)], "");
@@ -342,7 +342,7 @@ fn no_rivers_artifact_can_resolve_decimal_history_with_icm_and_asymmetric_stacks
     let config = temp.path().join("turn.toml");
     let raw = RIVER.replace(" / BB x, BTN x / BB x, BTN x", " / BB x, BTN x")
         .replace("Ks 7h 2d 3c 9s", "Ks 7h 2d 3c")
-        .replace("[spot]", "[table.stacks_bb]\nBB=20\n[economics]\nkind='tournament'\npayouts=[1000,600,400,0,0,0,0]\noutside_field_bb=[30]\n[spot]")
+        .replace("[spot]", "[table.stacks]\nBB=20\n[economics]\nkind='tournament'\npayouts=[1000,600,400,0,0,0,0]\noutside_field=[30]\n[spot]")
         .replace("script = '''river", "script = '''turn { replace bet [3.3bb] } river")
         .replace("[solver.stop]", "[solver]\nstorage='i16'\n[solver.algorithm]\nschedule='vanilla'\n[output]\nsolution_streets='no-rivers'\n[solver.stop]");
     std::fs::write(&config, raw).unwrap();

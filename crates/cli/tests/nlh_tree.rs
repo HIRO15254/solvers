@@ -118,6 +118,32 @@ fn terminal_rows_all_action_nodes_and_human_listing() {
     assert!(text.contains("bet 1 -> r1 (action)"), "{text}");
 }
 
+#[test]
+fn nondecimal_tree_pot_is_exact_chips_in_human_output() {
+    let dir = tempfile::tempdir().unwrap();
+    let config = dir.path().join("river.toml");
+    let source = std::fs::read_to_string(example("hu-postflop", "river_small.toml")).unwrap();
+    let source = source
+        .replace("stack = 5", "stack = 5\nbb_chips = 3")
+        .replace("BTN r2.5, BB c", "BTN r8c, BB c");
+    std::fs::write(&config, source).unwrap();
+    let human = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .arg("tree")
+        .arg(&config)
+        .output()
+        .unwrap();
+    assert!(
+        human.status.success(),
+        "{}",
+        String::from_utf8_lossy(&human.stderr)
+    );
+    let text = String::from_utf8(human.stdout).unwrap();
+    assert!(text.contains("action river actor=oop pot=16c"), "{text}");
+    let json = rows(&config, &[]);
+    assert_eq!(json[0]["pot"], serde_json::json!(16.0 / 3.0));
+    assert!(json[0].get("pot_text").is_none());
+}
+
 fn histories(rows: &serde_json::Value) -> Vec<&str> {
     rows.as_array()
         .unwrap()

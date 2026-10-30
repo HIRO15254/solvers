@@ -3,7 +3,7 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 3
-stack_bb = 2
+stack = 2
 
 [economics]
 kind = "tournament"

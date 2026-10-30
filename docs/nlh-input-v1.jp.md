@@ -10,10 +10,13 @@
 - ゲームの記述（`[table]` `[economics]` `[spot]` `[ranges]` `[tree]`）は製品によらず同じ意味を持つ。
   計算の設定（`[solver]` `[output]`）は製品ごと、`[run]`は共通の運用設定。
 - **製品はspotから決まる**（第3節）。利用者は製品名を書かない。`validate`が決定した製品を表示する。
-- **chip量は整数chip。** `table.bb_chips`で1 BBあたりのchip数を定める。BBで書いた額も整数chipに一致しなければerror（第5節）。
+- **額は単位付きの値で書く。** 1つの量に1つのkeyを使い、数値と接尾辞なしの額はBB、`Nbb`はBB、`Nc`は整数chipである。
+  内部の整数1単位は1 chipで、`table.bb_chips`が1 BBあたりのchip数を定める。BBの額は`table.chip_rounding`で整数chipへ丸める（第5節）。
+  tree scriptのsize literalも同じ規則で、pot比は`N%`と書く（第9節）。
 - **strict。** 未知key、決定した製品に適用されないkey、旧形式のkeyはerrorとし、黙って無視・近似しない。
-- **lineの行動とboardの表記は厳密**（第7節）。lineの額にはBBの10進数とchip表記の両方を使え、
-  実効configでは正規表記に揃える。string enum、position名、line、boardは大小文字を区別する。
+  丸めで額が変わった場合はwarningで示す。
+- **lineの行動とboardの表記は厳密**（第7節）。lineの額にはBBとchipのどちらも使え、
+  実効configではchipで書く。string enum、position名、line、boardは大小文字を区別する。
 - **正規化は冪等。** 既定値をすべて明示し、script本文をinline化した実効configを`run.toml`へ保存する。
   実効configを再び正規化すると同じbytesになる。
 - **自己完結。** tree scriptは正規化で本文へ置き換える。例外として`profile.freeze_upstream`は
@@ -55,6 +58,7 @@ confidence = 1.0
 - `node`は`solvers tree --node`と同じhistoryまたはlabel path。`root`と空文字列はrootを選ぶ。
   historyの`[?]`、label pathの`?`は全runoutに一致するwildcard。
   `action`は空にできず、`solvers tree`に表示されるlabelを使う。
+  node・labelの額は表示表記（第5節）のほか、BBとchipのどちらでも書け、第5節の方式で丸めた額で照合する。
 - `hands`は第8節のrange文字列で、明示weightはすべて1でなければならない。
   `category`は[hand category](hu-postflop.jp.md#hand-category)の式で、`hands`と排他。
   両方省略するとそのnodeのactorの全handが対象。
@@ -108,16 +112,19 @@ derived_from = { run_id = "...", solution_hash = "...", line = "...", board = ".
 [table]
 players = 6          # 必須。2..9
 bb_chips = 1000      # 既定1000。1 BBあたりのchip数（1..1000000）
-stack_bb = 100       # 必須（stacks_bbで全positionを指定する場合は省略可）。正
-sb_bb = 0.5          # 既定0.5。0 < sb_bb <= 1
-ante_bb = 0          # 既定0。全員が払うante
-bb_ante_bb = 0       # 既定0。BBだけが払うdead ante。ante_bbとの同時指定（ともに正）はerror
-straddles_bb = []    # 既定[]。live straddleの額（下記「straddle」）
-chip_rounding = "nearest"  # 既定。down | nearest | up。計算したsizeを整数chipへ丸める
+stack = 100          # 必須（stacksで全positionを指定する場合は省略可）。正
+sb = 0.5             # 既定0.5 BB。0 < sb <= 1 BB
+ante = 0             # 既定0。全員が払うante
+bb_ante = 0          # 既定0。BBだけが払うdead ante。anteとの同時指定（ともに正）はerror
+straddles = []       # 既定[]。live straddleの額（下記「straddle」）
+chip_rounding = "nearest"  # 既定。down | nearest | up。BBの額と計算したsizeを整数chipへ丸める
 
-[table.stacks_bb]    # 任意。positionごとの開始stack
+[table.stacks]       # 任意。positionごとの開始stack
 CO = 80
+BTN = "95000c"
 ```
+
+額のkeyの値は下記「chip単位」の額の値である。
 
 position名と行動順は人数で決まる（BTNを基準に時計回り）。表のPreflopの行動順はstraddleが無い場合。
 
@@ -138,16 +145,16 @@ position名と行動順は人数で決まる（BTNを基準に時計回り）。
 
 ### straddle
 
-- `straddles_bb`の1番目は、Preflopで最初に行動する席（上表の先頭。3人卓ではBTN）が置くstraddle、
-  2番目以降はその次の席から時計回りに続くre-straddle。額は各席の到達額（BB）。
-- 各額は直前の強制bet（BB、または直前のstraddle）の2倍以上で、chip単位の倍数。置ける数は`players − 2`まで
+- `straddles`の1番目は、Preflopで最初に行動する席（上表の先頭。3人卓ではBTN）が置くstraddle、
+  2番目以降はその次の席から時計回りに続くre-straddle。額は各席の到達額。
+- 各額は直前の強制bet（BB、または直前のstraddle）の2倍以上である。置ける数は`players − 2`まで
   （SB・BBの席には置けない）。`players = 2`では書けない。straddlerはanteとstraddleを払った後にstackが
   残らなければならない。いずれも違反は`NLH003`。
 - すべてlive straddleとする。Preflopの行動は最後のstraddlerの次の席から始まり、最後のstraddlerが最後に
   行動する（raiseが無ければcheckかraiseを選べる）。それ以外の席の相対順とPostflopの行動順は変わらない。
 - Preflopでは最後のstraddleをBBとして扱う。最小raiseの幅、size literal `3x`の基準額、limpの額は最後の
   straddle額。straddleは`aggressions`・`raises`に数えない。Postflopの最小betはtableのBB（=1）のまま。
-- 例: 6maxで`straddles_bb = [2, 4]`ならUTGが2 BB、HJが4 BBを置き、Preflopの行動順はCO, BTN, SB, BB, UTG, HJ。
+- 例: 6maxで`straddles = [2, 4]`ならUTGが2 BB、HJが4 BBを置き、Preflopの行動順はCO, BTN, SB, BB, UTG, HJ。
   最小raiseは8 BBへのraise。line `BTN r10, HJ c`はCO・SB・BB・UTGがfoldし、HJがBTNの10 BBにcallした進行で、
   開始potは23.5 BB。
 - 6maxのBTN straddleのように、Preflopで最初に行動する席以外から始まるstraddleはv1に含めない（付録A）。
@@ -155,30 +162,37 @@ position名と行動順は人数で決まる（BTNを基準に時計回り）。
 ### chip単位
 
 `bb_chips`は1 BBを構成する整数chip数であり、内部の整数1単位は1 chipである。
-例えば$1 chipを使う1-3 gameは`bb_chips = 3`、`sb_chips = 1`と書く（1 chipは1/3 BB）。
+例えば$1 chipを使う1-3 gameは`bb_chips = 3`、`sb = "1c"`と書く（1 chipは1/3 BB）。
 `bb_chips`は1以上1000000以下、既定1000である。
 
-次の各組はBB表記と整数chip表記の代替であり、同じ組の両方を指定すると`NLH003`である。
+額のkey（`table`の`stack`・`[table.stacks]`の各値・`sb`・`ante`・`bb_ante`・`straddles`の各要素、
+`economics`の`outside_field`の各要素、`economics.rake`の`cap`・`rounding_unit`）は、次の額の値を受ける。
 
-| 節 | BB key | chip key |
-|---|---|---|
-| `table` | `stack_bb` | `stack_chips` |
-| `table` | `[table.stacks_bb]` | `[table.stacks_chips]` |
-| `table` | `sb_bb` | `sb_chips` |
-| `table` | `ante_bb` | `ante_chips` |
-| `table` | `bb_ante_bb` | `bb_ante_chips` |
-| `table` | `straddles_bb` | `straddles_chips` |
-| `economics` | `outside_field_bb` | `outside_field_chips` |
-| `economics.rake` | `cap_bb` | `cap_chips` |
-| `economics.rake` | `rounding_unit_bb` | `rounding_unit_chips` |
+| 値 | 意味 |
+|---|---|
+| TOMLの数値（`100`、`2.5`） | BB |
+| 文字列`"N"`、`"Nbb"`（`"2.5"`、`"2.5bb"`） | BB。Nは符号・指数表記無しの10進数 |
+| 文字列`"Nc"`（`"250c"`） | 整数N chip。Nは符号・先頭0無しの10進整数 |
 
-BB値に`bb_chips`を掛けた値は整数でなければならない。違反は`NLH003`で、対応する`_chips` keyを使う。
-lineの不正な額は`NLH004`である。SBの既定0.5 BBも整数chipである必要があるため、
-`bb_chips`が奇数なら`sb_bb`または`sb_chips`を明示しなければ`table.sb_bb`のerrorとなる。
+配列の要素ごとに書き方を混ぜてもよい。数値でも上記の文字列でもない値は`NLH002`、解析できない文字列は`NLH003`である。
+旧版の`stack_bb`・`stack_chips`のような単位付きkey（`*_bb`と`*_chips`の計18 key）は`NLH002`とし、
+新しいkey名と、tree scriptのsize literalの接尾辞なしがBBになったこと（pot比は`N%`、第9節）を示す。
 
-size literalの解決時は計算した額を`chip_rounding`で整数chipへ丸める。
+BBの額は`bb_chips`を掛け、`chip_rounding`で整数chipへ丸める。
 `down`は切捨て、`nearest`は最近接（ちょうど中間なら上）、`up`は切上げである。
-最小full raiseへの引上げとstack capは丸めの後に適用する。
+丸めで額が変わる場合は、keyの位置、書いたBB値、丸め後のchip数と丸め方式をwarningに示す。
+省略した既定SBの0.5 BBも同じく丸め、変わる場合は警告する。例えば`bb_chips = 3`の既定SBは`nearest`なら2 chipとなる。
+正確に1 chipにしたい場合は`sb = "1c"`とする。`Nc`は正確に扱い、丸めない。
+正値・範囲やlineの合法性などは丸め後の額で検査する。
+size literalの計算額も同じ方式で丸め、最小full raiseへの引上げとstack capは丸めの後に適用する。
+
+実効configはkeyとlineの額をすべて`"Nc"`・`Nc`で書く（第13節）。そのため実効configの再読込でkeyとlineの丸めのwarningは出ない。
+tree scriptは書いたまま残すため、丸めで変わるscriptのBB sizeのwarningは再読込でも出る。
+
+人が見る出力（`validate`の表示、node historyとaction label、`solvers tree`・export・GUIの表示）は、
+次の**表示表記**で額を書く。`bb_chips`の素因数が2と5だけの卓では接尾辞なしの最短のBB10進数（`2.5`）、
+それ以外の卓では`Nc`（`8c`）である。どちらの卓でも額は正確に表される。
+
 showdownの各potは勝者へ等分し、余ったchipを決まった順の勝者へ1枚ずつ配る。
 P1はOOP、IPの順なので奇数chipはOOPが受け取り、P2はbuttonの次の席から時計回りの勝者順に配る。
 potの合計は保存する。rakeは別の丸め方式と整数chipの単位を使う（第6節）。
@@ -193,14 +207,14 @@ kind = "cash"              # 既定
 
 [economics.rake]           # 任意。無ければrakeなし
 rate = 0.05                # 必須。0..1
-cap_bb = 4                 # 任意。既定は上限なし。非負
+cap = 4                    # 任意。既定は上限なし。非負の額
 when = "flop_dealt"        # 既定"flop_dealt"（no flop no drop）
 allocation = "main-first"  # 既定。main-first | proportional
 rounding = "down"          # 既定。down | nearest | up
-rounding_unit_chips = 1    # 既定1 chip。rounding_unit_bbと排他
+rounding_unit = "1c"       # 既定1 chip。正の額
 ```
 
-`rounding_unit_bb`または`rounding_unit_chips`は正の整数chipを表す。既定は1 chipである。
+`cap`と`rounding_unit`は第5節の額の値で、BBなら`table.chip_rounding`で整数chipへ丸める。`rounding_unit`は丸め後に1 chip以上でなければならない。
 rakeはuncalled wagerを返却した後の全potの合計に率を掛け、指定の単位へ丸め、capで制限する。
 capは単位の倍数でなくてよく、capに達したrakeはcapの額である。丸めた額がpotを超えるときはpotの額とする。
 `down`は切捨て、`nearest`は最も近い倍数（ちょうど中間なら上）、`up`は切上げである。
@@ -239,7 +253,7 @@ P1では`flop_dealt = true`、`players_dealt = table.players`、`players_saw_flo
 [economics]
 kind = "tournament"
 payouts = [1000, 600, 400]   # 必須。順位順に非増加、非負、有限
-outside_field_bb = [18, 26]  # 既定[]。この卓にいない残存playerのstack
+outside_field = [18, 26]     # 既定[]。この卓にいない残存playerのstack（第5節の額の値）
 ```
 
 - 効用は卓の**全員**（そのhandでfoldした人を含む）とoutside fieldの最終stackから計算するICM equity。最大10,000人。
@@ -250,7 +264,7 @@ outside_field_bb = [18, 26]  # 既定[]。この卓にいない残存playerのst
   そのhandで0になった席は残存者より下位で、開始stackが大きい順に上位とする。同じ開始stackならその順位の賞金を等分する。
 - `payouts`の省略順位には0を補う。卓＋fieldの人数を超える項目は`NLH003`である。
   補完後の全順位が同額なら`NLH003`である。賞金のある順位だけが同額のチケット型サテライトは書ける。
-- outside fieldのstackは正、chip単位の倍数である。
+- outside fieldのstackは丸め後に正でなければならない。
 - 旧版のMonte Carlo指定`samples`・`seed`は廃止した。指定すると未知keyの`NLH002`である。
 - rakeと同時に指定できない。
 
@@ -282,13 +296,13 @@ move   = "x" | "c" | "b" amount | "r" amount | "a"
 | `r<額>` | raise | 賭けに直面しているとき。Preflopの最初のraise（open）も`r` |
 | `a` | all-in | stack全額でのbetまたはraise（min-raiseに届かないall-inを含む） |
 
-- 額はそのstreetでのactorの到達額（raise-to）で、整数chipに一致するBBの10進数または整数chipに`c`を付けた`Nc`で書く。
+- 額はそのstreetでのactorの到達額（raise-to）で、接尾辞なしか`bb`付きのBB（`r2.5`、`r2.5bb`）、
+  または`c`付きの整数chip（`r2500c`）で書く。BBの額は第5節の方式で丸め、丸めで変わればwarningを出す。`Nc`は正確に扱う。
   数値は最短表記とする（`2.5`、`3`、`10c`。`2.50`、`3.0`、`03`、`03c`、`+3`は不可）。
-  `spot.line`と`solvers line --moves`のどちらでも両形式を混在できる。例えば`bb_chips = 1000`では
-  `r2.5`と`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
-  実効configの`spot.line`は額を`scale.amount_text(amount)`に正規化する。
-  `bb_chips`の素因数が2と5だけの卓では最短のBB10進数、それ以外の卓では`Nc`である。
-  不正な額やchip gridに合わない額は`NLH004`。tree scriptのsize literalの規則は変わらない。
+  `spot.line`と`solvers line --moves`のどちらでも書き方を混在できる。例えば`bb_chips = 1000`では
+  `r2.5`・`r2.5bb`・`r2500c`、`bb_chips = 3`では`r1`と`r3c`が同額である。
+  実効configの`spot.line`は額をすべて`Nc`で書く（`BTN r2500c, BB c`）。
+  不正な表記や丸め後に違法な額は`NLH004`。tree scriptのsize literalは第9節に従う。
 - positionは`[table]`の人数で決まる名前（大文字）で、常に書く。positionの無い形式（GTO Wizardの
   `F-F-F-R2.5-F-C`）、単語形（`raise 2.5`）、大文字の動作記号、`;`区切り、余分な空白は受けない。
 - 額の単位を除き、1つの行動の書き方は1通り。stack全額になるbet/raiseを`b`/`r`で書く、call額以下のall-inを`a`で書く、
@@ -305,7 +319,7 @@ move   = "x" | "c" | "b" amount | "r" amount | "a"
 - 例: 6maxの`BTN r2.5, BB c`はUTG・HJ・CO・SBがfoldした進行で、開始potは5.5 BB、残stackは両者97.5 BB。
   `UTG r2.5, BTN c`＋Flop boardではSBとBBがfoldしたとみなし、UTG対BTNのspotになる。
   Turn開始は`BTN r2.5, BB c / BB x, BTN b1.8, BB c`のように書く。
-- `validate`は暗黙のfoldを含む全行動を表示し、lineの額は上記の正規表記を使う。
+- `validate`は暗黙のfoldを含む全行動を表示し、lineの額は表示表記（第5節）を使う。
 
 ### board
 
@@ -357,7 +371,7 @@ BB = "random"
 script = '''
 preflop when unopened { replace raise [2.5bb, a] }
 preflop when aggressions >= 1 { jam raise > 33.333%stack }
-flop { replace bet [33, 75] }
+flop { replace bet [33%, 75%] }
 '''
 # source = "trees/6max.tree"   # scriptと排他。正規化でscriptへinline化
 
@@ -384,15 +398,15 @@ scriptは宣言とstreet blockの列である。コメントは`#`から行末�
 streetは`preflop` / `flop` / `turn` / `river`、actionは`fold` / `check` / `call` / `bet` / `raise`である。
 
 ```text
-param cb = 33
+param cb = 33%
 define wet = flush_possible || straight_possible
 flop when cbet {
   replace bet [cb]
-  when wet { replace bet [cb, 75] }
+  when wet { replace bet [cb, 75%] }
 }
 turn, river {
   if spr <= 2 { force bet [a] }
-  else if unopened { replace bet [66] }
+  else if unopened { replace bet [66%] }
   else { remove raise }
 }
 ```
@@ -431,13 +445,13 @@ fold/check/callの候補はNLHの合法性から作り、size listの数値は�
 `jam`のACTIONは`bet` / `raise`だけ、OPは`>=` / `>`だけである。SIZEはsize listと同じ文法のliteralを
 1つだけ書き、`param`置換も使える。`[ ]`のlist、fold/check/call、他の比較演算子は`NLH003`である。
 閾値はsize literal解決順序の手順1（現streetの到達額への変換）だけで求め、最小full raiseへの引上げもMでのcapも行わない。
-例えば`85%stack`はround(M × 0.85)、`150`はpotの150%によるtarget、`a`はMである。
+例えば`85%stack`はround(M × 0.85)、`150%`はpotの150%によるtarget、`a`はMである。
 一致nodeで、それまでに作られたmenuへソース順に作用する。該当候補が無ければ変化せず、
 対象種別が違法またはmenuに無い場合も変化しない。`jam`単独ではall-inを追加しない。
 sizeを足すruleの後、慣例として最後の攻撃回数capの前か近くへ置く。後続ruleが足した候補には遡って作用しない。
 
 `merge`のACTIONも`bet` / `raise`だけで、`within`の後へ幅DIFFを1つだけ書く。DIFFはsize literalと同じ綴りで、`param`置換も使える。
-targetではなく額の差として読み、裸の`10`はround(P × 0.10)、`0.5bb`は0.5 BB、`5%stack`はround(M × 0.05)、
+targetではなく額の差として読み、`10%`はround(P × 0.10)、`0.5`と`0.5bb`は0.5 BB、`5%stack`はround(M × 0.05)、
 `5%effective`は`%effective`と同じ基準の5%である。Pはsize literalと同じ現在pot＋Cである。
 `Nx`、`min`、`a`、`e`、`Ne`は幅を持たないため`NLH003`である。`within`の欠落、`[ ]`のlist、fold/check/callも`NLH003`である。
 対象候補をtargetの降順に並べ、最大のものを残す。以降の候補は、直前に**残した**候補との差がDIFF以下なら削除し、超えれば残す。
@@ -447,8 +461,8 @@ all-inに近い候補はall-inへまとまる。`jam`と同じく一致nodeで�
 
 ```text
 flop {
-  replace bet [25, 33, 50, 66, 75, 100, 150]
-  merge bet within 10   # 150, 100, 75, 50, 33が残り、66と25は削除される
+  replace bet [25%, 33%, 50%, 66%, 75%, 100%, 150%]
+  merge bet within 10%   # 150%, 100%, 75%, 50%, 33%が残り、66%と25%は削除される
 }
 ```
 
@@ -484,7 +498,7 @@ param schemaは名前、実効値、型、説明を持つ。説明は宣言直�
 `validate`の`tree.params`は`name` / `kind` / `value`（string）/ `description`（無ければnull）の配列である。
 `tree.rules`は実適用順の平坦化ruleをソース風stringで返す。
 無条件ruleは`when`を省き、常にfalseのruleは`when unopened && !unopened`と書く。
-`jam`も`turn { jam raise >= 85%stack }`、`merge`も`flop { merge bet within 10 }`のように表示する。
+`jam`も`turn { jam raise >= 85%stack }`、`merge`も`flop { merge bet within 10% }`のように表示する。
 診断は実効configのkeyではない。scriptが無いときも空配列を持つ。
 
 ### 条件文法
@@ -567,17 +581,21 @@ hole cardと任意historyは条件変数に含めない。
 ### size literalと解決順序
 
 sizeは引用符無しのtokenである。数値部は符号・指数表記無しの10進数、有限かつ正である。
-裸百分率は1以上、`Nx`はN > 1、`Ne`は整数1..255、`Nbb`は整数chipに一致しなければならない。
-`Nc`は正の整数N chipを表す。`%stack`と`%effective`のNに100の上限は無く、候補sizeの解決時にstack capを適用する（`jam`の閾値と`merge`の幅には適用しない）。
+接尾辞なしの数値と`Nbb`はBB、`Nc`は正の整数N chip、`N%`はpot比である（第5節の額の値と同じ単位規則）。
+BBのsizeは第5節の方式で整数chipへ丸め、書いた額が丸めで変わればwarningにscriptの位置と丸め後のchip数を示す。
+`N%`のNは1以上、`Nx`はN > 1、`Ne`は整数1..255である。
+`%stack`と`%effective`のNに100の上限は無く、候補sizeの解決時にstack capを適用する（`jam`の閾値と`merge`の幅には適用しない）。
 旧綴り`allin` / `50%pot` / `geometric(...)`は`NLH003`である。
+v0.1.0では接尾辞なしの数値がpot比だった。旧scriptの`bet [50]`は50 BBのbetになるため、pot比は`50%`へ書き換える。
+`param`の値と`[tree.params]`の数値overrideも同じ規則で読む（`cb = 33`は33 BB、pot比は`cb = "33%"`）。
 
 以下でWはactorの現street wager、Cは`min(to_call, 残stack)`、Pは現在pot＋C、TはW＋C、
 Mはactorの現street最大到達額（W＋残stack）で、同じstreet内では一定である。Preflopではhand開始stackからanteを引いた額になる。
 
 | literal | raise-to target |
 |---|---|
-| `50` | T＋round(P × 0.50) |
-| `2.5bb` | そのstreetの到達額2.5 BB。straddleがあってもtableのBB単位 |
+| `50%` | T＋round(P × 0.50) |
+| `2.5`、`2.5bb` | そのstreetの到達額2.5 BB。straddleがあってもtableのBB単位 |
 | `20c` | そのstreetの到達額20 chip |
 | `3x` | round(現streetの最大wager × 3)。straddleありPreflopのopenでは最後のstraddle額を基準にする |
 | `a` | M |
@@ -822,8 +840,9 @@ effective stack）、treeの診断（paramの一覧、平坦化したrule）、�
 `--show-effective` / `--write-effective PATH`は実効configを出力し、`--format json`は同じ内容を機械可読で返す。
 
 実効configは第2節の順に節を並べ、既定値を持つkeyはすべて書く。`bb_chips`と`chip_rounding`も常に出力する。
-既定値の無い任意key（`cap_bb`、`max_time`等）は指定したときだけ書く。
-`bb_chips`の素因数が2と5だけの卓では額を`_bb` keyと最短の10進数で、それ以外の卓では`_chips` keyと整数で書く。
+既定値の無い任意key（`cap`、`max_time`等）は指定したときだけ書く。
+額のkeyは、どの卓でも`"Nc"`の文字列で書く（`stack = "100000c"`、`sb = "500c"`、`ante = "0c"`）。
+`spot.line`の額も`Nc`で書く。tree scriptは書いたまま残し、size literalを書き換えない。
 `source`は`script`へinline化し、scriptは複数行literal文字列（`'''`）で書く。
 P2の`[ranges]`は全positionを書く（書かなかったpositionは`"random"`）。`[solver]`・`[output]`は
 決定した製品が解釈し、その既定値を明示して書く。
@@ -838,15 +857,15 @@ P2の`[ranges]`は全positionを書く（書かなかったpositionは`"random"`
 
 CLIの型付き入力errorはexit 2であり、利用者由来のdiagnostic text（`resource limit`等）で終了codeを変更しない。実際のmemory/node資源上限は別のerror型でexit 75へ分類する。P2の資源事前検査は`NLH003`診断表記を保つが、入力errorとは区別する。
 
-実効configの節内keyは本書の順、positionは第5節の順である。等しいstackは単一の`stack_bb`または`stack_chips`、
-異なるstackは対応する`[table.stacks_bb]`または`[table.stacks_chips]`へ全positionを書く。時間とmemoryは割り切れる最大単位で書く。
+実効configの節内keyは本書の順、positionは第5節の順である。等しいstackは単一の`stack`、
+異なるstackは`[table.stacks]`へ全positionを書く。時間とmemoryは割り切れる最大単位で書く。
 空tableは書かない。scriptはCRLFをLFへ揃えるが、paramsを展開した本文には置き換えない。
 
 | code | 代表例 |
 |---|---|
 | `NLH001` | schema省略、未知schema、旧familyを共通parserへ渡す |
-| `NLH002` | playersがstring、未知`table.foo`、削除済みtree key（第9節）、P1へP2の`solver.kind`、source/script同時指定 |
-| `NLH003` | 0.0001 BB、重複board、全0 range、未知条件変数、`force raise []`で最終menuが空、P2のboard述語 |
+| `NLH002` | playersがstring、未知`table.foo`、旧単位付きkey`table.stack_bb`、額のkeyにboolean、削除済みtree key（第9節）、P1へP2の`solver.kind`、source/script同時指定 |
+| `NLH003` | `stack = "2.5c"`、`stack = "100BB"`、丸めると0 chipになる`stack`、重複board、全0 range、未知条件変数、`force raise []`で最終menuが空、P2のboard述語 |
 | `NLH004` | `BTN R2.5`、`BTN f`、`r2.50`、call額0で`c`、違法min-raise、lineが空でboard指定 |
 | `NLH005` | lineありboard無し、3人以上のPostflop、行動可能なP1 playerが2人未満、`p2` featureなしでP2入力 |
 
@@ -864,14 +883,14 @@ name = "6max NL50 BTN vs BB SRP Ks7h2d"
 
 [table]
 players = 6
-stack_bb = 100
+stack = 100
 
 [economics]
 kind = "cash"
 
 [economics.rake]
 rate = 0.05
-cap_bb = 4
+cap = 4
 
 [spot]
 line = "BTN r2.5, BB c"
@@ -885,20 +904,20 @@ BB = "99-22,AJs-A2s,KJs-K2s,Q4s+,J6s+,T6s+,96s+,85s+,74s+,64s+,53s+,43s,AJo-A2o,
 script = '''
 flop {
   when donk { remove bet }
-  replace bet [33]
-  replace raise [50]
+  replace bet [33%]
+  replace raise [50%]
   when aggressions >= 2 { replace raise [a] }
 }
 turn {
   when donk { remove bet }
-  replace bet [50]
-  when cbet { replace bet [75] }
+  replace bet [50%]
+  when cbet { replace bet [75%] }
   replace raise [a]
-  when spr > 3 { replace raise [50] }
+  when spr > 3 { replace raise [50%] }
 }
 river {
-  replace bet [50, a]
-  when in_position { replace bet [75, a] }
+  replace bet [50%, a]
+  when in_position { replace bet [75%, a] }
   replace raise [a]
 }
 flop, turn when aggressions >= 3 { remove raise }
@@ -918,7 +937,7 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 6
-stack_bb = 100
+stack = 100
 
 [tree]
 script = '''
@@ -949,12 +968,14 @@ max_time = "12h"
 | `[algorithm]` | `[solver.algorithm]` |
 | `[run] iterations` / `check_every` / `target_nash_conv` / `storage` | `[solver.stop]` / `[solver]` |
 | multiway `[game] seat_count` / `button` / `standard_blinds` / `common_ante_bb` | `[table]` |
-| multiway `[game.defaults]`、`[[game.players]]` | `[table]`、`[table.stacks_bb]`、`[ranges]` |
+| multiway `[game.defaults]`、`[[game.players]]` | `[table]`、`[table.stacks]`、`[ranges]` |
 | multiway `[game.tree] kind = "standard"`・`rules`・`allow_limp` | `[tree] script` |
 | multiway `[game.abstraction]` | `[solver.abstraction]` |
 | multiway `[game.information]` | 廃止（current-street固定） |
 | multiway `[run.stop]`、`[run.resources]`、`[run.checkpoint]` | `[solver.stop]`、`[run]` |
-| size literal `20c` | BB単位の`2.5bb`等へ |
+| `stack_bb`・`sb_bb`・`ante_bb`・`bb_ante_bb`・`straddles_bb`・`[table.stacks_bb]`・`outside_field_bb`・`cap_bb`・`rounding_unit_bb`（v0.1.0） | `_bb`を除いたkey（`stack = 100`）。値はBBの数値のまま |
+| tree scriptの接尾辞なしsize（v0.1.0ではpot比、`bet [33, 75]`） | `%`を付ける（`bet [33%, 75%]`）。接尾辞なしはBBになった |
+| `[tree.params]`のpot比の数値override（v0.1.0、`cb = 33`） | `cb = "33%"` |
 
 旧schemaは共通parserで`NLH001`として拒否し、移行先`docs/nlh-input-v1.jp.md`を案内する。旧configの自動変換コマンドは持たない（付録A）。
 
@@ -977,7 +998,8 @@ max_time = "12h"
 | Q12 | deriveのtreeと計算設定 | 既定でP2のtreeを引き継ぎ、Flop以降の`checkdown`を警告する。`--base`のfileから`[tree]`・`[solver]`・`[output]`・`[run]`を差し替えられ、baseの`[table]`・`[economics]`がP2と違えばerror（CLI reference） |
 | Q13 | deriveで未訪問のnode×class | weight 0として除き、席ごとに警告する（CLI reference） |
 | Q14 | deriveの実装時の細則（付録B） | 記載の定めで確定する |
-| Q15 | 卓のchip単位と丸め（2026-10-30） | 1 BBあたりのchip数を`table.bb_chips`で指定する。1-3で$1 chipを使うと1 chipは1/3 BBなので、0.001 BBの倍数を要求する`chip_unit_bb`方式ではなく、この方式を選んだ。sizeは`table.chip_rounding`で整数chipへ丸める（第5節） |
+| Q15 | 卓のchip単位と丸め（2026-10-30） | 1 BBあたりのchip数を`table.bb_chips`で指定する。1-3で$1 chipを使うと1 chipは1/3 BBなので、0.001 BBの倍数を要求する`chip_unit_bb`方式ではなく、この方式を選んだ。BBの額とsizeは`table.chip_rounding`で整数chipへ丸め、書いた額が変わればwarningを出す。省略した既定SBも丸める（第5節） |
+| Q16 | 額の単位の書き方（2026-10-30） | 1つの量に1つのkeyとし、単位は値に書く。数値・接尾辞なし・`Nbb`はBB、`Nc`はchip。tree scriptのsize literalも接尾辞なしはBBで、pot比は`N%`。実効configの額は`Nc`、人が見る出力は表示表記（第5・9・13節） |
 
 P2の方式と品質保証は製品定義D5により未決定である。
 
@@ -1002,7 +1024,7 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | treeのscriptの意味（第9節） | menu編集の各effectは両製品で同じである。P1でもfold・check・callを対象にできる。最終menuが空のnodeは`NLH003`（旧P1の非攻撃actionへの自動復帰は無い） | 第9節・effectと合法性 |
 | `checkdown`（第9節） | 一致した手番のmenuをx/fの1つにする。P2はx/fだけが残った手番を木から省略して自動で適用する（Q7） | 第9節・effectと合法性 |
 | rakeの丸め単位（第6節） | 正の整数chipを表す単位へ丸めてからcapで制限する。既定は1 chip、capは単位の倍数でなくてよい | 第6節 |
-| chip額面と正規化 | `bb_chips`・`chip_rounding`を常に出力し、10進表記できる卓では`_bb`、それ以外では`_chips`を使う | 第5・13節 |
+| chip額面と正規化 | `bb_chips`・`chip_rounding`を常に出力し、額のkeyとlineの額は`Nc`で書く（Q16） | 第5・13節 |
 | split potの端数 | P1はOOP、P2はbuttonの次の席から時計回りの勝者順に余りを配る | 第5節 |
 | 単位がpotより粗い場合（第6節） | 丸めた額がpotを超えればpotの額とする（Q11） | 第6節 |
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |

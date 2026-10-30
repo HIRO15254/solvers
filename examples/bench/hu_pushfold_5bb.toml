@@ -5,7 +5,7 @@ schema = "solvers.nlh/v1"
 [table]
 players = 2
 
-[table.stacks_bb]
+[table.stacks]
 BTN = 5.0
 BB = 5.0
 

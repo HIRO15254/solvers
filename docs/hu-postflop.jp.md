@@ -16,7 +16,7 @@ OOPは残る2人の固定Postflop行動順が先の席、IPは後の席である
 payoffには実際の残stack、Preflopからの各席の拠出、foldした席の最終stackを使う。
 `a`は木のeffective stackまでのall-inであり、`%stack`と`%effective`は同じである。
 最小betは1 BBである。内部の木の額は整数chipであり、1 BBあたりのchip数は`table.bb_chips`で決まる。
-size literalは`table.chip_rounding`で整数chipへ丸める（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
+BBで指定した額とsize literalは`table.chip_rounding`で整数chipへ丸め、`Nc`は正確に扱う。丸めで変わった指定値と既定SBはvalidationで警告し、合法性は丸め後にも検査する（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 P1 lowerは開始pot＋2 × effective stackがu32の内部単位を超える場合を`NLH003`で拒否する。
 scriptによる最終空menuも`NLH003`である。
 攻撃回数の構造上限は無く、capはscriptの最後の`flop, turn, river when aggressions >= 3 { remove raise }`などで書く。
@@ -25,8 +25,8 @@ cap ruleが無ければraise chainはeffective stackとNLHの合法性だけで�
 到達額がMの85%以上のものだけをall-inへ置き換える。MはactorのW＋残stackで、P1ではeffective-stackの木の到達額である。
 閾値は最小raiseへ引き上げずMでcapしない。`jam`は候補を追加しないのでsizeを足すruleの後へ置く
 （[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。低SPRの切替は`turn, river when spr <= 1.5 { replace raise [a] }`でも書ける。
-近いsizeは`flop { merge bet within 10 }`のように、大きい候補から順に直前に残した候補とのpot 10%以内の差を削除してまとめる。
-幅は`0.5bb`や`5%stack`でも書け、all-inに近い候補はall-inへまとまる（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
+近いsizeは`flop { merge bet within 10% }`のように、大きい候補から順に直前に残した候補とのpot 10%以内の差を削除してまとめる。
+幅は`0.5`や`0.5bb`（BB）、`5c`（chip）、`5%stack`でも書け、all-inに近い候補はall-inへまとまる（[共通Input第9節](nlh-input-v1.jp.md#effectと合法性)）。
 削除済みの`tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は未知keyの`NLH002`となり、
 これらを埋込みconfigに含む`.sol`・checkpointも読み込めない。
 正規化・実効configにも出力しない。旧Preflop設定の移行は[共通Input第9節](nlh-input-v1.jp.md#9-tree)を参照する。
@@ -278,7 +278,7 @@ node履歴はspotのlineとは別の文法である。actor positionとstreet区
 | `[dealN]` | 実cardを記録しないall-in runoutのchance branch。Nは0始まりの子位置であり、同じ親のbranchを一意に指す |
 
 例は`xr5c[Th]xx`である。出力する額は卓のchip尺度に従い、`bb_chips`の素因数が2と5だけなら最短のBB 10進数、それ以外なら整数chip数に`c`を付けた`Nc`を使う。例えばTurnで2 BBをbet・callした後のRiverで2 BBをbetすると、10進の卓では`r2c[Th]r2`、Riverのlabelは`bet 2`である。`bb_chips = 3`なら同じ額は6 chipsなので履歴は`r6cc[Th]r6c`、Riverのlabelは`bet 6c`である（最初の`c`はchip単位、次の`c`はcall）。
-history selectorには整数chipに一致するBB 10進数と`Nc`の両形式を使え、同額なら同じnodeに一致する。例えば`bb_chips = 3`では`r2c[Th]r2`も`r6cc[Th]r6c`と同じnodeを指す。
+history selectorとaction labelには表示表記のほか、接尾辞なしまたは`bb`付きのBBと正確な整数chipの`Nc`を使え、BB額を卓の方式で丸めた結果が同額なら同じnode・actionに一致する。例えば`bb_chips = 3`では`r2c[Th]r2`も`r6cc[Th]r6c`と同じnodeを指す。
 node selectorとaction labelによる指定はCLI referenceに従う。
 
 ## 6. run directoryと`run.json`
@@ -287,7 +287,7 @@ chip額面の変更より前のP1 checkpointは互換性hashが異なるため�
 
 | file | 内容・書込み |
 |---|---|
-| `run.toml` | 正規化した実効config。開始時に保存 |
+| `run.toml` | 正規化した実効config。額のkeyとlineの額は`Nc`、script本文はそのまま保持。開始時に保存 |
 | `manifest.json` | identityとstate。状態遷移時にatomic置換 |
 | `run.lock` | file更新前に取得しprocess終了まで保持する排他OS lock。artifactではない |
 | `progress.jsonl` | iteration、累積elapsed_secs、expl_p0、expl_p1、nash_convを評価境界で追記 |
@@ -497,7 +497,7 @@ JSONは上記`tree`行から`stored`だけを除いた8 fieldを持つ。木の�
 `--rest-of-street`は各選択nodeの後に、同じstreetの後続action nodeを先行順で続ける（chance・terminalで止まる）。
 configの不正と未知selectorは入力error（exit 2）であり、P2 configは`NLH005`で拒否する。
 
-pot・stack・action額はBB、EVとexplはutility単位である。
+数値fieldのpot・stack・action額はBB、EVとexplはutility単位である。historyとaction labelの額は第5節の表示表記を使う。
 nodeのweightは到達weightであり、root rangeのweightと区別する。frequencyは同じweightで加重する。
 CSVの配列列は`|`で結合する。`tree`の列順は`history,kind,street,actor,pot,stored,actions,children,child_kinds`で、`null`のセルは空文字となる。公開combo表記はglobalの実card表記を維持する。
 開始rangeのweight 0のhandはstrategy/EV/rangeに出力しない。

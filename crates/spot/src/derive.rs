@@ -77,10 +77,6 @@ pub fn assemble(
             ));
         }
         crate::parse::shape(&base, "", "document")?;
-        let lexical: toml_edit::DocumentMut = raw.parse().map_err(|e: toml_edit::TomlError| {
-            SpotError::new(Code::NLH002, "derive.base", e.to_string())
-        })?;
-        crate::parse::validate_bb_literals(lexical.as_item(), "")?;
         for key in ["table", "economics"] {
             if let Some(section) = base.get(key) {
                 let mut probe = value(source)?;
@@ -157,7 +153,7 @@ pub fn assemble(
 #[cfg(test)]
 mod tests {
     use super::*;
-    const SOURCE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 10\n[tree]\nscript = 'flop, turn, river { checkdown }'\n";
+    const SOURCE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 10\n[tree]\nscript = 'flop, turn, river { checkdown }'\n";
     fn ranges() -> BTreeMap<String, String> {
         BTreeMap::from([("BTN".into(), "AA".into()), ("BB".into(), "KK".into())])
     }
@@ -169,7 +165,7 @@ mod tests {
             "flop when unopened { force bet [a] }",
         )
         .unwrap();
-        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\n[table.stacks_bb]\nBTN = 10.0\nSB = 10\nBB = 10\n[economics]\nkind = 'cash'\n[tree]\nsource = 'small.tree'\n[meta]\nname = 'kept'\n[run]\nthreads = 2\n";
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\n[table.stacks]\nBTN = 10.0\nSB = 10\nBB = 10\n[economics]\nkind = 'cash'\n[tree]\nsource = 'small.tree'\n[meta]\nname = 'kept'\n[run]\nthreads = 2\n";
         let (doc, warnings) = assemble(
             SOURCE,
             Some((raw, &dir.path().join("base.toml"))),
@@ -189,7 +185,7 @@ mod tests {
         for raw in [
             "[solver]\nseed = 1",
             "schema = 'solvers.nlh/v1'\nunknown = 1",
-            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 10.0000000000000001",
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 'bad'",
         ] {
             assert!(
                 assemble(

@@ -109,13 +109,13 @@ fn p2_validation_effective_resources_types_and_preflight_before_directory() {
         } else {
             (extra, "")
         };
-        std::fs::write(&input, format!("schema = 'solvers.nlh/v1'\n{root_keys}\n[table]\nplayers = 3\nstack_bb = 2\n{sections}\n")).unwrap();
+        std::fs::write(&input, format!("schema = 'solvers.nlh/v1'\n{root_keys}\n[table]\nplayers = 3\nstack = 2\n{sections}\n")).unwrap();
         let error = cli(&["validate", text(&input)]);
         let stderr = String::from_utf8_lossy(&error.stderr);
         assert!(!error.status.success());
         assert!(stderr.contains(code) && stderr.contains(key), "{stderr}");
     }
-    std::fs::write(&input, "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = 'preflop when players == 9 { add raise [a] }'\n").unwrap();
+    std::fs::write(&input, "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2\n[tree]\nscript = 'preflop when players == 9 { add raise [a] }'\n").unwrap();
     let plain = json(&["validate", text(&input), "--format", "json"]);
     assert_eq!(plain["ruleHitStatus"], "not-checked");
     assert_eq!(
@@ -147,6 +147,73 @@ fn p2_validation_effective_resources_types_and_preflight_before_directory() {
     eprintln!(
         "M6 validate wall time: {:.3}s",
         started.elapsed().as_secs_f64()
+    );
+}
+
+#[test]
+fn p2_rounding_warning_reaches_both_validation_formats_once() {
+    let dir = tempfile::tempdir().unwrap();
+    let input = dir.path().join("input.toml");
+    let effective = dir.path().join("effective.toml");
+    std::fs::write(&input, "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2.0004\n[tree]\nscript = 'preflop when players == 9 { add raise [a] }'\n").unwrap();
+    for resources in [false, true] {
+        let mut args = vec![
+            "validate",
+            text(&input),
+            "--format",
+            "json",
+            "--write-effective",
+            text(&effective),
+        ];
+        if resources {
+            args.push("--resources");
+        }
+        let value = json(&args);
+        let warnings = value["warnings"].as_array().unwrap();
+        let rounded: Vec<_> = warnings
+            .iter()
+            .filter_map(|w| w.as_str())
+            .filter(|w| w.contains("table.stack"))
+            .collect();
+        assert_eq!(rounded.len(), 1, "{warnings:?}");
+        assert!(rounded[0].contains("2.0004"), "{}", rounded[0]);
+        assert!(
+            rounded[0].contains("2000") && rounded[0].contains("nearest"),
+            "{}",
+            rounded[0]
+        );
+        let expected = if resources {
+            "unmatched Preflop tree rule 1"
+        } else {
+            "unused tree rules not checked"
+        };
+        assert!(
+            warnings
+                .iter()
+                .any(|w| w.as_str().unwrap().contains(expected))
+        );
+        let mut human_args = vec!["validate", text(&input)];
+        if resources {
+            human_args.push("--resources");
+        }
+        let human = ok(&human_args);
+        let human = String::from_utf8_lossy(&human.stdout);
+        assert_eq!(
+            human.matches(&format!("warning: {}", rounded[0])).count(),
+            1
+        );
+    }
+    let effective_value: toml::Value =
+        toml::from_str(&std::fs::read_to_string(&effective).unwrap()).unwrap();
+    assert_eq!(effective_value["table"]["stack"].as_str(), Some("2000c"));
+    assert_eq!(effective_value["table"]["sb"].as_str(), Some("500c"));
+    let normalized = json(&["validate", text(&effective), "--format", "json"]);
+    assert!(
+        !normalized["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|w| w.as_str().unwrap().contains("table.stack"))
     );
 }
 

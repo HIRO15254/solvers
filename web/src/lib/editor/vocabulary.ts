@@ -86,7 +86,7 @@ export function textValues(name: string): readonly string[] {
 }
 
 export const KEYWORD_DOCS: Readonly<Record<string, string>> = {
-  param: "param NAME = VALUE: a one-token value the GUI can override in [tree.params]. Comment lines directly above it become its description.",
+  param: "param NAME = VALUE: a one-token value the GUI can override in [tree.params]. Numeric sizes are BB; use 33% for a pot percentage or 300c for chips. Comment lines directly above it become its description.",
   define: "define NAME = CONDITION: a named condition, usable after its declaration.",
   when: "when CONDITION { ... }: the body applies only where the condition holds; nested conditions AND together.",
   if: "if A { ... } else if B { ... } else { ... }: exclusive branches.",
@@ -123,30 +123,31 @@ export interface SizeExample {
 
 /** Common size literals, offered in size lists and jam thresholds. */
 export const SIZE_EXAMPLES: readonly SizeExample[] = [
-  { label: "33", doc: "33% of the pot after calling." },
-  { label: "50", doc: "Half the pot after calling." },
-  { label: "75", doc: "75% of the pot after calling." },
-  { label: "100", doc: "The pot after calling." },
-  { label: "150", doc: "150% of the pot after calling." },
+  { label: "33%", doc: "33% of the pot after calling." },
+  { label: "50%", doc: "Half the pot after calling." },
+  { label: "75%", doc: "75% of the pot after calling." },
+  { label: "100%", doc: "The pot after calling." },
+  { label: "150%", doc: "150% of the pot after calling." },
   { label: "a", doc: "All-in." },
   { label: "e", doc: "Geometric to all-in over the streets left." },
   { label: "2e", doc: "Geometric to all-in over two streets." },
   { label: "min", doc: "The minimum full bet or raise." },
   { label: "3x", doc: "Three times the street's largest wager." },
   { label: "2.5bb", doc: "A street target of 2.5 BB." },
+  { label: "300c", doc: "A street target of 300 chips." },
   { label: "85%stack", doc: "85% of the actor's maximum reachable amount M." },
   { label: "80%effective", doc: "80% of the effective stack against unfolded opponents." },
 ];
 
 /** Common merge widths: amounts, not targets. */
 export const WIDTH_EXAMPLES: readonly SizeExample[] = [
-  { label: "10", doc: "10% of the pot after calling." },
+  { label: "10%", doc: "10% of the pot after calling." },
   { label: "0.5bb", doc: "Half a big blind." },
   { label: "5%stack", doc: "5% of the actor's maximum reachable amount M." },
   { label: "5%effective", doc: "5% of the effective stack." },
 ];
 
-const SIZE_LITERAL = /^(?:\d+(?:\.\d+)?(?:x|e|bb|%stack|%effective)?|a|e|min)$/;
+const SIZE_LITERAL = /^(?:\d+(?:\.\d+)?(?:x|e|bb|c|%|%stack|%effective)?|a|e|min)$/;
 
 /** Whether a bare token reads as a size literal. */
 export function isSizeLiteral(word: string): boolean {
@@ -157,7 +158,7 @@ export function isSizeLiteral(word: string): boolean {
 export function describeSize(word: string): string | null {
   if (!isSizeLiteral(word)) return null;
   if (word in KEYWORD_DOCS) return KEYWORD_DOCS[word] ?? null;
-  const match = /^(\d+(?:\.\d+)?)(x|e|bb|%stack|%effective)?$/.exec(word);
+  const match = /^(\d+(?:\.\d+)?)(x|e|bb|c|%|%stack|%effective)?$/.exec(word);
   if (!match) return null;
   const [, number, suffix] = match;
   switch (suffix) {
@@ -167,11 +168,15 @@ export function describeSize(word: string): string | null {
       return `Geometric to all-in over ${number} streets.`;
     case "bb":
       return `A street target of ${number} BB (as a merge width: ${number} BB).`;
+    case "c":
+      return `A street target of ${number} chips (as a merge width: ${number} chips).`;
+    case "%":
+      return `${number}% of the pot after calling (as a merge width: that share of the pot).`;
     case "%stack":
       return `${number}% of the actor's maximum reachable amount M.`;
     case "%effective":
       return `${number}% of the effective stack against unfolded opponents.`;
     default:
-      return `${number}% of the pot after calling (as a merge width: that share of the pot).`;
+      return `A street target of ${number} BB (as a merge width: ${number} BB).`;
   }
 }

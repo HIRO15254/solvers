@@ -244,7 +244,7 @@ mod tests {
     }
     #[test]
     fn forced_checkdown_turns_need_no_decision_node() {
-        let last = "river when !unopened { replace raise [75, a] }";
+        let last = "river when !unopened { replace raise [75%, a] }";
         let raw = crate::views::tests::SMOKE.replace(
             last,
             &format!("{last}\npreflop when position == SB {{ checkdown }}"),

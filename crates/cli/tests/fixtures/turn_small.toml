@@ -2,8 +2,8 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 90
-ante_bb = 9
+stack = 90
+ante = 9
 
 [economics]
 kind = "cash"
@@ -17,7 +17,7 @@ BB = "AA,QQ,JJ,AKs"
 BTN = "KK,TT,AQs,KQs"
 
 [tree]
-script = '''turn, river { replace bet [100] }
+script = '''turn, river { replace bet [100%] }
 '''
 
 [solver.algorithm]

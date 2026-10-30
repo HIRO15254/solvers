@@ -65,45 +65,87 @@ impl ChipScale {
     }
 
     /// Exact chips of `mantissa × 10^exponent` BB; fails unless whole.
-    pub fn from_decimal(
-        self,
-        mut mantissa: u128,
-        mut exponent: i32,
-    ) -> Result<MwChips, ChipAmountError> {
-        if mantissa == 0 {
-            return Ok(MwChips::ZERO);
+    pub fn from_decimal(self, mantissa: u128, exponent: i32) -> Result<MwChips, ChipAmountError> {
+        let (chips, changed) =
+            self.from_decimal_rounded(mantissa, exponent, crate::Rounding::Down)?;
+        if changed {
+            Err(ChipAmountError::Fractional)
+        } else {
+            Ok(chips)
         }
-        while mantissa.is_multiple_of(10) {
-            mantissa /= 10;
-            exponent += 1;
+    }
+
+    /// Round an exact decimal BB value to chips. The flag reports a fractional
+    /// chip in the input, even when rounding down produces zero.
+    pub fn from_decimal_rounded(
+        self,
+        mantissa: u128,
+        exponent: i32,
+        rounding: crate::Rounding,
+    ) -> Result<(MwChips, bool), ChipAmountError> {
+        if mantissa == 0 {
+            return Ok((MwChips::ZERO, false));
+        }
+        if exponent < 0 {
+            let digits = mantissa.to_string();
+            let places = exponent.unsigned_abs() as usize;
+            if places > digits.len() + 7 {
+                return Ok((MwChips(u64::from(rounding == crate::Rounding::Up)), true));
+            }
+            let text = if places >= digits.len() {
+                format!("0.{}{digits}", "0".repeat(places - digits.len()))
+            } else {
+                let split = digits.len() - places;
+                format!("{}.{}", &digits[..split], &digits[split..])
+            };
+            return self.parse_bb_rounded(&text, rounding);
         }
         let scaled = mantissa
             .checked_mul(u128::from(self.0))
             .ok_or(ChipAmountError::Overflow)?;
-        let chips = if exponent >= 0 {
-            u32::try_from(exponent)
+        let (whole, remainder, divisor) = if exponent >= 0 {
+            let power = u32::try_from(exponent)
                 .ok()
                 .and_then(|e| 10u128.checked_pow(e))
-                .and_then(|p| scaled.checked_mul(p))
-                .ok_or(ChipAmountError::Overflow)?
+                .ok_or(ChipAmountError::Overflow)?;
+            (
+                scaled.checked_mul(power).ok_or(ChipAmountError::Overflow)?,
+                0,
+                1,
+            )
+        } else if let Some(divisor) = exponent
+            .checked_neg()
+            .and_then(|e| u32::try_from(e).ok())
+            .and_then(|e| 10u128.checked_pow(e))
+        {
+            (scaled / divisor, scaled % divisor, divisor)
         } else {
-            // 10^39 exceeds u128; no scale can cancel that many tens.
-            let divisor = u32::try_from(-exponent)
-                .ok()
-                .and_then(|e| 10u128.checked_pow(e))
-                .ok_or(ChipAmountError::Fractional)?;
-            if scaled % divisor != 0 {
-                return Err(ChipAmountError::Fractional);
-            }
-            scaled / divisor
+            // The divisor exceeds u128, so the scaled value is less than one
+            // tenth of a chip and cannot reach the nearest-mode half.
+            (0, scaled, 0)
         };
-        u64::try_from(chips)
-            .map(MwChips)
-            .map_err(|_| ChipAmountError::Overflow)
+        let changed = remainder != 0;
+        let increment = changed
+            && match rounding {
+                crate::Rounding::Down => false,
+                crate::Rounding::Up => true,
+                crate::Rounding::Nearest => divisor != 0 && remainder >= divisor - remainder,
+            };
+        let chips = whole
+            .checked_add(u128::from(increment))
+            .ok_or(ChipAmountError::Overflow)?;
+        Ok((
+            MwChips(u64::try_from(chips).map_err(|_| ChipAmountError::Overflow)?),
+            changed,
+        ))
     }
 
-    /// Exact chips of a plain unsigned decimal BB spelling (`12`, `2.25`).
-    pub fn parse_bb(self, text: &str) -> Result<MwChips, ChipAmountError> {
+    /// Parse and round a plain unsigned decimal BB spelling.
+    pub fn parse_bb_rounded(
+        self,
+        text: &str,
+        rounding: crate::Rounding,
+    ) -> Result<(MwChips, bool), ChipAmountError> {
         let (whole, fraction) = text.split_once('.').unwrap_or((text, ""));
         if whole.is_empty()
             || (text.contains('.') && fraction.is_empty())
@@ -114,18 +156,43 @@ impl ChipScale {
         {
             return Err(ChipAmountError::Syntax);
         }
-        let fraction = fraction.trim_end_matches('0');
-        let whole = whole.trim_start_matches('0');
-        let digits = format!("{whole}{fraction}");
-        let mantissa = if digits.is_empty() {
-            0
+        let whole = whole.bytes().try_fold(0u64, |n, digit| {
+            n.checked_mul(10)
+                .and_then(|n| n.checked_add(u64::from(digit - b'0')))
+                .ok_or(ChipAmountError::Overflow)
+        })?;
+        let mut carry = 0u64;
+        let mut fractional_nonzero = false;
+        let mut first_digit = 0;
+        for digit in fraction.bytes().rev() {
+            let product = u64::from(digit - b'0') * self.0 + carry;
+            first_digit = product % 10;
+            fractional_nonzero |= first_digit != 0;
+            carry = product / 10;
+        }
+        let changed = fractional_nonzero;
+        let increment = changed
+            && match rounding {
+                crate::Rounding::Down => false,
+                crate::Rounding::Nearest => first_digit >= 5,
+                crate::Rounding::Up => true,
+            };
+        let chips = whole
+            .checked_mul(self.0)
+            .and_then(|n| n.checked_add(carry))
+            .and_then(|n| n.checked_add(u64::from(increment)))
+            .ok_or(ChipAmountError::Overflow)?;
+        Ok((MwChips(chips), changed))
+    }
+
+    /// Exact chips of a plain unsigned decimal BB spelling (`12`, `2.25`).
+    pub fn parse_bb(self, text: &str) -> Result<MwChips, ChipAmountError> {
+        let (chips, changed) = self.parse_bb_rounded(text, crate::Rounding::Down)?;
+        if changed {
+            Err(ChipAmountError::Fractional)
         } else {
-            digits
-                .parse::<u128>()
-                .map_err(|_| ChipAmountError::Overflow)?
-        };
-        let exponent = -i32::try_from(fraction.len()).map_err(|_| ChipAmountError::Fractional)?;
-        self.from_decimal(mantissa, exponent)
+            Ok(chips)
+        }
     }
 
     /// Whether every chip amount has a terminating BB decimal.
@@ -216,6 +283,58 @@ mod tests {
             Err(ChipAmountError::Overflow)
         );
         assert_eq!(scale(3).from_bb(1.0 / 3.0), Ok(MwChips(1)));
+    }
+
+    #[test]
+    fn exact_decimal_rounding_obeys_modes_and_reports_changes() {
+        for (mode, expected) in [
+            (crate::Rounding::Down, [1, 1, 1]),
+            (crate::Rounding::Nearest, [1, 2, 2]),
+            (crate::Rounding::Up, [2, 2, 2]),
+        ] {
+            for (text, chips) in ["0.49", "0.5", "0.51"].into_iter().zip(expected) {
+                assert_eq!(
+                    scale(3).parse_bb_rounded(text, mode),
+                    Ok((MwChips(chips), true))
+                );
+            }
+            assert_eq!(
+                scale(3).parse_bb_rounded("2", mode),
+                Ok((MwChips(6), false))
+            );
+        }
+        assert_eq!(
+            scale(3).from_decimal_rounded(1, -60, crate::Rounding::Up),
+            Ok((MwChips(1), true))
+        );
+        assert_eq!(
+            scale(3).parse_bb_rounded("1e2", crate::Rounding::Nearest),
+            Err(ChipAmountError::Syntax)
+        );
+    }
+
+    #[test]
+    fn long_decimals_round_without_mantissa_overflow() {
+        let s = scale(3);
+        let below = "0.16666666666666666666666666666666666666666666666666";
+        let above = "0.16666666666666666666666666666666666666666666666667";
+        assert_eq!(
+            s.parse_bb_rounded(below, crate::Rounding::Nearest),
+            Ok((MwChips(0), true))
+        );
+        assert_eq!(
+            s.parse_bb_rounded(above, crate::Rounding::Nearest),
+            Ok((MwChips(1), true))
+        );
+        assert_eq!(
+            s.parse_bb_rounded(below, crate::Rounding::Up),
+            Ok((MwChips(1), true))
+        );
+        assert_eq!(
+            s.parse_bb("1.00000000000000000000000000000000000000000000000000"),
+            Ok(MwChips(3))
+        );
+        assert_eq!(s.parse_bb(below), Err(ChipAmountError::Fractional));
     }
 
     #[test]

@@ -1137,7 +1137,7 @@ mod tests {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 4s"
@@ -1145,7 +1145,7 @@ board = "2s 7s Ks 4s"
 BB = "AcKd,AhAd"
 BTN = "QhQd,JhJd,ThTd"
 [tree]
-script = "turn { checkdown } river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "turn { checkdown } river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [solver]
 storage = "f32"
 iso_merging = true
@@ -1352,7 +1352,7 @@ target = 1.0
         let raw = r#"schema='solvers.nlh/v1'
 [table]
 players=2
-stack_bb=21
+stack=21
 [spot]
 line='BTN c, BB x / BB x, BTN x'
 board='2s 7s Ks 2h'
@@ -1360,7 +1360,7 @@ board='2s 7s Ks 2h'
 BB='44,55'
 BTN='33,66'
 [tree]
-script='turn { replace bet [75] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }'
+script='turn { replace bet [75%] } river { replace bet [100%] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }'
 [solver]
 storage='i16'
 iso_merging=false
@@ -1503,7 +1503,7 @@ memory='1GiB'
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
 board = "2s 7s Ks 2h"
@@ -1511,7 +1511,7 @@ board = "2s 7s Ks 2h"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "turn { replace bet [2bb] } river { replace bet [100] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
+script = "turn { replace bet [2bb] } river { replace bet [100%] } turn when aggressions >= 1 { remove raise } river when aggressions >= 1 { remove raise }"
 [solver.stop]
 max_iterations = 32
 check_every = 32
@@ -1524,7 +1524,7 @@ memory = "1GiB"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2s 7s Ks 2h 9d"
@@ -1532,7 +1532,7 @@ board = "2s 7s Ks 2h 9d"
 BB = "44,55"
 BTN = "33,66"
 [tree]
-script = "river { replace bet [100] } river when aggressions >= 1 { remove raise }"
+script = "river { replace bet [100%] } river when aggressions >= 1 { remove raise }"
 [solver.stop]
 max_iterations = 16
 check_every = 16
@@ -1567,6 +1567,7 @@ memory = "1GiB"
             &pf_game.node_info,
             start_street,
             p.config.scale,
+            p.config.chip_rounding,
         );
         let mut solver = Solver::<_, S>::new(
             pf_game.game,

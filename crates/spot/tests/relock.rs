@@ -1,7 +1,7 @@
 use spot::{Document, RelockEdits, relock_config};
 use std::path::Path;
 
-const BASE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n";
+const BASE: &str = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n";
 const ORIGINAL: &str = "[[profile.lock]]\nnode = 'x'\nhands = 'AA'\nstrategy = { check = 1 }\n[[profile.lock]]\nnode = 'y'\nstrategy = { check = 1 }\n[[profile.incentive]]\nnode = 'x'\naction = 'check'\nbb = 1\n[[profile.frequency]]\nnode = 'x'\naction = 'check'\ntarget = 0.5\n";
 const ADD: &str = "[[profile.lock]]\nnode = 'x'\nhands = 'KK'\nstrategy = { check = 1 }\n[[profile.incentive]]\nnode = 'x'\naction = 'check'\nbb = 2\n[[profile.frequency]]\nnode = 'x'\naction = 'check'\ntarget = 0.7\n";
 
@@ -116,7 +116,7 @@ fn freeze_is_parsed_and_hashed() {
 
 #[test]
 fn rejects_p2_and_invalid_fragments() {
-    let p2 = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack_bb = 100\n";
+    let p2 = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack = 100\n";
     assert!(relock_config(p2, &RelockEdits::default()).is_err());
     for fragment in [
         "[solver]\nx = 1",

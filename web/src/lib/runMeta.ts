@@ -6,7 +6,7 @@ import { api } from "../api/client";
 import type { HuResources, RunSummary, StartState } from "../api/types";
 import { getAt, readDoc, setAt, writeDoc } from "./config";
 import { parseBoard } from "./cards";
-import { bb, significant } from "./format";
+import { amountDisplay, bb, chipDisplay, significant } from "./format";
 import { freezeBaseRun } from "./setupFreeze";
 
 export interface RunMeta {
@@ -55,11 +55,17 @@ async function load(run: RunSummary): Promise<RunMeta> {
   const payouts = getAt(doc, ["economics", "payouts"]);
   const kind = String(getAt(doc, ["economics", "kind"]) ?? "cash");
   const rate = getAt(doc, ["economics", "rake", "rate"]);
-  const stack = getAt(doc, ["table", "stack_bb"]);
-  const stackChips = getAt(doc, ["table", "stack_chips"]);
+  const stack = getAt(doc, ["table", "stack"]);
+  const bbChips = Number(getAt(doc, ["table", "bb_chips"]) ?? 1000);
+  // Effective run configs store line wagers as chips; render them in the
+  // same display form as solver action labels, not their persisted spelling.
+  const line = String(getAt(doc, ["spot", "line"]) ?? "").replace(
+    /\b([br])(\d+)c\b/g,
+    (_match, action: string, chips: string) => `${action}${chipDisplay(BigInt(chips), bbChips)}`,
+  );
   return {
     name: (getAt(doc, ["meta", "name"]) as string | undefined) ?? null,
-    line: String(getAt(doc, ["spot", "line"]) ?? ""),
+    line,
     board: parseBoard(String(getAt(doc, ["spot", "board"]) ?? "")) ?? [],
     start: validated?.summary.start ?? null,
     utilityUnit: validated?.summary.utilityUnit ?? (kind === "tournament" ? "prizes" : "BB"),
@@ -72,7 +78,7 @@ async function load(run: RunSummary): Promise<RunMeta> {
       return Array.isArray(entries) && entries.length > 0;
     }),
     economics: [
-      stack !== undefined ? `${stack}bb` : stackChips !== undefined ? `${stackChips}c` : null,
+      stack !== undefined ? (() => { const text = amountDisplay(stack, bbChips); return text.endsWith("c") ? text : `${text}bb`; })() : null,
       kind === "tournament" ? "ICM" : rate !== undefined ? `rake ${bb(Number(rate) * 100)}%` : "No rake",
     ]
       .filter(Boolean)

@@ -128,6 +128,7 @@ pid/nonce を含む一時ファイルを書いて rename する。同じ内容�
 受信 host の filesystem で `tree.source` を解決すると、同じ config が別ゲームを指し得る。
 local `validate --write-effective` は config file の directory を基準に script を解決し、
 本文を inline にして `params` を保持する。run の `run.toml` もこの effective config を使う。
+実効configは額のkeyとlineの額を全卓で`Nc`に正規化し、script本文をそのまま保持する。再正規化は同じbytesとなり、額の丸めwarningは生じない。入力のBB額は`table.chip_rounding`で整数chipへ丸め、変化した指定を警告する。人向けhistory・action labelは卓の尺度に応じた表示表記を使う（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 
 daemon は config text を受け取り、path を含む入力を解決せず拒否する。
 client は source を解決した effective config を送る。`POST /v1/validate` は受信 host の

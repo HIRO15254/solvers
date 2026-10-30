@@ -4,7 +4,7 @@ import type { LineCursor, LineOption, LineStep } from "../api/types";
 import { Button, Card, Input, Popover, PopoverContent, PopoverTrigger } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { fieldText, getAt } from "../lib/config";
-import { bb, lineAmount, lineToken } from "../lib/format";
+import { bb, lineToken, normalizedWager, writtenLine } from "../lib/format";
 import { Board } from "./common";
 import { DocText, useDoc } from "./DocFields";
 import { LinePresets } from "./LinePresets";
@@ -85,12 +85,11 @@ function TurnPicker({
   const sized = () => {
     const value = Number(amount);
     if (!sizing) return;
-    const chips = Math.round(value * turn.cursor.bbChips);
-    if (!amount.trim() || !Number.isFinite(value) || chips < Math.round(sizing.min * turn.cursor.bbChips) || chips > Math.round(sizing.max * turn.cursor.bbChips)) {
+    if (!amount.trim() || !Number.isFinite(value)) {
       setError(`Write the street total, ${bb(sizing.min)} to ${bb(sizing.max)} BB`);
       return;
     }
-    onPick([...moves, `${sizing.token}${lineAmount(value, turn.cursor.bbChips)}`]);
+    onPick([...moves, `${sizing.token}${normalizedWager(amount)}`]);
   };
   return (
     <Popover
@@ -154,9 +153,7 @@ function TurnPicker({
               aria-label={`${OPTION_LABEL[sizing.kind]} amount (BB, street total)`}
               placeholder={`${bb(sizing.min)}–${bb(sizing.max)}`}
               type="number"
-              min={sizing.min}
-              max={sizing.max}
-              step={1 / turn.cursor.bbChips}
+              step="any"
               inputMode="decimal"
               value={amount}
               spellCheck={false}
@@ -240,7 +237,9 @@ export function SetupStart({
   const build = async (moves: string[]) => {
     setBusy(true);
     try {
-      onBuilt(await api.line(toml, moves));
+      const result = await api.line(toml, moves);
+      // Keep the written BB amount so validation can report rounding.
+      onBuilt({ ...result, line: writtenLine(result.line, cursor?.line === line ? cursor.line : "", moves, result.moves) });
       setBuildError(null);
     } catch (error) {
       setBuildError((error as Error).message);

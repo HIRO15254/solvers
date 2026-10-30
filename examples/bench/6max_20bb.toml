@@ -5,7 +5,7 @@ schema = "solvers.nlh/v1"
 [table]
 players = 6
 
-[table.stacks_bb]
+[table.stacks]
 BTN = 20.0
 SB = 20.0
 BB = 20.0
@@ -32,12 +32,12 @@ preflop, flop, turn, river {
 }
 preflop when unopened { replace raise [2.5x, a] }
 preflop when !unopened { replace raise [3x, a] }
-flop when unopened { replace bet [50, a] }
-flop when !unopened { replace raise [75, a] }
-turn when unopened { replace bet [50, a] }
-turn when !unopened { replace raise [75, a] }
-river when unopened { replace bet [50, a] }
-river when !unopened { replace raise [75, a] }
+flop when unopened { replace bet [50%, a] }
+flop when !unopened { replace raise [75%, a] }
+turn when unopened { replace bet [50%, a] }
+turn when !unopened { replace raise [75%, a] }
+river when unopened { replace bet [50%, a] }
+river when !unopened { replace raise [75%, a] }
 preflop when unopened { remove call }
 preflop when unopened { replace raise [2.5x, a] }
 preflop when aggressions >= 1 { replace raise [3x, a] }

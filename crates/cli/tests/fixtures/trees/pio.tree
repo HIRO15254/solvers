@@ -11,9 +11,9 @@
 # flop texture branching earns its place.
 
 # c-bet size (pot %)
-param cb = 33
+param cb = 33%
 # barrel size on the turn (pot %)
-param barrel = 66
+param barrel = 66%
 
 define wet = flush_possible || straight_possible
 
@@ -42,9 +42,9 @@ turn {
     if donk {
       remove bet
     } else if paired {
-      replace bet [33]
+      replace bet [33%]
     } else if wet {
-      replace bet [100]
+      replace bet [100%]
     } else {
       replace bet [barrel]
     }
@@ -58,7 +58,7 @@ turn {
 }
 
 river when unopened {
-  replace bet [75, a]
+  replace bet [75%, a]
 }
 
 flop when aggressions >= 3 { remove raise }

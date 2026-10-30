@@ -2557,11 +2557,18 @@ fn selector_walk(
                                 &crate::queries::history_token(label),
                                 step,
                                 config.scale,
+                                config.chip_rounding,
                             )
                         })
                     } else {
                         let refs: Vec<&str> = labels.iter().map(String::as_str).collect();
-                        crate::queries::resolve_action(&refs, step).ok()
+                        crate::queries::resolve_scaled_action(
+                            &refs,
+                            step,
+                            config.scale,
+                            config.chip_rounding,
+                        )
+                        .ok()
                     };
                     if let Some(pos) = selected {
                         let node = match child_step(&state, actions[pos]) {
@@ -3154,7 +3161,13 @@ mod tests {
                 utility: &ChipEv,
             },
         );
-        let index = GameIndex::from_game(&game.game, &game.node_info, Street::Turn, config.scale);
+        let index = GameIndex::from_game(
+            &game.game,
+            &game.node_info,
+            Street::Turn,
+            config.scale,
+            config.chip_rounding,
+        );
         let tree = &game.game.tree;
         let view = TreeView {
             tree,
@@ -3192,7 +3205,7 @@ mod tests {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 bb_chips = 6
 [spot]
 line = "BTN c, BB x / BB x, BTN x"
@@ -3262,8 +3275,13 @@ memory = "1GiB"
                     utility: &ChipEv,
                 },
             );
-            let index =
-                GameIndex::from_game(&game.game, &game.node_info, Street::Flop, config.scale);
+            let index = GameIndex::from_game(
+                &game.game,
+                &game.node_info,
+                Street::Flop,
+                config.scale,
+                config.chip_rounding,
+            );
             let tree = &game.game.tree;
             let view = TreeView {
                 tree,

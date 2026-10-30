@@ -10,7 +10,7 @@ const RIVER: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2s 7s Ks 4h 3d"
@@ -18,7 +18,7 @@ board = "2s 7s Ks 4h 3d"
 BB = "AK,KQ,AA"
 BTN = "QQ,JJ"
 [tree]
-script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [solver]
 storage = "f32"
 [solver.stop]
@@ -448,8 +448,8 @@ fn missing_outside_base_strategy_falls_back_to_whole_tree() {
         )
         .replace("2s 7s Ks 4h 3d", "2s 7s Ks 4h")
         .replace(
-            "river { replace bet [50] }",
-            "turn { replace bet [50] } river { replace bet [50] }",
+            "river { replace bet [50%] }",
+            "turn { replace bet [50%] } river { replace bet [50%] }",
         )
         .replace("max_iterations = 50", "max_iterations = 2");
     let base_path = dir.path().join("base.sol");

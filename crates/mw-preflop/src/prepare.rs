@@ -271,7 +271,7 @@ mod tests {
 
     #[test]
     fn hits_count_conditions_even_without_menu_changes_and_at_forced_turns() {
-        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = '''\npreflop when players == 3 { remove bet }\npreflop when players == 9 { add raise [a] }\nflop, turn, river { checkdown }\n'''\n";
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2\n[tree]\nscript = '''\npreflop when players == 3 { remove bet }\npreflop when players == 9 { add raise [a] }\nflop, turn, river { checkdown }\n'''\n";
         assert_eq!(
             compare_hits(raw, Path::new("checkdown.toml")),
             // The three postflop rules match at elided checks. Conditions,
@@ -279,14 +279,14 @@ mod tests {
             [true, false, true, true, true]
         );
         compare_hits(
-            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 2\n",
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 2\n",
             Path::new("no-rules.toml"),
         );
     }
 
     #[test]
     fn node_limited_measurement_retains_only_partial_hits() {
-        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = 'preflop when position == BB { remove bet }'\n";
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2\n[tree]\nscript = 'preflop when position == BB { remove bet }'\n";
         let p = prepare(raw, Path::new("limited.toml")).unwrap();
         let game = HoldemGame::new(
             &p.lowered.game,
@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn forced_root_turns_and_later_matching_rules_record_hits() {
-        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack_bb = 2\n[tree]\nscript = '''preflop when position == BTN { checkdown remove bet } flop, turn, river { checkdown }'''\n";
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2\n[tree]\nscript = '''preflop when position == BTN { checkdown remove bet } flop, turn, river { checkdown }'''\n";
         assert_eq!(compare_hits(raw, Path::new("forced-root.toml")), [true; 5]);
     }
     #[test]

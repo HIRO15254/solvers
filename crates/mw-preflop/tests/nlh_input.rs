@@ -16,7 +16,7 @@ fn lower(text: &str) -> input::Lowered {
 }
 fn config(players: usize, straddles: &str, script: &str) -> String {
     format!(
-        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack_bb = 100\nstraddles_bb = {straddles}\n[tree]\nscript = '''{script}\npreflop when aggressions >= 4 {{ remove raise }}\nflop, turn, river when aggressions >= 3 {{ remove raise }}\n'''\n"
+        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = {players}\nstack = 100\nstraddles = {straddles}\n[tree]\nscript = '''{script}\npreflop when aggressions >= 4 {{ remove raise }}\nflop, turn, river when aggressions >= 3 {{ remove raise }}\n'''\n"
     )
 }
 
@@ -24,7 +24,7 @@ fn config(players: usize, straddles: &str, script: &str) -> String {
 fn default_rake_unit_preserves_fingerprints() {
     use mw_preflop::solver::{ExternalSamplingGame, configuration_fingerprint_for_setup};
     let raw = config(3, "[]", "flop, turn, river { checkdown }")
-        + "[economics.rake]\nrate = 0.05\ncap_bb = 4\n";
+        + "[economics.rake]\nrate = 0.05\ncap = 4\n";
     let lowered = lower(&raw);
     let game = mw_preflop::HoldemGame::new(
         &lowered.game,
@@ -35,7 +35,7 @@ fn default_rake_unit_preserves_fingerprints() {
     .unwrap();
     let configuration =
         configuration_fingerprint_for_setup(&game, &game.deal_sampler().unwrap(), lowered.solver);
-    let explicit = raw.replace("rate = 0.05", "rounding_unit_bb = 0.001\nrate = 0.05");
+    let explicit = raw.replace("rate = 0.05", "rounding_unit = 0.001\nrate = 0.05");
     let explicit = lower(&explicit);
     let explicit_game = mw_preflop::HoldemGame::new(
         &explicit.game,
@@ -56,6 +56,27 @@ fn default_rake_unit_preserves_fingerprints() {
 }
 
 #[test]
+fn p2_rake_cap_preserves_exact_chip_amount() {
+    let raw = config(3, "[]", "") + "[economics.rake]\nrate = 0.05\ncap = '9007199254740993c'\n";
+    let lowered = lower(&raw);
+    assert!(matches!(
+        lowered.rake,
+        economics::RakeConfig::Generic {
+            cap_chips: Some(9_007_199_254_740_993),
+            ..
+        }
+    ));
+    let compiled = lowered.rake.compile(nlh::ChipScale::DEFAULT).unwrap();
+    assert!(matches!(
+        compiled,
+        economics::CompiledRake::Generic {
+            cap: Some(MwChips(9_007_199_254_740_993)),
+            ..
+        }
+    ));
+}
+
+#[test]
 fn chip_scale_and_rounding_are_part_of_the_game_fingerprint() {
     use mw_preflop::solver::ExternalSamplingGame;
     let fingerprint = |raw: &str| {
@@ -72,22 +93,20 @@ fn chip_scale_and_rounding_are_part_of_the_game_fingerprint() {
     let raw = config(3, "[]", "flop, turn, river { checkdown }");
     let default = fingerprint(&raw);
     let explicit = raw.replace(
-        "stack_bb = 100\n",
-        "stack_bb = 100\nbb_chips = 1000\nchip_rounding = \"nearest\"\n",
+        "stack = 100\n",
+        "stack = 100\nbb_chips = 1000\nchip_rounding = \"nearest\"\n",
     );
     assert_eq!(fingerprint(&explicit), default);
     for grid in ["bb_chips = 2000\n", "chip_rounding = \"down\"\n"] {
-        let coarse = raw.replace("stack_bb = 100\n", &format!("stack_bb = 100\n{grid}"));
+        let coarse = raw.replace("stack = 100\n", &format!("stack = 100\n{grid}"));
         assert_ne!(fingerprint(&coarse), default, "{grid}");
     }
 }
 
 #[test]
 fn odd_chip_denomination_reports_tree_pot_in_bb() {
-    let raw = config(3, "[]", "flop, turn, river { checkdown }").replace(
-        "stack_bb = 100\n",
-        "stack_bb = 100\nbb_chips = 3\nsb_chips = 1\n",
-    );
+    let raw = config(3, "[]", "flop, turn, river { checkdown }")
+        .replace("stack = 100\n", "stack = 100\nbb_chips = 3\nsb = \"1c\"\n");
     let lowered = lower(&raw);
     let state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
     let actor = state.to_act.unwrap();
@@ -188,7 +207,7 @@ fn spec_p2_example_defaults_normalize_idempotently_and_lower() {
 #[test]
 fn scriptless_tree_has_only_passive_actions_and_sb_one_is_supported() {
     for players in 2..=9 {
-        let raw = config(players, "[]", "").replace("stack_bb = 100", "stack_bb = 100\nsb_bb = 1");
+        let raw = config(players, "[]", "").replace("stack = 100", "stack = 100\nsb = 1");
         let lowered = lower(&raw);
         let state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
         let actions = state.legal_actions(&lowered.game.betting).unwrap();
@@ -258,13 +277,32 @@ fn product_owned_keys_and_values_have_nlh_diagnostics() {
 }
 
 #[test]
+fn tournament_field_chips_remain_exact_beyond_float_integer_precision() {
+    let raw = config(3, "[]", "")
+        .replace("stack = 100\n", "stack = 100\nbb_chips = 3\nsb = '1c'\n")
+        + "[economics]\nkind = 'tournament'\npayouts = [100, 60, 30]\noutside_field = ['9007199254740993c']\n";
+    let lowered = lower(&raw);
+    let economics::UtilityConfig::TournamentIcm { outside_field, .. } = &lowered.utility else {
+        panic!("expected tournament utility");
+    };
+    assert_eq!(outside_field[0].stack_chips, 9_007_199_254_740_993);
+    mw_preflop::HoldemGame::new(
+        &lowered.game,
+        &lowered.utility,
+        &lowered.rake,
+        mw_preflop::FeatureHashAbstraction::default(),
+    )
+    .unwrap();
+}
+
+#[test]
 fn economics_resources_and_algorithm_lower_with_legacy_meanings() {
     let raw = config(3, "[]", "")
         + r#"
 [economics]
 kind = "tournament"
 payouts = [1000, 600, 400]
-outside_field_bb = [18, 26]
+outside_field = [18, 26]
 [solver]
 kind = "single-hand"
 seed = 19
@@ -294,6 +332,8 @@ probability_encoding = "f32"
         panic!()
     };
     assert_eq!(outside_field[0].name, "outside-0");
+    assert_eq!(outside_field[0].stack_chips, 18_000);
+    assert_eq!(outside_field[1].stack_chips, 26_000);
     assert_eq!(payouts, &[1000.0, 600.0, 400.0, 0.0, 0.0]);
     assert_eq!(lowered.run.dev_gain_threshold, 100.0);
     assert_eq!(
@@ -308,11 +348,9 @@ probability_encoding = "f32"
     assert_eq!(lowered.solver.exploration_epsilon, 0.125);
     assert_eq!(lowered.solver.discount_every, u64::MAX);
     assert!(!lowered.solver.traverser_vector && !lowered.solver.prune);
-    let antes =
-        lower(&config(3, "[]", "").replace("stack_bb = 100", "stack_bb = 100\nante_bb = 0.125"));
+    let antes = lower(&config(3, "[]", "").replace("stack = 100", "stack = 100\nante = 0.125"));
     assert_eq!(antes.game.forced_bets.unwrap().antes_bb, vec![0.125; 3]);
-    let bb_ante =
-        lower(&config(3, "[]", "").replace("stack_bb = 100", "stack_bb = 100\nbb_ante_bb = 0.5"));
+    let bb_ante = lower(&config(3, "[]", "").replace("stack = 100", "stack = 100\nbb_ante = 0.5"));
     assert_eq!(bb_ante.game.forced_bets.unwrap().common_ante_bb, 0.5);
     let huge_prizes = economics::UtilityConfig::TournamentIcm {
         outside_field: Vec::new(),
@@ -646,8 +684,7 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
         }
     ));
 
-    let raw =
-        config(3, "[]", "preflop { replace raise [a] }").replace("stack_bb = 100", "stack_bb = 10");
+    let raw = config(3, "[]", "preflop { replace raise [a] }").replace("stack = 100", "stack = 10");
     let lowered = lower(&raw);
     let state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
     assert!(
@@ -666,7 +703,7 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
     );
 
     let raw = config(3, "[]", "preflop { when unopened { replace raise [2.5bb] } when !unopened { replace raise [10bb] } } preflop when aggressions >= 1 { jam raise > 33.333%stack }")
-        .replace("stack_bb = 100", "stack_bb = 20");
+        .replace("stack = 100", "stack = 20");
     let lowered = lower(&raw);
     let mut state = BettingState::from_config(&lowered.game.validated().unwrap()).unwrap();
     let open = state
@@ -705,6 +742,36 @@ fn tree_controls_source_order_and_integer_boundaries_are_explicit() {
     let mut invalid = roundtrip;
     invalid.betting.nlh_rules[0].condition = "board_cards == 3".into();
     assert!(invalid.validated().is_err());
+}
+
+#[test]
+fn p2_chip_and_rounded_bb_tree_sizes_reach_the_action_menu() {
+    for (mode, literal, expected) in [
+        ("down", "2.5bb", 7),
+        ("nearest", "2.5", 8),
+        ("up", "2.5bb", 8),
+        ("nearest", "7c", 7),
+        ("down", "0.1bb", 6),
+    ] {
+        let script = format!("preflop {{ replace raise [{literal}] }}");
+        let raw = config(3, "[]", &script).replace(
+            "stack = 100\n",
+            &format!("stack = 100\nbb_chips = 3\nsb = '1c'\nchip_rounding = '{mode}'\n"),
+        );
+        let lowered = lower(&raw);
+        let validated = lowered.game.validated().unwrap();
+        let state = BettingState::from_config(&validated).unwrap();
+        assert!(
+            state
+                .legal_actions(&validated.betting)
+                .unwrap()
+                .iter()
+                .any(|action| {
+                    matches!(action, Action::RaiseTo { to, .. } if *to == MwChips(expected))
+                }),
+            "{mode} {literal}"
+        );
+    }
 }
 
 #[test]

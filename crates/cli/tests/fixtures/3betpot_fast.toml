@@ -2,8 +2,8 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 1000
-ante_bb = 99
+stack = 1000
+ante = 99
 
 [economics]
 kind = "cash"
@@ -18,8 +18,8 @@ BTN = "JJ-22,AQs-A2s,KQs-KTs,QJs-QTs,JTs,T9s,98s,AQo-ATo,KQo"
 
 [tree]
 script = '''flop, turn, river {
-  replace bet [75]
-  replace raise [75]
+  replace bet [75%]
+  replace raise [75%]
 }
 flop when aggressions >= 2 { remove raise }
 turn when aggressions >= 1 { remove raise }

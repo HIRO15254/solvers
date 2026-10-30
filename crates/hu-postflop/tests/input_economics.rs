@@ -11,7 +11,7 @@ use std::path::Path;
 
 fn source(economics: &str, tree: &str) -> String {
     format!(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\n[table.stacks_bb]\nBTN = 100\nSB = 80\nBB = 60\nUTG = 100\nHJ = 100\nCO = 100\n{economics}\n[spot]\nline = 'BTN r2.5, BB c / BB x, BTN x / BB x, BTN x'\nboard = 'Ks 7h 2d 3c 4s'\n[ranges]\nBTN = 'AA'\nBB = 'QQ'\n[tree]\nscript = '''{tree}'''\n"
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\n[table.stacks]\nBTN = 100\nSB = 80\nBB = 60\nUTG = 100\nHJ = 100\nCO = 100\n{economics}\n[spot]\nline = 'BTN r2.5, BB c / BB x, BTN x / BB x, BTN x'\nboard = 'Ks 7h 2d 3c 4s'\n[ranges]\nBTN = 'AA'\nBB = 'QQ'\n[tree]\nscript = '''{tree}'''\n"
     )
 }
 fn document(text: &str) -> Document {
@@ -236,7 +236,7 @@ fn rake_rounds_before_capping_on_milli_bb_grid() {
             expected,
         );
     }
-    let doc = document(&source("[economics.rake]\nrate = 0.05\ncap_bb = 0.2", ""));
+    let doc = document(&source("[economics.rake]\nrate = 0.05\ncap = 0.2", ""));
     close(
         NlhPayoff::new(&doc.spot).unwrap().rake.rake(&terminal(
             &doc,
@@ -295,8 +295,8 @@ fn actual_contributions_and_dead_money_cancel_from_reported_chip_ev() {
 #[test]
 fn unequal_actual_contributions_and_ante_dead_money_set_the_ev_shift() {
     for (extra, oop_contribution, ip_contribution, pot) in [
-        ("bb_ante_bb = 1", 3.5, 2.5, 6.5),
-        ("ante_bb = 0.1", 2.6, 2.6, 6.1),
+        ("bb_ante = 1", 3.5, 2.5, 6.5),
+        ("ante = 0.1", 2.6, 2.6, 6.1),
     ] {
         let text = source("", "").replace("players = 6", &format!("players = 6\n{extra}"));
         let doc = document(&text);
@@ -320,7 +320,7 @@ fn unequal_actual_contributions_and_ante_dead_money_set_the_ev_shift() {
 #[test]
 fn two_player_free_chip_ev_retains_the_zero_sum_shortcut() {
     let doc = document(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack_bb = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'QQ'",
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 100\n[spot]\nline = 'BTN r2.5, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'QQ'",
     );
     let models = NlhPayoff::new(&doc.spot).unwrap();
     assert!(models.pipeline().is_zero_sum());

@@ -159,7 +159,7 @@ mod tests {
         let directory = tempfile::tempdir().unwrap();
         std::fs::write(
             directory.path().join(runfiles::RUN_CONFIG_FILE),
-            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack_bb = 100\n",
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 6\nstack = 100\n",
         )
         .unwrap();
         assert_eq!(

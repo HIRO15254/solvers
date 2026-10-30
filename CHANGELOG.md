@@ -137,22 +137,39 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   again (even the same one) discards the re-solved River. Each action node
   now loads with one `decision` request instead of separate `actions` /
   `strategy` / `ev` requests.
-- Chip denomination: `table.bb_chips` (chips per BB, 1–1,000,000, default
-  1000) and `table.chip_rounding` (`down`, `nearest` or `up`, default
-  `nearest`) for computed sizes. One internal unit is one chip. Every amount
-  key in BB has a whole-chip twin (`stack_chips`, `[table.stacks_chips]`,
-  `sb_chips`, `ante_chips`, `bb_ante_chips`, `straddles_chips`,
-  `outside_field_chips`, `cap_chips`, `rounding_unit_chips`); writing both
-  of a pair is `NLH003`. Amounts in BB must be whole chips, so a table with an
-  odd `bb_chips` sets `sb_bb` or `sb_chips` explicitly. Size literals accept
-  `Nc` chips. Line amounts and node selectors accept a whole-chip BB decimal
-  or `Nc`, mixed freely; the effective config stores the line in the table's
-  canonical spelling (BB decimals when `bb_chips` has no prime factors other
-  than 2 and 5, `Nc` otherwise), so both spellings give the same config. With
-  the default denomination every existing config builds the same tree as
-  before. The GUI Setup table step sets both keys.
+- Chip denomination: `table.bb_chips` sets chips per BB (1–1,000,000,
+  default 1000); `table.chip_rounding` selects `down`, `nearest` (ties up,
+  the default), or `up`. Amount values are BB numbers or strings (`"N"`,
+  `"Nbb"`), or exact whole-chip strings (`"Nc"`). BB values are rounded to
+  chips, including line, selector and script amounts and the default 0.5 BB
+  small blind. Validation warns when rounding changes a value, identifying
+  its location, written BB value, resulting chips and mode. Legality is
+  checked after rounding. For example, with `bb_chips = 3`, the default
+  small blind is 2 chips under `nearest`; use `sb = "1c"` for exactly one.
+  Lines, selectors and action labels accept BB or chip spellings. Human
+  output uses the shortest bare BB decimal when the denomination has only
+  factors 2 and 5, and `Nc` otherwise.
 
 ### Changed
+
+- **Breaking:** amount keys lose their unit suffix and take the unit in the
+  value: `stack_bb` becomes `stack`, `[table.stacks_bb]` becomes
+  `[table.stacks]`, and likewise `sb`, `ante`, `bb_ante`, `straddles`,
+  `outside_field`, rake `cap` and `rounding_unit`. A number is BB; `"Nc"` is
+  exact chips. Old keys fail with `NLH002` naming the new key.
+- **Breaking:** bare tree-script sizes now mean BB; pot percentages require
+  `%`. An unmigrated `bet [50]` means 50 BB, not 50% pot. This also applies
+  to script parameters, `[tree.params]` overrides, jam thresholds and merge
+  differences.
+- **Breaking:** effective configs, including `run.toml` and the configs
+  embedded in solutions and checkpoints, write amount keys and line amounts as
+  exact `Nc` chips; the script is kept as written. Re-reading an effective
+  config gives the same config and repeats no rounding warning for keys or
+  the line.
+
+  Migration: drop `_bb` from amount keys (values stay BB numbers); add `%` to
+  every pot percentage in scripts, parameters and overrides (`bet [33, 75]`
+  becomes `bet [33%, 75%]`, `cb = 33` becomes `cb = "33%"`).
 
 - **Breaking:** heads-up postflop node histories and action labels give
   bet/raise amounts as the actor's raise-to amount on that street, as

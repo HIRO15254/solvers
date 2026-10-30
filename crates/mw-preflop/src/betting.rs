@@ -606,7 +606,7 @@ mod tests {
         );
         // The pot after the 1 BB call is 2.5 BB, so 20% of it is 0.5 BB.
         assert_eq!(
-            raises_for("preflop { merge raise within 20 }"),
+            raises_for("preflop { merge raise within 20% }"),
             [2_000, 3_000, 99_000]
         );
         assert_eq!(

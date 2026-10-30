@@ -34,7 +34,7 @@ const STREET_ORDER = ["preflop", "flop", "turn", "river"];
 const ROLE_LABEL: Record<SizeRole, string> = { oop: "OOP", ip: "IP" };
 
 const SIZE_HELP =
-  "33 is 33% of the pot, 2.5x is 2.5 times the largest wager on the street (for raises), e reaches all-in geometrically over the streets left, a is all-in, 3bb is a total of 3 BB, min is the minimum. Separate with commas or spaces; an empty cell leaves that action out.";
+  "33% is 33% of the pot; 3 or 3bb is 3 BB and 300c is 300 chips. 2.5x is 2.5 times the largest wager on the street (for raises), e reaches all-in geometrically over the streets left, a is all-in, and min is the minimum. BB amounts use the table's chip rounding mode. Separate with commas or spaces; an empty cell leaves that action out.";
 
 const SCRIPT_HELP =
   "The tree grammar in docs/nlh-input-v1.jp.md §9. Ctrl+Space completes keywords, variables and sizes; hover a word for its meaning. Ctrl+F searches, Ctrl+/ toggles a comment, Ctrl+[ / Ctrl+] indents, Ctrl+Shift+[ folds a block. Tab indents; press Esc, then Tab, to leave the editor.";
@@ -235,19 +235,23 @@ export function SetupTree({
   );
 }
 
+/** Convert a parameter input to its TOML value without losing size suffixes. */
+export function treeParamValue(text: string, kind: TreeParam["kind"]): number | string | undefined {
+  const trimmed = text.trim();
+  if (!trimmed) return undefined;
+  return kind === "number" && /^\d+(?:\.\d+)?$/.test(trimmed) ? Number(trimmed) : trimmed;
+}
+
 function ScriptParam({ param }: { param: TreeParam }) {
   const { doc, update } = useDoc();
   const id = useId();
   const path = ["tree", "params", param.name];
   const override = getAt(doc, path);
   const issue = useIssue(path.join("."));
-  const value = (text: string) => {
-    if (text.trim() === "") return undefined;
-    return param.kind === "number" ? Number(text) : text;
-  };
+  const value = (text: string) => treeParamValue(text, param.kind);
   return (
     <div className="stack" style={{ gap: 8 }}>
-      <Field label={param.name} hint={param.description ?? `Script default: ${param.value}`} htmlFor={id}>
+      <Field label={param.name} hint={`${param.description ?? `Script default: ${param.value}`}${param.kind === "bool" ? "" : " For sizes, bare numbers are BB; use % for pot or c for chips."}`} htmlFor={id}>
         {param.kind === "bool" ? (
           <Checkbox
             id={id}

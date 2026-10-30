@@ -5,7 +5,7 @@ schema = "solvers.nlh/v1"
 [table]
 players = 6
 
-[table.stacks_bb]
+[table.stacks]
 BTN = 100.0
 SB = 100.0
 BB = 100.0
@@ -18,10 +18,10 @@ kind = "cash"
 
 [economics.rake]
 rate = 0.05
-cap_bb = 4.0
+cap = 4.0
 when = "flop_dealt"
 allocation = "main-first"
-rounding_unit_bb = 0.001
+rounding_unit = 0.001
 rounding = "down"
 
 [ranges]
@@ -40,12 +40,12 @@ preflop, flop, turn, river {
 }
 preflop when unopened { replace raise [2.5x, a] }
 preflop when !unopened { replace raise [3x, a] }
-flop when unopened { replace bet [50, a] }
-flop when !unopened { replace raise [75, a] }
-turn when unopened { replace bet [50, a] }
-turn when !unopened { replace raise [75, a] }
-river when unopened { replace bet [50, a] }
-river when !unopened { replace raise [75, a] }
+flop when unopened { replace bet [50%, a] }
+flop when !unopened { replace raise [75%, a] }
+turn when unopened { replace bet [50%, a] }
+turn when !unopened { replace raise [75%, a] }
+river when unopened { replace bet [50%, a] }
+river when !unopened { replace raise [75%, a] }
 preflop when unopened && position != "SB" { remove call }
 preflop when limpers > 0 && aggressions == 0 { replace raise [4bb, a] }
 preflop when aggressions >= 1 { replace raise [2.5x, a] }

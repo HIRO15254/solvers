@@ -283,7 +283,13 @@ fn build_profiled_with_base(p: &Prepared) -> Result<ProfiledWithBase> {
     let mut built = crate::try_build_postflop_game(&p.config, p.payoff.pipeline())
         .map_err(|e| spot::SpotError::new(spot::Code::NLH003, "tree", e.to_string()))?;
     let start = crate::artifact::start_street_from_board_len(p.config.board.len());
-    let index = GameIndex::from_game(&built.game, &built.node_info, start, p.config.scale);
+    let index = GameIndex::from_game(
+        &built.game,
+        &built.node_info,
+        start,
+        p.config.scale,
+        p.config.chip_rounding,
+    );
     let mut loaded_base = None;
     let resolved = if let Some(ir) = &p.document.spot.profile {
         if !matches!(
@@ -1217,7 +1223,7 @@ mod tests {
 schema = "solvers.nlh/v1"
 [table]
 players = 2
-stack_bb = 21
+stack = 21
 [spot]
 line = "BTN c, BB x / BB x, BTN x / BB x, BTN x"
 board = "2s 7s Ks 4h 3d"
@@ -1225,7 +1231,7 @@ board = "2s 7s Ks 4h 3d"
 BB = "AK,KQ,AA"
 BTN = "QQ,JJ"
 [tree]
-script = "river { replace bet [50] } river when aggressions >= 1 { remove raise }"
+script = "river { replace bet [50%] } river when aggressions >= 1 { remove raise }"
 [solver]
 storage = "f32"
 [solver.stop]

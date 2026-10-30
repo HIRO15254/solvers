@@ -25,8 +25,8 @@ pub fn validate(
         None
     };
     let mut summary = p.document.summary();
-    summary.warnings = warnings(&p);
-    let mut value = serde_json::to_value(summary)?;
+    summary.warnings.extend(warnings(&p));
+    let mut value = serde_json::to_value(&summary)?;
     crate::validate::diagnostic_bb(&mut value, p.config.scale);
     value["status"] = json!("valid");
     value["schema"] = json!(SCHEMA);
@@ -89,7 +89,7 @@ pub fn validate(
                     );
                 }
             }
-            for warning in warnings(&p) {
+            for warning in &summary.warnings {
                 println!("warning: {warning}");
             }
             if resources {
@@ -117,14 +117,7 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
     let spot = &p.document.spot;
     let start = &spot.context;
     let scale = p.config.scale;
-    let monetary = |amount| {
-        let text = bb(amount, scale);
-        if scale.is_decimal() {
-            format!("{text} BB")
-        } else {
-            text
-        }
-    };
+    let monetary = |amount| bb(amount, scale);
     let mut out = String::new();
     writeln!(out, "street: {:?}", start.street).unwrap();
     writeln!(out, "board: {}", spot.board_text.as_deref().unwrap_or("")).unwrap();
@@ -203,12 +196,14 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
                 out,
                 "economics: cash with rake rate={} cap={} when={}",
                 number(&rake["rate"]),
-                rake.get("cap_bb")
-                    .map(|v| format!("{} BB", number(v)))
-                    .or_else(|| {
-                        rake.get("cap_chips")
-                            .map(|v| monetary(v.as_integer().expect("chip cap") as u64))
-                    })
+                rake.get("cap")
+                    .map(|v| monetary(
+                        v.as_str()
+                            .expect("chip cap")
+                            .trim_end_matches('c')
+                            .parse()
+                            .expect("chip cap")
+                    ))
                     .unwrap_or_else(|| "none".into()),
                 rake["when"].as_str().unwrap()
             )
@@ -220,8 +215,7 @@ fn human_summary(p: &hu_postflop::prepare::Prepared) -> String {
         let table = spot.table.positions.len();
         let field = table
             + economics
-                .get("outside_field_bb")
-                .or_else(|| economics.get("outside_field_chips"))
+                .get("outside_field")
                 .and_then(toml::Value::as_array)
                 .expect("ICM field")
                 .len();

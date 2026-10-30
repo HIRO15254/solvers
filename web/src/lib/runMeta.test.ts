@@ -6,18 +6,33 @@ import { runMeta } from "./runMeta";
 vi.mock("../api/client", () => ({ api: { artifactText: vi.fn(), validate: vi.fn() } }));
 
 describe("run profile metadata", () => {
-  it("shows BB and chip-denominated common stacks in the economics badge", async () => {
+  it("shows common stacks in the table's display form in the economics badge", async () => {
     vi.mocked(api.validate).mockRejectedValue(new Error("no validation"));
     for (const [hash, table, economics, expected] of [
-      ["stack-bb", "stack_bb = 100", "", "100bb · No rake"],
-      ["stack-chips", "stack_chips = 301\nbb_chips = 3", "", "301c · No rake"],
-      ["stack-chips-rake", "stack_chips = 50000", "[economics.rake]\nrate = 0.05", "50000c · rake 5%"],
-      ["stack-chips-icm", "stack_chips = 50000", "[economics]\nkind = 'tournament'", "50000c · ICM"],
+      ["stack-bb", "stack = 100", "", "100bb · No rake"],
+      ["stack-chips", "stack = '301c'\nbb_chips = 3", "", "301c · No rake"],
+      ["stack-chips-rake", "stack = '50000c'", "[economics.rake]\nrate = 0.05", "50bb · rake 5%"],
+      ["stack-chips-icm", "stack = '50000c'", "[economics]\nkind = 'tournament'", "50bb · ICM"],
       ["no-common-stack", "", "", "No rake"],
     ] as const) {
       vi.mocked(api.artifactText).mockResolvedValueOnce(`schema = 'solvers.nlh/v1'\n[table]\n${table}\n${economics}\n`);
       const run = { runId: hash, configHash: hash, gameKind: "hu-postflop" } as RunSummary;
       expect((await runMeta(run)).economics).toBe(expected);
+    }
+  });
+
+  it("renders persisted chip wagers in the table's display form", async () => {
+    vi.mocked(api.validate).mockRejectedValue(new Error("no validation"));
+    for (const [hash, bbChips, line, expected] of [
+      ["line-decimal", 1000, "BTN r2500c, BB c / BB b1250c, BTN c", "BTN r2.5, BB c / BB b1.25, BTN c"],
+      ["line-chips", 3, "BTN r6c, BB c / BB b15c, BTN c", "BTN r6c, BB c / BB b15c, BTN c"],
+      ["line-integer", 1, "BTN r6c, BB c", "BTN r6, BB c"],
+    ] as const) {
+      vi.mocked(api.artifactText).mockResolvedValueOnce(
+        `schema = 'solvers.nlh/v1'\n[table]\nbb_chips = ${bbChips}\n[spot]\nline = '${line}'\n`,
+      );
+      const run = { runId: hash, configHash: hash, gameKind: "hu-postflop" } as RunSummary;
+      expect((await runMeta(run)).line).toBe(expected);
     }
   });
 

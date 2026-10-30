@@ -79,11 +79,10 @@ solver・tree・range・board・economicsなど卓以外の設定は検証しな
 指定時はcomma区切りのtoken列で置換し、`--moves ""`は空prefixである。
 省略された途中のactionを補わず、prefix末尾から次の手番を返す。
 `--format`の既定は`human`。不正なmoveは`NLH004`で1-basedのmove indexを示しexit 2となる。
-`spot.line`と`--moves`のbet / raise額は、整数chipに一致するBB10進数と整数chipの`Nc`表記を混在できる。
-数値は各単位で最短表記とする。例えば`bb_chips = 1000`では`r2.5`と`r2500c`が同額で、
+`spot.line`と`--moves`のbet / raise額は、接尾辞なしまたは`bb`付きのBBと整数chipの`Nc`表記を混在できる。BB額は`table.chip_rounding`で整数chipへ丸め、`Nc`は正確に扱う。構文と行動の合法性は丸め後も検査する。
+数値は各単位で最短表記とする。例えば`bb_chips = 1000`では`r2.5`、`r2.5bb`、`r2500c`が同額で、
 `r2.50`は`NLH004`。`bb_chips = 3`では`r1`と`r3c`が同額である。
-実効configの`spot.line`は、`bb_chips`の素因数が2と5だけなら最短のBB10進数、
-それ以外なら`Nc`へ正規化する。tree scriptのsize literalの規則は変わらない。
+実効configの`spot.line`は常に`Nc`へ正規化する。人が見る表示は下記の表示表記に従う。
 
 JSONは次のobjectである。特記以外の金額はBB単位のnumber。
 
@@ -154,9 +153,10 @@ solvers validate <CONFIG> [--format human|json] [--show-effective]
 | `--resources` | 無効 | P1の木・storage見積り、P2のpublic tree・policy arena countを表示 |
 
 human表示は製品、開始状態、lineの行動、treeのparam・展開済みrule、警告を示す。
-P1のline表示の`*`は暗黙foldである。P1の金額は全chipを有限小数のBBで表せる卓ではBB、
-それ以外ではchip数に`c`を付けて表示し、headerの`amounts`もそれぞれ`BB` / `chips`とする。
-P2の金額はBB、utilityはcashでBB、ICMで賞金単位である。
+BB指定値が丸めで変わった場合は、key、lineのaction、script位置または既定SBの位置、指定BB値、結果のchip数と丸め方式を警告に表示する。
+実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列とし、既定値を明示する。stackが異なる場合は全positionを`[table.stacks]`に書く。tree script本文はそのまま保持する。
+`--show-effective`・`--write-effective`、`run.toml`、`--print-config`、solutionとcheckpointに埋め込むconfigはこの形式である。再正規化は同じbytesになり、丸め警告を繰り返さない。
+人が見る額（validate、node history、action label、tree、export、inspect、GUI）は、`bb_chips`の素因数が2と5だけなら最短の接尾辞なしBB10進数、それ以外なら`Nc`で表示する。P1のline表示の`*`は暗黙foldである。utilityはcashでBB、ICMで賞金単位である。
 P1のprofile指定時は実際の木へselectorを解決し、humanでは一致node・hand数と各selectorの内訳、
 JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。
 不正なselectorやactionは入力errorである。profileが無い場合はfieldを追加しない。
@@ -217,13 +217,14 @@ solve/resumeはstderr、reportはboard集合に対して1回だけ表示する�
 正規化・実効configにも削除済みkeyは出力しない。旧Preflop設定は他のPreflop ruleの後の
 `preflop when aggressions >= 1 { jam raise > 33.333%stack }`へ移行する。
 閾値の分母M（hand開始stack − ante）、整数chipへの丸め（`table.chip_rounding`）、ソース位置での適用は旧keyと異なる。
-卓の額面は`table.bb_chips`（既定1000）、計算sizeの丸めは`table.chip_rounding`で指定する。
-BB額の各keyには整数chipの`_chips`表記があり、同じ額の両表記は排他である（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
+卓の額面は`table.bb_chips`（既定1000）、BB額と計算sizeの丸めは`table.chip_rounding`で指定する。
+額は`stack = 100`、`sb = "1c"`のように単位を値に書く。数値・文字列`"N"`・`"Nbb"`はBB、`"Nc"`は整数chip。旧`stack_bb`・`stack_chips`などのkeyは`NLH002`で拒否する（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
+tree scriptの接尾辞なし数値と`Nbb`はBB、`Nc`はchip、`N%`はpot比である。例えば旧pot 33%は`33%`と書き、`33`は33 BBとなる。`[tree.params]`の数値overrideも同様で、pot比は`"33%"`とする。`Nx`、`Ne`、`N%stack`、`N%effective`、`a`、`min`も使える。
 例えば`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は現在menuの大きい候補だけをall-inへ置き換える。
 `jam`は候補を追加しないのでsizeを足すruleの後へ置く。閾値はliteralの到達額変換だけで求め、
 最小raiseへの引上げやMでのcapはしない。`tree.rules`でも`turn { jam raise >= 85%stack }`のように表示する。
-近いsizeをまとめる`merge bet within 10`は、大きい候補から順に直前に残した候補との差が幅以下のものを削除する。
-`tree.rules`では`flop { merge bet within 10 }`のように表示する。
+近いsizeをまとめる`merge bet within 10%`は、大きい候補から順に直前に残した候補との差がpotの10%以下のものを削除する。`within 10`は10 BBである。
+`tree.rules`では`flop { merge bet within 10% }`のように表示する。
 
 ## `solvers tree`
 
@@ -235,6 +236,7 @@ P1（`hu-postflop`）configのpublic treeをsolveせずに構築し、指定node
 P2（`mw-preflop`）は`NLH005`（exit 2）で明示的に拒否する。戦略・値・run directoryは作らない。
 `--node`の既定は`root`。履歴（`xr10c`、配牌を含む`xx[9d]`など）または
 slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。履歴のbet/raise額は各streetの到達額であり、前streetの投入額を含まない。
+selectorとaction labelの額は表示表記のほか、接尾辞なし・`bb`付きBBまたは`Nc`を受け付け、BBは卓の丸め方式でchipに変換して照合する。profileやrelockのselectorも同様である。
 `all`は全action nodeを木順で返す。chance・terminalも明示selectorで選べる。
 未知nodeは入力error（exit 2）であり、無視したりrootへ戻したりしない。
 `--rest-of-street`は選択した各nodeの行の直後に、同じstreetでそのnodeより後のaction nodeの行を木の先行順で続ける。

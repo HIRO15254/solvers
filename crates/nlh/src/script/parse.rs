@@ -952,7 +952,7 @@ flop {
   }
   when cbet {
     replace bet [cb]
-    when wet { replace bet [cb, 75] }
+    when wet { replace bet [cb, 75%] }
   }
   when aggressions == 1 {
     replace raise [3x]
@@ -1032,8 +1032,26 @@ turn, river when monotone {
     }
 
     #[test]
+    fn parameters_thresholds_and_widths_share_size_units() {
+        let script = compile_with(
+            "param size = 0.5\nflop { replace bet [size, 10c, 33%] jam bet >= 2bb merge bet within 0.5 }",
+            &[("size", "2")],
+        ).unwrap();
+        assert_eq!(
+            script.rules[0].sizes,
+            vec![
+                SizeSpec::ToBb { value: 2.0 },
+                SizeSpec::ToChips { value: 10 },
+                SizeSpec::PotAfterCall { fraction: 0.33 },
+            ]
+        );
+        assert_eq!(script.rules[1].sizes, vec![SizeSpec::ToBb { value: 2.0 }]);
+        assert_eq!(script.rules[2].sizes, vec![SizeSpec::ToBb { value: 0.5 }]);
+    }
+
+    #[test]
     fn jam_takes_a_wager_kind_a_lower_bound_and_one_threshold() {
-        let script = compile("param t = 85%stack\nturn { jam bet >= t jam raise > 150 }").unwrap();
+        let script = compile("param t = 85%stack\nturn { jam bet >= t jam raise > 150% }").unwrap();
         assert_eq!(script.rules[0].effect, Effect::Jam(JamBound::AtLeast));
         assert_eq!(script.rules[0].action, Some(ActionKind::Bet));
         assert_eq!(
@@ -1063,7 +1081,7 @@ turn, river when monotone {
     #[test]
     fn merge_takes_a_wager_kind_within_and_one_width() {
         let script =
-            compile("param w = 10\nflop { merge bet within w merge raise within 5%stack }")
+            compile("param w = 10%\nflop { merge bet within w merge raise within 5%stack }")
                 .unwrap();
         assert_eq!(script.rules[0].effect, Effect::Merge);
         assert_eq!(script.rules[0].action, Some(ActionKind::Bet));

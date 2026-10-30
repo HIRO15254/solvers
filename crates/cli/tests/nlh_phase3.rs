@@ -5,7 +5,7 @@ use std::process::{Command, Output};
 const RIVER: &str = r#"schema = "solvers.nlh/v1"
 [table]
 players = 6
-stack_bb = 5
+stack = 5
 [spot]
 line = "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x"
 board = "Ks 7h 2d 3c 9s"
@@ -1106,7 +1106,7 @@ fn rejects_memory_p2_sol_streets_and_empty_menus_before_creating_a_run() {
     assert!(!out.exists());
     std::fs::write(
         &config,
-        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack_bb = 5\n",
+        "schema = \"solvers.nlh/v1\"\n[table]\nplayers = 2\nstack = 5\n",
     )
     .unwrap();
     #[cfg(feature = "p2")]
@@ -1146,7 +1146,7 @@ name = "a"
 
 [table]
 players = 2
-stack_bb = 100
+stack = 100
 
 [run]
 threads = 1
@@ -1160,9 +1160,65 @@ threads = 1
         hash(base),
         hash(&base.replace("threads = 1", "threads = 2"))
     );
-    assert_ne!(
-        hash(base),
-        hash(&base.replace("stack_bb = 100", "stack_bb = 50"))
+    assert_ne!(hash(base), hash(&base.replace("stack = 100", "stack = 50")));
+}
+
+#[test]
+fn p1_rounding_warning_reaches_both_validation_formats_once() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("input.toml");
+    let effective = temp.path().join("effective.toml");
+    std::fs::write(&config, RIVER.replace("stack = 5", "stack = 5.0004")).unwrap();
+    let result = ok(&[
+        "validate",
+        text(&config),
+        "--format",
+        "json",
+        "--write-effective",
+        text(&effective),
+    ]);
+    let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let warnings = json["warnings"].as_array().unwrap();
+    let rounded: Vec<_> = warnings
+        .iter()
+        .filter_map(|w| w.as_str())
+        .filter(|w| w.contains("table.stack"))
+        .collect();
+    assert_eq!(rounded.len(), 1, "{warnings:?}");
+    assert!(rounded[0].contains("5.0004"), "{}", rounded[0]);
+    assert!(
+        rounded[0].contains("5000") && rounded[0].contains("nearest"),
+        "{}",
+        rounded[0]
+    );
+    assert!(
+        warnings
+            .iter()
+            .any(|w| w.as_str().unwrap().contains("have no effect in P1"))
+    );
+    let human = ok(&["validate", text(&config)]);
+    let human = String::from_utf8_lossy(&human.stdout);
+    assert_eq!(
+        human.matches(&format!("warning: {}", rounded[0])).count(),
+        1
+    );
+    let effective_value: toml::Value =
+        toml::from_str(&std::fs::read_to_string(&effective).unwrap()).unwrap();
+    assert_eq!(effective_value["table"]["stack"].as_str(), Some("5000c"));
+    assert!(
+        effective_value["spot"]["line"]
+            .as_str()
+            .unwrap()
+            .contains("r2500c")
+    );
+    let normalized = ok(&["validate", text(&effective), "--format", "json"]);
+    let normalized: serde_json::Value = serde_json::from_slice(&normalized.stdout).unwrap();
+    assert!(
+        !normalized["warnings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|w| w.as_str().unwrap().contains("table.stack"))
     );
 }
 
@@ -1369,7 +1425,7 @@ fn auto_storage_river_fallback_artifacts_resume_and_f32_preference() {
         .collect::<Vec<_>>()
         .join(",");
     let raw = RIVER
-        .replace("stack_bb = 5", "stack_bb = 10000")
+        .replace("stack = 5", "stack = 10000")
         .replace("AhAd,QhQd", "random")
         .replace("JhJd,ThTd", "random")
         .replace("replace bet [1bb]", &format!("replace bet [{bets}]"))

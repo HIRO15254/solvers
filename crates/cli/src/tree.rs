@@ -19,12 +19,12 @@ pub fn run(
         ValidationFormat::Human => {
             for row in rows {
                 println!(
-                    "{}: {} {} actor={} pot={} BB",
+                    "{}: {} {} actor={} pot={}",
                     row.history,
                     row.kind,
                     row.street,
                     row.actor.as_deref().unwrap_or("-"),
-                    row.pot.map_or_else(|| "-".into(), |pot| pot.to_string()),
+                    row.pot_text.as_deref().unwrap_or("-"),
                 );
                 for ((action, child), kind) in
                     row.actions.iter().zip(&row.children).zip(&row.child_kinds)

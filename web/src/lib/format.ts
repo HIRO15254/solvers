@@ -5,9 +5,9 @@ export function bb(value: number): string {
   return String(Number(value.toFixed(6)));
 }
 
-/** Canonical line amount, matching ChipScale::amount_text. */
-export function lineAmount(value: number, bbChips: number): string {
-  const chips = Math.round(value * bbChips);
+/** Exact human-readable chip amount for a table's big blind. */
+export function chipDisplay(chips: bigint, bbChips: number): string {
+  if (!Number.isSafeInteger(bbChips) || bbChips <= 0) return `${chips}c`;
   let denominator = bbChips;
   let twos = 0;
   let fives = 0;
@@ -15,12 +15,81 @@ export function lineAmount(value: number, bbChips: number): string {
   while (denominator % 5 === 0) { denominator /= 5; fives++; }
   if (denominator !== 1) return `${chips}c`;
   const digits = Math.max(twos, fives);
-  const scaled = BigInt(chips) * 10n ** BigInt(digits) / BigInt(bbChips);
+  const scaled = chips * 10n ** BigInt(digits) / BigInt(bbChips);
   if (digits === 0) return String(scaled);
   const text = scaled.toString().padStart(digits + 1, "0");
   const whole = text.slice(0, -digits);
   const fraction = text.slice(-digits).replace(/0+$/, "");
   return fraction ? `${whole}.${fraction}` : whole;
+}
+
+/** Resolve a BB or chip amount to whole chips without floating-point conversion. */
+export function amountChips(value: unknown, bbChips: number, rounding = "nearest"): bigint | undefined {
+  if (typeof value !== "number" && typeof value !== "string") return undefined;
+  const text = String(value);
+  if (/^(0|[1-9]\d*)c$/.test(text)) return BigInt(text.slice(0, -1));
+  const match = /^(\d+)(?:\.(\d+))?(?:bb)?$/.exec(text);
+  if (!match || !Number.isSafeInteger(bbChips) || bbChips <= 0) return undefined;
+  const fraction = match[2] ?? "";
+  const denominator = 10n ** BigInt(fraction.length);
+  const scaled = BigInt(match[1] + fraction) * BigInt(bbChips);
+  let chips = scaled / denominator;
+  const remainder = scaled % denominator;
+  if (rounding === "up" ? remainder > 0n : rounding !== "down" && remainder * 2n >= denominator) chips++;
+  return chips;
+}
+
+/** Display an amount key, preserving exact chip amounts. */
+export function amountDisplay(value: unknown, bbChips: number, rounding = "nearest"): string {
+  const chips = amountChips(value, bbChips, rounding);
+  return chips === undefined ? (value == null ? "" : String(value)) : chipDisplay(chips, bbChips);
+}
+
+/** TOML numbers are BB; explicitly suffixed inputs remain strings. */
+export function amountInput(text: string): number | string | undefined {
+  const value = text.trim();
+  if (/^(0|[1-9]\d*)c$/.test(value) || /^\d+(?:\.\d+)?bb$/.test(value)) return value;
+  if (/^\d+(?:\.\d+)?$/.test(value)) return Number(value);
+  return undefined;
+}
+
+/** Preserve a written line only when it is the line that was replayed. */
+export function replayedLine(replayed: string, written: string, isRequested: boolean): string {
+  return isRequested ? written : replayed;
+}
+
+/** Normalize an entered BB wager without rounding away its value. */
+export function normalizedWager(value: string): string {
+  return String(Number(value.trim()));
+}
+
+/** Canonical line amount, matching ChipScale::amount_text. */
+export function lineAmount(value: number, bbChips: number): string {
+  return chipDisplay(BigInt(Math.round(value * bbChips)), bbChips);
+}
+
+/** Keep written wagers in the replayed prefix and the newly selected action. */
+export function writtenLine(line: string, previous: string, moves: string[], canonicalMoves: string[]): string {
+  const parts = line.split(/(, | \/ )/);
+  const old = previous.split(/, | \/ /);
+  const last = moves.at(-1);
+  const canonical = canonicalMoves.at(-1);
+  const lastAction = parts.length - 1;
+  for (let i = 0; i < old.length && i * 2 < parts.length; i++) {
+    const index = i * 2;
+    if (index === lastAction && canonical !== "f" && last !== canonical) break;
+    const before = old[i]!.match(/^(\S+)\s+([br])(\S+)$/);
+    const after = parts[index]!.match(/^(\S+)\s+([br])(\S+)$/);
+    if (before && after && before[1] === after[1] && before[2] === after[2]) {
+      parts[index] = old[i]!;
+    } else if (old[i] !== parts[index]) {
+      break;
+    }
+  }
+  const preserved = parts.join("");
+  return last && canonical && /^[br]/.test(last) && last !== canonical && preserved.endsWith(canonical)
+    ? preserved.slice(0, -canonical.length) + last
+    : preserved;
 }
 
 /** One replayed action as the line grammar spells it. */

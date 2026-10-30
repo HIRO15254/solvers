@@ -5,7 +5,7 @@ use std::process::{Command, Output};
 const TABLE: &str = r#"schema = "solvers.nlh/v1"
 [table]
 players = 6
-stack_bb = 100
+stack = 100
 "#;
 
 fn cli(config: &Path, args: &[&str]) -> Output {
@@ -110,7 +110,7 @@ fn moves_accept_both_amount_spellings() {
     let config = temp.path().join("amounts.toml");
     for (table, decimal, chips, canonical) in [
         ("bb_chips = 10", "r2.5", "r25c", "r2.5"),
-        ("bb_chips = 3\nsb_chips = 1", "r2", "r6c", "r6c"),
+        ("bb_chips = 3\nsb = '1c'", "r2", "r6c", "r6c"),
     ] {
         std::fs::write(
             &config,
@@ -300,18 +300,18 @@ fn human_output_explains_cursor_and_options() {
     for text in [
         "line: BTN r2.5, BB c",
         "street: Flop",
-        "pot: 5.5 BB",
+        "pot: 5.5",
         "players: 2",
         "complete: true",
         "terminal: false",
         "board cards: 3",
         "next: BB",
-        "to call: 0 BB",
-        "stack: 97.5 BB",
+        "to call: 0",
+        "stack: 97.5",
         "options:",
         "Check (x)",
         "Bet (b)",
-        "min=1 BB",
+        "min=1",
     ] {
         assert!(human.contains(text), "missing {text:?}: {human}");
     }

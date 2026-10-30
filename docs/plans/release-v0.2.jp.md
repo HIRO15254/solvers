@@ -31,7 +31,18 @@ v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含め�
 | ID | 決定 |
 |---|---|
 | RV4 | `solvers upgrade`（旧`.sol` 4〜6の変換）は削除する。v0.1.0のsolutionは削除済みkeyを埋め込むため変換できず、profile付きの5・6は履歴とselectorを安全に書き換えられない。旧`.sol`と旧checkpointは再solveを案内する |
-| RV5 | lineの額はBBの10進数と`Nc`の両表記を受け付け、混在も認める。実効configでは卓の正規表記（`bb_chips`の素因数が2と5だけの卓はBB、それ以外は`Nc`）へ書き換え、表記によらず同じspotは同じconfig・hashになるようにする。node selectorも両表記を受け付ける |
+| RV5 | lineの額はBBと`Nc`の両表記を受け付け、混在も認める。node selectorも両表記を受け付ける。互換性hashは実効configの文字列から作るため、treeが同じでもscriptの書き方が違えば変わる。同じtreeかどうかは上流固定の基準解の照合（board・pot・stack・tree・label・range）で確かめる。実効configの表記はRV10、表示はRV11で定める |
+| RV6 | 利用者がBBで書いた額（table・economicsの額、lineの額、node selectorの額、size literalのBB）と既定のSB（0.5 BB）は、どの卓でも`table.chip_rounding`で整数chipへ丸める。丸めで額が変わったときは`validate`がwarningで場所と丸めた後のchip数を示す |
+
+続けて、額の単位の書き方を作り直すことにした（2026-10-30）。
+
+| ID | 決定 |
+|---|---|
+| RV7 | 単位の作り直しを済ませてからv0.2.0を配布する。`_chips` keyと`Nc`は0.2.0で入るため、配布後に消すと利用者の移行が2回になる |
+| RV8 | 1つの量に1つのkeyとし、単位は値に書く。数値と接尾辞なしはBB、`"Nbb"`はBB、`"Nc"`はchip。対象は`stack`・`[table.stacks]`・`sb`・`ante`・`bb_ante`・`straddles`・`outside_field`・`cap`・`rounding_unit`。旧`*_bb`・`*_chips` keyは`NLH002`とし、新しいkey名を示す |
+| RV9 | tree scriptのsize literalも接尾辞なしはBBとする。pot比は`N%`と書く。`Nbb`・`Nc`・`Nx`・`Ne`・`N%stack`・`N%effective`・`a`・`min`は維持する。v0.1.0の`bet [50]`は意味が変わるため、移行表と削除keyの`NLH002`の案内で`50`→`50%`を示す |
+| RV10 | 実効config（`run.toml`・`--print-config`・`.sol`とcheckpointに埋め込むconfig）の額は、どの卓でも`"Nc"`と`Nc`のlineで書く。scriptは書いたまま保存する |
+| RV11 | 人が見る表記（node履歴、action label、GUIとCLIの表示）は卓ごとの規則を維持する。`bb_chips`の素因数が2と5だけの卓はBBの10進数、それ以外は`Nc`。lineの額と同じく、selectorとlock keyはどちらの表記でも書け、RV6で丸めて照合する |
 
 ## 3. 手順と完了条件
 

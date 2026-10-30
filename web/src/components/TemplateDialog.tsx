@@ -1,6 +1,7 @@
 import { Button, Dialog } from "../cryst";
 import { fieldText, getAt, readDoc, TEMPLATES, type Doc } from "../lib/config";
 import { parseBoard } from "../lib/cards";
+import { amountDisplay } from "../lib/format";
 import { Board } from "./common";
 
 /** Each shipped example with what it sets up, read once at load. */
@@ -11,7 +12,7 @@ const ENTRIES = TEMPLATES.map((template) => {
     ...template,
     doc,
     title: text(["meta", "name"]) || template.name,
-    table: `${text(["table", "players"])} players · ${text(["table", "stack_bb"]) || "?"} BB · ${text(["economics", "kind"]) || "cash"}`,
+    table: `${text(["table", "players"])} players · ${amountDisplay(getAt(doc, ["table", "stack"]), Number(getAt(doc, ["table", "bb_chips"]) ?? 1000), text(["table", "chip_rounding"]) || "nearest") || "?"} · ${text(["economics", "kind"]) || "cash"}`,
     line: text(["spot", "line"]) || "Preflop root",
     board: parseBoard(text(["spot", "board"])) ?? [],
   };

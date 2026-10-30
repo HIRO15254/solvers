@@ -2,12 +2,12 @@ schema = "solvers.nlh/v1"
 
 [table]
 players = 2
-stack_bb = 205.5
+stack = 205.5
 
 [economics]
 kind = "tournament"
 payouts = [1000, 600, 400, 0]
-outside_field_bb = [1800, 2600]
+outside_field = [1800, 2600]
 
 [spot]
 line = "BTN r10.5, BB c"
@@ -21,7 +21,7 @@ BTN = "JJ-99,AQs-ATs,KQs,QJs"
 source = "trees/pio.tree"
 
 [tree.params]
-cb = 40
+cb = "40%"
 
 [solver.algorithm]
 schedule = "dcfr"

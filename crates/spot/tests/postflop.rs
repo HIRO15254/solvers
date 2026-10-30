@@ -24,7 +24,7 @@ fn config(
     ranges: &str,
 ) -> String {
     let mut text = format!(
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\nstack_bb = 100\n{table}\n[spot]\n"
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = {players}\nstack = 100\n{table}\n[spot]\n"
     );
     for (key, v) in [("line", line), ("board", board)] {
         if let Some(v) = v {
@@ -56,6 +56,24 @@ fn roundtrip(text: &str) -> String {
     let second = parse(&first).normalize(&Empty).unwrap();
     assert_eq!(first, second);
     first
+}
+
+#[test]
+fn fractional_line_amount_rounds_and_effective_line_is_exact() {
+    let raw = config(
+        2,
+        "bb_chips = 3\nsb = '1c'",
+        Some("BTN r2.5, BB c"),
+        Some("Ks 7h 2d"),
+        "BTN = 'random'\nBB = 'random'",
+    );
+    let doc = parse(&raw);
+    assert!(doc.warnings.iter().any(|w| w.contains("spot.line")
+        && w.contains("2.5")
+        && w.contains("8 chips")
+        && w.contains("nearest")));
+    let effective = doc.normalize(&Empty).unwrap();
+    assert!(parse(&effective).warnings.is_empty());
 }
 
 #[test]
@@ -175,7 +193,7 @@ fn checked_street_clears_previous_aggressor_but_keeps_preflop_history() {
 fn spec_straddle_pot_and_unraised_straddler_check() {
     let text = config(
         6,
-        "straddles_bb = [2,4]",
+        "straddles = [2,4]",
         Some("BTN r10, HJ c"),
         Some("Ks 7h 2d"),
         "BTN = 'random'\nHJ = 'random'",
@@ -187,7 +205,7 @@ fn spec_straddle_pot_and_unraised_straddler_check() {
     roundtrip(&text);
     let d = parse(&config(
         6,
-        "straddles_bb = [2,4]",
+        "straddles = [2,4]",
         Some("BTN c, HJ x"),
         Some("Ks 7h 2d"),
         "BTN = 'random'\nHJ = 'random'",
@@ -208,8 +226,8 @@ fn spec_straddle_pot_and_unraised_straddler_check() {
 #[test]
 fn ante_and_bb_ante_dead_money_and_asymmetric_remaining_stacks() {
     for (table, btn, bb) in [
-        ("ante_bb = 0.1", 97_400, 97_400),
-        ("bb_ante_bb = 0.6", 97_500, 96_900),
+        ("ante = 0.1", 97_400, 97_400),
+        ("bb_ante = 0.6", 97_500, 96_900),
     ] {
         let d = parse(&config(
             6,
@@ -246,14 +264,14 @@ fn heads_up_limp_and_shortest_grid_amount() {
     assert_eq!(d.spot.context.oop.as_ref().unwrap().seat, SeatId(1));
     let text = standard("BTN r2.501, BB c", "Ks 7h 2d");
     assert_eq!(parse(&text).spot.context.pot, MwChips(5502));
-    assert!(roundtrip(&text).contains("line = \"BTN r2.501, BB c\""));
+    assert!(roundtrip(&text).contains("line = \"BTN r2501c, BB c\""));
 }
 
 #[test]
 fn equivalent_line_amount_spellings_normalize_identically() {
     for (table, decimal, chips, canonical, chip_bet) in [
-        ("bb_chips = 10", "r2.5", "r25c", "r2.5", "b10c"),
-        ("bb_chips = 3\nsb_chips = 1", "r2", "r6c", "r6c", "b3c"),
+        ("bb_chips = 10", "r2.5", "r25c", "r25c", "b10c"),
+        ("bb_chips = 3\nsb = '1c'", "r2", "r6c", "r6c", "b3c"),
     ] {
         let make = |raise: &str, bet: &str| {
             config(
@@ -397,7 +415,6 @@ fn all_alternative_line_spellings_are_nlh004() {
         "BTN r+3, BB c",
         "BTN r-3, BB c",
         "BTN r3e0, BB c",
-        "BTN r2.5001, BB c",
         "BTN raise 2.5, BB call",
         "BTN R2.5, BB C",
         "F-F-R2.5-C",
@@ -442,7 +459,7 @@ fn errors_name_correct_spelling() {
     }
     let e = error(&config(
         2,
-        "[table.stacks_bb]\nBB = 10",
+        "[table.stacks]\nBB = 10",
         Some("BTN r20, BB a"),
         Some("Ks 7h 2d"),
         "BTN = 'random'\nBB = 'random'",
@@ -460,7 +477,7 @@ fn implicit_folds_cannot_skip_a_check() {
     }
     let e = error(&config(
         6,
-        "straddles_bb = [2,4]",
+        "straddles = [2,4]",
         Some("BTN c"),
         Some("Ks 7h 2d"),
         "BTN = 'random'\nHJ = 'random'",
@@ -505,7 +522,7 @@ fn board_spelling_duplicates_and_count_boundaries() {
 fn every_unsupported_product_case_is_explained() {
     for (text, message) in [
         (
-            config(2, "[table.stacks_bb]\nBTN = 0.5\nBB = 0.5", None, None, ""),
+            config(2, "[table.stacks]\nBTN = 0.5\nBB = 0.5", None, None, ""),
             "no decision left",
         ),
         (
@@ -527,7 +544,7 @@ fn every_unsupported_product_case_is_explained() {
         (
             config(
                 2,
-                "[table.stacks_bb]\nBB = 10",
+                "[table.stacks]\nBB = 10",
                 Some("BTN r20, BB c"),
                 Some("Ks 7h 2d"),
                 "",
@@ -537,7 +554,7 @@ fn every_unsupported_product_case_is_explained() {
         (
             config(
                 3,
-                "[table.stacks_bb]\nBTN = 5\nSB = 10",
+                "[table.stacks]\nBTN = 5\nSB = 10",
                 Some("BTN a, SB a, BB c"),
                 Some("Ks 7h 2d"),
                 "",
@@ -547,7 +564,7 @@ fn every_unsupported_product_case_is_explained() {
         (
             config(
                 6,
-                "[table.stacks_bb]\nUTG = 5",
+                "[table.stacks]\nUTG = 5",
                 Some("UTG a, BTN c, BB c"),
                 Some("Ks 7h 2d"),
                 "",
@@ -580,7 +597,7 @@ fn every_unsupported_product_case_is_explained() {
 
 #[test]
 fn short_allin_reopen_is_enforced_during_line_replay() {
-    let table = "[table.stacks_bb]\nSB = 3";
+    let table = "[table.stacks]\nSB = 3";
     let text = config(
         6,
         table,
@@ -623,7 +640,7 @@ fn p1_accepts_every_board_variable_and_preserves_preflop_rules() {
 #[test]
 fn validate_summary_is_serializable_and_rules_recompile() {
     let text = format!(
-        "{}[tree]\nscript = '''param z = 3bb\nparam alpha = 33\npreflop {{ remove call }}\nflop {{ if paired {{ replace bet [alpha, e, 3e, min, 80%effective] }} else {{ replace raise [z, a] }} }}\nturn {{ jam raise > 85%stack merge bet within 12.5 merge raise within 0.5bb }}'''\n[tree.params]\nz = '4bb'\nalpha = 75",
+        "{}[tree]\nscript = '''param z = 3bb\nparam alpha = 33%\npreflop {{ remove call }}\nflop {{ if paired {{ replace bet [alpha, e, 3e, min, 80%effective] }} else {{ replace raise [z, a] }} }}\nturn {{ jam raise > 85%stack merge bet within 12.5% merge raise within 0.5bb }}'''\n[tree.params]\nz = '4bb'\nalpha = '75%'",
         standard("BTN r2.5, BB c", "Ks 7h 2d")
     );
     let d = parse(&text);
@@ -632,18 +649,36 @@ fn validate_summary_is_serializable_and_rules_recompile() {
     assert_eq!(summary.actions.len(), 6);
     assert_eq!(summary.tree.params[0].name, "z");
     assert_eq!(summary.tree.params[0].value, "4bb");
-    assert_eq!(summary.tree.params[1].value, "75");
+    assert_eq!(summary.tree.params[1].value, "75%");
     assert!(summary.warnings.is_empty());
     let value = toml::Value::try_from(&summary).unwrap();
     assert_eq!(
         value["start"]["board"].as_array().unwrap()[0].as_str(),
         Some("Ks")
     );
+    assert!(
+        summary
+            .tree
+            .rules
+            .iter()
+            .any(|rule| rule.contains("replace raise [4, a]"))
+    );
+    assert!(
+        summary
+            .tree
+            .rules
+            .iter()
+            .any(|rule| rule.contains("merge raise within 0.5"))
+    );
     let flattened = summary.tree.rules.join("\n");
+    let compiled = Script::compile(&flattened, &Default::default(), &NLH_V1).unwrap();
+    assert_eq!(compiled.rules.len(), d.spot.tree.compiled.rules.len());
+    let reparsed = parse(&format!(
+        "{}[tree]\nscript = '''{flattened}'''\n",
+        standard("BTN r2.5, BB c", "Ks 7h 2d")
+    ));
     assert_eq!(
-        Script::compile(&flattened, &Default::default(), &NLH_V1)
-            .unwrap()
-            .rules,
+        reparsed.spot.tree.compiled.rules,
         d.spot.tree.compiled.rules
     );
     assert!(d.spot.start.seats[SeatId(1)].status == SeatStatus::Folded);
@@ -653,8 +688,8 @@ fn validate_summary_is_serializable_and_rules_recompile() {
 #[test]
 fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
     let text = format!(
-        "{}[meta]\nname = 'name'\ndescription = 'description'\nderived_from = {{ board = 'Ks 7h 2d', line = 'BTN c', solution_hash = 'hash', run_id = 'id' }}\n[economics.rake]\nrate = 0.05\ncap_bb = 4\n[tree]\nscript = '''param z = 3bb\nparam alpha = true\nflop when unopened == alpha {{ replace bet [z] }}'''\n[tree.params]\nalpha = false\nz = '4bb'\n[run]\nthreads = 2\nmemory = '6GiB'\nmax_time = '12h'\ncheckpoint_interval = '15m'",
-        config(6, "[table.stacks_bb]\nCO = 80", None, None, "")
+        "{}[meta]\nname = 'name'\ndescription = 'description'\nderived_from = {{ board = 'Ks 7h 2d', line = 'BTN c', solution_hash = 'hash', run_id = 'id' }}\n[economics.rake]\nrate = 0.05\ncap = 4\n[tree]\nscript = '''param z = 3bb\nparam alpha = true\nflop when unopened == alpha {{ replace bet [z] }}'''\n[tree.params]\nalpha = false\nz = '4bb'\n[run]\nthreads = 2\nmemory = '6GiB'\nmax_time = '12h'\ncheckpoint_interval = '15m'",
+        config(6, "[table.stacks]\nCO = 80", None, None, "")
     );
     let n = roundtrip(&text);
     for keys in [
@@ -662,20 +697,20 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
         vec![
             "players =",
             "bb_chips =",
-            "sb_bb =",
-            "ante_bb =",
-            "bb_ante_bb =",
-            "straddles_bb =",
+            "sb =",
+            "ante =",
+            "bb_ante =",
+            "straddles =",
             "chip_rounding =",
-            "[table.stacks_bb]",
+            "[table.stacks]",
         ],
         vec![
             "rate =",
-            "cap_bb =",
+            "cap =",
             "when =",
             "allocation =",
             "\nrounding =",
-            "rounding_unit_bb =",
+            "rounding_unit =",
         ],
         vec!["script =", "[tree.params]"],
         vec![
@@ -690,7 +725,7 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
     }
     assert!(n.contains("derived_from = { run_id = \"id\", solution_hash = \"hash\", line = \"BTN c\", board = \"Ks 7h 2d\" }"));
     assert!(!n.contains("[meta.derived_from]"));
-    assert!(!n.contains("stack_bb ="));
+    assert!(!n.contains("stack ="));
     assert!(n.contains("[tree.params]\nz = \"4bb\"\nalpha = false"));
     assert!(n.contains("memory = \"6GiB\""));
     assert!(n.contains("max_time = \"12h\""));
@@ -717,7 +752,7 @@ fn normalized_key_order_stacks_units_empty_tables_and_meta_inline() {
         assert!(roundtrip(&text).contains(&format!("max_time = \"{expected}\"")));
     }
     let n = roundtrip(&config(2, "", None, None, ""));
-    for section in ["meta", "tree.params", "solver", "output", "table.stacks_bb"] {
+    for section in ["meta", "tree.params", "solver", "output", "table.stacks"] {
         assert!(!n.contains(&format!("[{section}]")));
     }
 }
@@ -734,15 +769,9 @@ fn positions_follow_documentation_order_and_equal_stacks_use_one_key() {
         (8, "UTG UTG1 LJ HJ CO BTN SB BB"),
         (9, "UTG UTG1 UTG2 LJ HJ CO BTN SB BB"),
     ] {
-        let n = roundtrip(&config(
-            players,
-            "[table.stacks_bb]\nBTN = 99",
-            None,
-            None,
-            "",
-        ));
+        let n = roundtrip(&config(players, "[table.stacks]\nBTN = 99", None, None, ""));
         let value: toml_edit::DocumentMut = n.parse().unwrap();
-        for table in [&value["table"]["stacks_bb"], &value["ranges"]] {
+        for table in [&value["table"]["stacks"], &value["ranges"]] {
             assert_eq!(
                 table
                     .as_table()
@@ -756,7 +785,7 @@ fn positions_follow_documentation_order_and_equal_stacks_use_one_key() {
     }
     let uniform = config(2, "", None, None, "");
     let explicit =
-        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\n[table.stacks_bb]\nBB = 100\nBTN = 100";
+        "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\n[table.stacks]\nBB = 100\nBTN = 100";
     assert_eq!(roundtrip(&uniform), roundtrip(explicit));
 }
 
