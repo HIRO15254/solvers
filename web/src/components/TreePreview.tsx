@@ -4,7 +4,7 @@ import type { PreviewTreeRow, Seat, StartState } from "../api/types";
 import { Button, Card, CardAction, CardContent, CardHeader, CardTitle, EmptyState, Icon, IconButton } from "../cryst";
 import { actionColors } from "../lib/actions";
 import { STREET_LABEL } from "../lib/cards";
-import { bb } from "../lib/format";
+import { displayAmount } from "../lib/format";
 import type { SizeRole } from "../lib/sizes";
 import { describeAction, outcome, rootStacks, sizePercent, splitStreets, type ActionInfo } from "../lib/tree";
 import { CardGrid } from "./CardGrid";
@@ -35,8 +35,8 @@ interface Dealing {
   row: PreviewTreeRow;
 }
 
-function actionText(info: ActionInfo): string {
-  const amount = info.amount === null ? "" : ` ${bb(info.amount)}`;
+function actionText(info: ActionInfo, bbChips: number): string {
+  const amount = info.amount === null ? "" : ` ${displayAmount(info.amount, bbChips)}`;
   if (info.allIn && (info.kind === "bet" || info.kind === "raise")) return `All-in${amount}`;
   if (info.kind === "raise") return `Raise to${amount}`;
   const name = info.kind[0]!.toUpperCase() + info.kind.slice(1);
@@ -166,12 +166,16 @@ export function TreeCard({
 
   /** The labels from the street's first node to `history`'s parent action, then `last`. */
   const lineTo = (row: PreviewTreeRow, last: string): string[] => {
-    const labels = [last];
+    const label = (action: string) => action.replace(/^(bet|raise to) (\d+(?:\.\d+)?)$/, (original, kind: string, value: string) => {
+      const amount = displayAmount(Number(value), bbChips);
+      return amount.endsWith("c") ? `${kind} ${amount}` : original;
+    });
+    const labels = [label(last)];
     let history = row.history;
     while (history !== first?.history) {
       const parent = streetRows.find((candidate) => candidate.children.includes(history));
       if (!parent) break;
-      labels.unshift(parent.actions[parent.children.indexOf(history)] ?? "");
+      labels.unshift(label(parent.actions[parent.children.indexOf(history)] ?? ""));
       history = parent.history;
     }
     return labels;
@@ -231,7 +235,7 @@ export function TreeCard({
 
   const group = (row: PreviewTreeRow, depth: number) => {
     const colors = actionColors(row.actions);
-    const pot = row.pot === null ? "" : `pot ${bb(row.pot)}`;
+    const pot = row.pot === null ? "" : `pot ${displayAmount(row.pot, bbChips)}`;
     return (
       <div role="group" className="tree-group" aria-label={`${seat(row.actor)} to act, ${pot}`}>
         <div className="tree-group-head" aria-hidden="true">
@@ -253,7 +257,7 @@ export function TreeCard({
               aria-expanded={expanded}
               aria-setsize={row.actions.length}
               aria-posinset={index + 1}
-              aria-label={`${actionText(info)} ${sizeText(info)}`.trim()}
+              aria-label={`${actionText(info, bbChips)} ${sizeText(info)}`.trim()}
               tabIndex={tabbable ? 0 : -1}
               onFocus={(event) => {
                 if (event.target === event.currentTarget) setFocused(child);
@@ -264,7 +268,7 @@ export function TreeCard({
                   {next && <Icon name={expanded ? "chevron-down" : "chevron-right"} size={14} />}
                 </span>
                 <span className="swatch" style={{ background: colors[index] }} />
-                <span className="tree-label">{actionText(info)}</span>
+                <span className="tree-label">{actionText(info, bbChips)}</span>
                 <span className="tree-size mono">{sizeText(info)}</span>
                 <span className={`tree-outcome ${where}`}>
                   {where === "deal" && (
@@ -332,7 +336,7 @@ export function TreeCard({
                   >
                     <span className="history-head">
                       <span>{streetName(index)}</span>
-                      {pot != null && <span className="mono meta muted">{bb(pot)}</span>}
+                      {pot != null && <span className="mono meta muted">{displayAmount(pot, bbChips)}</span>}
                     </span>
                     {cards.length > 0 && (
                       <span className="row" style={{ gap: 2 }}>

@@ -4,7 +4,7 @@ import type { LineCursor, LineOption, LineStep } from "../api/types";
 import { Button, Card, Input, Popover, PopoverContent, PopoverTrigger } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { fieldText, getAt } from "../lib/config";
-import { bb, lineToken, normalizedWager, writtenLine } from "../lib/format";
+import { displayAmount, lineToken, normalizedWager, writtenLine } from "../lib/format";
 import { Board } from "./common";
 import { DocText, useDoc } from "./DocFields";
 import { LinePresets } from "./LinePresets";
@@ -19,9 +19,9 @@ const OPTION_LABEL: Record<LineOption["kind"], string> = {
 };
 
 /** An option badge's text: the action and, from the replay, its amount or range (BB). */
-function optionText(option: LineOption): string {
-  if ("min" in option) return `${OPTION_LABEL[option.kind]} ${bb(option.min)}–${bb(option.max)}`;
-  if ("amount" in option) return `${OPTION_LABEL[option.kind]} ${bb(option.amount)}`;
+function optionText(option: LineOption, bbChips: number): string {
+  if ("min" in option) return `${OPTION_LABEL[option.kind]} ${displayAmount(option.min, bbChips)}–${displayAmount(option.max, bbChips)}`;
+  if ("amount" in option) return `${OPTION_LABEL[option.kind]} ${displayAmount(option.amount, bbChips)}`;
   return OPTION_LABEL[option.kind];
 }
 
@@ -86,7 +86,7 @@ function TurnPicker({
     const value = Number(amount);
     if (!sizing) return;
     if (!amount.trim() || !Number.isFinite(value)) {
-      setError(`Write the street total, ${bb(sizing.min)} to ${bb(sizing.max)} BB`);
+      setError(`Write the street total in BB (${displayAmount(sizing.min, turn.cursor.bbChips)} to ${displayAmount(sizing.max, turn.cursor.bbChips)})`);
       return;
     }
     onPick([...moves, `${sizing.token}${normalizedWager(amount)}`]);
@@ -134,7 +134,7 @@ function TurnPicker({
                 else onPick([...moves, option.token]);
               }}
             >
-              {optionText(option)}
+              {optionText(option, turn.cursor.bbChips)}
             </button>
           ))}
         </div>
@@ -151,7 +151,7 @@ function TurnPicker({
               className="mono"
               autoFocus
               aria-label={`${OPTION_LABEL[sizing.kind]} amount (BB, street total)`}
-              placeholder={`${bb(sizing.min)}–${bb(sizing.max)}`}
+              placeholder={`${displayAmount(sizing.min, turn.cursor.bbChips)}–${displayAmount(sizing.max, turn.cursor.bbChips)}`}
               type="number"
               step="any"
               inputMode="decimal"

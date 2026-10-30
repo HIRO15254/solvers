@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { LineSeat } from "../api/types";
 import { Badge } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
-import { bb } from "../lib/format";
+import { displayAmount } from "../lib/format";
 import type { SizeRole } from "../lib/sizes";
 
 /**
@@ -17,6 +17,7 @@ export function PokerTable({
   button,
   pot,
   street,
+  bbChips,
   center,
   roles,
   selected,
@@ -26,6 +27,7 @@ export function PokerTable({
   button: number;
   pot: number;
   street: string;
+  bbChips: number;
   center: ReactNode;
   roles: Record<SizeRole, string> | null;
   selected: string[];
@@ -42,16 +44,17 @@ export function PokerTable({
     left: `${50 + 44 * reach * Math.cos(angle(index))}%`,
     top: `${50 + 40 * reach * Math.sin(angle(index))}%`,
   });
+  const potText = displayAmount(pot, bbChips);
 
   return (
-    <div className="poker-table" aria-label={`${STREET_LABEL[street] ?? street}, pot ${bb(pot)} BB`}>
+    <div className="poker-table" aria-label={`${STREET_LABEL[street] ?? street}, pot ${potText}${potText.endsWith("c") ? "" : " BB"}`}>
       <div className="felt" />
       <div className="table-center">{center}</div>
       {seats.map((seat, index) => (
         <div key={`chips-${seat.seat}`}>
           {seat.wager > 0 && (
             <span className="table-wager mono" style={place(index, 0.58)}>
-              {bb(seat.wager)}
+              {displayAmount(seat.wager, bbChips)}
             </span>
           )}
           {seat.seat === button && (
@@ -84,7 +87,7 @@ export function PokerTable({
               ) : seat.status === "allIn" ? (
                 <Badge variant="warning">all-in</Badge>
               ) : (
-                <span className="mono meta">{bb(seat.stack)}</span>
+                <span className="mono meta">{displayAmount(seat.stack, bbChips)}</span>
               )}
             </button>
           </div>

@@ -2,7 +2,7 @@ import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { ProfileReport } from "../api/types";
-import { ProfileDetails } from "./Results";
+import { PotAmount, ProfileDetails } from "./Results";
 
 // The production Cryst bundle requires a browser; these tests exercise the
 // profile text and selection rather than the design system's rendering.
@@ -13,6 +13,18 @@ vi.mock("../cryst", () => {
     Icon: container, Select: container, Tabs: container, Alert: container, Badge: container,
     Input: container, Label: container, Popover: container, PopoverContent: container, PopoverTrigger: container,
   };
+});
+
+describe("pot amounts", () => {
+  it("shows whole chips without a BB suffix for a non-terminating scale", () => {
+    expect(renderToStaticMarkup(<PotAmount value={10 / 3} bbChips={3} />)).toBe("10c");
+    expect(renderToStaticMarkup(<PotAmount value={1} bbChips={3} />)).toBe("3c");
+  });
+
+  it("preserves legacy BB decimal formatting for terminating scales", () => {
+    expect(renderToStaticMarkup(<PotAmount value={1.23456789} bbChips={1000} />)).toBe("1.234568 BB");
+    expect(renderToStaticMarkup(<PotAmount value={2.5} bbChips={4} />)).toBe("2.5 BB");
+  });
 });
 
 const profile: ProfileReport = {

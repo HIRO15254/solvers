@@ -17,7 +17,7 @@ import { Board, InfoHint, KeyValue, Notice, PlayingCard } from "../components/co
 import { Button, Card, CardContent, EmptyState, Icon, Select, Tabs } from "../cryst";
 import { actionColors } from "../lib/actions";
 import { STREET_LABEL } from "../lib/cards";
-import { bb, integer, percent } from "../lib/format";
+import { displayAmount, integer, percent } from "../lib/format";
 import { ALL_CLASSES, classCombos, classOf } from "../lib/range";
 import { runMeta, type RunMeta } from "../lib/runMeta";
 import { freezeBaseRun } from "../lib/setupFreeze";
@@ -185,6 +185,12 @@ export function ResultsPage({ runId }: { runId?: string }) {
   );
 }
 
+/** Pot values are whole chips even though the solution API reports them in BB. */
+export function PotAmount({ value, bbChips }: { value: number; bbChips: number }) {
+  const amount = displayAmount(value, bbChips);
+  return <>{amount.endsWith("c") ? amount : `${amount} BB`}</>;
+}
+
 function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   const [meta, setMeta] = useState<RunMeta | null>(null);
   const [summary, setSummary] = useState<SolSummary | null>(null);
@@ -301,7 +307,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
           <div className="history-card start">
             <div className="history-head">
               <span>{STREET_LABEL[nodes[""]?.row.street ?? ""] ?? "Start"}</span>
-              <span className="mono meta muted">{summary ? `${bb(summary.pot)} BB` : ""}</span>
+              <span className="mono meta muted">{summary && <PotAmount value={summary.pot} bbChips={meta?.bbChips ?? 1000} />}</span>
             </div>
             <Board cards={summary?.board.split(" ") ?? meta?.board ?? []} small />
           </div>
@@ -353,7 +359,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
               <div key={history} className="history-card node" aria-current={next ? undefined : "step"}>
                 <div className="history-head">
                   <span>{position(row.actor)}</span>
-                  <span className="mono meta muted">pot {row.pot !== null ? bb(row.pot) : ""} BB</span>
+                  <span className="mono meta muted">pot {row.pot !== null && <PotAmount value={row.pot} bbChips={meta?.bbChips ?? 1000} />}</span>
                 </div>
                 {summary?.profile?.summary.resolved_nodes?.some((item) => item.history === history) && (
                   <div className="meta" aria-label="Profile constraints">
@@ -437,7 +443,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
                   <span className="grow" />
                   <span style={{ fontWeight: 500 }}>{seatName(node.row.actor!)} to act</span>
                   <span className="mono meta muted">
-                    pot {bb(node.row.pot ?? 0)} BB ·{" "}
+                    pot <PotAmount value={node.row.pot ?? 0} bbChips={meta?.bbChips ?? 1000} /> ·{" "}
                     {integer(Math.round(seatTotals(node.ev, node.row.actor!).weight * 10) / 10)} combos
                   </span>
                 </div>

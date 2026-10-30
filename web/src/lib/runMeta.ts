@@ -12,6 +12,7 @@ import { freezeBaseRun } from "./setupFreeze";
 export interface RunMeta {
   name: string | null;
   line: string;
+  bbChips: number;
   board: string[];
   start: StartState | null;
   utilityUnit: string;
@@ -66,6 +67,7 @@ async function load(run: RunSummary): Promise<RunMeta> {
   return {
     name: (getAt(doc, ["meta", "name"]) as string | undefined) ?? null,
     line,
+    bbChips,
     board: parseBoard(String(getAt(doc, ["spot", "board"]) ?? "")) ?? [],
     start: validated?.summary.start ?? null,
     utilityUnit: validated?.summary.utilityUnit ?? (kind === "tournament" ? "prizes" : "BB"),

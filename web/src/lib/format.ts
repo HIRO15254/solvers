@@ -68,6 +68,12 @@ export function lineAmount(value: number, bbChips: number): string {
   return chipDisplay(BigInt(Math.round(value * bbChips)), bbChips);
 }
 
+/** Display a daemon whole-chip BB amount, preserving the GUI's decimal formatting. */
+export function displayAmount(value: number, bbChips: number): string {
+  const canonical = lineAmount(value, bbChips);
+  return canonical.endsWith("c") ? canonical : bb(value);
+}
+
 /** Keep written wagers in the replayed prefix and the newly selected action. */
 export function writtenLine(line: string, previous: string, moves: string[], canonicalMoves: string[]): string {
   const parts = line.split(/(, | \/ )/);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { amountChips, amountDisplay, amountInput, lineToken, normalizedWager, replayedLine, writtenLine } from "./format";
+import { amountChips, amountDisplay, amountInput, displayAmount, lineToken, normalizedWager, replayedLine, writtenLine } from "./format";
 import type { LineStep } from "../api/types";
 
 describe("line tokens", () => {
@@ -14,6 +14,12 @@ describe("line tokens", () => {
     expect(writtenLine("BTN r2 / BB b3", "BTN r1.9", ["r2", "b2.8"], ["r2", "b3"])).toBe("BTN r1.9 / BB b2.8");
     expect(writtenLine("BTN r2, BB c", "BTN r1.9", ["r2", "c"], ["r2", "c"])).toBe("BTN r1.9, BB c");
     expect(writtenLine("BTN r2", "BTN r1.9", ["r2", "f"], ["r2", "f"])).toBe("BTN r1.9");
+  });
+
+  it("displays whole-chip BB floats for both scale forms", () => {
+    expect(displayAmount(16 / 3, 3)).toBe("16c");
+    expect(displayAmount(8 / 3, 3)).toBe("8c");
+    expect(displayAmount(5.5, 1000)).toBe("5.5");
   });
 
   it("uses only the successfully replayed line after a failed replay", () => {

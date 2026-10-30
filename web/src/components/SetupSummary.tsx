@@ -14,7 +14,7 @@ import {
   Progress,
 } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
-import { bb, bytes, integer } from "../lib/format";
+import { bytes, displayAmount, integer } from "../lib/format";
 import type { SizeRole } from "../lib/sizes";
 import { IgnoredCard, KeyValue, Notice, PlayingCard, Section } from "./common";
 import { PokerTable } from "./PokerTable";
@@ -92,14 +92,15 @@ export function SpotCard({
             button={cursor.button}
             pot={cursor.pot}
             street={cursor.street}
+            bbChips={cursor.bbChips}
             roles={roles}
             center={
               <>
                 <span className="overline">{street}</span>
-                <span className="mono table-pot">pot {bb(cursor.pot)}</span>
+                <span className="mono table-pot">pot {displayAmount(cursor.pot, cursor.bbChips)}</span>
                 {effective !== null && Number.isFinite(effective) && (
                   <span className="mono meta muted">
-                    eff {bb(effective)} · SPR {cursor.pot > 0 ? (effective / cursor.pot).toFixed(2) : "—"}
+                    eff {displayAmount(effective, cursor.bbChips)} · SPR {cursor.pot > 0 ? (effective / cursor.pot).toFixed(2) : "—"}
                   </span>
                 )}
                 {slots + ignored.length > 0 && (
