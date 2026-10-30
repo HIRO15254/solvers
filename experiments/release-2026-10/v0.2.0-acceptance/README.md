@@ -107,3 +107,32 @@ GUIは、release workflow `41023993226`のLinux x86-64-v3 archiveを新しいAWS
 | Setupでの上流固定 | 上のrunを基準に選ぶと見積りが52.90 MiBになり、Resultsに「Upstream frozen to run …-2 · SHA-256 2debde811c83…」が出た |
 | `no-rivers`のRiver再solveと履歴表記 | Turnで BB check・BTN bet 1・BB call の後、River Ahを選ぶと「River re-solved on demand」と戦略が出た。RiverのBB betは`bet 1`、node欄は`xr1c[Ah]r1`で、street内のraise-to額になった |
 | 進捗とcancel | 1,164,212 nodeのflop spotを2本投入し、待機中の2本目をcancelすると`canceled`になった。実行中の1本目はcancel後にcheckpoint（iteration 100）を書いて`canceled`になった。Resumeすると続きから再開し、iteration 150まで進んだ |
+
+## 額の単位の再設計と再受入
+
+利用者決定RV6〜RV11（[計画](../../../docs/plans/release-v0.2.jp.md)第2節）で、額の書き方をv0.2.0の前に作り直した。
+1つの量に1つのkey（`stack`・`[table.stacks]`・`sb`・`ante`・`bb_ante`・`straddles`・`outside_field`・`cap`・`rounding_unit`）とし、
+数値はBB、`"Nc"`はchipである。BBの額（既定SBを含む）は`chip_rounding`で丸め、変われば警告する。
+tree scriptのsizeは接尾辞なしがBB、pot比は`N%`。実効configは額とlineを`Nc`で書き、人が見る出力は卓の表示表記を使う。
+変更はPR #12（`9cfe4ae4`〜`5880f67c`）。reviewer agentの指摘（jam閾値の誤検出、NUL文字で始まる額の文字列、0のline額の案内、
+文書のsize表と再読込警告の範囲）は`d86ae7ad`で直した。GUI受入で見つけた非10進の卓のpot・stack・木表示のBB小数は`5880f67c`で`Nc`表示にした。
+
+| 検査 | run | commit | 結果 |
+|---|---|---|---|
+| 通常CI（PR #12） | [41048232465](https://github.com/HIRO15254/solvers/actions/runs/41048232465) | `5880f67c` | success（fmt、clippy 2種、workspace試験、P1専用、web、Windows・macOS smoke） |
+| 受入 | [41046327379](https://github.com/HIRO15254/solvers/actions/runs/41046327379) | `b948e3b9` | 1209 passed、0 failed、除外1件。`5880f67c`との差はwebだけ |
+| release workflow（手動実行、Releaseは作らない） | [41048224388](https://github.com/HIRO15254/solvers/actions/runs/41048224388) | `5880f67c` | success |
+
+GUIは、release workflow `41046330977`と`41048224388`のLinux x86-64-v2 archiveをAWS Spot（c6i.2xlarge）で展開して確認した。
+`solvers --version`は`solvers 0.2.0 (5880f67c), heads-up postflop only`だった。
+
+| 操作 | 確認した結果 |
+|---|---|
+| 旧keyの拒否 | `stack_bb = 5`は`NLH002: table.stack_bb: use table.stack instead; tree script bare sizes are now BB, write pot percentages as N%` |
+| 丸め警告（`bb_chips = 3`、`stack = 20.5`、SB省略、line `BTN r2.5`、script `[50%, 2.5]`） | Validationに4件の丸め警告（stack 62 chips、既定SB 2 chips、line 8 chips、`tree.script:1:27` 8 chips）。Stack欄は`62c`、lineは`BTN r8c`。実効configは`stack = "62c"`・`sb = "2c"`・`line = "BTN r8c, …"`で、scriptは書いたまま |
+| 非10進の卓の表示 | 卓の図は`pot 16c`・`eff 54c`・stack `54c`、木の表示は`Bet 8c`・`Call 8c`・`pot 24c`、Resultsは`pot 16c`・`bet 8c`。EVは`2.588 BB`のまま |
+| size表 | 「Replace with the default size table」で`[33%]`・`[50%]`・`[75%, a]`を書いた |
+| chip卓のLock & re-solve（上流固定） | `bb_chips = 3`・`sb = "1c"`・`stack = "60c"`のrunで、node `r15c`のlock（call 1）を上流固定で再solveした。run.tomlは`stack = "60c"`、`line = "BTN r6c, …, BTN b9c, …"`、`node = "r15c"`、`relockedFrom`は基準run |
+| 10進の卓 | 木の表示は`Bet 1.815`・`Raise to 6.38`、Runsのlineは`BTN r2.5, BB c` |
+| `no-rivers`のRiver再solve | Turnで BB bet 1・BTN call の後、River Ahで「River re-solved on demand」と戦略（check 44.3%、bet 1 55.7%）が出た |
+| cancelとresume | 1,164,212 nodeのflop spotを実行中にcancelするとiteration 50のcheckpointを書いて`canceled`になり、Resumeでiteration 100まで進んだ |
