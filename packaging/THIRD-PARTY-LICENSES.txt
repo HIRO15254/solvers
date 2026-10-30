@@ -10,7 +10,7 @@ First-party code is covered by the root licenses.
 Rust target union: aarch64-apple-darwin, x86_64-apple-darwin, x86_64-pc-windows-msvc, x86_64-unknown-linux-gnu
 No build timestamp or machine-local paths are included.
 
-SHA-256 Cargo.lock: ee48c114348d9fac0b23ace2053825f8c14a014a8c989348db3f205753fd603b
+SHA-256 Cargo.lock: 1e8a5783d65da43ecf3854629b304645bb72795840afd67af527b73b52d0a38c
 SHA-256 web/package-lock.json: 81377acf3c9690c9aa603dbd2a16efffb61ae8193fc472b89c2af6cbf5bc5781
 SHA-256 packaging/third-party.json: 590c3717bd1e57a49234e4a6c64846fe7854986f8064855bbfc2c0f9c958b85e
 

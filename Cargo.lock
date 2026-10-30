@@ -443,6 +443,7 @@ version = "0.2.0"
 dependencies = [
  "nlh",
  "serde",
+ "serde_json",
  "thiserror",
 ]
 
@@ -1226,6 +1227,7 @@ dependencies = [
  "economics",
  "nlh",
  "serde",
+ "serde_json",
  "sha2",
  "tempfile",
  "thiserror",
